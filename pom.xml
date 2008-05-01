@@ -35,7 +35,7 @@ under the License.
       <repository>
         <id>localhost</id>
         <name>dumping to target</name>
-        <url>file://${project.build.directory}/repo</url>
+        <url>file://${basedir}/target/repo/</url>
       </repository>
     </distributionManagement>
 </project>
