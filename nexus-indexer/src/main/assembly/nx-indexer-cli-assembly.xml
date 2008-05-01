@@ -1,0 +1,50 @@
+<assembly>
+  <id>cli</id>
+  <includeBaseDirectory>false</includeBaseDirectory>
+  <formats>
+    <format>jar</format>
+  </formats>
+  <fileSets>
+    <fileSet>
+      <directory>target/classes</directory>
+      <outputDirectory>/</outputDirectory>
+    </fileSet>
+    <fileSet>
+      <directory>src/main/resources</directory>
+      <outputDirectory>/</outputDirectory>
+    </fileSet>
+  </fileSets>
+  <dependencySets>
+    <dependencySet>
+      <outputDirectory>/</outputDirectory>
+          <outputFileNameMapping></outputFileNameMapping>
+      <unpack>true</unpack>
+      <scope>runtime</scope>
+      <excludes>
+        <exclude>org.codehaus.plexus:plexus-component-api</exclude>
+        <exclude>classworlds:classworlds</exclude>
+        <exclude>junit:junit</exclude>
+        <exclude>xml-apis:xml-apis</exclude>
+        <!-- archetypeng -->
+        <exclude>org.apache.maven.archetype:archetypeng-common</exclude>
+        <!-- <exclude>aspectj:aspectjrt</exclude> -->
+        <exclude>commons-collections:commons-collections</exclude>
+        <exclude>commons-io:commons-io</exclude>
+        <exclude>dom4j:dom4j</exclude>
+        <exclude>jdom:jdom</exclude>
+        <exclude>net.sourceforge.jchardet:jchardet</exclude>
+        <exclude>org.apache.maven.artifact:maven-artifact</exclude>
+        <exclude>org.apache.maven.doxia:doxia-sink-api</exclude>
+        <exclude>org.apache.maven:maven-core</exclude>
+        <exclude>org.apache.maven:maven-lifecycle</exclude>
+        <exclude>org.apache.maven:maven-profile</exclude>
+        <exclude>org.apache.maven:maven-project</exclude>
+        <exclude>org.apache.maven:maven-reporting-api</exclude>
+        <exclude>org.codehaus.plexus:plexus-interactivity-api</exclude>
+        <exclude>org.codehaus.plexus:plexus-velocity</exclude>
+        <exclude>oro:oro</exclude>
+        <exclude>velocity:velocity</exclude>
+      </excludes>		    
+    </dependencySet>
+  </dependencySets>
+</assembly>
