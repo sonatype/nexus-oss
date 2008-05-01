@@ -1,23 +1,18 @@
-<!--/*
- * Nexus: Maven Repository Manager
- * Copyright (C) 2008 Sonatype, Inc.                                                                                                                          
- * 
- * This file is part of Nexus.                                                                                                                                  
- * 
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see http://www.gnu.org/licenses/.
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+/*******************************************************************************
+ * Copyright (c) 2007-2008 Sonatype Inc
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
  *
- */-->
+ * Contributors:
+ *    Eugene Kuleshov (Sonatype)
+ *    Tamás Cservenák (Sonatype)
+ *    Brian Fox (Sonatype)
+ *    Jason Van Zyl (Sonatype)
+ *******************************************************************************/-->
 <project xmlns="http://maven.apache.org/POM/4.0.0"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
@@ -33,6 +28,44 @@
     <version>1.0-SNAPSHOT</version>
     <name>Sonatype Nexus: Indexer</name>
 
+    <licenses>
+		<license>
+			<name>Eclipse Public License</name>
+			<url>http://www.eclipse.org/org/documents/epl-v10.html</url>
+		</license>
+	</licenses>
+    <developers>
+		<developer>
+			<id>cstamas</id>
+			<name>Tamás Cservenák</name>
+			<email>cstamas@sonatype.com</email>
+			<organization>Sonatype</organization>
+			<roles>
+				<role>Developer</role>
+			</roles>
+			<timezone>2</timezone>
+		</developer>
+		<developer>
+			<id>brianf</id>
+			<name>Brian Fox</name>
+			<email>brian@sonatype.com</email>
+			<organization>Sonatype</organization>
+			<roles>
+				<role>Developer</role>
+			</roles>
+			<timezone>-6</timezone>
+		</developer>
+		<developer>
+			<id>eu</id>
+			<name>Eugene Kuleshov</name>
+			<email>eugene@sonatype.com</email>
+			<organization>Sonatype</organization>
+			<roles>
+				<role>Developer</role>
+			</roles>
+			<timezone>-6</timezone>
+		</developer>
+     </developers>
     <dependencies>
 
         <!-- Plexus -->

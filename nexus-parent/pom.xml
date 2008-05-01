@@ -28,7 +28,7 @@ under the License.
     <artifactId>nexus-parent</artifactId>
     <version>1-SNAPSHOT</version>
     <packaging>pom</packaging>
-    <name>Sonatype Nexus Components</name>
+    <name>Sonatype Nexus Parent</name>
 
     <dependencyManagement>
         <dependencies>
