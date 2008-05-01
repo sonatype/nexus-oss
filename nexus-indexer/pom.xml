@@ -31,7 +31,7 @@
     <groupId>org.sonatype.nexus</groupId>
     <artifactId>nexus-indexer</artifactId>
     <version>1.0-SNAPSHOT</version>
-    <name>Nexus (Shared Indexer)</name>
+    <name>Sonatype Nexus: Indexer</name>
 
     <dependencies>
 
