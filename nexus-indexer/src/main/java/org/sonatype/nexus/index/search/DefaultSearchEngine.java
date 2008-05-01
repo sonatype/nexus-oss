@@ -7,7 +7,7 @@
  *
  * Contributors:
  *    Eugene Kuleshov (Sonatype)
- *    Tam·s Cserven·k (Sonatype)
+ *    Tam√°s Cserven√°k (Sonatype)
  *    Brian Fox (Sonatype)
  *    Jason Van Zyl (Sonatype)
  *******************************************************************************/
@@ -66,6 +66,8 @@ public class DefaultSearchEngine
                 if ( artifactInfo != null )
                 {
                     artifactInfo.repository = ctx.getRepositoryId();
+                    
+                    artifactInfo.context = ctx.getId();
 
                     result.add( artifactInfo );
                 }
@@ -99,10 +101,15 @@ public class DefaultSearchEngine
 
                 if ( artifactInfo != null )
                 {
+                    artifactInfo.repository = ctx.getRepositoryId();
+
+                    artifactInfo.context = ctx.getId();
+
                     grouping.addArtifactInfo( result, artifactInfo );
                 }
             }
         }
+        
         return result;
 
     }
