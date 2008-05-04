@@ -21,12 +21,19 @@ under the License.
 	<parent>
 		<groupId>org.sonatype.spice</groupId>
 		<artifactId>spice-parent</artifactId>
-		<version>1-SNAPSHOT</version>
+		<version>1</version>
 	</parent>
 	<groupId>org.sonatype.plexus</groupId>
 	<artifactId>plexus-restlet-bridge</artifactId>
 	<version>1.0-SNAPSHOT</version>
 	<name>Plexus Restlet.org Bridge Component</name>
+    
+    <scm>
+        <connection>scm:svn:http://svn.sonatype.org/spice/trunk/plexus-restlet-bridge</connection>
+        <url>http://svn.sonatype.org/spice/trunk/plexus-restlet-bridge</url>
+        <developerConnection>scm:svn:https://svn.sonatype.org/spice/trunk/plexus-restlet-bridge</developerConnection>
+    </scm>
+    
 	<dependencies>
 		<dependency>
 			<groupId>org.sonatype.plexus</groupId>
