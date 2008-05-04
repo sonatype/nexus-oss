@@ -46,9 +46,9 @@
       <artifactId>nexus-rest-api</artifactId>
     </dependency>
     <dependency>
-      <groupId>com.sonatype.nexus.tools</groupId>
+      <groupId>org.sonatype.nexus.tools</groupId>
       <artifactId>nexus-migration-app</artifactId>
-      <version>1.0.0-beta-1</version>
+      <version>${project.version}</version>
       <classifier>cli</classifier>
       <scope>provided</scope>
     </dependency>
