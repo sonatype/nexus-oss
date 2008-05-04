@@ -22,7 +22,7 @@ under the License.
     <parent>
         <groupId>org.sonatype.forge</groupId>
         <artifactId>forge-parent</artifactId>
-        <version>1-SNAPSHOT</version>
+        <version>1</version>
     </parent>
     <groupId>org.sonatype.nexus</groupId>
     <artifactId>nexus-parent</artifactId>
