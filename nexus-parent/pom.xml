@@ -30,6 +30,12 @@ under the License.
     <packaging>pom</packaging>
     <name>Sonatype Nexus Parent</name>
 
+    <scm>
+        <connection>scm:svn:http://svn.sonatype.org/spice/trunk/nexus-parent</connection>
+        <url>http://svn.sonatype.org/spice/trunk/nexus-parent</url>
+        <developerConnection>scm:svn:https://svn.sonatype.org/spice/trunk/nexus-parent</developerConnection>
+    </scm>
+    
     <dependencyManagement>
         <dependencies>
             <dependency>
