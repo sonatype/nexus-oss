@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+/*******************************************************************************
+ * Copyright (c) 2007-2008 Sonatype Inc
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    Eugene Kuleshov (Sonatype)
+ *    Tamas Cservenak (Sonatype)
+ *    Brian Fox (Sonatype)
+ *    Jason Van Zyl (Sonatype)
+ *    Justin Richards (Sonatype)
+ *******************************************************************************/-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<!-- the version of maven's project object model -->
+  <modelVersion>4.0.0</modelVersion>
+<!-- Parent POM -->
+  <parent>
+    <groupId>org.sonatype.nexus</groupId>
+    <artifactId>nexus</artifactId>
+    <version>1.0.0-beta-3-SNAPSHOT</version>
+  </parent>
+  <!-- a unique name for this project -->
+  <artifactId>nexus-webapp</artifactId>
+  <!--we don't need this to be a jar except that the app assembler crashes if it's not-->
+  <packaging>jar</packaging>
+  <!-- a short but descriptive name for the project -->
+  <name>Nexus (Web Application frontend)</name>
+  <properties>
+    <!-- NOTE: MNG-3355 will fix this so we can use ${project.build.directory} instead of the hard-coded target directory. -->
+    <jsw-input>target/jsw-template</jsw-input>
+    <nexus-tools-input>target/nexus-tools</nexus-tools-input>
+  </properties>
+  <dependencies>
+    <dependency>
+      <groupId>org.sonatype.appbooter.plexus-platforms</groupId>
+      <artifactId>plexus-platform-jsw</artifactId>
+      <version>1.0</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-rest-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.sonatype.nexus.tools</groupId>
+      <artifactId>nexus-migration-app</artifactId>
+      <version>1.0.0-beta-1</version>
+      <classifier>cli</classifier>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.jsw-binaries</groupId>
+      <artifactId>jsw-binaries</artifactId>
+      <type>zip</type>
+      <scope>provided</scope>
+    </dependency>
+  </dependencies>
+  <build>
+    <filters>
+      <filter>src/main/filters/assemble.properties</filter>
+    </filters>
+    <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+        <filtering>false</filtering>
+      </resource>
+      <resource>
+        <directory>src/main/filtered-resources</directory>
+        <filtering>true</filtering>
+      </resource>
+      <resource>
+        <directory>src/main/bundle</directory>
+        <filtering>false</filtering>
+        <targetPath>../plexus-home</targetPath>
+      </resource>
+      <resource>
+        <directory>${jsw-input}</directory>
+        <filtering>true</filtering>
+        <excludes>
+          <exclude>**/*.so</exclude>
+          <exclude>**/*.dll</exclude>
+          <exclude>**/*.jnilib</exclude>
+          <exclude>**/*.exe</exclude>
+          <exclude>**/*.a</exclude>
+          <exclude>**/*.sl</exclude>
+          <exclude>**/wrapper</exclude>
+        </excludes>
+        <targetPath>bin/jsw</targetPath>
+      </resource>
+      <resource>
+        <directory>${jsw-input}</directory>
+        <filtering>false</filtering>
+        <includes>
+          <include>**/*.so</include>
+          <include>**/*.dll</include>
+          <include>**/*.jnilib</include>
+          <include>**/*.exe</include>
+          <include>**/*.a</include>
+          <include>**/*.sl</include>
+          <include>**/wrapper</include>
+        </includes>
+        <targetPath>bin/jsw</targetPath>
+      </resource>
+    </resources>
+    <plugins>
+      <plugin>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <version>2.0</version>
+        <executions>
+          <execution>
+            <id>unpack-jsw</id>
+            <phase>generate-resources</phase>
+            <goals>
+              <goal>unpack-dependencies</goal>
+            </goals>
+            <configuration>
+              <includeArtifactIds>jsw-binaries</includeArtifactIds>
+              <outputDirectory>${jsw-input}</outputDirectory>
+            </configuration>
+          </execution>
+          <execution>
+            <id>unpack-nexus-tools</id>
+            <phase>generate-resources</phase>
+            <goals>
+              <goal>copy-dependencies</goal>
+            </goals>
+            <configuration>
+              <includeArtifactIds>nexus-migration-app</includeArtifactIds>
+              <outputDirectory>${nexus-tools-input}</outputDirectory>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      
+      <plugin>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <descriptors>
+            <descriptor>src/main/assembly/bundle.xml</descriptor>
+            <descriptor>src/main/assembly/base.xml</descriptor>
+            <descriptor>src/main/assembly/app.xml</descriptor>
+          </descriptors>
+          <tarLongFileMode>gnu</tarLongFileMode>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.sonatype.plugins</groupId>
+        <artifactId>plx-maven-plugin</artifactId>
+        <version>1.0-SNAPSHOT</version>
+        <configuration>
+          <includeTestClasspath>true</includeTestClasspath>
+          <!-- prependClasspaths>
+            <prependClasspath>${project.build.directory}/plexus-home/conf</prependClasspath>
+          </prependClasspaths-->
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>

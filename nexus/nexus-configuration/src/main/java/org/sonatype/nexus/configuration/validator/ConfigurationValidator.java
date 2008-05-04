@@ -1,0 +1,59 @@
+/*
+ * Nexus: Maven Repository Manager
+ * Copyright (C) 2008 Sonatype Inc.                                                                                                                          
+ * 
+ * This file is part of Nexus.                                                                                                                                  
+ * 
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see http://www.gnu.org/licenses/.
+ *
+ */
+package org.sonatype.nexus.configuration.validator;
+
+import org.sonatype.nexus.configuration.model.CRepository;
+import org.sonatype.nexus.configuration.model.CRepositoryShadow;
+
+/**
+ * The validator used to validate current configuration in boot-up sequence.
+ * 
+ * @author cstamas
+ */
+public interface ConfigurationValidator
+{
+
+    String ROLE = ConfigurationValidator.class.getName();
+
+    /**
+     * Validates the model. This does "whole" (contextual) config validation.
+     * 
+     * @param request
+     * @returns response
+     */
+    ValidationResponse validateModel( ValidationRequest request );
+
+    /**
+     * Validates a repository configuration.
+     * 
+     * @param repository
+     * @return
+     */
+    ValidationResponse validateRepository( CRepository repository );
+
+    /**
+     * Validates a repository configuration.
+     * 
+     * @param repository
+     * @return
+     */
+    ValidationResponse validateRepository( CRepositoryShadow repository );
+}

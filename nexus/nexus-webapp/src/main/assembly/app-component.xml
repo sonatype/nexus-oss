@@ -1,0 +1,25 @@
+<component>
+  <dependencySets>
+    <dependencySet>
+      <outputDirectory>/runtime/apps/nexus/lib</outputDirectory>
+      <fileMode>0644</fileMode>
+      <scope>runtime</scope>
+    </dependencySet>
+  </dependencySets>
+  <fileSets>
+    <fileSet>
+      <directory>${basedir}/src/main/bundle</directory>
+      <outputDirectory>/runtime/apps/nexus</outputDirectory>
+      <fileMode>0644</fileMode>
+    </fileSet>
+    <fileSet>
+      <directory>${basedir}/src/main/webapp</directory>
+      <outputDirectory>/runtime/apps/nexus/webapp</outputDirectory>
+    </fileSet>
+    <fileSet>
+      <directory>${basedir}/target/nexus-tools</directory>
+      <outputDirectory>/runtime/apps/nexus/tools</outputDirectory>
+      <fileMode>0644</fileMode>
+    </fileSet>
+  </fileSets>
+</component>

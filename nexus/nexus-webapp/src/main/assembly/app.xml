@@ -1,0 +1,10 @@
+<assembly>
+  <id>upgrade</id>
+  <formats>
+    <format>tar.gz</format>
+    <format>zip</format>
+  </formats>
+  <componentDescriptors>
+    <componentDescriptor>src/main/assembly/app-component.xml</componentDescriptor>
+  </componentDescriptors>
+</assembly>

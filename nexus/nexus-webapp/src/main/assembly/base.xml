@@ -1,0 +1,10 @@
+<assembly>
+  <id>base</id>
+  <formats>
+    <format>tar.gz</format>
+    <format>zip</format>
+  </formats>
+  <componentDescriptors>
+    <componentDescriptor>src/main/assembly/base-component.xml</componentDescriptor>
+  </componentDescriptors>
+</assembly>

@@ -1,0 +1,47 @@
+<html>
+  <head>
+    <title>Index of $request.resourceRef.path</title>
+  </head>
+  <body>
+    <h1>Index of $request.resourceRef.path</h1>
+    <table cellspacing="10">
+      <tr>
+        <th align="left">Name</th>
+        <th>Last Modified</th>
+        <th>Size</th>
+        <th>Description</th>
+      </tr>
+      <tr>
+        <td>
+          <a href="$request.resourceRef.parentRef">Parent Directory</a>
+        </td>
+      </tr>
+        #foreach( $listItem in $listItems )
+          <tr>
+            <td>
+              #if( $listItem.resourceUri.endsWith( '/' ) )
+                #set( $uriLength = $listItem.resourceUri.length() - 2 )
+                #set( $startIndex = $listItem.resourceUri.lastIndexOf( '/', $uriLength ) + 1 )
+                #set( $linkName = $listItem.resourceUri.substring( $startIndex ) )
+                <a href="$listItem.resourceUri">$linkName</a>
+              #else
+                #set( $startIndex = $listItem.resourceUri.lastIndexOf( '/' ) + 1 )
+                #set( $linkName = $listItem.resourceUri.substring( $startIndex ) )
+                <a href="$listItem.resourceUri">$linkName</a>
+              #end
+            </td>
+            <td align="center">
+              $listItem.lastModified
+            </td>
+            <td align="center">
+              #if( $listItem.sizeOnDisk == -1 )
+                -
+              #else
+                $listItem.sizeOnDisk
+              #end
+            </td>
+          </tr>
+        #end
+    </table>
+  </body>
+</html>
