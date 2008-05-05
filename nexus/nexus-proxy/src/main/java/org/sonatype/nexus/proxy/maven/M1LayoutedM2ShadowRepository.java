@@ -60,13 +60,13 @@ public class M1LayoutedM2ShadowRepository
     }
 
     protected String transformMaster2Shadow( String path )
-    throws ItemNotFoundException
+        throws ItemNotFoundException
     {
         return transformM2toM1( path );
     }
 
     protected String transformShadow2Master( String path )
-    throws ItemNotFoundException
+        throws ItemNotFoundException
     {
         return transformM1toM2( path );
     }

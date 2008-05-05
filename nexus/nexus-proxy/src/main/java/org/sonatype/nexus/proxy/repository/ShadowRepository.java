@@ -36,7 +36,6 @@ import org.sonatype.nexus.proxy.events.RepositoryItemEventDelete;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventStore;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.DefaultStorageLinkItem;
-import org.sonatype.nexus.proxy.item.RepositoryContentLocator;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
@@ -117,7 +116,7 @@ public abstract class ShadowRepository
                 try
                 {
                     String tuid = transformMaster2Shadow( ievt.getItemUid().getPath() );
-                    
+
                     if ( ievt instanceof RepositoryItemEventStore || ievt instanceof RepositoryItemEventCache )
                     {
                         DefaultStorageLinkItem link = new DefaultStorageLinkItem( this, tuid, true, true, ievt
@@ -143,32 +142,26 @@ public abstract class ShadowRepository
             StorageException,
             AccessDeniedException
     {
+        StorageItem result = null;
+
         try
         {
-            StorageItem result = super.doRetrieveItem( localOnly, uid, context );
-
-            if ( StorageFileItem.class.isAssignableFrom( result.getClass() ) )
-            {
-                String transformedPath = transformShadow2Master( uid.getPath() );
-                if (transformedPath == null)
-                {
-                    throw new ItemNotFoundException( uid.getPath() );
-                }
-                // if result should have content, spoof it with content coming from master repository
-                RepositoryItemUid tuid = new RepositoryItemUid( getMasterRepository(), transformedPath );
-
-                RepositoryContentLocator rcl = new RepositoryContentLocator( tuid );
-
-                ( (StorageFileItem) result ).setContentLocator( rcl );
-            }
+            result = super.doRetrieveItem( localOnly, uid, context );
 
             return result;
         }
         catch ( ItemNotFoundException e )
         {
+            // if it is thrown by super.doRetrieveItem()
+            String transformedPath = transformShadow2Master( uid.getPath() );
+
+            if ( transformedPath == null )
+            {
+                throw new ItemNotFoundException( uid.getPath() );
+            }
+
             // delegate the call to the master
-            RepositoryItemUid tuid = new RepositoryItemUid( getMasterRepository(), transformShadow2Master( uid
-                .getPath() ) );
+            RepositoryItemUid tuid = new RepositoryItemUid( getMasterRepository(), transformedPath );
 
             return ( (AbstractRepository) getMasterRepository() ).doRetrieveItem( localOnly, tuid, context );
         }
@@ -213,7 +206,7 @@ public abstract class ShadowRepository
      * @return the shadow path
      */
     protected abstract String transformMaster2Shadow( String path )
-    throws ItemNotFoundException;
+        throws ItemNotFoundException;
 
     /**
      * Gets the master path from shadow path.
@@ -222,7 +215,7 @@ public abstract class ShadowRepository
      * @return the master path
      */
     protected abstract String transformShadow2Master( String path )
-    throws ItemNotFoundException;
+        throws ItemNotFoundException;
 
     protected class SyncWalker
         extends StoreFileWalker

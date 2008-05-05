@@ -37,7 +37,7 @@ public class M2LayoutedM1ShadowRepository
     private ContentClass contentClass = new Maven2ContentClass();
 
     private ContentClass masterContentClass = new Maven1ContentClass();
-    
+
     /**
      * This repo provides Maven2 content.
      */
@@ -53,20 +53,20 @@ public class M2LayoutedM1ShadowRepository
     {
         return masterContentClass;
     }
-    
+
     protected String gav2path( Gav gav )
     {
         return M2GavCalculator.calculateRepositoryPath( gav );
     }
 
     protected String transformMaster2Shadow( String path )
-    throws ItemNotFoundException
+        throws ItemNotFoundException
     {
         return transformM1toM2( path );
     }
 
     protected String transformShadow2Master( String path )
-    throws ItemNotFoundException
+        throws ItemNotFoundException
     {
         return transformM2toM1( path );
     }
