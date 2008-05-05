@@ -112,7 +112,8 @@
 	<!-- Shortcut for outnumbered deps :) -->
 	<properties>
 		<slf4j.version>1.4.3</slf4j.version>
-		<nexus.version>1.0.0-beta-3-SNAPSHOT</nexus.version>
+		<maven.version>2.1-SONATYPE-653485</maven.version>
+        <maven.artifact.version>3.0-SONATYPE-653272</maven.artifact.version>
 	</properties>
 
 	<dependencyManagement>
@@ -243,32 +244,32 @@
 			<dependency>
 				<groupId>org.apache.maven</groupId>
 				<artifactId>maven-model</artifactId>
-				<version>2.1-SNAPSHOT</version>
+				<version>${maven.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.maven</groupId>
 				<artifactId>maven-project</artifactId>
-				<version>2.1-SNAPSHOT</version>
+				<version>${maven.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.maven</groupId>
 				<artifactId>maven-repository-metadata</artifactId>
-				<version>2.1-SNAPSHOT</version>
+				<version>${maven.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.maven</groupId>
 				<artifactId>maven-plugin-api</artifactId>
-				<version>2.1-SNAPSHOT</version>
+				<version>${maven.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.maven</groupId>
 				<artifactId>maven-core</artifactId>
-				<version>2.1-SNAPSHOT</version>
+				<version>${maven.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.maven.artifact</groupId>
 				<artifactId>maven-artifact</artifactId>
-				<version>3.0-SNAPSHOT</version>
+				<version>${maven.artifact.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.maven.archetype</groupId>
@@ -457,7 +458,7 @@
 			<dependency>
 				<groupId>org.sonatype.nexus</groupId>
 				<artifactId>nexus-indexer</artifactId>
-				<version>1.0-SNAPSHOT</version>
+				<version>1.0-beta-3-SNAPSHOT</version>
 			</dependency>
 			<dependency>
 				<groupId>org.sonatype.nexus</groupId>
