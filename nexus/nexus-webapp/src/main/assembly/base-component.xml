@@ -11,7 +11,7 @@
   </dependencySets>
   <fileSets>
     <fileSet>
-      <directory>${basedir}/src/main/base-bundle</directory>
+      <directory>src/main/base-bundle</directory>
       <outputDirectory>/</outputDirectory>
       <fileMode>0644</fileMode>
     </fileSet>
@@ -20,7 +20,7 @@
          NOTE: Only include the wrapper executables here, so we can set the executable file attribute.
     -->
     <fileSet>
-      <directory>${project.build.outputDirectory}/bin/jsw</directory>
+      <directory>target/jsw-template</directory>
       <outputDirectory>bin/jsw</outputDirectory>
       <includes>
         <include>**/wrapper</include>
@@ -34,7 +34,7 @@
          <files/> section, and the wrapper executables are handled above, where the executable bit is set.
     -->
     <fileSet>
-      <directory>${project.build.outputDirectory}/bin/jsw</directory>
+      <directory>target/jsw-template</directory>
       <outputDirectory>bin/jsw</outputDirectory>
       <excludes>
         <exclude>**/app</exclude>
@@ -50,86 +50,86 @@
          that unfortunately hasn't been implemented yet.
     -->
     <file>
-      <source>${project.build.outputDirectory}/bin/jsw/linux-ppc-64/app</source>
+      <source>target/jsw-template/linux-ppc-64/app</source>
       <outputDirectory>bin/jsw/linux-ppc-64</outputDirectory>
       <destName>nexus</destName>
       <fileMode>0755</fileMode>
     </file>
     <file>
-      <source>${project.build.outputDirectory}/bin/jsw/linux-x86-32/app</source>
+      <source>target/jsw-template/linux-x86-32/app</source>
       <outputDirectory>bin/jsw/linux-x86-32</outputDirectory>
       <destName>nexus</destName>
       <fileMode>0755</fileMode>
     </file>
     <file>
-      <source>${project.build.outputDirectory}/bin/jsw/linux-x86-64/app</source>
+      <source>target/jsw-template/linux-x86-64/app</source>
       <outputDirectory>bin/jsw/linux-x86-64</outputDirectory>
       <destName>nexus</destName>
       <fileMode>0755</fileMode>
     </file>
     <file>
-      <source>${project.build.outputDirectory}/bin/jsw/macosx-universal-32/app</source>
+      <source>target/jsw-template/macosx-universal-32/app</source>
       <outputDirectory>bin/jsw/macosx-universal-32</outputDirectory>
       <destName>nexus</destName>
       <fileMode>0755</fileMode>
     </file>
     <file>
-      <source>${project.build.outputDirectory}/bin/jsw/solaris-sparc-32/app</source>
+      <source>target/jsw-template/solaris-sparc-32/app</source>
       <outputDirectory>bin/jsw/solaris-sparc-32</outputDirectory>
       <destName>nexus</destName>
       <fileMode>0755</fileMode>
     </file>
     <file>
-      <source>${project.build.outputDirectory}/bin/jsw/solaris-sparc-64/app</source>
+      <source>target/jsw-template/solaris-sparc-64/app</source>
       <outputDirectory>bin/jsw/solaris-sparc-64</outputDirectory>
       <destName>nexus</destName>
       <fileMode>0755</fileMode>
     </file>
     <file>
-      <source>${project.build.outputDirectory}/bin/jsw/solaris-x86-32/app</source>
+      <source>target/jsw-template/solaris-x86-32/app</source>
       <outputDirectory>bin/jsw/solaris-x86-32</outputDirectory>
       <destName>nexus</destName>
       <fileMode>0755</fileMode>
     </file>
     <!-- Windows scripts -->
     <file>
-      <source>${project.build.outputDirectory}/bin/jsw/windows-x86-32/App.bat</source>
+      <source>target/jsw-template/windows-x86-32/App.bat</source>
       <outputDirectory>bin/jsw/windows-x86-32</outputDirectory>
       <destName>Nexus.bat</destName>
       <fileMode>0755</fileMode>
     </file>
     <file>
-      <source>${project.build.outputDirectory}/bin/jsw/windows-x86-32/InstallApp.bat</source>
+      <source>target/jsw-template/windows-x86-32/InstallApp.bat</source>
       <outputDirectory>bin/jsw/windows-x86-32</outputDirectory>
       <destName>InstallNexus.bat</destName>
       <fileMode>0755</fileMode>
     </file>
     <file>
-      <source>${project.build.outputDirectory}/bin/jsw/windows-x86-32/PauseApp.bat</source>
+      <source>target/jsw-template/windows-x86-32/PauseApp.bat</source>
       <outputDirectory>bin/jsw/windows-x86-32</outputDirectory>
       <destName>PauseNexus.bat</destName>
       <fileMode>0755</fileMode>
     </file>
     <file>
-      <source>${project.build.outputDirectory}/bin/jsw/windows-x86-32/ResumeApp.bat</source>
+      <source>target/jsw-template/windows-x86-32/ResumeApp.bat</source>
       <outputDirectory>bin/jsw/windows-x86-32</outputDirectory>
       <destName>ResumeNexus.bat</destName>
       <fileMode>0755</fileMode>
     </file>
     <file>
-      <source>${project.build.outputDirectory}/bin/jsw/windows-x86-32/StartApp.bat</source>
+      <source>target/jsw-template/windows-x86-32/StartApp.bat</source>
       <outputDirectory>bin/jsw/windows-x86-32</outputDirectory>
       <destName>StartNexus.bat</destName>
       <fileMode>0755</fileMode>
     </file>
     <file>
-      <source>${project.build.outputDirectory}/bin/jsw/windows-x86-32/StopApp.bat</source>
+      <source>target/jsw-template/windows-x86-32/StopApp.bat</source>
       <outputDirectory>bin/jsw/windows-x86-32</outputDirectory>
       <destName>StopNexus.bat</destName>
       <fileMode>0755</fileMode>
     </file>
     <file>
-      <source>${project.build.outputDirectory}/bin/jsw/windows-x86-32/UninstallApp.bat</source>
+      <source>target/jsw-template/windows-x86-32/UninstallApp.bat</source>
       <outputDirectory>bin/jsw/windows-x86-32</outputDirectory>
       <destName>UninstallNexus.bat</destName>
       <fileMode>0755</fileMode>

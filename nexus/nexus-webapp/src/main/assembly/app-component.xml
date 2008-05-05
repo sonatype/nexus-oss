@@ -8,16 +8,16 @@
   </dependencySets>
   <fileSets>
     <fileSet>
-      <directory>${basedir}/src/main/bundle</directory>
+      <directory>src/main/bundle</directory>
       <outputDirectory>/runtime/apps/nexus</outputDirectory>
       <fileMode>0644</fileMode>
     </fileSet>
     <fileSet>
-      <directory>${basedir}/src/main/webapp</directory>
+      <directory>src/main/webapp</directory>
       <outputDirectory>/runtime/apps/nexus/webapp</outputDirectory>
     </fileSet>
     <fileSet>
-      <directory>${basedir}/target/nexus-tools</directory>
+      <directory>target/nexus-tools</directory>
       <outputDirectory>/runtime/apps/nexus/tools</outputDirectory>
       <fileMode>0644</fileMode>
     </fileSet>
