@@ -114,9 +114,10 @@ public abstract class ShadowRepository
             RepositoryItemEvent ievt = (RepositoryItemEvent) evt;
             if ( ievt.getItemUid().getPath().endsWith( ".pom" ) || ievt.getItemUid().getPath().endsWith( ".jar" ) )
             {
-                String tuid = transformMaster2Shadow( ievt.getItemUid().getPath() );
                 try
                 {
+                    String tuid = transformMaster2Shadow( ievt.getItemUid().getPath() );
+                    
                     if ( ievt instanceof RepositoryItemEventStore || ievt instanceof RepositoryItemEventCache )
                     {
                         DefaultStorageLinkItem link = new DefaultStorageLinkItem( this, tuid, true, true, ievt
@@ -148,9 +149,13 @@ public abstract class ShadowRepository
 
             if ( StorageFileItem.class.isAssignableFrom( result.getClass() ) )
             {
+                String transformedPath = transformShadow2Master( uid.getPath() );
+                if (transformedPath == null)
+                {
+                    throw new ItemNotFoundException( uid.getPath() );
+                }
                 // if result should have content, spoof it with content coming from master repository
-                RepositoryItemUid tuid = new RepositoryItemUid( getMasterRepository(), transformShadow2Master( uid
-                    .getPath() ) );
+                RepositoryItemUid tuid = new RepositoryItemUid( getMasterRepository(), transformedPath );
 
                 RepositoryContentLocator rcl = new RepositoryContentLocator( tuid );
 
@@ -207,7 +212,8 @@ public abstract class ShadowRepository
      * @param path the path
      * @return the shadow path
      */
-    protected abstract String transformMaster2Shadow( String path );
+    protected abstract String transformMaster2Shadow( String path )
+    throws ItemNotFoundException;
 
     /**
      * Gets the master path from shadow path.
@@ -215,7 +221,8 @@ public abstract class ShadowRepository
      * @param path the path
      * @return the master path
      */
-    protected abstract String transformShadow2Master( String path );
+    protected abstract String transformShadow2Master( String path )
+    throws ItemNotFoundException;
 
     protected class SyncWalker
         extends StoreFileWalker
@@ -228,9 +235,9 @@ public abstract class ShadowRepository
         {
             if ( item.getPath().endsWith( ".pom" ) || item.getPath().endsWith( ".jar" ) )
             {
-                String tuid = transformMaster2Shadow( item.getRepositoryItemUid().getPath() );
                 try
                 {
+                    String tuid = transformMaster2Shadow( item.getRepositoryItemUid().getPath() );
                     DefaultStorageLinkItem link = new DefaultStorageLinkItem( repository, tuid, true, true, item
                         .getRepositoryItemUid().toString() );
                     storeItem( link );

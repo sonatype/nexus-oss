@@ -22,6 +22,7 @@ package org.sonatype.nexus.proxy.maven;
 
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.artifact.M2GavCalculator;
+import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 
 /**
@@ -59,11 +60,13 @@ public class M2LayoutedM1ShadowRepository
     }
 
     protected String transformMaster2Shadow( String path )
+    throws ItemNotFoundException
     {
         return transformM1toM2( path );
     }
 
     protected String transformShadow2Master( String path )
+    throws ItemNotFoundException
     {
         return transformM2toM1( path );
     }

@@ -85,8 +85,14 @@ public abstract class LayoutConverterShadowRepository
      * @return
      */
     protected String transformM1toM2( String path )
+    throws ItemNotFoundException
     {
         Gav gav = M1GavCalculator.calculate( path );
+        //Unsupported path
+        if (gav == null)
+        {
+            throw new ItemNotFoundException( path );
+        }
         // m2 repo is layouted as:
         // g/i/d
         // aid
@@ -110,9 +116,16 @@ public abstract class LayoutConverterShadowRepository
      * @param path
      * @return
      */
-    protected String transformM2toM1( String path )
+    protected String transformM2toM1( String path ) 
+    throws ItemNotFoundException
     {
         Gav gav = M2GavCalculator.calculate( path );
+        
+        //Unsupported path
+        if (gav == null)
+        {
+            throw new ItemNotFoundException( path );
+        }
         // m1 repo is layouted as:
         // g.i.d
         // poms/jars/java-sources/licenses
