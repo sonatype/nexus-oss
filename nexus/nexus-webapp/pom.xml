@@ -149,8 +149,9 @@
         <configuration>
           <descriptors>
             <descriptor>src/main/assembly/bundle.xml</descriptor>
-            <descriptor>src/main/assembly/base.xml</descriptor>
-            <descriptor>src/main/assembly/app.xml</descriptor>
+            <!--base changed...no updates for this version-->
+            <!--<descriptor>src/main/assembly/base.xml</descriptor>
+                               <descriptor>src/main/assembly/app.xml</descriptor>-->
           </descriptors>
           <tarLongFileMode>gnu</tarLongFileMode>
         </configuration>
