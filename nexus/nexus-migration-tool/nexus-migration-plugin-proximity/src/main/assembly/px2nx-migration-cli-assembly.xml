@@ -21,8 +21,8 @@
       <unpack>true</unpack>
       <scope>runtime</scope>
       <excludes>
-        <exclude>com.sonatype.nexus:nexus-proxy</exclude>
-        <exclude>com.sonatype.nexus:nexus-indexer</exclude>
+        <exclude>org.sonatype.nexus:nexus-proxy</exclude>
+        <exclude>org.sonatype.nexus:nexus-indexer</exclude>
         <exclude>org.codehaus.plexus:plexus-component-api</exclude>
         <exclude>classworlds:classworlds</exclude>
         <exclude>junit:junit</exclude>

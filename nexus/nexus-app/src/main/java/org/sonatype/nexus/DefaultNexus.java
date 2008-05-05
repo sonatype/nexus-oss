@@ -852,7 +852,7 @@ public class DefaultNexus
             Properties props = new Properties();
 
             InputStream is = getClass().getResourceAsStream(
-                "/META-INF/maven/com.sonatype.nexus/nexus-app/pom.properties" );
+                "/META-INF/maven/org.sonatype.nexus/nexus-app/pom.properties" );
 
             if ( is != null )
             {
@@ -864,7 +864,7 @@ public class DefaultNexus
         catch ( IOException e )
         {
             getLogger().warn(
-                "Could not load/read Nexus version from /META-INF/maven/com.sonatype.nexus/nexus-app/pom.properties",
+                "Could not load/read Nexus version from /META-INF/maven/org.sonatype.nexus/nexus-app/pom.properties",
                 e );
 
             systemStatus.setVersion( "unknown" );
