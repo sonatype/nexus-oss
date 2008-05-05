@@ -9,7 +9,7 @@
  *
  * Contributors:
  *    Eugene Kuleshov (Sonatype)
- *    Tamás Cservenák (Sonatype)
+ *    Tamas Cservenak (Sonatype)
  *    Brian Fox (Sonatype)
  *    Jason Van Zyl (Sonatype)
  *******************************************************************************/-->
@@ -25,7 +25,7 @@
 
     <groupId>org.sonatype.nexus</groupId>
     <artifactId>nexus-indexer</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0-beta-3-SNAPSHOT</version>
     <name>Sonatype Nexus: Indexer</name>
 
     <licenses>
@@ -37,7 +37,7 @@
     <developers>
 		<developer>
 			<id>cstamas</id>
-			<name>Tamás Cservenák</name>
+			<name>Tamas Cservenak</name>
 			<email>cstamas@sonatype.com</email>
 			<organization>Sonatype</organization>
 			<roles>
@@ -66,6 +66,12 @@
 			<timezone>-6</timezone>
 		</developer>
      </developers>
+     
+    <properties>
+		<maven.version>2.1-SONATYPE-653485</maven.version>
+        <maven.artifact.version>3.0-SONATYPE-653272</maven.artifact.version>
+	</properties>
+     
     <dependencies>
 
         <!-- Plexus -->
@@ -104,17 +110,17 @@
         <dependency>
             <groupId>org.apache.maven</groupId>
             <artifactId>maven-model</artifactId>
-            <version>2.1-SNAPSHOT</version>
+            <version>${maven.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.maven</groupId>
             <artifactId>maven-plugin-api</artifactId>
-            <version>2.1-SNAPSHOT</version>
+            <version>${maven.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.maven.artifact</groupId>
             <artifactId>maven-artifact</artifactId>
-            <version>3.0-SNAPSHOT</version>
+            <version>${maven.artifact.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.maven.archetype</groupId>
