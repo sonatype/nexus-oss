@@ -168,7 +168,7 @@ Sonatype.repoServer.GroupsEditPanel = function(config){
                   if(tree.root.childNodes.length < 1) {
                     this.markTreeInvalid(tree,null);
                   }
-                  else {
+                  else if (tree.invalid) {
                     //remove error messaging
                     tree.getEl().child('.x-panel-body').setStyle({
                       'background-color' : '#FFFFFF',
