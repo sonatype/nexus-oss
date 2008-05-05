@@ -130,25 +130,14 @@ Sonatype.repoServer.ServerEditPanel = function(config){
       }, //end http conn
       {
         xtype: 'fieldset',
-        checkboxToggle:true,
-        collapsed: true,
+        checkboxToggle:false,
         id: this.id + '_' + 'securitySettings',
-        title: 'Security Settings (optional)',
+        title: 'Security Settings',
         anchor: Sonatype.view.FIELDSET_OFFSET,
+        collapsible: true,
         autoHeight:true,
         layoutConfig: {
           labelSeparator: ''
-        },
-        listeners: {
-          'expand' : {
-            fn: this.optionalFieldsetExpandHandler,
-            scope: this
-          },
-          'collapse' : {
-            fn: this.optionalFieldsetCollapseHandler,
-            scope: this,
-            delay: 100
-          }
         },
         items: [
           { 
