@@ -111,6 +111,14 @@
 		<plugins>
 			<plugin>
 				<artifactId>maven-assembly-plugin</artifactId>
+				<dependencies>
+				  <dependency>
+				    <groupId>org.sonatype.components</groupId>
+				    <artifactId>maven-assembly-helpers</artifactId>
+				    <version>1.0-SNAPSHOT</version>
+				  </dependency>
+				</dependencies>
+				
 				<executions>
 					<execution>
 						<phase>package</phase>
