@@ -121,20 +121,10 @@
 				<plugin>
 					<groupId>org.codehaus.plexus</groupId>
 					<artifactId>plexus-maven-plugin</artifactId>
-					<version>1.3.8</version>
-					<executions>
-						<execution>
-							<goals>
-								<goal>descriptor</goal>
-								<goal>merge-descriptors</goal>
-							</goals>
-						</execution>
-					</executions>
 				</plugin>
 				<plugin>
 					<groupId>org.codehaus.modello</groupId>
 					<artifactId>modello-maven-plugin</artifactId>
-					<version>1.0-alpha-17</version>
 				</plugin>
 			</plugins>
 		</pluginManagement>

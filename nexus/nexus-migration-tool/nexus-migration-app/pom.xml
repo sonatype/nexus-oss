@@ -1,19 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-/*******************************************************************************
- * Copyright (c) 2007-2008 Sonatype Inc
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
- *
- * Contributors:
- *    Eugene Kuleshov (Sonatype)
- *    Tamas Cservenak (Sonatype)
- *    Brian Fox (Sonatype)
- *    Jason Van Zyl (Sonatype)
- *******************************************************************************/-->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	/*******************************************************************************
+	* Copyright (c) 2007-2008 Sonatype Inc
+	* All rights reserved. This program and the accompanying materials
+	* are made available under the terms of the Eclipse Public License v1.0
+	* which accompanies this distribution, and is available at
+	* http://www.eclipse.org/legal/epl-v10.html
+	*
+	* Contributors:
+	*    Eugene Kuleshov (Sonatype)
+	*    Tamas Cservenak (Sonatype)
+	*    Brian Fox (Sonatype)
+	*    Jason Van Zyl (Sonatype)
+	*******************************************************************************/-->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
 	<!-- Parent POM -->
@@ -60,7 +61,13 @@
 		</dependency>
 		<dependency>
 			<groupId>org.codehaus.plexus</groupId>
+			<artifactId>plexus-classworlds</artifactId>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.codehaus.plexus</groupId>
 			<artifactId>plexus-container-default</artifactId>
+			<scope>compile</scope>
 		</dependency>
 
 		<dependency>
@@ -114,11 +121,15 @@
 				</executions>
 				<configuration>
 					<descriptors>
-						<descriptor>src/main/assembly/migration-cli-assembly.xml</descriptor>
+						<descriptor>
+							src/main/assembly/migration-cli-assembly.xml
+						</descriptor>
 					</descriptors>
 					<archive>
 						<manifest>
-							<mainClass>org.sonatype.nexus.tools.migration.cli.NexusMigrationToolCli</mainClass>
+							<mainClass>
+								org.sonatype.nexus.tools.migration.cli.NexusMigrationToolCli
+							</mainClass>
 						</manifest>
 					</archive>
 				</configuration>
@@ -126,6 +137,20 @@
 			<plugin>
 				<groupId>org.codehaus.plexus</groupId>
 				<artifactId>plexus-maven-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>descriptor</id>
+						<goals>
+							<goal>descriptor</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>merge</id>
+						<goals>
+							<goal>merge-descriptors</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 	</build>
