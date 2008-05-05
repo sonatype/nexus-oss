@@ -75,7 +75,7 @@ Sonatype.repoServer.SearchPanel = function(config){
   this.searchField = new Ext.app.SearchField({
     id: 'search-all-field',
     searchPanel: this,
-    width: 400,
+    width: 400
   });
   
   this.filenamePanel = new Ext.Panel({
@@ -85,7 +85,10 @@ Sonatype.repoServer.SearchPanel = function(config){
       if ( p.filenameLabel ) {
         p.remove( p.filenameLabel );
       }
-      p.add( p.filenameLabel = new Ext.form.Label({ text: filename }));
+      p.add( p.filenameLabel = new Ext.form.Label({
+        text: filename,
+        style: 'font-size:11px'
+      }));
       if ( p.rendered ) {
         p.doLayout();
       }
@@ -94,7 +97,7 @@ Sonatype.repoServer.SearchPanel = function(config){
 
   this.appletPanel = new Ext.Panel({
     fieldLabel: '',
-    html: '<divid="checksumContainer"></div>'
+    html: '<div style="width:10px"></div>'
   });
   
   Sonatype.repoServer.SearchPanel.superclass.constructor.call(this, {
@@ -109,17 +112,15 @@ Sonatype.repoServer.SearchPanel = function(config){
         height: 36,
         frame: true,
         layout: 'table',
-        layoutConfig: {
-          columns: 6
-        },
         items: [
           {
             xtype: 'label',
             text: 'Search:',
+            style: 'font-size: 11px'
           },
           this.searchField,
           {
-            html: '<div style="width: 20px"></div>',
+            html: '<div style="width: 20px"></div>'
           },
           new Ext.ux.form.BrowseButton({
             text: 'Checksum Search...',
@@ -132,47 +133,43 @@ Sonatype.repoServer.SearchPanel = function(config){
             handler:function( b ) {
               var filename = b.detachInputFile().getValue();
 
-              b.searchPanel.filenamePanel.setFilenameLabel(
-                b.searchPanel.filenamePanel, filename );
-
               if ( b.appletPanel ) {
                 var owner = b.appletPanel.ownerCt;
                 owner.remove( this.appletPanel );
                 owner.add( new Ext.Panel({
-                  html: '<div id="checksumContainer">' +
+                  html: '<div id="checksumContainer" style="width:10px">' +
                     '<applet code="org/sonatype/nexus/applet/DigestApplet.class" ' +
                       'archive="' + Sonatype.config.resourcePath + '/digestapplet.jar" ' +
-                      'width="120" height="3" name="digestApplet"></applet>' +
+                      'width="10" height="10" name="digestApplet"></applet>' +
                    '</div>'
                 })); 
                 owner.doLayout();
                 b.appletPanel = null;
               }
 
+              b.disable();
               if ( document.digestApplet ) {
-                b.searchPanel.searchField.setRawValue(
-                  document.digestApplet.digest( filename ) );
-                b.searchPanel.startSearch( b.searchPanel );
-              }
-              else {
-                b.disable();
+                b.searchPanel.filenamePanel.setFilenameLabel(
+                  b.searchPanel.filenamePanel, 'Loading...' );
+                var f = function( b, filename ) {
+                  b.searchPanel.searchField.setRawValue(
+                    document.digestApplet.digest( filename ) );
+                  b.searchPanel.startSearch( b.searchPanel );
+                  b.searchPanel.filenamePanel.setFilenameLabel(
+                    b.searchPanel.filenamePanel, filename );
+                  b.enable();
+                }
+                f.defer( 200, b, [b, filename] );
               }
             }
           }),
-          {
-            html: '<div style="width: 10px"></div>',
-          },
-          this.filenamePanel,
-          {
-            html: '<div></div>',
-            colspan: 3
-          },
           {
             xtype:'panel',
             items:[
               this.appletPanel
             ]
-          }
+          },
+          this.filenamePanel
         ]
       },
       this.grid
@@ -214,9 +211,9 @@ Ext.extend(Sonatype.repoServer.SearchPanel, Ext.Panel, {
     //p.grid.store.reload({params:o});
     p.grid.store.removeAll();
     p.filenamePanel.setFilenameLabel( p.filenamePanel, '' );
-    if ( document.digestApplet ) {
-      document.digestApplet.resetProgress();
-    }
+//    if ( document.digestApplet ) {
+//      document.digestApplet.resetProgress();
+//    }
   },
 
   startSearch: function( p ) {
