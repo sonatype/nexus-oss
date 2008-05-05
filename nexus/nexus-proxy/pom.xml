@@ -64,11 +64,6 @@
 
 		<!-- Components impl -->
 		<dependency>
-			<groupId>com.sonatype.components</groupId>
-			<artifactId>plexus-ldap</artifactId>
-		</dependency>
-
-		<dependency>
 			<groupId>com.thoughtworks.xstream</groupId>
 			<artifactId>xstream</artifactId>
 		</dependency>
@@ -114,11 +109,6 @@
 		<dependency>
 			<groupId>org.sonatype.plexus</groupId>
 			<artifactId>plexus-jetty-testsuite</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>com.sonatype.components</groupId>
-			<artifactId>plexus-ldap-testsuite</artifactId>
 			<scope>test</scope>
 		</dependency>
 		<dependency>

@@ -47,7 +47,6 @@ import org.sonatype.nexus.proxy.access.AccessManager;
 import org.sonatype.nexus.proxy.access.AffirmativeAccessManager;
 import org.sonatype.nexus.proxy.access.OpenAccessManager;
 import org.sonatype.nexus.proxy.access.PropertiesUsernamePathBasedAccessDecisionVoter;
-import org.sonatype.nexus.proxy.access.ldap.LdapAccessDecisionVoter;
 import org.sonatype.nexus.proxy.maven.ChecksumPolicy;
 import org.sonatype.nexus.proxy.maven.ConstrainedM2ShadowRepository;
 import org.sonatype.nexus.proxy.maven.M1LayoutedM2ShadowRepository;
@@ -411,11 +410,6 @@ public class DefaultRuntimeConfigurationBuilder
                         Map<String, String> config = ModelloUtils.getMapFromConfigList( authz.getProperties() );
                         ( (PropertiesUsernamePathBasedAccessDecisionVoter) voter ).setPropertiesPath( config
                             .get( PropertiesUsernamePathBasedAccessDecisionVoter.PROPERTIES_PATH ) );
-                    }
-                    else if ( "ldap".equals( authz.getType() ) )
-                    {
-                        Map<String, String> config = ModelloUtils.getMapFromConfigList( authz.getProperties() );
-                        ( (LdapAccessDecisionVoter) voter ).getConfiguration().putAll( config );
                     }
 
                     am.getVoters().add( voter );
