@@ -39,6 +39,12 @@ import org.sonatype.nexus.rest.model.RemoteHttpProxySettings;
 public abstract class AbstractGlobalConfigurationResourceHandler
     extends AbstractNexusResourceHandler
 {
+    public static final String SECURITY_OFF = "off";
+
+    public static final String SECURITY_SIMPLE = "simple";
+    
+    public static final String SECURITY_CUSTOM = "custom";
+    
     public AbstractGlobalConfigurationResourceHandler( Context context, Request request, Response response )
     {
         super( context, request, response );

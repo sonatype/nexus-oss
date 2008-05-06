@@ -96,6 +96,12 @@ public interface Nexus
     // ------------------------------------------------------------------
     // Configuration defaults
 
+    boolean isDefaultSecurityEnabled();
+
+    boolean isDefaultAnonymousAccessEnabled();
+
+    String getDefaultAuthenticationSourceType();
+
     InputStream getDefaultConfigurationAsStream()
         throws IOException;
 
@@ -149,19 +155,23 @@ public interface Nexus
         throws IOException;
 
     void reindexRepository( String repositoryId )
-        throws NoSuchRepositoryException, IOException;
+        throws NoSuchRepositoryException,
+            IOException;
 
     void reindexRepositoryGroup( String repositoryGroupId )
-        throws NoSuchRepositoryGroupException, IOException;
+        throws NoSuchRepositoryGroupException,
+            IOException;
 
     void rebuildAttributesAllRepositories()
         throws IOException;
 
     void rebuildAttributesRepository( String repositoryId )
-        throws NoSuchRepositoryException, IOException;
+        throws NoSuchRepositoryException,
+            IOException;
 
     void rebuildAttributesRepositoryGroup( String repositoryGroupId )
-        throws NoSuchRepositoryGroupException, IOException;
+        throws NoSuchRepositoryGroupException,
+            IOException;
 
     ArtifactInfo identifyArtifact( String type, String checksum )
         throws IOException;

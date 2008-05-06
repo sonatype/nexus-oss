@@ -664,4 +664,22 @@ public class RemoteNexus
         return false;
     }
 
+    public String getDefaultAuthenticationSourceType()
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public boolean isDefaultAnonymousAccessEnabled()
+    {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    public boolean isDefaultSecurityEnabled()
+    {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
 }

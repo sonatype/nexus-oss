@@ -313,6 +313,9 @@ public class GlobalConfigurationResourceHandler
      */
     protected void fillDefaultConfiguration( GlobalConfigurationResource resource )
     {
+        resource.setSecurityConfiguration( getSecurityConfiguration( getNexus().isDefaultSecurityEnabled(), getNexus()
+            .getDefaultAuthenticationSourceType() ) );
+
         resource.setWorkingDirectory( getNexus().readDefaultWorkingDirectory() );
 
         resource.setLogDirectory( getNexus().readDefaultApplicationLogDirectory() );
@@ -329,6 +332,9 @@ public class GlobalConfigurationResourceHandler
      */
     protected void fillCurrentConfiguration( GlobalConfigurationResource resource )
     {
+        resource.setSecurityConfiguration( getSecurityConfiguration( getNexus().isSecurityEnabled(), getNexus()
+            .getAuthenticationSourceType() ) );
+
         resource.setWorkingDirectory( getNexus().readWorkingDirectory() );
 
         resource.setLogDirectory( getNexus().readApplicationLogDirectory() );
@@ -336,6 +342,25 @@ public class GlobalConfigurationResourceHandler
         resource.setGlobalConnectionSettings( convert( getNexus().readGlobalRemoteConnectionSettings() ) );
 
         resource.setGlobalHttpProxySettings( convert( getNexus().readGlobalRemoteHttpProxySettings() ) );
+    }
+
+    protected String getSecurityConfiguration( boolean enabled, String authSourceType )
+    {
+        if ( !enabled )
+        {
+            return SECURITY_OFF;
+        }
+        else
+        {
+            if ( SECURITY_SIMPLE.equals( authSourceType ) )
+            {
+                return SECURITY_SIMPLE;
+            }
+            else
+            {
+                return SECURITY_CUSTOM;
+            }
+        }
     }
 
 }
