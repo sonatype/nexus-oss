@@ -31,6 +31,7 @@ import org.restlet.data.Status;
 import org.restlet.resource.Representation;
 import org.restlet.resource.Variant;
 import org.sonatype.nexus.configuration.ConfigurationException;
+import org.sonatype.nexus.configuration.NexusConfiguration;
 import org.sonatype.nexus.configuration.model.CRemoteAuthentication;
 import org.sonatype.nexus.configuration.model.CRemoteConnectionSettings;
 import org.sonatype.nexus.configuration.model.CRemoteHttpProxySettings;
@@ -74,7 +75,16 @@ public class GlobalConfigurationResourceHandler
     {
         super( context, request, response );
 
-        authenticationSource = (AuthenticationSource) lookup( AuthenticationSource.ROLE, "simple" );
+        try
+        {
+            NexusConfiguration nc = (NexusConfiguration) lookup( NexusConfiguration.ROLE );
+
+            authenticationSource = nc.getAuthenticationSource();
+        }
+        catch ( ConfigurationException e )
+        {
+            throw new IllegalStateException( "Cannot get authenticationSource!", e );
+        }
     }
 
     /**
@@ -215,6 +225,22 @@ public class GlobalConfigurationResourceHandler
                     else
                     {
                         getNexus().updateGlobalRemoteHttpProxySettings( null );
+                    }
+
+                    if ( resource.getSecurityConfiguration() != null )
+                    {
+                        if ( "off".equalsIgnoreCase( resource.getSecurityConfiguration() ) )
+                        {
+                            getNexus().setSecurity( false, null );
+                        }
+                        else if ( "simple".equalsIgnoreCase( resource.getSecurityConfiguration() ) )
+                        {
+                            getNexus().setSecurity( true, "simple" );
+                        }
+                        else if ( "custom".equalsIgnoreCase( resource.getSecurityConfiguration() ) )
+                        {
+                            getNexus().setSecurity( true, "properties" );
+                        }
                     }
 
                     if ( MutableAuthenticationSource.class.isAssignableFrom( authenticationSource.getClass() ) )

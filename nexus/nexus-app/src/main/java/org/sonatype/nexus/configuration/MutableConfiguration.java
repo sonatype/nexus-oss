@@ -41,6 +41,15 @@ public interface MutableConfiguration
     // Repositories
     // ----------------------------------------------------------------------------------------------------------
 
+    void setSecurity( boolean enabled, String authenticationSourceType )
+        throws IOException;
+
+    boolean isSecurityEnabled();
+
+    boolean isAnonymousAccessEnabled();
+
+    String getAuthenticationSourceType();
+
     // ------------------------------------------------------------------
     // CRUD-like ops on config sections
 

@@ -80,10 +80,6 @@ public interface NexusConfiguration
 
     File getApplicationLogDirectory();
 
-    boolean isSecurityEnabled();
-
-    boolean isAnonymousAccessEnabled();
-
     RemoteStorageContext getRemoteStorageContext();
 
     AuthenticationSource getAuthenticationSource()

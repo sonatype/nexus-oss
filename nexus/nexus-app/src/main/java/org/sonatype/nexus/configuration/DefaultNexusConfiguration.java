@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Vector;
 
 import org.codehaus.plexus.logging.AbstractLogEnabled;
+import org.sonatype.nexus.configuration.model.CAuthSource;
 import org.sonatype.nexus.configuration.model.CGroupsSettingPathMappingItem;
 import org.sonatype.nexus.configuration.model.CRemoteConnectionSettings;
 import org.sonatype.nexus.configuration.model.CRemoteHttpProxySettings;
@@ -322,16 +323,6 @@ public class DefaultNexusConfiguration
         return applicationLogDirectory;
     }
 
-    public boolean isSecurityEnabled()
-    {
-        return getConfiguration().getSecurity() != null && getConfiguration().getSecurity().isEnabled();
-    }
-
-    public boolean isAnonymousAccessEnabled()
-    {
-        return getConfiguration().getSecurity() != null && getConfiguration().getSecurity().isAnonymousAccessEnabled();
-    }
-
     public AuthenticationSource getAuthenticationSource()
         throws ConfigurationException
     {
@@ -423,6 +414,62 @@ public class DefaultNexusConfiguration
 
     // ------------------------------------------------------------------
     // CRUD-like ops on config sections
+
+    public boolean isSecurityEnabled()
+    {
+        return getConfiguration().getSecurity() != null && getConfiguration().getSecurity().isEnabled();
+    }
+
+    public boolean isAnonymousAccessEnabled()
+    {
+        return getConfiguration().getSecurity() != null && getConfiguration().getSecurity().isAnonymousAccessEnabled();
+    }
+
+    public String getAuthenticationSourceType()
+    {
+        if ( isSecurityEnabled() )
+        {
+            return getConfiguration().getSecurity().getAuthenticationSource().getType();
+        }
+        else
+        {
+            return null;
+        }
+    }
+
+    public void setSecurity( boolean enabled, String authenticationSourceType )
+        throws IOException
+    {
+        if ( !enabled )
+        {
+            getConfiguration().getSecurity().setEnabled( false );
+
+            getConfiguration().getSecurity().setAnonymousAccessEnabled( false );
+
+            getConfiguration().getSecurity().setAuthenticationSource( null );
+
+            getConfiguration().getSecurity().setRealms( null );
+        }
+        else
+        {
+            getConfiguration().getSecurity().setEnabled( true );
+
+            if ( "simple".equals( authenticationSourceType ) )
+            {
+                getConfiguration().getSecurity().setAnonymousAccessEnabled( true );
+            }
+            else
+            {
+                getConfiguration().getSecurity().setAnonymousAccessEnabled( false );
+            }
+
+            getConfiguration().getSecurity().setAuthenticationSource( new CAuthSource() );
+
+            getConfiguration().getSecurity().getAuthenticationSource().setType( authenticationSourceType );
+        }
+
+        applyAndSaveConfiguration();
+    }
 
     // Globals are mandatory: RU
 

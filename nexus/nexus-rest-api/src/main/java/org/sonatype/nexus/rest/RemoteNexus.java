@@ -640,4 +640,28 @@ public class RemoteNexus
         return null;
     }
 
+    public String getAuthenticationSourceType()
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public boolean isSecurityEnabled()
+    {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    public void setSecurity( boolean enabled, String authenticationSourceType )
+    {
+        // TODO Auto-generated method stub
+        
+    }
+
+    public boolean isAnonymousAccessEnabled()
+    {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
 }

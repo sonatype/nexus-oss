@@ -218,6 +218,27 @@ public class DefaultNexus
     // ------------------------------------------------------------------
     // CRUD-like ops on config sections
 
+    public String getAuthenticationSourceType()
+    {
+        return nexusConfiguration.getAuthenticationSourceType();
+    }
+
+    public boolean isAnonymousAccessEnabled()
+    {
+        return nexusConfiguration.isAnonymousAccessEnabled();
+    }
+
+    public boolean isSecurityEnabled()
+    {
+        return nexusConfiguration.isSecurityEnabled();
+    }
+
+    public void setSecurity( boolean enabled, String authenticationSourceType )
+        throws IOException
+    {
+        nexusConfiguration.setSecurity( enabled, authenticationSourceType );
+    }
+
     // Globals are mandatory: RU
 
     public String readWorkingDirectory()
@@ -440,7 +461,6 @@ public class DefaultNexus
     {
         nexusConfiguration.deleteRepositoryGroup( id );
     }
-    
 
     public Collection<CRemoteNexusInstance> listRemoteNexusInstances()
     {
@@ -781,7 +801,7 @@ public class DefaultNexus
     {
         indexerManager.reindexRepositoryGroup( repositoryGroupId );
     }
-    
+
     public void rebuildAttributesAllRepositories()
         throws IOException
     {
@@ -794,13 +814,15 @@ public class DefaultNexus
     }
 
     public void rebuildAttributesRepository( String repositoryId )
-        throws NoSuchRepositoryException, IOException
+        throws NoSuchRepositoryException,
+            IOException
     {
         repositoryRegistry.getRepository( repositoryId ).recreateAttributes( null );
     }
 
     public void rebuildAttributesRepositoryGroup( String repositoryGroupId )
-        throws NoSuchRepositoryGroupException, IOException
+        throws NoSuchRepositoryGroupException,
+            IOException
     {
         List<Repository> reposes = repositoryRegistry.getRepositoryGroup( repositoryGroupId );
 
@@ -842,11 +864,11 @@ public class DefaultNexus
         repositoryRegistry.addProximityEventListener( indexerManager );
 
         systemStatus.setState( SystemState.STOPPED );
-        
+
         systemStatus.setOperationMode( OperationMode.STANDALONE );
 
         systemStatus.setInitializedAt( new Date() );
-        
+
         try
         {
             Properties props = new Properties();
@@ -889,7 +911,7 @@ public class DefaultNexus
             getFeedRecorder().addSystemEvent(
                 FeedRecorder.SYSTEM_BOOT_ACTION,
                 "Starting Nexus (version " + systemStatus.getVersion() + ")" );
-            
+
             systemStatus.setLastConfigChange( new Date() );
 
             systemStatus.setConfigurationValidationResponse( nexusConfiguration
@@ -949,8 +971,8 @@ public class DefaultNexus
             systemStatus.setErrorCause( e );
 
             getLogger().error( "Could not start Nexus, bad IO exception!", e );
-            
-            throw new StartingException("Could not start Nexus!", e);
+
+            throw new StartingException( "Could not start Nexus!", e );
         }
         catch ( ConfigurationException e )
         {
@@ -962,8 +984,8 @@ public class DefaultNexus
             systemStatus.setErrorCause( e );
 
             getLogger().error( "Could not start Nexus, user configuration exception!", e );
-            
-            throw new StartingException("Could not start Nexus!", e);
+
+            throw new StartingException( "Could not start Nexus!", e );
         }
 
         getLogger().info( "Started Nexus (version " + systemStatus.getVersion() + ")" );
@@ -1220,7 +1242,7 @@ public class DefaultNexus
     public void onConfigurationChange( ConfigurationChangeEvent evt )
     {
         systemStatus.setLastConfigChange( new Date() );
-        
+
         getFeedRecorder().addSystemEvent( FeedRecorder.SYSTEM_CONFIG_ACTION, "Nexus configuration changed/updated." );
     }
 
