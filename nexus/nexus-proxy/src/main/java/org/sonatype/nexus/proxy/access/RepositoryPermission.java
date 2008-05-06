@@ -51,6 +51,7 @@ public class RepositoryPermission
     public RepositoryPermission( String perm )
     {
         super();
+        
         this.perm = perm;
     }
 
@@ -64,21 +65,11 @@ public class RepositoryPermission
         return perm;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see java.lang.Object#toString()
-     */
     public String toString()
     {
         return perm;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see java.lang.Object#equals(java.lang.Object)
-     */
     public boolean equals( Object compare )
     {
         if ( !( compare instanceof RepositoryPermission ) )

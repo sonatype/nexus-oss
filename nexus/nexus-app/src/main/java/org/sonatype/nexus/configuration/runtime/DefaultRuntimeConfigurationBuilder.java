@@ -44,9 +44,7 @@ import org.sonatype.nexus.configuration.validator.InvalidConfigurationException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.access.AccessDecisionVoter;
 import org.sonatype.nexus.proxy.access.AccessManager;
-import org.sonatype.nexus.proxy.access.AffirmativeAccessManager;
 import org.sonatype.nexus.proxy.access.OpenAccessManager;
-import org.sonatype.nexus.proxy.access.PropertiesUsernamePathBasedAccessDecisionVoter;
 import org.sonatype.nexus.proxy.maven.ChecksumPolicy;
 import org.sonatype.nexus.proxy.maven.ConstrainedM2ShadowRepository;
 import org.sonatype.nexus.proxy.maven.M1LayoutedM2ShadowRepository;
@@ -61,6 +59,8 @@ import org.sonatype.nexus.proxy.repository.ShadowRepository;
 import org.sonatype.nexus.proxy.storage.local.LocalRepositoryStorage;
 import org.sonatype.nexus.proxy.storage.remote.DefaultRemoteStorageContext;
 import org.sonatype.nexus.proxy.storage.remote.RemoteRepositoryStorage;
+import org.sonatype.nexus.security.AuthenticationSource;
+import org.sonatype.nexus.security.OpenAuthenticationSource;
 
 /**
  * The Class DefaultRuntimeConfigurationBuilder. Todo: all the bad thing is now concentrated in this class. We are
@@ -372,6 +372,28 @@ public class DefaultRuntimeConfigurationBuilder
         }
     }
 
+    public AuthenticationSource getAuthenticationSource( Configuration configuration )
+        throws InvalidConfigurationException
+    {
+        if ( configuration.getSecurity().isEnabled() )
+        {
+            try
+            {
+                return (AuthenticationSource) plexusContainer.lookup( AuthenticationSource.ROLE, configuration
+                    .getSecurity().getAuthenticationSource().getType() );
+            }
+            catch ( ComponentLookupException e )
+            {
+                throw new InvalidConfigurationException( "Unsupported authentication source type: "
+                    + configuration.getSecurity().getAuthenticationSource().getType(), e );
+            }
+        }
+        else
+        {
+            return new OpenAuthenticationSource();
+        }
+    }
+
     public AccessManager getAccessManagerForRealm( Configuration configuration, String realm )
         throws InvalidConfigurationException
     {
@@ -386,15 +408,18 @@ public class DefaultRuntimeConfigurationBuilder
                 CAuthzSource authz = null;
                 try
                 {
-                    AffirmativeAccessManager am = new AffirmativeAccessManager();
-                    for ( Object authzSourceObj : configuration.getSecurity().getRealms() )
+                    AccessManager am = (AccessManager) plexusContainer.lookup( AccessManager.ROLE, "affirmative" );
+
+                    for ( CAuthzSource authzSource : (List<CAuthzSource>) configuration.getSecurity().getRealms() )
                     {
-                        if ( realm.equals( ( (CAuthzSource) authzSourceObj ).getId() ) )
+                        if ( realm.equals( authzSource.getId() ) )
                         {
-                            authz = (CAuthzSource) authzSourceObj;
+                            authz = authzSource;
+
                             break;
                         }
                     }
+
                     if ( authz == null )
                     {
                         throw new InvalidConfigurationException( "Could not find realm with ID=" + realm );
@@ -404,13 +429,7 @@ public class DefaultRuntimeConfigurationBuilder
                         AccessDecisionVoter.ROLE,
                         authz.getType() );
 
-                    // TODO: plexus config source injection!
-                    if ( "properties".equals( authz.getType() ) )
-                    {
-                        Map<String, String> config = ModelloUtils.getMapFromConfigList( authz.getProperties() );
-                        ( (PropertiesUsernamePathBasedAccessDecisionVoter) voter ).setPropertiesPath( config
-                            .get( PropertiesUsernamePathBasedAccessDecisionVoter.PROPERTIES_PATH ) );
-                    }
+                    voter.setConfiguration( ModelloUtils.getMapFromConfigList( authz.getProperties() ) );
 
                     am.getVoters().add( voter );
 
@@ -421,7 +440,7 @@ public class DefaultRuntimeConfigurationBuilder
                 catch ( ComponentLookupException e )
                 {
                     throw new InvalidConfigurationException( "Unsupported authentication source type: "
-                        + authz.getType() );
+                        + authz.getType(), e );
                 }
             }
         }

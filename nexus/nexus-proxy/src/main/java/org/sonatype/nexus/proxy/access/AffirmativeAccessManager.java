@@ -32,7 +32,7 @@ import org.sonatype.nexus.proxy.repository.Repository;
  * Simple implementation of AccessManager that passes only if all voter votes ACCESS_APPROVED.
  * 
  * @author t.cservenak
- * @plexus.component role-hint="affirmative"
+ * @plexus.component instantiation-strategy="per-lookup" role-hint="affirmative"
  */
 public class AffirmativeAccessManager
     implements AccessManager

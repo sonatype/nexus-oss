@@ -26,7 +26,7 @@ import org.codehaus.plexus.logging.AbstractLogEnabled;
  * The Class OpenAuthenticationSource.
  * 
  * @author cstamas
- * @plexus.component role-hint="open"
+ * @plexus.component role="org.sonatype.nexus.security.AuthenticationSource" instantiation-strategy="per-lookup" role-hint="open"
  */
 public class OpenAuthenticationSource
     extends AbstractLogEnabled
@@ -35,5 +35,20 @@ public class OpenAuthenticationSource
     public User authenticate( String username, String password )
     {
         return SimpleUser.ANONYMOUS_USER;
+    }
+
+    public boolean hasPasswordSet( String username )
+    {
+        return false;
+    }
+
+    public boolean isKnown( String username )
+    {
+        return true;
+    }
+
+    public boolean isAnynonymousAllowed()
+    {
+        return true;
     }
 }

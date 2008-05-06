@@ -22,7 +22,6 @@ package org.sonatype.nexus.proxy.access;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Properties;
 
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.repository.Repository;
@@ -44,50 +43,20 @@ import org.sonatype.nexus.security.User;
  * <p>
  * This implementation does not takes permissions in account.
  * 
- * @author cstamas
+ * @author cstamas instantiation-strategy="per-lookup" role-hint="simple-props"
  */
 public class SimplePropertiesFileUsernameBasedAccessDecisionVoter
-    implements AccessDecisionVoter
+    extends AbstractPropertiesFileBasedAccessDecisionVoter
 {
-
-    /** The auth properties. */
-    private Properties authProperties;
-
-    /**
-     * Gets the auth properties.
-     * 
-     * @return the auth properties
-     */
-    public Properties getAuthProperties()
-    {
-        return authProperties;
-    }
-
-    /**
-     * Sets the auth properties.
-     * 
-     * @param properties the new auth properties
-     */
-    public void setAuthProperties( Properties properties )
-    {
-        this.authProperties = properties;
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.sonatype.nexus.access.AccessDecisionVoter#vote(org.sonatype.nexus.ProximityRequest,
-     *      org.sonatype.nexus.Repository, org.sonatype.nexus.access.RepositoryPermission)
-     */
     public int vote( ResourceStoreRequest request, Repository repository, RepositoryPermission permission )
     {
         if ( request.getRequestContext().containsKey( REQUEST_USER ) )
         {
-            String allowedUsers = getAuthProperties().getProperty( repository.getId() );
+            String allowedUsers = getProperties().getProperty( repository.getId() );
             String username = ( (User) request.getRequestContext().get( REQUEST_USER ) ).getUsername();
 
             List<String> usersList = Arrays.asList( allowedUsers.split( "," ) );
-            
+
             if ( usersList.contains( username ) )
             {
                 return ACCESS_APPROVED;
@@ -102,5 +71,4 @@ public class SimplePropertiesFileUsernameBasedAccessDecisionVoter
             return ACCESS_DENIED;
         }
     }
-
 }

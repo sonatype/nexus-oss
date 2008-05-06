@@ -23,7 +23,6 @@ package org.sonatype.nexus.rest;
 import org.restlet.Context;
 import org.restlet.Restlet;
 import org.restlet.Router;
-import org.sonatype.nexus.security.SimpleAuthenticationSource;
 
 /**
  * Nexus REST content bridge.
@@ -55,15 +54,13 @@ public class ApplicationContentBridge
         LocalNexusInstanceFilter nif = new LocalNexusInstanceFilter( getContext() );
 
         // simple anonymous guard
-        NexusOptionalWriteAccessAuthenticationGuard nexusGuard = new NexusOptionalWriteAccessAuthenticationGuard(
-            getContext(),
-            SimpleAuthenticationSource.DEPLOYMENT_USERNAME );
+        NexusAuthenticationGuard nexusGuard = new NexusAuthenticationGuard( getContext() );
 
         // attaching it after nif
         nif.setNext( nexusGuard );
-        
-        BrowserSensingFilter browserFilter = new BrowserSensingFilter(getContext());
-        
+
+        BrowserSensingFilter browserFilter = new BrowserSensingFilter( getContext() );
+
         // next is filter
         nexusGuard.setNext( browserFilter );
 

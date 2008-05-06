@@ -28,6 +28,9 @@ import org.restlet.data.ChallengeScheme;
 import org.restlet.data.Form;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
+import org.restlet.data.Status;
+import org.sonatype.nexus.configuration.ConfigurationException;
+import org.sonatype.nexus.configuration.NexusConfiguration;
 import org.sonatype.nexus.security.AuthenticationSource;
 import org.sonatype.nexus.security.SimpleUser;
 import org.sonatype.nexus.security.User;
@@ -64,14 +67,19 @@ public class NexusAuthenticationGuard
         {
             sessionStore = (SessionStore) PlexusRestletUtils.plexusLookup( getContext(), SessionStore.ROLE );
 
-            authenticationSource = (AuthenticationSource) PlexusRestletUtils.plexusLookup(
+            NexusConfiguration nc = (NexusConfiguration) PlexusRestletUtils.plexusLookup(
                 getContext(),
-                AuthenticationSource.ROLE,
-                "simple" );
+                NexusConfiguration.ROLE );
+
+            authenticationSource = nc.getAuthenticationSource();
         }
         catch ( ComponentLookupException e )
         {
             throw new IllegalStateException( "Cannot lookup sessionStore or authenticationSource!", e );
+        }
+        catch ( ConfigurationException e )
+        {
+            throw new IllegalStateException( "Configuration exception!", e );
         }
     }
 
@@ -95,6 +103,16 @@ public class NexusAuthenticationGuard
     public String getUsernameFilter()
     {
         return usernameFilter;
+    }
+
+    public void doHandle( Request request, Response response )
+    {
+        super.doHandle( request, response );
+
+        if ( Status.CLIENT_ERROR_UNAUTHORIZED.equals( response.getStatus() ) )
+        {
+            challenge( response );
+        }
     }
 
     public int authenticate( Request request )
@@ -161,7 +179,17 @@ public class NexusAuthenticationGuard
             }
         }
 
-        return result;
+        if ( getUsernameFilter() == null && result != 1 && getAuthenticationSource().isAnynonymousAllowed() )
+        {
+            request.getAttributes().put( REST_USER_KEY, SimpleUser.ANONYMOUS_USER );
+
+            return 1;
+        }
+        else
+        {
+            return result;
+        }
+
     }
 
     protected boolean checkSecret( String identifier, char[] secret )

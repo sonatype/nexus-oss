@@ -47,6 +47,7 @@ import org.sonatype.nexus.rest.model.NexusArtifact;
 import org.sonatype.nexus.rest.model.NexusError;
 import org.sonatype.nexus.rest.model.NexusErrorResponse;
 import org.sonatype.nexus.schedule.Scheduler;
+import org.sonatype.nexus.security.User;
 import org.sonatype.plexus.rest.AbstractPlexusAwareResource;
 import org.sonatype.plexus.rest.PlexusRestletUtils;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
@@ -217,6 +218,25 @@ public abstract class AbstractNexusResourceHandler
         ne.setMsg( msg );
         ner.addError( ne );
         return ner;
+    }
+
+    protected boolean isRequestAuthenticated()
+    {
+        return getRequest().getAttributes().containsKey( NexusAuthenticationGuard.REST_USER_KEY );
+    }
+
+    protected boolean isRequestAnonymous()
+    {
+        User user = (User) getRequest().getAttributes().get( NexusAuthenticationGuard.REST_USER_KEY );
+
+        if ( user == null )
+        {
+            return true;
+        }
+        else
+        {
+            return user.isAnonymous();
+        }
     }
 
     /**

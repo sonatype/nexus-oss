@@ -27,6 +27,7 @@ import java.util.List;
 
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.StringUtils;
+import org.sonatype.nexus.configuration.model.CAuthSource;
 import org.sonatype.nexus.configuration.model.CAuthzSource;
 import org.sonatype.nexus.configuration.model.CGroupsSettingPathMappingItem;
 import org.sonatype.nexus.configuration.model.CHttpProxySettings;
@@ -34,6 +35,7 @@ import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.CRepositoryGroup;
 import org.sonatype.nexus.configuration.model.CRepositoryShadow;
 import org.sonatype.nexus.configuration.model.CRestApiSettings;
+import org.sonatype.nexus.configuration.model.CSecurity;
 import org.sonatype.nexus.configuration.model.Configuration;
 
 /**
@@ -54,18 +56,39 @@ public class DefaultConfigurationValidator
 
         Configuration model = request.getConfiguration();
 
+        // check for security model
+        if ( model.getSecurity() == null )
+        {
+            model.setSecurity( new CSecurity() );
+
+            response
+                .addValidationWarning( "Security configuration block, which is mandatory, was missing. Replaced with defaults." );
+
+            response.setModified( true );
+        }
+
         // if security enabled, at least auth source must be defined
-        if ( model.getSecurity() != null && model.getSecurity().isEnabled() )
+        if ( model.getSecurity().isEnabled() )
         {
             if ( model.getSecurity().getAuthenticationSource() == null )
             {
-                response.addValidationError( "Nexus security is enabled but no authentication source is defined!" );
+                getLogger().info(
+                    "Security is enabled, but no authenticationSource is set, assuming 'simple' authentication." );
+
+                model.getSecurity().setAuthenticationSource( new CAuthSource() );
+
+                model.getSecurity().getAuthenticationSource().setType( "simple" );
+
+                response
+                    .addValidationWarning( "Security is enabled, but no authenticationSource is set, setting 'simple' authentication source." );
+
+                response.setModified( true );
             }
         }
 
         // collect existing realms, if any
         List<String> existingRealms = null;
-        if ( model.getSecurity() != null && model.getSecurity().isEnabled() && model.getSecurity().getRealms() != null )
+        if ( model.getSecurity().isEnabled() && model.getSecurity().getRealms() != null )
         {
             existingRealms = new ArrayList<String>( model.getSecurity().getRealms().size() );
             List<CAuthzSource> realms = model.getSecurity().getRealms();

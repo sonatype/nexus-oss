@@ -949,6 +949,8 @@ public class DefaultNexus
             systemStatus.setErrorCause( e );
 
             getLogger().error( "Could not start Nexus, bad IO exception!", e );
+            
+            throw new StartingException("Could not start Nexus!", e);
         }
         catch ( ConfigurationException e )
         {
@@ -960,6 +962,8 @@ public class DefaultNexus
             systemStatus.setErrorCause( e );
 
             getLogger().error( "Could not start Nexus, user configuration exception!", e );
+            
+            throw new StartingException("Could not start Nexus!", e);
         }
 
         getLogger().info( "Started Nexus (version " + systemStatus.getVersion() + ")" );

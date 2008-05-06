@@ -21,9 +21,6 @@
 package org.sonatype.nexus.proxy.access;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
@@ -46,81 +43,12 @@ import org.sonatype.nexus.security.User;
  * (the usernames are concatenated with path).
  * 
  * @author cstamas
- * @plexus.component role-hint="properties"
+ * @plexus.component instantiation-strategy="per-lookup" role-hint="properties"
  */
 public class PropertiesUsernamePathBasedAccessDecisionVoter
-    implements AccessDecisionVoter
+    extends AbstractPropertiesFileBasedAccessDecisionVoter
 {
 
-    public static final String PROPERTIES_PATH = "propertiesFile";
-
-    /**
-     * The properties path.
-     */
-    protected String propertiesPath;
-
-    /** The properties base. */
-    private Properties properties;
-
-    /**
-     * Gets the properties path.
-     * 
-     * @return the properties path
-     */
-    public String getPropertiesPath()
-    {
-        return propertiesPath;
-    }
-
-    /**
-     * Sets the properties path.
-     * 
-     * @param propertiesPath the new properties path
-     */
-    public void setPropertiesPath( String propertiesPath )
-    {
-        this.propertiesPath = propertiesPath;
-    }
-
-    /**
-     * Gets the properties.
-     * 
-     * @return the properties
-     */
-    public Properties getProperties()
-    {
-        if ( properties == null )
-        {
-            try
-            {
-                loadProperties( getPropertiesPath() );
-            }
-            catch ( IOException e )
-            {
-                throw new IllegalArgumentException(
-                    "Could not initialize NexusAuthentication, nor auth properties nor propertiesPath parameter is given!",
-                    e );
-            }
-        }
-        return properties;
-    }
-
-    /**
-     * Sets the properties.
-     * 
-     * @param properties the new properties
-     */
-    public void setProperties( Properties properties )
-    {
-        this.properties = properties;
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.sonatype.nexus.access.AccessDecisionVoter#vote(org.sonatype.nexus.ProximityRequest,
-     *      org.sonatype.nexus.Repository, org.sonatype.nexus.access.RepositoryPermission)
-     */
     public int vote( ResourceStoreRequest request, Repository repository, RepositoryPermission permission )
     {
         return authorizeTree( getProperties(), (User) request.getRequestContext().get( REQUEST_USER ), request
@@ -147,53 +75,20 @@ public class PropertiesUsernamePathBasedAccessDecisionVoter
             {
                 return ACCESS_APPROVED;
             }
+            else
+            {
+                return ACCESS_DENIED;
+            }
         }
 
         String parent = ( new File( path ) ).getParent();
+        
         if ( parent == null )
         {
             return ACCESS_DENIED;
         }
 
         return authorizeTree( path2rights, user, parent, permission );
-    }
-
-    /**
-     * Load properties.
-     * 
-     * @param resource the resource
-     * @throws IOException Signals that an I/O exception has occurred.
-     */
-    public void loadProperties( String resource )
-        throws IOException
-    {
-        if ( resource == null )
-        {
-            throw new IllegalArgumentException( "Authorization source properties file path cannot be 'null'!" );
-        }
-        if ( this.properties == null )
-        {
-            this.properties = new Properties();
-        }
-
-        // First see if the resource is a valid file
-        File resourceFile = new File( resource );
-        if ( resourceFile.exists() )
-        {
-            this.properties.load( new FileInputStream( resourceFile ) );
-            return;
-        }
-
-        // Otherwise try to load it from the classpath
-        InputStream is = getClass().getClassLoader().getResourceAsStream( resource );
-        if ( is != null )
-        {
-            this.properties.load( is );
-            return;
-        }
-
-        throw new IllegalArgumentException( "Authorization source cannot be loaded because it is not found on "
-            + resource );
     }
 
 }

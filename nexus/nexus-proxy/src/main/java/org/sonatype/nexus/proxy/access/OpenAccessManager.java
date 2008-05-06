@@ -20,6 +20,9 @@
  */
 package org.sonatype.nexus.proxy.access;
 
+import java.util.Collections;
+import java.util.List;
+
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.repository.Repository;
@@ -28,23 +31,22 @@ import org.sonatype.nexus.proxy.repository.Repository;
  * A simple AccessManager implementation that allows everybody to access the Proximity core.
  * 
  * @author t.cservenak
- * @plexus.component role-hint="open"
+ * @plexus.component instantiation-strategy="per-lookup" role-hint="open"
  */
 public class OpenAccessManager
     implements AccessManager
 {
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.sonatype.nexus.access.AccessManager#decide(org.sonatype.nexus.ProximityRequest,
-     *      org.sonatype.nexus.Repository, org.sonatype.nexus.access.RepositoryPermission)
-     */
     public void decide( ResourceStoreRequest request, Repository repository, RepositoryPermission permission )
         throws AccessDeniedException
     {
         // this access manager is open, everybody has access to everything since
         // it never throws AccessDeniedEx
+    }
+
+    public List<AccessDecisionVoter> getVoters()
+    {
+        return Collections.emptyList();
     }
 
 }

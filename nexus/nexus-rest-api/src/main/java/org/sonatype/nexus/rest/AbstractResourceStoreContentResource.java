@@ -37,6 +37,7 @@ import org.apache.velocity.app.VelocityEngine;
 import org.apache.velocity.runtime.RuntimeConstants;
 import org.codehaus.plexus.util.StringUtils;
 import org.restlet.Context;
+import org.restlet.data.ChallengeRequest;
 import org.restlet.data.MediaType;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
@@ -299,39 +300,41 @@ public abstract class AbstractResourceStoreContentResource
 
         return result;
     }
-    
-    private List<ContentListResource> sortContentListResource( Collection<ContentListResource>list )
+
+    private List<ContentListResource> sortContentListResource( Collection<ContentListResource> list )
     {
         List<ContentListResource> result = new ArrayList<ContentListResource>( list );
-        
-        Collections.sort( result, new Comparator<ContentListResource>() {
+
+        Collections.sort( result, new Comparator<ContentListResource>()
+        {
             public int compare( ContentListResource o1, ContentListResource o2 )
             {
-                if (!o1.isLeaf())
+                if ( !o1.isLeaf() )
                 {
-                    if (!o2.isLeaf())
+                    if ( !o2.isLeaf() )
                     {
-                        //2 directories, do a path compare
+                        // 2 directories, do a path compare
                         return o1.getText().compareTo( o2.getText() );
                     }
                     else
                     {
-                        //first item is a dir, second is a file, dirs always win
+                        // first item is a dir, second is a file, dirs always win
                         return 1;
                     }
                 }
-                else if (!o2.isLeaf())
+                else if ( !o2.isLeaf() )
                 {
-                    //first item is a file, second is a dir, dirs always win
+                    // first item is a file, second is a dir, dirs always win
                     return -1;
                 }
                 else
                 {
-                    //2 files, do a path compare
+                    // 2 files, do a path compare
                     return o1.getText().compareTo( o2.getText() );
                 }
-            }});
-    
+            }
+        } );
+
         return result;
     }
 
@@ -341,9 +344,9 @@ public abstract class AbstractResourceStoreContentResource
         // APPLICATION_XML is requested by direct browsing (FF)
         if ( MediaType.TEXT_HTML.equals( variant.getMediaType() ) )
         {
-            HashMap<String, Object> dataModel = new HashMap<String, Object>(); 
+            HashMap<String, Object> dataModel = new HashMap<String, Object>();
 
-            dataModel.put( "listItems", sortContentListResource( ((ContentListResourceResponse) payload).getData() ) );
+            dataModel.put( "listItems", sortContentListResource( ( (ContentListResourceResponse) payload ).getData() ) );
 
             dataModel.put( "request", getRequest() );
 
@@ -392,7 +395,7 @@ public abstract class AbstractResourceStoreContentResource
             ResourceStoreRequest req = getResourceStoreRequest( false );
 
             StorageItem item = store.retrieveItem( req );
-            
+
             return renderItem( variant, item );
         }
         catch ( Throwable e )
@@ -587,7 +590,14 @@ public abstract class AbstractResourceStoreContentResource
         }
         else if ( t instanceof AccessDeniedException )
         {
-            getResponse().setStatus( Status.CLIENT_ERROR_FORBIDDEN, t.getMessage() );
+            if ( isRequestAnonymous() )
+            {
+                getResponse().setStatus( Status.CLIENT_ERROR_UNAUTHORIZED, "Authenticate to access this resource!" );
+            }
+            else
+            {
+                getResponse().setStatus( Status.CLIENT_ERROR_FORBIDDEN, "Access to resource is forbidden!" );
+            }
         }
         else
         {

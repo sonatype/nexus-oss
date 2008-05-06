@@ -30,22 +30,18 @@ import org.sonatype.nexus.proxy.repository.Repository;
  * The Class IpAddressAccessDecisionVoter.
  * 
  * @author cstamas
- * @plexus.component role-hint="ip-based"
+ * @plexus.component instantiation-strategy="per-lookup" role-hint="ip-based"
  */
 public class IpAddressAccessDecisionVoter
-    implements AccessDecisionVoter
+    extends AbstractAccessDecisionVoter
 {
-
     public static final String REQUEST_REMOTE_ADDRESS = "requestRemoteAddress";
 
-    /** The allow from pattern. */
-    private String allowFromPattern;
+    public static final String PARAM_ALLOWDENY = "allowDeny";
 
-    /** The deny from pattern. */
-    private String denyFromPattern;
+    public static final String PARAM_ALLOWFROM = "allowFrom";
 
-    /** The allow deny. */
-    private boolean allowDeny;
+    public static final String PARAM_DENYFROM = "denyFrom";
 
     /** The allow from. */
     private Pattern allowFrom;
@@ -60,17 +56,7 @@ public class IpAddressAccessDecisionVoter
      */
     public boolean isAllowDeny()
     {
-        return allowDeny;
-    }
-
-    /**
-     * Sets the allow deny.
-     * 
-     * @param allowDeny the new allow deny
-     */
-    public void setAllowDeny( boolean allowDeny )
-    {
-        this.allowDeny = allowDeny;
+        return Boolean.parseBoolean( getConfigurationValue( PARAM_ALLOWDENY ) );
     }
 
     /**
@@ -80,17 +66,7 @@ public class IpAddressAccessDecisionVoter
      */
     public String getAllowFromPattern()
     {
-        return allowFromPattern;
-    }
-
-    /**
-     * Sets the allow from pattern.
-     * 
-     * @param allowFromPattern the new allow from pattern
-     */
-    public void setAllowFromPattern( String allowFromPattern )
-    {
-        this.allowFromPattern = allowFromPattern;
+        return getConfigurationValue( PARAM_ALLOWFROM );
     }
 
     /**
@@ -100,25 +76,9 @@ public class IpAddressAccessDecisionVoter
      */
     public String getDenyFromPattern()
     {
-        return denyFromPattern;
+        return getConfigurationValue( PARAM_DENYFROM );
     }
 
-    /**
-     * Sets the deny from pattern.
-     * 
-     * @param denyFromPattern the new deny from pattern
-     */
-    public void setDenyFromPattern( String denyFromPattern )
-    {
-        this.denyFromPattern = denyFromPattern;
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.sonatype.nexus.access.AccessDecisionVoter#vote(org.sonatype.nexus.ProximityRequest,
-     *      org.sonatype.nexus.Repository, org.sonatype.nexus.access.RepositoryPermission)
-     */
     public int vote( ResourceStoreRequest request, Repository repository, RepositoryPermission permission )
     {
         if ( request.getRequestContext().containsKey( REQUEST_REMOTE_ADDRESS )
@@ -142,11 +102,14 @@ public class IpAddressAccessDecisionVoter
     {
         if ( allowFrom == null || denyFrom == null )
         {
-            allowFrom = Pattern.compile( this.allowFromPattern );
-            denyFrom = Pattern.compile( this.denyFromPattern );
+            allowFrom = Pattern.compile( getAllowFromPattern() );
+            
+            denyFrom = Pattern.compile( getDenyFromPattern() );
         }
         Matcher allowMatcher = allowFrom.matcher( ipAddress );
+        
         Matcher denyMatcher = denyFrom.matcher( ipAddress );
+        
         if ( isAllowDeny() )
         {
             if ( allowMatcher.matches() )

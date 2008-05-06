@@ -57,6 +57,7 @@ import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.ShadowRepository;
 import org.sonatype.nexus.proxy.storage.remote.DefaultRemoteStorageContext;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
+import org.sonatype.nexus.security.AuthenticationSource;
 
 /**
  * The class DefaultNexusConfiguration is responsible for config management. It actually keeps in sync Nexus internal
@@ -110,7 +111,7 @@ public class DefaultNexusConfiguration
 
     /** The config dir */
     private File configurationDirectory;
-    
+
     /** The temp dir */
     private File temporaryDirectory;
 
@@ -329,6 +330,12 @@ public class DefaultNexusConfiguration
     public boolean isAnonymousAccessEnabled()
     {
         return getConfiguration().getSecurity() != null && getConfiguration().getSecurity().isAnonymousAccessEnabled();
+    }
+
+    public AuthenticationSource getAuthenticationSource()
+        throws ConfigurationException
+    {
+        return runtimeConfigurationBuilder.getAuthenticationSource( getConfiguration() );
     }
 
     public AccessManager getAccessManagerForRealm( String realmId )
@@ -1036,7 +1043,7 @@ public class DefaultNexusConfiguration
                 return nexusInstance;
             }
         }
-        
+
         return null;
     }
 

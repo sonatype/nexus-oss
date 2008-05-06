@@ -27,10 +27,11 @@ import org.sonatype.nexus.configuration.model.Configuration;
 import org.sonatype.nexus.configuration.validator.InvalidConfigurationException;
 import org.sonatype.nexus.proxy.access.AccessManager;
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.security.AuthenticationSource;
 
 /**
- * A component to be slimmed! Actually, it is a "factory" that creates repo and other instances. It should realy onto
- * plexus as much can.
+ * A component to be slimmed! Actually, it is a "factory" (backed by Plexus) that creates repo and other instances. It
+ * should realy onto plexus as much can.
  * 
  * @author cstamas
  */
@@ -45,6 +46,9 @@ public interface RuntimeConfigurationBuilder
         throws InvalidConfigurationException;
 
     Repository createRepositoryFromModel( Configuration configuration, CRepositoryShadow repositoryShadow )
+        throws InvalidConfigurationException;
+
+    AuthenticationSource getAuthenticationSource( Configuration configuration )
         throws InvalidConfigurationException;
 
     AccessManager getAccessManagerForRealm( Configuration configuration, String realmId )

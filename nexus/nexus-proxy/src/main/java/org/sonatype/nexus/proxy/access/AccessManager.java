@@ -20,6 +20,8 @@
  */
 package org.sonatype.nexus.proxy.access;
 
+import java.util.List;
+
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.repository.Repository;
@@ -29,21 +31,27 @@ import org.sonatype.nexus.proxy.repository.Repository;
  * 
  * @author t.cservenak
  */
-public interface AccessManager {
-    
+public interface AccessManager
+{
+
     String ROLE = AccessManager.class.getName();
 
-	/**
-	 * The implementation of this method should throw AccessDeniedException or
-	 * any subclass if it denies access.
-	 * 
-	 * @param request the request
-	 * @param repository the repository
-	 * @param permission the permission
-	 * 
-	 * @throws AccessDeniedException the access denied exception
-	 */
-	void decide(ResourceStoreRequest request, Repository repository,
-			RepositoryPermission permission) throws AccessDeniedException;
+    /**
+     * The implementation of this method should throw AccessDeniedException or any subclass if it denies access.
+     * 
+     * @param request the request
+     * @param repository the repository
+     * @param permission the permission
+     * @throws AccessDeniedException the access denied exception
+     */
+    void decide( ResourceStoreRequest request, Repository repository, RepositoryPermission permission )
+        throws AccessDeniedException;
+
+    /**
+     * Returns the list of voters that participate in voting. The list may be empty.
+     * 
+     * @return
+     */
+    List<AccessDecisionVoter> getVoters();
 
 }

@@ -25,6 +25,12 @@ import org.sonatype.nexus.security.User;
 public interface AuthenticationSource
 {
     String ROLE = AuthenticationSource.class.getName();
+    
+    boolean isAnynonymousAllowed();
+
+    boolean isKnown( String username );
+    
+    boolean hasPasswordSet( String username );
 
     User authenticate( String username, String password );
 }

@@ -30,20 +30,20 @@ import org.sonatype.nexus.configuration.model.CProps;
  * A simple CProps to Map converter, to ease handling of CProps.
  * 
  * @author cstamas
- * @deprecated CProps will dissapear from model.
  */
 public class ModelloUtils
 {
     @SuppressWarnings( "unchecked" )
-    @Deprecated
     public static Map<String, String> getMapFromConfigList( List list )
     {
         Map<String, String> result = new HashMap<String, String>( list.size() );
+
         for ( Object obj : list )
         {
             CProps props = (CProps) obj;
             result.put( props.getKey(), props.getValue() );
         }
+
         return result;
     }
 }

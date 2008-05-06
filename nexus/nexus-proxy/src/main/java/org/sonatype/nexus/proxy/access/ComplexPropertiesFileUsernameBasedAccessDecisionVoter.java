@@ -22,12 +22,10 @@ package org.sonatype.nexus.proxy.access;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 
-import org.sonatype.nexus.proxy.LoggingComponent;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.security.User;
@@ -55,11 +53,10 @@ import org.sonatype.nexus.security.User;
  * properties.
  * 
  * @author cstamas
- * @plexus.component role-hint="complex-props"
+ * @plexus.component instantiation-strategy="per-lookup" role-hint="complex-props"
  */
 public class ComplexPropertiesFileUsernameBasedAccessDecisionVoter
-    extends LoggingComponent
-    implements AccessDecisionVoter
+    extends AbstractPropertiesFileBasedAccessDecisionVoter
 {
 
     /** The default rights. */
@@ -132,7 +129,7 @@ public class ComplexPropertiesFileUsernameBasedAccessDecisionVoter
     public int vote( ResourceStoreRequest request, Repository repository, RepositoryPermission permission )
     {
         Properties props = getProperties( (User) request.getRequestContext().get( REQUEST_USER ), repository.getId() );
-        
+
         return authorizeTree( props, request.getRequestPath(), permission );
     }
 
@@ -177,21 +174,14 @@ public class ComplexPropertiesFileUsernameBasedAccessDecisionVoter
     protected Properties getProperties( User user, String repositoryId )
     {
         Properties props = new Properties( getDefaultRights() );
+
         if ( user != null && repositoryId != null )
         {
-
             String propsName = getPropertiesBase() + user.getUsername() + "-" + repositoryId + ".properties";
+
             try
             {
-                InputStream is = this.getClass().getResourceAsStream( propsName );
-                if ( is != null )
-                {
-                    props.load( is );
-                }
-                else
-                {
-                    throw new IOException( "Resource not found by Classloader." );
-                }
+                props.putAll( loadProperties( propsName ) );
             }
             catch ( IOException e )
             {

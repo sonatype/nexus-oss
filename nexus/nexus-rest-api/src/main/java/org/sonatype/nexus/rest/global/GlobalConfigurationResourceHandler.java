@@ -39,6 +39,7 @@ import org.sonatype.nexus.rest.model.GlobalConfigurationResourceResponse;
 import org.sonatype.nexus.rest.model.RemoteConnectionSettings;
 import org.sonatype.nexus.rest.model.RemoteHttpProxySettings;
 import org.sonatype.nexus.security.AuthenticationSource;
+import org.sonatype.nexus.security.MutableAuthenticationSource;
 import org.sonatype.nexus.security.SimpleAuthenticationSource;
 
 /**
@@ -216,22 +217,20 @@ public class GlobalConfigurationResourceHandler
                         getNexus().updateGlobalRemoteHttpProxySettings( null );
                     }
 
-                    // TODO: This will be removed!
-                    if ( SimpleAuthenticationSource.class.isAssignableFrom( authenticationSource.getClass() ) )
+                    if ( MutableAuthenticationSource.class.isAssignableFrom( authenticationSource.getClass() ) )
                     {
                         if ( resource.getAdminPassword() != null )
                         {
                             if ( StringUtils.isEmpty( resource.getAdminPassword() ) )
                             {
                                 // resetting pwd
-                                ( (SimpleAuthenticationSource) authenticationSource ).setPassword(
-                                    SimpleAuthenticationSource.ADMIN_USERNAME,
-                                    null );
+                                ( (MutableAuthenticationSource) authenticationSource )
+                                    .unsetPassword( SimpleAuthenticationSource.ADMIN_USERNAME );
                             }
                             else
                             {
                                 // setting pwd
-                                ( (SimpleAuthenticationSource) authenticationSource ).setPassword(
+                                ( (MutableAuthenticationSource) authenticationSource ).setPassword(
                                     SimpleAuthenticationSource.ADMIN_USERNAME,
                                     resource.getAdminPassword() );
                             }
@@ -242,14 +241,13 @@ public class GlobalConfigurationResourceHandler
                             if ( StringUtils.isEmpty( resource.getDeploymentPassword() ) )
                             {
                                 // resetting pwd
-                                ( (SimpleAuthenticationSource) authenticationSource ).setPassword(
-                                    SimpleAuthenticationSource.DEPLOYMENT_USERNAME,
-                                    null );
+                                ( (MutableAuthenticationSource) authenticationSource )
+                                    .unsetPassword( SimpleAuthenticationSource.DEPLOYMENT_USERNAME );
                             }
                             else
                             {
                                 // setting pwd
-                                ( (SimpleAuthenticationSource) authenticationSource ).setPassword(
+                                ( (MutableAuthenticationSource) authenticationSource ).setPassword(
                                     SimpleAuthenticationSource.DEPLOYMENT_USERNAME,
                                     resource.getDeploymentPassword() );
                             }
