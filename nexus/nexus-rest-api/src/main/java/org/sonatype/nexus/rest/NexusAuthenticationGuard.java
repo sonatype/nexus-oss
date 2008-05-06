@@ -203,7 +203,14 @@ public class NexusAuthenticationGuard
 
             User user = getAuthenticationSource().authenticate( identifier, new String( secret ) );
 
-            return user != null && !user.isAnonymous();
+            if ( getAuthenticationSource().isAnynonymousAllowed() )
+            {
+                return user != null;
+            }
+            else
+            {
+                return user != null && !user.isAnonymous();
+            }
         }
         else
         {

@@ -20,9 +20,13 @@
  */
 package org.sonatype.nexus.rest;
 
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.restlet.Context;
 import org.restlet.Restlet;
 import org.restlet.Router;
+import org.sonatype.nexus.configuration.NexusConfiguration;
+import org.sonatype.nexus.security.SimpleAuthenticationSource;
+import org.sonatype.plexus.rest.PlexusRestletUtils;
 
 /**
  * Nexus REST content bridge.
@@ -41,6 +45,7 @@ public class ApplicationContentBridge
     public ApplicationContentBridge( Context context )
     {
         super( context );
+
     }
 
     /**
@@ -53,8 +58,31 @@ public class ApplicationContentBridge
         // instance filter, that injects proper Nexus instance into request attributes
         LocalNexusInstanceFilter nif = new LocalNexusInstanceFilter( getContext() );
 
-        // simple anonymous guard
-        NexusAuthenticationGuard nexusGuard = new NexusAuthenticationGuard( getContext() );
+        // simple guard
+        NexusAuthenticationGuard nexusGuard = null;
+
+        try
+        {
+            NexusConfiguration nc = (NexusConfiguration) PlexusRestletUtils.plexusLookup(
+                getContext(),
+                NexusConfiguration.ROLE );
+
+            if ( "simple".equals( nc.getAuthenticationSourceType() ) )
+            {
+                nexusGuard = new NexusWriteAccessAuthenticationGuard(
+                    getContext(),
+                    SimpleAuthenticationSource.DEPLOYMENT_USERNAME );
+            }
+            else
+            {
+                nexusGuard = new NexusAuthenticationGuard( getContext() );
+            }
+
+        }
+        catch ( ComponentLookupException e )
+        {
+            throw new IllegalStateException( "Cannot lookup sessionStore or authenticationSource!", e );
+        }
 
         // attaching it after nif
         nif.setNext( nexusGuard );

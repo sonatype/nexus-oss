@@ -75,10 +75,12 @@ public class DefaultConfigurationValidator
                 getLogger().info(
                     "Security is enabled, but no authenticationSource is set, assuming 'simple' authentication." );
 
+                model.getSecurity().setAnonymousAccessEnabled( true );
+
                 model.getSecurity().setAuthenticationSource( new CAuthSource() );
 
                 model.getSecurity().getAuthenticationSource().setType( "simple" );
-
+                
                 response
                     .addValidationWarning( "Security is enabled, but no authenticationSource is set, setting 'simple' authentication source." );
 
