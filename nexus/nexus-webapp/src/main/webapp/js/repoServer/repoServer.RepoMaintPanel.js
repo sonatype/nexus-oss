@@ -469,7 +469,7 @@ Ext.extend(Sonatype.repoServer.RepoMaintPanel, Ext.Panel, {
       
       if (!node.isRoot){
         menu.add(this.actions.deleteRepoItem);
-        if (isProxyRepo){
+        if (isProxyRepo && !node.isLeaf()){
           menu.add(this.actions.viewRemote);
         }
       }
