@@ -31,6 +31,7 @@ Sonatype.repoServer.referenceData = {
   globalSettingsState : {
     adminPassword: "",
     deploymentPassword: "",
+    securityConfiguration: "Simple",
     workingDirectory: "",
     logDirectory: "",
     globalConnectionSettings: {

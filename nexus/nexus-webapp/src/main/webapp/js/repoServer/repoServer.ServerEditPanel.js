@@ -25,11 +25,13 @@ Sonatype.repoServer.ServerEditPanel = function(config){
   Ext.apply(this, config, defaultConfig);
   
   var tfStore = new Ext.data.SimpleStore({fields:['value'], data:[['True'],['False']]});
+  var securityConfigStore = new Ext.data.SimpleStore({fields:['value'], data:[['Off'],['Simple'],['Custom']]});
   
   // help text alias
   var ht = Sonatype.repoServer.resources.help.server;
   
   Sonatype.repoServer.ServerEditPanel.superclass.constructor.call(this, {
+    trackResetOnLoad: true,
     autoScroll: true,
     border: false,
     frame: true,
@@ -140,6 +142,23 @@ Sonatype.repoServer.ServerEditPanel = function(config){
           labelSeparator: ''
         },
         items: [
+          {
+            xtype: 'combo',
+            fieldLabel: 'Security Model',
+            itemCls: 'required-field',
+            helpText: ht.securityConfiguration,
+            name: 'securityConfiguration',
+            width: 150,
+            store: securityConfigStore,
+            displayField:'value',
+            editable: false,
+            forceSelection: true,
+            mode: 'local',
+            triggerAction: 'all',
+            emptyText:'Select...',
+            selectOnFocus:true,
+            allowBlank: false
+          },
           { 
             xtype: 'textfield',
             fieldLabel:'Admin Password', 
@@ -304,6 +323,9 @@ Sonatype.repoServer.ServerEditPanel = function(config){
   this.on('afterlayout', this.afterLayoutHandler, this, {single:true});
   this.form.on('actioncomplete', this.actionCompleteHandler, this);
   this.form.on('actionfailed', this.actionFailedHandler, this);
+  
+  var securityConfigField = this.find('name', 'securityConfiguration')[0];
+  securityConfigField.on('select', this.securityConfigSelectHandler, securityConfigField);
 };
 
 Ext.extend(Sonatype.repoServer.ServerEditPanel, Ext.FormPanel, {
@@ -331,8 +353,9 @@ Ext.extend(Sonatype.repoServer.ServerEditPanel, Ext.FormPanel, {
   
   saveBtnHandler : function() {
     var wkDirField = this.find('name', 'workingDirectory')[0];
+    var securityConfigField = this.find('name', 'securityConfiguration')[0];
     if (this.form.isValid()) {
-      if (wkDirField.isDirty()) {
+      if (wkDirField.isDirty() || securityConfigField.isDirty()) {
         //@note: this handler selects the "No" button as the default
         //@todo: could extend Ext.MessageBox to take the button to select as a param
         Ext.Msg.getDialog().on('show', function(){
@@ -344,8 +367,8 @@ Ext.extend(Sonatype.repoServer.ServerEditPanel, Ext.FormPanel, {
       
         Ext.Msg.show({
           animEl: this,
-          title : 'Change Working Directory?',
-          msg : 'Changing the Working Directory requires a manual restart of Nexus.<br/><br/>Do you want to continue?',
+          title : 'Change Working Directory? or Security Model?',
+          msg : 'Changing the Working Directory or Security Model requires a manual restart of Nexus.<br/><br/>Do you want to continue?',
           buttons: Ext.Msg.YESNO,
           scope: this,
           icon: Ext.Msg.QUESTION,
@@ -378,7 +401,8 @@ Ext.extend(Sonatype.repoServer.ServerEditPanel, Ext.FormPanel, {
         "routing.groups.stopItemSearchOnFirstFoundFile" : Sonatype.utils.convert.stringContextToBool,
         "routing.groups.mergeMetadata" : Sonatype.utils.convert.stringContextToBool,
         "adminPassword" : Sonatype.utils.convert.passwordToString,
-        "deploymentPassword" : Sonatype.utils.convert.passwordToString
+        "deploymentPassword" : Sonatype.utils.convert.passwordToString,
+        "securityConfiguration" : Sonatype.utils.lowercase
       },
       serviceDataObj : Sonatype.repoServer.referenceData.globalSettingsState
     });
@@ -404,7 +428,8 @@ Ext.extend(Sonatype.repoServer.ServerEditPanel, Ext.FormPanel, {
       dataModifiers: {
         "routing.followLinks" : Sonatype.utils.capitalize,
         "routing.groups.stopItemSearchOnFirstFoundFile" : Sonatype.utils.capitalize,
-        "routing.groups.mergeMetadata" : Sonatype.utils.capitalize
+        "routing.groups.mergeMetadata" : Sonatype.utils.capitalize,
+        "securityConfiguration" : Sonatype.utils.capitalize
       }
     });
     
@@ -430,7 +455,7 @@ Ext.extend(Sonatype.repoServer.ServerEditPanel, Ext.FormPanel, {
       if (action.options.restartRequired) {
         Ext.Msg.show({
           title : 'Restart Required',
-          msg : 'Nexus must now be restarted for the Working Directory change to take effect',
+          msg : 'Nexus must now be restarted for the Working Directory and/or Security Model change to take effect',
           buttons: false,
           closable: false,
           icon: Ext.Msg.WARNING
@@ -446,6 +471,12 @@ Ext.extend(Sonatype.repoServer.ServerEditPanel, Ext.FormPanel, {
       //        default behavior sets the original value to whatever is specified in the config.
       var wkDirField = this.find('name', 'workingDirectory')[0];
       wkDirField.originalValue = wkDirField.getValue();
+      var disablePW = true;
+      if (action.options.fpanel.find('name', 'securityConfiguration')[0].getValue() == 'Simple') {
+        disablePW = false;
+      }
+      action.options.fpanel.find('name', 'adminPassword')[0].setDisabled(disablePW);
+      action.options.fpanel.find('name', 'deploymentPassword')[0].setDisabled(disablePW);
     }
     
     //@todo: some completion message would be helpful.
@@ -468,6 +499,16 @@ Ext.extend(Sonatype.repoServer.ServerEditPanel, Ext.FormPanel, {
     }
     
     //@todo: need global alert mechanism for fatal errors.
+  },
+  
+  securityConfigSelectHandler : function(combo, record, index){
+    var disabled = true;
+    if (record.data.value == 'Simple') {
+      disabled = false;
+    }
+    
+    this.ownerCt.find('name', 'adminPassword')[0].setDisabled(disabled);
+    this.ownerCt.find('name', 'deploymentPassword')[0].setDisabled(disabled);
   }
   
 });

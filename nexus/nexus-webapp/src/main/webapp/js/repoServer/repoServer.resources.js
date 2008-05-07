@@ -49,8 +49,9 @@ Sonatype.repoServer.resources.help = {
 
   // Server Config help text
   server : {
-    adminPassword : 'Optional field to set the new Admin user password.',
-    deploymentPassword : 'Optional field to set the new Deployment password.',
+    adminPassword : 'Field to set the new Admin user password.',
+    deploymentPassword : 'Field to set the new Deployment password.',
+    securityConfiguration : 'The Security Model to use.  Options include Simple, Custom and Off.', 
     workingDirectory : 'The base folder where Nexus will store all of its data. For easier upgrades, it is recommended that this be in a folder outside your Nexus binary installation. Nexus must be restarted after changing this value.',
     logDirectory : 'This is the location of your log files. It must correspond to the location specified by /etc/log4j.properties.',
 
