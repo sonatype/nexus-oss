@@ -23,7 +23,6 @@
   -->
   <dependencySets>
     <dependencySet>
-      <useProjectArtifact>true</useProjectArtifact>
       <scope>runtime</scope>
       <outputDirectory>/</outputDirectory>
       <unpack>true</unpack>
