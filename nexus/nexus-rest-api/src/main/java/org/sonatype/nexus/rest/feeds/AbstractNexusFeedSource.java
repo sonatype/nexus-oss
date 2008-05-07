@@ -124,7 +124,7 @@ public abstract class AbstractNexusFeedSource
         {
             if ( item.getEventContext().containsKey( AccessDecisionVoter.REQUEST_USER ) )
             {
-                username = ( (User) item.getEventContext().get( AccessDecisionVoter.REQUEST_USER ) ).getUsername();
+                username = (String) item.getEventContext().get( AccessDecisionVoter.REQUEST_USER );
             }
             else
             {

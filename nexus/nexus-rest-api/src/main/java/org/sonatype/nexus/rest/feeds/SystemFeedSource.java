@@ -29,7 +29,6 @@ import org.sonatype.nexus.feeds.FeedRecorder;
 import org.sonatype.nexus.feeds.SystemEvent;
 import org.sonatype.nexus.proxy.access.AccessDecisionVoter;
 import org.sonatype.nexus.proxy.access.IpAddressAccessDecisionVoter;
-import org.sonatype.nexus.security.User;
 
 import com.sun.syndication.feed.synd.SyndContent;
 import com.sun.syndication.feed.synd.SyndContentImpl;
@@ -110,7 +109,7 @@ public class SystemFeedSource
 
             if ( item.getEventContext().containsKey( AccessDecisionVoter.REQUEST_USER ) )
             {
-                username = ( (User) item.getEventContext().get( AccessDecisionVoter.REQUEST_USER ) ).getUsername();
+                username = (String) item.getEventContext().get( AccessDecisionVoter.REQUEST_USER );
             }
             else
             {

@@ -27,7 +27,6 @@ import java.util.Properties;
 
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.security.User;
 
 /**
  * Voter that allows/denies the repository access based on property file.
@@ -51,7 +50,7 @@ public class PropertiesUsernamePathBasedAccessDecisionVoter
 
     public int vote( ResourceStoreRequest request, Repository repository, RepositoryPermission permission )
     {
-        return authorizeTree( getProperties(), (User) request.getRequestContext().get( REQUEST_USER ), request
+        return authorizeTree( getProperties(), (String) request.getRequestContext().get( REQUEST_USER ), request
             .getRequestPath(), permission );
     }
 
@@ -63,9 +62,9 @@ public class PropertiesUsernamePathBasedAccessDecisionVoter
      * @param permission the permission
      * @return the int
      */
-    private int authorizeTree( Properties path2rights, User user, String path, RepositoryPermission permission )
+    private int authorizeTree( Properties path2rights, String username, String path, RepositoryPermission permission )
     {
-        String pathRights = path2rights.getProperty( user.getUsername() + path );
+        String pathRights = path2rights.getProperty( username + path );
 
         if ( pathRights != null )
         {
@@ -82,13 +81,13 @@ public class PropertiesUsernamePathBasedAccessDecisionVoter
         }
 
         String parent = ( new File( path ) ).getParent();
-        
+
         if ( parent == null )
         {
             return ACCESS_DENIED;
         }
 
-        return authorizeTree( path2rights, user, parent, permission );
+        return authorizeTree( path2rights, username, parent, permission );
     }
 
 }

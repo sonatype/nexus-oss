@@ -37,7 +37,6 @@ import org.apache.velocity.app.VelocityEngine;
 import org.apache.velocity.runtime.RuntimeConstants;
 import org.codehaus.plexus.util.StringUtils;
 import org.restlet.Context;
-import org.restlet.data.ChallengeRequest;
 import org.restlet.data.MediaType;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
@@ -177,7 +176,7 @@ public abstract class AbstractResourceStoreContentResource
         {
             User user = (User) getRequest().getAttributes().get( NexusAuthenticationGuard.REST_USER_KEY );
 
-            result.getRequestContext().put( AccessDecisionVoter.REQUEST_USER, user );
+            result.getRequestContext().put( AccessDecisionVoter.REQUEST_USER, user.getUsername() );
         }
 
         if ( getRequest().isConfidential() )

@@ -25,7 +25,6 @@ import java.util.List;
 
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.security.User;
 
 /**
  * <p>
@@ -53,7 +52,8 @@ public class SimplePropertiesFileUsernameBasedAccessDecisionVoter
         if ( request.getRequestContext().containsKey( REQUEST_USER ) )
         {
             String allowedUsers = getProperties().getProperty( repository.getId() );
-            String username = ( (User) request.getRequestContext().get( REQUEST_USER ) ).getUsername();
+
+            String username = (String) request.getRequestContext().get( REQUEST_USER );
 
             List<String> usersList = Arrays.asList( allowedUsers.split( "," ) );
 

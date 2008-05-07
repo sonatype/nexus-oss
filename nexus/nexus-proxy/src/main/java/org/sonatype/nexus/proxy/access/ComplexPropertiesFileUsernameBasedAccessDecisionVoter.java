@@ -28,7 +28,6 @@ import java.util.Properties;
 
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.security.User;
 
 /**
  * Quasi complex voter that allows/denies the repository access based on property files. The property files are searched
@@ -128,7 +127,7 @@ public class ComplexPropertiesFileUsernameBasedAccessDecisionVoter
      */
     public int vote( ResourceStoreRequest request, Repository repository, RepositoryPermission permission )
     {
-        Properties props = getProperties( (User) request.getRequestContext().get( REQUEST_USER ), repository.getId() );
+        Properties props = getProperties( (String) request.getRequestContext().get( REQUEST_USER ), repository.getId() );
 
         return authorizeTree( props, request.getRequestPath(), permission );
     }
@@ -171,13 +170,13 @@ public class ComplexPropertiesFileUsernameBasedAccessDecisionVoter
      * @param repositoryId the repository id
      * @return the properties
      */
-    protected Properties getProperties( User user, String repositoryId )
+    protected Properties getProperties( String username, String repositoryId )
     {
         Properties props = new Properties( getDefaultRights() );
 
-        if ( user != null && repositoryId != null )
+        if ( username != null && repositoryId != null )
         {
-            String propsName = getPropertiesBase() + user.getUsername() + "-" + repositoryId + ".properties";
+            String propsName = getPropertiesBase() + username + "-" + repositoryId + ".properties";
 
             try
             {
