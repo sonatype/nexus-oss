@@ -649,7 +649,8 @@ public class DefaultIndexerManager
                         new File( getWorkingDirectory(), getLocalContextId( repository.getId() ) ),
                         remoteRoot,
                         null,
-                        NexusIndexer.FULL_INDEX );
+                        NexusIndexer.FULL_INDEX,
+                        true );
 
                     if ( ctxLocal.getTimestamp() == null )
                     {
@@ -659,15 +660,15 @@ public class DefaultIndexerManager
 
                     if ( RepositoryType.PROXY.equals( repository.getRepositoryType() ) )
                     {
-                        IndexingContext ctxRemote = nexusIndexer
-                            .addIndexingContext(
-                                getRemoteContextId( repository.getId() ),
-                                repository.getId(),
-                                repoRoot,
-                                new File( getWorkingDirectory(), getRemoteContextId( repository.getId() ) ),
-                                remoteRoot,
-                                remoteRoot,
-                                NexusIndexer.FULL_INDEX );
+                        IndexingContext ctxRemote = nexusIndexer.addIndexingContext(
+                            getRemoteContextId( repository.getId() ),
+                            repository.getId(),
+                            repoRoot,
+                            new File( getWorkingDirectory(), getRemoteContextId( repository.getId() ) ),
+                            remoteRoot,
+                            remoteRoot,
+                            NexusIndexer.FULL_INDEX,
+                            true );
 
                         if ( ctxRemote.getTimestamp() == null )
                         {
@@ -704,8 +705,6 @@ public class DefaultIndexerManager
                 // we are handling repo events, like addition and removal
                 if ( RepositoryRegistryGroupEventAdd.class.isAssignableFrom( evt.getClass() ) )
                 {
-                    List<Repository> members = repositoryRegistry.getRepositoryGroup( gevt.getGroupId() );
-
                     IndexingContext ctxLocal = nexusIndexer.addIndexingContext(
                         getLocalContextId( gevt.getGroupId() ),
                         gevt.getGroupId(),
@@ -713,7 +712,8 @@ public class DefaultIndexerManager
                         new File( getWorkingDirectory(), getLocalContextId( gevt.getGroupId() ) ),
                         null,
                         null,
-                        NexusIndexer.FULL_INDEX );
+                        NexusIndexer.FULL_INDEX,
+                        true );
 
                     IndexingContext ctxRemote = nexusIndexer.addIndexingContext(
                         getRemoteContextId( gevt.getGroupId() ),
@@ -722,7 +722,10 @@ public class DefaultIndexerManager
                         new File( getWorkingDirectory(), getRemoteContextId( gevt.getGroupId() ) ),
                         null,
                         null,
-                        NexusIndexer.FULL_INDEX );
+                        NexusIndexer.FULL_INDEX,
+                        true );
+
+                    List<Repository> members = repositoryRegistry.getRepositoryGroup( gevt.getGroupId() );
 
                     /*
                      * TODO: NX-463 Commented, to fix bundle issues until we implement this for ( Repository repo :
@@ -830,16 +833,16 @@ public class DefaultIndexerManager
                             if ( ievt instanceof RepositoryItemEventDelete )
                             {
                                 ArtifactInfo ai = new ArtifactInfo();
-                                
+
                                 ai.groupId = gav.getGroupId();
-                                
+
                                 ai.artifactId = gav.getArtifactId();
-                                
+
                                 ai.version = gav.getVersion();
-                                
+
                                 ai.classifier = gav.getClassifier();
 
-                                ArtifactContext ac = new ArtifactContext(null, null, null, ai);
+                                ArtifactContext ac = new ArtifactContext( null, null, null, ai );
 
                                 // remove file from index
                                 getLogger().debug(
