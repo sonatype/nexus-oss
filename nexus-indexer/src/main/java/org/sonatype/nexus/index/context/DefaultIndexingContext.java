@@ -7,7 +7,7 @@
  *
  * Contributors:
  *    Eugene Kuleshov (Sonatype)
- *    Tamás Cservenák (Sonatype)
+ *    Tamas Cservenak (Sonatype)
  *    Brian Fox (Sonatype)
  *    Jason Van Zyl (Sonatype)
  *******************************************************************************/
@@ -31,7 +31,6 @@ import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
-import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.index.ArtifactContext;
 import org.sonatype.nexus.index.ArtifactInfo;
@@ -255,6 +254,17 @@ public class DefaultIndexingContext
         }
     }
 
+    private void deleteIndexFiles()
+        throws IOException
+    {
+        String[] names = indexDirectory.list();
+
+        for ( int i = 0; i < names.length; i++ )
+        {
+            indexDirectory.deleteFile( names[i] );
+        }
+    }
+
     public String getId()
     {
         return id;
@@ -337,6 +347,9 @@ public class DefaultIndexingContext
             if ( indexSearcher != null )
             {
                 indexSearcher.close();
+
+                // the reader was supplied explicitly
+                indexSearcher.getIndexReader().close();
             }
             indexSearcher = new IndexSearcher( getIndexReader() );
         }
@@ -358,13 +371,10 @@ public class DefaultIndexingContext
             closeReaders();
 
             indexDirectory.close();
+
             if ( deleteFiles )
             {
-                if ( indexDirectory instanceof FSDirectory )
-                {
-                    File file = ( (FSDirectory) indexDirectory ).getFile();
-                    FileUtils.deleteDirectory( file );
-                }
+                deleteIndexFiles();
             }
         }
         // TODO: this will prevent from reopening them, but needs better solution
@@ -398,14 +408,12 @@ public class DefaultIndexingContext
     {
         closeReaders();
 
-        String[] names = indexDirectory.list();
-
-        for ( int i = 0; i < names.length; i++ )
-        {
-            indexDirectory.deleteFile( names[i] );
-        }
+        deleteIndexFiles();
 
         Directory.copy( directory, indexDirectory, false );
+
+        // reclaim the index as mine
+        storeDescriptor();
     }
 
     public void merge( Directory directory )
