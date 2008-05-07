@@ -7,7 +7,7 @@
  *
  * Contributors:
  *    Eugene Kuleshov (Sonatype)
- *    Tamás Cservenák (Sonatype)
+ *    Tamï¿½s Cservenï¿½k (Sonatype)
  *    Brian Fox (Sonatype)
  *    Jason Van Zyl (Sonatype)
  *******************************************************************************/
@@ -174,7 +174,8 @@ public class NexusIndexerCli
             indexDirectory, // index folder
             null, // repositoryUrl
             null, // index update url
-            indexers );
+            indexers,
+            false);
 
         boolean createZip = cli.hasOption( ZIP );
 

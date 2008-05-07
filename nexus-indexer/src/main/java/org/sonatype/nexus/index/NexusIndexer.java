@@ -7,7 +7,7 @@
  *
  * Contributors:
  *    Eugene Kuleshov (Sonatype)
- *    Tamás Cservenák (Sonatype)
+ *    Tamï¿½s Cservenï¿½k (Sonatype)
  *    Brian Fox (Sonatype)
  *    Jason Van Zyl (Sonatype)
  *******************************************************************************/
@@ -58,12 +58,14 @@ public interface NexusIndexer
         new JarFileContentsIndexCreator() );
 
     IndexingContext addIndexingContext( String id, String repositoryId, File repository, File indexDirectory,
-        String repositoryUrl, String indexUpdateUrl, List<? extends IndexCreator> indexers )
+        String repositoryUrl, String indexUpdateUrl, List<? extends IndexCreator> indexers,
+        boolean reclaimIndexOwnership )
         throws IOException,
             UnsupportedExistingLuceneIndexException;
 
     IndexingContext addIndexingContext( String id, String repositoryId, File repository, Directory directory,
-        String repositoryUrl, String indexUpdateUrl, List<? extends IndexCreator> indexers )
+        String repositoryUrl, String indexUpdateUrl, List<? extends IndexCreator> indexers,
+        boolean reclaimIndexOwnership )
         throws IOException,
             UnsupportedExistingLuceneIndexException;
 
@@ -84,7 +86,7 @@ public interface NexusIndexer
 
     void scan( IndexingContext context, ArtifactScanningListener listener, boolean update )
         throws IOException;
-    
+
     void artifactDiscovered( ArtifactContext ac, IndexingContext context )
         throws IOException;
 
@@ -92,14 +94,14 @@ public interface NexusIndexer
     // Modifying
     // ----------------------------------------------------------------------------
 
-//    public void addArtifactToIndex( File pom, IndexingContext context )
-//        throws IOException;
+    // public void addArtifactToIndex( File pom, IndexingContext context )
+    // throws IOException;
 
     public void addArtifactToIndex( ArtifactContext ac, IndexingContext context )
         throws IOException;
 
-//    public void deleteArtifactFromIndex( File pom, IndexingContext context )
-//        throws IOException;
+    // public void deleteArtifactFromIndex( File pom, IndexingContext context )
+    // throws IOException;
 
     public void deleteArtifactFromIndex( ArtifactContext ac, IndexingContext context )
         throws IOException;
@@ -167,7 +169,7 @@ public interface NexusIndexer
     ArtifactInfo identify( Query query, Collection<IndexingContext> contexts )
         throws IOException,
             IndexContextInInconsistentStateException;
-    
+
     // ----------------------------------------------------------------------------
     // Root groups
     // ----------------------------------------------------------------------------
@@ -187,5 +189,5 @@ public interface NexusIndexer
 
     void setAllGroups( IndexingContext context, Collection<String> groups )
         throws IOException;
-    
+
 }

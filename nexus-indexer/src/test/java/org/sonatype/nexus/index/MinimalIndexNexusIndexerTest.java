@@ -7,7 +7,7 @@
  *
  * Contributors:
  *    Eugene Kuleshov (Sonatype)
- *    Tamás Cservenák (Sonatype)
+ *    Tamï¿½s Cservenï¿½k (Sonatype)
  *    Brian Fox (Sonatype)
  *    Jason Van Zyl (Sonatype)
  *******************************************************************************/
@@ -40,7 +40,7 @@ public class MinimalIndexNexusIndexerTest
             repo,
             indexDir,
             null,
-            null, NexusIndexer.MINIMAL_INDEX );
+            null, NexusIndexer.MINIMAL_INDEX, false );
         nexusIndexer.scan( context );
     }
 

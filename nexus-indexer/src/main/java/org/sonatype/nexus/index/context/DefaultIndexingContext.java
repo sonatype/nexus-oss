@@ -111,7 +111,7 @@ public class DefaultIndexingContext
     }
 
     public DefaultIndexingContext( String id, String repositoryId, File repository, File indexDirectoryFile,
-        String repositoryUrl, String indexUpdateUrl, List<? extends IndexCreator> indexCreators )
+        String repositoryUrl, String indexUpdateUrl, List<? extends IndexCreator> indexCreators, boolean reclaimIndex )
         throws IOException,
             UnsupportedExistingLuceneIndexException
     {
@@ -121,11 +121,11 @@ public class DefaultIndexingContext
 
         this.indexDirectory = FSDirectory.getDirectory( indexDirectoryFile );
 
-        prepareIndex();
+        prepareIndex( reclaimIndex );
     }
 
     public DefaultIndexingContext( String id, String repositoryId, File repository, Directory indexDirectory,
-        String repositoryUrl, String indexUpdateUrl, List<? extends IndexCreator> indexCreators )
+        String repositoryUrl, String indexUpdateUrl, List<? extends IndexCreator> indexCreators, boolean reclaimIndex )
         throws IOException,
             UnsupportedExistingLuceneIndexException
     {
@@ -138,7 +138,7 @@ public class DefaultIndexingContext
             this.indexDirectoryFile = ( (FSDirectory) indexDirectory ).getFile();
         }
 
-        prepareIndex();
+        prepareIndex( reclaimIndex );
     }
 
     public Directory getIndexDirectory()
@@ -151,7 +151,7 @@ public class DefaultIndexingContext
         return indexDirectoryFile;
     }
 
-    private void prepareIndex()
+    private void prepareIndex( boolean reclaimIndex )
         throws IOException,
             UnsupportedExistingLuceneIndexException
     {
@@ -163,7 +163,7 @@ public class DefaultIndexingContext
                 IndexReader.unlock( indexDirectory );
             }
 
-            checkAndUpdateIndexDescriptor();
+            checkAndUpdateIndexDescriptor( reclaimIndex );
         }
         else
         {
@@ -188,10 +188,16 @@ public class DefaultIndexingContext
         }
     }
 
-    private void checkAndUpdateIndexDescriptor()
+    private void checkAndUpdateIndexDescriptor( boolean reclaimIndex )
         throws IOException,
             UnsupportedExistingLuceneIndexException
     {
+        if ( reclaimIndex )
+        {
+            // forcefully "reclaiming" the ownership of the index as ours
+            storeDescriptor();
+        }
+
         Hits hits = getIndexSearcher().search( new TermQuery( DESCRIPTOR_TERM ) );
 
         if ( hits == null || hits.length() == 0 )

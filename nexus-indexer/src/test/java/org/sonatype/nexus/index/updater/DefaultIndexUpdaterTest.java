@@ -7,7 +7,7 @@
  *
  * Contributors:
  *    Eugene Kuleshov (Sonatype)
- *    Tamás Cservenák (Sonatype)
+ *    Tamï¿½s Cservenï¿½k (Sonatype)
  *    Brian Fox (Sonatype)
  *    Jason Van Zyl (Sonatype)
  *******************************************************************************/
@@ -50,7 +50,8 @@ public class DefaultIndexUpdaterTest
             indexDirectory,
             repositoryUrl,
             null,
-            NexusIndexer.MINIMAL_INDEX );
+            NexusIndexer.MINIMAL_INDEX,
+            false);
 
         indexer.addArtifactToIndex(
             createArtifactContext( repositoryId, "commons-lang", "commons-lang", "2.2", null ),
@@ -73,7 +74,7 @@ public class DefaultIndexUpdaterTest
             tempIndexDirectory,
             repositoryUrl,
             null,
-            NexusIndexer.MINIMAL_INDEX );
+            NexusIndexer.MINIMAL_INDEX, false );
 
         indexer.addArtifactToIndex(
             createArtifactContext( repositoryId, "commons-lang", "commons-lang", "2.3", null ),
@@ -120,7 +121,7 @@ public class DefaultIndexUpdaterTest
             indexDirectory,
             repositoryUrl,
             null,
-            NexusIndexer.MINIMAL_INDEX );
+            NexusIndexer.MINIMAL_INDEX, false );
 
         indexer.addArtifactToIndex(
             createArtifactContext( repositoryId, "commons-lang", "commons-lang", "2.2", null ),
@@ -143,7 +144,7 @@ public class DefaultIndexUpdaterTest
             tempIndexDirectory,
             repositoryUrl,
             null,
-            NexusIndexer.MINIMAL_INDEX );
+            NexusIndexer.MINIMAL_INDEX, false );
 
         // indexer.addArtifactToIndex(
         // createArtifactContext( repositoryId, "commons-lang", "commons-lang", "2.2", null ),

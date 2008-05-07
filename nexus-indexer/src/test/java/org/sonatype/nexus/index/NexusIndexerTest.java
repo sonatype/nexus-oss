@@ -7,7 +7,7 @@
  *
  * Contributors:
  *    Eugene Kuleshov (Sonatype)
- *    Tamás Cservenák (Sonatype)
+ *    Tamï¿½s Cservenï¿½k (Sonatype)
  *    Brian Fox (Sonatype)
  *    Jason Van Zyl (Sonatype)
  *******************************************************************************/
@@ -224,7 +224,7 @@ public class NexusIndexerTest
         indexer.removeIndexingContext( context, false );
 
         indexer
-            .addIndexingContext( indexId, repositoryId, repository, newDirectory, repositoryUrl, null, indexCreators );
+            .addIndexingContext( indexId, repositoryId, repository, newDirectory, repositoryUrl, null, indexCreators, false );
 
         Collection<ArtifactInfo> infos = indexer.searchFlat( ArtifactInfo.VERSION_COMPARATOR, new WildcardQuery(
             new Term( ArtifactInfo.PACKAGING, "maven-plugin" ) ) );
@@ -247,7 +247,7 @@ public class NexusIndexerTest
 
         List<IndexCreator> indexCreators = new ArrayList<IndexCreator>( 1 );
         indexCreators.add( new MinimalArtifactInfoIndexCreator() );
-        context = indexer.addIndexingContext( "test", "test", repo, indexDir, null, null, indexCreators );
+        context = indexer.addIndexingContext( "test", "test", repo, indexDir, null, null, indexCreators, false );
         indexer.scan( context );
 
 //        IndexReader indexReader = context.getIndexSearcher().getIndexReader();

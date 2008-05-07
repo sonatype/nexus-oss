@@ -7,7 +7,7 @@
  *
  * Contributors:
  *    Eugene Kuleshov (Sonatype)
- *    Tamás Cservenák (Sonatype)
+ *    Tamï¿½s Cservenï¿½k (Sonatype)
  *    Brian Fox (Sonatype)
  *    Jason Van Zyl (Sonatype)
  *******************************************************************************/
@@ -47,7 +47,7 @@ public class Nexus13NexusIndexerTest
             indexDir,
             null,
             null,
-            NexusIndexer.DEFAULT_INDEX );
+            NexusIndexer.DEFAULT_INDEX, false );
         nexusIndexer.scan( context );
     }
 
@@ -120,7 +120,7 @@ public class Nexus13NexusIndexerTest
             newIndexDir,
             null,
             null,
-            NexusIndexer.DEFAULT_INDEX );
+            NexusIndexer.DEFAULT_INDEX, false );
 
         assertEquals( 0, newContext.getTimestamp().getTime() - context.getTimestamp().getTime() );
 

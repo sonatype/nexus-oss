@@ -7,7 +7,7 @@
  *
  * Contributors:
  *    Eugene Kuleshov (Sonatype)
- *    Tamás Cservenák (Sonatype)
+ *    Tamï¿½s Cservenï¿½k (Sonatype)
  *    Brian Fox (Sonatype)
  *    Jason Van Zyl (Sonatype)
  *******************************************************************************/
@@ -85,7 +85,7 @@ public class DefaultNexusIndexer
     // ----------------------------------------------------------------------------
 
     public IndexingContext addIndexingContext( String id, String repositoryId, File repository, File indexDirectory,
-        String repositoryUrl, String indexUpdateUrl, List<? extends IndexCreator> indexers )
+        String repositoryUrl, String indexUpdateUrl, List<? extends IndexCreator> indexers, boolean reclaimIndexOwnership )
         throws IOException,
             UnsupportedExistingLuceneIndexException
     {
@@ -96,7 +96,8 @@ public class DefaultNexusIndexer
             indexDirectory,
             repositoryUrl,
             indexUpdateUrl,
-            indexers );
+            indexers,
+            reclaimIndexOwnership );
 
         indexingContexts.put( context.getId(), context );
 
@@ -104,7 +105,7 @@ public class DefaultNexusIndexer
     }
 
     public IndexingContext addIndexingContext( String id, String repositoryId, File repository, Directory directory,
-        String repositoryUrl, String indexUpdateUrl, List<? extends IndexCreator> indexers )
+        String repositoryUrl, String indexUpdateUrl, List<? extends IndexCreator> indexers, boolean reclaimIndexOwnership )
         throws IOException,
             UnsupportedExistingLuceneIndexException
     {
@@ -115,7 +116,8 @@ public class DefaultNexusIndexer
             directory,
             repositoryUrl,
             indexUpdateUrl,
-            indexers );
+            indexers,
+            reclaimIndexOwnership );
 
         indexingContexts.put( context.getId(), context );
 
