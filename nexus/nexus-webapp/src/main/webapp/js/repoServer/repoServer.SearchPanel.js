@@ -77,101 +77,67 @@ Sonatype.repoServer.SearchPanel = function(config){
     searchPanel: this,
     width: 400
   });
-  
-  this.filenamePanel = new Ext.Panel({
-    filenameLabel: null,
-    rowspan: 2,
-    setFilenameLabel: function( p, filename ) {
-      if ( p.filenameLabel ) {
-        p.remove( p.filenameLabel );
-      }
-      p.add( p.filenameLabel = new Ext.form.Label({
-        text: filename,
-        style: 'font-size:11px'
-      }));
-      if ( p.rendered ) {
-        p.doLayout();
-      }
-    }
-  });
 
   this.appletPanel = new Ext.Panel({
     fieldLabel: '',
     html: '<div style="width:10px"></div>'
   });
   
+  this.filenameLabel = null;
+  
+  this.searchToolbar = new Ext.Toolbar({
+    ctCls:'search-all-tbar',
+    items: [
+      'Search:',
+      this.searchField,
+      { xtype: 'tbspacer' },
+      new Ext.ux.form.BrowseButton({
+        text: 'Checksum Search...',
+        appletPanel: true,
+        searchPanel: this,
+        tooltip: 'Click to select a file. It will not be uploaded to the ' +
+          'remote server, an SHA1 checksum is calculated locally and sent to ' +
+          'Nexus to find a match. This feature requires Java applet ' +
+          'support in your web browser.',
+        handler: function( b ) {
+          var filename = b.detachInputFile().getValue();
+
+          if ( b.appletPanel ) {
+            b.searchPanel.searchToolbar.addText(
+              '<div id="checksumContainer" style="width:10px">' +
+                '<applet code="org/sonatype/nexus/applet/DigestApplet.class" ' +
+                  'archive="' + Sonatype.config.resourcePath + '/digestapplet.jar" ' +
+                  'width="1" height="1" name="digestApplet"></applet>' +
+                '</div>'
+            ); 
+            b.appletPanel = false;
+          }
+
+          b.disable();
+          if ( document.digestApplet ) {
+            b.searchPanel.setFilenameLabel( b.searchPanel, 'Loading...' );
+            var f = function( b, filename ) {
+              b.searchPanel.searchField.setRawValue(
+                document.digestApplet.digest( filename ) );
+              b.searchPanel.setFilenameLabel( b.searchPanel, filename );
+              b.enable();
+              b.searchPanel.startSearch( b.searchPanel );
+            }
+            f.defer( 200, b, [b, filename] );
+          }
+        }
+      })
+    ]
+  });
+  
+  
   Sonatype.repoServer.SearchPanel.superclass.constructor.call(this, {
 //  id: 'st-nexus-search-panel',
 //  title: 'Nexus Search',
     layout: 'border',
     hideMode: 'offsets',
+    tbar: this.searchToolbar,
     items: [
-      {
-        xtype: 'panel',
-        region: 'north',
-        height: 36,
-        frame: true,
-        layout: 'table',
-        items: [
-          {
-            xtype: 'label',
-            text: 'Search:',
-            style: 'font-size: 11px'
-          },
-          this.searchField,
-          {
-            html: '<div style="width: 20px"></div>'
-          },
-          new Ext.ux.form.BrowseButton({
-            text: 'Checksum Search...',
-            appletPanel: this.appletPanel,
-            searchPanel: this,
-            tooltip: 'Click to select a file. It will not be uploaded to the ' +
-              'remote server, an SHA1 checksum is calculated locally and sent to ' +
-              'Nexus to find a match. This feature requires Java applet ' +
-              'support in your web browser.',
-            handler:function( b ) {
-              var filename = b.detachInputFile().getValue();
-
-              if ( b.appletPanel ) {
-                var owner = b.appletPanel.ownerCt;
-                owner.remove( this.appletPanel );
-                owner.add( new Ext.Panel({
-                  html: '<div id="checksumContainer" style="width:10px">' +
-                    '<applet code="org/sonatype/nexus/applet/DigestApplet.class" ' +
-                      'archive="' + Sonatype.config.resourcePath + '/digestapplet.jar" ' +
-                      'width="10" height="10" name="digestApplet"></applet>' +
-                   '</div>'
-                })); 
-                owner.doLayout();
-                b.appletPanel = null;
-              }
-
-              b.disable();
-              if ( document.digestApplet ) {
-                b.searchPanel.filenamePanel.setFilenameLabel(
-                  b.searchPanel.filenamePanel, 'Loading...' );
-                var f = function( b, filename ) {
-                  b.searchPanel.searchField.setRawValue(
-                    document.digestApplet.digest( filename ) );
-                  b.searchPanel.startSearch( b.searchPanel );
-                  b.searchPanel.filenamePanel.setFilenameLabel(
-                    b.searchPanel.filenamePanel, filename );
-                  b.enable();
-                }
-                f.defer( 200, b, [b, filename] );
-              }
-            }
-          }),
-          {
-            xtype:'panel',
-            items:[
-              this.appletPanel
-            ]
-          },
-          this.filenamePanel
-        ]
-      },
       this.grid
 //    this.detailView
     ]
@@ -210,10 +176,7 @@ Ext.extend(Sonatype.repoServer.SearchPanel, Ext.Panel, {
     p.grid.store.baseParams[p.paramName] = '';
     //p.grid.store.reload({params:o});
     p.grid.store.removeAll();
-    p.filenamePanel.setFilenameLabel( p.filenamePanel, '' );
-//    if ( document.digestApplet ) {
-//      document.digestApplet.resetProgress();
-//    }
+    p.setFilenameLabel( p );
   },
 
   startSearch: function( p ) {
@@ -241,5 +204,12 @@ Ext.extend(Sonatype.repoServer.SearchPanel, Ext.Panel, {
       p.grid.store.baseParams[p.paramName] = v;
       p.grid.store.reload();//{params:o});
     }
+  },
+  
+  setFilenameLabel: function( p, s ) {
+    if ( p.filenameLabel ) {
+      p.filenameLabel.destroy();
+    }
+    p.filenameLabel = s ? p.searchToolbar.addText( '<span style="color:#808080;">'+s+'</span>' ) : null;
   }
 });
