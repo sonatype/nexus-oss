@@ -185,6 +185,12 @@ public class NexusAuthenticationGuard
 
             return 1;
         }
+        else if ( getUsernameFilter() != null && !getAuthenticationSource().hasPasswordSet( getUsernameFilter() ) )
+        {
+            request.getAttributes().put( REST_USER_KEY, SimpleUser.ANONYMOUS_USER );
+
+            return 1;
+        }
         else
         {
             return result;
@@ -196,6 +202,12 @@ public class NexusAuthenticationGuard
     {
         if ( getUsernameFilter() == null || getUsernameFilter().equals( identifier ) )
         {
+            if ( !getAuthenticationSource().hasPasswordSet( identifier ) )
+            {
+                // the user has no password set
+                return true;
+            }
+
             if ( secret == null )
             {
                 return false;
@@ -211,6 +223,11 @@ public class NexusAuthenticationGuard
             {
                 return user != null && !user.isAnonymous();
             }
+        }
+        else if ( getUsernameFilter() != null && !getAuthenticationSource().hasPasswordSet( getUsernameFilter() ) )
+        {
+            // we have filtered username access, but the user to filter has no password set, letting it in
+            return true;
         }
         else
         {

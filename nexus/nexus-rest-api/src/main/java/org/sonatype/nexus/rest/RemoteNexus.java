@@ -689,4 +689,10 @@ public class RemoteNexus
         return null;
     }
 
+    public boolean isSimpleSecurityModel()
+    {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
 }

@@ -102,7 +102,7 @@ public abstract class AbstractNexusTestCase
     {
         DefaultIndexerManager dim = (DefaultIndexerManager) lookup( IndexerManager.ROLE );
 
-        dim.shutdown();
+        dim.shutdown( true );
 
         super.tearDown();
     }

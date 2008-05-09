@@ -24,8 +24,7 @@ import org.codehaus.plexus.component.repository.exception.ComponentLookupExcepti
 import org.restlet.Context;
 import org.restlet.Restlet;
 import org.restlet.Router;
-import org.sonatype.nexus.configuration.NexusConfiguration;
-import org.sonatype.nexus.security.SimpleAuthenticationSource;
+import org.sonatype.nexus.Nexus;
 import org.sonatype.plexus.rest.PlexusRestletUtils;
 
 /**
@@ -63,15 +62,12 @@ public class ApplicationContentBridge
 
         try
         {
-            NexusConfiguration nc = (NexusConfiguration) PlexusRestletUtils.plexusLookup(
-                getContext(),
-                NexusConfiguration.ROLE );
+            Nexus nexus = (Nexus) PlexusRestletUtils.plexusLookup( getContext(), Nexus.ROLE );
 
-            if ( "simple".equals( nc.getAuthenticationSourceType() ) )
+            if ( nexus.isSimpleSecurityModel() )
             {
-                nexusGuard = new NexusWriteAccessAuthenticationGuard(
-                    getContext(),
-                    SimpleAuthenticationSource.DEPLOYMENT_USERNAME );
+                // with "simple" we offer RO public access, but pwd is needed (if set) for deployment
+                nexusGuard = new NexusWriteAccessAuthenticationGuard( getContext() );
             }
             else
             {

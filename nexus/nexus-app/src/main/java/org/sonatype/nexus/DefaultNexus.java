@@ -232,6 +232,11 @@ public class DefaultNexus
     {
         return nexusConfiguration.isSecurityEnabled();
     }
+    
+    public boolean isSimpleSecurityModel()
+    {
+        return nexusConfiguration.isSimpleSecurityModel();
+    }
 
     public void setSecurity( boolean enabled, String authenticationSourceType )
         throws IOException

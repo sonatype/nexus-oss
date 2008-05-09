@@ -160,13 +160,13 @@ public class DefaultIndexerManager
     /**
      * Used to close all indexing context explicitly.
      */
-    public void shutdown()
+    public void shutdown( boolean deleteFiles )
     {
         for ( IndexingContext ctx : nexusIndexer.getIndexingContexts().values() )
         {
             try
             {
-                ctx.close( true );
+                ctx.close( deleteFiles );
             }
             catch ( IOException e )
             {
@@ -541,6 +541,11 @@ public class DefaultIndexerManager
             {
                 result = sourceRepository.getName() + " (Remote)";
             }
+            else if ( ai.context.endsWith( CTX_MERGED_SUFIX ) )
+            {
+                // TODO: this is not repo!
+                result = result + " (Merged)";
+            }
 
         }
         catch ( NoSuchRepositoryException e )
@@ -650,7 +655,7 @@ public class DefaultIndexerManager
 
             if ( cTerm != null )
             {
-                // classifiers sadly not indexed
+                // classifiers are sadly not indexed
             }
 
             if ( context == null )
@@ -783,68 +788,57 @@ public class DefaultIndexerManager
                 // we are handling repo events, like addition and removal
                 if ( RepositoryRegistryGroupEventAdd.class.isAssignableFrom( evt.getClass() ) )
                 {
-                    IndexingContext ctxLocal = nexusIndexer.addIndexingContext(
-                        getLocalContextId( gevt.getGroupId() ),
+                    IndexingContext ctxMerged = nexusIndexer.addIndexingContext(
+                        getMergedContextId( gevt.getGroupId() ),
                         gevt.getGroupId(),
                         null,
-                        new File( getWorkingDirectory(), getLocalContextId( gevt.getGroupId() ) ),
+                        new File( getWorkingDirectory(), getMergedContextId( gevt.getGroupId() ) ),
                         null,
                         null,
                         NexusIndexer.FULL_INDEX,
                         true );
-
-                    IndexingContext ctxRemote = nexusIndexer.addIndexingContext(
-                        getRemoteContextId( gevt.getGroupId() ),
-                        gevt.getGroupId(),
-                        null,
-                        new File( getWorkingDirectory(), getRemoteContextId( gevt.getGroupId() ) ),
-                        null,
-                        null,
-                        NexusIndexer.FULL_INDEX,
-                        true );
-
-                    List<Repository> members = repositoryRegistry.getRepositoryGroup( gevt.getGroupId() );
 
                     /*
-                     * TODO: NX-463 Commented, to fix bundle issues until we implement this for ( Repository repo :
-                     * members ) { if ( nexusIndexer.getIndexingContexts().containsKey( getLocalContextId( repo.getId() ) ) ) {
-                     * ctxLocal.merge( nexusIndexer .getIndexingContexts().get( getLocalContextId( repo.getId() )
-                     * ).getIndexDirectory() ); } if ( nexusIndexer.getIndexingContexts().containsKey(
-                     * getRemoteContextId( repo.getId() ) ) ) { ctxRemote.merge( nexusIndexer
-                     * .getIndexingContexts().get( getRemoteContextId( repo.getId() ) ).getIndexDirectory() ); } }
-                     */
+                    List<Repository> members = repositoryRegistry.getRepositoryGroup( gevt.getGroupId() );
 
-                    if ( ctxLocal.getTimestamp() == null )
+                    IndexingContext bestContext = null;
+
+                    for ( Repository repo : members )
+                    {
+                        if ( nexusIndexer.getIndexingContexts().containsKey( getLocalContextId( repo.getId() ) ) )
+                        {
+                            // local idx has every repo
+                            bestContext = nexusIndexer.getIndexingContexts().get( getLocalContextId( repo.getId() ) );
+                        }
+                        if ( nexusIndexer.getIndexingContexts().containsKey( getRemoteContextId( repo.getId() ) ) )
+                        {
+                            // if remote is here, it is the best
+                            bestContext = nexusIndexer.getIndexingContexts().get( getRemoteContextId( repo.getId() ) );
+                        }
+
+                        ctxMerged.merge( bestContext.getIndexDirectory() );
+                    }
+                    */
+
+                    if ( ctxMerged.getTimestamp() == null )
                     {
                         // it is probably new or first start
-                        ctxLocal.updateTimestamp();
+                        ctxMerged.updateTimestamp();
                     }
-                    if ( ctxRemote.getTimestamp() == null )
-                    {
-                        // it is probably new or first start
-                        ctxRemote.updateTimestamp();
-                    }
-
                 }
                 else if ( RepositoryRegistryGroupEventRemove.class.isAssignableFrom( evt.getClass() ) )
                 {
                     // remove context for repository
-                    if ( nexusIndexer.getIndexingContexts().containsKey( getLocalContextId( gevt.getGroupId() ) ) )
+                    if ( nexusIndexer.getIndexingContexts().containsKey( getMergedContextId( gevt.getGroupId() ) ) )
                     {
                         nexusIndexer.removeIndexingContext( nexusIndexer.getIndexingContexts().get(
-                            getLocalContextId( gevt.getGroupId() ) ), true );
-                    }
-
-                    if ( nexusIndexer.getIndexingContexts().containsKey( getRemoteContextId( gevt.getGroupId() ) ) )
-                    {
-                        nexusIndexer.removeIndexingContext( nexusIndexer.getIndexingContexts().get(
-                            getRemoteContextId( gevt.getGroupId() ) ), true );
+                            getMergedContextId( gevt.getGroupId() ) ), true );
                     }
                 }
             }
             catch ( Exception e ) // TODO be more specific
             {
-                getLogger().error( "Could not maintain group indexing contexts!", e );
+                getLogger().error( "Could not maintain group (merged) indexing contexts!", e );
             }
         }
         else if ( RepositoryItemEvent.class.isAssignableFrom( evt.getClass() ) )
@@ -947,5 +941,10 @@ public class DefaultIndexerManager
     protected String getRemoteContextId( String repositoryId )
     {
         return repositoryId + CTX_REMOTE_SUFIX;
+    }
+
+    protected String getMergedContextId( String groupId )
+    {
+        return groupId + CTX_MERGED_SUFIX;
     }
 }

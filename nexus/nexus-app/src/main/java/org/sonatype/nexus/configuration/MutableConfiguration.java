@@ -47,6 +47,8 @@ public interface MutableConfiguration
     boolean isSecurityEnabled();
 
     boolean isAnonymousAccessEnabled();
+    
+    boolean isSimpleSecurityModel();
 
     String getAuthenticationSourceType();
 

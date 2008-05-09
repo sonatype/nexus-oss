@@ -424,6 +424,11 @@ public class DefaultNexusConfiguration
     {
         return getConfiguration().getSecurity() != null && getConfiguration().getSecurity().isAnonymousAccessEnabled();
     }
+    
+    public boolean isSimpleSecurityModel()
+    {
+        return "simple".equals( getAuthenticationSourceType() );
+    }
 
     public String getAuthenticationSourceType()
     {
