@@ -435,21 +435,21 @@ public abstract class AbstractResourceStoreContentResource
                 // we have a file
                 StorageFileItem file = (StorageFileItem) item;
 
-                result = serialize( getPreferredVariant(), file );
+                result = renderItem( getPreferredVariant(), file );
             }
             else if ( StorageLinkItem.class.isAssignableFrom( item.getClass() ) )
             {
                 // we have a link
                 StorageLinkItem link = (StorageLinkItem) item;
 
-                result = serialize( getPreferredVariant(), link );
+                result = renderItem( getPreferredVariant(), link );
             }
             else if ( StorageCollectionItem.class.isAssignableFrom( item.getClass() ) )
             {
                 // we have a collection
                 StorageCollectionItem coll = (StorageCollectionItem) item;
 
-                result = serialize( getPreferredVariant(), coll );
+                result = renderItem( getPreferredVariant(), coll );
             }
 
             getResponse().setEntity( result );
