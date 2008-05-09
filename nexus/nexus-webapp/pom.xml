@@ -32,6 +32,7 @@
   <properties>
     <!-- NOTE: MNG-3355 will fix this so we can use ${project.build.directory} instead of the hard-coded target directory. -->
     <jsw-input>target/jsw-template</jsw-input>
+    <jsw-output>jsw-filtered</jsw-output>
     <nexus-tools-input>target/nexus-tools</nexus-tools-input>
   </properties>
   <dependencies>
@@ -88,7 +89,7 @@
           <exclude>**/*.sl</exclude>
           <exclude>**/wrapper</exclude>
         </excludes>
-        <targetPath>bin/jsw</targetPath>
+        <targetPath>../${jsw-output}</targetPath>
       </resource>
       <resource>
         <directory>${jsw-input}</directory>
@@ -102,7 +103,7 @@
           <include>**/*.sl</include>
           <include>**/wrapper</include>
         </includes>
-        <targetPath>bin/jsw</targetPath>
+        <targetPath>../${jsw-output}</targetPath>
       </resource>
     </resources>
     <plugins>
