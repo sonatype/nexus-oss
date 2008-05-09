@@ -53,8 +53,6 @@ public class SimpleAuthenticationSource
 
             if ( oldSecretFile.exists() )
             {
-                getLogger().info( "Found pre-beta3 secret.txt file with 'admin' password, trying to upgrade it." );
-
                 String oldAdminHash = FileUtils.fileRead( oldSecretFile ).trim();
 
                 loadSecrets();
@@ -64,6 +62,8 @@ public class SimpleAuthenticationSource
                 saveSecrets();
 
                 oldSecretFile.delete();
+
+                getLogger().info( "Found pre-beta3 secret.txt file with 'admin' password, succesfully upgraded." );
             }
 
             loadSecrets();
