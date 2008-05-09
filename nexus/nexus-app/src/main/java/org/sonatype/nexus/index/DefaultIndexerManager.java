@@ -559,6 +559,11 @@ public class DefaultIndexerManager
     {
         IndexingContext context = null;
 
+        if ( groupId != null )
+        {
+            context = nexusIndexer.getIndexingContexts().get( getLocalContextId( groupId ) );
+        }
+
         if ( repositoryId != null )
         {
             context = nexusIndexer.getIndexingContexts().get( getLocalContextId( repositoryId ) );
@@ -597,6 +602,79 @@ public class DefaultIndexerManager
         {
             getLogger().error( "Got I/O exception while searching for query \"" + term + "\"", e );
         }
+        return Collections.emptyList();
+    }
+
+    public Collection<ArtifactInfo> searchArtifactFlat( String gTerm, String aTerm, String vTerm, String cTerm,
+        String repositoryId, String groupId )
+    {
+        IndexingContext context = null;
+
+        if ( gTerm == null && aTerm == null && vTerm == null )
+        {
+            return Collections.emptyList();
+        }
+
+        if ( groupId != null )
+        {
+            context = nexusIndexer.getIndexingContexts().get( getLocalContextId( groupId ) );
+        }
+
+        if ( repositoryId != null )
+        {
+            context = nexusIndexer.getIndexingContexts().get( getLocalContextId( repositoryId ) );
+        }
+
+        BooleanQuery bq = null;
+
+        try
+        {
+            Collection<ArtifactInfo> infos;
+
+            bq = new BooleanQuery();
+
+            if ( gTerm != null )
+            {
+                bq.add( nexusIndexer.constructQuery( ArtifactInfo.GROUP_ID, gTerm ), BooleanClause.Occur.SHOULD );
+            }
+
+            if ( aTerm != null )
+            {
+                bq.add( nexusIndexer.constructQuery( ArtifactInfo.ARTIFACT_ID, aTerm ), BooleanClause.Occur.SHOULD );
+            }
+
+            if ( vTerm != null )
+            {
+                bq.add( nexusIndexer.constructQuery( ArtifactInfo.VERSION, vTerm ), BooleanClause.Occur.SHOULD );
+            }
+
+            if ( cTerm != null )
+            {
+                // classifiers sadly not indexed
+            }
+
+            if ( context == null )
+            {
+                infos = nexusIndexer.searchFlat( bq );
+            }
+            else
+            {
+                infos = nexusIndexer.searchFlat( bq, context );
+            }
+
+            return limitResults( infos, RESULT_LIMIT );
+        }
+        catch ( IndexContextInInconsistentStateException e )
+        {
+            getLogger().error(
+                "Inconsistent index context state while searching for query \"" + bq.toString() + "\"",
+                e );
+        }
+        catch ( IOException e )
+        {
+            getLogger().error( "Got I/O exception while searching for query \"" + bq.toString() + "\"", e );
+        }
+
         return Collections.emptyList();
     }
 

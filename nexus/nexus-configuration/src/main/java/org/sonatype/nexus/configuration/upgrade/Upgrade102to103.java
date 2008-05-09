@@ -27,34 +27,34 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
-import org.sonatype.nexus.configuration.model.v1_0_1.CGroupsSettingPathMappingItem;
-import org.sonatype.nexus.configuration.model.v1_0_1.Configuration;
-import org.sonatype.nexus.configuration.model.v1_0_1.io.xpp3.NexusConfigurationXpp3Reader;
-import org.sonatype.nexus.configuration.model.v1_0_2.CAuthSource;
-import org.sonatype.nexus.configuration.model.v1_0_2.CAuthzSource;
-import org.sonatype.nexus.configuration.model.v1_0_2.CGroupsSetting;
-import org.sonatype.nexus.configuration.model.v1_0_2.CHttpProxySettings;
-import org.sonatype.nexus.configuration.model.v1_0_2.CLocalStorage;
-import org.sonatype.nexus.configuration.model.v1_0_2.CProps;
-import org.sonatype.nexus.configuration.model.v1_0_2.CRemoteAuthentication;
-import org.sonatype.nexus.configuration.model.v1_0_2.CRemoteConnectionSettings;
-import org.sonatype.nexus.configuration.model.v1_0_2.CRemoteHttpProxySettings;
-import org.sonatype.nexus.configuration.model.v1_0_2.CRemoteStorage;
-import org.sonatype.nexus.configuration.model.v1_0_2.CRepository;
-import org.sonatype.nexus.configuration.model.v1_0_2.CRepositoryGroup;
-import org.sonatype.nexus.configuration.model.v1_0_2.CRepositoryGrouping;
-import org.sonatype.nexus.configuration.model.v1_0_2.CRepositoryShadow;
-import org.sonatype.nexus.configuration.model.v1_0_2.CRestApiSettings;
-import org.sonatype.nexus.configuration.model.v1_0_2.CRouting;
-import org.sonatype.nexus.configuration.model.v1_0_2.CSecurity;
+import org.sonatype.nexus.configuration.model.CAuthSource;
+import org.sonatype.nexus.configuration.model.CAuthzSource;
+import org.sonatype.nexus.configuration.model.CGroupsSetting;
+import org.sonatype.nexus.configuration.model.CHttpProxySettings;
+import org.sonatype.nexus.configuration.model.CLocalStorage;
+import org.sonatype.nexus.configuration.model.CProps;
+import org.sonatype.nexus.configuration.model.CRemoteAuthentication;
+import org.sonatype.nexus.configuration.model.CRemoteConnectionSettings;
+import org.sonatype.nexus.configuration.model.CRemoteHttpProxySettings;
+import org.sonatype.nexus.configuration.model.CRemoteStorage;
+import org.sonatype.nexus.configuration.model.CRepository;
+import org.sonatype.nexus.configuration.model.CRepositoryGroup;
+import org.sonatype.nexus.configuration.model.CRepositoryGrouping;
+import org.sonatype.nexus.configuration.model.CRepositoryShadow;
+import org.sonatype.nexus.configuration.model.CRestApiSettings;
+import org.sonatype.nexus.configuration.model.CRouting;
+import org.sonatype.nexus.configuration.model.CSecurity;
+import org.sonatype.nexus.configuration.model.v1_0_2.CGroupsSettingPathMappingItem;
+import org.sonatype.nexus.configuration.model.v1_0_2.Configuration;
+import org.sonatype.nexus.configuration.model.v1_0_2.io.xpp3.NexusConfigurationXpp3Reader;
 
 /**
- * Upgrades configuration model from version 1.0.1 to 1.0.2.
+ * Upgrades configuration model from version 1.0.2 to 1.0.3.
  * 
  * @author cstamas
- * @plexus.component role="org.sonatype.nexus.configuration.upgrade.Upgrader" role-hint="1.0.1"
+ * @plexus.component role="org.sonatype.nexus.configuration.upgrade.Upgrader" role-hint="1.0.2"
  */
-public class Upgrade101to102
+public class Upgrade102to103
     implements Upgrader
 {
 
@@ -90,45 +90,59 @@ public class Upgrade101to102
         throws ConfigurationIsCorruptedException
     {
         Configuration oldc = (Configuration) message.getConfiguration();
-        org.sonatype.nexus.configuration.model.v1_0_2.Configuration newc = new org.sonatype.nexus.configuration.model.v1_0_2.Configuration();
+        org.sonatype.nexus.configuration.model.Configuration newc = new org.sonatype.nexus.configuration.model.Configuration();
 
-        newc.setVersion( org.sonatype.nexus.configuration.model.v1_0_2.Configuration.MODEL_VERSION );
+        newc.setVersion( org.sonatype.nexus.configuration.model.Configuration.MODEL_VERSION );
         newc.setWorkingDirectory( oldc.getWorkingDirectory() );
         newc.setApplicationLogDirectory( oldc.getApplicationLogDirectory() );
 
         CSecurity security = new CSecurity();
-        security.setEnabled( oldc.getSecurity().isEnabled() );
-        security.setAnonymousAccessEnabled( oldc.getSecurity().isAnonymousAccessEnabled() );
-        if ( oldc.getSecurity().getAuthenticationSource() != null )
+
+        if ( oldc.getSecurity().isEnabled() )
         {
-            CAuthSource authenticationSource = new CAuthSource();
-            authenticationSource.setType( oldc.getSecurity().getAuthenticationSource().getType() );
-            if ( oldc.getSecurity().getAuthenticationSource().getProperties() != null )
+            // someone already had security enabled
+            security.setEnabled( oldc.getSecurity().isEnabled() );
+            security.setAnonymousAccessEnabled( oldc.getSecurity().isAnonymousAccessEnabled() );
+            if ( oldc.getSecurity().getAuthenticationSource() != null )
             {
-                authenticationSource.setProperties( copyCProps1_0_1( oldc
-                    .getSecurity().getAuthenticationSource().getProperties() ) );
+                CAuthSource authenticationSource = new CAuthSource();
+                authenticationSource.setType( oldc.getSecurity().getAuthenticationSource().getType() );
+                if ( oldc.getSecurity().getAuthenticationSource().getProperties() != null )
+                {
+                    authenticationSource.setProperties( copyCProps1_0_2( oldc
+                        .getSecurity().getAuthenticationSource().getProperties() ) );
+                }
+                security.setAuthenticationSource( authenticationSource );
             }
-            security.setAuthenticationSource( authenticationSource );
+            if ( oldc.getSecurity().getRealms() != null )
+            {
+                List<CAuthzSource> realms = new ArrayList<CAuthzSource>( oldc.getSecurity().getRealms().size() );
+                for ( org.sonatype.nexus.configuration.model.v1_0_2.CAuthzSource oldrealm : (List<org.sonatype.nexus.configuration.model.v1_0_2.CAuthzSource>) oldc
+                    .getSecurity().getRealms() )
+                {
+                    CAuthzSource newrealm = new CAuthzSource();
+                    newrealm.setId( oldrealm.getId() );
+                    newrealm.setType( oldrealm.getType() );
+                    newrealm.setProperties( copyCProps1_0_2( oldrealm.getProperties() ) );
+                    realms.add( newrealm );
+                }
+                security.setRealms( realms );
+            }
         }
-        if ( oldc.getSecurity().getRealms() != null )
+        else
         {
-            List<CAuthzSource> realms = new ArrayList<CAuthzSource>( oldc.getSecurity().getRealms().size() );
-            for ( org.sonatype.nexus.configuration.model.v1_0_1.CAuthzSource oldrealm : (List<org.sonatype.nexus.configuration.model.v1_0_1.CAuthzSource>) oldc
-                .getSecurity().getRealms() )
-            {
-                CAuthzSource newrealm = new CAuthzSource();
-                newrealm.setId( oldrealm.getId() );
-                newrealm.setType( oldrealm.getType() );
-                newrealm.setProperties( copyCProps1_0_1( oldrealm.getProperties() ) );
-                realms.add( newrealm );
-            }
-            security.setRealms( realms );
+            // defaulting to "simple" model
+            security.setEnabled( true );
+            security.setAnonymousAccessEnabled( true );
+            security.setAuthenticationSource( new CAuthSource() );
+            security.getAuthenticationSource().setType( "simple" );
         }
+
         newc.setSecurity( security );
 
         if ( oldc.getGlobalConnectionSettings() != null )
         {
-            newc.setGlobalConnectionSettings( copyCRemoteConnectionSettings1_0_1( oldc.getGlobalConnectionSettings() ) );
+            newc.setGlobalConnectionSettings( copyCRemoteConnectionSettings1_0_2( oldc.getGlobalConnectionSettings() ) );
         }
         else
         {
@@ -137,7 +151,7 @@ public class Upgrade101to102
 
         if ( oldc.getGlobalHttpProxySettings() != null )
         {
-            newc.setGlobalHttpProxySettings( copyCRemoteHttpProxySettings1_0_1( oldc.getGlobalHttpProxySettings() ) );
+            newc.setGlobalHttpProxySettings( copyCRemoteHttpProxySettings1_0_2( oldc.getGlobalHttpProxySettings() ) );
         }
 
         if ( oldc.getRouting() != null )
@@ -166,10 +180,10 @@ public class Upgrade101to102
         newc.setHttpProxy( new CHttpProxySettings() );
 
         List<CRepository> repositories = new ArrayList<CRepository>( oldc.getRepositories().size() );
-        for ( org.sonatype.nexus.configuration.model.v1_0_1.CRepository oldrepos : (List<org.sonatype.nexus.configuration.model.v1_0_1.CRepository>) oldc
+        for ( org.sonatype.nexus.configuration.model.v1_0_2.CRepository oldrepos : (List<org.sonatype.nexus.configuration.model.v1_0_2.CRepository>) oldc
             .getRepositories() )
         {
-            CRepository newrepos = copyCRepository1_0_1( oldrepos );
+            CRepository newrepos = copyCRepository1_0_2( oldrepos );
             newrepos.setRepositoryPolicy( oldrepos.getRepositoryPolicy() );
             repositories.add( newrepos );
         }
@@ -179,15 +193,13 @@ public class Upgrade101to102
         {
             List<CRepositoryShadow> repositoryShadows = new ArrayList<CRepositoryShadow>( oldc
                 .getRepositoryShadows().size() );
-            for ( org.sonatype.nexus.configuration.model.v1_0_1.CRepositoryShadow oldshadow : (List<org.sonatype.nexus.configuration.model.v1_0_1.CRepositoryShadow>) oldc
+            for ( org.sonatype.nexus.configuration.model.v1_0_2.CRepositoryShadow oldshadow : (List<org.sonatype.nexus.configuration.model.v1_0_2.CRepositoryShadow>) oldc
                 .getRepositoryShadows() )
             {
                 CRepositoryShadow newshadow = new CRepositoryShadow();
                 newshadow.setId( oldshadow.getId() );
                 newshadow.setName( oldshadow.getName() );
-                newshadow.setLocalStatus( oldshadow.isAvailable()
-                    ? org.sonatype.nexus.configuration.model.Configuration.LOCAL_STATUS_IN_SERVICE
-                    : org.sonatype.nexus.configuration.model.Configuration.LOCAL_STATUS_OUT_OF_SERVICE );
+                newshadow.setLocalStatus( oldshadow.getLocalStatus() );
                 newshadow.setShadowOf( oldshadow.getShadowOf() );
                 newshadow.setType( oldshadow.getType() );
                 newshadow.setSyncAtStartup( oldshadow.isSyncAtStartup() );
@@ -205,7 +217,7 @@ public class Upgrade101to102
                 for ( CGroupsSettingPathMappingItem oldItem : (List<CGroupsSettingPathMappingItem>) oldc
                     .getRepositoryGrouping().getPathMappings() )
                 {
-                    org.sonatype.nexus.configuration.model.v1_0_2.CGroupsSettingPathMappingItem newItem = new org.sonatype.nexus.configuration.model.v1_0_2.CGroupsSettingPathMappingItem();
+                    org.sonatype.nexus.configuration.model.CGroupsSettingPathMappingItem newItem = new org.sonatype.nexus.configuration.model.CGroupsSettingPathMappingItem();
 
                     newItem.setId( oldItem.getId() );
 
@@ -220,7 +232,7 @@ public class Upgrade101to102
             }
             List<CRepositoryGroup> repositoryGroups = new ArrayList<CRepositoryGroup>( oldc
                 .getRepositoryGrouping().getRepositoryGroups().size() );
-            for ( org.sonatype.nexus.configuration.model.v1_0_1.CRepositoryGroup oldgroup : (List<org.sonatype.nexus.configuration.model.v1_0_1.CRepositoryGroup>) oldc
+            for ( org.sonatype.nexus.configuration.model.v1_0_2.CRepositoryGroup oldgroup : (List<org.sonatype.nexus.configuration.model.v1_0_2.CRepositoryGroup>) oldc
                 .getRepositoryGrouping().getRepositoryGroups() )
             {
                 CRepositoryGroup newgroup = new CRepositoryGroup();
@@ -233,14 +245,14 @@ public class Upgrade101to102
             newc.setRepositoryGrouping( repositoryGrouping );
         }
 
-        message.setModelVersion( org.sonatype.nexus.configuration.model.v1_0_2.Configuration.MODEL_VERSION );
+        message.setModelVersion( org.sonatype.nexus.configuration.model.Configuration.MODEL_VERSION );
         message.setConfiguration( newc );
     }
 
-    protected List<CProps> copyCProps1_0_1( List<org.sonatype.nexus.configuration.model.v1_0_1.CProps> oldprops )
+    protected List<CProps> copyCProps1_0_2( List<org.sonatype.nexus.configuration.model.v1_0_2.CProps> oldprops )
     {
         List<CProps> properties = new ArrayList<CProps>( oldprops.size() );
-        for ( org.sonatype.nexus.configuration.model.v1_0_1.CProps oldprop : oldprops )
+        for ( org.sonatype.nexus.configuration.model.v1_0_2.CProps oldprop : oldprops )
         {
             CProps newprop = new CProps();
             newprop.setKey( oldprop.getKey() );
@@ -250,8 +262,8 @@ public class Upgrade101to102
         return properties;
     }
 
-    protected CRemoteAuthentication copyCRemoteAuthentication1_0_1(
-        org.sonatype.nexus.configuration.model.v1_0_1.CRemoteAuthentication oldauth )
+    protected CRemoteAuthentication copyCRemoteAuthentication1_0_2(
+        org.sonatype.nexus.configuration.model.v1_0_2.CRemoteAuthentication oldauth )
     {
         if ( oldauth != null )
         {
@@ -270,8 +282,8 @@ public class Upgrade101to102
         }
     }
 
-    protected CRemoteConnectionSettings copyCRemoteConnectionSettings1_0_1(
-        org.sonatype.nexus.configuration.model.v1_0_1.CRemoteConnectionSettings old )
+    protected CRemoteConnectionSettings copyCRemoteConnectionSettings1_0_2(
+        org.sonatype.nexus.configuration.model.v1_0_2.CRemoteConnectionSettings old )
     {
         CRemoteConnectionSettings cs = new CRemoteConnectionSettings();
         cs.setConnectionTimeout( old.getConnectionTimeout() );
@@ -287,29 +299,25 @@ public class Upgrade101to102
         return cs;
     }
 
-    protected CRemoteHttpProxySettings copyCRemoteHttpProxySettings1_0_1(
-        org.sonatype.nexus.configuration.model.v1_0_1.CRemoteHttpProxySettings old )
+    protected CRemoteHttpProxySettings copyCRemoteHttpProxySettings1_0_2(
+        org.sonatype.nexus.configuration.model.v1_0_2.CRemoteHttpProxySettings old )
     {
         CRemoteHttpProxySettings cs = new CRemoteHttpProxySettings();
         cs.setProxyHostname( old.getProxyHostname() );
         cs.setProxyPort( old.getProxyPort() );
-        cs.setAuthentication( copyCRemoteAuthentication1_0_1( old.getAuthentication() ) );
+        cs.setAuthentication( copyCRemoteAuthentication1_0_2( old.getAuthentication() ) );
         return cs;
     }
 
-    protected CRepository copyCRepository1_0_1( org.sonatype.nexus.configuration.model.v1_0_1.CRepository oldrepos )
+    protected CRepository copyCRepository1_0_2( org.sonatype.nexus.configuration.model.v1_0_2.CRepository oldrepos )
     {
         CRepository newrepos = new CRepository();
         newrepos.setId( oldrepos.getId() );
         newrepos.setName( oldrepos.getName() );
-        newrepos.setType( CRepository.TYPE_MAVEN2 );
-        newrepos.setLocalStatus( oldrepos.isAvailable()
-            ? org.sonatype.nexus.configuration.model.v1_0_2.Configuration.LOCAL_STATUS_IN_SERVICE
-            : org.sonatype.nexus.configuration.model.v1_0_2.Configuration.LOCAL_STATUS_OUT_OF_SERVICE );
-        newrepos.setProxyMode( oldrepos.isOffline()
-            ? CRepository.PROXY_MODE_BLOCKED_MANUAL
-            : CRepository.PROXY_MODE_ALLOW );
-        newrepos.setAllowWrite( !oldrepos.isReadOnly() );
+        newrepos.setType( oldrepos.getType() );
+        newrepos.setLocalStatus( oldrepos.getLocalStatus() );
+        newrepos.setProxyMode( oldrepos.getProxyMode() );
+        newrepos.setAllowWrite( oldrepos.isAllowWrite() );
         newrepos.setBrowseable( oldrepos.isBrowseable() );
         newrepos.setIndexable( oldrepos.isIndexable() );
         newrepos.setNotFoundCacheTTL( oldrepos.getNotFoundCacheTTL() );
@@ -331,17 +339,17 @@ public class Upgrade101to102
             remoteStorage.setUrl( oldrepos.getRemoteStorage().getUrl() );
             if ( oldrepos.getRemoteStorage().getAuthentication() != null )
             {
-                remoteStorage.setAuthentication( copyCRemoteAuthentication1_0_1( oldrepos
+                remoteStorage.setAuthentication( copyCRemoteAuthentication1_0_2( oldrepos
                     .getRemoteStorage().getAuthentication() ) );
             }
             if ( oldrepos.getRemoteStorage().getConnectionSettings() != null )
             {
-                remoteStorage.setConnectionSettings( copyCRemoteConnectionSettings1_0_1( oldrepos
+                remoteStorage.setConnectionSettings( copyCRemoteConnectionSettings1_0_2( oldrepos
                     .getRemoteStorage().getConnectionSettings() ) );
             }
             if ( oldrepos.getRemoteStorage().getHttpProxySettings() != null )
             {
-                remoteStorage.setHttpProxySettings( copyCRemoteHttpProxySettings1_0_1( oldrepos
+                remoteStorage.setHttpProxySettings( copyCRemoteHttpProxySettings1_0_2( oldrepos
                     .getRemoteStorage().getHttpProxySettings() ) );
             }
             newrepos.setRemoteStorage( remoteStorage );

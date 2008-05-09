@@ -182,4 +182,6 @@ public interface Nexus
 
     Collection<ArtifactInfo> searchArtifactFlat( String term, String repositoryId, String groupId );
 
+    Collection<ArtifactInfo> searchArtifactFlat( String gTerm, String aTerm, String vTerm, String cTerm, String repositoryId, String groupId );
+
 }

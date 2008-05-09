@@ -76,11 +76,12 @@
 					</execution>
 				</executions>
 				<configuration>
-					<version>1.0.2</version>
+					<version>1.0.3</version>
 					<packageWithVersion>false</packageWithVersion>
 					<packagedVersions>
 						<packagedVersion>1.0.0</packagedVersion>
 						<packagedVersion>1.0.1</packagedVersion>
+						<packagedVersion>1.0.2</packagedVersion>
 					</packagedVersions>
 					<model>src/main/mdo/nexus.xml</model>
 				</configuration>

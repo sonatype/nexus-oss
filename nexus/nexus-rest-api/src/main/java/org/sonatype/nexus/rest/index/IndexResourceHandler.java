@@ -75,17 +75,30 @@ public class IndexResourceHandler
 
         String query = form.getFirstValue( "q" );
 
-        if ( query == null )
+        String g = form.getFirstValue( "g" );
+
+        String a = form.getFirstValue( "a" );
+
+        String v = form.getFirstValue( "v" );
+
+        String c = form.getFirstValue( "c" );
+
+        Collection<NexusArtifact> ais = null;
+
+        if ( query != null )
+        {
+            ais = ai2NaColl( getNexus().searchArtifactFlat( query, repositoryId, repositoryGroupId ) );
+        }
+        else if ( g != null || a != null || v != null || c != null )
+        {
+            ais = ai2NaColl( getNexus().searchArtifactFlat( g, a, v, c, repositoryId, repositoryGroupId ) );
+        }
+        else
         {
             getResponse().setStatus( Status.CLIENT_ERROR_BAD_REQUEST, "Search query not found in request!" );
 
             return null;
         }
-
-        Collection<NexusArtifact> ais = ai2NaColl( getNexus().searchArtifactFlat(
-            query,
-            repositoryId,
-            repositoryGroupId ) );
 
         SearchResponse result = new SearchResponse();
 

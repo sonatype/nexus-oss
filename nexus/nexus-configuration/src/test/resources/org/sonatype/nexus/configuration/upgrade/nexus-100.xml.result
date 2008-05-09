@@ -1,8 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?><nexusConfiguration>
-  <version>1.0.2</version>
+  <version>1.0.3</version>
   <workingDirectory>/dat/maven/mvnrepos</workingDirectory>
   <applicationLogDirectory>${basedir}/logs/</applicationLogDirectory>
-  <security />
+  <security>
+    <enabled>true</enabled>
+    <anonymousAccessEnabled>true</anonymousAccessEnabled>
+    <authenticationSource>
+      <type>simple</type>
+    </authenticationSource>
+  </security>
   <globalConnectionSettings />
   <globalHttpProxySettings>
     <proxyHostname>fproxyint0t</proxyHostname>

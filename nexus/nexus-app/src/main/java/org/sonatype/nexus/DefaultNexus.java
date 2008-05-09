@@ -878,6 +878,12 @@ public class DefaultNexus
         return indexerManager.searchArtifactFlat( term, repositoryId, groupId );
     }
 
+    public Collection<ArtifactInfo> searchArtifactFlat( String gTerm, String aTerm, String vTerm, String cTerm,
+        String repositoryId, String groupId )
+    {
+        return indexerManager.searchArtifactFlat( gTerm, aTerm, vTerm, cTerm, repositoryId, groupId );
+    }
+
     // ===========================
     // Nexus Application lifecycle
 

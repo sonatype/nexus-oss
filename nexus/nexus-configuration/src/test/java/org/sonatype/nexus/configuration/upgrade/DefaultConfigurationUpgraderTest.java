@@ -52,6 +52,8 @@ public class DefaultConfigurationUpgraderTest
 
         w.write( sw, configuration );
         
+        // System.out.println(sw.toString());
+        
         String shouldBe = IOUtil.toString( getClass().getResourceAsStream( path + ".result" ) );
 
         assertEquals( shouldBe, sw.toString() );

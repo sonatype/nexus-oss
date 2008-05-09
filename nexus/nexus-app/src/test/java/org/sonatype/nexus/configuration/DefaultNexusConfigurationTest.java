@@ -66,9 +66,9 @@ public class DefaultNexusConfigurationTest
 
         Configuration config = nexusConfiguration.getConfiguration();
 
-        assertEquals( false, config.getSecurity().isEnabled() );
+        assertEquals( true, config.getSecurity().isEnabled() );
 
-        config.getSecurity().setEnabled( true );
+        config.getSecurity().setEnabled( false );
 
         nexusConfiguration.saveConfiguration();
 
@@ -76,7 +76,7 @@ public class DefaultNexusConfigurationTest
 
         config = nexusConfiguration.getConfiguration();
 
-        assertEquals( true, config.getSecurity().isEnabled() );
+        assertEquals( false, config.getSecurity().isEnabled() );
     }
 
     public void testSaveGlobalProxyConfiguration()
@@ -126,10 +126,10 @@ public class DefaultNexusConfigurationTest
         Configuration config = nexusConfiguration.getConfiguration();
 
         // check it for default value
-        assertEquals( false, config.getSecurity().isEnabled() );
+        assertEquals( true, config.getSecurity().isEnabled() );
 
         // modify it
-        config.getSecurity().setEnabled( true );
+        config.getSecurity().setEnabled( false );
 
         // save it
         nexusConfiguration.saveConfiguration();
@@ -154,7 +154,7 @@ public class DefaultNexusConfigurationTest
         config = nexusConfiguration.getConfiguration();
 
         // it again contains default value, coz we overwritten it before
-        assertEquals( false, config.getSecurity().isEnabled() );
+        assertEquals( true, config.getSecurity().isEnabled() );
     }
 
     public void testGetConfiguration()

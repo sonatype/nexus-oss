@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?><nexusConfiguration>
-  <version>1.0.2</version>
+  <version>1.0.3</version>
   <workingDirectory>/dat/maven/mvnrepos</workingDirectory>
   <applicationLogDirectory>${basedir}/logs/</applicationLogDirectory>
   <security>

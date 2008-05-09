@@ -682,4 +682,11 @@ public class RemoteNexus
         return false;
     }
 
+    public Collection<ArtifactInfo> searchArtifactFlat( String term, String term2, String term3, String term4,
+        String repositoryId, String groupId )
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
 }

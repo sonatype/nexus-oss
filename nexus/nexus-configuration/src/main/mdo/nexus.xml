@@ -236,6 +236,16 @@
     public static final String LOCAL_STATUS_OUT_OF_SERVICE = "outOfService";
 ]]></code>
 				</codeSegment>
+				<codeSegment>
+					<version>1.0.3</version>
+					<code><![CDATA[
+    public static final String MODEL_VERSION = "1.0.3";
+    
+    public static final String LOCAL_STATUS_IN_SERVICE = "inService";
+
+    public static final String LOCAL_STATUS_OUT_OF_SERVICE = "outOfService";
+]]></code>
+				</codeSegment>
 			</codeSegments>
 		</class>
 
@@ -1355,6 +1365,13 @@
 			<version>1.0.2+</version>
 			<description>The REST API Settings.</description>
 			<fields>
+				<field>
+					<name>baseUrl</name>
+					<version>1.0.3+</version>
+					<type>String</type>
+					<required>true</required>
+					<description>The base URL against to build absolute URLs in REST responses, RSS feeds, mails, etc.</description>
+				</field>
 				<field>
 					<name>accessAllowedFrom</name>
 					<version>1.0.2+</version>
