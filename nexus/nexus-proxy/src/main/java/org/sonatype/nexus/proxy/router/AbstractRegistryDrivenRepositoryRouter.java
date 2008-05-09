@@ -216,7 +216,7 @@ public abstract class AbstractRegistryDrivenRepositoryRouter
                     // silent, we are searching
                     if ( getLogger().isDebugEnabled() )
                     {
-                        getLogger().debug( "During routed retrieval we had a NotFoundItem:", ex );
+                        getLogger().debug( "During routed retrieval we had a ItemNotFoundException" + ex.getMessage() );
                     }
                 }
                 catch ( AccessDeniedException ex )

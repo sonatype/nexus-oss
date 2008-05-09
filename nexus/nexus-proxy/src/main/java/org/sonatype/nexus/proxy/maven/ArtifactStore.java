@@ -18,8 +18,13 @@
  * along with this program.  If not, see http://www.gnu.org/licenses/.
  *
  */
-package org.sonatype.nexus.proxy;
+package org.sonatype.nexus.proxy.maven;
 
+import org.sonatype.nexus.proxy.AccessDeniedException;
+import org.sonatype.nexus.proxy.ItemNotFoundException;
+import org.sonatype.nexus.proxy.NoSuchResourceStoreException;
+import org.sonatype.nexus.proxy.RepositoryNotAvailableException;
+import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 
 /**
@@ -29,7 +34,6 @@ import org.sonatype.nexus.proxy.item.StorageFileItem;
  */
 public interface ArtifactStore
 {
-
     StorageFileItem retrieveArtifactPom( String groupId, String artifactId, String version )
         throws NoSuchResourceStoreException,
             RepositoryNotAvailableException,
@@ -37,4 +41,11 @@ public interface ArtifactStore
             StorageException,
             AccessDeniedException;
 
+    StorageFileItem retrieveArtifact( String groupId, String artifactId, String version, String timestampedVersion,
+        String classifier )
+        throws NoSuchResourceStoreException,
+            RepositoryNotAvailableException,
+            ItemNotFoundException,
+            StorageException,
+            AccessDeniedException;
 }

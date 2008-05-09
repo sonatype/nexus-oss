@@ -27,12 +27,13 @@ import java.util.Map;
 
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
+import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.artifact.NexusItemInfo;
 import org.sonatype.nexus.feeds.FeedRecorder;
 import org.sonatype.nexus.feeds.NexusArtifactEvent;
 import org.sonatype.nexus.proxy.AccessDeniedException;
-import org.sonatype.nexus.proxy.ArtifactStore;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
+import org.sonatype.nexus.proxy.NoSuchResourceStoreException;
 import org.sonatype.nexus.proxy.RepositoryNotAvailableException;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.attributes.inspectors.DigestCalculatingInspector;
@@ -184,6 +185,66 @@ public abstract class AbstractMavenRepository
     }
 
     protected abstract boolean shouldServeByPolicies( RepositoryItemUid uid );
+
+    protected abstract String gav2path( Gav gav );
+
+    public StorageFileItem retrieveArtifactPom( String groupId, String artifactId, String version )
+        throws NoSuchResourceStoreException,
+            RepositoryNotAvailableException,
+            ItemNotFoundException,
+            StorageException,
+            AccessDeniedException
+    {
+        Gav gav = new Gav( groupId, artifactId, version, null, "pom", null, null, null, false, false, false );
+
+        RepositoryItemUid uid = new RepositoryItemUid( this, gav2path( gav ) );
+
+        StorageItem item = retrieveItem( true, uid );
+
+        if ( StorageFileItem.class.isAssignableFrom( item.getClass() ) )
+        {
+            return (StorageFileItem) item;
+        }
+        else
+        {
+            throw new StorageException( "The POM retrieval returned non-file, path:" + uid.getPath() );
+        }
+    }
+
+    public StorageFileItem retrieveArtifact( String groupId, String artifactId, String version,
+        String timestampedVersion, String classifier )
+        throws NoSuchResourceStoreException,
+            RepositoryNotAvailableException,
+            ItemNotFoundException,
+            StorageException,
+            AccessDeniedException
+    {
+        Gav gav = new Gav(
+            groupId,
+            artifactId,
+            version,
+            classifier,
+            "jar",
+            timestampedVersion,
+            null,
+            null,
+            classifier == null,
+            false,
+            false );
+
+        RepositoryItemUid uid = new RepositoryItemUid( this, gav2path( gav ) );
+
+        StorageItem item = retrieveItem( true, uid );
+
+        if ( StorageFileItem.class.isAssignableFrom( item.getClass() ) )
+        {
+            return (StorageFileItem) item;
+        }
+        else
+        {
+            throw new StorageException( "The Artifact retrieval returned non-file, path:" + uid.getPath() );
+        }
+    }
 
     protected StorageItem doRetrieveItem( boolean localOnly, RepositoryItemUid uid, Map<String, Object> context )
         throws RepositoryNotAvailableException,

@@ -30,8 +30,8 @@ import org.restlet.Context;
 import org.restlet.Restlet;
 import org.restlet.Router;
 import org.restlet.resource.Resource;
+import org.sonatype.nexus.rest.artifact.ArtifactResourceContentHandler;
 import org.sonatype.nexus.rest.artifact.ArtifactResourceHandler;
-import org.sonatype.nexus.rest.artifact.ArtifactSectionResourceHandler;
 import org.sonatype.nexus.rest.attributes.AttributesResourceHandler;
 import org.sonatype.nexus.rest.authentication.LoginResourceHandler;
 import org.sonatype.nexus.rest.authentication.LogoutResourceHandler;
@@ -336,9 +336,7 @@ public class ApplicationBridge
 
         router.attach( "/artifact", ArtifactResourceHandler.class );
 
-        router.attach(
-            "/artifact/{" + ArtifactSectionResourceHandler.SECTION_KEY + "}",
-            ArtifactSectionResourceHandler.class );
+        router.attach( "/artifact/content", ArtifactResourceContentHandler.class );
 
         router.attach( "/data_index", IndexResourceHandler.class );
 

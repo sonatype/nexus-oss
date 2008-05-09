@@ -36,10 +36,9 @@ import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.artifact.versioning.VersionRange;
 import org.codehaus.plexus.util.IOUtil;
 import org.sonatype.nexus.artifact.Gav;
-import org.sonatype.nexus.artifact.M1GavCalculator;
 import org.sonatype.nexus.artifact.M2ArtifactRecognizer;
+import org.sonatype.nexus.artifact.M2GavCalculator;
 import org.sonatype.nexus.proxy.AccessDeniedException;
-import org.sonatype.nexus.proxy.ArtifactStore;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.NoSuchResourceStoreException;
 import org.sonatype.nexus.proxy.RepositoryNotAvailableException;
@@ -108,7 +107,7 @@ public class ConstrainedM2ShadowRepository
     {
         Gav gav = new Gav( groupId, artifactId, version, null, "pom", null, null, null, false, false, false );
 
-        RepositoryItemUid uid = new RepositoryItemUid( this, M1GavCalculator.calculateRepositoryPath( gav ) );
+        RepositoryItemUid uid = new RepositoryItemUid( this, M2GavCalculator.calculateRepositoryPath( gav ) );
 
         StorageItem item = retrieveItem( true, uid );
 
@@ -119,6 +118,41 @@ public class ConstrainedM2ShadowRepository
         else
         {
             throw new StorageException( "The POM retrieval returned non-file, path:" + uid.getPath() );
+        }
+    }
+
+    public StorageFileItem retrieveArtifact( String groupId, String artifactId, String version,
+        String timestampedVersion, String classifier )
+        throws NoSuchResourceStoreException,
+            RepositoryNotAvailableException,
+            ItemNotFoundException,
+            StorageException,
+            AccessDeniedException
+    {
+        Gav gav = new Gav(
+            groupId,
+            artifactId,
+            version,
+            classifier,
+            "jar",
+            timestampedVersion,
+            null,
+            null,
+            classifier == null,
+            false,
+            false );
+
+        RepositoryItemUid uid = new RepositoryItemUid( this, M2GavCalculator.calculateRepositoryPath( gav ) );
+
+        StorageItem item = retrieveItem( true, uid );
+
+        if ( StorageFileItem.class.isAssignableFrom( item.getClass() ) )
+        {
+            return (StorageFileItem) item;
+        }
+        else
+        {
+            throw new StorageException( "The Artifact retrieval returned non-file, path:" + uid.getPath() );
         }
     }
 

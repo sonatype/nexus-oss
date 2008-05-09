@@ -37,10 +37,6 @@ import org.codehaus.plexus.util.IOUtil;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.artifact.M2ArtifactRecognizer;
 import org.sonatype.nexus.artifact.M2GavCalculator;
-import org.sonatype.nexus.proxy.AccessDeniedException;
-import org.sonatype.nexus.proxy.ItemNotFoundException;
-import org.sonatype.nexus.proxy.NoSuchResourceStoreException;
-import org.sonatype.nexus.proxy.RepositoryNotAvailableException;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.PreparedContentLocator;
@@ -60,7 +56,7 @@ public class M2Repository
     extends AbstractMavenRepository
 {
     private static final Pattern VERSION_FILE_PATTERN = Pattern.compile( "^(.*)-([0-9]{8}.[0-9]{6})-([0-9]+)$" );
-    
+
     private ContentClass contentClass = new Maven2ContentClass();
 
     public ContentClass getRepositoryContentClass()
@@ -68,27 +64,9 @@ public class M2Repository
         return contentClass;
     }
 
-    public StorageFileItem retrieveArtifactPom( String groupId, String artifactId, String version )
-        throws NoSuchResourceStoreException,
-            RepositoryNotAvailableException,
-            ItemNotFoundException,
-            StorageException,
-            AccessDeniedException
+    protected String gav2path( Gav gav )
     {
-        Gav gav = new Gav( groupId, artifactId, version, null, "pom", null, null, null, false, false, false );
-
-        RepositoryItemUid uid = new RepositoryItemUid( this, M2GavCalculator.calculateRepositoryPath( gav ) );
-
-        StorageItem item = retrieveItem( true, uid );
-
-        if ( StorageFileItem.class.isAssignableFrom( item.getClass() ) )
-        {
-            return (StorageFileItem) item;
-        }
-        else
-        {
-            throw new StorageException( "The POM retrieval returned non-file, path:" + uid.getPath() );
-        }
+        return M2GavCalculator.calculateRepositoryPath( gav );
     }
 
     /**

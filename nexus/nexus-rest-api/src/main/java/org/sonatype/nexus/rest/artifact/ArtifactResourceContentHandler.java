@@ -27,26 +27,23 @@ import org.restlet.resource.Representation;
 import org.restlet.resource.Variant;
 
 /**
- * Prepares and returns segments of a POM.
+ * POM Resource handler.
  * 
  * @author cstamas
  */
-public class ArtifactSectionResourceHandler
+public class ArtifactResourceContentHandler
     extends AbstractArtifactResourceHandler
 {
 
-    public static final String SECTION_KEY = "section";
-
-    public ArtifactSectionResourceHandler( Context context, Request request, Response response )
+    public ArtifactResourceContentHandler( Context context, Request request, Response response )
     {
         super( context, request, response );
     }
 
-    @Override
     protected Representation getRepresentationHandler( Variant variant )
         throws Exception
     {
-        return serialize( variant, getPom() );
+        return getContent( variant );
     }
 
 }

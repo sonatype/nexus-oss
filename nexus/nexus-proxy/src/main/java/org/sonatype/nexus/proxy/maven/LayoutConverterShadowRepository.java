@@ -24,7 +24,6 @@ import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.artifact.M1GavCalculator;
 import org.sonatype.nexus.artifact.M2GavCalculator;
 import org.sonatype.nexus.proxy.AccessDeniedException;
-import org.sonatype.nexus.proxy.ArtifactStore;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.NoSuchResourceStoreException;
 import org.sonatype.nexus.proxy.RepositoryNotAvailableException;
@@ -70,6 +69,41 @@ public abstract class LayoutConverterShadowRepository
         }
     }
 
+    public StorageFileItem retrieveArtifact( String groupId, String artifactId, String version,
+        String timestampedVersion, String classifier )
+        throws NoSuchResourceStoreException,
+            RepositoryNotAvailableException,
+            ItemNotFoundException,
+            StorageException,
+            AccessDeniedException
+    {
+        Gav gav = new Gav(
+            groupId,
+            artifactId,
+            version,
+            classifier,
+            "jar",
+            timestampedVersion,
+            null,
+            null,
+            classifier == null,
+            false,
+            false );
+
+        RepositoryItemUid uid = new RepositoryItemUid( this, gav2path( gav ) );
+
+        StorageItem item = retrieveItem( true, uid );
+
+        if ( StorageFileItem.class.isAssignableFrom( item.getClass() ) )
+        {
+            return (StorageFileItem) item;
+        }
+        else
+        {
+            throw new StorageException( "The Artifact retrieval returned non-file, path:" + uid.getPath() );
+        }
+    }
+
     /**
      * Converts GAV to path according to layout.
      * 
@@ -85,11 +119,11 @@ public abstract class LayoutConverterShadowRepository
      * @return
      */
     protected String transformM1toM2( String path )
-    throws ItemNotFoundException
+        throws ItemNotFoundException
     {
         Gav gav = M1GavCalculator.calculate( path );
-        //Unsupported path
-        if (gav == null)
+        // Unsupported path
+        if ( gav == null )
         {
             throw new ItemNotFoundException( path );
         }
@@ -116,13 +150,13 @@ public abstract class LayoutConverterShadowRepository
      * @param path
      * @return
      */
-    protected String transformM2toM1( String path ) 
-    throws ItemNotFoundException
+    protected String transformM2toM1( String path )
+        throws ItemNotFoundException
     {
         Gav gav = M2GavCalculator.calculate( path );
-        
-        //Unsupported path
-        if (gav == null)
+
+        // Unsupported path
+        if ( gav == null )
         {
             throw new ItemNotFoundException( path );
         }

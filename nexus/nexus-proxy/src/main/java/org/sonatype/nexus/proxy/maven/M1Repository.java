@@ -23,13 +23,7 @@ package org.sonatype.nexus.proxy.maven;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.artifact.M1ArtifactRecognizer;
 import org.sonatype.nexus.artifact.M1GavCalculator;
-import org.sonatype.nexus.proxy.AccessDeniedException;
-import org.sonatype.nexus.proxy.ItemNotFoundException;
-import org.sonatype.nexus.proxy.NoSuchResourceStoreException;
-import org.sonatype.nexus.proxy.RepositoryNotAvailableException;
-import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
-import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 
@@ -49,28 +43,10 @@ public class M1Repository
     {
         return contentClass;
     }
-
-    public StorageFileItem retrieveArtifactPom( String groupId, String artifactId, String version )
-        throws NoSuchResourceStoreException,
-            RepositoryNotAvailableException,
-            ItemNotFoundException,
-            StorageException,
-            AccessDeniedException
+    
+    protected String gav2path(Gav gav)
     {
-        Gav gav = new Gav( groupId, artifactId, version, null, "pom", null, null, null, false, false, false );
-
-        RepositoryItemUid uid = new RepositoryItemUid( this, M1GavCalculator.calculateRepositoryPath( gav ) );
-
-        StorageItem item = retrieveItem( true, uid );
-
-        if ( StorageFileItem.class.isAssignableFrom( item.getClass() ) )
-        {
-            return (StorageFileItem) item;
-        }
-        else
-        {
-            throw new StorageException( "The POM retrieval returned non-file, path:" + uid.getPath() );
-        }
+        return M1GavCalculator.calculateRepositoryPath( gav );
     }
 
     /**

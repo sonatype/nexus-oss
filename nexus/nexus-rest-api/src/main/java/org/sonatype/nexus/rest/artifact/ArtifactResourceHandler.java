@@ -43,7 +43,7 @@ public class ArtifactResourceHandler
     protected Representation getRepresentationHandler( Variant variant )
         throws Exception
     {
-        return serialize( variant, getPom() );
+        return getPom( variant );
     }
 
 }
