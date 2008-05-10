@@ -520,7 +520,7 @@
 			<dependency>
 				<groupId>org.sonatype.nexus</groupId>
 				<artifactId>nexus-indexer</artifactId>
-				<version>1.0-beta-3-SNAPSHOT</version>
+				<version>1.0-beta-3</version>
 			</dependency>
 			<dependency>
 				<groupId>org.sonatype.nexus</groupId>
