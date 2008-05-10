@@ -4,11 +4,14 @@
   <formats>
     <format>jar</format>
   </formats>
+  <!--
+  THIS IS BROKEN!
+  
   <containerDescriptorHandlers>
     <containerDescriptorHandler>
       <handlerName>plexus-fixed</handlerName>
     </containerDescriptorHandler>
-  </containerDescriptorHandlers>
+  </containerDescriptorHandlers>-->
   <!--
   <fileSets>
     <fileSet>
