@@ -40,23 +40,45 @@ import org.sonatype.nexus.proxy.repository.Repository;
  */
 public abstract class StoreWalker
 {
-    public void walk( ResourceStore store, Logger logger )
+    protected ResourceStore store;
+
+    protected Logger logger;
+
+    public StoreWalker( ResourceStore store, Logger logger )
     {
-        walk( store, logger, null );
+        super();
+
+        this.store = store;
+
+        this.logger = logger;
     }
 
-    public void walk( ResourceStore store, Logger logger, String fromPath )
+    protected Logger getLogger()
     {
-        walk( store, logger, fromPath, true, false );
+        return logger;
     }
 
-    public final void walk( ResourceStore store, Logger logger, boolean localOnly, boolean collectionsOnly )
+    protected ResourceStore getResourceStore()
     {
-        walk( store, logger, null, localOnly, collectionsOnly );
+        return store;
     }
 
-    public final void walk( ResourceStore store, Logger logger, String fromPath, boolean localOnly,
-        boolean collectionsOnly )
+    public void walk()
+    {
+        walk( null );
+    }
+
+    public void walk( String fromPath )
+    {
+        walk( fromPath, true, false );
+    }
+
+    public final void walk( boolean localOnly, boolean collectionsOnly )
+    {
+        walk( null, localOnly, collectionsOnly );
+    }
+
+    public final void walk( String fromPath, boolean localOnly, boolean collectionsOnly )
     {
         if ( fromPath == null )
         {
@@ -70,7 +92,7 @@ public abstract class StoreWalker
             logger.debug( "Start walking on ResourceStore " + store.getId() + " from path " + fromPath );
         }
 
-        beforeWalk( store, logger );
+        beforeWalk();
 
         Stack<StorageCollectionItem> stack = new Stack<StorageCollectionItem>();
         StorageItem item = null;
@@ -129,28 +151,36 @@ public abstract class StoreWalker
         while ( !stack.isEmpty() )
         {
             coll = stack.pop();
-            processItem( store, coll, logger );
-            onCollectionEnter( store, coll, logger );
+            
+            processItem( coll );
+            
+            onCollectionEnter( coll );
+            
             itemCount++;
+            
             Collection<StorageItem> ls = coll.list();
+            
             for ( StorageItem i : ls )
             {
                 if ( collectionsOnly && StorageCollectionItem.class.isAssignableFrom( i.getClass() ) )
                 {
-                    processItem( store, i, logger );
+                    processItem( i );
                 }
                 else
                 {
-                    processItem( store, i, logger );
+                    processItem( i );
                 }
                 if ( StorageCollectionItem.class.isAssignableFrom( i.getClass() ) )
                 {
                     stack.push( (StorageCollectionItem) i );
                 }
             }
-            onCollectionExit( store, coll, logger );
+            
+            onCollectionExit( coll );
         }
-        afterWalk( store, logger );
+
+        afterWalk();
+
         if ( logger != null )
         {
             logger.info( "Finished walking on " + store.getId() + " Store with " + Integer.toString( itemCount )
@@ -158,24 +188,24 @@ public abstract class StoreWalker
         }
     }
 
-    protected void beforeWalk( ResourceStore store, Logger logger )
+    protected void beforeWalk()
     {
         // override if needed
     }
 
-    protected void onCollectionEnter( ResourceStore store, StorageCollectionItem coll, Logger logger )
+    protected void onCollectionEnter( StorageCollectionItem coll )
     {
         // override if needed
     }
 
-    protected abstract void processItem( ResourceStore store, StorageItem item, Logger logger );
+    protected abstract void processItem( StorageItem item );
 
-    protected void onCollectionExit( ResourceStore store, StorageCollectionItem coll, Logger logger )
+    protected void onCollectionExit( StorageCollectionItem coll )
     {
         // override if needed
     }
 
-    protected void afterWalk( ResourceStore store, Logger logger )
+    protected void afterWalk()
     {
         // override if needed
     }

@@ -22,13 +22,11 @@ package org.sonatype.nexus.proxy.storage.local;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Map;
 
 import org.sonatype.nexus.proxy.LoggingComponent;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.attributes.AttributesHandler;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
-import org.sonatype.nexus.proxy.repository.Repository;
 
 /**
  * Abstract Storage class. It have ID and defines logger. Predefines all write methods to be able to "decorate"
@@ -76,35 +74,14 @@ public abstract class AbstractLocalRepositoryStorage
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.sonatype.nexus.storage.local.LocalRepositoryStorage#getAttributesHandler()
-     */
     public AttributesHandler getAttributesHandler()
     {
         return attributesHandler;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.sonatype.nexus.storage.local.LocalRepositoryStorage#setAttributesHandler(org.sonatype.nexus.attributes.AttributesHandler)
-     */
     public void setAttributesHandler( AttributesHandler attributesHandler )
     {
         this.attributesHandler = attributesHandler;
-    }
-
-    /**
-     * Recreate attributes.
-     * 
-     * @param repository the repository
-     * @param initialData the initial data
-     */
-    public void recreateAttributes( Repository repository, Map<String, String> initialData )
-    {
-        getAttributesHandler().recreateAttributes( repository, initialData );
     }
 
 }

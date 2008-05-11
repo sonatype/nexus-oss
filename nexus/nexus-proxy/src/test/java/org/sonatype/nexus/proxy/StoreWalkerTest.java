@@ -52,20 +52,21 @@ public class StoreWalkerTest
             new ResourceStoreRequest( "/test/activemq/activemq-core/1.2/activemq-core-1.2.jar", false ) );
         getRouter( "groups-m2" ).retrieveItem(
             new ResourceStoreRequest( "/test/xstream/xstream/1.2.2/xstream-1.2.2.pom", false ) );
-        getRouter( "groups-m2" ).retrieveItem(
-            new ResourceStoreRequest( "/test/rome/rome/0.9/rome-0.9.pom", false ) );
+        getRouter( "groups-m2" ).retrieveItem( new ResourceStoreRequest( "/test/rome/rome/0.9/rome-0.9.pom", false ) );
         getRouter( "groups-m2" ).retrieveItem( new ResourceStoreRequest( "/test/repo3.txt", false ) );
 
-        TestWalker w = new TestWalker();
+        TestWalker w;
 
-        w.walk( getRouter( "repositories" ), null );
+        w = new TestWalker( getRouter( "repositories" ), null );
+        w.walk();
         assertEquals( 14, w.collEnters );
         assertEquals( 14, w.collExits );
         assertEquals( 27, w.colls );
         assertEquals( 4, w.files );
         assertEquals( 0, w.links );
 
-        w.walk( getRouter( "groups-m2" ), null );
+        w = new TestWalker( getRouter( "groups-m2" ), null );
+        w.walk();
         assertEquals( 11, w.collEnters );
         assertEquals( 11, w.collExits );
         assertEquals( 21, w.colls );
@@ -77,6 +78,11 @@ public class StoreWalkerTest
     private class TestWalker
         extends StoreWalker
     {
+        public TestWalker( ResourceStore store, Logger logger )
+        {
+            super( store, logger );
+        }
+
         public int collEnters;
 
         public int collExits;
@@ -87,23 +93,23 @@ public class StoreWalkerTest
 
         public int links;
 
-        public void walk( ResourceStore store, Logger logger )
+        public void walk()
         {
             collEnters = 0;
             collExits = 0;
             colls = 0;
             files = 0;
             links = 0;
-            super.walk( store, logger );
+            super.walk();
         }
 
-        protected void onCollectionEnter( ResourceStore store, StorageCollectionItem coll, Logger logger )
+        protected void onCollectionEnter( StorageCollectionItem coll )
         {
             collEnters++;
         }
 
         @Override
-        protected void processItem( ResourceStore store, StorageItem item, Logger logger )
+        protected void processItem( StorageItem item )
         {
             if ( StorageCollectionItem.class.isAssignableFrom( item.getClass() ) )
             {
@@ -119,7 +125,7 @@ public class StoreWalkerTest
             }
         }
 
-        protected void onCollectionExit( ResourceStore store, StorageCollectionItem coll, Logger logger )
+        protected void onCollectionExit( StorageCollectionItem coll )
         {
             collExits++;
         }

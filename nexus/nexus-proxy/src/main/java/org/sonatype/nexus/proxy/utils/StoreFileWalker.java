@@ -34,16 +34,18 @@ public abstract class StoreFileWalker
     extends StoreWalker
 {
 
-    /* (non-Javadoc)
-     * @see org.sonatype.nexus.proxy.utils.StoreWalker#processItem(org.sonatype.nexus.proxy.ResourceStore, org.sonatype.nexus.proxy.item.StorageItem, org.codehaus.plexus.logging.Logger)
-     */
-    protected final void processItem( ResourceStore store, StorageItem item, Logger logger )
+    public StoreFileWalker( ResourceStore store, Logger logger )
+    {
+        super( store, logger );
+    }
+
+    protected final void processItem( StorageItem item )
     {
         if ( StorageFileItem.class.isAssignableFrom( item.getClass() ) )
         {
             try
             {
-                processFileItem( store, (StorageFileItem) item, logger );
+                processFileItem( (StorageFileItem) item );
             }
             catch ( Exception ex )
             {
@@ -62,6 +64,6 @@ public abstract class StoreFileWalker
      * @param fItem the f item
      * @param logger the logger
      */
-    protected abstract void processFileItem( ResourceStore store, StorageFileItem fItem, Logger logger );
+    protected abstract void processFileItem( StorageFileItem fItem );
 
 }

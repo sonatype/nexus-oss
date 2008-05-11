@@ -32,7 +32,6 @@ import org.codehaus.plexus.logging.Logger;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.artifact.M2ArtifactRecognizer;
 import org.sonatype.nexus.artifact.M2GavCalculator;
-import org.sonatype.nexus.proxy.ResourceStore;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
@@ -143,8 +142,6 @@ public class DefaultSnapshotRemover
     private class SnapshotRemoverWalker
         extends StoreWalker
     {
-        private final Logger logger;
-
         private final Repository repository;
 
         private final SnapshotRemovalRequest request;
@@ -163,8 +160,7 @@ public class DefaultSnapshotRemover
 
         public SnapshotRemoverWalker( Logger logger, Repository repository, SnapshotRemovalRequest request )
         {
-            super();
-            this.logger = logger;
+            super( repository, logger );
             this.repository = repository;
             this.request = request;
             this.dateTreshold = System.currentTimeMillis() - ( request.getRemoveSnapshotsOlderThanDays() * 86400000 );
@@ -179,7 +175,7 @@ public class DefaultSnapshotRemover
             map.get( key ).add( item );
         }
 
-        protected void onCollectionEnter( ResourceStore store, StorageCollectionItem coll, Logger logger )
+        protected void onCollectionEnter( StorageCollectionItem coll )
         {
             deletableSnapshotsAndFiles.clear();
             remainingSnapshotsAndFiles.clear();
@@ -223,12 +219,12 @@ public class DefaultSnapshotRemover
             }
         }
 
-        protected void processItem( ResourceStore store, StorageItem item, Logger logger )
+        protected void processItem( StorageItem item )
         {
             // nothing here
         }
 
-        protected void onCollectionExit( ResourceStore store, StorageCollectionItem coll, Logger logger )
+        protected void onCollectionExit( StorageCollectionItem coll )
         {
             if ( shouldProcessCollection )
             {
@@ -278,7 +274,7 @@ public class DefaultSnapshotRemover
         {
             shouldProcessCollection = false;
 
-            walk( repository, logger, true, true );
+            walk( true, true );
         }
 
         public int getDeletedSnapshots()

@@ -26,7 +26,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.sonatype.nexus.configuration.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
@@ -37,7 +36,6 @@ import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryGroupException;
 import org.sonatype.nexus.proxy.NoSuchResourceStoreException;
 import org.sonatype.nexus.proxy.RepositoryNotAvailableException;
-import org.sonatype.nexus.proxy.ResourceStore;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.access.AccessManager;
@@ -45,6 +43,7 @@ import org.sonatype.nexus.proxy.access.OpenAccessManager;
 import org.sonatype.nexus.proxy.access.RepositoryPermission;
 import org.sonatype.nexus.proxy.cache.CacheManager;
 import org.sonatype.nexus.proxy.cache.PathCache;
+import org.sonatype.nexus.proxy.events.RepositoryEventClearCaches;
 import org.sonatype.nexus.proxy.events.RepositoryEventRecreateAttributes;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventDelete;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventRetrieve;
@@ -457,10 +456,10 @@ public abstract class AbstractRepository
         }
 
         // construct an imperial walker to do the job
-        StoreFileWalker walker = new StoreFileWalker()
+        StoreFileWalker walker = new StoreFileWalker( this, getLogger() )
         {
             @Override
-            protected void processFileItem( ResourceStore store, StorageFileItem item, Logger logger )
+            protected void processFileItem( StorageFileItem item )
             {
                 // expiring found files
                 try
@@ -480,14 +479,21 @@ public abstract class AbstractRepository
         };
 
         // and let it loose
-        walker.walk( this, getLogger(), path );
+        walker.walk( path, true, false );
+
+        notifyProximityEventListeners( new RepositoryEventClearCaches( this, path ) );
     }
 
-    public boolean recreateAttributes( Map<String, String> initialData )
+    public boolean recreateAttributes( final Map<String, String> initialData )
     {
         getLogger().info( "Recreating attributes on repository " + getId() );
-        getLocalStorage().getAttributesHandler().recreateAttributes( this, initialData );
+
+        RecreateAttributesWalker walker = new RecreateAttributesWalker( this, getLogger(), initialData );
+
+        walker.walk( true, false );
+
         notifyProximityEventListeners( new RepositoryEventRecreateAttributes( this ) );
+
         return true;
     }
 

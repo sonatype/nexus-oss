@@ -26,20 +26,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
-import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.IOUtil;
 import org.sonatype.nexus.configuration.ApplicationConfiguration;
 import org.sonatype.nexus.proxy.LoggingComponent;
-import org.sonatype.nexus.proxy.ResourceStore;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
-import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.proxy.utils.StoreFileWalker;
 
 /**
  * The Class DefaultAttributesHandler.
@@ -143,21 +138,11 @@ public class DefaultAttributesHandler
     // ======================================================================
     // AttributesHandler iface
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.sonatype.nexus.attributes.AttributesHandler#deleteAttributes(org.sonatype.nexus.item.RepositoryItemUid)
-     */
     public boolean deleteAttributes( RepositoryItemUid uid )
     {
         return getAttributeStorage().deleteAttributes( uid );
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.sonatype.nexus.attributes.AttributesHandler#fetchAttributes(org.sonatype.nexus.item.AbstractStorageItem)
-     */
     public void fetchAttributes( AbstractStorageItem item )
     {
         StorageItem mdItem = getAttributeStorage().getAttributes( item.getRepositoryItemUid() );
@@ -168,6 +153,8 @@ public class DefaultAttributesHandler
         }
         else
         {
+            // we are fixing md if we can
+            
             InputStream is = null;
 
             if ( StorageFileItem.class.isAssignableFrom( item.getClass() ) )
@@ -189,51 +176,14 @@ public class DefaultAttributesHandler
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.sonatype.nexus.attributes.AttributesHandler#storeAttributes(org.sonatype.nexus.item.AbstractStorageItem,
-     *      java.io.InputStream)
-     */
     public void storeAttributes( AbstractStorageItem item, InputStream inputStream )
     {
         if ( inputStream != null )
         {
             expandCustomItemAttributes( item, inputStream );
         }
+        
         getAttributeStorage().putAttribute( item );
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.sonatype.nexus.attributes.AttributesHandler#recreateAttributes(org.sonatype.nexus.repository.Repository,
-     *      java.util.Map)
-     */
-    public void recreateAttributes( Repository repository, final Map<String, String> initialData )
-    {
-        StoreFileWalker walker = new StoreFileWalker()
-        {
-            protected void processFileItem( ResourceStore store, StorageFileItem item, Logger logger )
-            {
-                try
-                {
-                    if ( initialData != null )
-                    {
-                        item.getAttributes().putAll( initialData );
-                    }
-
-                    storeAttributes( (AbstractStorageItem) item, item.getInputStream() );
-                }
-                catch ( IOException e )
-                {
-                    getLogger().warn(
-                        "Could not recreate attributes for item " + item.getRepositoryItemUid().toString(),
-                        e );
-                }
-            }
-        };
-        walker.walk( repository, getLogger() );
     }
 
     // ======================================================================

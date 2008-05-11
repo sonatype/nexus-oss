@@ -191,8 +191,10 @@ public abstract class ShadowRepository
         getLogger().info( "Syncing shadow " + getId() + " with master repository " + getMasterRepository().getId() );
 
         clearCaches( RepositoryItemUid.PATH_ROOT );
-        SyncWalker sw = new SyncWalker();
-        sw.walk( this, getMasterRepository(), getLogger() );
+        
+        SyncWalker sw = new SyncWalker( this, getMasterRepository(), getLogger() );
+        
+        sw.walk();
 
         // delete all links
         // walk master repo
@@ -223,16 +225,25 @@ public abstract class ShadowRepository
 
         private Repository repository;
 
+        public SyncWalker( Repository repository, ResourceStore master, Logger logger )
+        {
+            super( master, logger );
+            
+            this.repository = repository;
+        }
+
         @Override
-        protected void processFileItem( ResourceStore store, StorageFileItem item, Logger logger )
+        protected void processFileItem( StorageFileItem item )
         {
             if ( item.getPath().endsWith( ".pom" ) || item.getPath().endsWith( ".jar" ) )
             {
                 try
                 {
                     String tuid = transformMaster2Shadow( item.getRepositoryItemUid().getPath() );
+
                     DefaultStorageLinkItem link = new DefaultStorageLinkItem( repository, tuid, true, true, item
                         .getRepositoryItemUid().toString() );
+
                     storeItem( link );
                 }
                 catch ( Exception e )
@@ -241,13 +252,6 @@ public abstract class ShadowRepository
                 }
             }
         }
-
-        public void walk( Repository repository, Repository master, Logger logger )
-        {
-            this.repository = repository;
-            walk( master, logger );
-        }
-
     };
 
 }

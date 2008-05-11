@@ -25,16 +25,26 @@ import org.sonatype.nexus.proxy.repository.Repository;
 /**
  * The Class RepositoryEventRecreateAttributes.
  */
-public class RepositoryEventRecreateAttributes
+public class RepositoryEventClearCaches
     extends RepositoryEvent
 {
+    /** From where it happened */
+    private String path;
+
     /**
      * Instantiates a new repository event recreate attributes.
      * 
      * @param repository the repository
      */
-    public RepositoryEventRecreateAttributes( final Repository repository)
+    public RepositoryEventClearCaches( final Repository repository, String path )
     {
         super( repository );
+
+        this.path = path;
+    }
+
+    public String getPath()
+    {
+        return path;
     }
 }

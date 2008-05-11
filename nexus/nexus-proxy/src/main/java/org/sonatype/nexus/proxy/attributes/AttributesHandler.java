@@ -21,11 +21,9 @@
 package org.sonatype.nexus.proxy.attributes;
 
 import java.io.InputStream;
-import java.util.Map;
 
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
-import org.sonatype.nexus.proxy.repository.Repository;
 
 /**
  * The Interface AttributesHandler. Used by LocalStorage to decorate the items.
@@ -62,13 +60,4 @@ public interface AttributesHandler
      * @return true if attributes are found and deleted, false otherwise.
      */
     boolean deleteAttributes( RepositoryItemUid uid );
-
-    /**
-     * Recreates the attributes for all items in the given storage.
-     * 
-     * @param initialData the initial data
-     * @param repository the repository
-     */
-    void recreateAttributes( Repository repository, Map<String, String> initialData );
-
 }

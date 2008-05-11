@@ -37,6 +37,7 @@ import org.sonatype.nexus.proxy.NoSuchResourceStoreException;
 import org.sonatype.nexus.proxy.RepositoryNotAvailableException;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.attributes.inspectors.DigestCalculatingInspector;
+import org.sonatype.nexus.proxy.events.RepositoryEventRecreateAttributes;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
@@ -93,6 +94,19 @@ public abstract class AbstractMavenRepository
      * Checksum policy applied in this M2 repository.
      */
     private ChecksumPolicy checksumPolicy;
+
+    public boolean recreateAttributes( final Map<String, String> initialData )
+    {
+        getLogger().info( "Recreating Maven attributes on repository " + getId() );
+
+        RecreateMavenAttributesWalker walker = new RecreateMavenAttributesWalker( this, getLogger(), initialData );
+
+        walker.walk( true, false );
+
+        notifyProximityEventListeners( new RepositoryEventRecreateAttributes( this ) );
+
+        return true;
+    }
 
     public ChecksumPolicy getChecksumPolicy()
     {
