@@ -277,8 +277,8 @@ public abstract class AbstractMavenRepository
             }
             else
             {
-                // otherwise we get the "owner" (who's checksum is this) ans simply
-                // create a simply File item with prepared content: the hash
+                // otherwise we get the "owner" (who's checksum is this) and simply
+                // create a File item with prepared content: the hash
                 String ownerPath = null;
 
                 if ( uid.getPath().endsWith( ".sha1" ) )
