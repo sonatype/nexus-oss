@@ -630,8 +630,7 @@ public abstract class AbstractMavenRepository
     public void storeItem( AbstractStorageItem item )
         throws UnsupportedStorageOperationException,
             RepositoryNotAvailableException,
-            StorageException,
-            AccessDeniedException
+            StorageException
     {
         if ( shouldServeByPolicies( item.getRepositoryItemUid() ) )
         {
@@ -639,8 +638,8 @@ public abstract class AbstractMavenRepository
         }
         else
         {
-            throw new AccessDeniedException( item.getRepositoryItemUid(), "Storing of item "
-                + item.getRepositoryItemUid().toString() + " is forbidden by Repository policy." );
+            throw new UnsupportedStorageOperationException( "Storing of item " + item.getRepositoryItemUid().toString()
+                + " is forbidden by Repository policy." );
         }
     }
 

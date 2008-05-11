@@ -51,6 +51,10 @@ public class DefaultAttributesHandlerTest
     {
         super.setUp();
 
+        FileUtils.copyDirectoryStructure( new File( getBasedir(), "target/test-classes/repo1" ), new File(
+            getBasedir(),
+            "target/test-reposes/repo1" ) );
+
         attributesHandler = (DefaultAttributesHandler) lookup( AttributesHandler.ROLE );
 
         FileUtils.deleteDirectory( ( (DefaultAttributeStorage) attributesHandler.getAttributeStorage() )
@@ -60,7 +64,7 @@ public class DefaultAttributesHandlerTest
 
         repository.setId( "dummy" );
 
-        repository.setLocalUrl( new File( getBasedir(), "src/test/resources/repo1" ).toURI().toURL().toString() );
+        repository.setLocalUrl( new File( getBasedir(), "target/test-reposes/repo1" ).toURI().toURL().toString() );
 
         DefaultFSLocalRepositoryStorage ls = (DefaultFSLocalRepositoryStorage) lookup(
             LocalRepositoryStorage.ROLE,
@@ -76,7 +80,7 @@ public class DefaultAttributesHandlerTest
 
         assertFalse( ( (DefaultAttributeStorage) attributesHandler.getAttributeStorage() )
             .getFileFromBase( uid, false ).exists() );
-        
+
         repository.recreateAttributes( null );
 
         assertTrue( ( (DefaultAttributeStorage) attributesHandler.getAttributeStorage() )

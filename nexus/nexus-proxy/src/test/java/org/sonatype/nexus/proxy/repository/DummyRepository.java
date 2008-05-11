@@ -370,8 +370,7 @@ public class DummyRepository
     public void storeItem( AbstractStorageItem item )
         throws UnsupportedStorageOperationException,
             RepositoryNotAvailableException,
-            StorageException,
-            AccessDeniedException
+            StorageException
     {
         throw new UnsupportedOperationException( "This is dummy!" );
     }
@@ -564,6 +563,18 @@ public class DummyRepository
     {
         // TODO Auto-generated method stub
         return new DefaultContentClass();
+    }
+
+    public void addToNotFoundCache( String path )
+    {
+        // TODO Auto-generated method stub
+        
+    }
+
+    public void removeFromNotFoundCache( String path )
+    {
+        // TODO Auto-generated method stub
+        
     }
 
 }

@@ -120,6 +120,20 @@ public interface Repository
     void setNotFoundCache( PathCache notFoundcache );
 
     /**
+     * Adds path to NFC.
+     * 
+     * @param path
+     */
+    void addToNotFoundCache( String path );
+
+    /**
+     * Removes path from NFC.
+     * 
+     * @param path
+     */
+    void removeFromNotFoundCache( String path );
+
+    /**
      * Gets local status.
      */
     LocalStatus getLocalStatus();
@@ -381,8 +395,7 @@ public interface Repository
     void storeItem( AbstractStorageItem item )
         throws UnsupportedStorageOperationException,
             RepositoryNotAvailableException,
-            StorageException,
-            AccessDeniedException;
+            StorageException;
 
     /**
      * Lists the path denoted by item.

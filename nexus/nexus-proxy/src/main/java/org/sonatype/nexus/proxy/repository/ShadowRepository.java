@@ -170,8 +170,7 @@ public abstract class ShadowRepository
     public void storeItem( AbstractStorageItem item )
         throws UnsupportedStorageOperationException,
             RepositoryNotAvailableException,
-            StorageException,
-            AccessDeniedException
+            StorageException
     {
         if ( StorageLinkItem.class.isAssignableFrom( item.getClass() ) )
         {
@@ -191,10 +190,10 @@ public abstract class ShadowRepository
         getLogger().info( "Syncing shadow " + getId() + " with master repository " + getMasterRepository().getId() );
 
         clearCaches( RepositoryItemUid.PATH_ROOT );
-        
+
         SyncWalker sw = new SyncWalker( this, getMasterRepository(), getLogger() );
-        
-        sw.walk();
+
+        sw.walk( true, false );
 
         // delete all links
         // walk master repo
@@ -228,7 +227,7 @@ public abstract class ShadowRepository
         public SyncWalker( Repository repository, ResourceStore master, Logger logger )
         {
             super( master, logger );
-            
+
             this.repository = repository;
         }
 

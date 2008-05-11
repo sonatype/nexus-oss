@@ -876,8 +876,7 @@ public abstract class AbstractRepository
     public void storeItem( AbstractStorageItem item )
         throws UnsupportedStorageOperationException,
             RepositoryNotAvailableException,
-            StorageException,
-            AccessDeniedException
+            StorageException
     {
         if ( getLogger().isDebugEnabled() )
         {
@@ -954,7 +953,7 @@ public abstract class AbstractRepository
      * 
      * @param path the path
      */
-    protected void addToNotFoundCache( String path )
+    public void addToNotFoundCache( String path )
     {
         if ( getNotFoundCache() != null )
         {
@@ -971,7 +970,7 @@ public abstract class AbstractRepository
      * 
      * @param path the path
      */
-    protected void removeFromNotFoundCache( String path )
+    public void removeFromNotFoundCache( String path )
     {
         if ( getNotFoundCache() != null )
         {

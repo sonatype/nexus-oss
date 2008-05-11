@@ -27,6 +27,7 @@ import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.maven.M1Repository;
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 
 public class M1RepositoryTest
     extends M1ResourceStoreTest
@@ -134,7 +135,7 @@ public class M1RepositoryTest
 
             fail( "Should not be able to store snapshot to release repo" );
         }
-        catch ( AccessDeniedException e )
+        catch ( UnsupportedStorageOperationException e )
         {
             // good
         }
@@ -160,7 +161,7 @@ public class M1RepositoryTest
 
             fail( "Should not be able to store release to snapshot repo" );
         }
-        catch ( AccessDeniedException e )
+        catch ( UnsupportedStorageOperationException e )
         {
             // good
         }
