@@ -40,7 +40,8 @@ import org.sonatype.nexus.util.StringDigester;
  * The Class SimpleAuthenticationSource that uses simple props file for storing username pwds.
  * 
  * @author cstamas
- * @plexus.component role="org.sonatype.nexus.security.AuthenticationSource" instantiation-strategy="per-lookup" role-hint="properties"
+ * @plexus.component role="org.sonatype.nexus.security.AuthenticationSource" instantiation-strategy="per-lookup"
+ *                   role-hint="properties"
  */
 public class PropertiesFileBasedAuthenticationSource
     extends AbstractLogEnabled
@@ -97,7 +98,7 @@ public class PropertiesFileBasedAuthenticationSource
                 }
                 fis = new FileInputStream( secretFile );
 
-                secrets.loadFromXML( fis );
+                secrets.load( fis );
             }
             finally
             {
@@ -119,7 +120,7 @@ public class PropertiesFileBasedAuthenticationSource
 
                 fos = new FileOutputStream( secretFile );
 
-                secrets.storeToXML( fos, "Created by Sonatype Nexus" );
+                secrets.store( fos, "Created by Sonatype Nexus" );
             }
             finally
             {
