@@ -159,7 +159,7 @@
       <plugin>
         <groupId>org.sonatype.plugins</groupId>
         <artifactId>plx-maven-plugin</artifactId>
-        <version>1.0-SNAPSHOT</version>
+        <version>1.0</version>
         <configuration>
           <includeTestClasspath>true</includeTestClasspath>
           <!-- prependClasspaths>

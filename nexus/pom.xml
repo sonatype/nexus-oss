@@ -136,7 +136,7 @@
 		    <dependency>
       			<groupId>org.sonatype.appbooter.plexus-platforms</groupId>
       			<artifactId>plexus-platform-jsw</artifactId>
-				<version>1.1-SNAPSHOT</version>
+				<version>1.1</version>
       			<scope>provided</scope>
     		</dependency>
 
