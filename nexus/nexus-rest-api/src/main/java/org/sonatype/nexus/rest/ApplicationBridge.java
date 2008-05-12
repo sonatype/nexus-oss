@@ -359,9 +359,9 @@ public class ApplicationBridge
         // attaching the restlets to scond router
         router.attach( "/status", StatusResourceHandler.class );
 
-        router.attach( "/artifact", ArtifactResourceHandler.class );
+        router.attach( "/artifact/maven", ArtifactResourceHandler.class );
 
-        router.attach( "/artifact/content", ArtifactResourceContentHandler.class );
+        router.attach( "/artifact/maven/content", ArtifactResourceContentHandler.class );
 
         router.attach( "/data_index", IndexResourceHandler.class );
 
