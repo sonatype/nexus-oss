@@ -146,12 +146,20 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
 	          },
             items: [
               {
-                xtype: 'textfield',
+                xtype: 'datefield',
                 fieldLabel: 'Start Date',
                 itemCls: 'required-field',
                 helpText: ht.startDate,
                 name: 'startDate',
-                width: 200,
+                allowBlank:false
+              },
+              {
+                xtype: 'timefield',
+                fieldLabel: 'Start Time',
+                itemCls: 'required-field',
+                helpText: ht.startTime,
+                name: 'startTime',
+                width: 75,
                 allowBlank:false
               }
             ]
