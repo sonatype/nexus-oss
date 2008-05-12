@@ -32,7 +32,7 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
   //TODO: this will be calling a rest method at some point
   this.serviceTypeStore = new Ext.data.SimpleStore({fields:['value'], data:[['Synchronize Repositories'],['Purge Snapshots']]});  
   this.scheduleTypeStore = new Ext.data.SimpleStore({fields:['value'], data:[['Daily'],['Weekly'],['Monthly'],['Advanced']]});
-  this.weekdayStore = new Ext.data.SimpleStore({fields:['value'], data:[['Sunday'],['Monday'],['Tuesday'],['Wednesday'],['Thursday'],['Friday'],['Saturday']]});
+  this.weekdaysList = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
   
   this.loadDataModFuncs = {
     schedule : {
@@ -161,6 +161,15 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
                 name: 'startTime',
                 width: 75,
                 allowBlank:false
+              },
+              {
+                xtype: 'timefield',
+                fieldLabel: 'Recurring Time',
+                itemCls: 'required-field',
+                helpText: ht.recurringTime,
+                name: 'recurringTime',
+                width: 75,
+                allowBlank:false
               }
             ]
           },
@@ -176,13 +185,138 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
 	          },
             items: [
               {
-                xtype: 'textfield',
+                xtype: 'datefield',
                 fieldLabel: 'Start Date',
                 itemCls: 'required-field',
-                name: 'startDate',
                 helpText: ht.startDate,
-                width: 200,
+                name: 'startDate',
                 allowBlank:false
+              },
+              {
+                xtype: 'timefield',
+                fieldLabel: 'Start Time',
+                itemCls: 'required-field',
+                helpText: ht.startTime,
+                name: 'startTime',
+                width: 75,
+                allowBlank:false
+              },
+              {
+                xtype: 'timefield',
+                fieldLabel: 'Recurring Time',
+                itemCls: 'required-field',
+                helpText: ht.recurringTime,
+                name: 'recurringTime',
+                width: 75,
+                allowBlank:false
+              },
+              {
+                xtype: 'panel',
+                layout: 'column',
+                autoHeight: true,
+                style: 'padding: 10px 0 0 0',
+                
+                items: [
+                  {
+                    xtype: 'treepanel',
+                    id: '_weekdays-tree', //note: unique ID is assinged before instantiation
+                    title: 'Selected Days',
+                    cls: 'required-field',
+                    border: true, //note: this seem to have no effect w/in form panel
+                    bodyBorder: true, //note: this seem to have no effect w/in form panel
+                    //note: this style matches the expected behavior
+                    bodyStyle: 'background-color:#FFFFFF; border: 1px solid #B5B8C8',
+                    style: 'padding: 0 20px 0 0',
+                    width: 225,
+                    height: 150,
+                    animate:true,
+                    lines: false,
+                    autoScroll:true,
+                    containerScroll: true,
+                    //@note: root node must be instantiated uniquely for each instance of treepanel
+                    //@ext: can TreeNode be registerd as a component with an xtype so this new root node
+                    //      may be instantiated uniquely for each form panel that uses this config?
+                    rootVisible: false,
+
+                    enableDD: true,
+                    ddScroll: true,
+                    dropConfig: {
+                      allowContainerDrop: true,
+                      onContainerDrop: function(source, e, data){
+                        this.tree.root.appendChild(data.node);
+                        return true;
+                      },
+                      onContainerOver:function(source, e, data){return this.dropAllowed;},
+                      // passign padding to make whole treePanel the drop zone.  This is dependent
+                      // on a sonatype fix in the Ext.dd.DropTarget class.  This is necessary
+                      // because treepanel.dropZone.setPadding is never available in time to be useful.
+                      padding: [0,0,274,0]
+                    },
+                    // added Field values to simulate form field validation
+                    invalidText: 'One or more day is required',
+                    validate: function(){
+                      return (this.root.childNodes.length > 0);
+                    },
+                    invalid: false,
+                    listeners: {
+                      'append' : {
+                        fn: function(tree, parentNode, insertedNode, i) {
+                          if (tree.invalid) {
+                            //remove error messaging
+                            tree.getEl().child('.x-panel-body').setStyle({
+                              'background-color' : '#FFFFFF',
+                              border : '1px solid #B5B8C8'
+                            });
+                            Ext.form.Field.msgFx['normal'].hide(tree.errorEl, tree);
+                          }
+                        },
+                        scope: this
+                      },
+                      'remove' : {
+                        fn: function(tree, parentNode, removedNode) {
+                          if(tree.root.childNodes.length < 1) {
+                            this.markTreeInvalid(tree);
+                          }
+                        },
+                        scope: this
+                      }
+                    }
+                  },
+                  {
+                    xtype: 'treepanel',
+                    id: id + '_all_weekdays_tree', //note: unique ID is assinged before instantiation
+                    title: 'Available Days',
+                    border: true, //note: this seem to have no effect w/in form panel
+                    bodyBorder: true, //note: this seem to have no effect w/in form panel
+                    //note: this style matches the expected behavior
+                    bodyStyle: 'background-color:#FFFFFF; border: 1px solid #B5B8C8',
+                    width: 225,
+                    height: 150,
+                    animate:true,
+                    lines: false,
+                    autoScroll:true,
+                    containerScroll: true,
+                    //@note: root node must be instantiated uniquely for each instance of treepanel
+                    //@ext: can TreeNode be registerd as a component with an xtype so this new root node
+                    //      may be instantiated uniquely for each form panel that uses this config?
+                    rootVisible: false,
+
+                    enableDD: true,
+                    ddScroll: true,
+                    dropConfig: {
+                      allowContainerDrop: true,
+                      onContainerDrop: function(source, e, data){
+                        this.tree.root.appendChild(data.node);
+                        return true;
+                      },
+                      onContainerOver:function(source, e, data){return this.dropAllowed;},
+                      // passign padding to make whole treePanel the drop zone.  This is dependent
+                      // on a sonatype fix in the Ext.dd.DropTarget class.  This is necessary
+                      // because treepanel.dropZone.setPadding is never available in time to be useful.
+                      padding: [0,0,274,0]
+                    }
+                  }
+                ]
               }
             ]
           },
@@ -198,12 +332,29 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
 	          },
             items: [
               {
-                xtype: 'textfield',
+                xtype: 'datefield',
                 fieldLabel: 'Start Date',
-                helpText: ht.startDate,
                 itemCls: 'required-field',
+                helpText: ht.startDate,
                 name: 'startDate',
-                width: 200,
+                allowBlank:false
+              },
+              {
+                xtype: 'timefield',
+                fieldLabel: 'Start Time',
+                itemCls: 'required-field',
+                helpText: ht.startTime,
+                name: 'startTime',
+                width: 75,
+                allowBlank:false
+              },
+              {
+                xtype: 'timefield',
+                fieldLabel: 'Recurring Time',
+                itemCls: 'required-field',
+                helpText: ht.recurringTime,
+                name: 'recurringTime',
+                width: 75,
                 allowBlank:false
               }
             ]
@@ -448,8 +599,36 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
     this.formCards.getLayout().setActiveItem(0);
   },
   
+  markTreeInvalid : function(tree) {
+    var elp = tree.getEl();
+    
+    if(!tree.errorEl){
+        tree.errorEl = elp.createChild({cls:'x-form-invalid-msg'});
+        tree.errorEl.setWidth(elp.getWidth(true)); //note removed -20 like on form fields
+    }
+    tree.invalid = true;
+    tree.errorEl.update(tree.invalidText);
+    elp.child('.x-panel-body').setStyle({
+      'background-color' : '#fee',
+      border : '1px solid #dd7870'
+    });
+    Ext.form.Field.msgFx['normal'].show(tree.errorEl, tree);  
+  },
+  
   saveHandler : function(formInfoObj){
-    if (formInfoObj.formPanel.form.isValid()) {
+    allValid = formInfoObj.formPanel.form.isValid()
+    
+    //form validation of repository treepanel
+    var rtTree = Ext.getCmp(formInfoObj.formPanel.id + '_route-repos-tree');
+    var rtTreeValid = rtTree.validate.call(rtTree);
+    
+    if (!rtTreeValid) {
+      this.markTreeInvalid(rtTree);
+    }
+    
+    allValid = (allValid && rtTreeValid);
+    
+    if (allValid) {
       var isNew = formInfoObj.isNew;
       var repoType = formInfoObj.repoType;
       var createUri = Sonatype.config.repos.urls.schedules;
@@ -523,6 +702,8 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
     formPanel.buttons[0].on('click', this.saveHandler.createDelegate(this, [buttonInfoObj]));
     //cancel button event handler
     formPanel.buttons[1].on('click', this.cancelHandler.createDelegate(this, [buttonInfoObj]));
+    
+    this.loadWeekdayListHelper([], {}, formPanel);
     
     //add place holder to grid
     var newRec = new this.scheduleRecordConstructor({
@@ -806,7 +987,56 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
     var newConfig = config;
 
     newConfig.items[6].id = id + '_service_param_grid';
+    newConfig.items[5].items[2].items[3].items[0].id = id + '_weekdays-tree';
+    newConfig.items[5].items[2].items[3].items[0].root = new Ext.tree.TreeNode({text: 'root'});
+    newConfig.items[5].items[2].items[3].items[1].id = id + '_all_weekdays-tree';
+    newConfig.items[5].items[2].items[3].items[1].root = new Ext.tree.TreeNode({text: 'root'});
 
     return newConfig;
-  }  
+  },
+
+  loadWeekdayListHelper : function(arr, srcObj, fpanel){
+    var selectedTree = Ext.getCmp(fpanel.id + '_weekdays-tree');
+    var allTree = Ext.getCmp(fpanel.id + '_all_weekdays-tree');
+
+    var weekday;
+
+    for(var i=0; i<arr.length; i++){
+      weekday = arr[i];
+      selectedTree.root.appendChild(
+        new Ext.tree.TreeNode({
+          id: weekday,
+          text: weekday,
+          payload: weekday, //sonatype added attribute
+          allowChildren: false,
+          draggable: true,
+          leaf: true
+        })
+      );
+    }
+
+    if(this.weekdaysList){
+      for(var i=0; i<this.weekdaysList.length; i++){
+        weekday = this.weekdaysList[i];
+
+        if(typeof(selectedTree.getNodeById(weekday)) == 'undefined'){
+          allTree.root.appendChild(
+            new Ext.tree.TreeNode({
+              id: weekday,
+              text: weekday,
+              payload: weekday, //sonatype added attribute
+              allowChildren: false,
+              draggable: true,
+              leaf: true
+            })
+          );
+        }
+      }
+    }
+    else {
+      //@todo: race condition or error retrieving repos list
+    }
+    
+    return arr; //return arr, even if empty to comply with sonatypeLoad data modifier requirement
+  },  
 });

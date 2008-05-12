@@ -91,7 +91,9 @@ Sonatype.repoServer.resources.help = {
     serviceType : 'The Type of service that will be scheduled to run.',
     serviceSchedule : 'The frequency this service will run.  Off - stop this instance of the service from running. Daily - run the service every day at the specified time. Weekly - run the service every week on the specified day at the specified time. Monthly - run the service every month on the specified day(s) and time. Advanced - run the service using the supplied cron string.',
     enabled: 'Should this service be run.',
-    startDate: 'The Date and Time this service should start running.',
+    startDate: 'The Date this service should start running.',
+    startTime: 'The Time this service should start running.',
+    recurringTime: 'The time this service should start on days it will run.',
     cronCommand: 'A cron command that will control the running of the service.'
   },
 
