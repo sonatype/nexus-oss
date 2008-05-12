@@ -34,6 +34,7 @@ Sonatype.repoServer.referenceData = {
     securityConfiguration: "Simple",
     workingDirectory: "",
     logDirectory: "",
+    baseUrl: "",
     globalConnectionSettings: {
       connectionTimeout: 0,
       retrievalRetryCount: 0,

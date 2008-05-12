@@ -31,7 +31,7 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
   
   //TODO: this will be calling a rest method at some point
   this.serviceTypeStore = new Ext.data.SimpleStore({fields:['value'], data:[['Synchronize Repositories'],['Purge Snapshots']]});  
-  this.scheduleTypeStore = new Ext.data.SimpleStore({fields:['value'], data:[['Off'],['Daily'],['Weekly'],['Monthly'],['Advanced']]});
+  this.scheduleTypeStore = new Ext.data.SimpleStore({fields:['value'], data:[['Daily'],['Weekly'],['Monthly'],['Advanced']]});
   this.weekdayStore = new Ext.data.SimpleStore({fields:['value'], data:[['Sunday'],['Monday'],['Tuesday'],['Wednesday'],['Thursday'],['Friday'],['Saturday']]});
   
   this.loadDataModFuncs = {
@@ -45,7 +45,7 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
   };
   
   this.formConfig = {};
-  this.formConfig.scheduleOff = {
+  this.formConfig.schedule = {
     region: 'center',
     width: '100%',
     height: '100%',
@@ -489,7 +489,7 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
   addResourceHandler : function() {
     var id = 'new_schedule_' + new Date().getTime();
 
-    var config = Ext.apply({}, this.formConfig.scheduleOff, {id:id});
+    var config = Ext.apply({}, this.formConfig.schedule, {id:id});
     config = this.configUniqueIdHelper(id, config);
     var formPanel = new Ext.FormPanel(config);
     
@@ -740,7 +740,7 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
 
     //assumption: new route forms already exist in formCards, so they won't get into this case
     if(!formPanel){ //create form and populate current data
-      var config = Ext.apply({}, this.formConfig.scheduleOff, {id:id});
+      var config = Ext.apply({}, this.formConfig.schedule, {id:id});
       config = this.configUniqueIdHelper(id, config);
 
       formPanel = new Ext.FormPanel(config);
@@ -774,10 +774,7 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
   
   serviceScheduleSelectHandler : function(combo, record, index){
     var schedulePanel = this.ownerCt.find('id', 'schedule-config-card-panel')[0];
-    if (record.data.value == 'Off'){
-      schedulePanel.getLayout().setActiveItem(schedulePanel.items.itemAt(0));
-    }
-    else if (record.data.value == 'Daily'){
+    if (record.data.value == 'Daily'){
       schedulePanel.getLayout().setActiveItem(schedulePanel.items.itemAt(1));
     }
     else if (record.data.value == 'Weekly'){
@@ -788,6 +785,9 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
     }
     else if (record.data.value == 'Advanced'){
       schedulePanel.getLayout().setActiveItem(schedulePanel.items.itemAt(4));
+    }
+    else {
+      schedulePanel.getLayout().setActiveItem(schedulPanel.items.itemAt(0));
     }
     schedulePanel.doLayout();
   },

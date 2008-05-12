@@ -77,6 +77,29 @@ Sonatype.repoServer.ServerEditPanel = function(config){
       {
         xtype: 'fieldset',
         checkboxToggle:false,
+        title: 'Application Server Settings',
+        anchor: Sonatype.view.FIELDSET_OFFSET,
+        collapsible: true,
+        autoHeight:true,
+        layoutConfig: {
+          labelSeparator: ''
+        },
+
+        items: [
+          {
+            xtype: 'textfield',
+            fieldLabel: 'Base URL',
+            itemCls: 'required-field',
+            helpText: ht.baseUrl,
+            name: 'baseUrl',
+            anchor: Sonatype.view.FIELD_OFFSET,
+            allowBlank:false
+          }
+        ]
+      },
+      {
+        xtype: 'fieldset',
+        checkboxToggle:false,
         title: 'HTTP Request Settings',
         anchor: Sonatype.view.FIELDSET_OFFSET,
         collapsible: true,
