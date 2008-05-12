@@ -123,6 +123,13 @@ button.st-icon-refresh {
   vertical-align: middle;
 }
 
+.form-label-helpmark-check {
+  margin-left: 5px;
+  height:16px;
+  width:16px;
+  vertical-align: middle;
+}
+
 .form-label-after-field {
   padding-left: 3px;
   vertical-align: -1px;

@@ -11,10 +11,21 @@
  */
 Ext.override(Ext.form.Field, {
   afterRender : function(){
-    var isCombo = (this.getXType() == 'combo');
-    
-    var wrapDiv = (isCombo) ? this.getEl().up('div.x-form-field-wrap') : this.getEl().up('div.x-form-element');
-    
+    var helpClass = null;
+    var wrapDiv = null;
+    if (this.getXType() == 'combo') {
+      wrapDiv = this.getEl().up('div.x-form-field-wrap');
+      helpClass = 'form-label-helpmark-combo';
+    }
+    else if (this.getXType() == 'checkbox') {
+      wrapDiv = this.getEl().up('div.x-form-check-wrap');
+      helpClass = 'form-label-helpmark-check';
+    }
+    else {
+      wrapDiv = this.getEl().up('div.x-form-element');
+      helpClass = 'form-label-helpmark';
+    }
+        
     //@todo: afterText doesn't work with combo boxes!
     if(this.afterText){
       wrapDiv.createChild({
@@ -30,7 +41,7 @@ Ext.override(Ext.form.Field, {
      	  src: Sonatype.config.resourcePath + '/images/icons/help.png',
      	  width: 16,
      	  height: 16,
-     	  cls: (isCombo) ? 'form-label-helpmark-combo' : 'form-label-helpmark'
+     	  cls: helpClass
      	});
      	
       Ext.QuickTips.register({
