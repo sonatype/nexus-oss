@@ -83,6 +83,16 @@ Sonatype.repoServer.resources.help = {
     pattern : 'A regular expression used to match the artifact path. The path is everything after /nexus/content/ so it will include the group or repository name. .* is used to specify all paths. \'.*/com/some/company/.*\' will match any artifact with \'com.some.company\' as the group id or artifact id.',
     ruleType: 'There are two types of rules: Inclusive = if the pattern matches, only use the repositories listed below, and Exclusive = exclude the repositories listed below.'
   },
+  
+  // Scheduled Services Config help text
+  schedules : {
+    name : 'A name for the Scheduled Service.',
+    serviceType : 'The Type of service that will be scheduled to run.',
+    serviceSchedule : 'The frequency this service will run.  Off - stop this instance of the service from running. Daily - run the service every day at the specified time. Weekly - run the service every week on the specified day at the specified time. Monthly - run the service every month on the specified day(s) and time. Advanced - run the service using the supplied cron string.',
+    enabled: 'Should this service be run.',
+    startDate: 'The Date and Time this service should start running.',
+    cronCommand: 'A cron command that will control the running of the service.'
+  },
 
   // Repositories Config help text
   repos : {

@@ -1043,7 +1043,232 @@
 				</field>
 			</fields>
 		</class>
+		
+		<!-- Schedules -->
+		<class>
+			<name>ScheduledServiceListResourceResponse</name>
+			<version>1.0.0+</version>
+			<superClass>NexusResponse</superClass>
+			<fields>
+				<field>
+					<name>data</name>
+					<version>1.0.0+</version>
+					<association>
+						<type>ScheduledServiceListResource</type>
+						<multiplicity>*</multiplicity>
+					</association>
+					<required>true</required>
+				</field>
+			</fields>
+		</class>
 
+		<class>
+			<name>ScheduledServiceListResource</name>
+			<version>1.0.0+</version>
+			<fields>
+				<field>
+					<name>resourceURI</name>
+					<version>1.0.0+</version>
+					<type>String</type>
+					<required>true</required>
+				</field>
+				<field>
+					<name>name</name>
+					<version>1.0.0+</version>
+					<type>String</type>
+					<required>true</required>
+				</field>
+				<field>
+					<name>serviceType</name>
+					<version>1.0.0+</version>
+					<type>String</type>
+					<required>true</required>
+				</field>
+				<field>
+					<name>serviceStatus</name>
+					<version>1.0.0+</version>
+					<type>String</type>
+					<required>true</required>
+				</field>
+				<field>
+					<name>schedule</name>
+					<version>1.0.0+</version>
+					<type>String</type>
+					<required>true</required>
+				</field>
+				<field>
+					<name>nextRunTime</name>
+					<version>1.0.0+</version>
+					<type>String</type>
+					<required>true</required>
+				</field>
+				<field>
+					<name>lastRunTime</name>
+					<version>1.0.0+</version>
+					<type>String</type>
+					<required>true</required>
+				</field>
+				<field>
+					<name>lastRunResult</name>
+					<version>1.0.0+</version>
+					<type>String</type>
+					<required>true</required>
+				</field>
+				<field>
+					<name>created</name>
+					<version>1.0.0+</version>
+					<type>Date</type>
+					<required>true</required>
+				</field>
+			</fields>
+		</class>
+
+		<class>
+			<name>ScheduledServiceResourceResponse</name>
+			<version>1.0.0+</version>
+			<superClass>NexusResponse</superClass>
+			<fields>
+				<field>
+					<name>data</name>
+					<version>1.0.0+</version>
+					<association>
+						<type>ScheduledServiceBaseResource</type>
+					</association>
+					<required>true</required>
+				</field>
+			</fields>
+		</class>
+
+		<class>
+			<name>ScheduledServiceBaseResource</name>
+			<version>1.0.0+</version>
+			<fields>
+				<field>
+					<name>id</name>
+					<version>1.0.0+</version>
+					<type>String</type>
+					<required>true</required>
+				</field>
+				<field>
+					<name>name</name>
+					<version>1.0.0+</version>
+					<type>String</type>
+					<required>true</required>
+				</field>
+				<field>
+					<name>serviceType</name>
+					<version>1.0.0+</version>
+					<type>String</type>
+					<required>true</required>
+				</field>
+				<field>
+					<name>serviceSchedule</name>
+					<version>1.0.0+</version>
+					<type>String</type>
+					<required>true</required>
+				</field>
+				<field>
+					<name>enabled</name>
+					<version>1.0.0+</version>
+					<type>boolean</type>
+					<required>true</required>
+				</field>
+				<field>
+				    <name>serviceProperties</name>
+				    <version>1.0.0+</version>
+				    <association>
+						<type>ScheduledServicePropertyResource</type>
+						<multiplicity>*</multiplicity>
+					</association>
+					<required>false</required>
+				</field>
+			</fields>
+		</class>
+		
+		<class>
+		    <name>ScheduledServicePropertyResource</name>
+			<version>1.0.0+</version>
+			<fields>
+				<field>
+					<name>name</name>
+					<version>1.0.0+</version>
+					<type>String</type>
+					<required>true</required>
+				</field>
+				<field>
+					<name>value</name>
+					<version>1.0.0+</version>
+					<type>String</type>
+					<required>true</required>
+				</field>
+			</fields>
+		</class>
+		
+		<class>
+		    <name>ScheduledServiceDailyResource</name>
+		    <superClass>ScheduledServiceBaseResource</superClass>
+			<version>1.0.0+</version>
+			<fields>
+				<field>
+					<name>startTime</name>
+					<version>1.0.0+</version>
+					<type>Date</type>
+					<required>true</required>
+				</field>
+				<field>
+					<name>recurringInterval</name>
+					<version>1.0.0+</version>
+					<type>int</type>
+					<required>true</required>
+				</field>
+			</fields>
+		</class>
+		
+		<class>
+		    <name>ScheduledServiceWeeklyResource</name>
+		    <superClass>ScheduledServiceDailyResource</superClass>
+			<version>1.0.0+</version>
+			<fields>
+				<field>
+					<name>recurringSelections</name>
+					<version>1.0.0+</version>
+					<association>
+						<type>String</type>
+						<multiplicity>*</multiplicity>
+					</association>
+					<required>true</required>
+				</field>
+			</fields>
+		</class>
+		
+		<class>
+		    <name>ScheduledServiceMonthlyResource</name>
+		    <superClass>ScheduledServiceWeeklyResource</superClass>
+			<version>1.0.0+</version>
+			<fields>
+				<field>
+					<name>recurringSelectionsType</name>
+					<version>1.0.0+</version>
+					<type>String</type>
+					<required>true</required>
+				</field>
+			</fields>
+		</class>
+		
+		<class>
+		    <name>ScheduledServiceAdvancedResource</name>
+		    <superClass>ScheduledServiceBaseResource</superClass>
+			<version>1.0.0+</version>
+			<fields>
+				<field>
+					<name>cronCommand</name>
+					<version>1.0.0+</version>
+					<type>String</type>
+					<required>true</required>
+				</field>
+			</fields>
+		</class>
+		
 		<!-- Content -->
 		<class>
 			<name>ContentListResourceResponse</name>
@@ -1409,6 +1634,12 @@
 				</field>
 				<field>
 					<name>configRepos</name>
+					<version>1.0.0+</version>
+					<type>int</type>
+					<required>true</required>
+				</field>
+				<field>
+					<name>configSchedules</name>
 					<version>1.0.0+</version>
 					<type>int</type>
 					<required>true</required>

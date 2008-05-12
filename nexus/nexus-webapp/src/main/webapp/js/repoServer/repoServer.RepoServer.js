@@ -264,6 +264,9 @@ Sonatype.repoServer.RepoServer = function(){
       if(sp.checkPermission(userPerms.configRules, sp.EDIT)){
         cTplData.links.push( {id:'open-config-rules', title:'Routing'} );
       }
+      if(sp.checkPermission(userPerms.configSchedules, sp.EDIT)){
+        cTplData.links.push( {id:'open-config-schedules', title:'Scheduled Services'} );
+      }
       if(cTplData.links.length > 0){
         panelConf = Ext.apply({}, {title:'Configuration', id:'st-nexus-config', html: bodyTpl.apply(cTplData)}, defaultGroupPanel);
         this.nexusPanel.add(panelConf);
@@ -339,6 +342,10 @@ Sonatype.repoServer.RepoServer = function(){
       'open-config-rules' : function(scope){
         var id = 'routes-config';
         Sonatype.view.mainTabPanel.addOrShowTab(id, Sonatype.repoServer.RoutesEditPanel, {title: 'Routing'});
+      },
+      'open-config-schedules' : function(scope){
+        var id = 'schedules-config';
+        Sonatype.view.mainTabPanel.addOrShowTab(id, Sonatype.repoServer.SchedulesEditPanel, {title: 'Scheduled Services'});
       }
     },
     

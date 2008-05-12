@@ -94,7 +94,8 @@ Sonatype.config = function() {
         recentlyDeployedArtifactsRss: servicePath + '/feeds/recentlyDeployed',
         systemChangesRss: servicePath + '/feeds/systemChanges',
         status: servicePath + '/status',
-        identify: servicePath + '/identify/sha1'
+        identify: servicePath + '/identify/sha1',
+        schedules: servicePath + '/schedules'
       }
     },
     
@@ -105,7 +106,7 @@ Sonatype.config = function() {
   }
 }();
 
-// Defaul anonymous user permissions; 3-bit permissions: delete | edit | read
+// Default anonymous user permissions; 3-bit permissions: delete | edit | read
 Sonatype.user.anon = {
   username : '',
   isLoggedIn : false,
@@ -122,7 +123,8 @@ Sonatype.user.anon = {
     configServer : 0,
     configGroups : 0,
     configRules : 0,
-    configRepos : 0
+    configRepos : 0,
+    configSchedules : 0
   }
 };
 
