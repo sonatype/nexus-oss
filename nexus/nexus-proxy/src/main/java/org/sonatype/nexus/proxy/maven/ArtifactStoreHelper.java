@@ -52,7 +52,7 @@ public class ArtifactStoreHelper
 
         RepositoryItemUid uid = new RepositoryItemUid( repository, gavCalculator.gavToPath( gav ) );
 
-        StorageItem item = repository.retrieveItem( true, uid );
+        StorageItem item = repository.retrieveItem( false, uid );
 
         if ( StorageFileItem.class.isAssignableFrom( item.getClass() ) )
         {
@@ -75,7 +75,7 @@ public class ArtifactStoreHelper
 
         RepositoryItemUid uid = new RepositoryItemUid( repository, gavCalculator.gavToPath( gav ) );
 
-        StorageItem item = repository.retrieveItem( true, uid );
+        StorageItem item = repository.retrieveItem( false, uid );
 
         if ( StorageFileItem.class.isAssignableFrom( item.getClass() ) )
         {

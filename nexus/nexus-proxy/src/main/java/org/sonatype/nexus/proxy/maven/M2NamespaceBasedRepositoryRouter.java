@@ -60,32 +60,6 @@ public class M2NamespaceBasedRepositoryRouter
     
     private ContentClass contentClass = new Maven2NSContentClass();
 
-    // The list of gTLDs taken from wikipedia on 2008-02-11
-    // http://en.wikipedia.org/wiki/GTLD
-    // with dots at the end!
-    protected static final String[] TLDs = {
-    // "aero",
-        // "asia",
-        "biz",
-        // "cat",
-        "com",
-        // "coop",
-        "edu",
-        "gov",
-        // "info",
-        // "int",
-        // "jobs",
-        "mil",
-        // "mobi",
-        // "museum",
-        "name",
-        "net",
-        "org"// ,
-    // "pro",
-    // "tel",
-    // "travel"
-    };
-
     protected static final String[] ROOT = {
         "A",
         "B",
@@ -179,17 +153,6 @@ public class M2NamespaceBasedRepositoryRouter
                     DefaultStorageCollectionItem coll = new DefaultStorageCollectionItem(
                         this,
                         RepositoryItemUid.PATH_ROOT + pref.toUpperCase(),
-                        true,
-                        false );
-
-                    artifactList.add( coll );
-                }
-
-                for ( String pref : TLDs )
-                {
-                    DefaultStorageCollectionItem coll = new DefaultStorageCollectionItem(
-                        this,
-                        RepositoryItemUid.PATH_ROOT + pref.toLowerCase(),
                         true,
                         false );
 
