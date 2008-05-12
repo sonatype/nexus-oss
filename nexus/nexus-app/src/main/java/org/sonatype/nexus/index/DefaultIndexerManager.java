@@ -44,7 +44,7 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationExce
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.sonatype.nexus.artifact.Gav;
-import org.sonatype.nexus.artifact.M2GavCalculator;
+import org.sonatype.nexus.artifact.GavCalculator;
 import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
 import org.sonatype.nexus.configuration.ConfigurationChangeListener;
 import org.sonatype.nexus.configuration.NexusConfiguration;
@@ -97,6 +97,11 @@ public class DefaultIndexerManager
     /** Treshold for result set TODO: implement this in nexus indexer! */
     private static final int RESULT_LIMIT = 100;
 
+    /**
+     * @plexus.requirement role-hint="m2"
+     */
+    private GavCalculator gavCalculator;
+    
     /**
      * @plexus.requirement role="org.sonatype.nexus.index.ArtifactContextProducer"
      */
@@ -856,7 +861,7 @@ public class DefaultIndexerManager
                         getLocalContextId( ievt.getRepository().getId() ) );
 
                     // by calculating GAV we check wether the request is against a repo artifact at all
-                    Gav gav = M2GavCalculator.calculate( ievt.getItemUid().getPath() );
+                    Gav gav = gavCalculator.pathToGav( ievt.getItemUid().getPath() );
 
                     if ( context != null && gav != null )
                     {

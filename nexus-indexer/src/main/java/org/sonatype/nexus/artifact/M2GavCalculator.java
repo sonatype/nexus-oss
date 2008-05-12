@@ -7,7 +7,7 @@
  *
  * Contributors:
  *    Eugene Kuleshov (Sonatype)
- *    Tamás Cservenák (Sonatype)
+ *    Tamï¿½s Cservenï¿½k (Sonatype)
  *    Brian Fox (Sonatype)
  *    Jason Van Zyl (Sonatype)
  *******************************************************************************/
@@ -17,13 +17,16 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
 /**
+ * The M2 GAV Calculator.
+ * 
  * @author Jason van Zyl
  * @author cstamas
+ * @plexus.component role-hint="m2"
  */
 public class M2GavCalculator
+    implements GavCalculator
 {
-
-    public static Gav calculate( String str )
+    public Gav pathToGav( String str )
     {
         try
         {
@@ -56,14 +59,17 @@ public class M2GavCalculator
             String n = s.substring( vEndPos + 1 );
 
             boolean checksum = false;
+            Gav.HashType checksumType = null;
             if ( s.endsWith( ".md5" ) )
             {
                 checksum = true;
+                checksumType = Gav.HashType.md5;
                 s = s.substring( 0, s.length() - 4 );
             }
             else if ( s.endsWith( ".sha1" ) )
             {
                 checksum = true;
+                checksumType = Gav.HashType.sha1;
                 s = s.substring( 0, s.length() - 5 );
             }
 
@@ -81,8 +87,11 @@ public class M2GavCalculator
 
             if ( snapshot )
             {
-                String snapshotBuildNumber = null;
+                String bv = null;
+                Integer snapBuildNr = null;
                 Long snapshotTimestamp = null;
+
+                String snapshotBuildNumber = null;
 
                 int vSnapshotStart = vEndPos + a.length() + v.length() - 9 + 3;
                 String vSnapshot = s.substring( vSnapshotStart, vSnapshotStart + 8 );
@@ -98,6 +107,7 @@ public class M2GavCalculator
                 }
                 else
                 {
+                    bv = v;
                     StringBuffer sb = new StringBuffer( vSnapshot );
                     sb.append( s.substring( vSnapshotStart + sb.length(), vSnapshotStart + sb.length() + 8 ) );
                     try
@@ -110,12 +120,15 @@ public class M2GavCalculator
                     }
 
                     int buildNumberPos = vSnapshotStart + sb.length();
+                    StringBuffer bnr = new StringBuffer();
                     while ( s.charAt( buildNumberPos ) >= '0' && s.charAt( buildNumberPos ) <= '9' )
                     {
                         sb.append( s.charAt( buildNumberPos ) );
+                        bnr.append( s.charAt( buildNumberPos ) );
                         buildNumberPos++;
                     }
                     snapshotBuildNumber = sb.toString();
+                    snapBuildNr = Integer.parseInt( bnr.toString() );
 
                     primary = !checksum
                         && n
@@ -137,9 +150,23 @@ public class M2GavCalculator
                             c = s.substring( s.lastIndexOf( '-' ) + 1, s.lastIndexOf( '.' ) );
                         }
                     }
+
+                    v = bv.substring( 0, bv.length() - 8 ) + snapshotBuildNumber;
                 }
 
-                return new Gav( g, a, v, c, ext, snapshotBuildNumber, snapshotTimestamp, n, primary, snapshot, checksum );
+                return new Gav(
+                    g,
+                    a,
+                    v,
+                    bv,
+                    c,
+                    ext,
+                    snapBuildNr,
+                    snapshotTimestamp,
+                    n,
+                    snapshot,
+                    checksum,
+                    checksumType );
             }
             else
             {
@@ -157,7 +184,7 @@ public class M2GavCalculator
                             c = null;
                         }
                     }
-                    return new Gav( g, a, v, c, ext, null, null, n, primary, snapshot, checksum );
+                    return new Gav( g, a, v, null, c, ext, null, null, n, snapshot, checksum, checksumType );
                 }
                 else
                 {
@@ -169,10 +196,9 @@ public class M2GavCalculator
         {
             return null;
         }
-
     }
 
-    public static String calculateRepositoryPath( Gav gav )
+    public String gavToPath( Gav gav )
     {
         StringBuffer path = new StringBuffer( "/" );
 
@@ -184,7 +210,7 @@ public class M2GavCalculator
 
         path.append( "/" );
 
-        path.append( gav.getVersion() );
+        path.append( gav.getBaseVersion() );
 
         path.append( "/" );
 
@@ -193,36 +219,33 @@ public class M2GavCalculator
         return path.toString();
     }
 
-    public static String calculateArtifactName( Gav gav )
+    public String calculateArtifactName( Gav gav )
     {
         StringBuffer path = new StringBuffer( gav.getArtifactId() );
 
         path.append( "-" );
 
-        if ( !gav.isSnapshot() )
+        path.append( gav.getVersion() );
+
+        if ( gav.getClassifier() != null )
         {
-            path.append( gav.getVersion() );
+            path.append( "-" );
 
-        }
-        else
-        {
-            if ( gav.getSnapshotBuildNumber() != null )
-            {
-                path.append( gav.getVersion().substring( 0, gav.getVersion().length() - 9 ) );
-
-                path.append( "-" );
-
-                path.append( gav.getSnapshotBuildNumber() );
-            }
-            else
-            {
-                path.append( gav.getVersion() );
-            }
-
+            path.append( gav.getClassifier() );
         }
 
-        path.append( ".pom" );
+        path.append( "." );
+
+        path.append( gav.getExtension() );
+
+        if ( gav.isHash() )
+        {
+            path.append( "." );
+
+            path.append( gav.getHashType().toString() );
+        }
 
         return path.toString();
     }
+
 }

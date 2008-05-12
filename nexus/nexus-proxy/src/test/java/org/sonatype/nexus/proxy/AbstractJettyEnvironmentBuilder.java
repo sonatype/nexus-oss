@@ -22,6 +22,7 @@ package org.sonatype.nexus.proxy;
 
 import java.io.IOException;
 
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.StartingException;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.StoppingException;
 import org.sonatype.jettytestsuite.ServletServer;
@@ -61,6 +62,7 @@ public abstract class AbstractJettyEnvironmentBuilder
     }
 
     public abstract void buildEnvironment( AbstractProxyTestEnvironment env )
-        throws IOException;
+        throws IOException,
+            ComponentLookupException;
 
 }

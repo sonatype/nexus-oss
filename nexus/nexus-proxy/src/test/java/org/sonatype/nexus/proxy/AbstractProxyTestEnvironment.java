@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
 
+import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.logging.LoggerManager;
@@ -364,6 +365,11 @@ public abstract class AbstractProxyTestEnvironment
             }
         }
 
+    }
+
+    public PlexusContainer getPlexusContainer()
+    {
+        return this.getContainer();
     }
 
 }

@@ -26,12 +26,11 @@ import java.util.List;
 
 import org.restlet.data.MediaType;
 import org.sonatype.nexus.artifact.Gav;
-import org.sonatype.nexus.artifact.M2GavCalculator;
+import org.sonatype.nexus.artifact.GavCalculator;
 import org.sonatype.nexus.artifact.NexusItemInfo;
 import org.sonatype.nexus.feeds.NexusArtifactEvent;
 import org.sonatype.nexus.proxy.access.AccessDecisionVoter;
 import org.sonatype.nexus.proxy.access.IpAddressAccessDecisionVoter;
-import org.sonatype.nexus.security.User;
 
 import com.sun.syndication.feed.synd.SyndContent;
 import com.sun.syndication.feed.synd.SyndContentImpl;
@@ -49,6 +48,8 @@ import com.sun.syndication.feed.synd.SyndFeedImpl;
 public abstract class AbstractNexusFeedSource
     extends AbstractFeedSource
 {
+    /** @plexus.requirement role-hint="m2" */
+    private GavCalculator gavCalculator;
 
     /**
      * Creates/formats GAV strings from ArtifactInfo.
@@ -64,7 +65,7 @@ public abstract class AbstractNexusFeedSource
         }
         else
         {
-            Gav gav = M2GavCalculator.calculate( ai.getPath() );
+            Gav gav = gavCalculator.pathToGav( ai.getPath() );
 
             if ( gav != null )
             {

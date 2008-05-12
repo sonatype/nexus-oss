@@ -7,7 +7,7 @@
  *
  * Contributors:
  *    Eugene Kuleshov (Sonatype)
- *    Tamás Cservenák (Sonatype)
+ *    Tamï¿½s Cservenï¿½k (Sonatype)
  *    Brian Fox (Sonatype)
  *    Jason Van Zyl (Sonatype)
  *******************************************************************************/
@@ -20,7 +20,7 @@ import java.util.TreeSet;
 
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.sonatype.nexus.artifact.Gav;
-import org.sonatype.nexus.artifact.M2GavCalculator;
+import org.sonatype.nexus.artifact.GavCalculator;
 import org.sonatype.nexus.index.ArtifactContext;
 import org.sonatype.nexus.index.ArtifactContextProducer;
 import org.sonatype.nexus.index.context.IndexingContext;
@@ -38,6 +38,9 @@ public class DefaultScanner
 
     /** @plexus.requirement */
     private ArtifactContextProducer artifactContextProducer;
+
+    /** @plexus.requirement role-hint="m2" */
+    private GavCalculator gavCalculator;
 
     public ScanningResult scan( ScanningRequest request )
     {
@@ -94,13 +97,13 @@ public class DefaultScanner
                             String repoFile = f.getAbsolutePath().substring(
                                 request.getIndexingContext().getRepository().getAbsolutePath().length() + 1 );
 
-                            Gav gav = M2GavCalculator.calculate( repoFile.replace( '\\', '/' ) );
+                            Gav gav = gavCalculator.pathToGav( repoFile.replace( '\\', '/' ) );
 
                             if ( gav != null )
                             {
                                 String uinfo = AbstractIndexCreator.getGAV( gav.getGroupId(), //
                                     gav.getArtifactId(),
-                                    gav.getVersion(),
+                                    gav.getBaseVersion(),
                                     gav.getClassifier() );
 
                                 if ( request.getInfos().contains( uinfo ) )

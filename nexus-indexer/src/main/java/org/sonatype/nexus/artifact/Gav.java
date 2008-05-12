@@ -7,7 +7,7 @@
  *
  * Contributors:
  *    Eugene Kuleshov (Sonatype)
- *    Tamás Cservenák (Sonatype)
+ *    Tamï¿½s Cservenï¿½k (Sonatype)
  *    Brian Fox (Sonatype)
  *    Jason Van Zyl (Sonatype)
  *******************************************************************************/
@@ -15,48 +15,61 @@ package org.sonatype.nexus.artifact;
 
 public class Gav
 {
+    public enum HashType
+    {
+        sha1, md5
+    };
+
     private String groupId;
 
     private String artifactId;
-    
-    // TODO
-    private String baseVersion;
 
     private String version;
 
+    private String baseVersion;
+
     private String classifier;
-    
-    // TODO
-    private String type;
-    
+
     private String extension;
 
-    private String snapshotBuildNumber;
+    private Integer snapshotBuildNumber;
 
     private Long snapshotTimeStamp;
 
     private String name;
 
-    private boolean primary;
-
     private boolean snapshot;
 
-    private boolean checksum;
+    private boolean hash;
 
-    public Gav( String groupId, String artifactId, String version, String classifier, String extension, String snapshotBuildNumber,
-        Long snapshotTimeStamp, String name, boolean primary, boolean snapshot, boolean checksum )
+    private HashType hashType;
+
+    public Gav( String groupId, String artifactId, String version, String baseVersion, String classifier,
+        String extension, Integer snapshotBuildNumber, Long snapshotTimeStamp, String name, boolean snapshot,
+        boolean hash, HashType hashType )
     {
         this.groupId = groupId;
         this.artifactId = artifactId;
-        this.version = version;
+
+        if ( baseVersion == null )
+        {
+            this.version = version;
+            this.baseVersion = null;
+        }
+        else
+        {
+            this.version = version;
+            this.baseVersion = baseVersion;
+        }
+
         this.classifier = classifier;
         this.extension = extension;
         this.snapshotBuildNumber = snapshotBuildNumber;
         this.snapshotTimeStamp = snapshotTimeStamp;
         this.name = name;
-        this.primary = primary;
         this.snapshot = snapshot;
-        this.checksum = checksum;
+        this.hash = hash;
+        this.hashType = hashType;
     }
 
     public String getGroupId()
@@ -74,11 +87,23 @@ public class Gav
         return version;
     }
 
+    public String getBaseVersion()
+    {
+        if ( baseVersion == null )
+        {
+            return getVersion();
+        }
+        else
+        {
+            return baseVersion;
+        }
+    }
+
     public String getClassifier()
     {
         return classifier;
     }
-    
+
     public String getExtension()
     {
         return extension;
@@ -89,29 +114,29 @@ public class Gav
         return name;
     }
 
-    public boolean isPrimary()
-    {
-        return primary;
-    }
-
     public boolean isSnapshot()
     {
         return snapshot;
     }
 
-    public String getSnapshotBuildNumber()
+    public Integer getSnapshotBuildNumber()
     {
         return snapshotBuildNumber;
     }
 
-    public boolean isChecksum()
+    public boolean isHash()
     {
-        return checksum;
+        return hash;
     }
 
     public Long getSnapshotTimeStamp()
     {
         return snapshotTimeStamp;
+    }
+
+    public HashType getHashType()
+    {
+        return hashType;
     }
 
 }

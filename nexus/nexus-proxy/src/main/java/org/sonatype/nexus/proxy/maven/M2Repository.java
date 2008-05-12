@@ -35,8 +35,8 @@ import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Reader;
 import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Writer;
 import org.codehaus.plexus.util.IOUtil;
 import org.sonatype.nexus.artifact.Gav;
+import org.sonatype.nexus.artifact.GavCalculator;
 import org.sonatype.nexus.artifact.M2ArtifactRecognizer;
-import org.sonatype.nexus.artifact.M2GavCalculator;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.PreparedContentLocator;
@@ -57,16 +57,23 @@ public class M2Repository
 {
     private static final Pattern VERSION_FILE_PATTERN = Pattern.compile( "^(.*)-([0-9]{8}.[0-9]{6})-([0-9]+)$" );
 
+    /**
+     * The GAV Calculator.
+     * 
+     * @plexus.requirement role-hint="m2"
+     */
+    private GavCalculator gavCalculator;
+
     private ContentClass contentClass = new Maven2ContentClass();
 
     public ContentClass getRepositoryContentClass()
     {
         return contentClass;
     }
-
-    protected String gav2path( Gav gav )
+    
+    protected GavCalculator getGavCalculator()
     {
-        return M2GavCalculator.calculateRepositoryPath( gav );
+        return gavCalculator;
     }
 
     /**
@@ -75,7 +82,7 @@ public class M2Repository
      * @param uid the uid
      * @return true, if successful
      */
-    protected boolean shouldServeByPolicies( RepositoryItemUid uid )
+    public boolean shouldServeByPolicies( RepositoryItemUid uid )
     {
         if ( M2ArtifactRecognizer.isMetadata( uid.getPath() ) )
         {
@@ -90,7 +97,7 @@ public class M2Repository
             }
         }
         // we are using Gav to test the path
-        Gav gav = M2GavCalculator.calculate( uid.getPath() );
+        Gav gav = gavCalculator.pathToGav( uid.getPath() );
         if ( gav == null )
         {
             return true;
@@ -180,7 +187,7 @@ public class M2Repository
         }
 
         // we are using Gav to test the path
-        Gav gav = M2GavCalculator.calculate( item.getPath() );
+        Gav gav = gavCalculator.pathToGav( item.getPath() );
 
         if ( gav == null )
         {
@@ -218,14 +225,14 @@ public class M2Repository
         return metadata;
     }
 
-    protected String getLatestVersion( List<String> versions )
+    public String getLatestVersion( List<String> versions )
     {
         Collections.sort( versions, new AlphanumComparator() );
 
         return versions.get( versions.size() - 1 );
     }
 
-    protected boolean isSnapshot( String baseVersion )
+    public boolean isSnapshot( String baseVersion )
     {
         return VERSION_FILE_PATTERN.matcher( baseVersion ).matches()
             || baseVersion.endsWith( Artifact.SNAPSHOT_VERSION );

@@ -25,12 +25,15 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.codehaus.plexus.PlexusContainer;
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.sonatype.jettytestsuite.ServletServer;
 import org.sonatype.jettytestsuite.WebappContext;
 import org.sonatype.nexus.feeds.SimpleFeedRecorder;
 import org.sonatype.nexus.proxy.maven.ChecksumPolicy;
 import org.sonatype.nexus.proxy.maven.M1Repository;
 import org.sonatype.nexus.proxy.registry.InvalidGroupingException;
+import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.storage.remote.DefaultRemoteStorageContext;
 import org.sonatype.nexus.proxy.storage.remote.commonshttpclient.CommonsHttpClientRemoteStorage;
 
@@ -49,20 +52,24 @@ public class M1TestsuiteEnvironmentBuilder
     }
 
     public void buildEnvironment( AbstractProxyTestEnvironment env )
-        throws IOException
+        throws IOException,
+            ComponentLookupException
     {
+        PlexusContainer container = env.getPlexusContainer();
+
         List<String> reposes = new ArrayList<String>();
         for ( WebappContext remoteRepo : getServletServer().getWebappContexts() )
         {
-            M1Repository repo = new M1Repository();
-            repo.enableLogging( env.getLogger().getChildLogger( "REPO" + repo.getId() ) );
+            
+            M1Repository repo = (M1Repository)container.lookup( Repository.ROLE, "maven1" );
+            //repo.enableLogging( env.getLogger().getChildLogger( "REPO" + repo.getId() ) );
             repo.setId( remoteRepo.getName() );
             repo.setRemoteUrl( getServletServer().getUrl( remoteRepo.getName() ) );
             repo.setLocalUrl( new File( env.getWorkingDirectory(), "proxy/store/" + repo.getId() )
                 .toURI().toURL().toString() );
             repo.setLocalStorage( env.getLocalRepositoryStorage() );
             repo.setChecksumPolicy( ChecksumPolicy.STRICT_IF_EXISTS );
-            repo.setFeedRecorder( new SimpleFeedRecorder() );
+            //repo.setFeedRecorder( new SimpleFeedRecorder() );
             if ( remoteRepo.getAuthenticationInfo() != null )
             {
                 // we have a protected repo, cannot share remote peer
@@ -78,20 +85,20 @@ public class M1TestsuiteEnvironmentBuilder
 
                 repo.setRemoteStorageContext( env.getRemoteStorageContext() );
             }
-            repo.setCacheManager( env.getCacheManager() );
+            //repo.setCacheManager( env.getCacheManager() );
             reposes.add( repo.getId() );
 
             env.getRepositoryRegistry().addRepository( repo );
         }
 
         // ading one hosted only
-        M1Repository repo = new M1Repository();
-        repo.enableLogging( env.getLogger().getChildLogger( "REPO" + repo.getId() ) );
+        M1Repository repo = (M1Repository)container.lookup( Repository.ROLE, "maven1" );
+        //repo.enableLogging( env.getLogger().getChildLogger( "REPO" + repo.getId() ) );
         repo.setId( "inhouse" );
         repo.setLocalUrl( new File( env.getWorkingDirectory(), "proxy/store/" + repo.getId() )
             .toURI().toURL().toString() );
         repo.setLocalStorage( env.getLocalRepositoryStorage() );
-        repo.setCacheManager( env.getCacheManager() );
+        //repo.setCacheManager( env.getCacheManager() );
         reposes.add( repo.getId() );
         env.getRepositoryRegistry().addRepository( repo );
 

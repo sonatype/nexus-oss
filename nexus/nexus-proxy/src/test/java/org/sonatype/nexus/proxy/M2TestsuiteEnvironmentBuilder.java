@@ -25,12 +25,14 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.codehaus.plexus.PlexusContainer;
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.sonatype.jettytestsuite.ServletServer;
 import org.sonatype.jettytestsuite.WebappContext;
-import org.sonatype.nexus.feeds.SimpleFeedRecorder;
 import org.sonatype.nexus.proxy.maven.ChecksumPolicy;
 import org.sonatype.nexus.proxy.maven.M2Repository;
 import org.sonatype.nexus.proxy.registry.InvalidGroupingException;
+import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.storage.remote.DefaultRemoteStorageContext;
 import org.sonatype.nexus.proxy.storage.remote.commonshttpclient.CommonsHttpClientRemoteStorage;
 
@@ -45,24 +47,28 @@ public class M2TestsuiteEnvironmentBuilder
 
     public M2TestsuiteEnvironmentBuilder( ServletServer servletServer )
     {
-        super(servletServer);
+        super( servletServer );
     }
 
     public void buildEnvironment( AbstractProxyTestEnvironment env )
-        throws IOException
+        throws IOException,
+            ComponentLookupException
     {
+        PlexusContainer container = env.getPlexusContainer();
+
         List<String> reposes = new ArrayList<String>();
         for ( WebappContext remoteRepo : getServletServer().getWebappContexts() )
         {
-            M2Repository repo = new M2Repository();
-            repo.enableLogging( env.getLogger().getChildLogger( "REPO" + repo.getId() ) );
+            M2Repository repo = (M2Repository) container.lookup( Repository.ROLE, "maven2" );
+
+            // repo.enableLogging( env.getLogger().getChildLogger( "REPO" + repo.getId() ) );
             repo.setId( remoteRepo.getName() );
             repo.setRemoteUrl( getServletServer().getUrl( remoteRepo.getName() ) );
             repo.setLocalUrl( new File( env.getWorkingDirectory(), "proxy/store/" + repo.getId() )
                 .toURI().toURL().toString() );
             repo.setLocalStorage( env.getLocalRepositoryStorage() );
             repo.setChecksumPolicy( ChecksumPolicy.STRICT_IF_EXISTS );
-            repo.setFeedRecorder( new SimpleFeedRecorder() );
+            // repo.setFeedRecorder( new SimpleFeedRecorder() );
             if ( remoteRepo.getAuthenticationInfo() != null )
             {
                 // we have a protected repo, cannot share remote peer
@@ -78,20 +84,20 @@ public class M2TestsuiteEnvironmentBuilder
 
                 repo.setRemoteStorageContext( env.getRemoteStorageContext() );
             }
-            repo.setCacheManager( env.getCacheManager() );
+            // repo.setCacheManager( env.getCacheManager() );
             reposes.add( repo.getId() );
 
             env.getRepositoryRegistry().addRepository( repo );
         }
 
         // ading one hosted only
-        M2Repository repo = new M2Repository();
-        repo.enableLogging( env.getLogger().getChildLogger( "REPO" + repo.getId() ) );
+        M2Repository repo = (M2Repository) container.lookup( Repository.ROLE, "maven2" );
+        // repo.enableLogging( env.getLogger().getChildLogger( "REPO" + repo.getId() ) );
         repo.setId( "inhouse" );
         repo.setLocalUrl( new File( env.getWorkingDirectory(), "proxy/store/" + repo.getId() )
             .toURI().toURL().toString() );
         repo.setLocalStorage( env.getLocalRepositoryStorage() );
-        repo.setCacheManager( env.getCacheManager() );
+        // repo.setCacheManager( env.getCacheManager() );
         reposes.add( repo.getId() );
         env.getRepositoryRegistry().addRepository( repo );
 

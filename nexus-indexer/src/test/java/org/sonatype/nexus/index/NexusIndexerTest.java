@@ -31,6 +31,7 @@ import org.apache.lucene.search.BooleanClause.Occur;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.RAMDirectory;
 import org.codehaus.plexus.PlexusTestCase;
+import org.codehaus.plexus.util.FileUtils;
 import org.sonatype.nexus.index.context.IndexingContext;
 import org.sonatype.nexus.index.context.UnsupportedExistingLuceneIndexException;
 import org.sonatype.nexus.index.creator.IndexCreator;
@@ -239,9 +240,9 @@ public class NexusIndexerTest
     {
         NexusIndexer indexer = (NexusIndexer) lookup( NexusIndexer.class );
 
-        Directory indexDir = new RAMDirectory();
-        // File indexDir = new File( getBasedir(), "target/index/test-" + Long.toString( System.currentTimeMillis() ) );
-        // FileUtils.deleteDirectory( indexDir );
+        //Directory indexDir = new RAMDirectory();
+        File indexDir = new File( getBasedir(), "target/index/test-" + Long.toString( System.currentTimeMillis() ) );
+        FileUtils.deleteDirectory( indexDir );
 
         File repo = new File( getBasedir(), "src/test/repo" );
 

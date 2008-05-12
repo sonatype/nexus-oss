@@ -21,8 +21,8 @@
 package org.sonatype.nexus.proxy.maven;
 
 import org.sonatype.nexus.artifact.Gav;
+import org.sonatype.nexus.artifact.GavCalculator;
 import org.sonatype.nexus.artifact.M1ArtifactRecognizer;
-import org.sonatype.nexus.artifact.M1GavCalculator;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.registry.ContentClass;
@@ -37,16 +37,23 @@ import org.sonatype.nexus.proxy.registry.ContentClass;
 public class M1Repository
     extends AbstractMavenRepository
 {
+    /**
+     * The GAV Calculator.
+     * 
+     * @plexus.requirement role-hint="m1"
+     */
+    private GavCalculator gavCalculator;
+
     private ContentClass contentClass = new Maven1ContentClass();
 
     public ContentClass getRepositoryContentClass()
     {
         return contentClass;
     }
-    
-    protected String gav2path(Gav gav)
+
+    protected GavCalculator getGavCalculator()
     {
-        return M1GavCalculator.calculateRepositoryPath( gav );
+        return gavCalculator;
     }
 
     /**
@@ -55,7 +62,7 @@ public class M1Repository
      * @param uid the uid
      * @return true, if successful
      */
-    protected boolean shouldServeByPolicies( RepositoryItemUid uid )
+    public boolean shouldServeByPolicies( RepositoryItemUid uid )
     {
         if ( M1ArtifactRecognizer.isMetadata( uid.getPath() ) )
         {
@@ -70,7 +77,7 @@ public class M1Repository
             }
         }
         // we are using Gav to test the path
-        Gav gav = M1GavCalculator.calculate( uid.getPath() );
+        Gav gav = gavCalculator.pathToGav( uid.getPath() );
         if ( gav == null )
         {
             return true;
@@ -101,7 +108,7 @@ public class M1Repository
         }
 
         // we are using Gav to test the path
-        Gav gav = M1GavCalculator.calculate( item.getPath() );
+        Gav gav = gavCalculator.pathToGav( item.getPath() );
 
         if ( gav == null )
         {

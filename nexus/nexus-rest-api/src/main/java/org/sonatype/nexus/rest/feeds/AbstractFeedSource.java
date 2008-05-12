@@ -37,7 +37,6 @@ import com.sun.syndication.feed.synd.SyndFeed;
 public abstract class AbstractFeedSource
     implements FeedSource
 {
-
     /** @plexus.requirement */
     private Nexus nexus;
 

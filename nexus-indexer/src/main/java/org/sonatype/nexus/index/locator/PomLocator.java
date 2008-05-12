@@ -7,7 +7,7 @@
  *
  * Contributors:
  *    Eugene Kuleshov (Sonatype)
- *    Tamás Cservenák (Sonatype)
+ *    Tamï¿½s Cservenï¿½k (Sonatype)
  *    Brian Fox (Sonatype)
  *    Jason Van Zyl (Sonatype)
  *******************************************************************************/
@@ -16,15 +16,29 @@ package org.sonatype.nexus.index.locator;
 import java.io.File;
 
 import org.sonatype.nexus.artifact.Gav;
-import org.sonatype.nexus.artifact.M2GavCalculator;
 
 public class PomLocator
     implements Locator
 {
-
     public File locate( File source, Gav gav )
     {
-        return new File( source.getParent(), M2GavCalculator.calculateArtifactName( gav ) );
+        String artifactName = gav.getName();
+
+        if ( gav.isHash() )
+        {
+            // correction for last .sha or .md5
+            artifactName = artifactName.substring( 0, artifactName.lastIndexOf( "." ) );
+        }
+
+        // correction for classifier
+        artifactName = artifactName.substring( 0, artifactName.lastIndexOf( "." ) );
+
+        if ( gav.getClassifier() != null )
+        {
+            artifactName = artifactName.substring( 0, artifactName.length() - gav.getClassifier().length() - 1 );
+        }
+
+        return new File( source.getParent(), artifactName + ".pom" );
     }
 
 }

@@ -22,6 +22,7 @@ package org.sonatype.nexus.proxy;
 
 import java.io.IOException;
 
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Startable;
 
 /**
@@ -29,13 +30,15 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.Startable;
  * 
  * @author cstamas
  */
-public interface EnvironmentBuilder extends Startable
+public interface EnvironmentBuilder
+    extends Startable
 {
 
     /** The ROLE. */
     String ROLE = EnvironmentBuilder.class.getName();
 
-    public void buildEnvironment(AbstractProxyTestEnvironment abstractProxyTestEnvironment)
-        throws IOException;
+    public void buildEnvironment( AbstractProxyTestEnvironment abstractProxyTestEnvironment )
+        throws IOException,
+            ComponentLookupException;
 
 }

@@ -30,8 +30,8 @@ import java.util.TreeSet;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.logging.Logger;
 import org.sonatype.nexus.artifact.Gav;
+import org.sonatype.nexus.artifact.GavCalculator;
 import org.sonatype.nexus.artifact.M2ArtifactRecognizer;
-import org.sonatype.nexus.artifact.M2GavCalculator;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
@@ -58,6 +58,13 @@ public class DefaultSnapshotRemover
      * @plexus.requirement
      */
     private RepositoryRegistry repositoryRegistry;
+    
+    /**
+     * The M2 Gavcalculator.
+     * 
+     * @plexus.requirement role-hint="m2"
+     */
+    private GavCalculator gavCalculator;
 
     protected RepositoryRegistry getRepositoryRegistry()
     {
@@ -191,7 +198,7 @@ public class DefaultSnapshotRemover
                         if ( M2ArtifactRecognizer.isSnapshot( item.getPath() )
                             && !M2ArtifactRecognizer.isMetadata( item.getPath() ) )
                         {
-                            gav = M2GavCalculator.calculate( item.getPath() );
+                            gav = gavCalculator.pathToGav( item.getPath() );
 
                             if ( gav != null )
                             {
@@ -200,17 +207,13 @@ public class DefaultSnapshotRemover
 
                                 if ( itemTimestamp < dateTreshold )
                                 {
-                                    addStorageFileItemToMap(
-                                        deletableSnapshotsAndFiles,
-                                        gav.getSnapshotBuildNumber(),
-                                        (StorageFileItem) item );
+                                    addStorageFileItemToMap( deletableSnapshotsAndFiles, gav
+                                        .getSnapshotBuildNumber().toString(), (StorageFileItem) item );
                                 }
                                 else
                                 {
-                                    addStorageFileItemToMap(
-                                        remainingSnapshotsAndFiles,
-                                        gav.getSnapshotBuildNumber(),
-                                        (StorageFileItem) item );
+                                    addStorageFileItemToMap( remainingSnapshotsAndFiles, gav
+                                        .getSnapshotBuildNumber().toString(), (StorageFileItem) item );
                                 }
                             }
                         }

@@ -20,8 +20,7 @@
  */
 package org.sonatype.nexus.proxy.maven;
 
-import org.sonatype.nexus.artifact.Gav;
-import org.sonatype.nexus.artifact.M1GavCalculator;
+import org.sonatype.nexus.artifact.GavCalculator;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 
@@ -45,6 +44,11 @@ public class M1LayoutedM2ShadowRepository
     {
         return contentClass;
     }
+    
+    public GavCalculator getGavCalculator()
+    {
+        return getM1GavCalculator();
+    }
 
     /**
      * This repo needs Maven2 content master.
@@ -52,11 +56,6 @@ public class M1LayoutedM2ShadowRepository
     public ContentClass getMasterRepositoryContentClass()
     {
         return masterContentClass;
-    }
-
-    protected String gav2path( Gav gav )
-    {
-        return M1GavCalculator.calculateRepositoryPath( gav );
     }
 
     protected String transformMaster2Shadow( String path )

@@ -7,7 +7,7 @@
  *
  * Contributors:
  *    Eugene Kuleshov (Sonatype)
- *    Tamás Cservenák (Sonatype)
+ *    Tamï¿½s Cservenï¿½k (Sonatype)
  *    Brian Fox (Sonatype)
  *    Jason Van Zyl (Sonatype)
  *******************************************************************************/
@@ -17,17 +17,21 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
+ * The M1 GAV Calculator.
+ * 
  * @author Jason van Zyl
  * @author cstamas
+ * @plexus.component role-hint="m1"
  */
 public class M1GavCalculator
+    implements GavCalculator
 {
 
     private static final Pattern pat1 = Pattern.compile( "^([^0-9]+)-([0-9].+)\\.([^0-9]+)(\\.md5|\\.sha1){0,1}$" );
 
     private static final Pattern pat2 = Pattern.compile( "^([a-z0-9]+)-([0-9-].+)\\.([^0-9]+)(\\.md5|\\.sha1){0,1}$" );
 
-    public static Gav calculate( String str )
+    public Gav pathToGav( String str )
     {
         try
         {
@@ -64,14 +68,17 @@ public class M1GavCalculator
             boolean snapshot = s.contains( "SNAPSHOT" );
 
             boolean checksum = false;
+            Gav.HashType checksumType = null;
             if ( s.endsWith( ".md5" ) )
             {
                 checksum = true;
+                checksumType = Gav.HashType.md5;
                 s = s.substring( 0, s.length() - 4 );
             }
             else if ( s.endsWith( ".sha1" ) )
             {
                 checksum = true;
+                checksumType = Gav.HashType.sha1;
                 s = s.substring( 0, s.length() - 5 );
             }
 
@@ -81,8 +88,6 @@ public class M1GavCalculator
             }
 
             String ext = s.substring( s.lastIndexOf( '.' ) + 1 );
-
-            boolean primary = classifier == null && !checksum;
 
             Matcher m = pat1.matcher( n );
             if ( m.matches() )
@@ -94,7 +99,7 @@ public class M1GavCalculator
                     version = version.substring( 0, version.length() - ( classifier.length() + 1 ) );
                 }
 
-                return new Gav( g, a, version, classifier, ext, null, null, n, primary, snapshot, checksum );
+                return new Gav( g, a, version, null, classifier, ext, null, null, n, snapshot, checksum, checksumType );
             }
             else
             {
@@ -108,7 +113,19 @@ public class M1GavCalculator
                         version = version.substring( 0, version.length() - ( classifier.length() + 1 ) );
                     }
 
-                    return new Gav( g, a, version, classifier, ext, null, null, n, primary, snapshot, checksum );
+                    return new Gav(
+                        g,
+                        a,
+                        version,
+                        null,
+                        classifier,
+                        ext,
+                        null,
+                        null,
+                        n,
+                        snapshot,
+                        checksum,
+                        checksumType );
                 }
                 else
                 {
@@ -126,7 +143,7 @@ public class M1GavCalculator
         }
     }
 
-    public static String calculateRepositoryPath( Gav gav )
+    public String gavToPath( Gav gav )
     {
         StringBuffer path = new StringBuffer( "/" );
 
@@ -134,7 +151,24 @@ public class M1GavCalculator
 
         path.append( "/" );
 
-        path.append( "poms" );
+        if ( gav.getClassifier() == null )
+        {
+            path.append( gav.getExtension() );
+
+            path.append( "s" );
+        }
+        else
+        {
+            if ( gav.getClassifier().startsWith( "source" ) )
+            {
+                path.append( "java-source" );
+            }
+            else
+            {
+                path.append( gav.getClassifier() );
+            }
+            path.append( "s" );
+        }
 
         path.append( "/" );
 
@@ -144,8 +178,25 @@ public class M1GavCalculator
 
         path.append( gav.getVersion() );
 
-        path.append( ".pom" );
+        if ( gav.getClassifier() != null )
+        {
+            path.append( "-" );
+
+            path.append( gav.getClassifier() );
+        }
+
+        path.append( "." );
+
+        path.append( gav.getExtension() );
+
+        if ( gav.isHash() )
+        {
+            path.append( "." );
+
+            path.append( gav.getHashType().toString() );
+        }
 
         return path.toString();
     }
+
 }

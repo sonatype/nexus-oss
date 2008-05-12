@@ -35,9 +35,8 @@ import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Writer;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.artifact.versioning.VersionRange;
 import org.codehaus.plexus.util.IOUtil;
-import org.sonatype.nexus.artifact.Gav;
+import org.sonatype.nexus.artifact.GavCalculator;
 import org.sonatype.nexus.artifact.M2ArtifactRecognizer;
-import org.sonatype.nexus.artifact.M2GavCalculator;
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.NoSuchResourceStoreException;
@@ -62,6 +61,13 @@ public class ConstrainedM2ShadowRepository
     extends ShadowRepository
     implements ArtifactStore
 {
+    /**
+     * The GAV Calculator.
+     * 
+     * @plexus.requirement role-hint="m2"
+     */
+    private GavCalculator gavCalculator;
+    
     private ContentClass contentClass = new Maven2ContentClass();
 
     private Map<String, String> versionMap;
@@ -105,20 +111,9 @@ public class ConstrainedM2ShadowRepository
             StorageException,
             AccessDeniedException
     {
-        Gav gav = new Gav( groupId, artifactId, version, null, "pom", null, null, null, false, false, false );
+        ArtifactStoreHelper ash = new ArtifactStoreHelper( this, gavCalculator );
 
-        RepositoryItemUid uid = new RepositoryItemUid( this, M2GavCalculator.calculateRepositoryPath( gav ) );
-
-        StorageItem item = retrieveItem( true, uid );
-
-        if ( StorageFileItem.class.isAssignableFrom( item.getClass() ) )
-        {
-            return (StorageFileItem) item;
-        }
-        else
-        {
-            throw new StorageException( "The POM retrieval returned non-file, path:" + uid.getPath() );
-        }
+        return ash.retrieveArtifactPom( groupId, artifactId, version );
     }
 
     public StorageFileItem retrieveArtifact( String groupId, String artifactId, String version,
@@ -129,31 +124,9 @@ public class ConstrainedM2ShadowRepository
             StorageException,
             AccessDeniedException
     {
-        Gav gav = new Gav(
-            groupId,
-            artifactId,
-            version,
-            classifier,
-            "jar",
-            timestampedVersion,
-            null,
-            null,
-            classifier == null,
-            false,
-            false );
+        ArtifactStoreHelper ash = new ArtifactStoreHelper( this, gavCalculator );
 
-        RepositoryItemUid uid = new RepositoryItemUid( this, M2GavCalculator.calculateRepositoryPath( gav ) );
-
-        StorageItem item = retrieveItem( true, uid );
-
-        if ( StorageFileItem.class.isAssignableFrom( item.getClass() ) )
-        {
-            return (StorageFileItem) item;
-        }
-        else
-        {
-            throw new StorageException( "The Artifact retrieval returned non-file, path:" + uid.getPath() );
-        }
+        return ash.retrieveArtifact( groupId, artifactId, version, timestampedVersion, classifier );
     }
 
     protected StorageItem doRetrieveItem( boolean localOnly, RepositoryItemUid uid, Map<String, Object> context )
