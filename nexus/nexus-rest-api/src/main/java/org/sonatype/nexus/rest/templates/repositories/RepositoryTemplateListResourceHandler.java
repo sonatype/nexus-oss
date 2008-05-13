@@ -85,7 +85,7 @@ public class RepositoryTemplateListResourceHandler
             {
                 repoRes = new RepositoryListResource();
 
-                repoRes.setResourceURI( calculateSubReference( repository.getId() ).getPath() );
+                repoRes.setResourceURI( calculateSubReference( repository.getId() ).toString() );
 
                 if ( repository.getRemoteStorage() != null && repository.getRemoteStorage().getUrl() != null )
                 {
@@ -114,7 +114,7 @@ public class RepositoryTemplateListResourceHandler
             {
                 repoRes = new RepositoryListResource();
 
-                repoRes.setResourceURI( calculateSubReference( shadow.getId() ).getPath() );
+                repoRes.setResourceURI( calculateSubReference( shadow.getId() ).toString() );
 
                 repoRes.setRepoType( "virtual" );
 

@@ -695,4 +695,17 @@ public class RemoteNexus
         return false;
     }
 
+    public String getBaseUrl()
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public void setBaseUrl( String baseUrl )
+        throws IOException
+    {
+        // TODO Auto-generated method stub
+        
+    }
+
 }

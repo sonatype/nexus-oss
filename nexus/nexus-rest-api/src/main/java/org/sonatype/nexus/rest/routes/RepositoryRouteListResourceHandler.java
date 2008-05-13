@@ -87,7 +87,7 @@ public class RepositoryRouteListResourceHandler
             {
                 resource = new RepositoryRouteListResource();
 
-                resource.setResourceURI( calculateSubReference( item.getId() ).getPath() );
+                resource.setResourceURI( calculateSubReference( item.getId() ).toString() );
 
                 resource.setRuleType( config2resourceType( item.getRouteType() ) );
 

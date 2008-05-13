@@ -447,19 +447,40 @@ public abstract class AbstractNexusResourceHandler
         return super.getRepresentation( variant );
     }
 
+    /**
+     * Calculates a subReference.
+     * 
+     * @param relPart
+     * @return
+     */
     protected Reference calculateSubReference( String relPart )
     {
         return calculateReference( getRequest().getResourceRef(), relPart ).getTargetRef();
     }
 
-    protected Reference calculateRepositoryReference( Reference base, String repoId )
+    /**
+     * Calculates a reference to Repository based on Repository ID.
+     * 
+     * @param base
+     * @param repoId
+     * @return
+     */
+    protected Reference calculateRepositoryReference( String repoId )
     {
-        return calculateReference( base, "repositories/" + repoId ).getTargetRef();
+        return calculateReference( getRequest().getRootRef().getParentRef(), "service/local/repositories/" + repoId )
+            .getTargetRef();
     }
 
-    protected Reference calculateReference( Reference base, String relPart )
+    /**
+     * Calculates Reference.
+     * 
+     * @param base
+     * @param relPart
+     * @return
+     */
+    private Reference calculateReference( Reference base, String relPart )
     {
-        Reference ref = new Reference( base, relPart );
+        Reference ref = new Reference( mangleBase( base ), relPart );
 
         if ( !ref.getBaseRef().getPath().endsWith( "/" ) )
         {
@@ -467,6 +488,46 @@ public abstract class AbstractNexusResourceHandler
         }
 
         return ref.getTargetRef();
+    }
+
+    /**
+     * Calculates the service base in respect to user set baseUrl.
+     * 
+     * @return
+     */
+    private Reference mangleBase( Reference reference )
+    {
+        if ( getNexus().getBaseUrl() == null )
+        {
+            // used did not set it
+            return reference;
+        }
+
+        // http://localhost:8081/nexus
+        String root = getRequest().getRootRef().getParentRef().toString();
+
+        // make it not ending with "/"
+        if ( root.endsWith( "/" ) )
+        {
+            root = root.substring( 0, root.length() - 1 );
+        }
+
+        // http://repository.sonatype.org
+        String baseUrl = getNexus().getBaseUrl();
+
+        // make it not ending with "/"
+        if ( baseUrl.endsWith( "/" ) )
+        {
+            baseUrl = baseUrl.substring( 0, baseUrl.length() - 1 );
+        }
+
+        StringBuffer sb = new StringBuffer( reference.toString() );
+
+        sb.delete( 0, root.length() );
+
+        sb.insert( 0, baseUrl );
+
+        return new Reference( sb.toString() );
     }
 
 }

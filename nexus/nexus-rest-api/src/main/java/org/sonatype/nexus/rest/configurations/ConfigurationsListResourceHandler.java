@@ -56,7 +56,7 @@ public class ConfigurationsListResourceHandler
 
         ConfigurationsListResource resource = new ConfigurationsListResource();
 
-        resource.setResourceURI( calculateSubReference( GlobalConfigurationResourceHandler.DEFAULT_CONFIG_NAME ).getPath() );
+        resource.setResourceURI( calculateSubReference( GlobalConfigurationResourceHandler.DEFAULT_CONFIG_NAME ).toString() );
 
         resource.setName( GlobalConfigurationResourceHandler.DEFAULT_CONFIG_NAME );
 
@@ -64,7 +64,7 @@ public class ConfigurationsListResourceHandler
 
         resource = new ConfigurationsListResource();
 
-        resource.setResourceURI( calculateSubReference( GlobalConfigurationResourceHandler.CURRENT_CONFIG_NAME ).getPath() );
+        resource.setResourceURI( calculateSubReference( GlobalConfigurationResourceHandler.CURRENT_CONFIG_NAME ).toString() );
 
         resource.setName( GlobalConfigurationResourceHandler.CURRENT_CONFIG_NAME );
 

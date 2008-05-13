@@ -101,10 +101,7 @@ public class RepositoryGroupResourceHandler
 
                 member.setName( getNexus().getRepository( repoId ).getName() );
 
-                // TODO: find a better way to not hard-wire the URI!
-                member.setResourceURI( calculateRepositoryReference(
-                    getRequest().getResourceRef().getParentRef().getParentRef(),
-                    repoId ).getPath() );
+                member.setResourceURI( calculateRepositoryReference( repoId ).toString() );
 
                 resource.addRepository( member );
             }
@@ -177,7 +174,7 @@ public class RepositoryGroupResourceHandler
             try
             {
                 validateGroup( resource );
-                
+
                 CRepositoryGroup group = getNexus().readRepositoryGroup( getGroupId() );
 
                 group.setName( resource.getName() );

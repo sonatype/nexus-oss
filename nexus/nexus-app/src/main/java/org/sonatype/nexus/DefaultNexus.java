@@ -244,6 +244,17 @@ public class DefaultNexus
         nexusConfiguration.setSecurity( enabled, authenticationSourceType );
     }
 
+    public String getBaseUrl()
+    {
+        return nexusConfiguration.getBaseUrl();
+    }
+
+    public void setBaseUrl( String baseUrl )
+        throws IOException
+    {
+        nexusConfiguration.setBaseUrl( baseUrl );
+    }
+
     // Globals are mandatory: RU
 
     public String readWorkingDirectory()

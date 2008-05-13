@@ -87,7 +87,7 @@ public class DefaultConfigurationValidator
                 response.setModified( true );
             }
         }
-
+        
         // collect existing realms, if any
         List<String> existingRealms = null;
         if ( model.getSecurity().isEnabled() && model.getSecurity().getRealms() != null )

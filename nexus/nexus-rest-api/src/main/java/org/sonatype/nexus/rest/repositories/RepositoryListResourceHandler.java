@@ -85,7 +85,7 @@ public class RepositoryListResourceHandler
         {
             repoRes = new RepositoryListResource();
 
-            repoRes.setResourceURI( calculateSubReference( repository.getId() ).getPath() );
+            repoRes.setResourceURI( calculateSubReference( repository.getId() ).toString() );
 
             repoRes.setRepoType( getRestRepoType( repository ) );
 
@@ -115,7 +115,7 @@ public class RepositoryListResourceHandler
         {
             repoRes = new RepositoryListResource();
 
-            repoRes.setResourceURI( calculateSubReference( shadow.getId() ).getPath() );
+            repoRes.setResourceURI( calculateSubReference( shadow.getId() ).toString() );
 
             repoRes.setRepoType( getRestRepoType( shadow ) );
 

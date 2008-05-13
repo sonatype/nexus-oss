@@ -78,7 +78,7 @@ public class RepositoryStatusesListResourceHandler
         {
             repoRes = new RepositoryStatusListResource();
 
-            repoRes.setResourceURI( calculateSubReference( repository.getId() ).getPath() );
+            repoRes.setResourceURI( calculateSubReference( repository.getId() ).toString() );
 
             repoRes.setName( repository.getName() );
 
@@ -104,7 +104,7 @@ public class RepositoryStatusesListResourceHandler
         {
             repoRes = new RepositoryStatusListResource();
 
-            repoRes.setResourceURI( calculateSubReference( shadow.getId() ).getPath() );
+            repoRes.setResourceURI( calculateSubReference( shadow.getId() ).toString() );
 
             repoRes.setRepoType( getRestRepoType( shadow ) );
 

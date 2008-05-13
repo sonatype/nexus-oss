@@ -413,7 +413,7 @@ public class DefaultNexusConfiguration
     }
 
     // ------------------------------------------------------------------
-    // CRUD-like ops on config sections
+    // Security
 
     public boolean isSecurityEnabled()
     {
@@ -424,7 +424,7 @@ public class DefaultNexusConfiguration
     {
         return getConfiguration().getSecurity() != null && getConfiguration().getSecurity().isAnonymousAccessEnabled();
     }
-    
+
     public boolean isSimpleSecurityModel()
     {
         return "simple".equals( getAuthenticationSourceType() );
@@ -476,6 +476,31 @@ public class DefaultNexusConfiguration
         applyAndSaveConfiguration();
     }
 
+    // ------------------------------------------------------------------
+    // REST API
+
+    public String getBaseUrl()
+    {
+        if ( getConfiguration().getRestApi() != null )
+        {
+            return getConfiguration().getRestApi().getBaseUrl();
+        }
+        else
+        {
+            return null;
+        }
+    }
+
+    public void setBaseUrl( String baseUrl )
+        throws IOException
+    {
+        getConfiguration().getRestApi().setBaseUrl( baseUrl );
+
+        applyAndSaveConfiguration();
+    }
+
+    // ------------------------------------------------------------------
+    // CRUD-like ops on config sections
     // Globals are mandatory: RU
 
     public String readWorkingDirectory()

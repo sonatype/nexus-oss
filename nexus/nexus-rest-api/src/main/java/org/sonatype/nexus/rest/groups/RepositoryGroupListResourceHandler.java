@@ -85,7 +85,7 @@ public class RepositoryGroupListResourceHandler
             {
                 RepositoryGroupListResource resource = new RepositoryGroupListResource();
 
-                resource.setResourceURI( calculateSubReference( group.getGroupId() ).getPath() );
+                resource.setResourceURI( calculateSubReference( group.getGroupId() ).toString() );
 
                 resource.setName( group.getName() );
 
@@ -100,10 +100,7 @@ public class RepositoryGroupListResourceHandler
 
                     member.setName( getNexus().getRepository( repoId ).getName() );
 
-                    // TODO: find a better way to not hard-wire the URI!
-                    member.setResourceURI( calculateRepositoryReference(
-                        getRequest().getResourceRef().getParentRef(),
-                        repoId ).getPath() );
+                    member.setResourceURI( calculateRepositoryReference( repoId ).toString() );
 
                     resource.addRepository( member );
 

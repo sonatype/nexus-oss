@@ -68,7 +68,7 @@ public class LogsListResourceHandler
         {
             LogsListResource resource = new LogsListResource();
 
-            resource.setResourceURI( calculateSubReference( fileName ).getPath() );
+            resource.setResourceURI( calculateSubReference( fileName ).toString() );
 
             resource.setName( fileName );
 

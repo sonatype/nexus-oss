@@ -70,7 +70,7 @@ public class GlobalConfigurationListResourceHandler
 
         data.setName( GlobalConfigurationResourceHandler.DEFAULT_CONFIG_NAME );
 
-        data.setResourceURI( calculateSubReference( data.getName() ).getPath() );
+        data.setResourceURI( calculateSubReference( data.getName() ).toString() );
 
         response.addData( data );
 
@@ -78,7 +78,7 @@ public class GlobalConfigurationListResourceHandler
 
         data.setName( GlobalConfigurationResourceHandler.CURRENT_CONFIG_NAME );
 
-        data.setResourceURI( calculateSubReference( data.getName() ).getPath() );
+        data.setResourceURI( calculateSubReference( data.getName() ).toString() );
 
         response.addData( data );
 

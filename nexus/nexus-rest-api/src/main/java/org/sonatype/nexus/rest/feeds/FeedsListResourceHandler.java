@@ -64,7 +64,7 @@ public class FeedsListResourceHandler
             {
                 resource = new FeedListResource();
 
-                resource.setResourceURI( calculateSubReference( source.getFeedKey() ).getPath() );
+                resource.setResourceURI( calculateSubReference( source.getFeedKey() ).toString() );
 
                 resource.setName( source.getFeedName() );
 

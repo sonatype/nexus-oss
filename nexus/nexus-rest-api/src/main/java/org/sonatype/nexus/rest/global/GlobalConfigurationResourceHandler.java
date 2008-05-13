@@ -243,6 +243,11 @@ public class GlobalConfigurationResourceHandler
                         }
                     }
 
+                    if ( resource.getBaseUrl() != null )
+                    {
+                        getNexus().setBaseUrl( resource.getBaseUrl() );
+                    }
+
                     if ( MutableAuthenticationSource.class.isAssignableFrom( authenticationSource.getClass() ) )
                     {
                         if ( resource.getAdminPassword() != null )
@@ -342,6 +347,8 @@ public class GlobalConfigurationResourceHandler
         resource.setGlobalConnectionSettings( convert( getNexus().readGlobalRemoteConnectionSettings() ) );
 
         resource.setGlobalHttpProxySettings( convert( getNexus().readGlobalRemoteHttpProxySettings() ) );
+        
+        resource.setBaseUrl( getNexus().getBaseUrl() );
     }
 
     protected String getSecurityConfiguration( boolean enabled, String authSourceType )

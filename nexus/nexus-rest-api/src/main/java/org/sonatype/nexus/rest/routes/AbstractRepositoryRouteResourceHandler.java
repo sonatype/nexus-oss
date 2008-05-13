@@ -88,7 +88,7 @@ public abstract class AbstractRepositoryRouteResourceHandler
 
                 member.setName( getNexus().getRepository( repoId ).getName() );
 
-                member.setResourceURI( calculateRepositoryReference( listBase.getParentRef(), repoId ).getPath() );
+                member.setResourceURI( calculateRepositoryReference( repoId ).toString() );
             }
 
             members.add( member );

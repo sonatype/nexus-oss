@@ -47,10 +47,19 @@ public interface MutableConfiguration
     boolean isSecurityEnabled();
 
     boolean isAnonymousAccessEnabled();
-    
+
     boolean isSimpleSecurityModel();
 
     String getAuthenticationSourceType();
+
+    // ----------------------------------------------------------------------------------------------------------
+    // REST API
+    // ----------------------------------------------------------------------------------------------------------
+
+    String getBaseUrl();
+
+    void setBaseUrl( String baseUrl )
+        throws IOException;
 
     // ------------------------------------------------------------------
     // CRUD-like ops on config sections
