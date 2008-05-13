@@ -245,7 +245,16 @@ public class GlobalConfigurationResourceHandler
 
                     if ( resource.getBaseUrl() != null )
                     {
-                        getNexus().setBaseUrl( resource.getBaseUrl() );
+                        if ( StringUtils.isEmpty( resource.getBaseUrl() ) )
+                        {
+                            // resetting it
+                            getNexus().setBaseUrl( null );
+                        }
+                        else
+                        {
+                            // setting it
+                            getNexus().setBaseUrl( resource.getBaseUrl() );
+                        }
                     }
 
                     if ( MutableAuthenticationSource.class.isAssignableFrom( authenticationSource.getClass() ) )
@@ -347,7 +356,7 @@ public class GlobalConfigurationResourceHandler
         resource.setGlobalConnectionSettings( convert( getNexus().readGlobalRemoteConnectionSettings() ) );
 
         resource.setGlobalHttpProxySettings( convert( getNexus().readGlobalRemoteHttpProxySettings() ) );
-        
+
         resource.setBaseUrl( getNexus().getBaseUrl() );
     }
 
