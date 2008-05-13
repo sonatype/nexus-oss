@@ -519,6 +519,10 @@ Ext.extend(Sonatype.repoServer.ServerEditPanel, Ext.FormPanel, {
       }
       action.options.fpanel.find('name', 'adminPassword')[0].setDisabled(disablePW);
       action.options.fpanel.find('name', 'deploymentPassword')[0].setDisabled(disablePW);
+      var baseUrlValue = action.options.fpanel.find('name', 'baseUrl')[0].getValue();
+      if (baseUrlValue != null && baseUrlValue.length > 0) {
+        action.options.fpanel.find('id', (action.options.fpanel.id + '_' + 'applicationServerSettings'))[0].expand();
+      }
     }
     
     //@todo: some completion message would be helpful.
