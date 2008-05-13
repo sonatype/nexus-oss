@@ -20,6 +20,7 @@
  */
 //Instance of Ext.FormPanel
 Sonatype.repoServer.ServerEditPanel = function(config){
+  var baseUrlChanged = false;
   var config = config || {};
   var defaultConfig = {autoScroll:true};
   Ext.apply(this, config, defaultConfig);
@@ -71,29 +72,6 @@ Sonatype.repoServer.ServerEditPanel = function(config){
             anchor: Sonatype.view.FIELD_OFFSET,
             allowBlank:false,
             itemCls: 'required-field'
-          }
-        ]
-      },
-      {
-        xtype: 'fieldset',
-        checkboxToggle:false,
-        title: 'Application Server Settings',
-        anchor: Sonatype.view.FIELDSET_OFFSET,
-        collapsible: true,
-        autoHeight:true,
-        layoutConfig: {
-          labelSeparator: ''
-        },
-
-        items: [
-          {
-            xtype: 'textfield',
-            fieldLabel: 'Base URL',
-            itemCls: 'required-field',
-            helpText: ht.baseUrl,
-            name: 'baseUrl',
-            anchor: Sonatype.view.FIELD_OFFSET,
-            allowBlank:false
           }
         ]
       },
@@ -209,6 +187,40 @@ Sonatype.repoServer.ServerEditPanel = function(config){
             maxLength: 25,
             maxLengthText : "Password must be 25 characters or less",
             value: Sonatype.utils.passwordPlaceholder 
+          }
+        ]
+      },
+      {
+        xtype: 'fieldset',
+        checkboxToggle:true,
+        collapsed: true,
+        id: this.id + '_' + 'applicationServerSettings',
+        title: 'Application Server Settings (optional)',
+        anchor: Sonatype.view.FIELDSET_OFFSET,
+        autoHeight:true,
+        layoutConfig: {
+          labelSeparator: ''
+        },
+        listeners: {
+          'expand' : {
+            fn: this.optionalFieldsetExpandHandler,
+            scope: this
+          },
+          'collapse' : {
+            fn: this.optionalFieldsetCollapseHandler,
+            scope: this,
+            delay: 100
+          }
+        },
+
+        items: [
+          {
+            xtype: 'textfield',
+            fieldLabel: 'Base URL',
+            helpText: ht.baseUrl,
+            name: 'baseUrl',
+            anchor: Sonatype.view.FIELD_OFFSET,
+            allowBlank:true
           }
         ]
       },
@@ -377,7 +389,11 @@ Ext.extend(Sonatype.repoServer.ServerEditPanel, Ext.FormPanel, {
   saveBtnHandler : function() {
     var wkDirField = this.find('name', 'workingDirectory')[0];
     var securityConfigField = this.find('name', 'securityConfiguration')[0];
+    var baseUrlField = this.find('name', 'baseUrl')[0];
     if (this.form.isValid()) {
+      if (baseUrlField.isDirty()) {
+        this.baseUrlChanged = true;
+      }
       if (wkDirField.isDirty() || securityConfigField.isDirty()) {
         //@note: this handler selects the "No" button as the default
         //@todo: could extend Ext.MessageBox to take the button to select as a param
@@ -483,6 +499,9 @@ Ext.extend(Sonatype.repoServer.ServerEditPanel, Ext.FormPanel, {
           closable: false,
           icon: Ext.Msg.WARNING
         });
+      }
+      else if (action.options.fpanel.baseUrlChanged){
+        window.location = action.options.fpanel.find('name', 'baseUrl')[0].getValue();
       }
       action.options.fpanel.find('name', 'adminPassword')[0].setValue(Sonatype.utils.passwordPlaceholder);
       action.options.fpanel.find('name', 'deploymentPassword')[0].setValue(Sonatype.utils.passwordPlaceholder);

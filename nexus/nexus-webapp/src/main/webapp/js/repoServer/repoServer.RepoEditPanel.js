@@ -891,7 +891,12 @@ Sonatype.repoServer.RepoEditPanel = function(config){
   ];
 
   this.restToContentUrl = function(r) {
-    return Sonatype.config.host + r.replace(Sonatype.config.repos.urls.repositories, Sonatype.config.content.repositories);
+    if (r.indexOf(Sonatype.config.host) > -1) {
+      return r.replace(Sonatype.config.repos.urls.repositories, Sonatype.config.content.repositories);
+    }
+    else {
+      return Sonatype.config.host + r.replace(Sonatype.config.repos.urls.repositories, Sonatype.config.content.repositories);
+    }
   };
   // START: Repo list ******************************************************
   this.repoRecordConstructor = Ext.data.Record.create([

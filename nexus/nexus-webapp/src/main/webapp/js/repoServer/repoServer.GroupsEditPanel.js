@@ -235,7 +235,12 @@ Sonatype.repoServer.GroupsEditPanel = function(config){
   };
   
   this.restToContentUrl = function(r){
-    return Sonatype.config.host + r.replace(Sonatype.config.repos.urls.groups, Sonatype.config.content.groups);
+    if (r.indexOf(Sonatype.config.host) > -1) {
+      return r.replace(Sonatype.config.repos.urls.groups, Sonatype.config.content.groups);
+    }
+    else {
+      return Sonatype.config.host + r.replace(Sonatype.config.repos.urls.groups, Sonatype.config.content.groups);
+    }
   };
 
   // START: Repo list ******************************************************

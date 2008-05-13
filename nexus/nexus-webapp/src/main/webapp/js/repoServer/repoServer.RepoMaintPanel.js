@@ -188,7 +188,12 @@ Sonatype.repoServer.RepoMaintPanel = function(config){
   }
   
   this.restToContentUrl = function(r) {
-    return Sonatype.config.host + (r.replace(Sonatype.config.browsePathSnippet, '')).replace(Sonatype.config.repos.urls.repositories, Sonatype.config.content.repositories);
+    if (r.indexOf(Sonatype.config.host) > -1) {
+      return r.replace(Sonatype.config.browsePathSnippet, '').replace(Sonatype.config.repos.urls.repositories, Sonatype.config.content.repositories);
+    }
+    else {
+      return Sonatype.config.host + r.replace(Sonatype.config.browsePathSnippet, '').replace(Sonatype.config.repos.urls.repositories, Sonatype.config.content.repositories);
+    }
   };
   
   this.restToRemoteUrl = function(restUrl, repoRecord) {
@@ -795,7 +800,7 @@ Ext.extend(Sonatype.repoServer.RepoMaintPanel, Ext.Panel, {
   },
   
   updateRepoStatuses : function(repoStatus){
-    var rec = this.reposDataStore.getById(Sonatype.config.repos.urls.repositories + '/' + repoStatus.id);
+    var rec = this.reposDataStore.getById(Sonatype.config.host + Sonatype.config.repos.urls.repositories + '/' + repoStatus.id);
     rec.beginEdit();
     rec.set('localStatus', repoStatus.localStatus);
     rec.set('remoteStatus', (repoStatus.remoteStatus)?repoStatus.remoteStatus:null);
