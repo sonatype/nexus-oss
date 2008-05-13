@@ -41,6 +41,14 @@ Sonatype.utils = {
   returnEmptyStr : function(){
     return '';
   },
+  returnValidStr : function(str){
+    if (str != null) {
+      return str;
+    }
+    else {
+      return Sonatype.utils.returnEmptyStr();
+    }
+  },
   convert : {
     stringContextToBool : function(str){
       return (str.toLowerCase() === 'true');

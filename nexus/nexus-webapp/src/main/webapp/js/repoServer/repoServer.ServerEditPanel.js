@@ -441,7 +441,8 @@ Ext.extend(Sonatype.repoServer.ServerEditPanel, Ext.FormPanel, {
         "routing.groups.mergeMetadata" : Sonatype.utils.convert.stringContextToBool,
         "adminPassword" : Sonatype.utils.convert.passwordToString,
         "deploymentPassword" : Sonatype.utils.convert.passwordToString,
-        "securityConfiguration" : Sonatype.utils.lowercase
+        "securityConfiguration" : Sonatype.utils.lowercase,
+        "baseUrl" : Sonatype.utils.returnValidStr
       },
       serviceDataObj : Sonatype.repoServer.referenceData.globalSettingsState
     });
@@ -519,8 +520,7 @@ Ext.extend(Sonatype.repoServer.ServerEditPanel, Ext.FormPanel, {
       }
       action.options.fpanel.find('name', 'adminPassword')[0].setDisabled(disablePW);
       action.options.fpanel.find('name', 'deploymentPassword')[0].setDisabled(disablePW);
-      var baseUrlValue = action.options.fpanel.find('name', 'baseUrl')[0].getValue();
-      if (baseUrlValue != null && baseUrlValue.length > 0) {
+      if (!Ext.isEmpty(action.options.fpanel.find('name', 'baseUrl')[0].getValue())) {
         action.options.fpanel.find('id', (action.options.fpanel.id + '_' + 'applicationServerSettings'))[0].expand();
       }
     }
