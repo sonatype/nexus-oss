@@ -31,7 +31,7 @@ import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.restlet.resource.Representation;
 import org.restlet.resource.Variant;
-import org.sonatype.plexus.rest.AbstractPlexusAwareResource;
+import org.sonatype.nexus.rest.AbstractNexusResourceHandler;
 
 import com.sun.syndication.feed.synd.SyndFeed;
 
@@ -42,7 +42,7 @@ import com.sun.syndication.feed.synd.SyndFeed;
  * @author cstamas
  */
 public abstract class AbstractFeedResourceHandler
-    extends AbstractPlexusAwareResource
+    extends AbstractNexusResourceHandler
 {
 
     private static final String RSS_2_0 = "rss_2.0";
@@ -66,7 +66,7 @@ public abstract class AbstractFeedResourceHandler
         getVariants().add( new Variant( MediaType.APPLICATION_JSON ) );
     }
 
-    public Representation getRepresentation( Variant variant )
+    public Representation getRepresentationHandler( Variant variant )
     {
         try
         {

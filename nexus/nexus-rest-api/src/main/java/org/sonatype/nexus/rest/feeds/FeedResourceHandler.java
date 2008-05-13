@@ -34,7 +34,6 @@ import com.sun.syndication.feed.synd.SyndFeed;
 /**
  * Simple class that calculates the feed key by attribute (and it is probably mapped with FEED_KEY in some router).
  * 
- * @TODO: make this non-RSS specific and support more formats, like Atom
  * @author cstamas
  */
 public class FeedResourceHandler
@@ -70,7 +69,7 @@ public class FeedResourceHandler
                 {
                     feed.setLink( feed.getLink().substring( 1 ) );
                 }
-                feed.setLink( getRequest().getRootRef().getParentRef().toString() + feed.getLink() );
+                feed.setLink( calculateReference( getRequest().getRootRef().getParentRef(), feed.getLink() ).toString() );
             }
         }
 
@@ -86,7 +85,7 @@ public class FeedResourceHandler
                     {
                         entry.setLink( entry.getLink().substring( 1 ) );
                     }
-                    entry.setLink( getRequest().getRootRef().getParentRef().toString() + entry.getLink() );
+                    entry.setLink( calculateReference( getRequest().getRootRef().getParentRef(), entry.getLink() ).toString() );
                 }
             }
         }

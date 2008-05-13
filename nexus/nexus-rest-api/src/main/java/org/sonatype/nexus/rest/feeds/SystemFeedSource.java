@@ -88,7 +88,7 @@ public class SystemFeedSource
         feed.setAuthor( "Nexus " + getNexus().getSystemState().getVersion() );
 
         feed.setPublishedDate( new Date() );
-
+        
         List<SyndEntry> entries = new ArrayList<SyndEntry>( items.size() );
 
         SyndEntry entry = null;

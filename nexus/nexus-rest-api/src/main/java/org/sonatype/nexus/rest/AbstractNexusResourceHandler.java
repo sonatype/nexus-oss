@@ -478,7 +478,7 @@ public abstract class AbstractNexusResourceHandler
      * @param relPart
      * @return
      */
-    private Reference calculateReference( Reference base, String relPart )
+    protected Reference calculateReference( Reference base, String relPart )
     {
         Reference ref = new Reference( mangleBase( base ), relPart );
 
