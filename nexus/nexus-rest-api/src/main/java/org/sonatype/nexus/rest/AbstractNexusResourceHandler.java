@@ -143,7 +143,7 @@ public abstract class AbstractNexusResourceHandler
         Reference repoRoot = new Reference( getRequest().getRootRef(), "service/local/repositories/" + ai.repository
             + "/content" );
 
-        a.setResourceURI( calculateReference( repoRoot, path.toString() ).getPath() );
+        a.setResourceURI( calculateReference( repoRoot, path.toString() ).toString() );
 
         a.setGroupId( ai.groupId );
 
