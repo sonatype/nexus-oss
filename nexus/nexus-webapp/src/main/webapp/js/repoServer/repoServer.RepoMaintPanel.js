@@ -182,6 +182,11 @@ Sonatype.repoServer.RepoMaintPanel = function(config){
           text: 'Block Proxy',
           scope:this,
           handler: this.blockProxyHandler
+        }),
+        uploadArtifact: new Ext.Action({
+          text: 'Upload Artifact...',
+          scope: this,
+          handler: this.uploadArtifactHandler
         })
       }
     );
@@ -429,6 +434,10 @@ Ext.extend(Sonatype.repoServer.RepoMaintPanel, Ext.Panel, {
                  ? this.actions.putOutOfService
                  : this.actions.putInService
               );
+
+      if (this.ctxRecord.get('repoType') == 'hosted'){
+        menu.add(this.actions.uploadArtifact);
+      }
     }
     
     menu.on('hide', this.onContextHideHandler, this);
@@ -1031,6 +1040,80 @@ Ext.extend(Sonatype.repoServer.RepoMaintPanel, Ext.Panel, {
     }
     else {
       Ext.MessageBox.alert('Status retrieval failed');
+    }
+  },
+  
+  uploadArtifactHandler : function(){
+    if (this.ctxRecord || this.reposGridPanel.getSelectionModel().hasSelection()){
+      //@todo: start updating messaging here
+      var rec = (this.ctxRecord) ? this.ctxRecord : this.reposGridPanel.getSelectionModel().getSelected();
+      
+      Ext.Ajax.request({
+        url: rec.id,
+        scope: this,
+        callback: function(options, success, response) {
+          if ( success ) {
+            var statusResp = Ext.decode(response.responseText);
+            if (statusResp.data) {
+              if ( statusResp.data.allowWrite ) {
+                var oldItem = this.formCards.getLayout().activeItem;
+                this.formCards.remove(oldItem, true);
+
+                var rec = (this.ctxRecord) ? this.ctxRecord : this.reposGridPanel.getSelectionModel().getSelected();
+
+                var panel = new Ext.Panel({
+                  layout: 'fit',
+                  frame: true,
+                  items: [ new Sonatype.repoServer.FileUploadPanel({
+                    title: 'Artifact Upload to ' + rec.get('name'),
+                    repoPanel: this
+                  }) ]
+                });
+                this.formCards.insert(1, panel);
+                this.formCards.getLayout().setActiveItem(panel);
+                panel.doLayout();
+              }
+              else {
+                Ext.MessageBox.show({
+                  title: 'Deployment Disabled',
+                  icon: Ext.MessageBox.ERROR,
+                  buttons: Ext.MessageBox.OK,
+                  msg: 'Deployment is disabled for the selected repository.<br /><br />' +
+                    'You can enable it in the "Access Settings" section of the repository configuration'
+                });
+              }
+              return;
+            }
+          }
+          Ext.MessageBox.show({
+            title: 'Error',
+            icon: Ext.MessageBox.ERROR,
+            buttons: Ext.MessageBox.OK,
+            msg: 'There was a problem obtaining repository status:<br /><br />' +
+              'ERROR ' + response.status + ': ' + response.statusText
+          });
+        }
+      });
+/*
+      
+      var out = {
+        data : {
+          id : rec.id.slice(rec.id.lastIndexOf('/') + 1),
+          repoType : rec.get('repoType'),
+          localStatus : rec.get('localStatus'),
+          remoteStatus : rec.get('remoteStatus'),
+          proxyMode : 'blockedManual'
+        }
+      };
+      
+      Ext.Ajax.request({
+        url: rec.id + '/status',
+        jsonData: out,
+        callback: this.blockProxyCallback,
+        scope: this,
+        method: 'PUT'
+      });
+*/
     }
   }
 

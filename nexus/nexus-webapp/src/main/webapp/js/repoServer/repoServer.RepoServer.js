@@ -238,9 +238,6 @@ Sonatype.repoServer.RepoServer = function(){
       if(sp.checkPermission(userPerms.maintRepos, sp.EDIT)){
         mTplData.links.push( {id:'open-repos-maint', title:'Repositories'} );
       }
-      if(sp.checkPermission(userPerms.maintRepos, sp.EDIT)){
-        mTplData.links.push( {id:'open-file-upload', title:'Artifact Upload'} );
-      }
       if(sp.checkPermission(userPerms.maintConfig, sp.READ)){
          mTplData.links.push( {id:'open-view-config', title:'View Server Config'} );
       }
@@ -329,10 +326,6 @@ Sonatype.repoServer.RepoServer = function(){
       'open-repos-maint' : function(scope){
         var id = 'repos-maint';
         Sonatype.view.mainTabPanel.addOrShowTab(id, Sonatype.repoServer.RepoMaintPanel, {title: 'Maintenance', editMode: true});
-      },
-      'open-file-upload' : function(scope){
-        var id = 'file-upload';
-        Sonatype.view.mainTabPanel.addOrShowTab(id, Sonatype.repoServer.FileUploadPanel, {title: 'Upload', editMode: true});
       },
       'open-config-server' : function(scope){
         var id = 'nexus-config';

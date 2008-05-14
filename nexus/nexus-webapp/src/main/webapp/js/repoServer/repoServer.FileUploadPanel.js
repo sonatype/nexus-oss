@@ -112,14 +112,12 @@ Sonatype.repoServer.FileUploadPanel = function(config){
   );
 
   Sonatype.repoServer.FileUploadPanel.superclass.constructor.call(this, {
-    trackResetOnLoad: true,
     autoScroll: true,
-    border: false,
+    border: true,
+    bodyBorder: true,
     frame: true,
-    autoHeight: true,
     collapsible: false,
     collapsed: false,
-    labelWidth: 120,
     layoutConfig: {
       labelSeparator: ''
     },
@@ -214,7 +212,11 @@ Sonatype.repoServer.FileUploadPanel = function(config){
       },
       {
         text: 'Cancel',
-//        handler: this.cancelBtnHandler,
+        handler: function() {
+          if ( this.repoPanel ) {
+            this.repoPanel.viewHandler();
+          }
+        },
         scope: this
       }
     ]
