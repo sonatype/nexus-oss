@@ -48,19 +48,23 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
   this.submitDataModFuncs = {
     daily : {
       serviceSchedule : Sonatype.utils.lowercase,
-      startTime : this.exportStartTimeHelper.createDelegate(this)
+      startTime : this.exportStartTimeHelper.createDelegate(this),
+      recurringTime : this.exportRecurringTimeHelper.createDelegate(this)
     },
     weekly : {
       serviceSchedule : Sonatype.utils.lowercase,
       startTime : this.exportStartTimeHelper.createDelegate(this),
+      recurringTime : this.exportRecurringTimeHelper.createDelegate(this),
       recurringDay : this.exportRecurringDayHelper.createDelegate(this)
     },
     monthly : {
       serviceSchedule : Sonatype.utils.lowercase,
-      startTime : this.exportStartTimeHelper.createDelegate(this)
+      startTime : this.exportStartTimeHelper.createDelegate(this),
+      recurringTime : this.exportRecurringTimeHelper.createDelegate(this),
+      recurringDay : this.exportMonthlyRecurringDayHelper .createDelegate(this)
     },
     advanced : {
-      serviceSchedule : Sonatype.utils.lowercase    
+      serviceSchedule : Sonatype.utils.lowercase   
     }
   };
   
@@ -1262,12 +1266,45 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
     return arr; //return arr, even if empty to comply with sonatypeLoad data modifier requirement
   },  
   exportStartTimeHelper : function(val, fpanel){
-    var startDate = fpanel.find('name', 'startDate')[0];
-    var startTime = fpanel.find('name', 'startTime')[0];
+    var selectedStartDate = "";
+    var selectedStartTime = "";
     
-    //TODO: Combine the date & time
+    for each (startDate in fpanel.find('name', 'startDate')){
+      if (!startDate.disabled){
+        selectedStartDate = startDate;
+        break;
+      }
+    }
     
-    return "";
+    for each (startTime in fpanel.find('name', 'startTime')){
+      if (!startTime.disabled){
+        selectedStartTime = startTime;
+        break;
+      }
+    }
+    
+    var hours = parseInt(selectedStartTime.getValue().substring(0, selectedStartTime.getValue().indexOf(':')));
+    var minutes = parseInt(selectedStartTime.getValue().substring(selectedStartTime.getValue().indexOf(':') + 1, selectedStartTime.getValue().indexOf(':') + 3));
+    
+    var value = selectedStartDate.getValue();
+    value.setHours(hours + (selectedStartTime.getValue().indexOf('AM') == -1 ? 12 : 0));
+    value.setMinutes(minutes);
+    
+    return value;
+  },
+  exportRecurringTimeHelper : function(val, fpanel){
+    var selectedRecurringTime = "";
+    for each (recurringTime in fpanel.find('name', 'recurringTime')){
+      if (!recurringTime.disabled){
+        selectedRecurringTime = recurringTime;
+        break;
+      }
+    }
+    
+    var hours = parseInt(selectedRecurringTime.getValue().substring(0, selectedRecurringTime.getValue().indexOf(':'))) + (selectedRecurringTime.getValue().indexOf('AM') == -1 ? 12 : 0);
+    var minutes = selectedRecurringTime.getValue().substring(selectedRecurringTime.getValue().indexOf(':') + 1, selectedRecurringTime.getValue().indexOf(':') + 3);
+        
+    return hours + ":" + minutes;
   },
   exportRecurringDayHelper : function(val, fpanel){
     var selectedTree = Ext.getCmp(fpanel.id + '_weekdays-tree');
@@ -1283,6 +1320,15 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
   },
   exportMonthlyRecurringDayHelper : function(val, fpanel){
     var outputArr = [];
+    var j = 0;
+    for (var i = 1; i <= 31; i++){
+      if (fpanel.find('name','day' + i)[0].getValue()){
+        outputArr[j++] = '' + i;
+      }
+    }
+    if (fpanel.find('name','dayLast')[0].getValue()){
+      outputArr[j] = 'last';
+    }
     return outputArr;
   }
 });
