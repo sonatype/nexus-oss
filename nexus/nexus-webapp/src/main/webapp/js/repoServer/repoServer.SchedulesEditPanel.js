@@ -35,12 +35,27 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
   this.weekdaysList = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
   
   this.loadDataModFuncs = {
-    schedule : {
+    daily : {
+    },
+    weekly : {
+    },
+    monthly : {
+    },
+    advanced : {
     }
   };
   
   this.submitDataModFuncs = {
-    schedule : {
+    daily : {
+      startTime : this.exportStartTimeHelper.createDelegate(this)
+    },
+    weekly : {
+      startTime : this.exportStartTimeHelper.createDelegate(this)
+    },
+    monthly : {
+      startTime : this.exportStartTimeHelper.createDelegate(this)
+    },
+    advanced : {
     }
   };
   
@@ -616,21 +631,9 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
   },
   
   saveHandler : function(formInfoObj){
-    allValid = formInfoObj.formPanel.form.isValid()
-    
-    //form validation of repository treepanel
-    var rtTree = Ext.getCmp(formInfoObj.formPanel.id + '_route-repos-tree');
-    var rtTreeValid = rtTree.validate.call(rtTree);
-    
-    if (!rtTreeValid) {
-      this.markTreeInvalid(rtTree);
-    }
-    
-    allValid = (allValid && rtTreeValid);
-    
-    if (allValid) {
+    if (formInfoObj.formPanel.form.isValid()) {
       var isNew = formInfoObj.isNew;
-      var repoType = formInfoObj.repoType;
+      var scheduleType = formInfoObj.formPanel.find('name', 'scheduleType')[0].getValue().toLowerCase();
       var createUri = Sonatype.config.repos.urls.schedules;
       var updateUri = (formInfoObj.resourceUri) ? formInfoObj.resourceUri : '';
       var form = formInfoObj.formPanel.form;
@@ -640,7 +643,7 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
         url: isNew ? createUri : updateUri,
         waitMsg: isNew ? 'Creating scheduled service...' : 'Updating scheduled service configuration...',
         fpanel: formInfoObj.formPanel,
-        dataModifiers: this.submitDataModFuncs.schedule,
+        dataModifiers: this.submitDataModFuncs[scheduleType],
         serviceDataObj : Sonatype.repoServer.referenceData.schedule,
         isNew : isNew //extra option to send to callback, instead of conditioning on method
       });
@@ -1039,4 +1042,12 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
     
     return arr; //return arr, even if empty to comply with sonatypeLoad data modifier requirement
   },  
+  exportStartTimeHelper : function(val, fpanel){
+    var startDate = fpanel.find('name', 'startDate')[0];
+    var startTime = fpanel.find('name', 'startTime')[0];
+    
+    //TODO: Combine the date & time
+    
+    return "";
+  }
 });
