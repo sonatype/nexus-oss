@@ -69,7 +69,15 @@ public abstract class AbstractPropertiesFileBasedAccessDecisionVoter
 
         if ( resourceFile.exists() )
         {
-            result.load( new FileInputStream( resourceFile ) );
+            FileInputStream fis = new FileInputStream( resourceFile );
+            try
+            {
+                result.load( fis );
+            }
+            finally
+            {
+                fis.close();
+            }
 
             return result;
         }
@@ -79,7 +87,15 @@ public abstract class AbstractPropertiesFileBasedAccessDecisionVoter
 
         if ( resourceFile.exists() )
         {
-            result.load( new FileInputStream( resourceFile ) );
+            FileInputStream fis = new FileInputStream( resourceFile );
+            try
+            {
+                result.load( fis );
+            }
+            finally
+            {
+                fis.close();
+            }
 
             return result;
         }
