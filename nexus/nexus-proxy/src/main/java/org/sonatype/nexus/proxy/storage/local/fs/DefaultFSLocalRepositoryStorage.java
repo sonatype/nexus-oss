@@ -33,8 +33,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
+import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
@@ -299,24 +298,39 @@ public class DefaultFSLocalRepositoryStorage
                     throw new StorageException( "Could not create the directory hiearchy to write "
                         + target.getAbsolutePath() );
                 }
-                FileOutputStream os = new FileOutputStream( target );
-                long len = IOUtils.copy( ( (StorageFileItem) item ).getInputStream(), os );
-                os.flush();
-                os.close();
-                ( (DefaultStorageFileItem) item ).getInputStream().close();
+                InputStream is = null;
+                FileOutputStream os = null;
+
+                try
+                {
+                    is = ( (StorageFileItem) item ).getInputStream();
+
+                    os = new FileOutputStream( target );
+
+                    IOUtil.copy( is, os );
+
+                    os.flush();
+                }
+                finally
+                {
+                    IOUtil.close( is );
+                    
+                    IOUtil.close( os );
+                }
+
                 target.setLastModified( item.getModified() );
-                ( (DefaultStorageFileItem) item ).setLength( len );
+
+                ( (DefaultStorageFileItem) item ).setLength( target.length() );
+
                 InputStream mdis = new FileInputStream( target );
+
                 try
                 {
                     getAttributesHandler().storeAttributes( item, mdis );
                 }
                 finally
                 {
-                    if ( mdis != null )
-                    {
-                        mdis.close();
-                    }
+                    IOUtil.close( mdis );
                 }
             }
             catch ( IOException e )
@@ -353,7 +367,7 @@ public class DefaultFSLocalRepositoryStorage
                         + target.getAbsolutePath() );
                 }
                 FileOutputStream os = new FileOutputStream( target );
-                IOUtils.copy( new ByteArrayInputStream( ( LINK_PREFIX + ( (StorageLinkItem) item ).getTarget() )
+                IOUtil.copy( new ByteArrayInputStream( ( LINK_PREFIX + ( (StorageLinkItem) item ).getTarget() )
                     .getBytes() ), os );
                 os.flush();
                 os.close();
