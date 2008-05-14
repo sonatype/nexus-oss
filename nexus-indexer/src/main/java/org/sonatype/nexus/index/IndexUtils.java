@@ -34,15 +34,20 @@ public class IndexUtils
 
     // timestamp
 
+    public static void deleteTimestamp( Directory directory ) throws IOException 
+    {
+        if ( directory.fileExists( TIMESTAMP_FILE ) )
+        {
+            directory.deleteFile( TIMESTAMP_FILE );
+        }
+    }
+    
     public static void updateTimestamp( Directory directory, Date timestamp )
         throws IOException
     {
         synchronized ( directory )
         {
-            if ( directory.fileExists( TIMESTAMP_FILE ) )
-            {
-                directory.deleteFile( TIMESTAMP_FILE );
-            }
+            deleteTimestamp( directory );
 
             IndexOutput io = directory.createOutput( TIMESTAMP_FILE );
 

@@ -269,6 +269,8 @@ public class DefaultIndexingContext
         {
             indexDirectory.deleteFile( names[i] );
         }
+        
+        IndexUtils.deleteTimestamp( indexDirectory );
     }
 
     public String getId()
