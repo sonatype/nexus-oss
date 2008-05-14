@@ -208,8 +208,16 @@ public class DefaultIndexUpdater
             downloadResource( wagon, remoteIndexProperties, indexProperties );
 
             Properties properties = new Properties();
-
-            properties.load( new FileInputStream( indexProperties ) );
+            
+            FileInputStream fis = new FileInputStream( indexProperties );
+            try
+            {
+                properties.load( fis );
+            }
+            finally
+            {
+                fis.close();
+            }
 
             return properties;
         }

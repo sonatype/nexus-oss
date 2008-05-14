@@ -38,35 +38,46 @@ public class DefaultArchiver
         ZipOutputStream zos = new ZipOutputStream( new FileOutputStream( new File( sourceDirectory.getParent(), name
             + ".zip" ) ) );
 
-        zos.setLevel( 9 );
-
-        File[] files = sourceDirectory.listFiles();
-
-        for ( int i = 0; i < files.length; i++ )
+        try
         {
-            ZipEntry e = new ZipEntry( files[i].getName() );
-
-            zos.putNextEntry( e );
-
-            FileInputStream is = new FileInputStream( files[i] );
-
-            byte[] buf = new byte[4096];
-
-            int n;
-
-            while ( ( n = is.read( buf ) ) > 0 )
+            
+            zos.setLevel( 9 );
+    
+            File[] files = sourceDirectory.listFiles();
+    
+            for ( int i = 0; i < files.length; i++ )
             {
-                zos.write( buf, 0, n );
+                ZipEntry e = new ZipEntry( files[i].getName() );
+    
+                zos.putNextEntry( e );
+    
+                FileInputStream is = new FileInputStream( files[i] );
+    
+                try
+                {
+                    byte[] buf = new byte[4096];
+        
+                    int n;
+        
+                    while ( ( n = is.read( buf ) ) > 0 )
+                    {
+                        zos.write( buf, 0, n );
+                    }
+                }
+                finally
+                {
+                    is.close();
+                }
+        
+                zos.flush();
+    
+                zos.closeEntry();
             }
-
-            is.close();
-
-            zos.flush();
-
-            zos.closeEntry();
         }
-
-        zos.close();
+        finally
+        {
+            zos.close();
+        }
     }
 
     public void unzip( File archive, File targetDirectory )
@@ -75,25 +86,36 @@ public class DefaultArchiver
         InputStream in = new BufferedInputStream( new FileInputStream( archive ) );
 
         ZipInputStream zin = new ZipInputStream( in );
-
-        ZipEntry e;
-
-        while ( ( e = zin.getNextEntry() ) != null )
+        
+        try
         {
-            FileOutputStream out = new FileOutputStream( new File( targetDirectory, e.getName() ) );
-
-            byte[] b = new byte[512];
-
-            int len;
-
-            while ( ( len = zin.read( b ) ) != -1 )
+        
+            ZipEntry e;
+        
+            while ( ( e = zin.getNextEntry() ) != null )
             {
-                out.write( b, 0, len );
+                FileOutputStream out = new FileOutputStream( new File( targetDirectory, e.getName() ) );
+        
+                try
+                {
+                    byte[] b = new byte[512];
+            
+                    int len;
+            
+                    while ( ( len = zin.read( b ) ) != -1 )
+                    {
+                        out.write( b, 0, len );
+                    }
+                }
+                finally
+                {
+                  out.close();
+                }
             }
-
-            out.close();
         }
-
-        zin.close();
+        finally
+        {
+            zin.close();
+        }
     }
 }
