@@ -360,6 +360,9 @@ Sonatype.repoServer.RepoServer = function(){
             //note: we don't care about success or failure from the server here.
             //      if the token was expired (403), we can still go to anonymous client state
             delete Ext.lib.Ajax.defaultHeaders.Authorization;
+
+            Sonatype.state.CookieProvider.clear('authToken');
+            Sonatype.state.CookieProvider.clear('username');
             
             Sonatype.view.mainTabPanel.items.each(function(item, i, len){
               this.remove(item, true);
