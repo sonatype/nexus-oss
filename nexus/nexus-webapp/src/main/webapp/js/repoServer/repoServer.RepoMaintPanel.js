@@ -520,12 +520,12 @@ Ext.extend(Sonatype.repoServer.RepoMaintPanel, Ext.Panel, {
       var url;
       
       if (this.ctxBrowseNode){
-        url = Sonatype.config.repos.urls.cache + this.ctxBrowseNode.id.slice(Sonatype.config.servicePath.length);
+        url = Sonatype.config.repos.urls.cache + this.ctxBrowseNode.id.slice(Sonatype.config.host.length + Sonatype.config.servicePath.length);
       }
       else if (this.ctxRecord || this.reposGridPanel.getSelectionModel().hasSelection()){
         //@todo: start updating messaging here
         var rec = (this.ctxRecord) ? this.ctxRecord : this.reposGridPanel.getSelectionModel().getSelected();
-        url = Sonatype.config.repos.urls.cache + rec.id.slice(Sonatype.config.servicePath.length);
+        url = Sonatype.config.repos.urls.cache + rec.id.slice(Sonatype.config.host.length + Sonatype.config.servicePath.length);
       }
       
       //make sure to provide /content path for repository root requests like ../repositories/central
@@ -554,7 +554,7 @@ Ext.extend(Sonatype.repoServer.RepoMaintPanel, Ext.Panel, {
   
   deleteRepoItemHandler : function(){
     if (this.ctxBrowseNode){      
-      var url = Sonatype.config.repos.urls.repositories + this.ctxBrowseNode.id.slice(Sonatype.config.repos.urls.repositories.length);
+      var url = Sonatype.config.repos.urls.repositories + this.ctxBrowseNode.id.slice(Sonatype.config.host.length + Sonatype.config.repos.urls.repositories.length);
       //make sure to provide /content path for repository root requests like ../repositories/central
       if (/.*\/repositories\/[^\/]*$/i.test(url)){
         url += '/content';
@@ -597,12 +597,12 @@ Ext.extend(Sonatype.repoServer.RepoMaintPanel, Ext.Panel, {
       var url;
       
       if (this.ctxBrowseNode){
-        url = Sonatype.config.repos.urls.index + this.ctxBrowseNode.id.slice(Sonatype.config.servicePath.length);
+        url = Sonatype.config.repos.urls.index + this.ctxBrowseNode.id.slice(Sonatype.config.host.length + Sonatype.config.servicePath.length);
       }
       else if (this.ctxRecord || this.reposGridPanel.getSelectionModel().hasSelection()){
         //@todo: start updating messaging here
         var rec = (this.ctxRecord) ? this.ctxRecord : this.reposGridPanel.getSelectionModel().getSelected();
-        url = Sonatype.config.repos.urls.index + rec.id.slice(Sonatype.config.servicePath.length);
+        url = Sonatype.config.repos.urls.index + rec.id.slice(Sonatype.config.host.length + Sonatype.config.servicePath.length);
       }
       
       //make sure to provide /content path for repository root requests like ../repositories/central
@@ -635,12 +635,12 @@ Ext.extend(Sonatype.repoServer.RepoMaintPanel, Ext.Panel, {
       var url;
       
       if (this.ctxBrowseNode){
-        url = Sonatype.config.repos.urls.attributes + this.ctxBrowseNode.id.slice(Sonatype.config.servicePath.length);
+        url = Sonatype.config.repos.urls.attributes + this.ctxBrowseNode.id.slice(Sonatype.config.host.length + Sonatype.config.servicePath.length);
       }
       else if (this.ctxRecord || this.reposGridPanel.getSelectionModel().hasSelection()){
         //@todo: start updating messaging here
         var rec = (this.ctxRecord) ? this.ctxRecord : this.reposGridPanel.getSelectionModel().getSelected();
-        url = Sonatype.config.repos.urls.attributes + rec.id.slice(Sonatype.config.servicePath.length);
+        url = Sonatype.config.repos.urls.attributes + rec.id.slice(Sonatype.config.host.length + Sonatype.config.servicePath.length);
       }
       
       //make sure to provide /content path for repository root requests like ../repositories/central
