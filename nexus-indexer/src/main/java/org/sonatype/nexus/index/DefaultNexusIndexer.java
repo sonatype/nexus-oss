@@ -7,7 +7,7 @@
  *
  * Contributors:
  *    Eugene Kuleshov (Sonatype)
- *    Tam�s Cserven�k (Sonatype)
+ *    Tamas Cservenak (Sonatype)
  *    Brian Fox (Sonatype)
  *    Jason Van Zyl (Sonatype)
  *******************************************************************************/
@@ -29,6 +29,7 @@ import java.util.Set;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.Hits;
 import org.apache.lucene.search.Query;
@@ -85,7 +86,8 @@ public class DefaultNexusIndexer
     // ----------------------------------------------------------------------------
 
     public IndexingContext addIndexingContext( String id, String repositoryId, File repository, File indexDirectory,
-        String repositoryUrl, String indexUpdateUrl, List<? extends IndexCreator> indexers, boolean reclaimIndexOwnership )
+        String repositoryUrl, String indexUpdateUrl, List<? extends IndexCreator> indexers,
+        boolean reclaimIndexOwnership )
         throws IOException,
             UnsupportedExistingLuceneIndexException
     {
@@ -105,7 +107,8 @@ public class DefaultNexusIndexer
     }
 
     public IndexingContext addIndexingContext( String id, String repositoryId, File repository, Directory directory,
-        String repositoryUrl, String indexUpdateUrl, List<? extends IndexCreator> indexers, boolean reclaimIndexOwnership )
+        String repositoryUrl, String indexUpdateUrl, List<? extends IndexCreator> indexers,
+        boolean reclaimIndexOwnership )
         throws IOException,
             UnsupportedExistingLuceneIndexException
     {
@@ -149,23 +152,23 @@ public class DefaultNexusIndexer
         scan( context, null );
     }
 
-    public void scan( IndexingContext context, final ArtifactScanningListener listener ) 
+    public void scan( IndexingContext context, final ArtifactScanningListener listener )
         throws IOException
     {
         scan( context, null, false );
     }
-    
+
     public void scan( IndexingContext context, final ArtifactScanningListener listener, boolean update )
         throws IOException
     {
-        IndexReader r = context.getIndexReader();
-        
-        HashSet<String> infos = null;
-        
         final HashSet<String> allGroups = new HashSet<String>();
-        
+
         final HashSet<String> groups = new HashSet<String>();
-        
+
+        HashSet<String> infos = null;
+
+        IndexReader r = context.getIndexReader();
+
         if ( update )
         {
             infos = new HashSet<String>();
@@ -181,12 +184,12 @@ public class DefaultNexusIndexer
                     if ( uinfo != null )
                     {
                         infos.add( uinfo );
-                        //add all existing groupIds to the lists, as they will
+                        // add all existing groupIds to the lists, as they will
                         // not be "discovered" and would be missing from the new list..
-                        String grId = uinfo.substring( 0, uinfo.indexOf('|') );
+                        String grId = uinfo.substring( 0, uinfo.indexOf( '|' ) );
                         allGroups.add( grId );
                         int ind = grId.indexOf( '.' );
-                        if (ind > -1) 
+                        if ( ind > -1 )
                         {
                             grId = grId.substring( 0, ind );
                         }
@@ -195,7 +198,7 @@ public class DefaultNexusIndexer
                 }
             }
         }
-        
+
         File repositoryDirectory = context.getRepository();
 
         if ( !repositoryDirectory.exists() )
@@ -204,7 +207,6 @@ public class DefaultNexusIndexer
 
             return;
         }
-
 
         ArtifactScanningListener groupCollector = new ArtifactScanningListener()
         {
@@ -263,7 +265,7 @@ public class DefaultNexusIndexer
             setRootGroups( context, groups );
 
             setAllGroups( context, allGroups );
-            
+
         }
         catch ( ScanningException e )
         {
@@ -302,11 +304,11 @@ public class DefaultNexusIndexer
     // Modifying
     // ----------------------------------------------------------------------------
 
-//    public void addArtifactToIndex( File pom, IndexingContext context )
-//        throws IOException
-//    {
-//        addArtifactToIndex( artifactContextProducer.getArtifactContext( context, pom ), context );
-//    }
+    // public void addArtifactToIndex( File pom, IndexingContext context )
+    // throws IOException
+    // {
+    // addArtifactToIndex( artifactContextProducer.getArtifactContext( context, pom ), context );
+    // }
 
     public void addArtifactToIndex( ArtifactContext ac, IndexingContext context )
         throws IOException
@@ -317,8 +319,8 @@ public class DefaultNexusIndexer
             updateGroups( ac, context );
         }
     }
-    
-    private void updateGroups(ArtifactContext ac, IndexingContext context) 
+
+    private void updateGroups( ArtifactContext ac, IndexingContext context )
         throws IOException
     {
         Set<String> groups = getRootGroups( context );
@@ -329,18 +331,18 @@ public class DefaultNexusIndexer
             setRootGroups( context, groups );
         }
         groups = getAllGroups( context );
-        if ( !groups.contains( ac.getArtifactInfo().groupId )) 
+        if ( !groups.contains( ac.getArtifactInfo().groupId ) )
         {
             groups.add( ac.getArtifactInfo().groupId );
             setAllGroups( context, groups );
         }
     }
 
-//    public void deleteArtifactFromIndex( File pom, IndexingContext context )
-//        throws IOException
-//    {
-//        deleteArtifactFromIndex( artifactContextProducer.getArtifactContext( context, pom ), context );
-//    }
+    // public void deleteArtifactFromIndex( File pom, IndexingContext context )
+    // throws IOException
+    // {
+    // deleteArtifactFromIndex( artifactContextProducer.getArtifactContext( context, pom ), context );
+    // }
 
     public void deleteArtifactFromIndex( ArtifactContext ac, IndexingContext context )
         throws IOException
@@ -361,8 +363,8 @@ public class DefaultNexusIndexer
         Hits hits = context.getIndexSearcher().search(
             new TermQuery( new Term( ArtifactInfo.ROOT_GROUPS, ArtifactInfo.ROOT_GROUPS_VALUE ) ) );
 
-        Set<String> groups = new LinkedHashSet<String>(Math.max(10, hits.length()));
-        
+        Set<String> groups = new LinkedHashSet<String>( Math.max( 10, hits.length() ) );
+
         if ( hits.length() > 0 )
         {
             Document doc = hits.doc( 0 );
@@ -381,9 +383,18 @@ public class DefaultNexusIndexer
     public void setRootGroups( IndexingContext context, Collection<String> groups )
         throws IOException
     {
-        context.getIndexWriter().updateDocument(
-            new Term( ArtifactInfo.ROOT_GROUPS, ArtifactInfo.ROOT_GROUPS_VALUE ),
-            createRootGroupsDocument( groups ) );
+        IndexWriter w = context.getIndexWriter();
+
+        try
+        {
+            w.updateDocument(
+                new Term( ArtifactInfo.ROOT_GROUPS, ArtifactInfo.ROOT_GROUPS_VALUE ),
+                createRootGroupsDocument( groups ) );
+        }
+        finally
+        {
+            w.close();
+        }
     }
 
     private Document createRootGroupsDocument( Collection<String> groups )
@@ -402,7 +413,7 @@ public class DefaultNexusIndexer
 
         return groupDoc;
     }
-    
+
     // ----------------------------------------------------------------------------
     // All groups
     // ----------------------------------------------------------------------------
@@ -412,7 +423,7 @@ public class DefaultNexusIndexer
     {
         Hits hits = context.getIndexSearcher().search(
             new TermQuery( new Term( ArtifactInfo.ALL_GROUPS, ArtifactInfo.ALL_GROUPS_VALUE ) ) );
-        Set<String> groups = new LinkedHashSet<String>(Math.max(10, hits.length()));
+        Set<String> groups = new LinkedHashSet<String>( Math.max( 10, hits.length() ) );
         if ( hits.length() > 0 )
         {
             Document doc = hits.doc( 0 );
@@ -431,9 +442,17 @@ public class DefaultNexusIndexer
     public void setAllGroups( IndexingContext context, Collection<String> groups )
         throws IOException
     {
-        context.getIndexWriter().updateDocument(
-            new Term( ArtifactInfo.ALL_GROUPS, ArtifactInfo.ALL_GROUPS_VALUE ),
-            createAllGroupsDocument( groups ) );
+        IndexWriter w = context.getIndexWriter();
+        try
+        {
+            w.updateDocument(
+                new Term( ArtifactInfo.ALL_GROUPS, ArtifactInfo.ALL_GROUPS_VALUE ),
+                createAllGroupsDocument( groups ) );
+        }
+        finally
+        {
+            w.close();
+        }
     }
 
     private Document createAllGroupsDocument( Collection<String> groups )
@@ -452,7 +471,6 @@ public class DefaultNexusIndexer
 
         return groupDoc;
     }
-    
 
     // ----------------------------------------------------------------------------
     // Searching
