@@ -166,6 +166,7 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
                 itemCls: 'required-field',
                 helpText: ht.startDate,
                 name: 'startDate',
+                disabled:true,
                 allowBlank:false
               },
               {
@@ -174,7 +175,8 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
                 itemCls: 'required-field',
                 helpText: ht.startTime,
                 name: 'startTime',
-                width: 75,
+                width: 75,                
+                disabled:true,
                 allowBlank:false
               },
               {
@@ -184,6 +186,7 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
                 helpText: ht.recurringTime,
                 name: 'recurringTime',
                 width: 75,
+                disabled:true,
                 allowBlank:false
               }
             ]
@@ -205,6 +208,7 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
                 itemCls: 'required-field',
                 helpText: ht.startDate,
                 name: 'startDate',
+                disabled:true,
                 allowBlank:false
               },
               {
@@ -214,6 +218,7 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
                 helpText: ht.startTime,
                 name: 'startTime',
                 width: 75,
+                disabled:true,
                 allowBlank:false
               },
               {
@@ -223,6 +228,7 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
                 helpText: ht.recurringTime,
                 name: 'recurringTime',
                 width: 75,
+                disabled:true,
                 allowBlank:false
               },
               {
@@ -352,6 +358,7 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
                 itemCls: 'required-field',
                 helpText: ht.startDate,
                 name: 'startDate',
+                disabled:true,
                 allowBlank:false
               },
               {
@@ -361,6 +368,7 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
                 helpText: ht.startTime,
                 name: 'startTime',
                 width: 75,
+                disabled:true,
                 allowBlank:false
               },
               {
@@ -370,6 +378,7 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
                 helpText: ht.recurringTime,
                 name: 'recurringTime',
                 width: 75,
+                disabled:true,
                 allowBlank:false
               }
             ]
@@ -392,27 +401,7 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
                 name: 'cronCommand',
                 helpText: ht.cronCommand,
                 width: 200,
-                allowBlank:false
-              }
-            ]
-          },
-          {
-            xtype: 'fieldset',
-		    checkboxToggle:false,
-		    title: 'Advanced Schedule Settings',
-		    anchor: Sonatype.view.FIELDSET_OFFSET,
-		    collapsible: false,
-		    autoHeight:true,
-		    layoutConfig: {
-	          labelSeparator: ''
-	        },
-            items: [
-              {
-                xtype: 'textfield',
-                fieldLabel: 'cron command',
-                itemCls: 'required-field',
-                name: 'cronCommand',
-                width: 200,
+                disabled:true,
                 allowBlank:false
               }
             ]
@@ -633,7 +622,7 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
   saveHandler : function(formInfoObj){
     if (formInfoObj.formPanel.form.isValid()) {
       var isNew = formInfoObj.isNew;
-      var scheduleType = formInfoObj.formPanel.find('name', 'scheduleType')[0].getValue().toLowerCase();
+      var serviceSchedule = formInfoObj.formPanel.find('name', 'serviceSchedule')[0].getValue().toLowerCase();
       var createUri = Sonatype.config.repos.urls.schedules;
       var updateUri = (formInfoObj.resourceUri) ? formInfoObj.resourceUri : '';
       var form = formInfoObj.formPanel.form;
@@ -643,7 +632,7 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
         url: isNew ? createUri : updateUri,
         waitMsg: isNew ? 'Creating scheduled service...' : 'Updating scheduled service configuration...',
         fpanel: formInfoObj.formPanel,
-        dataModifiers: this.submitDataModFuncs[scheduleType],
+        dataModifiers: this.submitDataModFuncs[serviceSchedule],
         serviceDataObj : Sonatype.repoServer.referenceData.schedule,
         isNew : isNew //extra option to send to callback, instead of conditioning on method
       });
@@ -966,6 +955,9 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
   
   serviceScheduleSelectHandler : function(combo, record, index){
     var schedulePanel = this.ownerCt.find('id', 'schedule-config-card-panel')[0];
+    schedulePanel.getLayout().activeItem.items.each(function(item){
+      item.disable();
+    });
     if (record.data.value == 'Daily'){
       schedulePanel.getLayout().setActiveItem(schedulePanel.items.itemAt(1));
     }
@@ -981,6 +973,9 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
     else {
       schedulePanel.getLayout().setActiveItem(schedulPanel.items.itemAt(0));
     }
+    schedulePanel.getLayout().activeItem.items.each(function(item){
+      item.enable();
+    });
     schedulePanel.doLayout();
   },
   
