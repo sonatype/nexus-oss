@@ -153,25 +153,41 @@ Sonatype.repoServer.referenceData = {
   },
   
   schedule : {
-    id : "",
-    name : "",
-    serviceType : "",
-    serviceSchedule : "",
-    enabled : false,
     daily : {
-      startTime : "",
-      recurringTime : ""
+	  id : "",
+	  name : "",
+	  serviceType : "",
+	  serviceSchedule : "",
+	  enabled : false,
+	  startTime : "",
+	  recurringTime : ""
     },
     weekly : {
-      startTime : "",
-      recurringTime : ""
+	  id : "",
+	  name : "",
+	  serviceType : "",
+	  serviceSchedule : "",
+	  enabled : false,
+	  startTime : "",
+	  recurringTime : "",
+	  recurringDay : []
     },
     monthly : {
-      startTime : "",
-      recurringTime : ""
+	  id : "",
+	  name : "",
+	  serviceType : "",
+	  serviceSchedule : "",
+	  enabled : false,
+	  startTime : "",
+	  recurringTime : ""
     },
     advanced : {
-      cronCommand : ""
+	  id : "",
+	  name : "",
+	  serviceType : "",
+	  serviceSchedule : "",
+	  enabled : false,
+	  cronCommand : ""
     }
   }
 };

@@ -50,7 +50,8 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
       startTime : this.exportStartTimeHelper.createDelegate(this)
     },
     weekly : {
-      startTime : this.exportStartTimeHelper.createDelegate(this)
+      startTime : this.exportStartTimeHelper.createDelegate(this),
+      recurringDay : this.exportRecurringDayHelper.createDelegate(this)
     },
     monthly : {
       startTime : this.exportStartTimeHelper.createDelegate(this)
@@ -633,7 +634,7 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
         waitMsg: isNew ? 'Creating scheduled service...' : 'Updating scheduled service configuration...',
         fpanel: formInfoObj.formPanel,
         dataModifiers: this.submitDataModFuncs[serviceSchedule],
-        serviceDataObj : Sonatype.repoServer.referenceData.schedule,
+        serviceDataObj : Sonatype.repoServer.referenceData.schedule[serviceSchedule],
         isNew : isNew //extra option to send to callback, instead of conditioning on method
       });
     }
@@ -1044,5 +1045,17 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
     //TODO: Combine the date & time
     
     return "";
+  },
+  exportRecurringDayHelper : function(val, fpanel){
+    var selectedTree = Ext.getCmp(fpanel.id + '_weekdays-tree');
+
+    var outputArr = [];
+    var nodes = selectedTree.root.childNodes;
+
+    for(var i = 0; i < nodes.length; i++){
+      outputArr[i] = nodes[i].attributes.payload;
+    }
+
+    return outputArr;
   }
 });
