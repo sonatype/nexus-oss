@@ -159,6 +159,10 @@ Sonatype.repoServer.referenceData = {
 	  serviceType : "",
 	  serviceSchedule : "",
 	  enabled : false,
+	  serviceProperties : [{
+	    name: "",
+	    value: ""
+	  }],
 	  startTime : "",
 	  recurringTime : ""
     },
@@ -168,6 +172,10 @@ Sonatype.repoServer.referenceData = {
 	  serviceType : "",
 	  serviceSchedule : "",
 	  enabled : false,
+	  serviceProperties : [{
+	    name: "",
+	    value: ""
+	  }],
 	  startTime : "",
 	  recurringTime : "",
 	  recurringDay : []
@@ -178,9 +186,13 @@ Sonatype.repoServer.referenceData = {
 	  serviceType : "",
 	  serviceSchedule : "",
 	  enabled : false,
+	  serviceProperties : [{
+	    name: "",
+	    value: ""
+	  }],
 	  startTime : "",
 	  recurringTime : "",
-    recurringDay : []
+      recurringDay : []
     },
     advanced : {
 	  id : "",
@@ -188,6 +200,10 @@ Sonatype.repoServer.referenceData = {
 	  serviceType : "",
 	  serviceSchedule : "",
 	  enabled : false,
+	  serviceProperties : [{
+	    name: "",
+	    value: ""
+	  }],
 	  cronCommand : ""
     }
   }

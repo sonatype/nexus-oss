@@ -48,23 +48,27 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
   this.submitDataModFuncs = {
     daily : {
       serviceSchedule : Sonatype.utils.lowercase,
+      serviceProperties : this.exportServicePropertiesHelper.createDelegate(this),
       startTime : this.exportStartTimeHelper.createDelegate(this),
       recurringTime : this.exportRecurringTimeHelper.createDelegate(this)
     },
     weekly : {
       serviceSchedule : Sonatype.utils.lowercase,
+      serviceProperties : this.exportServicePropertiesHelper.createDelegate(this),
       startTime : this.exportStartTimeHelper.createDelegate(this),
       recurringTime : this.exportRecurringTimeHelper.createDelegate(this),
       recurringDay : this.exportRecurringDayHelper.createDelegate(this)
     },
     monthly : {
       serviceSchedule : Sonatype.utils.lowercase,
+      serviceProperties : this.exportServicePropertiesHelper.createDelegate(this),
       startTime : this.exportStartTimeHelper.createDelegate(this),
       recurringTime : this.exportRecurringTimeHelper.createDelegate(this),
       recurringDay : this.exportMonthlyRecurringDayHelper .createDelegate(this)
     },
     advanced : {
-      serviceSchedule : Sonatype.utils.lowercase   
+      serviceSchedule : Sonatype.utils.lowercase,
+      serviceProperties : this.exportServicePropertiesHelper.createDelegate(this),
     }
   };
   
@@ -1329,6 +1333,14 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
     if (fpanel.find('name','dayLast')[0].getValue()){
       outputArr[j] = 'last';
     }
+    return outputArr;
+  },
+  exportServicePropertiesHelper : function(val, fpanel){
+    var outputArr = [];
+    var dataStore = fpanel.find('id', fpanel.id + '_service_param_grid')[0].getStore();
+    dataStore.each(function(item, i, len){
+      outputArr[i] = item.data;
+    }, dataStore);
     return outputArr;
   }
 });
