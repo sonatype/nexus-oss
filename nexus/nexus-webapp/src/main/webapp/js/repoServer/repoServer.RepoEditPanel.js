@@ -208,7 +208,7 @@ Sonatype.repoServer.RepoEditPanel = function(config){
         allowBlank:true,
         validator: function(v){
           if(v.match(/^(?:file):\//i)){ return true; }
-          else{ return 'Protocol must be file:/'; }
+          else{ return 'Protocol must be file://'; }
         }
       },
       {
@@ -401,7 +401,7 @@ Sonatype.repoServer.RepoEditPanel = function(config){
         allowBlank:true,
         validator: function(v){
           if(v.match(/^(?:file):\//i)){ return true; }
-          else{ return 'Protocol must be file:/'; }
+          else{ return 'Protocol must be file://'; }
         }
       },
       {
