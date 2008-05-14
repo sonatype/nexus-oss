@@ -47,16 +47,20 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
   
   this.submitDataModFuncs = {
     daily : {
+      serviceSchedule : Sonatype.utils.lowercase,
       startTime : this.exportStartTimeHelper.createDelegate(this)
     },
     weekly : {
+      serviceSchedule : Sonatype.utils.lowercase,
       startTime : this.exportStartTimeHelper.createDelegate(this),
       recurringDay : this.exportRecurringDayHelper.createDelegate(this)
     },
     monthly : {
+      serviceSchedule : Sonatype.utils.lowercase,
       startTime : this.exportStartTimeHelper.createDelegate(this)
     },
     advanced : {
+      serviceSchedule : Sonatype.utils.lowercase    
     }
   };
   
@@ -381,6 +385,225 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
                 width: 75,
                 disabled:true,
                 allowBlank:false
+              },
+              {
+                xtype: 'panel',
+                layout: 'column',
+                items: [
+                  {
+                    width: 180,
+                    xtype: 'label',
+                    text: 'Days'
+                  },
+                  {
+                    xtype: 'panel',
+                    layout: 'column',
+                    items: [
+                      {
+                        xtype: 'panel',
+                        width: 50,
+                        items: [
+                          {
+                            xtype: 'checkbox',
+                            boxLabel: '1',
+                            name: 'day1'
+                          },
+                          {
+                            xtype: 'checkbox',
+                            boxLabel: '8',
+                            name: 'day8'
+                          },
+                          {
+                            xtype: 'checkbox',
+                            boxLabel: '15',
+                            name: 'day15'
+                          },
+                          {
+                            xtype: 'checkbox',
+                            boxLabel: '22',
+                            name: 'day22'
+                          },
+                          {
+                            xtype: 'checkbox',
+                            boxLabel: '29',
+                            name: 'day29'
+                          }
+                        ]                    
+                      },
+                      {
+                        xtype: 'panel',
+                        width: 50,
+                        items: [
+                          {
+                            xtype: 'checkbox',
+                            boxLabel: '2',
+                            name: 'day2',
+                          },
+                          {
+                            xtype: 'checkbox',
+                            boxLabel: '9',
+                            name: 'day9',
+                          },
+                          {
+                            xtype: 'checkbox',
+                            boxLabel: '16',
+                            name: 'day16',
+                          },
+                          {
+                            xtype: 'checkbox',
+                            boxLabel: '23',
+                            name: 'day23',
+                          },
+                          {
+                            xtype: 'checkbox',
+                            boxLabel: '30',
+                            name: 'day30',
+                          }
+                        ]                    
+                      },
+                      {
+                        xtype: 'panel',
+                        width: 50,
+                        items: [
+                          {
+                            xtype: 'checkbox',
+                            boxLabel: '3',
+                            name: 'day3',
+                          },
+                          {
+                            xtype: 'checkbox',
+                            boxLabel: '10',
+                            name: 'day10',
+                          },
+                          {
+                            xtype: 'checkbox',
+                            boxLabel: '17',
+                            name: 'day17',
+                          },
+                          {
+                            xtype: 'checkbox',
+                            boxLabel: '24',
+                            name: 'day24',
+                          },
+                          {
+                            xtype: 'checkbox',
+                            boxLabel: '31',
+                            name: 'day31',
+                          }
+                        ]                    
+                      },
+                      {
+                        xtype: 'panel',
+                        width: 50,
+                        items: [
+                          {
+                            xtype: 'checkbox',
+                            boxLabel: '4',
+                            name: 'day4',
+                          },
+                          {
+                            xtype: 'checkbox',
+                            boxLabel: '11',
+                            name: 'day11',
+                          },
+                          {
+                            xtype: 'checkbox',
+                            boxLabel: '18',
+                            name: 'day18',
+                          },
+                          {
+                            xtype: 'checkbox',
+                            boxLabel: '25',
+                            name: 'day25',
+                          },
+                          {
+                            xtype: 'checkbox',
+                            boxLabel: 'Last',
+                            name: 'dayLast',
+                          }
+                        ]                    
+                      },
+                      {
+                        xtype: 'panel',
+                        width: 50,
+                        items: [
+                          {
+                            xtype: 'checkbox',
+                            boxLabel: '5',
+                            name: 'day5',
+                          },
+                          {
+                            xtype: 'checkbox',
+                            boxLabel: '12',
+                            name: 'day12',
+                          },
+                          {
+                            xtype: 'checkbox',
+                            boxLabel: '19',
+                            name: 'day19',
+                          },
+                          {
+                            xtype: 'checkbox',
+                            boxLabel: '26',
+                            name: 'day26',
+                          }
+                        ]                    
+                      },
+                      {
+                        xtype: 'panel',
+                        width: 50,
+                        items: [
+                          {
+                            xtype: 'checkbox',
+                            boxLabel: '6',
+                            name: 'day6',
+                          },
+                          {
+                            xtype: 'checkbox',
+                            boxLabel: '13',
+                            name: 'day13',
+                          },
+                          {
+                            xtype: 'checkbox',
+                            boxLabel: '20',
+                            name: 'day20',
+                          },
+                          {
+                            xtype: 'checkbox',
+                            boxLabel: '27',
+                            name: 'day27',
+                          }
+                        ]                    
+                      },
+                      {
+                        xtype: 'panel',
+                        width: 50,
+                        items: [
+                          {
+                            xtype: 'checkbox',
+                            boxLabel: '7',
+                            name: 'day7',
+                          },
+                          {
+                            xtype: 'checkbox',
+                            boxLabel: '14',
+                            name: 'day14',
+                          },
+                          {
+                            xtype: 'checkbox',
+                            boxLabel: '21',
+                            name: 'day21',
+                          },
+                          {
+                            xtype: 'checkbox',
+                            boxLabel: '28',
+                            name: 'day28',
+                          }
+                        ]                    
+                      }
+                    ]
+                  }
+                ]
               }
             ]
           },
@@ -1056,6 +1279,10 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
       outputArr[i] = nodes[i].attributes.payload;
     }
 
+    return outputArr;
+  },
+  exportMonthlyRecurringDayHelper : function(val, fpanel){
+    var outputArr = [];
     return outputArr;
   }
 });

@@ -211,7 +211,7 @@ public class ScheduledServiceResponseTest
         throws Exception
     {
         String jsonString = "{ \"org.sonatype.nexus.rest.model.ScheduledServiceListResourceResponse\" : " +
-            "{\"data\":{\"id\":null,\"name\":\"test\",\"serviceType\":\"Synchronize Repositories\",\"serviceSchedule\":\"Weekly\",\"enabled\":false,\"startTime\":\"\",\"recurringTime\":null}}}";
+            "{\"data\":{\"id\":null,\"name\":\"test\",\"serviceType\":\"Synchronize Repositories\",\"serviceSchedule\":\"weekly\",\"enabled\":false,\"startTime\":\"\",\"recurringTime\":null}}}";
         XStreamRepresentation representation = new XStreamRepresentation(
             xstream,
             jsonString,
@@ -221,5 +221,19 @@ public class ScheduledServiceResponseTest
             .getPayload( new ScheduledServiceListResourceResponse() );
 
     }
-
+    /* NOT CURRENTLY FUNCTIONING
+    public void testWeeklyScheduledService()
+        throws Exception
+    {
+        String jsonString = "{ \"org.sonatype.nexus.rest.model.ScheduledServiceListResourceResponse\" : " +
+            "{\"data\":{\"id\":null,\"name\":\"test\",\"serviceType\":\"Synchronize Repositories\",\"serviceSchedule\":\"weekly\",\"enabled\":false,\"startTime\":\"\",\"recurringTime\":null,\"recurringDay\":[\"Monday\",\"Wednesday\"]}}}";
+        XStreamRepresentation representation = new XStreamRepresentation(
+            xstream,
+            jsonString,
+            MediaType.APPLICATION_JSON );
+    
+        ScheduledServiceListResourceResponse response = (ScheduledServiceListResourceResponse) representation
+            .getPayload( new ScheduledServiceListResourceResponse() );
+    }
+*/
 }
