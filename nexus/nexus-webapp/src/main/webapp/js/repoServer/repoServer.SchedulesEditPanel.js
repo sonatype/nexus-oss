@@ -36,12 +36,28 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
   
   this.loadDataModFuncs = {
     daily : {
+      serviceSchedule : Sonatype.utils.capitalize,
+      serviceProperties : this.importServicePropertiesHelper.createDelegate(this),
+      startTime : this.importStartTimeHelper.createDelegate(this),
+      recurringTime : this.importRecurringTimeHelper.createDelegate(this),
+      recurringDay : this.importRecurringDayHelper.createDelegate(this) 
     },
     weekly : {
+      serviceSchedule : Sonatype.utils.capitalize,
+      serviceProperties : this.importServicePropertiesHelper.createDelegate(this),
+      startTime : this.importStartTimeHelper.createDelegate(this),
+      recurringTime : this.importRecurringTimeHelper.createDelegate(this),
+      recurringDay : this.importMonthlyRecurringDayHelper.createDelegate(this)
     },
     monthly : {
+      serviceSchedule : Sonatype.utils.capitalize,
+      serviceProperties : this.importServicePropertiesHelper.createDelegate(this),
+      startTime : this.importStartTimeHelper.createDelegate(this),
+      recurringTime : this.importRecurringTimeHelper.createDelegate(this)
     },
     advanced : {
+      serviceSchedule : Sonatype.utils.capitalize,
+      serviceProperties : this.importServicePropertiesHelper.createDelegate(this)
     }
   };
   
@@ -68,7 +84,7 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
     },
     advanced : {
       serviceSchedule : Sonatype.utils.lowercase,
-      serviceProperties : this.exportServicePropertiesHelper.createDelegate(this),
+      serviceProperties : this.exportServicePropertiesHelper.createDelegate(this)
     }
   };
   
@@ -445,27 +461,27 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
                           {
                             xtype: 'checkbox',
                             boxLabel: '2',
-                            name: 'day2',
+                            name: 'day2'
                           },
                           {
                             xtype: 'checkbox',
                             boxLabel: '9',
-                            name: 'day9',
+                            name: 'day9'
                           },
                           {
                             xtype: 'checkbox',
                             boxLabel: '16',
-                            name: 'day16',
+                            name: 'day16'
                           },
                           {
                             xtype: 'checkbox',
                             boxLabel: '23',
-                            name: 'day23',
+                            name: 'day23'
                           },
                           {
                             xtype: 'checkbox',
                             boxLabel: '30',
-                            name: 'day30',
+                            name: 'day30'
                           }
                         ]                    
                       },
@@ -476,27 +492,27 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
                           {
                             xtype: 'checkbox',
                             boxLabel: '3',
-                            name: 'day3',
+                            name: 'day3'
                           },
                           {
                             xtype: 'checkbox',
                             boxLabel: '10',
-                            name: 'day10',
+                            name: 'day10'
                           },
                           {
                             xtype: 'checkbox',
                             boxLabel: '17',
-                            name: 'day17',
+                            name: 'day17'
                           },
                           {
                             xtype: 'checkbox',
                             boxLabel: '24',
-                            name: 'day24',
+                            name: 'day24'
                           },
                           {
                             xtype: 'checkbox',
                             boxLabel: '31',
-                            name: 'day31',
+                            name: 'day31'
                           }
                         ]                    
                       },
@@ -507,27 +523,27 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
                           {
                             xtype: 'checkbox',
                             boxLabel: '4',
-                            name: 'day4',
+                            name: 'day4'
                           },
                           {
                             xtype: 'checkbox',
                             boxLabel: '11',
-                            name: 'day11',
+                            name: 'day11'
                           },
                           {
                             xtype: 'checkbox',
                             boxLabel: '18',
-                            name: 'day18',
+                            name: 'day18'
                           },
                           {
                             xtype: 'checkbox',
                             boxLabel: '25',
-                            name: 'day25',
+                            name: 'day25'
                           },
                           {
                             xtype: 'checkbox',
                             boxLabel: 'Last',
-                            name: 'dayLast',
+                            name: 'dayLast'
                           }
                         ]                    
                       },
@@ -538,22 +554,22 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
                           {
                             xtype: 'checkbox',
                             boxLabel: '5',
-                            name: 'day5',
+                            name: 'day5'
                           },
                           {
                             xtype: 'checkbox',
                             boxLabel: '12',
-                            name: 'day12',
+                            name: 'day12'
                           },
                           {
                             xtype: 'checkbox',
                             boxLabel: '19',
-                            name: 'day19',
+                            name: 'day19'
                           },
                           {
                             xtype: 'checkbox',
                             boxLabel: '26',
-                            name: 'day26',
+                            name: 'day26'
                           }
                         ]                    
                       },
@@ -564,22 +580,22 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
                           {
                             xtype: 'checkbox',
                             boxLabel: '6',
-                            name: 'day6',
+                            name: 'day6'
                           },
                           {
                             xtype: 'checkbox',
                             boxLabel: '13',
-                            name: 'day13',
+                            name: 'day13'
                           },
                           {
                             xtype: 'checkbox',
                             boxLabel: '20',
-                            name: 'day20',
+                            name: 'day20'
                           },
                           {
                             xtype: 'checkbox',
                             boxLabel: '27',
-                            name: 'day27',
+                            name: 'day27'
                           }
                         ]                    
                       },
@@ -590,22 +606,22 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
                           {
                             xtype: 'checkbox',
                             boxLabel: '7',
-                            name: 'day7',
+                            name: 'day7'
                           },
                           {
                             xtype: 'checkbox',
                             boxLabel: '14',
-                            name: 'day14',
+                            name: 'day14'
                           },
                           {
                             xtype: 'checkbox',
                             boxLabel: '21',
-                            name: 'day21',
+                            name: 'day21'
                           },
                           {
                             xtype: 'checkbox',
                             boxLabel: '28',
-                            name: 'day28',
+                            name: 'day28'
                           }
                         ]                    
                       }
@@ -1273,16 +1289,18 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
     var selectedStartDate = "";
     var selectedStartTime = "";
     
-    for each (startDate in fpanel.find('name', 'startDate')){
-      if (!startDate.disabled){
-        selectedStartDate = startDate;
+    var startDateFields = fpanel.find('name', 'startDate');
+    for(var i=0; i<startDateFields.length; i++){
+      if (!startDateFields[i].disabled){
+        selectedStartDate = startDateFields[i];
         break;
       }
     }
     
-    for each (startTime in fpanel.find('name', 'startTime')){
-      if (!startTime.disabled){
-        selectedStartTime = startTime;
+    var startTimeFields = fpanel.find('name', 'startTime');
+    for(var i=0; i<startTimeFields.length; i++){
+      if (!startTimeFields[i].disabled){
+        selectedStartTime = startTimeFields[i];
         break;
       }
     }
@@ -1298,9 +1316,10 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
   },
   exportRecurringTimeHelper : function(val, fpanel){
     var selectedRecurringTime = "";
-    for each (recurringTime in fpanel.find('name', 'recurringTime')){
-      if (!recurringTime.disabled){
-        selectedRecurringTime = recurringTime;
+    var recurringTimeFields = fpanel.find('name', 'recurringTime');
+    for(var i=0; i<recurringTimeFields.length; i++){
+      if (!recurringTimeFields[i].disabled){
+        selectedRecurringTime = recurringTimeFields[i];
         break;
       }
     }
@@ -1342,5 +1361,112 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
       outputArr[i] = item.data;
     }, dataStore);
     return outputArr;
+  },
+  importStartTimeHelper : function(val, fpanel){
+    var selectedStartDate = "";
+    var selectedStartTime = "";
+    var startDateFields = fpanel.find('name', 'startDate');
+    for(var i=0; i<startDateFields.length; i++){
+      if (!startDateFields[i].disabled){
+        selectedStartDate = startDateFields[i];
+        break;
+      }
+    }
+    
+    var startTimeFields = fpanel.find('name', 'startTime');
+    for(var i=0; i<startTimeFields.length; i++){
+      if (!startTimeFields[i].disabled){
+        selectedStartTime = startTimeFields[i];
+        break;
+      }
+    }
+    
+    var afternoon = false;
+    var hours = val.getHours();
+    if (hours > 12){
+      hours = hours - 12;
+      afternoon = true;
+    }
+    var minutes = val.getMinutes();
+    selectedStartTime.setValue(hours + ':' + minutes + (afternoon ? ' PM' : ' AM'));
+    selectedStartDate.setValue(val);
+    return val;
+  },
+  importRecurringTimeHelper : function(val, fpanel){
+    var selectedRecurringTime = "";
+    var recurringTimeFields = fpanel.find('name', 'recurringTime');
+    for(var i=0; i<recurringTimeFields.length; i++){
+      if (!recurringTimeFields[i].disabled){
+        selectedRecurringTime = recurringTimeFields[i];
+        break;
+      }
+    }
+    
+    var afternoon = false;
+    var hours = parseInt(val.substring(0, val.indexOf(':')));
+    if (hours > 12){
+      hours = hours - 12;
+      afternoon = true;
+    }
+    var minutes = val.substring(val.indexOf(':') + 1, val.indexOf(':') + 3);
+    selectedReccuringTime.setValue(hours + ':' + minutes + (afternoon ? ' PM' : ' AM'));
+    return val;
+  },
+  importRecurringDayHelper : function(arr, srcObj, fpanel){
+    var selectedTree = Ext.getCmp(fpanel.id + '_weekdays-tree');
+    var allTree = Ext.getCmp(fpanel.id + '_all-weekdays-tree');
+
+    for(var i=0; i<arr.length; i++){
+      //@todo: adding this field is a temporary crutch for the server
+      selectedTree.root.appendChild(
+        new Ext.tree.TreeNode({
+          id: arr[i],
+          text: arr[i],
+          payload: arr[i], //sonatype added attribute
+
+          allowChildren: false,
+          draggable: true,
+          leaf: true
+        })
+      );
+    }
+    
+    for(var i=0; i<this.weekdaysList.length; i++){
+      if(typeof(selectedTree.getNodeById(this.weekdaysList[i])) == 'undefined'){
+        allTree.root.appendChild(
+          new Ext.tree.TreeNode({
+            id: this.weekdaysList[i],
+            text: this.weekdaysList[i],
+            payload: this.weekdaysList[i], //sonatype added attribute
+  
+            allowChildren: false,
+            draggable: true,
+            leaf: true
+          })
+        );
+      }
+    }
+    
+    return arr; //return arr, even if empty to comply with sonatypeLoad data modifier requirement
+  },
+  importMonthlyRecurringDayHelper : function(arr, srcObj, fpanel){
+    for(var i=0; i<arr.length; i++){
+      var checkbox = fpanel.find('name','day' + arr[i]);
+      if (checkbox == null){
+        checkbox = fpanel.find('name','dayLast');
+      }
+      checkbox.checked = true;
+    }
+  },
+  importServicePropertiesHelper : function(arr, srcObj, fpanel){
+    var store = fpanel.find('id', fpanel.id + '_service_param_grid')[0].getStore();
+    for(var i=0; i<arr.length; i++){
+      var newRec = new this.serviceParameterRecordConstructor({
+        name : arr[i].name,
+        value : arr[i].value
+      },
+      id);
+      store.insert([newRec]);
+    }
   }
 });
