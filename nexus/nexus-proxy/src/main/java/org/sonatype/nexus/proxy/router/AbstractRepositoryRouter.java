@@ -293,6 +293,15 @@ public abstract class AbstractRepositoryRouter
     // Customization stuff No2
 
     /**
+     * Retrieve item preprocessor.
+     */
+    protected StorageItem retrieveItemPreprocessor( ResourceStoreRequest request )
+        throws StorageException
+    {
+        return null;
+    }
+
+    /**
      * Retrieve item postprocessor. Since all our methods are working with lists (or list of reposes which produces a
      * list of items), we have to detect what the proper result it. The method takes a list of items and makes one from
      * them.

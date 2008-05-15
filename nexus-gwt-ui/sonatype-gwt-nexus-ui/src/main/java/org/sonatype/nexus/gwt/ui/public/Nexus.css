@@ -1,0 +1,87 @@
+body {
+	background-color: #EEEEEC;
+	color: #000000;
+	font-family: "Trebuchet MS", sans-serif;
+	font-size: 12px;
+	line-height: 1.66em;
+}
+h1 {
+	color: #204A87;
+	font-size: 24px;
+	line-height: 1.66em;
+	padding: 0;
+	margin: 0.42em 0;
+}
+
+.toolbar-button .gwt-PushButton, .toolbar-button .gwt-Label {
+	cursor: pointer;
+}
+.toolbar-button .gwt-PushButton.gwt-PushButton-up-disabled,
+.toolbar-button .gwt-PushButton.gwt-PushButton-down-disabled,
+.toolbar-button .gwt-Label.gwt-Label-disabled {
+	cursor: default;
+}
+
+.top-bar {
+	background-color: #729FCF;
+	background-image: url("images/row-background.png");
+	background-position: 0 50%;
+	background-repeat: repeat-x;
+	padding: 0 0.5em;
+	border-right: 1px solid #E0E0DE;
+	width: 100%;
+}
+.top-bar .toolbar .toolbar-button .gwt-PushButton {
+	padding-right: 0.25em;
+}
+.top-bar .toolbar .toolbar-button .gwt-Label {
+	padding-right: 1em;
+}
+.top-bar .toolbar .toolbar-button .gwt-Label.gwt-Label-disabled {
+	color: #555753;
+}
+.top-bar .navbar {
+	float: right;
+}
+.top-bar .navbar .toolbar-button .gwt-PushButton, .top-bar .navbar .gwt-Label {
+	padding-left: 0.5em;
+}
+.repo-list {
+	border-collapse: collapse;
+	border-bottom: 1px solid #E0E0DE;
+	margin-bottom: 1.66em;
+	width: 100%;
+	clear: both;
+}
+.repo-list .table-header {
+	background-color: #3465A4;
+	color: #FFFFFF;
+	font-weight: bold;
+}
+.repo-list .table-even-row {
+	background-color: #E0E0DE;
+}
+.repo-list .table-selected-row {
+	background-color: #FCAF3E;
+}
+.repo-list td, .repo-list th {
+	padding: 1px 0.5em;
+	border-right: 1px dotted #EEEEEC;
+}
+.repo-list .table-column-0 {
+	width: 200px;
+}
+.repo-list .table-column-1 {
+	width: 100px;
+}
+.repo-list .table-column-2 {
+	width: 100px;
+}
+.repo-list .table-column-3 {
+	width: 100px;
+}
+.repo-list .table-column-4 {
+	width: 100px;
+}
+
+

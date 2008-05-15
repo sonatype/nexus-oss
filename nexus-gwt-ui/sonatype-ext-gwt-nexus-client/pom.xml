@@ -1,0 +1,69 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.sonatype.nexus.gwt</groupId>
+		<artifactId>nexus-gwt-ui</artifactId>
+		<version>1.0.0-SNAPSHOT</version>
+	</parent>
+
+	<artifactId>sonatype-ext-gwt-nexus-client</artifactId>
+
+	<packaging>jar</packaging>
+
+	<name>Sonatype Nexus Ext-GWT UI</name>
+
+	<dependencies>
+		<dependency>
+			<groupId>com.google.gwt</groupId>
+			<artifactId>gwt-user</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.extjs.gxt</groupId>
+			<artifactId>gxt</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.sonatype.nexus.gwt</groupId>
+			<artifactId>sonatype-gwt-rest</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.sonatype.nexus.gwt</groupId>
+			<artifactId>sonatype-gwt-rest</artifactId>
+			<classifier>sources</classifier>
+		</dependency>
+
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+			</plugin>
+
+			<plugin>
+				<groupId>com.totsp.gwt</groupId>
+				<artifactId>maven-googlewebtoolkit2-plugin</artifactId>
+				<configuration>
+					<gwtVersion>${gwt.version}</gwtVersion>
+					<style>DETAILED</style>
+					<runTarget>org.sonatype.nexus.ext.gwt.ui.NexusUI/Nexus.html</runTarget>
+					<compileTargets>
+						<param>org.sonatype.nexus.ext.gwt.ui.NexusUI</param>
+					</compileTargets>
+					<overwriteGeneratedClasses>true</overwriteGeneratedClasses>
+					<logLevel>INFO</logLevel>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
+</project>

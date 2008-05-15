@@ -1,0 +1,12 @@
+<module>
+    <inherits name='com.google.gwt.user.User'/>
+    <inherits name="com.gwtext.GwtExt"/>
+    <inherits name="org.sonatype.gwt.REST" />
+	
+	<entry-point class="org.sonatype.nexus.gwt.ext.ui.client.NexusUI" />
+
+    <stylesheet src="js/ext/resources/css/ext-all.css" />
+    <script src="js/ext/adapter/ext/ext-base.js" />
+    <script src="js/ext/ext-all.js" />
+    
+</module>

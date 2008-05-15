@@ -1,0 +1,223 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.sonatype.nexus</groupId>
+		<artifactId>nexus-parent</artifactId>
+		<version>2</version>
+	</parent>
+
+	<groupId>org.sonatype.nexus.gwt</groupId>
+	<artifactId>nexus-gwt-ui</artifactId>
+	<version>1.0.0-SNAPSHOT</version>
+	<packaging>pom</packaging>
+	<name>Nexus GWT UI</name>
+	<description>Sonatype Nexus GWT User Inteface</description>
+	<inceptionYear>2008</inceptionYear>
+	<mailingLists />
+
+	<licenses>
+		<license>
+			<name>GNU General Public License</name>
+			<url>http://www.gnu.org/licenses/gpl.txt</url>
+		</license>
+	</licenses>
+
+	<developers />
+
+	<contributors />
+
+	<modules>
+		<module>sonatype-gwt-rest</module>
+		<module>sonatype-gwt-nexus-client</module>
+		<module>sonatype-ext-gwt-nexus-client</module>
+		<module>sonatype-gwt-ext-nexus-client</module>
+		<module>sonatype-gwt-nexus-ui</module>
+	</modules>
+
+	<properties>
+		<gwt.version>1.4.61</gwt.version>
+	</properties>
+
+	<dependencyManagement>
+		<dependencies>
+
+			<dependency>
+				<groupId>com.google.gwt</groupId>
+				<artifactId>gwt-user</artifactId>
+				<version>${gwt.version}</version>
+				<scope>compile</scope>
+				<type>jar</type>
+			</dependency>
+
+			<dependency>
+				<groupId>com.extjs.gxt</groupId>
+				<artifactId>gxt</artifactId>
+				<version>1.0-beta2</version>
+				<scope>compile</scope>
+				<type>jar</type>
+			</dependency>
+
+			<dependency>
+				<groupId>com.gwtext</groupId>
+				<artifactId>gwtext</artifactId>
+				<version>2.0.3</version>
+				<scope>compile</scope>
+				<type>jar</type>
+			</dependency>
+
+			<dependency>
+				<groupId>junit</groupId>
+				<artifactId>junit</artifactId>
+				<version>3.8.2</version>
+				<scope>test</scope>
+				<type>jar</type>
+			</dependency>
+
+			<!-- The modules -->
+			<dependency>
+				<groupId>org.sonatype.nexus.gwt</groupId>
+				<artifactId>sonatype-gwt-rest</artifactId>
+				<version>${project.version}</version>
+				<scope>compile</scope>
+				<type>jar</type>
+			</dependency>
+			<dependency>
+				<groupId>org.sonatype.nexus.gwt</groupId>
+				<artifactId>sonatype-gwt-rest</artifactId>
+				<version>${project.version}</version>
+				<scope>compile</scope>
+				<type>jar</type>
+				<classifier>sources</classifier>
+			</dependency>
+			<dependency>
+				<groupId>org.sonatype.nexus.gwt</groupId>
+				<artifactId>sonatype-gwt-nexus-client</artifactId>
+				<version>${project.version}</version>
+				<scope>compile</scope>
+				<type>jar</type>
+			</dependency>
+			<dependency>
+				<groupId>org.sonatype.nexus.gwt</groupId>
+				<artifactId>sonatype-gwt-nexus-client</artifactId>
+				<version>${project.version}</version>
+				<scope>compile</scope>
+				<type>jar</type>
+				<classifier>sources</classifier>
+			</dependency>
+			<dependency>
+				<groupId>org.sonatype.nexus.gwt</groupId>
+				<artifactId>sonatype-ext-gwt-nexus-client</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.sonatype.nexus.gwt</groupId>
+				<artifactId>sonatype-gwt-ext-nexus-client</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.sonatype.nexus.gwt</groupId>
+				<artifactId>sonatype-gwt-nexus-ui</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
+	<!-- build information for the project -->
+	<build>
+		<pluginManagement>
+			<plugins>
+
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-source-plugin</artifactId>
+					<executions>
+						<execution>
+							<id>attach-sources</id>
+							<phase>verify</phase>
+							<goals>
+								<goal>jar</goal>
+							</goals>
+						</execution>
+					</executions>
+				</plugin>
+
+				<plugin>
+					<artifactId>maven-compiler-plugin</artifactId>
+					<configuration>
+						<source>1.5</source>
+						<target>1.5</target>
+					</configuration>
+				</plugin>
+
+				<plugin>
+					<groupId>com.totsp.gwt</groupId>
+					<artifactId>maven-googlewebtoolkit2-plugin</artifactId>
+					<version>2.0-beta6</version>
+					<executions>
+						<execution>
+							<goals>
+								<goal>compile</goal>
+								<!-- goal>extractGwt</goal-->
+								<!-- goal>testGwt</goal-->
+							</goals>
+						</execution>
+					</executions>
+				</plugin>
+
+			</plugins>
+		</pluginManagement>
+	</build>
+
+	<reporting />
+
+	<profiles>
+		<profile>
+			<id>gwt-linux</id>
+			<activation>
+				<os>
+					<name>Linux</name>
+				</os>
+			</activation>
+			<properties>
+				<google.webtoolkit.home>${env.GWT_HOME}</google.webtoolkit.home>
+				<google.webtoolkit.extrajvmargs>-Xmx512M</google.webtoolkit.extrajvmargs>
+			</properties>
+
+			<dependencies>
+				<dependency>
+					<groupId>com.google.gwt</groupId>
+					<artifactId>gwt-linux</artifactId>
+					<version>${gwt.version}</version>
+					<scope>system</scope>
+					<systemPath>${google.webtoolkit.home}/gwt-dev-linux.jar</systemPath>
+				</dependency>
+			</dependencies>
+		</profile>
+
+		<profile>
+			<id>gwt-windows</id>
+			<activation>
+				<os>
+					<family>windows</family>
+				</os>
+			</activation>
+			<properties>
+				<google.webtoolkit.home>${env.GWT_HOME}</google.webtoolkit.home>
+				<google.webtoolkit.extrajvmargs>-Xmx512M</google.webtoolkit.extrajvmargs>
+			</properties>
+
+			<dependencies>
+				<dependency>
+					<groupId>com.google.gwt</groupId>
+					<artifactId>gwt-windows</artifactId>
+					<version>${gwt.version}</version>
+					<scope>system</scope>
+					<systemPath>${google.webtoolkit.home}/gwt-dev-windows.jar</systemPath>
+				</dependency>
+			</dependencies>
+		</profile>
+	</profiles>
+
+</project>
