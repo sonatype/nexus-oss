@@ -27,11 +27,11 @@ import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.resource.Representation;
 import org.restlet.resource.Variant;
-import org.sonatype.nexus.rest.model.ScheduledServiceBaseResource;
-import org.sonatype.nexus.rest.model.ScheduledServiceListResourceResponse;
-import org.sonatype.nexus.rest.model.ScheduledServiceResourceResponse;
+import org.sonatype.nexus.rest.model.ScheduledServiceTypePropertyResource;
+import org.sonatype.nexus.rest.model.ScheduledServiceTypeResource;
+import org.sonatype.nexus.rest.model.ScheduledServiceTypeResourceResponse;
 
-public class ScheduledServiceListResourceHandler
+public class ScheduledServiceTypeResourceHandler 
     extends AbstractScheduledServiceResourceHandler
 {
     /**
@@ -41,11 +41,11 @@ public class ScheduledServiceListResourceHandler
      * @param request
      * @param response
      */
-    public ScheduledServiceListResourceHandler( Context context, Request request, Response response )
+    public ScheduledServiceTypeResourceHandler( Context context, Request request, Response response )
     {
         super( context, request, response );
     }
-
+    
     /**
      * We are handling HTTP GETs.
      */
@@ -60,31 +60,38 @@ public class ScheduledServiceListResourceHandler
     public Representation getRepresentationHandler( Variant variant )
         throws IOException
     {
-        ScheduledServiceListResourceResponse response = new ScheduledServiceListResourceResponse();
+        ScheduledServiceTypeResourceResponse response = new ScheduledServiceTypeResourceResponse();
+        
+        ScheduledServiceTypeResource type = new ScheduledServiceTypeResource();
+        type.setId( "1" );
+        type.setName( "Purge Snapshots" );
+        ScheduledServiceTypePropertyResource property = new ScheduledServiceTypePropertyResource();
+        property.setName( "Some Config Value" );
+        property.setType( "string" );
+        property.setHelpText( "Some Help Text" );
+        type.addProperty( property );
+        property = new ScheduledServiceTypePropertyResource();
+        property.setName( "Other Config Value" );
+        property.setType( "string" );
+        property.setHelpText( "Other Help Text" );
+        type.addProperty( property );        
+        response.addData( type );
+        
+        type = new ScheduledServiceTypeResource();
+        type.setId( "2" );
+        type.setName( "Synchronize Repositories" );
+        property = new ScheduledServiceTypePropertyResource();
+        property.setName( "Some Config Value" );
+        property.setType( "string" );
+        property.setHelpText( "Some Help Text" );
+        type.addProperty( property );
+        property = new ScheduledServiceTypePropertyResource();
+        property.setName( "Other Config Value" );
+        property.setType( "string" );
+        property.setHelpText( "Other Help Text" );
+        type.addProperty( property );        
+        response.addData( type );
 
         return serialize( variant, response );
     }
-
-    /**
-     * This service allows POST.
-     */
-    public boolean allowPost()
-    {
-        return true;
-    }
-
-    public void post( Representation entity )
-    {
-        ScheduledServiceResourceResponse response = (ScheduledServiceResourceResponse) deserialize( new ScheduledServiceResourceResponse() );
-
-        if ( response != null )
-        {
-            ScheduledServiceBaseResource resource = response.getData();
-
-            resource.setId( Long.toHexString( System.currentTimeMillis() ) );
-
-            getResponse().setEntity( serialize( entity, response ) );
-        }
-    }
-
 }

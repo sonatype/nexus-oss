@@ -30,7 +30,6 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
   var ht = Sonatype.repoServer.resources.help.schedules;
   
   //TODO: this will be calling a rest method at some point
-  this.serviceTypeStore = new Ext.data.SimpleStore({fields:['value'], data:[['Synchronize Repositories'],['Purge Snapshots']]});  
   this.scheduleTypeStore = new Ext.data.SimpleStore({fields:['value'], data:[['None'],['Once'],['Daily'],['Weekly'],['Monthly'],['Advanced']]});
   this.weekdaysList = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
   
@@ -114,6 +113,38 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
     }
   };
   
+  this.serviceTypeRecordConstructor = Ext.data.Record.create([
+    {name:'id', sortType:Ext.data.SortTypes.asUCString},
+    {name:'name'},
+    {name:'properties'}
+  ]);
+    
+  this.scheduleRecordConstructor = Ext.data.Record.create([
+    {name:'resourceURI'},
+    {name:'name', sortType:Ext.data.SortTypes.asUCString},
+    {name:'serviceType'},
+    {name:'serviceSchedule'}
+  ]);
+  
+  this.serviceTypeReader = new Ext.data.JsonReader({root: 'data', id: 'id'}, this.serviceTypeRecordConstructor );
+  
+  this.serviceTypeDataStore = new Ext.data.Store({
+    url: Sonatype.config.repos.urls.scheduleTypes,
+    reader: this.serviceTypeReader,
+    sortInfo: {field: 'id', direction: 'ASC'},
+    autoLoad: true
+  });
+  
+  this.schedulesReader = new Ext.data.JsonReader({root: 'data', id: 'resourceURI'}, this.scheduleRecordConstructor );
+
+  //@ext: must use data.Store (not JsonStore) to pass in reader instead of using fields config array
+  this.schedulesDataStore = new Ext.data.Store({
+    url: Sonatype.config.repos.urls.schedules,
+    reader: this.schedulesReader,
+    sortInfo: {field: 'name', direction: 'ASC'},
+    autoLoad: true
+  });
+  
   this.formConfig = {};
   this.formConfig.schedule = {
     region: 'center',
@@ -149,8 +180,9 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
         itemCls: 'required-field',
         helpText: ht.serviceType,
         name: 'serviceType',
-        store: this.serviceTypeStore,
-        displayField:'value',
+        store: this.serviceTypeDataStore,
+        displayField:'name',
+        valueField:'id',
         editable: false,
         forceSelection: true,
         mode: 'local',
@@ -718,29 +750,6 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
       }
     ]
   };
-    
-  // START: Repo list ******************************************************
-  this.scheduleRecordConstructor = Ext.data.Record.create([
-    {name:'resourceURI'},
-    {name:'name', sortType:Ext.data.SortTypes.asUCString},
-    {name:'serviceType'},
-    {name:'serviceSchedule'}
-  ]);
-  
-  this.serviceParameterRecordConstructor = Ext.data.Record.create([
-    {name:'name', sortType:Ext.data.SortTypes.asUCString},
-    {name:'value'}
-  ]);
-
-  this.schedulesReader = new Ext.data.JsonReader({root: 'data', id: 'resourceURI'}, this.scheduleRecordConstructor );
-
-  //@ext: must use data.Store (not JsonStore) to pass in reader instead of using fields config array
-  this.schedulesDataStore = new Ext.data.Store({
-    url: Sonatype.config.repos.urls.schedules,
-    reader: this.schedulesReader,
-    sortInfo: {field: 'name', direction: 'ASC'},
-    autoLoad: true
-  });
 
   this.schedulesGridPanel = new Ext.grid.GridPanel({
     title: 'Scheduled Services',

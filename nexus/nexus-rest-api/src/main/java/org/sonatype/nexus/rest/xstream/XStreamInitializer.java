@@ -78,6 +78,9 @@ import org.sonatype.nexus.rest.model.ScheduledServiceMonthlyResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceOnceResource;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceResourceResponse;
+import org.sonatype.nexus.rest.model.ScheduledServiceTypePropertyResource;
+import org.sonatype.nexus.rest.model.ScheduledServiceTypeResource;
+import org.sonatype.nexus.rest.model.ScheduledServiceTypeResourceResponse;
 import org.sonatype.nexus.rest.model.ScheduledServiceWeeklyResource;
 import org.sonatype.nexus.rest.model.SearchResponse;
 import org.sonatype.nexus.rest.model.StatusConfigurationValidationResponse;
@@ -188,6 +191,9 @@ public final class XStreamInitializer
         xstream.omitField( ScheduledServiceMonthlyResource.class, "modelEncoding" );
         xstream.omitField( ScheduledServiceWeeklyResource.class, "modelEncoding" );
         xstream.omitField( ScheduledServiceResourceResponse.class, "modelEncoding" );
+        xstream.omitField( ScheduledServiceTypeResourceResponse.class, "modelEncoding" );
+        xstream.omitField( ScheduledServiceTypeResource.class, "modelEncoding" );
+        xstream.omitField( ScheduledServiceTypePropertyResource.class, "modelEncoding" );
 
         // Maven model
         xstream.omitField( Model.class, "modelEncoding" );
