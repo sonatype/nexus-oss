@@ -23,9 +23,6 @@ package org.sonatype.nexus.rest;
 import java.util.Date;
 
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
-import org.apache.maven.model.Model;
-import org.apache.maven.model.ModelBase;
-import org.apache.maven.model.Scm;
 import org.restlet.Context;
 import org.restlet.Restlet;
 import org.restlet.Router;
@@ -49,66 +46,6 @@ import org.sonatype.nexus.rest.identify.IdentifyHashResourceHandler;
 import org.sonatype.nexus.rest.index.IndexResourceHandler;
 import org.sonatype.nexus.rest.logs.LogsListResourceHandler;
 import org.sonatype.nexus.rest.logs.LogsResourceHandler;
-import org.sonatype.nexus.rest.model.AuthenticationClientPermissions;
-import org.sonatype.nexus.rest.model.AuthenticationLoginResource;
-import org.sonatype.nexus.rest.model.AuthenticationLoginResourceResponse;
-import org.sonatype.nexus.rest.model.AuthenticationSettings;
-import org.sonatype.nexus.rest.model.ConfigurationsListResource;
-import org.sonatype.nexus.rest.model.ConfigurationsListResourceResponse;
-import org.sonatype.nexus.rest.model.ContentListResource;
-import org.sonatype.nexus.rest.model.ContentListResourceResponse;
-import org.sonatype.nexus.rest.model.FeedListResource;
-import org.sonatype.nexus.rest.model.FeedListResourceResponse;
-import org.sonatype.nexus.rest.model.GlobalConfigurationListResource;
-import org.sonatype.nexus.rest.model.GlobalConfigurationListResourceResponse;
-import org.sonatype.nexus.rest.model.GlobalConfigurationResource;
-import org.sonatype.nexus.rest.model.GlobalConfigurationResourceResponse;
-import org.sonatype.nexus.rest.model.LogsListResource;
-import org.sonatype.nexus.rest.model.LogsListResourceResponse;
-import org.sonatype.nexus.rest.model.NexusArtifact;
-import org.sonatype.nexus.rest.model.NexusError;
-import org.sonatype.nexus.rest.model.NexusErrorResponse;
-import org.sonatype.nexus.rest.model.NexusResponse;
-import org.sonatype.nexus.rest.model.RemoteConnectionSettings;
-import org.sonatype.nexus.rest.model.RemoteHttpProxySettings;
-import org.sonatype.nexus.rest.model.RepositoryBaseResource;
-import org.sonatype.nexus.rest.model.RepositoryGroupListResource;
-import org.sonatype.nexus.rest.model.RepositoryGroupListResourceResponse;
-import org.sonatype.nexus.rest.model.RepositoryGroupMemberRepository;
-import org.sonatype.nexus.rest.model.RepositoryGroupResource;
-import org.sonatype.nexus.rest.model.RepositoryGroupResourceResponse;
-import org.sonatype.nexus.rest.model.RepositoryListResource;
-import org.sonatype.nexus.rest.model.RepositoryListResourceResponse;
-import org.sonatype.nexus.rest.model.RepositoryMetaResource;
-import org.sonatype.nexus.rest.model.RepositoryMetaResourceResponse;
-import org.sonatype.nexus.rest.model.RepositoryProxyResource;
-import org.sonatype.nexus.rest.model.RepositoryResource;
-import org.sonatype.nexus.rest.model.RepositoryResourceRemoteStorage;
-import org.sonatype.nexus.rest.model.RepositoryResourceResponse;
-import org.sonatype.nexus.rest.model.RepositoryRouteListResource;
-import org.sonatype.nexus.rest.model.RepositoryRouteListResourceResponse;
-import org.sonatype.nexus.rest.model.RepositoryRouteMemberRepository;
-import org.sonatype.nexus.rest.model.RepositoryRouteResource;
-import org.sonatype.nexus.rest.model.RepositoryRouteResourceResponse;
-import org.sonatype.nexus.rest.model.RepositoryShadowResource;
-import org.sonatype.nexus.rest.model.RepositoryStatusListResource;
-import org.sonatype.nexus.rest.model.RepositoryStatusListResourceResponse;
-import org.sonatype.nexus.rest.model.RepositoryStatusResource;
-import org.sonatype.nexus.rest.model.RepositoryStatusResourceResponse;
-import org.sonatype.nexus.rest.model.ScheduledServiceAdvancedResource;
-import org.sonatype.nexus.rest.model.ScheduledServiceBaseResource;
-import org.sonatype.nexus.rest.model.ScheduledServiceDailyResource;
-import org.sonatype.nexus.rest.model.ScheduledServiceListResource;
-import org.sonatype.nexus.rest.model.ScheduledServiceListResourceResponse;
-import org.sonatype.nexus.rest.model.ScheduledServiceMonthlyResource;
-import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
-import org.sonatype.nexus.rest.model.ScheduledServiceResourceResponse;
-import org.sonatype.nexus.rest.model.ScheduledServiceWeeklyResource;
-import org.sonatype.nexus.rest.model.SearchResponse;
-import org.sonatype.nexus.rest.model.StatusConfigurationValidationResponse;
-import org.sonatype.nexus.rest.model.StatusResource;
-import org.sonatype.nexus.rest.model.StatusResourceResponse;
-import org.sonatype.nexus.rest.repositories.RepositoryBaseResourceConverter;
 import org.sonatype.nexus.rest.repositories.RepositoryContentResourceHandler;
 import org.sonatype.nexus.rest.repositories.RepositoryListResourceHandler;
 import org.sonatype.nexus.rest.repositories.RepositoryMetaResourceHandler;
@@ -117,12 +54,12 @@ import org.sonatype.nexus.rest.repositories.RepositoryStatusResourceHandler;
 import org.sonatype.nexus.rest.repositorystatuses.RepositoryStatusesListResourceHandler;
 import org.sonatype.nexus.rest.routes.RepositoryRouteListResourceHandler;
 import org.sonatype.nexus.rest.routes.RepositoryRouteResourceHandler;
-import org.sonatype.nexus.rest.schedules.ScheduledServiceBaseResourceConverter;
 import org.sonatype.nexus.rest.schedules.ScheduledServiceListResourceHandler;
 import org.sonatype.nexus.rest.schedules.ScheduledServiceResourceHandler;
 import org.sonatype.nexus.rest.status.StatusResourceHandler;
 import org.sonatype.nexus.rest.templates.repositories.RepositoryTemplateListResourceHandler;
 import org.sonatype.nexus.rest.templates.repositories.RepositoryTemplateResourceHandler;
+import org.sonatype.nexus.rest.xstream.XStreamInitializer;
 import org.sonatype.nexus.security.SimpleAuthenticationSource;
 import org.sonatype.plexus.rest.PlexusRestletApplicationBridge;
 import org.sonatype.plexus.rest.RestletOrgApplication;
@@ -215,108 +152,7 @@ public class ApplicationBridge
      */
     protected XStream createAndConfigureXstream( HierarchicalStreamDriver driver )
     {
-        XStream xstream = new XStream( driver );
-
-        xstream.registerConverter( new RepositoryBaseResourceConverter( xstream.getMapper(), xstream
-            .getReflectionProvider() ), XStream.PRIORITY_VERY_HIGH );
-        
-        xstream.registerConverter( new ScheduledServiceBaseResourceConverter( xstream.getMapper(), xstream
-            .getReflectionProvider() ), XStream.PRIORITY_VERY_HIGH );
-
-        // aliasaes
-        // NexusResponse
-        xstream.alias( "artifact", NexusArtifact.class );
-
-        // Maven POM
-        xstream.alias( "project", Model.class );
-
-        // omitting modelEncoding
-        xstream.omitField( NexusErrorResponse.class, "modelEncoding" );
-        xstream.omitField( NexusError.class, "modelEncoding" );
-
-        xstream.omitField( ContentListResourceResponse.class, "modelEncoding" );
-        xstream.omitField( ContentListResource.class, "modelEncoding" );
-
-        xstream.omitField( RepositoryResourceResponse.class, "modelEncoding" );
-        xstream.omitField( RepositoryBaseResource.class, "modelEncoding" );
-        xstream.omitField( RepositoryResource.class, "modelEncoding" );
-        xstream.omitField( RepositoryProxyResource.class, "modelEncoding" );
-        xstream.omitField( RepositoryShadowResource.class, "modelEncoding" );
-        xstream.omitField( RepositoryResourceRemoteStorage.class, "modelEncoding" );
-
-        xstream.omitField( RepositoryListResourceResponse.class, "modelEncoding" );
-        xstream.omitField( RepositoryListResource.class, "modelEncoding" );
-
-        xstream.omitField( RepositoryStatusResourceResponse.class, "modelEncoding" );
-        xstream.omitField( RepositoryStatusResource.class, "modelEncoding" );
-
-        xstream.omitField( RepositoryStatusListResourceResponse.class, "modelEncoding" );
-        xstream.omitField( RepositoryStatusListResource.class, "modelEncoding" );
-
-        xstream.omitField( RepositoryMetaResourceResponse.class, "modelEncoding" );
-        xstream.omitField( RepositoryMetaResource.class, "modelEncoding" );
-
-        xstream.omitField( RepositoryGroupListResourceResponse.class, "modelEncoding" );
-        xstream.omitField( RepositoryGroupListResource.class, "modelEncoding" );
-
-        xstream.omitField( RepositoryGroupResourceResponse.class, "modelEncoding" );
-        xstream.omitField( RepositoryGroupResource.class, "modelEncoding" );
-        xstream.omitField( RepositoryGroupMemberRepository.class, "modelEncoding" );
-
-        xstream.omitField( RepositoryRouteListResourceResponse.class, "modelEncoding" );
-        xstream.omitField( RepositoryRouteListResource.class, "modelEncoding" );
-
-        xstream.omitField( RepositoryRouteResourceResponse.class, "modelEncoding" );
-        xstream.omitField( RepositoryRouteResource.class, "modelEncoding" );
-        xstream.omitField( RepositoryRouteMemberRepository.class, "modelEncoding" );
-
-        xstream.omitField( GlobalConfigurationListResourceResponse.class, "modelEncoding" );
-        xstream.omitField( GlobalConfigurationListResource.class, "modelEncoding" );
-
-        xstream.omitField( GlobalConfigurationResourceResponse.class, "modelEncoding" );
-        xstream.omitField( GlobalConfigurationResource.class, "modelEncoding" );
-        xstream.omitField( RemoteConnectionSettings.class, "modelEncoding" );
-        xstream.omitField( RemoteHttpProxySettings.class, "modelEncoding" );
-        xstream.omitField( AuthenticationSettings.class, "modelEncoding" );
-
-        xstream.omitField( LogsListResourceResponse.class, "modelEncoding" );
-        xstream.omitField( LogsListResource.class, "modelEncoding" );
-
-        xstream.omitField( ConfigurationsListResourceResponse.class, "modelEncoding" );
-        xstream.omitField( ConfigurationsListResource.class, "modelEncoding" );
-
-        xstream.omitField( FeedListResourceResponse.class, "modelEncoding" );
-        xstream.omitField( FeedListResource.class, "modelEncoding" );
-
-        xstream.omitField( SearchResponse.class, "modelEncoding" );
-
-        xstream.omitField( NexusResponse.class, "modelEncoding" );
-        xstream.omitField( NexusArtifact.class, "modelEncoding" );
-
-        xstream.omitField( AuthenticationLoginResourceResponse.class, "modelEncoding" );
-        xstream.omitField( AuthenticationLoginResource.class, "modelEncoding" );
-        xstream.omitField( AuthenticationClientPermissions.class, "modelEncoding" );
-
-        xstream.omitField( StatusResource.class, "modelEncoding" );
-        xstream.omitField( StatusResourceResponse.class, "modelEncoding" );
-        xstream.omitField( StatusConfigurationValidationResponse.class, "modelEncoding" );
-        
-        xstream.omitField( ScheduledServiceListResource.class, "modelEncoding" );
-        xstream.omitField( ScheduledServiceListResourceResponse.class, "modelEncoding" );
-        xstream.omitField( ScheduledServiceBaseResource.class, "modelEncoding" );
-        xstream.omitField( ScheduledServicePropertyResource.class, "modelEncoding" );
-        xstream.omitField( ScheduledServiceDailyResource.class, "modelEncoding" );
-        xstream.omitField( ScheduledServiceAdvancedResource.class, "modelEncoding" );
-        xstream.omitField( ScheduledServiceMonthlyResource.class, "modelEncoding" );
-        xstream.omitField( ScheduledServiceWeeklyResource.class, "modelEncoding" );
-        xstream.omitField( ScheduledServiceResourceResponse.class, "modelEncoding" );
-
-        // Maven model
-        xstream.omitField( Model.class, "modelEncoding" );
-        xstream.omitField( ModelBase.class, "modelEncoding" );
-        xstream.omitField( Scm.class, "modelEncoding" );
-
-        return xstream;
+        return XStreamInitializer.initialize( new XStream( driver ) );
     }
 
     /**

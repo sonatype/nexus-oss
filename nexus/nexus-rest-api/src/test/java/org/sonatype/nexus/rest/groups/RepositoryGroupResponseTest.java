@@ -58,6 +58,7 @@ import org.sonatype.nexus.rest.model.RepositoryRouteListResourceResponse;
 import org.sonatype.nexus.rest.model.RepositoryRouteMemberRepository;
 import org.sonatype.nexus.rest.model.RepositoryRouteResource;
 import org.sonatype.nexus.rest.model.RepositoryRouteResourceResponse;
+import org.sonatype.nexus.rest.xstream.XStreamInitializer;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
 import org.sonatype.plexus.rest.xstream.json.JsonOrgHierarchicalStreamDriver;
 import org.sonatype.plexus.rest.xstream.json.PrimitiveKeyedMapConverter;
@@ -76,67 +77,7 @@ public class RepositoryGroupResponseTest
         super.setUp();
 
         // create and configure XStream for JSON
-        xstream = new XStream( new JsonOrgHierarchicalStreamDriver() );
-
-        // aliasaes
-        // NexusResponse
-        xstream.alias( "artifact", NexusArtifact.class );
-
-        // Maven POM
-        xstream.alias( "project", Model.class );
-
-        // omitting modelEncoding
-        xstream.omitField( RepositoryListResourceResponse.class, "modelEncoding" );
-        xstream.omitField( RepositoryListResource.class, "modelEncoding" );
-
-        xstream.omitField( ContentListResourceResponse.class, "modelEncoding" );
-        xstream.omitField( ContentListResource.class, "modelEncoding" );
-
-        xstream.omitField( RepositoryResourceResponse.class, "modelEncoding" );
-        xstream.omitField( RepositoryResource.class, "modelEncoding" );
-        xstream.omitField( RepositoryResourceRemoteStorage.class, "modelEncoding" );
-
-        xstream.omitField( RepositoryGroupListResourceResponse.class, "modelEncoding" );
-        xstream.omitField( RepositoryGroupListResource.class, "modelEncoding" );
-
-        xstream.omitField( RepositoryGroupResourceResponse.class, "modelEncoding" );
-        xstream.omitField( RepositoryGroupResource.class, "modelEncoding" );
-        xstream.omitField( RepositoryGroupMemberRepository.class, "modelEncoding" );
-
-        xstream.omitField( RepositoryRouteListResourceResponse.class, "modelEncoding" );
-        xstream.omitField( RepositoryRouteListResource.class, "modelEncoding" );
-
-        xstream.omitField( RepositoryRouteResourceResponse.class, "modelEncoding" );
-        xstream.omitField( RepositoryRouteResource.class, "modelEncoding" );
-        xstream.omitField( RepositoryRouteMemberRepository.class, "modelEncoding" );
-
-        xstream.omitField( GlobalConfigurationListResourceResponse.class, "modelEncoding" );
-        xstream.omitField( GlobalConfigurationListResource.class, "modelEncoding" );
-
-        xstream.omitField( GlobalConfigurationResourceResponse.class, "modelEncoding" );
-        xstream.omitField( GlobalConfigurationResource.class, "modelEncoding" );
-        xstream.omitField( RemoteConnectionSettings.class, "modelEncoding" );
-        xstream.omitField( RemoteHttpProxySettings.class, "modelEncoding" );
-        xstream.omitField( AuthenticationSettings.class, "modelEncoding" );
-
-        xstream.omitField( LogsListResourceResponse.class, "modelEncoding" );
-        xstream.omitField( LogsListResource.class, "modelEncoding" );
-
-        xstream.omitField( ConfigurationsListResourceResponse.class, "modelEncoding" );
-        xstream.omitField( ConfigurationsListResource.class, "modelEncoding" );
-
-        xstream.omitField( FeedListResourceResponse.class, "modelEncoding" );
-        xstream.omitField( FeedListResource.class, "modelEncoding" );
-
-        xstream.omitField( NexusResponse.class, "modelEncoding" );
-        xstream.omitField( NexusArtifact.class, "modelEncoding" );
-
-        // Maven model
-        xstream.omitField( Model.class, "modelEncoding" );
-        xstream.omitField( ModelBase.class, "modelEncoding" );
-        xstream.omitField( Scm.class, "modelEncoding" );
-        // for JSON, we use a custom converter for Maps
-        xstream.registerConverter( new PrimitiveKeyedMapConverter( xstream.getMapper() ) );
+        xstream = XStreamInitializer.initialize( new XStream( new JsonOrgHierarchicalStreamDriver() ) );
     }
 
     protected void tearDown()
