@@ -192,6 +192,31 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
         allowBlank: false    
       },
       {
+        xtype: 'panel',
+        id: 'service-type-config-card-panel',
+        header: false,
+        layout: 'card',
+        region: 'center',
+        activeItem: 0,
+        bodyStyle: 'padding:15px',
+        deferredRender: false,
+        autoScroll: false,
+        frame: false,
+        items: [
+          {
+	          xtype: 'fieldset',
+    	      checkboxToggle:false,
+    	      title: 'Service Settings',
+    	      anchor: Sonatype.view.FIELDSET_OFFSET,
+    	      collapsible: false,
+    	      autoHeight:true,
+    	      layoutConfig: {
+	            labelSeparator: ''
+	          }
+          }
+        ]
+      },
+      {
         xtype: 'combo',
         fieldLabel: 'Recurrence',
         itemCls: 'required-field',
@@ -222,7 +247,7 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
           {
 	          xtype: 'fieldset',
     	      checkboxToggle:false,
-    	      title: 'No Schedule Settings',
+    	      title: 'Schedule Settings',
     	      anchor: Sonatype.view.FIELDSET_OFFSET,
     	      collapsible: false,
     	      autoHeight:true,
@@ -233,7 +258,7 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
           {
             xtype: 'fieldset',
     	      checkboxToggle:false,
-    	      title: 'One Time Schedule Settings',
+    	      title: 'Schedule Settings',
     	      anchor: Sonatype.view.FIELDSET_OFFSET,
     	      collapsible: false,
     	      autoHeight:true,
@@ -265,7 +290,7 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
           {
             xtype: 'fieldset',
     	      checkboxToggle:false,
-    	      title: 'Daily Schedule Settings',
+    	      title: 'Schedule Settings',
     	      anchor: Sonatype.view.FIELDSET_OFFSET,
     	      collapsible: false,
     	      autoHeight:true,
@@ -307,7 +332,7 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
           {
             xtype: 'fieldset',
     	      checkboxToggle:false,
-    	      title: 'Weekly Schedule Settings',
+    	      title: 'Schedule Settings',
     	      anchor: Sonatype.view.FIELDSET_OFFSET,
     	      collapsible: false,
     	      autoHeight:true,
@@ -457,7 +482,7 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
           {
             xtype: 'fieldset',
     	      checkboxToggle:false,
-    	      title: 'Monthly Schedule Settings',
+    	      title: 'Schedule Settings',
     	      anchor: Sonatype.view.FIELDSET_OFFSET,
     	      collapsible: false,
     	      autoHeight:true,
@@ -718,7 +743,7 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
           {
             xtype: 'fieldset',
     		    checkboxToggle:false,
-    		    title: 'Advanced Schedule Settings',
+    		    title: 'Schedule Settings',
     		    anchor: Sonatype.view.FIELDSET_OFFSET,
     		    collapsible: false,
     		    autoHeight:true,
@@ -923,6 +948,9 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
     formPanel.form.on('actionfailed', this.actionFailedHandler, this);
     formPanel.on('beforerender', this.beforeFormRenderHandler, this);
     formPanel.on('afterlayout', this.afterLayoutFormHandler, this, {single:true});
+    
+    var serviceTypeField = formPanel.find('name', 'serviceType')[0];
+    serviceTypeField.on('select', this.serviceTypeSelectHandler, serviceTypeField);
     
     var serviceScheduleField = formPanel.find('name', 'serviceSchedule')[0];
     serviceScheduleField.on('select', this.serviceScheduleSelectHandler, serviceScheduleField);
@@ -1176,6 +1204,45 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
     formPanel.doLayout();
   },
   
+  serviceTypeSelectHandler : function(combo, record, index){
+    var serviceTypePanel = this.ownerCt.find('id', 'service-type-config-card-panel')[0];
+    
+    serviceTypePanel.getLayout().activeItem.destroy();
+    serviceTypePanel.items.clear();
+    
+    var items = [];
+    for(var i=0;i<record.data.properties.length;i++){
+      items[i] = 
+        {
+          xtype: 'textfield',
+          fieldLabel: record.data.properties[i].name,
+          itemCls: 'required-field',
+          helpText: record.data.properties[i].helpText,
+          name: record.data.properties[i].id,
+          width: 200,
+          allowBlank:false
+        };
+    }
+    
+    serviceTypePanel.items.add( new Ext.form.FieldSet(
+      {
+        checkboxToggle:false,
+        title: 'Service Settings',
+        anchor: Sonatype.view.FIELDSET_OFFSET,
+        collapsible: false,
+        autoHeight:true,
+        layoutConfig: {
+          labelSeparator: ''
+        },
+        items:items
+      }
+    ));
+    
+    serviceTypePanel.getLayout().setActiveItem(serviceTypePanel.items.itemAt(0));
+    
+    serviceTypePanel.doLayout();
+  },
+  
   serviceScheduleSelectHandler : function(combo, record, index){
     var schedulePanel = this.ownerCt.find('id', 'schedule-config-card-panel')[0];
     schedulePanel.getLayout().activeItem.items.each(function(item){
@@ -1210,10 +1277,10 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
     //@note: there has to be a better way to do this.  Depending on offsets is very error prone
     var newConfig = config;
 
-    newConfig.items[4].items[3].items[3].items[0].id = id + '_weekdays-tree';
-    newConfig.items[4].items[3].items[3].items[0].root = new Ext.tree.TreeNode({text: 'root'});
-    newConfig.items[4].items[3].items[3].items[1].id = id + '_all_weekdays-tree';
-    newConfig.items[4].items[3].items[3].items[1].root = new Ext.tree.TreeNode({text: 'root'});
+    newConfig.items[5].items[3].items[3].items[0].id = id + '_weekdays-tree';
+    newConfig.items[5].items[3].items[3].items[0].root = new Ext.tree.TreeNode({text: 'root'});
+    newConfig.items[5].items[3].items[3].items[1].id = id + '_all_weekdays-tree';
+    newConfig.items[5].items[3].items[3].items[1].root = new Ext.tree.TreeNode({text: 'root'});
 
     return newConfig;
   },

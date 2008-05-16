@@ -66,11 +66,13 @@ public class ScheduledServiceTypeResourceHandler
         type.setId( "1" );
         type.setName( "Purge Snapshots" );
         ScheduledServiceTypePropertyResource property = new ScheduledServiceTypePropertyResource();
+        property.setId( "1" );
         property.setName( "Some Config Value" );
         property.setType( "string" );
         property.setHelpText( "Some Help Text" );
         type.addProperty( property );
         property = new ScheduledServiceTypePropertyResource();
+        property.setId( "2" );
         property.setName( "Other Config Value" );
         property.setType( "string" );
         property.setHelpText( "Other Help Text" );
@@ -81,11 +83,13 @@ public class ScheduledServiceTypeResourceHandler
         type.setId( "2" );
         type.setName( "Synchronize Repositories" );
         property = new ScheduledServiceTypePropertyResource();
+        property.setId( "3" );
         property.setName( "Some Config Value" );
         property.setType( "string" );
         property.setHelpText( "Some Help Text" );
         type.addProperty( property );
         property = new ScheduledServiceTypePropertyResource();
+        property.setId( "4" );
         property.setName( "Other Config Value" );
         property.setType( "string" );
         property.setHelpText( "Other Help Text" );
