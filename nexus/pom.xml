@@ -123,6 +123,15 @@
 				<version>1.1</version>
       			<scope>provided</scope>
     		</dependency>
+            
+            <dependency>
+				<groupId>org.sonatype.jsw-binaries</groupId>
+				<artifactId>jsw-binaries</artifactId>
+				<version>3.2.3.1</version>
+				<type>zip</type>
+				<!--make sure this doesn't get into any classpaths-->
+				<scope>provided</scope>
+			</dependency>
 
 			<!-- Plexus -->
 			<dependency>
@@ -462,14 +471,6 @@
 				<scope>compile</scope>
 			</dependency>
 
-			<dependency>
-				<groupId>org.sonatype.jsw-binaries</groupId>
-				<artifactId>jsw-binaries</artifactId>
-				<version>3.2.3</version>
-				<type>zip</type>
-				<!--make sure this doesn't get into any classpaths-->
-				<scope>provided</scope>
-			</dependency>
 
 			<!-- Tests -->
 			<dependency>
