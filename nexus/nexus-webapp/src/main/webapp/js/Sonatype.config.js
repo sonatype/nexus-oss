@@ -95,7 +95,8 @@ Sonatype.config = function() {
         systemChangesRss: servicePath + '/feeds/systemChanges',
         status: servicePath + '/status',
         identify: servicePath + '/identify/sha1',
-        schedules: servicePath + '/schedules'
+        schedules: servicePath + '/schedules',
+        scheduleTypes: servicePath + '/schedules/types'
       }
     },
     
