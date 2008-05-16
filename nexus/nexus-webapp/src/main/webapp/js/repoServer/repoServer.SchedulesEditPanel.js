@@ -50,8 +50,7 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
       //serviceProperties : this.importServicePropertiesHelper.createDelegate(this),
       startDate : this.importStartDateHelper.createDelegate(this),
       startTime : this.importStartTimeHelper.createDelegate(this),
-      recurringTime : this.importRecurringTimeHelper.createDelegate(this),
-      recurringDay : this.importRecurringDayHelper.createDelegate(this) 
+      recurringTime : this.importRecurringTimeHelper.createDelegate(this)       
     },
     weekly : {
       serviceSchedule : Sonatype.utils.capitalize,
@@ -59,14 +58,15 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
       startDate : this.importStartDateHelper.createDelegate(this),
       startTime : this.importStartTimeHelper.createDelegate(this),
       recurringTime : this.importRecurringTimeHelper.createDelegate(this),
-      recurringDay : this.importMonthlyRecurringDayHelper.createDelegate(this)
+      recurringDay : this.importRecurringDayHelper.createDelegate(this)
     },
     monthly : {
       serviceSchedule : Sonatype.utils.capitalize,
       //serviceProperties : this.importServicePropertiesHelper.createDelegate(this),
       startDate : this.importStartDateHelper.createDelegate(this),
       startTime : this.importStartTimeHelper.createDelegate(this),
-      recurringTime : this.importRecurringTimeHelper.createDelegate(this)
+      recurringTime : this.importRecurringTimeHelper.createDelegate(this),
+      recurringDay : this.importMonthlyRecurringDayHelper.createDelegate(this)
     },
     advanced : {
       serviceSchedule : Sonatype.utils.capitalize,
@@ -134,12 +134,6 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
         xtype: 'hidden',
         name: 'id'
       },      
-      {
-        xtype: 'checkbox',
-        fieldLabel: 'Enabled',
-        helpText: ht.enabled,
-        name: 'enabled'    
-      },
       {
         xtype: 'textfield',
         fieldLabel: 'Name',
@@ -1207,10 +1201,10 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
     //@note: there has to be a better way to do this.  Depending on offsets is very error prone
     var newConfig = config;
 
-    newConfig.items[5].items[3].items[3].items[0].id = id + '_weekdays-tree';
-    newConfig.items[5].items[3].items[3].items[0].root = new Ext.tree.TreeNode({text: 'root'});
-    newConfig.items[5].items[3].items[3].items[1].id = id + '_all_weekdays-tree';
-    newConfig.items[5].items[3].items[3].items[1].root = new Ext.tree.TreeNode({text: 'root'});
+    newConfig.items[4].items[3].items[3].items[0].id = id + '_weekdays-tree';
+    newConfig.items[4].items[3].items[3].items[0].root = new Ext.tree.TreeNode({text: 'root'});
+    newConfig.items[4].items[3].items[3].items[1].id = id + '_all_weekdays-tree';
+    newConfig.items[4].items[3].items[3].items[1].root = new Ext.tree.TreeNode({text: 'root'});
 
     return newConfig;
   },

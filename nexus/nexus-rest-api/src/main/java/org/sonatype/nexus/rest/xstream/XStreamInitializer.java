@@ -75,6 +75,7 @@ import org.sonatype.nexus.rest.model.ScheduledServiceDailyResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceListResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceListResourceResponse;
 import org.sonatype.nexus.rest.model.ScheduledServiceMonthlyResource;
+import org.sonatype.nexus.rest.model.ScheduledServiceOnceResource;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceResourceResponse;
 import org.sonatype.nexus.rest.model.ScheduledServiceWeeklyResource;
@@ -181,6 +182,7 @@ public final class XStreamInitializer
         xstream.omitField( ScheduledServiceListResourceResponse.class, "modelEncoding" );
         xstream.omitField( ScheduledServiceBaseResource.class, "modelEncoding" );
         xstream.omitField( ScheduledServicePropertyResource.class, "modelEncoding" );
+        xstream.omitField( ScheduledServiceOnceResource.class, "modelEncoding" );
         xstream.omitField( ScheduledServiceDailyResource.class, "modelEncoding" );
         xstream.omitField( ScheduledServiceAdvancedResource.class, "modelEncoding" );
         xstream.omitField( ScheduledServiceMonthlyResource.class, "modelEncoding" );

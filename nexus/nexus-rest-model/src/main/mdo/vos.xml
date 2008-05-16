@@ -1174,12 +1174,6 @@
 					<required>true</required>
 				</field>
 				<field>
-					<name>enabled</name>
-					<version>1.0.0+</version>
-					<type>boolean</type>
-					<required>true</required>
-				</field>
-				<field>
 				    <name>serviceProperties</name>
 				    <version>1.0.0+</version>
 				    <association>
