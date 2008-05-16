@@ -57,11 +57,7 @@ public class ScheduledServiceListResourceHandler
     {
         ScheduledServiceResourceResponse response = (ScheduledServiceResourceResponse) deserialize( new ScheduledServiceResourceResponse() );
 
-        if ( response == null )
-        {
-            return;
-        }
-        else
+        if ( response != null )
         {
             ScheduledServiceBaseResource resource = response.getData();
 

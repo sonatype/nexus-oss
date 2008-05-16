@@ -207,11 +207,11 @@ public class ScheduledServiceResponseTest
         super.tearDown();
     }
 
-    public void testDailyScheduledService()
+    public void testNoScheduledService()
         throws Exception
     {
         String jsonString = "{ \"org.sonatype.nexus.rest.model.ScheduledServiceListResourceResponse\" : " +
-            "{\"data\":{\"id\":null,\"name\":\"test\",\"serviceType\":\"Synchronize Repositories\",\"serviceSchedule\":\"weekly\",\"enabled\":false,\"startTime\":\"\",\"recurringTime\":null}}}";
+            "{\"data\":{\"id\":null,\"name\":\"test\",\"serviceType\":\"Synchronize Repositories\",\"serviceSchedule\":\"none\",\"enabled\":false}}}";
         XStreamRepresentation representation = new XStreamRepresentation(
             xstream,
             jsonString,
@@ -221,12 +221,11 @@ public class ScheduledServiceResponseTest
             .getPayload( new ScheduledServiceListResourceResponse() );
 
     }
-    /* NOT CURRENTLY FUNCTIONING
-    public void testWeeklyScheduledService()
+    public void testOnceScheduledService()
         throws Exception
     {
         String jsonString = "{ \"org.sonatype.nexus.rest.model.ScheduledServiceListResourceResponse\" : " +
-            "{\"data\":{\"id\":null,\"name\":\"test\",\"serviceType\":\"Synchronize Repositories\",\"serviceSchedule\":\"weekly\",\"enabled\":false,\"startTime\":\"\",\"recurringTime\":null,\"recurringDay\":[\"Monday\",\"Wednesday\"]}}}";
+            "{\"data\":{\"id\":null,\"name\":\"test\",\"serviceType\":\"Synchronize Repositories\",\"serviceSchedule\":\"once\",\"enabled\":false,\"startDate\":\"1210651200000\",\"startTime\":\"12:30\"}}}";
         XStreamRepresentation representation = new XStreamRepresentation(
             xstream,
             jsonString,
@@ -234,6 +233,62 @@ public class ScheduledServiceResponseTest
     
         ScheduledServiceListResourceResponse response = (ScheduledServiceListResourceResponse) representation
             .getPayload( new ScheduledServiceListResourceResponse() );
+    
     }
-*/
+    public void testDailyScheduledService()
+        throws Exception
+    {
+        String jsonString = "{ \"org.sonatype.nexus.rest.model.ScheduledServiceListResourceResponse\" : " +
+            "{\"data\":{\"id\":null,\"name\":\"test\",\"serviceType\":\"Synchronize Repositories\",\"serviceSchedule\":\"daily\",\"enabled\":false,\"startDate\":\"1210651200000\",\"startTime\":\"12:30\",\"recurringTime\":\"12:30\"}}}";
+        XStreamRepresentation representation = new XStreamRepresentation(
+            xstream,
+            jsonString,
+            MediaType.APPLICATION_JSON );
+    
+        ScheduledServiceListResourceResponse response = (ScheduledServiceListResourceResponse) representation
+            .getPayload( new ScheduledServiceListResourceResponse() );
+    
+    }
+    /*public void testWeeklyScheduledService()
+        throws Exception
+    {
+        String jsonString = "{ \"org.sonatype.nexus.rest.model.ScheduledServiceListResourceResponse\" : " +
+            "{\"data\":{\"id\":null,\"name\":\"test\",\"serviceType\":\"Synchronize Repositories\",\"serviceSchedule\":\"weekly\",\"enabled\":false,\"startDate\":\"1210651200000\",\"startTime\":\"12:30\",\"recurringTime\":\"12:30\",\"recurringDay\":[\"Monday\",\"Wednesday\"]}}}";
+        XStreamRepresentation representation = new XStreamRepresentation(
+            xstream,
+            jsonString,
+            MediaType.APPLICATION_JSON );
+    
+        ScheduledServiceListResourceResponse response = (ScheduledServiceListResourceResponse) representation
+            .getPayload( new ScheduledServiceListResourceResponse() );
+    
+    }
+    public void testMonthlyScheduledService()
+        throws Exception
+    {
+        String jsonString = "{ \"org.sonatype.nexus.rest.model.ScheduledServiceListResourceResponse\" : " +
+            "{\"data\":{\"id\":null,\"name\":\"test\",\"serviceType\":\"Synchronize Repositories\",\"serviceSchedule\":\"monthly\",\"enabled\":false,\"startDate\":\"1210651200000\",\"startTime\":\"12:30\",\"recurringTime\":\"12:30\",\"recurringDay\":[\"1\",\"2\"]}}}";
+        XStreamRepresentation representation = new XStreamRepresentation(
+            xstream,
+            jsonString,
+            MediaType.APPLICATION_JSON );
+    
+        ScheduledServiceListResourceResponse response = (ScheduledServiceListResourceResponse) representation
+            .getPayload( new ScheduledServiceListResourceResponse() );
+    
+    }*/
+    public void testAdvancedScheduledService()
+        throws Exception
+    {
+        String jsonString = "{ \"org.sonatype.nexus.rest.model.ScheduledServiceListResourceResponse\" : " +
+            "{\"data\":{\"id\":null,\"name\":\"test\",\"serviceType\":\"Synchronize Repositories\",\"serviceSchedule\":\"advanced\",\"enabled\":false}}}";
+        XStreamRepresentation representation = new XStreamRepresentation(
+            xstream,
+            jsonString,
+            MediaType.APPLICATION_JSON );
+    
+        ScheduledServiceListResourceResponse response = (ScheduledServiceListResourceResponse) representation
+            .getPayload( new ScheduledServiceListResourceResponse() );
+    
+    }
 }

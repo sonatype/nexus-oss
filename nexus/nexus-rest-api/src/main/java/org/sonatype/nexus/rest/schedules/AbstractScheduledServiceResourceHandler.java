@@ -9,7 +9,10 @@ public class AbstractScheduledServiceResourceHandler
     extends AbstractNexusResourceHandler
 {
     /** Schedule Type Off.*/
-    public static final String SCHEDULE_TYPE_OFF = "off";
+    public static final String SCHEDULE_TYPE_NONE = "none";
+    
+    /** Schedule Type Once.*/
+    public static final String SCHEDULE_TYPE_ONCE = "once";
     
     /** Schedule Type Daily. */
     public static final String SCHEDULE_TYPE_DAILY = "daily";

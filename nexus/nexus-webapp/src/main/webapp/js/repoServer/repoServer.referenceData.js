@@ -153,6 +153,30 @@ Sonatype.repoServer.referenceData = {
   },
   
   schedule : {
+    none : {
+      id : "",
+	  name : "",
+	  serviceType : "",
+	  serviceSchedule : "",
+	  enabled : false,
+	  serviceProperties : [{
+	    name: "",
+	    value: ""
+	  }]
+    },
+    once : {
+      id : "",
+	  name : "",
+	  serviceType : "",
+	  serviceSchedule : "",
+	  enabled : false,
+	  serviceProperties : [{
+	    name: "",
+	    value: ""
+	  }],
+	  startDate : "",
+	  startTime : ""
+    },
     daily : {
 	  id : "",
 	  name : "",
@@ -163,6 +187,7 @@ Sonatype.repoServer.referenceData = {
 	    name: "",
 	    value: ""
 	  }],
+	  startDate : "",
 	  startTime : "",
 	  recurringTime : ""
     },
@@ -176,6 +201,7 @@ Sonatype.repoServer.referenceData = {
 	    name: "",
 	    value: ""
 	  }],
+	  startDate : "",
 	  startTime : "",
 	  recurringTime : "",
 	  recurringDay : []
@@ -190,6 +216,7 @@ Sonatype.repoServer.referenceData = {
 	    name: "",
 	    value: ""
 	  }],
+	  startDate : "",
 	  startTime : "",
 	  recurringTime : "",
       recurringDay : []

@@ -1211,20 +1211,34 @@
 		</class>
 		
 		<class>
-		    <name>ScheduledServiceDailyResource</name>
+		    <name>ScheduledServiceOnceResource</name>
 		    <superClass>ScheduledServiceBaseResource</superClass>
 			<version>1.0.0+</version>
 			<fields>
 				<field>
-					<name>startTime</name>
+					<name>startDate</name>
 					<version>1.0.0+</version>
-					<type>Date</type>
+					<type>String</type>
 					<required>true</required>
 				</field>
 				<field>
+					<name>startTime</name>
+					<version>1.0.0+</version>
+					<type>String</type>
+					<required>true</required>
+				</field>
+			</fields>
+	    </class>
+		
+		<class>
+		    <name>ScheduledServiceDailyResource</name>
+		    <superClass>ScheduledServiceOnceResource</superClass>
+			<version>1.0.0+</version>
+			<fields>				
+				<field>
 					<name>recurringTime</name>
 					<version>1.0.0+</version>
-					<type>Date</type>
+					<type>String</type>
 					<required>true</required>
 				</field>
 			</fields>

@@ -31,60 +31,86 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
   
   //TODO: this will be calling a rest method at some point
   this.serviceTypeStore = new Ext.data.SimpleStore({fields:['value'], data:[['Synchronize Repositories'],['Purge Snapshots']]});  
-  this.scheduleTypeStore = new Ext.data.SimpleStore({fields:['value'], data:[['Daily'],['Weekly'],['Monthly'],['Advanced']]});
+  this.scheduleTypeStore = new Ext.data.SimpleStore({fields:['value'], data:[['None'],['Once'],['Daily'],['Weekly'],['Monthly'],['Advanced']]});
   this.weekdaysList = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
   
   this.loadDataModFuncs = {
+    none : {
+      serviceSchedule : Sonatype.utils.capitalize
+      //serviceProperties : this.importServicePropertiesHelper.createDelegate(this),
+    },
+    once : {
+      serviceSchedule : Sonatype.utils.capitalize,
+      //serviceProperties : this.importServicePropertiesHelper.createDelegate(this),
+      startDate : this.importStartDateHelper.createDelegate(this),
+      startTime : this.importStartTimeHelper.createDelegate(this)
+    },
     daily : {
       serviceSchedule : Sonatype.utils.capitalize,
-      serviceProperties : this.importServicePropertiesHelper.createDelegate(this),
+      //serviceProperties : this.importServicePropertiesHelper.createDelegate(this),
+      startDate : this.importStartDateHelper.createDelegate(this),
       startTime : this.importStartTimeHelper.createDelegate(this),
       recurringTime : this.importRecurringTimeHelper.createDelegate(this),
       recurringDay : this.importRecurringDayHelper.createDelegate(this) 
     },
     weekly : {
       serviceSchedule : Sonatype.utils.capitalize,
-      serviceProperties : this.importServicePropertiesHelper.createDelegate(this),
+      //serviceProperties : this.importServicePropertiesHelper.createDelegate(this),
+      startDate : this.importStartDateHelper.createDelegate(this),
       startTime : this.importStartTimeHelper.createDelegate(this),
       recurringTime : this.importRecurringTimeHelper.createDelegate(this),
       recurringDay : this.importMonthlyRecurringDayHelper.createDelegate(this)
     },
     monthly : {
       serviceSchedule : Sonatype.utils.capitalize,
-      serviceProperties : this.importServicePropertiesHelper.createDelegate(this),
+      //serviceProperties : this.importServicePropertiesHelper.createDelegate(this),
+      startDate : this.importStartDateHelper.createDelegate(this),
       startTime : this.importStartTimeHelper.createDelegate(this),
       recurringTime : this.importRecurringTimeHelper.createDelegate(this)
     },
     advanced : {
       serviceSchedule : Sonatype.utils.capitalize,
-      serviceProperties : this.importServicePropertiesHelper.createDelegate(this)
+      //serviceProperties : this.importServicePropertiesHelper.createDelegate(this)
     }
   };
   
   this.submitDataModFuncs = {
+    none : {
+      serviceSchedule : Sonatype.utils.lowercase
+      //serviceProperties : this.exportServicePropertiesHelper.createDelegate(this)
+    },
+    once : {
+      serviceSchedule : Sonatype.utils.lowercase,
+      //serviceProperties : this.exportServicePropertiesHelper.createDelegate(this),
+      startDate : this.exportStartDateHelper.createDelegate(this),
+      startTime : this.exportStartTimeHelper.createDelegate(this)
+    },
     daily : {
       serviceSchedule : Sonatype.utils.lowercase,
-      serviceProperties : this.exportServicePropertiesHelper.createDelegate(this),
+      //serviceProperties : this.exportServicePropertiesHelper.createDelegate(this),
+      startDate : this.exportStartDateHelper.createDelegate(this),
       startTime : this.exportStartTimeHelper.createDelegate(this),
       recurringTime : this.exportRecurringTimeHelper.createDelegate(this)
     },
     weekly : {
       serviceSchedule : Sonatype.utils.lowercase,
-      serviceProperties : this.exportServicePropertiesHelper.createDelegate(this),
+      //serviceProperties : this.exportServicePropertiesHelper.createDelegate(this),
+      startDate : this.exportStartDateHelper.createDelegate(this),
       startTime : this.exportStartTimeHelper.createDelegate(this),
       recurringTime : this.exportRecurringTimeHelper.createDelegate(this),
       recurringDay : this.exportRecurringDayHelper.createDelegate(this)
     },
     monthly : {
       serviceSchedule : Sonatype.utils.lowercase,
-      serviceProperties : this.exportServicePropertiesHelper.createDelegate(this),
+      //serviceProperties : this.exportServicePropertiesHelper.createDelegate(this),
+      startDate : this.exportStartDateHelper.createDelegate(this),
       startTime : this.exportStartTimeHelper.createDelegate(this),
       recurringTime : this.exportRecurringTimeHelper.createDelegate(this),
       recurringDay : this.exportMonthlyRecurringDayHelper .createDelegate(this)
     },
     advanced : {
       serviceSchedule : Sonatype.utils.lowercase,
-      serviceProperties : this.exportServicePropertiesHelper.createDelegate(this)
+      //serviceProperties : this.exportServicePropertiesHelper.createDelegate(this)
     }
   };
   
@@ -177,6 +203,38 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
     	      layoutConfig: {
 	            labelSeparator: ''
 	          }
+          },
+          {
+            xtype: 'fieldset',
+    	      checkboxToggle:false,
+    	      title: 'One Time Schedule Settings',
+    	      anchor: Sonatype.view.FIELDSET_OFFSET,
+    	      collapsible: false,
+    	      autoHeight:true,
+    	      layoutConfig: {
+	            labelSeparator: ''
+	          },
+            items: [
+              {
+                xtype: 'datefield',
+                fieldLabel: 'Start Date',
+                itemCls: 'required-field',
+                helpText: ht.startDate,
+                name: 'startDate',
+                disabled:true,
+                allowBlank:false
+              },
+              {
+                xtype: 'timefield',
+                fieldLabel: 'Start Time',
+                itemCls: 'required-field',
+                helpText: ht.startTime,
+                name: 'startTime',
+                width: 75,                
+                disabled:true,
+                allowBlank:false
+              }
+            ]
           },
           {
             xtype: 'fieldset',
@@ -639,85 +697,23 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
     		    collapsible: false,
     		    autoHeight:true,
     		    layoutConfig: {
-              labelSeparator: ''
-            },
-            items: [
-              {
-                xtype: 'textfield',
-                fieldLabel: 'CRON command',
-                itemCls: 'required-field',
-                name: 'cronCommand',
-                helpText: ht.cronCommand,
-                width: 200,
-                disabled:true,
-                allowBlank:false
-              }
-            ]
-          }
-        ]
-      },
-      {
-        xtype: 'editorgrid',
-        title: 'Service Parameters',
-        id: '_service_param_grid',
-        collapsible: true,
-        split: true,
-        height: 200,
-        minHeight: 150,
-        maxHeight: 400,
-        frame: false,
-        autoScroll: true,
-        clicksToEdit:2,
-        tbar: [
-          {
-            id: 'schedule-add-btn',
-            text:'Add',
-            icon: Sonatype.config.resourcePath + '/images/icons/add.png',
-            cls: 'x-btn-text-icon',
-            scope: this,
-            handler: this.addParameterResourceHandler
-          },
-          {
-            id: 'schedule-delete-btn',
-            text: 'Delete',
-            icon: Sonatype.config.resourcePath + '/images/icons/delete.png',
-            cls: 'x-btn-text-icon',
-            scope:this,
-            handler: this.deleteParameterResourceHandler
-          }
-        ],
-        //grid view options
-        //This will be assigned later at add time
-        ds: null,
-        sortInfo:{field: 'name', direction: "ASC"},
-        loadMask: true,
-        deferredRender: false,
-        columns: [
-          {
-            header: 'Name', 
-            dataIndex: 'name', 
-            width:175, 
-            id: 'schedule-config-parameter-name-col',
-            editor: new Ext.form.TextField({
-               allowBlank: false
-            })
-          },
-          {
-            header: 'Value', 
-            dataIndex: 'value', 
-            width:175, 
-            id: 'schedule-config-parameter-value-col',
-            editor: new Ext.form.TextField({
-              allowBlank: false
-            })
-          }
-        ],
-        autoExpandColumn: 'schedule-config-parameter-name-col',
-        disableSelection: false,
-        viewConfig: {
-          emptyText: 'Click "Add" to create a new parameter.'
+                labelSeparator: ''
+              },
+              items: [
+                {
+                  xtype: 'textfield',
+                  fieldLabel: 'CRON command',
+                  itemCls: 'required-field',
+                  name: 'cronCommand',
+                  helpText: ht.cronCommand,
+                  width: 200,
+                  disabled:true,
+                  allowBlank:false
+                }
+              ]
+            }
+          ]
         }
-      }
 	  ],
     buttons: [
       {
@@ -928,11 +924,6 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
     var serviceScheduleField = formPanel.find('name', 'serviceSchedule')[0];
     serviceScheduleField.on('select', this.serviceScheduleSelectHandler, serviceScheduleField);
     
-    //Rebuild
-    formPanel.find('id', id + '_service_param_grid')[0].store = new Ext.data.SimpleStore(
-      {fields:['name','value'], data:[['repository.id','central'],['some.other.id','blah']]}
-    );
-    
     var buttonInfoObj = {
         formPanel : formPanel,
         isNew : true
@@ -960,17 +951,6 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
     //always set active and re-layout
     this.formCards.getLayout().setActiveItem(formPanel);
     formPanel.doLayout();
-  },
-  
-  addParameterResourceHandler : function() {
-    var id = 'new_service_parameter_' + new Date().getTime();
-    var newRec = new this.serviceParameterRecordConstructor({
-        name : 'New Parameter',
-        value : 'New Value'
-      },
-      id);
-    
-    this.find('id', this.formCards.layout.activeItem.id + '_service_param_grid')[0].getStore().insert(0,[newRec]);
   },
   
   afterLayoutFormHandler : function(formPanel, fLayout){
@@ -1068,15 +1048,7 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
       Ext.MessageBox.alert('The server did not delete the scheduled service.');
     }
   },
-  
-  deleteParameterResourceHandler : function(){
-    var paramGrid = this.find('id', this.formCards.layout.activeItem.id + '_service_param_grid')[0];
-    if (paramGrid.getSelectionModel().hasSelection()){
-      var rec = paramGrid.getSelectionModel().selection.record;
-      paramGrid.getStore().remove(rec);
-    }
-  },
-  
+    
   //(Ext.form.BasicForm, Ext.form.Action)
   actionCompleteHandler : function(form, action) {
     //@todo: handle server error response here!!
@@ -1206,20 +1178,23 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
     schedulePanel.getLayout().activeItem.items.each(function(item){
       item.disable();
     });
-    if (record.data.value == 'Daily'){
+    if (record.data.value == 'Once'){
       schedulePanel.getLayout().setActiveItem(schedulePanel.items.itemAt(1));
     }
-    else if (record.data.value == 'Weekly'){
+    else if (record.data.value == 'Daily'){
       schedulePanel.getLayout().setActiveItem(schedulePanel.items.itemAt(2));
     }
-    else if (record.data.value == 'Monthly'){
+    else if (record.data.value == 'Weekly'){
       schedulePanel.getLayout().setActiveItem(schedulePanel.items.itemAt(3));
     }
-    else if (record.data.value == 'Advanced'){
+    else if (record.data.value == 'Monthly'){
       schedulePanel.getLayout().setActiveItem(schedulePanel.items.itemAt(4));
     }
+    else if (record.data.value == 'Advanced'){
+      schedulePanel.getLayout().setActiveItem(schedulePanel.items.itemAt(5));
+    }
     else {
-      schedulePanel.getLayout().setActiveItem(schedulPanel.items.itemAt(0));
+      schedulePanel.getLayout().setActiveItem(schedulePanel.items.itemAt(0));
     }
     schedulePanel.getLayout().activeItem.items.each(function(item){
       item.enable();
@@ -1232,11 +1207,10 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
     //@note: there has to be a better way to do this.  Depending on offsets is very error prone
     var newConfig = config;
 
-    newConfig.items[6].id = id + '_service_param_grid';
-    newConfig.items[5].items[2].items[3].items[0].id = id + '_weekdays-tree';
-    newConfig.items[5].items[2].items[3].items[0].root = new Ext.tree.TreeNode({text: 'root'});
-    newConfig.items[5].items[2].items[3].items[1].id = id + '_all_weekdays-tree';
-    newConfig.items[5].items[2].items[3].items[1].root = new Ext.tree.TreeNode({text: 'root'});
+    newConfig.items[5].items[3].items[3].items[0].id = id + '_weekdays-tree';
+    newConfig.items[5].items[3].items[3].items[0].root = new Ext.tree.TreeNode({text: 'root'});
+    newConfig.items[5].items[3].items[3].items[1].id = id + '_all_weekdays-tree';
+    newConfig.items[5].items[3].items[3].items[1].root = new Ext.tree.TreeNode({text: 'root'});
 
     return newConfig;
   },
@@ -1284,10 +1258,9 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
     }
     
     return arr; //return arr, even if empty to comply with sonatypeLoad data modifier requirement
-  },  
-  exportStartTimeHelper : function(val, fpanel){
+  },
+  exportStartDateHelper : function(val, fpanel){
     var selectedStartDate = "";
-    var selectedStartTime = "";
     
     var startDateFields = fpanel.find('name', 'startDate');
     for(var i=0; i<startDateFields.length; i++){
@@ -1297,6 +1270,11 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
       }
     }
     
+    return '' + selectedStartDate.getValue().getTime();
+  },  
+  exportStartTimeHelper : function(val, fpanel){
+    var selectedStartTime = "";
+    
     var startTimeFields = fpanel.find('name', 'startTime');
     for(var i=0; i<startTimeFields.length; i++){
       if (!startTimeFields[i].disabled){
@@ -1305,17 +1283,14 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
       }
     }
     
-    var hours = parseInt(selectedStartTime.getValue().substring(0, selectedStartTime.getValue().indexOf(':')));
-    var minutes = parseInt(selectedStartTime.getValue().substring(selectedStartTime.getValue().indexOf(':') + 1, selectedStartTime.getValue().indexOf(':') + 3));
+    var hours = parseInt(selectedStartTime.getValue().substring(0, selectedStartTime.getValue().indexOf(':'))) + (selectedStartTime.getValue().indexOf('AM') == -1 ? 12 : 0);
+    var minutes = selectedStartTime.getValue().substring(selectedStartTime.getValue().indexOf(':') + 1, selectedStartTime.getValue().indexOf(':') + 3);
     
-    var value = selectedStartDate.getValue();
-    value.setHours(hours + (selectedStartTime.getValue().indexOf('AM') == -1 ? 12 : 0));
-    value.setMinutes(minutes);
-    
-    return value;
-  },
+    return hours + ':' + minutes;
+  },  
   exportRecurringTimeHelper : function(val, fpanel){
     var selectedRecurringTime = "";
+    
     var recurringTimeFields = fpanel.find('name', 'recurringTime');
     for(var i=0; i<recurringTimeFields.length; i++){
       if (!recurringTimeFields[i].disabled){
@@ -1326,8 +1301,8 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
     
     var hours = parseInt(selectedRecurringTime.getValue().substring(0, selectedRecurringTime.getValue().indexOf(':'))) + (selectedRecurringTime.getValue().indexOf('AM') == -1 ? 12 : 0);
     var minutes = selectedRecurringTime.getValue().substring(selectedRecurringTime.getValue().indexOf(':') + 1, selectedRecurringTime.getValue().indexOf(':') + 3);
-        
-    return hours + ":" + minutes;
+    
+    return hours + ':' + minutes;
   },
   exportRecurringDayHelper : function(val, fpanel){
     var selectedTree = Ext.getCmp(fpanel.id + '_weekdays-tree');
@@ -1354,17 +1329,8 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
     }
     return outputArr;
   },
-  exportServicePropertiesHelper : function(val, fpanel){
-    var outputArr = [];
-    var dataStore = fpanel.find('id', fpanel.id + '_service_param_grid')[0].getStore();
-    dataStore.each(function(item, i, len){
-      outputArr[i] = item.data;
-    }, dataStore);
-    return outputArr;
-  },
-  importStartTimeHelper : function(val, fpanel){
+  importStartDateHelper : function(val, fpanel){
     var selectedStartDate = "";
-    var selectedStartTime = "";
     var startDateFields = fpanel.find('name', 'startDate');
     for(var i=0; i<startDateFields.length; i++){
       if (!startDateFields[i].disabled){
@@ -1372,6 +1338,12 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
         break;
       }
     }
+    
+    selectedStartDate.setValue(new Date(parseInt(val)));
+    return val;
+  },
+  importStartTimeHelper : function(val, fpanel){
+    var selectedStartTime = "";
     
     var startTimeFields = fpanel.find('name', 'startTime');
     for(var i=0; i<startTimeFields.length; i++){
@@ -1381,20 +1353,21 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
       }
     }
     
+    var hours = parseInt(selectedStartTime.getValue().substring(0, selectedStartTime.getValue().indexOf(':')));
+    var minutes = selectedStartTime.getValue().substring(selectedStartTime.getValue().indexOf(':') + 1, selectedStartTime.getValue().indexOf(':') + 3);    
     var afternoon = false;
-    var hours = val.getHours();
+    
     if (hours > 12){
       hours = hours - 12;
       afternoon = true;
     }
-    var minutes = val.getMinutes();
     selectedStartTime.setValue(hours + ':' + minutes + (afternoon ? ' PM' : ' AM'));
-    selectedStartDate.setValue(val);
     return val;
   },
   importRecurringTimeHelper : function(val, fpanel){
     var selectedRecurringTime = "";
-    var recurringTimeFields = fpanel.find('name', 'recurringTime');
+    
+    var recurringTimeFields = fpanel.find('name', 'startTime');
     for(var i=0; i<recurringTimeFields.length; i++){
       if (!recurringTimeFields[i].disabled){
         selectedRecurringTime = recurringTimeFields[i];
@@ -1402,13 +1375,14 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
       }
     }
     
+    var hours = parseInt(selectedRecurringTime.getValue().substring(0, selectedRecurringTime.getValue().indexOf(':')));
+    var minutes = selectedStartTime.getValue().substring(selectedRecurringTime.getValue().indexOf(':') + 1, selectedRecurringTime.getValue().indexOf(':') + 3);    
     var afternoon = false;
-    var hours = parseInt(val.substring(0, val.indexOf(':')));
+    
     if (hours > 12){
       hours = hours - 12;
       afternoon = true;
     }
-    var minutes = val.substring(val.indexOf(':') + 1, val.indexOf(':') + 3);
     selectedReccuringTime.setValue(hours + ':' + minutes + (afternoon ? ' PM' : ' AM'));
     return val;
   },
@@ -1457,16 +1431,7 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
       }
       checkbox.checked = true;
     }
-  },
-  importServicePropertiesHelper : function(arr, srcObj, fpanel){
-    var store = fpanel.find('id', fpanel.id + '_service_param_grid')[0].getStore();
-    for(var i=0; i<arr.length; i++){
-      var newRec = new this.serviceParameterRecordConstructor({
-        name : arr[i].name,
-        value : arr[i].value
-      },
-      id);
-      store.insert([newRec]);
-    }
+    
+    return arr;
   }
 });

@@ -4,6 +4,7 @@ import org.sonatype.nexus.rest.model.ScheduledServiceAdvancedResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceBaseResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceDailyResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceMonthlyResource;
+import org.sonatype.nexus.rest.model.ScheduledServiceOnceResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceWeeklyResource;
 import org.sonatype.plexus.rest.xstream.json.LookAheadStreamReader;
 
@@ -45,6 +46,14 @@ public class ScheduledServiceBaseResourceConverter
             if ( serviceSchedule == null )
             {
                 return super.instantiateNewInstance( reader, context );
+            }
+            else if ( AbstractScheduledServiceResourceHandler.SCHEDULE_TYPE_NONE.equals( serviceSchedule ))
+            {
+                return new ScheduledServiceBaseResource();
+            }
+            else if ( AbstractScheduledServiceResourceHandler.SCHEDULE_TYPE_ONCE.equals( serviceSchedule ))
+            {
+                return new ScheduledServiceOnceResource();
             }
             else if ( AbstractScheduledServiceResourceHandler.SCHEDULE_TYPE_DAILY.equals( serviceSchedule ))
             {
