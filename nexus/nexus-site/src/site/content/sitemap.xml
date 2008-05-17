@@ -8,6 +8,7 @@
     <page>news.html</page>
     <page>changes.html</page>
     <page>history.html</page>
+    <link title="Product Roadmap">https://docs.sonatype.com/display/Nexus/Nexus+RoadMap</link>
    <!-- <page>versioning.html</page>    -->
     <!--
     <page>used-by.html</page>   
@@ -25,5 +26,6 @@
     <page>mailing-lists.html</page>
     <page>team.html</page>
     <page>repository.html</page>
+    <link title="Product Wiki">https://docs.sonatype.com/display/Nexus/Home</link>
   </section>
 </sitemap>
