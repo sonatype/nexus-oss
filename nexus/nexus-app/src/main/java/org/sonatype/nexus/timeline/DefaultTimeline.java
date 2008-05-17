@@ -77,6 +77,12 @@ public class DefaultTimeline
 
     private Directory indexDirectory;
 
+    private IndexReader indexReader;
+
+    private IndexSearcher indexSearcher;
+
+    private NexusIndexWriter indexWriter;
+
     private boolean running = false;
 
     public void initialize()
@@ -117,8 +123,6 @@ public class DefaultTimeline
 
         getLogger().info( "Starting Timeline..." );
 
-        IndexWriter indexWriter = null;
-
         try
         {
             synchronized ( this )
@@ -148,8 +152,6 @@ public class DefaultTimeline
 
                 indexWriter.optimize();
 
-                indexWriter.close();
-
                 running = true;
             }
         }
@@ -161,10 +163,6 @@ public class DefaultTimeline
 
             throw e;
         }
-        finally
-        {
-            closeIndexWriter( indexWriter );
-        }
     }
 
     public void stopService()
@@ -175,9 +173,38 @@ public class DefaultTimeline
 
         try
         {
+            boolean shouldStop = false;
             synchronized ( this )
             {
+                shouldStop = running;
+
                 running = false;
+            }
+
+            if ( shouldStop )
+            {
+                if ( indexWriter != null )
+                {
+                    indexWriter.optimize();
+
+                    indexWriter.close();
+
+                    indexWriter = null;
+                }
+
+                if ( indexSearcher != null )
+                {
+                    indexSearcher.close();
+
+                    indexSearcher = null;
+                }
+
+                if ( indexReader != null )
+                {
+                    indexReader.close();
+
+                    indexReader = null;
+                }
 
                 if ( indexDirectory != null )
                 {
@@ -195,35 +222,54 @@ public class DefaultTimeline
         }
     }
 
+    protected IndexWriter getIndexWriter()
+        throws IOException
+    {
+        if ( indexWriter == null || indexWriter.isClosed() )
+        {
+            indexWriter = new NexusIndexWriter( indexDirectory, new KeywordAnalyzer(), false );
+        }
+        return indexWriter;
+    }
+
     protected IndexReader getIndexReader()
         throws IOException
     {
-        return IndexReader.open( indexDirectory );
+        if ( indexReader == null || !indexReader.isCurrent() )
+        {
+            if ( indexReader != null )
+            {
+                indexReader.close();
+            }
+            indexReader = IndexReader.open( indexDirectory );
+        }
+        return indexReader;
     }
 
     protected IndexSearcher getIndexSearcher()
         throws IOException
     {
-        return new IndexSearcher( getIndexReader() );
-    }
+        if ( indexSearcher == null || getIndexReader() != indexSearcher.getIndexReader() )
+        {
+            if ( indexSearcher != null )
+            {
+                indexSearcher.close();
 
-    protected IndexWriter getIndexWriter()
-        throws IOException
-    {
-        return new NexusIndexWriter( indexDirectory, new KeywordAnalyzer(), false );
+                // the reader was supplied explicitly
+                indexSearcher.getIndexReader().close();
+            }
+            indexSearcher = new IndexSearcher( getIndexReader() );
+        }
+        return indexSearcher;
     }
 
     protected void purge( Query query )
     {
-        IndexSearcher is = null;
-
         try
         {
             synchronized ( this )
             {
-                is = getIndexSearcher();
-
-                Hits hits = is.search( query );
+                Hits hits = getIndexSearcher().search( query );
 
                 int docId;
 
@@ -231,6 +277,7 @@ public class DefaultTimeline
                 {
                     docId = hits.id( i );
 
+                    // TODO: this will break if concurrent Writer is open!
                     getIndexSearcher().getIndexReader().deleteDocument( docId );
                 }
             }
@@ -239,25 +286,17 @@ public class DefaultTimeline
         {
             getLogger().error( "Could not purge timeline index!", e );
         }
-        finally
-        {
-            closeIndexSearcher( is );
-        }
     }
 
     protected List<Map<String, String>> retrieve( Query query, int count )
     {
         List<Map<String, String>> result = new ArrayList<Map<String, String>>();
 
-        IndexSearcher is = null;
-
         try
         {
             synchronized ( this )
             {
-                is = getIndexSearcher();
-
-                Hits hits = is.search( query, new Sort( new SortField( TIMESTAMP, SortField.LONG, true ) ) );
+                Hits hits = getIndexSearcher().search( query, new Sort( new SortField( TIMESTAMP, SortField.LONG, true ) ) );
 
                 for ( Iterator<Hit> i = (Iterator<Hit>) hits.iterator(); i.hasNext() && result.size() <= count; )
                 {
@@ -282,10 +321,6 @@ public class DefaultTimeline
         catch ( IOException e )
         {
             getLogger().error( "Could not search timeline index!", e );
-        }
-        finally
-        {
-            closeIndexSearcher( is );
         }
 
         return result;
@@ -370,14 +405,12 @@ public class DefaultTimeline
             iw = getIndexWriter();
 
             addDocument( iw, System.currentTimeMillis(), type, subType, data );
+
+            iw.flush();
         }
         catch ( IOException e )
         {
             getLogger().error( "Cannot add to timeline!", e );
-        }
-        finally
-        {
-            closeIndexWriter( iw );
         }
     }
 
@@ -400,14 +433,12 @@ public class DefaultTimeline
             {
                 addDocument( iw, ts, type, subType, data );
             }
+
+            iw.flush();
         }
         catch ( IOException e )
         {
             getLogger().error( "Cannot add to timeline!", e );
-        }
-        finally
-        {
-            closeIndexWriter( iw );
         }
     }
 
@@ -425,14 +456,12 @@ public class DefaultTimeline
             iw = getIndexWriter();
 
             addDocument( iw, timestamp, type, subType, data );
+
+            iw.flush();
         }
         catch ( IOException e )
         {
             getLogger().error( "Cannot add to timeline!", e );
-        }
-        finally
-        {
-            closeIndexWriter( iw );
         }
     }
 
@@ -453,14 +482,12 @@ public class DefaultTimeline
             {
                 addDocument( iw, timestamp, type, subType, data );
             }
+
+            iw.flush();
         }
         catch ( IOException e )
         {
             getLogger().error( "Cannot add to timeline!", e );
-        }
-        finally
-        {
-            closeIndexWriter( iw );
         }
     }
 
@@ -512,58 +539,6 @@ public class DefaultTimeline
     public List<Map<String, String>> retrieveNewest( int count, String type, String subType )
     {
         return retrieve( buildQuery( 0L, System.currentTimeMillis(), type, subType ), count );
-    }
-
-    // internal stuff
-
-    protected void closeIndexReader( IndexReader ir )
-    {
-        if ( ir == null )
-        {
-            return;
-        }
-
-        try
-        {
-            ir.close();
-        }
-        catch ( IOException e )
-        {
-        }
-    }
-
-    protected void closeIndexSearcher( IndexSearcher is )
-    {
-        if ( is == null )
-        {
-            return;
-        }
-
-        try
-        {
-            is.close();
-        }
-        catch ( IOException e )
-        {
-        }
-
-        closeIndexReader( is.getIndexReader() );
-    }
-
-    protected void closeIndexWriter( IndexWriter iw )
-    {
-        if ( iw == null )
-        {
-            return;
-        }
-
-        try
-        {
-            iw.close();
-        }
-        catch ( IOException e )
-        {
-        }
     }
 
 }

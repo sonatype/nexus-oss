@@ -84,7 +84,7 @@ public class DefaultIndexingContext
 
     private NexusIndexWriter indexWriter;
 
-    private Date timestamp;
+    private long timestamp;
 
     private List<? extends IndexCreator> indexCreators;
 
@@ -167,7 +167,7 @@ public class DefaultIndexingContext
         }
         else
         {
-            if ( getRepositoryId() == null || getRepositoryId().length() == 0 )
+            if ( StringUtils.isEmpty( getRepositoryId() ) )
             {
                 throw new IllegalArgumentException( "The repositoryId cannot be null when creating new repository!" );
             }
@@ -178,13 +178,17 @@ public class DefaultIndexingContext
             storeDescriptor();
         }
 
-        timestamp = IndexUtils.getTimestamp( indexDirectory );
+        Date ts = IndexUtils.getTimestamp( indexDirectory );
 
-        if ( timestamp == null )
+        if ( ts == null )
         {
             IndexUtils.updateTimestamp( indexDirectory, new Date( System.currentTimeMillis() ) );
 
-            timestamp = IndexUtils.getTimestamp( indexDirectory );
+            timestamp = IndexUtils.getTimestamp( indexDirectory ).getTime();
+        }
+        else
+        {
+            timestamp = ts.getTime();
         }
     }
 
@@ -239,25 +243,21 @@ public class DefaultIndexingContext
         throws IOException
     {
         IndexWriter w = getIndexWriter();
-        try
-        {
-            w.deleteDocuments( DESCRIPTOR_TERM );
 
-            Document hdr = new Document();
+        w.deleteDocuments( DESCRIPTOR_TERM );
 
-            hdr.add( new Field( FLD_DESCRIPTOR, FLD_DESCRIPTOR_CONTENTS, Field.Store.YES, Field.Index.UN_TOKENIZED ) );
+        Document hdr = new Document();
 
-            hdr.add( new Field(
-                FLD_IDXINFO,
-                VERSION + AbstractIndexCreator.FS + getRepositoryId(),
-                Field.Store.YES,
-                Field.Index.NO ) );
-            w.addDocument( hdr );
-        }
-        finally
-        {
-            w.close();
-        }
+        hdr.add( new Field( FLD_DESCRIPTOR, FLD_DESCRIPTOR_CONTENTS, Field.Store.YES, Field.Index.UN_TOKENIZED ) );
+
+        hdr.add( new Field(
+            FLD_IDXINFO,
+            VERSION + AbstractIndexCreator.FS + getRepositoryId(),
+            Field.Store.YES,
+            Field.Index.NO ) );
+        w.addDocument( hdr );
+
+        w.flush();
     }
 
     private void deleteIndexFiles()
@@ -269,7 +269,7 @@ public class DefaultIndexingContext
         {
             indexDirectory.deleteFile( names[i] );
         }
-        
+
         IndexUtils.deleteTimestamp( indexDirectory );
     }
 
@@ -281,14 +281,12 @@ public class DefaultIndexingContext
     public void updateTimestamp()
         throws IOException
     {
-        timestamp = new Date( System.currentTimeMillis() );
-        // IndexUtils.updateTimestamp( indexDirectory, timestamp );
+        timestamp = System.currentTimeMillis();
     }
 
     public Date getTimestamp()
     {
-        return timestamp;
-        // return IndexUtils.getTimestamp( indexDirectory );
+        return new Date( timestamp );
     }
 
     public String getRepositoryId()
@@ -329,6 +327,8 @@ public class DefaultIndexingContext
         if ( indexWriter == null || indexWriter.isClosed() )
         {
             indexWriter = new NexusIndexWriter( indexDirectory, analyzer, false );
+
+            indexWriter.setRAMBufferSizeMB( 2 );
         }
         return indexWriter;
     }
@@ -367,7 +367,7 @@ public class DefaultIndexingContext
     public void close( boolean deleteFiles )
         throws IOException
     {
-        IndexUtils.updateTimestamp( indexDirectory, timestamp );
+        IndexUtils.updateTimestamp( indexDirectory, getTimestamp() );
 
         if ( indexDirectory != null )
         {
@@ -393,9 +393,12 @@ public class DefaultIndexingContext
         throws CorruptIndexException,
             IOException
     {
-        if ( indexWriter != null && !indexWriter.isClosed() )
+        if ( indexWriter != null )
         {
-            indexWriter.close();
+            if ( !indexWriter.isClosed() )
+            {
+                indexWriter.close();
+            }
             indexWriter = null;
         }
         if ( indexSearcher != null )
@@ -477,7 +480,8 @@ public class DefaultIndexingContext
             }
 
             w.optimize();
-            w.close();
+
+            w.flush();
         }
         finally
         {

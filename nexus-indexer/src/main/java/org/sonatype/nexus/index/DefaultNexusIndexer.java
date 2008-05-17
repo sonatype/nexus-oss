@@ -316,6 +316,7 @@ public class DefaultNexusIndexer
         if ( ac != null )
         {
             indexer.update( context, ac );
+
             updateGroups( ac, context );
         }
     }
@@ -385,16 +386,11 @@ public class DefaultNexusIndexer
     {
         IndexWriter w = context.getIndexWriter();
 
-        try
-        {
-            w.updateDocument(
-                new Term( ArtifactInfo.ROOT_GROUPS, ArtifactInfo.ROOT_GROUPS_VALUE ),
-                createRootGroupsDocument( groups ) );
-        }
-        finally
-        {
-            w.close();
-        }
+        w.updateDocument(
+            new Term( ArtifactInfo.ROOT_GROUPS, ArtifactInfo.ROOT_GROUPS_VALUE ),
+            createRootGroupsDocument( groups ) );
+
+        w.flush();
     }
 
     private Document createRootGroupsDocument( Collection<String> groups )
@@ -443,16 +439,12 @@ public class DefaultNexusIndexer
         throws IOException
     {
         IndexWriter w = context.getIndexWriter();
-        try
-        {
-            w.updateDocument(
-                new Term( ArtifactInfo.ALL_GROUPS, ArtifactInfo.ALL_GROUPS_VALUE ),
-                createAllGroupsDocument( groups ) );
-        }
-        finally
-        {
-            w.close();
-        }
+
+        w.updateDocument(
+            new Term( ArtifactInfo.ALL_GROUPS, ArtifactInfo.ALL_GROUPS_VALUE ),
+            createAllGroupsDocument( groups ) );
+
+        w.flush();
     }
 
     private Document createAllGroupsDocument( Collection<String> groups )

@@ -7,7 +7,7 @@
  *
  * Contributors:
  *    Eugene Kuleshov (Sonatype)
- *    Tamás Cservenák (Sonatype)
+ *    Tamas Cservenak (Sonatype)
  *    Brian Fox (Sonatype)
  *    Jason Van Zyl (Sonatype)
  *******************************************************************************/
@@ -47,8 +47,6 @@ public class DefaultIndexerEngine
         throws IOException
     {
         context.getIndexWriter().addDocument( createDocument( context, ac ) );
-        
-        context.updateTimestamp();
     }
 
     public void endIndexing( IndexingContext context )
@@ -58,7 +56,7 @@ public class DefaultIndexerEngine
         
         w.optimize();
 
-        w.close();
+        w.flush();
 
         context.updateTimestamp();
     }
@@ -70,7 +68,7 @@ public class DefaultIndexerEngine
         
         w.deleteDocuments( getKeyTerm( ac ) );
 
-        w.close();
+        w.flush();
         
         context.updateTimestamp();
     }
@@ -82,7 +80,7 @@ public class DefaultIndexerEngine
 
         w.updateDocument( getKeyTerm( ac ), createDocument( context, ac ) );
         
-        w.close();
+        w.flush();
         
         context.updateTimestamp();
     }

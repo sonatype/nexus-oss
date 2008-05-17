@@ -7,7 +7,7 @@
  *
  * Contributors:
  *    Eugene Kuleshov (Sonatype)
- *    Tamás Cservenák (Sonatype)
+ *    Tamas Cservenak (Sonatype)
  *    Brian Fox (Sonatype)
  *    Jason Van Zyl (Sonatype)
  *******************************************************************************/
@@ -34,14 +34,15 @@ public class IndexUtils
 
     // timestamp
 
-    public static void deleteTimestamp( Directory directory ) throws IOException 
+    public static void deleteTimestamp( Directory directory )
+        throws IOException
     {
         if ( directory.fileExists( TIMESTAMP_FILE ) )
         {
             directory.deleteFile( TIMESTAMP_FILE );
         }
     }
-    
+
     public static void updateTimestamp( Directory directory, Date timestamp )
         throws IOException
     {
@@ -54,7 +55,7 @@ public class IndexUtils
             try
             {
                 io.writeLong( timestamp.getTime() );
-                
+
                 io.flush();
             }
             finally
@@ -74,7 +75,7 @@ public class IndexUtils
                 if ( directory.fileExists( TIMESTAMP_FILE ) )
                 {
                     IndexInput ii = null;
-                    
+
                     try
                     {
                         ii = directory.openInput( TIMESTAMP_FILE );

@@ -7,7 +7,7 @@
  *
  * Contributors:
  *    Eugene Kuleshov (Sonatype)
- *    Tamás Cservenák (Sonatype)
+ *    Tamas Cservenak (Sonatype)
  *    Brian Fox (Sonatype)
  *    Jason Van Zyl (Sonatype)
  *******************************************************************************/
@@ -24,7 +24,6 @@ import org.apache.lucene.store.LockObtainFailedException;
 public class NexusIndexWriter
     extends IndexWriter
 {
-
     private boolean closed;
 
     public NexusIndexWriter( Directory d, Analyzer a, boolean create )
@@ -32,7 +31,9 @@ public class NexusIndexWriter
             LockObtainFailedException,
             IOException
     {
-        super( d, false, a, create );
+        // cstamas: was autoCommit = false!
+        super( d, true, a, create );
+
         this.closed = false;
     }
 
@@ -42,10 +43,12 @@ public class NexusIndexWriter
             IOException
     {
         super.close();
+
         this.closed = true;
     }
-    
-    public boolean isClosed() {
+
+    public boolean isClosed()
+    {
         return closed;
     }
 
