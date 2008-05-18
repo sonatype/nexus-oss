@@ -95,6 +95,23 @@ public class ScheduledServiceTypeResourceHandler
         property.setHelpText( "Other Help Text" );
         type.addProperty( property );        
         response.addData( type );
+        
+        type = new ScheduledServiceTypeResource();
+        type.setId( "3" );
+        type.setName( "Some Other Service" );
+        property = new ScheduledServiceTypePropertyResource();
+        property.setId( "5" );
+        property.setName( "Config Date" );
+        property.setType( "date" );
+        property.setHelpText( "Date Help" );
+        type.addProperty( property );
+        property = new ScheduledServiceTypePropertyResource();
+        property.setId( "6" );
+        property.setName( "Config number" );
+        property.setType( "number" );
+        property.setHelpText( "number help" );
+        type.addProperty( property );        
+        response.addData( type );
 
         return serialize( variant, response );
     }

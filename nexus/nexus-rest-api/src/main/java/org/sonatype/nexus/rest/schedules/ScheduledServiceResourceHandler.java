@@ -21,6 +21,7 @@
 package org.sonatype.nexus.rest.schedules;
 
 import java.io.IOException;
+import java.util.Date;
 
 import org.restlet.Context;
 import org.restlet.data.Request;
@@ -28,13 +29,22 @@ import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.restlet.resource.Representation;
 import org.restlet.resource.Variant;
+import org.sonatype.nexus.rest.model.ScheduledServiceAdvancedResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceBaseResource;
+import org.sonatype.nexus.rest.model.ScheduledServiceDailyResource;
+import org.sonatype.nexus.rest.model.ScheduledServiceMonthlyResource;
+import org.sonatype.nexus.rest.model.ScheduledServiceOnceResource;
+import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceResourceResponse;
+import org.sonatype.nexus.rest.model.ScheduledServiceWeeklyResource;
 
 public class ScheduledServiceResourceHandler
     extends AbstractScheduledServiceResourceHandler
 {
     public static final String SCHEDULED_SERVICE_ID_KEY = "scheduledServiceId";
+    
+    /** The scheduledService ID */
+    private String scheduledServiceId;
 
     /**
      * The default constructor.
@@ -46,11 +56,13 @@ public class ScheduledServiceResourceHandler
     public ScheduledServiceResourceHandler( Context context, Request request, Response response )
     {
         super( context, request, response );
+        
+        this.scheduledServiceId = getRequest().getAttributes().get( SCHEDULED_SERVICE_ID_KEY ).toString();
     }
 
     protected String getScheduledServiceId()
     {
-        return getRequest().getAttributes().get( SCHEDULED_SERVICE_ID_KEY ).toString();
+        return this.scheduledServiceId;
     }
 
     /**
@@ -67,9 +79,68 @@ public class ScheduledServiceResourceHandler
     public Representation getRepresentationHandler( Variant variant )
         throws IOException
     {
-        getResponse().setStatus( Status.CLIENT_ERROR_NOT_FOUND, "No such scheduled service" );
-
-        return null;
+        ScheduledServiceBaseResource resource = null;
+        
+        if ( "0".equals( getScheduledServiceId() ) )
+        {
+            resource = new ScheduledServiceBaseResource();
+            resource.setServiceSchedule( "none" );
+        }
+        else if ( "1".equals( getScheduledServiceId() ) )
+        {
+            resource = new ScheduledServiceOnceResource();
+            resource.setServiceSchedule( "once" );
+            ((ScheduledServiceOnceResource)resource).setStartDate( String.valueOf( new Date().getTime() ) );
+            ((ScheduledServiceOnceResource)resource).setStartTime( "22:00" );
+        }
+        else if ( "2".equals( getScheduledServiceId() ) )
+        {
+            resource = new ScheduledServiceDailyResource();
+            resource.setServiceSchedule( "daily" );
+            ((ScheduledServiceDailyResource)resource).setStartDate( String.valueOf( new Date().getTime() ) );
+            ((ScheduledServiceDailyResource)resource).setStartTime( "22:00" );
+            ((ScheduledServiceDailyResource)resource).setRecurringTime( "23:00" );
+        }
+        else if ( "3".equals( getScheduledServiceId() ) )
+        {
+            resource = new ScheduledServiceWeeklyResource();
+            resource.setServiceSchedule( "weekly" );
+            ((ScheduledServiceWeeklyResource)resource).setStartDate( String.valueOf( new Date().getTime() ) );
+            ((ScheduledServiceWeeklyResource)resource).setStartTime( "22:00" );
+            ((ScheduledServiceWeeklyResource)resource).setRecurringTime( "23:00" );
+            ((ScheduledServiceWeeklyResource)resource).addRecurringDay( "monday" );
+            ((ScheduledServiceWeeklyResource)resource).addRecurringDay( "tuesday" );
+        }
+        else if ( "4".equals( getScheduledServiceId() ) )
+        {
+            resource = new ScheduledServiceMonthlyResource();
+            resource.setServiceSchedule( "monthly" );
+            ((ScheduledServiceMonthlyResource)resource).setStartDate( String.valueOf( new Date().getTime() ) );
+            ((ScheduledServiceMonthlyResource)resource).setStartTime( "22:00" );
+            ((ScheduledServiceMonthlyResource)resource).setRecurringTime( "23:00" );
+            ((ScheduledServiceMonthlyResource)resource).addRecurringDay( "1" );
+            ((ScheduledServiceMonthlyResource)resource).addRecurringDay( "7" );
+        }
+        else if ( "5".equals( getScheduledServiceId() ) )
+        {
+            resource = new ScheduledServiceAdvancedResource();
+            resource.setServiceSchedule( "advanced" );
+            ((ScheduledServiceAdvancedResource)resource).setCronCommand( "cronCommand" );
+        }
+        
+        resource.setId( getScheduledServiceId() );
+        resource.setName( "name" + getScheduledServiceId() );
+        resource.setServiceType( "1" );
+        
+        ScheduledServicePropertyResource propResource = new ScheduledServicePropertyResource();
+        propResource.setId( "1" );
+        propResource.setValue( "some text" );
+        resource.addServiceProperty( propResource );
+        
+        ScheduledServiceResourceResponse response = new ScheduledServiceResourceResponse();
+        response.setData( resource );
+        
+        return serialize( variant, response );
     }
 
     /**
@@ -90,8 +161,6 @@ public class ScheduledServiceResourceHandler
         if ( response != null )
         {
             ScheduledServiceBaseResource resource = response.getData();
-            
-            getResponse().setStatus( Status.CLIENT_ERROR_NOT_FOUND, "Scheduled service not found!" );
         }
     }
 

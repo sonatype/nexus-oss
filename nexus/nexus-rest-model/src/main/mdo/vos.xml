@@ -1085,7 +1085,13 @@
 					<required>true</required>
 				</field>
 				<field>
-					<name>serviceType</name>
+					<name>serviceTypeId</name>
+					<version>1.0.0+</version>
+					<type>String</type>
+					<required>true</required>
+				</field>
+				<field>
+					<name>serviceTypeName</name>
 					<version>1.0.0+</version>
 					<type>String</type>
 					<required>true</required>
@@ -1097,7 +1103,7 @@
 					<required>true</required>
 				</field>
 				<field>
-					<name>schedule</name>
+					<name>serviceSchedule</name>
 					<version>1.0.0+</version>
 					<type>String</type>
 					<required>true</required>
@@ -1190,7 +1196,7 @@
 			<version>1.0.0+</version>
 			<fields>
 				<field>
-					<name>name</name>
+					<name>id</name>
 					<version>1.0.0+</version>
 					<type>String</type>
 					<required>true</required>
