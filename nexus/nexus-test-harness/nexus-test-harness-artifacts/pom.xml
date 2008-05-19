@@ -13,5 +13,6 @@
 	
 	<modules>
 		<module>release-jar-1</module>
+    <module>release-jar-2</module>
 	</modules>
 </project>
