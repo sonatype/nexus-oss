@@ -89,8 +89,9 @@
 		<module>nexus-app</module>
 		<module>nexus-rest-model</module>
 		<module>nexus-rest-api</module>
-        <module>nexus-migration-tool</module>
+    <module>nexus-migration-tool</module>
 		<module>nexus-webapp</module>
+    <!--  <module>nexus-test-harness</module> -->
 	</modules>
 
 	<!-- Shortcut for outnumbered deps :) -->

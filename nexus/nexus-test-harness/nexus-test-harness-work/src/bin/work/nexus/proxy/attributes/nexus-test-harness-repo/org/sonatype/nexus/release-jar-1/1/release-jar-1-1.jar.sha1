@@ -1,0 +1,21 @@
+<file>
+  <length>40</length>
+  <path>/org/sonatype/nexus/release-jar-1/1/release-jar-1-1.jar.sha1</path>
+  <readable>true</readable>
+  <writable>true</writable>
+  <repositoryId>nexus-test-harness-repo</repositoryId>
+  <created>1211229424533</created>
+  <modified>1211229424533</modified>
+  <storedLocally>1211229424533</storedLocally>
+  <lastTouched>1211229424533</lastTouched>
+  <attributes>
+    <entry>
+      <string>digest.sha1</string>
+      <string>bda3ca00f5beab40a46ced1a07cd02abd9a1f41e</string>
+    </entry>
+    <entry>
+      <string>digest.md5</string>
+      <string>42e503a276ff8a92ca9ec1a2882e38c9</string>
+    </entry>
+  </attributes>
+</file>

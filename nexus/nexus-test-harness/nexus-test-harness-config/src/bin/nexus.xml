@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?><nexusConfiguration>
+  <version>1.0.3</version>
+  <workingDirectory>C:\Development\Code\nexus\nexus-webapp\target\nexus-webapp-1.0.0-beta-4-SNAPSHOT\runtime\work\nexus</workingDirectory>
+  <applicationLogDirectory>C:\Development\Code\nexus\nexus-webapp\target\nexus-webapp-1.0.0-beta-4-SNAPSHOT\runtime\apps\nexus\logs</applicationLogDirectory>
+  <security />
+  <globalConnectionSettings />
+  <restApi />
+  <httpProxy>
+    <enabled>true</enabled>
+  </httpProxy>
+  <routing>
+    <groups />
+  </routing>
+  <repositories>
+    <repository>
+      <id>nexus-test-harness-repo</id>
+      <name>nexus-test-harness-repo</name>
+      <allowWrite>true</allowWrite>
+      <checksumPolicy>ignore</checksumPolicy>
+    </repository>
+  </repositories>
+  <repositoryGrouping>
+    <repositoryGroups>
+      <repositoryGroup>
+        <groupId>nexus-test</groupId>
+        <name>nexus-test</name>
+        <repositories>
+          <repository>nexus-test-harness-repo</repository>
+        </repositories>
+      </repositoryGroup>
+    </repositoryGroups>
+  </repositoryGrouping>
+</nexusConfiguration>
