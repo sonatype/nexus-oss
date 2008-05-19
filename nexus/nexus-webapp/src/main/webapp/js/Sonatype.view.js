@@ -43,7 +43,34 @@ Sonatype.view = {
     Ext.Ajax.on( {
       "requestexception" : { 
         fn: function(conn, response, options) {
-          Ext.MessageBox.show( {
+          if ( response.status == 403 ) {
+            if ( Sonatype.repoServer.RepoServer.loginWindow.isVisible() ) {
+              Ext.MessageBox.show( {
+                title: 'Login Error',
+                msg: 'Incorrect username or password.<br />Try again.',
+                buttons: Ext.MessageBox.OK,
+                icon: Ext.MessageBox.ERROR,
+                animEl: 'mb3'
+              } );
+            }
+            else {
+              delete Ext.lib.Ajax.defaultHeaders.Authorization;
+              Sonatype.state.CookieProvider.clear('authToken');
+              Sonatype.state.CookieProvider.clear('username');
+              Ext.MessageBox.show( {
+                title: 'Authentication Error',
+                msg: 'Your login is incorrect or your session has expired.<br />' +
+                  'Please login again.',
+                buttons: Ext.MessageBox.OK,
+                icon: Ext.MessageBox.ERROR,
+                animEl: 'mb3',
+                fn: function(button) {
+                  window.location.reload();
+                }
+              } );
+            }
+          }
+          else Ext.MessageBox.show( {
             title: "Connection Error",
             msg: (
               response.status ?
