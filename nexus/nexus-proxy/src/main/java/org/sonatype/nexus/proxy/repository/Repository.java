@@ -318,21 +318,6 @@ public interface Repository
     void setRemoteStorage( RemoteRepositoryStorage storage );
 
     /**
-     * Lookup item from the path.
-     * 
-     * @param uid the uid
-     * @return the storage item
-     * @throws RepositoryNotAvailableException the repository not available exception
-     * @throws ItemNotFoundException the item not found exception
-     * @throws StorageException the storage exception
-     * @throws AccessDeniedException the access denied exception
-     */
-    StorageItem lookupItem( RepositoryItemUid uid )
-        throws RepositoryNotAvailableException,
-            StorageException,
-            AccessDeniedException;
-
-    /**
      * Retrieves item with content from the path.
      * 
      * @param localOnly should look it up locally only

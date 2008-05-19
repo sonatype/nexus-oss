@@ -30,15 +30,11 @@ import org.sonatype.nexus.proxy.RepositoryNotAvailableException;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventCache;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
-import org.sonatype.nexus.proxy.item.DefaultStorageCollectionItem;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
-import org.sonatype.nexus.proxy.item.DefaultStorageLinkItem;
 import org.sonatype.nexus.proxy.item.PreparedContentLocator;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
-import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
-import org.sonatype.nexus.proxy.item.StorageLinkItem;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 
 /**
@@ -76,65 +72,6 @@ public abstract class DefaultRepository
         this.itemMaxAge = itemMaxAge;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.sonatype.nexus.proxy.repository.AbstractRepository#doLookupItem(org.sonatype.nexus.proxy.ResourceStoreRequest,
-     *      org.sonatype.nexus.proxy.item.RepositoryItemUid)
-     */
-    @Override
-    protected StorageItem doLookupItem( RepositoryItemUid uid )
-        throws RepositoryNotAvailableException,
-            StorageException,
-            AccessDeniedException
-    {
-        if ( getLocalStorage() != null && getLocalStorage().getAttributesHandler() != null )
-        {
-            AbstractStorageItem item = null;
-            try
-            {
-                AbstractStorageItem mdItem = getLocalStorage().retrieveItem( uid );
-                if ( StorageCollectionItem.class.isAssignableFrom( mdItem.getClass() ) )
-                {
-                    item = new DefaultStorageCollectionItem( this, mdItem.getPath(), mdItem.isReadable(), mdItem
-                        .isWritable() );
-                }
-                else if ( StorageFileItem.class.isAssignableFrom( mdItem.getClass() ) )
-                {
-                    item = new DefaultStorageFileItem( this, mdItem.getPath(), mdItem.isReadable(), mdItem.isWritable() );
-                }
-                else if ( StorageLinkItem.class.isAssignableFrom( mdItem.getClass() ) )
-                {
-                    item = new DefaultStorageLinkItem(
-                        this,
-                        mdItem.getPath(),
-                        mdItem.isReadable(),
-                        mdItem.isWritable(),
-                        ( (StorageLinkItem) mdItem ).getTarget() );
-                }
-                if ( item != null )
-                {
-                    item.overlay( mdItem );
-                }
-                return item;
-            }
-            catch ( ItemNotFoundException e )
-            {
-                return null;
-            }
-        }
-        else
-        {
-            return null;
-        }
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.sonatype.nexus.repository.AbstractRepository#doRetrieveItem(org.sonatype.nexus.ResourceStoreRequest,
-     *      org.sonatype.nexus.item.RepositoryItemUid)
-     */
     protected StorageItem doRetrieveItem( boolean localOnly, RepositoryItemUid uid, Map<String, Object> context )
         throws RepositoryNotAvailableException,
             ItemNotFoundException,
@@ -350,13 +287,6 @@ public abstract class DefaultRepository
         return result;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.sonatype.nexus.repository.AbstractRepository#doCopyItem(org.sonatype.nexus.ResourceStoreRequest,
-     *      org.sonatype.nexus.item.RepositoryItemUid, org.sonatype.nexus.ResourceStoreRequest,
-     *      org.sonatype.nexus.item.RepositoryItemUid)
-     */
     protected void doCopyItem( RepositoryItemUid fromUid, RepositoryItemUid toUid )
         throws RepositoryNotAvailableException,
             ItemNotFoundException,
@@ -390,13 +320,6 @@ public abstract class DefaultRepository
 
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.sonatype.nexus.repository.AbstractRepository#doMoveItem(org.sonatype.nexus.ResourceStoreRequest,
-     *      org.sonatype.nexus.item.RepositoryItemUid, org.sonatype.nexus.ResourceStoreRequest,
-     *      org.sonatype.nexus.item.RepositoryItemUid)
-     */
     protected void doMoveItem( RepositoryItemUid fromUid, RepositoryItemUid toUid )
         throws RepositoryNotAvailableException,
             ItemNotFoundException,
@@ -407,12 +330,6 @@ public abstract class DefaultRepository
         doDeleteItem( fromUid );
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.sonatype.nexus.repository.AbstractRepository#doDeleteItem(org.sonatype.nexus.ResourceStoreRequest,
-     *      org.sonatype.nexus.item.RepositoryItemUid)
-     */
     protected void doDeleteItem( RepositoryItemUid uid )
         throws RepositoryNotAvailableException,
             ItemNotFoundException,
@@ -429,11 +346,6 @@ public abstract class DefaultRepository
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.sonatype.nexus.repository.AbstractRepository#doListItems(org.sonatype.nexus.item.RepositoryItemUid)
-     */
     protected Collection<StorageItem> doListItems( RepositoryItemUid uid )
         throws RepositoryNotAvailableException,
             ItemNotFoundException,
@@ -458,7 +370,7 @@ public abstract class DefaultRepository
     }
 
     /**
-     * Checks if item is old.
+     * Checks if item is old with "default" maxAge.
      * 
      * @param item the item
      * @return true, if is old
@@ -468,6 +380,13 @@ public abstract class DefaultRepository
         return isOld( getItemMaxAge(), item );
     }
 
+    /**
+     * Checks if item is old with given maxAge.
+     * 
+     * @param maxAge
+     * @param item
+     * @return
+     */
     protected boolean isOld( int maxAge, StorageItem item )
     {
         // if item is manually expired, true

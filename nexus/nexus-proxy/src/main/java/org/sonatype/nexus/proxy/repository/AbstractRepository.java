@@ -522,27 +522,6 @@ public abstract class AbstractRepository
     // ===================================================================================
     // Store iface
 
-    public StorageItem lookupItem( ResourceStoreRequest request )
-        throws RepositoryNotAvailableException,
-            StorageException,
-            AccessDeniedException
-    {
-        if ( getLogger().isDebugEnabled() )
-        {
-            getLogger().debug( getId() + " lookupItem() :: " + request.getRequestPath() );
-        }
-        checkConditions( request, RepositoryPermission.RETRIEVE );
-
-        RepositoryItemUid uid = new RepositoryItemUid( this, request.getRequestPath() );
-        StorageItem item = null;
-
-        item = doLookupItem( uid );
-        item.getItemContext().putAll( request.getRequestContext() );
-
-        // notifyProximityEventListeners( new RepositoryItemEventRetrieve( this, uid ) );
-        return item;
-    }
-
     public StorageItem retrieveItem( ResourceStoreRequest request )
         throws RepositoryNotAvailableException,
             ItemNotFoundException,
@@ -789,30 +768,6 @@ public abstract class AbstractRepository
     // ===================================================================================
     // Repositry store-like
 
-    public StorageItem lookupItem( RepositoryItemUid uid )
-        throws RepositoryNotAvailableException,
-            StorageException,
-            AccessDeniedException
-    {
-        if ( getLogger().isDebugEnabled() )
-        {
-            getLogger().debug( getId() + " lookupItem() :: " + uid.toString() );
-        }
-
-        if ( !getLocalStatus().shouldServiceRequest() )
-        {
-            throw new RepositoryNotAvailableException( "Repository " + this.getId() + " is not available!" );
-        }
-
-        StorageItem item = null;
-
-        item = doLookupItem( uid );
-
-        // notifyProximityEventListeners( new RepositoryItemEventRetrieve( this, uid ) );
-        return item;
-
-    }
-
     public StorageItem retrieveItem( boolean localOnly, RepositoryItemUid uid )
         throws RepositoryNotAvailableException,
             ItemNotFoundException,
@@ -1006,21 +961,6 @@ public abstract class AbstractRepository
         }
         getAccessManager().decide( request, this, permission );
     }
-
-    /**
-     * Do lookup item.
-     * 
-     * @param request the request
-     * @param uid the uid
-     * @return the storage item
-     * @throws RepositoryNotAvailableException the repository not available exception
-     * @throws StorageException the storage exception
-     * @throws AccessDeniedException the access denied exception
-     */
-    protected abstract StorageItem doLookupItem( RepositoryItemUid uid )
-        throws RepositoryNotAvailableException,
-            StorageException,
-            AccessDeniedException;
 
     /**
      * Do retrieve item.
