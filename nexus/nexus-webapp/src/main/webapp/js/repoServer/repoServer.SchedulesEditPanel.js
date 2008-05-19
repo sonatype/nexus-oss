@@ -1483,10 +1483,21 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
     var servicePropertiesPanel = fpanel.find('id', 'service-type-config-card-panel')[0];
     var i = 0;
     servicePropertiesPanel.getLayout().activeItem.items.each(function(item, i, len){
+      var value;
+      
+      if (item.xtype == 'datefield'){
+        value = item.getValue().getTime();
+      }
+      else if (item.xtype == 'textfield'){
+        value = item.getValue();
+      }
+      else if (item.xtype == 'numberfield'){
+        value = '' + item.getValue();
+      }
       outputArr[i] = 
       {
-        id:item.getName(),
-        value:item.getValue()
+        id:item.getName().substring('serviceProperties_'.length),
+        value:value
       };
       Ext.apply(outputArr[i], {'@class':'org.sonatype.nexus.rest.model.ScheduledServicePropertyResource'});
       i++;
@@ -1596,7 +1607,15 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
     for(var i=0;i<srcObj.serviceProperties.length;i++){
       var servicePropertyItem = fpanel.find('name','serviceProperties_' + srcObj.serviceProperties[i].id)[0];
       if (servicePropertyItem != null){
-        servicePropertyItem.setValue(srcObj.serviceProperties[i].value);
+        if (servicePropertyItem.xtype == 'datefield'){
+          servicePropertyItem.setValue(new Date(Number(srcObj.serviceProperties[i].value)));
+        }
+        else if (servicePropertyItem.xtype == 'textfield'){
+          servicePropertyItem.setValue(srcObj.serviceProperties[i].value);
+        }
+        else if (servicePropertyItem.xtype == 'numberfield'){
+          servicePropertyItem.setValue(Number(srcObj.serviceProperties[i].value));
+        }
       }
     }
     return val;
