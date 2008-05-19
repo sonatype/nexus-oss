@@ -871,6 +871,19 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
     if (this.serviceTypeDataStore.data.items.length < 1){
       return this.populateServiceTypePanelItems.defer(300, this, arguments);
     }
+    this.serviceTypePanelItems[0] =
+    {
+      xtype:'fieldset',
+      id:'emptyItem',
+      checkboxToggle:false,
+      title: 'Service Settings',
+      anchor: Sonatype.view.FIELDSET_OFFSET,
+      collapsible: false,
+      autoHeight:true,
+      layoutConfig: {
+        labelSeparator: ''
+      }
+    };
     this.serviceTypeDataStore.each(function(item, i, len){
       var items = [];
       for(var j=0;j<item.data.properties.length;j++){
@@ -913,7 +926,7 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
         }
       }  
 
-      this.serviceTypePanelItems[i] =
+      this.serviceTypePanelItems[i + 1] =
       {
         xtype:'fieldset',
         id:item.data.id,
