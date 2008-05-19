@@ -18,6 +18,12 @@
       <allowWrite>true</allowWrite>
       <checksumPolicy>ignore</checksumPolicy>
     </repository>
+    <repository>
+      <id>nexus-test-harness-repo2</id>
+      <name>nexus-test-harness-repo2</name>
+      <allowWrite>true</allowWrite>
+      <checksumPolicy>ignore</checksumPolicy>
+    </repository>
   </repositories>
   <repositoryGrouping>
     <repositoryGroups>
@@ -26,6 +32,7 @@
         <name>nexus-test</name>
         <repositories>
           <repository>nexus-test-harness-repo</repository>
+          <repository>nexus-test-harness-repo2</repository>
         </repositories>
       </repositoryGroup>
     </repositoryGroups>

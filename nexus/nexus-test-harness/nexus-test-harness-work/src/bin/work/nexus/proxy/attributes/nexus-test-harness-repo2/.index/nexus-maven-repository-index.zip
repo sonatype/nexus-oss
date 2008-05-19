@@ -1,0 +1,21 @@
+<file>
+  <length>678</length>
+  <path>/.index/nexus-maven-repository-index.zip</path>
+  <readable>true</readable>
+  <writable>true</writable>
+  <repositoryId>nexus-test-harness-repo2</repositoryId>
+  <created>1211231400266</created>
+  <modified>1211231400266</modified>
+  <storedLocally>1211231400266</storedLocally>
+  <lastTouched>1211231400266</lastTouched>
+  <attributes>
+    <entry>
+      <string>digest.sha1</string>
+      <string>27a607cfc16b5f2fae8caef8d2c2f5755c99a9de</string>
+    </entry>
+    <entry>
+      <string>digest.md5</string>
+      <string>15ee5c6d947d531b3c4ecce9c257b2d4</string>
+    </entry>
+  </attributes>
+</file>
