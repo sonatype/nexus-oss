@@ -487,6 +487,7 @@ Sonatype.repoServer.RepoEditPanel = function(config){
                 xtype: 'textfield',
                 fieldLabel: 'Password',
                 helpText: ht.remotePassword,
+                inputType:'password',
                 name: 'remoteStorage.authentication.password',
                 width: 100,
                 allowBlank:true
@@ -751,6 +752,7 @@ Sonatype.repoServer.RepoEditPanel = function(config){
                 xtype: 'textfield',
                 fieldLabel: 'Password',
                 helpText: ht.password,
+                inputType:'password',
                 name: 'remoteStorage.httpProxySettings.authentication.password',
                 width: 100,
                 allowBlank:true
