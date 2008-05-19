@@ -36,7 +36,7 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
   this.loadDataModFuncs = {
     none : {
       serviceSchedule : Sonatype.utils.capitalize,
-      serviceProperties : this.importServicePropertiesHelper.createDelegate(this),
+      serviceProperties : this.importServicePropertiesHelper.createDelegate(this)
     },
     once : {
       serviceSchedule : Sonatype.utils.capitalize,
@@ -150,6 +150,10 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
     autoLoad: true
   });
   
+  this.serviceTypePanelItems = [];
+  
+  this.populateServiceTypePanelItems();
+  
   this.formConfig = {};
   this.formConfig.schedule = {
     region: 'center',
@@ -207,19 +211,7 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
         deferredRender: false,
         autoScroll: false,
         frame: false,
-        items: [
-          {
-	          xtype: 'fieldset',
-    	      checkboxToggle:false,
-    	      title: 'Service Settings',
-    	      anchor: Sonatype.view.FIELDSET_OFFSET,
-    	      collapsible: false,
-    	      autoHeight:true,
-    	      layoutConfig: {
-	            labelSeparator: ''
-	          }
-          }
-        ]
+        items: this.serviceTypePanelItems
       },
       {
         xtype: 'combo',
@@ -875,8 +867,71 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
 
 
 Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
+  populateServiceTypePanelItems : function() {
+    if (this.serviceTypeDataStore.data.items.length < 1){
+      return this.populateServiceTypePanelItems.defer(300, this, arguments);
+    }
+    this.serviceTypeDataStore.each(function(item, i, len){
+      var items = [];
+      for(var j=0;j<item.data.properties.length;j++){
+        var curRec = item.data.properties[j];
+        if(curRec.type == 'string'){
+          items[j] = 
+          {
+            xtype: 'textfield',
+            fieldLabel: curRec.name,
+            itemCls: 'required-field',
+            helpText: curRec.helpText,
+            name: 'serviceProperties_' + curRec.id,
+            allowBlank:false,
+            disabled:true
+          };
+        }
+        else if(curRec.type == 'number'){
+          items[j] =
+          {
+            xtype: 'numberfield',
+            fieldLabel: curRec.name,
+            itemCls: 'required-field',
+            helpText: curRec.helpText,
+            name: 'serviceProperties_' + curRec.id,
+            allowBlank:false,
+            disabled:true
+          };
+        }
+        else if(curRec.type == 'date'){
+          items[j] =
+          {
+            xtype: 'datefield',
+            fieldLabel: curRec.name,
+            itemCls: 'required-field',
+            helpText: curRec.helpText,
+            name: 'serviceProperties_' + curRec.id,
+            allowBlank:false,
+            disabled:true
+          };
+        }
+      }  
+
+      this.serviceTypePanelItems[i] =
+      {
+        xtype:'fieldset',
+        id:item.data.id,
+        checkboxToggle:false,
+        title: 'Service Settings',
+        anchor: Sonatype.view.FIELDSET_OFFSET,
+        collapsible: false,
+        autoHeight:true,
+        layoutConfig: {
+          labelSeparator: ''
+        },
+        items:items
+      };
+    }, this);
+  },
   reloadAll : function(){
     this.schedulesDataStore.reload();
+    this.serviceTypeDataStore.reload();
     this.formCards.items.each(function(item, i, len){
       if(i>0){this.remove(item, true);}
     }, this.formCards);
@@ -959,10 +1014,10 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
     formPanel.on('afterlayout', this.afterLayoutFormHandler, this, {single:true});
     
     var serviceTypeField = formPanel.find('name', 'serviceType')[0];
-    serviceTypeField.on('select', this.serviceTypeSelectHandler, this);
+    serviceTypeField.on('select', this.serviceTypeSelectHandler, formPanel);
     
     var serviceScheduleField = formPanel.find('name', 'serviceSchedule')[0];
-    serviceScheduleField.on('select', this.serviceScheduleSelectHandler, serviceScheduleField);
+    serviceScheduleField.on('select', this.serviceScheduleSelectHandler, formPanel);
     
     var buttonInfoObj = {
         formPanel : formPanel,
@@ -1183,65 +1238,6 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
     if(!formPanel){ //create form and populate current data
       var config = Ext.apply({}, this.formConfig.schedule, {id:id});
       config = this.configUniqueIdHelper(id, config);
-
-      var foundServiceType = this.serviceTypeDataStore.getById(rec.data.serviceTypeId);
-      
-      var serviceTypePanel = config.items[3];
-      
-      var items = [];
-      for(var i=0;i<foundServiceType.data.properties.length;i++){
-        var curRec = foundServiceType.data.properties[i];
-        if(curRec.type == 'string'){
-          items[i] = 
-          {
-            xtype: 'textfield',
-            fieldLabel: curRec.name,
-            itemCls: 'required-field',
-            helpText: curRec.helpText,
-            name: 'serviceProperties_' + curRec.id,
-            allowBlank:false
-          };
-        }
-        else if(curRec.type == 'number'){
-          items[i] =
-          {
-            xtype: 'numberfield',
-            fieldLabel: curRec.name,
-            itemCls: 'required-field',
-            helpText: curRec.helpText,
-            name: 'serviceProperties_' + curRec.id,
-            allowBlank:false
-          };
-        }
-        else if(curRec.type == 'date'){
-          items[i] =
-          {
-            xtype: 'datefield',
-            fieldLabel: curRec.name,
-            itemCls: 'required-field',
-            helpText: curRec.helpText,
-            name: 'serviceProperties_' + curRec.id,
-            allowBlank:false
-          };
-        }
-      }  
-
-      serviceTypePanel.items[rec.data.serviceTypeId] =
-        {
-          xtype:'fieldset',
-          id:rec.data.serviceTypeId,
-          checkboxToggle:false,
-          title: 'Service Settings',
-          anchor: Sonatype.view.FIELDSET_OFFSET,
-          collapsible: false,
-          autoHeight:true,
-          layoutConfig: {
-            labelSeparator: ''
-          },
-          items:items
-        };
-        
-      serviceTypePanel.activeItem = rec.data.serviceTypeId;
       
       formPanel = new Ext.FormPanel(config);
       formPanel.form.on('actioncomplete', this.actionCompleteHandler, this);
@@ -1271,11 +1267,21 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
         });
       }
       
+      var serviceTypePanel = formPanel.find('id', 'service-type-config-card-panel')[0];
+      serviceTypePanel.items.each(function(item,i,len){
+        if (item.id == rec.data.serviceTypeId){
+          serviceTypePanel.activeItem = i;
+          item.items.each(function(item){
+            item.disabled=false;
+          });
+        }
+      });
+            
       var serviceTypeField = formPanel.find('name', 'serviceType')[0];
-      serviceTypeField.on('select', this.serviceTypeSelectHandler, serviceTypeField);
+      serviceTypeField.on('select', this.serviceTypeSelectHandler, formPanel);
       
       var serviceScheduleField = formPanel.find('name', 'serviceSchedule')[0];
-      serviceScheduleField.on('select', this.serviceScheduleSelectHandler, serviceScheduleField);
+      serviceScheduleField.on('select', this.serviceScheduleSelectHandler, formPanel);
 
       var buttonInfoObj = {
         formPanel : formPanel,
@@ -1297,84 +1303,26 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
 
     //always set active and re-layout
     this.formCards.getLayout().setActiveItem(formPanel);
-    formPanel.doLayout();
   },
   
   serviceTypeSelectHandler : function(combo, record, index){
-    var serviceTypePanel = Ext.getCmp('schedules-config').formCards.getLayout().activeItem.find('id', 'service-type-config-card-panel')[0];
-    
+    var serviceTypePanel = this.find('id', 'service-type-config-card-panel')[0];
     serviceTypePanel.getLayout().activeItem.items.each(function(item){
       item.disable();
-    }); 
-    
-    var itemToSelect = serviceTypePanel.find('id',record.data.id)[0];
-    if (itemToSelect == null){
-      var items = [];
-      for(var i=0;i<record.data.properties.length;i++){
-        var curRec = record.data.properties[i];
-        if(curRec.type == 'string'){
-          items[i] = 
-          {
-            xtype: 'textfield',
-            fieldLabel: curRec.name,
-            itemCls: 'required-field',
-            helpText: curRec.helpText,
-            name: 'serviceProperties_' + curRec.id,
-            allowBlank:false
-          };
-        }
-        else if(curRec.type == 'number'){
-          items[i] = 
-          {
-            xtype: 'numberfield',
-            fieldLabel: curRec.name,
-            itemCls: 'required-field',
-            helpText: curRec.helpText,
-            name: 'serviceProperties_' + curRec.id,
-            allowBlank:false
-          };
-        }
-        else if(curRec.type == 'date'){
-          items[i] = 
-          {
-            xtype: 'datefield',
-            fieldLabel: curRec.name,
-            itemCls: 'required-field',
-            helpText: curRec.helpText,
-            name: 'serviceProperties_' + curRec.id,
-            allowBlank:false
-          };
-        }
-      }    
-      serviceTypePanel.items.add(new Ext.form.FieldSet(
-        {
-          id:record.data.id,
-          labelWidth:175,
-          checkboxToggle:false,
-          title: 'Service Settings',
-          anchor: Sonatype.view.FIELDSET_OFFSET,
-          collapsible: false,
-          autoHeight:true,
-          layoutConfig: {
-            labelSeparator: ''
-          },
-          items:items
-        }
-      ));
-    }
-    
-    var newItemToSelect = serviceTypePanel.find('id',record.data.id)[0];
-    if (newItemToSelect){
-      serviceTypePanel.getLayout().setActiveItem(newItemToSelect);
-      serviceTypePanel.getLayout().activeItem.items.each(function(item){
-        item.enable();
-      }); 
-      serviceTypePanel.doLayout();
-    }
+    });
+    serviceTypePanel.items.each(function(item,i,len){
+      if (item.id == record.data.id){
+        serviceTypePanel.getLayout().setActiveItem(item);
+        item.items.each(function(item){
+          item.enable();
+        });
+      }
+    },serviceTypePanel);
+    serviceTypePanel.doLayout();
   },
   
   serviceScheduleSelectHandler : function(combo, record, index){
-    var schedulePanel = this.findParentByType(Ext.form.FieldSet.class).formCards.getLayout().activeItem.find('id', 'schedule-config-card-panel')[0];
+    var schedulePanel = this.find('id', 'schedule-config-card-panel')[0];
     schedulePanel.getLayout().activeItem.items.each(function(item){
       item.disable();
     });
