@@ -905,6 +905,7 @@ Sonatype.repoServer.RepoEditPanel = function(config){
     {name:'repoType'},
     {name:'resourceURI'},
     {name:'name', sortType:Ext.data.SortTypes.asUCString},
+    {name:'repoPolicy'},
 //  {name:'effectiveLocalStorageUrl'},
     {name:'contentUri', mapping:'resourceURI', convert: this.restToContentUrl }
   ]);
@@ -983,6 +984,7 @@ Sonatype.repoServer.RepoEditPanel = function(config){
     columns: [
       {header: 'Repository', dataIndex: 'name', width:175},
       {header: 'Type', dataIndex: 'repoType', width:50},
+      {header: 'Policy', dataIndex: 'repoPolicy', width:60},
       {header: 'Repository Path', dataIndex: 'contentUri', id: 'repo-config-url-col', width:300,renderer: function(s){return '<a href="' + s + '">' + s + '</a>';},menuDisabled:true}
     ],
     autoExpandColumn: 'repo-config-url-col',
