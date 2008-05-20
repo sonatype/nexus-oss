@@ -251,37 +251,32 @@ public abstract class DefaultRepository
         throws StorageException
     {
         AbstractStorageItem result = null;
-        if ( getLocalStorage() != null )
+
+        try
         {
-            try
+            if ( getLogger().isDebugEnabled() )
             {
-                if ( getLogger().isDebugEnabled() )
-                {
-                    getLogger().debug(
-                        "Caching item " + item.getRepositoryItemUid().toString() + " in local storage of repository." );
-                }
-                getLocalStorage().storeItem( item );
-                removeFromNotFoundCache( item.getRepositoryItemUid().getPath() );
-                notifyProximityEventListeners( new RepositoryItemEventCache( item.getRepositoryItemUid(), item
-                    .getItemContext() ) );
-                result = getLocalStorage().retrieveItem( item.getRepositoryItemUid() );
-                result.getItemContext().putAll( item.getItemContext() );
+                getLogger().debug(
+                    "Caching item " + item.getRepositoryItemUid().toString() + " in local storage of repository." );
             }
-            catch ( ItemNotFoundException ex )
-            {
-                // this is a nonsense, we just stored it!
-                result = item;
-            }
-            catch ( UnsupportedStorageOperationException ex )
-            {
-                getLogger().warn( "LocalStorage does not handle STORE operation, not caching remote fetched item.", ex );
-                result = item;
-            }
+            getLocalStorage().storeItem( item );
+            removeFromNotFoundCache( item.getRepositoryItemUid().getPath() );
+            notifyProximityEventListeners( new RepositoryItemEventCache( item.getRepositoryItemUid(), item
+                .getItemContext() ) );
+            result = getLocalStorage().retrieveItem( item.getRepositoryItemUid() );
+            result.getItemContext().putAll( item.getItemContext() );
         }
-        else
+        catch ( ItemNotFoundException ex )
         {
+            // this is a nonsense, we just stored it!
             result = item;
         }
+        catch ( UnsupportedStorageOperationException ex )
+        {
+            getLogger().warn( "LocalStorage does not handle STORE operation, not caching remote fetched item.", ex );
+            result = item;
+        }
+
         return result;
     }
 
@@ -308,21 +303,9 @@ public abstract class DefaultRepository
             }
             catch ( IOException e )
             {
-                throw new StorageException( "Could not get the content of source file!", e );
+                throw new StorageException( "Could not get the content of source file (is it file?)!", e );
             }
         }
-
-    }
-
-    protected void doMoveItem( RepositoryItemUid fromUid, RepositoryItemUid toUid )
-        throws UnsupportedStorageOperationException,
-            RepositoryNotAvailableException,
-            ItemNotFoundException,
-            StorageException
-    {
-        doCopyItem( fromUid, toUid );
-
-        doDeleteItem( fromUid );
     }
 
     protected void doDeleteItem( RepositoryItemUid uid )
@@ -339,14 +322,7 @@ public abstract class DefaultRepository
             ItemNotFoundException,
             StorageException
     {
-        if ( getLocalStorage() != null )
-        {
-            return getLocalStorage().listItems( uid );
-        }
-        else
-        {
-            throw new StorageException( "Repository " + getId() + " does not have LocalStorage!" );
-        }
+        return getLocalStorage().listItems( uid );
     }
 
     /**

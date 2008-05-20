@@ -50,6 +50,7 @@ import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.DefaultStorageCollectionItem;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
+import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
@@ -581,7 +582,7 @@ public abstract class AbstractRepository
 
         notifyProximityEventListeners( new RepositoryItemEventDelete( fromUid, from.getRequestContext() ) );
 
-        moveItem( fromUid, toUid );
+        moveItem( fromUid, toUid, to.getRequestContext() );
 
         notifyProximityEventListeners( new RepositoryItemEventStore( toUid, to.getRequestContext() ) );
     }
@@ -599,9 +600,10 @@ public abstract class AbstractRepository
 
         RepositoryItemUid uid = new RepositoryItemUid( this, request.getRequestPath() );
 
+        // fire the event for file being deleted
         notifyProximityEventListeners( new RepositoryItemEventDelete( uid, request.getRequestContext() ) );
 
-        deleteItem( uid );
+        deleteItem( uid, request.getRequestContext() );
     }
 
     public void storeItem( ResourceStoreRequest request, InputStream is, Map<String, String> userAttributes )
@@ -763,7 +765,7 @@ public abstract class AbstractRepository
         removeFromNotFoundCache( to.getPath() );
     }
 
-    public void moveItem( RepositoryItemUid from, RepositoryItemUid to )
+    public void moveItem( RepositoryItemUid from, RepositoryItemUid to, Map<String, Object> context )
         throws UnsupportedStorageOperationException,
             RepositoryNotAvailableException,
             ItemNotFoundException,
@@ -779,15 +781,21 @@ public abstract class AbstractRepository
             throw new RepositoryNotAvailableException( "Repository " + this.getId() + " is not available!" );
         }
 
-        maintainNotFoundCache( from.getPath() );
+        copyItem( from, to );
 
-        doMoveItem( from, to );
-
-        // remove the "to" item from n-cache if there
-        removeFromNotFoundCache( to.getPath() );
+        deleteItem( from, context );
     }
 
-    public void deleteItem( RepositoryItemUid uid )
+    public void moveItem( RepositoryItemUid from, RepositoryItemUid to )
+        throws UnsupportedStorageOperationException,
+            RepositoryNotAvailableException,
+            ItemNotFoundException,
+            StorageException
+    {
+        moveItem( from, to, null );
+    }
+
+    public void deleteItem( RepositoryItemUid uid, Map<String, Object> context )
         throws UnsupportedStorageOperationException,
             RepositoryNotAvailableException,
             ItemNotFoundException,
@@ -805,7 +813,27 @@ public abstract class AbstractRepository
 
         maintainNotFoundCache( uid.getPath() );
 
+        // determine is the thing to be deleted a collection or not
+        StorageItem item = retrieveItem( true, uid );
+
+        if ( StorageCollectionItem.class.isAssignableFrom( item.getClass() ) )
+        {
+            // it is collection, walk it and below and fire events for all files
+            DeletionNotifierWalker dnw = new DeletionNotifierWalker( this, getLogger(), context );
+
+            dnw.walk( uid.getPath() );
+        }
+
         doDeleteItem( uid );
+    }
+
+    public void deleteItem( RepositoryItemUid uid )
+        throws UnsupportedStorageOperationException,
+            RepositoryNotAvailableException,
+            ItemNotFoundException,
+            StorageException
+    {
+        deleteItem( uid, null );
     }
 
     public void storeItem( AbstractStorageItem item )
@@ -982,24 +1010,6 @@ public abstract class AbstractRepository
      * @throws UnsupportedStorageOperationException
      */
     protected abstract void doCopyItem( RepositoryItemUid fromUid, RepositoryItemUid toUid )
-        throws UnsupportedStorageOperationException,
-            RepositoryNotAvailableException,
-            ItemNotFoundException,
-            StorageException;
-
-    /**
-     * Do move item.
-     * 
-     * @param from the from
-     * @param fromUid the from uid
-     * @param to the to
-     * @param toUid the to uid
-     * @throws RepositoryNotAvailableException the repository not available exception
-     * @throws ItemNotFoundException the item not found exception
-     * @throws StorageException the storage exception
-     * @throws UnsupportedStorageOperationException
-     */
-    protected abstract void doMoveItem( RepositoryItemUid fromUid, RepositoryItemUid toUid )
         throws UnsupportedStorageOperationException,
             RepositoryNotAvailableException,
             ItemNotFoundException,

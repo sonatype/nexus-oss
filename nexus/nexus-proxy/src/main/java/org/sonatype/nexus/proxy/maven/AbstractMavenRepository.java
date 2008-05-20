@@ -591,16 +591,4 @@ public abstract class AbstractMavenRepository
         }
     }
 
-    protected void doDeleteItem( RepositoryItemUid uid )
-        throws UnsupportedStorageOperationException,
-            RepositoryNotAvailableException,
-            ItemNotFoundException,
-            StorageException
-    {
-        if ( getLocalStorage().containsItem( uid ) )
-        {
-            super.doDeleteItem( uid );
-        }
-    }
-
 }
