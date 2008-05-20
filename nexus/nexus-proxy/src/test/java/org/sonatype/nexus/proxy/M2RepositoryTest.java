@@ -28,6 +28,7 @@ import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.maven.M2Repository;
+import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 
@@ -62,8 +63,7 @@ public class M2RepositoryTest
         M2Repository repository = (M2Repository) getResourceStore();
 
         // a "release"
-        repository.setShouldServeReleases( true );
-        repository.setShouldServeSnapshots( false );
+        repository.setRepositoryPolicy( RepositoryPolicy.RELEASE );
 
         StorageItem item = getResourceStore().retrieveItem( new ResourceStoreRequest( SPOOF_RELEASE, false ) );
         checkForFileAndMatchContents( item );
@@ -83,8 +83,7 @@ public class M2RepositoryTest
         repository.clearCaches( "/" );
 
         // a "snapshot"
-        repository.setShouldServeReleases( false );
-        repository.setShouldServeSnapshots( true );
+        repository.setRepositoryPolicy( RepositoryPolicy.SNAPSHOT );
 
         item = getResourceStore().retrieveItem( new ResourceStoreRequest( SPOOF_SNAPSHOT, false ) );
         checkForFileAndMatchContents( item );
@@ -107,8 +106,7 @@ public class M2RepositoryTest
         M2Repository repository = (M2Repository) getResourceStore();
 
         // a "release"
-        repository.setShouldServeReleases( true );
-        repository.setShouldServeSnapshots( false );
+        repository.setRepositoryPolicy( RepositoryPolicy.RELEASE );
 
         DefaultStorageFileItem item = new DefaultStorageFileItem(
             repository,
@@ -137,8 +135,7 @@ public class M2RepositoryTest
         repository.clearCaches( "/" );
 
         // a "snapshot"
-        repository.setShouldServeReleases( false );
-        repository.setShouldServeSnapshots( true );
+        repository.setRepositoryPolicy( RepositoryPolicy.SNAPSHOT );
 
         item = new DefaultStorageFileItem( repository, SPOOF_SNAPSHOT, true, true, new ByteArrayInputStream(
             SPOOF_SNAPSHOT.getBytes() ) );
@@ -190,8 +187,7 @@ public class M2RepositoryTest
         RepositoryItemUid anyNonArtifactFile = new RepositoryItemUid( repository, "/any/file.txt" );
 
         // it is equiv of repo type: RELEASE
-        repository.setShouldServeReleases( true );
-        repository.setShouldServeSnapshots( false );
+        repository.setRepositoryPolicy( RepositoryPolicy.RELEASE );
         assertEquals( true, repository.shouldServeByPolicies( releasePom ) );
         assertEquals( true, repository.shouldServeByPolicies( releaseArtifact ) );
         assertEquals( false, repository.shouldServeByPolicies( snapshotPom ) );
@@ -203,8 +199,7 @@ public class M2RepositoryTest
         assertEquals( true, repository.shouldServeByPolicies( anyNonArtifactFile ) );
 
         // it is equiv of repo type: SNAPSHOT
-        repository.setShouldServeReleases( false );
-        repository.setShouldServeSnapshots( true );
+        repository.setRepositoryPolicy( RepositoryPolicy.SNAPSHOT );
         assertEquals( false, repository.shouldServeByPolicies( releasePom ) );
         assertEquals( false, repository.shouldServeByPolicies( releaseArtifact ) );
         assertEquals( true, repository.shouldServeByPolicies( snapshotPom ) );
@@ -212,32 +207,6 @@ public class M2RepositoryTest
         assertEquals( true, repository.shouldServeByPolicies( metadata1 ) );
         assertEquals( true, repository.shouldServeByPolicies( metadataR ) );
         assertEquals( true, repository.shouldServeByPolicies( metadataS ) );
-        assertEquals( true, repository.shouldServeByPolicies( someDirectory ) );
-        assertEquals( true, repository.shouldServeByPolicies( anyNonArtifactFile ) );
-
-        // for complete tests, but an impossible to configure
-        repository.setShouldServeReleases( true );
-        repository.setShouldServeSnapshots( true );
-        assertEquals( true, repository.shouldServeByPolicies( releasePom ) );
-        assertEquals( true, repository.shouldServeByPolicies( releaseArtifact ) );
-        assertEquals( true, repository.shouldServeByPolicies( snapshotPom ) );
-        assertEquals( true, repository.shouldServeByPolicies( snapshotArtifact ) );
-        assertEquals( true, repository.shouldServeByPolicies( metadata1 ) );
-        assertEquals( true, repository.shouldServeByPolicies( metadataR ) );
-        assertEquals( true, repository.shouldServeByPolicies( metadataS ) );
-        assertEquals( true, repository.shouldServeByPolicies( someDirectory ) );
-        assertEquals( true, repository.shouldServeByPolicies( anyNonArtifactFile ) );
-
-        // for complete tests, but an impossible to configure
-        repository.setShouldServeReleases( false );
-        repository.setShouldServeSnapshots( false );
-        assertEquals( false, repository.shouldServeByPolicies( releasePom ) );
-        assertEquals( false, repository.shouldServeByPolicies( releaseArtifact ) );
-        assertEquals( false, repository.shouldServeByPolicies( snapshotPom ) );
-        assertEquals( false, repository.shouldServeByPolicies( snapshotArtifact ) );
-        assertEquals( true, repository.shouldServeByPolicies( metadata1 ) );
-        assertEquals( true, repository.shouldServeByPolicies( metadataR ) );
-        assertEquals( false, repository.shouldServeByPolicies( metadataS ) );
         assertEquals( true, repository.shouldServeByPolicies( someDirectory ) );
         assertEquals( true, repository.shouldServeByPolicies( anyNonArtifactFile ) );
     }

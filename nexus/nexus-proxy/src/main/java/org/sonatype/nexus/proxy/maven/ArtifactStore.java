@@ -41,11 +41,11 @@ public interface ArtifactStore
             StorageException,
             AccessDeniedException;
 
-    StorageFileItem retrieveArtifact( String groupId, String artifactId, String version, String timestampedVersion,
-        String classifier )
+    StorageFileItem retrieveArtifact( String groupId, String artifactId, String version, String classifier )
         throws NoSuchResourceStoreException,
             RepositoryNotAvailableException,
             ItemNotFoundException,
             StorageException,
             AccessDeniedException;
+
 }

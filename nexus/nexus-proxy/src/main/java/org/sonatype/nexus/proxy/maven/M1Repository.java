@@ -32,7 +32,7 @@ import org.sonatype.nexus.proxy.registry.ContentClass;
  * policies for them.
  * 
  * @author cstamas
- * @plexus.component instantiation-strategy="per-lookup" role-hint="maven1"
+ * @plexus.component instantiation-strategy="per-lookup" role="org.sonatype.nexus.proxy.repository.Repository" role-hint="maven1"
  */
 public class M1Repository
     extends AbstractMavenRepository
@@ -68,7 +68,7 @@ public class M1Repository
         {
             if ( M1ArtifactRecognizer.isSnapshot( uid.getPath() ) )
             {
-                return isShouldServeSnapshots();
+                return RepositoryPolicy.SNAPSHOT.equals( getRepositoryPolicy() );
             }
             else
             {
@@ -87,11 +87,11 @@ public class M1Repository
             if ( gav.isSnapshot() )
             {
                 // snapshots goes if enabled
-                return isShouldServeSnapshots();
+                return RepositoryPolicy.SNAPSHOT.equals( getRepositoryPolicy() );
             }
             else
             {
-                return isShouldServeReleases();
+                return RepositoryPolicy.RELEASE.equals( getRepositoryPolicy() );
             }
         }
     }

@@ -38,7 +38,7 @@ import org.sonatype.nexus.proxy.repository.ShadowRepository;
  */
 public abstract class LayoutConverterShadowRepository
     extends ShadowRepository
-    implements ArtifactStore
+    implements MavenRepository
 {
     /**
      * The GAV Calculator.
@@ -64,6 +64,11 @@ public abstract class LayoutConverterShadowRepository
         return m2GavCalculator;
     }
 
+    public RepositoryPolicy getRepositoryPolicy()
+    {
+        return ( (MavenRepository) getMasterRepository() ).getRepositoryPolicy();
+    }
+
     /**
      * Implements ArtifactStore
      */
@@ -79,8 +84,7 @@ public abstract class LayoutConverterShadowRepository
         return ash.retrieveArtifactPom( groupId, artifactId, version );
     }
 
-    public StorageFileItem retrieveArtifact( String groupId, String artifactId, String version,
-        String timestampedVersion, String classifier )
+    public StorageFileItem retrieveArtifact( String groupId, String artifactId, String version, String classifier )
         throws NoSuchResourceStoreException,
             RepositoryNotAvailableException,
             ItemNotFoundException,
@@ -89,7 +93,7 @@ public abstract class LayoutConverterShadowRepository
     {
         ArtifactStoreHelper ash = new ArtifactStoreHelper( this, getGavCalculator() );
 
-        return ash.retrieveArtifact( groupId, artifactId, version, timestampedVersion, classifier );
+        return ash.retrieveArtifact( groupId, artifactId, version, classifier );
     }
 
     /**

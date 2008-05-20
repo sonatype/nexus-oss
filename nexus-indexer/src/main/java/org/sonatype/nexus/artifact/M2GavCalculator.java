@@ -154,19 +154,7 @@ public class M2GavCalculator
                     v = bv.substring( 0, bv.length() - 8 ) + snapshotBuildNumber;
                 }
 
-                return new Gav(
-                    g,
-                    a,
-                    v,
-                    bv,
-                    c,
-                    ext,
-                    snapBuildNr,
-                    snapshotTimestamp,
-                    n,
-                    snapshot,
-                    checksum,
-                    checksumType );
+                return new Gav( g, a, v, c, ext, snapBuildNr, snapshotTimestamp, n, snapshot, checksum, checksumType );
             }
             else
             {
@@ -184,7 +172,7 @@ public class M2GavCalculator
                             c = null;
                         }
                     }
-                    return new Gav( g, a, v, null, c, ext, null, null, n, snapshot, checksum, checksumType );
+                    return new Gav( g, a, v, c, ext, null, null, n, snapshot, checksum, checksumType );
                 }
                 else
                 {

@@ -43,7 +43,7 @@ import org.sonatype.nexus.proxy.NoSuchResourceStoreException;
 import org.sonatype.nexus.proxy.RepositoryNotAvailableException;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
-import org.sonatype.nexus.proxy.maven.ArtifactStore;
+import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.rest.AbstractNexusResourceHandler;
 import org.sonatype.plexus.rest.representation.InputStreamRepresentation;
@@ -81,7 +81,7 @@ public class AbstractArtifactResourceHandler
         {
             Repository repository = getNexus().getRepository( repositoryId );
 
-            if ( !ArtifactStore.class.isAssignableFrom( repository.getClass() ) )
+            if ( !MavenRepository.class.isAssignableFrom( repository.getClass() ) )
             {
                 getResponse().setStatus( Status.CLIENT_ERROR_BAD_REQUEST, "This is not a Maven repository!" );
 
@@ -96,7 +96,7 @@ public class AbstractArtifactResourceHandler
 
             try
             {
-                StorageFileItem file = ( (ArtifactStore) repository )
+                StorageFileItem file = ( (MavenRepository) repository )
                     .retrieveArtifactPom( groupId, artifactId, version );
 
                 pomContent = file.getInputStream();
@@ -171,8 +171,6 @@ public class AbstractArtifactResourceHandler
 
         String version = form.getFirstValue( "v" );
 
-        String timestampedVersion = form.getFirstValue( "t" );
-
         String classifier = form.getFirstValue( "c" );
 
         String repositoryId = form.getFirstValue( "r" );
@@ -188,18 +186,17 @@ public class AbstractArtifactResourceHandler
         {
             Repository repository = getNexus().getRepository( repositoryId );
 
-            if ( !ArtifactStore.class.isAssignableFrom( repository.getClass() ) )
+            if ( !MavenRepository.class.isAssignableFrom( repository.getClass() ) )
             {
                 getResponse().setStatus( Status.CLIENT_ERROR_BAD_REQUEST, "This is not a Maven repository!" );
 
                 return null;
             }
 
-            StorageFileItem file = ( (ArtifactStore) repository ).retrieveArtifact(
+            StorageFileItem file = ( (MavenRepository) repository ).retrieveArtifact(
                 groupId,
                 artifactId,
                 version,
-                timestampedVersion,
                 classifier );
 
             Representation result = new InputStreamRepresentation( MediaType.valueOf( file.getMimeType() ), file

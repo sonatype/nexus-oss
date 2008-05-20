@@ -55,11 +55,11 @@ import org.sonatype.nexus.util.AlphanumComparator;
  * metadata. This shadow will (if set) report specific plugin versions only.
  * 
  * @author cstamas
- * @plexus.component instantiation-strategy="per-lookup" role-hint="m2-constrained"
+ * @plexus.component instantiation-strategy="per-lookup" role="org.sonatype.nexus.proxy.repository.Repository" role-hint="m2-constrained"
  */
 public class ConstrainedM2ShadowRepository
     extends ShadowRepository
-    implements ArtifactStore
+    implements MavenRepository
 {
     /**
      * The GAV Calculator.
@@ -67,7 +67,7 @@ public class ConstrainedM2ShadowRepository
      * @plexus.requirement role-hint="m2"
      */
     private GavCalculator gavCalculator;
-    
+
     private ContentClass contentClass = new Maven2ContentClass();
 
     private Map<String, String> versionMap;
@@ -90,6 +90,11 @@ public class ConstrainedM2ShadowRepository
     public ContentClass getMasterRepositoryContentClass()
     {
         return contentClass;
+    }
+
+    public RepositoryPolicy getRepositoryPolicy()
+    {
+        return ( (MavenRepository) getMasterRepository() ).getRepositoryPolicy();
     }
 
     @Override
@@ -116,8 +121,7 @@ public class ConstrainedM2ShadowRepository
         return ash.retrieveArtifactPom( groupId, artifactId, version );
     }
 
-    public StorageFileItem retrieveArtifact( String groupId, String artifactId, String version,
-        String timestampedVersion, String classifier )
+    public StorageFileItem retrieveArtifact( String groupId, String artifactId, String version, String classifier )
         throws NoSuchResourceStoreException,
             RepositoryNotAvailableException,
             ItemNotFoundException,
@@ -126,7 +130,7 @@ public class ConstrainedM2ShadowRepository
     {
         ArtifactStoreHelper ash = new ArtifactStoreHelper( this, gavCalculator );
 
-        return ash.retrieveArtifact( groupId, artifactId, version, timestampedVersion, classifier );
+        return ash.retrieveArtifact( groupId, artifactId, version, classifier );
     }
 
     protected StorageItem doRetrieveItem( boolean localOnly, RepositoryItemUid uid, Map<String, Object> context )

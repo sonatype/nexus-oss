@@ -44,22 +44,30 @@ public class Gav
 
     private HashType hashType;
 
-    public Gav( String groupId, String artifactId, String version, String baseVersion, String classifier,
-        String extension, Integer snapshotBuildNumber, Long snapshotTimeStamp, String name, boolean snapshot,
-        boolean hash, HashType hashType )
+    public Gav( String groupId, String artifactId, String version, String classifier, String extension,
+        Integer snapshotBuildNumber, Long snapshotTimeStamp, String name, boolean snapshot, boolean hash,
+        HashType hashType )
     {
         this.groupId = groupId;
         this.artifactId = artifactId;
+        this.version = version;
 
-        if ( baseVersion == null )
+        if ( !snapshot )
         {
-            this.version = version;
             this.baseVersion = null;
         }
         else
         {
-            this.version = version;
-            this.baseVersion = baseVersion;
+            if ( version.contains( "SNAPSHOT" ) )
+            {
+                // this is not a timestamped version
+                this.baseVersion = null;
+            }
+            else
+            {
+                // this is probably a timestamped version
+                this.baseVersion = version.substring( 0, version.indexOf( "-" ) ) + "-SNAPSHOT";
+            }
         }
 
         this.classifier = classifier;

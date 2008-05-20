@@ -10,16 +10,15 @@ import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
-import org.sonatype.nexus.proxy.repository.Repository;
 
 public class ArtifactStoreHelper
     implements ArtifactStore
 {
-    private final Repository repository;
+    private final MavenRepository repository;
 
     private final GavCalculator gavCalculator;
 
-    public ArtifactStoreHelper( Repository repo, GavCalculator gavCalculator )
+    public ArtifactStoreHelper( MavenRepository repo, GavCalculator gavCalculator )
     {
         super();
 
@@ -28,27 +27,15 @@ public class ArtifactStoreHelper
         this.gavCalculator = gavCalculator;
     }
 
-    public StorageFileItem retrieveArtifact( String groupId, String artifactId, String version,
-        String timestampedVersion, String classifier )
+    public StorageFileItem retrieveArtifact( String groupId, String artifactId, String version, String classifier )
         throws NoSuchResourceStoreException,
             RepositoryNotAvailableException,
             ItemNotFoundException,
             StorageException,
             AccessDeniedException
     {
-        Gav gav = new Gav(
-            groupId,
-            artifactId,
-            version,
-            timestampedVersion,
-            classifier,
-            "jar",
-            null,
-            null,
-            null,
-            false,
-            false,
-            null );
+        Gav gav = new Gav( groupId, artifactId, version, classifier, "jar", null, null, null, RepositoryPolicy.SNAPSHOT
+            .equals( repository.getRepositoryPolicy() ), false, null );
 
         RepositoryItemUid uid = new RepositoryItemUid( repository, gavCalculator.gavToPath( gav ) );
 
@@ -71,7 +58,8 @@ public class ArtifactStoreHelper
             StorageException,
             AccessDeniedException
     {
-        Gav gav = new Gav( groupId, artifactId, version, null, null, "pom", null, null, null, false, false, null );
+        Gav gav = new Gav( groupId, artifactId, version, null, "pom", null, null, null, RepositoryPolicy.SNAPSHOT
+            .equals( repository.getRepositoryPolicy() ), false, null );
 
         RepositoryItemUid uid = new RepositoryItemUid( repository, gavCalculator.gavToPath( gav ) );
 

@@ -31,6 +31,7 @@ import org.sonatype.jettytestsuite.ServletServer;
 import org.sonatype.jettytestsuite.WebappContext;
 import org.sonatype.nexus.proxy.maven.ChecksumPolicy;
 import org.sonatype.nexus.proxy.maven.M2Repository;
+import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.proxy.registry.InvalidGroupingException;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.storage.remote.DefaultRemoteStorageContext;
@@ -67,6 +68,7 @@ public class M2TestsuiteEnvironmentBuilder
             repo.setLocalUrl( new File( env.getWorkingDirectory(), "proxy/store/" + repo.getId() )
                 .toURI().toURL().toString() );
             repo.setLocalStorage( env.getLocalRepositoryStorage() );
+            repo.setRepositoryPolicy( RepositoryPolicy.RELEASE );
             repo.setChecksumPolicy( ChecksumPolicy.STRICT_IF_EXISTS );
             // repo.setFeedRecorder( new SimpleFeedRecorder() );
             if ( remoteRepo.getAuthenticationInfo() != null )

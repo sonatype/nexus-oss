@@ -51,6 +51,7 @@ import org.sonatype.nexus.proxy.maven.M1LayoutedM2ShadowRepository;
 import org.sonatype.nexus.proxy.maven.M1Repository;
 import org.sonatype.nexus.proxy.maven.M2LayoutedM1ShadowRepository;
 import org.sonatype.nexus.proxy.maven.M2Repository;
+import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.LocalStatus;
 import org.sonatype.nexus.proxy.repository.ProxyMode;
@@ -129,13 +130,11 @@ public class DefaultRuntimeConfigurationBuilder
 
                 if ( CRepository.REPOSITORY_POLICY_RELEASE.equals( repo.getRepositoryPolicy() ) )
                 {
-                    m2repository.setShouldServeReleases( true );
-                    m2repository.setShouldServeSnapshots( false );
+                    m2repository.setRepositoryPolicy( RepositoryPolicy.RELEASE );
                 }
                 else
                 {
-                    m2repository.setShouldServeReleases( false );
-                    m2repository.setShouldServeSnapshots( true );
+                    m2repository.setRepositoryPolicy( RepositoryPolicy.SNAPSHOT );
                 }
 
                 repository = m2repository;
@@ -162,13 +161,11 @@ public class DefaultRuntimeConfigurationBuilder
 
                 if ( CRepository.REPOSITORY_POLICY_RELEASE.equals( repo.getRepositoryPolicy() ) )
                 {
-                    m1repository.setShouldServeReleases( true );
-                    m1repository.setShouldServeSnapshots( false );
+                    m1repository.setRepositoryPolicy( RepositoryPolicy.RELEASE );
                 }
                 else
                 {
-                    m1repository.setShouldServeReleases( false );
-                    m1repository.setShouldServeSnapshots( true );
+                    m1repository.setRepositoryPolicy( RepositoryPolicy.SNAPSHOT );
                 }
 
                 repository = m1repository;

@@ -54,7 +54,7 @@ import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
  */
 public abstract class AbstractMavenRepository
     extends DefaultRepository
-    implements ArtifactStore
+    implements MavenRepository
 {
     /**
      * Feed recorder.
@@ -63,11 +63,8 @@ public abstract class AbstractMavenRepository
      */
     private FeedRecorder feedRecorder;
 
-    /** Should repository serve snapshots?. */
-    private boolean shouldServeSnapshots = false;
-
-    /** Should repository serve releases?. */
-    private boolean shouldServeReleases = true;
+    /** Maven repository policy */
+    private RepositoryPolicy repositoryPolicy = RepositoryPolicy.RELEASE;
 
     /** Should repository metadata be cleaned? */
     private boolean cleanseRepositoryMetadata = false;
@@ -118,24 +115,14 @@ public abstract class AbstractMavenRepository
         this.checksumPolicy = checksumPolicy;
     }
 
-    public boolean isShouldServeReleases()
+    public RepositoryPolicy getRepositoryPolicy()
     {
-        return shouldServeReleases;
+        return repositoryPolicy;
     }
 
-    public void setShouldServeReleases( boolean shouldServeReleases )
+    public void setRepositoryPolicy( RepositoryPolicy repositoryPolicy )
     {
-        this.shouldServeReleases = shouldServeReleases;
-    }
-
-    public boolean isShouldServeSnapshots()
-    {
-        return shouldServeSnapshots;
-    }
-
-    public void setShouldServeSnapshots( boolean shouldServeSnapshots )
-    {
-        this.shouldServeSnapshots = shouldServeSnapshots;
+        this.repositoryPolicy = repositoryPolicy;
     }
 
     public int getReleaseMaxAge()
@@ -214,8 +201,7 @@ public abstract class AbstractMavenRepository
         return ash.retrieveArtifactPom( groupId, artifactId, version );
     }
 
-    public StorageFileItem retrieveArtifact( String groupId, String artifactId, String version,
-        String timestampedVersion, String classifier )
+    public StorageFileItem retrieveArtifact( String groupId, String artifactId, String version, String classifier )
         throws NoSuchResourceStoreException,
             RepositoryNotAvailableException,
             ItemNotFoundException,
@@ -224,7 +210,7 @@ public abstract class AbstractMavenRepository
     {
         ArtifactStoreHelper ash = new ArtifactStoreHelper( this, getGavCalculator() );
 
-        return ash.retrieveArtifact( groupId, artifactId, version, timestampedVersion, classifier );
+        return ash.retrieveArtifact( groupId, artifactId, version, classifier );
     }
 
     protected StorageItem doRetrieveItem( boolean localOnly, RepositoryItemUid uid, Map<String, Object> context )

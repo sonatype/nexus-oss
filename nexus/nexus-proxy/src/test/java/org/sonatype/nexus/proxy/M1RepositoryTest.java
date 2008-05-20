@@ -26,6 +26,7 @@ import org.sonatype.jettytestsuite.ServletServer;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.maven.M1Repository;
+import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 
@@ -69,8 +70,7 @@ public class M1RepositoryTest
         M1Repository repository = (M1Repository) getResourceStore();
 
         // a "release"
-        repository.setShouldServeReleases( true );
-        repository.setShouldServeSnapshots( false );
+        repository.setRepositoryPolicy( RepositoryPolicy.RELEASE );
 
         StorageItem item = getResourceStore().retrieveItem( new ResourceStoreRequest( SPOOF_RELEASE, false ) );
         checkForFileAndMatchContents( item );
@@ -90,8 +90,7 @@ public class M1RepositoryTest
         repository.clearCaches( "/" );
 
         // a "snapshot"
-        repository.setShouldServeReleases( false );
-        repository.setShouldServeSnapshots( true );
+        repository.setRepositoryPolicy( RepositoryPolicy.SNAPSHOT );
 
         item = getResourceStore().retrieveItem( new ResourceStoreRequest( SPOOF_SNAPSHOT, false ) );
         checkForFileAndMatchContents( item );
@@ -114,8 +113,7 @@ public class M1RepositoryTest
         M1Repository repository = (M1Repository) getResourceStore();
 
         // a "release"
-        repository.setShouldServeReleases( true );
-        repository.setShouldServeSnapshots( false );
+        repository.setRepositoryPolicy( RepositoryPolicy.RELEASE );
 
         DefaultStorageFileItem item = new DefaultStorageFileItem(
             repository,
@@ -144,8 +142,7 @@ public class M1RepositoryTest
         repository.clearCaches( "/" );
 
         // a "snapshot"
-        repository.setShouldServeReleases( false );
-        repository.setShouldServeSnapshots( true );
+        repository.setRepositoryPolicy( RepositoryPolicy.SNAPSHOT );
 
         item = new DefaultStorageFileItem( repository, SPOOF_SNAPSHOT, true, true, new ByteArrayInputStream(
             SPOOF_SNAPSHOT.getBytes() ) );

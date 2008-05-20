@@ -50,7 +50,7 @@ import org.sonatype.nexus.util.AlphanumComparator;
  * The default M2Repository.
  * 
  * @author cstamas
- * @plexus.component instantiation-strategy="per-lookup" role-hint="maven2"
+ * @plexus.component instantiation-strategy="per-lookup" role="org.sonatype.nexus.proxy.repository.Repository" role-hint="maven2"
  */
 public class M2Repository
     extends AbstractMavenRepository
@@ -70,7 +70,7 @@ public class M2Repository
     {
         return contentClass;
     }
-    
+
     protected GavCalculator getGavCalculator()
     {
         return gavCalculator;
@@ -88,7 +88,7 @@ public class M2Repository
         {
             if ( M2ArtifactRecognizer.isSnapshot( uid.getPath() ) )
             {
-                return isShouldServeSnapshots();
+                return RepositoryPolicy.SNAPSHOT.equals( getRepositoryPolicy() );
             }
             else
             {
@@ -107,11 +107,11 @@ public class M2Repository
             if ( gav.isSnapshot() )
             {
                 // snapshots goes if enabled
-                return isShouldServeSnapshots();
+                return RepositoryPolicy.SNAPSHOT.equals( getRepositoryPolicy() );
             }
             else
             {
-                return isShouldServeReleases();
+                return RepositoryPolicy.RELEASE.equals( getRepositoryPolicy() );
             }
         }
     }
@@ -120,11 +120,8 @@ public class M2Repository
         throws StorageException
     {
         // if the item is file, is M2 repository metadata and this repo is release-only or snapshot-only
-        if ( isCleanseRepositoryMetadata()
-            && StorageFileItem.class.isAssignableFrom( item.getClass() )
-            && M2ArtifactRecognizer.isMetadata( item.getPath() )
-            && ( isShouldServeReleases() && !isShouldServeSnapshots() || !isShouldServeReleases()
-                && isShouldServeSnapshots() ) )
+        if ( isCleanseRepositoryMetadata() && StorageFileItem.class.isAssignableFrom( item.getClass() )
+            && M2ArtifactRecognizer.isMetadata( item.getPath() ) )
         {
             StorageFileItem mdFile = (StorageFileItem) item;
             ByteArrayInputStream backup = null;
@@ -141,16 +138,7 @@ public class M2Repository
                 Metadata imd = metadataReader.read( isr );
 
                 // and fix it
-                if ( isShouldServeReleases() && !isShouldServeSnapshots() )
-                {
-                    // this is a release-only repo
-                    imd = cleanseMetadataForRepository( false, imd );
-                }
-                else if ( !isShouldServeReleases() && isShouldServeSnapshots() )
-                {
-                    // this is a snapshot-only repo
-                    imd = cleanseMetadataForRepository( true, imd );
-                }
+                imd = cleanseMetadataForRepository( RepositoryPolicy.SNAPSHOT.equals( getRepositoryPolicy() ), imd );
 
                 // serialize and swap the new metadata
                 MetadataXpp3Writer metadataWriter = new MetadataXpp3Writer();
