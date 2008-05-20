@@ -14,6 +14,7 @@
 		<config-expanded-dir>target/config</config-expanded-dir>
 		<config-target-dir>${bundle-expanded-dir}/nexus-webapp-${project.version}/runtime/apps/nexus/conf</config-target-dir>
 		<work-target-dir>${bundle-expanded-dir}/nexus-webapp-${project.version}/runtime/work</work-target-dir>
+		<plexus-config-file>${bundle-expanded-dir}/nexus-webapp-${project.version}/conf/plexus.xml</plexus-config-file>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -41,8 +42,17 @@
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-			<scope>test</scope>
 		</dependency>
+		<dependency>
+		    <groupId>org.sonatype.appbooter.plexus-booters</groupId>
+		    <artifactId>plexus-app-booter</artifactId>
+		    <version>1.1</version>
+		</dependency>
+		<dependency>
+            <groupId>org.sonatype.appbooter.plexus-platforms</groupId>
+            <artifactId>plexus-platform-base</artifactId>
+            <version>1.1</version>
+        </dependency>
 	</dependencies>
 	<build>
 	    <filters>
@@ -56,6 +66,39 @@
 	        </resource>
 	    </resources>
 		<plugins>
+		    <plugin>
+		        <artifactId>plx-maven-plugin</artifactId>
+		        <groupId>org.sonatype.plugins</groupId>		        
+                <version>1.1-SNAPSHOT</version>
+		        <executions>
+		            <execution>
+		                <id>start-nexus</id>
+		                <phase>pre-integration-test</phase>
+		                <goals>
+		                    <goal>run</goal>
+		                </goals>
+		                <configuration>
+		                    <systemProperties>
+		                        <plexus.blocking.enabled>false</plexus.blocking.enabled>
+		                    </systemProperties>
+		                    <basedir>${bundle-expanded-dir}/nexus-webapp-${project.version}</basedir>
+		                    <configuration>${plexus-config-file}</configuration>
+		                    <includeTestClasspath>true</includeTestClasspath>
+		                </configuration>
+		            </execution>
+		            <execution>
+                        <id>stop-nexus</id>
+                        <phase>post-integration-test</phase>
+                        <goals>
+                            <goal>stop</goal>
+                        </goals>
+                        <configuration>
+                            <configuration>${plexus-config-file}</configuration>
+                            <includeTestClasspath>true</includeTestClasspath>
+                        </configuration>
+                    </execution>
+		        </executions>    
+		    </plugin>
 			<plugin>
 				<artifactId>maven-dependency-plugin</artifactId>
 				<version>2.0</version>
@@ -107,6 +150,28 @@
 					</execution>
 				</executions>
 			</plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <skip>true</skip>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>integration-tests</id>
+                        <phase>integration-test</phase>
+                        <goals>
+                            <goal>test</goal>
+                        </goals>
+                        <configuration>
+                            <skip>false</skip>
+                            <includes>
+                                <include>**/NexusTestSuite.java</include>
+                            </includes>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>			
 		</plugins>
 	</build>
 </project>
