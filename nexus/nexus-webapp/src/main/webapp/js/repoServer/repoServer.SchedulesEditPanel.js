@@ -29,10 +29,12 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
   
   var ht = Sonatype.repoServer.resources.help.schedules;
   
-  //TODO: this will be calling a rest method at some point
+  //List of schedule types
   this.scheduleTypeStore = new Ext.data.SimpleStore({fields:['value'], data:[['None'],['Once'],['Daily'],['Weekly'],['Monthly'],['Advanced']]});
+  //List of weekdays
   this.weekdaysList = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
   
+  //Methods that will take the incoming json data and map over to the ui controls
   this.loadDataModFuncs = {
     none : {
       serviceSchedule : Sonatype.utils.capitalize,
@@ -73,6 +75,7 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
     }
   };
   
+  //Methods that will take the data from the ui controls and map over to json
   this.submitDataModFuncs = {
     none : {
       serviceSchedule : Sonatype.utils.lowercase,
@@ -113,12 +116,14 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
     }
   };
   
+  //Simply a record to hold details of each service type 
   this.serviceTypeRecordConstructor = Ext.data.Record.create([
     {name:'id', sortType:Ext.data.SortTypes.asUCString},
     {name:'name'},
     {name:'properties'}
   ]);
     
+  //A record that holds the data for each service in the system
   this.scheduleRecordConstructor = Ext.data.Record.create([
     {name:'resourceURI'},
     {name:'name', sortType:Ext.data.SortTypes.asUCString},
@@ -131,8 +136,8 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
     {name:'lastRunResult'}
   ]);
   
-  this.serviceTypeReader = new Ext.data.JsonReader({root: 'data', id: 'id'}, this.serviceTypeRecordConstructor );
-  
+  //Reader and datastore that queries the server for the list of service types
+  this.serviceTypeReader = new Ext.data.JsonReader({root: 'data', id: 'id'}, this.serviceTypeRecordConstructor );  
   this.serviceTypeDataStore = new Ext.data.Store({
     url: Sonatype.config.repos.urls.scheduleTypes,
     reader: this.serviceTypeReader,
@@ -140,9 +145,8 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
     autoLoad: true
   });
   
+  //Reader and datastore that queries the server for the list of currently defined services
   this.schedulesReader = new Ext.data.JsonReader({root: 'data', id: 'resourceURI'}, this.scheduleRecordConstructor );
-
-  //@ext: must use data.Store (not JsonStore) to pass in reader instead of using fields config array
   this.schedulesDataStore = new Ext.data.Store({
     url: Sonatype.config.repos.urls.schedules,
     reader: this.schedulesReader,
@@ -150,10 +154,14 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
     autoLoad: true
   });
   
+  //This is the dynamically generated array that contains the items that will be shown as properties for the different
+  //service types, there will be 1 item in this array for each serviceType retrieved from the serviceTypeDataStore
   this.serviceTypePanelItems = [];
   
+  //Populate the dynamic content
   this.populateServiceTypePanelItems();
   
+  //Build the form
   this.formConfig = {};
   this.formConfig.schedule = {
     region: 'center',
@@ -867,10 +875,15 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
 
 
 Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
+  //Populate the dynamic content, based upon the currently defined service types from the server
   populateServiceTypePanelItems : function() {
+    //If the items haven't loaded yet, wait until they are.   This of course requires that their be at least
+    //1 service type available at ALL times on the server.
+    //TODO: could probably use better logic here
     if (this.serviceTypeDataStore.data.items.length < 1){
       return this.populateServiceTypePanelItems.defer(300, this, arguments);
     }
+    //Add the default card, simply an empty formset
     this.serviceTypePanelItems[0] =
     {
       xtype:'fieldset',
@@ -884,10 +897,13 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
         labelSeparator: ''
       }
     };
+    //Now add the dynamic content
     this.serviceTypeDataStore.each(function(item, i, len){
       var items = [];
       for(var j=0;j<item.data.properties.length;j++){
         var curRec = item.data.properties[j];
+        //Note that each item is disabled initially, this is because the select handler for the serviceType
+        //combo box handles enabling/disabling as necessary, so each inactive card isn't also included in the form
         if(curRec.type == 'string'){
           items[j] = 
           {
@@ -942,6 +958,7 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
       };
     }, this);
   },
+  //Dump the currently stored data and requery for everything
   reloadAll : function(){
     this.schedulesDataStore.reload();
     this.serviceTypeDataStore.reload();
@@ -1257,7 +1274,8 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
       formPanel.form.on('actionfailed', this.actionFailedHandler, this);
       formPanel.on('beforerender', this.beforeFormRenderHandler, this);
       formPanel.on('afterlayout', this.afterLayoutFormHandler, this, {single:true});
-      
+  
+      //On load need to make sure and set the proper schedule type card as active    
       var schedulePanel = formPanel.find('id', 'schedule-config-card-panel')[0];
       if (rec.data.serviceSchedule == 'once'){
         schedulePanel.activeItem = 1;
@@ -1274,12 +1292,15 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
       else if (rec.data.serviceSchedule == 'advanced'){
         schedulePanel.activeItem = 5;
       }
+      //Then enable each field in the active card (after this point, select handler takes care of all
+      //enable/disable transitions
       if (schedulePanel.items.items[schedulePanel.activeItem].items){
         schedulePanel.items.items[schedulePanel.activeItem].items.each(function(item){
           item.disabled=false;
         });
       }
       
+      //Need to do the same w/ service type and make sure the correct card is active.  Dynamic cards, so little more generic
       var serviceTypePanel = formPanel.find('id', 'service-type-config-card-panel')[0];
       serviceTypePanel.items.each(function(item,i,len){
         if (item.id == rec.data.serviceTypeId){
@@ -1290,11 +1311,8 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
         }
       });
             
-      var serviceTypeField = formPanel.find('name', 'serviceType')[0];
-      serviceTypeField.on('select', this.serviceTypeSelectHandler, formPanel);
-      
-      var serviceScheduleField = formPanel.find('name', 'serviceSchedule')[0];
-      serviceScheduleField.on('select', this.serviceScheduleSelectHandler, formPanel);
+      formPanel.find('name', 'serviceType')[0].on('select', this.serviceTypeSelectHandler, formPanel);
+      formPanel.find('name', 'serviceSchedule')[0].on('select', this.serviceScheduleSelectHandler, formPanel);
 
       var buttonInfoObj = {
         formPanel : formPanel,
@@ -1302,9 +1320,7 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
         resourceUri : rec.data.resourceURI
       };
 
-        //save button event handler
       formPanel.buttons[0].on('click', this.saveHandler.createDelegate(this, [buttonInfoObj]));
-      //cancel button event handler
       formPanel.buttons[1].on('click', this.cancelHandler.createDelegate(this, [buttonInfoObj]));
       
       this.loadWeekdayListHelper([], {}, formPanel);
@@ -1314,15 +1330,18 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
       this.formCards.add(formPanel);
     }
 
-    //always set active and re-layout
+    //always set active
     this.formCards.getLayout().setActiveItem(formPanel);
   },
   
   serviceTypeSelectHandler : function(combo, record, index){
     var serviceTypePanel = this.find('id', 'service-type-config-card-panel')[0];
+    //First disable all the items currently on screen, so they wont be validated/submitted etc
     serviceTypePanel.getLayout().activeItem.items.each(function(item){
       item.disable();
     });
+    //Then find the proper card to activate (based upon id of the serviceType)
+    //Then enable the fields in that card
     serviceTypePanel.items.each(function(item,i,len){
       if (item.id == record.data.id){
         serviceTypePanel.getLayout().setActiveItem(item);
@@ -1336,9 +1355,11 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
   
   serviceScheduleSelectHandler : function(combo, record, index){
     var schedulePanel = this.find('id', 'schedule-config-card-panel')[0];
+    //First disable all the items currently on screen, so they wont be validated/submitted etc
     schedulePanel.getLayout().activeItem.items.each(function(item){
       item.disable();
     });
+    //Then find the proper card to activate (based upon the selected schedule type)
     if (record.data.value == 'Once'){
       schedulePanel.getLayout().setActiveItem(schedulePanel.items.itemAt(1));
     }
@@ -1357,6 +1378,7 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
     else {
       schedulePanel.getLayout().setActiveItem(schedulePanel.items.itemAt(0));
     }
+    //Then enable the fields in that card
     schedulePanel.getLayout().activeItem.items.each(function(item){
       item.enable();
     });
@@ -1421,9 +1443,11 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
     return arr; //return arr, even if empty to comply with sonatypeLoad data modifier requirement
   },
   exportStartDateHelper : function(val, fpanel){
+    //as there is no Date transfer in json, i pass the long representation of the date.
     var selectedStartDate = "";
     
     var startDateFields = fpanel.find('name', 'startDate');
+    //Need to find the startDate that is currently enabled, as multiple cards will have a startDate field
     for(var i=0; i<startDateFields.length; i++){
       if (!startDateFields[i].disabled){
         selectedStartDate = startDateFields[i];
@@ -1437,6 +1461,7 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
     var selectedStartTime = "";
     
     var startTimeFields = fpanel.find('name', 'startTime');
+    //Need to find the startTime that is currently enabled, as multiple cards will have a startDate field
     for(var i=0; i<startTimeFields.length; i++){
       if (!startTimeFields[i].disabled){
         selectedStartTime = startTimeFields[i];
@@ -1444,6 +1469,7 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
       }
     }
     
+    //rest api is using 24 hour clock
     var hours = parseInt(selectedStartTime.getValue().substring(0, selectedStartTime.getValue().indexOf(':'))) + (selectedStartTime.getValue().indexOf('AM') == -1 ? 12 : 0);
     var minutes = selectedStartTime.getValue().substring(selectedStartTime.getValue().indexOf(':') + 1, selectedStartTime.getValue().indexOf(':') + 3);
     
@@ -1453,6 +1479,7 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
     var selectedRecurringTime = "";
     
     var recurringTimeFields = fpanel.find('name', 'recurringTime');
+    //Need to find the recurringTime that is currently enabled, as multiple cards will have a startDate field
     for(var i=0; i<recurringTimeFields.length; i++){
       if (!recurringTimeFields[i].disabled){
         selectedRecurringTime = recurringTimeFields[i];
@@ -1460,6 +1487,7 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
       }
     }
     
+    //rest api is using 24 hour clock
     var hours = parseInt(selectedRecurringTime.getValue().substring(0, selectedRecurringTime.getValue().indexOf(':'))) + (selectedRecurringTime.getValue().indexOf('AM') == -1 ? 12 : 0);
     var minutes = selectedRecurringTime.getValue().substring(selectedRecurringTime.getValue().indexOf(':') + 1, selectedRecurringTime.getValue().indexOf(':') + 3);
     
@@ -1471,6 +1499,8 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
     var outputArr = [];
     var nodes = selectedTree.root.childNodes;
 
+    //Pretty simple here, just go through the weekdays selected and output the payload
+    //which is just the name of the weekday (monday, tuesday, etc.)
     for(var i = 0; i < nodes.length; i++){
       outputArr[i] = nodes[i].attributes.payload;
     }
@@ -1480,11 +1510,14 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
   exportMonthlyRecurringDayHelper : function(val, fpanel){
     var outputArr = [];
     var j = 0;
+    //Another pretty simple conversion, just find all selected check boxes
+    //and send along the day number
     for (var i = 1; i <= 31; i++){
       if (fpanel.find('name','day' + i)[0].getValue()){
         outputArr[j++] = '' + i;
       }
     }
+    //and last if necessary
     if (fpanel.find('name','dayLast')[0].getValue()){
       outputArr[j] = 'last';
     }
@@ -1495,16 +1528,20 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
     
     var servicePropertiesPanel = fpanel.find('id', 'service-type-config-card-panel')[0];
     var i = 0;
+    //These are dynamic fields here, so some pretty straightforward generic logic below
     servicePropertiesPanel.getLayout().activeItem.items.each(function(item, i, len){
       var value;
       
       if (item.xtype == 'datefield'){
-        value = item.getValue().getTime();
+        //long representation is used, not actual date
+        //force to a string, as that is what the current api requires
+        value = '' + item.getValue().getTime();
       }
       else if (item.xtype == 'textfield'){
         value = item.getValue();
       }
       else if (item.xtype == 'numberfield'){
+        //force to a string, as that is what the current api requires
         value = '' + item.getValue();
       }
       outputArr[i] = 
@@ -1512,6 +1549,7 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
         id:item.getName().substring('serviceProperties_'.length),
         value:value
       };
+      //The server is currently requiring this, would definitely be nice to not need to know this in the ui
       Ext.apply(outputArr[i], {'@class':'org.sonatype.nexus.rest.model.ScheduledServicePropertyResource'});
       i++;
     }, servicePropertiesPanel.getLayout().activeItem);
@@ -1522,6 +1560,7 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
     var selectedStartDate = "";
     
     var startDateFields = fpanel.find('name', 'startDate');
+    //Find the correct startDate field, as their will be multiples, all but 1 disabled
     for(var i=0; i<startDateFields.length; i++){
       if (!startDateFields[i].disabled){
         selectedStartDate = startDateFields[i];
@@ -1529,6 +1568,7 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
       }
     }
     
+    //translate the long representation back into date
     var importedDate = new Date(Number(val));
     selectedStartDate.setValue(importedDate);
     return importedDate;
@@ -1537,6 +1577,7 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
     var selectedStartTime = "";
     
     var startTimeFields = fpanel.find('name', 'startTime');
+    //Find the correct startTime field, as their will be multiples, all but 1 disabled
     for(var i=0; i<startTimeFields.length; i++){
       if (!startTimeFields[i].disabled){
         selectedStartTime = startTimeFields[i];
@@ -1547,6 +1588,7 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
     var minutes = val.substring(val.indexOf(':') + 1, val.indexOf(':') + 3);    
     var afternoon = false;
     
+    //Note api uses 24 hour format, ui is currently showing 12 hour format, so conversion here
     if (hours > 12){
       hours = hours - 12;
       afternoon = true;
@@ -1559,6 +1601,7 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
     var selectedRecurringTime = "";
     
     var recurringTimeFields = fpanel.find('name', 'recurringTime');
+    //Find the correct recurringTime field, as their will be multiples, all but 1 disabled
     for(var i=0; i<recurringTimeFields.length; i++){
       if (!recurringTimeFields[i].disabled){
         selectedRecurringTime = recurringTimeFields[i];
@@ -1569,6 +1612,7 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
     var minutes = val.substring(val.indexOf(':') + 1, val.indexOf(':') + 3);    
     var afternoon = false;
     
+    //Note api uses 24 hour format, ui is currently showing 12 hour format, so conversion here
     if (hours > 12){
       hours = hours - 12;
       afternoon = true;
@@ -1581,15 +1625,14 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
     var selectedTree = Ext.getCmp(fpanel.id + '_weekdays-tree');
     var allTree = Ext.getCmp(fpanel.id + '_all_weekdays-tree');
 
+    //Iterate through the list, and add any selected items to the selected tree
     for(var i=0; i<arr.length; i++){
       arr[i] = Sonatype.utils.capitalize(arr[i]);
-      //@todo: adding this field is a temporary crutch for the server
       selectedTree.root.appendChild(
         new Ext.tree.TreeNode({
           id: arr[i],
           text: arr[i],
-          payload: arr[i], //sonatype added attribute
-
+          payload: arr[i],
           allowChildren: false,
           draggable: true,
           leaf: true
@@ -1597,15 +1640,17 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
       );
     }
     
+    //If not in the selected list, add to the available list
     for(var i=0; i<this.weekdaysList.length; i++){
       if(typeof(selectedTree.getNodeById(this.weekdaysList[i])) != 'undefined'){
         allTree.root.removeChild(allTree.getNodeById(this.weekdaysList[i]));
       }
     }
     
-    return arr; //return arr, even if empty to comply with sonatypeLoad data modifier requirement
+    return arr;
   },
   importMonthlyRecurringDayHelper : function(arr, srcObj, fpanel){
+    //simply look at each item, and select the proper checkbox
     for(var i=0; i<arr.length; i++){
       var checkbox = fpanel.find('name','day' + arr[i])[0];
       if (checkbox == null){
@@ -1617,6 +1662,8 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
     return arr;
   },
   importServicePropertiesHelper : function(val, srcObj, fpanel){
+    //Maps the incoming json properties to the generic component
+    //Uses the id of the serviceProperty item as the key, so the id _must_ be unique within a service type
     for(var i=0;i<srcObj.serviceProperties.length;i++){
       var servicePropertyItem = fpanel.find('name','serviceProperties_' + srcObj.serviceProperties[i].id)[0];
       if (servicePropertyItem != null){
