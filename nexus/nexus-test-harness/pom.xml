@@ -15,5 +15,6 @@
     <module>nexus-test-harness-artifacts</module>
 		<module>nexus-test-harness-config</module>
 		<module>nexus-test-harness-work</module>
+    <module>nexus-test-harness-launcher</module>
 	</modules>
 </project>

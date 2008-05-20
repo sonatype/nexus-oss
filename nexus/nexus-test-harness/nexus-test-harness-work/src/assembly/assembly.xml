@@ -23,7 +23,7 @@ under the License.
   <includeBaseDirectory>false</includeBaseDirectory>
   <fileSets>
     <fileSet>
-      <directory>./src/bin</directory> 
+      <directory>./src/bin/work</directory> 
       <outputDirectory>/</outputDirectory>           
     </fileSet>
   </fileSets>        
