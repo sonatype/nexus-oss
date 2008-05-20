@@ -43,14 +43,14 @@ public abstract class LayoutConverterShadowRepository
     /**
      * The GAV Calculator.
      * 
-     * @plexus.requirement role-hint="m1"
+     * @plexus.requirement role-hint="maven1"
      */
     private GavCalculator m1GavCalculator;
 
     /**
      * The GAV Calculator.
      * 
-     * @plexus.requirement role-hint="m2"
+     * @plexus.requirement role-hint="maven2"
      */
     private GavCalculator m2GavCalculator;
 

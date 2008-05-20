@@ -44,7 +44,6 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationExce
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.sonatype.nexus.artifact.Gav;
-import org.sonatype.nexus.artifact.GavCalculator;
 import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
 import org.sonatype.nexus.configuration.ConfigurationChangeListener;
 import org.sonatype.nexus.configuration.NexusConfiguration;
@@ -69,6 +68,7 @@ import org.sonatype.nexus.proxy.events.RepositoryRegistryGroupEventRemove;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
+import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RepositoryType;
@@ -97,11 +97,6 @@ public class DefaultIndexerManager
     /** Treshold for result set TODO: implement this in nexus indexer! */
     private static final int RESULT_LIMIT = 100;
 
-    /**
-     * @plexus.requirement role-hint="m2"
-     */
-    private GavCalculator gavCalculator;
-    
     /**
      * @plexus.requirement role="org.sonatype.nexus.index.ArtifactContextProducer"
      */
@@ -804,26 +799,15 @@ public class DefaultIndexerManager
                         true );
 
                     /*
-                    List<Repository> members = repositoryRegistry.getRepositoryGroup( gevt.getGroupId() );
-
-                    IndexingContext bestContext = null;
-
-                    for ( Repository repo : members )
-                    {
-                        if ( nexusIndexer.getIndexingContexts().containsKey( getLocalContextId( repo.getId() ) ) )
-                        {
-                            // local idx has every repo
-                            bestContext = nexusIndexer.getIndexingContexts().get( getLocalContextId( repo.getId() ) );
-                        }
-                        if ( nexusIndexer.getIndexingContexts().containsKey( getRemoteContextId( repo.getId() ) ) )
-                        {
-                            // if remote is here, it is the best
-                            bestContext = nexusIndexer.getIndexingContexts().get( getRemoteContextId( repo.getId() ) );
-                        }
-
-                        ctxMerged.merge( bestContext.getIndexDirectory() );
-                    }
-                    */
+                     * List<Repository> members = repositoryRegistry.getRepositoryGroup( gevt.getGroupId() );
+                     * IndexingContext bestContext = null; for ( Repository repo : members ) { if (
+                     * nexusIndexer.getIndexingContexts().containsKey( getLocalContextId( repo.getId() ) ) ) { // local
+                     * idx has every repo bestContext = nexusIndexer.getIndexingContexts().get( getLocalContextId(
+                     * repo.getId() ) ); } if ( nexusIndexer.getIndexingContexts().containsKey( getRemoteContextId(
+                     * repo.getId() ) ) ) { // if remote is here, it is the best bestContext =
+                     * nexusIndexer.getIndexingContexts().get( getRemoteContextId( repo.getId() ) ); } ctxMerged.merge(
+                     * bestContext.getIndexDirectory() ); }
+                     */
 
                     if ( ctxMerged.getTimestamp() == null )
                     {
@@ -851,6 +835,14 @@ public class DefaultIndexerManager
             try
             {
                 RepositoryItemEvent ievt = (RepositoryItemEvent) evt;
+
+                // sadly, the nexus-indexer is maven2 only, hence we check is the repo
+                // from where we get the event is a maven2 repo
+                if ( !MavenRepository.class.isAssignableFrom( ievt.getRepository().getClass() ) )
+                {
+                    return;
+                }
+
                 // should we sync at all
                 if ( ievt.getRepository().isIndexable()
                     && ( RepositoryItemEventStore.class.isAssignableFrom( ievt.getClass() )
@@ -861,7 +853,8 @@ public class DefaultIndexerManager
                         getLocalContextId( ievt.getRepository().getId() ) );
 
                     // by calculating GAV we check wether the request is against a repo artifact at all
-                    Gav gav = gavCalculator.pathToGav( ievt.getItemUid().getPath() );
+                    Gav gav = ( (MavenRepository) ievt.getRepository() ).getGavCalculator().pathToGav(
+                        ievt.getItemUid().getPath() );
 
                     if ( context != null && gav != null )
                     {

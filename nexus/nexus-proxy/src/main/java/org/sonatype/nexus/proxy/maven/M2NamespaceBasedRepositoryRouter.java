@@ -57,8 +57,13 @@ public class M2NamespaceBasedRepositoryRouter
     extends AbstractSearchableBasedRepositoryRouter
 {
     public static final String ID = "m2namespace";
-    
-    private ContentClass contentClass = new Maven2NSContentClass();
+
+    /**
+     * The ContentClass.
+     * 
+     * @plexus.requirement role-hint="maven2-namespace"
+     */
+    private ContentClass contentClass;
 
     protected static final String[] ROOT = {
         "A",

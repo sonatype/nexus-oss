@@ -233,18 +233,11 @@ public abstract class DefaultRepository
         throws ItemNotFoundException,
             StorageException
     {
-        if ( getRepositoryContentClass().isRemoteFile( uid.getPath() ) )
-        {
-            AbstractStorageItem result = getRemoteStorage().retrieveItem( uid );
+        AbstractStorageItem result = getRemoteStorage().retrieveItem( uid );
 
-            result.getItemContext().putAll( context );
+        result.getItemContext().putAll( context );
 
-            return doCacheItem( result );
-        }
-        else
-        {
-            throw new ItemNotFoundException( uid );
-        }
+        return doCacheItem( result );
     }
 
     protected AbstractStorageItem doCacheItem( AbstractStorageItem item )

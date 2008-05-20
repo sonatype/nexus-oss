@@ -39,7 +39,7 @@ public class DefaultScanner
     /** @plexus.requirement */
     private ArtifactContextProducer artifactContextProducer;
 
-    /** @plexus.requirement role-hint="m2" */
+    /** @plexus.requirement role-hint="maven2" */
     private GavCalculator gavCalculator;
 
     public ScanningResult scan( ScanningRequest request )

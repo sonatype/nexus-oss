@@ -28,14 +28,25 @@ import org.sonatype.nexus.proxy.registry.ContentClass;
  * A shadow repository that transforms M1 content hierarchy of master to M2 layouted shadow.
  * 
  * @author cstamas
- * @plexus.component instantiation-strategy="per-lookup" role="org.sonatype.nexus.proxy.repository.Repository" role-hint="m1-m2-shadow"
+ * @plexus.component instantiation-strategy="per-lookup" role="org.sonatype.nexus.proxy.repository.Repository"
+ *                   role-hint="m1-m2-shadow"
  */
 public class M2LayoutedM1ShadowRepository
     extends LayoutConverterShadowRepository
 {
-    private ContentClass contentClass = new Maven2ContentClass();
+    /**
+     * The ContentClass.
+     * 
+     * @plexus.requirement role-hint="maven2"
+     */
+    private ContentClass contentClass;
 
-    private ContentClass masterContentClass = new Maven1ContentClass();
+    /**
+     * The ContentClass.
+     * 
+     * @plexus.requirement role-hint="maven1"
+     */
+    private ContentClass masterContentClass;
 
     /**
      * This repo provides Maven2 content.

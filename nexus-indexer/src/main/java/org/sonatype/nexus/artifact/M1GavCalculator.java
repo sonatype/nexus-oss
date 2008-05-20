@@ -21,7 +21,7 @@ import java.util.regex.Pattern;
  * 
  * @author Jason van Zyl
  * @author cstamas
- * @plexus.component role-hint="m1"
+ * @plexus.component role-hint="maven1"
  */
 public class M1GavCalculator
     implements GavCalculator

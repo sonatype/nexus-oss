@@ -21,7 +21,7 @@ import java.text.SimpleDateFormat;
  * 
  * @author Jason van Zyl
  * @author cstamas
- * @plexus.component role-hint="m2"
+ * @plexus.component role-hint="maven2"
  */
 public class M2GavCalculator
     implements GavCalculator

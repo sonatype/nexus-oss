@@ -50,7 +50,8 @@ import org.sonatype.nexus.util.AlphanumComparator;
  * The default M2Repository.
  * 
  * @author cstamas
- * @plexus.component instantiation-strategy="per-lookup" role="org.sonatype.nexus.proxy.repository.Repository" role-hint="maven2"
+ * @plexus.component instantiation-strategy="per-lookup" role="org.sonatype.nexus.proxy.repository.Repository"
+ *                   role-hint="maven2"
  */
 public class M2Repository
     extends AbstractMavenRepository
@@ -58,13 +59,18 @@ public class M2Repository
     private static final Pattern VERSION_FILE_PATTERN = Pattern.compile( "^(.*)-([0-9]{8}.[0-9]{6})-([0-9]+)$" );
 
     /**
+     * The ContentClass.
+     * 
+     * @plexus.requirement role-hint="maven2"
+     */
+    private ContentClass contentClass;
+
+    /**
      * The GAV Calculator.
      * 
-     * @plexus.requirement role-hint="m2"
+     * @plexus.requirement role-hint="maven2"
      */
     private GavCalculator gavCalculator;
-
-    private ContentClass contentClass = new Maven2ContentClass();
 
     public ContentClass getRepositoryContentClass()
     {

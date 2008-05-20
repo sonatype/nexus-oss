@@ -63,7 +63,12 @@ import org.sonatype.nexus.proxy.router.DefaultGroupIdBasedRepositoryRouter;
 public class M2GroupIdBasedRepositoryRouter
     extends DefaultGroupIdBasedRepositoryRouter
 {
-    private ContentClass contentClass = new Maven2ContentClass();
+    /**
+     * The ContentClass.
+     * 
+     * @plexus.requirement role-hint="maven2"
+     */
+    private ContentClass contentClass;
 
     public ContentClass getHandledContentClass()
     {

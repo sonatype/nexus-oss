@@ -22,6 +22,12 @@ package org.sonatype.nexus.proxy.maven;
 
 import org.sonatype.nexus.proxy.registry.AbstractIdContentClass;
 
+/**
+ * The Maven2 content class.
+ * 
+ * @author cstamas
+ * @plexus.component role-hint="maven2-namespace"
+ */
 public class Maven2NSContentClass
     extends AbstractIdContentClass
 {
@@ -30,11 +36,5 @@ public class Maven2NSContentClass
     public String getId()
     {
         return ID;
-    }
-
-    public boolean isRemoteFile( String path )
-    {
-        // this is "artifical" view, and shows only cache/hosted contents
-        return false;
     }
 }

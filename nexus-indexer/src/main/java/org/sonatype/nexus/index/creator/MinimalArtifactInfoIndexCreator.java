@@ -57,7 +57,7 @@ import org.sonatype.nexus.index.locator.SourcesLocator;
 public class MinimalArtifactInfoIndexCreator
     extends AbstractIndexCreator
 {
-    /** @plexus.requirement role-hint="m2" */
+    /** @plexus.requirement role-hint="maven2" */
     private GavCalculator gavCalculator = new M2GavCalculator();
 
     private ModelReader modelReader = new ModelReader();

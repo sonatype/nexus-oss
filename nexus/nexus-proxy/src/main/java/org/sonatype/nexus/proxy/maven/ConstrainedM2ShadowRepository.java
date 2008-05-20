@@ -65,7 +65,7 @@ public class ConstrainedM2ShadowRepository
     /**
      * The GAV Calculator.
      * 
-     * @plexus.requirement role-hint="m2"
+     * @plexus.requirement role-hint="maven2"
      */
     private GavCalculator gavCalculator;
 

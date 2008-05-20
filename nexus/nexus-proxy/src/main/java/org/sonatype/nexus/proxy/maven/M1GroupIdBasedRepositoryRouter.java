@@ -34,7 +34,12 @@ import org.sonatype.nexus.proxy.router.DefaultGroupIdBasedRepositoryRouter;
 public class M1GroupIdBasedRepositoryRouter
     extends DefaultGroupIdBasedRepositoryRouter
 {
-    private ContentClass contentClass = new Maven1ContentClass();
+    /**
+     * The ContentClass.
+     * 
+     * @plexus.requirement role-hint="maven1"
+     */
+    private ContentClass contentClass;
     
     public ContentClass getHandledContentClass()
     {

@@ -32,19 +32,25 @@ import org.sonatype.nexus.proxy.registry.ContentClass;
  * policies for them.
  * 
  * @author cstamas
- * @plexus.component instantiation-strategy="per-lookup" role="org.sonatype.nexus.proxy.repository.Repository" role-hint="maven1"
+ * @plexus.component instantiation-strategy="per-lookup" role="org.sonatype.nexus.proxy.repository.Repository"
+ *                   role-hint="maven1"
  */
 public class M1Repository
     extends AbstractMavenRepository
 {
     /**
+     * The ContentClass.
+     * 
+     * @plexus.requirement role-hint="maven1"
+     */
+    private ContentClass contentClass;
+
+    /**
      * The GAV Calculator.
      * 
-     * @plexus.requirement role-hint="m1"
+     * @plexus.requirement role-hint="maven1"
      */
     private GavCalculator gavCalculator;
-
-    private ContentClass contentClass = new Maven1ContentClass();
 
     public ContentClass getRepositoryContentClass()
     {
@@ -76,8 +82,10 @@ public class M1Repository
                 return true;
             }
         }
+
         // we are using Gav to test the path
-        Gav gav = gavCalculator.pathToGav( uid.getPath() );
+        Gav gav = getGavCalculator().pathToGav( uid.getPath() );
+
         if ( gav == null )
         {
             return true;
@@ -108,7 +116,7 @@ public class M1Repository
         }
 
         // we are using Gav to test the path
-        Gav gav = gavCalculator.pathToGav( item.getPath() );
+        Gav gav = getGavCalculator().pathToGav( item.getPath() );
 
         if ( gav == null )
         {

@@ -36,10 +36,4 @@ public class DefaultContentClass
     {
         return true;
     }
-
-    public boolean isRemoteFile( String path )
-    {
-        return true;
-    }
-
 }

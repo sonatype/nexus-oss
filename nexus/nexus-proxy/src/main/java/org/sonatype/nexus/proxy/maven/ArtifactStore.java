@@ -20,6 +20,9 @@
  */
 package org.sonatype.nexus.proxy.maven;
 
+import java.util.Collection;
+
+import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.NoSuchResourceStoreException;
@@ -48,4 +51,10 @@ public interface ArtifactStore
             StorageException,
             AccessDeniedException;
 
+    // delete
+
+    // store
+
+    // list
+    //Collection<Gav> listArtifacts();
 }

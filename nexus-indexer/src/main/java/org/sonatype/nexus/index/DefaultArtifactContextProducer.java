@@ -33,7 +33,7 @@ import org.sonatype.nexus.index.locator.PomLocator;
 public class DefaultArtifactContextProducer
     implements ArtifactContextProducer
 {
-    /** @plexus.requirement role-hint="m2" */
+    /** @plexus.requirement role-hint="maven2" */
     private GavCalculator gavCalculator;
 
     private Locator al = new ArtifactLocator();
