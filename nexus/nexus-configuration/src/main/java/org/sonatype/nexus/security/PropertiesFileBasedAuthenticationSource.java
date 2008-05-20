@@ -150,29 +150,37 @@ public class PropertiesFileBasedAuthenticationSource
             }
         }
 
-        if ( !StringUtils.isEmpty( secrets.getProperty( username ) ) )
+        if ( isKnown( username ) )
         {
-            getLogger().debug( "Trying " + username + " authentication..." );
-
-            String inputHash = StringDigester.getSha1Digest( password );
-
-            String neededHash = secrets.getProperty( username );
-
-            if ( inputHash != null && neededHash != null && inputHash.equals( neededHash ) )
+            if ( hasPasswordSet( username ) )
             {
-                return new SimpleUser( username );
+                getLogger().debug( "Trying " + username + " authentication..." );
+
+                String inputHash = StringDigester.getSha1Digest( password );
+
+                String neededHash = secrets.getProperty( username );
+
+                if ( inputHash != null && neededHash != null && inputHash.equals( neededHash ) )
+                {
+                    return new SimpleUser( username );
+                }
+                else
+                {
+                    return null;
+                }
             }
             else
             {
-                return null;
+                getLogger().debug( "User " + username + " has no password set, passing it as authenticated..." );
+
+                return new SimpleUser( username );
             }
         }
         else
         {
-            getLogger().debug( "User " + username + " has no password set, passing it as authenticated..." );
-
-            return new SimpleUser( username );
+            return null;
         }
+
     }
 
     public boolean isKnown( String username )

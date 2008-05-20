@@ -47,8 +47,6 @@ public class SimpleAuthenticationSourceTest
         assertFalse( source.isKnown( "UNKNOWN" ) );
         assertFalse( source.hasPasswordSet( "UNKNOWN" ) );
         User unknownUser = source.authenticate( "UNKNOWN", "unknown" );
-        assertNotNull( unknownUser );
-        assertEquals( "UNKNOWN", unknownUser.getUsername() );
-        assertFalse( unknownUser.isAnonymous() );
+        assertNull( unknownUser );
     }
 }
