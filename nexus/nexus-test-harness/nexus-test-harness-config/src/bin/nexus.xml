@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?><nexusConfiguration>
   <version>1.0.3</version>
-  <workingDirectory>C:\Development\Code\nexus\nexus-webapp\target\nexus-webapp-1.0.0-beta-4-SNAPSHOT\runtime\work\nexus</workingDirectory>
-  <applicationLogDirectory>C:\Development\Code\nexus\nexus-webapp\target\nexus-webapp-1.0.0-beta-4-SNAPSHOT\runtime\apps\nexus\logs</applicationLogDirectory>
+  <workingDirectory>${nexus.working.directory}</workingDirectory>
+  <applicationLogDirectory>${nexus.log.directory}</applicationLogDirectory>
   <security />
   <globalConnectionSettings />
   <restApi />
