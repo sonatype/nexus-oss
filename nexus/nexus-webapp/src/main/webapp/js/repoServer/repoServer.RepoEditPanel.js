@@ -943,7 +943,6 @@ Sonatype.repoServer.RepoEditPanel = function(config){
       },
       {
         id: 'repo-add-btn',
-        split:true,
         text:'Add...',
         icon: Sonatype.config.resourcePath + '/images/icons/add.png',
         cls: 'x-btn-text-icon',
