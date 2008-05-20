@@ -43,6 +43,7 @@ import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.item.StorageLinkItem;
+import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 
 /**
  * <p>
@@ -174,7 +175,8 @@ public abstract class AbstractRepositoryRouter
     }
 
     public void copyItem( ResourceStoreRequest from, ResourceStoreRequest to )
-        throws NoSuchResourceStoreException,
+        throws UnsupportedStorageOperationException,
+            NoSuchResourceStoreException,
             RepositoryNotAvailableException,
             ItemNotFoundException,
             StorageException,
@@ -190,7 +192,8 @@ public abstract class AbstractRepositoryRouter
     }
 
     public void moveItem( ResourceStoreRequest from, ResourceStoreRequest to )
-        throws NoSuchResourceStoreException,
+        throws UnsupportedStorageOperationException,
+            NoSuchResourceStoreException,
             RepositoryNotAvailableException,
             ItemNotFoundException,
             StorageException,
@@ -206,7 +209,8 @@ public abstract class AbstractRepositoryRouter
     }
 
     public void storeItem( ResourceStoreRequest request, InputStream is, Map<String, String> userAttributes )
-        throws NoSuchResourceStoreException,
+        throws UnsupportedStorageOperationException,
+            NoSuchResourceStoreException,
             RepositoryNotAvailableException,
             StorageException,
             AccessDeniedException
@@ -221,7 +225,7 @@ public abstract class AbstractRepositoryRouter
     }
 
     public void createCollection( ResourceStoreRequest request, Map<String, String> userAttributes )
-        throws IllegalArgumentException,
+        throws UnsupportedStorageOperationException,
             NoSuchResourceStoreException,
             RepositoryNotAvailableException,
             StorageException,
@@ -237,7 +241,8 @@ public abstract class AbstractRepositoryRouter
     }
 
     public void deleteItem( ResourceStoreRequest request )
-        throws NoSuchResourceStoreException,
+        throws UnsupportedStorageOperationException,
+            NoSuchResourceStoreException,
             RepositoryNotAvailableException,
             ItemNotFoundException,
             StorageException,
@@ -459,7 +464,7 @@ public abstract class AbstractRepositoryRouter
      * @throws AccessDeniedException the access denied exception
      */
     protected abstract void doCopyItem( ResourceStoreRequest from, ResourceStoreRequest to )
-        throws IllegalArgumentException,
+        throws UnsupportedStorageOperationException,
             NoSuchResourceStoreException,
             RepositoryNotAvailableException,
             ItemNotFoundException,
@@ -480,7 +485,7 @@ public abstract class AbstractRepositoryRouter
      * @throws AccessDeniedException the access denied exception
      */
     protected abstract void doMoveItem( ResourceStoreRequest from, ResourceStoreRequest to )
-        throws IllegalArgumentException,
+        throws UnsupportedStorageOperationException,
             NoSuchResourceStoreException,
             RepositoryNotAvailableException,
             ItemNotFoundException,
@@ -502,7 +507,7 @@ public abstract class AbstractRepositoryRouter
      */
     protected abstract void doStoreItem( ResourceStoreRequest request, InputStream is,
         Map<String, String> userAttributes )
-        throws IllegalArgumentException,
+        throws UnsupportedStorageOperationException,
             NoSuchResourceStoreException,
             RepositoryNotAvailableException,
             StorageException,
@@ -521,7 +526,7 @@ public abstract class AbstractRepositoryRouter
      * @throws AccessDeniedException the access denied exception
      */
     protected void doCreateCollection( ResourceStoreRequest request, Map<String, String> userAttributes )
-        throws IllegalArgumentException,
+        throws UnsupportedStorageOperationException,
             NoSuchResourceStoreException,
             RepositoryNotAvailableException,
             StorageException,
@@ -543,7 +548,7 @@ public abstract class AbstractRepositoryRouter
      * @throws AccessDeniedException the access denied exception
      */
     protected abstract void doDeleteItem( ResourceStoreRequest request )
-        throws IllegalArgumentException,
+        throws UnsupportedStorageOperationException,
             NoSuchResourceStoreException,
             RepositoryNotAvailableException,
             ItemNotFoundException,

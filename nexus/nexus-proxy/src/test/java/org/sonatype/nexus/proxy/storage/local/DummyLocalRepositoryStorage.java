@@ -65,7 +65,6 @@ public class DummyLocalRepositoryStorage
 
     public Collection<StorageItem> listItems( RepositoryItemUid uid )
         throws ItemNotFoundException,
-            UnsupportedStorageOperationException,
             StorageException
     {
 
@@ -134,7 +133,7 @@ public class DummyLocalRepositoryStorage
             StorageException
     {
         // TODO Auto-generated method stub
-        
+
     }
 
 }

@@ -314,7 +314,7 @@ public class DefaultFSLocalRepositoryStorage
                 finally
                 {
                     IOUtil.close( is );
-                    
+
                     IOUtil.close( os );
                 }
 
@@ -424,7 +424,6 @@ public class DefaultFSLocalRepositoryStorage
 
     public Collection<StorageItem> listItems( RepositoryItemUid uid )
         throws ItemNotFoundException,
-            UnsupportedStorageOperationException,
             StorageException
     {
         File target = getFileFromBase( uid );

@@ -97,13 +97,6 @@ public abstract class LayoutConverterShadowRepository
     }
 
     /**
-     * Returns the GAV
-     * 
-     * @return
-     */
-    protected abstract GavCalculator getGavCalculator();
-
-    /**
      * Transforms a full artifact path from M1 layout to M2 layout.
      * 
      * @param path

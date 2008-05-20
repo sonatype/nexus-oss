@@ -23,7 +23,6 @@ package org.sonatype.nexus.proxy.repository;
 import java.util.Map;
 
 import org.codehaus.plexus.logging.Logger;
-import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.RepositoryNotAvailableException;
 import org.sonatype.nexus.proxy.ResourceStore;
@@ -139,8 +138,7 @@ public abstract class ShadowRepository
     protected StorageItem doRetrieveItem( boolean localOnly, RepositoryItemUid uid, Map<String, Object> context )
         throws RepositoryNotAvailableException,
             ItemNotFoundException,
-            StorageException,
-            AccessDeniedException
+            StorageException
     {
         StorageItem result = null;
 

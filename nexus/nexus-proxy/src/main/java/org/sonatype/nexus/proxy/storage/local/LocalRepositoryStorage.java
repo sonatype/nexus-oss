@@ -165,7 +165,6 @@ public interface LocalRepositoryStorage
      */
     Collection<StorageItem> listItems( RepositoryItemUid uid )
         throws ItemNotFoundException,
-            UnsupportedStorageOperationException,
             StorageException;
 
 }

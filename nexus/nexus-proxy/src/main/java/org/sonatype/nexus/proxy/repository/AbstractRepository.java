@@ -21,8 +21,8 @@
 package org.sonatype.nexus.proxy.repository;
 
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -32,8 +32,6 @@ import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.EventMulticasterComponent;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
-import org.sonatype.nexus.proxy.NoSuchRepositoryException;
-import org.sonatype.nexus.proxy.NoSuchRepositoryGroupException;
 import org.sonatype.nexus.proxy.NoSuchResourceStoreException;
 import org.sonatype.nexus.proxy.RepositoryNotAvailableException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
@@ -528,272 +526,163 @@ public abstract class AbstractRepository
             StorageException,
             AccessDeniedException
     {
-        if ( getLogger().isDebugEnabled() )
-        {
-            getLogger().debug( getId() + " retrieveItem() :: " + request.getRequestPath() );
-        }
         checkConditions( request, RepositoryPermission.RETRIEVE );
 
         RepositoryItemUid uid = new RepositoryItemUid( this, request.getRequestPath() );
-        StorageItem item = null;
-        maintainNotFoundCache( uid.getPath() );
 
-        try
-        {
-            item = doRetrieveItem( request.isRequestLocalOnly(), uid, request.getRequestContext() );
-        }
-        catch ( ItemNotFoundException ex )
-        {
-            if ( getLogger().isDebugEnabled() )
-            {
-                getLogger().debug( getId() + " retrieveItem() :: NOT FOUND " + request.getRequestPath() );
-            }
-            if ( !request.isRequestLocalOnly() )
-            {
-                addToNotFoundCache( uid.getPath() );
-            }
-            throw ex;
-        }
+        StorageItem item = retrieveItem( request.isRequestLocalOnly(), uid );
 
-        if ( getLogger().isDebugEnabled() )
-        {
-            getLogger().debug( getId() + " retrieveItem() :: FOUND " + request.getRequestPath() );
-        }
         item.getItemContext().putAll( request.getRequestContext() );
+
         notifyProximityEventListeners( new RepositoryItemEventRetrieve( item.getRepositoryItemUid(), item
             .getItemContext() ) );
+
         return item;
     }
 
     public void copyItem( ResourceStoreRequest from, ResourceStoreRequest to )
-        throws RepositoryNotAvailableException,
+        throws UnsupportedStorageOperationException,
+            NoSuchResourceStoreException,
+            RepositoryNotAvailableException,
             ItemNotFoundException,
             StorageException,
             AccessDeniedException
     {
-        if ( getLogger().isDebugEnabled() )
-        {
-            getLogger().debug( "copyItem() :: " + from.getRequestPath() + " --> " + to.getRequestPath() );
-        }
         checkConditions( from, RepositoryPermission.RETRIEVE );
+
         checkConditions( to, RepositoryPermission.STORE );
+
         RepositoryItemUid fromUid = new RepositoryItemUid( this, from.getRequestPath() );
+
         RepositoryItemUid toUid = new RepositoryItemUid( this, to.getRequestPath() );
-        if ( getLocalStorage() != null )
-        {
-            doCopyItem( fromUid, toUid );
-            // remove the "to" item from n-cache if there
-            removeFromNotFoundCache( toUid.getPath() );
-            notifyProximityEventListeners( new RepositoryItemEventStore( toUid, to.getRequestContext() ) );
-        }
-        else
-        {
-            throw new StorageException( "Repository " + getId() + " does not have LocalStorage!" );
-        }
+
+        copyItem( fromUid, toUid );
+
+        notifyProximityEventListeners( new RepositoryItemEventStore( toUid, to.getRequestContext() ) );
     }
 
     public void moveItem( ResourceStoreRequest from, ResourceStoreRequest to )
-        throws RepositoryNotAvailableException,
+        throws UnsupportedStorageOperationException,
+            NoSuchResourceStoreException,
+            RepositoryNotAvailableException,
             ItemNotFoundException,
             StorageException,
             AccessDeniedException
     {
-        if ( getLogger().isDebugEnabled() )
-        {
-            getLogger().debug( "moveItem() :: " + from.getRequestPath() + " --> " + to.getRequestPath() );
-        }
         checkConditions( from, RepositoryPermission.RETRIEVE );
+
         checkConditions( from, RepositoryPermission.DELETE );
+
         checkConditions( to, RepositoryPermission.STORE );
+
         RepositoryItemUid fromUid = new RepositoryItemUid( this, from.getRequestPath() );
+
         RepositoryItemUid toUid = new RepositoryItemUid( this, to.getRequestPath() );
-        if ( getLocalStorage() != null )
-        {
-            doMoveItem( fromUid, toUid );
-            // remove the "to" item from n-cache if there
-            removeFromNotFoundCache( toUid.getPath() );
-            notifyProximityEventListeners( new RepositoryItemEventStore( toUid, to.getRequestContext() ) );
-            notifyProximityEventListeners( new RepositoryItemEventDelete( fromUid, from.getRequestContext() ) );
-        }
-        else
-        {
-            throw new StorageException( "Repository " + getId() + " does not have LocalStorage!" );
-        }
+
+        notifyProximityEventListeners( new RepositoryItemEventDelete( fromUid, from.getRequestContext() ) );
+
+        moveItem( fromUid, toUid );
+
+        notifyProximityEventListeners( new RepositoryItemEventStore( toUid, to.getRequestContext() ) );
     }
 
-    public void storeItem( ResourceStoreRequest request, InputStream is, Map<String, String> userAttributes )
-        throws RepositoryNotAvailableException,
+    public void deleteItem( ResourceStoreRequest request )
+        throws IllegalArgumentException,
+            UnsupportedStorageOperationException,
+            NoSuchResourceStoreException,
+            RepositoryNotAvailableException,
+            ItemNotFoundException,
             StorageException,
             AccessDeniedException
     {
-        if ( getLogger().isDebugEnabled() )
-        {
-            getLogger().debug( "storeItem() :: " + request.getRequestPath() );
-        }
-        checkConditions( request, RepositoryPermission.STORE );
+        checkConditions( request, RepositoryPermission.DELETE );
+
         RepositoryItemUid uid = new RepositoryItemUid( this, request.getRequestPath() );
-        if ( getLocalStorage() != null )
-        {
-            DefaultStorageFileItem fItem = new DefaultStorageFileItem( this, request.getRequestPath(), true, true, is );
-            fItem.getItemContext().putAll( request.getRequestContext() );
-            if ( userAttributes != null )
-            {
-                fItem.getAttributes().putAll( userAttributes );
-            }
-            try
-            {
-                storeItem( fItem );
-            }
-            catch ( UnsupportedStorageOperationException ex )
-            {
-                throw new StorageException( "LocalStorage does not handle STORE operation.", ex );
-            }
-            // remove the "request" item from n-cache if there
-            removeFromNotFoundCache( uid.getPath() );
-            notifyProximityEventListeners( new RepositoryItemEventStore( fItem.getRepositoryItemUid(), fItem
-                .getItemContext() ) );
-        }
-        else
-        {
-            throw new StorageException( "Repository " + getId() + " does not have LocalStorage!" );
-        }
+
+        notifyProximityEventListeners( new RepositoryItemEventDelete( uid, request.getRequestContext() ) );
+
+        deleteItem( uid );
     }
 
-    public void createCollection( ResourceStoreRequest request, Map<String, String> userAttributes )
-        throws IllegalArgumentException,
+    public void storeItem( ResourceStoreRequest request, InputStream is, Map<String, String> userAttributes )
+        throws UnsupportedStorageOperationException,
             NoSuchResourceStoreException,
             RepositoryNotAvailableException,
             StorageException,
             AccessDeniedException
     {
-        if ( getLogger().isDebugEnabled() )
-        {
-            getLogger().debug( "createCollection() :: " + request.getRequestPath() );
-        }
         checkConditions( request, RepositoryPermission.STORE );
-        RepositoryItemUid uid = new RepositoryItemUid( this, request.getRequestPath() );
-        if ( getLocalStorage() != null )
+
+        DefaultStorageFileItem fItem = new DefaultStorageFileItem( this, request.getRequestPath(), true, true, is );
+
+        fItem.getItemContext().putAll( request.getRequestContext() );
+
+        if ( userAttributes != null )
         {
-            DefaultStorageCollectionItem coll = new DefaultStorageCollectionItem(
-                this,
-                request.getRequestPath(),
-                true,
-                true );
-            coll.getItemContext().putAll( request.getRequestContext() );
-            if ( userAttributes != null )
-            {
-                coll.getAttributes().putAll( userAttributes );
-            }
-            try
-            {
-                storeItem( coll );
-            }
-            catch ( UnsupportedStorageOperationException ex )
-            {
-                throw new StorageException( "LocalStorage does not handle STORE operation.", ex );
-            }
-            // remove the "request" item from n-cache if there
-            removeFromNotFoundCache( uid.getPath() );
-            notifyProximityEventListeners( new RepositoryItemEventStore( coll.getRepositoryItemUid(), coll
-                .getItemContext() ) );
+            fItem.getAttributes().putAll( userAttributes );
         }
-        else
-        {
-            throw new StorageException( "Repository " + getId() + " does not have LocalStorage!" );
-        }
+
+        storeItem( fItem );
+
+        notifyProximityEventListeners( new RepositoryItemEventStore( fItem.getRepositoryItemUid(), fItem
+            .getItemContext() ) );
     }
 
-    public void deleteItem( ResourceStoreRequest request )
-        throws RepositoryNotAvailableException,
-            ItemNotFoundException,
+    public void createCollection( ResourceStoreRequest request, Map<String, String> userAttributes )
+        throws UnsupportedStorageOperationException,
+            NoSuchResourceStoreException,
+            RepositoryNotAvailableException,
             StorageException,
             AccessDeniedException
     {
-        if ( getLogger().isDebugEnabled() )
+        checkConditions( request, RepositoryPermission.STORE );
+
+        DefaultStorageCollectionItem coll = new DefaultStorageCollectionItem(
+            this,
+            request.getRequestPath(),
+            true,
+            true );
+
+        coll.getItemContext().putAll( request.getRequestContext() );
+
+        if ( userAttributes != null )
         {
-            getLogger().debug( "deleteItem() :: " + request.getRequestPath() );
+            coll.getAttributes().putAll( userAttributes );
         }
-        checkConditions( request, RepositoryPermission.DELETE );
-        RepositoryItemUid uid = new RepositoryItemUid( this, request.getRequestPath() );
-        if ( getLocalStorage() != null )
-        {
-            doDeleteItem( uid );
-            notifyProximityEventListeners( new RepositoryItemEventDelete( uid, request.getRequestContext() ) );
-        }
-        else
-        {
-            throw new StorageException( "Repository " + getId() + " does not have LocalStorage!" );
-        }
+
+        storeItem( coll );
+
+        notifyProximityEventListeners( new RepositoryItemEventStore( coll.getRepositoryItemUid(), coll.getItemContext() ) );
     }
 
     public Collection<StorageItem> list( ResourceStoreRequest request )
-        throws NoSuchRepositoryException,
-            NoSuchRepositoryGroupException,
+        throws NoSuchResourceStoreException,
             RepositoryNotAvailableException,
             ItemNotFoundException,
             StorageException,
             AccessDeniedException
     {
-        if ( getLogger().isDebugEnabled() )
-        {
-            getLogger().debug( "list() :: " + request.getRequestPath() );
-        }
-        if ( isBrowseable() )
-        {
-            checkConditions( request, RepositoryPermission.LIST );
-            RepositoryItemUid uid = new RepositoryItemUid( this, request.getRequestPath() );
-            if ( getLocalStorage() != null )
-            {
-                Collection<StorageItem> items = doListItems( uid );
+        checkConditions( request, RepositoryPermission.LIST );
 
-                for ( StorageItem item : items )
-                {
-                    item.getItemContext().putAll( request.getRequestContext() );
-                }
+        RepositoryItemUid uid = new RepositoryItemUid( this, request.getRequestPath() );
 
-                return items;
-            }
-            else
-            {
-                throw new StorageException( "Repository " + getId() + " does not have LocalStorage!" );
-            }
-        }
-        else
+        Collection<StorageItem> items = list( uid );
+
+        for ( StorageItem item : items )
         {
-            // empty list, we are not listable
-            return new ArrayList<StorageItem>();
+            item.getItemContext().putAll( request.getRequestContext() );
         }
+
+        return items;
     }
 
     // ===================================================================================
     // Repositry store-like
 
-    public StorageItem retrieveItem( boolean localOnly, RepositoryItemUid uid )
-        throws RepositoryNotAvailableException,
-            ItemNotFoundException,
-            StorageException,
-            AccessDeniedException
-    {
-        if ( getLogger().isDebugEnabled() )
-        {
-            getLogger().debug( "retrieveItem() :: " + uid.toString() );
-        }
-
-        if ( !getLocalStatus().shouldServiceRequest() )
-        {
-            throw new RepositoryNotAvailableException( "Repository " + this.getId() + " is not available!" );
-        }
-
-        // TODO: this solution with contxt is somehow forced, i dont like it
-        // this call obviously comes from "inside" of nexus, so avoids auth stuff
-        return doRetrieveItem( localOnly, uid, new HashMap<String, Object>() );
-    }
-
     public InputStream retrieveItemContent( RepositoryItemUid uid )
         throws RepositoryNotAvailableException,
             ItemNotFoundException,
-            StorageException,
-            AccessDeniedException
+            StorageException
     {
         if ( getLogger().isDebugEnabled() )
         {
@@ -808,12 +697,101 @@ public abstract class AbstractRepository
         return getLocalStorage().retrieveItemContent( uid );
     }
 
+    public StorageItem retrieveItem( boolean localOnly, RepositoryItemUid uid )
+        throws RepositoryNotAvailableException,
+            ItemNotFoundException,
+            StorageException
+    {
+        if ( getLogger().isDebugEnabled() )
+        {
+            getLogger().debug( "retrieveItem() :: " + uid.toString() );
+        }
+
+        if ( !getLocalStatus().shouldServiceRequest() )
+        {
+            throw new RepositoryNotAvailableException( "Repository " + this.getId() + " is not available!" );
+        }
+
+        maintainNotFoundCache( uid.getPath() );
+
+        try
+        {
+            StorageItem item = doRetrieveItem( localOnly, uid, new HashMap<String, Object>() );
+
+            if ( getLogger().isDebugEnabled() )
+            {
+                getLogger().debug( getId() + " retrieveItem() :: FOUND " + uid.toString() );
+            }
+
+            return item;
+        }
+        catch ( ItemNotFoundException ex )
+        {
+            if ( getLogger().isDebugEnabled() )
+            {
+                getLogger().debug( getId() + " retrieveItem() :: NOT FOUND " + uid.toString() );
+            }
+            if ( !localOnly )
+            {
+                addToNotFoundCache( uid.getPath() );
+            }
+            throw ex;
+        }
+    }
+
+    public void copyItem( RepositoryItemUid from, RepositoryItemUid to )
+        throws UnsupportedStorageOperationException,
+            RepositoryNotAvailableException,
+            ItemNotFoundException,
+            StorageException
+    {
+        if ( getLogger().isDebugEnabled() )
+        {
+            getLogger().debug( "copyItem() :: " + from.toString() + " --> " + to.toString() );
+        }
+
+        if ( !getLocalStatus().shouldServiceRequest() )
+        {
+            throw new RepositoryNotAvailableException( "Repository " + this.getId() + " is not available!" );
+        }
+
+        maintainNotFoundCache( from.getPath() );
+
+        doCopyItem( from, to );
+
+        // remove the "to" item from n-cache if there
+        removeFromNotFoundCache( to.getPath() );
+    }
+
+    public void moveItem( RepositoryItemUid from, RepositoryItemUid to )
+        throws UnsupportedStorageOperationException,
+            RepositoryNotAvailableException,
+            ItemNotFoundException,
+            StorageException
+    {
+        if ( getLogger().isDebugEnabled() )
+        {
+            getLogger().debug( "moveItem() :: " + from.toString() + " --> " + to.toString() );
+        }
+
+        if ( !getLocalStatus().shouldServiceRequest() )
+        {
+            throw new RepositoryNotAvailableException( "Repository " + this.getId() + " is not available!" );
+        }
+
+        maintainNotFoundCache( from.getPath() );
+
+        doMoveItem( from, to );
+
+        // remove the "to" item from n-cache if there
+        removeFromNotFoundCache( to.getPath() );
+    }
+
     public void deleteItem( RepositoryItemUid uid )
         throws UnsupportedStorageOperationException,
             RepositoryNotAvailableException,
             ItemNotFoundException,
-            StorageException,
-            AccessDeniedException
+            StorageException
     {
         if ( getLogger().isDebugEnabled() )
         {
@@ -825,6 +803,8 @@ public abstract class AbstractRepository
             throw new RepositoryNotAvailableException( "Repository " + this.getId() + " is not available!" );
         }
 
+        maintainNotFoundCache( uid.getPath() );
+
         doDeleteItem( uid );
     }
 
@@ -835,8 +815,7 @@ public abstract class AbstractRepository
     {
         if ( getLogger().isDebugEnabled() )
         {
-            getLogger().debug(
-                "Storing item " + item.getRepositoryItemUid().toString() + " in local storage of repository." );
+            getLogger().debug( "storeItem() :: " + item.getRepositoryItemUid().toString() );
         }
 
         if ( !getLocalStatus().shouldServiceRequest() )
@@ -845,13 +824,15 @@ public abstract class AbstractRepository
         }
 
         getLocalStorage().storeItem( item );
+
+        // remove the "request" item from n-cache if there
+        removeFromNotFoundCache( item.getRepositoryItemUid().getPath() );
     }
 
     public Collection<StorageItem> list( RepositoryItemUid uid )
         throws RepositoryNotAvailableException,
             ItemNotFoundException,
-            StorageException,
-            AccessDeniedException
+            StorageException
     {
         if ( getLogger().isDebugEnabled() )
         {
@@ -863,7 +844,17 @@ public abstract class AbstractRepository
             throw new RepositoryNotAvailableException( "Repository " + this.getId() + " is not available!" );
         }
 
-        return doListItems( uid );
+        if ( isBrowseable() )
+        {
+            maintainNotFoundCache( uid.getPath() );
+
+            return doListItems( uid );
+        }
+        else
+        {
+            // empty list, we are not listable
+            return Collections.emptyList();
+        }
     }
 
     // ===================================================================================
@@ -976,8 +967,7 @@ public abstract class AbstractRepository
     protected abstract StorageItem doRetrieveItem( boolean localOnly, RepositoryItemUid uid, Map<String, Object> context )
         throws RepositoryNotAvailableException,
             ItemNotFoundException,
-            StorageException,
-            AccessDeniedException;
+            StorageException;
 
     /**
      * Do copy item.
@@ -989,13 +979,13 @@ public abstract class AbstractRepository
      * @throws RepositoryNotAvailableException the repository not available exception
      * @throws ItemNotFoundException the item not found exception
      * @throws StorageException the storage exception
-     * @throws AccessDeniedException the access denied exception
+     * @throws UnsupportedStorageOperationException
      */
     protected abstract void doCopyItem( RepositoryItemUid fromUid, RepositoryItemUid toUid )
-        throws RepositoryNotAvailableException,
+        throws UnsupportedStorageOperationException,
+            RepositoryNotAvailableException,
             ItemNotFoundException,
-            StorageException,
-            AccessDeniedException;
+            StorageException;
 
     /**
      * Do move item.
@@ -1007,13 +997,13 @@ public abstract class AbstractRepository
      * @throws RepositoryNotAvailableException the repository not available exception
      * @throws ItemNotFoundException the item not found exception
      * @throws StorageException the storage exception
-     * @throws AccessDeniedException the access denied exception
+     * @throws UnsupportedStorageOperationException
      */
     protected abstract void doMoveItem( RepositoryItemUid fromUid, RepositoryItemUid toUid )
-        throws RepositoryNotAvailableException,
+        throws UnsupportedStorageOperationException,
+            RepositoryNotAvailableException,
             ItemNotFoundException,
-            StorageException,
-            AccessDeniedException;
+            StorageException;
 
     /**
      * Do delete item.
@@ -1023,13 +1013,13 @@ public abstract class AbstractRepository
      * @throws RepositoryNotAvailableException the repository not available exception
      * @throws ItemNotFoundException the item not found exception
      * @throws StorageException the storage exception
-     * @throws AccessDeniedException the access denied exception
+     * @throws UnsupportedStorageOperationException
      */
     protected abstract void doDeleteItem( RepositoryItemUid uid )
-        throws RepositoryNotAvailableException,
+        throws UnsupportedStorageOperationException,
+            RepositoryNotAvailableException,
             ItemNotFoundException,
-            StorageException,
-            AccessDeniedException;
+            StorageException;
 
     /**
      * Do list items.
@@ -1044,7 +1034,6 @@ public abstract class AbstractRepository
     protected abstract Collection<StorageItem> doListItems( RepositoryItemUid uid )
         throws RepositoryNotAvailableException,
             ItemNotFoundException,
-            StorageException,
-            AccessDeniedException;
+            StorageException;
 
 }

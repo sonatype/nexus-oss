@@ -25,6 +25,7 @@ import java.util.Collection;
 import java.util.Map;
 
 import org.sonatype.nexus.proxy.item.StorageItem;
+import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 
 /**
  * The base abstraction of Proximity. This interface is implemented by Repositories and also by Routers.
@@ -47,7 +48,6 @@ public interface ResourceStore
      * @param request the request
      * @return the storage item
      * @throws NoSuchResourceStoreException the no such store exception
-     * @throws NoSuchRepositoryGroupException the no such repository group exception
      * @throws RepositoryNotAvailableException the repository not available exception
      * @throws ItemNotFoundException the item not found exception
      * @throws StorageException the storage exception
@@ -66,7 +66,7 @@ public interface ResourceStore
      * 
      * @param from the from
      * @param to the to
-     * @throws IllegalArgumentException the illegal argument exception
+     * @throws UnsupportedStorageOperationException
      * @throws NoSuchResourceStoreException the no such repository exception
      * @throws RepositoryNotAvailableException the repository not available exception
      * @throws ItemNotFoundException the item not found exception
@@ -74,7 +74,7 @@ public interface ResourceStore
      * @throws AccessDeniedException the access denied exception
      */
     void copyItem( ResourceStoreRequest from, ResourceStoreRequest to )
-        throws IllegalArgumentException,
+        throws UnsupportedStorageOperationException,
             NoSuchResourceStoreException,
             RepositoryNotAvailableException,
             ItemNotFoundException,
@@ -87,7 +87,7 @@ public interface ResourceStore
      * 
      * @param from the from
      * @param to the to
-     * @throws IllegalArgumentException the illegal argument exception
+     * @throws UnsupportedStorageOperationException
      * @throws NoSuchResourceStoreException the no such repository exception
      * @throws RepositoryNotAvailableException the repository not available exception
      * @throws ItemNotFoundException the item not found exception
@@ -95,7 +95,7 @@ public interface ResourceStore
      * @throws AccessDeniedException the access denied exception
      */
     void moveItem( ResourceStoreRequest from, ResourceStoreRequest to )
-        throws IllegalArgumentException,
+        throws UnsupportedStorageOperationException,
             NoSuchResourceStoreException,
             RepositoryNotAvailableException,
             ItemNotFoundException,
@@ -106,15 +106,15 @@ public interface ResourceStore
      * Deletes item from the request path. Involves local storage only.
      * 
      * @param request the request
+     * @throws UnsupportedStorageOperationException
      * @throws StorageException the storage exception
-     * @throws IllegalArgumentException the illegal argument exception
      * @throws NoSuchResourceStoreException the no such repository exception
      * @throws RepositoryNotAvailableException the repository not available exception
      * @throws ItemNotFoundException the item not found exception
      * @throws AccessDeniedException the access denied exception
      */
     void deleteItem( ResourceStoreRequest request )
-        throws IllegalArgumentException,
+        throws UnsupportedStorageOperationException,
             NoSuchResourceStoreException,
             RepositoryNotAvailableException,
             ItemNotFoundException,
@@ -127,32 +127,32 @@ public interface ResourceStore
      * @param request the request
      * @param is the is
      * @param userAttributes the user attributes
+     * @throws UnsupportedStorageOperationException
      * @throws StorageException the storage exception
-     * @throws IllegalArgumentException the illegal argument exception
      * @throws NoSuchResourceStoreException the no such repository exception
      * @throws RepositoryNotAvailableException the repository not available exception
      * @throws AccessDeniedException the access denied exception
      */
     void storeItem( ResourceStoreRequest request, InputStream is, Map<String, String> userAttributes )
-        throws IllegalArgumentException,
+        throws UnsupportedStorageOperationException,
             NoSuchResourceStoreException,
             RepositoryNotAvailableException,
             StorageException,
             AccessDeniedException;
-    
+
     /**
      * Creates a collection (directory) on requested path. Involves local storage only.
      * 
      * @param request the request
      * @param userAttributes the user attributes
+     * @throws UnsupportedStorageOperationException
      * @throws StorageException the storage exception
-     * @throws IllegalArgumentException the illegal argument exception
      * @throws NoSuchResourceStoreException the no such repository exception
      * @throws RepositoryNotAvailableException the repository not available exception
      * @throws AccessDeniedException the access denied exception
      */
     void createCollection( ResourceStoreRequest request, Map<String, String> userAttributes )
-        throws IllegalArgumentException,
+        throws UnsupportedStorageOperationException,
             NoSuchResourceStoreException,
             RepositoryNotAvailableException,
             StorageException,

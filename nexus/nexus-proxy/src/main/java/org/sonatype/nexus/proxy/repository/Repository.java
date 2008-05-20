@@ -318,23 +318,6 @@ public interface Repository
     void setRemoteStorage( RemoteRepositoryStorage storage );
 
     /**
-     * Retrieves item with content from the path.
-     * 
-     * @param localOnly should look it up locally only
-     * @param uid the uid
-     * @return the storage item
-     * @throws RepositoryNotAvailableException the repository not available exception
-     * @throws ItemNotFoundException the item not found exception
-     * @throws StorageException the storage exception
-     * @throws AccessDeniedException the access denied exception
-     */
-    StorageItem retrieveItem( boolean localOnly, RepositoryItemUid uid )
-        throws RepositoryNotAvailableException,
-            ItemNotFoundException,
-            StorageException,
-            AccessDeniedException;
-
-    /**
      * Retrieves item content from the path.
      * 
      * @param uid the uid
@@ -348,8 +331,35 @@ public interface Repository
     InputStream retrieveItemContent( RepositoryItemUid uid )
         throws RepositoryNotAvailableException,
             ItemNotFoundException,
-            StorageException,
-            AccessDeniedException;
+            StorageException;
+
+    /**
+     * Retrieves item with content from the path.
+     * 
+     * @param localOnly should look it up locally only
+     * @param uid the uid
+     * @return the storage item
+     * @throws RepositoryNotAvailableException the repository not available exception
+     * @throws ItemNotFoundException the item not found exception
+     * @throws StorageException the storage exception
+     * @throws AccessDeniedException the access denied exception
+     */
+    StorageItem retrieveItem( boolean localOnly, RepositoryItemUid uid )
+        throws RepositoryNotAvailableException,
+            ItemNotFoundException,
+            StorageException;
+
+    void copyItem( RepositoryItemUid from, RepositoryItemUid to )
+        throws UnsupportedStorageOperationException,
+            RepositoryNotAvailableException,
+            ItemNotFoundException,
+            StorageException;
+
+    void moveItem( RepositoryItemUid from, RepositoryItemUid to )
+        throws UnsupportedStorageOperationException,
+            RepositoryNotAvailableException,
+            ItemNotFoundException,
+            StorageException;
 
     /**
      * Delete item.
@@ -365,8 +375,7 @@ public interface Repository
         throws UnsupportedStorageOperationException,
             RepositoryNotAvailableException,
             ItemNotFoundException,
-            StorageException,
-            AccessDeniedException;
+            StorageException;
 
     /**
      * Stores item. Involves local storage only.
@@ -397,7 +406,6 @@ public interface Repository
     Collection<StorageItem> list( RepositoryItemUid uid )
         throws RepositoryNotAvailableException,
             ItemNotFoundException,
-            StorageException,
-            AccessDeniedException;
+            StorageException;
 
 }

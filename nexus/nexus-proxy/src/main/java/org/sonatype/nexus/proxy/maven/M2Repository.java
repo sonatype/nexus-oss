@@ -71,7 +71,7 @@ public class M2Repository
         return contentClass;
     }
 
-    protected GavCalculator getGavCalculator()
+    public GavCalculator getGavCalculator()
     {
         return gavCalculator;
     }

@@ -27,7 +27,6 @@ import java.util.Map;
 
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
-import org.sonatype.nexus.artifact.GavCalculator;
 import org.sonatype.nexus.artifact.NexusItemInfo;
 import org.sonatype.nexus.feeds.FeedRecorder;
 import org.sonatype.nexus.feeds.NexusArtifactEvent;
@@ -185,8 +184,6 @@ public abstract class AbstractMavenRepository
         this.feedRecorder = feedRecorder;
     }
 
-    protected abstract GavCalculator getGavCalculator();
-
     public abstract boolean shouldServeByPolicies( RepositoryItemUid uid );
 
     public StorageFileItem retrieveArtifactPom( String groupId, String artifactId, String version )
@@ -216,8 +213,7 @@ public abstract class AbstractMavenRepository
     protected StorageItem doRetrieveItem( boolean localOnly, RepositoryItemUid uid, Map<String, Object> context )
         throws RepositoryNotAvailableException,
             ItemNotFoundException,
-            StorageException,
-            AccessDeniedException
+            StorageException
     {
         if ( shouldServeByPolicies( uid ) )
         {
@@ -562,8 +558,7 @@ public abstract class AbstractMavenRepository
         throws IllegalArgumentException,
             RepositoryNotAvailableException,
             ItemNotFoundException,
-            StorageException,
-            AccessDeniedException
+            StorageException
     {
         if ( shouldServeByPolicies( uid ) )
         {
@@ -597,21 +592,14 @@ public abstract class AbstractMavenRepository
     }
 
     protected void doDeleteItem( RepositoryItemUid uid )
-        throws RepositoryNotAvailableException,
+        throws UnsupportedStorageOperationException,
+            RepositoryNotAvailableException,
             ItemNotFoundException,
-            StorageException,
-            AccessDeniedException
+            StorageException
     {
-        if ( shouldServeByPolicies( uid ) )
+        if ( getLocalStorage().containsItem( uid ) )
         {
-            if ( getLocalStorage().containsItem( uid ) )
-            {
-                super.doDeleteItem( uid );
-            }
-        }
-        else
-        {
-            throw new AccessDeniedException( uid, "Repository policy forbids" );
+            super.doDeleteItem( uid );
         }
     }
 

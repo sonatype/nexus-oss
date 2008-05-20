@@ -24,7 +24,6 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Map;
 
-import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.RepositoryNotAvailableException;
 import org.sonatype.nexus.proxy.StorageException;
@@ -75,8 +74,7 @@ public abstract class DefaultRepository
     protected StorageItem doRetrieveItem( boolean localOnly, RepositoryItemUid uid, Map<String, Object> context )
         throws RepositoryNotAvailableException,
             ItemNotFoundException,
-            StorageException,
-            AccessDeniedException
+            StorageException
     {
         AbstractStorageItem item = null;
         AbstractStorageItem localItem = null;
@@ -288,10 +286,10 @@ public abstract class DefaultRepository
     }
 
     protected void doCopyItem( RepositoryItemUid fromUid, RepositoryItemUid toUid )
-        throws RepositoryNotAvailableException,
+        throws UnsupportedStorageOperationException,
+            RepositoryNotAvailableException,
             ItemNotFoundException,
-            StorageException,
-            AccessDeniedException
+            StorageException
     {
         AbstractStorageItem item = getLocalStorage().retrieveItem( fromUid );
 
@@ -308,10 +306,6 @@ public abstract class DefaultRepository
 
                 getLocalStorage().storeItem( target );
             }
-            catch ( UnsupportedStorageOperationException e )
-            {
-                throw new StorageException( "STORE Operation not supported!", e );
-            }
             catch ( IOException e )
             {
                 throw new StorageException( "Could not get the content of source file!", e );
@@ -321,47 +315,33 @@ public abstract class DefaultRepository
     }
 
     protected void doMoveItem( RepositoryItemUid fromUid, RepositoryItemUid toUid )
-        throws RepositoryNotAvailableException,
+        throws UnsupportedStorageOperationException,
+            RepositoryNotAvailableException,
             ItemNotFoundException,
-            StorageException,
-            AccessDeniedException
+            StorageException
     {
         doCopyItem( fromUid, toUid );
+
         doDeleteItem( fromUid );
     }
 
     protected void doDeleteItem( RepositoryItemUid uid )
-        throws RepositoryNotAvailableException,
+        throws UnsupportedStorageOperationException,
+            RepositoryNotAvailableException,
             ItemNotFoundException,
-            StorageException,
-            AccessDeniedException
+            StorageException
     {
-        try
-        {
-            getLocalStorage().deleteItem( uid );
-        }
-        catch ( UnsupportedStorageOperationException ex )
-        {
-            throw new StorageException( "LocalStorage does not handle DELETE operation.", ex );
-        }
+        getLocalStorage().deleteItem( uid );
     }
 
     protected Collection<StorageItem> doListItems( RepositoryItemUid uid )
         throws RepositoryNotAvailableException,
             ItemNotFoundException,
-            StorageException,
-            AccessDeniedException
+            StorageException
     {
         if ( getLocalStorage() != null )
         {
-            try
-            {
-                return getLocalStorage().listItems( uid );
-            }
-            catch ( UnsupportedStorageOperationException ex )
-            {
-                throw new StorageException( "LocalStorage does not handle LIST operation.", ex );
-            }
+            return getLocalStorage().listItems( uid );
         }
         else
         {

@@ -30,11 +30,11 @@ import java.util.TreeSet;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.logging.Logger;
 import org.sonatype.nexus.artifact.Gav;
-import org.sonatype.nexus.artifact.GavCalculator;
 import org.sonatype.nexus.artifact.M2ArtifactRecognizer;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
+import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.utils.StoreWalker;
@@ -51,20 +51,12 @@ public class DefaultSnapshotRemover
     extends AbstractLogEnabled
     implements SnapshotRemover
 {
-
     /**
      * The registry.
      * 
      * @plexus.requirement
      */
     private RepositoryRegistry repositoryRegistry;
-    
-    /**
-     * The M2 Gavcalculator.
-     * 
-     * @plexus.requirement role-hint="m2"
-     */
-    private GavCalculator gavCalculator;
 
     protected RepositoryRegistry getRepositoryRegistry()
     {
@@ -82,7 +74,15 @@ public class DefaultSnapshotRemover
 
             Repository repository = getRepositoryRegistry().getRepository( request.getRepositoryId() );
 
-            result = removeSnapshotsFromMavenRepository( repository, request );
+            if ( MavenRepository.class.isAssignableFrom( repository.getClass() ) )
+            {
+                result.append( removeSnapshotsFromMavenRepository( repository, request ) );
+            }
+            else
+            {
+                throw new IllegalArgumentException( "The repository with ID=" + repository.getId()
+                    + " is not MavenRepository!" );
+            }
         }
         else if ( request.getRepositoryGroupId() != null )
         {
@@ -93,9 +93,12 @@ public class DefaultSnapshotRemover
 
             for ( Repository repository : getRepositoryRegistry().getRepositoryGroup( request.getRepositoryGroupId() ) )
             {
-                result.append( removeSnapshotsFromMavenRepository( repository, request ) );
+                // only from maven repositories, stay silent for others and simply skip
+                if ( MavenRepository.class.isAssignableFrom( repository.getClass() ) )
+                {
+                    result.append( removeSnapshotsFromMavenRepository( repository, request ) );
+                }
             }
-
         }
         else
         {
@@ -105,7 +108,11 @@ public class DefaultSnapshotRemover
 
             for ( Repository repository : getRepositoryRegistry().getRepositories() )
             {
-                result.append( removeSnapshotsFromMavenRepository( repository, request ) );
+                // only from maven repositories, stay silent for others and simply skip
+                if ( MavenRepository.class.isAssignableFrom( repository.getClass() ) )
+                {
+                    result.append( removeSnapshotsFromMavenRepository( repository, request ) );
+                }
             }
         }
 
@@ -198,7 +205,8 @@ public class DefaultSnapshotRemover
                         if ( M2ArtifactRecognizer.isSnapshot( item.getPath() )
                             && !M2ArtifactRecognizer.isMetadata( item.getPath() ) )
                         {
-                            gav = gavCalculator.pathToGav( item.getPath() );
+                            gav = ( (MavenRepository) coll.getRepositoryItemUid().getRepository() )
+                                .getGavCalculator().pathToGav( item.getPath() );
 
                             if ( gav != null )
                             {

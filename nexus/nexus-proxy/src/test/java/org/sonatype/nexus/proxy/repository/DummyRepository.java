@@ -121,8 +121,7 @@ public class DummyRepository
     public Collection<StorageItem> list( RepositoryItemUid uid )
         throws RepositoryNotAvailableException,
             ItemNotFoundException,
-            StorageException,
-            AccessDeniedException
+            StorageException
     {
         if ( uid.getPath().endsWith( "coll" ) )
         {
@@ -144,8 +143,7 @@ public class DummyRepository
     public StorageItem retrieveItem( boolean localOnly, RepositoryItemUid uid )
         throws RepositoryNotAvailableException,
             ItemNotFoundException,
-            StorageException,
-            AccessDeniedException
+            StorageException
     {
         if ( uid.getPath().endsWith( "coll" ) )
         {
@@ -202,8 +200,7 @@ public class DummyRepository
         throws UnsupportedOperationException,
             RepositoryNotAvailableException,
             ItemNotFoundException,
-            StorageException,
-            AccessDeniedException
+            StorageException
     {
         return new ByteArrayInputStream( uid.getPath().getBytes() );
     }
@@ -253,8 +250,7 @@ public class DummyRepository
         throws UnsupportedStorageOperationException,
             RepositoryNotAvailableException,
             ItemNotFoundException,
-            StorageException,
-            AccessDeniedException
+            StorageException
     {
         throw new UnsupportedOperationException( "This is dummy!" );
     }
@@ -452,7 +448,7 @@ public class DummyRepository
     public void clearCaches( String path )
     {
         // TODO Auto-generated method stub
-        
+
     }
 
     public PathCache getNotFoundCache()
@@ -470,13 +466,13 @@ public class DummyRepository
     public void setNotFoundCache( PathCache notFoundcache )
     {
         // TODO Auto-generated method stub
-        
+
     }
 
     public void setNotFoundCacheTimeToLive( int notFoundCacheTimeToLive )
     {
         // TODO Auto-generated method stub
-        
+
     }
 
     public void createCollection( ResourceStoreRequest request, Map<String, String> userAttributes )
@@ -487,13 +483,13 @@ public class DummyRepository
             AccessDeniedException
     {
         // TODO Auto-generated method stub
-        
+
     }
 
     public void onConfigurationChange( ConfigurationChangeEvent evt )
     {
         // TODO Auto-generated method stub
-        
+
     }
 
     public LocalStatus getLocalStatus()
@@ -506,7 +502,7 @@ public class DummyRepository
         return null;
     }
 
-    public RemoteStatus getRemoteStatus(boolean forceCheck)
+    public RemoteStatus getRemoteStatus( boolean forceCheck )
     {
         return null;
     }
@@ -526,25 +522,25 @@ public class DummyRepository
     public void setAllowWrite( boolean val )
     {
         // TODO Auto-generated method stub
-        
+
     }
 
     public void setBrowseable( boolean val )
     {
         // TODO Auto-generated method stub
-        
+
     }
 
     public void setLocalStatus( LocalStatus val )
     {
         // TODO Auto-generated method stub
-        
+
     }
 
     public void setProxyMode( ProxyMode val )
     {
         // TODO Auto-generated method stub
-        
+
     }
 
     public RepositoryType getRepositoryType()
@@ -556,7 +552,7 @@ public class DummyRepository
     public void setRepositoryType( RepositoryType repositoryType )
     {
         // TODO Auto-generated method stub
-        
+
     }
 
     public ContentClass getRepositoryContentClass()
@@ -568,10 +564,30 @@ public class DummyRepository
     public void addToNotFoundCache( String path )
     {
         // TODO Auto-generated method stub
-        
+
     }
 
     public void removeFromNotFoundCache( String path )
+    {
+        // TODO Auto-generated method stub
+
+    }
+
+    public void copyItem( RepositoryItemUid from, RepositoryItemUid to )
+        throws UnsupportedStorageOperationException,
+            RepositoryNotAvailableException,
+            ItemNotFoundException,
+            StorageException
+    {
+        // TODO Auto-generated method stub
+        
+    }
+
+    public void moveItem( RepositoryItemUid from, RepositoryItemUid to )
+        throws UnsupportedStorageOperationException,
+            RepositoryNotAvailableException,
+            ItemNotFoundException,
+            StorageException
     {
         // TODO Auto-generated method stub
         

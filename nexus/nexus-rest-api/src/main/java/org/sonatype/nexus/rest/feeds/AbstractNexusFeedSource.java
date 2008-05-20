@@ -26,11 +26,13 @@ import java.util.List;
 
 import org.restlet.data.MediaType;
 import org.sonatype.nexus.artifact.Gav;
-import org.sonatype.nexus.artifact.GavCalculator;
 import org.sonatype.nexus.artifact.NexusItemInfo;
 import org.sonatype.nexus.feeds.NexusArtifactEvent;
+import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.access.AccessDecisionVoter;
 import org.sonatype.nexus.proxy.access.IpAddressAccessDecisionVoter;
+import org.sonatype.nexus.proxy.maven.MavenRepository;
+import org.sonatype.nexus.proxy.repository.Repository;
 
 import com.sun.syndication.feed.synd.SyndContent;
 import com.sun.syndication.feed.synd.SyndContentImpl;
@@ -48,9 +50,6 @@ import com.sun.syndication.feed.synd.SyndFeedImpl;
 public abstract class AbstractNexusFeedSource
     extends AbstractFeedSource
 {
-    /** @plexus.requirement role-hint="m2" */
-    private GavCalculator gavCalculator;
-
     /**
      * Creates/formats GAV strings from ArtifactInfo.
      * 
@@ -65,22 +64,38 @@ public abstract class AbstractNexusFeedSource
         }
         else
         {
-            Gav gav = gavCalculator.pathToGav( ai.getPath() );
-
-            if ( gav != null )
+            try
             {
-                StringBuffer result = new StringBuffer( gav.getGroupId() )
-                    .append( " : " ).append( gav.getArtifactId() ).append( " : " ).append(
-                        gav.getVersion() != null ? gav.getVersion() : "unknown" );
+                Repository repo = getNexus().getRepository( ai.getRepositoryId() );
 
-                if ( gav.getClassifier() != null )
+                if ( MavenRepository.class.isAssignableFrom( repo.getClass() ) )
                 {
-                    result.append( " : " ).append( gav.getClassifier() );
-                }
+                    Gav gav = ( (MavenRepository) repo ).getGavCalculator().pathToGav( ai.getPath() );
 
-                return result.toString();
+                    if ( gav != null )
+                    {
+                        StringBuffer result = new StringBuffer( gav.getGroupId() ).append( " : " ).append(
+                            gav.getArtifactId() ).append( " : " ).append(
+                            gav.getVersion() != null ? gav.getVersion() : "unknown" );
+
+                        if ( gav.getClassifier() != null )
+                        {
+                            result.append( " : " ).append( gav.getClassifier() );
+                        }
+
+                        return result.toString();
+                    }
+                    else
+                    {
+                        return ai.getPath();
+                    }
+                }
+                else
+                {
+                    return ai.getPath();
+                }
             }
-            else
+            catch ( NoSuchRepositoryException e )
             {
                 return ai.getPath();
             }

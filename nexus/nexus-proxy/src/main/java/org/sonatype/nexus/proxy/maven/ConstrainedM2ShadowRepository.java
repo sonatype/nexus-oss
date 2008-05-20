@@ -55,7 +55,8 @@ import org.sonatype.nexus.util.AlphanumComparator;
  * metadata. This shadow will (if set) report specific plugin versions only.
  * 
  * @author cstamas
- * @plexus.component instantiation-strategy="per-lookup" role="org.sonatype.nexus.proxy.repository.Repository" role-hint="m2-constrained"
+ * @plexus.component instantiation-strategy="per-lookup" role="org.sonatype.nexus.proxy.repository.Repository"
+ *                   role-hint="m2-constrained"
  */
 public class ConstrainedM2ShadowRepository
     extends ShadowRepository
@@ -108,6 +109,11 @@ public class ConstrainedM2ShadowRepository
     {
         return path;
     }
+    
+    public GavCalculator getGavCalculator()
+    {
+        return gavCalculator;
+    }
 
     public StorageFileItem retrieveArtifactPom( String groupId, String artifactId, String version )
         throws NoSuchResourceStoreException,
@@ -136,8 +142,7 @@ public class ConstrainedM2ShadowRepository
     protected StorageItem doRetrieveItem( boolean localOnly, RepositoryItemUid uid, Map<String, Object> context )
         throws RepositoryNotAvailableException,
             ItemNotFoundException,
-            StorageException,
-            AccessDeniedException
+            StorageException
     {
         if ( M2ArtifactRecognizer.isMetadata( uid.getPath() ) && !M2ArtifactRecognizer.isChecksum( uid.getPath() ) )
         {

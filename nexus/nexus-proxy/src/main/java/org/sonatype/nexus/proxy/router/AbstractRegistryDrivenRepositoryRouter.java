@@ -223,7 +223,7 @@ public abstract class AbstractRegistryDrivenRepositoryRouter
                 {
                     // silent, we are searching but remember it for later
                     lastAccessDenial = ex;
-                    
+
                     if ( getLogger().isDebugEnabled() )
                     {
                         getLogger().debug( "During routed retrieval we had a AccessDenied:", ex );
@@ -290,7 +290,7 @@ public abstract class AbstractRegistryDrivenRepositoryRouter
         List<StorageItem> result = new ArrayList<StorageItem>();
 
         List<ResourceStore> stores = resolveResourceStoreByRequest( req );
-        
+
         if ( stores == null )
         {
             // we handle "virtual" paths, not backed by real Reposes
@@ -436,7 +436,8 @@ public abstract class AbstractRegistryDrivenRepositoryRouter
      * A not really proper move implementation: copy + delete.
      */
     protected void doMoveItem( ResourceStoreRequest f, ResourceStoreRequest t )
-        throws NoSuchResourceStoreException,
+        throws UnsupportedStorageOperationException,
+            NoSuchResourceStoreException,
             RepositoryNotAvailableException,
             ItemNotFoundException,
             StorageException,
@@ -451,7 +452,8 @@ public abstract class AbstractRegistryDrivenRepositoryRouter
      * Storing an item. Getting the list of affected reposes and ensuring we have only one.
      */
     protected void doStoreItem( ResourceStoreRequest req, InputStream is, Map<String, String> userAttributes )
-        throws NoSuchResourceStoreException,
+        throws UnsupportedStorageOperationException,
+            NoSuchResourceStoreException,
             RepositoryNotAvailableException,
             StorageException,
             AccessDeniedException
@@ -483,7 +485,8 @@ public abstract class AbstractRegistryDrivenRepositoryRouter
      * Creating a collection. Getting the list of affected reposes and ensuring we have only one.
      */
     protected void doCreateCollection( ResourceStoreRequest req, Map<String, String> userAttributes )
-        throws NoSuchResourceStoreException,
+        throws UnsupportedStorageOperationException,
+            NoSuchResourceStoreException,
             RepositoryNotAvailableException,
             StorageException,
             AccessDeniedException
@@ -515,7 +518,8 @@ public abstract class AbstractRegistryDrivenRepositoryRouter
      * Deleting and item. We are working only against one targeted repos.
      */
     protected void doDeleteItem( ResourceStoreRequest request )
-        throws NoSuchResourceStoreException,
+        throws UnsupportedStorageOperationException,
+            NoSuchResourceStoreException,
             RepositoryNotAvailableException,
             ItemNotFoundException,
             StorageException,
