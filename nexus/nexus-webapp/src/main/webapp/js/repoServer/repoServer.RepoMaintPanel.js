@@ -481,7 +481,7 @@ Ext.extend(Sonatype.repoServer.RepoMaintPanel, Ext.Panel, {
         menu.add(this.actions.download);
       }
       
-      if (!node.isRoot){
+      if (this.editMode && !node.isRoot){
         menu.add(this.actions.deleteRepoItem);
         if (isProxyRepo && !node.isLeaf()){
           menu.add(this.actions.viewRemote);
