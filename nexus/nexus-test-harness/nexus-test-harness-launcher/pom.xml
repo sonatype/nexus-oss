@@ -46,13 +46,8 @@
 		<dependency>
 		    <groupId>org.sonatype.appbooter.plexus-booters</groupId>
 		    <artifactId>plexus-app-booter</artifactId>
-		    <version>1.1</version>
+		    <version>1.2-SNAPSHOT</version>
 		</dependency>
-		<dependency>
-            <groupId>org.sonatype.appbooter.plexus-platforms</groupId>
-            <artifactId>plexus-platform-base</artifactId>
-            <version>1.1</version>
-        </dependency>
 	</dependencies>
 	<build>
 	    <filters>
@@ -75,11 +70,11 @@
 		                <id>start-nexus</id>
 		                <phase>pre-integration-test</phase>
 		                <goals>
-		                    <goal>run</goal>
+		                    <goal>start</goal>
 		                </goals>
 		                <configuration>
 		                    <systemProperties>
-		                        <plexus.blocking.enabled>false</plexus.blocking.enabled>
+		                        <plexus.blocking.disabled>true</plexus.blocking.disabled>
 		                    </systemProperties>
 		                    <basedir>${bundle-expanded-dir}/nexus-webapp-${project.version}</basedir>
 		                    <configuration>${plexus-config-file}</configuration>
