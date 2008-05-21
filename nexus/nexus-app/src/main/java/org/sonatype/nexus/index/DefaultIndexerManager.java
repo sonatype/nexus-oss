@@ -317,37 +317,42 @@ public class DefaultIndexerManager
 
                         DefaultStorageFileItem fItem = null;
 
-                        for ( File file : targetDir.listFiles() )
+                        File[] files = targetDir.listFiles();
+
+                        if ( files != null )
                         {
-                            try
+                            for ( File file : files )
                             {
-                                fis = new FileInputStream( file );
-
-                                fItem = new DefaultStorageFileItem(
-                                    repository,
-                                    "/.index/" + file.getName(),
-                                    true,
-                                    true,
-                                    fis );
-
-                                if ( RepositoryType.PROXY.equals( repository.getRepositoryType() ) )
+                                try
                                 {
-                                    // for proxy reposes, date is important
-                                    // for locally published indexes in proxy reposes, set file dates old
-                                    // by setting spoofed file timestamps old, we will refetch them when we can
-                                    fItem.setModified( 1 );
-                                    fItem.setCreated( 1 );
-                                }
+                                    fis = new FileInputStream( file );
 
-                                repository.storeItem( fItem );
-                            }
-                            catch ( Exception e )
-                            {
-                                getLogger().error( "Cannot store index file " + fItem.getPath(), e );
-                            }
-                            finally
-                            {
-                                IOUtil.close( fis );
+                                    fItem = new DefaultStorageFileItem(
+                                        repository,
+                                        "/.index/" + file.getName(),
+                                        true,
+                                        true,
+                                        fis );
+
+                                    if ( RepositoryType.PROXY.equals( repository.getRepositoryType() ) )
+                                    {
+                                        // for proxy reposes, date is important
+                                        // for locally published indexes in proxy reposes, set file dates old
+                                        // by setting spoofed file timestamps old, we will refetch them when we can
+                                        fItem.setModified( 1 );
+                                        fItem.setCreated( 1 );
+                                    }
+
+                                    repository.storeItem( fItem );
+                                }
+                                catch ( Exception e )
+                                {
+                                    getLogger().error( "Cannot store index file " + fItem.getPath(), e );
+                                }
+                                finally
+                                {
+                                    IOUtil.close( fis );
+                                }
                             }
                         }
                     }
