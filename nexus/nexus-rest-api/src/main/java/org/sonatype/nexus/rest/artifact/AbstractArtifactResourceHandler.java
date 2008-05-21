@@ -43,6 +43,7 @@ import org.sonatype.nexus.proxy.NoSuchResourceStoreException;
 import org.sonatype.nexus.proxy.RepositoryNotAvailableException;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
+import org.sonatype.nexus.proxy.maven.GAVRequest;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.rest.AbstractNexusResourceHandler;
@@ -77,6 +78,14 @@ public class AbstractArtifactResourceHandler
             return null;
         }
 
+        GAVRequest gavRequest = new GAVRequest();
+
+        gavRequest.setGroupId( groupId );
+
+        gavRequest.setArtifactId( artifactId );
+
+        gavRequest.setVersion( version );
+
         try
         {
             Repository repository = getNexus().getRepository( repositoryId );
@@ -96,8 +105,7 @@ public class AbstractArtifactResourceHandler
 
             try
             {
-                StorageFileItem file = ( (MavenRepository) repository )
-                    .retrieveArtifactPom( groupId, artifactId, version );
+                StorageFileItem file = ( (MavenRepository) repository ).retrieveArtifactPom( gavRequest );
 
                 pomContent = file.getInputStream();
 
@@ -182,6 +190,16 @@ public class AbstractArtifactResourceHandler
             return null;
         }
 
+        GAVRequest gavRequest = new GAVRequest();
+
+        gavRequest.setGroupId( groupId );
+
+        gavRequest.setArtifactId( artifactId );
+
+        gavRequest.setVersion( version );
+
+        gavRequest.setClassifier( classifier );
+
         try
         {
             Repository repository = getNexus().getRepository( repositoryId );
@@ -193,11 +211,7 @@ public class AbstractArtifactResourceHandler
                 return null;
             }
 
-            StorageFileItem file = ( (MavenRepository) repository ).retrieveArtifact(
-                groupId,
-                artifactId,
-                version,
-                classifier );
+            StorageFileItem file = ( (MavenRepository) repository ).retrieveArtifact( gavRequest );
 
             Representation result = new InputStreamRepresentation( MediaType.valueOf( file.getMimeType() ), file
                 .getInputStream() );

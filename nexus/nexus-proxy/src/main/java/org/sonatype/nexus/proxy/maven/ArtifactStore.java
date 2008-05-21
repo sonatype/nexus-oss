@@ -20,6 +20,7 @@
  */
 package org.sonatype.nexus.proxy.maven;
 
+import java.io.InputStream;
 import java.util.Collection;
 
 import org.sonatype.nexus.artifact.Gav;
@@ -29,6 +30,7 @@ import org.sonatype.nexus.proxy.NoSuchResourceStoreException;
 import org.sonatype.nexus.proxy.RepositoryNotAvailableException;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
+import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 
 /**
  * A specialized store for Maven Artifacts.
@@ -37,24 +39,123 @@ import org.sonatype.nexus.proxy.item.StorageFileItem;
  */
 public interface ArtifactStore
 {
-    StorageFileItem retrieveArtifactPom( String groupId, String artifactId, String version )
+    /**
+     * Retrieves the contents of the addressed POM.
+     * 
+     * @param gavRequest
+     * @return
+     * @throws NoSuchResourceStoreException
+     * @throws RepositoryNotAvailableException
+     * @throws ItemNotFoundException
+     * @throws StorageException
+     * @throws AccessDeniedException
+     */
+    StorageFileItem retrieveArtifactPom( GAVRequest gavRequest )
         throws NoSuchResourceStoreException,
             RepositoryNotAvailableException,
             ItemNotFoundException,
             StorageException,
             AccessDeniedException;
 
-    StorageFileItem retrieveArtifact( String groupId, String artifactId, String version, String classifier )
+    /**
+     * Retrieves the contents of the addressed artifact.
+     * 
+     * @param gavRequest
+     * @return
+     * @throws NoSuchResourceStoreException
+     * @throws RepositoryNotAvailableException
+     * @throws ItemNotFoundException
+     * @throws StorageException
+     * @throws AccessDeniedException
+     */
+    StorageFileItem retrieveArtifact( GAVRequest gavRequest )
         throws NoSuchResourceStoreException,
             RepositoryNotAvailableException,
             ItemNotFoundException,
             StorageException,
             AccessDeniedException;
 
-    // delete
+    /**
+     * Stores the artifacts POM contents, that is supplied as InputStream.
+     * 
+     * @param gavRequest
+     * @param is
+     * @throws UnsupportedStorageOperationException
+     * @throws NoSuchResourceStoreException
+     * @throws RepositoryNotAvailableException
+     * @throws StorageException
+     * @throws AccessDeniedException
+     */
+    void storeArtifactPom( GAVRequest gavRequest, InputStream is )
+        throws UnsupportedStorageOperationException,
+            NoSuchResourceStoreException,
+            RepositoryNotAvailableException,
+            StorageException,
+            AccessDeniedException;
 
-    // store
+    /**
+     * Stores the artifact contents, that is supplied as InputStream.
+     * 
+     * @param gavRequest
+     * @param is
+     * @throws UnsupportedStorageOperationException
+     * @throws NoSuchResourceStoreException
+     * @throws RepositoryNotAvailableException
+     * @throws StorageException
+     * @throws AccessDeniedException
+     */
+    void storeArtifact( GAVRequest gavRequest, InputStream is )
+        throws UnsupportedStorageOperationException,
+            NoSuchResourceStoreException,
+            RepositoryNotAvailableException,
+            StorageException,
+            AccessDeniedException;
 
-    // list
-    //Collection<Gav> listArtifacts();
+    /**
+     * Stores the artifact contents, that is supplied as InputStream, and along with it generated a little POM based on
+     * information in GAVRequest.
+     * 
+     * @param gavRequest
+     * @param is
+     * @throws UnsupportedStorageOperationException
+     * @throws NoSuchResourceStoreException
+     * @throws RepositoryNotAvailableException
+     * @throws StorageException
+     * @throws AccessDeniedException
+     */
+    void storeArtifactWithGeneratedPom( GAVRequest gavRequest, InputStream is )
+        throws UnsupportedStorageOperationException,
+            NoSuchResourceStoreException,
+            RepositoryNotAvailableException,
+            StorageException,
+            AccessDeniedException;
+
+    /**
+     * Deletes the addressed Artifact (with POM if exists). If it is addressed only up to GAV, and withAllSubordinates
+     * is true, it will erase the whole GAV.
+     * 
+     * @param gavRequest
+     * @param withAllSubordinates
+     * @throws UnsupportedStorageOperationException
+     * @throws NoSuchResourceStoreException
+     * @throws RepositoryNotAvailableException
+     * @throws ItemNotFoundException
+     * @throws StorageException
+     * @throws AccessDeniedException
+     */
+    void deleteArtifact( GAVRequest gavRequest, boolean withAllSubordinates )
+        throws UnsupportedStorageOperationException,
+            NoSuchResourceStoreException,
+            RepositoryNotAvailableException,
+            ItemNotFoundException,
+            StorageException,
+            AccessDeniedException;
+
+    /**
+     * Lists the Artifacts.
+     * 
+     * @param gavRequest
+     * @return
+     */
+    Collection<Gav> listArtifacts( GAVRequest gavRequest );
 }

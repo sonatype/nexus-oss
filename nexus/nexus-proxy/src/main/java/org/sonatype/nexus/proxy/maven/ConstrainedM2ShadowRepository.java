@@ -22,8 +22,10 @@ package org.sonatype.nexus.proxy.maven;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -35,6 +37,7 @@ import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Writer;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.artifact.versioning.VersionRange;
 import org.codehaus.plexus.util.IOUtil;
+import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.artifact.GavCalculator;
 import org.sonatype.nexus.artifact.M2ArtifactRecognizer;
 import org.sonatype.nexus.proxy.AccessDeniedException;
@@ -48,6 +51,7 @@ import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.repository.ShadowRepository;
+import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.util.AlphanumComparator;
 
 /**
@@ -69,7 +73,17 @@ public class ConstrainedM2ShadowRepository
      */
     private GavCalculator gavCalculator;
 
-    private ContentClass contentClass = new Maven2ContentClass();
+    /**
+     * The ContentClass.
+     * 
+     * @plexus.requirement role-hint="maven2"
+     */
+    private ContentClass contentClass;
+
+    /**
+     * ArtifactStoreHelper.
+     */
+    private ArtifactStoreHelper artifactStoreHelper;
 
     private Map<String, String> versionMap;
 
@@ -97,6 +111,15 @@ public class ConstrainedM2ShadowRepository
     {
         return ( (MavenRepository) getMasterRepository() ).getRepositoryPolicy();
     }
+    
+    protected ArtifactStoreHelper getArtifactStoreHelper()
+    {
+        if ( artifactStoreHelper == null )
+        {
+            artifactStoreHelper = new ArtifactStoreHelper( this );
+        }
+        return artifactStoreHelper;
+    }
 
     @Override
     protected String transformMaster2Shadow( String path )
@@ -115,29 +138,77 @@ public class ConstrainedM2ShadowRepository
         return gavCalculator;
     }
 
-    public StorageFileItem retrieveArtifactPom( String groupId, String artifactId, String version )
+    // =================================================================================
+    // ArtifactStore iface
+
+    public StorageFileItem retrieveArtifactPom( GAVRequest gavRequest )
         throws NoSuchResourceStoreException,
             RepositoryNotAvailableException,
             ItemNotFoundException,
             StorageException,
             AccessDeniedException
     {
-        ArtifactStoreHelper ash = new ArtifactStoreHelper( this, gavCalculator );
-
-        return ash.retrieveArtifactPom( groupId, artifactId, version );
+        return getArtifactStoreHelper().retrieveArtifactPom( gavRequest );
     }
 
-    public StorageFileItem retrieveArtifact( String groupId, String artifactId, String version, String classifier )
+    public StorageFileItem retrieveArtifact( GAVRequest gavRequest )
         throws NoSuchResourceStoreException,
             RepositoryNotAvailableException,
             ItemNotFoundException,
             StorageException,
             AccessDeniedException
     {
-        ArtifactStoreHelper ash = new ArtifactStoreHelper( this, gavCalculator );
-
-        return ash.retrieveArtifact( groupId, artifactId, version, classifier );
+        return getArtifactStoreHelper().retrieveArtifact( gavRequest );
     }
+
+    public void storeArtifact( GAVRequest gavRequest, InputStream is )
+        throws UnsupportedStorageOperationException,
+            NoSuchResourceStoreException,
+            RepositoryNotAvailableException,
+            StorageException,
+            AccessDeniedException
+    {
+        getArtifactStoreHelper().storeArtifact( gavRequest, is );
+    }
+
+    public void storeArtifactPom( GAVRequest gavRequest, InputStream is )
+        throws UnsupportedStorageOperationException,
+            NoSuchResourceStoreException,
+            RepositoryNotAvailableException,
+            StorageException,
+            AccessDeniedException
+    {
+        getArtifactStoreHelper().storeArtifactPom( gavRequest, is );
+    }
+
+    public void storeArtifactWithGeneratedPom( GAVRequest gavRequest, InputStream is )
+        throws UnsupportedStorageOperationException,
+            NoSuchResourceStoreException,
+            RepositoryNotAvailableException,
+            StorageException,
+            AccessDeniedException
+    {
+        getArtifactStoreHelper().storeArtifactWithGeneratedPom( gavRequest, is );
+    }
+
+    public void deleteArtifact( GAVRequest gavRequest, boolean withAllSubordinates )
+        throws UnsupportedStorageOperationException,
+            NoSuchResourceStoreException,
+            RepositoryNotAvailableException,
+            ItemNotFoundException,
+            StorageException,
+            AccessDeniedException
+    {
+        getArtifactStoreHelper().deleteArtifact( gavRequest, withAllSubordinates );
+    }
+
+    public Collection<Gav> listArtifacts( GAVRequest gavRequest )
+    {
+        return getArtifactStoreHelper().listArtifacts( gavRequest );
+    }
+
+    // =================================================================================
+    // ShadowRepository customizations
 
     protected StorageItem doRetrieveItem( boolean localOnly, RepositoryItemUid uid, Map<String, Object> context )
         throws RepositoryNotAvailableException,

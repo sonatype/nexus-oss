@@ -20,6 +20,9 @@
  */
 package org.sonatype.nexus.proxy.maven;
 
+import java.io.InputStream;
+import java.util.Collection;
+
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.artifact.GavCalculator;
 import org.sonatype.nexus.proxy.AccessDeniedException;
@@ -30,6 +33,7 @@ import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.repository.ShadowRepository;
+import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 
 /**
  * Base class for shadows that make "gateways" from M1 to M2 lauouts and vice versa.
@@ -54,6 +58,11 @@ public abstract class LayoutConverterShadowRepository
      */
     private GavCalculator m2GavCalculator;
 
+    /**
+     * ArtifactStoreHelper.
+     */
+    private ArtifactStoreHelper artifactStoreHelper;
+
     public GavCalculator getM1GavCalculator()
     {
         return m1GavCalculator;
@@ -69,32 +78,86 @@ public abstract class LayoutConverterShadowRepository
         return ( (MavenRepository) getMasterRepository() ).getRepositoryPolicy();
     }
 
-    /**
-     * Implements ArtifactStore
-     */
-    public StorageFileItem retrieveArtifactPom( String groupId, String artifactId, String version )
+    protected ArtifactStoreHelper getArtifactStoreHelper()
+    {
+        if ( artifactStoreHelper == null )
+        {
+            artifactStoreHelper = new ArtifactStoreHelper( this );
+        }
+        return artifactStoreHelper;
+    }
+
+    // =================================================================================
+    // ArtifactStore iface
+
+    public StorageFileItem retrieveArtifactPom( GAVRequest gavRequest )
         throws NoSuchResourceStoreException,
             RepositoryNotAvailableException,
             ItemNotFoundException,
             StorageException,
             AccessDeniedException
     {
-        ArtifactStoreHelper ash = new ArtifactStoreHelper( this, getGavCalculator() );
-
-        return ash.retrieveArtifactPom( groupId, artifactId, version );
+        return getArtifactStoreHelper().retrieveArtifactPom( gavRequest );
     }
 
-    public StorageFileItem retrieveArtifact( String groupId, String artifactId, String version, String classifier )
+    public StorageFileItem retrieveArtifact( GAVRequest gavRequest )
         throws NoSuchResourceStoreException,
             RepositoryNotAvailableException,
             ItemNotFoundException,
             StorageException,
             AccessDeniedException
     {
-        ArtifactStoreHelper ash = new ArtifactStoreHelper( this, getGavCalculator() );
-
-        return ash.retrieveArtifact( groupId, artifactId, version, classifier );
+        return getArtifactStoreHelper().retrieveArtifact( gavRequest );
     }
+
+    public void storeArtifact( GAVRequest gavRequest, InputStream is )
+        throws UnsupportedStorageOperationException,
+            NoSuchResourceStoreException,
+            RepositoryNotAvailableException,
+            StorageException,
+            AccessDeniedException
+    {
+        getArtifactStoreHelper().storeArtifact( gavRequest, is );
+    }
+
+    public void storeArtifactPom( GAVRequest gavRequest, InputStream is )
+        throws UnsupportedStorageOperationException,
+            NoSuchResourceStoreException,
+            RepositoryNotAvailableException,
+            StorageException,
+            AccessDeniedException
+    {
+        getArtifactStoreHelper().storeArtifactPom( gavRequest, is );
+    }
+
+    public void storeArtifactWithGeneratedPom( GAVRequest gavRequest, InputStream is )
+        throws UnsupportedStorageOperationException,
+            NoSuchResourceStoreException,
+            RepositoryNotAvailableException,
+            StorageException,
+            AccessDeniedException
+    {
+        getArtifactStoreHelper().storeArtifactWithGeneratedPom( gavRequest, is );
+    }
+
+    public void deleteArtifact( GAVRequest gavRequest, boolean withAllSubordinates )
+        throws UnsupportedStorageOperationException,
+            NoSuchResourceStoreException,
+            RepositoryNotAvailableException,
+            ItemNotFoundException,
+            StorageException,
+            AccessDeniedException
+    {
+        getArtifactStoreHelper().deleteArtifact( gavRequest, withAllSubordinates );
+    }
+
+    public Collection<Gav> listArtifacts( GAVRequest gavRequest )
+    {
+        return getArtifactStoreHelper().listArtifacts( gavRequest );
+    }
+
+    // =================================================================================
+    // ShadowRepository customizations
 
     /**
      * Transforms a full artifact path from M1 layout to M2 layout.
