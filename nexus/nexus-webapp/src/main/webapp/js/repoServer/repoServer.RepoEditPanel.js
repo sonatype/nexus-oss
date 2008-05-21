@@ -923,7 +923,9 @@ Sonatype.repoServer.RepoEditPanel = function(config){
   this.reposGridPanel = new Ext.grid.GridPanel({
     title: 'Repositories',
     id: 'st-repos-grid',
-    
+    selModel: new Ext.grid.RowSelectionModel({
+      singleSelect: true
+    }),
     region: 'north',
     layout:'fit',
     collapsible: true,

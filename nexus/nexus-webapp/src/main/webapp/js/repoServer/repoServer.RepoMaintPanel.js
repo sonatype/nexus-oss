@@ -264,6 +264,9 @@ Sonatype.repoServer.RepoMaintPanel = function(config){
     maxHeight: 400,
     frame: false,
     autoScroll: true,
+    selModel: new Ext.grid.RowSelectionModel({
+      singleSelect: true
+    }),
     tbar: [
       this.actions.refreshList
     ],
