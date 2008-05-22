@@ -40,10 +40,25 @@ public class ArtifactResourceContentHandler
         super( context, request, response );
     }
 
+    public boolean allowGet()
+    {
+        return true;
+    }
+
     protected Representation getRepresentationHandler( Variant variant )
         throws Exception
     {
         return getContent( variant );
+    }
+
+    public boolean allowPost()
+    {
+        return true;
+    }
+
+    public void post( Representation representation )
+    {
+        uploadArtifact( representation );
     }
 
 }

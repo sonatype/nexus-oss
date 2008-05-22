@@ -29,6 +29,7 @@ import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.NoSuchResourceStoreException;
 import org.sonatype.nexus.proxy.RepositoryNotAvailableException;
 import org.sonatype.nexus.proxy.StorageException;
+import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 
@@ -39,6 +40,19 @@ import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
  */
 public interface ArtifactStore
 {
+    /**
+     * Stores the item and also creates and stores it's Maven repository checksums.
+     * 
+     * @param item
+     * @throws UnsupportedStorageOperationException
+     * @throws RepositoryNotAvailableException
+     * @throws StorageException
+     */
+    void storeItemWithChecksums( AbstractStorageItem item )
+        throws UnsupportedStorageOperationException,
+            RepositoryNotAvailableException,
+            StorageException;
+
     /**
      * Retrieves the contents of the addressed POM.
      * 

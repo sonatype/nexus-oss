@@ -45,6 +45,7 @@ import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.NoSuchResourceStoreException;
 import org.sonatype.nexus.proxy.RepositoryNotAvailableException;
 import org.sonatype.nexus.proxy.StorageException;
+import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.PreparedContentLocator;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
@@ -111,7 +112,7 @@ public class ConstrainedM2ShadowRepository
     {
         return ( (MavenRepository) getMasterRepository() ).getRepositoryPolicy();
     }
-    
+
     protected ArtifactStoreHelper getArtifactStoreHelper()
     {
         if ( artifactStoreHelper == null )
@@ -132,7 +133,7 @@ public class ConstrainedM2ShadowRepository
     {
         return path;
     }
-    
+
     public GavCalculator getGavCalculator()
     {
         return gavCalculator;
@@ -140,6 +141,14 @@ public class ConstrainedM2ShadowRepository
 
     // =================================================================================
     // ArtifactStore iface
+
+    public void storeItemWithChecksums( AbstractStorageItem item )
+        throws UnsupportedStorageOperationException,
+            RepositoryNotAvailableException,
+            StorageException
+    {
+        getArtifactStoreHelper().storeItemWithChecksums( item );
+    }
 
     public StorageFileItem retrieveArtifactPom( GAVRequest gavRequest )
         throws NoSuchResourceStoreException,

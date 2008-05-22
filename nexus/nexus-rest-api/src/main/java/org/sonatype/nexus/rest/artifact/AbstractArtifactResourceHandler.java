@@ -24,8 +24,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Date;
+import java.util.List;
 import java.util.logging.Level;
 
+import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.fileupload.FileItemFactory;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
@@ -35,6 +38,7 @@ import org.restlet.data.MediaType;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.data.Status;
+import org.restlet.ext.fileupload.RestletFileUpload;
 import org.restlet.resource.Representation;
 import org.restlet.resource.Variant;
 import org.sonatype.nexus.proxy.AccessDeniedException;
@@ -47,6 +51,7 @@ import org.sonatype.nexus.proxy.maven.GAVRequest;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.rest.AbstractNexusResourceHandler;
+import org.sonatype.nexus.rest.ApplicationBridge;
 import org.sonatype.plexus.rest.representation.InputStreamRepresentation;
 
 public class AbstractArtifactResourceHandler
@@ -252,6 +257,153 @@ public class AbstractArtifactResourceHandler
         }
 
         return null;
+    }
+
+    protected void uploadArtifact( Representation representation )
+    {
+        if ( representation != null )
+        {
+            if ( MediaType.MULTIPART_FORM_DATA.equals( representation.getMediaType(), true ) )
+            {
+                FileItemFactory factory = (FileItemFactory) getContext().getAttributes().get(
+                    ApplicationBridge.FILEITEM_FACTORY );
+
+                RestletFileUpload upload = new RestletFileUpload( factory );
+
+                List<FileItem> items;
+
+                try
+                {
+                    items = upload.parseRequest( getRequest() );
+
+                    // we have "nibbles": (params,fileA,[fileB])+
+                    // the second file is optional
+                    // if two files are present, one of them should be POM
+                    for ( FileItem fi : items )
+                    {
+                        String repositoryId = null;
+
+                        boolean hasPom = false;
+
+                        boolean isPom = false;
+
+                        InputStream is = null;
+
+                        String groupId = null;
+
+                        String artifactId = null;
+
+                        String version = null;
+
+                        String classifier = null;
+
+                        String packaging = null;
+
+                        if ( fi.isFormField() )
+                        {
+                            // a parameter
+                            if ( "r".equals( fi.getFieldName() ) )
+                            {
+                                repositoryId = fi.getString();
+                            }
+                            else if ( "g".equals( fi.getFieldName() ) )
+                            {
+                                groupId = fi.getString();
+                            }
+                            else if ( "a".equals( fi.getFieldName() ) )
+                            {
+                                artifactId = fi.getString();
+                            }
+                            else if ( "v".equals( fi.getFieldName() ) )
+                            {
+                                version = fi.getString();
+                            }
+                            else if ( "c".equals( fi.getFieldName() ) )
+                            {
+                                classifier = fi.getString();
+                            }
+                            else if ( "p".equals( fi.getFieldName() ) )
+                            {
+                                packaging = fi.getString();
+                            }
+                            else if ( "hasPom".equals( fi.getFieldName() ) )
+                            {
+                                hasPom = Boolean.parseBoolean( fi.getString() );
+                            }
+                        }
+                        else
+                        {
+                            // a file
+                            isPom = fi.getName().endsWith( ".pom" );
+
+                            is = fi.getInputStream();
+                        }
+
+                        GAVRequest gavRequest = new GAVRequest();
+
+                        gavRequest.setGroupId( groupId );
+
+                        gavRequest.setArtifactId( artifactId );
+
+                        gavRequest.setVersion( version );
+
+                        gavRequest.setClassifier( classifier );
+
+                        gavRequest.setPackaging( packaging );
+
+                        try
+                        {
+                            Repository repository = getNexus().getRepository( repositoryId );
+
+                            if ( !MavenRepository.class.isAssignableFrom( repository.getClass() ) )
+                            {
+                                getResponse().setStatus(
+                                    Status.CLIENT_ERROR_BAD_REQUEST,
+                                    "This is not a Maven repository!" );
+
+                                return;
+                            }
+
+                            if ( isPom )
+                            {
+                                ( (MavenRepository) repository ).storeArtifactPom( gavRequest, is );
+                            }
+                            else
+                            {
+                                if ( hasPom )
+                                {
+                                    ( (MavenRepository) repository ).storeArtifact( gavRequest, is );
+                                }
+                                else
+                                {
+                                    ( (MavenRepository) repository ).storeArtifactWithGeneratedPom( gavRequest, is );
+                                }
+                            }
+                        }
+                        catch ( IllegalArgumentException e )
+                        {
+                            getResponse().setStatus( Status.CLIENT_ERROR_BAD_REQUEST, e.getMessage() );
+
+                            return;
+                        }
+                    }
+
+                    getResponse().setStatus( Status.SUCCESS_CREATED );
+
+                }
+                catch ( Exception e )
+                {
+                    getLogger().log( Level.SEVERE, "Exception during upload:", e );
+
+                    getResponse().setStatus( Status.CLIENT_ERROR_BAD_REQUEST );
+                }
+            }
+        }
+        else
+        {
+            // POST request with no entity.
+            getResponse().setStatus( Status.CLIENT_ERROR_BAD_REQUEST );
+        }
 
     }
 }

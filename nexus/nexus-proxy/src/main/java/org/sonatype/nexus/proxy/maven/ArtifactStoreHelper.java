@@ -1,18 +1,28 @@
 package org.sonatype.nexus.proxy.maven;
 
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringWriter;
 import java.util.Collection;
 import java.util.Collections;
 
+import org.apache.maven.model.Model;
+import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
+import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.NoSuchResourceStoreException;
 import org.sonatype.nexus.proxy.RepositoryNotAvailableException;
 import org.sonatype.nexus.proxy.StorageException;
+import org.sonatype.nexus.proxy.attributes.inspectors.DigestCalculatingInspector;
+import org.sonatype.nexus.proxy.item.AbstractStorageItem;
+import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
+import org.sonatype.nexus.proxy.item.PreparedContentLocator;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
+import org.sonatype.nexus.proxy.item.StringContentLocator;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 
 public class ArtifactStoreHelper
@@ -27,6 +37,47 @@ public class ArtifactStoreHelper
         this.repository = repo;
     }
 
+    public void storeItemWithChecksums( AbstractStorageItem item )
+        throws UnsupportedStorageOperationException,
+            RepositoryNotAvailableException,
+            StorageException
+    {
+        try
+        {
+            repository.storeItem( item );
+
+            StorageFileItem storedFile = (StorageFileItem) repository.retrieveItem( true, item.getRepositoryItemUid() );
+
+            String sha1Hash = storedFile.getAttributes().get( DigestCalculatingInspector.DIGEST_SHA1_KEY );
+
+            String md5Hash = storedFile.getAttributes().get( DigestCalculatingInspector.DIGEST_MD5_KEY );
+
+            if ( !StringUtils.isEmpty( sha1Hash ) )
+            {
+                repository.storeItem( new DefaultStorageFileItem(
+                    repository,
+                    item.getPath() + ".sha1",
+                    true,
+                    true,
+                    new StringContentLocator( sha1Hash ) ) );
+            }
+
+            if ( !StringUtils.isEmpty( md5Hash ) )
+            {
+                repository.storeItem( new DefaultStorageFileItem(
+                    repository,
+                    item.getPath() + ".md5",
+                    true,
+                    true,
+                    new StringContentLocator( md5Hash ) ) );
+            }
+        }
+        catch ( ItemNotFoundException e )
+        {
+            throw new StorageException( "Storage inconsistency!", e );
+        }
+    }
+
     public StorageFileItem retrieveArtifactPom( GAVRequest gavRequest )
         throws NoSuchResourceStoreException,
             RepositoryNotAvailableException,
@@ -34,6 +85,8 @@ public class ArtifactStoreHelper
             StorageException,
             AccessDeniedException
     {
+        checkRequest( gavRequest );
+
         Gav gav = new Gav(
             gavRequest.getGroupId(),
             gavRequest.getArtifactId(),
@@ -68,7 +121,10 @@ public class ArtifactStoreHelper
             StorageException,
             AccessDeniedException
     {
+        checkRequest( gavRequest );
+
         // TODO: packaging2extension mapping, now we default to JAR
+        // or use POM to "find" the packaging
         Gav gav = new Gav( gavRequest.getGroupId(), gavRequest.getArtifactId(), gavRequest.getVersion(), gavRequest
             .getClassifier(), "jar", null, null, null, RepositoryPolicy.SNAPSHOT.equals( repository
             .getRepositoryPolicy() ), false, null );
@@ -94,8 +150,16 @@ public class ArtifactStoreHelper
             StorageException,
             AccessDeniedException
     {
-        // TODO Auto-generated method stub
+        checkRequest( gavRequest );
 
+        Gav gav = new Gav( gavRequest.getGroupId(), gavRequest.getArtifactId(), gavRequest.getVersion(), gavRequest
+            .getClassifier(), "pom", null, null, null, RepositoryPolicy.SNAPSHOT.equals( repository
+            .getRepositoryPolicy() ), false, null );
+
+        DefaultStorageFileItem file = new DefaultStorageFileItem( repository, repository.getGavCalculator().gavToPath(
+            gav ), true, true, new PreparedContentLocator( is ) );
+
+        storeItemWithChecksums( file );
     }
 
     public void storeArtifact( GAVRequest gavRequest, InputStream is )
@@ -105,8 +169,17 @@ public class ArtifactStoreHelper
             StorageException,
             AccessDeniedException
     {
-        // TODO Auto-generated method stub
+        checkRequest( gavRequest );
 
+        // TODO: packaging2extension mapping, now we default to JAR
+        Gav gav = new Gav( gavRequest.getGroupId(), gavRequest.getArtifactId(), gavRequest.getVersion(), gavRequest
+            .getClassifier(), "jar", null, null, null, RepositoryPolicy.SNAPSHOT.equals( repository
+            .getRepositoryPolicy() ), false, null );
+
+        DefaultStorageFileItem file = new DefaultStorageFileItem( repository, repository.getGavCalculator().gavToPath(
+            gav ), true, true, new PreparedContentLocator( is ) );
+
+        storeItemWithChecksums( file );
     }
 
     public void storeArtifactWithGeneratedPom( GAVRequest gavRequest, InputStream is )
@@ -116,8 +189,68 @@ public class ArtifactStoreHelper
             StorageException,
             AccessDeniedException
     {
-        // TODO Auto-generated method stub
+        checkRequest( gavRequest );
 
+        Gav pomGav = new Gav( gavRequest.getGroupId(), gavRequest.getArtifactId(), gavRequest.getVersion(), gavRequest
+            .getClassifier(), "pom", null, null, null, RepositoryPolicy.SNAPSHOT.equals( repository
+            .getRepositoryPolicy() ), false, null );
+
+        try
+        {
+            // check for POM existence
+            repository.retrieveItem( true, new RepositoryItemUid( repository, repository.getGavCalculator().gavToPath(
+                pomGav ) ) );
+        }
+        catch ( ItemNotFoundException e )
+        {
+            if ( gavRequest.getPackaging() == null )
+            {
+                throw new IllegalArgumentException( "Cannot generate POM without valid 'packaging'!" );
+            }
+
+            // POM does not exists
+            // generate minimal POM
+            // got from install:install-file plugin/mojo, thanks
+            Model model = new Model();
+            model.setModelVersion( "4.0.0" );
+            model.setGroupId( gavRequest.getGroupId() );
+            model.setArtifactId( gavRequest.getArtifactId() );
+            model.setVersion( gavRequest.getVersion() );
+            model.setPackaging( gavRequest.getPackaging() );
+            model.setDescription( "POM was created by Sonatype Nexus" );
+
+            StringWriter sw = new StringWriter();
+
+            MavenXpp3Writer mw = new MavenXpp3Writer();
+
+            try
+            {
+                mw.write( sw, model );
+            }
+            catch ( IOException ex )
+            {
+                // writing to string, not to happen
+            }
+
+            storeItemWithChecksums( new DefaultStorageFileItem( repository, repository.getGavCalculator().gavToPath(
+                pomGav ), true, true, new StringContentLocator( sw.toString() ) ) );
+        }
+
+        Gav artifactGav = new Gav(
+            gavRequest.getGroupId(),
+            gavRequest.getArtifactId(),
+            gavRequest.getVersion(),
+            gavRequest.getClassifier(),
+            "jar",
+            null,
+            null,
+            null,
+            RepositoryPolicy.SNAPSHOT.equals( repository.getRepositoryPolicy() ),
+            false,
+            null );
+
+        storeItemWithChecksums( new DefaultStorageFileItem( repository, repository.getGavCalculator().gavToPath(
+            artifactGav ), true, true, new PreparedContentLocator( is ) ) );
     }
 
     public void deleteArtifact( GAVRequest gavRequest, boolean withAllSubordinates )
@@ -128,13 +261,31 @@ public class ArtifactStoreHelper
             StorageException,
             AccessDeniedException
     {
-        // TODO Auto-generated method stub
+        Gav gav = new Gav( gavRequest.getGroupId(), gavRequest.getArtifactId(), gavRequest.getVersion(), gavRequest
+            .getClassifier(), "jar", null, null, null, RepositoryPolicy.SNAPSHOT.equals( repository
+            .getRepositoryPolicy() ), false, null );
 
+        RepositoryItemUid uid = new RepositoryItemUid( repository, repository.getGavCalculator().gavToPath( gav ) );
+
+        // TODO: implement other stuff too
+        repository.deleteItem( uid );
     }
 
     public Collection<Gav> listArtifacts( GAVRequest gavRequest )
     {
         return Collections.emptyList();
+    }
+
+    // =======================================================================================
+
+    protected void checkRequest( GAVRequest gavRequest )
+    {
+        if ( gavRequest.getGroupId() == null || gavRequest.getArtifactId() == null || gavRequest.getVersion() == null )
+        {
+            throw new IllegalArgumentException( "GAV is not supplied or only partially supplied! (G: '"
+                + gavRequest.getGroupId() + "', A: '" + gavRequest.getArtifactId() + "', V: '"
+                + gavRequest.getVersion() + "')" );
+        }
     }
 
 }

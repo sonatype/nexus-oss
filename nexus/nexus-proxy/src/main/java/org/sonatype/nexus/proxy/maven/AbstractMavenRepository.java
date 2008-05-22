@@ -205,6 +205,14 @@ public abstract class AbstractMavenRepository
     // =================================================================================
     // ArtifactStore iface
 
+    public void storeItemWithChecksums( AbstractStorageItem item )
+        throws UnsupportedStorageOperationException,
+            RepositoryNotAvailableException,
+            StorageException
+    {
+        getArtifactStoreHelper().storeItemWithChecksums( item );
+    }
+
     public StorageFileItem retrieveArtifactPom( GAVRequest gavRequest )
         throws NoSuchResourceStoreException,
             RepositoryNotAvailableException,

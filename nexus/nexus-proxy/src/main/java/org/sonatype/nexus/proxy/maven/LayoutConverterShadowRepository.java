@@ -30,6 +30,7 @@ import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.NoSuchResourceStoreException;
 import org.sonatype.nexus.proxy.RepositoryNotAvailableException;
 import org.sonatype.nexus.proxy.StorageException;
+import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.repository.ShadowRepository;
@@ -89,6 +90,14 @@ public abstract class LayoutConverterShadowRepository
 
     // =================================================================================
     // ArtifactStore iface
+
+    public void storeItemWithChecksums( AbstractStorageItem item )
+        throws UnsupportedStorageOperationException,
+            RepositoryNotAvailableException,
+            StorageException
+    {
+        getArtifactStoreHelper().storeItemWithChecksums( item );
+    }
 
     public StorageFileItem retrieveArtifactPom( GAVRequest gavRequest )
         throws NoSuchResourceStoreException,
