@@ -62,43 +62,10 @@
 	    </resources>
 		<plugins>
 		    <plugin>
-		        <artifactId>plx-maven-plugin</artifactId>
-		        <groupId>org.sonatype.plugins</groupId>		        
-                <version>1.1-SNAPSHOT</version>
-		        <executions>
-		            <execution>
-		                <id>start-nexus</id>
-		                <phase>pre-integration-test</phase>
-		                <goals>
-		                    <goal>start</goal>
-		                </goals>
-		                <configuration>
-		                    <systemProperties>
-		                        <plexus.blocking.disabled>true</plexus.blocking.disabled>
-		                    </systemProperties>
-		                    <basedir>${bundle-expanded-dir}/nexus-webapp-${project.version}</basedir>
-		                    <configuration>${plexus-config-file}</configuration>
-		                    <includeTestClasspath>true</includeTestClasspath>
-		                </configuration>
-		            </execution>
-		            <execution>
-                        <id>stop-nexus</id>
-                        <phase>post-integration-test</phase>
-                        <goals>
-                            <goal>stop</goal>
-                        </goals>
-                        <configuration>
-                            <configuration>${plexus-config-file}</configuration>
-                            <includeTestClasspath>true</includeTestClasspath>
-                        </configuration>
-                    </execution>
-		        </executions>    
-		    </plugin>
-			<plugin>
-				<artifactId>maven-dependency-plugin</artifactId>
-				<version>2.0</version>
-				<executions>
-				    <execution>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>2.0</version>
+                <executions>
+                    <execution>
                         <id>unpack-bundle</id>
                         <phase>generate-resources</phase>
                         <goals>
@@ -113,38 +80,105 @@
                             </outputDirectory>
                         </configuration>
                     </execution>
-					<execution>
-						<id>unpack-config</id>
-						<phase>generate-resources</phase>
-						<goals>
-							<goal>unpack-dependencies</goal>
-						</goals>
-						<configuration>
-							<includeArtifactIds>
-								nexus-test-harness-config
-							</includeArtifactIds>
-							<outputDirectory>
-								${config-expanded-dir}
-							</outputDirectory>
-						</configuration>
-					</execution>
-					<execution>
-						<id>unpack-work</id>
-						<phase>generate-resources</phase>
-						<goals>
-							<goal>unpack-dependencies</goal>
-						</goals>
-						<configuration>
-							<includeArtifactIds>
-								nexus-test-harness-work
-							</includeArtifactIds>
-							<outputDirectory>
-								${work-target-dir}
-							</outputDirectory>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
+                    <execution>
+                        <id>unpack-config</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>unpack-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <includeArtifactIds>
+                                nexus-test-harness-config
+                            </includeArtifactIds>
+                            <outputDirectory>
+                                ${config-expanded-dir}
+                            </outputDirectory>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>unpack-work</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>unpack-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <includeArtifactIds>
+                                nexus-test-harness-work
+                            </includeArtifactIds>
+                            <outputDirectory>
+                                ${work-target-dir}
+                            </outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+		    <plugin>
+		        <artifactId>plx-maven-plugin</artifactId>
+		        <groupId>org.sonatype.plugins</groupId>		        
+                <version>1.1-SNAPSHOT</version>
+		        <executions>
+		            <execution>
+		                <id>start-nexus</id>
+		                <phase>pre-integration-test</phase>
+		                <goals>
+		                    <goal>start</goal>
+		                </goals>
+		                <configuration>
+		                    <prependClasspaths>
+		                        <prependClasspath>${basedir}/${config-target-dir}</prependClasspath>
+		                    </prependClasspaths>
+		                    <systemProperties>
+		                        <java.util.logging.config.file>${basedir}/${config-target-dir}/jul-logging.properties</java.util.logging.config.file>
+                                <java.io.tmpdir>${basedir}/${work-target-dir}/tmp</java.io.tmpdir>
+		                    </systemProperties>
+		                    <basedir>${bundle-expanded-dir}/nexus-webapp-${project.version}</basedir>
+		                    <configuration>${plexus-config-file}</configuration>
+		                    <includeTestClasspath>true</includeTestClasspath>
+		                </configuration>
+		            </execution>
+		            <execution>
+                        <id>stop-nexus</id>
+                        <phase>post-integration-test</phase>
+                        <goals>
+                            <goal>stop</goal>
+                        </goals>
+                        <configuration>
+                            <prependClasspaths>
+                                <prependClasspath>${basedir}/${config-target-dir}</prependClasspath>
+                            </prependClasspaths>
+                            <systemProperties>
+                                <java.util.logging.config.file>${basedir}/${config-target-dir}/jul-logging.properties</java.util.logging.config.file>
+                                <java.io.tmpdir>${basedir}/${work-target-dir}/tmp</java.io.tmpdir>
+                            </systemProperties>
+                            <basedir>${bundle-expanded-dir}/nexus-webapp-${project.version}</basedir>
+                            <configuration>${plexus-config-file}</configuration>
+                            <includeTestClasspath>true</includeTestClasspath>
+                        </configuration>
+                    </execution>
+		        </executions>    
+		    </plugin>
+		    <plugin>
+                <groupId>org.sonatype.plugins</groupId>
+                <artifactId>wait-maven-plugin</artifactId>
+                <version>1.0-SNAPSHOT</version>
+                <executions>
+                    <execution>
+                        <id>wait-for-nexus</id>
+                        <phase>pre-integration-test</phase>
+                        <goals>
+                            <goal>wait</goal>
+                        </goals>
+                        <configuration>
+                            <protocol>http</protocol>
+                            <host>localhost</host>
+                            <port>8081</port>
+                            <file>/nexus</file>
+                            <maxcount>0</maxcount>
+                            <timeout>5000</timeout>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
@@ -160,9 +194,6 @@
                         </goals>
                         <configuration>
                             <skip>false</skip>
-                            <includes>
-                                <include>**/NexusTestSuite.java</include>
-                            </includes>
                         </configuration>
                     </execution>
                 </executions>
