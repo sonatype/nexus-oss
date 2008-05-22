@@ -18,6 +18,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -227,6 +228,21 @@ public class DefaultIndexNexusIndexerTest
         assertEquals( "1.5", ai.version );
 
         assertEquals( "test", ai.repository );
+        
+        Date timestamp = newContext.getTimestamp();
+        
+        newContext.close( false );
+        
+        newContext = nexusIndexer.addIndexingContext( 
+            "test-new", 
+            "test", 
+            null, 
+            newIndexDir, 
+            null, 
+            null, 
+            NexusIndexer.DEFAULT_INDEX, false );
+        
+        assertEquals( timestamp, newContext.getTimestamp() );
         
         newContext.close( true );
         
