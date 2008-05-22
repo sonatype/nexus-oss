@@ -309,7 +309,7 @@ Sonatype.repoServer.GroupsEditPanel = function(config){
     columns: [
       {header: 'Group', dataIndex: 'name', width:175},
       {header: 'Repositories', dataIndex: 'sRepositories', width:300},
-      {header: 'Group Path', dataIndex: 'contentUri', id: 'groups-config-url-col', width:300}
+      {header: 'Group Path', dataIndex: 'contentUri', id: 'groups-config-url-col', width:300,renderer: function(s){return '<a href="' + s + '">' + s + '</a>';},menuDisabled:true}
     ],
     autoExpandColumn: 'groups-config-url-col',
     disableSelection: false,
@@ -516,43 +516,79 @@ Ext.extend(Sonatype.repoServer.GroupsEditPanel, Ext.Panel, {
 
   deleteResourceHandler : function(){
     if (this.groupsGridPanel.getSelectionModel().hasSelection()){
-      var rec = this.groupsGridPanel.getSelectionModel().getSelected();
+      var selections = this.groupsGridPanel.getSelectionModel().getSelections();
 
-      if(rec.data.resourceURI == 'new'){
-        this.cancelHandler({
-          formPanel : Ext.getCmp(rec.id),
-          isNew : true
-        });
-      }
-      else {
-        //@note: this handler selects the "No" button as the default
-        //@todo: could extend Ext.MessageBox to take the button to select as a param
-        Ext.Msg.getDialog().on('show', function(){
+      //@note: this handler selects the "No" button as the default
+      //@todo: could extend Ext.MessageBox to take the button to select as a param
+      Ext.Msg.getDialog().on('show', function(){
           this.focusEl = this.buttons[2]; //ack! we're offset dependent here
           this.focus();
         },
         Ext.Msg.getDialog(),
-        {single:true});
-        
+        {single:true}
+      );
+
+      if ( selections.length == 1 ) {
+        var rec = this.groupsGridPanel.getSelectionModel().getSelected();
+
+        if(rec.data.resourceURI == 'new'){
+          this.cancelHandler({
+            formPanel : Ext.getCmp(rec.id),
+            isNew : true
+          });
+        }
+        else {
+          Ext.Msg.show({
+            animEl: this.groupsGridPanel.getEl(),
+            title : 'Delete Group?',
+            msg : 'Delete the ' + rec.get('name') + ' group?',
+            buttons: Ext.Msg.YESNO,
+            scope: this,
+            icon: Ext.Msg.QUESTION,
+            fn: function(btnName){
+              if (btnName == 'yes' || btnName == 'ok') {
+                Ext.Ajax.request({
+                  callback: this.deleteCallback,
+                  cbPassThru: {
+                    resourceId: rec.id
+                  },
+                  scope: this,
+                  method: 'DELETE',
+                  url:rec.data.resourceURI
+                });
+              }
+            }
+          });
+        }
+      }
+      else {
         Ext.Msg.show({
           animEl: this.groupsGridPanel.getEl(),
-          title : 'Delete Group?',
-          msg : 'Delete the ' + rec.get('name') + ' group?',
+          title : 'Delete Groups?',
+          msg : 'Delete ' + selections.length + ' groups?',
           buttons: Ext.Msg.YESNO,
           scope: this,
           icon: Ext.Msg.QUESTION,
           fn: function(btnName){
-            if (btnName == 'yes' || btnName == 'ok') {
-              Ext.Ajax.request({
-                callback: this.deleteCallback,
-                cbPassThru: {
-                  resourceId: rec.id
-                },
-                scope: this,
-                method: 'DELETE',
-                url:rec.data.resourceURI
-              });
-            }
+            Ext.each( selections, function(rec) {
+              if(rec.data.resourceURI == 'new'){
+                this.cancelHandler({
+                  formPanel : Ext.getCmp(rec.id),
+                  isNew : true
+                });
+              }
+              else {
+                Ext.Ajax.request({
+                  callback: this.deleteCallback,
+                   cbPassThru: {
+                    resourceId: rec.id
+                  },
+                  scope: this,
+                  method: 'DELETE',
+                  url:rec.data.resourceURI
+                });
+              }
+            }, this );
           }
         });
       }
