@@ -518,16 +518,6 @@ Ext.extend(Sonatype.repoServer.GroupsEditPanel, Ext.Panel, {
     if (this.groupsGridPanel.getSelectionModel().hasSelection()){
       var selections = this.groupsGridPanel.getSelectionModel().getSelections();
 
-      //@note: this handler selects the "No" button as the default
-      //@todo: could extend Ext.MessageBox to take the button to select as a param
-      Ext.Msg.getDialog().on('show', function(){
-          this.focusEl = this.buttons[2]; //ack! we're offset dependent here
-          this.focus();
-        },
-        Ext.Msg.getDialog(),
-        {single:true}
-      );
-
       if ( selections.length == 1 ) {
         var rec = this.groupsGridPanel.getSelectionModel().getSelected();
 
@@ -538,9 +528,10 @@ Ext.extend(Sonatype.repoServer.GroupsEditPanel, Ext.Panel, {
           });
         }
         else {
+          Sonatype.utils.defaultToNo();
           Ext.Msg.show({
             animEl: this.groupsGridPanel.getEl(),
-            title : 'Delete Group?',
+            title : 'Delete Group',
             msg : 'Delete the ' + rec.get('name') + ' group?',
             buttons: Ext.Msg.YESNO,
             scope: this,
@@ -562,9 +553,10 @@ Ext.extend(Sonatype.repoServer.GroupsEditPanel, Ext.Panel, {
         }
       }
       else {
+        Sonatype.utils.defaultToNo();
         Ext.Msg.show({
           animEl: this.groupsGridPanel.getEl(),
-          title : 'Delete Groups?',
+          title : 'Delete Groups',
           msg : 'Delete ' + selections.length + ' groups?',
           buttons: Ext.Msg.YESNO,
           scope: this,

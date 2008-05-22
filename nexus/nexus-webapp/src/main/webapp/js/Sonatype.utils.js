@@ -224,7 +224,19 @@ Sonatype.utils = {
     		return output;
     	}
     }
-  }()
+  }(),
+  
+  defaultToNo: function() {
+    //@note: this handler selects the "No" button as the default
+    //@todo: could extend Ext.MessageBox to take the button to select as a param
+    Ext.Msg.getDialog().on('show', function(){
+        this.focusEl = this.buttons[2]; //ack! we're offset dependent here
+        this.focus();
+      },
+      Ext.Msg.getDialog(),
+      {single:true}
+    );
+  }
   
 };
 

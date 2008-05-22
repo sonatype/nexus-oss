@@ -493,43 +493,71 @@ Ext.extend(Sonatype.repoServer.RoutesEditPanel, Ext.Panel, {
   
   deleteResourceHandler : function(){
     if (this.routesGridPanel.getSelectionModel().hasSelection()){
-      var rec = this.routesGridPanel.getSelectionModel().getSelected();
+      var selections = this.routesGridPanel.getSelectionModel().getSelections();
+  
+      if ( selections.length == 1 ) {
+        var rec = this.routesGridPanel.getSelectionModel().getSelected();
 
-      if(rec.data.resourceURI == 'new'){
-        this.cancelHandler({
-          formPanel : Ext.getCmp(rec.id),
-          isNew : true
-        });
+        if(rec.data.resourceURI == 'new'){
+          this.cancelHandler({
+            formPanel : Ext.getCmp(rec.id),
+            isNew : true
+          });
+        }
+        else {
+          Sonatype.utils.defaultToNo();
+          Ext.Msg.show({
+            animEl: this.routesGridPanel.getEl(),
+            title : 'Delete Route',
+            msg : 'Delete the ' + rec.get('pattern') + ' route?',
+            buttons: Ext.Msg.YESNO,
+            scope: this,
+            icon: Ext.Msg.QUESTION,
+            fn: function(btnName){
+              if (btnName == 'yes' || btnName == 'ok') {
+                Ext.Ajax.request({
+                  callback: this.deleteCallback,
+                  cbPassThru: {
+                    resourceId: rec.id
+                  },
+                  scope: this,
+                  method: 'DELETE',
+                  url:rec.data.resourceURI
+                });
+              }
+            }
+          });
+        }
       }
       else {
-        //@note: this handler selects the "No" button as the default
-        //@todo: could extend Ext.MessageBox to take the button to select as a param
-        Ext.Msg.getDialog().on('show', function(){
-          this.focusEl = this.buttons[2]; //ack! we're offset dependent here
-          this.focus();
-        },
-        Ext.Msg.getDialog(),
-        {single:true});
-        
+        Sonatype.utils.defaultToNo();
         Ext.Msg.show({
           animEl: this.routesGridPanel.getEl(),
-          title : 'Delete Route?',
-          msg : 'Delete the ' + rec.get('pattern') + ' route?',
+          title : 'Delete Routes',
+          msg : 'Delete ' + selections.length + ' routes?',
           buttons: Ext.Msg.YESNO,
           scope: this,
           icon: Ext.Msg.QUESTION,
           fn: function(btnName){
-            if (btnName == 'yes' || btnName == 'ok') {
-              Ext.Ajax.request({
-                callback: this.deleteCallback,
-                cbPassThru: {
-                  resourceId: rec.id
-                },
-                scope: this,
-                method: 'DELETE',
-                url:rec.data.resourceURI
-              });
-            }
+            Ext.each( selections, function(rec) {
+              if(rec.data.resourceURI == 'new'){
+                this.cancelHandler({
+                  formPanel : Ext.getCmp(rec.id),
+                  isNew : true
+                });
+              }
+              else {
+                Ext.Ajax.request({
+                  callback: this.deleteCallback,
+                   cbPassThru: {
+                    resourceId: rec.id
+                  },
+                  scope: this,
+                  method: 'DELETE',
+                  url:rec.data.resourceURI
+                });
+              }
+            }, this );
           }
         });
       }
