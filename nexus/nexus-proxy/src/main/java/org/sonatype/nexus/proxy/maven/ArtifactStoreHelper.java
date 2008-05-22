@@ -126,7 +126,8 @@ public class ArtifactStoreHelper
         // TODO: packaging2extension mapping, now we default to JAR
         // or use POM to "find" the packaging
         Gav gav = new Gav( gavRequest.getGroupId(), gavRequest.getArtifactId(), gavRequest.getVersion(), gavRequest
-            .getClassifier(), "jar", null, null, null, RepositoryPolicy.SNAPSHOT.equals( repository
+            .getClassifier(), repository.getArtifactPackagingMapper().getExtensionForPackaging(
+            gavRequest.getPackaging() ), null, null, null, RepositoryPolicy.SNAPSHOT.equals( repository
             .getRepositoryPolicy() ), false, null );
 
         RepositoryItemUid uid = new RepositoryItemUid( repository, repository.getGavCalculator().gavToPath( gav ) );
@@ -171,9 +172,14 @@ public class ArtifactStoreHelper
     {
         checkRequest( gavRequest );
 
-        // TODO: packaging2extension mapping, now we default to JAR
+        if ( gavRequest.getPackaging() == null )
+        {
+            throw new IllegalArgumentException( "Cannot generate POM without valid 'packaging'!" );
+        }
+
         Gav gav = new Gav( gavRequest.getGroupId(), gavRequest.getArtifactId(), gavRequest.getVersion(), gavRequest
-            .getClassifier(), "jar", null, null, null, RepositoryPolicy.SNAPSHOT.equals( repository
+            .getClassifier(), repository.getArtifactPackagingMapper().getExtensionForPackaging(
+            gavRequest.getPackaging() ), null, null, null, RepositoryPolicy.SNAPSHOT.equals( repository
             .getRepositoryPolicy() ), false, null );
 
         DefaultStorageFileItem file = new DefaultStorageFileItem( repository, repository.getGavCalculator().gavToPath(
@@ -241,7 +247,7 @@ public class ArtifactStoreHelper
             gavRequest.getArtifactId(),
             gavRequest.getVersion(),
             gavRequest.getClassifier(),
-            "jar",
+            repository.getArtifactPackagingMapper().getExtensionForPackaging( gavRequest.getPackaging() ),
             null,
             null,
             null,
@@ -262,7 +268,8 @@ public class ArtifactStoreHelper
             AccessDeniedException
     {
         Gav gav = new Gav( gavRequest.getGroupId(), gavRequest.getArtifactId(), gavRequest.getVersion(), gavRequest
-            .getClassifier(), "jar", null, null, null, RepositoryPolicy.SNAPSHOT.equals( repository
+            .getClassifier(), repository.getArtifactPackagingMapper().getExtensionForPackaging(
+            gavRequest.getPackaging() ), null, null, null, RepositoryPolicy.SNAPSHOT.equals( repository
             .getRepositoryPolicy() ), false, null );
 
         RepositoryItemUid uid = new RepositoryItemUid( repository, repository.getGavCalculator().gavToPath( gav ) );

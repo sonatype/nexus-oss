@@ -22,6 +22,7 @@ package org.sonatype.nexus.proxy.maven.maven2;
 
 import org.sonatype.nexus.artifact.GavCalculator;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
+import org.sonatype.nexus.proxy.maven.ArtifactPackagingMapper;
 import org.sonatype.nexus.proxy.maven.LayoutConverterShadowRepository;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 
@@ -50,6 +51,13 @@ public class M2LayoutedM1ShadowRepository
     private ContentClass masterContentClass;
 
     /**
+     * The artifact packaging mapper.
+     * 
+     * @plexus.requirement
+     */
+    private ArtifactPackagingMapper artifactPackagingMapper;
+
+    /**
      * This repo provides Maven2 content.
      */
     public ContentClass getRepositoryContentClass()
@@ -60,6 +68,11 @@ public class M2LayoutedM1ShadowRepository
     public GavCalculator getGavCalculator()
     {
         return getM2GavCalculator();
+    }
+
+    public ArtifactPackagingMapper getArtifactPackagingMapper()
+    {
+        return artifactPackagingMapper;
     }
 
     /**

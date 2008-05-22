@@ -83,13 +83,7 @@ public class AbstractArtifactResourceHandler
             return null;
         }
 
-        GAVRequest gavRequest = new GAVRequest();
-
-        gavRequest.setGroupId( groupId );
-
-        gavRequest.setArtifactId( artifactId );
-
-        gavRequest.setVersion( version );
+        GAVRequest gavRequest = new GAVRequest( groupId, artifactId, version );
 
         try
         {
@@ -184,6 +178,8 @@ public class AbstractArtifactResourceHandler
 
         String version = form.getFirstValue( "v" );
 
+        String packaging = form.getFirstValue( "p" );
+
         String classifier = form.getFirstValue( "c" );
 
         String repositoryId = form.getFirstValue( "r" );
@@ -195,15 +191,7 @@ public class AbstractArtifactResourceHandler
             return null;
         }
 
-        GAVRequest gavRequest = new GAVRequest();
-
-        gavRequest.setGroupId( groupId );
-
-        gavRequest.setArtifactId( artifactId );
-
-        gavRequest.setVersion( version );
-
-        gavRequest.setClassifier( classifier );
+        GAVRequest gavRequest = new GAVRequest( groupId, artifactId, version, packaging, classifier );
 
         try
         {
@@ -318,13 +306,13 @@ public class AbstractArtifactResourceHandler
                             {
                                 version = fi.getString();
                             }
-                            else if ( "c".equals( fi.getFieldName() ) )
-                            {
-                                classifier = fi.getString();
-                            }
                             else if ( "p".equals( fi.getFieldName() ) )
                             {
                                 packaging = fi.getString();
+                            }
+                            else if ( "c".equals( fi.getFieldName() ) )
+                            {
+                                classifier = fi.getString();
                             }
                             else if ( "hasPom".equals( fi.getFieldName() ) )
                             {
@@ -335,21 +323,11 @@ public class AbstractArtifactResourceHandler
                         {
                             // a file
                             isPom = fi.getName().endsWith( ".pom" );
-
+                            
                             is = fi.getInputStream();
                         }
 
-                        GAVRequest gavRequest = new GAVRequest();
-
-                        gavRequest.setGroupId( groupId );
-
-                        gavRequest.setArtifactId( artifactId );
-
-                        gavRequest.setVersion( version );
-
-                        gavRequest.setClassifier( classifier );
-
-                        gavRequest.setPackaging( packaging );
+                        GAVRequest gavRequest = new GAVRequest( groupId, artifactId, version, packaging, classifier );
 
                         try
                         {

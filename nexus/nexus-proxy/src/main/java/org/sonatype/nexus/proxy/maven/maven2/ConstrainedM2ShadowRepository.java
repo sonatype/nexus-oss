@@ -50,6 +50,7 @@ import org.sonatype.nexus.proxy.item.PreparedContentLocator;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
+import org.sonatype.nexus.proxy.maven.ArtifactPackagingMapper;
 import org.sonatype.nexus.proxy.maven.ArtifactStoreHelper;
 import org.sonatype.nexus.proxy.maven.ChecksumPolicy;
 import org.sonatype.nexus.proxy.maven.GAVRequest;
@@ -86,6 +87,13 @@ public class ConstrainedM2ShadowRepository
      * @plexus.requirement role-hint="maven2"
      */
     private ContentClass contentClass;
+
+    /**
+     * The artifact packaging mapper.
+     * 
+     * @plexus.requirement
+     */
+    private ArtifactPackagingMapper artifactPackagingMapper;
 
     /**
      * ArtifactStoreHelper.
@@ -133,7 +141,12 @@ public class ConstrainedM2ShadowRepository
 
     public RepositoryPolicy getRepositoryPolicy()
     {
-        return ( (MavenRepository) getMasterRepository() ).getRepositoryPolicy();
+        return getMasterRepository().getRepositoryPolicy();
+    }
+
+    public ArtifactPackagingMapper getArtifactPackagingMapper()
+    {
+        return artifactPackagingMapper;
     }
 
     protected ArtifactStoreHelper getArtifactStoreHelper()
@@ -467,37 +480,37 @@ public class ConstrainedM2ShadowRepository
 
     public void setChecksumPolicy( ChecksumPolicy checksumPolicy )
     {
-        throw new UnsupportedOperationException("This method is not supported on Repository of type SHADOW");
+        throw new UnsupportedOperationException( "This method is not supported on Repository of type SHADOW" );
     }
 
     public void setCleanseRepositoryMetadata( boolean cleanseRepositoryMetadata )
     {
-        throw new UnsupportedOperationException("This method is not supported on Repository of type SHADOW");
+        throw new UnsupportedOperationException( "This method is not supported on Repository of type SHADOW" );
     }
 
     public void setFixRepositoryChecksums( boolean fixRepositoryChecksums )
     {
-        throw new UnsupportedOperationException("This method is not supported on Repository of type SHADOW");
+        throw new UnsupportedOperationException( "This method is not supported on Repository of type SHADOW" );
     }
 
     public void setMetadataMaxAge( int metadataMaxAge )
     {
-        throw new UnsupportedOperationException("This method is not supported on Repository of type SHADOW");
+        throw new UnsupportedOperationException( "This method is not supported on Repository of type SHADOW" );
     }
 
     public void setReleaseMaxAge( int releaseMaxAge )
     {
-        throw new UnsupportedOperationException("This method is not supported on Repository of type SHADOW");
+        throw new UnsupportedOperationException( "This method is not supported on Repository of type SHADOW" );
     }
 
     public void setRepositoryPolicy( RepositoryPolicy repositoryPolicy )
     {
-        throw new UnsupportedOperationException("This method is not supported on Repository of type SHADOW");
+        throw new UnsupportedOperationException( "This method is not supported on Repository of type SHADOW" );
     }
 
     public void setSnapshotMaxAge( int snapshotMaxAge )
     {
-        throw new UnsupportedOperationException("This method is not supported on Repository of type SHADOW");
+        throw new UnsupportedOperationException( "This method is not supported on Repository of type SHADOW" );
     }
 
 }

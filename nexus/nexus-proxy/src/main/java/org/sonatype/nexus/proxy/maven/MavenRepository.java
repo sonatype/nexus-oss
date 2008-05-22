@@ -9,6 +9,8 @@ public interface MavenRepository
     GavCalculator getGavCalculator();
 
     ChecksumPolicy getChecksumPolicy();
+    
+    ArtifactPackagingMapper getArtifactPackagingMapper();
 
     void setChecksumPolicy( ChecksumPolicy checksumPolicy );
 
