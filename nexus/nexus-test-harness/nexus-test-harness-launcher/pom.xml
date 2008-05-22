@@ -42,11 +42,13 @@
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
-		    <groupId>org.sonatype.appbooter.plexus-booters</groupId>
-		    <artifactId>plexus-app-booter</artifactId>
-		    <version>1.2-SNAPSHOT</version>
+		    <groupId>org.codehaus.plexus</groupId>
+            <artifactId>plexus-archiver</artifactId>
+            <version>1.0-alpha-9</version>
+            <scope>test</scope>
 		</dependency>
 	</dependencies>
 	<build>
