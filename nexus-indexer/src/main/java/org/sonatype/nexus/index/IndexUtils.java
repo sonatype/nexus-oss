@@ -48,19 +48,24 @@ public class IndexUtils
     {
         synchronized ( directory )
         {
-            deleteTimestamp( directory );
-
-            IndexOutput io = directory.createOutput( TIMESTAMP_FILE );
-
-            try
+            Date currentTimestamp = getTimestamp( directory );
+            
+            if ( currentTimestamp == null || !currentTimestamp.equals( timestamp ) ) 
             {
-                io.writeLong( timestamp.getTime() );
-
-                io.flush();
-            }
-            finally
-            {
-                close( io );
+                deleteTimestamp( directory );
+        
+                IndexOutput io = directory.createOutput( TIMESTAMP_FILE );
+        
+                try 
+                {
+                    io.writeLong( timestamp.getTime() );
+        
+                    io.flush();
+                } 
+                finally 
+                {
+                    close( io );
+                }
             }
         }
     }

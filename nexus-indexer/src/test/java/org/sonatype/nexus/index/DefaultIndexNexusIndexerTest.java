@@ -46,7 +46,12 @@ public class DefaultIndexNexusIndexerTest
             null,
             null,
             NexusIndexer.DEFAULT_INDEX, false );
+        
+        assertNull( context.getTimestamp() );  // unknown upon creation
+        
         nexusIndexer.scan( context );
+        
+        assertNotNull( context.getTimestamp() );
     }
 
     public void testSearchGroupedClasses()
@@ -182,7 +187,9 @@ public class DefaultIndexNexusIndexerTest
         
         Thread.sleep( 1000L );
         
-        Directory newIndexDir = FSDirectory.getDirectory( new File( getBasedir(), "target/test-new" ) );
+        File newIndex = new File( getBasedir(), "target/test-new" );
+        
+        Directory newIndexDir = FSDirectory.getDirectory( newIndex );
         
         IndexUtils.unpackIndexArchive( new ByteArrayInputStream( os.toByteArray() ), newIndexDir );
         
@@ -195,7 +202,7 @@ public class DefaultIndexNexusIndexerTest
             null, 
             NexusIndexer.DEFAULT_INDEX, false );
         
-        assertEquals( 0, newContext.getTimestamp().getTime() - context.getTimestamp().getTime() );
+        assertEquals( context.getTimestamp().getTime(), newContext.getTimestamp().getTime() );
 
         assertEquals( context.getTimestamp(), newContext.getTimestamp() );
 
@@ -222,6 +229,8 @@ public class DefaultIndexNexusIndexerTest
         assertEquals( "test", ai.repository );
         
         newContext.close( true );
+        
+        assertFalse( new File( newIndex, "timestamp" ).exists() );
     }
 
 }

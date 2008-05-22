@@ -84,7 +84,7 @@ public class DefaultIndexingContext
 
     private NexusIndexWriter indexWriter;
 
-    private long timestamp;
+    private Date timestamp;
 
     private List<? extends IndexCreator> indexCreators;
 
@@ -178,18 +178,14 @@ public class DefaultIndexingContext
             storeDescriptor();
         }
 
-        Date ts = IndexUtils.getTimestamp( indexDirectory );
+        timestamp = IndexUtils.getTimestamp( indexDirectory );
 
-        if ( ts == null )
-        {
-            IndexUtils.updateTimestamp( indexDirectory, new Date( System.currentTimeMillis() ) );
-
-            timestamp = IndexUtils.getTimestamp( indexDirectory ).getTime();
-        }
-        else
-        {
-            timestamp = ts.getTime();
-        }
+//        if ( timestamp == null )
+//        {
+//            timestamp = new Date( System.currentTimeMillis() );
+//
+//            IndexUtils.updateTimestamp( indexDirectory, timestamp );
+//        }
     }
 
     private void checkAndUpdateIndexDescriptor( boolean reclaimIndex )
@@ -281,12 +277,12 @@ public class DefaultIndexingContext
     public void updateTimestamp()
         throws IOException
     {
-        timestamp = System.currentTimeMillis();
+        timestamp = new Date();
     }
 
     public Date getTimestamp()
     {
-        return new Date( timestamp );
+        return timestamp;
     }
 
     public String getRepositoryId()
