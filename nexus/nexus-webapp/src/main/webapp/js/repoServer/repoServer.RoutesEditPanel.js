@@ -46,7 +46,10 @@ Sonatype.repoServer.RoutesEditPanel = function(config){
     };
   
   var tfStore = new Ext.data.SimpleStore({fields:['value'], data:[['True'],['False']]});
-  var ruleTypeStore = new Ext.data.SimpleStore({fields:['value'], data:[['Inclusive'],['Exclusive']]});
+  this.ruleTypeStore = new Ext.data.SimpleStore({fields:['value'], data:[['Blocking'],['Exclusive'],['Inclusive']]});
+  this.BLOCKING_TYPE_INDEX = 0;
+  this.BLOCKING = 'Blocking';
+  this.TREE_PANEL_ID_SUFFIX = '_route-tree-panel';
   
   var ht = Sonatype.repoServer.resources.help.routes;
   
@@ -101,7 +104,7 @@ Sonatype.repoServer.RoutesEditPanel = function(config){
         name: 'ruleType',
         //hiddenName: 'connectionTimeout',
         width: 75,
-        store: ruleTypeStore,
+        store: this.ruleTypeStore,
         displayField:'value',
         editable: false,
         forceSelection: true,
@@ -109,10 +112,20 @@ Sonatype.repoServer.RoutesEditPanel = function(config){
         triggerAction: 'all',
         emptyText:'Select...',
         selectOnFocus:true,
-        allowBlank: false       
+        allowBlank: false,
+        listeners: {
+          'select': {
+            fn: function(combo, record, index) {
+              this.updateTreePanel( index == this.BLOCKING_TYPE_INDEX,
+                combo.findParentByType( 'form' ).id );
+            },
+            scope: this
+          }
+        }       
       },
       {
         xtype: 'panel',
+        id: this.TREE_PANEL_ID_SUFFIX,
         layout: 'column',
         autoHeight: true,
         style: 'padding: 10px 0 0 0',
@@ -679,6 +692,10 @@ Ext.extend(Sonatype.repoServer.RoutesEditPanel, Ext.Panel, {
         this.routesDataStore.sort(sortState.field, sortState.direction);
       }
     }
+    else if ( action.type == 'sonatypeLoad' ) {
+      var value = action.options.fpanel.find('name', 'ruleType')[0].getValue();
+      this.updateTreePanel( value == this.BLOCKING, action.options.fpanel.id );
+    }
   },
 
   //(Ext.form.BasicForm, Ext.form.Action)
@@ -758,6 +775,7 @@ Ext.extend(Sonatype.repoServer.RoutesEditPanel, Ext.Panel, {
       {obj : newConfig.items[3].items[1], postpend : '_route-all-repos-tree'}
     ];
 
+    newConfig.items[3].id = id + this.TREE_PANEL_ID_SUFFIX;
     for (var i = 0; i<trees.length; i++) {
       trees[i].obj.id = id + trees[i].postpend;
       trees[i].obj.root = new Ext.tree.TreeNode({text: 'root'});
@@ -837,5 +855,13 @@ Ext.extend(Sonatype.repoServer.RoutesEditPanel, Ext.Panel, {
     }
 
     return outputArr;
+  },
+  
+  updateTreePanel: function( blockingType, id ) {
+    var p = this.findById( id + this.TREE_PANEL_ID_SUFFIX );
+    p.setVisible( ! blockingType );
+    p.items.items[0].validate = blockingType ?
+      function() { return true; } :
+      function() { return (this.root.childNodes.length > 0); };
   }
 });
