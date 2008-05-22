@@ -31,7 +31,7 @@ import org.codehaus.plexus.util.io.InputStreamFacade;
 import org.sonatype.nexus.AbstractNexusTestCase;
 import org.sonatype.nexus.configuration.model.CRemoteHttpProxySettings;
 import org.sonatype.nexus.configuration.model.Configuration;
-import org.sonatype.nexus.proxy.maven.M2GroupIdBasedRepositoryRouter;
+import org.sonatype.nexus.proxy.maven.maven2.M2GroupIdBasedRepositoryRouter;
 import org.sonatype.nexus.proxy.router.RepositoryRouter;
 
 public class DefaultNexusConfigurationTest

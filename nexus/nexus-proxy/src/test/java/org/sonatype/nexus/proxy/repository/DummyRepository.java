@@ -593,4 +593,16 @@ public class DummyRepository
         
     }
 
+    public int getItemMaxAge()
+    {
+        // TODO Auto-generated method stub
+        return 0;
+    }
+
+    public void setItemMaxAge( int itemMaxAge )
+    {
+        // TODO Auto-generated method stub
+        
+    }
+
 }

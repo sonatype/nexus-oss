@@ -33,6 +33,7 @@ import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
+import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.ShadowRepository;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 
@@ -63,6 +64,23 @@ public abstract class LayoutConverterShadowRepository
      * ArtifactStoreHelper.
      */
     private ArtifactStoreHelper artifactStoreHelper;
+
+    public MavenRepository getMasterRepository()
+    {
+        return (MavenRepository) super.getMasterRepository();
+    }
+
+    public void setMasterRepository( Repository masterRepository )
+    {
+        // we allow only MavenRepository instances as masters
+        if ( !MavenRepository.class.isAssignableFrom( masterRepository.getClass() ) )
+        {
+            throw new IllegalArgumentException(
+                "This shadow repository needs master repository which implements MavenRepository interface!" );
+        }
+
+        super.setMasterRepository( masterRepository );
+    }
 
     public GavCalculator getM1GavCalculator()
     {
@@ -163,6 +181,74 @@ public abstract class LayoutConverterShadowRepository
     public Collection<Gav> listArtifacts( GAVRequest gavRequest )
     {
         return getArtifactStoreHelper().listArtifacts( gavRequest );
+    }
+    
+    // =======================================================================================
+    // MavenRepository iface, delegates to master simply
+
+    public ChecksumPolicy getChecksumPolicy()
+    {
+        return getMasterRepository().getChecksumPolicy();
+    }
+
+    public int getMetadataMaxAge()
+    {
+        return getMasterRepository().getMetadataMaxAge();
+    }
+
+    public int getReleaseMaxAge()
+    {
+        return getMasterRepository().getReleaseMaxAge();
+    }
+
+    public int getSnapshotMaxAge()
+    {
+        return getMasterRepository().getSnapshotMaxAge();
+    }
+
+    public boolean isCleanseRepositoryMetadata()
+    {
+        return getMasterRepository().isCleanseRepositoryMetadata();
+    }
+
+    public boolean isFixRepositoryChecksums()
+    {
+        return getMasterRepository().isFixRepositoryChecksums();
+    }
+
+    public void setChecksumPolicy( ChecksumPolicy checksumPolicy )
+    {
+        throw new UnsupportedOperationException("This method is not supported on Repository of type SHADOW");
+    }
+
+    public void setCleanseRepositoryMetadata( boolean cleanseRepositoryMetadata )
+    {
+        throw new UnsupportedOperationException("This method is not supported on Repository of type SHADOW");
+    }
+
+    public void setFixRepositoryChecksums( boolean fixRepositoryChecksums )
+    {
+        throw new UnsupportedOperationException("This method is not supported on Repository of type SHADOW");
+    }
+
+    public void setMetadataMaxAge( int metadataMaxAge )
+    {
+        throw new UnsupportedOperationException("This method is not supported on Repository of type SHADOW");
+    }
+
+    public void setReleaseMaxAge( int releaseMaxAge )
+    {
+        throw new UnsupportedOperationException("This method is not supported on Repository of type SHADOW");
+    }
+
+    public void setRepositoryPolicy( RepositoryPolicy repositoryPolicy )
+    {
+        throw new UnsupportedOperationException("This method is not supported on Repository of type SHADOW");
+    }
+
+    public void setSnapshotMaxAge( int snapshotMaxAge )
+    {
+        throw new UnsupportedOperationException("This method is not supported on Repository of type SHADOW");
     }
 
     // =================================================================================

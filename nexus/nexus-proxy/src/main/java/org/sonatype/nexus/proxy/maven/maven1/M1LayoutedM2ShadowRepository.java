@@ -18,38 +18,39 @@
  * along with this program.  If not, see http://www.gnu.org/licenses/.
  *
  */
-package org.sonatype.nexus.proxy.maven;
+package org.sonatype.nexus.proxy.maven.maven1;
 
 import org.sonatype.nexus.artifact.GavCalculator;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
+import org.sonatype.nexus.proxy.maven.LayoutConverterShadowRepository;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 
 /**
- * A shadow repository that transforms M1 content hierarchy of master to M2 layouted shadow.
+ * A shadow repository that transforms M2 layout of master to M1 layouted shadow.
  * 
  * @author cstamas
  * @plexus.component instantiation-strategy="per-lookup" role="org.sonatype.nexus.proxy.repository.Repository"
- *                   role-hint="m1-m2-shadow"
+ *                   role-hint="m2-m1-shadow"
  */
-public class M2LayoutedM1ShadowRepository
+public class M1LayoutedM2ShadowRepository
     extends LayoutConverterShadowRepository
 {
     /**
      * The ContentClass.
      * 
-     * @plexus.requirement role-hint="maven2"
+     * @plexus.requirement role-hint="maven1"
      */
     private ContentClass contentClass;
 
     /**
      * The ContentClass.
      * 
-     * @plexus.requirement role-hint="maven1"
+     * @plexus.requirement role-hint="maven2"
      */
     private ContentClass masterContentClass;
 
     /**
-     * This repo provides Maven2 content.
+     * This repo provides Maven1 content.
      */
     public ContentClass getRepositoryContentClass()
     {
@@ -58,11 +59,11 @@ public class M2LayoutedM1ShadowRepository
 
     public GavCalculator getGavCalculator()
     {
-        return getM2GavCalculator();
+        return getM1GavCalculator();
     }
 
     /**
-     * This repo needs Maven1 content master.
+     * This repo needs Maven2 content master.
      */
     public ContentClass getMasterRepositoryContentClass()
     {
@@ -72,12 +73,13 @@ public class M2LayoutedM1ShadowRepository
     protected String transformMaster2Shadow( String path )
         throws ItemNotFoundException
     {
-        return transformM1toM2( path );
+        return transformM2toM1( path );
     }
 
     protected String transformShadow2Master( String path )
         throws ItemNotFoundException
     {
-        return transformM2toM1( path );
+        return transformM1toM2( path );
     }
+
 }

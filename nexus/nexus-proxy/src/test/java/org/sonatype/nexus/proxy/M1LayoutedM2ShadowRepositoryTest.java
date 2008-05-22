@@ -27,7 +27,7 @@ import org.codehaus.plexus.component.repository.exception.ComponentLookupExcepti
 import org.sonatype.jettytestsuite.ServletServer;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.item.StorageLinkItem;
-import org.sonatype.nexus.proxy.maven.M1LayoutedM2ShadowRepository;
+import org.sonatype.nexus.proxy.maven.maven1.M1LayoutedM2ShadowRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 
 public class M1LayoutedM2ShadowRepositoryTest

@@ -18,7 +18,7 @@
  * along with this program.  If not, see http://www.gnu.org/licenses/.
  *
  */
-package org.sonatype.nexus.proxy.maven;
+package org.sonatype.nexus.proxy.maven.maven2;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -50,7 +50,13 @@ import org.sonatype.nexus.proxy.item.PreparedContentLocator;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
+import org.sonatype.nexus.proxy.maven.ArtifactStoreHelper;
+import org.sonatype.nexus.proxy.maven.ChecksumPolicy;
+import org.sonatype.nexus.proxy.maven.GAVRequest;
+import org.sonatype.nexus.proxy.maven.MavenRepository;
+import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.proxy.registry.ContentClass;
+import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.ShadowRepository;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.util.AlphanumComparator;
@@ -96,6 +102,23 @@ public class ConstrainedM2ShadowRepository
     public void setVersionMap( Map<String, String> versionMap )
     {
         this.versionMap = versionMap;
+    }
+
+    public MavenRepository getMasterRepository()
+    {
+        return (MavenRepository) super.getMasterRepository();
+    }
+
+    public void setMasterRepository( Repository masterRepository )
+    {
+        // we allow only MavenRepository instances as masters
+        if ( !MavenRepository.class.isAssignableFrom( masterRepository.getClass() ) )
+        {
+            throw new IllegalArgumentException(
+                "This shadow repository needs master repository which implements MavenRepository interface!" );
+        }
+
+        super.setMasterRepository( masterRepository );
     }
 
     public ContentClass getRepositoryContentClass()
@@ -407,6 +430,74 @@ public class ConstrainedM2ShadowRepository
         {
             return artifactId;
         }
+    }
+
+    // =======================================================================================
+    // MavenRepository iface, delegates to master simply
+
+    public ChecksumPolicy getChecksumPolicy()
+    {
+        return getMasterRepository().getChecksumPolicy();
+    }
+
+    public int getMetadataMaxAge()
+    {
+        return getMasterRepository().getMetadataMaxAge();
+    }
+
+    public int getReleaseMaxAge()
+    {
+        return getMasterRepository().getReleaseMaxAge();
+    }
+
+    public int getSnapshotMaxAge()
+    {
+        return getMasterRepository().getSnapshotMaxAge();
+    }
+
+    public boolean isCleanseRepositoryMetadata()
+    {
+        return getMasterRepository().isCleanseRepositoryMetadata();
+    }
+
+    public boolean isFixRepositoryChecksums()
+    {
+        return getMasterRepository().isFixRepositoryChecksums();
+    }
+
+    public void setChecksumPolicy( ChecksumPolicy checksumPolicy )
+    {
+        throw new UnsupportedOperationException("This method is not supported on Repository of type SHADOW");
+    }
+
+    public void setCleanseRepositoryMetadata( boolean cleanseRepositoryMetadata )
+    {
+        throw new UnsupportedOperationException("This method is not supported on Repository of type SHADOW");
+    }
+
+    public void setFixRepositoryChecksums( boolean fixRepositoryChecksums )
+    {
+        throw new UnsupportedOperationException("This method is not supported on Repository of type SHADOW");
+    }
+
+    public void setMetadataMaxAge( int metadataMaxAge )
+    {
+        throw new UnsupportedOperationException("This method is not supported on Repository of type SHADOW");
+    }
+
+    public void setReleaseMaxAge( int releaseMaxAge )
+    {
+        throw new UnsupportedOperationException("This method is not supported on Repository of type SHADOW");
+    }
+
+    public void setRepositoryPolicy( RepositoryPolicy repositoryPolicy )
+    {
+        throw new UnsupportedOperationException("This method is not supported on Repository of type SHADOW");
+    }
+
+    public void setSnapshotMaxAge( int snapshotMaxAge )
+    {
+        throw new UnsupportedOperationException("This method is not supported on Repository of type SHADOW");
     }
 
 }

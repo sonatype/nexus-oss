@@ -18,21 +18,21 @@
  * along with this program.  If not, see http://www.gnu.org/licenses/.
  *
  */
-package org.sonatype.nexus.proxy.maven;
+package org.sonatype.nexus.proxy.maven.maven1;
 
-import org.sonatype.nexus.artifact.GavCalculator;
-import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.registry.ContentClass;
+import org.sonatype.nexus.proxy.router.DefaultGroupIdBasedRepositoryRouter;
 
 /**
- * A shadow repository that transforms M2 layout of master to M1 layouted shadow.
+ * Mavenized version of RepoGrouId based router. The only difference with the base class is the maven specific
+ * aggregation. Since requests may hit multiple resources in groups with multiple repositories, this is the place where
+ * we aggregate them. Aggregation happens for repository metadata only.
  * 
  * @author cstamas
- * @plexus.component instantiation-strategy="per-lookup" role="org.sonatype.nexus.proxy.repository.Repository"
- *                   role-hint="m2-m1-shadow"
+ * @plexus.component role-hint="groups-m1"
  */
-public class M1LayoutedM2ShadowRepository
-    extends LayoutConverterShadowRepository
+public class M1GroupIdBasedRepositoryRouter
+    extends DefaultGroupIdBasedRepositoryRouter
 {
     /**
      * The ContentClass.
@@ -40,45 +40,9 @@ public class M1LayoutedM2ShadowRepository
      * @plexus.requirement role-hint="maven1"
      */
     private ContentClass contentClass;
-
-    /**
-     * The ContentClass.
-     * 
-     * @plexus.requirement role-hint="maven2"
-     */
-    private ContentClass masterContentClass;
-
-    /**
-     * This repo provides Maven1 content.
-     */
-    public ContentClass getRepositoryContentClass()
+    
+    public ContentClass getHandledContentClass()
     {
         return contentClass;
     }
-
-    public GavCalculator getGavCalculator()
-    {
-        return getM1GavCalculator();
-    }
-
-    /**
-     * This repo needs Maven2 content master.
-     */
-    public ContentClass getMasterRepositoryContentClass()
-    {
-        return masterContentClass;
-    }
-
-    protected String transformMaster2Shadow( String path )
-        throws ItemNotFoundException
-    {
-        return transformM2toM1( path );
-    }
-
-    protected String transformShadow2Master( String path )
-        throws ItemNotFoundException
-    {
-        return transformM1toM2( path );
-    }
-
 }

@@ -33,7 +33,7 @@ import org.codehaus.plexus.util.IOUtil;
 import org.sonatype.jettytestsuite.ServletServer;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
-import org.sonatype.nexus.proxy.maven.M2GroupIdBasedRepositoryRouter;
+import org.sonatype.nexus.proxy.maven.maven2.M2GroupIdBasedRepositoryRouter;
 
 public class GroupingBehaviourTest
     extends AbstractProxyTestEnvironment

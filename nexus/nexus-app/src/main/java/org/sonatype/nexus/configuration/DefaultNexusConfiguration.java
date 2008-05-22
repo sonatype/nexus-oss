@@ -50,11 +50,11 @@ import org.sonatype.nexus.configuration.validator.ValidationResponse;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryGroupException;
 import org.sonatype.nexus.proxy.access.AccessManager;
-import org.sonatype.nexus.proxy.maven.M2Repository;
 import org.sonatype.nexus.proxy.registry.InvalidGroupingException;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.LocalStatus;
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.proxy.repository.RepositoryType;
 import org.sonatype.nexus.proxy.repository.ShadowRepository;
 import org.sonatype.nexus.proxy.storage.remote.DefaultRemoteStorageContext;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
@@ -660,7 +660,7 @@ public class DefaultNexusConfiguration
         {
             Repository repository = repositoryRegistry.getRepository( settings.getId() );
 
-            if ( M2Repository.class.isAssignableFrom( repository.getClass() ) )
+            if ( !RepositoryType.SHADOW.equals( repository.getRepositoryType() ) )
             {
                 Repository newRepository = runtimeConfigurationBuilder.createRepositoryFromModel(
                     getConfiguration(),

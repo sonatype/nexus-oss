@@ -134,6 +134,20 @@ public interface Repository
     void removeFromNotFoundCache( String path );
 
     /**
+     * Gets the item max age in (in minutes).
+     * 
+     * @return the item max age in (in minutes)
+     */
+    int getItemMaxAge();
+
+    /**
+     * Sets the item max age in (in minutes).
+     * 
+     * @param itemMaxAgeInSeconds the new item max age in (in minutes).
+     */
+    void setItemMaxAge( int itemMaxAge );
+
+    /**
      * Gets local status.
      */
     LocalStatus getLocalStatus();

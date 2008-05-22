@@ -46,12 +46,9 @@ import org.sonatype.nexus.proxy.access.AccessDecisionVoter;
 import org.sonatype.nexus.proxy.access.AccessManager;
 import org.sonatype.nexus.proxy.access.OpenAccessManager;
 import org.sonatype.nexus.proxy.maven.ChecksumPolicy;
-import org.sonatype.nexus.proxy.maven.ConstrainedM2ShadowRepository;
-import org.sonatype.nexus.proxy.maven.M1LayoutedM2ShadowRepository;
-import org.sonatype.nexus.proxy.maven.M1Repository;
-import org.sonatype.nexus.proxy.maven.M2LayoutedM1ShadowRepository;
-import org.sonatype.nexus.proxy.maven.M2Repository;
+import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
+import org.sonatype.nexus.proxy.maven.maven2.ConstrainedM2ShadowRepository;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.LocalStatus;
 import org.sonatype.nexus.proxy.repository.ProxyMode;
@@ -110,7 +107,7 @@ public class DefaultRuntimeConfigurationBuilder
             // Setting contentClass specific things on a repository
             if ( CRepository.TYPE_MAVEN2.equals( repo.getType() ) )
             {
-                M2Repository m2repository = (M2Repository) plexusContainer.lookup( Repository.ROLE, "maven2" );
+                MavenRepository m2repository = (MavenRepository) plexusContainer.lookup( Repository.ROLE, "maven2" );
 
                 m2repository.setId( repo.getId() );
                 m2repository.setName( repo.getName() );
@@ -141,7 +138,7 @@ public class DefaultRuntimeConfigurationBuilder
             }
             else if ( CRepository.TYPE_MAVEN1.equals( repo.getType() ) )
             {
-                M1Repository m1repository = (M1Repository) plexusContainer.lookup( Repository.ROLE, "maven1" );
+                MavenRepository m1repository = (MavenRepository) plexusContainer.lookup( Repository.ROLE, "maven1" );
 
                 m1repository.setId( repo.getId() );
                 m1repository.setName( repo.getName() );
@@ -260,7 +257,7 @@ public class DefaultRuntimeConfigurationBuilder
 
             if ( CRepositoryShadow.TYPE_MAVEN1.equals( shadow.getType() ) )
             {
-                shadowRepository = (M1LayoutedM2ShadowRepository) plexusContainer.lookup(
+                shadowRepository = (ShadowRepository) plexusContainer.lookup(
                     Repository.ROLE,
                     "m2-m1-shadow" );
 
@@ -275,11 +272,11 @@ public class DefaultRuntimeConfigurationBuilder
                 shadowRepository.setIndexable( false );
                 shadowRepository.setNotFoundCacheTimeToLive( master.getNotFoundCacheTimeToLive() );
 
-                shadowRepository.setItemMaxAge( ( (M2Repository) master ).getItemMaxAge() );
+                shadowRepository.setItemMaxAge( ( (MavenRepository) master ).getItemMaxAge() );
             }
             else if ( CRepositoryShadow.TYPE_MAVEN2.equals( shadow.getType() ) )
             {
-                shadowRepository = (M2LayoutedM1ShadowRepository) plexusContainer.lookup(
+                shadowRepository = (ShadowRepository) plexusContainer.lookup(
                     Repository.ROLE,
                     "m1-m2-shadow" );
 
@@ -294,11 +291,11 @@ public class DefaultRuntimeConfigurationBuilder
                 shadowRepository.setIndexable( false );
                 shadowRepository.setNotFoundCacheTimeToLive( master.getNotFoundCacheTimeToLive() );
 
-                shadowRepository.setItemMaxAge( ( (M1Repository) master ).getItemMaxAge() );
+                shadowRepository.setItemMaxAge( ( (MavenRepository) master ).getItemMaxAge() );
             }
             else if ( CRepositoryShadow.TYPE_MAVEN2_CONSTRAINED.equals( shadow.getType() ) )
             {
-                shadowRepository = (ConstrainedM2ShadowRepository) plexusContainer.lookup(
+                shadowRepository = (ShadowRepository) plexusContainer.lookup(
                     Repository.ROLE,
                     "m2-constrained" );
 
@@ -313,7 +310,7 @@ public class DefaultRuntimeConfigurationBuilder
                 shadowRepository.setIndexable( false );
                 shadowRepository.setNotFoundCacheTimeToLive( master.getNotFoundCacheTimeToLive() );
 
-                shadowRepository.setItemMaxAge( ( (M2Repository) master ).getItemMaxAge() );
+                shadowRepository.setItemMaxAge( ( (MavenRepository) master ).getItemMaxAge() );
 
                 if ( shadow.getArtifactVersionConstraints() != null )
                 {

@@ -18,20 +18,20 @@
  * along with this program.  If not, see http://www.gnu.org/licenses/.
  *
  */
-package org.sonatype.nexus.proxy.maven;
+package org.sonatype.nexus.proxy.maven.maven2;
 
 import org.sonatype.nexus.proxy.registry.AbstractIdContentClass;
 
 /**
- * The Maven1 content class.
+ * The Maven2 content class.
  * 
  * @author cstamas
- * @plexus.component role-hint="maven1"
+ * @plexus.component role-hint="maven2"
  */
-public class Maven1ContentClass
+public class Maven2ContentClass
     extends AbstractIdContentClass
 {
-    private static final String ID = "maven1";
+    private static final String ID = "maven2";
 
     public String getId()
     {

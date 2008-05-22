@@ -25,7 +25,7 @@ import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.sonatype.nexus.proxy.NoSuchRepositoryRouterException;
 import org.sonatype.nexus.proxy.ResourceStore;
-import org.sonatype.nexus.proxy.maven.M2GroupIdBasedRepositoryRouter;
+import org.sonatype.nexus.proxy.maven.maven2.M2GroupIdBasedRepositoryRouter;
 import org.sonatype.nexus.proxy.router.RepositoryRouter;
 import org.sonatype.nexus.rest.AbstractResourceStoreContentResource;
 

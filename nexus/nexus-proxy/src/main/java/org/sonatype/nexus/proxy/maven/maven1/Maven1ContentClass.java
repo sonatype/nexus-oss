@@ -18,31 +18,23 @@
  * along with this program.  If not, see http://www.gnu.org/licenses/.
  *
  */
-package org.sonatype.nexus.proxy.maven;
+package org.sonatype.nexus.proxy.maven.maven1;
 
-import org.sonatype.nexus.proxy.registry.ContentClass;
-import org.sonatype.nexus.proxy.router.DefaultGroupIdBasedRepositoryRouter;
+import org.sonatype.nexus.proxy.registry.AbstractIdContentClass;
 
 /**
- * Mavenized version of RepoGrouId based router. The only difference with the base class is the maven specific
- * aggregation. Since requests may hit multiple resources in groups with multiple repositories, this is the place where
- * we aggregate them. Aggregation happens for repository metadata only.
+ * The Maven1 content class.
  * 
  * @author cstamas
- * @plexus.component role-hint="groups-m1"
+ * @plexus.component role-hint="maven1"
  */
-public class M1GroupIdBasedRepositoryRouter
-    extends DefaultGroupIdBasedRepositoryRouter
+public class Maven1ContentClass
+    extends AbstractIdContentClass
 {
-    /**
-     * The ContentClass.
-     * 
-     * @plexus.requirement role-hint="maven1"
-     */
-    private ContentClass contentClass;
-    
-    public ContentClass getHandledContentClass()
+    private static final String ID = "maven1";
+
+    public String getId()
     {
-        return contentClass;
+        return ID;
     }
 }

@@ -26,7 +26,7 @@ import org.sonatype.nexus.proxy.events.EventListener;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.maven.ChecksumPolicy;
-import org.sonatype.nexus.proxy.maven.M2Repository;
+import org.sonatype.nexus.proxy.maven.maven2.M2Repository;
 
 public class RepoChecksumPolicyTest
     extends AbstractProxyTestEnvironment
