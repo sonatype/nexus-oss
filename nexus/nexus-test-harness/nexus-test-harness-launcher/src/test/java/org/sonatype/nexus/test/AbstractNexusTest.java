@@ -36,12 +36,18 @@ import org.codehaus.plexus.archiver.manager.ArchiverManager;
 import org.codehaus.plexus.archiver.manager.DefaultArchiverManager;
 
 public abstract class AbstractNexusTest extends PlexusTestCase
-{
+{    
     private String nexusUrl;
     
     public AbstractNexusTest( String nexusUrl )
     {
         this.nexusUrl = nexusUrl;
+    }
+    
+    protected void restartNexus()
+    {
+        System.out.println( "Not yet implemented..." );
+        //TODO: Restart nexus
     }
     
     protected File downloadArtifact( String groupId, String artifact, String version, String type, String targetDirectory )

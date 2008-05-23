@@ -109,19 +109,19 @@
 			<dependency>
 				<groupId>org.sonatype.appbooter.plexus-booters</groupId>
 				<artifactId>plexus-app-booter</artifactId>
-				<version>1.1</version>
+				<version>1.2-SNAPSHOT</version>
 				<scope>provided</scope>
 			</dependency>
             <dependency>
 				<groupId>org.sonatype.appbooter.plexus-booters</groupId>
 				<artifactId>plexus-jsw-app-booter</artifactId>
-				<version>1.1</version>
+				<version>1.2-SNAPSHOT</version>
 				<scope>provided</scope>
 			</dependency>
 		    <dependency>
       			<groupId>org.sonatype.appbooter.plexus-platforms</groupId>
       			<artifactId>plexus-platform-jsw</artifactId>
-				<version>1.1</version>
+				<version>1.2-SNAPSHOT</version>
       			<scope>provided</scope>
     		</dependency>
             

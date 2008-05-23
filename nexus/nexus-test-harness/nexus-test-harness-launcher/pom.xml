@@ -45,6 +45,12 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
+            <groupId>org.sonatype.appbooter.plexus-booters</groupId>
+            <artifactId>plexus-app-booter</artifactId>
+            <version>1.2-SNAPSHOT</version>
+            <scope>test</scope>
+        </dependency>
+		<dependency>
 		    <groupId>org.codehaus.plexus</groupId>
             <artifactId>plexus-archiver</artifactId>
             <version>1.0-alpha-9</version>
@@ -123,19 +129,26 @@
 		                <id>start-nexus</id>
 		                <phase>pre-integration-test</phase>
 		                <goals>
-		                    <goal>start</goal>
+		                    <goal>run</goal>
 		                </goals>
 		                <configuration>
 		                    <prependClasspaths>
 		                        <prependClasspath>${basedir}/${config-target-dir}</prependClasspath>
 		                    </prependClasspaths>
+		                    <disableBlocking>true</disableBlocking>
 		                    <systemProperties>
 		                        <java.util.logging.config.file>${basedir}/${config-target-dir}/jul-logging.properties</java.util.logging.config.file>
                                 <java.io.tmpdir>${basedir}/${work-target-dir}/tmp</java.io.tmpdir>
+                                <plexus.host.control.socket.enabled>true</plexus.host.control.socket.enabled>
 		                    </systemProperties>
 		                    <basedir>${bundle-expanded-dir}/nexus-webapp-${project.version}</basedir>
 		                    <configuration>${plexus-config-file}</configuration>
 		                    <includeTestClasspath>true</includeTestClasspath>
+		                    <platformArtifact>
+		                        <groupId>org.sonatype.appbooter.plexus-platforms</groupId>
+                                <artifactId>plexus-platform-base</artifactId>
+                                <version>1.2-SNAPSHOT</version>
+		                    </platformArtifact>
 		                </configuration>
 		            </execution>
 		            <execution>
@@ -144,18 +157,6 @@
                         <goals>
                             <goal>stop</goal>
                         </goals>
-                        <configuration>
-                            <prependClasspaths>
-                                <prependClasspath>${basedir}/${config-target-dir}</prependClasspath>
-                            </prependClasspaths>
-                            <systemProperties>
-                                <java.util.logging.config.file>${basedir}/${config-target-dir}/jul-logging.properties</java.util.logging.config.file>
-                                <java.io.tmpdir>${basedir}/${work-target-dir}/tmp</java.io.tmpdir>
-                            </systemProperties>
-                            <basedir>${bundle-expanded-dir}/nexus-webapp-${project.version}</basedir>
-                            <configuration>${plexus-config-file}</configuration>
-                            <includeTestClasspath>true</includeTestClasspath>
-                        </configuration>
                     </execution>
 		        </executions>    
 		    </plugin>
