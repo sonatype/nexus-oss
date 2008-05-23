@@ -42,6 +42,10 @@
 		</dependency>
 	</dependencies>
 
+    <properties>
+        <gwt.version>0.0.2415</gwt.version>
+    </properties>
+     
 	<build>
 		<plugins>
 			<plugin>
