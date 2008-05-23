@@ -144,6 +144,15 @@ Sonatype.repoServer.resources.help = {
     passphrase : passphrase,
     ntlmHost : ntlmHost,
     ntlmDomain : ntlmDomain
+  },
+  
+  // artifact upload help text
+  artifact: {
+    groupId: 'Group ID',
+    artifactId: 'Maven artifact ID',
+    version: 'Artifact version',
+    packaging: 'Packaging type',
+    classifier: 'Classifier (optional)'
   }
 };
 
