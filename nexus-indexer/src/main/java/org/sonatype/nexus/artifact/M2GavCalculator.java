@@ -180,6 +180,10 @@ public class M2GavCalculator
                 }
             }
         }
+        catch ( NumberFormatException e )
+        {
+            return null;
+        }
         catch ( StringIndexOutOfBoundsException e )
         {
             return null;
