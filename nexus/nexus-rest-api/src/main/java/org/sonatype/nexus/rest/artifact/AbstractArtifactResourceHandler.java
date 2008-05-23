@@ -322,47 +322,47 @@ public class AbstractArtifactResourceHandler
                         else
                         {
                             // a file
-                            isPom = fi.getName().endsWith( ".pom" );
-                            
+                            isPom = fi.getName().endsWith( ".pom" ) || fi.getName().endsWith( "pom.xml" );
+
                             is = fi.getInputStream();
-                        }
 
-                        GAVRequest gavRequest = new GAVRequest( groupId, artifactId, version, packaging, classifier );
+                            GAVRequest gavRequest = new GAVRequest( groupId, artifactId, version, packaging, classifier );
 
-                        try
-                        {
-                            Repository repository = getNexus().getRepository( repositoryId );
-
-                            if ( !MavenRepository.class.isAssignableFrom( repository.getClass() ) )
+                            try
                             {
-                                getResponse().setStatus(
-                                    Status.CLIENT_ERROR_BAD_REQUEST,
-                                    "This is not a Maven repository!" );
+                                Repository repository = getNexus().getRepository( repositoryId );
 
-                                return;
-                            }
-
-                            if ( isPom )
-                            {
-                                ( (MavenRepository) repository ).storeArtifactPom( gavRequest, is );
-                            }
-                            else
-                            {
-                                if ( hasPom )
+                                if ( !MavenRepository.class.isAssignableFrom( repository.getClass() ) )
                                 {
-                                    ( (MavenRepository) repository ).storeArtifact( gavRequest, is );
+                                    getResponse().setStatus(
+                                        Status.CLIENT_ERROR_BAD_REQUEST,
+                                        "This is not a Maven repository!" );
+
+                                    return;
+                                }
+
+                                if ( isPom )
+                                {
+                                    ( (MavenRepository) repository ).storeArtifactPom( gavRequest, is );
                                 }
                                 else
                                 {
-                                    ( (MavenRepository) repository ).storeArtifactWithGeneratedPom( gavRequest, is );
+                                    if ( hasPom )
+                                    {
+                                        ( (MavenRepository) repository ).storeArtifact( gavRequest, is );
+                                    }
+                                    else
+                                    {
+                                        ( (MavenRepository) repository ).storeArtifactWithGeneratedPom( gavRequest, is );
+                                    }
                                 }
                             }
-                        }
-                        catch ( IllegalArgumentException e )
-                        {
-                            getResponse().setStatus( Status.CLIENT_ERROR_BAD_REQUEST, e.getMessage() );
+                            catch ( IllegalArgumentException e )
+                            {
+                                getResponse().setStatus( Status.CLIENT_ERROR_BAD_REQUEST, e.getMessage() );
 
-                            return;
+                                return;
+                            }
                         }
                     }
 
