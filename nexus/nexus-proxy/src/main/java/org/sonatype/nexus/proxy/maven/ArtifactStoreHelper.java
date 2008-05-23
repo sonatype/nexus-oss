@@ -45,6 +45,12 @@ import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.item.StringContentLocator;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 
+/**
+ * Am ArtifactStore helper class, that simply drives a MavenRepository and gets various infos from it. It uses the
+ * Repository interface of it's "owner" repository for storing/retrieval.
+ * 
+ * @author cstamas
+ */
 public class ArtifactStoreHelper
     implements ArtifactStore
 {
@@ -143,8 +149,6 @@ public class ArtifactStoreHelper
     {
         checkRequest( gavRequest );
 
-        // TODO: packaging2extension mapping, now we default to JAR
-        // or use POM to "find" the packaging
         Gav gav = new Gav( gavRequest.getGroupId(), gavRequest.getArtifactId(), gavRequest.getVersion(), gavRequest
             .getClassifier(), repository.getArtifactPackagingMapper().getExtensionForPackaging(
             gavRequest.getPackaging() ), null, null, null, RepositoryPolicy.SNAPSHOT.equals( repository

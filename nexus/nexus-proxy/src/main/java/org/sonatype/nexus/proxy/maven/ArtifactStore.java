@@ -127,7 +127,7 @@ public interface ArtifactStore
 
     /**
      * Stores the artifact contents, that is supplied as InputStream, and along with it generated a little POM based on
-     * information in GAVRequest.
+     * information in GAVRequest. If existing POM foind in repository, it will not be overwritten.
      * 
      * @param gavRequest
      * @param is
