@@ -20,14 +20,22 @@
  */
 package org.sonatype.nexus.rest.cache;
 
+import java.io.IOException;
+
 import org.codehaus.plexus.util.StringUtils;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.data.Status;
+import org.restlet.resource.Representation;
+import org.restlet.resource.Variant;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryGroupException;
+import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.rest.AbstractNexusResourceHandler;
+import org.sonatype.nexus.rest.model.NFCRepositoryResource;
+import org.sonatype.nexus.rest.model.NFCResource;
+import org.sonatype.nexus.rest.model.NFCResourceResponse;
 
 /**
  * @author cstamas
@@ -96,7 +104,61 @@ public class CacheResourceHandler
 
     public boolean allowGet()
     {
-        return false;
+        return true;
+    }
+
+    public Representation getRepresentationHandler( Variant variant )
+        throws IOException
+    {
+        try
+        {
+            NFCResource resource = new NFCResource();
+
+            // check reposes
+            if ( repositoryGroupId != null )
+            {
+                for ( Repository repository : getNexus().getRepositoryGroup( repositoryGroupId ) )
+                {
+                    NFCRepositoryResource repoNfc = new NFCRepositoryResource();
+
+                    repoNfc.setRepositoryId( repository.getId() );
+
+                    repoNfc.getNfcPaths().addAll( repository.getNotFoundCache().listKeysInCache() );
+
+                    resource.addNfcContent( repoNfc );
+                }
+            }
+            else if ( repositoryId != null )
+            {
+                Repository repository = getNexus().getRepository( repositoryId );
+
+                NFCRepositoryResource repoNfc = new NFCRepositoryResource();
+
+                repoNfc.setRepositoryId( repository.getId() );
+
+                repoNfc.getNfcPaths().addAll( repository.getNotFoundCache().listKeysInCache() );
+
+                resource.addNfcContent( repoNfc );
+            }
+
+            NFCResourceResponse response = new NFCResourceResponse();
+
+            response.setData( resource );
+
+            return serialize( variant, response );
+        }
+        catch ( NoSuchRepositoryException e )
+        {
+            getResponse().setStatus( Status.CLIENT_ERROR_NOT_FOUND, e.getMessage() );
+
+            return null;
+        }
+        catch ( NoSuchRepositoryGroupException e )
+        {
+            getResponse().setStatus( Status.CLIENT_ERROR_NOT_FOUND, e.getMessage() );
+
+            return null;
+        }
     }
 
     public boolean allowDelete()

@@ -20,6 +20,7 @@
  */
 package org.sonatype.nexus.proxy.cache;
 
+import java.util.Collection;
 import java.util.List;
 
 import net.sf.ehcache.Ehcache;
@@ -92,9 +93,9 @@ public class EhCachePathCache
     public boolean removeWithChildren( String path )
     {
         List<String> keys = ec.getKeys();
-        
+
         String keyToRemove = makeKeyFromPath( path );
-        
+
         for ( String key : keys )
         {
             if ( key.startsWith( keyToRemove ) )
@@ -116,6 +117,15 @@ public class EhCachePathCache
         Statistics stats = ec.getStatistics();
 
         return new CacheStatistics( stats.getObjectCount(), stats.getCacheMisses(), stats.getCacheHits() );
+    }
+
+    public Collection<String> listKeysInCache()
+    {
+        ec.evictExpiredElements();
+
+        List<String> keys = (List<String>) ec.getKeys();
+
+        return keys;
     }
 
 }

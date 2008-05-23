@@ -23,6 +23,7 @@ package org.sonatype.nexus;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
+import java.util.List;
 
 import org.sonatype.nexus.configuration.MutableConfiguration;
 import org.sonatype.nexus.configuration.model.CRemoteConnectionSettings;
@@ -62,6 +63,9 @@ public interface Nexus
 
     Repository getRepository( String repoId )
         throws NoSuchRepositoryException;
+
+    List<Repository> getRepositoryGroup( String repoGroupId )
+        throws NoSuchRepositoryGroupException;
 
     Collection<Repository> getRepositories();
 
@@ -182,6 +186,7 @@ public interface Nexus
 
     Collection<ArtifactInfo> searchArtifactFlat( String term, String repositoryId, String groupId );
 
-    Collection<ArtifactInfo> searchArtifactFlat( String gTerm, String aTerm, String vTerm, String cTerm, String repositoryId, String groupId );
+    Collection<ArtifactInfo> searchArtifactFlat( String gTerm, String aTerm, String vTerm, String cTerm,
+        String repositoryId, String groupId );
 
 }

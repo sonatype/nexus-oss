@@ -70,9 +70,10 @@ public class EhCacheCacheManagerTest
         assertTrue( c.contains( "com" ) );
 
         c.put( "/com/sonatype", Boolean.TRUE );
-        assertTrue( c.contains( "/com/sonatype" ) );
         assertTrue( c.contains( "/com/sonatype/" ) );
-        assertTrue( c.contains( "comsonatype" ) );
+        assertTrue( c.contains( "/com/sonatype" ) );
+        assertTrue( c.contains( "com/sonatype" ) );
+        assertTrue( c.contains( "com/sonatype/" ) );
 
         c.removeWithParents( "/com/sonatype/" );
 
@@ -80,7 +81,6 @@ public class EhCacheCacheManagerTest
         assertFalse( c.contains( "/com/sonatype" ) );
         assertFalse( c.contains( "/com/" ) );
         assertFalse( c.contains( "/com" ) );
-
     }
 
 }

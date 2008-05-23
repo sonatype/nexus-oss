@@ -39,6 +39,9 @@ import org.sonatype.nexus.rest.model.GlobalConfigurationResource;
 import org.sonatype.nexus.rest.model.GlobalConfigurationResourceResponse;
 import org.sonatype.nexus.rest.model.LogsListResource;
 import org.sonatype.nexus.rest.model.LogsListResourceResponse;
+import org.sonatype.nexus.rest.model.NFCRepositoryResource;
+import org.sonatype.nexus.rest.model.NFCResource;
+import org.sonatype.nexus.rest.model.NFCResourceResponse;
 import org.sonatype.nexus.rest.model.NexusArtifact;
 import org.sonatype.nexus.rest.model.NexusError;
 import org.sonatype.nexus.rest.model.NexusErrorResponse;
@@ -95,13 +98,11 @@ public final class XStreamInitializer
 {
     public static XStream initialize( XStream xstream )
     {
-        xstream.registerConverter( new RepositoryBaseResourceConverter( xstream.getMapper(),
-                                                                        xstream.getReflectionProvider() ),
-                                   XStream.PRIORITY_VERY_HIGH );
+        xstream.registerConverter( new RepositoryBaseResourceConverter( xstream.getMapper(), xstream
+            .getReflectionProvider() ), XStream.PRIORITY_VERY_HIGH );
 
-        xstream.registerConverter( new ScheduledServiceBaseResourceConverter( xstream.getMapper(),
-                                                                              xstream.getReflectionProvider() ),
-                                   XStream.PRIORITY_VERY_HIGH );
+        xstream.registerConverter( new ScheduledServiceBaseResourceConverter( xstream.getMapper(), xstream
+            .getReflectionProvider() ), XStream.PRIORITY_VERY_HIGH );
 
         // aliasaes
         // NexusResponse
@@ -194,6 +195,10 @@ public final class XStreamInitializer
         xstream.omitField( ScheduledServiceTypeResourceResponse.class, "modelEncoding" );
         xstream.omitField( ScheduledServiceTypeResource.class, "modelEncoding" );
         xstream.omitField( ScheduledServiceTypePropertyResource.class, "modelEncoding" );
+
+        xstream.omitField( NFCResourceResponse.class, "modelEncoding" );
+        xstream.omitField( NFCResource.class, "modelEncoding" );
+        xstream.omitField( NFCRepositoryResource.class, "modelEncoding" );
 
         // Maven model
         xstream.omitField( Model.class, "modelEncoding" );

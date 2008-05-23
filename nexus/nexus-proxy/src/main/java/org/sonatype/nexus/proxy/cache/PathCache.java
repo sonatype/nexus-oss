@@ -20,25 +20,32 @@
  */
 package org.sonatype.nexus.proxy.cache;
 
+import java.util.Collection;
+
+/**
+ * Cache that stores paths.
+ * 
+ * @author cstamas
+ */
 public interface PathCache
 {
-
     boolean contains( String path );
 
     boolean isExpired( String path );
 
     boolean remove( String path );
-    
+
     boolean removeWithParents( String path );
 
     boolean removeWithChildren( String path );
-    
+
     void purge();
 
     void put( String path, Object element );
 
     void put( String path, Object element, int expirationSeconds );
-    
-    CacheStatistics getStatistics();
 
+    CacheStatistics getStatistics();
+    
+    Collection<String> listKeysInCache();
 }

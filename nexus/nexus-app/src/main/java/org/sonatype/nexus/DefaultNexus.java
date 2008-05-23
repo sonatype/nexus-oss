@@ -189,6 +189,12 @@ public class DefaultNexus
         return repositoryRegistry.getRepository( repoId );
     }
 
+    public List<Repository> getRepositoryGroup( String repoGroupId )
+        throws NoSuchRepositoryGroupException
+    {
+        return repositoryRegistry.getRepositoryGroup( repoGroupId );
+    }
+
     public Collection<Repository> getRepositories()
     {
         return repositoryRegistry.getRepositories();
@@ -232,7 +238,7 @@ public class DefaultNexus
     {
         return nexusConfiguration.isSecurityEnabled();
     }
-    
+
     public boolean isSimpleSecurityModel()
     {
         return nexusConfiguration.isSimpleSecurityModel();

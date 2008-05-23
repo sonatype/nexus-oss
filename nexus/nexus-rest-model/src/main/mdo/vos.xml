@@ -90,9 +90,8 @@
 			<name>AuthenticationSettings</name>
 			<version>1.0.0+</version>
 			<description>
-				Remote authentication tokens used in remote
-				authentications against HTTP Proxies and/or protected
-				remote repositories.
+				Remote authentication tokens used in remote authentications against HTTP Proxies and/or protected remote
+				repositories.
 			</description>
 			<fields>
 				<field>
@@ -138,8 +137,7 @@
 			<name>RemoteConnectionSettings</name>
 			<version>1.0.0+</version>
 			<description>
-				The connections settings defines common connection
-				properties, like retries count and timeouts.
+				The connections settings defines common connection properties, like retries count and timeouts.
 			</description>
 			<fields>
 				<field>
@@ -172,10 +170,7 @@
 		<class>
 			<name>RemoteHttpProxySettings</name>
 			<version>1.0.0+</version>
-			<description>
-				The HTTP Proxy defines proxies used to access the
-				internet.
-			</description>
+			<description>The HTTP Proxy defines proxies used to access the internet.</description>
 			<fields>
 				<field>
 					<name>proxyHostname</name>
@@ -569,7 +564,7 @@
 
 			</fields>
 		</class>
-		
+
 		<class>
 			<name>RepositoryProxyResource</name>
 			<superClass>RepositoryResource</superClass>
@@ -1049,7 +1044,7 @@
 				</field>
 			</fields>
 		</class>
-		
+
 		<!-- Schedules -->
 		<class>
 			<name>ScheduledServiceListResourceResponse</name>
@@ -1180,9 +1175,9 @@
 					<required>true</required>
 				</field>
 				<field>
-				    <name>serviceProperties</name>
-				    <version>1.0.0+</version>
-				    <association>
+					<name>serviceProperties</name>
+					<version>1.0.0+</version>
+					<association>
 						<type>ScheduledServicePropertyResource</type>
 						<multiplicity>*</multiplicity>
 					</association>
@@ -1190,9 +1185,9 @@
 				</field>
 			</fields>
 		</class>
-		
+
 		<class>
-		    <name>ScheduledServicePropertyResource</name>
+			<name>ScheduledServicePropertyResource</name>
 			<version>1.0.0+</version>
 			<fields>
 				<field>
@@ -1209,10 +1204,10 @@
 				</field>
 			</fields>
 		</class>
-		
+
 		<class>
-		    <name>ScheduledServiceOnceResource</name>
-		    <superClass>ScheduledServiceBaseResource</superClass>
+			<name>ScheduledServiceOnceResource</name>
+			<superClass>ScheduledServiceBaseResource</superClass>
 			<version>1.0.0+</version>
 			<fields>
 				<field>
@@ -1228,13 +1223,13 @@
 					<required>true</required>
 				</field>
 			</fields>
-	    </class>
-		
+		</class>
+
 		<class>
-		    <name>ScheduledServiceDailyResource</name>
-		    <superClass>ScheduledServiceOnceResource</superClass>
+			<name>ScheduledServiceDailyResource</name>
+			<superClass>ScheduledServiceOnceResource</superClass>
 			<version>1.0.0+</version>
-			<fields>				
+			<fields>
 				<field>
 					<name>recurringTime</name>
 					<version>1.0.0+</version>
@@ -1243,10 +1238,10 @@
 				</field>
 			</fields>
 		</class>
-		
+
 		<class>
-		    <name>ScheduledServiceWeeklyResource</name>
-		    <superClass>ScheduledServiceDailyResource</superClass>
+			<name>ScheduledServiceWeeklyResource</name>
+			<superClass>ScheduledServiceDailyResource</superClass>
 			<version>1.0.0+</version>
 			<fields>
 				<field>
@@ -1260,16 +1255,16 @@
 				</field>
 			</fields>
 		</class>
-		
+
 		<class>
-		    <name>ScheduledServiceMonthlyResource</name>
-		    <superClass>ScheduledServiceWeeklyResource</superClass>
+			<name>ScheduledServiceMonthlyResource</name>
+			<superClass>ScheduledServiceWeeklyResource</superClass>
 			<version>1.0.0+</version>
 		</class>
-		
+
 		<class>
-		    <name>ScheduledServiceAdvancedResource</name>
-		    <superClass>ScheduledServiceBaseResource</superClass>
+			<name>ScheduledServiceAdvancedResource</name>
+			<superClass>ScheduledServiceBaseResource</superClass>
 			<version>1.0.0+</version>
 			<fields>
 				<field>
@@ -1280,7 +1275,7 @@
 				</field>
 			</fields>
 		</class>
-		
+
 		<class>
 			<name>ScheduledServiceTypeResourceResponse</name>
 			<version>1.0.0+</version>
@@ -1325,12 +1320,12 @@
 				</field>
 			</fields>
 		</class>
-		
+
 		<class>
 			<name>ScheduledServiceTypePropertyResource</name>
 			<version>1.0.0+</version>
 			<fields>
-			    <field>
+				<field>
 					<name>id</name>
 					<version>1.0.0+</version>
 					<type>String</type>
@@ -1356,7 +1351,7 @@
 				</field>
 			</fields>
 		</class>
-		
+
 		<!-- Content -->
 		<class>
 			<name>ContentListResourceResponse</name>
@@ -1404,10 +1399,10 @@
 					<required>true</required>
 				</field>
 				<field>
-				    <name>lastModified</name>
-				    <version>1.0.0+</version>
-				    <type>Date</type>
-				    <required>false</required>
+					<name>lastModified</name>
+					<version>1.0.0+</version>
+					<type>Date</type>
+					<required>false</required>
 				</field>
 				<field>
 					<name>sizeOnDisk</name>
@@ -1731,6 +1726,61 @@
 					<version>1.0.0+</version>
 					<type>int</type>
 					<required>true</required>
+				</field>
+			</fields>
+		</class>
+
+		<!-- NFCs -->
+		<class>
+			<name>NFCResourceResponse</name>
+			<version>1.0.0+</version>
+			<superClass>NexusResponse</superClass>
+			<fields>
+				<field>
+					<name>data</name>
+					<version>1.0.0+</version>
+					<association>
+						<type>NFCResource</type>
+					</association>
+					<required>true</required>
+				</field>
+			</fields>
+		</class>
+
+		<class>
+			<name>NFCResource</name>
+			<version>1.0.0+</version>
+			<fields>
+				<field>
+					<name>nfcContents</name>
+					<version>1.0.0+</version>
+					<association>
+						<type>NFCRepositoryResource</type>
+						<multiplicity>*</multiplicity>
+					</association>
+					<required>true</required>
+				</field>
+			</fields>
+		</class>
+
+		<class>
+			<name>NFCRepositoryResource</name>
+			<version>1.0.0+</version>
+			<fields>
+				<field>
+					<name>repositoryId</name>
+					<version>1.0.0+</version>
+					<type>String</type>
+					<required>true</required>
+				</field>
+				<field>
+					<name>nfcPaths</name>
+					<version>1.0.0+</version>
+					<association>
+						<type>String</type>
+						<multiplicity>*</multiplicity>
+					</association>
+					<required>false</required>
 				</field>
 			</fields>
 		</class>

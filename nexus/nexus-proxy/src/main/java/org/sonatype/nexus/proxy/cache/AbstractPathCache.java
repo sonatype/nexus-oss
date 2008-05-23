@@ -65,7 +65,7 @@ public abstract class AbstractPathCache
         }
         return result;
     }
-    
+
     public abstract boolean removeWithChildren( String path );
 
     public final void purge()
@@ -75,7 +75,17 @@ public abstract class AbstractPathCache
 
     protected String makeKeyFromPath( String path )
     {
-        return path.replaceAll( "/", "" );
+        while ( path.startsWith( "/" ) )
+        {
+            path = path.substring( 1 );
+        }
+
+        while ( path.endsWith( "/" ) )
+        {
+            path = path.substring( 0, path.length() - 1 );
+        }
+
+        return path;
     }
 
     public abstract boolean doContains( String key );

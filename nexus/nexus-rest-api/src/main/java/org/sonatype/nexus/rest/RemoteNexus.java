@@ -25,6 +25,7 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Collection;
+import java.util.List;
 
 import org.restlet.Client;
 import org.restlet.Context;
@@ -706,6 +707,13 @@ public class RemoteNexus
     {
         // TODO Auto-generated method stub
         
+    }
+
+    public List<Repository> getRepositoryGroup( String repoGroupId )
+        throws NoSuchRepositoryGroupException
+    {
+        // TODO Auto-generated method stub
+        return null;
     }
 
 }
