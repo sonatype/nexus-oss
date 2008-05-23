@@ -22,7 +22,13 @@ Sonatype.repoServer.FileUploadPanel = function(config){
   var config = config || {};
   var defaultConfig = {autoScroll:true};
   Ext.apply(this, config, defaultConfig);
-  
+
+  var ht = Sonatype.repoServer.resources.help.artifact;
+
+  var packagingStore = new Ext.data.SimpleStore({fields:['value'], data:[['pom'], ['jar'], ['ejb'], ['war'], ['ear'], ['rar'], ['par'], ['maven-archetype'], ['maven-plugin']]});
+
+  this.pomMode = true;
+
   this.filenameField = new Ext.form.TextField({
     xtype: 'textfield',
     name: 'filenameField',
@@ -62,6 +68,7 @@ Sonatype.repoServer.FileUploadPanel = function(config){
               handler: function( b ) {
                 var filename = b.detachInputFile().getValue();
                 b.uploadPanel.pomnameField.setRawValue( filename );
+                b.uploadPanel.updateUploadButton( b.uploadPanel );
               }
             }
           ] 
@@ -80,30 +87,54 @@ Sonatype.repoServer.FileUploadPanel = function(config){
           items: [
             {
               xtype: 'textfield',
-              fieldLabel: 'Artifact',
-              itemCls: 'required-field',
-//          helpText: ht.workingDirectory,
-              anchor: Sonatype.view.FIELD_OFFSET,
-              name: 'artifactId',
-              allowBlank:false
-            },
-            {
-              xtype: 'textfield',
               fieldLabel: 'Group',
               itemCls: 'required-field',
-//          helpText: ht.workingDirectory,
+              helpText: ht.groupId,
               anchor: Sonatype.view.FIELD_OFFSET,
               name: 'groupId',
               allowBlank: false
             },
             {
               xtype: 'textfield',
+              fieldLabel: 'Artifact',
+              itemCls: 'required-field',
+              helpText: ht.artifactId,
+              anchor: Sonatype.view.FIELD_OFFSET,
+              name: 'artifactId',
+              allowBlank:false
+            },
+            {
+              xtype: 'textfield',
               fieldLabel: 'Version',
               itemCls: 'required-field',
-//          helpText: ht.workingDirectory,
+              helpText: ht.version,
               anchor: Sonatype.view.FIELD_OFFSET,
               name: 'version',
               allowBlank:false
+            },
+            {
+              xtype: 'combo',
+              fieldLabel: 'Packaging',
+              itemCls: 'required-field',
+              helpText: ht.packaging,
+              store: packagingStore,
+              displayField: 'value',
+              editable: true,
+              forceSelection: true,
+              mode: 'local',
+              triggerAction: 'all',
+              emptyText: 'Select...',
+              selectOnFocus: true,
+              allowBlank: false,
+              name: 'packaging'
+            },
+            {
+              xtype: 'textfield',
+              fieldLabel: 'Classifier',
+              helpText: ht.classifier,
+              anchor: Sonatype.view.FIELD_OFFSET,
+              name: 'classifier',
+              allowBlank:true
             }
           ]
         }
@@ -144,7 +175,12 @@ Sonatype.repoServer.FileUploadPanel = function(config){
                 uploadPanel: this,
                 handler: function( b ) {
                   var filename = b.detachInputFile().getValue();
-                  b.uploadPanel.filenameField.setRawValue( filename );
+                  b.uploadPanel.filenameField.setValue( filename );
+                  var extensionIndex = filename.lastIndexOf( '.' );
+                  if ( extensionIndex > 0 ) {
+                    b.uploadPanel.cardPanel.find( 'name', 'packaging' )[0].setValue( filename.substring( extensionIndex + 1 ) );
+                  }
+                  b.uploadPanel.updateUploadButton( b.uploadPanel );
                 }
               }
             ] 
@@ -163,6 +199,8 @@ Sonatype.repoServer.FileUploadPanel = function(config){
             xtype: 'panel',
             columnWidth: .15,
             items: [
+              {xtype: 'panel',
+               items: [
               {
                 xtype: 'radio',
                 boxLabel: 'POM File',
@@ -174,7 +212,9 @@ Sonatype.repoServer.FileUploadPanel = function(config){
                     fn: function( checkbox, checked ) {
                       if ( checked ) {
                         this.cardPanel.layout.setActiveItem( this.pomCard );
+                        this.pomMode = true;
                       }
+                      this.updateUploadButton( this );
                     },
                     scope: this
                   }
@@ -190,12 +230,15 @@ Sonatype.repoServer.FileUploadPanel = function(config){
                     fn: function( checkbox, checked ) {
                       if ( checked ) {
                         this.cardPanel.layout.setActiveItem( this.attributeCard );
+                        this.pomMode = false;
                       }
+                      this.updateUploadButton( this );
                     },
                     scope: this
                   }
                 }
               }
+              ]}
             ]
           },
           this.cardPanel
@@ -206,7 +249,12 @@ Sonatype.repoServer.FileUploadPanel = function(config){
     buttons: [
       {
         text: 'Upload',
-//        handler: this.saveBtnHandler,
+        id: 'upload-button',
+        handler: function() {
+          if ( this.pomMode || this.form.isValid() ) {
+            alert( 'uploading...' );
+          }
+        },
         disabled: true,
         scope: this
       },
@@ -224,4 +272,11 @@ Sonatype.repoServer.FileUploadPanel = function(config){
 };
 
 Ext.extend(Sonatype.repoServer.FileUploadPanel, Ext.FormPanel, {
+
+  updateUploadButton: function( p ) {
+    var filesSelected = p.filenameField.getValue().length > 0 &&
+      ( ! p.pomMode || p.pomnameField.getValue().length > 0 );
+    p.buttons[0].setDisabled( ! filesSelected );
+  }
+
 });
