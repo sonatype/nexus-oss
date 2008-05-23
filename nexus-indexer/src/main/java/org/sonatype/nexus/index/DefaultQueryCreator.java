@@ -54,11 +54,11 @@ public class DefaultQueryCreator
 
             if ( ArtifactInfo.GROUP_ID.equals( field ) )
             {
-                terms = phrase.split( "[ -/\\\\&&[^\\.]]" );
+                terms = phrase.split( "[ _\\-/\\\\&&[^\\.]]" );
             }
             else
             {
-                terms = phrase.split( "[\\. -/\\\\]" );
+                terms = phrase.split( "[\\. _\\-/\\\\]" );
             }
 
             int len = terms.length;
