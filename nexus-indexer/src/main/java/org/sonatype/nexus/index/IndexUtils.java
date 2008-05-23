@@ -50,7 +50,7 @@ public class IndexUtils
         {
             Date currentTimestamp = getTimestamp( directory );
             
-            if ( currentTimestamp == null || !currentTimestamp.equals( timestamp ) ) 
+            if ( timestamp != null && ( currentTimestamp == null || !currentTimestamp.equals( timestamp ) ) ) 
             {
                 deleteTimestamp( directory );
         
