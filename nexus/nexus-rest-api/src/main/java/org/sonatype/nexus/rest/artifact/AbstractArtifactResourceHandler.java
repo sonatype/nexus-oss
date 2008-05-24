@@ -267,26 +267,26 @@ public class AbstractArtifactResourceHandler
                     // we have "nibbles": (params,fileA,[fileB])+
                     // the second file is optional
                     // if two files are present, one of them should be POM
+                    String repositoryId = null;
+
+                    boolean hasPom = false;
+
+                    boolean isPom = false;
+
+                    InputStream is = null;
+
+                    String groupId = null;
+
+                    String artifactId = null;
+
+                    String version = null;
+
+                    String classifier = null;
+
+                    String packaging = null;
+
                     for ( FileItem fi : items )
                     {
-                        String repositoryId = null;
-
-                        boolean hasPom = false;
-
-                        boolean isPom = false;
-
-                        InputStream is = null;
-
-                        String groupId = null;
-
-                        String artifactId = null;
-
-                        String version = null;
-
-                        String classifier = null;
-
-                        String packaging = null;
-
                         if ( fi.isFormField() )
                         {
                             // a parameter
@@ -344,6 +344,8 @@ public class AbstractArtifactResourceHandler
                                 if ( isPom )
                                 {
                                     ( (MavenRepository) repository ).storeArtifactPom( gavRequest, is );
+                                    
+                                    isPom = false;
                                 }
                                 else
                                 {
