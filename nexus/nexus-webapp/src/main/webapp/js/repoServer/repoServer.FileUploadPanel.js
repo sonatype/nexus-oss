@@ -35,6 +35,7 @@ Sonatype.repoServer.FileUploadPanel = function(config){
     readOnly: true,
     columnWidth: .85
   });
+  this.fileInput = null;
 
   this.pomnameField = new Ext.form.TextField({
     xtype: 'textfield',
@@ -42,6 +43,7 @@ Sonatype.repoServer.FileUploadPanel = function(config){
     readOnly: true,
     columnWidth: .8
   });
+  this.pomInput = null;
 
   this.pomCard = 'pomCard';
   this.attributeCard = 'attributeCard';
@@ -66,7 +68,8 @@ Sonatype.repoServer.FileUploadPanel = function(config){
               setSize: function() {}, // column layout requires setSize()
               uploadPanel: this,
               handler: function( b ) {
-                var filename = b.detachInputFile().getValue();
+                b.uploadPanel.pomInput = b.detachInputFile(); 
+                var filename = b.uploadPanel.pomInput.getValue();
                 b.uploadPanel.pomnameField.setRawValue( filename );
                 b.uploadPanel.updateUploadButton( b.uploadPanel );
               }
@@ -91,7 +94,7 @@ Sonatype.repoServer.FileUploadPanel = function(config){
               itemCls: 'required-field',
               helpText: ht.groupId,
               anchor: Sonatype.view.FIELD_OFFSET,
-              name: 'groupId',
+              name: 'g',
               allowBlank: false
             },
             {
@@ -100,7 +103,7 @@ Sonatype.repoServer.FileUploadPanel = function(config){
               itemCls: 'required-field',
               helpText: ht.artifactId,
               anchor: Sonatype.view.FIELD_OFFSET,
-              name: 'artifactId',
+              name: 'a',
               allowBlank:false
             },
             {
@@ -109,7 +112,7 @@ Sonatype.repoServer.FileUploadPanel = function(config){
               itemCls: 'required-field',
               helpText: ht.version,
               anchor: Sonatype.view.FIELD_OFFSET,
-              name: 'version',
+              name: 'v',
               allowBlank:false
             },
             {
@@ -126,14 +129,14 @@ Sonatype.repoServer.FileUploadPanel = function(config){
               emptyText: 'Select...',
               selectOnFocus: true,
               allowBlank: false,
-              name: 'packaging'
+              name: 'p'
             },
             {
               xtype: 'textfield',
               fieldLabel: 'Classifier',
               helpText: ht.classifier,
               anchor: Sonatype.view.FIELD_OFFSET,
-              name: 'classifier',
+              name: 'c',
               allowBlank:true
             }
           ]
@@ -149,11 +152,17 @@ Sonatype.repoServer.FileUploadPanel = function(config){
     frame: true,
     collapsible: false,
     collapsed: false,
+    fileUpload: true,
     layoutConfig: {
       labelSeparator: ''
     },
         
     items: [
+      {
+        xtype: 'hidden',
+        name: 'r',
+        value: this.repoRecord.id
+      },
       {
         xtype: 'fieldset',
         checkboxToggle:false,
@@ -174,11 +183,12 @@ Sonatype.repoServer.FileUploadPanel = function(config){
                 setSize: function() {}, // column layout requires setSize()
                 uploadPanel: this,
                 handler: function( b ) {
-                  var filename = b.detachInputFile().getValue();
+                  b.uploadPanel.fileInput = b.detachInputFile(); 
+                  var filename = b.uploadPanel.fileInput.getValue();
                   b.uploadPanel.filenameField.setValue( filename );
                   var extensionIndex = filename.lastIndexOf( '.' );
                   if ( extensionIndex > 0 ) {
-                    b.uploadPanel.cardPanel.find( 'name', 'packaging' )[0].setValue( filename.substring( extensionIndex + 1 ) );
+                    b.uploadPanel.cardPanel.find( 'name', 'p' )[0].setValue( filename.substring( extensionIndex + 1 ) );
                   }
                   b.uploadPanel.updateUploadButton( b.uploadPanel );
                 }
@@ -204,8 +214,8 @@ Sonatype.repoServer.FileUploadPanel = function(config){
               {
                 xtype: 'radio',
                 boxLabel: 'POM File',
-                name: 'infoSwitch',
-                value: 'pom',
+                name: 'hasPom',
+                value: 'true',
                 checked: true,
                 listeners: {
                   'check': {
@@ -223,8 +233,8 @@ Sonatype.repoServer.FileUploadPanel = function(config){
               {
                 xtype: 'radio',
                 boxLabel: 'Attributes',
-                name: 'infoSwitch',
-                value: 'attributes',
+                name: 'hasPom',
+                value: 'false',
                 listeners: {
                   'check': {
                     fn: function( checkbox, checked ) {
@@ -252,7 +262,7 @@ Sonatype.repoServer.FileUploadPanel = function(config){
         id: 'upload-button',
         handler: function() {
           if ( this.pomMode || this.form.isValid() ) {
-            alert( 'uploading...' );
+            this.doUpload();
           }
         },
         disabled: true,
@@ -269,6 +279,21 @@ Sonatype.repoServer.FileUploadPanel = function(config){
       }
     ]
   });
+
+  this.form.on(
+    'actioncomplete',
+    function( form, action ) {
+      var a;
+    },
+    this
+  );
+  this.form.on(
+    'actionfailed',
+    function( form, action ) {
+      var a;
+    },
+    this
+  );
 };
 
 Ext.extend(Sonatype.repoServer.FileUploadPanel, Ext.FormPanel, {
@@ -277,6 +302,93 @@ Ext.extend(Sonatype.repoServer.FileUploadPanel, Ext.FormPanel, {
     var filesSelected = p.filenameField.getValue().length > 0 &&
       ( ! p.pomMode || p.pomnameField.getValue().length > 0 );
     p.buttons[0].setDisabled( ! filesSelected );
-  }
+  },
+  
+  doUpload: function() {
+    Ext.Msg.wait( 'Uploading...' );
+    this.createUploadForm();
+  },
 
+  createUploadForm: function() {
+    var repoId = this.repoRecord.id;
+    repoId = repoId.substring( repoId.lastIndexOf( '/' ) + 1 );
+
+    var tmpForm = Ext.getBody().createChild({
+      tag: 'form',
+      cls: 'x-hidden',
+      id: Ext.id(),
+      children:
+        this.pomMode ?
+          [
+            {
+              tag: 'input',
+              type: 'hidden',
+              name: 'r',
+              value: repoId
+            },
+            {
+              tag: 'input',
+              type: 'hidden',
+              name: 'hasPom',
+              value: '1'
+            }
+          ]
+        :
+          [
+            {
+              tag: 'input',
+              type: 'hidden',
+              name: 'r',
+              value: repoId
+            },
+            {
+              tag: 'input',
+              type: 'hidden',
+              name: 'g',
+              value: this.form.findField( 'g' ).getValue()
+            },
+            {
+              tag: 'input',
+              type: 'hidden',
+              name: 'a',
+              value: this.form.findField( 'a' ).getValue()
+            },
+            {
+              tag: 'input',
+              type: 'hidden',
+              name: 'v',
+              value: this.form.findField( 'v' ).getValue()
+            },
+            {
+              tag: 'input',
+              type: 'hidden',
+              name: 'p',
+              value: this.form.findField( 'p' ).getValue()
+            },
+            {
+              tag: 'input',
+              type: 'hidden',
+              name: 'c',
+              value: this.form.findField( 'c' ).getValue()
+            }
+          ]
+    });
+
+    if ( this.pomMode ) {
+      this.pomInput.appendTo( tmpForm );
+    }
+    this.fileInput.appendTo( tmpForm );
+    
+    Ext.Ajax.request({
+      url: Sonatype.config.repos.urls.upload,
+      form : tmpForm,
+      isUpload : true,
+      callback: function( options, success, response ) {
+        tmpForm.remove();
+        Ext.Msg.alert( 'Upload Finished', 'Status: ' + success ); 
+      },
+      scope : this
+    });
+    
+  }
 });

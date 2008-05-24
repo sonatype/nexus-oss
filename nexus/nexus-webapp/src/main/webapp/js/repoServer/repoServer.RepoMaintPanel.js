@@ -1069,7 +1069,8 @@ Ext.extend(Sonatype.repoServer.RepoMaintPanel, Ext.Panel, {
                   frame: true,
                   items: [ new Sonatype.repoServer.FileUploadPanel({
                     title: 'Artifact Upload to ' + rec.get('name'),
-                    repoPanel: this
+                    repoPanel: this,
+                    repoRecord: rec
                   }) ]
                 });
                 this.formCards.insert(1, panel);

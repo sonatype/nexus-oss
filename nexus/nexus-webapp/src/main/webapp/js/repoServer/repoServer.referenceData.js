@@ -227,7 +227,17 @@ Sonatype.repoServer.referenceData = {
 	  }],
 	  cronCommand : ""
     }
+  },
+  
+  upload : {
+    r : "",
+    g : "",
+    a : "",
+    v : "",
+    p : "",
+    c : ""
   }
+  
 };
 
 })();
