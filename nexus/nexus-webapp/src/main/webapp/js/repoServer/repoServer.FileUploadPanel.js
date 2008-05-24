@@ -385,7 +385,22 @@ Ext.extend(Sonatype.repoServer.FileUploadPanel, Ext.FormPanel, {
       isUpload : true,
       callback: function( options, success, response ) {
         tmpForm.remove();
-        Ext.Msg.alert( 'Upload Finished', 'Status: ' + success ); 
+        Ext.Msg.show(
+          success ?
+            {
+              title: 'Upload Complete',
+              msg: 'Artifact upload finished successfully',
+              buttons: Ext.MessageBox.OK,
+              icon: Ext.MessageBox.INFO
+            }
+            :
+            {
+              title: 'Upload Failed',
+              msg: 'Artifact upload failed.<br />Check Nexus logs for more information.',
+              buttons: Ext.MessageBox.OK,
+              icon: Ext.MessageBox.ERROR
+            }
+        );
       },
       scope : this
     });
