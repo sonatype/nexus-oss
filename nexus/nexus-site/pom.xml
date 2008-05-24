@@ -21,6 +21,15 @@
   <version>1.0-SNAPSHOT</version>
   <name>Nexus Site</name>
   <build>
+    <!--DONE TO INSERT A PAGE NOT PROCESSED BY XSITE INTO THE SITE (EMBEDDED NABBLE FORUM)-->
+    <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+        <targetPath>../site</targetPath>
+        <filtering>false</filtering>
+      </resource>
+    </resources>
+    
     <plugins>
       <plugin>
         <groupId>org.codehaus.xsite</groupId>
