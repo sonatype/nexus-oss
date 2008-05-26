@@ -449,7 +449,7 @@ Ext.extend(Sonatype.repoServer.RepoMaintPanel, Ext.Panel, {
       ]
     });
     
-    if (this.editMode && !isGroup) {
+    if (this.editMode) {
       if(this.ctxRecord.get('repoType') != 'virtual'){
         menu.add(this.actions.clearCache);
       }
@@ -464,10 +464,12 @@ Ext.extend(Sonatype.repoServer.RepoMaintPanel, Ext.Panel, {
                 );
       }
       
-      menu.add((this.ctxRecord.get('localStatus') == 'inService') 
+      if ( !isGroup ) {
+        menu.add((this.ctxRecord.get('localStatus') == 'inService') 
                  ? this.actions.putOutOfService
                  : this.actions.putInService
               );
+      }
 
       if (this.ctxRecord.get('repoType') == 'hosted'){
         menu.add(this.actions.uploadArtifact);
