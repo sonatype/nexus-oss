@@ -204,6 +204,32 @@ Sonatype.repoServer.RepoMaintPanel = function(config){
   this.restToRemoteUrl = function(restUrl, repoRecord) {
     return repoRecord.get('remoteUri') + restUrl.replace(Sonatype.config.browsePathSnippet, '').replace(repoRecord.get('resourceURI'), '');
   };
+
+  this.groupRecordConstructor = Ext.data.Record.create([
+    {name:'repoType', convert: function(s, parent){return 'group';}},
+    {name:'resourceURI'},
+    {name:'name', sortType:Ext.data.SortTypes.asUCString},
+    {name:'sStatus'},
+    {name:'contentUri', mapping:'resourceURI', convert: this.restToContentUrl }
+  ]);
+
+  this.groupsReader = new Ext.data.JsonReader({root: 'data', id: 'resourceURI'}, this.groupRecordConstructor );
+
+  this.groupsDataStore = new Ext.data.Store({
+    url: Sonatype.config.repos.urls.groups,
+    reader: this.groupsReader,
+    sortInfo: {field: 'name', direction: 'ASC'},
+    autoLoad: false,
+    listeners: {
+      'load' : {
+        fn: function() {
+          this.reposDataStore.insert( 0, this.groupsDataStore.data.items );
+        },
+        scope: this
+      }
+    }
+  });
+
   
   // START: Repo list ******************************************************
   this.repoRecordConstructor = Ext.data.Record.create([
@@ -244,6 +270,7 @@ Sonatype.repoServer.RepoMaintPanel = function(config){
     listeners: {
       'load' : {
         fn: function() {
+          this.groupsDataStore.reload();
           Ext.TaskMgr.start(this.repoStatusTask);
         },
         scope: this
@@ -277,7 +304,9 @@ Sonatype.repoServer.RepoMaintPanel = function(config){
     loadMask: true,
     deferredRender: false,
     columns: [
-      {header: 'Repository', dataIndex: 'name', width:175},
+      {header: 'Repository', dataIndex: 'name', width:175, renderer: function(value, metadata, record, rowIndex, colIndex, store){
+          return record.get('repoType') == 'group' ? ( '<b>' + value + '</b>' ) : value;
+        }},
       {header: 'Type', dataIndex: 'repoType', width:50},
       {header: 'Status', dataIndex: 'sStatus', width:300},
       {header: 'Repository Path', dataIndex: 'contentUri', id: 'repo-maint-url-col', width:250,renderer: function(s){return '<a href="' + s + '">' + s + '</a>';},menuDisabled:true}
@@ -409,6 +438,8 @@ Ext.extend(Sonatype.repoServer.RepoMaintPanel, Ext.Panel, {
     this.ctxRow = this.reposGridPanel.view.getRow(index);
     this.ctxRecord = this.reposGridPanel.store.getAt(index);
     Ext.fly(this.ctxRow).addClass('x-node-ctx');
+    
+    var isGroup = this.ctxRecord.get('repoType') == 'group';
 
     //@todo: would be faster to pre-render the six variations of the menu for whole instance
     var menu = new Ext.menu.Menu({
@@ -418,7 +449,7 @@ Ext.extend(Sonatype.repoServer.RepoMaintPanel, Ext.Panel, {
       ]
     });
     
-    if (this.editMode) {
+    if (this.editMode && !isGroup) {
       if(this.ctxRecord.get('repoType') != 'virtual'){
         menu.add(this.actions.clearCache);
       }
