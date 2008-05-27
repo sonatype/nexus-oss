@@ -51,7 +51,7 @@ public class RepoMaintenancePage extends LayoutContainer implements ServerFuncti
                 if (selection.size() > 0) {
                     Model repo = selection.get(0);
                     if (repo != null) {
-                        treeBinder.selectRepo((String) repo.get("name"),
+                        treeBinding.selectRepo((String) repo.get("name"),
                                 (String) repo.get("contentUri") + "/content");
                     }
                 }
