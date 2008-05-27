@@ -30,8 +30,12 @@ Sonatype.repoServer.ServerEditPanel = function(config){
   
   // help text alias
   var ht = Sonatype.repoServer.resources.help.server;
-  
-  Sonatype.repoServer.ServerEditPanel.superclass.constructor.call(this, {
+
+  var formId = Ext.id();
+
+  this.formPanel = new Ext.FormPanel({  
+    region: 'center',
+    id: formId,
     trackResetOnLoad: true,
     autoScroll: true,
     border: false,
@@ -134,7 +138,7 @@ Sonatype.repoServer.ServerEditPanel = function(config){
       {
         xtype: 'fieldset',
         checkboxToggle:false,
-        id: this.id + '_' + 'securitySettings',
+        id: formId + '_' + 'securitySettings',
         title: 'Security Settings',
         anchor: Sonatype.view.FIELDSET_OFFSET,
         collapsible: true,
@@ -194,7 +198,7 @@ Sonatype.repoServer.ServerEditPanel = function(config){
         xtype: 'fieldset',
         checkboxToggle:true,
         collapsed: true,
-        id: this.id + '_' + 'applicationServerSettings',
+        id: formId + '_' + 'applicationServerSettings',
         title: 'Application Server Settings (optional)',
         anchor: Sonatype.view.FIELDSET_OFFSET,
         autoHeight:true,
@@ -228,7 +232,7 @@ Sonatype.repoServer.ServerEditPanel = function(config){
         xtype: 'fieldset',
         checkboxToggle:true,
         collapsed: true,
-        id: this.id + '_' + 'globalHttpProxySettings',
+        id: formId + '_' + 'globalHttpProxySettings',
         title: 'HTTP Proxy Settings (optional)',
         anchor: Sonatype.view.FIELDSET_OFFSET,
         autoHeight:true,
@@ -277,7 +281,7 @@ Sonatype.repoServer.ServerEditPanel = function(config){
             xtype: 'fieldset',
             checkboxToggle:true,
             collapsed: true,
-            id: this.id + '_' + 'globalHttpProxySettings.authentication',
+            id: formId + '_' + 'globalHttpProxySettings.authentication',
             title: 'Authentication (optional)',
             //collapsible: false,
             autoHeight:true,
@@ -298,7 +302,6 @@ Sonatype.repoServer.ServerEditPanel = function(config){
                 xtype: 'textfield',
                 fieldLabel: 'Password',
                 helpText: ht.password,
-                inputType: 'password',
                 name: 'globalHttpProxySettings.authentication.password',
                 width: 100,
                 allowBlank:true
@@ -355,16 +358,42 @@ Sonatype.repoServer.ServerEditPanel = function(config){
     ]
   });
   
-  this.on('beforerender', this.beforeRenderHandler, this);
-  this.on('afterlayout', this.afterLayoutHandler, this, {single:true});
-  this.form.on('actioncomplete', this.actionCompleteHandler, this);
-  this.form.on('actionfailed', this.actionFailedHandler, this);
+  this.formPanel.buttons[0].scope = this.formPanel; 
+  this.formPanel.save = this.save;
+
+  Sonatype.repoServer.ServerEditPanel.superclass.constructor.call(this, {
+    autoScroll: false,
+    layout: 'border',
+/*
+    tbar: [
+      {
+        text: 'Restart Nexus',
+        icon: Sonatype.config.resourcePath + '/images/icons/arrow_refresh.png',
+        cls: 'x-btn-text-icon',
+        scope: this,
+        handler: this.reloadAll
+        disabled: true
+      }
+    ],
+*/
+    items: [
+      this.formPanel
+    ]
+  });
   
-  var securityConfigField = this.find('name', 'securityConfiguration')[0];
+//  this.form = this.formPanel.form;
+//  this.buttons = this.formPanel.buttons;
+  
+  this.formPanel.on('beforerender', this.beforeRenderHandler, this.formPanel);
+  this.formPanel.on('afterlayout', this.afterLayoutHandler, this.formPanel, {single:true});
+  this.formPanel.form.on('actioncomplete', this.actionCompleteHandler, this.formPanel);
+  this.formPanel.form.on('actionfailed', this.actionFailedHandler, this.formPanel);
+  
+  var securityConfigField = this.formPanel.find('name', 'securityConfiguration')[0];
   securityConfigField.on('select', this.securityConfigSelectHandler, securityConfigField);
 };
 
-Ext.extend(Sonatype.repoServer.ServerEditPanel, Ext.FormPanel, {
+Ext.extend(Sonatype.repoServer.ServerEditPanel, Ext.Panel, {
   optionalFieldsetExpandHandler : function(panel){
     panel.items.each(function(item, i, len){
       if (item.getEl().up('div.required-field', 3)) {
