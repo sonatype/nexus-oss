@@ -214,15 +214,7 @@ public class ApplicationBridge
 
         router.attach( "/feeds/{" + FeedResourceHandler.FEED_KEY + "}", FeedResourceHandler.class );
 
-        router.attach(
-            "/repositories/{" + RepositoryResourceHandler.REPOSITORY_ID_KEY + "}/content",
-            RepositoryContentResourceHandler.class );
-
         router.attach( "/repository_statuses", RepositoryStatusesListResourceHandler.class );
-
-        router.attach(
-            "/repo_groups/{" + RepositoryGroupResourceHandler.GROUP_ID_KEY + "}/content",
-            RepositoryGroupContentResourceHandler.class );
 
         router.attach( "/authentication/logout", LogoutResourceHandler.class );
 
@@ -230,6 +222,14 @@ public class ApplicationBridge
             + IdentifyHashResourceHandler.HASH_KEY + "}", IdentifyHashResourceHandler.class );
 
         // protected resources
+
+        router.attach(
+            "/repositories/{" + RepositoryResourceHandler.REPOSITORY_ID_KEY + "}/content",
+            protectWriteToResource( RepositoryContentResourceHandler.class ) );
+
+        router.attach(
+            "/repo_groups/{" + RepositoryGroupResourceHandler.GROUP_ID_KEY + "}/content",
+            protectWriteToResource( RepositoryGroupContentResourceHandler.class ) );
 
         router.attach( "/authentication/login", protectResource( LoginResourceHandler.class ) );
 
@@ -264,7 +264,7 @@ public class ApplicationBridge
             "/repositories/{" + RepositoryResourceHandler.REPOSITORY_ID_KEY + "}/meta",
             protectResource( RepositoryMetaResourceHandler.class ) );
 
-        router.attach( "/repo_groups", protectResource( RepositoryGroupListResourceHandler.class ) );
+        router.attach( "/repo_groups", protectWriteToResource( RepositoryGroupListResourceHandler.class ) );
 
         router.attach(
             "/repo_groups/{" + RepositoryGroupResourceHandler.GROUP_ID_KEY + "}",
@@ -284,12 +284,12 @@ public class ApplicationBridge
 
         router.attach( "/data_cache/{" + CacheResourceHandler.DOMAIN + "}/{" + CacheResourceHandler.TARGET_ID
             + "}/content", protectResource( CacheResourceHandler.class ) );
-        
+
         router.attach( "/schedules", protectResource( ScheduledServiceListResourceHandler.class ) );
-        
+
         router.attach( "/schedules/types", protectResource( ScheduledServiceTypeResourceHandler.class ) );
-        
-        router.attach( 
+
+        router.attach(
             "/schedules/{" + ScheduledServiceResourceHandler.SCHEDULED_SERVICE_ID_KEY + "}",
             protectResource( ScheduledServiceResourceHandler.class ) );
 
