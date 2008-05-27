@@ -1,5 +1,7 @@
 package org.sonatype.nexus.ext.gwt.ui.client.reposerver;
 
+import java.util.List;
+
 import org.sonatype.nexus.ext.gwt.ui.client.ServerFunctionPanel;
 import org.sonatype.nexus.ext.gwt.ui.client.ServerInstance;
 
@@ -33,10 +35,10 @@ public class RepoMaintenancePage extends LayoutContainer implements ServerFuncti
         repoListPanel.setHeaderVisible(false);
         
         TableColumnModel cm = new TableColumnModel(
-                new TableColumn("name", "Repository", 175f),
-                new TableColumn("repoType", "Type", 50f),
-                new TableColumn("sStatus", "Status", 200f),
-                new TableColumn("contentUri", "Repository Path", 250f)
+            new TableColumn("name", "Repository", 175f),
+            new TableColumn("repoType", "Type", 50f),
+            new TableColumn("sStatus", "Status", 200f),
+            new TableColumn("contentUri", "Repository Path", 1f)
         );
         
         Table repoTable = new Table<RowSelectionModel>(cm);
@@ -45,9 +47,14 @@ public class RepoMaintenancePage extends LayoutContainer implements ServerFuncti
         
         tableBinding.getBinder().addSelectionListener(new SelectionChangedListener() {
             public void selectionChanged(SelectionChangedEvent event) {
-                Model repo = (Model) event.getSelection().get(0);
-                treeBinding.selectRepo((String) repo.get("name"),
-                        (String) repo.get("contentUri") + "/content");
+                List<Model> selection = event.getSelection();
+                if (selection.size() > 0) {
+                    Model repo = selection.get(0);
+                    if (repo != null) {
+                        treeBinder.selectRepo((String) repo.get("name"),
+                                (String) repo.get("contentUri") + "/content");
+                    }
+                }
             }
         });
         
