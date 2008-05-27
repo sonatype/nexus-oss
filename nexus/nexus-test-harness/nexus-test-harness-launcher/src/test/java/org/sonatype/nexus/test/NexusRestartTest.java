@@ -1,5 +1,7 @@
 package org.sonatype.nexus.test;
 
+import java.io.File;
+
 
 
 public class NexusRestartTest extends AbstractNexusTest
@@ -12,10 +14,32 @@ public class NexusRestartTest extends AbstractNexusTest
     public void testRestart()
     {
         
-        restartNexus();
+        /*stopNexus();
         
-        //File artifact = downloadArtifact( "org.sonatype.nexus", "release-jar", "1", "jar", "./target/downloaded-jars" );
+        try
+        {
+            Thread.sleep( 20000 );
+        }
+        catch ( InterruptedException e )
+        {
+            e.printStackTrace();
+            assert( false );
+        }
         
-        //assert( artifact.exists() );
+        startNexus();
+        
+        try
+        {
+            Thread.sleep( 20000 );
+        }
+        catch ( InterruptedException e )
+        {
+            e.printStackTrace();
+            assert( false );
+        }
+        
+        File artifact = downloadArtifact( "org.sonatype.nexus", "release-jar", "1", "jar", "./target/downloaded-jars" );
+        
+        assert( artifact.exists() );*/
     }
 }

@@ -29,14 +29,18 @@ import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.net.UnknownHostException;
 
 import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.archiver.UnArchiver;
 import org.codehaus.plexus.archiver.manager.ArchiverManager;
 import org.codehaus.plexus.archiver.manager.DefaultArchiverManager;
+import org.sonatype.appbooter.ctl.ControlConnectionException;
+import org.sonatype.appbooter.ctl.ControllerClient;
 
 public abstract class AbstractNexusTest extends PlexusTestCase
 {    
+    private static final int CONTROLLER_PORT = 32002;
     private String nexusUrl;
     
     public AbstractNexusTest( String nexusUrl )
@@ -44,10 +48,58 @@ public abstract class AbstractNexusTest extends PlexusTestCase
         this.nexusUrl = nexusUrl;
     }
     
+    protected void stopNexus()
+    {
+        try
+        {
+            ControllerClient client = new ControllerClient( CONTROLLER_PORT );
+            client.stop();
+        }
+        catch ( UnknownHostException e )
+        {
+            e.printStackTrace();
+            assert( false );
+        }
+        catch ( ControlConnectionException e )
+        {
+            e.printStackTrace();
+            assert( false );
+        }
+        catch ( IOException e )
+        {
+            e.printStackTrace();
+            assert( false );
+        }
+    }
+    
+    protected void startNexus()
+    {
+        try
+        {
+            ControllerClient client = new ControllerClient( CONTROLLER_PORT );
+            client.start();
+        }
+        catch ( UnknownHostException e )
+        {
+            e.printStackTrace();
+            assert( false );
+        }
+        catch ( ControlConnectionException e )
+        {
+            e.printStackTrace();
+            assert( false );
+        }
+        catch ( IOException e )
+        {
+            e.printStackTrace();
+            assert( false );
+        }
+    }
+    
     protected void restartNexus()
     {
-        System.out.println( "Not yet implemented..." );
-        //TODO: Restart nexus
+        stopNexus();
+        startNexus();
     }
     
     protected File downloadArtifact( String groupId, String artifact, String version, String type, String targetDirectory )
