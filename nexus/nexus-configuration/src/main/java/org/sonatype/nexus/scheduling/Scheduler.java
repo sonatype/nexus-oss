@@ -4,6 +4,8 @@ import java.util.concurrent.Callable;
 
 public interface Scheduler
 {
+    String ROLE = Scheduler.class.getName();
+
     /**
      * Issue a Runnable for immediate execution, but have a control over it.
      * 

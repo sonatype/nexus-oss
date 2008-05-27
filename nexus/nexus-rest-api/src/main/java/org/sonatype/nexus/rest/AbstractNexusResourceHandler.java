@@ -46,7 +46,7 @@ import org.sonatype.nexus.index.ArtifactInfo;
 import org.sonatype.nexus.rest.model.NexusArtifact;
 import org.sonatype.nexus.rest.model.NexusError;
 import org.sonatype.nexus.rest.model.NexusErrorResponse;
-import org.sonatype.nexus.schedule.Scheduler;
+import org.sonatype.nexus.scheduling.Scheduler;
 import org.sonatype.nexus.security.User;
 import org.sonatype.plexus.rest.AbstractPlexusAwareResource;
 import org.sonatype.plexus.rest.PlexusRestletUtils;
