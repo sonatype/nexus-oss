@@ -36,7 +36,7 @@ public class DefaultRunnableTask
 
     public void start()
     {
-        reschedule();
+        future = reschedule();
     }
 
     // SubmittedTask
@@ -101,24 +101,30 @@ public class DefaultRunnableTask
 
         runnable.run();
 
-        reschedule();
+        Future<?> nextFuture = reschedule();
+
+        if ( nextFuture != null )
+        {
+            future = nextFuture;
+        }
     }
 
-    protected void reschedule()
+    protected Future<?> reschedule()
     {
-        if ( scheduleIterator != null )
+        if ( scheduleIterator != null && !scheduleIterator.isFinished() )
         {
-            if ( !scheduleIterator.isFinished() )
-            {
-                future = executor.schedule(
-                    this,
-                    scheduleIterator.next().getTime() - System.currentTimeMillis(),
-                    TimeUnit.MILLISECONDS );
-            }
+            return executor.schedule(
+                this,
+                scheduleIterator.next().getTime() - System.currentTimeMillis(),
+                TimeUnit.MILLISECONDS );
         }
         else if ( lastRun == null )
         {
-            future = executor.submit( this );
+            return executor.submit( this );
+        }
+        else
+        {
+            return null;
         }
     }
 }

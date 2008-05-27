@@ -38,7 +38,7 @@ public class DefaultCallableTask<T>
 
     public void start()
     {
-        reschedule();
+        future = reschedule();
     }
 
     // SubmittedTask
@@ -150,26 +150,32 @@ public class DefaultCallableTask<T>
 
         T result = callable.call();
 
-        reschedule();
+        Future<T> nextFuture = reschedule();
+
+        if ( nextFuture != null )
+        {
+            future = nextFuture;
+        }
 
         return result;
     }
 
-    protected void reschedule()
+    protected Future<T> reschedule()
     {
-        if ( scheduleIterator != null )
+        if ( scheduleIterator != null && !scheduleIterator.isFinished() )
         {
-            if ( !scheduleIterator.isFinished() )
-            {
-                future = executor.schedule(
-                    this,
-                    scheduleIterator.next().getTime() - System.currentTimeMillis(),
-                    TimeUnit.MILLISECONDS );
-            }
+            return executor.schedule(
+                this,
+                scheduleIterator.next().getTime() - System.currentTimeMillis(),
+                TimeUnit.MILLISECONDS );
         }
         else if ( lastRun == null )
         {
-            future = executor.submit( this );
+            return executor.submit( this );
+        }
+        else
+        {
+            return null;
         }
     }
 
