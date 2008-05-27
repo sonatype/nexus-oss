@@ -9,7 +9,6 @@ import org.sonatype.nexus.ext.gwt.ui.client.reposerver.RepoServer;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.RequestCallback;
 import com.google.gwt.http.client.Response;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.xml.client.Document;
 import com.google.gwt.xml.client.XMLParser;
 
@@ -59,7 +58,6 @@ public class ApplicationContext {
                 Document doc = XMLParser.parse(response.getText());
                 serverState = doc.getElementsByTagName("state").item(0).getFirstChild().getNodeValue();
                 serverVersion = doc.getElementsByTagName("version").item(0).getFirstChild().getNodeValue();
-                Window.alert(serverState);
             }
         }, Variant.APPLICATION_XML);
     }

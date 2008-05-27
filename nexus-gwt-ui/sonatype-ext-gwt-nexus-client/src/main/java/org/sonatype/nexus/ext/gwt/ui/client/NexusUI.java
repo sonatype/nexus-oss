@@ -4,8 +4,8 @@ import org.sonatype.nexus.ext.gwt.ui.client.reposerver.RepoMaintenancePage;
 
 import com.extjs.gxt.ui.client.Style.LayoutRegion;
 import com.extjs.gxt.ui.client.util.Margins;
-import com.extjs.gxt.ui.client.widget.Container;
 import com.extjs.gxt.ui.client.widget.ContentPanel;
+import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.TabItem;
 import com.extjs.gxt.ui.client.widget.TabPanel;
 import com.extjs.gxt.ui.client.widget.Text;
@@ -44,15 +44,15 @@ public class NexusUI implements EntryPoint {
         RootPanel.get().add(viewport);
     }
 
-    private void addHeader(Container container) {
-        Container header = new Container() {
+    private void addHeader(LayoutContainer container) {
+        LayoutContainer header = new LayoutContainer() {
             {
                 setId("st-header");
                 addText("Sonatype Nexus").setId("st-logo");
             }
         };
 
-        Container rightSide = new Container() {
+        LayoutContainer rightSide = new LayoutContainer() {
             {
                 setId("st-right-side");
             }
@@ -84,8 +84,8 @@ public class NexusUI implements EntryPoint {
 
         BorderLayoutData headerLayoutData = new BorderLayoutData(LayoutRegion.NORTH) {
             {
-                margins = new Margins(5, 5, 5, 5);
-                size = 30;
+                setMargins(new Margins(5, 5, 5, 5));
+                setSize(30);
             }
         };
 
@@ -94,7 +94,7 @@ public class NexusUI implements EntryPoint {
         updateLoginStatus();
     }
 
-    private void addMenu(Container container) {
+    private void addMenu(LayoutContainer container) {
         ContentPanel menu = new ContentPanel() {
             {
                 setHeading("Sonatype Servers");
@@ -122,17 +122,17 @@ public class NexusUI implements EntryPoint {
 
         BorderLayoutData menuLayoutData = new BorderLayoutData(LayoutRegion.WEST) {
             {
-                margins = new Margins(0, 5, 5, 5);
-                size = 185;
-                collapsible = true;
-                split = false;
+                setMargins(new Margins(0, 5, 5, 5));
+                setSize(185);
+                setCollapsible(true);
+                setSplit(false);
             }
         };
 
         container.add(menu, menuLayoutData);
     }
 
-    private void addMain(Container container) {
+    private void addMain(LayoutContainer container) {
         // TODO: Make this a MainTabPanel
         TabPanel main = new TabPanel() {
             {
@@ -150,7 +150,7 @@ public class NexusUI implements EntryPoint {
 
         BorderLayoutData mainLayoutData = new BorderLayoutData(LayoutRegion.CENTER) {
             {
-                margins = new Margins(0, 5, 5, 0);
+                setMargins(new Margins(0, 5, 5, 0));
             }
         };
 
@@ -161,7 +161,7 @@ public class NexusUI implements EntryPoint {
     }
 
     private void addWelcomeTab(TabPanel panel) {
-        Container welcome = new Container() {
+        LayoutContainer welcome = new LayoutContainer() {
             {
                 setId("st-welcome-tab");
                 setStyleName("st-little-padding");
