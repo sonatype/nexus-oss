@@ -23,11 +23,6 @@ public class DefaultRunnableTask
         this.runnable = runnable;
     }
 
-    public void start()
-    {
-        setFuture( reschedule() );
-    }
-
     public void run()
     {
         if ( isEnabled() )

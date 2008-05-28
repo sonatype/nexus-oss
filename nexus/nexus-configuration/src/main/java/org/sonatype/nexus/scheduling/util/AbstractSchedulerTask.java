@@ -32,6 +32,11 @@ public abstract class AbstractSchedulerTask<T>
         this.enabled = true;
     }
 
+    public void start()
+    {
+        setFuture( reschedule() );
+    }
+
     protected Future<T> getFuture()
     {
         return future;
@@ -61,6 +66,8 @@ public abstract class AbstractSchedulerTask<T>
     {
         return executor;
     }
+    
+    protected abstract Future<T> reschedule();
 
     // SubmittedTask
 

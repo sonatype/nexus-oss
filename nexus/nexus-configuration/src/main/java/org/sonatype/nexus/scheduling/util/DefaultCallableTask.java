@@ -31,11 +31,6 @@ public class DefaultCallableTask<T>
         this.results = new ArrayList<T>();
     }
 
-    public void start()
-    {
-        setFuture( reschedule() );
-    }
-
     // SubmittedCallableTask
 
     public T get()
