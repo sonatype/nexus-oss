@@ -20,6 +20,8 @@
  */
 package org.sonatype.nexus.rest.restore;
 
+import java.util.concurrent.RejectedExecutionException;
+
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
@@ -109,6 +111,10 @@ public abstract class AbstractRestoreResourceHandler
             }
 
             getNexus().submit( task );
+        }
+        catch ( RejectedExecutionException e )
+        {
+            getResponse().setStatus( Status.CLIENT_ERROR_CONFLICT, e.getMessage() );
         }
         catch ( NoSuchRepositoryException e )
         {

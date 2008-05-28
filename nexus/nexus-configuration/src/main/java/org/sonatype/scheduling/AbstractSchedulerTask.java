@@ -3,6 +3,9 @@ package org.sonatype.scheduling;
 import java.util.Date;
 import java.util.concurrent.Future;
 
+import org.sonatype.scheduling.iterators.ScheduleIterator;
+import org.sonatype.scheduling.schedules.Schedule;
+
 public abstract class AbstractSchedulerTask<T>
     implements SubmittedTask, ScheduledTask
 {
@@ -11,6 +14,8 @@ public abstract class AbstractSchedulerTask<T>
     private final ScheduleIterator scheduleIterator;
 
     private final DefaultScheduler scheduler;
+
+    private final Schedule schedule;
 
     private boolean enabled;
 
@@ -22,7 +27,8 @@ public abstract class AbstractSchedulerTask<T>
 
     private Date lastRun;
 
-    public AbstractSchedulerTask( Class<?> clazz, ScheduleIterator scheduleIterator, DefaultScheduler scheduler )
+    public AbstractSchedulerTask( Class<?> clazz, ScheduleIterator scheduleIterator, DefaultScheduler scheduler,
+        Schedule schedule )
     {
         super();
 
@@ -31,6 +37,8 @@ public abstract class AbstractSchedulerTask<T>
         this.scheduleIterator = scheduleIterator;
 
         this.scheduler = scheduler;
+
+        this.schedule = schedule;
 
         this.enabled = true;
 
@@ -110,7 +118,7 @@ public abstract class AbstractSchedulerTask<T>
         getScheduler().removeFromTasksMap( this );
     }
 
-    // ScheduledTask
+    // IteratingTask
 
     public Date getNextRun()
     {
@@ -138,5 +146,13 @@ public abstract class AbstractSchedulerTask<T>
     {
         return scheduleIterator;
     }
+    
+    // ScheduledTask
+
+    public Schedule getSchedule()
+    {
+        return schedule;
+    }
+
 
 }

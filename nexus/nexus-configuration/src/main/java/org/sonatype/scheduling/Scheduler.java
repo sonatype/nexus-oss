@@ -5,6 +5,9 @@ import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.RejectedExecutionException;
 
+import org.sonatype.scheduling.iterators.ScheduleIterator;
+import org.sonatype.scheduling.schedules.Schedule;
+
 public interface Scheduler
 {
     String ROLE = Scheduler.class.getName();
@@ -26,7 +29,18 @@ public interface Scheduler
      * @param iterator
      * @return
      */
-    ScheduledTask schedule( Runnable runnable, ScheduleIterator iterator )
+    IteratingTask iterate( Runnable runnable, ScheduleIterator iterator )
+        throws RejectedExecutionException,
+            NullPointerException;
+
+    /**
+     * Issue a Runnable for scheduled execution.
+     * 
+     * @param runnable
+     * @param iterator
+     * @return
+     */
+    ScheduledTask schedule( Runnable runnable, Schedule schedule )
         throws RejectedExecutionException,
             NullPointerException;
 
@@ -47,7 +61,18 @@ public interface Scheduler
      * @param iterator
      * @return
      */
-    <T> ScheduledCallableTask<T> schedule( Callable<T> callable, ScheduleIterator iterator )
+    <T> IteratingCallableTask<T> iterate( Callable<T> callable, ScheduleIterator iterator )
+        throws RejectedExecutionException,
+            NullPointerException;
+
+    /**
+     * Issue a Runnable for scheduled execution.
+     * 
+     * @param runnable
+     * @param iterator
+     * @return
+     */
+    <T> ScheduledCallableTask<T> schedule( Callable<T> callable, Schedule schedule )
         throws RejectedExecutionException,
             NullPointerException;
 

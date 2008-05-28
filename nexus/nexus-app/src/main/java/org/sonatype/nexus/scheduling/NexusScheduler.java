@@ -2,9 +2,9 @@ package org.sonatype.nexus.scheduling;
 
 import java.util.concurrent.RejectedExecutionException;
 
-import org.sonatype.scheduling.ScheduleIterator;
 import org.sonatype.scheduling.ScheduledTask;
 import org.sonatype.scheduling.SubmittedTask;
+import org.sonatype.scheduling.schedules.Schedule;
 
 public interface NexusScheduler
 {
@@ -27,8 +27,7 @@ public interface NexusScheduler
      * @param iterator
      * @return
      */
-    ScheduledTask schedule( NexusTask nexusTask, ScheduleIterator iterator )
+    ScheduledTask schedule( NexusTask nexusTask, Schedule schedule )
         throws RejectedExecutionException,
             NullPointerException;
-
 }

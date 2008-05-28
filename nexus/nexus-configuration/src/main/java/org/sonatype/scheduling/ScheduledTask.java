@@ -1,17 +1,9 @@
 package org.sonatype.scheduling;
 
-import java.util.Date;
+import org.sonatype.scheduling.schedules.Schedule;
 
 public interface ScheduledTask
-    extends SubmittedTask
+    extends IteratingTask
 {
-    Date getLastRun();
-
-    Date getNextRun();
-
-    boolean isEnabled();
-
-    void setEnabled( boolean enabled );
-    
-    ScheduleIterator getScheduleIterator();
+    Schedule getSchedule();
 }

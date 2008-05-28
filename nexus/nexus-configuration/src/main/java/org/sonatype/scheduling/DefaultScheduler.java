@@ -39,6 +39,8 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Startable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.StartingException;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.StoppingException;
+import org.sonatype.scheduling.iterators.ScheduleIterator;
+import org.sonatype.scheduling.schedules.Schedule;
 
 /**
  * A simple facade to ScheduledThreadPoolExecutor as Plexus component.
@@ -139,7 +141,7 @@ public class DefaultScheduler
     public SubmittedTask submit( Runnable runnable )
     {
         DefaultCallableTask<Object> drt = new DefaultCallableTask<Object>( runnable.getClass(), Executors
-            .callable( runnable ), null, this );
+            .callable( runnable ), null, this, null );
 
         addToTasksMap( drt );
 
@@ -148,10 +150,22 @@ public class DefaultScheduler
         return drt;
     }
 
-    public ScheduledTask schedule( Runnable runnable, ScheduleIterator iterator )
+    public IteratingTask iterate( Runnable runnable, ScheduleIterator iterator )
     {
         DefaultCallableTask<Object> drt = new DefaultCallableTask<Object>( runnable.getClass(), Executors
-            .callable( runnable ), iterator, this );
+            .callable( runnable ), iterator, this, null );
+
+        addToTasksMap( drt );
+
+        drt.start();
+
+        return drt;
+    }
+
+    public ScheduledTask schedule( Runnable runnable, Schedule schedule )
+    {
+        DefaultCallableTask<Object> drt = new DefaultCallableTask<Object>( runnable.getClass(), Executors
+            .callable( runnable ), schedule.getIterator(), this, schedule );
 
         addToTasksMap( drt );
 
@@ -162,7 +176,7 @@ public class DefaultScheduler
 
     public <T> SubmittedCallableTask<T> submit( Callable<T> callable )
     {
-        DefaultCallableTask<T> dct = new DefaultCallableTask<T>( callable.getClass(), callable, null, this );
+        DefaultCallableTask<T> dct = new DefaultCallableTask<T>( callable.getClass(), callable, null, this, null );
 
         addToTasksMap( dct );
 
@@ -171,9 +185,25 @@ public class DefaultScheduler
         return dct;
     }
 
-    public <T> ScheduledCallableTask<T> schedule( Callable<T> callable, ScheduleIterator iterator )
+    public <T> IteratingCallableTask<T> iterate( Callable<T> callable, ScheduleIterator iterator )
     {
-        DefaultCallableTask<T> dct = new DefaultCallableTask<T>( callable.getClass(), callable, iterator, this );
+        DefaultCallableTask<T> dct = new DefaultCallableTask<T>( callable.getClass(), callable, iterator, this, null );
+
+        addToTasksMap( dct );
+
+        dct.start();
+
+        return dct;
+    }
+
+    public <T> ScheduledCallableTask<T> schedule( Callable<T> callable, Schedule schedule )
+    {
+        DefaultCallableTask<T> dct = new DefaultCallableTask<T>(
+            callable.getClass(),
+            callable,
+            schedule.getIterator(),
+            this,
+            schedule );
 
         addToTasksMap( dct );
 

@@ -4,10 +4,10 @@ import java.util.List;
 import java.util.concurrent.RejectedExecutionException;
 
 import org.codehaus.plexus.logging.LoggerManager;
-import org.sonatype.scheduling.ScheduleIterator;
 import org.sonatype.scheduling.ScheduledTask;
 import org.sonatype.scheduling.Scheduler;
 import org.sonatype.scheduling.SubmittedTask;
+import org.sonatype.scheduling.schedules.Schedule;
 
 /**
  * The Nexus scheduler.
@@ -52,7 +52,7 @@ public class DefaultNexusScheduler
         }
     }
 
-    public ScheduledTask schedule( NexusTask nexusTask, ScheduleIterator iterator )
+    public ScheduledTask schedule( NexusTask nexusTask, Schedule schedule )
         throws RejectedExecutionException,
             NullPointerException
     {
@@ -64,7 +64,7 @@ public class DefaultNexusScheduler
 
         if ( existingTasks == null || nexusTask.allowConcurrentExecution( existingTasks ) )
         {
-            return scheduler.schedule( nexusTask, iterator );
+            return scheduler.schedule( nexusTask, schedule );
         }
         else
         {

@@ -8,18 +8,21 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
+import org.sonatype.scheduling.iterators.ScheduleIterator;
+import org.sonatype.scheduling.schedules.Schedule;
+
 public class DefaultCallableTask<T>
     extends AbstractSchedulerTask<T>
-    implements SubmittedCallableTask<T>, ScheduledCallableTask<T>, Callable<T>
+    implements ScheduledCallableTask<T>, Callable<T>
 {
     private final Callable<T> callable;
 
     private List<T> results;
 
     public DefaultCallableTask( Class<?> clazz, Callable<T> callable, ScheduleIterator scheduleIterator,
-        DefaultScheduler scheduler )
+        DefaultScheduler scheduler, Schedule schedule )
     {
-        super( clazz, scheduleIterator, scheduler );
+        super( clazz, scheduleIterator, scheduler, schedule );
 
         this.callable = callable;
 
