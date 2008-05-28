@@ -1,6 +1,8 @@
 package org.sonatype.nexus.scheduling.util;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -12,89 +14,26 @@ import org.sonatype.nexus.scheduling.ScheduledCallableTask;
 import org.sonatype.nexus.scheduling.SubmittedCallableTask;
 
 public class DefaultCallableTask<T>
+    extends AbstractSchedulerTask<T>
     implements SubmittedCallableTask<T>, ScheduledCallableTask<T>, Callable<T>
 {
     private final Callable<T> callable;
 
-    private final ScheduleIterator scheduleIterator;
-
-    private final ScheduledThreadPoolExecutor executor;
-
-    private Future<T> future;
-
-    private Date lastRun;
+    private List<T> results;
 
     public DefaultCallableTask( Callable<T> callable, ScheduleIterator scheduleIterator,
         ScheduledThreadPoolExecutor executor )
     {
-        super();
+        super( scheduleIterator, executor );
 
         this.callable = callable;
 
-        this.scheduleIterator = scheduleIterator;
-
-        this.executor = executor;
+        this.results = new ArrayList<T>();
     }
 
     public void start()
     {
-        future = reschedule();
-    }
-
-    // SubmittedTask
-
-    public void cancel()
-    {
-        future.cancel( true );
-    }
-
-    public boolean isCancelled()
-    {
-        return future.isCancelled();
-    }
-
-    public boolean isDone()
-    {
-        return future.isDone();
-    }
-
-    // ScheduledTask
-
-    public Date lastRun()
-    {
-        return lastRun;
-    }
-
-    public Date nextRun()
-    {
-        if ( scheduleIterator != null )
-        {
-            return scheduleIterator.peekNext();
-        }
-        else
-        {
-            return null;
-        }
-    }
-
-    public boolean isPaused()
-    {
-        if ( scheduleIterator != null )
-        {
-            return scheduleIterator.isPaused();
-        }
-        else
-        {
-            return false;
-        }
-    }
-
-    public void setPaused( boolean paused )
-    {
-        if ( scheduleIterator != null )
-        {
-            scheduleIterator.setPaused( paused );
-        }
+        setFuture( reschedule() );
     }
 
     // SubmittedCallableTask
@@ -103,7 +42,7 @@ public class DefaultCallableTask<T>
         throws ExecutionException,
             InterruptedException
     {
-        return future.get();
+        return getFuture().get();
     }
 
     public T getIfDone()
@@ -112,7 +51,7 @@ public class DefaultCallableTask<T>
         {
             try
             {
-                return future.get();
+                return getFuture().get();
             }
             catch ( ExecutionException e )
             {
@@ -143,18 +82,38 @@ public class DefaultCallableTask<T>
         return getIfDone();
     }
 
+    public int getResultCount()
+    {
+        return results.size();
+    }
+
+    public T get( int i )
+        throws IndexOutOfBoundsException
+    {
+        return results.get( i );
+    }
+
+    // Other
+
     public T call()
         throws Exception
     {
-        lastRun = new Date();
+        T result = null;
 
-        T result = callable.call();
+        if ( isEnabled() )
+        {
+            setLastRun( new Date() );
+
+            result = callable.call();
+
+            results.add( result );
+        }
 
         Future<T> nextFuture = reschedule();
 
         if ( nextFuture != null )
         {
-            future = nextFuture;
+            setFuture( nextFuture );
         }
 
         return result;
@@ -162,16 +121,16 @@ public class DefaultCallableTask<T>
 
     protected Future<T> reschedule()
     {
-        if ( scheduleIterator != null && !scheduleIterator.isFinished() )
+        if ( getScheduleIterator() != null && !getScheduleIterator().isFinished() )
         {
-            return executor.schedule(
+            return getExecutor().schedule(
                 this,
-                scheduleIterator.next().getTime() - System.currentTimeMillis(),
+                getScheduleIterator().next().getTime() - System.currentTimeMillis(),
                 TimeUnit.MILLISECONDS );
         }
-        else if ( lastRun == null )
+        else if ( getLastRun() == null )
         {
-            return executor.submit( this );
+            return getExecutor().submit( this );
         }
         else
         {

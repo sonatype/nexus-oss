@@ -20,5 +20,4 @@ public class WeeklyScheduleIterator
     {
         getCalendar().add( Calendar.WEEK_OF_YEAR, 1 );
     }
-
 }

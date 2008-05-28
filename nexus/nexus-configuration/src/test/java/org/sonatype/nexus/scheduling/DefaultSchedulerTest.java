@@ -42,7 +42,7 @@ public class DefaultSchedulerTest
 
         tr = new TestCallable();
 
-        SubmittedTask st = defaultScheduler.submit( tr );
+        SubmittedCallableTask<Integer> st = defaultScheduler.submit( tr );
 
         while ( !st.isDone() )
         {
@@ -50,6 +50,8 @@ public class DefaultSchedulerTest
         }
 
         assertEquals( 1, tr.getRunCount() );
+
+        assertEquals( Integer.valueOf( 0 ), st.getIfDone() );
     }
 
     public void testSecondsRunnable()
@@ -63,7 +65,7 @@ public class DefaultSchedulerTest
 
         ScheduleIterator iterator = new SecondScheduleIterator( new Date( nearFuture ), new Date( nearFuture + 4900 ) );
 
-        SubmittedTask st = defaultScheduler.schedule( tr, iterator );
+        ScheduledTask st = defaultScheduler.schedule( tr, iterator );
 
         while ( !st.isDone() )
         {
@@ -84,7 +86,7 @@ public class DefaultSchedulerTest
 
         ScheduleIterator iterator = new SecondScheduleIterator( new Date( nearFuture ), new Date( nearFuture + 4900 ) );
 
-        SubmittedTask st = defaultScheduler.schedule( tr, iterator );
+        ScheduledCallableTask<Integer> st = defaultScheduler.schedule( tr, iterator );
 
         while ( !st.isDone() )
         {
@@ -92,6 +94,18 @@ public class DefaultSchedulerTest
         }
 
         assertEquals( 5, tr.getRunCount() );
+
+        assertEquals( 5, st.getResultCount() );
+
+        assertEquals( Integer.valueOf( 0 ), st.get( 0 ) );
+
+        assertEquals( Integer.valueOf( 1 ), st.get( 1 ) );
+
+        assertEquals( Integer.valueOf( 2 ), st.get( 2 ) );
+
+        assertEquals( Integer.valueOf( 3 ), st.get( 3 ) );
+
+        assertEquals( Integer.valueOf( 4 ), st.get( 4 ) );
     }
 
     public void testCancelRunnable()

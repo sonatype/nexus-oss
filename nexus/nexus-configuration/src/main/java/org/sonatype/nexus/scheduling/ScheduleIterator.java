@@ -9,8 +9,4 @@ public interface ScheduleIterator
     Date next();
 
     boolean isFinished();
-
-    boolean isPaused();
-
-    void setPaused( boolean paused );
 }

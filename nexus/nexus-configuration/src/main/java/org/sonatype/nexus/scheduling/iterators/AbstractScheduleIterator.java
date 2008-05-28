@@ -11,8 +11,6 @@ public abstract class AbstractScheduleIterator
 
     private final Date endingDate;
 
-    private boolean paused;
-
     public AbstractScheduleIterator( Date startingDate )
     {
         this( startingDate, null );
@@ -60,10 +58,7 @@ public abstract class AbstractScheduleIterator
     {
         Date result = peekNext();
 
-        if ( !isPaused() )
-        {
-            stepNext();
-        }
+        stepNext();
 
         return result;
     }
@@ -71,16 +66,6 @@ public abstract class AbstractScheduleIterator
     public boolean isFinished()
     {
         return peekNext() == null;
-    }
-
-    public boolean isPaused()
-    {
-        return paused;
-    }
-
-    public void setPaused( boolean paused )
-    {
-        this.paused = paused;
     }
 
     protected abstract Date doPeekNext();

@@ -10,4 +10,9 @@ public interface ScheduledCallableTask<T>
             InterruptedException;
 
     T getLastIfDone();
+
+    int getResultCount();
+
+    T get( int i )
+        throws IndexOutOfBoundsException;
 }

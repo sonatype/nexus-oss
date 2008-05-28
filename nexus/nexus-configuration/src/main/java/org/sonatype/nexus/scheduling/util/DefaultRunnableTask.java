@@ -10,117 +10,53 @@ import org.sonatype.nexus.scheduling.ScheduledTask;
 import org.sonatype.nexus.scheduling.SubmittedTask;
 
 public class DefaultRunnableTask
+    extends AbstractSchedulerTask<Object>
     implements SubmittedTask, ScheduledTask, Runnable
 {
     private final Runnable runnable;
 
-    private final ScheduleIterator scheduleIterator;
-
-    private final ScheduledThreadPoolExecutor executor;
-
-    private Future<?> future;
-
-    private Date lastRun;
-
     public DefaultRunnableTask( Runnable runnable, ScheduleIterator scheduleIterator,
         ScheduledThreadPoolExecutor executor )
     {
-        super();
+        super( scheduleIterator, executor );
 
         this.runnable = runnable;
-
-        this.scheduleIterator = scheduleIterator;
-
-        this.executor = executor;
     }
 
     public void start()
     {
-        future = reschedule();
-    }
-
-    // SubmittedTask
-
-    public void cancel()
-    {
-        future.cancel( true );
-    }
-
-    public boolean isCancelled()
-    {
-        return future.isCancelled();
-    }
-
-    public boolean isDone()
-    {
-        return future.isDone();
-    }
-
-    // ScheduledTask
-
-    public Date lastRun()
-    {
-        return lastRun;
-    }
-
-    public Date nextRun()
-    {
-        if ( scheduleIterator != null )
-        {
-            return scheduleIterator.peekNext();
-        }
-        else
-        {
-            return null;
-        }
-    }
-
-    public boolean isPaused()
-    {
-        if ( scheduleIterator != null )
-        {
-            return scheduleIterator.isPaused();
-        }
-        else
-        {
-            return false;
-        }
-    }
-
-    public void setPaused( boolean paused )
-    {
-        if ( scheduleIterator != null )
-        {
-            scheduleIterator.setPaused( paused );
-        }
+        setFuture( reschedule() );
     }
 
     public void run()
     {
-        lastRun = new Date();
+        if ( isEnabled() )
+        {
+            setLastRun( new Date() );
 
-        runnable.run();
+            runnable.run();
+        }
 
-        Future<?> nextFuture = reschedule();
+        Future<Object> nextFuture = reschedule();
 
         if ( nextFuture != null )
         {
-            future = nextFuture;
+            setFuture( nextFuture );
         }
     }
 
-    protected Future<?> reschedule()
+    protected Future<Object> reschedule()
     {
-        if ( scheduleIterator != null && !scheduleIterator.isFinished() )
+        if ( getScheduleIterator() != null && !getScheduleIterator().isFinished() )
         {
-            return executor.schedule(
+            return (Future<Object>) getExecutor().schedule(
                 this,
-                scheduleIterator.next().getTime() - System.currentTimeMillis(),
+                getScheduleIterator().next().getTime() - System.currentTimeMillis(),
                 TimeUnit.MILLISECONDS );
         }
-        else if ( lastRun == null )
+        else if ( getLastRun() == null )
         {
-            return executor.submit( this );
+            return (Future<Object>) getExecutor().submit( this );
         }
         else
         {

@@ -9,7 +9,7 @@ public interface ScheduledTask
 
     Date nextRun();
 
-    boolean isPaused();
+    boolean isEnabled();
 
-    void setPaused( boolean paused );
+    void setEnabled( boolean enabled );
 }
