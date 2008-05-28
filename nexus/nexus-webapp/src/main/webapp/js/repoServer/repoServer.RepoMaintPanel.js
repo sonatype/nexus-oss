@@ -191,19 +191,21 @@ Sonatype.repoServer.RepoMaintPanel = function(config){
       }
     );
   }
-  
+
   this.restToContentUrl = function(r) {
-    var isRepo = r.indexOf( Sonatype.config.repos.urls.groups ) < 0;
-    if (r.indexOf(Sonatype.config.host) > -1) {
-      return isRepo ?
-        r.replace(Sonatype.config.browsePathSnippet, '').replace(Sonatype.config.repos.urls.repositories, Sonatype.config.content.repositories) :
-        r.replace(Sonatype.config.repos.urls.groups, Sonatype.config.content.groups);
+    var isGroup = r.indexOf( Sonatype.config.repos.urls.groups ) > -1;
+    var hasHost = r.indexOf(Sonatype.config.host) > -1;
+    
+    r = r.replace(Sonatype.config.browsePathSnippet, '');
+
+    if ( isGroup ) {
+      r = r.replace(Sonatype.config.repos.urls.groups, Sonatype.config.content.groups);
     }
     else {
-      return Sonatype.config.host + isRepo ?
-        r.replace(Sonatype.config.browsePathSnippet, '').replace(Sonatype.config.repos.urls.repositories, Sonatype.config.content.repositories) :
-        r.replace(Sonatype.config.repos.urls.groups, Sonatype.config.content.groups);
+      r = r.replace(Sonatype.config.repos.urls.repositories, Sonatype.config.content.repositories);
     }
+
+    return hasHost ? r : ( Sonatype.config.host + r );
   };
   
   this.restToRemoteUrl = function(restUrl, repoRecord) {
