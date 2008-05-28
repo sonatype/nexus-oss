@@ -56,6 +56,7 @@ import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.registry.InvalidGroupingException;
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.scheduling.Scheduler;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
 
 import com.thoughtworks.xstream.XStream;
@@ -711,6 +712,12 @@ public class RemoteNexus
 
     public List<Repository> getRepositoryGroup( String repoGroupId )
         throws NoSuchRepositoryGroupException
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public Scheduler getScheduler()
     {
         // TODO Auto-generated method stub
         return null;

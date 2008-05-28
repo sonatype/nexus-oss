@@ -41,6 +41,7 @@ import org.sonatype.nexus.proxy.RepositoryNotAvailableException;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.scheduling.Scheduler;
 
 /**
  * The main Nexus application interface.
@@ -96,6 +97,11 @@ public interface Nexus
     // Feeds
 
     FeedRecorder getFeedRecorder();
+
+    // ------------------------------------------------------------------
+    // Schedules
+
+    Scheduler getScheduler();
 
     // ------------------------------------------------------------------
     // Configuration defaults

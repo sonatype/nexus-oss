@@ -46,7 +46,6 @@ import org.sonatype.nexus.index.ArtifactInfo;
 import org.sonatype.nexus.rest.model.NexusArtifact;
 import org.sonatype.nexus.rest.model.NexusError;
 import org.sonatype.nexus.rest.model.NexusErrorResponse;
-import org.sonatype.nexus.scheduling.Scheduler;
 import org.sonatype.nexus.security.User;
 import org.sonatype.plexus.rest.AbstractPlexusAwareResource;
 import org.sonatype.plexus.rest.PlexusRestletUtils;
@@ -63,8 +62,6 @@ import com.thoughtworks.xstream.XStream;
 public abstract class AbstractNexusResourceHandler
     extends AbstractPlexusAwareResource
 {
-    private Scheduler scheduler;
-
     public AbstractNexusResourceHandler( Context context, Request request, Response response )
     {
         super( context, request, response );
@@ -72,8 +69,6 @@ public abstract class AbstractNexusResourceHandler
         getVariants().add( new Variant( MediaType.APPLICATION_XML ) );
 
         getVariants().add( new Variant( MediaType.APPLICATION_JSON ) );
-
-        scheduler = (Scheduler) lookup( Scheduler.ROLE );
     }
 
     /**
@@ -108,16 +103,6 @@ public abstract class AbstractNexusResourceHandler
         {
             throw new IllegalStateException( "Cannot lookup role " + role + " with roleHint " + roleHint, e );
         }
-    }
-
-    /**
-     * Gets the scheduler instance.
-     * 
-     * @return
-     */
-    protected Scheduler getScheduler()
-    {
-        return scheduler;
     }
 
     /**

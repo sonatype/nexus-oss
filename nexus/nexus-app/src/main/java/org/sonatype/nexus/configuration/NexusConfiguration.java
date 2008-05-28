@@ -74,7 +74,7 @@ public interface NexusConfiguration
     InputStream getConfigurationAsStream()
         throws IOException;
 
-    boolean isInstanceUpgradeNeeded();
+    boolean isConfigurationUpgraded();
 
     boolean isConfigurationDefaulted();
 

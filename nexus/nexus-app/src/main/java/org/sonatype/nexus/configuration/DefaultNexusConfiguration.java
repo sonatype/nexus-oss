@@ -256,7 +256,7 @@ public class DefaultNexusConfiguration
         return configurationSource.getConfigurationAsStream();
     }
 
-    public boolean isInstanceUpgradeNeeded()
+    public boolean isConfigurationUpgraded()
     {
         return configurationSource.isConfigurationUpgraded();
     }

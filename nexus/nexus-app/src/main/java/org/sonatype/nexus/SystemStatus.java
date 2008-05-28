@@ -55,7 +55,7 @@ public class SystemStatus
      * The time this instance of Nexus was started.
      */
     private Date startedAt;
-    
+
     /**
      * The timestamp of last config change.
      */
@@ -70,6 +70,11 @@ public class SystemStatus
      * Was it an instance upgrade?
      */
     private boolean instanceUpgraded;
+
+    /**
+     * If instanceUpgraded, was there also a configuration upgrade?
+     */
+    private boolean configurationUpgraded;
 
     /**
      * The validation response of the configuration.
@@ -179,6 +184,16 @@ public class SystemStatus
     public void setInstanceUpgraded( boolean instanceUpgraded )
     {
         this.instanceUpgraded = instanceUpgraded;
+    }
+
+    public boolean isConfigurationUpgraded()
+    {
+        return configurationUpgraded;
+    }
+
+    public void setConfigurationUpgraded( boolean configurationUpgraded )
+    {
+        this.configurationUpgraded = configurationUpgraded;
     }
 
 }

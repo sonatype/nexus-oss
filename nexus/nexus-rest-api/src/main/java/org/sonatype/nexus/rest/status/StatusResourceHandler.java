@@ -57,18 +57,20 @@ public class StatusResourceHandler
 
         resource.setVersion( status.getVersion() );
 
-        resource.setInitializedAt(status.getInitializedAt() );
+        resource.setInitializedAt( status.getInitializedAt() );
 
         resource.setStartedAt( status.getStartedAt() );
-        
+
         resource.setLastConfigChange( status.getLastConfigChange() );
-        
+
         resource.setFirstStart( status.isFirstStart() );
-        
+
         resource.setInstanceUpgraded( status.isInstanceUpgraded() );
 
+        resource.setConfigurationUpgraded( status.isConfigurationUpgraded() );
+
         resource.setState( status.getState().toString() );
-        
+
         resource.setOperationMode( status.getOperationMode().toString() );
 
         resource.setErrorCause( spit( status.getErrorCause() ) );

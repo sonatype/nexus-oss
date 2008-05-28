@@ -42,9 +42,9 @@ public abstract class AbstractRestoreResourceHandler
     protected String repositoryId;
 
     protected String repositoryGroupId;
-    
+
     public AbstractRestoreResourceHandler( Context context, Request request, Response response )
-    {        
+    {
         super( context, request, response );
 
         repositoryId = null;
@@ -62,8 +62,8 @@ public abstract class AbstractRestoreResourceHandler
                 repositoryGroupId = getRequest().getAttributes().get( TARGET_ID ).toString();
             }
         }
-    }   
-    
+    }
+
     /**
      * This resource allows DELETE.
      */
@@ -71,7 +71,7 @@ public abstract class AbstractRestoreResourceHandler
     {
         return true;
     }
-    
+
     public void handleDelete( AbstractRestoreTask task )
     {
         try
@@ -86,7 +86,7 @@ public abstract class AbstractRestoreResourceHandler
                 getNexus().readRepository( repositoryId );
             }
 
-            getScheduler().submit( task );
+            getNexus().getScheduler().submit( task );
         }
         catch ( NoSuchRepositoryException e )
         {

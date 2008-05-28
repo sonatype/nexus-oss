@@ -29,7 +29,6 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Properties;
-import java.util.concurrent.Callable;
 
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
@@ -829,6 +828,14 @@ public class DefaultNexus
     }
 
     // =============
+    // Schedules
+
+    public Scheduler getScheduler()
+    {
+        return scheduler;
+    }
+
+    // =============
     // Search and indexing related
 
     public void reindexAllRepositories()
@@ -974,7 +981,9 @@ public class DefaultNexus
 
             systemStatus.setFirstStart( nexusConfiguration.isConfigurationDefaulted() );
 
-            systemStatus.setInstanceUpgraded( nexusConfiguration.isInstanceUpgradeNeeded() );
+            systemStatus.setInstanceUpgraded( nexusConfiguration.isConfigurationUpgraded() );
+
+            systemStatus.setConfigurationUpgraded( nexusConfiguration.isConfigurationUpgraded() );
 
             // creating default templates if needed
             createDefaultTemplate( TEMPLATE_DEFAULT_HOSTED_RELEASE, systemStatus.isInstanceUpgraded() );
@@ -1001,14 +1010,18 @@ public class DefaultNexus
                 // TODO: perform upgrade or something
             }
 
-            scheduler.submit( new Callable<Object>()
+            scheduler.submit( new Runnable()
             {
-                public Object call()
-                    throws Exception
+                public void run()
                 {
-                    indexerManager.publishAllIndex();
-
-                    return null;
+                    try
+                    {
+                        indexerManager.publishAllIndex();
+                    }
+                    catch ( IOException e )
+                    {
+                        getLogger().error( "Cannot publish indexes at startup!", e );
+                    }
                 }
             } );
 

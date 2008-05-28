@@ -1855,6 +1855,12 @@
 					<required>true</required>
 				</field>
 				<field>
+					<name>configurationUpgraded</name>
+					<version>1.0.0+</version>
+					<type>boolean</type>
+					<required>true</required>
+				</field>
+				<field>
 					<name>configurationValidationResponse</name>
 					<version>1.0.0+</version>
 					<association>

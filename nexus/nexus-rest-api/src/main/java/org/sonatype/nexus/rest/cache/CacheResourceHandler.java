@@ -187,8 +187,8 @@ public class CacheResourceHandler
                 }
             }
 
-            getScheduler()
-                .submit( new ClearCacheTask( getNexus(), repositoryId, repositoryGroupId, resourceStorePath ) );
+            getNexus().getScheduler().submit(
+                new ClearCacheTask( getNexus(), repositoryId, repositoryGroupId, resourceStorePath ) );
         }
         catch ( NoSuchRepositoryException e )
         {
