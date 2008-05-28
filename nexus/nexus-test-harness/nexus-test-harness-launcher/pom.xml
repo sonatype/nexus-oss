@@ -140,6 +140,7 @@
 		                        <java.util.logging.config.file>${basedir}/${config-target-dir}/jul-logging.properties</java.util.logging.config.file>
                                 <java.io.tmpdir>${basedir}/${work-target-dir}/tmp</java.io.tmpdir>
                                 <plexus.host.control.socket.enabled>true</plexus.host.control.socket.enabled>
+                                <plexus.container.dev.mode>true</plexus.container.dev.mode>
 		                    </systemProperties>
 		                    <basedir>${bundle-expanded-dir}/nexus-webapp-${project.version}</basedir>
 		                    <configuration>${plexus-config-file}</configuration>

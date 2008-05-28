@@ -165,7 +165,7 @@
 				<groupId>org.codehaus.plexus</groupId>
 				<artifactId>plexus-container-default</artifactId>
 				<scope>provided</scope>
-                <version>1.0-alpha-46</version>
+                <version>1.0-alpha-47-SNAPSHOT</version>
 				<exclusions>
 					<exclusion>
 						<groupId>commons-logging</groupId>

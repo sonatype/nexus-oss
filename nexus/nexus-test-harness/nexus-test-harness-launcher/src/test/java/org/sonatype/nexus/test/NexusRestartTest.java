@@ -14,11 +14,11 @@ public class NexusRestartTest extends AbstractNexusTest
     public void testRestart()
     {
         
-        /*stopNexus();
+        stopNexus();
         
         try
         {
-            Thread.sleep( 20000 );
+            Thread.sleep( 10000 );
         }
         catch ( InterruptedException e )
         {
@@ -30,7 +30,7 @@ public class NexusRestartTest extends AbstractNexusTest
         
         try
         {
-            Thread.sleep( 20000 );
+            Thread.sleep( 10000 );
         }
         catch ( InterruptedException e )
         {
@@ -40,6 +40,6 @@ public class NexusRestartTest extends AbstractNexusTest
         
         File artifact = downloadArtifact( "org.sonatype.nexus", "release-jar", "1", "jar", "./target/downloaded-jars" );
         
-        assert( artifact.exists() );*/
+        assert( artifact.exists() );
     }
 }
