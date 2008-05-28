@@ -33,6 +33,8 @@ public class DefaultSchedulerTest
         }
 
         assertEquals( 1, tr.getRunCount() );
+        
+        assertEquals( TaskState.FINISHED, st.getTaskState() );
     }
 
     public void testSimpleCallable()
@@ -52,6 +54,8 @@ public class DefaultSchedulerTest
         assertEquals( 1, tr.getRunCount() );
 
         assertEquals( Integer.valueOf( 0 ), st.getIfDone() );
+
+        assertEquals( TaskState.FINISHED, st.getTaskState() );
     }
 
     public void testSecondsRunnable()
@@ -73,6 +77,8 @@ public class DefaultSchedulerTest
         }
 
         assertEquals( 5, tr.getRunCount() );
+        
+        assertEquals( TaskState.FINISHED, st.getTaskState() );
     }
 
     public void testSecondsCallable()
@@ -106,6 +112,8 @@ public class DefaultSchedulerTest
         assertEquals( Integer.valueOf( 3 ), st.get( 3 ) );
 
         assertEquals( Integer.valueOf( 4 ), st.get( 4 ) );
+
+        assertEquals( TaskState.FINISHED, st.getTaskState() );
     }
 
     public void testCancelRunnable()
@@ -125,9 +133,9 @@ public class DefaultSchedulerTest
 
         assertEquals( 0, tr.getRunCount() );
 
-        assertTrue( st.isCancelled() );
-
         assertTrue( st.isDone() );
+        
+        assertEquals( TaskState.CANCELLED, st.getTaskState() );
     }
 
     public void testCancelCallable()
@@ -147,9 +155,9 @@ public class DefaultSchedulerTest
 
         assertEquals( 0, tr.getRunCount() );
 
-        assertTrue( st.isCancelled() );
-
         assertTrue( st.isDone() );
+        
+        assertEquals( TaskState.CANCELLED, st.getTaskState() );
     }
 
     // Helper classes

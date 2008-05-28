@@ -2,9 +2,9 @@ package org.sonatype.nexus.scheduling;
 
 public interface SubmittedTask
 {
-    void cancel();
-
-    boolean isCancelled();
-
+    TaskState getTaskState();
+    
     boolean isDone();
+
+    void cancel();
 }

@@ -7,6 +7,7 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import org.sonatype.nexus.scheduling.ScheduleIterator;
 import org.sonatype.nexus.scheduling.ScheduledTask;
 import org.sonatype.nexus.scheduling.SubmittedTask;
+import org.sonatype.nexus.scheduling.TaskState;
 
 public abstract class AbstractSchedulerTask<T>
     implements SubmittedTask, ScheduledTask
@@ -16,6 +17,8 @@ public abstract class AbstractSchedulerTask<T>
     private final ScheduledThreadPoolExecutor executor;
 
     private boolean enabled;
+
+    private TaskState taskState;
 
     private Future<T> future;
 
@@ -30,6 +33,8 @@ public abstract class AbstractSchedulerTask<T>
         this.executor = executor;
 
         this.enabled = true;
+
+        this.taskState = TaskState.SCHEDULED;
     }
 
     public void start()
@@ -66,25 +71,34 @@ public abstract class AbstractSchedulerTask<T>
     {
         return executor;
     }
-    
+
+    protected void setTaskState( TaskState state )
+    {
+        if ( !getTaskState().isEndingState() )
+        {
+            this.taskState = state;
+        }
+    }
+
     protected abstract Future<T> reschedule();
 
     // SubmittedTask
 
-    public void cancel()
+    public TaskState getTaskState()
     {
-        getFuture().cancel( true );
-    }
-
-    public boolean isCancelled()
-    {
-
-        return getFuture().isCancelled();
+        return taskState;
     }
 
     public boolean isDone()
     {
-        return getFuture().isDone();
+        return getTaskState().isEndingState();
+    }
+
+    public void cancel()
+    {
+        getFuture().cancel( true );
+
+        setTaskState( TaskState.CANCELLED );
     }
 
     // ScheduledTask

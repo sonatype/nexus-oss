@@ -8,6 +8,7 @@ import java.util.concurrent.TimeUnit;
 import org.sonatype.nexus.scheduling.ScheduleIterator;
 import org.sonatype.nexus.scheduling.ScheduledTask;
 import org.sonatype.nexus.scheduling.SubmittedTask;
+import org.sonatype.nexus.scheduling.TaskState;
 
 public class DefaultRunnableTask
     extends AbstractSchedulerTask<Object>
@@ -25,18 +26,35 @@ public class DefaultRunnableTask
 
     public void run()
     {
-        if ( isEnabled() )
+        if ( isEnabled() && getTaskState().isActive() )
         {
+            setTaskState( TaskState.RUNNING );
+
             setLastRun( new Date() );
 
-            runnable.run();
+            try
+            {
+                runnable.run();
+            }
+            catch ( RuntimeException e )
+            {
+                setTaskState( TaskState.BROKEN );
+
+                throw e;
+            }
         }
 
         Future<Object> nextFuture = reschedule();
 
         if ( nextFuture != null )
         {
+            setTaskState( TaskState.WAITING );
+
             setFuture( nextFuture );
+        }
+        else
+        {
+            setTaskState( TaskState.FINISHED );
         }
     }
 

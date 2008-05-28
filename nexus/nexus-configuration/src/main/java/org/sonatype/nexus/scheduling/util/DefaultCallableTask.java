@@ -12,6 +12,7 @@ import java.util.concurrent.TimeUnit;
 import org.sonatype.nexus.scheduling.ScheduleIterator;
 import org.sonatype.nexus.scheduling.ScheduledCallableTask;
 import org.sonatype.nexus.scheduling.SubmittedCallableTask;
+import org.sonatype.nexus.scheduling.TaskState;
 
 public class DefaultCallableTask<T>
     extends AbstractSchedulerTask<T>
@@ -42,7 +43,7 @@ public class DefaultCallableTask<T>
 
     public T getIfDone()
     {
-        if ( isDone() )
+        if ( TaskState.FINISHED.equals( getTaskState() ) )
         {
             try
             {
@@ -95,20 +96,37 @@ public class DefaultCallableTask<T>
     {
         T result = null;
 
-        if ( isEnabled() )
+        if ( isEnabled() && getTaskState().isActive() )
         {
+            setTaskState( TaskState.RUNNING );
+
             setLastRun( new Date() );
 
-            result = callable.call();
+            try
+            {
+                result = callable.call();
 
-            results.add( result );
+                results.add( result );
+            }
+            catch ( Exception e )
+            {
+                setTaskState( TaskState.BROKEN );
+
+                throw e;
+            }
         }
 
         Future<T> nextFuture = reschedule();
 
         if ( nextFuture != null )
         {
+            setTaskState( TaskState.WAITING );
+
             setFuture( nextFuture );
+        }
+        else
+        {
+            setTaskState( TaskState.FINISHED );
         }
 
         return result;
