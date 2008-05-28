@@ -193,11 +193,16 @@ Sonatype.repoServer.RepoMaintPanel = function(config){
   }
   
   this.restToContentUrl = function(r) {
+    var isRepo = r.indexOf( Sonatype.config.repos.urls.groups ) < 0;
     if (r.indexOf(Sonatype.config.host) > -1) {
-      return r.replace(Sonatype.config.browsePathSnippet, '').replace(Sonatype.config.repos.urls.repositories, Sonatype.config.content.repositories);
+      return isRepo ?
+        r.replace(Sonatype.config.browsePathSnippet, '').replace(Sonatype.config.repos.urls.repositories, Sonatype.config.content.repositories) :
+        r.replace(Sonatype.config.repos.urls.groups, Sonatype.config.content.groups);
     }
     else {
-      return Sonatype.config.host + r.replace(Sonatype.config.browsePathSnippet, '').replace(Sonatype.config.repos.urls.repositories, Sonatype.config.content.repositories);
+      return Sonatype.config.host + isRepo ?
+        r.replace(Sonatype.config.browsePathSnippet, '').replace(Sonatype.config.repos.urls.repositories, Sonatype.config.content.repositories) :
+        r.replace(Sonatype.config.repos.urls.groups, Sonatype.config.content.groups);
     }
   };
   
