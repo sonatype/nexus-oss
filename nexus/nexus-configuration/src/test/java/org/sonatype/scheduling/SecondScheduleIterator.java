@@ -1,9 +1,9 @@
-package org.sonatype.nexus.scheduling;
+package org.sonatype.scheduling;
 
 import java.util.Calendar;
 import java.util.Date;
 
-import org.sonatype.nexus.scheduling.iterators.AbstractCalendarBasedScheduleIterator;
+import org.sonatype.scheduling.iterators.AbstractCalendarBasedScheduleIterator;
 
 public class SecondScheduleIterator
     extends AbstractCalendarBasedScheduleIterator

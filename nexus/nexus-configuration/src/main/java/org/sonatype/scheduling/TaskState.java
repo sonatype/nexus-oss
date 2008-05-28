@@ -1,4 +1,4 @@
-package org.sonatype.nexus.scheduling;
+package org.sonatype.scheduling;
 
 /**
  * Enum for describing task state. It is a state machine: starting state is SCHEDULED, finishing states are FINISHED,

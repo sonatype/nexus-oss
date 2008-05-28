@@ -1,36 +1,36 @@
-package org.sonatype.nexus.scheduling.util;
+package org.sonatype.scheduling;
 
 import java.util.Date;
 import java.util.concurrent.Future;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
-
-import org.sonatype.nexus.scheduling.ScheduleIterator;
-import org.sonatype.nexus.scheduling.ScheduledTask;
-import org.sonatype.nexus.scheduling.SubmittedTask;
-import org.sonatype.nexus.scheduling.TaskState;
 
 public abstract class AbstractSchedulerTask<T>
     implements SubmittedTask, ScheduledTask
 {
+    private final Class<?> clazz;
+
     private final ScheduleIterator scheduleIterator;
 
-    private final ScheduledThreadPoolExecutor executor;
+    private final DefaultScheduler scheduler;
 
     private boolean enabled;
 
     private TaskState taskState;
 
+    private Date scheduledAt;
+
     private Future<T> future;
 
     private Date lastRun;
 
-    public AbstractSchedulerTask( ScheduleIterator scheduleIterator, ScheduledThreadPoolExecutor executor )
+    public AbstractSchedulerTask( Class<?> clazz, ScheduleIterator scheduleIterator, DefaultScheduler scheduler )
     {
         super();
 
+        this.clazz = clazz;
+
         this.scheduleIterator = scheduleIterator;
 
-        this.executor = executor;
+        this.scheduler = scheduler;
 
         this.enabled = true;
 
@@ -39,6 +39,8 @@ public abstract class AbstractSchedulerTask<T>
 
     public void start()
     {
+        this.scheduledAt = new Date();
+
         setFuture( reschedule() );
     }
 
@@ -52,24 +54,14 @@ public abstract class AbstractSchedulerTask<T>
         this.future = future;
     }
 
-    protected Date getLastRun()
-    {
-        return lastRun;
-    }
-
     protected void setLastRun( Date lastRun )
     {
         this.lastRun = lastRun;
     }
 
-    protected ScheduleIterator getScheduleIterator()
+    protected DefaultScheduler getScheduler()
     {
-        return scheduleIterator;
-    }
-
-    protected ScheduledThreadPoolExecutor getExecutor()
-    {
-        return executor;
+        return scheduler;
     }
 
     protected void setTaskState( TaskState state )
@@ -84,9 +76,24 @@ public abstract class AbstractSchedulerTask<T>
 
     // SubmittedTask
 
+    public Class<?> getType()
+    {
+        return clazz;
+    }
+
     public TaskState getTaskState()
     {
         return taskState;
+    }
+
+    public Date getScheduledAt()
+    {
+        return scheduledAt;
+    }
+
+    public Date getLastRun()
+    {
+        return lastRun;
     }
 
     public boolean isDone()
@@ -99,16 +106,13 @@ public abstract class AbstractSchedulerTask<T>
         getFuture().cancel( true );
 
         setTaskState( TaskState.CANCELLED );
+
+        getScheduler().removeFromTasksMap( this );
     }
 
     // ScheduledTask
 
-    public Date lastRun()
-    {
-        return getLastRun();
-    }
-
-    public Date nextRun()
+    public Date getNextRun()
     {
         if ( getScheduleIterator() != null )
         {
@@ -128,6 +132,11 @@ public abstract class AbstractSchedulerTask<T>
     public void setEnabled( boolean enabled )
     {
         this.enabled = enabled;
+    }
+
+    public ScheduleIterator getScheduleIterator()
+    {
+        return scheduleIterator;
     }
 
 }

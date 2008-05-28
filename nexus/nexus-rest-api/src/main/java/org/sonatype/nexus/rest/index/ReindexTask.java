@@ -22,17 +22,17 @@ package org.sonatype.nexus.rest.index;
 
 import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.feeds.FeedRecorder;
-import org.sonatype.nexus.rest.restore.AbstractRestoreTask;
+import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesTask;
 
 public class ReindexTask
-    extends AbstractRestoreTask
+    extends AbstractNexusRepositoriesTask
 {
     public ReindexTask( Nexus nexus, String repositoryId, String repositoryGroupId )
     {
         super( nexus, repositoryId, repositoryGroupId );
     }
 
-    public Object doRun()
+    public void doRun()
         throws Exception
     {
         if ( getRepositoryGroupId() != null )
@@ -47,8 +47,6 @@ public class ReindexTask
         {
             getNexus().reindexAllRepositories();
         }
-
-        return null;
     }
 
     protected String getAction()

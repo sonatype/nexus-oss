@@ -1,4 +1,4 @@
-package org.sonatype.nexus.scheduling.iterators;
+package org.sonatype.scheduling.iterators;
 
 import java.util.Date;
 

@@ -1,8 +1,8 @@
-package org.sonatype.nexus.scheduling.iterators;
+package org.sonatype.scheduling.iterators;
 
 import java.util.Date;
 
-import org.sonatype.nexus.scheduling.ScheduleIterator;
+import org.sonatype.scheduling.ScheduleIterator;
 
 public abstract class AbstractScheduleIterator
     implements ScheduleIterator

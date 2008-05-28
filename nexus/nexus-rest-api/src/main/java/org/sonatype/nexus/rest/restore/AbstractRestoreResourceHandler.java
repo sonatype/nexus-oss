@@ -27,6 +27,7 @@ import org.restlet.data.Status;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryGroupException;
 import org.sonatype.nexus.rest.AbstractNexusResourceHandler;
+import org.sonatype.nexus.scheduling.NexusTask;
 
 public abstract class AbstractRestoreResourceHandler
     extends AbstractNexusResourceHandler
@@ -39,29 +40,43 @@ public abstract class AbstractRestoreResourceHandler
 
     public static final String TARGET_ID = "target";
 
-    protected String repositoryId;
+    private final String repositoryId;
 
-    protected String repositoryGroupId;
+    private final String repositoryGroupId;
 
     public AbstractRestoreResourceHandler( Context context, Request request, Response response )
     {
         super( context, request, response );
 
-        repositoryId = null;
+        String repoId = null;
 
-        repositoryGroupId = null;
+        String groupId = null;
 
         if ( getRequest().getAttributes().containsKey( DOMAIN ) && getRequest().getAttributes().containsKey( TARGET_ID ) )
         {
             if ( DOMAIN_REPOSITORIES.equals( getRequest().getAttributes().get( DOMAIN ) ) )
             {
-                repositoryId = getRequest().getAttributes().get( TARGET_ID ).toString();
+                repoId = getRequest().getAttributes().get( TARGET_ID ).toString();
             }
             else if ( DOMAIN_REPO_GROUPS.equals( getRequest().getAttributes().get( DOMAIN ) ) )
             {
-                repositoryGroupId = getRequest().getAttributes().get( TARGET_ID ).toString();
+                groupId = getRequest().getAttributes().get( TARGET_ID ).toString();
             }
         }
+
+        repositoryId = repoId;
+
+        repositoryGroupId = groupId;
+    }
+
+    protected String getRepositoryId()
+    {
+        return repositoryId;
+    }
+
+    protected String getRepositoryGroupId()
+    {
+        return repositoryGroupId;
     }
 
     /**
@@ -72,7 +87,7 @@ public abstract class AbstractRestoreResourceHandler
         return true;
     }
 
-    public void handleDelete( AbstractRestoreTask task )
+    public void handleDelete( NexusTask task )
     {
         try
         {
@@ -83,10 +98,17 @@ public abstract class AbstractRestoreResourceHandler
             }
             else if ( repositoryId != null )
             {
-                getNexus().readRepository( repositoryId );
+                try
+                {
+                    getNexus().readRepository( repositoryId );
+                }
+                catch ( NoSuchRepositoryException e )
+                {
+                    getNexus().readRepositoryShadow( repositoryId );
+                }
             }
 
-            getNexus().getScheduler().submit( task );
+            getNexus().submit( task );
         }
         catch ( NoSuchRepositoryException e )
         {

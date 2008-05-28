@@ -26,7 +26,7 @@ import org.restlet.data.Response;
 import org.sonatype.nexus.rest.restore.AbstractRestoreResourceHandler;
 
 public class AttributesResourceHandler
-extends AbstractRestoreResourceHandler
+    extends AbstractRestoreResourceHandler
 {
 
     public AttributesResourceHandler( Context context, Request request, Response response )
@@ -36,7 +36,7 @@ extends AbstractRestoreResourceHandler
 
     public void handleDelete()
     {
-        super.handleDelete( new RebuildAttributesTask( getNexus(), repositoryId, repositoryGroupId ) );
+        super.handleDelete( new RebuildAttributesTask( getNexus(), getRepositoryId(), getRepositoryGroupId() ) );
     }
 
 }

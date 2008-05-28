@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.RejectedExecutionException;
 
 import org.sonatype.nexus.configuration.MutableConfiguration;
 import org.sonatype.nexus.configuration.model.CRemoteConnectionSettings;
@@ -41,7 +42,7 @@ import org.sonatype.nexus.proxy.RepositoryNotAvailableException;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.scheduling.Scheduler;
+import org.sonatype.nexus.scheduling.NexusTask;
 
 /**
  * The main Nexus application interface.
@@ -99,9 +100,11 @@ public interface Nexus
     FeedRecorder getFeedRecorder();
 
     // ------------------------------------------------------------------
-    // Schedules
+    // Scheduler
 
-    Scheduler getScheduler();
+    void submit( NexusTask task )
+        throws RejectedExecutionException,
+            NullPointerException;
 
     // ------------------------------------------------------------------
     // Configuration defaults

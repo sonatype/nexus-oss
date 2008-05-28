@@ -18,19 +18,18 @@
  * along with this program.  If not, see http://www.gnu.org/licenses/.
  *
  */
-package org.sonatype.nexus.rest.restore;
+package org.sonatype.nexus.scheduling;
 
 import org.sonatype.nexus.Nexus;
-import org.sonatype.nexus.rest.AbstractRestTask;
 
-public abstract class AbstractRestoreTask
-    extends AbstractRestTask<Object>
+public abstract class AbstractNexusRepositoriesTask
+    extends AbstractNexusTask
 {
     private final String repositoryId;
 
     private final String repositoryGroupId;
-    
-    public AbstractRestoreTask( Nexus nexus, String repositoryId, String repositoryGroupId )
+
+    public AbstractNexusRepositoriesTask( Nexus nexus, String repositoryId, String repositoryGroupId )
     {
         super( nexus );
 
@@ -43,7 +42,7 @@ public abstract class AbstractRestoreTask
     {
         return repositoryId;
     }
-    
+
     protected String getRepositoryGroupId()
     {
         return repositoryGroupId;

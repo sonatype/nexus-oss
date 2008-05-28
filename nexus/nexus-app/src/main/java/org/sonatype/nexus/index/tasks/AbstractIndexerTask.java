@@ -18,34 +18,31 @@
  * along with this program.  If not, see http://www.gnu.org/licenses/.
  *
  */
-package org.sonatype.nexus.index;
+package org.sonatype.nexus.index.tasks;
 
-import java.util.concurrent.Callable;
+import java.util.List;
 
 import org.sonatype.nexus.Nexus;
-import org.sonatype.nexus.feeds.SystemProcess;
+import org.sonatype.nexus.index.IndexerManager;
+import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesTask;
+import org.sonatype.scheduling.SubmittedTask;
 
-public abstract class AbstractIndexerTask<T>
-    implements Callable<T>
+public abstract class AbstractIndexerTask
+    extends AbstractNexusRepositoriesTask
 {
-    private final Nexus nexus;
-
     private final IndexerManager indexerManager;
-
-    private SystemProcess prc;
 
     public AbstractIndexerTask( Nexus nexus, IndexerManager indexerManager )
     {
-        super();
-
-        this.nexus = nexus;
-
-        this.indexerManager = indexerManager;
+        this( nexus, indexerManager, null, null );
     }
 
-    protected Nexus getNexus()
+    public AbstractIndexerTask( Nexus nexus, IndexerManager indexerManager, String repositoryId,
+        String repositoryGroupId )
     {
-        return nexus;
+        super( nexus, repositoryId, repositoryGroupId );
+
+        this.indexerManager = indexerManager;
     }
 
     protected IndexerManager getIndexerManager()
@@ -53,46 +50,10 @@ public abstract class AbstractIndexerTask<T>
         return indexerManager;
     }
 
-    public final T call()
-        throws Exception
+    public boolean allowConcurrentExecution( List<SubmittedTask> existingTasks )
     {
-        prc = getNexus().getFeedRecorder().systemProcessStarted( getAction(), getMessage() );
-
-        T result = null;
-
-        beforeRun();
-
-        try
-        {
-            result = doRun();
-
-            getNexus().getFeedRecorder().systemProcessFinished( prc );
-        }
-        catch ( Exception e )
-        {
-            getNexus().getFeedRecorder().systemProcessBroken( prc, e );
-
-            throw e;
-        }
-
-        afterRun();
-
-        return result;
+        // override if needed
+        return false;
     }
-
-    protected void beforeRun()
-    {
-    }
-
-    protected abstract T doRun()
-        throws Exception;
-
-    protected void afterRun()
-    {
-    }
-
-    protected abstract String getAction();
-
-    protected abstract String getMessage();
 
 }

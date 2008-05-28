@@ -1,4 +1,4 @@
-package org.sonatype.nexus.scheduling.util;
+package org.sonatype.scheduling;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -6,13 +6,7 @@ import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-
-import org.sonatype.nexus.scheduling.ScheduleIterator;
-import org.sonatype.nexus.scheduling.ScheduledCallableTask;
-import org.sonatype.nexus.scheduling.SubmittedCallableTask;
-import org.sonatype.nexus.scheduling.TaskState;
 
 public class DefaultCallableTask<T>
     extends AbstractSchedulerTask<T>
@@ -22,10 +16,10 @@ public class DefaultCallableTask<T>
 
     private List<T> results;
 
-    public DefaultCallableTask( Callable<T> callable, ScheduleIterator scheduleIterator,
-        ScheduledThreadPoolExecutor executor )
+    public DefaultCallableTask( Class<?> clazz, Callable<T> callable, ScheduleIterator scheduleIterator,
+        DefaultScheduler scheduler )
     {
-        super( scheduleIterator, executor );
+        super( clazz, scheduleIterator, scheduler );
 
         this.callable = callable;
 
@@ -112,6 +106,8 @@ public class DefaultCallableTask<T>
             {
                 setTaskState( TaskState.BROKEN );
 
+                getScheduler().removeFromTasksMap( this );
+
                 throw e;
             }
         }
@@ -127,6 +123,8 @@ public class DefaultCallableTask<T>
         else
         {
             setTaskState( TaskState.FINISHED );
+
+            getScheduler().removeFromTasksMap( this );
         }
 
         return result;
@@ -136,14 +134,14 @@ public class DefaultCallableTask<T>
     {
         if ( getScheduleIterator() != null && !getScheduleIterator().isFinished() )
         {
-            return getExecutor().schedule(
+            return getScheduler().getScheduledExecutorService().schedule(
                 this,
                 getScheduleIterator().next().getTime() - System.currentTimeMillis(),
                 TimeUnit.MILLISECONDS );
         }
         else if ( getLastRun() == null )
         {
-            return getExecutor().submit( this );
+            return getScheduler().getScheduledExecutorService().submit( this );
         }
         else
         {

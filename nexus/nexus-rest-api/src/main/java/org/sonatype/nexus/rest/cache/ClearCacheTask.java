@@ -22,34 +22,24 @@ package org.sonatype.nexus.rest.cache;
 
 import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.feeds.FeedRecorder;
-import org.sonatype.nexus.rest.AbstractRestTask;
+import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesTask;
 
 public class ClearCacheTask
-    extends AbstractRestTask<Object>
+    extends AbstractNexusRepositoriesTask
 {
-    private final String repositoryId;
-
-    private final String repositoryGroupId;
-
     private final String resourceStorePath;
 
     public ClearCacheTask( Nexus nexus, String repositoryId, String repositoryGroupId, String resourceStorePath )
     {
-        super( nexus );
-
-        this.repositoryId = repositoryId;
-
-        this.repositoryGroupId = repositoryGroupId;
+        super( nexus, repositoryId, repositoryGroupId );
 
         this.resourceStorePath = resourceStorePath;
     }
 
-    public Object doRun()
+    public void doRun()
         throws Exception
     {
-        getNexus().clearCaches( resourceStorePath, repositoryId, repositoryGroupId );
-
-        return null;
+        getNexus().clearCaches( resourceStorePath, getRepositoryId(), getRepositoryGroupId() );
     }
 
     protected String getAction()
@@ -59,14 +49,14 @@ public class ClearCacheTask
 
     protected String getMessage()
     {
-        if ( repositoryGroupId != null )
+        if ( getRepositoryGroupId() != null )
         {
-            return "Clearing caches for repository group with ID=" + repositoryGroupId + " from path "
+            return "Clearing caches for repository group with ID=" + getRepositoryGroupId() + " from path "
                 + resourceStorePath + " and below.";
         }
-        else if ( repositoryId != null )
+        else if ( getRepositoryId() != null )
         {
-            return "Clearing caches for repository with ID=" + repositoryId + " from path " + resourceStorePath
+            return "Clearing caches for repository with ID=" + getRepositoryId() + " from path " + resourceStorePath
                 + " and below.";
         }
         else

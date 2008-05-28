@@ -41,26 +41,9 @@ import org.sonatype.nexus.rest.restore.AbstractRestoreResourceHandler;
 public class IndexResourceHandler
     extends AbstractRestoreResourceHandler
 {
-
     public IndexResourceHandler( Context context, Request request, Response response )
     {
         super( context, request, response );
-
-        repositoryId = null;
-
-        repositoryGroupId = null;
-
-        if ( getRequest().getAttributes().containsKey( DOMAIN ) && getRequest().getAttributes().containsKey( TARGET_ID ) )
-        {
-            if ( DOMAIN_REPOSITORIES.equals( getRequest().getAttributes().get( DOMAIN ) ) )
-            {
-                repositoryId = getRequest().getAttributes().get( TARGET_ID ).toString();
-            }
-            else if ( DOMAIN_REPO_GROUPS.equals( getRequest().getAttributes().get( DOMAIN ) ) )
-            {
-                repositoryGroupId = getRequest().getAttributes().get( TARGET_ID ).toString();
-            }
-        }
     }
 
     public boolean allowGet()
@@ -87,11 +70,11 @@ public class IndexResourceHandler
 
         if ( query != null )
         {
-            ais = ai2NaColl( getNexus().searchArtifactFlat( query, repositoryId, repositoryGroupId ) );
+            ais = ai2NaColl( getNexus().searchArtifactFlat( query, getRepositoryId(), getRepositoryGroupId() ) );
         }
         else if ( g != null || a != null || v != null || c != null )
         {
-            ais = ai2NaColl( getNexus().searchArtifactFlat( g, a, v, c, repositoryId, repositoryGroupId ) );
+            ais = ai2NaColl( getNexus().searchArtifactFlat( g, a, v, c, getRepositoryId(), getRepositoryGroupId() ) );
         }
         else
         {
@@ -111,7 +94,7 @@ public class IndexResourceHandler
 
     public void handleDelete()
     {
-        super.handleDelete( new ReindexTask( getNexus(), repositoryId, repositoryGroupId ) );
+        super.handleDelete( new ReindexTask( getNexus(), getRepositoryId(), getRepositoryGroupId() ) );
     }
 
 }

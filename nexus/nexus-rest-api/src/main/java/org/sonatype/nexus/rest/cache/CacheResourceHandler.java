@@ -32,74 +32,48 @@ import org.restlet.resource.Variant;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryGroupException;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.rest.AbstractNexusResourceHandler;
 import org.sonatype.nexus.rest.model.NFCRepositoryResource;
 import org.sonatype.nexus.rest.model.NFCResource;
 import org.sonatype.nexus.rest.model.NFCResourceResponse;
+import org.sonatype.nexus.rest.restore.AbstractRestoreResourceHandler;
 
 /**
  * @author cstamas
  */
 public class CacheResourceHandler
-    extends AbstractNexusResourceHandler
+    extends AbstractRestoreResourceHandler
 {
-    public static final String DOMAIN = "domain";
-
-    public static final String DOMAIN_REPOSITORIES = "repositories";
-
-    public static final String DOMAIN_REPO_GROUPS = "repo_groups";
-
-    public static final String TARGET_ID = "target";
-
-    protected String repositoryId;
-
-    protected String repositoryGroupId;
-
-    protected String resourceStorePath;
+    protected final String resourceStorePath;
 
     public CacheResourceHandler( Context context, Request request, Response response )
     {
         super( context, request, response );
 
-        resourceStorePath = null;
+        String path = null;
 
-        repositoryId = null;
-
-        repositoryGroupId = null;
-
-        if ( getRequest().getAttributes().containsKey( DOMAIN ) && getRequest().getAttributes().containsKey( TARGET_ID ) )
+        if ( getRepositoryId() != null || getRepositoryGroupId() != null )
         {
-            if ( DOMAIN_REPOSITORIES.equals( getRequest().getAttributes().get( DOMAIN ) ) )
-            {
-                repositoryId = getRequest().getAttributes().get( TARGET_ID ).toString();
-            }
-            else if ( DOMAIN_REPO_GROUPS.equals( getRequest().getAttributes().get( DOMAIN ) ) )
-            {
-                repositoryGroupId = getRequest().getAttributes().get( TARGET_ID ).toString();
-            }
-        }
-
-        if ( repositoryId != null || repositoryGroupId != null )
-        {
-            resourceStorePath = getRequest().getResourceRef().getRemainingPart();
+            path = getRequest().getResourceRef().getRemainingPart();
 
             // get rid of query part
-            if ( resourceStorePath.contains( "?" ) )
+            if ( path.contains( "?" ) )
             {
-                resourceStorePath = resourceStorePath.substring( 0, resourceStorePath.indexOf( '?' ) );
+                path = path.substring( 0, path.indexOf( '?' ) );
             }
 
             // get rid of reference part
-            if ( resourceStorePath.contains( "#" ) )
+            if ( path.contains( "#" ) )
             {
-                resourceStorePath = resourceStorePath.substring( 0, resourceStorePath.indexOf( '#' ) );
+                path = path.substring( 0, path.indexOf( '#' ) );
             }
 
-            if ( StringUtils.isEmpty( resourceStorePath ) )
+            if ( StringUtils.isEmpty( path ) )
             {
-                resourceStorePath = "/";
+                path = "/";
             }
         }
+
+        this.resourceStorePath = path;
     }
 
     public boolean allowGet()
@@ -115,9 +89,9 @@ public class CacheResourceHandler
             NFCResource resource = new NFCResource();
 
             // check reposes
-            if ( repositoryGroupId != null )
+            if ( getRepositoryGroupId() != null )
             {
-                for ( Repository repository : getNexus().getRepositoryGroup( repositoryGroupId ) )
+                for ( Repository repository : getNexus().getRepositoryGroup( getRepositoryGroupId() ) )
                 {
                     NFCRepositoryResource repoNfc = new NFCRepositoryResource();
 
@@ -128,9 +102,9 @@ public class CacheResourceHandler
                     resource.addNfcContent( repoNfc );
                 }
             }
-            else if ( repositoryId != null )
+            else if ( getRepositoryId() != null )
             {
-                Repository repository = getNexus().getRepository( repositoryId );
+                Repository repository = getNexus().getRepository( getRepositoryId() );
 
                 NFCRepositoryResource repoNfc = new NFCRepositoryResource();
 
@@ -168,36 +142,11 @@ public class CacheResourceHandler
 
     public void delete()
     {
-        try
-        {
-            // check reposes
-            if ( repositoryGroupId != null )
-            {
-                getNexus().readRepositoryGroup( repositoryGroupId );
-            }
-            else if ( repositoryId != null )
-            {
-                try
-                {
-                    getNexus().readRepository( repositoryId );
-                }
-                catch ( NoSuchRepositoryException e )
-                {
-                    getNexus().readRepositoryShadow( repositoryId );
-                }
-            }
-
-            getNexus().getScheduler().submit(
-                new ClearCacheTask( getNexus(), repositoryId, repositoryGroupId, resourceStorePath ) );
-        }
-        catch ( NoSuchRepositoryException e )
-        {
-            getResponse().setStatus( Status.CLIENT_ERROR_NOT_FOUND, e.getMessage() );
-        }
-        catch ( NoSuchRepositoryGroupException e )
-        {
-            getResponse().setStatus( Status.CLIENT_ERROR_NOT_FOUND, e.getMessage() );
-        }
+        super.handleDelete( new ClearCacheTask(
+            getNexus(),
+            getRepositoryId(),
+            getRepositoryGroupId(),
+            resourceStorePath ) );
     }
 
 }

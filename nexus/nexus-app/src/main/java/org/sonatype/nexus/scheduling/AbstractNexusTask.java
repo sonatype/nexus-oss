@@ -18,25 +18,39 @@
  * along with this program.  If not, see http://www.gnu.org/licenses/.
  *
  */
-package org.sonatype.nexus.rest;
+package org.sonatype.nexus.scheduling;
 
-import java.util.concurrent.Callable;
+import java.util.List;
 
+import org.codehaus.plexus.logging.Logger;
 import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.feeds.SystemProcess;
+import org.sonatype.scheduling.SubmittedTask;
 
-public abstract class AbstractRestTask<T>
-    implements Callable<T>
+public abstract class AbstractNexusTask
+    implements NexusTask
 {
     private final Nexus nexus;
 
     private SystemProcess prc;
 
-    public AbstractRestTask( Nexus nexus )
+    private Logger logger;
+
+    public AbstractNexusTask( Nexus nexus )
     {
         super();
 
         this.nexus = nexus;
+    }
+
+    public Logger getLogger()
+    {
+        return logger;
+    }
+
+    public void setLogger( Logger logger )
+    {
+        this.logger = logger;
     }
 
     protected Nexus getNexus()
@@ -44,41 +58,43 @@ public abstract class AbstractRestTask<T>
         return nexus;
     }
 
-    public final T call()
-        throws Exception
+    public boolean allowConcurrentExecution( List<SubmittedTask> existingTasks )
+    {
+        // override if needed
+        return false;
+    }
+
+    public final void run()
     {
         prc = getNexus().getFeedRecorder().systemProcessStarted( getAction(), getMessage() );
-
-        T result = null;
 
         beforeRun();
 
         try
         {
-            result = doRun();
+            doRun();
 
             getNexus().getFeedRecorder().systemProcessFinished( prc );
+
+            afterRun();
         }
         catch ( Exception e )
         {
             getNexus().getFeedRecorder().systemProcessBroken( prc, e );
-
-            throw e;
         }
-
-        afterRun();
-
-        return result;
     }
 
     protected void beforeRun()
     {
+        // override if needed
     }
 
-    protected abstract T doRun() throws Exception;
+    protected abstract void doRun()
+        throws Exception;
 
     protected void afterRun()
     {
+        // override if needed
     }
 
     protected abstract String getAction();

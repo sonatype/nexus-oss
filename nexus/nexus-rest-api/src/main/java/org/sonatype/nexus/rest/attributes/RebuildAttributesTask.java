@@ -22,17 +22,17 @@ package org.sonatype.nexus.rest.attributes;
 
 import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.feeds.FeedRecorder;
-import org.sonatype.nexus.rest.restore.AbstractRestoreTask;
+import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesTask;
 
 public class RebuildAttributesTask
-extends AbstractRestoreTask
+    extends AbstractNexusRepositoriesTask
 {
     public RebuildAttributesTask( Nexus nexus, String repositoryId, String repositoryGroupId )
     {
         super( nexus, repositoryId, repositoryGroupId );
     }
 
-    public Object doRun()
+    public void doRun()
         throws Exception
     {
         if ( getRepositoryGroupId() != null )
@@ -47,8 +47,6 @@ extends AbstractRestoreTask
         {
             getNexus().rebuildAttributesAllRepositories();
         }
-
-        return null;
     }
 
     protected String getAction()

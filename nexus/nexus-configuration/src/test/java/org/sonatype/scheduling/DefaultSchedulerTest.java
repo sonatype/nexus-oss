@@ -1,4 +1,4 @@
-package org.sonatype.nexus.scheduling;
+package org.sonatype.scheduling;
 
 import java.util.Date;
 import java.util.concurrent.Callable;
@@ -27,6 +27,8 @@ public class DefaultSchedulerTest
 
         SubmittedTask st = defaultScheduler.submit( tr );
 
+        assertEquals( 1, defaultScheduler.getScheduledTasks().size() );
+        
         while ( !st.isDone() )
         {
             Thread.sleep( 300 );
@@ -35,6 +37,8 @@ public class DefaultSchedulerTest
         assertEquals( 1, tr.getRunCount() );
         
         assertEquals( TaskState.FINISHED, st.getTaskState() );
+        
+        assertEquals( 0, defaultScheduler.getScheduledTasks().size() );
     }
 
     public void testSimpleCallable()
@@ -46,6 +50,8 @@ public class DefaultSchedulerTest
 
         SubmittedCallableTask<Integer> st = defaultScheduler.submit( tr );
 
+        assertEquals( 1, defaultScheduler.getScheduledTasks().size() );
+        
         while ( !st.isDone() )
         {
             Thread.sleep( 300 );
@@ -56,6 +62,8 @@ public class DefaultSchedulerTest
         assertEquals( Integer.valueOf( 0 ), st.getIfDone() );
 
         assertEquals( TaskState.FINISHED, st.getTaskState() );
+
+        assertEquals( 0, defaultScheduler.getScheduledTasks().size() );
     }
 
     public void testSecondsRunnable()
@@ -71,6 +79,8 @@ public class DefaultSchedulerTest
 
         ScheduledTask st = defaultScheduler.schedule( tr, iterator );
 
+        assertEquals( 1, defaultScheduler.getScheduledTasks().size() );
+        
         while ( !st.isDone() )
         {
             Thread.sleep( 300 );
@@ -79,6 +89,8 @@ public class DefaultSchedulerTest
         assertEquals( 5, tr.getRunCount() );
         
         assertEquals( TaskState.FINISHED, st.getTaskState() );
+
+        assertEquals( 0, defaultScheduler.getScheduledTasks().size() );
     }
 
     public void testSecondsCallable()
@@ -94,6 +106,8 @@ public class DefaultSchedulerTest
 
         ScheduledCallableTask<Integer> st = defaultScheduler.schedule( tr, iterator );
 
+        assertEquals( 1, defaultScheduler.getScheduledTasks().size() );
+        
         while ( !st.isDone() )
         {
             Thread.sleep( 300 );
@@ -114,6 +128,8 @@ public class DefaultSchedulerTest
         assertEquals( Integer.valueOf( 4 ), st.get( 4 ) );
 
         assertEquals( TaskState.FINISHED, st.getTaskState() );
+
+        assertEquals( 0, defaultScheduler.getScheduledTasks().size() );
     }
 
     public void testCancelRunnable()
@@ -129,6 +145,8 @@ public class DefaultSchedulerTest
 
         SubmittedTask st = defaultScheduler.schedule( tr, iterator );
 
+        assertEquals( 1, defaultScheduler.getScheduledTasks().size() );
+        
         st.cancel();
 
         assertEquals( 0, tr.getRunCount() );
@@ -136,6 +154,8 @@ public class DefaultSchedulerTest
         assertTrue( st.isDone() );
         
         assertEquals( TaskState.CANCELLED, st.getTaskState() );
+
+        assertEquals( 0, defaultScheduler.getScheduledTasks().size() );
     }
 
     public void testCancelCallable()
@@ -151,6 +171,8 @@ public class DefaultSchedulerTest
 
         SubmittedTask st = defaultScheduler.schedule( tr, iterator );
 
+        assertEquals( 1, defaultScheduler.getScheduledTasks().size() );
+        
         st.cancel();
 
         assertEquals( 0, tr.getRunCount() );
@@ -158,6 +180,8 @@ public class DefaultSchedulerTest
         assertTrue( st.isDone() );
         
         assertEquals( TaskState.CANCELLED, st.getTaskState() );
+
+        assertEquals( 0, defaultScheduler.getScheduledTasks().size() );
     }
 
     // Helper classes

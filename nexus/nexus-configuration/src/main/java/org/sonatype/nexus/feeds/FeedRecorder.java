@@ -46,7 +46,12 @@ public interface FeedRecorder
      * System event action: reindex
      */
     public static final String SYSTEM_REINDEX_ACTION = "REINDEX";
-    
+
+    /**
+     * System event action: publish indexes
+     */
+    public static final String SYSTEM_PUBLISHINDEX_ACTION = "PUBLISHINDEX";
+
     /**
      * System event action: rebuildAttributes
      */

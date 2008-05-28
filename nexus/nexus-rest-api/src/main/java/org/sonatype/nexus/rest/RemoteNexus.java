@@ -26,6 +26,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.RejectedExecutionException;
 
 import org.restlet.Client;
 import org.restlet.Context;
@@ -56,7 +57,8 @@ import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.registry.InvalidGroupingException;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.scheduling.Scheduler;
+import org.sonatype.nexus.scheduling.NexusScheduler;
+import org.sonatype.nexus.scheduling.NexusTask;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
 
 import com.thoughtworks.xstream.XStream;
@@ -717,10 +719,18 @@ public class RemoteNexus
         return null;
     }
 
-    public Scheduler getScheduler()
+    public NexusScheduler getScheduler()
     {
         // TODO Auto-generated method stub
         return null;
+    }
+
+    public void submit( NexusTask task )
+        throws RejectedExecutionException,
+            NullPointerException
+    {
+        // TODO Auto-generated method stub
+        
     }
 
 }

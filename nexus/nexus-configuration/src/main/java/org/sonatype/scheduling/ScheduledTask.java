@@ -1,15 +1,17 @@
-package org.sonatype.nexus.scheduling;
+package org.sonatype.scheduling;
 
 import java.util.Date;
 
 public interface ScheduledTask
     extends SubmittedTask
 {
-    Date lastRun();
+    Date getLastRun();
 
-    Date nextRun();
+    Date getNextRun();
 
     boolean isEnabled();
 
     void setEnabled( boolean enabled );
+    
+    ScheduleIterator getScheduleIterator();
 }

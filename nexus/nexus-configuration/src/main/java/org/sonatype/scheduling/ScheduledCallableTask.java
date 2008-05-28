@@ -1,4 +1,4 @@
-package org.sonatype.nexus.scheduling;
+package org.sonatype.scheduling;
 
 import java.util.concurrent.ExecutionException;
 

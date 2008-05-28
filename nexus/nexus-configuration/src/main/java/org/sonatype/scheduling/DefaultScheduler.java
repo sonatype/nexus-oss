@@ -18,9 +18,13 @@
  * along with this program.  If not, see http://www.gnu.org/licenses/.
  *
  */
-package org.sonatype.nexus.scheduling;
+package org.sonatype.scheduling;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -35,8 +39,6 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Startable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.StartingException;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.StoppingException;
-import org.sonatype.nexus.scheduling.util.DefaultCallableTask;
-import org.sonatype.nexus.scheduling.util.DefaultRunnableTask;
 
 /**
  * A simple facade to ScheduledThreadPoolExecutor as Plexus component.
@@ -54,6 +56,8 @@ public class DefaultScheduler
 
     private ScheduledThreadPoolExecutor scheduledExecutorService;
 
+    private Map<Class<?>, List<SubmittedTask>> tasksMap;
+
     public void contextualize( Context context )
         throws ContextException
     {
@@ -63,6 +67,8 @@ public class DefaultScheduler
     public void start()
         throws StartingException
     {
+        tasksMap = new HashMap<Class<?>, List<SubmittedTask>>();
+
         plexusThreadFactory = new PlexusThreadFactory( plexusContainer );
 
         scheduledExecutorService = (ScheduledThreadPoolExecutor) Executors.newScheduledThreadPool(
@@ -102,9 +108,40 @@ public class DefaultScheduler
         return scheduledExecutorService;
     }
 
+    protected void addToTasksMap( SubmittedTask task )
+    {
+        synchronized ( tasksMap )
+        {
+            if ( !tasksMap.containsKey( task.getType() ) )
+            {
+                tasksMap.put( task.getType(), new ArrayList<SubmittedTask>() );
+            }
+            tasksMap.get( task.getType() ).add( task );
+        }
+    }
+
+    protected void removeFromTasksMap( SubmittedTask task )
+    {
+        synchronized ( tasksMap )
+        {
+            if ( tasksMap.containsKey( task.getType() ) )
+            {
+                tasksMap.get( task.getType() ).remove( task );
+
+                if ( tasksMap.get( task.getType() ).size() == 0 )
+                {
+                    tasksMap.remove( task.getType() );
+                }
+            }
+        }
+    }
+
     public SubmittedTask submit( Runnable runnable )
     {
-        DefaultRunnableTask drt = new DefaultRunnableTask( runnable, null, getScheduledExecutorService() );
+        DefaultCallableTask<Object> drt = new DefaultCallableTask<Object>( runnable.getClass(), Executors
+            .callable( runnable ), null, this );
+
+        addToTasksMap( drt );
 
         drt.start();
 
@@ -113,7 +150,10 @@ public class DefaultScheduler
 
     public ScheduledTask schedule( Runnable runnable, ScheduleIterator iterator )
     {
-        DefaultRunnableTask drt = new DefaultRunnableTask( runnable, iterator, getScheduledExecutorService() );
+        DefaultCallableTask<Object> drt = new DefaultCallableTask<Object>( runnable.getClass(), Executors
+            .callable( runnable ), iterator, this );
+
+        addToTasksMap( drt );
 
         drt.start();
 
@@ -122,7 +162,9 @@ public class DefaultScheduler
 
     public <T> SubmittedCallableTask<T> submit( Callable<T> callable )
     {
-        DefaultCallableTask<T> dct = new DefaultCallableTask<T>( callable, null, getScheduledExecutorService() );
+        DefaultCallableTask<T> dct = new DefaultCallableTask<T>( callable.getClass(), callable, null, this );
+
+        addToTasksMap( dct );
 
         dct.start();
 
@@ -131,11 +173,18 @@ public class DefaultScheduler
 
     public <T> ScheduledCallableTask<T> schedule( Callable<T> callable, ScheduleIterator iterator )
     {
-        DefaultCallableTask<T> dct = new DefaultCallableTask<T>( callable, iterator, getScheduledExecutorService() );
+        DefaultCallableTask<T> dct = new DefaultCallableTask<T>( callable.getClass(), callable, iterator, this );
+
+        addToTasksMap( dct );
 
         dct.start();
 
         return dct;
+    }
+
+    public Map<Class<?>, List<SubmittedTask>> getScheduledTasks()
+    {
+        return Collections.unmodifiableMap( new HashMap<Class<?>, List<SubmittedTask>>( tasksMap ) );
     }
 
 }

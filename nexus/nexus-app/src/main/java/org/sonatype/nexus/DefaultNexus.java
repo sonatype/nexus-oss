@@ -29,6 +29,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Properties;
+import java.util.concurrent.RejectedExecutionException;
 
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
@@ -55,6 +56,7 @@ import org.sonatype.nexus.feeds.NexusArtifactEvent;
 import org.sonatype.nexus.index.ArtifactInfo;
 import org.sonatype.nexus.index.IndexerManager;
 import org.sonatype.nexus.index.context.IndexContextInInconsistentStateException;
+import org.sonatype.nexus.index.tasks.PublishIndexesTask;
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
@@ -81,7 +83,8 @@ import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RepositoryType;
 import org.sonatype.nexus.proxy.repository.ShadowRepository;
-import org.sonatype.nexus.scheduling.Scheduler;
+import org.sonatype.nexus.scheduling.NexusScheduler;
+import org.sonatype.nexus.scheduling.NexusTask;
 import org.sonatype.nexus.store.DefaultEntry;
 import org.sonatype.nexus.store.Entry;
 import org.sonatype.nexus.store.Store;
@@ -137,7 +140,7 @@ public class DefaultNexus
      * 
      * @plexus.requirement
      */
-    private Scheduler scheduler;
+    private NexusScheduler scheduler;
 
     /**
      * The Feed recorder.
@@ -830,9 +833,11 @@ public class DefaultNexus
     // =============
     // Schedules
 
-    public Scheduler getScheduler()
+    public void submit( NexusTask task )
+        throws RejectedExecutionException,
+            NullPointerException
     {
-        return scheduler;
+        scheduler.submit( task );
     }
 
     // =============
@@ -1010,20 +1015,7 @@ public class DefaultNexus
                 // TODO: perform upgrade or something
             }
 
-            scheduler.submit( new Runnable()
-            {
-                public void run()
-                {
-                    try
-                    {
-                        indexerManager.publishAllIndex();
-                    }
-                    catch ( IOException e )
-                    {
-                        getLogger().error( "Cannot publish indexes at startup!", e );
-                    }
-                }
-            } );
+            scheduler.submit( new PublishIndexesTask( this, indexerManager, null, null ) );
 
             systemStatus.setState( SystemState.STARTED );
 

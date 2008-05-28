@@ -1,4 +1,4 @@
-package org.sonatype.nexus.scheduling.iterators;
+package org.sonatype.scheduling.iterators;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -6,7 +6,7 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
-import org.sonatype.nexus.scheduling.ScheduleIterator;
+import org.sonatype.scheduling.ScheduleIterator;
 
 public class CompositeScheduleIterator
     extends AbstractScheduleIterator
