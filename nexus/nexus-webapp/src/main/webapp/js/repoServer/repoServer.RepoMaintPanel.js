@@ -499,6 +499,7 @@ Ext.extend(Sonatype.repoServer.RepoMaintPanel, Ext.Panel, {
     
     var isVirtualRepo = (node.getOwnerTree().root.attributes.repoType == 'virtual');
     var isProxyRepo = (node.getOwnerTree().root.attributes.repoType == 'proxy');
+    var isGroup = (node.getOwnerTree().root.attributes.repoType == 'group');
     
     if (node.isLeaf() || this.editMode){
       this.ctxBrowseNode = node;
@@ -522,7 +523,7 @@ Ext.extend(Sonatype.repoServer.RepoMaintPanel, Ext.Panel, {
         menu.add(this.actions.download);
       }
       
-      if (this.editMode && !node.isRoot){
+      if (this.editMode && !node.isRoot && !isGroup){
         menu.add(this.actions.deleteRepoItem);
         if (isProxyRepo && !node.isLeaf()){
           menu.add(this.actions.viewRemote);
