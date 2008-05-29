@@ -9,7 +9,7 @@ import org.sonatype.scheduling.schedules.Schedule;
 public abstract class AbstractSchedulerTask<T>
     implements SubmittedTask, ScheduledTask
 {
-    private final Class<?> clazz;
+    private final String clazz;
 
     private final ScheduleIterator scheduleIterator;
 
@@ -27,7 +27,7 @@ public abstract class AbstractSchedulerTask<T>
 
     private Date lastRun;
 
-    public AbstractSchedulerTask( Class<?> clazz, ScheduleIterator scheduleIterator, DefaultScheduler scheduler,
+    public AbstractSchedulerTask( String clazz, ScheduleIterator scheduleIterator, DefaultScheduler scheduler,
         Schedule schedule )
     {
         super();
@@ -84,7 +84,7 @@ public abstract class AbstractSchedulerTask<T>
 
     // SubmittedTask
 
-    public Class<?> getType()
+    public String getType()
     {
         return clazz;
     }

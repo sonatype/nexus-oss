@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.RejectedExecutionException;
 
@@ -88,6 +89,9 @@ import org.sonatype.nexus.scheduling.NexusTask;
 import org.sonatype.nexus.store.DefaultEntry;
 import org.sonatype.nexus.store.Entry;
 import org.sonatype.nexus.store.Store;
+import org.sonatype.scheduling.ScheduledTask;
+import org.sonatype.scheduling.SubmittedTask;
+import org.sonatype.scheduling.schedules.Schedule;
 
 /**
  * The default Nexus implementation.
@@ -849,6 +853,18 @@ public class DefaultNexus
         scheduler.submit( task );
     }
 
+    public ScheduledTask schedule( NexusTask nexusTask, Schedule schedule )
+        throws RejectedExecutionException,
+            NullPointerException
+    {
+        return scheduler.schedule( nexusTask, schedule );
+    }
+
+    public Map<String, List<SubmittedTask>> getScheduledTasks()
+    {
+        return scheduler.getScheduledTasks();
+    }
+
     // =============
     // Search and indexing related
 
@@ -1314,5 +1330,4 @@ public class DefaultNexus
 
         getFeedRecorder().addSystemEvent( FeedRecorder.SYSTEM_CONFIG_ACTION, "Nexus configuration changed/updated." );
     }
-
 }

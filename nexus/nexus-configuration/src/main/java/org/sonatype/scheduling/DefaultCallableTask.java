@@ -19,7 +19,7 @@ public class DefaultCallableTask<T>
 
     private List<T> results;
 
-    public DefaultCallableTask( Class<?> clazz, Callable<T> callable, ScheduleIterator scheduleIterator,
+    public DefaultCallableTask( String clazz, Callable<T> callable, ScheduleIterator scheduleIterator,
         DefaultScheduler scheduler, Schedule schedule )
     {
         super( clazz, scheduleIterator, scheduler, schedule );

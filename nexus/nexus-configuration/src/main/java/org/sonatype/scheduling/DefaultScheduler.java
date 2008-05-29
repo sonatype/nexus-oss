@@ -21,7 +21,6 @@
 package org.sonatype.scheduling;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -58,7 +57,7 @@ public class DefaultScheduler
 
     private ScheduledThreadPoolExecutor scheduledExecutorService;
 
-    private Map<Class<?>, List<SubmittedTask>> tasksMap;
+    private Map<String, List<SubmittedTask>> tasksMap;
 
     public void contextualize( Context context )
         throws ContextException
@@ -69,7 +68,7 @@ public class DefaultScheduler
     public void start()
         throws StartingException
     {
-        tasksMap = new HashMap<Class<?>, List<SubmittedTask>>();
+        tasksMap = new HashMap<String, List<SubmittedTask>>();
 
         plexusThreadFactory = new PlexusThreadFactory( plexusContainer );
 
@@ -140,7 +139,7 @@ public class DefaultScheduler
 
     public SubmittedTask submit( Runnable runnable )
     {
-        DefaultCallableTask<Object> drt = new DefaultCallableTask<Object>( runnable.getClass(), Executors
+        DefaultCallableTask<Object> drt = new DefaultCallableTask<Object>( runnable.getClass().getName(), Executors
             .callable( runnable ), null, this, null );
 
         addToTasksMap( drt );
@@ -152,7 +151,7 @@ public class DefaultScheduler
 
     public IteratingTask iterate( Runnable runnable, ScheduleIterator iterator )
     {
-        DefaultCallableTask<Object> drt = new DefaultCallableTask<Object>( runnable.getClass(), Executors
+        DefaultCallableTask<Object> drt = new DefaultCallableTask<Object>( runnable.getClass().getName(), Executors
             .callable( runnable ), iterator, this, null );
 
         addToTasksMap( drt );
@@ -164,7 +163,7 @@ public class DefaultScheduler
 
     public ScheduledTask schedule( Runnable runnable, Schedule schedule )
     {
-        DefaultCallableTask<Object> drt = new DefaultCallableTask<Object>( runnable.getClass(), Executors
+        DefaultCallableTask<Object> drt = new DefaultCallableTask<Object>( runnable.getClass().getName(), Executors
             .callable( runnable ), schedule.getIterator(), this, schedule );
 
         addToTasksMap( drt );
@@ -176,7 +175,12 @@ public class DefaultScheduler
 
     public <T> SubmittedCallableTask<T> submit( Callable<T> callable )
     {
-        DefaultCallableTask<T> dct = new DefaultCallableTask<T>( callable.getClass(), callable, null, this, null );
+        DefaultCallableTask<T> dct = new DefaultCallableTask<T>(
+            callable.getClass().getName(),
+            callable,
+            null,
+            this,
+            null );
 
         addToTasksMap( dct );
 
@@ -187,7 +191,12 @@ public class DefaultScheduler
 
     public <T> IteratingCallableTask<T> iterate( Callable<T> callable, ScheduleIterator iterator )
     {
-        DefaultCallableTask<T> dct = new DefaultCallableTask<T>( callable.getClass(), callable, iterator, this, null );
+        DefaultCallableTask<T> dct = new DefaultCallableTask<T>(
+            callable.getClass().getName(),
+            callable,
+            iterator,
+            this,
+            null );
 
         addToTasksMap( dct );
 
@@ -198,12 +207,8 @@ public class DefaultScheduler
 
     public <T> ScheduledCallableTask<T> schedule( Callable<T> callable, Schedule schedule )
     {
-        DefaultCallableTask<T> dct = new DefaultCallableTask<T>(
-            callable.getClass(),
-            callable,
-            schedule.getIterator(),
-            this,
-            schedule );
+        DefaultCallableTask<T> dct = new DefaultCallableTask<T>( callable.getClass().getName(), callable, schedule
+            .getIterator(), this, schedule );
 
         addToTasksMap( dct );
 
@@ -212,9 +217,37 @@ public class DefaultScheduler
         return dct;
     }
 
-    public Map<Class<?>, List<SubmittedTask>> getScheduledTasks()
+    public Map<String, List<SubmittedTask>> getScheduledTasks()
     {
-        return Collections.unmodifiableMap( new HashMap<Class<?>, List<SubmittedTask>>( tasksMap ) );
+        Map<String, List<SubmittedTask>> result = null;
+
+        // create a "snapshots" of active tasks
+        synchronized ( tasksMap )
+        {
+            result = new HashMap<String, List<SubmittedTask>>( tasksMap.size() );
+
+            List<SubmittedTask> tasks = null;
+
+            for ( String cls : tasksMap.keySet() )
+            {
+                tasks = new ArrayList<SubmittedTask>();
+
+                for ( SubmittedTask task : tasksMap.get( cls ) )
+                {
+                    if ( task.getTaskState().isActive() )
+                    {
+                        tasks.add( task );
+                    }
+                }
+
+                if ( tasks.size() > 0 )
+                {
+                    result.put( cls, tasks );
+                }
+            }
+        }
+
+        return result;
     }
 
 }

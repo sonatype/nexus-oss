@@ -4,7 +4,7 @@ import java.util.Date;
 
 public interface SubmittedTask
 {
-    Class<?> getType();
+    String getType();
 
     TaskState getTaskState();
 

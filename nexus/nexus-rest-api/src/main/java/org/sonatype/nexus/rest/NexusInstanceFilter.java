@@ -111,11 +111,10 @@ public class NexusInstanceFilter
             if ( remoteInstance == null )
             {
                 throw new IllegalArgumentException( "Nexus instance with alias [" + alias + "] is unknown!" );
-
             }
             else
             {
-                return new RemoteNexus( getContext(), remoteInstance.getInstanceUrl() );
+                throw new IllegalArgumentException( "Nexus remoting is not implemented!" );
             }
         }
         catch ( IOException e )

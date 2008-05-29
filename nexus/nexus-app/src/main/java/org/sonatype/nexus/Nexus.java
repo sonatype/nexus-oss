@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.RejectedExecutionException;
 
 import org.sonatype.nexus.configuration.MutableConfiguration;
@@ -44,6 +45,9 @@ import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.scheduling.NexusTask;
+import org.sonatype.scheduling.ScheduledTask;
+import org.sonatype.scheduling.SubmittedTask;
+import org.sonatype.scheduling.schedules.Schedule;
 
 /**
  * The main Nexus application interface.
@@ -60,12 +64,11 @@ public interface Nexus
     // Status
 
     SystemStatus getSystemState();
-    
+
     // ------------------------------------------------------------------
     // Configuration
-    
+
     NexusConfiguration getNexusConfiguration();
-    
 
     // ------------------------------------------------------------------
     // Reposes
@@ -112,6 +115,12 @@ public interface Nexus
     void submit( NexusTask task )
         throws RejectedExecutionException,
             NullPointerException;
+
+    ScheduledTask schedule( NexusTask nexusTask, Schedule schedule )
+        throws RejectedExecutionException,
+            NullPointerException;
+
+    Map<String, List<SubmittedTask>> getScheduledTasks();
 
     // ------------------------------------------------------------------
     // Configuration defaults

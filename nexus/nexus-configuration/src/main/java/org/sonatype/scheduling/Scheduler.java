@@ -82,5 +82,5 @@ public interface Scheduler
      * 
      * @return
      */
-    Map<Class<?>, List<SubmittedTask>> getScheduledTasks();
+    Map<String, List<SubmittedTask>> getScheduledTasks();
 }
