@@ -330,7 +330,7 @@ Ext.extend(Sonatype.repoServer.FileUploadPanel, Ext.FormPanel, {
               tag: 'input',
               type: 'hidden',
               name: 'hasPom',
-              value: '1'
+              value: 'true'
             }
           ]
         :

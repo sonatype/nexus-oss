@@ -284,6 +284,8 @@ public class AbstractArtifactResourceHandler
                     String classifier = null;
 
                     String packaging = null;
+                    
+                    PomArtifactManager pomManager = new PomArtifactManager();
 
                     for ( FileItem fi : items )
                     {
@@ -323,10 +325,28 @@ public class AbstractArtifactResourceHandler
                         {
                             // a file
                             isPom = fi.getName().endsWith( ".pom" ) || fi.getName().endsWith( "pom.xml" );
-
-                            is = fi.getInputStream();
-
-                            GAVRequest gavRequest = new GAVRequest( groupId, artifactId, version, packaging, classifier );
+                            
+                            GAVRequest gavRequest;
+                            
+                            if ( hasPom )
+                            {
+                                if ( isPom )
+                                {
+                                    pomManager.storeTempPomFile( fi.getInputStream() );
+                                    is = pomManager.getTempPomFileInputStream();
+                                }
+                                else
+                                {
+                                    is = fi.getInputStream();
+                                }
+                                
+                                gavRequest = pomManager.getGAVRequestFromTempPomFile();
+                            }
+                            else
+                            {
+                                is = fi.getInputStream();
+                                gavRequest = new GAVRequest( groupId, artifactId, version, packaging, classifier );
+                            }
 
                             try
                             {
@@ -366,6 +386,11 @@ public class AbstractArtifactResourceHandler
                                 return;
                             }
                         }
+                    }
+                    
+                    if ( hasPom )
+                    {
+                        pomManager.removeTempPomFile();
                     }
 
                     getResponse().setStatus( Status.SUCCESS_CREATED );
