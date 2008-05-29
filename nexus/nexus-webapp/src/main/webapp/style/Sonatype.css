@@ -231,3 +231,5 @@ button.st-icon-refresh {
     background-image: url(../images/icons/folder-trigger.png);
     cursor:pointer;
 }
+
+.ext-ie .x-fieldset{padding-top:10px;padding-bottom:10px;}
