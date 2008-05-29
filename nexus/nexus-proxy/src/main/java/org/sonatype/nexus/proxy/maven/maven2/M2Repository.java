@@ -27,9 +27,7 @@ import java.io.OutputStreamWriter;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.regex.Pattern;
 
-import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Reader;
 import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Writer;
@@ -48,6 +46,7 @@ import org.sonatype.nexus.proxy.maven.ArtifactPackagingMapper;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.util.AlphanumComparator;
+import org.sonatype.nexus.util.VersionUtils;
 
 /**
  * The default M2Repository.
@@ -59,8 +58,6 @@ import org.sonatype.nexus.util.AlphanumComparator;
 public class M2Repository
     extends AbstractMavenRepository
 {
-    private static final Pattern VERSION_FILE_PATTERN = Pattern.compile( "^(.*)-([0-9]{8}.[0-9]{6})-([0-9]+)$" );
-
     /**
      * The ContentClass.
      * 
@@ -216,7 +213,7 @@ public class M2Repository
         {
             // if we need snapshots and the version is not snapshot, or
             // if we need releases and the version is snapshot
-            if ( ( snapshot && !isSnapshot( iversion.next() ) ) || ( !snapshot && isSnapshot( iversion.next() ) ) )
+            if ( ( snapshot && !VersionUtils.isSnapshot( iversion.next() ) ) || ( !snapshot && VersionUtils.isSnapshot( iversion.next() ) ) )
             {
                 iversion.remove();
             }
@@ -239,12 +236,6 @@ public class M2Repository
         Collections.sort( versions, new AlphanumComparator() );
 
         return versions.get( versions.size() - 1 );
-    }
-
-    public boolean isSnapshot( String baseVersion )
-    {
-        return VERSION_FILE_PATTERN.matcher( baseVersion ).matches()
-            || baseVersion.endsWith( Artifact.SNAPSHOT_VERSION );
     }
 
 }

@@ -386,7 +386,9 @@ Ext.extend(Sonatype.repoServer.FileUploadPanel, Ext.FormPanel, {
       callback: function( options, success, response ) {
         tmpForm.remove();
         Ext.Msg.show(
-          success ?
+          //This is a hack to get around the fact that upload submit always returns
+          //success = true
+          response.responseXML.title == '' ?
             {
               title: 'Upload Complete',
               msg: 'Artifact upload finished successfully',

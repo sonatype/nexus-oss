@@ -31,6 +31,7 @@ import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.proxy.maven.maven2.M2Repository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
+import org.sonatype.nexus.util.VersionUtils;
 
 public class M2RepositoryTest
     extends M2ResourceStoreTest
@@ -244,9 +245,9 @@ public class M2RepositoryTest
     {
         M2Repository repository = (M2Repository) getResourceStore();
 
-        assertEquals( false, repository.isSnapshot( "1.0.0" ) );
-        assertEquals( true, repository.isSnapshot( "1.0.0-SNAPSHOT" ) );
-        assertEquals( false, repository.isSnapshot( "1.0-alpha-25" ) );
-        assertEquals( true, repository.isSnapshot( "1.0-alpha-25-20070518.002146-2" ) );
+        assertEquals( false, VersionUtils.isSnapshot( "1.0.0" ) );
+        assertEquals( true, VersionUtils.isSnapshot( "1.0.0-SNAPSHOT" ) );
+        assertEquals( false, VersionUtils.isSnapshot( "1.0-alpha-25" ) );
+        assertEquals( true, VersionUtils.isSnapshot( "1.0-alpha-25-20070518.002146-2" ) );
     }
 }

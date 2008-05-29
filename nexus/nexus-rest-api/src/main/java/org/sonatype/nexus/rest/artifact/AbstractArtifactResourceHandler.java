@@ -49,9 +49,11 @@ import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.maven.GAVRequest;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
+import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.rest.AbstractNexusResourceHandler;
 import org.sonatype.nexus.rest.ApplicationBridge;
+import org.sonatype.nexus.util.VersionUtils;
 import org.sonatype.plexus.rest.representation.InputStreamRepresentation;
 
 public class AbstractArtifactResourceHandler
@@ -355,9 +357,20 @@ public class AbstractArtifactResourceHandler
 
                                 if ( !MavenRepository.class.isAssignableFrom( repository.getClass() ) )
                                 {
+                                    getLogger().log( Level.SEVERE, "Upload to non maven repository attempted" );
                                     getResponse().setStatus(
                                         Status.CLIENT_ERROR_BAD_REQUEST,
                                         "This is not a Maven repository!" );
+
+                                    return;
+                                }
+                                
+                                if ( !versionMatchesPolicy( gavRequest.getVersion(), ( (MavenRepository) repository ).getRepositoryPolicy() ))
+                                {
+                                    getLogger().log( Level.SEVERE, "Version (" + gavRequest.getVersion() + ") and Repository Policy mismatch" );
+                                    getResponse().setStatus(
+                                        Status.CLIENT_ERROR_BAD_REQUEST,
+                                        "The version " + gavRequest.getVersion() + " does not match the repository policy!" );
 
                                     return;
                                 }
@@ -411,5 +424,18 @@ public class AbstractArtifactResourceHandler
             getResponse().setStatus( Status.CLIENT_ERROR_BAD_REQUEST );
         }
 
+    }
+    
+    private boolean versionMatchesPolicy( String version, RepositoryPolicy policy )
+    {
+        boolean result = false;
+        
+        if ( ( RepositoryPolicy.SNAPSHOT.equals( policy ) && VersionUtils.isSnapshot( version ) )
+             || ( RepositoryPolicy.RELEASE.equals( policy ) && !VersionUtils.isSnapshot( version ) ) )
+        {
+            result = true;
+        }
+        
+        return result;
     }
 }
