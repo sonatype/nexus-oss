@@ -27,6 +27,8 @@ import org.restlet.Context;
 import org.restlet.Restlet;
 import org.restlet.Router;
 import org.restlet.resource.Resource;
+import org.sonatype.nexus.Nexus;
+import org.sonatype.nexus.configuration.ConfigurationException;
 import org.sonatype.nexus.rest.artifact.ArtifactResourceContentHandler;
 import org.sonatype.nexus.rest.artifact.ArtifactResourceHandler;
 import org.sonatype.nexus.rest.attributes.AttributesResourceHandler;
@@ -145,6 +147,11 @@ public class ApplicationBridge
         getContext().getAttributes().put( FILEITEM_FACTORY, new DiskFileItemFactory() );
     }
 
+    protected Nexus getNexus()
+    {
+        return null;
+    }
+
     /**
      * Creates and configures XStream instance for Nexus needs.
      * 
@@ -201,9 +208,10 @@ public class ApplicationBridge
         router.attach( "/artifact/maven/content", ArtifactResourceContentHandler.class );
 
         router.attach( "/data_index", IndexResourceHandler.class );
-        
-        router.attach( "/data_index/{" + IndexResourceHandler.DOMAIN + "}/{" + IndexResourceHandler.TARGET_ID
-            + "}", IndexResourceHandler.class );
+
+        router.attach(
+            "/data_index/{" + IndexResourceHandler.DOMAIN + "}/{" + IndexResourceHandler.TARGET_ID + "}",
+            IndexResourceHandler.class );
 
         router.attach( "/data_index/{" + IndexResourceHandler.DOMAIN + "}/{" + IndexResourceHandler.TARGET_ID
             + "}/content", IndexResourceHandler.class );
@@ -211,8 +219,8 @@ public class ApplicationBridge
         router.attach( "/attributes", AttributesResourceHandler.class );
 
         router.attach( "/attributes/{" + AttributesResourceHandler.DOMAIN + "}/{" + AttributesResourceHandler.TARGET_ID
-                       + "}", AttributesResourceHandler.class );
-        
+            + "}", AttributesResourceHandler.class );
+
         router.attach( "/attributes/{" + AttributesResourceHandler.DOMAIN + "}/{" + AttributesResourceHandler.TARGET_ID
             + "}/content", AttributesResourceHandler.class );
 
@@ -229,85 +237,94 @@ public class ApplicationBridge
 
         // protected resources
 
-        router.attach(
-            "/repositories/{" + RepositoryResourceHandler.REPOSITORY_ID_KEY + "}/content",
-            protectWriteToResource( RepositoryContentResourceHandler.class ) );
+        try
+        {
+            router.attach(
+                "/repositories/{" + RepositoryResourceHandler.REPOSITORY_ID_KEY + "}/content",
+                protectWriteToResource( RepositoryContentResourceHandler.class ) );
 
-        router.attach(
-            "/repo_groups/{" + RepositoryGroupResourceHandler.GROUP_ID_KEY + "}/content",
-            protectWriteToResource( RepositoryGroupContentResourceHandler.class ) );
+            router.attach(
+                "/repo_groups/{" + RepositoryGroupResourceHandler.GROUP_ID_KEY + "}/content",
+                protectWriteToResource( RepositoryGroupContentResourceHandler.class ) );
 
-        router.attach( "/authentication/login", protectResource( LoginResourceHandler.class ) );
+            router.attach( "/authentication/login", protectResource( LoginResourceHandler.class ) );
 
-        router.attach( "/logs", protectResource( LogsListResourceHandler.class ) );
+            router.attach( "/logs", protectResource( LogsListResourceHandler.class ) );
 
-        router
-            .attach( "/logs/{" + LogsResourceHandler.FILE_NAME_KEY + "}", protectResource( LogsResourceHandler.class ) );
+            router.attach(
+                "/logs/{" + LogsResourceHandler.FILE_NAME_KEY + "}",
+                protectResource( LogsResourceHandler.class ) );
 
-        router.attach( "/configs", protectResource( ConfigurationsListResourceHandler.class ) );
+            router.attach( "/configs", protectResource( ConfigurationsListResourceHandler.class ) );
 
-        router.attach(
-            "/configs/{" + GlobalConfigurationResourceHandler.CONFIG_NAME_KEY + "}",
-            protectResource( ConfigurationsResourceHandler.class ) );
+            router.attach(
+                "/configs/{" + GlobalConfigurationResourceHandler.CONFIG_NAME_KEY + "}",
+                protectResource( ConfigurationsResourceHandler.class ) );
 
-        router.attach( "/global_settings", protectResource( GlobalConfigurationListResourceHandler.class ) );
+            router.attach( "/global_settings", protectResource( GlobalConfigurationListResourceHandler.class ) );
 
-        router.attach(
-            "/global_settings/{" + GlobalConfigurationResourceHandler.CONFIG_NAME_KEY + "}",
-            protectResource( GlobalConfigurationResourceHandler.class ) );
+            router.attach(
+                "/global_settings/{" + GlobalConfigurationResourceHandler.CONFIG_NAME_KEY + "}",
+                protectResource( GlobalConfigurationResourceHandler.class ) );
 
-        router.attach( "/repositories", protectWriteToResource( RepositoryListResourceHandler.class ) );
+            router.attach( "/repositories", protectWriteToResource( RepositoryListResourceHandler.class ) );
 
-        router.attach(
-            "/repositories/{" + RepositoryResourceHandler.REPOSITORY_ID_KEY + "}",
-            protectResource( RepositoryResourceHandler.class ) );
+            router.attach(
+                "/repositories/{" + RepositoryResourceHandler.REPOSITORY_ID_KEY + "}",
+                protectResource( RepositoryResourceHandler.class ) );
 
-        router.attach(
-            "/repositories/{" + RepositoryResourceHandler.REPOSITORY_ID_KEY + "}/status",
-            protectResource( RepositoryStatusResourceHandler.class ) );
+            router.attach(
+                "/repositories/{" + RepositoryResourceHandler.REPOSITORY_ID_KEY + "}/status",
+                protectResource( RepositoryStatusResourceHandler.class ) );
 
-        router.attach(
-            "/repositories/{" + RepositoryResourceHandler.REPOSITORY_ID_KEY + "}/meta",
-            protectResource( RepositoryMetaResourceHandler.class ) );
+            router.attach(
+                "/repositories/{" + RepositoryResourceHandler.REPOSITORY_ID_KEY + "}/meta",
+                protectResource( RepositoryMetaResourceHandler.class ) );
 
-        router.attach( "/repo_groups", protectWriteToResource( RepositoryGroupListResourceHandler.class ) );
+            router.attach( "/repo_groups", protectWriteToResource( RepositoryGroupListResourceHandler.class ) );
 
-        router.attach(
-            "/repo_groups/{" + RepositoryGroupResourceHandler.GROUP_ID_KEY + "}",
-            protectResource( RepositoryGroupResourceHandler.class ) );
+            router.attach(
+                "/repo_groups/{" + RepositoryGroupResourceHandler.GROUP_ID_KEY + "}",
+                protectResource( RepositoryGroupResourceHandler.class ) );
 
-        router.attach( "/repo_routes", protectResource( RepositoryRouteListResourceHandler.class ) );
+            router.attach( "/repo_routes", protectResource( RepositoryRouteListResourceHandler.class ) );
 
-        router.attach(
-            "/repo_routes/{" + RepositoryRouteResourceHandler.ROUTE_ID_KEY + "}",
-            protectResource( RepositoryRouteResourceHandler.class ) );
+            router.attach(
+                "/repo_routes/{" + RepositoryRouteResourceHandler.ROUTE_ID_KEY + "}",
+                protectResource( RepositoryRouteResourceHandler.class ) );
 
-        router.attach( "/templates/repositories", protectResource( RepositoryTemplateListResourceHandler.class ) );
+            router.attach( "/templates/repositories", protectResource( RepositoryTemplateListResourceHandler.class ) );
 
-        router.attach(
-            "/templates/repositories/{" + RepositoryTemplateResourceHandler.REPOSITORY_ID_KEY + "}",
-            protectResource( RepositoryTemplateResourceHandler.class ) );
+            router.attach(
+                "/templates/repositories/{" + RepositoryTemplateResourceHandler.REPOSITORY_ID_KEY + "}",
+                protectResource( RepositoryTemplateResourceHandler.class ) );
 
-        router.attach( "/data_cache/{" + CacheResourceHandler.DOMAIN + "}/{" + CacheResourceHandler.TARGET_ID
-            + "}/content", protectResource( CacheResourceHandler.class ) );
+            router.attach( "/data_cache/{" + CacheResourceHandler.DOMAIN + "}/{" + CacheResourceHandler.TARGET_ID
+                + "}/content", protectResource( CacheResourceHandler.class ) );
 
-        router.attach( "/schedules", protectResource( ScheduledServiceListResourceHandler.class ) );
+            router.attach( "/schedules", protectResource( ScheduledServiceListResourceHandler.class ) );
 
-        router.attach( "/schedules/types", protectResource( ScheduledServiceTypeResourceHandler.class ) );
+            router.attach( "/schedules/types", protectResource( ScheduledServiceTypeResourceHandler.class ) );
 
-        router.attach(
-            "/schedules/{" + ScheduledServiceResourceHandler.SCHEDULED_SERVICE_ID_KEY + "}",
-            protectResource( ScheduledServiceResourceHandler.class ) );
+            router.attach(
+                "/schedules/{" + ScheduledServiceResourceHandler.SCHEDULED_SERVICE_ID_KEY + "}",
+                protectResource( ScheduledServiceResourceHandler.class ) );
+
+        }
+        catch ( ConfigurationException e )
+        {
+            throw new IllegalStateException( "Cannot initialize Nexus REST Application!", e );
+        }
 
         // returning root
         return root;
     }
 
     protected NexusAuthenticationGuard protectResource( Class<? extends Resource> targetClass )
+        throws ConfigurationException
     {
-        NexusAuthenticationGuard result = new NexusAuthenticationGuard(
-            getContext(),
-            SimpleAuthenticationSource.ADMIN_USERNAME );
+        NexusAuthenticationGuard result = new NexusAuthenticationGuard( getContext(), getNexus()
+            .getNexusConfiguration().getAuthenticationSource(), SimpleAuthenticationSource.ADMIN_USERNAME );
 
         result.setNext( targetClass );
 
@@ -315,10 +332,10 @@ public class ApplicationBridge
     }
 
     protected NexusAuthenticationGuard protectWriteToResource( Class<? extends Resource> targetClass )
+        throws ConfigurationException
     {
-        NexusWriteAccessAuthenticationGuard result = new NexusWriteAccessAuthenticationGuard(
-            getContext(),
-            SimpleAuthenticationSource.ADMIN_USERNAME );
+        NexusWriteAccessAuthenticationGuard result = new NexusWriteAccessAuthenticationGuard( getContext(), getNexus()
+            .getNexusConfiguration().getAuthenticationSource(), SimpleAuthenticationSource.ADMIN_USERNAME );
 
         result.setNext( targetClass );
 

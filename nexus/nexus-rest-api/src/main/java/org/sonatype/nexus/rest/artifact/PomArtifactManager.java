@@ -22,13 +22,13 @@ package org.sonatype.nexus.rest.artifact;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileWriter;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.Random;
 
+import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.pull.MXParser;
@@ -37,16 +37,30 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.sonatype.nexus.proxy.maven.GAVRequest;
 
 public class PomArtifactManager
-{    
+{
+    private File tmpStorage = null;
+
     private File tmpPomFile = null;
-    private GAVRequest gavRequest = null;    
+
+    private GAVRequest gavRequest = null;
+
     private int state = 0;
-    
+
     private static final int STATE_NONE = 0;
+
     private static final int STATE_FILE_STORED = 1;
-    private static final int STATE_GAV_GENERATED = 2;    
+
+    private static final int STATE_GAV_GENERATED = 2;
+
     private static final Random identifierGenerator = new Random();
-    
+
+    public PomArtifactManager( File tmpStorage )
+    {
+        super();
+
+        this.tmpStorage = tmpStorage;
+    }
+
     private long getNextIdentifier()
     {
         synchronized ( identifierGenerator )
@@ -54,7 +68,7 @@ public class PomArtifactManager
             return identifierGenerator.nextLong();
         }
     }
-        
+
     public void storeTempPomFile( InputStream is )
         throws IOException
     {
@@ -62,32 +76,29 @@ public class PomArtifactManager
         {
             throw new IllegalStateException( "There is already a temporary pom file managed by this PomArtifactManager" );
         }
-        
-        tmpPomFile = new File( System.getProperty( "java.io.tmpdir" ), getNextIdentifier() + ".xml" );
+
+        tmpPomFile = new File( tmpStorage, getNextIdentifier() + ".xml" );
+
         tmpPomFile.deleteOnExit();
-        
-        FileWriter fw = null;
+
+        FileOutputStream os = null;
+
         try
         {
-            fw = new FileWriter( tmpPomFile );
-            InputStreamReader reader = new InputStreamReader( is );
-            char[] buf = new char[256];
-            int read = 0;
-            while ((read = reader.read(buf)) > 0) {
-                fw.write(buf, 0, read);
-            }
-            fw.flush();
+            os = new FileOutputStream( tmpPomFile );
+
+            IOUtil.copy( is, os );
+
             state = STATE_FILE_STORED;
         }
         finally
         {
-            if ( fw != null )
-            {
-                fw.close();
-            }
+            IOUtil.close( is );
+
+            IOUtil.close( os );
         }
     }
-    
+
     public InputStream getTempPomFileInputStream()
         throws IOException
     {
@@ -95,94 +106,133 @@ public class PomArtifactManager
         {
             throw new IllegalStateException( "The temporary pom file has not yet been stored" );
         }
-        
+
         return new FileInputStream( tmpPomFile );
     }
-    
+
     public GAVRequest getGAVRequestFromTempPomFile()
-        throws IOException, XmlPullParserException
+        throws IOException,
+            XmlPullParserException
     {
         if ( STATE_FILE_STORED > state )
         {
             throw new IllegalStateException( "The temporary pom file has not yet been stored" );
         }
-        
-        if ( STATE_GAV_GENERATED == state)
+
+        if ( STATE_GAV_GENERATED == state )
         {
             return gavRequest;
         }
-        
+
         Reader reader = null;
+
         try
         {
             reader = ReaderFactory.newXmlReader( tmpPomFile );
+
             gavRequest = parsePom( reader );
+
             state = STATE_GAV_GENERATED;
         }
         finally
         {
-            if ( reader != null )
-            {
-                reader.close();
-            }
+            IOUtil.close( reader );
         }
+
         return gavRequest;
     }
-    
+
     public void removeTempPomFile()
     {
         if ( STATE_FILE_STORED > state )
         {
             throw new IllegalStateException( "The temporary pom file has not yet been stored" );
         }
-        
+
         tmpPomFile.delete();
-        
+
         gavRequest = null;
-        
+
         state = STATE_NONE;
     }
-    
+
     private GAVRequest parsePom( Reader reader )
-        throws IOException, XmlPullParserException
+        throws IOException,
+            XmlPullParserException
     {
         String groupId = null;
+
         String artifactId = null;
+
         String version = null;
-        
+
         XmlPullParser parser = new MXParser();
+
         parser.setInput( reader );
-     
+
         boolean foundRoot = false;
+
+        boolean inParent = false;
+
         int eventType = parser.getEventType();
+
+        // TODO: we should detect when we got all we need and simply stop parsing further
+        // since we are neglecting other contents anyway
         while ( eventType != XmlPullParser.END_DOCUMENT )
         {
             if ( eventType == XmlPullParser.START_TAG )
             {
                 if ( parser.getName().equals( "project" ) )
-                {                 
+                {
                     foundRoot = true;
                 }
+                else if ( parser.getName().equals( "parent" ) )
+                {
+                    inParent = true;
+                }
                 else if ( parser.getName().equals( "groupId" ) )
-                {                 
-                    groupId = StringUtils.trim( parser.nextText() );
+                {
+                    // 1st: if found project/groupId -> overwrite
+                    // 2nd: if in parent, and groupId is still null, overwrite
+                    if ( parser.getDepth() == 2 || ( inParent && groupId == null ) )
+                    {
+                        groupId = StringUtils.trim( parser.nextText() );
+                    }
                 }
                 else if ( parser.getName().equals( "artifactId" ) )
-                {   
-                    artifactId = StringUtils.trim( parser.nextText() );
+                {
+                    // 1st: if found project/artifactId -> overwrite
+                    // 2nd: if in parent, and artifactId is still null, overwrite
+                    if ( parser.getDepth() == 2 || ( inParent && artifactId == null ) )
+                    {
+                        artifactId = StringUtils.trim( parser.nextText() );
+                    }
                 }
                 else if ( parser.getName().equals( "version" ) )
-                {                 
-                    version = StringUtils.trim( parser.nextText() );
+                {
+                    // 1st: if found project/version -> overwrite
+                    // 2nd: if in parent, and version is still null, overwrite
+                    if ( parser.getDepth() == 2 || ( inParent && version == null ) )
+                    {
+                        version = StringUtils.trim( parser.nextText() );
+                    }
                 }
                 else if ( !foundRoot )
                 {
-                    throw new XmlPullParserException( "Unrecognised tag: '" + parser.getName() + "'", parser, null);
+                    throw new XmlPullParserException( "Unrecognised tag: '" + parser.getName() + "'", parser, null );
                 }
             }
+            else if ( eventType == XmlPullParser.END_TAG )
+            {
+                if ( parser.getName().equals( "parent" ) )
+                {
+                    inParent = false;
+                }
+            }
+
             eventType = parser.next();
         }
-        
+
         return new GAVRequest( groupId, artifactId, version );
     }
 }

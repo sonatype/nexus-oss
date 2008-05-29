@@ -20,6 +20,7 @@
  */
 package org.sonatype.nexus.rest.artifact;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -28,22 +29,48 @@ import junit.framework.TestCase;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.sonatype.nexus.proxy.maven.GAVRequest;
 
-public class PomArtifactManagerTest 
+public class PomArtifactManagerTest
     extends TestCase
 {
-  public void testGenerateGAV() 
-      throws IOException, XmlPullParserException
-  {
-      InputStream is = PomArtifactManagerTest.class.getResourceAsStream( "/test.pom" );
-      
-      PomArtifactManager manager = new PomArtifactManager();
-      
-      manager.storeTempPomFile( is );
-      
-      GAVRequest request = manager.getGAVRequestFromTempPomFile();
-      
-      assertTrue( "groupId should be test-group", "test-group".equals( request.getGroupId() ) );
-      assertTrue( "artifactId should be test-artifact", "test-artifact".equals( request.getArtifactId() ) );
-      assertTrue( "version should be 1.0", "1.0".equals( request.getVersion() ) );
-  }
+    public void testGenerateGAV()
+        throws IOException,
+            XmlPullParserException
+    {
+        InputStream is = PomArtifactManagerTest.class.getResourceAsStream( "/test.pom" );
+
+        File tmpStorage = new File( "target/pom-artifact-manager" );
+
+        tmpStorage.mkdirs();
+
+        PomArtifactManager manager = new PomArtifactManager( tmpStorage );
+
+        manager.storeTempPomFile( is );
+
+        GAVRequest request = manager.getGAVRequestFromTempPomFile();
+
+        assertTrue( "groupId should be test-group", "test-group".equals( request.getGroupId() ) );
+        assertTrue( "artifactId should be test-artifact", "test-artifact".equals( request.getArtifactId() ) );
+        assertTrue( "version should be 1.0", "1.0".equals( request.getVersion() ) );
+    }
+
+    public void testGenerateGAVComplex()
+        throws IOException,
+            XmlPullParserException
+    {
+        InputStream is = PomArtifactManagerTest.class.getResourceAsStream( "/test1.pom" );
+
+        File tmpStorage = new File( "target/pom-artifact-manager" );
+
+        tmpStorage.mkdirs();
+
+        PomArtifactManager manager = new PomArtifactManager( tmpStorage );
+
+        manager.storeTempPomFile( is );
+
+        GAVRequest request = manager.getGAVRequestFromTempPomFile();
+
+        assertTrue( "groupId should be test-group", "test-group".equals( request.getGroupId() ) );
+        assertTrue( "artifactId should be test-artifact", "test-artifact".equals( request.getArtifactId() ) );
+        assertTrue( "version should be 1.0", "1.0".equals( request.getVersion() ) );
+    }
 }

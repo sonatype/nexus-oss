@@ -284,8 +284,9 @@ public class AbstractArtifactResourceHandler
                     String classifier = null;
 
                     String packaging = null;
-                    
-                    PomArtifactManager pomManager = new PomArtifactManager();
+
+                    PomArtifactManager pomManager = new PomArtifactManager( getNexus()
+                        .getNexusConfiguration().getTemporaryDirectory() );
 
                     for ( FileItem fi : items )
                     {
@@ -325,9 +326,9 @@ public class AbstractArtifactResourceHandler
                         {
                             // a file
                             isPom = fi.getName().endsWith( ".pom" ) || fi.getName().endsWith( "pom.xml" );
-                            
+
                             GAVRequest gavRequest;
-                            
+
                             if ( hasPom )
                             {
                                 if ( isPom )
@@ -339,7 +340,7 @@ public class AbstractArtifactResourceHandler
                                 {
                                     is = fi.getInputStream();
                                 }
-                                
+
                                 gavRequest = pomManager.getGAVRequestFromTempPomFile();
                             }
                             else
@@ -364,7 +365,7 @@ public class AbstractArtifactResourceHandler
                                 if ( isPom )
                                 {
                                     ( (MavenRepository) repository ).storeArtifactPom( gavRequest, is );
-                                    
+
                                     isPom = false;
                                 }
                                 else
@@ -387,7 +388,7 @@ public class AbstractArtifactResourceHandler
                             }
                         }
                     }
-                    
+
                     if ( hasPom )
                     {
                         pomManager.removeTempPomFile();

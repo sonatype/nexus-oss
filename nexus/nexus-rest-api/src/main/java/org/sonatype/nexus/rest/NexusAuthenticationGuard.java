@@ -29,8 +29,6 @@ import org.restlet.data.Form;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.data.Status;
-import org.sonatype.nexus.configuration.ConfigurationException;
-import org.sonatype.nexus.configuration.NexusConfiguration;
 import org.sonatype.nexus.security.AuthenticationSource;
 import org.sonatype.nexus.security.SimpleUser;
 import org.sonatype.nexus.security.User;
@@ -59,33 +57,25 @@ public class NexusAuthenticationGuard
 
     private String usernameFilter;
 
-    public NexusAuthenticationGuard( Context context )
+    public NexusAuthenticationGuard( Context context, AuthenticationSource authenticationSource )
     {
         super( context, ChallengeScheme.HTTP_BASIC, "Nexus REST API" );
 
         try
         {
-            sessionStore = (SessionStore) PlexusRestletUtils.plexusLookup( getContext(), SessionStore.ROLE );
+            this.sessionStore = (SessionStore) PlexusRestletUtils.plexusLookup( getContext(), SessionStore.ROLE );
 
-            NexusConfiguration nc = (NexusConfiguration) PlexusRestletUtils.plexusLookup(
-                getContext(),
-                NexusConfiguration.ROLE );
-
-            authenticationSource = nc.getAuthenticationSource();
+            this.authenticationSource = authenticationSource;
         }
         catch ( ComponentLookupException e )
         {
             throw new IllegalStateException( "Cannot lookup sessionStore or authenticationSource!", e );
         }
-        catch ( ConfigurationException e )
-        {
-            throw new IllegalStateException( "Configuration exception!", e );
-        }
     }
 
-    public NexusAuthenticationGuard( Context context, String usernameFilter )
+    public NexusAuthenticationGuard( Context context, AuthenticationSource authenticationSource, String usernameFilter )
     {
-        this( context );
+        this( context, authenticationSource );
 
         this.usernameFilter = usernameFilter;
     }

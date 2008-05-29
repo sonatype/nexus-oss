@@ -25,18 +25,20 @@ import org.restlet.data.Method;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.data.Status;
+import org.sonatype.nexus.security.AuthenticationSource;
 
 public class NexusWriteAccessAuthenticationGuard
     extends NexusAuthenticationGuard
 {
-    public NexusWriteAccessAuthenticationGuard( Context context )
+    public NexusWriteAccessAuthenticationGuard( Context context, AuthenticationSource authenticationSource )
     {
-        super( context );
+        super( context, authenticationSource );
     }
 
-    public NexusWriteAccessAuthenticationGuard( Context context, String usernameFilter )
+    public NexusWriteAccessAuthenticationGuard( Context context, AuthenticationSource authenticationSource,
+        String usernameFilter )
     {
-        super( context, usernameFilter );
+        super( context, authenticationSource, usernameFilter );
     }
 
     public void doHandle( Request request, Response response )

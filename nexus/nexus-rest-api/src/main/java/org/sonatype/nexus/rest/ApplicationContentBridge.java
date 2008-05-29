@@ -25,6 +25,7 @@ import org.restlet.Context;
 import org.restlet.Restlet;
 import org.restlet.Router;
 import org.sonatype.nexus.Nexus;
+import org.sonatype.nexus.configuration.ConfigurationException;
 import org.sonatype.nexus.security.SimpleAuthenticationSource;
 import org.sonatype.plexus.rest.PlexusRestletUtils;
 
@@ -68,19 +69,23 @@ public class ApplicationContentBridge
             if ( nexus.isSimpleSecurityModel() )
             {
                 // with "simple" we offer RO public access, but pwd is needed (if set) for deployment
-                nexusGuard = new NexusWriteAccessAuthenticationGuard(
-                    getContext(),
-                    SimpleAuthenticationSource.DEPLOYMENT_USERNAME );
+                nexusGuard = new NexusWriteAccessAuthenticationGuard( getContext(), getNexus()
+                    .getNexusConfiguration().getAuthenticationSource(), SimpleAuthenticationSource.DEPLOYMENT_USERNAME );
             }
             else
             {
-                nexusGuard = new NexusAuthenticationGuard( getContext() );
+                nexusGuard = new NexusAuthenticationGuard( getContext(), getNexus()
+                    .getNexusConfiguration().getAuthenticationSource() );
             }
 
         }
         catch ( ComponentLookupException e )
         {
             throw new IllegalStateException( "Cannot lookup sessionStore or authenticationSource!", e );
+        }
+        catch ( ConfigurationException e )
+        {
+            throw new IllegalStateException( "Cannot lookup authenticationSource!", e );
         }
 
         // attaching it after nif

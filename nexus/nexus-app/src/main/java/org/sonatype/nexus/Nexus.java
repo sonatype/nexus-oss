@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.concurrent.RejectedExecutionException;
 
 import org.sonatype.nexus.configuration.MutableConfiguration;
+import org.sonatype.nexus.configuration.NexusConfiguration;
 import org.sonatype.nexus.configuration.model.CRemoteConnectionSettings;
 import org.sonatype.nexus.configuration.model.CRemoteHttpProxySettings;
 import org.sonatype.nexus.configuration.model.CRepository;
@@ -59,6 +60,12 @@ public interface Nexus
     // Status
 
     SystemStatus getSystemState();
+    
+    // ------------------------------------------------------------------
+    // Configuration
+    
+    NexusConfiguration getNexusConfiguration();
+    
 
     // ------------------------------------------------------------------
     // Reposes

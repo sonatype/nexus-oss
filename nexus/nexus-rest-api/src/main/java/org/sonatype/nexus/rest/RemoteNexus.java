@@ -38,6 +38,7 @@ import org.restlet.data.Response;
 import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.SystemStatus;
 import org.sonatype.nexus.configuration.ConfigurationException;
+import org.sonatype.nexus.configuration.NexusConfiguration;
 import org.sonatype.nexus.configuration.model.CGroupsSettingPathMappingItem;
 import org.sonatype.nexus.configuration.model.CRemoteConnectionSettings;
 import org.sonatype.nexus.configuration.model.CRemoteHttpProxySettings;
@@ -731,6 +732,12 @@ public class RemoteNexus
     {
         // TODO Auto-generated method stub
         
+    }
+
+    public NexusConfiguration getNexusConfiguration()
+    {
+        // TODO Auto-generated method stub
+        return null;
     }
 
 }

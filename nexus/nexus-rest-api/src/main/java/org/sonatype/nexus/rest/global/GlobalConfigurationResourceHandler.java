@@ -31,7 +31,6 @@ import org.restlet.data.Status;
 import org.restlet.resource.Representation;
 import org.restlet.resource.Variant;
 import org.sonatype.nexus.configuration.ConfigurationException;
-import org.sonatype.nexus.configuration.NexusConfiguration;
 import org.sonatype.nexus.configuration.model.CRemoteAuthentication;
 import org.sonatype.nexus.configuration.model.CRemoteConnectionSettings;
 import org.sonatype.nexus.configuration.model.CRemoteHttpProxySettings;
@@ -77,9 +76,7 @@ public class GlobalConfigurationResourceHandler
 
         try
         {
-            NexusConfiguration nc = (NexusConfiguration) lookup( NexusConfiguration.ROLE );
-
-            authenticationSource = nc.getAuthenticationSource();
+            authenticationSource = getNexus().getNexusConfiguration().getAuthenticationSource();
         }
         catch ( ConfigurationException e )
         {
