@@ -181,7 +181,7 @@ Sonatype.view = {
     }
     else {
       loginEl.update('Log In');
-      usernameEl.hide();
+      usernameEl.update('');
     }
   }
 };
