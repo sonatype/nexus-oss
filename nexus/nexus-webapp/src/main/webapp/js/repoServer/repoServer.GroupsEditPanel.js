@@ -191,7 +191,7 @@ Sonatype.repoServer.GroupsEditPanel = function(config){
             //note: this style matches the expected behavior
             bodyStyle: 'background-color:#FFFFFF; border: 1px solid #B5B8C8',
             width: 225,
-            height: 300,
+            height: Ext.isGecko ? 315 : 300,
             animate:true,
             lines: false,
             autoScroll:true,
