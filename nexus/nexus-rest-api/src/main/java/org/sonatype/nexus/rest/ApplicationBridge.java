@@ -201,12 +201,18 @@ public class ApplicationBridge
         router.attach( "/artifact/maven/content", ArtifactResourceContentHandler.class );
 
         router.attach( "/data_index", IndexResourceHandler.class );
+        
+        router.attach( "/data_index/{" + IndexResourceHandler.DOMAIN + "}/{" + IndexResourceHandler.TARGET_ID
+            + "}", IndexResourceHandler.class );
 
         router.attach( "/data_index/{" + IndexResourceHandler.DOMAIN + "}/{" + IndexResourceHandler.TARGET_ID
             + "}/content", IndexResourceHandler.class );
 
         router.attach( "/attributes", AttributesResourceHandler.class );
 
+        router.attach( "/attributes/{" + AttributesResourceHandler.DOMAIN + "}/{" + AttributesResourceHandler.TARGET_ID
+                       + "}", AttributesResourceHandler.class );
+        
         router.attach( "/attributes/{" + AttributesResourceHandler.DOMAIN + "}/{" + AttributesResourceHandler.TARGET_ID
             + "}/content", AttributesResourceHandler.class );
 
