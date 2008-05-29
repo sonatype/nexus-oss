@@ -210,6 +210,12 @@ public class DefaultNexus
         return repositoryRegistry.getRepositoryGroup( repoGroupId );
     }
 
+    public String getRepositoryGroupType( String repoGroupId )
+        throws NoSuchRepositoryGroupException
+    {
+        return repositoryRegistry.getRepositoryGroupContentClass( repoGroupId ).getId();
+    }
+
     public Collection<Repository> getRepositories()
     {
         return repositoryRegistry.getRepositories();

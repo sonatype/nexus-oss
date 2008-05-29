@@ -79,6 +79,9 @@ public interface Nexus
     List<Repository> getRepositoryGroup( String repoGroupId )
         throws NoSuchRepositoryGroupException;
 
+    String getRepositoryGroupType( String repoGroupId )
+        throws NoSuchRepositoryGroupException;
+
     Collection<Repository> getRepositories();
 
     StorageItem dereferenceLinkItem( StorageItem item )

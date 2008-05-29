@@ -23,6 +23,7 @@ package org.sonatype.nexus.rest;
 import java.util.Date;
 
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.restlet.Context;
 import org.restlet.Restlet;
 import org.restlet.Router;
@@ -65,6 +66,7 @@ import org.sonatype.nexus.rest.templates.repositories.RepositoryTemplateResource
 import org.sonatype.nexus.rest.xstream.XStreamInitializer;
 import org.sonatype.nexus.security.SimpleAuthenticationSource;
 import org.sonatype.plexus.rest.PlexusRestletApplicationBridge;
+import org.sonatype.plexus.rest.PlexusRestletUtils;
 import org.sonatype.plexus.rest.RestletOrgApplication;
 import org.sonatype.plexus.rest.xstream.json.JsonOrgHierarchicalStreamDriver;
 import org.sonatype.plexus.rest.xstream.json.PrimitiveKeyedMapConverter;
@@ -149,7 +151,14 @@ public class ApplicationBridge
 
     protected Nexus getNexus()
     {
-        return null;
+        try
+        {
+            return (Nexus) PlexusRestletUtils.plexusLookup( getContext(), Nexus.ROLE );
+        }
+        catch ( ComponentLookupException e )
+        {
+            throw new IllegalStateException( "Cannot get Nexus instance!", e );
+        }
     }
 
     /**

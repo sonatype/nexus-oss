@@ -88,6 +88,10 @@ public class RepositoryListResourceHandler
             repoRes.setResourceURI( calculateSubReference( repository.getId() ).toString() );
 
             repoRes.setRepoType( getRestRepoType( repository ) );
+            
+            repoRes.setFormat( repository.getType() );
+            
+            repoRes.setId( repository.getId() );
 
             repoRes.setName( repository.getName() );
 

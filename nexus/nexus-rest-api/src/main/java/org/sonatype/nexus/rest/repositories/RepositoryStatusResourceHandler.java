@@ -64,6 +64,8 @@ public class RepositoryStatusResourceHandler
                 resource.setId( model.getId() );
 
                 resource.setRepoType( getRestRepoType( model ) );
+                
+                resource.setFormat( model.getType() );
 
                 resource.setLocalStatus( getRestRepoLocalStatus( model ) );
 
@@ -189,6 +191,8 @@ public class RepositoryStatusResourceHandler
                             dependent.setId( shadow.getId() );
 
                             dependent.setRepoType( getRestRepoType( shadow ) );
+                            
+                            dependent.setFormat( shadow.getType() );
 
                             dependent.setLocalStatus( getRestRepoLocalStatus( shadow ) );
 

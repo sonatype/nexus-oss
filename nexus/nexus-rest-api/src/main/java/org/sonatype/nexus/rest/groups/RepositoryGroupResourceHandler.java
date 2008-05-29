@@ -90,6 +90,8 @@ public class RepositoryGroupResourceHandler
 
             resource.setName( group.getName() );
 
+            resource.setFormat( getNexus().getRepositoryGroupType( group.getGroupId() ) );
+
             // just to trigger list creation, and not stay null coz of XStream serialization
             resource.getRepositories();
 

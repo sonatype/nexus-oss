@@ -79,11 +79,17 @@ public class RepositoryStatusesListResourceHandler
             repoRes = new RepositoryStatusListResource();
 
             repoRes.setResourceURI( calculateSubReference( repository.getId() ).toString() );
+            
+            repoRes.setId( repository.getId() );
 
             repoRes.setName( repository.getName() );
 
             repoRes.setRepoType( getRestRepoType( repository ) );
-
+            
+            repoRes.setRepoPolicy( getRestRepoPolicy( repository ) );
+            
+            repoRes.setFormat( repository.getType() );
+            
             repoRes.setStatus( new RepositoryStatusResource() );
 
             repoRes.getStatus().setLocalStatus( getRestRepoLocalStatus( repository ) );

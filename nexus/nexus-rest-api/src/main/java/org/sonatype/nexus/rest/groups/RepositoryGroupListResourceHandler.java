@@ -87,6 +87,10 @@ public class RepositoryGroupListResourceHandler
 
                 resource.setResourceURI( calculateSubReference( group.getGroupId() ).toString() );
 
+                resource.setId( group.getGroupId() );
+
+                resource.setFormat( getNexus().getRepositoryGroupType( group.getGroupId() ) );
+
                 resource.setName( group.getName() );
 
                 // just to trigger list creation, and not stay null coz of XStream serialization
@@ -113,6 +117,14 @@ public class RepositoryGroupListResourceHandler
         catch ( NoSuchRepositoryException e )
         {
             getLogger().log( Level.SEVERE, "Cannot find a repository declared within a group!", e );
+
+            getResponse().setStatus( Status.SERVER_ERROR_INTERNAL );
+
+            return null;
+        }
+        catch ( NoSuchRepositoryGroupException e )
+        {
+            getLogger().log( Level.SEVERE, "Cannot find a repository group!", e );
 
             getResponse().setStatus( Status.SERVER_ERROR_INTERNAL );
 

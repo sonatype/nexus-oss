@@ -68,16 +68,20 @@ public class RepositoryMetaResourceHandler
                 CRepository model = getNexus().readRepository( getRepositoryId() );
 
                 resource.setRepoType( getRestRepoType( model ) );
+                
+                resource.setFormat( model.getType() );
             }
             catch ( NoSuchRepositoryException e )
             {
                 CRepositoryShadow model = getNexus().readRepositoryShadow( getRepositoryId() );
 
                 resource.setRepoType( getRestRepoType( model ) );
+
+                resource.setFormat( model.getType() );
             }
 
             resource.setId( getRepositoryId() );
-
+            
             try
             {
                 resource.setSizeOnDisk( FileUtils.sizeOfDirectory( localPath ) );
