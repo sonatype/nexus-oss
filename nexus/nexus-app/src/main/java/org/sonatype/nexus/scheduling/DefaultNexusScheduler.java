@@ -6,10 +6,11 @@ import java.util.concurrent.RejectedExecutionException;
 
 import org.codehaus.plexus.logging.LoggerManager;
 import org.sonatype.scheduling.IteratingTask;
+import org.sonatype.scheduling.NoSuchTaskException;
 import org.sonatype.scheduling.ScheduledTask;
 import org.sonatype.scheduling.Scheduler;
 import org.sonatype.scheduling.SubmittedTask;
-import org.sonatype.scheduling.iterators.ScheduleIterator;
+import org.sonatype.scheduling.iterators.SchedulerIterator;
 import org.sonatype.scheduling.schedules.Schedule;
 
 /**
@@ -43,7 +44,7 @@ public class DefaultNexusScheduler
 
         Class<?> cls = nexusTask.getClass();
 
-        List<SubmittedTask> existingTasks = scheduler.getScheduledTasks().get( cls );
+        List<SubmittedTask> existingTasks = scheduler.getActiveTasks().get( cls );
 
         if ( existingTasks == null || nexusTask.allowConcurrentExecution( existingTasks ) )
         {
@@ -55,7 +56,7 @@ public class DefaultNexusScheduler
         }
     }
 
-    public IteratingTask iterate( NexusTask nexusTask, ScheduleIterator iterator )
+    public IteratingTask iterate( NexusTask nexusTask, SchedulerIterator iterator )
         throws RejectedExecutionException,
             NullPointerException
     {
@@ -63,7 +64,7 @@ public class DefaultNexusScheduler
 
         Class<?> cls = nexusTask.getClass();
 
-        List<SubmittedTask> existingTasks = scheduler.getScheduledTasks().get( cls );
+        List<SubmittedTask> existingTasks = scheduler.getActiveTasks().get( cls );
 
         if ( existingTasks == null || nexusTask.allowConcurrentExecution( existingTasks ) )
         {
@@ -83,7 +84,7 @@ public class DefaultNexusScheduler
 
         Class<?> cls = nexusTask.getClass();
 
-        List<SubmittedTask> existingTasks = scheduler.getScheduledTasks().get( cls );
+        List<SubmittedTask> existingTasks = scheduler.getActiveTasks().get( cls );
 
         if ( existingTasks == null || nexusTask.allowConcurrentExecution( existingTasks ) )
         {
@@ -95,9 +96,15 @@ public class DefaultNexusScheduler
         }
     }
 
-    public Map<String, List<SubmittedTask>> getScheduledTasks()
+    public Map<String, List<SubmittedTask>> getActiveTasks()
     {
-        return scheduler.getScheduledTasks();
+        return scheduler.getActiveTasks();
+    }
+
+    public <T> SubmittedTask<T> getTaskById( String id )
+        throws NoSuchTaskException
+    {
+        return scheduler.getTaskById( id );
     }
 
 }

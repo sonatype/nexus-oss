@@ -9,7 +9,7 @@ package org.sonatype.scheduling;
  */
 public enum TaskState
 {
-    SCHEDULED, // -> RUNNING, CANCELLED
+    SUBMITTED, // -> RUNNING, CANCELLED
 
     RUNNING, // -> WAITING, FINISHED, BROKEN, CANCELLED
 
@@ -21,9 +21,14 @@ public enum TaskState
 
     CANCELLED; // END
     
+    public boolean isActiveOrSubmitted()
+    {
+        return this.equals( SUBMITTED ) || this.equals( RUNNING ) || this.equals( WAITING );
+    }
+    
     public boolean isActive()
     {
-        return this.equals( SCHEDULED ) || this.equals( RUNNING ) || this.equals( WAITING );
+        return this.equals( RUNNING ) || this.equals( WAITING );
     }
 
     public boolean isEndingState()

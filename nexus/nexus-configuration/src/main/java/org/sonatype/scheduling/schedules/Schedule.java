@@ -1,8 +1,8 @@
 package org.sonatype.scheduling.schedules;
 
-import org.sonatype.scheduling.iterators.ScheduleIterator;
+import org.sonatype.scheduling.iterators.SchedulerIterator;
 
 public interface Schedule
 {
-    ScheduleIterator getIterator();
+    SchedulerIterator getIterator();
 }

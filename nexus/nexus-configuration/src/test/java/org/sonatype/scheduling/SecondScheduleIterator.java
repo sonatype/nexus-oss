@@ -3,10 +3,10 @@ package org.sonatype.scheduling;
 import java.util.Calendar;
 import java.util.Date;
 
-import org.sonatype.scheduling.iterators.AbstractCalendarBasedScheduleIterator;
+import org.sonatype.scheduling.iterators.AbstractCalendarBasedSchedulerIterator;
 
 public class SecondScheduleIterator
-    extends AbstractCalendarBasedScheduleIterator
+    extends AbstractCalendarBasedSchedulerIterator
 {
 
     public SecondScheduleIterator( Date startingDate )

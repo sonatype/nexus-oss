@@ -4,7 +4,7 @@ import java.util.Date;
 import java.util.concurrent.Callable;
 
 import org.codehaus.plexus.PlexusTestCase;
-import org.sonatype.scheduling.iterators.ScheduleIterator;
+import org.sonatype.scheduling.iterators.SchedulerIterator;
 
 public class DefaultSchedulerTest
     extends PlexusTestCase
@@ -26,11 +26,11 @@ public class DefaultSchedulerTest
 
         tr = new TestRunnable();
 
-        SubmittedTask st = defaultScheduler.submit( tr );
+        SubmittedTask<Object> st = defaultScheduler.submit( tr );
 
-        assertEquals( 1, defaultScheduler.getScheduledTasks().size() );
+        assertEquals( 1, defaultScheduler.getActiveTasks().size() );
 
-        while ( !st.isDone() )
+        while ( !st.getTaskState().isEndingState() )
         {
             Thread.sleep( 300 );
         }
@@ -39,7 +39,7 @@ public class DefaultSchedulerTest
 
         assertEquals( TaskState.FINISHED, st.getTaskState() );
 
-        assertEquals( 0, defaultScheduler.getScheduledTasks().size() );
+        assertEquals( 0, defaultScheduler.getActiveTasks().size() );
     }
 
     public void testSimpleCallable()
@@ -49,11 +49,11 @@ public class DefaultSchedulerTest
 
         tr = new TestCallable();
 
-        SubmittedCallableTask<Integer> st = defaultScheduler.submit( tr );
+        SubmittedTask<Integer> st = defaultScheduler.submit( tr );
 
-        assertEquals( 1, defaultScheduler.getScheduledTasks().size() );
+        assertEquals( 1, defaultScheduler.getActiveTasks().size() );
 
-        while ( !st.isDone() )
+        while ( !st.getTaskState().isEndingState() )
         {
             Thread.sleep( 300 );
         }
@@ -64,7 +64,7 @@ public class DefaultSchedulerTest
 
         assertEquals( TaskState.FINISHED, st.getTaskState() );
 
-        assertEquals( 0, defaultScheduler.getScheduledTasks().size() );
+        assertEquals( 0, defaultScheduler.getActiveTasks().size() );
     }
 
     public void testSecondsRunnable()
@@ -76,13 +76,13 @@ public class DefaultSchedulerTest
 
         long nearFuture = System.currentTimeMillis() + 500;
 
-        ScheduleIterator iterator = new SecondScheduleIterator( new Date( nearFuture ), new Date( nearFuture + 4900 ) );
+        SchedulerIterator iterator = new SecondScheduleIterator( new Date( nearFuture ), new Date( nearFuture + 4900 ) );
 
-        IteratingTask st = defaultScheduler.iterate( tr, iterator );
+        IteratingTask<Object> st = defaultScheduler.iterate( tr, iterator );
 
-        assertEquals( 1, defaultScheduler.getScheduledTasks().size() );
+        assertEquals( 1, defaultScheduler.getActiveTasks().size() );
 
-        while ( !st.isDone() )
+        while ( !st.getTaskState().isEndingState() )
         {
             Thread.sleep( 300 );
         }
@@ -91,7 +91,7 @@ public class DefaultSchedulerTest
 
         assertEquals( TaskState.FINISHED, st.getTaskState() );
 
-        assertEquals( 0, defaultScheduler.getScheduledTasks().size() );
+        assertEquals( 0, defaultScheduler.getActiveTasks().size() );
     }
 
     public void testSecondsCallable()
@@ -103,34 +103,34 @@ public class DefaultSchedulerTest
 
         long nearFuture = System.currentTimeMillis() + 500;
 
-        ScheduleIterator iterator = new SecondScheduleIterator( new Date( nearFuture ), new Date( nearFuture + 4900 ) );
+        SchedulerIterator iterator = new SecondScheduleIterator( new Date( nearFuture ), new Date( nearFuture + 4900 ) );
 
-        IteratingCallableTask<Integer> st = defaultScheduler.iterate( tr, iterator );
+        IteratingTask<Integer> st = defaultScheduler.iterate( tr, iterator );
 
-        assertEquals( 1, defaultScheduler.getScheduledTasks().size() );
+        assertEquals( 1, defaultScheduler.getActiveTasks().size() );
 
-        while ( !st.isDone() )
+        while ( !st.getTaskState().isEndingState() )
         {
             Thread.sleep( 300 );
         }
 
         assertEquals( 5, tr.getRunCount() );
 
-        assertEquals( 5, st.getResultCount() );
+        assertEquals( 5, st.getResults().size() );
 
-        assertEquals( Integer.valueOf( 0 ), st.get( 0 ) );
+        assertEquals( Integer.valueOf( 0 ), st.getResults().get( 0 ) );
 
-        assertEquals( Integer.valueOf( 1 ), st.get( 1 ) );
+        assertEquals( Integer.valueOf( 1 ), st.getResults().get( 1 ) );
 
-        assertEquals( Integer.valueOf( 2 ), st.get( 2 ) );
+        assertEquals( Integer.valueOf( 2 ), st.getResults().get( 2 ) );
 
-        assertEquals( Integer.valueOf( 3 ), st.get( 3 ) );
+        assertEquals( Integer.valueOf( 3 ), st.getResults().get( 3 ) );
 
-        assertEquals( Integer.valueOf( 4 ), st.get( 4 ) );
+        assertEquals( Integer.valueOf( 4 ), st.getResults().get( 4 ) );
 
         assertEquals( TaskState.FINISHED, st.getTaskState() );
 
-        assertEquals( 0, defaultScheduler.getScheduledTasks().size() );
+        assertEquals( 0, defaultScheduler.getActiveTasks().size() );
     }
 
     public void testCancelRunnable()
@@ -142,21 +142,21 @@ public class DefaultSchedulerTest
 
         long nearFuture = System.currentTimeMillis() + 500;
 
-        ScheduleIterator iterator = new SecondScheduleIterator( new Date( nearFuture ), new Date( nearFuture + 4900 ) );
+        SchedulerIterator iterator = new SecondScheduleIterator( new Date( nearFuture ), new Date( nearFuture + 4900 ) );
 
-        IteratingTask st = defaultScheduler.iterate( tr, iterator );
+        IteratingTask<Object> st = defaultScheduler.iterate( tr, iterator );
 
-        assertEquals( 1, defaultScheduler.getScheduledTasks().size() );
+        assertEquals( 1, defaultScheduler.getActiveTasks().size() );
 
         st.cancel();
 
         assertEquals( 0, tr.getRunCount() );
 
-        assertTrue( st.isDone() );
+        assertTrue( st.getTaskState().isEndingState() );
 
         assertEquals( TaskState.CANCELLED, st.getTaskState() );
 
-        assertEquals( 0, defaultScheduler.getScheduledTasks().size() );
+        assertEquals( 0, defaultScheduler.getActiveTasks().size() );
     }
 
     public void testCancelCallable()
@@ -168,21 +168,21 @@ public class DefaultSchedulerTest
 
         long nearFuture = System.currentTimeMillis() + 500;
 
-        ScheduleIterator iterator = new SecondScheduleIterator( new Date( nearFuture ), new Date( nearFuture + 4900 ) );
+        SchedulerIterator iterator = new SecondScheduleIterator( new Date( nearFuture ), new Date( nearFuture + 4900 ) );
 
-        IteratingTask st = defaultScheduler.iterate( tr, iterator );
+        IteratingTask<Integer> st = defaultScheduler.iterate( tr, iterator );
 
-        assertEquals( 1, defaultScheduler.getScheduledTasks().size() );
+        assertEquals( 1, defaultScheduler.getActiveTasks().size() );
 
         st.cancel();
 
         assertEquals( 0, tr.getRunCount() );
 
-        assertTrue( st.isDone() );
+        assertTrue( st.getTaskState().isEndingState() );
 
         assertEquals( TaskState.CANCELLED, st.getTaskState() );
 
-        assertEquals( 0, defaultScheduler.getScheduledTasks().size() );
+        assertEquals( 0, defaultScheduler.getActiveTasks().size() );
     }
 
     // Helper classes

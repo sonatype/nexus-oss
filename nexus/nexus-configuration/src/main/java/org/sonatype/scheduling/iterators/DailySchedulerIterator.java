@@ -3,15 +3,15 @@ package org.sonatype.scheduling.iterators;
 import java.util.Calendar;
 import java.util.Date;
 
-public class DailyScheduleIterator
-    extends AbstractCalendarBasedScheduleIterator
+public class DailySchedulerIterator
+    extends AbstractCalendarBasedSchedulerIterator
 {
-    public DailyScheduleIterator( Date startingDate )
+    public DailySchedulerIterator( Date startingDate )
     {
         super( startingDate );
     }
 
-    public DailyScheduleIterator( Date startingDate, Date endingDate )
+    public DailySchedulerIterator( Date startingDate, Date endingDate )
     {
         super( startingDate, endingDate );
     }

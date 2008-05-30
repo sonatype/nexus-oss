@@ -4,26 +4,26 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Set;
 
-public class WeeklyScheduleIterator
-    extends AbstractCalendarBasedScheduleIterator
+public class WeeklySchedulerIterator
+    extends AbstractCalendarBasedSchedulerIterator
 {
     private final Set<Integer> weekdaysToRun;
 
-    public WeeklyScheduleIterator( Date startingDate )
+    public WeeklySchedulerIterator( Date startingDate )
     {
         super( startingDate );
 
         this.weekdaysToRun = null;
     }
 
-    public WeeklyScheduleIterator( Date startingDate, Date endingDate )
+    public WeeklySchedulerIterator( Date startingDate, Date endingDate )
     {
         super( startingDate, endingDate );
 
         this.weekdaysToRun = null;
     }
 
-    public WeeklyScheduleIterator( Date startingDate, Date endingDate, Set<Integer> weekdaysToRun )
+    public WeeklySchedulerIterator( Date startingDate, Date endingDate, Set<Integer> weekdaysToRun )
     {
         super( startingDate, endingDate );
 

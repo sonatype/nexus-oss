@@ -45,6 +45,7 @@ import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.scheduling.NexusTask;
+import org.sonatype.scheduling.NoSuchTaskException;
 import org.sonatype.scheduling.ScheduledTask;
 import org.sonatype.scheduling.SubmittedTask;
 import org.sonatype.scheduling.schedules.Schedule;
@@ -123,7 +124,10 @@ public interface Nexus
         throws RejectedExecutionException,
             NullPointerException;
 
-    Map<String, List<SubmittedTask>> getScheduledTasks();
+    Map<String, List<SubmittedTask>> getActiveTasks();
+
+    SubmittedTask getTaskById( String id )
+        throws NoSuchTaskException;
 
     // ------------------------------------------------------------------
     // Configuration defaults

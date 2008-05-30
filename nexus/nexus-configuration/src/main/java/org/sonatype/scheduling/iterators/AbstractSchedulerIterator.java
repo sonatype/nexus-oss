@@ -2,19 +2,19 @@ package org.sonatype.scheduling.iterators;
 
 import java.util.Date;
 
-public abstract class AbstractScheduleIterator
-    implements ScheduleIterator
+public abstract class AbstractSchedulerIterator
+    implements SchedulerIterator
 {
     private final Date startingDate;
 
     private final Date endingDate;
 
-    public AbstractScheduleIterator( Date startingDate )
+    public AbstractSchedulerIterator( Date startingDate )
     {
         this( startingDate, null );
     }
 
-    public AbstractScheduleIterator( Date startingDate, Date endingDate )
+    public AbstractSchedulerIterator( Date startingDate, Date endingDate )
     {
         super();
 

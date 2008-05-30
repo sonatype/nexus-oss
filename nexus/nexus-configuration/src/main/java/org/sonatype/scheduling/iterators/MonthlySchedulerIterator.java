@@ -4,26 +4,26 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Set;
 
-public class MonthlyScheduleIterator
-    extends AbstractCalendarBasedScheduleIterator
+public class MonthlySchedulerIterator
+    extends AbstractCalendarBasedSchedulerIterator
 {
     private final Set<Integer> monthdaysToRun;
 
-    public MonthlyScheduleIterator( Date startingDate )
+    public MonthlySchedulerIterator( Date startingDate )
     {
         super( startingDate );
 
         this.monthdaysToRun = null;
     }
 
-    public MonthlyScheduleIterator( Date startingDate, Date endingDate )
+    public MonthlySchedulerIterator( Date startingDate, Date endingDate )
     {
         super( startingDate, endingDate );
 
         this.monthdaysToRun = null;
     }
 
-    public MonthlyScheduleIterator( Date startingDate, Date endingDate, Set<Integer> monthdaysToRun )
+    public MonthlySchedulerIterator( Date startingDate, Date endingDate, Set<Integer> monthdaysToRun )
     {
         super( startingDate, endingDate );
 

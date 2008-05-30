@@ -37,12 +37,13 @@ import org.sonatype.nexus.rest.model.ScheduledServiceOnceResource;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceResourceResponse;
 import org.sonatype.nexus.rest.model.ScheduledServiceWeeklyResource;
+import org.sonatype.scheduling.NoSuchTaskException;
 
 public class ScheduledServiceResourceHandler
     extends AbstractScheduledServiceResourceHandler
 {
     public static final String SCHEDULED_SERVICE_ID_KEY = "scheduledServiceId";
-    
+
     /** The scheduledService ID */
     private String scheduledServiceId;
 
@@ -56,7 +57,7 @@ public class ScheduledServiceResourceHandler
     public ScheduledServiceResourceHandler( Context context, Request request, Response response )
     {
         super( context, request, response );
-        
+
         this.scheduledServiceId = getRequest().getAttributes().get( SCHEDULED_SERVICE_ID_KEY ).toString();
     }
 
@@ -80,7 +81,7 @@ public class ScheduledServiceResourceHandler
         throws IOException
     {
         ScheduledServiceBaseResource resource = null;
-        
+
         if ( "0".equals( getScheduledServiceId() ) )
         {
             resource = new ScheduledServiceBaseResource();
@@ -90,56 +91,56 @@ public class ScheduledServiceResourceHandler
         {
             resource = new ScheduledServiceOnceResource();
             resource.setServiceSchedule( "once" );
-            ((ScheduledServiceOnceResource)resource).setStartDate( String.valueOf( new Date().getTime() ) );
-            ((ScheduledServiceOnceResource)resource).setStartTime( "22:00" );
+            ( (ScheduledServiceOnceResource) resource ).setStartDate( String.valueOf( new Date().getTime() ) );
+            ( (ScheduledServiceOnceResource) resource ).setStartTime( "22:00" );
         }
         else if ( "2".equals( getScheduledServiceId() ) )
         {
             resource = new ScheduledServiceDailyResource();
             resource.setServiceSchedule( "daily" );
-            ((ScheduledServiceDailyResource)resource).setStartDate( String.valueOf( new Date().getTime() ) );
-            ((ScheduledServiceDailyResource)resource).setStartTime( "22:00" );
-            ((ScheduledServiceDailyResource)resource).setRecurringTime( "23:00" );
+            ( (ScheduledServiceDailyResource) resource ).setStartDate( String.valueOf( new Date().getTime() ) );
+            ( (ScheduledServiceDailyResource) resource ).setStartTime( "22:00" );
+            ( (ScheduledServiceDailyResource) resource ).setRecurringTime( "23:00" );
         }
         else if ( "3".equals( getScheduledServiceId() ) )
         {
             resource = new ScheduledServiceWeeklyResource();
             resource.setServiceSchedule( "weekly" );
-            ((ScheduledServiceWeeklyResource)resource).setStartDate( String.valueOf( new Date().getTime() ) );
-            ((ScheduledServiceWeeklyResource)resource).setStartTime( "22:00" );
-            ((ScheduledServiceWeeklyResource)resource).setRecurringTime( "23:00" );
-            ((ScheduledServiceWeeklyResource)resource).addRecurringDay( "monday" );
-            ((ScheduledServiceWeeklyResource)resource).addRecurringDay( "tuesday" );
+            ( (ScheduledServiceWeeklyResource) resource ).setStartDate( String.valueOf( new Date().getTime() ) );
+            ( (ScheduledServiceWeeklyResource) resource ).setStartTime( "22:00" );
+            ( (ScheduledServiceWeeklyResource) resource ).setRecurringTime( "23:00" );
+            ( (ScheduledServiceWeeklyResource) resource ).addRecurringDay( "monday" );
+            ( (ScheduledServiceWeeklyResource) resource ).addRecurringDay( "tuesday" );
         }
         else if ( "4".equals( getScheduledServiceId() ) )
         {
             resource = new ScheduledServiceMonthlyResource();
             resource.setServiceSchedule( "monthly" );
-            ((ScheduledServiceMonthlyResource)resource).setStartDate( String.valueOf( new Date().getTime() ) );
-            ((ScheduledServiceMonthlyResource)resource).setStartTime( "22:00" );
-            ((ScheduledServiceMonthlyResource)resource).setRecurringTime( "23:00" );
-            ((ScheduledServiceMonthlyResource)resource).addRecurringDay( "1" );
-            ((ScheduledServiceMonthlyResource)resource).addRecurringDay( "7" );
+            ( (ScheduledServiceMonthlyResource) resource ).setStartDate( String.valueOf( new Date().getTime() ) );
+            ( (ScheduledServiceMonthlyResource) resource ).setStartTime( "22:00" );
+            ( (ScheduledServiceMonthlyResource) resource ).setRecurringTime( "23:00" );
+            ( (ScheduledServiceMonthlyResource) resource ).addRecurringDay( "1" );
+            ( (ScheduledServiceMonthlyResource) resource ).addRecurringDay( "7" );
         }
         else if ( "5".equals( getScheduledServiceId() ) )
         {
             resource = new ScheduledServiceAdvancedResource();
             resource.setServiceSchedule( "advanced" );
-            ((ScheduledServiceAdvancedResource)resource).setCronCommand( "cronCommand" );
+            ( (ScheduledServiceAdvancedResource) resource ).setCronCommand( "cronCommand" );
         }
-        
+
         resource.setId( getScheduledServiceId() );
         resource.setName( "name" + getScheduledServiceId() );
         resource.setServiceType( "1" );
-        
+
         ScheduledServicePropertyResource propResource = new ScheduledServicePropertyResource();
         propResource.setId( "1" );
         propResource.setValue( "some text" );
         resource.addServiceProperty( propResource );
-        
+
         ScheduledServiceResourceResponse response = new ScheduledServiceResourceResponse();
         response.setData( resource );
-        
+
         return serialize( variant, response );
     }
 
@@ -173,10 +174,17 @@ public class ScheduledServiceResourceHandler
     }
 
     /**
-     * Delete a repository route.
+     * Delete a task.
      */
     public void delete()
     {
-        getResponse().setStatus( Status.CLIENT_ERROR_NOT_FOUND, "Scheduled service not found!" );
+        try
+        {
+            getNexus().getTaskById( getScheduledServiceId() ).cancel();
+        }
+        catch ( NoSuchTaskException e )
+        {
+            getResponse().setStatus( Status.CLIENT_ERROR_NOT_FOUND, "Scheduled service not found!" );
+        }
     }
 }

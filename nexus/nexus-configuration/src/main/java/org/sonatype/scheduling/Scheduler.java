@@ -5,7 +5,7 @@ import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.RejectedExecutionException;
 
-import org.sonatype.scheduling.iterators.ScheduleIterator;
+import org.sonatype.scheduling.iterators.SchedulerIterator;
 import org.sonatype.scheduling.schedules.Schedule;
 
 public interface Scheduler
@@ -18,7 +18,7 @@ public interface Scheduler
      * @param runnable
      * @return
      */
-    SubmittedTask submit( Runnable runnable )
+    SubmittedTask<Object> submit( Runnable runnable )
         throws RejectedExecutionException,
             NullPointerException;
 
@@ -29,7 +29,7 @@ public interface Scheduler
      * @param iterator
      * @return
      */
-    IteratingTask iterate( Runnable runnable, ScheduleIterator iterator )
+    IteratingTask<Object> iterate( Runnable runnable, SchedulerIterator iterator )
         throws RejectedExecutionException,
             NullPointerException;
 
@@ -40,7 +40,7 @@ public interface Scheduler
      * @param iterator
      * @return
      */
-    ScheduledTask schedule( Runnable runnable, Schedule schedule )
+    ScheduledTask<Object> schedule( Runnable runnable, Schedule schedule )
         throws RejectedExecutionException,
             NullPointerException;
 
@@ -50,7 +50,7 @@ public interface Scheduler
      * @param runnable
      * @return
      */
-    <T> SubmittedCallableTask<T> submit( Callable<T> callable )
+    <T> SubmittedTask<T> submit( Callable<T> callable )
         throws RejectedExecutionException,
             NullPointerException;
 
@@ -61,7 +61,7 @@ public interface Scheduler
      * @param iterator
      * @return
      */
-    <T> IteratingCallableTask<T> iterate( Callable<T> callable, ScheduleIterator iterator )
+    <T> IteratingTask<T> iterate( Callable<T> callable, SchedulerIterator iterator )
         throws RejectedExecutionException,
             NullPointerException;
 
@@ -72,7 +72,7 @@ public interface Scheduler
      * @param iterator
      * @return
      */
-    <T> ScheduledCallableTask<T> schedule( Callable<T> callable, Schedule schedule )
+    <T> ScheduledTask<T> schedule( Callable<T> callable, Schedule schedule )
         throws RejectedExecutionException,
             NullPointerException;
 
@@ -82,5 +82,14 @@ public interface Scheduler
      * 
      * @return
      */
-    Map<String, List<SubmittedTask>> getScheduledTasks();
+    Map<String, List<SubmittedTask>> getActiveTasks();
+
+    /**
+     * Returns an active task by it's ID.
+     * 
+     * @param id
+     * @return
+     */
+    <T> SubmittedTask<T> getTaskById( String id )
+        throws NoSuchTaskException;
 }

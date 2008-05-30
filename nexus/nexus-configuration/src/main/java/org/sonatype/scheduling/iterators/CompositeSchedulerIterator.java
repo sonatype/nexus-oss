@@ -6,16 +6,16 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
-public class CompositeScheduleIterator
-    extends AbstractScheduleIterator
+public class CompositeSchedulerIterator
+    extends AbstractSchedulerIterator
 {
-    private final List<ScheduleIterator> iterators;
+    private final List<SchedulerIterator> iterators;
 
-    public CompositeScheduleIterator( Collection<ScheduleIterator> its )
+    public CompositeSchedulerIterator( Collection<SchedulerIterator> its )
     {
         super( new Date(), null );
 
-        this.iterators = new ArrayList<ScheduleIterator>( its.size() );
+        this.iterators = new ArrayList<SchedulerIterator>( its.size() );
 
         this.iterators.addAll( its );
     }
@@ -40,7 +40,7 @@ public class CompositeScheduleIterator
         // it is finished if all iterators are finished
         boolean result = false;
 
-        for ( ScheduleIterator i : iterators )
+        for ( SchedulerIterator i : iterators )
         {
             result = result || i.isFinished();
         }
@@ -48,17 +48,17 @@ public class CompositeScheduleIterator
         return result;
     }
 
-    protected ScheduleIterator getNextIterator()
+    protected SchedulerIterator getNextIterator()
     {
         Date currDate = null;
 
         Date nextDate = null;
 
-        ScheduleIterator currIterator = null;
+        SchedulerIterator currIterator = null;
 
-        ScheduleIterator nextIterator = null;
+        SchedulerIterator nextIterator = null;
 
-        for ( Iterator<ScheduleIterator> i = iterators.iterator(); i.hasNext(); )
+        for ( Iterator<SchedulerIterator> i = iterators.iterator(); i.hasNext(); )
         {
             currIterator = i.next();
 

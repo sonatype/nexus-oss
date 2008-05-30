@@ -3,8 +3,8 @@ package org.sonatype.scheduling.schedules;
 import java.util.Date;
 import java.util.Set;
 
-import org.sonatype.scheduling.iterators.MonthlyScheduleIterator;
-import org.sonatype.scheduling.iterators.ScheduleIterator;
+import org.sonatype.scheduling.iterators.MonthlySchedulerIterator;
+import org.sonatype.scheduling.iterators.SchedulerIterator;
 
 public class MonthlySchedule
     extends AbstractSchedule
@@ -23,9 +23,9 @@ public class MonthlySchedule
         return daysToRun;
     }
 
-    public ScheduleIterator getIterator()
+    public SchedulerIterator getIterator()
     {
-        return new MonthlyScheduleIterator( getStartDate(), getEndDate(), daysToRun );
+        return new MonthlySchedulerIterator( getStartDate(), getEndDate(), daysToRun );
     }
 
 }

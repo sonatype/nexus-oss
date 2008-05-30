@@ -27,11 +27,15 @@ import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.resource.Representation;
 import org.restlet.resource.Variant;
+import org.sonatype.nexus.index.tasks.PublishIndexesTask;
+import org.sonatype.nexus.rest.attributes.RebuildAttributesTask;
+import org.sonatype.nexus.rest.cache.ClearCacheTask;
+import org.sonatype.nexus.rest.index.ReindexTask;
 import org.sonatype.nexus.rest.model.ScheduledServiceTypePropertyResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceTypeResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceTypeResourceResponse;
 
-public class ScheduledServiceTypeResourceHandler 
+public class ScheduledServiceTypeResourceHandler
     extends AbstractScheduledServiceResourceHandler
 {
     /**
@@ -45,7 +49,7 @@ public class ScheduledServiceTypeResourceHandler
     {
         super( context, request, response );
     }
-    
+
     /**
      * We are handling HTTP GETs.
      */
@@ -61,56 +65,80 @@ public class ScheduledServiceTypeResourceHandler
         throws IOException
     {
         ScheduledServiceTypeResourceResponse response = new ScheduledServiceTypeResourceResponse();
-        
+
         ScheduledServiceTypeResource type = new ScheduledServiceTypeResource();
-        type.setId( "1" );
-        type.setName( "Purge Snapshots" );
+        type.setId( PublishIndexesTask.class.getName() );
+        type.setName( "Publish Indexes" );
         ScheduledServiceTypePropertyResource property = new ScheduledServiceTypePropertyResource();
         property.setId( "1" );
-        property.setName( "Some Config Value" );
+        property.setName( "Repository ID" );
         property.setType( "string" );
-        property.setHelpText( "Some Help Text" );
+        property.setHelpText( "Type in the repository ID to publish the indexes." );
         type.addProperty( property );
         property = new ScheduledServiceTypePropertyResource();
         property.setId( "2" );
-        property.setName( "Other Config Value" );
+        property.setName( "Repository Group ID" );
         property.setType( "string" );
-        property.setHelpText( "Other Help Text" );
-        type.addProperty( property );        
+        property.setHelpText( "Type in the repository group ID to publish the indexes for all member repositories." );
+        type.addProperty( property );
         response.addData( type );
-        
+
         type = new ScheduledServiceTypeResource();
-        type.setId( "2" );
-        type.setName( "Synchronize Repositories" );
+        type.setId( ReindexTask.class.getName() );
+        type.setName( "Reindex Repositories" );
+        property = new ScheduledServiceTypePropertyResource();
+        property.setId( "1" );
+        property.setName( "Repository ID" );
+        property.setType( "string" );
+        property.setHelpText( "Type in the repository ID to reindex." );
+        type.addProperty( property );
+        property = new ScheduledServiceTypePropertyResource();
+        property.setId( "2" );
+        property.setName( "Repository Group ID" );
+        property.setType( "string" );
+        property.setHelpText( "Type in the repository group ID to reindex all member repositories." );
+        type.addProperty( property );
+        response.addData( type );
+
+        type = new ScheduledServiceTypeResource();
+        type.setId( RebuildAttributesTask.class.getName() );
+        type.setName( "Rebuild Repository Atributes" );
+        property = new ScheduledServiceTypePropertyResource();
+        property.setId( "1" );
+        property.setName( "Repository ID" );
+        property.setType( "string" );
+        property.setHelpText( "Type in the repository ID to rebuild attributes." );
+        type.addProperty( property );
+        property = new ScheduledServiceTypePropertyResource();
+        property.setId( "2" );
+        property.setName( "Repository Group ID" );
+        property.setType( "string" );
+        property.setHelpText( "Type in the repository group ID to rebuild attributes for all member repositories." );
+        type.addProperty( property );
+        response.addData( type );
+
+        type = new ScheduledServiceTypeResource();
+        type.setId( ClearCacheTask.class.getName() );
+        type.setName( "Clear Repository Caches" );
+        property = new ScheduledServiceTypePropertyResource();
+        property.setId( "1" );
+        property.setName( "Repository ID" );
+        property.setType( "string" );
+        property.setHelpText( "Type in the repository ID to rebuild attributes." );
+        type.addProperty( property );
+        property = new ScheduledServiceTypePropertyResource();
+        property.setId( "2" );
+        property.setName( "Repository Group ID" );
+        property.setType( "string" );
+        property.setHelpText( "Type in the repository group ID to rebuild attributes for all member repositories." );
+        type.addProperty( property );
         property = new ScheduledServiceTypePropertyResource();
         property.setId( "3" );
-        property.setName( "Some Config Value" );
+        property.setName( "Repository path" );
         property.setType( "string" );
-        property.setHelpText( "Some Help Text" );
+        property
+            .setHelpText( "Type in the repository path from which to clear caches recursively (ie. \"/\" for root or \"/org/apache\")" );
         type.addProperty( property );
-        property = new ScheduledServiceTypePropertyResource();
-        property.setId( "4" );
-        property.setName( "Other Config Value" );
-        property.setType( "string" );
-        property.setHelpText( "Other Help Text" );
-        type.addProperty( property );        
-        response.addData( type );
-        
-        type = new ScheduledServiceTypeResource();
-        type.setId( "3" );
-        type.setName( "Some Other Service" );
-        property = new ScheduledServiceTypePropertyResource();
-        property.setId( "5" );
-        property.setName( "Config Date" );
-        property.setType( "date" );
-        property.setHelpText( "Date Help" );
-        type.addProperty( property );
-        property = new ScheduledServiceTypePropertyResource();
-        property.setId( "6" );
-        property.setName( "Config number" );
-        property.setType( "number" );
-        property.setHelpText( "number help" );
-        type.addProperty( property );        
         response.addData( type );
 
         return serialize( variant, response );

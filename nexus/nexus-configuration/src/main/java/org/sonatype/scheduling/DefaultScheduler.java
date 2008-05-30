@@ -21,6 +21,7 @@
 package org.sonatype.scheduling;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -38,7 +39,9 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Startable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.StartingException;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.StoppingException;
-import org.sonatype.scheduling.iterators.ScheduleIterator;
+import org.codehaus.plexus.util.CollectionUtils;
+import org.codehaus.plexus.util.StringUtils;
+import org.sonatype.scheduling.iterators.SchedulerIterator;
 import org.sonatype.scheduling.schedules.Schedule;
 
 /**
@@ -137,78 +140,53 @@ public class DefaultScheduler
         }
     }
 
-    public SubmittedTask submit( Runnable runnable )
+    public SubmittedTask<Object> submit( Runnable runnable )
     {
-        DefaultCallableTask<Object> drt = new DefaultCallableTask<Object>( runnable.getClass().getName(), Executors
-            .callable( runnable ), null, this, null );
-
-        addToTasksMap( drt );
-
-        drt.start();
-
-        return drt;
-    }
-
-    public IteratingTask iterate( Runnable runnable, ScheduleIterator iterator )
-    {
-        DefaultCallableTask<Object> drt = new DefaultCallableTask<Object>( runnable.getClass().getName(), Executors
-            .callable( runnable ), iterator, this, null );
-
-        addToTasksMap( drt );
-
-        drt.start();
-
-        return drt;
-    }
-
-    public ScheduledTask schedule( Runnable runnable, Schedule schedule )
-    {
-        DefaultCallableTask<Object> drt = new DefaultCallableTask<Object>( runnable.getClass().getName(), Executors
-            .callable( runnable ), schedule.getIterator(), this, schedule );
-
-        addToTasksMap( drt );
-
-        drt.start();
-
-        return drt;
-    }
-
-    public <T> SubmittedCallableTask<T> submit( Callable<T> callable )
-    {
-        DefaultCallableTask<T> dct = new DefaultCallableTask<T>(
-            callable.getClass().getName(),
-            callable,
-            null,
+        DefaultSubmittedTask<Object> drt = new DefaultSubmittedTask<Object>(
+            runnable.getClass().getName(),
             this,
-            null );
+            Executors.callable( runnable ) );
 
-        addToTasksMap( dct );
+        addToTasksMap( drt );
 
-        dct.start();
+        drt.start();
 
-        return dct;
+        return drt;
     }
 
-    public <T> IteratingCallableTask<T> iterate( Callable<T> callable, ScheduleIterator iterator )
+    public IteratingTask<Object> iterate( Runnable runnable, SchedulerIterator iterator )
     {
-        DefaultCallableTask<T> dct = new DefaultCallableTask<T>(
-            callable.getClass().getName(),
-            callable,
-            iterator,
+        DefaultIteratingTask<Object> drt = new DefaultIteratingTask<Object>(
+            runnable.getClass().getName(),
             this,
-            null );
+            Executors.callable( runnable ),
+            iterator );
 
-        addToTasksMap( dct );
+        addToTasksMap( drt );
 
-        dct.start();
+        drt.start();
 
-        return dct;
+        return drt;
     }
 
-    public <T> ScheduledCallableTask<T> schedule( Callable<T> callable, Schedule schedule )
+    public ScheduledTask<Object> schedule( Runnable runnable, Schedule schedule )
     {
-        DefaultCallableTask<T> dct = new DefaultCallableTask<T>( callable.getClass().getName(), callable, schedule
-            .getIterator(), this, schedule );
+        DefaultScheduledTask<Object> drt = new DefaultScheduledTask<Object>(
+            runnable.getClass().getName(),
+            this,
+            Executors.callable( runnable ),
+            schedule );
+
+        addToTasksMap( drt );
+
+        drt.start();
+
+        return drt;
+    }
+
+    public <T> SubmittedTask<T> submit( Callable<T> callable )
+    {
+        DefaultSubmittedTask<T> dct = new DefaultSubmittedTask<T>( callable.getClass().getName(), this, callable );
 
         addToTasksMap( dct );
 
@@ -217,7 +195,37 @@ public class DefaultScheduler
         return dct;
     }
 
-    public Map<String, List<SubmittedTask>> getScheduledTasks()
+    public <T> IteratingTask<T> iterate( Callable<T> callable, SchedulerIterator iterator )
+    {
+        DefaultIteratingTask<T> dct = new DefaultIteratingTask<T>(
+            callable.getClass().getName(),
+            this,
+            callable,
+            iterator );
+
+        addToTasksMap( dct );
+
+        dct.start();
+
+        return dct;
+    }
+
+    public <T> ScheduledTask<T> schedule( Callable<T> callable, Schedule schedule )
+    {
+        DefaultScheduledTask<T> dct = new DefaultScheduledTask<T>(
+            callable.getClass().getName(),
+            this,
+            callable,
+            schedule );
+
+        addToTasksMap( dct );
+
+        dct.start();
+
+        return dct;
+    }
+
+    public Map<String, List<SubmittedTask>> getActiveTasks()
     {
         Map<String, List<SubmittedTask>> result = null;
 
@@ -234,7 +242,7 @@ public class DefaultScheduler
 
                 for ( SubmittedTask task : tasksMap.get( cls ) )
                 {
-                    if ( task.getTaskState().isActive() )
+                    if ( task.getTaskState().isActiveOrSubmitted() )
                     {
                         tasks.add( task );
                     }
@@ -246,8 +254,31 @@ public class DefaultScheduler
                 }
             }
         }
-
         return result;
+    }
+
+    public <T> SubmittedTask<T> getTaskById( String id )
+        throws NoSuchTaskException
+    {
+        if ( StringUtils.isEmpty( id ) )
+        {
+            throw new IllegalArgumentException( "The Tasks cannot have null IDs!" );
+        }
+
+        Collection<List<SubmittedTask>> activeTasks = getActiveTasks().values();
+
+        for ( List<SubmittedTask> tasks : activeTasks )
+        {
+            for ( SubmittedTask task : tasks )
+            {
+                if ( task.getId().equals( id ) )
+                {
+                    return task;
+                }
+            }
+        }
+
+        throw new NoSuchTaskException( id );
     }
 
 }

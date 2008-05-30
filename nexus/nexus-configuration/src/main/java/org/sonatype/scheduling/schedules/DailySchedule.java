@@ -2,8 +2,8 @@ package org.sonatype.scheduling.schedules;
 
 import java.util.Date;
 
-import org.sonatype.scheduling.iterators.DailyScheduleIterator;
-import org.sonatype.scheduling.iterators.ScheduleIterator;
+import org.sonatype.scheduling.iterators.DailySchedulerIterator;
+import org.sonatype.scheduling.iterators.SchedulerIterator;
 
 public class DailySchedule
     extends AbstractSchedule
@@ -13,8 +13,8 @@ public class DailySchedule
         super( startDate, endDate );
     }
 
-    public ScheduleIterator getIterator()
+    public SchedulerIterator getIterator()
     {
-        return new DailyScheduleIterator( getStartDate(), getEndDate() );
+        return new DailySchedulerIterator( getStartDate(), getEndDate() );
     }
 }

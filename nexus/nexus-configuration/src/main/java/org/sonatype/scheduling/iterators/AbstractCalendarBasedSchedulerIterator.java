@@ -3,17 +3,17 @@ package org.sonatype.scheduling.iterators;
 import java.util.Calendar;
 import java.util.Date;
 
-public abstract class AbstractCalendarBasedScheduleIterator
-    extends AbstractScheduleIterator
+public abstract class AbstractCalendarBasedSchedulerIterator
+    extends AbstractSchedulerIterator
 {
     private final Calendar calendar;
 
-    public AbstractCalendarBasedScheduleIterator( Date startingDate )
+    public AbstractCalendarBasedSchedulerIterator( Date startingDate )
     {
         this( startingDate, null );
     }
 
-    public AbstractCalendarBasedScheduleIterator( Date startingDate, Date endingDate )
+    public AbstractCalendarBasedSchedulerIterator( Date startingDate, Date endingDate )
     {
         super( startingDate, endingDate );
 

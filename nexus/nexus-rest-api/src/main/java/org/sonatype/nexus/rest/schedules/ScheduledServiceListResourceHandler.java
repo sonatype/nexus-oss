@@ -22,7 +22,10 @@ package org.sonatype.nexus.rest.schedules;
 
 import java.io.IOException;
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
+import org.codehaus.plexus.util.StringUtils;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
@@ -32,6 +35,10 @@ import org.sonatype.nexus.rest.model.ScheduledServiceBaseResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceListResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceListResourceResponse;
 import org.sonatype.nexus.rest.model.ScheduledServiceResourceResponse;
+import org.sonatype.scheduling.IteratingTask;
+import org.sonatype.scheduling.ScheduledTask;
+import org.sonatype.scheduling.SubmittedTask;
+import org.sonatype.scheduling.TaskState;
 
 public class ScheduledServiceListResourceHandler
     extends AbstractScheduledServiceResourceHandler
@@ -62,85 +69,49 @@ public class ScheduledServiceListResourceHandler
     public Representation getRepresentationHandler( Variant variant )
         throws IOException
     {
+        Map<String, List<SubmittedTask>> tasksMap = getNexus().getActiveTasks();
+
         ScheduledServiceListResourceResponse response = new ScheduledServiceListResourceResponse();
-        
-        ScheduledServiceListResource item = new ScheduledServiceListResource();
-        item.setCreated( new Date() );
-        item.setLastRunResult( "last run result" );
-        item.setLastRunTime( "last run time" );
-        item.setName( "name0" );
-        item.setNextRunTime( "next run time" );
-        item.setResourceURI( calculateSubReference( "0" ).toString() );
-        item.setServiceSchedule( "none" );
-        item.setServiceStatus( "status" );
-        item.setServiceTypeName( "Purge Snapshots" );
-        item.setServiceTypeId( "1" );
-        response.addData( item );
-        
-        item = new ScheduledServiceListResource();
-        item.setCreated( new Date() );
-        item.setLastRunResult( "last run result" );
-        item.setLastRunTime( "last run time" );
-        item.setName( "name1" );
-        item.setNextRunTime( "next run time" );
-        item.setResourceURI( calculateSubReference( "1" ).toString() );
-        item.setServiceSchedule( "once" );
-        item.setServiceStatus( "status" );
-        item.setServiceTypeName( "Purge Snapshots" );
-        item.setServiceTypeId( "1" );        
-        response.addData( item );
-        
-        item = new ScheduledServiceListResource();
-        item.setCreated( new Date() );
-        item.setLastRunResult( "last run result" );
-        item.setLastRunTime( "last run time" );
-        item.setName( "name2" );
-        item.setNextRunTime( "next run time" );
-        item.setResourceURI( calculateSubReference( "2" ).toString() );
-        item.setServiceSchedule( "daily" );
-        item.setServiceStatus( "status" );
-        item.setServiceTypeName( "Purge Snapshots" );
-        item.setServiceTypeId( "1" );
-        response.addData( item );
-        
-        item = new ScheduledServiceListResource();
-        item.setCreated( new Date() );
-        item.setLastRunResult( "last run result" );
-        item.setLastRunTime( "last run time" );
-        item.setName( "name3" );
-        item.setNextRunTime( "next run time" );
-        item.setResourceURI( calculateSubReference( "3" ).toString() );
-        item.setServiceSchedule( "weekly" );
-        item.setServiceStatus( "status" );
-        item.setServiceTypeName( "Purge Snapshots" );
-        item.setServiceTypeId( "1" );
-        response.addData( item );
-        
-        item = new ScheduledServiceListResource();
-        item.setCreated( new Date() );
-        item.setLastRunResult( "last run result" );
-        item.setLastRunTime( "last run time" );
-        item.setName( "name4" );
-        item.setNextRunTime( "next run time" );
-        item.setResourceURI( calculateSubReference( "4" ).toString() );
-        item.setServiceSchedule( "monthly" );
-        item.setServiceStatus( "status" );
-        item.setServiceTypeName( "Purge Snapshots" );
-        item.setServiceTypeId( "1" );
-        response.addData( item );
-        
-        item = new ScheduledServiceListResource();
-        item.setCreated( new Date() );
-        item.setLastRunResult( "last run result" );
-        item.setLastRunTime( "last run time" );
-        item.setName( "name5" );
-        item.setNextRunTime( "next run time" );
-        item.setResourceURI( calculateSubReference( "5" ).toString() );
-        item.setServiceSchedule( "advanced" );
-        item.setServiceStatus( "status" );
-        item.setServiceTypeName( "Purge Snapshots" );
-        item.setServiceTypeId( "1" );        
-        response.addData( item );
+
+        for ( String key : tasksMap.keySet() )
+        {
+            List<SubmittedTask> tasks = tasksMap.get( key );
+
+            for ( SubmittedTask task : tasks )
+            {
+                ScheduledServiceListResource item = new ScheduledServiceListResource();
+                item.setResourceURI( calculateSubReference( task.getId() ).toString() );
+                item.setCreated( task.getScheduledAt() );
+                item.setLastRunResult( TaskState.BROKEN.equals( task.getTaskState() ) ? "Error" : "Ok" );
+                item.setName( task.getId() );
+                item.setServiceStatus( StringUtils.capitalise( task.getTaskState().toString() ) );
+                item.setServiceTypeId( task.getType() );
+                item.setServiceTypeName( getServiceTypeName( task.getType() ) );
+
+                if ( IteratingTask.class.isAssignableFrom( task.getClass() ) )
+                {
+                    item.setLastRunTime( ( (IteratingTask) task ).getLastRun().toString() );
+                    item.setNextRunTime( ( (IteratingTask) task ).getNextRun().toString() );
+                }
+                else
+                {
+                    item.setLastRunTime( "n/a" );
+                    item.setNextRunTime( "n/a" );
+                }
+
+                if ( ScheduledTask.class.isAssignableFrom( task.getClass() ) )
+                {
+                    item.setServiceSchedule( getScheduleShortName( ( (ScheduledTask) task ).getSchedule() ) );
+                }
+                else
+                {
+                    item.setServiceSchedule( "n/a" );
+                }
+
+                response.addData( item );
+            }
+
+        }
 
         return serialize( variant, response );
     }

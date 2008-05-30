@@ -1,7 +1,7 @@
 package org.sonatype.scheduling.schedules;
 
 import org.sonatype.scheduling.iterators.CronIterator;
-import org.sonatype.scheduling.iterators.ScheduleIterator;
+import org.sonatype.scheduling.iterators.SchedulerIterator;
 
 public class CronSchedule
     extends AbstractSchedule
@@ -20,7 +20,7 @@ public class CronSchedule
         return cronExpression;
     }
 
-    public ScheduleIterator getIterator()
+    public SchedulerIterator getIterator()
     {
         return new CronIterator( cronExpression );
     }
