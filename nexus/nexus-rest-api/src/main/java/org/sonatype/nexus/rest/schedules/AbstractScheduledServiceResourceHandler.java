@@ -60,6 +60,21 @@ public class AbstractScheduledServiceResourceHandler
     /** Schedule Type Advanced. */
     public static final String SCHEDULE_TYPE_ADVANCED = "advanced";
 
+    /**
+     * Type property resource: string
+     */
+    public static final String PROPERTY_TYPE_STRING = "string";
+
+    /**
+     * Type property resource: number
+     */
+    public static final String PROPERTY_TYPE_NUMBER = "number";
+
+    /**
+     * Type property resource: date
+     */
+    public static final String PROPERTY_TYPE_DATE = "date";
+
     protected Map<String, String> serviceNames = new HashMap<String, String>();
     {
         serviceNames.put( PublishIndexesTask.class.getName(), "Publish Indexes" );
