@@ -41,6 +41,8 @@ import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
  * locally but it's age is more then allowed.
  * 
  * @author cstamas
+ * @plexus.component instantiation-strategy="per-lookup" role="org.sonatype.nexus.proxy.repository.Repository"
+ *                   role-hint="default"
  */
 public abstract class DefaultRepository
     extends AbstractRepository

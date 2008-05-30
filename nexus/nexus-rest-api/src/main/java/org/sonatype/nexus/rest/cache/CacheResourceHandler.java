@@ -36,6 +36,7 @@ import org.sonatype.nexus.rest.model.NFCRepositoryResource;
 import org.sonatype.nexus.rest.model.NFCResource;
 import org.sonatype.nexus.rest.model.NFCResourceResponse;
 import org.sonatype.nexus.rest.restore.AbstractRestoreResourceHandler;
+import org.sonatype.nexus.tasks.ClearCacheTask;
 
 /**
  * @author cstamas

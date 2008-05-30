@@ -1,9 +1,10 @@
-package org.sonatype.nexus.index.tasks;
+package org.sonatype.nexus.tasks;
 
 import java.io.IOException;
 
 import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.feeds.FeedRecorder;
+import org.sonatype.nexus.index.AbstractIndexerTask;
 import org.sonatype.nexus.index.IndexerManager;
 
 public class PublishIndexesTask

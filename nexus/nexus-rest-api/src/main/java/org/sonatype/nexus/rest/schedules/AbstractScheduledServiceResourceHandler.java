@@ -26,8 +26,12 @@ import java.util.Map;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
-import org.sonatype.nexus.index.tasks.PublishIndexesTask;
+import org.sonatype.nexus.maven.tasks.SnapshotRemoverTask;
 import org.sonatype.nexus.rest.AbstractNexusResourceHandler;
+import org.sonatype.nexus.tasks.ClearCacheTask;
+import org.sonatype.nexus.tasks.PublishIndexesTask;
+import org.sonatype.nexus.tasks.RebuildAttributesTask;
+import org.sonatype.nexus.tasks.ReindexTask;
 import org.sonatype.scheduling.schedules.CronSchedule;
 import org.sonatype.scheduling.schedules.DailySchedule;
 import org.sonatype.scheduling.schedules.MonthlySchedule;
@@ -58,7 +62,11 @@ public class AbstractScheduledServiceResourceHandler
 
     protected Map<String, String> serviceNames = new HashMap<String, String>();
     {
-        serviceNames.put( PublishIndexesTask.class.getName(), "Publish Repository Indexes" );
+        serviceNames.put( PublishIndexesTask.class.getName(), "Publish Indexes" );
+        serviceNames.put( ReindexTask.class.getName(), "Reindex Repositories" );
+        serviceNames.put( RebuildAttributesTask.class.getName(), "Rebuild Repository Atributes" );
+        serviceNames.put( ClearCacheTask.class.getName(), "Clear Repository Caches" );
+        serviceNames.put( SnapshotRemoverTask.class.getName(), "Remove Snapshots From Repository" );
     }
 
     /**

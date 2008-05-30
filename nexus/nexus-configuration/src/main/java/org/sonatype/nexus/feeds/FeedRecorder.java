@@ -62,6 +62,11 @@ public interface FeedRecorder
      */
     public static final String SYSTEM_CLEARCACHE_ACTION = "CLEARCACHE";
 
+    /**
+     * System event action: removeSnapshots
+     */
+    public static final String SYSTEM_REMOVE_SNAPSHOTS_ACTION = "REMOVESNAPSHOTS";
+
     // service
 
     void startService()

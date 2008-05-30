@@ -18,55 +18,51 @@
  * along with this program.  If not, see http://www.gnu.org/licenses/.
  *
  */
-package org.sonatype.nexus.rest.schedules.jobs;
+package org.sonatype.nexus.tasks;
 
 import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.feeds.FeedRecorder;
 import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesTask;
 
-public class SnapshotRemoverTask
+public class ClearCacheTask
     extends AbstractNexusRepositoriesTask
 {
-    public SnapshotRemoverTask( Nexus nexus, String repositoryId, String repositoryGroupId )
+    private final String resourceStorePath;
+
+    public ClearCacheTask( Nexus nexus, String repositoryId, String repositoryGroupId, String resourceStorePath )
     {
         super( nexus, repositoryId, repositoryGroupId );
+
+        this.resourceStorePath = resourceStorePath;
     }
 
     public void doRun()
         throws Exception
     {
-        if ( getRepositoryGroupId() != null )
-        {
-            getNexus().reindexRepositoryGroup( getRepositoryGroupId() );
-        }
-        else if ( getRepositoryId() != null )
-        {
-            getNexus().reindexRepository( getRepositoryId() );
-        }
-        else
-        {
-            getNexus().reindexAllRepositories();
-        }
+        getNexus().clearCaches( resourceStorePath, getRepositoryId(), getRepositoryGroupId() );
     }
 
     protected String getAction()
     {
-        return FeedRecorder.SYSTEM_REINDEX_ACTION;
+        return FeedRecorder.SYSTEM_CLEARCACHE_ACTION;
     }
 
     protected String getMessage()
     {
         if ( getRepositoryGroupId() != null )
         {
-            return "Reindexing repository group with ID=" + getRepositoryGroupId();
+            return "Clearing caches for repository group with ID=" + getRepositoryGroupId() + " from path "
+                + resourceStorePath + " and below.";
         }
         else if ( getRepositoryId() != null )
         {
-            return "Reindexing repository with ID=" + getRepositoryId();
+            return "Clearing caches for repository with ID=" + getRepositoryId() + " from path " + resourceStorePath
+                + " and below.";
         }
         else
         {
-            return "Reindexing all registered repositories";
+            return "Clearing caches for all registered repositories" + " from path " + resourceStorePath
+                + " and below.";
         }
     }
 

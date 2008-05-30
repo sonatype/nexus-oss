@@ -34,6 +34,7 @@ import org.restlet.resource.Variant;
 import org.sonatype.nexus.rest.model.NexusArtifact;
 import org.sonatype.nexus.rest.model.SearchResponse;
 import org.sonatype.nexus.rest.restore.AbstractRestoreResourceHandler;
+import org.sonatype.nexus.tasks.ReindexTask;
 
 /**
  * @author cstamas

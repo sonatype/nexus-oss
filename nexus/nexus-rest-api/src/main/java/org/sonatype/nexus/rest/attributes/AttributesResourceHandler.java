@@ -24,6 +24,7 @@ import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.sonatype.nexus.rest.restore.AbstractRestoreResourceHandler;
+import org.sonatype.nexus.tasks.RebuildAttributesTask;
 
 public class AttributesResourceHandler
     extends AbstractRestoreResourceHandler

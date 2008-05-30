@@ -18,36 +18,28 @@
  * along with this program.  If not, see http://www.gnu.org/licenses/.
  *
  */
-package org.sonatype.nexus.proxy.maven.jobs;
+package org.sonatype.nexus.maven.tasks;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.sonatype.nexus.proxy.repository.Repository;
 
 public class SnapshotRemovalRequest
 {
-    private String repositoryId;
-
-    private String repositoryGroupId;
+    private List<Repository> repositories;
 
     private int minCountOfSnapshotsToKeep = 2;
 
     private int removeSnapshotsOlderThanDays = 2;
 
-    public String getRepositoryId()
+    public List<Repository> getRepositories()
     {
-        return repositoryId;
-    }
-
-    public void setRepositoryId( String repositoryId )
-    {
-        this.repositoryId = repositoryId;
-    }
-
-    public String getRepositoryGroupId()
-    {
-        return repositoryGroupId;
-    }
-
-    public void setRepositoryGroupId( String repositoryGroupId )
-    {
-        this.repositoryGroupId = repositoryGroupId;
+        if ( repositories == null )
+        {
+            repositories = new ArrayList<Repository>();
+        }
+        return repositories;
     }
 
     public int getMinCountOfSnapshotsToKeep()

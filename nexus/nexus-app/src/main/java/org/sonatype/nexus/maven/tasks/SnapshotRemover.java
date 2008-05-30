@@ -18,42 +18,12 @@
  * along with this program.  If not, see http://www.gnu.org/licenses/.
  *
  */
-package org.sonatype.nexus.index.tasks;
+package org.sonatype.nexus.maven.tasks;
 
-import java.util.List;
-
-import org.sonatype.nexus.Nexus;
-import org.sonatype.nexus.index.IndexerManager;
-import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesTask;
-import org.sonatype.scheduling.SubmittedTask;
-
-public abstract class AbstractIndexerTask
-    extends AbstractNexusRepositoriesTask
+public interface SnapshotRemover
 {
-    private final IndexerManager indexerManager;
+    String ROLE = SnapshotRemover.class.getName();
 
-    public AbstractIndexerTask( Nexus nexus, IndexerManager indexerManager )
-    {
-        this( nexus, indexerManager, null, null );
-    }
-
-    public AbstractIndexerTask( Nexus nexus, IndexerManager indexerManager, String repositoryId,
-        String repositoryGroupId )
-    {
-        super( nexus, repositoryId, repositoryGroupId );
-
-        this.indexerManager = indexerManager;
-    }
-
-    protected IndexerManager getIndexerManager()
-    {
-        return indexerManager;
-    }
-
-    public boolean allowConcurrentExecution( List<SubmittedTask> existingTasks )
-    {
-        // override if needed
-        return false;
-    }
-
+    SnapshotRemovalResult removeSnapshots( SnapshotRemovalRequest request )
+        throws Exception;
 }

@@ -18,7 +18,7 @@
  * along with this program.  If not, see http://www.gnu.org/licenses/.
  *
  */
-package org.sonatype.nexus.proxy.maven.jobs;
+package org.sonatype.nexus.maven.tasks;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -35,7 +35,6 @@ import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
-import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.utils.StoreWalker;
 
@@ -45,74 +44,26 @@ import org.sonatype.nexus.proxy.utils.StoreWalker;
  * snapshots per one snapshot collection by removing all older from removeSnapshotsOlderThanDays.
  * 
  * @author cstamas
- * @plexus.component
  */
 public class DefaultSnapshotRemover
     extends AbstractLogEnabled
     implements SnapshotRemover
 {
-    /**
-     * The registry.
-     * 
-     * @plexus.requirement
-     */
-    private RepositoryRegistry repositoryRegistry;
-
-    protected RepositoryRegistry getRepositoryRegistry()
-    {
-        return repositoryRegistry;
-    }
-
     public SnapshotRemovalResult removeSnapshots( SnapshotRemovalRequest request )
         throws Exception
     {
-        SnapshotRemovalResult result = null;
+        SnapshotRemovalResult result = new SnapshotRemovalResult();
 
-        if ( request.getRepositoryId() != null )
+        getLogger().info( "Removing old SNAPSHOT deployments from all repositories." );
+
+        result = new SnapshotRemovalResult();
+
+        for ( Repository repository : request.getRepositories() )
         {
-            getLogger().info( "Removing old SNAPSHOT deployments from " + request.getRepositoryId() + " repository." );
-
-            Repository repository = getRepositoryRegistry().getRepository( request.getRepositoryId() );
-
+            // only from maven repositories, stay silent for others and simply skip
             if ( MavenRepository.class.isAssignableFrom( repository.getClass() ) )
             {
-                result.append( removeSnapshotsFromMavenRepository( repository, request ) );
-            }
-            else
-            {
-                throw new IllegalArgumentException( "The repository with ID=" + repository.getId()
-                    + " is not MavenRepository!" );
-            }
-        }
-        else if ( request.getRepositoryGroupId() != null )
-        {
-            getLogger().info(
-                "Removing old SNAPSHOT deployments from " + request.getRepositoryGroupId() + " repository group." );
-
-            result = new SnapshotRemovalResult();
-
-            for ( Repository repository : getRepositoryRegistry().getRepositoryGroup( request.getRepositoryGroupId() ) )
-            {
-                // only from maven repositories, stay silent for others and simply skip
-                if ( MavenRepository.class.isAssignableFrom( repository.getClass() ) )
-                {
-                    result.append( removeSnapshotsFromMavenRepository( repository, request ) );
-                }
-            }
-        }
-        else
-        {
-            getLogger().info( "Removing old SNAPSHOT deployments from all repositories." );
-
-            result = new SnapshotRemovalResult();
-
-            for ( Repository repository : getRepositoryRegistry().getRepositories() )
-            {
-                // only from maven repositories, stay silent for others and simply skip
-                if ( MavenRepository.class.isAssignableFrom( repository.getClass() ) )
-                {
-                    result.append( removeSnapshotsFromMavenRepository( repository, request ) );
-                }
+                result.addResult( removeSnapshotsFromMavenRepository( repository, request ) );
             }
         }
 
@@ -125,11 +76,11 @@ public class DefaultSnapshotRemover
      * @param repository the repository
      * @throws Exception the exception
      */
-    protected SnapshotRemovalResult removeSnapshotsFromMavenRepository( Repository repository,
+    protected SnapshotRemovalRepositoryResult removeSnapshotsFromMavenRepository( Repository repository,
         SnapshotRemovalRequest request )
         throws Exception
     {
-        SnapshotRemovalResult result = new SnapshotRemovalResult( repository.getId(), 0, 0 );
+        SnapshotRemovalRepositoryResult result = new SnapshotRemovalRepositoryResult( repository.getId(), 0, 0 );
 
         if ( getLogger().isDebugEnabled() )
         {
@@ -138,8 +89,11 @@ public class DefaultSnapshotRemover
 
         // create a walker to collect deletables and let it loose on collections only
         SnapshotRemoverWalker walker = new SnapshotRemoverWalker( getLogger(), repository, request );
+
+        // start the dance
         walker.start();
 
+        // and collect results
         result.setDeletedSnapshots( walker.getDeletedSnapshots() );
         result.setDeletedFiles( walker.getDeletedFiles() );
 

@@ -27,13 +27,14 @@ import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.resource.Representation;
 import org.restlet.resource.Variant;
-import org.sonatype.nexus.index.tasks.PublishIndexesTask;
-import org.sonatype.nexus.rest.attributes.RebuildAttributesTask;
-import org.sonatype.nexus.rest.cache.ClearCacheTask;
-import org.sonatype.nexus.rest.index.ReindexTask;
+import org.sonatype.nexus.maven.tasks.SnapshotRemoverTask;
 import org.sonatype.nexus.rest.model.ScheduledServiceTypePropertyResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceTypeResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceTypeResourceResponse;
+import org.sonatype.nexus.tasks.ClearCacheTask;
+import org.sonatype.nexus.tasks.PublishIndexesTask;
+import org.sonatype.nexus.tasks.RebuildAttributesTask;
+import org.sonatype.nexus.tasks.ReindexTask;
 
 public class ScheduledServiceTypeResourceHandler
     extends AbstractScheduledServiceResourceHandler
@@ -68,7 +69,7 @@ public class ScheduledServiceTypeResourceHandler
 
         ScheduledServiceTypeResource type = new ScheduledServiceTypeResource();
         type.setId( PublishIndexesTask.class.getName() );
-        type.setName( "Publish Indexes" );
+        type.setName( getServiceTypeName( type.getId() ) );
         ScheduledServiceTypePropertyResource property = new ScheduledServiceTypePropertyResource();
         property.setId( "1" );
         property.setName( "Repository ID" );
@@ -85,7 +86,7 @@ public class ScheduledServiceTypeResourceHandler
 
         type = new ScheduledServiceTypeResource();
         type.setId( ReindexTask.class.getName() );
-        type.setName( "Reindex Repositories" );
+        type.setName( getServiceTypeName( type.getId() ) );
         property = new ScheduledServiceTypePropertyResource();
         property.setId( "1" );
         property.setName( "Repository ID" );
@@ -102,7 +103,7 @@ public class ScheduledServiceTypeResourceHandler
 
         type = new ScheduledServiceTypeResource();
         type.setId( RebuildAttributesTask.class.getName() );
-        type.setName( "Rebuild Repository Atributes" );
+        type.setName( getServiceTypeName( type.getId() ) );
         property = new ScheduledServiceTypePropertyResource();
         property.setId( "1" );
         property.setName( "Repository ID" );
@@ -119,7 +120,7 @@ public class ScheduledServiceTypeResourceHandler
 
         type = new ScheduledServiceTypeResource();
         type.setId( ClearCacheTask.class.getName() );
-        type.setName( "Clear Repository Caches" );
+        type.setName( getServiceTypeName( type.getId() ) );
         property = new ScheduledServiceTypePropertyResource();
         property.setId( "1" );
         property.setName( "Repository ID" );
@@ -138,6 +139,36 @@ public class ScheduledServiceTypeResourceHandler
         property.setType( "string" );
         property
             .setHelpText( "Type in the repository path from which to clear caches recursively (ie. \"/\" for root or \"/org/apache\")" );
+        type.addProperty( property );
+        response.addData( type );
+
+        type = new ScheduledServiceTypeResource();
+        type.setId( SnapshotRemoverTask.class.getName() );
+        type.setName( getServiceTypeName( type.getId() ) );
+        property = new ScheduledServiceTypePropertyResource();
+        property.setId( "1" );
+        property.setName( "Repository ID" );
+        property.setType( "string" );
+        property.setHelpText( "Type in the repository ID to remove snapshots from." );
+        type.addProperty( property );
+        property = new ScheduledServiceTypePropertyResource();
+        property.setId( "2" );
+        property.setName( "Repository Group ID" );
+        property.setType( "string" );
+        property.setHelpText( "Type in the repository group ID to remove from all it's member repositories." );
+        type.addProperty( property );
+        property = new ScheduledServiceTypePropertyResource();
+        property.setId( "3" );
+        property.setName( "Min. count of snapshots to keep." );
+        property.setType( "integer" );
+        property.setHelpText( "Minimum number of snapshots to keep for one GAV." );
+        type.addProperty( property );
+        property = new ScheduledServiceTypePropertyResource();
+        property.setId( "4" );
+        property.setName( "Remove snapshots older than (days)" );
+        property.setType( "integer" );
+        property
+            .setHelpText( "The job will purge all snapshots older than the entered number of days, but will obey to Min. count of snapshots to keep." );
         type.addProperty( property );
         response.addData( type );
 

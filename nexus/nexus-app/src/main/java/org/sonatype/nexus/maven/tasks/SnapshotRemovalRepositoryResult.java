@@ -18,37 +18,28 @@
  * along with this program.  If not, see http://www.gnu.org/licenses/.
  *
  */
-package org.sonatype.nexus.proxy.maven.jobs;
+package org.sonatype.nexus.maven.tasks;
 
-import java.util.ArrayList;
-import java.util.List;
-
-public class SnapshotRemovalResult
+public class SnapshotRemovalRepositoryResult
 {
-    private List<String> processedRepositories;
+    private final String repoId;
 
     private int deletedSnapshots;
 
     private int deletedFiles;
 
-    public SnapshotRemovalResult()
+    public SnapshotRemovalRepositoryResult( String repoId, int deletedSnapshots, int deletedFiles )
     {
-        super();
-
-        this.deletedSnapshots = 0;
-
-        this.deletedFiles = 0;
-    }
-
-    public SnapshotRemovalResult( String repoId, int deletedSnapshots, int deletedFiles )
-    {
-        this();
-
-        getProcessedRepositories().add( repoId );
+        this.repoId = repoId;
 
         this.deletedSnapshots = deletedSnapshots;
 
         this.deletedFiles = deletedFiles;
+    }
+
+    public String getRepositoryId()
+    {
+        return repoId;
     }
 
     public int getDeletedSnapshots()
@@ -69,24 +60,6 @@ public class SnapshotRemovalResult
     public void setDeletedFiles( int deletedFiles )
     {
         this.deletedFiles = deletedFiles;
-    }
-
-    public List<String> getProcessedRepositories()
-    {
-        if ( processedRepositories == null )
-        {
-            this.processedRepositories = new ArrayList<String>();
-        }
-        return processedRepositories;
-    }
-
-    public void append( SnapshotRemovalResult res )
-    {
-        getProcessedRepositories().addAll( res.getProcessedRepositories() );
-
-        setDeletedFiles( getDeletedFiles() + res.getDeletedFiles() );
-
-        setDeletedSnapshots( getDeletedSnapshots() + res.getDeletedSnapshots() );
     }
 
 }
