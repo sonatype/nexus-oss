@@ -35,25 +35,77 @@ import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.archiver.UnArchiver;
 import org.codehaus.plexus.archiver.manager.ArchiverManager;
 import org.codehaus.plexus.archiver.manager.DefaultArchiverManager;
+import org.sonatype.appbooter.PlexusContainerHost;
 import org.sonatype.appbooter.ctl.ControlConnectionException;
 import org.sonatype.appbooter.ctl.ControllerClient;
 
 public abstract class AbstractNexusTest extends PlexusTestCase
 {    
-    private static final int CONTROLLER_PORT = 32002;
     private String nexusUrl;
+    private static final int TEST_CONNECTION_ATTEMPTS = 5;
+    private static final int TEST_CONNECTION_TIMEOUT = 3000;
     
     public AbstractNexusTest( String nexusUrl )
     {
         this.nexusUrl = nexusUrl;
     }
     
+    private boolean testConnection( int attempts, int timeout )
+    {
+        if ( attempts < 1 )
+        {
+            throw new IllegalArgumentException( "Must have at least 1 attempt" );
+        }
+        
+        if ( timeout < 1 )
+        {
+            throw new IllegalArgumentException( "Must have at least 1 millisecond timeout" );
+        }
+        
+        boolean result = false;
+        
+        for ( int i = 0; i < attempts; i++)
+        {
+            try
+            {
+                URL url = new URL( nexusUrl );
+                URLConnection connection = url.openConnection();
+                connection.setConnectTimeout( timeout );
+                InputStream stream = connection.getInputStream();
+                stream.close();
+                result = true;
+                break;
+            }
+            catch ( IOException e )
+            {
+                //Just break out to skip the unnecessary sleep
+                if ( ( i + 1 ) == attempts )
+                {
+                    break;
+                }
+                try
+                {
+                    Thread.sleep( timeout );
+                }
+                catch ( InterruptedException e1 )
+                {
+                }
+            }
+        }
+
+        
+        return result;
+    }
+    
     protected void stopNexus()
     {
         try
         {
-            ControllerClient client = new ControllerClient( CONTROLLER_PORT );
+            ControllerClient client = new ControllerClient( PlexusContainerHost.CONTROL_PORT );
             client.stop();
+            
+            //Note calling testConnection w/ only 1 attempt, becuase just 1 timeout will do
+            assertFalse( testConnection( 1, TEST_CONNECTION_TIMEOUT ) );
         }
         catch ( UnknownHostException e )
         {
@@ -76,8 +128,10 @@ public abstract class AbstractNexusTest extends PlexusTestCase
     {
         try
         {
-            ControllerClient client = new ControllerClient( CONTROLLER_PORT );
+            ControllerClient client = new ControllerClient( PlexusContainerHost.CONTROL_PORT );
             client.start();
+            
+            assertTrue( testConnection( TEST_CONNECTION_ATTEMPTS, TEST_CONNECTION_TIMEOUT ) );
         }
         catch ( UnknownHostException e )
         {
