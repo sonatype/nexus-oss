@@ -21,7 +21,7 @@ public interface NexusScheduler
      * @param runnable
      * @return
      */
-    SubmittedTask submit( NexusTask nexusTask )
+    <T> SubmittedTask<T> submit( NexusTask<T> nexusTask )
         throws RejectedExecutionException,
             NullPointerException;
 
@@ -32,7 +32,7 @@ public interface NexusScheduler
      * @param iterator
      * @return
      */
-    IteratingTask iterate( NexusTask nexusTask, SchedulerIterator iterator )
+    <T> IteratingTask<T> iterate( NexusTask<T> nexusTask, SchedulerIterator iterator )
         throws RejectedExecutionException,
             NullPointerException;
 
@@ -43,7 +43,7 @@ public interface NexusScheduler
      * @param iterator
      * @return
      */
-    ScheduledTask schedule( NexusTask nexusTask, Schedule schedule )
+    <T> ScheduledTask<T> schedule( NexusTask<T> nexusTask, Schedule schedule )
         throws RejectedExecutionException,
             NullPointerException;
 
@@ -53,7 +53,7 @@ public interface NexusScheduler
      * 
      * @return
      */
-    Map<String, List<SubmittedTask>> getActiveTasks();
+    Map<String, List<SubmittedTask<?>>> getActiveTasks();
 
     /**
      * Returns an active task by it's ID.
@@ -61,6 +61,6 @@ public interface NexusScheduler
      * @param id
      * @return
      */
-    <T> SubmittedTask<T> getTaskById( String id )
+    SubmittedTask<?> getTaskById( String id )
         throws NoSuchTaskException;
 }

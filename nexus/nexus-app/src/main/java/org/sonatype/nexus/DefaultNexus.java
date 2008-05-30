@@ -853,26 +853,26 @@ public class DefaultNexus
     // =============
     // Schedules
 
-    public void submit( NexusTask task )
+    public <T> void submit( NexusTask<T> task )
         throws RejectedExecutionException,
             NullPointerException
     {
         scheduler.submit( task );
     }
 
-    public ScheduledTask schedule( NexusTask nexusTask, Schedule schedule )
+    public <T> ScheduledTask<T> schedule( NexusTask<T> nexusTask, Schedule schedule )
         throws RejectedExecutionException,
             NullPointerException
     {
         return scheduler.schedule( nexusTask, schedule );
     }
 
-    public Map<String, List<SubmittedTask>> getActiveTasks()
+    public Map<String, List<SubmittedTask<?>>> getActiveTasks()
     {
         return scheduler.getActiveTasks();
     }
 
-    public SubmittedTask getTaskById( String id )
+    public SubmittedTask<?> getTaskById( String id )
         throws NoSuchTaskException
     {
         return scheduler.getTaskById( id );

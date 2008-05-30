@@ -39,7 +39,6 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Startable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.StartingException;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.StoppingException;
-import org.codehaus.plexus.util.CollectionUtils;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.scheduling.iterators.SchedulerIterator;
 import org.sonatype.scheduling.schedules.Schedule;
@@ -60,7 +59,7 @@ public class DefaultScheduler
 
     private ScheduledThreadPoolExecutor scheduledExecutorService;
 
-    private Map<String, List<SubmittedTask>> tasksMap;
+    private Map<String, List<SubmittedTask<?>>> tasksMap;
 
     public void contextualize( Context context )
         throws ContextException
@@ -71,7 +70,7 @@ public class DefaultScheduler
     public void start()
         throws StartingException
     {
-        tasksMap = new HashMap<String, List<SubmittedTask>>();
+        tasksMap = new HashMap<String, List<SubmittedTask<?>>>();
 
         plexusThreadFactory = new PlexusThreadFactory( plexusContainer );
 
@@ -112,19 +111,19 @@ public class DefaultScheduler
         return scheduledExecutorService;
     }
 
-    protected void addToTasksMap( SubmittedTask task )
+    protected <T> void addToTasksMap( SubmittedTask<T> task )
     {
         synchronized ( tasksMap )
         {
             if ( !tasksMap.containsKey( task.getType() ) )
             {
-                tasksMap.put( task.getType(), new ArrayList<SubmittedTask>() );
+                tasksMap.put( task.getType(), new ArrayList<SubmittedTask<?>>() );
             }
             tasksMap.get( task.getType() ).add( task );
         }
     }
 
-    protected void removeFromTasksMap( SubmittedTask task )
+    protected <T> void removeFromTasksMap( SubmittedTask<T> task )
     {
         synchronized ( tasksMap )
         {
@@ -225,22 +224,22 @@ public class DefaultScheduler
         return dct;
     }
 
-    public Map<String, List<SubmittedTask>> getActiveTasks()
+    public Map<String, List<SubmittedTask<?>>> getActiveTasks()
     {
-        Map<String, List<SubmittedTask>> result = null;
+        Map<String, List<SubmittedTask<?>>> result = null;
 
         // create a "snapshots" of active tasks
         synchronized ( tasksMap )
         {
-            result = new HashMap<String, List<SubmittedTask>>( tasksMap.size() );
+            result = new HashMap<String, List<SubmittedTask<?>>>( tasksMap.size() );
 
-            List<SubmittedTask> tasks = null;
+            List<SubmittedTask<?>> tasks = null;
 
             for ( String cls : tasksMap.keySet() )
             {
-                tasks = new ArrayList<SubmittedTask>();
+                tasks = new ArrayList<SubmittedTask<?>>();
 
-                for ( SubmittedTask task : tasksMap.get( cls ) )
+                for ( SubmittedTask<?> task : tasksMap.get( cls ) )
                 {
                     if ( task.getTaskState().isActiveOrSubmitted() )
                     {
@@ -257,7 +256,7 @@ public class DefaultScheduler
         return result;
     }
 
-    public <T> SubmittedTask<T> getTaskById( String id )
+    public SubmittedTask<?> getTaskById( String id )
         throws NoSuchTaskException
     {
         if ( StringUtils.isEmpty( id ) )
@@ -265,11 +264,11 @@ public class DefaultScheduler
             throw new IllegalArgumentException( "The Tasks cannot have null IDs!" );
         }
 
-        Collection<List<SubmittedTask>> activeTasks = getActiveTasks().values();
+        Collection<List<SubmittedTask<?>>> activeTasks = getActiveTasks().values();
 
-        for ( List<SubmittedTask> tasks : activeTasks )
+        for ( List<SubmittedTask<?>> tasks : activeTasks )
         {
-            for ( SubmittedTask task : tasks )
+            for ( SubmittedTask<?> task : tasks )
             {
                 if ( task.getId().equals( id ) )
                 {

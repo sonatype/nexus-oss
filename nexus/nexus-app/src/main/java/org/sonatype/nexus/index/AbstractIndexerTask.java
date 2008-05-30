@@ -26,8 +26,8 @@ import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesTask;
 import org.sonatype.scheduling.SubmittedTask;
 
-public abstract class AbstractIndexerTask
-    extends AbstractNexusRepositoriesTask
+public abstract class AbstractIndexerTask<T>
+    extends AbstractNexusRepositoriesTask<T>
 {
     private final IndexerManager indexerManager;
 
@@ -49,7 +49,7 @@ public abstract class AbstractIndexerTask
         return indexerManager;
     }
 
-    public boolean allowConcurrentExecution( List<SubmittedTask> existingTasks )
+    public boolean allowConcurrentExecution( List<SubmittedTask<?>> existingTasks )
     {
         // override if needed
         return false;

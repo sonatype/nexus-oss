@@ -37,7 +37,15 @@ import org.sonatype.nexus.rest.model.ScheduledServiceOnceResource;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceResourceResponse;
 import org.sonatype.nexus.rest.model.ScheduledServiceWeeklyResource;
+import org.sonatype.scheduling.IteratingTask;
 import org.sonatype.scheduling.NoSuchTaskException;
+import org.sonatype.scheduling.ScheduledTask;
+import org.sonatype.scheduling.SubmittedTask;
+import org.sonatype.scheduling.schedules.CronSchedule;
+import org.sonatype.scheduling.schedules.DailySchedule;
+import org.sonatype.scheduling.schedules.MonthlySchedule;
+import org.sonatype.scheduling.schedules.OnceSchedule;
+import org.sonatype.scheduling.schedules.WeeklySchedule;
 
 public class ScheduledServiceResourceHandler
     extends AbstractScheduledServiceResourceHandler
@@ -80,6 +88,59 @@ public class ScheduledServiceResourceHandler
     public Representation getRepresentationHandler( Variant variant )
         throws IOException
     {
+        try
+        {
+            ScheduledServiceResourceResponse response = new ScheduledServiceResourceResponse();
+
+            SubmittedTask<?> task = getNexus().getTaskById( getScheduledServiceId() );
+
+            if ( ScheduledTask.class.isAssignableFrom( task.getClass() ) )
+            {
+                ScheduledTask<?> scheduledTask = (ScheduledTask<?>) task;
+
+                if ( OnceSchedule.class.isAssignableFrom( scheduledTask.getSchedule().getClass() ) )
+                {
+                    ScheduledServiceOnceResource res = new ScheduledServiceOnceResource();
+
+                    response.setData( res );
+                }
+                else if ( DailySchedule.class.isAssignableFrom( scheduledTask.getSchedule().getClass() ) )
+                {
+
+                }
+                else if ( WeeklySchedule.class.isAssignableFrom( scheduledTask.getSchedule().getClass() ) )
+                {
+
+                }
+                else if ( MonthlySchedule.class.isAssignableFrom( scheduledTask.getSchedule().getClass() ) )
+                {
+
+                }
+                else if ( CronSchedule.class.isAssignableFrom( scheduledTask.getSchedule().getClass() ) )
+                {
+
+                }
+            }
+            else if ( IteratingTask.class.isAssignableFrom( task.getClass() ) )
+            {
+                // we have no representation for this?
+                // and also, it is not editable
+            }
+            else
+            {
+                // we have no representation for this?
+                // and also, it is not editable
+            }
+        }
+        catch ( NoSuchTaskException e )
+        {
+            getResponse().setStatus(
+                Status.CLIENT_ERROR_NOT_FOUND,
+                "There is no task with ID=" + getScheduledServiceId() );
+
+            return null;
+        }
+
         ScheduledServiceBaseResource resource = null;
 
         if ( "0".equals( getScheduledServiceId() ) )

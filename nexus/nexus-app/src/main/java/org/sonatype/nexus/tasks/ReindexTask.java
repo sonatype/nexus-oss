@@ -25,14 +25,14 @@ import org.sonatype.nexus.feeds.FeedRecorder;
 import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesTask;
 
 public class ReindexTask
-    extends AbstractNexusRepositoriesTask
+    extends AbstractNexusRepositoriesTask<Object>
 {
     public ReindexTask( Nexus nexus, String repositoryId, String repositoryGroupId )
     {
         super( nexus, repositoryId, repositoryGroupId );
     }
 
-    public void doRun()
+    public Object doRun()
         throws Exception
     {
         if ( getRepositoryGroupId() != null )
@@ -47,6 +47,8 @@ public class ReindexTask
         {
             getNexus().reindexAllRepositories();
         }
+
+        return null;
     }
 
     protected String getAction()

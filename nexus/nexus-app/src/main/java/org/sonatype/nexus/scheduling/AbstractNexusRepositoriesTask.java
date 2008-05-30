@@ -22,8 +22,8 @@ package org.sonatype.nexus.scheduling;
 
 import org.sonatype.nexus.Nexus;
 
-public abstract class AbstractNexusRepositoriesTask
-    extends AbstractNexusTask
+public abstract class AbstractNexusRepositoriesTask<T>
+    extends AbstractNexusTask<T>
 {
     private final String repositoryId;
 

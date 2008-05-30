@@ -82,7 +82,7 @@ public interface Scheduler
      * 
      * @return
      */
-    Map<String, List<SubmittedTask>> getActiveTasks();
+    Map<String, List<SubmittedTask<?>>> getActiveTasks();
 
     /**
      * Returns an active task by it's ID.
@@ -90,6 +90,6 @@ public interface Scheduler
      * @param id
      * @return
      */
-    <T> SubmittedTask<T> getTaskById( String id )
+    SubmittedTask<?> getTaskById( String id )
         throws NoSuchTaskException;
 }

@@ -25,7 +25,7 @@ import org.sonatype.nexus.feeds.FeedRecorder;
 import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesTask;
 
 public class ClearCacheTask
-    extends AbstractNexusRepositoriesTask
+    extends AbstractNexusRepositoriesTask<Object>
 {
     private final String resourceStorePath;
 
@@ -36,10 +36,12 @@ public class ClearCacheTask
         this.resourceStorePath = resourceStorePath;
     }
 
-    public void doRun()
+    public Object doRun()
         throws Exception
     {
         getNexus().clearCaches( resourceStorePath, getRepositoryId(), getRepositoryGroupId() );
+
+        return null;
     }
 
     protected String getAction()

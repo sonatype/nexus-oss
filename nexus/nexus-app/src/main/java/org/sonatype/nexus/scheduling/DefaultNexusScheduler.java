@@ -36,7 +36,7 @@ public class DefaultNexusScheduler
      */
     private LoggerManager loggerManager;
 
-    public SubmittedTask submit( NexusTask nexusTask )
+    public <T> SubmittedTask<T> submit( NexusTask<T> nexusTask )
         throws RejectedExecutionException,
             NullPointerException
     {
@@ -44,7 +44,7 @@ public class DefaultNexusScheduler
 
         Class<?> cls = nexusTask.getClass();
 
-        List<SubmittedTask> existingTasks = scheduler.getActiveTasks().get( cls );
+        List<SubmittedTask<?>> existingTasks = scheduler.getActiveTasks().get( cls );
 
         if ( existingTasks == null || nexusTask.allowConcurrentExecution( existingTasks ) )
         {
@@ -56,7 +56,7 @@ public class DefaultNexusScheduler
         }
     }
 
-    public IteratingTask iterate( NexusTask nexusTask, SchedulerIterator iterator )
+    public <T> IteratingTask<T> iterate( NexusTask<T> nexusTask, SchedulerIterator iterator )
         throws RejectedExecutionException,
             NullPointerException
     {
@@ -64,7 +64,7 @@ public class DefaultNexusScheduler
 
         Class<?> cls = nexusTask.getClass();
 
-        List<SubmittedTask> existingTasks = scheduler.getActiveTasks().get( cls );
+        List<SubmittedTask<?>> existingTasks = scheduler.getActiveTasks().get( cls );
 
         if ( existingTasks == null || nexusTask.allowConcurrentExecution( existingTasks ) )
         {
@@ -76,7 +76,7 @@ public class DefaultNexusScheduler
         }
     }
 
-    public ScheduledTask schedule( NexusTask nexusTask, Schedule schedule )
+    public <T> ScheduledTask<T> schedule( NexusTask<T> nexusTask, Schedule schedule )
         throws RejectedExecutionException,
             NullPointerException
     {
@@ -84,7 +84,7 @@ public class DefaultNexusScheduler
 
         Class<?> cls = nexusTask.getClass();
 
-        List<SubmittedTask> existingTasks = scheduler.getActiveTasks().get( cls );
+        List<SubmittedTask<?>> existingTasks = scheduler.getActiveTasks().get( cls );
 
         if ( existingTasks == null || nexusTask.allowConcurrentExecution( existingTasks ) )
         {
@@ -96,12 +96,12 @@ public class DefaultNexusScheduler
         }
     }
 
-    public Map<String, List<SubmittedTask>> getActiveTasks()
+    public Map<String, List<SubmittedTask<?>>> getActiveTasks()
     {
         return scheduler.getActiveTasks();
     }
 
-    public <T> SubmittedTask<T> getTaskById( String id )
+    public SubmittedTask<?> getTaskById( String id )
         throws NoSuchTaskException
     {
         return scheduler.getTaskById( id );

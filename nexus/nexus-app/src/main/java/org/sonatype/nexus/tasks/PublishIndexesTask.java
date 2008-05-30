@@ -8,7 +8,7 @@ import org.sonatype.nexus.index.AbstractIndexerTask;
 import org.sonatype.nexus.index.IndexerManager;
 
 public class PublishIndexesTask
-    extends AbstractIndexerTask
+    extends AbstractIndexerTask<Object>
 {
     public PublishIndexesTask( Nexus nexus, IndexerManager indexerManager, String repositoryId, String repositoryGroupId )
     {
@@ -16,7 +16,7 @@ public class PublishIndexesTask
     }
 
     @Override
-    protected void doRun()
+    protected Object doRun()
         throws Exception
     {
         try
@@ -38,6 +38,8 @@ public class PublishIndexesTask
         {
             getLogger().error( "Cannot publish indexes!", e );
         }
+
+        return null;
     }
 
     @Override

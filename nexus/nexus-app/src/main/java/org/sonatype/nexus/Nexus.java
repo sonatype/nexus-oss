@@ -116,17 +116,17 @@ public interface Nexus
     // ------------------------------------------------------------------
     // Scheduler
 
-    void submit( NexusTask task )
+    <T> void submit( NexusTask<T> task )
         throws RejectedExecutionException,
             NullPointerException;
 
-    ScheduledTask schedule( NexusTask nexusTask, Schedule schedule )
+    <T> ScheduledTask<T> schedule( NexusTask<T> nexusTask, Schedule schedule )
         throws RejectedExecutionException,
             NullPointerException;
 
-    Map<String, List<SubmittedTask>> getActiveTasks();
+    Map<String, List<SubmittedTask<?>>> getActiveTasks();
 
-    SubmittedTask getTaskById( String id )
+    SubmittedTask<?> getTaskById( String id )
         throws NoSuchTaskException;
 
     // ------------------------------------------------------------------

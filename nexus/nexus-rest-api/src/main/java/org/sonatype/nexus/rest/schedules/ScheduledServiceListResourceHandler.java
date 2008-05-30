@@ -68,15 +68,15 @@ public class ScheduledServiceListResourceHandler
     public Representation getRepresentationHandler( Variant variant )
         throws IOException
     {
-        Map<String, List<SubmittedTask>> tasksMap = getNexus().getActiveTasks();
+        Map<String, List<SubmittedTask<?>>> tasksMap = getNexus().getActiveTasks();
 
         ScheduledServiceListResourceResponse response = new ScheduledServiceListResourceResponse();
 
         for ( String key : tasksMap.keySet() )
         {
-            List<SubmittedTask> tasks = tasksMap.get( key );
+            List<SubmittedTask<?>> tasks = tasksMap.get( key );
 
-            for ( SubmittedTask task : tasks )
+            for ( SubmittedTask<?> task : tasks )
             {
                 ScheduledServiceListResource item = new ScheduledServiceListResource();
                 item.setResourceURI( calculateSubReference( task.getId() ).toString() );
@@ -89,8 +89,8 @@ public class ScheduledServiceListResourceHandler
 
                 if ( IteratingTask.class.isAssignableFrom( task.getClass() ) )
                 {
-                    item.setLastRunTime( ( (IteratingTask) task ).getLastRun().toString() );
-                    item.setNextRunTime( ( (IteratingTask) task ).getNextRun().toString() );
+                    item.setLastRunTime( ( (IteratingTask<?>) task ).getLastRun().toString() );
+                    item.setNextRunTime( ( (IteratingTask<?>) task ).getNextRun().toString() );
                 }
                 else
                 {
@@ -100,7 +100,7 @@ public class ScheduledServiceListResourceHandler
 
                 if ( ScheduledTask.class.isAssignableFrom( task.getClass() ) )
                 {
-                    item.setServiceSchedule( getScheduleShortName( ( (ScheduledTask) task ).getSchedule() ) );
+                    item.setServiceSchedule( getScheduleShortName( ( (ScheduledTask<?>) task ).getSchedule() ) );
                 }
                 else
                 {

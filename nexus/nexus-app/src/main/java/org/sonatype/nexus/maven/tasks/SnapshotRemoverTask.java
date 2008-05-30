@@ -27,7 +27,7 @@ import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesTask;
 
 public class SnapshotRemoverTask
-    extends AbstractNexusRepositoriesTask
+    extends AbstractNexusRepositoriesTask<SnapshotRemovalResult>
 {
     private final int minSnapshotsToKeep;
 
@@ -43,7 +43,7 @@ public class SnapshotRemoverTask
         this.removeOlderThanDays = removeOlderThanDays;
     }
 
-    public void doRun()
+    public SnapshotRemovalResult doRun()
         throws Exception
     {
         SnapshotRemovalRequest req = new SnapshotRemovalRequest();
@@ -97,10 +97,10 @@ public class SnapshotRemoverTask
         }
 
         DefaultSnapshotRemover sr = new DefaultSnapshotRemover();
-        
+
         sr.enableLogging( getLogger() );
 
-        sr.removeSnapshots( req );
+        return sr.removeSnapshots( req );
     }
 
     protected String getAction()
@@ -112,15 +112,15 @@ public class SnapshotRemoverTask
     {
         if ( getRepositoryGroupId() != null )
         {
-            return "Reindexing repository group with ID=" + getRepositoryGroupId();
+            return "Removing snapshots from repository group with ID=" + getRepositoryGroupId();
         }
         else if ( getRepositoryId() != null )
         {
-            return "Reindexing repository with ID=" + getRepositoryId();
+            return "Removing snapshots from repository with ID=" + getRepositoryId();
         }
         else
         {
-            return "Reindexing all registered repositories";
+            return "Removing snapshots from all registered repositories";
         }
     }
 

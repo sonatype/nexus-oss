@@ -27,8 +27,8 @@ import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.feeds.SystemProcess;
 import org.sonatype.scheduling.SubmittedTask;
 
-public abstract class AbstractNexusTask
-    implements NexusTask
+public abstract class AbstractNexusTask<T>
+    implements NexusTask<T>
 {
     private final Nexus nexus;
 
@@ -58,29 +58,36 @@ public abstract class AbstractNexusTask
         return nexus;
     }
 
-    public boolean allowConcurrentExecution( List<SubmittedTask> existingTasks )
+    public boolean allowConcurrentExecution( List<SubmittedTask<?>> existingTasks )
     {
         // override if needed
         return false;
     }
 
-    public final void run()
+    public final T call()
+        throws Exception
     {
         prc = getNexus().getFeedRecorder().systemProcessStarted( getAction(), getMessage() );
 
         beforeRun();
 
+        T result = null;
+
         try
         {
-            doRun();
+            result = doRun();
 
             getNexus().getFeedRecorder().systemProcessFinished( prc );
 
             afterRun();
+
+            return result;
         }
         catch ( Exception e )
         {
             getNexus().getFeedRecorder().systemProcessBroken( prc, e );
+
+            throw e;
         }
     }
 
@@ -89,7 +96,7 @@ public abstract class AbstractNexusTask
         // override if needed
     }
 
-    protected abstract void doRun()
+    protected abstract T doRun()
         throws Exception;
 
     protected void afterRun()
