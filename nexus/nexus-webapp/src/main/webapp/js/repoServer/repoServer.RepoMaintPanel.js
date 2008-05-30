@@ -249,6 +249,7 @@ Sonatype.repoServer.RepoMaintPanel = function(config){
     {name:'sStatus', /*mapping:'status', */convert: this.statusTextMaker},
     {name:'name', sortType:Ext.data.SortTypes.asUCString},
 //  {name:'effectiveLocalStorageUrl'},
+    {name:'repoPolicy'},
     {name:'contentUri', mapping:'resourceURI', convert: this.restToContentUrl },
     {name:'remoteUri'}
   ]);

@@ -113,7 +113,23 @@ Sonatype.repoServer.FileUploadPanel = function(config){
               helpText: ht.version,
               anchor: Sonatype.view.FIELD_OFFSET,
               name: 'v',
-              allowBlank:false
+              allowBlank: false,
+              uploadPanel: this,
+              validator: function( v ){
+                var isSnapshotVersion = /-SNAPSHOT$/.test( v ) || /LATEST$/.test( v ) || /^(.*)-([0-9]{8}.[0-9]{6})-([0-9]+)$/.test( v );
+                var isSnapshotRepo = this.uploadPanel.repoRecord.get( 'repoPolicy' ) == 'snapshot';
+                if ( isSnapshotRepo ) {
+                  if ( ! isSnapshotVersion ) {
+                    return 'You cannot upload a release version into a snapshot repository';
+                  }
+                }
+                else {
+                  if ( isSnapshotVersion ) {
+                    return 'You cannot upload a snapshot version into a release repository';
+                  }
+                }
+                return true;
+              }
             },
             {
               xtype: 'combo',
