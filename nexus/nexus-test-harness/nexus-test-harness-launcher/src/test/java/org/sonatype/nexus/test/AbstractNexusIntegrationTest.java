@@ -20,6 +20,10 @@
  */
 package org.sonatype.nexus.test;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -30,56 +34,125 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.UnknownHostException;
+import java.util.HashMap;
+import java.util.Map;
 
-import org.codehaus.plexus.PlexusTestCase;
+import org.codehaus.plexus.ContainerConfiguration;
+import org.codehaus.plexus.DefaultContainerConfiguration;
+import org.codehaus.plexus.DefaultPlexusContainer;
+import org.codehaus.plexus.PlexusContainer;
+import org.codehaus.plexus.PlexusContainerException;
 import org.codehaus.plexus.archiver.UnArchiver;
 import org.codehaus.plexus.archiver.manager.ArchiverManager;
 import org.codehaus.plexus.archiver.manager.DefaultArchiverManager;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.sonatype.appbooter.PlexusContainerHost;
 import org.sonatype.appbooter.ctl.ControlConnectionException;
 import org.sonatype.appbooter.ctl.ControllerClient;
 
-public abstract class AbstractNexusIntegrationTest extends PlexusTestCase
+public abstract class AbstractNexusIntegrationTest
 {
     private String nexusUrl;
-    private ControllerClient manager;
-    private boolean detach = false;
+    private PlexusContainer container;
+    private Map context;
+
+    private static ControllerClient manager;
+    private static boolean detach = false;
+    private static Object waitObj = new Object();
     private static final int TEST_CONNECTION_ATTEMPTS = 5;
     private static final int TEST_CONNECTION_TIMEOUT = 3000;
     private static final int MANAGER_WAIT_TIME = 500;
+    private static String basedir;
 
     public AbstractNexusIntegrationTest( String nexusUrl )
     {
-        this.nexusUrl = nexusUrl;   
+        this.nexusUrl = nexusUrl;
+        setupContainer();
     }
-    
+
     protected void complete()
     {
         detach = true;
     }
-    
-    protected void setUp()
-        throws Exception
-    {
-        super.setUp();
-        detach = false;
-        manager = new ControllerClient( PlexusContainerHost.DEFAULT_CONTROL_PORT );
-        manager.shutdownOnClose();
-        Thread.sleep( MANAGER_WAIT_TIME );
-    }
-    
-    protected void tearDown()
-        throws Exception
-    {
-        super.tearDown();
 
-        if ( detach )
+    @BeforeClass
+    public static void oncePerClassSetUp()
+    {
+        synchronized ( waitObj )
         {
-            manager.detachOnClose();
+            try
+            {
+                detach = false;
+                if ( manager != null )
+                {
+                    manager.close();
+                }
+
+                manager = new ControllerClient( PlexusContainerHost.DEFAULT_CONTROL_PORT );
+                manager.shutdownOnClose();
+                Thread.sleep( MANAGER_WAIT_TIME );
+            }
+            catch ( UnknownHostException e )
+            {
+                e.printStackTrace();
+                throw new RuntimeException( "Unable to initialize test.", e );
+            }
+            catch ( ControlConnectionException e )
+            {
+                e.printStackTrace();
+                throw new RuntimeException( "Unable to initialize test.", e );
+            }
+            catch ( IOException e )
+            {
+                e.printStackTrace();
+                throw new RuntimeException( "Unable to initialize test.", e );
+            }
+            catch ( InterruptedException e )
+            {
+                e.printStackTrace();
+                throw new RuntimeException( "Unable to initialize test.", e );
+            }
         }
-        
-        manager.close();
-        Thread.sleep( MANAGER_WAIT_TIME );
+    }
+
+    @AfterClass
+    public static void oncePerClassTearDown()
+    {
+        synchronized ( waitObj )
+        {
+            try
+            {
+                if ( detach )
+                {
+                    manager.detachOnClose();
+                }
+
+                manager.close();
+                manager = null;
+                Thread.sleep( MANAGER_WAIT_TIME );
+            }
+            catch ( UnknownHostException e )
+            {
+                e.printStackTrace();
+                throw new RuntimeException( "Unable to teardown test.", e );
+            }
+            catch ( ControlConnectionException e )
+            {
+                e.printStackTrace();
+                throw new RuntimeException( "Unable to teardown test.", e );
+            }
+            catch ( IOException e )
+            {
+                e.printStackTrace();
+                throw new RuntimeException( "Unable to teardown test.", e );
+            }
+            catch ( InterruptedException e )
+            {
+                e.printStackTrace();
+                throw new RuntimeException( "Unable to teardown test.", e );
+            }
+        }
     }
 
     private boolean testConnection( int attempts, int timeout )
@@ -96,7 +169,7 @@ public abstract class AbstractNexusIntegrationTest extends PlexusTestCase
 
         boolean result = false;
 
-        for ( int i = 0; i < attempts; i++)
+        for ( int i = 0; i < attempts; i++ )
         {
             try
             {
@@ -110,7 +183,7 @@ public abstract class AbstractNexusIntegrationTest extends PlexusTestCase
             }
             catch ( IOException e )
             {
-                //Just break out to skip the unnecessary sleep
+                // Just break out to skip the unnecessary sleep
                 if ( ( i + 1 ) == attempts )
                 {
                     break;
@@ -125,7 +198,6 @@ public abstract class AbstractNexusIntegrationTest extends PlexusTestCase
             }
         }
 
-
         return result;
     }
 
@@ -134,10 +206,10 @@ public abstract class AbstractNexusIntegrationTest extends PlexusTestCase
         try
         {
             manager.stop();
-            
+
             Thread.sleep( MANAGER_WAIT_TIME );
 
-            //Note calling testConnection w/ only 1 attempt, becuase just 1 timeout will do
+            // Note calling testConnection w/ only 1 attempt, becuase just 1 timeout will do
             assertFalse( testConnection( 1, TEST_CONNECTION_TIMEOUT ) );
         }
         catch ( UnknownHostException e )
@@ -193,7 +265,8 @@ public abstract class AbstractNexusIntegrationTest extends PlexusTestCase
         startNexus();
     }
 
-    protected File downloadArtifact( String groupId, String artifact, String version, String type, String targetDirectory )
+    protected File downloadArtifact( String groupId, String artifact, String version, String type,
+                                     String targetDirectory )
     {
         URL url = null;
         OutputStream out = null;
@@ -205,7 +278,9 @@ public abstract class AbstractNexusIntegrationTest extends PlexusTestCase
         File downloadedFile = new File( targetDirectory + "/" + artifact + "-" + version + "." + type );
         try
         {
-            url = new URL( nexusUrl + groupId.replace( '.', '/' ) + "/" + artifact + "/" + version + "/" + artifact + "-" + version + "." + type);
+            url =
+                new URL( nexusUrl + groupId.replace( '.', '/' ) + "/" + artifact + "/" + version + "/" + artifact + "-"
+                    + version + "." + type );
             out = new BufferedOutputStream( new FileOutputStream( downloadedFile ) );
             conn = url.openConnection();
             in = conn.getInputStream();
@@ -271,4 +346,62 @@ public abstract class AbstractNexusIntegrationTest extends PlexusTestCase
 
         return target;
     }
+
+    private void setupContainer()
+    {
+        // ----------------------------------------------------------------------------
+        // Context Setup
+        // ----------------------------------------------------------------------------
+
+        context = new HashMap();
+
+        context.put( "basedir", basedir );
+
+        boolean hasPlexusHome = context.containsKey( "plexus.home" );
+
+        if ( !hasPlexusHome )
+        {
+            File f = new File( basedir, "target/plexus-home" );
+
+            if ( !f.isDirectory() )
+            {
+                f.mkdir();
+            }
+
+            context.put( "plexus.home", f.getAbsolutePath() );
+        }
+
+        // ----------------------------------------------------------------------------
+        // Configuration
+        // ----------------------------------------------------------------------------
+
+        ContainerConfiguration containerConfiguration =
+            new DefaultContainerConfiguration()
+                .setName( "test" )
+                .setContext( context )
+                .setContainerConfiguration( getClass().getName().replace( '.', '/' ) + ".xml" );
+
+        try
+        {
+            container = new DefaultPlexusContainer( containerConfiguration );
+        }
+        catch ( PlexusContainerException e )
+        {
+            e.printStackTrace();
+            fail( "Failed to create plexus container." );
+        }
+    }
+
+    protected Object lookup( String componentKey )
+        throws Exception
+    {
+        return container.lookup( componentKey );
+    }
+
+    protected Object lookup( String role, String id )
+        throws Exception
+    {
+        return container.lookup( role, id );
+    }
+
 }

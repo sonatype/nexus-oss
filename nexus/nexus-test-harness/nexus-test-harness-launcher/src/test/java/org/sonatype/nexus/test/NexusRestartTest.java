@@ -1,7 +1,11 @@
 package org.sonatype.nexus.test;
 
+import static org.junit.Assert.assertTrue;
+
 import java.io.File;
 import java.io.FilenameFilter;
+
+import org.junit.Test;
 
 
 
@@ -12,7 +16,8 @@ public class NexusRestartTest extends AbstractNexusIntegrationTest
         super( "http://localhost:8081/nexus/content/groups/nexus-test/" );
     }
     
-    public void testRestart()
+    @Test
+    public void restartNexus()
     {
         
         stopNexus();
