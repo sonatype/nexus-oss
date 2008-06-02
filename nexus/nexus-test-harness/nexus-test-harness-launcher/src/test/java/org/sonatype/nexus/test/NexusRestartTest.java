@@ -25,19 +25,33 @@ public class NexusRestartTest extends AbstractNexusTest
         
         File outputDirectory = unpackArtifact( artifact, "./target/extracted-jars" );
         
-        assert( outputDirectory.exists() );
-        
-        File[] files = outputDirectory.listFiles( new FilenameFilter()
+        try
         {
-            public boolean accept(File dir, String name) {
-            if ("nexus-test-harness-1.txt".equals( name ))
-            {
-                return true;
-            }
+            assertTrue( outputDirectory.exists() );
             
-            return false;
-        };} );
-        
-        assert ( files.length == 1 );
+            File[] files = outputDirectory.listFiles( new FilenameFilter()
+            {
+                public boolean accept(File dir, String name) {
+                if ("nexus-test-harness-1.txt".equals( name ))
+                {
+                    return true;
+                }
+                
+                return false;
+            };} );
+            
+            assertTrue( files.length == 1 );
+            
+            complete();
+        }
+        finally
+        {
+            File[] files = outputDirectory.listFiles();
+            for ( int i = 0; i < files.length; i++ )
+            {
+                files[i].delete();
+            }
+            outputDirectory.delete();
+        }
     }
 }

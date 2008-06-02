@@ -198,6 +198,9 @@
                         </goals>
                         <configuration>
                             <skip>false</skip>
+                            <excludes>
+                                <exclude>**/AbstractNexusTest*</exclude>
+                            </excludes>
                         </configuration>
                     </execution>
                 </executions>

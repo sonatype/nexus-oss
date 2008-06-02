@@ -30,27 +30,42 @@ public class NexusGroupDownloadTest
     {
         super( "http://localhost:8081/nexus/content/groups/nexus-test/" );
     }
+    
     public void testDownloadArtifact()
     {
         File artifact = downloadArtifact( "org.sonatype.nexus", "release-jar", "1", "jar", "./target/downloaded-jars" );
         
-        assert( artifact.exists() );
+        assertTrue( artifact.exists() );
         
         File outputDirectory = unpackArtifact( artifact, "./target/extracted-jars" );
         
-        assert( outputDirectory.exists() );
-        
-        File[] files = outputDirectory.listFiles( new FilenameFilter()
+        try
         {
-            public boolean accept(File dir, String name) {
-            if ("nexus-test-harness-1.txt".equals( name ))
-            {
-                return true;
-            }
+            assertTrue( outputDirectory.exists() );
             
-            return false;
-        };} );
-        
-        assert ( files.length == 1 );
+            File[] files = outputDirectory.listFiles( new FilenameFilter()
+            {
+                public boolean accept(File dir, String name) {
+                if ("nexus-test-harness-1.txt".equals( name ))
+                {
+                    return true;
+                }
+                
+                return false;
+            };} );
+            
+            assertTrue( files.length == 1 );
+            
+            complete();
+        }
+        finally
+        {
+            File[] files = outputDirectory.listFiles();
+            for ( int i = 0; i < files.length; i++ )
+            {
+                files[i].delete();
+            }
+            outputDirectory.delete();
+        }
     }
 }

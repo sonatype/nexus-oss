@@ -20,14 +20,6 @@
  */
 package org.sonatype.nexus.test;
 
-import org.codehaus.plexus.PlexusTestCase;
-import org.codehaus.plexus.archiver.UnArchiver;
-import org.codehaus.plexus.archiver.manager.ArchiverManager;
-import org.codehaus.plexus.archiver.manager.DefaultArchiverManager;
-import org.sonatype.appbooter.PlexusContainerHost;
-import org.sonatype.appbooter.ctl.ControlConnectionException;
-import org.sonatype.appbooter.ctl.ControllerClient;
-
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -39,15 +31,54 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.net.UnknownHostException;
 
+import org.codehaus.plexus.PlexusTestCase;
+import org.codehaus.plexus.archiver.UnArchiver;
+import org.codehaus.plexus.archiver.manager.ArchiverManager;
+import org.codehaus.plexus.archiver.manager.DefaultArchiverManager;
+import org.sonatype.appbooter.PlexusContainerHost;
+import org.sonatype.appbooter.ctl.ControlConnectionException;
+import org.sonatype.appbooter.ctl.ControllerClient;
+
 public abstract class AbstractNexusTest extends PlexusTestCase
 {
     private String nexusUrl;
+    private ControllerClient manager;
+    private boolean detach = false;
     private static final int TEST_CONNECTION_ATTEMPTS = 5;
     private static final int TEST_CONNECTION_TIMEOUT = 3000;
 
     public AbstractNexusTest( String nexusUrl )
     {
-        this.nexusUrl = nexusUrl;
+        this.nexusUrl = nexusUrl;   
+    }
+    
+    protected void complete()
+    {
+        detach = true;
+    }
+    
+    protected void setUp()
+        throws Exception
+    {
+        super.setUp();
+        detach = false;
+        manager = new ControllerClient( PlexusContainerHost.DEFAULT_CONTROL_PORT );
+        manager.shutdownOnClose();
+        Thread.sleep( 500 );
+    }
+    
+    protected void tearDown()
+        throws Exception
+    {
+        super.tearDown();
+
+        if ( detach )
+        {
+            manager.detachOnClose();
+        }
+        
+        manager.close();
+        Thread.sleep( 500 );
     }
 
     private boolean testConnection( int attempts, int timeout )
@@ -99,70 +130,60 @@ public abstract class AbstractNexusTest extends PlexusTestCase
 
     protected void stopNexus()
     {
-        ControllerClient client = null;
         try
         {
-            client = new ControllerClient( PlexusContainerHost.DEFAULT_CONTROL_PORT );
-            client.stop();
+            manager.stop();
 
             //Note calling testConnection w/ only 1 attempt, becuase just 1 timeout will do
             assertFalse( testConnection( 1, TEST_CONNECTION_TIMEOUT ) );
+            
+            //Sleep for an extra half second, just to make sure nexus is all wrapped up
+            Thread.sleep( 500 );
         }
         catch ( UnknownHostException e )
         {
             e.printStackTrace();
-            assert( false );
+            fail( "Exception stopping nexus" );
         }
         catch ( ControlConnectionException e )
         {
             e.printStackTrace();
-            assert( false );
+            fail( "Exception stopping nexus" );
         }
         catch ( IOException e )
         {
             e.printStackTrace();
-            assert( false );
+            fail( "Exception stopping nexus" );
         }
-        finally
+        catch ( InterruptedException e )
         {
-            if ( client != null )
-            {
-                client.close();
-            }
+            e.printStackTrace();
+            fail( "Exception stopping nexus" );
         }
     }
 
     protected void startNexus()
     {
-        ControllerClient client = null;
         try
         {
-            client = new ControllerClient( PlexusContainerHost.DEFAULT_CONTROL_PORT );
-            client.start();
+            manager.start();
 
             assertTrue( testConnection( TEST_CONNECTION_ATTEMPTS, TEST_CONNECTION_TIMEOUT ) );
         }
         catch ( UnknownHostException e )
         {
             e.printStackTrace();
-            assert( false );
+            fail( "Exception starting nexus" );
         }
         catch ( ControlConnectionException e )
         {
             e.printStackTrace();
-            assert( false );
+            fail( "Exception starting nexus" );
         }
         catch ( IOException e )
         {
             e.printStackTrace();
-            assert( false );
-        }
-        finally
-        {
-            if ( client != null )
-            {
-                client.close();
-            }
+            fail( "Exception starting nexus" );
         }
     }
 
@@ -200,12 +221,12 @@ public abstract class AbstractNexusTest extends PlexusTestCase
         catch ( MalformedURLException e )
         {
             e.printStackTrace();
-            assert( false );
+            fail( "Exception downloading artifact" );
         }
         catch ( IOException e )
         {
             e.printStackTrace();
-            assert( false );
+            fail( "Exception downloading artifact" );
         }
         finally
         {
@@ -245,7 +266,7 @@ public abstract class AbstractNexusTest extends PlexusTestCase
         catch ( Exception e )
         {
             e.printStackTrace();
-            assert( false );
+            fail( "Exception unpacking artifact" );
         }
 
         return target;
