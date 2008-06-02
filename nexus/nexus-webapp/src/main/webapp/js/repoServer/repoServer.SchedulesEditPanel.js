@@ -1137,6 +1137,12 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
     var serviceScheduleField = formPanel.find('name', 'serviceSchedule')[0];
     serviceScheduleField.on('select', this.serviceScheduleSelectHandler, formPanel);
     
+    var startTimeArray = formPanel.find('name', 'startTime');
+    for (var i = 0 ; i < startTimeArray.length ; i++)
+    {
+      startTimeArray[i].on('change', this.startTimeChangeHandler, formPanel);
+    }
+    
     var buttonInfoObj = {
         formPanel : formPanel,
         isNew : true
@@ -1401,6 +1407,12 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
             
       formPanel.find('name', 'serviceType')[0].on('select', this.serviceTypeSelectHandler, formPanel);
       formPanel.find('name', 'serviceSchedule')[0].on('select', this.serviceScheduleSelectHandler, formPanel);
+      
+      var startTimeArray = formPanel.find('name', 'startTime');
+      for (var i = 0 ; i < startTimeArray.length ; i++)
+      {
+        startTimeArray[i].on('change', this.startTimeChangeHandler, formPanel);
+      }
 
       var buttonInfoObj = {
         formPanel : formPanel,
@@ -1420,6 +1432,19 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
 
     //always set active
     this.formCards.getLayout().setActiveItem(formPanel);
+  },
+  
+  startTimeChangeHandler : function(field, newvalue, oldvalue){
+    var recurringTimeFields = this.find('name', 'recurringTime');
+    //Find the correct recurringTime field, as their will be multiples, all but 1 disabled
+    for(var i=0; i<recurringTimeFields.length; i++){
+      if (!recurringTimeFields[i].disabled){
+        if (Ext.isEmpty(recurringTimeFields[i].getValue())){ 
+          recurringTimeFields[i].setValue(newvalue);
+        }
+        break;
+      }
+    }
   },
   
   serviceTypeSelectHandler : function(combo, record, index){
