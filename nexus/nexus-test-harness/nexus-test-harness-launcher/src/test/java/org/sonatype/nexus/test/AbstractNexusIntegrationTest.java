@@ -39,15 +39,16 @@ import org.sonatype.appbooter.PlexusContainerHost;
 import org.sonatype.appbooter.ctl.ControlConnectionException;
 import org.sonatype.appbooter.ctl.ControllerClient;
 
-public abstract class AbstractNexusTest extends PlexusTestCase
+public abstract class AbstractNexusIntegrationTest extends PlexusTestCase
 {
     private String nexusUrl;
     private ControllerClient manager;
     private boolean detach = false;
     private static final int TEST_CONNECTION_ATTEMPTS = 5;
     private static final int TEST_CONNECTION_TIMEOUT = 3000;
+    private static final int MANAGER_WAIT_TIME = 500;
 
-    public AbstractNexusTest( String nexusUrl )
+    public AbstractNexusIntegrationTest( String nexusUrl )
     {
         this.nexusUrl = nexusUrl;   
     }
@@ -64,7 +65,7 @@ public abstract class AbstractNexusTest extends PlexusTestCase
         detach = false;
         manager = new ControllerClient( PlexusContainerHost.DEFAULT_CONTROL_PORT );
         manager.shutdownOnClose();
-        Thread.sleep( 500 );
+        Thread.sleep( MANAGER_WAIT_TIME );
     }
     
     protected void tearDown()
@@ -78,7 +79,7 @@ public abstract class AbstractNexusTest extends PlexusTestCase
         }
         
         manager.close();
-        Thread.sleep( 500 );
+        Thread.sleep( MANAGER_WAIT_TIME );
     }
 
     private boolean testConnection( int attempts, int timeout )
@@ -133,12 +134,11 @@ public abstract class AbstractNexusTest extends PlexusTestCase
         try
         {
             manager.stop();
+            
+            Thread.sleep( MANAGER_WAIT_TIME );
 
             //Note calling testConnection w/ only 1 attempt, becuase just 1 timeout will do
             assertFalse( testConnection( 1, TEST_CONNECTION_TIMEOUT ) );
-            
-            //Sleep for an extra half second, just to make sure nexus is all wrapped up
-            Thread.sleep( 500 );
         }
         catch ( UnknownHostException e )
         {

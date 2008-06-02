@@ -24,7 +24,7 @@ import java.io.File;
 import java.io.FilenameFilter;
 
 public class NexusGroupDownloadTest
-    extends AbstractNexusTest
+    extends AbstractNexusIntegrationTest
 {
     public NexusGroupDownloadTest()
     {

@@ -199,7 +199,7 @@
                         <configuration>
                             <skip>false</skip>
                             <excludes>
-                                <exclude>**/AbstractNexusTest*</exclude>
+                                <exclude>**/AbstractNexusIntegrationTest*</exclude>
                             </excludes>
                         </configuration>
                     </execution>

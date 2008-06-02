@@ -5,7 +5,7 @@ import java.io.FilenameFilter;
 
 
 
-public class NexusRestartTest extends AbstractNexusTest
+public class NexusRestartTest extends AbstractNexusIntegrationTest
 {
     public NexusRestartTest()
     {
