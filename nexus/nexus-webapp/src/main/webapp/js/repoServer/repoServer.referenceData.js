@@ -159,7 +159,7 @@ Sonatype.repoServer.referenceData = {
 	  serviceType : "",
 	  serviceSchedule : "",
 	  serviceProperties : [{
-	    name: "",
+	    id: "",
 	    value: ""
 	  }]
     },
@@ -169,7 +169,7 @@ Sonatype.repoServer.referenceData = {
 	  serviceType : "",
 	  serviceSchedule : "",
 	  serviceProperties : [{
-	    name: "",
+	    id: "",
 	    value: ""
 	  }],
 	  startDate : "",
@@ -181,7 +181,7 @@ Sonatype.repoServer.referenceData = {
 	  serviceType : "",
 	  serviceSchedule : "",
 	  serviceProperties : [{
-	    name: "",
+	    id: "",
 	    value: ""
 	  }],
 	  startDate : "",
@@ -194,7 +194,7 @@ Sonatype.repoServer.referenceData = {
 	  serviceType : "",
 	  serviceSchedule : "",
 	  serviceProperties : [{
-	    name: "",
+	    id: "",
 	    value: ""
 	  }],
 	  startDate : "",
@@ -208,7 +208,7 @@ Sonatype.repoServer.referenceData = {
 	  serviceType : "",
 	  serviceSchedule : "",
 	  serviceProperties : [{
-	    name: "",
+	    id: "",
 	    value: ""
 	  }],
 	  startDate : "",
@@ -222,7 +222,7 @@ Sonatype.repoServer.referenceData = {
 	  serviceType : "",
 	  serviceSchedule : "",
 	  serviceProperties : [{
-	    name: "",
+	    id: "",
 	    value: ""
 	  }],
 	  cronCommand : ""

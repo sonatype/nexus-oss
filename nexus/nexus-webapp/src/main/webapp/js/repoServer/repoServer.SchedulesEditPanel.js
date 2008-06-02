@@ -116,6 +116,18 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
     }
   };
   
+  //A record to hold the name and id of a repository
+  this.repositoryRecordConstructor = Ext.data.Record.create([
+    {name:'id'},
+    {name:'name', sortType:Ext.data.SortTypes.asUCString},
+  ]);
+  
+  //A record to hold the name and id of a repository group
+  this.repositoryGroupRecordConstructor = Ext.data.Record.create([
+    {name:'id'},
+    {name:'name', sortType:Ext.data.SortTypes.asUCString},
+  ]);
+  
   //Simply a record to hold details of each service type 
   this.serviceTypeRecordConstructor = Ext.data.Record.create([
     {name:'id', sortType:Ext.data.SortTypes.asUCString},
@@ -135,6 +147,24 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
     {name:'lastRunTime'},
     {name:'lastRunResult'}
   ]);
+  
+  //Reader and datastore that queries the server for the list of repositories
+  this.repositoryReader = new Ext.data.JsonReader({root: 'data', id: 'id'}, this.repositoryRecordConstructor );  
+  this.repositoryDataStore = new Ext.data.Store({
+    url: Sonatype.config.repos.urls.repositories,
+    reader: this.repositoryReader,
+    sortInfo: {field: 'name', direction: 'ASC'},
+    autoLoad: true
+  });
+  
+  //Reader and datastore that queries the server for the list of repository groups
+  this.repositoryGroupReader = new Ext.data.JsonReader({root: 'data', id: 'id'}, this.repositoryGroupRecordConstructor );  
+  this.repositoryGroupDataStore = new Ext.data.Store({
+    url: Sonatype.config.repos.urls.groups,
+    reader: this.repositoryGroupReader,
+    sortInfo: {field: 'name', direction: 'ASC'},
+    autoLoad: true
+  });
   
   //Reader and datastore that queries the server for the list of service types
   this.serviceTypeReader = new Ext.data.JsonReader({root: 'data', id: 'id'}, this.serviceTypeRecordConstructor );  
@@ -206,7 +236,8 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
         triggerAction: 'all',
         emptyText:'Select...',
         selectOnFocus:true,
-        allowBlank: false    
+        allowBlank: false,
+        width: 200
       },
       {
         xtype: 'panel',
@@ -235,7 +266,8 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
         triggerAction: 'all',
         emptyText:'Select...',
         selectOnFocus:true,
-        allowBlank: false    
+        allowBlank: false,
+        width: 200  
       },
       {
         xtype: 'panel',
@@ -258,7 +290,13 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
     	      autoHeight:true,
     	      layoutConfig: {
 	            labelSeparator: ''
-	          }
+	          },
+	          items: [
+              {
+                xtype: 'label',
+                text: 'Without recurrence, this service can only be run manually.'
+              }
+            ]
           },
           {
             xtype: 'fieldset',
@@ -909,11 +947,12 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
           {
             xtype: 'textfield',
             fieldLabel: curRec.name,
-            itemCls: 'required-field',
+            itemCls: curRec.required ? 'required-field' : '',
             helpText: curRec.helpText,
             name: 'serviceProperties_' + curRec.id,
             allowBlank:false,
-            disabled:true
+            disabled:true,
+            width: 200
           };
         }
         else if(curRec.type == 'number'){
@@ -921,11 +960,12 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
           {
             xtype: 'numberfield',
             fieldLabel: curRec.name,
-            itemCls: 'required-field',
+            itemCls: curRec.required ? 'required-field' : '',
             helpText: curRec.helpText,
             name: 'serviceProperties_' + curRec.id,
             allowBlank:false,
-            disabled:true
+            disabled:true,
+            width: 200
           };
         }
         else if(curRec.type == 'date'){
@@ -933,11 +973,57 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
           {
             xtype: 'datefield',
             fieldLabel: curRec.name,
-            itemCls: 'required-field',
+            itemCls: curRec.required ? 'required-field' : '',
             helpText: curRec.helpText,
             name: 'serviceProperties_' + curRec.id,
             allowBlank:false,
             disabled:true
+          };
+        }
+        else if(curRec.type == 'repository'){
+          items[j] =
+          {
+            xtype: 'combo',
+            fieldLabel: curRec.name,
+            itemCls: curRec.required ? 'required-field' : '',
+            helpText: curRec.helpText,
+            name: 'serviceProperties_' + curRec.id,
+            store: this.repositoryDataStore,
+            displayField:'name',
+            valueField:'id',
+            editable: false,
+            forceSelection: true,
+            mode: 'local',
+            triggerAction: 'all',
+            emptyText:'Select...',
+            selectOnFocus:true,
+            allowBlank: curRec.required ? false : true,
+            disabled: true,
+            width: 200,
+            minListWidth: 200
+          };
+        }
+        else if(curRec.type == 'repositoryGroup'){
+          items[j] =
+          {
+            xtype: 'combo',
+            fieldLabel: curRec.name,
+            itemCls: curRec.required ? 'required-field' : '',
+            helpText: curRec.helpText,
+            name: 'serviceProperties_' + curRec.id,
+            store: this.repositoryGroupDataStore,
+            displayField:'name',
+            valueField:'id',
+            editable: false,
+            forceSelection: true,
+            mode: 'local',
+            triggerAction: 'all',
+            emptyText:'Select...',
+            selectOnFocus:true,
+            allowBlank: curRec.required ? false : true,
+            disabled: true,
+            width: 200,
+            minListWidth: 200
           };
         }
       }  
@@ -961,6 +1047,8 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
   //Dump the currently stored data and requery for everything
   reloadAll : function(){
     this.schedulesDataStore.reload();
+    this.repositoryDataStore.reload();
+    this.repositoryGroupDataStore.reload();
     this.serviceTypeDataStore.reload();
     this.formCards.items.each(function(item, i, len){
       if(i>0){this.remove(item, true);}
@@ -1544,6 +1632,9 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
         //force to a string, as that is what the current api requires
         value = '' + item.getValue();
       }
+      else if (item.xtype == 'combo'){
+        value = item.getValue();
+      }
       outputArr[i] = 
       {
         id:item.getName().substring('serviceProperties_'.length),
@@ -1675,6 +1766,9 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
         }
         else if (servicePropertyItem.xtype == 'numberfield'){
           servicePropertyItem.setValue(Number(srcObj.serviceProperties[i].value));
+        }
+        else if (servicePropertyItem.xtype == 'combo'){
+          servicePropertyItem.setValue(srcObj.serviceProperties[i].value);
         }
       }
     }

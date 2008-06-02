@@ -74,6 +74,16 @@ public class AbstractScheduledServiceResourceHandler
      * Type property resource: date
      */
     public static final String PROPERTY_TYPE_DATE = "date";
+    
+    /**
+     * Type property resource: repository
+     */
+    public static final String PROPERTY_TYPE_REPO = "repository";
+    
+    /**
+     * Type property resource: repositoryGroup
+     */
+    public static final String PROPERTY_TYPE_REPO_GROUP = "repositoryGroup";
 
     protected Map<String, String> serviceNames = new HashMap<String, String>();
     {
