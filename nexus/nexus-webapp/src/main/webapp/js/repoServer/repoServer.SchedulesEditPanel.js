@@ -34,6 +34,25 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
   //List of weekdays
   this.weekdaysList = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
   
+  this.actions = {
+    refresh : new Ext.Action({
+      text: 'Refresh',
+      iconCls: 'st-icon-refresh',
+      scope:this,
+      handler: this.reloadAll
+    }),
+    delete : new Ext.Action({
+      text: 'Delete',
+      scope:this,
+      handler: this.deleteHandler
+    }),
+    run : new Ext.Action({
+      text: 'Run',
+      scope:this,
+      handler: this.runHandler
+    })
+  };
+  
   //Methods that will take the incoming json data and map over to the ui controls
   this.loadDataModFuncs = {
     none : {
@@ -854,7 +873,7 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
         icon: Sonatype.config.resourcePath + '/images/icons/delete.png',
         cls: 'x-btn-text-icon',
         scope:this,
-        handler: this.deleteResourceHandler
+        handler: this.deleteHandler
       }
     ],
 
@@ -879,6 +898,7 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
     }
   });
   this.schedulesGridPanel.on('rowclick', this.rowClick, this);
+  this.schedulesGridPanel.on('rowcontextmenu', this.contextClick, this);
 
   Sonatype.repoServer.SchedulesEditPanel.superclass.constructor.call(this, {
     layout: 'border',
@@ -1046,6 +1066,7 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
   },
   //Dump the currently stored data and requery for everything
   reloadAll : function(){
+    this.schedulesDataStore.removeAll();
     this.schedulesDataStore.reload();
     this.repositoryDataStore.reload();
     this.repositoryGroupDataStore.reload();
@@ -1189,9 +1210,9 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
     
   },
   
-  deleteResourceHandler : function(){
-    if (this.schedulesGridPanel.getSelectionModel().hasSelection()){
-      var rec = this.schedulesGridPanel.getSelectionModel().getSelected();
+  deleteHandler : function(){
+    if (this.ctxRecord || this.schedulesGridPanel.getSelectionModel().hasSelection()){
+      var rec = this.ctxRecord ? this.ctxRecord : this.schedulesGridPanel.getSelectionModel().getSelected();
 
       if(rec.data.resourceURI == 'new'){
         this.cancelHandler({
@@ -1265,6 +1286,45 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
     }
     else {
       Ext.MessageBox.alert('The server did not delete the scheduled service.');
+    }
+  },
+  
+  runHandler : function() {
+    if (this.ctxRecord && this.ctxRecord.data.resourceURI != 'new'){
+      Ext.Msg.getDialog().on('show', function(){
+          this.focusEl = this.buttons[2]; //ack! we're offset dependent here
+          this.focus();
+        },
+        Ext.Msg.getDialog(),
+        {single:true});
+        
+      Ext.Msg.show({
+        animEl: this.schedulesGridPanel.getEl(),
+        title : 'Run Scheduled Service?',
+        msg : 'Run the ' + this.ctxRecord.get('name') + ' scheduled service?',
+        buttons: Ext.Msg.YESNO,
+        scope: this,
+        icon: Ext.Msg.QUESTION,
+        fn: function(btnName){
+          if (btnName == 'yes' || btnName == 'ok') {
+            Ext.Ajax.request({
+              callback: this.runCallback,
+              cbPassThru: {
+                resourceId: this.ctxRecord.id
+              },
+              scope: this,
+              method: 'GET',
+              url:(Sonatype.config.urls.scheduleRun + '/' + this.ctxRecord.id)
+            });
+          }
+        }
+      });
+    }
+  },
+  
+  runCallback : function(options, isSuccess, response){
+    if(!isSuccess){
+      Ext.MessageBox.alert('The server did not run the scheduled service.');
     }
   },
     
@@ -1432,6 +1492,41 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
 
     //always set active
     this.formCards.getLayout().setActiveItem(formPanel);
+  },
+  
+  contextClick : function(grid, index, e){
+    this.contextHide();
+    
+    if ( e.target.nodeName == 'A' ) return; // no menu on links
+    
+    this.ctxRow = this.schedulesGridPanel.view.getRow(index);
+    this.ctxRecord = this.schedulesGridPanel.store.getAt(index);
+    Ext.fly(this.ctxRow).addClass('x-node-ctx');
+
+    //@todo: would be faster to pre-render the six variations of the menu for whole instance
+    var menu = new Ext.menu.Menu({
+      id:'schedules-grid-ctx',
+      items: [
+        this.actions.refresh,
+        this.actions.delete
+      ]
+    });
+    
+    if (this.ctxRecord.data.status == 'idle') {
+      menu.add(this.actions.run);
+    }
+    
+    menu.on('hide', this.contextHide, this);
+    e.stopEvent();
+    menu.showAt(e.getXY());
+  },
+  
+  contextHide : function(){
+    if(this.ctxRow){
+      Ext.fly(this.ctxRow).removeClass('x-node-ctx');
+      this.ctxRow = null;
+      this.ctxRecord = null;
+    }
   },
   
   startTimeChangeHandler : function(field, newvalue, oldvalue){

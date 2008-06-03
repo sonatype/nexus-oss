@@ -170,14 +170,14 @@ public class ScheduledServiceTypeResourceHandler
         type.addProperty( property );
         property = new ScheduledServiceTypePropertyResource();
         property.setId( "3" );
-        property.setName( "Min. count of snapshots to keep." );
+        property.setName( "Minimum snapshot count" );
         property.setType( PROPERTY_TYPE_NUMBER );
         property.setHelpText( "Minimum number of snapshots to keep for one GAV." );
         property.setRequired( true );
         type.addProperty( property );
         property = new ScheduledServiceTypePropertyResource();
         property.setId( "4" );
-        property.setName( "Remove snapshots older than (days)" );
+        property.setName( "Snapshot retention (days)" );
         property.setType( PROPERTY_TYPE_NUMBER );
         property
             .setHelpText( "The job will purge all snapshots older than the entered number of days, but will obey to Min. count of snapshots to keep." );

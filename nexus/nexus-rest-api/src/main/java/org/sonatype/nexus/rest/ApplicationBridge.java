@@ -59,6 +59,7 @@ import org.sonatype.nexus.rest.routes.RepositoryRouteListResourceHandler;
 import org.sonatype.nexus.rest.routes.RepositoryRouteResourceHandler;
 import org.sonatype.nexus.rest.schedules.ScheduledServiceListResourceHandler;
 import org.sonatype.nexus.rest.schedules.ScheduledServiceResourceHandler;
+import org.sonatype.nexus.rest.schedules.ScheduledServiceRunResourceHandler;
 import org.sonatype.nexus.rest.schedules.ScheduledServiceTypeResourceHandler;
 import org.sonatype.nexus.rest.status.StatusResourceHandler;
 import org.sonatype.nexus.rest.templates.repositories.RepositoryTemplateListResourceHandler;
@@ -314,6 +315,10 @@ public class ApplicationBridge
             router.attach( "/schedules", protectResource( ScheduledServiceListResourceHandler.class ) );
 
             router.attach( "/schedules/types", protectResource( ScheduledServiceTypeResourceHandler.class ) );
+            
+            router.attach( 
+                "/schedules/run/{" + ScheduledServiceRunResourceHandler.SCHEDULED_SERVICE_ID_KEY + "}", 
+                protectResource( ScheduledServiceRunResourceHandler.class ) );
 
             router.attach(
                 "/schedules/{" + ScheduledServiceResourceHandler.SCHEDULED_SERVICE_ID_KEY + "}",

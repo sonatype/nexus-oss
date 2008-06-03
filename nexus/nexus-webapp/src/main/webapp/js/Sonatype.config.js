@@ -96,6 +96,7 @@ Sonatype.config = function() {
         status: servicePath + '/status',
         identify: servicePath + '/identify/sha1',
         schedules: servicePath + '/schedules',
+        scheduleRun: servicePath + '/schedules/run',
         scheduleTypes: servicePath + '/schedules/types',
         upload: servicePath + '/artifact/maven/content'
       }
