@@ -45,7 +45,7 @@ public class RepoMaintenancePage extends LayoutContainer implements ServerFuncti
         
         final RepoTableBinding tableBinding = new RepoTableBinding(repoTable, server);
         
-        tableBinding.getBinder().addSelectionListener(new SelectionChangedListener() {
+        tableBinding.getBinder().addSelectionChangedListener(new SelectionChangedListener() {
             public void selectionChanged(SelectionChangedEvent event) {
                 List<Model> selection = event.getSelection();
                 if (selection.size() > 0) {

@@ -37,7 +37,7 @@
 	</modules>
 
 	<properties>
-        <gwt.version>0.0.2415</gwt.version>
+        <gwt.version>1.5.0-rc1</gwt.version>
 	</properties>
 
 	<dependencyManagement>
@@ -54,7 +54,7 @@
 			<dependency>
 				<groupId>com.extjs.gxt</groupId>
 				<artifactId>gxt</artifactId>
-				<version>1.0-beta3</version>
+				<version>1.0-beta4</version>
 				<scope>compile</scope>
 				<type>jar</type>
 			</dependency>
