@@ -67,6 +67,8 @@ public class DefaultIndexingContext
     private File indexDirectoryFile;
 
     private String id;
+    
+    private boolean searchable;
 
     private String repositoryId;
 
@@ -92,6 +94,8 @@ public class DefaultIndexingContext
         String repositoryUrl, String indexUpdateUrl, List<? extends IndexCreator> indexCreators )
     {
         this.id = id;
+        
+        this.searchable = true;
 
         this.repositoryId = repositoryId;
 
@@ -267,6 +271,16 @@ public class DefaultIndexingContext
         }
 
         IndexUtils.deleteTimestamp( indexDirectory );
+    }
+
+    public boolean isSearchable()
+    {
+        return searchable;
+    }
+
+    public void setSearchable( boolean searchable )
+    {
+        this.searchable = searchable;
     }
 
     public String getId()

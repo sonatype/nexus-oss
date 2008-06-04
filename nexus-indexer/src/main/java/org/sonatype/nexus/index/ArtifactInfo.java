@@ -7,7 +7,7 @@
  *
  * Contributors:
  *    Eugene Kuleshov (Sonatype)
- *    Tamás Cservenák (Sonatype)
+ *    Tamï¿½s Cservenï¿½k (Sonatype)
  *    Brian Fox (Sonatype)
  *    Jason Van Zyl (Sonatype)
  *******************************************************************************/
@@ -34,13 +34,12 @@ public class ArtifactInfo
     public static final String ROOT_GROUPS_VALUE = "rootGroups";
 
     public static final String ROOT_GROUPS_LIST = "rootGroupsList";
-    
+
     public static final String ALL_GROUPS = "allGroups";
 
     public static final String ALL_GROUPS_VALUE = "allGroups";
 
     public static final String ALL_GROUPS_LIST = "allGroupsList";
-    
 
     /**
      * packaging lastModified size sourcesExists javadocExists signatureExists
@@ -93,8 +92,9 @@ public class ArtifactInfo
     public static final String PLUGIN_GOALS = "gx";
 
     public static final VersionComparator VERSION_COMPARATOR = new VersionComparator();
-    
-    
+
+    public static final VersionComparator REPOSITORY_VERSION_COMPARATOR = new RepositoryVersionComparator();
+
     public String fname;
 
     public String groupId;
@@ -128,11 +128,11 @@ public class ArtifactInfo
     public String classNames;
 
     public String repository;
-    
+
     public String path;
-    
+
     public String remoteUrl;
-    
+
     public String context;
 
     /**
@@ -145,14 +145,14 @@ public class ArtifactInfo
      */
     public List<String> goals;
 
-
     public ArtifactInfo()
     {
     }
 
     public ArtifactInfo( String fname, String groupId, String artifactId, String version, String classifier,
         String packaging, String name, String description, long lastModified, long size, String md5, String sha1,
-        ArtifactAvailablility sourcesExists, ArtifactAvailablility javadocExists, ArtifactAvailablility signatureExists, String repository )
+        ArtifactAvailablility sourcesExists, ArtifactAvailablility javadocExists,
+        ArtifactAvailablility signatureExists, String repository )
     {
         // artifact unique
         this.fname = fname;
@@ -227,6 +227,30 @@ public class ArtifactInfo
             else
             {
                 return c2 == null ? 1 : c1.compareTo( c2 );
+            }
+        }
+    }
+
+    public static class RepositoryVersionComparator
+        extends VersionComparator
+    {
+        public int compare( ArtifactInfo f1, ArtifactInfo f2 )
+        {
+            int n = super.compare( f1, f2 );
+            if ( n != 0 )
+            {
+                return n;
+            }
+
+            String r1 = f1.repository;
+            String r2 = f2.repository;
+            if ( r1 == null )
+            {
+                return r2 == null ? 0 : -1;
+            }
+            else
+            {
+                return r2 == null ? 1 : r1.compareTo( r2 );
             }
         }
     }

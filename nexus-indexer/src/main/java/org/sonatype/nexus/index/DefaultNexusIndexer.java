@@ -86,6 +86,55 @@ public class DefaultNexusIndexer
     // ----------------------------------------------------------------------------
 
     public IndexingContext addIndexingContext( String id, String repositoryId, File repository, File indexDirectory,
+        String repositoryUrl, String indexUpdateUrl, List<? extends IndexCreator> indexers )
+        throws IOException,
+            UnsupportedExistingLuceneIndexException
+    {
+        IndexingContext context = new DefaultIndexingContext(
+            id,
+            repositoryId,
+            repository,
+            indexDirectory,
+            repositoryUrl,
+            indexUpdateUrl,
+            indexers,
+            false );
+
+        indexingContexts.put( context.getId(), context );
+
+        return context;
+    }
+
+    public IndexingContext addIndexingContextForced( String id, String repositoryId, File repository,
+        File indexDirectory, String repositoryUrl, String indexUpdateUrl, List<? extends IndexCreator> indexers )
+        throws IOException
+    {
+        IndexingContext context = null;
+
+        try
+        {
+            context = new DefaultIndexingContext(
+                id,
+                repositoryId,
+                repository,
+                indexDirectory,
+                repositoryUrl,
+                indexUpdateUrl,
+                indexers,
+                true );
+        }
+        catch ( UnsupportedExistingLuceneIndexException e )
+        {
+            // will not be thrown
+        }
+
+        indexingContexts.put( context.getId(), context );
+
+        return context;
+    }
+
+    @Deprecated
+    public IndexingContext addIndexingContext( String id, String repositoryId, File repository, File indexDirectory,
         String repositoryUrl, String indexUpdateUrl, List<? extends IndexCreator> indexers,
         boolean reclaimIndexOwnership )
         throws IOException,
@@ -106,6 +155,55 @@ public class DefaultNexusIndexer
         return context;
     }
 
+    public IndexingContext addIndexingContext( String id, String repositoryId, File repository, Directory directory,
+        String repositoryUrl, String indexUpdateUrl, List<? extends IndexCreator> indexers )
+        throws IOException,
+            UnsupportedExistingLuceneIndexException
+    {
+        IndexingContext context = new DefaultIndexingContext(
+            id,
+            repositoryId,
+            repository,
+            directory,
+            repositoryUrl,
+            indexUpdateUrl,
+            indexers,
+            false );
+
+        indexingContexts.put( context.getId(), context );
+
+        return context;
+    }
+
+    public IndexingContext addIndexingContextForced( String id, String repositoryId, File repository,
+        Directory directory, String repositoryUrl, String indexUpdateUrl, List<? extends IndexCreator> indexers )
+        throws IOException
+    {
+        IndexingContext context = null;
+
+        try
+        {
+            context = new DefaultIndexingContext(
+                id,
+                repositoryId,
+                repository,
+                directory,
+                repositoryUrl,
+                indexUpdateUrl,
+                indexers,
+                true );
+        }
+        catch ( UnsupportedExistingLuceneIndexException e )
+        {
+            // will not be thrown
+        }
+
+        indexingContexts.put( context.getId(), context );
+
+        return context;
+    }
+
+    @Deprecated
     public IndexingContext addIndexingContext( String id, String repositoryId, File repository, Directory directory,
         String repositoryUrl, String indexUpdateUrl, List<? extends IndexCreator> indexers,
         boolean reclaimIndexOwnership )
@@ -304,12 +402,6 @@ public class DefaultNexusIndexer
     // Modifying
     // ----------------------------------------------------------------------------
 
-    // public void addArtifactToIndex( File pom, IndexingContext context )
-    // throws IOException
-    // {
-    // addArtifactToIndex( artifactContextProducer.getArtifactContext( context, pom ), context );
-    // }
-
     public void addArtifactToIndex( ArtifactContext ac, IndexingContext context )
         throws IOException
     {
@@ -338,12 +430,6 @@ public class DefaultNexusIndexer
             setAllGroups( context, groups );
         }
     }
-
-    // public void deleteArtifactFromIndex( File pom, IndexingContext context )
-    // throws IOException
-    // {
-    // deleteArtifactFromIndex( artifactContextProducer.getArtifactContext( context, pom ), context );
-    // }
 
     public void deleteArtifactFromIndex( ArtifactContext ac, IndexingContext context )
         throws IOException
@@ -494,7 +580,23 @@ public class DefaultNexusIndexer
         throws IOException,
             IndexContextInInconsistentStateException
     {
-        return searcher.searchFlat( artifactInfoComparator, Collections.singletonList( context ), query );
+        return searcher.searchFlat( artifactInfoComparator, context, query );
+    }
+
+    public Collection<ArtifactInfo> searchFlat( FlatSearchRequest request )
+        throws IOException,
+            IndexContextInInconsistentStateException
+    {
+        if ( request.getContext() == null )
+        {
+            return searcher.searchFlatPaged( request.getArtifactInfoComparator(), indexingContexts.values(), request
+                .getQuery(), request.getStart(), request.getAiCount() );
+        }
+        else
+        {
+            return searcher.searchFlatPaged( request.getArtifactInfoComparator(), request.getContext(), request
+                .getQuery(), request.getStart(), request.getAiCount() );
+        }
     }
 
     public Map<String, ArtifactInfoGroup> searchGrouped( Grouping grouping, Query query )
@@ -524,7 +626,26 @@ public class DefaultNexusIndexer
         throws IOException,
             IndexContextInInconsistentStateException
     {
-        return searcher.searchGrouped( grouping, groupKeyComparator, Collections.singletonList( context ), query );
+        return searcher.searchGrouped( grouping, groupKeyComparator, context, query );
+    }
+
+    public Map<String, ArtifactInfoGroup> searchGrouped( GroupedSearchRequest request )
+        throws IOException,
+            IndexContextInInconsistentStateException
+    {
+        if ( request.getContext() == null )
+        {
+            return searcher.searchGrouped(
+                request.getGrouping(),
+                request.getGroupKeyComparator(),
+                request.getContext(),
+                request.getQuery() );
+        }
+        else
+        {
+            return searcher.searchGrouped( request.getGrouping(), request.getGroupKeyComparator(), indexingContexts
+                .values(), request.getQuery() );
+        }
     }
 
     // ----------------------------------------------------------------------------

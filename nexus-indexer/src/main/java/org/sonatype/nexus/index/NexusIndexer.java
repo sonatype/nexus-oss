@@ -45,33 +45,136 @@ public interface NexusIndexer
     // Contexts
     // ----------------------------------------------------------------------------
 
+    /**
+     * The minimal set of index creators.
+     */
     public static final List<? extends IndexCreator> MINIMAL_INDEX =
     // Collections.singletonList(new MinimalArtifactInfoIndexCreator());
     Arrays.asList( new MinimalArtifactInfoIndexCreator() );
 
+    /**
+     * The "default" set of index creators. It adds Jar contents (classes) to minimal index.
+     */
     public static final List<? extends IndexCreator> DEFAULT_INDEX = Arrays.asList(
         new MinimalArtifactInfoIndexCreator(),
         new JarFileContentsIndexCreator() );
 
+    /**
+     * The full set of index creators.
+     */
     public static final List<? extends IndexCreator> FULL_INDEX = Arrays.asList(
         new MinimalArtifactInfoIndexCreator(),
         new JarFileContentsIndexCreator() );
 
+    /**
+     * Adds an indexing context to Nexus indexer.
+     * 
+     * @param id the ID of the context.
+     * @param repositoryId the ID of the repository that this context represents.
+     * @param repository the location of the repository.
+     * @param indexDirectory the location of the Lucene indexes.
+     * @param repositoryUrl the location of the remote repository.
+     * @param indexUpdateUrl the alternate location of the remote repository indexes (if they are not in default place).
+     * @param indexers the set of indexers to apply to this context.
+     * @return
+     * @throws IOException in case of some serious IO problem.
+     * @throws UnsupportedExistingLuceneIndexException if a Lucene index already exists where location is specified, but
+     *         it has no Nexus descriptor record or it has, but the embedded repoId differs from the repoId specified
+     *         from the supplied one.
+     */
+    IndexingContext addIndexingContext( String id, String repositoryId, File repository, File indexDirectory,
+        String repositoryUrl, String indexUpdateUrl, List<? extends IndexCreator> indexers )
+        throws IOException,
+            UnsupportedExistingLuceneIndexException;
+
+    /**
+     * Adds an indexing context to Nexus indexer. It "forces" this operation, thus no
+     * UnsupportedExistingLuceneIndexException is thrown. If it founds an existing lucene index, it will simply
+     * stomp-over and rewrite (or add) the Nexus index descriptor.
+     * 
+     * @param id the ID of the context.
+     * @param repositoryId the ID of the repository that this context represents.
+     * @param repository the location of the repository.
+     * @param indexDirectory the location of the Lucene indexes.
+     * @param repositoryUrl the location of the remote repository.
+     * @param indexUpdateUrl the alternate location of the remote repository indexes (if they are not in default place).
+     * @param indexers the set of indexers to apply to this context.
+     * @return
+     * @throws IOException in case of some serious IO problem.
+     */
+    IndexingContext addIndexingContextForced( String id, String repositoryId, File repository, File indexDirectory,
+        String repositoryUrl, String indexUpdateUrl, List<? extends IndexCreator> indexers )
+        throws IOException;
+
+    @Deprecated
     IndexingContext addIndexingContext( String id, String repositoryId, File repository, File indexDirectory,
         String repositoryUrl, String indexUpdateUrl, List<? extends IndexCreator> indexers,
         boolean reclaimIndexOwnership )
         throws IOException,
             UnsupportedExistingLuceneIndexException;
 
+    /**
+     * Adds an indexing context to Nexus indexer.
+     * 
+     * @param id the ID of the context.
+     * @param repositoryId the ID of the repository that this context represents.
+     * @param repository the location of the repository.
+     * @param directory the location of the Lucene indexes.
+     * @param repositoryUrl the location of the remote repository.
+     * @param indexUpdateUrl the alternate location of the remote repository indexes (if they are not in default place).
+     * @param indexers the set of indexers to apply to this context.
+     * @return
+     * @throws IOException in case of some serious IO problem.
+     * @throws UnsupportedExistingLuceneIndexException if a Lucene index already exists where location is specified, but
+     *         it has no Nexus descriptor record or it has, but the embedded repoId differs from the repoId specified
+     *         from the supplied one.
+     */
+    IndexingContext addIndexingContext( String id, String repositoryId, File repository, Directory directory,
+        String repositoryUrl, String indexUpdateUrl, List<? extends IndexCreator> indexers )
+        throws IOException,
+            UnsupportedExistingLuceneIndexException;
+
+    /**
+     * Adds an indexing context to Nexus indexer. It "forces" this operation, thus no
+     * UnsupportedExistingLuceneIndexException is thrown. If it founds an existing lucene index, it will simply
+     * stomp-over and rewrite (or add) the Nexus index descriptor.
+     * 
+     * @param id the ID of the context.
+     * @param repositoryId the ID of the repository that this context represents.
+     * @param repository the location of the repository.
+     * @param directory the location of the Lucene indexes.
+     * @param repositoryUrl the location of the remote repository.
+     * @param indexUpdateUrl the alternate location of the remote repository indexes (if they are not in default place).
+     * @param indexers the set of indexers to apply to this context.
+     * @return
+     * @throws IOException in case of some serious IO problem.
+     */
+    IndexingContext addIndexingContextForced( String id, String repositoryId, File repository, Directory directory,
+        String repositoryUrl, String indexUpdateUrl, List<? extends IndexCreator> indexers )
+        throws IOException;
+
+    @Deprecated
     IndexingContext addIndexingContext( String id, String repositoryId, File repository, Directory directory,
         String repositoryUrl, String indexUpdateUrl, List<? extends IndexCreator> indexers,
         boolean reclaimIndexOwnership )
         throws IOException,
             UnsupportedExistingLuceneIndexException;
 
+    /**
+     * Removes the indexing context from Nexus indexer, closes it and deletes (if specified) the index files.
+     * 
+     * @param context
+     * @param deleteFiles
+     * @throws IOException
+     */
     void removeIndexingContext( IndexingContext context, boolean deleteFiles )
         throws IOException;
 
+    /**
+     * Returns the map of indexing contexts keyed by their ID.
+     * 
+     * @return
+     */
     Map<String, IndexingContext> getIndexingContexts();
 
     // ----------------------------------------------------------------------------
@@ -94,14 +197,8 @@ public interface NexusIndexer
     // Modifying
     // ----------------------------------------------------------------------------
 
-    // public void addArtifactToIndex( File pom, IndexingContext context )
-    // throws IOException;
-
     public void addArtifactToIndex( ArtifactContext ac, IndexingContext context )
         throws IOException;
-
-    // public void deleteArtifactFromIndex( File pom, IndexingContext context )
-    // throws IOException;
 
     public void deleteArtifactFromIndex( ArtifactContext ac, IndexingContext context )
         throws IOException;
@@ -110,37 +207,115 @@ public interface NexusIndexer
     // Searching
     // ----------------------------------------------------------------------------
 
+    /**
+     * Will search all searchable contexts know to Nexus indexer and merge the results. The default comparator will be
+     * used (VersionComparator) to sort the results.
+     */
     Collection<ArtifactInfo> searchFlat( Query query )
         throws IOException,
             IndexContextInInconsistentStateException;
 
+    /**
+     * Will search the given context. The default comparator will be used (VersionComparator) to sort the results.
+     */
     Collection<ArtifactInfo> searchFlat( Query query, IndexingContext context )
         throws IOException,
             IndexContextInInconsistentStateException;
 
+    /**
+     * Will search all searchable contexts know to Nexus indexer and merge the results. The given comparator will be
+     * used to sort the results.
+     */
     Collection<ArtifactInfo> searchFlat( Comparator<ArtifactInfo> artifactInfoComparator, Query query )
         throws IOException,
             IndexContextInInconsistentStateException;
 
+    /**
+     * Will search the given context. The given comparator will be used to sort the results.
+     */
     Collection<ArtifactInfo> searchFlat( Comparator<ArtifactInfo> artifactInfoComparator, Query query,
         IndexingContext context )
         throws IOException,
             IndexContextInInconsistentStateException;
 
+    /**
+     * Will search according the request parameters.
+     * 
+     * @param request
+     * @return
+     * @throws IOException
+     * @throws IndexContextInInconsistentStateException
+     */
+    Collection<ArtifactInfo> searchFlat( FlatSearchRequest request )
+        throws IOException,
+            IndexContextInInconsistentStateException;
+
+    /**
+     * Will search all searchable contexts know to Nexus indexer and merge the results.
+     * 
+     * @param grouping
+     * @param query
+     * @return
+     * @throws IOException
+     * @throws IndexContextInInconsistentStateException
+     */
     Map<String, ArtifactInfoGroup> searchGrouped( Grouping grouping, Query query )
         throws IOException,
             IndexContextInInconsistentStateException;
 
+    /**
+     * Will search the given context.
+     * 
+     * @param grouping
+     * @param query
+     * @param context
+     * @return
+     * @throws IOException
+     * @throws IndexContextInInconsistentStateException
+     */
     Map<String, ArtifactInfoGroup> searchGrouped( Grouping grouping, Query query, IndexingContext context )
         throws IOException,
             IndexContextInInconsistentStateException;
 
+    /**
+     * Will search all searchable contexts know to Nexus indexer and merge the results.
+     * 
+     * @param grouping
+     * @param groupKeyComparator
+     * @param query
+     * @return
+     * @throws IOException
+     * @throws IndexContextInInconsistentStateException
+     */
     Map<String, ArtifactInfoGroup> searchGrouped( Grouping grouping, Comparator<String> groupKeyComparator, Query query )
         throws IOException,
             IndexContextInInconsistentStateException;
 
+    /**
+     * Will search the given context.
+     * 
+     * @param grouping
+     * @param groupKeyComparator
+     * @param query
+     * @param context
+     * @return
+     * @throws IOException
+     * @throws IndexContextInInconsistentStateException
+     */
     Map<String, ArtifactInfoGroup> searchGrouped( Grouping grouping, Comparator<String> groupKeyComparator,
         Query query, IndexingContext context )
+        throws IOException,
+            IndexContextInInconsistentStateException;
+
+    /**
+     * Will search according the request parameters.
+     * 
+     * @param request
+     * @return
+     * @throws IOException
+     * @throws IndexContextInInconsistentStateException
+     */
+    Map<String, ArtifactInfoGroup> searchGrouped( GroupedSearchRequest request )
         throws IOException,
             IndexContextInInconsistentStateException;
 

@@ -78,7 +78,18 @@ public class M2GavCalculator
                 return null;
             }
 
-            String ext = s.substring( s.lastIndexOf( '.' ) + 1 );
+            String ext = null;
+            
+            // TODO: refine this, the version may contain dot too!
+            if ( n.contains( "." ) )
+            {
+                ext = s.substring( s.lastIndexOf( '.' ) + 1 );
+            }
+            else
+            {
+                // NX-563: not allowing extensionless paths to be interpreted as artifact
+                return null;
+            }
 
             boolean snapshot = v.contains( "-SNAPSHOT" );
 
@@ -226,9 +237,12 @@ public class M2GavCalculator
             path.append( gav.getClassifier() );
         }
 
-        path.append( "." );
+        if ( gav.getExtension() != null )
+        {
+            path.append( "." );
 
-        path.append( gav.getExtension() );
+            path.append( gav.getExtension() );
+        }
 
         if ( gav.isHash() )
         {

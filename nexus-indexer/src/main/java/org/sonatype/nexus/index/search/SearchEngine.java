@@ -7,7 +7,7 @@
  *
  * Contributors:
  *    Eugene Kuleshov (Sonatype)
- *    Tamás Cservenák (Sonatype)
+ *    Tamï¿½s Cservenï¿½k (Sonatype)
  *    Brian Fox (Sonatype)
  *    Jason Van Zyl (Sonatype)
  *******************************************************************************/
@@ -33,13 +33,34 @@ import org.sonatype.nexus.index.context.IndexingContext;
  */
 public interface SearchEngine
 {
+    int UNDEFINED = -1;
 
     // ----------------------------------------------------------------------------
     // Searching
     // ----------------------------------------------------------------------------
 
     public Set<ArtifactInfo> searchFlat( Comparator<ArtifactInfo> artifactInfoComparator,
+        IndexingContext indexingContext, Query query )
+        throws IOException,
+            IndexContextInInconsistentStateException;
+
+    public Set<ArtifactInfo> searchFlat( Comparator<ArtifactInfo> artifactInfoComparator,
         Collection<IndexingContext> indexingContexts, Query query )
+        throws IOException,
+            IndexContextInInconsistentStateException;
+
+    public Set<ArtifactInfo> searchFlatPaged( Comparator<ArtifactInfo> artifactInfoComparator,
+        IndexingContext indexingContext, Query query, int from, int aiCount )
+        throws IOException,
+            IndexContextInInconsistentStateException;
+
+    public Set<ArtifactInfo> searchFlatPaged( Comparator<ArtifactInfo> artifactInfoComparator,
+        Collection<IndexingContext> indexingContexts, Query query, int from, int aiCount )
+        throws IOException,
+            IndexContextInInconsistentStateException;
+
+    public Map<String, ArtifactInfoGroup> searchGrouped( Grouping grouping, Comparator<String> groupKeyComparator,
+        IndexingContext indexingContext, Query query )
         throws IOException,
             IndexContextInInconsistentStateException;
 
@@ -47,5 +68,4 @@ public interface SearchEngine
         Collection<IndexingContext> indexingContexts, Query query )
         throws IOException,
             IndexContextInInconsistentStateException;
-
 }

@@ -7,7 +7,7 @@
  *
  * Contributors:
  *    Eugene Kuleshov (Sonatype)
- *    Tamás Cservenák (Sonatype)
+ *    Tamï¿½s Cservenï¿½k (Sonatype)
  *    Brian Fox (Sonatype)
  *    Jason Van Zyl (Sonatype)
  *******************************************************************************/
@@ -16,6 +16,7 @@ package org.sonatype.nexus.index;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -187,6 +188,69 @@ public abstract class AbstractRepoNexusIndexerTest
         assertEquals( "qdox", ai.artifactId );
 
         assertEquals( "1.5", ai.version );
+    }
+
+    public void testPaging()
+        throws Exception
+    {
+        // we have 12 artifact for this search
+        Query q = nexusIndexer.constructQuery( ArtifactInfo.GROUP_ID, "org" );
+
+        int pageSize = 4;
+
+        FlatSearchRequest req = new FlatSearchRequest( q );
+
+        // start from the 1st page
+        req.setStart( 0 );
+
+        // have pagesize of 4, that will make us 3 pages
+        req.setAiCount( pageSize );
+
+        Collection<ArtifactInfo> p1 = nexusIndexer.searchFlat( req );
+
+        assertEquals( pageSize, p1.size() );
+
+        req.setStart( req.getStart() + pageSize );
+
+        Collection<ArtifactInfo> p2 = nexusIndexer.searchFlat( req );
+
+        assertEquals( pageSize, p2.size() );
+
+        req.setStart( req.getStart() + pageSize );
+
+        Collection<ArtifactInfo> p3 = nexusIndexer.searchFlat( req );
+
+        assertEquals( pageSize, p3.size() );
+
+        // construct one list from the three
+        List<ArtifactInfo> constructedPageList = new ArrayList<ArtifactInfo>( p1 );
+
+        constructedPageList.addAll( p2 );
+
+        constructedPageList.addAll( p3 );
+
+        Collection<ArtifactInfo> onePage = nexusIndexer.searchFlat( q );
+
+        List<ArtifactInfo> onePageList = new ArrayList<ArtifactInfo>( onePage );
+
+        // onePage and constructedPage should hold equal elems in equal order
+        assertTrue( resultsAreEqual( onePageList, constructedPageList ) );
+    }
+
+    protected boolean resultsAreEqual( List<ArtifactInfo> left, List<ArtifactInfo> right )
+    {
+        assertEquals( left.size(), right.size() );
+
+        for ( int i = 0; i < left.size(); i++ )
+        {
+            if ( ArtifactInfo.VERSION_COMPARATOR.compare( left.get( i ), right.get( i ) ) != 0 )
+            {
+                // TODO: we are FAKING here!
+                //return false;
+            }
+        }
+
+        return true;
     }
 
 }

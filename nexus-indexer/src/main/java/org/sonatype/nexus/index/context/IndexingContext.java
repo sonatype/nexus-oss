@@ -7,7 +7,7 @@
  *
  * Contributors:
  *    Eugene Kuleshov (Sonatype)
- *    Tamás Cservenák (Sonatype)
+ *    Tamï¿½s Cservenï¿½k (Sonatype)
  *    Brian Fox (Sonatype)
  *    Jason Van Zyl (Sonatype)
  *******************************************************************************/
@@ -72,6 +72,21 @@ public interface IndexingContext
      * Returns url for the index update
      */
     String getIndexUpdateUrl();
+
+    /**
+     * Is the context searchable when doing "non-targeted" searches? Ie. Should it take a part when searching without
+     * specifying context?
+     * 
+     * @return
+     */
+    boolean isSearchable();
+
+    /**
+     * Sets is the context searchable when doing "non-targeted" searches.
+     * 
+     * @param searchable
+     */
+    void setSearchable( boolean searchable );
 
     /**
      * Returns index update time

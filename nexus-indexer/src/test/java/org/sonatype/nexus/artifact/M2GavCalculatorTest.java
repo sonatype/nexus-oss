@@ -344,13 +344,17 @@ public class M2GavCalculatorTest
 
         gav = gavCalculator.pathToGav( "/org/codehaus/plexus/plexus-container-default/maven-metadata.xml" );
         assertEquals( null, gav );
+
+        gav = gavCalculator.pathToGav( "org/apache/maven/scm/maven-scm" );
+        assertEquals( null, gav );
     }
-    
+
     public void testIssueNexus57()
     {
         Gav gav;
         // broken path, baseVersion and version mismatch (2.0-SNAPSHOT vs 2.0-alpha-1...)
-        gav = gavCalculator.pathToGav( "/org/apache/maven/plugins/maven-dependency-plugin/2.0-SNAPSHOT/maven-dependency-plugin-2.0-alpha-1-20070109.165112-13.jar" );
+        gav = gavCalculator
+            .pathToGav( "/org/apache/maven/plugins/maven-dependency-plugin/2.0-SNAPSHOT/maven-dependency-plugin-2.0-alpha-1-20070109.165112-13.jar" );
         assertEquals( null, gav );
     }
 }
