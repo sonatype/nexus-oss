@@ -1433,6 +1433,94 @@
 				</codeSegment>
 			</codeSegments>
 		</class>
+		
+		<!-- Scheduled Tasks -->
+		<class>
+		    <name>CTaskConfiguration</name>
+		    <version>1.0.0+</version>
+		    <description>The main configuration of the scheduled tasks</description>
+		    <fields>
+                <field>
+                    <name>tasks</name>
+                    <version>1.0.0+</version>
+                    <description>Currently defined tasks</description>
+                    <required>false</required>
+                    <association>
+                        <type>CTask</type>
+                        <multiplicity>*</multiplicity>
+                    </association>
+                </field>		    
+		    </fields>
+		</class>
+		<class>
+		    <name>CTask</name>
+		    <version>1.0.0+</version>
+		    <description>A task in the nexus system.</description>
+		    <fields>
+		        <field>
+		            <name>id</name>
+		            <type>String</type>
+		            <version>1.0.0+</version>
+		            <required>true</required>
+		            <description>The id of the task</description>
+		        </field>
+		        <field>
+                    <name>type</name>
+                    <type>String</type>
+                    <version>1.0.0+</version>
+                    <required>true</required>
+                    <description>The type of the task</description>
+                </field>
+		    </fields>
+		</class>
+		
+		<class>
+            <name>CTaskIterating</name>
+            <superClass>CTask</superClass>
+            <description>An iterating task</description>
+        </class>
+		
+		<class>
+		    <name>CTaskScheduled</name>
+		    <superClass>CTask</superClass>
+		    <description>A scheduled task</description>
+		</class>
+		
+		<class>
+		    <name>CSchedule</name>
+		    <version>1.0.0+</version>
+		    <description>A schedule, which can be used to control a task.</description>
+		</class>
+		
+		<class>
+		    <name>CScheduleOnce</name>
+		    <version>1.0.0+</version>
+		    <description>A schedule, which will run a task once.</description>
+		</class>
+		
+		<class>
+            <name>CScheduleDaily</name>
+            <version>1.0.0+</version>
+            <description>A schedule, which will run a task daily.</description>
+        </class>
+        
+        <class>
+            <name>CScheduleWeekly</name>
+            <version>1.0.0+</version>
+            <description>A schedule, which will run a task weekly.</description>
+        </class>
+        
+        <class>
+            <name>CScheduleMonthly</name>
+            <version>1.0.0+</version>
+            <description>A schedule, which will run a task monthly.</description>
+        </class>
+        
+        <class>
+            <name>CScheduleAdvanced</name>
+            <version>1.0.0+</version>
+            <description>A schedule, which will run a task using a cron command.</description>
+        </class>
 
 		<!-- UTIL -->
 		<class>

@@ -60,6 +60,8 @@ public class DefaultScheduler
     private ScheduledThreadPoolExecutor scheduledExecutorService;
 
     private Map<String, List<SubmittedTask<?>>> tasksMap;
+    
+    private TaskConfigManager taskConfig;
 
     public void contextualize( Context context )
         throws ContextException
@@ -70,8 +72,10 @@ public class DefaultScheduler
     public void start()
         throws StartingException
     {
-        tasksMap = new HashMap<String, List<SubmittedTask<?>>>();
-
+        taskConfig = new DefaultTaskConfigManager();
+        
+        tasksMap = taskConfig.getTasks();
+        
         plexusThreadFactory = new PlexusThreadFactory( plexusContainer );
 
         scheduledExecutorService = (ScheduledThreadPoolExecutor) Executors.newScheduledThreadPool(
@@ -120,6 +124,7 @@ public class DefaultScheduler
                 tasksMap.put( task.getType(), new ArrayList<SubmittedTask<?>>() );
             }
             tasksMap.get( task.getType() ).add( task );
+            taskConfig.addTask( task );
         }
     }
 
@@ -135,6 +140,8 @@ public class DefaultScheduler
                 {
                     tasksMap.remove( task.getType() );
                 }
+                
+                taskConfig.removeTask( task );
             }
         }
     }
