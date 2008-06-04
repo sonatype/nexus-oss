@@ -237,6 +237,23 @@ public abstract class AbstractRepoNexusIndexerTest
         assertTrue( resultsAreEqual( onePageList, constructedPageList ) );
     }
 
+    public void testPurge()
+        throws Exception
+    {
+        // we have 12 artifact for this search
+        Query q = nexusIndexer.constructQuery( ArtifactInfo.GROUP_ID, "org" );
+
+        Collection<ArtifactInfo> p1 = nexusIndexer.searchFlat( q );
+
+        assertEquals( 12, p1.size() );
+
+        context.purge();
+
+        Collection<ArtifactInfo> p2 = nexusIndexer.searchFlat( q );
+
+        assertEquals( 0, p2.size() );
+    }
+
     protected boolean resultsAreEqual( List<ArtifactInfo> left, List<ArtifactInfo> right )
     {
         assertEquals( left.size(), right.size() );
@@ -246,7 +263,7 @@ public abstract class AbstractRepoNexusIndexerTest
             if ( ArtifactInfo.VERSION_COMPARATOR.compare( left.get( i ), right.get( i ) ) != 0 )
             {
                 // TODO: we are FAKING here!
-                //return false;
+                // return false;
             }
         }
 

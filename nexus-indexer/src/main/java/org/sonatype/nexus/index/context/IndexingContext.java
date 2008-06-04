@@ -147,15 +147,17 @@ public interface IndexingContext
         throws IndexContextInInconsistentStateException;
 
     /**
-     * Sets current identifier in context.
-     * 
-     * @param id
-     */
-    // void setCurrentId( String id );
-    /**
      * Shuts down this context.
      */
     void close( boolean deleteFiles )
+        throws IOException;
+
+    /**
+     * Purge (cleans) the context, deletes/empties the index and restores the context to new/empty state.
+     * 
+     * @throws IOException
+     */
+    void purge()
         throws IOException;
 
     /**

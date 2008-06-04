@@ -67,7 +67,7 @@ public class DefaultIndexingContext
     private File indexDirectoryFile;
 
     private String id;
-    
+
     private boolean searchable;
 
     private String repositoryId;
@@ -94,7 +94,7 @@ public class DefaultIndexingContext
         String repositoryUrl, String indexUpdateUrl, List<? extends IndexCreator> indexCreators )
     {
         this.id = id;
-        
+
         this.searchable = true;
 
         this.repositoryId = repositoryId;
@@ -184,12 +184,12 @@ public class DefaultIndexingContext
 
         timestamp = IndexUtils.getTimestamp( indexDirectory );
 
-//        if ( timestamp == null )
-//        {
-//            timestamp = new Date( System.currentTimeMillis() );
-//
-//            IndexUtils.updateTimestamp( indexDirectory, timestamp );
-//        }
+        // if ( timestamp == null )
+        // {
+        // timestamp = new Date( System.currentTimeMillis() );
+        //
+        // IndexUtils.updateTimestamp( indexDirectory, timestamp );
+        // }
     }
 
     private void checkAndUpdateIndexDescriptor( boolean reclaimIndex )
@@ -397,6 +397,28 @@ public class DefaultIndexingContext
         }
         // TODO: this will prevent from reopening them, but needs better solution
         indexDirectory = null;
+    }
+
+    public void purge()
+        throws IOException
+    {
+        IndexUtils.updateTimestamp( indexDirectory, getTimestamp() );
+
+        if ( indexDirectory != null )
+        {
+            closeReaders();
+
+            deleteIndexFiles();
+
+            try
+            {
+                prepareIndex( true );
+            }
+            catch ( UnsupportedExistingLuceneIndexException e )
+            {
+                // just deleted it
+            }
+        }
     }
 
     private void closeReaders()
