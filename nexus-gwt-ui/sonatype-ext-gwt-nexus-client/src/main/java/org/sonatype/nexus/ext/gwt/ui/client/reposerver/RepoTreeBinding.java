@@ -1,21 +1,28 @@
 package org.sonatype.nexus.ext.gwt.ui.client.reposerver;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.sonatype.gwt.client.resource.DefaultResource;
-import org.sonatype.gwt.client.resource.Resource;
 import org.sonatype.gwt.client.resource.Variant;
 import org.sonatype.nexus.ext.gwt.ui.client.Constants;
-import org.sonatype.nexus.ext.gwt.ui.client.ResourceProxy;
 
 import com.extjs.gxt.ui.client.binder.TreeBinder;
 import com.extjs.gxt.ui.client.data.BaseTreeLoader;
 import com.extjs.gxt.ui.client.data.BaseTreeModel;
 import com.extjs.gxt.ui.client.data.DataProxy;
+import com.extjs.gxt.ui.client.data.DataReader;
+import com.extjs.gxt.ui.client.data.ListLoadResult;
 import com.extjs.gxt.ui.client.data.Model;
 import com.extjs.gxt.ui.client.data.ModelType;
 import com.extjs.gxt.ui.client.data.TreeLoader;
 import com.extjs.gxt.ui.client.data.XmlReader;
 import com.extjs.gxt.ui.client.store.TreeStore;
 import com.extjs.gxt.ui.client.widget.tree.Tree;
+import com.google.gwt.http.client.Request;
+import com.google.gwt.http.client.RequestCallback;
+import com.google.gwt.http.client.Response;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public class RepoTreeBinding {
 
@@ -29,11 +36,9 @@ public class RepoTreeBinding {
         }
     };
     
-    private Tree tree;
-    
-    private ModelType modelType;
-    
     private Variant variant;
+    
+    private TreeStore store;
     
     private TreeBinder binder;
     
@@ -42,23 +47,50 @@ public class RepoTreeBinding {
     }
     
     public RepoTreeBinding(Tree tree, ModelType modelType, Variant variant) {
-        this.tree = tree;
-        this.modelType = modelType;
         this.variant = variant;
+        
+        TreeLoader loader =
+            new BaseTreeLoader(new RepoContentProxy(), new XmlReader(modelType));
+        store = new TreeStore(loader);
+        binder = new TreeBinder(tree, store);
+        binder.setDisplayProperty("name");
     }
     
-    public void selectRepo(String repoName, String resourceUri) {
-        Resource resource = new DefaultResource(Constants.HOST_URL + resourceUri);
-        DataProxy proxy = new ResourceProxy(resource, variant);
-        TreeLoader loader = new BaseTreeLoader(proxy, new XmlReader(modelType));
-        TreeStore store = new TreeStore(loader);
+    public void selectRepo(final String repoName, final String resourceUri) {
+        store.removeAll();
         store.add(new RepoContentNode(repoName, resourceUri, false));
-        binder = new TreeBinder(tree, store);
-        loader.load();
     }
 
     public TreeBinder getBinder() {
         return binder;
+    }
+    
+    private class RepoContentProxy implements DataProxy<RepoContentNode, Object> {
+        
+        public void load(final DataReader<RepoContentNode, Object> reader,
+                RepoContentNode parent, final AsyncCallback<Object> callback) {
+
+            String url = Constants.HOST_URL + parent.getResourceUri();
+
+            new DefaultResource(url).get(new RequestCallback() {
+
+                public void onError(Request request, Throwable exception) {
+                    callback.onFailure(exception);
+                }
+
+                public void onResponseReceived(Request request, Response response) {
+                    List<RepoContentNode> list = new ArrayList<RepoContentNode>();
+                    ListLoadResult<Model> result =
+                        (ListLoadResult<Model>) reader.read(null, response.getText());
+                    for (Model model : result.getData()) {
+                        list.add(new RepoContentNode(model));
+                    }
+                    callback.onSuccess(list);
+                }
+
+            }, variant);
+        }
+        
     }
     
     private static class RepoContentNode extends BaseTreeModel {

@@ -1,11 +1,9 @@
 package org.sonatype.nexus.ext.gwt.ui.client.reposerver;
 
-import java.util.List;
-
 import org.sonatype.nexus.ext.gwt.ui.client.ServerFunctionPanel;
 import org.sonatype.nexus.ext.gwt.ui.client.ServerInstance;
 
-import com.extjs.gxt.ui.client.data.Model;
+import com.extjs.gxt.ui.client.data.ModelData;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.event.SelectionChangedEvent;
 import com.extjs.gxt.ui.client.event.SelectionChangedListener;
@@ -47,13 +45,10 @@ public class RepoMaintenancePage extends LayoutContainer implements ServerFuncti
         
         tableBinding.getBinder().addSelectionChangedListener(new SelectionChangedListener() {
             public void selectionChanged(SelectionChangedEvent event) {
-                List<Model> selection = event.getSelection();
-                if (selection.size() > 0) {
-                    Model repo = selection.get(0);
-                    if (repo != null) {
-                        treeBinding.selectRepo((String) repo.get("name"),
-                                (String) repo.get("contentUri") + "/content");
-                    }
+                ModelData repo = event.getSelectedItem();
+                if (repo != null) {
+                    treeBinding.selectRepo((String) repo.get("name"),
+                            (String) repo.get("contentUri") + "/content");
                 }
             }
         });
