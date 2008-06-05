@@ -1478,11 +1478,27 @@
             <name>CTaskIterating</name>
             <superClass>CTask</superClass>
             <description>An iterating task</description>
+            <fields>
+                <field>
+                    <name>lastRun</name>
+                    <type>Date</type>
+                    <version>1.0.0+</version>
+                    <required>true</required>
+                    <description>The date the task last ran</description>
+                </field>
+                <field>
+                    <name>nextRun</name>
+                    <type>Date</type>
+                    <version>1.0.0+</version>
+                    <required>true</required>
+                    <description>The date the task will run next</description>
+                </field>
+            </fields>
         </class>
 		
 		<class>
 		    <name>CTaskScheduled</name>
-		    <superClass>CTask</superClass>
+		    <superClass>CTaskIterating</superClass>
 		    <description>A scheduled task</description>
 		</class>
 		

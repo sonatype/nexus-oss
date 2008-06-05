@@ -3,11 +3,11 @@ package org.sonatype.scheduling;
 import java.util.Date;
 import java.util.concurrent.Callable;
 
-import org.codehaus.plexus.PlexusTestCase;
+import org.sonatype.nexus.configuration.AbstractNexusTestCase;
 import org.sonatype.scheduling.iterators.SchedulerIterator;
 
 public class DefaultSchedulerTest
-    extends PlexusTestCase
+    extends AbstractNexusTestCase
 {
     protected DefaultScheduler defaultScheduler;
 

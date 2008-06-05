@@ -61,6 +61,9 @@ public class DefaultScheduler
 
     private Map<String, List<SubmittedTask<?>>> tasksMap;
     
+    /**
+     * @plexus.requirement
+     */
     private TaskConfigManager taskConfig;
 
     public void contextualize( Context context )
@@ -71,9 +74,7 @@ public class DefaultScheduler
 
     public void start()
         throws StartingException
-    {
-        taskConfig = new DefaultTaskConfigManager();
-        
+    {        
         tasksMap = taskConfig.getTasks();
         
         plexusThreadFactory = new PlexusThreadFactory( plexusContainer );

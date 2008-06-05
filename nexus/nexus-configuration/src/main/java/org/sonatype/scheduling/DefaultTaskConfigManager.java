@@ -1,77 +1,136 @@
 package org.sonatype.scheduling;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
+import org.codehaus.plexus.logging.AbstractLogEnabled;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
+import org.codehaus.plexus.util.IOUtil;
+import org.sonatype.nexus.configuration.model.CSchedule;
+import org.sonatype.nexus.configuration.model.CScheduleAdvanced;
+import org.sonatype.nexus.configuration.model.CScheduleDaily;
+import org.sonatype.nexus.configuration.model.CScheduleMonthly;
+import org.sonatype.nexus.configuration.model.CScheduleOnce;
+import org.sonatype.nexus.configuration.model.CScheduleWeekly;
 import org.sonatype.nexus.configuration.model.CTask;
 import org.sonatype.nexus.configuration.model.CTaskConfiguration;
 import org.sonatype.nexus.configuration.model.CTaskIterating;
 import org.sonatype.nexus.configuration.model.CTaskScheduled;
+import org.sonatype.scheduling.schedules.CronSchedule;
+import org.sonatype.scheduling.schedules.DailySchedule;
+import org.sonatype.scheduling.schedules.MonthlySchedule;
+import org.sonatype.scheduling.schedules.OnceSchedule;
+import org.sonatype.scheduling.schedules.Schedule;
+import org.sonatype.scheduling.schedules.WeeklySchedule;
 
-public class DefaultTaskConfigManager implements TaskConfigManager
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.io.xml.DomDriver;
+
+/**
+ * The default implementation of the Task Configuration manager
+ * 
+ * @plexus.component
+ */
+public class DefaultTaskConfigManager 
+    extends AbstractLogEnabled
+    implements TaskConfigManager, Initializable
 {    
     private CTaskConfiguration config;
+   
+    /**
+     * The configuration file.
+     * 
+     * @plexus.configuration default-value="${apps}/nexus/conf/tasks.xml"
+     */
+    private File configurationFile;
     
-    public DefaultTaskConfigManager()
+    public void initialize()
+        throws InitializationException
     {
-        super();
-        
         loadConfig();
     }
     
     public HashMap<String, List<SubmittedTask<?>>> getTasks()
     {
-        HashMap<String, List<SubmittedTask<?>>> map = new HashMap<String, List<SubmittedTask<?>>>();
-        
-        for ( Iterator iter = config.getTasks().iterator(); iter.hasNext(); )
+        synchronized( config )
         {
-            CTask storedTask = (CTask) iter.next();            
+            HashMap<String, List<SubmittedTask<?>>> map = new HashMap<String, List<SubmittedTask<?>>>();
             
-            if ( !map.containsKey( storedTask.getType() ))
+            for ( Iterator iter = config.getTasks().iterator(); iter.hasNext(); )
             {
-                map.put( storedTask.getType() , new ArrayList<SubmittedTask<?>>() );
+                CTask storedTask = (CTask) iter.next();            
+                
+                if ( !map.containsKey( storedTask.getType() ))
+                {
+                    map.put( storedTask.getType() , new ArrayList<SubmittedTask<?>>() );
+                }
+                
+                map.get( storedTask.getType() ).add( translateFrom( storedTask ) );
             }
             
-            map.get( storedTask.getType() ).add( translateFrom( storedTask ) );
+            return map;
         }
-        
-        return map;
     }
     
     public <T> void addTask( SubmittedTask<T> task )
     {
-        CTask storeableTask = translateFrom( task );
-        
-        if ( storeableTask != null )
+        synchronized( config )
         {
-            config.addTask( storeableTask );
-            storeConfig();
+            CTask storeableTask = translateFrom( task );
+            
+            if ( storeableTask != null )
+            {
+                config.addTask( storeableTask );
+                storeConfig();
+            }
         }
     }
     
     public <T> void removeTask( SubmittedTask<T> task )
     {        
-        for ( Iterator iter = config.getTasks().iterator(); iter.hasNext(); )
+        synchronized( config )
         {
-            CTask storedTask = (CTask) iter.next();
-            
-            if ( storedTask.getId().equals( task.getId() ))
+            for ( Iterator iter = config.getTasks().iterator(); iter.hasNext(); )
             {
-                iter.remove();
-                break;
+                CTask storedTask = (CTask) iter.next();
+                
+                if ( storedTask.getId().equals( task.getId() ))
+                {
+                    iter.remove();
+                    break;
+                }
             }
+            
+            storeConfig();
         }
-        
-        storeConfig();
         //TODO: need to also add task to a history file
     }
     
     private <T> SubmittedTask<T> translateFrom( CTask task )
     {
-        //TODO: need to translate properly
-        return null;
+        SubmittedTask<T> useableTask = null;
+        
+        //TODO: Need to complete translation
+        
+        if ( CTaskScheduled.class.isAssignableFrom( task.getClass() ) )
+        {
+        }
+        else if ( CTaskIterating.class.isAssignableFrom( task.getClass() ) )
+        {
+        }
+        else if ( CTask.class.isAssignableFrom( task.getClass() ) )
+        {
+        }
+        
+        return useableTask;
     }
     
     private <T> CTask translateFrom ( SubmittedTask<T> task )
@@ -81,10 +140,44 @@ public class DefaultTaskConfigManager implements TaskConfigManager
         if ( ScheduledTask.class.isAssignableFrom( task.getClass() ) )
         {
             storeableTask = new CTaskScheduled();
+            
+            ( ( CTaskScheduled )storeableTask ).setLastRun( ( ( ScheduledTask<T> )task ).getLastRun() );
+            ( ( CTaskScheduled )storeableTask ).setNextRun( ( ( ScheduledTask<T> )task ).getNextRun() );
+            ( ( ScheduledTask<T> )task ).getTaskState().name();
+            
+            Schedule schedule = ( ( ScheduledTask<T> )task ).getSchedule();
+            
+            if ( CronSchedule.class.isAssignableFrom( schedule.getClass() ) )
+            {
+                ( ( CronSchedule) schedule ).getCronExpression();
+            }
+            else if ( DailySchedule.class.isAssignableFrom( schedule.getClass() ) )
+            {
+                ( ( DailySchedule) schedule ).getStartDate();
+                ( ( DailySchedule) schedule ).getEndDate();
+            }
+            else if ( MonthlySchedule.class.isAssignableFrom( schedule.getClass() ) )
+            {
+                ( ( MonthlySchedule) schedule ).getStartDate();
+                ( ( MonthlySchedule) schedule ).getEndDate();
+                ( ( MonthlySchedule) schedule ).getDaysToRun();
+            }
+            else if ( OnceSchedule.class.isAssignableFrom( schedule.getClass() ) )
+            {
+                ( ( OnceSchedule) schedule ).getStartDate();
+                ( ( OnceSchedule) schedule ).getEndDate();
+            }
+            else if ( WeeklySchedule.class.isAssignableFrom( schedule.getClass() ) )
+            {
+            }
         }
         else if ( IteratingTask.class.isAssignableFrom( task.getClass() ) )
         {
             storeableTask = new CTaskIterating();
+            
+            ( ( CTaskIterating )storeableTask ).setLastRun( ( ( IteratingTask<T> )task ).getLastRun() );
+            ( ( CTaskIterating )storeableTask ).setNextRun( ( ( IteratingTask<T> )task ).getNextRun() );
+            ( ( IteratingTask<T> )task ).getTaskState().name();
         }
         else if ( SubmittedTask.class.isAssignableFrom( task.getClass() ) )
         {
@@ -95,6 +188,7 @@ public class DefaultTaskConfigManager implements TaskConfigManager
         {
             storeableTask.setId( task.getId() );
             storeableTask.setType( task.getType() );
+            storeableTask.setType( task.getTaskState().name() );
         }
         
         //TODO: need to complete translation
@@ -102,14 +196,108 @@ public class DefaultTaskConfigManager implements TaskConfigManager
         return storeableTask;
     }
     
-    private void loadConfig()
-    {
-        //TODO: need to load from file
-        config = new CTaskConfiguration();
-    }
-    
     private void storeConfig()
     {
-        //TODO: need to write to file
+        XStream xstream = configureXStream( new XStream() );
+        
+        FileOutputStream fos = null;
+        try
+        {
+            fos = new FileOutputStream( configurationFile );
+            xstream.toXML( config, fos );
+            fos.flush();
+        }
+        catch ( FileNotFoundException e )
+        {
+            getLogger().error( "Unable to write to " + configurationFile.getAbsolutePath(), e );
+        }
+        catch ( IOException e )
+        {
+            getLogger().error( "Unable to write to " + configurationFile.getAbsolutePath(), e );
+        }
+        finally
+        {
+            if ( fos != null )
+            {
+                try
+                {
+                    fos.close();
+                }
+                catch ( IOException e )
+                {
+                }
+            }
+        }
+    }
+    
+    private void loadConfig()
+    {        
+        XStream xstream = configureXStream( new XStream( new DomDriver() ) );
+        
+        config = new CTaskConfiguration();
+        
+        if ( !configurationFile.exists() )
+        {
+            loadDefaultConfig();
+        }
+        
+        FileInputStream fis = null;
+        try
+        {
+            fis = new FileInputStream( configurationFile );
+            xstream.fromXML( fis, config );
+        }
+        catch ( FileNotFoundException e )
+        {
+            getLogger().error( "Unable to read from " + configurationFile.getAbsolutePath(), e );
+        }
+        finally
+        {
+            if ( fis != null )
+            {
+                try
+                {
+                    fis.close();
+                }
+                catch ( IOException e )
+                {
+                }
+            }
+        }  
+    }
+    
+    private void loadDefaultConfig()
+    {   
+        try
+        {
+            configurationFile.getParentFile().mkdirs();
+            IOUtil.copy( 
+                getClass().getResourceAsStream( "/META-INF/nexus/tasks.xml" ), 
+                new FileOutputStream( configurationFile ) );
+        }
+        catch ( FileNotFoundException e )
+        {
+            getLogger().error( "Unable to write default configuration to " + configurationFile.getAbsolutePath(), e );
+        }
+        catch ( IOException e )
+        {
+            getLogger().error( "Unable to write default configuration to " + configurationFile.getAbsolutePath(), e );
+        }
+    }
+    
+    private XStream configureXStream( XStream xstream )
+    {
+        xstream.omitField( CTaskConfiguration.class, "modelEncoding" );
+        xstream.omitField( CTask.class, "modelEncoding" );
+        xstream.omitField( CTaskIterating.class, "modelEncoding" );
+        xstream.omitField( CTaskScheduled.class, "modelEncoding" );
+        xstream.omitField( CSchedule.class, "modelEncoding" );
+        xstream.omitField( CScheduleAdvanced.class, "modelEncoding" );
+        xstream.omitField( CScheduleDaily.class, "modelEncoding" );
+        xstream.omitField( CScheduleMonthly.class, "modelEncoding" );
+        xstream.omitField( CScheduleOnce.class, "modelEncoding" );
+        xstream.omitField( CScheduleWeekly.class, "modelEncoding" );
+        
+        return xstream;
     }
 }
