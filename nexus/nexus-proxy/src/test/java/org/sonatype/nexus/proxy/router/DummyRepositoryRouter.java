@@ -20,6 +20,7 @@
  */
 package org.sonatype.nexus.proxy.router;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -208,6 +209,20 @@ public class DummyRepositoryRouter
     public ContentClass getHandledContentClass()
     {
         return new DefaultContentClass();
+    }
+
+    public void storeItem( String path, InputStream is )
+        throws IOException
+    {
+        // TODO Auto-generated method stub
+        
+    }
+
+    public void deleteItem( String path )
+        throws IOException
+    {
+        // TODO Auto-generated method stub
+        
     }
 
 }

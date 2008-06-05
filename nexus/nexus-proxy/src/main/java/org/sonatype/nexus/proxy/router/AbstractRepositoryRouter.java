@@ -20,6 +20,11 @@
  */
 package org.sonatype.nexus.proxy.router;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -27,6 +32,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
+import org.codehaus.plexus.util.IOUtil;
 import org.sonatype.nexus.configuration.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
 import org.sonatype.nexus.proxy.AccessDeniedException;
@@ -39,6 +45,7 @@ import org.sonatype.nexus.proxy.RepositoryNotAvailableException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.item.DefaultStorageCollectionItem;
+import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
@@ -75,6 +82,9 @@ public abstract class AbstractRepositoryRouter
     /** Should links be resolved? */
     private boolean followLinks;
 
+    /** The place to store spoofing router stuff */
+    private File fileStore;
+
     public void initialize()
     {
         applicationConfiguration.addConfigurationChangeListener( this );
@@ -83,6 +93,8 @@ public abstract class AbstractRepositoryRouter
     public void onConfigurationChange( ConfigurationChangeEvent evt )
     {
         followLinks = applicationConfiguration.getConfiguration().getRouting().isFollowLinks();
+
+        fileStore = applicationConfiguration.getWorkingDirectory( "router-" + getId() );
     }
 
     protected ApplicationConfiguration getApplicationConfiguration()
@@ -108,6 +120,30 @@ public abstract class AbstractRepositoryRouter
         if ( getLogger().isDebugEnabled() )
         {
             getLogger().debug( "retrieveItem() " + request.getRequestPath() );
+        }
+
+        // try to give it from our own file store
+        File fileItem = getFileStoreFile( request.getRequestPath() );
+
+        if ( fileItem.exists() )
+        {
+            try
+            {
+                DefaultStorageFileItem result = new DefaultStorageFileItem( this, request.getRequestPath(), true, true, new FileInputStream(
+                    fileItem ) );
+                
+                result.setCreated( fileItem.lastModified() );
+                
+                result.setModified( fileItem.lastModified() );
+                
+                result.setLength( fileItem.length() );
+                
+                return result;
+            }
+            catch ( FileNotFoundException e )
+            {
+                throw new StorageException( "Cannot find the file?", e );
+            }
         }
 
         try
@@ -257,8 +293,54 @@ public abstract class AbstractRepositoryRouter
         doDeleteItem( request );
     }
 
+    public void storeItem( String path, InputStream is )
+        throws IOException
+    {
+        File dest = getFileStoreFile( path );
+
+        FileOutputStream fos = null;
+
+        try
+        {
+            dest.getParentFile().mkdirs();
+
+            fos = new FileOutputStream( dest );
+
+            IOUtil.copy( is, fos );
+        }
+        finally
+        {
+            if ( fos != null )
+            {
+                fos.flush();
+
+                fos.close();
+            }
+        }
+    }
+
+    public void deleteItem( String path )
+        throws IOException
+    {
+        File dest = getFileStoreFile( path );
+
+        dest.delete();
+    }
+
     // =====================================================================
     // Customization stuff No1
+
+    protected File getFileStoreFile( String path )
+    {
+        while ( path.startsWith( "/" ) )
+        {
+            path = path.substring( 1 );
+        }
+
+        File dest = new File( fileStore, path );
+
+        return dest;
+    }
 
     /**
      * Dereference link. We are trying to dereference it the "simplest" way. The subclasses will probably reimplement

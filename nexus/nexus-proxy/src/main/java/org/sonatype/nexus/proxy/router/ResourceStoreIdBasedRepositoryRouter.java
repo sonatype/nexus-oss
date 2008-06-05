@@ -147,9 +147,8 @@ public class ResourceStoreIdBasedRepositoryRouter
     /**
      * This is RouterRouter, hence we are returning a Router identified by ID as first elem im path.
      */
-    protected List<ResourceStore> resolveResourceStore( ResourceStoreRequest request )
-        throws NoSuchRepositoryException,
-            NoSuchRepositoryGroupException
+    public List<ResourceStore> resolveResourceStore( ResourceStoreRequest request )
+        throws NoSuchRepositoryGroupException
     {
         List<ResourceStore> result = null;
 

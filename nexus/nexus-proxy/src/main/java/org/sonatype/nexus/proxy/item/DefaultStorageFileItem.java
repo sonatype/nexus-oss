@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.proxy.router.RepositoryRouter;
 
 /**
  * The Class DefaultStorageFileItem.
@@ -91,6 +92,38 @@ public class DefaultStorageFileItem
         this.contentLocator = contentLocator;
     }
 
+    /**
+     * Instantiates a new default storage file item.
+     * 
+     * @param RepositoryRouter router
+     * @param path the path
+     * @param canRead the can read
+     * @param canWrite the can write
+     * @param inputStream the input stream
+     */
+    public DefaultStorageFileItem( RepositoryRouter router, String path, boolean canRead, boolean canWrite,
+        InputStream inputStream )
+    {
+        super( router, path, canRead, canWrite );
+        this.contentLocator = new PreparedContentLocator( inputStream );
+    }
+
+    /**
+     * Instantiates a new default storage file item.
+     * 
+     * @param RepositoryRouter router
+     * @param path the path
+     * @param canRead the can read
+     * @param canWrite the can write
+     * @param contentLocator the content locator
+     */
+    public DefaultStorageFileItem( RepositoryRouter router, String path, boolean canRead, boolean canWrite,
+        ContentLocator contentLocator )
+    {
+        super( router, path, canRead, canWrite );
+        this.contentLocator = contentLocator;
+    }
+
     /*
      * (non-Javadoc)
      * 
@@ -149,13 +182,20 @@ public class DefaultStorageFileItem
     public InputStream getInputStream()
         throws IOException
     {
-        if ( !isVirtual() )
+        if ( contentLocator != null )
         {
             return contentLocator.getContent();
         }
         else
         {
-            throw new UnsupportedOperationException( "This item is virtual, it does not have content!" );
+            if ( isVirtual() )
+            {
+                throw new UnsupportedOperationException( "This item is virtual, and does not have content!" );
+            }
+            else
+            {
+                return null;
+            }
         }
     }
 

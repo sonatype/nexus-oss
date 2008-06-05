@@ -51,6 +51,7 @@ import org.sonatype.nexus.index.packer.IndexPacker;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryGroupException;
+import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.events.AbstractEvent;
 import org.sonatype.nexus.proxy.events.RepositoryItemEvent;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventCache;
@@ -69,6 +70,9 @@ import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RepositoryType;
+import org.sonatype.nexus.proxy.router.DefaultGroupIdBasedRepositoryRouter;
+import org.sonatype.nexus.proxy.router.RepositoryRouter;
+import org.sonatype.nexus.proxy.router.ResourceStoreIdBasedRepositoryRouter;
 import org.sonatype.nexus.proxy.storage.local.fs.DefaultFSLocalRepositoryStorage;
 
 /**
@@ -115,6 +119,11 @@ public class DefaultIndexerManager
      * @plexus.requirement
      */
     private RepositoryRegistry repositoryRegistry;
+
+    /**
+     * @plexus.requirement role="org.sonatype.nexus.proxy.router.RootRepositoryRouter"
+     */
+    private ResourceStoreIdBasedRepositoryRouter rootRouter;
 
     private File workingDirectory;
 
@@ -577,7 +586,15 @@ public class DefaultIndexerManager
                 {
                     for ( File file : files )
                     {
-                        // store it to router HOW?
+                        fis = new FileInputStream( file );
+
+                        String filePath = DefaultGroupIdBasedRepositoryRouter.ID + "/" + repositoryGroupId + "/.index/"
+                            + file.getName();
+
+                        RepositoryRouter router = (RepositoryRouter) rootRouter.resolveResourceStore(
+                            new ResourceStoreRequest( filePath, true ) ).get( 0 );
+
+                        router.storeItem( repositoryGroupId + "/.index/" + file.getName(), fis );
                     }
                 }
             }

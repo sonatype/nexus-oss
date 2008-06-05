@@ -30,8 +30,6 @@ import org.codehaus.plexus.context.ContextException;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.sonatype.nexus.configuration.NexusConfiguration;
-import org.sonatype.nexus.index.DefaultIndexerManager;
-import org.sonatype.nexus.index.IndexerManager;
 
 public abstract class AbstractNexusTestCase
     extends PlexusTestCase

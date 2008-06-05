@@ -20,6 +20,9 @@
  */
 package org.sonatype.nexus.proxy.router;
 
+import java.io.IOException;
+import java.io.InputStream;
+
 import org.sonatype.nexus.configuration.ConfigurationChangeListener;
 import org.sonatype.nexus.proxy.ResourceStore;
 import org.sonatype.nexus.proxy.registry.ContentClass;
@@ -45,4 +48,22 @@ public interface RepositoryRouter
      * @return
      */
     ContentClass getHandledContentClass();
+
+    /**
+     * Storing an item in router is simply "spoofing" all repo items beneath that path.
+     * 
+     * @param path
+     * @param is
+     */
+    void storeItem( String path, InputStream is )
+        throws IOException;
+
+    /**
+     * Deletes an item from the router. See storeItem(path, is)
+     * 
+     * @param path
+     * @throws IOException
+     */
+    void deleteItem( String path )
+        throws IOException;
 }
