@@ -215,15 +215,6 @@ Sonatype.repoServer.RepoServer = function(){
       if(sp.checkPermission(userPerms.maintRepos, sp.READ) && !sp.checkPermission(userPerms.maintRepos, sp.EDIT)) {
         vTplData.links.push( {id:'open-repos-maint-readonly', title:'Browse Repositories'} );
       }
-      if(sp.checkPermission(userPerms.viewUpdatedArtifacts, sp.READ)){
-        vTplData.links.push( {id:'open-updated-artifacts', title:'Recently Updated Artifacts'} );
-      }
-      if(sp.checkPermission(userPerms.viewCachedArtifacts, sp.READ)){
-        vTplData.links.push( {id:'open-cached-artifacts', title:'Recently Cached Artifacts'} );
-      }
-      if(sp.checkPermission(userPerms.viewDeployedArtifacts, sp.READ)){
-        vTplData.links.push( {id:'open-deployed-artifacts', title:'Recently Deployed Artifacts'} );
-      }
       if(sp.checkPermission(userPerms.viewSystemChanges, sp.READ)){
         vTplData.links.push( {id:'open-system-changes', title:'System Changes'} );
       }
@@ -272,7 +263,20 @@ Sonatype.repoServer.RepoServer = function(){
         this.nexusPanel.add(panelConf);
         //groupConfigs.push(panelConf);
       }
-
+/*
+      //Security Group **************************************************
+      var sTplData = {links:[]};
+      if( sp.checkPermission( userPerms.configServer, sp.EDIT ) ) {
+        sTplData.links.push( { id: 'open-security-users', title: 'Users' } );
+      }
+      if ( sp.checkPermission( userPerms.configServer, sp.EDIT ) ) {
+        sTplData.links.push( { id: 'open-security-roles', title: 'Roles' } );
+      }
+      if ( sTplData.links.length > 0 ){
+        panelConf = Ext.apply( {}, { title:'Security', id: 'st-nexus-security', html: bodyTpl.apply( sTplData ) }, defaultGroupPanel );
+        this.nexusPanel.add( panelConf );
+      }
+*/
       if (wasRendered) {
         this.nexusPanel.doLayout();
         this.nexusPanel.getEl().unmask();
@@ -295,21 +299,9 @@ Sonatype.repoServer.RepoServer = function(){
         var id = 'st-nexus-checksum-search-panel';
         Sonatype.view.mainTabPanel.addOrShowTab(id, Sonatype.repoServer.ChecksumSearchPanel, {title: 'Checksum Search'});
       },
-      'open-updated-artifacts' : function(scope) {
-        var id = 'feed-view-recently_updated';
-        Sonatype.view.mainTabPanel.addOrShowTab(id, Sonatype.repoServer.FeedViewPanel, {title: 'Updated Artifacts', feedUrl: cfg.urls.recentlyChangedArtifactsRss});
-      },
-      'open-cached-artifacts' : function(scope) {
-        var id = 'feed-view-recently_cached';
-        Sonatype.view.mainTabPanel.addOrShowTab(id, Sonatype.repoServer.FeedViewPanel, {title: 'Cached Artifacts', feedUrl: cfg.urls.recentlyCachedArtifactsRss});
-      },
-      'open-deployed-artifacts' : function(scope) {
-        var id = 'feed-view-recently_deployed';
-        Sonatype.view.mainTabPanel.addOrShowTab(id, Sonatype.repoServer.FeedViewPanel, {title: 'Deployed Artifacts', feedUrl: cfg.urls.recentlyDeployedArtifactsRss});
-      },
       'open-system-changes' : function(scope) {
         var id = 'feed-view-system_changes';
-        Sonatype.view.mainTabPanel.addOrShowTab(id, Sonatype.repoServer.FeedViewPanel, {title: 'System Changes', feedUrl: cfg.urls.systemChangesRss});
+        Sonatype.view.mainTabPanel.addOrShowTab(id, Sonatype.repoServer.FeedViewPanel, {title: 'System Changes'});
       },      
       'open-view-config' : function(scope) {
         var id = 'view-config';
@@ -346,6 +338,16 @@ Sonatype.repoServer.RepoServer = function(){
       'open-config-schedules' : function(scope){
         var id = 'schedules-config';
         Sonatype.view.mainTabPanel.addOrShowTab(id, Sonatype.repoServer.SchedulesEditPanel, {title: 'Scheduled Services'});
+/*
+      },
+      'open-security-users' : function(scope){
+        var id = 'security-users';
+        Sonatype.view.mainTabPanel.addOrShowTab(id, Sonatype.repoServer.UserEditPanel, {title: 'Users'});
+      },
+      'open-security-roles' : function(scope){
+        var id = 'security-roles';
+        Sonatype.view.mainTabPanel.addOrShowTab(id, Sonatype.repoServer.RoleEditPanel, {title: 'Roles'});
+*/
       }
     },
     
