@@ -209,6 +209,8 @@ public abstract class AbstractRepoNexusIndexerTest
 
         FlatSearchResponse resp1 = nexusIndexer.searchFlat( req );
 
+        assertEquals( 12, resp1.getTotalHits() );
+
         Collection<ArtifactInfo> p1 = resp1.getResults();
 
         assertEquals( pageSize, p1.size() );
@@ -217,6 +219,8 @@ public abstract class AbstractRepoNexusIndexerTest
 
         FlatSearchResponse resp2 = nexusIndexer.searchFlat( req );
 
+        assertEquals( 12, resp2.getTotalHits() );
+
         Collection<ArtifactInfo> p2 = resp2.getResults();
 
         assertEquals( pageSize, p2.size() );
@@ -224,6 +228,8 @@ public abstract class AbstractRepoNexusIndexerTest
         req.setStart( req.getStart() + pageSize );
 
         FlatSearchResponse resp3 = nexusIndexer.searchFlat( req );
+
+        assertEquals( 12, resp3.getTotalHits() );
 
         Collection<ArtifactInfo> p3 = resp3.getResults();
 
