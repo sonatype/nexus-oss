@@ -1416,10 +1416,10 @@
 					<required>true</required>
 				</field>
 				<field>
-				    <name>required</name>
-                    <version>1.0.0+</version>
-                    <type>boolean</type>
-                    <required>true</required>
+					<name>required</name>
+					<version>1.0.0+</version>
+					<type>boolean</type>
+					<required>true</required>
 				</field>
 			</fields>
 		</class>
@@ -1577,6 +1577,18 @@
 			<fields>
 				<field>
 					<name>totalCount</name>
+					<version>1.0.0+</version>
+					<type>int</type>
+					<required>true</required>
+				</field>
+				<field>
+					<name>from</name>
+					<version>1.0.0+</version>
+					<type>int</type>
+					<required>true</required>
+				</field>
+				<field>
+					<name>count</name>
 					<version>1.0.0+</version>
 					<type>int</type>
 					<required>true</required>

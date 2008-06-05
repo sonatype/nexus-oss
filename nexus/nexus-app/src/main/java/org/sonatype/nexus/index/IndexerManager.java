@@ -101,10 +101,10 @@ public interface IndexerManager
     // Combined searching
     // ----------------------------------------------------------------------------
 
-    Collection<ArtifactInfo> searchArtifactFlat( String term, String repositoryId, String groupId, Integer from,
+    FlatSearchResponse searchArtifactFlat( String term, String repositoryId, String groupId, Integer from,
         Integer count );
 
-    Collection<ArtifactInfo> searchArtifactFlat( String gTerm, String aTerm, String vTerm, String cTerm,
+    FlatSearchResponse searchArtifactFlat( String gTerm, String aTerm, String vTerm, String cTerm,
         String repositoryId, String groupId, Integer from, Integer count );
 
     // ----------------------------------------------------------------------------

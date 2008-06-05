@@ -31,6 +31,7 @@ import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.restlet.resource.Representation;
 import org.restlet.resource.Variant;
+import org.sonatype.nexus.index.FlatSearchResponse;
 import org.sonatype.nexus.rest.model.NexusArtifact;
 import org.sonatype.nexus.rest.model.SearchResponse;
 import org.sonatype.nexus.rest.restore.AbstractRestoreResourceHandler;
@@ -95,20 +96,18 @@ public class IndexResourceHandler
             }
         }
 
+        FlatSearchResponse searchResult = null;
+
         Collection<NexusArtifact> ais = null;
 
         if ( query != null )
         {
-            ais = ai2NaColl( getNexus().searchArtifactFlat(
-                query,
-                getRepositoryId(),
-                getRepositoryGroupId(),
-                from,
-                count ) );
+            searchResult = getNexus()
+                .searchArtifactFlat( query, getRepositoryId(), getRepositoryGroupId(), from, count );
         }
         else if ( g != null || a != null || v != null || c != null )
         {
-            ais = ai2NaColl( getNexus().searchArtifactFlat(
+            searchResult = getNexus().searchArtifactFlat(
                 g,
                 a,
                 v,
@@ -116,7 +115,7 @@ public class IndexResourceHandler
                 getRepositoryId(),
                 getRepositoryGroupId(),
                 from,
-                count ) );
+                count );
         }
         else
         {
@@ -125,9 +124,15 @@ public class IndexResourceHandler
             return null;
         }
 
+        ais = ai2NaColl( searchResult.getResults() );
+
         SearchResponse result = new SearchResponse();
 
-        result.setTotalCount( ais.size() );
+        result.setTotalCount( searchResult.getTotalHits() );
+
+        result.setFrom( from == null ? -1 : from.intValue() );
+
+        result.setCount( count == null ? -1 : count.intValue() );
 
         result.setData( new ArrayList<NexusArtifact>( ais ) );
 

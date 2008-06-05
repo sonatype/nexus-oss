@@ -706,7 +706,7 @@ public class DefaultIndexerManager
     // Combined searching
     // ----------------------------------------------------------------------------
 
-    public Collection<ArtifactInfo> searchArtifactFlat( String term, String repositoryId, String groupId, Integer from,
+    public FlatSearchResponse searchArtifactFlat( String term, String repositoryId, String groupId, Integer from,
         Integer count )
     {
         IndexingContext context = null;
@@ -721,10 +721,10 @@ public class DefaultIndexerManager
             context = nexusIndexer.getIndexingContexts().get( getLocalContextId( repositoryId ) );
         }
 
+        FlatSearchRequest req = null;
+
         try
         {
-            Collection<ArtifactInfo> infos;
-
             Query q1 = nexusIndexer.constructQuery( ArtifactInfo.GROUP_ID, term );
 
             Query q2 = nexusIndexer.constructQuery( ArtifactInfo.ARTIFACT_ID, term );
@@ -734,8 +734,6 @@ public class DefaultIndexerManager
             bq.add( q1, BooleanClause.Occur.SHOULD );
 
             bq.add( q2, BooleanClause.Occur.SHOULD );
-
-            FlatSearchRequest req = null;
 
             if ( context == null )
             {
@@ -756,11 +754,11 @@ public class DefaultIndexerManager
                 req.setAiCount( count );
             }
 
-            infos = nexusIndexer.searchFlat( req );
+            FlatSearchResponse result = nexusIndexer.searchFlat( req );
 
-            postprocessResults( infos );
+            postprocessResults( result.getResults() );
 
-            return infos;
+            return result;
         }
         catch ( IndexContextInInconsistentStateException e )
         {
@@ -770,17 +768,18 @@ public class DefaultIndexerManager
         {
             getLogger().error( "Got I/O exception while searching for query \"" + term + "\"", e );
         }
-        return Collections.emptyList();
+
+        return new FlatSearchResponse( req.getQuery(), 0, Collections.EMPTY_SET );
     }
 
-    public Collection<ArtifactInfo> searchArtifactFlat( String gTerm, String aTerm, String vTerm, String cTerm,
+    public FlatSearchResponse searchArtifactFlat( String gTerm, String aTerm, String vTerm, String cTerm,
         String repositoryId, String groupId, Integer from, Integer count )
     {
         IndexingContext context = null;
 
         if ( gTerm == null && aTerm == null && vTerm == null )
         {
-            return Collections.emptyList();
+            return new FlatSearchResponse( null, 0, Collections.EMPTY_SET );
         }
 
         if ( groupId != null )
@@ -795,10 +794,10 @@ public class DefaultIndexerManager
 
         BooleanQuery bq = null;
 
+        FlatSearchRequest req = null;
+
         try
         {
-            Collection<ArtifactInfo> infos;
-
             bq = new BooleanQuery();
 
             if ( gTerm != null )
@@ -821,8 +820,6 @@ public class DefaultIndexerManager
                 // classifiers are sadly not indexed
             }
 
-            FlatSearchRequest req = null;
-
             if ( context == null )
             {
                 req = new FlatSearchRequest( bq, ArtifactInfo.REPOSITORY_VERSION_COMPARATOR );
@@ -842,11 +839,11 @@ public class DefaultIndexerManager
                 req.setAiCount( count );
             }
 
-            infos = nexusIndexer.searchFlat( req );
+            FlatSearchResponse result = nexusIndexer.searchFlat( req );
 
-            postprocessResults( infos );
+            postprocessResults( result.getResults() );
 
-            return infos;
+            return result;
         }
         catch ( IndexContextInInconsistentStateException e )
         {
@@ -859,7 +856,7 @@ public class DefaultIndexerManager
             getLogger().error( "Got I/O exception while searching for query \"" + bq.toString() + "\"", e );
         }
 
-        return Collections.emptyList();
+        return new FlatSearchResponse( req.getQuery(), 0, Collections.EMPTY_SET );
     }
 
     protected void postprocessResults( Collection<ArtifactInfo> res )

@@ -55,6 +55,7 @@ import org.sonatype.nexus.configuration.model.CRouting;
 import org.sonatype.nexus.feeds.FeedRecorder;
 import org.sonatype.nexus.feeds.NexusArtifactEvent;
 import org.sonatype.nexus.index.ArtifactInfo;
+import org.sonatype.nexus.index.FlatSearchResponse;
 import org.sonatype.nexus.index.IndexerManager;
 import org.sonatype.nexus.index.context.IndexContextInInconsistentStateException;
 import org.sonatype.nexus.proxy.AccessDeniedException;
@@ -944,13 +945,13 @@ public class DefaultNexus
         }
     }
 
-    public Collection<ArtifactInfo> searchArtifactFlat( String term, String repositoryId, String groupId, Integer from,
+    public FlatSearchResponse searchArtifactFlat( String term, String repositoryId, String groupId, Integer from,
         Integer count )
     {
         return indexerManager.searchArtifactFlat( term, repositoryId, groupId, from, count );
     }
 
-    public Collection<ArtifactInfo> searchArtifactFlat( String gTerm, String aTerm, String vTerm, String cTerm,
+    public FlatSearchResponse searchArtifactFlat( String gTerm, String aTerm, String vTerm, String cTerm,
         String repositoryId, String groupId, Integer from, Integer count )
     {
         return indexerManager.searchArtifactFlat( gTerm, aTerm, vTerm, cTerm, repositoryId, groupId, from, count );

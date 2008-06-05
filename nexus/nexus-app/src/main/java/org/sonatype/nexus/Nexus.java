@@ -36,6 +36,7 @@ import org.sonatype.nexus.configuration.model.CRepositoryShadow;
 import org.sonatype.nexus.configuration.model.CRouting;
 import org.sonatype.nexus.feeds.FeedRecorder;
 import org.sonatype.nexus.index.ArtifactInfo;
+import org.sonatype.nexus.index.FlatSearchResponse;
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
@@ -221,10 +222,9 @@ public interface Nexus
     // Combined searching
     // ----------------------------------------------------------------------------
 
-    Collection<ArtifactInfo> searchArtifactFlat( String term, String repositoryId, String groupId, Integer from,
-        Integer count );
+    FlatSearchResponse searchArtifactFlat( String term, String repositoryId, String groupId, Integer from, Integer count );
 
-    Collection<ArtifactInfo> searchArtifactFlat( String gTerm, String aTerm, String vTerm, String cTerm,
-        String repositoryId, String groupId, Integer from, Integer count );
+    FlatSearchResponse searchArtifactFlat( String gTerm, String aTerm, String vTerm, String cTerm, String repositoryId,
+        String groupId, Integer from, Integer count );
 
 }
