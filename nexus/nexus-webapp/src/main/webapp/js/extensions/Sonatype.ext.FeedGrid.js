@@ -16,7 +16,7 @@ Sonatype.ext.FeedGrid = function(config) {
             ['title', 'author', {name:'pubDate', type:'date', dateFormat:'D, d M Y H:i:s T'}, 'link', 'description', 'content']
         ),
         sortInfo: {field: 'pubDate', direction: 'DESC'},
-        autoLoad: true
+        autoLoad: false
     });
 
     this.columns = [{
@@ -36,6 +36,7 @@ Sonatype.ext.FeedGrid = function(config) {
     }];
 
     Sonatype.ext.FeedGrid.superclass.constructor.call(this, {
+        title: 'Select a feed from the list',
         region: 'center',
         id: 'topic-grid',
         loadMask: {msg:'Loading Feed...'},
@@ -50,21 +51,14 @@ Sonatype.ext.FeedGrid = function(config) {
             getRowClass : this.applyRowClass,
             emptyText: 'No artifacts match this query'
         },
-        tbar: [
+        tools: [
           {
-            text: "Refresh",
-            icon: Sonatype.config.resourcePath + '/images/icons/arrow_refresh.png',
-            cls: 'x-btn-text-icon',
-            tooltip: {text:'Reloads the artifact feed'},
-            handler: this.reloadFeed,
-            scope: this
-          },
-          {
-            text: "Subscribe",
-            icon: Sonatype.config.resourcePath + '/images/icons/feed.png',
-            cls: 'x-btn-text-icon',
-            tooltip: {text:'Subscribe to this feed'},
-            handler: this.subscribeFeed,
+            id: 'refresh',
+            handler: function( e, toolEl, panel ) {
+              if ( this.feedUrl ) {
+                this.store.reload();
+              }
+            },
             scope: this
           }
         ]
@@ -74,12 +68,21 @@ Sonatype.ext.FeedGrid = function(config) {
 };
 
 Ext.extend(Sonatype.ext.FeedGrid, Ext.grid.GridPanel, {
-    reloadFeed : function(){
-      this.store.reload();
+
+    setFeed: function( name, url ) {
+      this.setTitle( name );
+      this.feedUrl = url;
+      this.store.proxy = new Ext.data.HttpProxy({
+        url: this.feedUrl,
+        headers: {'accept' : 'text/xml'}
+      });
+      this.reloadFeed();
     },
-    
-    subscribeFeed : function(){
-      window.open(this.feedUrl);
+
+    reloadFeed : function(){
+      if ( this.feedUrl ) {
+        this.store.reload();
+      }
     },
  
     togglePreview : function(show){

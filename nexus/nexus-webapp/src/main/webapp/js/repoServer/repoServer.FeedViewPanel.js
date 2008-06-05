@@ -34,6 +34,89 @@ Sonatype.repoServer.FeedViewPanel = function(config){
     title : 'Feed Viewer'
   };
   Ext.apply(this, config, defaultConfig);
+
+  this.feedRecordConstructor = Ext.data.Record.create([
+    {name:'resourceURI'},
+    {name:'name', sortType:Ext.data.SortTypes.asUCString}
+  ]);
+
+  this.feedReader = new Ext.data.JsonReader(
+    { root: 'data', id: 'resourceURI'},
+    this.feedRecordConstructor
+  );
+
+  this.feedsDataStore = new Ext.data.Store({
+    url: Sonatype.config.repos.urls.feeds,
+    reader: this.feedReader,
+    sortInfo: { field: 'name', direction: 'ASC' },
+    autoLoad: true
+  });
+
+  this.feedsGridPanel = new Ext.grid.GridPanel({
+    id: 'st-feeds-grid',
+    region: 'north',
+    layout:'fit',
+    collapsible: true,
+    split:true,
+    height: 160,
+    minHeight: 120,
+    maxHeight: 400,
+    frame: false,
+    autoScroll: true,
+    selModel: new Ext.grid.RowSelectionModel({
+      singleSelect: true
+    }),
+
+    tbar: [
+      {
+        text: 'Refresh',
+        icon: Sonatype.config.resourcePath + '/images/icons/arrow_refresh.png',
+        cls: 'x-btn-text-icon',
+        scope: this,
+        handler: function() {
+          this.feedsDataStore.reload();
+        }
+      },
+      {
+        text: 'Subscribe',
+        icon: Sonatype.config.resourcePath + '/images/icons/feed.png',
+        cls: 'x-btn-text-icon',
+        scope: this,
+        handler: function() {
+          if ( this.feedsGridPanel.getSelectionModel().hasSelection() ) {
+            var rec = this.feedsGridPanel.getSelectionModel().getSelected();
+            window.open( rec.get( 'resourceURI' ) );
+          }
+        }
+      }
+    ],
+
+    //grid view options
+    ds: this.feedsDataStore,
+    sortInfo: { field: 'name', direction: "ASC" },
+    loadMask: true,
+    deferredRender: false,
+    columns: [
+      { header: 'Feed', dataIndex: 'name', width: 300 },
+      { header: 'URL', dataIndex: 'resourceURI', width: 300, id: 'feeds-url-col',
+        renderer: function( s ) {
+          return '<a href="' + s + '">' + s + '</a>';
+        },
+        menuDisabled:true }
+    ],
+    autoExpandColumn: 'feeds-url-col',
+    disableSelection: false,
+    listeners: {
+      'rowclick': {
+        fn: function( grid, rowIndex, e ) {
+          var rec = grid.store.getAt( rowIndex );
+
+          this.grid.setFeed( rec.get( 'name' ), rec.get( 'resourceURI' ) );
+        },
+        scope: this
+      }
+    }
+  });
   
   var tmplTxt = [
     '<div class="post-data">',
@@ -81,9 +164,7 @@ Sonatype.repoServer.FeedViewPanel = function(config){
 //    listeners: this.LinkInterceptor
 //});
 
-  this.grid = new Sonatype.ext.FeedGrid({
-    feedUrl : this.feedUrl
-  });
+  this.grid = new Sonatype.ext.FeedGrid({});
 
   Sonatype.repoServer.FeedViewPanel.superclass.constructor.call(this, {
     //id:'feed-view-' + this.title,
@@ -91,6 +172,7 @@ Sonatype.repoServer.FeedViewPanel = function(config){
     title: this.title,
     hideMode:'offsets',
     items:[
+        this.feedsGridPanel,
         this.grid 
 //      ,this.preview
     ]
