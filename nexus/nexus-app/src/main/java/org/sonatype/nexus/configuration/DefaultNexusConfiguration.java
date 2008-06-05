@@ -168,8 +168,6 @@ public class DefaultNexusConfiguration
             // and register things
             runtimeConfigurationBuilder.initialize( this );
 
-            createRepositories();
-
             notifyConfigurationChangeListeners();
         }
     }
@@ -335,81 +333,16 @@ public class DefaultNexusConfiguration
         return runtimeConfigurationBuilder.getAccessManagerForRealm( getConfiguration(), realmId );
     }
 
-    // ----------------------------------------------------------------------------------------------------------
-    //
-    // ----------------------------------------------------------------------------------------------------------
-
-    protected void removeRepositories()
+    public Repository createRepositoryFromModel( Configuration configuration, CRepository repository )
+        throws InvalidConfigurationException
     {
-        try
-        {
-            // get all IDs
-            List<String> repoIds = repositoryRegistry.getRepositoryIds();
-
-            for ( String repoId : repoIds )
-            {
-                repositoryRegistry.removeRepository( repoId );
-            }
-        }
-        catch ( NoSuchRepositoryException e )
-        {
-            // will not happen
-        }
+        return runtimeConfigurationBuilder.createRepositoryFromModel( configuration, repository );
     }
 
-    @SuppressWarnings( "unchecked" )
-    protected void createRepositories()
-        throws ConfigurationException,
-            IOException
+    public Repository createRepositoryFromModel( Configuration configuration, CRepositoryShadow repositoryShadow )
+        throws InvalidConfigurationException
     {
-        removeRepositories();
-
-        List<CRepository> reposes = getConfiguration().getRepositories();
-
-        for ( CRepository repo : reposes )
-        {
-            Repository repository = runtimeConfigurationBuilder.createRepositoryFromModel( getConfiguration(), repo );
-
-            repositoryRegistry.addRepository( repository );
-        }
-
-        if ( getConfiguration().getRepositoryShadows() != null )
-        {
-            List<CRepositoryShadow> shadows = getConfiguration().getRepositoryShadows();
-            for ( CRepositoryShadow shadow : shadows )
-            {
-                Repository repository = runtimeConfigurationBuilder.createRepositoryFromModel(
-                    getConfiguration(),
-                    shadow );
-                repositoryRegistry.addRepository( repository );
-            }
-        }
-
-        if ( getConfiguration().getRepositoryGrouping() != null
-            && getConfiguration().getRepositoryGrouping().getRepositoryGroups() != null )
-        {
-            List<CRepositoryGroup> groups = getConfiguration().getRepositoryGrouping().getRepositoryGroups();
-
-            for ( CRepositoryGroup group : groups )
-            {
-                if ( group.getName() == null )
-                {
-                    group.setName( group.getGroupId() );
-                }
-                try
-                {
-                    repositoryRegistry.addRepositoryGroup( group.getGroupId(), group.getRepositories() );
-                }
-                catch ( NoSuchRepositoryException e )
-                {
-                    throw new ConfigurationException( "Cannot register repository groups!", e );
-                }
-                catch ( InvalidGroupingException e )
-                {
-                    throw new ConfigurationException( "Configuration contains invalid grouping!", e );
-                }
-            }
-        }
+        return runtimeConfigurationBuilder.createRepositoryFromModel( configuration, repositoryShadow );
     }
 
     // ------------------------------------------------------------------

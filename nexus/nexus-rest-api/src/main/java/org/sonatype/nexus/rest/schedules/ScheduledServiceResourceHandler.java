@@ -100,7 +100,23 @@ public class ScheduledServiceResourceHandler
 
                 if ( OnceSchedule.class.isAssignableFrom( scheduledTask.getSchedule().getClass() ) )
                 {
+                    OnceSchedule taskSchedule = (OnceSchedule) scheduledTask.getSchedule();
+
                     ScheduledServiceOnceResource res = new ScheduledServiceOnceResource();
+
+                    res.setId( task.getId() );
+
+                    res.setName( task.getId() );
+
+                    res.setServiceType( getServiceTypeName( task.getType() ) );
+
+                    res.setServiceSchedule( getScheduleShortName( taskSchedule ) );
+
+                    res.setServiceProperties( null );
+
+                    res.setStartDate( formatDate( taskSchedule.getStartDate() ) );
+
+                    res.setStartTime( formatTime( taskSchedule.getStartDate() ) );
 
                     response.setData( res );
                 }

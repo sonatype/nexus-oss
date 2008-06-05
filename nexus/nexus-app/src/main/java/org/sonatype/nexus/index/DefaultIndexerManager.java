@@ -26,13 +26,10 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
@@ -93,9 +90,6 @@ public class DefaultIndexerManager
 
     /** Context id merged suffix */
     public static final String CTX_MERGED_SUFIX = "-merged";
-
-    /** Treshold for result set TODO: implement this in nexus indexer! */
-    private static final int RESULT_LIMIT = 100;
 
     /**
      * @plexus.requirement role="org.sonatype.nexus.index.ArtifactContextProducer"
@@ -161,22 +155,154 @@ public class DefaultIndexerManager
      * Used to close all indexing context explicitly.
      */
     public void shutdown( boolean deleteFiles )
+        throws IOException
     {
+        getLogger().info( "Shutting down Nexus IndexerManager" );
+
         for ( IndexingContext ctx : nexusIndexer.getIndexingContexts().values() )
         {
+            ctx.close( deleteFiles );
+        }
+    }
+
+    // ----------------------------------------------------------------------------
+    // Context management et al
+    // ----------------------------------------------------------------------------
+
+    public void addRepositoryIndexContext( String repositoryId )
+        throws IOException,
+            NoSuchRepositoryException
+    {
+        Repository repository = repositoryRegistry.getRepository( repositoryId );
+
+        String remoteRoot = null;
+
+        if ( repository.getRemoteUrl() != null )
+        {
+            remoteRoot = repository.getRemoteUrl();
+        }
+
+        // add context for repository
+        File repoRoot = null;
+        if ( repository.getLocalUrl() != null
+            && repository.getLocalStorage() instanceof DefaultFSLocalRepositoryStorage )
+        {
+            URL url = new URL( repository.getLocalUrl() );
             try
             {
-                ctx.close( deleteFiles );
+                repoRoot = new File( url.toURI() );
             }
-            catch ( IOException e )
+            catch ( URISyntaxException e )
             {
-                getLogger().warn( "Could not close indexing context " + ctx.getId(), e );
+                repoRoot = new File( url.getPath() );
+            }
+        }
+
+        IndexingContext ctxLocal = nexusIndexer.addIndexingContextForced(
+            getLocalContextId( repository.getId() ),
+            repository.getId(),
+            repoRoot,
+            new File( getWorkingDirectory(), getLocalContextId( repository.getId() ) ),
+            remoteRoot,
+            null,
+            NexusIndexer.FULL_INDEX );
+
+        ctxLocal.setSearchable( repository.isIndexable() );
+
+        if ( ctxLocal.getTimestamp() == null )
+        {
+            // it is probably new or first start
+            ctxLocal.updateTimestamp();
+        }
+
+        if ( RepositoryType.PROXY.equals( repository.getRepositoryType() ) )
+        {
+            IndexingContext ctxRemote = nexusIndexer.addIndexingContextForced(
+                getRemoteContextId( repository.getId() ),
+                repository.getId(),
+                repoRoot,
+                new File( getWorkingDirectory(), getRemoteContextId( repository.getId() ) ),
+                remoteRoot,
+                remoteRoot,
+                NexusIndexer.FULL_INDEX );
+
+            ctxRemote.setSearchable( repository.isIndexable() );
+
+            if ( ctxRemote.getTimestamp() == null )
+            {
+                // it is probably new or first start
+                ctxRemote.updateTimestamp();
             }
         }
     }
 
-    // =============
-    // Index publishing
+    public void removeRepositoryIndexContext( String repositoryId, boolean deleteFiles )
+        throws IOException,
+            NoSuchRepositoryException
+    {
+        Repository repository = repositoryRegistry.getRepository( repositoryId );
+
+        // remove context for repository
+        nexusIndexer.removeIndexingContext( nexusIndexer.getIndexingContexts().get(
+            getLocalContextId( repository.getId() ) ), deleteFiles );
+
+        if ( nexusIndexer.getIndexingContexts().containsKey( getRemoteContextId( repository.getId() ) ) )
+        {
+            nexusIndexer.removeIndexingContext( nexusIndexer.getIndexingContexts().get(
+                getRemoteContextId( repository.getId() ) ), deleteFiles );
+        }
+    }
+
+    public void addRepositoryGroupIndexContext( String repositoryGroupId )
+        throws IOException,
+            NoSuchRepositoryGroupException
+    {
+        IndexingContext ctxMerged = nexusIndexer.addIndexingContextForced(
+            getMergedContextId( repositoryGroupId ),
+            repositoryGroupId,
+            null,
+            new File( getWorkingDirectory(), getMergedContextId( repositoryGroupId ) ),
+            null,
+            null,
+            NexusIndexer.FULL_INDEX );
+
+        // the merged context is not adding any value, so it does not takes part in searches
+        // it gets only published
+
+        ctxMerged.setSearchable( false );
+
+        if ( ctxMerged.getTimestamp() == null )
+        {
+            // it is probably new or first start
+            ctxMerged.updateTimestamp();
+        }
+    }
+
+    public void removeRepositoryGroupIndexContext( String repositoryGroupId, boolean deleteFiles )
+        throws IOException,
+            NoSuchRepositoryGroupException
+    {
+        // remove context for repository
+        if ( nexusIndexer.getIndexingContexts().containsKey( getMergedContextId( repositoryGroupId ) ) )
+        {
+            nexusIndexer.removeIndexingContext( nexusIndexer.getIndexingContexts().get(
+                getMergedContextId( repositoryGroupId ) ), deleteFiles );
+        }
+    }
+
+    public void setRepositoryIndexContextSearchable( String repositoryId, boolean searchable )
+    {
+        nexusIndexer.getIndexingContexts().get( getLocalContextId( repositoryId ) ).setSearchable( searchable );
+
+        if ( nexusIndexer.getIndexingContexts().containsKey( getRemoteContextId( repositoryId ) ) )
+        {
+            nexusIndexer.getIndexingContexts().get( getRemoteContextId( repositoryId ) ).setSearchable( searchable );
+        }
+    }
+
+    // ----------------------------------------------------------------------------
+    // Publishing index
+    // ----------------------------------------------------------------------------
 
     public void publishAllIndex()
         throws IOException
@@ -186,6 +312,20 @@ public class DefaultIndexerManager
         for ( Repository repository : reposes )
         {
             publishRepositoryIndex( repository );
+        }
+
+        List<String> groupIds = repositoryRegistry.getRepositoryGroupIds();
+
+        for ( String groupId : groupIds )
+        {
+            try
+            {
+                publishRepositoryGroupIndex( groupId, repositoryRegistry.getRepositoryGroup( groupId ) );
+            }
+            catch ( NoSuchRepositoryGroupException e )
+            {
+                // will not be thrown
+            }
         }
     }
 
@@ -206,6 +346,8 @@ public class DefaultIndexerManager
         {
             publishRepositoryIndex( repository );
         }
+
+        publishRepositoryGroupIndex( repositoryGroupId, group );
     }
 
     protected void publishRepositoryIndex( Repository repository )
@@ -376,8 +518,86 @@ public class DefaultIndexerManager
         }
     }
 
-    // =============
-    // Search and indexing related
+    protected void publishRepositoryGroupIndex( String repositoryGroupId, List<Repository> repositories )
+        throws IOException,
+            NoSuchRepositoryGroupException
+    {
+        getLogger().info( "Merging index for repository group " + repositoryGroupId );
+
+        IndexingContext context = nexusIndexer.getIndexingContexts().get( getMergedContextId( repositoryGroupId ) );
+
+        context.purge();
+
+        IndexingContext bestContext = null;
+
+        for ( Repository repo : repositories )
+        {
+            // only merge non-shadows and indexable reposes
+            if ( !RepositoryType.SHADOW.equals( repo.getRepositoryType() ) && repo.isIndexable() )
+            {
+                // local idx has every repo
+                bestContext = nexusIndexer.getIndexingContexts().get( getLocalContextId( repo.getId() ) );
+
+                if ( nexusIndexer.getIndexingContexts().containsKey( getRemoteContextId( repo.getId() ) ) )
+                {
+                    // if remote is here and is downloaded, it is the best
+                    if ( bestContext.getIndexReader().numDocs() < nexusIndexer.getIndexingContexts().get(
+                        getRemoteContextId( repo.getId() ) ).getIndexReader().numDocs() )
+                    {
+                        bestContext = nexusIndexer.getIndexingContexts().get( getRemoteContextId( repo.getId() ) );
+                    }
+                }
+
+                if ( bestContext != null )
+                {
+                    context.merge( bestContext.getIndexDirectory() );
+                }
+            }
+        }
+
+        context.updateTimestamp();
+
+        getLogger().info( "Publishing merged index for repository group " + repositoryGroupId );
+
+        File targetDir = null;
+
+        try
+        {
+            targetDir = new File( getTempDirectory(), "nx-index" + System.currentTimeMillis() );
+
+            if ( targetDir.mkdirs() )
+            {
+                indexPacker.packIndex( context, targetDir );
+
+                FileInputStream fis = null;
+
+                File[] files = targetDir.listFiles();
+
+                if ( files != null )
+                {
+                    for ( File file : files )
+                    {
+                        // store it to router HOW?
+                    }
+                }
+            }
+            else
+            {
+                getLogger().error( "Could not create temp dir for packing indexes: " + targetDir );
+            }
+        }
+        finally
+        {
+            if ( targetDir != null )
+            {
+                FileUtils.deleteDirectory( targetDir );
+            }
+        }
+    }
+
+    // ----------------------------------------------------------------------------
+    // Reindexing related
+    // ----------------------------------------------------------------------------
 
     public void reindexAllRepositories()
         throws IOException
@@ -388,6 +608,8 @@ public class DefaultIndexerManager
         {
             reindexRepository( repository );
         }
+
+        publishAllIndex();
     }
 
     public void reindexRepository( String repositoryId )
@@ -397,6 +619,8 @@ public class DefaultIndexerManager
         Repository repository = repositoryRegistry.getRepository( repositoryId );
 
         reindexRepository( repository );
+
+        publishRepositoryIndex( repositoryId );
     }
 
     public void reindexRepositoryGroup( String repositoryGroupId )
@@ -409,6 +633,8 @@ public class DefaultIndexerManager
         {
             reindexRepository( repository );
         }
+
+        publishRepositoryGroupIndex( repositoryGroupId );
     }
 
     protected void reindexRepository( Repository repository )
@@ -416,21 +642,41 @@ public class DefaultIndexerManager
     {
         boolean repositoryIndexable = repository.isIndexable();
 
+        IndexingContext tmpContext = null;
+
         try
         {
             repository.setIndexable( false );
 
             IndexingContext context = nexusIndexer.getIndexingContexts().get( getLocalContextId( repository.getId() ) );
 
-            nexusIndexer.scan( context );
+            tmpContext = nexusIndexer.addIndexingContextForced(
+                context.getId() + "-tmp",
+                context.getRepositoryId(),
+                context.getRepository(),
+                new RAMDirectory(),
+                context.getRepositoryUrl(),
+                context.getIndexUpdateUrl(),
+                context.getIndexCreators() );
 
-            publishRepositoryIndex( repository );
+            nexusIndexer.scan( tmpContext );
+
+            context.replace( tmpContext.getIndexDirectory() );
         }
         finally
         {
             repository.setIndexable( repositoryIndexable );
+
+            if ( tmpContext != null )
+            {
+                nexusIndexer.removeIndexingContext( tmpContext, true );
+            }
         }
     }
+
+    // ----------------------------------------------------------------------------
+    // Identify
+    // ----------------------------------------------------------------------------
 
     public ArtifactInfo identifyArtifact( String type, String checksum )
         throws IOException,
@@ -440,132 +686,11 @@ public class DefaultIndexerManager
     }
 
     // ----------------------------------------------------------------------------
-    // Searching
-    // ----------------------------------------------------------------------------
-
-    public Collection<ArtifactInfo> searchFlat( Query query )
-        throws IOException,
-            IndexContextInInconsistentStateException
-    {
-        return limitResults( nexusIndexer.searchFlat( query ), RESULT_LIMIT );
-    }
-
-    public Collection<ArtifactInfo> searchFlat( Query query, IndexingContext context )
-        throws IOException,
-            IndexContextInInconsistentStateException
-    {
-        return limitResults( nexusIndexer.searchFlat( query, context ), RESULT_LIMIT );
-    }
-
-    public Collection<ArtifactInfo> searchFlat( Comparator<ArtifactInfo> artifactInfoComparator, Query query )
-        throws IOException,
-            IndexContextInInconsistentStateException
-    {
-        return limitResults( nexusIndexer.searchFlat( artifactInfoComparator, query ), RESULT_LIMIT );
-    }
-
-    public Collection<ArtifactInfo> searchFlat( Comparator<ArtifactInfo> artifactInfoComparator, Query query,
-        IndexingContext context )
-        throws IOException,
-            IndexContextInInconsistentStateException
-    {
-        return limitResults( nexusIndexer.searchFlat( artifactInfoComparator, query, context ), RESULT_LIMIT );
-    }
-
-    public Map<String, ArtifactInfoGroup> searchGrouped( Grouping grouping, Query query )
-        throws IOException,
-            IndexContextInInconsistentStateException
-    {
-        return nexusIndexer.searchGrouped( grouping, query );
-    }
-
-    public Map<String, ArtifactInfoGroup> searchGrouped( Grouping grouping, Query query, IndexingContext context )
-        throws IOException,
-            IndexContextInInconsistentStateException
-    {
-        return nexusIndexer.searchGrouped( grouping, query, context );
-    }
-
-    public Map<String, ArtifactInfoGroup> searchGrouped( Grouping grouping, Comparator<String> groupKeyComparator,
-        Query query )
-        throws IOException,
-            IndexContextInInconsistentStateException
-    {
-        return nexusIndexer.searchGrouped( grouping, groupKeyComparator, query );
-    }
-
-    public Map<String, ArtifactInfoGroup> searchGrouped( Grouping grouping, Comparator<String> groupKeyComparator,
-        Query query, IndexingContext context )
-        throws IOException,
-            IndexContextInInconsistentStateException
-    {
-        return nexusIndexer.searchGrouped( grouping, groupKeyComparator, query, context );
-    }
-
-    protected Collection<ArtifactInfo> limitResults( Collection<ArtifactInfo> res, int count )
-    {
-        List<ArtifactInfo> result = new ArrayList<ArtifactInfo>( count );
-
-        for ( Iterator<ArtifactInfo> i = res.iterator(); i.hasNext(); )
-        {
-            ArtifactInfo ai = i.next();
-
-            ai.context = formatContextId( ai );
-
-            result.add( ai );
-
-            if ( result.size() > count )
-            {
-                break;
-            }
-        }
-
-        return result;
-    }
-
-    protected String formatContextId( ArtifactInfo ai )
-    {
-        String result = ai.context;
-
-        try
-        {
-            Repository sourceRepository = repositoryRegistry.getRepository( ai.repository );
-
-            if ( ai.context.endsWith( CTX_LOCAL_SUFIX ) )
-            {
-                if ( RepositoryType.PROXY.equals( sourceRepository.getRepositoryType() ) )
-                {
-                    result = sourceRepository.getName() + " (Cache)";
-                }
-                else
-                {
-                    result = sourceRepository.getName() + " (Local)";
-                }
-            }
-            else if ( ai.context.endsWith( CTX_REMOTE_SUFIX ) )
-            {
-                result = sourceRepository.getName() + " (Remote)";
-            }
-            else if ( ai.context.endsWith( CTX_MERGED_SUFIX ) )
-            {
-                // TODO: this is not repo!
-                result = result + " (Merged)";
-            }
-
-        }
-        catch ( NoSuchRepositoryException e )
-        {
-            // nothing
-        }
-
-        return result;
-    }
-
-    // ----------------------------------------------------------------------------
     // Combined searching
     // ----------------------------------------------------------------------------
 
-    public Collection<ArtifactInfo> searchArtifactFlat( String term, String repositoryId, String groupId )
+    public Collection<ArtifactInfo> searchArtifactFlat( String term, String repositoryId, String groupId, Integer from,
+        Integer count )
     {
         IndexingContext context = null;
 
@@ -593,16 +718,32 @@ public class DefaultIndexerManager
 
             bq.add( q2, BooleanClause.Occur.SHOULD );
 
+            FlatSearchRequest req = null;
+
             if ( context == null )
             {
-                infos = nexusIndexer.searchFlat( bq );
+                req = new FlatSearchRequest( bq, ArtifactInfo.REPOSITORY_VERSION_COMPARATOR );
             }
             else
             {
-                infos = nexusIndexer.searchFlat( bq, context );
+                req = new FlatSearchRequest( bq, ArtifactInfo.REPOSITORY_VERSION_COMPARATOR, context );
             }
 
-            return limitResults( infos, RESULT_LIMIT );
+            if ( from != null )
+            {
+                req.setStart( from );
+            }
+
+            if ( count != null )
+            {
+                req.setAiCount( count );
+            }
+
+            infos = nexusIndexer.searchFlat( req );
+
+            postprocessResults( infos );
+
+            return infos;
         }
         catch ( IndexContextInInconsistentStateException e )
         {
@@ -616,7 +757,7 @@ public class DefaultIndexerManager
     }
 
     public Collection<ArtifactInfo> searchArtifactFlat( String gTerm, String aTerm, String vTerm, String cTerm,
-        String repositoryId, String groupId )
+        String repositoryId, String groupId, Integer from, Integer count )
     {
         IndexingContext context = null;
 
@@ -663,16 +804,32 @@ public class DefaultIndexerManager
                 // classifiers are sadly not indexed
             }
 
+            FlatSearchRequest req = null;
+
             if ( context == null )
             {
-                infos = nexusIndexer.searchFlat( bq );
+                req = new FlatSearchRequest( bq, ArtifactInfo.REPOSITORY_VERSION_COMPARATOR );
             }
             else
             {
-                infos = nexusIndexer.searchFlat( bq, context );
+                req = new FlatSearchRequest( bq, ArtifactInfo.REPOSITORY_VERSION_COMPARATOR, context );
             }
 
-            return limitResults( infos, RESULT_LIMIT );
+            if ( from != null )
+            {
+                req.setStart( from );
+            }
+
+            if ( count != null )
+            {
+                req.setAiCount( count );
+            }
+
+            infos = nexusIndexer.searchFlat( req );
+
+            postprocessResults( infos );
+
+            return infos;
         }
         catch ( IndexContextInInconsistentStateException e )
         {
@@ -688,6 +845,54 @@ public class DefaultIndexerManager
         return Collections.emptyList();
     }
 
+    protected void postprocessResults( Collection<ArtifactInfo> res )
+    {
+        for ( Iterator<ArtifactInfo> i = res.iterator(); i.hasNext(); )
+        {
+            ArtifactInfo ai = i.next();
+
+            ai.context = formatContextId( ai );
+        }
+    }
+
+    protected String formatContextId( ArtifactInfo ai )
+    {
+        String result = ai.context;
+
+        try
+        {
+            Repository sourceRepository = repositoryRegistry.getRepository( ai.repository );
+
+            if ( ai.context.endsWith( CTX_LOCAL_SUFIX ) )
+            {
+                if ( RepositoryType.PROXY.equals( sourceRepository.getRepositoryType() ) )
+                {
+                    result = sourceRepository.getName() + " (Cache)";
+                }
+                else
+                {
+                    result = sourceRepository.getName() + " (Local)";
+                }
+            }
+            else if ( ai.context.endsWith( CTX_REMOTE_SUFIX ) )
+            {
+                result = sourceRepository.getName() + " (Remote)";
+            }
+            else if ( ai.context.endsWith( CTX_MERGED_SUFIX ) )
+            {
+                // TODO: this is not repo!
+                result = result + " (Merged)";
+            }
+
+        }
+        catch ( NoSuchRepositoryException e )
+        {
+            // nothing
+        }
+
+        return result;
+    }
+
     // ----------------------------------------------------------------------------
     // Query construction
     // ----------------------------------------------------------------------------
@@ -697,6 +902,10 @@ public class DefaultIndexerManager
         return nexusIndexer.constructQuery( field, query );
     }
 
+    // ----------------------------------------------------------------------------
+    // Event handling
+    // ----------------------------------------------------------------------------
+
     public void onProximityEvent( AbstractEvent evt )
     {
         if ( RepositoryRegistryEvent.class.isAssignableFrom( evt.getClass() ) )
@@ -705,81 +914,17 @@ public class DefaultIndexerManager
             {
                 Repository repository = ( (RepositoryRegistryEvent) evt ).getRepository();
 
-                String remoteRoot = null;
-                if ( repository.getRemoteUrl() != null )
-                {
-                    remoteRoot = repository.getRemoteUrl();
-                }
-
                 // we are handling repo events, like addition and removal
                 if ( RepositoryRegistryEventAdd.class.isAssignableFrom( evt.getClass() ) )
                 {
-                    // add context for repository
-                    File repoRoot = null;
-                    if ( repository.getLocalUrl() != null
-                        && repository.getLocalStorage() instanceof DefaultFSLocalRepositoryStorage )
-                    {
-                        URL url = new URL( repository.getLocalUrl() );
-                        try
-                        {
-                            repoRoot = new File( url.toURI() );
-                        }
-                        catch ( URISyntaxException e )
-                        {
-                            repoRoot = new File( url.getPath() );
-                        }
-                    }
-
-                    IndexingContext ctxLocal = nexusIndexer.addIndexingContext(
-                        getLocalContextId( repository.getId() ),
-                        repository.getId(),
-                        repoRoot,
-                        new File( getWorkingDirectory(), getLocalContextId( repository.getId() ) ),
-                        remoteRoot,
-                        null,
-                        NexusIndexer.FULL_INDEX,
-                        true );
-
-                    if ( ctxLocal.getTimestamp() == null )
-                    {
-                        // it is probably new or first start
-                        ctxLocal.updateTimestamp();
-                    }
-
-                    if ( RepositoryType.PROXY.equals( repository.getRepositoryType() ) )
-                    {
-                        IndexingContext ctxRemote = nexusIndexer.addIndexingContext(
-                            getRemoteContextId( repository.getId() ),
-                            repository.getId(),
-                            repoRoot,
-                            new File( getWorkingDirectory(), getRemoteContextId( repository.getId() ) ),
-                            remoteRoot,
-                            remoteRoot,
-                            NexusIndexer.FULL_INDEX,
-                            true );
-
-                        if ( ctxRemote.getTimestamp() == null )
-                        {
-                            // it is probably new or first start
-                            ctxRemote.updateTimestamp();
-                        }
-                    }
-
+                    addRepositoryIndexContext( repository.getId() );
                 }
                 else if ( RepositoryRegistryEventRemove.class.isAssignableFrom( evt.getClass() ) )
                 {
-                    // remove context for repository
-                    nexusIndexer.removeIndexingContext( nexusIndexer.getIndexingContexts().get(
-                        getLocalContextId( repository.getId() ) ), true );
-
-                    if ( nexusIndexer.getIndexingContexts().containsKey( getRemoteContextId( repository.getId() ) ) )
-                    {
-                        nexusIndexer.removeIndexingContext( nexusIndexer.getIndexingContexts().get(
-                            getRemoteContextId( repository.getId() ) ), true );
-                    }
+                    removeRepositoryIndexContext( repository.getId(), true );
                 }
             }
-            catch ( Exception e ) // TODO be more specific
+            catch ( Exception e )
             {
                 getLogger().error( "Could not maintain indexing contexts!", e );
             }
@@ -793,44 +938,14 @@ public class DefaultIndexerManager
                 // we are handling repo events, like addition and removal
                 if ( RepositoryRegistryGroupEventAdd.class.isAssignableFrom( evt.getClass() ) )
                 {
-                    IndexingContext ctxMerged = nexusIndexer.addIndexingContext(
-                        getMergedContextId( gevt.getGroupId() ),
-                        gevt.getGroupId(),
-                        null,
-                        new File( getWorkingDirectory(), getMergedContextId( gevt.getGroupId() ) ),
-                        null,
-                        null,
-                        NexusIndexer.FULL_INDEX,
-                        true );
-
-                    /*
-                     * List<Repository> members = repositoryRegistry.getRepositoryGroup( gevt.getGroupId() );
-                     * IndexingContext bestContext = null; for ( Repository repo : members ) { if (
-                     * nexusIndexer.getIndexingContexts().containsKey( getLocalContextId( repo.getId() ) ) ) { // local
-                     * idx has every repo bestContext = nexusIndexer.getIndexingContexts().get( getLocalContextId(
-                     * repo.getId() ) ); } if ( nexusIndexer.getIndexingContexts().containsKey( getRemoteContextId(
-                     * repo.getId() ) ) ) { // if remote is here, it is the best bestContext =
-                     * nexusIndexer.getIndexingContexts().get( getRemoteContextId( repo.getId() ) ); } ctxMerged.merge(
-                     * bestContext.getIndexDirectory() ); }
-                     */
-
-                    if ( ctxMerged.getTimestamp() == null )
-                    {
-                        // it is probably new or first start
-                        ctxMerged.updateTimestamp();
-                    }
+                    addRepositoryGroupIndexContext( gevt.getGroupId() );
                 }
                 else if ( RepositoryRegistryGroupEventRemove.class.isAssignableFrom( evt.getClass() ) )
                 {
-                    // remove context for repository
-                    if ( nexusIndexer.getIndexingContexts().containsKey( getMergedContextId( gevt.getGroupId() ) ) )
-                    {
-                        nexusIndexer.removeIndexingContext( nexusIndexer.getIndexingContexts().get(
-                            getMergedContextId( gevt.getGroupId() ) ), true );
-                    }
+                    removeRepositoryGroupIndexContext( gevt.getGroupId(), true );
                 }
             }
-            catch ( Exception e ) // TODO be more specific
+            catch ( Exception e )
             {
                 getLogger().error( "Could not maintain group (merged) indexing contexts!", e );
             }
@@ -950,4 +1065,5 @@ public class DefaultIndexerManager
     {
         return groupId + CTX_MERGED_SUFIX;
     }
+
 }

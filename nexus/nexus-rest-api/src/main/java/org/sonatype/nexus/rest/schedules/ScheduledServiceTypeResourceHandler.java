@@ -65,6 +65,8 @@ public class ScheduledServiceTypeResourceHandler
     public Representation getRepresentationHandler( Variant variant )
         throws IOException
     {
+        // TODO: This should be auto-discovered!
+
         ScheduledServiceTypeResourceResponse response = new ScheduledServiceTypeResourceResponse();
 
         ScheduledServiceTypeResource type = new ScheduledServiceTypeResource();
@@ -72,17 +74,17 @@ public class ScheduledServiceTypeResourceHandler
         type.setName( getServiceTypeName( type.getId() ) );
         ScheduledServiceTypePropertyResource property = new ScheduledServiceTypePropertyResource();
         property.setId( "1" );
-        property.setName( "Repository" );
+        property.setName( "Repository ID" );
         property.setType( PROPERTY_TYPE_REPO );
-        property.setHelpText( "Select a repository to publish the indexes." );
         property.setRequired( false );
+        property.setHelpText( "Type in the repository ID to publish the indexes." );
         type.addProperty( property );
         property = new ScheduledServiceTypePropertyResource();
         property.setId( "2" );
-        property.setName( "Repository Group" );
+        property.setName( "Repository Group ID" );
         property.setType( PROPERTY_TYPE_REPO_GROUP );
-        property.setHelpText( "Select a repository group to publish the indexes for all member repositories." );
         property.setRequired( false );
+        property.setHelpText( "Type in the repository group ID to publish the indexes for all member repositories." );
         type.addProperty( property );
         response.addData( type );
 
@@ -91,17 +93,17 @@ public class ScheduledServiceTypeResourceHandler
         type.setName( getServiceTypeName( type.getId() ) );
         property = new ScheduledServiceTypePropertyResource();
         property.setId( "1" );
-        property.setName( "Repository" );
+        property.setName( "Repository ID" );
         property.setType( PROPERTY_TYPE_REPO );
-        property.setHelpText( "Select a repository to reindex." );
         property.setRequired( false );
+        property.setHelpText( "Type in the repository ID to reindex." );
         type.addProperty( property );
         property = new ScheduledServiceTypePropertyResource();
         property.setId( "2" );
-        property.setName( "Repository Group" );
+        property.setName( "Repository Group ID" );
         property.setType( PROPERTY_TYPE_REPO_GROUP );
-        property.setHelpText( "Select a repository group to reindex all member repositories." );
         property.setRequired( false );
+        property.setHelpText( "Type in the repository group ID to reindex all member repositories." );
         type.addProperty( property );
         response.addData( type );
 
@@ -110,17 +112,17 @@ public class ScheduledServiceTypeResourceHandler
         type.setName( getServiceTypeName( type.getId() ) );
         property = new ScheduledServiceTypePropertyResource();
         property.setId( "1" );
-        property.setName( "Repository" );
+        property.setName( "Repository ID" );
         property.setType( PROPERTY_TYPE_REPO );
-        property.setHelpText( "Select a repository to rebuild attributes." );
         property.setRequired( false );
+        property.setHelpText( "Type in the repository ID to rebuild attributes." );
         type.addProperty( property );
         property = new ScheduledServiceTypePropertyResource();
         property.setId( "2" );
-        property.setName( "Repository Group" );
+        property.setName( "Repository Group ID" );
         property.setType( PROPERTY_TYPE_REPO_GROUP );
-        property.setHelpText( "Select a repository group to rebuild attributes for all member repositories." );
         property.setRequired( false );
+        property.setHelpText( "Type in the repository group ID to rebuild attributes for all member repositories." );
         type.addProperty( property );
         response.addData( type );
 
@@ -129,23 +131,22 @@ public class ScheduledServiceTypeResourceHandler
         type.setName( getServiceTypeName( type.getId() ) );
         property = new ScheduledServiceTypePropertyResource();
         property.setId( "1" );
-        property.setName( "Repository" );
+        property.setName( "Repository ID" );
         property.setType( PROPERTY_TYPE_REPO );
-        property.setHelpText( "Select a repository to rebuild attributes." );
         property.setRequired( false );
+        property.setHelpText( "Type in the repository ID to rebuild attributes." );
         type.addProperty( property );
         property = new ScheduledServiceTypePropertyResource();
         property.setId( "2" );
-        property.setName( "Repository Group" );
+        property.setName( "Repository Group ID" );
         property.setType( PROPERTY_TYPE_REPO_GROUP );
-        property.setHelpText( "Select a repository group to rebuild attributes for all member repositories." );
         property.setRequired( false );
+        property.setHelpText( "Type in the repository group ID to rebuild attributes for all member repositories." );
         type.addProperty( property );
         property = new ScheduledServiceTypePropertyResource();
         property.setId( "3" );
         property.setName( "Repository path" );
         property.setType( PROPERTY_TYPE_STRING );
-        property.setRequired( true );
         property
             .setHelpText( "Type in the repository path from which to clear caches recursively (ie. \"/\" for root or \"/org/apache\")" );
         type.addProperty( property );
@@ -156,32 +157,32 @@ public class ScheduledServiceTypeResourceHandler
         type.setName( getServiceTypeName( type.getId() ) );
         property = new ScheduledServiceTypePropertyResource();
         property.setId( "1" );
-        property.setName( "Repository" );
+        property.setName( "Repository ID" );
         property.setType( PROPERTY_TYPE_REPO );
-        property.setHelpText( "Select a repository to remove snapshots from." );
         property.setRequired( false );
+        property.setHelpText( "Type in the repository ID to remove snapshots from." );
         type.addProperty( property );
         property = new ScheduledServiceTypePropertyResource();
         property.setId( "2" );
-        property.setName( "Repository Group" );
+        property.setName( "Repository Group ID" );
         property.setType( PROPERTY_TYPE_REPO_GROUP );
-        property.setHelpText( "Select a repository group to remove snapshots from all it's member repositories." );
         property.setRequired( false );
+        property.setHelpText( "Type in the repository group ID to remove from all it's member repositories." );
         type.addProperty( property );
         property = new ScheduledServiceTypePropertyResource();
         property.setId( "3" );
         property.setName( "Minimum snapshot count" );
         property.setType( PROPERTY_TYPE_NUMBER );
-        property.setHelpText( "Minimum number of snapshots to keep for one GAV." );
         property.setRequired( true );
+        property.setHelpText( "Minimum number of snapshots to keep for one GAV." );
         type.addProperty( property );
         property = new ScheduledServiceTypePropertyResource();
         property.setId( "4" );
         property.setName( "Snapshot retention (days)" );
         property.setType( PROPERTY_TYPE_NUMBER );
+        property.setRequired( true );
         property
             .setHelpText( "The job will purge all snapshots older than the entered number of days, but will obey to Min. count of snapshots to keep." );
-        property.setRequired( true );
         type.addProperty( property );
         response.addData( type );
 

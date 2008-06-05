@@ -39,7 +39,18 @@ public class ClearCacheTask
     public Object doRun()
         throws Exception
     {
-        getNexus().clearCaches( resourceStorePath, getRepositoryId(), getRepositoryGroupId() );
+        if ( getRepositoryGroupId() != null )
+        {
+            getNexus().clearRepositoryGroupCaches( resourceStorePath, getRepositoryGroupId() );
+        }
+        else if ( getRepositoryId() != null )
+        {
+            getNexus().clearRepositoryCaches( resourceStorePath, getRepositoryId() );
+        }
+        else
+        {
+            getNexus().clearAllCaches( resourceStorePath );
+        }
 
         return null;
     }

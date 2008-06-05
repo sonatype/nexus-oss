@@ -67,15 +67,56 @@ public class IndexResourceHandler
 
         String c = form.getFirstValue( "c" );
 
+        Integer from = null;
+
+        Integer count = null;
+
+        if ( form.getFirstValue( "from" ) != null )
+        {
+            try
+            {
+                from = Integer.valueOf( form.getFirstValue( "from" ) );
+            }
+            catch ( NumberFormatException e )
+            {
+                from = null;
+            }
+        }
+
+        if ( form.getFirstValue( "count" ) != null )
+        {
+            try
+            {
+                count = Integer.valueOf( form.getFirstValue( "count" ) );
+            }
+            catch ( NumberFormatException e )
+            {
+                count = null;
+            }
+        }
+
         Collection<NexusArtifact> ais = null;
 
         if ( query != null )
         {
-            ais = ai2NaColl( getNexus().searchArtifactFlat( query, getRepositoryId(), getRepositoryGroupId() ) );
+            ais = ai2NaColl( getNexus().searchArtifactFlat(
+                query,
+                getRepositoryId(),
+                getRepositoryGroupId(),
+                from,
+                count ) );
         }
         else if ( g != null || a != null || v != null || c != null )
         {
-            ais = ai2NaColl( getNexus().searchArtifactFlat( g, a, v, c, getRepositoryId(), getRepositoryGroupId() ) );
+            ais = ai2NaColl( getNexus().searchArtifactFlat(
+                g,
+                a,
+                v,
+                c,
+                getRepositoryId(),
+                getRepositoryGroupId(),
+                from,
+                count ) );
         }
         else
         {

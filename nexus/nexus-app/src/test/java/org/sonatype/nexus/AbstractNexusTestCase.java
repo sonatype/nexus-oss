@@ -100,9 +100,9 @@ public abstract class AbstractNexusTestCase
     protected void tearDown()
         throws Exception
     {
-        DefaultIndexerManager dim = (DefaultIndexerManager) lookup( IndexerManager.ROLE );
-
-        dim.shutdown( true );
+        // this is done by DefaultNexus from now on
+        // DefaultIndexerManager dim = (DefaultIndexerManager) lookup( IndexerManager.ROLE );
+        // dim.shutdown( true );
 
         super.tearDown();
     }

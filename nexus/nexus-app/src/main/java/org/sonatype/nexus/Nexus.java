@@ -104,13 +104,18 @@ public interface Nexus
     InputStream getApplicationLogAsStream( String logFile )
         throws IOException;
 
-    void clearCaches( String path, String repositoryId, String repositoryGroupId )
-        throws NoSuchRepositoryException,
-            NoSuchRepositoryGroupException;
+    void clearAllCaches( String path );
+
+    void clearRepositoryCaches( String path, String repositoryId )
+        throws NoSuchRepositoryException;
+
+    void clearRepositoryGroupCaches( String path, String repositoryGroupId )
+        throws NoSuchRepositoryGroupException;
 
     // ------------------------------------------------------------------
     // Feeds
 
+    @Deprecated
     FeedRecorder getFeedRecorder();
 
     // ------------------------------------------------------------------
@@ -216,9 +221,10 @@ public interface Nexus
     // Combined searching
     // ----------------------------------------------------------------------------
 
-    Collection<ArtifactInfo> searchArtifactFlat( String term, String repositoryId, String groupId );
+    Collection<ArtifactInfo> searchArtifactFlat( String term, String repositoryId, String groupId, Integer from,
+        Integer count );
 
     Collection<ArtifactInfo> searchArtifactFlat( String gTerm, String aTerm, String vTerm, String cTerm,
-        String repositoryId, String groupId );
+        String repositoryId, String groupId, Integer from, Integer count );
 
 }

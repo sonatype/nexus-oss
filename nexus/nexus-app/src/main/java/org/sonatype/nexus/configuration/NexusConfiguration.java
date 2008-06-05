@@ -24,8 +24,13 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
+import org.sonatype.nexus.configuration.model.CRepository;
+import org.sonatype.nexus.configuration.model.CRepositoryShadow;
+import org.sonatype.nexus.configuration.model.Configuration;
 import org.sonatype.nexus.configuration.source.ConfigurationSource;
+import org.sonatype.nexus.configuration.validator.InvalidConfigurationException;
 import org.sonatype.nexus.proxy.access.AccessManager;
+import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 import org.sonatype.nexus.security.AuthenticationSource;
 
@@ -87,5 +92,11 @@ public interface NexusConfiguration
 
     AccessManager getAccessManagerForRealm( String realmId )
         throws ConfigurationException;
+
+    Repository createRepositoryFromModel( Configuration configuration, CRepository repository )
+        throws InvalidConfigurationException;
+
+    Repository createRepositoryFromModel( Configuration configuration, CRepositoryShadow repositoryShadow )
+        throws InvalidConfigurationException;
 
 }

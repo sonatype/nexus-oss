@@ -22,12 +22,9 @@ package org.sonatype.nexus.index;
 
 import java.io.IOException;
 import java.util.Collection;
-import java.util.Comparator;
-import java.util.Map;
 
 import org.apache.lucene.search.Query;
 import org.sonatype.nexus.index.context.IndexContextInInconsistentStateException;
-import org.sonatype.nexus.index.context.IndexingContext;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryGroupException;
 import org.sonatype.nexus.proxy.events.EventListener;
@@ -35,8 +32,36 @@ import org.sonatype.nexus.proxy.events.EventListener;
 public interface IndexerManager
     extends EventListener
 {
-
     String ROLE = IndexerManager.class.getName();
+
+    // ----------------------------------------------------------------------------
+    // Context management et al
+    // ----------------------------------------------------------------------------
+
+    void shutdown( boolean deleteFiles )
+        throws IOException;
+
+    void addRepositoryIndexContext( String repositoryId )
+        throws IOException,
+            NoSuchRepositoryException;
+
+    void removeRepositoryIndexContext( String repositoryId, boolean deleteFiles )
+        throws IOException,
+            NoSuchRepositoryException;
+
+    void addRepositoryGroupIndexContext( String repositoryGroupId )
+        throws IOException,
+            NoSuchRepositoryGroupException;
+
+    void removeRepositoryGroupIndexContext( String repositoryGroupId, boolean deleteFiles )
+        throws IOException,
+            NoSuchRepositoryGroupException;
+
+    void setRepositoryIndexContextSearchable( String repositoryId, boolean searchable );
+
+    // ----------------------------------------------------------------------------
+    // Publishing index
+    // ----------------------------------------------------------------------------
 
     void publishAllIndex()
         throws IOException;
@@ -49,8 +74,9 @@ public interface IndexerManager
         throws IOException,
             NoSuchRepositoryGroupException;
 
-    // =============
-    // Search and indexing related
+    // ----------------------------------------------------------------------------
+    // Reindexing related
+    // ----------------------------------------------------------------------------
 
     void reindexAllRepositories()
         throws IOException;
@@ -63,45 +89,11 @@ public interface IndexerManager
         throws NoSuchRepositoryGroupException,
             IOException;
 
+    // ----------------------------------------------------------------------------
+    // Identify
+    // ----------------------------------------------------------------------------
+
     ArtifactInfo identifyArtifact( String type, String checksum )
-        throws IOException,
-            IndexContextInInconsistentStateException;
-
-    // ----------------------------------------------------------------------------
-    // Searching
-    // ----------------------------------------------------------------------------
-
-    Collection<ArtifactInfo> searchFlat( Query query )
-        throws IOException,
-            IndexContextInInconsistentStateException;
-
-    Collection<ArtifactInfo> searchFlat( Query query, IndexingContext context )
-        throws IOException,
-            IndexContextInInconsistentStateException;
-
-    Collection<ArtifactInfo> searchFlat( Comparator<ArtifactInfo> artifactInfoComparator, Query query )
-        throws IOException,
-            IndexContextInInconsistentStateException;
-
-    Collection<ArtifactInfo> searchFlat( Comparator<ArtifactInfo> artifactInfoComparator, Query query,
-        IndexingContext context )
-        throws IOException,
-            IndexContextInInconsistentStateException;
-
-    Map<String, ArtifactInfoGroup> searchGrouped( Grouping grouping, Query query )
-        throws IOException,
-            IndexContextInInconsistentStateException;
-
-    Map<String, ArtifactInfoGroup> searchGrouped( Grouping grouping, Query query, IndexingContext context )
-        throws IOException,
-            IndexContextInInconsistentStateException;
-
-    Map<String, ArtifactInfoGroup> searchGrouped( Grouping grouping, Comparator<String> groupKeyComparator, Query query )
-        throws IOException,
-            IndexContextInInconsistentStateException;
-
-    Map<String, ArtifactInfoGroup> searchGrouped( Grouping grouping, Comparator<String> groupKeyComparator,
-        Query query, IndexingContext context )
         throws IOException,
             IndexContextInInconsistentStateException;
 
@@ -109,9 +101,11 @@ public interface IndexerManager
     // Combined searching
     // ----------------------------------------------------------------------------
 
-    Collection<ArtifactInfo> searchArtifactFlat( String term, String repositoryId, String groupId );
+    Collection<ArtifactInfo> searchArtifactFlat( String term, String repositoryId, String groupId, Integer from,
+        Integer count );
 
-    Collection<ArtifactInfo> searchArtifactFlat( String gTerm, String aTerm, String vTerm, String cTerm, String repositoryId, String groupId );
+    Collection<ArtifactInfo> searchArtifactFlat( String gTerm, String aTerm, String vTerm, String cTerm,
+        String repositoryId, String groupId, Integer from, Integer count );
 
     // ----------------------------------------------------------------------------
     // Query construction

@@ -88,7 +88,6 @@ import org.sonatype.nexus.scheduling.NexusTask;
 import org.sonatype.nexus.store.DefaultEntry;
 import org.sonatype.nexus.store.Entry;
 import org.sonatype.nexus.store.Store;
-import org.sonatype.nexus.tasks.PublishIndexesTask;
 import org.sonatype.scheduling.NoSuchTaskException;
 import org.sonatype.scheduling.ScheduledTask;
 import org.sonatype.scheduling.SubmittedTask;
@@ -587,33 +586,32 @@ public class DefaultNexus
         return null;
     }
 
-    public void clearCaches( String path, String repositoryId, String repositoryGroupId )
-        throws NoSuchRepositoryException,
-            NoSuchRepositoryGroupException
+    public void clearAllCaches( String path )
     {
-        if ( repositoryId != null )
-        {
-            getLogger().info( "Clearing caches in repository " + repositoryId + " from path " + path );
+        getLogger().info( "Clearing caches in all repositories from path " + path );
 
-            repositoryRegistry.getRepository( repositoryId ).clearCaches( path );
+        for ( Repository repository : repositoryRegistry.getRepositories() )
+        {
+            repository.clearCaches( path );
         }
-        else if ( repositoryGroupId != null )
-        {
-            getLogger().info( "Clearing caches in repository group " + repositoryGroupId + " from path " + path );
+    }
 
-            for ( Repository repository : repositoryRegistry.getRepositoryGroup( repositoryGroupId ) )
-            {
-                repository.clearCaches( path );
-            }
-        }
-        else
-        {
-            getLogger().info( "Clearing caches in all repositories " + repositoryGroupId + " from path " + path );
+    public void clearRepositoryCaches( String path, String repositoryId )
+        throws NoSuchRepositoryException
+    {
+        getLogger().info( "Clearing caches in repository " + repositoryId + " from path " + path );
 
-            for ( Repository repository : repositoryRegistry.getRepositories() )
-            {
-                repository.clearCaches( path );
-            }
+        repositoryRegistry.getRepository( repositoryId ).clearCaches( path );
+    }
+
+    public void clearRepositoryGroupCaches( String path, String repositoryGroupId )
+        throws NoSuchRepositoryGroupException
+    {
+        getLogger().info( "Clearing caches in repository group " + repositoryGroupId + " from path " + path );
+
+        for ( Repository repository : repositoryRegistry.getRepositoryGroup( repositoryGroupId ) )
+        {
+            repository.clearCaches( path );
         }
     }
 
@@ -845,6 +843,7 @@ public class DefaultNexus
     // =============
     // Feeds
 
+    @Deprecated
     public FeedRecorder getFeedRecorder()
     {
         return feedRecorder;
@@ -945,15 +944,16 @@ public class DefaultNexus
         }
     }
 
-    public Collection<ArtifactInfo> searchArtifactFlat( String term, String repositoryId, String groupId )
+    public Collection<ArtifactInfo> searchArtifactFlat( String term, String repositoryId, String groupId, Integer from,
+        Integer count )
     {
-        return indexerManager.searchArtifactFlat( term, repositoryId, groupId );
+        return indexerManager.searchArtifactFlat( term, repositoryId, groupId, from, count );
     }
 
     public Collection<ArtifactInfo> searchArtifactFlat( String gTerm, String aTerm, String vTerm, String cTerm,
-        String repositoryId, String groupId )
+        String repositoryId, String groupId, Integer from, Integer count )
     {
-        return indexerManager.searchArtifactFlat( gTerm, aTerm, vTerm, cTerm, repositoryId, groupId );
+        return indexerManager.searchArtifactFlat( gTerm, aTerm, vTerm, cTerm, repositoryId, groupId, from, count );
     }
 
     // ===========================
@@ -1011,6 +1011,10 @@ public class DefaultNexus
             // applies configuration and notifies listeners
             nexusConfiguration.loadConfiguration( true );
 
+            createRepositories();
+
+            nexusConfiguration.notifyConfigurationChangeListeners();
+
             feedRecorder.startService();
 
             getFeedRecorder().addSystemEvent(
@@ -1052,8 +1056,6 @@ public class DefaultNexus
 
                 // TODO: perform upgrade or something
             }
-
-            scheduler.submit( new PublishIndexesTask( this, indexerManager, null, null ) );
 
             systemStatus.setState( SystemState.STARTED );
 
@@ -1102,6 +1104,15 @@ public class DefaultNexus
 
         try
         {
+            indexerManager.shutdown( false );
+        }
+        catch ( IOException e )
+        {
+            getLogger().error( "Error while stopping IndexerManager:", e );
+        }
+
+        try
+        {
             feedRecorder.stopService();
         }
         catch ( IOException e )
@@ -1112,6 +1123,80 @@ public class DefaultNexus
         systemStatus.setState( SystemState.STOPPED );
 
         getLogger().info( "Stopped Nexus (version " + systemStatus.getVersion() + ")" );
+    }
+
+    @SuppressWarnings( "unchecked" )
+    protected void createRepositories()
+        throws ConfigurationException,
+            IOException
+    {
+        // drop all reposes (restarting?)
+        try
+        {
+            // get all IDs
+            List<String> repoIds = repositoryRegistry.getRepositoryIds();
+
+            for ( String repoId : repoIds )
+            {
+                repositoryRegistry.removeRepository( repoId );
+            }
+        }
+        catch ( NoSuchRepositoryException e )
+        {
+            // will not happen
+        }
+
+        List<CRepository> reposes = getNexusConfiguration().getConfiguration().getRepositories();
+
+        for ( CRepository repo : reposes )
+        {
+            Repository repository = getNexusConfiguration().createRepositoryFromModel(
+                getNexusConfiguration().getConfiguration(),
+                repo );
+
+            repositoryRegistry.addRepository( repository );
+        }
+
+        if ( getNexusConfiguration().getConfiguration().getRepositoryShadows() != null )
+        {
+            List<CRepositoryShadow> shadows = getNexusConfiguration().getConfiguration().getRepositoryShadows();
+            for ( CRepositoryShadow shadow : shadows )
+            {
+                Repository repository = getNexusConfiguration().createRepositoryFromModel(
+                    getNexusConfiguration().getConfiguration(),
+                    shadow );
+
+                // shadows has no index
+                repositoryRegistry.addRepository( repository );
+            }
+        }
+
+        if ( getNexusConfiguration().getConfiguration().getRepositoryGrouping() != null
+            && getNexusConfiguration().getConfiguration().getRepositoryGrouping().getRepositoryGroups() != null )
+        {
+            List<CRepositoryGroup> groups = getNexusConfiguration()
+                .getConfiguration().getRepositoryGrouping().getRepositoryGroups();
+
+            for ( CRepositoryGroup group : groups )
+            {
+                if ( group.getName() == null )
+                {
+                    group.setName( group.getGroupId() );
+                }
+                try
+                {
+                    repositoryRegistry.addRepositoryGroup( group.getGroupId(), group.getRepositories() );
+                }
+                catch ( NoSuchRepositoryException e )
+                {
+                    throw new ConfigurationException( "Cannot register repository groups!", e );
+                }
+                catch ( InvalidGroupingException e )
+                {
+                    throw new ConfigurationException( "Configuration contains invalid grouping!", e );
+                }
+            }
+        }
     }
 
     private void createDefaultTemplate( String id, boolean shouldRecreate )

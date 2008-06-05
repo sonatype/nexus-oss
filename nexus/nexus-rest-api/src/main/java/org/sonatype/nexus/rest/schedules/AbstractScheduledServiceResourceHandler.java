@@ -20,6 +20,10 @@
  */
 package org.sonatype.nexus.rest.schedules;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -74,16 +78,20 @@ public class AbstractScheduledServiceResourceHandler
      * Type property resource: date
      */
     public static final String PROPERTY_TYPE_DATE = "date";
-    
+
     /**
      * Type property resource: repository
      */
     public static final String PROPERTY_TYPE_REPO = "repository";
-    
+
     /**
      * Type property resource: repositoryGroup
      */
     public static final String PROPERTY_TYPE_REPO_GROUP = "repositoryGroup";
+
+    private DateFormat dateFormat = new SimpleDateFormat( "yyyy.MM.dd" );
+
+    private DateFormat timeFormat = new SimpleDateFormat( "HH:mm" );
 
     protected Map<String, String> serviceNames = new HashMap<String, String>();
     {
@@ -144,5 +152,20 @@ public class AbstractScheduledServiceResourceHandler
         {
             return schedule.getClass().getName();
         }
+    }
+
+    protected String formatDate( Date date )
+    {
+        return dateFormat.format( date );
+    }
+
+    protected String formatTime( Date date )
+    {
+        return timeFormat.format( date );
+    }
+
+    protected Date parseDate( String date, String time )
+    {
+        return null;
     }
 }

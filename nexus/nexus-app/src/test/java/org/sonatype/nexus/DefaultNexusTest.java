@@ -127,7 +127,7 @@ public class DefaultNexusTest
         CRepositoryShadow stemplate = new CRepositoryShadow();
         stemplate.setId( "aTemplate" );
         stemplate.setName( "This is a shadow" );
-        
+
         getDefaultNexus().createRepositoryShadowTemplate( stemplate );
 
         Collection<CRepositoryShadow> stemplates = getDefaultNexus().listRepositoryShadowTemplates();
