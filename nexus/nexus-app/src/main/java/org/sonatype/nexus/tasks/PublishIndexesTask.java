@@ -4,15 +4,14 @@ import java.io.IOException;
 
 import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.feeds.FeedRecorder;
-import org.sonatype.nexus.index.AbstractIndexerTask;
-import org.sonatype.nexus.index.IndexerManager;
+import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesTask;
 
 public class PublishIndexesTask
-    extends AbstractIndexerTask<Object>
+    extends AbstractNexusRepositoriesTask<Object>
 {
-    public PublishIndexesTask( Nexus nexus, IndexerManager indexerManager, String repositoryId, String repositoryGroupId )
+    public PublishIndexesTask( Nexus nexus, String repositoryId, String repositoryGroupId )
     {
-        super( nexus, indexerManager, repositoryId, repositoryGroupId );
+        super( nexus, repositoryId, repositoryGroupId );
     }
 
     @Override
@@ -23,15 +22,15 @@ public class PublishIndexesTask
         {
             if ( getRepositoryId() != null )
             {
-                getIndexerManager().publishRepositoryIndex( getRepositoryId() );
+                getNexus().publishRepositoryIndex( getRepositoryId() );
             }
             else if ( getRepositoryGroupId() != null )
             {
-                getIndexerManager().publishRepositoryGroupIndex( getRepositoryGroupId() );
+                getNexus().publishRepositoryGroupIndex( getRepositoryGroupId() );
             }
             else
             {
-                getIndexerManager().publishAllIndex();
+                getNexus().publishAllIndex();
             }
         }
         catch ( IOException e )

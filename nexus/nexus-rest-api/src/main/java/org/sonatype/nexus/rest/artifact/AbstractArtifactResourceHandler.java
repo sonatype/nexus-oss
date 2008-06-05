@@ -46,13 +46,18 @@ import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.NoSuchResourceStoreException;
 import org.sonatype.nexus.proxy.RepositoryNotAvailableException;
 import org.sonatype.nexus.proxy.StorageException;
+import org.sonatype.nexus.proxy.access.AccessDecisionVoter;
+import org.sonatype.nexus.proxy.access.CertificateBasedAccessDecisionVoter;
+import org.sonatype.nexus.proxy.access.IpAddressAccessDecisionVoter;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
-import org.sonatype.nexus.proxy.maven.GAVRequest;
+import org.sonatype.nexus.proxy.maven.ArtifactStoreRequest;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.rest.AbstractNexusResourceHandler;
 import org.sonatype.nexus.rest.ApplicationBridge;
+import org.sonatype.nexus.rest.NexusAuthenticationGuard;
+import org.sonatype.nexus.security.User;
 import org.sonatype.nexus.util.VersionUtils;
 import org.sonatype.plexus.rest.representation.InputStreamRepresentation;
 
@@ -62,6 +67,56 @@ public class AbstractArtifactResourceHandler
     public AbstractArtifactResourceHandler( Context context, Request request, Response response )
     {
         super( context, request, response );
+    }
+
+    /**
+     * Centralized way to create ResourceStoreRequests, since we have to fill in various things in Request context, like
+     * authenticated username, etc.
+     * 
+     * @param isLocal
+     * @return
+     */
+    protected ArtifactStoreRequest getResourceStoreRequest( boolean localOnly, String repositoryId,
+        String repositoryGroupId, String g, String a, String v, String p, String c )
+    {
+        ArtifactStoreRequest result = new ArtifactStoreRequest(
+            localOnly,
+            repositoryId,
+            repositoryGroupId,
+            g,
+            a,
+            v,
+            p,
+            c );
+
+        if ( getLogger().isLoggable( Level.FINE ) )
+        {
+            getLogger().log( Level.FINE, "Created ResourceStore request for " + result.getRequestPath() );
+        }
+
+        result.getRequestContext().put(
+            IpAddressAccessDecisionVoter.REQUEST_REMOTE_ADDRESS,
+            getRequest().getClientInfo().getAddress() );
+
+        if ( getRequest().getAttributes().containsKey( NexusAuthenticationGuard.REST_USER_KEY ) )
+        {
+            User user = (User) getRequest().getAttributes().get( NexusAuthenticationGuard.REST_USER_KEY );
+
+            result.getRequestContext().put( AccessDecisionVoter.REQUEST_USER, user.getUsername() );
+        }
+
+        if ( getRequest().isConfidential() )
+        {
+            result.getRequestContext().put( CertificateBasedAccessDecisionVoter.REQUEST_SECURE, Boolean.TRUE );
+
+            // X509Certificate[] certs = (X509Certificate[]) context.getHttpServletRequest().getAttribute(
+            // "javax.servlet.request.X509Certificate" );
+            // if ( false ) // certs != null )
+            // {
+            // result.getRequestContext().put( CertificateBasedAccessDecisionVoter.REQUEST_CERTIFICATES, certs );
+            // }
+        }
+        return result;
     }
 
     protected Representation getPom( Variant variant )
@@ -85,7 +140,15 @@ public class AbstractArtifactResourceHandler
             return null;
         }
 
-        GAVRequest gavRequest = new GAVRequest( groupId, artifactId, version );
+        ArtifactStoreRequest gavRequest = getResourceStoreRequest(
+            false,
+            repositoryId,
+            null,
+            groupId,
+            artifactId,
+            version,
+            null,
+            null );
 
         try
         {
@@ -193,7 +256,15 @@ public class AbstractArtifactResourceHandler
             return null;
         }
 
-        GAVRequest gavRequest = new GAVRequest( groupId, artifactId, version, packaging, classifier );
+        ArtifactStoreRequest gavRequest = getResourceStoreRequest(
+            false,
+            repositoryId,
+            null,
+            groupId,
+            artifactId,
+            version,
+            packaging,
+            classifier );
 
         try
         {
@@ -329,13 +400,14 @@ public class AbstractArtifactResourceHandler
                             // a file
                             isPom = fi.getName().endsWith( ".pom" ) || fi.getName().endsWith( "pom.xml" );
 
-                            GAVRequest gavRequest;
+                            ArtifactStoreRequest gavRequest;
 
                             if ( hasPom )
                             {
                                 if ( isPom )
                                 {
                                     pomManager.storeTempPomFile( fi.getInputStream() );
+
                                     is = pomManager.getTempPomFileInputStream();
                                 }
                                 else
@@ -343,12 +415,32 @@ public class AbstractArtifactResourceHandler
                                     is = fi.getInputStream();
                                 }
 
-                                gavRequest = pomManager.getGAVRequestFromTempPomFile();
+                                // this is ugly: since GAVRequest does not allow contructing
+                                // without GAV, i am filling it with dummy values, and pomManager
+                                // will set those to proper values
+                                gavRequest = pomManager.getGAVRequestFromTempPomFile( getResourceStoreRequest(
+                                    true,
+                                    repositoryId,
+                                    null,
+                                    "G",
+                                    "A",
+                                    "V",
+                                    "P",
+                                    "C" ) );
                             }
                             else
                             {
                                 is = fi.getInputStream();
-                                gavRequest = new GAVRequest( groupId, artifactId, version, packaging, classifier );
+
+                                gavRequest = getResourceStoreRequest(
+                                    true,
+                                    repositoryId,
+                                    null,
+                                    groupId,
+                                    artifactId,
+                                    version,
+                                    packaging,
+                                    classifier );
                             }
 
                             try
@@ -364,20 +456,24 @@ public class AbstractArtifactResourceHandler
 
                                     return;
                                 }
-                                
-                                if ( !versionMatchesPolicy( gavRequest.getVersion(), ( (MavenRepository) repository ).getRepositoryPolicy() ))
+
+                                if ( !versionMatchesPolicy( gavRequest.getVersion(), ( (MavenRepository) repository )
+                                    .getRepositoryPolicy() ) )
                                 {
-                                    getLogger().log( Level.SEVERE, "Version (" + gavRequest.getVersion() + ") and Repository Policy mismatch" );
+                                    getLogger().log(
+                                        Level.SEVERE,
+                                        "Version (" + gavRequest.getVersion() + ") and Repository Policy mismatch" );
                                     getResponse().setStatus(
                                         Status.CLIENT_ERROR_BAD_REQUEST,
-                                        "The version " + gavRequest.getVersion() + " does not match the repository policy!" );
+                                        "The version " + gavRequest.getVersion()
+                                            + " does not match the repository policy!" );
 
                                     return;
                                 }
 
                                 if ( isPom )
                                 {
-                                    ( (MavenRepository) repository ).storeArtifactPom( gavRequest, is );
+                                    ( (MavenRepository) repository ).storeArtifactPom( gavRequest, is, null );
 
                                     isPom = false;
                                 }
@@ -385,11 +481,14 @@ public class AbstractArtifactResourceHandler
                                 {
                                     if ( hasPom )
                                     {
-                                        ( (MavenRepository) repository ).storeArtifact( gavRequest, is );
+                                        ( (MavenRepository) repository ).storeArtifact( gavRequest, is, null );
                                     }
                                     else
                                     {
-                                        ( (MavenRepository) repository ).storeArtifactWithGeneratedPom( gavRequest, is );
+                                        ( (MavenRepository) repository ).storeArtifactWithGeneratedPom(
+                                            gavRequest,
+                                            is,
+                                            null );
                                     }
                                 }
                             }
@@ -425,17 +524,17 @@ public class AbstractArtifactResourceHandler
         }
 
     }
-    
+
     private boolean versionMatchesPolicy( String version, RepositoryPolicy policy )
     {
         boolean result = false;
-        
+
         if ( ( RepositoryPolicy.SNAPSHOT.equals( policy ) && VersionUtils.isSnapshot( version ) )
-             || ( RepositoryPolicy.RELEASE.equals( policy ) && !VersionUtils.isSnapshot( version ) ) )
+            || ( RepositoryPolicy.RELEASE.equals( policy ) && !VersionUtils.isSnapshot( version ) ) )
         {
             result = true;
         }
-        
+
         return result;
     }
 }

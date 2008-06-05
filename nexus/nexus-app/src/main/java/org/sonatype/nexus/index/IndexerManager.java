@@ -21,7 +21,6 @@
 package org.sonatype.nexus.index;
 
 import java.io.IOException;
-import java.util.Collection;
 
 import org.apache.lucene.search.Query;
 import org.sonatype.nexus.index.context.IndexContextInInconsistentStateException;

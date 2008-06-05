@@ -27,7 +27,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Collection;
-import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
@@ -85,7 +85,6 @@ public class DefaultIndexerManager
     extends AbstractLogEnabled
     implements IndexerManager, Initializable, ConfigurationChangeListener
 {
-
     /** Context id local suffix */
     public static final String CTX_LOCAL_SUFIX = "-local";
 
@@ -769,7 +768,7 @@ public class DefaultIndexerManager
             getLogger().error( "Got I/O exception while searching for query \"" + term + "\"", e );
         }
 
-        return new FlatSearchResponse( req.getQuery(), 0, Collections.EMPTY_SET );
+        return new FlatSearchResponse( req.getQuery(), 0, new HashSet<ArtifactInfo>() );
     }
 
     public FlatSearchResponse searchArtifactFlat( String gTerm, String aTerm, String vTerm, String cTerm,
@@ -779,7 +778,7 @@ public class DefaultIndexerManager
 
         if ( gTerm == null && aTerm == null && vTerm == null )
         {
-            return new FlatSearchResponse( null, 0, Collections.EMPTY_SET );
+            return new FlatSearchResponse( null, 0, new HashSet<ArtifactInfo>() );
         }
 
         if ( groupId != null )
@@ -856,7 +855,7 @@ public class DefaultIndexerManager
             getLogger().error( "Got I/O exception while searching for query \"" + bq.toString() + "\"", e );
         }
 
-        return new FlatSearchResponse( req.getQuery(), 0, Collections.EMPTY_SET );
+        return new FlatSearchResponse( req.getQuery(), 0, new HashSet<ArtifactInfo>() );
     }
 
     protected void postprocessResults( Collection<ArtifactInfo> res )

@@ -22,6 +22,7 @@ package org.sonatype.nexus.proxy.maven;
 
 import java.io.InputStream;
 import java.util.Collection;
+import java.util.Map;
 
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.artifact.GavCalculator;
@@ -30,7 +31,6 @@ import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.NoSuchResourceStoreException;
 import org.sonatype.nexus.proxy.RepositoryNotAvailableException;
 import org.sonatype.nexus.proxy.StorageException;
-import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.repository.Repository;
@@ -109,15 +109,7 @@ public abstract class LayoutConverterShadowRepository
     // =================================================================================
     // ArtifactStore iface
 
-    public void storeItemWithChecksums( AbstractStorageItem item )
-        throws UnsupportedStorageOperationException,
-            RepositoryNotAvailableException,
-            StorageException
-    {
-        getArtifactStoreHelper().storeItemWithChecksums( item );
-    }
-
-    public StorageFileItem retrieveArtifactPom( GAVRequest gavRequest )
+    public StorageFileItem retrieveArtifactPom( ArtifactStoreRequest gavRequest )
         throws NoSuchResourceStoreException,
             RepositoryNotAvailableException,
             ItemNotFoundException,
@@ -127,7 +119,7 @@ public abstract class LayoutConverterShadowRepository
         return getArtifactStoreHelper().retrieveArtifactPom( gavRequest );
     }
 
-    public StorageFileItem retrieveArtifact( GAVRequest gavRequest )
+    public StorageFileItem retrieveArtifact( ArtifactStoreRequest gavRequest )
         throws NoSuchResourceStoreException,
             RepositoryNotAvailableException,
             ItemNotFoundException,
@@ -137,37 +129,38 @@ public abstract class LayoutConverterShadowRepository
         return getArtifactStoreHelper().retrieveArtifact( gavRequest );
     }
 
-    public void storeArtifact( GAVRequest gavRequest, InputStream is )
+    public void storeArtifact( ArtifactStoreRequest gavRequest, InputStream is, Map<String, String> attributes )
         throws UnsupportedStorageOperationException,
             NoSuchResourceStoreException,
             RepositoryNotAvailableException,
             StorageException,
             AccessDeniedException
     {
-        getArtifactStoreHelper().storeArtifact( gavRequest, is );
+        getArtifactStoreHelper().storeArtifact( gavRequest, is, attributes );
     }
 
-    public void storeArtifactPom( GAVRequest gavRequest, InputStream is )
+    public void storeArtifactPom( ArtifactStoreRequest gavRequest, InputStream is, Map<String, String> attributes )
         throws UnsupportedStorageOperationException,
             NoSuchResourceStoreException,
             RepositoryNotAvailableException,
             StorageException,
             AccessDeniedException
     {
-        getArtifactStoreHelper().storeArtifactPom( gavRequest, is );
+        getArtifactStoreHelper().storeArtifactPom( gavRequest, is, attributes );
     }
 
-    public void storeArtifactWithGeneratedPom( GAVRequest gavRequest, InputStream is )
+    public void storeArtifactWithGeneratedPom( ArtifactStoreRequest gavRequest, InputStream is,
+        Map<String, String> attributes )
         throws UnsupportedStorageOperationException,
             NoSuchResourceStoreException,
             RepositoryNotAvailableException,
             StorageException,
             AccessDeniedException
     {
-        getArtifactStoreHelper().storeArtifactWithGeneratedPom( gavRequest, is );
+        getArtifactStoreHelper().storeArtifactWithGeneratedPom( gavRequest, is, attributes );
     }
 
-    public void deleteArtifact( GAVRequest gavRequest, boolean withAllSubordinates )
+    public void deleteArtifact( ArtifactStoreRequest gavRequest, boolean withAllSubordinates )
         throws UnsupportedStorageOperationException,
             NoSuchResourceStoreException,
             RepositoryNotAvailableException,
@@ -178,11 +171,11 @@ public abstract class LayoutConverterShadowRepository
         getArtifactStoreHelper().deleteArtifact( gavRequest, withAllSubordinates );
     }
 
-    public Collection<Gav> listArtifacts( GAVRequest gavRequest )
+    public Collection<Gav> listArtifacts( ArtifactStoreRequest gavRequest )
     {
         return getArtifactStoreHelper().listArtifacts( gavRequest );
     }
-    
+
     // =======================================================================================
     // MavenRepository iface, delegates to master simply
 
@@ -218,37 +211,37 @@ public abstract class LayoutConverterShadowRepository
 
     public void setChecksumPolicy( ChecksumPolicy checksumPolicy )
     {
-        throw new UnsupportedOperationException("This method is not supported on Repository of type SHADOW");
+        throw new UnsupportedOperationException( "This method is not supported on Repository of type SHADOW" );
     }
 
     public void setCleanseRepositoryMetadata( boolean cleanseRepositoryMetadata )
     {
-        throw new UnsupportedOperationException("This method is not supported on Repository of type SHADOW");
+        throw new UnsupportedOperationException( "This method is not supported on Repository of type SHADOW" );
     }
 
     public void setFixRepositoryChecksums( boolean fixRepositoryChecksums )
     {
-        throw new UnsupportedOperationException("This method is not supported on Repository of type SHADOW");
+        throw new UnsupportedOperationException( "This method is not supported on Repository of type SHADOW" );
     }
 
     public void setMetadataMaxAge( int metadataMaxAge )
     {
-        throw new UnsupportedOperationException("This method is not supported on Repository of type SHADOW");
+        throw new UnsupportedOperationException( "This method is not supported on Repository of type SHADOW" );
     }
 
     public void setReleaseMaxAge( int releaseMaxAge )
     {
-        throw new UnsupportedOperationException("This method is not supported on Repository of type SHADOW");
+        throw new UnsupportedOperationException( "This method is not supported on Repository of type SHADOW" );
     }
 
     public void setRepositoryPolicy( RepositoryPolicy repositoryPolicy )
     {
-        throw new UnsupportedOperationException("This method is not supported on Repository of type SHADOW");
+        throw new UnsupportedOperationException( "This method is not supported on Repository of type SHADOW" );
     }
 
     public void setSnapshotMaxAge( int snapshotMaxAge )
     {
-        throw new UnsupportedOperationException("This method is not supported on Repository of type SHADOW");
+        throw new UnsupportedOperationException( "This method is not supported on Repository of type SHADOW" );
     }
 
     // =================================================================================

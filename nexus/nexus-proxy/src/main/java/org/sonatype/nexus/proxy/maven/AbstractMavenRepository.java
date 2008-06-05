@@ -205,15 +205,7 @@ public abstract class AbstractMavenRepository
     // =================================================================================
     // ArtifactStore iface
 
-    public void storeItemWithChecksums( AbstractStorageItem item )
-        throws UnsupportedStorageOperationException,
-            RepositoryNotAvailableException,
-            StorageException
-    {
-        getArtifactStoreHelper().storeItemWithChecksums( item );
-    }
-
-    public StorageFileItem retrieveArtifactPom( GAVRequest gavRequest )
+    public StorageFileItem retrieveArtifactPom( ArtifactStoreRequest gavRequest )
         throws NoSuchResourceStoreException,
             RepositoryNotAvailableException,
             ItemNotFoundException,
@@ -223,7 +215,7 @@ public abstract class AbstractMavenRepository
         return getArtifactStoreHelper().retrieveArtifactPom( gavRequest );
     }
 
-    public StorageFileItem retrieveArtifact( GAVRequest gavRequest )
+    public StorageFileItem retrieveArtifact( ArtifactStoreRequest gavRequest )
         throws NoSuchResourceStoreException,
             RepositoryNotAvailableException,
             ItemNotFoundException,
@@ -233,37 +225,38 @@ public abstract class AbstractMavenRepository
         return getArtifactStoreHelper().retrieveArtifact( gavRequest );
     }
 
-    public void storeArtifact( GAVRequest gavRequest, InputStream is )
+    public void storeArtifact( ArtifactStoreRequest gavRequest, InputStream is, Map<String, String> attributes )
         throws UnsupportedStorageOperationException,
             NoSuchResourceStoreException,
             RepositoryNotAvailableException,
             StorageException,
             AccessDeniedException
     {
-        getArtifactStoreHelper().storeArtifact( gavRequest, is );
+        getArtifactStoreHelper().storeArtifact( gavRequest, is, attributes );
     }
 
-    public void storeArtifactPom( GAVRequest gavRequest, InputStream is )
+    public void storeArtifactPom( ArtifactStoreRequest gavRequest, InputStream is, Map<String, String> attributes )
         throws UnsupportedStorageOperationException,
             NoSuchResourceStoreException,
             RepositoryNotAvailableException,
             StorageException,
             AccessDeniedException
     {
-        getArtifactStoreHelper().storeArtifactPom( gavRequest, is );
+        getArtifactStoreHelper().storeArtifactPom( gavRequest, is, attributes );
     }
 
-    public void storeArtifactWithGeneratedPom( GAVRequest gavRequest, InputStream is )
+    public void storeArtifactWithGeneratedPom( ArtifactStoreRequest gavRequest, InputStream is,
+        Map<String, String> attributes )
         throws UnsupportedStorageOperationException,
             NoSuchResourceStoreException,
             RepositoryNotAvailableException,
             StorageException,
             AccessDeniedException
     {
-        getArtifactStoreHelper().storeArtifactWithGeneratedPom( gavRequest, is );
+        getArtifactStoreHelper().storeArtifactWithGeneratedPom( gavRequest, is, attributes );
     }
 
-    public void deleteArtifact( GAVRequest gavRequest, boolean withAllSubordinates )
+    public void deleteArtifact( ArtifactStoreRequest gavRequest, boolean withAllSubordinates )
         throws UnsupportedStorageOperationException,
             NoSuchResourceStoreException,
             RepositoryNotAvailableException,
@@ -274,7 +267,7 @@ public abstract class AbstractMavenRepository
         getArtifactStoreHelper().deleteArtifact( gavRequest, withAllSubordinates );
     }
 
-    public Collection<Gav> listArtifacts( GAVRequest gavRequest )
+    public Collection<Gav> listArtifacts( ArtifactStoreRequest gavRequest )
     {
         return getArtifactStoreHelper().listArtifacts( gavRequest );
     }

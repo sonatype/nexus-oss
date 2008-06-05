@@ -25,6 +25,7 @@ import java.io.InputStream;
 import java.io.StringWriter;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Map;
 
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
@@ -36,7 +37,7 @@ import org.sonatype.nexus.proxy.NoSuchResourceStoreException;
 import org.sonatype.nexus.proxy.RepositoryNotAvailableException;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.attributes.inspectors.DigestCalculatingInspector;
-import org.sonatype.nexus.proxy.item.AbstractStorageItem;
+import org.sonatype.nexus.proxy.item.ContentLocator;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.PreparedContentLocator;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
@@ -63,16 +64,29 @@ public class ArtifactStoreHelper
         this.repository = repo;
     }
 
-    public void storeItemWithChecksums( AbstractStorageItem item )
+    public void storeItemWithChecksums( ArtifactStoreRequest request, ContentLocator locator,
+        Map<String, String> attributes )
         throws UnsupportedStorageOperationException,
+            NoSuchResourceStoreException,
             RepositoryNotAvailableException,
-            StorageException
+            StorageException,
+            AccessDeniedException
     {
         try
         {
-            repository.storeItem( item );
+            // this will refuse storing with AccessDenied if no rights
+            try
+            {
+                repository.storeItem( request, locator.getContent(), attributes );
+            }
+            catch ( IOException e )
+            {
+                throw new StorageException( "Could not get the content from the ContentLocator!", e );
+            }
 
-            StorageFileItem storedFile = (StorageFileItem) repository.retrieveItem( true, item.getRepositoryItemUid() );
+            RepositoryItemUid uid = new RepositoryItemUid( repository, request.getRequestPath() );
+
+            StorageFileItem storedFile = (StorageFileItem) repository.retrieveItem( true, uid );
 
             String sha1Hash = storedFile.getAttributes().get( DigestCalculatingInspector.DIGEST_SHA1_KEY );
 
@@ -82,7 +96,7 @@ public class ArtifactStoreHelper
             {
                 repository.storeItem( new DefaultStorageFileItem(
                     repository,
-                    item.getPath() + ".sha1",
+                    request.getRequestPath() + ".sha1",
                     true,
                     true,
                     new StringContentLocator( sha1Hash ) ) );
@@ -92,7 +106,7 @@ public class ArtifactStoreHelper
             {
                 repository.storeItem( new DefaultStorageFileItem(
                     repository,
-                    item.getPath() + ".md5",
+                    request.getRequestPath() + ".md5",
                     true,
                     true,
                     new StringContentLocator( md5Hash ) ) );
@@ -104,7 +118,7 @@ public class ArtifactStoreHelper
         }
     }
 
-    public StorageFileItem retrieveArtifactPom( GAVRequest gavRequest )
+    public StorageFileItem retrieveArtifactPom( ArtifactStoreRequest gavRequest )
         throws NoSuchResourceStoreException,
             RepositoryNotAvailableException,
             ItemNotFoundException,
@@ -126,9 +140,9 @@ public class ArtifactStoreHelper
             false,
             null );
 
-        RepositoryItemUid uid = new RepositoryItemUid( repository, repository.getGavCalculator().gavToPath( gav ) );
+        gavRequest.setRequestPath( repository.getGavCalculator().gavToPath( gav ) );
 
-        StorageItem item = repository.retrieveItem( false, uid );
+        StorageItem item = repository.retrieveItem( gavRequest );
 
         if ( StorageFileItem.class.isAssignableFrom( item.getClass() ) )
         {
@@ -136,11 +150,11 @@ public class ArtifactStoreHelper
         }
         else
         {
-            throw new StorageException( "The POM retrieval returned non-file, path:" + uid.getPath() );
+            throw new StorageException( "The POM retrieval returned non-file, path:" + gavRequest.getRequestPath() );
         }
     }
 
-    public StorageFileItem retrieveArtifact( GAVRequest gavRequest )
+    public StorageFileItem retrieveArtifact( ArtifactStoreRequest gavRequest )
         throws NoSuchResourceStoreException,
             RepositoryNotAvailableException,
             ItemNotFoundException,
@@ -154,9 +168,9 @@ public class ArtifactStoreHelper
             gavRequest.getPackaging() ), null, null, null, RepositoryPolicy.SNAPSHOT.equals( repository
             .getRepositoryPolicy() ), false, null );
 
-        RepositoryItemUid uid = new RepositoryItemUid( repository, repository.getGavCalculator().gavToPath( gav ) );
+        gavRequest.setRequestPath( repository.getGavCalculator().gavToPath( gav ) );
 
-        StorageItem item = repository.retrieveItem( false, uid );
+        StorageItem item = repository.retrieveItem( gavRequest );
 
         if ( StorageFileItem.class.isAssignableFrom( item.getClass() ) )
         {
@@ -164,11 +178,11 @@ public class ArtifactStoreHelper
         }
         else
         {
-            throw new StorageException( "The Artifact retrieval returned non-file, path:" + uid.getPath() );
+            throw new StorageException( "The Artifact retrieval returned non-file, path:" + gavRequest.getRequestPath() );
         }
     }
 
-    public void storeArtifactPom( GAVRequest gavRequest, InputStream is )
+    public void storeArtifactPom( ArtifactStoreRequest gavRequest, InputStream is, Map<String, String> attributes )
         throws UnsupportedStorageOperationException,
             NoSuchResourceStoreException,
             RepositoryNotAvailableException,
@@ -181,13 +195,12 @@ public class ArtifactStoreHelper
             .getClassifier(), "pom", null, null, null, RepositoryPolicy.SNAPSHOT.equals( repository
             .getRepositoryPolicy() ), false, null );
 
-        DefaultStorageFileItem file = new DefaultStorageFileItem( repository, repository.getGavCalculator().gavToPath(
-            gav ), true, true, new PreparedContentLocator( is ) );
+        gavRequest.setRequestPath( repository.getGavCalculator().gavToPath( gav ) );
 
-        storeItemWithChecksums( file );
+        storeItemWithChecksums( gavRequest, new PreparedContentLocator( is ), attributes );
     }
 
-    public void storeArtifact( GAVRequest gavRequest, InputStream is )
+    public void storeArtifact( ArtifactStoreRequest gavRequest, InputStream is, Map<String, String> attributes )
         throws UnsupportedStorageOperationException,
             NoSuchResourceStoreException,
             RepositoryNotAvailableException,
@@ -206,13 +219,13 @@ public class ArtifactStoreHelper
             gavRequest.getPackaging() ), null, null, null, RepositoryPolicy.SNAPSHOT.equals( repository
             .getRepositoryPolicy() ), false, null );
 
-        DefaultStorageFileItem file = new DefaultStorageFileItem( repository, repository.getGavCalculator().gavToPath(
-            gav ), true, true, new PreparedContentLocator( is ) );
+        gavRequest.setRequestPath( repository.getGavCalculator().gavToPath( gav ) );
 
-        storeItemWithChecksums( file );
+        storeItemWithChecksums( gavRequest, new PreparedContentLocator( is ), attributes );
     }
 
-    public void storeArtifactWithGeneratedPom( GAVRequest gavRequest, InputStream is )
+    public void storeArtifactWithGeneratedPom( ArtifactStoreRequest gavRequest, InputStream is,
+        Map<String, String> attributes )
         throws UnsupportedStorageOperationException,
             NoSuchResourceStoreException,
             RepositoryNotAvailableException,
@@ -262,8 +275,9 @@ public class ArtifactStoreHelper
                 // writing to string, not to happen
             }
 
-            storeItemWithChecksums( new DefaultStorageFileItem( repository, repository.getGavCalculator().gavToPath(
-                pomGav ), true, true, new StringContentLocator( sw.toString() ) ) );
+            gavRequest.setRequestPath( repository.getGavCalculator().gavToPath( pomGav ) );
+
+            storeItemWithChecksums( gavRequest, new StringContentLocator( sw.toString() ), attributes );
         }
 
         Gav artifactGav = new Gav(
@@ -279,11 +293,12 @@ public class ArtifactStoreHelper
             false,
             null );
 
-        storeItemWithChecksums( new DefaultStorageFileItem( repository, repository.getGavCalculator().gavToPath(
-            artifactGav ), true, true, new PreparedContentLocator( is ) ) );
+        gavRequest.setRequestPath( repository.getGavCalculator().gavToPath( artifactGav ) );
+
+        storeItemWithChecksums( gavRequest, new PreparedContentLocator( is ), attributes );
     }
 
-    public void deleteArtifact( GAVRequest gavRequest, boolean withAllSubordinates )
+    public void deleteArtifact( ArtifactStoreRequest gavRequest, boolean withAllSubordinates )
         throws UnsupportedStorageOperationException,
             NoSuchResourceStoreException,
             RepositoryNotAvailableException,
@@ -296,20 +311,20 @@ public class ArtifactStoreHelper
             gavRequest.getPackaging() ), null, null, null, RepositoryPolicy.SNAPSHOT.equals( repository
             .getRepositoryPolicy() ), false, null );
 
-        RepositoryItemUid uid = new RepositoryItemUid( repository, repository.getGavCalculator().gavToPath( gav ) );
+        gavRequest.setRequestPath( repository.getGavCalculator().gavToPath( gav ) );
 
         // TODO: implement other stuff too
-        repository.deleteItem( uid );
+        repository.deleteItem( gavRequest );
     }
 
-    public Collection<Gav> listArtifacts( GAVRequest gavRequest )
+    public Collection<Gav> listArtifacts( ArtifactStoreRequest gavRequest )
     {
         return Collections.emptyList();
     }
 
     // =======================================================================================
 
-    protected void checkRequest( GAVRequest gavRequest )
+    protected void checkRequest( ArtifactStoreRequest gavRequest )
     {
         if ( gavRequest.getGroupId() == null || gavRequest.getArtifactId() == null || gavRequest.getVersion() == null )
         {

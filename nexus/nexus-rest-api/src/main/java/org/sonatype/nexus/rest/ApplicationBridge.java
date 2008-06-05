@@ -213,27 +213,6 @@ public class ApplicationBridge
         // attaching the restlets to scond router
         router.attach( "/status", StatusResourceHandler.class );
 
-        router.attach( "/artifact/maven", ArtifactResourceHandler.class );
-
-        router.attach( "/artifact/maven/content", ArtifactResourceContentHandler.class );
-
-        router.attach( "/data_index", IndexResourceHandler.class );
-
-        router.attach(
-            "/data_index/{" + IndexResourceHandler.DOMAIN + "}/{" + IndexResourceHandler.TARGET_ID + "}",
-            IndexResourceHandler.class );
-
-        router.attach( "/data_index/{" + IndexResourceHandler.DOMAIN + "}/{" + IndexResourceHandler.TARGET_ID
-            + "}/content", IndexResourceHandler.class );
-
-        router.attach( "/attributes", AttributesResourceHandler.class );
-
-        router.attach( "/attributes/{" + AttributesResourceHandler.DOMAIN + "}/{" + AttributesResourceHandler.TARGET_ID
-            + "}", AttributesResourceHandler.class );
-
-        router.attach( "/attributes/{" + AttributesResourceHandler.DOMAIN + "}/{" + AttributesResourceHandler.TARGET_ID
-            + "}/content", AttributesResourceHandler.class );
-
         router.attach( "/feeds", FeedsListResourceHandler.class );
 
         router.attach( "/feeds/{" + FeedResourceHandler.FEED_KEY + "}", FeedResourceHandler.class );
@@ -249,6 +228,30 @@ public class ApplicationBridge
 
         try
         {
+            router.attach( "/artifact/maven", protectWriteToResource( ArtifactResourceHandler.class ) );
+
+            router.attach( "/artifact/maven/content", protectWriteToResource( ArtifactResourceContentHandler.class ) );
+
+            router.attach( "/data_index", protectWriteToResource( IndexResourceHandler.class ) );
+
+            router.attach(
+                "/data_index/{" + IndexResourceHandler.DOMAIN + "}/{" + IndexResourceHandler.TARGET_ID + "}",
+                protectWriteToResource( IndexResourceHandler.class ) );
+
+            router.attach( "/data_index/{" + IndexResourceHandler.DOMAIN + "}/{" + IndexResourceHandler.TARGET_ID
+                + "}/content", protectWriteToResource( IndexResourceHandler.class ) );
+
+            router.attach( "/attributes", protectResource( AttributesResourceHandler.class ) );
+
+            router.attach( "/attributes/{" + AttributesResourceHandler.DOMAIN + "}/{"
+                + AttributesResourceHandler.TARGET_ID + "}", protectResource( AttributesResourceHandler.class ) );
+
+            router
+                .attach(
+                    "/attributes/{" + AttributesResourceHandler.DOMAIN + "}/{" + AttributesResourceHandler.TARGET_ID
+                        + "}/content",
+                    protectResource( AttributesResourceHandler.class ) );
+
             router.attach(
                 "/repositories/{" + RepositoryResourceHandler.REPOSITORY_ID_KEY + "}/content",
                 protectWriteToResource( RepositoryContentResourceHandler.class ) );
@@ -315,9 +318,9 @@ public class ApplicationBridge
             router.attach( "/schedules", protectResource( ScheduledServiceListResourceHandler.class ) );
 
             router.attach( "/schedules/types", protectResource( ScheduledServiceTypeResourceHandler.class ) );
-            
-            router.attach( 
-                "/schedules/run/{" + ScheduledServiceRunResourceHandler.SCHEDULED_SERVICE_ID_KEY + "}", 
+
+            router.attach(
+                "/schedules/run/{" + ScheduledServiceRunResourceHandler.SCHEDULED_SERVICE_ID_KEY + "}",
                 protectResource( ScheduledServiceRunResourceHandler.class ) );
 
             router.attach(

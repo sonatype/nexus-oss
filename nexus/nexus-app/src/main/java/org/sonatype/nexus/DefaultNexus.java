@@ -901,6 +901,26 @@ public class DefaultNexus
         indexerManager.reindexRepositoryGroup( repositoryGroupId );
     }
 
+    public void publishAllIndex()
+        throws IOException
+    {
+        indexerManager.publishAllIndex();
+    }
+
+    public void publishRepositoryIndex( String repositoryId )
+        throws IOException,
+            NoSuchRepositoryException
+    {
+        indexerManager.publishRepositoryIndex( repositoryId );
+    }
+
+    public void publishRepositoryGroupIndex( String repositoryGroupId )
+        throws IOException,
+            NoSuchRepositoryGroupException
+    {
+        indexerManager.publishRepositoryGroupIndex( repositoryGroupId );
+    }
+
     public void rebuildAttributesAllRepositories()
         throws IOException
     {
@@ -1429,4 +1449,5 @@ public class DefaultNexus
 
         getFeedRecorder().addSystemEvent( FeedRecorder.SYSTEM_CONFIG_ACTION, "Nexus configuration changed/updated." );
     }
+
 }

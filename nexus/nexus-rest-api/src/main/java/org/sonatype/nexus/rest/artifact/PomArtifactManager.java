@@ -34,7 +34,7 @@ import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.pull.MXParser;
 import org.codehaus.plexus.util.xml.pull.XmlPullParser;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
-import org.sonatype.nexus.proxy.maven.GAVRequest;
+import org.sonatype.nexus.proxy.maven.ArtifactStoreRequest;
 
 public class PomArtifactManager
 {
@@ -42,7 +42,7 @@ public class PomArtifactManager
 
     private File tmpPomFile = null;
 
-    private GAVRequest gavRequest = null;
+    private ArtifactStoreRequest gavRequest = null;
 
     private int state = 0;
 
@@ -110,7 +110,7 @@ public class PomArtifactManager
         return new FileInputStream( tmpPomFile );
     }
 
-    public GAVRequest getGAVRequestFromTempPomFile()
+    public ArtifactStoreRequest getGAVRequestFromTempPomFile( ArtifactStoreRequest request )
         throws IOException,
             XmlPullParserException
     {
@@ -130,7 +130,9 @@ public class PomArtifactManager
         {
             reader = ReaderFactory.newXmlReader( tmpPomFile );
 
-            gavRequest = parsePom( reader );
+            gavRequest = request;
+
+            parsePom( reader );
 
             state = STATE_GAV_GENERATED;
         }
@@ -156,7 +158,7 @@ public class PomArtifactManager
         state = STATE_NONE;
     }
 
-    private GAVRequest parsePom( Reader reader )
+    private void parsePom( Reader reader )
         throws IOException,
             XmlPullParserException
     {
@@ -165,6 +167,8 @@ public class PomArtifactManager
         String artifactId = null;
 
         String version = null;
+
+        String packaging = "jar";
 
         XmlPullParser parser = new MXParser();
 
@@ -217,6 +221,14 @@ public class PomArtifactManager
                         version = StringUtils.trim( parser.nextText() );
                     }
                 }
+                else if ( parser.getName().equals( "packaging" ) )
+                {
+                    // 1st: if found project/packaging -> overwrite
+                    if ( parser.getDepth() == 2 )
+                    {
+                        packaging = StringUtils.trim( parser.nextText() );
+                    }
+                }
                 else if ( !foundRoot )
                 {
                     throw new XmlPullParserException( "Unrecognised tag: '" + parser.getName() + "'", parser, null );
@@ -233,6 +245,15 @@ public class PomArtifactManager
             eventType = parser.next();
         }
 
-        return new GAVRequest( groupId, artifactId, version );
+        gavRequest.setGroupId( groupId );
+
+        gavRequest.setArtifactId( artifactId );
+
+        gavRequest.setVersion( version );
+
+        gavRequest.setPackaging( packaging );
+
+        // POMs have no classifiers, so reset it
+        gavRequest.setClassifier( null );
     }
 }

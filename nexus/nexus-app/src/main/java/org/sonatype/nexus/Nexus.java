@@ -72,8 +72,9 @@ public interface Nexus
 
     NexusConfiguration getNexusConfiguration();
 
-    // ------------------------------------------------------------------
+    // ----------------------------------------------------------------------------
     // Reposes
+    // ----------------------------------------------------------------------------
 
     Repository getRepository( String repoId )
         throws NoSuchRepositoryException;
@@ -93,8 +94,9 @@ public interface Nexus
             RepositoryNotAvailableException,
             StorageException;
 
-    // ------------------------------------------------------------------
+    // ----------------------------------------------------------------------------
     // Maintenance
+    // ----------------------------------------------------------------------------
 
     InputStream getConfigurationAsStream()
         throws IOException;
@@ -113,14 +115,49 @@ public interface Nexus
     void clearRepositoryGroupCaches( String path, String repositoryGroupId )
         throws NoSuchRepositoryGroupException;
 
-    // ------------------------------------------------------------------
+    void reindexAllRepositories()
+        throws IOException;
+
+    void reindexRepository( String repositoryId )
+        throws NoSuchRepositoryException,
+            IOException;
+
+    void reindexRepositoryGroup( String repositoryGroupId )
+        throws NoSuchRepositoryGroupException,
+            IOException;
+
+    void publishAllIndex()
+        throws IOException;
+
+    void publishRepositoryIndex( String repositoryId )
+        throws IOException,
+            NoSuchRepositoryException;
+
+    void publishRepositoryGroupIndex( String repositoryGroupId )
+        throws IOException,
+            NoSuchRepositoryGroupException;
+
+    void rebuildAttributesAllRepositories()
+        throws IOException;
+
+    void rebuildAttributesRepository( String repositoryId )
+        throws NoSuchRepositoryException,
+            IOException;
+
+    void rebuildAttributesRepositoryGroup( String repositoryGroupId )
+        throws NoSuchRepositoryGroupException,
+            IOException;
+
+    // ----------------------------------------------------------------------------
     // Feeds
+    // ----------------------------------------------------------------------------
 
     @Deprecated
     FeedRecorder getFeedRecorder();
 
-    // ------------------------------------------------------------------
+    // ----------------------------------------------------------------------------
     // Scheduler
+    // ----------------------------------------------------------------------------
 
     <T> void submit( NexusTask<T> task )
         throws RejectedExecutionException,
@@ -135,8 +172,9 @@ public interface Nexus
     SubmittedTask<?> getTaskById( String id )
         throws NoSuchTaskException;
 
-    // ------------------------------------------------------------------
-    // Configuration defaults
+    // ----------------------------------------------------------------------------
+    // Default Configuration
+    // ----------------------------------------------------------------------------
 
     boolean isDefaultSecurityEnabled();
 
@@ -157,8 +195,9 @@ public interface Nexus
 
     CRouting readDefaultRouting();
 
-    // ------------------------------------------------------------------
+    // ----------------------------------------------------------------------------
     // Repo templates, CRUD
+    // ----------------------------------------------------------------------------
 
     Collection<CRepository> listRepositoryTemplates()
         throws IOException;
@@ -190,37 +229,12 @@ public interface Nexus
     void deleteRepositoryShadowTemplate( String id )
         throws IOException;
 
-    // ------------------------------------------------------------------
-    // Search and indexing related
-
-    void reindexAllRepositories()
-        throws IOException;
-
-    void reindexRepository( String repositoryId )
-        throws NoSuchRepositoryException,
-            IOException;
-
-    void reindexRepositoryGroup( String repositoryGroupId )
-        throws NoSuchRepositoryGroupException,
-            IOException;
-
-    void rebuildAttributesAllRepositories()
-        throws IOException;
-
-    void rebuildAttributesRepository( String repositoryId )
-        throws NoSuchRepositoryException,
-            IOException;
-
-    void rebuildAttributesRepositoryGroup( String repositoryGroupId )
-        throws NoSuchRepositoryGroupException,
-            IOException;
+    // ----------------------------------------------------------------------------
+    // Search/identify
+    // ----------------------------------------------------------------------------
 
     ArtifactInfo identifyArtifact( String type, String checksum )
         throws IOException;
-
-    // ----------------------------------------------------------------------------
-    // Combined searching
-    // ----------------------------------------------------------------------------
 
     FlatSearchResponse searchArtifactFlat( String term, String repositoryId, String groupId, Integer from, Integer count );
 

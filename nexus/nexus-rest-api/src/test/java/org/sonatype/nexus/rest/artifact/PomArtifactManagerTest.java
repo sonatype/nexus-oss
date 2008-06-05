@@ -27,7 +27,7 @@ import java.io.InputStream;
 import junit.framework.TestCase;
 
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
-import org.sonatype.nexus.proxy.maven.GAVRequest;
+import org.sonatype.nexus.proxy.maven.ArtifactStoreRequest;
 
 public class PomArtifactManagerTest
     extends TestCase
@@ -46,7 +46,7 @@ public class PomArtifactManagerTest
 
         manager.storeTempPomFile( is );
 
-        GAVRequest request = manager.getGAVRequestFromTempPomFile();
+        ArtifactStoreRequest request = manager.getGAVRequestFromTempPomFile( new ArtifactStoreRequest( "G", "A", "V" ) );
 
         assertTrue( "groupId should be test-group", "test-group".equals( request.getGroupId() ) );
         assertTrue( "artifactId should be test-artifact", "test-artifact".equals( request.getArtifactId() ) );
@@ -67,7 +67,7 @@ public class PomArtifactManagerTest
 
         manager.storeTempPomFile( is );
 
-        GAVRequest request = manager.getGAVRequestFromTempPomFile();
+        ArtifactStoreRequest request = manager.getGAVRequestFromTempPomFile( new ArtifactStoreRequest( "G", "A", "V" ) );
 
         assertTrue( "groupId should be test-group", "test-group".equals( request.getGroupId() ) );
         assertTrue( "artifactId should be test-artifact", "test-artifact".equals( request.getArtifactId() ) );

@@ -21,8 +21,10 @@
 package org.sonatype.nexus.proxy.maven;
 
 import org.codehaus.plexus.util.StringUtils;
+import org.sonatype.nexus.proxy.ResourceStoreRequest;
 
-public class GAVRequest
+public class ArtifactStoreRequest
+    extends ResourceStoreRequest
 {
     private String groupId;
 
@@ -34,9 +36,10 @@ public class GAVRequest
 
     private String classifier;
 
-    public GAVRequest( String g, String a, String v )
+    public ArtifactStoreRequest( boolean localOnly, String repositoryId, String repositoryGroupId, String g, String a,
+        String v, String p, String c )
     {
-        super();
+        super( "GAV", localOnly, repositoryId, repositoryGroupId );
 
         if ( StringUtils.isEmpty( g ) || StringUtils.isEmpty( a ) || StringUtils.isEmpty( v ) )
         {
@@ -49,24 +52,33 @@ public class GAVRequest
 
         setVersion( v );
 
-        setPackaging( "jar" );
-
-        setClassifier( null );
-    }
-
-    public GAVRequest( String g, String a, String v, String p, String c )
-    {
-        this( g, a, v );
+        if ( !StringUtils.isEmpty( p ) )
+        {
+            setPackaging( p );
+        }
+        else
+        {
+            setPackaging( "jar" );
+        }
 
         if ( !StringUtils.isEmpty( c ) )
         {
             setClassifier( c );
         }
-
-        if ( !StringUtils.isEmpty( p ) )
+        else
         {
-            setPackaging( p );
+            setClassifier( null );
         }
+    }
+
+    public ArtifactStoreRequest( String g, String a, String v, String p, String c )
+    {
+        this( false, null, null, g, a, v, p, c );
+    }
+
+    public ArtifactStoreRequest( String g, String a, String v )
+    {
+        this( false, null, null, g, a, v, null, null );
     }
 
     public String getGroupId()
