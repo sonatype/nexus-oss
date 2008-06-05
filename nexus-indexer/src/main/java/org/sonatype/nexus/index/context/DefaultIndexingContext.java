@@ -388,12 +388,12 @@ public class DefaultIndexingContext
 
             closeReaders();
 
-            indexDirectory.close();
-
             if ( deleteFiles )
             {
                 deleteIndexFiles();
             }
+            
+            indexDirectory.close();
         }
         // TODO: this will prevent from reopening them, but needs better solution
         indexDirectory = null;
@@ -402,8 +402,6 @@ public class DefaultIndexingContext
     public void purge()
         throws IOException
     {
-        IndexUtils.updateTimestamp( indexDirectory, getTimestamp() );
-
         if ( indexDirectory != null )
         {
             closeReaders();
