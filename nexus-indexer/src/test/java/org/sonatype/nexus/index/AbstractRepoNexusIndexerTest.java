@@ -16,7 +16,6 @@ package org.sonatype.nexus.index;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -94,7 +93,9 @@ public abstract class AbstractRepoNexusIndexerTest
         // ----------------------------------------------------------------------------
         Query q = nexusIndexer.constructQuery( ArtifactInfo.GROUP_ID, "qdox" );
 
-        Map<String, ArtifactInfoGroup> r = nexusIndexer.searchGrouped( new GAGrouping(), q );
+        GroupedSearchResponse response = nexusIndexer.searchGrouped( new GroupedSearchRequest( q, new GAGrouping() ) );
+
+        Map<String, ArtifactInfoGroup> r = response.getResults();
 
         assertEquals( 1, r.size() );
 
@@ -206,19 +207,25 @@ public abstract class AbstractRepoNexusIndexerTest
         // have pagesize of 4, that will make us 3 pages
         req.setAiCount( pageSize );
 
-        Collection<ArtifactInfo> p1 = nexusIndexer.searchFlat( req );
+        FlatSearchResponse resp1 = nexusIndexer.searchFlat( req );
+
+        Collection<ArtifactInfo> p1 = resp1.getResults();
 
         assertEquals( pageSize, p1.size() );
 
         req.setStart( req.getStart() + pageSize );
 
-        Collection<ArtifactInfo> p2 = nexusIndexer.searchFlat( req );
+        FlatSearchResponse resp2 = nexusIndexer.searchFlat( req );
+
+        Collection<ArtifactInfo> p2 = resp2.getResults();
 
         assertEquals( pageSize, p2.size() );
 
         req.setStart( req.getStart() + pageSize );
 
-        Collection<ArtifactInfo> p3 = nexusIndexer.searchFlat( req );
+        FlatSearchResponse resp3 = nexusIndexer.searchFlat( req );
+
+        Collection<ArtifactInfo> p3 = resp3.getResults();
 
         assertEquals( pageSize, p3.size() );
 

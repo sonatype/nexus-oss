@@ -16,13 +16,14 @@ package org.sonatype.nexus.index.search;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Comparator;
-import java.util.Map;
 import java.util.Set;
 
 import org.apache.lucene.search.Query;
 import org.sonatype.nexus.index.ArtifactInfo;
-import org.sonatype.nexus.index.ArtifactInfoGroup;
-import org.sonatype.nexus.index.Grouping;
+import org.sonatype.nexus.index.FlatSearchRequest;
+import org.sonatype.nexus.index.FlatSearchResponse;
+import org.sonatype.nexus.index.GroupedSearchRequest;
+import org.sonatype.nexus.index.GroupedSearchResponse;
 import org.sonatype.nexus.index.context.IndexContextInInconsistentStateException;
 import org.sonatype.nexus.index.context.IndexingContext;
 
@@ -39,33 +40,32 @@ public interface SearchEngine
     // Searching
     // ----------------------------------------------------------------------------
 
+    @Deprecated
     public Set<ArtifactInfo> searchFlat( Comparator<ArtifactInfo> artifactInfoComparator,
         IndexingContext indexingContext, Query query )
         throws IOException,
             IndexContextInInconsistentStateException;
 
+    @Deprecated
     public Set<ArtifactInfo> searchFlat( Comparator<ArtifactInfo> artifactInfoComparator,
         Collection<IndexingContext> indexingContexts, Query query )
         throws IOException,
             IndexContextInInconsistentStateException;
 
-    public Set<ArtifactInfo> searchFlatPaged( Comparator<ArtifactInfo> artifactInfoComparator,
-        IndexingContext indexingContext, Query query, int from, int aiCount )
+    public FlatSearchResponse searchFlatPaged( FlatSearchRequest request )
         throws IOException,
             IndexContextInInconsistentStateException;
 
-    public Set<ArtifactInfo> searchFlatPaged( Comparator<ArtifactInfo> artifactInfoComparator,
-        Collection<IndexingContext> indexingContexts, Query query, int from, int aiCount )
+    public FlatSearchResponse searchFlatPaged( FlatSearchRequest request, Collection<IndexingContext> indexingContexts )
         throws IOException,
             IndexContextInInconsistentStateException;
 
-    public Map<String, ArtifactInfoGroup> searchGrouped( Grouping grouping, Comparator<String> groupKeyComparator,
-        IndexingContext indexingContext, Query query )
+    public GroupedSearchResponse searchGrouped( GroupedSearchRequest request )
         throws IOException,
             IndexContextInInconsistentStateException;
 
-    public Map<String, ArtifactInfoGroup> searchGrouped( Grouping grouping, Comparator<String> groupKeyComparator,
-        Collection<IndexingContext> indexingContexts, Query query )
+    public GroupedSearchResponse searchGrouped( GroupedSearchRequest request,
+        Collection<IndexingContext> indexingContexts )
         throws IOException,
             IndexContextInInconsistentStateException;
 }

@@ -211,6 +211,7 @@ public interface NexusIndexer
      * Will search all searchable contexts know to Nexus indexer and merge the results. The default comparator will be
      * used (VersionComparator) to sort the results.
      */
+    @Deprecated
     Collection<ArtifactInfo> searchFlat( Query query )
         throws IOException,
             IndexContextInInconsistentStateException;
@@ -218,6 +219,7 @@ public interface NexusIndexer
     /**
      * Will search the given context. The default comparator will be used (VersionComparator) to sort the results.
      */
+    @Deprecated
     Collection<ArtifactInfo> searchFlat( Query query, IndexingContext context )
         throws IOException,
             IndexContextInInconsistentStateException;
@@ -226,6 +228,7 @@ public interface NexusIndexer
      * Will search all searchable contexts know to Nexus indexer and merge the results. The given comparator will be
      * used to sort the results.
      */
+    @Deprecated
     Collection<ArtifactInfo> searchFlat( Comparator<ArtifactInfo> artifactInfoComparator, Query query )
         throws IOException,
             IndexContextInInconsistentStateException;
@@ -233,6 +236,7 @@ public interface NexusIndexer
     /**
      * Will search the given context. The given comparator will be used to sort the results.
      */
+    @Deprecated
     Collection<ArtifactInfo> searchFlat( Comparator<ArtifactInfo> artifactInfoComparator, Query query,
         IndexingContext context )
         throws IOException,
@@ -246,7 +250,7 @@ public interface NexusIndexer
      * @throws IOException
      * @throws IndexContextInInconsistentStateException
      */
-    Collection<ArtifactInfo> searchFlat( FlatSearchRequest request )
+    FlatSearchResponse searchFlat( FlatSearchRequest request )
         throws IOException,
             IndexContextInInconsistentStateException;
 
@@ -259,6 +263,7 @@ public interface NexusIndexer
      * @throws IOException
      * @throws IndexContextInInconsistentStateException
      */
+    @Deprecated
     Map<String, ArtifactInfoGroup> searchGrouped( Grouping grouping, Query query )
         throws IOException,
             IndexContextInInconsistentStateException;
@@ -273,6 +278,7 @@ public interface NexusIndexer
      * @throws IOException
      * @throws IndexContextInInconsistentStateException
      */
+    @Deprecated
     Map<String, ArtifactInfoGroup> searchGrouped( Grouping grouping, Query query, IndexingContext context )
         throws IOException,
             IndexContextInInconsistentStateException;
@@ -287,6 +293,7 @@ public interface NexusIndexer
      * @throws IOException
      * @throws IndexContextInInconsistentStateException
      */
+    @Deprecated
     Map<String, ArtifactInfoGroup> searchGrouped( Grouping grouping, Comparator<String> groupKeyComparator, Query query )
         throws IOException,
             IndexContextInInconsistentStateException;
@@ -302,6 +309,7 @@ public interface NexusIndexer
      * @throws IOException
      * @throws IndexContextInInconsistentStateException
      */
+    @Deprecated
     Map<String, ArtifactInfoGroup> searchGrouped( Grouping grouping, Comparator<String> groupKeyComparator,
         Query query, IndexingContext context )
         throws IOException,
@@ -315,7 +323,7 @@ public interface NexusIndexer
      * @throws IOException
      * @throws IndexContextInInconsistentStateException
      */
-    Map<String, ArtifactInfoGroup> searchGrouped( GroupedSearchRequest request )
+    GroupedSearchResponse searchGrouped( GroupedSearchRequest request )
         throws IOException,
             IndexContextInInconsistentStateException;
 

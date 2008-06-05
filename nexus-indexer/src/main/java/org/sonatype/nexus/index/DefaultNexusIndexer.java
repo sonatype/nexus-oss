@@ -554,6 +554,7 @@ public class DefaultNexusIndexer
     // Searching
     // ----------------------------------------------------------------------------
 
+    @Deprecated
     public Collection<ArtifactInfo> searchFlat( Query query )
         throws IOException,
             IndexContextInInconsistentStateException
@@ -561,6 +562,7 @@ public class DefaultNexusIndexer
         return searchFlat( ArtifactInfo.VERSION_COMPARATOR, query );
     }
 
+    @Deprecated
     public Collection<ArtifactInfo> searchFlat( Query query, IndexingContext context )
         throws IOException,
             IndexContextInInconsistentStateException
@@ -568,6 +570,7 @@ public class DefaultNexusIndexer
         return searchFlat( ArtifactInfo.VERSION_COMPARATOR, query, context );
     }
 
+    @Deprecated
     public Collection<ArtifactInfo> searchFlat( Comparator<ArtifactInfo> artifactInfoComparator, Query query )
         throws IOException,
             IndexContextInInconsistentStateException
@@ -575,6 +578,7 @@ public class DefaultNexusIndexer
         return searcher.searchFlat( artifactInfoComparator, indexingContexts.values(), query );
     }
 
+    @Deprecated
     public Collection<ArtifactInfo> searchFlat( Comparator<ArtifactInfo> artifactInfoComparator, Query query,
         IndexingContext context )
         throws IOException,
@@ -583,22 +587,21 @@ public class DefaultNexusIndexer
         return searcher.searchFlat( artifactInfoComparator, context, query );
     }
 
-    public Collection<ArtifactInfo> searchFlat( FlatSearchRequest request )
+    public FlatSearchResponse searchFlat( FlatSearchRequest request )
         throws IOException,
             IndexContextInInconsistentStateException
     {
         if ( request.getContext() == null )
         {
-            return searcher.searchFlatPaged( request.getArtifactInfoComparator(), indexingContexts.values(), request
-                .getQuery(), request.getStart(), request.getAiCount() );
+            return searcher.searchFlatPaged( request, indexingContexts.values() );
         }
         else
         {
-            return searcher.searchFlatPaged( request.getArtifactInfoComparator(), request.getContext(), request
-                .getQuery(), request.getStart(), request.getAiCount() );
+            return searcher.searchFlatPaged( request );
         }
     }
 
+    @Deprecated
     public Map<String, ArtifactInfoGroup> searchGrouped( Grouping grouping, Query query )
         throws IOException,
             IndexContextInInconsistentStateException
@@ -606,6 +609,7 @@ public class DefaultNexusIndexer
         return searchGrouped( grouping, String.CASE_INSENSITIVE_ORDER, query );
     }
 
+    @Deprecated
     public Map<String, ArtifactInfoGroup> searchGrouped( Grouping grouping, Query query, IndexingContext context )
         throws IOException,
             IndexContextInInconsistentStateException
@@ -613,38 +617,38 @@ public class DefaultNexusIndexer
         return searchGrouped( grouping, String.CASE_INSENSITIVE_ORDER, query, context );
     }
 
+    @Deprecated
     public Map<String, ArtifactInfoGroup> searchGrouped( Grouping grouping, Comparator<String> groupKeyComparator,
         Query query )
         throws IOException,
             IndexContextInInconsistentStateException
     {
-        return searcher.searchGrouped( grouping, groupKeyComparator, indexingContexts.values(), query );
+        return searcher.searchGrouped(
+            new GroupedSearchRequest( query, grouping, groupKeyComparator ),
+            indexingContexts.values() ).getResults();
     }
 
+    @Deprecated
     public Map<String, ArtifactInfoGroup> searchGrouped( Grouping grouping, Comparator<String> groupKeyComparator,
         Query query, IndexingContext context )
         throws IOException,
             IndexContextInInconsistentStateException
     {
-        return searcher.searchGrouped( grouping, groupKeyComparator, context, query );
+        return searcher
+            .searchGrouped( new GroupedSearchRequest( query, grouping, groupKeyComparator, context ) ).getResults();
     }
 
-    public Map<String, ArtifactInfoGroup> searchGrouped( GroupedSearchRequest request )
+    public GroupedSearchResponse searchGrouped( GroupedSearchRequest request )
         throws IOException,
             IndexContextInInconsistentStateException
     {
         if ( request.getContext() == null )
         {
-            return searcher.searchGrouped(
-                request.getGrouping(),
-                request.getGroupKeyComparator(),
-                request.getContext(),
-                request.getQuery() );
+            return searcher.searchGrouped( request, indexingContexts.values() );
         }
         else
         {
-            return searcher.searchGrouped( request.getGrouping(), request.getGroupKeyComparator(), indexingContexts
-                .values(), request.getQuery() );
+            return searcher.searchGrouped( request );
         }
     }
 
