@@ -22,7 +22,6 @@ import org.sonatype.nexus.configuration.model.CScheduleOnce;
 import org.sonatype.nexus.configuration.model.CScheduleWeekly;
 import org.sonatype.nexus.configuration.model.CTask;
 import org.sonatype.nexus.configuration.model.CTaskConfiguration;
-import org.sonatype.nexus.configuration.model.CTaskIterating;
 import org.sonatype.nexus.configuration.model.CTaskScheduled;
 import org.sonatype.scheduling.schedules.CronSchedule;
 import org.sonatype.scheduling.schedules.DailySchedule;
@@ -35,7 +34,8 @@ import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
 
 /**
- * The default implementation of the Task Configuration manager
+ * The default implementation of the Task Configuration manager.  Will handle writing to and loading from
+ * the tasks.xml file.  Will also load a default set of tasks if there is no existing configuration
  * 
  * @plexus.component
  */
@@ -123,9 +123,6 @@ public class DefaultTaskConfigManager
         if ( CTaskScheduled.class.isAssignableFrom( task.getClass() ) )
         {
         }
-        else if ( CTaskIterating.class.isAssignableFrom( task.getClass() ) )
-        {
-        }
         else if ( CTask.class.isAssignableFrom( task.getClass() ) )
         {
         }
@@ -143,7 +140,6 @@ public class DefaultTaskConfigManager
             
             ( ( CTaskScheduled )storeableTask ).setLastRun( ( ( ScheduledTask<T> )task ).getLastRun() );
             ( ( CTaskScheduled )storeableTask ).setNextRun( ( ( ScheduledTask<T> )task ).getNextRun() );
-            ( ( ScheduledTask<T> )task ).getTaskState().name();
             
             Schedule schedule = ( ( ScheduledTask<T> )task ).getSchedule();
             
@@ -171,14 +167,6 @@ public class DefaultTaskConfigManager
             {
             }
         }
-        else if ( IteratingTask.class.isAssignableFrom( task.getClass() ) )
-        {
-            storeableTask = new CTaskIterating();
-            
-            ( ( CTaskIterating )storeableTask ).setLastRun( ( ( IteratingTask<T> )task ).getLastRun() );
-            ( ( CTaskIterating )storeableTask ).setNextRun( ( ( IteratingTask<T> )task ).getNextRun() );
-            ( ( IteratingTask<T> )task ).getTaskState().name();
-        }
         else if ( SubmittedTask.class.isAssignableFrom( task.getClass() ) )
         {
             storeableTask = new CTask();
@@ -188,7 +176,7 @@ public class DefaultTaskConfigManager
         {
             storeableTask.setId( task.getId() );
             storeableTask.setType( task.getType() );
-            storeableTask.setType( task.getTaskState().name() );
+            task.getTaskState().name();
         }
         
         //TODO: need to complete translation
@@ -289,7 +277,6 @@ public class DefaultTaskConfigManager
     {
         xstream.omitField( CTaskConfiguration.class, "modelEncoding" );
         xstream.omitField( CTask.class, "modelEncoding" );
-        xstream.omitField( CTaskIterating.class, "modelEncoding" );
         xstream.omitField( CTaskScheduled.class, "modelEncoding" );
         xstream.omitField( CSchedule.class, "modelEncoding" );
         xstream.omitField( CScheduleAdvanced.class, "modelEncoding" );

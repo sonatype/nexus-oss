@@ -1473,12 +1473,12 @@
                 </field>
 		    </fields>
 		</class>
-		
+				
 		<class>
-            <name>CTaskIterating</name>
-            <superClass>CTask</superClass>
-            <description>An iterating task</description>
-            <fields>
+		    <name>CTaskScheduled</name>
+		    <superClass>CTask</superClass>
+		    <description>A scheduled task</description>
+		    <fields>
                 <field>
                     <name>lastRun</name>
                     <type>Date</type>
@@ -1494,12 +1494,6 @@
                     <description>The date the task will run next</description>
                 </field>
             </fields>
-        </class>
-		
-		<class>
-		    <name>CTaskScheduled</name>
-		    <superClass>CTaskIterating</superClass>
-		    <description>A scheduled task</description>
 		</class>
 		
 		<class>

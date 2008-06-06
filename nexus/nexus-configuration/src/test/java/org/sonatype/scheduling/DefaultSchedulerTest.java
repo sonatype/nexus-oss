@@ -4,7 +4,7 @@ import java.util.Date;
 import java.util.concurrent.Callable;
 
 import org.sonatype.nexus.configuration.AbstractNexusTestCase;
-import org.sonatype.scheduling.iterators.SchedulerIterator;
+import org.sonatype.scheduling.schedules.Schedule;
 
 public class DefaultSchedulerTest
     extends AbstractNexusTestCase
@@ -76,9 +76,9 @@ public class DefaultSchedulerTest
 
         long nearFuture = System.currentTimeMillis() + 500;
 
-        SchedulerIterator iterator = new SecondScheduleIterator( new Date( nearFuture ), new Date( nearFuture + 4900 ) );
+        Schedule schedule = new SecondSchedule( new Date( nearFuture ), new Date( nearFuture + 4900 ) );
 
-        IteratingTask<Object> st = defaultScheduler.iterate( tr, iterator );
+        ScheduledTask<Object> st = defaultScheduler.schedule( tr, schedule );
 
         assertEquals( 1, defaultScheduler.getActiveTasks().size() );
 
@@ -102,10 +102,10 @@ public class DefaultSchedulerTest
         tr = new TestCallable();
 
         long nearFuture = System.currentTimeMillis() + 500;
+        
+        Schedule schedule = new SecondSchedule( new Date( nearFuture ), new Date( nearFuture + 4900 ) );
 
-        SchedulerIterator iterator = new SecondScheduleIterator( new Date( nearFuture ), new Date( nearFuture + 4900 ) );
-
-        IteratingTask<Integer> st = defaultScheduler.iterate( tr, iterator );
+        ScheduledTask<Integer> st = defaultScheduler.schedule( tr, schedule );
 
         assertEquals( 1, defaultScheduler.getActiveTasks().size() );
 
@@ -141,10 +141,10 @@ public class DefaultSchedulerTest
         tr = new TestRunnable();
 
         long nearFuture = System.currentTimeMillis() + 500;
+        
+        Schedule schedule = new SecondSchedule( new Date( nearFuture ), new Date( nearFuture + 4900 ) );
 
-        SchedulerIterator iterator = new SecondScheduleIterator( new Date( nearFuture ), new Date( nearFuture + 4900 ) );
-
-        IteratingTask<Object> st = defaultScheduler.iterate( tr, iterator );
+        ScheduledTask<Object> st = defaultScheduler.schedule( tr, schedule );
 
         assertEquals( 1, defaultScheduler.getActiveTasks().size() );
 
@@ -167,10 +167,10 @@ public class DefaultSchedulerTest
         tr = new TestCallable();
 
         long nearFuture = System.currentTimeMillis() + 500;
+        
+        Schedule schedule = new SecondSchedule( new Date( nearFuture ), new Date( nearFuture + 4900 ) );
 
-        SchedulerIterator iterator = new SecondScheduleIterator( new Date( nearFuture ), new Date( nearFuture + 4900 ) );
-
-        IteratingTask<Integer> st = defaultScheduler.iterate( tr, iterator );
+        ScheduledTask<Integer> st = defaultScheduler.schedule( tr, schedule );
 
         assertEquals( 1, defaultScheduler.getActiveTasks().size() );
 

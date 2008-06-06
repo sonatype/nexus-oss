@@ -40,7 +40,6 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.Startable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.StartingException;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.StoppingException;
 import org.codehaus.plexus.util.StringUtils;
-import org.sonatype.scheduling.iterators.SchedulerIterator;
 import org.sonatype.scheduling.schedules.Schedule;
 
 /**
@@ -161,21 +160,6 @@ public class DefaultScheduler
         return drt;
     }
 
-    public IteratingTask<Object> iterate( Runnable runnable, SchedulerIterator iterator )
-    {
-        DefaultIteratingTask<Object> drt = new DefaultIteratingTask<Object>(
-            runnable.getClass().getName(),
-            this,
-            Executors.callable( runnable ),
-            iterator );
-
-        addToTasksMap( drt );
-
-        drt.start();
-
-        return drt;
-    }
-
     public ScheduledTask<Object> schedule( Runnable runnable, Schedule schedule )
     {
         DefaultScheduledTask<Object> drt = new DefaultScheduledTask<Object>(
@@ -194,21 +178,6 @@ public class DefaultScheduler
     public <T> SubmittedTask<T> submit( Callable<T> callable )
     {
         DefaultSubmittedTask<T> dct = new DefaultSubmittedTask<T>( callable.getClass().getName(), this, callable );
-
-        addToTasksMap( dct );
-
-        dct.start();
-
-        return dct;
-    }
-
-    public <T> IteratingTask<T> iterate( Callable<T> callable, SchedulerIterator iterator )
-    {
-        DefaultIteratingTask<T> dct = new DefaultIteratingTask<T>(
-            callable.getClass().getName(),
-            this,
-            callable,
-            iterator );
 
         addToTasksMap( dct );
 
