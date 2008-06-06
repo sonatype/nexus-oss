@@ -458,7 +458,13 @@ Ext.extend(Sonatype.repoServer.ServerEditPanel, Ext.Panel, {
   // only defined value now is {restartRequired:bool}
   save : function(config) {
     var form = this.form;
-    
+
+    var appSettingsPanel = this.findById( this.id + '_applicationServerSettings' );
+    if ( appSettingsPanel.collapsed ) {
+      var baseUrlField = this.find( 'name', 'baseUrl' )[0];
+      baseUrlField.setRawValue( '' );
+    }
+
     form.doAction('sonatypeSubmit', {
       method: 'PUT',
       url: Sonatype.config.repos.urls.globalSettingsState,
