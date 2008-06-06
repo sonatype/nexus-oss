@@ -67,7 +67,7 @@
 
     <!--
       Uncomment this if you need to edit JavaScript files and other resources
-      while Jetty is running (to prevent it from locking everything). -->
+      while Jetty is running (to prevent it from locking everything).
     <servlet>
       <servlet-name>default</servlet-name>
       <servlet-class>org.mortbay.jetty.servlet.DefaultServlet</servlet-class>
@@ -76,5 +76,6 @@
         <param-value>false</param-value>
       </init-param>
     </servlet>
+    -->
 
 </web-app>
