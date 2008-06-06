@@ -20,7 +20,9 @@
  */
 package org.sonatype.nexus.scheduling;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.sonatype.nexus.Nexus;
@@ -35,12 +37,24 @@ public abstract class AbstractNexusTask<T>
      * @plexus.requirement
      */
     private Nexus nexus;
-    
+
+    private Map<String, String> parameters;
+
     private SystemProcess prc;
 
     protected Nexus getNexus()
     {
         return nexus;
+    }
+
+    public Map<String, String> getParameters()
+    {
+        if ( parameters == null )
+        {
+            parameters = new HashMap<String, String>();
+        }
+
+        return parameters;
     }
 
     public boolean allowConcurrentExecution( List<ScheduledTask<?>> existingTasks )

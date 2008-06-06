@@ -32,25 +32,40 @@ import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesTask;
 public class SnapshotRemoverTask
     extends AbstractNexusRepositoriesTask<SnapshotRemovalResult>
 {
-    private int minSnapshotsToKeep;
+    public static final String MIN_SNAPSHOTS_TO_KEEP_KEY = "minSnapshotsToKeep";
 
-    private int removeOlderThanDays;
+    public static final String REMOVE_OLDER_THAN_DAYS_KEY = "removeOlderThanDays";
 
-    private boolean removeIfReleaseExists;
+    public static final String REMOVE_IF_RELEASE_EXISTS_KEY = "removeIfReleaseExists";
 
     public int getMinSnapshotsToKeep()
     {
-        return minSnapshotsToKeep;
+        return Integer.parseInt( getParameters().get( MIN_SNAPSHOTS_TO_KEEP_KEY ) );
+    }
+
+    public void setMinSnapshotsToKeep( int minSnapshotsToKeep )
+    {
+        getParameters().put( MIN_SNAPSHOTS_TO_KEEP_KEY, Integer.toString( minSnapshotsToKeep ) );
     }
 
     public int getRemoveOlderThanDays()
     {
-        return removeOlderThanDays;
+        return Integer.parseInt( getParameters().get( REMOVE_OLDER_THAN_DAYS_KEY ) );
+    }
+
+    public void setRemoveOlderThanDays( int removeOlderThanDays )
+    {
+        getParameters().put( REMOVE_OLDER_THAN_DAYS_KEY, Integer.toString( removeOlderThanDays ) );
     }
 
     public boolean isRemoveIfReleaseExists()
     {
-        return removeIfReleaseExists;
+        return Boolean.parseBoolean( getParameters().get( REMOVE_IF_RELEASE_EXISTS_KEY ) );
+    }
+
+    public void setRemoveIfReleaseExists( boolean removeIfReleaseExists )
+    {
+        getParameters().put( REMOVE_IF_RELEASE_EXISTS_KEY, Boolean.toString( removeIfReleaseExists ) );
     }
 
     public SnapshotRemovalResult doRun()
@@ -59,9 +74,9 @@ public class SnapshotRemoverTask
         SnapshotRemovalRequest req = new SnapshotRemovalRequest(
             getRepositoryId(),
             getRepositoryGroupId(),
-            minSnapshotsToKeep,
-            removeOlderThanDays,
-            removeIfReleaseExists );
+            getMinSnapshotsToKeep(),
+            getRemoveOlderThanDays(),
+            isRemoveIfReleaseExists() );
 
         return getNexus().removeSnapshots( req );
     }

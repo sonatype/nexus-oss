@@ -23,31 +23,27 @@ package org.sonatype.nexus.scheduling;
 public abstract class AbstractNexusRepositoriesTask<T>
     extends AbstractNexusTask<T>
 {
-    public static final String REPOSITORY_ID = "repositoryId";
+    public static final String REPOSITORY_ID_KEY = "repositoryId";
 
-    public static final String REPOSITORY_GROUP_ID = "repositoryGroupId";
+    public static final String REPOSITORY_GROUP_ID_KEY = "repositoryGroupId";
 
-    private String repositoryId;
-
-    private String repositoryGroupId;
+    public String getRepositoryId()
+    {
+        return getParameters().get( REPOSITORY_ID_KEY );
+    }
 
     public void setRepositoryId( String repositoryId )
     {
-        this.repositoryId = repositoryId;
+        getParameters().put( REPOSITORY_ID_KEY, repositoryId );
+    }
+
+    public String getRepositoryGroupId()
+    {
+        return getParameters().get( REPOSITORY_GROUP_ID_KEY );
     }
 
     public void setRepositoryGroupId( String repositoryGroupId )
     {
-        this.repositoryGroupId = repositoryGroupId;
-    }
-
-    protected String getRepositoryId()
-    {
-        return repositoryId;
-    }
-
-    protected String getRepositoryGroupId()
-    {
-        return repositoryGroupId;
+        getParameters().put( REPOSITORY_GROUP_ID_KEY, repositoryGroupId );
     }
 }

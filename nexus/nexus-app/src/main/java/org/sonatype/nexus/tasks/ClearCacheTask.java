@@ -32,16 +32,16 @@ import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesTask;
 public class ClearCacheTask
     extends AbstractNexusRepositoriesTask<Object>
 {
-    private String resourceStorePath;
+    public static final String RESOURCE_STORE_PATH_KEY = "resourceStorePath";
 
     public String getResourceStorePath()
     {
-        return resourceStorePath;
+        return getParameters().get( RESOURCE_STORE_PATH_KEY );
     }
 
     public void setResourceStorePath( String resourceStorePath )
     {
-        this.resourceStorePath = resourceStorePath;
+        getParameters().put( RESOURCE_STORE_PATH_KEY, resourceStorePath );
     }
 
     public Object doRun()
@@ -49,15 +49,15 @@ public class ClearCacheTask
     {
         if ( getRepositoryGroupId() != null )
         {
-            getNexus().clearRepositoryGroupCaches( resourceStorePath, getRepositoryGroupId() );
+            getNexus().clearRepositoryGroupCaches( getResourceStorePath(), getRepositoryGroupId() );
         }
         else if ( getRepositoryId() != null )
         {
-            getNexus().clearRepositoryCaches( resourceStorePath, getRepositoryId() );
+            getNexus().clearRepositoryCaches( getResourceStorePath(), getRepositoryId() );
         }
         else
         {
-            getNexus().clearAllCaches( resourceStorePath );
+            getNexus().clearAllCaches( getResourceStorePath() );
         }
 
         return null;
@@ -73,16 +73,16 @@ public class ClearCacheTask
         if ( getRepositoryGroupId() != null )
         {
             return "Clearing caches for repository group with ID=" + getRepositoryGroupId() + " from path "
-                + resourceStorePath + " and below.";
+                + getResourceStorePath() + " and below.";
         }
         else if ( getRepositoryId() != null )
         {
-            return "Clearing caches for repository with ID=" + getRepositoryId() + " from path " + resourceStorePath
+            return "Clearing caches for repository with ID=" + getRepositoryId() + " from path " + getResourceStorePath()
                 + " and below.";
         }
         else
         {
-            return "Clearing caches for all registered repositories" + " from path " + resourceStorePath
+            return "Clearing caches for all registered repositories" + " from path " + getResourceStorePath()
                 + " and below.";
         }
     }

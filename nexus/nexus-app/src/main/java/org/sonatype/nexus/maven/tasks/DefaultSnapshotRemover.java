@@ -42,9 +42,10 @@ import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.utils.StoreWalker;
 
 /**
- * The Class SnapshotRemoverJob. It has two parameters: minCountOfSnapshotsToKeep and removeSnapshotsOlderThanDays.
- * After a succesful run, the job guarantees that there will remain at least minCountOfSnapshotsToKeep (but maybe more)
- * snapshots per one snapshot collection by removing all older from removeSnapshotsOlderThanDays.
+ * The Class SnapshotRemoverJob. After a succesful run, the job guarantees that there will remain at least
+ * minCountOfSnapshotsToKeep (but maybe more) snapshots per one snapshot collection by removing all older from
+ * removeSnapshotsOlderThanDays. If should remove snaps if their release counterpart exists, the whole GAV will be
+ * removed.
  * 
  * @author cstamas
  * @plexus.component
@@ -82,7 +83,7 @@ public class DefaultSnapshotRemover
 
             if ( MavenRepository.class.isAssignableFrom( repository.getClass() ) )
             {
-                result.addResult( removeSnapshotsFromMavenRepository( repository, request ) );
+                result.addResult( removeSnapshotsFromMavenRepository( (MavenRepository) repository, request ) );
             }
             else
             {
@@ -100,7 +101,7 @@ public class DefaultSnapshotRemover
                 // only from maven repositories, stay silent for others and simply skip
                 if ( MavenRepository.class.isAssignableFrom( repository.getClass() ) )
                 {
-                    result.addResult( removeSnapshotsFromMavenRepository( repository, request ) );
+                    result.addResult( removeSnapshotsFromMavenRepository( (MavenRepository) repository, request ) );
                 }
             }
         }
@@ -113,7 +114,7 @@ public class DefaultSnapshotRemover
                 // only from maven repositories, stay silent for others and simply skip
                 if ( MavenRepository.class.isAssignableFrom( repository.getClass() ) )
                 {
-                    result.addResult( removeSnapshotsFromMavenRepository( repository, request ) );
+                    result.addResult( removeSnapshotsFromMavenRepository( (MavenRepository) repository, request ) );
                 }
             }
         }
@@ -127,7 +128,7 @@ public class DefaultSnapshotRemover
      * @param repository the repository
      * @throws Exception the exception
      */
-    protected SnapshotRemovalRepositoryResult removeSnapshotsFromMavenRepository( Repository repository,
+    protected SnapshotRemovalRepositoryResult removeSnapshotsFromMavenRepository( MavenRepository repository,
         SnapshotRemovalRequest request )
     {
         SnapshotRemovalRepositoryResult result = new SnapshotRemovalRepositoryResult( repository.getId(), 0, 0 );
@@ -160,7 +161,7 @@ public class DefaultSnapshotRemover
     private class SnapshotRemoverWalker
         extends StoreWalker
     {
-        private final Repository repository;
+        private final MavenRepository repository;
 
         private final SnapshotRemovalRequest request;
 
@@ -172,15 +173,20 @@ public class DefaultSnapshotRemover
 
         private boolean shouldProcessCollection;
 
+        private boolean removeWholeGAV;
+
         private int deletedSnapshots = 0;
 
         private int deletedFiles = 0;
 
-        public SnapshotRemoverWalker( Logger logger, Repository repository, SnapshotRemovalRequest request )
+        public SnapshotRemoverWalker( Logger logger, MavenRepository repository, SnapshotRemovalRequest request )
         {
             super( repository, logger );
+
             this.repository = repository;
+
             this.request = request;
+
             this.dateTreshold = System.currentTimeMillis() - ( request.getRemoveSnapshotsOlderThanDays() * 86400000 );
         }
 
@@ -190,12 +196,14 @@ public class DefaultSnapshotRemover
             {
                 map.put( key, new ArrayList<StorageFileItem>() );
             }
+
             map.get( key ).add( item );
         }
 
         protected void onCollectionEnter( StorageCollectionItem coll )
         {
             deletableSnapshotsAndFiles.clear();
+
             remainingSnapshotsAndFiles.clear();
 
             shouldProcessCollection = coll.getParentPath().endsWith( "-SNAPSHOT" );
@@ -203,7 +211,9 @@ public class DefaultSnapshotRemover
             if ( shouldProcessCollection )
             {
                 Gav gav = null;
+
                 Collection<StorageItem> items = coll.list();
+
                 for ( StorageItem item : items )
                 {
                     if ( !item.isVirtual() && !StorageCollectionItem.class.isAssignableFrom( item.getClass() ) )
@@ -216,6 +226,13 @@ public class DefaultSnapshotRemover
 
                             if ( gav != null )
                             {
+                                if ( request.isRemoveIfReleaseExists() && releaseExistsForSnapshot( gav ) )
+                                {
+                                    removeWholeGAV = true;
+
+                                    break;
+                                }
+
                                 long itemTimestamp = gav.getSnapshotTimeStamp() != null ? gav
                                     .getSnapshotTimeStamp().longValue() : item.getCreated();
 
@@ -245,46 +262,72 @@ public class DefaultSnapshotRemover
         {
             if ( shouldProcessCollection )
             {
-                // and now check some things
-                if ( remainingSnapshotsAndFiles.size() < request.getMinCountOfSnapshotsToKeep() )
+                if ( removeWholeGAV )
                 {
-                    // do something
-                    if ( remainingSnapshotsAndFiles.size() + deletableSnapshotsAndFiles.size() < request
-                        .getMinCountOfSnapshotsToKeep() )
+                    try
                     {
-                        // delete nothing, since there is less snapshots in total as allowed
-                        return;
+                        repository.deleteItem( coll.getRepositoryItemUid() );
                     }
-                    else
+                    catch ( Exception e )
                     {
-                        TreeSet<String> keys = new TreeSet<String>( deletableSnapshotsAndFiles.keySet() );
-                        while ( remainingSnapshotsAndFiles.size() < request.getMinCountOfSnapshotsToKeep() )
-                        {
-                            remainingSnapshotsAndFiles.put( keys.last(), deletableSnapshotsAndFiles.get( keys.last() ) );
-                            deletableSnapshotsAndFiles.remove( keys.last() );
-                            keys.remove( keys.last() );
-                        }
-
+                        logger.warn( "Could not delete whole GAV " + coll.getRepositoryItemUid().toString(), e );
                     }
                 }
-                for ( String key : deletableSnapshotsAndFiles.keySet() )
+                else
                 {
-                    List<StorageFileItem> files = deletableSnapshotsAndFiles.get( key );
-                    deletedSnapshots++;
-                    for ( StorageFileItem file : files )
+                    // and now check some things
+                    if ( remainingSnapshotsAndFiles.size() < request.getMinCountOfSnapshotsToKeep() )
                     {
-                        try
+                        // do something
+                        if ( remainingSnapshotsAndFiles.size() + deletableSnapshotsAndFiles.size() < request
+                            .getMinCountOfSnapshotsToKeep() )
                         {
-                            repository.deleteItem( file.getRepositoryItemUid() );
-                            deletedFiles++;
+                            // delete nothing, since there is less snapshots in total as allowed
+                            return;
                         }
-                        catch ( Exception e )
+                        else
                         {
-                            logger.warn( "Could not delete file:", e );
+                            TreeSet<String> keys = new TreeSet<String>( deletableSnapshotsAndFiles.keySet() );
+
+                            while ( remainingSnapshotsAndFiles.size() < request.getMinCountOfSnapshotsToKeep() )
+                            {
+                                remainingSnapshotsAndFiles.put( keys.last(), deletableSnapshotsAndFiles.get( keys
+                                    .last() ) );
+
+                                deletableSnapshotsAndFiles.remove( keys.last() );
+
+                                keys.remove( keys.last() );
+                            }
+
+                        }
+                    }
+                    for ( String key : deletableSnapshotsAndFiles.keySet() )
+                    {
+                        List<StorageFileItem> files = deletableSnapshotsAndFiles.get( key );
+
+                        deletedSnapshots++;
+
+                        for ( StorageFileItem file : files )
+                        {
+                            try
+                            {
+                                repository.deleteItem( file.getRepositoryItemUid() );
+
+                                deletedFiles++;
+                            }
+                            catch ( Exception e )
+                            {
+                                logger.warn( "Could not delete file:", e );
+                            }
                         }
                     }
                 }
             }
+        }
+
+        public boolean releaseExistsForSnapshot( Gav snapshotGav )
+        {
+            return false;
         }
 
         public void start()
