@@ -4,11 +4,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.RejectedExecutionException;
 
-import org.sonatype.scheduling.IteratingTask;
 import org.sonatype.scheduling.NoSuchTaskException;
 import org.sonatype.scheduling.ScheduledTask;
-import org.sonatype.scheduling.SubmittedTask;
-import org.sonatype.scheduling.iterators.SchedulerIterator;
 import org.sonatype.scheduling.schedules.Schedule;
 
 public interface NexusScheduler
@@ -21,18 +18,7 @@ public interface NexusScheduler
      * @param runnable
      * @return
      */
-    <T> SubmittedTask<T> submit( NexusTask<T> nexusTask )
-        throws RejectedExecutionException,
-            NullPointerException;
-
-    /**
-     * Issue a NexusTask for iterating execution.
-     * 
-     * @param runnable
-     * @param iterator
-     * @return
-     */
-    <T> IteratingTask<T> iterate( NexusTask<T> nexusTask, SchedulerIterator iterator )
+    <T> ScheduledTask<T> submit( NexusTask<T> nexusTask )
         throws RejectedExecutionException,
             NullPointerException;
 
@@ -53,7 +39,7 @@ public interface NexusScheduler
      * 
      * @return
      */
-    Map<String, List<SubmittedTask<?>>> getActiveTasks();
+    Map<String, List<ScheduledTask<?>>> getActiveTasks();
 
     /**
      * Returns an active task by it's ID.
@@ -61,6 +47,6 @@ public interface NexusScheduler
      * @param id
      * @return
      */
-    SubmittedTask<?> getTaskById( String id )
+    ScheduledTask<?> getTaskById( String id )
         throws NoSuchTaskException;
 }

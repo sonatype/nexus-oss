@@ -40,6 +40,7 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.Startable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.StartingException;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.StoppingException;
 import org.codehaus.plexus.util.StringUtils;
+import org.sonatype.scheduling.schedules.RunNowSchedule;
 import org.sonatype.scheduling.schedules.Schedule;
 
 /**
@@ -58,7 +59,7 @@ public class DefaultScheduler
 
     private ScheduledThreadPoolExecutor scheduledExecutorService;
 
-    private Map<String, List<SubmittedTask<?>>> tasksMap;
+    private Map<String, List<ScheduledTask<?>>> tasksMap;
     
     /**
      * @plexus.requirement
@@ -115,20 +116,20 @@ public class DefaultScheduler
         return scheduledExecutorService;
     }
 
-    protected <T> void addToTasksMap( SubmittedTask<T> task )
+    protected <T> void addToTasksMap( ScheduledTask<T> task )
     {
         synchronized ( tasksMap )
         {
             if ( !tasksMap.containsKey( task.getType() ) )
             {
-                tasksMap.put( task.getType(), new ArrayList<SubmittedTask<?>>() );
+                tasksMap.put( task.getType(), new ArrayList<ScheduledTask<?>>() );
             }
             tasksMap.get( task.getType() ).add( task );
             taskConfig.addTask( task );
         }
     }
 
-    protected <T> void removeFromTasksMap( SubmittedTask<T> task )
+    protected <T> void removeFromTasksMap( ScheduledTask<T> task )
     {
         synchronized ( tasksMap )
         {
@@ -146,18 +147,9 @@ public class DefaultScheduler
         }
     }
 
-    public SubmittedTask<Object> submit( Runnable runnable )
+    public ScheduledTask<Object> submit( Runnable runnable )
     {
-        DefaultSubmittedTask<Object> drt = new DefaultSubmittedTask<Object>(
-            runnable.getClass().getName(),
-            this,
-            Executors.callable( runnable ) );
-
-        addToTasksMap( drt );
-
-        drt.start();
-
-        return drt;
+        return schedule( runnable, new RunNowSchedule() );
     }
 
     public ScheduledTask<Object> schedule( Runnable runnable, Schedule schedule )
@@ -175,15 +167,9 @@ public class DefaultScheduler
         return drt;
     }
 
-    public <T> SubmittedTask<T> submit( Callable<T> callable )
+    public <T> ScheduledTask<T> submit( Callable<T> callable )
     {
-        DefaultSubmittedTask<T> dct = new DefaultSubmittedTask<T>( callable.getClass().getName(), this, callable );
-
-        addToTasksMap( dct );
-
-        dct.start();
-
-        return dct;
+        return schedule( callable, new RunNowSchedule() );
     }
 
     public <T> ScheduledTask<T> schedule( Callable<T> callable, Schedule schedule )
@@ -201,22 +187,22 @@ public class DefaultScheduler
         return dct;
     }
 
-    public Map<String, List<SubmittedTask<?>>> getActiveTasks()
+    public Map<String, List<ScheduledTask<?>>> getActiveTasks()
     {
-        Map<String, List<SubmittedTask<?>>> result = null;
+        Map<String, List<ScheduledTask<?>>> result = null;
 
         // create a "snapshots" of active tasks
         synchronized ( tasksMap )
         {
-            result = new HashMap<String, List<SubmittedTask<?>>>( tasksMap.size() );
+            result = new HashMap<String, List<ScheduledTask<?>>>( tasksMap.size() );
 
-            List<SubmittedTask<?>> tasks = null;
+            List<ScheduledTask<?>> tasks = null;
 
             for ( String cls : tasksMap.keySet() )
             {
-                tasks = new ArrayList<SubmittedTask<?>>();
+                tasks = new ArrayList<ScheduledTask<?>>();
 
-                for ( SubmittedTask<?> task : tasksMap.get( cls ) )
+                for ( ScheduledTask<?> task : tasksMap.get( cls ) )
                 {
                     if ( task.getTaskState().isActiveOrSubmitted() )
                     {
@@ -233,7 +219,7 @@ public class DefaultScheduler
         return result;
     }
 
-    public SubmittedTask<?> getTaskById( String id )
+    public ScheduledTask<?> getTaskById( String id )
         throws NoSuchTaskException
     {
         if ( StringUtils.isEmpty( id ) )
@@ -241,11 +227,11 @@ public class DefaultScheduler
             throw new IllegalArgumentException( "The Tasks cannot have null IDs!" );
         }
 
-        Collection<List<SubmittedTask<?>>> activeTasks = getActiveTasks().values();
+        Collection<List<ScheduledTask<?>>> activeTasks = getActiveTasks().values();
 
-        for ( List<SubmittedTask<?>> tasks : activeTasks )
+        for ( List<ScheduledTask<?>> tasks : activeTasks )
         {
-            for ( SubmittedTask<?> task : tasks )
+            for ( ScheduledTask<?> task : tasks )
             {
                 if ( task.getId().equals( id ) )
                 {

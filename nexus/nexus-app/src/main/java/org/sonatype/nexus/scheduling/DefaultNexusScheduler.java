@@ -5,12 +5,9 @@ import java.util.Map;
 import java.util.concurrent.RejectedExecutionException;
 
 import org.codehaus.plexus.logging.LoggerManager;
-import org.sonatype.scheduling.IteratingTask;
 import org.sonatype.scheduling.NoSuchTaskException;
 import org.sonatype.scheduling.ScheduledTask;
 import org.sonatype.scheduling.Scheduler;
-import org.sonatype.scheduling.SubmittedTask;
-import org.sonatype.scheduling.iterators.SchedulerIterator;
 import org.sonatype.scheduling.schedules.Schedule;
 
 /**
@@ -36,7 +33,7 @@ public class DefaultNexusScheduler
      */
     private LoggerManager loggerManager;
 
-    public <T> SubmittedTask<T> submit( NexusTask<T> nexusTask )
+    public <T> ScheduledTask<T> submit( NexusTask<T> nexusTask )
         throws RejectedExecutionException,
             NullPointerException
     {
@@ -44,31 +41,11 @@ public class DefaultNexusScheduler
 
         Class<?> cls = nexusTask.getClass();
 
-        List<SubmittedTask<?>> existingTasks = scheduler.getActiveTasks().get( cls );
+        List<ScheduledTask<?>> existingTasks = scheduler.getActiveTasks().get( cls );
 
         if ( existingTasks == null || nexusTask.allowConcurrentExecution( existingTasks ) )
         {
             return scheduler.submit( nexusTask );
-        }
-        else
-        {
-            throw new RejectedExecutionException( "Task of this type is already submitted!" );
-        }
-    }
-
-    public <T> IteratingTask<T> iterate( NexusTask<T> nexusTask, SchedulerIterator iterator )
-        throws RejectedExecutionException,
-            NullPointerException
-    {
-        nexusTask.setLogger( loggerManager.getLoggerForComponent( nexusTask.getClass().getName() ) );
-
-        Class<?> cls = nexusTask.getClass();
-
-        List<SubmittedTask<?>> existingTasks = scheduler.getActiveTasks().get( cls );
-
-        if ( existingTasks == null || nexusTask.allowConcurrentExecution( existingTasks ) )
-        {
-            return scheduler.iterate( nexusTask, iterator );
         }
         else
         {
@@ -84,7 +61,7 @@ public class DefaultNexusScheduler
 
         Class<?> cls = nexusTask.getClass();
 
-        List<SubmittedTask<?>> existingTasks = scheduler.getActiveTasks().get( cls );
+        List<ScheduledTask<?>> existingTasks = scheduler.getActiveTasks().get( cls );
 
         if ( existingTasks == null || nexusTask.allowConcurrentExecution( existingTasks ) )
         {
@@ -96,12 +73,12 @@ public class DefaultNexusScheduler
         }
     }
 
-    public Map<String, List<SubmittedTask<?>>> getActiveTasks()
+    public Map<String, List<ScheduledTask<?>>> getActiveTasks()
     {
         return scheduler.getActiveTasks();
     }
 
-    public SubmittedTask<?> getTaskById( String id )
+    public ScheduledTask<?> getTaskById( String id )
         throws NoSuchTaskException
     {
         return scheduler.getTaskById( id );

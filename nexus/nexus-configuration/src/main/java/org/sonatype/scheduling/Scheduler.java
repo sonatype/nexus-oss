@@ -17,7 +17,7 @@ public interface Scheduler
      * @param runnable
      * @return
      */
-    SubmittedTask<Object> submit( Runnable runnable )
+    ScheduledTask<Object> submit( Runnable runnable )
         throws RejectedExecutionException,
             NullPointerException;
 
@@ -38,7 +38,7 @@ public interface Scheduler
      * @param runnable
      * @return
      */
-    <T> SubmittedTask<T> submit( Callable<T> callable )
+    <T> ScheduledTask<T> submit( Callable<T> callable )
         throws RejectedExecutionException,
             NullPointerException;
 
@@ -59,7 +59,7 @@ public interface Scheduler
      * 
      * @return
      */
-    Map<String, List<SubmittedTask<?>>> getActiveTasks();
+    Map<String, List<ScheduledTask<?>>> getActiveTasks();
 
     /**
      * Returns an active task by it's ID.
@@ -67,6 +67,6 @@ public interface Scheduler
      * @param id
      * @return
      */
-    SubmittedTask<?> getTaskById( String id )
+    ScheduledTask<?> getTaskById( String id )
         throws NoSuchTaskException;
 }

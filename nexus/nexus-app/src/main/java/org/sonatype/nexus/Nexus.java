@@ -50,7 +50,6 @@ import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.scheduling.NexusTask;
 import org.sonatype.scheduling.NoSuchTaskException;
 import org.sonatype.scheduling.ScheduledTask;
-import org.sonatype.scheduling.SubmittedTask;
 import org.sonatype.scheduling.schedules.Schedule;
 
 /**
@@ -192,9 +191,9 @@ public interface Nexus
         throws RejectedExecutionException,
             NullPointerException;
 
-    Map<String, List<SubmittedTask<?>>> getActiveTasks();
+    Map<String, List<ScheduledTask<?>>> getActiveTasks();
 
-    SubmittedTask<?> getTaskById( String id )
+    ScheduledTask<?> getTaskById( String id )
         throws NoSuchTaskException;
 
     // ----------------------------------------------------------------------------

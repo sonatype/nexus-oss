@@ -58,11 +58,11 @@ public class DefaultTaskConfigManager
         loadConfig();
     }
     
-    public HashMap<String, List<SubmittedTask<?>>> getTasks()
+    public HashMap<String, List<ScheduledTask<?>>> getTasks()
     {
         synchronized( config )
         {
-            HashMap<String, List<SubmittedTask<?>>> map = new HashMap<String, List<SubmittedTask<?>>>();
+            HashMap<String, List<ScheduledTask<?>>> map = new HashMap<String, List<ScheduledTask<?>>>();
             
             for ( Iterator iter = config.getTasks().iterator(); iter.hasNext(); )
             {
@@ -70,7 +70,7 @@ public class DefaultTaskConfigManager
                 
                 if ( !map.containsKey( storedTask.getType() ))
                 {
-                    map.put( storedTask.getType() , new ArrayList<SubmittedTask<?>>() );
+                    map.put( storedTask.getType() , new ArrayList<ScheduledTask<?>>() );
                 }
                 
                 map.get( storedTask.getType() ).add( translateFrom( storedTask ) );
@@ -80,7 +80,7 @@ public class DefaultTaskConfigManager
         }
     }
     
-    public <T> void addTask( SubmittedTask<T> task )
+    public <T> void addTask( ScheduledTask<T> task )
     {
         synchronized( config )
         {
@@ -94,7 +94,7 @@ public class DefaultTaskConfigManager
         }
     }
     
-    public <T> void removeTask( SubmittedTask<T> task )
+    public <T> void removeTask( ScheduledTask<T> task )
     {        
         synchronized( config )
         {
@@ -114,9 +114,9 @@ public class DefaultTaskConfigManager
         //TODO: need to also add task to a history file
     }
     
-    private <T> SubmittedTask<T> translateFrom( CTask task )
+    private <T> ScheduledTask<T> translateFrom( CTask task )
     {
-        SubmittedTask<T> useableTask = null;
+        ScheduledTask<T> useableTask = null;
         
         //TODO: Need to complete translation
         
@@ -130,7 +130,7 @@ public class DefaultTaskConfigManager
         return useableTask;
     }
     
-    private <T> CTask translateFrom ( SubmittedTask<T> task )
+    private <T> CTask translateFrom ( ScheduledTask<T> task )
     {
         CTask storeableTask = null;
         
@@ -166,10 +166,6 @@ public class DefaultTaskConfigManager
             else if ( WeeklySchedule.class.isAssignableFrom( schedule.getClass() ) )
             {
             }
-        }
-        else if ( SubmittedTask.class.isAssignableFrom( task.getClass() ) )
-        {
-            storeableTask = new CTask();
         }
         
         if ( storeableTask != null )

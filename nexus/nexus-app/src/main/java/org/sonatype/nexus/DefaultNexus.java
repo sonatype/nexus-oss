@@ -95,7 +95,6 @@ import org.sonatype.nexus.store.Entry;
 import org.sonatype.nexus.store.Store;
 import org.sonatype.scheduling.NoSuchTaskException;
 import org.sonatype.scheduling.ScheduledTask;
-import org.sonatype.scheduling.SubmittedTask;
 import org.sonatype.scheduling.schedules.Schedule;
 
 /**
@@ -933,12 +932,12 @@ public class DefaultNexus
         return scheduler.schedule( nexusTask, schedule );
     }
 
-    public Map<String, List<SubmittedTask<?>>> getActiveTasks()
+    public Map<String, List<ScheduledTask<?>>> getActiveTasks()
     {
         return scheduler.getActiveTasks();
     }
 
-    public SubmittedTask<?> getTaskById( String id )
+    public ScheduledTask<?> getTaskById( String id )
         throws NoSuchTaskException
     {
         return scheduler.getTaskById( id );

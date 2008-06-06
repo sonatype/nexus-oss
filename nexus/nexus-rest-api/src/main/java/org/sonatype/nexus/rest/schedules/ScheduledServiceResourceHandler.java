@@ -37,10 +37,8 @@ import org.sonatype.nexus.rest.model.ScheduledServiceOnceResource;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceResourceResponse;
 import org.sonatype.nexus.rest.model.ScheduledServiceWeeklyResource;
-import org.sonatype.scheduling.IteratingTask;
 import org.sonatype.scheduling.NoSuchTaskException;
 import org.sonatype.scheduling.ScheduledTask;
-import org.sonatype.scheduling.SubmittedTask;
 import org.sonatype.scheduling.schedules.CronSchedule;
 import org.sonatype.scheduling.schedules.DailySchedule;
 import org.sonatype.scheduling.schedules.MonthlySchedule;
@@ -92,60 +90,45 @@ public class ScheduledServiceResourceHandler
         {
             ScheduledServiceResourceResponse response = new ScheduledServiceResourceResponse();
 
-            SubmittedTask<?> task = getNexus().getTaskById( getScheduledServiceId() );
+            ScheduledTask<?> task = getNexus().getTaskById( getScheduledServiceId() );
 
-            if ( ScheduledTask.class.isAssignableFrom( task.getClass() ) )
+            if ( OnceSchedule.class.isAssignableFrom( task.getSchedule().getClass() ) )
             {
-                ScheduledTask<?> scheduledTask = (ScheduledTask<?>) task;
+                OnceSchedule taskSchedule = (OnceSchedule) task.getSchedule();
 
-                if ( OnceSchedule.class.isAssignableFrom( scheduledTask.getSchedule().getClass() ) )
-                {
-                    OnceSchedule taskSchedule = (OnceSchedule) scheduledTask.getSchedule();
+                ScheduledServiceOnceResource res = new ScheduledServiceOnceResource();
 
-                    ScheduledServiceOnceResource res = new ScheduledServiceOnceResource();
+                res.setId( task.getId() );
 
-                    res.setId( task.getId() );
+                res.setName( task.getId() );
 
-                    res.setName( task.getId() );
+                res.setServiceType( getServiceTypeName( task.getType() ) );
 
-                    res.setServiceType( getServiceTypeName( task.getType() ) );
+                res.setServiceSchedule( getScheduleShortName( taskSchedule ) );
 
-                    res.setServiceSchedule( getScheduleShortName( taskSchedule ) );
+                res.setServiceProperties( null );
 
-                    res.setServiceProperties( null );
+                res.setStartDate( formatDate( taskSchedule.getStartDate() ) );
 
-                    res.setStartDate( formatDate( taskSchedule.getStartDate() ) );
+                res.setStartTime( formatTime( taskSchedule.getStartDate() ) );
 
-                    res.setStartTime( formatTime( taskSchedule.getStartDate() ) );
-
-                    response.setData( res );
-                }
-                else if ( DailySchedule.class.isAssignableFrom( scheduledTask.getSchedule().getClass() ) )
-                {
-
-                }
-                else if ( WeeklySchedule.class.isAssignableFrom( scheduledTask.getSchedule().getClass() ) )
-                {
-
-                }
-                else if ( MonthlySchedule.class.isAssignableFrom( scheduledTask.getSchedule().getClass() ) )
-                {
-
-                }
-                else if ( CronSchedule.class.isAssignableFrom( scheduledTask.getSchedule().getClass() ) )
-                {
-
-                }
+                response.setData( res );
             }
-            else if ( IteratingTask.class.isAssignableFrom( task.getClass() ) )
+            else if ( DailySchedule.class.isAssignableFrom( task.getSchedule().getClass() ) )
             {
-                // we have no representation for this?
-                // and also, it is not editable
+
             }
-            else
+            else if ( WeeklySchedule.class.isAssignableFrom( task.getSchedule().getClass() ) )
             {
-                // we have no representation for this?
-                // and also, it is not editable
+
+            }
+            else if ( MonthlySchedule.class.isAssignableFrom( task.getSchedule().getClass() ) )
+            {
+
+            }
+            else if ( CronSchedule.class.isAssignableFrom( task.getSchedule().getClass() ) )
+            {
+
             }
         }
         catch ( NoSuchTaskException e )

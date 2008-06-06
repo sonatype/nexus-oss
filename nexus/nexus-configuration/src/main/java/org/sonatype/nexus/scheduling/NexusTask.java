@@ -4,12 +4,12 @@ import java.util.List;
 import java.util.concurrent.Callable;
 
 import org.codehaus.plexus.logging.Logger;
-import org.sonatype.scheduling.SubmittedTask;
+import org.sonatype.scheduling.ScheduledTask;
 
 public interface NexusTask<T>
     extends Callable<T>
 {
     void setLogger( Logger logger );
 
-    boolean allowConcurrentExecution( List<SubmittedTask<?>> existingTasks );
+    boolean allowConcurrentExecution( List<ScheduledTask<?>> existingTasks );
 }

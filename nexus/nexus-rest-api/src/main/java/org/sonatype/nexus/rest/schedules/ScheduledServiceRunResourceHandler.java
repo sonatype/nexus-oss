@@ -9,7 +9,7 @@ import org.restlet.data.Status;
 import org.restlet.resource.Representation;
 import org.restlet.resource.Variant;
 import org.sonatype.scheduling.NoSuchTaskException;
-import org.sonatype.scheduling.SubmittedTask;
+import org.sonatype.scheduling.ScheduledTask;
 
 public class ScheduledServiceRunResourceHandler extends AbstractScheduledServiceResourceHandler
 {
@@ -37,7 +37,7 @@ public class ScheduledServiceRunResourceHandler extends AbstractScheduledService
     {
         try
         {
-            SubmittedTask<?> task = getNexus().getTaskById( getScheduledServiceId() );
+            ScheduledTask<?> task = getNexus().getTaskById( getScheduledServiceId() );
             //TODO: run the task
             getResponse().setStatus( Status.SUCCESS_ACCEPTED );
         }

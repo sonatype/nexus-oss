@@ -34,9 +34,7 @@ import org.sonatype.nexus.rest.model.ScheduledServiceBaseResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceListResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceListResourceResponse;
 import org.sonatype.nexus.rest.model.ScheduledServiceResourceResponse;
-import org.sonatype.scheduling.IteratingTask;
 import org.sonatype.scheduling.ScheduledTask;
-import org.sonatype.scheduling.SubmittedTask;
 import org.sonatype.scheduling.TaskState;
 
 public class ScheduledServiceListResourceHandler
@@ -68,15 +66,15 @@ public class ScheduledServiceListResourceHandler
     public Representation getRepresentationHandler( Variant variant )
         throws IOException
     {
-        Map<String, List<SubmittedTask<?>>> tasksMap = getNexus().getActiveTasks();
+        Map<String, List<ScheduledTask<?>>> tasksMap = getNexus().getActiveTasks();
 
         ScheduledServiceListResourceResponse response = new ScheduledServiceListResourceResponse();
 
         for ( String key : tasksMap.keySet() )
         {
-            List<SubmittedTask<?>> tasks = tasksMap.get( key );
+            List<ScheduledTask<?>> tasks = tasksMap.get( key );
 
-            for ( SubmittedTask<?> task : tasks )
+            for ( ScheduledTask<?> task : tasks )
             {
                 ScheduledServiceListResource item = new ScheduledServiceListResource();
                 item.setResourceURI( calculateSubReference( task.getId() ).toString() );
@@ -86,27 +84,25 @@ public class ScheduledServiceListResourceHandler
                 item.setServiceStatus( StringUtils.capitalise( task.getTaskState().toString() ) );
                 item.setServiceTypeId( task.getType() );
                 item.setServiceTypeName( getServiceTypeName( task.getType() ) );
-
-                if ( IteratingTask.class.isAssignableFrom( task.getClass() ) )
+                if ( task.getLastRun() != null)
                 {
-                    item.setLastRunTime( ( (IteratingTask<?>) task ).getLastRun().toString() );
-                    item.setNextRunTime( ( (IteratingTask<?>) task ).getNextRun().toString() );
+                    item.setLastRunTime( task.getLastRun().toString() );
                 }
                 else
                 {
                     item.setLastRunTime( "n/a" );
-                    item.setNextRunTime( "n/a" );
                 }
-
-                if ( ScheduledTask.class.isAssignableFrom( task.getClass() ) )
+                if ( task.getNextRun() != null)
                 {
-                    item.setServiceSchedule( getScheduleShortName( ( (ScheduledTask<?>) task ).getSchedule() ) );
+                    item.setNextRunTime( task.getNextRun().toString() );
                 }
                 else
                 {
-                    item.setServiceSchedule( "n/a" );
+                    item.setNextRunTime( "n/a" );
                 }
-
+                
+                item.setServiceSchedule( getScheduleShortName( task.getSchedule() ) );
+                
                 response.addData( item );
             }
 

@@ -25,7 +25,7 @@ import java.util.List;
 import org.codehaus.plexus.logging.Logger;
 import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.feeds.SystemProcess;
-import org.sonatype.scheduling.SubmittedTask;
+import org.sonatype.scheduling.ScheduledTask;
 
 public abstract class AbstractNexusTask<T>
     implements NexusTask<T>
@@ -58,7 +58,7 @@ public abstract class AbstractNexusTask<T>
         return nexus;
     }
 
-    public boolean allowConcurrentExecution( List<SubmittedTask<?>> existingTasks )
+    public boolean allowConcurrentExecution( List<ScheduledTask<?>> existingTasks )
     {
         // override if needed
         return false;
