@@ -122,13 +122,17 @@ public class ScheduledServiceListResourceHandler
     public void post( Representation entity )
     {
         ScheduledServiceResourceResponse response = (ScheduledServiceResourceResponse) deserialize( new ScheduledServiceResourceResponse() );
-
-        if ( response != null )
+        
+        if ( response == null )
+        {
+            return;
+        }
+        else
         {
             ScheduledServiceBaseResource resource = response.getData();
-
-            resource.setId( Long.toHexString( System.currentTimeMillis() ) );
-
+            
+            getNexus().schedule( getModelName( resource ), getModelNexusTask( resource ), getModelSchedule( resource ) );
+            
             getResponse().setEntity( serialize( entity, response ) );
         }
     }

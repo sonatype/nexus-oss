@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.Callable;
@@ -37,6 +38,32 @@ public class DefaultTaskConfigManagerTest
     private DefaultTaskConfigManager defaultManager;
 
     private File configurationFile;
+    
+    private static final String PROPERTY_KEY_START_DATE = "startDate";
+    private static final String PROPERTY_KEY_END_DATE = "endDate";
+    private static final String PROPERTY_KEY_CRON_EXPRESSION = "cronExpression";
+    
+    private static final String SCHEDULE_TYPE_ONCE = "once";
+    private static final String SCHEDULE_TYPE_DAILY = "daily";
+    private static final String SCHEDULE_TYPE_WEEKLY = "weekly";
+    private static final String SCHEDULE_TYPE_MONTHLY = "monthly";
+    private static final String SCHEDULE_TYPE_ADVANCED = "advanced";
+    
+    private static final String TASK_NAME = "test";
+    
+    private static final String CRON_EXPRESSION = "blah";
+    
+    private static final HashMap<String,Class>typeClassMap;
+    
+    static
+    {
+        typeClassMap = new HashMap<String,Class>();
+        typeClassMap.put( SCHEDULE_TYPE_ONCE, COnceSchedule.class );
+        typeClassMap.put( SCHEDULE_TYPE_DAILY, CDailySchedule.class );
+        typeClassMap.put( SCHEDULE_TYPE_WEEKLY, CWeeklySchedule.class );
+        typeClassMap.put( SCHEDULE_TYPE_MONTHLY, CMonthlySchedule.class );
+        typeClassMap.put( SCHEDULE_TYPE_ADVANCED, CAdvancedSchedule.class );
+    }
 
     /** 
      * NOTE: this is only populated after call to loadConfig()
@@ -51,98 +78,92 @@ public class DefaultTaskConfigManagerTest
         defaultScheduler = (DefaultScheduler) lookup( Scheduler.class.getName() );
         defaultManager = (DefaultTaskConfigManager) lookup( TaskConfigManager.class.getName() );
         configurationFile = new File( PLEXUS_HOME + "/nexus/conf/tasks.xml" );
+        
     }
 
     public void testStoreOnceSchedule()
     {
-        ScheduledTask<Integer> task = createScheduledTask( createSchedule( "once" ) );
-        defaultManager.addTask( task );
-        loadConfig();
-        assertTrue( configuration.getTasks().size() == 1 );
-        assertTrue( "test".equals( ( (CScheduledTask) configuration.getTasks().get( 0 ) ).getName() ) );
-        assertTrue( COnceSchedule.class.isAssignableFrom( ( (CScheduledTask) configuration.getTasks().get( 0 ) ).getSchedule().getClass() ) );
-        defaultManager.removeTask( task );
-        loadConfig();
-        assertTrue( configuration.getTasks().size() == 0 );
+        Date date = new Date();
+        HashMap<String,Object> scheduleProperties = new HashMap<String,Object>();
+        scheduleProperties.put( PROPERTY_KEY_START_DATE, date );
+        genericTestStore( SCHEDULE_TYPE_ONCE, scheduleProperties );
     }
 
     public void testStoreDailySchedule()
     {
-        ScheduledTask<Integer> task = createScheduledTask( createSchedule( "daily" ) );
-        defaultManager.addTask( task );
-        loadConfig();
-        assertTrue( configuration.getTasks().size() == 1 );
-        assertTrue( "test".equals( ( (CScheduledTask) configuration.getTasks().get( 0 ) ).getName() ) );
-        assertTrue( CDailySchedule.class.isAssignableFrom( ( (CScheduledTask) configuration.getTasks().get( 0 ) ).getSchedule().getClass() ) );
-        defaultManager.removeTask( task );
-        loadConfig();
-        assertTrue( configuration.getTasks().size() == 0 );
+        Date startDate = new Date();
+        Date endDate = new Date();
+        HashMap<String,Object> scheduleProperties = new HashMap<String,Object>();
+        scheduleProperties.put( PROPERTY_KEY_START_DATE, startDate );
+        scheduleProperties.put( PROPERTY_KEY_END_DATE, endDate );
+        genericTestStore( SCHEDULE_TYPE_DAILY, scheduleProperties );
     }
 
     public void testStoreWeeklySchedule()
     {
-        ScheduledTask<Integer> task = createScheduledTask( createSchedule( "weekly" ) );
-        defaultManager.addTask( task );
-        loadConfig();
-        assertTrue( configuration.getTasks().size() == 1 );
-        assertTrue( "test".equals( ( (CScheduledTask) configuration.getTasks().get( 0 ) ).getName() ) );
-        assertTrue( CWeeklySchedule.class.isAssignableFrom( ( (CScheduledTask) configuration.getTasks().get( 0 ) ).getSchedule().getClass() ) );
-        defaultManager.removeTask( task );
-        loadConfig();
-        assertTrue( configuration.getTasks().size() == 0 );
+        Date startDate = new Date();
+        Date endDate = new Date();
+        HashMap<String,Object> scheduleProperties = new HashMap<String,Object>();
+        scheduleProperties.put( PROPERTY_KEY_START_DATE, startDate );
+        scheduleProperties.put( PROPERTY_KEY_END_DATE, endDate );
+        genericTestStore( SCHEDULE_TYPE_WEEKLY, scheduleProperties );
     }
 
     public void testStoreMonthlySchedule()
     {
-        ScheduledTask<Integer> task = createScheduledTask( createSchedule( "monthly" ) );
-        defaultManager.addTask( task );
-        loadConfig();
-        assertTrue( configuration.getTasks().size() == 1 );
-        assertTrue( "test".equals( ( (CScheduledTask) configuration.getTasks().get( 0 ) ).getName() ) );
-        assertTrue( CMonthlySchedule.class.isAssignableFrom( ( (CScheduledTask) configuration.getTasks().get( 0 ) ).getSchedule().getClass() ) );
-        defaultManager.removeTask( task );
-        loadConfig();
-        assertTrue( configuration.getTasks().size() == 0 );
+        Date startDate = new Date();
+        Date endDate = new Date();
+        HashMap<String,Object> scheduleProperties = new HashMap<String,Object>();
+        scheduleProperties.put( PROPERTY_KEY_START_DATE, startDate );
+        scheduleProperties.put( PROPERTY_KEY_END_DATE, endDate );
+        genericTestStore( SCHEDULE_TYPE_MONTHLY, scheduleProperties );
     }
 
     public void testStoreAdvancedSchedule()
     {
-        ScheduledTask<Integer> task = createScheduledTask( createSchedule( "advanced" ) );
+        HashMap<String,Object> scheduleProperties = new HashMap<String,Object>();
+        scheduleProperties.put( PROPERTY_KEY_CRON_EXPRESSION, CRON_EXPRESSION );
+        genericTestStore( SCHEDULE_TYPE_ADVANCED, scheduleProperties );
+    }
+    
+    public void genericTestStore( String scheduleType, HashMap<String,Object>scheduleProperties)
+    {
+        ScheduledTask<Integer> task = createScheduledTask( createSchedule( scheduleType, scheduleProperties ) );
         defaultManager.addTask( task );
         loadConfig();
         assertTrue( configuration.getTasks().size() == 1 );
-        assertTrue( "test".equals( ( (CScheduledTask) configuration.getTasks().get( 0 ) ).getName() ) );
-        assertTrue( CAdvancedSchedule.class.isAssignableFrom( ( (CScheduledTask) configuration.getTasks().get( 0 ) ).getSchedule().getClass() ) );
+        assertTrue( TASK_NAME.equals( ( (CScheduledTask) configuration.getTasks().get( 0 ) ).getName() ) );
+        assertTrue( typeClassMap.get( scheduleType ).isAssignableFrom( ( (CScheduledTask) configuration.getTasks().get( 0 ) ).getSchedule().getClass() ) );
         defaultManager.removeTask( task );
         loadConfig();
         assertTrue( configuration.getTasks().size() == 0 );
     }
 
-    private Schedule createSchedule( String type )
+    private Schedule createSchedule( String type, HashMap<String,Object>properties )
     {
-        if ( "once".equals( type ) )
+        if ( SCHEDULE_TYPE_ONCE.equals( type ) )
         {
-            return new OnceSchedule( new Date() );
+            return new OnceSchedule( (Date) properties.get( PROPERTY_KEY_START_DATE ) );
         }
-        else if ( "daily".equals( type ) )
+        else if ( SCHEDULE_TYPE_DAILY.equals( type ) )
         {
-            return new DailySchedule( new Date(), new Date() );
+            return new DailySchedule( (Date) properties.get( PROPERTY_KEY_START_DATE ), (Date) properties.get( PROPERTY_KEY_END_DATE ) );
         }
-        else if ( "weekly".equals( type ) )
+        else if ( SCHEDULE_TYPE_WEEKLY.equals( type ) )
         {
             Set<Integer> daysToRun = new HashSet<Integer>();
             daysToRun.add( new Integer( 0 ) );
-            return new WeeklySchedule( new Date(), new Date(), daysToRun );
+            return new WeeklySchedule( (Date) properties.get( PROPERTY_KEY_START_DATE ), (Date) properties.get( PROPERTY_KEY_END_DATE ), daysToRun );
         }
-        else if ( "monthly".equals( type ) )
+        else if ( SCHEDULE_TYPE_MONTHLY.equals( type ) )
         {
             Set<Integer> daysToRun = new HashSet<Integer>();
             daysToRun.add( new Integer( 1 ) );
-            return new MonthlySchedule( new Date(), new Date(), daysToRun );
+            return new MonthlySchedule( (Date) properties.get( PROPERTY_KEY_START_DATE ), (Date) properties.get( PROPERTY_KEY_END_DATE ), daysToRun );
         }
-        else if ( "advanced".equals( type ) )
+        else if ( SCHEDULE_TYPE_ADVANCED.equals( type ) )
         {
-            return new CronSchedule( "someexpression" );
+            return new CronSchedule( (String) properties.get( PROPERTY_KEY_CRON_EXPRESSION ) );
         }
 
         return null;
@@ -151,7 +172,7 @@ public class DefaultTaskConfigManagerTest
     private ScheduledTask<Integer> createScheduledTask( Schedule schedule )
     {
         TestCallable callable = new TestCallable();
-        return new DefaultScheduledTask<Integer>( "test", callable.getClass().getName(), defaultScheduler, callable,
+        return new DefaultScheduledTask<Integer>( TASK_NAME, callable.getClass().getName(), defaultScheduler, callable,
                                                   schedule );
     }
 
