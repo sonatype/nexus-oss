@@ -1,15 +1,16 @@
 package org.sonatype.nexus.ext.gwt.ui.client.reposerver;
 
+import org.sonatype.nexus.ext.gwt.ui.client.Action;
 import org.sonatype.nexus.ext.gwt.ui.client.ServerFunctionPanel;
 import org.sonatype.nexus.ext.gwt.ui.client.ServerInstance;
 
 import com.extjs.gxt.ui.client.Style;
 import com.extjs.gxt.ui.client.data.ModelData;
+import com.extjs.gxt.ui.client.data.TreeModel;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.event.SelectionChangedEvent;
 import com.extjs.gxt.ui.client.event.SelectionChangedListener;
 import com.extjs.gxt.ui.client.event.SelectionListener;
-import com.extjs.gxt.ui.client.widget.Component;
 import com.extjs.gxt.ui.client.widget.ContentPanel;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.button.ToolButton;
@@ -23,6 +24,7 @@ import com.extjs.gxt.ui.client.widget.table.TableColumnModel;
 import com.extjs.gxt.ui.client.widget.toolbar.TextToolItem;
 import com.extjs.gxt.ui.client.widget.toolbar.ToolBar;
 import com.extjs.gxt.ui.client.widget.tree.Tree;
+import com.google.gwt.user.client.Window;
 
 public class RepoMaintenancePage extends LayoutContainer implements ServerFunctionPanel {
 
@@ -90,6 +92,46 @@ public class RepoMaintenancePage extends LayoutContainer implements ServerFuncti
         };
 
         add(panel, panelLayoutData);
+        
+        ContextMenuProvider tableMenu =
+            new ContextMenuProvider(table, tableBinding.getBinder());
+        
+        tableMenu.addAction(new Action<ModelData>("View") {
+            public void execute(ModelData data) {
+                Window.alert(getCaption());
+            }
+        });
+        
+        tableMenu.addAction(new Action<ModelData>("Clear Cache") {
+            public boolean supports(ModelData data) {
+                String repoType = (String) data.get("repoType");
+                return repoType.equals("hosted") || repoType.equals("proxy");
+            }
+            public void execute(ModelData data) {
+                Window.alert(getCaption());
+            }
+        });
+        
+        tableMenu.addAction(new Action<ModelData>("Re-Index") {
+            public void execute(ModelData data) {
+                Window.alert(getCaption());
+            }
+        });
+        
+        tableMenu.addAction(new Action<ModelData>("Block Proxy") {
+            public boolean supports(ModelData data) {
+                return data.get("repoType").equals("proxy");
+            }
+            public void execute(ModelData data) {
+                Window.alert(getCaption());
+            }
+        });
+        
+        tableMenu.addAction(new Action<ModelData>("Put Out of Service") {
+            public void execute(ModelData data) {
+                Window.alert(getCaption());
+            }
+        });
     }
 
     private void addRepoPanel() {
@@ -142,6 +184,24 @@ public class RepoMaintenancePage extends LayoutContainer implements ServerFuncti
         repoPanel.removeAll();
         repoPanel.add(outerPanel);
         repoPanel.layout();
+
+        ContextMenuProvider treeMenu =
+            new ContextMenuProvider(tree, treeBinding.getBinder());
+        
+        treeMenu.addAction(new Action<TreeModel>("Re-Index") {
+            public void execute(TreeModel data) {
+                Window.alert(getCaption());
+            }
+        });
+        
+        treeMenu.addAction(new Action<TreeModel>("Download") {
+            public boolean supports(TreeModel data) {
+                return data.isLeaf();
+            }
+            public void execute(TreeModel data) {
+                Window.alert(getCaption());
+            }
+        });
     }
 
 }
