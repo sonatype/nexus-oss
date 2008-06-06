@@ -16,6 +16,7 @@ import com.extjs.gxt.ui.client.data.ListLoadResult;
 import com.extjs.gxt.ui.client.data.Model;
 import com.extjs.gxt.ui.client.data.ModelType;
 import com.extjs.gxt.ui.client.data.TreeLoader;
+import com.extjs.gxt.ui.client.data.TreeModel;
 import com.extjs.gxt.ui.client.data.XmlReader;
 import com.extjs.gxt.ui.client.store.TreeStore;
 import com.extjs.gxt.ui.client.widget.tree.Tree;
@@ -40,7 +41,7 @@ public class RepoTreeBinding {
     
     private TreeStore store;
     
-    private TreeBinder binder;
+    private TreeBinder<TreeModel> binder;
     
     public RepoTreeBinding(Tree tree) {
         this(tree, DEFAULT_MODEL_TYPE, Variant.APPLICATION_XML);
@@ -62,7 +63,7 @@ public class RepoTreeBinding {
         // TODO: Display the children of the root node
     }
 
-    public TreeBinder getBinder() {
+    public TreeBinder<TreeModel> getBinder() {
         return binder;
     }
     
