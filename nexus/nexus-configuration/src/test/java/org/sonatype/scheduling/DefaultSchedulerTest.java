@@ -26,7 +26,7 @@ public class DefaultSchedulerTest
 
         tr = new TestRunnable();
 
-        ScheduledTask<Object> st = defaultScheduler.submit( tr );
+        ScheduledTask<Object> st = defaultScheduler.submit( "default", tr );
 
         assertEquals( 1, defaultScheduler.getActiveTasks().size() );
 
@@ -49,7 +49,7 @@ public class DefaultSchedulerTest
 
         tr = new TestCallable();
 
-        ScheduledTask<Integer> st = defaultScheduler.submit( tr );
+        ScheduledTask<Integer> st = defaultScheduler.submit( "default", tr );
 
         assertEquals( 1, defaultScheduler.getActiveTasks().size() );
 
@@ -78,7 +78,7 @@ public class DefaultSchedulerTest
 
         Schedule schedule = new SecondSchedule( new Date( nearFuture ), new Date( nearFuture + 4900 ) );
 
-        ScheduledTask<Object> st = defaultScheduler.schedule( tr, schedule );
+        ScheduledTask<Object> st = defaultScheduler.schedule( "default", tr, schedule );
 
         assertEquals( 1, defaultScheduler.getActiveTasks().size() );
 
@@ -105,7 +105,7 @@ public class DefaultSchedulerTest
         
         Schedule schedule = new SecondSchedule( new Date( nearFuture ), new Date( nearFuture + 4900 ) );
 
-        ScheduledTask<Integer> st = defaultScheduler.schedule( tr, schedule );
+        ScheduledTask<Integer> st = defaultScheduler.schedule( "default", tr, schedule );
 
         assertEquals( 1, defaultScheduler.getActiveTasks().size() );
 
@@ -144,7 +144,7 @@ public class DefaultSchedulerTest
         
         Schedule schedule = new SecondSchedule( new Date( nearFuture ), new Date( nearFuture + 4900 ) );
 
-        ScheduledTask<Object> st = defaultScheduler.schedule( tr, schedule );
+        ScheduledTask<Object> st = defaultScheduler.schedule( "default", tr, schedule );
 
         assertEquals( 1, defaultScheduler.getActiveTasks().size() );
 
@@ -170,7 +170,7 @@ public class DefaultSchedulerTest
         
         Schedule schedule = new SecondSchedule( new Date( nearFuture ), new Date( nearFuture + 4900 ) );
 
-        ScheduledTask<Integer> st = defaultScheduler.schedule( tr, schedule );
+        ScheduledTask<Integer> st = defaultScheduler.schedule( "default", tr, schedule );
 
         assertEquals( 1, defaultScheduler.getActiveTasks().size() );
 

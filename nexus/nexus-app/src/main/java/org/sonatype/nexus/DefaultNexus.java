@@ -918,18 +918,18 @@ public class DefaultNexus
     // =============
     // Schedules
 
-    public <T> void submit( NexusTask<T> task )
+    public <T> void submit( String name, NexusTask<T> task )
         throws RejectedExecutionException,
             NullPointerException
     {
-        scheduler.submit( task );
+        scheduler.submit( name, task );
     }
 
-    public <T> ScheduledTask<T> schedule( NexusTask<T> nexusTask, Schedule schedule )
+    public <T> ScheduledTask<T> schedule( String name, NexusTask<T> nexusTask, Schedule schedule )
         throws RejectedExecutionException,
             NullPointerException
     {
-        return scheduler.schedule( nexusTask, schedule );
+        return scheduler.schedule( name, nexusTask, schedule );
     }
 
     public Map<String, List<ScheduledTask<?>>> getActiveTasks()

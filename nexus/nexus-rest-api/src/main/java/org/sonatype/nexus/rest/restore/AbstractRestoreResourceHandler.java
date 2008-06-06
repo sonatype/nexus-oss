@@ -110,7 +110,7 @@ public abstract class AbstractRestoreResourceHandler
                 }
             }
 
-            getNexus().submit( task );
+            getNexus().submit( "Internal", task );
         }
         catch ( RejectedExecutionException e )
         {

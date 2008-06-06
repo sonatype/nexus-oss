@@ -33,7 +33,7 @@ public class DefaultNexusScheduler
      */
     private LoggerManager loggerManager;
 
-    public <T> ScheduledTask<T> submit( NexusTask<T> nexusTask )
+    public <T> ScheduledTask<T> submit( String name, NexusTask<T> nexusTask )
         throws RejectedExecutionException,
             NullPointerException
     {
@@ -45,7 +45,7 @@ public class DefaultNexusScheduler
 
         if ( existingTasks == null || nexusTask.allowConcurrentExecution( existingTasks ) )
         {
-            return scheduler.submit( nexusTask );
+            return scheduler.submit( name, nexusTask );
         }
         else
         {
@@ -53,7 +53,7 @@ public class DefaultNexusScheduler
         }
     }
 
-    public <T> ScheduledTask<T> schedule( NexusTask<T> nexusTask, Schedule schedule )
+    public <T> ScheduledTask<T> schedule( String name, NexusTask<T> nexusTask, Schedule schedule )
         throws RejectedExecutionException,
             NullPointerException
     {
@@ -65,7 +65,7 @@ public class DefaultNexusScheduler
 
         if ( existingTasks == null || nexusTask.allowConcurrentExecution( existingTasks ) )
         {
-            return scheduler.schedule( nexusTask, schedule );
+            return scheduler.schedule( name, nexusTask, schedule );
         }
         else
         {

@@ -18,6 +18,8 @@ public class DefaultScheduledTask<T>
     private static final AtomicInteger ID_GENERATOR = new AtomicInteger( 0 );
 
     private final String id;
+    
+    private String name;
 
     private final String clazz;
 
@@ -283,5 +285,14 @@ public class DefaultScheduledTask<T>
     {
         return scheduleIterator;
     }
+    
+    public void setName( String name )
+    {
+        this.name = name;
+    }
 
+    public String getName()
+    {
+        return name;
+    }
 }

@@ -15,6 +15,13 @@ public interface ScheduledTask<T>
      * @return
      */
     String getId();
+    
+    /**
+     * Returns a name of the task.
+     * 
+     * @return
+     */
+    String getName();
 
     /**
      * Returns the "type" of the task.

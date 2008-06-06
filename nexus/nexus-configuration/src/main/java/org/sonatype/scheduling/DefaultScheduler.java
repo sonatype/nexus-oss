@@ -147,12 +147,12 @@ public class DefaultScheduler
         }
     }
 
-    public ScheduledTask<Object> submit( Runnable runnable )
+    public ScheduledTask<Object> submit( String name, Runnable runnable )
     {
-        return schedule( runnable, new RunNowSchedule() );
+        return schedule( name, runnable, new RunNowSchedule() );
     }
 
-    public ScheduledTask<Object> schedule( Runnable runnable, Schedule schedule )
+    public ScheduledTask<Object> schedule( String name, Runnable runnable, Schedule schedule )
     {
         DefaultScheduledTask<Object> drt = new DefaultScheduledTask<Object>(
             runnable.getClass().getName(),
@@ -167,12 +167,12 @@ public class DefaultScheduler
         return drt;
     }
 
-    public <T> ScheduledTask<T> submit( Callable<T> callable )
+    public <T> ScheduledTask<T> submit( String name, Callable<T> callable )
     {
-        return schedule( callable, new RunNowSchedule() );
+        return schedule( name, callable, new RunNowSchedule() );
     }
 
-    public <T> ScheduledTask<T> schedule( Callable<T> callable, Schedule schedule )
+    public <T> ScheduledTask<T> schedule( String name, Callable<T> callable, Schedule schedule )
     {
         DefaultScheduledTask<T> dct = new DefaultScheduledTask<T>(
             callable.getClass().getName(),

@@ -15,21 +15,23 @@ public interface NexusScheduler
     /**
      * Issue a NexusTask for immediate execution, but have a control over it.
      * 
+     * @param name
      * @param runnable
      * @return
      */
-    <T> ScheduledTask<T> submit( NexusTask<T> nexusTask )
+    <T> ScheduledTask<T> submit( String name, NexusTask<T> nexusTask )
         throws RejectedExecutionException,
             NullPointerException;
 
     /**
      * Issue a NexusTask for scheduled execution.
      * 
+     * @param name
      * @param runnable
      * @param iterator
      * @return
      */
-    <T> ScheduledTask<T> schedule( NexusTask<T> nexusTask, Schedule schedule )
+    <T> ScheduledTask<T> schedule( String name, NexusTask<T> nexusTask, Schedule schedule )
         throws RejectedExecutionException,
             NullPointerException;
 

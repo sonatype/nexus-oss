@@ -14,18 +14,20 @@ import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
 import org.codehaus.plexus.util.IOUtil;
+import org.sonatype.nexus.configuration.model.CAdvancedSchedule;
+import org.sonatype.nexus.configuration.model.CDailySchedule;
+import org.sonatype.nexus.configuration.model.CMonthlySchedule;
+import org.sonatype.nexus.configuration.model.COnceSchedule;
+import org.sonatype.nexus.configuration.model.CProps;
 import org.sonatype.nexus.configuration.model.CSchedule;
-import org.sonatype.nexus.configuration.model.CScheduleAdvanced;
-import org.sonatype.nexus.configuration.model.CScheduleDaily;
-import org.sonatype.nexus.configuration.model.CScheduleMonthly;
-import org.sonatype.nexus.configuration.model.CScheduleOnce;
-import org.sonatype.nexus.configuration.model.CScheduleWeekly;
+import org.sonatype.nexus.configuration.model.CScheduledTask;
 import org.sonatype.nexus.configuration.model.CTaskConfiguration;
-import org.sonatype.nexus.configuration.model.CTaskScheduled;
+import org.sonatype.nexus.configuration.model.CWeeklySchedule;
 import org.sonatype.scheduling.schedules.CronSchedule;
 import org.sonatype.scheduling.schedules.DailySchedule;
 import org.sonatype.scheduling.schedules.MonthlySchedule;
 import org.sonatype.scheduling.schedules.OnceSchedule;
+import org.sonatype.scheduling.schedules.RunNowSchedule;
 import org.sonatype.scheduling.schedules.Schedule;
 import org.sonatype.scheduling.schedules.WeeklySchedule;
 
@@ -65,7 +67,7 @@ public class DefaultTaskConfigManager
             
             for ( Iterator iter = config.getTasks().iterator(); iter.hasNext(); )
             {
-                CTaskScheduled storedTask = (CTaskScheduled) iter.next();            
+                CScheduledTask storedTask = (CScheduledTask) iter.next();            
                 
                 if ( !map.containsKey( storedTask.getType() ))
                 {
@@ -83,7 +85,7 @@ public class DefaultTaskConfigManager
     {
         synchronized( config )
         {
-            CTaskScheduled storeableTask = translateFrom( task );
+            CScheduledTask storeableTask = translateFrom( task );
             
             if ( storeableTask != null )
             {
@@ -99,7 +101,7 @@ public class DefaultTaskConfigManager
         {
             for ( Iterator iter = config.getTasks().iterator(); iter.hasNext(); )
             {
-                CTaskScheduled storedTask = (CTaskScheduled) iter.next();
+                CScheduledTask storedTask = (CScheduledTask) iter.next();
                 
                 if ( storedTask.getId().equals( task.getId() ))
                 {
@@ -113,7 +115,7 @@ public class DefaultTaskConfigManager
         //TODO: need to also add task to a history file
     }
     
-    private <T> ScheduledTask<T> translateFrom( CTaskScheduled task )
+    private <T> ScheduledTask<T> translateFrom( CScheduledTask task )
     {
         ScheduledTask<T> useableTask = null;
         
@@ -122,47 +124,70 @@ public class DefaultTaskConfigManager
         return useableTask;
     }
     
-    private <T> CTaskScheduled translateFrom ( ScheduledTask<T> task )
+    private <T> CScheduledTask translateFrom ( ScheduledTask<T> task )
     {
-        CTaskScheduled storeableTask = new CTaskScheduled();
+        //Run now doesn't get stored
+        if ( RunNowSchedule.class.isAssignableFrom( task.getSchedule().getClass() ))
+        {
+            return null;
+        }
         
-        ( ( CTaskScheduled )storeableTask ).setLastRun( ( ( ScheduledTask<T> )task ).getLastRun() );
-        ( ( CTaskScheduled )storeableTask ).setNextRun( ( ( ScheduledTask<T> )task ).getNextRun() );
+        CScheduledTask storeableTask = new CScheduledTask();
         
-        Schedule schedule = ( ( ScheduledTask<T> )task ).getSchedule();
+        storeableTask.setId( task.getId() );
+        storeableTask.setName( task.getName() );
+        storeableTask.setType( task.getType() );
+        storeableTask.setStatus( task.getTaskState().name() );
+        storeableTask.setLastRun( task.getLastRun() );
+        storeableTask.setNextRun( task.getNextRun() );
+        
+        Schedule schedule = task.getSchedule();
+        CSchedule storeableSchedule = null;
         
         if ( CronSchedule.class.isAssignableFrom( schedule.getClass() ) )
         {
-            ( ( CronSchedule) schedule ).getCronExpression();
+            storeableSchedule = new CAdvancedSchedule();
+            ( ( CAdvancedSchedule) storeableSchedule ).setCronCommand( ( ( CronSchedule) schedule ).getCronExpression() );
         }
         else if ( DailySchedule.class.isAssignableFrom( schedule.getClass() ) )
         {
-            ( ( DailySchedule) schedule ).getStartDate();
-            ( ( DailySchedule) schedule ).getEndDate();
+            storeableSchedule = new CDailySchedule();
+            ( ( CDailySchedule) storeableSchedule ).setStartDate( ( ( DailySchedule) schedule ).getStartDate() );
+            ( ( CDailySchedule) storeableSchedule ).setEndDate( ( ( DailySchedule) schedule ).getEndDate() );
         }
         else if ( MonthlySchedule.class.isAssignableFrom( schedule.getClass() ) )
         {
-            ( ( MonthlySchedule) schedule ).getStartDate();
-            ( ( MonthlySchedule) schedule ).getEndDate();
-            ( ( MonthlySchedule) schedule ).getDaysToRun();
+            storeableSchedule = new CMonthlySchedule();
+            ( ( CMonthlySchedule) storeableSchedule ).setStartDate( ( ( MonthlySchedule) schedule ).getStartDate() );
+            ( ( CMonthlySchedule) storeableSchedule ).setEndDate( ( ( MonthlySchedule) schedule ).getEndDate() );
+            
+            for ( Iterator iter = ( ( MonthlySchedule) schedule ).getDaysToRun().iterator(); iter.hasNext(); )
+            {
+                //TODO: String.valueOf is used because currently the days to run are integers in the monthly schedule
+                //needs to be string
+                ( ( CMonthlySchedule) storeableSchedule ).addDaysOfMonth( String.valueOf( iter.next() ) );
+            }
         }
         else if ( OnceSchedule.class.isAssignableFrom( schedule.getClass() ) )
         {
-            ( ( OnceSchedule) schedule ).getStartDate();
-            ( ( OnceSchedule) schedule ).getEndDate();
+            storeableSchedule = new COnceSchedule();            
+            ( ( COnceSchedule) storeableSchedule ).setStartDate( ( ( OnceSchedule) schedule ).getStartDate() );
         }
         else if ( WeeklySchedule.class.isAssignableFrom( schedule.getClass() ) )
         {
-        }
-        
-        if ( storeableTask != null )
-        {
-            storeableTask.setId( task.getId() );
-            storeableTask.setType( task.getType() );
-            task.getTaskState().name();
-        }
-        
-        //TODO: need to complete translation
+            storeableSchedule = new CWeeklySchedule();
+            ( ( CWeeklySchedule) storeableSchedule ).setStartDate( ( ( WeeklySchedule) schedule ).getStartDate() );
+            ( ( CWeeklySchedule) storeableSchedule ).setEndDate( ( ( WeeklySchedule) schedule ).getEndDate() );
+            
+            for ( Iterator iter = ( ( WeeklySchedule) schedule ).getDaysToRun().iterator(); iter.hasNext(); )
+            {
+                //TODO: String.valueOf is used because currently the days to run are integers in the weekly schedule
+                //needs to be string
+                ( ( CWeeklySchedule) storeableSchedule ).addDaysOfWeek( String.valueOf( iter.next() ) );
+            }
+        }       
+         
+        storeableTask.setSchedule( storeableSchedule );
         
         return storeableTask;
     }
@@ -259,13 +284,14 @@ public class DefaultTaskConfigManager
     private XStream configureXStream( XStream xstream )
     {
         xstream.omitField( CTaskConfiguration.class, "modelEncoding" );
-        xstream.omitField( CTaskScheduled.class, "modelEncoding" );
+        xstream.omitField( CScheduledTask.class, "modelEncoding" );
         xstream.omitField( CSchedule.class, "modelEncoding" );
-        xstream.omitField( CScheduleAdvanced.class, "modelEncoding" );
-        xstream.omitField( CScheduleDaily.class, "modelEncoding" );
-        xstream.omitField( CScheduleMonthly.class, "modelEncoding" );
-        xstream.omitField( CScheduleOnce.class, "modelEncoding" );
-        xstream.omitField( CScheduleWeekly.class, "modelEncoding" );
+        xstream.omitField( CAdvancedSchedule.class, "modelEncoding" );
+        xstream.omitField( CDailySchedule.class, "modelEncoding" );
+        xstream.omitField( CMonthlySchedule.class, "modelEncoding" );
+        xstream.omitField( COnceSchedule.class, "modelEncoding" );
+        xstream.omitField( CWeeklySchedule.class, "modelEncoding" );
+        xstream.omitField( CProps.class, "modelEncoding" );
         
         return xstream;
     }

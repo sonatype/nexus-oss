@@ -183,11 +183,11 @@ public interface Nexus
     // Scheduler
     // ----------------------------------------------------------------------------
 
-    <T> void submit( NexusTask<T> task )
+    <T> void submit( String name, NexusTask<T> task )
         throws RejectedExecutionException,
             NullPointerException;
 
-    <T> ScheduledTask<T> schedule( NexusTask<T> nexusTask, Schedule schedule )
+    <T> ScheduledTask<T> schedule( String name, NexusTask<T> nexusTask, Schedule schedule )
         throws RejectedExecutionException,
             NullPointerException;
 

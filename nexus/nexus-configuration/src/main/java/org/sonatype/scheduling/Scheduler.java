@@ -14,42 +14,46 @@ public interface Scheduler
     /**
      * Issue a Runnable for immediate execution, but have a control over it.
      * 
+     * @param name
      * @param runnable
      * @return
      */
-    ScheduledTask<Object> submit( Runnable runnable )
+    ScheduledTask<Object> submit( String name, Runnable runnable )
         throws RejectedExecutionException,
             NullPointerException;
 
     /**
      * Issue a Runnable for scheduled execution.
      * 
+     * @param name
      * @param runnable
      * @param iterator
      * @return
      */
-    ScheduledTask<Object> schedule( Runnable runnable, Schedule schedule )
+    ScheduledTask<Object> schedule( String name, Runnable runnable, Schedule schedule )
         throws RejectedExecutionException,
             NullPointerException;
 
     /**
      * Issue a Callable for immediate execution, but have a control over it.
      * 
+     * @param name
      * @param runnable
      * @return
      */
-    <T> ScheduledTask<T> submit( Callable<T> callable )
+    <T> ScheduledTask<T> submit( String name, Callable<T> callable )
         throws RejectedExecutionException,
             NullPointerException;
 
     /**
      * Issue a Runnable for scheduled execution.
      * 
+     * @param name
      * @param runnable
      * @param iterator
      * @return
      */
-    <T> ScheduledTask<T> schedule( Callable<T> callable, Schedule schedule )
+    <T> ScheduledTask<T> schedule( String name, Callable<T> callable, Schedule schedule )
         throws RejectedExecutionException,
             NullPointerException;
 
