@@ -176,6 +176,7 @@ Ext.extend(Sonatype.repoServer.SearchPanel, Ext.Panel, {
     p.grid.store.baseParams[p.paramName] = '';
     //p.grid.store.reload({params:o});
     p.grid.store.removeAll();
+    p.grid.updateRowTotals( p.grid );
     p.setFilenameLabel( p );
   },
 
@@ -195,6 +196,8 @@ Ext.extend(Sonatype.repoServer.SearchPanel, Ext.Panel, {
               this.grid.store.loadData({data:[statusResp]});
             }
           }
+          this.grid.totalRecords = 0;
+          this.grid.updateRowTotals( this.grid );
         },
         scope: p
       } );
@@ -202,7 +205,13 @@ Ext.extend(Sonatype.repoServer.SearchPanel, Ext.Panel, {
     else {
       p.grid.store.baseParams = p.grid.store.baseParams || {};
       p.grid.store.baseParams[p.paramName] = v;
-      p.grid.store.reload();//{params:o});
+      p.grid.totalRecords = 0;
+      p.grid.store.load({
+        params: {
+          from: 0,
+          count: 50
+        }
+      });//{params:o});
     }
   },
   

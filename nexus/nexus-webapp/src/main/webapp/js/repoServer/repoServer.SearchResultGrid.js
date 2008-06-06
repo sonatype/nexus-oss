@@ -47,11 +47,36 @@ Sonatype.repoServer.SearchResultGrid = function(config) {
     //headers: {Accept: 'application/json'}
   });
   
+  this.totalRecords = 0;
+  
   //@todo: create stand alone data reader to read update/create responses as well
   //@ext: must use data.Store (not JsonStore) to pass in reader instead of using fields config array
   this.store = new Ext.data.Store({
     proxy: requestProxy,
-    reader: resultReader
+    reader: resultReader,
+    listeners: {
+      'beforeload': {
+        fn: function( store, options ) {
+          requestProxy.getConnection().on( 'requestcomplete',
+            function( conn, response, options ) {
+              if ( response.responseText ) {
+                var statusResp = Ext.decode(response.responseText);
+                if ( statusResp ) {
+                  this.totalRecords = statusResp.totalCount;
+                }
+              }
+            }, this, { single: true } );
+          return true;
+        },
+        scope: this
+      },
+      'load': {
+        fn: function( store, records, options ) {
+          this.updateRowTotals( this );
+        },
+        scope: this
+      }
+    }
   });
   
   this.store.setDefaultSort('groupId', "ASC");
@@ -106,6 +131,48 @@ Sonatype.repoServer.SearchResultGrid = function(config) {
 //  }
   ];
 
+  this.fetchMoreButton = new Ext.SplitButton({
+    text: 'Fetch Next 50',
+    value: '50',
+    handler: this.fetchMoreRows,
+    disabled: true,
+    scope: this,
+    menu: {
+      items: [
+        {
+          text: 'Fetch Next 50',
+          value: '50',
+          scope: this,
+          handler: this.fetchMoreRows
+        },
+        {
+          text: 'Fetch Next 100',
+          value: '100',
+          scope: this,
+          handler: this.fetchMoreRows
+        },
+        {
+          text: 'Fetch Next 200',
+          value: '200',
+          scope: this,
+          handler: this.fetchMoreRows
+        },
+        {
+          text: 'Fetch All',
+          value: '0',
+          scope: this,
+          handler: this.fetchMoreRows
+        }
+      ]
+    }
+    
+  });
+
+  this.fetchMoreBar = new Ext.Toolbar({
+    ctCls: 'search-all-tbar',
+    items: [ 'Displaying 0 of 0 records', this.fetchMoreButton ]
+  });
+
   Sonatype.repoServer.SearchResultGrid.superclass.constructor.call(this, {
       region: 'center',
       id: 'search-result-grid',
@@ -114,6 +181,8 @@ Sonatype.repoServer.SearchResultGrid = function(config) {
       sm: new Ext.grid.RowSelectionModel({
           singleSelect: true
       }),
+      
+      bbar: this.fetchMoreBar,
 
       viewConfig: {
           forceFit:true,
@@ -166,5 +235,37 @@ Ext.extend(Sonatype.repoServer.SearchResultGrid, Ext.grid.GridPanel, {
   
   formatPomLink: function(value, p, record, rowIndex, colIndex, store) {
       return '<a class="pom-link" index="'+rowIndex+'" href="#">View & Copy</a>';
+  },
+
+  fetchMoreRows: function( button, event ) {
+    if ( button.value != this.fetchMoreButton.value ) {
+      this.fetchMoreButton.value = button.value;
+      this.fetchMoreButton.setText( button.text );
+    }
+
+    var fetched = this.store.getCount();
+    var toFetch = this.fetchMoreButton.value;
+    if ( toFetch == 0 ) {
+      toFetch = this.totalRecords - fetched;
+    }
+    this.store.load({
+      params: {
+        from: fetched,
+        count: toFetch
+      },
+      add: true
+    });
+  },
+  
+  updateRowTotals: function( p ) {
+    var count = p.store.getCount();
+    if ( count == 0 || count > p.totalRecords ) {
+      p.totalRecords = count;
+    }
+    
+    p.fetchMoreBar.items.items[0].destroy();
+    p.fetchMoreBar.insertButton( 0, new Ext.Toolbar.TextItem( 'Displaying ' + count + ' of ' + p.totalRecords + ' records' ) );
+
+    p.fetchMoreButton.setDisabled( count >= p.totalRecords );
   }
 });
