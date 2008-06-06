@@ -404,4 +404,9 @@ public abstract class AbstractNexusIntegrationTest
         return container.lookup( role, id );
     }
 
+    protected PlexusContainer getContainer()
+    {
+        return this.container;
+    }
+
 }
