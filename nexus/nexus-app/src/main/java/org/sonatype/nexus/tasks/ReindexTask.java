@@ -20,18 +20,18 @@
  */
 package org.sonatype.nexus.tasks;
 
-import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.feeds.FeedRecorder;
 import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesTask;
 
+/**
+ * Reindex task.
+ * 
+ * @author cstamas
+ * @plexus.component role="org.sonatype.nexus.tasks.ReindexTask"
+ */
 public class ReindexTask
     extends AbstractNexusRepositoriesTask<Object>
 {
-    public ReindexTask( Nexus nexus, String repositoryId, String repositoryGroupId )
-    {
-        super( nexus, repositoryId, repositoryGroupId );
-    }
-
     public Object doRun()
         throws Exception
     {

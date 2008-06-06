@@ -31,10 +31,13 @@ import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.logging.Logger;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.artifact.M2ArtifactRecognizer;
+import org.sonatype.nexus.proxy.NoSuchRepositoryException;
+import org.sonatype.nexus.proxy.NoSuchRepositoryGroupException;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
+import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.utils.StoreWalker;
 
@@ -44,24 +47,74 @@ import org.sonatype.nexus.proxy.utils.StoreWalker;
  * snapshots per one snapshot collection by removing all older from removeSnapshotsOlderThanDays.
  * 
  * @author cstamas
+ * @plexus.component
  */
 public class DefaultSnapshotRemover
     extends AbstractLogEnabled
     implements SnapshotRemover
 {
+    /**
+     * The registry.
+     * 
+     * @plexus.requirement
+     */
+    private RepositoryRegistry repositoryRegistry;
+
+    public RepositoryRegistry getRepositoryRegistry()
+    {
+        return repositoryRegistry;
+    }
+
     public SnapshotRemovalResult removeSnapshots( SnapshotRemovalRequest request )
-        throws Exception
+        throws NoSuchRepositoryException,
+            NoSuchRepositoryGroupException,
+            IllegalArgumentException
     {
         SnapshotRemovalResult result = new SnapshotRemovalResult();
 
         result = new SnapshotRemovalResult();
 
-        for ( Repository repository : request.getRepositories() )
+        if ( request.getRepositoryId() != null )
         {
-            // only from maven repositories, stay silent for others and simply skip
+            getLogger().info( "Removing old SNAPSHOT deployments from " + request.getRepositoryId() + " repository." );
+
+            Repository repository = getRepositoryRegistry().getRepository( request.getRepositoryId() );
+
             if ( MavenRepository.class.isAssignableFrom( repository.getClass() ) )
             {
                 result.addResult( removeSnapshotsFromMavenRepository( repository, request ) );
+            }
+            else
+            {
+                throw new IllegalArgumentException( "The repository with ID=" + repository.getId()
+                    + " is not MavenRepository!" );
+            }
+        }
+        else if ( request.getRepositoryGroupId() != null )
+        {
+            getLogger().info(
+                "Removing old SNAPSHOT deployments from " + request.getRepositoryGroupId() + " repository group." );
+
+            for ( Repository repository : getRepositoryRegistry().getRepositoryGroup( request.getRepositoryGroupId() ) )
+            {
+                // only from maven repositories, stay silent for others and simply skip
+                if ( MavenRepository.class.isAssignableFrom( repository.getClass() ) )
+                {
+                    result.addResult( removeSnapshotsFromMavenRepository( repository, request ) );
+                }
+            }
+        }
+        else
+        {
+            getLogger().info( "Removing old SNAPSHOT deployments from all repositories." );
+
+            for ( Repository repository : getRepositoryRegistry().getRepositories() )
+            {
+                // only from maven repositories, stay silent for others and simply skip
+                if ( MavenRepository.class.isAssignableFrom( repository.getClass() ) )
+                {
+                    result.addResult( removeSnapshotsFromMavenRepository( repository, request ) );
+                }
             }
         }
 
@@ -76,7 +129,6 @@ public class DefaultSnapshotRemover
      */
     protected SnapshotRemovalRepositoryResult removeSnapshotsFromMavenRepository( Repository repository,
         SnapshotRemovalRequest request )
-        throws Exception
     {
         SnapshotRemovalRepositoryResult result = new SnapshotRemovalRepositoryResult( repository.getId(), 0, 0 );
 

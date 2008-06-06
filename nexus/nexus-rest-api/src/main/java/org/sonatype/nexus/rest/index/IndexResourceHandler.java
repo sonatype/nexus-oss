@@ -129,7 +129,7 @@ public class IndexResourceHandler
         SearchResponse result = new SearchResponse();
 
         result.setTotalCount( searchResult.getTotalHits() );
-        
+
         result.setFrom( from == null ? -1 : from.intValue() );
 
         result.setCount( count == null ? -1 : count.intValue() );
@@ -141,7 +141,13 @@ public class IndexResourceHandler
 
     public void handleDelete()
     {
-        super.handleDelete( new ReindexTask( getNexus(), getRepositoryId(), getRepositoryGroupId() ) );
+        ReindexTask task = (ReindexTask) createTaskInstance( ReindexTask.class.getName() );
+
+        task.setRepositoryId( getRepositoryId() );
+
+        task.setRepositoryGroupId( getRepositoryGroupId() );
+
+        super.handleDelete( task );
     }
 
 }

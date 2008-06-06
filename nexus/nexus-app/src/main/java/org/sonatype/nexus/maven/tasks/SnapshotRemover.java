@@ -20,10 +20,15 @@
  */
 package org.sonatype.nexus.maven.tasks;
 
+import org.sonatype.nexus.proxy.NoSuchRepositoryException;
+import org.sonatype.nexus.proxy.NoSuchRepositoryGroupException;
+
 public interface SnapshotRemover
 {
     String ROLE = SnapshotRemover.class.getName();
 
     SnapshotRemovalResult removeSnapshots( SnapshotRemovalRequest request )
-        throws Exception;
+        throws NoSuchRepositoryException,
+            NoSuchRepositoryGroupException,
+            IllegalArgumentException;
 }

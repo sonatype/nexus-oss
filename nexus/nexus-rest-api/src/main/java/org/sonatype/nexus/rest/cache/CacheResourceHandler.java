@@ -143,11 +143,15 @@ public class CacheResourceHandler
 
     public void delete()
     {
-        super.handleDelete( new ClearCacheTask(
-            getNexus(),
-            getRepositoryId(),
-            getRepositoryGroupId(),
-            resourceStorePath ) );
+        ClearCacheTask task = (ClearCacheTask) createTaskInstance( ClearCacheTask.class.getName() );
+
+        task.setRepositoryId( getRepositoryId() );
+
+        task.setRepositoryGroupId( getRepositoryGroupId() );
+
+        task.setResourceStorePath( resourceStorePath );
+
+        super.handleDelete( task );
     }
 
 }

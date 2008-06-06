@@ -39,6 +39,8 @@ import org.sonatype.nexus.feeds.SystemEvent;
 import org.sonatype.nexus.feeds.SystemProcess;
 import org.sonatype.nexus.index.ArtifactInfo;
 import org.sonatype.nexus.index.FlatSearchResponse;
+import org.sonatype.nexus.maven.tasks.SnapshotRemovalRequest;
+import org.sonatype.nexus.maven.tasks.SnapshotRemovalResult;
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
@@ -148,6 +150,11 @@ public interface Nexus
     void rebuildAttributesRepositoryGroup( String repositoryGroupId )
         throws NoSuchRepositoryGroupException,
             IOException;
+
+    SnapshotRemovalResult removeSnapshots( SnapshotRemovalRequest request )
+        throws NoSuchRepositoryException,
+            NoSuchRepositoryGroupException,
+            IllegalArgumentException;
 
     // ----------------------------------------------------------------------------
     // Feeds

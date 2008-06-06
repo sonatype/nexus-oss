@@ -62,6 +62,9 @@ import org.sonatype.nexus.index.ArtifactInfo;
 import org.sonatype.nexus.index.FlatSearchResponse;
 import org.sonatype.nexus.index.IndexerManager;
 import org.sonatype.nexus.index.context.IndexContextInInconsistentStateException;
+import org.sonatype.nexus.maven.tasks.SnapshotRemovalRequest;
+import org.sonatype.nexus.maven.tasks.SnapshotRemovalResult;
+import org.sonatype.nexus.maven.tasks.SnapshotRemover;
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
@@ -156,6 +159,13 @@ public class DefaultNexus
      * @plexus.requirement
      */
     private FeedRecorder feedRecorder;
+
+    /**
+     * The snapshot remover component.
+     * 
+     * @plexus.requiremenr
+     */
+    private SnapshotRemover snapshotRemover;
 
     /**
      * System status.
@@ -617,6 +627,14 @@ public class DefaultNexus
         {
             repository.clearCaches( path );
         }
+    }
+
+    public SnapshotRemovalResult removeSnapshots( SnapshotRemovalRequest request )
+        throws NoSuchRepositoryException,
+            NoSuchRepositoryGroupException,
+            IllegalArgumentException
+    {
+        return snapshotRemover.removeSnapshots( request );
     }
 
     // ------------------------------------------------------------------

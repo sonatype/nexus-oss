@@ -20,14 +20,9 @@
  */
 package org.sonatype.nexus.maven.tasks;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.sonatype.nexus.proxy.maven.MavenRepository;
-
 public class SnapshotRemovalRequest
 {
-    private final List<MavenRepository> repositories;
+    private final String repositoryId, repositoryGroupId;
 
     private final int minCountOfSnapshotsToKeep;
 
@@ -35,12 +30,14 @@ public class SnapshotRemovalRequest
 
     private final boolean removeIfReleaseExists;
 
-    public SnapshotRemovalRequest( int minCountOfSnapshotsToKeep, int removeSnapshotsOlderThanDays,
-        boolean removeIfReleaseExists )
+    public SnapshotRemovalRequest( String repositoryId, String repositoryGroupId, int minCountOfSnapshotsToKeep,
+        int removeSnapshotsOlderThanDays, boolean removeIfReleaseExists )
     {
         super();
 
-        this.repositories = new ArrayList<MavenRepository>();
+        this.repositoryId = repositoryId;
+
+        this.repositoryGroupId = repositoryGroupId;
 
         this.minCountOfSnapshotsToKeep = minCountOfSnapshotsToKeep;
 
@@ -49,9 +46,14 @@ public class SnapshotRemovalRequest
         this.removeIfReleaseExists = removeIfReleaseExists;
     }
 
-    public List<MavenRepository> getRepositories()
+    public String getRepositoryId()
     {
-        return repositories;
+        return repositoryId;
+    }
+
+    public String getRepositoryGroupId()
+    {
+        return repositoryGroupId;
     }
 
     public int getMinCountOfSnapshotsToKeep()

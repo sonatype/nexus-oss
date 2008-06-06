@@ -46,6 +46,7 @@ import org.sonatype.nexus.index.ArtifactInfo;
 import org.sonatype.nexus.rest.model.NexusArtifact;
 import org.sonatype.nexus.rest.model.NexusError;
 import org.sonatype.nexus.rest.model.NexusErrorResponse;
+import org.sonatype.nexus.scheduling.NexusTask;
 import org.sonatype.nexus.security.User;
 import org.sonatype.plexus.rest.AbstractPlexusAwareResource;
 import org.sonatype.plexus.rest.PlexusRestletUtils;
@@ -79,6 +80,11 @@ public abstract class AbstractNexusResourceHandler
     protected Nexus getNexus()
     {
         return (Nexus) getRequest().getAttributes().get( Nexus.ROLE );
+    }
+
+    protected NexusTask<?> createTaskInstance( String taskType )
+    {
+        return (NexusTask<?>) lookup( taskType );
     }
 
     protected Object lookup( String role )

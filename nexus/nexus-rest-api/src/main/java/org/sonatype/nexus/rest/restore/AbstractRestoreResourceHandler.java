@@ -89,7 +89,7 @@ public abstract class AbstractRestoreResourceHandler
         return true;
     }
 
-    public void handleDelete( NexusTask task )
+    public void handleDelete( NexusTask<?> task )
     {
         try
         {

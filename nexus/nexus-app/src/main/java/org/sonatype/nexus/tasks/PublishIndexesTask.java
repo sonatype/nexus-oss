@@ -2,18 +2,18 @@ package org.sonatype.nexus.tasks;
 
 import java.io.IOException;
 
-import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.feeds.FeedRecorder;
 import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesTask;
 
+/**
+ * Publish indexes task.
+ * 
+ * @author cstamas
+ * @plexus.component role="org.sonatype.nexus.tasks.PublishIndexesTask"
+ */
 public class PublishIndexesTask
     extends AbstractNexusRepositoriesTask<Object>
 {
-    public PublishIndexesTask( Nexus nexus, String repositoryId, String repositoryGroupId )
-    {
-        super( nexus, repositoryId, repositoryGroupId );
-    }
-
     @Override
     protected Object doRun()
         throws Exception

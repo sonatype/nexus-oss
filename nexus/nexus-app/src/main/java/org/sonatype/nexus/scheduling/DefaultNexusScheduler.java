@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.RejectedExecutionException;
 
-import org.codehaus.plexus.logging.LoggerManager;
 import org.sonatype.scheduling.NoSuchTaskException;
 import org.sonatype.scheduling.ScheduledTask;
 import org.sonatype.scheduling.Scheduler;
@@ -26,19 +25,10 @@ public class DefaultNexusScheduler
      */
     private Scheduler scheduler;
 
-    /**
-     * The lm
-     * 
-     * @plexus.requirement
-     */
-    private LoggerManager loggerManager;
-
     public <T> ScheduledTask<T> submit( String name, NexusTask<T> nexusTask )
         throws RejectedExecutionException,
             NullPointerException
     {
-        nexusTask.setLogger( loggerManager.getLoggerForComponent( nexusTask.getClass().getName() ) );
-
         Class<?> cls = nexusTask.getClass();
 
         List<ScheduledTask<?>> existingTasks = scheduler.getActiveTasks().get( cls );
@@ -57,8 +47,6 @@ public class DefaultNexusScheduler
         throws RejectedExecutionException,
             NullPointerException
     {
-        nexusTask.setLogger( loggerManager.getLoggerForComponent( nexusTask.getClass().getName() ) );
-
         Class<?> cls = nexusTask.getClass();
 
         List<ScheduledTask<?>> existingTasks = scheduler.getActiveTasks().get( cls );

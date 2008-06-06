@@ -20,18 +20,18 @@
  */
 package org.sonatype.nexus.tasks;
 
-import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.feeds.FeedRecorder;
 import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesTask;
 
+/**
+ * Rebuild attributes task.
+ * 
+ * @author cstamas
+ * @plexus.component role="org.sonatype.nexus.tasks.RebuildAttributesTask"
+ */
 public class RebuildAttributesTask
     extends AbstractNexusRepositoriesTask<Object>
 {
-    public RebuildAttributesTask( Nexus nexus, String repositoryId, String repositoryGroupId )
-    {
-        super( nexus, repositoryId, repositoryGroupId );
-    }
-
     public Object doRun()
         throws Exception
     {

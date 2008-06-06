@@ -20,90 +20,50 @@
  */
 package org.sonatype.nexus.maven.tasks;
 
-import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.feeds.FeedRecorder;
-import org.sonatype.nexus.proxy.maven.MavenRepository;
-import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesTask;
 
+/**
+ * SnapshotRemoverTask
+ * 
+ * @author cstamas
+ * @plexus.component role="org.sonatype.nexus.maven.tasks.SnapshotRemoverTask"
+ */
 public class SnapshotRemoverTask
     extends AbstractNexusRepositoriesTask<SnapshotRemovalResult>
 {
-    private final int minSnapshotsToKeep;
+    private int minSnapshotsToKeep;
 
-    private final int removeOlderThanDays;
+    private int removeOlderThanDays;
 
-    private final boolean removeIfReleaseExists;
+    private boolean removeIfReleaseExists;
 
-    public SnapshotRemoverTask( Nexus nexus, String repositoryId, String repositoryGroupId, int minSnapshotsToKeep,
-        int removeOlderThanDays, boolean removeIfReleaseExists )
+    public int getMinSnapshotsToKeep()
     {
-        super( nexus, repositoryId, repositoryGroupId );
+        return minSnapshotsToKeep;
+    }
 
-        this.minSnapshotsToKeep = minSnapshotsToKeep;
+    public int getRemoveOlderThanDays()
+    {
+        return removeOlderThanDays;
+    }
 
-        this.removeOlderThanDays = removeOlderThanDays;
-
-        this.removeIfReleaseExists = removeIfReleaseExists;
+    public boolean isRemoveIfReleaseExists()
+    {
+        return removeIfReleaseExists;
     }
 
     public SnapshotRemovalResult doRun()
         throws Exception
     {
         SnapshotRemovalRequest req = new SnapshotRemovalRequest(
+            getRepositoryId(),
+            getRepositoryGroupId(),
             minSnapshotsToKeep,
             removeOlderThanDays,
             removeIfReleaseExists );
 
-        if ( getRepositoryId() != null )
-        {
-            getLogger().info( "Removing old SNAPSHOT deployments from " + getRepositoryId() + " repository." );
-
-            Repository repository = getNexus().getRepository( getRepositoryId() );
-
-            if ( MavenRepository.class.isAssignableFrom( repository.getClass() ) )
-            {
-                req.getRepositories().add( (MavenRepository) repository );
-            }
-            else
-            {
-                throw new IllegalArgumentException( "The repository with ID=" + repository.getId()
-                    + " is not MavenRepository!" );
-            }
-        }
-        else if ( getRepositoryGroupId() != null )
-        {
-            getLogger()
-                .info( "Removing old SNAPSHOT deployments from " + getRepositoryGroupId() + " repository group." );
-
-            for ( Repository repository : getNexus().getRepositoryGroup( getRepositoryGroupId() ) )
-            {
-                // only from maven repositories, stay silent for others and simply skip
-                if ( MavenRepository.class.isAssignableFrom( repository.getClass() ) )
-                {
-                    req.getRepositories().add( (MavenRepository) repository );
-                }
-            }
-        }
-        else
-        {
-            getLogger().info( "Removing old SNAPSHOT deployments from all repositories." );
-
-            for ( Repository repository : getNexus().getRepositories() )
-            {
-                // only from maven repositories, stay silent for others and simply skip
-                if ( MavenRepository.class.isAssignableFrom( repository.getClass() ) )
-                {
-                    req.getRepositories().add( (MavenRepository) repository );
-                }
-            }
-        }
-
-        DefaultSnapshotRemover sr = new DefaultSnapshotRemover();
-
-        sr.enableLogging( getLogger() );
-
-        return sr.removeSnapshots( req );
+        return getNexus().removeSnapshots( req );
     }
 
     protected String getAction()

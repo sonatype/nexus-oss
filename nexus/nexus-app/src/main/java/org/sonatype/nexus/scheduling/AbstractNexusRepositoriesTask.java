@@ -20,21 +20,24 @@
  */
 package org.sonatype.nexus.scheduling;
 
-import org.sonatype.nexus.Nexus;
-
 public abstract class AbstractNexusRepositoriesTask<T>
     extends AbstractNexusTask<T>
 {
-    private final String repositoryId;
+    public static final String REPOSITORY_ID = "repositoryId";
 
-    private final String repositoryGroupId;
+    public static final String REPOSITORY_GROUP_ID = "repositoryGroupId";
 
-    public AbstractNexusRepositoriesTask( Nexus nexus, String repositoryId, String repositoryGroupId )
+    private String repositoryId;
+
+    private String repositoryGroupId;
+
+    public void setRepositoryId( String repositoryId )
     {
-        super( nexus );
-
         this.repositoryId = repositoryId;
+    }
 
+    public void setRepositoryGroupId( String repositoryGroupId )
+    {
         this.repositoryGroupId = repositoryGroupId;
     }
 

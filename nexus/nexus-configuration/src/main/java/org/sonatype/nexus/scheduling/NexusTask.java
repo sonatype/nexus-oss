@@ -3,13 +3,11 @@ package org.sonatype.nexus.scheduling;
 import java.util.List;
 import java.util.concurrent.Callable;
 
-import org.codehaus.plexus.logging.Logger;
+import org.codehaus.plexus.logging.LogEnabled;
 import org.sonatype.scheduling.ScheduledTask;
 
 public interface NexusTask<T>
-    extends Callable<T>
+    extends Callable<T>, LogEnabled
 {
-    void setLogger( Logger logger );
-
     boolean allowConcurrentExecution( List<ScheduledTask<?>> existingTasks );
 }

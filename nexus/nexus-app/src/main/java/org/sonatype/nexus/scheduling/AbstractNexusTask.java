@@ -22,36 +22,21 @@ package org.sonatype.nexus.scheduling;
 
 import java.util.List;
 
-import org.codehaus.plexus.logging.Logger;
+import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.feeds.SystemProcess;
 import org.sonatype.scheduling.ScheduledTask;
 
 public abstract class AbstractNexusTask<T>
+    extends AbstractLogEnabled
     implements NexusTask<T>
 {
-    private final Nexus nexus;
-
+    /**
+     * @plexus.requirement
+     */
+    private Nexus nexus;
+    
     private SystemProcess prc;
-
-    private Logger logger;
-
-    public AbstractNexusTask( Nexus nexus )
-    {
-        super();
-
-        this.nexus = nexus;
-    }
-
-    public Logger getLogger()
-    {
-        return logger;
-    }
-
-    public void setLogger( Logger logger )
-    {
-        this.logger = logger;
-    }
 
     protected Nexus getNexus()
     {

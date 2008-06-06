@@ -10,4 +10,9 @@ public class NoSuchTaskException
         super( "There is no running/active task with ID=" + id );
     }
 
+    public NoSuchTaskException( String message, Throwable cause )
+    {
+        super( message, cause );
+    }
+
 }

@@ -20,19 +20,27 @@
  */
 package org.sonatype.nexus.tasks;
 
-import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.feeds.FeedRecorder;
 import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesTask;
 
+/**
+ * Clear caches task.
+ * 
+ * @author cstamas
+ * @plexus.component role="org.sonatype.nexus.tasks.ClearCacheTask"
+ */
 public class ClearCacheTask
     extends AbstractNexusRepositoriesTask<Object>
 {
-    private final String resourceStorePath;
+    private String resourceStorePath;
 
-    public ClearCacheTask( Nexus nexus, String repositoryId, String repositoryGroupId, String resourceStorePath )
+    public String getResourceStorePath()
     {
-        super( nexus, repositoryId, repositoryGroupId );
+        return resourceStorePath;
+    }
 
+    public void setResourceStorePath( String resourceStorePath )
+    {
         this.resourceStorePath = resourceStorePath;
     }
 
