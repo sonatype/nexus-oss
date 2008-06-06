@@ -39,7 +39,7 @@ public class RecentOverallCachingFeedSource
     {
         return CHANNEL_KEY;
     }
-    
+
     public String getFeedName()
     {
         return getDescription();
@@ -54,7 +54,7 @@ public class RecentOverallCachingFeedSource
     @Override
     public List<NexusArtifactEvent> getEventList()
     {
-        return getNexus().getFeedRecorder().getRecentlyCachedArtifacts();
+        return getNexus().getRecentlyCachedArtifacts();
     }
 
     @Override

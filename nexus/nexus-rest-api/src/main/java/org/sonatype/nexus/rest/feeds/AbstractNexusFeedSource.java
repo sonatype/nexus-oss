@@ -209,6 +209,24 @@ public abstract class AbstractNexusFeedSource
                     msg.append( " Processing was initiated by user " ).append( username ).append( "." );
                 }
             }
+            else if ( NexusArtifactEvent.ACTION_BROKEN_WRONG_REMOTE_CHECKSUM.equals( item.getAction() ) )
+            {
+                msg.append( "proxied, and the remote repository contains wrong checksum for it." );
+
+                if ( item.getMessage() != null )
+                {
+                    msg.append( " Details: \n" );
+
+                    msg.append( item.getMessage() );
+
+                    msg.append( "\n" );
+                }
+
+                if ( username != null )
+                {
+                    msg.append( " Processing was initiated by user " ).append( username ).append( "." );
+                }
+            }
             else if ( NexusArtifactEvent.ACTION_RETRIEVED.equals( item.getAction() ) )
             {
                 msg.append( "served by Nexus." );

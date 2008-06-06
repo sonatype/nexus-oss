@@ -33,24 +33,27 @@ public class SnapshotRemoverTask
 
     private final int removeOlderThanDays;
 
+    private final boolean removeIfReleaseExists;
+
     public SnapshotRemoverTask( Nexus nexus, String repositoryId, String repositoryGroupId, int minSnapshotsToKeep,
-        int removeOlderThanDays )
+        int removeOlderThanDays, boolean removeIfReleaseExists )
     {
         super( nexus, repositoryId, repositoryGroupId );
 
         this.minSnapshotsToKeep = minSnapshotsToKeep;
 
         this.removeOlderThanDays = removeOlderThanDays;
+
+        this.removeIfReleaseExists = removeIfReleaseExists;
     }
 
     public SnapshotRemovalResult doRun()
         throws Exception
     {
-        SnapshotRemovalRequest req = new SnapshotRemovalRequest();
-
-        req.setMinCountOfSnapshotsToKeep( minSnapshotsToKeep );
-
-        req.setRemoveSnapshotsOlderThanDays( removeOlderThanDays );
+        SnapshotRemovalRequest req = new SnapshotRemovalRequest(
+            minSnapshotsToKeep,
+            removeOlderThanDays,
+            removeIfReleaseExists );
 
         if ( getRepositoryId() != null )
         {
@@ -60,7 +63,7 @@ public class SnapshotRemoverTask
 
             if ( MavenRepository.class.isAssignableFrom( repository.getClass() ) )
             {
-                req.getRepositories().add( repository );
+                req.getRepositories().add( (MavenRepository) repository );
             }
             else
             {
@@ -78,7 +81,7 @@ public class SnapshotRemoverTask
                 // only from maven repositories, stay silent for others and simply skip
                 if ( MavenRepository.class.isAssignableFrom( repository.getClass() ) )
                 {
-                    req.getRepositories().add( repository );
+                    req.getRepositories().add( (MavenRepository) repository );
                 }
             }
         }
@@ -91,7 +94,7 @@ public class SnapshotRemoverTask
                 // only from maven repositories, stay silent for others and simply skip
                 if ( MavenRepository.class.isAssignableFrom( repository.getClass() ) )
                 {
-                    req.getRepositories().add( repository );
+                    req.getRepositories().add( (MavenRepository) repository );
                 }
             }
         }

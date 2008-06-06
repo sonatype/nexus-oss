@@ -24,6 +24,8 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class SimpleFeedRecorder
     implements FeedRecorder
@@ -36,31 +38,6 @@ public class SimpleFeedRecorder
 
     public void addSystemEvent( String action, String message )
     {
-    }
-
-    public List<NexusArtifactEvent> getBrokenArtifacts()
-    {
-        return Collections.emptyList();
-    }
-
-    public List<NexusArtifactEvent> getRecentlyCachedArtifacts()
-    {
-        return Collections.emptyList();
-    }
-
-    public List<NexusArtifactEvent> getRecentlyDeployedArtifacts()
-    {
-        return Collections.emptyList();
-    }
-
-    public List<NexusArtifactEvent> getRecentlyDeployedOrCachedArtifacts()
-    {
-        return Collections.emptyList();
-    }
-
-    public List<SystemEvent> getSystemEvents()
-    {
-        return Collections.emptyList();
     }
 
     public void systemProcessBroken( SystemProcess prc, Throwable e )
@@ -80,14 +57,29 @@ public class SimpleFeedRecorder
         throws IOException
     {
         // TODO Auto-generated method stub
-        
+
     }
 
     public void stopService()
         throws IOException
     {
         // TODO Auto-generated method stub
-        
+
+    }
+
+    public List<Map<String, String>> getEvents( Set<String> types, Set<String> subtypes, Integer from, Integer count )
+    {
+        return Collections.emptyList();
+    }
+
+    public List<NexusArtifactEvent> getNexusArtifectEvents( Set<String> subtypes, Integer from, Integer count )
+    {
+        return Collections.emptyList();
+    }
+
+    public List<SystemEvent> getSystemEvents( Set<String> subtypes, Integer from, Integer count )
+    {
+        return Collections.emptyList();
     }
 
 }

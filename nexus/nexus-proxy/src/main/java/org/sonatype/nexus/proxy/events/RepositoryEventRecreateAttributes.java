@@ -33,7 +33,7 @@ public class RepositoryEventRecreateAttributes
      * 
      * @param repository the repository
      */
-    public RepositoryEventRecreateAttributes( final Repository repository)
+    public RepositoryEventRecreateAttributes( final Repository repository )
     {
         super( repository );
     }

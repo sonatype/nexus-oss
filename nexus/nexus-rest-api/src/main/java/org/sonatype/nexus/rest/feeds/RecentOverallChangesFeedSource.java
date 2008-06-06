@@ -48,13 +48,13 @@ public class RecentOverallChangesFeedSource
     @Override
     public String getDescription()
     {
-        return "Recent overall changes in all Nexus repositories.";
+        return "Recent overall changes (caches, deployments, deletions) in all Nexus repositories.";
     }
 
     @Override
     public List<NexusArtifactEvent> getEventList()
     {
-        return getNexus().getFeedRecorder().getRecentlyDeployedOrCachedArtifacts();
+        return getNexus().getRecentlyStorageChanges();
     }
 
     @Override

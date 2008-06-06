@@ -23,22 +23,34 @@ package org.sonatype.nexus.maven.tasks;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.proxy.maven.MavenRepository;
 
 public class SnapshotRemovalRequest
 {
-    private List<Repository> repositories;
+    private final List<MavenRepository> repositories;
 
-    private int minCountOfSnapshotsToKeep = 2;
+    private final int minCountOfSnapshotsToKeep;
 
-    private int removeSnapshotsOlderThanDays = 2;
+    private final int removeSnapshotsOlderThanDays;
 
-    public List<Repository> getRepositories()
+    private final boolean removeIfReleaseExists;
+
+    public SnapshotRemovalRequest( int minCountOfSnapshotsToKeep, int removeSnapshotsOlderThanDays,
+        boolean removeIfReleaseExists )
     {
-        if ( repositories == null )
-        {
-            repositories = new ArrayList<Repository>();
-        }
+        super();
+
+        this.repositories = new ArrayList<MavenRepository>();
+
+        this.minCountOfSnapshotsToKeep = minCountOfSnapshotsToKeep;
+
+        this.removeSnapshotsOlderThanDays = removeSnapshotsOlderThanDays;
+
+        this.removeIfReleaseExists = removeIfReleaseExists;
+    }
+
+    public List<MavenRepository> getRepositories()
+    {
         return repositories;
     }
 
@@ -47,18 +59,13 @@ public class SnapshotRemovalRequest
         return minCountOfSnapshotsToKeep;
     }
 
-    public void setMinCountOfSnapshotsToKeep( int minCountOfSnapshotsToKeep )
-    {
-        this.minCountOfSnapshotsToKeep = minCountOfSnapshotsToKeep;
-    }
-
     public int getRemoveSnapshotsOlderThanDays()
     {
         return removeSnapshotsOlderThanDays;
     }
 
-    public void setRemoveSnapshotsOlderThanDays( int removeSnapshotsOlderThanDays )
+    public boolean isRemoveIfReleaseExists()
     {
-        this.removeSnapshotsOlderThanDays = removeSnapshotsOlderThanDays;
+        return removeIfReleaseExists;
     }
 }

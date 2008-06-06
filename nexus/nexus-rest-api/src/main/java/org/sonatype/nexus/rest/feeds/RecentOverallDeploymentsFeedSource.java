@@ -54,7 +54,7 @@ public class RecentOverallDeploymentsFeedSource
     @Override
     public List<NexusArtifactEvent> getEventList()
     {
-        return getNexus().getFeedRecorder().getRecentlyDeployedArtifacts();
+        return getNexus().getRecentlyDeployedArtifacts();
     }
 
     @Override

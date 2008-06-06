@@ -375,7 +375,7 @@ public class M2NamespaceBasedRepositoryRouter
 
     // private stuff
 
-    private Field getFieldByNameIncludingSuperclasses( String fieldName, Class clazz )
+    private Field getFieldByNameIncludingSuperclasses( String fieldName, Class<?> clazz )
     {
         Field retValue = null;
 
@@ -385,7 +385,7 @@ public class M2NamespaceBasedRepositoryRouter
         }
         catch ( NoSuchFieldException e )
         {
-            Class superclass = clazz.getSuperclass();
+            Class<?> superclass = clazz.getSuperclass();
 
             if ( superclass != null )
             {

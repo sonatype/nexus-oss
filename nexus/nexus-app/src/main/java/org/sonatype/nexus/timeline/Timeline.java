@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.sonatype.nexus.configuration.ConfigurationChangeListener;
 
@@ -48,21 +49,21 @@ public interface Timeline
 
     void purgeAll();
 
-    void purgeAll( String type );
+    void purgeAll( Set<String> types );
 
-    void purgeAll( String type, String subType );
+    void purgeAll( Set<String> types, Set<String> subTypes );
 
     void purgeOlderThan( long timestamp );
 
-    void purgeOlderThan( long timestamp, String type );
+    void purgeOlderThan( long timestamp, Set<String> types );
 
-    void purgeOlderThan( long timestamp, String type, String subType );
+    void purgeOlderThan( long timestamp, Set<String> types, Set<String> subTypes );
 
-    List<Map<String, String>> retrieveNewest( int count, String type );
+    List<Map<String, String>> retrieveNewest( int count, Set<String> types );
 
-    List<Map<String, String>> retrieveNewest( int count, String type, String subtype );
+    List<Map<String, String>> retrieveNewest( int count, Set<String> types, Set<String> subtypes );
 
-    List<Map<String, String>> retrieve( long from, int count, String type );
+    List<Map<String, String>> retrieve( long from, int count, Set<String> types );
 
-    List<Map<String, String>> retrieve( long from, int count, String type, String subtype );
+    List<Map<String, String>> retrieve( long from, int count, Set<String> types, Set<String> subtypes );
 }

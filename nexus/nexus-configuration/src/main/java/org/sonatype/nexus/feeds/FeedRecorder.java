@@ -22,6 +22,8 @@ package org.sonatype.nexus.feeds;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * A recorder for events for later retrieval. This is actually event recorder, not feed recorder.
@@ -89,14 +91,9 @@ public interface FeedRecorder
 
     // reading
 
-    List<NexusArtifactEvent> getRecentlyDeployedOrCachedArtifacts();
+    List<Map<String, String>> getEvents( Set<String> types, Set<String> subtypes, Integer from, Integer count );
 
-    List<NexusArtifactEvent> getRecentlyCachedArtifacts();
+    List<NexusArtifactEvent> getNexusArtifectEvents( Set<String> subtypes, Integer from, Integer count );
 
-    List<NexusArtifactEvent> getRecentlyDeployedArtifacts();
-
-    List<NexusArtifactEvent> getBrokenArtifacts();
-
-    List<SystemEvent> getSystemEvents();
-
+    List<SystemEvent> getSystemEvents( Set<String> subtypes, Integer from, Integer count );
 }

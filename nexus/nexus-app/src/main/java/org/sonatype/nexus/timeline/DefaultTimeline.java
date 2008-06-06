@@ -28,6 +28,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.lucene.analysis.KeywordAnalyzer;
 import org.apache.lucene.document.DateTools;
@@ -296,7 +297,9 @@ public class DefaultTimeline
         {
             synchronized ( this )
             {
-                Hits hits = getIndexSearcher().search( query, new Sort( new SortField( TIMESTAMP, SortField.LONG, true ) ) );
+                Hits hits = getIndexSearcher().search(
+                    query,
+                    new Sort( new SortField( TIMESTAMP, SortField.LONG, true ) ) );
 
                 for ( Iterator<Hit> i = (Iterator<Hit>) hits.iterator(); i.hasNext() && result.size() <= count; )
                 {
@@ -326,9 +329,14 @@ public class DefaultTimeline
         return result;
     }
 
-    protected Query buildQuery( long from, long to, String type, String subType )
+    protected boolean isEmptySet( Set<String> set )
     {
-        if ( type == null && subType == null )
+        return set == null || set.size() == 0;
+    }
+
+    protected Query buildQuery( long from, long to, Set<String> types, Set<String> subTypes )
+    {
+        if ( isEmptySet( types ) && isEmptySet( subTypes ) )
         {
             return new ConstantScoreRangeQuery(
                 TIMESTAMP,
@@ -350,13 +358,27 @@ public class DefaultTimeline
                     true ),
                 Occur.MUST );
 
-            if ( type != null )
+            if ( !isEmptySet( types ) )
             {
-                result.add( new TermQuery( new Term( TYPE, type ) ), Occur.MUST );
+                BooleanQuery typeQ = new BooleanQuery();
+
+                for ( String type : types )
+                {
+                    typeQ.add( new TermQuery( new Term( TYPE, type ) ), Occur.SHOULD );
+                }
+
+                result.add( typeQ, Occur.MUST );
             }
-            if ( subType != null )
+            if ( !isEmptySet( subTypes ) )
             {
-                result.add( new TermQuery( new Term( SUBTYPE, subType ) ), Occur.MUST );
+                BooleanQuery subTypeQ = new BooleanQuery();
+
+                for ( String subType : subTypes )
+                {
+                    subTypeQ.add( new TermQuery( new Term( SUBTYPE, subType ) ), Occur.SHOULD );
+                }
+
+                result.add( subTypeQ, Occur.MUST );
             }
             return result;
         }
@@ -496,14 +518,14 @@ public class DefaultTimeline
         purge( buildQuery( 0L, System.currentTimeMillis(), null, null ) );
     }
 
-    public void purgeAll( String type )
+    public void purgeAll( Set<String> types )
     {
-        purge( buildQuery( 0L, System.currentTimeMillis(), type, null ) );
+        purge( buildQuery( 0L, System.currentTimeMillis(), types, null ) );
     }
 
-    public void purgeAll( String type, String subType )
+    public void purgeAll( Set<String> types, Set<String> subTypes )
     {
-        purge( buildQuery( 0L, System.currentTimeMillis(), type, subType ) );
+        purge( buildQuery( 0L, System.currentTimeMillis(), types, subTypes ) );
     }
 
     public void purgeOlderThan( long timestamp )
@@ -511,34 +533,34 @@ public class DefaultTimeline
         purge( buildQuery( 0L, timestamp, null, null ) );
     }
 
-    public void purgeOlderThan( long timestamp, String type )
+    public void purgeOlderThan( long timestamp, Set<String> types )
     {
-        purge( buildQuery( 0L, timestamp, type, null ) );
+        purge( buildQuery( 0L, timestamp, types, null ) );
     }
 
-    public void purgeOlderThan( long timestamp, String type, String subType )
+    public void purgeOlderThan( long timestamp, Set<String> types, Set<String> subTypes )
     {
-        purge( buildQuery( 0L, timestamp, type, subType ) );
+        purge( buildQuery( 0L, timestamp, types, subTypes ) );
     }
 
-    public List<Map<String, String>> retrieve( long from, int count, String type )
+    public List<Map<String, String>> retrieve( long from, int count, Set<String> types )
     {
-        return retrieve( buildQuery( from, System.currentTimeMillis(), type, null ), count );
+        return retrieve( buildQuery( from, System.currentTimeMillis(), types, null ), count );
     }
 
-    public List<Map<String, String>> retrieve( long from, int count, String type, String subType )
+    public List<Map<String, String>> retrieve( long from, int count, Set<String> types, Set<String> subTypes )
     {
-        return retrieve( buildQuery( from, System.currentTimeMillis(), type, subType ), count );
+        return retrieve( buildQuery( from, System.currentTimeMillis(), types, subTypes ), count );
     }
 
-    public List<Map<String, String>> retrieveNewest( int count, String type )
+    public List<Map<String, String>> retrieveNewest( int count, Set<String> types )
     {
-        return retrieve( buildQuery( 0L, System.currentTimeMillis(), type, null ), count );
+        return retrieve( buildQuery( 0L, System.currentTimeMillis(), types, null ), count );
     }
 
-    public List<Map<String, String>> retrieveNewest( int count, String type, String subType )
+    public List<Map<String, String>> retrieveNewest( int count, Set<String> types, Set<String> subTypes )
     {
-        return retrieve( buildQuery( 0L, System.currentTimeMillis(), type, subType ), count );
+        return retrieve( buildQuery( 0L, System.currentTimeMillis(), types, subTypes ), count );
     }
 
 }

@@ -54,8 +54,6 @@ public class DefaultSnapshotRemover
     {
         SnapshotRemovalResult result = new SnapshotRemovalResult();
 
-        getLogger().info( "Removing old SNAPSHOT deployments from all repositories." );
-
         result = new SnapshotRemovalResult();
 
         for ( Repository repository : request.getRepositories() )
@@ -147,7 +145,9 @@ public class DefaultSnapshotRemover
         {
             deletableSnapshotsAndFiles.clear();
             remainingSnapshotsAndFiles.clear();
-            shouldProcessCollection = coll.getParentPath().contains( "-SNAPSHOT" );
+
+            shouldProcessCollection = coll.getParentPath().endsWith( "-SNAPSHOT" );
+
             if ( shouldProcessCollection )
             {
                 Gav gav = null;

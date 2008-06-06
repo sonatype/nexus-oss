@@ -424,7 +424,7 @@ public abstract class AbstractMavenRepository
 
                 NexusArtifactEvent nae = new NexusArtifactEvent();
 
-                nae.setAction( NexusArtifactEvent.ACTION_WRONG_CHECKSUM );
+                nae.setAction( NexusArtifactEvent.ACTION_BROKEN_WRONG_REMOTE_CHECKSUM );
 
                 nae.setEventDate( new Date() );
 
@@ -456,7 +456,7 @@ public abstract class AbstractMavenRepository
 
                 NexusArtifactEvent nae = new NexusArtifactEvent();
 
-                nae.setAction( NexusArtifactEvent.ACTION_WRONG_CHECKSUM );
+                nae.setAction( NexusArtifactEvent.ACTION_BROKEN_WRONG_REMOTE_CHECKSUM );
 
                 nae.setEventDate( new Date() );
 
@@ -519,7 +519,7 @@ public abstract class AbstractMavenRepository
                     {
                         NexusArtifactEvent nae = new NexusArtifactEvent();
 
-                        nae.setAction( NexusArtifactEvent.ACTION_WRONG_CHECKSUM );
+                        nae.setAction( NexusArtifactEvent.ACTION_BROKEN_WRONG_REMOTE_CHECKSUM );
 
                         nae.setEventDate( new Date() );
 
@@ -547,7 +547,7 @@ public abstract class AbstractMavenRepository
                     {
                         NexusArtifactEvent nae = new NexusArtifactEvent();
 
-                        nae.setAction( NexusArtifactEvent.ACTION_WRONG_CHECKSUM );
+                        nae.setAction( NexusArtifactEvent.ACTION_BROKEN_WRONG_REMOTE_CHECKSUM );
 
                         nae.setEventDate( new Date() );
 

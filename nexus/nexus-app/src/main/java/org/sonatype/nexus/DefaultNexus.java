@@ -25,8 +25,10 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -54,6 +56,8 @@ import org.sonatype.nexus.configuration.model.CRepositoryShadow;
 import org.sonatype.nexus.configuration.model.CRouting;
 import org.sonatype.nexus.feeds.FeedRecorder;
 import org.sonatype.nexus.feeds.NexusArtifactEvent;
+import org.sonatype.nexus.feeds.SystemEvent;
+import org.sonatype.nexus.feeds.SystemProcess;
 import org.sonatype.nexus.index.ArtifactInfo;
 import org.sonatype.nexus.index.FlatSearchResponse;
 import org.sonatype.nexus.index.IndexerManager;
@@ -844,10 +848,72 @@ public class DefaultNexus
     // =============
     // Feeds
 
-    @Deprecated
-    public FeedRecorder getFeedRecorder()
+    // creating
+
+    public void addNexusArtifactEvent( NexusArtifactEvent nae )
     {
-        return feedRecorder;
+        feedRecorder.addNexusArtifactEvent( nae );
+    }
+
+    public void addSystemEvent( String action, String message )
+    {
+        feedRecorder.addSystemEvent( action, message );
+    }
+
+    public SystemProcess systemProcessStarted( String action, String message )
+    {
+        return feedRecorder.systemProcessStarted( action, message );
+    }
+
+    public void systemProcessFinished( SystemProcess prc )
+    {
+        feedRecorder.systemProcessFinished( prc );
+    }
+
+    public void systemProcessBroken( SystemProcess prc, Throwable e )
+    {
+        feedRecorder.systemProcessBroken( prc, e );
+    }
+
+    // reading
+
+    public List<NexusArtifactEvent> getRecentlyStorageChanges()
+    {
+        return feedRecorder.getNexusArtifectEvents( new HashSet<String>( Arrays.asList( new String[] {
+            NexusArtifactEvent.ACTION_CACHED,
+            NexusArtifactEvent.ACTION_DEPLOYED,
+            NexusArtifactEvent.ACTION_DELETED } ) ), null, null );
+    }
+
+    public List<NexusArtifactEvent> getRecentlyDeployedOrCachedArtifacts()
+    {
+        return feedRecorder.getNexusArtifectEvents( new HashSet<String>( Arrays.asList( new String[] {
+            NexusArtifactEvent.ACTION_CACHED,
+            NexusArtifactEvent.ACTION_DEPLOYED } ) ), null, null );
+    }
+
+    public List<NexusArtifactEvent> getRecentlyCachedArtifacts()
+    {
+        return feedRecorder.getNexusArtifectEvents( new HashSet<String>( Arrays
+            .asList( new String[] { NexusArtifactEvent.ACTION_CACHED } ) ), null, null );
+    }
+
+    public List<NexusArtifactEvent> getRecentlyDeployedArtifacts()
+    {
+        return feedRecorder.getNexusArtifectEvents( new HashSet<String>( Arrays
+            .asList( new String[] { NexusArtifactEvent.ACTION_DEPLOYED } ) ), null, null );
+    }
+
+    public List<NexusArtifactEvent> getBrokenArtifacts()
+    {
+        return feedRecorder.getNexusArtifectEvents( new HashSet<String>( Arrays.asList( new String[] {
+            NexusArtifactEvent.ACTION_BROKEN,
+            NexusArtifactEvent.ACTION_BROKEN_WRONG_REMOTE_CHECKSUM } ) ), null, null );
+    }
+
+    public List<SystemEvent> getSystemEvents()
+    {
+        return feedRecorder.getSystemEvents( null, null, null );
     }
 
     // =============
@@ -1038,9 +1104,8 @@ public class DefaultNexus
 
             feedRecorder.startService();
 
-            getFeedRecorder().addSystemEvent(
-                FeedRecorder.SYSTEM_BOOT_ACTION,
-                "Starting Nexus (version " + systemStatus.getVersion() + ")" );
+            addSystemEvent( FeedRecorder.SYSTEM_BOOT_ACTION, "Starting Nexus (version " + systemStatus.getVersion()
+                + ")" );
 
             systemStatus.setLastConfigChange( new Date() );
 
@@ -1117,9 +1182,7 @@ public class DefaultNexus
     {
         systemStatus.setState( SystemState.STOPPING );
 
-        getFeedRecorder().addSystemEvent(
-            FeedRecorder.SYSTEM_BOOT_ACTION,
-            "Stopping Nexus (version " + systemStatus.getVersion() + ")" );
+        addSystemEvent( FeedRecorder.SYSTEM_BOOT_ACTION, "Stopping Nexus (version " + systemStatus.getVersion() + ")" );
 
         httpProxyService.stopService();
 
@@ -1377,7 +1440,7 @@ public class DefaultNexus
                             return;
                         }
 
-                        getFeedRecorder().addNexusArtifactEvent( nae );
+                        addNexusArtifactEvent( nae );
                     }
 
                 }
@@ -1434,7 +1497,7 @@ public class DefaultNexus
                     sb.insert( 0, "Unregistered" );
                 }
 
-                getFeedRecorder().addSystemEvent( FeedRecorder.SYSTEM_CONFIG_ACTION, sb.toString() );
+                addSystemEvent( FeedRecorder.SYSTEM_CONFIG_ACTION, sb.toString() );
             }
         }
         catch ( Exception e )
@@ -1447,7 +1510,7 @@ public class DefaultNexus
     {
         systemStatus.setLastConfigChange( new Date() );
 
-        getFeedRecorder().addSystemEvent( FeedRecorder.SYSTEM_CONFIG_ACTION, "Nexus configuration changed/updated." );
+        addSystemEvent( FeedRecorder.SYSTEM_CONFIG_ACTION, "Nexus configuration changed/updated." );
     }
 
 }

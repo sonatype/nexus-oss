@@ -25,15 +25,15 @@ import java.util.List;
 import org.sonatype.nexus.feeds.NexusArtifactEvent;
 
 /**
- * The brokenArtifacts feed.
+ * The overall changes feed.
  * 
  * @author cstamas
- * @plexus.component role-hint="brokenArtifacts"
+ * @plexus.component role-hint="recentCacheOrDeployments"
  */
-public class BrokenArtifactsFeedSource
+public class RecentOverallCachedOrDeployedFeedSource
     extends AbstractNexusFeedSource
 {
-    public static final String CHANNEL_KEY = "brokenArtifacts";
+    public static final String CHANNEL_KEY = "recentCacheOrDeployments";
 
     public String getFeedKey()
     {
@@ -48,19 +48,19 @@ public class BrokenArtifactsFeedSource
     @Override
     public String getDescription()
     {
-        return "Broken artifacts in all Nexus repositories.";
+        return "Recently cached or deployed (new) artifacts in all Nexus repositories.";
     }
 
     @Override
     public List<NexusArtifactEvent> getEventList()
     {
-        return getNexus().getBrokenArtifacts();
+        return getNexus().getRecentlyDeployedOrCachedArtifacts();
     }
 
     @Override
     public String getTitle()
     {
-        return "Nexus Repository Broken Artifacts";
+        return "Nexus Repository Recent Changes";
     }
 
 }

@@ -224,14 +224,14 @@ public class ApplicationBridge
         router.attach( "/identify/{" + IdentifyHashResourceHandler.ALGORITHM_KEY + "}/{"
             + IdentifyHashResourceHandler.HASH_KEY + "}", IdentifyHashResourceHandler.class );
 
+        router.attach( "/artifact/maven", ArtifactResourceHandler.class );
+
+        router.attach( "/artifact/maven/content", ArtifactResourceContentHandler.class );
+
         // protected resources
 
         try
         {
-            router.attach( "/artifact/maven", protectWriteToResource( ArtifactResourceHandler.class ) );
-
-            router.attach( "/artifact/maven/content", protectWriteToResource( ArtifactResourceContentHandler.class ) );
-
             router.attach( "/data_index", protectWriteToResource( IndexResourceHandler.class ) );
 
             router.attach(

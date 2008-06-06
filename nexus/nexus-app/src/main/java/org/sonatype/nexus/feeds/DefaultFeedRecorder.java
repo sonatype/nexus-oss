@@ -27,8 +27,10 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.sonatype.nexus.artifact.NexusItemInfo;
@@ -63,10 +65,20 @@ public class DefaultFeedRecorder
      */
     private static final String REPO_EVENT_TYPE = "REPO_EVENTS";
 
+    private static final Set<String> REPO_EVENT_TYPE_SET = new HashSet<String>( 1 );
+    {
+        REPO_EVENT_TYPE_SET.add( REPO_EVENT_TYPE );
+    }
+
     /**
      * Event type: system
      */
     private static final String SYSTEM_EVENT_TYPE = "SYSTEM";
+
+    private static final Set<String> SYSTEM_EVENT_TYPE_SET = new HashSet<String>( 1 );
+    {
+        SYSTEM_EVENT_TYPE_SET.add( SYSTEM_EVENT_TYPE );
+    }
 
     /**
      * The timeline for persistent events and feeds.
@@ -178,29 +190,35 @@ public class DefaultFeedRecorder
         return result;
     }
 
-    public List<NexusArtifactEvent> getRecentlyDeployedOrCachedArtifacts()
+    public List<Map<String, String>> getEvents( Set<String> types, Set<String> subtypes, Integer from, Integer count )
     {
-        return getAisFromMaps( timeline.retrieveNewest( 40, REPO_EVENT_TYPE ) );
+        return timeline.retrieveNewest( 40, types, subtypes );
     }
 
-    public List<NexusArtifactEvent> getRecentlyCachedArtifacts()
+    public List<NexusArtifactEvent> getNexusArtifectEvents( Set<String> subtypes, Integer from, Integer count )
     {
-        return getAisFromMaps( timeline.retrieveNewest( 40, REPO_EVENT_TYPE, NexusArtifactEvent.ACTION_CACHED ) );
+        // TODO: wire in paging
+        if ( subtypes == null || subtypes.size() == 0 )
+        {
+            return getAisFromMaps( timeline.retrieveNewest( 40, REPO_EVENT_TYPE_SET ) );
+        }
+        else
+        {
+            return getAisFromMaps( timeline.retrieveNewest( 40, REPO_EVENT_TYPE_SET, subtypes ) );
+        }
     }
 
-    public List<NexusArtifactEvent> getRecentlyDeployedArtifacts()
+    public List<SystemEvent> getSystemEvents( Set<String> subtypes, Integer from, Integer count )
     {
-        return getAisFromMaps( timeline.retrieveNewest( 40, REPO_EVENT_TYPE, NexusArtifactEvent.ACTION_DEPLOYED ) );
-    }
-
-    public List<NexusArtifactEvent> getBrokenArtifacts()
-    {
-        return getAisFromMaps( timeline.retrieveNewest( 40, REPO_EVENT_TYPE, NexusArtifactEvent.ACTION_BROKEN ) );
-    }
-
-    public List<SystemEvent> getSystemEvents()
-    {
-        return getSesFromMaps( timeline.retrieveNewest( 40, SYSTEM_EVENT_TYPE ) );
+        // TODO: wire in paging
+        if ( subtypes == null || subtypes.size() == 0 )
+        {
+            return getSesFromMaps( timeline.retrieveNewest( 40, SYSTEM_EVENT_TYPE_SET ) );
+        }
+        else
+        {
+            return getSesFromMaps( timeline.retrieveNewest( 40, SYSTEM_EVENT_TYPE_SET, subtypes ) );
+        }
     }
 
     public void addSystemEvent( String action, String message )

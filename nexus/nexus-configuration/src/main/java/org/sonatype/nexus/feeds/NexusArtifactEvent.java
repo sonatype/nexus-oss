@@ -42,7 +42,7 @@ public class NexusArtifactEvent
 
     public static final String ACTION_BROKEN = "broken";
 
-    public static final String ACTION_WRONG_CHECKSUM = "broken";
+    public static final String ACTION_BROKEN_WRONG_REMOTE_CHECKSUM = "brokenWRC";
 
     /**
      * The artifactInfo about artifact.
@@ -63,7 +63,7 @@ public class NexusArtifactEvent
      * The action.
      */
     private String action;
-    
+
     /**
      * The message.
      */

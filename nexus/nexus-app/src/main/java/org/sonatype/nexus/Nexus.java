@@ -34,7 +34,9 @@ import org.sonatype.nexus.configuration.model.CRemoteHttpProxySettings;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.CRepositoryShadow;
 import org.sonatype.nexus.configuration.model.CRouting;
-import org.sonatype.nexus.feeds.FeedRecorder;
+import org.sonatype.nexus.feeds.NexusArtifactEvent;
+import org.sonatype.nexus.feeds.SystemEvent;
+import org.sonatype.nexus.feeds.SystemProcess;
 import org.sonatype.nexus.index.ArtifactInfo;
 import org.sonatype.nexus.index.FlatSearchResponse;
 import org.sonatype.nexus.proxy.AccessDeniedException;
@@ -152,8 +154,31 @@ public interface Nexus
     // Feeds
     // ----------------------------------------------------------------------------
 
-    @Deprecated
-    FeedRecorder getFeedRecorder();
+    // creating
+
+    void addNexusArtifactEvent( NexusArtifactEvent nae );
+
+    void addSystemEvent( String action, String message );
+
+    SystemProcess systemProcessStarted( String action, String message );
+
+    void systemProcessFinished( SystemProcess prc );
+
+    void systemProcessBroken( SystemProcess prc, Throwable e );
+
+    // reading
+
+    List<NexusArtifactEvent> getRecentlyStorageChanges();
+
+    List<NexusArtifactEvent> getRecentlyDeployedOrCachedArtifacts();
+
+    List<NexusArtifactEvent> getRecentlyCachedArtifacts();
+
+    List<NexusArtifactEvent> getRecentlyDeployedArtifacts();
+
+    List<NexusArtifactEvent> getBrokenArtifacts();
+
+    List<SystemEvent> getSystemEvents();
 
     // ----------------------------------------------------------------------------
     // Scheduler

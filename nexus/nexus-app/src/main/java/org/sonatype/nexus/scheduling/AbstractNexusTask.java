@@ -67,7 +67,7 @@ public abstract class AbstractNexusTask<T>
     public final T call()
         throws Exception
     {
-        prc = getNexus().getFeedRecorder().systemProcessStarted( getAction(), getMessage() );
+        prc = getNexus().systemProcessStarted( getAction(), getMessage() );
 
         beforeRun();
 
@@ -77,7 +77,7 @@ public abstract class AbstractNexusTask<T>
         {
             result = doRun();
 
-            getNexus().getFeedRecorder().systemProcessFinished( prc );
+            getNexus().systemProcessFinished( prc );
 
             afterRun();
 
@@ -85,7 +85,7 @@ public abstract class AbstractNexusTask<T>
         }
         catch ( Exception e )
         {
-            getNexus().getFeedRecorder().systemProcessBroken( prc, e );
+            getNexus().systemProcessBroken( prc, e );
 
             throw e;
         }

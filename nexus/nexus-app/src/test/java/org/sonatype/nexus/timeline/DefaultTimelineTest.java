@@ -20,7 +20,9 @@
  */
 package org.sonatype.nexus.timeline;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -37,7 +39,7 @@ public class DefaultTimelineTest
         super.setUp();
 
         defaultTimeline = (DefaultTimeline) this.lookup( DefaultTimeline.ROLE );
-        
+
         defaultTimeline.startService();
     }
 
@@ -45,7 +47,7 @@ public class DefaultTimelineTest
         throws Exception
     {
         defaultTimeline.stopService();
-        
+
         super.tearDown();
     }
 
@@ -62,20 +64,26 @@ public class DefaultTimelineTest
         List<Map<String, String>> res = defaultTimeline.retrieve(
             System.currentTimeMillis() - 2 * 60 * 60 * 1000,
             10,
-            "TEST",
-            "1" );
+            new HashSet<String>( Arrays.asList( new String[] { "TEST" } ) ),
+            new HashSet<String>( Arrays.asList( new String[] { "1" } ) ) );
 
         assertEquals( 1, res.size() );
 
-        res = defaultTimeline.retrieveNewest( 10, "TEST", "1" );
+        res = defaultTimeline.retrieveNewest(
+            10,
+            new HashSet<String>( Arrays.asList( new String[] { "TEST" } ) ),
+            new HashSet<String>( Arrays.asList( new String[] { "1" } ) ) );
 
         assertEquals( 1, res.size() );
 
-        res = defaultTimeline.retrieveNewest( 10, "TEST", "2" );
+        res = defaultTimeline.retrieveNewest(
+            10,
+            new HashSet<String>( Arrays.asList( new String[] { "TEST" } ) ),
+            new HashSet<String>( Arrays.asList( new String[] { "2" } ) ) );
 
         assertEquals( 1, res.size() );
 
-        res = defaultTimeline.retrieveNewest( 10, "TEST");
+        res = defaultTimeline.retrieveNewest( 10, new HashSet<String>( Arrays.asList( new String[] { "TEST" } ) ) );
 
         assertEquals( 2, res.size() );
     }
@@ -92,12 +100,13 @@ public class DefaultTimelineTest
 
         defaultTimeline.add( System.currentTimeMillis() - 1 * 60 * 60 * 1000, "TEST", "1", data );
 
-        List<Map<String, String>> res = defaultTimeline.retrieveNewest( 10, "TEST", "1" );
+        List<Map<String, String>> res = defaultTimeline.retrieveNewest( 10, new HashSet<String>( Arrays
+            .asList( new String[] { "TEST" } ) ), new HashSet<String>( Arrays.asList( new String[] { "1" } ) ) );
 
         assertEquals( 2, res.size() );
 
         assertEquals( "1st", res.get( 0 ).get( "place" ) );
-        
+
         assertEquals( "2nd", res.get( 1 ).get( "place" ) );
     }
 }
