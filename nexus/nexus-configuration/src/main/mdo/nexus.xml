@@ -1446,39 +1446,30 @@
                     <description>Currently defined tasks</description>
                     <required>false</required>
                     <association>
-                        <type>CTask</type>
+                        <type>CTaskScheduled</type>
                         <multiplicity>*</multiplicity>
                     </association>
                 </field>		    
 		    </fields>
-		</class>
+		</class>				
 		<class>
-		    <name>CTask</name>
-		    <version>1.0.0+</version>
-		    <description>A task in the nexus system.</description>
+		    <name>CTaskScheduled</name>
+		    <description>A scheduled task</description>
 		    <fields>
 		        <field>
-		            <name>id</name>
-		            <type>String</type>
-		            <version>1.0.0+</version>
-		            <required>true</required>
-		            <description>The id of the task</description>
-		        </field>
-		        <field>
+                    <name>id</name>
+                    <type>String</type>
+                    <version>1.0.0+</version>
+                    <required>true</required>
+                    <description>The id of the task</description>
+                </field>
+                <field>
                     <name>type</name>
                     <type>String</type>
                     <version>1.0.0+</version>
                     <required>true</required>
                     <description>The type of the task</description>
                 </field>
-		    </fields>
-		</class>
-				
-		<class>
-		    <name>CTaskScheduled</name>
-		    <superClass>CTask</superClass>
-		    <description>A scheduled task</description>
-		    <fields>
                 <field>
                     <name>lastRun</name>
                     <type>Date</type>

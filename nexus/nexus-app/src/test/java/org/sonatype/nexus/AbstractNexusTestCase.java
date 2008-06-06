@@ -36,6 +36,7 @@ public abstract class AbstractNexusTestCase
 {
 
     public static final String NEXUS_CONFIGURATION_KEY = "nexus.configuration";
+    public static final String APPS_CONFIGURATION_KEY = "apps";
 
     protected static final File PLEXUS_HOME = new File( getBasedir(), "target/plexus-home" );
 
@@ -48,6 +49,7 @@ public abstract class AbstractNexusTestCase
         nexusConfigFile.getParentFile().mkdirs();
 
         ctx.put( NEXUS_CONFIGURATION_KEY, nexusConfigFile.getAbsolutePath() );
+        ctx.put( APPS_CONFIGURATION_KEY, PLEXUS_HOME.getAbsolutePath() );
 
         ctx.put( "runtime", PLEXUS_HOME.getAbsolutePath() );
     }

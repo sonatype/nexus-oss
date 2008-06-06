@@ -20,7 +20,6 @@ import org.sonatype.nexus.configuration.model.CScheduleDaily;
 import org.sonatype.nexus.configuration.model.CScheduleMonthly;
 import org.sonatype.nexus.configuration.model.CScheduleOnce;
 import org.sonatype.nexus.configuration.model.CScheduleWeekly;
-import org.sonatype.nexus.configuration.model.CTask;
 import org.sonatype.nexus.configuration.model.CTaskConfiguration;
 import org.sonatype.nexus.configuration.model.CTaskScheduled;
 import org.sonatype.scheduling.schedules.CronSchedule;
@@ -66,7 +65,7 @@ public class DefaultTaskConfigManager
             
             for ( Iterator iter = config.getTasks().iterator(); iter.hasNext(); )
             {
-                CTask storedTask = (CTask) iter.next();            
+                CTaskScheduled storedTask = (CTaskScheduled) iter.next();            
                 
                 if ( !map.containsKey( storedTask.getType() ))
                 {
@@ -84,7 +83,7 @@ public class DefaultTaskConfigManager
     {
         synchronized( config )
         {
-            CTask storeableTask = translateFrom( task );
+            CTaskScheduled storeableTask = translateFrom( task );
             
             if ( storeableTask != null )
             {
@@ -100,7 +99,7 @@ public class DefaultTaskConfigManager
         {
             for ( Iterator iter = config.getTasks().iterator(); iter.hasNext(); )
             {
-                CTask storedTask = (CTask) iter.next();
+                CTaskScheduled storedTask = (CTaskScheduled) iter.next();
                 
                 if ( storedTask.getId().equals( task.getId() ))
                 {
@@ -114,58 +113,46 @@ public class DefaultTaskConfigManager
         //TODO: need to also add task to a history file
     }
     
-    private <T> ScheduledTask<T> translateFrom( CTask task )
+    private <T> ScheduledTask<T> translateFrom( CTaskScheduled task )
     {
         ScheduledTask<T> useableTask = null;
         
         //TODO: Need to complete translation
         
-        if ( CTaskScheduled.class.isAssignableFrom( task.getClass() ) )
-        {
-        }
-        else if ( CTask.class.isAssignableFrom( task.getClass() ) )
-        {
-        }
-        
         return useableTask;
     }
     
-    private <T> CTask translateFrom ( ScheduledTask<T> task )
+    private <T> CTaskScheduled translateFrom ( ScheduledTask<T> task )
     {
-        CTask storeableTask = null;
+        CTaskScheduled storeableTask = new CTaskScheduled();
         
-        if ( ScheduledTask.class.isAssignableFrom( task.getClass() ) )
+        ( ( CTaskScheduled )storeableTask ).setLastRun( ( ( ScheduledTask<T> )task ).getLastRun() );
+        ( ( CTaskScheduled )storeableTask ).setNextRun( ( ( ScheduledTask<T> )task ).getNextRun() );
+        
+        Schedule schedule = ( ( ScheduledTask<T> )task ).getSchedule();
+        
+        if ( CronSchedule.class.isAssignableFrom( schedule.getClass() ) )
         {
-            storeableTask = new CTaskScheduled();
-            
-            ( ( CTaskScheduled )storeableTask ).setLastRun( ( ( ScheduledTask<T> )task ).getLastRun() );
-            ( ( CTaskScheduled )storeableTask ).setNextRun( ( ( ScheduledTask<T> )task ).getNextRun() );
-            
-            Schedule schedule = ( ( ScheduledTask<T> )task ).getSchedule();
-            
-            if ( CronSchedule.class.isAssignableFrom( schedule.getClass() ) )
-            {
-                ( ( CronSchedule) schedule ).getCronExpression();
-            }
-            else if ( DailySchedule.class.isAssignableFrom( schedule.getClass() ) )
-            {
-                ( ( DailySchedule) schedule ).getStartDate();
-                ( ( DailySchedule) schedule ).getEndDate();
-            }
-            else if ( MonthlySchedule.class.isAssignableFrom( schedule.getClass() ) )
-            {
-                ( ( MonthlySchedule) schedule ).getStartDate();
-                ( ( MonthlySchedule) schedule ).getEndDate();
-                ( ( MonthlySchedule) schedule ).getDaysToRun();
-            }
-            else if ( OnceSchedule.class.isAssignableFrom( schedule.getClass() ) )
-            {
-                ( ( OnceSchedule) schedule ).getStartDate();
-                ( ( OnceSchedule) schedule ).getEndDate();
-            }
-            else if ( WeeklySchedule.class.isAssignableFrom( schedule.getClass() ) )
-            {
-            }
+            ( ( CronSchedule) schedule ).getCronExpression();
+        }
+        else if ( DailySchedule.class.isAssignableFrom( schedule.getClass() ) )
+        {
+            ( ( DailySchedule) schedule ).getStartDate();
+            ( ( DailySchedule) schedule ).getEndDate();
+        }
+        else if ( MonthlySchedule.class.isAssignableFrom( schedule.getClass() ) )
+        {
+            ( ( MonthlySchedule) schedule ).getStartDate();
+            ( ( MonthlySchedule) schedule ).getEndDate();
+            ( ( MonthlySchedule) schedule ).getDaysToRun();
+        }
+        else if ( OnceSchedule.class.isAssignableFrom( schedule.getClass() ) )
+        {
+            ( ( OnceSchedule) schedule ).getStartDate();
+            ( ( OnceSchedule) schedule ).getEndDate();
+        }
+        else if ( WeeklySchedule.class.isAssignableFrom( schedule.getClass() ) )
+        {
         }
         
         if ( storeableTask != null )
@@ -272,7 +259,6 @@ public class DefaultTaskConfigManager
     private XStream configureXStream( XStream xstream )
     {
         xstream.omitField( CTaskConfiguration.class, "modelEncoding" );
-        xstream.omitField( CTask.class, "modelEncoding" );
         xstream.omitField( CTaskScheduled.class, "modelEncoding" );
         xstream.omitField( CSchedule.class, "modelEncoding" );
         xstream.omitField( CScheduleAdvanced.class, "modelEncoding" );
