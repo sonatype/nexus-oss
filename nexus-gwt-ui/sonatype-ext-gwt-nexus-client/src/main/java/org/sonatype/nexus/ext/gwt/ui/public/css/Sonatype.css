@@ -33,22 +33,35 @@ body {
   font-size: 14px;
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
 /* Sonatype Icons */
 button.st-icon-refresh {
   background-image:url(../images/icons/arrow_refresh.png);
 }
+
+#st-repo-browser .x-panel-body {
+  background-color: #FFFFFF;
+  border: 1px solid #99BBE8;
+}
+
+.my-tbl {
+  border: none;
+}
+.my-tbl-item-cell-text {
+  padding: 3px 3px 3px 5px;
+}
+.my-tbl-col-text {
+  padding: 4px 3px 4px 5px;
+}
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -130,10 +143,6 @@ button.st-icon-refresh {
 
 #st-server-tab-panel .st-server-panel .x-panel-body.x-panel-body-noheader {
   background-color:#F9F9F9;
-}
-
-.search-all-tbar {
-  
 }
 
 #st-server-tab-panel ul.group-links a {

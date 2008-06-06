@@ -5,6 +5,7 @@ import org.sonatype.gwt.client.resource.Variant;
 import org.sonatype.nexus.ext.gwt.ui.client.ResourceProxy;
 import org.sonatype.nexus.ext.gwt.ui.client.ServerInstance;
 
+import com.extjs.gxt.ui.client.Style;
 import com.extjs.gxt.ui.client.binder.TableBinder;
 import com.extjs.gxt.ui.client.data.BaseListLoader;
 import com.extjs.gxt.ui.client.data.BaseModelData;
@@ -26,6 +27,7 @@ public class RepoTableBinding {
             recordName = "org.sonatype.nexus.rest.model.RepositoryListResource";
             addField("name");
             addField("repoType");
+            // FIXME: Add status information
             //addField("sStatus", "status.localStatus");
             addField("contentUri", "resourceURI");
         }
@@ -55,8 +57,15 @@ public class RepoTableBinding {
                 table.el().mask("Loading failed!!!!");
             }
         });
-        
-        binder = new TableBinder(table, new ListStore(loader));
+
+        ListStore store = new ListStore(loader) {
+            {
+                // FIXME: This doesn't work
+                setDefaultSort("name", Style.SortDir.ASC);
+            }
+        };
+
+        binder = new TableBinder(table, store);
     }
     
     public void reload() {

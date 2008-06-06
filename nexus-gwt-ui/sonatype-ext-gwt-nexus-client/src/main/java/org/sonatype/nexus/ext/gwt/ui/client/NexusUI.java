@@ -183,7 +183,7 @@ public class NexusUI implements EntryPoint {
     private void addRepoMaintenanceTab(TabPanel panel) {
         RepoMaintenancePage repoMaintenancePanel = new RepoMaintenancePage();
         repoMaintenancePanel.init(ctx.getLocalRepoServer());
-        TabItem repoMaintenanceTab = new TabItem("Maintenance");
+        TabItem repoMaintenanceTab = new TabItem("Repositories");
         repoMaintenanceTab.setClosable(true);
         repoMaintenanceTab.add(repoMaintenancePanel);
         panel.add(repoMaintenanceTab);

@@ -59,6 +59,7 @@ public class RepoTreeBinding {
     public void selectRepo(final String repoName, final String resourceUri) {
         store.removeAll();
         store.add(new RepoContentNode(repoName, resourceUri, false));
+        // TODO: Display the children of the root node
     }
 
     public TreeBinder getBinder() {
