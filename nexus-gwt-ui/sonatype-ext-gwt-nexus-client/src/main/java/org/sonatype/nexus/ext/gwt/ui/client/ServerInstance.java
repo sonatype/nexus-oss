@@ -43,7 +43,7 @@ public class ServerInstance {
     }
     
     public Resource getResource(String url) {
-        return new DefaultResource(Constants.HOST_URL + getPath() + "/" + url);
+        return new DefaultResource(Constants.HOST + getPath() + "/" + url);
     }
     
 }

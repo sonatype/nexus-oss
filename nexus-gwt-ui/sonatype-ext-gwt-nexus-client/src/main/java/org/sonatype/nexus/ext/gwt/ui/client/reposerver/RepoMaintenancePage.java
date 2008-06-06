@@ -1,6 +1,7 @@
 package org.sonatype.nexus.ext.gwt.ui.client.reposerver;
 
 import org.sonatype.nexus.ext.gwt.ui.client.Action;
+import org.sonatype.nexus.ext.gwt.ui.client.Constants;
 import org.sonatype.nexus.ext.gwt.ui.client.ServerFunctionPanel;
 import org.sonatype.nexus.ext.gwt.ui.client.ServerInstance;
 
@@ -17,6 +18,7 @@ import com.extjs.gxt.ui.client.widget.button.ToolButton;
 import com.extjs.gxt.ui.client.widget.layout.BorderLayout;
 import com.extjs.gxt.ui.client.widget.layout.BorderLayoutData;
 import com.extjs.gxt.ui.client.widget.layout.FitLayout;
+import com.extjs.gxt.ui.client.widget.table.CellRenderer;
 import com.extjs.gxt.ui.client.widget.table.RowSelectionModel;
 import com.extjs.gxt.ui.client.widget.table.Table;
 import com.extjs.gxt.ui.client.widget.table.TableColumn;
@@ -54,7 +56,17 @@ public class RepoMaintenancePage extends LayoutContainer implements ServerFuncti
                     new TableColumn("repoType", "Type", 50f),
                     new TableColumn("sStatus", "Status", 200f),
                     // TODO: Display URL as link
-                    new TableColumn("contentUri", "Repository Path", 1f)
+                    new TableColumn("contentUri", "Repository Path", 1f) {
+                        {
+                            setRenderer(new CellRenderer() {
+                                public String render(String property, Object _value) {
+                                    String value = (String) _value;
+                                    value = Constants.HOST + value.replace(Constants.SERVICE_REPOSITORIES, Constants.CONTENT_REPOSITORIES);
+                                    return "<a href=\"" + value + "\">" + value + "</a>";
+                                }
+                            });
+                        }
+                    }
                 ));
             }
         };

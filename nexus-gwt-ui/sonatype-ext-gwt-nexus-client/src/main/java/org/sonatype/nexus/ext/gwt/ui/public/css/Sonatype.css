@@ -46,6 +46,16 @@ button.st-icon-refresh {
 .my-tbl {
   border: none;
 }
+.my-tbl-item-cell a {
+  color: #1E4176;
+}
+.my-tbl-item-cell a:link, .my-tbl-item-cell a:visited {
+  text-decoration: none;
+}
+.my-tbl-item-cell a:hover {
+  color: #15428b;
+  text-decoration: underline;
+}
 .my-tbl-item-cell-text {
   padding: 3px 3px 3px 5px;
 }
@@ -201,21 +211,4 @@ button.st-icon-refresh {
 #topic-grid .x-grid3-row-body p {
   margin:2px 10px 4px 10px !important;
   color:#555;
-}
-
-/* Grid Panel style overrides */
-.x-grid-panel a {
-  color: #1E4176;
-}
-.x-grid-panel a:link {
-  color: #1E4176;
-  text-decoration: none;
-}
-.x-grid-panel a:visited {
-  color: #1E4176;
-  text-decoration: none;
-}
-.x-grid-panel a:hover {
-  color: #15428b;
-  text-decoration: underline;
 }

@@ -72,7 +72,7 @@ public class RepoTreeBinding {
         public void load(final DataReader<RepoContentNode, Object> reader,
                 RepoContentNode parent, final AsyncCallback<Object> callback) {
 
-            String url = Constants.HOST_URL + parent.getResourceUri();
+            String url = Constants.HOST + parent.getResourceUri();
 
             new DefaultResource(url).get(new RequestCallback() {
 
