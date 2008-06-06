@@ -45,11 +45,13 @@ public class DefaultScheduledTask<T>
     
     private final SchedulerIterator scheduleIterator;
 
-    public DefaultScheduledTask( String clazz, DefaultScheduler scheduler, Callable<T> callable, Schedule schedule )
+    public DefaultScheduledTask( String name, String clazz, DefaultScheduler scheduler, Callable<T> callable, Schedule schedule )
     {
         super();
         
         this.id = String.valueOf( ID_GENERATOR.getAndIncrement() );
+        
+        this.name = name;
 
         this.clazz = clazz;
 
@@ -130,7 +132,10 @@ public class DefaultScheduledTask<T>
 
     public void cancel()
     {
-        getFuture().cancel( true );
+        if ( getFuture() != null )
+        {
+            getFuture().cancel( true );
+        }
 
         setTaskState( TaskState.CANCELLED );
 

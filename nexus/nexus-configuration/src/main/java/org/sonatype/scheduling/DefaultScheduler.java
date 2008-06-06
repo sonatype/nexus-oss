@@ -155,6 +155,7 @@ public class DefaultScheduler
     public ScheduledTask<Object> schedule( String name, Runnable runnable, Schedule schedule )
     {
         DefaultScheduledTask<Object> drt = new DefaultScheduledTask<Object>(
+            name,
             runnable.getClass().getName(),
             this,
             Executors.callable( runnable ),
@@ -175,6 +176,7 @@ public class DefaultScheduler
     public <T> ScheduledTask<T> schedule( String name, Callable<T> callable, Schedule schedule )
     {
         DefaultScheduledTask<T> dct = new DefaultScheduledTask<T>(
+            name,
             callable.getClass().getName(),
             this,
             callable,
