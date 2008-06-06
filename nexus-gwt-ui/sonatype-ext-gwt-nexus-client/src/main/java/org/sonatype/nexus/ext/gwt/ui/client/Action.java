@@ -4,7 +4,7 @@ public abstract class Action<D> {
     
     private String caption;
     
-    private boolean enabled;
+    private boolean enabled = true;
     
     public Action() {
     }

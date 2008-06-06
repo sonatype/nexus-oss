@@ -37,7 +37,7 @@ class ContextMenuProvider implements Listener<BaseEvent> {
         actions.add(action);
     }
 
-    public void handleEvent(BaseEvent be) {
+    public void handleEvent(BaseEvent event) {
         List selection = selectionProvider.getSelection();
         
         if (!selection.isEmpty()) {
@@ -52,11 +52,18 @@ class ContextMenuProvider implements Listener<BaseEvent> {
                             action.execute(data);
                         }
                     });
+                    item.setEnabled(action.isEnabled());
                     menu.add(item);
                 }
             }
             
-            setContextMenu(menu);
+            if (menu.getItemCount() > 0) {
+                setContextMenu(menu);
+            } else {
+                event.doit = false;
+            }
+        } else {
+            event.doit = false;
         }
     }
     
