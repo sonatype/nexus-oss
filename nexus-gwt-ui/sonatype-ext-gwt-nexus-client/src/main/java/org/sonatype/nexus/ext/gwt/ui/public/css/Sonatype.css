@@ -63,6 +63,34 @@ button.st-icon-refresh {
   padding: 4px 3px 4px 5px;
 }
 
+.my-tree-joint div {
+  width: 16px;
+  height: 18px;
+}
+.my-tree-joint .my-tree-open, .my-tree-joint-over .my-tree-open {
+  background-image: url(../images/default/tree/elbow-end-minus-nl.gif);
+  background-position: center;
+}
+.my-tree-joint .my-tree-close, .my-tree-joint-over .my-tree-close {
+  background-image: url(../images/default/tree/elbow-end-plus-nl.gif);
+  background-position: center;
+}
+.my-tree-icon div {
+  width: 16px;
+  height: 18px;
+  margin: 0;
+}
+.my-tree-icon .tree-folder {
+  background-image: url(../images/default/tree/folder.gif);
+  background-position: 0 0;
+}
+.my-tree-icon .tree-folder-open {
+  background-image: url(../images/default/tree/folder-open.gif);
+  background-position: 0 0;
+}
+.my-tree-icon .tree-leaf {
+  background-image: url(../images/default/tree/leaf.gif);
+}
 
 
 

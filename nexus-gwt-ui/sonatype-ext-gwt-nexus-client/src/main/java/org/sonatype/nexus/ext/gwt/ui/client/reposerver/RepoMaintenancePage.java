@@ -185,7 +185,11 @@ public class RepoMaintenancePage extends LayoutContainer implements ServerFuncti
             }
         };
 
-        Tree tree = new Tree();
+        Tree tree = new Tree() {
+            {
+                setItemIconStyle("tree-leaf");
+            }
+        };
 
         repoTreeBinding = new RepoTreeBinding(tree);
 
