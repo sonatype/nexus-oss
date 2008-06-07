@@ -54,15 +54,14 @@ public class RepoMaintenancePage extends LayoutContainer implements ServerFuncti
                 setColumnModel(new TableColumnModel(
                     new TableColumn("name", "Repository", 175f),
                     new TableColumn("repoType", "Type", 50f),
-                    new TableColumn("sStatus", "Status", 200f),
-                    // TODO: Display URL as link
+                    new TableColumn("status", "Status", 200f),
                     new TableColumn("contentUri", "Repository Path", 1f) {
                         {
                             setRenderer(new CellRenderer() {
-                                public String render(String property, Object _value) {
-                                    String value = (String) _value;
-                                    value = Constants.HOST + value.replace(Constants.SERVICE_REPOSITORIES, Constants.CONTENT_REPOSITORIES);
-                                    return "<a href=\"" + value + "\">" + value + "</a>";
+                                public String render(String property, Object value) {
+                                    String path = (String) value;
+                                    path = Constants.HOST + path.replace(Constants.SERVICE_REPOSITORIES, Constants.CONTENT_REPOSITORIES);
+                                    return "<a href=\"" + path + "\">" + path + "</a>";
                                 }
                             });
                         }

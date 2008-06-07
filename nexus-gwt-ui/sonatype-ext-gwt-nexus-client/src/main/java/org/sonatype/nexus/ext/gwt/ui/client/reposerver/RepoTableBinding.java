@@ -27,8 +27,7 @@ public class RepoTableBinding {
             recordName = "org.sonatype.nexus.rest.model.RepositoryListResource";
             addField("name");
             addField("repoType");
-            // FIXME: Add status information
-            //addField("sStatus", "status.localStatus");
+            addField("status", "status/localStatus");
             addField("contentUri", "resourceURI");
         }
     };
