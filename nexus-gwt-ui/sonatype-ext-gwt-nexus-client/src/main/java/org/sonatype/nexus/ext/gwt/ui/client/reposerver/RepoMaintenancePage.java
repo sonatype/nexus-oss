@@ -32,6 +32,10 @@ public class RepoMaintenancePage extends LayoutContainer implements ServerFuncti
 
     ContentPanel repoPanel;
 
+    ContentPanel repoTree;
+    ContentPanel repoTreePanel;
+    RepoTreeBinding repoTreeBinding;
+
     public void init(ServerInstance server) {
         setLayout(new BorderLayout());
         setWidth("100%");
@@ -39,6 +43,10 @@ public class RepoMaintenancePage extends LayoutContainer implements ServerFuncti
 
         addRepoList(server);
         addRepoPanel();
+
+        createRepoTree();
+
+        showRepoHelp();
     }
 
     private void addRepoList(ServerInstance server) {
@@ -49,7 +57,7 @@ public class RepoMaintenancePage extends LayoutContainer implements ServerFuncti
             }
         };
 
-        final Table table = new Table<RowSelectionModel>() {
+        Table table = new Table<RowSelectionModel>() {
             {
                 setColumnModel(new TableColumnModel(
                     new TableColumn("name", "Repository", 175f),
@@ -73,7 +81,7 @@ public class RepoMaintenancePage extends LayoutContainer implements ServerFuncti
         final RepoTableBinding tableBinding = new RepoTableBinding(table, server);
         tableBinding.getBinder().addSelectionChangedListener(new SelectionChangedListener() {
             public void selectionChanged(SelectionChangedEvent event) {
-                addRepoBrowser(event.getSelectedItem());
+                showRepoTree(event.getSelectedItem());
             }
         });
 
@@ -83,7 +91,7 @@ public class RepoMaintenancePage extends LayoutContainer implements ServerFuncti
                 addSelectionListener(new SelectionListener<ComponentEvent>() {
                     public void componentSelected(ComponentEvent ce) {
                         tableBinding.reload();
-                        table.recalculate();
+                        showRepoHelp();
                     }
                 });
             }
@@ -150,19 +158,15 @@ public class RepoMaintenancePage extends LayoutContainer implements ServerFuncti
             {
                 setHeading("Repository Information");
                 setLayout(new FitLayout());
-                addText("Select a repository to view it").setStyleName("st-little-padding");
+                setLayoutOnChange(true);
             }
         };
 
         add(repoPanel, new BorderLayoutData(Style.LayoutRegion.CENTER));
     }
 
-    private void addRepoBrowser(final ModelData repo) {
-        if (repo == null) {
-            return;
-        }
-
-        ContentPanel outerPanel = new ContentPanel() {
+    private void createRepoTree() {
+        repoTree = new ContentPanel() {
             {
                 setFrame(true);
                 setHeaderVisible(false);
@@ -170,10 +174,9 @@ public class RepoMaintenancePage extends LayoutContainer implements ServerFuncti
             }
         };
 
-        ContentPanel panel = new ContentPanel() {
+        repoTreePanel = new ContentPanel() {
             {
                 setId("st-repo-browser");
-                setHeading(((String) repo.get("name")) + " Repository Content");
                 setBodyBorder(true);
                 setBorders(true);
                 setScrollMode(Style.Scroll.AUTO);
@@ -183,21 +186,11 @@ public class RepoMaintenancePage extends LayoutContainer implements ServerFuncti
         };
 
         Tree tree = new Tree();
-        RepoTreeBinding treeBinding = new RepoTreeBinding(tree) {
-            {
-                selectRepo((String) repo.get("name"),
-                           (String) repo.get("contentUri") + "/content");
-            }
-        };
-        panel.add(tree);
-        outerPanel.add(panel);
 
-        repoPanel.removeAll();
-        repoPanel.add(outerPanel);
-        repoPanel.layout();
+        repoTreeBinding = new RepoTreeBinding(tree);
 
         ContextMenuProvider treeMenu =
-            new ContextMenuProvider(tree, treeBinding.getBinder());
+            new ContextMenuProvider(tree, repoTreeBinding.getBinder());
         
         treeMenu.addAction(new Action<TreeModel>("Re-Index") {
             public void execute(TreeModel data) {
@@ -213,6 +206,28 @@ public class RepoMaintenancePage extends LayoutContainer implements ServerFuncti
                 Window.alert(getCaption());
             }
         });
+
+        repoTreePanel.add(tree);
+        repoTree.add(repoTreePanel);
     }
 
+    private void showRepoTree(ModelData repo) {
+        if (repo == null) {
+            return;
+        }
+
+        repoTreePanel.setHeading((String) repo.get("name") +
+                                 " Repository Content");
+        repoTreeBinding.selectRepo((String) repo.get("name"),
+                                   (String) repo.get("contentUri") + "/content");
+
+        repoPanel.removeAll();
+        repoPanel.add(repoTree);
+    }
+
+    private void showRepoHelp() {
+        repoPanel.removeAll();
+        repoPanel.addText("Select a repository to view it")
+                 .setStyleName("st-little-padding");
+    }
 }
