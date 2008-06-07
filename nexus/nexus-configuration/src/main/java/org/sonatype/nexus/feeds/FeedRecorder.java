@@ -45,6 +45,11 @@ public interface FeedRecorder
     public static final String SYSTEM_CONFIG_ACTION = "CONFIG";
 
     /**
+     * System event action: timeline purge
+     */
+    public static final String SYSTEM_TL_PURGE_ACTION = "TL_PURGE";
+
+    /**
      * System event action: reindex
      */
     public static final String SYSTEM_REINDEX_ACTION = "REINDEX";
