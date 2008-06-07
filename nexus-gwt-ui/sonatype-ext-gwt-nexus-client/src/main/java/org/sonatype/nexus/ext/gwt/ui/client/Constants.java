@@ -7,7 +7,8 @@ public interface Constants {
 
     String HOST = GWT.isScript()? Window.Location.getProtocol() + "//" + Window.Location.getHost()
                                 : "http://localhost:8081";
-    String PATH = Window.Location.getPath().substring(0, Window.Location.getPath().lastIndexOf("/"));
+    // FIXME: Find a way to determine the path automatically
+    String PATH = "/nexus";
 
     String SERVICE = PATH + "/service/local";
     String SERVICE_REPOSITORIES = SERVICE + "/repositories";
