@@ -55,6 +55,7 @@ public class RepoTreeBinding {
         store = new TreeStore(loader);
         binder = new TreeBinder(tree, store);
         binder.setDisplayProperty("name");
+        // TODO: Sort children by name
     }
     
     public void selectRepo(final String repoName, final String resourceUri) {
