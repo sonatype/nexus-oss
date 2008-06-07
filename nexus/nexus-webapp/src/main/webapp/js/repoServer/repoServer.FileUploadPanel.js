@@ -329,6 +329,19 @@ Ext.extend(Sonatype.repoServer.FileUploadPanel, Ext.FormPanel, {
     var repoId = this.repoRecord.id;
     repoId = repoId.substring( repoId.lastIndexOf( '/' ) + 1 );
 
+    var authTokenTag = {
+      tag: 'input',
+      type: 'hidden',
+      name: 'NexusAuthToken',
+      value: Sonatype.user.curr.authToken
+    };
+    var repoTag = {
+      tag: 'input',
+      type: 'hidden',
+      name: 'r',
+      value: repoId
+    }
+
     var tmpForm = Ext.getBody().createChild({
       tag: 'form',
       cls: 'x-hidden',
@@ -336,12 +349,8 @@ Ext.extend(Sonatype.repoServer.FileUploadPanel, Ext.FormPanel, {
       children:
         this.pomMode ?
           [
-            {
-              tag: 'input',
-              type: 'hidden',
-              name: 'r',
-              value: repoId
-            },
+            authTokenTag,
+            repoTag,
             {
               tag: 'input',
               type: 'hidden',
@@ -351,12 +360,8 @@ Ext.extend(Sonatype.repoServer.FileUploadPanel, Ext.FormPanel, {
           ]
         :
           [
-            {
-              tag: 'input',
-              type: 'hidden',
-              name: 'r',
-              value: repoId
-            },
+            authTokenTag,
+            repoTag,
             {
               tag: 'input',
               type: 'hidden',
