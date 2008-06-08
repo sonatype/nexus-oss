@@ -174,17 +174,6 @@ public class RepoMaintenancePage extends LayoutContainer implements ServerFuncti
             }
         };
 
-        repoTreePanel = new ContentPanel() {
-            {
-                setId("st-repo-browser");
-                setBodyBorder(true);
-                setBorders(true);
-                setScrollMode(Style.Scroll.AUTO);
-                // TODO: Add an action to this button
-                getHeader().addTool(new ToolButton("x-tool-refresh"));
-            }
-        };
-
         Tree tree = new Tree() {
             {
                 setItemIconStyle("tree-leaf");
@@ -192,6 +181,20 @@ public class RepoMaintenancePage extends LayoutContainer implements ServerFuncti
         };
 
         repoTreeBinding = new RepoTreeBinding(tree);
+
+        repoTreePanel = new ContentPanel() {
+            {
+                setId("st-repo-browser");
+                setBodyBorder(true);
+                setBorders(true);
+                setScrollMode(Style.Scroll.AUTO);
+                getHeader().addTool(new ToolButton("x-tool-refresh", new SelectionListener() {
+                    public void componentSelected(ComponentEvent ce) {
+                        repoTreeBinding.reload();
+                    }
+                }));
+            }
+        };
 
         ContextMenuProvider treeMenu =
             new ContextMenuProvider(tree, repoTreeBinding.getBinder());
@@ -220,10 +223,8 @@ public class RepoMaintenancePage extends LayoutContainer implements ServerFuncti
             return;
         }
 
-        repoTreePanel.setHeading((String) repo.get("name") +
-                                 " Repository Content");
-        repoTreeBinding.selectRepo((String) repo.get("name"),
-                                   (String) repo.get("contentUri") + "/content");
+        repoTreePanel.setHeading((String) repo.get("name") + " Repository Content");
+        repoTreeBinding.selectRepo(repo);
 
         repoPanel.removeAll();
         repoPanel.add(repoTree);

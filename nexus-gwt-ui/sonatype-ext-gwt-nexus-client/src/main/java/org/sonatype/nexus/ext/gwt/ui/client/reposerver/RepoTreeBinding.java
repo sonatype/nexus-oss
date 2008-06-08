@@ -13,7 +13,7 @@ import com.extjs.gxt.ui.client.data.BaseTreeModel;
 import com.extjs.gxt.ui.client.data.DataProxy;
 import com.extjs.gxt.ui.client.data.DataReader;
 import com.extjs.gxt.ui.client.data.ListLoadResult;
-import com.extjs.gxt.ui.client.data.Model;
+import com.extjs.gxt.ui.client.data.ModelData;
 import com.extjs.gxt.ui.client.data.ModelType;
 import com.extjs.gxt.ui.client.data.TreeLoader;
 import com.extjs.gxt.ui.client.data.TreeModel;
@@ -43,6 +43,8 @@ public class RepoTreeBinding {
     
     private TreeBinder<TreeModel> binder;
     
+    private ModelData selectedRepo;
+    
     public RepoTreeBinding(Tree tree) {
         this(tree, DEFAULT_MODEL_TYPE, Variant.APPLICATION_XML);
     }
@@ -58,10 +60,20 @@ public class RepoTreeBinding {
         // TODO: Sort children by name
     }
     
-    public void selectRepo(final String repoName, final String resourceUri) {
+    public void selectRepo(final ModelData repo) {
+        if (repo == null) {
+            return;
+        }
+        selectedRepo = repo;
         store.removeAll();
+        String repoName = (String) repo.get("name");
+        String resourceUri = (String) repo.get("contentUri") + "/content";
         store.add(new RepoContentNode(repoName, resourceUri, false));
         // TODO: Display the children of the root node
+    }
+    
+    public void reload() {
+        selectRepo(selectedRepo);
     }
 
     public TreeBinder<TreeModel> getBinder() {
@@ -83,9 +95,9 @@ public class RepoTreeBinding {
 
                 public void onResponseReceived(Request request, Response response) {
                     List<RepoContentNode> list = new ArrayList<RepoContentNode>();
-                    ListLoadResult<Model> result =
-                        (ListLoadResult<Model>) reader.read(null, response.getText());
-                    for (Model model : result.getData()) {
+                    ListLoadResult<ModelData> result =
+                        (ListLoadResult<ModelData>) reader.read(null, response.getText());
+                    for (ModelData model : result.getData()) {
                         list.add(new RepoContentNode(model));
                     }
                     callback.onSuccess(list);
@@ -98,7 +110,7 @@ public class RepoTreeBinding {
     
     private static class RepoContentNode extends BaseTreeModel {
         
-        public RepoContentNode(Model model) {
+        public RepoContentNode(ModelData model) {
             set("name", model.get("name"));
             set("resourceUri", model.get("resourceUri"));
             set("leaf", Boolean.valueOf((String) model.get("leaf")));
