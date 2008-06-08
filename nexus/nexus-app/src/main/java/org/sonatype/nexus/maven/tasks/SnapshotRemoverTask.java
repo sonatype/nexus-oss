@@ -20,7 +20,6 @@
  */
 package org.sonatype.nexus.maven.tasks;
 
-import org.sonatype.nexus.feeds.FeedRecorder;
 import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesTask;
 
 /**
@@ -32,6 +31,8 @@ import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesTask;
 public class SnapshotRemoverTask
     extends AbstractNexusRepositoriesTask<SnapshotRemovalResult>
 {
+    public static final String SYSTEM_REMOVE_SNAPSHOTS_ACTION = "REMOVESNAPSHOTS";
+
     public static final String MIN_SNAPSHOTS_TO_KEEP_KEY = "minSnapshotsToKeep";
 
     public static final String REMOVE_OLDER_THAN_DAYS_KEY = "removeOlderThanDays";
@@ -83,7 +84,7 @@ public class SnapshotRemoverTask
 
     protected String getAction()
     {
-        return FeedRecorder.SYSTEM_REMOVE_SNAPSHOTS_ACTION;
+        return SYSTEM_REMOVE_SNAPSHOTS_ACTION;
     }
 
     protected String getMessage()
