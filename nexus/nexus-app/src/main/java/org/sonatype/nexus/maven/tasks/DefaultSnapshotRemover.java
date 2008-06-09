@@ -31,12 +31,15 @@ import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.logging.Logger;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.artifact.M2ArtifactRecognizer;
+import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryGroupException;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
+import org.sonatype.nexus.proxy.maven.ArtifactStoreRequest;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
+import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.utils.StoreWalker;
@@ -132,6 +135,12 @@ public class DefaultSnapshotRemover
         SnapshotRemovalRequest request )
     {
         SnapshotRemovalRepositoryResult result = new SnapshotRemovalRepositoryResult( repository.getId(), 0, 0 );
+
+        // if this is not snap repo, do nothing
+        if ( !RepositoryPolicy.SNAPSHOT.equals( repository.getRepositoryPolicy() ) )
+        {
+            return result;
+        }
 
         if ( getLogger().isDebugEnabled() )
         {
@@ -327,7 +336,39 @@ public class DefaultSnapshotRemover
 
         public boolean releaseExistsForSnapshot( Gav snapshotGav )
         {
-            // TODO: a big TODO
+            ArtifactStoreRequest req = new ArtifactStoreRequest(
+                snapshotGav.getGroupId(),
+                snapshotGav.getArtifactId(),
+                snapshotGav
+                    .getBaseVersion().substring( 0, snapshotGav.getBaseVersion().length() - "-SNAPSHOT".length() ) );
+
+            for ( Repository repository : repositoryRegistry.getRepositories() )
+            {
+                if ( MavenRepository.class.isAssignableFrom( repository.getClass() ) )
+                {
+                    MavenRepository mrepository = (MavenRepository) repository;
+
+                    // look in release reposes only
+                    if ( RepositoryPolicy.RELEASE.equals( mrepository.getRepositoryPolicy() ) )
+                    {
+                        try
+                        {
+                            mrepository.retrieveArtifactPom( req );
+
+                            return true;
+                        }
+                        catch ( ItemNotFoundException e )
+                        {
+                            // nothing
+                        }
+                        catch ( Exception e )
+                        {
+                            // nothing
+                        }
+                    }
+                }
+            }
+
             return false;
         }
 
