@@ -44,6 +44,8 @@ public abstract class StoreWalker
 
     protected Logger logger;
 
+    protected boolean running;
+
     public StoreWalker( ResourceStore store, Logger logger )
     {
         super();
@@ -78,8 +80,15 @@ public abstract class StoreWalker
         walk( null, localOnly, collectionsOnly );
     }
 
+    public void stop()
+    {
+        running = false;
+    }
+
     public final void walk( String fromPath, boolean localOnly, boolean collectionsOnly )
     {
+        running = true;
+
         if ( fromPath == null )
         {
             fromPath = RepositoryItemUid.PATH_ROOT;
@@ -148,18 +157,18 @@ public abstract class StoreWalker
         {
             stack.push( (StorageCollectionItem) item );
         }
-        while ( !stack.isEmpty() )
+        while ( !stack.isEmpty() && running )
         {
             coll = stack.pop();
-            
+
             processItem( coll );
-            
+
             onCollectionEnter( coll );
-            
+
             itemCount++;
-            
+
             Collection<StorageItem> ls = coll.list();
-            
+
             for ( StorageItem i : ls )
             {
                 if ( collectionsOnly && StorageCollectionItem.class.isAssignableFrom( i.getClass() ) )
@@ -175,16 +184,27 @@ public abstract class StoreWalker
                     stack.push( (StorageCollectionItem) i );
                 }
             }
-            
+
             onCollectionExit( coll );
         }
 
         afterWalk();
 
-        if ( logger != null )
+        if ( running )
         {
-            logger.info( "Finished walking on " + store.getId() + " Store with " + Integer.toString( itemCount )
-                + " items" );
+            if ( logger != null )
+            {
+                logger.info( "Finished walking on " + store.getId() + " Store with " + Integer.toString( itemCount )
+                    + " items" );
+            }
+        }
+        else
+        {
+            if ( logger != null )
+            {
+                logger.info( "Walking STOPPED on " + store.getId() + " Store with " + Integer.toString( itemCount )
+                    + " items" );
+            }
         }
     }
 

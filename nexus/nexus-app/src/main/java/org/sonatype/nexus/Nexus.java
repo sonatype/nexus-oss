@@ -151,6 +151,28 @@ public interface Nexus
         throws NoSuchRepositoryGroupException,
             IOException;
 
+    void evictAllUnusedItems( long timestamp )
+        throws IOException;
+
+    void evictRepositoryUnusedItems( long timestamp, String repositoryId )
+        throws NoSuchRepositoryException,
+            IOException;
+
+    void evictRepositoryGroupUnusedItems( long timestamp, String repositoryGroupId )
+        throws NoSuchRepositoryGroupException,
+            IOException;
+
+    void evictAllUnusedProxiedItems( long timestamp )
+        throws IOException;
+
+    void evictRepositoryUnusedProxiedItems( long timestamp, String repositoryId )
+        throws NoSuchRepositoryException,
+            IOException;
+
+    void evictRepositoryGroupUnusedProxiedItems( long timestamp, String repositoryGroupId )
+        throws NoSuchRepositoryGroupException,
+            IOException;
+
     SnapshotRemovalResult removeSnapshots( SnapshotRemovalRequest request )
         throws NoSuchRepositoryException,
             NoSuchRepositoryGroupException,

@@ -42,6 +42,7 @@ import org.sonatype.nexus.proxy.access.RepositoryPermission;
 import org.sonatype.nexus.proxy.cache.CacheManager;
 import org.sonatype.nexus.proxy.cache.PathCache;
 import org.sonatype.nexus.proxy.events.RepositoryEventClearCaches;
+import org.sonatype.nexus.proxy.events.RepositoryEventEvictUnusedItems;
 import org.sonatype.nexus.proxy.events.RepositoryEventRecreateAttributes;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventDelete;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventRetrieve;
@@ -481,6 +482,49 @@ public abstract class AbstractRepository
         walker.walk( path, true, false );
 
         notifyProximityEventListeners( new RepositoryEventClearCaches( this, path ) );
+    }
+
+    public void evictUnusedItems( final long timestamp )
+    {
+        // construct an imperial walker to do the job
+        StoreFileWalker walker = new StoreFileWalker( this, getLogger() )
+        {
+            @Override
+            protected void processFileItem( StorageFileItem item )
+            {
+                // expiring found files
+                try
+                {
+                    if ( item.getLastTouched() < timestamp )
+                    {
+                        deleteItem( item.getRepositoryItemUid() );
+                    }
+                }
+                catch ( RepositoryNotAvailableException e )
+                {
+                    // simply stop if set during processing
+                    stop();
+                }
+                catch ( UnsupportedStorageOperationException e )
+                {
+                    // if op not supported (R/O repo?)
+                    stop();
+                }
+                catch ( ItemNotFoundException e )
+                {
+                    // will not happen
+                }
+                catch ( StorageException e )
+                {
+                    logger.warn( "Got storage exception while evicting " + item.getRepositoryItemUid().toString(), e );
+                }
+            }
+        };
+
+        // and let it loose
+        walker.walk( RepositoryItemUid.PATH_ROOT, true, false );
+
+        notifyProximityEventListeners( new RepositoryEventEvictUnusedItems( this ) );
     }
 
     public boolean recreateAttributes( final Map<String, String> initialData )

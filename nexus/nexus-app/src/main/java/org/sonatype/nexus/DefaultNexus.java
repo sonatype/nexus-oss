@@ -629,6 +629,83 @@ public class DefaultNexus
         }
     }
 
+    protected void evictUnusedItems( long timestamp, Repository repository, boolean proxyOnly )
+        throws IOException
+    {
+        if ( proxyOnly && RepositoryType.PROXY.equals( repository.getRepositoryType() ) )
+        {
+            repository.evictUnusedItems( timestamp );
+        }
+        else
+        {
+            repository.evictUnusedItems( timestamp );
+        }
+    }
+
+    public void evictAllUnusedItems( long timestamp )
+        throws IOException
+    {
+        getLogger().info( "Evicting unused items in all repositories." );
+
+        for ( Repository repository : repositoryRegistry.getRepositories() )
+        {
+            evictUnusedItems( timestamp, repository, false );
+        }
+    }
+
+    public void evictRepositoryUnusedItems( long timestamp, String repositoryId )
+        throws NoSuchRepositoryException,
+            IOException
+    {
+        getLogger().info( "Evicting unused items from repository " + repositoryId + "." );
+
+        evictUnusedItems( timestamp, repositoryRegistry.getRepository( repositoryId ), false );
+    }
+
+    public void evictRepositoryGroupUnusedItems( long timestamp, String repositoryGroupId )
+        throws NoSuchRepositoryGroupException,
+            IOException
+    {
+        getLogger().info( "Evicting unused items from repositories in group " + repositoryGroupId + "." );
+
+        for ( Repository repository : repositoryRegistry.getRepositoryGroup( repositoryGroupId ) )
+        {
+            evictUnusedItems( timestamp, repository, false );
+        }
+    }
+
+    public void evictAllUnusedProxiedItems( long timestamp )
+        throws IOException
+    {
+        getLogger().info( "Evicting unused items in all repositories." );
+
+        for ( Repository repository : repositoryRegistry.getRepositories() )
+        {
+            evictUnusedItems( timestamp, repository, true );
+        }
+    }
+
+    public void evictRepositoryUnusedProxiedItems( long timestamp, String repositoryId )
+        throws NoSuchRepositoryException,
+            IOException
+    {
+        getLogger().info( "Evicting unused items from repository " + repositoryId + "." );
+
+        evictUnusedItems( timestamp, repositoryRegistry.getRepository( repositoryId ), true );
+    }
+
+    public void evictRepositoryGroupUnusedProxiedItems( long timestamp, String repositoryGroupId )
+        throws NoSuchRepositoryGroupException,
+            IOException
+    {
+        getLogger().info( "Evicting unused items from repositories in group " + repositoryGroupId + "." );
+
+        for ( Repository repository : repositoryRegistry.getRepositoryGroup( repositoryGroupId ) )
+        {
+            evictUnusedItems( timestamp, repository, true );
+        }
+    }
+
     public SnapshotRemovalResult removeSnapshots( SnapshotRemovalRequest request )
         throws NoSuchRepositoryException,
             NoSuchRepositoryGroupException,

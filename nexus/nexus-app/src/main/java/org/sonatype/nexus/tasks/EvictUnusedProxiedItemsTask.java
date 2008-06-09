@@ -9,7 +9,7 @@ import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesTask;
  * @author cstamas
  * @plexus.component role="org.sonatype.nexus.tasks.EvictUnusedItemsTask"
  */
-public class EvictUnusedItemsTask
+public class EvictUnusedProxiedItemsTask
     extends AbstractNexusRepositoriesTask<Object>
 {
     public static final String EVICT_OLDER_CACHE_ITEMS_THEN_KEY = "evictOlderCacheItemsThen";
@@ -30,15 +30,15 @@ public class EvictUnusedItemsTask
     {
         if ( getRepositoryGroupId() != null )
         {
-            getNexus().evictRepositoryGroupUnusedItems( getEvictOlderCacheItemsThen(), getRepositoryGroupId() );
+            getNexus().evictRepositoryGroupUnusedProxiedItems( getEvictOlderCacheItemsThen(), getRepositoryGroupId() );
         }
         else if ( getRepositoryId() != null )
         {
-            getNexus().evictRepositoryUnusedItems( getEvictOlderCacheItemsThen(), getRepositoryId() );
+            getNexus().evictRepositoryUnusedProxiedItems( getEvictOlderCacheItemsThen(), getRepositoryId() );
         }
         else
         {
-            getNexus().evictAllUnusedItems( getEvictOlderCacheItemsThen() );
+            getNexus().evictAllUnusedProxiedItems( getEvictOlderCacheItemsThen() );
         }
 
         return null;

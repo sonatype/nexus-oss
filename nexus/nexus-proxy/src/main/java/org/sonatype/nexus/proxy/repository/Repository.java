@@ -273,6 +273,13 @@ public interface Repository
     void clearCaches( String path );
 
     /**
+     * Evicts items that were last used before timestamp.
+     * 
+     * @param timestamp
+     */
+    void evictUnusedItems( long timestamp );
+
+    /**
      * Checks whether the remote storage of this repo is reachable.
      * 
      * @return true if remote is reachable.
