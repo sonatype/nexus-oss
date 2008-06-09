@@ -35,7 +35,7 @@ public class DefaultNexusScheduler
 
         if ( existingTasks == null || nexusTask.allowConcurrentExecution( existingTasks ) )
         {
-            return scheduler.submit( name, nexusTask );
+            return scheduler.submit( name, nexusTask, nexusTask.getParameters() );
         }
         else
         {
@@ -53,7 +53,7 @@ public class DefaultNexusScheduler
 
         if ( existingTasks == null || nexusTask.allowConcurrentExecution( existingTasks ) )
         {
-            return scheduler.schedule( name, nexusTask, schedule );
+            return scheduler.schedule( name, nexusTask, schedule, nexusTask.getParameters(), true );
         }
         else
         {

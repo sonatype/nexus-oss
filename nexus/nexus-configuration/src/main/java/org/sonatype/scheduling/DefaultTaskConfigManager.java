@@ -7,8 +7,11 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
@@ -34,7 +37,6 @@ import org.sonatype.scheduling.schedules.CronSchedule;
 import org.sonatype.scheduling.schedules.DailySchedule;
 import org.sonatype.scheduling.schedules.MonthlySchedule;
 import org.sonatype.scheduling.schedules.OnceSchedule;
-import org.sonatype.scheduling.schedules.RunNowSchedule;
 import org.sonatype.scheduling.schedules.Schedule;
 import org.sonatype.scheduling.schedules.WeeklySchedule;
 
@@ -68,49 +70,89 @@ public class DefaultTaskConfigManager
         this.plexusContainer = (PlexusContainer) ctx.get( PlexusConstants.PLEXUS_KEY );
     }
 
+    /* (non-Javadoc)
+     * @see org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable#initialize()
+     */
     public void initialize()
         throws InitializationException
     {
         loadConfig();
     }
-
-    public HashMap<String, List<ScheduledTask<?>>> getTasks()
+    
+    public void initializeTasks( Scheduler scheduler )
     {
-        synchronized ( config )
-        {
-            HashMap<String, List<ScheduledTask<?>>> map = new HashMap<String, List<ScheduledTask<?>>>();
-
-            for ( Iterator iter = config.getTasks().iterator(); iter.hasNext(); )
+        //TODO: this code needs to be synchronized because of access to config
+        //object
+        List<CScheduledTask> tempList = new ArrayList<CScheduledTask>( config.getTasks() );
+        
+        getLogger().info( tempList.size() + " task(s) to load." );
+        
+        for ( CScheduledTask task : tempList )
+        {   
+            getLogger().info( "Loading task - " + task.getType() );
+            try
             {
-                CScheduledTask storedTask = (CScheduledTask) iter.next();
-
-                if ( !map.containsKey( storedTask.getType() ) )
+                NexusTask<?> nexusTask = ( NexusTask<?> ) plexusContainer.lookup( task.getType() );
+                for ( Iterator iter = task.getProperties().iterator(); iter.hasNext(); )
                 {
-                    map.put( storedTask.getType(), new ArrayList<ScheduledTask<?>>() );
+                    CProps prop = ( CProps ) iter.next();
+                    nexusTask.addParameter( prop.getKey(), prop.getValue() );
                 }
-
-                map.get( storedTask.getType() ).add( translateFrom( storedTask ) );
+                scheduler.schedule( 
+                    task.getName(), 
+                    nexusTask, 
+                    translateFrom( task.getSchedule() ), 
+                    translateFrom( task.getProperties() ),
+                    false );
             }
-
-            return map;
-        }
+            catch ( ComponentLookupException e )
+            {
+                // this is bad, Plexus did not find the component, possibly the task.getType() contains bad class name
+                getLogger().error( "Unable to initialize task " + task.getName() + ", couldn't load service class " + task.getId() );
+            }            
+        }   
     }
-
+    
+    /* (non-Javadoc)
+     * @see org.sonatype.scheduling.TaskConfigManager#addTask(org.sonatype.scheduling.ScheduledTask)
+     */
     public <T> void addTask( ScheduledTask<T> task )
     {
         synchronized ( config )
         {
+            CScheduledTask foundTask = findTask( task.getId() );
             CScheduledTask storeableTask = translateFrom( task );
 
             if ( storeableTask != null )
             {
+                if ( foundTask != null )
+                {
+                    config.removeTask( foundTask );
+                }            
                 config.addTask( storeableTask );
                 storeConfig();
             }
         }
     }
 
+    /* (non-Javadoc)
+     * @see org.sonatype.scheduling.TaskConfigManager#removeTask(org.sonatype.scheduling.ScheduledTask)
+     */
     public <T> void removeTask( ScheduledTask<T> task )
+    {
+        synchronized ( config )
+        {
+            CScheduledTask foundTask = findTask( task.getId() );
+            if ( foundTask != null )
+            {
+                config.removeTask( foundTask );
+                storeConfig();
+            }
+        }
+        // TODO: need to also add task to a history file
+    }
+    
+    private CScheduledTask findTask( String id )
     {
         synchronized ( config )
         {
@@ -118,44 +160,96 @@ public class DefaultTaskConfigManager
             {
                 CScheduledTask storedTask = (CScheduledTask) iter.next();
 
-                if ( storedTask.getId().equals( task.getId() ) )
+                if ( storedTask.getId().equals( id ) )
                 {
-                    iter.remove();
-                    break;
+                    return storedTask;
                 }
             }
-
-            storeConfig();
+            
+            return null;
         }
-        // TODO: need to also add task to a history file
     }
-
-    private <T> ScheduledTask<T> translateFrom( CScheduledTask task )
+    
+    private Map<String,String> translateFrom( List list )
     {
-        ScheduledTask<T> useableTask = null;
-
-        try
+        Map<String,String> map = new HashMap<String,String>();
+        
+        for ( Iterator iter = list.iterator(); iter.hasNext(); )
         {
-            NexusTask<?> nexusTask = (NexusTask<?>) plexusContainer.lookup( task.getType() );
+            CProps prop = ( CProps )iter.next();
+            map.put( prop.getKey(), prop.getValue() );
         }
-        catch ( ComponentLookupException e )
+        
+        return map;
+    }
+    
+    private Schedule translateFrom( CSchedule modelSchedule )
+    {
+        Schedule schedule = null;
+        
+        if ( CAdvancedSchedule.class.isAssignableFrom( modelSchedule.getClass() ) )
         {
-            // this is bad, Plexus did not find the component, possibly the task.getType() contains bad class name
+            schedule = new CronSchedule( ( ( CAdvancedSchedule ) modelSchedule ).getCronCommand() );
         }
-
-        // TODO: Need to complete translation
-
-        return useableTask;
+        else if ( CMonthlySchedule.class.isAssignableFrom( modelSchedule.getClass() ) )
+        {
+            Set<Integer> daysToRun = new HashSet<Integer>();
+            
+            for ( Iterator iter = ( ( CMonthlySchedule ) modelSchedule ).getDaysOfMonth().iterator(); iter.hasNext(); )
+            {
+                String day = ( String ) iter.next();
+                
+                try
+                {
+                    daysToRun.add( Integer.valueOf( day ) );
+                }
+                catch ( NumberFormatException nfe )
+                {
+                    getLogger().error( "Invalid day being added to monthly schedule - " + day + " - skipping.");
+                }
+            }
+            
+            schedule = new MonthlySchedule( ( ( CMonthlySchedule ) modelSchedule ).getStartDate(),
+                                            ( ( CMonthlySchedule ) modelSchedule ).getEndDate(),
+                                            daysToRun );
+        }
+        else if ( CWeeklySchedule.class.isAssignableFrom( modelSchedule.getClass() ) )
+        {
+            Set<Integer> daysToRun = new HashSet<Integer>();
+            
+            for ( Iterator iter = ( ( CWeeklySchedule ) modelSchedule ).getDaysOfWeek().iterator(); iter.hasNext(); )
+            {
+                String day = ( String ) iter.next();
+                
+                try
+                {
+                    daysToRun.add( Integer.valueOf( day ) );
+                }
+                catch ( NumberFormatException nfe )
+                {
+                    getLogger().error( "Invalid day being added to weekly schedule - " + day + " - skipping.");
+                }
+            }
+            
+            schedule = new WeeklySchedule( ( ( CWeeklySchedule ) modelSchedule ).getStartDate(),
+                                            ( ( CWeeklySchedule ) modelSchedule ).getEndDate(),
+                                            daysToRun );
+        }
+        else if ( CDailySchedule.class.isAssignableFrom( modelSchedule.getClass() ) )
+        {
+            schedule = new DailySchedule( ( ( CDailySchedule ) modelSchedule ).getStartDate(),
+                                            ( ( CDailySchedule ) modelSchedule ).getEndDate() );
+        }
+        else if ( COnceSchedule.class.isAssignableFrom( modelSchedule.getClass() ) )
+        {
+            schedule = new OnceSchedule( ( ( COnceSchedule ) modelSchedule ).getStartDate() );
+        }
+        
+        return schedule;
     }
 
     private <T> CScheduledTask translateFrom( ScheduledTask<T> task )
     {
-        // Run now doesn't get stored
-        if ( RunNowSchedule.class.isAssignableFrom( task.getSchedule().getClass() ) )
-        {
-            return null;
-        }
-
         CScheduledTask storeableTask = new CScheduledTask();
 
         storeableTask.setId( task.getId() );
@@ -164,6 +258,15 @@ public class DefaultTaskConfigManager
         storeableTask.setStatus( task.getTaskState().name() );
         storeableTask.setLastRun( task.getLastRun() );
         storeableTask.setNextRun( task.getNextRun() );
+        
+        for ( String key : task.getTaskParams().keySet() )
+        {
+            CProps props = new CProps();
+            props.setKey( key );
+            props.setValue( task.getTaskParams().get( key ) );
+            
+            storeableTask.addProperty( props );
+        }
 
         Schedule schedule = task.getSchedule();
         CSchedule storeableSchedule = null;

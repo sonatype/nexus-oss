@@ -21,10 +21,17 @@
 package org.sonatype.nexus.rest.schedules;
 
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.logging.Level;
 
 import org.restlet.Context;
 import org.restlet.data.Request;
@@ -36,12 +43,14 @@ import org.sonatype.nexus.rest.model.ScheduledServiceBaseResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceDailyResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceMonthlyResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceOnceResource;
+import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceWeeklyResource;
 import org.sonatype.nexus.scheduling.NexusTask;
 import org.sonatype.nexus.tasks.ClearCacheTask;
 import org.sonatype.nexus.tasks.PublishIndexesTask;
 import org.sonatype.nexus.tasks.RebuildAttributesTask;
 import org.sonatype.nexus.tasks.ReindexTask;
+import org.sonatype.scheduling.ScheduledTask;
 import org.sonatype.scheduling.schedules.CronSchedule;
 import org.sonatype.scheduling.schedules.DailySchedule;
 import org.sonatype.scheduling.schedules.MonthlySchedule;
@@ -94,7 +103,7 @@ public class AbstractScheduledServiceResourceHandler
      * Type property resource: repositoryGroup
      */
     public static final String PROPERTY_TYPE_REPO_GROUP = "repositoryGroup";
-
+    
     private DateFormat dateFormat = new SimpleDateFormat( "yyyy.MM.dd" );
 
     private DateFormat timeFormat = new SimpleDateFormat( "HH:mm" );
@@ -162,7 +171,7 @@ public class AbstractScheduledServiceResourceHandler
 
     protected String formatDate( Date date )
     {
-        return dateFormat.format( date );
+        return Long.toString( date.getTime() );
     }
 
     protected String formatTime( Date date )
@@ -172,7 +181,23 @@ public class AbstractScheduledServiceResourceHandler
 
     protected Date parseDate( String date, String time )
     {
-        return null;
+        Calendar cal = Calendar.getInstance();
+        Calendar timeCalendar = Calendar.getInstance();
+        
+        try
+        {
+            timeCalendar.setTime( timeFormat.parse( time ) );
+            
+            cal.setTime( new Date( Long.parseLong( date ) ) );
+            cal.add( Calendar.HOUR_OF_DAY, timeCalendar.get( Calendar.HOUR_OF_DAY ) );
+            cal.add( Calendar.MINUTE, timeCalendar.get( Calendar.MINUTE ) );
+        }
+        catch ( ParseException e )
+        {
+            cal = null;
+        }
+        
+        return cal == null ? null : cal.getTime();
     }
     
     public String getModelName( ScheduledServiceBaseResource model )
@@ -182,20 +207,42 @@ public class AbstractScheduledServiceResourceHandler
     
     public NexusTask<Object> getModelNexusTask( ScheduledServiceBaseResource model )
     {
-        //TODO: this is currently giong to be based off of the hard coded list of services
+        String serviceType = model.getServiceType();
         
-        return null;        
+        NexusTask<Object> task = (NexusTask<Object>) lookup( model.getServiceType() );
+        
+        for ( Iterator iter = model.getServiceProperties().iterator(); iter.hasNext(); )
+        {
+            ScheduledServicePropertyResource prop = (ScheduledServicePropertyResource) iter.next();
+            task.addParameter( prop.getId(), prop.getValue() );
+        }
+        
+        return task;        
     }
     
     public Schedule getModelSchedule( ScheduledServiceBaseResource model )
     {
         Schedule schedule = null;
         
-        if ( ScheduledServiceOnceResource.class.isAssignableFrom( model.getClass() ) )
-        {            
-            schedule = new OnceSchedule( 
-                parseDate( ( ( ScheduledServiceOnceResource ) model ).getStartDate(), 
-                           ( ( ScheduledServiceOnceResource ) model ).getStartTime() ) );
+        if ( ScheduledServiceAdvancedResource.class.isAssignableFrom( model.getClass() ) )
+        {
+            schedule = new CronSchedule( ( ( ScheduledServiceAdvancedResource ) model ).getCronCommand() );
+        }
+        else if ( ScheduledServiceMonthlyResource.class.isAssignableFrom( model.getClass() ) )
+        {
+            schedule = new MonthlySchedule( 
+                parseDate( ( ( ScheduledServiceMonthlyResource ) model ).getStartDate(), 
+                           ( ( ScheduledServiceMonthlyResource ) model ).getRecurringTime() ),
+                null,
+                translateFrom( ( ( ScheduledServiceMonthlyResource ) model ).getRecurringDay() ) );
+        }
+        else if ( ScheduledServiceWeeklyResource.class.isAssignableFrom( model.getClass() ) )
+        {
+            schedule = new WeeklySchedule( 
+                 parseDate( ( ( ScheduledServiceWeeklyResource ) model ).getStartDate(), 
+                            ( ( ScheduledServiceWeeklyResource ) model ).getRecurringTime() ),
+                 null,
+                 translateFrom( ( ( ScheduledServiceWeeklyResource ) model ).getRecurringDay() ) );
         }
         else if ( ScheduledServiceDailyResource.class.isAssignableFrom( model.getClass() ) )
         {
@@ -204,29 +251,46 @@ public class AbstractScheduledServiceResourceHandler
                            ( ( ScheduledServiceDailyResource ) model ).getRecurringTime() ),
                 null );
         }
-        else if ( ScheduledServiceWeeklyResource.class.isAssignableFrom( model.getClass() ) )
-        {
-            schedule = new WeeklySchedule( 
-                 parseDate( ( ( ScheduledServiceWeeklyResource ) model ).getStartDate(), 
-                            ( ( ScheduledServiceWeeklyResource ) model ).getRecurringTime() ),
-                 null,
-                 null);
-            //TODO: need to get the proper values for days of week in here
-        }
-        else if ( ScheduledServiceMonthlyResource.class.isAssignableFrom( model.getClass() ) )
-        {
-            schedule = new MonthlySchedule( 
-                parseDate( ( ( ScheduledServiceMonthlyResource ) model ).getStartDate(), 
-                           ( ( ScheduledServiceMonthlyResource ) model ).getRecurringTime() ),
-                null,
-                null);
-            //TODO: need to get the proper values for days of week in here
-        }
-        else if ( ScheduledServiceAdvancedResource.class.isAssignableFrom( model.getClass() ) )
-        {
-            schedule = new CronSchedule( ( ( ScheduledServiceAdvancedResource ) model ).getCronCommand() );
+        else if ( ScheduledServiceOnceResource.class.isAssignableFrom( model.getClass() ) )
+        {            
+            schedule = new OnceSchedule( 
+                parseDate( ( ( ScheduledServiceOnceResource ) model ).getStartDate(), 
+                           ( ( ScheduledServiceOnceResource ) model ).getStartTime() ) );
         }
         
         return schedule;
+    }
+    
+    private Set<Integer> translateFrom( List list )
+    {
+        Set<Integer> set = new HashSet<Integer>();
+        
+        for ( Iterator iter = list.iterator(); iter.hasNext(); )
+        {
+            String next = (String) iter.next();
+            try
+            {
+                
+                set.add( Integer.valueOf( next ) );
+            }
+            catch ( NumberFormatException nfe )
+            {
+                getLogger().log( Level.SEVERE, "Invalid day being added to schedule - " + next + " - skipping.");
+            }
+        }
+        
+        return set;
+    }
+    
+    protected <T> boolean compareSchedules( ScheduledTask<T> task, ScheduledServiceBaseResource resource)
+    {
+        boolean result = false;
+        
+        if ( getModelSchedule( resource ).equals( task.getSchedule() ) )
+        {
+            result = true;
+        }
+        
+        return result;
     }
 }

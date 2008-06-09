@@ -2,6 +2,7 @@ package org.sonatype.scheduling;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 import org.sonatype.scheduling.iterators.SchedulerIterator;
@@ -123,4 +124,6 @@ public interface ScheduledTask<T>
      * @return
      */
     Schedule getSchedule();
+    
+    Map<String,String> getTaskParams();
 }

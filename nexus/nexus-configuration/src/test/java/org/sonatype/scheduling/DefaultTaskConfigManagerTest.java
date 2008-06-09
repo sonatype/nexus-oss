@@ -128,15 +128,28 @@ public class DefaultTaskConfigManagerTest
     
     public void genericTestStore( String scheduleType, HashMap<String,Object>scheduleProperties)
     {
-        ScheduledTask<Integer> task = createScheduledTask( createSchedule( scheduleType, scheduleProperties ) );
-        defaultManager.addTask( task );
-        loadConfig();
-        assertTrue( configuration.getTasks().size() == 1 );
-        assertTrue( TASK_NAME.equals( ( (CScheduledTask) configuration.getTasks().get( 0 ) ).getName() ) );
-        assertTrue( typeClassMap.get( scheduleType ).isAssignableFrom( ( (CScheduledTask) configuration.getTasks().get( 0 ) ).getSchedule().getClass() ) );
-        defaultManager.removeTask( task );
-        loadConfig();
-        assertTrue( configuration.getTasks().size() == 0 );
+        ScheduledTask<Integer> task = null;
+        try
+        {
+            task = createScheduledTask( createSchedule( scheduleType, scheduleProperties ) );
+            defaultManager.addTask( task );
+            loadConfig();
+            assertTrue( configuration.getTasks().size() == 1 );
+            assertTrue( TaskState.SUBMITTED.equals( TaskState.valueOf( ( (CScheduledTask) configuration.getTasks().get( 0 ) ).getStatus() ) ) );
+            assertTrue( TASK_NAME.equals( ( (CScheduledTask) configuration.getTasks().get( 0 ) ).getName() ) );
+            assertTrue( typeClassMap.get( scheduleType ).isAssignableFrom( ( (CScheduledTask) configuration.getTasks().get( 0 ) ).getSchedule().getClass() ) );
+            defaultManager.removeTask( task );
+            loadConfig();
+            assertTrue( configuration.getTasks().size() == 0 );
+        }
+        finally
+        {
+            if ( task != null )
+            {
+                task.cancel();
+                defaultManager.removeTask( task );
+            }
+        }
     }
 
     private Schedule createSchedule( String type, HashMap<String,Object>properties )
@@ -173,7 +186,7 @@ public class DefaultTaskConfigManagerTest
     {
         TestCallable callable = new TestCallable();
         return new DefaultScheduledTask<Integer>( TASK_NAME, callable.getClass().getName(), defaultScheduler, callable,
-                                                  schedule );
+                                                  schedule, null );
     }
 
     private void loadConfig()

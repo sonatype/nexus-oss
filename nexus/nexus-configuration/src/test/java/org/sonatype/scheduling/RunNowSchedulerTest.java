@@ -26,7 +26,7 @@ public class RunNowSchedulerTest
 
         Schedule schedule = new RunNowSchedule();
 
-        ScheduledTask<Object> st = defaultScheduler.schedule( "default", tr, schedule );
+        ScheduledTask<Object> st = defaultScheduler.schedule( "default", tr, schedule, null, true );
 
         assertEquals( 1, defaultScheduler.getActiveTasks().size() );
 
@@ -49,7 +49,7 @@ public class RunNowSchedulerTest
 
         Schedule schedule = new RunNowSchedule();
 
-        ScheduledTask<Integer> st = defaultScheduler.schedule( "default", tr, schedule );
+        ScheduledTask<Integer> st = defaultScheduler.schedule( "default", tr, schedule, null, true );
 
         assertEquals( 1, defaultScheduler.getActiveTasks().size() );
 

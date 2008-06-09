@@ -2,7 +2,9 @@ package org.sonatype.scheduling;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -44,8 +46,10 @@ public class DefaultScheduledTask<T>
     private final Schedule schedule;
     
     private final SchedulerIterator scheduleIterator;
+    
+    private Map<String,String> taskParams;
 
-    public DefaultScheduledTask( String name, String clazz, DefaultScheduler scheduler, Callable<T> callable, Schedule schedule )
+    public DefaultScheduledTask( String name, String clazz, DefaultScheduler scheduler, Callable<T> callable, Schedule schedule, Map<String,String> taskParams )
     {
         super();
         
@@ -68,6 +72,8 @@ public class DefaultScheduledTask<T>
         this.schedule = schedule;
         
         this.scheduleIterator = schedule.getIterator();
+        
+        this.taskParams = taskParams;
     }
     
     protected void start()
@@ -299,5 +305,14 @@ public class DefaultScheduledTask<T>
     public String getName()
     {
         return name;
+    }
+    
+    public Map<String, String> getTaskParams()
+    {
+        if ( taskParams == null )
+        {
+            taskParams = new HashMap<String,String>();
+        }
+        return taskParams;
     }
 }

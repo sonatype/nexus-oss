@@ -46,6 +46,16 @@ public abstract class AbstractNexusTask<T>
     {
         return nexus;
     }
+    
+    public void addParameter( String key, String value )
+    {
+        getParameters().put( key, value );
+    }
+    
+    public String getParameter( String key )
+    {
+        return getParameters().get( key );
+    }
 
     public Map<String, String> getParameters()
     {

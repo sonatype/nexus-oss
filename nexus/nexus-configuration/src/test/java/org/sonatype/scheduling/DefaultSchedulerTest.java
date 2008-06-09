@@ -26,7 +26,7 @@ public class DefaultSchedulerTest
 
         tr = new TestRunnable();
 
-        ScheduledTask<Object> st = defaultScheduler.submit( "default", tr );
+        ScheduledTask<Object> st = defaultScheduler.submit( "default", tr, null );
 
         assertEquals( 1, defaultScheduler.getActiveTasks().size() );
 
@@ -49,7 +49,7 @@ public class DefaultSchedulerTest
 
         tr = new TestCallable();
 
-        ScheduledTask<Integer> st = defaultScheduler.submit( "default", tr );
+        ScheduledTask<Integer> st = defaultScheduler.submit( "default", tr, null );
 
         assertEquals( 1, defaultScheduler.getActiveTasks().size() );
 
@@ -78,7 +78,7 @@ public class DefaultSchedulerTest
 
         Schedule schedule = new SecondSchedule( new Date( nearFuture ), new Date( nearFuture + 4900 ) );
 
-        ScheduledTask<Object> st = defaultScheduler.schedule( "default", tr, schedule );
+        ScheduledTask<Object> st = defaultScheduler.schedule( "default", tr, schedule, null, true );
 
         assertEquals( 1, defaultScheduler.getActiveTasks().size() );
 
@@ -105,7 +105,7 @@ public class DefaultSchedulerTest
         
         Schedule schedule = new SecondSchedule( new Date( nearFuture ), new Date( nearFuture + 4900 ) );
 
-        ScheduledTask<Integer> st = defaultScheduler.schedule( "default", tr, schedule );
+        ScheduledTask<Integer> st = defaultScheduler.schedule( "default", tr, schedule, null, true );
 
         assertEquals( 1, defaultScheduler.getActiveTasks().size() );
 
@@ -144,7 +144,7 @@ public class DefaultSchedulerTest
         
         Schedule schedule = new SecondSchedule( new Date( nearFuture ), new Date( nearFuture + 4900 ) );
 
-        ScheduledTask<Object> st = defaultScheduler.schedule( "default", tr, schedule );
+        ScheduledTask<Object> st = defaultScheduler.schedule( "default", tr, schedule, null, true );
 
         assertEquals( 1, defaultScheduler.getActiveTasks().size() );
 
@@ -170,7 +170,7 @@ public class DefaultSchedulerTest
         
         Schedule schedule = new SecondSchedule( new Date( nearFuture ), new Date( nearFuture + 4900 ) );
 
-        ScheduledTask<Integer> st = defaultScheduler.schedule( "default", tr, schedule );
+        ScheduledTask<Integer> st = defaultScheduler.schedule( "default", tr, schedule, null, true );
 
         assertEquals( 1, defaultScheduler.getActiveTasks().size() );
 

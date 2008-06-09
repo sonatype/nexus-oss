@@ -22,6 +22,7 @@ package org.sonatype.nexus.rest.schedules;
 
 import java.io.IOException;
 import java.util.Date;
+import java.util.logging.Level;
 
 import org.restlet.Context;
 import org.restlet.data.Request;
@@ -29,6 +30,7 @@ import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.restlet.resource.Representation;
 import org.restlet.resource.Variant;
+import org.sonatype.nexus.rest.model.RepositoryResourceResponse;
 import org.sonatype.nexus.rest.model.ScheduledServiceAdvancedResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceBaseResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceDailyResource;
@@ -218,10 +220,29 @@ public class ScheduledServiceResourceHandler
     public void put( Representation representation )
     {
         ScheduledServiceResourceResponse response = (ScheduledServiceResourceResponse) deserialize( new ScheduledServiceResourceResponse() );
-
-        if ( response != null )
+        
+        if ( response == null )
+        {
+            return;
+        }
+        else
         {
             ScheduledServiceBaseResource resource = response.getData();
+            
+            try
+            {
+                ScheduledTask<?> task = getNexus().getTaskById( resource.getId() );
+
+                //TODO: ultimately will not want to create new schedule everytime, should just update parameters
+                //in existing, unless schedule changes or service type changes
+                task.cancel();
+                getNexus().schedule( getModelName( resource ), getModelNexusTask( resource ), getModelSchedule( resource ) );
+            }
+            catch ( NoSuchTaskException e )
+            {
+                getLogger().log( Level.SEVERE, "Unable to locate task id:" + resource.getId(), e );
+                getResponse().setStatus( Status.CLIENT_ERROR_NOT_FOUND, "Scheduled service not found!" );
+            }
         }
     }
 

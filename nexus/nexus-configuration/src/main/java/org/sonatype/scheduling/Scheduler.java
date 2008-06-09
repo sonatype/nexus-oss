@@ -16,9 +16,10 @@ public interface Scheduler
      * 
      * @param name
      * @param runnable
+     * @param taskParams
      * @return
      */
-    ScheduledTask<Object> submit( String name, Runnable runnable )
+    ScheduledTask<Object> submit( String name, Runnable runnable, Map<String,String>taskParams )
         throws RejectedExecutionException,
             NullPointerException;
 
@@ -27,10 +28,12 @@ public interface Scheduler
      * 
      * @param name
      * @param runnable
-     * @param iterator
+     * @param schedule
+     * @param taskParams
+     * @param store
      * @return
      */
-    ScheduledTask<Object> schedule( String name, Runnable runnable, Schedule schedule )
+    ScheduledTask<Object> schedule( String name, Runnable runnable, Schedule schedule, Map<String,String>taskParams, boolean store )
         throws RejectedExecutionException,
             NullPointerException;
 
@@ -39,9 +42,10 @@ public interface Scheduler
      * 
      * @param name
      * @param runnable
+     * @param taskParams
      * @return
      */
-    <T> ScheduledTask<T> submit( String name, Callable<T> callable )
+    <T> ScheduledTask<T> submit( String name, Callable<T> callable, Map<String,String>taskParams )
         throws RejectedExecutionException,
             NullPointerException;
 
@@ -50,10 +54,12 @@ public interface Scheduler
      * 
      * @param name
      * @param runnable
-     * @param iterator
+     * @param schedule
+     * @param taskParams
+     * @param store
      * @return
      */
-    <T> ScheduledTask<T> schedule( String name, Callable<T> callable, Schedule schedule )
+    <T> ScheduledTask<T> schedule( String name, Callable<T> callable, Schedule schedule, Map<String,String>taskParams, boolean store )
         throws RejectedExecutionException,
             NullPointerException;
 

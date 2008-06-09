@@ -74,14 +74,16 @@ public class DefaultScheduler
 
     public void start()
         throws StartingException
-    {        
-        tasksMap = taskConfig.getTasks();
+    {   
+        tasksMap = new HashMap<String,List<ScheduledTask<?>>>();
         
         plexusThreadFactory = new PlexusThreadFactory( plexusContainer );
 
         scheduledExecutorService = (ScheduledThreadPoolExecutor) Executors.newScheduledThreadPool(
             10,
             plexusThreadFactory );
+        
+        taskConfig.initializeTasks( this );
     }
 
     public void stop()
@@ -116,7 +118,7 @@ public class DefaultScheduler
         return scheduledExecutorService;
     }
 
-    protected <T> void addToTasksMap( ScheduledTask<T> task )
+    protected <T> void addToTasksMap( ScheduledTask<T> task, boolean store )
     {
         synchronized ( tasksMap )
         {
@@ -125,7 +127,11 @@ public class DefaultScheduler
                 tasksMap.put( task.getType(), new ArrayList<ScheduledTask<?>>() );
             }
             tasksMap.get( task.getType() ).add( task );
-            taskConfig.addTask( task );
+            
+            if ( store )
+            {
+                taskConfig.addTask( task );
+            }
         }
     }
 
@@ -147,42 +153,44 @@ public class DefaultScheduler
         }
     }
 
-    public ScheduledTask<Object> submit( String name, Runnable runnable )
+    public ScheduledTask<Object> submit( String name, Runnable runnable, Map<String,String>taskParams )
     {
-        return schedule( name, runnable, new RunNowSchedule() );
+        return schedule( name, runnable, new RunNowSchedule(), taskParams, false );
     }
 
-    public ScheduledTask<Object> schedule( String name, Runnable runnable, Schedule schedule )
+    public ScheduledTask<Object> schedule( String name, Runnable runnable, Schedule schedule, Map<String,String>taskParams, boolean store )
     {
         DefaultScheduledTask<Object> drt = new DefaultScheduledTask<Object>(
             name,
             runnable.getClass().getName(),
             this,
             Executors.callable( runnable ),
-            schedule );
+            schedule,
+            taskParams );
 
-        addToTasksMap( drt );
+        addToTasksMap( drt, store );
 
         drt.start();
 
         return drt;
     }
 
-    public <T> ScheduledTask<T> submit( String name, Callable<T> callable )
+    public <T> ScheduledTask<T> submit( String name, Callable<T> callable, Map<String,String>taskParams )
     {
-        return schedule( name, callable, new RunNowSchedule() );
+        return schedule( name, callable, new RunNowSchedule(), taskParams, false );
     }
 
-    public <T> ScheduledTask<T> schedule( String name, Callable<T> callable, Schedule schedule )
+    public <T> ScheduledTask<T> schedule( String name, Callable<T> callable, Schedule schedule, Map<String,String>taskParams, boolean store )
     {
         DefaultScheduledTask<T> dct = new DefaultScheduledTask<T>(
             name,
             callable.getClass().getName(),
             this,
             callable,
-            schedule );
+            schedule,
+            taskParams );
 
-        addToTasksMap( dct );
+        addToTasksMap( dct, store );
 
         dct.start();
 
