@@ -21,8 +21,6 @@
 package org.sonatype.nexus.proxy;
 
 import org.sonatype.jettytestsuite.ServletServer;
-import org.sonatype.nexus.proxy.events.AbstractEvent;
-import org.sonatype.nexus.proxy.events.EventListener;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.maven.ChecksumPolicy;
@@ -41,43 +39,6 @@ public class RepoChecksumPolicyTest
         ServletServer ss = (ServletServer) lookup( ServletServer.ROLE );
         this.jettyTestsuiteEnvironmentBuilder = new M2TestsuiteEnvironmentBuilder( ss );
         return jettyTestsuiteEnvironmentBuilder;
-    }
-
-    protected class TestEventListener
-        implements EventListener
-    {
-        private AbstractEvent firstEvent;
-
-        private AbstractEvent lastEvent;
-
-        public AbstractEvent getFirstEvent()
-        {
-            return firstEvent;
-        }
-
-        public AbstractEvent getLastEvent()
-        {
-            return lastEvent;
-        }
-
-        public void reset()
-        {
-            firstEvent = null;
-
-            lastEvent = null;
-        }
-
-        public void onProximityEvent( AbstractEvent evt )
-        {
-            if ( firstEvent == null )
-            {
-                this.firstEvent = evt;
-            }
-            else
-            {
-                this.lastEvent = evt;
-            }
-        }
     }
 
     protected M2Repository getRepository()

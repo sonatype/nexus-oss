@@ -24,8 +24,6 @@ import java.util.Collection;
 
 import org.codehaus.plexus.util.FileUtils;
 import org.sonatype.jettytestsuite.ServletServer;
-import org.sonatype.nexus.proxy.events.AbstractEvent;
-import org.sonatype.nexus.proxy.events.EventListener;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventCache;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventRetrieve;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
@@ -47,50 +45,9 @@ public class SimplePullTest
         return jettyTestsuiteEnvironmentBuilder;
     }
 
-    protected class TestEventListener
-        implements EventListener
-    {
-        private AbstractEvent firstEvent;
-
-        private AbstractEvent lastEvent;
-
-        public AbstractEvent getFirstEvent()
-        {
-            return firstEvent;
-        }
-
-        public AbstractEvent getLastEvent()
-        {
-            return lastEvent;
-        }
-
-        public void reset()
-        {
-            firstEvent = null;
-
-            lastEvent = null;
-        }
-
-        public void onProximityEvent( AbstractEvent evt )
-        {
-            if ( firstEvent == null )
-            {
-                this.firstEvent = evt;
-            }
-            else
-            {
-                this.lastEvent = evt;
-            }
-        }
-    }
-
     public void testSimplePull()
         throws Exception
     {
-        TestEventListener tel = new TestEventListener();
-
-        getRepositoryRegistry().addProximityEventListener( tel );
-
         StorageItem item = null;
 
         try
@@ -108,43 +65,43 @@ public class SimplePullTest
         item = getRouter( "repositories" ).retrieveItem(
             new ResourceStoreRequest( "/repo1/activemq/activemq-core/1.2/activemq-core-1.2.jar", false ) );
         checkForFileAndMatchContents( item );
-        assertEquals( RepositoryItemEventCache.class, tel.getFirstEvent().getClass() );
-        assertEquals( RepositoryItemEventRetrieve.class, tel.getLastEvent().getClass() );
-        tel.reset();
+        assertEquals( RepositoryItemEventCache.class, getTestEventListener().getFirstEvent().getClass() );
+        assertEquals( RepositoryItemEventRetrieve.class, getTestEventListener().getLastEvent().getClass() );
+        getTestEventListener().reset();
 
         item = getRouter( "repositories" ).retrieveItem(
             new ResourceStoreRequest( "/repo2/xstream/xstream/1.2.2/xstream-1.2.2.pom", false ) );
         checkForFileAndMatchContents( item );
-        assertEquals( RepositoryItemEventCache.class, tel.getFirstEvent().getClass() );
-        assertEquals( RepositoryItemEventRetrieve.class, tel.getLastEvent().getClass() );
-        tel.reset();
+        assertEquals( RepositoryItemEventCache.class, getTestEventListener().getFirstEvent().getClass() );
+        assertEquals( RepositoryItemEventRetrieve.class, getTestEventListener().getLastEvent().getClass() );
+        getTestEventListener().reset();
 
         item = getRouter( "groups-m2" ).retrieveItem(
             new ResourceStoreRequest( "/test/activemq/activemq-core/1.2/activemq-core-1.2.jar", false ) );
         checkForFileAndMatchContents( item );
-        assertEquals( RepositoryItemEventRetrieve.class, tel.getFirstEvent().getClass() );
-        assertEquals( null, tel.getLastEvent() );
-        tel.reset();
+        assertEquals( RepositoryItemEventRetrieve.class, getTestEventListener().getFirstEvent().getClass() );
+        assertEquals( 1, getTestEventListener().getEvents().size() );
+        getTestEventListener().reset();
 
         item = getRouter( "groups-m2" ).retrieveItem(
             new ResourceStoreRequest( "/test/xstream/xstream/1.2.2/xstream-1.2.2.pom", false ) );
         checkForFileAndMatchContents( item );
-        assertEquals( RepositoryItemEventRetrieve.class, tel.getFirstEvent().getClass() );
-        assertEquals( null, tel.getLastEvent() );
-        tel.reset();
+        assertEquals( RepositoryItemEventRetrieve.class, getTestEventListener().getFirstEvent().getClass() );
+        assertEquals( 1, getTestEventListener().getEvents().size() );
+        getTestEventListener().reset();
 
         item = getRouter( "groups-m2" ).retrieveItem(
             new ResourceStoreRequest( "/test/rome/rome/0.9/rome-0.9.pom", false ) );
         checkForFileAndMatchContents( item );
-        assertEquals( RepositoryItemEventCache.class, tel.getFirstEvent().getClass() );
-        assertEquals( RepositoryItemEventRetrieve.class, tel.getLastEvent().getClass() );
-        tel.reset();
+        assertEquals( RepositoryItemEventCache.class, getTestEventListener().getFirstEvent().getClass() );
+        assertEquals( RepositoryItemEventRetrieve.class, getTestEventListener().getLastEvent().getClass() );
+        getTestEventListener().reset();
 
         item = getRouter( "groups-m2" ).retrieveItem( new ResourceStoreRequest( "/test/repo3.txt", false ) );
         checkForFileAndMatchContents( item );
-        assertEquals( RepositoryItemEventCache.class, tel.getFirstEvent().getClass() );
-        assertEquals( RepositoryItemEventRetrieve.class, tel.getLastEvent().getClass() );
-        tel.reset();
+        assertEquals( RepositoryItemEventCache.class, getTestEventListener().getFirstEvent().getClass() );
+        assertEquals( RepositoryItemEventRetrieve.class, getTestEventListener().getLastEvent().getClass() );
+        getTestEventListener().reset();
 
         item = getRouter( "groups-m2" ).retrieveItem( new ResourceStoreRequest( "/test/", false ) );
         Collection<StorageItem> dir = ( (StorageCollectionItem) item ).list();

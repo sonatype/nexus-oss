@@ -25,6 +25,8 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import org.codehaus.plexus.PlexusContainer;
@@ -37,6 +39,9 @@ import org.sonatype.nexus.configuration.ApplicationConfiguration;
 import org.sonatype.nexus.proxy.attributes.AttributesHandler;
 import org.sonatype.nexus.proxy.attributes.DefaultAttributeStorage;
 import org.sonatype.nexus.proxy.cache.CacheManager;
+import org.sonatype.nexus.proxy.events.AbstractEvent;
+import org.sonatype.nexus.proxy.events.EventListener;
+import org.sonatype.nexus.proxy.events.RepositoryItemEvent;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
@@ -84,6 +89,9 @@ public abstract class AbstractProxyTestEnvironment
     /** The root router */
     private RepositoryRouter rootRouter;
 
+    /** The test listener */
+    private TestItemEventListener testEventListener;
+
     /**
      * The all routers.
      */
@@ -97,11 +105,6 @@ public abstract class AbstractProxyTestEnvironment
     public void setApplicationConfiguration( ApplicationConfiguration applicationConfiguration )
     {
         this.applicationConfiguration = applicationConfiguration;
-    }
-
-    public File getWorkingDirectory()
-    {
-        return getApplicationConfiguration().getWorkingDirectory();
     }
 
     public RemoteStorageContext getRemoteStorageContext()
@@ -225,6 +228,16 @@ public abstract class AbstractProxyTestEnvironment
         return routers.get( hint );
     }
 
+    /**
+     * Gets the test event listener.
+     * 
+     * @return
+     */
+    public TestItemEventListener getTestEventListener()
+    {
+        return testEventListener;
+    }
+
     /*
      * (non-Javadoc)
      * 
@@ -246,14 +259,21 @@ public abstract class AbstractProxyTestEnvironment
         applicationConfiguration.getConfiguration().setWorkingDirectory(
             new File( getBasedir(), "target/plexus-home" ).getAbsolutePath() );
 
+        // deleting files
+        FileUtils.forceDelete( getApplicationConfiguration().getWorkingDirectory() );
+
         repositoryRegistry = (RepositoryRegistry) lookup( RepositoryRegistry.ROLE );
+
+        testEventListener = new TestItemEventListener();
+
+        repositoryRegistry.addProximityEventListener( testEventListener );
 
         cacheManager = (CacheManager) lookup( CacheManager.ROLE );
 
         attributesHandler = (AttributesHandler) lookup( AttributesHandler.ROLE );
-        ( (DefaultAttributeStorage) attributesHandler.getAttributeStorage() ).setWorkingDirectory( new File(
-            getWorkingDirectory(),
-            "proxy/attributes" ) );
+
+        ( (DefaultAttributeStorage) attributesHandler.getAttributeStorage() )
+            .setWorkingDirectory( getApplicationConfiguration().getWorkingDirectory( "proxy/attributes" ) );
 
         localRepositoryStorage = (LocalRepositoryStorage) lookup( LocalRepositoryStorage.ROLE, "file" );
 
@@ -265,12 +285,9 @@ public abstract class AbstractProxyTestEnvironment
 
         routers = getContainer().lookupMap( RepositoryRouter.ROLE );
 
-        // deleting files
-        FileUtils.forceDelete( getWorkingDirectory() );
+        cacheManager.startService();
 
         getEnvironmentBuilder().buildEnvironment( this );
-
-        cacheManager.startService();
 
         applicationConfiguration.notifyConfigurationChangeListeners();
 
@@ -347,7 +364,8 @@ public abstract class AbstractProxyTestEnvironment
     protected File getFile( Repository repository, String path )
         throws IOException
     {
-        return new File( getWorkingDirectory(), "proxy/store/" + repository.getId() + path );
+        return new File( getApplicationConfiguration().getWorkingDirectory(), "proxy/store/" + repository.getId()
+            + path );
     }
 
     protected File getRemoteFile( Repository repository, String path )
@@ -378,6 +396,102 @@ public abstract class AbstractProxyTestEnvironment
     public PlexusContainer getPlexusContainer()
     {
         return this.getContainer();
+    }
+
+    protected class TestItemEventListener
+        implements EventListener
+    {
+        private List<AbstractEvent> events = new ArrayList<AbstractEvent>();
+
+        public List<AbstractEvent> getEvents()
+        {
+            return events;
+        }
+
+        public AbstractEvent getFirstEvent()
+        {
+            if ( events.size() > 0 )
+            {
+                return events.get( 0 );
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        public AbstractEvent getLastEvent()
+        {
+            if ( events.size() > 0 )
+            {
+                return events.get( events.size() - 1 );
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        public void reset()
+        {
+            events.clear();
+        }
+
+        public void onProximityEvent( AbstractEvent evt )
+        {
+            if ( RepositoryItemEvent.class.isAssignableFrom( evt.getClass() ) )
+            {
+                events.add( evt );
+            }
+        }
+    }
+
+    protected class TestRepositoryEventListener
+        implements EventListener
+    {
+        private List<AbstractEvent> events = new ArrayList<AbstractEvent>();
+
+        public List<AbstractEvent> getEvents()
+        {
+            return events;
+        }
+
+        public AbstractEvent getFirstEvent()
+        {
+            if ( events.size() > 0 )
+            {
+                return events.get( 0 );
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        public AbstractEvent getLastEvent()
+        {
+            if ( events.size() > 0 )
+            {
+                return events.get( events.size() - 1 );
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        public void reset()
+        {
+            events.clear();
+        }
+
+        public void onProximityEvent( AbstractEvent evt )
+        {
+            if ( !RepositoryItemEvent.class.isAssignableFrom( evt.getClass() ) )
+            {
+                events.add( evt );
+            }
+        }
     }
 
 }

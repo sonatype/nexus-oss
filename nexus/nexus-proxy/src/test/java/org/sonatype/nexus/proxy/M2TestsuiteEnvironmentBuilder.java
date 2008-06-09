@@ -20,7 +20,6 @@
  */
 package org.sonatype.nexus.proxy;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -65,8 +64,9 @@ public class M2TestsuiteEnvironmentBuilder
             // repo.enableLogging( env.getLogger().getChildLogger( "REPO" + repo.getId() ) );
             repo.setId( remoteRepo.getName() );
             repo.setRemoteUrl( getServletServer().getUrl( remoteRepo.getName() ) );
-            repo.setLocalUrl( new File( env.getWorkingDirectory(), "proxy/store/" + repo.getId() )
-                .toURI().toURL().toString() );
+            repo.setLocalUrl( env
+                .getApplicationConfiguration().getWorkingDirectory( "proxy/store/" + repo.getId() ).toURI().toURL()
+                .toString() );
             repo.setLocalStorage( env.getLocalRepositoryStorage() );
             repo.setRepositoryPolicy( RepositoryPolicy.RELEASE );
             repo.setChecksumPolicy( ChecksumPolicy.STRICT_IF_EXISTS );
@@ -96,8 +96,9 @@ public class M2TestsuiteEnvironmentBuilder
         M2Repository repo = (M2Repository) container.lookup( Repository.ROLE, "maven2" );
         // repo.enableLogging( env.getLogger().getChildLogger( "REPO" + repo.getId() ) );
         repo.setId( "inhouse" );
-        repo.setLocalUrl( new File( env.getWorkingDirectory(), "proxy/store/" + repo.getId() )
-            .toURI().toURL().toString() );
+        repo.setLocalUrl( env
+            .getApplicationConfiguration().getWorkingDirectory( "proxy/store/" + repo.getId() ).toURI().toURL()
+            .toString() );
         repo.setLocalStorage( env.getLocalRepositoryStorage() );
         // repo.setCacheManager( env.getCacheManager() );
         reposes.add( repo.getId() );

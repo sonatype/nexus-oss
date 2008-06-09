@@ -20,7 +20,6 @@
  */
 package org.sonatype.nexus.proxy;
 
-import java.io.File;
 import java.io.IOException;
 
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
@@ -57,7 +56,8 @@ public class M1LayoutedM2ShadowRepositoryTest
             // shadow.enableLogging( getLogger().getChildLogger( "SHADOW " + master.getId() ) );
             shadow.setMasterRepository( master );
             shadow.setId( master.getId() + "-m1" );
-            shadow.setLocalUrl( new File( getWorkingDirectory(), shadow.getId() ).toURI().toURL().toString() );
+            shadow.setLocalUrl( getApplicationConfiguration()
+                .getWorkingDirectory( shadow.getId() ).toURI().toURL().toString() );
 
             shadow.setLocalStorage( getLocalRepositoryStorage() );
             // shadow.setCacheManager( getCacheManager() );

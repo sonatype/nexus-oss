@@ -20,7 +20,6 @@
  */
 package org.sonatype.nexus.proxy;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -60,17 +59,18 @@ public class M1TestsuiteEnvironmentBuilder
         List<String> reposes = new ArrayList<String>();
         for ( WebappContext remoteRepo : getServletServer().getWebappContexts() )
         {
-            
-            M1Repository repo = (M1Repository)container.lookup( Repository.ROLE, "maven1" );
-            //repo.enableLogging( env.getLogger().getChildLogger( "REPO" + repo.getId() ) );
+
+            M1Repository repo = (M1Repository) container.lookup( Repository.ROLE, "maven1" );
+            // repo.enableLogging( env.getLogger().getChildLogger( "REPO" + repo.getId() ) );
             repo.setId( remoteRepo.getName() );
             repo.setRemoteUrl( getServletServer().getUrl( remoteRepo.getName() ) );
-            repo.setLocalUrl( new File( env.getWorkingDirectory(), "proxy/store/" + repo.getId() )
-                .toURI().toURL().toString() );
+            repo.setLocalUrl( env
+                .getApplicationConfiguration().getWorkingDirectory( "proxy/store/" + repo.getId() ).toURI().toURL()
+                .toString() );
             repo.setLocalStorage( env.getLocalRepositoryStorage() );
             repo.setRepositoryPolicy( RepositoryPolicy.RELEASE );
             repo.setChecksumPolicy( ChecksumPolicy.STRICT_IF_EXISTS );
-            //repo.setFeedRecorder( new SimpleFeedRecorder() );
+            // repo.setFeedRecorder( new SimpleFeedRecorder() );
             if ( remoteRepo.getAuthenticationInfo() != null )
             {
                 // we have a protected repo, cannot share remote peer
@@ -86,20 +86,21 @@ public class M1TestsuiteEnvironmentBuilder
 
                 repo.setRemoteStorageContext( env.getRemoteStorageContext() );
             }
-            //repo.setCacheManager( env.getCacheManager() );
+            // repo.setCacheManager( env.getCacheManager() );
             reposes.add( repo.getId() );
 
             env.getRepositoryRegistry().addRepository( repo );
         }
 
         // ading one hosted only
-        M1Repository repo = (M1Repository)container.lookup( Repository.ROLE, "maven1" );
-        //repo.enableLogging( env.getLogger().getChildLogger( "REPO" + repo.getId() ) );
+        M1Repository repo = (M1Repository) container.lookup( Repository.ROLE, "maven1" );
+        // repo.enableLogging( env.getLogger().getChildLogger( "REPO" + repo.getId() ) );
         repo.setId( "inhouse" );
-        repo.setLocalUrl( new File( env.getWorkingDirectory(), "proxy/store/" + repo.getId() )
-            .toURI().toURL().toString() );
+        repo.setLocalUrl( env
+            .getApplicationConfiguration().getWorkingDirectory( "proxy/store/" + repo.getId() ).toURI().toURL()
+            .toString() );
         repo.setLocalStorage( env.getLocalRepositoryStorage() );
-        //repo.setCacheManager( env.getCacheManager() );
+        // repo.setCacheManager( env.getCacheManager() );
         reposes.add( repo.getId() );
         env.getRepositoryRegistry().addRepository( repo );
 

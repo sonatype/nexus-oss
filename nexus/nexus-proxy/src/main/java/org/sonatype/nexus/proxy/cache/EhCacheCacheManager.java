@@ -83,6 +83,8 @@ public class EhCacheCacheManager
         throws StoppingException
     {
         getLogger().info( "Shutting down EHCache manager." );
+        
+        ehCacheManager.removalAll();
 
         ehCacheManager.shutdown();
     }
