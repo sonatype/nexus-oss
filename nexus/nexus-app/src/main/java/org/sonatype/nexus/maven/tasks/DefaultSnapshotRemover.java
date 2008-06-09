@@ -184,6 +184,8 @@ public class DefaultSnapshotRemover
 
         private boolean removeWholeGAV;
 
+        private Gav gavToRemove;
+
         private int deletedSnapshots = 0;
 
         private int deletedFiles = 0;
@@ -239,6 +241,8 @@ public class DefaultSnapshotRemover
                                 {
                                     removeWholeGAV = true;
 
+                                    gavToRemove = gav;
+
                                     break;
                                 }
 
@@ -275,6 +279,12 @@ public class DefaultSnapshotRemover
                 {
                     try
                     {
+                        // ArtifactStoreRequest req = new ArtifactStoreRequest( gavToRemove.getGroupId(), gavToRemove
+                        // .getArtifactId(), gavToRemove.getBaseVersion() );
+
+                        // TODO: the one below would not be needed, since withAllSubordinates = true would do all?
+                        // repository.deleteArtifact( req, true );
+
                         repository.deleteItem( coll.getRepositoryItemUid() );
                     }
                     catch ( Exception e )

@@ -55,15 +55,15 @@ public class EvictUnusedItemsTask
     {
         if ( getRepositoryGroupId() != null )
         {
-            return "Evicting unused proxied items for repository group with ID=" + getRepositoryGroupId() + ".";
+            return "Evicting unused items for repository group with ID=" + getRepositoryGroupId() + ".";
         }
         else if ( getRepositoryId() != null )
         {
-            return "Evicting unused proxied items for repository with ID=" + getRepositoryId() + ".";
+            return "Evicting unused items for repository with ID=" + getRepositoryId() + ".";
         }
         else
         {
-            return "Evicting unused proxied items for all registered proxy repositories.";
+            return "Evicting unused items for all registered repositories.";
         }
     }
 
