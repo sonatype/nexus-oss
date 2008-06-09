@@ -221,7 +221,7 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
     frame: true,
     collapsible: false,
     collapsed: false,
-    labelWidth: 175,
+    labelWidth: 200,
     layoutConfig: {
       labelSeparator: ''
     },
@@ -307,6 +307,7 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
     	      anchor: Sonatype.view.FIELDSET_OFFSET,
     	      collapsible: false,
     	      autoHeight:true,
+              labelWidth: 175,
     	      layoutConfig: {
 	            labelSeparator: ''
 	          },
@@ -324,6 +325,7 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
     	      anchor: Sonatype.view.FIELDSET_OFFSET,
     	      collapsible: false,
     	      autoHeight:true,
+              labelWidth: 175,
     	      layoutConfig: {
 	            labelSeparator: ''
 	          },
@@ -356,6 +358,7 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
     	      anchor: Sonatype.view.FIELDSET_OFFSET,
     	      collapsible: false,
     	      autoHeight:true,
+              labelWidth: 175,
     	      layoutConfig: {
 	            labelSeparator: ''
 	          },
@@ -398,6 +401,7 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
     	      anchor: Sonatype.view.FIELDSET_OFFSET,
     	      collapsible: false,
     	      autoHeight:true,
+              labelWidth: 175,
     	      layoutConfig: {
 	            labelSeparator: ''
 	          },
@@ -548,6 +552,7 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
     	      anchor: Sonatype.view.FIELDSET_OFFSET,
     	      collapsible: false,
     	      autoHeight:true,
+              labelWidth: 175,
     	      layoutConfig: {
 	            labelSeparator: ''
 	          },
@@ -809,6 +814,7 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
     		    anchor: Sonatype.view.FIELDSET_OFFSET,
     		    collapsible: false,
     		    autoHeight:true,
+                labelWidth: 175,
     		    layoutConfig: {
                 labelSeparator: ''
               },
@@ -819,7 +825,8 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
                   itemCls: 'required-field',
                   name: 'cronCommand',
                   helpText: ht.cronCommand,
-                  width: 200,
+//                  width: 200,
+                  anchor: Sonatype.view.FIELDSET_OFFSET,
                   disabled:true,
                   allowBlank:false
                 }
@@ -1057,6 +1064,7 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
         anchor: Sonatype.view.FIELDSET_OFFSET,
         collapsible: false,
         autoHeight:true,
+        labelWidth: 175,
         layoutConfig: {
           labelSeparator: ''
         },
