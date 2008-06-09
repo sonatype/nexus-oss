@@ -216,7 +216,7 @@ Sonatype.repoServer.RepoServer = function(){
         vTplData.links.push( {id:'open-repos-maint-readonly', title:'Browse Repositories'} );
       }
       if(sp.checkPermission(userPerms.viewSystemChanges, sp.READ)){
-        vTplData.links.push( {id:'open-system-changes', title:'System Changes'} );
+        vTplData.links.push( {id:'open-system-changes', title:'System Feeds'} );
       }
       if(vTplData.links.length > 0){
         panelConf = Ext.apply({}, {title:'Views', id:'st-nexus-views', html: bodyTpl.apply(vTplData)}, defaultGroupPanel);
@@ -301,7 +301,7 @@ Sonatype.repoServer.RepoServer = function(){
       },
       'open-system-changes' : function(scope) {
         var id = 'feed-view-system_changes';
-        Sonatype.view.mainTabPanel.addOrShowTab(id, Sonatype.repoServer.FeedViewPanel, {title: 'System Changes'});
+        Sonatype.view.mainTabPanel.addOrShowTab(id, Sonatype.repoServer.FeedViewPanel, {title: 'System Feeds'});
       },      
       'open-view-config' : function(scope) {
         var id = 'view-config';
@@ -338,7 +338,6 @@ Sonatype.repoServer.RepoServer = function(){
       'open-config-schedules' : function(scope){
         var id = 'schedules-config';
         Sonatype.view.mainTabPanel.addOrShowTab(id, Sonatype.repoServer.SchedulesEditPanel, {title: 'Scheduled Services'});
-/*
       },
       'open-security-users' : function(scope){
         var id = 'security-users';
@@ -347,7 +346,6 @@ Sonatype.repoServer.RepoServer = function(){
       'open-security-roles' : function(scope){
         var id = 'security-roles';
         Sonatype.view.mainTabPanel.addOrShowTab(id, Sonatype.repoServer.RoleEditPanel, {title: 'Roles'});
-*/
       }
     },
     
