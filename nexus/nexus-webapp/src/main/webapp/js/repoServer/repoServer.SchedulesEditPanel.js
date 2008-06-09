@@ -41,7 +41,7 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
       scope:this,
       handler: this.reloadAll
     }),
-    delete : new Ext.Action({
+    deleteAction : new Ext.Action({
       text: 'Delete',
       scope:this,
       handler: this.deleteHandler
@@ -1516,7 +1516,7 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
       id:'schedules-grid-ctx',
       items: [
         this.actions.refresh,
-        this.actions.delete
+        this.actions.deleteAction
       ]
     });
     
