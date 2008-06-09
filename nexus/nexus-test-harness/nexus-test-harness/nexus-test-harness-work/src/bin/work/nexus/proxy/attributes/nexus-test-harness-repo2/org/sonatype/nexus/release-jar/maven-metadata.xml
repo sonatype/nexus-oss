@@ -1,0 +1,21 @@
+<file>
+  <length>297</length>
+  <path>/org/sonatype/nexus/release-jar/maven-metadata.xml</path>
+  <readable>true</readable>
+  <writable>true</writable>
+  <repositoryId>nexus-test-harness-repo2</repositoryId>
+  <created>1211231510303</created>
+  <modified>1211231510303</modified>
+  <storedLocally>1211231510303</storedLocally>
+  <lastTouched>1211231510303</lastTouched>
+  <attributes>
+    <entry>
+      <string>digest.sha1</string>
+      <string>5a6ec3a119a1e4812b183db0e4cbb823e9ad0d9c</string>
+    </entry>
+    <entry>
+      <string>digest.md5</string>
+      <string>d2633b258a4313ec5a7c9a292f692619</string>
+    </entry>
+  </attributes>
+</file>

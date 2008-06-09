@@ -1,0 +1,18 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.sonatype.nexus</groupId>
+		<artifactId>nexus-test-harness</artifactId>
+		<version>1.0.0-beta-4-SNAPSHOT</version>
+	</parent>
+	
+	<artifactId>nexus-test-harness-artifacts</artifactId>
+	<packaging>pom</packaging>
+	<name>Nexus Test Harness Artifacts</name>
+	
+	<modules>
+		<module>release-jar-1</module>
+    <module>release-jar-2</module>
+	</modules>
+</project>

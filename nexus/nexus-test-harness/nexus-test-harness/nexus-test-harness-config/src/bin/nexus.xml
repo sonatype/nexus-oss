@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?><nexusConfiguration>
+  <version>1.0.3</version>
+  <workingDirectory>${nexus.working.directory}</workingDirectory>
+  <applicationLogDirectory>${nexus.log.directory}</applicationLogDirectory>
+  <security />
+  <globalConnectionSettings />
+  <restApi />
+  <httpProxy>
+    <enabled>true</enabled>
+  </httpProxy>
+  <routing>
+    <groups />
+  </routing>
+  <repositories>
+    <repository>
+      <id>nexus-test-harness-repo</id>
+      <name>nexus-test-harness-repo</name>
+      <allowWrite>true</allowWrite>
+      <checksumPolicy>ignore</checksumPolicy>
+    </repository>
+    <repository>
+      <id>nexus-test-harness-repo2</id>
+      <name>nexus-test-harness-repo2</name>
+      <allowWrite>true</allowWrite>
+      <checksumPolicy>ignore</checksumPolicy>
+    </repository>
+  </repositories>
+  <repositoryGrouping>
+    <repositoryGroups>
+      <repositoryGroup>
+        <groupId>nexus-test</groupId>
+        <name>nexus-test</name>
+        <repositories>
+          <repository>nexus-test-harness-repo</repository>
+          <repository>nexus-test-harness-repo2</repository>
+        </repositories>
+      </repositoryGroup>
+    </repositoryGroups>
+  </repositoryGrouping>
+</nexusConfiguration>
