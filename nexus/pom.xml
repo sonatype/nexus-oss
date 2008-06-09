@@ -6,7 +6,7 @@
 		<artifactId>nexus-parent</artifactId>
 		<version>2</version>
 	</parent>
-	
+
 	<artifactId>nexus</artifactId>
 	<packaging>pom</packaging>
 	<name>Nexus Repository Manager</name>
@@ -83,16 +83,46 @@
 		</contributor>
 	</contributors>
 
-	<modules>
-		<module>nexus-configuration</module>
-		<module>nexus-proxy</module>
-		<module>nexus-app</module>
-		<module>nexus-rest-model</module>
-		<module>nexus-rest-api</module>
-    <module>nexus-migration-tool</module>
-		<module>nexus-webapp</module>
-    <!--  <module>nexus-test-harness</module> -->
-	</modules>
+
+
+	<profiles>
+	  <profile>
+		  <id>default</id>
+		  <activation>
+		  	<activeByDefault>true</activeByDefault>
+		  </activation>
+
+		  <modules>
+		  	<module>nexus-configuration</module>
+			<module>nexus-proxy</module>
+			<module>nexus-app</module>
+			<module>nexus-rest-model</module>
+			<module>nexus-rest-api</module>
+		    <module>nexus-migration-tool</module>
+			<module>nexus-webapp</module>
+		  </modules>
+	  </profile>
+
+	  <profile>
+		  <id>test-harness</id>
+		  <activation>
+		  	<property>
+		  		<name>test-harness</name>
+		  	</property>
+		  </activation>
+		  <modules>
+		  	<module>nexus-configuration</module>
+			<module>nexus-proxy</module>
+			<module>nexus-app</module>
+			<module>nexus-rest-model</module>
+			<module>nexus-rest-api</module>
+		    <module>nexus-migration-tool</module>
+			<module>nexus-webapp</module>
+		    <module>nexus-test-harness</module>
+		  </modules>
+	  </profile>
+	</profiles>
+
 
 	<!-- Shortcut for outnumbered deps :) -->
 	<properties>
@@ -124,7 +154,7 @@
 				<version>1.2-SNAPSHOT</version>
       			<scope>provided</scope>
     		</dependency>
-            
+
             <dependency>
 				<groupId>org.sonatype.jsw-binaries</groupId>
 				<artifactId>jsw-binaries</artifactId>
@@ -211,7 +241,7 @@
               <artifactId>lucene-core</artifactId>
               <version>2.3.1</version>
             </dependency>
-            
+
 			<dependency>
 				<groupId>commons-cli</groupId>
 				<artifactId>commons-cli</artifactId>
@@ -357,22 +387,22 @@
                   <artifactId>servlet-api</artifactId>
                 </exclusion>
               </exclusions>
-		    </dependency>        
+		    </dependency>
 		    <dependency>
 			  <groupId>org.restlet</groupId>
 			  <artifactId>org.restlet.ext.velocity</artifactId>
               <version>${restlet.version}</version>
-		    </dependency>  
+		    </dependency>
 		    <dependency>
 			  <groupId>org.restlet</groupId>
 			  <artifactId>org.restlet.ext.fileupload</artifactId>
               <version>${restlet.version}</version>
-		    </dependency>  
+		    </dependency>
 		    <dependency>
 			  <groupId>org.restlet</groupId>
 			  <artifactId>org.restlet</artifactId>
               <version>${restlet.version}</version>
-		    </dependency>              
+		    </dependency>
 			<!-- Storage impls -->
 			<dependency>
 				<groupId>commons-net</groupId>
@@ -631,7 +661,7 @@
 				<artifactId>maven-pmd-plugin</artifactId>
 				<version>2.3</version>
                 <configuration>
-                  <targetJdk>1.5</targetJdk> 
+                  <targetJdk>1.5</targetJdk>
                 </configuration>
 			</plugin>
 		</plugins>
