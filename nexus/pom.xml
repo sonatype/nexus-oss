@@ -83,26 +83,17 @@
 		</contributor>
 	</contributors>
 
-
+	<modules>
+		<module>nexus-configuration</module>
+		<module>nexus-proxy</module>
+		<module>nexus-app</module>
+		<module>nexus-rest-model</module>
+		<module>nexus-rest-api</module>
+		<module>nexus-migration-tool</module>
+		<module>nexus-webapp</module>
+	</modules>
 
 	<profiles>
-	  <profile>
-		  <id>default</id>
-		  <activation>
-		  	<activeByDefault>true</activeByDefault>
-		  </activation>
-
-		  <modules>
-		  	<module>nexus-configuration</module>
-			<module>nexus-proxy</module>
-			<module>nexus-app</module>
-			<module>nexus-rest-model</module>
-			<module>nexus-rest-api</module>
-		    <module>nexus-migration-tool</module>
-			<module>nexus-webapp</module>
-		  </modules>
-	  </profile>
-
 	  <profile>
 		  <id>test-harness</id>
 		  <activation>
@@ -111,13 +102,6 @@
 		  	</property>
 		  </activation>
 		  <modules>
-		  	<module>nexus-configuration</module>
-			<module>nexus-proxy</module>
-			<module>nexus-app</module>
-			<module>nexus-rest-model</module>
-			<module>nexus-rest-api</module>
-		    <module>nexus-migration-tool</module>
-			<module>nexus-webapp</module>
 		    <module>nexus-test-harness</module>
 		  </modules>
 	  </profile>
