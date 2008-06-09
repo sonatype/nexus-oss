@@ -17,6 +17,16 @@ public class DefaultSchedulerTest
         super.setUp();
 
         defaultScheduler = (DefaultScheduler) lookup( Scheduler.class.getName() );
+
+        defaultScheduler.startService();
+    }
+
+    public void tearDown()
+        throws Exception
+    {
+        defaultScheduler.stopService();
+
+        super.tearDown();
     }
 
     public void testSimpleRunnable()
@@ -102,7 +112,7 @@ public class DefaultSchedulerTest
         tr = new TestCallable();
 
         long nearFuture = System.currentTimeMillis() + 500;
-        
+
         Schedule schedule = new SecondSchedule( new Date( nearFuture ), new Date( nearFuture + 4900 ) );
 
         ScheduledTask<Integer> st = defaultScheduler.schedule( "default", tr, schedule, null, true );
@@ -141,7 +151,7 @@ public class DefaultSchedulerTest
         tr = new TestRunnable();
 
         long nearFuture = System.currentTimeMillis() + 500;
-        
+
         Schedule schedule = new SecondSchedule( new Date( nearFuture ), new Date( nearFuture + 4900 ) );
 
         ScheduledTask<Object> st = defaultScheduler.schedule( "default", tr, schedule, null, true );
@@ -167,7 +177,7 @@ public class DefaultSchedulerTest
         tr = new TestCallable();
 
         long nearFuture = System.currentTimeMillis() + 500;
-        
+
         Schedule schedule = new SecondSchedule( new Date( nearFuture ), new Date( nearFuture + 4900 ) );
 
         ScheduledTask<Integer> st = defaultScheduler.schedule( "default", tr, schedule, null, true );

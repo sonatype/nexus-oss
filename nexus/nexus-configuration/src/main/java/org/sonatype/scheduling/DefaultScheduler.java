@@ -36,7 +36,6 @@ import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.context.ContextException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.Startable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.StartingException;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.StoppingException;
 import org.codehaus.plexus.util.StringUtils;
@@ -51,7 +50,7 @@ import org.sonatype.scheduling.schedules.Schedule;
  */
 public class DefaultScheduler
     extends AbstractLogEnabled
-    implements Scheduler, Contextualizable, Startable
+    implements Scheduler, Contextualizable
 {
     private PlexusContainer plexusContainer;
 
@@ -60,7 +59,7 @@ public class DefaultScheduler
     private ScheduledThreadPoolExecutor scheduledExecutorService;
 
     private Map<String, List<ScheduledTask<?>>> tasksMap;
-    
+
     /**
      * @plexus.requirement
      */
@@ -72,21 +71,21 @@ public class DefaultScheduler
         plexusContainer = (PlexusContainer) context.get( PlexusConstants.PLEXUS_KEY );
     }
 
-    public void start()
+    public void startService()
         throws StartingException
-    {   
-        tasksMap = new HashMap<String,List<ScheduledTask<?>>>();
-        
+    {
+        tasksMap = new HashMap<String, List<ScheduledTask<?>>>();
+
         plexusThreadFactory = new PlexusThreadFactory( plexusContainer );
 
         scheduledExecutorService = (ScheduledThreadPoolExecutor) Executors.newScheduledThreadPool(
             10,
             plexusThreadFactory );
-        
+
         taskConfig.initializeTasks( this );
     }
 
-    public void stop()
+    public void stopService()
         throws StoppingException
     {
         getScheduledExecutorService().shutdown();
@@ -127,7 +126,7 @@ public class DefaultScheduler
                 tasksMap.put( task.getType(), new ArrayList<ScheduledTask<?>>() );
             }
             tasksMap.get( task.getType() ).add( task );
-            
+
             if ( store )
             {
                 taskConfig.addTask( task );
@@ -147,18 +146,19 @@ public class DefaultScheduler
                 {
                     tasksMap.remove( task.getType() );
                 }
-                
+
                 taskConfig.removeTask( task );
             }
         }
     }
 
-    public ScheduledTask<Object> submit( String name, Runnable runnable, Map<String,String>taskParams )
+    public ScheduledTask<Object> submit( String name, Runnable runnable, Map<String, String> taskParams )
     {
         return schedule( name, runnable, new RunNowSchedule(), taskParams, false );
     }
 
-    public ScheduledTask<Object> schedule( String name, Runnable runnable, Schedule schedule, Map<String,String>taskParams, boolean store )
+    public ScheduledTask<Object> schedule( String name, Runnable runnable, Schedule schedule,
+        Map<String, String> taskParams, boolean store )
     {
         DefaultScheduledTask<Object> drt = new DefaultScheduledTask<Object>(
             name,
@@ -175,12 +175,13 @@ public class DefaultScheduler
         return drt;
     }
 
-    public <T> ScheduledTask<T> submit( String name, Callable<T> callable, Map<String,String>taskParams )
+    public <T> ScheduledTask<T> submit( String name, Callable<T> callable, Map<String, String> taskParams )
     {
         return schedule( name, callable, new RunNowSchedule(), taskParams, false );
     }
 
-    public <T> ScheduledTask<T> schedule( String name, Callable<T> callable, Schedule schedule, Map<String,String>taskParams, boolean store )
+    public <T> ScheduledTask<T> schedule( String name, Callable<T> callable, Schedule schedule,
+        Map<String, String> taskParams, boolean store )
     {
         DefaultScheduledTask<T> dct = new DefaultScheduledTask<T>(
             name,

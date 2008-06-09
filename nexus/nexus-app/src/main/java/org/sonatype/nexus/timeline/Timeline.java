@@ -20,24 +20,18 @@
  */
 package org.sonatype.nexus.timeline;
 
-import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.sonatype.nexus.NexusService;
 import org.sonatype.nexus.configuration.ConfigurationChangeListener;
 
 public interface Timeline
-    extends ConfigurationChangeListener
+    extends NexusService, ConfigurationChangeListener
 {
     String ROLE = Timeline.class.getName();
-
-    void startService()
-        throws IOException;
-
-    void stopService()
-        throws IOException;
 
     void add( String type, String subType, Map<String, String> data );
 

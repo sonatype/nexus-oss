@@ -28,7 +28,6 @@ import net.sf.ehcache.config.Configuration;
 import net.sf.ehcache.config.ConfigurationFactory;
 
 import org.codehaus.plexus.logging.AbstractLogEnabled;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.Startable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.StartingException;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.StoppingException;
 import org.sonatype.nexus.util.ApplicationInterpolatorProvider;
@@ -41,7 +40,7 @@ import org.sonatype.nexus.util.ApplicationInterpolatorProvider;
  */
 public class EhCacheCacheManager
     extends AbstractLogEnabled
-    implements CacheManager, Startable
+    implements CacheManager
 {
 
     /**
@@ -74,18 +73,18 @@ public class EhCacheCacheManager
         return new EhCachePathCache( ehCacheManager.getEhcache( cache ) );
     }
 
-    public void start()
+    public void startService()
         throws StartingException
     {
         constructEhCacheManager();
     }
 
-    public void stop()
+    public void stopService()
         throws StoppingException
     {
         getLogger().info( "Shutting down EHCache manager." );
-        
-        // ehCacheManager.shutdown();
+
+        ehCacheManager.shutdown();
     }
 
     private void constructEhCacheManager()

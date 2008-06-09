@@ -20,7 +20,6 @@
  */
 package org.sonatype.nexus.feeds;
 
-import java.io.IOException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -33,6 +32,8 @@ import java.util.Map;
 import java.util.Set;
 
 import org.codehaus.plexus.logging.AbstractLogEnabled;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.StartingException;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.StoppingException;
 import org.sonatype.nexus.artifact.NexusItemInfo;
 import org.sonatype.nexus.timeline.Timeline;
 
@@ -93,13 +94,13 @@ public class DefaultFeedRecorder
     private DateFormat eventDateFormat = new SimpleDateFormat( "yyyy-MM-dd HH:mm:ss.SSSZ" );
 
     public void startService()
-        throws IOException
+        throws StartingException
     {
         timeline.startService();
     }
 
     public void stopService()
-        throws IOException
+        throws StoppingException
     {
         timeline.stopService();
     }

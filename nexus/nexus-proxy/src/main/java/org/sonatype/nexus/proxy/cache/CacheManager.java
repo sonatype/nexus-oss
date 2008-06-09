@@ -20,11 +20,12 @@
  */
 package org.sonatype.nexus.proxy.cache;
 
+import org.sonatype.nexus.NexusService;
+
 public interface CacheManager
+    extends NexusService
 {
-    
     String ROLE = CacheManager.class.getName();
 
     PathCache getPathCache( String cache );
-
 }

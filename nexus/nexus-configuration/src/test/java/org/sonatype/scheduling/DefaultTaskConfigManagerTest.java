@@ -38,26 +38,32 @@ public class DefaultTaskConfigManagerTest
     private DefaultTaskConfigManager defaultManager;
 
     private File configurationFile;
-    
+
     private static final String PROPERTY_KEY_START_DATE = "startDate";
+
     private static final String PROPERTY_KEY_END_DATE = "endDate";
+
     private static final String PROPERTY_KEY_CRON_EXPRESSION = "cronExpression";
-    
+
     private static final String SCHEDULE_TYPE_ONCE = "once";
+
     private static final String SCHEDULE_TYPE_DAILY = "daily";
+
     private static final String SCHEDULE_TYPE_WEEKLY = "weekly";
+
     private static final String SCHEDULE_TYPE_MONTHLY = "monthly";
+
     private static final String SCHEDULE_TYPE_ADVANCED = "advanced";
-    
+
     private static final String TASK_NAME = "test";
-    
+
     private static final String CRON_EXPRESSION = "blah";
-    
-    private static final HashMap<String,Class>typeClassMap;
-    
+
+    private static final HashMap<String, Class> typeClassMap;
+
     static
     {
-        typeClassMap = new HashMap<String,Class>();
+        typeClassMap = new HashMap<String, Class>();
         typeClassMap.put( SCHEDULE_TYPE_ONCE, COnceSchedule.class );
         typeClassMap.put( SCHEDULE_TYPE_DAILY, CDailySchedule.class );
         typeClassMap.put( SCHEDULE_TYPE_WEEKLY, CWeeklySchedule.class );
@@ -65,7 +71,7 @@ public class DefaultTaskConfigManagerTest
         typeClassMap.put( SCHEDULE_TYPE_ADVANCED, CAdvancedSchedule.class );
     }
 
-    /** 
+    /**
      * NOTE: this is only populated after call to loadConfig()
      */
     private CTaskConfiguration configuration;
@@ -76,15 +82,25 @@ public class DefaultTaskConfigManagerTest
         super.setUp();
 
         defaultScheduler = (DefaultScheduler) lookup( Scheduler.class.getName() );
+        defaultScheduler.startService();
+
         defaultManager = (DefaultTaskConfigManager) lookup( TaskConfigManager.class.getName() );
         configurationFile = new File( PLEXUS_HOME + "/nexus/conf/tasks.xml" );
-        
+
+    }
+
+    public void tearDown()
+        throws Exception
+    {
+        defaultScheduler.stopService();
+
+        super.tearDown();
     }
 
     public void testStoreOnceSchedule()
     {
         Date date = new Date();
-        HashMap<String,Object> scheduleProperties = new HashMap<String,Object>();
+        HashMap<String, Object> scheduleProperties = new HashMap<String, Object>();
         scheduleProperties.put( PROPERTY_KEY_START_DATE, date );
         genericTestStore( SCHEDULE_TYPE_ONCE, scheduleProperties );
     }
@@ -93,7 +109,7 @@ public class DefaultTaskConfigManagerTest
     {
         Date startDate = new Date();
         Date endDate = new Date();
-        HashMap<String,Object> scheduleProperties = new HashMap<String,Object>();
+        HashMap<String, Object> scheduleProperties = new HashMap<String, Object>();
         scheduleProperties.put( PROPERTY_KEY_START_DATE, startDate );
         scheduleProperties.put( PROPERTY_KEY_END_DATE, endDate );
         genericTestStore( SCHEDULE_TYPE_DAILY, scheduleProperties );
@@ -103,7 +119,7 @@ public class DefaultTaskConfigManagerTest
     {
         Date startDate = new Date();
         Date endDate = new Date();
-        HashMap<String,Object> scheduleProperties = new HashMap<String,Object>();
+        HashMap<String, Object> scheduleProperties = new HashMap<String, Object>();
         scheduleProperties.put( PROPERTY_KEY_START_DATE, startDate );
         scheduleProperties.put( PROPERTY_KEY_END_DATE, endDate );
         genericTestStore( SCHEDULE_TYPE_WEEKLY, scheduleProperties );
@@ -113,7 +129,7 @@ public class DefaultTaskConfigManagerTest
     {
         Date startDate = new Date();
         Date endDate = new Date();
-        HashMap<String,Object> scheduleProperties = new HashMap<String,Object>();
+        HashMap<String, Object> scheduleProperties = new HashMap<String, Object>();
         scheduleProperties.put( PROPERTY_KEY_START_DATE, startDate );
         scheduleProperties.put( PROPERTY_KEY_END_DATE, endDate );
         genericTestStore( SCHEDULE_TYPE_MONTHLY, scheduleProperties );
@@ -121,12 +137,12 @@ public class DefaultTaskConfigManagerTest
 
     public void testStoreAdvancedSchedule()
     {
-        HashMap<String,Object> scheduleProperties = new HashMap<String,Object>();
+        HashMap<String, Object> scheduleProperties = new HashMap<String, Object>();
         scheduleProperties.put( PROPERTY_KEY_CRON_EXPRESSION, CRON_EXPRESSION );
         genericTestStore( SCHEDULE_TYPE_ADVANCED, scheduleProperties );
     }
-    
-    public void genericTestStore( String scheduleType, HashMap<String,Object>scheduleProperties)
+
+    public void genericTestStore( String scheduleType, HashMap<String, Object> scheduleProperties )
     {
         ScheduledTask<Integer> task = null;
         try
@@ -135,9 +151,11 @@ public class DefaultTaskConfigManagerTest
             defaultManager.addTask( task );
             loadConfig();
             assertTrue( configuration.getTasks().size() == 1 );
-            assertTrue( TaskState.SUBMITTED.equals( TaskState.valueOf( ( (CScheduledTask) configuration.getTasks().get( 0 ) ).getStatus() ) ) );
+            assertTrue( TaskState.SUBMITTED.equals( TaskState.valueOf( ( (CScheduledTask) configuration.getTasks().get(
+                0 ) ).getStatus() ) ) );
             assertTrue( TASK_NAME.equals( ( (CScheduledTask) configuration.getTasks().get( 0 ) ).getName() ) );
-            assertTrue( typeClassMap.get( scheduleType ).isAssignableFrom( ( (CScheduledTask) configuration.getTasks().get( 0 ) ).getSchedule().getClass() ) );
+            assertTrue( typeClassMap.get( scheduleType ).isAssignableFrom(
+                ( (CScheduledTask) configuration.getTasks().get( 0 ) ).getSchedule().getClass() ) );
             defaultManager.removeTask( task );
             loadConfig();
             assertTrue( configuration.getTasks().size() == 0 );
@@ -152,7 +170,7 @@ public class DefaultTaskConfigManagerTest
         }
     }
 
-    private Schedule createSchedule( String type, HashMap<String,Object>properties )
+    private Schedule createSchedule( String type, HashMap<String, Object> properties )
     {
         if ( SCHEDULE_TYPE_ONCE.equals( type ) )
         {
@@ -160,19 +178,22 @@ public class DefaultTaskConfigManagerTest
         }
         else if ( SCHEDULE_TYPE_DAILY.equals( type ) )
         {
-            return new DailySchedule( (Date) properties.get( PROPERTY_KEY_START_DATE ), (Date) properties.get( PROPERTY_KEY_END_DATE ) );
+            return new DailySchedule( (Date) properties.get( PROPERTY_KEY_START_DATE ), (Date) properties
+                .get( PROPERTY_KEY_END_DATE ) );
         }
         else if ( SCHEDULE_TYPE_WEEKLY.equals( type ) )
         {
             Set<Integer> daysToRun = new HashSet<Integer>();
             daysToRun.add( new Integer( 0 ) );
-            return new WeeklySchedule( (Date) properties.get( PROPERTY_KEY_START_DATE ), (Date) properties.get( PROPERTY_KEY_END_DATE ), daysToRun );
+            return new WeeklySchedule( (Date) properties.get( PROPERTY_KEY_START_DATE ), (Date) properties
+                .get( PROPERTY_KEY_END_DATE ), daysToRun );
         }
         else if ( SCHEDULE_TYPE_MONTHLY.equals( type ) )
         {
             Set<Integer> daysToRun = new HashSet<Integer>();
             daysToRun.add( new Integer( 1 ) );
-            return new MonthlySchedule( (Date) properties.get( PROPERTY_KEY_START_DATE ), (Date) properties.get( PROPERTY_KEY_END_DATE ), daysToRun );
+            return new MonthlySchedule( (Date) properties.get( PROPERTY_KEY_START_DATE ), (Date) properties
+                .get( PROPERTY_KEY_END_DATE ), daysToRun );
         }
         else if ( SCHEDULE_TYPE_ADVANCED.equals( type ) )
         {
@@ -185,8 +206,13 @@ public class DefaultTaskConfigManagerTest
     private ScheduledTask<Integer> createScheduledTask( Schedule schedule )
     {
         TestCallable callable = new TestCallable();
-        return new DefaultScheduledTask<Integer>( TASK_NAME, callable.getClass().getName(), defaultScheduler, callable,
-                                                  schedule, null );
+        return new DefaultScheduledTask<Integer>(
+            TASK_NAME,
+            callable.getClass().getName(),
+            defaultScheduler,
+            callable,
+            schedule,
+            null );
     }
 
     private void loadConfig()

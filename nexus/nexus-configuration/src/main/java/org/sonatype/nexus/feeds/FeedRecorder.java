@@ -20,10 +20,11 @@
  */
 package org.sonatype.nexus.feeds;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import org.sonatype.nexus.NexusService;
 
 /**
  * A recorder for events for later retrieval. This is actually event recorder, not feed recorder.
@@ -31,6 +32,7 @@ import java.util.Set;
  * @author cstamas
  */
 public interface FeedRecorder
+    extends NexusService
 {
     String ROLE = FeedRecorder.class.getName();
 
@@ -73,14 +75,6 @@ public interface FeedRecorder
      * System event action: evict unused proxied items
      */
     public static final String SYSTEM_EVICT_UNUSED_PROXIED_ITEMS = "EVICT_UNUSED_PROXIED_ITEMS";
-
-    // service
-
-    void startService()
-        throws IOException;
-
-    void stopService()
-        throws IOException;
 
     // creating
 

@@ -151,7 +151,7 @@ public class DefaultNexus
      * 
      * @plexus.requirement
      */
-    private NexusScheduler scheduler;
+    private NexusScheduler nexusScheduler;
 
     /**
      * The Feed recorder.
@@ -1017,25 +1017,25 @@ public class DefaultNexus
         throws RejectedExecutionException,
             NullPointerException
     {
-        scheduler.submit( name, task );
+        nexusScheduler.submit( name, task );
     }
 
     public <T> ScheduledTask<T> schedule( String name, NexusTask<T> nexusTask, Schedule schedule )
         throws RejectedExecutionException,
             NullPointerException
     {
-        return scheduler.schedule( name, nexusTask, schedule );
+        return nexusScheduler.schedule( name, nexusTask, schedule );
     }
 
     public Map<String, List<ScheduledTask<?>>> getActiveTasks()
     {
-        return scheduler.getActiveTasks();
+        return nexusScheduler.getActiveTasks();
     }
 
     public ScheduledTask<?> getTaskById( String id )
         throws NoSuchTaskException
     {
-        return scheduler.getTaskById( id );
+        return nexusScheduler.getTaskById( id );
     }
 
     // =============
@@ -1198,6 +1198,8 @@ public class DefaultNexus
 
             feedRecorder.startService();
 
+            nexusScheduler.startService();
+
             addSystemEvent( FeedRecorder.SYSTEM_BOOT_ACTION, "Starting Nexus (version " + systemStatus.getVersion()
                 + ")" );
 
@@ -1279,6 +1281,8 @@ public class DefaultNexus
         addSystemEvent( FeedRecorder.SYSTEM_BOOT_ACTION, "Stopping Nexus (version " + systemStatus.getVersion() + ")" );
 
         httpProxyService.stopService();
+        
+        nexusScheduler.stopService();
 
         try
         {
@@ -1289,14 +1293,7 @@ public class DefaultNexus
             getLogger().error( "Error while stopping IndexerManager:", e );
         }
 
-        try
-        {
-            feedRecorder.stopService();
-        }
-        catch ( IOException e )
-        {
-            getLogger().error( "Error while stopping FeedRecorder:", e );
-        }
+        feedRecorder.stopService();
 
         systemStatus.setState( SystemState.STOPPED );
 

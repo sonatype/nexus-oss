@@ -5,9 +5,11 @@ import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.RejectedExecutionException;
 
+import org.sonatype.nexus.NexusService;
 import org.sonatype.scheduling.schedules.Schedule;
 
 public interface Scheduler
+    extends NexusService
 {
     String ROLE = Scheduler.class.getName();
 
@@ -19,7 +21,7 @@ public interface Scheduler
      * @param taskParams
      * @return
      */
-    ScheduledTask<Object> submit( String name, Runnable runnable, Map<String,String>taskParams )
+    ScheduledTask<Object> submit( String name, Runnable runnable, Map<String, String> taskParams )
         throws RejectedExecutionException,
             NullPointerException;
 
@@ -33,7 +35,8 @@ public interface Scheduler
      * @param store
      * @return
      */
-    ScheduledTask<Object> schedule( String name, Runnable runnable, Schedule schedule, Map<String,String>taskParams, boolean store )
+    ScheduledTask<Object> schedule( String name, Runnable runnable, Schedule schedule, Map<String, String> taskParams,
+        boolean store )
         throws RejectedExecutionException,
             NullPointerException;
 
@@ -45,7 +48,7 @@ public interface Scheduler
      * @param taskParams
      * @return
      */
-    <T> ScheduledTask<T> submit( String name, Callable<T> callable, Map<String,String>taskParams )
+    <T> ScheduledTask<T> submit( String name, Callable<T> callable, Map<String, String> taskParams )
         throws RejectedExecutionException,
             NullPointerException;
 
@@ -59,7 +62,8 @@ public interface Scheduler
      * @param store
      * @return
      */
-    <T> ScheduledTask<T> schedule( String name, Callable<T> callable, Schedule schedule, Map<String,String>taskParams, boolean store )
+    <T> ScheduledTask<T> schedule( String name, Callable<T> callable, Schedule schedule,
+        Map<String, String> taskParams, boolean store )
         throws RejectedExecutionException,
             NullPointerException;
 

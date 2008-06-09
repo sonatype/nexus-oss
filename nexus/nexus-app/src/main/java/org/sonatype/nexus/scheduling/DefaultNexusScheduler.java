@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.RejectedExecutionException;
 
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.StartingException;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.StoppingException;
 import org.sonatype.scheduling.NoSuchTaskException;
 import org.sonatype.scheduling.ScheduledTask;
 import org.sonatype.scheduling.Scheduler;
@@ -70,6 +72,18 @@ public class DefaultNexusScheduler
         throws NoSuchTaskException
     {
         return scheduler.getTaskById( id );
+    }
+
+    public void startService()
+        throws StartingException
+    {
+        scheduler.startService();
+    }
+
+    public void stopService()
+        throws StoppingException
+    {
+        scheduler.stopService();
     }
 
 }

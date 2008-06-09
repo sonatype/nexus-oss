@@ -51,6 +51,8 @@ import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.StartingException;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.StoppingException;
 import org.sonatype.nexus.configuration.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
 import org.sonatype.nexus.index.context.NexusIndexWriter;
@@ -106,7 +108,7 @@ public class DefaultTimeline
 
                     startService();
                 }
-                catch ( IOException e )
+                catch ( Exception e )
                 {
                     getLogger().error( "Cannot manage Timeline:", e );
                 }
@@ -115,7 +117,7 @@ public class DefaultTimeline
     }
 
     public void startService()
-        throws IOException
+        throws StartingException
     {
         if ( running )
         {
@@ -162,12 +164,12 @@ public class DefaultTimeline
 
             running = false;
 
-            throw e;
+            throw new StartingException( "Cannot start Timeline!", e );
         }
     }
 
     public void stopService()
-        throws IOException
+        throws StoppingException
     {
         // cleanup
         getLogger().info( "Stopping Timeline..." );
@@ -219,7 +221,7 @@ public class DefaultTimeline
         {
             indexDirectory = null;
 
-            throw e;
+            throw new StoppingException( "Cannot stop Timeline!", e );
         }
     }
 

@@ -4,11 +4,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.RejectedExecutionException;
 
+import org.sonatype.nexus.NexusService;
 import org.sonatype.scheduling.NoSuchTaskException;
 import org.sonatype.scheduling.ScheduledTask;
 import org.sonatype.scheduling.schedules.Schedule;
 
 public interface NexusScheduler
+    extends NexusService
 {
     String ROLE = NexusScheduler.class.getName();
 

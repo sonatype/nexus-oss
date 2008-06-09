@@ -20,12 +20,14 @@
  */
 package org.sonatype.nexus.feeds;
 
-import java.io.IOException;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.StartingException;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.StoppingException;
 
 public class SimpleFeedRecorder
     implements FeedRecorder
@@ -54,14 +56,14 @@ public class SimpleFeedRecorder
     }
 
     public void startService()
-        throws IOException
+        throws StartingException
     {
         // TODO Auto-generated method stub
 
     }
 
     public void stopService()
-        throws IOException
+        throws StoppingException
     {
         // TODO Auto-generated method stub
 

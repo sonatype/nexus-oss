@@ -242,10 +242,12 @@ public abstract class AbstractProxyTestEnvironment
         this.logger = loggerManager.getLoggerForComponent( this.getClass().toString() );
 
         applicationConfiguration = (ApplicationConfiguration) lookup( ApplicationConfiguration.ROLE );
+
         applicationConfiguration.getConfiguration().setWorkingDirectory(
             new File( getBasedir(), "target/plexus-home" ).getAbsolutePath() );
 
         repositoryRegistry = (RepositoryRegistry) lookup( RepositoryRegistry.ROLE );
+
         cacheManager = (CacheManager) lookup( CacheManager.ROLE );
 
         attributesHandler = (AttributesHandler) lookup( AttributesHandler.ROLE );
@@ -263,9 +265,12 @@ public abstract class AbstractProxyTestEnvironment
 
         routers = getContainer().lookupMap( RepositoryRouter.ROLE );
 
+        // deleting files
         FileUtils.forceDelete( getWorkingDirectory() );
 
         getEnvironmentBuilder().buildEnvironment( this );
+
+        cacheManager.startService();
 
         applicationConfiguration.notifyConfigurationChangeListeners();
 
@@ -281,6 +286,9 @@ public abstract class AbstractProxyTestEnvironment
         throws Exception
     {
         getEnvironmentBuilder().stop();
+
+        cacheManager.stopService();
+
         super.tearDown();
     }
 
