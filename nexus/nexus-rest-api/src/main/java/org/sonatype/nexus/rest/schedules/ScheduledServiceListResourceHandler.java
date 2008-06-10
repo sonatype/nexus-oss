@@ -80,6 +80,7 @@ public class ScheduledServiceListResourceHandler
                 ScheduledServiceListResource item = new ScheduledServiceListResource();
                 item.setResourceURI( calculateSubReference( task.getId() ).toString() );
                 item.setLastRunResult( TaskState.BROKEN.equals( task.getTaskState() ) ? "Error" : "Ok" );
+                item.setId( task.getId() );
                 item.setName( task.getName() );
                 item.setStatus( StringUtils.capitalise( task.getTaskState().toString() ) );
                 item.setTypeId( task.getType() );

@@ -151,6 +151,7 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
   //A record that holds the data for each service in the system
   this.scheduleRecordConstructor = Ext.data.Record.create([
     {name:'resourceURI'},
+    {name:'id'},
     {name:'name', sortType:Ext.data.SortTypes.asUCString},
     {name:'typeName'},
     {name:'typeId'},
@@ -1258,6 +1259,7 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
   
   runHandler : function() {
     if (this.ctxRecord && this.ctxRecord.data.resourceURI != 'new'){
+      var rec = this.ctxRecord;
       Ext.Msg.getDialog().on('show', function(){
           this.focusEl = this.buttons[2]; //ack! we're offset dependent here
           this.focus();
@@ -1268,7 +1270,7 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
       Ext.Msg.show({
         animEl: this.schedulesGridPanel.getEl(),
         title : 'Run Scheduled Service?',
-        msg : 'Run the ' + this.ctxRecord.get('name') + ' scheduled service?',
+        msg : 'Run the ' + rec.get('name') + ' scheduled service?',
         buttons: Ext.Msg.YESNO,
         scope: this,
         icon: Ext.Msg.QUESTION,
@@ -1277,11 +1279,11 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
             Ext.Ajax.request({
               callback: this.runCallback,
               cbPassThru: {
-                resourceId: this.ctxRecord.id
+                resourceId: rec.data.id
               },
               scope: this,
               method: 'GET',
-              url:(Sonatype.config.urls.scheduleRun + '/' + this.ctxRecord.id)
+              url: Sonatype.config.repos.urls.scheduleRun + '/' + rec.data.id
             });
           }
         }
@@ -1306,10 +1308,12 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
         //successful create
         var sentData = action.output.data;
         var receivedData = action.handleResponse(action.response).data;
+        
         var dataObj = {
           name : receivedData.resource.name,
+          id : receivedData.resource.id,
           resourceURI : action.getUrl() + '/' + receivedData.resource.id,
-          typeName : this.serviceTypeDataStore.find('id',receivedData.resource.typeId).name,
+          typeName : this.serviceTypeDataStore.getAt(this.serviceTypeDataStore.find('id',receivedData.resource.typeId)).data.name,
           typeId : receivedData.resource.typeId,
           status : receivedData.status,
           schedule : receivedData.resource.schedule,
@@ -1458,7 +1462,7 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
       
       this.loadWeekdayListHelper([], {}, formPanel);
 
-      this.formDataLoader(formPanel, rec.data.resourceURI, this.loadDataModFuncs[rec.data.serviceSchedule]);
+      this.formDataLoader(formPanel, rec.data.resourceURI, this.loadDataModFuncs[rec.data.schedule]);
       
       this.formCards.add(formPanel);
     }
@@ -1485,7 +1489,8 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
       ]
     });
     
-    if (this.ctxRecord.data.status == 'idle') {
+    if (this.ctxRecord.data.status == 'SUBMITTED'
+      || this.ctxRecord.data.status == 'WAITING') {
       menu.add(this.actions.run);
     }
     
@@ -1836,7 +1841,7 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
     //Maps the incoming json properties to the generic component
     //Uses the id of the serviceProperty item as the key, so the id _must_ be unique within a service type
     for(var i=0;i<srcObj.properties.length;i++){
-      var servicePropertyItem = fpanel.find('name','serviceProperties_' + srcObj.serviceProperties[i].id)[0];
+      var servicePropertyItem = fpanel.find('name','serviceProperties_' + srcObj.properties[i].id)[0];
       if (servicePropertyItem != null){
         if (servicePropertyItem.xtype == 'datefield'){
           servicePropertyItem.setValue(new Date(Number(srcObj.properties[i].value)));
