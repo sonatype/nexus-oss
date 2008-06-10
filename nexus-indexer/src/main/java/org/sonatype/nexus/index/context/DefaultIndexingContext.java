@@ -387,7 +387,7 @@ public class DefaultIndexingContext
             }
 
             closeReaders();
-
+            
             if ( deleteFiles )
             {
                 deleteIndexFiles();

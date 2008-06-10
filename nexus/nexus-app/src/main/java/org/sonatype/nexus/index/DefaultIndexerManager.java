@@ -934,7 +934,7 @@ public class DefaultIndexerManager
                 }
                 else if ( RepositoryRegistryEventRemove.class.isAssignableFrom( evt.getClass() ) )
                 {
-                    removeRepositoryIndexContext( repository.getId(), true );
+                    removeRepositoryIndexContext( repository.getId(), false );
                 }
             }
             catch ( Exception e )
@@ -955,7 +955,7 @@ public class DefaultIndexerManager
                 }
                 else if ( RepositoryRegistryGroupEventRemove.class.isAssignableFrom( evt.getClass() ) )
                 {
-                    removeRepositoryGroupIndexContext( gevt.getGroupId(), true );
+                    removeRepositoryGroupIndexContext( gevt.getGroupId(), false );
                 }
             }
             catch ( Exception e )
