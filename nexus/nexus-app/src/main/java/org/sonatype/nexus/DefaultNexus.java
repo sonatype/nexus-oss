@@ -387,6 +387,8 @@ public class DefaultNexus
             IOException
     {
         nexusConfiguration.createRepository( settings );
+
+        indexerManager.setRepositoryIndexContextSearchable( settings.getId(), settings.isIndexable() );
     }
 
     public CRepository readRepository( String id )
@@ -401,6 +403,8 @@ public class DefaultNexus
             IOException
     {
         nexusConfiguration.updateRepository( settings );
+
+        indexerManager.setRepositoryIndexContextSearchable( settings.getId(), settings.isIndexable() );
     }
 
     public void deleteRepository( String id )
@@ -1281,7 +1285,7 @@ public class DefaultNexus
         addSystemEvent( FeedRecorder.SYSTEM_BOOT_ACTION, "Stopping Nexus (version " + systemStatus.getVersion() + ")" );
 
         httpProxyService.stopService();
-        
+
         nexusScheduler.stopService();
 
         try
