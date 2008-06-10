@@ -393,6 +393,10 @@ public class DefaultIndexerManager
 
                 if ( shouldDownloadRemoteIndex )
                 {
+                    RepositoryItemUid propsUid = null;
+
+                    RepositoryItemUid zipUid = null;
+
                     try
                     {
                         getLogger().info( "Trying to get remote index for repository " + repository.getId() );
@@ -400,14 +404,14 @@ public class DefaultIndexerManager
                         // this will force redownload
                         repository.clearCaches( "/.index" );
 
-                        RepositoryItemUid uid = new RepositoryItemUid( repository, "/.index/"
-                            + IndexingContext.INDEX_FILE + ".properties" );
+                        propsUid = new RepositoryItemUid( repository, "/.index/" + IndexingContext.INDEX_FILE
+                            + ".properties" );
 
-                        StorageFileItem fitem = (StorageFileItem) repository.retrieveItem( false, uid );
+                        StorageFileItem fitem = (StorageFileItem) repository.retrieveItem( false, propsUid );
 
-                        uid = new RepositoryItemUid( repository, "/.index/" + IndexingContext.INDEX_FILE + ".zip" );
+                        zipUid = new RepositoryItemUid( repository, "/.index/" + IndexingContext.INDEX_FILE + ".zip" );
 
-                        fitem = (StorageFileItem) repository.retrieveItem( false, uid );
+                        fitem = (StorageFileItem) repository.retrieveItem( false, zipUid );
 
                         RAMDirectory directory = new RAMDirectory();
 
@@ -440,6 +444,40 @@ public class DefaultIndexerManager
                         getLogger().warn( "Cannot fetch remote index:", e );
 
                         hasRemoteIndex = false;
+
+                        // delete the potentially partially downloaded files
+                        if ( propsUid != null )
+                        {
+                            try
+                            {
+                                repository.deleteItem( propsUid );
+                            }
+                            catch ( ItemNotFoundException ex )
+                            {
+                                // silent
+                            }
+                            catch ( Exception ex )
+                            {
+                                getLogger().warn( "Cannot delete index part:", e );
+                            }
+                        }
+
+                        // delete the potentially partially downloaded files
+                        if ( zipUid != null )
+                        {
+                            try
+                            {
+                                repository.deleteItem( zipUid );
+                            }
+                            catch ( ItemNotFoundException ex )
+                            {
+                                // silent
+                            }
+                            catch ( Exception ex )
+                            {
+                                getLogger().warn( "Cannot delete index part:", e );
+                            }
+                        }
                     }
                 }
             }
