@@ -23,8 +23,8 @@ under the License.
   <includeBaseDirectory>false</includeBaseDirectory>
   <fileSets>
     <fileSet>
-      <directory>./src/bin</directory> 
-      <outputDirectory>/</outputDirectory>           
+      <directory>./src/nexus-root</directory>
+      <outputDirectory>/</outputDirectory>
     </fileSet>
-  </fileSets>        
+  </fileSets>
 </assembly>

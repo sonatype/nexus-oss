@@ -11,10 +11,15 @@
 	<name>Nexus Test Harness Launcher</name>
 	<properties>
 		<bundle-expanded-dir>target/bundle</bundle-expanded-dir>
-		<config-expanded-dir>target/config</config-expanded-dir>
-		<config-target-dir>${bundle-expanded-dir}/nexus-webapp-${project.version}/runtime/apps/nexus/conf</config-target-dir>
-		<work-target-dir>${bundle-expanded-dir}/nexus-webapp-${project.version}/runtime/work</work-target-dir>
-		<plexus-config-file>${bundle-expanded-dir}/nexus-webapp-${project.version}/conf/plexus.xml</plexus-config-file>
+		<config-expanded-dir>target/test-nexus-config</config-expanded-dir>
+		<nexus-basedir>${bundle-expanded-dir}/nexus-webapp-${project.version}</nexus-basedir>
+		<config-target-dir>${nexus-basedir}/runtime/apps/nexus/conf</config-target-dir>
+		<work-target-dir>${nexus-basedir}/runtime/work</work-target-dir>
+		<plexus-config-file>${nexus-basedir}/conf/plexus.xml</plexus-config-file>
+		<nexus-application-protocol>http</nexus-application-protocol>
+		<nexus-application-host>localhost</nexus-application-host>
+		<nexus-application-name>nexus</nexus-application-name>
+		<nexus-application-port>8087</nexus-application-port>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -66,9 +71,15 @@
 	        <resource>
 	            <directory>${config-expanded-dir}</directory>
 	            <filtering>true</filtering>
-	            <targetPath>../../${config-target-dir}</targetPath>
+	            <targetPath>../../${nexus-basedir}</targetPath>
 	        </resource>
 	    </resources>
+	    <testResources>
+	      <testResource>
+	      	<directory>src/test/resources</directory>
+	      	<filtering>true</filtering>
+	      </testResource>
+	    </testResources>
 		<plugins>
 		    <plugin>
                 <artifactId>maven-dependency-plugin</artifactId>
@@ -123,7 +134,7 @@
             </plugin>
 		    <plugin>
 		        <artifactId>plx-maven-plugin</artifactId>
-		        <groupId>org.sonatype.plugins</groupId>		        
+		        <groupId>org.sonatype.plugins</groupId>
                 <version>1.1-SNAPSHOT</version>
 		        <executions>
 		            <execution>
@@ -143,7 +154,7 @@
                                 <plexus.host.control.socket.enabled>true</plexus.host.control.socket.enabled>
                                 <plexus.container.dev.mode>true</plexus.container.dev.mode>
 		                    </systemProperties>
-		                    <basedir>${bundle-expanded-dir}/nexus-webapp-${project.version}</basedir>
+		                    <basedir>${nexus-basedir}</basedir>
 		                    <configuration>${plexus-config-file}</configuration>
 		                    <includeTestClasspath>true</includeTestClasspath>
 		                    <platformArtifact>
@@ -160,7 +171,7 @@
                             <goal>stop</goal>
                         </goals>
                     </execution>
-		        </executions>    
+		        </executions>
 		    </plugin>
 		    <plugin>
                 <groupId>org.sonatype.plugins</groupId>
@@ -174,10 +185,10 @@
                             <goal>wait</goal>
                         </goals>
                         <configuration>
-                            <protocol>http</protocol>
-                            <host>localhost</host>
-                            <port>8081</port>
-                            <file>/nexus</file>
+                            <protocol>${nexus-application-protocol}</protocol>
+                            <host>${nexus-application-hostl}</host>
+                            <port>${nexus-application-port}</port>
+                            <file>/${nexus-application-name}</file>
                             <maxcount>0</maxcount>
                             <timeout>5000</timeout>
                         </configuration>
@@ -205,7 +216,7 @@
                         </configuration>
                     </execution>
                 </executions>
-            </plugin>			
+            </plugin>
 		</plugins>
 	</build>
 </project>

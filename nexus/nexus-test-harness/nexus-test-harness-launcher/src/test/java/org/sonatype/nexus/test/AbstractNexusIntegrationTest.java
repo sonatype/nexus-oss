@@ -36,6 +36,7 @@ import java.net.URLConnection;
 import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.ResourceBundle;
 
 import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.DefaultContainerConfiguration;
@@ -56,6 +57,7 @@ public abstract class AbstractNexusIntegrationTest
     private String nexusUrl;
     private PlexusContainer container;
     private Map context;
+    private String baseNexusUrl;
 
     private static ControllerClient manager;
     private static boolean detach = false;
@@ -63,11 +65,22 @@ public abstract class AbstractNexusIntegrationTest
     private static final int TEST_CONNECTION_ATTEMPTS = 5;
     private static final int TEST_CONNECTION_TIMEOUT = 3000;
     private static final int MANAGER_WAIT_TIME = 500;
+
+    public static final String REPOSITORY_RELATIVE_URL = "content/repositories/";
+    public static final String GROUP_REPOSITORY_RELATIVE_URL = "content/groups/";
+
     private static String basedir;
 
+    /**
+     * Sets up the infrastructure for the tests.
+     * @param nexusUrl The relative url i.e. 'content/groups/nexus-test/'
+     */
     public AbstractNexusIntegrationTest( String nexusUrl )
     {
-        this.nexusUrl = nexusUrl;
+     // Using ResourceBundle here because its on line..
+        this.baseNexusUrl = ResourceBundle.getBundle( "baseTest" ).getString( "nexus.base.url" );
+
+        this.nexusUrl = baseNexusUrl + nexusUrl;
         setupContainer();
     }
 
@@ -282,6 +295,7 @@ public abstract class AbstractNexusIntegrationTest
                 new URL( nexusUrl + groupId.replace( '.', '/' ) + "/" + artifact + "/" + version + "/" + artifact + "-"
                     + version + "." + type );
             out = new BufferedOutputStream( new FileOutputStream( downloadedFile ) );
+
             conn = url.openConnection();
             in = conn.getInputStream();
             byte[] buffer = new byte[1024];
@@ -408,5 +422,22 @@ public abstract class AbstractNexusIntegrationTest
     {
         return this.container;
     }
+
+    public String getBaseNexusUrl()
+    {
+        return baseNexusUrl;
+    }
+
+    public String getNexusRepositoryURL(String repositoryName)
+    {
+        return this.getBaseNexusUrl() + REPOSITORY_RELATIVE_URL + repositoryName;
+    }
+
+    public String getNexusGroupRepositoryURL(String repositoryName)
+    {
+        return this.getBaseNexusUrl() + GROUP_REPOSITORY_RELATIVE_URL + repositoryName;
+    }
+
+
 
 }

@@ -32,22 +32,22 @@ public class NexusGroupDownloadTest
 {
     public NexusGroupDownloadTest()
     {
-        super( "http://localhost:8081/nexus/content/groups/nexus-test/" );
+        super( GROUP_REPOSITORY_RELATIVE_URL + "nexus-test/" );
     }
-    
+
     @Test
     public void downloadArtifact()
     {
         File artifact = downloadArtifact( "org.sonatype.nexus", "release-jar", "1", "jar", "./target/downloaded-jars" );
-        
+
         assertTrue( artifact.exists() );
-        
+
         File outputDirectory = unpackArtifact( artifact, "./target/extracted-jars" );
-        
+
         try
         {
             assertTrue( outputDirectory.exists() );
-            
+
             File[] files = outputDirectory.listFiles( new FilenameFilter()
             {
                 public boolean accept(File dir, String name) {
@@ -55,12 +55,12 @@ public class NexusGroupDownloadTest
                 {
                     return true;
                 }
-                
+
                 return false;
             };} );
-            
+
             assertTrue( files.length == 1 );
-            
+
             complete();
         }
         finally
