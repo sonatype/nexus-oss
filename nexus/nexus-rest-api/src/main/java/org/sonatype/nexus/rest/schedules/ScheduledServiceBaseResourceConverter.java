@@ -52,42 +52,42 @@ public class ScheduledServiceBaseResourceConverter
         if ( LookAheadStreamReader.class.isAssignableFrom( reader.getClass() )
                         || LookAheadStreamReader.class.isAssignableFrom( reader.underlyingReader().getClass() ) )
         {
-            String serviceSchedule = null;
+            String schedule = null;
 
             if ( LookAheadStreamReader.class.isAssignableFrom( reader.getClass() ) )
             {
-                serviceSchedule = ( (LookAheadStreamReader) reader ).getFieldValue( "serviceSchedule" );
+                schedule = ( (LookAheadStreamReader) reader ).getFieldValue( "schedule" );
             }
             else
             {
-                serviceSchedule = ( (LookAheadStreamReader) reader.underlyingReader() ).getFieldValue( "serviceSchedule" );
+                schedule = ( (LookAheadStreamReader) reader.underlyingReader() ).getFieldValue( "schedule" );
             }
 
-            if ( serviceSchedule == null )
+            if ( schedule == null )
             {
                 return super.instantiateNewInstance( reader, context );
             }
-            else if ( AbstractScheduledServiceResourceHandler.SCHEDULE_TYPE_NONE.equals( serviceSchedule ))
+            else if ( AbstractScheduledServiceResourceHandler.SCHEDULE_TYPE_NONE.equals( schedule ))
             {
                 return new ScheduledServiceBaseResource();
             }
-            else if ( AbstractScheduledServiceResourceHandler.SCHEDULE_TYPE_ONCE.equals( serviceSchedule ))
+            else if ( AbstractScheduledServiceResourceHandler.SCHEDULE_TYPE_ONCE.equals( schedule ))
             {
                 return new ScheduledServiceOnceResource();
             }
-            else if ( AbstractScheduledServiceResourceHandler.SCHEDULE_TYPE_DAILY.equals( serviceSchedule ))
+            else if ( AbstractScheduledServiceResourceHandler.SCHEDULE_TYPE_DAILY.equals( schedule ))
             {
                 return new ScheduledServiceDailyResource();
             }
-            else if ( AbstractScheduledServiceResourceHandler.SCHEDULE_TYPE_WEEKLY.equals( serviceSchedule ))
+            else if ( AbstractScheduledServiceResourceHandler.SCHEDULE_TYPE_WEEKLY.equals( schedule ))
             {
                 return new ScheduledServiceWeeklyResource();
             }
-            else if ( AbstractScheduledServiceResourceHandler.SCHEDULE_TYPE_MONTHLY.equals( serviceSchedule ))
+            else if ( AbstractScheduledServiceResourceHandler.SCHEDULE_TYPE_MONTHLY.equals( schedule ))
             {
                 return new ScheduledServiceMonthlyResource();
             }
-            else if ( AbstractScheduledServiceResourceHandler.SCHEDULE_TYPE_ADVANCED.equals( serviceSchedule ))
+            else if ( AbstractScheduledServiceResourceHandler.SCHEDULE_TYPE_ADVANCED.equals( schedule ))
             {
                 return new ScheduledServiceAdvancedResource();
             }

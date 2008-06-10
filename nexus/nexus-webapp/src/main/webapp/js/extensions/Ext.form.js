@@ -137,7 +137,7 @@ Ext.extend(Ext.form.Action.sonatypeSubmit, Ext.form.Action, {
     success : function(response){
       var result = this.processResponse(response);
 
-      if(result === true){
+      if(result === true || result.data){
         this.form.afterAction(this, true);
         return;
       }

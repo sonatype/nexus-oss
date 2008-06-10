@@ -1146,25 +1146,25 @@
 					<required>true</required>
 				</field>
 				<field>
-					<name>serviceTypeId</name>
+					<name>typeId</name>
 					<version>1.0.0+</version>
 					<type>String</type>
 					<required>true</required>
 				</field>
 				<field>
-					<name>serviceTypeName</name>
+					<name>typeName</name>
 					<version>1.0.0+</version>
 					<type>String</type>
 					<required>true</required>
 				</field>
 				<field>
-					<name>serviceStatus</name>
+					<name>status</name>
 					<version>1.0.0+</version>
 					<type>String</type>
 					<required>true</required>
 				</field>
 				<field>
-					<name>serviceSchedule</name>
+					<name>schedule</name>
 					<version>1.0.0+</version>
 					<type>String</type>
 					<required>true</required>
@@ -1190,10 +1190,71 @@
 				<field>
 					<name>created</name>
 					<version>1.0.0+</version>
-					<type>Date</type>
+					<type>String</type>
 					<required>true</required>
 				</field>
 			</fields>
+		</class>
+		
+		<class>
+            <name>ScheduledServiceResourceStatusResponse</name>
+            <version>1.0.0+</version>
+            <superClass>NexusResponse</superClass>
+            <fields>
+                <field>
+                    <name>data</name>
+                    <version>1.0.0+</version>
+                    <association>
+                        <type>ScheduledServiceResourceStatus</type>
+                    </association>
+                    <required>true</required>
+                </field>
+            </fields>
+        </class>
+		
+		<class>
+		    <name>ScheduledServiceResourceStatus</name>
+		    <version>1.0.0+</version>
+		    <fields>
+                <field>
+                    <name>resource</name>
+                    <version>1.0.0+</version>
+                    <association>
+                        <type>ScheduledServiceBaseResource</type>
+                    </association>
+                    <required>true</required>
+                </field>
+                <field>
+                    <name>status</name>
+                    <version>1.0.0+</version>
+                    <type>String</type>
+                    <required>true</required>
+                </field>
+                <field>
+                    <name>nextRunTime</name>
+                    <version>1.0.0+</version>
+                    <type>String</type>
+                    <required>true</required>
+                </field>
+                <field>
+                    <name>lastRunTime</name>
+                    <version>1.0.0+</version>
+                    <type>String</type>
+                    <required>true</required>
+                </field>
+                <field>
+                    <name>lastRunResult</name>
+                    <version>1.0.0+</version>
+                    <type>String</type>
+                    <required>true</required>
+                </field>
+                <field>
+                    <name>created</name>
+                    <version>1.0.0+</version>
+                    <type>String</type>
+                    <required>true</required>
+                </field>
+		    </fields>
 		</class>
 
 		<class>
@@ -1229,19 +1290,19 @@
 					<required>true</required>
 				</field>
 				<field>
-					<name>serviceType</name>
+					<name>typeId</name>
 					<version>1.0.0+</version>
 					<type>String</type>
 					<required>true</required>
 				</field>
 				<field>
-					<name>serviceSchedule</name>
+					<name>schedule</name>
 					<version>1.0.0+</version>
 					<type>String</type>
 					<required>true</required>
 				</field>
 				<field>
-					<name>serviceProperties</name>
+					<name>properties</name>
 					<version>1.0.0+</version>
 					<association>
 						<type>ScheduledServicePropertyResource</type>
@@ -1293,9 +1354,15 @@
 
 		<class>
 			<name>ScheduledServiceDailyResource</name>
-			<superClass>ScheduledServiceOnceResource</superClass>
+			<superClass>ScheduledServiceBaseResource</superClass>
 			<version>1.0.0+</version>
 			<fields>
+			    <field>
+                    <name>startDate</name>
+                    <version>1.0.0+</version>
+                    <type>String</type>
+                    <required>true</required>
+                </field>
 				<field>
 					<name>recurringTime</name>
 					<version>1.0.0+</version>

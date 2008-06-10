@@ -30,10 +30,11 @@ import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.resource.Representation;
 import org.restlet.resource.Variant;
-import org.sonatype.nexus.rest.model.ScheduledServiceBaseResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceListResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceListResourceResponse;
 import org.sonatype.nexus.rest.model.ScheduledServiceResourceResponse;
+import org.sonatype.nexus.rest.model.ScheduledServiceResourceStatus;
+import org.sonatype.nexus.rest.model.ScheduledServiceResourceStatusResponse;
 import org.sonatype.scheduling.ScheduledTask;
 import org.sonatype.scheduling.TaskState;
 
@@ -78,12 +79,19 @@ public class ScheduledServiceListResourceHandler
             {
                 ScheduledServiceListResource item = new ScheduledServiceListResource();
                 item.setResourceURI( calculateSubReference( task.getId() ).toString() );
-                item.setCreated( task.getScheduledAt() );
                 item.setLastRunResult( TaskState.BROKEN.equals( task.getTaskState() ) ? "Error" : "Ok" );
-                item.setName( task.getId() );
-                item.setServiceStatus( StringUtils.capitalise( task.getTaskState().toString() ) );
-                item.setServiceTypeId( task.getType() );
-                item.setServiceTypeName( getServiceTypeName( task.getType() ) );
+                item.setName( task.getName() );
+                item.setStatus( StringUtils.capitalise( task.getTaskState().toString() ) );
+                item.setTypeId( task.getType() );
+                item.setTypeName( getServiceTypeName( task.getType() ) );
+                if ( task.getScheduledAt() != null)
+                {
+                    item.setCreated( task.getScheduledAt().toString() );
+                }
+                else
+                {
+                    item.setCreated( "n/a" );
+                }
                 if ( task.getLastRun() != null)
                 {
                     item.setLastRunTime( task.getLastRun().toString() );
@@ -101,7 +109,7 @@ public class ScheduledServiceListResourceHandler
                     item.setNextRunTime( "n/a" );
                 }
                 
-                item.setServiceSchedule( getScheduleShortName( task.getSchedule() ) );
+                item.setSchedule( getScheduleShortName( task.getSchedule() ) );
                 
                 response.addData( item );
             }
@@ -121,17 +129,26 @@ public class ScheduledServiceListResourceHandler
 
     public void post( Representation entity )
     {
-        ScheduledServiceResourceResponse response = (ScheduledServiceResourceResponse) deserialize( new ScheduledServiceResourceResponse() );
+        ScheduledServiceResourceResponse request = (ScheduledServiceResourceResponse) deserialize( new ScheduledServiceResourceResponse() );
         
-        if ( response == null )
+        if ( request == null )
         {
             return;
         }
         else
         {
-            ScheduledServiceBaseResource resource = response.getData();
+            ScheduledTask<Object> task = getNexus().schedule( getModelName( request.getData() ), getModelNexusTask( request.getData() ), getModelSchedule( request.getData() ) );
             
-            getNexus().schedule( getModelName( resource ), getModelNexusTask( resource ), getModelSchedule( resource ) );
+            ScheduledServiceResourceStatus resourceStatus = new ScheduledServiceResourceStatus();
+            resourceStatus.setResource( request.getData() );
+            resourceStatus.setStatus( task.getTaskState().toString() );
+            resourceStatus.setCreated( task.getScheduledAt() == null ? "n/a" : task.getScheduledAt().toString() );
+            resourceStatus.setLastRunResult( TaskState.BROKEN.equals( task.getTaskState() ) ? "Error" : "Ok" );
+            resourceStatus.setLastRunTime( task.getLastRun() == null ? "n/a" : task.getLastRun().toString() );
+            resourceStatus.setNextRunTime( task.getNextRun() == null ? "n/a" : task.getNextRun().toString() );
+            
+            ScheduledServiceResourceStatusResponse response = new ScheduledServiceResourceStatusResponse();
+            response.setData( resourceStatus );
             
             getResponse().setEntity( serialize( entity, response ) );
         }

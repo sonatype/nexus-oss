@@ -156,9 +156,9 @@ Sonatype.repoServer.referenceData = {
     none : {
       id : "",
 	  name : "",
-	  serviceType : "",
-	  serviceSchedule : "",
-	  serviceProperties : [{
+	  typeId : "",
+	  schedule : "",
+	  properties : [{
 	    id: "",
 	    value: ""
 	  }]
@@ -166,11 +166,11 @@ Sonatype.repoServer.referenceData = {
     once : {
       id : "",
 	  name : "",
-	  serviceType : "",
-	  serviceSchedule : "",
-	  serviceProperties : [{
-	    id: "",
-	    value: ""
+	  typeId : "",
+      schedule : "",
+      properties : [{
+        id: "",
+        value: ""
 	  }],
 	  startDate : "",
 	  startTime : ""
@@ -178,50 +178,47 @@ Sonatype.repoServer.referenceData = {
     daily : {
 	  id : "",
 	  name : "",
-	  serviceType : "",
-	  serviceSchedule : "",
-	  serviceProperties : [{
-	    id: "",
-	    value: ""
+	  typeId : "",
+      schedule : "",
+      properties : [{
+        id: "",
+        value: ""
 	  }],
 	  startDate : "",
-	  startTime : "",
 	  recurringTime : ""
     },
     weekly : {
 	  id : "",
 	  name : "",
-	  serviceType : "",
-	  serviceSchedule : "",
-	  serviceProperties : [{
+	  typeId : "",
+      schedule : "",
+      properties : [{
 	    id: "",
 	    value: ""
 	  }],
 	  startDate : "",
-	  startTime : "",
 	  recurringTime : "",
 	  recurringDay : []
     },
     monthly : {
 	  id : "",
 	  name : "",
-	  serviceType : "",
-	  serviceSchedule : "",
-	  serviceProperties : [{
+	  typeId : "",
+      schedule : "",
+      properties : [{
 	    id: "",
 	    value: ""
 	  }],
 	  startDate : "",
-	  startTime : "",
 	  recurringTime : "",
       recurringDay : []
     },
     advanced : {
 	  id : "",
 	  name : "",
-	  serviceType : "",
-	  serviceSchedule : "",
-	  serviceProperties : [{
+	  typeId : "",
+      schedule : "",
+      properties : [{
 	    id: "",
 	    value: ""
 	  }],

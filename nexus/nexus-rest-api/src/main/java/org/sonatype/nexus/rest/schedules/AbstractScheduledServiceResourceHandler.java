@@ -23,6 +23,7 @@ package org.sonatype.nexus.rest.schedules;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -104,7 +105,7 @@ public class AbstractScheduledServiceResourceHandler
      */
     public static final String PROPERTY_TYPE_REPO_GROUP = "repositoryGroup";
     
-    private DateFormat dateFormat = new SimpleDateFormat( "yyyy.MM.dd" );
+    public static final Integer DAY_OF_MONTH_LAST = new Integer( 999 );
 
     private DateFormat timeFormat = new SimpleDateFormat( "HH:mm" );
 
@@ -178,6 +179,61 @@ public class AbstractScheduledServiceResourceHandler
     {
         return timeFormat.format( date );
     }
+    
+    protected List<ScheduledServicePropertyResource> formatServiceProperties( Map<String,String> map )
+    {
+        List<ScheduledServicePropertyResource> list = new ArrayList<ScheduledServicePropertyResource>();
+        
+        for ( String key : map.keySet() )
+        {
+            ScheduledServicePropertyResource prop = new ScheduledServicePropertyResource();
+            prop.setId( key );
+            prop.setValue( map.get( key ) );
+            list.add( prop );
+        }
+        
+        return list;
+    }
+    
+    protected List<String> formatRecurringDayOfWeek( Set<Integer> days )
+    {
+        List<String> list = new ArrayList<String>();
+        
+        for ( Integer day : days )
+        {
+            switch ( day.intValue() )
+            {
+            case 0: { list.add( "sunday" ); break; }
+            case 1: { list.add( "monday" ); break; }
+            case 2: { list.add( "tuesday" ); break; }
+            case 3: { list.add( "wednesday" ); break; }
+            case 4: { list.add( "thursday" ); break; }
+            case 5: { list.add( "friday" ); break; }
+            case 6: { list.add( "saturday" ); break; }
+            }
+        }
+        
+        return list;
+    }
+    
+    protected List<String> formatRecurringDayOfMonth( Set<Integer> days )
+    {
+        List<String> list = new ArrayList<String>();
+        
+        for ( Integer day : days )
+        {
+            if ( day.equals( DAY_OF_MONTH_LAST ) )
+            {
+                list.add( "last" );
+            }
+            else
+            {
+                list.add( String.valueOf( day ) );
+            }
+        }
+        
+        return list;
+    }
 
     protected Date parseDate( String date, String time )
     {
@@ -207,11 +263,11 @@ public class AbstractScheduledServiceResourceHandler
     
     public NexusTask<Object> getModelNexusTask( ScheduledServiceBaseResource model )
     {
-        String serviceType = model.getServiceType();
+        String serviceType = model.getTypeId();
         
-        NexusTask<Object> task = (NexusTask<Object>) lookup( model.getServiceType() );
+        NexusTask<Object> task = (NexusTask<Object>) lookup( serviceType );
         
-        for ( Iterator iter = model.getServiceProperties().iterator(); iter.hasNext(); )
+        for ( Iterator iter = model.getProperties().iterator(); iter.hasNext(); )
         {
             ScheduledServicePropertyResource prop = (ScheduledServicePropertyResource) iter.next();
             task.addParameter( prop.getId(), prop.getValue() );
@@ -281,6 +337,8 @@ public class AbstractScheduledServiceResourceHandler
         
         return set;
     }
+    
+    
     
     protected <T> boolean compareSchedules( ScheduledTask<T> task, ScheduledServiceBaseResource resource)
     {

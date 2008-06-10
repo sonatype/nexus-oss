@@ -21,7 +21,6 @@
 package org.sonatype.nexus.rest.schedules;
 
 import java.io.IOException;
-import java.util.Date;
 import java.util.logging.Level;
 
 import org.restlet.Context;
@@ -30,13 +29,11 @@ import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.restlet.resource.Representation;
 import org.restlet.resource.Variant;
-import org.sonatype.nexus.rest.model.RepositoryResourceResponse;
 import org.sonatype.nexus.rest.model.ScheduledServiceAdvancedResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceBaseResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceDailyResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceMonthlyResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceOnceResource;
-import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceResourceResponse;
 import org.sonatype.nexus.rest.model.ScheduledServiceWeeklyResource;
 import org.sonatype.scheduling.NoSuchTaskException;
@@ -93,45 +90,79 @@ public class ScheduledServiceResourceHandler
             ScheduledServiceResourceResponse response = new ScheduledServiceResourceResponse();
 
             ScheduledTask<?> task = getNexus().getTaskById( getScheduledServiceId() );
+            
+            ScheduledServiceBaseResource resource = null;
 
             if ( OnceSchedule.class.isAssignableFrom( task.getSchedule().getClass() ) )
             {
+                resource = new ScheduledServiceOnceResource();
+                
                 OnceSchedule taskSchedule = (OnceSchedule) task.getSchedule();
-
-                ScheduledServiceOnceResource res = new ScheduledServiceOnceResource();
-
-                res.setId( task.getId() );
-
-                res.setName( task.getId() );
-
-                res.setServiceType( getServiceTypeName( task.getType() ) );
-
-                res.setServiceSchedule( getScheduleShortName( taskSchedule ) );
-
-                res.setServiceProperties( null );
+                ScheduledServiceOnceResource res = ( ScheduledServiceOnceResource ) resource;                
 
                 res.setStartDate( formatDate( taskSchedule.getStartDate() ) );
-
                 res.setStartTime( formatTime( taskSchedule.getStartDate() ) );
-
-                response.setData( res );
             }
             else if ( DailySchedule.class.isAssignableFrom( task.getSchedule().getClass() ) )
             {
+                resource = new ScheduledServiceDailyResource();
+                
+                DailySchedule taskSchedule = (DailySchedule) task.getSchedule();
+                ScheduledServiceDailyResource res = ( ScheduledServiceDailyResource ) resource;                
 
+                res.setStartDate( formatDate( taskSchedule.getStartDate() ) );
+                res.setRecurringTime( formatTime( taskSchedule.getStartDate() ) );
             }
             else if ( WeeklySchedule.class.isAssignableFrom( task.getSchedule().getClass() ) )
             {
+                resource = new ScheduledServiceWeeklyResource();
+                
+                WeeklySchedule taskSchedule = (WeeklySchedule) task.getSchedule();
+                ScheduledServiceWeeklyResource res = ( ScheduledServiceWeeklyResource ) resource;                
 
+                res.setStartDate( formatDate( taskSchedule.getStartDate() ) );
+                res.setRecurringTime( formatTime( taskSchedule.getStartDate() ) );
+                res.setRecurringDay( formatRecurringDayOfWeek( taskSchedule.getDaysToRun() ) );
             }
             else if ( MonthlySchedule.class.isAssignableFrom( task.getSchedule().getClass() ) )
             {
+                resource = new ScheduledServiceMonthlyResource();
+                
+                MonthlySchedule taskSchedule = (MonthlySchedule) task.getSchedule();
+                ScheduledServiceMonthlyResource res = ( ScheduledServiceMonthlyResource ) resource;                
 
+                res.setStartDate( formatDate( taskSchedule.getStartDate() ) );
+                res.setRecurringTime( formatTime( taskSchedule.getStartDate() ) );
+                res.setRecurringDay( formatRecurringDayOfMonth( taskSchedule.getDaysToRun() ) );
             }
             else if ( CronSchedule.class.isAssignableFrom( task.getSchedule().getClass() ) )
             {
+                resource = new ScheduledServiceAdvancedResource();
+                
+                CronSchedule taskSchedule = (CronSchedule) task.getSchedule();
+                ScheduledServiceAdvancedResource res = ( ScheduledServiceAdvancedResource ) resource;                
 
+                res.setCronCommand( taskSchedule.getCronExpression() );
             }
+            
+            if ( resource != null )
+            {
+                resource.setId( task.getId() );
+                resource.setName( task.getName() );
+                resource.setSchedule( getScheduleShortName( task.getSchedule() ) );
+                resource.setTypeId( task.getType() );
+                resource.setProperties( formatServiceProperties( task.getTaskParams() ) );
+                
+                response.setData( resource );
+                
+                return serialize( variant, response );
+            }
+            
+            getResponse().setStatus(
+                Status.CLIENT_ERROR_NOT_FOUND,
+                "Invalid schedule, can't load task." );
+            
+            return null;
         }
         catch ( NoSuchTaskException e )
         {
@@ -141,69 +172,6 @@ public class ScheduledServiceResourceHandler
 
             return null;
         }
-
-        ScheduledServiceBaseResource resource = null;
-
-        if ( "0".equals( getScheduledServiceId() ) )
-        {
-            resource = new ScheduledServiceBaseResource();
-            resource.setServiceSchedule( "none" );
-        }
-        else if ( "1".equals( getScheduledServiceId() ) )
-        {
-            resource = new ScheduledServiceOnceResource();
-            resource.setServiceSchedule( "once" );
-            ( (ScheduledServiceOnceResource) resource ).setStartDate( String.valueOf( new Date().getTime() ) );
-            ( (ScheduledServiceOnceResource) resource ).setStartTime( "22:00" );
-        }
-        else if ( "2".equals( getScheduledServiceId() ) )
-        {
-            resource = new ScheduledServiceDailyResource();
-            resource.setServiceSchedule( "daily" );
-            ( (ScheduledServiceDailyResource) resource ).setStartDate( String.valueOf( new Date().getTime() ) );
-            ( (ScheduledServiceDailyResource) resource ).setStartTime( "22:00" );
-            ( (ScheduledServiceDailyResource) resource ).setRecurringTime( "23:00" );
-        }
-        else if ( "3".equals( getScheduledServiceId() ) )
-        {
-            resource = new ScheduledServiceWeeklyResource();
-            resource.setServiceSchedule( "weekly" );
-            ( (ScheduledServiceWeeklyResource) resource ).setStartDate( String.valueOf( new Date().getTime() ) );
-            ( (ScheduledServiceWeeklyResource) resource ).setStartTime( "22:00" );
-            ( (ScheduledServiceWeeklyResource) resource ).setRecurringTime( "23:00" );
-            ( (ScheduledServiceWeeklyResource) resource ).addRecurringDay( "monday" );
-            ( (ScheduledServiceWeeklyResource) resource ).addRecurringDay( "tuesday" );
-        }
-        else if ( "4".equals( getScheduledServiceId() ) )
-        {
-            resource = new ScheduledServiceMonthlyResource();
-            resource.setServiceSchedule( "monthly" );
-            ( (ScheduledServiceMonthlyResource) resource ).setStartDate( String.valueOf( new Date().getTime() ) );
-            ( (ScheduledServiceMonthlyResource) resource ).setStartTime( "22:00" );
-            ( (ScheduledServiceMonthlyResource) resource ).setRecurringTime( "23:00" );
-            ( (ScheduledServiceMonthlyResource) resource ).addRecurringDay( "1" );
-            ( (ScheduledServiceMonthlyResource) resource ).addRecurringDay( "7" );
-        }
-        else if ( "5".equals( getScheduledServiceId() ) )
-        {
-            resource = new ScheduledServiceAdvancedResource();
-            resource.setServiceSchedule( "advanced" );
-            ( (ScheduledServiceAdvancedResource) resource ).setCronCommand( "cronCommand" );
-        }
-
-        resource.setId( getScheduledServiceId() );
-        resource.setName( "name" + getScheduledServiceId() );
-        resource.setServiceType( "1" );
-
-        ScheduledServicePropertyResource propResource = new ScheduledServicePropertyResource();
-        propResource.setId( "1" );
-        propResource.setValue( "some text" );
-        resource.addServiceProperty( propResource );
-
-        ScheduledServiceResourceResponse response = new ScheduledServiceResourceResponse();
-        response.setData( resource );
-
-        return serialize( variant, response );
     }
 
     /**
