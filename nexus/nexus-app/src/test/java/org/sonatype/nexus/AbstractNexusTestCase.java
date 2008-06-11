@@ -24,12 +24,15 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
+import net.sf.ehcache.Cache;
+
 import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.context.ContextException;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.sonatype.nexus.configuration.NexusConfiguration;
+import org.sonatype.nexus.proxy.cache.CacheManager;
 
 public abstract class AbstractNexusTestCase
     extends PlexusTestCase
@@ -41,6 +44,8 @@ public abstract class AbstractNexusTestCase
     protected static final File PLEXUS_HOME = new File( getBasedir(), "target/plexus-home" );
 
     protected NexusConfiguration nexusConfiguration;
+    
+    protected CacheManager cacheManager;
 
     protected void customizeContext( Context ctx )
     {
@@ -86,7 +91,7 @@ public abstract class AbstractNexusTestCase
         super.setUp();
 
         FileUtils.deleteDirectory( PLEXUS_HOME );
-
+        
         if ( loadConfigurationAtSetUp() )
         {
             nexusConfiguration = (NexusConfiguration) this.lookup( NexusConfiguration.ROLE );
@@ -95,6 +100,10 @@ public abstract class AbstractNexusTestCase
 
             nexusConfiguration.applyConfiguration();
         }
+        
+        cacheManager = (CacheManager) lookup( CacheManager.ROLE );
+        
+        cacheManager.startService();
     }
 
     protected void tearDown()
@@ -103,6 +112,8 @@ public abstract class AbstractNexusTestCase
         // this is done by DefaultNexus from now on
         // DefaultIndexerManager dim = (DefaultIndexerManager) lookup( IndexerManager.ROLE );
         // dim.shutdown( true );
+        
+        cacheManager.stopService();
 
         super.tearDown();
     }
