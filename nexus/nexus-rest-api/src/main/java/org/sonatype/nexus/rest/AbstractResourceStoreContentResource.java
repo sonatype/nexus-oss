@@ -61,6 +61,7 @@ import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.item.StorageLinkItem;
+import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.rest.model.ContentListResource;
 import org.sonatype.nexus.rest.model.ContentListResourceResponse;
 import org.sonatype.nexus.security.User;
@@ -236,7 +237,7 @@ public abstract class AbstractResourceStoreContentResource
             {
                 return renderItem( variant, getNexus().dereferenceLinkItem( item ) );
             }
-            catch ( Throwable e )
+            catch ( Exception e )
             {
                 handleException( e );
 
@@ -397,7 +398,7 @@ public abstract class AbstractResourceStoreContentResource
 
             return renderItem( variant, item );
         }
-        catch ( Throwable e )
+        catch ( Exception e )
         {
             handleException( e );
 
@@ -454,7 +455,7 @@ public abstract class AbstractResourceStoreContentResource
 
             getResponse().setEntity( result );
         }
-        catch ( Throwable e )
+        catch ( Exception e )
         {
             handleException( e );
         }
@@ -497,7 +498,7 @@ public abstract class AbstractResourceStoreContentResource
 
             getResourceStore().storeItem( req, body, null );
         }
-        catch ( Throwable t )
+        catch ( Exception t )
         {
             handleException( t );
         }
@@ -541,7 +542,7 @@ public abstract class AbstractResourceStoreContentResource
 
             store.deleteItem( req );
         }
-        catch ( Throwable e )
+        catch ( Exception e )
         {
             handleException( e );
         }
@@ -553,7 +554,7 @@ public abstract class AbstractResourceStoreContentResource
      * 
      * @param t
      */
-    protected void handleException( Throwable t )
+    protected void handleException( Exception t )
     {
         if ( t instanceof IllegalArgumentException )
         {
@@ -566,6 +567,10 @@ public abstract class AbstractResourceStoreContentResource
             getResponse().setStatus( Status.SERVER_ERROR_INTERNAL, t.getMessage() );
 
             getLogger().log( Level.SEVERE, "IO error!", t );
+        }
+        else if ( t instanceof UnsupportedStorageOperationException )
+        {
+            getResponse().setStatus( Status.CLIENT_ERROR_FORBIDDEN, t.getMessage() );
         }
         else if ( t instanceof NoSuchRepositoryException )
         {
