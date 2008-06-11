@@ -23,13 +23,13 @@ package org.sonatype.nexus.proxy.registry;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.codehaus.plexus.PlexusTestCase;
+import org.sonatype.nexus.proxy.AbstractNexusTestEnvironment;
 import org.sonatype.nexus.proxy.NoSuchRepositoryGroupException;
 import org.sonatype.nexus.proxy.repository.DummyRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 
 public class DefaultRepositoryRegistryTest
-    extends PlexusTestCase
+    extends AbstractNexusTestEnvironment
 {
 
     private RepositoryRegistry repositoryRegistry;

@@ -26,9 +26,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.codehaus.plexus.PlexusTestCase;
 import org.sonatype.nexus.configuration.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.model.CGroupsSettingPathMappingItem;
+import org.sonatype.nexus.proxy.AbstractNexusTestEnvironment;
 import org.sonatype.nexus.proxy.ResourceStore;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
@@ -36,7 +36,7 @@ import org.sonatype.nexus.proxy.repository.DummyRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 
 public class PathBasedRequestRepositoryMapperTest
-    extends PlexusTestCase
+    extends AbstractNexusTestEnvironment
 {
 
     private ApplicationConfiguration applicationConfiguration;

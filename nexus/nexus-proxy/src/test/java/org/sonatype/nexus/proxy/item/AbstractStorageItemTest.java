@@ -20,14 +20,14 @@
  */
 package org.sonatype.nexus.proxy.item;
 
-import org.codehaus.plexus.PlexusTestCase;
+import org.sonatype.nexus.proxy.AbstractNexusTestEnvironment;
 import org.sonatype.nexus.proxy.ResourceStore;
 import org.sonatype.nexus.proxy.repository.DummyRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.router.DummyRepositoryRouter;
 
 public class AbstractStorageItemTest
-    extends PlexusTestCase
+    extends AbstractNexusTestEnvironment
 {
 
     protected DummyRepository repository = new DummyRepository();

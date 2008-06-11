@@ -30,7 +30,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.codehaus.plexus.PlexusContainer;
-import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.logging.LoggerManager;
 import org.codehaus.plexus.util.FileUtils;
@@ -38,7 +37,6 @@ import org.codehaus.plexus.util.IOUtil;
 import org.sonatype.nexus.configuration.ApplicationConfiguration;
 import org.sonatype.nexus.proxy.attributes.AttributesHandler;
 import org.sonatype.nexus.proxy.attributes.DefaultAttributeStorage;
-import org.sonatype.nexus.proxy.cache.CacheManager;
 import org.sonatype.nexus.proxy.events.AbstractEvent;
 import org.sonatype.nexus.proxy.events.EventListener;
 import org.sonatype.nexus.proxy.events.RepositoryItemEvent;
@@ -59,7 +57,7 @@ import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
  * @author cstamas
  */
 public abstract class AbstractProxyTestEnvironment
-    extends PlexusTestCase
+    extends AbstractNexusTestEnvironment
 {
 
     /** The logger. */
@@ -79,9 +77,6 @@ public abstract class AbstractProxyTestEnvironment
 
     /** The remote repository storage. */
     private RemoteRepositoryStorage remoteRepositoryStorage;
-
-    /** The cache manager. */
-    private CacheManager cacheManager;
 
     /** The shared remote storage context */
     private RemoteStorageContext remoteStorageContext;
@@ -178,26 +173,6 @@ public abstract class AbstractProxyTestEnvironment
     }
 
     /**
-     * Gets the cache manager.
-     * 
-     * @return the cache manager
-     */
-    public CacheManager getCacheManager()
-    {
-        return cacheManager;
-    }
-
-    /**
-     * Sets the cache manager.
-     * 
-     * @param cacheManager the new cache manager
-     */
-    public void setCacheManager( CacheManager cacheManager )
-    {
-        this.cacheManager = cacheManager;
-    }
-
-    /**
      * Gets the logger.
      * 
      * @return the logger
@@ -268,8 +243,6 @@ public abstract class AbstractProxyTestEnvironment
 
         repositoryRegistry.addProximityEventListener( testEventListener );
 
-        cacheManager = (CacheManager) lookup( CacheManager.ROLE );
-
         attributesHandler = (AttributesHandler) lookup( AttributesHandler.ROLE );
 
         ( (DefaultAttributeStorage) attributesHandler.getAttributeStorage() )
@@ -284,8 +257,6 @@ public abstract class AbstractProxyTestEnvironment
         rootRouter = (RepositoryRouter) lookup( ResourceStoreIdBasedRepositoryRouter.ROLE );
 
         routers = getContainer().lookupMap( RepositoryRouter.ROLE );
-
-        cacheManager.startService();
 
         getEnvironmentBuilder().buildEnvironment( this );
 
@@ -303,8 +274,6 @@ public abstract class AbstractProxyTestEnvironment
         throws Exception
     {
         getEnvironmentBuilder().stop();
-
-        cacheManager.stopService();
 
         super.tearDown();
     }

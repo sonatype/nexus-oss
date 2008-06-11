@@ -24,8 +24,8 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.util.FileUtils;
+import org.sonatype.nexus.proxy.AbstractNexusTestEnvironment;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
@@ -39,7 +39,7 @@ import org.sonatype.nexus.proxy.storage.local.fs.DefaultFSLocalRepositoryStorage
  * @author cstamas
  */
 public class DefaultAttributesHandlerTest
-    extends PlexusTestCase
+    extends AbstractNexusTestEnvironment
 {
 
     protected DefaultAttributesHandler attributesHandler;

@@ -22,8 +22,8 @@ package org.sonatype.nexus.proxy.attributes;
 
 import java.io.ByteArrayInputStream;
 
-import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.util.FileUtils;
+import org.sonatype.nexus.proxy.AbstractNexusTestEnvironment;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.repository.DummyRepository;
@@ -34,7 +34,7 @@ import org.sonatype.nexus.proxy.repository.DummyRepository;
  * @author cstamas
  */
 public class DefaultAttributeStorageTest
-    extends PlexusTestCase
+    extends AbstractNexusTestEnvironment
 {
 
     protected DefaultAttributeStorage attributeStorage;

@@ -20,17 +20,19 @@
  */
 package org.sonatype.nexus.proxy.cache;
 
-import org.codehaus.plexus.PlexusTestCase;
+import org.sonatype.nexus.proxy.AbstractNexusTestEnvironment;
 
 public class EhCacheCacheManagerTest
-    extends PlexusTestCase
+    extends AbstractNexusTestEnvironment
 {
 
     public void testGetCache()
         throws Exception
     {
         CacheManager cm = (CacheManager) lookup( CacheManager.ROLE );
+        
         PathCache c = cm.getPathCache( "test" );
+        
         assertEquals( true, null != c );
     }
 
@@ -38,6 +40,7 @@ public class EhCacheCacheManagerTest
         throws Exception
     {
         CacheManager cm = (CacheManager) lookup( CacheManager.ROLE );
+        
         PathCache c = cm.getPathCache( "test" );
 
         c.put( "/com", Boolean.TRUE );
@@ -62,6 +65,7 @@ public class EhCacheCacheManagerTest
         throws Exception
     {
         CacheManager cm = (CacheManager) lookup( CacheManager.ROLE );
+        
         PathCache c = cm.getPathCache( "test" );
 
         c.put( "/com/", Boolean.TRUE );
