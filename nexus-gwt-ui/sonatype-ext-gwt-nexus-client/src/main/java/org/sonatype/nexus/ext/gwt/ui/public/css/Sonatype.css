@@ -80,6 +80,11 @@ button.st-icon-refresh {
   height: 18px;
   margin: 0;
 }
+.my-tree-loading .my-tree-icon .tree-folder {
+  background: url(../images/default/tree/loading.gif);
+  background-repeat: no-repeat;
+  background-position: 0 0;
+}
 .my-tree-icon .tree-folder {
   background-image: url(../images/default/tree/folder.gif);
   background-position: 0 0;
