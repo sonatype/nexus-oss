@@ -81,6 +81,8 @@ import org.sonatype.nexus.rest.model.ScheduledServiceMonthlyResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceOnceResource;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceResourceResponse;
+import org.sonatype.nexus.rest.model.ScheduledServiceResourceStatus;
+import org.sonatype.nexus.rest.model.ScheduledServiceResourceStatusResponse;
 import org.sonatype.nexus.rest.model.ScheduledServiceTypePropertyResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceTypeResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceTypeResourceResponse;
@@ -91,6 +93,7 @@ import org.sonatype.nexus.rest.model.StatusResource;
 import org.sonatype.nexus.rest.model.StatusResourceResponse;
 import org.sonatype.nexus.rest.repositories.RepositoryBaseResourceConverter;
 import org.sonatype.nexus.rest.schedules.ScheduledServiceBaseResourceConverter;
+import org.sonatype.nexus.rest.schedules.ScheduledServicePropertyResourceConverter;
 
 import com.thoughtworks.xstream.XStream;
 
@@ -102,6 +105,9 @@ public final class XStreamInitializer
             .getReflectionProvider() ), XStream.PRIORITY_VERY_HIGH );
 
         xstream.registerConverter( new ScheduledServiceBaseResourceConverter( xstream.getMapper(), xstream
+            .getReflectionProvider() ), XStream.PRIORITY_VERY_HIGH );
+        
+        xstream.registerConverter( new ScheduledServicePropertyResourceConverter( xstream.getMapper(), xstream
             .getReflectionProvider() ), XStream.PRIORITY_VERY_HIGH );
 
         // aliasaes
@@ -195,6 +201,8 @@ public final class XStreamInitializer
         xstream.omitField( ScheduledServiceTypeResourceResponse.class, "modelEncoding" );
         xstream.omitField( ScheduledServiceTypeResource.class, "modelEncoding" );
         xstream.omitField( ScheduledServiceTypePropertyResource.class, "modelEncoding" );
+        xstream.omitField( ScheduledServiceResourceStatus.class, "modelEncoding" );
+        xstream.omitField( ScheduledServiceResourceStatusResponse.class, "modelEncoding" );
 
         xstream.omitField( NFCResourceResponse.class, "modelEncoding" );
         xstream.omitField( NFCResource.class, "modelEncoding" );

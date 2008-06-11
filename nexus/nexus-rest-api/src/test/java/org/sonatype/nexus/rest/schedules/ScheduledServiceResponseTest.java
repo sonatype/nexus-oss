@@ -27,6 +27,7 @@ import org.sonatype.nexus.rest.model.ScheduledServiceAdvancedResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceDailyResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceMonthlyResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceOnceResource;
+import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceResourceResponse;
 import org.sonatype.nexus.rest.model.ScheduledServiceWeeklyResource;
 import org.sonatype.nexus.rest.xstream.XStreamInitializer;
@@ -164,6 +165,27 @@ public class ScheduledServiceResponseTest
         assert response.getData().getName().equals( "test" );
         assert response.getData().getTypeId().equals( "Synchronize Repositories" );
         assert response.getData().getSchedule().equals( "advanced" );
+        assert ( (ScheduledServiceAdvancedResource) response.getData() ).getCronCommand().equals( "somecroncommand" );
+    }
+    
+    public void testAdvancedScheduledServiceWithProperties()
+        throws Exception
+    {
+        String jsonString =
+            "{\"data\":{\"id\":null,\"name\":\"test\",\"typeId\":\"Synchronize Repositories\",\"schedule\":\"advanced\",\"cronCommand\":\"somecroncommand\",\"properties\":[{\"id\":\"1\",\"value\":\"true\",\"@class\":\"org.sonatype.nexus.rest.model.ScheduledServicePropertyResource\"}]}}}";
+        XStreamRepresentation representation =
+            new XStreamRepresentation( xstream, jsonString, MediaType.APPLICATION_JSON );
+    
+        ScheduledServiceResourceResponse response =
+            (ScheduledServiceResourceResponse) representation.getPayload( new ScheduledServiceResourceResponse() );
+    
+        assert response.getData().getId() == null;
+        assert response.getData().getName().equals( "test" );
+        assert response.getData().getTypeId().equals( "Synchronize Repositories" );
+        assert response.getData().getSchedule().equals( "advanced" );
+        assert response.getData().getProperties().size() == 1;
+        assert ( (ScheduledServicePropertyResource) response.getData().getProperties().get( 0 ) ).getId().equals( "1" );
+        assert ( (ScheduledServicePropertyResource) response.getData().getProperties().get( 0 ) ).getValue().equals( "true" );
         assert ( (ScheduledServiceAdvancedResource) response.getData() ).getCronCommand().equals( "somecroncommand" );
     }
 }

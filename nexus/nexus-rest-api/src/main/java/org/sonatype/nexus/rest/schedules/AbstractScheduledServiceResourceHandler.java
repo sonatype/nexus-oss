@@ -89,6 +89,11 @@ public class AbstractScheduledServiceResourceHandler
      * Type property resource: number
      */
     public static final String PROPERTY_TYPE_NUMBER = "number";
+    
+    /**
+     * Type property resource: number
+     */
+    public static final String PROPERTY_TYPE_BOOLEAN = "boolean";
 
     /**
      * Type property resource: date
@@ -98,12 +103,17 @@ public class AbstractScheduledServiceResourceHandler
     /**
      * Type property resource: repository
      */
-    public static final String PROPERTY_TYPE_REPO = "repository";
+    public static final String PROPERTY_TYPE_REPO = "repo";
 
     /**
      * Type property resource: repositoryGroup
      */
-    public static final String PROPERTY_TYPE_REPO_GROUP = "repositoryGroup";
+    public static final String PROPERTY_TYPE_REPO_GROUP = "group";
+    
+    /**
+     * Type property resource: repo-or-group
+     */
+    public static final String PROPERTY_TYPE_REPO_OR_GROUP = "repo-or-group";
     
     public static final Integer DAY_OF_MONTH_LAST = new Integer( 999 );
 

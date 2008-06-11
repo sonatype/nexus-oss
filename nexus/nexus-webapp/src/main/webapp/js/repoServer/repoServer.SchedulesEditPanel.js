@@ -162,13 +162,29 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
     {name:'lastRunResult'}
   ]);
   
+  //Datastore that will hold both repos and repogroups
+  this.repoOrGroupDataStore = new Ext.data.SimpleStore({fields:['id','name'], id:'id'});
+  
   //Reader and datastore that queries the server for the list of repositories
   this.repositoryReader = new Ext.data.JsonReader({root: 'data', id: 'id'}, this.repositoryRecordConstructor );  
   this.repositoryDataStore = new Ext.data.Store({
     url: Sonatype.config.repos.urls.repositories,
     reader: this.repositoryReader,
     sortInfo: {field: 'name', direction: 'ASC'},
-    autoLoad: true
+    autoLoad: true,
+    listeners: {
+      'load' : {
+        fn: function() {
+          this.repositoryDataStore.each(function(item,i,len){
+            var rec = item.copy();
+            rec.data.id = 'repo_' + rec.data.id;
+            rec.data.name = rec.data.name + ' (Repo)';
+            this.repoOrGroupDataStore.add(rec);
+          },this);
+        },
+        scope: this
+      }
+    }
   });
   
   //Reader and datastore that queries the server for the list of repository groups
@@ -177,7 +193,20 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
     url: Sonatype.config.repos.urls.groups,
     reader: this.repositoryGroupReader,
     sortInfo: {field: 'name', direction: 'ASC'},
-    autoLoad: true
+    autoLoad: true,
+    listeners: {
+      'load' : {
+        fn: function() {
+          this.repositoryGroupDataStore.each(function(item,i,len){
+            var rec = item.copy();
+            rec.data.id = 'group_' + rec.data.id;
+            rec.data.name = rec.data.name + ' (Group)';
+            this.repoOrGroupDataStore.add(rec);
+          },this);
+        },
+        scope: this
+      }
+    }
   });
   
   //Reader and datastore that queries the server for the list of service types
@@ -960,6 +989,17 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
             width: 200
           };
         }
+        else if(curRec.type == 'boolean'){
+          items[j] =
+          {
+            xtype: 'checkbox',
+            fieldLabel: curRec.name,
+            itemCls: curRec.required ? 'required-field' : '',
+            helpText: curRec.helpText,
+            name: 'serviceProperties_' + curRec.id,
+            disabled:true
+          };
+        }
         else if(curRec.type == 'date'){
           items[j] =
           {
@@ -972,7 +1012,7 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
             disabled:true
           };
         }
-        else if(curRec.type == 'repository'){
+        else if(curRec.type == 'repo'){
           items[j] =
           {
             xtype: 'combo',
@@ -995,7 +1035,7 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
             minListWidth: 200
           };
         }
-        else if(curRec.type == 'repositoryGroup'){
+        else if(curRec.type == 'group'){
           items[j] =
           {
             xtype: 'combo',
@@ -1004,6 +1044,29 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
             helpText: curRec.helpText,
             name: 'serviceProperties_' + curRec.id,
             store: this.repositoryGroupDataStore,
+            displayField:'name',
+            valueField:'id',
+            editable: false,
+            forceSelection: true,
+            mode: 'local',
+            triggerAction: 'all',
+            emptyText:'Select...',
+            selectOnFocus:true,
+            allowBlank: curRec.required ? false : true,
+            disabled: true,
+            width: 200,
+            minListWidth: 200
+          };
+        }
+        else if(curRec.type == 'repo-or-group'){
+          items[j] =
+          {
+            xtype: 'combo',
+            fieldLabel: curRec.name,
+            itemCls: curRec.required ? 'required-field' : '',
+            helpText: curRec.helpText,
+            name: 'serviceProperties_' + curRec.id,
+            store: this.repoOrGroupDataStore,
             displayField:'name',
             valueField:'id',
             editable: false,
@@ -1042,6 +1105,7 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
   reloadAll : function(){
     this.schedulesDataStore.removeAll();
     this.schedulesDataStore.reload();
+    this.repoOrGroupDataStore.removeAll();
     this.repositoryDataStore.reload();
     this.repositoryGroupDataStore.reload();
     this.serviceTypeDataStore.reload();
@@ -1717,6 +1781,9 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
         //force to a string, as that is what the current api requires
         value = '' + item.getValue();
       }
+      else if (item.xtype == 'checkbox'){
+        value = '' + item.getValue();
+      }
       else if (item.xtype == 'combo'){
         value = item.getValue();
       }
@@ -1851,6 +1918,9 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
         }
         else if (servicePropertyItem.xtype == 'numberfield'){
           servicePropertyItem.setValue(Number(srcObj.properties[i].value));
+        }
+        else if (servicePropertyItem.xtype == 'checkbox'){
+          servicePropertyItem.setValue(Boolean(srcObj.properties[i].value));
         }
         else if (servicePropertyItem.xtype == 'combo'){
           servicePropertyItem.setValue(srcObj.properties[i].value);

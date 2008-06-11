@@ -85,31 +85,9 @@ public class ScheduledServiceListResourceHandler
                 item.setStatus( StringUtils.capitalise( task.getTaskState().toString() ) );
                 item.setTypeId( task.getType() );
                 item.setTypeName( getServiceTypeName( task.getType() ) );
-                if ( task.getScheduledAt() != null)
-                {
-                    item.setCreated( task.getScheduledAt().toString() );
-                }
-                else
-                {
-                    item.setCreated( "n/a" );
-                }
-                if ( task.getLastRun() != null)
-                {
-                    item.setLastRunTime( task.getLastRun().toString() );
-                }
-                else
-                {
-                    item.setLastRunTime( "n/a" );
-                }
-                if ( task.getNextRun() != null)
-                {
-                    item.setNextRunTime( task.getNextRun().toString() );
-                }
-                else
-                {
-                    item.setNextRunTime( "n/a" );
-                }
-                
+                item.setCreated( task.getScheduledAt() == null ? "n/a" : task.getScheduledAt().toString() );
+                item.setLastRunTime( task.getLastRun() == null ? "n/a" : task.getLastRun().toString() );
+                item.setNextRunTime( task.getNextRun() == null ? "n/a" : task.getNextRun().toString() );
                 item.setSchedule( getScheduleShortName( task.getSchedule() ) );
                 
                 response.addData( item );
