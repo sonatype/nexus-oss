@@ -119,8 +119,8 @@ public class ScheduledServiceTypeResourceHandler
         property.setId( ClearCacheTask.RESOURCE_STORE_PATH_KEY );
         property.setName( "Repository path" );
         property.setType( PROPERTY_TYPE_STRING );
-        property
-            .setHelpText( "Type in the repository path from which to clear caches recursively (ie. \"/\" for root or \"/org/apache\")" );
+        property.setHelpText( "Type in the repository path from which to clear caches recursively (ie. \"/\" for root or \"/org/apache\")" );
+        property.setRequired( true );
         type.addProperty( property );
         response.addData( type );
 
@@ -146,8 +146,7 @@ public class ScheduledServiceTypeResourceHandler
         property.setName( "Snapshot retention (days)" );
         property.setType( PROPERTY_TYPE_NUMBER );
         property.setRequired( true );
-        property
-            .setHelpText( "The job will purge all snapshots older than the entered number of days, but will obey to Min. count of snapshots to keep." );
+        property.setHelpText( "The job will purge all snapshots older than the entered number of days, but will obey to Min. count of snapshots to keep." );
         type.addProperty( property );
         response.addData( type );
         
