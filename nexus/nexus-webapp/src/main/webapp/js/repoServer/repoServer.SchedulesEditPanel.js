@@ -30,7 +30,9 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
   var ht = Sonatype.repoServer.resources.help.schedules;
   
   //List of schedule types
-  this.scheduleTypeStore = new Ext.data.SimpleStore({fields:['value'], data:[['None'],['Once'],['Daily'],['Weekly'],['Monthly'],['Advanced']]});
+  //None removed for the time being
+  //this.scheduleTypeStore = new Ext.data.SimpleStore({fields:['value'], data:[['None'],['Once'],['Daily'],['Weekly'],['Monthly'],['Advanced']]});
+  this.scheduleTypeStore = new Ext.data.SimpleStore({fields:['value'], data:[['Once'],['Daily'],['Weekly'],['Monthly'],['Advanced']]});
   //List of weekdays
   this.weekdaysList = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
   
@@ -1397,7 +1399,7 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
         
         var newRec = new this.scheduleRecordConstructor(
           dataObj,
-          receivedData.resourceURI);
+          action.options.fpanel.id);
         
         this.schedulesDataStore.remove(this.schedulesDataStore.getById(action.options.fpanel.id)); //remove old one
         this.schedulesDataStore.addSorted(newRec);
@@ -1419,6 +1421,9 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
         action.options.fpanel.buttons[0].on('click', this.saveHandler.createDelegate(this, [buttonInfoObj]));
         //cancel button event handler
         action.options.fpanel.buttons[1].on('click', this.cancelHandler.createDelegate(this, [buttonInfoObj]));
+        
+        //disable the service type, only avaiable on add
+        action.options.fpanel.find('name', 'typeId')[0].disable();
       }
       else {
         var sentData = action.output.data;
@@ -1473,6 +1478,7 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
     var rec = grid.store.getAt(rowIndex);
     var id = rec.id; //note: rec.id is unique for new resources and equal to resourceURI for existing ones
     var formPanel = this.formCards.findById(id);
+    var schedulePanel = null;
     
     //assumption: new route forms already exist in formCards, so they won't get into this case
     if(!formPanel){ //create form and populate current data
@@ -1486,7 +1492,7 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
       formPanel.on('afterlayout', this.afterLayoutFormHandler, this, {single:true});
   
       //On load need to make sure and set the proper schedule type card as active    
-      var schedulePanel = formPanel.find('id', 'schedule-config-card-panel')[0];
+      schedulePanel = formPanel.find('id', 'schedule-config-card-panel')[0];
       if (rec.data.schedule == 'once'){
         schedulePanel.activeItem = 1;
       }
@@ -1521,7 +1527,7 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
         }
       });
             
-      formPanel.find('name', 'typeId')[0].on('select', this.serviceTypeSelectHandler, formPanel);
+      formPanel.find('name', 'typeId')[0].disable();
       formPanel.find('name', 'schedule')[0].on('select', this.serviceScheduleSelectHandler, formPanel);
       
       var buttonInfoObj = {
@@ -1542,7 +1548,9 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
 
     //always set active
     this.formCards.getLayout().setActiveItem(formPanel);
-    schedulePanel.doLayout();
+    if (schedulePanel != null){    
+      schedulePanel.doLayout();
+    }
   },
   
   contextClick : function(grid, index, e){
