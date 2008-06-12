@@ -1320,6 +1320,8 @@ Ext.extend(Sonatype.repoServer.RepoEditPanel, Sonatype.repoServer.AbstractRepoPa
       else{
         gridSelectModel.clearSelections();
       }
+
+      Sonatype.Events.fireEvent( 'repositoryChanged' );
     }
     else {
       Ext.MessageBox.alert('The server did not delete the repository.');

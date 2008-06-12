@@ -638,6 +638,8 @@ Ext.extend(Sonatype.repoServer.GroupsEditPanel, Ext.Panel, {
       else{
         gridSelectModel.clearSelections();
       }
+
+      Sonatype.Events.fireEvent( 'groupChanged' );
     }
     else {
       Ext.MessageBox.alert('The server did not delete the group.');
