@@ -45,6 +45,14 @@ Sonatype.repoServer.RepoServer = function(){
     '</ul>'
   );
 
+  var linkTpl = new Ext.XTemplate(
+    '<ul class="group-links">',
+    '<tpl for="links">',
+      '<li><a href="{href}" target="{href}">{title}</a></li>',
+    '</tpl>',
+    '</ul>'
+  );
+
 
 // ************************************  
   return {
@@ -78,6 +86,16 @@ Sonatype.repoServer.RepoServer = function(){
       //buttons added later to provide scope to handler
        
     },
+
+    addClickListeners: function( p ) {
+      p.on('render', 
+        function(panel){
+          panel.body.on('click', Ext.emptyFn, null, {delegate:'a', preventDefault:true});
+          panel.body.on('mousedown', this.doAction, this, {delegate:'a'});
+        },
+        this
+      );
+    },
     
     // Each Sonatype server will need one of these 
     initServerTab : function() {
@@ -91,15 +109,7 @@ Sonatype.repoServer.RepoServer = function(){
         border: false
         //items: groupConfigs
       });
-      
-      this.nexusPanel.on('render', 
-        function(panel){
-          panel.body.on('click', Ext.emptyFn, null, {delegate:'a', preventDefault:true});
-          panel.body.on('mousedown', this.doAction, this, {delegate:'a'});
-        },
-        this
-      );
-      
+
       this.createSubComponents();
       
       Sonatype.view.serverTabPanel.add(this.nexusPanel);
@@ -224,7 +234,7 @@ Sonatype.repoServer.RepoServer = function(){
       }
       if(vTplData.links.length > 0){
         panelConf = Ext.apply({}, {title:'Views', id:'st-nexus-views', html: bodyTpl.apply(vTplData)}, defaultGroupPanel);
-        this.nexusPanel.add(panelConf);
+        this.addClickListeners( this.nexusPanel.add(panelConf) ); 
         //groupConfigs.push(panelConf);
       }
 
@@ -253,7 +263,7 @@ Sonatype.repoServer.RepoServer = function(){
       }
       if(cTplData.links.length > 0){
         panelConf = Ext.apply({}, {title:'Configuration', id:'st-nexus-config', html: bodyTpl.apply(cTplData)}, defaultGroupPanel);
-        this.nexusPanel.add(panelConf);
+        this.addClickListeners( this.nexusPanel.add(panelConf) ); 
         //groupConfigs.push(panelConf);
       }
 /*
@@ -270,6 +280,35 @@ Sonatype.repoServer.RepoServer = function(){
         this.nexusPanel.add( panelConf );
       }
 */
+
+      //Security Group **************************************************
+      var sTplData = {links:[]};
+      if( sp.checkPermission( userPerms.configServer, sp.EDIT ) ) {
+        sTplData.links.push( { id: 'open-security-users', title: 'Users' } );
+      }
+      if ( sp.checkPermission( userPerms.configServer, sp.EDIT ) ) {
+        sTplData.links.push( { id: 'open-security-roles', title: 'Roles' } );
+      }
+      if ( sTplData.links.length > 0 ){
+        panelConf = Ext.apply( {}, { title:'Security', id: 'st-nexus-security', html: bodyTpl.apply( sTplData ) }, defaultGroupPanel );
+      this.nexusPanel.add( Ext.apply( {},
+        {
+          title: 'Help',
+          id: 'st-nexus-docs',
+          html: linkTpl.apply({
+            links: [
+              { href: 'http://nexus.sonatype.org/', title: 'Nexus Home' },
+              { href: 'http://www.sonatype.com/book/reference/repository-manager.html', title: 'Getting Started' },
+              { href: 'https://docs.sonatype.com/display/Nexus/Home', title: 'Nexus Wiki' },
+              { href: 'http://www.sonatype.com/book/reference/public-book.html', title: 'Maven Book' },
+              { href: 'http://nexus.sonatype.org/changes.html', title: 'Release Notes' },
+              { href: 'http://issues.sonatype.org/browse/NEXUS', title: 'Report Issues' }
+            ]
+          }) 
+        },
+        defaultGroupPanel ) );
+      }
+
       if (wasRendered) {
         this.nexusPanel.doLayout();
         this.nexusPanel.getEl().unmask();
