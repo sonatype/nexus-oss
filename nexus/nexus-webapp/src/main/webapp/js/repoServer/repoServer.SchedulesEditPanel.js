@@ -1542,6 +1542,7 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
 
     //always set active
     this.formCards.getLayout().setActiveItem(formPanel);
+    schedulePanel.doLayout();
   },
   
   contextClick : function(grid, index, e){
