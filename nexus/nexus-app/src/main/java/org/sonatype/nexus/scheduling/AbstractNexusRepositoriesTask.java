@@ -20,6 +20,8 @@
  */
 package org.sonatype.nexus.scheduling;
 
+import org.codehaus.plexus.util.StringUtils;
+
 public abstract class AbstractNexusRepositoriesTask<T>
     extends AbstractNexusTask<T>
 {
@@ -40,7 +42,10 @@ public abstract class AbstractNexusRepositoriesTask<T>
 
     public void setRepositoryId( String repositoryId )
     {
-        getParameters().put( REPOSITORY_OR_GROUP_ID_KEY, REPO_PREFIX + repositoryId );
+        if ( !StringUtils.isEmpty( repositoryId ) )
+        {
+            getParameters().put( REPOSITORY_OR_GROUP_ID_KEY, REPO_PREFIX + repositoryId );
+        }
     }
 
     public String getRepositoryGroupId()
@@ -56,6 +61,9 @@ public abstract class AbstractNexusRepositoriesTask<T>
 
     public void setRepositoryGroupId( String repositoryGroupId )
     {
-        getParameters().put( REPOSITORY_OR_GROUP_ID_KEY, GROUP_PREFIX + repositoryGroupId );
+        if ( !StringUtils.isEmpty( repositoryGroupId ) )
+        {
+            getParameters().put( REPOSITORY_OR_GROUP_ID_KEY, GROUP_PREFIX + repositoryGroupId );
+        }
     }
 }
