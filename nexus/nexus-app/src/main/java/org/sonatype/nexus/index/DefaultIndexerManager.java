@@ -427,7 +427,7 @@ public class DefaultIndexerManager
                         context.updateTimestamp();
 
                         getLogger().info(
-                            "Remote indexes published and merged succesfully for repository " + repository.getId() );
+                            "Remote indexes published and imported succesfully for repository " + repository.getId() );
 
                         hasRemoteIndex = true;
                     }
