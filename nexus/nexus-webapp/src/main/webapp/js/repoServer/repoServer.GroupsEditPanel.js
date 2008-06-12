@@ -714,6 +714,8 @@ Ext.extend(Sonatype.repoServer.GroupsEditPanel, Ext.Panel, {
         var sortState = this.groupsDataStore.getSortState();
         this.groupsDataStore.sort(sortState.field, sortState.direction);
       }
+
+      Sonatype.Events.fireEvent( 'groupChanged' );
     }
   },
 

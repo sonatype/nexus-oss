@@ -37,6 +37,9 @@ Sonatype.repoServer.RepoMaintPanel = function(config){
   var forceStatuses = false;
   Ext.apply(this, config, defaultConfig);
 
+  Sonatype.Events.addListener( 'repositoryChanged', this.onRepoChange, this );
+  Sonatype.Events.addListener( 'groupChanged', this.onRepoChange, this );
+
   this.actions = {
     view : new Ext.Action({
       text: 'View',
@@ -335,6 +338,15 @@ Sonatype.repoServer.RepoMaintPanel = function(config){
     autoScroll: false,
     width: '100%',
     height: '100%',
+    listeners: {
+      'beforedestroy': {
+        fn: function(){
+          Sonatype.Events.removeListener( 'repositoryChanged', this.onRepoChange, this );
+          Sonatype.Events.removeListener( 'groupChanged', this.onRepoChange, this );
+        },
+        scope: this
+      }
+    },
     items: [
       this.reposGridPanel,
       {
@@ -800,6 +812,10 @@ Ext.extend(Sonatype.repoServer.RepoMaintPanel, Sonatype.repoServer.AbstractRepoP
     else {
       Ext.MessageBox.alert('Status retrieval failed');
     }
+  },
+  
+  onRepoChange: function() {
+    this.reloadAll();
   }
 
 });

@@ -1387,6 +1387,8 @@ Ext.extend(Sonatype.repoServer.RepoEditPanel, Sonatype.repoServer.AbstractRepoPa
         var sortState = this.reposDataStore.getSortState();
         this.reposDataStore.sort(sortState.field, sortState.direction);
       }
+
+      Sonatype.Events.fireEvent( 'repositoryChanged' );
     }
     
     if (action.type == 'sonatypeLoad'){

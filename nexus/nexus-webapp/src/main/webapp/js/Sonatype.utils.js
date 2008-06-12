@@ -241,3 +241,13 @@ Sonatype.utils = {
 };
 
 })();
+
+
+Sonatype.utils.Observable = function(){
+  this.addEvents({
+    'repositoryChanged': true,
+    'groupChanged': true 
+  });
+};
+Ext.extend( Sonatype.utils.Observable, Ext.util.Observable );
+Sonatype.Events = new Sonatype.utils.Observable();
