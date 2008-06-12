@@ -7,7 +7,7 @@
  *
  * Contributors:
  *    Eugene Kuleshov (Sonatype)
- *    Tamás Cservenák (Sonatype)
+ *    Tamï¿½s Cservenï¿½k (Sonatype)
  *    Brian Fox (Sonatype)
  *    Jason Van Zyl (Sonatype)
  *******************************************************************************/
@@ -38,17 +38,68 @@ public class QueryCreatorTest
 
     public void testConstructQuery()
     {
+        // ARTIFACT_ID : dots are not left in place
+
         Query q = queryCreator.constructQuery( ArtifactInfo.ARTIFACT_ID, "something is dotted" );
 
         assertEquals( "a:something* a:is* a:dotted*", q.toString() );
 
         q = queryCreator.constructQuery( ArtifactInfo.ARTIFACT_ID, "something.is.dotted" );
 
+        assertEquals( "+a:something +a:is +a:dotted*", q.toString() );
+
+        q = queryCreator.constructQuery( ArtifactInfo.ARTIFACT_ID, "\"something.is.dotted\"" );
+
         assertEquals( "a:\"something is dotted\"", q.toString() );
+
+        
+        // GROUP_ID : dots are left in place
+
+        q = queryCreator.constructQuery( ArtifactInfo.GROUP_ID, "something is dotted" );
+
+        assertEquals( "g:something* g:is* g:dotted*", q.toString() );
 
         q = queryCreator.constructQuery( ArtifactInfo.GROUP_ID, "something.is.dotted" );
 
         assertEquals( "g:something.is.dotted*", q.toString() );
-    }
+
+        q = queryCreator.constructQuery( ArtifactInfo.GROUP_ID, "\"something.is.dotted\"" );
+
+        assertEquals( "g:\"something.is.dotted\"*", q.toString() );
+        
+        // some special chars
+        
+        q = queryCreator.constructQuery( ArtifactInfo.ARTIFACT_ID, "_" );
+
+        assertEquals( "a:_*", q.toString() );
+
+        q = queryCreator.constructQuery( ArtifactInfo.ARTIFACT_ID, "geronimo-javamail_1.4" );
+
+        assertEquals( "+a:geronimo +a:javamail +a:1 +a:4*", q.toString() );
+
+        q = queryCreator.constructQuery( ArtifactInfo.ARTIFACT_ID, "commons-col" );
+
+        assertEquals( "+a:commons +a:col*", q.toString() );
+
+        q = queryCreator.constructQuery( ArtifactInfo.ARTIFACT_ID, "\"commons-col\"" );
+
+        assertEquals( "a:\"commons col\"", q.toString() );
+
+        q = queryCreator.constructQuery( ArtifactInfo.GROUP_ID, "_" );
+
+        assertEquals( "g:_*", q.toString() );
+
+        q = queryCreator.constructQuery( ArtifactInfo.GROUP_ID, "geronimo-javamail_1.4" );
+
+        assertEquals( "+g:geronimo +g:javamail +g:1.4*", q.toString() );
+
+        q = queryCreator.constructQuery( ArtifactInfo.GROUP_ID, "commons-col" );
+
+        assertEquals( "+g:commons +g:col*", q.toString() );
+
+        q = queryCreator.constructQuery( ArtifactInfo.GROUP_ID, "\"commons-col\"" );
+
+        assertEquals( "g:\"commons col\"", q.toString() );
+}
 
 }

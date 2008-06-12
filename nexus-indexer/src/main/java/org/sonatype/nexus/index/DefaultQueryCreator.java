@@ -7,7 +7,7 @@
  *
  * Contributors:
  *    Eugene Kuleshov (Sonatype)
- *    Tamás Cservenák (Sonatype)
+ *    Tamas Cservenak (Sonatype)
  *    Brian Fox (Sonatype)
  *    Jason Van Zyl (Sonatype)
  *******************************************************************************/
@@ -67,53 +67,111 @@ public class DefaultQueryCreator
             {
                 if ( phrase.indexOf( 'X' ) > -1 )
                 {
+                    // we have a joker in it
+
                     BooleanQuery bq = new BooleanQuery();
 
                     for ( int i = 0; i < len; i++ )
                     {
                         if ( terms[i].indexOf( 'X' ) > -1 )
                         {
+                            // any that has a joker
+
                             Query q1 = new WildcardQuery( new Term( field, terms[i].replaceAll( "X", "*" ) ) );
-                            
+
                             bq.add( q1, BooleanClause.Occur.MUST );
                         }
-                        else if ( i < len - 1 )
+                        else if ( i < ( len - 1 ) )
                         {
+                            // any "in the middle"
+
                             Query q1 = new TermQuery( new Term( field, terms[i] ) );
-                            
+
                             bq.add( q1, BooleanClause.Occur.MUST );
                         }
                         else
                         {
+                            // the last one
+
                             Query q1 = new PrefixQuery( new Term( field, terms[i] ) );
-                            
+
                             bq.add( q1, BooleanClause.Occur.MUST );
                         }
                     }
 
                     queries.add( bq );
                 }
-                else
+                else if ( phrase.startsWith( "\"" ) && phrase.endsWith( "\"" ) )
                 {
+                    // we have quotes around, make it a phrase query
+
                     PhraseQuery pq = new PhraseQuery();
 
-                    for ( int i = 0; i < len; i++ )
+                    if ( len == 1 )
                     {
-                        pq.add( new Term( field, terms[i] ) );
+                        // "shave" those quotes
+                        pq.add( new Term( field, terms[0].substring( 1, terms.length - 1 ) ) );
+                    }
+                    else
+                    {
+                        for ( int i = 0; i < len; i++ )
+                        {
+                            if ( i == 0 )
+                            {
+                                // first: "shave" those quotes
+                                pq.add( new Term( field, terms[i].substring( 1 ) ) );
+                            }
+                            else if ( i == len - 1 )
+                            {
+                                // last: "shave" those quotes
+                                pq.add( new Term( field, terms[i].substring( 0, terms[i].length() - 1 ) ) );
+                            }
+                            else
+                            {
+                                // in the middle
+                                pq.add( new Term( field, terms[i] ) );
+                            }
+                        }
                     }
 
                     queries.add( pq );
+                }
+                else
+                {
+                    // we have a "free" phrase, combine it into query from multiple Term + last as Wildcard query
+
+                    BooleanQuery bq = new BooleanQuery();
+
+                    Query q1 = null;
+
+                    for ( int i = 0; i < len; i++ )
+                    {
+                        if ( i < len - 1 )
+                        {
+                            // all in the middle
+                            q1 = new TermQuery( new Term( field, terms[i] ) );
+                        }
+                        else
+                        {
+                            // the last term
+                            q1 = new PrefixQuery( new Term( field, terms[i] ) );
+                        }
+
+                        bq.add( q1, BooleanClause.Occur.MUST );
+                    }
+
+                    queries.add( bq );
                 }
             }
             else
             {
                 if ( phrase.indexOf( 'X' ) > -1 )
                 {
-                    queries.add( new WildcardQuery( new Term( field, terms[0].replaceAll( "X", "*" ) ) ) );
+                    queries.add( new WildcardQuery( new Term( field, phrase.replaceAll( "X", "*" ) ) ) );
                 }
                 else
                 {
-                    queries.add( new PrefixQuery( new Term( field, terms[0] ) ) );
+                    queries.add( new PrefixQuery( new Term( field, phrase ) ) );
                 }
             }
         }
@@ -143,5 +201,4 @@ public class DefaultQueryCreator
 
         return result;
     }
-
 }
