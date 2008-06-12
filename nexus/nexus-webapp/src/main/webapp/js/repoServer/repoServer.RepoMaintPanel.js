@@ -762,7 +762,7 @@ Ext.extend(Sonatype.repoServer.RepoMaintPanel, Sonatype.repoServer.AbstractRepoP
     tp.setRootNode(rNode);
     
     var uniqueConfig = {
-      id : id,
+      id : id + '_repo-browse-top',
       autoScroll: false,
       border: false,
       frame: true,
