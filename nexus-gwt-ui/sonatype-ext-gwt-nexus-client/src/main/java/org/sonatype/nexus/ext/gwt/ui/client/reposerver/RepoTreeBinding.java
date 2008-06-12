@@ -67,8 +67,8 @@ public class RepoTreeBinding {
         selectedRepo = repo;
         store.removeAll();
         String repoName = (String) repo.get("name");
-        String resourceUri = (String) repo.get("contentUri") + "/content";
-        store.add(new RepoContentNode(repoName, resourceUri, false));
+        String resourceURI = (String) repo.get("resourceURI") + "/content";
+        store.add(new RepoContentNode(repoName, resourceURI, false));
         // TODO: Display the children of the root node
     }
     

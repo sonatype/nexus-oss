@@ -12,6 +12,7 @@ public interface Constants {
 
     String SERVICE = PATH + "/service/local";
     String SERVICE_REPOSITORIES = SERVICE + "/repositories";
+    String SERVICE_REPOSITORY_STATUSES = SERVICE + "/repository_statuses";
 
     String CONTENT = PATH + "/content";
     String CONTENT_REPOSITORIES = CONTENT + "/repositories";
