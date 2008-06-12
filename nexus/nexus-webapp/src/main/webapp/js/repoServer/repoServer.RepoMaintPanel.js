@@ -36,80 +36,6 @@ Sonatype.repoServer.RepoMaintPanel = function(config){
   var defaultConfig = {};
   var forceStatuses = false;
   Ext.apply(this, config, defaultConfig);
-  
-  this.detailPanelConfig = {
-    //region: 'center',
-    autoScroll: false,
-    //autoWidth: true,
-    border: false,
-    frame: true,
-    collapsible: false,
-    collapsed: false,
-    labelWidth: 100,
-    layoutConfig: {
-      labelSeparator: ''
-    },
-    //  items: [
-    //    {
-    //      xtype: 'panel',
-    //      layout: 'column',
-    //      autoWidth: true,
-    //      //height: 400,
-    //      autoHeight: true,
-    //      //style: 'padding: 10px 0 0 0',
-
-    items: [
-//    {
-//      //columnWidth: .5,
-//      xtype: 'panel',
-//      layout: 'fit',
-//      //title: 'Additional Repository Info',
-//      //autoHeight: true,
-//      autoScroll: false,
-//      border: false,
-//      frame: true,
-//      collapsible: false,
-//      collapsed: false
-//      //,
-//      //contentEl: '<p>Additional Repository Info Here</p>'
-//    },
-
-//    {
-//      xtype: 'treepanel',
-//      anchor: '0 -2',
-//      id: '_repo-browse', //note: unique ID is assinged before instantiation
-//      title: 'Repository Content',
-//      border: true,
-//      bodyBorder: true,
-//      loader: null, //note: created uniquely per repo
-//      //note: this style matches the expected behavior
-//      bodyStyle: 'background-color:#FFFFFF; border: 1px solid #99BBE8',
-//      animate:true,
-//      lines: false,
-//      autoScroll:true,
-//      containerScroll: true,
-//      rootVisible: true,
-//      enableDD: false,
-//      tools: [
-//        {
-//          id: 'refresh',
-//          handler: function(e, toolEl, panel){
-//            var i = panel.root.text.search(/\(Out of Service\)/);
-//            if(i > -1){
-//              panel.root.setText(panel.root.text.slice(0, i-1));
-//            }
-//            panel.root.reload();
-//          }
-//        }
-//      ],
-//      listeners: {
-//        contextmenu: this.onBrowseContextClickHandler,
-//        scope: this
-//      }
-//    }
-    ]
-};
-      
 
   this.actions = {
     view : new Ext.Action({
@@ -190,7 +116,81 @@ Sonatype.repoServer.RepoMaintPanel = function(config){
         })
       }
     );
-  }
+  };
+  
+  this.detailPanelConfig = {
+    //region: 'center',
+    autoScroll: false,
+    //autoWidth: true,
+    border: false,
+    frame: true,
+    collapsible: false,
+    collapsed: false,
+    labelWidth: 100,
+    layoutConfig: {
+      labelSeparator: ''
+    },
+    //  items: [
+    //    {
+    //      xtype: 'panel',
+    //      layout: 'column',
+    //      autoWidth: true,
+    //      //height: 400,
+    //      autoHeight: true,
+    //      //style: 'padding: 10px 0 0 0',
+
+    items: [
+//    {
+//      //columnWidth: .5,
+//      xtype: 'panel',
+//      layout: 'fit',
+//      //title: 'Additional Repository Info',
+//      //autoHeight: true,
+//      autoScroll: false,
+//      border: false,
+//      frame: true,
+//      collapsible: false,
+//      collapsed: false
+//      //,
+//      //contentEl: '<p>Additional Repository Info Here</p>'
+//    },
+
+//    {
+//      xtype: 'treepanel',
+//      anchor: '0 -2',
+//      id: '_repo-browse', //note: unique ID is assinged before instantiation
+//      title: 'Repository Content',
+//      border: true,
+//      bodyBorder: true,
+//      loader: null, //note: created uniquely per repo
+//      //note: this style matches the expected behavior
+//      bodyStyle: 'background-color:#FFFFFF; border: 1px solid #99BBE8',
+//      animate:true,
+//      lines: false,
+//      autoScroll:true,
+//      containerScroll: true,
+//      rootVisible: true,
+//      enableDD: false,
+//      tools: [
+//        {
+//          id: 'refresh',
+//          handler: function(e, toolEl, panel){
+//            var i = panel.root.text.search(/\(Out of Service\)/);
+//            if(i > -1){
+//              panel.root.setText(panel.root.text.slice(0, i-1));
+//            }
+//            panel.root.reload();
+//          }
+//        }
+//      ],
+//      listeners: {
+//        contextmenu: this.onBrowseContextClickHandler,
+//        scope: this
+//      }
+//    }
+    ]
+};
+      
 
   this.restToContentUrl = function(r) {
     var isGroup = r.indexOf( Sonatype.config.repos.urls.groups ) > -1;
@@ -362,7 +362,7 @@ Sonatype.repoServer.RepoMaintPanel = function(config){
 };
 
 
-Ext.extend(Sonatype.repoServer.RepoMaintPanel, Ext.Panel, {
+Ext.extend(Sonatype.repoServer.RepoMaintPanel, Sonatype.repoServer.AbstractRepoPanel, {
   //default values
   title : 'Repositories',
   editMode : false,
@@ -370,39 +370,6 @@ Ext.extend(Sonatype.repoServer.RepoMaintPanel, Ext.Panel, {
 //contentUriColRender: function(value, p, record, rowIndex, colIndex, store) {
 //  return String.format('<a target="_blank" href="{0}">{0}</a>', value);
 //},
-  
-  reloadAll : function(){
-    this.reposDataStore.reload();
-    this.formCards.items.each(function(item, i, len){
-      this.remove(item, true);
-    }, this.formCards);
-    
-    this.formCards.add({
-      xtype: 'panel',
-      layout: 'fit',
-      html: '<div class="little-padding">Select a repository to view it</div>'
-    });
-    this.formCards.getLayout().setActiveItem(0);
-    
-    this.forceStatuses = true;
-    
-// note: it looks like the reload takes care of reselecting the previously selected row
-//  if (this.reposGridPanel.getSelectionModel().hasSelection()){
-//    var rec = this.reposGridPanel.getSelectionModel().getSelected();
-//    var id = rec.id;
-//    
-//    var reselect = function(recs, opts, success){ this.reposGridPanel.getSelectionModel().selectRecords([this.reposDataStore.getById(id)])};
-//    
-//    this.reposDataStore.reload();
-//      this.store.reload({
-//        callback: reselect,
-//        scope: this
-//      });
-//  }
-//  else{
-//    this.reposDataStore.reload();
-//  }
-  },
   
   statusTextMaker : function(statusObj, parent){
     if ( ! parent.status ) return '<I>retrieving...</I>';
@@ -560,43 +527,6 @@ Ext.extend(Sonatype.repoServer.RepoMaintPanel, Ext.Panel, {
     }
   },  
   
-  clearCacheHandler : function(){
-    if (this.ctxBrowseNode || this.ctxRecord || this.reposGridPanel.getSelectionModel().hasSelection()){
-      var url;
-      
-      if (this.ctxBrowseNode){
-        url = Sonatype.config.repos.urls.cache + this.ctxBrowseNode.id.slice(Sonatype.config.host.length + Sonatype.config.servicePath.length);
-      }
-      else if (this.ctxRecord || this.reposGridPanel.getSelectionModel().hasSelection()){
-        //@todo: start updating messaging here
-        var rec = (this.ctxRecord) ? this.ctxRecord : this.reposGridPanel.getSelectionModel().getSelected();
-        url = Sonatype.config.repos.urls.cache + rec.id.slice(Sonatype.config.host.length + Sonatype.config.servicePath.length);
-      }
-      
-      //make sure to provide /content path for repository root requests like ../repositories/central
-      if (/.*\/repositories\/[^\/]*$/i.test(url)){
-        url += '/content';
-      }
-      
-      Ext.Ajax.request({
-        url: url,
-        callback: this.clearCacheCallback,
-        scope: this,
-        method: 'DELETE'
-      });
-    }
-  },
-  
-  clearCacheCallback : function(options, isSuccess, response){
-    //@todo: stop updating messaging here
-    if(isSuccess){
-      
-    }
-    else {
-      Ext.MessageBox.alert('The server did not clear the repository\'s cache');
-    }
-  },
-  
   deleteRepoItemHandler : function(){
     if (this.ctxBrowseNode){      
       var url = Sonatype.config.repos.urls.repositories + this.ctxBrowseNode.id.slice(Sonatype.config.host.length + Sonatype.config.repos.urls.repositories.length);
@@ -634,222 +564,6 @@ Ext.extend(Sonatype.repoServer.RepoMaintPanel, Ext.Panel, {
     }
     else {
       Ext.MessageBox.alert('The server did not delete the file/folder from the repository');
-    }
-  },
-  
-  reIndexHandler : function(){
-    if (this.ctxBrowseNode || this.ctxRecord || this.reposGridPanel.getSelectionModel().hasSelection()){
-      var url;
-      
-      if (this.ctxBrowseNode){
-        url = Sonatype.config.repos.urls.index + this.ctxBrowseNode.id.slice(Sonatype.config.host.length + Sonatype.config.servicePath.length);
-      }
-      else if (this.ctxRecord || this.reposGridPanel.getSelectionModel().hasSelection()){
-        //@todo: start updating messaging here
-        var rec = (this.ctxRecord) ? this.ctxRecord : this.reposGridPanel.getSelectionModel().getSelected();
-        url = Sonatype.config.repos.urls.index + rec.id.slice(Sonatype.config.host.length + Sonatype.config.servicePath.length);
-      }
-      
-      //make sure to provide /content path for repository root requests like ../repositories/central
-      if (/.*\/repositories\/[^\/]*$/i.test(url)){
-        url += '/content';
-      }
-      
-      Ext.Ajax.request({
-        url: url,
-        callback: this.reIndexCallback,
-        scope: this,
-        method: 'DELETE'
-      });
-    }
-  },
-  
-  reIndexCallback : function(options, isSuccess, response){
-    //@todo: stop updating messaging here
-    if(isSuccess){
-
-    }
-    else {
-      
-      Ext.MessageBox.alert('The server did not re-index the repository');
-    }
-  },
-  
-  rebuildAttributesHandler : function(){
-    if (this.ctxBrowseNode || this.ctxRecord || this.reposGridPanel.getSelectionModel().hasSelection()){
-      var url;
-      
-      if (this.ctxBrowseNode){
-        url = Sonatype.config.repos.urls.attributes + this.ctxBrowseNode.id.slice(Sonatype.config.host.length + Sonatype.config.servicePath.length);
-      }
-      else if (this.ctxRecord || this.reposGridPanel.getSelectionModel().hasSelection()){
-        //@todo: start updating messaging here
-        var rec = (this.ctxRecord) ? this.ctxRecord : this.reposGridPanel.getSelectionModel().getSelected();
-        url = Sonatype.config.repos.urls.attributes + rec.id.slice(Sonatype.config.host.length + Sonatype.config.servicePath.length);
-      }
-      
-      //make sure to provide /content path for repository root requests like ../repositories/central
-      if (/.*\/repositories\/[^\/]*$/i.test(url)){
-        url += '/content';
-      }
-      
-      Ext.Ajax.request({
-        url: url,
-        callback: this.rebuildAttributesCallback,
-        scope: this,
-        method: 'DELETE'
-      });
-    }
-  },
-  
-  rebuildAttributesCallback : function(options, isSuccess, response){
-    //@todo: stop updating messaging here
-    if(isSuccess){
-
-    }
-    else {
-      
-      Ext.MessageBox.alert('The server did not rebuild attributes in the repository');
-    }
-  },
-  
-  putInServiceHandler : function(){
-    if (this.ctxRecord || this.reposGridPanel.getSelectionModel().hasSelection()){
-      //@todo: start updating messaging here
-      var rec = (this.ctxRecord) ? this.ctxRecord : this.reposGridPanel.getSelectionModel().getSelected();
-      
-      var out = {
-        data : {
-          id : rec.id.slice(rec.id.lastIndexOf('/') + 1),
-          repoType : rec.get('repoType'),
-          localStatus : 'inService'
-        }
-      };
-      
-      Ext.Ajax.request({
-        url: rec.id + '/status',
-        jsonData: out,
-        callback: this.putInServiceCallback,
-        scope: this,
-        method: 'PUT'
-      });
-    }
-  },
-  
-  putInServiceCallback : function(options, isSuccess, response){
-    //@todo: stop updating messaging here
-    if(isSuccess){
-      var statusResp = Ext.decode(response.responseText);
-      this.updateRepoStatuses(statusResp.data);
-    }
-    else {
-      Ext.MessageBox.alert('The server did not put the repository into service');
-    }
-  },
-
-  putOutOfServiceHandler : function(){
-    if (this.ctxRecord || this.reposGridPanel.getSelectionModel().hasSelection()){
-      //@todo: start updating messaging here
-      var rec = (this.ctxRecord) ? this.ctxRecord : this.reposGridPanel.getSelectionModel().getSelected();
-      
-      var out = {
-        data : {
-          id : rec.id.slice(rec.id.lastIndexOf('/') + 1),
-          repoType : rec.get('repoType'),
-          localStatus : 'outOfService'
-        }
-      };
-      
-      Ext.Ajax.request({
-        url: rec.id + '/status',
-        jsonData: out,
-        callback: this.putOutOfServiceCallback,
-        scope: this,
-        method: 'PUT'
-      });
-    }
-  },
-  
-  putOutOfServiceCallback : function(options, isSuccess, response){
-    //@todo: stop updating messaging here
-    if(isSuccess){
-      var statusResp = Ext.decode(response.responseText);
-      this.updateRepoStatuses(statusResp.data);
-    }
-    else {
-      Ext.MessageBox.alert('The server did not put the repository out of service');
-    }
-  },
-  
-  allowProxyHandler : function(){
-    if (this.ctxRecord || this.reposGridPanel.getSelectionModel().hasSelection()){
-      //@todo: start updating messaging here
-      var rec = (this.ctxRecord) ? this.ctxRecord : this.reposGridPanel.getSelectionModel().getSelected();
-      
-      var out = {
-        data : {
-          id : rec.id.slice(rec.id.lastIndexOf('/') + 1),
-          repoType : rec.get('repoType'),
-          localStatus : rec.get('localStatus'),
-          remoteStatus : rec.get('remoteStatus'),
-          proxyMode : 'allow'
-        }
-      };
-      
-      Ext.Ajax.request({
-        url: rec.id + '/status',
-        jsonData: out,
-        callback: this.allowProxyCallback,
-        scope: this,
-        method: 'PUT'
-      });
-    }
-  },
-  
-  allowProxyCallback : function(options, isSuccess, response){
-    //@todo: stop updating messaging here
-    if(isSuccess){
-      var statusResp = Ext.decode(response.responseText);
-      this.updateRepoStatuses(statusResp.data);
-    }
-    else {
-      Ext.MessageBox.alert('The server did not update the proxy repository status to allow');
-    }
-  },
-  
-  blockProxyHandler : function(){
-    if (this.ctxRecord || this.reposGridPanel.getSelectionModel().hasSelection()){
-      //@todo: start updating messaging here
-      var rec = (this.ctxRecord) ? this.ctxRecord : this.reposGridPanel.getSelectionModel().getSelected();
-      
-      var out = {
-        data : {
-          id : rec.id.slice(rec.id.lastIndexOf('/') + 1),
-          repoType : rec.get('repoType'),
-          localStatus : rec.get('localStatus'),
-          remoteStatus : rec.get('remoteStatus'),
-          proxyMode : 'blockedManual'
-        }
-      };
-      
-      Ext.Ajax.request({
-        url: rec.id + '/status',
-        jsonData: out,
-        callback: this.blockProxyCallback,
-        scope: this,
-        method: 'PUT'
-      });
-    }
-  },
-  
-  blockProxyCallback : function(options, isSuccess, response){
-    //@todo: stop updating messaging here
-    if(isSuccess){
-      var statusResp = Ext.decode(response.responseText);
-      this.updateRepoStatuses(statusResp.data);
-    }
-    else {
-      Ext.MessageBox.alert('The server did not update the proxy repository status to blocked');
     }
   },
   
@@ -1085,81 +799,6 @@ Ext.extend(Sonatype.repoServer.RepoMaintPanel, Ext.Panel, {
     }
     else {
       Ext.MessageBox.alert('Status retrieval failed');
-    }
-  },
-  
-  uploadArtifactHandler : function(){
-    if (this.ctxRecord || this.reposGridPanel.getSelectionModel().hasSelection()){
-      //@todo: start updating messaging here
-      var rec = (this.ctxRecord) ? this.ctxRecord : this.reposGridPanel.getSelectionModel().getSelected();
-      
-      Ext.Ajax.request({
-        url: rec.id,
-        scope: this,
-        callback: function(options, success, response) {
-          if ( success ) {
-            var statusResp = Ext.decode(response.responseText);
-            if (statusResp.data) {
-              if ( statusResp.data.allowWrite ) {
-                var oldItem = this.formCards.getLayout().activeItem;
-                this.formCards.remove(oldItem, true);
-
-                var rec = (this.ctxRecord) ? this.ctxRecord : this.reposGridPanel.getSelectionModel().getSelected();
-
-                var panel = new Ext.Panel({
-                  layout: 'fit',
-                  frame: true,
-                  items: [ new Sonatype.repoServer.FileUploadPanel({
-                    title: 'Artifact Upload to ' + rec.get('name'),
-                    repoPanel: this,
-                    repoRecord: rec
-                  }) ]
-                });
-                this.formCards.insert(1, panel);
-                this.formCards.getLayout().setActiveItem(panel);
-                panel.doLayout();
-              }
-              else {
-                Ext.MessageBox.show({
-                  title: 'Deployment Disabled',
-                  icon: Ext.MessageBox.ERROR,
-                  buttons: Ext.MessageBox.OK,
-                  msg: 'Deployment is disabled for the selected repository.<br /><br />' +
-                    'You can enable it in the "Access Settings" section of the repository configuration'
-                });
-              }
-              return;
-            }
-          }
-          Ext.MessageBox.show({
-            title: 'Error',
-            icon: Ext.MessageBox.ERROR,
-            buttons: Ext.MessageBox.OK,
-            msg: 'There was a problem obtaining repository status:<br /><br />' +
-              'ERROR ' + response.status + ': ' + response.statusText
-          });
-        }
-      });
-/*
-      
-      var out = {
-        data : {
-          id : rec.id.slice(rec.id.lastIndexOf('/') + 1),
-          repoType : rec.get('repoType'),
-          localStatus : rec.get('localStatus'),
-          remoteStatus : rec.get('remoteStatus'),
-          proxyMode : 'blockedManual'
-        }
-      };
-      
-      Ext.Ajax.request({
-        url: rec.id + '/status',
-        jsonData: out,
-        callback: this.blockProxyCallback,
-        scope: this,
-        method: 'PUT'
-      });
-*/
     }
   }
 

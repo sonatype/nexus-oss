@@ -212,8 +212,12 @@ Sonatype.repoServer.RepoServer = function(){
       if(sp.checkPermission(userPerms.viewSearch, sp.READ)){
         vTplData.links.push( {id:'open-search-all', title:'Artifact Search'} );
       }
-      if(sp.checkPermission(userPerms.maintRepos, sp.READ) && !sp.checkPermission(userPerms.maintRepos, sp.EDIT)) {
-        vTplData.links.push( {id:'open-repos-maint-readonly', title:'Browse Repositories'} );
+      if(sp.checkPermission(userPerms.maintRepos, sp.READ)) {
+        vTplData.links.push({
+          id: sp.checkPermission(userPerms.maintRepos, sp.EDIT) ?
+            'open-repos-maint' : 'open-repos-maint-readonly',
+          title:'Browse Repositories'
+        });
       }
       if(sp.checkPermission(userPerms.viewSystemChanges, sp.READ)){
         vTplData.links.push( {id:'open-system-changes', title:'System Feeds'} );
@@ -223,23 +227,6 @@ Sonatype.repoServer.RepoServer = function(){
         this.nexusPanel.add(panelConf);
         //groupConfigs.push(panelConf);
       }
-      
-      //Maintenance Group **************************************************
-      var mTplData = {links:[]};
-      if(sp.checkPermission(userPerms.maintRepos, sp.EDIT)){
-        mTplData.links.push( {id:'open-repos-maint', title:'Repositories'} );
-      }
-      if(sp.checkPermission(userPerms.maintConfig, sp.READ)){
-         mTplData.links.push( {id:'open-view-config', title:'View Server Config'} );
-      }
-      if(sp.checkPermission(userPerms.maintLogs, sp.READ)){
-         mTplData.links.push( {id:'open-view-logs', title:'View Server Logs'} );
-      }
-      if(mTplData.links.length > 0){
-        panelConf = Ext.apply({}, {title:'Maintenance', id:'st-nexus-maint', html: bodyTpl.apply(mTplData)}, defaultGroupPanel);
-        this.nexusPanel.add(panelConf);
-        //groupConfigs.push(panelConf);
-      }      
 
       //Config Group **************************************************
       var cTplData = {links:[]};
@@ -257,6 +244,12 @@ Sonatype.repoServer.RepoServer = function(){
       }
       if(sp.checkPermission(userPerms.configSchedules, sp.EDIT)){
         cTplData.links.push( {id:'open-config-schedules', title:'Scheduled Services'} );
+      }
+      if(sp.checkPermission(userPerms.maintConfig, sp.READ)){
+         cTplData.links.push( {id:'open-view-config', title:'View Server Config'} );
+      }
+      if(sp.checkPermission(userPerms.maintLogs, sp.READ)){
+         cTplData.links.push( {id:'open-view-logs', title:'View Server Logs'} );
       }
       if(cTplData.links.length > 0){
         panelConf = Ext.apply({}, {title:'Configuration', id:'st-nexus-config', html: bodyTpl.apply(cTplData)}, defaultGroupPanel);
@@ -317,7 +310,7 @@ Sonatype.repoServer.RepoServer = function(){
       },
       'open-repos-maint' : function(scope){
         var id = 'repos-maint';
-        Sonatype.view.mainTabPanel.addOrShowTab(id, Sonatype.repoServer.RepoMaintPanel, {title: 'Maintenance', editMode: true});
+        Sonatype.view.mainTabPanel.addOrShowTab(id, Sonatype.repoServer.RepoMaintPanel, {title: 'Repositories', editMode: true});
       },
       'open-config-server' : function(scope){
         var id = 'nexus-config';
@@ -325,7 +318,7 @@ Sonatype.repoServer.RepoServer = function(){
       },
       'open-config-repos' : function(scope){
         var id = 'repos-config';
-        Sonatype.view.mainTabPanel.addOrShowTab(id, Sonatype.repoServer.RepoEditPanel, {title: 'Repositories'});
+        Sonatype.view.mainTabPanel.addOrShowTab(id, Sonatype.repoServer.RepoEditPanel, {title: 'Repository Config'});
       },
       'open-config-groups' : function(scope){
         var id = 'groups-config';

@@ -33,6 +33,29 @@ Sonatype.repoServer.RepoEditPanel = function(config){
   var formatStore = new Ext.data.SimpleStore({fields:['value'], data:[['maven1'],['maven2']]});
 
   var ht = Sonatype.repoServer.resources.help.repos;
+
+  this.actions = {
+    clearCache : new Ext.Action({
+      text: 'Clear Cache',
+      scope:this,
+      handler: this.clearCacheHandler
+    }),
+    reIndex : new Ext.Action({
+      text: 'Re-Index',
+      scope:this,
+      handler: this.reIndexHandler
+    }),
+    rebuildAttributes : new Ext.Action({
+      text: 'Rebuild Attributes',
+      scope:this,
+      handler: this.rebuildAttributesHandler
+    }),
+    uploadArtifact: new Ext.Action({
+      text: 'Upload Artifact...',
+      scope: this,
+      handler: this.uploadArtifactHandler
+    })
+  };
   
   this.defaultTimeoutVals = {
     proxy_release : null,
@@ -995,6 +1018,7 @@ Sonatype.repoServer.RepoEditPanel = function(config){
     }
   });
   this.reposGridPanel.on('rowclick', this.repoRowClick, this);
+  this.reposGridPanel.on('rowcontextmenu', this.onContextClickHandler, this);
   // END: Repo List ******************************************************
   // *********************************************************************
 
@@ -1030,7 +1054,7 @@ Sonatype.repoServer.RepoEditPanel = function(config){
 };
 
 
-Ext.extend(Sonatype.repoServer.RepoEditPanel, Ext.Panel, {
+Ext.extend(Sonatype.repoServer.RepoEditPanel, Sonatype.repoServer.AbstractRepoPanel, {
   reloadAll : function(){
     this.reposDataStore.reload();
     this.formCards.items.each(function(item, i, len){
@@ -1065,6 +1089,46 @@ Ext.extend(Sonatype.repoServer.RepoEditPanel, Ext.Panel, {
 //contentUriColRender: function(value, p, record, rowIndex, colIndex, store) {
 //  return String.format('<a target="_blank" href="{0}">{0}</a>', value);
 //},
+
+
+  onContextClickHandler : function(grid, index, e){
+    this.onContextHideHandler();
+    
+    if ( e.target.nodeName == 'A' ) return; // no menu on links
+    
+    this.ctxRow = this.reposGridPanel.view.getRow(index);
+    this.ctxRecord = this.reposGridPanel.store.getAt(index);
+    Ext.fly(this.ctxRow).addClass('x-node-ctx');
+
+    //@todo: would be faster to pre-render the six variations of the menu for whole instance
+    var menu = new Ext.menu.Menu({
+      id:'repo-maint-grid-ctx',
+      items: []
+    });
+    
+    if(this.ctxRecord.get('repoType') != 'virtual'){
+      menu.add(this.actions.clearCache);
+    }
+    
+    menu.add(this.actions.reIndex);
+    menu.add(this.actions.rebuildAttributes);
+
+    if (this.ctxRecord.get('repoType') == 'hosted'){
+      menu.add(this.actions.uploadArtifact);
+    }
+    
+    menu.on('hide', this.onContextHideHandler, this);
+    e.stopEvent();
+    menu.showAt(e.getXY());
+  },
+
+  onContextHideHandler : function(){
+    if(this.ctxRow){
+      Ext.fly(this.ctxRow).removeClass('x-node-ctx');
+      this.ctxRow = null;
+      this.ctxRecord = null;
+    }
+  },
   
   // formInfoObj : {formPanel, isNew, repoType, [resourceUri]}
   saveHandler : function(formInfoObj){
