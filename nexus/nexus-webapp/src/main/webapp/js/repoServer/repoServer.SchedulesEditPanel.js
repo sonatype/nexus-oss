@@ -1404,7 +1404,7 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
         this.schedulesGridPanel.getSelectionModel().selectRecords([newRec], false);
 
         //set the hidden id field in the form for subsequent updates
-        action.options.fpanel.id = receivedData.resourceURI;
+        action.options.fpanel.find('name', 'id')[0].setValue(receivedData.resourceURI);
         //remove button click listeners
         action.options.fpanel.buttons[0].purgeListeners();
         action.options.fpanel.buttons[1].purgeListeners();
