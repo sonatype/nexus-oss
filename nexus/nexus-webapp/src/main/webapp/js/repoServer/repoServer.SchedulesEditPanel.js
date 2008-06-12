@@ -132,13 +132,18 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
   //A record to hold the name and id of a repository
   this.repositoryRecordConstructor = Ext.data.Record.create([
     {name:'id'},
-    {name:'name', sortType:Ext.data.SortTypes.asUCString},
+    {name:'name', sortType:Ext.data.SortTypes.asUCString}
   ]);
   
   //A record to hold the name and id of a repository group
   this.repositoryGroupRecordConstructor = Ext.data.Record.create([
     {name:'id'},
-    {name:'name', sortType:Ext.data.SortTypes.asUCString},
+    {name:'name', sortType:Ext.data.SortTypes.asUCString}
+  ]);
+  
+  this.repositoryOrGroupRecordConstructor = Ext.data.Record.create([
+    {name:'id'},
+    {name:'name', sortType:Ext.data.SortTypes.asUCString}
   ]);
   
   //Simply a record to hold details of each service type 
@@ -176,10 +181,12 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
       'load' : {
         fn: function() {
           this.repositoryDataStore.each(function(item,i,len){
-            var rec = item.copy();
-            rec.data.id = 'repo_' + rec.data.id;
-            rec.data.name = rec.data.name + ' (Repo)';
-            this.repoOrGroupDataStore.add(rec);
+            var newRec = new this.repositoryOrGroupRecordConstructor({
+                id : 'repo_' + item.data.id,
+                name : item.data.name + ' (Repo)'
+              },
+              'repo_' + item.id);
+            this.repoOrGroupDataStore.add([newRec]);
           },this);
         },
         scope: this
@@ -198,10 +205,12 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
       'load' : {
         fn: function() {
           this.repositoryGroupDataStore.each(function(item,i,len){
-            var rec = item.copy();
-            rec.data.id = 'group_' + rec.data.id;
-            rec.data.name = rec.data.name + ' (Group)';
-            this.repoOrGroupDataStore.add(rec);
+            var newRec = new this.repositoryOrGroupRecordConstructor({
+                id : 'group_' + item.data.id,
+                name : item.data.name + ' (Group)'
+              },
+              'group_' + item.id);
+            this.repoOrGroupDataStore.add([newRec]);
           },this);
         },
         scope: this
@@ -1376,7 +1385,7 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
         var dataObj = {
           name : receivedData.resource.name,
           id : receivedData.resource.id,
-          resourceURI : action.getUrl() + '/' + receivedData.resource.id,
+          resourceURI : receivedData.resourceURI,
           typeName : this.serviceTypeDataStore.getAt(this.serviceTypeDataStore.find('id',receivedData.resource.typeId)).data.name,
           typeId : receivedData.resource.typeId,
           status : receivedData.status,
@@ -1388,14 +1397,14 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
         
         var newRec = new this.scheduleRecordConstructor(
           dataObj,
-          receivedData.resource.id);
+          receivedData.resourceURI);
         
         this.schedulesDataStore.remove(this.schedulesDataStore.getById(action.options.fpanel.id)); //remove old one
         this.schedulesDataStore.addSorted(newRec);
         this.schedulesGridPanel.getSelectionModel().selectRecords([newRec], false);
 
         //set the hidden id field in the form for subsequent updates
-        action.options.fpanel.find('name', 'id')[0].setValue(receivedData.resource.id);
+        action.options.fpanel.id = receivedData.resourceURI;
         //remove button click listeners
         action.options.fpanel.buttons[0].purgeListeners();
         action.options.fpanel.buttons[1].purgeListeners();
@@ -1908,22 +1917,29 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
     //Maps the incoming json properties to the generic component
     //Uses the id of the serviceProperty item as the key, so the id _must_ be unique within a service type
     for(var i=0;i<srcObj.properties.length;i++){
-      var servicePropertyItem = fpanel.find('name','serviceProperties_' + srcObj.properties[i].id)[0];
-      if (servicePropertyItem != null){
-        if (servicePropertyItem.xtype == 'datefield'){
-          servicePropertyItem.setValue(new Date(Number(srcObj.properties[i].value)));
-        }
-        else if (servicePropertyItem.xtype == 'textfield'){
-          servicePropertyItem.setValue(srcObj.properties[i].value);
-        }
-        else if (servicePropertyItem.xtype == 'numberfield'){
-          servicePropertyItem.setValue(Number(srcObj.properties[i].value));
-        }
-        else if (servicePropertyItem.xtype == 'checkbox'){
-          servicePropertyItem.setValue(Boolean(srcObj.properties[i].value));
-        }
-        else if (servicePropertyItem.xtype == 'combo'){
-          servicePropertyItem.setValue(srcObj.properties[i].value);
+      var servicePropertyItems = fpanel.find('name','serviceProperties_' + srcObj.properties[i].id);
+      for (var j=0;j<servicePropertyItems.length;j++){
+        var servicePropertyItem = servicePropertyItems[j];
+        
+        if (!servicePropertyItem.disabled){
+          if (servicePropertyItem != null){
+            if (servicePropertyItem.xtype == 'datefield'){
+              servicePropertyItem.setValue(new Date(Number(srcObj.properties[i].value)));
+            }
+            else if (servicePropertyItem.xtype == 'textfield'){
+              servicePropertyItem.setValue(srcObj.properties[i].value);
+            }
+            else if (servicePropertyItem.xtype == 'numberfield'){
+              servicePropertyItem.setValue(Number(srcObj.properties[i].value));
+            }
+            else if (servicePropertyItem.xtype == 'checkbox'){
+              servicePropertyItem.setValue(Boolean(srcObj.properties[i].value));
+            }
+            else if (servicePropertyItem.xtype == 'combo'){
+              servicePropertyItem.setValue(srcObj.properties[i].value);
+            }
+          }
+          break;
         }
       }
     }

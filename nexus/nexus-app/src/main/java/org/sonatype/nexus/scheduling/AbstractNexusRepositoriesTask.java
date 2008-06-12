@@ -23,27 +23,39 @@ package org.sonatype.nexus.scheduling;
 public abstract class AbstractNexusRepositoriesTask<T>
     extends AbstractNexusTask<T>
 {
-    public static final String REPOSITORY_ID_KEY = "repositoryId";
-
-    public static final String REPOSITORY_GROUP_ID_KEY = "repositoryGroupId";
+    public static final String REPOSITORY_OR_GROUP_ID_KEY = "repositoryOrGroupId";
+    private static final String REPO_PREFIX = "repo_";
+    private static final String GROUP_PREFIX = "group_";
 
     public String getRepositoryId()
     {
-        return getParameters().get( REPOSITORY_ID_KEY );
+        String param = getParameters().get( REPOSITORY_OR_GROUP_ID_KEY );
+        if ( param != null && param.startsWith( REPO_PREFIX ))
+        {
+            return param.substring( REPO_PREFIX.length() );
+        }
+        
+        return null;
     }
 
     public void setRepositoryId( String repositoryId )
     {
-        getParameters().put( REPOSITORY_ID_KEY, repositoryId );
+        getParameters().put( REPOSITORY_OR_GROUP_ID_KEY, REPO_PREFIX + repositoryId );
     }
 
     public String getRepositoryGroupId()
     {
-        return getParameters().get( REPOSITORY_GROUP_ID_KEY );
+        String param = getParameters().get( REPOSITORY_OR_GROUP_ID_KEY );
+        if ( param != null && param.startsWith( GROUP_PREFIX ))
+        {
+            return param.substring( GROUP_PREFIX.length() );
+        }
+        
+        return null;
     }
 
     public void setRepositoryGroupId( String repositoryGroupId )
     {
-        getParameters().put( REPOSITORY_GROUP_ID_KEY, repositoryGroupId );
+        getParameters().put( REPOSITORY_OR_GROUP_ID_KEY, GROUP_PREFIX + repositoryGroupId );
     }
 }

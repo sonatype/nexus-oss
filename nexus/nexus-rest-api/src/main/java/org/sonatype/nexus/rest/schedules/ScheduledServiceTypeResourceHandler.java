@@ -73,37 +73,23 @@ public class ScheduledServiceTypeResourceHandler
         type.setId( PublishIndexesTask.class.getName() );
         type.setName( getServiceTypeName( type.getId() ) );
         ScheduledServiceTypePropertyResource property = new ScheduledServiceTypePropertyResource();
-        property.setId( PublishIndexesTask.REPOSITORY_ID_KEY );
-        property.setName( "Repository ID" );
-        property.setType( PROPERTY_TYPE_REPO );
+        property.setId( PublishIndexesTask.REPOSITORY_OR_GROUP_ID_KEY );
+        property.setName( "Repository/Group" );
+        property.setType( PROPERTY_TYPE_REPO_OR_GROUP );
         property.setRequired( false );
-        property.setHelpText( "Type in the repository ID to publish the indexes." );
-        type.addProperty( property );
-        property = new ScheduledServiceTypePropertyResource();
-        property.setId( PublishIndexesTask.REPOSITORY_GROUP_ID_KEY );
-        property.setName( "Repository Group ID" );
-        property.setType( PROPERTY_TYPE_REPO_GROUP );
-        property.setRequired( false );
-        property.setHelpText( "Type in the repository group ID to publish the indexes for all member repositories." );
+        property.setHelpText( "Select the repository or repository group to assign to this task.  Making no selection will result in the task running for ALL repositories." );
         type.addProperty( property );
         response.addData( type );
-
+        
         type = new ScheduledServiceTypeResource();
         type.setId( ReindexTask.class.getName() );
         type.setName( getServiceTypeName( type.getId() ) );
         property = new ScheduledServiceTypePropertyResource();
-        property.setId( ReindexTask.REPOSITORY_ID_KEY );
-        property.setName( "Repository ID" );
-        property.setType( PROPERTY_TYPE_REPO );
+        property.setId( PublishIndexesTask.REPOSITORY_OR_GROUP_ID_KEY );
+        property.setName( "Repository/Group" );
+        property.setType( PROPERTY_TYPE_REPO_OR_GROUP );
         property.setRequired( false );
-        property.setHelpText( "Type in the repository ID to reindex." );
-        type.addProperty( property );
-        property = new ScheduledServiceTypePropertyResource();
-        property.setId( ReindexTask.REPOSITORY_GROUP_ID_KEY );
-        property.setName( "Repository Group ID" );
-        property.setType( PROPERTY_TYPE_REPO_GROUP );
-        property.setRequired( false );
-        property.setHelpText( "Type in the repository group ID to reindex all member repositories." );
+        property.setHelpText( "Select the repository or repository group to assign to this task.  Making no selection will result in the task running for ALL repositories." );
         type.addProperty( property );
         response.addData( type );
 
@@ -111,18 +97,11 @@ public class ScheduledServiceTypeResourceHandler
         type.setId( RebuildAttributesTask.class.getName() );
         type.setName( getServiceTypeName( type.getId() ) );
         property = new ScheduledServiceTypePropertyResource();
-        property.setId( RebuildAttributesTask.REPOSITORY_ID_KEY );
-        property.setName( "Repository ID" );
-        property.setType( PROPERTY_TYPE_REPO );
+        property.setId( PublishIndexesTask.REPOSITORY_OR_GROUP_ID_KEY );
+        property.setName( "Repository/Group" );
+        property.setType( PROPERTY_TYPE_REPO_OR_GROUP );
         property.setRequired( false );
-        property.setHelpText( "Type in the repository ID to rebuild attributes." );
-        type.addProperty( property );
-        property = new ScheduledServiceTypePropertyResource();
-        property.setId( RebuildAttributesTask.REPOSITORY_GROUP_ID_KEY );
-        property.setName( "Repository Group ID" );
-        property.setType( PROPERTY_TYPE_REPO_GROUP );
-        property.setRequired( false );
-        property.setHelpText( "Type in the repository group ID to rebuild attributes for all member repositories." );
+        property.setHelpText( "Select the repository or repository group to assign to this task.  Making no selection will result in the task running for ALL repositories." );
         type.addProperty( property );
         response.addData( type );
 
@@ -130,18 +109,11 @@ public class ScheduledServiceTypeResourceHandler
         type.setId( ClearCacheTask.class.getName() );
         type.setName( getServiceTypeName( type.getId() ) );
         property = new ScheduledServiceTypePropertyResource();
-        property.setId( ClearCacheTask.REPOSITORY_ID_KEY );
-        property.setName( "Repository ID" );
-        property.setType( PROPERTY_TYPE_REPO );
+        property.setId( PublishIndexesTask.REPOSITORY_OR_GROUP_ID_KEY );
+        property.setName( "Repository/Group" );
+        property.setType( PROPERTY_TYPE_REPO_OR_GROUP );
         property.setRequired( false );
-        property.setHelpText( "Type in the repository ID to rebuild attributes." );
-        type.addProperty( property );
-        property = new ScheduledServiceTypePropertyResource();
-        property.setId( ClearCacheTask.REPOSITORY_GROUP_ID_KEY );
-        property.setName( "Repository Group ID" );
-        property.setType( PROPERTY_TYPE_REPO_GROUP );
-        property.setRequired( false );
-        property.setHelpText( "Type in the repository group ID to rebuild attributes for all member repositories." );
+        property.setHelpText( "Select the repository or repository group to assign to this task.  Making no selection will result in the task running for ALL repositories." );
         type.addProperty( property );
         property = new ScheduledServiceTypePropertyResource();
         property.setId( ClearCacheTask.RESOURCE_STORE_PATH_KEY );
@@ -156,18 +128,11 @@ public class ScheduledServiceTypeResourceHandler
         type.setId( SnapshotRemoverTask.class.getName() );
         type.setName( getServiceTypeName( type.getId() ) );
         property = new ScheduledServiceTypePropertyResource();
-        property.setId( SnapshotRemoverTask.REPOSITORY_ID_KEY );
-        property.setName( "Repository ID" );
-        property.setType( PROPERTY_TYPE_REPO );
+        property.setId( PublishIndexesTask.REPOSITORY_OR_GROUP_ID_KEY );
+        property.setName( "Repository/Group" );
+        property.setType( PROPERTY_TYPE_REPO_OR_GROUP );
         property.setRequired( false );
-        property.setHelpText( "Type in the repository ID to remove snapshots from." );
-        type.addProperty( property );
-        property = new ScheduledServiceTypePropertyResource();
-        property.setId( SnapshotRemoverTask.REPOSITORY_GROUP_ID_KEY );
-        property.setName( "Repository Group ID" );
-        property.setType( PROPERTY_TYPE_REPO_GROUP );
-        property.setRequired( false );
-        property.setHelpText( "Type in the repository group ID to remove from all it's member repositories." );
+        property.setHelpText( "Select the repository or repository group to assign to this task.  Making no selection will result in the task running for ALL repositories." );
         type.addProperty( property );
         property = new ScheduledServiceTypePropertyResource();
         property.setId( SnapshotRemoverTask.MIN_SNAPSHOTS_TO_KEEP_KEY );
@@ -185,7 +150,7 @@ public class ScheduledServiceTypeResourceHandler
             .setHelpText( "The job will purge all snapshots older than the entered number of days, but will obey to Min. count of snapshots to keep." );
         type.addProperty( property );
         response.addData( type );
-
+        
         return serialize( variant, response );
     }
 }
