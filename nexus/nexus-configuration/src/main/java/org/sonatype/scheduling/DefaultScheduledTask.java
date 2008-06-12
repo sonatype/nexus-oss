@@ -40,7 +40,7 @@ public class DefaultScheduledTask<T>
     private static final AtomicInteger ID_GENERATOR = new AtomicInteger( 0 );
 
     private final String id;
-    
+
     private String name;
 
     private final String clazz;
@@ -56,46 +56,47 @@ public class DefaultScheduledTask<T>
     private Future<T> future;
 
     private Exception exception;
-    
+
     private boolean enabled;
 
     private Date lastRun;
 
     private List<T> results;
-    
-    private final Schedule schedule;
-    
-    private final SchedulerIterator scheduleIterator;
-    
-    private Map<String,String> taskParams;
 
-    public DefaultScheduledTask( String name, String clazz, DefaultScheduler scheduler, Callable<T> callable, Schedule schedule, Map<String,String> taskParams )
+    private Schedule schedule;
+
+    private SchedulerIterator scheduleIterator;
+
+    private Map<String, String> taskParams;
+
+    public DefaultScheduledTask( String name, String clazz, DefaultScheduler scheduler, Callable<T> callable,
+        Schedule schedule, Map<String, String> taskParams )
     {
         super();
-        
+
         this.id = String.valueOf( ID_GENERATOR.getAndIncrement() );
-        
+
         this.name = name;
 
         this.clazz = clazz;
 
         this.scheduler = scheduler;
-        
+
         this.callable = callable;
 
         this.taskState = TaskState.SUBMITTED;
-        
+
         this.enabled = true;
-        
+
         this.results = new ArrayList<T>();
 
         this.schedule = schedule;
-        
-        this.scheduleIterator = schedule.getIterator();
-        
+
+        this.scheduleIterator = null;
+
         this.taskParams = taskParams;
     }
-    
+
     protected void start()
     {
         this.scheduledAt = new Date();
@@ -168,6 +169,18 @@ public class DefaultScheduledTask<T>
         getScheduler().removeFromTasksMap( this );
     }
 
+    public void reset()
+    {
+        if ( getFuture() != null )
+        {
+            getFuture().cancel( true );
+        }
+
+        setTaskState( TaskState.SUBMITTED );
+
+        setFuture( reschedule() );
+    }
+
     public Exception getBrokenCause()
     {
         return exception;
@@ -202,7 +215,7 @@ public class DefaultScheduledTask<T>
             return null;
         }
     }
-    
+
     protected void setLastRun( Date lastRun )
     {
         this.lastRun = lastRun;
@@ -311,12 +324,23 @@ public class DefaultScheduledTask<T>
     {
         return schedule;
     }
-    
+
+    public void setSchedule( Schedule schedule )
+    {
+        this.schedule = schedule;
+
+        this.scheduleIterator = null;
+    }
+
     public SchedulerIterator getScheduleIterator()
     {
+        if ( scheduleIterator == null )
+        {
+            scheduleIterator = getSchedule().getIterator();
+        }
         return scheduleIterator;
     }
-    
+
     public void setName( String name )
     {
         this.name = name;
@@ -326,12 +350,12 @@ public class DefaultScheduledTask<T>
     {
         return name;
     }
-    
+
     public Map<String, String> getTaskParams()
     {
         if ( taskParams == null )
         {
-            taskParams = new HashMap<String,String>();
+            taskParams = new HashMap<String, String>();
         }
         return taskParams;
     }

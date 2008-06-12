@@ -21,6 +21,7 @@
 package org.sonatype.nexus.rest.schedules;
 
 import java.io.IOException;
+import java.util.Iterator;
 import java.util.logging.Level;
 
 import org.restlet.Context;
@@ -34,6 +35,7 @@ import org.sonatype.nexus.rest.model.ScheduledServiceBaseResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceDailyResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceMonthlyResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceOnceResource;
+import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceResourceResponse;
 import org.sonatype.nexus.rest.model.ScheduledServiceWeeklyResource;
 import org.sonatype.scheduling.NoSuchTaskException;
@@ -42,6 +44,7 @@ import org.sonatype.scheduling.schedules.CronSchedule;
 import org.sonatype.scheduling.schedules.DailySchedule;
 import org.sonatype.scheduling.schedules.MonthlySchedule;
 import org.sonatype.scheduling.schedules.OnceSchedule;
+import org.sonatype.scheduling.schedules.Schedule;
 import org.sonatype.scheduling.schedules.WeeklySchedule;
 
 public class ScheduledServiceResourceHandler
@@ -90,15 +93,15 @@ public class ScheduledServiceResourceHandler
             ScheduledServiceResourceResponse response = new ScheduledServiceResourceResponse();
 
             ScheduledTask<?> task = getNexus().getTaskById( getScheduledServiceId() );
-            
+
             ScheduledServiceBaseResource resource = null;
 
             if ( OnceSchedule.class.isAssignableFrom( task.getSchedule().getClass() ) )
             {
                 resource = new ScheduledServiceOnceResource();
-                
+
                 OnceSchedule taskSchedule = (OnceSchedule) task.getSchedule();
-                ScheduledServiceOnceResource res = ( ScheduledServiceOnceResource ) resource;                
+                ScheduledServiceOnceResource res = (ScheduledServiceOnceResource) resource;
 
                 res.setStartDate( formatDate( taskSchedule.getStartDate() ) );
                 res.setStartTime( formatTime( taskSchedule.getStartDate() ) );
@@ -106,9 +109,9 @@ public class ScheduledServiceResourceHandler
             else if ( DailySchedule.class.isAssignableFrom( task.getSchedule().getClass() ) )
             {
                 resource = new ScheduledServiceDailyResource();
-                
+
                 DailySchedule taskSchedule = (DailySchedule) task.getSchedule();
-                ScheduledServiceDailyResource res = ( ScheduledServiceDailyResource ) resource;                
+                ScheduledServiceDailyResource res = (ScheduledServiceDailyResource) resource;
 
                 res.setStartDate( formatDate( taskSchedule.getStartDate() ) );
                 res.setRecurringTime( formatTime( taskSchedule.getStartDate() ) );
@@ -116,9 +119,9 @@ public class ScheduledServiceResourceHandler
             else if ( WeeklySchedule.class.isAssignableFrom( task.getSchedule().getClass() ) )
             {
                 resource = new ScheduledServiceWeeklyResource();
-                
+
                 WeeklySchedule taskSchedule = (WeeklySchedule) task.getSchedule();
-                ScheduledServiceWeeklyResource res = ( ScheduledServiceWeeklyResource ) resource;                
+                ScheduledServiceWeeklyResource res = (ScheduledServiceWeeklyResource) resource;
 
                 res.setStartDate( formatDate( taskSchedule.getStartDate() ) );
                 res.setRecurringTime( formatTime( taskSchedule.getStartDate() ) );
@@ -127,9 +130,9 @@ public class ScheduledServiceResourceHandler
             else if ( MonthlySchedule.class.isAssignableFrom( task.getSchedule().getClass() ) )
             {
                 resource = new ScheduledServiceMonthlyResource();
-                
+
                 MonthlySchedule taskSchedule = (MonthlySchedule) task.getSchedule();
-                ScheduledServiceMonthlyResource res = ( ScheduledServiceMonthlyResource ) resource;                
+                ScheduledServiceMonthlyResource res = (ScheduledServiceMonthlyResource) resource;
 
                 res.setStartDate( formatDate( taskSchedule.getStartDate() ) );
                 res.setRecurringTime( formatTime( taskSchedule.getStartDate() ) );
@@ -138,13 +141,13 @@ public class ScheduledServiceResourceHandler
             else if ( CronSchedule.class.isAssignableFrom( task.getSchedule().getClass() ) )
             {
                 resource = new ScheduledServiceAdvancedResource();
-                
+
                 CronSchedule taskSchedule = (CronSchedule) task.getSchedule();
-                ScheduledServiceAdvancedResource res = ( ScheduledServiceAdvancedResource ) resource;                
+                ScheduledServiceAdvancedResource res = (ScheduledServiceAdvancedResource) resource;
 
                 res.setCronCommand( taskSchedule.getCronExpression() );
             }
-            
+
             if ( resource != null )
             {
                 resource.setId( task.getId() );
@@ -152,16 +155,14 @@ public class ScheduledServiceResourceHandler
                 resource.setSchedule( getScheduleShortName( task.getSchedule() ) );
                 resource.setTypeId( task.getType() );
                 resource.setProperties( formatServiceProperties( task.getTaskParams() ) );
-                
+
                 response.setData( resource );
-                
+
                 return serialize( variant, response );
             }
-            
-            getResponse().setStatus(
-                Status.CLIENT_ERROR_NOT_FOUND,
-                "Invalid schedule, can't load task." );
-            
+
+            getResponse().setStatus( Status.CLIENT_ERROR_NOT_FOUND, "Invalid schedule, can't load task." );
+
             return null;
         }
         catch ( NoSuchTaskException e )
@@ -188,7 +189,7 @@ public class ScheduledServiceResourceHandler
     public void put( Representation representation )
     {
         ScheduledServiceResourceResponse response = (ScheduledServiceResourceResponse) deserialize( new ScheduledServiceResourceResponse() );
-        
+
         if ( response == null )
         {
             return;
@@ -196,15 +197,27 @@ public class ScheduledServiceResourceHandler
         else
         {
             ScheduledServiceBaseResource resource = response.getData();
-            
+
             try
             {
+                // currently we allow editing of:
+                // task name
+                // task schedule (even to another type)
+                // task params
                 ScheduledTask<?> task = getNexus().getTaskById( resource.getId() );
 
-                //TODO: ultimately will not want to create new schedule everytime, should just update parameters
-                //in existing, unless schedule changes or service type changes
-                task.cancel();
-                getNexus().schedule( getModelName( resource ), getModelNexusTask( resource ), getModelSchedule( resource ) );
+                task.setName( getModelName( resource ) );
+
+                task.setSchedule( getModelSchedule( resource ) );
+
+                for ( Iterator iter = resource.getProperties().iterator(); iter.hasNext(); )
+                {
+                    ScheduledServicePropertyResource prop = (ScheduledServicePropertyResource) iter.next();
+
+                    task.getTaskParams().put( prop.getId(), prop.getValue() );
+                }
+
+                task.reset();
             }
             catch ( NoSuchTaskException e )
             {

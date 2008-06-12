@@ -36,13 +36,20 @@ public interface ScheduledTask<T>
      * @return
      */
     String getId();
-    
+
     /**
      * Returns a name of the task.
      * 
      * @return
      */
     String getName();
+
+    /**
+     * Sets the name of the ScheduledTask.
+     * 
+     * @param name
+     */
+    void setName( String name );
 
     /**
      * Returns the "type" of the task.
@@ -71,6 +78,11 @@ public interface ScheduledTask<T>
     void cancel();
 
     /**
+     * Resets the task state and reschedules if needed.
+     */
+    void reset();
+
+    /**
      * Returns an exception is TaskState is BROKEN, null in any other case.
      * 
      * @return null, if task in not in BROKEN status, otherwise the exception that broke it.
@@ -95,7 +107,7 @@ public interface ScheduledTask<T>
      * @return
      */
     T getIfDone();
-    
+
     /**
      * Returns the last run date of task, if any. Null otherwise.
      * 
@@ -131,19 +143,25 @@ public interface ScheduledTask<T>
      * @return
      */
     List<T> getResults();
-    
+
     /**
      * Returns the iterator that is being used to repeat the task
      * 
      * @return
      */
     SchedulerIterator getScheduleIterator();
-    
+
     /**
      * Returns the Schedule that is being used
+     * 
      * @return
      */
     Schedule getSchedule();
-    
-    Map<String,String> getTaskParams();
+
+    /**
+     * Sets the Schedule that is being used
+     */
+    void setSchedule( Schedule schedule );
+
+    Map<String, String> getTaskParams();
 }
