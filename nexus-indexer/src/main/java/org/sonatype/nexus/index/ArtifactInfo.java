@@ -17,6 +17,9 @@ import java.io.Serializable;
 import java.util.Comparator;
 import java.util.List;
 
+import org.apache.maven.artifact.versioning.ArtifactVersion;
+import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
+
 /**
  * ArtifactInfo holds the values known about an repository artifact. This is a simple Value Object kind of stuff.
  * 
@@ -103,6 +106,8 @@ public class ArtifactInfo
 
     public String version;
 
+    private ArtifactVersion artifactVersion;
+
     public String classifier;
 
     public String packaging;
@@ -183,6 +188,15 @@ public class ArtifactInfo
         this.classifier = classifier;
     }
 
+    public ArtifactVersion getArtifactVersion()
+    {
+        if ( artifactVersion == null )
+        {
+            artifactVersion = new DefaultArtifactVersion( version );
+        }
+        return artifactVersion;
+    }
+
     @Override
     public String toString()
     {
@@ -212,7 +226,7 @@ public class ArtifactInfo
                 return n;
             }
 
-            n = -f1.version.compareTo( f2.version );
+            n = -f1.getArtifactVersion().compareTo( f2.getArtifactVersion() );
             if ( n != 0 )
             {
                 return n;
