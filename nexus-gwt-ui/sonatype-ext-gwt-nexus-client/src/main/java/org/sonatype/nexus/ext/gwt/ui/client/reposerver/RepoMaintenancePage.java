@@ -12,6 +12,7 @@ import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.event.SelectionChangedEvent;
 import com.extjs.gxt.ui.client.event.SelectionChangedListener;
 import com.extjs.gxt.ui.client.event.SelectionListener;
+import com.extjs.gxt.ui.client.widget.Component;
 import com.extjs.gxt.ui.client.widget.ContentPanel;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.button.ToolButton;
@@ -19,7 +20,6 @@ import com.extjs.gxt.ui.client.widget.layout.BorderLayout;
 import com.extjs.gxt.ui.client.widget.layout.BorderLayoutData;
 import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.extjs.gxt.ui.client.widget.table.CellRenderer;
-import com.extjs.gxt.ui.client.widget.table.RowSelectionModel;
 import com.extjs.gxt.ui.client.widget.table.Table;
 import com.extjs.gxt.ui.client.widget.table.TableColumn;
 import com.extjs.gxt.ui.client.widget.table.TableColumnModel;
@@ -48,8 +48,8 @@ public class RepoMaintenancePage extends LayoutContainer implements ServerFuncti
 
         showRepoHelp();
     }
-
-    private void addRepoList(ServerInstance server) {
+    
+    private void addRepoList(final ServerInstance server) {
         ContentPanel panel = new ContentPanel() {
             {
                 setHeaderVisible(false);
@@ -57,7 +57,7 @@ public class RepoMaintenancePage extends LayoutContainer implements ServerFuncti
             }
         };
 
-        Table table = new Table<RowSelectionModel>() {
+        Table table = new Table() {
             {
                 setColumnModel(new TableColumnModel(
                     new TableColumn("name", "Repository", 175f),
@@ -65,7 +65,7 @@ public class RepoMaintenancePage extends LayoutContainer implements ServerFuncti
                     new TableColumn("status", "Status", 200f) {
                     	{
                     		setRenderer(new CellRenderer() {
-                    			public String render(String property, Object value) {
+                    			public String render(Component item, String property, Object value) {
                     				if (value == null) {
                     					return "<i>retrieving</i>";
                     				}
@@ -77,7 +77,7 @@ public class RepoMaintenancePage extends LayoutContainer implements ServerFuncti
                     new TableColumn("resourceURI", "Repository Path", 1f) {
                         {
                             setRenderer(new CellRenderer() {
-                                public String render(String property, Object value) {
+                                public String render(Component item, String property, Object value) {
                                     String path = (String) value;
                                     path = Constants.HOST + path.replace(Constants.SERVICE_REPOSITORIES, Constants.CONTENT_REPOSITORIES);
                                     return "<a href=\"" + path + "\" target=\"_blank\">" + path + "</a>";
@@ -88,9 +88,9 @@ public class RepoMaintenancePage extends LayoutContainer implements ServerFuncti
                 ));
             }
         };
-
+        
         final RepoTableBinding tableBinding = new RepoTableBinding(table, server);
-        tableBinding.getBinder().addSelectionChangedListener(new SelectionChangedListener() {
+        tableBinding.getBinder().addSelectionChangedListener(new SelectionChangedListener<ModelData>() {
             public void selectionChanged(SelectionChangedEvent event) {
                 showRepoTree(event.getSelectedItem());
             }
@@ -159,7 +159,23 @@ public class RepoMaintenancePage extends LayoutContainer implements ServerFuncti
         
         tableMenu.addAction(new Action<ModelData>("Put Out of Service") {
             public void execute(ModelData data) {
-                Window.alert(getCaption());
+                /*
+                String path = data.get("contentUri") + "/status";
+                Document doc = XMLParser.createDocument();
+                doc.createElement("");
+                String request = "{\"data\":{\"id\":\"central-m1\",\"repoType\":\"virtual\",\"localStatus\":\"inService\"}}";
+                server.getResource(path).put(new RequestCallback() {
+                    public void onError(Request request, Throwable exception) {
+                        Window.alert("ERROR: " + exception.getMessage());
+                    }
+                    public void onResponseReceived(Request request, Response response) {
+                        if (response.getStatusCode() != Response.SC_OK) {
+                            Window.alert("ERROR - " + response.getStatusText());
+                        }
+                        Window.alert(response.getText());
+                    }
+                }, new Representation(Variant.APPLICATION_XML, request));
+                */
             }
         });
     }
@@ -199,7 +215,7 @@ public class RepoMaintenancePage extends LayoutContainer implements ServerFuncti
                 setBodyBorder(true);
                 setBorders(true);
                 setScrollMode(Style.Scroll.AUTO);
-                getHeader().addTool(new ToolButton("x-tool-refresh", new SelectionListener() {
+                getHeader().addTool(new ToolButton("x-tool-refresh", new SelectionListener<ComponentEvent>() {
                     public void componentSelected(ComponentEvent ce) {
                         repoTreeBinding.reload();
                     }
