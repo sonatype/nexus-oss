@@ -226,13 +226,31 @@ public class AbstractScheduledServiceResourceHandler
         return list;
     }
     
+    protected Set<Integer> formatRecurringDayOfWeek( List<String> days )
+    {
+        Set<Integer> set = new HashSet<Integer>();
+        
+        for ( String day : days )
+        {
+            if ( "sunday".equals( day )) { set.add( new Integer(0) ); }
+            else if ( "monday".equals( day )) { set.add( new Integer(1) ); }
+            else if ( "tuesday".equals( day )) { set.add( new Integer(2) ); }
+            else if ( "wednesday".equals( day )) { set.add( new Integer(3) ); }
+            else if ( "thursday".equals( day )) { set.add( new Integer(4) ); }
+            else if ( "friday".equals( day )) { set.add( new Integer(5) ); }
+            else if ( "saturday".equals( day )) { set.add( new Integer(6) ); }
+        }
+        
+        return set;
+    }
+    
     protected List<String> formatRecurringDayOfMonth( Set<Integer> days )
     {
         List<String> list = new ArrayList<String>();
         
         for ( Integer day : days )
         {
-            if ( day.equals( DAY_OF_MONTH_LAST ) )
+            if ( DAY_OF_MONTH_LAST.equals( day ) )
             {
                 list.add( "last" );
             }
@@ -243,6 +261,25 @@ public class AbstractScheduledServiceResourceHandler
         }
         
         return list;
+    }
+    
+    protected Set<Integer> formatRecurringDayOfMonth( List<String> days )
+    {
+        Set<Integer> set = new HashSet<Integer>();
+        
+        for ( String day : days )
+        {
+            if ( "last".equals( day ) )
+            {
+                set.add( DAY_OF_MONTH_LAST );
+            }
+            else
+            {
+                set.add( Integer.valueOf( day ) );
+            }
+        }
+        
+        return set;
     }
 
     protected Date parseDate( String date, String time )
@@ -300,7 +337,7 @@ public class AbstractScheduledServiceResourceHandler
                 parseDate( ( ( ScheduledServiceMonthlyResource ) model ).getStartDate(), 
                            ( ( ScheduledServiceMonthlyResource ) model ).getRecurringTime() ),
                 null,
-                translateFrom( ( ( ScheduledServiceMonthlyResource ) model ).getRecurringDay() ) );
+                formatRecurringDayOfMonth( ( ( ScheduledServiceMonthlyResource ) model ).getRecurringDay() ) );
         }
         else if ( ScheduledServiceWeeklyResource.class.isAssignableFrom( model.getClass() ) )
         {
@@ -308,7 +345,7 @@ public class AbstractScheduledServiceResourceHandler
                  parseDate( ( ( ScheduledServiceWeeklyResource ) model ).getStartDate(), 
                             ( ( ScheduledServiceWeeklyResource ) model ).getRecurringTime() ),
                  null,
-                 translateFrom( ( ( ScheduledServiceWeeklyResource ) model ).getRecurringDay() ) );
+                 formatRecurringDayOfWeek( ( ( ScheduledServiceWeeklyResource ) model ).getRecurringDay() ) );
         }
         else if ( ScheduledServiceDailyResource.class.isAssignableFrom( model.getClass() ) )
         {
@@ -326,29 +363,6 @@ public class AbstractScheduledServiceResourceHandler
         
         return schedule;
     }
-    
-    private Set<Integer> translateFrom( List list )
-    {
-        Set<Integer> set = new HashSet<Integer>();
-        
-        for ( Iterator iter = list.iterator(); iter.hasNext(); )
-        {
-            String next = (String) iter.next();
-            try
-            {
-                
-                set.add( Integer.valueOf( next ) );
-            }
-            catch ( NumberFormatException nfe )
-            {
-                getLogger().log( Level.SEVERE, "Invalid day being added to schedule - " + next + " - skipping.");
-            }
-        }
-        
-        return set;
-    }
-    
-    
     
     protected <T> boolean compareSchedules( ScheduledTask<T> task, ScheduledServiceBaseResource resource)
     {

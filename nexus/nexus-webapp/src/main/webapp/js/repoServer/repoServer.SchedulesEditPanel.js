@@ -457,7 +457,7 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
                 items: [
                   {
                     xtype: 'treepanel',
-                    id: '_weekdays-tree', //note: unique ID is assinged before instantiation
+                    id: 'weekdays_tree',
                     title: 'Selected Days',
                     cls: 'required-field',
                     border: true, //note: this seem to have no effect w/in form panel
@@ -522,7 +522,7 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
                   },
                   {
                     xtype: 'treepanel',
-                    id: id + '_all_weekdays_tree', //note: unique ID is assinged before instantiation
+                    id: 'all_weekdays_tree', 
                     title: 'Available Days',
                     border: true, //note: this seem to have no effect w/in form panel
                     bodyBorder: true, //note: this seem to have no effect w/in form panel
@@ -1636,17 +1636,15 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
     //@note: there has to be a better way to do this.  Depending on offsets is very error prone
     var newConfig = config;
 
-    newConfig.items[5].items[3].items[2].items[0].id = id + '_weekdays-tree';
     newConfig.items[5].items[3].items[2].items[0].root = new Ext.tree.TreeNode({text: 'root'});
-    newConfig.items[5].items[3].items[2].items[1].id = id + '_all_weekdays-tree';
     newConfig.items[5].items[3].items[2].items[1].root = new Ext.tree.TreeNode({text: 'root'});
 
     return newConfig;
   },
 
   loadWeekdayListHelper : function(arr, srcObj, fpanel){
-    var selectedTree = Ext.getCmp(fpanel.id + '_weekdays-tree');
-    var allTree = Ext.getCmp(fpanel.id + '_all_weekdays-tree');
+    var selectedTree = fpanel.find('id', 'weekdays_tree')[0];
+    var allTree = fpanel.find('id', 'all_weekdays_tree')[0];
 
     var weekday;
 
@@ -1740,7 +1738,7 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
     return hours + ':' + minutes;
   },
   exportRecurringDayHelper : function(val, fpanel){
-    var selectedTree = Ext.getCmp(fpanel.id + '_weekdays-tree');
+    var selectedTree = fpanel.find('id', 'weekdays_tree')[0];
 
     var outputArr = [];
     var nodes = selectedTree.root.childNodes;
@@ -1748,7 +1746,7 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
     //Pretty simple here, just go through the weekdays selected and output the payload
     //which is just the name of the weekday (monday, tuesday, etc.)
     for(var i = 0; i < nodes.length; i++){
-      outputArr[i] = nodes[i].attributes.payload;
+      outputArr[i] = Sonatype.utils.lowercase(nodes[i].attributes.payload);
     }
 
     return outputArr;
@@ -1874,8 +1872,8 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
     return importedTime;
   },
   importRecurringDayHelper : function(arr, srcObj, fpanel){
-    var selectedTree = Ext.getCmp(fpanel.id + '_weekdays-tree');
-    var allTree = Ext.getCmp(fpanel.id + '_all_weekdays-tree');
+    var selectedTree = fpanel.find('id', 'weekdays_tree')[0];
+    var allTree = fpanel.find('id', 'all_weekdays_tree')[0];
 
     //Iterate through the list, and add any selected items to the selected tree
     for(var i=0; i<arr.length; i++){
