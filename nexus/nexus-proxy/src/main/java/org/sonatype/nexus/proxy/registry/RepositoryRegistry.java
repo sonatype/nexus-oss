@@ -45,6 +45,14 @@ public interface RepositoryRegistry
     void addRepository( Repository repository );
 
     /**
+     * Updates (replaces) single repository, with keeping all its memberships in groups, etc.
+     * 
+     * @param repository the repository
+     */
+    void updateRepository( Repository repository )
+        throws NoSuchRepositoryException;
+
+    /**
      * Removes single repository.
      * 
      * @param repoId the repo id

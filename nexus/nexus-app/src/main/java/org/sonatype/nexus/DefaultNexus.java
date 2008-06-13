@@ -81,6 +81,7 @@ import org.sonatype.nexus.proxy.events.RepositoryItemEventStore;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEvent;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventAdd;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventRemove;
+import org.sonatype.nexus.proxy.events.RepositoryRegistryEventUpdate;
 import org.sonatype.nexus.proxy.http.HttpProxyService;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
@@ -1590,6 +1591,10 @@ public class DefaultNexus
                 else if ( revt instanceof RepositoryRegistryEventRemove )
                 {
                     sb.insert( 0, "Unregistered" );
+                }
+                else if ( revt instanceof RepositoryRegistryEventUpdate )
+                {
+                    sb.insert( 0, "Updated" );
                 }
 
                 addSystemEvent( FeedRecorder.SYSTEM_CONFIG_ACTION, sb.toString() );

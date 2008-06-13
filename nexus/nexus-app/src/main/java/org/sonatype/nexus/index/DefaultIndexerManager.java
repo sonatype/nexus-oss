@@ -60,6 +60,7 @@ import org.sonatype.nexus.proxy.events.RepositoryItemEventStore;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEvent;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventAdd;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventRemove;
+import org.sonatype.nexus.proxy.events.RepositoryRegistryEventUpdate;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryGroupEvent;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryGroupEventAdd;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryGroupEventRemove;
@@ -258,6 +259,40 @@ public class DefaultIndexerManager
         {
             nexusIndexer.removeIndexingContext( nexusIndexer.getIndexingContexts().get(
                 getRemoteContextId( repository.getId() ) ), deleteFiles );
+        }
+    }
+
+    public void updateRepositoryIndexContext( String repositoryId )
+        throws IOException,
+            NoSuchRepositoryException
+    {
+        Repository repository = repositoryRegistry.getRepository( repositoryId );
+
+        File repoRoot = null;
+        if ( repository.getLocalUrl() != null
+            && repository.getLocalStorage() instanceof DefaultFSLocalRepositoryStorage )
+        {
+            URL url = new URL( repository.getLocalUrl() );
+            try
+            {
+                repoRoot = new File( url.toURI() );
+            }
+            catch ( URISyntaxException e )
+            {
+                repoRoot = new File( url.getPath() );
+            }
+        }
+
+        // get context for repository
+        IndexingContext ctx = nexusIndexer.getIndexingContexts().get( getLocalContextId( repository.getId() ) );
+
+        ctx.setRepository( repoRoot );
+
+        if ( nexusIndexer.getIndexingContexts().containsKey( getRemoteContextId( repository.getId() ) ) )
+        {
+            ctx = nexusIndexer.getIndexingContexts().get( getLocalContextId( repository.getId() ) );
+
+            ctx.setRepository( repoRoot );
         }
     }
 
@@ -973,6 +1008,10 @@ public class DefaultIndexerManager
                 else if ( RepositoryRegistryEventRemove.class.isAssignableFrom( evt.getClass() ) )
                 {
                     removeRepositoryIndexContext( repository.getId(), false );
+                }
+                else if ( RepositoryRegistryEventUpdate.class.isAssignableFrom( evt.getClass() ) )
+                {
+                    updateRepositoryIndexContext( repository.getId() );
                 }
             }
             catch ( Exception e )

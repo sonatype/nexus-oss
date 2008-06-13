@@ -599,8 +599,8 @@ public class DefaultNexusConfiguration
                     getConfiguration(),
                     settings );
 
-                // this is ok, registry maintains a map of reposes, this will simply replace the old one
-                repositoryRegistry.addRepository( newRepository );
+                // replace it with new one
+                repositoryRegistry.updateRepository( newRepository );
 
                 List<CRepository> reposes = getConfiguration().getRepositories();
 
@@ -793,9 +793,9 @@ public class DefaultNexusConfiguration
                 Repository newRepository = runtimeConfigurationBuilder.createRepositoryFromModel(
                     getConfiguration(),
                     settings );
-
-                // this is ok, registry maintains a map of reposes, this will simply replace the old one
-                repositoryRegistry.addRepository( newRepository );
+                
+                // replace it with new one
+                repositoryRegistry.updateRepository( newRepository );
 
                 List<CRepositoryShadow> reposes = getConfiguration().getRepositoryShadows();
 

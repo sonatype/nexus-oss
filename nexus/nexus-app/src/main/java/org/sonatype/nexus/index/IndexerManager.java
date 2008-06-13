@@ -48,6 +48,10 @@ public interface IndexerManager
         throws IOException,
             NoSuchRepositoryException;
 
+    void updateRepositoryIndexContext( String repositoryId )
+        throws IOException,
+            NoSuchRepositoryException;
+
     void addRepositoryGroupIndexContext( String repositoryGroupId )
         throws IOException,
             NoSuchRepositoryGroupException;

@@ -34,6 +34,7 @@ import org.sonatype.nexus.proxy.events.EventListener;
 import org.sonatype.nexus.proxy.events.EventMulticaster;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventAdd;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventRemove;
+import org.sonatype.nexus.proxy.events.RepositoryRegistryEventUpdate;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryGroupEventAdd;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryGroupEventRemove;
 import org.sonatype.nexus.proxy.repository.Repository;
@@ -77,8 +78,32 @@ public class DefaultRepositoryRegistry
         notifyProximityEventListeners( new RepositoryRegistryEventAdd( repository ) );
 
         getLogger().info(
-            "Added repository ID=" + repository.getId() + " (contentClass=" + repository.getRepositoryContentClass().getId()
-                + ")" );
+            "Added repository ID=" + repository.getId() + " (contentClass="
+                + repository.getRepositoryContentClass().getId() + ")" );
+    }
+
+    public void updateRepository( Repository repository )
+        throws NoSuchRepositoryException
+    {
+        if ( repositories.containsKey( repository.getId() ) )
+        {
+            repositories.put( repository.getId(), repository );
+
+            if ( repository instanceof EventMulticaster )
+            {
+                ( (EventMulticaster) repository ).addProximityEventListener( this );
+            }
+
+            notifyProximityEventListeners( new RepositoryRegistryEventUpdate( repository ) );
+
+            getLogger().info(
+                "Updated repository ID=" + repository.getId() + " (contentClass="
+                    + repository.getRepositoryContentClass().getId() + ")" );
+        }
+        else
+        {
+            throw new NoSuchRepositoryException( repository.getId() );
+        }
     }
 
     public void removeRepository( String repoId )
@@ -134,8 +159,7 @@ public class DefaultRepositoryRegistry
                     }
                     else if ( !contentClass.isCompatible( repository.getRepositoryContentClass() ) )
                     {
-                        throw new InvalidGroupingException(
-                            "The repositories in the group are not compatible classes" );
+                        throw new InvalidGroupingException( "The repositories in the group are not compatible classes" );
                     }
 
                     groupOrder.add( repository.getId() );
