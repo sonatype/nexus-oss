@@ -49,32 +49,42 @@ Sonatype.repoServer.LogsViewPanel = function(config){
     tbar: [
       {
         text: "Refresh",
-        tooltip: {text:'Reloads the current log file'},
+        tooltip: {text:'Reloads the current document'},
         icon: Sonatype.config.resourcePath + '/images/icons/arrow_refresh.png',
         cls: 'x-btn-text-icon',
         handler: this.getLogFile,
         scope: this
       },
       {
-        text: 'Download Log',
+        text: 'Download',
         icon: Sonatype.config.resourcePath + '/images/icons/page_white_put.png',
         cls: 'x-btn-text-icon',
         scope:this,
         handler: function(){
-          window.open(this.currentLogUrl);
+          if ( this.currentLogUrl ) {
+            window.open(this.currentLogUrl);
+          }
         }
       },
       {
         id: 'log-btn',
-        split:true,
-        text:'Select a log...',
+        text:'Select a document...',
         icon: Sonatype.config.resourcePath + '/images/icons/page_white_stack.png',
         cls: 'x-btn-text-icon',
-        tooltip: {text:'Select the log file to display'},
+        tooltip: {text:'Select the file to display'},
         //handler: this.movePreview.createDelegate(this, []),
         menu:{
           id:'log-menu',
-          width:200
+          width:200,
+          items: [
+            {
+              text: 'nexus.xml',
+              checked: false,
+              group:'rp-group',
+              checkHandler: this.logMenuBtnClick.createDelegate(this, [Sonatype.config.repos.urls.configCurrent,'application/xml'], 0),
+              scope:this
+            }
+          ]
         }
       }      
     ],
@@ -85,7 +95,7 @@ Sonatype.repoServer.LogsViewPanel = function(config){
         readOnly: true,
         hideLabel: true,
         anchor: '100% 100%',
-        emptyText: 'Select a log to view'
+        emptyText: 'Select a document to view'
       }
     ]
   });
@@ -105,29 +115,29 @@ Ext.extend(Sonatype.repoServer.LogsViewPanel, Ext.form.FormPanel, {
           text: resp.data[i].name,
           checked: false,
           group:'rp-group',
-          checkHandler: this.logMenuBtnClick.createDelegate(this, [resp.data[i].resourceURI], 0),
+          checkHandler: this.logMenuBtnClick.createDelegate(this, [resp.data[i].resourceURI,'text/plain'], 0),
           scope:this
         });
       }
     }
     else {
-      Ext.MessageBox.alert('Failed to get log list from server.');
+      Ext.MessageBox.alert('Failed to get file list from server.');
     }
   },
   
-  logMenuBtnClick : function(resourceUri, mItem, pressed){
+  logMenuBtnClick : function(resourceUri, contentType, mItem, pressed){
     this.getTopToolbar().items.get(2).setText(mItem.text);
     this.currentLogUrl = resourceUri;
-    this.getLogFile();
+    this.getLogFile(contentType);
   },
   
   //gets the log file specified by this.currentLogUrl
-  getLogFile : function(){
+  getLogFile : function(contentType){
     Ext.Ajax.request({
       callback: this.renderLog,
       scope: this,
       method: 'GET',
-      headers: {'accept' : 'text/plain'},
+      headers: {'accept' : contentType},
       url: this.currentLogUrl
     });
   },
@@ -137,7 +147,7 @@ Ext.extend(Sonatype.repoServer.LogsViewPanel, Ext.form.FormPanel, {
       this.logTextArea.setRawValue(response.responseText);
     }
     else {
-      Ext.MessageBox.alert('The log failed to load from the server.');
+      Ext.MessageBox.alert('The file failed to load from the server.');
     }
   }
   

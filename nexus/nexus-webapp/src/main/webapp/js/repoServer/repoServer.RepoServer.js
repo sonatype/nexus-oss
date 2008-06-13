@@ -266,9 +266,9 @@ Sonatype.repoServer.RepoServer = function(){
       if(sp.checkPermission(userPerms.viewSystemChanges, sp.READ)){
         vTplData.links.push( {id:'open-system-changes', title:'System Feeds'} );
       }
-//      if(sp.checkPermission(userPerms.maintLogs, sp.READ) || sp.checkPermission(userPerms.maintConfig, sp.READ)){
-//         vTplData.links.push( {id:'open-view-logs', title:'Logs and Config Files'} );
-//      }
+      if(sp.checkPermission(userPerms.maintLogs, sp.READ) || sp.checkPermission(userPerms.maintConfig, sp.READ)){
+         vTplData.links.push( {id:'open-view-logs', title:'Logs and Config Files'} );
+      }
       if(vTplData.links.length > 0){
         panelConf = Ext.apply({}, {title:'Views', id:'st-nexus-views', html: bodyTpl.apply(vTplData)}, defaultGroupPanel);
         this.addClickListeners( this.nexusPanel.add(panelConf) ); 
@@ -291,12 +291,6 @@ Sonatype.repoServer.RepoServer = function(){
       }
       if(sp.checkPermission(userPerms.configSchedules, sp.EDIT)){
         cTplData.links.push( {id:'open-config-schedules', title:'Scheduled Services'} );
-      }
-      if(sp.checkPermission(userPerms.maintConfig, sp.READ)){
-         cTplData.links.push( {id:'open-view-config', title:'View Server Config'} );
-      }
-      if(sp.checkPermission(userPerms.maintLogs, sp.READ)){
-         cTplData.links.push( {id:'open-view-logs', title:'View Server Logs'} );
       }
       if(cTplData.links.length > 0){
         panelConf = Ext.apply({}, {title:'Administration', id:'st-nexus-config', html: bodyTpl.apply(cTplData)}, defaultGroupPanel);
@@ -363,13 +357,9 @@ Sonatype.repoServer.RepoServer = function(){
         var id = 'feed-view-system_changes';
         Sonatype.view.mainTabPanel.addOrShowTab(id, Sonatype.repoServer.FeedViewPanel, {title: 'System Feeds'});
       },      
-      'open-view-config' : function(scope) {
-        var id = 'view-config';
-        Sonatype.view.mainTabPanel.addOrShowTab(id, Sonatype.repoServer.ConfigViewPanel, {title: 'Config'});
-      },
       'open-view-logs' : function(scope) {
         var id = 'view-logs';
-        Sonatype.view.mainTabPanel.addOrShowTab(id, Sonatype.repoServer.LogsViewPanel, {title: 'Logs'});
+        Sonatype.view.mainTabPanel.addOrShowTab(id, Sonatype.repoServer.LogsViewPanel, {title: 'Logs and Configs'});
       },
       'open-repos-maint-readonly' : function(scope){
         var id = 'repos-maint-readonly';
