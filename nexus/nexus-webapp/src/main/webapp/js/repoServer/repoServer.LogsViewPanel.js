@@ -24,7 +24,8 @@ Sonatype.repoServer.LogsViewPanel = function(config){
   var defaultConfig = {};
   Ext.apply(this, config, defaultConfig);
 
-  this.currentLogUrl = "";
+  this.currentLogUrl = null;
+  this.currentContentType = null;
   
   this.listeners = {
     'beforerender' : function(){
@@ -126,20 +127,24 @@ Ext.extend(Sonatype.repoServer.LogsViewPanel, Ext.form.FormPanel, {
   },
   
   logMenuBtnClick : function(resourceUri, contentType, mItem, pressed){
+    this.currentContentType = contentType;
     this.getTopToolbar().items.get(2).setText(mItem.text);
     this.currentLogUrl = resourceUri;
     this.getLogFile(contentType);
   },
   
   //gets the log file specified by this.currentLogUrl
-  getLogFile : function(contentType){
-    Ext.Ajax.request({
-      callback: this.renderLog,
-      scope: this,
-      method: 'GET',
-      headers: {'accept' : contentType},
-      url: this.currentLogUrl
-    });
+  getLogFile : function(){
+    //Don't bother refreshing if no files are currently shown
+    if (this.currentLogUrl){
+      Ext.Ajax.request({
+        callback: this.renderLog,
+        scope: this,
+        method: 'GET',
+        headers: {'accept' : this.currentContentType ? this.currentContentType : 'text/plain'},
+        url: this.currentLogUrl
+      });
+    }
   },
   
   renderLog : function(options, success, response){
