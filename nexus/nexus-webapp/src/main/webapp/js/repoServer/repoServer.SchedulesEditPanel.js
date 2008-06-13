@@ -1946,7 +1946,7 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
               servicePropertyItem.setValue(Number(srcObj.properties[i].value));
             }
             else if (servicePropertyItem.xtype == 'checkbox'){
-              servicePropertyItem.setValue(Boolean(srcObj.properties[i].value));
+              servicePropertyItem.setValue(Boolean('true' == srcObj.properties[i].value));
             }
             else if (servicePropertyItem.xtype == 'combo'){
               servicePropertyItem.setValue(srcObj.properties[i].value);
