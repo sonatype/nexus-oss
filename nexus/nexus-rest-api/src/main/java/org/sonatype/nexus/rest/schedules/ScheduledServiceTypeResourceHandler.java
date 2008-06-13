@@ -76,8 +76,8 @@ public class ScheduledServiceTypeResourceHandler
         property.setId( PublishIndexesTask.REPOSITORY_OR_GROUP_ID_KEY );
         property.setName( "Repository/Group" );
         property.setType( PROPERTY_TYPE_REPO_OR_GROUP );
-        property.setRequired( false );
-        property.setHelpText( "Select the repository or repository group to assign to this task.  Making no selection will result in the task running for ALL repositories." );
+        property.setRequired( true );
+        property.setHelpText( "Select the repository or repository group to assign to this task." );
         type.addProperty( property );
         response.addData( type );
         
@@ -88,8 +88,8 @@ public class ScheduledServiceTypeResourceHandler
         property.setId( PublishIndexesTask.REPOSITORY_OR_GROUP_ID_KEY );
         property.setName( "Repository/Group" );
         property.setType( PROPERTY_TYPE_REPO_OR_GROUP );
-        property.setRequired( false );
-        property.setHelpText( "Select the repository or repository group to assign to this task.  Making no selection will result in the task running for ALL repositories." );
+        property.setRequired( true );
+        property.setHelpText( "Select the repository or repository group to assign to this task." );
         type.addProperty( property );
         response.addData( type );
 
@@ -100,8 +100,8 @@ public class ScheduledServiceTypeResourceHandler
         property.setId( PublishIndexesTask.REPOSITORY_OR_GROUP_ID_KEY );
         property.setName( "Repository/Group" );
         property.setType( PROPERTY_TYPE_REPO_OR_GROUP );
-        property.setRequired( false );
-        property.setHelpText( "Select the repository or repository group to assign to this task.  Making no selection will result in the task running for ALL repositories." );
+        property.setRequired( true );
+        property.setHelpText( "Select the repository or repository group to assign to this task." );
         type.addProperty( property );
         response.addData( type );
 
@@ -112,8 +112,8 @@ public class ScheduledServiceTypeResourceHandler
         property.setId( PublishIndexesTask.REPOSITORY_OR_GROUP_ID_KEY );
         property.setName( "Repository/Group" );
         property.setType( PROPERTY_TYPE_REPO_OR_GROUP );
-        property.setRequired( false );
-        property.setHelpText( "Select the repository or repository group to assign to this task.  Making no selection will result in the task running for ALL repositories." );
+        property.setRequired( true );
+        property.setHelpText( "Select the repository or repository group to assign to this task." );
         type.addProperty( property );
         property = new ScheduledServiceTypePropertyResource();
         property.setId( ClearCacheTask.RESOURCE_STORE_PATH_KEY );
@@ -131,8 +131,8 @@ public class ScheduledServiceTypeResourceHandler
         property.setId( PublishIndexesTask.REPOSITORY_OR_GROUP_ID_KEY );
         property.setName( "Repository/Group" );
         property.setType( PROPERTY_TYPE_REPO_OR_GROUP );
-        property.setRequired( false );
-        property.setHelpText( "Select the repository or repository group to assign to this task.  Making no selection will result in the task running for ALL repositories." );
+        property.setRequired( true );
+        property.setHelpText( "Select the repository or repository group to assign to this task." );
         type.addProperty( property );
         property = new ScheduledServiceTypePropertyResource();
         property.setId( SnapshotRemoverTask.MIN_SNAPSHOTS_TO_KEEP_KEY );

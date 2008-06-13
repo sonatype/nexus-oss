@@ -190,6 +190,12 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
               'repo_' + item.id);
             this.repoOrGroupDataStore.add([newRec]);
           },this);
+          var allRec = new this.repositoryRecordConstructor({
+            id : 'all_repo',
+            name : 'All Repositories'
+          },
+          'all_repo');
+          this.repoOrGroupDataStore.insert(0, allRec);
         },
         scope: this
       }
