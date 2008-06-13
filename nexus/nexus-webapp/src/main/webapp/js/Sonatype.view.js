@@ -199,5 +199,7 @@ Sonatype.view.MainTabPanel = Ext.extend(Ext.TabPanel, {
     }
     
     this.setActiveTab(tab);
+    
+    return tab;
   }
 });

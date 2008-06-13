@@ -216,13 +216,53 @@ Sonatype.repoServer.RepoServer = function(){
       
       var groupConfigs = [];
       var panelConf;
+
+      if(sp.checkPermission(userPerms.viewSearch, sp.READ)){
+        this.addClickListeners( 
+          this.nexusPanel.add( Ext.apply( {},
+            {
+              title: 'Artifact Search',
+              id: 'st-nexus-search',
+              items: [
+                {
+                  xtype: 'trigger',
+                  id: 'quick-search--field',
+                  triggerClass: 'x-form-search-trigger',
+                  repoPanel: this,
+                  width: 150,
+                  listeners: {
+                    'specialkey': {
+                      fn: function(f, e){
+                        if(e.getKey() == e.ENTER){
+                          this.onTriggerClick();
+                        }
+                      }
+                    }
+                  },
+                  onTriggerClick: function(a,b,c){
+                    var v = this.getRawValue();
+                    if ( v.length > 0 ) {
+                      var panel = this.repoPanel.actions['open-search-all'](this.repoPanel);
+                      panel.searchField.setRawValue( this.getRawValue() );
+                      panel.startSearch( panel );
+                    }
+                  }
+                }
+              ],
+              html: bodyTpl.apply({
+                links: [
+                  { id:'open-search-all', title: 'Show Search Results' }
+                ]
+              }) 
+            },
+            defaultGroupPanel )
+          )
+        );
+      }
       
       //Views Group **************************************************
       var vTplData = {links:[]};
       
-      if(sp.checkPermission(userPerms.viewSearch, sp.READ)){
-        vTplData.links.push( {id:'open-search-all', title:'Artifact Search'} );
-      }
       if(sp.checkPermission(userPerms.maintRepos, sp.READ)) {
         vTplData.links.push({
           id: sp.checkPermission(userPerms.maintRepos, sp.EDIT) ?
@@ -317,7 +357,7 @@ Sonatype.repoServer.RepoServer = function(){
     actions : {
       'open-search-all' : function(scope) {
         var id = 'st-nexus-search-panel';
-        Sonatype.view.mainTabPanel.addOrShowTab(id, Sonatype.repoServer.SearchPanel, {title: 'Search'});
+        return Sonatype.view.mainTabPanel.addOrShowTab(id, Sonatype.repoServer.SearchPanel, {title: 'Search'});
       },
       'open-checksum-search' : function(scope) {
         var id = 'st-nexus-checksum-search-panel';
