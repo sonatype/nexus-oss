@@ -152,6 +152,7 @@ Sonatype.repoServer.RepoServer = function(){
               }, Sonatype.view.mainTabPanel);
               //show welcome tab again
               Sonatype.view.mainTabPanel.add(Sonatype.view.welcomeTab);
+              Sonatype.view.welcomeTab.setVisible(true);
               Sonatype.view.mainTabPanel.setActiveTab(Sonatype.view.welcomeTab);
               
               this.loginWindow.hide();
@@ -262,7 +263,7 @@ Sonatype.repoServer.RepoServer = function(){
          cTplData.links.push( {id:'open-view-logs', title:'View Server Logs'} );
       }
       if(cTplData.links.length > 0){
-        panelConf = Ext.apply({}, {title:'Configuration', id:'st-nexus-config', html: bodyTpl.apply(cTplData)}, defaultGroupPanel);
+        panelConf = Ext.apply({}, {title:'Administration', id:'st-nexus-config', html: bodyTpl.apply(cTplData)}, defaultGroupPanel);
         this.addClickListeners( this.nexusPanel.add(panelConf) ); 
         //groupConfigs.push(panelConf);
       }
@@ -281,20 +282,12 @@ Sonatype.repoServer.RepoServer = function(){
       }
 */
 
-      //Security Group **************************************************
-      var sTplData = {links:[]};
-      if( sp.checkPermission( userPerms.configServer, sp.EDIT ) ) {
-        sTplData.links.push( { id: 'open-security-users', title: 'Users' } );
-      }
-      if ( sp.checkPermission( userPerms.configServer, sp.EDIT ) ) {
-        sTplData.links.push( { id: 'open-security-roles', title: 'Roles' } );
-      }
-      if ( sTplData.links.length > 0 ){
-        panelConf = Ext.apply( {}, { title:'Security', id: 'st-nexus-security', html: bodyTpl.apply( sTplData ) }, defaultGroupPanel );
       this.nexusPanel.add( Ext.apply( {},
         {
           title: 'Help',
           id: 'st-nexus-docs',
+          collapsible: true,
+          collapsed: true,
           html: linkTpl.apply({
             links: [
               { href: 'http://nexus.sonatype.org/', title: 'Nexus Home' },
@@ -307,7 +300,6 @@ Sonatype.repoServer.RepoServer = function(){
           }) 
         },
         defaultGroupPanel ) );
-      }
 
       if (wasRendered) {
         this.nexusPanel.doLayout();
@@ -401,6 +393,7 @@ Sonatype.repoServer.RepoServer = function(){
             }, Sonatype.view.mainTabPanel);
             
             Sonatype.view.mainTabPanel.add(Sonatype.view.welcomeTab);
+            Sonatype.view.welcomeTab.setVisible(true);
             Sonatype.view.mainTabPanel.setActiveTab(Sonatype.view.welcomeTab);
             
             Sonatype.user.curr = Sonatype.utils.cloneObj(Sonatype.user.anon);
