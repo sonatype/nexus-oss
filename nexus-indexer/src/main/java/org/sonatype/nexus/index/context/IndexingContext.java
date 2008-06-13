@@ -64,6 +64,13 @@ public interface IndexingContext
     File getRepository();
 
     /**
+     * Sets the location of the local repository.
+     * 
+     * @param repository
+     */
+    void setRepository( File repository );
+
+    /**
      * Returns public repository url.
      */
     String getRepositoryUrl();

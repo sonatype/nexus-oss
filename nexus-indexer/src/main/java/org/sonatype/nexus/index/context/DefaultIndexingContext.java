@@ -309,6 +309,11 @@ public class DefaultIndexingContext
         return repository;
     }
 
+    public void setRepository( File repository )
+    {
+        this.repository = repository;
+    }
+
     public String getRepositoryUrl()
     {
         return repositoryUrl;
@@ -387,12 +392,12 @@ public class DefaultIndexingContext
             }
 
             closeReaders();
-            
+
             if ( deleteFiles )
             {
                 deleteIndexFiles();
             }
-            
+
             indexDirectory.close();
         }
         // TODO: this will prevent from reopening them, but needs better solution
