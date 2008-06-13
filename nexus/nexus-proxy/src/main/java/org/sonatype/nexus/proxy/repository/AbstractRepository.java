@@ -769,6 +769,15 @@ public abstract class AbstractRepository
                 getLogger().debug( getId() + " retrieveItem() :: FOUND " + uid.toString() );
             }
 
+            if ( StorageCollectionItem.class.isAssignableFrom( item.getClass() ) && !isBrowseable() )
+            {
+                getLogger().debug(
+                    getId() + " retrieveItem() :: FOUND a collection on " + uid.toString()
+                        + " but repository is not Browseable." );
+
+                throw new ItemNotFoundException( uid );
+            }
+
             return item;
         }
         catch ( ItemNotFoundException ex )
