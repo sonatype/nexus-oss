@@ -24,6 +24,7 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Collection;
@@ -191,22 +192,9 @@ public class DefaultIndexerManager
             remoteRoot = repository.getRemoteUrl();
         }
 
-        // add context for repository
-        File repoRoot = null;
-        if ( repository.getLocalUrl() != null
-            && repository.getLocalStorage() instanceof DefaultFSLocalRepositoryStorage )
-        {
-            URL url = new URL( repository.getLocalUrl() );
-            try
-            {
-                repoRoot = new File( url.toURI() );
-            }
-            catch ( URISyntaxException e )
-            {
-                repoRoot = new File( url.getPath() );
-            }
-        }
+        File repoRoot = getRepositoryLocalStorageAsFile( repository );
 
+        // add context for repository
         IndexingContext ctxLocal = nexusIndexer.addIndexingContextForced(
             getLocalContextId( repository.getId() ),
             repository.getId(),
@@ -268,20 +256,7 @@ public class DefaultIndexerManager
     {
         Repository repository = repositoryRegistry.getRepository( repositoryId );
 
-        File repoRoot = null;
-        if ( repository.getLocalUrl() != null
-            && repository.getLocalStorage() instanceof DefaultFSLocalRepositoryStorage )
-        {
-            URL url = new URL( repository.getLocalUrl() );
-            try
-            {
-                repoRoot = new File( url.toURI() );
-            }
-            catch ( URISyntaxException e )
-            {
-                repoRoot = new File( url.getPath() );
-            }
-        }
+        File repoRoot = getRepositoryLocalStorageAsFile( repository );
 
         // get context for repository
         IndexingContext ctx = nexusIndexer.getIndexingContexts().get( getLocalContextId( repository.getId() ) );
@@ -290,7 +265,7 @@ public class DefaultIndexerManager
 
         if ( nexusIndexer.getIndexingContexts().containsKey( getRemoteContextId( repository.getId() ) ) )
         {
-            ctx = nexusIndexer.getIndexingContexts().get( getLocalContextId( repository.getId() ) );
+            ctx = nexusIndexer.getIndexingContexts().get( getRemoteContextId( repository.getId() ) );
 
             ctx.setRepository( repoRoot );
         }
@@ -341,6 +316,36 @@ public class DefaultIndexerManager
         {
             nexusIndexer.getIndexingContexts().get( getRemoteContextId( repositoryId ) ).setSearchable( searchable );
         }
+    }
+
+    /**
+     * Extracts the repo root on local FS as File. It may return null!
+     * 
+     * @param repository
+     * @return
+     * @throws MalformedURLException
+     */
+    protected File getRepositoryLocalStorageAsFile( Repository repository )
+        throws MalformedURLException
+    {
+        File repoRoot = null;
+
+        if ( repository.getLocalUrl() != null
+            && repository.getLocalStorage() instanceof DefaultFSLocalRepositoryStorage )
+        {
+            URL url = new URL( repository.getLocalUrl() );
+
+            try
+            {
+                repoRoot = new File( url.toURI() );
+            }
+            catch ( URISyntaxException e )
+            {
+                repoRoot = new File( url.getPath() );
+            }
+        }
+
+        return repoRoot;
     }
 
     // ----------------------------------------------------------------------------

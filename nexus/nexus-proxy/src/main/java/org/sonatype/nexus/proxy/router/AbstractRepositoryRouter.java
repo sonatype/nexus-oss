@@ -316,6 +316,8 @@ public abstract class AbstractRepositoryRouter
 
                 fos.close();
             }
+            
+            IOUtil.close( is );
         }
     }
 
