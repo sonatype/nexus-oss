@@ -163,7 +163,7 @@ public class DefaultNexus
     /**
      * The snapshot remover component.
      * 
-     * @plexus.requiremenr
+     * @plexus.requirement
      */
     private SnapshotRemover snapshotRemover;
 
