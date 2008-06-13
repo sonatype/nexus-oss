@@ -271,6 +271,14 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
       {
         xtype: 'hidden',
         name: 'id'
+      },
+      {
+        xtype: 'checkbox',
+        fieldLabel: 'Enabled',
+        helpText: ht.enabled,
+        name: 'enabled',
+        allowBlank: false,
+        checked: true
       },      
       {
         xtype: 'textfield',
@@ -1011,7 +1019,6 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
           {
             xtype: 'checkbox',
             fieldLabel: curRec.name,
-            itemCls: curRec.required ? 'required-field' : '',
             helpText: curRec.helpText,
             name: 'serviceProperties_' + curRec.id,
             disabled:true
@@ -1651,8 +1658,8 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
     //@note: there has to be a better way to do this.  Depending on offsets is very error prone
     var newConfig = config;
 
-    newConfig.items[5].items[3].items[2].items[0].root = new Ext.tree.TreeNode({text: 'root'});
-    newConfig.items[5].items[3].items[2].items[1].root = new Ext.tree.TreeNode({text: 'root'});
+    newConfig.items[6].items[3].items[2].items[0].root = new Ext.tree.TreeNode({text: 'root'});
+    newConfig.items[6].items[3].items[2].items[1].root = new Ext.tree.TreeNode({text: 'root'});
 
     return newConfig;
   },

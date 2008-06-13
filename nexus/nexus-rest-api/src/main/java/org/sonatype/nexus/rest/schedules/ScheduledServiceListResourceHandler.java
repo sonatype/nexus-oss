@@ -118,6 +118,8 @@ public class ScheduledServiceListResourceHandler
         {
             ScheduledTask<Object> task = getNexus().schedule( getModelName( request.getData() ), getModelNexusTask( request.getData() ), getModelSchedule( request.getData() ) );
             
+            task.setEnabled( request.getData().isEnabled() );
+            
             ScheduledServiceResourceStatus resourceStatus = new ScheduledServiceResourceStatus();
             resourceStatus.setResource( request.getData() );
             //Just need to update the id, as the incoming data is a POST w/ no id

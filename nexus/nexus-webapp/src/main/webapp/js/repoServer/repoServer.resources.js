@@ -87,6 +87,7 @@ Sonatype.repoServer.resources.help = {
   
   // Scheduled Services Config help text
   schedules : {
+    enabled : 'This flag determines if the service is currently active.  To disable this service for a period of time, de-select this checkbox.',
     name : 'A name for the Scheduled Service.',
     serviceType : 'The Type of service that will be scheduled to run.',
     serviceSchedule : 'The frequency this service will run.  None - this service can only be run manually. Once - run the service once at the specified date/time. Daily - run the service every day at the specified time. Weekly - run the service every week on the specified day at the specified time. Monthly - run the service every month on the specified day(s) and time. Advanced - run the service using the supplied cron string.',

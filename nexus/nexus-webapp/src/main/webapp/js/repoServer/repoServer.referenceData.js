@@ -156,6 +156,7 @@ Sonatype.repoServer.referenceData = {
     none : {
       id : "",
 	  name : "",
+	  enabled : "",
 	  typeId : "",
 	  schedule : "",
 	  properties : [{
@@ -166,6 +167,7 @@ Sonatype.repoServer.referenceData = {
     once : {
       id : "",
 	  name : "",
+	  enabled : "",
 	  typeId : "",
       schedule : "",
       properties : [{
@@ -178,6 +180,7 @@ Sonatype.repoServer.referenceData = {
     daily : {
 	  id : "",
 	  name : "",
+	  enabled : "",
 	  typeId : "",
       schedule : "",
       properties : [{
@@ -190,6 +193,7 @@ Sonatype.repoServer.referenceData = {
     weekly : {
 	  id : "",
 	  name : "",
+	  enabled : "",
 	  typeId : "",
       schedule : "",
       properties : [{
@@ -203,6 +207,7 @@ Sonatype.repoServer.referenceData = {
     monthly : {
 	  id : "",
 	  name : "",
+	  enabled : "",
 	  typeId : "",
       schedule : "",
       properties : [{
@@ -216,6 +221,7 @@ Sonatype.repoServer.referenceData = {
     advanced : {
 	  id : "",
 	  name : "",
+	  enabled : "",
 	  typeId : "",
       schedule : "",
       properties : [{

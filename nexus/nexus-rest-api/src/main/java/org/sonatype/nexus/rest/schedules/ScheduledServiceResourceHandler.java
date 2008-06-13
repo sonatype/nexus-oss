@@ -151,6 +151,7 @@ public class ScheduledServiceResourceHandler
             if ( resource != null )
             {
                 resource.setId( task.getId() );
+                resource.setEnabled( task.isEnabled() );
                 resource.setName( task.getName() );
                 resource.setSchedule( getScheduleShortName( task.getSchedule() ) );
                 resource.setTypeId( task.getType() );
@@ -205,6 +206,8 @@ public class ScheduledServiceResourceHandler
                 // task schedule (even to another type)
                 // task params
                 ScheduledTask<?> task = getNexus().getTaskById( getScheduledServiceId() );
+                
+                task.setEnabled( resource.isEnabled() );
 
                 task.setName( getModelName( resource ) );
 
