@@ -27,7 +27,7 @@ import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesTask;
  * Rebuild attributes task.
  * 
  * @author cstamas
- * @plexus.component role="org.sonatype.nexus.tasks.RebuildAttributesTask"
+ * @plexus.component role="org.sonatype.nexus.tasks.RebuildAttributesTask" instantiation-strategy="per-lookup"
  */
 public class RebuildAttributesTask
     extends AbstractNexusRepositoriesTask<Object>

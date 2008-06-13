@@ -29,7 +29,7 @@ import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesTask;
  * Publish indexes task.
  * 
  * @author cstamas
- * @plexus.component role="org.sonatype.nexus.tasks.PublishIndexesTask"
+ * @plexus.component role="org.sonatype.nexus.tasks.PublishIndexesTask" instantiation-strategy="per-lookup"
  */
 public class PublishIndexesTask
     extends AbstractNexusRepositoriesTask<Object>

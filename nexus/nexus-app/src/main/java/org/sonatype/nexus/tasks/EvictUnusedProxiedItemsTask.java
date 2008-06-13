@@ -27,7 +27,7 @@ import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesTask;
  * Evicts unused proxied items.
  * 
  * @author cstamas
- * @plexus.component role="org.sonatype.nexus.tasks.EvictUnusedItemsTask"
+ * @plexus.component role="org.sonatype.nexus.tasks.EvictUnusedItemsTask" instantiation-strategy="per-lookup"
  */
 public class EvictUnusedProxiedItemsTask
     extends AbstractNexusRepositoriesTask<Object>
@@ -50,15 +50,20 @@ public class EvictUnusedProxiedItemsTask
     {
         if ( getRepositoryGroupId() != null )
         {
-            getNexus().evictRepositoryGroupUnusedProxiedItems( getEvictOlderCacheItemsThen(), getRepositoryGroupId() );
+            getNexus().evictRepositoryGroupUnusedProxiedItems(
+                System.currentTimeMillis() - ( getEvictOlderCacheItemsThen() * 24 * 60 * 60 * 1000 ),
+                getRepositoryGroupId() );
         }
         else if ( getRepositoryId() != null )
         {
-            getNexus().evictRepositoryUnusedProxiedItems( getEvictOlderCacheItemsThen(), getRepositoryId() );
+            getNexus().evictRepositoryUnusedProxiedItems(
+                System.currentTimeMillis() - ( getEvictOlderCacheItemsThen() * 24 * 60 * 60 * 1000 ),
+                getRepositoryId() );
         }
         else
         {
-            getNexus().evictAllUnusedProxiedItems( getEvictOlderCacheItemsThen() );
+            getNexus().evictAllUnusedProxiedItems(
+                System.currentTimeMillis() - ( getEvictOlderCacheItemsThen() * 24 * 60 * 60 * 1000 ) );
         }
 
         return null;

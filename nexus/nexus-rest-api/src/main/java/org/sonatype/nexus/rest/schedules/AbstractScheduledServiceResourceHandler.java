@@ -32,7 +32,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Level;
 
 import org.restlet.Context;
 import org.restlet.data.Request;
@@ -48,7 +47,10 @@ import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceWeeklyResource;
 import org.sonatype.nexus.scheduling.NexusTask;
 import org.sonatype.nexus.tasks.ClearCacheTask;
+import org.sonatype.nexus.tasks.EvictUnusedItemsTask;
+import org.sonatype.nexus.tasks.EvictUnusedProxiedItemsTask;
 import org.sonatype.nexus.tasks.PublishIndexesTask;
+import org.sonatype.nexus.tasks.PurgeTimeline;
 import org.sonatype.nexus.tasks.RebuildAttributesTask;
 import org.sonatype.nexus.tasks.ReindexTask;
 import org.sonatype.scheduling.ScheduledTask;
@@ -89,7 +91,7 @@ public class AbstractScheduledServiceResourceHandler
      * Type property resource: number
      */
     public static final String PROPERTY_TYPE_NUMBER = "number";
-    
+
     /**
      * Type property resource: number
      */
@@ -109,12 +111,12 @@ public class AbstractScheduledServiceResourceHandler
      * Type property resource: repositoryGroup
      */
     public static final String PROPERTY_TYPE_REPO_GROUP = "group";
-    
+
     /**
      * Type property resource: repo-or-group
      */
     public static final String PROPERTY_TYPE_REPO_OR_GROUP = "repo-or-group";
-    
+
     public static final Integer DAY_OF_MONTH_LAST = new Integer( 999 );
 
     private DateFormat timeFormat = new SimpleDateFormat( "HH:mm" );
@@ -126,6 +128,9 @@ public class AbstractScheduledServiceResourceHandler
         serviceNames.put( RebuildAttributesTask.class.getName(), "Rebuild Repository Atributes" );
         serviceNames.put( ClearCacheTask.class.getName(), "Clear Repository Caches" );
         serviceNames.put( SnapshotRemoverTask.class.getName(), "Remove Snapshots From Repository" );
+        serviceNames.put( EvictUnusedItemsTask.class.getName(), "Evict Unused Items From Repository" );
+        serviceNames.put( EvictUnusedProxiedItemsTask.class.getName(), "Evict Unused Proxied Items From Repository Caches" );
+        serviceNames.put( PurgeTimeline.class.getName(), "Purge Nexus Timeline" );
     }
 
     /**
@@ -189,11 +194,11 @@ public class AbstractScheduledServiceResourceHandler
     {
         return timeFormat.format( date );
     }
-    
-    protected List<ScheduledServicePropertyResource> formatServiceProperties( Map<String,String> map )
+
+    protected List<ScheduledServicePropertyResource> formatServiceProperties( Map<String, String> map )
     {
         List<ScheduledServicePropertyResource> list = new ArrayList<ScheduledServicePropertyResource>();
-        
+
         for ( String key : map.keySet() )
         {
             ScheduledServicePropertyResource prop = new ScheduledServicePropertyResource();
@@ -201,53 +206,102 @@ public class AbstractScheduledServiceResourceHandler
             prop.setValue( map.get( key ) );
             list.add( prop );
         }
-        
+
         return list;
     }
-    
+
     protected List<String> formatRecurringDayOfWeek( Set<Integer> days )
     {
         List<String> list = new ArrayList<String>();
-        
+
         for ( Integer day : days )
         {
             switch ( day.intValue() )
             {
-            case 0: { list.add( "sunday" ); break; }
-            case 1: { list.add( "monday" ); break; }
-            case 2: { list.add( "tuesday" ); break; }
-            case 3: { list.add( "wednesday" ); break; }
-            case 4: { list.add( "thursday" ); break; }
-            case 5: { list.add( "friday" ); break; }
-            case 6: { list.add( "saturday" ); break; }
+                case 0:
+                {
+                    list.add( "sunday" );
+                    break;
+                }
+                case 1:
+                {
+                    list.add( "monday" );
+                    break;
+                }
+                case 2:
+                {
+                    list.add( "tuesday" );
+                    break;
+                }
+                case 3:
+                {
+                    list.add( "wednesday" );
+                    break;
+                }
+                case 4:
+                {
+                    list.add( "thursday" );
+                    break;
+                }
+                case 5:
+                {
+                    list.add( "friday" );
+                    break;
+                }
+                case 6:
+                {
+                    list.add( "saturday" );
+                    break;
+                }
             }
         }
-        
+
         return list;
     }
-    
+
     protected Set<Integer> formatRecurringDayOfWeek( List<String> days )
     {
         Set<Integer> set = new HashSet<Integer>();
-        
+
         for ( String day : days )
         {
-            if ( "sunday".equals( day )) { set.add( new Integer(0) ); }
-            else if ( "monday".equals( day )) { set.add( new Integer(1) ); }
-            else if ( "tuesday".equals( day )) { set.add( new Integer(2) ); }
-            else if ( "wednesday".equals( day )) { set.add( new Integer(3) ); }
-            else if ( "thursday".equals( day )) { set.add( new Integer(4) ); }
-            else if ( "friday".equals( day )) { set.add( new Integer(5) ); }
-            else if ( "saturday".equals( day )) { set.add( new Integer(6) ); }
+            if ( "sunday".equals( day ) )
+            {
+                set.add( new Integer( 0 ) );
+            }
+            else if ( "monday".equals( day ) )
+            {
+                set.add( new Integer( 1 ) );
+            }
+            else if ( "tuesday".equals( day ) )
+            {
+                set.add( new Integer( 2 ) );
+            }
+            else if ( "wednesday".equals( day ) )
+            {
+                set.add( new Integer( 3 ) );
+            }
+            else if ( "thursday".equals( day ) )
+            {
+                set.add( new Integer( 4 ) );
+            }
+            else if ( "friday".equals( day ) )
+            {
+                set.add( new Integer( 5 ) );
+            }
+            else if ( "saturday".equals( day ) )
+            {
+                set.add( new Integer( 6 ) );
+            }
         }
-        
+
         return set;
     }
-    
+
     protected List<String> formatRecurringDayOfMonth( Set<Integer> days )
     {
         List<String> list = new ArrayList<String>();
-        
+
         for ( Integer day : days )
         {
             if ( DAY_OF_MONTH_LAST.equals( day ) )
@@ -259,14 +313,14 @@ public class AbstractScheduledServiceResourceHandler
                 list.add( String.valueOf( day ) );
             }
         }
-        
+
         return list;
     }
-    
+
     protected Set<Integer> formatRecurringDayOfMonth( List<String> days )
     {
         Set<Integer> set = new HashSet<Integer>();
-        
+
         for ( String day : days )
         {
             if ( "last".equals( day ) )
@@ -278,7 +332,7 @@ public class AbstractScheduledServiceResourceHandler
                 set.add( Integer.valueOf( day ) );
             }
         }
-        
+
         return set;
     }
 
@@ -286,11 +340,11 @@ public class AbstractScheduledServiceResourceHandler
     {
         Calendar cal = Calendar.getInstance();
         Calendar timeCalendar = Calendar.getInstance();
-        
+
         try
         {
             timeCalendar.setTime( timeFormat.parse( time ) );
-            
+
             cal.setTime( new Date( Long.parseLong( date ) ) );
             cal.add( Calendar.HOUR_OF_DAY, timeCalendar.get( Calendar.HOUR_OF_DAY ) );
             cal.add( Calendar.MINUTE, timeCalendar.get( Calendar.MINUTE ) );
@@ -299,80 +353,81 @@ public class AbstractScheduledServiceResourceHandler
         {
             cal = null;
         }
-        
+
         return cal == null ? null : cal.getTime();
     }
-    
+
     public String getModelName( ScheduledServiceBaseResource model )
     {
         return model.getName();
     }
-    
+
     public NexusTask<Object> getModelNexusTask( ScheduledServiceBaseResource model )
     {
         String serviceType = model.getTypeId();
-        
+
         NexusTask<Object> task = (NexusTask<Object>) lookup( serviceType );
-        
+
         for ( Iterator iter = model.getProperties().iterator(); iter.hasNext(); )
         {
             ScheduledServicePropertyResource prop = (ScheduledServicePropertyResource) iter.next();
             task.addParameter( prop.getId(), prop.getValue() );
         }
-        
-        return task;        
+
+        return task;
     }
-    
+
     public Schedule getModelSchedule( ScheduledServiceBaseResource model )
     {
         Schedule schedule = null;
-        
+
         if ( ScheduledServiceAdvancedResource.class.isAssignableFrom( model.getClass() ) )
         {
-            schedule = new CronSchedule( ( ( ScheduledServiceAdvancedResource ) model ).getCronCommand() );
+            schedule = new CronSchedule( ( (ScheduledServiceAdvancedResource) model ).getCronCommand() );
         }
         else if ( ScheduledServiceMonthlyResource.class.isAssignableFrom( model.getClass() ) )
         {
-            schedule = new MonthlySchedule( 
-                parseDate( ( ( ScheduledServiceMonthlyResource ) model ).getStartDate(), 
-                           ( ( ScheduledServiceMonthlyResource ) model ).getRecurringTime() ),
+            schedule = new MonthlySchedule(
+                parseDate(
+                    ( (ScheduledServiceMonthlyResource) model ).getStartDate(),
+                    ( (ScheduledServiceMonthlyResource) model ).getRecurringTime() ),
                 null,
-                formatRecurringDayOfMonth( ( ( ScheduledServiceMonthlyResource ) model ).getRecurringDay() ) );
+                formatRecurringDayOfMonth( ( (ScheduledServiceMonthlyResource) model ).getRecurringDay() ) );
         }
         else if ( ScheduledServiceWeeklyResource.class.isAssignableFrom( model.getClass() ) )
         {
-            schedule = new WeeklySchedule( 
-                 parseDate( ( ( ScheduledServiceWeeklyResource ) model ).getStartDate(), 
-                            ( ( ScheduledServiceWeeklyResource ) model ).getRecurringTime() ),
-                 null,
-                 formatRecurringDayOfWeek( ( ( ScheduledServiceWeeklyResource ) model ).getRecurringDay() ) );
+            schedule = new WeeklySchedule(
+                parseDate(
+                    ( (ScheduledServiceWeeklyResource) model ).getStartDate(),
+                    ( (ScheduledServiceWeeklyResource) model ).getRecurringTime() ),
+                null,
+                formatRecurringDayOfWeek( ( (ScheduledServiceWeeklyResource) model ).getRecurringDay() ) );
         }
         else if ( ScheduledServiceDailyResource.class.isAssignableFrom( model.getClass() ) )
         {
-            schedule = new DailySchedule( 
-                parseDate( ( ( ScheduledServiceDailyResource ) model ).getStartDate(), 
-                           ( ( ScheduledServiceDailyResource ) model ).getRecurringTime() ),
-                null );
+            schedule = new DailySchedule( parseDate(
+                ( (ScheduledServiceDailyResource) model ).getStartDate(),
+                ( (ScheduledServiceDailyResource) model ).getRecurringTime() ), null );
         }
         else if ( ScheduledServiceOnceResource.class.isAssignableFrom( model.getClass() ) )
-        {            
-            schedule = new OnceSchedule( 
-                parseDate( ( ( ScheduledServiceOnceResource ) model ).getStartDate(), 
-                           ( ( ScheduledServiceOnceResource ) model ).getStartTime() ) );
+        {
+            schedule = new OnceSchedule( parseDate(
+                ( (ScheduledServiceOnceResource) model ).getStartDate(),
+                ( (ScheduledServiceOnceResource) model ).getStartTime() ) );
         }
-        
+
         return schedule;
     }
-    
-    protected <T> boolean compareSchedules( ScheduledTask<T> task, ScheduledServiceBaseResource resource)
+
+    protected <T> boolean compareSchedules( ScheduledTask<T> task, ScheduledServiceBaseResource resource )
     {
         boolean result = false;
-        
+
         if ( getModelSchedule( resource ).equals( task.getSchedule() ) )
         {
             result = true;
         }
-        
+
         return result;
     }
 }

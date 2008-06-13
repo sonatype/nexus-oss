@@ -21,7 +21,6 @@
 package org.sonatype.nexus.tasks;
 
 import java.util.Arrays;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -34,7 +33,7 @@ import org.sonatype.nexus.timeline.Timeline;
  * Purge timeline.
  * 
  * @author cstamas
- * @plexus.component role="org.sonatype.nexus.tasks.PurgeTimeline"
+ * @plexus.component role="org.sonatype.nexus.tasks.PurgeTimeline" instantiation-strategy="per-lookup"
  */
 public class PurgeTimeline
     extends AbstractNexusTask<Object>
@@ -50,16 +49,14 @@ public class PurgeTimeline
      */
     private Timeline timeline;
 
-    public Date getPurgeOlderThan()
+    public int getPurgeOlderThan()
     {
-        long ts = Long.parseLong( getParameters().get( PURGE_OLDER_THAN_KEY ) );
-
-        return new Date( ts );
+        return Integer.parseInt( getParameters().get( PURGE_OLDER_THAN_KEY ) );
     }
 
-    public void setPurgeOlderThan( Date purgeOlderThan )
+    public void setPurgeOlderThan( int purgeOlderThan )
     {
-        getParameters().put( PURGE_OLDER_THAN_KEY, Long.toString( purgeOlderThan.getTime() ) );
+        getParameters().put( PURGE_OLDER_THAN_KEY, Integer.toString( purgeOlderThan ) );
     }
 
     public Set<String> getTypes()
@@ -110,15 +107,20 @@ public class PurgeTimeline
     {
         if ( getTypes().size() == 0 )
         {
-            timeline.purgeOlderThan( getPurgeOlderThan().getTime() );
+            timeline.purgeOlderThan( System.currentTimeMillis() - ( getPurgeOlderThan() * 24 * 60 * 60 * 1000 ) );
         }
         else if ( getSubTypes().size() == 0 )
         {
-            timeline.purgeOlderThan( getPurgeOlderThan().getTime(), getTypes() );
+            timeline.purgeOlderThan(
+                System.currentTimeMillis() - ( getPurgeOlderThan() * 24 * 60 * 60 * 1000 ),
+                getTypes() );
         }
         else
         {
-            timeline.purgeOlderThan( getPurgeOlderThan().getTime(), getTypes(), getSubTypes() );
+            timeline.purgeOlderThan(
+                System.currentTimeMillis() - ( getPurgeOlderThan() * 24 * 60 * 60 * 1000 ),
+                getTypes(),
+                getSubTypes() );
         }
 
         return null;
