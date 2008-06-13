@@ -94,6 +94,65 @@ Sonatype.utils = {
     
     return sOut.substring(0, sOut.length - sep.length);
   },
+
+  connectionError: function( response, message, offerRestart ) {
+    if ( response.status == 403 ) {
+      if ( Sonatype.repoServer.RepoServer.loginWindow.isVisible() ) {
+        Ext.MessageBox.show( {
+          title: 'Login Error',
+          msg: 'Incorrect username or password.<br />Try again.',
+          buttons: Ext.MessageBox.OK,
+          icon: Ext.MessageBox.ERROR,
+          animEl: 'mb3'
+        } );
+      }
+      else {
+        delete Ext.lib.Ajax.defaultHeaders.Authorization;
+        Sonatype.state.CookieProvider.clear('authToken');
+        Sonatype.state.CookieProvider.clear('username');
+        Ext.MessageBox.show( {
+          title: 'Authentication Error',
+          msg: 'Your login is incorrect or your session has expired.<br />' +
+            'Please login again.',
+          buttons: Ext.MessageBox.OK,
+          icon: Ext.MessageBox.ERROR,
+          animEl: 'mb3',
+          fn: function(button) {
+            window.location.reload();
+          }
+        } );
+      }
+    }
+    else {
+      Ext.MessageBox.show( {
+        title: "Connection Error",
+        msg: (
+          ( message ? message + '<br /><br />' : '' ) + 
+          ( response.status ?
+              'ERROR ' + response.status + ': ' + response.statusText + '<br />' +
+              '<br />' +
+              'Nexus returned an error.'
+              :
+              'ERROR: ' + response.statusText + '<br />' +
+              '<br />' +
+              'There was an error connecting to Nexus.<br />' +
+              'Check your network connection, make sure Nexus is running.' ) +
+          ( offerRestart ?
+              '<br /><br />Click OK to reload the console or ' +
+              'CANCEL if you wish to retry the same action in a little while.'
+              : '' )
+        ),
+        buttons: offerRestart ? Ext.MessageBox.OKCANCEL : Ext.MessageBox.OK,
+        icon: Ext.MessageBox.ERROR,
+        animEl: 'mb3',
+        fn: function(button) {
+          if ( offerRestart && button == "ok" ) {
+            window.location.reload();
+          }
+        }
+      } );
+    }
+  },
   
   /**
   *  Base64 encode / decode
@@ -237,7 +296,6 @@ Sonatype.utils = {
       {single:true}
     );
   }
-  
 };
 
 })();

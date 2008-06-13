@@ -1516,7 +1516,7 @@ Ext.extend(Sonatype.repoServer.RepoEditPanel, Sonatype.repoServer.AbstractRepoPa
 //    Ext.MessageBox.alert('Invalid Fields', 'The server identified invalid fields.').setIcon(Ext.MessageBox.ERROR);
 //  }
     else if(action.failureType == Ext.form.Action.CONNECT_FAILURE){
-      Ext.MessageBox.alert('Connection Failure', 'There is an error communicating with the server.').setIcon(Ext.MessageBox.ERROR);
+      Sonatype.utils.connectionError( action.response, 'There is an error communicating with the server.' )
     }
     else if(action.failureType == Ext.form.Action.LOAD_FAILURE){
       Ext.MessageBox.alert('Load Failure', 'The data failed to load from the server.').setIcon(Ext.MessageBox.ERROR);

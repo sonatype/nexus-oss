@@ -152,7 +152,7 @@ Ext.extend(Sonatype.repoServer.LogsViewPanel, Ext.form.FormPanel, {
       this.logTextArea.setRawValue(response.responseText);
     }
     else {
-      Ext.MessageBox.alert('The file failed to load from the server.');
+      Sonatype.utils.connectionError( response, 'The file failed to load from the server.' )
     }
   }
   

@@ -43,55 +43,7 @@ Sonatype.view = {
     Ext.Ajax.on( {
       "requestexception" : { 
         fn: function(conn, response, options) {
-          if ( response.status == 403 ) {
-            if ( Sonatype.repoServer.RepoServer.loginWindow.isVisible() ) {
-              Ext.MessageBox.show( {
-                title: 'Login Error',
-                msg: 'Incorrect username or password.<br />Try again.',
-                buttons: Ext.MessageBox.OK,
-                icon: Ext.MessageBox.ERROR,
-                animEl: 'mb3'
-              } );
-            }
-            else {
-              delete Ext.lib.Ajax.defaultHeaders.Authorization;
-              Sonatype.state.CookieProvider.clear('authToken');
-              Sonatype.state.CookieProvider.clear('username');
-              Ext.MessageBox.show( {
-                title: 'Authentication Error',
-                msg: 'Your login is incorrect or your session has expired.<br />' +
-                  'Please login again.',
-                buttons: Ext.MessageBox.OK,
-                icon: Ext.MessageBox.ERROR,
-                animEl: 'mb3',
-                fn: function(button) {
-                  window.location.reload();
-                }
-              } );
-            }
-          }
-          else Ext.MessageBox.show( {
-            title: "Connection Error",
-            msg: (
-              response.status ?
-                "ERROR " + response.status + ": " + response.statusText + "<br />" +
-                "<br />" +
-                "Nexus returned an error.<br />" +
-                "The server is running, but Nexus does not appear to be available."
-                :
-                "ERROR: " + response.statusText + "<br />" +
-                "<br />" +
-                "There was an error connecting to Nexus.<br />" +
-                "Check your network connection, make sure Nexus is running." ) +
-              "<br /><br />" +
-              "Click OK to reload the console or CANCEL if you wish to retry the same action in a little while.",
-            buttons: Ext.MessageBox.OKCANCEL,
-            icon: Ext.MessageBox.ERROR,
-            animEl: 'mb3',
-            fn: function(button) {
-              if(button == "ok") window.location.reload();
-            }
-          } );
+          Sonatype.utils.connectionError( response );
         },
         scope: this } 
     } );
