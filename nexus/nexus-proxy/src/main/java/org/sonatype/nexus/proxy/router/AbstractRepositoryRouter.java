@@ -125,7 +125,7 @@ public abstract class AbstractRepositoryRouter
         // try to give it from our own file store
         File fileItem = getFileStoreFile( request.getRequestPath() );
 
-        if ( fileItem.exists() )
+        if ( fileItem.exists() && fileItem.isFile() )
         {
             try
             {
