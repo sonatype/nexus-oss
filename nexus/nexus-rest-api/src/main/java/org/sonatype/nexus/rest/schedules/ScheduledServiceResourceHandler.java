@@ -204,7 +204,7 @@ public class ScheduledServiceResourceHandler
                 // task name
                 // task schedule (even to another type)
                 // task params
-                ScheduledTask<?> task = getNexus().getTaskById( resource.getId() );
+                ScheduledTask<?> task = getNexus().getTaskById( getScheduledServiceId() );
 
                 task.setName( getModelName( resource ) );
 
