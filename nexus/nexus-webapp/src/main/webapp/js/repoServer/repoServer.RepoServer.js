@@ -145,15 +145,8 @@ Sonatype.repoServer.RepoServer = function(){
               
               Sonatype.user.curr.isLoggedIn = true;
               Sonatype.view.updateLoginLinkText();
-              
-              //close tabs
-              Sonatype.view.mainTabPanel.items.each(function(item, i, len){
-                this.remove(item, true);
-              }, Sonatype.view.mainTabPanel);
-              //show welcome tab again
-              Sonatype.view.mainTabPanel.add(Sonatype.view.welcomeTab);
-              Sonatype.view.welcomeTab.setVisible(true);
-              Sonatype.view.mainTabPanel.setActiveTab(Sonatype.view.welcomeTab);
+
+              this.resetMainTabPanel();
               
               this.loginWindow.hide();
               this.loginWindow.getEl().unmask();
@@ -251,7 +244,7 @@ Sonatype.repoServer.RepoServer = function(){
               ],
               html: bodyTpl.apply({
                 links: [
-                  { id:'open-search-all', title: 'Show Search Results' }
+                  { id:'open-search-all', title: 'Advanced Search' }
                 ]
               }) 
             },
@@ -273,6 +266,9 @@ Sonatype.repoServer.RepoServer = function(){
       if(sp.checkPermission(userPerms.viewSystemChanges, sp.READ)){
         vTplData.links.push( {id:'open-system-changes', title:'System Feeds'} );
       }
+//      if(sp.checkPermission(userPerms.maintLogs, sp.READ) || sp.checkPermission(userPerms.maintConfig, sp.READ)){
+//         vTplData.links.push( {id:'open-view-logs', title:'Logs and Config Files'} );
+//      }
       if(vTplData.links.length > 0){
         panelConf = Ext.apply({}, {title:'Views', id:'st-nexus-views', html: bodyTpl.apply(vTplData)}, defaultGroupPanel);
         this.addClickListeners( this.nexusPanel.add(panelConf) ); 
@@ -428,13 +424,7 @@ Sonatype.repoServer.RepoServer = function(){
             Sonatype.state.CookieProvider.clear('authToken');
             Sonatype.state.CookieProvider.clear('username');
             
-            Sonatype.view.mainTabPanel.items.each(function(item, i, len){
-              this.remove(item, true);
-            }, Sonatype.view.mainTabPanel);
-            
-            Sonatype.view.mainTabPanel.add(Sonatype.view.welcomeTab);
-            Sonatype.view.welcomeTab.setVisible(true);
-            Sonatype.view.mainTabPanel.setActiveTab(Sonatype.view.welcomeTab);
+            this.resetMainTabPanel();
             
             Sonatype.user.curr = Sonatype.utils.cloneObj(Sonatype.user.anon);
             Sonatype.view.updateLoginLinkText();
@@ -447,6 +437,16 @@ Sonatype.repoServer.RepoServer = function(){
         this.loginForm.getForm().clearInvalid();
         this.loginWindow.show();
       }
+    },
+    
+    resetMainTabPanel: function() {
+      Sonatype.view.mainTabPanel.items.each(function(item, i, len){
+        this.remove( item, true );
+      }, Sonatype.view.mainTabPanel);
+      Sonatype.view.mainTabPanel.activeTab = null;
+      
+      Sonatype.view.mainTabPanel.add(Sonatype.view.welcomeTab);
+      Sonatype.view.mainTabPanel.setActiveTab(Sonatype.view.welcomeTab);
     }
      
   };
