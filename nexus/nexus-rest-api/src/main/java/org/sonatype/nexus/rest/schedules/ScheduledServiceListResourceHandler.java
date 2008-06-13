@@ -21,6 +21,7 @@
 package org.sonatype.nexus.rest.schedules;
 
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.List;
 import java.util.Map;
 
@@ -28,6 +29,7 @@ import org.codehaus.plexus.util.StringUtils;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
+import org.restlet.data.Status;
 import org.restlet.resource.Representation;
 import org.restlet.resource.Variant;
 import org.sonatype.nexus.rest.model.ScheduledServiceListResource;
@@ -89,7 +91,7 @@ public class ScheduledServiceListResourceHandler
                 item.setLastRunTime( task.getLastRun() == null ? "n/a" : task.getLastRun().toString() );
                 item.setNextRunTime( task.getNextRun() == null ? "n/a" : task.getNextRun().toString() );
                 item.setSchedule( getScheduleShortName( task.getSchedule() ) );
-                
+
                 response.addData( item );
             }
 
@@ -109,32 +111,44 @@ public class ScheduledServiceListResourceHandler
     public void post( Representation entity )
     {
         ScheduledServiceResourceResponse request = (ScheduledServiceResourceResponse) deserialize( new ScheduledServiceResourceResponse() );
-        
+
         if ( request == null )
         {
             return;
         }
         else
         {
-            ScheduledTask<Object> task = getNexus().schedule( getModelName( request.getData() ), getModelNexusTask( request.getData() ), getModelSchedule( request.getData() ) );
-            
-            task.setEnabled( request.getData().isEnabled() );
-            
-            ScheduledServiceResourceStatus resourceStatus = new ScheduledServiceResourceStatus();
-            resourceStatus.setResource( request.getData() );
-            //Just need to update the id, as the incoming data is a POST w/ no id
-            resourceStatus.getResource().setId( task.getId() );
-            resourceStatus.setResourceURI( calculateSubReference( task.getId() ).toString() );
-            resourceStatus.setStatus( task.getTaskState().toString() );
-            resourceStatus.setCreated( task.getScheduledAt() == null ? "n/a" : task.getScheduledAt().toString() );
-            resourceStatus.setLastRunResult( TaskState.BROKEN.equals( task.getTaskState() ) ? "Error" : "Ok" );
-            resourceStatus.setLastRunTime( task.getLastRun() == null ? "n/a" : task.getLastRun().toString() );
-            resourceStatus.setNextRunTime( task.getNextRun() == null ? "n/a" : task.getNextRun().toString() );
-            
-            ScheduledServiceResourceStatusResponse response = new ScheduledServiceResourceStatusResponse();
-            response.setData( resourceStatus );
-            
-            getResponse().setEntity( serialize( entity, response ) );
+            try
+            {
+                ScheduledTask<Object> task = getNexus().schedule(
+                    getModelName( request.getData() ),
+                    getModelNexusTask( request.getData() ),
+                    getModelSchedule( request.getData() ) );
+
+                task.setEnabled( request.getData().isEnabled() );
+
+                ScheduledServiceResourceStatus resourceStatus = new ScheduledServiceResourceStatus();
+                resourceStatus.setResource( request.getData() );
+                // Just need to update the id, as the incoming data is a POST w/ no id
+                resourceStatus.getResource().setId( task.getId() );
+                resourceStatus.setResourceURI( calculateSubReference( task.getId() ).toString() );
+                resourceStatus.setStatus( task.getTaskState().toString() );
+                resourceStatus.setCreated( task.getScheduledAt() == null ? "n/a" : task.getScheduledAt().toString() );
+                resourceStatus.setLastRunResult( TaskState.BROKEN.equals( task.getTaskState() ) ? "Error" : "Ok" );
+                resourceStatus.setLastRunTime( task.getLastRun() == null ? "n/a" : task.getLastRun().toString() );
+                resourceStatus.setNextRunTime( task.getNextRun() == null ? "n/a" : task.getNextRun().toString() );
+
+                ScheduledServiceResourceStatusResponse response = new ScheduledServiceResourceStatusResponse();
+                response.setData( resourceStatus );
+
+                getResponse().setEntity( serialize( entity, response ) );
+            }
+            catch ( ParseException e )
+            {
+                getResponse().setStatus( Status.CLIENT_ERROR_BAD_REQUEST, e.getMessage() );
+
+                return;
+            }
         }
     }
 

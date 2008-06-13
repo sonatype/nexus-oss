@@ -22,12 +22,16 @@ package org.sonatype.scheduling.iterators;
 
 import java.util.Date;
 
+import org.sonatype.scheduling.iterators.cron.CronExpression;
+
 public class CronIterator
     extends AbstractSchedulerIterator
 {
-    private final String cronExpression;
+    private final CronExpression cronExpression;
 
-    public CronIterator( String cronExpression )
+    private Date nextDate;
+
+    public CronIterator( CronExpression cronExpression )
     {
         super( new Date() );
 
@@ -37,14 +41,24 @@ public class CronIterator
     @Override
     protected Date doPeekNext()
     {
-        // TODO Auto-generated method stub
-        return null;
+        if ( nextDate == null )
+        {
+            nextDate = cronExpression.getNextValidTimeAfter( new Date() );
+        }
+
+        return nextDate;
     }
 
     @Override
     protected void stepNext()
     {
-        // TODO Auto-generated method stub
+        if ( nextDate == null )
+        {
+            doPeekNext();
+        }
+        else
+        {
+            nextDate = cronExpression.getNextValidTimeAfter( doPeekNext() );
+        }
     }
-
 }

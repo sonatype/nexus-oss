@@ -21,6 +21,7 @@
 package org.sonatype.nexus.rest.schedules;
 
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.Iterator;
 import java.util.logging.Level;
 
@@ -44,8 +45,9 @@ import org.sonatype.scheduling.schedules.CronSchedule;
 import org.sonatype.scheduling.schedules.DailySchedule;
 import org.sonatype.scheduling.schedules.MonthlySchedule;
 import org.sonatype.scheduling.schedules.OnceSchedule;
-import org.sonatype.scheduling.schedules.Schedule;
 import org.sonatype.scheduling.schedules.WeeklySchedule;
+
+import com.sun.org.apache.bcel.internal.generic.GETSTATIC;
 
 public class ScheduledServiceResourceHandler
     extends AbstractScheduledServiceResourceHandler
@@ -145,7 +147,7 @@ public class ScheduledServiceResourceHandler
                 CronSchedule taskSchedule = (CronSchedule) task.getSchedule();
                 ScheduledServiceAdvancedResource res = (ScheduledServiceAdvancedResource) resource;
 
-                res.setCronCommand( taskSchedule.getCronExpression() );
+                res.setCronCommand( taskSchedule.getCronString() );
             }
 
             if ( resource != null )
@@ -206,7 +208,7 @@ public class ScheduledServiceResourceHandler
                 // task schedule (even to another type)
                 // task params
                 ScheduledTask<?> task = getNexus().getTaskById( getScheduledServiceId() );
-                
+
                 task.setEnabled( resource.isEnabled() );
 
                 task.setName( getModelName( resource ) );
@@ -225,7 +227,12 @@ public class ScheduledServiceResourceHandler
             catch ( NoSuchTaskException e )
             {
                 getLogger().log( Level.SEVERE, "Unable to locate task id:" + resource.getId(), e );
+                
                 getResponse().setStatus( Status.CLIENT_ERROR_NOT_FOUND, "Scheduled service not found!" );
+            }
+            catch ( ParseException e )
+            {
+                getResponse().setStatus( Status.CLIENT_ERROR_BAD_REQUEST, e.getMessage() );
             }
         }
     }

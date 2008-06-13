@@ -24,6 +24,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -77,7 +78,7 @@ public class DefaultTaskConfigManagerTest
 
     private static final String TASK_NAME = "test";
 
-    private static final String CRON_EXPRESSION = "blah";
+    private static final String CRON_EXPRESSION = "0 0/5 14,18,3-9,2 ? JAN,MAR,SEP MON-FRI 2002-2010";
 
     private static final HashMap<String, Class> typeClassMap;
 
@@ -118,6 +119,7 @@ public class DefaultTaskConfigManagerTest
     }
 
     public void testStoreOnceSchedule()
+        throws Exception
     {
         Date date = new Date();
         HashMap<String, Object> scheduleProperties = new HashMap<String, Object>();
@@ -126,6 +128,7 @@ public class DefaultTaskConfigManagerTest
     }
 
     public void testStoreDailySchedule()
+        throws Exception
     {
         Date startDate = new Date();
         Date endDate = new Date();
@@ -136,6 +139,7 @@ public class DefaultTaskConfigManagerTest
     }
 
     public void testStoreWeeklySchedule()
+        throws Exception
     {
         Date startDate = new Date();
         Date endDate = new Date();
@@ -146,6 +150,7 @@ public class DefaultTaskConfigManagerTest
     }
 
     public void testStoreMonthlySchedule()
+        throws Exception
     {
         Date startDate = new Date();
         Date endDate = new Date();
@@ -156,6 +161,7 @@ public class DefaultTaskConfigManagerTest
     }
 
     public void testStoreAdvancedSchedule()
+        throws Exception
     {
         HashMap<String, Object> scheduleProperties = new HashMap<String, Object>();
         scheduleProperties.put( PROPERTY_KEY_CRON_EXPRESSION, CRON_EXPRESSION );
@@ -163,6 +169,7 @@ public class DefaultTaskConfigManagerTest
     }
 
     public void genericTestStore( String scheduleType, HashMap<String, Object> scheduleProperties )
+        throws ParseException
     {
         ScheduledTask<Integer> task = null;
         try
@@ -191,6 +198,7 @@ public class DefaultTaskConfigManagerTest
     }
 
     private Schedule createSchedule( String type, HashMap<String, Object> properties )
+        throws ParseException
     {
         if ( SCHEDULE_TYPE_ONCE.equals( type ) )
         {

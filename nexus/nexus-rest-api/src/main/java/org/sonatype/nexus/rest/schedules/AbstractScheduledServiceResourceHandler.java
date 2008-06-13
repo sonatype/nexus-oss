@@ -53,7 +53,6 @@ import org.sonatype.nexus.tasks.PublishIndexesTask;
 import org.sonatype.nexus.tasks.PurgeTimeline;
 import org.sonatype.nexus.tasks.RebuildAttributesTask;
 import org.sonatype.nexus.tasks.ReindexTask;
-import org.sonatype.scheduling.ScheduledTask;
 import org.sonatype.scheduling.schedules.CronSchedule;
 import org.sonatype.scheduling.schedules.DailySchedule;
 import org.sonatype.scheduling.schedules.MonthlySchedule;
@@ -129,7 +128,9 @@ public class AbstractScheduledServiceResourceHandler
         serviceNames.put( ClearCacheTask.class.getName(), "Clear Repository Caches" );
         serviceNames.put( SnapshotRemoverTask.class.getName(), "Remove Snapshots From Repository" );
         serviceNames.put( EvictUnusedItemsTask.class.getName(), "Evict Unused Items From Repository" );
-        serviceNames.put( EvictUnusedProxiedItemsTask.class.getName(), "Evict Unused Proxied Items From Repository Caches" );
+        serviceNames.put(
+            EvictUnusedProxiedItemsTask.class.getName(),
+            "Evict Unused Proxied Items From Repository Caches" );
         serviceNames.put( PurgeTimeline.class.getName(), "Purge Nexus Timeline" );
     }
 
@@ -378,6 +379,7 @@ public class AbstractScheduledServiceResourceHandler
     }
 
     public Schedule getModelSchedule( ScheduledServiceBaseResource model )
+        throws ParseException
     {
         Schedule schedule = null;
 
@@ -417,17 +419,5 @@ public class AbstractScheduledServiceResourceHandler
         }
 
         return schedule;
-    }
-
-    protected <T> boolean compareSchedules( ScheduledTask<T> task, ScheduledServiceBaseResource resource )
-    {
-        boolean result = false;
-
-        if ( getModelSchedule( resource ).equals( task.getSchedule() ) )
-        {
-            result = true;
-        }
-
-        return result;
     }
 }

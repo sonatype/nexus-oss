@@ -20,24 +20,33 @@
  */
 package org.sonatype.scheduling.schedules;
 
+import java.text.ParseException;
+import java.util.Date;
+
 import org.sonatype.scheduling.iterators.CronIterator;
 import org.sonatype.scheduling.iterators.SchedulerIterator;
+import org.sonatype.scheduling.iterators.cron.CronExpression;
 
 public class CronSchedule
     extends AbstractSchedule
 {
-    private final String cronExpression;
+    private final String cronString;
+
+    private final CronExpression cronExpression;
 
     public CronSchedule( String cronExpression )
+        throws ParseException
     {
-        super( null, null );
+        super( new Date(), null );
 
-        this.cronExpression = cronExpression;
+        this.cronString = cronExpression;
+
+        this.cronExpression = new CronExpression( cronString );
     }
 
-    public String getCronExpression()
+    public String getCronString()
     {
-        return cronExpression;
+        return cronString;
     }
 
     public SchedulerIterator getIterator()

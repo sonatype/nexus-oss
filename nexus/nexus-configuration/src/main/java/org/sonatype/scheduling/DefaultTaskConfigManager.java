@@ -25,6 +25,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -90,7 +91,9 @@ public class DefaultTaskConfigManager
         this.plexusContainer = (PlexusContainer) ctx.get( PlexusConstants.PLEXUS_KEY );
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable#initialize()
      */
     public void initialize()
@@ -98,42 +101,41 @@ public class DefaultTaskConfigManager
     {
         loadConfig();
     }
-    
+
     public void initializeTasks( Scheduler scheduler )
     {
-        //TODO: this code needs to be synchronized because of access to config
-        //object
+        // TODO: this code needs to be synchronized because of access to config
+        // object
         List<CScheduledTask> tempList = new ArrayList<CScheduledTask>( config.getTasks() );
-        
+
         getLogger().info( tempList.size() + " task(s) to load." );
-        
+
         for ( CScheduledTask task : tempList )
-        {   
+        {
             getLogger().info( "Loading task - " + task.getType() );
             try
             {
-                NexusTask<?> nexusTask = ( NexusTask<?> ) plexusContainer.lookup( task.getType() );
+                NexusTask<?> nexusTask = (NexusTask<?>) plexusContainer.lookup( task.getType() );
                 for ( Iterator iter = task.getProperties().iterator(); iter.hasNext(); )
                 {
-                    CProps prop = ( CProps ) iter.next();
+                    CProps prop = (CProps) iter.next();
                     nexusTask.addParameter( prop.getKey(), prop.getValue() );
                 }
-                scheduler.schedule( 
-                    task.getName(), 
-                    nexusTask, 
-                    translateFrom( task.getSchedule() ), 
-                    translateFrom( task.getProperties() ),
-                    false );
+                scheduler.schedule( task.getName(), nexusTask, translateFrom( task.getSchedule() ), translateFrom( task
+                    .getProperties() ), false );
             }
             catch ( ComponentLookupException e )
             {
                 // this is bad, Plexus did not find the component, possibly the task.getType() contains bad class name
-                getLogger().error( "Unable to initialize task " + task.getName() + ", couldn't load service class " + task.getId() );
-            }            
-        }   
+                getLogger().error(
+                    "Unable to initialize task " + task.getName() + ", couldn't load service class " + task.getId() );
+            }
+        }
     }
-    
-    /* (non-Javadoc)
+
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.sonatype.scheduling.TaskConfigManager#addTask(org.sonatype.scheduling.ScheduledTask)
      */
     public <T> void addTask( ScheduledTask<T> task )
@@ -148,14 +150,16 @@ public class DefaultTaskConfigManager
                 if ( foundTask != null )
                 {
                     config.removeTask( foundTask );
-                }            
+                }
                 config.addTask( storeableTask );
                 storeConfig();
             }
         }
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.sonatype.scheduling.TaskConfigManager#removeTask(org.sonatype.scheduling.ScheduledTask)
      */
     public <T> void removeTask( ScheduledTask<T> task )
@@ -171,7 +175,7 @@ public class DefaultTaskConfigManager
         }
         // TODO: need to also add task to a history file
     }
-    
+
     private CScheduledTask findTask( String id )
     {
         synchronized ( config )
@@ -185,86 +189,96 @@ public class DefaultTaskConfigManager
                     return storedTask;
                 }
             }
-            
+
             return null;
         }
     }
-    
-    private Map<String,String> translateFrom( List list )
+
+    private Map<String, String> translateFrom( List list )
     {
-        Map<String,String> map = new HashMap<String,String>();
-        
+        Map<String, String> map = new HashMap<String, String>();
+
         for ( Iterator iter = list.iterator(); iter.hasNext(); )
         {
-            CProps prop = ( CProps )iter.next();
+            CProps prop = (CProps) iter.next();
             map.put( prop.getKey(), prop.getValue() );
         }
-        
+
         return map;
     }
-    
+
     private Schedule translateFrom( CSchedule modelSchedule )
     {
         Schedule schedule = null;
-        
+
         if ( CAdvancedSchedule.class.isAssignableFrom( modelSchedule.getClass() ) )
         {
-            schedule = new CronSchedule( ( ( CAdvancedSchedule ) modelSchedule ).getCronCommand() );
+            try
+            {
+                schedule = new CronSchedule( ( (CAdvancedSchedule) modelSchedule ).getCronCommand() );
+            }
+            catch ( ParseException e )
+            {
+                // this will not happen, since it was persisted, hence already sublitted
+            }
         }
         else if ( CMonthlySchedule.class.isAssignableFrom( modelSchedule.getClass() ) )
         {
             Set<Integer> daysToRun = new HashSet<Integer>();
-            
-            for ( Iterator iter = ( ( CMonthlySchedule ) modelSchedule ).getDaysOfMonth().iterator(); iter.hasNext(); )
+
+            for ( Iterator iter = ( (CMonthlySchedule) modelSchedule ).getDaysOfMonth().iterator(); iter.hasNext(); )
             {
-                String day = ( String ) iter.next();
-                
+                String day = (String) iter.next();
+
                 try
                 {
                     daysToRun.add( Integer.valueOf( day ) );
                 }
                 catch ( NumberFormatException nfe )
                 {
-                    getLogger().error( "Invalid day being added to monthly schedule - " + day + " - skipping.");
+                    getLogger().error( "Invalid day being added to monthly schedule - " + day + " - skipping." );
                 }
             }
-            
-            schedule = new MonthlySchedule( ( ( CMonthlySchedule ) modelSchedule ).getStartDate(),
-                                            ( ( CMonthlySchedule ) modelSchedule ).getEndDate(),
-                                            daysToRun );
+
+            schedule = new MonthlySchedule(
+                ( (CMonthlySchedule) modelSchedule ).getStartDate(),
+                ( (CMonthlySchedule) modelSchedule ).getEndDate(),
+                daysToRun );
         }
         else if ( CWeeklySchedule.class.isAssignableFrom( modelSchedule.getClass() ) )
         {
             Set<Integer> daysToRun = new HashSet<Integer>();
-            
-            for ( Iterator iter = ( ( CWeeklySchedule ) modelSchedule ).getDaysOfWeek().iterator(); iter.hasNext(); )
+
+            for ( Iterator iter = ( (CWeeklySchedule) modelSchedule ).getDaysOfWeek().iterator(); iter.hasNext(); )
             {
-                String day = ( String ) iter.next();
-                
+                String day = (String) iter.next();
+
                 try
                 {
                     daysToRun.add( Integer.valueOf( day ) );
                 }
                 catch ( NumberFormatException nfe )
                 {
-                    getLogger().error( "Invalid day being added to weekly schedule - " + day + " - skipping.");
+                    getLogger().error( "Invalid day being added to weekly schedule - " + day + " - skipping." );
                 }
             }
-            
-            schedule = new WeeklySchedule( ( ( CWeeklySchedule ) modelSchedule ).getStartDate(),
-                                            ( ( CWeeklySchedule ) modelSchedule ).getEndDate(),
-                                            daysToRun );
+
+            schedule = new WeeklySchedule(
+                ( (CWeeklySchedule) modelSchedule ).getStartDate(),
+                ( (CWeeklySchedule) modelSchedule ).getEndDate(),
+                daysToRun );
         }
         else if ( CDailySchedule.class.isAssignableFrom( modelSchedule.getClass() ) )
         {
-            schedule = new DailySchedule( ( ( CDailySchedule ) modelSchedule ).getStartDate(),
-                                            ( ( CDailySchedule ) modelSchedule ).getEndDate() );
+            schedule = new DailySchedule(
+                ( (CDailySchedule) modelSchedule ).getStartDate(),
+                ( (CDailySchedule) modelSchedule ).getEndDate() );
         }
         else if ( COnceSchedule.class.isAssignableFrom( modelSchedule.getClass() ) )
         {
-            schedule = new OnceSchedule( ( ( COnceSchedule ) modelSchedule ).getStartDate() );
+            schedule = new OnceSchedule( ( (COnceSchedule) modelSchedule ).getStartDate() );
         }
-        
+
         return schedule;
     }
 
@@ -278,13 +292,13 @@ public class DefaultTaskConfigManager
         storeableTask.setStatus( task.getTaskState().name() );
         storeableTask.setLastRun( task.getLastRun() );
         storeableTask.setNextRun( task.getNextRun() );
-        
+
         for ( String key : task.getTaskParams().keySet() )
         {
             CProps props = new CProps();
             props.setKey( key );
             props.setValue( task.getTaskParams().get( key ) );
-            
+
             storeableTask.addProperty( props );
         }
 
@@ -294,7 +308,7 @@ public class DefaultTaskConfigManager
         if ( CronSchedule.class.isAssignableFrom( schedule.getClass() ) )
         {
             storeableSchedule = new CAdvancedSchedule();
-            ( (CAdvancedSchedule) storeableSchedule ).setCronCommand( ( (CronSchedule) schedule ).getCronExpression() );
+            ( (CAdvancedSchedule) storeableSchedule ).setCronCommand( ( (CronSchedule) schedule ).getCronString() );
         }
         else if ( DailySchedule.class.isAssignableFrom( schedule.getClass() ) )
         {
