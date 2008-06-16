@@ -1,18 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-/*******************************************************************************
- * Copyright (c) 2007-2008 Sonatype Inc
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
- *
- * Contributors:
- *    Eugene Kuleshov (Sonatype)
- *    Tamas Cservenak (Sonatype)
- *    Brian Fox (Sonatype)
- *    Jason Van Zyl (Sonatype)
- *******************************************************************************/-->
+  <!--
+    /*******************************************************************************
+    * Copyright (c) 2007-2008 Sonatype Inc * All rights reserved. This
+    program and the accompanying materials * are made available under
+    the terms of the Eclipse Public License v1.0 * which accompanies
+    this distribution, and is available at *
+    http://www.eclipse.org/legal/epl-v10.html * * Contributors: * Eugene
+    Kuleshov (Sonatype) * Tamas Cservenak (Sonatype) * Brian Fox
+    (Sonatype) * Jason Van Zyl (Sonatype)
+    *******************************************************************************/
+  -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
@@ -21,7 +18,10 @@
   <version>1.0-SNAPSHOT</version>
   <name>Nexus Site</name>
   <build>
-    <!--DONE TO INSERT A PAGE NOT PROCESSED BY XSITE INTO THE SITE (EMBEDDED NABBLE FORUM)-->
+    <!--
+      DONE TO INSERT A PAGE NOT PROCESSED BY XSITE INTO THE SITE
+      (EMBEDDED NABBLE FORUM)
+    -->
     <resources>
       <resource>
         <directory>src/main/resources</directory>
@@ -29,26 +29,14 @@
         <filtering>false</filtering>
       </resource>
     </resources>
-    
     <plugins>
       <plugin>
-        <groupId>org.codehaus.xsite</groupId>
-        <artifactId>xsite-maven-plugin</artifactId>
+        <groupId>org.sonatype.idiom</groupId>
+        <artifactId>maven-idiom-plugin</artifactId>
+        <version>1.0-SNAPSHOT</version>
         <configuration>
-          <sourceDirectoryPath>${basedir}/src/site</sourceDirectoryPath>
-          <sitemapPath>content/sitemap.xml</sitemapPath>
-          <skinPath>templates/skin.html</skinPath>
-          <resourcePaths>resources</resourcePaths>
-          <outputDirectoryPath>${basedir}/target/site</outputDirectoryPath>
+          <siteUrl>https://nexus.sonatype.org/idiom</siteUrl>
         </configuration>
-        <executions>
-          <execution>
-            <phase>package</phase>
-            <goals>
-              <goal>run</goal>
-            </goals>
-          </execution>
-        </executions>
       </plugin>
     </plugins>
   </build>
