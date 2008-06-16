@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.RejectedExecutionException;
 
+import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.StartingException;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.StoppingException;
 import org.sonatype.scheduling.NoSuchTaskException;
@@ -38,6 +39,7 @@ import org.sonatype.scheduling.schedules.Schedule;
  * @plexus.component
  */
 public class DefaultNexusScheduler
+    extends AbstractLogEnabled
     implements NexusScheduler
 {
     /**
@@ -51,7 +53,7 @@ public class DefaultNexusScheduler
         throws RejectedExecutionException,
             NullPointerException
     {
-        Class<?> cls = nexusTask.getClass();
+        String cls = nexusTask.getClass().getName();
 
         List<ScheduledTask<?>> existingTasks = scheduler.getActiveTasks().get( cls );
 
@@ -69,7 +71,7 @@ public class DefaultNexusScheduler
         throws RejectedExecutionException,
             NullPointerException
     {
-        Class<?> cls = nexusTask.getClass();
+        String cls = nexusTask.getClass().getName();
 
         List<ScheduledTask<?>> existingTasks = scheduler.getActiveTasks().get( cls );
 
@@ -82,16 +84,16 @@ public class DefaultNexusScheduler
             throw new RejectedExecutionException( "Task of this type is already scheduled!" );
         }
     }
-    
+
     public <T> ScheduledTask<T> updateSchedule( ScheduledTask<T> task )
-        throws RejectedExecutionException, 
+        throws RejectedExecutionException,
             NullPointerException
     {
         if ( task != null )
         {
             scheduler.updateSchedule( task );
         }
-        
+
         return task;
     }
 
@@ -109,12 +111,16 @@ public class DefaultNexusScheduler
     public void startService()
         throws StartingException
     {
+        getLogger().info( "Starting Scheduler" );
+        
         scheduler.startService();
     }
 
     public void stopService()
         throws StoppingException
     {
+        getLogger().info( "Stopping Scheduler" );
+        
         scheduler.stopService();
     }
 

@@ -99,7 +99,7 @@ public class DefaultScheduler
             {
                 List<Runnable> queueds = getScheduledExecutorService().shutdownNow();
 
-                getLogger().warn( "Scheduler shut down with " + queueds.size() + " tasks queued." );
+                getLogger().warn( "Scheduler shut down forcedly with " + queueds.size() + " tasks queued." );
             }
         }
         catch ( InterruptedException e )

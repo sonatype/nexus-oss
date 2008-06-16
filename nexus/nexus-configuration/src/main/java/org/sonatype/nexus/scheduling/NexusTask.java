@@ -24,11 +24,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
-import org.codehaus.plexus.logging.LogEnabled;
 import org.sonatype.scheduling.ScheduledTask;
 
 public interface NexusTask<T>
-    extends Callable<T>, LogEnabled
+    extends Callable<T>
 {
     String ROLE = NexusTask.class.getName();
     

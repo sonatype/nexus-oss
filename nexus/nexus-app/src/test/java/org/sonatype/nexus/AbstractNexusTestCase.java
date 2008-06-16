@@ -24,8 +24,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-import net.sf.ehcache.Cache;
-
 import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.context.ContextException;
