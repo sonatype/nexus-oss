@@ -341,6 +341,7 @@ Sonatype.repoServer.RepoMaintPanel = function(config){
     listeners: {
       'beforedestroy': {
         fn: function(){
+          Ext.TaskMgr.stop( this.repoStatusTask );
           Sonatype.Events.removeListener( 'repositoryChanged', this.onRepoChange, this );
           Sonatype.Events.removeListener( 'groupChanged', this.onRepoChange, this );
         },
