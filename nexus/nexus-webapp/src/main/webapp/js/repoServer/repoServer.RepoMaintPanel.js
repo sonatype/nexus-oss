@@ -816,6 +816,39 @@ Ext.extend(Sonatype.repoServer.RepoMaintPanel, Sonatype.repoServer.AbstractRepoP
   
   onRepoChange: function() {
     this.reloadAll();
+  },
+
+  reloadAll : function(){
+    this.reposDataStore.reload();
+    this.formCards.items.each(function(item, i, len){
+      this.remove(item, true);
+    }, this.formCards);
+    
+    this.formCards.add({
+      xtype: 'panel',
+      layout: 'fit',
+      html: '<div class="little-padding">Select a repository to view it</div>'
+    });
+    this.formCards.getLayout().setActiveItem(0);
+    
+    this.forceStatuses = true;
+    
+// note: it looks like the reload takes care of reselecting the previously selected row
+//  if (this.reposGridPanel.getSelectionModel().hasSelection()){
+//    var rec = this.reposGridPanel.getSelectionModel().getSelected();
+//    var id = rec.id;
+//    
+//    var reselect = function(recs, opts, success){ this.reposGridPanel.getSelectionModel().selectRecords([this.reposDataStore.getById(id)])};
+//    
+//    this.reposDataStore.reload();
+//      this.store.reload({
+//        callback: reselect,
+//        scope: this
+//      });
+//  }
+//  else{
+//    this.reposDataStore.reload();
+//  }
   }
 
 });
