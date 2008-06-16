@@ -33,7 +33,8 @@ import org.sonatype.nexus.timeline.Timeline;
  * Purge timeline.
  * 
  * @author cstamas
- * @plexus.component role="org.sonatype.nexus.tasks.PurgeTimeline" instantiation-strategy="per-lookup"
+ * @plexus.component role="org.sonatype.nexus.scheduling.NexusTask" role-hint="org.sonatype.nexus.tasks.PurgeTimeline"
+ *                   instantiation-strategy="per-lookup"
  */
 public class PurgeTimeline
     extends AbstractNexusTask<Object>

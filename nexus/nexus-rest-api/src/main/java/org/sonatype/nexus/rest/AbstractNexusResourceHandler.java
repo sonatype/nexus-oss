@@ -84,7 +84,7 @@ public abstract class AbstractNexusResourceHandler
 
     protected NexusTask<?> createTaskInstance( String taskType )
     {
-        return (NexusTask<?>) lookup( taskType );
+        return (NexusTask<?>) lookup( NexusTask.ROLE, taskType );
     }
 
     protected Object lookup( String role )

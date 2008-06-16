@@ -363,11 +363,11 @@ public class AbstractScheduledServiceResourceHandler
         return model.getName();
     }
 
-    public NexusTask<Object> getModelNexusTask( ScheduledServiceBaseResource model )
+    public NexusTask<?> getModelNexusTask( ScheduledServiceBaseResource model )
     {
         String serviceType = model.getTypeId();
 
-        NexusTask<Object> task = (NexusTask<Object>) lookup( serviceType );
+        NexusTask<?> task = createTaskInstance( serviceType );
 
         for ( Iterator iter = model.getProperties().iterator(); iter.hasNext(); )
         {

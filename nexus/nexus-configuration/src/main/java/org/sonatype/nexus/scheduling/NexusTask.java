@@ -30,6 +30,8 @@ import org.sonatype.scheduling.ScheduledTask;
 public interface NexusTask<T>
     extends Callable<T>, LogEnabled
 {
+    String ROLE = NexusTask.class.getName();
+    
     boolean allowConcurrentExecution( List<ScheduledTask<?>> existingTasks );
     
     void addParameter(String key, String value);

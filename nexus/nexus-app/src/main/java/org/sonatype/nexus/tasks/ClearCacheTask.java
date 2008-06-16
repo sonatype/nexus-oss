@@ -27,7 +27,8 @@ import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesTask;
  * Clear caches task.
  * 
  * @author cstamas
- * @plexus.component role="org.sonatype.nexus.tasks.ClearCacheTask" instantiation-strategy="per-lookup"
+ * @plexus.component role="org.sonatype.nexus.scheduling.NexusTask" role-hint="org.sonatype.nexus.tasks.ClearCacheTask"
+ *                   instantiation-strategy="per-lookup"
  */
 public class ClearCacheTask
     extends AbstractNexusRepositoriesTask<Object>
@@ -77,8 +78,8 @@ public class ClearCacheTask
         }
         else if ( getRepositoryId() != null )
         {
-            return "Clearing caches for repository with ID=" + getRepositoryId() + " from path " + getResourceStorePath()
-                + " and below.";
+            return "Clearing caches for repository with ID=" + getRepositoryId() + " from path "
+                + getResourceStorePath() + " and below.";
         }
         else
         {

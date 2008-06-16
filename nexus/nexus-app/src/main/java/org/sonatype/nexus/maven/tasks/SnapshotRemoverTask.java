@@ -26,7 +26,8 @@ import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesTask;
  * SnapshotRemoverTask
  * 
  * @author cstamas
- * @plexus.component role="org.sonatype.nexus.maven.tasks.SnapshotRemoverTask" instantiation-strategy="per-lookup"
+ * @plexus.component role="org.sonatype.nexus.scheduling.NexusTask"
+ *                   role-hint="org.sonatype.nexus.maven.tasks.SnapshotRemoverTask" instantiation-strategy="per-lookup"
  */
 public class SnapshotRemoverTask
     extends AbstractNexusRepositoriesTask<SnapshotRemovalResult>

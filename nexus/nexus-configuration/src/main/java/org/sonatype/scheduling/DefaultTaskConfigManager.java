@@ -115,14 +115,19 @@ public class DefaultTaskConfigManager
             getLogger().info( "Loading task - " + task.getType() );
             try
             {
-                NexusTask<?> nexusTask = (NexusTask<?>) plexusContainer.lookup( task.getType() );
+                NexusTask<?> nexusTask = (NexusTask<?>) plexusContainer.lookup( NexusTask.ROLE, task.getType() );
+                
                 for ( Iterator iter = task.getProperties().iterator(); iter.hasNext(); )
                 {
                     CProps prop = (CProps) iter.next();
                     nexusTask.addParameter( prop.getKey(), prop.getValue() );
                 }
-                scheduler.schedule( task.getName(), nexusTask, translateFrom( task.getSchedule() ), translateFrom( task
-                    .getProperties() ), false ).setEnabled( task.isEnabled() );
+                scheduler.schedule(
+                    task.getName(),
+                    nexusTask,
+                    translateFrom( task.getSchedule() ),
+                    translateFrom( task.getProperties() ),
+                    false ).setEnabled( task.isEnabled() );
             }
             catch ( ComponentLookupException e )
             {

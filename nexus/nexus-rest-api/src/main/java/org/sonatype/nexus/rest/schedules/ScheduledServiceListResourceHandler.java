@@ -120,7 +120,7 @@ public class ScheduledServiceListResourceHandler
         {
             try
             {
-                ScheduledTask<Object> task = getNexus().schedule(
+                ScheduledTask<?> task = getNexus().schedule(
                     getModelName( request.getData() ),
                     getModelNexusTask( request.getData() ),
                     getModelSchedule( request.getData() ) );
