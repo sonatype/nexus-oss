@@ -105,7 +105,7 @@ public abstract class AbstractRepository
     private LocalStatus localStatus = LocalStatus.IN_SERVICE;
 
     /** The proxy mode */
-    private ProxyMode proxyMode = null;
+    private ProxyMode proxyMode = ProxyMode.ALLOW;
 
     /** The proxy remote status */
     private RemoteStatus remoteStatus = RemoteStatus.UNKNOWN;
@@ -393,8 +393,6 @@ public abstract class AbstractRepository
         {
             this.remoteUrl = trstr.substring( 0, trstr.length() - 1 );
         }
-
-        this.proxyMode = ProxyMode.ALLOW;
     }
 
     public RemoteStorageContext getRemoteStorageContext()

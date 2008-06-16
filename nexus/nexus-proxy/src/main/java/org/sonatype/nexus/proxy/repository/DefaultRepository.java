@@ -110,6 +110,11 @@ public abstract class DefaultRepository
         }
         if ( getProxyMode() != null && getProxyMode().shouldProxy() && !localOnly )
         {
+            if ( getLogger().isDebugEnabled() )
+            {
+                getLogger().debug( "ProxyMode is " + getProxyMode().toString() );
+            }
+
             // we are able to go remote
             if ( localItem == null || isOld( localItem ) )
             {
