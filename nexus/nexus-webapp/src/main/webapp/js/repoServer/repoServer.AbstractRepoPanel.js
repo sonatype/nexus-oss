@@ -61,7 +61,7 @@ Ext.extend(Sonatype.repoServer.AbstractRepoPanel, Ext.Panel, {
       }
       
       //make sure to provide /content path for repository root requests like ../repositories/central
-      if (/.*\/repositories\/[^\/]*$/i.test(url)){
+      if (/.*\/repositories\/[^\/]*$/i.test(url) || /.*\/repo_groups\/[^\/]*$/i.test(url)){
         url += '/content';
       }
       
@@ -99,7 +99,7 @@ Ext.extend(Sonatype.repoServer.AbstractRepoPanel, Ext.Panel, {
       }
       
       //make sure to provide /content path for repository root requests like ../repositories/central
-      if (/.*\/repositories\/[^\/]*$/i.test(url)){
+      if (/.*\/repositories\/[^\/]*$/i.test(url) || /.*\/repo_groups\/[^\/]*$/i.test(url)){
         url += '/content';
       }
       
@@ -137,7 +137,7 @@ Ext.extend(Sonatype.repoServer.AbstractRepoPanel, Ext.Panel, {
       }
       
       //make sure to provide /content path for repository root requests like ../repositories/central
-      if (/.*\/repositories\/[^\/]*$/i.test(url)){
+      if (/.*\/repositories\/[^\/]*$/i.test(url) || /.*\/repo_groups\/[^\/]*$/i.test(url)){
         url += '/content';
       }
       
