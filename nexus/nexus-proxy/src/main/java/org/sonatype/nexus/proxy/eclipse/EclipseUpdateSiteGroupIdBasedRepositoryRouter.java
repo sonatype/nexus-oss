@@ -80,7 +80,10 @@ public class EclipseUpdateSiteGroupIdBasedRepositoryRouter
         }
         else
         {
-            getLogger().debug( "Applying 'eclipse' postprocessing for site.xml." );
+            if ( getLogger().isDebugEnabled() )
+            {
+                getLogger().debug( "Applying 'eclipse' postprocessing for site.xml." );
+            }
 
             // the listOfStorageItemss are actually a list of FileItems containing site.xml-s from various
             // reposes.. simply merge them, nothing else (see EclipseUpdateSiteRepository!)!

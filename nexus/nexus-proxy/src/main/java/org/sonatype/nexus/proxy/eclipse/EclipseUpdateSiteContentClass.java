@@ -31,9 +31,4 @@ public class EclipseUpdateSiteContentClass
     {
         return ID;
     }
-
-    public boolean isRemoteFile( String path )
-    {
-        return true;
-    }
 }
