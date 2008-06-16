@@ -636,6 +636,12 @@ public class DefaultIndexerManager
 
                 if ( bestContext != null )
                 {
+                    if ( getLogger().isDebugEnabled() )
+                    {
+                        getLogger().debug(
+                            " ...found best context " + bestContext.getId() + " for repository "
+                                + bestContext.getRepositoryId() + ", merging it..." );
+                    }
                     context.merge( bestContext.getIndexDirectory() );
                 }
             }
@@ -653,6 +659,11 @@ public class DefaultIndexerManager
 
             if ( targetDir.mkdirs() )
             {
+                if ( getLogger().isDebugEnabled() )
+                {
+                    getLogger().debug( "Packing the merged index context." );
+                }
+
                 indexPacker.packIndex( context, targetDir );
 
                 FileInputStream fis = null;
@@ -671,6 +682,12 @@ public class DefaultIndexerManager
                         RepositoryRouter router = (RepositoryRouter) rootRouter.resolveResourceStore(
                             new ResourceStoreRequest( filePath, true ) ).get( 0 );
 
+                        if ( getLogger().isDebugEnabled() )
+                        {
+                            getLogger().debug(
+                                "Storing the " + file.getName() + " file in the " + router.getId() + " router." );
+                        }
+
                         router.storeItem( repositoryGroupId + "/.index/" + file.getName(), fis );
                     }
                 }
@@ -684,6 +701,10 @@ public class DefaultIndexerManager
         {
             if ( targetDir != null )
             {
+                if ( getLogger().isDebugEnabled() )
+                {
+                    getLogger().debug( "Cleanup of temp files..." );
+                }
                 FileUtils.deleteDirectory( targetDir );
             }
         }
