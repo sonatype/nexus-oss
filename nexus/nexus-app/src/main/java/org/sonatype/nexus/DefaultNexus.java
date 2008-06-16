@@ -1031,6 +1031,13 @@ public class DefaultNexus
     {
         return nexusScheduler.schedule( name, nexusTask, schedule );
     }
+    
+    public <T> ScheduledTask<T> updateSchedule( ScheduledTask<T> task )
+        throws RejectedExecutionException, 
+            NullPointerException
+    {
+        return nexusScheduler.updateSchedule( task );
+    }
 
     public Map<String, List<ScheduledTask<?>>> getActiveTasks()
     {

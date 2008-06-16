@@ -86,6 +86,16 @@ public interface Scheduler
         Map<String, String> taskParams, boolean store )
         throws RejectedExecutionException,
             NullPointerException;
+    
+    /**
+     * Issue a Runnable for scheduled execution.
+     * 
+     * @param task
+     * @return
+     */
+    <T> ScheduledTask<T> updateSchedule( ScheduledTask<T> task )
+        throws RejectedExecutionException,
+            NullPointerException;    
 
     /**
      * Returns the map of currently active tasks. The resturned collection is an unmodifiable snapshot. It may differ

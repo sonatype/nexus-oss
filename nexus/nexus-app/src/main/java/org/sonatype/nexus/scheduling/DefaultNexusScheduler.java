@@ -82,6 +82,18 @@ public class DefaultNexusScheduler
             throw new RejectedExecutionException( "Task of this type is already scheduled!" );
         }
     }
+    
+    public <T> ScheduledTask<T> updateSchedule( ScheduledTask<T> task )
+        throws RejectedExecutionException, 
+            NullPointerException
+    {
+        if ( task != null )
+        {
+            scheduler.updateSchedule( task );
+        }
+        
+        return task;
+    }
 
     public Map<String, List<ScheduledTask<?>>> getActiveTasks()
     {

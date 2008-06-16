@@ -219,6 +219,10 @@ public interface Nexus
     <T> ScheduledTask<T> schedule( String name, NexusTask<T> nexusTask, Schedule schedule )
         throws RejectedExecutionException,
             NullPointerException;
+    
+    <T> ScheduledTask<T> updateSchedule( ScheduledTask<T> task )
+        throws RejectedExecutionException,
+            NullPointerException;
 
     Map<String, List<ScheduledTask<?>>> getActiveTasks();
 

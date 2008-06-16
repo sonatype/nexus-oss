@@ -223,6 +223,9 @@ public class ScheduledServiceResourceHandler
                 }
 
                 task.reset();
+                
+                //Store the changes
+                getNexus().updateSchedule( task );
             }
             catch ( NoSuchTaskException e )
             {

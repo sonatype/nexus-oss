@@ -122,7 +122,7 @@ public class DefaultTaskConfigManager
                     nexusTask.addParameter( prop.getKey(), prop.getValue() );
                 }
                 scheduler.schedule( task.getName(), nexusTask, translateFrom( task.getSchedule() ), translateFrom( task
-                    .getProperties() ), false );
+                    .getProperties() ), false ).setEnabled( task.isEnabled() );
             }
             catch ( ComponentLookupException e )
             {
@@ -286,6 +286,7 @@ public class DefaultTaskConfigManager
     {
         CScheduledTask storeableTask = new CScheduledTask();
 
+        storeableTask.setEnabled( task.isEnabled() );
         storeableTask.setId( task.getId() );
         storeableTask.setName( task.getName() );
         storeableTask.setType( task.getType() );

@@ -1473,6 +1473,13 @@
                     <description>The name of the task</description>
                 </field>
                 <field>
+                    <name>enabled</name>
+                    <type>boolean</type>
+                    <version>1.0.0+</version>
+                    <required>true</required>
+                    <description>The flag determining if the task should run</description>
+                </field>
+                <field>
                     <name>type</name>
                     <type>String</type>
                     <version>1.0.0+</version>

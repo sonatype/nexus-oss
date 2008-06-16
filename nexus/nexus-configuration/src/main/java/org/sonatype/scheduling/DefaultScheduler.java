@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Executors;
+import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
@@ -196,6 +197,15 @@ public class DefaultScheduler
         dct.start();
 
         return dct;
+    }
+    
+    public <T> ScheduledTask<T> updateSchedule( ScheduledTask<T> task )
+        throws RejectedExecutionException, NullPointerException
+    {
+        //Simply add the task to config, will find existing by id, remove, then store new
+        taskConfig.addTask( task );
+        
+        return task;
     }
 
     public Map<String, List<ScheduledTask<?>>> getActiveTasks()

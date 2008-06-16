@@ -56,6 +56,16 @@ public interface NexusScheduler
     <T> ScheduledTask<T> schedule( String name, NexusTask<T> nexusTask, Schedule schedule )
         throws RejectedExecutionException,
             NullPointerException;
+    
+    /**
+     * Update parameters of a scheduled task
+     * 
+     * @param task
+     * @return
+     */
+    <T> ScheduledTask<T> updateSchedule( ScheduledTask<T> task )
+        throws RejectedExecutionException,
+            NullPointerException;
 
     /**
      * Returns the map of currently active tasks. The resturned collection is an unmodifiable snapshot. It may differ

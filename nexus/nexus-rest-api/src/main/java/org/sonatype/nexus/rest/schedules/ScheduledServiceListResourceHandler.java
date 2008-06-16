@@ -126,6 +126,9 @@ public class ScheduledServiceListResourceHandler
                     getModelSchedule( request.getData() ) );
 
                 task.setEnabled( request.getData().isEnabled() );
+                
+                //Need to store the enabled flag update
+                getNexus().updateSchedule( task );
 
                 ScheduledServiceResourceStatus resourceStatus = new ScheduledServiceResourceStatus();
                 resourceStatus.setResource( request.getData() );
