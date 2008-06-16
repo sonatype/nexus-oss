@@ -127,6 +127,7 @@ Ext.extend(Sonatype.repoServer.LogsViewPanel, Ext.form.FormPanel, {
   },
   
   logMenuBtnClick : function(resourceUri, contentType, mItem, pressed){
+    if ( ! pressed ) return;
     this.currentContentType = contentType;
     this.getTopToolbar().items.get(2).setText(mItem.text);
     this.currentLogUrl = resourceUri;
