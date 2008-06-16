@@ -193,9 +193,11 @@ public class PathBasedRequestRepositoryMapper
     {
         compiled = true;
 
-        inclusionsPrepared = new HashMap<Pattern, List<ResourceStore>>();
+        blockings.clear();
 
-        exclusionsPrepared = new HashMap<Pattern, List<ResourceStore>>();
+        inclusionsPrepared.clear();
+
+        exclusionsPrepared.clear();
 
         if ( getApplicationConfiguration().getConfiguration() == null
             || getApplicationConfiguration().getConfiguration().getRepositoryGrouping() == null

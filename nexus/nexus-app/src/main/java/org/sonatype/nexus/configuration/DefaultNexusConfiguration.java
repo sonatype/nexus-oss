@@ -29,6 +29,8 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.sonatype.nexus.configuration.model.CAuthSource;
@@ -793,7 +795,7 @@ public class DefaultNexusConfiguration
                 Repository newRepository = runtimeConfigurationBuilder.createRepositoryFromModel(
                     getConfiguration(),
                     settings );
-                
+
                 // replace it with new one
                 repositoryRegistry.updateRepository( newRepository );
 
@@ -860,6 +862,20 @@ public class DefaultNexusConfiguration
     }
 
     // CGroupsSettingPathMapping: CRUD
+    protected void validateRoutePattern( CGroupsSettingPathMappingItem settings )
+        throws ConfigurationException
+    {
+        try
+        {
+            Pattern.compile( settings.getRoutePattern() );
+        }
+        catch ( PatternSyntaxException e )
+        {
+            throw new ConfigurationException( "Malformed regexp pattern!", e );
+        }
+
+    }
+
     public Collection<CGroupsSettingPathMappingItem> listGroupsSettingPathMapping()
     {
         if ( getConfiguration().getRepositoryGrouping() != null
@@ -879,6 +895,8 @@ public class DefaultNexusConfiguration
             ConfigurationException,
             IOException
     {
+        validateRoutePattern( settings );
+
         if ( getConfiguration().getRepositoryGrouping() == null )
         {
             getConfiguration().setRepositoryGrouping( new CRepositoryGrouping() );
@@ -912,6 +930,8 @@ public class DefaultNexusConfiguration
             ConfigurationException,
             IOException
     {
+        validateRoutePattern( settings );
+
         List<CGroupsSettingPathMappingItem> items = getConfiguration().getRepositoryGrouping().getPathMappings();
 
         for ( Iterator<CGroupsSettingPathMappingItem> i = items.iterator(); i.hasNext(); )
