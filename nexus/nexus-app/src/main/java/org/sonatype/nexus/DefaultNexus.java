@@ -21,6 +21,7 @@
 package org.sonatype.nexus;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -560,15 +561,34 @@ public class DefaultNexus
         throws IOException
     {
         getLogger().info( "List log files." );
+
         File logDir = nexusConfiguration.getApplicationLogDirectory();
-        File[] dir = logDir.listFiles();
+
+        File[] dir = logDir.listFiles( new FileFilter()
+        {
+            public boolean accept( File pathname )
+            {
+                // list only ".log" files
+                if ( pathname.getName().endsWith( ".log" ) )
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+        } );
+
         if ( dir != null )
         {
             ArrayList<String> result = new ArrayList<String>( dir.length );
+
             for ( int i = 0; i < dir.length; i++ )
             {
                 result.add( dir[i].getName() );
             }
+
             return result;
         }
         else
@@ -1031,9 +1051,9 @@ public class DefaultNexus
     {
         return nexusScheduler.schedule( name, nexusTask, schedule );
     }
-    
+
     public <T> ScheduledTask<T> updateSchedule( ScheduledTask<T> task )
-        throws RejectedExecutionException, 
+        throws RejectedExecutionException,
             NullPointerException
     {
         return nexusScheduler.updateSchedule( task );
