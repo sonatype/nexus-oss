@@ -55,7 +55,7 @@ public class DefaultScheduledTask<T>
 
     private Future<T> future;
 
-    private Exception exception;
+    private Throwable throwable;
 
     private boolean enabled;
 
@@ -127,9 +127,9 @@ public class DefaultScheduledTask<T>
         }
     }
 
-    protected void setBrokenCause( Exception e )
+    protected void setBrokenCause( Throwable e )
     {
-        this.exception = e;
+        this.throwable = e;
     }
 
     protected Callable<T> getCallable()
@@ -181,9 +181,9 @@ public class DefaultScheduledTask<T>
         setFuture( reschedule() );
     }
 
-    public Exception getBrokenCause()
+    public Throwable getBrokenCause()
     {
-        return exception;
+        return throwable;
     }
 
     public T get()
@@ -250,10 +250,13 @@ public class DefaultScheduledTask<T>
             try
             {
                 result = getCallable().call();
-
-                results.add( result );
+                
+                if ( result != null )
+                {
+                    results.add( result );
+                }
             }
-            catch ( Exception e )
+            catch ( Throwable e )
             {
                 setBrokenCause( e );
 
@@ -262,7 +265,7 @@ public class DefaultScheduledTask<T>
                 // TODO: Should we remove brokeneds?
                 // getScheduler().removeFromTasksMap( this );
 
-                throw e;
+                throw new TaskExecutionException( e );
             }
         }
 

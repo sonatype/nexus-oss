@@ -34,6 +34,7 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.feeds.SystemProcess;
 import org.sonatype.scheduling.ScheduledTask;
+import org.sonatype.scheduling.TaskExecutionException;
 
 public abstract class AbstractNexusTask<T>
     extends AbstractLogEnabled
@@ -45,6 +46,8 @@ public abstract class AbstractNexusTask<T>
 
     private SystemProcess prc;
 
+    private Nexus nexus = null;
+
     public void contextualize( Context ctx )
         throws ContextException
     {
@@ -53,14 +56,19 @@ public abstract class AbstractNexusTask<T>
 
     protected Nexus getNexus()
     {
-        try
+        if ( nexus == null )
         {
-            return (Nexus) plexusContainer.lookup( Nexus.ROLE );
+            try
+            {
+                return (Nexus) plexusContainer.lookup( Nexus.ROLE );
+            }
+            catch ( ComponentLookupException e )
+            {
+                throw new IllegalStateException( "Cannot fetch Nexus from container!", e );
+            }
         }
-        catch ( ComponentLookupException e )
-        {
-            throw new IllegalStateException( "Cannot fetch Nexus from container!", e );
-        }
+
+        return nexus;
     }
 
     public void addParameter( String key, String value )
@@ -108,11 +116,20 @@ public abstract class AbstractNexusTask<T>
 
             return result;
         }
-        catch ( Exception e )
+        catch ( Throwable e )
         {
             getNexus().systemProcessBroken( prc, e );
 
-            throw e;
+            if ( Exception.class.isAssignableFrom( e.getClass() ) )
+            {
+                // this is an exception, pass it further
+                throw (Exception) e;
+            }
+            else
+            {
+                // this is a Throwable or Error instance, pack it into an exception and rethrow
+                throw new TaskExecutionException( e );
+            }
         }
     }
 

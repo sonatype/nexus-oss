@@ -87,7 +87,7 @@ public interface ScheduledTask<T>
      * 
      * @return null, if task in not in BROKEN status, otherwise the exception that broke it.
      */
-    Exception getBrokenCause();
+    Throwable getBrokenCause();
 
     /**
      * Gets the result of Callable, or null if it is "converted" from Runnable. It behaves just like Future.get(), if
