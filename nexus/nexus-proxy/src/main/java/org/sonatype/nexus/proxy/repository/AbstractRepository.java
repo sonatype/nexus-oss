@@ -261,6 +261,16 @@ public abstract class AbstractRepository
 
     public void setProxyMode( ProxyMode proxyMode )
     {
+        if ( RepositoryType.PROXY.equals( getRepositoryType() ) )
+        {
+            // if this is proxy
+            // and was !shouldProxy() and the new is shouldProxy()
+            if ( this.proxyMode != null && !this.proxyMode.shouldProxy() && proxyMode.shouldProxy() )
+            {
+                getNotFoundCache().purge();
+            }
+        }
+
         this.proxyMode = proxyMode;
     }
 
