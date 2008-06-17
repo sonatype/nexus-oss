@@ -68,6 +68,8 @@ public class DefaultScheduledTask<T>
     private SchedulerIterator scheduleIterator;
 
     private Map<String, String> taskParams;
+    
+    private boolean manualRun;
 
     public DefaultScheduledTask( String name, String clazz, DefaultScheduler scheduler, Callable<T> callable,
         Schedule schedule, Map<String, String> taskParams )
@@ -95,6 +97,8 @@ public class DefaultScheduledTask<T>
         this.scheduleIterator = null;
 
         this.taskParams = taskParams;
+        
+        this.manualRun = false;
     }
 
     protected void start()
@@ -238,11 +242,15 @@ public class DefaultScheduledTask<T>
     
     public void runNow()
     {        
-        //Just set schedule for now, when done processing will reschedule as normal
-        getScheduler().getScheduledExecutorService().schedule(
-            this,
-            0,
-            TimeUnit.MILLISECONDS );
+        if ( !manualRun )
+        {
+            manualRun = true;
+            //Just set schedule for now, when done processing will reschedule as normal
+            getScheduler().getScheduledExecutorService().schedule(
+                this,
+                0,
+                TimeUnit.MILLISECONDS );
+        }
     }
 
     public T call()
@@ -286,8 +294,20 @@ public class DefaultScheduledTask<T>
                 }
             }
         }
-
-        Future<T> nextFuture = reschedule();
+        
+        Future<T> nextFuture = null;
+        
+        //If manually running, just grab the previous future and use that
+        if ( manualRun )
+        {
+            nextFuture = getFuture();  
+            manualRun = false;
+        }
+        //Otherwise, grab the next one
+        else
+        {
+            nextFuture = reschedule();
+        }
 
         if ( nextFuture != null )
         {
