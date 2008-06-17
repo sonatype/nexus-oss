@@ -95,7 +95,7 @@ public class ScheduledServiceTypeResourceHandler
         type.addProperty( property );
         property = new ScheduledServiceTypePropertyResource();
         property.setId( EvictUnusedProxiedItemsTask.EVICT_OLDER_CACHE_ITEMS_THEN_KEY );
-        property.setName( "Evict items older than" );
+        property.setName( "Evict items older than (days)" );
         property.setType( PROPERTY_TYPE_NUMBER );
         property.setRequired( true );
         property
@@ -108,7 +108,7 @@ public class ScheduledServiceTypeResourceHandler
         type.setName( getServiceTypeName( type.getId() ) );
         property = new ScheduledServiceTypePropertyResource();
         property.setId( PurgeTimeline.PURGE_OLDER_THAN_KEY );
-        property.setName( "Purge older items than" );
+        property.setName( "Purge older items than (days)" );
         property.setType( PROPERTY_TYPE_NUMBER );
         property.setRequired( true );
         property
@@ -157,7 +157,7 @@ public class ScheduledServiceTypeResourceHandler
         property.setType( PROPERTY_TYPE_STRING );
         property
             .setHelpText( "Type in the repository path from which to clear caches recursively (ie. \"/\" for root or \"/org/apache\")" );
-        property.setRequired( true );
+        property.setRequired( false );
         type.addProperty( property );
         response.addData( type );
 

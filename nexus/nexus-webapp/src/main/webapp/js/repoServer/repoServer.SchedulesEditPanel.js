@@ -350,17 +350,17 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
         frame: false,
         items: [
           {
-	          xtype: 'fieldset',
-    	      checkboxToggle:false,
-    	      title: 'Schedule Settings',
-    	      anchor: Sonatype.view.FIELDSET_OFFSET,
-    	      collapsible: false,
-    	      autoHeight:true,
+              xtype: 'fieldset',
+              checkboxToggle:false,
+              title: 'Schedule Settings',
+              anchor: Sonatype.view.FIELDSET_OFFSET,
+              collapsible: false,
+              autoHeight:true,
               labelWidth: 175,
-    	      layoutConfig: {
-	            labelSeparator: ''
-	          },
-	          items: [
+              layoutConfig: {
+                labelSeparator: ''
+              },
+              items: [
               {
                 xtype: 'label',
                 text: 'Without recurrence, this service can only be run manually.'
@@ -369,15 +369,15 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
           },
           {
             xtype: 'fieldset',
-    	      checkboxToggle:false,
-    	      title: 'Schedule Settings',
-    	      anchor: Sonatype.view.FIELDSET_OFFSET,
-    	      collapsible: false,
-    	      autoHeight:true,
+              checkboxToggle:false,
+              title: 'Schedule Settings',
+              anchor: Sonatype.view.FIELDSET_OFFSET,
+              collapsible: false,
+              autoHeight:true,
               labelWidth: 175,
-    	      layoutConfig: {
-	            labelSeparator: ''
-	          },
+              layoutConfig: {
+                labelSeparator: ''
+              },
             items: [
               {
                 xtype: 'datefield',
@@ -402,15 +402,15 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
           },
           {
             xtype: 'fieldset',
-    	      checkboxToggle:false,
-    	      title: 'Schedule Settings',
-    	      anchor: Sonatype.view.FIELDSET_OFFSET,
-    	      collapsible: false,
-    	      autoHeight:true,
+              checkboxToggle:false,
+              title: 'Schedule Settings',
+              anchor: Sonatype.view.FIELDSET_OFFSET,
+              collapsible: false,
+              autoHeight:true,
               labelWidth: 175,
-    	      layoutConfig: {
-	            labelSeparator: ''
-	          },
+              layoutConfig: {
+                labelSeparator: ''
+              },
             items: [
               {
                 xtype: 'datefield',
@@ -435,15 +435,15 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
           },
           {
             xtype: 'fieldset',
-    	      checkboxToggle:false,
-    	      title: 'Schedule Settings',
-    	      anchor: Sonatype.view.FIELDSET_OFFSET,
-    	      collapsible: false,
-    	      autoHeight:true,
+              checkboxToggle:false,
+              title: 'Schedule Settings',
+              anchor: Sonatype.view.FIELDSET_OFFSET,
+              collapsible: false,
+              autoHeight:true,
               labelWidth: 175,
-    	      layoutConfig: {
-	            labelSeparator: ''
-	          },
+              layoutConfig: {
+                labelSeparator: ''
+              },
             items: [
               {
                 xtype: 'datefield',
@@ -576,15 +576,15 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
           },
           {
             xtype: 'fieldset',
-    	      checkboxToggle:false,
-    	      title: 'Schedule Settings',
-    	      anchor: Sonatype.view.FIELDSET_OFFSET,
-    	      collapsible: false,
-    	      autoHeight:true,
+              checkboxToggle:false,
+              title: 'Schedule Settings',
+              anchor: Sonatype.view.FIELDSET_OFFSET,
+              collapsible: false,
+              autoHeight:true,
               labelWidth: 175,
-    	      layoutConfig: {
-	            labelSeparator: ''
-	          },
+              layoutConfig: {
+                labelSeparator: ''
+              },
             items: [
               {
                 xtype: 'datefield',
@@ -828,13 +828,13 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
           },
           {
             xtype: 'fieldset',
-    		    checkboxToggle:false,
-    		    title: 'Schedule Settings',
-    		    anchor: Sonatype.view.FIELDSET_OFFSET,
-    		    collapsible: false,
-    		    autoHeight:true,
+                checkboxToggle:false,
+                title: 'Schedule Settings',
+                anchor: Sonatype.view.FIELDSET_OFFSET,
+                collapsible: false,
+                autoHeight:true,
                 labelWidth: 175,
-    		    layoutConfig: {
+                layoutConfig: {
                 labelSeparator: ''
               },
               items: [
@@ -853,7 +853,7 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
             }
           ]
         }
-	  ],
+      ],
     buttons: [
       {
         text: 'Save'
@@ -1246,7 +1246,6 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
     
     //always set active and re-layout
     this.formCards.getLayout().setActiveItem(formPanel);
-    formPanel.doLayout();
   },
   
   afterLayoutFormHandler : function(formPanel, fLayout){
@@ -1430,8 +1429,15 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
             resourceUri : dataObj.resourceURI
           };
 
-        //save button event handler
-        action.options.fpanel.buttons[0].on('click', this.saveHandler.createDelegate(this, [buttonInfoObj]));
+        if (dataObj.schedule == 'once'){
+          action.options.fpanel.buttons[0].disable();
+        }
+        else
+        {
+          //save button event handler
+          action.options.fpanel.buttons[0].on('click', this.saveHandler.createDelegate(this, [buttonInfoObj]));
+        }
+        
         //cancel button event handler
         action.options.fpanel.buttons[1].on('click', this.cancelHandler.createDelegate(this, [buttonInfoObj]));
         
@@ -1548,7 +1554,7 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
         isNew : false, //not a new route form, see assumption
         resourceUri : rec.data.resourceURI
       };
-
+      
       formPanel.buttons[0].on('click', this.saveHandler.createDelegate(this, [buttonInfoObj]));
       formPanel.buttons[1].on('click', this.cancelHandler.createDelegate(this, [buttonInfoObj]));
       
@@ -1558,7 +1564,7 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
       
       this.formCards.add(formPanel);
     }
-
+    
     //always set active
     this.formCards.getLayout().setActiveItem(formPanel);
     if (schedulePanel != null){    
