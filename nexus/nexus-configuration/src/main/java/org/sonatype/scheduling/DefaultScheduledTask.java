@@ -265,7 +265,16 @@ public class DefaultScheduledTask<T>
                 // TODO: Should we remove brokeneds?
                 // getScheduler().removeFromTasksMap( this );
 
-                throw new TaskExecutionException( e );
+                if ( Exception.class.isAssignableFrom( e.getClass() ) )
+                {
+                    // this is an exception, pass it further
+                    throw (Exception) e;
+                }
+                else
+                {
+                    // this is a Throwable or Error instance, pack it into an exception and rethrow
+                    throw new TaskExecutionException( e );
+                }
             }
         }
 
