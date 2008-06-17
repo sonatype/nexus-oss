@@ -23,6 +23,7 @@ package org.sonatype.scheduling;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
@@ -198,17 +199,43 @@ public class DefaultScheduler
 
         return dct;
     }
-    
+
     public <T> ScheduledTask<T> updateSchedule( ScheduledTask<T> task )
-        throws RejectedExecutionException, NullPointerException
+        throws RejectedExecutionException,
+            NullPointerException
     {
-        //Simply add the task to config, will find existing by id, remove, then store new
+        // Simply add the task to config, will find existing by id, remove, then store new
         taskConfig.addTask( task );
-        
+
         return task;
     }
 
     public Map<String, List<ScheduledTask<?>>> getActiveTasks()
+    {
+        Map<String, List<ScheduledTask<?>>> result = getAllTasks();
+
+        List<ScheduledTask<?>> tasks = null;
+
+        // filter for activeOrSubmitted
+        for ( String cls : result.keySet() )
+        {
+            tasks = result.get( cls );
+
+            for ( Iterator<ScheduledTask<?>> i = tasks.iterator(); i.hasNext(); )
+            {
+                ScheduledTask<?> task = i.next();
+
+                if ( !task.getTaskState().isActiveOrSubmitted() )
+                {
+                    i.remove();
+                }
+            }
+        }
+
+        return result;
+    }
+
+    public Map<String, List<ScheduledTask<?>>> getAllTasks()
     {
         Map<String, List<ScheduledTask<?>>> result = null;
 
@@ -225,10 +252,7 @@ public class DefaultScheduler
 
                 for ( ScheduledTask<?> task : tasksMap.get( cls ) )
                 {
-                    if ( task.getTaskState().isActiveOrSubmitted() )
-                    {
-                        tasks.add( task );
-                    }
+                    tasks.add( task );
                 }
 
                 if ( tasks.size() > 0 )

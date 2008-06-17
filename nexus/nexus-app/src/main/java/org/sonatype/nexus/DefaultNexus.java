@@ -1059,6 +1059,11 @@ public class DefaultNexus
         return nexusScheduler.updateSchedule( task );
     }
 
+    public Map<String, List<ScheduledTask<?>>> getAllTasks()
+    {
+        return nexusScheduler.getAllTasks();
+    }
+
     public Map<String, List<ScheduledTask<?>>> getActiveTasks()
     {
         return nexusScheduler.getActiveTasks();

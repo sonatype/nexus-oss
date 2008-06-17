@@ -224,6 +224,8 @@ public interface Nexus
         throws RejectedExecutionException,
             NullPointerException;
 
+    Map<String, List<ScheduledTask<?>>> getAllTasks();
+    
     Map<String, List<ScheduledTask<?>>> getActiveTasks();
 
     ScheduledTask<?> getTaskById( String id )

@@ -69,7 +69,7 @@ public class ScheduledServiceListResourceHandler
     public Representation getRepresentationHandler( Variant variant )
         throws IOException
     {
-        Map<String, List<ScheduledTask<?>>> tasksMap = getNexus().getActiveTasks();
+        Map<String, List<ScheduledTask<?>>> tasksMap = getNexus().getAllTasks();
 
         ScheduledServiceListResourceResponse response = new ScheduledServiceListResourceResponse();
 

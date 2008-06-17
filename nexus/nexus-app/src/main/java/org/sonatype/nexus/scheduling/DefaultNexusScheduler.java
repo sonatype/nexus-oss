@@ -97,6 +97,11 @@ public class DefaultNexusScheduler
         return task;
     }
 
+    public Map<String, List<ScheduledTask<?>>> getAllTasks()
+    {
+        return scheduler.getAllTasks();
+    }
+
     public Map<String, List<ScheduledTask<?>>> getActiveTasks()
     {
         return scheduler.getActiveTasks();
@@ -112,7 +117,7 @@ public class DefaultNexusScheduler
         throws StartingException
     {
         getLogger().info( "Starting Scheduler" );
-        
+
         scheduler.startService();
     }
 
@@ -120,7 +125,7 @@ public class DefaultNexusScheduler
         throws StoppingException
     {
         getLogger().info( "Stopping Scheduler" );
-        
+
         scheduler.stopService();
     }
 
