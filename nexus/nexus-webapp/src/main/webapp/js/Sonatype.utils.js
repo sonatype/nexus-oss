@@ -129,13 +129,9 @@ Sonatype.utils = {
         msg: (
           ( message ? message + '<br /><br />' : '' ) + 
           ( response.status ?
-              'ERROR ' + response.status + ': ' + response.statusText + '<br />' +
-              '<br />' +
-              'Nexus returned an error.'
+              'Nexus returned an error: ERROR ' + response.status + ': ' + response.statusText
               :
-              'ERROR: ' + response.statusText + '<br />' +
-              '<br />' +
-              'There was an error connecting to Nexus.<br />' +
+              'There was an error connecting to Nexus: ' + response.statusText + '<br />' +
               'Check your network connection, make sure Nexus is running.' ) +
           ( offerRestart ?
               '<br /><br />Click OK to reload the console or ' +

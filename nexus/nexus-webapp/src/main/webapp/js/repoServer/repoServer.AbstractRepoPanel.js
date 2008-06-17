@@ -80,7 +80,7 @@ Ext.extend(Sonatype.repoServer.AbstractRepoPanel, Ext.Panel, {
       
     }
     else {
-      Ext.MessageBox.alert('The server did not clear the repository\'s cache');
+      Sonatype.utils.connectionError( response, 'The server did not clear the repository\'s cache.' );
     }
   },
 
@@ -118,8 +118,7 @@ Ext.extend(Sonatype.repoServer.AbstractRepoPanel, Ext.Panel, {
 
     }
     else {
-      
-      Ext.MessageBox.alert('The server did not re-index the repository');
+      Sonatype.utils.connectionError( response, 'The server did not re-index the repository.' );
     }
   },
   
@@ -156,8 +155,7 @@ Ext.extend(Sonatype.repoServer.AbstractRepoPanel, Ext.Panel, {
 
     }
     else {
-      
-      Ext.MessageBox.alert('The server did not rebuild attributes in the repository');
+      Sonatype.utils.connectionError( response, 'The server did not rebuild attributes in the repository.' );
     }
   },
   
@@ -191,7 +189,7 @@ Ext.extend(Sonatype.repoServer.AbstractRepoPanel, Ext.Panel, {
       this.updateRepoStatuses(statusResp.data);
     }
     else {
-      Ext.MessageBox.alert('The server did not put the repository into service');
+      Sonatype.utils.connectionError( response, 'The server did not put the repository into service.' );
     }
   },
 
@@ -250,7 +248,7 @@ Ext.extend(Sonatype.repoServer.AbstractRepoPanel, Ext.Panel, {
       this.updateRepoStatuses(statusResp.data);
     }
     else {
-      Ext.MessageBox.alert('The server did not update the proxy repository status to allow');
+      Sonatype.utils.connectionError( response, 'The server did not update the proxy repository status to allow.' );
     }
   },
   
@@ -286,7 +284,7 @@ Ext.extend(Sonatype.repoServer.AbstractRepoPanel, Ext.Panel, {
       this.updateRepoStatuses(statusResp.data);
     }
     else {
-      Ext.MessageBox.alert('The server did not update the proxy repository status to blocked');
+      Sonatype.utils.connectionError( response, 'The server did not update the proxy repository status to blocked.' );
     }
   },
   
@@ -297,7 +295,7 @@ Ext.extend(Sonatype.repoServer.AbstractRepoPanel, Ext.Panel, {
       this.updateRepoStatuses(statusResp.data);
     }
     else {
-      Ext.MessageBox.alert('The server did not put the repository out of service');
+      Sonatype.utils.connectionError( response, 'The server did not put the repository out of service.' );
     }
   },
   
@@ -347,13 +345,7 @@ Ext.extend(Sonatype.repoServer.AbstractRepoPanel, Ext.Panel, {
               return;
             }
           }
-          Ext.MessageBox.show({
-            title: 'Error',
-            icon: Ext.MessageBox.ERROR,
-            buttons: Ext.MessageBox.OK,
-            msg: 'There was a problem obtaining repository status:<br /><br />' +
-              'ERROR ' + response.status + ': ' + response.statusText
-          });
+          Sonatype.utils.connectionError( response, 'There was a problem obtaining repository status.' );
         }
       });
     }
