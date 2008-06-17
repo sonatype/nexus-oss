@@ -530,7 +530,7 @@ public class DefaultIndexerManager
             {
                 getLogger().info( "Publishing local index for repository " + repository.getId() );
 
-                // otherwise publich local cache index
+                // otherwise publish local cache index
                 context = nexusIndexer.getIndexingContexts().get( getLocalContextId( repository.getId() ) );
 
                 try
