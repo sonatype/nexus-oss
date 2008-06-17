@@ -25,6 +25,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.Callable;
 
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.sonatype.nexus.configuration.ApplicationConfiguration;
@@ -59,8 +60,7 @@ import org.sonatype.nexus.proxy.storage.local.LocalRepositoryStorage;
 import org.sonatype.nexus.proxy.storage.remote.RemoteRepositoryStorage;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 import org.sonatype.nexus.proxy.utils.StoreFileWalker;
-
-import edu.emory.mathcs.backport.java.util.concurrent.Executors;
+import org.sonatype.scheduling.Scheduler;
 
 /**
  * <p>
@@ -97,6 +97,13 @@ public abstract class AbstractRepository
      * @plexus.requirement
      */
     private CacheManager cacheManager;
+
+    /**
+     * The Scheduler.
+     * 
+     * @plexus.requirement
+     */
+    private Scheduler scheduler;
 
     /** The id. */
     private String id;
@@ -204,9 +211,10 @@ public abstract class AbstractRepository
             if ( RemoteStatus.UNKNOWN.equals( remoteStatus ) && !remoteStatusChecking )
             {
                 // check for thread and go check it
-                Executors.newFixedThreadPool( 1 ).submit( new Runnable()
+                scheduler.submit( getId() + " remote status check", new Callable<Object>()
                 {
-                    public void run()
+                    public Object call()
+                        throws Exception
                     {
                         remoteStatusChecking = true;
 
@@ -225,8 +233,10 @@ public abstract class AbstractRepository
                         {
                             remoteStatusChecking = false;
                         }
+
+                        return null;
                     }
-                } );
+                }, null );
             }
 
             return remoteStatus;
