@@ -745,7 +745,7 @@ public abstract class AbstractRepository
 
         if ( !getLocalStatus().shouldServiceRequest() )
         {
-            throw new RepositoryNotAvailableException( "Repository " + this.getId() + " is not available!" );
+            throw new RepositoryNotAvailableException( this.getId() );
         }
 
         return getLocalStorage().retrieveItemContent( uid );
@@ -763,7 +763,7 @@ public abstract class AbstractRepository
 
         if ( !getLocalStatus().shouldServiceRequest() )
         {
-            throw new RepositoryNotAvailableException( "Repository " + this.getId() + " is not available!" );
+            throw new RepositoryNotAvailableException( this.getId() );
         }
 
         maintainNotFoundCache( uid.getPath() );
@@ -815,7 +815,7 @@ public abstract class AbstractRepository
 
         if ( !getLocalStatus().shouldServiceRequest() )
         {
-            throw new RepositoryNotAvailableException( "Repository " + this.getId() + " is not available!" );
+            throw new RepositoryNotAvailableException( this.getId() );
         }
 
         maintainNotFoundCache( from.getPath() );
@@ -839,7 +839,7 @@ public abstract class AbstractRepository
 
         if ( !getLocalStatus().shouldServiceRequest() )
         {
-            throw new RepositoryNotAvailableException( "Repository " + this.getId() + " is not available!" );
+            throw new RepositoryNotAvailableException( this.getId() );
         }
 
         copyItem( from, to );
@@ -869,7 +869,7 @@ public abstract class AbstractRepository
 
         if ( !getLocalStatus().shouldServiceRequest() )
         {
-            throw new RepositoryNotAvailableException( "Repository " + this.getId() + " is not available!" );
+            throw new RepositoryNotAvailableException( this.getId() );
         }
 
         maintainNotFoundCache( uid.getPath() );
@@ -909,7 +909,7 @@ public abstract class AbstractRepository
 
         if ( !getLocalStatus().shouldServiceRequest() )
         {
-            throw new RepositoryNotAvailableException( "Repository " + this.getId() + " is not available!" );
+            throw new RepositoryNotAvailableException( this.getId() );
         }
 
         getLocalStorage().storeItem( item );
@@ -930,7 +930,7 @@ public abstract class AbstractRepository
 
         if ( !getLocalStatus().shouldServiceRequest() )
         {
-            throw new RepositoryNotAvailableException( "Repository " + this.getId() + " is not available!" );
+            throw new RepositoryNotAvailableException( this.getId() );
         }
 
         if ( isBrowseable() )
@@ -1031,7 +1031,7 @@ public abstract class AbstractRepository
     {
         if ( !getLocalStatus().shouldServiceRequest() )
         {
-            throw new RepositoryNotAvailableException( "Repository " + this.getId() + " is not available!" );
+            throw new RepositoryNotAvailableException( this.getId() );
         }
         if ( !isAllowWrite() && ( RepositoryPermission.STORE.equals( permission ) ) )
         {

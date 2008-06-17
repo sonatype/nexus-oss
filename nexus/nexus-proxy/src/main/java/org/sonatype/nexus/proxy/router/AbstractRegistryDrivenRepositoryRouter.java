@@ -211,6 +211,10 @@ public abstract class AbstractRegistryDrivenRepositoryRouter
                         break;
                     }
                 }
+                catch ( RepositoryNotAvailableException ex )
+                {
+                    getLogger().info( ex.getMessage() );
+                }
                 catch ( ItemNotFoundException ex )
                 {
                     // silent, we are searching
