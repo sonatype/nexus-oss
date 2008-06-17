@@ -235,6 +235,15 @@ public class DefaultScheduledTask<T>
             return null;
         }
     }
+    
+    public void runNow()
+    {        
+        //Just set schedule for now, when done processing will reschedule as normal
+        getScheduler().getScheduledExecutorService().schedule(
+            this,
+            0,
+            TimeUnit.MILLISECONDS );
+    }
 
     public T call()
         throws Exception

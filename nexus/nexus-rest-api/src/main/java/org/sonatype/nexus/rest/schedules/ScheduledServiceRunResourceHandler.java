@@ -58,7 +58,9 @@ public class ScheduledServiceRunResourceHandler extends AbstractScheduledService
         try
         {
             ScheduledTask<?> task = getNexus().getTaskById( getScheduledServiceId() );
-            //TODO: run the task
+
+            task.runNow();
+
             getResponse().setStatus( Status.SUCCESS_ACCEPTED );
         }
         catch ( NoSuchTaskException e )

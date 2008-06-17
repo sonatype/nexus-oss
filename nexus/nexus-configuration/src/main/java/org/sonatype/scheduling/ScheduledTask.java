@@ -71,6 +71,12 @@ public interface ScheduledTask<T>
      * @return
      */
     Date getScheduledAt();
+    
+    /**
+     * Runs the task right now, putting schedule on hold until complete
+     * 
+     */
+    void runNow();
 
     /**
      * Cancels the task and removes it from queue.
