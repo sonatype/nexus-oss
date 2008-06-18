@@ -852,6 +852,10 @@ public abstract class AbstractRepository
 
         maintainNotFoundCache( uid.getPath() );
 
+        boolean isCollectionAndBrowsingNotAllowed = false;
+
+        boolean isLocalOnlyRequest = ( localOnly ) || ( getProxyMode() != null && !getProxyMode().shouldProxy() );
+
         try
         {
             StorageItem item = doRetrieveItem( localOnly, uid, new HashMap<String, Object>() );
@@ -867,6 +871,8 @@ public abstract class AbstractRepository
                     getId() + " retrieveItem() :: FOUND a collection on " + uid.toString()
                         + " but repository is not Browseable." );
 
+                isCollectionAndBrowsingNotAllowed = true;
+
                 throw new ItemNotFoundException( uid );
             }
 
@@ -878,10 +884,12 @@ public abstract class AbstractRepository
             {
                 getLogger().debug( getId() + " retrieveItem() :: NOT FOUND " + uid.toString() );
             }
-            if ( !localOnly )
+
+            if ( !isCollectionAndBrowsingNotAllowed && !isLocalOnlyRequest )
             {
                 addToNotFoundCache( uid.getPath() );
             }
+
             throw ex;
         }
     }
