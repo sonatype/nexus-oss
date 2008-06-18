@@ -21,6 +21,7 @@
 package org.sonatype.nexus.rest.schedules;
 
 import java.io.IOException;
+import java.util.concurrent.RejectedExecutionException;
 
 import org.restlet.Context;
 import org.restlet.data.Request;
@@ -62,6 +63,10 @@ public class ScheduledServiceRunResourceHandler extends AbstractScheduledService
             task.runNow();
 
             getResponse().setStatus( Status.SUCCESS_ACCEPTED );
+        }
+        catch ( RejectedExecutionException e )
+        {
+            getResponse().setStatus( Status.CLIENT_ERROR_CONFLICT, e.getMessage() );
         }
         catch ( NoSuchTaskException e )
         {

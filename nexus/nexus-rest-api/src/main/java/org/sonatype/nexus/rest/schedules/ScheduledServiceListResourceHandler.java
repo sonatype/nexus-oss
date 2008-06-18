@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.RejectedExecutionException;
 
 import org.codehaus.plexus.util.StringUtils;
 import org.restlet.Context;
@@ -145,6 +146,12 @@ public class ScheduledServiceListResourceHandler
                 response.setData( resourceStatus );
 
                 getResponse().setEntity( serialize( entity, response ) );
+            }
+            catch ( RejectedExecutionException e )
+            {
+                getResponse().setStatus( Status.CLIENT_ERROR_CONFLICT, e.getMessage() );
+                
+                return;
             }
             catch ( ParseException e )
             {

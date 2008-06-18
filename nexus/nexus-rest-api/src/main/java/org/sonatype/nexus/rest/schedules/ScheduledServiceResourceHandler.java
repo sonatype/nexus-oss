@@ -23,6 +23,7 @@ package org.sonatype.nexus.rest.schedules;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.Iterator;
+import java.util.concurrent.RejectedExecutionException;
 import java.util.logging.Level;
 
 import org.restlet.Context;
@@ -230,6 +231,12 @@ public class ScheduledServiceResourceHandler
                 getLogger().log( Level.SEVERE, "Unable to locate task id:" + resource.getId(), e );
                 
                 getResponse().setStatus( Status.CLIENT_ERROR_NOT_FOUND, "Scheduled service not found!" );
+            }
+            catch ( RejectedExecutionException e )
+            {
+                getResponse().setStatus( Status.CLIENT_ERROR_CONFLICT, e.getMessage() );
+                
+                return;
             }
             catch ( ParseException e )
             {
