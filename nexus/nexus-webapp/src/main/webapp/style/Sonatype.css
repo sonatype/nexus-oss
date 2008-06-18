@@ -233,3 +233,8 @@ button.st-icon-refresh {
 }
 
 .ext-ie .x-fieldset{padding-top:10px;padding-bottom:10px;}
+
+.x-date-middle {
+    padding-top:2px;padding-bottom:2px;
+    width:130px; /* FF3 */
+}
