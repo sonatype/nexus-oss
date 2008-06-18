@@ -61,7 +61,7 @@ public class StoreWalkerTest
         w.walk();
         assertEquals( 14, w.collEnters );
         assertEquals( 14, w.collExits );
-        assertEquals( 27, w.colls );
+        assertEquals( 14, w.colls );
         assertEquals( 4, w.files );
         assertEquals( 0, w.links );
 
@@ -69,7 +69,7 @@ public class StoreWalkerTest
         w.walk();
         assertEquals( 11, w.collEnters );
         assertEquals( 11, w.collExits );
-        assertEquals( 21, w.colls );
+        assertEquals( 11, w.colls );
         assertEquals( 4, w.files );
         assertEquals( 0, w.links );
 

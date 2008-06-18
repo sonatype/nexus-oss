@@ -551,37 +551,6 @@ public abstract class AbstractRepository
         StoreFileWalker walker = new StoreFileWalker( this, getLogger() )
         {
             @Override
-            protected void onCollectionExit( StorageCollectionItem coll )
-            {
-                // expiring now empty directories
-                try
-                {
-                    if ( coll.list().size() == 0 )
-                    {
-                        deleteItem( coll.getRepositoryItemUid() );
-                    }
-                }
-                catch ( RepositoryNotAvailableException e )
-                {
-                    // simply stop if set during processing
-                    stop();
-                }
-                catch ( UnsupportedStorageOperationException e )
-                {
-                    // if op not supported (R/O repo?)
-                    stop();
-                }
-                catch ( ItemNotFoundException e )
-                {
-                    // will not happen
-                }
-                catch ( StorageException e )
-                {
-                    logger.warn( "Got storage exception while evicting " + coll.getRepositoryItemUid().toString(), e );
-                }
-                super.onCollectionExit( coll );
-            }
-            @Override
             protected void processFileItem( StorageFileItem item )
             {
                 // expiring found files
@@ -609,6 +578,37 @@ public abstract class AbstractRepository
                 catch ( StorageException e )
                 {
                     logger.warn( "Got storage exception while evicting " + item.getRepositoryItemUid().toString(), e );
+                }
+            }
+
+            @Override
+            protected void onCollectionExit( StorageCollectionItem coll )
+            {
+                // expiring now empty directories
+                try
+                {
+                    if ( coll.list().size() == 0 )
+                    {
+                        deleteItem( coll.getRepositoryItemUid() );
+                    }
+                }
+                catch ( RepositoryNotAvailableException e )
+                {
+                    // simply stop if set during processing
+                    stop();
+                }
+                catch ( UnsupportedStorageOperationException e )
+                {
+                    // if op not supported (R/O repo?)
+                    stop();
+                }
+                catch ( ItemNotFoundException e )
+                {
+                    // will not happen
+                }
+                catch ( StorageException e )
+                {
+                    logger.warn( "Got storage exception while evicting " + coll.getRepositoryItemUid().toString(), e );
                 }
             }
         };

@@ -21,7 +21,6 @@
 package org.sonatype.nexus.proxy.utils;
 
 import java.util.Collection;
-import java.util.Stack;
 
 import org.codehaus.plexus.logging.Logger;
 import org.sonatype.nexus.proxy.AccessDeniedException;
@@ -94,8 +93,6 @@ public abstract class StoreWalker
             fromPath = RepositoryItemUid.PATH_ROOT;
         }
 
-        int itemCount = 0;
-
         if ( logger != null && logger.isDebugEnabled() )
         {
             logger.debug( "Start walking on ResourceStore " + store.getId() + " from path " + fromPath );
@@ -103,9 +100,7 @@ public abstract class StoreWalker
 
         beforeWalk();
 
-        Stack<StorageCollectionItem> stack = new Stack<StorageCollectionItem>();
         StorageItem item = null;
-        StorageCollectionItem coll = null;
 
         try
         {
@@ -153,39 +148,11 @@ public abstract class StoreWalker
             return;
         }
 
+        int collCount = 0;
+        
         if ( StorageCollectionItem.class.isAssignableFrom( item.getClass() ) )
         {
-            stack.push( (StorageCollectionItem) item );
-        }
-        while ( !stack.isEmpty() && running )
-        {
-            coll = stack.pop();
-
-            processItem( coll );
-
-            onCollectionEnter( coll );
-
-            itemCount++;
-
-            Collection<StorageItem> ls = coll.list();
-
-            for ( StorageItem i : ls )
-            {
-                if ( collectionsOnly && StorageCollectionItem.class.isAssignableFrom( i.getClass() ) )
-                {
-                    processItem( i );
-                }
-                else
-                {
-                    processItem( i );
-                }
-                if ( StorageCollectionItem.class.isAssignableFrom( i.getClass() ) )
-                {
-                    stack.push( (StorageCollectionItem) i );
-                }
-            }
-
-            onCollectionExit( coll );
+            collCount = walkRecursive( 0, (StorageCollectionItem) item, collectionsOnly );
         }
 
         afterWalk();
@@ -194,18 +161,46 @@ public abstract class StoreWalker
         {
             if ( logger != null )
             {
-                logger.info( "Finished walking on " + store.getId() + " Store with " + Integer.toString( itemCount )
-                    + " items" );
+                logger.info( "Finished walking on " + store.getId() + " Store with " + Integer.toString( collCount )
+                    + " collections." );
             }
         }
         else
         {
             if ( logger != null )
             {
-                logger.info( "Walking STOPPED on " + store.getId() + " Store with " + Integer.toString( itemCount )
-                    + " items" );
+                logger.info( "Walking STOPPED on " + store.getId() + " Store with " + Integer.toString( collCount )
+                    + " collections." );
             }
         }
+    }
+
+    protected final int walkRecursive( int collCount, StorageCollectionItem coll, boolean collectionsOnly )
+    {
+        collCount++;
+
+        onCollectionEnter( coll );
+
+        processItem( coll );
+
+        Collection<StorageItem> ls = coll.list();
+
+        for ( StorageItem i : ls )
+        {
+            if ( !collectionsOnly && !StorageCollectionItem.class.isAssignableFrom( i.getClass() ) )
+            {
+                processItem( i );
+            }
+
+            if ( StorageCollectionItem.class.isAssignableFrom( i.getClass() ) )
+            {
+                collCount += walkRecursive( collCount, (StorageCollectionItem) i, collectionsOnly );
+            }
+        }
+
+        onCollectionExit( coll );
+
+        return collCount;
     }
 
     protected void beforeWalk()
