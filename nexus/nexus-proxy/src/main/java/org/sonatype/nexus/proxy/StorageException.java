@@ -20,6 +20,8 @@
  */
 package org.sonatype.nexus.proxy;
 
+import java.io.IOException;
+
 /**
  * Generic storage exception thrown by given storage implementation (like IOExceptions), and so. Denotes a (probably)
  * unrecoverable, serious system and/or IO error.
@@ -27,7 +29,7 @@ package org.sonatype.nexus.proxy;
  * @author cstamas
  */
 public class StorageException
-    extends Exception
+    extends IOException
 {
     private static final long serialVersionUID = -7119754988039787918L;
 
@@ -38,7 +40,8 @@ public class StorageException
 
     public StorageException( String msg, Throwable cause )
     {
-        super( msg, cause );
-    }
+        super( msg );
 
+        initCause( cause );
+    }
 }

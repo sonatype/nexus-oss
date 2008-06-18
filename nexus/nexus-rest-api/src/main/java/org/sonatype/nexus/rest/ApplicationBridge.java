@@ -64,6 +64,7 @@ import org.sonatype.nexus.rest.schedules.ScheduledServiceTypeResourceHandler;
 import org.sonatype.nexus.rest.status.StatusResourceHandler;
 import org.sonatype.nexus.rest.templates.repositories.RepositoryTemplateListResourceHandler;
 import org.sonatype.nexus.rest.templates.repositories.RepositoryTemplateResourceHandler;
+import org.sonatype.nexus.rest.wastebasket.WastebasketResourceHandler;
 import org.sonatype.nexus.rest.xstream.XStreamInitializer;
 import org.sonatype.nexus.security.SimpleAuthenticationSource;
 import org.sonatype.plexus.rest.PlexusRestletApplicationBridge;
@@ -241,6 +242,8 @@ public class ApplicationBridge
             router.attach( "/data_index/{" + IndexResourceHandler.DOMAIN + "}/{" + IndexResourceHandler.TARGET_ID
                 + "}/content", protectWriteToResource( IndexResourceHandler.class ) );
 
+            router.attach( "/wastebasket", protectResource( WastebasketResourceHandler.class ) );
+            
             router.attach( "/attributes", protectResource( AttributesResourceHandler.class ) );
 
             router.attach( "/attributes/{" + AttributesResourceHandler.DOMAIN + "}/{"

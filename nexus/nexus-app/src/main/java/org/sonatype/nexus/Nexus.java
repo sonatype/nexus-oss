@@ -98,6 +98,19 @@ public interface Nexus
             StorageException;
 
     // ----------------------------------------------------------------------------
+    // Wastebasket
+    // ----------------------------------------------------------------------------
+
+    long getWastebasketItemCount()
+        throws IOException;
+
+    long getWastebasketSize()
+        throws IOException;
+
+    void wastebasketPurge()
+        throws IOException;
+
+    // ----------------------------------------------------------------------------
     // Maintenance
     // ----------------------------------------------------------------------------
 

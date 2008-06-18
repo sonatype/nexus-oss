@@ -23,10 +23,13 @@ package org.sonatype.nexus.proxy.storage.local;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.LoggingComponent;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.attributes.AttributesHandler;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
+import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
+import org.sonatype.nexus.proxy.wastebasket.Wastebasket;
 
 /**
  * Abstract Storage class. It have ID and defines logger. Predefines all write methods to be able to "decorate"
@@ -45,6 +48,13 @@ public abstract class AbstractLocalRepositoryStorage
      * @plexus.requirement
      */
     private AttributesHandler attributesHandler;
+
+    /**
+     * The wastebasket.
+     * 
+     * @plexus.requirement
+     */
+    private Wastebasket wastebasket;
 
     /**
      * Gets the absolute url from base.
@@ -82,6 +92,14 @@ public abstract class AbstractLocalRepositoryStorage
     public void setAttributesHandler( AttributesHandler attributesHandler )
     {
         this.attributesHandler = attributesHandler;
+    }
+
+    public final void deleteItem( RepositoryItemUid uid )
+        throws ItemNotFoundException,
+            UnsupportedStorageOperationException,
+            StorageException
+    {
+        wastebasket.delete( uid, this );
     }
 
 }

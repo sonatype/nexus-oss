@@ -145,7 +145,7 @@ public class ScheduledServiceTypeResourceHandler
         type.setId( ClearCacheTask.class.getName() );
         type.setName( getServiceTypeName( type.getId() ) );
         property = new ScheduledServiceTypePropertyResource();
-        property.setId( PublishIndexesTask.REPOSITORY_OR_GROUP_ID_KEY );
+        property.setId( ClearCacheTask.REPOSITORY_OR_GROUP_ID_KEY );
         property.setName( "Repository/Group" );
         property.setType( PROPERTY_TYPE_REPO_OR_GROUP );
         property.setRequired( true );

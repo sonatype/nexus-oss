@@ -118,6 +118,9 @@ public class DefaultNexusConfiguration
     /** The temp dir */
     private File temporaryDirectory;
 
+    /** The trash */
+    private File wastebasketDirectory;
+
     /** The config event listeners. */
     private Vector<ConfigurationChangeListener> configurationChangeListeners = new Vector<ConfigurationChangeListener>();
 
@@ -150,9 +153,13 @@ public class DefaultNexusConfiguration
 
             workingDirectory = null;
 
+            applicationLogDirectory = null;
+
             configurationDirectory = null;
 
-            applicationLogDirectory = null;
+            temporaryDirectory = null;
+
+            wastebasketDirectory = null;
 
             // create shared remote ctx
             remoteStorageContext = new DefaultRemoteStorageContext();
@@ -181,9 +188,13 @@ public class DefaultNexusConfiguration
 
         workingDirectory = null;
 
+        applicationLogDirectory = null;
+
         configurationDirectory = null;
 
-        applicationLogDirectory = null;
+        temporaryDirectory = null;
+
+        wastebasketDirectory = null;
 
         notifyConfigurationChangeListeners();
     }
@@ -321,6 +332,15 @@ public class DefaultNexusConfiguration
             applicationLogDirectory = new File( getConfiguration().getApplicationLogDirectory() );
         }
         return applicationLogDirectory;
+    }
+
+    public File getWastebasketDirectory()
+    {
+        if ( wastebasketDirectory == null )
+        {
+            wastebasketDirectory = getWorkingDirectory( "trash" );
+        }
+        return wastebasketDirectory;
     }
 
     public AuthenticationSource getAuthenticationSource()

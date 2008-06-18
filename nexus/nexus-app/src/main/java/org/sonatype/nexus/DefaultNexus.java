@@ -97,6 +97,7 @@ import org.sonatype.nexus.proxy.repository.ProxyMode;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RepositoryType;
 import org.sonatype.nexus.proxy.repository.ShadowRepository;
+import org.sonatype.nexus.proxy.wastebasket.Wastebasket;
 import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.nexus.scheduling.NexusTask;
 import org.sonatype.nexus.store.DefaultEntry;
@@ -172,6 +173,13 @@ public class DefaultNexus
      * @plexus.requirement
      */
     private SnapshotRemover snapshotRemover;
+
+    /**
+     * The Wastebasket component.
+     * 
+     * @plexus.requirement
+     */
+    private Wastebasket wastebasket;
 
     /**
      * System status.
@@ -260,6 +268,28 @@ public class DefaultNexus
         {
             return item;
         }
+    }
+
+    // ----------------------------------------------------------------------------------------------------------
+    // Wastebasket
+    // ----------------------------------------------------------------------------------------------------------
+
+    public long getWastebasketItemCount()
+        throws IOException
+    {
+        return wastebasket.getItemCount();
+    }
+
+    public long getWastebasketSize()
+        throws IOException
+    {
+        return wastebasket.getSize();
+    }
+
+    public void wastebasketPurge()
+        throws IOException
+    {
+        wastebasket.purge();
     }
 
     // ------------------------------------------------------------------

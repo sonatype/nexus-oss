@@ -91,6 +91,8 @@ import org.sonatype.nexus.rest.model.SearchResponse;
 import org.sonatype.nexus.rest.model.StatusConfigurationValidationResponse;
 import org.sonatype.nexus.rest.model.StatusResource;
 import org.sonatype.nexus.rest.model.StatusResourceResponse;
+import org.sonatype.nexus.rest.model.WastebasketResource;
+import org.sonatype.nexus.rest.model.WastebasketResourceResponse;
 import org.sonatype.nexus.rest.repositories.RepositoryBaseResourceConverter;
 import org.sonatype.nexus.rest.schedules.ScheduledServiceBaseResourceConverter;
 import org.sonatype.nexus.rest.schedules.ScheduledServicePropertyResourceConverter;
@@ -106,7 +108,7 @@ public final class XStreamInitializer
 
         xstream.registerConverter( new ScheduledServiceBaseResourceConverter( xstream.getMapper(), xstream
             .getReflectionProvider() ), XStream.PRIORITY_VERY_HIGH );
-        
+
         xstream.registerConverter( new ScheduledServicePropertyResourceConverter( xstream.getMapper(), xstream
             .getReflectionProvider() ), XStream.PRIORITY_VERY_HIGH );
 
@@ -165,6 +167,9 @@ public final class XStreamInitializer
         xstream.omitField( RemoteConnectionSettings.class, "modelEncoding" );
         xstream.omitField( RemoteHttpProxySettings.class, "modelEncoding" );
         xstream.omitField( AuthenticationSettings.class, "modelEncoding" );
+
+        xstream.omitField( WastebasketResource.class, "modelEncoding" );
+        xstream.omitField( WastebasketResourceResponse.class, "modelEncoding" );
 
         xstream.omitField( LogsListResourceResponse.class, "modelEncoding" );
         xstream.omitField( LogsListResource.class, "modelEncoding" );

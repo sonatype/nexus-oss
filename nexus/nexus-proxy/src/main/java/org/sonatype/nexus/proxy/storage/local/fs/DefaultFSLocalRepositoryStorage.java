@@ -388,7 +388,7 @@ public class DefaultFSLocalRepositoryStorage
         item.getItemContext().put( FS_FILE, target );
     }
 
-    public void deleteItem( RepositoryItemUid uid )
+    public void shredItem( RepositoryItemUid uid )
         throws ItemNotFoundException,
             UnsupportedStorageOperationException,
             StorageException

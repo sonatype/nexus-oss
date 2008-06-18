@@ -57,6 +57,11 @@ public class ApplicationConfigurationAdapter
     {
         return nexusConfiguration.getTemporaryDirectory();
     }
+    
+    public File getWastebasketDirectory()
+    {
+        return nexusConfiguration.getWastebasketDirectory();
+    }
 
     public File getConfigurationDirectory()
     {

@@ -136,4 +136,13 @@ public class DummyLocalRepositoryStorage
 
     }
 
+    public void shredItem( RepositoryItemUid uid )
+        throws ItemNotFoundException,
+            UnsupportedStorageOperationException,
+            StorageException
+    {
+        // TODO Auto-generated method stub
+        
+    }
+
 }

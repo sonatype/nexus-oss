@@ -142,7 +142,7 @@ public interface LocalRepositoryStorage
             StorageException;
 
     /**
-     * Delete item.
+     * Delete item, using wastebasket.
      * 
      * @param uid the uid
      * @throws ItemNotFoundException the item not found exception
@@ -150,6 +150,19 @@ public interface LocalRepositoryStorage
      * @throws StorageException the storage exception
      */
     void deleteItem( RepositoryItemUid uid )
+        throws ItemNotFoundException,
+            UnsupportedStorageOperationException,
+            StorageException;
+
+    /**
+     * Shred item, avoid wastebasket.
+     * 
+     * @param uid the uid
+     * @throws ItemNotFoundException the item not found exception
+     * @throws UnsupportedStorageOperationException the unsupported storage operation exception
+     * @throws StorageException the storage exception
+     */
+    void shredItem( RepositoryItemUid uid )
         throws ItemNotFoundException,
             UnsupportedStorageOperationException,
             StorageException;

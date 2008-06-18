@@ -76,6 +76,11 @@ public class SimpleApplicationConfiguration
 
         return result;
     }
+    
+    public File getWastebasketDirectory()
+    {
+        return getWorkingDirectory( "trash" );
+    }
 
     public void addConfigurationChangeListener( ConfigurationChangeListener listener )
     {
