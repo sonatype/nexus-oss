@@ -141,7 +141,7 @@ public class IndexResourceHandler
 
     public void handleDelete()
     {
-        ReindexTask task = (ReindexTask) createTaskInstance( ReindexTask.class.getName() );
+        ReindexTask task = (ReindexTask) getNexus().createTaskInstance( ReindexTask.class );
 
         task.setRepositoryId( getRepositoryId() );
 

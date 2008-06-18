@@ -60,7 +60,9 @@ public interface IndexerManager
         throws IOException,
             NoSuchRepositoryGroupException;
 
-    void setRepositoryIndexContextSearchable( String repositoryId, boolean searchable );
+    void setRepositoryIndexContextSearchable( String repositoryId, boolean searchable )
+        throws IOException,
+            NoSuchRepositoryException;
 
     // ----------------------------------------------------------------------------
     // Publishing index

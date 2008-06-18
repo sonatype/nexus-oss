@@ -736,9 +736,6 @@ public abstract class AbstractRepository
 
         RepositoryItemUid uid = new RepositoryItemUid( this, request.getRequestPath() );
 
-        // fire the event for file being deleted
-        notifyProximityEventListeners( new RepositoryItemEventDelete( uid, request.getRequestContext() ) );
-
         deleteItem( uid, request.getRequestContext() );
     }
 
@@ -976,6 +973,9 @@ public abstract class AbstractRepository
 
             dnw.walk( uid.getPath() );
         }
+
+        // fire the event for file being deleted
+        notifyProximityEventListeners( new RepositoryItemEventDelete( uid, context ) );
 
         doDeleteItem( uid );
     }

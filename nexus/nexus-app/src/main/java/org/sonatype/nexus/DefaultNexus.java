@@ -394,7 +394,14 @@ public class DefaultNexus
     {
         nexusConfiguration.createRepository( settings );
 
-        indexerManager.setRepositoryIndexContextSearchable( settings.getId(), settings.isIndexable() );
+        try
+        {
+            indexerManager.setRepositoryIndexContextSearchable( settings.getId(), settings.isIndexable() );
+        }
+        catch ( NoSuchRepositoryException e )
+        {
+            // will not happen, just added it
+        }
     }
 
     public CRepository readRepository( String id )
@@ -665,41 +672,10 @@ public class DefaultNexus
         {
             repository.evictUnusedItems( timestamp );
         }
-        else
+        else if ( !proxyOnly )
         {
-            repository.evictUnusedItems( timestamp );
-        }
-    }
-
-    public void evictAllUnusedItems( long timestamp )
-        throws IOException
-    {
-        getLogger().info( "Evicting unused items in all repositories." );
-
-        for ( Repository repository : repositoryRegistry.getRepositories() )
-        {
-            evictUnusedItems( timestamp, repository, false );
-        }
-    }
-
-    public void evictRepositoryUnusedItems( long timestamp, String repositoryId )
-        throws NoSuchRepositoryException,
-            IOException
-    {
-        getLogger().info( "Evicting unused items from repository " + repositoryId + "." );
-
-        evictUnusedItems( timestamp, repositoryRegistry.getRepository( repositoryId ), false );
-    }
-
-    public void evictRepositoryGroupUnusedItems( long timestamp, String repositoryGroupId )
-        throws NoSuchRepositoryGroupException,
-            IOException
-    {
-        getLogger().info( "Evicting unused items from repositories in group " + repositoryGroupId + "." );
-
-        for ( Repository repository : repositoryRegistry.getRepositoryGroup( repositoryGroupId ) )
-        {
-            evictUnusedItems( timestamp, repository, false );
+            // TODO: remove this
+            // repository.evictUnusedItems( timestamp );
         }
     }
 
@@ -1084,6 +1060,18 @@ public class DefaultNexus
         throws NoSuchTaskException
     {
         return nexusScheduler.getTaskById( id );
+    }
+
+    public NexusTask<?> createTaskInstance( String taskType )
+        throws IllegalArgumentException
+    {
+        return nexusScheduler.createTaskInstance( taskType );
+    }
+
+    public NexusTask<?> createTaskInstance( Class<?> taskType )
+        throws IllegalArgumentException
+    {
+        return nexusScheduler.createTaskInstance( taskType );
     }
 
     // =============

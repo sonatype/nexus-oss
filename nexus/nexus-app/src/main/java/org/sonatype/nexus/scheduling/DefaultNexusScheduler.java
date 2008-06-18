@@ -24,7 +24,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.RejectedExecutionException;
 
+import org.codehaus.plexus.PlexusConstants;
+import org.codehaus.plexus.PlexusContainer;
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
+import org.codehaus.plexus.context.Context;
+import org.codehaus.plexus.context.ContextException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.StartingException;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.StoppingException;
 import org.sonatype.scheduling.NoSuchTaskException;
@@ -40,7 +46,7 @@ import org.sonatype.scheduling.schedules.Schedule;
  */
 public class DefaultNexusScheduler
     extends AbstractLogEnabled
-    implements NexusScheduler
+    implements NexusScheduler, Contextualizable
 {
     /**
      * The scheduler.
@@ -48,6 +54,20 @@ public class DefaultNexusScheduler
      * @plexus.requirement
      */
     private Scheduler scheduler;
+
+    /** For task lookups */
+    private PlexusContainer plexusContainer;
+
+    public void contextualize( Context ctx )
+        throws ContextException
+    {
+        plexusContainer = (PlexusContainer) ctx.get( PlexusConstants.PLEXUS_KEY );
+    }
+
+    protected PlexusContainer getPlexusContainer()
+    {
+        return plexusContainer;
+    }
 
     public <T> ScheduledTask<T> submit( String name, NexusTask<T> nexusTask )
         throws RejectedExecutionException,
@@ -127,6 +147,25 @@ public class DefaultNexusScheduler
         getLogger().info( "Stopping Scheduler" );
 
         scheduler.stopService();
+    }
+
+    public NexusTask<?> createTaskInstance( String taskType )
+        throws IllegalArgumentException
+    {
+        try
+        {
+            return (NexusTask<?>) getPlexusContainer().lookup( NexusTask.ROLE, taskType );
+        }
+        catch ( ComponentLookupException e )
+        {
+            throw new IllegalArgumentException( "Could not create task of type" + taskType, e );
+        }
+    }
+
+    public NexusTask<?> createTaskInstance( Class<?> taskType )
+        throws IllegalArgumentException
+    {
+        return createTaskInstance( taskType.getName() );
     }
 
 }

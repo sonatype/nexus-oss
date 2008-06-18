@@ -365,7 +365,7 @@ public class AbstractScheduledServiceResourceHandler
     {
         String serviceType = model.getTypeId();
 
-        NexusTask<?> task = createTaskInstance( serviceType );
+        NexusTask<?> task = getNexus().createTaskInstance( serviceType );
 
         for ( Iterator iter = model.getProperties().iterator(); iter.hasNext(); )
         {

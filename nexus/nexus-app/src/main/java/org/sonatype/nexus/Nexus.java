@@ -151,17 +151,6 @@ public interface Nexus
         throws NoSuchRepositoryGroupException,
             IOException;
 
-    void evictAllUnusedItems( long timestamp )
-        throws IOException;
-
-    void evictRepositoryUnusedItems( long timestamp, String repositoryId )
-        throws NoSuchRepositoryException,
-            IOException;
-
-    void evictRepositoryGroupUnusedItems( long timestamp, String repositoryGroupId )
-        throws NoSuchRepositoryGroupException,
-            IOException;
-
     void evictAllUnusedProxiedItems( long timestamp )
         throws IOException;
 
@@ -205,7 +194,7 @@ public interface Nexus
     List<NexusArtifactEvent> getRecentlyDeployedArtifacts();
 
     List<NexusArtifactEvent> getBrokenArtifacts();
-    
+
     List<SystemEvent> getRepositoryStatusChanges();
 
     List<SystemEvent> getSystemEvents();
@@ -221,17 +210,23 @@ public interface Nexus
     <T> ScheduledTask<T> schedule( String name, NexusTask<T> nexusTask, Schedule schedule )
         throws RejectedExecutionException,
             NullPointerException;
-    
+
     <T> ScheduledTask<T> updateSchedule( ScheduledTask<T> task )
         throws RejectedExecutionException,
             NullPointerException;
 
     Map<String, List<ScheduledTask<?>>> getAllTasks();
-    
+
     Map<String, List<ScheduledTask<?>>> getActiveTasks();
 
     ScheduledTask<?> getTaskById( String id )
         throws NoSuchTaskException;
+
+    NexusTask<?> createTaskInstance( String taskType )
+        throws IllegalArgumentException;
+
+    NexusTask<?> createTaskInstance( Class<?> taskType )
+        throws IllegalArgumentException;
 
     // ----------------------------------------------------------------------------
     // Default Configuration

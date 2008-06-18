@@ -82,11 +82,6 @@ public abstract class AbstractNexusResourceHandler
         return (Nexus) getRequest().getAttributes().get( Nexus.ROLE );
     }
 
-    protected NexusTask<?> createTaskInstance( String taskType )
-    {
-        return (NexusTask<?>) lookup( NexusTask.ROLE, taskType );
-    }
-
     protected Object lookup( String role )
     {
         try

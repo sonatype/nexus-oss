@@ -76,6 +76,8 @@ import org.sonatype.nexus.proxy.router.DefaultGroupIdBasedRepositoryRouter;
 import org.sonatype.nexus.proxy.router.RepositoryRouter;
 import org.sonatype.nexus.proxy.router.ResourceStoreIdBasedRepositoryRouter;
 import org.sonatype.nexus.proxy.storage.local.fs.DefaultFSLocalRepositoryStorage;
+import org.sonatype.nexus.scheduling.NexusScheduler;
+import org.sonatype.nexus.tasks.ReindexTask;
 
 /**
  * IndexManager
@@ -120,6 +122,11 @@ public class DefaultIndexerManager
      * @plexus.requirement
      */
     private RepositoryRegistry repositoryRegistry;
+
+    /**
+     * @plexus.requirement
+     */
+    private NexusScheduler nexusScheduler;
 
     /**
      * @plexus.requirement role="org.sonatype.nexus.proxy.router.RootRepositoryRouter"
@@ -309,8 +316,22 @@ public class DefaultIndexerManager
     }
 
     public void setRepositoryIndexContextSearchable( String repositoryId, boolean searchable )
+        throws IOException,
+            NoSuchRepositoryException
     {
-        nexusIndexer.getIndexingContexts().get( getLocalContextId( repositoryId ) ).setSearchable( searchable );
+        IndexingContext ctx = nexusIndexer.getIndexingContexts().get( getLocalContextId( repositoryId ) );
+
+        if ( !ctx.isSearchable() && searchable )
+        {
+            // we have a !searchable -> searchable transition, reindex it
+            ReindexTask rt = (ReindexTask) nexusScheduler.createTaskInstance( ReindexTask.class );
+
+            rt.setRepositoryId( repositoryId );
+
+            nexusScheduler.submit( "Searchable re-enabled", rt );
+        }
+
+        ctx.setSearchable( searchable );
 
         if ( nexusIndexer.getIndexingContexts().containsKey( getRemoteContextId( repositoryId ) ) )
         {
