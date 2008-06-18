@@ -47,7 +47,6 @@ import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceWeeklyResource;
 import org.sonatype.nexus.scheduling.NexusTask;
 import org.sonatype.nexus.tasks.ClearCacheTask;
-import org.sonatype.nexus.tasks.EvictUnusedItemsTask;
 import org.sonatype.nexus.tasks.EvictUnusedProxiedItemsTask;
 import org.sonatype.nexus.tasks.PublishIndexesTask;
 import org.sonatype.nexus.tasks.PurgeTimeline;
@@ -127,7 +126,6 @@ public class AbstractScheduledServiceResourceHandler
         serviceNames.put( RebuildAttributesTask.class.getName(), "Rebuild Repository Atributes" );
         serviceNames.put( ClearCacheTask.class.getName(), "Clear Repository Caches" );
         serviceNames.put( SnapshotRemoverTask.class.getName(), "Remove Snapshots From Repository" );
-        serviceNames.put( EvictUnusedItemsTask.class.getName(), "Evict Unused Items From Repository" );
         serviceNames.put(
             EvictUnusedProxiedItemsTask.class.getName(),
             "Evict Unused Proxied Items From Repository Caches" );

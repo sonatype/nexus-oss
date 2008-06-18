@@ -49,20 +49,20 @@ public class IndexUtils
         synchronized ( directory )
         {
             Date currentTimestamp = getTimestamp( directory );
-            
-            if ( timestamp != null && ( currentTimestamp == null || !currentTimestamp.equals( timestamp ) ) ) 
+
+            if ( timestamp != null && ( currentTimestamp == null || !currentTimestamp.equals( timestamp ) ) )
             {
                 deleteTimestamp( directory );
-        
+
                 IndexOutput io = directory.createOutput( TIMESTAMP_FILE );
-        
-                try 
+
+                try
                 {
                     io.writeLong( timestamp.getTime() );
-        
+
                     io.flush();
-                } 
-                finally 
+                }
+                finally
                 {
                     close( io );
                 }
@@ -205,11 +205,13 @@ public class IndexUtils
 
             boolean savedTimestamp = false;
 
+            byte[] buf = new byte[8192];
+
             for ( int i = 0; i < names.length; i++ )
             {
                 String name = names[i];
 
-                writeFile( name, zos, context.getIndexDirectory() );
+                writeFile( name, zos, context.getIndexDirectory(), buf );
 
                 if ( name.equals( TIMESTAMP_FILE ) )
                 {
@@ -220,7 +222,7 @@ public class IndexUtils
             // FSDirectory filter out the foreign files
             if ( !savedTimestamp && context.getIndexDirectory().fileExists( TIMESTAMP_FILE ) )
             {
-                writeFile( TIMESTAMP_FILE, zos, context.getIndexDirectory() );
+                writeFile( TIMESTAMP_FILE, zos, context.getIndexDirectory(), buf );
             }
         }
         finally
@@ -229,7 +231,7 @@ public class IndexUtils
         }
     }
 
-    private static void writeFile( String name, ZipOutputStream zos, Directory directory )
+    private static void writeFile( String name, ZipOutputStream zos, Directory directory, byte[] buf )
         throws IOException
     {
         ZipEntry e = new ZipEntry( name );
@@ -240,14 +242,22 @@ public class IndexUtils
 
         try
         {
+            int toRead = 0;
+
+            int haveRead = 0;
+
             int len = (int) in.length();
 
-            byte[] buf = new byte[len];
+            while ( haveRead != len )
+            {
+                toRead = ( len - haveRead > buf.length ) ? buf.length : len - haveRead;
+                
+                in.readBytes( buf, 0, toRead, false );
 
-            in.readBytes( buf, 0, len );
+                zos.write( buf, 0, toRead );
 
-            zos.write( buf, 0, len );
-
+                haveRead = haveRead + toRead;
+            }
         }
         finally
         {
@@ -260,6 +270,17 @@ public class IndexUtils
     }
 
     //
+
+    public static void copyAll( final InputStream input, final OutputStream output, byte[] buffer )
+        throws IOException
+    {
+        int n = 0;
+
+        while ( -1 != ( n = input.read( buffer ) ) )
+        {
+            output.write( buffer, 0, n );
+        }
+    }
 
     private static void close( OutputStream os )
     {

@@ -46,7 +46,8 @@ public interface RemoteRepositoryStorage
      * @return true, if available (reachable)
      * @throws StorageException the storage exception
      */
-    boolean isReachable( Repository repository );
+    boolean isReachable( Repository repository )
+        throws StorageException;
 
     /**
      * Gets the absolute url from base.

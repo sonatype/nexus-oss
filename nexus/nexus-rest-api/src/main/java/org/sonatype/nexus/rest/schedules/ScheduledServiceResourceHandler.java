@@ -47,8 +47,6 @@ import org.sonatype.scheduling.schedules.MonthlySchedule;
 import org.sonatype.scheduling.schedules.OnceSchedule;
 import org.sonatype.scheduling.schedules.WeeklySchedule;
 
-import com.sun.org.apache.bcel.internal.generic.GETSTATIC;
-
 public class ScheduledServiceResourceHandler
     extends AbstractScheduledServiceResourceHandler
 {

@@ -67,6 +67,16 @@ public interface FeedRecorder
     public static final String SYSTEM_REBUILDATTRIBUTES_ACTION = "REBUILDATTRIBUTES";
 
     /**
+     * System event action: repository local status changes
+     */
+    public static final String SYSTEM_REPO_LSTATUS_CHANGES_ACTION = "REPO_LSTATUS_CHANGES";
+
+    /**
+     * System event action: repository proxy status auto change
+     */
+    public static final String SYSTEM_REPO_PSTATUS_AUTO_CHANGES_ACTION = "REPO_PSTATUS_AUTO_CHANGES";
+
+    /**
      * System event action: clearCache
      */
     public static final String SYSTEM_CLEARCACHE_ACTION = "CLEARCACHE";

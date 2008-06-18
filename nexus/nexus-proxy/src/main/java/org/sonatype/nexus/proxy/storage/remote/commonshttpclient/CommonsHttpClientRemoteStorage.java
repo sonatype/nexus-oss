@@ -85,8 +85,21 @@ public class CommonsHttpClientRemoteStorage
 
         int response = executeMethod( uid, head );
 
-        return response == HttpStatus.SC_OK
-            && makeDateFromHeader( head.getResponseHeader( "last-modified" ) ) > newerThen;
+        if ( response == HttpStatus.SC_OK )
+        {
+            // we have newer if this below is true
+            return makeDateFromHeader( head.getResponseHeader( "last-modified" ) ) > newerThen;
+        }
+        else if ( ( response >= HttpStatus.SC_MULTIPLE_CHOICES && response < HttpStatus.SC_BAD_REQUEST )
+            || response == HttpStatus.SC_NOT_FOUND )
+        {
+            return false;
+        }
+        else
+        {
+            throw new StorageException( "The response to HTTP HEAD was unexpected HTTP Code " + response + " : "
+                + HttpStatus.getStatusText( response ) );
+        }
     }
 
     /*
@@ -395,12 +408,13 @@ public class CommonsHttpClientRemoteStorage
         }
         catch ( HttpException ex )
         {
-            getLogger().error( "Protocol error while executing " + method.getName() + " method", ex );
+            throw new StorageException( "Protocol error while executing " + method.getName() + " method", ex );
         }
         catch ( IOException ex )
         {
-            getLogger().error( "Tranport error while executing " + method.getName() + " method", ex );
+            throw new StorageException( "Tranport error while executing " + method.getName() + " method", ex );
         }
+
         return resultCode;
     }
 

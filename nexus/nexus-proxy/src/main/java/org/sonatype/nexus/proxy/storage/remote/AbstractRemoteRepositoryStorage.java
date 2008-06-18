@@ -122,20 +122,9 @@ public abstract class AbstractRemoteRepositoryStorage
     }
 
     public boolean isReachable( Repository repository )
+        throws StorageException
     {
-        try
-        {
-            return containsItem( new RepositoryItemUid( repository, RepositoryItemUid.PATH_ROOT ) );
-        }
-        catch ( StorageException e )
-        {
-            if ( getLogger().isDebugEnabled() )
-            {
-                getLogger().debug( "Got storage exception while checking for remote storage reachability.", e );
-            }
-
-            return false;
-        }
+        return containsItem( new RepositoryItemUid( repository, RepositoryItemUid.PATH_ROOT ) );
     }
 
     public boolean containsItem( RepositoryItemUid uid )

@@ -44,6 +44,8 @@ import org.sonatype.nexus.proxy.cache.CacheManager;
 import org.sonatype.nexus.proxy.cache.PathCache;
 import org.sonatype.nexus.proxy.events.RepositoryEventClearCaches;
 import org.sonatype.nexus.proxy.events.RepositoryEventEvictUnusedItems;
+import org.sonatype.nexus.proxy.events.RepositoryEventLocalStatusChanged;
+import org.sonatype.nexus.proxy.events.RepositoryEventProxyModeBlockedAutomatically;
 import org.sonatype.nexus.proxy.events.RepositoryEventRecreateAttributes;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventDelete;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventRetrieve;
@@ -193,7 +195,11 @@ public abstract class AbstractRepository
 
     public void setLocalStatus( LocalStatus localStatus )
     {
+        LocalStatus oldStatus = getLocalStatus();
+
         this.localStatus = localStatus;
+
+        notifyProximityEventListeners( new RepositoryEventLocalStatusChanged( this, oldStatus ) );
     }
 
     public RemoteStatus getRemoteStatus( boolean forceCheck )
@@ -208,7 +214,8 @@ public abstract class AbstractRepository
                 remoteStatusUpdated = System.currentTimeMillis();
             }
 
-            if ( RemoteStatus.UNKNOWN.equals( remoteStatus ) && !remoteStatusChecking )
+            if ( getProxyMode() != null && getProxyMode().shouldProxy() && RemoteStatus.UNKNOWN.equals( remoteStatus )
+                && !remoteStatusChecking )
             {
                 // check for thread and go check it
                 scheduler.submit( getId() + " remote status check", new Callable<Object>()
@@ -238,6 +245,13 @@ public abstract class AbstractRepository
                     }
                 }, null );
             }
+            else if ( getProxyMode() != null && !getProxyMode().shouldProxy()
+                && RemoteStatus.UNKNOWN.equals( remoteStatus ) && !remoteStatusChecking )
+            {
+                remoteStatus = RemoteStatus.UNAVAILABLE;
+
+                remoteStatusChecking = false;
+            }
 
             return remoteStatus;
         }
@@ -265,13 +279,28 @@ public abstract class AbstractRepository
         {
             // if this is proxy
             // and was !shouldProxy() and the new is shouldProxy()
-            if ( this.proxyMode != null && !this.proxyMode.shouldProxy() && proxyMode.shouldProxy() )
+            // if ( this.proxyMode != null && !this.proxyMode.shouldProxy() && proxyMode.shouldProxy() )
+            // the line above is CORRECT way to doing it, BUT until models are not used
+            // properly and we are UPDATING instead of RECREATING reposes, the below works
+            if ( proxyMode.shouldProxy() )
             {
                 getNotFoundCache().purge();
             }
         }
 
         this.proxyMode = proxyMode;
+    }
+
+    protected void autoBlockProxying( Throwable cause )
+    {
+        if ( RepositoryType.PROXY.equals( getRepositoryType() ) )
+        {
+            ProxyMode oldMode = getProxyMode();
+
+            setProxyMode( ProxyMode.BLOCKED_AUTO );
+
+            notifyProximityEventListeners( new RepositoryEventProxyModeBlockedAutomatically( this, oldMode, cause ) );
+        }
     }
 
     public boolean isAllowWrite()
@@ -446,7 +475,21 @@ public abstract class AbstractRepository
         }
         else
         {
-            return getRemoteStorage().isReachable( this );
+            try
+            {
+                return getRemoteStorage().isReachable( this );
+            }
+            catch ( StorageException e )
+            {
+                if ( getLogger().isDebugEnabled() )
+                {
+                    getLogger().debug( "isRemoteStorageReachable :: StorageException", e );
+                }
+
+                autoBlockProxying( e );
+
+                return false;
+            }
         }
 
     }

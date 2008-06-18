@@ -30,7 +30,6 @@ import org.sonatype.nexus.configuration.AbstractNexusTestCase;
 public abstract class AbstractConfigurationSourceTest
     extends AbstractNexusTestCase
 {
-
     protected ConfigurationSource configurationSource;
 
     protected abstract ConfigurationSource getConfigurationSource()

@@ -492,7 +492,7 @@ public class DefaultIndexingContext
 
                     if ( hits.length() == 0 )
                     {
-                        ArtifactInfo info = constructArtifactInfo( null, d );
+                        ArtifactInfo info = constructArtifactInfo( d );
                         ArtifactContext artifactContext = new ArtifactContext( null, null, null, info );
                         ArtifactIndexingContext indexingContext = new DefaultArtifactIndexingContext( artifactContext );
 
@@ -529,16 +529,19 @@ public class DefaultIndexingContext
         return Collections.unmodifiableList( indexCreators );
     }
 
+    @Deprecated
     public ArtifactInfo constructArtifactInfo( IndexingContext ctx, Document doc )
+    {
+        return constructArtifactInfo( doc );
+    }
+
+    public ArtifactInfo constructArtifactInfo( Document doc )
     {
         boolean res = false;
 
         ArtifactInfo artifactInfo = new ArtifactInfo();
 
-        if ( ctx != null )
-        {
-            artifactInfo.context = ctx.getId();
-        }
+        artifactInfo.context = getId();
 
         for ( IndexCreator ic : getIndexCreators() )
         {

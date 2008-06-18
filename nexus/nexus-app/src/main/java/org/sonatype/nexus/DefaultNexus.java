@@ -74,6 +74,8 @@ import org.sonatype.nexus.proxy.RepositoryNotAvailableException;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.events.AbstractEvent;
 import org.sonatype.nexus.proxy.events.EventListener;
+import org.sonatype.nexus.proxy.events.RepositoryEventLocalStatusChanged;
+import org.sonatype.nexus.proxy.events.RepositoryEventProxyModeBlockedAutomatically;
 import org.sonatype.nexus.proxy.events.RepositoryItemEvent;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventCache;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventDelete;
@@ -90,6 +92,8 @@ import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.item.StorageLinkItem;
 import org.sonatype.nexus.proxy.registry.InvalidGroupingException;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
+import org.sonatype.nexus.proxy.repository.LocalStatus;
+import org.sonatype.nexus.proxy.repository.ProxyMode;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RepositoryType;
 import org.sonatype.nexus.proxy.repository.ShadowRepository;
@@ -1030,6 +1034,13 @@ public class DefaultNexus
             NexusArtifactEvent.ACTION_BROKEN_WRONG_REMOTE_CHECKSUM } ) ), null, null );
     }
 
+    public List<SystemEvent> getRepositoryStatusChanges()
+    {
+        return feedRecorder.getSystemEvents( new HashSet<String>( Arrays.asList( new String[] {
+            FeedRecorder.SYSTEM_REPO_LSTATUS_CHANGES_ACTION,
+            FeedRecorder.SYSTEM_REPO_PSTATUS_AUTO_CHANGES_ACTION } ) ), null, null );
+    }
+
     public List<SystemEvent> getSystemEvents()
     {
         return feedRecorder.getSystemEvents( null, null, null );
@@ -1630,6 +1641,72 @@ public class DefaultNexus
                 }
 
                 addSystemEvent( FeedRecorder.SYSTEM_CONFIG_ACTION, sb.toString() );
+            }
+            else if ( evt instanceof RepositoryEventLocalStatusChanged )
+            {
+                RepositoryEventLocalStatusChanged revt = (RepositoryEventLocalStatusChanged) evt;
+
+                StringBuffer sb = new StringBuffer( "The repository '" );
+
+                sb.append( revt.getRepository().getName() );
+
+                sb.append( "' (ID='" ).append( revt.getRepository().getId() ).append( "') was put " );
+
+                if ( LocalStatus.IN_SERVICE.equals( revt.getRepository().getLocalStatus() ) )
+                {
+                    sb.append( "IN SERVICE." );
+                }
+                else if ( LocalStatus.OUT_OF_SERVICE.equals( revt.getRepository().getLocalStatus() ) )
+                {
+                    sb.append( "OUT OF SERVICE." );
+                }
+                else
+                {
+                    sb.append( revt.getRepository().getLocalStatus().toString() ).append( "." );
+                }
+
+                addSystemEvent( FeedRecorder.SYSTEM_REPO_LSTATUS_CHANGES_ACTION, sb.toString() );
+            }
+            else if ( evt instanceof RepositoryEventProxyModeBlockedAutomatically )
+            {
+                RepositoryEventProxyModeBlockedAutomatically revt = (RepositoryEventProxyModeBlockedAutomatically) evt;
+
+                StringBuffer sb = new StringBuffer( "Warning: User intervention required! The proxy repository '" );
+
+                sb.append( revt.getRepository().getName() );
+
+                sb.append( "' (ID='" ).append( revt.getRepository().getId() ).append(
+                    "') was having connection problems, and Nexus set it's ProxyMode to 'Blocked'." );
+
+                if ( revt.getCause() != null )
+                {
+                    sb.append( " Last detected transport error: " ).append( revt.getCause().getMessage() );
+                }
+
+                addSystemEvent( FeedRecorder.SYSTEM_REPO_PSTATUS_AUTO_CHANGES_ACTION, sb.toString() );
+
+                // TODO: this should be handled by reposes when they use their models 1:1
+                try
+                {
+                    CRepository repositoryModel = readRepository( revt.getRepository().getId() );
+
+                    repositoryModel.setProxyMode( ProxyMode.toModel( revt.getRepository().getProxyMode() ) );
+
+                    updateRepository( repositoryModel );
+                }
+                catch ( ConfigurationException e )
+                {
+                    // should not happen
+                }
+                catch ( NoSuchRepositoryException e )
+                {
+                    // should not happen
+                }
+                catch ( IOException e )
+                {
+                    getLogger().warn( "Could not save repo changes!", e );
+                }
+                // TODO ends here
             }
         }
         catch ( Exception e )

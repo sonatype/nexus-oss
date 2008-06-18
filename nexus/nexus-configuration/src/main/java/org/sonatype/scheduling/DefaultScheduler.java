@@ -94,7 +94,7 @@ public class DefaultScheduler
 
         try
         {
-            boolean stopped = getScheduledExecutorService().awaitTermination( 15, TimeUnit.SECONDS );
+            boolean stopped = getScheduledExecutorService().awaitTermination( 5, TimeUnit.SECONDS );
 
             if ( !stopped )
             {

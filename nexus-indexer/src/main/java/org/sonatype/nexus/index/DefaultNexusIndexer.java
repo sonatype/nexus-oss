@@ -551,6 +551,51 @@ public class DefaultNexusIndexer
     }
 
     // ----------------------------------------------------------------------------
+    // Groups utils
+    // ----------------------------------------------------------------------------
+
+    public void rebuildGroups( IndexingContext context )
+        throws IOException
+    {
+        int numDocs = context.getIndexReader().numDocs();
+
+        for ( int i = 0; i < numDocs; i++ )
+        {
+            if ( context.getIndexReader().isDeleted( i ) )
+            {
+                continue;
+            }
+
+            Document d = context.getIndexReader().document( i );
+
+            String uinfo = d.get( ArtifactInfo.UINFO );
+
+            if ( uinfo != null )
+            {
+                try
+                {
+                    ArtifactInfo info = context.constructArtifactInfo( d );
+
+                    ArtifactContext artifactContext = new ArtifactContext( null, null, null, info );
+
+                    updateGroups( artifactContext, context );
+                }
+                catch ( IndexContextInInconsistentStateException e )
+                {
+                    getLogger().info(
+                        "Unrecognized record with field '" + ArtifactInfo.UINFO + "'='" + uinfo
+                            + "' found on index but is not recognized as Nexus Indexer record.",
+                        e );
+                }
+            }
+        }
+
+        context.getIndexWriter().optimize();
+
+        context.getIndexWriter().flush();
+    }
+
+    // ----------------------------------------------------------------------------
     // Searching
     // ----------------------------------------------------------------------------
 

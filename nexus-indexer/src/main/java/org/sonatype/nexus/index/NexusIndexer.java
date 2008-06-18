@@ -373,4 +373,16 @@ public interface NexusIndexer
     void setAllGroups( IndexingContext context, Collection<String> groups )
         throws IOException;
 
+    // ----------------------------------------------------------------------------
+    // Groups utils
+    // ----------------------------------------------------------------------------
+
+    /**
+     * Used to rebuild group information, for example on context which were merged, since merge() of contexts does sucks
+     * only the Documents with UINFO record (Artifacts). This method may be used by IDE integrations also, since the
+     * grouping feature is not used in Nexus Server.
+     */
+    void rebuildGroups( IndexingContext context )
+        throws IOException;
+
 }

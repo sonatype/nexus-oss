@@ -170,10 +170,15 @@ public abstract class DefaultRepository
                 }
                 catch ( StorageException ex )
                 {
-                    getLogger().warn(
-                        "RemoteStorage of repository " + getId()
-                            + " throws StorageException. Are we online? Is storage properly set up? ",
-                        ex );
+                    getLogger()
+                        .warn(
+                            "RemoteStorage of repository "
+                                + getId()
+                                + " throws StorageException. Are we online? Is storage properly set up? Setting ProxyMode of this repository to BlockedAuto. MANUAL INTERVENTION NEEDED.",
+                            ex );
+                    
+                    autoBlockProxying( ex );
+                    
                     remoteItem = null;
                 }
             }

@@ -150,7 +150,17 @@ public interface IndexingContext
      * @param doc
      * @return
      */
+    @Deprecated
     ArtifactInfo constructArtifactInfo( IndexingContext ctx, Document doc )
+        throws IndexContextInInconsistentStateException;
+
+    /**
+     * Constructs an artifacts infos for a Lucene document, probably that came from Hits as a search result.
+     * 
+     * @param doc
+     * @return
+     */
+    ArtifactInfo constructArtifactInfo( Document doc )
         throws IndexContextInInconsistentStateException;
 
     /**

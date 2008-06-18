@@ -205,6 +205,8 @@ public interface Nexus
     List<NexusArtifactEvent> getRecentlyDeployedArtifacts();
 
     List<NexusArtifactEvent> getBrokenArtifacts();
+    
+    List<SystemEvent> getRepositoryStatusChanges();
 
     List<SystemEvent> getSystemEvents();
 

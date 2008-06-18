@@ -28,16 +28,16 @@ import org.sonatype.nexus.feeds.SystemEvent;
  * The system changes feed.
  * 
  * @author cstamas
- * @plexus.component role-hint="systemChanges"
+ * @plexus.component role-hint="systemRepositoryStatusChanges"
  */
-public class SystemFeedSource
+public class SystemRepositoryStatusChangesFeedSource
     extends AbstractSystemFeedSource
 {
-    public static final String CHANNEL_KEY = "systemChanges";
+    public static final String CHANNEL_KEY = "systemRepositoryStatusChanges";
 
     public List<SystemEvent> getEventList()
     {
-        return getNexus().getSystemEvents();
+        return getNexus().getRepositoryStatusChanges();
     }
 
     public String getFeedKey()
@@ -53,13 +53,13 @@ public class SystemFeedSource
     @Override
     public String getDescription()
     {
-        return "System changes in Nexus.";
+        return "Repository Status Changes in Nexus (user interventions and automatic).";
     }
 
     @Override
     public String getTitle()
     {
-        return "Nexus System Changes";
+        return "Nexus Repository Status Changes";
     }
 
 }

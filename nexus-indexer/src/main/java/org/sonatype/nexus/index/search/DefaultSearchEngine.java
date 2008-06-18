@@ -68,7 +68,7 @@ public class DefaultSearchEngine
             {
                 Document doc = hits.doc( i );
 
-                ArtifactInfo artifactInfo = indexingContext.constructArtifactInfo( indexingContext, doc );
+                ArtifactInfo artifactInfo = indexingContext.constructArtifactInfo( doc );
 
                 if ( artifactInfo != null )
                 {
@@ -100,7 +100,7 @@ public class DefaultSearchEngine
         {
             for ( int i = 0; i < hits.length(); i++ )
             {
-                ArtifactInfo artifactInfo = indexingContext.constructArtifactInfo( indexingContext, hits.doc( i ) );
+                ArtifactInfo artifactInfo = indexingContext.constructArtifactInfo( hits.doc( i ) );
 
                 if ( artifactInfo != null )
                 {

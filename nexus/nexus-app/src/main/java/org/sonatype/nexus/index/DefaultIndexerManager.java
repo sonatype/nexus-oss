@@ -608,7 +608,7 @@ public class DefaultIndexerManager
         throws IOException,
             NoSuchRepositoryGroupException
     {
-        getLogger().info( "Merging index for repository group " + repositoryGroupId );
+        getLogger().info( "Merging and publising index for repository group " + repositoryGroupId );
 
         IndexingContext context = nexusIndexer.getIndexingContexts().get( getMergedContextId( repositoryGroupId ) );
 
@@ -647,9 +647,23 @@ public class DefaultIndexerManager
             }
         }
 
+        if ( getLogger().isDebugEnabled() )
+        {
+            getLogger().debug( "Rebuilding IDE information in merged index for repository group " + repositoryGroupId );
+        }
+
+        // rebuild IDE information
+        nexusIndexer.rebuildGroups( context );
+
+        // commiting changes
+        context.getIndexWriter().flush();
+
         context.updateTimestamp();
 
-        getLogger().info( "Publishing merged index for repository group " + repositoryGroupId );
+        if ( getLogger().isDebugEnabled() )
+        {
+            getLogger().debug( "Publishing merged index for repository group " + repositoryGroupId );
+        }
 
         File targetDir = null;
 
@@ -694,7 +708,7 @@ public class DefaultIndexerManager
             }
             else
             {
-                getLogger().error( "Could not create temp dir for packing indexes: " + targetDir );
+                getLogger().warn( "Could not create temp dir for packing indexes: " + targetDir );
             }
         }
         finally

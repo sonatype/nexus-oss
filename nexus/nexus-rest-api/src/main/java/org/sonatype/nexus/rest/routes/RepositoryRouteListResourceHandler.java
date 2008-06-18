@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.logging.Level;
+import java.util.regex.PatternSyntaxException;
 
 import org.restlet.Context;
 import org.restlet.data.Request;
@@ -178,11 +179,18 @@ public class RepositoryRouteListResourceHandler
             }
             catch ( ConfigurationException e )
             {
-                getLogger().log( Level.SEVERE, "Configuration error!", e );
+                getLogger().log( Level.WARNING, "Configuration error!", e );
 
                 getResponse().setStatus( Status.CLIENT_ERROR_BAD_REQUEST, "Configuration error." );
 
-                getResponse().setEntity( serialize( entity, getNexusErrorResponse( "*", e.getMessage() ) ) );
+                if ( e.getCause() != null && e.getCause() instanceof PatternSyntaxException )
+                {
+                    getResponse().setEntity( serialize( entity, getNexusErrorResponse( "pattern", e.getMessage() ) ) );
+                }
+                else
+                {
+                    getResponse().setEntity( serialize( entity, getNexusErrorResponse( "*", e.getMessage() ) ) );
+                }
             }
             catch ( NoSuchRepositoryException e )
             {

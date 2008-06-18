@@ -38,3 +38,4 @@ public class ConfigurationException
         super( msg );
     }
 }
+

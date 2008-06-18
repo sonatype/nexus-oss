@@ -18,48 +18,33 @@
  * along with this program.  If not, see http://www.gnu.org/licenses/.
  *
  */
-package org.sonatype.nexus.rest.feeds;
+package org.sonatype.nexus.proxy.events;
 
-import java.util.List;
-
-import org.sonatype.nexus.feeds.SystemEvent;
+import org.sonatype.nexus.proxy.repository.LocalStatus;
+import org.sonatype.nexus.proxy.repository.Repository;
 
 /**
- * The system changes feed.
- * 
- * @author cstamas
- * @plexus.component role-hint="systemChanges"
+ * The Class RepositoryEventEvictUnusedItems.
  */
-public class SystemFeedSource
-    extends AbstractSystemFeedSource
+public class RepositoryEventLocalStatusChanged
+    extends RepositoryEvent
 {
-    public static final String CHANNEL_KEY = "systemChanges";
+    private final LocalStatus oldLocalStatus;
 
-    public List<SystemEvent> getEventList()
+    /**
+     * Instantiates a new repository event evict unused items.
+     * 
+     * @param repository the repository
+     */
+    public RepositoryEventLocalStatusChanged( final Repository repository, final LocalStatus oldLocalStatus )
     {
-        return getNexus().getSystemEvents();
+        super( repository );
+
+        this.oldLocalStatus = oldLocalStatus;
     }
 
-    public String getFeedKey()
+    public LocalStatus getOldLocalStatus()
     {
-        return CHANNEL_KEY;
+        return oldLocalStatus;
     }
-
-    public String getFeedName()
-    {
-        return getDescription();
-    }
-
-    @Override
-    public String getDescription()
-    {
-        return "System changes in Nexus.";
-    }
-
-    @Override
-    public String getTitle()
-    {
-        return "Nexus System Changes";
-    }
-
 }
