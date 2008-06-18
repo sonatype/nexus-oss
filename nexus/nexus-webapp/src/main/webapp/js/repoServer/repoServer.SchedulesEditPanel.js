@@ -250,6 +250,8 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
   
   //Populate the dynamic content
   this.populateServiceTypePanelItems();
+
+  this.COMBO_WIDTH = 300;
   
   //Build the form
   this.formConfig = {};
@@ -288,7 +290,7 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
         itemCls: 'required-field',
         helpText: ht.name,
         name: 'name',
-        width: 200,
+        width: this.COMBO_WIDTH,
         allowBlank:false
       },
       {
@@ -308,7 +310,7 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
         emptyText:'Select...',
         selectOnFocus:true,
         allowBlank: false,
-        width: 200
+        width: this.COMBO_WIDTH
       },
       {
         xtype: 'panel',
@@ -339,7 +341,7 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
         emptyText:'Select...',
         selectOnFocus:true,
         allowBlank: false,
-        width: 200  
+        width: this.COMBO_WIDTH
       },
       {
         xtype: 'panel',
@@ -1002,7 +1004,7 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
             name: 'serviceProperties_' + curRec.id,
             allowBlank:curRec.required ? false : true,
             disabled:true,
-            width: 200
+            width: this.COMBO_WIDTH
           };
         }
         else if(curRec.type == 'number'){
@@ -1015,7 +1017,7 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
             name: 'serviceProperties_' + curRec.id,
             allowBlank:curRec.required ? false : true,
             disabled:true,
-            width: 200
+            width: this.COMBO_WIDTH
           };
         }
         else if(curRec.type == 'boolean'){
@@ -1059,8 +1061,8 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
             selectOnFocus:true,
             allowBlank: curRec.required ? false : true,
             disabled: true,
-            width: 200,
-            minListWidth: 200
+            width: this.COMBO_WIDTH,
+            minListWidth: this.COMBO_WIDTH
           };
         }
         else if(curRec.type == 'group'){
@@ -1082,8 +1084,8 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
             selectOnFocus:true,
             allowBlank: curRec.required ? false : true,
             disabled: true,
-            width: 200,
-            minListWidth: 200
+            width: this.COMBO_WIDTH,
+            minListWidth: this.COMBO_WIDTH
           };
         }
         else if(curRec.type == 'repo-or-group'){
@@ -1105,8 +1107,8 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
             selectOnFocus:true,
             allowBlank: curRec.required ? false : true,
             disabled: true,
-            width: 200,
-            minListWidth: 200
+            width: this.COMBO_WIDTH,
+            minListWidth: this.COMBO_WIDTH
           };
         }
       }  
