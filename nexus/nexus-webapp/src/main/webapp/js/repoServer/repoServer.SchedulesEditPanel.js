@@ -275,6 +275,7 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
       {
         xtype: 'checkbox',
         fieldLabel: 'Enabled',
+        labelStyle: 'margin-left: 15px; width: 185px;',
         helpText: ht.enabled,
         name: 'enabled',
         allowBlank: false,
@@ -283,6 +284,7 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
       {
         xtype: 'textfield',
         fieldLabel: 'Name',
+        labelStyle: 'margin-left: 15px; width: 185px;',
         itemCls: 'required-field',
         helpText: ht.name,
         name: 'name',
@@ -292,6 +294,7 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
       {
         xtype: 'combo',
         fieldLabel: 'Service Type',
+        labelStyle: 'margin-left: 15px; width: 185px;',
         itemCls: 'required-field',
         helpText: ht.serviceType,
         name: 'typeId',
@@ -323,6 +326,7 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
       {
         xtype: 'combo',
         fieldLabel: 'Recurrence',
+        labelStyle: 'margin-left: 15px; width: 185px;',
         itemCls: 'required-field',
         helpText: ht.serviceSchedule,
         name: 'schedule',
