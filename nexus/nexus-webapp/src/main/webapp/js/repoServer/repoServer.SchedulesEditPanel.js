@@ -996,7 +996,7 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
             itemCls: curRec.required ? 'required-field' : '',
             helpText: curRec.helpText,
             name: 'serviceProperties_' + curRec.id,
-            allowBlank:false,
+            allowBlank:curRec.required ? false : true,
             disabled:true,
             width: 200
           };
@@ -1009,7 +1009,7 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
             itemCls: curRec.required ? 'required-field' : '',
             helpText: curRec.helpText,
             name: 'serviceProperties_' + curRec.id,
-            allowBlank:false,
+            allowBlank:curRec.required ? false : true,
             disabled:true,
             width: 200
           };
@@ -1032,7 +1032,7 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
             itemCls: curRec.required ? 'required-field' : '',
             helpText: curRec.helpText,
             name: 'serviceProperties_' + curRec.id,
-            allowBlank:false,
+            allowBlank:curRec.required ? false : true,
             disabled:true
           };
         }
