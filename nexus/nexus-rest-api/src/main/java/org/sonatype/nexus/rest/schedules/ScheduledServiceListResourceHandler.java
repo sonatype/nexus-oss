@@ -25,6 +25,7 @@ import java.text.ParseException;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.RejectedExecutionException;
+import java.util.logging.Level;
 
 import org.codehaus.plexus.util.StringUtils;
 import org.restlet.Context;
@@ -149,13 +150,20 @@ public class ScheduledServiceListResourceHandler
             }
             catch ( RejectedExecutionException e )
             {
+                getLogger().log( Level.SEVERE, "Execution of task " + getModelName( request.getData() ) + " rejected." );
                 getResponse().setStatus( Status.CLIENT_ERROR_CONFLICT, e.getMessage() );
                 
                 return;
             }
             catch ( ParseException e )
             {
+                getLogger().log( Level.SEVERE, "Unable to parse data for task " + getModelName( request.getData() ) );
                 getResponse().setStatus( Status.CLIENT_ERROR_BAD_REQUEST, e.getMessage() );
+                
+                getResponse().setEntity(
+                                        serialize( entity, getNexusErrorResponse(
+                                            "cronCommand",
+                                            e.getMessage() ) ) );
 
                 return;
             }
