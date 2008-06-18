@@ -406,24 +406,35 @@ Ext.extend(Sonatype.repoServer.FileUploadPanel, Ext.FormPanel, {
       isUpload : true,
       callback: function( options, success, response ) {
         tmpForm.remove();
-        Ext.Msg.show(
-          //This is a hack to get around the fact that upload submit always returns
-          //success = true
-          response.responseXML.title == '' ?
-            {
-              title: 'Upload Complete',
-              msg: 'Artifact upload finished successfully',
-              buttons: Ext.MessageBox.OK,
-              icon: Ext.MessageBox.INFO
-            }
-            :
-            {
-              title: 'Upload Failed',
-              msg: 'Artifact upload failed.<br />Check Nexus logs for more information.',
-              buttons: Ext.MessageBox.OK,
-              icon: Ext.MessageBox.ERROR
-            }
-        );
+
+        //This is a hack to get around the fact that upload submit always returns
+        //success = true
+        if ( response.responseXML.title == '' ) {
+          Ext.Msg.show({
+            title: 'Upload Complete',
+            msg: 'Artifact upload finished successfully',
+            buttons: Ext.MessageBox.OK,
+            icon: Ext.MessageBox.INFO
+          });
+        }
+        else {
+          var s = 'Artifact upload failed.<br />';
+          var r = response.responseText;
+          var n1 = r.toLowerCase().indexOf( '<h3>' ) + 4;
+          var n2 = r.toLowerCase().indexOf( '</h3>' );
+          if ( n2 > n1 ) {
+            s += r.substring( n1, n2 );
+          }
+          else {
+            s += 'Check Nexus logs for more information.';
+          }
+          Ext.Msg.show({
+            title: 'Upload Failed',
+            msg: s,
+            buttons: Ext.MessageBox.OK,
+            icon: Ext.MessageBox.ERROR
+          });
+        }
       },
       scope : this
     });
