@@ -783,6 +783,12 @@ Ext.extend(Sonatype.repoServer.RepoMaintPanel, Sonatype.repoServer.AbstractRepoP
     if (response.status == 503){
       node.setText(node.text + ' (Out of Service)');
     }
+    else if ( response.status == 404 ) {
+      if ( Ext.Msg.isVisible() ) {
+        Ext.Msg.hide();
+      }
+      node.setText( node.text + ( node.isRoot ? ' (Not Available)' : ' (Not Found)'));
+    }
   },
 
   statusCallback : function(options, success, response) {
