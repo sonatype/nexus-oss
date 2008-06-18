@@ -118,7 +118,7 @@ public class DummyRepository
         return false;
     }
 
-    public Collection<StorageItem> list( RepositoryItemUid uid )
+    public Collection<StorageItem> list( RepositoryItemUid uid, Map<String, Object> ctx )
         throws RepositoryNotAvailableException,
             ItemNotFoundException,
             StorageException
@@ -580,7 +580,7 @@ public class DummyRepository
             StorageException
     {
         // TODO Auto-generated method stub
-        
+
     }
 
     public void moveItem( RepositoryItemUid from, RepositoryItemUid to )
@@ -590,7 +590,7 @@ public class DummyRepository
             StorageException
     {
         // TODO Auto-generated method stub
-        
+
     }
 
     public int getItemMaxAge()
@@ -602,13 +602,13 @@ public class DummyRepository
     public void setItemMaxAge( int itemMaxAge )
     {
         // TODO Auto-generated method stub
-        
+
     }
 
     public void evictUnusedItems( long timestamp )
     {
         // TODO Auto-generated method stub
-        
+
     }
 
 }

@@ -25,8 +25,12 @@ import java.util.Collection;
 import org.codehaus.plexus.logging.Logger;
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
+import org.sonatype.nexus.proxy.NoSuchResourceStoreException;
+import org.sonatype.nexus.proxy.RepositoryNotAvailableException;
+import org.sonatype.nexus.proxy.RepositoryNotListableException;
 import org.sonatype.nexus.proxy.ResourceStore;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
+import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
@@ -98,7 +102,13 @@ public abstract class StoreWalker
             logger.debug( "Start walking on ResourceStore " + store.getId() + " from path " + fromPath );
         }
 
+        // user may call stop()
         beforeWalk();
+
+        if ( !running )
+        {
+            return;
+        }
 
         StorageItem item = null;
 
@@ -149,16 +159,37 @@ public abstract class StoreWalker
         }
 
         int collCount = 0;
-        
+
         if ( StorageCollectionItem.class.isAssignableFrom( item.getClass() ) )
         {
-            collCount = walkRecursive( 0, (StorageCollectionItem) item, collectionsOnly );
-        }
+            try
+            {
+                collCount = walkRecursive( 0, (StorageCollectionItem) item, collectionsOnly );
+            }
+            catch ( Throwable e )
+            {
+                if ( logger != null )
+                {
+                    if ( !logger.isDebugEnabled() )
+                    {
+                        logger.warn( "Walking on " + store.getId()
+                            + " store threw an exception with message (in DEBUG mode the Stack trace is available): "
+                            + e.getMessage() );
+                    }
+                    else
+                    {
+                        logger.debug( "Walking on " + store.getId() + " store threw an exception: ", e );
+                    }
+                }
 
-        afterWalk();
+                stop();
+            }
+        }
 
         if ( running )
         {
+            afterWalk();
+            
             if ( logger != null )
             {
                 logger.info( "Finished walking on " + store.getId() + " Store with " + Integer.toString( collCount )
@@ -176,28 +207,66 @@ public abstract class StoreWalker
     }
 
     protected final int walkRecursive( int collCount, StorageCollectionItem coll, boolean collectionsOnly )
+        throws AccessDeniedException,
+            NoSuchResourceStoreException,
+            RepositoryNotAvailableException,
+            RepositoryNotListableException,
+            ItemNotFoundException,
+            StorageException
     {
+        if ( !running )
+        {
+            return collCount;
+        }
+
         collCount++;
 
+        // user may call stop()
         onCollectionEnter( coll );
 
+        if ( !running )
+        {
+            return collCount;
+        }
+
+        // user may call stop()
         processItem( coll );
 
-        Collection<StorageItem> ls = coll.list();
+        if ( !running )
+        {
+            return collCount;
+        }
+
+        Collection<StorageItem> ls;
+
+        ls = coll.list();
 
         for ( StorageItem i : ls )
         {
             if ( !collectionsOnly && !StorageCollectionItem.class.isAssignableFrom( i.getClass() ) )
             {
+                // user may call stop()
                 processItem( i );
+
+                if ( !running )
+                {
+                    return collCount;
+                }
             }
 
             if ( StorageCollectionItem.class.isAssignableFrom( i.getClass() ) )
             {
+                // user may call stop()
                 collCount += walkRecursive( collCount, (StorageCollectionItem) i, collectionsOnly );
+
+                if ( !running )
+                {
+                    return collCount;
+                }
             }
         }
 
+        // user may call stop()
         onCollectionExit( coll );
 
         return collCount;

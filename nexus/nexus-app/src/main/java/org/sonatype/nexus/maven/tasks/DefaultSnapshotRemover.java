@@ -223,7 +223,19 @@ public class DefaultSnapshotRemover
             {
                 Gav gav = null;
 
-                Collection<StorageItem> items = coll.list();
+                Collection<StorageItem> items;
+                
+                try
+                {
+                    items = coll.list();
+                }
+                catch ( Exception e )
+                {
+                    // stop the crawling
+                    stop();
+                    
+                    return;
+                }
 
                 for ( StorageItem item : items )
                 {

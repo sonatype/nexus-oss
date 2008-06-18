@@ -50,7 +50,9 @@ import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryGroupException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryRouterException;
+import org.sonatype.nexus.proxy.NoSuchResourceStoreException;
 import org.sonatype.nexus.proxy.RepositoryNotAvailableException;
+import org.sonatype.nexus.proxy.RepositoryNotListableException;
 import org.sonatype.nexus.proxy.ResourceStore;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
@@ -196,7 +198,13 @@ public abstract class AbstractResourceStoreContentResource
     }
 
     protected Representation renderItem( Variant variant, StorageItem item )
-        throws IOException
+        throws IOException,
+            AccessDeniedException,
+            NoSuchResourceStoreException,
+            RepositoryNotAvailableException,
+            RepositoryNotListableException,
+            ItemNotFoundException,
+            StorageException
     {
         Representation result = null;
 
@@ -576,6 +584,10 @@ public abstract class AbstractResourceStoreContentResource
         {
             getResponse().setStatus( Status.CLIENT_ERROR_NOT_FOUND, t.getMessage() );
         }
+        else if ( t instanceof NoSuchResourceStoreException )
+        {
+            getResponse().setStatus( Status.CLIENT_ERROR_NOT_FOUND, t.getMessage() );
+        }
         else if ( t instanceof NoSuchRepositoryGroupException )
         {
             getResponse().setStatus( Status.CLIENT_ERROR_NOT_FOUND, t.getMessage() );
@@ -587,6 +599,10 @@ public abstract class AbstractResourceStoreContentResource
         else if ( t instanceof RepositoryNotAvailableException )
         {
             getResponse().setStatus( Status.SERVER_ERROR_SERVICE_UNAVAILABLE, t.getMessage() );
+        }
+        else if ( t instanceof RepositoryNotListableException )
+        {
+            getResponse().setStatus( Status.CLIENT_ERROR_NOT_FOUND, t.getMessage() );
         }
         else if ( t instanceof ItemNotFoundException )
         {

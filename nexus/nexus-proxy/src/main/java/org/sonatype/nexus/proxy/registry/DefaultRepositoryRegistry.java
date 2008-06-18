@@ -87,11 +87,15 @@ public class DefaultRepositoryRegistry
     {
         if ( repositories.containsKey( repository.getId() ) )
         {
-            repositories.put( repository.getId(), repository );
-
-            if ( repository instanceof EventMulticaster )
+            // is this a new instance of the same (keyed by ID) repo?
+            if ( repository != repositories.get( repository.getId() ) )
             {
-                ( (EventMulticaster) repository ).addProximityEventListener( this );
+                repositories.put( repository.getId(), repository );
+
+                if ( repository instanceof EventMulticaster )
+                {
+                    ( (EventMulticaster) repository ).addProximityEventListener( this );
+                }
             }
 
             notifyProximityEventListeners( new RepositoryRegistryEventUpdate( repository ) );

@@ -22,7 +22,6 @@ package org.sonatype.nexus.proxy.repository;
 
 import java.io.InputStream;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Callable;
@@ -35,6 +34,7 @@ import org.sonatype.nexus.proxy.EventMulticasterComponent;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.NoSuchResourceStoreException;
 import org.sonatype.nexus.proxy.RepositoryNotAvailableException;
+import org.sonatype.nexus.proxy.RepositoryNotListableException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.access.AccessManager;
@@ -279,11 +279,13 @@ public abstract class AbstractRepository
         {
             // if this is proxy
             // and was !shouldProxy() and the new is shouldProxy()
-            // if ( this.proxyMode != null && !this.proxyMode.shouldProxy() && proxyMode.shouldProxy() )
-            // the line above is CORRECT way to doing it, BUT until models are not used
-            // properly and we are UPDATING instead of RECREATING reposes, the below works
-            if ( proxyMode.shouldProxy() )
+            if ( this.proxyMode != null && !this.proxyMode.shouldProxy() && proxyMode.shouldProxy() )
             {
+                if ( getLogger().isDebugEnabled() )
+                {
+                    getLogger().debug( "We have a !shouldProxy() -> shouldProxy() transition, purging NFC" );
+                }
+                
                 getNotFoundCache().purge();
             }
         }
@@ -609,6 +611,22 @@ public abstract class AbstractRepository
                 catch ( StorageException e )
                 {
                     logger.warn( "Got storage exception while evicting " + coll.getRepositoryItemUid().toString(), e );
+
+                    stop();
+                }
+                catch ( AccessDeniedException e )
+                {
+                    // stop it
+                    stop();
+                }
+                catch ( NoSuchResourceStoreException e )
+                {
+                    // will not happen
+                }
+                catch ( RepositoryNotListableException e )
+                {
+                    // simply stop it
+                    stop();
                 }
             }
         };
@@ -793,6 +811,7 @@ public abstract class AbstractRepository
     public Collection<StorageItem> list( ResourceStoreRequest request )
         throws NoSuchResourceStoreException,
             RepositoryNotAvailableException,
+            RepositoryNotListableException,
             ItemNotFoundException,
             StorageException,
             AccessDeniedException
@@ -801,12 +820,7 @@ public abstract class AbstractRepository
 
         RepositoryItemUid uid = new RepositoryItemUid( this, request.getRequestPath() );
 
-        Collection<StorageItem> items = list( uid );
-
-        for ( StorageItem item : items )
-        {
-            item.getItemContext().putAll( request.getRequestContext() );
-        }
+        Collection<StorageItem> items = list( uid, request.getRequestContext() );
 
         return items;
     }
@@ -1010,8 +1024,9 @@ public abstract class AbstractRepository
         removeFromNotFoundCache( item.getRepositoryItemUid().getPath() );
     }
 
-    public Collection<StorageItem> list( RepositoryItemUid uid )
+    public Collection<StorageItem> list( RepositoryItemUid uid, Map<String, Object> context )
         throws RepositoryNotAvailableException,
+            RepositoryNotListableException,
             ItemNotFoundException,
             StorageException
     {
@@ -1029,12 +1044,18 @@ public abstract class AbstractRepository
         {
             maintainNotFoundCache( uid.getPath() );
 
-            return doListItems( uid );
+            Collection<StorageItem> items = doListItems( uid );
+
+            for ( StorageItem item : items )
+            {
+                item.getItemContext().putAll( context );
+            }
+
+            return items;
         }
         else
         {
-            // empty list, we are not listable
-            return Collections.emptyList();
+            throw new RepositoryNotListableException( this.getId() );
         }
     }
 

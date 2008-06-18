@@ -30,6 +30,7 @@ import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryGroupException;
 import org.sonatype.nexus.proxy.RepositoryNotAvailableException;
+import org.sonatype.nexus.proxy.RepositoryNotListableException;
 import org.sonatype.nexus.proxy.ResourceStore;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.access.AccessManager;
@@ -424,8 +425,9 @@ public interface Repository
      * @throws StorageException the storage exception
      * @throws AccessDeniedException the access denied exception
      */
-    Collection<StorageItem> list( RepositoryItemUid uid )
+    Collection<StorageItem> list( RepositoryItemUid uid, Map<String, Object> context )
         throws RepositoryNotAvailableException,
+            RepositoryNotListableException,
             ItemNotFoundException,
             StorageException;
 

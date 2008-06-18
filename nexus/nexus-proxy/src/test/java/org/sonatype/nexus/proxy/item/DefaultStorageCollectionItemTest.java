@@ -33,7 +33,7 @@ public class DefaultStorageCollectionItemTest
         checkAbstractStorageItem( getRepository(), coll, false, "", "/", "/" );
     }
 
-    public void testNonVirtualCollectionList()
+    public void testNonVirtualCollectionList() throws Exception
     {
         DefaultStorageCollectionItem coll = new DefaultStorageCollectionItem( getRepository(), "/a/some/dir/coll", true, true );
         checkAbstractStorageItem( getRepository(), coll, false, "coll", "/a/some/dir/coll", "/a/some/dir" );
@@ -48,7 +48,7 @@ public class DefaultStorageCollectionItemTest
         checkAbstractStorageItem( getRouter(), coll, true, "", "/", "/" );
     }
 
-    public void testVirtualCollectionList()
+    public void testVirtualCollectionList() throws Exception
     {
         DefaultStorageCollectionItem coll = new DefaultStorageCollectionItem( getRouter(), "/and/another/coll", true, true );
         checkAbstractStorageItem( getRouter(), coll, true, "coll", "/and/another/coll", "/and/another" );

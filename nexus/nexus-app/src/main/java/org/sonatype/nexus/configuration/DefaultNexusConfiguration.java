@@ -597,7 +597,8 @@ public class DefaultNexusConfiguration
 
             if ( !RepositoryType.SHADOW.equals( repository.getRepositoryType() ) )
             {
-                Repository newRepository = runtimeConfigurationBuilder.createRepositoryFromModel(
+                Repository newRepository = runtimeConfigurationBuilder.updateRepositoryFromModel(
+                    repository,
                     getConfiguration(),
                     settings );
 
@@ -792,7 +793,8 @@ public class DefaultNexusConfiguration
 
             if ( ShadowRepository.class.isAssignableFrom( repository.getClass() ) )
             {
-                Repository newRepository = runtimeConfigurationBuilder.createRepositoryFromModel(
+                Repository newRepository = runtimeConfigurationBuilder.updateRepositoryFromModel(
+                    (ShadowRepository) repository,
                     getConfiguration(),
                     settings );
 

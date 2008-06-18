@@ -22,7 +22,13 @@ package org.sonatype.nexus.proxy.item;
 
 import java.util.Collection;
 
+import org.sonatype.nexus.proxy.AccessDeniedException;
+import org.sonatype.nexus.proxy.ItemNotFoundException;
+import org.sonatype.nexus.proxy.NoSuchResourceStoreException;
+import org.sonatype.nexus.proxy.RepositoryNotAvailableException;
+import org.sonatype.nexus.proxy.RepositoryNotListableException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
+import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.router.RepositoryRouter;
 
@@ -70,42 +76,40 @@ public class DefaultStorageCollectionItem
      * @see org.sonatype.nexus.item.StorageCollectionItem#list()
      */
     public Collection<StorageItem> list()
+        throws AccessDeniedException,
+            NoSuchResourceStoreException,
+            RepositoryNotAvailableException,
+            RepositoryNotListableException,
+            ItemNotFoundException,
+            StorageException
     {
-        try
+        if ( isVirtual() || !Repository.class.isAssignableFrom( getStore().getClass() ) )
         {
-            if ( isVirtual() || !Repository.class.isAssignableFrom( getStore().getClass() ) )
-            {
-                ResourceStoreRequest req = new ResourceStoreRequest( getPath(), true );
+            ResourceStoreRequest req = new ResourceStoreRequest( getPath(), true );
 
-                // let the call inherit the context, ie. auth info, etc.
-                req.getRequestContext().putAll( getItemContext() );
+            // let the call inherit the context, ie. auth info, etc.
+            req.getRequestContext().putAll( getItemContext() );
 
-                return getStore().list( req );
-            }
-            else
-            {
-                Collection<StorageItem> result = ( (Repository) getStore() ).list( getRepositoryItemUid() );
-
-                for ( StorageItem item : result )
-                {
-                    if ( getPath().endsWith( RepositoryItemUid.PATH_SEPARATOR ) )
-                    {
-                        ( (AbstractStorageItem) item ).setPath( getPath() + item.getName() );
-                    }
-                    else
-                    {
-                        ( (AbstractStorageItem) item ).setPath( getPath() + RepositoryItemUid.PATH_SEPARATOR
-                            + item.getName() );
-                    }
-                }
-                return result;
-            }
+            return getStore().list( req );
         }
-        catch ( Exception e )
+        else
         {
-            e.printStackTrace();
+            Collection<StorageItem> result = ( (Repository) getStore() )
+                .list( getRepositoryItemUid(), getItemContext() );
 
-            return null;
+            for ( StorageItem item : result )
+            {
+                if ( getPath().endsWith( RepositoryItemUid.PATH_SEPARATOR ) )
+                {
+                    ( (AbstractStorageItem) item ).setPath( getPath() + item.getName() );
+                }
+                else
+                {
+                    ( (AbstractStorageItem) item ).setPath( getPath() + RepositoryItemUid.PATH_SEPARATOR
+                        + item.getName() );
+                }
+            }
+            return result;
         }
     }
 

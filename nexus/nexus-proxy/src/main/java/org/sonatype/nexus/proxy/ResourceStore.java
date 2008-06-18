@@ -172,6 +172,7 @@ public interface ResourceStore
     Collection<StorageItem> list( ResourceStoreRequest request )
         throws NoSuchResourceStoreException,
             RepositoryNotAvailableException,
+            RepositoryNotListableException,
             ItemNotFoundException,
             StorageException,
             AccessDeniedException;

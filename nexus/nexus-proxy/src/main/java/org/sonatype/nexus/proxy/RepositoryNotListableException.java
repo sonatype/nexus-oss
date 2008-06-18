@@ -18,35 +18,21 @@
  * along with this program.  If not, see http://www.gnu.org/licenses/.
  *
  */
-package org.sonatype.nexus.proxy.item;
-
-import java.util.Collection;
-
-import org.sonatype.nexus.proxy.AccessDeniedException;
-import org.sonatype.nexus.proxy.ItemNotFoundException;
-import org.sonatype.nexus.proxy.NoSuchResourceStoreException;
-import org.sonatype.nexus.proxy.RepositoryNotAvailableException;
-import org.sonatype.nexus.proxy.RepositoryNotListableException;
-import org.sonatype.nexus.proxy.StorageException;
+package org.sonatype.nexus.proxy;
 
 /**
- * The Interface StorageCollectionItem.
+ * Thrown if the repository involved in processing is not listable.
+ * 
+ * @author cstamas
  */
-public interface StorageCollectionItem
-    extends StorageItem
+public class RepositoryNotListableException
+    extends Exception
 {
+    private static final long serialVersionUID = 6414483658234772613L;
 
-    /**
-     * Lists this collection.
-     * 
-     * @return the collection< storage item>
-     */
-    Collection<StorageItem> list()
-        throws AccessDeniedException,
-            NoSuchResourceStoreException,
-            RepositoryNotAvailableException,
-            RepositoryNotListableException,
-            ItemNotFoundException,
-            StorageException;;
+    public RepositoryNotListableException( String repoId )
+    {
+        super( "Repository with repoId=[" + repoId + "] is not listable!" );
+    }
 
 }

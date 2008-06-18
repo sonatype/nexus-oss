@@ -27,6 +27,7 @@ import org.sonatype.nexus.configuration.model.Configuration;
 import org.sonatype.nexus.configuration.validator.InvalidConfigurationException;
 import org.sonatype.nexus.proxy.access.AccessManager;
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.proxy.repository.ShadowRepository;
 import org.sonatype.nexus.security.AuthenticationSource;
 
 /**
@@ -45,7 +46,14 @@ public interface RuntimeConfigurationBuilder
     Repository createRepositoryFromModel( Configuration configuration, CRepository repository )
         throws InvalidConfigurationException;
 
+    Repository updateRepositoryFromModel( Repository old, Configuration configuration, CRepository repository )
+        throws InvalidConfigurationException;
+
     Repository createRepositoryFromModel( Configuration configuration, CRepositoryShadow repositoryShadow )
+        throws InvalidConfigurationException;
+
+    Repository updateRepositoryFromModel( ShadowRepository old, Configuration configuration,
+        CRepositoryShadow repositoryShadow )
         throws InvalidConfigurationException;
 
     AuthenticationSource getAuthenticationSource( Configuration configuration )

@@ -20,6 +20,7 @@
  */
 package org.sonatype.nexus.proxy.events;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
@@ -33,8 +34,8 @@ public abstract class RepositoryItemEvent
 
     /** The uid. */
     private final RepositoryItemUid uid;
-    
-    private final Map<String, Object> context;
+
+    private Map<String, Object> context;
 
     /**
      * Instantiates a new repository item event.
@@ -58,7 +59,7 @@ public abstract class RepositoryItemEvent
     {
         return uid;
     }
-    
+
     /**
      * Gets the item context.
      * 
@@ -66,6 +67,11 @@ public abstract class RepositoryItemEvent
      */
     public Map<String, Object> getContext()
     {
+        if ( context == null )
+        {
+            context = new HashMap<String, Object>();
+        }
+        
         return context;
     }
 

@@ -104,10 +104,39 @@ public class DefaultRuntimeConfigurationBuilder
         {
             Repository repository = null;
 
+            if ( CRepository.TYPE_MAVEN2.equals( repo.getType() ) )
+            {
+                repository = (MavenRepository) plexusContainer.lookup( Repository.ROLE, "maven2" );
+            }
+            else if ( CRepository.TYPE_MAVEN1.equals( repo.getType() ) )
+            {
+                repository = (MavenRepository) plexusContainer.lookup( Repository.ROLE, "maven1" );
+            }
+            else
+            {
+                throw new InvalidConfigurationException( "Repository type '" + repo.getType()
+                    + "' creation is not (yet) implemented!" );
+            }
+
+            return updateRepositoryFromModel( repository, configuration, repo );
+        }
+        catch ( ComponentLookupException e )
+        {
+            throw new InvalidConfigurationException( "Could not lookup a new instance of Repository!", e );
+        }
+    }
+
+    public Repository updateRepositoryFromModel( Repository old, Configuration configuration, CRepository repo )
+        throws InvalidConfigurationException
+    {
+        try
+        {
+            Repository repository = null;
+
             // Setting contentClass specific things on a repository
             if ( CRepository.TYPE_MAVEN2.equals( repo.getType() ) )
             {
-                MavenRepository m2repository = (MavenRepository) plexusContainer.lookup( Repository.ROLE, "maven2" );
+                MavenRepository m2repository = (MavenRepository) old;
 
                 m2repository.setId( repo.getId() );
                 m2repository.setName( repo.getName() );
@@ -138,7 +167,7 @@ public class DefaultRuntimeConfigurationBuilder
             }
             else if ( CRepository.TYPE_MAVEN1.equals( repo.getType() ) )
             {
-                MavenRepository m1repository = (MavenRepository) plexusContainer.lookup( Repository.ROLE, "maven1" );
+                MavenRepository m1repository = (MavenRepository) old;
 
                 m1repository.setId( repo.getId() );
                 m1repository.setName( repo.getName() );
@@ -231,13 +260,43 @@ public class DefaultRuntimeConfigurationBuilder
         {
             throw new InvalidConfigurationException( "Malformed local storage URL!", e );
         }
+    }
+
+    public Repository createRepositoryFromModel( Configuration configuration, CRepositoryShadow shadow )
+        throws InvalidConfigurationException
+    {
+        try
+        {
+            ShadowRepository shadowRepository = null;
+
+            if ( CRepositoryShadow.TYPE_MAVEN1.equals( shadow.getType() ) )
+            {
+                shadowRepository = (ShadowRepository) plexusContainer.lookup( Repository.ROLE, "m2-m1-shadow" );
+            }
+            else if ( CRepositoryShadow.TYPE_MAVEN2.equals( shadow.getType() ) )
+            {
+                shadowRepository = (ShadowRepository) plexusContainer.lookup( Repository.ROLE, "m1-m2-shadow" );
+            }
+            else if ( CRepositoryShadow.TYPE_MAVEN2_CONSTRAINED.equals( shadow.getType() ) )
+            {
+                shadowRepository = (ShadowRepository) plexusContainer.lookup( Repository.ROLE, "m2-constrained" );
+            }
+            else
+            {
+                throw new InvalidConfigurationException( "Repository type '" + shadow.getType()
+                    + "' creation is not (yet) implemented!" );
+            }
+
+            return updateRepositoryFromModel( shadowRepository, configuration, shadow );
+        }
         catch ( ComponentLookupException e )
         {
             throw new InvalidConfigurationException( "Could not lookup a new instance of Repository!", e );
         }
     }
 
-    public Repository createRepositoryFromModel( Configuration configuration, CRepositoryShadow shadow )
+    public Repository updateRepositoryFromModel( ShadowRepository old, Configuration configuration,
+        CRepositoryShadow shadow )
         throws InvalidConfigurationException
     {
         try
@@ -257,9 +316,7 @@ public class DefaultRuntimeConfigurationBuilder
 
             if ( CRepositoryShadow.TYPE_MAVEN1.equals( shadow.getType() ) )
             {
-                shadowRepository = (ShadowRepository) plexusContainer.lookup(
-                    Repository.ROLE,
-                    "m2-m1-shadow" );
+                shadowRepository = old;
 
                 shadowRepository.setMasterRepository( master );
                 shadowRepository.setId( shadow.getId() );
@@ -276,9 +333,7 @@ public class DefaultRuntimeConfigurationBuilder
             }
             else if ( CRepositoryShadow.TYPE_MAVEN2.equals( shadow.getType() ) )
             {
-                shadowRepository = (ShadowRepository) plexusContainer.lookup(
-                    Repository.ROLE,
-                    "m1-m2-shadow" );
+                shadowRepository = (ShadowRepository) old;
 
                 shadowRepository.setMasterRepository( master );
                 shadowRepository.setId( shadow.getId() );
@@ -295,9 +350,7 @@ public class DefaultRuntimeConfigurationBuilder
             }
             else if ( CRepositoryShadow.TYPE_MAVEN2_CONSTRAINED.equals( shadow.getType() ) )
             {
-                shadowRepository = (ShadowRepository) plexusContainer.lookup(
-                    Repository.ROLE,
-                    "m2-constrained" );
+                shadowRepository = old;
 
                 shadowRepository.setMasterRepository( master );
                 shadowRepository.setId( shadow.getId() );
@@ -359,10 +412,6 @@ public class DefaultRuntimeConfigurationBuilder
         catch ( MalformedURLException e )
         {
             throw new InvalidConfigurationException( "Malformed local storage URL!", e );
-        }
-        catch ( ComponentLookupException e )
-        {
-            throw new InvalidConfigurationException( "Could not lookup a new instance of Repository!", e );
         }
     }
 

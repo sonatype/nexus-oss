@@ -28,7 +28,6 @@ package org.sonatype.nexus.proxy;
 public class RepositoryNotAvailableException
     extends Exception
 {
-
     private static final long serialVersionUID = 6414483658234772613L;
 
     public RepositoryNotAvailableException( String repoId )

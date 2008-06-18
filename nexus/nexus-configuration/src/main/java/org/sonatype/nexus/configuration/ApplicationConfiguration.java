@@ -61,6 +61,13 @@ public interface ApplicationConfiguration
     File getTemporaryDirectory();
 
     /**
+     * Returns the wastebasket directory.
+     * 
+     * @return
+     */
+    File getWastebasketDirectory();
+
+    /**
      * Gets the Configuration object.
      * 
      * @return

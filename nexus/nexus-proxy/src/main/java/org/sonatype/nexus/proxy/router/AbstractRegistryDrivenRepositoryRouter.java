@@ -34,6 +34,7 @@ import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryGroupException;
 import org.sonatype.nexus.proxy.NoSuchResourceStoreException;
 import org.sonatype.nexus.proxy.RepositoryNotAvailableException;
+import org.sonatype.nexus.proxy.RepositoryNotListableException;
 import org.sonatype.nexus.proxy.ResourceStore;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
@@ -352,6 +353,11 @@ public abstract class AbstractRegistryDrivenRepositoryRouter
                 {
                     getLogger().info(
                         "Repository " + store.getId() + " is not available during list of " + req.getRequestPath() );
+                }
+                catch ( RepositoryNotListableException e )
+                {
+                    getLogger().info(
+                        "Repository " + store.getId() + " is not listable during list of " + req.getRequestPath() );
                 }
                 catch ( ItemNotFoundException e )
                 {
