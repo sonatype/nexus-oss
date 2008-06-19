@@ -109,8 +109,9 @@ Sonatype.repoServer.FeedViewPanel = function(config){
     listeners: {
       'rowclick': {
         fn: function( grid, rowIndex, e ) {
-          var rec = grid.store.getAt( rowIndex );
+          if ( e.target.nodeName.toUpperCase() == 'A' ) return; // no menu on links
 
+          var rec = grid.store.getAt( rowIndex );
           this.grid.setFeed( rec.get( 'name' ), rec.get( 'resourceURI' ) );
         },
         scope: this
