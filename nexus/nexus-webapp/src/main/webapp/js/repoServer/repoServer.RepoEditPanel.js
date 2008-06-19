@@ -1000,10 +1000,10 @@ Sonatype.repoServer.RepoEditPanel = function(config){
       },
       {
         id: 'repo-trash-btn',
-        text:'Wastebasket..',
+        text:'Trash...',
         icon: Sonatype.config.resourcePath + '/images/icons/user-trash.png',
         cls: 'x-btn-text-icon',
-        tooltip: {title:'Wastebasket',text:'Manage the Wastebasket'},
+        tooltip: {title:'Trash',text:'Manage the Trash contents'},
         menu: {
           width:125,
           items: [
