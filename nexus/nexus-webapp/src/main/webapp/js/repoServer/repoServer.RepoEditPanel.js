@@ -997,6 +997,22 @@ Sonatype.repoServer.RepoEditPanel = function(config){
         cls: 'x-btn-text-icon',
         scope:this,
         handler: this.deleteRepoHandler
+      },
+      {
+        id: 'repo-trash-btn',
+        text:'Wastebasket..',
+        icon: Sonatype.config.resourcePath + '/images/icons/user-trash.png',
+        cls: 'x-btn-text-icon',
+        tooltip: {title:'Wastebasket',text:'Manage the Wastebasket'},
+        menu: {
+          width:125,
+          items: [
+            {
+              text: 'Empty Trash',
+              handler: this.deleteTrashHandler.createDelegate(this)
+            }
+          ]
+        }
       }
     ],
 
@@ -1178,6 +1194,36 @@ Ext.extend(Sonatype.repoServer.RepoEditPanel, Sonatype.repoServer.AbstractRepoPa
     }
   },
   
+  deleteTrashHandler : function() {
+    //@note: this handler selects the "No" button as the default
+    //@todo: could extend Ext.MessageBox to take the button to select as a param
+    Ext.Msg.getDialog().on('show', function(){
+      this.focusEl = this.buttons[2]; //ack! we're offset dependent here
+      this.focus();
+    },
+    Ext.Msg.getDialog(),
+    {single:true});
+    
+    Ext.Msg.show({
+      animEl: this.reposGridPanel.getEl(),
+      title : 'Empty Trash?',
+      msg : 'Delete the entire contents of the Trash?<br><br>This operation cannot be undone!',
+      buttons: Ext.Msg.YESNO,
+      scope: this,
+      icon: Ext.Msg.QUESTION,
+      fn: function(btnName){
+        if (btnName == 'yes' || btnName == 'ok') {
+          Ext.Ajax.request({
+            callback: this.deleteTrashCallback,
+            scope: this,
+            method: 'DELETE',
+            url:Sonatype.config.repos.urls.trash
+          });
+        }
+      }
+    });
+  },
+  
   addRepoHandler : function(repoType) {
     var id = 'new_repo_' + new Date().getTime();
 
@@ -1289,6 +1335,12 @@ Ext.extend(Sonatype.repoServer.RepoEditPanel, Sonatype.repoServer.AbstractRepoPa
           }
         });
       }
+    }
+  },
+  
+  deleteTrashCallback : function(options, isSuccess, response){
+    if(!isSuccess){
+      Ext.MessageBox.alert('The server did not empty the trash.');
     }
   },
   
