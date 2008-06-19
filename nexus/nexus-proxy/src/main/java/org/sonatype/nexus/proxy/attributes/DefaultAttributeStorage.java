@@ -25,6 +25,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.commons.io.FilenameUtils;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
@@ -65,8 +66,11 @@ public class DefaultAttributeStorage
 
     /** The xstream. */
     private XStream xstream;
-    
-    private ConcurrentHashMap<String, RepositoryItemUid> locks;
+
+    /**
+     * The table of current operations.
+     */
+    private ConcurrentHashMap<String, ReentrantLock> locks;
 
     /**
      * Instantiates a new FSX stream attribute storage.
@@ -78,6 +82,7 @@ public class DefaultAttributeStorage
         this.xstream.alias( "file", DefaultStorageFileItem.class );
         this.xstream.alias( "collection", DefaultStorageCollectionItem.class );
         this.xstream.alias( "link", DefaultStorageLinkItem.class );
+        this.locks = new ConcurrentHashMap<String, ReentrantLock>();
     }
 
     public void initialize()
@@ -88,6 +93,43 @@ public class DefaultAttributeStorage
     public void onConfigurationChange( ConfigurationChangeEvent evt )
     {
         this.workingDirectory = null;
+    }
+
+    protected ReentrantLock getLock( RepositoryItemUid uid )
+    {
+        ReentrantLock lock = null;
+
+        synchronized ( locks )
+        {
+            if ( !locks.containsKey( uid.toString() ) )
+            {
+                locks.put( uid.toString(), new ReentrantLock() );
+            }
+
+            lock = locks.get( uid.toString() );
+        }
+
+        return lock;
+    }
+
+    protected void lockFor( RepositoryItemUid uid )
+    {
+        getLock( uid ).lock();
+    }
+
+    protected void releaseFor( RepositoryItemUid uid )
+    {
+        ReentrantLock lock = getLock( uid );
+
+        lock.unlock();
+
+        if ( lock.getHoldCount() == 0 )
+        {
+            synchronized ( locks )
+            {
+                locks.remove( uid.toString() );
+            }
+        }
     }
 
     /**
@@ -132,111 +174,139 @@ public class DefaultAttributeStorage
 
     public boolean deleteAttributes( RepositoryItemUid uid )
     {
-        if ( getLogger().isDebugEnabled() )
-        {
-            getLogger().debug( "Deleting attributes on UID=" + uid.toString() );
-        }
-
-        boolean result = false;
-
         try
         {
-            File ftarget = getFileFromBase( uid );
+            lockFor( uid );
 
-            result = ftarget.exists() && ftarget.isFile() && ftarget.delete();
+            if ( getLogger().isDebugEnabled() )
+            {
+                getLogger().debug( "Deleting attributes on UID=" + uid.toString() );
+            }
+
+            boolean result = false;
+
+            try
+            {
+                File ftarget = getFileFromBase( uid );
+
+                result = ftarget.exists() && ftarget.isFile() && ftarget.delete();
+            }
+            catch ( IOException e )
+            {
+                getLogger().warn( "Got IOException during delete of UID=" + uid.toString(), e );
+            }
+
+            return result;
         }
-        catch ( IOException e )
+        finally
         {
-            getLogger().warn( "Got IOException during delete of UID=" + uid.toString(), e );
+            releaseFor( uid );
         }
-
-        return result;
     }
 
     public AbstractStorageItem getAttributes( RepositoryItemUid uid )
     {
-        if ( getLogger().isDebugEnabled() )
-        {
-            getLogger().debug( "Loading attributes on UID=" + uid.toString() );
-        }
         try
         {
-            AbstractStorageItem result = null;
+            lockFor( uid );
+            
+            if ( getLogger().isDebugEnabled() )
+            {
+                getLogger().debug( "Loading attributes on UID=" + uid.toString() );
+            }
+            try
+            {
+                AbstractStorageItem result = null;
 
-            result = doGetAttributes( uid );
+                result = doGetAttributes( uid );
 
-            return result;
+                return result;
+            }
+            catch ( IOException ex )
+            {
+                getLogger().error( "Got IOException during store of UID=" + uid.toString(), ex );
+                
+                return null;
+            }
         }
-        catch ( IOException ex )
+        finally
         {
-            getLogger().error( "Got IOException during store of UID=" + uid.toString(), ex );
-            return null;
+            releaseFor( uid );
         }
     }
 
     public void putAttribute( AbstractStorageItem item )
     {
-        if ( getLogger().isDebugEnabled() )
-        {
-            getLogger().debug( "Storing attributes on UID=" + item.getRepositoryItemUid() );
-        }
-
-        if ( StorageCollectionItem.class.isAssignableFrom( item.getClass() ) )
-        {
-            // not saving attributes for directories anymore
-            return;
-        }
-
         try
         {
-            AbstractStorageItem onDisk = doGetAttributes( item.getRepositoryItemUid() );
+            lockFor( item.getRepositoryItemUid() );
 
-            if ( onDisk != null && ( onDisk.getGeneration() > item.getGeneration() ) )
+            if ( getLogger().isDebugEnabled() )
             {
-                // change detected, overlay the to be saved onto the newer one and swap
-                onDisk.overlay( item );
-
-                // and overlay other things too
-                onDisk.setRepositoryItemUid( item.getRepositoryItemUid() );
-                onDisk.setReadable( item.isReadable() );
-                onDisk.setWritable( item.isWritable() );
-
-                item = onDisk;
+                getLogger().debug( "Storing attributes on UID=" + item.getRepositoryItemUid() );
             }
 
-            File target = getFileFromBase( item.getRepositoryItemUid() );
-
-            target.getParentFile().mkdirs();
-
-            if ( target.getParentFile().exists() && target.getParentFile().isDirectory() )
+            if ( StorageCollectionItem.class.isAssignableFrom( item.getClass() ) )
             {
-                FileOutputStream fos = null;
+                // not saving attributes for directories anymore
+                return;
+            }
 
-                try
+            try
+            {
+                AbstractStorageItem onDisk = doGetAttributes( item.getRepositoryItemUid() );
+
+                if ( onDisk != null && ( onDisk.getGeneration() > item.getGeneration() ) )
                 {
-                    fos = new FileOutputStream( target );
+                    // change detected, overlay the to be saved onto the newer one and swap
+                    onDisk.overlay( item );
 
-                    item.incrementGeneration();
+                    // and overlay other things too
+                    onDisk.setRepositoryItemUid( item.getRepositoryItemUid() );
+                    onDisk.setReadable( item.isReadable() );
+                    onDisk.setWritable( item.isWritable() );
 
-                    xstream.toXML( item, fos );
-
-                    fos.flush();
+                    item = onDisk;
                 }
-                finally
+
+                File target = getFileFromBase( item.getRepositoryItemUid() );
+
+                target.getParentFile().mkdirs();
+
+                if ( target.getParentFile().exists() && target.getParentFile().isDirectory() )
                 {
-                    IOUtil.close( fos );
+                    FileOutputStream fos = null;
+
+                    try
+                    {
+                        fos = new FileOutputStream( target );
+
+                        item.incrementGeneration();
+
+                        xstream.toXML( item, fos );
+
+                        fos.flush();
+                    }
+                    finally
+                    {
+                        IOUtil.close( fos );
+                    }
+                }
+                else
+                {
+                    getLogger().error(
+                        "Could not store attributes on UID=" + item.getRepositoryItemUid()
+                            + ", parent exists but is not a directory!" );
                 }
             }
-            else
+            catch ( IOException ex )
             {
-                getLogger().error(
-                    "Could not store attributes on UID=" + item.getRepositoryItemUid()
-                        + ", parent exists but is not a directory!" );
+                getLogger().error( "Got IOException during store of UID=" + item.getRepositoryItemUid(), ex );
             }
         }
-        catch ( IOException ex )
+        finally
         {
-            getLogger().error( "Got IOException during store of UID=" + item.getRepositoryItemUid(), ex );
+            releaseFor( item.getRepositoryItemUid() );
         }
     }
 
@@ -264,7 +334,7 @@ public class DefaultAttributeStorage
                 fis = new FileInputStream( target );
 
                 result = (AbstractStorageItem) xstream.fromXML( fis );
-                
+
                 result.setRepositoryItemUid( uid );
             }
             catch ( BaseException e )
