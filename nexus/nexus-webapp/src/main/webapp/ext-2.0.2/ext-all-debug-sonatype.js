@@ -11663,7 +11663,7 @@ Ext.extend(Ext.data.Node, Ext.util.Observable, {
     },
 
     hasChildNodes : function(){
-        return !this.isLeaf() && this.childNodes.length > 0;
+        return !this.isLeaf() && this.childNodes && this.childNodes.length > 0;
     },
 
     
@@ -23027,7 +23027,7 @@ Ext.extend(Ext.tree.TreeNode, Ext.data.Node, {
             this.fireEvent("beforechildrenrendered", this);
         }
         var cs = this.childNodes;
-        for(var i = 0, len = cs.length; i < len; i++){
+        if ( cs ) for(var i = 0, len = cs.length; i < len; i++){
             cs[i].render(true);
         }
         this.childrenRendered = true;
@@ -23411,7 +23411,7 @@ Ext.tree.TreeNodeUI.prototype = {
     
     expand : function(){
         this.updateExpandIcon();
-        this.ctNode.style.display = "";
+        if ( this.ctNode ) this.ctNode.style.display = "";
     },
 
     
@@ -23657,7 +23657,7 @@ Ext.tree.TreeNodeUI.prototype = {
                 }
             }
             var ecc = "x-tree-ec-icon "+cls;
-            if(this.ecc != ecc){
+            if(this.ecc != ecc && this.ecNode){
                 this.ecNode.className = ecc;
                 this.ecc = ecc;
             }
