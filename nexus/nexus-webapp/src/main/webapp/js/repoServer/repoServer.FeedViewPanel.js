@@ -100,7 +100,7 @@ Sonatype.repoServer.FeedViewPanel = function(config){
       { header: 'Feed', dataIndex: 'name', width: 300 },
       { header: 'URL', dataIndex: 'resourceURI', width: 300, id: 'feeds-url-col',
         renderer: function( s ) {
-          return '<a href="' + s + '">' + s + '</a>';
+          return '<a href="' + s + '" target="_blank">' + s + '</a>';
         },
         menuDisabled:true }
     ],
