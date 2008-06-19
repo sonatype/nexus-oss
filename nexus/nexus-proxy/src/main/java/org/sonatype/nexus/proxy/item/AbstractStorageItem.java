@@ -46,6 +46,9 @@ public abstract class AbstractStorageItem
     /** The trasient context. */
     private transient Map<String, Object> context;
 
+    /** Used for versioning of attribute */
+    private int generation = 0;
+
     /** The path. */
     private String path;
 
@@ -161,6 +164,22 @@ public abstract class AbstractStorageItem
     public RepositoryItemUid getRepositoryItemUid()
     {
         return repositoryItemUid;
+    }
+
+    /**
+     * Sets the UID.
+     * 
+     * @param repositoryItemUid
+     */
+    public void setRepositoryItemUid( RepositoryItemUid repositoryItemUid )
+    {
+        this.repositoryItemUid = repositoryItemUid;
+        
+        this.store = repositoryItemUid.getRepository();
+        
+        this.repositoryId = repositoryItemUid.getRepository().getId();
+        
+        this.path = repositoryItemUid.getPath();
     }
 
     public String getRepositoryId()
@@ -381,19 +400,38 @@ public abstract class AbstractStorageItem
         this.lastRequested = lastRequested;
     }
 
+    public int getGeneration()
+    {
+        return generation;
+    }
+
+    public void incrementGeneration()
+    {
+        this.generation++;
+    }
+
     public void overlay( StorageItem item )
         throws IllegalArgumentException
     {
         if ( item != null && this.getClass().isAssignableFrom( item.getClass() ) )
         {
+            // TODO: WHY?
+            // these do not overlays:
+            // path
+            // readable
+            // writable
+            // repositoryItemUid
+            // store
+
+            // these do overlays:
             setRepositoryId( item.getRepositoryId() );
+            setCreated( item.getCreated() );
+            setModified( item.getModified() );
             setStoredLocally( item.getStoredLocally() );
             setRemoteChecked( item.getRemoteChecked() );
             setLastRequested( item.getLastRequested() );
             setExpired( item.isExpired() );
             setRemoteUrl( item.getRemoteUrl() );
-            setCreated( item.getCreated() );
-            setModified( item.getModified() );
             getAttributes().putAll( item.getAttributes() );
             getItemContext().putAll( item.getItemContext() );
         }

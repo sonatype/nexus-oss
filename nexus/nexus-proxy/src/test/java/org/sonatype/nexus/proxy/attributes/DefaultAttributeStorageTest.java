@@ -92,10 +92,10 @@ public class DefaultAttributeStorageTest
 
         RepositoryItemUid uid = new RepositoryItemUid( dummy, "/b.txt" );
 
-        assertTrue( attributeStorage.getFileFromBase( uid, false ).exists() );
+        assertTrue( attributeStorage.getFileFromBase( uid ).exists() );
 
         assertTrue( attributeStorage.deleteAttributes( uid ) );
 
-        assertFalse( attributeStorage.getFileFromBase( uid, false ).exists() );
+        assertFalse( attributeStorage.getFileFromBase( uid ).exists() );
     }
 }

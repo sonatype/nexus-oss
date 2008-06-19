@@ -27,6 +27,7 @@ import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.item.StorageLinkItem;
 import org.sonatype.nexus.proxy.utils.StoreWalker;
+import org.sonatype.nexus.proxy.utils.WalkerException;
 
 public class StoreWalkerTest
     extends AbstractProxyTestEnvironment
@@ -94,6 +95,7 @@ public class StoreWalkerTest
         public int links;
 
         public void walk()
+            throws WalkerException
         {
             collEnters = 0;
             collExits = 0;

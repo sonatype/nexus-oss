@@ -694,8 +694,6 @@ public abstract class AbstractRepository
         notifyProximityEventListeners( new RepositoryItemEventRetrieve( item.getRepositoryItemUid(), item
             .getItemContext() ) );
 
-        getLocalStorage().touchItemLastRequested( uid );
-
         return item;
     }
 
@@ -846,6 +844,8 @@ public abstract class AbstractRepository
         {
             throw new RepositoryNotAvailableException( this.getId() );
         }
+
+        getLocalStorage().touchItemLastRequested( uid );
 
         return getLocalStorage().retrieveItemContent( uid );
     }

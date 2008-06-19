@@ -69,16 +69,19 @@ public abstract class StoreWalker
     }
 
     public void walk()
+        throws WalkerException
     {
         walk( null );
     }
 
     public void walk( String fromPath )
+        throws WalkerException
     {
         walk( fromPath, true, false );
     }
 
     public final void walk( boolean localOnly, boolean collectionsOnly )
+        throws WalkerException
     {
         walk( null, localOnly, collectionsOnly );
     }
@@ -89,6 +92,7 @@ public abstract class StoreWalker
     }
 
     public final void walk( String fromPath, boolean localOnly, boolean collectionsOnly )
+        throws WalkerException
     {
         running = true;
 
@@ -175,6 +179,8 @@ public abstract class StoreWalker
                 }
 
                 stop();
+
+                throw new WalkerException( e );
             }
         }
 

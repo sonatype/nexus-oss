@@ -24,8 +24,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.util.IOUtil;
@@ -65,6 +65,8 @@ public class DefaultAttributeStorage
 
     /** The xstream. */
     private XStream xstream;
+    
+    private ConcurrentHashMap<String, RepositoryItemUid> locks;
 
     /**
      * Instantiates a new FSX stream attribute storage.
@@ -128,41 +130,29 @@ public class DefaultAttributeStorage
         this.workingDirectory = baseDir;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.sonatype.nexus.attributes.AttributeStorage#deleteAttributes(org.sonatype.nexus.item.RepositoryItemUid)
-     */
     public boolean deleteAttributes( RepositoryItemUid uid )
     {
         if ( getLogger().isDebugEnabled() )
         {
             getLogger().debug( "Deleting attributes on UID=" + uid.toString() );
         }
+
         boolean result = false;
+
         try
         {
-            File ftarget = getFileFromBase( uid, false );
+            File ftarget = getFileFromBase( uid );
+
             result = ftarget.exists() && ftarget.isFile() && ftarget.delete();
-            if ( !result )
-            {
-                File dtarget = getFileFromBase( uid, true );
-                result = dtarget.exists() && dtarget.isFile() && dtarget.delete();
-                FileUtils.deleteDirectory( dtarget.getParentFile() );
-            }
         }
         catch ( IOException e )
         {
             getLogger().warn( "Got IOException during delete of UID=" + uid.toString(), e );
         }
+
         return result;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.sonatype.nexus.attributes.AttributeStorage#getAttributes(org.sonatype.nexus.item.RepositoryItemUid)
-     */
     public AbstractStorageItem getAttributes( RepositoryItemUid uid )
     {
         if ( getLogger().isDebugEnabled() )
@@ -173,12 +163,8 @@ public class DefaultAttributeStorage
         {
             AbstractStorageItem result = null;
 
-            result = getAttributes( uid, false );
+            result = doGetAttributes( uid );
 
-            if ( result == null )
-            {
-                result = getAttributes( uid, true );
-            }
             return result;
         }
         catch ( IOException ex )
@@ -188,29 +174,52 @@ public class DefaultAttributeStorage
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.sonatype.nexus.attributes.AttributeStorage#putAttribute(org.sonatype.nexus.item.AbstractStorageItem)
-     */
     public void putAttribute( AbstractStorageItem item )
     {
         if ( getLogger().isDebugEnabled() )
         {
             getLogger().debug( "Storing attributes on UID=" + item.getRepositoryItemUid() );
         }
+
+        if ( StorageCollectionItem.class.isAssignableFrom( item.getClass() ) )
+        {
+            // not saving attributes for directories anymore
+            return;
+        }
+
         try
         {
-            File target = getFileFromBase( item.getRepositoryItemUid(), StorageCollectionItem.class
-                .isAssignableFrom( item.getClass() ) );
+            AbstractStorageItem onDisk = doGetAttributes( item.getRepositoryItemUid() );
+
+            if ( onDisk != null && ( onDisk.getGeneration() > item.getGeneration() ) )
+            {
+                // change detected, overlay the to be saved onto the newer one and swap
+                onDisk.overlay( item );
+
+                // and overlay other things too
+                onDisk.setRepositoryItemUid( item.getRepositoryItemUid() );
+                onDisk.setReadable( item.isReadable() );
+                onDisk.setWritable( item.isWritable() );
+
+                item = onDisk;
+            }
+
+            File target = getFileFromBase( item.getRepositoryItemUid() );
+
             target.getParentFile().mkdirs();
+
             if ( target.getParentFile().exists() && target.getParentFile().isDirectory() )
             {
                 FileOutputStream fos = null;
+
                 try
                 {
                     fos = new FileOutputStream( target );
+
+                    item.incrementGeneration();
+
                     xstream.toXML( item, fos );
+
                     fos.flush();
                 }
                 finally
@@ -239,18 +248,24 @@ public class DefaultAttributeStorage
      * @return the attributes
      * @throws IOException Signals that an I/O exception has occurred.
      */
-    protected AbstractStorageItem getAttributes( RepositoryItemUid uid, boolean isCollection )
+    protected AbstractStorageItem doGetAttributes( RepositoryItemUid uid )
         throws IOException
     {
-        File target = getFileFromBase( uid, isCollection );
+        File target = getFileFromBase( uid );
+
         AbstractStorageItem result = null;
+
         if ( target.exists() && target.isFile() )
         {
             FileInputStream fis = null;
+
             try
             {
                 fis = new FileInputStream( target );
+
                 result = (AbstractStorageItem) xstream.fromXML( fis );
+                
+                result.setRepositoryItemUid( uid );
             }
             catch ( BaseException e )
             {
@@ -264,6 +279,7 @@ public class DefaultAttributeStorage
                 IOUtil.close( fis );
             }
         }
+
         return result;
     }
 
@@ -274,7 +290,7 @@ public class DefaultAttributeStorage
      * @param isCollection the is collection
      * @return the file from base
      */
-    protected File getFileFromBase( RepositoryItemUid uid, boolean isCollection )
+    protected File getFileFromBase( RepositoryItemUid uid )
         throws IOException
     {
         File repoBase = new File( getWorkingDirectory(), uid.getRepository().getId() );
@@ -285,17 +301,11 @@ public class DefaultAttributeStorage
 
         String name = FilenameUtils.getName( uid.getPath() );
 
-        if ( isCollection )
-        {
-            result = new File( repoBase, path + "/" + name + ".directory" );
-        }
-        else
-        {
-            result = new File( repoBase, path + "/" + name );
-        }
+        result = new File( repoBase, path + "/" + name );
 
         // to be foolproof
         // 2007.11.09. - Believe or not, Nexus deleted my whole USB rack! (cstamas)
+        // ok, now you may laugh :)
         if ( !result.getAbsolutePath().startsWith( getWorkingDirectory().getAbsolutePath() ) )
         {
             throw new IOException( "FileFromBase evaluated directory wrongly! baseDir="

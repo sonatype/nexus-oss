@@ -106,13 +106,18 @@ public abstract class AbstractLocalRepositoryStorage
         throws ItemNotFoundException,
             StorageException
     {
-        AbstractStorageItem item = retrieveItem( uid );
+        AbstractStorageItem item = getAttributesHandler().getAttributeStorage().getAttributes( uid );
 
-        item.setRemoteChecked( timestamp );
+        if ( item != null )
+        {
+            item.setRepositoryItemUid( uid );
+            
+            item.setRemoteChecked( timestamp );
 
-        item.setExpired( false );
+            item.setExpired( false );
 
-        getAttributesHandler().storeAttributes( item, null );
+            getAttributesHandler().getAttributeStorage().putAttribute( item );
+        }
     }
 
     public void touchItemLastRequested( RepositoryItemUid uid )
@@ -126,18 +131,23 @@ public abstract class AbstractLocalRepositoryStorage
         throws ItemNotFoundException,
             StorageException
     {
-        AbstractStorageItem item = retrieveItem( uid );
+        AbstractStorageItem item = getAttributesHandler().getAttributeStorage().getAttributes( uid );
 
-        item.setLastRequested( timestamp );
+        if ( item != null )
+        {
+            item.setRepositoryItemUid( uid );
 
-        getAttributesHandler().storeAttributes( item, null );
+            item.setLastRequested( timestamp );
+
+            getAttributesHandler().getAttributeStorage().putAttribute( item );
+        }
     }
 
     public void updateItemAttributes( AbstractStorageItem item )
         throws ItemNotFoundException,
             StorageException
     {
-        getAttributesHandler().storeAttributes( item, null );
+        getAttributesHandler().getAttributeStorage().putAttribute( item );
     }
 
     public final void deleteItem( RepositoryItemUid uid )

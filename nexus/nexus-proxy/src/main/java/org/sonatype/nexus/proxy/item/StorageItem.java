@@ -27,7 +27,6 @@ import java.util.Map;
  */
 public interface StorageItem
 {
-
     /**
      * Gets the repository item uid from where originates item.
      * 
@@ -152,4 +151,10 @@ public interface StorageItem
      */
     void overlay( StorageItem item );
 
+    /**
+     * Returns the generation of the attributes. For Nexus internal use only!
+     * 
+     * @return
+     */
+    int getGeneration();
 }

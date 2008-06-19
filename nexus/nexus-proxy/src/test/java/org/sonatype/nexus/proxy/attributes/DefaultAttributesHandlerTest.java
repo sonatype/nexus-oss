@@ -79,12 +79,12 @@ public class DefaultAttributesHandlerTest
         RepositoryItemUid uid = new RepositoryItemUid( repository, "/activemq/activemq-core/1.2/activemq-core-1.2.jar" );
 
         assertFalse( ( (DefaultAttributeStorage) attributesHandler.getAttributeStorage() )
-            .getFileFromBase( uid, false ).exists() );
+            .getFileFromBase( uid ).exists() );
 
         repository.recreateAttributes( null );
 
         assertTrue( ( (DefaultAttributeStorage) attributesHandler.getAttributeStorage() )
-            .getFileFromBase( uid, false ).exists() );
+            .getFileFromBase( uid ).exists() );
     }
 
     public void testRecreateAttrsWithCustomAttrs()
@@ -93,7 +93,7 @@ public class DefaultAttributesHandlerTest
         RepositoryItemUid uid = new RepositoryItemUid( repository, "/activemq/activemq-core/1.2/activemq-core-1.2.jar" );
 
         assertFalse( ( (DefaultAttributeStorage) attributesHandler.getAttributeStorage() )
-            .getFileFromBase( uid, false ).exists() );
+            .getFileFromBase( uid ).exists() );
 
         Map<String, String> customAttrs = new HashMap<String, String>();
         customAttrs.put( "one", "1" );
@@ -102,7 +102,7 @@ public class DefaultAttributesHandlerTest
         repository.recreateAttributes( customAttrs );
 
         assertTrue( ( (DefaultAttributeStorage) attributesHandler.getAttributeStorage() )
-            .getFileFromBase( uid, false ).exists() );
+            .getFileFromBase( uid ).exists() );
 
         AbstractStorageItem item = attributesHandler.getAttributeStorage().getAttributes( uid );
 
