@@ -1,10 +1,9 @@
 package org.sonatype.nexus.proxy;
 
-import org.codehaus.plexus.PlexusTestCase;
 import org.sonatype.nexus.proxy.cache.CacheManager;
 
 public class AbstractNexusTestEnvironment
-    extends PlexusTestCase
+    extends AbstractNexusTestCase
 {
     /** The cache manager. */
     private CacheManager cacheManager;

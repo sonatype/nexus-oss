@@ -22,7 +22,6 @@ package org.sonatype.nexus.proxy.item;
 
 import java.util.Collection;
 
-
 public class DefaultStorageCollectionItemTest
     extends AbstractStorageItemTest
 {
@@ -33,12 +32,17 @@ public class DefaultStorageCollectionItemTest
         checkAbstractStorageItem( getRepository(), coll, false, "", "/", "/" );
     }
 
-    public void testNonVirtualCollectionList() throws Exception
+    public void testNonVirtualCollectionList()
+        throws Exception
     {
-        DefaultStorageCollectionItem coll = new DefaultStorageCollectionItem( getRepository(), "/a/some/dir/coll", true, true );
+        DefaultStorageCollectionItem coll = new DefaultStorageCollectionItem(
+            getRepository(),
+            "/a/some/dir/coll",
+            true,
+            true );
         checkAbstractStorageItem( getRepository(), coll, false, "coll", "/a/some/dir/coll", "/a/some/dir" );
-        
-        Collection<StorageItem> items= coll.list();
+
+        Collection<StorageItem> items = coll.list();
         assertEquals( 3, items.size() );
     }
 
@@ -48,12 +52,17 @@ public class DefaultStorageCollectionItemTest
         checkAbstractStorageItem( getRouter(), coll, true, "", "/", "/" );
     }
 
-    public void testVirtualCollectionList() throws Exception
+    public void testVirtualCollectionList()
+        throws Exception
     {
-        DefaultStorageCollectionItem coll = new DefaultStorageCollectionItem( getRouter(), "/and/another/coll", true, true );
+        DefaultStorageCollectionItem coll = new DefaultStorageCollectionItem(
+            getRouter(),
+            "/and/another/coll",
+            true,
+            true );
         checkAbstractStorageItem( getRouter(), coll, true, "coll", "/and/another/coll", "/and/another" );
 
-        Collection<StorageItem> items= coll.list();
+        Collection<StorageItem> items = coll.list();
         assertEquals( 2, items.size() );
     }
 
