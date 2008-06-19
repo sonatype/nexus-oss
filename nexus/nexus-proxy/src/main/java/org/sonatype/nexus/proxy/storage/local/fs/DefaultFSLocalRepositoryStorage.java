@@ -234,26 +234,6 @@ public class DefaultFSLocalRepositoryStorage
         return target.exists() && target.canWrite();
     }
 
-    public void touchItem( RepositoryItemUid uid )
-        throws ItemNotFoundException,
-            StorageException
-    {
-        touchItem( uid, System.currentTimeMillis() );
-    }
-
-    public void touchItem( RepositoryItemUid uid, long timestamp )
-        throws ItemNotFoundException,
-            StorageException
-    {
-        File target = getFileFromBase( uid );
-
-        AbstractStorageItem item = retrieveItemFromFile( uid, target );
-
-        item.setLastTouched( timestamp );
-
-        getAttributesHandler().storeAttributes( item, null );
-    }
-
     public boolean containsItem( RepositoryItemUid uid )
         throws StorageException
     {
@@ -285,8 +265,11 @@ public class DefaultFSLocalRepositoryStorage
         throws UnsupportedStorageOperationException,
             StorageException
     {
+        // set some sanity stuff
         item.setStoredLocally( System.currentTimeMillis() );
-        item.setLastTouched( item.getStoredLocally() );
+        item.setRemoteChecked( item.getStoredLocally() );
+        item.setExpired( false );
+
         File target = null;
         if ( StorageFileItem.class.isAssignableFrom( item.getClass() ) )
         {

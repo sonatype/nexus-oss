@@ -285,7 +285,7 @@ public abstract class AbstractRepository
                 {
                     getLogger().debug( "We have a !shouldProxy() -> shouldProxy() transition, purging NFC" );
                 }
-                
+
                 getNotFoundCache().purge();
             }
         }
@@ -527,8 +527,10 @@ public abstract class AbstractRepository
                 // expiring found files
                 try
                 {
-                    // set this "very old", but not 0!!!
-                    getLocalStorage().touchItem( item.getRepositoryItemUid(), AbstractStorageItem.EXPIRED_TS );
+                    // expire it
+                    ( (AbstractStorageItem) item ).setExpired( true );
+
+                    getLocalStorage().updateItemAttributes( (AbstractStorageItem) item );
                 }
                 catch ( ItemNotFoundException e )
                 {
@@ -558,7 +560,7 @@ public abstract class AbstractRepository
                 // expiring found files
                 try
                 {
-                    if ( item.getLastTouched() < timestamp )
+                    if ( item.getLastRequested() < timestamp )
                     {
                         deleteItem( item.getRepositoryItemUid() );
                     }
@@ -691,6 +693,8 @@ public abstract class AbstractRepository
 
         notifyProximityEventListeners( new RepositoryItemEventRetrieve( item.getRepositoryItemUid(), item
             .getItemContext() ) );
+
+        getLocalStorage().touchItemLastRequested( uid );
 
         return item;
     }

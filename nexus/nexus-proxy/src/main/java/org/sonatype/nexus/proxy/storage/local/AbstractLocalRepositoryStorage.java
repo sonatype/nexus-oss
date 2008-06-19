@@ -27,6 +27,7 @@ import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.LoggingComponent;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.attributes.AttributesHandler;
+import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.proxy.wastebasket.Wastebasket;
@@ -92,6 +93,51 @@ public abstract class AbstractLocalRepositoryStorage
     public void setAttributesHandler( AttributesHandler attributesHandler )
     {
         this.attributesHandler = attributesHandler;
+    }
+
+    public void touchItemRemoteChecked( RepositoryItemUid uid )
+        throws ItemNotFoundException,
+            StorageException
+    {
+        touchItemRemoteChecked( uid, System.currentTimeMillis() );
+    }
+
+    public void touchItemRemoteChecked( RepositoryItemUid uid, long timestamp )
+        throws ItemNotFoundException,
+            StorageException
+    {
+        AbstractStorageItem item = retrieveItem( uid );
+
+        item.setRemoteChecked( timestamp );
+
+        item.setExpired( false );
+
+        getAttributesHandler().storeAttributes( item, null );
+    }
+
+    public void touchItemLastRequested( RepositoryItemUid uid )
+        throws ItemNotFoundException,
+            StorageException
+    {
+        touchItemLastRequested( uid, System.currentTimeMillis() );
+    }
+
+    public void touchItemLastRequested( RepositoryItemUid uid, long timestamp )
+        throws ItemNotFoundException,
+            StorageException
+    {
+        AbstractStorageItem item = retrieveItem( uid );
+
+        item.setLastRequested( timestamp );
+
+        getAttributesHandler().storeAttributes( item, null );
+    }
+
+    public void updateItemAttributes( AbstractStorageItem item )
+        throws ItemNotFoundException,
+            StorageException
+    {
+        getAttributesHandler().storeAttributes( item, null );
     }
 
     public final void deleteItem( RepositoryItemUid uid )

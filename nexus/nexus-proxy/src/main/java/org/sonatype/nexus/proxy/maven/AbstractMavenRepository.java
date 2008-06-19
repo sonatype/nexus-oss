@@ -382,7 +382,7 @@ public abstract class AbstractMavenRepository
         throws ItemNotFoundException,
             StorageException
     {
-        if ( tried == getRemoteStorageContext().getRemoteConnectionSettings().getRetrievalRetryCount() )
+        if ( tried == 1 )
         {
             if ( ChecksumPolicy.STRICT.equals( getChecksumPolicy() )
                 || ChecksumPolicy.STRICT_IF_EXISTS.equals( getChecksumPolicy() ) )
@@ -479,6 +479,10 @@ public abstract class AbstractMavenRepository
 
                 return result;
             }
+            else
+            {
+                return result;
+            }
         }
         // this is not a checksum for sure (see doRetrieveItem in this class), hence go remote as should
         // but use remote maven repo checksum to verify transport success
@@ -499,6 +503,8 @@ public abstract class AbstractMavenRepository
                 hashUid = new RepositoryItemUid( uid.getRepository(), uid.getPath() + ".sha1" );
 
                 hashItem = (DefaultStorageFileItem) doRetrieveRemoteItem( hashUid, context );
+
+                getLocalStorage().touchItemRemoteChecked( hashUid );
             }
             catch ( ItemNotFoundException esha1 )
             {
@@ -509,6 +515,8 @@ public abstract class AbstractMavenRepository
                     hashUid = new RepositoryItemUid( uid.getRepository(), uid.getPath() + ".md5" );
 
                     hashItem = (DefaultStorageFileItem) doRetrieveRemoteItem( hashUid, context );
+
+                    getLocalStorage().touchItemRemoteChecked( hashUid );
                 }
                 catch ( ItemNotFoundException emd5 )
                 {
@@ -616,6 +624,27 @@ public abstract class AbstractMavenRepository
         else
         {
             return result;
+        }
+    }
+
+    protected void markItemRemotelyChecked( RepositoryItemUid uid )
+        throws StorageException,
+            ItemNotFoundException
+    {
+        super.markItemRemotelyChecked( uid );
+
+        RepositoryItemUid sha1Uid = new RepositoryItemUid( uid.getRepository(), uid.getPath() + ".sha1" );
+
+        if ( getLocalStorage().containsItem( sha1Uid ) )
+        {
+            super.markItemRemotelyChecked( sha1Uid );
+        }
+
+        RepositoryItemUid md5Uid = new RepositoryItemUid( uid.getRepository(), uid.getPath() + ".md5" );
+
+        if ( getLocalStorage().containsItem( md5Uid ) )
+        {
+            super.markItemRemotelyChecked( md5Uid );
         }
     }
 

@@ -81,7 +81,7 @@ public interface LocalRepositoryStorage
      * @param uid the uid
      * @throws StorageException the storage exception
      */
-    void touchItem( RepositoryItemUid uid )
+    void touchItemRemoteChecked( RepositoryItemUid uid )
         throws ItemNotFoundException,
             StorageException;
 
@@ -92,7 +92,28 @@ public interface LocalRepositoryStorage
      * @param timestamp the ts to set on file, 0 to "expire" it
      * @throws StorageException the storage exception
      */
-    void touchItem( RepositoryItemUid uid, long timestamp )
+    void touchItemRemoteChecked( RepositoryItemUid uid, long timestamp )
+        throws ItemNotFoundException,
+            StorageException;
+
+    /**
+     * Touch item last requested and sets on it the current time.
+     * 
+     * @param uid the uid
+     * @throws StorageException the storage exception
+     */
+    void touchItemLastRequested( RepositoryItemUid uid )
+        throws ItemNotFoundException,
+            StorageException;
+
+    /**
+     * Touch item last requested and sets on it the given timestamp.
+     * 
+     * @param uid the uid
+     * @param timestamp the ts to set on file, 0 to "expire" it
+     * @throws StorageException the storage exception
+     */
+    void touchItemLastRequested( RepositoryItemUid uid, long timestamp )
         throws ItemNotFoundException,
             StorageException;
 
@@ -139,6 +160,16 @@ public interface LocalRepositoryStorage
      */
     void storeItem( AbstractStorageItem item )
         throws UnsupportedStorageOperationException,
+            StorageException;
+
+    /**
+     * Update item attributes, does not modify the content of it.
+     * 
+     * @param item the item
+     * @throws StorageException the storage exception
+     */
+    void updateItemAttributes( AbstractStorageItem item )
+        throws ItemNotFoundException,
             StorageException;
 
     /**

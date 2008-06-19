@@ -68,7 +68,14 @@ public interface StorageItem
      * 
      * @return the remote checked
      */
-    long getLastTouched();
+    long getRemoteChecked();
+
+    /**
+     * Gets the last requested.
+     * 
+     * @return time when it was last served
+     */
+    long getLastRequested();
 
     /**
      * Checks if is virtual.

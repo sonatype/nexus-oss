@@ -93,9 +93,10 @@ public abstract class DefaultRepository
                     getLogger().debug( "Item " + uid.toString() + " found in local storage." );
                 }
                 // this "self correction" is needed to nexus build for himself the needed metadata
-                if ( localItem.getLastTouched() == 0 )
+                if ( localItem.getRemoteChecked() == 0 )
                 {
-                    getLocalStorage().touchItem( localItem.getRepositoryItemUid() );
+                    markItemRemotelyChecked( localItem.getRepositoryItemUid() );
+
                     localItem = getLocalStorage().retrieveItem( uid );
                 }
             }
@@ -136,7 +137,7 @@ public abstract class DefaultRepository
                         if ( !shouldGetRemote )
                         {
                             // remote file unchanged, touch the local one to renew it's Age
-                            getLocalStorage().touchItem( localItem.getRepositoryItemUid() );
+                            markItemRemotelyChecked( localItem.getRepositoryItemUid() );
                         }
                     }
                     else
@@ -176,9 +177,9 @@ public abstract class DefaultRepository
                                 + getId()
                                 + " throws StorageException. Are we online? Is storage properly set up? Setting ProxyMode of this repository to BlockedAuto. MANUAL INTERVENTION NEEDED.",
                             ex );
-                    
+
                     autoBlockProxying( ex );
-                    
+
                     remoteItem = null;
                 }
             }
@@ -239,6 +240,13 @@ public abstract class DefaultRepository
             }
         }
         return item;
+    }
+
+    protected void markItemRemotelyChecked( RepositoryItemUid uid )
+        throws StorageException,
+            ItemNotFoundException
+    {
+        getLocalStorage().touchItemRemoteChecked( uid );
     }
 
     protected AbstractStorageItem doRetrieveRemoteItem( RepositoryItemUid uid, Map<String, Object> context )
@@ -364,7 +372,7 @@ public abstract class DefaultRepository
         // else check age
         else
         {
-            return ( ( System.currentTimeMillis() - item.getLastTouched() ) > ( maxAge * 60 * 1000 ) );
+            return ( ( System.currentTimeMillis() - item.getRemoteChecked() ) > ( maxAge * 60 * 1000 ) );
         }
     }
 

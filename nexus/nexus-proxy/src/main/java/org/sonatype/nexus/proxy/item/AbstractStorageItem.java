@@ -31,20 +31,19 @@ import org.sonatype.nexus.proxy.router.RepositoryRouter;
 
 /**
  * The Class AbstractStorageItem.
+ * 
+ * @author cstamas
  */
 public abstract class AbstractStorageItem
     implements StorageItem
 {
-    
-    public static final long EXPIRED_TS = 1;
-
     /** The repository item uid. */
     private transient RepositoryItemUid repositoryItemUid;
 
     /** The store. */
     private transient ResourceStore store;
 
-    /** The context. */
+    /** The trasient context. */
     private transient Map<String, Object> context;
 
     /** The path. */
@@ -68,13 +67,20 @@ public abstract class AbstractStorageItem
     /** The stored locally. */
     private long storedLocally;
 
-    /** The last touched. */
+    /** The last remoteCheck timestamp. */
+    // TODO: leave the field name as-is coz of persistence and old nexuses!
     private long lastTouched;
+
+    /** The last requested timestamp. */
+    private long lastRequested;
+
+    /** Expired flag */
+    private boolean expired;
 
     /** The remote url. */
     private String remoteUrl;
 
-    /** The attributes. */
+    /** The persisted attributes. */
     private Map<String, String> attributes;
 
     /**
@@ -90,10 +96,9 @@ public abstract class AbstractStorageItem
         setPath( path );
         this.readable = readable;
         this.writable = writable;
+        this.expired = false;
         this.created = System.currentTimeMillis();
         this.modified = this.created;
-        this.attributes = new HashMap<String, String>();
-        this.context = new HashMap<String, Object>();
     }
 
     /**
@@ -153,21 +158,11 @@ public abstract class AbstractStorageItem
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.sonatype.nexus.item.StorageItem#getRepositoryItemUid()
-     */
     public RepositoryItemUid getRepositoryItemUid()
     {
         return repositoryItemUid;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.sonatype.nexus.item.StorageItem#getRepositoryId()
-     */
     public String getRepositoryId()
     {
         return repositoryId;
@@ -183,11 +178,6 @@ public abstract class AbstractStorageItem
         this.repositoryId = repositoryId;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.sonatype.nexus.item.StorageItem#getCreated()
-     */
     public long getCreated()
     {
         return created;
@@ -203,11 +193,6 @@ public abstract class AbstractStorageItem
         this.created = created;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.sonatype.nexus.item.StorageItem#getModified()
-     */
     public long getModified()
     {
         return modified;
@@ -223,11 +208,6 @@ public abstract class AbstractStorageItem
         this.modified = modified;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.sonatype.nexus.item.StorageItem#isReadable()
-     */
     public boolean isReadable()
     {
         return readable;
@@ -243,11 +223,6 @@ public abstract class AbstractStorageItem
         this.readable = readable;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.sonatype.nexus.item.StorageItem#isWritable()
-     */
     public boolean isWritable()
     {
         return writable;
@@ -263,11 +238,6 @@ public abstract class AbstractStorageItem
         this.writable = writable;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.sonatype.nexus.item.StorageItem#getPath()
-     */
     public String getPath()
     {
         return path;
@@ -294,27 +264,27 @@ public abstract class AbstractStorageItem
             this.path = path;
         }
     }
-    
+
     public boolean isExpired()
     {
-        return getLastTouched() == EXPIRED_TS;
+        return expired;
     }
 
-    /*
-     * (non-Javadoc)
+    /**
+     * Sets the expired flag.
      * 
-     * @see org.sonatype.nexus.item.StorageItem#getName()
+     * @param expired
      */
+    public void setExpired( boolean expired )
+    {
+        this.expired = expired;
+    }
+
     public String getName()
     {
         return new File( getPath() ).getName();
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.sonatype.nexus.item.StorageItem#getParentPath()
-     */
     public String getParentPath()
     {
         String parent = getPath().substring( 0, getPath().lastIndexOf( "/" ) );
@@ -326,51 +296,31 @@ public abstract class AbstractStorageItem
         return parent;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.sonatype.nexus.item.StorageItem#getAttributes()
-     */
     public Map<String, String> getAttributes()
     {
+        if ( attributes == null )
+        {
+            attributes = new HashMap<String, String>();
+        }
+
         return attributes;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.sonatype.nexus.item.StorageItem#getItemContext()
-     */
     public Map<String, Object> getItemContext()
     {
+        if ( context == null )
+        {
+            context = new HashMap<String, Object>();
+        }
+
         return context;
     }
 
-    /**
-     * Sets the attributes.
-     * 
-     * @param attributes the attributes
-     */
-    public void setAttributes( Map<String, String> attributes )
-    {
-        this.attributes = attributes;
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.sonatype.nexus.item.StorageItem#isVirtual()
-     */
     public boolean isVirtual()
     {
         return getRepositoryItemUid() == null;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.sonatype.nexus.item.StorageItem#getRemoteUrl()
-     */
     public String getRemoteUrl()
     {
         return remoteUrl;
@@ -386,11 +336,6 @@ public abstract class AbstractStorageItem
         this.remoteUrl = remoteUrl;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.sonatype.nexus.item.StorageItem#getStoredLocally()
-     */
     public long getStoredLocally()
     {
         return storedLocally;
@@ -406,12 +351,7 @@ public abstract class AbstractStorageItem
         this.storedLocally = storedLocally;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.sonatype.nexus.proxy.item.StorageItem#getRemoteChecked()
-     */
-    public long getLastTouched()
+    public long getRemoteChecked()
     {
         return lastTouched;
     }
@@ -421,9 +361,24 @@ public abstract class AbstractStorageItem
      * 
      * @param remoteChecked the new remote checked
      */
-    public void setLastTouched( long lastTouched )
+    public void setRemoteChecked( long lastTouched )
     {
         this.lastTouched = lastTouched;
+    }
+
+    public long getLastRequested()
+    {
+        return lastRequested;
+    }
+
+    /**
+     * Sets the last requested timestamp.
+     * 
+     * @param lastRequested
+     */
+    public void setLastRequested( long lastRequested )
+    {
+        this.lastRequested = lastRequested;
     }
 
     public void overlay( StorageItem item )
@@ -433,11 +388,14 @@ public abstract class AbstractStorageItem
         {
             setRepositoryId( item.getRepositoryId() );
             setStoredLocally( item.getStoredLocally() );
-            setLastTouched( item.getLastTouched() );
+            setRemoteChecked( item.getRemoteChecked() );
+            setLastRequested( item.getLastRequested() );
+            setExpired( item.isExpired() );
             setRemoteUrl( item.getRemoteUrl() );
             setCreated( item.getCreated() );
             setModified( item.getModified() );
             getAttributes().putAll( item.getAttributes() );
+            getItemContext().putAll( item.getItemContext() );
         }
         else
         {

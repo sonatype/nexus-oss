@@ -256,8 +256,8 @@ public class M2GroupIdBasedRepositoryRouter
                 item.isWritable(),
                 new PreparedContentLocator( spoofedContent ) );
             result.getItemContext().putAll( request.getRequestContext() );
+            result.getAttributes().putAll( item.getAttributes() );
             result.setLength( spoofedLength );
-            result.setAttributes( item.getAttributes() );
             result.setCreated( System.currentTimeMillis() );
             result.setModified( result.getCreated() );
             result.setMimeType( item.getMimeType() );

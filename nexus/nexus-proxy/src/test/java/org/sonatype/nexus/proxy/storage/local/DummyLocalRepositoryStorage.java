@@ -72,13 +72,6 @@ public class DummyLocalRepositoryStorage
         return null;
     }
 
-    public AbstractStorageItem lookupItem( RepositoryItemUid uid )
-        throws StorageException
-    {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
     public AbstractStorageItem retrieveItem( RepositoryItemUid uid )
         throws ItemNotFoundException,
             StorageException
@@ -102,20 +95,6 @@ public class DummyLocalRepositoryStorage
 
     }
 
-    public boolean isShared()
-    {
-        return true;
-    }
-
-    public void setShared( boolean shared )
-    {
-    }
-
-    public void touchItem( RepositoryItemUid uid )
-        throws StorageException
-    {
-    }
-
     public URL getAbsoluteUrlFromBase( RepositoryItemUid uid )
     {
         // TODO Auto-generated method stub
@@ -128,17 +107,49 @@ public class DummyLocalRepositoryStorage
         return false;
     }
 
-    public void touchItem( RepositoryItemUid uid, long timestamp )
+    public void shredItem( RepositoryItemUid uid )
+        throws ItemNotFoundException,
+            UnsupportedStorageOperationException,
+            StorageException
+    {
+        // TODO Auto-generated method stub
+        
+    }
+
+    public void updateItemAttributes( AbstractStorageItem item )
         throws ItemNotFoundException,
             StorageException
     {
         // TODO Auto-generated method stub
-
+        
     }
 
-    public void shredItem( RepositoryItemUid uid )
+    public void touchItemRemoteChecked( RepositoryItemUid uid )
         throws ItemNotFoundException,
-            UnsupportedStorageOperationException,
+            StorageException
+    {
+        // TODO Auto-generated method stub
+        
+    }
+
+    public void touchItemRemoteChecked( RepositoryItemUid uid, long timestamp )
+        throws ItemNotFoundException,
+            StorageException
+    {
+        // TODO Auto-generated method stub
+        
+    }
+
+    public void touchItemLastRequested( RepositoryItemUid uid )
+        throws ItemNotFoundException,
+            StorageException
+    {
+        // TODO Auto-generated method stub
+        
+    }
+
+    public void touchItemLastRequested( RepositoryItemUid uid, long timestamp )
+        throws ItemNotFoundException,
             StorageException
     {
         // TODO Auto-generated method stub

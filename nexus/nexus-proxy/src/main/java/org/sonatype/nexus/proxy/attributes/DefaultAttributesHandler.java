@@ -154,7 +154,7 @@ public class DefaultAttributesHandler
         else
         {
             // we are fixing md if we can
-            
+
             InputStream is = null;
 
             if ( StorageFileItem.class.isAssignableFrom( item.getClass() ) )
@@ -180,9 +180,23 @@ public class DefaultAttributesHandler
     {
         if ( inputStream != null )
         {
+            // resetting some important values
+            if ( item.getRemoteChecked() == 0 )
+            {
+                item.setRemoteChecked( System.currentTimeMillis() );
+            }
+
+            if ( item.getLastRequested() == 0 )
+            {
+                item.setLastRequested( item.getRemoteChecked() );
+            }
+
+            item.setExpired( false );
+
+            // resetting the pluggable attributes
             expandCustomItemAttributes( item, inputStream );
         }
-        
+
         getAttributeStorage().putAttribute( item );
     }
 

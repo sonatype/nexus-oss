@@ -170,16 +170,8 @@ public abstract class StoreWalker
             {
                 if ( logger != null )
                 {
-                    if ( !logger.isDebugEnabled() )
-                    {
-                        logger.warn( "Walking on " + store.getId()
-                            + " store threw an exception with message (in DEBUG mode the Stack trace is available): "
-                            + e.getMessage() );
-                    }
-                    else
-                    {
-                        logger.debug( "Walking on " + store.getId() + " store threw an exception: ", e );
-                    }
+                    logger.warn( "Walking on " + store.getId() + " store threw an exception " + e.getClass().getName()
+                        + " with message (in DEBUG mode the Stack trace is available): " + e.getMessage(), e );
                 }
 
                 stop();
@@ -189,7 +181,7 @@ public abstract class StoreWalker
         if ( running )
         {
             afterWalk();
-            
+
             if ( logger != null )
             {
                 logger.info( "Finished walking on " + store.getId() + " Store with " + Integer.toString( collCount )
