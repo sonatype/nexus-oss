@@ -1595,6 +1595,10 @@ Ext.extend(Sonatype.repoServer.RepoEditPanel, Sonatype.repoServer.AbstractRepoPa
   
   repoRowClick : function(grid, rowIndex, e){
     var rec = grid.store.getAt(rowIndex);
+    this.viewRepo( rec );
+  },
+    
+  viewRepo: function( rec ) {
     var id = rec.id; //note: rec.id is unique for new repos and equal to resourceURI for existing ones
     var formPanel = this.formCards.findById(id);
     

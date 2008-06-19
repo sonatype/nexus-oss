@@ -46,6 +46,13 @@ Ext.extend(Sonatype.repoServer.AbstractRepoPanel, Ext.Panel, {
   hasSelection: function() {
     return this.ctxRecord || this.reposGridPanel.getSelectionModel().hasSelection();
   },
+
+  viewHandler : function(){
+    if (this.ctxRecord || this.reposGridPanel.getSelectionModel().hasSelection()){
+      var rec = (this.ctxRecord) ? this.ctxRecord : this.reposGridPanel.getSelectionModel().getSelected();
+      this.viewRepo(rec);
+    }
+  },
   
   clearCacheHandler : function(){
     if (this.ctxBrowseNode || this.hasSelection()){

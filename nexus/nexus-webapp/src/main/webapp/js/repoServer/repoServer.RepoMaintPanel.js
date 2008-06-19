@@ -609,13 +609,6 @@ Ext.extend(Sonatype.repoServer.RepoMaintPanel, Sonatype.repoServer.AbstractRepoP
     this.viewRepo(rec);
   },
   
-  viewHandler : function(){
-    if (this.ctxRecord || this.reposGridPanel.getSelectionModel().hasSelection()){
-      var rec = (this.ctxRecord) ? this.ctxRecord : this.reposGridPanel.getSelectionModel().getSelected();
-      this.viewRepo(rec);
-    }
-  },
-  
   //rec is grid store record
   viewRepo : function(rec){
     //change in behavior.  Always load a new detail view until we work out all the cache
