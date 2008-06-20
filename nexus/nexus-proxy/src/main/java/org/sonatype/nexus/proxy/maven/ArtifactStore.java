@@ -34,7 +34,9 @@ import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 
 /**
- * A specialized store for Maven Artifacts.
+ * A specialized store for Maven Artifacts. This "face" if completely "maven aware", that means that doing operations
+ * over this interface will maintain maven repo metadata too. This offers the "logical" view in contrary to the
+ * Reposiory which offers the "low level" (file based) view on the same content.
  * 
  * @author cstamas
  */

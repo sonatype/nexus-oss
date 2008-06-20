@@ -226,6 +226,11 @@ public abstract class StoreWalker
             NoSuchResourceStoreException,
             StorageException
     {
+        if ( !shouldProcess( coll ) )
+        {
+            return collCount;
+        }
+
         if ( !running )
         {
             return collCount;
@@ -292,6 +297,11 @@ public abstract class StoreWalker
         onCollectionExit( coll );
 
         return collCount;
+    }
+
+    protected boolean shouldProcess( StorageCollectionItem coll )
+    {
+        return true;
     }
 
     protected void beforeWalk()

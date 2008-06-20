@@ -21,7 +21,6 @@
 package org.sonatype.nexus.proxy.repository;
 
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -552,82 +551,14 @@ public abstract class AbstractRepository
 
     public Collection<String> evictUnusedItems( final long timestamp )
     {
-        final ArrayList<String> files = new ArrayList<String>();
-
-        // construct an imperial walker to do the job
-        StoreFileWalker walker = new StoreFileWalker( this, getLogger() )
-        {
-            @Override
-            protected void processFileItem( StorageFileItem item )
-            {
-                // expiring found files
-                try
-                {
-                    if ( item.getLastRequested() < timestamp )
-                    {
-                        deleteItem( item.getRepositoryItemUid() );
-
-                        files.add( item.getPath() );
-                    }
-                }
-                catch ( RepositoryNotAvailableException e )
-                {
-                    // simply stop if set during processing
-                    stop( e );
-                }
-                catch ( UnsupportedStorageOperationException e )
-                {
-                    // if op not supported (R/O repo?)
-                    stop( e );
-                }
-                catch ( ItemNotFoundException e )
-                {
-                    // will not happen
-                }
-                catch ( StorageException e )
-                {
-                    logger.warn( "Got storage exception while evicting " + item.getRepositoryItemUid().toString(), e );
-                }
-            }
-
-            @Override
-            protected void onCollectionExit( StorageCollectionItem coll )
-            {
-                // expiring now empty directories
-                try
-                {
-                    if ( ( (Repository) getResourceStore() ).list( coll ).size() == 0 )
-                    {
-                        deleteItem( coll.getRepositoryItemUid() );
-                    }
-                }
-                catch ( RepositoryNotAvailableException e )
-                {
-                    // simply stop if set during processing
-                    stop( e );
-                }
-                catch ( UnsupportedStorageOperationException e )
-                {
-                    // if op not supported (R/O repo?)
-                    stop( e );
-                }
-                catch ( ItemNotFoundException e )
-                {
-                    // will not happen
-                }
-                catch ( StorageException e )
-                {
-                    stop( e );
-                }
-            }
-        };
+        EvictUnusedItemsWalker walker = new EvictUnusedItemsWalker(this, getLogger(), timestamp);
 
         // and let it loose
         walker.walk( RepositoryItemUid.PATH_ROOT, true, false );
 
         notifyProximityEventListeners( new RepositoryEventEvictUnusedItems( this ) );
 
-        return files;
+        return walker.getFiles();
     }
 
     public boolean recreateAttributes( final Map<String, String> initialData )

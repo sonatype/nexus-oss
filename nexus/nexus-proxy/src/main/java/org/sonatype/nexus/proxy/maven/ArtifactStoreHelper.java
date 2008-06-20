@@ -378,7 +378,7 @@ public class ArtifactStoreHelper
 
             deleteWithChecksums( gavRequest );
         }
-/*
+
         // and others
         if ( deleteWholeGav )
         {
@@ -391,7 +391,7 @@ public class ArtifactStoreHelper
 
             StorageCollectionItem parentColl = (StorageCollectionItem) repository.retrieveItem( true, parentCollUid );
 
-            Collection<StorageItem> items = parentColl.list();
+            Collection<StorageItem> items = repository.list( parentColl );
 
             boolean hadSubdirectory = false;
 
@@ -420,8 +420,6 @@ public class ArtifactStoreHelper
                 // delete all classifiers
             }
         }
-*/
-        // TODO: m2 metadata maintenance?
     }
 
     public Collection<Gav> listArtifacts( ArtifactStoreRequest gavRequest )

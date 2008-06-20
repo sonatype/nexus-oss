@@ -303,14 +303,8 @@ public class DefaultSnapshotRemover
                         ArtifactStoreRequest req = new ArtifactStoreRequest( gavToRemove.getGroupId(), gavToRemove
                             .getArtifactId(), gavToRemove.getVersion() );
 
-                        // remove the whole GAV and all of it subsidiaries
+                        // remove the whole GAV
                         repository.deleteArtifact( req, true, true );
-
-                        if ( repository.list( coll ).size() == 0 )
-                        {
-                            // remove the whole version directory
-                            repository.deleteItem( coll.getRepositoryItemUid() );
-                        }
                     }
                     catch ( Exception e )
                     {
@@ -361,7 +355,7 @@ public class DefaultSnapshotRemover
                                 ArtifactStoreRequest req = new ArtifactStoreRequest( gav.getGroupId(), gav
                                     .getArtifactId(), gav.getVersion() );
 
-                                // delete the artifact only with all subsidiaries (like sources et al)
+                                // delete the artifact only with all subordinates (like sources et al)
                                 repository.deleteArtifact( req, true, false );
 
                                 deletedFiles++;

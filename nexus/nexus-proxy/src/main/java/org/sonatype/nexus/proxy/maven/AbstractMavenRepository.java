@@ -38,6 +38,7 @@ import org.sonatype.nexus.proxy.NoSuchResourceStoreException;
 import org.sonatype.nexus.proxy.RepositoryNotAvailableException;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.attributes.inspectors.DigestCalculatingInspector;
+import org.sonatype.nexus.proxy.events.RepositoryEventEvictUnusedItems;
 import org.sonatype.nexus.proxy.events.RepositoryEventRecreateAttributes;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
@@ -97,6 +98,18 @@ public abstract class AbstractMavenRepository
      * ArtifactStoreHelper.
      */
     private ArtifactStoreHelper artifactStoreHelper;
+
+    public Collection<String> evictUnusedItems( final long timestamp )
+    {
+        EvictUnusedMavenItemsWalker walker = new EvictUnusedMavenItemsWalker( this, getLogger(), timestamp );
+
+        // and let it loose
+        walker.walk( RepositoryItemUid.PATH_ROOT, true, false );
+
+        notifyProximityEventListeners( new RepositoryEventEvictUnusedItems( this ) );
+
+        return walker.getFiles();
+    }
 
     public boolean recreateAttributes( final Map<String, String> initialData )
     {
