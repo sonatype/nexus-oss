@@ -32,6 +32,7 @@ import org.apache.commons.httpclient.HostConfiguration;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.httpclient.HttpMethod;
+import org.apache.commons.httpclient.HttpMethodBase;
 import org.apache.commons.httpclient.HttpMethodRetryHandler;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
@@ -81,14 +82,44 @@ public class CommonsHttpClientRemoteStorage
     public boolean containsItem( RepositoryItemUid uid, long newerThen )
         throws StorageException
     {
-        HeadMethod head = new HeadMethod( getAbsoluteUrlFromBase( uid ).toString() );
+        HttpMethodBase method = new HeadMethod( getAbsoluteUrlFromBase( uid ).toString() );
 
-        int response = executeMethod( uid, head );
+        int response = HttpStatus.SC_BAD_REQUEST;
+        
+        boolean doGet = false;
+        
+        try
+        {
+            response = executeMethod( uid, method );
+        }
+        catch ( StorageException e )
+        {
+            //If HEAD failed, attempt a GET.  Some repos may not support HEAD method
+            doGet = true;
+            getLogger().warn( "HEAD method threw Exception, will attempt GET", e );
+        }
+        finally
+        {
+            //HEAD returned error, but not exception, try GET before failing
+            if ( doGet == false
+                && response != HttpStatus.SC_OK )
+            {
+                doGet = true;
+                getLogger().warn( "HEAD method failed, will attempt GET.  Status: " + response );
+            }
+        }
+        
+        if ( doGet )
+        {
+            method = new GetMethod( getAbsoluteUrlFromBase( uid ).toString() );
+            
+            response = executeMethod( uid, method );
+        }
 
         if ( response == HttpStatus.SC_OK )
         {
             // we have newer if this below is true
-            return makeDateFromHeader( head.getResponseHeader( "last-modified" ) ) > newerThen;
+            return makeDateFromHeader( method.getResponseHeader( "last-modified" ) ) > newerThen;
         }
         else if ( ( response >= HttpStatus.SC_MULTIPLE_CHOICES && response < HttpStatus.SC_BAD_REQUEST )
             || response == HttpStatus.SC_NOT_FOUND )
@@ -97,7 +128,7 @@ public class CommonsHttpClientRemoteStorage
         }
         else
         {
-            throw new StorageException( "The response to HTTP HEAD was unexpected HTTP Code " + response + " : "
+            throw new StorageException( "The response to HTTP " + method.getName() + " was unexpected HTTP Code " + response + " : "
                 + HttpStatus.getStatusText( response ) );
         }
     }

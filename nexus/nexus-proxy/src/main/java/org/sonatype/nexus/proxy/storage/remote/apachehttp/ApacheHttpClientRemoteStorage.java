@@ -107,8 +107,17 @@ public class ApacheHttpClientRemoteStorage
             HttpHead head = new HttpHead( targetUrl.getPath() );
 
             HttpResponse response = executeMethod( uid.getRepository(), target, head );
+            
+            //In case the remote repository doesn't support the HEAD method, we will attempt
+            //a GET
+            if ( HttpStatus.SC_OK != response.getStatusLine().getStatusCode() )
+            {
+                HttpGet get = new HttpGet( targetUrl.getPath() );
+                
+                response = executeMethod( uid.getRepository(), target, get );
+            }
 
-            return response.getStatusLine().getStatusCode() == HttpStatus.SC_OK
+            return HttpStatus.SC_OK == response.getStatusLine().getStatusCode()
                 && makeDateFromHeader( response.getFirstHeader( "last-modified" ) ) > newerThen;
         }
         catch ( URISyntaxException e )
