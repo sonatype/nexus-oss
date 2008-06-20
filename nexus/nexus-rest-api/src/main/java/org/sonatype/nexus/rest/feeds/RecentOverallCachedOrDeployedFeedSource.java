@@ -48,7 +48,7 @@ public class RecentOverallCachedOrDeployedFeedSource
     @Override
     public String getDescription()
     {
-        return "Recently cached or deployed (new) artifacts in all Nexus repositories.";
+        return "New artifacts in all Nexus repositories (cached or deployed).";
     }
 
     @Override
@@ -60,7 +60,7 @@ public class RecentOverallCachedOrDeployedFeedSource
     @Override
     public String getTitle()
     {
-        return "Nexus Repository Recent Changes";
+        return "New artifacts";
     }
 
 }

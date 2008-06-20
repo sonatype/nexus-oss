@@ -59,7 +59,7 @@ public class SystemFeedSource
     @Override
     public String getTitle()
     {
-        return "Nexus System Changes";
+        return "System changes";
     }
 
 }

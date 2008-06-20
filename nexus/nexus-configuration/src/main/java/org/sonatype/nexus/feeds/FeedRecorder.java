@@ -74,6 +74,11 @@ public interface FeedRecorder
     /**
      * System event action: repository proxy status auto change
      */
+    public static final String SYSTEM_REPO_PSTATUS_CHANGES_ACTION = "REPO_PSTATUS_CHANGES";
+    
+    /**
+     * System event action: repository proxy status auto change
+     */
     public static final String SYSTEM_REPO_PSTATUS_AUTO_CHANGES_ACTION = "REPO_PSTATUS_AUTO_CHANGES";
 
     /**

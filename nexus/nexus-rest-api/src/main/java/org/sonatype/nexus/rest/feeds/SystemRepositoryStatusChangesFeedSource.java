@@ -59,7 +59,7 @@ public class SystemRepositoryStatusChangesFeedSource
     @Override
     public String getTitle()
     {
-        return "Nexus Repository Status Changes";
+        return "Repository Status Changes";
     }
 
 }

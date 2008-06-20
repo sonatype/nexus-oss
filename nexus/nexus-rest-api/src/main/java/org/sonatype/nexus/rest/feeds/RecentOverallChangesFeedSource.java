@@ -48,7 +48,7 @@ public class RecentOverallChangesFeedSource
     @Override
     public String getDescription()
     {
-        return "Recent overall changes (caches, deployments, deletions) in all Nexus repositories.";
+        return "Recent storage changes in all Nexus repositories (caches, deployments, deletions).";
     }
 
     @Override
@@ -60,7 +60,7 @@ public class RecentOverallChangesFeedSource
     @Override
     public String getTitle()
     {
-        return "Nexus Repository Recent Changes";
+        return "Recent storage changes";
     }
 
 }

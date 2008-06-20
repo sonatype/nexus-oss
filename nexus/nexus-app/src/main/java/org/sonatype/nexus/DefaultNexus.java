@@ -76,6 +76,7 @@ import org.sonatype.nexus.proxy.events.AbstractEvent;
 import org.sonatype.nexus.proxy.events.EventListener;
 import org.sonatype.nexus.proxy.events.RepositoryEventLocalStatusChanged;
 import org.sonatype.nexus.proxy.events.RepositoryEventProxyModeBlockedAutomatically;
+import org.sonatype.nexus.proxy.events.RepositoryEventProxyModeChanged;
 import org.sonatype.nexus.proxy.events.RepositoryItemEvent;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventCache;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventDelete;
@@ -1051,6 +1052,7 @@ public class DefaultNexus
     {
         return feedRecorder.getSystemEvents( new HashSet<String>( Arrays.asList( new String[] {
             FeedRecorder.SYSTEM_REPO_LSTATUS_CHANGES_ACTION,
+            FeedRecorder.SYSTEM_REPO_PSTATUS_CHANGES_ACTION,
             FeedRecorder.SYSTEM_REPO_PSTATUS_AUTO_CHANGES_ACTION } ) ), null, null );
     }
 
@@ -1690,6 +1692,21 @@ public class DefaultNexus
                     sb.append( revt.getRepository().getLocalStatus().toString() ).append( "." );
                 }
 
+                sb.append( " The previous state was " );
+
+                if ( LocalStatus.IN_SERVICE.equals( revt.getOldLocalStatus() ) )
+                {
+                    sb.append( "IN SERVICE." );
+                }
+                else if ( LocalStatus.OUT_OF_SERVICE.equals( revt.getOldLocalStatus() ) )
+                {
+                    sb.append( "OUT OF SERVICE." );
+                }
+                else
+                {
+                    sb.append( revt.getOldLocalStatus().toString() ).append( "." );
+                }
+
                 addSystemEvent( FeedRecorder.SYSTEM_REPO_LSTATUS_CHANGES_ACTION, sb.toString() );
             }
             else if ( evt instanceof RepositoryEventProxyModeBlockedAutomatically )
@@ -1732,6 +1749,54 @@ public class DefaultNexus
                     getLogger().warn( "Could not save repo changes!", e );
                 }
                 // TODO ends here
+            }
+            else if ( evt instanceof RepositoryEventProxyModeChanged )
+            {
+                RepositoryEventProxyModeChanged revt = (RepositoryEventProxyModeChanged) evt;
+
+                StringBuffer sb = new StringBuffer( "The proxy mode of repository '" );
+
+                sb.append( revt.getRepository().getName() );
+
+                sb.append( "' (ID='" ).append( revt.getRepository().getId() ).append( "') was set to " );
+
+                if ( ProxyMode.ALLOW.equals( revt.getRepository().getProxyMode() ) )
+                {
+                    sb.append( "Allow." );
+                }
+                else if ( ProxyMode.BLOCKED_AUTO.equals( revt.getRepository().getProxyMode() ) )
+                {
+                    sb.append( "Blocked (auto)." );
+                }
+                else if ( ProxyMode.BLOKED_MANUAL.equals( revt.getRepository().getProxyMode() ) )
+                {
+                    sb.append( "Blocked (by user)." );
+                }
+                else
+                {
+                    sb.append( revt.getRepository().getProxyMode().toString() ).append( "." );
+                }
+
+                sb.append( " The previous state was " );
+
+                if ( ProxyMode.ALLOW.equals( revt.getOldProxyMode() ) )
+                {
+                    sb.append( "Allow." );
+                }
+                else if ( ProxyMode.BLOCKED_AUTO.equals( revt.getOldProxyMode() ) )
+                {
+                    sb.append( "Blocked (auto)." );
+                }
+                else if ( ProxyMode.BLOKED_MANUAL.equals( revt.getOldProxyMode() ) )
+                {
+                    sb.append( "Blocked (by user)." );
+                }
+                else
+                {
+                    sb.append( revt.getOldProxyMode().toString() ).append( "." );
+                }
+
+                addSystemEvent( FeedRecorder.SYSTEM_REPO_PSTATUS_CHANGES_ACTION, sb.toString() );
             }
         }
         catch ( Exception e )

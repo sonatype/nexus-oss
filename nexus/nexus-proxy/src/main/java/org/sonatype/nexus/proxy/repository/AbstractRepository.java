@@ -46,6 +46,7 @@ import org.sonatype.nexus.proxy.events.RepositoryEventClearCaches;
 import org.sonatype.nexus.proxy.events.RepositoryEventEvictUnusedItems;
 import org.sonatype.nexus.proxy.events.RepositoryEventLocalStatusChanged;
 import org.sonatype.nexus.proxy.events.RepositoryEventProxyModeBlockedAutomatically;
+import org.sonatype.nexus.proxy.events.RepositoryEventProxyModeChanged;
 import org.sonatype.nexus.proxy.events.RepositoryEventRecreateAttributes;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventDelete;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventRetrieve;
@@ -195,11 +196,19 @@ public abstract class AbstractRepository
 
     public void setLocalStatus( LocalStatus localStatus )
     {
-        LocalStatus oldStatus = getLocalStatus();
+        LocalStatus oldStatus = this.localStatus;
 
         this.localStatus = localStatus;
 
-        notifyProximityEventListeners( new RepositoryEventLocalStatusChanged( this, oldStatus ) );
+        if ( !oldStatus.equals( localStatus ) )
+        {
+            notifyProximityEventListeners( new RepositoryEventLocalStatusChanged( this, oldStatus ) );
+        }
+    }
+    
+    protected void resetRemoteStatus()
+    {
+        remoteStatusUpdated = 0;
     }
 
     public RemoteStatus getRemoteStatus( boolean forceCheck )
@@ -273,10 +282,14 @@ public abstract class AbstractRepository
         }
     }
 
-    public void setProxyMode( ProxyMode proxyMode )
+    protected void setProxyMode( ProxyMode proxyMode, boolean sendNotification )
     {
         if ( RepositoryType.PROXY.equals( getRepositoryType() ) )
         {
+            ProxyMode oldProxyMode = this.proxyMode;
+
+            this.proxyMode = proxyMode;
+
             // if this is proxy
             // and was !shouldProxy() and the new is shouldProxy()
             if ( this.proxyMode != null && !this.proxyMode.shouldProxy() && proxyMode.shouldProxy() )
@@ -287,10 +300,20 @@ public abstract class AbstractRepository
                 }
 
                 getNotFoundCache().purge();
+                
+                resetRemoteStatus();
+            }
+
+            if ( sendNotification && !oldProxyMode.equals( proxyMode ) )
+            {
+                notifyProximityEventListeners( new RepositoryEventProxyModeChanged( this, oldProxyMode ) );
             }
         }
+    }
 
-        this.proxyMode = proxyMode;
+    public void setProxyMode( ProxyMode proxyMode )
+    {
+        setProxyMode( proxyMode, true );
     }
 
     protected void autoBlockProxying( Throwable cause )
@@ -299,7 +322,7 @@ public abstract class AbstractRepository
         {
             ProxyMode oldMode = getProxyMode();
 
-            setProxyMode( ProxyMode.BLOCKED_AUTO );
+            setProxyMode( ProxyMode.BLOCKED_AUTO, false );
 
             notifyProximityEventListeners( new RepositoryEventProxyModeBlockedAutomatically( this, oldMode, cause ) );
         }

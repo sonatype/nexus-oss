@@ -140,6 +140,10 @@ public abstract class AbstractSystemFeedSource
             {
                 entry.setTitle( "Repository local status change" );
             }
+            else if ( FeedRecorder.SYSTEM_REPO_PSTATUS_CHANGES_ACTION.equals( item.getAction() ) )
+            {
+                entry.setTitle( "Repository proxy mode change" );
+            }
             else if ( FeedRecorder.SYSTEM_REPO_PSTATUS_AUTO_CHANGES_ACTION.equals( item.getAction() ) )
             {
                 entry.setTitle( "Repository proxy mode change (user intervention may be needed!)" );

@@ -123,7 +123,7 @@ public class AbstractScheduledServiceResourceHandler
     {
         serviceNames.put( PublishIndexesTask.class.getName(), "Publish Indexes" );
         serviceNames.put( ReindexTask.class.getName(), "Reindex Repositories" );
-        serviceNames.put( RebuildAttributesTask.class.getName(), "Rebuild Repository Atributes" );
+        serviceNames.put( RebuildAttributesTask.class.getName(), "Rebuild Repository Attributes" );
         serviceNames.put( ClearCacheTask.class.getName(), "Clear Repository Caches" );
         serviceNames.put( SnapshotRemoverTask.class.getName(), "Remove Snapshots From Repository" );
         serviceNames.put(

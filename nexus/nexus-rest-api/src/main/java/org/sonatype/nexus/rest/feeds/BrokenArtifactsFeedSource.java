@@ -48,7 +48,7 @@ public class BrokenArtifactsFeedSource
     @Override
     public String getDescription()
     {
-        return "Broken artifacts in all Nexus repositories.";
+        return "Broken artifacts in all Nexus repositories (checksum errors, wrong POMs, ...).";
     }
 
     @Override
@@ -60,7 +60,7 @@ public class BrokenArtifactsFeedSource
     @Override
     public String getTitle()
     {
-        return "Nexus Repository Broken Artifacts";
+        return "Broken artifacts";
     }
 
 }

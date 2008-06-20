@@ -48,7 +48,7 @@ public class RecentOverallDeploymentsFeedSource
     @Override
     public String getDescription()
     {
-        return "Recent overall deployments in all Nexus repositories.";
+        return "New deployed artifacts in all Nexus repositories (deployed).";
     }
 
     @Override
@@ -60,7 +60,7 @@ public class RecentOverallDeploymentsFeedSource
     @Override
     public String getTitle()
     {
-        return "Nexus Repository Recent Deployments";
+        return "New deployed artifacts";
     }
 
 }
