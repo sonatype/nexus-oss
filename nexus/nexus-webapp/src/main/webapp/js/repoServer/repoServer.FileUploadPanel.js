@@ -288,7 +288,7 @@ Sonatype.repoServer.FileUploadPanel = function(config){
         text: 'Cancel',
         handler: function() {
           if ( this.repoPanel ) {
-            this.repoPanel.viewHandler();
+            this.repoPanel.viewRepo( this.repoRecord );
           }
         },
         scope: this
