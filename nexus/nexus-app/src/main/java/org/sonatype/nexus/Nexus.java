@@ -164,14 +164,14 @@ public interface Nexus
         throws NoSuchRepositoryGroupException,
             IOException;
 
-    void evictAllUnusedProxiedItems( long timestamp )
+    Collection<String> evictAllUnusedProxiedItems( long timestamp )
         throws IOException;
 
-    void evictRepositoryUnusedProxiedItems( long timestamp, String repositoryId )
+    Collection<String> evictRepositoryUnusedProxiedItems( long timestamp, String repositoryId )
         throws NoSuchRepositoryException,
             IOException;
 
-    void evictRepositoryGroupUnusedProxiedItems( long timestamp, String repositoryGroupId )
+    Collection<String> evictRepositoryGroupUnusedProxiedItems( long timestamp, String repositoryGroupId )
         throws NoSuchRepositoryGroupException,
             IOException;
 

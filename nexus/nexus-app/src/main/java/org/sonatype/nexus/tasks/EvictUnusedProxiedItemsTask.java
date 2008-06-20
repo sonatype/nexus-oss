@@ -20,6 +20,8 @@
  */
 package org.sonatype.nexus.tasks;
 
+import java.util.Collection;
+
 import org.sonatype.nexus.feeds.FeedRecorder;
 import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesTask;
 
@@ -32,7 +34,7 @@ import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesTask;
  *                   instantiation-strategy="per-lookup"
  */
 public class EvictUnusedProxiedItemsTask
-    extends AbstractNexusRepositoriesTask<Object>
+    extends AbstractNexusRepositoriesTask<Collection<String>>
 {
     public static final String EVICT_OLDER_CACHE_ITEMS_THEN_KEY = "evictOlderCacheItemsThen";
 
@@ -47,28 +49,26 @@ public class EvictUnusedProxiedItemsTask
     }
 
     @Override
-    protected Object doRun()
+    protected Collection<String> doRun()
         throws Exception
     {
         if ( getRepositoryGroupId() != null )
         {
-            getNexus().evictRepositoryGroupUnusedProxiedItems(
+            return getNexus().evictRepositoryGroupUnusedProxiedItems(
                 System.currentTimeMillis() - ( getEvictOlderCacheItemsThen() * 24 * 60 * 60 * 1000 ),
                 getRepositoryGroupId() );
         }
         else if ( getRepositoryId() != null )
         {
-            getNexus().evictRepositoryUnusedProxiedItems(
+            return getNexus().evictRepositoryUnusedProxiedItems(
                 System.currentTimeMillis() - ( getEvictOlderCacheItemsThen() * 24 * 60 * 60 * 1000 ),
                 getRepositoryId() );
         }
         else
         {
-            getNexus().evictAllUnusedProxiedItems(
+            return getNexus().evictAllUnusedProxiedItems(
                 System.currentTimeMillis() - ( getEvictOlderCacheItemsThen() * 24 * 60 * 60 * 1000 ) );
         }
-
-        return null;
     }
 
     @Override
