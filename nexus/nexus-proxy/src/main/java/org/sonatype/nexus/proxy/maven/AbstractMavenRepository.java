@@ -256,7 +256,7 @@ public abstract class AbstractMavenRepository
         getArtifactStoreHelper().storeArtifactWithGeneratedPom( gavRequest, is, attributes );
     }
 
-    public void deleteArtifact( ArtifactStoreRequest gavRequest, boolean withAllSubordinates )
+    public void deleteArtifact( ArtifactStoreRequest gavRequest, boolean withAllSubordinates, boolean deleteWholeGav )
         throws UnsupportedStorageOperationException,
             NoSuchResourceStoreException,
             RepositoryNotAvailableException,
@@ -264,7 +264,7 @@ public abstract class AbstractMavenRepository
             StorageException,
             AccessDeniedException
     {
-        getArtifactStoreHelper().deleteArtifact( gavRequest, withAllSubordinates );
+        getArtifactStoreHelper().deleteArtifact( gavRequest, withAllSubordinates, deleteWholeGav );
     }
 
     public Collection<Gav> listArtifacts( ArtifactStoreRequest gavRequest )

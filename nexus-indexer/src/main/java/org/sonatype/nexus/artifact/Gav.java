@@ -58,6 +58,12 @@ public class Gav
         }
         else
         {
+            if ( !VersionUtils.isSnapshot( version ) )
+            {
+                throw new IllegalArgumentException( "GAV marked as snapshot but the supplied version '" + version
+                    + "' is not!" );
+            }
+
             if ( version.contains( "SNAPSHOT" ) )
             {
                 // this is not a timestamped version

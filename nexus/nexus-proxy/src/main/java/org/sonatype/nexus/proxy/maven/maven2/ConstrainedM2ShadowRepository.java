@@ -228,7 +228,7 @@ public class ConstrainedM2ShadowRepository
         getArtifactStoreHelper().storeArtifactWithGeneratedPom( gavRequest, is, attributes );
     }
 
-    public void deleteArtifact( ArtifactStoreRequest gavRequest, boolean withAllSubordinates )
+    public void deleteArtifact( ArtifactStoreRequest gavRequest, boolean withAllSubordinates, boolean deleteWholeGav )
         throws UnsupportedStorageOperationException,
             NoSuchResourceStoreException,
             RepositoryNotAvailableException,
@@ -236,7 +236,7 @@ public class ConstrainedM2ShadowRepository
             StorageException,
             AccessDeniedException
     {
-        getArtifactStoreHelper().deleteArtifact( gavRequest, withAllSubordinates );
+        getArtifactStoreHelper().deleteArtifact( gavRequest, withAllSubordinates, deleteWholeGav );
     }
 
     public Collection<Gav> listArtifacts( ArtifactStoreRequest gavRequest )

@@ -27,10 +27,7 @@ import java.util.Map;
 import org.sonatype.nexus.configuration.ConfigurationChangeListener;
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
-import org.sonatype.nexus.proxy.NoSuchRepositoryException;
-import org.sonatype.nexus.proxy.NoSuchRepositoryGroupException;
 import org.sonatype.nexus.proxy.RepositoryNotAvailableException;
-import org.sonatype.nexus.proxy.RepositoryNotListableException;
 import org.sonatype.nexus.proxy.ResourceStore;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.access.AccessManager;
@@ -38,6 +35,7 @@ import org.sonatype.nexus.proxy.cache.PathCache;
 import org.sonatype.nexus.proxy.events.EventMulticaster;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
+import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
@@ -418,16 +416,26 @@ public interface Repository
      * 
      * @param uid the uid
      * @return the collection< storage item>
-     * @throws NoSuchRepositoryException *
-     * @throws NoSuchRepositoryGroupException *
      * @throws RepositoryNotAvailableException the repository not available exception
      * @throws ItemNotFoundException the item not found exception
      * @throws StorageException the storage exception
-     * @throws AccessDeniedException the access denied exception
      */
     Collection<StorageItem> list( RepositoryItemUid uid, Map<String, Object> context )
         throws RepositoryNotAvailableException,
-            RepositoryNotListableException,
+            ItemNotFoundException,
+            StorageException;
+
+    /**
+     * Lists the path denoted by item.
+     * 
+     * @param uid the uid
+     * @return the collection< storage item>
+     * @throws RepositoryNotAvailableException the repository not available exception
+     * @throws ItemNotFoundException the item not found exception
+     * @throws StorageException the storage exception
+     */
+    Collection<StorageItem> list( StorageCollectionItem item )
+        throws RepositoryNotAvailableException,
             ItemNotFoundException,
             StorageException;
 

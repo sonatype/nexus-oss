@@ -41,6 +41,7 @@ import org.sonatype.nexus.proxy.item.ContentLocator;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.PreparedContentLocator;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
+import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.item.StringContentLocator;
@@ -64,7 +65,7 @@ public class ArtifactStoreHelper
         this.repository = repo;
     }
 
-    public void storeItemWithChecksums( ArtifactStoreRequest request, ContentLocator locator,
+    protected void storeItemWithChecksums( ArtifactStoreRequest request, ContentLocator locator,
         Map<String, String> attributes )
         throws UnsupportedStorageOperationException,
             NoSuchResourceStoreException,
@@ -115,6 +116,45 @@ public class ArtifactStoreHelper
         catch ( ItemNotFoundException e )
         {
             throw new StorageException( "Storage inconsistency!", e );
+        }
+    }
+
+    protected void deleteWithChecksums( ArtifactStoreRequest request )
+        throws UnsupportedStorageOperationException,
+            RepositoryNotAvailableException,
+            ItemNotFoundException,
+            StorageException,
+            AccessDeniedException
+    {
+        try
+        {
+            repository.deleteItem( request );
+
+            RepositoryItemUid sha1Uid = new RepositoryItemUid( repository, request.getRequestPath() + ".sha1" );
+
+            try
+            {
+                repository.deleteItem( sha1Uid );
+            }
+            catch ( ItemNotFoundException e )
+            {
+                // ignore not found
+            }
+
+            RepositoryItemUid md5Uid = new RepositoryItemUid( repository, request.getRequestPath() + ".md5" );
+
+            try
+            {
+                repository.deleteItem( md5Uid );
+            }
+            catch ( ItemNotFoundException e )
+            {
+                // ignore not found
+            }
+        }
+        catch ( NoSuchResourceStoreException e )
+        {
+            // will not happen
         }
     }
 
@@ -298,7 +338,7 @@ public class ArtifactStoreHelper
         storeItemWithChecksums( gavRequest, new PreparedContentLocator( is ), attributes );
     }
 
-    public void deleteArtifact( ArtifactStoreRequest gavRequest, boolean withAllSubordinates )
+    public void deleteArtifact( ArtifactStoreRequest gavRequest, boolean withAllSubordinates, boolean deleteWholeGav )
         throws UnsupportedStorageOperationException,
             NoSuchResourceStoreException,
             RepositoryNotAvailableException,
@@ -306,6 +346,7 @@ public class ArtifactStoreHelper
             StorageException,
             AccessDeniedException
     {
+        // delete the artifact
         Gav gav = new Gav( gavRequest.getGroupId(), gavRequest.getArtifactId(), gavRequest.getVersion(), gavRequest
             .getClassifier(), repository.getArtifactPackagingMapper().getExtensionForPackaging(
             gavRequest.getPackaging() ), null, null, null, RepositoryPolicy.SNAPSHOT.equals( repository
@@ -313,12 +354,79 @@ public class ArtifactStoreHelper
 
         gavRequest.setRequestPath( repository.getGavCalculator().gavToPath( gav ) );
 
-        // TODO: implement other stuff too
-        repository.deleteItem( gavRequest );
+        deleteWithChecksums( gavRequest );
+
+        // if this was a request for deletion a secondary artifact, do not delete POM
+        // since those have no accompained POMs
+        if ( gavRequest.getClassifier() == null )
+        {
+            // delete the POM too
+            Gav pomGav = new Gav(
+                gavRequest.getGroupId(),
+                gavRequest.getArtifactId(),
+                gavRequest.getVersion(),
+                null,
+                "pom",
+                null,
+                null,
+                null,
+                RepositoryPolicy.SNAPSHOT.equals( repository.getRepositoryPolicy() ),
+                false,
+                null );
+
+            gavRequest.setRequestPath( repository.getGavCalculator().gavToPath( pomGav ) );
+
+            deleteWithChecksums( gavRequest );
+        }
+/*
+        // and others
+        if ( deleteWholeGav )
+        {
+            // delete all in this directory
+            // watch for subdirs
+            // delete dir if empty
+            RepositoryItemUid parentCollUid = new RepositoryItemUid( repository, gavRequest.getRequestPath().substring(
+                0,
+                gavRequest.getRequestPath().indexOf( RepositoryItemUid.PATH_SEPARATOR ) ) );
+
+            StorageCollectionItem parentColl = (StorageCollectionItem) repository.retrieveItem( true, parentCollUid );
+
+            Collection<StorageItem> items = parentColl.list();
+
+            boolean hadSubdirectory = false;
+
+            for ( StorageItem item : items )
+            {
+                if ( !StorageCollectionItem.class.isAssignableFrom( item.getClass() ) )
+                {
+                    repository.deleteItem( item.getRepositoryItemUid() );
+                }
+                else
+                {
+                    hadSubdirectory = true;
+                }
+            }
+
+            if ( !hadSubdirectory )
+            {
+                repository.deleteItem( parentCollUid );
+            }
+        }
+        else
+        {
+            if ( withAllSubordinates )
+            {
+                // delete POM/JAR if this was JAR/POM
+                // delete all classifiers
+            }
+        }
+*/
+        // TODO: m2 metadata maintenance?
     }
 
     public Collection<Gav> listArtifacts( ArtifactStoreRequest gavRequest )
     {
+        // TODO: implement this
         return Collections.emptyList();
     }
 

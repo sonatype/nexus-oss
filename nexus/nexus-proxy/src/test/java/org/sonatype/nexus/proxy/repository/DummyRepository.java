@@ -46,6 +46,7 @@ import org.sonatype.nexus.proxy.item.DefaultStorageCollectionItem;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.DefaultStorageLinkItem;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
+import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.router.DefaultContentClass;
@@ -216,7 +217,7 @@ public class DummyRepository
             StorageException,
             AccessDeniedException
     {
-        throw new UnsupportedOperationException( "This is dummy!" );
+        return list( new RepositoryItemUid(this, request.getRequestPath()), null );
     }
 
     public StorageItem retrieveItem( ResourceStoreRequest request )
@@ -608,6 +609,14 @@ public class DummyRepository
     public Collection<String> evictUnusedItems( long timestamp )
     {
         return null;
+    }
+
+    public Collection<StorageItem> list( StorageCollectionItem item )
+        throws RepositoryNotAvailableException,
+            ItemNotFoundException,
+            StorageException
+    {
+        return list(item.getRepositoryItemUid(), item.getItemContext());
     }
 
 }

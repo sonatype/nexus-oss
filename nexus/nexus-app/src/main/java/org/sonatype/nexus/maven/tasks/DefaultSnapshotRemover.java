@@ -27,6 +27,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeSet;
 
+import org.apache.maven.artifact.versioning.ArtifactVersion;
+import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.logging.Logger;
 import org.sonatype.nexus.artifact.Gav;
@@ -40,6 +42,8 @@ import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.maven.ArtifactStoreRequest;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
+import org.sonatype.nexus.proxy.maven.maven2.Maven2ContentClass;
+import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.utils.StoreWalker;
@@ -64,6 +68,8 @@ public class DefaultSnapshotRemover
      */
     private RepositoryRegistry repositoryRegistry;
 
+    private ContentClass contentClass = new Maven2ContentClass();
+
     public RepositoryRegistry getRepositoryRegistry()
     {
         return repositoryRegistry;
@@ -76,15 +82,14 @@ public class DefaultSnapshotRemover
     {
         SnapshotRemovalResult result = new SnapshotRemovalResult();
 
-        result = new SnapshotRemovalResult();
-
         if ( request.getRepositoryId() != null )
         {
             getLogger().info( "Removing old SNAPSHOT deployments from " + request.getRepositoryId() + " repository." );
 
             Repository repository = getRepositoryRegistry().getRepository( request.getRepositoryId() );
 
-            if ( MavenRepository.class.isAssignableFrom( repository.getClass() ) )
+            if ( MavenRepository.class.isAssignableFrom( repository.getClass() )
+                && repository.getRepositoryContentClass().isCompatible( contentClass ) )
             {
                 result.addResult( removeSnapshotsFromMavenRepository( (MavenRepository) repository, request ) );
             }
@@ -102,7 +107,8 @@ public class DefaultSnapshotRemover
             for ( Repository repository : getRepositoryRegistry().getRepositoryGroup( request.getRepositoryGroupId() ) )
             {
                 // only from maven repositories, stay silent for others and simply skip
-                if ( MavenRepository.class.isAssignableFrom( repository.getClass() ) )
+                if ( MavenRepository.class.isAssignableFrom( repository.getClass() )
+                    && repository.getRepositoryContentClass().isCompatible( contentClass ) )
                 {
                     result.addResult( removeSnapshotsFromMavenRepository( (MavenRepository) repository, request ) );
                 }
@@ -115,7 +121,8 @@ public class DefaultSnapshotRemover
             for ( Repository repository : getRepositoryRegistry().getRepositories() )
             {
                 // only from maven repositories, stay silent for others and simply skip
-                if ( MavenRepository.class.isAssignableFrom( repository.getClass() ) )
+                if ( MavenRepository.class.isAssignableFrom( repository.getClass() )
+                    && repository.getRepositoryContentClass().isCompatible( contentClass ) )
                 {
                     result.addResult( removeSnapshotsFromMavenRepository( (MavenRepository) repository, request ) );
                 }
@@ -174,9 +181,9 @@ public class DefaultSnapshotRemover
 
         private final SnapshotRemovalRequest request;
 
-        private final Map<String, List<StorageFileItem>> remainingSnapshotsAndFiles = new HashMap<String, List<StorageFileItem>>();
+        private final Map<ArtifactVersion, List<StorageFileItem>> remainingSnapshotsAndFiles = new HashMap<ArtifactVersion, List<StorageFileItem>>();
 
-        private final Map<String, List<StorageFileItem>> deletableSnapshotsAndFiles = new HashMap<String, List<StorageFileItem>>();
+        private final Map<ArtifactVersion, List<StorageFileItem>> deletableSnapshotsAndFiles = new HashMap<ArtifactVersion, List<StorageFileItem>>();
 
         private final long dateTreshold;
 
@@ -201,8 +208,11 @@ public class DefaultSnapshotRemover
             this.dateTreshold = System.currentTimeMillis() - ( request.getRemoveSnapshotsOlderThanDays() * 86400000 );
         }
 
-        protected void addStorageFileItemToMap( Map<String, List<StorageFileItem>> map, String key, StorageFileItem item )
+        protected void addStorageFileItemToMap( Map<ArtifactVersion, List<StorageFileItem>> map, Gav gav,
+            StorageFileItem item )
         {
+            ArtifactVersion key = new DefaultArtifactVersion( gav.getVersion() );
+
             if ( !map.containsKey( key ) )
             {
                 map.put( key, new ArrayList<StorageFileItem>() );
@@ -211,38 +221,47 @@ public class DefaultSnapshotRemover
             map.get( key ).add( item );
         }
 
-        protected void onCollectionEnter( StorageCollectionItem coll )
+        protected void processItem( StorageItem item )
         {
-            deletableSnapshotsAndFiles.clear();
+            // nothing here
+        }
 
-            remainingSnapshotsAndFiles.clear();
-
-            shouldProcessCollection = coll.getParentPath().endsWith( "-SNAPSHOT" );
+        protected void onCollectionExit( StorageCollectionItem coll )
+        {
+            shouldProcessCollection = coll.getPath().endsWith( "-SNAPSHOT" );
 
             if ( shouldProcessCollection )
             {
+                deletableSnapshotsAndFiles.clear();
+
+                remainingSnapshotsAndFiles.clear();
+
                 Gav gav = null;
 
                 Collection<StorageItem> items;
 
                 try
                 {
-                    items = coll.list();
+                    items = repository.list( coll );
                 }
                 catch ( Exception e )
                 {
                     // stop the crawling
-                    stop();
+                    stop( e );
 
                     return;
                 }
 
+                // gathering the facts
                 for ( StorageItem item : items )
                 {
                     if ( !item.isVirtual() && !StorageCollectionItem.class.isAssignableFrom( item.getClass() ) )
                     {
+                        // process only snapshot POMs
                         if ( M2ArtifactRecognizer.isSnapshot( item.getPath() )
-                            && !M2ArtifactRecognizer.isMetadata( item.getPath() ) )
+                            && !M2ArtifactRecognizer.isMetadata( item.getPath() )
+                            && !M2ArtifactRecognizer.isChecksum( item.getPath() )
+                            && M2ArtifactRecognizer.isPom( item.getPath() ) )
                         {
                             gav = ( (MavenRepository) coll.getRepositoryItemUid().getRepository() )
                                 .getGavCalculator().pathToGav( item.getPath() );
@@ -258,46 +277,40 @@ public class DefaultSnapshotRemover
                                     break;
                                 }
 
+                                item.getItemContext().put( Gav.class.getName(), gav );
+
                                 long itemTimestamp = gav.getSnapshotTimeStamp() != null ? gav
                                     .getSnapshotTimeStamp().longValue() : item.getCreated();
 
                                 if ( itemTimestamp < dateTreshold )
                                 {
-                                    addStorageFileItemToMap( deletableSnapshotsAndFiles, gav
-                                        .getSnapshotBuildNumber().toString(), (StorageFileItem) item );
+                                    addStorageFileItemToMap( deletableSnapshotsAndFiles, gav, (StorageFileItem) item );
                                 }
                                 else
                                 {
-                                    addStorageFileItemToMap( remainingSnapshotsAndFiles, gav
-                                        .getSnapshotBuildNumber().toString(), (StorageFileItem) item );
+                                    addStorageFileItemToMap( remainingSnapshotsAndFiles, gav, (StorageFileItem) item );
                                 }
                             }
                         }
                     }
                 }
-            }
-        }
 
-        protected void processItem( StorageItem item )
-        {
-            // nothing here
-        }
-
-        protected void onCollectionExit( StorageCollectionItem coll )
-        {
-            if ( shouldProcessCollection )
-            {
+                // and doing the work here
                 if ( removeWholeGAV )
                 {
                     try
                     {
                         ArtifactStoreRequest req = new ArtifactStoreRequest( gavToRemove.getGroupId(), gavToRemove
-                            .getArtifactId(), gavToRemove.getBaseVersion() );
+                            .getArtifactId(), gavToRemove.getVersion() );
 
-                        repository.deleteArtifact( req, true );
+                        // remove the whole GAV and all of it subsidiaries
+                        repository.deleteArtifact( req, true, true );
 
-                        // remove the whole version directory
-                        repository.deleteItem( coll.getRepositoryItemUid() );
+                        if ( repository.list( coll ).size() == 0 )
+                        {
+                            // remove the whole version directory
+                            repository.deleteItem( coll.getRepositoryItemUid() );
+                        }
                     }
                     catch ( Exception e )
                     {
@@ -318,7 +331,8 @@ public class DefaultSnapshotRemover
                         }
                         else
                         {
-                            TreeSet<String> keys = new TreeSet<String>( deletableSnapshotsAndFiles.keySet() );
+                            TreeSet<ArtifactVersion> keys = new TreeSet<ArtifactVersion>( deletableSnapshotsAndFiles
+                                .keySet() );
 
                             while ( remainingSnapshotsAndFiles.size() < request.getMinCountOfSnapshotsToKeep() )
                             {
@@ -332,7 +346,7 @@ public class DefaultSnapshotRemover
 
                         }
                     }
-                    for ( String key : deletableSnapshotsAndFiles.keySet() )
+                    for ( ArtifactVersion key : deletableSnapshotsAndFiles.keySet() )
                     {
                         List<StorageFileItem> files = deletableSnapshotsAndFiles.get( key );
 
@@ -342,7 +356,13 @@ public class DefaultSnapshotRemover
                         {
                             try
                             {
-                                repository.deleteItem( file.getRepositoryItemUid() );
+                                gav = (Gav) file.getItemContext().get( Gav.class.getName() );
+
+                                ArtifactStoreRequest req = new ArtifactStoreRequest( gav.getGroupId(), gav
+                                    .getArtifactId(), gav.getVersion() );
+
+                                // delete the artifact only with all subsidiaries (like sources et al)
+                                repository.deleteArtifact( req, true, false );
 
                                 deletedFiles++;
                             }
@@ -354,15 +374,35 @@ public class DefaultSnapshotRemover
                     }
                 }
             }
+
+            // remove empty dirs
+            try
+            {
+                if ( repository.list( coll ).size() == 0 )
+                {
+                    repository.deleteItem( coll.getRepositoryItemUid() );
+                }
+            }
+            catch ( Exception e )
+            {
+                // stop the crawling
+                stop( e );
+
+                return;
+            }
         }
 
         public boolean releaseExistsForSnapshot( Gav snapshotGav )
         {
+            // get a GAV request
             ArtifactStoreRequest req = new ArtifactStoreRequest(
                 snapshotGav.getGroupId(),
                 snapshotGav.getArtifactId(),
                 snapshotGav
                     .getBaseVersion().substring( 0, snapshotGav.getBaseVersion().length() - "-SNAPSHOT".length() ) );
+
+            // do not proxy, look for local content only
+            req.setRequestLocalOnly( true );
 
             for ( Repository repository : repositoryRegistry.getRepositories() )
             {

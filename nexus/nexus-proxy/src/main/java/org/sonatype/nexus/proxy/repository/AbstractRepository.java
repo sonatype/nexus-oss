@@ -553,7 +553,7 @@ public abstract class AbstractRepository
     public Collection<String> evictUnusedItems( final long timestamp )
     {
         final ArrayList<String> files = new ArrayList<String>();
-        
+
         // construct an imperial walker to do the job
         StoreFileWalker walker = new StoreFileWalker( this, getLogger() )
         {
@@ -566,19 +566,19 @@ public abstract class AbstractRepository
                     if ( item.getLastRequested() < timestamp )
                     {
                         deleteItem( item.getRepositoryItemUid() );
-                        
+
                         files.add( item.getPath() );
                     }
                 }
                 catch ( RepositoryNotAvailableException e )
                 {
                     // simply stop if set during processing
-                    stop();
+                    stop( e );
                 }
                 catch ( UnsupportedStorageOperationException e )
                 {
                     // if op not supported (R/O repo?)
-                    stop();
+                    stop( e );
                 }
                 catch ( ItemNotFoundException e )
                 {
@@ -596,7 +596,7 @@ public abstract class AbstractRepository
                 // expiring now empty directories
                 try
                 {
-                    if ( coll.list().size() == 0 )
+                    if ( ( (Repository) getResourceStore() ).list( coll ).size() == 0 )
                     {
                         deleteItem( coll.getRepositoryItemUid() );
                     }
@@ -604,12 +604,12 @@ public abstract class AbstractRepository
                 catch ( RepositoryNotAvailableException e )
                 {
                     // simply stop if set during processing
-                    stop();
+                    stop( e );
                 }
                 catch ( UnsupportedStorageOperationException e )
                 {
                     // if op not supported (R/O repo?)
-                    stop();
+                    stop( e );
                 }
                 catch ( ItemNotFoundException e )
                 {
@@ -617,23 +617,7 @@ public abstract class AbstractRepository
                 }
                 catch ( StorageException e )
                 {
-                    logger.warn( "Got storage exception while evicting " + coll.getRepositoryItemUid().toString(), e );
-
-                    stop();
-                }
-                catch ( AccessDeniedException e )
-                {
-                    // stop it
-                    stop();
-                }
-                catch ( NoSuchResourceStoreException e )
-                {
-                    // will not happen
-                }
-                catch ( RepositoryNotListableException e )
-                {
-                    // simply stop it
-                    stop();
+                    stop( e );
                 }
             }
         };
@@ -642,7 +626,7 @@ public abstract class AbstractRepository
         walker.walk( RepositoryItemUid.PATH_ROOT, true, false );
 
         notifyProximityEventListeners( new RepositoryEventEvictUnusedItems( this ) );
-        
+
         return files;
     }
 
@@ -829,7 +813,16 @@ public abstract class AbstractRepository
 
         RepositoryItemUid uid = new RepositoryItemUid( this, request.getRequestPath() );
 
-        Collection<StorageItem> items = list( uid, request.getRequestContext() );
+        Collection<StorageItem> items = null;
+
+        if ( isBrowseable() )
+        {
+            items = list( uid, request.getRequestContext() );
+        }
+        else
+        {
+            throw new RepositoryNotListableException( this.getId() );
+        }
 
         return items;
     }
@@ -1037,7 +1030,6 @@ public abstract class AbstractRepository
 
     public Collection<StorageItem> list( RepositoryItemUid uid, Map<String, Object> context )
         throws RepositoryNotAvailableException,
-            RepositoryNotListableException,
             ItemNotFoundException,
             StorageException
     {
@@ -1051,23 +1043,24 @@ public abstract class AbstractRepository
             throw new RepositoryNotAvailableException( this.getId() );
         }
 
-        if ( isBrowseable() )
+        maintainNotFoundCache( uid.getPath() );
+
+        Collection<StorageItem> items = doListItems( uid );
+
+        for ( StorageItem item : items )
         {
-            maintainNotFoundCache( uid.getPath() );
-
-            Collection<StorageItem> items = doListItems( uid );
-
-            for ( StorageItem item : items )
-            {
-                item.getItemContext().putAll( context );
-            }
-
-            return items;
+            item.getItemContext().putAll( context );
         }
-        else
-        {
-            throw new RepositoryNotListableException( this.getId() );
-        }
+
+        return items;
+    }
+
+    public Collection<StorageItem> list( StorageCollectionItem item )
+        throws RepositoryNotAvailableException,
+            ItemNotFoundException,
+            StorageException
+    {
+        return list( item.getRepositoryItemUid(), item.getItemContext() );
     }
 
     // ===================================================================================

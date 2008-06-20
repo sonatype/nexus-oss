@@ -41,6 +41,7 @@ import org.restlet.data.Status;
 import org.restlet.ext.fileupload.RestletFileUpload;
 import org.restlet.resource.Representation;
 import org.restlet.resource.Variant;
+import org.sonatype.nexus.artifact.VersionUtils;
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.NoSuchResourceStoreException;
@@ -58,7 +59,6 @@ import org.sonatype.nexus.rest.AbstractNexusResourceHandler;
 import org.sonatype.nexus.rest.ApplicationBridge;
 import org.sonatype.nexus.rest.NexusAuthenticationGuard;
 import org.sonatype.nexus.security.User;
-import org.sonatype.nexus.util.VersionUtils;
 import org.sonatype.plexus.rest.representation.InputStreamRepresentation;
 
 public class AbstractArtifactResourceHandler

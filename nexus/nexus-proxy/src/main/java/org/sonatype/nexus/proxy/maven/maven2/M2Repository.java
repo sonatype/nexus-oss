@@ -35,6 +35,7 @@ import org.codehaus.plexus.util.IOUtil;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.artifact.GavCalculator;
 import org.sonatype.nexus.artifact.M2ArtifactRecognizer;
+import org.sonatype.nexus.artifact.VersionUtils;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.PreparedContentLocator;
@@ -46,7 +47,6 @@ import org.sonatype.nexus.proxy.maven.ArtifactPackagingMapper;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.util.AlphanumComparator;
-import org.sonatype.nexus.util.VersionUtils;
 
 /**
  * The default M2Repository.

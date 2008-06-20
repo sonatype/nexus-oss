@@ -18,7 +18,7 @@
  * along with this program.  If not, see http://www.gnu.org/licenses/.
  *
  */
-package org.sonatype.nexus.util;
+package org.sonatype.nexus.artifact;
 
 import java.util.regex.Pattern;
 

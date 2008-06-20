@@ -209,7 +209,7 @@ public class DefaultAttributeStorage
         try
         {
             lockFor( uid );
-            
+
             if ( getLogger().isDebugEnabled() )
             {
                 getLogger().debug( "Loading attributes on UID=" + uid.toString() );
@@ -225,7 +225,7 @@ public class DefaultAttributeStorage
             catch ( IOException ex )
             {
                 getLogger().error( "Got IOException during store of UID=" + uid.toString(), ex );
-                
+
                 return null;
             }
         }
@@ -336,6 +336,22 @@ public class DefaultAttributeStorage
                 result = (AbstractStorageItem) xstream.fromXML( fis );
 
                 result.setRepositoryItemUid( uid );
+
+                // fixing remoteChecked
+                if ( result.getRemoteChecked() == 0 )
+                {
+                    result.setRemoteChecked( System.currentTimeMillis() );
+                }
+                else if ( result.getRemoteChecked() == 1 )
+                {
+                    result.setExpired( true );
+                }
+
+                // fixing lastRequested
+                if ( result.getLastRequested() == 0 )
+                {
+                    result.setLastRequested( result.getRemoteChecked() );
+                }
             }
             catch ( BaseException e )
             {

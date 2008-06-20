@@ -83,19 +83,19 @@ public class DefaultStorageCollectionItem
             ItemNotFoundException,
             StorageException
     {
+        // create request
+        ResourceStoreRequest req = new ResourceStoreRequest( getPath(), true );
+
+        // let the call inherit the context, ie. auth info, etc.
+        req.getRequestContext().putAll( getItemContext() );
+
         if ( isVirtual() || !Repository.class.isAssignableFrom( getStore().getClass() ) )
         {
-            ResourceStoreRequest req = new ResourceStoreRequest( getPath(), true );
-
-            // let the call inherit the context, ie. auth info, etc.
-            req.getRequestContext().putAll( getItemContext() );
-
             return getStore().list( req );
         }
         else
         {
-            Collection<StorageItem> result = ( (Repository) getStore() )
-                .list( getRepositoryItemUid(), getItemContext() );
+            Collection<StorageItem> result = getStore().list( req );
 
             for ( StorageItem item : result )
             {

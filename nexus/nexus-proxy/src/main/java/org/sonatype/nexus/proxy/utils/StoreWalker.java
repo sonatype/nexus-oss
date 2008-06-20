@@ -49,6 +49,8 @@ public abstract class StoreWalker
 
     protected boolean running;
 
+    protected Throwable stopCause;
+
     public StoreWalker( ResourceStore store, Logger logger )
     {
         super();
@@ -56,6 +58,8 @@ public abstract class StoreWalker
         this.store = store;
 
         this.logger = logger;
+
+        this.stopCause = null;
     }
 
     protected Logger getLogger()
@@ -66,6 +70,11 @@ public abstract class StoreWalker
     protected ResourceStore getResourceStore()
     {
         return store;
+    }
+
+    public Throwable getStopCause()
+    {
+        return stopCause;
     }
 
     public void walk()
@@ -86,9 +95,21 @@ public abstract class StoreWalker
         walk( null, localOnly, collectionsOnly );
     }
 
-    public void stop()
+    public void stop( Throwable cause )
     {
         running = false;
+
+        this.stopCause = cause;
+
+        if ( cause != null )
+        {
+            logger.debug( "Walking STOPPED on " + store.getId() + " because stop() was called with cause:", cause );
+        }
+        else
+        {
+            logger
+                .debug( "Walking STOPPED on " + store.getId() + " because stop() was called without submitted cause." );
+        }
     }
 
     public final void walk( String fromPath, boolean localOnly, boolean collectionsOnly )
@@ -168,7 +189,7 @@ public abstract class StoreWalker
         {
             try
             {
-                collCount = walkRecursive( 0, (StorageCollectionItem) item, collectionsOnly );
+                collCount = walkRecursive( 0, (StorageCollectionItem) item, localOnly, collectionsOnly );
             }
             catch ( Throwable e )
             {
@@ -178,7 +199,7 @@ public abstract class StoreWalker
                         + " with message (in DEBUG mode the Stack trace is available): " + e.getMessage(), e );
                 }
 
-                stop();
+                stop( e );
 
                 throw new WalkerException( e );
             }
@@ -190,26 +211,19 @@ public abstract class StoreWalker
 
             if ( logger != null )
             {
-                logger.info( "Finished walking on " + store.getId() + " Store with " + Integer.toString( collCount )
-                    + " collections." );
-            }
-        }
-        else
-        {
-            if ( logger != null )
-            {
-                logger.info( "Walking STOPPED on " + store.getId() + " Store with " + Integer.toString( collCount )
+                logger.debug( "Finished walking on " + store.getId() + " Store with " + Integer.toString( collCount )
                     + " collections." );
             }
         }
     }
 
-    protected final int walkRecursive( int collCount, StorageCollectionItem coll, boolean collectionsOnly )
+    protected final int walkRecursive( int collCount, StorageCollectionItem coll, boolean localOnly,
+        boolean collectionsOnly )
         throws AccessDeniedException,
-            NoSuchResourceStoreException,
             RepositoryNotAvailableException,
             RepositoryNotListableException,
             ItemNotFoundException,
+            NoSuchResourceStoreException,
             StorageException
     {
         if ( !running )
@@ -235,9 +249,19 @@ public abstract class StoreWalker
             return collCount;
         }
 
-        Collection<StorageItem> ls;
+        Collection<StorageItem> ls = null;
 
-        ls = coll.list();
+        if ( Repository.class.isAssignableFrom( store.getClass() ) )
+        {
+            ls = ( (Repository) store ).list( coll );
+        }
+        else
+        {
+            // we are dealing with router
+            ResourceStoreRequest request = new ResourceStoreRequest( coll.getPath(), localOnly );
+
+            ls = store.list( request );
+        }
 
         for ( StorageItem i : ls )
         {
@@ -255,7 +279,7 @@ public abstract class StoreWalker
             if ( StorageCollectionItem.class.isAssignableFrom( i.getClass() ) )
             {
                 // user may call stop()
-                collCount += walkRecursive( collCount, (StorageCollectionItem) i, collectionsOnly );
+                collCount = walkRecursive( collCount, (StorageCollectionItem) i, localOnly, collectionsOnly );
 
                 if ( !running )
                 {
