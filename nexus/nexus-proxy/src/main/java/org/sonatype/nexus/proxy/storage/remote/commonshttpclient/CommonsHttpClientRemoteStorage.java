@@ -96,7 +96,7 @@ public class CommonsHttpClientRemoteStorage
         {
             //If HEAD failed, attempt a GET.  Some repos may not support HEAD method
             doGet = true;
-            getLogger().warn( "HEAD method threw Exception, will attempt GET", e );
+            getLogger().warn( "HEAD method failed, will attempt GET.  Exception: " + e.getMessage() );
         }
         finally
         {
