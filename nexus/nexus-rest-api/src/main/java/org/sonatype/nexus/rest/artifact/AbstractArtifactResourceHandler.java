@@ -326,6 +326,11 @@ public class AbstractArtifactResourceHandler
         {
             if ( MediaType.MULTIPART_FORM_DATA.equals( representation.getMediaType(), true ) )
             {
+                //Just forcing creation of the temporary directory if it doesn't exist.
+                //Because the upload is using the tmp directory outside of our code
+                //Our method wont be called, which will create the directory on request
+                getNexus().getNexusConfiguration().getTemporaryDirectory();
+                
                 FileItemFactory factory = (FileItemFactory) getContext().getAttributes().get(
                     ApplicationBridge.FILEITEM_FACTORY );
 
