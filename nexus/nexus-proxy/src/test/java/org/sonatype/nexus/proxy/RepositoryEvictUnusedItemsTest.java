@@ -76,5 +76,41 @@ public class RepositoryEvictUnusedItemsTest
         assertEquals( 1, evicted.size() );
 
         assertEquals( "/activemq/activemq-core/1.2/activemq-core-1.2.jar", evicted.iterator().next() );
+
+        // check for removed empty folders too
+        // doing localOnly requests to avoid proxying and make sure they are gone too
+        try
+        {
+            repo1.retrieveItem( new ResourceStoreRequest( "/activemq/activemq-core/1.2", true ) );
+
+            fail( "Collection should not exists!" );
+        }
+        catch ( ItemNotFoundException e )
+        {
+            // fine
+        }
+
+        try
+        {
+            repo1.retrieveItem( new ResourceStoreRequest( "/activemq/activemq-core", true ) );
+
+            fail( "Collection should not exists!" );
+        }
+        catch ( ItemNotFoundException e )
+        {
+            // fine
+        }
+
+        try
+        {
+            repo1.retrieveItem( new ResourceStoreRequest( "/activemq", true ) );
+
+            fail( "Collection should not exists!" );
+        }
+        catch ( ItemNotFoundException e )
+        {
+            // fine
+        }
+
     }
 }
