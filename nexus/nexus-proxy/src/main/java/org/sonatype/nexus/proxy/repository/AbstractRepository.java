@@ -551,7 +551,7 @@ public abstract class AbstractRepository
 
     public Collection<String> evictUnusedItems( final long timestamp )
     {
-        EvictUnusedItemsWalker walker = new EvictUnusedItemsWalker(this, getLogger(), timestamp);
+        EvictUnusedItemsWalker walker = new EvictUnusedItemsWalker( this, getLogger(), timestamp );
 
         // and let it loose
         walker.walk( RepositoryItemUid.PATH_ROOT, true, false );
@@ -917,6 +917,11 @@ public abstract class AbstractRepository
 
         if ( StorageCollectionItem.class.isAssignableFrom( item.getClass() ) )
         {
+            if ( getLogger().isDebugEnabled() )
+            {
+                getLogger().debug(
+                    "We are deleting a collection, starting a walker to send delete notifications per-file." );
+            }
             // it is collection, walk it and below and fire events for all files
             DeletionNotifierWalker dnw = new DeletionNotifierWalker( this, getLogger(), context );
 
