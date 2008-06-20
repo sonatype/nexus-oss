@@ -224,7 +224,7 @@ public class DefaultSnapshotRemover
                 Gav gav = null;
 
                 Collection<StorageItem> items;
-                
+
                 try
                 {
                     items = coll.list();
@@ -233,7 +233,7 @@ public class DefaultSnapshotRemover
                 {
                     // stop the crawling
                     stop();
-                    
+
                     return;
                 }
 
@@ -291,12 +291,12 @@ public class DefaultSnapshotRemover
                 {
                     try
                     {
-                        // ArtifactStoreRequest req = new ArtifactStoreRequest( gavToRemove.getGroupId(), gavToRemove
-                        // .getArtifactId(), gavToRemove.getBaseVersion() );
+                        ArtifactStoreRequest req = new ArtifactStoreRequest( gavToRemove.getGroupId(), gavToRemove
+                            .getArtifactId(), gavToRemove.getBaseVersion() );
 
-                        // TODO: the one below would not be needed, since withAllSubordinates = true would do all?
-                        // repository.deleteArtifact( req, true );
+                        repository.deleteArtifact( req, true );
 
+                        // remove the whole version directory
                         repository.deleteItem( coll.getRepositoryItemUid() );
                     }
                     catch ( Exception e )

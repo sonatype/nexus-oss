@@ -278,7 +278,7 @@ public interface Repository
      * 
      * @param timestamp
      */
-    void evictUnusedItems( long timestamp );
+    Collection<String> evictUnusedItems( long timestamp );
 
     /**
      * Checks whether the remote storage of this repo is reachable.

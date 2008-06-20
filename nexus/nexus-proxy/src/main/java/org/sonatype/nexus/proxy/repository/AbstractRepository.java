@@ -21,6 +21,7 @@
 package org.sonatype.nexus.proxy.repository;
 
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -549,8 +550,10 @@ public abstract class AbstractRepository
         notifyProximityEventListeners( new RepositoryEventClearCaches( this, path ) );
     }
 
-    public void evictUnusedItems( final long timestamp )
+    public Collection<String> evictUnusedItems( final long timestamp )
     {
+        final ArrayList<String> files = new ArrayList<String>();
+        
         // construct an imperial walker to do the job
         StoreFileWalker walker = new StoreFileWalker( this, getLogger() )
         {
@@ -563,6 +566,8 @@ public abstract class AbstractRepository
                     if ( item.getLastRequested() < timestamp )
                     {
                         deleteItem( item.getRepositoryItemUid() );
+                        
+                        files.add( item.getPath() );
                     }
                 }
                 catch ( RepositoryNotAvailableException e )
@@ -637,6 +642,8 @@ public abstract class AbstractRepository
         walker.walk( RepositoryItemUid.PATH_ROOT, true, false );
 
         notifyProximityEventListeners( new RepositoryEventEvictUnusedItems( this ) );
+        
+        return files;
     }
 
     public boolean recreateAttributes( final Map<String, String> initialData )

@@ -605,10 +605,9 @@ public class DummyRepository
 
     }
 
-    public void evictUnusedItems( long timestamp )
+    public Collection<String> evictUnusedItems( long timestamp )
     {
-        // TODO Auto-generated method stub
-
+        return null;
     }
 
 }
