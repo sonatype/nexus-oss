@@ -2,6 +2,7 @@ package org.sonatype.nexus.ext.gwt.ui.client.reposerver;
 
 import org.sonatype.nexus.ext.gwt.ui.client.AbstractServerType;
 import org.sonatype.nexus.ext.gwt.ui.client.ServerFunction;
+import org.sonatype.nexus.ext.gwt.ui.client.ServerFunctionGroup;
 import org.sonatype.nexus.ext.gwt.ui.client.ServerInstance;
 
 public class RepoServer extends AbstractServerType {
@@ -12,12 +13,16 @@ public class RepoServer extends AbstractServerType {
         local.setName("Local");
         addInstance(local);
         
+        ServerFunctionGroup views = new ServerFunctionGroup();
+        views.setName("Views");
+        
         ServerFunction repoMaintenance = new ServerFunction();
         repoMaintenance.setMenuName("Repositories");
         repoMaintenance.setTabName("Maintenance");
-        repoMaintenance.setGroupName("Maintenance");
         repoMaintenance.setPanel(new RepoMaintenancePage());
-        addFunction(repoMaintenance);
+        views.addFunction(repoMaintenance);
+        
+        addFunctionGroup(views);
     }
 
     public String getName() {

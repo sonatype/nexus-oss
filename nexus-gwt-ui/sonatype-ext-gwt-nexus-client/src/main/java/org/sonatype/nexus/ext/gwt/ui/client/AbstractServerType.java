@@ -5,12 +5,12 @@ import java.util.List;
 
 public abstract class AbstractServerType implements ServerType {
 
-    private List<ServerFunction> functions = new ArrayList<ServerFunction>();
+    private List<ServerFunctionGroup> functionGroups = new ArrayList<ServerFunctionGroup>();
     
     private List<ServerInstance> instances = new ArrayList<ServerInstance>();
     
-    public List<ServerFunction> getFunctions() {
-        return functions;
+    public List<ServerFunctionGroup> getFunctionGroups() {
+        return functionGroups;
     }
 
     public List<ServerInstance> getInstances() {
@@ -21,8 +21,8 @@ public abstract class AbstractServerType implements ServerType {
         instances.add(instance);
     }
     
-    protected void addFunction(ServerFunction function) {
-        functions.add(function);
+    protected void addFunctionGroup(ServerFunctionGroup functionGroup) {
+        functionGroups.add(functionGroup);
     }
 
 }

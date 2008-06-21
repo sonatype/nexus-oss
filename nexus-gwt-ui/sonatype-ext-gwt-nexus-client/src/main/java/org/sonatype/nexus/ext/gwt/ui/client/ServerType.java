@@ -12,6 +12,6 @@ public interface ServerType {
     
     List<ServerInstance> getInstances();
     
-    List<ServerFunction> getFunctions();
+    List<ServerFunctionGroup> getFunctionGroups();
 
 }

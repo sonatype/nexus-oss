@@ -1,9 +1,10 @@
 package org.sonatype.nexus.ext.gwt.ui.client;
 
-import org.sonatype.nexus.ext.gwt.ui.client.reposerver.RepoMaintenancePage;
-
 import com.extjs.gxt.ui.client.Style.LayoutRegion;
+import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.util.Margins;
+import com.extjs.gxt.ui.client.widget.Component;
+import com.extjs.gxt.ui.client.widget.Container;
 import com.extjs.gxt.ui.client.widget.ContentPanel;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.TabItem;
@@ -27,6 +28,8 @@ public class NexusUI implements EntryPoint {
     private Text loginLink;
     private Text version;
 
+    private TabPanel tabPanel;
+    
     public void onModuleLoad() {
         ctx = ApplicationContext.instance();
         
@@ -38,8 +41,7 @@ public class NexusUI implements EntryPoint {
 
         addHeader(viewport);
         addMenu(viewport);
-        addServers();
-        addMain(viewport);
+        addTabPanel(viewport);
 
         RootPanel.get().add(viewport);
     }
@@ -68,7 +70,7 @@ public class NexusUI implements EntryPoint {
                 setTagName("span");
                 setId("st-login-link");
 
-                // TODO: Find out how to do this
+                // TODO: Find out how to do authentication
                 // Ext.get('login-link').on('click', Sonatype.repoServer.RepoServer.loginHandler, Sonatype.repoServer.RepoServer);
             }
         };
@@ -107,16 +109,14 @@ public class NexusUI implements EntryPoint {
             {
                 setId("st-server-tab-panel");
                 setBodyBorder(false);
-
-                // TODO: Set these when the library will support them
-                // layoutOnTabChange: true
             }
         };
         
         for (ServerType serverType : ctx.getServerTypes()) {
-            servers.add(new TabItem(serverType.getName()));
-            //TODO: build function list
+            addServer(servers, serverType);
         }
+        
+        servers.setSelection(servers.getItem(0));
 
         menu.add(servers);
 
@@ -132,78 +132,140 @@ public class NexusUI implements EntryPoint {
         container.add(menu, menuLayoutData);
     }
 
-    private void addMain(LayoutContainer container) {
-        // TODO: Make this a MainTabPanel
-        TabPanel main = new TabPanel() {
+    private void addServer(TabPanel servers, ServerType serverType) {
+        final String serverID = convertToStyleName(serverType.getName());
+        
+        TabItem instances = new TabItem(serverType.getName()) {
+            {
+                setId("st-server-" + serverID + "-tab");
+            }
+        };
+        
+        for (ServerInstance serverInstance: serverType.getInstances()) {
+            addServerInstance(instances, serverType, serverInstance);
+        }
+        
+        servers.add(instances);
+    }
+    
+    private void addServerInstance(TabItem instances, ServerType serverType,
+            ServerInstance serverInstance) {
+        instances.removeAll();
+        
+        ContentPanel groups = new ContentPanel() {
+            {
+                addStyleName("st-server-instance-panel");
+                setHeaderVisible(false);
+                setLayout(new FitLayout());
+            }
+        };
+
+        for (ServerFunctionGroup serverFunctionGroup: serverType.getFunctionGroups()) {
+            addServerFunctionGroup(groups, serverFunctionGroup);
+        }
+
+        instances.add(groups);
+        
+        if (instances.isRendered()) {
+            instances.layout();
+        }
+    }
+
+    private void addServerFunctionGroup(ContentPanel groups, final ServerFunctionGroup serverFunctionGroup) {
+        final ContentPanel functions = new ContentPanel() {
+            {
+                setHeading(serverFunctionGroup.getName());
+                addStyleName("st-server-group-panel");
+                setLayout(new FitLayout());
+                setFrame(true);
+            }
+        };
+        
+        for (ServerFunction serverFunction: serverFunctionGroup.getFunctions()) {
+            addServerFunction(functions, serverFunction);
+        }
+        
+        groups.add(functions);
+    }
+
+    private void addServerFunction(ContentPanel functions, final ServerFunction serverFunction) {
+        functions.add(new Link(serverFunction.getMenuName()) {
+            public void onClick(ComponentEvent event) {
+                   addServerFunctionTab(serverFunction);
+            }
+        });
+    }
+
+    private void addTabPanel(LayoutContainer container) {
+        tabPanel = new TabPanel() {
             {
                 setId("st-main-tab-panel");
                 setResizeTabs(true);
                 setTabScroll(true);
                 setMinTabWidth(110);
-
-                // TODO: Set these when the library will support them
-                // deferredRender: false,
-                // defaults: {autoScroll: false, closable: true},
-                // layoutOnTabChange: true,
             }
         };
 
-        BorderLayoutData mainLayoutData = new BorderLayoutData(LayoutRegion.CENTER) {
+        BorderLayoutData tabPanelLayoutData = new BorderLayoutData(LayoutRegion.CENTER) {
             {
                 setMargins(new Margins(0, 5, 5, 0));
             }
         };
 
-        addWelcomeTab(main);
-        addRepoMaintenanceTab(main);
+        container.add(tabPanel, tabPanelLayoutData);
 
-        container.add(main, mainLayoutData);
+        addWelcomeTab();
     }
 
-    private void addWelcomeTab(TabPanel panel) {
+    private void addWelcomeTab() {
+        if (activateTab("st-welcome-tab")) {
+            return;
+        }
+
         LayoutContainer welcome = new LayoutContainer() {
             {
-                setId("st-welcome-tab");
                 setStyleName("st-little-padding");
                 addText("Welcome to the Sonatype Nexus Repository Manager.").setTagName("p");
                 addText("You may browse and search the repositories using the options on the left. Administrators may login via the link on the top right.").setTagName("p");
             }
         };
+        addTab(welcome, "Welcome", "st-welcome-tab");
+    }
+    
+    private void addServerFunctionTab(ServerFunction serverFunction) {
+        String id = "st-" + convertToStyleName(serverFunction.getTabName()) + "-tab";
+        if (activateTab(id)) {
+            return;
+        }
+        
+        addTab(serverFunction.getPanel(ctx.getLocalRepoServer()),
+                serverFunction.getTabName(), id);
+    }
+    
+    private boolean activateTab(String id) {
+        TabItem tabItem = tabPanel.findItem(id, false);
+        if (tabItem == null) {
+            return false;
+        }
 
-        TabItem welcomeTab = new TabItem("Welcome") {
+        tabPanel.setSelection(tabItem);
+
+        return true;
+    }
+    
+    private void addTab(final Container<Component> container, String title, final String id) {
+        TabItem tabItem = new TabItem(title) {
             {
+                setId(id);
                 setClosable(true);
+                add(container);
             }
         };
-        welcomeTab.add(welcome);
 
-        panel.add(welcomeTab);
+        tabPanel.add(tabItem);
+        tabPanel.setSelection(tabItem);
     }
     
-    private void addRepoMaintenanceTab(TabPanel panel) {
-        RepoMaintenancePage repoMaintenancePanel = new RepoMaintenancePage();
-        repoMaintenancePanel.init(ctx.getLocalRepoServer());
-        TabItem repoMaintenanceTab = new TabItem("Repositories");
-        repoMaintenanceTab.setClosable(true);
-        repoMaintenanceTab.add(repoMaintenancePanel);
-        panel.add(repoMaintenanceTab);
-        panel.setSelection(repoMaintenanceTab);
-    }
-    
-    private void addServers() {
-/*
-    //allow each included sonatype server to setup its tab and events
-    var availSvrs = Sonatype.config.installedServers;
-    for(var srv in availSvrs) {
-      if (availSvrs[srv] && typeof(Sonatype[srv]) != 'undefined') {
-        Sonatype[srv][Sonatype.utils.capitalize(srv)].initServerTab();
-      }
-    }
-
-    Sonatype.view.serverTabPanel.setActiveTab('st-nexus-tab');
-*/
-    }
-
     private void updateLoginStatus() {
         if (false) {
             // TODO: Print the user name
@@ -215,4 +277,20 @@ public class NexusUI implements EntryPoint {
             loginLink.setText("Log In");
         }
     }
+
+    // TODO: Move this to a utility class
+    public static String convertToStyleName(String javaName) {
+        StringBuffer styleName = new StringBuffer(javaName.toLowerCase());
+        int offset = 0;
+        
+        for (int i = 1; i < javaName.length(); i++) {
+            if (Character.isUpperCase(javaName.charAt(i))) {
+                styleName.insert(i + offset, '-');
+                offset++;
+            }
+        }
+        
+        return styleName.toString();
+    }
+    
 }

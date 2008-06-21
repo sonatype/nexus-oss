@@ -9,9 +9,8 @@ public class ServerFunction {
     
     private String tabName;
     
-    private String groupName;
-    
     private Container<Component> panel;
+    private boolean panelInitialized = false;
 
     public String getMenuName() {
         return menuName;
@@ -29,15 +28,11 @@ public class ServerFunction {
         this.tabName = tabName;
     }
 
-    public String getGroupName() {
-        return groupName;
-    }
-
-    public void setGroupName(String groupName) {
-        this.groupName = groupName;
-    }
-
-    public Container<Component> getPanel() {
+    public Container<Component> getPanel(ServerInstance serverInstance) {
+    	if (!panelInitialized && panel instanceof ServerFunctionPanel) {
+    		((ServerFunctionPanel) panel).init(serverInstance);
+    		panelInitialized = true;
+    	}
         return panel;
     }
 
