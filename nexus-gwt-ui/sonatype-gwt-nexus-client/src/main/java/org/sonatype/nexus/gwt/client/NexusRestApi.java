@@ -7,7 +7,7 @@ import org.sonatype.nexus.gwt.client.services.GlobalSettingsService;
 import org.sonatype.nexus.gwt.client.services.RepositoriesService;
 
 /**
- * The inteface published by Nexus REST API.
+ * The interface published by Nexus REST API.
  * 
  * @author cstamas
  */

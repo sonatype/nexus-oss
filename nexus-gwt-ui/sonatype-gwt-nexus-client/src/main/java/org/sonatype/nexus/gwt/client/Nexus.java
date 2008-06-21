@@ -25,7 +25,7 @@ public class Nexus
     private Map namedInstances = new HashMap();
 
     /**
-     * Instantaniate Nexus resource instance using <code>GWT.getHostPageBaseURL()</code>. This presumes that the GWT
+     * Instantiate Nexus resource instance using <code>GWT.getHostPageBaseURL()</code>. This presumes that the GWT
      * UI is served from the Nexus web application root.
      */
     public Nexus()
@@ -34,7 +34,7 @@ public class Nexus
     }
 
     /**
-     * Instantaniate Nexus resource instance from custom URL.
+     * Instantiate Nexus resource instance from custom URL.
      * 
      * @param url
      */
@@ -44,7 +44,7 @@ public class Nexus
     }
 
     /**
-     * Instantaniate Nexus resource instance with existing RESTRequestBuilder and known path.
+     * Instantiate Nexus resource instance with existing RESTRequestBuilder and known path.
      * 
      * @param path
      * @param requestBuilder
