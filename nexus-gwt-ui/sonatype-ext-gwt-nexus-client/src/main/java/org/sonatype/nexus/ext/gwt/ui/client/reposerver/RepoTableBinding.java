@@ -6,10 +6,7 @@ import org.sonatype.nexus.ext.gwt.ui.client.Constants;
 import org.sonatype.nexus.ext.gwt.ui.client.ResourceProxy;
 import org.sonatype.nexus.ext.gwt.ui.client.ServerInstance;
 
-import com.google.gwt.http.client.Request;
-import com.google.gwt.http.client.RequestCallback;
-import com.google.gwt.http.client.Response;
-import com.google.gwt.user.client.Window;
+import com.extjs.gxt.ui.client.Style.SortDir;
 import com.extjs.gxt.ui.client.binder.TableBinder;
 import com.extjs.gxt.ui.client.data.BaseListLoader;
 import com.extjs.gxt.ui.client.data.DataProxy;
@@ -29,6 +26,10 @@ import com.extjs.gxt.ui.client.store.StoreEvent;
 import com.extjs.gxt.ui.client.store.StoreListener;
 import com.extjs.gxt.ui.client.util.DelayedTask;
 import com.extjs.gxt.ui.client.widget.table.Table;
+import com.google.gwt.http.client.Request;
+import com.google.gwt.http.client.RequestCallback;
+import com.google.gwt.http.client.Response;
+import com.google.gwt.user.client.Window;
 
 public class RepoTableBinding {
 
@@ -102,11 +103,11 @@ public class RepoTableBinding {
         };
 
         binder = new TableBinder(table, store);
-        // TODO: Sort table by name
     }
     
     public void reload() {
         loader.load();
+        store.sort("name", SortDir.ASC);
     }
 
     public TableBinder<ModelData> getBinder() {
