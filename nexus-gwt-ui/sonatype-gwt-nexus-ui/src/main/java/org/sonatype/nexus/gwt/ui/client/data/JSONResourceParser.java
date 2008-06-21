@@ -47,7 +47,7 @@ public class JSONResourceParser implements ResourceParser {
             obj = json.isString().stringValue();
         }
         else if (json instanceof JSONNumber) {
-            obj = new Double(json.isNumber().getValue());
+            obj = new Double(json.isNumber().doubleValue());
         }
         
         return obj;

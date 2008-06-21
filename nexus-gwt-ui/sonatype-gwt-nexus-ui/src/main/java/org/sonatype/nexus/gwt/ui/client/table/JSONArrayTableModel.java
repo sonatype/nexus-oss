@@ -56,7 +56,7 @@ public class JSONArrayTableModel extends AbstractTableModel implements DataStore
             } else if (val.isBoolean() != null) {
                 return Boolean.valueOf(val.isBoolean().booleanValue());
             } else if (val.isNumber() != null) {
-                return new Double(val.isNumber().getValue());
+                return new Double(val.isNumber().doubleValue());
             } else if (val.isNull() != null) {
                 return null;
             } else {
