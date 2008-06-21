@@ -54,7 +54,7 @@
 			<dependency>
 				<groupId>com.extjs.gxt</groupId>
 				<artifactId>gxt</artifactId>
-				<version>1.0-beta5</version>
+				<version>1.0-rc1b</version>
 				<scope>compile</scope>
 				<type>jar</type>
 			</dependency>
