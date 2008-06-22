@@ -24,6 +24,7 @@ import com.extjs.gxt.ui.client.event.LoadListener;
 import com.extjs.gxt.ui.client.store.ListStore;
 import com.extjs.gxt.ui.client.store.StoreEvent;
 import com.extjs.gxt.ui.client.store.StoreListener;
+import com.extjs.gxt.ui.client.store.StoreSorter;
 import com.extjs.gxt.ui.client.util.DelayedTask;
 import com.extjs.gxt.ui.client.widget.table.Table;
 import com.google.gwt.http.client.Request;
@@ -71,18 +72,23 @@ public class RepoTableBinding {
         Resource repoList = server.getResource("repositories");
         DataProxy proxy = new ResourceProxy(repoList, Variant.APPLICATION_XML);
         
-        loader = new BaseListLoader(proxy , reader);
-        loader.addLoadListener(new LoadListener() {
-            public void loaderBeforeLoad(LoadEvent le) {
-                table.el().mask("Loading...");
+        loader = new BaseListLoader(proxy , reader) {
+            {
+                setSortField("name");
+                setSortDir(SortDir.ASC);
+                addLoadListener(new LoadListener() {
+                    public void loaderBeforeLoad(LoadEvent le) {
+                        table.el().mask("Loading...");
+                    }
+                    public void loaderLoad(LoadEvent le) {
+                        table.el().unmask();
+                    }
+                    public void loaderLoadException(LoadEvent le) {
+                        table.el().mask("Loading failed!");
+                    }
+                });
             }
-            public void loaderLoad(LoadEvent le) {
-                table.el().unmask();
-            }
-            public void loaderLoadException(LoadEvent le) {
-                table.el().mask("Loading failed!");
-            }
-        });
+        };
         
         store = new ListStore(loader) {
             {
@@ -91,6 +97,7 @@ public class RepoTableBinding {
                         loadStatuses(server, true);
                     }
                 });
+                setStoreSorter(new StoreSorter());
                 setModelComparer(new ModelComparer() {
                 	public boolean equals(ModelData model1, ModelData model2) {
                 		String resourceURI1 = (String) model1.get("resourceURI");
@@ -106,8 +113,12 @@ public class RepoTableBinding {
     }
     
     public void reload() {
+        int sortColumn = binder.getTable().getTableHeader().getSortColumn();
+        if (sortColumn != -1) {
+            loader.setSortField(binder.getTable().getColumn(sortColumn).getId());
+            loader.setSortDir(binder.getTable().getColumn(sortColumn).getSortDir());
+        }
         loader.load();
-        store.sort("name", SortDir.ASC);
     }
 
     public TableBinder<ModelData> getBinder() {
