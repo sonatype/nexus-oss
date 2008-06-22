@@ -1,5 +1,7 @@
 package org.sonatype.nexus.ext.gwt.ui.client;
 
+import org.sonatype.gwt.client.resource.Variant;
+
 import com.extjs.gxt.ui.client.Style.LayoutRegion;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.util.Margins;
@@ -15,7 +17,12 @@ import com.extjs.gxt.ui.client.widget.layout.BorderLayout;
 import com.extjs.gxt.ui.client.widget.layout.BorderLayoutData;
 import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.google.gwt.core.client.EntryPoint;
+import com.google.gwt.http.client.Request;
+import com.google.gwt.http.client.RequestCallback;
+import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.ui.RootPanel;
+import com.google.gwt.xml.client.Document;
+import com.google.gwt.xml.client.XMLParser;
 
 /**
  * Entry point of the NexusUI.
@@ -74,7 +81,7 @@ public class NexusUI implements EntryPoint {
                 // Ext.get('login-link').on('click', Sonatype.repoServer.RepoServer.loginHandler, Sonatype.repoServer.RepoServer);
             }
         };
-        version = new Text(ctx.getServerVersion()) {
+        version = new Text() {
             {
                 setId("st-version");
             }
@@ -93,9 +100,23 @@ public class NexusUI implements EntryPoint {
 
         container.add(header, headerLayoutData);
 
+        getServerVersion();
         updateLoginStatus();
     }
 
+    private void getServerVersion() {
+        ctx.getLocalRepoServer().getResource("status").get(new RequestCallback() {
+            public void onError(Request request, Throwable exception) {
+                version.setText("Version unavailable");
+            }
+            public void onResponseReceived(Request request, Response response) {
+                Document doc = XMLParser.parse(response.getText());
+                String ver = doc.getElementsByTagName("version").item(0).getFirstChild().getNodeValue();
+                version.setText(ver);
+            }
+        }, Variant.APPLICATION_XML);
+    }
+    
     private void addMenu(LayoutContainer container) {
         ContentPanel menu = new ContentPanel() {
             {
