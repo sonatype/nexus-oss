@@ -157,6 +157,7 @@ public class NexusUI implements EntryPoint {
                 addStyleName("st-server-instance-panel");
                 setHeaderVisible(false);
                 setLayout(new FitLayout());
+                setBodyBorder(false);
             }
         };
 
