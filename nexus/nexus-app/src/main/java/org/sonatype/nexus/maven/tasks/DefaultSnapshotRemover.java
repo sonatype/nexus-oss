@@ -185,7 +185,7 @@ public class DefaultSnapshotRemover
 
         private final Map<ArtifactVersion, List<StorageFileItem>> deletableSnapshotsAndFiles = new HashMap<ArtifactVersion, List<StorageFileItem>>();
 
-        private final long dateTreshold;
+        private final long dateThreshold;
 
         private boolean shouldProcessCollection;
 
@@ -205,7 +205,16 @@ public class DefaultSnapshotRemover
 
             this.request = request;
 
-            this.dateTreshold = System.currentTimeMillis() - ( request.getRemoveSnapshotsOlderThanDays() * 86400000 );
+            int days = request.getRemoveSnapshotsOlderThanDays();
+            
+            if ( days > -1 )
+            {
+                this.dateThreshold = System.currentTimeMillis() - ( days * 86400000 );
+            }
+            else
+            {
+                this.dateThreshold = -1;
+            }
         }
 
         protected void addStorageFileItemToMap( Map<ArtifactVersion, List<StorageFileItem>> map, Gav gav,
@@ -282,7 +291,8 @@ public class DefaultSnapshotRemover
                                 long itemTimestamp = gav.getSnapshotTimeStamp() != null ? gav
                                     .getSnapshotTimeStamp().longValue() : item.getCreated();
 
-                                if ( itemTimestamp < dateTreshold )
+                                if ( -1 < dateThreshold
+                                    && itemTimestamp < dateThreshold )
                                 {
                                     addStorageFileItemToMap( deletableSnapshotsAndFiles, gav, (StorageFileItem) item );
                                 }

@@ -175,14 +175,14 @@ public class ScheduledServiceTypeResourceHandler
         property.setId( SnapshotRemoverTask.MIN_SNAPSHOTS_TO_KEEP_KEY );
         property.setName( "Minimum snapshot count" );
         property.setType( PROPERTY_TYPE_NUMBER );
-        property.setRequired( true );
+        property.setRequired( false );
         property.setHelpText( "Minimum number of snapshots to keep for one GAV." );
         type.addProperty( property );
         property = new ScheduledServiceTypePropertyResource();
         property.setId( SnapshotRemoverTask.REMOVE_OLDER_THAN_DAYS_KEY );
         property.setName( "Snapshot retention (days)" );
         property.setType( PROPERTY_TYPE_NUMBER );
-        property.setRequired( true );
+        property.setRequired( false );
         property
             .setHelpText( "The job will purge all snapshots older than the entered number of days, but will obey to Min. count of snapshots to keep." );
         type.addProperty( property );
@@ -190,7 +190,7 @@ public class ScheduledServiceTypeResourceHandler
         property.setId( SnapshotRemoverTask.REMOVE_IF_RELEASE_EXISTS_KEY );
         property.setName( "Remove if released" );
         property.setType( PROPERTY_TYPE_BOOLEAN );
-        property.setRequired( true );
+        property.setRequired( false );
         property.setHelpText( "The job will purge all snapshots that have a corresponding released artifact (same version not including the -SNAPSHOT)." );
         type.addProperty( property );
         response.addData( type );

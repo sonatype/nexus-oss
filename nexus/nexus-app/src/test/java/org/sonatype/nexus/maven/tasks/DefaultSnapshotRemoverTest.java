@@ -110,5 +110,19 @@ public class DefaultSnapshotRemoverTest
 
         assertEquals( 1, result.getProcessedRepositories().size() );
     }
+    
+    public void testSnapshotRemoverDefaultValues()
+        throws Exception
+    {
+        fillInRepo();
+    
+        // and now setup the request
+        // process the apacheSnapshots, leave min 1 snap, remove older than 0 day and delete them if release exists
+        SnapshotRemovalRequest request = new SnapshotRemovalRequest( apacheSnapshots.getId(), null, 1, -1, true );
+    
+        SnapshotRemovalResult result = defaultNexus.removeSnapshots( request );
+    
+        assertEquals( 1, result.getProcessedRepositories().size() );
+    }
 
 }

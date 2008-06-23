@@ -20,6 +20,7 @@
  */
 package org.sonatype.nexus.maven.tasks;
 
+import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesTask;
 
 /**
@@ -39,10 +40,21 @@ public class SnapshotRemoverTask
     public static final String REMOVE_OLDER_THAN_DAYS_KEY = "removeOlderThanDays";
 
     public static final String REMOVE_IF_RELEASE_EXISTS_KEY = "removeIfReleaseExists";
+    
+    public static final int DEFAULT_MIN_SNAPSHOTS_TO_KEEP = 0;
+    
+    public static final int DEFAULT_OLDER_THAN_DAYS = -1;
 
     public int getMinSnapshotsToKeep()
-    {
-        return Integer.parseInt( getParameters().get( MIN_SNAPSHOTS_TO_KEEP_KEY ) );
+    {        
+        String param = getParameters().get( MIN_SNAPSHOTS_TO_KEEP_KEY );
+        
+        if ( StringUtils.isEmpty( param ) )
+        {
+            return DEFAULT_MIN_SNAPSHOTS_TO_KEEP;
+        }
+        
+        return Integer.parseInt( param );
     }
 
     public void setMinSnapshotsToKeep( int minSnapshotsToKeep )
@@ -52,7 +64,14 @@ public class SnapshotRemoverTask
 
     public int getRemoveOlderThanDays()
     {
-        return Integer.parseInt( getParameters().get( REMOVE_OLDER_THAN_DAYS_KEY ) );
+        String param = getParameters().get( REMOVE_OLDER_THAN_DAYS_KEY );
+        
+        if ( StringUtils.isEmpty( param ) )
+        {
+            return DEFAULT_OLDER_THAN_DAYS;
+        }
+        
+        return Integer.parseInt( param );
     }
 
     public void setRemoveOlderThanDays( int removeOlderThanDays )
