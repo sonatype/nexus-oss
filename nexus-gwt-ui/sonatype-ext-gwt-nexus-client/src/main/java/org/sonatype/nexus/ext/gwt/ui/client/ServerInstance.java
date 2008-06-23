@@ -43,7 +43,10 @@ public class ServerInstance {
     }
     
     public Resource getResource(String url) {
-        return new DefaultResource(Constants.HOST + getPath() + "/" + url);
+        String resporcePath = Constants.HOST + getPath() + "/" + url;
+        resporcePath += (url.indexOf('?') == -1) ? "?" : "&";
+        resporcePath += "_dc=" + System.currentTimeMillis();
+        return new DefaultResource(resporcePath);
     }
     
 }
