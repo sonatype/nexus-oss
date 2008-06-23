@@ -346,6 +346,10 @@ public class ArtifactStoreHelper
             StorageException,
             AccessDeniedException
     {
+        boolean deleted = false;
+
+        ItemNotFoundException lastINF = null;
+
         // delete the artifact
         Gav gav = new Gav( gavRequest.getGroupId(), gavRequest.getArtifactId(), gavRequest.getVersion(), gavRequest
             .getClassifier(), repository.getArtifactPackagingMapper().getExtensionForPackaging(
@@ -354,7 +358,18 @@ public class ArtifactStoreHelper
 
         gavRequest.setRequestPath( repository.getGavCalculator().gavToPath( gav ) );
 
-        deleteWithChecksums( gavRequest );
+        try
+        {
+            deleteWithChecksums( gavRequest );
+
+            deleted = true;
+        }
+        catch ( ItemNotFoundException e )
+        {
+            deleted = false;
+
+            lastINF = e;
+        }
 
         // if this was a request for deletion a secondary artifact, do not delete POM
         // since those have no accompained POMs
@@ -377,11 +392,29 @@ public class ArtifactStoreHelper
 
             gavRequest.setRequestPath( repository.getGavCalculator().gavToPath( pomGav ) );
 
-            deleteWithChecksums( gavRequest );
+            try
+            {
+                deleteWithChecksums( gavRequest );
+
+                deleted = true;
+            }
+            catch ( ItemNotFoundException e )
+            {
+                deleted = deleted || false;
+
+                if ( lastINF == null )
+                {
+                    lastINF = e;
+                }
+            }
         }
 
-        // and others
-        if ( deleteWholeGav )
+        if ( !deleted && !deleteWholeGav && !withAllSubordinates )
+        {
+            // we could do nothing
+            throw lastINF;
+        }
+        else if ( deleteWholeGav )
         {
             // delete all in this directory
             // watch for subdirs
