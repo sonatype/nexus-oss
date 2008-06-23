@@ -367,6 +367,22 @@ public class M2GavCalculatorTest
         path = gavCalculator.gavToPath( gav );
         assertEquals( "/foo1/foo1/1.0.0-beta-4-SNAPSHOT/foo1-1.0.0-beta-4-20080623.175436-1.jar", path );
         
+        gav = gavCalculator.pathToGav( "/org/sonatype/nexus/nexus-webapp/1.0.0-beta-4-SNAPSHOT/nexus-webapp-1.0.0-beta-4-20080623.203653-349.pom" );
+        assertEquals( "org.sonatype.nexus", gav.getGroupId() );
+        assertEquals( "nexus-webapp", gav.getArtifactId() );
+        assertEquals( "1.0.0-beta-4-20080623.203653-349", gav.getVersion() );
+        assertEquals( "1.0.0-beta-4-SNAPSHOT", gav.getBaseVersion() );
+        assertEquals( null, gav.getClassifier() );
+        assertEquals( "pom", gav.getExtension() );
+        assertEquals( Integer.valueOf( 349 ), gav.getSnapshotBuildNumber() );
+        assertEquals( parseTimestamp( "20080623.203653" ), gav.getSnapshotTimeStamp() );
+        assertEquals( "nexus-webapp-1.0.0-beta-4-20080623.203653-349.pom", gav.getName() );
+        assertEquals( true, gav.isSnapshot() );
+        assertEquals( false, gav.isHash() );
+        assertEquals( null, gav.getHashType() );
+
+        path = gavCalculator.gavToPath( gav );
+        assertEquals( "/org/sonatype/nexus/nexus-webapp/1.0.0-beta-4-SNAPSHOT/nexus-webapp-1.0.0-beta-4-20080623.203653-349.pom", path );
         
     }
 
