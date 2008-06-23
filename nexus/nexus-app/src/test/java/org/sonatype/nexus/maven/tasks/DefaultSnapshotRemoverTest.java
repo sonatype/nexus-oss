@@ -113,11 +113,12 @@ public class DefaultSnapshotRemoverTest
 
         ArtifactStoreRequest gavRequest = null;
 
+        // test the results by their local availability
+        
         gavRequest = new ArtifactStoreRequest( "org.apache.maven", "maven-core", "2.0.9-20080306.010327-7" );
 
         gavRequest.setRequestLocalOnly( true );
 
-        // test the results by their local availability
         try
         {
             apacheSnapshots.retrieveArtifactPom( gavRequest );
