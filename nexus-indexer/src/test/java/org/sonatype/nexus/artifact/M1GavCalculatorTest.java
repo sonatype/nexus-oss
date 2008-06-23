@@ -210,6 +210,46 @@ public class M1GavCalculatorTest
 
         path = gavCalculator.gavToPath( gav );
         assertEquals( "/castor/jars/castor-0.9.9-xml.jar", path );
+        
+        gav = gavCalculator.pathToGav( "/org.slf4j/poms/slf4j-log4j12-1.4.3.pom" );
+
+        assertEquals( "org.slf4j", gav.getGroupId() );
+        assertEquals( "slf4j-log4j12", gav.getArtifactId() );
+        assertEquals( "1.4.3", gav.getVersion() );
+        assertEquals( "1.4.3", gav.getBaseVersion() );
+        assertEquals( null, gav.getClassifier() );
+        assertEquals( "pom", gav.getExtension() );
+        assertEquals( null, gav.getSnapshotBuildNumber() );
+        assertEquals( null, gav.getSnapshotTimeStamp() );
+        assertEquals( "slf4j-log4j12-1.4.3.pom", gav.getName() );
+        assertEquals( false, gav.isSnapshot() );
+        assertEquals( false, gav.isHash() );
+        assertEquals( null, gav.getHashType() );
+
+        path = gavCalculator.gavToPath( gav );
+        assertEquals( "/org.slf4j/poms/slf4j-log4j12-1.4.3.pom", path );
+
+
+        
+        // TODO: fix this!
+        /* There is an "Oh" letter at the end, not a zero! */
+        gav = gavCalculator.pathToGav( "/xpp3/poms/xpp3_min-1.1.3.4.O.pom" );
+
+        assertEquals( "xpp3", gav.getGroupId() );
+        assertEquals( "xpp3_min", gav.getArtifactId() );
+        assertEquals( "1.1.3.4.O", gav.getVersion() );
+        assertEquals( "1.1.3.4.O", gav.getBaseVersion() );
+        assertEquals( null, gav.getClassifier() );
+        assertEquals( "pom", gav.getExtension() );
+        assertEquals( null, gav.getSnapshotBuildNumber() );
+        assertEquals( null, gav.getSnapshotTimeStamp() );
+        assertEquals( "xpp3_min-1.1.3.4.O.pom", gav.getName() );
+        assertEquals( false, gav.isSnapshot() );
+        assertEquals( false, gav.isHash() );
+        assertEquals( null, gav.getHashType() );
+
+        path = gavCalculator.gavToPath( gav );
+        assertEquals( "/xpp3/poms/xpp3_min-1.1.3.4.O.pom", path );
     }
 
     public void testGavExtreme()
