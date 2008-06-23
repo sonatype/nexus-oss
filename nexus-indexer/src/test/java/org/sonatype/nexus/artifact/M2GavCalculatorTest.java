@@ -125,6 +125,42 @@ public class M2GavCalculatorTest
         path = gavCalculator.gavToPath( gav );
         assertEquals( "/org/jruby/jruby/1.0RC1-SNAPSHOT/jruby-1.0RC1-20070504.160758-2.jar.md5", path );
 
+        gav = gavCalculator.pathToGav( "/org/jruby/jruby/1.0RC1-SNAPSHOT/jruby-1.0RC1-20070504.160758-2.jar" );
+
+        assertEquals( "org.jruby", gav.getGroupId() );
+        assertEquals( "jruby", gav.getArtifactId() );
+        assertEquals( "1.0RC1-20070504.160758-2", gav.getVersion() );
+        assertEquals( "1.0RC1-SNAPSHOT", gav.getBaseVersion() );
+        assertEquals( null, gav.getClassifier() );
+        assertEquals( "jar", gav.getExtension() );
+        assertEquals( Integer.valueOf( 2 ), gav.getSnapshotBuildNumber() );
+        assertEquals( parseTimestamp( "20070504.160758" ), gav.getSnapshotTimeStamp() );
+        assertEquals( "jruby-1.0RC1-20070504.160758-2.jar", gav.getName() );
+        assertEquals( true, gav.isSnapshot() );
+        assertEquals( false, gav.isHash() );
+        assertEquals( null, gav.getHashType() );
+
+        path = gavCalculator.gavToPath( gav );
+        assertEquals( "/org/jruby/jruby/1.0RC1-SNAPSHOT/jruby-1.0RC1-20070504.160758-2.jar", path );
+
+        gav = gavCalculator.pathToGav( "/org/jruby/jruby/1.0RC1-SNAPSHOT/jruby-1.0RC1-20070504.160758-2-sources.jar" );
+
+        assertEquals( "org.jruby", gav.getGroupId() );
+        assertEquals( "jruby", gav.getArtifactId() );
+        assertEquals( "1.0RC1-20070504.160758-2", gav.getVersion() );
+        assertEquals( "1.0RC1-SNAPSHOT", gav.getBaseVersion() );
+        assertEquals( "sources", gav.getClassifier() );
+        assertEquals( "jar", gav.getExtension() );
+        assertEquals( Integer.valueOf( 2 ), gav.getSnapshotBuildNumber() );
+        assertEquals( parseTimestamp( "20070504.160758" ), gav.getSnapshotTimeStamp() );
+        assertEquals( "jruby-1.0RC1-20070504.160758-2-sources.jar", gav.getName() );
+        assertEquals( true, gav.isSnapshot() );
+        assertEquals( false, gav.isHash() );
+        assertEquals( null, gav.getHashType() );
+
+        path = gavCalculator.gavToPath( gav );
+        assertEquals( "/org/jruby/jruby/1.0RC1-SNAPSHOT/jruby-1.0RC1-20070504.160758-2-sources.jar", path );
+
         gav = gavCalculator
             .pathToGav( "/com/stchome/products/dsms/services/dsms-intervention-service/2.4.2-64-SNAPSHOT/dsms-intervention-service-2.4.2-64-SNAPSHOT.jar.sha1" );
 
@@ -313,6 +349,25 @@ public class M2GavCalculatorTest
 
         path = gavCalculator.gavToPath( gav );
         assertEquals( "/foo1/foo1/0.0.1-SNAPSHOT/foo1-0.0.1-SNAPSHOT-jdk14.jar", path );
+
+        gav = gavCalculator.pathToGav( "/foo1/foo1/1.0.0-beta-4-SNAPSHOT/foo1-1.0.0-beta-4-20080623.175436-1.jar" );
+        assertEquals( "foo1", gav.getGroupId() );
+        assertEquals( "foo1", gav.getArtifactId() );
+        assertEquals( "1.0.0-beta-4-20080623.175436-1", gav.getVersion() );
+        assertEquals( "1.0.0-beta-4-SNAPSHOT", gav.getBaseVersion() );
+        assertEquals( null, gav.getClassifier() );
+        assertEquals( "jar", gav.getExtension() );
+        assertEquals( Integer.valueOf( 1 ), gav.getSnapshotBuildNumber() );
+        assertEquals( parseTimestamp( "20080623.175436" ), gav.getSnapshotTimeStamp() );
+        assertEquals( "foo1-1.0.0-beta-4-20080623.175436-1.jar", gav.getName() );
+        assertEquals( true, gav.isSnapshot() );
+        assertEquals( false, gav.isHash() );
+        assertEquals( null, gav.getHashType() );
+
+        path = gavCalculator.gavToPath( gav );
+        assertEquals( "/foo1/foo1/1.0.0-beta-4-SNAPSHOT/foo1-1.0.0-beta-4-20080623.175436-1.jar", path );
+        
+        
     }
 
     public void testGavExtreme()

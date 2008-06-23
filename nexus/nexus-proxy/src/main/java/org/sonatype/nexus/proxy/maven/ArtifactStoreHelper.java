@@ -358,7 +358,8 @@ public class ArtifactStoreHelper
 
         // if this was a request for deletion a secondary artifact, do not delete POM
         // since those have no accompained POMs
-        if ( gavRequest.getClassifier() == null )
+        // and if the artifact itself was not a POM
+        if ( gavRequest.getClassifier() == null && !"pom".equalsIgnoreCase( gavRequest.getPackaging() ) )
         {
             // delete the POM too
             Gav pomGav = new Gav(

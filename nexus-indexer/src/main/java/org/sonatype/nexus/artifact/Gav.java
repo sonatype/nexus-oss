@@ -71,8 +71,12 @@ public class Gav
             }
             else
             {
-                // this is probably a timestamped version
-                this.baseVersion = version.substring( 0, version.indexOf( "-" ) ) + "-SNAPSHOT";
+                // this is a timestamped version (verified against pattern, see above)
+                // we have XXXXXX-YYYYMMDD.HHMMSS-B
+                // but XXXXXX may contain "-" too!
+                this.baseVersion = version.substring( 0, version.lastIndexOf( '-' ) );
+
+                this.baseVersion = baseVersion.substring( 0, baseVersion.lastIndexOf( '-' ) ) + "-SNAPSHOT";
             }
         }
 
