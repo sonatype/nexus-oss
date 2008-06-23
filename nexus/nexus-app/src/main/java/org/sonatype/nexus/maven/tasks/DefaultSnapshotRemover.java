@@ -206,7 +206,7 @@ public class DefaultSnapshotRemover
             this.request = request;
 
             int days = request.getRemoveSnapshotsOlderThanDays();
-            
+
             if ( days > -1 )
             {
                 this.dateThreshold = System.currentTimeMillis() - ( days * 86400000 );
@@ -291,8 +291,10 @@ public class DefaultSnapshotRemover
                                 long itemTimestamp = gav.getSnapshotTimeStamp() != null ? gav
                                     .getSnapshotTimeStamp().longValue() : item.getCreated();
 
-                                if ( -1 < dateThreshold
-                                    && itemTimestamp < dateThreshold )
+                                // if dateTreshold is not used (zero days) OR
+                                // if itemTimestamp is less then dateTreshold (NB: both are positive!)
+                                // below will the retentionCount overrule if needed this
+                                if ( -1 == dateThreshold || itemTimestamp < dateThreshold )
                                 {
                                     addStorageFileItemToMap( deletableSnapshotsAndFiles, gav, (StorageFileItem) item );
                                 }
