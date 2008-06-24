@@ -1962,8 +1962,8 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
       for (var j=0;j<servicePropertyItems.length;j++){
         var servicePropertyItem = servicePropertyItems[j];
         
-        if (!servicePropertyItem.disabled){
-          if (servicePropertyItem != null){
+        if (servicePropertyItem != null){
+          if (!servicePropertyItem.disabled && !Ext.isEmpty(srcObj.properties[i].value)){
             if (servicePropertyItem.xtype == 'datefield'){
               servicePropertyItem.setValue(new Date(Number(srcObj.properties[i].value)));
             }
@@ -1979,8 +1979,8 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
             else if (servicePropertyItem.xtype == 'combo'){
               servicePropertyItem.setValue(srcObj.properties[i].value);
             }
+            break;
           }
-          break;
         }
       }
     }
