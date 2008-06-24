@@ -205,7 +205,7 @@ public abstract class AbstractRepository
             notifyProximityEventListeners( new RepositoryEventLocalStatusChanged( this, oldStatus ) );
         }
     }
-    
+
     protected void resetRemoteStatus()
     {
         remoteStatusUpdated = 0;
@@ -300,7 +300,7 @@ public abstract class AbstractRepository
                 }
 
                 getNotFoundCache().purge();
-                
+
                 resetRemoteStatus();
             }
 
@@ -634,6 +634,15 @@ public abstract class AbstractRepository
 
         StorageItem item = retrieveItem( request.isRequestLocalOnly(), uid );
 
+        if ( StorageCollectionItem.class.isAssignableFrom( item.getClass() ) && !isBrowseable() )
+        {
+            getLogger().debug(
+                getId() + " retrieveItem() :: FOUND a collection on " + uid.toString()
+                    + " but repository is not Browseable." );
+
+            throw new ItemNotFoundException( uid );
+        }
+
         item.getItemContext().putAll( request.getRequestContext() );
 
         notifyProximityEventListeners( new RepositoryItemEventRetrieve( item.getRepositoryItemUid(), item
@@ -821,8 +830,6 @@ public abstract class AbstractRepository
 
         maintainNotFoundCache( uid.getPath() );
 
-        boolean isCollectionAndBrowsingNotAllowed = false;
-
         boolean isLocalOnlyRequest = ( localOnly ) || ( getProxyMode() != null && !getProxyMode().shouldProxy() );
 
         try
@@ -834,17 +841,6 @@ public abstract class AbstractRepository
                 getLogger().debug( getId() + " retrieveItem() :: FOUND " + uid.toString() );
             }
 
-            if ( StorageCollectionItem.class.isAssignableFrom( item.getClass() ) && !isBrowseable() )
-            {
-                getLogger().debug(
-                    getId() + " retrieveItem() :: FOUND a collection on " + uid.toString()
-                        + " but repository is not Browseable." );
-
-                isCollectionAndBrowsingNotAllowed = true;
-
-                throw new ItemNotFoundException( uid );
-            }
-
             return item;
         }
         catch ( ItemNotFoundException ex )
@@ -854,7 +850,7 @@ public abstract class AbstractRepository
                 getLogger().debug( getId() + " retrieveItem() :: NOT FOUND " + uid.toString() );
             }
 
-            if ( !isCollectionAndBrowsingNotAllowed && !isLocalOnlyRequest )
+            if ( !isLocalOnlyRequest )
             {
                 addToNotFoundCache( uid.getPath() );
             }
