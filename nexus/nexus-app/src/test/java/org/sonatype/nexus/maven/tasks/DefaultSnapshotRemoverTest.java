@@ -53,6 +53,12 @@ public class DefaultSnapshotRemoverTest
         apacheSnapshots.retrieveArtifactPom( gavRequest );
 
         apacheSnapshots.retrieveArtifact( gavRequest );
+        
+        // get sources for this too
+        
+        gavRequest = new ArtifactStoreRequest( "org.apache.maven", "maven-core", "2.0.9-20080302.032223-6", "zip", "bin" );
+
+        apacheSnapshots.retrieveArtifact( gavRequest );
 
         gavRequest = new ArtifactStoreRequest( "org.apache.maven", "maven-core", "2.0.9-20080302.014714-5" );
 
@@ -146,6 +152,21 @@ public class DefaultSnapshotRemoverTest
             apacheSnapshots.retrieveArtifactPom( gavRequest );
 
             fail( "This is not the newest, it should be deleted!" );
+        }
+        catch ( ItemNotFoundException e )
+        {
+            // good
+        }
+
+        gavRequest = new ArtifactStoreRequest( "org.apache.maven", "maven-core", "2.0.9-20080302.032223-6", "zip", "bin" );
+
+        gavRequest.setRequestLocalOnly( true );
+
+        try
+        {
+            apacheSnapshots.retrieveArtifactPom( gavRequest );
+
+            fail( "This is not the newest bin distro, it should be deleted!" );
         }
         catch ( ItemNotFoundException e )
         {

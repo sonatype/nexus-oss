@@ -207,7 +207,7 @@ public class DefaultSnapshotRemover
 
             int days = request.getRemoveSnapshotsOlderThanDays();
 
-            if ( days > -1 )
+            if ( days > 0 )
             {
                 this.dateThreshold = System.currentTimeMillis() - ( days * 86400000 );
             }
@@ -244,8 +244,10 @@ public class DefaultSnapshotRemover
                 deletableSnapshotsAndFiles.clear();
 
                 remainingSnapshotsAndFiles.clear();
-                
+
                 removeWholeGAV = false;
+                
+                gavToRemove = null;
 
                 Gav gav = null;
 
@@ -268,11 +270,10 @@ public class DefaultSnapshotRemover
                 {
                     if ( !item.isVirtual() && !StorageCollectionItem.class.isAssignableFrom( item.getClass() ) )
                     {
-                        // process only snapshot POMs
+                        // process only snapshot non-checksums
                         if ( M2ArtifactRecognizer.isSnapshot( item.getPath() )
                             && !M2ArtifactRecognizer.isMetadata( item.getPath() )
-                            && !M2ArtifactRecognizer.isChecksum( item.getPath() )
-                            && M2ArtifactRecognizer.isPom( item.getPath() ) )
+                            && !M2ArtifactRecognizer.isChecksum( item.getPath() ) )
                         {
                             gav = ( (MavenRepository) coll.getRepositoryItemUid().getRepository() )
                                 .getGavCalculator().pathToGav( item.getPath() );
@@ -384,10 +385,10 @@ public class DefaultSnapshotRemover
                                 gav = (Gav) file.getItemContext().get( Gav.class.getName() );
 
                                 ArtifactStoreRequest req = new ArtifactStoreRequest( gav.getGroupId(), gav
-                                    .getArtifactId(), gav.getVersion() );
+                                    .getArtifactId(), gav.getVersion(), gav.getExtension(), gav.getClassifier() );
 
-                                // delete the artifact only with all subordinates (like sources et al)
-                                repository.deleteArtifact( req, true, false );
+                                // delete the artifact only
+                                repository.deleteArtifact( req, false, false );
 
                                 deletedFiles++;
                             }

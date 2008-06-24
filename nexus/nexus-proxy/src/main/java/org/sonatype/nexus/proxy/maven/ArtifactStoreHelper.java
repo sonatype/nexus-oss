@@ -119,42 +119,47 @@ public class ArtifactStoreHelper
         }
     }
 
-    protected void deleteWithChecksums( ArtifactStoreRequest request )
+    protected RepositoryItemUid deleteWithChecksums( ArtifactStoreRequest request )
         throws UnsupportedStorageOperationException,
             RepositoryNotAvailableException,
             ItemNotFoundException,
-            StorageException,
-            AccessDeniedException
+            StorageException
     {
+        RepositoryItemUid uid = new RepositoryItemUid( repository, request.getRequestPath() );
+
+        deleteWithChecksums( uid );
+
+        return uid;
+    }
+
+    protected void deleteWithChecksums( RepositoryItemUid uid )
+        throws UnsupportedStorageOperationException,
+            RepositoryNotAvailableException,
+            ItemNotFoundException,
+            StorageException
+    {
+        repository.deleteItem( uid );
+
+        RepositoryItemUid sha1Uid = new RepositoryItemUid( repository, uid.getPath() + ".sha1" );
+
         try
         {
-            repository.deleteItem( request );
-
-            RepositoryItemUid sha1Uid = new RepositoryItemUid( repository, request.getRequestPath() + ".sha1" );
-
-            try
-            {
-                repository.deleteItem( sha1Uid );
-            }
-            catch ( ItemNotFoundException e )
-            {
-                // ignore not found
-            }
-
-            RepositoryItemUid md5Uid = new RepositoryItemUid( repository, request.getRequestPath() + ".md5" );
-
-            try
-            {
-                repository.deleteItem( md5Uid );
-            }
-            catch ( ItemNotFoundException e )
-            {
-                // ignore not found
-            }
+            repository.deleteItem( sha1Uid );
         }
-        catch ( NoSuchResourceStoreException e )
+        catch ( ItemNotFoundException e )
         {
-            // will not happen
+            // ignore not found
+        }
+
+        RepositoryItemUid md5Uid = new RepositoryItemUid( repository, uid.getPath() + ".md5" );
+
+        try
+        {
+            repository.deleteItem( md5Uid );
+        }
+        catch ( ItemNotFoundException e )
+        {
+            // ignore not found
         }
     }
 
@@ -338,6 +343,33 @@ public class ArtifactStoreHelper
         storeItemWithChecksums( gavRequest, new PreparedContentLocator( is ), attributes );
     }
 
+    public void deleteArtifactPom( ArtifactStoreRequest gavRequest, boolean withAllSubordinates, boolean deleteWholeGav )
+        throws UnsupportedStorageOperationException,
+            NoSuchResourceStoreException,
+            RepositoryNotAvailableException,
+            ItemNotFoundException,
+            StorageException,
+            AccessDeniedException
+    {
+        // delete the artifact
+        Gav gav = new Gav( gavRequest.getGroupId(), gavRequest.getArtifactId(), gavRequest.getVersion(), gavRequest
+            .getClassifier(), "pom", null, null, null, RepositoryPolicy.SNAPSHOT.equals( repository
+            .getRepositoryPolicy() ), false, null );
+
+        gavRequest.setRequestPath( repository.getGavCalculator().gavToPath( gav ) );
+
+        deleteWithChecksums( gavRequest );
+
+        if ( deleteWholeGav )
+        {
+            deleteWholeGav( gavRequest );
+        }
+        else
+        {
+            deleteAllSubordinates( gavRequest );
+        }
+    }
+
     public void deleteArtifact( ArtifactStoreRequest gavRequest, boolean withAllSubordinates, boolean deleteWholeGav )
         throws UnsupportedStorageOperationException,
             NoSuchResourceStoreException,
@@ -346,10 +378,6 @@ public class ArtifactStoreHelper
             StorageException,
             AccessDeniedException
     {
-        boolean deleted = false;
-
-        ItemNotFoundException lastINF = null;
-
         // delete the artifact
         Gav gav = new Gav( gavRequest.getGroupId(), gavRequest.getArtifactId(), gavRequest.getVersion(), gavRequest
             .getClassifier(), repository.getArtifactPackagingMapper().getExtensionForPackaging(
@@ -358,82 +386,115 @@ public class ArtifactStoreHelper
 
         gavRequest.setRequestPath( repository.getGavCalculator().gavToPath( gav ) );
 
+        deleteWithChecksums( gavRequest );
+
+        if ( deleteWholeGav )
+        {
+            deleteWholeGav( gavRequest );
+        }
+        else if ( withAllSubordinates )
+        {
+            deleteAllSubordinates( gavRequest );
+        }
+    }
+
+    public Collection<Gav> listArtifacts( ArtifactStoreRequest gavRequest )
+    {
+        // TODO: implement this
+        return Collections.emptyList();
+    }
+
+    // =======================================================================================
+
+    protected void deleteAllSubordinates( ArtifactStoreRequest gavRequest )
+        throws UnsupportedStorageOperationException,
+            NoSuchResourceStoreException,
+            RepositoryNotAvailableException,
+            StorageException,
+            AccessDeniedException
+    {
+        // delete all "below", meaning: classifiers of the GAV
+        // watch for subdirs
+        // delete dir if empty
+        RepositoryItemUid parentCollUid = new RepositoryItemUid( repository, gavRequest.getRequestPath().substring(
+            0,
+            gavRequest.getRequestPath().indexOf( RepositoryItemUid.PATH_SEPARATOR ) ) );
+
         try
         {
-            deleteWithChecksums( gavRequest );
-
-            deleted = true;
-        }
-        catch ( ItemNotFoundException e )
-        {
-            deleted = false;
-
-            lastINF = e;
-        }
-
-        // if this was a request for deletion a secondary artifact, do not delete POM
-        // since those have no accompained POMs
-        // and if the artifact itself was not a POM
-        if ( gavRequest.getClassifier() == null && !"pom".equalsIgnoreCase( gavRequest.getPackaging() ) )
-        {
-            // delete the POM too
-            Gav pomGav = new Gav(
-                gavRequest.getGroupId(),
-                gavRequest.getArtifactId(),
-                gavRequest.getVersion(),
-                null,
-                "pom",
-                null,
-                null,
-                null,
-                RepositoryPolicy.SNAPSHOT.equals( repository.getRepositoryPolicy() ),
-                false,
-                null );
-
-            gavRequest.setRequestPath( repository.getGavCalculator().gavToPath( pomGav ) );
-
-            try
-            {
-                deleteWithChecksums( gavRequest );
-
-                deleted = true;
-            }
-            catch ( ItemNotFoundException e )
-            {
-                deleted = deleted || false;
-
-                if ( lastINF == null )
-                {
-                    lastINF = e;
-                }
-            }
-        }
-
-        if ( !deleted && !deleteWholeGav && !withAllSubordinates )
-        {
-            // we could do nothing
-            throw lastINF;
-        }
-        else if ( deleteWholeGav )
-        {
-            // delete all in this directory
-            // watch for subdirs
-            // delete dir if empty
-            RepositoryItemUid parentCollUid = new RepositoryItemUid( repository, gavRequest.getRequestPath().substring(
-                0,
-                gavRequest.getRequestPath().indexOf( RepositoryItemUid.PATH_SEPARATOR ) ) );
-
+            // get the parent collection
             StorageCollectionItem parentColl = (StorageCollectionItem) repository.retrieveItem( true, parentCollUid );
 
+            // list it
             Collection<StorageItem> items = repository.list( parentColl );
 
-            boolean hadSubdirectory = false;
+            boolean hadSubdirectoryOrOtherFiles = false;
 
+            // and delete all except subdirs
             for ( StorageItem item : items )
             {
                 if ( !StorageCollectionItem.class.isAssignableFrom( item.getClass() ) )
                 {
-                    repository.deleteItem( item.getRepositoryItemUid() );
+                    Gav gav = repository.getGavCalculator().pathToGav( item.getPath() );
+
+                    if ( gav != null && gavRequest.getGroupId().equals( gav.getGroupId() )
+                        && gavRequest.getArtifactId().equals( gav.getArtifactId() )
+                        && gavRequest.getVersion().equals( gav.getVersion() ) && gav.getClassifier() != null )
+                    {
+                        deleteWithChecksums( item.getRepositoryItemUid() );
+                    }
+                    else
+                    {
+                        hadSubdirectoryOrOtherFiles = true;
+                    }
+                }
+                else
+                {
+                    hadSubdirectoryOrOtherFiles = true;
+                }
+            }
+
+            if ( !hadSubdirectoryOrOtherFiles )
+            {
+                repository.deleteItem( parentCollUid );
+            }
+        }
+        catch ( ItemNotFoundException e )
+        {
+            // silent
+        }
+    }
+
+    protected void deleteWholeGav( ArtifactStoreRequest gavRequest )
+        throws UnsupportedStorageOperationException,
+            NoSuchResourceStoreException,
+            RepositoryNotAvailableException,
+            StorageException,
+            AccessDeniedException
+    {
+        // delete all in this directory
+        // watch for subdirs
+        // delete dir if empty
+        RepositoryItemUid parentCollUid = new RepositoryItemUid( repository, gavRequest.getRequestPath().substring(
+            0,
+            gavRequest.getRequestPath().lastIndexOf( RepositoryItemUid.PATH_SEPARATOR ) ) );
+
+        try
+        {
+            // get the parent collection
+            StorageCollectionItem parentColl = (StorageCollectionItem) repository.retrieveItem( true, parentCollUid );
+
+            // list it
+            Collection<StorageItem> items = repository.list( parentColl );
+
+            boolean hadSubdirectory = false;
+
+            // and delete all except subdirs
+            for ( StorageItem item : items )
+            {
+                if ( !StorageCollectionItem.class.isAssignableFrom( item.getClass() ) )
+                {
+                    deleteWithChecksums( item.getRepositoryItemUid() );
                 }
                 else
                 {
@@ -446,23 +507,11 @@ public class ArtifactStoreHelper
                 repository.deleteItem( parentCollUid );
             }
         }
-        else
+        catch ( ItemNotFoundException e )
         {
-            if ( withAllSubordinates )
-            {
-                // delete POM/JAR if this was JAR/POM
-                // delete all classifiers
-            }
+            // silent
         }
     }
-
-    public Collection<Gav> listArtifacts( ArtifactStoreRequest gavRequest )
-    {
-        // TODO: implement this
-        return Collections.emptyList();
-    }
-
-    // =======================================================================================
 
     protected void checkRequest( ArtifactStoreRequest gavRequest )
     {

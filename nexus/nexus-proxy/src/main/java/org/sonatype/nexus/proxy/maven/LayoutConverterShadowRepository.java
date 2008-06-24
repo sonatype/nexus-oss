@@ -160,6 +160,17 @@ public abstract class LayoutConverterShadowRepository
         getArtifactStoreHelper().storeArtifactWithGeneratedPom( gavRequest, is, attributes );
     }
 
+    public void deleteArtifactPom( ArtifactStoreRequest gavRequest, boolean withAllSubordinates, boolean deleteWholeGav )
+        throws UnsupportedStorageOperationException,
+            NoSuchResourceStoreException,
+            RepositoryNotAvailableException,
+            ItemNotFoundException,
+            StorageException,
+            AccessDeniedException
+    {
+        getArtifactStoreHelper().deleteArtifactPom( gavRequest, withAllSubordinates, deleteWholeGav );
+    }
+
     public void deleteArtifact( ArtifactStoreRequest gavRequest, boolean withAllSubordinates, boolean deleteWholeGav )
         throws UnsupportedStorageOperationException,
             NoSuchResourceStoreException,
