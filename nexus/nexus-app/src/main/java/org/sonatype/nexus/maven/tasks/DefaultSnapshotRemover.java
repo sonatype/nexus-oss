@@ -288,8 +288,25 @@ public class DefaultSnapshotRemover
 
                                 item.getItemContext().put( Gav.class.getName(), gav );
 
-                                long itemTimestamp = gav.getSnapshotTimeStamp() != null ? gav
-                                    .getSnapshotTimeStamp().longValue() : item.getCreated();
+                                long itemTimestamp = System.currentTimeMillis();
+
+                                getLogger().debug( "NOW is " + itemTimestamp );
+
+                                if ( gav.getSnapshotTimeStamp() != null )
+                                {
+                                    getLogger().debug( "Using GAV snapshot timestamp" );
+
+                                    itemTimestamp = gav.getSnapshotTimeStamp().longValue();
+                                }
+                                else
+                                {
+                                    getLogger().debug( "GAV Snapshot timestamp not available, using item.getCreated()" );
+
+                                    itemTimestamp = item.getCreated();
+                                }
+
+                                getLogger()
+                                    .debug( "itemTimestamp=" + itemTimestamp + ", dateTreshold=" + dateThreshold );
 
                                 // if dateTreshold is not used (zero days) OR
                                 // if itemTimestamp is less then dateTreshold (NB: both are positive!)
