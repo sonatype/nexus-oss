@@ -2,13 +2,14 @@ package org.sonatype.nexus.ext.gwt.ui.client.reposerver;
 
 import org.sonatype.gwt.client.resource.Resource;
 import org.sonatype.gwt.client.resource.Variant;
-import org.sonatype.nexus.ext.gwt.ui.client.Constants;
 import org.sonatype.nexus.ext.gwt.ui.client.ResourceProxy;
 import org.sonatype.nexus.ext.gwt.ui.client.ServerInstance;
+import org.sonatype.nexus.ext.gwt.ui.client.reposerver.model.RepositoryStatus;
 
 import com.extjs.gxt.ui.client.Style.SortDir;
 import com.extjs.gxt.ui.client.binder.TableBinder;
 import com.extjs.gxt.ui.client.data.BaseListLoader;
+import com.extjs.gxt.ui.client.data.BaseModelData;
 import com.extjs.gxt.ui.client.data.DataProxy;
 import com.extjs.gxt.ui.client.data.DataReader;
 import com.extjs.gxt.ui.client.data.ListLoadResult;
@@ -26,11 +27,11 @@ import com.extjs.gxt.ui.client.store.StoreEvent;
 import com.extjs.gxt.ui.client.store.StoreListener;
 import com.extjs.gxt.ui.client.store.StoreSorter;
 import com.extjs.gxt.ui.client.util.DelayedTask;
+import com.extjs.gxt.ui.client.widget.MessageBox;
 import com.extjs.gxt.ui.client.widget.table.Table;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.RequestCallback;
 import com.google.gwt.http.client.Response;
-import com.google.gwt.user.client.Window;
 
 public class RepoTableBinding {
 
@@ -56,6 +57,8 @@ public class RepoTableBinding {
             addField("status/proxyMode");
         }
     };
+    
+    private RepoServerInstance server;
 
     private ListLoader loader;
 
@@ -68,6 +71,8 @@ public class RepoTableBinding {
     }
 
     public RepoTableBinding(final Table table, final ServerInstance server, ModelType modelType) {
+        this.server = (RepoServerInstance) server;
+        
         DataReader reader = new XmlReader(modelType);
         Resource repoList = server.getResource("repositories");
         DataProxy proxy = new ResourceProxy(repoList, Variant.APPLICATION_XML);
@@ -94,7 +99,7 @@ public class RepoTableBinding {
             {
                 addStoreListener(new StoreListener() {
                     public void storeDataChanged(StoreEvent event) {
-                        loadStatuses(server, true);
+                        loadStatuses(true);
                     }
                 });
                 setStoreSorter(new StoreSorter());
@@ -102,7 +107,7 @@ public class RepoTableBinding {
                 	public boolean equals(ModelData model1, ModelData model2) {
                 		String resourceURI1 = (String) model1.get("resourceURI");
                 		String resourceURI2 = (String) model2.get("resourceURI");
-                		resourceURI2 = resourceURI2.replace(Constants.SERVICE_REPOSITORY_STATUSES, Constants.SERVICE_REPOSITORIES);
+                		resourceURI2 = resourceURI2.replace(server.getPath() + "/repository_statuses", server.getPath() + "/repositories");
                 		return resourceURI1.equals(resourceURI2);
                 	}
                 });
@@ -124,29 +129,46 @@ public class RepoTableBinding {
     public TableBinder<ModelData> getBinder() {
         return binder;
     }
+    
+    public void updateRepoStatus(RepositoryStatus status) {
+        //TODO: find a way to avoid ModelData/JavaBean mapping
+        BaseModelData item = new BaseModelData();
+        item.set("resourceURI", server.getPath() + "/repository_statuses/" + status.getId());
+        item.set("status/localStatus", status.getLocalStatus());
+        item.set("status/remoteStatus", status.getRemoteStatus());
+        item.set("status/proxyMode", status.getProxyMode());
+        
+        ModelData storeItem = store.findModel(item);
+        storeItem.set("localStatus", item.get("status/localStatus"));
+        storeItem.set("status", convertStatusToString(item, storeItem));
+        store.update(storeItem);
+        
+        loadStatuses(false);
+    }
 
-    private void loadStatuses(final ServerInstance server, boolean forceCheck) {
+    private void loadStatuses(boolean forceCheck) {
         Resource resource = server.getResource("repository_statuses" + (forceCheck? "?forceCheck": ""));
         resource.get(new RequestCallback() {
             public void onError(Request request, Throwable exception) {
-                Window.alert("Status retrieval failed!");
+                MessageBox.alert("Error", "Status retrieval failed!", null);
             }
             public void onResponseReceived(Request request, Response response) {
                 XmlReader reader = new XmlReader(STATUSES_MODEL_TYPE);
                 ListLoadResult<ModelData> result = reader.read(null, response.getText());
 
-                for (ModelData item: result.getData()) {
+                for (ModelData item : result.getData()) {
                 	ModelData storeItem = store.findModel(item);
                 	if (storeItem != null) {
+                	    storeItem.set("localStatus", item.get("status/localStatus"));
                         storeItem.set("status", convertStatusToString(item, storeItem));
                         store.update(storeItem);
                 	}
                 }
 
-                if (response.getStatusCode() == 202) {
+                if (response.getStatusCode() == Response.SC_ACCEPTED) {
                 	DelayedTask task = new DelayedTask(new Listener() {
                 	    public void handleEvent(BaseEvent event) {
-                	    	loadStatuses(server, false);
+                	    	loadStatuses(false);
                 	    }
                 	});
                 	task.delay(2000);

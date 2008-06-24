@@ -4,6 +4,7 @@ import org.sonatype.nexus.ext.gwt.ui.client.Action;
 import org.sonatype.nexus.ext.gwt.ui.client.Constants;
 import org.sonatype.nexus.ext.gwt.ui.client.ServerFunctionPanel;
 import org.sonatype.nexus.ext.gwt.ui.client.ServerInstance;
+import org.sonatype.nexus.ext.gwt.ui.client.reposerver.model.RepositoryStatus;
 
 import com.extjs.gxt.ui.client.Style;
 import com.extjs.gxt.ui.client.data.ModelData;
@@ -15,6 +16,7 @@ import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.widget.Component;
 import com.extjs.gxt.ui.client.widget.ContentPanel;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
+import com.extjs.gxt.ui.client.widget.MessageBox;
 import com.extjs.gxt.ui.client.widget.button.ToolButton;
 import com.extjs.gxt.ui.client.widget.layout.BorderLayout;
 import com.extjs.gxt.ui.client.widget.layout.BorderLayoutData;
@@ -26,22 +28,22 @@ import com.extjs.gxt.ui.client.widget.table.TableColumnModel;
 import com.extjs.gxt.ui.client.widget.toolbar.TextToolItem;
 import com.extjs.gxt.ui.client.widget.toolbar.ToolBar;
 import com.extjs.gxt.ui.client.widget.tree.Tree;
+import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.Window;
 
 public class RepoMaintenancePage extends LayoutContainer implements ServerFunctionPanel {
 
-    ContentPanel repoPanel;
-
-    ContentPanel repoTree;
-    ContentPanel repoTreePanel;
-    RepoTreeBinding repoTreeBinding;
+    private ContentPanel repoPanel;
+    private ContentPanel repoTree;
+    private ContentPanel repoTreePanel;
+    private RepoTreeBinding repoTreeBinding;
 
     public void init(ServerInstance server) {
         setLayout(new BorderLayout());
         setWidth("100%");
         setHeight("100%");
 
-        addRepoList(server);
+        addRepoList((RepoServerInstance) server);
         addRepoPanel();
 
         createRepoTree();
@@ -49,7 +51,7 @@ public class RepoMaintenancePage extends LayoutContainer implements ServerFuncti
         showRepoHelp();
     }
     
-    private void addRepoList(final ServerInstance server) {
+    private void addRepoList(final RepoServerInstance server) {
         ContentPanel panel = new ContentPanel() {
             {
                 setHeaderVisible(false);
@@ -148,6 +150,15 @@ public class RepoMaintenancePage extends LayoutContainer implements ServerFuncti
             }
         });
         
+        tableMenu.addAction(new Action<ModelData>("Rebuild Attributes") {
+            public boolean supports(ModelData data) {
+                return data.get("repoType").equals("hosted");
+            }
+            public void execute(ModelData data) {
+                Window.alert(getCaption());
+            }
+        });
+        
         tableMenu.addAction(new Action<ModelData>("Block Proxy") {
             public boolean supports(ModelData data) {
                 return data.get("repoType").equals("proxy");
@@ -158,24 +169,38 @@ public class RepoMaintenancePage extends LayoutContainer implements ServerFuncti
         });
         
         tableMenu.addAction(new Action<ModelData>("Put Out of Service") {
+            public boolean supports(ModelData data) {
+                return "inService".equals(data.get("localStatus"));
+            }
             public void execute(ModelData data) {
-                /*
-                String path = data.get("contentUri") + "/status";
-                Document doc = XMLParser.createDocument();
-                doc.createElement("");
-                String request = "{\"data\":{\"id\":\"central-m1\",\"repoType\":\"virtual\",\"localStatus\":\"inService\"}}";
-                server.getResource(path).put(new RequestCallback() {
-                    public void onError(Request request, Throwable exception) {
-                        Window.alert("ERROR: " + exception.getMessage());
+                RepositoryStatus status = new RepositoryStatus(data);
+                status.setLocalStatus("outOfService");
+                server.updateRepositoryStatus(status, new ResponseHandler<RepositoryStatus>() {
+                    public void onError(Response response, Throwable error) {
+                        MessageBox.alert("Error", "The server did not put the repository out of service", null);
                     }
-                    public void onResponseReceived(Request request, Response response) {
-                        if (response.getStatusCode() != Response.SC_OK) {
-                            Window.alert("ERROR - " + response.getStatusText());
-                        }
-                        Window.alert(response.getText());
+                    public void onResponse(RepositoryStatus status) {
+                        tableBinding.updateRepoStatus(status);
                     }
-                }, new Representation(Variant.APPLICATION_XML, request));
-                */
+                });
+            }
+        });
+
+        tableMenu.addAction(new Action<ModelData>("Put in Service") {
+            public boolean supports(ModelData data) {
+                return "outOfService".equals(data.get("localStatus"));
+            }
+            public void execute(ModelData data) {
+                RepositoryStatus status = new RepositoryStatus(data);
+                status.setLocalStatus("inService");
+                server.updateRepositoryStatus(status, new ResponseHandler<RepositoryStatus>() {
+                    public void onError(Response response, Throwable error) {
+                        MessageBox.alert("Error", "The server did not put the repository into service", null);
+                    }
+                    public void onResponse(RepositoryStatus status) {
+                        tableBinding.updateRepoStatus(status);
+                    }
+                });
             }
         });
     }
@@ -262,4 +287,5 @@ public class RepoMaintenancePage extends LayoutContainer implements ServerFuncti
         repoPanel.addText("Select a repository to view it")
                  .setStyleName("st-little-padding");
     }
+    
 }

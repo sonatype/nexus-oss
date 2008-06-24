@@ -8,21 +8,21 @@ import org.sonatype.nexus.ext.gwt.ui.client.ServerInstance;
 public class RepoServer extends AbstractServerType {
 
     public void init() {
-        ServerInstance local = new ServerInstance(this);
+        ServerInstance local = new RepoServerInstance(this);
         local.setId("local");
         local.setName("Local");
         addInstance(local);
         
-        ServerFunctionGroup views = new ServerFunctionGroup();
-        views.setName("Views");
+        ServerFunctionGroup viewsGroup = new ServerFunctionGroup();
+        viewsGroup.setName("Views");
         
         ServerFunction repoMaintenance = new ServerFunction();
         repoMaintenance.setMenuName("Repositories");
         repoMaintenance.setTabName("Maintenance");
         repoMaintenance.setPanel(new RepoMaintenancePage());
-        views.addFunction(repoMaintenance);
+        viewsGroup.addFunction(repoMaintenance);
         
-        addFunctionGroup(views);
+        addFunctionGroup(viewsGroup);
     }
 
     public String getName() {
