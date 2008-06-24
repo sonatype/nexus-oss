@@ -34,11 +34,11 @@ public class JavaBeanListTableModel extends AbstractTableModel {
 
     public Object getCell(int rowIndex, int colIndex) {
         try {
-            Method getter = beans[rowIndex].getClass()
-                    .getMethod("get" + props[colIndex], null);
-            return getter.invoke(beans[rowIndex], null);
+            Method getter =
+                beans[rowIndex].getClass().getMethod("get" + props[colIndex]);
+            return getter.invoke(beans[rowIndex]);
         } catch (Exception e) {
-            e.printStackTrace();
+            //ignored
         }
         return null;
     }
