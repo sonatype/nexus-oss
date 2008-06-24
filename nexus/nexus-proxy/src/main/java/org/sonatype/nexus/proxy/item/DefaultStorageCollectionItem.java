@@ -95,6 +95,9 @@ public class DefaultStorageCollectionItem
         }
         else
         {
+            // path correction here
+            req.setRequestPath( getRepositoryItemUid().getPath() );
+
             Collection<StorageItem> result = getStore().list( req );
 
             for ( StorageItem item : result )

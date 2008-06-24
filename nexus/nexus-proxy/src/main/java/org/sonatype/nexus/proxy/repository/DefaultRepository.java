@@ -32,6 +32,7 @@ import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.PreparedContentLocator;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
+import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
@@ -362,6 +363,12 @@ public abstract class DefaultRepository
         if ( item.isExpired() )
         {
             return true;
+        }
+
+        // a directory is not "aged"
+        if ( StorageCollectionItem.class.isAssignableFrom( item.getClass() ) )
+        {
+            return false;
         }
 
         // if repo is non-expirable, false
