@@ -1,5 +1,7 @@
 package org.sonatype.gwt.client.resource;
 
+import java.util.Map;
+
 import org.sonatype.gwt.client.request.RESTRequestBuilder;
 
 /**
@@ -42,10 +44,33 @@ public interface Resource
     Resource getResource( String path );
 
     /**
-     * Retuens the RESTRequestBuilder used by this resource.
+     * Returns the RESTRequestBuilder used by this resource.
      * 
      * @return
      */
     RESTRequestBuilder getRestRequestBuilder();
+
+    /**
+     * Adds a header field to the request
+     * 
+     * @param name the name of the header
+     * @param value the value of the header
+     */
+    void addHeader( String name, String value );
+
+    /**
+     * Merge the given headers to the existing ones. Existing entries will be
+     * overwritten with the new values.
+     * 
+     * @param headers the headers to be added to the existing ones.
+     */
+    public void addHeaders( Map<String, String> headers );
+
+    /**
+     * Get all of the headers
+     * 
+     * @return the headers
+     */
+    Map<String, String> getHeaders();
 
 }

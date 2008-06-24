@@ -1,5 +1,7 @@
 package org.sonatype.gwt.client.request;
 
+import java.util.Map;
+
 import org.sonatype.gwt.client.resource.Resource;
 import org.sonatype.gwt.client.resource.Variant;
 
@@ -109,6 +111,11 @@ public class DefaultRESTRequestBuilder
             result.setHeader( "Accept", variant.getMediaType() );
 
             result.setHeader( "Content-Type", variant.getMediaType() );
+        }
+
+        for ( Map.Entry<String, String> header : resource.getHeaders().entrySet() )
+        {
+            result.setHeader( header.getKey(), header.getValue() );
         }
 
         return result;

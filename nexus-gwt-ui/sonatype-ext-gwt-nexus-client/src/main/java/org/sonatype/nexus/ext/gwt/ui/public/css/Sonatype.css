@@ -33,14 +33,13 @@ body {
   font-size: 14px;
 }
 
-/* Sonatype Icons */
-button.st-icon-refresh {
-  background-image:url(../images/icons/arrow_refresh.png);
+a.st-link {
+  color: #15428B;
+  cursor: pointer;
 }
 
-#st-repo-browser .x-panel-body {
-  background-color: #FFFFFF;
-  border: 1px solid #99BBE8;
+button.st-icon-refresh {
+  background-image:url(../images/icons/arrow_refresh.png);
 }
 
 /* left server sub-panels */
@@ -51,16 +50,18 @@ button.st-icon-refresh {
   background-color: #F9F9F9;
 }
 #st-server-nexus-tab a.st-link {
-  color: #15428B;
 /* FIXME: Find out how to recalculate the height of a link
   font-size: 13px;
 */
   text-decoration: none;
-  display: block;
 /* FIXME: Find out how to recalculate the height of a link
   padding: 2px;
 */
-  cursor: pointer;
+}
+
+#st-repo-browser .x-panel-body {
+  background-color: #FFFFFF;
+  border: 1px solid #99BBE8;
 }
 
 .my-tbl {

@@ -1,5 +1,8 @@
 package org.sonatype.gwt.client.resource;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.sonatype.gwt.client.request.DefaultRESTRequestBuilder;
 import org.sonatype.gwt.client.request.RESTRequestBuilder;
 import org.sonatype.gwt.client.resource.PathUtils.UrlElements;
@@ -21,6 +24,8 @@ public class DefaultResource
     private String resourceUri;
 
     private RESTRequestBuilder restRequestBuilder;
+
+    private HashMap<String, String> headers = new HashMap<String, String>();
 
     /**
      * Create resource from an URL in form <code>http://localhost[:port][/some/path]</code>. This constructor will
@@ -151,6 +156,21 @@ public class DefaultResource
     public Resource getResource( String resourceUri )
     {
         return new DefaultResource( PathUtils.append( getPath(), resourceUri ), getRestRequestBuilder() );
+    }
+
+    public void addHeader( String name, String value )
+    {
+        headers.put( name, value );
+    }
+
+    public void addHeaders( Map<String, String> headers )
+    {
+        headers.putAll( headers );
+    }
+
+    public Map<String, String> getHeaders()
+    {
+        return headers;
     }
 
 }
