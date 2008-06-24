@@ -244,6 +244,8 @@ public class DefaultSnapshotRemover
                 deletableSnapshotsAndFiles.clear();
 
                 remainingSnapshotsAndFiles.clear();
+                
+                removeWholeGAV = false;
 
                 Gav gav = null;
 
