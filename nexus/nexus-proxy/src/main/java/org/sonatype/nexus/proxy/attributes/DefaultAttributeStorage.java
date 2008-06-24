@@ -338,19 +338,17 @@ public class DefaultAttributeStorage
                 result.setRepositoryItemUid( uid );
 
                 // fixing remoteChecked
-                if ( result.getRemoteChecked() == 0 )
+                if ( result.getRemoteChecked() == 0 || result.getRemoteChecked() == 1 )
                 {
                     result.setRemoteChecked( System.currentTimeMillis() );
-                }
-                else if ( result.getRemoteChecked() == 1 )
-                {
+
                     result.setExpired( true );
                 }
 
                 // fixing lastRequested
                 if ( result.getLastRequested() == 0 )
                 {
-                    result.setLastRequested( result.getRemoteChecked() );
+                    result.setLastRequested( System.currentTimeMillis() );
                 }
             }
             catch ( BaseException e )
