@@ -322,12 +322,203 @@ public class DefaultSnapshotRemoverTest
         fillInRepo();
 
         // and now setup the request
-        // process the apacheSnapshots, leave min 1 snap, remove older than 0 day and delete them if release exists
-        SnapshotRemovalRequest request = new SnapshotRemovalRequest( apacheSnapshots.getId(), null, 1, -1, true );
+        // process the apacheSnapshots, leave min 1 snap
+        SnapshotRemovalRequest request = new SnapshotRemovalRequest( apacheSnapshots.getId(), null, 2, -1, false );
 
         SnapshotRemovalResult result = defaultNexus.removeSnapshots( request );
 
         assertEquals( 1, result.getProcessedRepositories().size() );
+        
+        ArtifactStoreRequest gavRequest = null;
+
+        // test the results by their local availability
+        
+        gavRequest = new ArtifactStoreRequest( "org.apache.maven", "maven-core", "2.0.9-20080306.010327-7" );
+
+        gavRequest.setRequestLocalOnly( true );
+
+        try
+        {
+            apacheSnapshots.retrieveArtifactPom( gavRequest );
+        }
+        catch ( ItemNotFoundException e )
+        {
+            fail( "Should not be deleted!" );
+        }
+
+        try
+        {
+            apacheSnapshots.retrieveArtifact( gavRequest );
+        }
+        catch ( ItemNotFoundException e )
+        {
+            fail( "Should not be deleted!" );
+        }
+
+        gavRequest = new ArtifactStoreRequest( "org.apache.maven", "maven-core", "2.0.9-20080302.032223-6" );
+
+        gavRequest.setRequestLocalOnly( true );
+
+        try
+        {
+            apacheSnapshots.retrieveArtifactPom( gavRequest );
+        }
+        catch ( ItemNotFoundException e )
+        {
+            fail( "Should not be deleted!" );
+        }
+
+        try
+        {
+            apacheSnapshots.retrieveArtifact( gavRequest );
+        }
+        catch ( ItemNotFoundException e )
+        {
+            fail( "Should not be deleted!" );
+        }
+
+        gavRequest = new ArtifactStoreRequest( "org.apache.maven", "maven-core", "2.0.9-20080302.014714-5" );
+
+        gavRequest.setRequestLocalOnly( true );
+
+        try
+        {
+            apacheSnapshots.retrieveArtifactPom( gavRequest );
+
+            fail( "Should be deleted!" );
+        }
+        catch ( ItemNotFoundException e )
+        {
+            // good
+        }
+
+        try
+        {
+            apacheSnapshots.retrieveArtifact( gavRequest );
+
+            fail( "Should be deleted!" );
+        }
+        catch ( ItemNotFoundException e )
+        {
+            // good
+        }
+
+        gavRequest = new ArtifactStoreRequest( "org.apache.maven", "maven-core", "2.0.9-20080215.024846-4" );
+
+        gavRequest.setRequestLocalOnly( true );
+
+        try
+        {
+            apacheSnapshots.retrieveArtifactPom( gavRequest );
+
+            fail( "Should be deleted!" );
+        }
+        catch ( ItemNotFoundException e )
+        {
+            // good
+        }
+
+        try
+        {
+            apacheSnapshots.retrieveArtifact( gavRequest );
+
+            fail( "Should be deleted!" );
+        }
+        catch ( ItemNotFoundException e )
+        {
+            // good
+        }
+
+        // get 2 pieces of maven-archiver
+        gavRequest = new ArtifactStoreRequest( "org.apache.maven", "maven-archiver", "2.3-20080101.212006-10" );
+
+        gavRequest.setRequestLocalOnly( true );
+
+        try
+        {
+            apacheSnapshots.retrieveArtifactPom( gavRequest );
+        }
+        catch ( ItemNotFoundException e )
+        {
+            fail( "Should not be deleted!" );
+        }
+
+        try
+        {
+            apacheSnapshots.retrieveArtifact( gavRequest );
+        }
+        catch ( ItemNotFoundException e )
+        {
+            fail( "Should not be deleted!" );
+        }
+
+        gavRequest = new ArtifactStoreRequest( "org.apache.maven", "maven-archiver", "2.3-20080101.211719-9" );
+
+        gavRequest.setRequestLocalOnly( true );
+
+        try
+        {
+            apacheSnapshots.retrieveArtifactPom( gavRequest );
+        }
+        catch ( ItemNotFoundException e )
+        {
+            fail( "Should not be deleted!" );
+        }
+
+        try
+        {
+            apacheSnapshots.retrieveArtifact( gavRequest );
+        }
+        catch ( ItemNotFoundException e )
+        {
+            fail( "Should not be deleted!" );
+        }
+
+        // get 1 piece of maven-artifact
+        try
+        {
+            apacheSnapshots.retrieveItem( new ResourceStoreRequest(
+                "/org/apache/maven/maven-artifact/2.0.9-SNAPSHOT/maven-artifact-2.0.9-20080306.011152-9.pom",
+                true ) );
+        }
+        catch ( ItemNotFoundException e )
+        {
+            fail( "Should not be deleted!" );
+        }
+
+        try
+        {
+            apacheSnapshots.retrieveItem( new ResourceStoreRequest(
+                "/org/apache/maven/maven-artifact/2.0.9-SNAPSHOT/maven-artifact-2.0.9-20080306.011152-9.jar",
+                true ) );
+        }
+        catch ( ItemNotFoundException e )
+        {
+            fail( "Should not be deleted!" );
+        }
+
+        // and get it's release counterpart
+        try
+        {
+            central.retrieveItem( new ResourceStoreRequest(
+                "/org/apache/maven/maven-artifact/2.0.9/maven-artifact-2.0.9.pom",
+                true ) );
+        }
+        catch ( ItemNotFoundException e )
+        {
+            fail( "Should not be deleted!" );
+        }
+
+        try
+        {
+            central.retrieveItem( new ResourceStoreRequest(
+                "/org/apache/maven/maven-artifact/2.0.9/maven-artifact-2.0.9.jar",
+                true ) );
+        }
+        catch ( ItemNotFoundException e )
+        {
+            fail( "Should not be deleted!" );
+        }
     }
 
 }
