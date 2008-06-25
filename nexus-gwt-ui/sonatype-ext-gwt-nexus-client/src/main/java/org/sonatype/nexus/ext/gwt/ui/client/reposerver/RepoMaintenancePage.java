@@ -6,10 +6,13 @@ import org.sonatype.nexus.ext.gwt.ui.client.ServerFunctionPanel;
 import org.sonatype.nexus.ext.gwt.ui.client.ServerInstance;
 import org.sonatype.nexus.ext.gwt.ui.client.reposerver.model.RepositoryStatus;
 
+import com.extjs.gxt.ui.client.Events;
 import com.extjs.gxt.ui.client.Style;
 import com.extjs.gxt.ui.client.data.ModelData;
 import com.extjs.gxt.ui.client.data.TreeModel;
+import com.extjs.gxt.ui.client.event.BaseEvent;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
+import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.event.SelectionChangedEvent;
 import com.extjs.gxt.ui.client.event.SelectionChangedListener;
 import com.extjs.gxt.ui.client.event.SelectionListener;
@@ -129,78 +132,185 @@ public class RepoMaintenancePage extends LayoutContainer implements ServerFuncti
             new ContextMenuProvider(table, tableBinding.getBinder());
         
         tableMenu.addAction(new Action<ModelData>("View") {
+            
             public void execute(ModelData data) {
                 Window.alert(getCaption());
             }
+            
         });
         
         tableMenu.addAction(new Action<ModelData>("Clear Cache") {
+            
             public boolean supports(ModelData data) {
                 String repoType = (String) data.get("repoType");
                 return repoType.equals("hosted") || repoType.equals("proxy");
             }
+            
             public void execute(ModelData data) {
-                Window.alert(getCaption());
+                String repositoryId = RepoServerUtil.getRepositoryId(data);
+                
+                server.clearRepositoryCache(repositoryId, new ResponseHandler() {
+
+                    public void onError(Response response, Throwable error) {
+                        MessageBox.alert("Error", "The server did not clear the repository's cache", null);
+                    }
+
+                    public void onSuccess(Response response, Object entity) {
+                        //do nothing
+                    }
+                    
+                });
             }
+            
         });
         
         tableMenu.addAction(new Action<ModelData>("Re-Index") {
+            
             public void execute(ModelData data) {
-                Window.alert(getCaption());
+                String repositoryId = RepoServerUtil.getRepositoryId(data);
+                
+                server.reindexRepository(repositoryId, new ResponseHandler() {
+
+                    public void onError(Response response, Throwable error) {
+                        MessageBox.alert("Error", "The server did not re-index the repository", null);
+                    }
+
+                    public void onSuccess(Response response, Object entity) {
+                        //do nothing
+                    }
+                    
+                });
             }
+            
         });
         
         tableMenu.addAction(new Action<ModelData>("Rebuild Attributes") {
+            
             public boolean supports(ModelData data) {
                 return data.get("repoType").equals("hosted");
             }
+            
             public void execute(ModelData data) {
-                Window.alert(getCaption());
+                String repositoryId = RepoServerUtil.getRepositoryId(data);
+                
+                server.rebuildRepositoryAttributes(repositoryId, new ResponseHandler() {
+
+                    public void onError(Response response, Throwable error) {
+                        MessageBox.alert("Error", "The server did not rebuild attributes in the repository", null);
+                    }
+
+                    public void onSuccess(Response response, Object entity) {
+                        //do nothing
+                    }
+                    
+                });
             }
+            
         });
         
         tableMenu.addAction(new Action<ModelData>("Block Proxy") {
+            
             public boolean supports(ModelData data) {
-                return data.get("repoType").equals("proxy");
+                return "proxy".equals(data.get("repoType")) && "allow".equals(data.get("proxyMode"));
             }
+            
             public void execute(ModelData data) {
-                Window.alert(getCaption());
+                RepositoryStatus status = new RepositoryStatus(data);
+                status.setProxyMode("blockedManual");
+                
+                server.updateRepositoryStatus(status, new ResponseHandler<RepositoryStatus>() {
+                    
+                    public void onError(Response response, Throwable error) {
+                        MessageBox.alert("Error", "The server did not update the proxy repository status to blocked", null);
+                    }
+                    
+                    public void onSuccess(Response response, RepositoryStatus status) {
+                        tableBinding.updateRepoStatus(status);
+                    }
+                    
+                });
             }
+            
+        });
+        
+        tableMenu.addAction(new Action<ModelData>("Allow Proxy") {
+            
+            public boolean supports(ModelData data) {
+                return "proxy".equals(data.get("repoType")) && !"allow".equals(data.get("proxyMode"));
+            }
+            
+            public void execute(ModelData data) {
+                RepositoryStatus status = new RepositoryStatus(data);
+                status.setProxyMode("allow");
+                
+                server.updateRepositoryStatus(status, new ResponseHandler<RepositoryStatus>() {
+                    
+                    public void onError(Response response, Throwable error) {
+                        MessageBox.alert("Error", "The server did not update the proxy repository status to allow", null);
+                    }
+                    
+                    public void onSuccess(Response response, RepositoryStatus status) {
+                        tableBinding.updateRepoStatus(status);
+                    }
+                    
+                });
+            }
+            
         });
         
         tableMenu.addAction(new Action<ModelData>("Put Out of Service") {
+            
             public boolean supports(ModelData data) {
                 return "inService".equals(data.get("localStatus"));
             }
+            
             public void execute(ModelData data) {
                 RepositoryStatus status = new RepositoryStatus(data);
                 status.setLocalStatus("outOfService");
+                
                 server.updateRepositoryStatus(status, new ResponseHandler<RepositoryStatus>() {
+                    
                     public void onError(Response response, Throwable error) {
                         MessageBox.alert("Error", "The server did not put the repository out of service", null);
                     }
-                    public void onResponse(RepositoryStatus status) {
+                    
+                    public void onSuccess(Response response, RepositoryStatus status) {
                         tableBinding.updateRepoStatus(status);
                     }
+                    
                 });
             }
+            
         });
 
         tableMenu.addAction(new Action<ModelData>("Put in Service") {
+            
             public boolean supports(ModelData data) {
                 return "outOfService".equals(data.get("localStatus"));
             }
+            
             public void execute(ModelData data) {
                 RepositoryStatus status = new RepositoryStatus(data);
                 status.setLocalStatus("inService");
+                
                 server.updateRepositoryStatus(status, new ResponseHandler<RepositoryStatus>() {
+                    
                     public void onError(Response response, Throwable error) {
                         MessageBox.alert("Error", "The server did not put the repository into service", null);
                     }
-                    public void onResponse(RepositoryStatus status) {
+                    
+                    public void onSuccess(Response response, RepositoryStatus status) {
                         tableBinding.updateRepoStatus(status);
                     }
+                    
                 });
+            }
+            
+        });
+        
+        addListener(Events.Render, new Listener<BaseEvent>() {
+            public void handleEvent(BaseEvent be) {
+                tableBinding.reload();
             }
         });
     }

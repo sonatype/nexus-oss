@@ -140,6 +140,8 @@ public class RepoTableBinding {
         
         ModelData storeItem = store.findModel(item);
         storeItem.set("localStatus", item.get("status/localStatus"));
+        storeItem.set("remoteStatus", item.get("status/remoteStatus"));
+        storeItem.set("proxyMode", item.get("status/proxyMode"));
         storeItem.set("status", convertStatusToString(item, storeItem));
         store.update(storeItem);
         
@@ -160,6 +162,8 @@ public class RepoTableBinding {
                 	ModelData storeItem = store.findModel(item);
                 	if (storeItem != null) {
                 	    storeItem.set("localStatus", item.get("status/localStatus"));
+                        storeItem.set("remoteStatus", item.get("status/remoteStatus"));
+                        storeItem.set("proxyMode", item.get("status/proxyMode"));
                         storeItem.set("status", convertStatusToString(item, storeItem));
                         store.update(storeItem);
                 	}

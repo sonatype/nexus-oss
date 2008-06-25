@@ -1,5 +1,7 @@
 package org.sonatype.nexus.ext.gwt.ui.client.reposerver.model;
 
+import org.sonatype.nexus.ext.gwt.ui.client.reposerver.RepoServerUtil;
+
 import com.extjs.gxt.ui.client.data.ModelData;
 import com.google.gwt.xml.client.Document;
 import com.google.gwt.xml.client.Node;
@@ -22,10 +24,11 @@ public class RepositoryStatus {
     }
 
     public RepositoryStatus(ModelData model) {
-        String uri = (String) model.get("resourceURI");
-        setId(uri.substring(uri.lastIndexOf('/') + 1));
+        setId(RepoServerUtil.getRepositoryId(model));
         setRepoType((String) model.get("repoType"));
         setLocalStatus((String) model.get("localStatus"));
+        setRemoteStatus((String) model.get("remoteStatus"));
+        setProxyMode((String) model.get("proxyMode"));
     }
 
     public String getId() {
@@ -79,6 +82,12 @@ public class RepositoryStatus {
         sb.append("<localStatus>");
         sb.append(localStatus);
         sb.append("</localStatus>");
+        sb.append("<remoteStatus>");
+        sb.append(remoteStatus);
+        sb.append("</remoteStatus>");
+        sb.append("<proxyMode>");
+        sb.append(proxyMode);
+        sb.append("</proxyMode>");
         return sb.toString();
     }
 

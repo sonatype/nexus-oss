@@ -19,23 +19,71 @@ public class RepoServerInstance extends ServerInstance {
     }
     
     public void updateRepositoryStatus(RepositoryStatus status, final ResponseHandler<RepositoryStatus> handler) {
-        String path = "repositories/" + status.getId() + "/status";
+        String url = "repositories/" + status.getId() + "/status";
         String request = new RepositoryStatusResponse(status).toXML();
-        getResource(path).put(new RequestCallback() {
-            public void onError(Request request, Throwable exception) {
-                handler.onError(null, exception);
+        
+        doPut(url, request, new ResponseProcessor(handler, Response.SC_OK, Response.SC_ACCEPTED) {
+            
+            protected Object createEntity(Response response) {
+                RepositoryStatusResponse entity = new RepositoryStatusResponse();
+                entity.fromXML(response.getText());
+                return entity.getData();
             }
-            public void onResponseReceived(Request request, Response response) {
-                if (response.getStatusCode() == Response.SC_ACCEPTED
-                        || response.getStatusCode() == Response.SC_OK) {
-                    RepositoryStatusResponse entity = new RepositoryStatusResponse();
-                    entity.fromXML(response.getText());
-                    handler.onResponse(entity.getData());
-                } else {
-                    handler.onError(response, null);
-                }
-            }
-        }, new Representation(VARIANT, request));
+            
+        });
+    }
+    
+    public void reindexRepository(String repositoryId, final ResponseHandler handler) {
+        String url = "data_index/repositories/" + repositoryId + "/content";
+        getResource(url).delete(new ResponseProcessor(handler, Response.SC_OK));
+    }
+    
+    public void clearRepositoryCache(String repositoryId, final ResponseHandler handler) {
+        String url = "data_cache/repositories/" + repositoryId + "/content";
+        getResource(url).delete(new ResponseProcessor(handler, Response.SC_OK));
+    }
+    
+    public void rebuildRepositoryAttributes(String repositoryId, final ResponseHandler handler) {
+        String url = "attributes/repositories/" + repositoryId + "/content";
+        getResource(url).delete(new ResponseProcessor(handler, Response.SC_OK));
+    }
+    
+    private void doPut(String path, String request, RequestCallback callback) {
+        getResource(path).put(callback, new Representation(VARIANT, request));
     }
 
+    
+    private static class ResponseProcessor<E> implements RequestCallback {
+        
+        private ResponseHandler<E> handler;
+        
+        private int[] successCodes;
+        
+        public ResponseProcessor(ResponseHandler<E> handler, int... successCodes) {
+            this.handler = handler;
+            this.successCodes = successCodes;
+        }
+
+        public void onError(Request request, Throwable exception) {
+            handler.onError(null, exception);
+        }
+
+        public void onResponseReceived(Request request, Response response) {
+            for (int i = 0; i < successCodes.length; i++) {
+                if (successCodes[i] == response.getStatusCode()) {
+                    E entity = createEntity(response);
+                    handler.onSuccess(response, entity);
+                    return;
+                }
+            }
+            
+            handler.onError(response, null);
+        }
+        
+        protected E createEntity(Response response) {
+            return null;
+        }
+        
+    }
+    
 }

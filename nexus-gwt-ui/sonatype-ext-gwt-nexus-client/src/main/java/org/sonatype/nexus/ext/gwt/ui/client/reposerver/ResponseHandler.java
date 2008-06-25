@@ -6,6 +6,6 @@ public interface ResponseHandler<E> {
     
     void onError(Response response, Throwable error);
     
-    void onResponse(E entity);
+    void onSuccess(Response response, E entity);
 
 }
