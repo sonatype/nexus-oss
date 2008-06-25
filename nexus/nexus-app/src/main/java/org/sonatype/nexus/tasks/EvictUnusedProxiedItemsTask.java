@@ -29,7 +29,7 @@ import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesTask;
  * Evicts unused proxied items.
  * 
  * @author cstamas
- * @plexus.component role="org.sonatype.nexus.scheduling.NexusTask"
+ * @plexus.component role="org.sonatype.scheduling.SchedulerTask"
  *                   role-hint="org.sonatype.nexus.tasks.EvictUnusedProxiedItemsTask"
  *                   instantiation-strategy="per-lookup"
  */

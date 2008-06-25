@@ -27,7 +27,7 @@ import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesTask;
  * Reindex task.
  * 
  * @author cstamas
- * @plexus.component role="org.sonatype.nexus.scheduling.NexusTask" role-hint="org.sonatype.nexus.tasks.ReindexTask"
+ * @plexus.component role="org.sonatype.scheduling.SchedulerTask" role-hint="org.sonatype.nexus.tasks.ReindexTask"
  *                   instantiation-strategy="per-lookup"
  */
 public class ReindexTask
