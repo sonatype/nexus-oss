@@ -68,7 +68,7 @@ public class DefaultScheduledTask<T>
     private SchedulerIterator scheduleIterator;
 
     private Map<String, String> taskParams;
-    
+
     private boolean manualRun;
 
     public DefaultScheduledTask( String name, Class<?> clazz, DefaultScheduler scheduler, Callable<T> callable,
@@ -97,7 +97,7 @@ public class DefaultScheduledTask<T>
         this.scheduleIterator = null;
 
         this.taskParams = taskParams;
-        
+
         this.manualRun = false;
     }
 
@@ -239,17 +239,14 @@ public class DefaultScheduledTask<T>
             return null;
         }
     }
-    
+
     public void runNow()
-    {        
+    {
         if ( !manualRun )
         {
             manualRun = true;
-            //Just set schedule for now, when done processing will reschedule as normal
-            getScheduler().getScheduledExecutorService().schedule(
-                this,
-                0,
-                TimeUnit.MILLISECONDS );
+            // Just set schedule for now, when done processing will reschedule as normal
+            getScheduler().getScheduledExecutorService().schedule( this, 0, TimeUnit.MILLISECONDS );
         }
     }
 
@@ -257,6 +254,15 @@ public class DefaultScheduledTask<T>
         throws Exception
     {
         T result = null;
+
+        if ( SchedulerTask.class.isAssignableFrom( getCallable().getClass() ) )
+        {
+            // check for execution
+            while ( !( (SchedulerTask<?>) getCallable() ).allowConcurrentExecution( getScheduler().getActiveTasks() ) )
+            {
+                Thread.sleep( 10000 );
+            };
+        }
 
         if ( isEnabled() && getTaskState().isActiveOrSubmitted() )
         {
@@ -267,7 +273,7 @@ public class DefaultScheduledTask<T>
             try
             {
                 result = getCallable().call();
-                
+
                 if ( result != null )
                 {
                     results.add( result );
@@ -294,16 +300,16 @@ public class DefaultScheduledTask<T>
                 }
             }
         }
-        
+
         Future<T> nextFuture = null;
-        
-        //If manually running, just grab the previous future and use that
+
+        // If manually running, just grab the previous future and use that
         if ( manualRun )
         {
-            nextFuture = getFuture();  
+            nextFuture = getFuture();
             manualRun = false;
         }
-        //Otherwise, grab the next one
+        // Otherwise, grab the next one
         else
         {
             nextFuture = reschedule();

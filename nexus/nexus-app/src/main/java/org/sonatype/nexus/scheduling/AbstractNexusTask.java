@@ -36,6 +36,7 @@ import org.sonatype.nexus.feeds.SystemProcess;
 import org.sonatype.scheduling.ScheduledTask;
 import org.sonatype.scheduling.SchedulerTask;
 import org.sonatype.scheduling.TaskExecutionException;
+import org.sonatype.scheduling.TaskState;
 
 public abstract class AbstractNexusTask<T>
     extends AbstractLogEnabled
@@ -102,7 +103,21 @@ public abstract class AbstractNexusTask<T>
     {
         // most basic check: simply not allowing multiple execution of instances of this class
         // override if needed
-        return !activeTasks.containsKey( this.getClass() );
+        if ( activeTasks.containsKey( this.getClass() ) )
+        {
+            for ( ScheduledTask<?> task : activeTasks.get( this.getClass() ) )
+            {
+                if ( TaskState.RUNNING.equals( task.getTaskState() ) )
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+        else
+        {
+            return true;
+        }
     }
 
     public final T call()
