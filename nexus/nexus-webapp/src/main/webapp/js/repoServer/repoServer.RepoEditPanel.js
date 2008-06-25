@@ -1129,7 +1129,8 @@ Ext.extend(Sonatype.repoServer.RepoEditPanel, Sonatype.repoServer.AbstractRepoPa
     menu.add(this.actions.reIndex);
     menu.add(this.actions.rebuildAttributes);
 
-    if (this.ctxRecord.get('repoType') == 'hosted'){
+    if (this.ctxRecord.get('repoType') == 'hosted'
+    && this.ctxRecord.get('repoPolicy') == 'release'){
       menu.add(this.actions.uploadArtifact);
     }
     

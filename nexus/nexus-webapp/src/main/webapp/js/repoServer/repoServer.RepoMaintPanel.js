@@ -459,7 +459,8 @@ Ext.extend(Sonatype.repoServer.RepoMaintPanel, Sonatype.repoServer.AbstractRepoP
               );
       }
 
-      if (this.ctxRecord.get('repoType') == 'hosted'){
+      if (this.ctxRecord.get('repoType') == 'hosted'
+      && this.ctxRecord.get('repoPolicy') == 'release'){
         menu.add(this.actions.uploadArtifact);
       }
     }
