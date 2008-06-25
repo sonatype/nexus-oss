@@ -30,7 +30,7 @@ import org.sonatype.nexus.proxy.repository.Repository;
 public class RepositoryEvictUnusedItemsTest
     extends AbstractProxyTestEnvironment
 {
-    private static final long DAY = 24 * 60 * 60 * 1000;
+    private static final long DAY = 24L * 60L * 60L * 1000L;
 
     private M2TestsuiteEnvironmentBuilder jettyTestsuiteEnvironmentBuilder;
 

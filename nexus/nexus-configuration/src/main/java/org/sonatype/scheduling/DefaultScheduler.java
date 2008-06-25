@@ -94,13 +94,22 @@ public class DefaultScheduler
 
         try
         {
-            boolean stopped = getScheduledExecutorService().awaitTermination( 5, TimeUnit.SECONDS );
+            boolean stopped = getScheduledExecutorService().awaitTermination( 1, TimeUnit.SECONDS );
 
             if ( !stopped )
             {
-                List<Runnable> queueds = getScheduledExecutorService().shutdownNow();
+                Map<Class<?>, List<ScheduledTask<?>>> runningTasks = getRunningTasks();
 
-                getLogger().warn( "Scheduler shut down forcedly with " + queueds.size() + " tasks queued." );
+                if ( runningTasks.size() > 0 )
+                {
+                    getScheduledExecutorService().shutdownNow();
+
+                    getLogger().warn( "Scheduler shut down forcedly with tasks running." );
+                }
+                else
+                {
+                    getLogger().info( "Scheduler shut down cleanly with tasks scheduled." );
+                }
             }
         }
         catch ( InterruptedException e )
@@ -162,13 +171,8 @@ public class DefaultScheduler
     public ScheduledTask<Object> schedule( String name, Runnable runnable, Schedule schedule,
         Map<String, String> taskParams, boolean store )
     {
-        DefaultScheduledTask<Object> drt = new DefaultScheduledTask<Object>(
-            name,
-            runnable.getClass(),
-            this,
-            Executors.callable( runnable ),
-            schedule,
-            taskParams );
+        DefaultScheduledTask<Object> drt = new DefaultScheduledTask<Object>( name, runnable.getClass(), this, Executors
+            .callable( runnable ), schedule, taskParams );
 
         addToTasksMap( drt, store );
 
@@ -226,6 +230,31 @@ public class DefaultScheduler
                 ScheduledTask<?> task = i.next();
 
                 if ( !task.getTaskState().isActiveOrSubmitted() )
+                {
+                    i.remove();
+                }
+            }
+        }
+
+        return result;
+    }
+
+    public Map<Class<?>, List<ScheduledTask<?>>> getRunningTasks()
+    {
+        Map<Class<?>, List<ScheduledTask<?>>> result = getAllTasks();
+
+        List<ScheduledTask<?>> tasks = null;
+
+        // filter for activeOrSubmitted
+        for ( Class<?> cls : result.keySet() )
+        {
+            tasks = result.get( cls );
+
+            for ( Iterator<ScheduledTask<?>> i = tasks.iterator(); i.hasNext(); )
+            {
+                ScheduledTask<?> task = i.next();
+
+                if ( !TaskState.RUNNING.equals( task.getTaskState() ) )
                 {
                     i.remove();
                 }

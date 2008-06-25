@@ -123,9 +123,9 @@ public class DefaultSessionStore
         return sessionExpiration;
     }
 
-    public void setSessionExpiration( int minutes )
+    public void setSessionExpiration( int seconds )
     {
-        this.sessionExpiration = minutes * 60 * 1000;
+        this.sessionExpiration = seconds * 60 * 1000;
     }
 
 }

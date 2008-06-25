@@ -188,7 +188,7 @@ public class DefaultAttributesHandler
 
             if ( item.getLastRequested() == 0 )
             {
-                item.setLastRequested( item.getRemoteChecked() );
+                item.setLastRequested( System.currentTimeMillis() );
             }
 
             item.setExpired( false );

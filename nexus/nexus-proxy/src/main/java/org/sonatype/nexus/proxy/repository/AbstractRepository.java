@@ -87,7 +87,7 @@ public abstract class AbstractRepository
     implements Repository, Initializable
 {
     /** The time while we do NOT check an already known remote status: 5 mins */
-    private static final long REMOTE_STATUS_RETAIN_TIME = 5 * 60 * 1000;
+    private static final long REMOTE_STATUS_RETAIN_TIME = 5L * 60L * 1000L;
 
     /**
      * @plexus.requirement

@@ -55,19 +55,19 @@ public class EvictUnusedProxiedItemsTask
         if ( getRepositoryGroupId() != null )
         {
             return getNexus().evictRepositoryGroupUnusedProxiedItems(
-                System.currentTimeMillis() - ( ( (long) getEvictOlderCacheItemsThen() ) * 24 * 60 * 60 * 1000 ),
+                System.currentTimeMillis() - ( ( (long) getEvictOlderCacheItemsThen() ) * A_DAY ),
                 getRepositoryGroupId() );
         }
         else if ( getRepositoryId() != null )
         {
             return getNexus().evictRepositoryUnusedProxiedItems(
-                System.currentTimeMillis() - ( ( (long) getEvictOlderCacheItemsThen() ) * 24 * 60 * 60 * 1000 ),
+                System.currentTimeMillis() - ( ( (long) getEvictOlderCacheItemsThen() ) * A_DAY ),
                 getRepositoryId() );
         }
         else
         {
             return getNexus().evictAllUnusedProxiedItems(
-                System.currentTimeMillis() - ( ( (long) getEvictOlderCacheItemsThen() ) * 24 * 60 * 60 * 1000 ) );
+                System.currentTimeMillis() - ( ( (long) getEvictOlderCacheItemsThen() ) * A_DAY ) );
         }
     }
 

@@ -57,12 +57,12 @@ public class DefaultTimelineTest
         data.put( "a", "a" );
         data.put( "b", "b" );
 
-        defaultTimeline.add( System.currentTimeMillis() - 1 * 60 * 60 * 1000, "TEST", "1", data );
+        defaultTimeline.add( System.currentTimeMillis() - 1L * 60L * 60L * 1000L, "TEST", "1", data );
 
-        defaultTimeline.add( System.currentTimeMillis() - 1 * 60 * 60 * 1000, "TEST", "2", data );
+        defaultTimeline.add( System.currentTimeMillis() - 1L * 60L * 60L * 1000L, "TEST", "2", data );
 
         List<Map<String, String>> res = defaultTimeline.retrieve(
-            System.currentTimeMillis() - 2 * 60 * 60 * 1000,
+            System.currentTimeMillis() - 2L * 60L * 60L * 1000L,
             10,
             new HashSet<String>( Arrays.asList( new String[] { "TEST" } ) ),
             new HashSet<String>( Arrays.asList( new String[] { "1" } ) ) );
@@ -94,11 +94,11 @@ public class DefaultTimelineTest
         data.put( "place", "2nd" );
         data.put( "x", "y" );
 
-        defaultTimeline.add( System.currentTimeMillis() - 2 * 60 * 60 * 1000, "TEST", "1", data );
+        defaultTimeline.add( System.currentTimeMillis() - 2L * 60L * 60L * 1000L, "TEST", "1", data );
 
         data.put( "place", "1st" );
 
-        defaultTimeline.add( System.currentTimeMillis() - 1 * 60 * 60 * 1000, "TEST", "1", data );
+        defaultTimeline.add( System.currentTimeMillis() - 1L * 60L * 60L * 1000L, "TEST", "1", data );
 
         List<Map<String, String>> res = defaultTimeline.retrieveNewest( 10, new HashSet<String>( Arrays
             .asList( new String[] { "TEST" } ) ), new HashSet<String>( Arrays.asList( new String[] { "1" } ) ) );

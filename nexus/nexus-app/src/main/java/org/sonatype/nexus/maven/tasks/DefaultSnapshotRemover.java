@@ -209,7 +209,7 @@ public class DefaultSnapshotRemover
 
             if ( days > 0 )
             {
-                this.dateThreshold = System.currentTimeMillis() - ( days * 86400000 );
+                this.dateThreshold = System.currentTimeMillis() - ( (long) days * 86400000L );
             }
             else
             {

@@ -42,6 +42,8 @@ public abstract class AbstractNexusTask<T>
     extends AbstractLogEnabled
     implements SchedulerTask<T>, Contextualizable
 {
+    public static final long A_DAY = 24L * 60L * 60L * 1000L;
+
     private PlexusContainer plexusContainer;
 
     private Map<String, String> parameters;
