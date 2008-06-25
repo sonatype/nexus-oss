@@ -411,10 +411,14 @@ public class DefaultSnapshotRemover
                     repository.deleteItem( coll.getRepositoryItemUid() );
                 }
             }
+            catch ( ItemNotFoundException e )
+            {
+                // silent, this happens if whole GAV is removed and the dir is removed too
+            }
             catch ( Throwable t )
             {
-                stop ( t );
-                
+                stop( t );
+
                 return;
             }
         }
