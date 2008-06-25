@@ -306,8 +306,20 @@ public class ArtifactStoreHelper
             .getRepositoryPolicy() ), false, null );
 
         gavRequest.setRequestPath( repository.getGavCalculator().gavToPath( gav ) );
-
-        deleteWithChecksums( gavRequest );
+        
+        if ( deleteWholeGav )
+        {
+            deleteWholeGav( gavRequest );
+        }
+        else
+        {
+            deleteWithChecksums( gavRequest );
+            
+            if ( withAllSubordinates )
+            {
+                deleteAllSubordinates( gavRequest );
+            }
+        }
         
         try
         {
@@ -316,15 +328,6 @@ public class ArtifactStoreHelper
         catch ( IOException e )
         {
             throw new StorageException( "Could not maintain metadata!", e );
-        }
-
-        if ( deleteWholeGav )
-        {
-            deleteWholeGav( gavRequest );
-        }
-        else
-        {
-            deleteAllSubordinates( gavRequest );
         }
     }
 
@@ -343,16 +346,19 @@ public class ArtifactStoreHelper
             .getRepositoryPolicy() ), false, null );
 
         gavRequest.setRequestPath( repository.getGavCalculator().gavToPath( gav ) );
-
-        deleteWithChecksums( gavRequest );
-
+        
         if ( deleteWholeGav )
         {
             deleteWholeGav( gavRequest );
         }
-        else if ( withAllSubordinates )
+        else
         {
-            deleteAllSubordinates( gavRequest );
+            deleteWithChecksums( gavRequest );
+    
+            if ( withAllSubordinates )
+            {
+                deleteAllSubordinates( gavRequest );
+            }
         }
     }
 
@@ -452,7 +458,7 @@ public class ArtifactStoreHelper
             {
                 if ( !StorageCollectionItem.class.isAssignableFrom( item.getClass() ) )
                 {
-                    repository.deleteItemWithChecksums( item.getRepositoryItemUid() );
+                    repository.deleteItem( item.getRepositoryItemUid() );
                 }
                 else
                 {

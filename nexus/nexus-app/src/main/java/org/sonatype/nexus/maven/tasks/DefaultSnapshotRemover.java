@@ -411,11 +411,10 @@ public class DefaultSnapshotRemover
                     repository.deleteItem( coll.getRepositoryItemUid() );
                 }
             }
-            catch ( Exception e )
+            catch ( Throwable t )
             {
-                // stop the crawling
-                stop( e );
-
+                stop ( t );
+                
                 return;
             }
         }
