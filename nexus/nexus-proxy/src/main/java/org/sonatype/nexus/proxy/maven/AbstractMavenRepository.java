@@ -65,6 +65,13 @@ public abstract class AbstractMavenRepository
      */
     private FeedRecorder feedRecorder;
 
+    /**
+     * Metadata manager.
+     * 
+     * @plexus.requirement
+     */
+    private MetadataManager metadataManager;
+
     /** Maven repository policy */
     private RepositoryPolicy repositoryPolicy = RepositoryPolicy.RELEASE;
 
@@ -199,9 +206,103 @@ public abstract class AbstractMavenRepository
         return feedRecorder;
     }
 
+    public void storeItemWithChecksums( AbstractStorageItem item )
+        throws UnsupportedStorageOperationException,
+            RepositoryNotAvailableException,
+            StorageException
+    {
+        if ( getLogger().isDebugEnabled() )
+        {
+            getLogger().debug( "storeItemWithChecksums() :: " + item.getRepositoryItemUid().toString() );
+        }
+
+        try
+        {
+            try
+            {
+                storeItem( item );
+            }
+            catch ( IOException e )
+            {
+                throw new StorageException( "Could not get the content from the ContentLocator!", e );
+            }
+
+            StorageFileItem storedFile = (StorageFileItem) retrieveItem( true, item.getRepositoryItemUid() );
+
+            String sha1Hash = storedFile.getAttributes().get( DigestCalculatingInspector.DIGEST_SHA1_KEY );
+
+            String md5Hash = storedFile.getAttributes().get( DigestCalculatingInspector.DIGEST_MD5_KEY );
+
+            if ( !StringUtils.isEmpty( sha1Hash ) )
+            {
+                storeItem( new DefaultStorageFileItem(
+                    this,
+                    item.getPath() + ".sha1",
+                    true,
+                    true,
+                    new StringContentLocator( sha1Hash ) ) );
+            }
+
+            if ( !StringUtils.isEmpty( md5Hash ) )
+            {
+                storeItem( new DefaultStorageFileItem(
+                    this,
+                    item.getPath() + ".sha1",
+                    true,
+                    true,
+                    new StringContentLocator( md5Hash ) ) );
+            }
+        }
+        catch ( ItemNotFoundException e )
+        {
+            throw new StorageException( "Storage inconsistency!", e );
+        }
+    }
+
+    public void deleteItemWithChecksums( RepositoryItemUid uid )
+        throws UnsupportedStorageOperationException,
+            RepositoryNotAvailableException,
+            ItemNotFoundException,
+            StorageException
+    {
+        if ( getLogger().isDebugEnabled() )
+        {
+            getLogger().debug( "deleteItemWithChecksums() :: " + uid.toString() );
+        }
+
+        deleteItem( uid );
+
+        RepositoryItemUid sha1Uid = new RepositoryItemUid( this, uid.getPath() + ".sha1" );
+
+        try
+        {
+            deleteItem( sha1Uid );
+        }
+        catch ( ItemNotFoundException e )
+        {
+            // ignore not found
+        }
+
+        RepositoryItemUid md5Uid = new RepositoryItemUid( this, uid.getPath() + ".md5" );
+
+        try
+        {
+            deleteItem( md5Uid );
+        }
+        catch ( ItemNotFoundException e )
+        {
+            // ignore not found
+        }
+    }
+
     public void setFeedRecorder( FeedRecorder feedRecorder )
     {
         this.feedRecorder = feedRecorder;
+    }
+    
+    public MetadataManager getMetadataManager()
+    {
+        return metadataManager;
     }
 
     protected ArtifactStoreHelper getArtifactStoreHelper()

@@ -20,10 +20,12 @@
  */
 package org.sonatype.nexus.proxy.maven;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.Map;
 
+import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.artifact.GavCalculator;
 import org.sonatype.nexus.proxy.AccessDeniedException;
@@ -31,8 +33,12 @@ import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.NoSuchResourceStoreException;
 import org.sonatype.nexus.proxy.RepositoryNotAvailableException;
 import org.sonatype.nexus.proxy.StorageException;
+import org.sonatype.nexus.proxy.attributes.inspectors.DigestCalculatingInspector;
+import org.sonatype.nexus.proxy.item.AbstractStorageItem;
+import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
+import org.sonatype.nexus.proxy.item.StringContentLocator;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.ShadowRepository;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
@@ -59,6 +65,13 @@ public abstract class LayoutConverterShadowRepository
      * @plexus.requirement role-hint="maven2"
      */
     private GavCalculator m2GavCalculator;
+
+    /**
+     * Metadata manager.
+     * 
+     * @plexus.requirement
+     */
+    private MetadataManager metadataManager;
 
     /**
      * ArtifactStoreHelper.
@@ -95,6 +108,100 @@ public abstract class LayoutConverterShadowRepository
     public RepositoryPolicy getRepositoryPolicy()
     {
         return ( (MavenRepository) getMasterRepository() ).getRepositoryPolicy();
+    }
+
+    public MetadataManager getMetadataManager()
+    {
+        return metadataManager;
+    }
+
+    public void storeItemWithChecksums( AbstractStorageItem item )
+        throws UnsupportedStorageOperationException,
+            RepositoryNotAvailableException,
+            StorageException
+    {
+        if ( getLogger().isDebugEnabled() )
+        {
+            getLogger().debug( "storeItemWithChecksums() :: " + item.getRepositoryItemUid().toString() );
+        }
+
+        try
+        {
+            try
+            {
+                storeItem( item );
+            }
+            catch ( IOException e )
+            {
+                throw new StorageException( "Could not get the content from the ContentLocator!", e );
+            }
+
+            StorageFileItem storedFile = (StorageFileItem) retrieveItem( true, item.getRepositoryItemUid() );
+
+            String sha1Hash = storedFile.getAttributes().get( DigestCalculatingInspector.DIGEST_SHA1_KEY );
+
+            String md5Hash = storedFile.getAttributes().get( DigestCalculatingInspector.DIGEST_MD5_KEY );
+
+            if ( !StringUtils.isEmpty( sha1Hash ) )
+            {
+                storeItem( new DefaultStorageFileItem(
+                    this,
+                    item.getPath() + ".sha1",
+                    true,
+                    true,
+                    new StringContentLocator( sha1Hash ) ) );
+            }
+
+            if ( !StringUtils.isEmpty( md5Hash ) )
+            {
+                storeItem( new DefaultStorageFileItem(
+                    this,
+                    item.getPath() + ".sha1",
+                    true,
+                    true,
+                    new StringContentLocator( md5Hash ) ) );
+            }
+        }
+        catch ( ItemNotFoundException e )
+        {
+            throw new StorageException( "Storage inconsistency!", e );
+        }
+    }
+
+    public void deleteItemWithChecksums( RepositoryItemUid uid )
+        throws UnsupportedStorageOperationException,
+            RepositoryNotAvailableException,
+            ItemNotFoundException,
+            StorageException
+    {
+        if ( getLogger().isDebugEnabled() )
+        {
+            getLogger().debug( "deleteItemWithChecksums() :: " + uid.toString() );
+        }
+
+        deleteItem( uid );
+
+        RepositoryItemUid sha1Uid = new RepositoryItemUid( this, uid.getPath() + ".sha1" );
+
+        try
+        {
+            deleteItem( sha1Uid );
+        }
+        catch ( ItemNotFoundException e )
+        {
+            // ignore not found
+        }
+
+        RepositoryItemUid md5Uid = new RepositoryItemUid( this, uid.getPath() + ".md5" );
+
+        try
+        {
+            deleteItem( md5Uid );
+        }
+        catch ( ItemNotFoundException e )
+        {
+            // ignore not found
+        }
     }
 
     protected ArtifactStoreHelper getArtifactStoreHelper()

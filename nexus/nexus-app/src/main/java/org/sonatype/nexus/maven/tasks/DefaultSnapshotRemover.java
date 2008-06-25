@@ -246,7 +246,7 @@ public class DefaultSnapshotRemover
                 remainingSnapshotsAndFiles.clear();
 
                 removeWholeGAV = false;
-                
+
                 gavToRemove = null;
 
                 Gav gav = null;
@@ -383,6 +383,8 @@ public class DefaultSnapshotRemover
                             try
                             {
                                 gav = (Gav) file.getItemContext().get( Gav.class.getName() );
+
+                                // TODO: extension VS packaging!
 
                                 ArtifactStoreRequest req = new ArtifactStoreRequest( gav.getGroupId(), gav
                                     .getArtifactId(), gav.getVersion(), gav.getExtension(), gav.getClassifier() );

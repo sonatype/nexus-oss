@@ -22,6 +22,7 @@ package org.sonatype.nexus.proxy.maven.maven2;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
@@ -37,6 +38,7 @@ import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Writer;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.artifact.versioning.VersionRange;
 import org.codehaus.plexus.util.IOUtil;
+import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.artifact.GavCalculator;
 import org.sonatype.nexus.artifact.M2ArtifactRecognizer;
@@ -45,15 +47,20 @@ import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.NoSuchResourceStoreException;
 import org.sonatype.nexus.proxy.RepositoryNotAvailableException;
 import org.sonatype.nexus.proxy.StorageException;
+import org.sonatype.nexus.proxy.attributes.inspectors.DigestCalculatingInspector;
+import org.sonatype.nexus.proxy.item.AbstractStorageItem;
+import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.PreparedContentLocator;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
+import org.sonatype.nexus.proxy.item.StringContentLocator;
 import org.sonatype.nexus.proxy.maven.ArtifactPackagingMapper;
 import org.sonatype.nexus.proxy.maven.ArtifactStoreHelper;
 import org.sonatype.nexus.proxy.maven.ArtifactStoreRequest;
 import org.sonatype.nexus.proxy.maven.ChecksumPolicy;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
+import org.sonatype.nexus.proxy.maven.MetadataManager;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.repository.Repository;
@@ -93,6 +100,13 @@ public class ConstrainedM2ShadowRepository
      * @plexus.requirement
      */
     private ArtifactPackagingMapper artifactPackagingMapper;
+
+    /**
+     * Metadata manager.
+     * 
+     * @plexus.requirement
+     */
+    private MetadataManager metadataManager;
 
     /**
      * ArtifactStoreHelper.
@@ -172,6 +186,100 @@ public class ConstrainedM2ShadowRepository
     public GavCalculator getGavCalculator()
     {
         return gavCalculator;
+    }
+
+    public MetadataManager getMetadataManager()
+    {
+        return metadataManager;
+    }
+
+    public void storeItemWithChecksums( AbstractStorageItem item )
+        throws UnsupportedStorageOperationException,
+            RepositoryNotAvailableException,
+            StorageException
+    {
+        if ( getLogger().isDebugEnabled() )
+        {
+            getLogger().debug( "storeItemWithChecksums() :: " + item.getRepositoryItemUid().toString() );
+        }
+
+        try
+        {
+            try
+            {
+                storeItem( item );
+            }
+            catch ( IOException e )
+            {
+                throw new StorageException( "Could not get the content from the ContentLocator!", e );
+            }
+
+            StorageFileItem storedFile = (StorageFileItem) retrieveItem( true, item.getRepositoryItemUid() );
+
+            String sha1Hash = storedFile.getAttributes().get( DigestCalculatingInspector.DIGEST_SHA1_KEY );
+
+            String md5Hash = storedFile.getAttributes().get( DigestCalculatingInspector.DIGEST_MD5_KEY );
+
+            if ( !StringUtils.isEmpty( sha1Hash ) )
+            {
+                storeItem( new DefaultStorageFileItem(
+                    this,
+                    item.getPath() + ".sha1",
+                    true,
+                    true,
+                    new StringContentLocator( sha1Hash ) ) );
+            }
+
+            if ( !StringUtils.isEmpty( md5Hash ) )
+            {
+                storeItem( new DefaultStorageFileItem(
+                    this,
+                    item.getPath() + ".sha1",
+                    true,
+                    true,
+                    new StringContentLocator( md5Hash ) ) );
+            }
+        }
+        catch ( ItemNotFoundException e )
+        {
+            throw new StorageException( "Storage inconsistency!", e );
+        }
+    }
+
+    public void deleteItemWithChecksums( RepositoryItemUid uid )
+        throws UnsupportedStorageOperationException,
+            RepositoryNotAvailableException,
+            ItemNotFoundException,
+            StorageException
+    {
+        if ( getLogger().isDebugEnabled() )
+        {
+            getLogger().debug( "deleteItemWithChecksums() :: " + uid.toString() );
+        }
+
+        deleteItem( uid );
+
+        RepositoryItemUid sha1Uid = new RepositoryItemUid( this, uid.getPath() + ".sha1" );
+
+        try
+        {
+            deleteItem( sha1Uid );
+        }
+        catch ( ItemNotFoundException e )
+        {
+            // ignore not found
+        }
+
+        RepositoryItemUid md5Uid = new RepositoryItemUid( this, uid.getPath() + ".md5" );
+
+        try
+        {
+            deleteItem( md5Uid );
+        }
+        catch ( ItemNotFoundException e )
+        {
+            // ignore not found
+        }
     }
 
     // =================================================================================

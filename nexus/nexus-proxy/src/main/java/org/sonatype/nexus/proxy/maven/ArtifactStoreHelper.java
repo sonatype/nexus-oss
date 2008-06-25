@@ -29,14 +29,13 @@ import java.util.Map;
 
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
-import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.NoSuchResourceStoreException;
 import org.sonatype.nexus.proxy.RepositoryNotAvailableException;
+import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
-import org.sonatype.nexus.proxy.attributes.inspectors.DigestCalculatingInspector;
 import org.sonatype.nexus.proxy.item.ContentLocator;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.PreparedContentLocator;
@@ -65,7 +64,7 @@ public class ArtifactStoreHelper
         this.repository = repo;
     }
 
-    protected void storeItemWithChecksums( ArtifactStoreRequest request, ContentLocator locator,
+    protected void storeItemWithChecksums( ResourceStoreRequest request, ContentLocator locator,
         Map<String, String> attributes )
         throws UnsupportedStorageOperationException,
             NoSuchResourceStoreException,
@@ -73,50 +72,12 @@ public class ArtifactStoreHelper
             StorageException,
             AccessDeniedException
     {
-        try
-        {
-            // this will refuse storing with AccessDenied if no rights
-            try
-            {
-                repository.storeItem( request, locator.getContent(), attributes );
-            }
-            catch ( IOException e )
-            {
-                throw new StorageException( "Could not get the content from the ContentLocator!", e );
-            }
-
-            RepositoryItemUid uid = new RepositoryItemUid( repository, request.getRequestPath() );
-
-            StorageFileItem storedFile = (StorageFileItem) repository.retrieveItem( true, uid );
-
-            String sha1Hash = storedFile.getAttributes().get( DigestCalculatingInspector.DIGEST_SHA1_KEY );
-
-            String md5Hash = storedFile.getAttributes().get( DigestCalculatingInspector.DIGEST_MD5_KEY );
-
-            if ( !StringUtils.isEmpty( sha1Hash ) )
-            {
-                repository.storeItem( new DefaultStorageFileItem(
-                    repository,
-                    request.getRequestPath() + ".sha1",
-                    true,
-                    true,
-                    new StringContentLocator( sha1Hash ) ) );
-            }
-
-            if ( !StringUtils.isEmpty( md5Hash ) )
-            {
-                repository.storeItem( new DefaultStorageFileItem(
-                    repository,
-                    request.getRequestPath() + ".md5",
-                    true,
-                    true,
-                    new StringContentLocator( md5Hash ) ) );
-            }
-        }
-        catch ( ItemNotFoundException e )
-        {
-            throw new StorageException( "Storage inconsistency!", e );
-        }
+        repository.storeItemWithChecksums( new DefaultStorageFileItem(
+            repository,
+            request.getRequestPath(),
+            true,
+            true,
+            locator ) );
     }
 
     protected RepositoryItemUid deleteWithChecksums( ArtifactStoreRequest request )
@@ -127,40 +88,9 @@ public class ArtifactStoreHelper
     {
         RepositoryItemUid uid = new RepositoryItemUid( repository, request.getRequestPath() );
 
-        deleteWithChecksums( uid );
+        repository.deleteItemWithChecksums( uid );
 
         return uid;
-    }
-
-    protected void deleteWithChecksums( RepositoryItemUid uid )
-        throws UnsupportedStorageOperationException,
-            RepositoryNotAvailableException,
-            ItemNotFoundException,
-            StorageException
-    {
-        repository.deleteItem( uid );
-
-        RepositoryItemUid sha1Uid = new RepositoryItemUid( repository, uid.getPath() + ".sha1" );
-
-        try
-        {
-            repository.deleteItem( sha1Uid );
-        }
-        catch ( ItemNotFoundException e )
-        {
-            // ignore not found
-        }
-
-        RepositoryItemUid md5Uid = new RepositoryItemUid( repository, uid.getPath() + ".md5" );
-
-        try
-        {
-            repository.deleteItem( md5Uid );
-        }
-        catch ( ItemNotFoundException e )
-        {
-            // ignore not found
-        }
     }
 
     public StorageFileItem retrieveArtifactPom( ArtifactStoreRequest gavRequest )
@@ -243,6 +173,15 @@ public class ArtifactStoreHelper
         gavRequest.setRequestPath( repository.getGavCalculator().gavToPath( gav ) );
 
         storeItemWithChecksums( gavRequest, new PreparedContentLocator( is ), attributes );
+
+        try
+        {
+            repository.getMetadataManager().deployArtifact( gavRequest, repository );
+        }
+        catch ( IOException e )
+        {
+            throw new StorageException( "Could not maintain metadata!", e );
+        }
     }
 
     public void storeArtifact( ArtifactStoreRequest gavRequest, InputStream is, Map<String, String> attributes )
@@ -323,6 +262,16 @@ public class ArtifactStoreHelper
             gavRequest.setRequestPath( repository.getGavCalculator().gavToPath( pomGav ) );
 
             storeItemWithChecksums( gavRequest, new StringContentLocator( sw.toString() ), attributes );
+
+            try
+            {
+                repository.getMetadataManager().deployArtifact( gavRequest, repository );
+            }
+            catch ( IOException ex )
+            {
+                throw new StorageException( "Could not maintain metadata!", ex );
+            }
+
         }
 
         Gav artifactGav = new Gav(
@@ -359,6 +308,15 @@ public class ArtifactStoreHelper
         gavRequest.setRequestPath( repository.getGavCalculator().gavToPath( gav ) );
 
         deleteWithChecksums( gavRequest );
+        
+        try
+        {
+            repository.getMetadataManager().undeployArtifact( gavRequest, repository );
+        }
+        catch ( IOException e )
+        {
+            throw new StorageException( "Could not maintain metadata!", e );
+        }
 
         if ( deleteWholeGav )
         {
@@ -441,7 +399,7 @@ public class ArtifactStoreHelper
                         && gavRequest.getArtifactId().equals( gav.getArtifactId() )
                         && gavRequest.getVersion().equals( gav.getVersion() ) && gav.getClassifier() != null )
                     {
-                        deleteWithChecksums( item.getRepositoryItemUid() );
+                        repository.deleteItemWithChecksums( item.getRepositoryItemUid() );
                     }
                     else
                     {
@@ -494,7 +452,7 @@ public class ArtifactStoreHelper
             {
                 if ( !StorageCollectionItem.class.isAssignableFrom( item.getClass() ) )
                 {
-                    deleteWithChecksums( item.getRepositoryItemUid() );
+                    repository.deleteItemWithChecksums( item.getRepositoryItemUid() );
                 }
                 else
                 {

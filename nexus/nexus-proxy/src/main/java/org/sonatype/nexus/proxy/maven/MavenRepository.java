@@ -21,7 +21,13 @@
 package org.sonatype.nexus.proxy.maven;
 
 import org.sonatype.nexus.artifact.GavCalculator;
+import org.sonatype.nexus.proxy.ItemNotFoundException;
+import org.sonatype.nexus.proxy.RepositoryNotAvailableException;
+import org.sonatype.nexus.proxy.StorageException;
+import org.sonatype.nexus.proxy.item.AbstractStorageItem;
+import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 
 public interface MavenRepository
     extends ArtifactStore, Repository
@@ -29,7 +35,7 @@ public interface MavenRepository
     GavCalculator getGavCalculator();
 
     ChecksumPolicy getChecksumPolicy();
-    
+
     ArtifactPackagingMapper getArtifactPackagingMapper();
 
     void setChecksumPolicy( ChecksumPolicy checksumPolicy );
@@ -57,4 +63,17 @@ public interface MavenRepository
     boolean isFixRepositoryChecksums();
 
     void setFixRepositoryChecksums( boolean fixRepositoryChecksums );
+    
+    MetadataManager getMetadataManager();
+
+    void storeItemWithChecksums( AbstractStorageItem item )
+        throws UnsupportedStorageOperationException,
+            RepositoryNotAvailableException,
+            StorageException;
+
+    void deleteItemWithChecksums( RepositoryItemUid uid )
+        throws UnsupportedStorageOperationException,
+            RepositoryNotAvailableException,
+            ItemNotFoundException,
+            StorageException;
 }
