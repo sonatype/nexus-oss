@@ -61,7 +61,7 @@ public abstract class AbstractNexusTask<T>
         {
             try
             {
-                return (Nexus) plexusContainer.lookup( Nexus.ROLE );
+                nexus = (Nexus) plexusContainer.lookup( Nexus.ROLE );
             }
             catch ( ComponentLookupException e )
             {

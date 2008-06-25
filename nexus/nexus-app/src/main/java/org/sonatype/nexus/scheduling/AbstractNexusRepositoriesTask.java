@@ -20,7 +20,6 @@
  */
 package org.sonatype.nexus.scheduling;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -74,25 +73,33 @@ public abstract class AbstractNexusRepositoriesTask<T>
         }
     }
 
-    public boolean allowConcurrentExecution( Map<Class<?>, List<ScheduledTask<?>>> activeTasks )
+    protected boolean repositorySetIntersectionIsNotEmpty( AbstractNexusRepositoriesTask<?> otherTask )
     {
-        // create a list of AbstractNexusRepositoriesTask within activeTasks
-        ArrayList<ScheduledTask<?>> activeRepoTasks = new ArrayList<ScheduledTask<?>>();
+        return false;
+    }
 
-        for ( Class<?> key : activeTasks.keySet() )
+    protected boolean taskOfThisTypeWithIntersectionExists( Map<Class<?>, List<ScheduledTask<?>>> activeTasks )
+    {
+        List<ScheduledTask<?>> tasksOfThisType = activeTasks.get( this.getClass() );
+
+        if ( tasksOfThisType != null )
         {
-            for ( ScheduledTask<?> task : activeTasks.get( key ) )
+            for ( ScheduledTask<?> task : tasksOfThisType )
             {
-                if ( AbstractNexusRepositoriesTask.class.isAssignableFrom( task.getType() ) )
+                // this is same class as we are, it is safe to cast
+                if ( repositorySetIntersectionIsNotEmpty( (AbstractNexusRepositoriesTask<?>) task ) )
                 {
-                    activeRepoTasks.add( task );
+                    return true;
                 }
-
             }
         }
-        // more
-        // most basic check: simply not allowing multiple execution of instances of this class
-        // override if needed
-        return !activeTasks.containsKey( this.getClass().getName() );
+
+        return false;
+    }
+
+    protected boolean abstractNexusRepositoriesTaskWithIntersectionExists(
+        Map<Class<?>, List<ScheduledTask<?>>> activeTasks )
+    {
+        return false;
     }
 }
