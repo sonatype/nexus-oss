@@ -36,6 +36,7 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.StoppingException;
 import org.sonatype.scheduling.NoSuchTaskException;
 import org.sonatype.scheduling.ScheduledTask;
 import org.sonatype.scheduling.Scheduler;
+import org.sonatype.scheduling.SchedulerTask;
 import org.sonatype.scheduling.schedules.Schedule;
 
 /**
@@ -69,15 +70,11 @@ public class DefaultNexusScheduler
         return plexusContainer;
     }
 
-    public <T> ScheduledTask<T> submit( String name, NexusTask<T> nexusTask )
+    public <T> ScheduledTask<T> submit( String name, SchedulerTask<T> nexusTask )
         throws RejectedExecutionException,
             NullPointerException
     {
-        String cls = nexusTask.getClass().getName();
-
-        List<ScheduledTask<?>> existingTasks = scheduler.getActiveTasks().get( cls );
-
-        if ( existingTasks == null || nexusTask.allowConcurrentExecution( existingTasks ) )
+        if ( nexusTask.allowConcurrentSubmission( scheduler.getActiveTasks() ) )
         {
             return scheduler.submit( name, nexusTask, nexusTask.getParameters() );
         }
@@ -87,15 +84,11 @@ public class DefaultNexusScheduler
         }
     }
 
-    public <T> ScheduledTask<T> schedule( String name, NexusTask<T> nexusTask, Schedule schedule )
+    public <T> ScheduledTask<T> schedule( String name, SchedulerTask<T> nexusTask, Schedule schedule )
         throws RejectedExecutionException,
             NullPointerException
     {
-        String cls = nexusTask.getClass().getName();
-
-        List<ScheduledTask<?>> existingTasks = scheduler.getActiveTasks().get( cls );
-
-        if ( existingTasks == null || nexusTask.allowConcurrentExecution( existingTasks ) )
+        if ( nexusTask.allowConcurrentSubmission( scheduler.getActiveTasks() ) )
         {
             return scheduler.schedule( name, nexusTask, schedule, nexusTask.getParameters(), true );
         }
@@ -117,12 +110,12 @@ public class DefaultNexusScheduler
         return task;
     }
 
-    public Map<String, List<ScheduledTask<?>>> getAllTasks()
+    public Map<Class<?>, List<ScheduledTask<?>>> getAllTasks()
     {
         return scheduler.getAllTasks();
     }
 
-    public Map<String, List<ScheduledTask<?>>> getActiveTasks()
+    public Map<Class<?>, List<ScheduledTask<?>>> getActiveTasks()
     {
         return scheduler.getActiveTasks();
     }
@@ -149,12 +142,12 @@ public class DefaultNexusScheduler
         scheduler.stopService();
     }
 
-    public NexusTask<?> createTaskInstance( String taskType )
+    public SchedulerTask<?> createTaskInstance( String taskType )
         throws IllegalArgumentException
     {
         try
         {
-            return (NexusTask<?>) getPlexusContainer().lookup( NexusTask.ROLE, taskType );
+            return (SchedulerTask<?>) getPlexusContainer().lookup( SchedulerTask.ROLE, taskType );
         }
         catch ( ComponentLookupException e )
         {
@@ -162,7 +155,7 @@ public class DefaultNexusScheduler
         }
     }
 
-    public NexusTask<?> createTaskInstance( Class<?> taskType )
+    public SchedulerTask<?> createTaskInstance( Class<?> taskType )
         throws IllegalArgumentException
     {
         return createTaskInstance( taskType.getName() );

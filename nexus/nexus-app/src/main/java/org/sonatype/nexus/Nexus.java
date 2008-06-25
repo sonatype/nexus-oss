@@ -49,9 +49,9 @@ import org.sonatype.nexus.proxy.RepositoryNotAvailableException;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.scheduling.NexusTask;
 import org.sonatype.scheduling.NoSuchTaskException;
 import org.sonatype.scheduling.ScheduledTask;
+import org.sonatype.scheduling.SchedulerTask;
 import org.sonatype.scheduling.schedules.Schedule;
 
 /**
@@ -216,11 +216,11 @@ public interface Nexus
     // Scheduler
     // ----------------------------------------------------------------------------
 
-    <T> void submit( String name, NexusTask<T> task )
+    <T> void submit( String name, SchedulerTask<T> task )
         throws RejectedExecutionException,
             NullPointerException;
 
-    <T> ScheduledTask<T> schedule( String name, NexusTask<T> nexusTask, Schedule schedule )
+    <T> ScheduledTask<T> schedule( String name, SchedulerTask<T> nexusTask, Schedule schedule )
         throws RejectedExecutionException,
             NullPointerException;
 
@@ -228,17 +228,17 @@ public interface Nexus
         throws RejectedExecutionException,
             NullPointerException;
 
-    Map<String, List<ScheduledTask<?>>> getAllTasks();
+    Map<Class<?>, List<ScheduledTask<?>>> getAllTasks();
 
-    Map<String, List<ScheduledTask<?>>> getActiveTasks();
+    Map<Class<?>, List<ScheduledTask<?>>> getActiveTasks();
 
     ScheduledTask<?> getTaskById( String id )
         throws NoSuchTaskException;
 
-    NexusTask<?> createTaskInstance( String taskType )
+    SchedulerTask<?> createTaskInstance( String taskType )
         throws IllegalArgumentException;
 
-    NexusTask<?> createTaskInstance( Class<?> taskType )
+    SchedulerTask<?> createTaskInstance( Class<?> taskType )
         throws IllegalArgumentException;
 
     // ----------------------------------------------------------------------------

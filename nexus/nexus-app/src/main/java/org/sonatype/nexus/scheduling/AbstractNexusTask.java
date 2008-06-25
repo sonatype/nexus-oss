@@ -34,11 +34,12 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.feeds.SystemProcess;
 import org.sonatype.scheduling.ScheduledTask;
+import org.sonatype.scheduling.SchedulerTask;
 import org.sonatype.scheduling.TaskExecutionException;
 
 public abstract class AbstractNexusTask<T>
     extends AbstractLogEnabled
-    implements NexusTask<T>, Contextualizable
+    implements SchedulerTask<T>, Contextualizable
 {
     private PlexusContainer plexusContainer;
 
@@ -91,10 +92,17 @@ public abstract class AbstractNexusTask<T>
         return parameters;
     }
 
-    public boolean allowConcurrentExecution( List<ScheduledTask<?>> existingTasks )
+    public boolean allowConcurrentSubmission( Map<Class<?>, List<ScheduledTask<?>>> activeTasks )
     {
+        // concurrent execution will stop us if needed, but user may freely submit
+        return true;
+    }
+
+    public boolean allowConcurrentExecution( Map<Class<?>, List<ScheduledTask<?>>> activeTasks )
+    {
+        // most basic check: simply not allowing multiple execution of instances of this class
         // override if needed
-        return false;
+        return !activeTasks.containsKey( this.getClass() );
     }
 
     public final T call()

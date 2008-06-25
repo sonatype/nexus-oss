@@ -60,7 +60,7 @@ public class DefaultScheduler
 
     private ScheduledThreadPoolExecutor scheduledExecutorService;
 
-    private Map<String, List<ScheduledTask<?>>> tasksMap;
+    private Map<Class<?>, List<ScheduledTask<?>>> tasksMap;
 
     /**
      * @plexus.requirement
@@ -76,7 +76,7 @@ public class DefaultScheduler
     public void startService()
         throws StartingException
     {
-        tasksMap = new HashMap<String, List<ScheduledTask<?>>>();
+        tasksMap = new HashMap<Class<?>, List<ScheduledTask<?>>>();
 
         plexusThreadFactory = new PlexusThreadFactory( plexusContainer );
 
@@ -164,7 +164,7 @@ public class DefaultScheduler
     {
         DefaultScheduledTask<Object> drt = new DefaultScheduledTask<Object>(
             name,
-            runnable.getClass().getName(),
+            runnable.getClass(),
             this,
             Executors.callable( runnable ),
             schedule,
@@ -187,7 +187,7 @@ public class DefaultScheduler
     {
         DefaultScheduledTask<T> dct = new DefaultScheduledTask<T>(
             name,
-            callable.getClass().getName(),
+            callable.getClass(),
             this,
             callable,
             schedule,
@@ -210,14 +210,14 @@ public class DefaultScheduler
         return task;
     }
 
-    public Map<String, List<ScheduledTask<?>>> getActiveTasks()
+    public Map<Class<?>, List<ScheduledTask<?>>> getActiveTasks()
     {
-        Map<String, List<ScheduledTask<?>>> result = getAllTasks();
+        Map<Class<?>, List<ScheduledTask<?>>> result = getAllTasks();
 
         List<ScheduledTask<?>> tasks = null;
 
         // filter for activeOrSubmitted
-        for ( String cls : result.keySet() )
+        for ( Class<?> cls : result.keySet() )
         {
             tasks = result.get( cls );
 
@@ -235,18 +235,18 @@ public class DefaultScheduler
         return result;
     }
 
-    public Map<String, List<ScheduledTask<?>>> getAllTasks()
+    public Map<Class<?>, List<ScheduledTask<?>>> getAllTasks()
     {
-        Map<String, List<ScheduledTask<?>>> result = null;
+        Map<Class<?>, List<ScheduledTask<?>>> result = null;
 
         // create a "snapshots" of active tasks
         synchronized ( tasksMap )
         {
-            result = new HashMap<String, List<ScheduledTask<?>>>( tasksMap.size() );
+            result = new HashMap<Class<?>, List<ScheduledTask<?>>>( tasksMap.size() );
 
             List<ScheduledTask<?>> tasks = null;
 
-            for ( String cls : tasksMap.keySet() )
+            for ( Class<?> cls : tasksMap.keySet() )
             {
                 tasks = new ArrayList<ScheduledTask<?>>();
 

@@ -73,7 +73,7 @@ public class ScheduledServiceTypeResourceHandler
 
         ScheduledServiceTypeResource type = new ScheduledServiceTypeResource();
         type.setId( PublishIndexesTask.class.getName() );
-        type.setName( getServiceTypeName( type.getId() ) );
+        type.setName( getServiceTypeName( PublishIndexesTask.class ) );
         ScheduledServiceTypePropertyResource property = new ScheduledServiceTypePropertyResource();
         property.setId( PublishIndexesTask.REPOSITORY_OR_GROUP_ID_KEY );
         property.setName( "Repository/Group" );
@@ -85,7 +85,7 @@ public class ScheduledServiceTypeResourceHandler
 
         type = new ScheduledServiceTypeResource();
         type.setId( EvictUnusedProxiedItemsTask.class.getName() );
-        type.setName( getServiceTypeName( type.getId() ) );
+        type.setName( getServiceTypeName( EvictUnusedProxiedItemsTask.class ) );
         property = new ScheduledServiceTypePropertyResource();
         property.setId( EvictUnusedProxiedItemsTask.REPOSITORY_OR_GROUP_ID_KEY );
         property.setName( "Repository/Group" );
@@ -105,7 +105,7 @@ public class ScheduledServiceTypeResourceHandler
 
         type = new ScheduledServiceTypeResource();
         type.setId( PurgeTimeline.class.getName() );
-        type.setName( getServiceTypeName( type.getId() ) );
+        type.setName( getServiceTypeName( PurgeTimeline.class ) );
         property = new ScheduledServiceTypePropertyResource();
         property.setId( PurgeTimeline.PURGE_OLDER_THAN_KEY );
         property.setName( "Purge older items than (days)" );
@@ -119,7 +119,7 @@ public class ScheduledServiceTypeResourceHandler
 
         type = new ScheduledServiceTypeResource();
         type.setId( ReindexTask.class.getName() );
-        type.setName( getServiceTypeName( type.getId() ) );
+        type.setName( getServiceTypeName( ReindexTask.class ) );
         property = new ScheduledServiceTypePropertyResource();
         property.setId( PublishIndexesTask.REPOSITORY_OR_GROUP_ID_KEY );
         property.setName( "Repository/Group" );
@@ -131,7 +131,7 @@ public class ScheduledServiceTypeResourceHandler
 
         type = new ScheduledServiceTypeResource();
         type.setId( RebuildAttributesTask.class.getName() );
-        type.setName( getServiceTypeName( type.getId() ) );
+        type.setName( getServiceTypeName( RebuildAttributesTask.class ) );
         property = new ScheduledServiceTypePropertyResource();
         property.setId( PublishIndexesTask.REPOSITORY_OR_GROUP_ID_KEY );
         property.setName( "Repository/Group" );
@@ -143,7 +143,7 @@ public class ScheduledServiceTypeResourceHandler
 
         type = new ScheduledServiceTypeResource();
         type.setId( ClearCacheTask.class.getName() );
-        type.setName( getServiceTypeName( type.getId() ) );
+        type.setName( getServiceTypeName( ClearCacheTask.class ) );
         property = new ScheduledServiceTypePropertyResource();
         property.setId( ClearCacheTask.REPOSITORY_OR_GROUP_ID_KEY );
         property.setName( "Repository/Group" );
@@ -163,7 +163,7 @@ public class ScheduledServiceTypeResourceHandler
 
         type = new ScheduledServiceTypeResource();
         type.setId( SnapshotRemoverTask.class.getName() );
-        type.setName( getServiceTypeName( type.getId() ) );
+        type.setName( getServiceTypeName( SnapshotRemoverTask.class ) );
         property = new ScheduledServiceTypePropertyResource();
         property.setId( PublishIndexesTask.REPOSITORY_OR_GROUP_ID_KEY );
         property.setName( "Repository/Group" );
@@ -191,7 +191,8 @@ public class ScheduledServiceTypeResourceHandler
         property.setName( "Remove if released" );
         property.setType( PROPERTY_TYPE_BOOLEAN );
         property.setRequired( false );
-        property.setHelpText( "The job will purge all snapshots that have a corresponding released artifact (same version not including the -SNAPSHOT)." );
+        property
+            .setHelpText( "The job will purge all snapshots that have a corresponding released artifact (same version not including the -SNAPSHOT)." );
         type.addProperty( property );
         response.addData( type );
 

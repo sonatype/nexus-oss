@@ -53,7 +53,6 @@ import org.sonatype.nexus.configuration.model.CSchedule;
 import org.sonatype.nexus.configuration.model.CScheduledTask;
 import org.sonatype.nexus.configuration.model.CTaskConfiguration;
 import org.sonatype.nexus.configuration.model.CWeeklySchedule;
-import org.sonatype.nexus.scheduling.NexusTask;
 import org.sonatype.scheduling.schedules.CronSchedule;
 import org.sonatype.scheduling.schedules.DailySchedule;
 import org.sonatype.scheduling.schedules.MonthlySchedule;
@@ -115,7 +114,7 @@ public class DefaultTaskConfigManager
             getLogger().info( "Loading task - " + task.getType() );
             try
             {
-                NexusTask<?> nexusTask = (NexusTask<?>) plexusContainer.lookup( NexusTask.ROLE, task.getType() );
+                SchedulerTask<?> nexusTask = (SchedulerTask<?>) plexusContainer.lookup( SchedulerTask.ROLE, task.getType() );
                 
                 for ( Iterator iter = task.getProperties().iterator(); iter.hasNext(); )
                 {
@@ -294,7 +293,7 @@ public class DefaultTaskConfigManager
         storeableTask.setEnabled( task.isEnabled() );
         storeableTask.setId( task.getId() );
         storeableTask.setName( task.getName() );
-        storeableTask.setType( task.getType() );
+        storeableTask.setType( task.getType().getName() );
         storeableTask.setStatus( task.getTaskState().name() );
         storeableTask.setLastRun( task.getLastRun() );
         storeableTask.setNextRun( task.getNextRun() );

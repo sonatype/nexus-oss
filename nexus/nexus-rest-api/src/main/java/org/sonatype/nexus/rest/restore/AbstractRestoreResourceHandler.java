@@ -29,7 +29,7 @@ import org.restlet.data.Status;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryGroupException;
 import org.sonatype.nexus.rest.AbstractNexusResourceHandler;
-import org.sonatype.nexus.scheduling.NexusTask;
+import org.sonatype.scheduling.SchedulerTask;
 
 public abstract class AbstractRestoreResourceHandler
     extends AbstractNexusResourceHandler
@@ -89,7 +89,7 @@ public abstract class AbstractRestoreResourceHandler
         return true;
     }
 
-    public void handleDelete( NexusTask<?> task )
+    public void handleDelete( SchedulerTask<?> task )
     {
         try
         {

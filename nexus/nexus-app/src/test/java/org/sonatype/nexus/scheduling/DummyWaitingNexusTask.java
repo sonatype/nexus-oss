@@ -5,10 +5,13 @@ import java.util.List;
 import java.util.Map;
 
 import org.sonatype.scheduling.ScheduledTask;
+import org.sonatype.scheduling.SchedulerTask;
 
 public class DummyWaitingNexusTask
-    implements NexusTask<Object>
+    implements SchedulerTask<Object>
 {
+    private boolean allowConcurrentSubmission = false;
+
     private boolean allowConcurrentExecution = false;
 
     private long sleepTime = 10000;
@@ -35,11 +38,21 @@ public class DummyWaitingNexusTask
         return parameters;
     }
 
-    public boolean allowConcurrentExecution( List<ScheduledTask<?>> existingTasks )
+    public boolean allowConcurrentSubmission( Map<Class<?>, List<ScheduledTask<?>>> activeTasks )
+    {
+        return allowConcurrentSubmission;
+    }
+
+    public boolean allowConcurrentExecution( Map<Class<?>, List<ScheduledTask<?>>> activeTasks )
     {
         return allowConcurrentExecution;
     }
 
+    public void setAllowConcurrentSubmission( boolean allowConcurrentSubmission )
+    {
+        this.allowConcurrentSubmission = allowConcurrentSubmission;
+    }
+    
     public void setAllowConcurrentExecution( boolean allowConcurrentExecution )
     {
         this.allowConcurrentExecution = allowConcurrentExecution;

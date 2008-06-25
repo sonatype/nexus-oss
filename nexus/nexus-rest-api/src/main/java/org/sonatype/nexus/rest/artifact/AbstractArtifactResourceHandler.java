@@ -461,6 +461,24 @@ public class AbstractArtifactResourceHandler
 
                                     return;
                                 }
+                                else
+                                {
+                                    // temporarily we disable SNAPSHOT upload
+                                    // check is it a Snapshot repo
+                                    MavenRepository mr = (MavenRepository) repository;
+
+                                    if ( RepositoryPolicy.SNAPSHOT.equals( mr.getRepositoryPolicy() ) )
+                                    {
+                                        getLogger().log( Level.INFO, "Upload to SNAPSHOT maven repository attempted" );
+
+                                        getResponse()
+                                            .setStatus(
+                                                Status.CLIENT_ERROR_BAD_REQUEST,
+                                                "This is a Maven SNAPSHOT repository, and manual upload against it is forbidden!" );
+
+                                        return;
+                                    }
+                                }
 
                                 if ( !versionMatchesPolicy( gavRequest.getVersion(), ( (MavenRepository) repository )
                                     .getRepositoryPolicy() ) )

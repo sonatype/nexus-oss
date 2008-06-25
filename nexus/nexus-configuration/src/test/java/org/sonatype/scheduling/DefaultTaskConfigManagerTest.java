@@ -236,7 +236,7 @@ public class DefaultTaskConfigManagerTest
         TestCallable callable = new TestCallable();
         return new DefaultScheduledTask<Integer>(
             TASK_NAME,
-            callable.getClass().getName(),
+            callable.getClass(),
             defaultScheduler,
             callable,
             schedule,

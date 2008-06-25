@@ -56,7 +56,7 @@ public interface ScheduledTask<T>
      * 
      * @return
      */
-    String getType();
+    Class<?> getType();
 
     /**
      * Returns the task state.

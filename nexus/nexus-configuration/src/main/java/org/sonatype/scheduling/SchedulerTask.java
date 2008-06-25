@@ -18,7 +18,7 @@
  * along with this program.  If not, see http://www.gnu.org/licenses/.
  *
  */
-package org.sonatype.nexus.scheduling;
+package org.sonatype.scheduling;
 
 import java.util.List;
 import java.util.Map;
@@ -26,16 +26,18 @@ import java.util.concurrent.Callable;
 
 import org.sonatype.scheduling.ScheduledTask;
 
-public interface NexusTask<T>
+public interface SchedulerTask<T>
     extends Callable<T>
 {
-    String ROLE = NexusTask.class.getName();
-    
-    boolean allowConcurrentExecution( List<ScheduledTask<?>> existingTasks );
-    
-    void addParameter(String key, String value);
-    
-    String getParameter(String key);
-    
+    String ROLE = SchedulerTask.class.getName();
+
+    boolean allowConcurrentSubmission( Map<Class<?>, List<ScheduledTask<?>>> currentActiveTasks );
+
+    boolean allowConcurrentExecution( Map<Class<?>, List<ScheduledTask<?>>> currentActiveTasks );
+
+    void addParameter( String key, String value );
+
+    String getParameter( String key );
+
     Map<String, String> getParameters();
 }

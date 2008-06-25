@@ -100,12 +100,12 @@ import org.sonatype.nexus.proxy.repository.RepositoryType;
 import org.sonatype.nexus.proxy.repository.ShadowRepository;
 import org.sonatype.nexus.proxy.wastebasket.Wastebasket;
 import org.sonatype.nexus.scheduling.NexusScheduler;
-import org.sonatype.nexus.scheduling.NexusTask;
 import org.sonatype.nexus.store.DefaultEntry;
 import org.sonatype.nexus.store.Entry;
 import org.sonatype.nexus.store.Store;
 import org.sonatype.scheduling.NoSuchTaskException;
 import org.sonatype.scheduling.ScheduledTask;
+import org.sonatype.scheduling.SchedulerTask;
 import org.sonatype.scheduling.schedules.Schedule;
 
 /**
@@ -1064,14 +1064,14 @@ public class DefaultNexus
     // =============
     // Schedules
 
-    public <T> void submit( String name, NexusTask<T> task )
+    public <T> void submit( String name, SchedulerTask<T> task )
         throws RejectedExecutionException,
             NullPointerException
     {
         nexusScheduler.submit( name, task );
     }
 
-    public <T> ScheduledTask<T> schedule( String name, NexusTask<T> nexusTask, Schedule schedule )
+    public <T> ScheduledTask<T> schedule( String name, SchedulerTask<T> nexusTask, Schedule schedule )
         throws RejectedExecutionException,
             NullPointerException
     {
@@ -1085,12 +1085,12 @@ public class DefaultNexus
         return nexusScheduler.updateSchedule( task );
     }
 
-    public Map<String, List<ScheduledTask<?>>> getAllTasks()
+    public Map<Class<?>, List<ScheduledTask<?>>> getAllTasks()
     {
         return nexusScheduler.getAllTasks();
     }
 
-    public Map<String, List<ScheduledTask<?>>> getActiveTasks()
+    public Map<Class<?>, List<ScheduledTask<?>>> getActiveTasks()
     {
         return nexusScheduler.getActiveTasks();
     }
@@ -1101,13 +1101,13 @@ public class DefaultNexus
         return nexusScheduler.getTaskById( id );
     }
 
-    public NexusTask<?> createTaskInstance( String taskType )
+    public SchedulerTask<?> createTaskInstance( String taskType )
         throws IllegalArgumentException
     {
         return nexusScheduler.createTaskInstance( taskType );
     }
 
-    public NexusTask<?> createTaskInstance( Class<?> taskType )
+    public SchedulerTask<?> createTaskInstance( Class<?> taskType )
         throws IllegalArgumentException
     {
         return nexusScheduler.createTaskInstance( taskType );

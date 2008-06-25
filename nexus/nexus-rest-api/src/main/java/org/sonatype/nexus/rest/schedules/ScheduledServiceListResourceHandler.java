@@ -71,11 +71,11 @@ public class ScheduledServiceListResourceHandler
     public Representation getRepresentationHandler( Variant variant )
         throws IOException
     {
-        Map<String, List<ScheduledTask<?>>> tasksMap = getNexus().getAllTasks();
+        Map<Class<?>, List<ScheduledTask<?>>> tasksMap = getNexus().getAllTasks();
 
         ScheduledServiceListResourceResponse response = new ScheduledServiceListResourceResponse();
 
-        for ( String key : tasksMap.keySet() )
+        for ( Class<?> key : tasksMap.keySet() )
         {
             List<ScheduledTask<?>> tasks = tasksMap.get( key );
 
@@ -87,7 +87,7 @@ public class ScheduledServiceListResourceHandler
                 item.setId( task.getId() );
                 item.setName( task.getName() );
                 item.setStatus( StringUtils.capitalise( task.getTaskState().toString() ) );
-                item.setTypeId( task.getType() );
+                item.setTypeId( task.getType().getName() );
                 item.setTypeName( getServiceTypeName( task.getType() ) );
                 item.setCreated( task.getScheduledAt() == null ? "n/a" : task.getScheduledAt().toString() );
                 item.setLastRunTime( task.getLastRun() == null ? "n/a" : task.getLastRun().toString() );

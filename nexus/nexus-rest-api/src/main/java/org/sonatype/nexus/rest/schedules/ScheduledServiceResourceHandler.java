@@ -155,7 +155,7 @@ public class ScheduledServiceResourceHandler
                 resource.setEnabled( task.isEnabled() );
                 resource.setName( task.getName() );
                 resource.setSchedule( getScheduleShortName( task.getSchedule() ) );
-                resource.setTypeId( task.getType() );
+                resource.setTypeId( task.getType().getName() );
                 resource.setProperties( formatServiceProperties( task.getTaskParams() ) );
 
                 response.setData( resource );

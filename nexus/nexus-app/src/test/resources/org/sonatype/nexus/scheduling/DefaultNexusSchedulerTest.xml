@@ -1,7 +1,7 @@
 <plexus>
 	<components>
 		<component>
-			<role>org.sonatype.nexus.scheduling.NexusTask</role>
+			<role>org.sonatype.scheduling.SchedulerTask</role>
 			<role-hint>org.sonatype.nexus.scheduling.DummyWaitingNexusTask</role-hint>
 			<instantiation-strategy>per-lookup</instantiation-strategy>
 			<implementation>org.sonatype.nexus.scheduling.DummyWaitingNexusTask</implementation>

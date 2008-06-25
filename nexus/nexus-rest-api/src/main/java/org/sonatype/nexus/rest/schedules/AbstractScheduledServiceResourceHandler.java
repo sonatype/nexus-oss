@@ -45,13 +45,13 @@ import org.sonatype.nexus.rest.model.ScheduledServiceMonthlyResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceOnceResource;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceWeeklyResource;
-import org.sonatype.nexus.scheduling.NexusTask;
 import org.sonatype.nexus.tasks.ClearCacheTask;
 import org.sonatype.nexus.tasks.EvictUnusedProxiedItemsTask;
 import org.sonatype.nexus.tasks.PublishIndexesTask;
 import org.sonatype.nexus.tasks.PurgeTimeline;
 import org.sonatype.nexus.tasks.RebuildAttributesTask;
 import org.sonatype.nexus.tasks.ReindexTask;
+import org.sonatype.scheduling.SchedulerTask;
 import org.sonatype.scheduling.schedules.CronSchedule;
 import org.sonatype.scheduling.schedules.DailySchedule;
 import org.sonatype.scheduling.schedules.MonthlySchedule;
@@ -119,17 +119,15 @@ public class AbstractScheduledServiceResourceHandler
 
     private DateFormat timeFormat = new SimpleDateFormat( "HH:mm" );
 
-    protected Map<String, String> serviceNames = new HashMap<String, String>();
+    protected Map<Class<?>, String> serviceNames = new HashMap<Class<?>, String>();
     {
-        serviceNames.put( PublishIndexesTask.class.getName(), "Publish Indexes" );
-        serviceNames.put( ReindexTask.class.getName(), "Reindex Repositories" );
-        serviceNames.put( RebuildAttributesTask.class.getName(), "Rebuild Repository Attributes" );
-        serviceNames.put( ClearCacheTask.class.getName(), "Clear Repository Caches" );
-        serviceNames.put( SnapshotRemoverTask.class.getName(), "Remove Snapshots From Repository" );
-        serviceNames.put(
-            EvictUnusedProxiedItemsTask.class.getName(),
-            "Evict Unused Proxied Items From Repository Caches" );
-        serviceNames.put( PurgeTimeline.class.getName(), "Purge Nexus Timeline" );
+        serviceNames.put( PublishIndexesTask.class, "Publish Indexes" );
+        serviceNames.put( ReindexTask.class, "Reindex Repositories" );
+        serviceNames.put( RebuildAttributesTask.class, "Rebuild Repository Attributes" );
+        serviceNames.put( ClearCacheTask.class, "Clear Repository Caches" );
+        serviceNames.put( SnapshotRemoverTask.class, "Remove Snapshots From Repository" );
+        serviceNames.put( EvictUnusedProxiedItemsTask.class, "Evict Unused Proxied Items From Repository Caches" );
+        serviceNames.put( PurgeTimeline.class, "Purge Nexus Timeline" );
     }
 
     /**
@@ -144,7 +142,7 @@ public class AbstractScheduledServiceResourceHandler
         super( context, request, response );
     }
 
-    protected String getServiceTypeName( String serviceTypeId )
+    protected String getServiceTypeName( Class<?> serviceTypeId )
     {
         if ( serviceNames.containsKey( serviceTypeId ) )
         {
@@ -152,7 +150,7 @@ public class AbstractScheduledServiceResourceHandler
         }
         else
         {
-            return serviceTypeId;
+            return serviceTypeId.getName();
         }
     }
 
@@ -361,11 +359,11 @@ public class AbstractScheduledServiceResourceHandler
         return model.getName();
     }
 
-    public NexusTask<?> getModelNexusTask( ScheduledServiceBaseResource model )
+    public SchedulerTask<?> getModelNexusTask( ScheduledServiceBaseResource model )
     {
         String serviceType = model.getTypeId();
 
-        NexusTask<?> task = getNexus().createTaskInstance( serviceType );
+        SchedulerTask<?> task = getNexus().createTaskInstance( serviceType );
 
         for ( Iterator iter = model.getProperties().iterator(); iter.hasNext(); )
         {
