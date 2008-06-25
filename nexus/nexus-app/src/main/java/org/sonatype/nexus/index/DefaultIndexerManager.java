@@ -629,7 +629,7 @@ public class DefaultIndexerManager
         throws IOException,
             NoSuchRepositoryGroupException
     {
-        getLogger().info( "Merging and publising index for repository group " + repositoryGroupId );
+        getLogger().info( "Merging and publishing index for repository group " + repositoryGroupId );
 
         IndexingContext context = nexusIndexer.getIndexingContexts().get( getMergedContextId( repositoryGroupId ) );
 
