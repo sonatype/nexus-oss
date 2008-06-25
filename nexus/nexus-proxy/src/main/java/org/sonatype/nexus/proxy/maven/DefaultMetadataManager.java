@@ -27,6 +27,7 @@ import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.NoSuchResourceStoreException;
 import org.sonatype.nexus.proxy.RepositoryNotAvailableException;
+import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
@@ -302,9 +303,7 @@ public class DefaultMetadataManager
         }
         catch ( XmlPullParserException e )
         {
-            getLogger().warn( "Could not read the metadatas!", e );
-
-            return;
+            throw new StorageException( "Could not read the metadatas!", e );
         }
 
         if ( RepositoryPolicy.SNAPSHOT.equals( repository.getRepositoryPolicy() ) )
@@ -331,6 +330,9 @@ public class DefaultMetadataManager
 
             Snapshot snapshot = new Snapshot();
 
+            // TODO: a potential NPE source: if gav has no snapshotTimestamp, then what?
+            // Nexus will enforce using timestamped snaps in remote reposes anyway as "good practice"
+
             snapshot.setTimestamp( df.format( new Date( gav.getSnapshotTimeStamp().longValue() ) ) );
 
             snapshot.setBuildNumber( gav.getSnapshotBuildNumber().intValue() );
@@ -345,22 +347,27 @@ public class DefaultMetadataManager
             {
                 DefaultArtifactVersion oldVersion = new DefaultArtifactVersion( gaMd.getVersioning().getLatest() );
 
-                DefaultArtifactVersion newVersion = new DefaultArtifactVersion( gav.getVersion() );
+                DefaultArtifactVersion newVersion = new DefaultArtifactVersion( gav.getBaseVersion() );
 
                 if ( newVersion.compareTo( oldVersion ) > -1 )
                 {
-                    gaMd.getVersioning().setLatest( gav.getVersion() );
+                    gaMd.getVersioning().setLatest( gav.getBaseVersion() );
                 }
             }
             else
             {
-                gaMd.getVersioning().setLatest( gav.getVersion() );
+                gaMd.getVersioning().setLatest( gav.getBaseVersion() );
             }
 
             gaMd.getVersioning().setRelease( null );
         }
         else
         {
+            // GAV
+
+            // nothing for release artifacts
+            gavMd = null;
+
             // GA
 
             gaMd.getVersioning().setLatest( null );
@@ -373,12 +380,12 @@ public class DefaultMetadataManager
 
                 if ( newVersion.compareTo( oldVersion ) > -1 )
                 {
-                    gaMd.getVersioning().setRelease( gav.getVersion() );
+                    gaMd.getVersioning().setRelease( gav.getBaseVersion() );
                 }
             }
             else
             {
-                gaMd.getVersioning().setRelease( gav.getVersion() );
+                gaMd.getVersioning().setRelease( gav.getBaseVersion() );
             }
 
         }
@@ -391,7 +398,11 @@ public class DefaultMetadataManager
         gaMd.getVersioning().updateTimestamp();
 
         // save it
-        saveGAVMetadata( repository, gav, gavMd );
+        if ( gavMd != null )
+        {
+            saveGAVMetadata( repository, gav, gavMd );
+        }
+
         saveGAMetadata( repository, gav, gaMd );
 
         if ( "maven-plugin".equals( req.getPackaging() ) )

@@ -306,7 +306,7 @@ public class ArtifactStoreHelper
             .getRepositoryPolicy() ), false, null );
 
         gavRequest.setRequestPath( repository.getGavCalculator().gavToPath( gav ) );
-        
+
         if ( deleteWholeGav )
         {
             deleteWholeGav( gavRequest );
@@ -405,9 +405,9 @@ public class ArtifactStoreHelper
                         && gavRequest.getArtifactId().equals( gav.getArtifactId() )
                         && gavRequest.getVersion().equals( gav.getVersion() ) && gav.getClassifier() != null )
                     {
-                        repository.deleteItemWithChecksums( item.getRepositoryItemUid() );
+                        repository.deleteItem( item.getRepositoryItemUid() );
                     }
-                    else
+                    else if ( !item.getPath().endsWith( "maven-metadata.xml" ) )
                     {
                         hadSubdirectoryOrOtherFiles = true;
                     }
@@ -460,7 +460,7 @@ public class ArtifactStoreHelper
                 {
                     repository.deleteItem( item.getRepositoryItemUid() );
                 }
-                else
+                else if ( !item.getPath().endsWith( "maven-metadata.xml" ) )
                 {
                     hadSubdirectory = true;
                 }
