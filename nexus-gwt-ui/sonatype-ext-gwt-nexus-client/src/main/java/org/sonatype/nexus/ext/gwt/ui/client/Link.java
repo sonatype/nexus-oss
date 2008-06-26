@@ -6,7 +6,7 @@ import com.extjs.gxt.ui.client.widget.Html;
 import com.google.gwt.user.client.Element;
 
 public class Link extends Html {
-
+    
     public Link() {
         setTagName("a");
         addStyleName("st-link");
@@ -16,10 +16,9 @@ public class Link extends Html {
         this();
         setHtml(html);
     }
-
+    
     protected void onRender(Element target, int index) {
         super.onRender(target, index);
-        el().setDisplayed("block");
         el().addEventsSunk(Events.OnClick);
     }
 

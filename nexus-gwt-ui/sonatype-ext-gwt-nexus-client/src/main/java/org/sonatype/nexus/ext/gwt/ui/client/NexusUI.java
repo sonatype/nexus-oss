@@ -342,11 +342,10 @@ public class NexusUI implements EntryPoint {
         if (user != null) {
             ctx.login(user, authorizationToken);
             username.setText(user + " | ");
-            username.show();
             loginLink.setHtml("Log Out");
         } else {
             ctx.logout();
-            username.hide();
+            username.setText("");
             loginLink.setHtml("Log In");
         }
         
@@ -394,7 +393,6 @@ public class NexusUI implements EntryPoint {
             {
                 addStyleName("st-server-instance-panel");
                 setHeaderVisible(false);
-                setLayout(new FitLayout());
                 setBodyBorder(false);
             }
         };
@@ -416,7 +414,6 @@ public class NexusUI implements EntryPoint {
             {
                 setHeading(serverFunctionGroup.getName());
                 addStyleName("st-server-group-panel");
-                setLayout(new FitLayout());
                 setFrame(true);
             }
         };

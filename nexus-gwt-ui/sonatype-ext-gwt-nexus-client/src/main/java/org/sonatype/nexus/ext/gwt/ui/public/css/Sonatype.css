@@ -12,6 +12,7 @@ body {
   float: right;
   font-size: 14px;
   display: inline;
+  text-align: right;
 }
 #st-header #st-right-side #st-username {
   text-align: right;
@@ -43,20 +44,16 @@ button.st-icon-refresh {
 }
 
 /* left server sub-panels */
-#st-server-nexus-tab .st-server-instance-panel {
-  padding: 2px 4px;
+#st-server-nexus-tab .st-server-group-panel {
+  padding: 4px 4px 0px 4px;
 }
 #st-server-nexus-tab {
   background-color: #F9F9F9;
 }
 #st-server-nexus-tab a.st-link {
-/* FIXME: Find out how to recalculate the height of a link
   font-size: 13px;
-*/
   text-decoration: none;
-/* FIXME: Find out how to recalculate the height of a link
-  padding: 2px;
-*/
+  display: block;
 }
 
 #st-repo-browser .x-panel-body {
