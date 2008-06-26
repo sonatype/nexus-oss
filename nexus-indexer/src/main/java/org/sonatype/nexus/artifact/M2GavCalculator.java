@@ -59,6 +59,7 @@ public class M2GavCalculator
             String n = s.substring( vEndPos + 1 );
 
             boolean checksum = false;
+            boolean signature = false;
             Gav.HashType checksumType = null;
             if ( s.endsWith( ".md5" ) )
             {
@@ -72,6 +73,11 @@ public class M2GavCalculator
                 checksumType = Gav.HashType.sha1;
                 s = s.substring( 0, s.length() - 5 );
             }
+            else if ( s.endsWith( ".asc" ) )
+            {
+                signature = true;
+                s = s.substring( 0, s.length() - 4 );
+            }
 
             if ( s.endsWith( "maven-metadata.xml" ) )
             {
@@ -79,7 +85,7 @@ public class M2GavCalculator
             }
 
             String ext = null;
-            
+
             // TODO: refine this, the version may contain dot too!
             if ( n.contains( "." ) )
             {
@@ -142,11 +148,12 @@ public class M2GavCalculator
                     snapBuildNr = Integer.parseInt( bnr.toString() );
 
                     primary = !checksum
+                        && !signature
                         && n
                             .equals( a + "-" + v.substring( 0, v.length() - 9 ) + "-" + snapshotBuildNumber + "." + ext );
                     if ( !primary )
                     {
-                        if ( checksum )
+                        if ( checksum || signature )
                         {
                             c = s.substring(
                                 vEndPos + a.length() + v.length() - 9 + 3 + snapshotBuildNumber.length(),
@@ -249,6 +256,12 @@ public class M2GavCalculator
             path.append( "." );
 
             path.append( gav.getHashType().toString() );
+        }
+        else if ( gav.getName().endsWith( ".asc" ) )
+        {
+            path.append( "." );
+
+            path.append( "asc" );
         }
 
         return path.toString();
