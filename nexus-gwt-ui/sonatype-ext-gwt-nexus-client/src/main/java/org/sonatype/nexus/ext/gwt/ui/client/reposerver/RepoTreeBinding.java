@@ -87,7 +87,7 @@ public class RepoTreeBinding {
                 RepoContentNode parent, final AsyncCallback<Object> callback) {
 
             int i = parent.getResourceUri().indexOf("repositories");
-            String url = parent.getResourceUri().substring(i);
+            String url = parent.getResourceUri().substring(i) + "/";
 
             server.getResource(url).get(new RequestCallback() {
 
