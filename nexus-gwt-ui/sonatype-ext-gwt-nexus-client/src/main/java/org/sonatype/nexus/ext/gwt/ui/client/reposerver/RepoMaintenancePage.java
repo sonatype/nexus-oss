@@ -36,17 +36,20 @@ import com.google.gwt.user.client.Window;
 
 public class RepoMaintenancePage extends LayoutContainer implements ServerFunctionPanel {
 
+    private RepoServerInstance server;
     private ContentPanel repoPanel;
     private ContentPanel repoTree;
     private ContentPanel repoTreePanel;
     private RepoTreeBinding repoTreeBinding;
 
     public void init(ServerInstance server) {
+        this.server = (RepoServerInstance) server;
+        
         setLayout(new BorderLayout());
         setWidth("100%");
         setHeight("100%");
 
-        addRepoList((RepoServerInstance) server);
+        addRepoList();
         addRepoPanel();
 
         createRepoTree();
@@ -54,7 +57,7 @@ public class RepoMaintenancePage extends LayoutContainer implements ServerFuncti
         showRepoHelp();
     }
     
-    private void addRepoList(final RepoServerInstance server) {
+    private void addRepoList() {
         ContentPanel panel = new ContentPanel() {
             {
                 setHeaderVisible(false);
@@ -342,7 +345,7 @@ public class RepoMaintenancePage extends LayoutContainer implements ServerFuncti
             }
         };
 
-        repoTreeBinding = new RepoTreeBinding(tree);
+        repoTreeBinding = new RepoTreeBinding(tree, server);
 
         repoTreePanel = new ContentPanel() {
             {

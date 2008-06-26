@@ -3,9 +3,7 @@ package org.sonatype.nexus.ext.gwt.ui.client.reposerver;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.sonatype.gwt.client.resource.DefaultResource;
 import org.sonatype.gwt.client.resource.Variant;
-import org.sonatype.nexus.ext.gwt.ui.client.Constants;
 
 import com.extjs.gxt.ui.client.binder.TreeBinder;
 import com.extjs.gxt.ui.client.data.BaseTreeLoader;
@@ -39,17 +37,20 @@ public class RepoTreeBinding {
     
     private Variant variant;
     
+    private RepoServerInstance server;
+    
     private TreeStore store;
     
     private TreeBinder<TreeModel> binder;
     
     private ModelData selectedRepo;
     
-    public RepoTreeBinding(Tree tree) {
-        this(tree, DEFAULT_MODEL_TYPE, Variant.APPLICATION_XML);
+    public RepoTreeBinding(Tree tree, RepoServerInstance server) {
+        this(tree, server, DEFAULT_MODEL_TYPE, Variant.APPLICATION_XML);
     }
     
-    public RepoTreeBinding(Tree tree, ModelType modelType, Variant variant) {
+    public RepoTreeBinding(Tree tree, RepoServerInstance server, ModelType modelType, Variant variant) {
+        this.server = server;
         this.variant = variant;
         
         TreeLoader loader =
@@ -85,9 +86,10 @@ public class RepoTreeBinding {
         public void load(final DataReader<RepoContentNode, Object> reader,
                 RepoContentNode parent, final AsyncCallback<Object> callback) {
 
-            String url = Constants.HOST + parent.getResourceUri();
+            int i = parent.getResourceUri().indexOf("repositories");
+            String url = parent.getResourceUri().substring(i);
 
-            new DefaultResource(url).get(new RequestCallback() {
+            server.getResource(url).get(new RequestCallback() {
 
                 public void onError(Request request, Throwable exception) {
                     callback.onFailure(exception);
