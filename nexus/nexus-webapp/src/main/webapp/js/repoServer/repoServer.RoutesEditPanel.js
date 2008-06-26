@@ -360,6 +360,13 @@ Sonatype.repoServer.RoutesEditPanel = function(config){
 
 Ext.extend(Sonatype.repoServer.RoutesEditPanel, Ext.Panel, {
   reloadAll : function(){
+    Ext.Ajax.request({
+      callback: this.processRepoList,
+      scope: this,
+      method: 'GET',
+      url: Sonatype.config.repos.urls.repositories
+    });
+    this.routesDataStore.removeAll();
     this.routesDataStore.reload();
     this.formCards.items.each(function(item, i, len){
       if(i>0){this.remove(item, true);}
