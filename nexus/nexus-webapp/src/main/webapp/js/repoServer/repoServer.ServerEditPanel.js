@@ -394,26 +394,30 @@ Sonatype.repoServer.ServerEditPanel = function(config){
 };
 
 Ext.extend(Sonatype.repoServer.ServerEditPanel, Ext.Panel, {
+
   optionalFieldsetExpandHandler : function(panel){
     panel.items.each(function(item, i, len){
-      if (item.getEl().up('div.required-field', 3)) {
-        item.allowBlank = false;
-      }
-      else if (item.isXType('fieldset', true)){
+      if (item.isXType('fieldset', true)){
         this.optionalFieldsetExpandHandler(item);
       }
-    }, this); // "this" is ServerEditPanel
+      else if (item.getEl() != null && item.getEl().up('div.required-field', 3)){
+        item.allowBlank = false;
+      }
+      else {
+        item.allowBlank = true;
+      }
+    }, this); // "this" is RepoEditPanel
   },
   
   optionalFieldsetCollapseHandler : function(panel){
     panel.items.each(function(item, i, len){
-      if (item.getEl().up('div.required-field', 3)) {
-        item.allowBlank = true;
-      }
-      else if (item.isXType('fieldset', true)){
+      if (item.isXType('fieldset', true)){
         this.optionalFieldsetCollapseHandler(item);
       }
-    }, this); // "this" is ServerEditPanel
+      else {
+        item.allowBlank = true;
+      }
+    }, this); // "this" is RepoEditPanel
   },
   
   saveBtnHandler : function() {
