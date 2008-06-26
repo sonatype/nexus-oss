@@ -564,7 +564,7 @@ public class DefaultMetadataManager
 
         try
         {
-            PluginDescriptor pd = extractPluginDescriptor( (InputStream) pomFile.getInputStream() );
+            PluginDescriptor pd = extractPluginDescriptor( pomFile.getInputStream() );
 
             plugin.setPrefix( pd.getGoalPrefix() );
 

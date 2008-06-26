@@ -22,6 +22,7 @@ package org.sonatype.nexus.proxy.maven.maven2;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.Collections;
@@ -141,13 +142,16 @@ public class M2Repository
         if ( isCleanseRepositoryMetadata() && StorageFileItem.class.isAssignableFrom( item.getClass() )
             && M2ArtifactRecognizer.isMetadata( item.getPath() ) )
         {
+            InputStream orig = null;
             StorageFileItem mdFile = (StorageFileItem) item;
             ByteArrayInputStream backup = null;
             try
             {
                 // remote item is not reusable, and we usually cache remote stuff locally
                 ByteArrayOutputStream backup1 = new ByteArrayOutputStream();
-                IOUtil.copy( mdFile.getInputStream(), backup1 );
+                orig = mdFile.getInputStream();
+                IOUtil.copy( orig, backup1 );
+                IOUtil.close( orig );
                 backup = new ByteArrayInputStream( backup1.toByteArray() );
 
                 // Metadata is small, let's do it in memory

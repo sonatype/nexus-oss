@@ -58,6 +58,7 @@ import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.rest.AbstractNexusResourceHandler;
 import org.sonatype.nexus.rest.ApplicationBridge;
 import org.sonatype.nexus.rest.NexusAuthenticationGuard;
+import org.sonatype.nexus.rest.StorageFileItemRepresentation;
 import org.sonatype.nexus.security.User;
 import org.sonatype.plexus.rest.representation.InputStreamRepresentation;
 
@@ -279,12 +280,7 @@ public class AbstractArtifactResourceHandler
 
             StorageFileItem file = ( (MavenRepository) repository ).retrieveArtifact( gavRequest );
 
-            Representation result = new InputStreamRepresentation( MediaType.valueOf( file.getMimeType() ), file
-                .getInputStream() );
-
-            result.setModificationDate( new Date( file.getModified() ) );
-
-            result.setSize( file.getLength() );
+            Representation result = new StorageFileItemRepresentation( file );
 
             return result;
         }

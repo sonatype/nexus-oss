@@ -67,7 +67,6 @@ import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.rest.model.ContentListResource;
 import org.sonatype.nexus.rest.model.ContentListResourceResponse;
 import org.sonatype.nexus.security.User;
-import org.sonatype.plexus.rest.representation.InputStreamRepresentation;
 
 /**
  * This is an abstract resource handler that uses ResourceStore implementor and publishes those over REST.
@@ -218,8 +217,7 @@ public abstract class AbstractResourceStoreContentResource
                 // this is a conditional GET
                 if ( file.getModified() > getRequest().getConditions().getModifiedSince().getTime() )
                 {
-                    result = new InputStreamRepresentation( MediaType.valueOf( file.getMimeType() ), file
-                        .getInputStream() );
+                    result = new StorageFileItemRepresentation( file );
                 }
                 else
                 {
@@ -230,12 +228,8 @@ public abstract class AbstractResourceStoreContentResource
             }
             else
             {
-                result = new InputStreamRepresentation( MediaType.valueOf( file.getMimeType() ), file.getInputStream() );
+                result = new StorageFileItemRepresentation( file );
             }
-
-            result.setModificationDate( new Date( file.getModified() ) );
-
-            result.setSize( file.getLength() );
         }
         else if ( StorageLinkItem.class.isAssignableFrom( item.getClass() ) )
         {
