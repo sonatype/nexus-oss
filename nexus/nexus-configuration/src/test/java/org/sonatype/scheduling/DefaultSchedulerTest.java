@@ -96,6 +96,45 @@ public class DefaultSchedulerTest
 
         assertEquals( 0, defaultScheduler.getActiveTasks().size() );
     }
+    
+    public void testManual()
+        throws Exception
+    {
+        TestCallable tr = new TestCallable();
+        
+        ScheduledTask<Integer> st = defaultScheduler.store( "default", tr, null );
+        
+        assertEquals( 1, defaultScheduler.getActiveTasks().size() );
+
+        // Give the scheduler a chance to start if it would (it shouldn't that's the test)
+        Thread.sleep( 100 );
+        
+        assertEquals( TaskState.SUBMITTED, st.getTaskState() );
+        
+        st.runNow();
+        
+        // Give the task a chance to start
+        Thread.sleep( 100 );
+        
+        //Now wait for it to finish
+        while ( !st.getTaskState().equals( TaskState.SUBMITTED ) )
+        {
+            Thread.sleep( 100 );
+        }
+        
+        assertEquals( 1, tr.getRunCount() );
+        
+        assertEquals( TaskState.SUBMITTED, st.getTaskState() );
+        
+        assertEquals( 1, defaultScheduler.getActiveTasks().size() );
+        
+        st.cancel();
+        
+        while ( defaultScheduler.getActiveTasks().size() > 0 )
+        {
+            Thread.sleep( 100 );
+        }
+    }
 
     public void testSecondsRunnable()
         throws Exception
