@@ -4,9 +4,12 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+
+import org.apache.http.client.utils.URLUtils;
 
 /**
  * Simple File testing utilities.
@@ -20,6 +23,7 @@ public class FileTestingUtils
 
     /**
      * Creates a SHA1 hash from a file.
+     * 
      * @param file The file to be digested.
      * @return An SHA1 hash based on the contents of the file.
      * @throws IOException
@@ -35,13 +39,38 @@ public class FileTestingUtils
         }
         finally
         {
-            if( fis != null )
-            fis.close();
+            if ( fis != null )
+                fis.close();
+        }
+    }
+
+    /**
+     * Creates a SHA1 hash from a url.
+     * 
+     * @param url The URL to opened and digested.
+     * @return An SHA1 hash based on the contents of the URL.
+     * @throws IOException
+     */
+    public static String createSHA1FromURL( URL url )
+        throws IOException
+    {
+        InputStream is = url.openStream();
+        try
+        {
+            return createSHA1FromStream( is );
+        }
+        finally
+        {
+            if ( is != null )
+            {
+                is.close();
+            }
         }
     }
 
     /**
      * Creates a SHA1 hash from an InputStream.
+     * 
      * @param in Inputstream to be digested.
      * @returnn SHA1 hash based on the contents of the stream.
      * @throws IOException
@@ -83,10 +112,11 @@ public class FileTestingUtils
         }
     }
 
-    public static boolean compareFileSHA1s(File file1, File file2) throws IOException
+    public static boolean compareFileSHA1s( File file1, File file2 )
+        throws IOException
     {
 
-        if( file1 != null && file1.exists() && file2 != null && file2.exists() )
+        if ( file1 != null && file1.exists() && file2 != null && file2.exists() )
         {
             String file1SHA1 = createSHA1FromFile( file1 );
             String file2SHA1 = createSHA1FromFile( file2 );
@@ -96,13 +126,35 @@ public class FileTestingUtils
         return false;
     }
 
-    @SuppressWarnings("unchecked")
-    public static File getTestFile(Class clazz, String filename)
+    @SuppressWarnings( "unchecked" )
+    public static File getTestFile( Class clazz, String filename )
     {
-        String resource = clazz.getName().replace( '.', '/' )+ "Resources/"+ filename;
+        String resource = clazz.getName().replace( '.', '/' ) + "Resources/" + filename;
         URL classURL = Thread.currentThread().getContextClassLoader().getResource( resource );
-        return new File(classURL.getFile());
+        return new File( classURL.getFile() );
     }
 
+    public static void main( String[] args )
+    {
+        String usage = "Usage: java " + FileTestingUtils.class + " <url>";
+
+        if ( args == null || args.length != 1 )
+        {
+            System.out.println( usage );
+            return;
+        }
+
+        try
+        {
+            URL url = new URL( args[0] );
+            System.out.println( createSHA1FromURL( url ));
+        }
+        catch ( Exception e )
+        {
+            System.out.println( usage );
+            e.printStackTrace(System.out);
+        }
+
+    }
 
 }

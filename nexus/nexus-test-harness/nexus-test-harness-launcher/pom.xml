@@ -69,8 +69,13 @@
 	    <resources>
 	        <resource>
 	            <directory>${config-expanded-dir}</directory>
+	            <filtering>false</filtering>
+	            <targetPath>../../${nexus-basedir}</targetPath>            
+	        </resource>
+	        <resource>
+	            <directory>${config-expanded-dir}/runtime/apps/nexus/conf</directory>
 	            <filtering>true</filtering>
-	            <targetPath>../../${nexus-basedir}</targetPath>
+	            <targetPath>../../${nexus-basedir}/runtime/apps/nexus/conf</targetPath>            
 	        </resource>
 	    </resources>
 	    <testResources>
@@ -152,7 +157,7 @@
                                 <plexus.host.control.socket.enabled>true</plexus.host.control.socket.enabled>
                                 <plexus.container.dev.mode>true</plexus.container.dev.mode>
 		                    </systemProperties>
-		                    <basedir>${nexus-basedir}</basedir>
+		                    <basedir>${bundle-expanded-dir}/nexus-webapp-${project.version}</basedir>
 		                    <configuration>${plexus-config-file}</configuration>
 		                    <includeTestClasspath>true</includeTestClasspath>
 		                    <platformArtifact>

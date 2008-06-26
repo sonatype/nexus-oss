@@ -1,2 +1,3 @@
 nexus.working.directory=${basedir}/target/bundle/nexus-webapp-${project.version}/runtime/work/nexus
 nexus.log.directory=${basedir}/target/bundle/nexus-webapp-${project.version}/runtime/apps/nexus/logs
+filter.hack=$
