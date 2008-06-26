@@ -466,7 +466,7 @@ Ext.extend(Sonatype.repoServer.ServerEditPanel, Ext.Panel, {
     var appSettingsPanel = this.findById( this.id + '_applicationServerSettings' );
     if ( appSettingsPanel.collapsed ) {
       var baseUrlField = this.find( 'name', 'baseUrl' )[0];
-      baseUrlField.setRawValue( '' );
+      baseUrlField.setValue( '' );
     }
 
     form.doAction('sonatypeSubmit', {
@@ -500,6 +500,7 @@ Ext.extend(Sonatype.repoServer.ServerEditPanel, Ext.Panel, {
   },
   
   afterLayoutHandler : function(){
+    var appSettingsPanel = this.findById( this.id + '_applicationServerSettings' );
     // invoke form data load
     this.getForm().doAction('sonatypeLoad', {
       url:Sonatype.config.repos.urls.globalSettingsState,
@@ -509,7 +510,13 @@ Ext.extend(Sonatype.repoServer.ServerEditPanel, Ext.Panel, {
         "routing.followLinks" : Sonatype.utils.capitalize,
         "routing.groups.stopItemSearchOnFirstFoundFile" : Sonatype.utils.capitalize,
         "routing.groups.mergeMetadata" : Sonatype.utils.capitalize,
-        "securityConfiguration" : Sonatype.utils.capitalize
+        "securityConfiguration" : Sonatype.utils.capitalize,
+        "baseUrl" : function(str) {
+            if (!Ext.isEmpty(str)){
+              appSettingsPanel.expand();
+            }
+            return str;
+          }
       }
     });
     
