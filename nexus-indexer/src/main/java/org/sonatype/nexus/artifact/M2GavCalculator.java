@@ -257,7 +257,8 @@ public class M2GavCalculator
 
             path.append( gav.getHashType().toString() );
         }
-        else if ( gav.getName().endsWith( ".asc" ) )
+        else if ( gav.getName() != null
+            && gav.getName().endsWith( ".asc" ) )
         {
             path.append( "." );
 
