@@ -8,7 +8,7 @@
 		<version>1.0.0-SNAPSHOT</version>
 	</parent>
 
-	<artifactId>sonatype-ext-gwt-nexus-client</artifactId>
+	<artifactId>sonatype-gxt-nexus-ui</artifactId>
 
 	<packaging>jar</packaging>
 

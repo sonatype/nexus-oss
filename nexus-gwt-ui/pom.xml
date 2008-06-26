@@ -32,8 +32,6 @@
 		<module>sonatype-gwt-rest</module>
 		<module>sonatype-gwt-nexus-client</module>
 		<module>sonatype-ext-gwt-nexus-client</module>
-		<module>sonatype-gwt-ext-nexus-client</module>
-		<module>sonatype-gwt-nexus-ui</module>
 	</modules>
 
 	<properties>
@@ -108,17 +106,7 @@
 			</dependency>
 			<dependency>
 				<groupId>org.sonatype.nexus.gwt</groupId>
-				<artifactId>sonatype-ext-gwt-nexus-client</artifactId>
-				<version>${project.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.sonatype.nexus.gwt</groupId>
-				<artifactId>sonatype-gwt-ext-nexus-client</artifactId>
-				<version>${project.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.sonatype.nexus.gwt</groupId>
-				<artifactId>sonatype-gwt-nexus-ui</artifactId>
+				<artifactId>sonatype-gxt-nexus-ui</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 		</dependencies>
