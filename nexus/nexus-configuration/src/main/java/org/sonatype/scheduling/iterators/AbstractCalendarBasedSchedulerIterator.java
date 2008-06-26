@@ -51,4 +51,9 @@ public abstract class AbstractCalendarBasedSchedulerIterator
     {
         return getCalendar().getTime();
     }
+
+    public void resetFrom( Date from )
+    {
+        calendar.setTime( from );
+    }
 }

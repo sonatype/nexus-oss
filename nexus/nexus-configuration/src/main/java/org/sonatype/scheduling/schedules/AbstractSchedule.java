@@ -22,12 +22,16 @@ package org.sonatype.scheduling.schedules;
 
 import java.util.Date;
 
+import org.sonatype.scheduling.iterators.SchedulerIterator;
+
 public abstract class AbstractSchedule
     implements Schedule
 {
     private final Date startDate;
 
     private final Date endDate;
+
+    private SchedulerIterator schedulerIterator;
 
     public AbstractSchedule( Date startDate, Date endDate )
     {
@@ -47,4 +51,16 @@ public abstract class AbstractSchedule
     {
         return endDate;
     }
+
+    public SchedulerIterator getIterator()
+    {
+        if ( schedulerIterator == null )
+        {
+            schedulerIterator = createIterator();
+        }
+
+        return schedulerIterator;
+    }
+
+    protected abstract SchedulerIterator createIterator();
 }

@@ -43,7 +43,7 @@ public class WeeklySchedule
         return daysToRun;
     }
 
-    public SchedulerIterator getIterator()
+    protected SchedulerIterator createIterator()
     {
         return new WeeklySchedulerIterator( getStartDate(), getEndDate(), daysToRun );
     }

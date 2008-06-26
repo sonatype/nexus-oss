@@ -128,7 +128,7 @@ public class DefaultScheduler
         return scheduledExecutorService;
     }
 
-    protected <T> void addToTasksMap( ScheduledTask<T> task, boolean store )
+    protected <T> void addToTasksMap( ScheduledTask<T> task )
     {
         synchronized ( tasksMap )
         {
@@ -138,10 +138,15 @@ public class DefaultScheduler
             }
             tasksMap.get( task.getType() ).add( task );
 
-            if ( store )
-            {
-                taskConfig.addTask( task );
-            }
+            taskConfig.addTask( task );
+        }
+    }
+
+    protected void taskRescheduled( ScheduledTask<?> task )
+    {
+        synchronized ( tasksMap )
+        {
+            taskConfig.addTask( task );
         }
     }
 
@@ -172,9 +177,9 @@ public class DefaultScheduler
         Map<String, String> taskParams, boolean store )
     {
         DefaultScheduledTask<Object> drt = new DefaultScheduledTask<Object>( name, runnable.getClass(), this, Executors
-            .callable( runnable ), schedule, taskParams );
+            .callable( runnable ), schedule, taskParams, store );
 
-        addToTasksMap( drt, store );
+        addToTasksMap( drt );
 
         drt.start();
 
@@ -195,9 +200,10 @@ public class DefaultScheduler
             this,
             callable,
             schedule,
-            taskParams );
+            taskParams,
+            store );
 
-        addToTasksMap( dct, store );
+        addToTasksMap( dct );
 
         dct.start();
 
@@ -221,8 +227,10 @@ public class DefaultScheduler
         List<ScheduledTask<?>> tasks = null;
 
         // filter for activeOrSubmitted
-        for ( Class<?> cls : result.keySet() )
+        for ( Iterator<Class<?>> c = result.keySet().iterator(); c.hasNext(); )
         {
+            Class<?> cls = c.next();
+
             tasks = result.get( cls );
 
             for ( Iterator<ScheduledTask<?>> i = tasks.iterator(); i.hasNext(); )
@@ -233,6 +241,11 @@ public class DefaultScheduler
                 {
                     i.remove();
                 }
+            }
+
+            if ( tasks.isEmpty() )
+            {
+                c.remove();
             }
         }
 
@@ -245,9 +258,11 @@ public class DefaultScheduler
 
         List<ScheduledTask<?>> tasks = null;
 
-        // filter for activeOrSubmitted
-        for ( Class<?> cls : result.keySet() )
+        // filter for RUNNING
+        for ( Iterator<Class<?>> c = result.keySet().iterator(); c.hasNext(); )
         {
+            Class<?> cls = c.next();
+
             tasks = result.get( cls );
 
             for ( Iterator<ScheduledTask<?>> i = tasks.iterator(); i.hasNext(); )
@@ -258,6 +273,11 @@ public class DefaultScheduler
                 {
                     i.remove();
                 }
+            }
+
+            if ( tasks.isEmpty() )
+            {
+                c.remove();
             }
         }
 
@@ -301,7 +321,7 @@ public class DefaultScheduler
             throw new IllegalArgumentException( "The Tasks cannot have null IDs!" );
         }
 
-        Collection<List<ScheduledTask<?>>> activeTasks = getActiveTasks().values();
+        Collection<List<ScheduledTask<?>>> activeTasks = getAllTasks().values();
 
         for ( List<ScheduledTask<?>> tasks : activeTasks )
         {

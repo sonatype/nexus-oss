@@ -61,4 +61,9 @@ public class CronIterator
             nextDate = cronExpression.getNextValidTimeAfter( doPeekNext() );
         }
     }
+
+    public void resetFrom( Date from )
+    {
+        this.nextDate = cronExpression.getNextValidTimeAfter( from );
+    }
 }

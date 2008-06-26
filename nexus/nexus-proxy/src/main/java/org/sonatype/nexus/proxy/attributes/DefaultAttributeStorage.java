@@ -70,7 +70,7 @@ public class DefaultAttributeStorage
     /**
      * The table of current operations.
      */
-    private ConcurrentHashMap<String, ReentrantLock> locks;
+    private volatile ConcurrentHashMap<String, ReentrantLock> locks;
 
     /**
      * Instantiates a new FSX stream attribute storage.

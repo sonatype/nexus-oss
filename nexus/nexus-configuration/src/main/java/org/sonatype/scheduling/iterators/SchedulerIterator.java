@@ -24,6 +24,8 @@ import java.util.Date;
 
 public interface SchedulerIterator
 {
+    void resetFrom( Date from );
+
     Date peekNext();
 
     Date next();

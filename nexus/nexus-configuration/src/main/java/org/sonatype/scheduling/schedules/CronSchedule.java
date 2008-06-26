@@ -49,7 +49,7 @@ public class CronSchedule
         return cronString;
     }
 
-    public SchedulerIterator getIterator()
+    protected SchedulerIterator createIterator()
     {
         return new CronIterator( cronExpression );
     }

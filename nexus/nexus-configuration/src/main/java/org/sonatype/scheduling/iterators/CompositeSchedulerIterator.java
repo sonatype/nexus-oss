@@ -100,4 +100,12 @@ public class CompositeSchedulerIterator
         }
         return nextIterator;
     }
+
+    public void resetFrom( Date from )
+    {
+        for ( SchedulerIterator iter : iterators )
+        {
+            iter.resetFrom( from );
+        }
+    }
 }

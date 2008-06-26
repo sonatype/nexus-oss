@@ -71,10 +71,9 @@ public interface ScheduledTask<T>
      * @return
      */
     Date getScheduledAt();
-    
+
     /**
      * Runs the task right now, putting schedule on hold until complete
-     * 
      */
     void runNow();
 
@@ -135,6 +134,13 @@ public interface ScheduledTask<T>
      * @return
      */
     boolean isEnabled();
+
+    /**
+     * Returns if the task config should be persisted.
+     * 
+     * @return
+     */
+    boolean isStoreConfig();
 
     /**
      * Sets enabled.

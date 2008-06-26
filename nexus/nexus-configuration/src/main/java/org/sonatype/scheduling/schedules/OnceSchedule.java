@@ -33,7 +33,7 @@ public class OnceSchedule
         super( date, date );
     }
 
-    public SchedulerIterator getIterator()
+    protected SchedulerIterator createIterator()
     {
         return new OnceSchedulerIterator( getStartDate() );
     }

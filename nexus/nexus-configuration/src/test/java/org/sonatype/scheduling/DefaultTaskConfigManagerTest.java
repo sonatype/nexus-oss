@@ -240,7 +240,8 @@ public class DefaultTaskConfigManagerTest
             defaultScheduler,
             callable,
             schedule,
-            null );
+            null,
+            true );
     }
 
     private void loadConfig()

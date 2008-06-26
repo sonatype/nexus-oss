@@ -33,7 +33,7 @@ public class DailySchedule
         super( startDate, endDate );
     }
 
-    public SchedulerIterator getIterator()
+    protected SchedulerIterator createIterator()
     {
         return new DailySchedulerIterator( getStartDate(), getEndDate() );
     }

@@ -43,7 +43,7 @@ public class MonthlySchedule
         return daysToRun;
     }
 
-    public SchedulerIterator getIterator()
+    protected SchedulerIterator createIterator()
     {
         return new MonthlySchedulerIterator( getStartDate(), getEndDate(), daysToRun );
     }

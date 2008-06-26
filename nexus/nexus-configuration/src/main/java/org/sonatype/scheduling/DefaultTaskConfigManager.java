@@ -27,6 +27,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -114,8 +115,9 @@ public class DefaultTaskConfigManager
             getLogger().info( "Loading task - " + task.getType() );
             try
             {
-                SchedulerTask<?> nexusTask = (SchedulerTask<?>) plexusContainer.lookup( SchedulerTask.ROLE, task.getType() );
-                
+                SchedulerTask<?> nexusTask = (SchedulerTask<?>) plexusContainer.lookup( SchedulerTask.ROLE, task
+                    .getType() );
+
                 for ( Iterator iter = task.getProperties().iterator(); iter.hasNext(); )
                 {
                     CProps prop = (CProps) iter.next();
@@ -124,7 +126,7 @@ public class DefaultTaskConfigManager
                 scheduler.schedule(
                     task.getName(),
                     nexusTask,
-                    translateFrom( task.getSchedule() ),
+                    translateFrom( task.getSchedule(), task.getLastRun() ),
                     translateFrom( task.getProperties() ),
                     false ).setEnabled( task.isEnabled() );
             }
@@ -144,6 +146,11 @@ public class DefaultTaskConfigManager
      */
     public <T> void addTask( ScheduledTask<T> task )
     {
+        if ( !task.isStoreConfig() )
+        {
+            return;
+        }
+
         synchronized ( config )
         {
             CScheduledTask foundTask = findTask( task.getId() );
@@ -211,7 +218,7 @@ public class DefaultTaskConfigManager
         return map;
     }
 
-    private Schedule translateFrom( CSchedule modelSchedule )
+    private Schedule translateFrom( CSchedule modelSchedule, Date lastRun )
     {
         Schedule schedule = null;
 
@@ -281,6 +288,11 @@ public class DefaultTaskConfigManager
         else if ( COnceSchedule.class.isAssignableFrom( modelSchedule.getClass() ) )
         {
             schedule = new OnceSchedule( ( (COnceSchedule) modelSchedule ).getStartDate() );
+        }
+
+        if ( lastRun != null )
+        {
+            schedule.getIterator().resetFrom( lastRun );
         }
 
         return schedule;

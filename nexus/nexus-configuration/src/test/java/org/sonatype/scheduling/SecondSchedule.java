@@ -34,7 +34,8 @@ public class SecondSchedule
     {
         super( startDate, endDate );
     }
-    public SchedulerIterator getIterator()
+
+    protected SchedulerIterator createIterator()
     {
         return new SecondScheduleIterator( getStartDate(), getEndDate() );
     }

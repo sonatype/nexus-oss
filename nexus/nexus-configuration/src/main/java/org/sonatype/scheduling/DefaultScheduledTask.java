@@ -69,10 +69,12 @@ public class DefaultScheduledTask<T>
 
     private Map<String, String> taskParams;
 
+    private final boolean storeConfig;
+
     private boolean manualRun;
 
     public DefaultScheduledTask( String name, Class<?> clazz, DefaultScheduler scheduler, Callable<T> callable,
-        Schedule schedule, Map<String, String> taskParams )
+        Schedule schedule, Map<String, String> taskParams, boolean storeConfig )
     {
         super();
 
@@ -97,6 +99,8 @@ public class DefaultScheduledTask<T>
         this.scheduleIterator = null;
 
         this.taskParams = taskParams;
+
+        this.storeConfig = storeConfig;
 
         this.manualRun = false;
     }
@@ -159,6 +163,11 @@ public class DefaultScheduledTask<T>
     public Date getScheduledAt()
     {
         return scheduledAt;
+    }
+
+    public boolean isStoreConfig()
+    {
+        return storeConfig;
     }
 
     public void cancel()
@@ -229,9 +238,13 @@ public class DefaultScheduledTask<T>
     {
         if ( !getScheduleIterator().isFinished() )
         {
+            long nextTime = getScheduleIterator().next().getTime();
+
+            getScheduler().taskRescheduled( this );
+
             return getScheduler().getScheduledExecutorService().schedule(
                 this,
-                getScheduleIterator().next().getTime() - System.currentTimeMillis(),
+                nextTime - System.currentTimeMillis(),
                 TimeUnit.MILLISECONDS );
         }
         else
