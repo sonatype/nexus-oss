@@ -71,7 +71,18 @@ public class PublishIndexesTask
     @Override
     protected String getMessage()
     {
-        return "Publishing indexes for all registered repositories.";
+        if ( getRepositoryGroupId() != null )
+        {
+            return "Publishing indexes for repository group with ID=" + getRepositoryGroupId();
+        }
+        else if ( getRepositoryId() != null )
+        {
+            return "Publishing indexes for repository with ID=" + getRepositoryId();
+        }
+        else
+        {
+            return "Publishing indexes for all registered repositories";
+        }
     }
 
 }
