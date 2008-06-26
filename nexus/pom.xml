@@ -114,6 +114,11 @@
         <restlet.version>1.0.9</restlet.version>
 		<maven.version>2.1-SONATYPE-653485</maven.version>
         <maven.artifact.version>3.0-SONATYPE-653272</maven.artifact.version>
+        <plexus.appbooter.version>1.2</plexus.appbooter.version>
+        <jsw.binaries.version>3.2.3.2</jsw.binaries.version>
+        <plexus.container.version>1.0-alpha-47</plexus.container.version>
+        <plx.plugin.version>1.1</plx.plugin.version>
+        <nexus.indexer.version>1.0-beta-4-SNAPSHOT</nexus.indexer.version>
 	</properties>
 
 	<dependencyManagement>
@@ -123,26 +128,26 @@
 			<dependency>
 				<groupId>org.sonatype.appbooter.plexus-booters</groupId>
 				<artifactId>plexus-app-booter</artifactId>
-				<version>1.2-SNAPSHOT</version>
+				<version>${plexus.appbooter.version}</version>
 				<scope>provided</scope>
 			</dependency>
             <dependency>
 				<groupId>org.sonatype.appbooter.plexus-booters</groupId>
 				<artifactId>plexus-jsw-app-booter</artifactId>
-				<version>1.2-SNAPSHOT</version>
+				<version>${plexus.appbooter.version}</version>
 				<scope>provided</scope>
 			</dependency>
 		    <dependency>
       			<groupId>org.sonatype.appbooter.plexus-platforms</groupId>
       			<artifactId>plexus-platform-jsw</artifactId>
-				<version>1.2-SNAPSHOT</version>
+				<version>${plexus.appbooter.version}</version>
       			<scope>provided</scope>
     		</dependency>
 
             <dependency>
 				<groupId>org.sonatype.jsw-binaries</groupId>
 				<artifactId>jsw-binaries</artifactId>
-				<version>3.2.3.1</version>
+				<version>${jsw.binaries.version}</version>
 				<type>zip</type>
 				<!--make sure this doesn't get into any classpaths-->
 				<scope>provided</scope>
@@ -179,7 +184,7 @@
 				<groupId>org.codehaus.plexus</groupId>
 				<artifactId>plexus-container-default</artifactId>
 				<scope>provided</scope>
-                <version>1.0-alpha-47-SNAPSHOT</version>
+                <version>${plexus.container.version}</version>
 				<exclusions>
 					<exclusion>
 						<groupId>commons-logging</groupId>
@@ -513,7 +518,7 @@
 			<dependency>
 				<groupId>org.sonatype.nexus</groupId>
 				<artifactId>nexus-indexer</artifactId>
-				<version>1.0-beta-4-SNAPSHOT</version>
+				<version>${nexus.indexer.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.sonatype.nexus</groupId>
@@ -584,7 +589,7 @@
   				  <dependency>
   				    <groupId>org.sonatype.spice</groupId>
   				    <artifactId>maven-assembly-helpers</artifactId>
-  				    <version>1.0-SNAPSHOT</version>
+  				    <version>1.0</version>
   				  </dependency>
   				</dependencies>
 				</plugin>
@@ -619,6 +624,11 @@
 					<artifactId>modello-maven-plugin</artifactId>
 					<version>1.0-alpha-17</version>
 				</plugin>
+                <plugin>
+		          <artifactId>plx-maven-plugin</artifactId>
+		          <groupId>org.sonatype.plugins</groupId>
+                  <version>${plx.plugin.version}</version>
+                </plugin>
 			</plugins>
 		</pluginManagement>
 	</build>
