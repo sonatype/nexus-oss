@@ -2,6 +2,8 @@ package org.sonatype.nexus.ext.gwt.ui.client;
 
 import org.sonatype.gwt.client.resource.Resource;
 import org.sonatype.gwt.client.resource.Variant;
+import org.sonatype.nexus.ext.gwt.ui.client.reposerver.ResponseHandler;
+import org.sonatype.nexus.ext.gwt.ui.client.reposerver.model.AuthenticationLoginResource;
 
 import com.extjs.gxt.ui.client.Events;
 import com.extjs.gxt.ui.client.Style;
@@ -39,8 +41,6 @@ import com.google.gwt.xml.client.XMLParser;
 public class NexusUI implements EntryPoint {
     
     private ApplicationContext ctx;
-    
-    private boolean userLoggedIn = false;
     
     private Text username;
     private Link loginLink;
@@ -92,7 +92,7 @@ public class NexusUI implements EntryPoint {
                 setId("st-login-link");
             }
             public void onClick(ComponentEvent event) {
-                if (!userLoggedIn) {
+                if (!ctx.isUserLoggedIn()) {
                     showLoginWindow();
                 } else {
                     logout();
@@ -192,12 +192,13 @@ public class NexusUI implements EntryPoint {
         }
 
         Resource resource = ctx.getLocalRepoServer().getResource(Constants.AUTHENTICATION_LOGIN);
-        resource.addHeader("Authorization",
-                "NexusAuthToken " + authorizationToken);
+        resource.addHeader("Authorization", "NexusAuthToken " + authorizationToken);
         resource.get(new RequestCallback() {
+            
             public void onError(Request request, Throwable exception) {
                 updateLoginStatus(null, null);
             }
+            
             public void onResponseReceived(Request request, Response response) {
                 if (response.getStatusCode() == Response.SC_OK) {
                     Document doc = XMLParser.parse(response.getText());
@@ -207,6 +208,7 @@ public class NexusUI implements EntryPoint {
                     updateLoginStatus(null, null);
                 }
             }
+            
         }, Variant.APPLICATION_XML);
     }
     
@@ -295,67 +297,55 @@ public class NexusUI implements EntryPoint {
     private void login(final Window loginWindow, FormPanel loginForm) {
         loginWindow.el().mask("Logging you in...");
 
-        final Field username = loginForm.getFields().get(0);
-        final Field password = loginForm.getFields().get(1);
+        final Field usernameField = loginForm.getFields().get(0);
+        final Field passwordField = loginForm.getFields().get(1);
         
-        Resource resource = ctx.getLocalRepoServer().getResource(Constants.AUTHENTICATION_LOGIN);
-        // TODO: Use real HTTP basic authentication
-        resource.addHeader("Authorization", "Basic " +
-                Util.base64Encode((String) username.getValue() + ":" + (String) password.getValue()));
-        resource.get(new RequestCallback() {
-            public void onError(Request request, Throwable exception) {
+        final String username = (String) usernameField.getValue();
+        final String password = (String) passwordField.getValue();
+        
+        ctx.getLocalRepoServer().login(username, password, new ResponseHandler<AuthenticationLoginResource>() {
+
+            public void onError(Response response, Throwable error) {
                 loginWindow.el().unmask();
-                password.focus();
+                passwordField.focus();
             }
-            public void onResponseReceived(Request request, Response response) {
+
+            public void onSuccess(Response response, AuthenticationLoginResource auth) {
                 loginWindow.el().unmask();
-                if (response.getStatusCode() == Response.SC_OK) {
-                    loginWindow.hide();
-                    
-                    Document doc = XMLParser.parse(response.getText());
-                    String authorizationToken = doc.getElementsByTagName("authToken").item(0).getFirstChild().getNodeValue();
-                    // TODO: Extract permissions from reponse.clientPermissions
-                    
-                    updateLoginStatus((String) username.getValue(), authorizationToken);
-                    
-                    username.reset();
-                    password.reset();
-                }
+                loginWindow.hide();
+                
+                updateLoginStatus(username, auth.getAuthToken());
+                
+                usernameField.reset();
+                passwordField.reset();
             }
-        }, Variant.APPLICATION_XML);
+            
+        });
     }
     
     private void logout() {
-        ctx.getLocalRepoServer().getResource(Constants.AUTHENTICATION_LOGOUT).get(new RequestCallback() {
-            public void onError(Request request, Throwable exception) {
+        ctx.getLocalRepoServer().logout(new ResponseHandler() {
+            
+            public void onError(Response response, Throwable error) {
                 updateLoginStatus(null, null);
             }
-            public void onResponseReceived(Request request, Response response) {
+
+            public void onSuccess(Response response, Object entity) {
                 updateLoginStatus(null, null);
             }
-        }, Variant.APPLICATION_XML);
+            
+        });
     }
     
     // TODO: Require a user object instead of a name
     private void updateLoginStatus(String user, String authorizationToken) {
         if (user != null) {
-            userLoggedIn = true;
-            
-            ctx.setCookie("username", user);
-            ctx.setCookie("authToken", authorizationToken);
-            ctx.getLocalRepoServer().addDefaultHeader("Authorization",
-                    "NexusAuthToken " + authorizationToken);
-            
+            ctx.login(user, authorizationToken);
             username.setText(user + " | ");
             username.show();
             loginLink.setHtml("Log Out");
         } else {
-            userLoggedIn = false;
-            
-            ctx.removeCookie("username");
-            ctx.removeCookie("authToken");
-            ctx.getLocalRepoServer().removeDefaultHeader("Authorization");
-            
+            ctx.logout();
             username.hide();
             loginLink.setHtml("Log In");
         }
@@ -438,7 +428,7 @@ public class NexusUI implements EntryPoint {
         groups.add(functions);
     }
 
-    private void addServerFunction(ContentPanel functions, 
+    private void addServerFunction(ContentPanel functions,
             final ServerFunction serverFunction, String user) {
         functions.add(new Link(serverFunction.getMenuName()) {
             public void onClick(ComponentEvent event) {

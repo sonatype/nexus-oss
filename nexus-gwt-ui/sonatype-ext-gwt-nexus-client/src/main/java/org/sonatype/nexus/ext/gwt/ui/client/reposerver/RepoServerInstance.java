@@ -1,14 +1,20 @@
 package org.sonatype.nexus.ext.gwt.ui.client.reposerver;
 
 import org.sonatype.gwt.client.resource.Representation;
+import org.sonatype.gwt.client.resource.Resource;
 import org.sonatype.gwt.client.resource.Variant;
+import org.sonatype.nexus.ext.gwt.ui.client.Constants;
 import org.sonatype.nexus.ext.gwt.ui.client.ServerInstance;
+import org.sonatype.nexus.ext.gwt.ui.client.Util;
+import org.sonatype.nexus.ext.gwt.ui.client.reposerver.model.AuthenticationLoginResource;
 import org.sonatype.nexus.ext.gwt.ui.client.reposerver.model.RepositoryStatus;
 import org.sonatype.nexus.ext.gwt.ui.client.reposerver.model.RepositoryStatusResponse;
 
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.RequestCallback;
 import com.google.gwt.http.client.Response;
+import com.google.gwt.xml.client.Document;
+import com.google.gwt.xml.client.XMLParser;
 
 public class RepoServerInstance extends ServerInstance {
     
@@ -35,23 +41,54 @@ public class RepoServerInstance extends ServerInstance {
     
     public void reindexRepository(String repositoryId, final ResponseHandler handler) {
         String url = "data_index/repositories/" + repositoryId + "/content";
-        getResource(url).delete(new ResponseProcessor(handler, Response.SC_OK));
+        getResource(url).delete(new ResponseProcessor(handler));
     }
     
     public void clearRepositoryCache(String repositoryId, final ResponseHandler handler) {
         String url = "data_cache/repositories/" + repositoryId + "/content";
-        getResource(url).delete(new ResponseProcessor(handler, Response.SC_OK));
+        getResource(url).delete(new ResponseProcessor(handler));
     }
     
     public void rebuildRepositoryAttributes(String repositoryId, final ResponseHandler handler) {
         String url = "attributes/repositories/" + repositoryId + "/content";
-        getResource(url).delete(new ResponseProcessor(handler, Response.SC_OK));
+        getResource(url).delete(new ResponseProcessor(handler));
+    }
+    
+    public void login(String username, String password, final ResponseHandler handler) {
+        Resource resource = getResource(Constants.AUTHENTICATION_LOGIN);
+        
+        // TODO: Use real HTTP basic authentication
+        resource.addHeader("Authorization", "Basic " +
+                Util.base64Encode(username + ":" + password));
+        
+        resource.get(new ResponseProcessor<AuthenticationLoginResource>(handler) {
+            
+            protected AuthenticationLoginResource createEntity(Response response) {
+                Document doc = XMLParser.parse(response.getText());
+                String authorizationToken = doc.getElementsByTagName("authToken").item(0).getFirstChild().getNodeValue();
+                // TODO: Extract permissions from response.clientPermissions
+                
+                AuthenticationLoginResource entity = new AuthenticationLoginResource();
+                entity.setAuthToken(authorizationToken);
+                
+                return entity;
+            }
+            
+        }, VARIANT);
+    }
+
+    public void logout(final ResponseHandler handler) {
+        doGet(Constants.AUTHENTICATION_LOGOUT, new ResponseProcessor(handler));
+    }
+
+    private void doGet(String path, RequestCallback callback) {
+        getResource(path).get(callback, VARIANT);
     }
     
     private void doPut(String path, String request, RequestCallback callback) {
         getResource(path).put(callback, new Representation(VARIANT, request));
     }
-
+    
     
     private static class ResponseProcessor<E> implements RequestCallback {
         
@@ -61,7 +98,12 @@ public class RepoServerInstance extends ServerInstance {
         
         public ResponseProcessor(ResponseHandler<E> handler, int... successCodes) {
             this.handler = handler;
-            this.successCodes = successCodes;
+            
+            if (successCodes.length > 0) {
+                this.successCodes = successCodes;
+            } else {
+                this.successCodes = new int[] { Response.SC_OK };
+            }
         }
 
         public void onError(Request request, Throwable exception) {

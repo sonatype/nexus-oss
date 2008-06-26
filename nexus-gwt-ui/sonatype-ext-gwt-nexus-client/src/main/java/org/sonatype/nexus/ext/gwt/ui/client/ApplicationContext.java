@@ -14,6 +14,9 @@ public class ApplicationContext {
     
     private List<ServerType> serverTypes = new ArrayList<ServerType>();
     
+    private boolean userLoggedIn = false;
+    private String userName;
+    
     private ApplicationContext() {
         RepoServer repoServer = new RepoServer();
         repoServer.init();
@@ -46,6 +49,30 @@ public class ApplicationContext {
         Cookies.removeCookie("st-" + name);
     }
     
+    public void login(String user, String authorizationToken) {
+        userLoggedIn = true;
+        userName = user;
+        setCookie("username", user);
+        setCookie("authToken", authorizationToken);
+        getLocalRepoServer().addDefaultHeader(
+                "Authorization", "NexusAuthToken " + authorizationToken);
+    }
+    
+    public void logout() {
+        userLoggedIn = false;
+        removeCookie("username");
+        removeCookie("authToken");
+        getLocalRepoServer().removeDefaultHeader("Authorization");
+    }
+    
+    public boolean isUserLoggedIn() {
+        return userLoggedIn;
+    }
+    
+    public String getUserName() {
+        return userName;
+    }
+
     private void init() {
     }
 

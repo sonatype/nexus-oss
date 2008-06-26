@@ -4,6 +4,7 @@ import java.util.HashMap;
 
 import org.sonatype.gwt.client.resource.DefaultResource;
 import org.sonatype.gwt.client.resource.Resource;
+import org.sonatype.nexus.ext.gwt.ui.client.reposerver.ResponseHandler;
 
 public class ServerInstance {
     
@@ -64,6 +65,12 @@ public class ServerInstance {
         resource.addHeaders(defaultHeaders);
         
         return resource;
+    }
+    
+    public void login(String username, String password, ResponseHandler handler) {
+    }
+    
+    public void logout(ResponseHandler handler) {
     }
     
 }
