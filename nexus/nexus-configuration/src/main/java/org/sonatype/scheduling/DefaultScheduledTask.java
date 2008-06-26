@@ -236,7 +236,9 @@ public class DefaultScheduledTask<T>
 
     protected Future<T> reschedule()
     {
-        if ( !getScheduleIterator().isFinished() )
+        SchedulerIterator iter = getScheduleIterator();
+        
+        if ( iter != null &&  !iter.isFinished() )
         {
             long nextTime = getScheduleIterator().next().getTime();
 
@@ -336,9 +338,17 @@ public class DefaultScheduledTask<T>
         }
         else
         {
-            setTaskState( TaskState.FINISHED );
-
-            getScheduler().removeFromTasksMap( this );
+            if ( getSchedule() != null )
+            {
+                setTaskState( TaskState.FINISHED );
+    
+                getScheduler().removeFromTasksMap( this );
+            }
+            else
+            {
+                // Manual schedule types just stay submitted when not running
+                setTaskState( TaskState.SUBMITTED );
+            }
         }
 
         return result;
@@ -394,10 +404,11 @@ public class DefaultScheduledTask<T>
 
     public SchedulerIterator getScheduleIterator()
     {
-        if ( scheduleIterator == null )
+        if ( scheduleIterator == null && getSchedule() != null )
         {
             scheduleIterator = getSchedule().getIterator();
         }
+        
         return scheduleIterator;
     }
 

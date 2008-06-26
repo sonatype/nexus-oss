@@ -67,7 +67,7 @@ public class ScheduledServiceBaseResourceConverter
             {
                 return super.instantiateNewInstance( reader, context );
             }
-            else if ( AbstractScheduledServiceResourceHandler.SCHEDULE_TYPE_NONE.equals( schedule ))
+            else if ( AbstractScheduledServiceResourceHandler.SCHEDULE_TYPE_MANUAL.equals( schedule ))
             {
                 return new ScheduledServiceBaseResource();
             }

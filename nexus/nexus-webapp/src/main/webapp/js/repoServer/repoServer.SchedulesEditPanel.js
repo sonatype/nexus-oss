@@ -32,7 +32,7 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
   //List of schedule types
   //None removed for the time being
   //this.scheduleTypeStore = new Ext.data.SimpleStore({fields:['value'], data:[['None'],['Once'],['Daily'],['Weekly'],['Monthly'],['Advanced']]});
-  this.scheduleTypeStore = new Ext.data.SimpleStore({fields:['value'], data:[['Once'],['Daily'],['Weekly'],['Monthly'],['Advanced']]});
+  this.scheduleTypeStore = new Ext.data.SimpleStore({fields:['value'], data:[['Manual'],['Once'],['Daily'],['Weekly'],['Monthly'],['Advanced']]});
   //List of weekdays
   this.weekdaysList = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
   
@@ -57,7 +57,7 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
   
   //Methods that will take the incoming json data and map over to the ui controls
   this.loadDataModFuncs = {
-    none : {
+    manual : {
       schedule : Sonatype.utils.capitalize,
       properties : this.importServicePropertiesHelper.createDelegate(this)
     },
@@ -95,7 +95,7 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
   
   //Methods that will take the data from the ui controls and map over to json
   this.submitDataModFuncs = {
-    none : {
+    manual : {
       schedule : Sonatype.utils.lowercase,
       properties : this.exportServicePropertiesHelper.createDelegate(this)
     },

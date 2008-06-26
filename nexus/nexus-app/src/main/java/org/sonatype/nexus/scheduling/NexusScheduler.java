@@ -34,6 +34,20 @@ public interface NexusScheduler
     extends NexusService
 {
     String ROLE = NexusScheduler.class.getName();
+    
+    /**
+     * Store a task for manual usage, this task will never be started automatically
+     * by the scheduler
+     * 
+     * @param name
+     * @param nexusTask
+     * @return
+     * @throws RejectedExecutionException
+     * @throws NullPointerException
+     */
+    <T> ScheduledTask<T> store( String name, SchedulerTask<T> nexusTask )
+        throws RejectedExecutionException,
+            NullPointerException;
 
     /**
      * Issue a NexusTask for immediate execution, but have a control over it.

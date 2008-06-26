@@ -1063,6 +1063,13 @@ public class DefaultNexus
 
     // =============
     // Schedules
+    
+    public <T> ScheduledTask<T> store( String name, SchedulerTask<T> task )
+        throws RejectedExecutionException, 
+            NullPointerException
+    {
+        return nexusScheduler.store( name, task );
+    }
 
     public <T> void submit( String name, SchedulerTask<T> task )
         throws RejectedExecutionException,

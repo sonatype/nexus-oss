@@ -63,7 +63,7 @@ public class AbstractScheduledServiceResourceHandler
     extends AbstractNexusResourceHandler
 {
     /** Schedule Type Off. */
-    public static final String SCHEDULE_TYPE_NONE = "none";
+    public static final String SCHEDULE_TYPE_MANUAL = "manual";
 
     /** Schedule Type Once. */
     public static final String SCHEDULE_TYPE_ONCE = "once";
@@ -156,7 +156,11 @@ public class AbstractScheduledServiceResourceHandler
 
     protected String getScheduleShortName( Schedule schedule )
     {
-        if ( OnceSchedule.class.isAssignableFrom( schedule.getClass() ) )
+        if ( schedule == null )
+        {
+            return SCHEDULE_TYPE_MANUAL;
+        }
+        else if ( OnceSchedule.class.isAssignableFrom( schedule.getClass() ) )
         {
             return SCHEDULE_TYPE_ONCE;
         }

@@ -32,6 +32,20 @@ public interface Scheduler
     extends NexusService
 {
     String ROLE = Scheduler.class.getName();
+    
+    /**
+     * Store a task for future manual run
+     * 
+     * @param name
+     * @param runnable
+     * @param taskParams
+     * @return
+     * @throws RejectedExecutionException
+     * @throws NullPointerException
+     */
+    ScheduledTask<Object> store( String name, Runnable runnable, Map<String, String> taskParams )
+        throws RejectedExecutionException,
+            NullPointerException;
 
     /**
      * Issue a Runnable for immediate execution, but have a control over it.
@@ -57,6 +71,20 @@ public interface Scheduler
      */
     ScheduledTask<Object> schedule( String name, Runnable runnable, Schedule schedule, Map<String, String> taskParams,
         boolean store )
+        throws RejectedExecutionException,
+            NullPointerException;
+    
+    /**
+     * Store a task for future manual run
+     * 
+     * @param name
+     * @param callable
+     * @param taskParams
+     * @return
+     * @throws RejectedExecutionException
+     * @throws NullPointerException
+     */
+    <T> ScheduledTask<T> store( String name, Callable<T> callable, Map<String, String> taskParams )
         throws RejectedExecutionException,
             NullPointerException;
 

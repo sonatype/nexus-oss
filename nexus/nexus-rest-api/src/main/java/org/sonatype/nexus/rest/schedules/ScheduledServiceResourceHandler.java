@@ -96,8 +96,12 @@ public class ScheduledServiceResourceHandler
             ScheduledTask<?> task = getNexus().getTaskById( getScheduledServiceId() );
 
             ScheduledServiceBaseResource resource = null;
-
-            if ( OnceSchedule.class.isAssignableFrom( task.getSchedule().getClass() ) )
+            
+            if ( task.getSchedule() == null )
+            {
+                resource = new ScheduledServiceBaseResource();
+            }
+            else if ( OnceSchedule.class.isAssignableFrom( task.getSchedule().getClass() ) )
             {
                 resource = new ScheduledServiceOnceResource();
 

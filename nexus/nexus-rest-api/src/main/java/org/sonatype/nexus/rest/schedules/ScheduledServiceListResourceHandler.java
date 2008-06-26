@@ -41,6 +41,7 @@ import org.sonatype.nexus.rest.model.ScheduledServiceResourceStatus;
 import org.sonatype.nexus.rest.model.ScheduledServiceResourceStatusResponse;
 import org.sonatype.scheduling.ScheduledTask;
 import org.sonatype.scheduling.TaskState;
+import org.sonatype.scheduling.schedules.Schedule;
 
 public class ScheduledServiceListResourceHandler
     extends AbstractScheduledServiceResourceHandler
@@ -122,10 +123,22 @@ public class ScheduledServiceListResourceHandler
         {
             try
             {
-                ScheduledTask<?> task = getNexus().schedule(
-                    getModelName( request.getData() ),
-                    getModelNexusTask( request.getData() ),
-                    getModelSchedule( request.getData() ) );
+                Schedule schedule = getModelSchedule( request.getData() );
+                ScheduledTask<?> task = null;
+                
+                if ( schedule != null )
+                {                
+                    task = getNexus().schedule(
+                        getModelName( request.getData() ),
+                        getModelNexusTask( request.getData() ),
+                        getModelSchedule( request.getData() ) );
+                }
+                else
+                {
+                    task = getNexus().store(
+                        getModelName( request.getData() ),
+                        getModelNexusTask( request.getData() ) );
+                }
 
                 task.setEnabled( request.getData().isEnabled() );
                 

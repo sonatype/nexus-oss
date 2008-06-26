@@ -153,7 +153,7 @@ Sonatype.repoServer.referenceData = {
   },
   
   schedule : {
-    none : {
+    manual : {
       id : "",
 	  name : "",
 	  enabled : "",

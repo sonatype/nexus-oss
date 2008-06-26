@@ -167,6 +167,22 @@ public class DefaultScheduler
             }
         }
     }
+    
+    public ScheduledTask<Object> store( String name, Runnable runnable, Map<String, String> taskParams )
+    {
+        DefaultScheduledTask<Object> drt = new DefaultScheduledTask<Object>(
+            name,
+            runnable.getClass(),
+            this,
+            Executors.callable( runnable ),
+            null,
+            taskParams,
+            true );
+        
+        addToTasksMap( drt );
+        
+        return drt;
+    }
 
     public ScheduledTask<Object> submit( String name, Runnable runnable, Map<String, String> taskParams )
     {
@@ -183,6 +199,22 @@ public class DefaultScheduler
 
         drt.start();
 
+        return drt;
+    }
+    
+    public <T> ScheduledTask<T> store( String name, Callable<T> callable, Map<String, String> taskParams )
+    {
+        DefaultScheduledTask<T> drt = new DefaultScheduledTask<T>(
+            name,
+            callable.getClass(),
+            this,
+            callable,
+            null,
+            taskParams,
+            true );
+        
+        addToTasksMap( drt );
+        
         return drt;
     }
 

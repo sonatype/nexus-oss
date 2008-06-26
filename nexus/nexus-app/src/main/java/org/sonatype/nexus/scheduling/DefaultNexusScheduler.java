@@ -69,6 +69,13 @@ public class DefaultNexusScheduler
     {
         return plexusContainer;
     }
+    
+    public <T> ScheduledTask<T> store( String name, SchedulerTask<T> nexusTask )
+        throws RejectedExecutionException, 
+            NullPointerException
+    {
+        return scheduler.store( name, nexusTask, nexusTask.getParameters() );
+    }
 
     public <T> ScheduledTask<T> submit( String name, SchedulerTask<T> nexusTask )
         throws RejectedExecutionException,
