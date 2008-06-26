@@ -163,9 +163,9 @@ public class DefaultResource
         headers.put( name, value );
     }
 
-    public void addHeaders( Map<String, String> headers )
+    public void addHeaders( Map<String, String> otherHeaders )
     {
-        headers.putAll( headers );
+        headers.putAll( otherHeaders );
     }
 
     public Map<String, String> getHeaders()
