@@ -126,7 +126,7 @@ public class DefaultTaskConfigManager
                 scheduler.schedule(
                     task.getName(),
                     nexusTask,
-                    translateFrom( task.getSchedule(), task.getLastRun() ),
+                    translateFrom( task.getSchedule(), task.getNextRun() ),
                     translateFrom( task.getProperties() ),
                     false ).setEnabled( task.isEnabled() );
             }
