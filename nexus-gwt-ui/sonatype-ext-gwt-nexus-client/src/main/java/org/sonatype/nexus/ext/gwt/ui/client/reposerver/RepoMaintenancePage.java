@@ -14,6 +14,7 @@ import com.extjs.gxt.ui.client.Style;
 import com.extjs.gxt.ui.client.data.TreeModel;
 import com.extjs.gxt.ui.client.event.BaseEvent;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
+import com.extjs.gxt.ui.client.event.ContainerEvent;
 import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.event.SelectionChangedEvent;
 import com.extjs.gxt.ui.client.event.SelectionChangedListener;
@@ -30,6 +31,7 @@ import com.extjs.gxt.ui.client.widget.table.CellRenderer;
 import com.extjs.gxt.ui.client.widget.table.Table;
 import com.extjs.gxt.ui.client.widget.table.TableColumn;
 import com.extjs.gxt.ui.client.widget.table.TableColumnModel;
+import com.extjs.gxt.ui.client.widget.table.TableSelectionModel;
 import com.extjs.gxt.ui.client.widget.toolbar.TextToolItem;
 import com.extjs.gxt.ui.client.widget.toolbar.ToolBar;
 import com.extjs.gxt.ui.client.widget.tree.Tree;
@@ -66,7 +68,7 @@ public class RepoMaintenancePage extends LayoutContainer implements ServerFuncti
                 setLayout(new FitLayout());
             }
         };
-
+        
         Table table = new Table() {
             {
                 setColumnModel(new TableColumnModel(
@@ -97,16 +99,11 @@ public class RepoMaintenancePage extends LayoutContainer implements ServerFuncti
                     }
                 ));
                 
-                /*
-                // FIXME: context menu generated for the highlighted
-                // row not for the right-clicked
-                //
-                // This disables selecting the repository when right clicking
+                // This disables showing the repository when right clicking
                 setSelectionModel(new TableSelectionModel() {
-                    protected void onContextMenu(ContainerEvent ce) {
+                    protected void onContextMenu(ContainerEvent event) {
                     }
                 });
-                */
             }
         };
         
@@ -144,8 +141,7 @@ public class RepoMaintenancePage extends LayoutContainer implements ServerFuncti
 
         add(panel, panelLayoutData);
         
-        ContextMenuProvider tableMenu =
-            new ContextMenuProvider(table, tableBinding.getBinder());
+        ContextMenuProvider tableMenu = new ContextMenuProvider(table);
         
         tableMenu.addAction(new Action<Repository>("View") {
             
@@ -389,8 +385,7 @@ public class RepoMaintenancePage extends LayoutContainer implements ServerFuncti
             }
         };
 
-        ContextMenuProvider treeMenu =
-            new ContextMenuProvider(tree, repoTreeBinding.getBinder());
+        ContextMenuProvider treeMenu = new ContextMenuProvider(tree);
         
         treeMenu.addAction(new Action<TreeModel>("Re-Index") {
             public boolean supports(TreeModel data) {

@@ -6,11 +6,14 @@ import java.util.List;
 import org.sonatype.nexus.ext.gwt.ui.client.Action;
 
 import com.extjs.gxt.ui.client.Events;
+import com.extjs.gxt.ui.client.data.ModelData;
 import com.extjs.gxt.ui.client.event.BaseEvent;
 import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.event.MenuEvent;
+import com.extjs.gxt.ui.client.event.TreeEvent;
 import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.event.SelectionProvider;
+import com.extjs.gxt.ui.client.event.TableEvent;
 import com.extjs.gxt.ui.client.widget.Component;
 import com.extjs.gxt.ui.client.widget.menu.Menu;
 import com.extjs.gxt.ui.client.widget.menu.MenuItem;
@@ -21,13 +24,10 @@ class ContextMenuProvider implements Listener<BaseEvent> {
     
     private Component component;
     
-    private SelectionProvider selectionProvider;
-    
     private List<Action> actions = new ArrayList<Action>();
     
-    public ContextMenuProvider(Component component, SelectionProvider selectionProvider) {
+    public ContextMenuProvider(Component component) {
         this.component = component;
-        this.selectionProvider = selectionProvider;
         
         setContextMenu(new Menu());
         component.addListener(Events.ContextMenu, this);
@@ -38,33 +38,41 @@ class ContextMenuProvider implements Listener<BaseEvent> {
     }
 
     public void handleEvent(BaseEvent event) {
-        List selection = selectionProvider.getSelection();
+        boolean result = false;
         
-        if (!selection.isEmpty()) {
-            final Object data = selection.get(0);
-            Menu menu = new Menu();
-            
-            for (final Action action : actions) {
-                if (action.supports(data)) {
-                    MenuItem item = new MenuItem(action.getCaption());
-                    item.addSelectionListener(new SelectionListener<MenuEvent>() {
-                        public void componentSelected(MenuEvent event) {
-                            action.execute(data);
-                        }
-                    });
-                    item.setEnabled(action.isEnabled());
-                    menu.add(item);
-                }
-            }
-            
-            if (menu.getItemCount() > 0) {
-                setContextMenu(menu);
-            } else {
-                event.doit = false;
-            }
-        } else {
+        if (event instanceof TableEvent && ((TableEvent) event).item != null) {
+            result = createMenu(((TableEvent) event).item.getModel());
+        } else if (event instanceof TreeEvent && ((TreeEvent) event).item != null) {
+            result = createMenu(((TreeEvent) event).item.getModel());
+        }
+        
+        if (result == false) {
             event.doit = false;
         }
+    }
+    
+    private boolean createMenu(final ModelData data) {
+        Menu menu = new Menu();
+            
+        for (final Action action : actions) {
+            if (action.supports(data)) {
+                MenuItem item = new MenuItem(action.getCaption());
+                item.addSelectionListener(new SelectionListener<MenuEvent>() {
+                    public void componentSelected(MenuEvent event) {
+                        action.execute(data);
+                    }
+                });
+                item.setEnabled(action.isEnabled());
+                menu.add(item);
+            }
+        }
+            
+        if (menu.getItemCount() == 0) {
+            return false;
+        }
+        
+        setContextMenu(menu);
+        return true;
     }
     
     private void setContextMenu(Menu menu) {
