@@ -11,8 +11,10 @@ import org.sonatype.nexus.ext.gwt.ui.client.Util;
 import org.sonatype.nexus.ext.gwt.ui.client.data.Entity;
 import org.sonatype.nexus.ext.gwt.ui.client.data.EntityFactory;
 import org.sonatype.nexus.ext.gwt.ui.client.data.RepresentationParser;
+import org.sonatype.nexus.ext.gwt.ui.client.data.ResponseHandler;
 import org.sonatype.nexus.ext.gwt.ui.client.data.XMLRepresentationParser;
 import org.sonatype.nexus.ext.gwt.ui.client.reposerver.model.AuthenticationLoginResource;
+import org.sonatype.nexus.ext.gwt.ui.client.reposerver.model.ContentListResource;
 import org.sonatype.nexus.ext.gwt.ui.client.reposerver.model.Repository;
 import org.sonatype.nexus.ext.gwt.ui.client.reposerver.model.RepositoryListResource;
 import org.sonatype.nexus.ext.gwt.ui.client.reposerver.model.RepositoryStatusListResource;
@@ -32,6 +34,10 @@ public class RepoServerInstance extends ServerInstance {
 
     public RepoServerInstance(RepoServer repoServer) {
         super(repoServer);
+    }
+    
+    public Variant getDefaultVariant() {
+        return VARIANT;
     }
     
     public void getRepositories(final ResponseHandler<List<RepositoryListResource>> handler) {
@@ -72,6 +78,23 @@ public class RepoServerInstance extends ServerInstance {
             
             protected Object createEntity(Response response) {
                 return parser.parseEntity(response.getText(), new RepositoryStatusResource());
+            }
+            
+        });
+    }
+    
+    public void getRepositoryContent(ContentListResource parent, final ResponseHandler<List<ContentListResource>> handler) {
+        int i = parent.getResourceUri().indexOf("repositories");
+        String url = parent.getResourceUri().substring(i) + "/";
+        
+        doGet(url, new ResponseProcessor(handler) {
+            
+            protected Object createEntity(Response response) {
+                return parser.parseEntityList(response.getText(), new EntityFactory() {
+                    public Entity create() {
+                        return new ContentListResource();
+                    }
+                });
             }
             
         });

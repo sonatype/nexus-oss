@@ -44,11 +44,13 @@ public class XMLRepresentationParser implements RepresentationParser {
                 Class fieldType = entity.getFieldType(nodeName);
                 Object value = null;
                 
-                //TODO: handle all primitive wrapper type
+                //TODO: handle all primitive type and their wrappers
                 if (String.class.equals(fieldType)) {
                     value = n.getFirstChild().getNodeValue();
-                } else if (Integer.class.equals(fieldType)) {
+                } else if (Integer.class.equals(fieldType) || int.class.equals(fieldType)) {
                     value = Integer.valueOf(n.getFirstChild().getNodeValue());
+                } else if (Boolean.class.equals(fieldType) || boolean.class.equals(fieldType)) {
+                    value = Boolean.valueOf(n.getFirstChild().getNodeValue());
                 } else if (fieldType != null) {
                     Entity childEntity = entity.createEntity(nodeName);
                     if (childEntity != null) {

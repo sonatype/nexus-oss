@@ -1,141 +1,74 @@
 package org.sonatype.nexus.ext.gwt.ui.client.reposerver;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import org.sonatype.gwt.client.resource.Variant;
+import org.sonatype.nexus.ext.gwt.ui.client.data.CallbackResponseHandler;
+import org.sonatype.nexus.ext.gwt.ui.client.reposerver.model.ContentListResource;
+import org.sonatype.nexus.ext.gwt.ui.client.reposerver.model.Repository;
 
 import com.extjs.gxt.ui.client.binder.TreeBinder;
 import com.extjs.gxt.ui.client.data.BaseTreeLoader;
-import com.extjs.gxt.ui.client.data.BaseTreeModel;
 import com.extjs.gxt.ui.client.data.DataProxy;
 import com.extjs.gxt.ui.client.data.DataReader;
-import com.extjs.gxt.ui.client.data.ListLoadResult;
-import com.extjs.gxt.ui.client.data.ModelData;
-import com.extjs.gxt.ui.client.data.ModelType;
-import com.extjs.gxt.ui.client.data.TreeLoader;
 import com.extjs.gxt.ui.client.data.TreeModel;
-import com.extjs.gxt.ui.client.data.XmlReader;
 import com.extjs.gxt.ui.client.store.TreeStore;
 import com.extjs.gxt.ui.client.widget.tree.Tree;
-import com.google.gwt.http.client.Request;
-import com.google.gwt.http.client.RequestCallback;
-import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public class RepoTreeBinding {
 
-    private static final ModelType DEFAULT_MODEL_TYPE = new ModelType() {
-        {
-            root = "data";
-            recordName = "org.sonatype.nexus.rest.model.ContentListResource";
-            addField("name", "text");
-            addField("resourceUri");
-            addField("leaf");
-        }
-    };
-    
-    private Variant variant;
-    
-    private RepoServerInstance server;
-    
     private TreeStore store;
     
     private TreeBinder<TreeModel> binder;
     
-    private ModelData selectedRepo;
+    private Repository selectedRepository;
     
-    public RepoTreeBinding(Tree tree, RepoServerInstance server) {
-        this(tree, server, DEFAULT_MODEL_TYPE, Variant.APPLICATION_XML);
-    }
-    
-    public RepoTreeBinding(Tree tree, RepoServerInstance server, ModelType modelType, Variant variant) {
-        this.server = server;
-        this.variant = variant;
+    public RepoTreeBinding(Tree tree, final RepoServerInstance server) {
         
-        TreeLoader loader =
-            new BaseTreeLoader(new RepoContentProxy(), new XmlReader(modelType));
-        store = new TreeStore(loader);
+        DataProxy<ContentListResource, Object> proxy = new DataProxy<ContentListResource, Object>() {
+            
+            public void load(final DataReader<ContentListResource, Object> reader,
+                    ContentListResource parent, final AsyncCallback<Object> callback) {
+                
+                server.getRepositoryContent(parent, new CallbackResponseHandler<List<ContentListResource>>(callback));
+            }
+            
+        };
+        
+        store = new TreeStore(new BaseTreeLoader(proxy));
+        
         binder = new TreeBinder(tree, store);
-        binder.setDisplayProperty("name");
+        binder.setDisplayProperty("text");
         // TODO: Sort children by name
     }
     
-    public void selectRepo(final ModelData repo) {
+    public Repository getSelectedRepository() {
+        return selectedRepository;
+    }
+    
+    public void selectRepository(final Repository repo) {
         if (repo == null) {
             return;
         }
-        selectedRepo = repo;
+        
+        selectedRepository = repo;
         store.removeAll();
-        String repoName = (String) repo.get("name");
-        String resourceURI = (String) repo.get("resourceURI") + "/content";
-        store.add(new RepoContentNode(repoName, resourceURI, false), false);
+        
+        ContentListResource root = new ContentListResource();
+        root.setText(repo.getName());
+        root.setResourceUri(repo.getResourceURI() + "/content");
+        root.setLeaf(false);
+        
+        store.add(root, false);
         // TODO: Display the children of the root node
     }
     
     public void reload() {
-        selectRepo(selectedRepo);
+        selectRepository(selectedRepository);
     }
 
     public TreeBinder<TreeModel> getBinder() {
         return binder;
     }
     
-    private class RepoContentProxy implements DataProxy<RepoContentNode, Object> {
-        
-        public void load(final DataReader<RepoContentNode, Object> reader,
-                RepoContentNode parent, final AsyncCallback<Object> callback) {
-
-            int i = parent.getResourceUri().indexOf("repositories");
-            String url = parent.getResourceUri().substring(i) + "/";
-
-            server.getResource(url).get(new RequestCallback() {
-
-                public void onError(Request request, Throwable exception) {
-                    callback.onFailure(exception);
-                }
-
-                public void onResponseReceived(Request request, Response response) {
-                    List<RepoContentNode> list = new ArrayList<RepoContentNode>();
-                    ListLoadResult<ModelData> result =
-                        (ListLoadResult<ModelData>) reader.read(null, response.getText());
-                    for (ModelData model : result.getData()) {
-                        list.add(new RepoContentNode(model));
-                    }
-                    callback.onSuccess(list);
-                }
-
-            }, variant);
-        }
-        
-    }
-    
-    private static class RepoContentNode extends BaseTreeModel {
-        
-        public RepoContentNode(ModelData model) {
-            set("name", model.get("name"));
-            set("resourceUri", model.get("resourceUri"));
-            set("leaf", Boolean.valueOf((String) model.get("leaf")));
-        }
-        
-        public RepoContentNode(String name, String resourceUri, boolean leaf) {
-            set("name", name);
-            set("resourceUri", resourceUri);
-            set("leaf", leaf);
-        }
-        
-        public String getName() {
-            return (String) get("name");
-        }
-        
-        public String getResourceUri() {
-            return (String) get("resourceUri");
-        }
-        
-        public boolean isLeaf() {
-            return (Boolean) get("leaf");
-        }
-        
-    }
-
 }
