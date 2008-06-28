@@ -12,6 +12,7 @@ import com.extjs.gxt.ui.client.data.ModelData;
 import com.extjs.gxt.ui.client.data.TreeModel;
 import com.extjs.gxt.ui.client.event.BaseEvent;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
+import com.extjs.gxt.ui.client.event.ContainerEvent;
 import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.event.SelectionChangedEvent;
 import com.extjs.gxt.ui.client.event.SelectionChangedListener;
@@ -28,6 +29,7 @@ import com.extjs.gxt.ui.client.widget.table.CellRenderer;
 import com.extjs.gxt.ui.client.widget.table.Table;
 import com.extjs.gxt.ui.client.widget.table.TableColumn;
 import com.extjs.gxt.ui.client.widget.table.TableColumnModel;
+import com.extjs.gxt.ui.client.widget.table.TableSelectionModel;
 import com.extjs.gxt.ui.client.widget.toolbar.TextToolItem;
 import com.extjs.gxt.ui.client.widget.toolbar.ToolBar;
 import com.extjs.gxt.ui.client.widget.tree.Tree;
@@ -94,6 +96,11 @@ public class RepoMaintenancePage extends LayoutContainer implements ServerFuncti
                         }
                     }
                 ));
+                // This disables selecting the repository when right clicking
+                setSelectionModel(new TableSelectionModel() {
+                    protected void onContextMenu(ContainerEvent ce) {
+                    }
+                });
             }
         };
         
