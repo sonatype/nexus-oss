@@ -6,12 +6,12 @@ import org.sonatype.nexus.ext.gwt.ui.client.Constants;
 import org.sonatype.nexus.ext.gwt.ui.client.ServerFunctionPanel;
 import org.sonatype.nexus.ext.gwt.ui.client.ServerInstance;
 import org.sonatype.nexus.ext.gwt.ui.client.data.ResponseHandler;
+import org.sonatype.nexus.ext.gwt.ui.client.reposerver.model.ContentListResource;
 import org.sonatype.nexus.ext.gwt.ui.client.reposerver.model.Repository;
 import org.sonatype.nexus.ext.gwt.ui.client.reposerver.model.RepositoryStatusResource;
 
 import com.extjs.gxt.ui.client.Events;
 import com.extjs.gxt.ui.client.Style;
-import com.extjs.gxt.ui.client.data.TreeModel;
 import com.extjs.gxt.ui.client.event.BaseEvent;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.event.ContainerEvent;
@@ -387,22 +387,93 @@ public class RepoMaintenancePage extends LayoutContainer implements ServerFuncti
 
         ContextMenuProvider treeMenu = new ContextMenuProvider(tree);
         
-        treeMenu.addAction(new Action<TreeModel>("Re-Index") {
-            public boolean supports(TreeModel data) {
-                return ApplicationContext.instance().isUserLoggedIn();
+        treeMenu.addAction(new Action<ContentListResource>("Clear Cache") {
+            
+            public boolean supports(ContentListResource data) {
+                return ApplicationContext.instance().isUserLoggedIn() &&
+                       !"virtual".equals(repoTreeBinding.getSelectedRepository().getRepoType());
             }
-            public void execute(TreeModel data) {
+            
+            public void execute(ContentListResource data) {
                 Window.alert(getCaption());
             }
+            
         });
         
-        treeMenu.addAction(new Action<TreeModel>("Download") {
-            public boolean supports(TreeModel data) {
-                return ApplicationContext.instance().isUserLoggedIn() && data.isLeaf();
+        treeMenu.addAction(new Action<ContentListResource>("Re-Index") {
+            
+            public boolean supports(ContentListResource data) {
+                return ApplicationContext.instance().isUserLoggedIn();
             }
-            public void execute(TreeModel data) {
+            
+            public void execute(ContentListResource data) {
                 Window.alert(getCaption());
             }
+            
+        });
+        
+        treeMenu.addAction(new Action<ContentListResource>("Rebuild Attributes") {
+            
+            public boolean supports(ContentListResource data) {
+                return ApplicationContext.instance().isUserLoggedIn();
+            }
+            
+            public void execute(ContentListResource data) {
+                Window.alert(getCaption());
+            }
+            
+        });
+        
+        treeMenu.addAction(new Action<ContentListResource>("Download From Remote") {
+            
+            public boolean supports(ContentListResource data) {
+                return ApplicationContext.instance().isUserLoggedIn() && data.isLeaf() &&
+                       "proxy".equals(repoTreeBinding.getSelectedRepository().getRepoType());
+            }
+            
+            public void execute(ContentListResource data) {
+                Window.alert(getCaption());
+            }
+            
+        });
+
+        treeMenu.addAction(new Action<ContentListResource>("Download") {
+            
+            public boolean supports(ContentListResource data) {
+                return ApplicationContext.instance().isUserLoggedIn() && data.isLeaf();
+            }
+            
+            public void execute(ContentListResource data) {
+                Window.alert(getCaption());
+            }
+            
+        });
+
+        treeMenu.addAction(new Action<ContentListResource>("Delete") {
+            
+            public boolean supports(ContentListResource data) {
+                return ApplicationContext.instance().isUserLoggedIn() &&
+                       data.getParent() != null;
+            }
+            
+            public void execute(ContentListResource data) {
+                Window.alert(getCaption());
+            }
+            
+        });
+
+        treeMenu.addAction(new Action<ContentListResource>("View Remote") {
+            
+            public boolean supports(ContentListResource data) {
+                return ApplicationContext.instance().isUserLoggedIn() &&
+                       "proxy".equals(repoTreeBinding.getSelectedRepository().getRepoType()) &&
+                       !data.isLeaf() && data.getParent() != null;
+            }
+            
+            public void execute(ContentListResource data) {
+                Window.alert(getCaption());
+            }
+            
         });
 
         repoTreePanel.add(tree);

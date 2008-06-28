@@ -13,6 +13,7 @@ import com.extjs.gxt.ui.client.data.DataReader;
 import com.extjs.gxt.ui.client.data.TreeModel;
 import com.extjs.gxt.ui.client.store.TreeStore;
 import com.extjs.gxt.ui.client.widget.tree.Tree;
+import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public class RepoTreeBinding {
@@ -28,9 +29,18 @@ public class RepoTreeBinding {
         DataProxy<ContentListResource, Object> proxy = new DataProxy<ContentListResource, Object>() {
             
             public void load(final DataReader<ContentListResource, Object> reader,
-                    ContentListResource parent, final AsyncCallback<Object> callback) {
+                    final ContentListResource parent, final AsyncCallback<Object> callback) {
                 
-                server.getRepositoryContent(parent, new CallbackResponseHandler<List<ContentListResource>>(callback));
+                server.getRepositoryContent(parent, new CallbackResponseHandler<List<ContentListResource>>(callback) {
+
+                    public void onSuccess(Response response, List<ContentListResource> children) {
+                        for (ContentListResource child : children) {
+                            child.setParent(parent);
+                        }
+                        callback.onSuccess(children);
+                    }
+                    
+                });
             }
             
         };
