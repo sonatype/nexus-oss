@@ -2,7 +2,8 @@ package org.sonatype.nexus.ext.gwt.ui.client.reposerver;
 
 import java.util.List;
 
-import org.sonatype.nexus.ext.gwt.ui.client.data.ErrorResponseException;
+import org.sonatype.nexus.ext.gwt.ui.client.data.CallbackResponseHandler;
+import org.sonatype.nexus.ext.gwt.ui.client.data.ResponseHandler;
 import org.sonatype.nexus.ext.gwt.ui.client.reposerver.model.Repository;
 import org.sonatype.nexus.ext.gwt.ui.client.reposerver.model.RepositoryListResource;
 import org.sonatype.nexus.ext.gwt.ui.client.reposerver.model.RepositoryStatusListResource;
@@ -39,7 +40,7 @@ public class RepoTableBinding {
 
     private ListStore store;
     
-    private TableBinder<ModelData> binder;
+    private TableBinder<Repository> binder;
     
     public RepoTableBinding(final Table table, final RepoServerInstance server) {
         this.server = server;
@@ -47,21 +48,8 @@ public class RepoTableBinding {
         DataProxy proxy = new DataProxy() {
 
             public void load(DataReader reader, Object loadConfig, final AsyncCallback callback) {
-                server.getRepositories(new ResponseHandler<List<RepositoryListResource>>() {
-
-                    public void onError(Response response, Throwable error) {
-                        if (error != null) {
-                            callback.onFailure(error);
-                        } else {
-                            callback.onFailure(new ErrorResponseException(response));
-                        }
-                    }
-
-                    public void onSuccess(Response response, List<RepositoryListResource> repositories) {
-                        callback.onSuccess(repositories);
-                    }
-                    
-                });
+                server.getRepositories(
+                    new CallbackResponseHandler<List<RepositoryListResource>>(callback));
             }
             
         };
@@ -115,7 +103,7 @@ public class RepoTableBinding {
         loader.load();
     }
 
-    public TableBinder<ModelData> getBinder() {
+    public TableBinder<Repository> getBinder() {
         return binder;
     }
     
