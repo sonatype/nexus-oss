@@ -47,8 +47,8 @@ public class RepoServer extends AbstractServerType {
                     });
                     addFunction(new ServerFunction() {
                         {
-                            setMenuName("System Cahnges");
-                            setTabName("System Cahnges");
+                            setMenuName("System Changes");
+                            setTabName("System Changes");
                             setPanel(new EmptyPage());
                         }
                     });
@@ -135,13 +135,6 @@ public class RepoServer extends AbstractServerType {
                             setMenuName("Browse Repositories");
                             setTabName("Repositories");
                             setPanel(new RepoMaintenancePage());
-                        }
-                    });
-                    addFunction(new ServerFunction() {
-                        {
-                            setMenuName("Artifact Search");
-                            setTabName("Search");
-                            setPanel(new EmptyPage());
                         }
                     });
                     addFunction(new ServerFunction() {
