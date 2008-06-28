@@ -4,7 +4,8 @@ import org.sonatype.nexus.ext.gwt.ui.client.Action;
 import org.sonatype.nexus.ext.gwt.ui.client.Constants;
 import org.sonatype.nexus.ext.gwt.ui.client.ServerFunctionPanel;
 import org.sonatype.nexus.ext.gwt.ui.client.ServerInstance;
-import org.sonatype.nexus.ext.gwt.ui.client.reposerver.model.RepositoryStatus;
+import org.sonatype.nexus.ext.gwt.ui.client.reposerver.model.Repository;
+import org.sonatype.nexus.ext.gwt.ui.client.reposerver.model.RepositoryStatusResource;
 
 import com.extjs.gxt.ui.client.Events;
 import com.extjs.gxt.ui.client.Style;
@@ -12,7 +13,6 @@ import com.extjs.gxt.ui.client.data.ModelData;
 import com.extjs.gxt.ui.client.data.TreeModel;
 import com.extjs.gxt.ui.client.event.BaseEvent;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
-import com.extjs.gxt.ui.client.event.ContainerEvent;
 import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.event.SelectionChangedEvent;
 import com.extjs.gxt.ui.client.event.SelectionChangedListener;
@@ -29,7 +29,6 @@ import com.extjs.gxt.ui.client.widget.table.CellRenderer;
 import com.extjs.gxt.ui.client.widget.table.Table;
 import com.extjs.gxt.ui.client.widget.table.TableColumn;
 import com.extjs.gxt.ui.client.widget.table.TableColumnModel;
-import com.extjs.gxt.ui.client.widget.table.TableSelectionModel;
 import com.extjs.gxt.ui.client.widget.toolbar.TextToolItem;
 import com.extjs.gxt.ui.client.widget.toolbar.ToolBar;
 import com.extjs.gxt.ui.client.widget.tree.Tree;
@@ -72,7 +71,7 @@ public class RepoMaintenancePage extends LayoutContainer implements ServerFuncti
                 setColumnModel(new TableColumnModel(
                     new TableColumn("name", "Repository", 175f),
                     new TableColumn("repoType", "Type", 50f),
-                    new TableColumn("status", "Status", 200f) {
+                    new TableColumn("statusText", "Status", 200f) {
                     	{
                     		setRenderer(new CellRenderer() {
                     			public String render(Component item, String property, Object value) {
@@ -96,11 +95,17 @@ public class RepoMaintenancePage extends LayoutContainer implements ServerFuncti
                         }
                     }
                 ));
+                
+                /*
+                // FIXME: context menu generated for the highlighted
+                // row not for the right-clicked
+                //
                 // This disables selecting the repository when right clicking
                 setSelectionModel(new TableSelectionModel() {
                     protected void onContextMenu(ContainerEvent ce) {
                     }
                 });
+                */
             }
         };
         
@@ -141,23 +146,23 @@ public class RepoMaintenancePage extends LayoutContainer implements ServerFuncti
         ContextMenuProvider tableMenu =
             new ContextMenuProvider(table, tableBinding.getBinder());
         
-        tableMenu.addAction(new Action<ModelData>("View") {
+        tableMenu.addAction(new Action<Repository>("View") {
             
-            public void execute(ModelData data) {
+            public void execute(Repository data) {
                 Window.alert(getCaption());
             }
             
         });
         
-        tableMenu.addAction(new Action<ModelData>("Clear Cache") {
+        tableMenu.addAction(new Action<Repository>("Clear Cache") {
             
-            public boolean supports(ModelData data) {
-                String repoType = (String) data.get("repoType");
-                return repoType.equals("hosted") || repoType.equals("proxy");
+            public boolean supports(Repository repo) {
+                return repo.getRepoType().equals("hosted") ||
+                       repo.getRepoType().equals("proxy");
             }
             
-            public void execute(ModelData data) {
-                String repositoryId = RepoServerUtil.getRepositoryId(data);
+            public void execute(Repository repo) {
+                String repositoryId = RepoServerUtil.getRepositoryId(repo);
                 
                 server.clearRepositoryCache(repositoryId, new ResponseHandler() {
 
@@ -174,10 +179,10 @@ public class RepoMaintenancePage extends LayoutContainer implements ServerFuncti
             
         });
         
-        tableMenu.addAction(new Action<ModelData>("Re-Index") {
+        tableMenu.addAction(new Action<Repository>("Re-Index") {
             
-            public void execute(ModelData data) {
-                String repositoryId = RepoServerUtil.getRepositoryId(data);
+            public void execute(Repository repo) {
+                String repositoryId = RepoServerUtil.getRepositoryId(repo);
                 
                 server.reindexRepository(repositoryId, new ResponseHandler() {
 
@@ -194,14 +199,14 @@ public class RepoMaintenancePage extends LayoutContainer implements ServerFuncti
             
         });
         
-        tableMenu.addAction(new Action<ModelData>("Rebuild Attributes") {
+        tableMenu.addAction(new Action<Repository>("Rebuild Attributes") {
             
-            public boolean supports(ModelData data) {
-                return data.get("repoType").equals("hosted");
+            public boolean supports(Repository repo) {
+                return true;
             }
             
-            public void execute(ModelData data) {
-                String repositoryId = RepoServerUtil.getRepositoryId(data);
+            public void execute(Repository repo) {
+                String repositoryId = RepoServerUtil.getRepositoryId(repo);
                 
                 server.rebuildRepositoryAttributes(repositoryId, new ResponseHandler() {
 
@@ -218,23 +223,25 @@ public class RepoMaintenancePage extends LayoutContainer implements ServerFuncti
             
         });
         
-        tableMenu.addAction(new Action<ModelData>("Block Proxy") {
+        tableMenu.addAction(new Action<Repository>("Block Proxy") {
             
-            public boolean supports(ModelData data) {
-                return "proxy".equals(data.get("repoType")) && "allow".equals(data.get("proxyMode"));
+            public boolean supports(Repository repo) {
+                return "proxy".equals(repo.getRepoType()) &&
+                       "allow".equals(repo.getStatus().getProxyMode());
             }
             
-            public void execute(ModelData data) {
-                RepositoryStatus status = new RepositoryStatus(data);
+            public void execute(Repository repo) {
+                RepositoryStatusResource status = repo.getStatus().copy();
+                status.setId(RepoServerUtil.toRepositoryId(repo.getResourceURI()));
                 status.setProxyMode("blockedManual");
                 
-                server.updateRepositoryStatus(status, new ResponseHandler<RepositoryStatus>() {
+                server.updateRepositoryStatus(status, new ResponseHandler<RepositoryStatusResource>() {
                     
                     public void onError(Response response, Throwable error) {
                         MessageBox.alert("Error", "The server did not update the proxy repository status to blocked", null);
                     }
                     
-                    public void onSuccess(Response response, RepositoryStatus status) {
+                    public void onSuccess(Response response, RepositoryStatusResource status) {
                         tableBinding.updateRepoStatus(status);
                     }
                     
@@ -243,23 +250,25 @@ public class RepoMaintenancePage extends LayoutContainer implements ServerFuncti
             
         });
         
-        tableMenu.addAction(new Action<ModelData>("Allow Proxy") {
+        tableMenu.addAction(new Action<Repository>("Allow Proxy") {
             
-            public boolean supports(ModelData data) {
-                return "proxy".equals(data.get("repoType")) && !"allow".equals(data.get("proxyMode"));
+            public boolean supports(Repository repo) {
+                return "proxy".equals(repo.getRepoType()) &&
+                       !"allow".equals(repo.getStatus().getProxyMode());
             }
             
-            public void execute(ModelData data) {
-                RepositoryStatus status = new RepositoryStatus(data);
+            public void execute(Repository repo) {
+                RepositoryStatusResource status = repo.getStatus().copy();
+                status.setId(RepoServerUtil.toRepositoryId(repo.getResourceURI()));
                 status.setProxyMode("allow");
                 
-                server.updateRepositoryStatus(status, new ResponseHandler<RepositoryStatus>() {
+                server.updateRepositoryStatus(status, new ResponseHandler<RepositoryStatusResource>() {
                     
                     public void onError(Response response, Throwable error) {
                         MessageBox.alert("Error", "The server did not update the proxy repository status to allow", null);
                     }
                     
-                    public void onSuccess(Response response, RepositoryStatus status) {
+                    public void onSuccess(Response response, RepositoryStatusResource status) {
                         tableBinding.updateRepoStatus(status);
                     }
                     
@@ -268,23 +277,24 @@ public class RepoMaintenancePage extends LayoutContainer implements ServerFuncti
             
         });
         
-        tableMenu.addAction(new Action<ModelData>("Put Out of Service") {
+        tableMenu.addAction(new Action<Repository>("Put Out of Service") {
             
-            public boolean supports(ModelData data) {
-                return "inService".equals(data.get("localStatus"));
+            public boolean supports(Repository repo) {
+                return "inService".equals(repo.getStatus().getLocalStatus());
             }
             
-            public void execute(ModelData data) {
-                RepositoryStatus status = new RepositoryStatus(data);
+            public void execute(Repository repo) {
+                RepositoryStatusResource status = repo.getStatus().copy();
+                status.setId(RepoServerUtil.toRepositoryId(repo.getResourceURI()));
                 status.setLocalStatus("outOfService");
                 
-                server.updateRepositoryStatus(status, new ResponseHandler<RepositoryStatus>() {
+                server.updateRepositoryStatus(status, new ResponseHandler<RepositoryStatusResource>() {
                     
                     public void onError(Response response, Throwable error) {
                         MessageBox.alert("Error", "The server did not put the repository out of service", null);
                     }
                     
-                    public void onSuccess(Response response, RepositoryStatus status) {
+                    public void onSuccess(Response response, RepositoryStatusResource status) {
                         tableBinding.updateRepoStatus(status);
                     }
                     
@@ -293,23 +303,24 @@ public class RepoMaintenancePage extends LayoutContainer implements ServerFuncti
             
         });
 
-        tableMenu.addAction(new Action<ModelData>("Put in Service") {
+        tableMenu.addAction(new Action<Repository>("Put in Service") {
             
-            public boolean supports(ModelData data) {
-                return "outOfService".equals(data.get("localStatus"));
+            public boolean supports(Repository repo) {
+                return "outOfService".equals(repo.getStatus().getLocalStatus());
             }
             
-            public void execute(ModelData data) {
-                RepositoryStatus status = new RepositoryStatus(data);
+            public void execute(Repository repo) {
+                RepositoryStatusResource status = repo.getStatus().copy();
+                status.setId(RepoServerUtil.toRepositoryId(repo.getResourceURI()));
                 status.setLocalStatus("inService");
                 
-                server.updateRepositoryStatus(status, new ResponseHandler<RepositoryStatus>() {
+                server.updateRepositoryStatus(status, new ResponseHandler<RepositoryStatusResource>() {
                     
                     public void onError(Response response, Throwable error) {
                         MessageBox.alert("Error", "The server did not put the repository into service", null);
                     }
                     
-                    public void onSuccess(Response response, RepositoryStatus status) {
+                    public void onSuccess(Response response, RepositoryStatusResource status) {
                         tableBinding.updateRepoStatus(status);
                     }
                     

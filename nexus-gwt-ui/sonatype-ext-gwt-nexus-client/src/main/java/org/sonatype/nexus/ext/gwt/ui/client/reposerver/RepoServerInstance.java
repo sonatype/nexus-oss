@@ -1,14 +1,22 @@
 package org.sonatype.nexus.ext.gwt.ui.client.reposerver;
 
+import java.util.List;
+
 import org.sonatype.gwt.client.resource.Representation;
 import org.sonatype.gwt.client.resource.Resource;
 import org.sonatype.gwt.client.resource.Variant;
 import org.sonatype.nexus.ext.gwt.ui.client.Constants;
 import org.sonatype.nexus.ext.gwt.ui.client.ServerInstance;
 import org.sonatype.nexus.ext.gwt.ui.client.Util;
+import org.sonatype.nexus.ext.gwt.ui.client.data.Entity;
+import org.sonatype.nexus.ext.gwt.ui.client.data.EntityFactory;
+import org.sonatype.nexus.ext.gwt.ui.client.data.RepresentationParser;
+import org.sonatype.nexus.ext.gwt.ui.client.data.XMLRepresentationParser;
 import org.sonatype.nexus.ext.gwt.ui.client.reposerver.model.AuthenticationLoginResource;
-import org.sonatype.nexus.ext.gwt.ui.client.reposerver.model.RepositoryStatus;
-import org.sonatype.nexus.ext.gwt.ui.client.reposerver.model.RepositoryStatusResponse;
+import org.sonatype.nexus.ext.gwt.ui.client.reposerver.model.Repository;
+import org.sonatype.nexus.ext.gwt.ui.client.reposerver.model.RepositoryListResource;
+import org.sonatype.nexus.ext.gwt.ui.client.reposerver.model.RepositoryStatusListResource;
+import org.sonatype.nexus.ext.gwt.ui.client.reposerver.model.RepositoryStatusResource;
 
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.RequestCallback;
@@ -19,21 +27,51 @@ import com.google.gwt.xml.client.XMLParser;
 public class RepoServerInstance extends ServerInstance {
     
     private static final Variant VARIANT = Variant.APPLICATION_XML;
+    
+    private final RepresentationParser parser = new XMLRepresentationParser();
 
     public RepoServerInstance(RepoServer repoServer) {
         super(repoServer);
     }
     
-    public void updateRepositoryStatus(RepositoryStatus status, final ResponseHandler<RepositoryStatus> handler) {
+    public void getRepositories(final ResponseHandler<List<RepositoryListResource>> handler) {
+        doGet("repositories/", new ResponseProcessor(handler) {
+            
+            protected Object createEntity(Response response) {
+                return parser.parseEntityList(response.getText(), new EntityFactory() {
+                    public Entity create() {
+                        return new Repository();
+                    }
+                });
+            }
+            
+        });
+    }
+    
+    public void getRepositoryStatuses(boolean forceCheck, final ResponseHandler<List<RepositoryStatusListResource>> handler) {
+        String url = "repository_statuses" + (forceCheck ? "?forceCheck" : "");
+        doGet(url, new ResponseProcessor(handler, Response.SC_OK, Response.SC_ACCEPTED) {
+            
+            protected Object createEntity(Response response) {
+                return parser.parseEntityList(response.getText(), new EntityFactory() {
+                    public Entity create() {
+                        return new RepositoryStatusListResource();
+                    }
+                });
+            }
+            
+        });
+    }
+    
+    public void updateRepositoryStatus(RepositoryStatusResource status, final ResponseHandler<RepositoryStatusResource> handler) {
         String url = "repositories/" + status.getId() + "/status";
-        String request = new RepositoryStatusResponse(status).toXML();
+        String request = parser.serializeEntity(
+                "org.sonatype.nexus.rest.model.RepositoryStatusResourceResponse", status);
         
         doPut(url, request, new ResponseProcessor(handler, Response.SC_OK, Response.SC_ACCEPTED) {
             
             protected Object createEntity(Response response) {
-                RepositoryStatusResponse entity = new RepositoryStatusResponse();
-                entity.fromXML(response.getText());
-                return entity.getData();
+                return parser.parseEntity(response.getText(), new RepositoryStatusResource());
             }
             
         });
