@@ -262,10 +262,13 @@ public class NexusUI implements EntryPoint {
         // TODO: Enter should start the login
         Button ok = new Button("Log In") {
             {
+                setType("submit");
                 setTabIndex(3);
                 addSelectionListener(new SelectionListener<ComponentEvent>() {
                     public void componentSelected(ComponentEvent event) {
-                        login(loginWindow, loginForm);
+                        if (loginForm.isValid()) {
+                            login(loginWindow, loginForm);
+                        }
                     }
                 });
             }
