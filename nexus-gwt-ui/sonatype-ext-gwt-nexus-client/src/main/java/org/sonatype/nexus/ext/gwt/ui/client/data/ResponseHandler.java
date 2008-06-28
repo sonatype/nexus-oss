@@ -1,4 +1,4 @@
-package org.sonatype.nexus.ext.gwt.ui.client.reposerver;
+package org.sonatype.nexus.ext.gwt.ui.client.data;
 
 import com.google.gwt.http.client.Response;
 

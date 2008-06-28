@@ -2,7 +2,7 @@ package org.sonatype.nexus.ext.gwt.ui.client;
 
 import org.sonatype.gwt.client.resource.Resource;
 import org.sonatype.gwt.client.resource.Variant;
-import org.sonatype.nexus.ext.gwt.ui.client.reposerver.ResponseHandler;
+import org.sonatype.nexus.ext.gwt.ui.client.data.ResponseHandler;
 import org.sonatype.nexus.ext.gwt.ui.client.reposerver.model.AuthenticationLoginResource;
 
 import com.extjs.gxt.ui.client.Events;
