@@ -1,6 +1,5 @@
 package org.sonatype.nexus.ext.gwt.ui.client;
 
-import org.sonatype.gwt.client.resource.Resource;
 import org.sonatype.gwt.client.resource.Variant;
 import org.sonatype.nexus.ext.gwt.ui.client.data.ResponseHandler;
 import org.sonatype.nexus.ext.gwt.ui.client.reposerver.model.AuthenticationLoginResource;
@@ -191,25 +190,17 @@ public class NexusUI implements EntryPoint {
             return;
         }
 
-        Resource resource = ctx.getLocalRepoServer().getResource(Constants.AUTHENTICATION_LOGIN);
-        resource.addHeader("Authorization", "NexusAuthToken " + authorizationToken);
-        resource.get(new RequestCallback() {
-            
-            public void onError(Request request, Throwable exception) {
+        ctx.getLocalRepoServer().checkLogin(authorizationToken, new ResponseHandler<AuthenticationLoginResource>() {
+
+            public void onError(Response response, Throwable error) {
                 updateLoginStatus(null, null);
             }
-            
-            public void onResponseReceived(Request request, Response response) {
-                if (response.getStatusCode() == Response.SC_OK) {
-                    Document doc = XMLParser.parse(response.getText());
-                    String authorizationToken = doc.getElementsByTagName("authToken").item(0).getFirstChild().getNodeValue();
-                    updateLoginStatus(ctx.getCookie("username"), authorizationToken);
-                } else {
-                    updateLoginStatus(null, null);
-                }
+
+            public void onSuccess(Response response, AuthenticationLoginResource auth) {
+                updateLoginStatus(ctx.getCookie("username"), auth);
             }
             
-        }, Variant.APPLICATION_XML);
+        });
     }
     
     private void showLoginWindow() {
@@ -259,7 +250,6 @@ public class NexusUI implements EntryPoint {
         };
         loginForm.add(password);
         
-        // TODO: Enter should start the login
         Button ok = new Button("Log In") {
             {
                 setType("submit");
@@ -317,7 +307,7 @@ public class NexusUI implements EntryPoint {
                 loginWindow.el().unmask();
                 loginWindow.hide();
                 
-                updateLoginStatus(username, auth.getAuthToken());
+                updateLoginStatus(username, auth);
                 
                 usernameField.reset();
                 passwordField.reset();
@@ -341,10 +331,10 @@ public class NexusUI implements EntryPoint {
     }
     
     // TODO: Require a user object instead of a name
-    private void updateLoginStatus(String user, String authorizationToken) {
-        if (user != null) {
-            ctx.login(user, authorizationToken);
-            username.setText(user + " | ");
+    private void updateLoginStatus(String userName, AuthenticationLoginResource auth) {
+        if (userName != null && auth != null) {
+            ctx.login(userName, auth);
+            username.setText(userName + " | ");
             loginLink.setHtml("Log Out");
         } else {
             ctx.logout();
@@ -354,7 +344,7 @@ public class NexusUI implements EntryPoint {
         
         removeServers();
         removeTabs();
-        addServers(user);
+        addServers();
         addWelcomeTab();
     }
     
@@ -366,15 +356,15 @@ public class NexusUI implements EntryPoint {
         tabPanel.removeAll();
     }
     
-    private void addServers(String user) {
+    private void addServers() {
         for (ServerType serverType : ctx.getServerTypes()) {
-            addServer(serverType, user);
+            addServer(serverType);
         }
         
         servers.setSelection(servers.getItem(0));
     }
     
-    private void addServer(ServerType serverType, String user) {
+    private void addServer(ServerType serverType) {
         final String serverID = Util.convertToStyleName(serverType.getName());
         
         TabItem instances = new TabItem(serverType.getName()) {
@@ -384,14 +374,14 @@ public class NexusUI implements EntryPoint {
         };
         
         for (ServerInstance serverInstance: serverType.getInstances()) {
-            addServerInstance(instances, serverType, serverInstance, user);
+            addServerInstance(instances, serverType, serverInstance);
         }
         
         servers.add(instances);
     }
     
     private void addServerInstance(TabItem instances, ServerType serverType,
-            ServerInstance serverInstance, String user) {
+            ServerInstance serverInstance) {
         ContentPanel groups = new ContentPanel() {
             {
                 addStyleName("st-server-instance-panel");
@@ -401,7 +391,7 @@ public class NexusUI implements EntryPoint {
         };
 
         for (ServerFunctionGroup serverFunctionGroup: serverType.getFunctionGroups()) {
-            addServerFunctionGroup(groups, serverFunctionGroup, user);
+            addServerFunctionGroup(groups, serverFunctionGroup);
         }
 
         instances.add(groups);
@@ -412,7 +402,7 @@ public class NexusUI implements EntryPoint {
     }
 
     private void addServerFunctionGroup(ContentPanel groups,
-            final ServerFunctionGroup serverFunctionGroup, String user) {
+            final ServerFunctionGroup serverFunctionGroup) {
         final ContentPanel functions = new ContentPanel() {
             {
                 setHeading(serverFunctionGroup.getName());
@@ -422,14 +412,14 @@ public class NexusUI implements EntryPoint {
         };
         
         for (ServerFunction serverFunction: serverFunctionGroup.getFunctions()) {
-            addServerFunction(functions, serverFunction, user);
+            addServerFunction(functions, serverFunction);
         }
         
         groups.add(functions);
     }
 
     private void addServerFunction(ContentPanel functions,
-            final ServerFunction serverFunction, String user) {
+            final ServerFunction serverFunction) {
         functions.add(new Link(serverFunction.getMenuName()) {
             public void onClick(ComponentEvent event) {
                 addServerFunctionTab(serverFunction);

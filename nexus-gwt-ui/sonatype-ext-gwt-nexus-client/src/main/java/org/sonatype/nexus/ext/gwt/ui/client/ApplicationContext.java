@@ -5,6 +5,8 @@ import java.util.Date;
 import java.util.List;
 
 import org.sonatype.nexus.ext.gwt.ui.client.reposerver.RepoServer;
+import org.sonatype.nexus.ext.gwt.ui.client.reposerver.model.AuthenticationClientPermissions;
+import org.sonatype.nexus.ext.gwt.ui.client.reposerver.model.AuthenticationLoginResource;
 
 import com.google.gwt.user.client.Cookies;
 
@@ -16,6 +18,7 @@ public class ApplicationContext {
     
     private boolean userLoggedIn = false;
     private String userName;
+    private AuthenticationClientPermissions userPermissions;
     
     private ApplicationContext() {
         RepoServer repoServer = new RepoServer();
@@ -49,13 +52,14 @@ public class ApplicationContext {
         Cookies.removeCookie("st-" + name);
     }
     
-    public void login(String user, String authorizationToken) {
-        userLoggedIn = true;
-        userName = user;
-        setCookie("username", user);
-        setCookie("authToken", authorizationToken);
+    public void login(String userName, AuthenticationLoginResource auth) {
+        this.userLoggedIn = true;
+        this.userName = userName;
+        this.userPermissions = auth.getClientPermissions();
+        setCookie("username", userName);
+        setCookie("authToken", auth.getAuthToken());
         getLocalRepoServer().addDefaultHeader(
-                "Authorization", "NexusAuthToken " + authorizationToken);
+                "Authorization", "NexusAuthToken " + auth.getAuthToken());
     }
     
     public void logout() {
@@ -63,6 +67,10 @@ public class ApplicationContext {
         removeCookie("username");
         removeCookie("authToken");
         getLocalRepoServer().removeDefaultHeader("Authorization");
+    }
+
+    public boolean checkPermission(String name, Integer value) {
+        return (((Integer) userPermissions.get(name)) & value) == value;
     }
     
     public boolean isUserLoggedIn() {

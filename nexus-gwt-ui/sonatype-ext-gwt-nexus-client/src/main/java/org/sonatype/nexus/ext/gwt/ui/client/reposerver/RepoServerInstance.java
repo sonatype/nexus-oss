@@ -14,6 +14,7 @@ import org.sonatype.nexus.ext.gwt.ui.client.data.RepresentationParser;
 import org.sonatype.nexus.ext.gwt.ui.client.data.ResponseHandler;
 import org.sonatype.nexus.ext.gwt.ui.client.data.XMLRepresentationParser;
 import org.sonatype.nexus.ext.gwt.ui.client.reposerver.model.AuthenticationLoginResource;
+import org.sonatype.nexus.ext.gwt.ui.client.reposerver.model.AuthenticationClientPermissions;
 import org.sonatype.nexus.ext.gwt.ui.client.reposerver.model.ContentListResource;
 import org.sonatype.nexus.ext.gwt.ui.client.reposerver.model.Repository;
 import org.sonatype.nexus.ext.gwt.ui.client.reposerver.model.RepositoryListResource;
@@ -24,6 +25,8 @@ import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.RequestCallback;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.xml.client.Document;
+import com.google.gwt.xml.client.Node;
+import com.google.gwt.xml.client.NodeList;
 import com.google.gwt.xml.client.XMLParser;
 
 public class RepoServerInstance extends ServerInstance {
@@ -137,27 +140,47 @@ public class RepoServerInstance extends ServerInstance {
         getResource(url).delete(new ResponseProcessor(handler));
     }
     
-    public void login(String username, String password, final ResponseHandler handler) {
+    public void doLogin(String authorization, ResponseHandler handler) {
         Resource resource = getResource(Constants.AUTHENTICATION_LOGIN);
         
-        // TODO: Use real HTTP basic authentication
-        resource.addHeader("Authorization", "Basic " +
-                Util.base64Encode(username + ":" + password));
-        
-        resource.get(new ResponseProcessor<AuthenticationLoginResource>(handler) {
-            
-            protected AuthenticationLoginResource createEntity(Response response) {
+        resource.addHeader("Authorization", authorization);
+
+        resource.get(new ResponseProcessor(handler) {
+
+            protected Object createEntity(Response response) {
                 Document doc = XMLParser.parse(response.getText());
-                String authorizationToken = doc.getElementsByTagName("authToken").item(0).getFirstChild().getNodeValue();
-                // TODO: Extract permissions from response.clientPermissions
                 
                 AuthenticationLoginResource entity = new AuthenticationLoginResource();
+                
+                String authorizationToken = doc.getElementsByTagName("authToken").item(0).getFirstChild().getNodeValue();
                 entity.setAuthToken(authorizationToken);
+                
+                AuthenticationClientPermissions clientPermissions
+                        = new AuthenticationClientPermissions();
+                NodeList nodes = doc.getElementsByTagName("clientPermissions").item(0).getChildNodes();
+                for (int i = 0; i < nodes.getLength(); ++i) {
+                    Node node = nodes.item(i);
+                    short nodeType = node.getNodeType();
+                    if (nodeType == Node.ELEMENT_NODE) {
+                        clientPermissions.set(node.getNodeName(), node.getFirstChild().getNodeValue());
+                    }
+                }
+                entity.setClientPermissions(clientPermissions);
                 
                 return entity;
             }
-            
+
         }, VARIANT);
+        
+    }
+    
+    public void checkLogin(String authorizationToken, ResponseHandler handler) {
+        doLogin("NexusAuthToken " + authorizationToken, handler);
+    }
+    
+    public void login(String username, String password, ResponseHandler handler) {
+        // TODO: Use real HTTP basic authentication
+        doLogin("Basic " + Util.base64Encode(username + ":" + password), handler);
     }
 
     public void logout(final ResponseHandler handler) {

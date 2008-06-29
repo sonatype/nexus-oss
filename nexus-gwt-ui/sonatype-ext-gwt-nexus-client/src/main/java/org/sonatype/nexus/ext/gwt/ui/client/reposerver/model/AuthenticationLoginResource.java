@@ -6,10 +6,6 @@ import com.extjs.gxt.ui.client.data.BaseModelData;
 
 public class AuthenticationLoginResource extends BaseModelData implements Entity {
     
-    private String authToken;
-    
-    private AuthenticationClientPermissions clientPermissions;
-
     public String getType() {
         return "org.sonatype.nexus.rest.model.AuthenticationLoginResource";
     }
@@ -23,20 +19,20 @@ public class AuthenticationLoginResource extends BaseModelData implements Entity
     }
 
     public String getAuthToken() {
-        return authToken;
+        return get("authToken");
     }
 
     public void setAuthToken(String authToken) {
-        this.authToken = authToken;
+        set("authToken", authToken);
     }
 
     public AuthenticationClientPermissions getClientPermissions() {
-        return clientPermissions;
+        return get("clientPermissions");
     }
 
     public void setClientPermissions(
             AuthenticationClientPermissions clientPermissions) {
-        this.clientPermissions = clientPermissions;
+        set("clientPermissions", clientPermissions);
     }
 
 }

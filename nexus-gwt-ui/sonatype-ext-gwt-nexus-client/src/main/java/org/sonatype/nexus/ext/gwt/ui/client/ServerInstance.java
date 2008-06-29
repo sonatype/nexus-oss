@@ -67,6 +67,9 @@ public class ServerInstance {
         return resource;
     }
     
+    public void checkLogin(String authorizationToken, ResponseHandler handler) {
+    }
+    
     public void login(String username, String password, ResponseHandler handler) {
     }
     
