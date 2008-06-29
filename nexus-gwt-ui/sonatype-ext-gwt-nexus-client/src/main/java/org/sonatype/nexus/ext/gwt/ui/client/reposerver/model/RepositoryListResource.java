@@ -42,4 +42,12 @@ public class RepositoryListResource extends BaseModelData implements Entity {
         set("resourceURI", resourceURI);
     }
 
+    public String getRemoteUri() {
+        return get("remoteUri");
+    }
+
+    public void setRemoteUri(String remoteUri) {
+        set("remoteUri", remoteUri);
+    }
+
 }

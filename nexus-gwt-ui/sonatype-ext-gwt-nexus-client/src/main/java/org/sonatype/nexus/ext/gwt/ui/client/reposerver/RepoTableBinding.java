@@ -84,7 +84,7 @@ public class RepoTableBinding {
                 	public boolean equals(ModelData model1, ModelData model2) {
                 		String resourceURI1 = (String) model1.get("resourceURI");
                 		String resourceURI2 = (String) model2.get("resourceURI");
-                		resourceURI2 = resourceURI2.replace(server.getPath() + "/repository_statuses", server.getPath() + "/repositories");
+                		resourceURI2 = resourceURI2.replace(server.getServicePath() + "/repository_statuses", server.getServicePath() + "/repositories");
                 		return resourceURI1.equals(resourceURI2);
                 	}
                 });
@@ -109,7 +109,7 @@ public class RepoTableBinding {
     
     public void updateRepoStatus(RepositoryStatusResource status) {
         BaseModelData item = new BaseModelData();
-        item.set("resourceURI", server.getPath() + "/repository_statuses/" + status.getId());
+        item.set("resourceURI", server.getServicePath() + "/repository_statuses/" + status.getId());
         
         Repository storeItem = (Repository) store.findModel(item);
         storeItem.setStatus(status);

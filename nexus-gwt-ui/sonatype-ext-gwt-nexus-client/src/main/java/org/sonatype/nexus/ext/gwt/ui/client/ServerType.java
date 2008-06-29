@@ -8,7 +8,7 @@ public interface ServerType {
     
     String getName();
     
-    String getPath();
+    String getServicePath();
     
     List<ServerInstance> getInstances();
     

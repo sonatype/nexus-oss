@@ -51,12 +51,12 @@ public class ServerInstance {
         defaultHeaders.remove(name);
     }
     
-    public String getPath() {
-        return serverType.getPath() + "/" + getId();
+    public String getServicePath() {
+        return serverType.getServicePath() + "/" + getId();
     }
     
     public Resource getResource(String url) {
-        String resourcePath = Constants.HOST + getPath() + "/" + url;
+        String resourcePath = Constants.HOST + getServicePath() + "/" + url;
         resourcePath += (url.indexOf('?') == -1) ? "?" : "&";
         resourcePath += "_dc=" + System.currentTimeMillis();
         

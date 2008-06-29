@@ -19,6 +19,7 @@ import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.event.SelectionChangedEvent;
 import com.extjs.gxt.ui.client.event.SelectionChangedListener;
 import com.extjs.gxt.ui.client.event.SelectionListener;
+import com.extjs.gxt.ui.client.event.WindowEvent;
 import com.extjs.gxt.ui.client.widget.Component;
 import com.extjs.gxt.ui.client.widget.ContentPanel;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
@@ -155,14 +156,11 @@ public class RepoMaintenancePage extends LayoutContainer implements ServerFuncti
             
             public boolean supports(Repository repo) {
                 return ApplicationContext.instance().isUserLoggedIn() &&
-                       (repo.getRepoType().equals("hosted") ||
-                       repo.getRepoType().equals("proxy"));
+                       !repo.getRepoType().equals("virtual");
             }
             
             public void execute(Repository repo) {
-                String repositoryId = RepoServerUtil.getRepositoryId(repo);
-                
-                server.clearRepositoryCache(repositoryId, new ResponseHandler() {
+                server.clearRepositoryCache(repo.getId(), null, new ResponseHandler() {
 
                     public void onError(Response response, Throwable error) {
                         MessageBox.alert("Error", "The server did not clear the repository's cache", null);
@@ -184,9 +182,7 @@ public class RepoMaintenancePage extends LayoutContainer implements ServerFuncti
             }
 
             public void execute(Repository repo) {
-                String repositoryId = RepoServerUtil.getRepositoryId(repo);
-                
-                server.reindexRepository(repositoryId, new ResponseHandler() {
+                server.reindexRepository(repo.getId(), null, new ResponseHandler() {
 
                     public void onError(Response response, Throwable error) {
                         MessageBox.alert("Error", "The server did not re-index the repository", null);
@@ -208,9 +204,7 @@ public class RepoMaintenancePage extends LayoutContainer implements ServerFuncti
             }
             
             public void execute(Repository repo) {
-                String repositoryId = RepoServerUtil.getRepositoryId(repo);
-                
-                server.rebuildRepositoryAttributes(repositoryId, new ResponseHandler() {
+                server.rebuildRepositoryAttributes(repo.getId(), null, new ResponseHandler() {
 
                     public void onError(Response response, Throwable error) {
                         MessageBox.alert("Error", "The server did not rebuild attributes in the repository", null);
@@ -395,7 +389,19 @@ public class RepoMaintenancePage extends LayoutContainer implements ServerFuncti
             }
             
             public void execute(ContentListResource data) {
-                Window.alert(getCaption());
+                String repositoryId = repoTreeBinding.getSelectedRepository().getId();
+                
+                server.clearRepositoryCache(repositoryId, data.getRelativePath(), new ResponseHandler() {
+
+                    public void onError(Response response, Throwable error) {
+                        MessageBox.alert("Error", "The server did not clear the repository's cache", null);
+                    }
+
+                    public void onSuccess(Response response, Object entity) {
+                        //do nothing
+                    }
+                    
+                });
             }
             
         });
@@ -407,7 +413,19 @@ public class RepoMaintenancePage extends LayoutContainer implements ServerFuncti
             }
             
             public void execute(ContentListResource data) {
-                Window.alert(getCaption());
+                String repositoryId = repoTreeBinding.getSelectedRepository().getId();
+                
+                server.reindexRepository(repositoryId, data.getRelativePath(), new ResponseHandler() {
+
+                    public void onError(Response response, Throwable error) {
+                        MessageBox.alert("Error", "The server did not re-index the repository", null);
+                    }
+
+                    public void onSuccess(Response response, Object entity) {
+                        //do nothing
+                    }
+                    
+                });
             }
             
         });
@@ -419,36 +437,23 @@ public class RepoMaintenancePage extends LayoutContainer implements ServerFuncti
             }
             
             public void execute(ContentListResource data) {
-                Window.alert(getCaption());
+                String repositoryId = repoTreeBinding.getSelectedRepository().getId();
+                
+                server.rebuildRepositoryAttributes(repositoryId, data.getRelativePath(), new ResponseHandler() {
+
+                    public void onError(Response response, Throwable error) {
+                        MessageBox.alert("Error", "The server did not rebuild attributes in the repository", null);
+                    }
+
+                    public void onSuccess(Response response, Object entity) {
+                        //do nothing
+                    }
+                    
+                });
             }
             
         });
         
-        treeMenu.addAction(new Action<ContentListResource>("Download From Remote") {
-            
-            public boolean supports(ContentListResource data) {
-                return ApplicationContext.instance().isUserLoggedIn() && data.isLeaf() &&
-                       "proxy".equals(repoTreeBinding.getSelectedRepository().getRepoType());
-            }
-            
-            public void execute(ContentListResource data) {
-                Window.alert(getCaption());
-            }
-            
-        });
-
-        treeMenu.addAction(new Action<ContentListResource>("Download") {
-            
-            public boolean supports(ContentListResource data) {
-                return ApplicationContext.instance().isUserLoggedIn() && data.isLeaf();
-            }
-            
-            public void execute(ContentListResource data) {
-                Window.alert(getCaption());
-            }
-            
-        });
-
         treeMenu.addAction(new Action<ContentListResource>("Delete") {
             
             public boolean supports(ContentListResource data) {
@@ -456,8 +461,30 @@ public class RepoMaintenancePage extends LayoutContainer implements ServerFuncti
                        data.getParent() != null;
             }
             
-            public void execute(ContentListResource data) {
-                Window.alert(getCaption());
+            public void execute(final ContentListResource data) {
+                MessageBox.confirm("Delete Repository Item?", "Delete the selected file/folder?", new Listener<WindowEvent>() {
+
+                    public void handleEvent(WindowEvent event) {
+                        if (!event.buttonClicked.getItemId().equals("yes")) {
+                            return;
+                        }
+                        
+                        String repositoryId = repoTreeBinding.getSelectedRepository().getId();
+                        
+                        server.deleteRepositoryItem(repositoryId, data.getRelativePath(), new ResponseHandler() {
+
+                            public void onError(Response response, Throwable error) {
+                                MessageBox.alert("Error", "The server did not delete the file/folder from the repository", null);
+                            }
+
+                            public void onSuccess(Response response, Object entity) {
+                                repoTreeBinding.reload();
+                            }
+                            
+                        });
+                    }
+                    
+                });
             }
             
         });
@@ -471,7 +498,38 @@ public class RepoMaintenancePage extends LayoutContainer implements ServerFuncti
             }
             
             public void execute(ContentListResource data) {
-                Window.alert(getCaption());
+                String url = repoTreeBinding.
+                    getSelectedRepository().getRemoteUri() + data.getRelativePath();
+                Window.open(url, "_blank", "");
+            }
+            
+        });
+
+        treeMenu.addAction(new Action<ContentListResource>("Download From Remote") {
+            
+            public boolean supports(ContentListResource data) {
+                return ApplicationContext.instance().isUserLoggedIn() && data.isLeaf() &&
+                       "proxy".equals(repoTreeBinding.getSelectedRepository().getRepoType());
+            }
+            
+            public void execute(ContentListResource data) {
+                String url = repoTreeBinding.
+                    getSelectedRepository().getRemoteUri() + data.getRelativePath();
+                Window.open(url, "_blank", "");
+            }
+            
+        });
+
+        treeMenu.addAction(new Action<ContentListResource>("Download") {
+            
+            public boolean supports(ContentListResource data) {
+                return ApplicationContext.instance().isUserLoggedIn() && data.isLeaf();
+            }
+            
+            public void execute(ContentListResource data) {
+                String url = Constants.HOST +
+                    "/nexus/content/repositories/apache-snapshots" + data.getRelativePath();
+                Window.open(url, "_blank", "");
             }
             
         });

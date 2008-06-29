@@ -171,7 +171,7 @@ public class RepoServer extends AbstractServerType {
         return "Nexus";
     }
 
-    public String getPath() {
+    public String getServicePath() {
         return "/nexus/service";
     }
     

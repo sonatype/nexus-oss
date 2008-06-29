@@ -40,7 +40,8 @@ public class RepoServerInstance extends ServerInstance {
         return VARIANT;
     }
     
-    public void getRepositories(final ResponseHandler<List<RepositoryListResource>> handler) {
+    public void getRepositories(
+            final ResponseHandler<List<RepositoryListResource>> handler) {
         doGet("repositories/", new ResponseProcessor(handler) {
             
             protected Object createEntity(Response response) {
@@ -54,7 +55,8 @@ public class RepoServerInstance extends ServerInstance {
         });
     }
     
-    public void getRepositoryStatuses(boolean forceCheck, final ResponseHandler<List<RepositoryStatusListResource>> handler) {
+    public void getRepositoryStatuses(boolean forceCheck,
+            final ResponseHandler<List<RepositoryStatusListResource>> handler) {
         String url = "repository_statuses" + (forceCheck ? "?forceCheck" : "");
         doGet(url, new ResponseProcessor(handler, Response.SC_OK, Response.SC_ACCEPTED) {
             
@@ -69,7 +71,8 @@ public class RepoServerInstance extends ServerInstance {
         });
     }
     
-    public void updateRepositoryStatus(RepositoryStatusResource status, final ResponseHandler<RepositoryStatusResource> handler) {
+    public void updateRepositoryStatus(RepositoryStatusResource status,
+            final ResponseHandler<RepositoryStatusResource> handler) {
         String url = "repositories/" + status.getId() + "/status";
         String request = parser.serializeEntity(
                 "org.sonatype.nexus.rest.model.RepositoryStatusResourceResponse", status);
@@ -83,9 +86,10 @@ public class RepoServerInstance extends ServerInstance {
         });
     }
     
-    public void getRepositoryContent(ContentListResource parent, final ResponseHandler<List<ContentListResource>> handler) {
+    public void getRepositoryContent(ContentListResource parent,
+            final ResponseHandler<List<ContentListResource>> handler) {
         int i = parent.getResourceUri().indexOf("repositories");
-        String url = parent.getResourceUri().substring(i) + "/";
+        String url = parent.getResourceUri().substring(i);
         
         doGet(url, new ResponseProcessor(handler) {
             
@@ -100,18 +104,36 @@ public class RepoServerInstance extends ServerInstance {
         });
     }
     
-    public void reindexRepository(String repositoryId, final ResponseHandler handler) {
+    public void deleteRepositoryItem(
+            String repositoryId, String itemPath, final ResponseHandler handler) {
+        String url = "repositories/" + repositoryId + "/content" + itemPath;
+        getResource(url).delete(new ResponseProcessor(handler));
+    }
+    
+    public void reindexRepository(
+            String repositoryId, String path, final ResponseHandler handler) {
         String url = "data_index/repositories/" + repositoryId + "/content";
+        if (path != null) {
+            url += path;
+        }
         getResource(url).delete(new ResponseProcessor(handler));
     }
     
-    public void clearRepositoryCache(String repositoryId, final ResponseHandler handler) {
+    public void clearRepositoryCache(
+            String repositoryId, String path, final ResponseHandler handler) {
         String url = "data_cache/repositories/" + repositoryId + "/content";
+        if (path != null) {
+            url += path;
+        }
         getResource(url).delete(new ResponseProcessor(handler));
     }
     
-    public void rebuildRepositoryAttributes(String repositoryId, final ResponseHandler handler) {
+    public void rebuildRepositoryAttributes(
+            String repositoryId, String path, final ResponseHandler handler) {
         String url = "attributes/repositories/" + repositoryId + "/content";
+        if (path != null) {
+            url += path;
+        }
         getResource(url).delete(new ResponseProcessor(handler));
     }
     

@@ -10,10 +10,9 @@ import com.extjs.gxt.ui.client.data.ModelData;
 import com.extjs.gxt.ui.client.event.BaseEvent;
 import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.event.MenuEvent;
-import com.extjs.gxt.ui.client.event.TreeEvent;
 import com.extjs.gxt.ui.client.event.SelectionListener;
-import com.extjs.gxt.ui.client.event.SelectionProvider;
 import com.extjs.gxt.ui.client.event.TableEvent;
+import com.extjs.gxt.ui.client.event.TreeEvent;
 import com.extjs.gxt.ui.client.widget.Component;
 import com.extjs.gxt.ui.client.widget.menu.Menu;
 import com.extjs.gxt.ui.client.widget.menu.MenuItem;
@@ -42,13 +41,12 @@ class ContextMenuProvider implements Listener<BaseEvent> {
         
         if (event instanceof TableEvent && ((TableEvent) event).item != null) {
             result = createMenu(((TableEvent) event).item.getModel());
-        } else if (event instanceof TreeEvent && ((TreeEvent) event).item != null) {
+        }
+        else if (event instanceof TreeEvent && ((TreeEvent) event).item != null) {
             result = createMenu(((TreeEvent) event).item.getModel());
         }
         
-        if (result == false) {
-            event.doit = false;
-        }
+        event.doit = result;
     }
     
     private boolean createMenu(final ModelData data) {
@@ -72,6 +70,7 @@ class ContextMenuProvider implements Listener<BaseEvent> {
         }
         
         setContextMenu(menu);
+        
         return true;
     }
     
