@@ -116,6 +116,10 @@ public class HttpProxyHandler
                         }
 
                         Socket serverSocket = new Socket( resolvedUrl.getHost(), port );
+                        
+                        //Hopefully this will resolve the problem of using up all teh system sockets
+                        //and running out of resources
+                        serverSocket.setSoLinger( false, 0 );
 
                         serverSocket.setSoTimeout( DefaultHttpProxyService.DEFAULT_TIMEOUT );
 
