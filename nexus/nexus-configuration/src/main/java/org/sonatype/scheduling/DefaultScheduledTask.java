@@ -60,6 +60,8 @@ public class DefaultScheduledTask<T>
     private boolean enabled;
 
     private Date lastRun;
+    
+    private Date nextRun;
 
     private List<T> results;
 
@@ -103,6 +105,8 @@ public class DefaultScheduledTask<T>
         this.storeConfig = storeConfig;
 
         this.manualRun = false;
+        
+        this.nextRun = null;
     }
 
     protected void start()
@@ -240,7 +244,9 @@ public class DefaultScheduledTask<T>
         
         if ( iter != null &&  !iter.isFinished() )
         {
-            long nextTime = getScheduleIterator().next().getTime();
+            nextRun = iter.next();
+            
+            long nextTime = nextRun.getTime();
 
             getScheduler().taskRescheduled( this );
 
@@ -251,6 +257,8 @@ public class DefaultScheduledTask<T>
         }
         else
         {
+            nextRun = null;
+            
             return null;
         }
     }
@@ -363,14 +371,7 @@ public class DefaultScheduledTask<T>
 
     public Date getNextRun()
     {
-        if ( getScheduleIterator() != null )
-        {
-            return getScheduleIterator().peekNext();
-        }
-        else
-        {
-            return null;
-        }
+        return nextRun;
     }
 
     public boolean isEnabled()

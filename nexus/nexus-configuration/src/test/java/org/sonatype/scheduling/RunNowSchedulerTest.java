@@ -23,8 +23,6 @@ package org.sonatype.scheduling;
 import java.util.concurrent.Callable;
 
 import org.sonatype.nexus.configuration.AbstractNexusTestCase;
-import org.sonatype.scheduling.schedules.RunNowSchedule;
-import org.sonatype.scheduling.schedules.Schedule;
 
 public class RunNowSchedulerTest
     extends AbstractNexusTestCase
@@ -54,9 +52,7 @@ public class RunNowSchedulerTest
     {
         TestRunnable tr = new TestRunnable();
 
-        Schedule schedule = new RunNowSchedule();
-
-        ScheduledTask<Object> st = defaultScheduler.schedule( "default", tr, schedule, null, true );
+        ScheduledTask<Object> st = defaultScheduler.submit( "default", tr, null );
 
         assertEquals( 1, defaultScheduler.getActiveTasks().size() );
 
@@ -76,10 +72,8 @@ public class RunNowSchedulerTest
         throws Exception
     {
         TestCallable tr = new TestCallable();
-
-        Schedule schedule = new RunNowSchedule();
-
-        ScheduledTask<Integer> st = defaultScheduler.schedule( "default", tr, schedule, null, true );
+        
+        ScheduledTask<Integer> st = defaultScheduler.submit( "default", tr, null );
 
         assertEquals( 1, defaultScheduler.getActiveTasks().size() );
 
