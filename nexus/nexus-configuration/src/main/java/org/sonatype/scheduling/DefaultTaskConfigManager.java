@@ -139,7 +139,7 @@ public class DefaultTaskConfigManager
                         nexusTask,
                         translateFrom( task.getSchedule(), task.getNextRun() ),
                         translateFrom( task.getProperties() ),
-                        false )
+                        true )
                             .setEnabled( task.isEnabled() );
                 }
             }
