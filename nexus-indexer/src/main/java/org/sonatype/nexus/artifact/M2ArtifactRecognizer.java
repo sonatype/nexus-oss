@@ -42,5 +42,9 @@ public class M2ArtifactRecognizer {
 		return path.endsWith("maven-metadata.xml") || path.endsWith("maven-metadata.xml.sha1")
 				|| path.endsWith("maven-metadata.xml.md5");
 	}
+	
+	public static boolean isSignature(String path) {
+	    return path.endsWith( ".asc" );
+	}
 
 }

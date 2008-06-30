@@ -273,7 +273,8 @@ public class DefaultSnapshotRemover
                         // process only snapshot non-checksums
                         if ( M2ArtifactRecognizer.isSnapshot( item.getPath() )
                             && !M2ArtifactRecognizer.isMetadata( item.getPath() )
-                            && !M2ArtifactRecognizer.isChecksum( item.getPath() ) )
+                            && !M2ArtifactRecognizer.isChecksum( item.getPath() ) 
+                            && !M2ArtifactRecognizer.isSignature( item.getPath() ) )
                         {
                             gav = ( (MavenRepository) coll.getRepositoryItemUid().getRepository() )
                                 .getGavCalculator().pathToGav( item.getPath() );
@@ -390,7 +391,7 @@ public class DefaultSnapshotRemover
                                     .getArtifactId(), gav.getVersion(), gav.getExtension(), gav.getClassifier() );
 
                                 // delete the artifact only
-                                repository.deleteArtifact( req, false, false );
+                                repository.deleteArtifact( req, true, false );
 
                                 deletedFiles++;
                             }

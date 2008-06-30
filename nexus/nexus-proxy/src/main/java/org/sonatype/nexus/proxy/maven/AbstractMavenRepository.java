@@ -270,7 +270,21 @@ public abstract class AbstractMavenRepository
             getLogger().debug( "deleteItemWithChecksums() :: " + uid.toString() );
         }
 
-        deleteItem( uid );
+        try
+        {
+            deleteItem( uid );
+        }
+        catch ( ItemNotFoundException e )
+        {
+            if ( uid.getPath().endsWith( ".asc" ) )
+            {
+                //Do nothing no guarantee that the .asc files will exist
+            }
+            else
+            {
+                throw e;
+            }
+        }
 
         RepositoryItemUid sha1Uid = new RepositoryItemUid( this, uid.getPath() + ".sha1" );
 
@@ -292,6 +306,13 @@ public abstract class AbstractMavenRepository
         catch ( ItemNotFoundException e )
         {
             // ignore not found
+        }
+        
+        //Now remove the .asc files, and the checksums stored with them as well
+        //Note this is a recursive call, hence the check for .asc
+        if ( !uid.getPath().endsWith( ".asc" ) )
+        {
+            deleteItemWithChecksums( new RepositoryItemUid( this, uid.getPath() + ".asc" ) );
         }
     }
 
