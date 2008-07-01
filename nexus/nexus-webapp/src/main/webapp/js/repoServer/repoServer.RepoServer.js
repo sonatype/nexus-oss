@@ -68,6 +68,7 @@ Sonatype.repoServer.RepoServer = function(){
 
       items:[
         { 
+          id:'usernamefield',
           fieldLabel:'Username', 
           name:'username',
           tabIndex: 1,
@@ -75,6 +76,7 @@ Sonatype.repoServer.RepoServer = function(){
           allowBlank:false 
         },
         { 
+          id:'passwordfield',
           fieldLabel:'Password', 
           name:'password',
           tabIndex: 2, 
@@ -114,6 +116,7 @@ Sonatype.repoServer.RepoServer = function(){
       
       Sonatype.view.serverTabPanel.add(this.nexusPanel);
       this.loginFormConfig.buttons = [{ 
+        id:'loginbutton',
         text:'Log In',
         tabIndex: 3, 
         formBind: true,
