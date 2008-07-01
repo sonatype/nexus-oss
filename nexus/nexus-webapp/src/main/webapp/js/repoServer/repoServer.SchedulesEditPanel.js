@@ -392,7 +392,8 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
                 helpText: ht.startDate,
                 name: 'startDate',
                 disabled:true,
-                allowBlank:false
+                allowBlank:false,
+                value:new Date()
               },
               {
                 xtype: 'timefield',
@@ -402,7 +403,8 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
                 name: 'startTime',
                 width: 75,                
                 disabled:true,
-                allowBlank:false
+                allowBlank:false,
+                value: new Date().format('g:i A')
               }
             ]
           },
@@ -425,7 +427,8 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
                 helpText: ht.startDate,
                 name: 'startDate',
                 disabled:true,
-                allowBlank:false
+                allowBlank:false,
+                value:new Date()
               },
               {
                 xtype: 'timefield',
@@ -435,7 +438,8 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
                 name: 'recurringTime',
                 width: 75,
                 disabled:true,
-                allowBlank:false
+                allowBlank:false,
+                value: new Date().format('g:i A')
               }
             ]
           },
@@ -458,7 +462,8 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
                 helpText: ht.startDate,
                 name: 'startDate',
                 disabled:true,
-                allowBlank:false
+                allowBlank:false,
+                value:new Date()
               },
               {
                 xtype: 'timefield',
@@ -468,7 +473,8 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
                 name: 'recurringTime',
                 width: 75,
                 disabled:true,
-                allowBlank:false
+                allowBlank:false,
+                value: new Date().format('g:i A')
               },
               {
                 xtype: 'panel',
@@ -599,7 +605,8 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
                 helpText: ht.startDate,
                 name: 'startDate',
                 disabled:true,
-                allowBlank:false
+                allowBlank:false,
+                value:new Date()
               },
               {
                 xtype: 'timefield',
@@ -609,7 +616,8 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
                 name: 'recurringTime',
                 width: 75,
                 disabled:true,
-                allowBlank:false
+                allowBlank:false,
+                value: new Date().format('g:i A')
               },
               {
                 xtype: 'panel',
@@ -1043,7 +1051,8 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
             helpText: curRec.helpText,
             name: 'serviceProperties_' + curRec.id,
             allowBlank:curRec.required ? false : true,
-            disabled:true
+            disabled:true,
+            value:new Date()
           };
         }
         else if(curRec.type == 'repo'){
@@ -1382,7 +1391,7 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
             Ext.Ajax.request({
               callback: this.runCallback,
               cbPassThru: {
-                resourceId: rec.data.id
+                resourceId: rec.id
               },
               scope: this,
               method: 'GET',
@@ -1398,6 +1407,16 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
     if(!isSuccess){
       Ext.MessageBox.alert('The server did not run the scheduled task.');
     }
+    else {
+        var receivedData = Ext.decode(response.responseText).data;
+        var i = this.schedulesDataStore.indexOfId(options.cbPassThru.resourceId);
+        var rec = this.schedulesDataStore.getAt(i);
+
+        this.updateServiceRecord(rec, receivedData);
+        
+        var sortState = this.schedulesDataStore.getSortState();
+        this.schedulesDataStore.sort(sortState.field, sortState.direction);
+    }
   },
     
   //(Ext.form.BasicForm, Ext.form.Action)
@@ -1406,11 +1425,10 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
 
     if (action.type == 'sonatypeSubmit'){
       var isNew = action.options.isNew;
-
+      var receivedData = action.handleResponse(action.response).data;
       if (isNew) {
         //successful create
         var sentData = action.output.data;
-        var receivedData = action.handleResponse(action.response).data;
         
         var dataObj = {
           name : receivedData.resource.name,
@@ -1469,17 +1487,26 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
         var i = this.schedulesDataStore.indexOfId(action.options.fpanel.id);
         var rec = this.schedulesDataStore.getAt(i);
 
-        rec.beginEdit();
-        rec.set('name', sentData.name);
-        rec.set('typeId', sentData.typeId);
-        rec.set('schedule', sentData.schedule);
-        rec.commit();
-        rec.endEdit();
+        this.updateServiceRecord(rec, receivedData);
         
         var sortState = this.schedulesDataStore.getSortState();
         this.schedulesDataStore.sort(sortState.field, sortState.direction);
       }
     }
+  },
+  
+  updateServiceRecord : function(rec, receivedData){
+        rec.beginEdit();
+        rec.set('name', receivedData.resource.name);
+        rec.set('typeId', receivedData.resource.typeId);
+        rec.set('typeName', this.serviceTypeDataStore.getAt(this.serviceTypeDataStore.find('id',receivedData.resource.typeId)).data.name);
+        rec.set('schedule', receivedData.resource.schedule);
+        rec.set('status', receivedData.status);
+        rec.set('nextRunTime', receivedData.nextRunTime);
+        rec.set('lastRunTime', receivedData.lastRunTime);
+        rec.set('lastRunResult', receivedData.lastRunResult);
+        rec.commit();
+        rec.endEdit();
   },
 
   //(Ext.form.BasicForm, Ext.form.Action)

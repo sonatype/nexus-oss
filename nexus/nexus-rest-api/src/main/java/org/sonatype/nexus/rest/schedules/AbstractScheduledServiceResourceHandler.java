@@ -51,6 +51,7 @@ import org.sonatype.nexus.tasks.PublishIndexesTask;
 import org.sonatype.nexus.tasks.PurgeTimeline;
 import org.sonatype.nexus.tasks.RebuildAttributesTask;
 import org.sonatype.nexus.tasks.ReindexTask;
+import org.sonatype.scheduling.ScheduledTask;
 import org.sonatype.scheduling.SchedulerTask;
 import org.sonatype.scheduling.schedules.CronSchedule;
 import org.sonatype.scheduling.schedules.DailySchedule;
@@ -419,5 +420,78 @@ public class AbstractScheduledServiceResourceHandler
         }
 
         return schedule;
+    }
+    
+    public <T> ScheduledServiceBaseResource getServiceRestModel( ScheduledTask<T> task )
+    {
+        ScheduledServiceBaseResource resource = null;
+        
+        if ( task.getSchedule() == null )
+        {
+            resource = new ScheduledServiceBaseResource();
+        }
+        else if ( OnceSchedule.class.isAssignableFrom( task.getSchedule().getClass() ) )
+        {
+            resource = new ScheduledServiceOnceResource();
+
+            OnceSchedule taskSchedule = (OnceSchedule) task.getSchedule();
+            ScheduledServiceOnceResource res = (ScheduledServiceOnceResource) resource;
+
+            res.setStartDate( formatDate( taskSchedule.getStartDate() ) );
+            res.setStartTime( formatTime( taskSchedule.getStartDate() ) );
+        }
+        else if ( DailySchedule.class.isAssignableFrom( task.getSchedule().getClass() ) )
+        {
+            resource = new ScheduledServiceDailyResource();
+
+            DailySchedule taskSchedule = (DailySchedule) task.getSchedule();
+            ScheduledServiceDailyResource res = (ScheduledServiceDailyResource) resource;
+
+            res.setStartDate( formatDate( taskSchedule.getStartDate() ) );
+            res.setRecurringTime( formatTime( taskSchedule.getStartDate() ) );
+        }
+        else if ( WeeklySchedule.class.isAssignableFrom( task.getSchedule().getClass() ) )
+        {
+            resource = new ScheduledServiceWeeklyResource();
+
+            WeeklySchedule taskSchedule = (WeeklySchedule) task.getSchedule();
+            ScheduledServiceWeeklyResource res = (ScheduledServiceWeeklyResource) resource;
+
+            res.setStartDate( formatDate( taskSchedule.getStartDate() ) );
+            res.setRecurringTime( formatTime( taskSchedule.getStartDate() ) );
+            res.setRecurringDay( formatRecurringDayOfWeek( taskSchedule.getDaysToRun() ) );
+        }
+        else if ( MonthlySchedule.class.isAssignableFrom( task.getSchedule().getClass() ) )
+        {
+            resource = new ScheduledServiceMonthlyResource();
+
+            MonthlySchedule taskSchedule = (MonthlySchedule) task.getSchedule();
+            ScheduledServiceMonthlyResource res = (ScheduledServiceMonthlyResource) resource;
+
+            res.setStartDate( formatDate( taskSchedule.getStartDate() ) );
+            res.setRecurringTime( formatTime( taskSchedule.getStartDate() ) );
+            res.setRecurringDay( formatRecurringDayOfMonth( taskSchedule.getDaysToRun() ) );
+        }
+        else if ( CronSchedule.class.isAssignableFrom( task.getSchedule().getClass() ) )
+        {
+            resource = new ScheduledServiceAdvancedResource();
+
+            CronSchedule taskSchedule = (CronSchedule) task.getSchedule();
+            ScheduledServiceAdvancedResource res = (ScheduledServiceAdvancedResource) resource;
+
+            res.setCronCommand( taskSchedule.getCronString() );
+        }
+
+        if ( resource != null )
+        {
+            resource.setId( task.getId() );
+            resource.setEnabled( task.isEnabled() );
+            resource.setName( task.getName() );
+            resource.setSchedule( getScheduleShortName( task.getSchedule() ) );
+            resource.setTypeId( task.getType().getName() );
+            resource.setProperties( formatServiceProperties( task.getTaskParams() ) );
+        }
+        
+        return resource;
     }
 }

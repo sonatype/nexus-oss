@@ -21,7 +21,6 @@
 package org.sonatype.nexus.rest.schedules;
 
 import java.io.IOException;
-import java.util.concurrent.RejectedExecutionException;
 
 import org.restlet.Context;
 import org.restlet.data.Request;
@@ -29,8 +28,12 @@ import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.restlet.resource.Representation;
 import org.restlet.resource.Variant;
+import org.sonatype.nexus.rest.model.ScheduledServiceBaseResource;
+import org.sonatype.nexus.rest.model.ScheduledServiceResourceStatus;
+import org.sonatype.nexus.rest.model.ScheduledServiceResourceStatusResponse;
 import org.sonatype.scheduling.NoSuchTaskException;
 import org.sonatype.scheduling.ScheduledTask;
+import org.sonatype.scheduling.TaskState;
 
 public class ScheduledServiceRunResourceHandler extends AbstractScheduledServiceResourceHandler
 {
@@ -59,20 +62,40 @@ public class ScheduledServiceRunResourceHandler extends AbstractScheduledService
         try
         {
             ScheduledTask<?> task = getNexus().getTaskById( getScheduledServiceId() );
-
+            
             task.runNow();
 
-            getResponse().setStatus( Status.SUCCESS_ACCEPTED );
-        }
-        catch ( RejectedExecutionException e )
-        {
-            getResponse().setStatus( Status.CLIENT_ERROR_CONFLICT, e.getMessage() );
+            ScheduledServiceBaseResource resource = getServiceRestModel( task );
+            
+            
+            if ( resource != null )
+            {
+                ScheduledServiceResourceStatus resourceStatus = new ScheduledServiceResourceStatus();
+                resourceStatus.setResource( resource );
+                resourceStatus.setResourceURI( calculateSubReference( task.getId() ).toString() );
+                resourceStatus.setStatus( task.getTaskState().toString() );
+                resourceStatus.setCreated( task.getScheduledAt() == null ? "n/a" : task.getScheduledAt().toString() );
+                resourceStatus.setLastRunResult( TaskState.BROKEN.equals( task.getTaskState() ) ? "Error" : "Ok" );
+                resourceStatus.setLastRunTime( task.getLastRun() == null ? "n/a" : task.getLastRun().toString() );
+                resourceStatus.setNextRunTime( task.getNextRun() == null ? "n/a" : task.getNextRun().toString() );
+
+                ScheduledServiceResourceStatusResponse response = new ScheduledServiceResourceStatusResponse();
+                response.setData( resourceStatus );
+
+                return serialize( variant, response );
+            }
+
+            getResponse().setStatus( Status.CLIENT_ERROR_NOT_FOUND, "Invalid schedule id (" + getScheduledServiceId() + "), can't load task." );
+
+            return null;
         }
         catch ( NoSuchTaskException e )
         {
-            getResponse().setStatus( Status.CLIENT_ERROR_NOT_FOUND, "Scheduled service not found!" );
-        }
+            getResponse().setStatus(
+                Status.CLIENT_ERROR_NOT_FOUND,
+                "There is no task with ID=" + getScheduledServiceId() );
 
-        return null;
+            return null;
+        }
     }
 }

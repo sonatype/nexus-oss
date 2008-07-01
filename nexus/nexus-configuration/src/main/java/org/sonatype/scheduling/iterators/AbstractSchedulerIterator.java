@@ -75,6 +75,16 @@ public abstract class AbstractSchedulerIterator
     public final Date next()
     {
         Date result = peekNext();
+        
+        Date now = new Date();
+        
+        // Blow through all iterations up until we reach some point in the future (even a single millisecond will do)
+        while ( result != null && result.before( now ))
+        {
+            stepNext();
+            
+            result = peekNext();
+        }
 
         stepNext();
 
