@@ -364,7 +364,7 @@ public abstract class AbstractResourceStoreContentResource
             // redirecting Velocity logging to Log4j
             engine.setProperty(
                 RuntimeConstants.RUNTIME_LOG_LOGSYSTEM_CLASS,
-                "org.apache.velocity.runtime.log.Log4JLogChute" );
+                "org.apache.velocity.runtime.log.Log4JLogSystem" );
 
             // setting the logger name
             engine.setProperty(
