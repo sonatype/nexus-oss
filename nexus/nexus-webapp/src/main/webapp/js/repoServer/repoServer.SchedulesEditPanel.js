@@ -846,15 +846,19 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
               items: [
                 {
                   xtype: 'textfield',
-                  fieldLabel: 'CRON command',
+                  fieldLabel: 'CRON expression',
                   itemCls: 'required-field',
                   name: 'cronCommand',
                   helpText: ht.cronCommand,
-//                  width: 200,
-                  anchor: Sonatype.view.FIELDSET_OFFSET,
                   disabled:true,
-                  allowBlank:false
-                }
+                  allowBlank:false,
+                  width: this.COMBO_WIDTH
+                },
+                {
+                  xtype: 'panel',
+                  layout: 'fit',
+                  html: Sonatype.repoServer.resources.help.cronBigHelp.text
+                }                
               ]
             }
           ]
@@ -871,7 +875,7 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
   };
 
   this.schedulesGridPanel = new Ext.grid.GridPanel({
-    title: 'Scheduled Services',
+    title: 'Scheduled Tasks',
     id: 'st-schedules-grid',
     
     region: 'north',
@@ -926,7 +930,7 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
     autoExpandColumn: 'schedule-config-service-last-result-col',
     disableSelection: false,
     viewConfig: {
-      emptyText: 'Click "Add" to create a scheduled service.'
+      emptyText: 'Click "Add" to create a scheduled task.'
     }
   });
   this.schedulesGridPanel.on('rowclick', this.rowClick, this);
@@ -942,7 +946,7 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
       {
         xtype: 'panel',
         id: 'schedule-config-forms',
-        title: 'Scheduled Service Configuration',
+        title: 'Scheduled Task Configuration',
         layout: 'card',
         region: 'center',
         activeItem: 0,
@@ -953,7 +957,7 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
           {
             xtype: 'panel',
             layout: 'fit',
-            html: '<div class="little-padding">Select a scheduled service to edit it, or click "Add" to create a new one.</div>'
+            html: '<div class="little-padding">Select a scheduled task to edit it, or click "Add" to create a new one.</div>'
           }
         ]
       }
@@ -1175,7 +1179,7 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
       form.doAction('sonatypeSubmit', {
         method: (isNew) ? 'POST' : 'PUT',
         url: isNew ? createUri : updateUri,
-        waitMsg: isNew ? 'Creating scheduled service...' : 'Updating scheduled service configuration...',
+        waitMsg: isNew ? 'Creating scheduled task...' : 'Updating scheduled task configuration...',
         fpanel: formInfoObj.formPanel,
         dataModifiers: this.submitDataModFuncs[serviceSchedule],
         serviceDataObj : Sonatype.repoServer.referenceData.schedule[serviceSchedule],
@@ -1246,7 +1250,7 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
     
     //add place holder to grid
     var newRec = new this.scheduleRecordConstructor({
-        name : 'New Scheduled Service',
+        name : 'New Scheduled Task',
         resourceURI : 'new'
       },
       id); //use "new_schedule_" id instead of resourceURI like the reader does
@@ -1299,8 +1303,8 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
         
         Ext.Msg.show({
           animEl: this.schedulesGridPanel.getEl(),
-          title : 'Delete Scheduled Service?',
-          msg : 'Delete the ' + rec.get('name') + ' scheduled service?',
+          title : 'Delete Scheduled Task?',
+          msg : 'Delete the ' + rec.get('name') + ' scheduled task?',
           buttons: Ext.Msg.YESNO,
           scope: this,
           icon: Ext.Msg.QUESTION,
@@ -1352,7 +1356,7 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
       }
     }
     else {
-      Ext.MessageBox.alert('The server did not delete the scheduled service.');
+      Ext.MessageBox.alert('The server did not delete the scheduled task.');
     }
   },
   
@@ -1368,8 +1372,8 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
         
       Ext.Msg.show({
         animEl: this.schedulesGridPanel.getEl(),
-        title : 'Run Scheduled Service?',
-        msg : 'Run the ' + rec.get('name') + ' scheduled service?',
+        title : 'Run Scheduled Task?',
+        msg : 'Run the ' + rec.get('name') + ' scheduled task?',
         buttons: Ext.Msg.YESNO,
         scope: this,
         icon: Ext.Msg.QUESTION,
@@ -1392,7 +1396,7 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
   
   runCallback : function(options, isSuccess, response){
     if(!isSuccess){
-      Ext.MessageBox.alert('The server did not run the scheduled service.');
+      Ext.MessageBox.alert('The server did not run the scheduled task.');
     }
   },
     
