@@ -361,6 +361,16 @@ public abstract class AbstractResourceStoreContentResource
             // Setup the velocity classloader, to find the template properly
             VelocityEngine engine = representation.getEngine();
 
+            // redirecting Velocity logging to Log4j
+            engine.setProperty(
+                RuntimeConstants.RUNTIME_LOG_LOGSYSTEM_CLASS,
+                "org.apache.velocity.runtime.log.Log4JLogChute" );
+
+            // setting the logger name
+            engine.setProperty(
+                "runtime.log.logsystem.log4j.logger",
+                "org.sonatype.nexus.rest.AbstractResourceStoreContentResource.velocity" );
+
             engine.setProperty( RuntimeConstants.RESOURCE_LOADER, "class" );
 
             engine.setProperty(
