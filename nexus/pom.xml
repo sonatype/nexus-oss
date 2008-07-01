@@ -564,8 +564,8 @@
 								<bannedDependencies>
 									<excludes>
 										<exclude>commons-logging:*</exclude>
-                                        <exclude>*:velocity:1.4</exclude>
-                                        <exclude>*:velocity-dep:1.4</exclude>
+                                   <!--     <exclude>*:velocity:1.4</exclude>
+                                        <exclude>*:velocity-dep:1.4</exclude>-->
 									</excludes>
 									<message>
 										commons-logging conflicts with slf4j. You probably added a dependency that is
