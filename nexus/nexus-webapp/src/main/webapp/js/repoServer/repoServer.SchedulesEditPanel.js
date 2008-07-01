@@ -1388,6 +1388,7 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
         icon: Ext.Msg.QUESTION,
         fn: function(btnName){
           if (btnName == 'yes' || btnName == 'ok') {
+            this.alreadyDeferred = false;
             Ext.Ajax.request({
               callback: this.runCallback,
               cbPassThru: {
@@ -1407,15 +1408,20 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
     if(!isSuccess){
       Ext.MessageBox.alert('The server did not run the scheduled task.');
     }
-    else {
-        var receivedData = Ext.decode(response.responseText).data;
-        var i = this.schedulesDataStore.indexOfId(options.cbPassThru.resourceId);
-        var rec = this.schedulesDataStore.getAt(i);
+    else if (!this.alreadyDeferred)
+    {
+      var receivedData = Ext.decode(response.responseText).data;
+      var i = this.schedulesDataStore.indexOfId(options.cbPassThru.resourceId);
+      var rec = this.schedulesDataStore.getAt(i);
 
-        this.updateServiceRecord(rec, receivedData);
-        
-        var sortState = this.schedulesDataStore.getSortState();
-        this.schedulesDataStore.sort(sortState.field, sortState.direction);
+      this.updateServiceRecord(rec, receivedData);
+      
+      this.schedulesDataStore.commitChanges();        
+      
+      var sortState = this.schedulesDataStore.getSortState();
+      this.schedulesDataStore.sort(sortState.field, sortState.direction);
+      this.alreadyDeferred = true;
+      this.runCallback.defer(500, this, [options, isSuccess, response]);
     }
   },
     
