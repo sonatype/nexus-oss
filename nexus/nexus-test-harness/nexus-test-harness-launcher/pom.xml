@@ -14,7 +14,8 @@
 		<config-expanded-dir>target/test-nexus-config</config-expanded-dir>
 		<nexus-basedir>${bundle-expanded-dir}/nexus-webapp-${project.version}</nexus-basedir>
 		<config-target-dir>${nexus-basedir}/runtime/apps/nexus/conf</config-target-dir>
-		<work-target-dir>${nexus-basedir}/runtime/work</work-target-dir>
+		<work-target-dir>${nexus-basedir}/runtime/work</work-target-dir>		
+		<proxy-repo-target-dir>${nexus-basedir}/proxy-repos/</proxy-repo-target-dir>
 		<plexus-config-file>${nexus-basedir}/conf/plexus.xml</plexus-config-file>
 		<nexus-application-protocol>http</nexus-application-protocol>
 		<nexus-application-host>localhost</nexus-application-host>
@@ -102,6 +103,7 @@
                             <outputDirectory>
                                 ${bundle-expanded-dir}
                             </outputDirectory>
+                            <excludes>**/conf/plexus.properties</excludes>                            
                         </configuration>
                     </execution>
                     <execution>
