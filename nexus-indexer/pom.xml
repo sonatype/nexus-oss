@@ -55,14 +55,6 @@
         <maven.artifact.version>3.0-SONATYPE-653272</maven.artifact.version>
 	</properties>
      
-     <!--override the snapshot included in maven-->
-     <dependencyManagement>
-       <dependencies>
-         <groupId>org.apache.xbean</groupId>
-         <artifactId>xbean-reflect</artifactId>
-         <version>3.4</version>
-       </dependencies>
-     </dependencyManagement>
      
     <dependencies>
 
