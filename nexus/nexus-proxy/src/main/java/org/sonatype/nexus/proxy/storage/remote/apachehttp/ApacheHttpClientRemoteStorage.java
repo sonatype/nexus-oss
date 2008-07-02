@@ -45,11 +45,11 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpHead;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.conn.ClientConnectionManager;
-import org.apache.http.conn.PlainSocketFactory;
-import org.apache.http.conn.Scheme;
-import org.apache.http.conn.SchemeRegistry;
 import org.apache.http.conn.params.ConnRoutePNames;
 import org.apache.http.conn.params.HttpConnectionManagerParams;
+import org.apache.http.conn.scheme.PlainSocketFactory;
+import org.apache.http.conn.scheme.Scheme;
+import org.apache.http.conn.scheme.SchemeRegistry;
 import org.apache.http.conn.ssl.SSLSocketFactory;
 import org.apache.http.entity.HttpEntityWrapper;
 import org.apache.http.impl.client.DefaultHttpClient;
@@ -409,11 +409,9 @@ public class ApacheHttpClientRemoteStorage
         {
             getLogger().error( "Tranport error while executing " + request.getMethod() + " method", ex );
         }
-        catch ( InterruptedException ex )
-        {
-            getLogger().error( "Interrupted while executing " + request.getMethod() + " method", ex );
-        }
+        
         getLogger().debug( "HTTPClient :: executeMethod() DONE" );
+        
         return response;
     }
 

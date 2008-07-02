@@ -72,6 +72,7 @@ import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryGroupException;
 import org.sonatype.nexus.proxy.RepositoryNotAvailableException;
 import org.sonatype.nexus.proxy.StorageException;
+import org.sonatype.nexus.proxy.cache.CacheManager;
 import org.sonatype.nexus.proxy.events.AbstractEvent;
 import org.sonatype.nexus.proxy.events.EventListener;
 import org.sonatype.nexus.proxy.events.RepositoryEventLocalStatusChanged;
@@ -181,6 +182,13 @@ public class DefaultNexus
      * @plexus.requirement
      */
     private Wastebasket wastebasket;
+
+    /**
+     * The CacheManager component.
+     * 
+     * @plexus.requirement
+     */
+    private CacheManager cacheManager;
 
     /**
      * System status.
@@ -1063,9 +1071,9 @@ public class DefaultNexus
 
     // =============
     // Schedules
-    
+
     public <T> ScheduledTask<T> store( String name, SchedulerTask<T> task )
-        throws RejectedExecutionException, 
+        throws RejectedExecutionException,
             NullPointerException
     {
         return nexusScheduler.store( name, task );
@@ -1278,6 +1286,8 @@ public class DefaultNexus
 
             nexusConfiguration.notifyConfigurationChangeListeners();
 
+            cacheManager.startService();
+
             feedRecorder.startService();
 
             nexusScheduler.startService();
@@ -1376,6 +1386,8 @@ public class DefaultNexus
         }
 
         feedRecorder.stopService();
+
+        cacheManager.stopService();
 
         systemStatus.setState( SystemState.STOPPED );
 

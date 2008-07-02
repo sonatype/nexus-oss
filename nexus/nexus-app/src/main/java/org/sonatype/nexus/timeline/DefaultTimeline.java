@@ -153,7 +153,12 @@ public class DefaultTimeline
                     indexWriter = new NexusIndexWriter( indexDirectory, new KeywordAnalyzer(), true );
                 }
 
-                indexWriter.optimize();
+                // TODO: decide should optimize happen here?
+                // indexWriter.optimize();
+
+                indexWriter.close();
+
+                indexWriter = null;
 
                 running = true;
             }
@@ -188,6 +193,7 @@ public class DefaultTimeline
             {
                 if ( indexWriter != null )
                 {
+                    // TODO: decide should this happen here?
                     indexWriter.optimize();
 
                     indexWriter.close();

@@ -85,35 +85,42 @@ public class CommonsHttpClientRemoteStorage
         HttpMethodBase method = new HeadMethod( getAbsoluteUrlFromBase( uid ).toString() );
 
         int response = HttpStatus.SC_BAD_REQUEST;
-        
+
         boolean doGet = false;
-        
+
         try
         {
             response = executeMethod( uid, method );
+
+            method.releaseConnection();
         }
         catch ( StorageException e )
         {
-            //If HEAD failed, attempt a GET.  Some repos may not support HEAD method
+            // If HEAD failed, attempt a GET. Some repos may not support HEAD method
             doGet = true;
+
             getLogger().warn( "HEAD method failed, will attempt GET.  Exception: " + e.getMessage() );
         }
         finally
         {
-            //HEAD returned error, but not exception, try GET before failing
-            if ( doGet == false
-                && response != HttpStatus.SC_OK )
+            // HEAD returned error, but not exception, try GET before failing
+            if ( doGet == false && response != HttpStatus.SC_OK )
             {
                 doGet = true;
                 getLogger().warn( "HEAD method failed, will attempt GET.  Status: " + response );
             }
         }
-        
+
         if ( doGet )
         {
+            // create a GET
             method = new GetMethod( getAbsoluteUrlFromBase( uid ).toString() );
-            
+
+            // execute it
             response = executeMethod( uid, method );
+
+            // and release it immediately
+            method.releaseConnection();
         }
 
         if ( response == HttpStatus.SC_OK )
@@ -128,16 +135,11 @@ public class CommonsHttpClientRemoteStorage
         }
         else
         {
-            throw new StorageException( "The response to HTTP " + method.getName() + " was unexpected HTTP Code " + response + " : "
-                + HttpStatus.getStatusText( response ) );
+            throw new StorageException( "The response to HTTP " + method.getName() + " was unexpected HTTP Code "
+                + response + " : " + HttpStatus.getStatusText( response ) );
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.sonatype.nexus.storage.remote.RemoteRepositoryStorage#deleteItem(org.sonatype.nexus.item.RepositoryItemUid)
-     */
     public void deleteItem( RepositoryItemUid uid )
         throws ItemNotFoundException,
             UnsupportedStorageOperationException,
@@ -148,16 +150,10 @@ public class CommonsHttpClientRemoteStorage
             + getAbsoluteUrlFromBase( uid ).toString() );
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.sonatype.nexus.storage.remote.RemoteRepositoryStorage#retrieveItem(org.sonatype.nexus.item.RepositoryItemUid)
-     */
     public AbstractStorageItem retrieveItem( RepositoryItemUid uid )
         throws ItemNotFoundException,
             StorageException
     {
-        // TODO: implement conditional GET
         HttpMethod method = null;
         method = new GetMethod( getAbsoluteUrlFromBase( uid ).toString() );
 
@@ -210,17 +206,20 @@ public class CommonsHttpClientRemoteStorage
             catch ( IOException ex )
             {
                 method.releaseConnection();
+                
                 throw new StorageException( "IO Error during response stream handling!", ex );
             }
             catch ( RuntimeException ex )
             {
                 method.releaseConnection();
+                
                 throw ex;
             }
         }
         else
         {
             method.releaseConnection();
+
             if ( response == HttpStatus.SC_NOT_FOUND )
             {
                 throw new ItemNotFoundException( getAbsoluteUrlFromBase( uid ).toString() );
@@ -232,11 +231,6 @@ public class CommonsHttpClientRemoteStorage
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.sonatype.nexus.storage.remote.RemoteRepositoryStorage#storeItem(org.sonatype.nexus.item.AbstractStorageItem)
-     */
     public void storeItem( AbstractStorageItem item )
         throws UnsupportedStorageOperationException,
             StorageException
@@ -381,7 +375,8 @@ public class CommonsHttpClientRemoteStorage
     }
 
     /**
-     * Execute method.
+     * Execute method. In case of any exception thrown by HttpClient, it will release the connection. In other cases it
+     * is the duty of caller to do it, or process the input stream.
      * 
      * @param method the method
      * @return the int
@@ -433,16 +428,21 @@ public class CommonsHttpClientRemoteStorage
         }
 
         int resultCode = 0;
+
         try
         {
             resultCode = httpClient.executeMethod( httpConfiguration, method );
         }
         catch ( HttpException ex )
         {
+            method.releaseConnection();
+
             throw new StorageException( "Protocol error while executing " + method.getName() + " method", ex );
         }
         catch ( IOException ex )
         {
+            method.releaseConnection();
+
             throw new StorageException( "Tranport error while executing " + method.getName() + " method", ex );
         }
 

@@ -24,6 +24,7 @@ import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
 import org.sonatype.jettytestsuite.ServletServer;
 import org.sonatype.nexus.proxy.item.StorageItem;
+import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 import org.sonatype.nexus.proxy.storage.remote.commonshttpclient.CommonsHttpClientRemoteStorage;
 
@@ -77,4 +78,33 @@ public class SimpleRemoteLeakTest
         assertEquals( 2, cm.getConnectionsInPool() );
 
     }
+
+    public void testSimplerAvailabilityCheckRemoteLeak()
+        throws Exception
+    {
+
+        // mangle one repos to have quasi different host, thus different HttpCommons HostConfig
+        getRepositoryRegistry().getRepository( "repo1" ).setRemoteUrl(
+            getRepositoryRegistry().getRepository( "repo1" ).getRemoteUrl().replace( "localhost", "some.nonexistent.domain.org.com" ) );
+
+        Repository repo1 = getRepositoryRegistry().getRepository( "repo1" );
+        Repository repo2 = getRepositoryRegistry().getRepository( "repo2" );
+
+        for ( int i = 0; i < 2; i++ )
+        {
+            repo1.isRemoteStorageReachable();
+            
+            repo2.isRemoteStorageReachable();
+        }
+
+        // get the default context, since they used it
+        RemoteStorageContext ctx = getRemoteStorageContext();
+
+        MultiThreadedHttpConnectionManager cm = (MultiThreadedHttpConnectionManager) ( (HttpClient) ctx
+            .getRemoteConnectionContext().get( CommonsHttpClientRemoteStorage.CTX_KEY_CLIENT ) )
+            .getHttpConnectionManager();
+        assertEquals( 2, cm.getConnectionsInPool() );
+
+    }
+
 }
