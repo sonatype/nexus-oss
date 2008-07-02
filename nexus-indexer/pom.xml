@@ -8,7 +8,7 @@
 
     <groupId>org.sonatype.nexus</groupId>
     <artifactId>nexus-indexer</artifactId>
-    <version>1.0-beta-5-SNAPSHOT</version>
+    <version>1.0-beta-4.1-SNAPSHOT</version>
     <name>Sonatype Nexus: Indexer</name>
 
     <licenses>
@@ -54,6 +54,15 @@
 		<maven.version>2.1-SONATYPE-653485</maven.version>
         <maven.artifact.version>3.0-SONATYPE-653272</maven.artifact.version>
 	</properties>
+     
+     <!--override the snapshot included in maven-->
+     <dependencyManagement>
+       <dependencies>
+         <groupId>org.apache.xbean</groupId>
+         <artifactId>xbean-reflect</artifactId>
+         <version>3.4</version>
+       </dependencies>
+     </dependencyManagement>
      
     <dependencies>
 
