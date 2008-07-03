@@ -46,12 +46,13 @@ public class DefaultIndexNexusIndexerTest
             indexDir,
             null,
             null,
-            NexusIndexer.DEFAULT_INDEX, false );
-        
-        assertNull( context.getTimestamp() );  // unknown upon creation
-        
+            NexusIndexer.DEFAULT_INDEX,
+            false );
+
+        assertNull( context.getTimestamp() ); // unknown upon creation
+
         nexusIndexer.scan( context );
-        
+
         assertNotNull( context.getTimestamp() );
     }
 
@@ -148,69 +149,71 @@ public class DefaultIndexNexusIndexerTest
 
         assertEquals( "1.4.1", ai.version );
     }
-    
+
     public void testSearchArchetypes()
         throws Exception
     {
-//      TermQuery tq = new TermQuery(new Term(ArtifactInfo.PACKAGING, "maven-archetype"));
-//      BooleanQuery bq = new BooleanQuery();
-//      bq.add(new WildcardQuery(new Term(ArtifactInfo.GROUP_ID, term + "*")), Occur.SHOULD);
-//      bq.add(new WildcardQuery(new Term(ArtifactInfo.ARTIFACT_ID, term + "*")), Occur.SHOULD);
-//      FilteredQuery query = new FilteredQuery(tq, new QueryWrapperFilter(bq));
+        // TermQuery tq = new TermQuery(new Term(ArtifactInfo.PACKAGING, "maven-archetype"));
+        // BooleanQuery bq = new BooleanQuery();
+        // bq.add(new WildcardQuery(new Term(ArtifactInfo.GROUP_ID, term + "*")), Occur.SHOULD);
+        // bq.add(new WildcardQuery(new Term(ArtifactInfo.ARTIFACT_ID, term + "*")), Occur.SHOULD);
+        // FilteredQuery query = new FilteredQuery(tq, new QueryWrapperFilter(bq));
 
-      Query query = new TermQuery(new Term(ArtifactInfo.PACKAGING, "maven-archetype"));
+        Query query = new TermQuery( new Term( ArtifactInfo.PACKAGING, "maven-archetype" ) );
 
-      Collection<ArtifactInfo> r = nexusIndexer.searchFlat( ArtifactInfo.VERSION_COMPARATOR, query );
-      
-      assertEquals( 2, r.size() );
-      
-      Iterator<ArtifactInfo> it = r.iterator();
-      {
-          ArtifactInfo ai = it.next();
-          assertEquals( "org.apache.directory.server", ai.groupId );
-          assertEquals( "apacheds-schema-archetype", ai.artifactId );
-          assertEquals( "1.0.2", ai.version );
-      }
-      {
-          ArtifactInfo ai = it.next();
-          assertEquals( "org.terracotta.maven.archetypes", ai.groupId );
-          assertEquals( "pojo-archetype", ai.artifactId );
-          assertEquals( "1.0.3", ai.version );
-      }
-      
+        Collection<ArtifactInfo> r = nexusIndexer.searchFlat( ArtifactInfo.VERSION_COMPARATOR, query );
+
+        assertEquals( 2, r.size() );
+
+        Iterator<ArtifactInfo> it = r.iterator();
+        {
+            ArtifactInfo ai = it.next();
+            assertEquals( "org.apache.directory.server", ai.groupId );
+            assertEquals( "apacheds-schema-archetype", ai.artifactId );
+            assertEquals( "1.0.2", ai.version );
+        }
+        {
+            ArtifactInfo ai = it.next();
+            assertEquals( "org.terracotta.maven.archetypes", ai.groupId );
+            assertEquals( "pojo-archetype", ai.artifactId );
+            assertEquals( "1.0.3", ai.version );
+        }
+
     }
-    
-    public void testIndexTimestamp() throws Exception 
+
+    public void testIndexTimestamp()
+        throws Exception
     {
         ByteArrayOutputStream os = new ByteArrayOutputStream();
-        
+
         IndexUtils.packIndexArchive( context, os );
-        
+
         Thread.sleep( 1000L );
-        
+
         File newIndex = new File( getBasedir(), "target/test-new" );
-        
+
         Directory newIndexDir = FSDirectory.getDirectory( newIndex );
-        
+
         IndexUtils.unpackIndexArchive( new ByteArrayInputStream( os.toByteArray() ), newIndexDir );
-        
-        IndexingContext newContext = nexusIndexer.addIndexingContext( 
-            "test-new", 
-            "test", 
-            null, 
-            newIndexDir, 
-            null, 
-            null, 
-            NexusIndexer.DEFAULT_INDEX, false );
-        
+
+        IndexingContext newContext = nexusIndexer.addIndexingContext(
+            "test-new",
+            "test",
+            null,
+            newIndexDir,
+            null,
+            null,
+            NexusIndexer.DEFAULT_INDEX,
+            false );
+
         assertEquals( context.getTimestamp().getTime(), newContext.getTimestamp().getTime() );
 
         assertEquals( context.getTimestamp(), newContext.getTimestamp() );
 
         // make sure context has the same artifacts
-        
+
         Query query = nexusIndexer.constructQuery( ArtifactInfo.GROUP_ID, "qdox" );
-        
+
         Collection<ArtifactInfo> r = nexusIndexer.searchFlat( query, newContext );
 
         assertEquals( 2, r.size() );
@@ -228,24 +231,25 @@ public class DefaultIndexNexusIndexerTest
         assertEquals( "1.5", ai.version );
 
         assertEquals( "test", ai.repository );
-        
+
         Date timestamp = newContext.getTimestamp();
-        
+
         newContext.close( false );
-        
-        newContext = nexusIndexer.addIndexingContext( 
-            "test-new", 
-            "test", 
-            null, 
-            newIndexDir, 
-            null, 
-            null, 
-            NexusIndexer.DEFAULT_INDEX, false );
-        
+
+        newContext = nexusIndexer.addIndexingContext(
+            "test-new",
+            "test",
+            null,
+            newIndexDir,
+            null,
+            null,
+            NexusIndexer.DEFAULT_INDEX,
+            false );
+
         assertEquals( timestamp, newContext.getTimestamp() );
-        
+
         newContext.close( true );
-        
+
         assertFalse( new File( newIndex, "timestamp" ).exists() );
     }
 

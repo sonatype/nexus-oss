@@ -60,6 +60,20 @@ public abstract class AbstractRepoNexusIndexerTest
         assertGroup( 0, "org.apache.maven.plugins.maven-core-it-plugin", context );
     }
 
+    public void testSearchFlatPaged()
+        throws Exception
+    {
+        FlatSearchRequest request = new FlatSearchRequest( nexusIndexer.constructQuery( ArtifactInfo.GROUP_ID, "org" ) );
+
+        request.setStart( 0 );
+
+        request.setAiCount( 50 );
+
+        FlatSearchResponse response = nexusIndexer.searchFlat( request );
+
+        assertEquals( 12, response.getTotalHits() );
+    }
+
     public void testSearchFlat()
         throws Exception
     {
