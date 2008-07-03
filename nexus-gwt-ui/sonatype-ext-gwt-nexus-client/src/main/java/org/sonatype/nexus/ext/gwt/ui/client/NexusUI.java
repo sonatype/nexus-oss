@@ -330,7 +330,6 @@ public class NexusUI implements EntryPoint {
         });
     }
     
-    // TODO: Require a user object instead of a name
     private void updateLoginStatus(String userName, AuthenticationLoginResource auth) {
         if (userName != null && auth != null) {
             ctx.login(userName, auth);

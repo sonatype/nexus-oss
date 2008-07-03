@@ -16,7 +16,6 @@ public class ApplicationContext {
     
     private List<ServerType> serverTypes = new ArrayList<ServerType>();
     
-    private boolean userLoggedIn = false;
     private String userName;
     private AuthenticationClientPermissions userPermissions;
     
@@ -24,7 +23,6 @@ public class ApplicationContext {
         RepoServer repoServer = new RepoServer();
         repoServer.init();
         serverTypes.add(repoServer);
-        init();
     }
     
     public static ApplicationContext instance() {
@@ -52,10 +50,9 @@ public class ApplicationContext {
         Cookies.removeCookie("st-" + name);
     }
     
-    public void login(String userName, AuthenticationLoginResource auth) {
-        this.userLoggedIn = true;
-        this.userName = userName;
-        this.userPermissions = auth.getClientPermissions();
+    public void login(String name, AuthenticationLoginResource auth) {
+        userName = name;
+        userPermissions = auth.getClientPermissions();
         setCookie("username", userName);
         setCookie("authToken", auth.getAuthToken());
         getLocalRepoServer().addDefaultHeader(
@@ -63,25 +60,27 @@ public class ApplicationContext {
     }
     
     public void logout() {
-        userLoggedIn = false;
+        userName = null;
+        userPermissions = AuthenticationClientPermissions.getAnonymousUserPermissions();
         removeCookie("username");
         removeCookie("authToken");
         getLocalRepoServer().removeDefaultHeader("Authorization");
     }
 
-    public boolean checkPermission(String name, Integer value) {
-        return (((Integer) userPermissions.get(name)) & value) == value;
-    }
-    
-    public boolean isUserLoggedIn() {
-        return userLoggedIn;
-    }
-    
     public String getUserName() {
         return userName;
     }
 
-    private void init() {
+    public boolean isUserLoggedIn() {
+        return userName != null;
     }
 
+    public boolean checkPermission(String name, Integer value) {
+    	Integer permission = (Integer) userPermissions.get(name);
+    	if (permission == null) {
+    		return false;
+    	}
+        return (permission & value) == value;
+    }
+    
 }

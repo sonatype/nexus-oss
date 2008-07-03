@@ -9,6 +9,7 @@ import org.sonatype.nexus.ext.gwt.ui.client.data.ResponseHandler;
 import org.sonatype.nexus.ext.gwt.ui.client.reposerver.model.ContentListResource;
 import org.sonatype.nexus.ext.gwt.ui.client.reposerver.model.Repository;
 import org.sonatype.nexus.ext.gwt.ui.client.reposerver.model.RepositoryStatusResource;
+import org.sonatype.nexus.ext.gwt.ui.client.reposerver.model.AuthenticationClientPermissions.Permissions;
 
 import com.extjs.gxt.ui.client.Events;
 import com.extjs.gxt.ui.client.Style;
@@ -142,6 +143,9 @@ public class RepoMaintenancePage extends LayoutContainer implements ServerFuncti
 
         add(panel, panelLayoutData);
         
+        final boolean editEnabled
+                = ApplicationContext.instance().checkPermission("maintRepos", Permissions.EDIT);
+        
         ContextMenuProvider tableMenu = new ContextMenuProvider(table);
         
         tableMenu.addAction(new Action<Repository>("View") {
@@ -155,8 +159,7 @@ public class RepoMaintenancePage extends LayoutContainer implements ServerFuncti
         tableMenu.addAction(new Action<Repository>("Clear Cache") {
             
             public boolean supports(Repository repo) {
-                return ApplicationContext.instance().isUserLoggedIn() &&
-                       !repo.getRepoType().equals("virtual");
+                return editEnabled && !repo.getRepoType().equals("virtual");
             }
             
             public void execute(Repository repo) {
@@ -178,7 +181,7 @@ public class RepoMaintenancePage extends LayoutContainer implements ServerFuncti
         tableMenu.addAction(new Action<Repository>("Re-Index") {
             
             public boolean supports(Repository repo) {
-                return ApplicationContext.instance().isUserLoggedIn();
+                return editEnabled;
             }
 
             public void execute(Repository repo) {
@@ -200,7 +203,7 @@ public class RepoMaintenancePage extends LayoutContainer implements ServerFuncti
         tableMenu.addAction(new Action<Repository>("Rebuild Attributes") {
             
             public boolean supports(Repository repo) {
-                return ApplicationContext.instance().isUserLoggedIn();
+                return editEnabled;
             }
             
             public void execute(Repository repo) {
@@ -222,7 +225,7 @@ public class RepoMaintenancePage extends LayoutContainer implements ServerFuncti
         tableMenu.addAction(new Action<Repository>("Block Proxy") {
             
             public boolean supports(Repository repo) {
-                return ApplicationContext.instance().isUserLoggedIn() &&
+                return editEnabled &&
                        "proxy".equals(repo.getRepoType()) &&
                        "allow".equals(repo.getStatus().getProxyMode());
             }
@@ -250,7 +253,7 @@ public class RepoMaintenancePage extends LayoutContainer implements ServerFuncti
         tableMenu.addAction(new Action<Repository>("Allow Proxy") {
             
             public boolean supports(Repository repo) {
-                return ApplicationContext.instance().isUserLoggedIn() &&
+                return editEnabled &&
                        "proxy".equals(repo.getRepoType()) &&
                        !"allow".equals(repo.getStatus().getProxyMode());
             }
@@ -278,7 +281,7 @@ public class RepoMaintenancePage extends LayoutContainer implements ServerFuncti
         tableMenu.addAction(new Action<Repository>("Put Out of Service") {
             
             public boolean supports(Repository repo) {
-                return ApplicationContext.instance().isUserLoggedIn() &&
+                return editEnabled &&
                        "inService".equals(repo.getStatus().getLocalStatus());
             }
             
@@ -305,7 +308,7 @@ public class RepoMaintenancePage extends LayoutContainer implements ServerFuncti
         tableMenu.addAction(new Action<Repository>("Put in Service") {
             
             public boolean supports(Repository repo) {
-                return ApplicationContext.instance().isUserLoggedIn() &&
+                return editEnabled &&
                        "outOfService".equals(repo.getStatus().getLocalStatus());
             }
             
@@ -379,12 +382,15 @@ public class RepoMaintenancePage extends LayoutContainer implements ServerFuncti
             }
         };
 
+        final boolean editEnabled
+                = ApplicationContext.instance().checkPermission("maintRepos", Permissions.EDIT);
+
         ContextMenuProvider treeMenu = new ContextMenuProvider(tree);
         
         treeMenu.addAction(new Action<ContentListResource>("Clear Cache") {
             
             public boolean supports(ContentListResource data) {
-                return ApplicationContext.instance().isUserLoggedIn() &&
+                return editEnabled &&
                        !"virtual".equals(repoTreeBinding.getSelectedRepository().getRepoType());
             }
             
@@ -409,7 +415,7 @@ public class RepoMaintenancePage extends LayoutContainer implements ServerFuncti
         treeMenu.addAction(new Action<ContentListResource>("Re-Index") {
             
             public boolean supports(ContentListResource data) {
-                return ApplicationContext.instance().isUserLoggedIn();
+                return editEnabled;
             }
             
             public void execute(ContentListResource data) {
@@ -433,7 +439,7 @@ public class RepoMaintenancePage extends LayoutContainer implements ServerFuncti
         treeMenu.addAction(new Action<ContentListResource>("Rebuild Attributes") {
             
             public boolean supports(ContentListResource data) {
-                return ApplicationContext.instance().isUserLoggedIn();
+                return editEnabled;
             }
             
             public void execute(ContentListResource data) {
@@ -453,12 +459,40 @@ public class RepoMaintenancePage extends LayoutContainer implements ServerFuncti
             }
             
         });
-        
+
+        treeMenu.addAction(new Action<ContentListResource>("Download From Remote") {
+            
+            public boolean supports(ContentListResource data) {
+                return editEnabled && data.isLeaf() &&
+                       "proxy".equals(repoTreeBinding.getSelectedRepository().getRepoType());
+            }
+            
+            public void execute(ContentListResource data) {
+                String url = repoTreeBinding.
+                    getSelectedRepository().getRemoteUri() + data.getRelativePath();
+                Window.open(url, "_blank", "");
+            }
+            
+        });
+
+        treeMenu.addAction(new Action<ContentListResource>("Download") {
+            
+            public boolean supports(ContentListResource data) {
+                return editEnabled && data.isLeaf();
+            }
+            
+            public void execute(ContentListResource data) {
+                String url = Constants.HOST +
+                    "/nexus/content/repositories/apache-snapshots" + data.getRelativePath();
+                Window.open(url, "_blank", "");
+            }
+            
+        });
+
         treeMenu.addAction(new Action<ContentListResource>("Delete") {
             
             public boolean supports(ContentListResource data) {
-                return ApplicationContext.instance().isUserLoggedIn() &&
-                       data.getParent() != null;
+                return editEnabled && data.getParent() != null;
             }
             
             public void execute(final ContentListResource data) {
@@ -492,7 +526,7 @@ public class RepoMaintenancePage extends LayoutContainer implements ServerFuncti
         treeMenu.addAction(new Action<ContentListResource>("View Remote") {
             
             public boolean supports(ContentListResource data) {
-                return ApplicationContext.instance().isUserLoggedIn() &&
+                return editEnabled &&
                        "proxy".equals(repoTreeBinding.getSelectedRepository().getRepoType()) &&
                        !data.isLeaf() && data.getParent() != null;
             }
@@ -500,35 +534,6 @@ public class RepoMaintenancePage extends LayoutContainer implements ServerFuncti
             public void execute(ContentListResource data) {
                 String url = repoTreeBinding.
                     getSelectedRepository().getRemoteUri() + data.getRelativePath();
-                Window.open(url, "_blank", "");
-            }
-            
-        });
-
-        treeMenu.addAction(new Action<ContentListResource>("Download From Remote") {
-            
-            public boolean supports(ContentListResource data) {
-                return ApplicationContext.instance().isUserLoggedIn() && data.isLeaf() &&
-                       "proxy".equals(repoTreeBinding.getSelectedRepository().getRepoType());
-            }
-            
-            public void execute(ContentListResource data) {
-                String url = repoTreeBinding.
-                    getSelectedRepository().getRemoteUri() + data.getRelativePath();
-                Window.open(url, "_blank", "");
-            }
-            
-        });
-
-        treeMenu.addAction(new Action<ContentListResource>("Download") {
-            
-            public boolean supports(ContentListResource data) {
-                return ApplicationContext.instance().isUserLoggedIn() && data.isLeaf();
-            }
-            
-            public void execute(ContentListResource data) {
-                String url = Constants.HOST +
-                    "/nexus/content/repositories/apache-snapshots" + data.getRelativePath();
                 Window.open(url, "_blank", "");
             }
             

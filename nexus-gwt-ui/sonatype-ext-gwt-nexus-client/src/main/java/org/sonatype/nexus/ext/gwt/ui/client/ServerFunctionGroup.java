@@ -17,6 +17,10 @@ public class ServerFunctionGroup {
         return functions;
     }
 
+    public int countFunctions() {
+        return functions.size();
+    }
+    
     public String getName() {
     	return name;
     }

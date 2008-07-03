@@ -8,6 +8,7 @@ import org.sonatype.nexus.ext.gwt.ui.client.ApplicationContext;
 import org.sonatype.nexus.ext.gwt.ui.client.ServerFunction;
 import org.sonatype.nexus.ext.gwt.ui.client.ServerFunctionGroup;
 import org.sonatype.nexus.ext.gwt.ui.client.ServerInstance;
+import org.sonatype.nexus.ext.gwt.ui.client.reposerver.model.AuthenticationClientPermissions.Permissions;
 
 public class RepoServer extends AbstractServerType {
 
@@ -19,11 +20,14 @@ public class RepoServer extends AbstractServerType {
     }
 
     public List<ServerFunctionGroup> getFunctionGroups() {
+        final ApplicationContext ctx = ApplicationContext.instance();
+
         List<ServerFunctionGroup> groups = new ArrayList<ServerFunctionGroup>();
-        if (ApplicationContext.instance().isUserLoggedIn()) {
-            ServerFunctionGroup viewsGroup = new ServerFunctionGroup(){
-                {
-                    setName("Views");
+
+        ServerFunctionGroup views = new ServerFunctionGroup(){
+            {
+                setName("Views");
+                if (ctx.checkPermission("viewSearch", Permissions.READ)) {
                     addFunction(new ServerFunction() {
                         {
                             setMenuName("Artifact Search");
@@ -31,6 +35,27 @@ public class RepoServer extends AbstractServerType {
                             setPanel(new EmptyPage());
                         }
                     });
+                }
+                if (ctx.checkPermission("maintRepos", Permissions.READ) &&
+                	!ctx.checkPermission("maintRepos", Permissions.EDIT)) {
+                    addFunction(new ServerFunction() {
+                        {
+                            setMenuName("Browse Repositories");
+                            setTabName("Repositories");
+                            setPanel(new RepoMaintenancePage());
+                        }
+                    });
+                }
+                if (ctx.checkPermission("viewUpdatedArtifacts", Permissions.READ)) {
+                    addFunction(new ServerFunction() {
+                        {
+                            setMenuName("Recently Updated Artifacts");
+                            setTabName("Updated Artifacts");
+                            setPanel(new EmptyPage());
+                        }
+                    });
+                }
+                if (ctx.checkPermission("viewCachedArtifacts", Permissions.READ)) {
                     addFunction(new ServerFunction() {
                         {
                             setMenuName("Recently Cached Artifacts");
@@ -38,6 +63,8 @@ public class RepoServer extends AbstractServerType {
                             setPanel(new EmptyPage());
                         }
                     });
+                }
+                if (ctx.checkPermission("viewDeployedArtifacts", Permissions.READ)) {
                     addFunction(new ServerFunction() {
                         {
                             setMenuName("Recently Deployed Artifacts");
@@ -45,6 +72,8 @@ public class RepoServer extends AbstractServerType {
                             setPanel(new EmptyPage());
                         }
                     });
+                }
+                if (ctx.checkPermission("viewSystemChanges", Permissions.READ)) {
                     addFunction(new ServerFunction() {
                         {
                             setMenuName("System Changes");
@@ -53,11 +82,16 @@ public class RepoServer extends AbstractServerType {
                         }
                     });
                 }
-            };
-            
-            ServerFunctionGroup maintenance = new ServerFunctionGroup(){
-                {
-                    setName("Maintenance");
+            }
+        };
+        if (views.countFunctions() > 0) {
+            groups.add(views);
+        }
+
+        ServerFunctionGroup maintenance = new ServerFunctionGroup(){
+            {
+                setName("Maintenance");
+                if (ctx.checkPermission("maintRepos", Permissions.EDIT)) {
                     addFunction(new ServerFunction() {
                         {
                             setMenuName("Repositories");
@@ -65,6 +99,8 @@ public class RepoServer extends AbstractServerType {
                             setPanel(new RepoMaintenancePage());
                         }
                     });
+                }
+                if (ctx.checkPermission("maintConfig", Permissions.READ)) {
                     addFunction(new ServerFunction() {
                         {
                             setMenuName("View Server Config");
@@ -72,6 +108,8 @@ public class RepoServer extends AbstractServerType {
                             setPanel(new EmptyPage());
                         }
                     });
+                }
+                if (ctx.checkPermission("maintLogs", Permissions.READ)) {
                     addFunction(new ServerFunction() {
                         {
                             setMenuName("View Server Logs");
@@ -80,11 +118,16 @@ public class RepoServer extends AbstractServerType {
                         }
                     });
                 }
-            };
+            }
+        };
+        if (maintenance.countFunctions() > 0) {
+            groups.add(maintenance);
+        }
             
-            ServerFunctionGroup configuration = new ServerFunctionGroup(){
-                {
-                    setName("Configuration");
+        ServerFunctionGroup configuration = new ServerFunctionGroup(){
+            {
+                setName("Configuration");
+                if (ctx.checkPermission("configServer", Permissions.EDIT)) {
                     addFunction(new ServerFunction() {
                         {
                             setMenuName("Server");
@@ -92,6 +135,8 @@ public class RepoServer extends AbstractServerType {
                             setPanel(new EmptyPage());
                         }
                     });
+                }
+                if (ctx.checkPermission("configRepos", Permissions.EDIT)) {
                     addFunction(new ServerFunction() {
                         {
                             setMenuName("Repositories");
@@ -99,6 +144,8 @@ public class RepoServer extends AbstractServerType {
                             setPanel(new EmptyPage());
                         }
                     });
+                }
+                if (ctx.checkPermission("configGroups", Permissions.EDIT)) {
                     addFunction(new ServerFunction() {
                         {
                             setMenuName("Groups");
@@ -106,6 +153,8 @@ public class RepoServer extends AbstractServerType {
                             setPanel(new EmptyPage());
                         }
                     });
+                }
+                if (ctx.checkPermission("configRules", Permissions.EDIT)) {
                     addFunction(new ServerFunction() {
                         {
                             setMenuName("Routing");
@@ -114,56 +163,12 @@ public class RepoServer extends AbstractServerType {
                         }
                     });
                 }
-            };
-            
-            groups.add(viewsGroup);
-            groups.add(maintenance);
+            }
+        };
+        if (configuration.countFunctions() > 0) {
             groups.add(configuration);
-        } else {
-            ServerFunctionGroup viewsGroup = new ServerFunctionGroup(){
-                {
-                    setName("Views");
-                    addFunction(new ServerFunction() {
-                        {
-                            setMenuName("Artifact Search");
-                            setTabName("Search");
-                            setPanel(new EmptyPage());
-                        }
-                    });
-                    addFunction(new ServerFunction() {
-                        {
-                            setMenuName("Browse Repositories");
-                            setTabName("Repositories");
-                            setPanel(new RepoMaintenancePage());
-                        }
-                    });
-                    addFunction(new ServerFunction() {
-                        {
-                            setMenuName("Recently Cached Artifacts");
-                            setTabName("Cached Artifacts");
-                            setPanel(new EmptyPage());
-                        }
-                    });
-                    addFunction(new ServerFunction() {
-                        {
-                            setMenuName("Recently Deployed Artifacts");
-                            setTabName("Deployed Artifacts");
-                            setPanel(new EmptyPage());
-                        }
-                    });
-                    addFunction(new ServerFunction() {
-                        {
-                            setMenuName("System Cahnges");
-                            setTabName("System Cahnges");
-                            setPanel(new EmptyPage());
-                        }
-                    });
-                }
-            };
-            
-            groups.add(viewsGroup);
         }
-        
+
         return groups;
     }
 

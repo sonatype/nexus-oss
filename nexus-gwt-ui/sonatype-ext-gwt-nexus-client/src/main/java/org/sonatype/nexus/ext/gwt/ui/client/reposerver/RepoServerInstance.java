@@ -160,9 +160,9 @@ public class RepoServerInstance extends ServerInstance {
                 NodeList nodes = doc.getElementsByTagName("clientPermissions").item(0).getChildNodes();
                 for (int i = 0; i < nodes.getLength(); ++i) {
                     Node node = nodes.item(i);
-                    short nodeType = node.getNodeType();
-                    if (nodeType == Node.ELEMENT_NODE) {
-                        clientPermissions.set(node.getNodeName(), node.getFirstChild().getNodeValue());
+                    if (node.getNodeType() == Node.ELEMENT_NODE) {
+                        String value = node.getFirstChild().getNodeValue();
+                        clientPermissions.set(node.getNodeName(), Integer.valueOf(value));
                     }
                 }
                 entity.setClientPermissions(clientPermissions);

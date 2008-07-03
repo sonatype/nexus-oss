@@ -114,4 +114,33 @@ public class AuthenticationClientPermissions extends BaseModelData implements En
         set("configRepos", configRepos);
     }
 
+    static public AuthenticationClientPermissions getAnonymousUserPermissions() {
+        AuthenticationClientPermissions permissions
+                = new AuthenticationClientPermissions();
+
+        permissions.setViewSearch(Permissions.READ);
+        permissions.setViewUpdatedArtifacts(Permissions.NONE);
+        permissions.setViewCachedArtifacts(Permissions.READ);
+        permissions.setViewDeployedArtifacts(Permissions.READ);
+        permissions.setViewSystemChanges(Permissions.READ);
+        permissions.setMaintRepos(Permissions.READ);
+        permissions.setMaintLogs(Permissions.NONE);
+        permissions.setMaintConfig(Permissions.NONE);
+        permissions.setConfigServer(Permissions.NONE);
+        permissions.setConfigGroups(Permissions.NONE);
+        permissions.setConfigRules(Permissions.NONE);
+        permissions.setConfigRepos(Permissions.NONE);
+
+        return permissions;
+    }
+
+    public interface Permissions {
+
+        static public Integer NONE = 0;
+        static public Integer READ = 1;
+        static public Integer EDIT = 2;
+        static public Integer DELETE = 4;
+
+    }
+
 }
