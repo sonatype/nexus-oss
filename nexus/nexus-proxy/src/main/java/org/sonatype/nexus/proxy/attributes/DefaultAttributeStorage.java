@@ -107,6 +107,14 @@ public class DefaultAttributeStorage
             }
 
             lock = locks.get( uid.toString() );
+
+            if ( !create && lock != null )
+            {
+                if ( lock.getHoldCount() == 1 )
+                {
+                    locks.remove( uid.toString() );
+                }
+            }
         }
 
         return lock;
@@ -114,32 +122,12 @@ public class DefaultAttributeStorage
 
     protected void lockFor( RepositoryItemUid uid )
     {
-        synchronized ( locks )
-        {
-            getLock( uid, true ).lock();
-        }
+        getLock( uid, true ).lock();
     }
 
     protected void releaseFor( RepositoryItemUid uid )
     {
-        synchronized ( locks )
-        {
-            ReentrantLock lock = getLock( uid, false );
-
-            if ( lock != null )
-            {
-                lock.unlock();
-
-                if ( lock.getHoldCount() == 0 )
-                {
-                    locks.remove( uid.toString() );
-                }
-            }
-            else
-            {
-                getLogger().warn( "Had no lock for " + uid.toString() + "? (BUG)!" );
-            }
-        }
+        getLock( uid, false ).unlock();
     }
 
     /**
