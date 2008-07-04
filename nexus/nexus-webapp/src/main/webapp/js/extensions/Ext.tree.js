@@ -26,7 +26,7 @@ Ext.extend(Ext.tree.SonatypeTreeLoader, Ext.tree.TreeLoader, {
       if(this.fireEvent("beforeload", this, node, callback) !== false){
           this.transId = Ext.Ajax.request({
               method:this.requestMethod,
-              url: node.id,                                                     //diff
+              url: node.id + '?isLocal',                                                     //diff
               success: this.handleResponse,
               failure: this.handleFailure,
               scope: this,

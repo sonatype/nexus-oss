@@ -110,10 +110,10 @@ public class RepositoryItemUid
                 this.path = RepositoryItemUid.PATH_ROOT + path;
             }
 
-            if ( this.path.length() > 1 && this.path.endsWith( RepositoryItemUid.PATH_SEPARATOR ) )
-            {
-                this.path = path.substring( 0, this.path.length() - 1 );
-            }
+            // if ( this.path.length() > 1 && this.path.endsWith( RepositoryItemUid.PATH_SEPARATOR ) )
+            // {
+             //   this.path = path.substring( 0, this.path.length() - 1 );
+            // }
         }
         else
         {

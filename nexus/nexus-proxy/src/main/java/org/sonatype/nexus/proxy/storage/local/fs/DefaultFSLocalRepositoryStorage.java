@@ -168,7 +168,10 @@ public class DefaultFSLocalRepositoryStorage
         throws ItemNotFoundException,
             StorageException
     {
+        boolean mustBeACollection = tuid.getPath().endsWith( RepositoryItemUid.PATH_SEPARATOR );
+        
         String path = tuid.getPath();
+        
         if ( path.endsWith( "/" ) )
         {
             path = path.substring( 0, path.length() - 1 );
@@ -196,7 +199,7 @@ public class DefaultFSLocalRepositoryStorage
             result = coll;
 
         }
-        else if ( target.exists() && target.isFile() )
+        else if ( target.exists() && target.isFile() && !mustBeACollection )
         {
             if ( checkBeginOfFile( LINK_PREFIX, target ) )
             {
@@ -222,7 +225,9 @@ public class DefaultFSLocalRepositoryStorage
         {
             throw new ItemNotFoundException( uid );
         }
+        
         result.getItemContext().put( FS_FILE, target );
+        
         return result;
     }
 

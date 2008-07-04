@@ -54,7 +54,7 @@ public class SimplePullTest
         {
             item = getRouter( "repositories" ).retrieveItem(
                 new ResourceStoreRequest( "/repo1/activemq/activemq-core/1.2/broken/activemq-core-1.2", false ) );
-            
+
             fail();
         }
         catch ( ItemNotFoundException e )
@@ -206,6 +206,32 @@ public class SimplePullTest
         catch ( ItemNotFoundException e )
         {
             // good, this is what we need
+        }
+    }
+
+    public void testSimplePullOfSlashEndedFilePaths()
+        throws Exception
+    {
+        try
+        {
+            getRouter( "repositories" ).retrieveItem(
+                new ResourceStoreRequest( "/repo1/activemq/activemq-core/1.2/activemq-core-1.2.jar", false ) );
+        }
+        catch ( ItemNotFoundException e )
+        {
+            fail();
+        }
+
+        try
+        {
+            getRouter( "repositories" ).retrieveItem(
+                new ResourceStoreRequest( "/repo1/activemq/activemq-core/1.2/activemq-core-1.2.jar/", false ) );
+            
+            fail("The path ends with slash '/'!");
+        }
+        catch ( ItemNotFoundException e )
+        {
+            // good
         }
     }
 

@@ -59,6 +59,7 @@ import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.access.AccessDecisionVoter;
 import org.sonatype.nexus.proxy.access.CertificateBasedAccessDecisionVoter;
 import org.sonatype.nexus.proxy.access.IpAddressAccessDecisionVoter;
+import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
@@ -78,6 +79,8 @@ public abstract class AbstractResourceStoreContentResource
 {
     private String resourceStorePath;
 
+    private boolean isLocal;
+
     /**
      * The default Resource constructor. It is also calculating the path from undelrying resource store. It is actually
      * the "remaining" part from the matched Resource basename. It simply makes the path "absolute" by prepending a
@@ -94,7 +97,14 @@ public abstract class AbstractResourceStoreContentResource
         // overriding the "default" variant to text_html
         getVariants().add( 0, new Variant( MediaType.TEXT_HTML ) );
 
+        // get the path from request UIR
         resourceStorePath = parsePathFromUri( getRequest().getResourceRef().getRemainingPart() );
+
+        // check do we need local only access
+        isLocal = getRequest().getResourceRef().getQueryAsForm().getFirst( "isLocal" ) != null;
+
+        // overriding isLocal is we know it will be a collection
+        isLocal = isLocal || resourceStorePath.endsWith( RepositoryItemUid.PATH_SEPARATOR );
     }
 
     protected String parsePathFromUri( String uri )
@@ -161,7 +171,7 @@ public abstract class AbstractResourceStoreContentResource
      * @param isLocal
      * @return
      */
-    protected ResourceStoreRequest getResourceStoreRequest( boolean isLocal )
+    protected ResourceStoreRequest getResourceStoreRequest()
     {
         ResourceStoreRequest result = new ResourceStoreRequest( getResourceStorePath(), isLocal );
 
@@ -396,7 +406,7 @@ public abstract class AbstractResourceStoreContentResource
         {
             ResourceStore store = getResourceStore();
 
-            ResourceStoreRequest req = getResourceStoreRequest( false );
+            ResourceStoreRequest req = getResourceStoreRequest();
 
             StorageItem item = store.retrieveItem( req );
 
@@ -431,7 +441,7 @@ public abstract class AbstractResourceStoreContentResource
         {
             ResourceStore store = getResourceStore();
 
-            ResourceStoreRequest req = getResourceStoreRequest( false );
+            ResourceStoreRequest req = getResourceStoreRequest();
 
             StorageItem item = store.retrieveItem( req );
 
@@ -498,7 +508,7 @@ public abstract class AbstractResourceStoreContentResource
                 body = entity.getStream();
             }
 
-            ResourceStoreRequest req = getResourceStoreRequest( true );
+            ResourceStoreRequest req = getResourceStoreRequest();
 
             getResourceStore().storeItem( req, body, null );
         }
@@ -542,7 +552,7 @@ public abstract class AbstractResourceStoreContentResource
         {
             ResourceStore store = getResourceStore();
 
-            ResourceStoreRequest req = getResourceStoreRequest( true );
+            ResourceStoreRequest req = getResourceStoreRequest();
 
             store.deleteItem( req );
         }
