@@ -95,13 +95,13 @@ public class DefaultAttributeStorage
         this.workingDirectory = null;
     }
 
-    protected ReentrantLock getLock( RepositoryItemUid uid )
+    private ReentrantLock getLock( RepositoryItemUid uid, boolean create )
     {
         ReentrantLock lock = null;
 
         synchronized ( locks )
         {
-            if ( !locks.containsKey( uid.toString() ) )
+            if ( create && !locks.containsKey( uid.toString() ) )
             {
                 locks.put( uid.toString(), new ReentrantLock() );
             }
@@ -114,20 +114,30 @@ public class DefaultAttributeStorage
 
     protected void lockFor( RepositoryItemUid uid )
     {
-        getLock( uid ).lock();
+        synchronized ( locks )
+        {
+            getLock( uid, true ).lock();
+        }
     }
 
     protected void releaseFor( RepositoryItemUid uid )
     {
-        ReentrantLock lock = getLock( uid );
-
-        lock.unlock();
-
-        if ( lock.getHoldCount() == 0 )
+        synchronized ( locks )
         {
-            synchronized ( locks )
+            ReentrantLock lock = getLock( uid, false );
+
+            if ( lock != null )
             {
-                locks.remove( uid.toString() );
+                lock.unlock();
+
+                if ( lock.getHoldCount() == 0 )
+                {
+                    locks.remove( uid.toString() );
+                }
+            }
+            else
+            {
+                getLogger().warn( "Had no lock for " + uid.toString() + "? (BUG)!" );
             }
         }
     }

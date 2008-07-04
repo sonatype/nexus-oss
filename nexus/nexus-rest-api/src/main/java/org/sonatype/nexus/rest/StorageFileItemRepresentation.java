@@ -66,7 +66,7 @@ public class StorageFileItemRepresentation
         }
         finally
         {
-            is.close();
+            IOUtil.close( is );
         }
     }
 

@@ -124,11 +124,6 @@ public class DefaultStorageFileItem
         this.contentLocator = contentLocator;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.sonatype.nexus.item.StorageFileItem#getLength()
-     */
     public long getLength()
     {
         return length;
@@ -144,11 +139,6 @@ public class DefaultStorageFileItem
         this.length = length;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.sonatype.nexus.item.StorageFileItem#getMimeType()
-     */
     public String getMimeType()
     {
         return mimeType;
@@ -164,21 +154,11 @@ public class DefaultStorageFileItem
         this.mimeType = mimeType;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.sonatype.nexus.proxy.item.StorageFileItem#isReusableStream()
-     */
     public boolean isReusableStream()
     {
         return contentLocator.isReusable();
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.sonatype.nexus.item.StorageFileItem#getInputStream()
-     */
     public InputStream getInputStream()
         throws IOException
     {
@@ -194,7 +174,7 @@ public class DefaultStorageFileItem
             }
             else
             {
-                return null;
+                throw new IllegalStateException( "This item is NOT virtual, but does not have content? (BUG)" );
             }
         }
     }
