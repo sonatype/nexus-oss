@@ -24,7 +24,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.HashMap;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.commons.io.FilenameUtils;
@@ -70,7 +70,7 @@ public class DefaultAttributeStorage
     /**
      * The table of current operations.
      */
-    private volatile ConcurrentHashMap<String, ReentrantLock> locks;
+    private volatile HashMap<String, ReentrantLock> locks;
 
     /**
      * Instantiates a new FSX stream attribute storage.
@@ -82,7 +82,7 @@ public class DefaultAttributeStorage
         this.xstream.alias( "file", DefaultStorageFileItem.class );
         this.xstream.alias( "collection", DefaultStorageCollectionItem.class );
         this.xstream.alias( "link", DefaultStorageLinkItem.class );
-        this.locks = new ConcurrentHashMap<String, ReentrantLock>();
+        this.locks = new HashMap<String, ReentrantLock>();
     }
 
     public void initialize()
@@ -107,14 +107,6 @@ public class DefaultAttributeStorage
             }
 
             lock = locks.get( uid.toString() );
-
-            if ( !create && lock != null )
-            {
-                if ( lock.getHoldCount() == 1 )
-                {
-                    locks.remove( uid.toString() );
-                }
-            }
         }
 
         return lock;
@@ -172,10 +164,10 @@ public class DefaultAttributeStorage
 
     public boolean deleteAttributes( RepositoryItemUid uid )
     {
+        lockFor( uid );
+
         try
         {
-            lockFor( uid );
-
             if ( getLogger().isDebugEnabled() )
             {
                 getLogger().debug( "Deleting attributes on UID=" + uid.toString() );
@@ -204,10 +196,10 @@ public class DefaultAttributeStorage
 
     public AbstractStorageItem getAttributes( RepositoryItemUid uid )
     {
+        lockFor( uid );
+
         try
         {
-            lockFor( uid );
-
             if ( getLogger().isDebugEnabled() )
             {
                 getLogger().debug( "Loading attributes on UID=" + uid.toString() );
@@ -222,7 +214,7 @@ public class DefaultAttributeStorage
             }
             catch ( IOException ex )
             {
-                getLogger().error( "Got IOException during store of UID=" + uid.toString(), ex );
+                getLogger().error( "Got IOException during reading of UID=" + uid.toString(), ex );
 
                 return null;
             }
@@ -235,10 +227,10 @@ public class DefaultAttributeStorage
 
     public void putAttribute( AbstractStorageItem item )
     {
+        lockFor( item.getRepositoryItemUid() );
+
         try
         {
-            lockFor( item.getRepositoryItemUid() );
-
             if ( getLogger().isDebugEnabled() )
             {
                 getLogger().debug( "Storing attributes on UID=" + item.getRepositoryItemUid() );
