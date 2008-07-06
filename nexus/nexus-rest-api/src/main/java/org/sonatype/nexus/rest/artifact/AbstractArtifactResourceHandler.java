@@ -23,7 +23,6 @@ package org.sonatype.nexus.rest.artifact;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 
@@ -60,7 +59,6 @@ import org.sonatype.nexus.rest.ApplicationBridge;
 import org.sonatype.nexus.rest.NexusAuthenticationGuard;
 import org.sonatype.nexus.rest.StorageFileItemRepresentation;
 import org.sonatype.nexus.security.User;
-import org.sonatype.plexus.rest.representation.InputStreamRepresentation;
 
 public class AbstractArtifactResourceHandler
     extends AbstractNexusResourceHandler
