@@ -15,17 +15,16 @@ package org.sonatype.nexus.index;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
@@ -79,7 +78,7 @@ public class DefaultNexusIndexer
 
     public DefaultNexusIndexer()
     {
-        this.indexingContexts = new HashMap<String, IndexingContext>();
+        this.indexingContexts = new ConcurrentHashMap<String, IndexingContext>();
     }
 
     // ----------------------------------------------------------------------------
@@ -621,10 +620,7 @@ public class DefaultNexusIndexer
         throws IOException,
             IndexContextInInconsistentStateException
     {
-        return searcher.searchFlat(
-            artifactInfoComparator,
-            new ArrayList<IndexingContext>( indexingContexts.values() ),
-            query );
+        return searcher.searchFlat( artifactInfoComparator, indexingContexts.values(), query );
     }
 
     @Deprecated
@@ -642,7 +638,7 @@ public class DefaultNexusIndexer
     {
         if ( request.getContext() == null )
         {
-            return searcher.searchFlatPaged( request, new ArrayList<IndexingContext>( indexingContexts.values() ) );
+            return searcher.searchFlatPaged( request, indexingContexts.values() );
         }
         else
         {
@@ -674,7 +670,7 @@ public class DefaultNexusIndexer
     {
         return searcher.searchGrouped(
             new GroupedSearchRequest( query, grouping, groupKeyComparator ),
-            new ArrayList<IndexingContext>( indexingContexts.values() ) ).getResults();
+            indexingContexts.values() ).getResults();
     }
 
     @Deprecated
@@ -693,7 +689,7 @@ public class DefaultNexusIndexer
     {
         if ( request.getContext() == null )
         {
-            return searcher.searchGrouped( request, new ArrayList<IndexingContext>( indexingContexts.values() ) );
+            return searcher.searchGrouped( request, indexingContexts.values() );
         }
         else
         {
@@ -742,7 +738,7 @@ public class DefaultNexusIndexer
         throws IOException,
             IndexContextInInconsistentStateException
     {
-        return identify( query, new ArrayList<IndexingContext>( indexingContexts.values() ) );
+        return identify( query, indexingContexts.values() );
     }
 
     public ArtifactInfo identify( Query query, Collection<IndexingContext> contexts )
