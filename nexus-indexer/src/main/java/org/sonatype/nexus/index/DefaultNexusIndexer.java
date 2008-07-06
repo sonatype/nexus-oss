@@ -15,6 +15,7 @@ package org.sonatype.nexus.index;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -620,7 +621,10 @@ public class DefaultNexusIndexer
         throws IOException,
             IndexContextInInconsistentStateException
     {
-        return searcher.searchFlat( artifactInfoComparator, indexingContexts.values(), query );
+        return searcher.searchFlat(
+            artifactInfoComparator,
+            new ArrayList<IndexingContext>( indexingContexts.values() ),
+            query );
     }
 
     @Deprecated
@@ -638,7 +642,7 @@ public class DefaultNexusIndexer
     {
         if ( request.getContext() == null )
         {
-            return searcher.searchFlatPaged( request, indexingContexts.values() );
+            return searcher.searchFlatPaged( request, new ArrayList<IndexingContext>( indexingContexts.values() ) );
         }
         else
         {
@@ -670,7 +674,7 @@ public class DefaultNexusIndexer
     {
         return searcher.searchGrouped(
             new GroupedSearchRequest( query, grouping, groupKeyComparator ),
-            indexingContexts.values() ).getResults();
+            new ArrayList<IndexingContext>( indexingContexts.values() ) ).getResults();
     }
 
     @Deprecated
@@ -689,7 +693,7 @@ public class DefaultNexusIndexer
     {
         if ( request.getContext() == null )
         {
-            return searcher.searchGrouped( request, indexingContexts.values() );
+            return searcher.searchGrouped( request, new ArrayList<IndexingContext>( indexingContexts.values() ) );
         }
         else
         {
@@ -738,7 +742,7 @@ public class DefaultNexusIndexer
         throws IOException,
             IndexContextInInconsistentStateException
     {
-        return identify( query, indexingContexts.values() );
+        return identify( query, new ArrayList<IndexingContext>( indexingContexts.values() ) );
     }
 
     public ArtifactInfo identify( Query query, Collection<IndexingContext> contexts )
