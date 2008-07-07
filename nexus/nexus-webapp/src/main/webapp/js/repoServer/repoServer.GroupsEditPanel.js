@@ -222,9 +222,11 @@ Sonatype.repoServer.GroupsEditPanel = function(config){
     ],
     buttons: [
       {
+        id: 'savebutton',
         text: 'Save'
       },
       {
+        id: 'cancelbutton',
         text: 'Cancel'
       }
     ]
@@ -277,6 +279,7 @@ Sonatype.repoServer.GroupsEditPanel = function(config){
     autoScroll: true,
     tbar: [
       {
+        id: 'group-refresh-btn',
         text: 'Refresh',
         icon: Sonatype.config.resourcePath + '/images/icons/arrow_refresh.png',
         cls: 'x-btn-text-icon',
@@ -529,13 +532,13 @@ Ext.extend(Sonatype.repoServer.GroupsEditPanel, Ext.Panel, {
         }
         else {
           Sonatype.utils.defaultToNo();
-          Ext.Msg.show({
+          Sonatype.MessageBox.show({
             animEl: this.groupsGridPanel.getEl(),
             title : 'Delete Group',
             msg : 'Delete the ' + rec.get('name') + ' group?',
-            buttons: Ext.Msg.YESNO,
+            buttons: Sonatype.MessageBox.YESNO,
             scope: this,
-            icon: Ext.Msg.QUESTION,
+            icon: Sonatype.MessageBox.QUESTION,
             fn: function(btnName){
               if (btnName == 'yes' || btnName == 'ok') {
                 Ext.Ajax.request({
@@ -554,13 +557,13 @@ Ext.extend(Sonatype.repoServer.GroupsEditPanel, Ext.Panel, {
       }
       else {
         Sonatype.utils.defaultToNo();
-        Ext.Msg.show({
+        Sonatype.MessageBox.show({
           animEl: this.groupsGridPanel.getEl(),
           title : 'Delete Groups',
           msg : 'Delete ' + selections.length + ' groups?',
-          buttons: Ext.Msg.YESNO,
+          buttons: Sonatype.MessageBox.YESNO,
           scope: this,
-          icon: Ext.Msg.QUESTION,
+          icon: Sonatype.MessageBox.QUESTION,
           fn: function(btnName){
             Ext.each( selections, function(rec) {
               if(rec.data.resourceURI == 'new'){
@@ -606,7 +609,7 @@ Ext.extend(Sonatype.repoServer.GroupsEditPanel, Ext.Panel, {
     }
     else {
       this.reposList = [];
-      Ext.MessageBox.alert('Could not receive the list of available repositories.');
+      Sonatype.MessageBox.alert('Could not receive the list of available repositories.');
     }
   },
   
@@ -642,7 +645,7 @@ Ext.extend(Sonatype.repoServer.GroupsEditPanel, Ext.Panel, {
       Sonatype.Events.fireEvent( 'groupChanged' );
     }
     else {
-      Ext.MessageBox.alert('The server did not delete the group.');
+      Sonatype.MessageBox.alert('The server did not delete the group.');
     }
   },
 
@@ -724,7 +727,7 @@ Ext.extend(Sonatype.repoServer.GroupsEditPanel, Ext.Panel, {
   //(Ext.form.BasicForm, Ext.form.Action)
   actionFailedHandler : function(form, action){
     if(action.failureType == Ext.form.Action.CLIENT_INVALID){
-      Ext.MessageBox.alert('Missing or Invalid Fields', 'Please change the missing or invalid fields.').setIcon(Ext.MessageBox.WARNING);
+      Sonatype.MessageBox.alert('Missing or Invalid Fields', 'Please change the missing or invalid fields.').setIcon(Sonatype.MessageBox.WARNING);
     }
     //@note: server validation error are now handled just like client validation errors by marking the field invalid
     //@new note: because of the fact that repositories field is not directly linked to list of repos, need to manually handle this case
@@ -740,7 +743,7 @@ Ext.extend(Sonatype.repoServer.GroupsEditPanel, Ext.Panel, {
       Sonatype.utils.connectionError( action.response, 'There is an error communicating with the server.' )
     }
     else if(action.failureType == Ext.form.Action.LOAD_FAILURE){
-      Ext.MessageBox.alert('Load Failure', 'The data failed to load from the server.').setIcon(Ext.MessageBox.ERROR);
+      Sonatype.MessageBox.alert('Load Failure', 'The data failed to load from the server.').setIcon(Sonatype.MessageBox.ERROR);
     }
     
     //@todo: need global alert mechanism for fatal errors.

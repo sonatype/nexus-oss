@@ -155,80 +155,80 @@ Sonatype.repoServer.referenceData = {
   schedule : {
     manual : {
       id : "",
-	  name : "",
-	  enabled : "",
-	  typeId : "",
-	  schedule : "",
-	  properties : [{
-	    id: "",
-	    value: ""
-	  }]
+      name : "",
+      enabled : "",
+      typeId : "",
+      schedule : "",
+      properties : [{
+        id: "",
+        value: ""
+      }]
     },
     once : {
       id : "",
-	  name : "",
-	  enabled : "",
-	  typeId : "",
+      name : "",
+      enabled : "",
+      typeId : "",
       schedule : "",
       properties : [{
         id: "",
         value: ""
-	  }],
-	  startDate : "",
-	  startTime : ""
+      }],
+      startDate : "",
+      startTime : ""
     },
     daily : {
-	  id : "",
-	  name : "",
-	  enabled : "",
-	  typeId : "",
+      id : "",
+      name : "",
+      enabled : "",
+      typeId : "",
       schedule : "",
       properties : [{
         id: "",
         value: ""
-	  }],
-	  startDate : "",
-	  recurringTime : ""
+      }],
+      startDate : "",
+      recurringTime : ""
     },
     weekly : {
-	  id : "",
-	  name : "",
-	  enabled : "",
-	  typeId : "",
+      id : "",
+      name : "",
+      enabled : "",
+      typeId : "",
       schedule : "",
       properties : [{
-	    id: "",
-	    value: ""
-	  }],
-	  startDate : "",
-	  recurringTime : "",
-	  recurringDay : []
+        id: "",
+        value: ""
+      }],
+      startDate : "",
+      recurringTime : "",
+      recurringDay : []
     },
     monthly : {
-	  id : "",
-	  name : "",
-	  enabled : "",
-	  typeId : "",
+      id : "",
+      name : "",
+      enabled : "",
+      typeId : "",
       schedule : "",
       properties : [{
-	    id: "",
-	    value: ""
-	  }],
-	  startDate : "",
-	  recurringTime : "",
+        id: "",
+        value: ""
+      }],
+      startDate : "",
+      recurringTime : "",
       recurringDay : []
     },
     advanced : {
-	  id : "",
-	  name : "",
-	  enabled : "",
-	  typeId : "",
+      id : "",
+      name : "",
+      enabled : "",
+      typeId : "",
       schedule : "",
       properties : [{
-	    id: "",
-	    value: ""
-	  }],
-	  cronCommand : ""
+        id: "",
+        value: ""
+      }],
+      cronCommand : ""
     }
   },
   
@@ -239,6 +239,24 @@ Sonatype.repoServer.referenceData = {
     v : "",
     p : "",
     c : ""
+  },
+  
+  users : {
+    userId : "",
+    name : "",
+    email : "",
+    status : "",
+    password : "",
+    roles : []
+  },
+  
+  roles : {
+    id : "",
+    name : "",
+    description : "",
+    sessionTimeout : 0,
+    roles : [],
+    privileges : []
   }
   
 };

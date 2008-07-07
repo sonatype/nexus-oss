@@ -874,9 +874,11 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
       ],
     buttons: [
       {
+        id: 'savebutton',
         text: 'Save'
       },
       {
+        id: 'cancelbutton',
         text: 'Cancel'
       }
     ]
@@ -897,6 +899,7 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
     autoScroll: true,
     tbar: [
       {
+        id: 'schedule-refresh-btn',
         text: 'Refresh',
         icon: Sonatype.config.resourcePath + '/images/icons/arrow_refresh.png',
         cls: 'x-btn-text-icon',
@@ -1302,21 +1305,21 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
       }
       else {
         //@note: this handler selects the "No" button as the default
-        //@todo: could extend Ext.MessageBox to take the button to select as a param
-        Ext.Msg.getDialog().on('show', function(){
+        //@todo: could extend Sonatype.MessageBox to take the button to select as a param
+        Sonatype.MessageBox.getDialog().on('show', function(){
           this.focusEl = this.buttons[2]; //ack! we're offset dependent here
           this.focus();
         },
-        Ext.Msg.getDialog(),
+        Sonatype.MessageBox.getDialog(),
         {single:true});
         
-        Ext.Msg.show({
+        Sonatype.MessageBox.show({
           animEl: this.schedulesGridPanel.getEl(),
           title : 'Delete Scheduled Task?',
           msg : 'Delete the ' + rec.get('name') + ' scheduled task?',
-          buttons: Ext.Msg.YESNO,
+          buttons: Sonatype.MessageBox.YESNO,
           scope: this,
-          icon: Ext.Msg.QUESTION,
+          icon: Sonatype.MessageBox.QUESTION,
           fn: function(btnName){
             if (btnName == 'yes' || btnName == 'ok') {
               Ext.Ajax.request({
@@ -1365,27 +1368,27 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
       }
     }
     else {
-      Ext.MessageBox.alert('The server did not delete the scheduled task.');
+      Sonatype.MessageBox.alert('The server did not delete the scheduled task.');
     }
   },
   
   runHandler : function() {
     if (this.ctxRecord && this.ctxRecord.data.resourceURI != 'new'){
       var rec = this.ctxRecord;
-      Ext.Msg.getDialog().on('show', function(){
+      Sonatype.MessageBox.getDialog().on('show', function(){
           this.focusEl = this.buttons[2]; //ack! we're offset dependent here
           this.focus();
         },
-        Ext.Msg.getDialog(),
+        Sonatype.MessageBox.getDialog(),
         {single:true});
         
-      Ext.Msg.show({
+      Sonatype.MessageBox.show({
         animEl: this.schedulesGridPanel.getEl(),
         title : 'Run Scheduled Task?',
         msg : 'Run the ' + rec.get('name') + ' scheduled task?',
-        buttons: Ext.Msg.YESNO,
+        buttons: Sonatype.MessageBox.YESNO,
         scope: this,
-        icon: Ext.Msg.QUESTION,
+        icon: Sonatype.MessageBox.QUESTION,
         fn: function(btnName){
           if (btnName == 'yes' || btnName == 'ok') {
             this.alreadyDeferred = false;
@@ -1406,7 +1409,7 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
   
   runCallback : function(options, isSuccess, response){
     if(!isSuccess){
-      Ext.MessageBox.alert('The server did not run the scheduled task.');
+      Sonatype.MessageBox.alert('The server did not run the scheduled task.');
     }
     else if (!this.alreadyDeferred)
     {
@@ -1518,17 +1521,17 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
   //(Ext.form.BasicForm, Ext.form.Action)
   actionFailedHandler : function(form, action){
     if(action.failureType == Ext.form.Action.CLIENT_INVALID){
-      Ext.MessageBox.alert('Missing or Invalid Fields', 'Please change the missing or invalid fields.').setIcon(Ext.MessageBox.WARNING);
+      Sonatype.MessageBox.alert('Missing or Invalid Fields', 'Please change the missing or invalid fields.').setIcon(Sonatype.MessageBox.WARNING);
     }
 //@note: server validation error are now handled just like client validation errors by marking the field invalid
 //  else if(action.failureType == Ext.form.Action.SERVER_INVALID){
-//    Ext.MessageBox.alert('Invalid Fields', 'The server identified invalid fields.').setIcon(Ext.MessageBox.ERROR);
+//    Sonatype.MessageBox.alert('Invalid Fields', 'The server identified invalid fields.').setIcon(Sonatype.MessageBox.ERROR);
 //  }
     else if(action.failureType == Ext.form.Action.CONNECT_FAILURE){
       Sonatype.utils.connectionError( action.response, 'There is an error communicating with the server.' )
     }
     else if(action.failureType == Ext.form.Action.LOAD_FAILURE){
-      Ext.MessageBox.alert('Load Failure', 'The data failed to load from the server.').setIcon(Ext.MessageBox.ERROR);
+      Sonatype.MessageBox.alert('Load Failure', 'The data failed to load from the server.').setIcon(Sonatype.MessageBox.ERROR);
     }
 
     //@todo: need global alert mechanism for fatal errors.

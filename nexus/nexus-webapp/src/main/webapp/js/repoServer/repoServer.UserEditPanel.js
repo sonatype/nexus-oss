@@ -21,152 +21,91 @@
 /*
  * User Edit/Create panel layout and controller
  */
-
-Sonatype.repoServer.UserEditPanel = function( config ){
+  
+Sonatype.repoServer.UserEditPanel = function(config){
   var config = config || {};
   var defaultConfig = {};
-  Ext.apply( this, config, defaultConfig );
-
-  this.userGridPanel = new Ext.grid.GridPanel({
-    id: 'st-users-grid',
-    region: 'north',
-    layout:'fit',
-    collapsible: true,
-    split:true,
-    height: 200,
-    minHeight: 150,
-    maxHeight: 400,
-    frame: false,
-    autoScroll: true,
-    tbar: [
-      {
-        text: 'Refresh',
-        icon: Sonatype.config.resourcePath + '/images/icons/arrow_refresh.png',
-        cls: 'x-btn-text-icon',
-//        handler: this.reloadAll,
-        scope: this
-      },
-      {
-        id: 'user-add-btn',
-        text:'Add',
-        icon: Sonatype.config.resourcePath + '/images/icons/add.png',
-        cls: 'x-btn-text-icon',
-//        handler: this.addUserHandler,
-        scope: this
-      },
-      {
-        id: 'user-delete-btn',
-        text: 'Delete',
-        icon: Sonatype.config.resourcePath + '/images/icons/delete.png',
-        cls: 'x-btn-text-icon',
-//        handler: this.deleteUserHandler,
-        scope: this
-      }
-    ],
-
-    //grid view options
-    ds: new Ext.data.SimpleStore({fields:['id','name','email','status','roles'], 
-      data:[
-        ['admin', 'Yoda', 'swamp@dagobah.com', 'active', 'nexusAdmin, allReposRW'],
-        ['palpatine', 'Darth Sidious', 'emperor@galaxy.com', 'blocked', 'nexusAdmin, darksideRepoRW'],
-        ['ani', 'Darth Vader', 'fastestever@podracer.net', 'closed', 'darksideRepoRead'],
-        ['owkenobi', 'Obi-Wan Kenobi', 'ed@bigfish.com', 'active', 'lightsideRepoRead'],
-        ['liam', 'Qui-Gon Jinn', 'firstghost@force.org', 'active', 'lightsideRepoRW']
-      ]}),
-//    sortInfo:{field: 'name', direction: "ASC"},
-    loadMask: true,
-    deferredRender: false,
-    columns: [
-      { header: 'User ID', dataIndex: 'id', width: 120 },
-      { header: 'Name', dataIndex: 'name', width: 200 },
-      { header: 'Email', dataIndex: 'email', width: 150,
-        renderer: function( s ) {
-          return '<a href="mailto:' + s + '">' + s + '</a>';
-        },
-        menuDisabled:true
-      },
-      { header: 'Status', dataIndex: 'status', width: 100 },
-      { header: 'Roles', dataIndex: 'roles', id: 'users-role-column' }
-    ],
-    autoExpandColumn: 'users-role-column',
-    disableSelection: false,
-    viewConfig: {
-      emptyText: 'Click "Add" to create a new user'
-    }
+  Ext.apply(this, config, defaultConfig);
+  
+  var ht = Sonatype.repoServer.resources.help.users;
+  
+  //List of user statuses
+  this.statusStore = new Ext.data.SimpleStore({fields:['value','display'], data:[['active','Active'],['locked','Locked'],['disabled','Disabled']]});
+    
+  this.roleCombiner = function(val, parent) {
+    return Sonatype.utils.joinArrayObject(val, 'roleName');
+  };
+  
+  this.actions = {
+    refresh : new Ext.Action({
+      text: 'Refresh',
+      iconCls: 'st-icon-refresh',
+      scope:this,
+      handler: this.reloadAll
+    }),
+    deleteAction : new Ext.Action({
+      text: 'Delete',
+      scope:this,
+      handler: this.deleteHandler
+    }),
+    resetPasswordAction: new Ext.Action({
+      text: 'Reset Password',
+      scope: this,
+      handler: this.resetPasswordHandler
+    })
+  };
+  
+  //Methods that will take the incoming json data and map over to the ui controls
+  this.loadDataModFunc = {
+    "roles" : this.loadTreeHelper.createDelegate(this)
+  };
+  
+  //Methods that will take the data from the ui controls and map over to json
+  this.submitDataModFunc = {
+    "password" : Sonatype.utils.convert.passwordToString,
+    "roles" : this.saveTreeHelper.createDelegate(this)
+  };
+  
+  //A record to hold the name and id of a repository
+  this.userRecordConstructor = Ext.data.Record.create([
+    {name:'resourceURI'},
+    {name:'userId', sortType:Ext.data.SortTypes.asUCString},
+    {name:'name'},
+    {name:'email'},
+    {name:'status'},
+    {name:'roles'},
+    {name:'displayRoles', mapping:'roles', convert: this.roleCombiner}
+  ]);
+  
+  //A record to hold the name and id of a role
+  this.roleRecordConstructor = Ext.data.Record.create([
+    {name:'id'},
+    {name:'name', sortType:Ext.data.SortTypes.asUCString}
+  ]);
+  
+  
+  //Reader and datastore that queries the server for the list of currently defined users
+  this.usersReader = new Ext.data.JsonReader({root: 'data', id: 'resourceURI'}, this.userRecordConstructor );
+  this.usersDataStore = new Ext.data.Store({
+    url: Sonatype.config.repos.urls.users,
+    reader: this.usersReader,
+    sortInfo: {field: 'userId', direction: 'ASC'},
+    autoLoad: true
   });
-
-  this.assignedRoot = new Ext.tree.TreeNode({text: 'root'});
-  this.assignedRoot.appendChild([
-    new Ext.tree.TreeNode({
-      id: 'bountyRepoRW',
-      text: 'bountyRepoRW',
-//      payload: repo, //sonatype added attribute
-      
-      allowChildren: false,
-      draggable: true,
-      leaf: true
-    })
-  ]);
-
-  this.availableRoot = new Ext.tree.TreeNode({text: 'root'});
-  this.availableRoot.appendChild([
-    new Ext.tree.TreeNode({
-      id: 'nexusAdmin',
-      text: 'nexusAdmin',
-//      payload: repo, //sonatype added attribute
-      
-      allowChildren: false,
-      draggable: true,
-      leaf: true
-    }),
-    new Ext.tree.TreeNode({
-      id: 'allReposRW',
-      text: 'allReposRW',
-//      payload: repo, //sonatype added attribute
-      
-      allowChildren: false,
-      draggable: true,
-      leaf: true
-    }),
-    new Ext.tree.TreeNode({
-      id: 'darksideRepoRead',
-      text: 'darksideRepoRead',
-//      payload: repo, //sonatype added attribute
-      
-      allowChildren: false,
-      draggable: true,
-      leaf: true
-    }),
-    new Ext.tree.TreeNode({
-      id: 'darksideRepoRW',
-      text: 'darksideRepoRW',
-//      payload: repo, //sonatype added attribute
-      
-      allowChildren: false,
-      draggable: true,
-      leaf: true
-    }),
-    new Ext.tree.TreeNode({
-      id: 'lightsideRepoRead',
-      text: 'lightsideRepoRead',
-//      payload: repo, //sonatype added attribute
-      
-      allowChildren: false,
-      draggable: true,
-      leaf: true
-    }),
-    new Ext.tree.TreeNode({
-      id: 'lightsideRepoRW',
-      text: 'lightsideRepoRW',
-//      payload: repo, //sonatype added attribute
-      
-      allowChildren: false,
-      draggable: true,
-      leaf: true
-    })
-  ]);
-
-  this.userFormPanel = new Ext.form.FormPanel({
+  
+  this.roleReader = new Ext.data.JsonReader({root: 'data', id: 'id'}, this.roleRecordConstructor );  
+  this.roleDataStore = new Ext.data.Store({
+    url: Sonatype.config.repos.urls.roles,
+    reader: this.roleReader,
+    sortInfo: {field: 'name', direction: 'ASC'},
+    autoLoad: true
+  });
+  
+  this.COMBO_WIDTH = 300;
+  
+  //Build the form
+  this.formConfig = {
+    region: 'center',
     width: '100%',
     height: '100%',
     autoScroll: true,
@@ -174,94 +113,98 @@ Sonatype.repoServer.UserEditPanel = function( config ){
     frame: true,
     collapsible: false,
     collapsed: false,
-    labelWidth: 150,
+    labelWidth: 200,
     layoutConfig: {
       labelSeparator: ''
     },
+        
     items: [
       {
         xtype: 'textfield',
         fieldLabel: 'User ID',
         itemCls: 'required-field',
-//        helpText: ht.workingDirectory,
-        name: 'userid',
-        value: 'slave1',
-        anchor: Sonatype.view.FIELD_OFFSET,
-        allowBlank: false
+        labelStyle: 'margin-left: 15px; width: 185px;',
+        helpText: ht.userId,
+        name: 'userId',
+        allowBlank: false,
+        width: this.COMBO_WIDTH
       },
       {
         xtype: 'textfield',
         fieldLabel: 'Name',
         itemCls: 'required-field',
-//        helpText: ht.workingDirectory,
+        labelStyle: 'margin-left: 15px; width: 185px;',
+        helpText: ht.name,
         name: 'name',
-        value: 'Jango Fett',
-        anchor: Sonatype.view.FIELD_OFFSET,
-        allowBlank: false
+        allowBlank: false,
+        width: this.COMBO_WIDTH
       },
       {
         xtype: 'textfield',
-        fieldLabel: 'Email Address',
+        fieldLabel: 'Email',
         itemCls: 'required-field',
-//        helpText: ht.workingDirectory,
+        labelStyle: 'margin-left: 15px; width: 185px;',
+        helpText: ht.email,
         name: 'email',
-        value: 'theoriginal@clones.com',
-        anchor: Sonatype.view.FIELD_OFFSET,
-        allowBlank: false
+        allowBlank: false,
+        width: this.COMBO_WIDTH
       },
       {
         xtype: 'combo',
-        fieldLabel: 'Account Status',
+        fieldLabel: 'Status',
+        labelStyle: 'margin-left: 15px; width: 185px;',
         itemCls: 'required-field',
-//        helpText: ht.ruleType,
+        helpText: ht.status,
         name: 'status',
-        //hiddenName: 'connectionTimeout',
-        width: 75,
-        store: new Ext.data.SimpleStore({fields:['value'],data:[['active'],['blocked'],['closed']]}),
-        displayField: 'value',
+        store: this.statusStore,
+        displayField:'display',
+        valueField:'value',
         editable: false,
         forceSelection: true,
         mode: 'local',
         triggerAction: 'all',
-        emptyText: 'Select...',
-        selectOnFocus: true,
-        allowBlank: false
-/*
-        listeners: {
-          'select': {
-            fn: function(combo, record, index) {
-              this.updateTreePanel( index == this.BLOCKING_TYPE_INDEX,
-                combo.findParentByType( 'form' ).id );
-            },
-            scope: this
-          }
-        }
-*/
+        emptyText:'Select...',
+        selectOnFocus:true,
+        allowBlank: false,
+        width: this.COMBO_WIDTH
       },
       {
         xtype: 'textfield',
+        inputType:'password',
         fieldLabel: 'Password',
         itemCls: 'required-field',
-//        helpText: ht.workingDirectory,
+        labelStyle: 'margin-left: 15px; width: 185px;',
+        helpText: ht.password,
         name: 'password',
-        value: 'aaaaaa',
-        inputType: 'password',
-        anchor: Sonatype.view.FIELD_OFFSET,
-        allowBlank: false
+        allowBlank: false,
+        width: this.COMBO_WIDTH,
+        minLength: 4,
+        minLengthText : "Password must be 4 characters or more",
+        maxLength: 25,
+        maxLengthText : "Password must be 25 characters or less",
+        value: Sonatype.utils.passwordPlaceholder
       },
       {
         xtype: 'textfield',
-        fieldLabel: 'Password (repeat)',
+        inputType:'password',
+        fieldLabel: 'Re-enter Password',
         itemCls: 'required-field',
-//        helpText: ht.workingDirectory,
-        name: 'password2',
-        value: 'aaaaaa',
-        inputType: 'password',
-        anchor: Sonatype.view.FIELD_OFFSET,
-        allowBlank: false
+        labelStyle: 'margin-left: 15px; width: 185px;',
+        helpText: ht.reenterPassword,
+        name: 'reenterPassword',
+        allowBlank: false,
+        width: this.COMBO_WIDTH,
+        minLength: 4,
+        minLengthText : "Password must be 4 characters or more",
+        maxLength: 25,
+        maxLengthText : "Password must be 25 characters or less",
+        vtype: 'password',
+        value: Sonatype.utils.passwordPlaceholder,
+        initialPasswordField: 'password'
       },
       {
         xtype: 'panel',
+        id: 'roles_tree_panel',
         layout: 'column',
         autoHeight: true,
         style: 'padding: 10px 0 0 0',
@@ -269,8 +212,8 @@ Sonatype.repoServer.UserEditPanel = function( config ){
         items: [
           {
             xtype: 'treepanel',
-            id: '_user-roles-tree', //note: unique ID is assinged before instantiation
-            title: 'Assigned Roles',
+            id: 'roles_tree', //note: unique ID is assinged before instantiation
+            title: 'Selected Roles',
             cls: 'required-field',
             border: true, //note: this seem to have no effect w/in form panel
             bodyBorder: true, //note: this seem to have no effect w/in form panel
@@ -287,10 +230,8 @@ Sonatype.repoServer.UserEditPanel = function( config ){
             //@ext: can TreeNode be registerd as a component with an xtype so this new root node
             //      may be instantiated uniquely for each form panel that uses this config?
             rootVisible: false,
-            root: this.assignedRoot,
 
             enableDD: true,
-            //ddGroup: 'group-repos',
             ddScroll: true,
             dropConfig: {
               allowContainerDrop: true,
@@ -305,7 +246,7 @@ Sonatype.repoServer.UserEditPanel = function( config ){
               padding: [0,0,274,0]
             },
             // added Field values to simulate form field validation
-            invalidText: 'One or more repository is required',
+            invalidText: 'One or more roles are required',
             validate: function(){
               return (this.root.childNodes.length > 0);
             },
@@ -327,25 +268,16 @@ Sonatype.repoServer.UserEditPanel = function( config ){
               'remove' : {
                 fn: function(tree, parentNode, removedNode) {
                   if(tree.root.childNodes.length < 1) {
-                    this.markTreeInvalid(tree,null);
-                  }
-                  else if (tree.invalid) {
-                    //remove error messaging
-                    tree.getEl().child('.x-panel-body').setStyle({
-                      'background-color' : '#FFFFFF',
-                      border : '1px solid #B5B8C8'
-                    });
-                    Ext.form.Field.msgFx['normal'].hide(tree.errorEl, tree);
+                    this.markTreeInvalid(tree);
                   }
                 },
                 scope: this
               }
             }
-            
           },
           {
             xtype: 'treepanel',
-            id: id + '_all-user-roles-tree', //note: unique ID is assinged before instantiation
+            id: 'all_roles_tree', //note: unique ID is assinged before instantiation
             title: 'Available Roles',
             border: true, //note: this seem to have no effect w/in form panel
             bodyBorder: true, //note: this seem to have no effect w/in form panel
@@ -361,10 +293,8 @@ Sonatype.repoServer.UserEditPanel = function( config ){
             //@ext: can TreeNode be registerd as a component with an xtype so this new root node
             //      may be instantiated uniquely for each form panel that uses this config?
             rootVisible: false,
-            root: this.availableRoot,
 
             enableDD: true,
-            //ddGroup: 'group-repos',
             ddScroll: true,
             dropConfig: {
               allowContainerDrop: true,
@@ -379,56 +309,605 @@ Sonatype.repoServer.UserEditPanel = function( config ){
               padding: [0,0,274,0]
             }
           }
-        ]
-      }
-    ],
+          ]
+        }
+      ],
     buttons: [
       {
-        text: 'Save',
-//        handler: this.saveBtnHandler,
-        disabled: true,
-        scope: this
+        id: 'savebutton',
+        text: 'Save'
       },
       {
-        text: 'Cancel',
-//        handler: this.cancelBtnHandler,
-        scope: this
+        id: 'cancelbutton',
+        text: 'Cancel'
       }
     ]
+  };
+
+  this.usersGridPanel = new Ext.grid.GridPanel({
+    title: 'Users',
+    id: 'st-users-grid',
+    
+    region: 'north',
+    layout:'fit',
+    collapsible: true,
+    split:true,
+    height: 200,
+    minHeight: 150,
+    maxHeight: 400,
+    frame: false,
+    autoScroll: true,
+    tbar: [
+      {
+        id: 'user-refresh-btn',
+        text: 'Refresh',
+        icon: Sonatype.config.resourcePath + '/images/icons/arrow_refresh.png',
+        cls: 'x-btn-text-icon',
+        scope: this,
+        handler: this.reloadAll
+      },
+      {
+        id: 'user-add-btn',
+        text:'Add',
+        icon: Sonatype.config.resourcePath + '/images/icons/add.png',
+        cls: 'x-btn-text-icon',
+        scope: this,
+        handler: this.addResourceHandler
+      },
+      {
+        id: 'user-delete-btn',
+        text: 'Delete',
+        icon: Sonatype.config.resourcePath + '/images/icons/delete.png',
+        cls: 'x-btn-text-icon',
+        scope:this,
+        handler: this.deleteHandler
+      }
+    ],
+
+    //grid view options
+    ds: this.usersDataStore,
+    sortInfo:{field: 'userId', direction: "ASC"},
+    loadMask: true,
+    deferredRender: false,
+    columns: [
+      {header: 'User ID', dataIndex: 'userId', width:175, id: 'user-config-userid-col'},
+      {header: 'Name', dataIndex: 'name', width:175, id: 'user-config-name-col'},
+      {header: 'Email', dataIndex: 'email', width:175, id: 'user-config-email-col'},
+      {header: 'Status', dataIndex: 'status', width:175, id: 'user-config-status-col'},
+      {header: 'Roles', dataIndex: 'displayRoles', width:175, id: 'user-config-roles-col'}
+    ],
+    autoExpandColumn: 'user-config-roles-col',
+    disableSelection: false,
+    viewConfig: {
+      emptyText: 'Click "Add" to create a new User.'
+    }
   });
+  this.usersGridPanel.on('rowclick', this.rowClick, this);
+  this.usersGridPanel.on('rowcontextmenu', this.contextClick, this);
 
-
-  Sonatype.repoServer.UserEditPanel.superclass.constructor.call( this, {
+  Sonatype.repoServer.UserEditPanel.superclass.constructor.call(this, {
     layout: 'border',
+    autoScroll: false,
+    width: '100%',
+    height: '100%',
     items: [
-      this.userGridPanel,
+      this.usersGridPanel,
       {
         xtype: 'panel',
-        id: 'user-forms',
-        title: 'User Properties',
+        id: 'user-config-forms',
+        title: 'User Configuration',
         layout: 'card',
         region: 'center',
-        split: true,
         activeItem: 0,
         deferredRender: false,
         autoScroll: false,
         frame: false,
         items: [
-          this.userFormPanel
-/*
           {
             xtype: 'panel',
             layout: 'fit',
-            id: 'user-no-form',
-            html: '<div class="little-padding">Select a user to edit, or click "Add" to create a new one.</div>'
+            html: '<div class="little-padding">Select a user to edit it, or click "Add" to create a new one.</div>'
           }
-*/
         ]
       }
     ]
   });
+
+  this.formCards = this.findById('user-config-forms');
 };
 
 
-Ext.extend( Sonatype.repoServer.UserEditPanel, Ext.Panel, {
+Ext.extend(Sonatype.repoServer.UserEditPanel, Ext.Panel, {
+  //Dump the currently stored data and requery for everything
+  reloadAll : function(){
+    this.usersDataStore.removeAll();
+    this.usersDataStore.reload();
+    this.roleDataStore.removeAll();
+    this.roleDataStore.reload();
+    this.formCards.items.each(function(item, i, len){
+      if(i>0){this.remove(item, true);}
+    }, this.formCards);
+    
+    this.formCards.getLayout().setActiveItem(0);
+  },
+  
+  saveHandler : function(formInfoObj){
+    if (formInfoObj.formPanel.form.isValid()) {
+      var isNew = formInfoObj.isNew;
+      var createUri = Sonatype.config.repos.urls.users;
+      var updateUri = (formInfoObj.resourceUri) ? formInfoObj.resourceUri : '';
+      var form = formInfoObj.formPanel.form;
+    
+      form.doAction('sonatypeSubmit', {
+        method: (isNew) ? 'POST' : 'PUT',
+        url: isNew ? createUri : updateUri,
+        waitMsg: isNew ? 'Creating User...' : 'Updating User...',
+        fpanel: formInfoObj.formPanel,
+        dataModifiers: this.submitDataModFunc,
+        serviceDataObj : Sonatype.repoServer.referenceData.users,
+        isNew : isNew //extra option to send to callback, instead of conditioning on method
+      });
+    }
+  },
+  
+  cancelHandler : function(formInfoObj) {
+    var formLayout = this.formCards.getLayout();
+    var gridSelectModel = this.usersGridPanel.getSelectionModel();
+    var store = this.usersGridPanel.getStore();
+    
+    this.formCards.remove(formInfoObj.formPanel.id, true);
+    //select previously selected form, or the default view (index == 0)
+    var newIndex = this.formCards.items.length - 1;
+    newIndex = (newIndex >= 0) ? newIndex : 0;
+    formLayout.setActiveItem(newIndex);
+
+    //delete row from grid if canceling a new repo form
+    if(formInfoObj.isNew){
+      store.remove( store.getById(formInfoObj.formPanel.id) );
+    }
+    
+    //select the coordinating row in the grid, or none if back to default
+    var i = store.indexOfId(formLayout.activeItem.id);
+    if (i >= 0){
+      gridSelectModel.selectRow(i);
+    }
+    else{
+      gridSelectModel.clearSelections();
+    }
+  },
+  
+  addResourceHandler : function() {
+    var id = 'new_user_' + new Date().getTime();
+
+    var config = Ext.apply({}, this.formConfig, {id:id});
+    
+    config = this.initializeTreeRoots(id, config);
+    
+    var formPanel = new Ext.FormPanel(config);
+    
+    formPanel.form.on('actioncomplete', this.actionCompleteHandler, this);
+    formPanel.form.on('actionfailed', this.actionFailedHandler, this);
+    formPanel.on('beforerender', this.beforeFormRenderHandler, this);
+    formPanel.on('afterlayout', this.afterLayoutFormHandler, this, {single:true});
+        
+    var buttonInfoObj = {
+        formPanel : formPanel,
+        isNew : true
+      };
+    
+    //save button event handler
+    formPanel.buttons[0].on('click', this.saveHandler.createDelegate(this, [buttonInfoObj]));
+    //cancel button event handler
+    formPanel.buttons[1].on('click', this.cancelHandler.createDelegate(this, [buttonInfoObj]));
+    
+    this.loadTreeHelper([], {}, formPanel);
+    
+    //add place holder to grid
+    var newRec = new this.userRecordConstructor({
+        userId : 'New User',
+        resourceURI : 'new'
+      },
+      id); //use "new_user_" id instead of resourceURI like the reader does
+    this.usersDataStore.insert(0, [newRec]);
+    this.usersGridPanel.getSelectionModel().selectRow(0);
+    
+    //add new form
+    this.formCards.add(formPanel);
+    
+    //always set active and re-layout
+    this.formCards.getLayout().setActiveItem(formPanel);
+    formPanel.doLayout();
+  },
+  
+  afterLayoutFormHandler : function(formPanel, fLayout){
+    // register required field quicktip, but have to wait for elements to show up in DOM
+    var temp = function(){
+      var els = Ext.select('.required-field .x-form-item-label, .required-field .x-panel-header-text', this.getEl());
+      els.each(function(el, els, i){
+        Ext.QuickTips.register({
+          target: el,
+          cls: 'required-field',
+          title: '',
+          text: 'Required Field',
+          enabled: true
+        });
+      });
+    }.defer(300, formPanel);
+  },
+  
+  resetPasswordHandler : function(){
+    if (this.ctxRecord && this.ctxRecord.data.resourceURI != 'new'){
+      var rec = this.ctxRecord;
+      Sonatype.MessageBox.getDialog().on('show', function(){
+        this.focusEl = this.buttons[2]; //ack! we're offset dependent here
+        this.focus();
+      },
+      Sonatype.MessageBox.getDialog(),
+      {single:true});
+        
+      Sonatype.MessageBox.show({
+        animEl: this.usersGridPanel.getEl(),
+        title : 'Reset user password?',
+        msg : 'Reset the ' + rec.get('userId') + ' user password?',
+        buttons: Sonatype.MessageBox.YESNO,
+        scope: this,
+        icon: Sonatype.MessageBox.QUESTION,
+        fn: function(btnName){
+          if (btnName == 'yes' || btnName == 'ok') {
+            Ext.Ajax.request({
+              callback: this.resetPasswordCallback,
+              cbPassThru: {
+                resourceId: rec.id
+              },
+              scope: this,
+              method: 'DELETE',
+              url: Sonatype.config.repos.urls.usersReset + '/' + rec.data.userId
+            });
+          }
+        }
+      });
+    } 
+  },
+  
+  resetPasswordCallback : function(options, isSuccess, response){
+    if(isSuccess){
+      Sonatype.MessageBox.alert('The password has been reset.');
+    }
+    else {
+      Sonatype.MessageBox.alert('The server did not reset the password.');
+    }
+  },
+  
+  deleteHandler : function(){
+    if (this.ctxRecord || this.usersGridPanel.getSelectionModel().hasSelection()){
+      var rec = this.ctxRecord ? this.ctxRecord : this.usersGridPanel.getSelectionModel().getSelected();
+
+      if(rec.data.resourceURI == 'new'){
+        this.cancelHandler({
+          formPanel : Ext.getCmp(rec.id),
+          isNew : true
+        });
+      }
+      else {
+        //@note: this handler selects the "No" button as the default
+        //@todo: could extend Sonatype.MessageBox to take the button to select as a param
+        Sonatype.MessageBox.getDialog().on('show', function(){
+          this.focusEl = this.buttons[2]; //ack! we're offset dependent here
+          this.focus();
+        },
+        Sonatype.MessageBox.getDialog(),
+        {single:true});
+        
+        Sonatype.MessageBox.show({
+          animEl: this.usersGridPanel.getEl(),
+          title : 'Delete User?',
+          msg : 'Delete the ' + rec.get('userId') + ' User?',
+          buttons: Sonatype.MessageBox.YESNO,
+          scope: this,
+          icon: Sonatype.MessageBox.QUESTION,
+          fn: function(btnName){
+            if (btnName == 'yes' || btnName == 'ok') {
+              Ext.Ajax.request({
+                callback: this.deleteCallback,
+                cbPassThru: {
+                  resourceId: rec.id
+                },
+                scope: this,
+                method: 'DELETE',
+                url:rec.data.resourceURI
+              });
+            }
+          }
+        });
+      }
+    }
+  },
+  
+  deleteCallback : function(options, isSuccess, response){
+    if(isSuccess){
+      var resourceId = options.cbPassThru.resourceId;
+      var formLayout = this.formCards.getLayout();
+      var gridSelectModel = this.usersGridPanel.getSelectionModel();
+      var store = this.usersGridPanel.getStore();
+
+      if(formLayout.activeItem.id == resourceId){
+        this.formCards.remove(resourceId, true);
+        //select previously selected form, or the default view (index == 0)
+        var newIndex = this.formCards.items.length - 1;
+        newIndex = (newIndex >= 0) ? newIndex : 0;
+        formLayout.setActiveItem(newIndex);
+      }
+      else {
+        this.formCards.remove(resourceId, true);
+      }
+
+      store.remove( store.getById(resourceId) );
+
+      //select the coordinating row in the grid, or none if back to default
+      var i = store.indexOfId(formLayout.activeItem.id);
+      if (i >= 0){
+        gridSelectModel.selectRow(i);
+      }
+      else{
+        gridSelectModel.clearSelections();
+      }
+    }
+    else {
+      Sonatype.MessageBox.alert('The server did not delete the user.');
+    }
+  },
+      
+  //(Ext.form.BasicForm, Ext.form.Action)
+  actionCompleteHandler : function(form, action) {
+    //@todo: handle server error response here!!
+
+    if (action.type == 'sonatypeSubmit'){
+      var isNew = action.options.isNew;
+      var receivedData = action.handleResponse(action.response).data;
+      if (isNew) {
+        //successful create
+        var sentData = action.output.data;
+        
+        var dataObj = {
+          userId : receivedData.userId,
+          name : receivedData.name,
+          resourceURI : receivedData.resourceURI,
+          email : receivedData.email,
+          status : receivedData.status,
+          roles : receivedData.roles,
+          displayRoles : this.roleCombiner(receivedData.roles)
+        };
+        
+        var newRec = new this.userRecordConstructor(
+          dataObj,
+          action.options.fpanel.id);
+        
+        this.usersDataStore.remove(this.usersDataStore.getById(action.options.fpanel.id)); //remove old one
+        this.usersDataStore.addSorted(newRec);
+        this.usersDataStore.getSelectionModel().selectRecords([newRec], false);
+
+        //set the hidden id field in the form for subsequent updates
+        action.options.fpanel.find('name', 'id')[0].setValue(receivedData.resourceURI);
+        //remove button click listeners
+        action.options.fpanel.buttons[0].purgeListeners();
+        action.options.fpanel.buttons[1].purgeListeners();
+
+        var buttonInfoObj = {
+            formPanel : action.options.fpanel,
+            isNew : false,
+            resourceUri : dataObj.resourceURI
+          };
+
+        //save button event handler
+        action.options.fpanel.buttons[0].on('click', this.saveHandler.createDelegate(this, [buttonInfoObj]));
+        
+        //cancel button event handler
+        action.options.fpanel.buttons[1].on('click', this.cancelHandler.createDelegate(this, [buttonInfoObj]));
+      }
+      else {
+        var sentData = action.output.data;
+
+        var i = this.usersDataStore.indexOfId(action.options.fpanel.id);
+        var rec = this.usersDataStore.getAt(i);
+
+        this.updateUserRecord(rec, receivedData);
+        
+        var sortState = this.usersDataStore.getSortState();
+        this.usersDataStore.sort(sortState.field, sortState.direction);
+      }
+    }
+  },
+  
+  updateUserRecord : function(rec, receivedData){
+        rec.beginEdit();
+        rec.set('name', receivedData.name);
+        rec.set('userId', receivedData.userId);
+        rec.set('email', receivedData.email);
+        rec.set('status', receivedData.status);
+        rec.set('roles', receivedData.roles);
+        rec.set('displayRoles', this.roleCombiner(receivedData.roles));
+        rec.commit();
+        rec.endEdit();
+  },
+
+  //(Ext.form.BasicForm, Ext.form.Action)
+  actionFailedHandler : function(form, action){
+    if(action.failureType == Ext.form.Action.CLIENT_INVALID){
+      Sonatype.MessageBox.alert('Missing or Invalid Fields', 'Please change the missing or invalid fields.').setIcon(Sonatype.MessageBox.WARNING);
+    }
+//@note: server validation error are now handled just like client validation errors by marking the field invalid
+//  else if(action.failureType == Ext.form.Action.SERVER_INVALID){
+//    Sonatype.MessageBox.alert('Invalid Fields', 'The server identified invalid fields.').setIcon(Sonatype.MessageBox.ERROR);
+//  }
+    else if(action.failureType == Ext.form.Action.CONNECT_FAILURE){
+      Sonatype.utils.connectionError( action.response, 'There is an error communicating with the server.' )
+    }
+    else if(action.failureType == Ext.form.Action.LOAD_FAILURE){
+      Sonatype.MessageBox.alert('Load Failure', 'The data failed to load from the server.').setIcon(Sonatype.MessageBox.ERROR);
+    }
+
+    //@todo: need global alert mechanism for fatal errors.
+  },
+  
+  beforeFormRenderHandler : function(component){
+    var sp = Sonatype.lib.Permissions;
+    if(sp.checkPermission(Sonatype.user.curr.repoServer.configUsers, sp.EDIT)){
+      component.buttons[0].disabled = false;
+    }
+  },
+
+  formDataLoader : function(formPanel, resourceUri, modFuncs){
+    formPanel.getForm().doAction('sonatypeLoad', {url:resourceUri, method:'GET', fpanel:formPanel, dataModifiers: modFuncs, scope: this});
+  },
+
+  rowClick : function(grid, rowIndex, e){
+    var rec = grid.store.getAt(rowIndex);
+    var id = rec.id; //note: rec.id is unique for new resources and equal to resourceURI for existing ones
+    var formPanel = this.formCards.findById(id);
+    
+    //assumption: new route forms already exist in formCards, so they won't get into this case
+    if(!formPanel){ //create form and populate current data
+      var config = Ext.apply({}, this.formConfig, {id:id});
+      
+      config = this.initializeTreeRoots(id, config);
+      
+      formPanel = new Ext.FormPanel(config);
+      formPanel.form.on('actioncomplete', this.actionCompleteHandler, this);
+      formPanel.form.on('actionfailed', this.actionFailedHandler, this);
+      formPanel.on('beforerender', this.beforeFormRenderHandler, this);
+      formPanel.on('afterlayout', this.afterLayoutFormHandler, this, {single:true});
+      
+      var buttonInfoObj = {
+        formPanel : formPanel,
+        isNew : false, //not a new route form, see assumption
+        resourceUri : rec.data.resourceURI
+      };
+      
+      formPanel.buttons[0].on('click', this.saveHandler.createDelegate(this, [buttonInfoObj]));
+      formPanel.buttons[1].on('click', this.cancelHandler.createDelegate(this, [buttonInfoObj]));
+  
+      this.formDataLoader(formPanel, rec.data.resourceURI, this.loadDataModFunc);
+      
+      this.formCards.add(formPanel);
+      this.formCards.getLayout().setActiveItem(formPanel);    
+      formPanel.doLayout();
+    }
+    else{
+      //always set active
+      this.formCards.getLayout().setActiveItem(formPanel);
+    }
+  },
+  
+  contextClick : function(grid, index, e){
+    this.contextHide();
+    
+    if ( e.target.nodeName == 'A' ) return; // no menu on links
+    
+    this.ctxRow = this.usersGridPanel.view.getRow(index);
+    this.ctxRecord = this.usersGridPanel.store.getAt(index);
+    Ext.fly(this.ctxRow).addClass('x-node-ctx');
+
+    //@todo: would be faster to pre-render the six variations of the menu for whole instance
+    var menu = new Ext.menu.Menu({
+      id:'users-grid-ctx',
+      items: [
+        this.actions.refresh,
+        this.actions.deleteAction,
+        this.actions.resetPasswordAction
+      ]
+    });
+    
+    //TODO: Add additional menu items
+    
+    menu.on('hide', this.contextHide, this);
+    e.stopEvent();
+    menu.showAt(e.getXY());
+  },
+  
+  contextHide : function(){
+    if(this.ctxRow){
+      Ext.fly(this.ctxRow).removeClass('x-node-ctx');
+      this.ctxRow = null;
+      this.ctxRecord = null;
+    }
+  },
+  
+  markTreeInvalid : function(tree) {
+    var elp = tree.getEl();
+    
+    if(!tree.errorEl){
+        tree.errorEl = elp.createChild({cls:'x-form-invalid-msg'});
+        tree.errorEl.setWidth(elp.getWidth(true)); //note removed -20 like on form fields
+    }
+    tree.invalid = true;
+    tree.errorEl.update(tree.invalidText);
+    elp.child('.x-panel-body').setStyle({
+      'background-color' : '#fee',
+      border : '1px solid #dd7870'
+    });
+    Ext.form.Field.msgFx['normal'].show(tree.errorEl, tree);  
+  },
+  
+  initializeTreeRoots : function(id, config){
+    //@note: there has to be a better way to do this.  Depending on offsets is very error prone
+    var newConfig = config;
+
+    newConfig.items[6].items[0].root = new Ext.tree.TreeNode({text: 'root'});
+    newConfig.items[6].items[1].root = new Ext.tree.TreeNode({text: 'root'});
+
+    return newConfig;
+  },
+    
+  loadTreeHelper : function(arr, srcObj, fpanel){
+    var selectedTree = fpanel.find('id', 'roles_tree')[0];
+    var allTree = fpanel.find('id', 'all_roles_tree')[0];
+
+    var role;
+
+    for(var i=0; i<arr.length; i++){
+      role = arr[i];
+      selectedTree.root.appendChild(
+        new Ext.tree.TreeNode({
+          id: role.roleId,
+          text: role.roleName,
+          payload: role.roleId, //sonatype added attribute
+          allowChildren: false,
+          draggable: true,
+          leaf: true
+        })
+      );
+    }
+    
+    
+    this.roleDataStore.each(function(item, i, len){
+      if(typeof(selectedTree.getNodeById(item.data.id)) == 'undefined'){
+        allTree.root.appendChild(
+          new Ext.tree.TreeNode({
+            id: item.data.id,
+            text: item.data.name,
+            payload: item.data.id, //sonatype added attribute
+            allowChildren: false,
+            draggable: true,
+            leaf: true
+          })
+        );
+      }
+    }, this);
+    
+    return arr; //return arr, even if empty to comply with sonatypeLoad data modifier requirement
+  },
+  
+  saveTreeHelper : function(val, fpanel){
+    var tree = fpanel.find('id', 'roles_tree')[0];
+
+    var outputArr = [];
+    var nodes = tree.root.childNodes;
+
+    for(var i = 0; i < nodes.length; i++){
+      outputArr[i] = {roleId : nodes[i].attributes.payload};
+      Ext.apply(outputArr[i], {'@class':'org.sonatype.nexus.rest.model.UserRoleResource'});
+    }
+
+    return outputArr;
+  }
 });

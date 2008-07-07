@@ -89,7 +89,7 @@ Ext.extend(Sonatype.repoServer.ConfigViewPanel, Ext.form.FormPanel, {
       this.configTextArea.setRawValue(response.responseText);
     }
     else {
-      Ext.MessageBox.alert('The data failed to load from the server.');
+      Sonatype.MessageBox.alert('The data failed to load from the server.');
     }
   }
   

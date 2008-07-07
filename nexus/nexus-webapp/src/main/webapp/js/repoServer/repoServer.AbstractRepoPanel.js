@@ -341,10 +341,10 @@ Ext.extend(Sonatype.repoServer.AbstractRepoPanel, Ext.Panel, {
                 panel.doLayout();
               }
               else {
-                Ext.MessageBox.show({
+                Sonatype.MessageBox.show({
                   title: 'Deployment Disabled',
-                  icon: Ext.MessageBox.ERROR,
-                  buttons: Ext.MessageBox.OK,
+                  icon: Sonatype.MessageBox.ERROR,
+                  buttons: Sonatype.MessageBox.OK,
                   msg: 'Deployment is disabled for the selected repository.<br /><br />' +
                     'You can enable it in the "Access Settings" section of the repository configuration'
                 });

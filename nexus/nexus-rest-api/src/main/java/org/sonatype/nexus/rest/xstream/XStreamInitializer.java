@@ -72,6 +72,12 @@ import org.sonatype.nexus.rest.model.RepositoryStatusListResource;
 import org.sonatype.nexus.rest.model.RepositoryStatusListResourceResponse;
 import org.sonatype.nexus.rest.model.RepositoryStatusResource;
 import org.sonatype.nexus.rest.model.RepositoryStatusResourceResponse;
+import org.sonatype.nexus.rest.model.RoleContainedPrivilegeResource;
+import org.sonatype.nexus.rest.model.RoleContainedRoleResource;
+import org.sonatype.nexus.rest.model.RoleListResourceResponse;
+import org.sonatype.nexus.rest.model.RoleResource;
+import org.sonatype.nexus.rest.model.RoleResourceRequest;
+import org.sonatype.nexus.rest.model.RoleResourceResponse;
 import org.sonatype.nexus.rest.model.ScheduledServiceAdvancedResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceBaseResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceDailyResource;
@@ -91,6 +97,12 @@ import org.sonatype.nexus.rest.model.SearchResponse;
 import org.sonatype.nexus.rest.model.StatusConfigurationValidationResponse;
 import org.sonatype.nexus.rest.model.StatusResource;
 import org.sonatype.nexus.rest.model.StatusResourceResponse;
+import org.sonatype.nexus.rest.model.UserListResourceResponse;
+import org.sonatype.nexus.rest.model.UserResource;
+import org.sonatype.nexus.rest.model.UserResourceRequest;
+import org.sonatype.nexus.rest.model.UserResourceStatusResponse;
+import org.sonatype.nexus.rest.model.UserRoleResource;
+import org.sonatype.nexus.rest.model.UserStatusResource;
 import org.sonatype.nexus.rest.model.WastebasketResource;
 import org.sonatype.nexus.rest.model.WastebasketResourceResponse;
 import org.sonatype.nexus.rest.repositories.RepositoryBaseResourceConverter;
@@ -208,6 +220,20 @@ public final class XStreamInitializer
         xstream.omitField( ScheduledServiceTypePropertyResource.class, "modelEncoding" );
         xstream.omitField( ScheduledServiceResourceStatus.class, "modelEncoding" );
         xstream.omitField( ScheduledServiceResourceStatusResponse.class, "modelEncoding" );
+        
+        xstream.omitField( UserListResourceResponse.class, "modelEncoding" );
+        xstream.omitField( UserResourceRequest.class, "modelEncoding" );
+        xstream.omitField( UserResourceStatusResponse.class, "modelEncoding" );
+        xstream.omitField( UserStatusResource.class, "modelEncoding" );
+        xstream.omitField( UserResource.class, "modelEncoding" );
+        xstream.omitField( UserRoleResource.class, "modelEncoding" );
+        
+        xstream.omitField( RoleContainedPrivilegeResource.class, "modelEncoding" );
+        xstream.omitField( RoleContainedRoleResource.class, "modelEncoding" );
+        xstream.omitField( RoleListResourceResponse.class, "modelEncoding" );
+        xstream.omitField( RoleResource.class, "modelEncoding" );
+        xstream.omitField( RoleResourceRequest.class, "modelEncoding" );
+        xstream.omitField( RoleResourceResponse.class, "modelEncoding" );
 
         xstream.omitField( NFCResourceResponse.class, "modelEncoding" );
         xstream.omitField( NFCResource.class, "modelEncoding" );

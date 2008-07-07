@@ -55,6 +55,8 @@ import org.sonatype.nexus.rest.repositories.RepositoryMetaResourceHandler;
 import org.sonatype.nexus.rest.repositories.RepositoryResourceHandler;
 import org.sonatype.nexus.rest.repositories.RepositoryStatusResourceHandler;
 import org.sonatype.nexus.rest.repositorystatuses.RepositoryStatusesListResourceHandler;
+import org.sonatype.nexus.rest.roles.RoleListResourceHandler;
+import org.sonatype.nexus.rest.roles.RoleResourceHandler;
 import org.sonatype.nexus.rest.routes.RepositoryRouteListResourceHandler;
 import org.sonatype.nexus.rest.routes.RepositoryRouteResourceHandler;
 import org.sonatype.nexus.rest.schedules.ScheduledServiceListResourceHandler;
@@ -64,6 +66,9 @@ import org.sonatype.nexus.rest.schedules.ScheduledServiceTypeResourceHandler;
 import org.sonatype.nexus.rest.status.StatusResourceHandler;
 import org.sonatype.nexus.rest.templates.repositories.RepositoryTemplateListResourceHandler;
 import org.sonatype.nexus.rest.templates.repositories.RepositoryTemplateResourceHandler;
+import org.sonatype.nexus.rest.users.UserListResourceHandler;
+import org.sonatype.nexus.rest.users.UserResetResourceHandler;
+import org.sonatype.nexus.rest.users.UserResourceHandler;
 import org.sonatype.nexus.rest.wastebasket.WastebasketResourceHandler;
 import org.sonatype.nexus.rest.xstream.XStreamInitializer;
 import org.sonatype.nexus.security.SimpleAuthenticationSource;
@@ -329,7 +334,26 @@ public class ApplicationBridge
             router.attach(
                 "/schedules/{" + ScheduledServiceResourceHandler.SCHEDULED_SERVICE_ID_KEY + "}",
                 protectResource( ScheduledServiceResourceHandler.class ) );
-
+            
+            router.attach( 
+                "/users", 
+                protectResource( UserListResourceHandler.class ) );
+            
+            router.attach( 
+                "/users/{" + UserResourceHandler.USER_ID_KEY + "}", 
+                protectResource( UserResourceHandler.class ) );
+            
+            router.attach( 
+                 "/users/reset/{" + UserResourceHandler.USER_ID_KEY + "}", 
+                 protectResource( UserResetResourceHandler.class ) );
+            
+            router.attach( 
+                "/roles", 
+                protectResource( RoleListResourceHandler.class ) );
+                      
+            router.attach( 
+                "/roles/{" + RoleResourceHandler.ROLE_ID_KEY + "}", 
+                protectResource( RoleResourceHandler.class ) );
         }
         catch ( ConfigurationException e )
         {

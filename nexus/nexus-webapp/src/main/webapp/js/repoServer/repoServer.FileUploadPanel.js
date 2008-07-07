@@ -321,7 +321,7 @@ Ext.extend(Sonatype.repoServer.FileUploadPanel, Ext.FormPanel, {
   },
   
   doUpload: function() {
-    Ext.Msg.wait( 'Uploading...' );
+    Sonatype.MessageBox.wait( 'Uploading...' );
     this.createUploadForm();
   },
 
@@ -410,11 +410,11 @@ Ext.extend(Sonatype.repoServer.FileUploadPanel, Ext.FormPanel, {
         //This is a hack to get around the fact that upload submit always returns
         //success = true
         if ( response.responseXML.title == '' ) {
-          Ext.Msg.show({
+          Sonatype.MessageBox.show({
             title: 'Upload Complete',
             msg: 'Artifact upload finished successfully',
-            buttons: Ext.MessageBox.OK,
-            icon: Ext.MessageBox.INFO
+            buttons: Sonatype.MessageBox.OK,
+            icon: Sonatype.MessageBox.INFO
           });
         }
         else {
@@ -428,11 +428,11 @@ Ext.extend(Sonatype.repoServer.FileUploadPanel, Ext.FormPanel, {
           else {
             s += 'Check Nexus logs for more information.';
           }
-          Ext.Msg.show({
+          Sonatype.MessageBox.show({
             title: 'Upload Failed',
             msg: s,
-            buttons: Ext.MessageBox.OK,
-            icon: Ext.MessageBox.ERROR
+            buttons: Sonatype.MessageBox.OK,
+            icon: Sonatype.MessageBox.ERROR
           });
         }
       },

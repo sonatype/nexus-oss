@@ -32,7 +32,8 @@ Sonatype.repoServer.SearchResultGrid = function(config) {
       {name:'version'},
       {name:'repoId'},
       {name:'resourceURI'},
-      {name:'contextId'}
+      {name:'contextId'},
+      {name:'classifier'}
   ]);
 
   var resultReader = new Ext.data.JsonReader({
@@ -99,7 +100,7 @@ Sonatype.repoServer.SearchResultGrid = function(config) {
       header: "Group",
       dataIndex: 'groupId',
       sortable:true,
-      width: 200
+      width: 145
     },{
       id: 'artifact',
       header: "Artifact",
@@ -110,6 +111,12 @@ Sonatype.repoServer.SearchResultGrid = function(config) {
       id: 'version',
       header: "Version",
       dataIndex: 'version',
+      width: 55,
+      sortable:true
+    },{
+      id: 'classifier',
+      header: "Classifier",
+      dataIndex: 'classifier',
       width: 55,
       sortable:true
     },{

@@ -30,7 +30,7 @@ Ext.lib.Ajax.defaultPostHeader = 'application/json';
 //set Sonatype defaults for Ext widgets
 Ext.form.Field.prototype.msgTarget = 'under';
 
-Ext.Msg.minWidth = 200;
+Sonatype.MessageBox.minWidth = 200;
 
 Ext.state.Manager.setProvider(new Ext.state.CookieProvider());
 Ext.QuickTips.init();
@@ -99,7 +99,10 @@ Sonatype.config = function() {
         scheduleRun: servicePath + '/schedules/run',
         scheduleTypes: servicePath + '/schedules/types',
         upload: servicePath + '/artifact/maven/content',
-        trash: servicePath + '/wastebasket'
+        trash: servicePath + '/wastebasket',
+        users: servicePath + '/users',
+        usersReset: servicePath + '/users/reset',
+        roles: servicePath + '/roles',
       }
     },
     
@@ -128,7 +131,9 @@ Sonatype.user.anon = {
     configGroups : 0,
     configRules : 0,
     configRepos : 0,
-    configSchedules : 0
+    configSchedules : 0,
+    configUsers : 0,
+    configRoles : 0
   }
 };
 

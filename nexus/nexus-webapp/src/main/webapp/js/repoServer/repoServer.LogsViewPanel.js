@@ -122,7 +122,7 @@ Ext.extend(Sonatype.repoServer.LogsViewPanel, Ext.form.FormPanel, {
       }
     }
     else {
-      Ext.MessageBox.alert('Failed to get file list from server.');
+      Sonatype.MessageBox.alert('Failed to get file list from server.');
     }
   },
   

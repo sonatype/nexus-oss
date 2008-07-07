@@ -345,12 +345,14 @@ Sonatype.repoServer.ServerEditPanel = function(config){
     ],
     buttons: [
       {
+        id: 'savebutton',
         text: 'Save',
         handler: this.saveBtnHandler,
         disabled: true,
         scope: this
       },
       {
+        id: 'cancelbutton',
         text: 'Cancel',
         handler: this.cancelBtnHandler,
         scope: this
@@ -430,21 +432,21 @@ Ext.extend(Sonatype.repoServer.ServerEditPanel, Ext.Panel, {
       }
       if (wkDirField.isDirty() || securityConfigField.isDirty()) {
         //@note: this handler selects the "No" button as the default
-        //@todo: could extend Ext.MessageBox to take the button to select as a param
-        Ext.Msg.getDialog().on('show', function(){
+        //@todo: could extend Sonatype.MessageBox to take the button to select as a param
+        Sonatype.MessageBox.getDialog().on('show', function(){
           this.focusEl = this.buttons[2]; //ack! we're offset dependent here
           this.focus();
         },
-        Ext.Msg.getDialog(),
+        Sonatype.MessageBox.getDialog(),
         {single:true});
       
-        Ext.Msg.show({
+        Sonatype.MessageBox.show({
           animEl: this,
           title : 'Change Working Directory? or Security Model?',
           msg : 'Changing the Working Directory or Security Model requires a manual restart of Nexus.<br/><br/>Do you want to continue?',
-          buttons: Ext.Msg.YESNO,
+          buttons: Sonatype.MessageBox.YESNO,
           scope: this,
-          icon: Ext.Msg.QUESTION,
+          icon: Sonatype.MessageBox.QUESTION,
           fn: function(btnName){
             if (btnName == 'yes' || btnName == 'ok') {
               this.save({restartRequired:true});
@@ -540,12 +542,12 @@ Ext.extend(Sonatype.repoServer.ServerEditPanel, Ext.Panel, {
   actionCompleteHandler : function(form, action) {
     if (action.type == 'sonatypeSubmit'){
       if (action.options.restartRequired) {
-        Ext.Msg.show({
+        Sonatype.MessageBox.show({
           title : 'Restart Required',
           msg : 'Nexus must now be restarted for the Working Directory and/or Security Model change to take effect',
           buttons: false,
           closable: false,
-          icon: Ext.Msg.WARNING
+          icon: Sonatype.MessageBox.WARNING
         });
       }
       else if (action.options.fpanel.baseUrlChanged){
@@ -578,17 +580,17 @@ Ext.extend(Sonatype.repoServer.ServerEditPanel, Ext.Panel, {
   //(Ext.form.BasicForm, Ext.form.Action)
   actionFailedHandler : function(form, action){
     if(action.failureType == Ext.form.Action.CLIENT_INVALID){
-      Ext.MessageBox.alert('Missing or Invalid Fields', 'Please change the missing or invalid fields.').setIcon(Ext.MessageBox.WARNING);
+      Sonatype.MessageBox.alert('Missing or Invalid Fields', 'Please change the missing or invalid fields.').setIcon(Sonatype.MessageBox.WARNING);
     }
     //@note: server validation error are now handled just like client validation errors by marking the field invalid
 //  else if(action.failureType == Ext.form.Action.SERVER_INVALID){
-//    Ext.MessageBox.alert('Invalid Fields', 'The server identified invalid fields.').setIcon(Ext.MessageBox.ERROR);
+//    Sonatype.MessageBox.alert('Invalid Fields', 'The server identified invalid fields.').setIcon(Sonatype.MessageBox.ERROR);
 //  }
     else if(action.failureType == Ext.form.Action.CONNECT_FAILURE){
       Sonatype.utils.connectionError( action.response, 'There is an error communicating with the server.' )
     }
     else if(action.failureType == Ext.form.Action.LOAD_FAILURE){
-      Ext.MessageBox.alert('Load Failure', 'The data failed to load from the server.').setIcon(Ext.MessageBox.ERROR);
+      Sonatype.MessageBox.alert('Load Failure', 'The data failed to load from the server.').setIcon(Sonatype.MessageBox.ERROR);
     }
     
     //@todo: need global alert mechanism for fatal errors.

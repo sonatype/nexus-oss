@@ -548,13 +548,13 @@ Ext.extend(Sonatype.repoServer.RepoMaintPanel, Sonatype.repoServer.AbstractRepoP
       if (/.*\/repositories\/[^\/]*$/i.test(url)){
         url += '/content';
       }
-      Ext.Msg.show({
+      Sonatype.MessageBox.show({
         animEl: this.reposGridPanel.getEl(),
         title : 'Delete Repository Item?',
         msg : 'Delete the selected file/folder?',
-        buttons: Ext.Msg.YESNO,
+        buttons: Sonatype.MessageBox.YESNO,
         scope: this,
-        icon: Ext.Msg.QUESTION,
+        icon: Sonatype.MessageBox.QUESTION,
         fn: function(btnName){
           if (btnName == 'yes' || btnName == 'ok') {
             Ext.Ajax.request({
@@ -577,7 +577,7 @@ Ext.extend(Sonatype.repoServer.RepoMaintPanel, Sonatype.repoServer.AbstractRepoP
       }
     }
     else {
-      Ext.MessageBox.alert('The server did not delete the file/folder from the repository');
+      Sonatype.MessageBox.alert('The server did not delete the file/folder from the repository');
     }
   },
   
@@ -778,8 +778,8 @@ Ext.extend(Sonatype.repoServer.RepoMaintPanel, Sonatype.repoServer.AbstractRepoP
       node.setText(node.text + ' (Out of Service)');
     }
     else if ( response.status == 404 ) {
-      if ( Ext.Msg.isVisible() ) {
-        Ext.Msg.hide();
+      if ( Sonatype.MessageBox.isVisible() ) {
+        Sonatype.MessageBox.hide();
       }
       node.setText( node.text + ( node.isRoot ? ' (Not Available)' : ' (Not Found)'));
     }
@@ -811,7 +811,7 @@ Ext.extend(Sonatype.repoServer.RepoMaintPanel, Sonatype.repoServer.AbstractRepoP
       }
     }
     else {
-      Ext.MessageBox.alert('Status retrieval failed');
+      Sonatype.MessageBox.alert('Status retrieval failed');
     }
   },
   

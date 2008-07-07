@@ -677,11 +677,11 @@ Ext.ux.FileTreePanel = Ext.extend(Ext.tree.TreePanel, {
 	 * @param {Object} scope Scope for callback (defaults to this)
 	 */
 	,confirmOverwrite:function(filename, callback, scope) {
-		Ext.Msg.show({
+		Sonatype.MessageBox.show({
 			 title:this.confirmText
 			,msg:String.format(this.existsText, filename) + '. ' + this.overwriteText
-			,icon:Ext.Msg.QUESTION
-			,buttons:Ext.Msg.YESNO
+			,icon:Sonatype.MessageBox.QUESTION
+			,buttons:Sonatype.MessageBox.YESNO
 			,fn:callback.createDelegate(scope || this)
 		});
 	}
@@ -741,11 +741,11 @@ Ext.ux.FileTreePanel = Ext.extend(Ext.tree.TreePanel, {
 			return;
 		}
 
-		Ext.Msg.show({
+		Sonatype.MessageBox.show({
 			 title:this.deleteText
 			,msg:this.reallyWantText + ' ' + this.deleteText.toLowerCase()  + ' <b>' + node.text + '</b>?'
-			,icon:Ext.Msg.WARNING
-			,buttons:Ext.Msg.YESNO
+			,icon:Sonatype.MessageBox.WARNING
+			,buttons:Sonatype.MessageBox.YESNO
 			,scope:this
 			,fn:function(response) {
 				// do nothing if answer is not yes
@@ -1480,12 +1480,12 @@ Ext.ux.FileTreePanel = Ext.extend(Ext.tree.TreePanel, {
 	 * @param {String} title title
 	 */
 	,showError:function(msg, title) {
-		Ext.Msg.show({
+		Sonatype.MessageBox.show({
 			 title:title || this.errorText
 			,msg:Ext.util.Format.ellipsis(msg, this.maxMsgLen)
 			,fixCursor:true
-			,icon:Ext.Msg.ERROR
-			,buttons:Ext.Msg.OK
+			,icon:Sonatype.MessageBox.ERROR
+			,buttons:Sonatype.MessageBox.OK
 			,minWidth:1200 > String(msg).length ? 360 : 600
 		});
 	} // eo function showError

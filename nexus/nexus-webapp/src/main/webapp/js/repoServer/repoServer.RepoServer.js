@@ -300,20 +300,19 @@ Sonatype.repoServer.RepoServer = function(){
         this.addClickListeners( this.nexusPanel.add(panelConf) ); 
         //groupConfigs.push(panelConf);
       }
-/*
+
       //Security Group **************************************************
       var sTplData = {links:[]};
-      if( sp.checkPermission( userPerms.configServer, sp.EDIT ) ) {
+      if( sp.checkPermission( userPerms.configUsers, sp.EDIT ) ) {
         sTplData.links.push( { id: 'open-security-users', title: 'Users' } );
       }
-      if ( sp.checkPermission( userPerms.configServer, sp.EDIT ) ) {
+      if ( sp.checkPermission( userPerms.configRoles, sp.EDIT ) ) {
         sTplData.links.push( { id: 'open-security-roles', title: 'Roles' } );
       }
       if ( sTplData.links.length > 0 ){
         panelConf = Ext.apply( {}, { title:'Security', id: 'st-nexus-security', html: bodyTpl.apply( sTplData ) }, defaultGroupPanel );
-        this.nexusPanel.add( panelConf );
+        this.addClickListeners( this.nexusPanel.add(panelConf) );
       }
-*/
 
       this.nexusPanel.add( Ext.apply( {},
         {
