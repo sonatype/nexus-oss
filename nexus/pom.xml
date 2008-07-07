@@ -10,7 +10,7 @@
 	<artifactId>nexus</artifactId>
 	<packaging>pom</packaging>
 	<name>Nexus Repository Manager</name>
-	<version>1.0.0-beta-4-SNAPSHOT</version>
+	<version>1.0.0-beta-4</version>
 	<description>Sonatype Nexus Repository Manager</description>
 	<inceptionYear>2007</inceptionYear>
 	<mailingLists />
@@ -662,4 +662,10 @@
 			</plugin>
 		</plugins>
 	</reporting>
+
+  <scm>
+    <connection>scm:svn:http://svn.sonatype.org/nexus/tags/nexus-1.0.0-beta-4</connection>
+    <developerConnection>scm:svn:https://svn.sonatype.org/nexus/tags/nexus-1.0.0-beta-4</developerConnection>
+    <url>http://svn.sonatype.org/nexus/tags/nexus-1.0.0-beta-4</url>
+  </scm>
 </project>
