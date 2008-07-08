@@ -4,12 +4,12 @@
 <head profile="http://selenium-ide.openqa.org/profiles/test-case">
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <link rel="selenium.base" href="" />
-<title>Log In and Search</title>
+<title>Nexus Automated Test Script</title>
 </head>
 <body>
 <table cellpadding="1" cellspacing="1" border="1">
 <thead>
-<tr><td rowspan="1" colspan="3">Log In and Search</td></tr>
+<tr><td rowspan="1" colspan="3">Nexus Automated Test Script</td></tr>
 </thead><tbody>
 <tr>
 	<td>open</td>
@@ -24,12 +24,47 @@
 <tr>
 	<td>type</td>
 	<td>usernamefield</td>
-	<td>admin</td>
+	<td>test</td>
 </tr>
 <tr>
 	<td>type</td>
 	<td>passwordfield</td>
 	<td>admin123</td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td>500</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>loginbutton</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td>500</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>OK</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td>500</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>usernamefield</td>
+	<td>admin</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>usernamefield</td>
+	<td>admin</td>
 </tr>
 <tr>
 	<td>pause</td>
@@ -53,7 +88,152 @@
 </tr>
 <tr>
 	<td>verifyTextPresent</td>
-	<td>maven</td>
+	<td>Search</td>
+	<td></td>
+</tr>
+<tr>
+	<td>mouseDown</td>
+	<td>open-config-repos</td>
+	<td></td>
+</tr>
+<tr>
+	<td>mouseUp</td>
+	<td>open-config-repos</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td>500</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>repo-add-btn</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td>500</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>link=Hosted</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td>500</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>document.forms[0].elements[0]</td>
+	<td>aaa-hosted-repo</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>document.forms[0].elements[1]</td>
+	<td>aaa-hosted-repo</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>savebutton</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td>500</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>repo-delete-btn</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td>500</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>No</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td>500</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>repo-delete-btn</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>Yes</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//div[2]/div[1]/div/table/tbody/tr/td[4]/table/tbody/tr/td[2]/em/button</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>link=Empty Trash</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>No</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//div[2]/div[1]/div/table/tbody/tr/td[4]/table/tbody/tr/td[2]/em</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>link=Empty Trash</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>Yes</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>open-view-logs</td>
+	<td></td>
+</tr>
+<tr>
+	<td>mouseDown</td>
+	<td>open-logs</td>
+	<td></td>
+</tr>
+<tr>
+	<td>mouseUp</td>
+	<td>open-logs</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>link=nexus.log</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td>500</td>
+</tr>
+<tr>
+	<td>verifyTextPresent</td>
+	<td>Removed repository id=aaa-hosted-repo</td>
 	<td></td>
 </tr>
 
