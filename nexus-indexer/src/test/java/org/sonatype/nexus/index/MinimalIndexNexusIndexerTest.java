@@ -40,7 +40,7 @@ public class MinimalIndexNexusIndexerTest
             repo,
             indexDir,
             null,
-            null, NexusIndexer.MINIMAL_INDEX, false );
+            null, NexusIndexer.MINIMAL_INDEX );
         nexusIndexer.scan( context );
     }
 
@@ -60,7 +60,9 @@ public class MinimalIndexNexusIndexerTest
         TermQuery tq = new TermQuery( new Term( ArtifactInfo.PACKAGING, "maven-plugin" ) );
         Query query = new FilteredQuery( tq, new QueryWrapperFilter( bq ) );
 
-        Collection<ArtifactInfo> r = nexusIndexer.searchFlat( ArtifactInfo.VERSION_COMPARATOR, query );
+        FlatSearchResponse response = nexusIndexer.searchFlat( new FlatSearchRequest( query ) );
+        
+        Collection<ArtifactInfo> r = response.getResults(); 
 
         assertEquals( r.toString(), 1, r.size() );
 
@@ -88,4 +90,20 @@ public class MinimalIndexNexusIndexerTest
         assertEquals( "tricky-params", goals.get( 13 ) );
     }
 
+    public void testArchetype()
+        throws Exception 
+    {
+        String term = "proptest";
+  
+        Query bq = new PrefixQuery( new Term( ArtifactInfo.GROUP_ID, term ) );
+        TermQuery tq = new TermQuery( new Term( ArtifactInfo.PACKAGING, "maven-archetype" ) );
+        Query query = new FilteredQuery( tq, new QueryWrapperFilter( bq ) );
+    
+        FlatSearchResponse response = nexusIndexer.searchFlat( new FlatSearchRequest( query ) );
+        
+        Collection<ArtifactInfo> r = response.getResults(); 
+    
+        assertEquals( r.toString(), 1, r.size() );
+    }
+    
 }

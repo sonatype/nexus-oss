@@ -32,10 +32,12 @@ public abstract class AbstractRepoNexusIndexerTest
         throws Exception
     {
         Set<String> rootGroups = nexusIndexer.getRootGroups( context );
-        assertEquals( rootGroups.toString(), 7, rootGroups.size() );
+        assertEquals( rootGroups.toString(), 8, rootGroups.size() );
 
         assertGroup( 2, "qdox", context );
 
+        assertGroup( 1, "proptest", context );
+        
         assertGroup( 1, "junit", context );
 
         assertGroup( 6, "commons-logging", context );

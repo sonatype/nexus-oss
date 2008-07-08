@@ -83,10 +83,10 @@ public class DefaultArtifactContextProducer
 
             pom = pl.locate( file, gav );
 
-            if ( !pom.exists() )
-            {
-                return null;
-            }
+//            if ( !pom.exists() )
+//            {
+//                return null;
+//            }
         }
 
         ArtifactInfo ai = new ArtifactInfo( context.getRepositoryId(), groupId, artifactId, version, classifier );

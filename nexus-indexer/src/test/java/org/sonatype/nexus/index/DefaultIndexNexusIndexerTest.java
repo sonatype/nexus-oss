@@ -163,7 +163,7 @@ public class DefaultIndexNexusIndexerTest
 
         Collection<ArtifactInfo> r = nexusIndexer.searchFlat( ArtifactInfo.VERSION_COMPARATOR, query );
 
-        assertEquals( 2, r.size() );
+        assertEquals( 3, r.size() );
 
         Iterator<ArtifactInfo> it = r.iterator();
         {
@@ -177,6 +177,12 @@ public class DefaultIndexNexusIndexerTest
             assertEquals( "org.terracotta.maven.archetypes", ai.groupId );
             assertEquals( "pojo-archetype", ai.artifactId );
             assertEquals( "1.0.3", ai.version );
+        }
+        {
+          ArtifactInfo ai = it.next();
+          assertEquals( "proptest", ai.groupId );
+          assertEquals( "proptest-archetype", ai.artifactId );
+          assertEquals( "1.0", ai.version );
         }
 
     }
