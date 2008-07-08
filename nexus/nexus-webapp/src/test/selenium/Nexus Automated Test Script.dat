@@ -24,7 +24,7 @@
 <tr>
 	<td>type</td>
 	<td>usernamefield</td>
-	<td>test</td>
+	<td>untest</td>
 </tr>
 <tr>
 	<td>type</td>
@@ -63,8 +63,43 @@
 </tr>
 <tr>
 	<td>type</td>
+	<td>passwordfield</td>
+	<td>pwtest</td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td>500</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>loginbutton</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td>500</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>OK</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td>500</td>
+</tr>
+<tr>
+	<td>type</td>
 	<td>usernamefield</td>
 	<td>admin</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>passwordfield</td>
+	<td>admin123</td>
 </tr>
 <tr>
 	<td>pause</td>
@@ -147,6 +182,51 @@
 	<td>500</td>
 </tr>
 <tr>
+	<td>pause</td>
+	<td>500</td>
+	<td>500</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>repo-add-btn</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td>500</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>link=Hosted</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td>500</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>document.forms[0].elements[0]</td>
+	<td>bbb-hosted-repo</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>document.forms[0].elements[1]</td>
+	<td>bbb-hosted-repo</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>savebutton</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td>500</td>
+</tr>
+<tr>
 	<td>click</td>
 	<td>repo-delete-btn</td>
 	<td></td>
@@ -172,19 +252,39 @@
 	<td></td>
 </tr>
 <tr>
+	<td>pause</td>
+	<td>500</td>
+	<td>500</td>
+</tr>
+<tr>
 	<td>click</td>
 	<td>Yes</td>
 	<td></td>
 </tr>
 <tr>
 	<td>click</td>
-	<td>//div[2]/div[1]/div/table/tbody/tr/td[4]/table/tbody/tr/td[2]/em/button</td>
+	<td>repo-trash-btn</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td>500</td>
+</tr>
+<tr>
+	<td></td>
+	<td></td>
 	<td></td>
 </tr>
 <tr>
 	<td>click</td>
-	<td>link=Empty Trash</td>
+	<td>//a[contains(text(),'Empty Trash')]</td>
 	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td>500</td>
 </tr>
 <tr>
 	<td>click</td>
@@ -192,14 +292,29 @@
 	<td></td>
 </tr>
 <tr>
-	<td>click</td>
-	<td>//div[2]/div[1]/div/table/tbody/tr/td[4]/table/tbody/tr/td[2]/em</td>
-	<td></td>
+	<td>pause</td>
+	<td>500</td>
+	<td>500</td>
 </tr>
 <tr>
 	<td>click</td>
-	<td>link=Empty Trash</td>
+	<td>repo-trash-btn</td>
 	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td>500</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//a[contains(text(),'Empty Trash')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td>500</td>
 </tr>
 <tr>
 	<td>click</td>
@@ -207,23 +322,18 @@
 	<td></td>
 </tr>
 <tr>
-	<td>click</td>
-	<td>open-view-logs</td>
-	<td></td>
+	<td>pause</td>
+	<td>500</td>
+	<td>500</td>
 </tr>
 <tr>
 	<td>mouseDown</td>
-	<td>open-logs</td>
+	<td>open-security-users</td>
 	<td></td>
 </tr>
 <tr>
 	<td>mouseUp</td>
-	<td>open-logs</td>
-	<td></td>
-</tr>
-<tr>
-	<td>click</td>
-	<td>link=nexus.log</td>
+	<td>open-security-users</td>
 	<td></td>
 </tr>
 <tr>
@@ -232,8 +342,53 @@
 	<td>500</td>
 </tr>
 <tr>
-	<td>verifyTextPresent</td>
-	<td>Removed repository id=aaa-hosted-repo</td>
+	<td>click</td>
+	<td>//div[4]/div/div/div[1]/div[2]/div[1]/div/table/tbody/tr/td[1]/table/tbody/tr/td[2]/em/button</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//div[4]/div/div/div[1]/div[2]/div[1]/div/table/tbody/tr/td[2]/table/tbody/tr/td[2]/em/button</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>userId</td>
+	<td>User1</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>name</td>
+	<td>User One</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>email</td>
+	<td>userone@email.com</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//div[4]/div[1]/div/img[1]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//div[27]/div/div[1]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>password</td>
+	<td>userone</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>reenterPassword</td>
+	<td>userone</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//div[2]/div/div/div/div/div/table/tbody/tr/td[1]/table/tbody/tr/td[2]/em/button</td>
 	<td></td>
 </tr>
 
