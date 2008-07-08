@@ -312,7 +312,7 @@ Sonatype.repoServer.GroupsEditPanel = function(config){
     columns: [
       {header: 'Group', dataIndex: 'name', width:175},
       {header: 'Repositories', dataIndex: 'sRepositories', width:300},
-      {header: 'Group Path', dataIndex: 'contentUri', id: 'groups-config-url-col', width:300,renderer: function(s){return '<a href="' + s + '" target="_blank">' + s + '</a>';},menuDisabled:true}
+      {header: 'Group Path', dataIndex: 'contentUri', id: 'groups-config-url-col', width:300,renderer: function(s){return '<a href="' + s+ (((s.charAt(s.length)) == '/') ? '' : '/') + '" target="_blank">' + s + '</a>';},menuDisabled:true}
     ],
     autoExpandColumn: 'groups-config-url-col',
     disableSelection: false,

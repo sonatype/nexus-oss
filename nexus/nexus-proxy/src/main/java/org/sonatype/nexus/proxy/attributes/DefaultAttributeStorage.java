@@ -24,8 +24,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.commons.io.FilenameUtils;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
@@ -68,11 +66,6 @@ public class DefaultAttributeStorage
     private XStream xstream;
 
     /**
-     * The table of current operations.
-     */
-    private volatile HashMap<String, ReentrantLock> locks;
-
-    /**
      * Instantiates a new FSX stream attribute storage.
      */
     public DefaultAttributeStorage()
@@ -82,7 +75,6 @@ public class DefaultAttributeStorage
         this.xstream.alias( "file", DefaultStorageFileItem.class );
         this.xstream.alias( "collection", DefaultStorageCollectionItem.class );
         this.xstream.alias( "link", DefaultStorageLinkItem.class );
-        this.locks = new HashMap<String, ReentrantLock>();
     }
 
     public void initialize()
@@ -93,34 +85,7 @@ public class DefaultAttributeStorage
     public void onConfigurationChange( ConfigurationChangeEvent evt )
     {
         this.workingDirectory = null;
-    }
-
-    private ReentrantLock getLock( RepositoryItemUid uid, boolean create )
-    {
-        ReentrantLock lock = null;
-
-        synchronized ( locks )
-        {
-            if ( create && !locks.containsKey( uid.toString() ) )
-            {
-                locks.put( uid.toString(), new ReentrantLock() );
-            }
-
-            lock = locks.get( uid.toString() );
-        }
-
-        return lock;
-    }
-
-    protected void lockFor( RepositoryItemUid uid )
-    {
-        getLock( uid, true ).lock();
-    }
-
-    protected void releaseFor( RepositoryItemUid uid )
-    {
-        getLock( uid, false ).unlock();
-    }
+    }    
 
     /**
      * Gets the base dir.
@@ -164,7 +129,7 @@ public class DefaultAttributeStorage
 
     public boolean deleteAttributes( RepositoryItemUid uid )
     {
-        lockFor( uid );
+        uid.lock();
 
         try
         {
@@ -190,13 +155,13 @@ public class DefaultAttributeStorage
         }
         finally
         {
-            releaseFor( uid );
+            uid.unlock();
         }
     }
 
     public AbstractStorageItem getAttributes( RepositoryItemUid uid )
     {
-        lockFor( uid );
+        uid.lock();
 
         try
         {
@@ -221,13 +186,13 @@ public class DefaultAttributeStorage
         }
         finally
         {
-            releaseFor( uid );
+            uid.unlock();
         }
     }
 
     public void putAttribute( AbstractStorageItem item )
     {
-        lockFor( item.getRepositoryItemUid() );
+        item.getRepositoryItemUid().lock();
 
         try
         {
@@ -296,7 +261,7 @@ public class DefaultAttributeStorage
         }
         finally
         {
-            releaseFor( item.getRepositoryItemUid() );
+            item.getRepositoryItemUid().unlock();
         }
     }
 
@@ -390,5 +355,4 @@ public class DefaultAttributeStorage
             return result;
         }
     }
-
 }

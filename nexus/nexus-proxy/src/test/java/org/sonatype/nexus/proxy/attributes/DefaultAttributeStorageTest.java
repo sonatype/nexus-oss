@@ -38,6 +38,8 @@ public class DefaultAttributeStorageTest
 {
 
     protected DefaultAttributeStorage attributeStorage;
+    
+    protected DummyRepository repository;
 
     public void setUp()
         throws Exception
@@ -45,6 +47,8 @@ public class DefaultAttributeStorageTest
         super.setUp();
 
         attributeStorage = (DefaultAttributeStorage) lookup( AttributeStorage.ROLE );
+        
+        repository = new DummyRepository( "dummy" );
 
         FileUtils.deleteDirectory( attributeStorage.getWorkingDirectory() );
     }
@@ -52,11 +56,8 @@ public class DefaultAttributeStorageTest
     public void testSimplePutGet()
         throws Exception
     {
-        DummyRepository dummy = new DummyRepository();
-        dummy.setId( "dummy" );
-
         DefaultStorageFileItem file = new DefaultStorageFileItem(
-            dummy,
+            repository,
             "/a.txt",
             true,
             true,
@@ -66,7 +67,7 @@ public class DefaultAttributeStorageTest
 
         attributeStorage.putAttribute( file );
 
-        RepositoryItemUid uid = new RepositoryItemUid( dummy, "/a.txt" );
+        RepositoryItemUid uid = new RepositoryItemUid( repository, "/a.txt" );
         DefaultStorageFileItem file1 = (DefaultStorageFileItem) attributeStorage.getAttributes( uid );
 
         assertTrue( file1.getAttributes().containsKey( "kuku" ) );
@@ -76,11 +77,8 @@ public class DefaultAttributeStorageTest
     public void testSimplePutDelete()
         throws Exception
     {
-        DummyRepository dummy = new DummyRepository();
-        dummy.setId( "dummy" );
-
         DefaultStorageFileItem file = new DefaultStorageFileItem(
-            dummy,
+            repository,
             "/b.txt",
             true,
             true,
@@ -90,7 +88,7 @@ public class DefaultAttributeStorageTest
 
         attributeStorage.putAttribute( file );
 
-        RepositoryItemUid uid = new RepositoryItemUid( dummy, "/b.txt" );
+        RepositoryItemUid uid = new RepositoryItemUid( repository, "/b.txt" );
 
         assertTrue( attributeStorage.getFileFromBase( uid ).exists() );
 
