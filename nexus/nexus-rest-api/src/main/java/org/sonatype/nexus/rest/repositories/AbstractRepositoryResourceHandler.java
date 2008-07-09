@@ -361,23 +361,23 @@ public class AbstractRepositoryResourceHandler
                     target.getRemoteStorage().getHttpProxySettings().setAuthentication( new CRemoteAuthentication() );
                 }
 
-                target.getRemoteStorage().getAuthentication().setUsername(
-                    model.getRemoteStorage().getAuthentication().getUsername() );
+                target.getRemoteStorage().getHttpProxySettings().getAuthentication().setUsername(
+                    model.getRemoteStorage().getHttpProxySettings().getAuthentication().getUsername() );
 
-                target.getRemoteStorage().getAuthentication().setPassword(
-                    model.getRemoteStorage().getAuthentication().getPassword() );
+                target.getRemoteStorage().getHttpProxySettings().getAuthentication().setPassword(
+                    model.getRemoteStorage().getHttpProxySettings().getAuthentication().getPassword() );
 
-                target.getRemoteStorage().getAuthentication().setNtlmDomain(
-                    model.getRemoteStorage().getAuthentication().getNtlmDomain() );
+                target.getRemoteStorage().getHttpProxySettings().getAuthentication().setNtlmDomain(
+                    model.getRemoteStorage().getHttpProxySettings().getAuthentication().getNtlmDomain() );
 
-                target.getRemoteStorage().getAuthentication().setNtlmHost(
-                    model.getRemoteStorage().getAuthentication().getNtlmHost() );
+                target.getRemoteStorage().getHttpProxySettings().getAuthentication().setNtlmHost(
+                    model.getRemoteStorage().getHttpProxySettings().getAuthentication().getNtlmHost() );
 
-                target.getRemoteStorage().getAuthentication().setPrivateKey(
-                    model.getRemoteStorage().getAuthentication().getPrivateKey() );
+                target.getRemoteStorage().getHttpProxySettings().getAuthentication().setPrivateKey(
+                    model.getRemoteStorage().getHttpProxySettings().getAuthentication().getPrivateKey() );
 
-                target.getRemoteStorage().getAuthentication().setPassphrase(
-                    model.getRemoteStorage().getAuthentication().getPassphrase() );
+                target.getRemoteStorage().getHttpProxySettings().getAuthentication().setPassphrase(
+                    model.getRemoteStorage().getHttpProxySettings().getAuthentication().getPassphrase() );
             }
 
         }
