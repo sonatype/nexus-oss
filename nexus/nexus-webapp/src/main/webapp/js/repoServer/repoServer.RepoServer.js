@@ -295,6 +295,9 @@ Sonatype.repoServer.RepoServer = function(){
       if(sp.checkPermission(userPerms.configSchedules, sp.EDIT)){
         cTplData.links.push( {id:'open-config-schedules', title:'Scheduled Tasks'} );
       }
+      if(sp.checkPermission(userPerms.configSchedules, sp.EDIT)){
+        cTplData.links.push( {id:'open-config-repoTargets', title:'Repository Targets'} );
+      }
       if(cTplData.links.length > 0){
         panelConf = Ext.apply({}, {title:'Administration', id:'st-nexus-config', html: bodyTpl.apply(cTplData)}, defaultGroupPanel);
         this.addClickListeners( this.nexusPanel.add(panelConf) ); 
@@ -398,6 +401,10 @@ Sonatype.repoServer.RepoServer = function(){
       'open-security-roles' : function(scope){
         var id = 'security-roles';
         Sonatype.view.mainTabPanel.addOrShowTab(id, Sonatype.repoServer.RoleEditPanel, {title: 'Roles'});
+      },
+      'open-config-repoTargets' : function(scope){
+        var id = 'config-repoTargets';
+        Sonatype.view.mainTabPanel.addOrShowTab(id, Sonatype.repoServer.RepoTargetEditPanel, {title: 'Repository Targets'});
       }
     },
     

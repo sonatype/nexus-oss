@@ -103,6 +103,7 @@ Sonatype.config = function() {
         users: servicePath + '/users',
         usersReset: servicePath + '/users/reset',
         roles: servicePath + '/roles'
+        repoTargets: servicePath + '/repo_targets'
       }
     },
     

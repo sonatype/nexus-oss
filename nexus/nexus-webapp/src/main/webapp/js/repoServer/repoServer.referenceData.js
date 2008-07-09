@@ -257,6 +257,15 @@ Sonatype.repoServer.referenceData = {
     sessionTimeout : 0,
     roles : [],
     privileges : []
+  },
+  
+  repoTargets : {
+    id : "",
+    name : "",
+    description : "",
+    sessionTimeout : 0,
+    roles : [],
+    privileges : []
   }
   
 };
