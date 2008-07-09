@@ -9,6 +9,7 @@ import java.util.ResourceBundle;
 
 import org.sonatype.appbooter.ctl.ControlConnectionException;
 import org.sonatype.appbooter.ctl.ControllerClient;
+import org.sonatype.nexus.artifact.Gav;
 
 public class ProxyRepo
 {
@@ -206,6 +207,11 @@ public class ProxyRepo
         {
             throw new RuntimeException( e.getMessage(), e );
         }
+    }
+    
+    public File getLocalFile( String repositoryId, Gav gav, String targetDirectory )
+    {
+        return this.getLocalFile( repositoryId, gav.getGroupId(), gav.getArtifactId(), gav.getVersion(), gav.getExtension(), targetDirectory );
     }
 
     public File getLocalFile( String repositoryId, String groupId, String artifact, String version, String type,
