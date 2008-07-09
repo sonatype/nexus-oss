@@ -177,7 +177,8 @@ public class DefaultRepositoryRegistry
             notifyProximityEventListeners( new RepositoryRegistryGroupEventAdd( this, groupId ) );
 
             getLogger().info(
-                "Added repository group ID=" + groupId + " (contentClass=" + contentClass.getId()
+                "Added repository group ID=" + groupId + " (contentClass=" + 
+                (contentClass != null ? contentClass.getId() : "null")
                     + ") with repository members of (in processing order) " + memberRepositories );
         }
         catch ( NoSuchRepositoryException e )
