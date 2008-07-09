@@ -320,7 +320,7 @@ Sonatype.repoServer.RepoMaintPanel = function(config){
         }},
       {header: 'Type', dataIndex: 'repoType', width:50},
       {header: 'Status', dataIndex: 'sStatus', width:300},
-      {header: 'Repository Path', dataIndex: 'contentUri', id: 'repo-maint-url-col', width:250,renderer: function(s){return '<a href="' + s + (((s.charAt(s.length)) == '/') ? '' : '/') +'" target="_blank">' + s + '</a>';},menuDisabled:true}      
+      {header: 'Repository Path', dataIndex: 'contentUri', id: 'repo-maint-url-col', width:250,renderer: function(s){return '<a href="' + s + ((s != null && (s.charAt(s.length)) == '/') ? '' : '/') +'" target="_blank">' + s + '</a>';},menuDisabled:true}      
     ],
     autoExpandColumn: 'repo-maint-url-col',
     disableSelection: false,
