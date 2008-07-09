@@ -61,6 +61,7 @@ public abstract class AbstractNexusIntegrationTest
     private PlexusContainer container;
     private Map context;
     private String baseNexusUrl;
+    private String nexusBundleDir;
 
     private static ControllerClient manager;
     private static boolean detach = false;
@@ -83,8 +84,11 @@ public abstract class AbstractNexusIntegrationTest
      */
     public AbstractNexusIntegrationTest( String nexusUrl )
     {
-     // Using ResourceBundle here because its on line..
-        this.baseNexusUrl = ResourceBundle.getBundle( "baseTest" ).getString( "nexus.base.url" );
+     // Using ResourceBundle here because its easy
+        ResourceBundle rb = ResourceBundle.getBundle( "baseTest" );
+        
+        this.baseNexusUrl = rb.getString( "nexus.base.url" );
+        this.nexusBundleDir = rb.getString( "nexus.bundle.dir" );
 
         this.nexusUrl = baseNexusUrl + nexusUrl;
         setupContainer();
@@ -464,6 +468,18 @@ public abstract class AbstractNexusIntegrationTest
     public String getNexusURL()
     {
         return this.nexusUrl;
+    }
+
+
+    public String getNexusBundleDir()
+    {
+        return nexusBundleDir;
+    }
+
+
+    public void setNexusBundleDir( String nexusBundleDir )
+    {
+        this.nexusBundleDir = nexusBundleDir;
     }
 
 

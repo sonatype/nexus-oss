@@ -127,7 +127,9 @@ public class FileTestingUtils
     public static File getTestFile( Class clazz, String filename )
     {
         String resource = clazz.getName().replace( '.', '/' ) + "Resources/" + filename;
+        System.out.println( "Looking for resource: "+ resource );
         URL classURL = Thread.currentThread().getContextClassLoader().getResource( resource );
+        System.out.println( "found: "+ classURL );
         return new File( classURL.getFile() );
     }
 
