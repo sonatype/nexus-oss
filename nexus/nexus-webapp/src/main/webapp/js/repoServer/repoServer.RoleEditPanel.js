@@ -715,7 +715,8 @@ Ext.extend(Sonatype.repoServer.RoleEditPanel, Ext.Panel, {
           allowChildren: false,
           draggable: true,
           leaf: true,
-          nodeType: 'role'
+          nodeType: 'role',
+          icon: Sonatype.config.resourcePath + '/ext-2.0.2/resources/images/default/tree/folder.gif'
         })
       );
     }
@@ -730,7 +731,8 @@ Ext.extend(Sonatype.repoServer.RoleEditPanel, Ext.Panel, {
             allowChildren: false,
             draggable: true,
             leaf: true,
-            nodeType: 'role'
+            nodeType: 'role',
+            icon: Sonatype.config.resourcePath + '/ext-2.0.2/resources/images/default/tree/folder.gif'
           })
         );
       }
