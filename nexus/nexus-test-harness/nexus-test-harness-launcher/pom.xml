@@ -214,16 +214,7 @@
 		                    </platformArtifact>
 		                </configuration>
 		            </execution>
-		            <execution>
-                        <id>stop-nexus</id>
-                        <phase>post-integration-test</phase>
-                        <goals>
-                            <goal>stop</goal>
-                        </goals>
-                        <configuration>
-                        <controlPort>${nexus-control-port}</controlPort>
-                        </configuration>
-                    </execution>
+		            
                     
                     <execution>
 		                <id>start-proxy-repo</id>
@@ -253,7 +244,8 @@
 		                    </platformArtifact>
 		                </configuration>
 		            </execution>
-		             <execution>
+		            
+		            <execution>
                         <id>stop-proxy-repo</id>
                         <phase>post-integration-test</phase>
                         <goals>
@@ -263,6 +255,18 @@
                         <controlPort>${proxy-repo-control-port}</controlPort>
                         </configuration>
                     </execution>
+                    
+                    <execution>
+                        <id>stop-nexus</id>
+                        <phase>post-integration-test</phase>
+                        <goals>
+                            <goal>stop</goal>
+                        </goals>
+                        <configuration>
+                        <controlPort>${nexus-control-port}</controlPort>
+                        </configuration>
+                    </execution>
+                    
 		        </executions> 
                     
 		    </plugin>
