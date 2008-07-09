@@ -92,6 +92,7 @@ import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.item.StorageLinkItem;
+import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.registry.InvalidGroupingException;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.LocalStatus;
@@ -250,7 +251,14 @@ public class DefaultNexus
     public String getRepositoryGroupType( String repoGroupId )
         throws NoSuchRepositoryGroupException
     {
-        return repositoryRegistry.getRepositoryGroupContentClass( repoGroupId ).getId();
+        ContentClass contentClass = repositoryRegistry.getRepositoryGroupContentClass( repoGroupId );
+        
+        if ( contentClass == null )
+        {
+            return null;
+        }
+        
+        return contentClass.getId();
     }
 
     public Collection<Repository> getRepositories()
