@@ -26,6 +26,7 @@ import static org.junit.Assert.fail;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -51,6 +52,8 @@ import org.junit.BeforeClass;
 import org.sonatype.appbooter.PlexusContainerHost;
 import org.sonatype.appbooter.ctl.ControlConnectionException;
 import org.sonatype.appbooter.ctl.ControllerClient;
+import org.sonatype.nexus.artifact.Gav;
+import org.sonatype.nexus.test.proxy.ProxyRepo;
 
 public abstract class AbstractNexusIntegrationTest
 {
@@ -70,6 +73,9 @@ public abstract class AbstractNexusIntegrationTest
     public static final String GROUP_REPOSITORY_RELATIVE_URL = "content/groups/";
 
     private static String basedir;
+    
+    // TODO: need to configure this via the pom
+    private static boolean STANDALONE_MODE = false;
 
     /**
      * Sets up the infrastructure for the tests.
@@ -83,6 +89,7 @@ public abstract class AbstractNexusIntegrationTest
         this.nexusUrl = baseNexusUrl + nexusUrl;
         setupContainer();
     }
+    
 
     protected void complete()
     {
@@ -92,39 +99,45 @@ public abstract class AbstractNexusIntegrationTest
     @BeforeClass
     public static void oncePerClassSetUp()
     {
-        synchronized ( waitObj )
+        if( !STANDALONE_MODE )
         {
-            try
+            synchronized ( waitObj )
             {
-                detach = false;
-                if ( manager != null )
+                try
                 {
-                    manager.close();
+                    detach = false;
+                    if ( manager != null )
+                    {
+                        manager.close();
+                        
+                    }
+                    
+                    String controlPortString = ResourceBundle.getBundle( "baseTest" ).getString( "nexus.control.port" );
+                    // if this throws the test will fail...
+                    manager = new ControllerClient( Integer.parseInt( controlPortString ) );
+                    manager.shutdownOnClose();
+                    Thread.sleep( MANAGER_WAIT_TIME );
                 }
-
-                manager = new ControllerClient( PlexusContainerHost.DEFAULT_CONTROL_PORT );
-                manager.shutdownOnClose();
-                Thread.sleep( MANAGER_WAIT_TIME );
-            }
-            catch ( UnknownHostException e )
-            {
-                e.printStackTrace();
-                throw new RuntimeException( "Unable to initialize test.", e );
-            }
-            catch ( ControlConnectionException e )
-            {
-                e.printStackTrace();
-                throw new RuntimeException( "Unable to initialize test.", e );
-            }
-            catch ( IOException e )
-            {
-                e.printStackTrace();
-                throw new RuntimeException( "Unable to initialize test.", e );
-            }
-            catch ( InterruptedException e )
-            {
-                e.printStackTrace();
-                throw new RuntimeException( "Unable to initialize test.", e );
+                catch ( UnknownHostException e )
+                {
+                    e.printStackTrace();
+                    throw new RuntimeException( "Unable to initialize test.", e );
+                }
+                catch ( ControlConnectionException e )
+                {
+                    e.printStackTrace();
+                    throw new RuntimeException( "Unable to initialize test.", e );
+                }
+                catch ( IOException e )
+                {
+                    e.printStackTrace();
+                    throw new RuntimeException( "Unable to initialize test.", e );
+                }
+                catch ( InterruptedException e )
+                {
+                    e.printStackTrace();
+                    throw new RuntimeException( "Unable to initialize test.", e );
+                }
             }
         }
     }
@@ -132,38 +145,45 @@ public abstract class AbstractNexusIntegrationTest
     @AfterClass
     public static void oncePerClassTearDown()
     {
-        synchronized ( waitObj )
+        if( !STANDALONE_MODE )
         {
-            try
+            synchronized ( waitObj )
             {
-                if ( detach )
+                try
                 {
-                    manager.detachOnClose();
+                    //if detach is true, then the tests passed
+                    if ( detach )
+                    {
+                        manager.detachOnClose();
+                    }
+    
+                    manager.close();
+                    manager = null;
+    
+                    ProxyRepo.getInstance().disconnect( detach );
+                    
+                    Thread.sleep( MANAGER_WAIT_TIME );
                 }
-
-                manager.close();
-                manager = null;
-                Thread.sleep( MANAGER_WAIT_TIME );
-            }
-            catch ( UnknownHostException e )
-            {
-                e.printStackTrace();
-                throw new RuntimeException( "Unable to teardown test.", e );
-            }
-            catch ( ControlConnectionException e )
-            {
-                e.printStackTrace();
-                throw new RuntimeException( "Unable to teardown test.", e );
-            }
-            catch ( IOException e )
-            {
-                e.printStackTrace();
-                throw new RuntimeException( "Unable to teardown test.", e );
-            }
-            catch ( InterruptedException e )
-            {
-                e.printStackTrace();
-                throw new RuntimeException( "Unable to teardown test.", e );
+                catch ( UnknownHostException e )
+                {
+                    e.printStackTrace();
+                    throw new RuntimeException( "Unable to teardown test.", e );
+                }
+                catch ( ControlConnectionException e )
+                {
+                    e.printStackTrace();
+                    throw new RuntimeException( "Unable to teardown test.", e );
+                }
+                catch ( IOException e )
+                {
+                    e.printStackTrace();
+                    throw new RuntimeException( "Unable to teardown test.", e );
+                }
+                catch ( InterruptedException e )
+                {
+                    e.printStackTrace();
+                    throw new RuntimeException( "Unable to teardown test.", e );
+                }
             }
         }
     }
@@ -272,14 +292,26 @@ public abstract class AbstractNexusIntegrationTest
         }
     }
 
-    protected void restartNexus()
+    protected void restartNexus() throws IOException
     {
         stopNexus();
         startNexus();
     }
+    
+    protected File downloadArtifact( Gav gav, String targetDirectory ) throws IOException
+    {
+        return this.downloadArtifact( gav.getGroupId(), gav.getArtifactId(), gav.getVersion(), gav.getExtension(), targetDirectory );
+    }
+    
+    protected String getRelitiveArtifactPath( Gav gav ) throws FileNotFoundException
+    {
+        return gav.getGroupId().replace( '.', '/' ) + "/" + gav.getArtifactId() + "/" + gav.getVersion() + "/" + gav.getArtifactId() + "-"
+        + gav.getVersion() + "." + gav.getExtension();
+    }
+    
 
     protected File downloadArtifact( String groupId, String artifact, String version, String type,
-                                     String targetDirectory )
+                                     String targetDirectory ) throws IOException
     {
         URL url = null;
         OutputStream out = null;
@@ -294,6 +326,7 @@ public abstract class AbstractNexusIntegrationTest
             url =
                 new URL( nexusUrl + groupId.replace( '.', '/' ) + "/" + artifact + "/" + version + "/" + artifact + "-"
                     + version + "." + type );
+            System.out.println( "Downloading file: " + url );
             out = new BufferedOutputStream( new FileOutputStream( downloadedFile ) );
 
             conn = url.openConnection();
@@ -306,16 +339,6 @@ public abstract class AbstractNexusIntegrationTest
                 out.write( buffer, 0, numRead );
                 numWritten += numRead;
             }
-        }
-        catch ( MalformedURLException e )
-        {
-            e.printStackTrace();
-            fail( "Exception downloading artifact" );
-        }
-        catch ( IOException e )
-        {
-            e.printStackTrace();
-            fail( "Exception downloading artifact" );
         }
         finally
         {
@@ -436,6 +459,11 @@ public abstract class AbstractNexusIntegrationTest
     public String getNexusGroupRepositoryURL(String repositoryName)
     {
         return this.getBaseNexusUrl() + GROUP_REPOSITORY_RELATIVE_URL + repositoryName;
+    }
+    
+    public String getNexusURL()
+    {
+        return this.nexusUrl;
     }
 
 

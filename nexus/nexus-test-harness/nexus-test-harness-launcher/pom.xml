@@ -15,12 +15,17 @@
 		<nexus-basedir>${bundle-expanded-dir}/nexus-webapp-${project.version}</nexus-basedir>
 		<config-target-dir>${nexus-basedir}/runtime/apps/nexus/conf</config-target-dir>
 		<work-target-dir>${nexus-basedir}/runtime/work</work-target-dir>		
-		<proxy-repo-target-dir>${nexus-basedir}/proxy-repos/</proxy-repo-target-dir>
-		<plexus-config-file>${nexus-basedir}/conf/plexus.xml</plexus-config-file>
+		<proxy-repo-target-dir>${project.build.directory}/proxy-repos/</proxy-repo-target-dir>
+		<nexus-plexus-config-file>${nexus-basedir}/conf/plexus.xml</nexus-plexus-config-file>
+		<proxy-repo-plexus-config-file>${project.build.directory}/test-classes/proxyRepo/conf/ProxyRepoPlexus.xml</proxy-repo-plexus-config-file>
+		<proxy-repo-port>8089</proxy-repo-port>
+		<proxy-repo-base-url>http://localhost:${proxy-repo-port}/remote/</proxy-repo-base-url>
 		<nexus-application-protocol>http</nexus-application-protocol>
 		<nexus-application-host>localhost</nexus-application-host>
 		<nexus-application-name>nexus</nexus-application-name>
 		<nexus-application-port>8087</nexus-application-port>
+		<nexus-control-port>32001</nexus-control-port>
+		<proxy-repo-control-port>32002</proxy-repo-control-port>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -38,6 +43,13 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
+			<groupId>org.sonatype.nexus</groupId>
+			<artifactId>nexus-test-harness-proxy-repo</artifactId>
+			<version>${project.version}</version>
+			<type>zip</type>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
             <groupId>org.sonatype.nexus</groupId>
             <artifactId>nexus-webapp</artifactId>
             <version>${project.version}</version>
@@ -49,6 +61,11 @@
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<version>4.4</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.sonatype.plexus</groupId>
+			<artifactId>plexus-jetty-testsuite</artifactId>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -82,9 +99,19 @@
 	    <testResources>
 	      <testResource>
 	      	<directory>src/test/resources</directory>
+	      	<!-- <excludes>
+	      	  <exclude>**/ProxyRepoPlexus.xml</exclude>
+	      	</excludes> -->
 	      	<filtering>true</filtering>
 	      </testResource>
-	    </testResources>
+	      <!-- <testResource>
+	      	<directory>src/test/resources</directory>
+	      	<includes>
+	      	  <include>**/ProxyRepoPlexus.xml</include>
+	      	</includes>
+	      	<filtering>false</filtering>
+	      </testResource> -->
+	    </testResources> 
 		<plugins>
 		    <plugin>
                 <artifactId>maven-dependency-plugin</artifactId>
@@ -136,6 +163,23 @@
                             </outputDirectory>
                         </configuration>
                     </execution>
+                    
+                    <execution>
+                        <id>unpack-proxy-repo</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>unpack-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <includeArtifactIds>
+                                nexus-test-harness-proxy-repo
+                            </includeArtifactIds>
+                            <outputDirectory>
+                                ${proxy-repo-target-dir}
+                            </outputDirectory>
+                        </configuration>
+                    </execution>
+                    
                 </executions>
             </plugin>
 		    <plugin>
@@ -153,6 +197,7 @@
 		                        <prependClasspath>${basedir}/${config-target-dir}</prependClasspath>
 		                    </prependClasspaths>
 		                    <disableBlocking>true</disableBlocking>
+		                    <controlPort>${nexus-control-port}</controlPort>
 		                    <systemProperties>
 		                        <java.util.logging.config.file>${basedir}/${config-target-dir}/jul-logging.properties</java.util.logging.config.file>
                                 <java.io.tmpdir>${basedir}/${work-target-dir}/tmp</java.io.tmpdir>
@@ -160,7 +205,7 @@
                                 <plexus.container.dev.mode>true</plexus.container.dev.mode>
 		                    </systemProperties>
 		                    <basedir>${bundle-expanded-dir}/nexus-webapp-${project.version}</basedir>
-		                    <configuration>${plexus-config-file}</configuration>
+		                    <configuration>${nexus-plexus-config-file}</configuration>
 		                    <includeTestClasspath>true</includeTestClasspath>
 		                    <platformArtifact>
 		                        <groupId>org.sonatype.appbooter.plexus-platforms</groupId>
@@ -175,9 +220,54 @@
                         <goals>
                             <goal>stop</goal>
                         </goals>
+                        <configuration>
+                        <controlPort>${nexus-control-port}</controlPort>
+                        </configuration>
                     </execution>
-		        </executions>
+                    
+                    <execution>
+		                <id>start-proxy-repo</id>
+		                <phase>pre-integration-test</phase>
+		                <goals>
+		                    <goal>run</goal>
+		                </goals>
+		                <configuration>
+		                    <prependClasspaths>
+		                        <prependClasspath>${basedir}/${config-target-dir}</prependClasspath>
+		                    </prependClasspaths>
+		                    <disableBlocking>true</disableBlocking>
+		                    <controlPort>${proxy-repo-control-port}</controlPort>
+		                    <systemProperties>
+		                        <java.util.logging.config.file>${basedir}/${config-target-dir}/jul-logging.properties</java.util.logging.config.file>
+                                <java.io.tmpdir>${basedir}/target/proxy-repo/tmp</java.io.tmpdir>
+                                <plexus.host.control.socket.enabled>true</plexus.host.control.socket.enabled>
+                                <plexus.container.dev.mode>true</plexus.container.dev.mode>
+		                    </systemProperties>
+		                    <basedir>${proxy-repo-target-dir}</basedir>
+		                    <configuration>${proxy-repo-plexus-config-file}</configuration>
+		                    <includeTestClasspath>true</includeTestClasspath>
+		                    <platformArtifact>
+		                        <groupId>org.sonatype.appbooter.plexus-platforms</groupId>
+                                <artifactId>plexus-platform-base</artifactId>
+                                <version>${plexus.appbooter.version}</version>
+		                    </platformArtifact>
+		                </configuration>
+		            </execution>
+		             <execution>
+                        <id>stop-proxy-repo</id>
+                        <phase>post-integration-test</phase>
+                        <goals>
+                            <goal>stop</goal>
+                        </goals>
+                        <configuration>
+                        <controlPort>${proxy-repo-control-port}</controlPort>
+                        </configuration>
+                    </execution>
+		        </executions> 
+                    
 		    </plugin>
+		    
+		    
 		    <plugin>
                 <groupId>org.sonatype.plugins</groupId>
                 <artifactId>wait-maven-plugin</artifactId>

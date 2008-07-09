@@ -24,6 +24,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.FilenameFilter;
+import java.io.IOException;
 
 import org.junit.Test;
 
@@ -36,7 +37,7 @@ public class NexusGroupDownloadTest
     }
 
     @Test
-    public void downloadArtifact()
+    public void downloadArtifact() throws IOException
     {
         File artifact = downloadArtifact( "org.sonatype.nexus", "release-jar", "1", "jar", "./target/downloaded-jars" );
 
