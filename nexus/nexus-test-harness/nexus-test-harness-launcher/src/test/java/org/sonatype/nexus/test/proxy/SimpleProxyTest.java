@@ -21,7 +21,7 @@ public class SimpleProxyTest extends AbstractNexusIntegrationTest
     @Test
     public void downloadFromProxy() throws IOException
     {
-        File localFile = ProxyRepo.getInstance().getLocalFile( "release-proxy-repo-1", "simple.artifact", "simpleXMLArtifact", "1.0.0", "xml", "target/downloads" );
+        File localFile = ProxyRepo.getInstance().getLocalFile( "release-proxy-repo-1", "simple.artifact", "simpleXMLArtifact", "1.0.0", "xml" );
                                                                                               
         System.out.println( "localFile: "+ localFile.getAbsolutePath() );
         

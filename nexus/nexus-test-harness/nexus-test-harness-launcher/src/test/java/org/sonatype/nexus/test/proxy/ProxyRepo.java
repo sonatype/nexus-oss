@@ -7,6 +7,14 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.ResourceBundle;
 
+import junit.framework.Assert;
+
+import org.restlet.Client;
+import org.restlet.data.MediaType;
+import org.restlet.data.Method;
+import org.restlet.data.Protocol;
+import org.restlet.data.Request;
+import org.restlet.data.Response;
 import org.sonatype.appbooter.ctl.ControlConnectionException;
 import org.sonatype.appbooter.ctl.ControllerClient;
 import org.sonatype.nexus.artifact.Gav;
@@ -48,8 +56,6 @@ public class ProxyRepo
         }
         return INSTANCE;
     }
-
-
 
     public synchronized static void stop()
     {
@@ -196,7 +202,7 @@ public class ProxyRepo
         // if detach is true, then the tests passed
         try
         {
-            if ( detach && this.manager != null)
+            if ( detach && this.manager != null )
             {
                 this.manager.detachOnClose();
                 this.manager.close();
@@ -208,17 +214,52 @@ public class ProxyRepo
             throw new RuntimeException( e.getMessage(), e );
         }
     }
-    
-    public File getLocalFile( String repositoryId, Gav gav, String targetDirectory )
+
+    public File getLocalFile( String repositoryId, Gav gav)
     {
-        return this.getLocalFile( repositoryId, gav.getGroupId(), gav.getArtifactId(), gav.getVersion(), gav.getExtension(), targetDirectory );
+        return this.getLocalFile( repositoryId, gav.getGroupId(), gav.getArtifactId(), gav.getVersion(),
+                                  gav.getExtension() );
     }
 
-    public File getLocalFile( String repositoryId, String groupId, String artifact, String version, String type,
-                              String targetDirectory )
+    public File getLocalFile( String repositoryId, String groupId, String artifact, String version, String type )
     {
         return new File( this.localStorageDir, repositoryId + "/" + groupId.replace( '.', '/' ) + "/" + artifact + "/"
             + version + "/" + artifact + "-" + version + "." + type );
+    }
+    
+    public void setBlockProxy( String nexusBaseUrl, String repoId, boolean block )
+    {
+
+        String serviceURI = nexusBaseUrl + "service/local/repositories/" + repoId + "/status?undefined";
+
+        Request request = new Request();
+
+        request.setResourceRef( serviceURI );
+
+        request.setMethod( Method.PUT );
+        
+        // unblock string
+        String blockOrNotCommand = "\"unavailable\",\"proxyMode\":\"allow\"";
+        // change to block if true
+        if( block == true )
+        {
+            blockOrNotCommand = "\"available\",\"proxyMode\":\"blockedManual\"";
+        }
+        
+        request.setEntity(
+                           "{\"data\":{\"id\":\""
+                               + repoId
+                               + "\",\"repoType\":\"proxy\",\"localStatus\":\"inService\",\"remoteStatus\":"+ blockOrNotCommand +"}}",
+                           MediaType.APPLICATION_JSON );
+
+        Client client = new Client( Protocol.HTTP );
+
+        Response response = client.handle( request );
+
+        if ( !response.getStatus().isSuccess() )
+        {
+            Assert.fail( "Could not unblock proxy: " + repoId );
+        }
     }
 
 }

@@ -3,15 +3,12 @@ package org.sonatype.nexus.test.proxy;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.StringWriter;
-import java.io.Writer;
 import java.util.Date;
 
 import junit.framework.Assert;
 
 import org.junit.Test;
 import org.restlet.Client;
-import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Protocol;
 import org.restlet.data.Request;
@@ -41,7 +38,7 @@ public class RemoteRepoDownTest
             new Gav( this.getClass().getName(), "repo-down-test-artifact", "1.0.0", null, "xml", 0,
                      new Date().getTime(), "Simple Test Artifact", false, false, null );
 
-        File localFile = ProxyRepo.getInstance().getLocalFile( TEST_RELEASE_REPO, gav, "target/downloads" );
+        File localFile = ProxyRepo.getInstance().getLocalFile( TEST_RELEASE_REPO, gav );
 
         // make sure this exists first, or the test is invalid anyway.
         Assert.assertTrue( "The File: " + localFile + " does not exist.", localFile.exists() );
@@ -73,7 +70,7 @@ public class RemoteRepoDownTest
         Assert.assertTrue( "A FileNotFoundException should have been thrown.", testPassed );
 
         // unblock the proxy
-        this.unblockProxy();
+        ProxyRepo.getInstance().setBlockProxy( this.getBaseNexusUrl(), TEST_RELEASE_REPO, false);
 
         File artifact = this.downloadArtifact( gav, "target/downloads" );
 
@@ -100,30 +97,6 @@ public class RemoteRepoDownTest
         if ( !response.getStatus().isSuccess() )
         {
             Assert.fail( "Could not clear the cache for repo: " + TEST_RELEASE_REPO );
-        }
-    }
-    
-    
-    private void unblockProxy()
-    {
-
-        String serviceURI =
-            this.getBaseNexusUrl() + "service/local/repositories/" + TEST_RELEASE_REPO + "/status?undefined";
-
-        Request request = new Request();
-
-        request.setResourceRef( serviceURI );
-
-        request.setMethod( Method.PUT );
-        request.setEntity( "{\"data\":{\"id\":\"" + TEST_RELEASE_REPO + "\",\"repoType\":\"proxy\",\"localStatus\":\"inService\",\"remoteStatus\":\"unavailable\",\"proxyMode\":\"allow\"}}", MediaType.APPLICATION_JSON );
-        
-        Client client = new Client( Protocol.HTTP );
-
-        Response response = client.handle( request );
-
-        if ( !response.getStatus().isSuccess() )
-        {
-            Assert.fail( "Could not unblock proxy: " + TEST_RELEASE_REPO );
         }
     }
     
