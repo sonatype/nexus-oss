@@ -211,6 +211,16 @@
 					</association>
 					<required>false</required>
 				</field>
+				<field>
+					<name>repositoryTargets</name>
+					<version>1.0.4+</version>
+					<description>The repository targets.</description>
+					<association>
+						<type>CRepositoryTarget</type>
+						<multiplicity>*</multiplicity>
+					</association>
+					<required>false</required>
+				</field>
 			</fields>
 			<codeSegments>
 				<codeSegment>
@@ -240,6 +250,16 @@
 					<version>1.0.3</version>
 					<code><![CDATA[
     public static final String MODEL_VERSION = "1.0.3";
+    
+    public static final String LOCAL_STATUS_IN_SERVICE = "inService";
+
+    public static final String LOCAL_STATUS_OUT_OF_SERVICE = "outOfService";
+]]></code>
+				</codeSegment>
+				<codeSegment>
+					<version>1.0.4</version>
+					<code><![CDATA[
+    public static final String MODEL_VERSION = "1.0.4";
     
     public static final String LOCAL_STATUS_IN_SERVICE = "inService";
 
@@ -1433,6 +1453,39 @@
 				</codeSegment>
 			</codeSegments>
 		</class>
+		
+		<!-- Repository target -->
+		<class>
+            <name>CRepositoryTarget</name>
+            <version>1.0.4+</version>
+            <description>A repository target.</description>
+            <fields>
+                <field>
+                    <name>id</name>
+                    <type>String</type>
+                    <version>1.0.4+</version>
+                    <required>true</required>
+                    <description>The ID of target.</description>
+                </field>
+                <field>
+                    <name>name</name>
+                    <type>String</type>
+                    <version>1.0.4+</version>
+                    <required>true</required>
+                    <description>The name of the Target.</description>
+                </field>
+				<field>
+					<name>patterns</name>
+					<version>1.0.4+</version>
+					<description>The patterns that comprises this target..</description>
+					<required>true</required>
+					<association>
+						<type>String</type>
+						<multiplicity>*</multiplicity>
+					</association>
+				</field>
+            </fields>
+        </class>
 		
 		<!-- Scheduled Tasks -->
 		
