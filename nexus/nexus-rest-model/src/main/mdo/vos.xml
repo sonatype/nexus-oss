@@ -1469,9 +1469,7 @@
 					<name>properties</name>
 					<version>1.0.0+</version>
 					<association>
-						<type>
-							ScheduledServiceTypePropertyResource
-						</type>
+						<type>ScheduledServiceTypePropertyResource</type>
 						<multiplicity>*</multiplicity>
 					</association>
 					<required>true</required>
@@ -2341,9 +2339,7 @@
 					<name>configurationValidationResponse</name>
 					<version>1.0.0+</version>
 					<association>
-						<type>
-							StatusConfigurationValidationResponse
-						</type>
+						<type>StatusConfigurationValidationResponse</type>
 					</association>
 					<required>false</required>
 				</field>
