@@ -97,7 +97,7 @@ public class M2GavCalculator
                 return null;
             }
 
-            boolean snapshot = v.contains( "-SNAPSHOT" );
+            boolean snapshot = v.contains( "-SNAPSHOT" ) || v.equals( "SNAPSHOT" );
 
             boolean primary = false;
             String c = null;
@@ -150,7 +150,8 @@ public class M2GavCalculator
                     primary = !checksum
                         && !signature
                         && n
-                            .equals( a + "-" + v.substring( 0, v.length() - 9 ) + "-" + snapshotBuildNumber + "." + ext );
+                            .equals( a + "-" + ( ( v.length() > 9 ) ? ( v.substring( 0, v.length() - 9 ) + "-" ) : "" ) 
+                                     + snapshotBuildNumber + "." + ext );
                     if ( !primary )
                     {
                         if ( checksum || signature )

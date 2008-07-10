@@ -400,6 +400,40 @@ public class M2GavCalculatorTest
 
         path = gavCalculator.gavToPath( gav );
         assertEquals( "/org/apache/maven/artifact/maven-artifact/3.0-SNAPSHOT/maven-artifact-3.0-20080411.005221-75.pom.asc", path );
+        
+        gav = gavCalculator.pathToGav( "/foo/artifact/SNAPSHOT/artifact-SNAPSHOT.jar" );
+        assertEquals( "foo", gav.getGroupId() );
+        assertEquals( "artifact", gav.getArtifactId() );
+        assertEquals( "SNAPSHOT", gav.getVersion() );
+        assertEquals( "SNAPSHOT", gav.getBaseVersion() );
+        assertEquals( null, gav.getClassifier() );
+        assertEquals( "jar", gav.getExtension() );
+        assertEquals( null, gav.getSnapshotBuildNumber() );
+        assertEquals( null, gav.getSnapshotTimeStamp() );
+        assertEquals( "artifact-SNAPSHOT.jar", gav.getName() );
+        assertEquals( true, gav.isSnapshot() );
+        assertEquals( false, gav.isHash() );
+        assertEquals( null, gav.getHashType() );
+        
+        path = gavCalculator.gavToPath( gav );
+        assertEquals( "/foo/artifact/SNAPSHOT/artifact-SNAPSHOT.jar", path );
+        
+        gav = gavCalculator.pathToGav( "/foo/artifact/SNAPSHOT/artifact-20080623.175436-1.jar" );
+        assertEquals( "foo", gav.getGroupId() );
+        assertEquals( "artifact", gav.getArtifactId() );
+        assertEquals( "20080623.175436-1", gav.getVersion() );
+        assertEquals( "SNAPSHOT", gav.getBaseVersion() );
+        assertEquals( null, gav.getClassifier() );
+        assertEquals( "jar", gav.getExtension() );
+        assertEquals( Integer.valueOf( 1 ), gav.getSnapshotBuildNumber() );
+        assertEquals( parseTimestamp( "20080623.175436" ), gav.getSnapshotTimeStamp() );
+        assertEquals( "artifact-20080623.175436-1.jar", gav.getName() );
+        assertEquals( true, gav.isSnapshot() );
+        assertEquals( false, gav.isHash() );
+        assertEquals( null, gav.getHashType() );
+        
+        path = gavCalculator.gavToPath( gav );
+        assertEquals( "/foo/artifact/SNAPSHOT/artifact-20080623.175436-1.jar", path );
     }
 
     public void testGavExtreme()

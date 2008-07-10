@@ -74,9 +74,18 @@ public class Gav
                 // this is a timestamped version (verified against pattern, see above)
                 // we have XXXXXX-YYYYMMDD.HHMMSS-B
                 // but XXXXXX may contain "-" too!
-                this.baseVersion = version.substring( 0, version.lastIndexOf( '-' ) );
-
-                this.baseVersion = baseVersion.substring( 0, baseVersion.lastIndexOf( '-' ) ) + "-SNAPSHOT";
+                // also there may be no XXXXXX (i.e. when version is strictly named SNAPSHOT
+                String tempBaseVersion = version.substring( 0, version.lastIndexOf( '-' ) );
+                int baseVersionEndPos = tempBaseVersion.lastIndexOf( "-" );
+                
+                if ( baseVersionEndPos >= 0 )
+                {
+                    this.baseVersion = tempBaseVersion.substring( 0, baseVersionEndPos ) + "-SNAPSHOT";
+                }
+                else
+                {
+                    this.baseVersion = "SNAPSHOT";
+                }
             }
         }
 
