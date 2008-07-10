@@ -72,6 +72,10 @@ import org.sonatype.nexus.rest.model.RepositoryStatusListResource;
 import org.sonatype.nexus.rest.model.RepositoryStatusListResourceResponse;
 import org.sonatype.nexus.rest.model.RepositoryStatusResource;
 import org.sonatype.nexus.rest.model.RepositoryStatusResourceResponse;
+import org.sonatype.nexus.rest.model.RepositoryTargetListResource;
+import org.sonatype.nexus.rest.model.RepositoryTargetListResourceResponse;
+import org.sonatype.nexus.rest.model.RepositoryTargetResource;
+import org.sonatype.nexus.rest.model.RepositoryTargetResourceResponse;
 import org.sonatype.nexus.rest.model.RoleContainedPrivilegeResource;
 import org.sonatype.nexus.rest.model.RoleContainedRoleResource;
 import org.sonatype.nexus.rest.model.RoleListResourceResponse;
@@ -220,14 +224,14 @@ public final class XStreamInitializer
         xstream.omitField( ScheduledServiceTypePropertyResource.class, "modelEncoding" );
         xstream.omitField( ScheduledServiceResourceStatus.class, "modelEncoding" );
         xstream.omitField( ScheduledServiceResourceStatusResponse.class, "modelEncoding" );
-        
+
         xstream.omitField( UserListResourceResponse.class, "modelEncoding" );
         xstream.omitField( UserResourceRequest.class, "modelEncoding" );
         xstream.omitField( UserResourceStatusResponse.class, "modelEncoding" );
         xstream.omitField( UserStatusResource.class, "modelEncoding" );
         xstream.omitField( UserResource.class, "modelEncoding" );
         xstream.omitField( UserRoleResource.class, "modelEncoding" );
-        
+
         xstream.omitField( RoleContainedPrivilegeResource.class, "modelEncoding" );
         xstream.omitField( RoleContainedRoleResource.class, "modelEncoding" );
         xstream.omitField( RoleListResourceResponse.class, "modelEncoding" );
@@ -238,6 +242,11 @@ public final class XStreamInitializer
         xstream.omitField( NFCResourceResponse.class, "modelEncoding" );
         xstream.omitField( NFCResource.class, "modelEncoding" );
         xstream.omitField( NFCRepositoryResource.class, "modelEncoding" );
+
+        xstream.omitField( RepositoryTargetListResourceResponse.class, "modelEncoding" );
+        xstream.omitField( RepositoryTargetListResource.class, "modelEncoding" );
+        xstream.omitField( RepositoryTargetResourceResponse.class, "modelEncoding" );
+        xstream.omitField( RepositoryTargetResource.class, "modelEncoding" );
 
         // Maven model
         xstream.omitField( Model.class, "modelEncoding" );

@@ -55,6 +55,8 @@ import org.sonatype.nexus.rest.repositories.RepositoryMetaResourceHandler;
 import org.sonatype.nexus.rest.repositories.RepositoryResourceHandler;
 import org.sonatype.nexus.rest.repositories.RepositoryStatusResourceHandler;
 import org.sonatype.nexus.rest.repositorystatuses.RepositoryStatusesListResourceHandler;
+import org.sonatype.nexus.rest.repotargets.RepositoryTargetListResourceHandler;
+import org.sonatype.nexus.rest.repotargets.RepositoryTargetResourceHandler;
 import org.sonatype.nexus.rest.roles.RoleListResourceHandler;
 import org.sonatype.nexus.rest.roles.RoleResourceHandler;
 import org.sonatype.nexus.rest.routes.RepositoryRouteListResourceHandler;
@@ -248,7 +250,7 @@ public class ApplicationBridge
                 + "}/content", protectWriteToResource( IndexResourceHandler.class ) );
 
             router.attach( "/wastebasket", protectResource( WastebasketResourceHandler.class ) );
-            
+
             router.attach( "/attributes", protectResource( AttributesResourceHandler.class ) );
 
             router.attach( "/attributes/{" + AttributesResourceHandler.DOMAIN + "}/{"
@@ -334,26 +336,28 @@ public class ApplicationBridge
             router.attach(
                 "/schedules/{" + ScheduledServiceResourceHandler.SCHEDULED_SERVICE_ID_KEY + "}",
                 protectResource( ScheduledServiceResourceHandler.class ) );
-            
-            router.attach( 
-                "/users", 
-                protectResource( UserListResourceHandler.class ) );
-            
-            router.attach( 
-                "/users/{" + UserResourceHandler.USER_ID_KEY + "}", 
+
+            router.attach( "/users", protectResource( UserListResourceHandler.class ) );
+
+            router.attach(
+                "/users/{" + UserResourceHandler.USER_ID_KEY + "}",
                 protectResource( UserResourceHandler.class ) );
-            
-            router.attach( 
-                 "/users/reset/{" + UserResourceHandler.USER_ID_KEY + "}", 
-                 protectResource( UserResetResourceHandler.class ) );
-            
-            router.attach( 
-                "/roles", 
-                protectResource( RoleListResourceHandler.class ) );
-                      
-            router.attach( 
-                "/roles/{" + RoleResourceHandler.ROLE_ID_KEY + "}", 
+
+            router.attach(
+                "/users/reset/{" + UserResourceHandler.USER_ID_KEY + "}",
+                protectResource( UserResetResourceHandler.class ) );
+
+            router.attach( "/roles", protectResource( RoleListResourceHandler.class ) );
+
+            router.attach(
+                "/roles/{" + RoleResourceHandler.ROLE_ID_KEY + "}",
                 protectResource( RoleResourceHandler.class ) );
+
+            router.attach( "/repo_targets", protectResource( RepositoryTargetListResourceHandler.class ) );
+
+            router.attach(
+                "/repo_targets/{" + RepositoryTargetResourceHandler.REPO_TARGET_ID_KEY + "}",
+                protectResource( RepositoryTargetResourceHandler.class ) );
         }
         catch ( ConfigurationException e )
         {
