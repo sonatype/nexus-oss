@@ -227,6 +227,8 @@ public class ProxyRepo
             + version + "/" + artifact + "-" + version + "." + type );
     }
     
+    //TODO: Refactor this into the AbstractNexusIntegrationTest or some util class, to make more generic
+    
     public void setBlockProxy( String nexusBaseUrl, String repoId, boolean block )
     {
 
@@ -262,4 +264,35 @@ public class ProxyRepo
         }
     }
 
+    public void setOutOfServiceProxy( String nexusBaseUrl, String repoId, boolean outOfService )
+    {
+
+        String serviceURI = nexusBaseUrl + "service/local/repositories/" + repoId + "/status?undefined";
+
+        Request request = new Request();
+
+        request.setResourceRef( serviceURI );
+
+        request.setMethod( Method.PUT );
+        
+        // unblock string
+        String servicePart = outOfService ? "outOfService" : "inService";
+        
+        request.setEntity(
+                           "{\"data\":{\"id\":\""
+                               + repoId
+                               + "\",\"repoType\":\"proxy\",\"localStatus\":\"" + servicePart + "\"}}",
+                           MediaType.APPLICATION_JSON );
+
+        Client client = new Client( Protocol.HTTP );
+
+        Response response = client.handle( request );
+
+        if ( !response.getStatus().isSuccess() )
+        {
+            Assert.fail( "Could not set proxy out of service status: " + repoId );
+        }
+    }
+    
+    
 }
