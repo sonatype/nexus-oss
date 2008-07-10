@@ -181,7 +181,7 @@ Sonatype.repoServer.resources.help = {
   },
   
   repoTargets: {
-    name : 'The name of the repository target.',
+    name : 'The name of the repository target.'
   }
   
 };
