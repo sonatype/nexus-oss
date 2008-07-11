@@ -62,6 +62,7 @@ public class M2GavCalculator
             boolean checksum = false;
             boolean signature = false;
             Gav.HashType checksumType = null;
+            Gav.SignatureType signatureType = null;
             if ( s.endsWith( ".md5" ) )
             {
                 checksum = true;
@@ -74,9 +75,11 @@ public class M2GavCalculator
                 checksumType = Gav.HashType.sha1;
                 s = s.substring( 0, s.length() - 5 );
             }
-            else if ( s.endsWith( ".asc" ) )
+
+            if ( s.endsWith( ".asc" ) )
             {
                 signature = true;
+                signatureType = Gav.SignatureType.gpg;
                 s = s.substring( 0, s.length() - 4 );
             }
 
@@ -98,8 +101,7 @@ public class M2GavCalculator
                 return null;
             }
 
-            boolean snapshot = v.contains( "-SNAPSHOT" ) 
-                || ( !getEnforcer().isStrict() && v.equals( "SNAPSHOT" ) );
+            boolean snapshot = v.contains( "-SNAPSHOT" ) || ( !getEnforcer().isStrict() && v.equals( "SNAPSHOT" ) );
 
             boolean primary = false;
             String c = null;
@@ -153,19 +155,16 @@ public class M2GavCalculator
                     {
                         primary = !checksum
                             && !signature
-                            && n.equals( 
-                                 a + "-" 
-                                 + v.substring( 0, v.length() - 9 ) + "-" 
-                                 + snapshotBuildNumber + "." + ext );
+                            && n.equals( a + "-" + v.substring( 0, v.length() - 9 ) + "-" + snapshotBuildNumber + "."
+                                + ext );
                     }
                     else
                     {
                         primary = !checksum
                             && !signature
-                            && n.equals( 
-                                 a + "-" 
-                                 + ( ( v.length() > 9 ) ? ( v.substring( 0, v.length() - 9 ) + "-" ) : "" ) 
-                                 + snapshotBuildNumber + "." + ext );
+                            && n.equals( a + "-"
+                                + ( ( v.length() > 9 ) ? ( v.substring( 0, v.length() - 9 ) + "-" ) : "" )
+                                + snapshotBuildNumber + "." + ext );
                     }
                     if ( !primary )
                     {
@@ -188,18 +187,20 @@ public class M2GavCalculator
                     v = bv.substring( 0, bv.length() - 8 ) + snapshotBuildNumber;
                 }
 
-                return new Gav( 
-                    g, 
-                    a, 
-                    v, 
-                    c, 
-                    ext, 
-                    snapBuildNr, 
-                    snapshotTimestamp, 
-                    n, 
-                    snapshot, 
-                    checksum, 
-                    checksumType );
+                return new Gav(
+                    g,
+                    a,
+                    v,
+                    c,
+                    ext,
+                    snapBuildNr,
+                    snapshotTimestamp,
+                    n,
+                    snapshot,
+                    checksum,
+                    checksumType,
+                    signature,
+                    signatureType );
             }
             else
             {
@@ -217,18 +218,20 @@ public class M2GavCalculator
                             c = null;
                         }
                     }
-                    return new Gav( 
-                        g, 
-                        a, 
-                        v, 
-                        c, 
-                        ext, 
-                        null, 
-                        null, 
-                        n, 
-                        snapshot, 
-                        checksum, 
-                        checksumType );
+                    return new Gav(
+                        g,
+                        a,
+                        v,
+                        c,
+                        ext,
+                        null,
+                        null,
+                        n,
+                        snapshot,
+                        checksum,
+                        checksumType,
+                        signature,
+                        signatureType );
                 }
                 else
                 {
@@ -289,18 +292,18 @@ public class M2GavCalculator
             path.append( gav.getExtension() );
         }
 
+        if ( gav.isSignature() )
+        {
+            path.append( "." );
+
+            path.append( gav.getSignatureType().toString() );
+        }
+
         if ( gav.isHash() )
         {
             path.append( "." );
 
             path.append( gav.getHashType().toString() );
-        }
-        else if ( gav.getName() != null
-            && gav.getName().endsWith( ".asc" ) )
-        {
-            path.append( "." );
-
-            path.append( "asc" );
         }
 
         return path.toString();

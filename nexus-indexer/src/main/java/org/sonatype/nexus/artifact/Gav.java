@@ -16,13 +16,33 @@ package org.sonatype.nexus.artifact;
 import org.sonatype.nexus.DefaultNexusEnforcer;
 import org.sonatype.nexus.NexusEnforcer;
 
-
 public class Gav
 {
     public enum HashType
     {
         sha1, md5
-    };
+    }
+
+    public enum SignatureType
+    {
+        gpg;
+
+        public String toString()
+        {
+            switch ( this )
+            {
+                case gpg:
+                {
+                    return "asc";
+                }
+
+                default:
+                {
+                    return "unknown-signature-type";
+                }
+            }
+        }
+    }
 
     private String groupId;
 
@@ -47,12 +67,16 @@ public class Gav
     private boolean hash;
 
     private HashType hashType;
-    
+
+    private boolean signature;
+
+    private SignatureType signatureType;
+
     private NexusEnforcer enforcer = new DefaultNexusEnforcer();
 
     public Gav( String groupId, String artifactId, String version, String classifier, String extension,
         Integer snapshotBuildNumber, Long snapshotTimeStamp, String name, boolean snapshot, boolean hash,
-        HashType hashType )
+        HashType hashType, boolean signature, SignatureType signatureType )
     {
         this.groupId = groupId;
         this.artifactId = artifactId;
@@ -80,7 +104,7 @@ public class Gav
                 // this is a timestamped version (verified against pattern, see above)
                 // we have XXXXXX-YYYYMMDD.HHMMSS-B
                 // but XXXXXX may contain "-" too!
-                
+
                 if ( enforcer.isStrict() )
                 {
                     this.baseVersion = version.substring( 0, version.lastIndexOf( '-' ) );
@@ -92,7 +116,7 @@ public class Gav
                 {
                     String tempBaseVersion = version.substring( 0, version.lastIndexOf( '-' ) );
                     int baseVersionEndPos = tempBaseVersion.lastIndexOf( "-" );
-                    
+
                     if ( baseVersionEndPos >= 0 )
                     {
                         this.baseVersion = tempBaseVersion.substring( 0, baseVersionEndPos ) + "-SNAPSHOT";
@@ -100,7 +124,7 @@ public class Gav
                     else
                     {
                         this.baseVersion = "SNAPSHOT";
-                    }   
+                    }
                 }
             }
         }
@@ -113,6 +137,8 @@ public class Gav
         this.snapshot = snapshot;
         this.hash = hash;
         this.hashType = hashType;
+        this.signature = signature;
+        this.signatureType = signatureType;
     }
 
     public String getGroupId()
@@ -167,19 +193,29 @@ public class Gav
         return snapshotBuildNumber;
     }
 
-    public boolean isHash()
-    {
-        return hash;
-    }
-
     public Long getSnapshotTimeStamp()
     {
         return snapshotTimeStamp;
     }
 
+    public boolean isHash()
+    {
+        return hash;
+    }
+
     public HashType getHashType()
     {
         return hashType;
+    }
+
+    public boolean isSignature()
+    {
+        return signature;
+    }
+
+    public SignatureType getSignatureType()
+    {
+        return signatureType;
     }
 
 }

@@ -100,18 +100,20 @@ public class M1GavCalculator
                     version = version.substring( 0, version.length() - ( classifier.length() + 1 ) );
                 }
 
-                return new Gav( 
-                    g, 
-                    a, 
-                    version, 
-                    classifier, 
-                    ext, 
-                    null, 
-                    null, 
-                    n, 
-                    snapshot, 
-                    checksum, 
-                    checksumType );
+                return new Gav(
+                    g,
+                    a,
+                    version,
+                    classifier,
+                    ext,
+                    null,
+                    null,
+                    n,
+                    snapshot,
+                    checksum,
+                    checksumType,
+                    false,
+                    null );
             }
             else
             {
@@ -136,7 +138,9 @@ public class M1GavCalculator
                         n,
                         snapshot,
                         checksum,
-                        checksumType);
+                        checksumType,
+                        false,
+                        null );
                 }
                 else
                 {
