@@ -404,10 +404,31 @@ public class M2GavCalculatorTest
         assertEquals( true, gav.isSnapshot() );
         assertEquals( false, gav.isHash() );
         assertEquals( null, gav.getHashType() );
+        assertEquals( true, gav.isSignature() );
+        assertEquals( Gav.SignatureType.gpg, gav.getSignatureType() );
 
         path = gavCalculator.gavToPath( gav );
         assertEquals( "/org/apache/maven/artifact/maven-artifact/3.0-SNAPSHOT/maven-artifact-3.0-20080411.005221-75.pom.asc", path );
-        
+
+        gav = gavCalculator.pathToGav( "/org/apache/maven/artifact/maven-artifact/3.0-SNAPSHOT/maven-artifact-3.0-20080411.005221-75.pom.asc.sha1" );
+        assertEquals( "org.apache.maven.artifact", gav.getGroupId() );
+        assertEquals( "maven-artifact", gav.getArtifactId() );
+        assertEquals( "3.0-20080411.005221-75", gav.getVersion() );
+        assertEquals( "3.0-SNAPSHOT", gav.getBaseVersion() );
+        assertEquals( null, gav.getClassifier() );
+        assertEquals( "pom", gav.getExtension() );
+        assertEquals( Integer.valueOf( 75 ), gav.getSnapshotBuildNumber() );
+        assertEquals( parseTimestamp( "20080411.005221" ), gav.getSnapshotTimeStamp() );
+        assertEquals( "maven-artifact-3.0-20080411.005221-75.pom.asc.sha1", gav.getName() );
+        assertEquals( true, gav.isSnapshot() );
+        assertEquals( true, gav.isHash() );
+        assertEquals( Gav.HashType.sha1, gav.getHashType() );
+        assertEquals( true, gav.isSignature() );
+        assertEquals( Gav.SignatureType.gpg, gav.getSignatureType() );
+
+        path = gavCalculator.gavToPath( gav );
+        assertEquals( "/org/apache/maven/artifact/maven-artifact/3.0-SNAPSHOT/maven-artifact-3.0-20080411.005221-75.pom.asc.sha1", path );
+
         gav = gavCalculator.pathToGav( "/foo/artifact/SNAPSHOT/artifact-SNAPSHOT.jar" );
         
         if ( enforcer.isStrict() )
