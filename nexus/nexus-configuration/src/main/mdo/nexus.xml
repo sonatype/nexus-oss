@@ -1474,10 +1474,17 @@
                     <required>true</required>
                     <description>The name of the Target.</description>
                 </field>
+                <field>
+                    <name>contentClass</name>
+                    <type>String</type>
+                    <version>1.0.4+</version>
+                    <required>true</required>
+                    <description>The repository contentClass this Target is applicable.</description>
+                </field>
 				<field>
 					<name>patterns</name>
 					<version>1.0.4+</version>
-					<description>The patterns that comprises this target..</description>
+					<description>The patterns that comprises this target.</description>
 					<required>true</required>
 					<association>
 						<type>String</type>
