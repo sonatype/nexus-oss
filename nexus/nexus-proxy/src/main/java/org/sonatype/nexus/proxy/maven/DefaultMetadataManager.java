@@ -279,6 +279,8 @@ public class DefaultMetadataManager
             null,
             RepositoryPolicy.SNAPSHOT.equals( repository.getRepositoryPolicy() ),
             false,
+            null,
+            false,
             null );
 
         Metadata gavMd = null;
@@ -437,6 +439,8 @@ public class DefaultMetadataManager
             null,
             RepositoryPolicy.SNAPSHOT.equals( repository.getRepositoryPolicy() ),
             false,
+            null,
+            false,
             null );
 
         Metadata gavMd = null;
@@ -530,6 +534,8 @@ public class DefaultMetadataManager
             null,
             null,
             RepositoryPolicy.SNAPSHOT.equals( repository.getRepositoryPolicy() ),
+            false,
+            null,
             false,
             null );
 
@@ -629,6 +635,8 @@ public class DefaultMetadataManager
             null,
             null,
             RepositoryPolicy.SNAPSHOT.equals( repository.getRepositoryPolicy() ),
+            false,
+            null,
             false,
             null );
 

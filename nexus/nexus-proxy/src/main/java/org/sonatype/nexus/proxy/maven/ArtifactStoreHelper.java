@@ -113,6 +113,8 @@ public class ArtifactStoreHelper
             null,
             RepositoryPolicy.SNAPSHOT.equals( repository.getRepositoryPolicy() ),
             false,
+            null,
+            false,
             null );
 
         gavRequest.setRequestPath( repository.getGavCalculator().gavToPath( gav ) );
@@ -141,7 +143,7 @@ public class ArtifactStoreHelper
         Gav gav = new Gav( gavRequest.getGroupId(), gavRequest.getArtifactId(), gavRequest.getVersion(), gavRequest
             .getClassifier(), repository.getArtifactPackagingMapper().getExtensionForPackaging(
             gavRequest.getPackaging() ), null, null, null, RepositoryPolicy.SNAPSHOT.equals( repository
-            .getRepositoryPolicy() ), false, null );
+            .getRepositoryPolicy() ), false, null, false, null );
 
         gavRequest.setRequestPath( repository.getGavCalculator().gavToPath( gav ) );
 
@@ -168,7 +170,7 @@ public class ArtifactStoreHelper
 
         Gav gav = new Gav( gavRequest.getGroupId(), gavRequest.getArtifactId(), gavRequest.getVersion(), gavRequest
             .getClassifier(), "pom", null, null, null, RepositoryPolicy.SNAPSHOT.equals( repository
-            .getRepositoryPolicy() ), false, null );
+            .getRepositoryPolicy() ), false, null, false, null );
 
         gavRequest.setRequestPath( repository.getGavCalculator().gavToPath( gav ) );
 
@@ -201,7 +203,7 @@ public class ArtifactStoreHelper
         Gav gav = new Gav( gavRequest.getGroupId(), gavRequest.getArtifactId(), gavRequest.getVersion(), gavRequest
             .getClassifier(), repository.getArtifactPackagingMapper().getExtensionForPackaging(
             gavRequest.getPackaging() ), null, null, null, RepositoryPolicy.SNAPSHOT.equals( repository
-            .getRepositoryPolicy() ), false, null );
+            .getRepositoryPolicy() ), false, null, false, null );
 
         gavRequest.setRequestPath( repository.getGavCalculator().gavToPath( gav ) );
 
@@ -220,7 +222,7 @@ public class ArtifactStoreHelper
 
         Gav pomGav = new Gav( gavRequest.getGroupId(), gavRequest.getArtifactId(), gavRequest.getVersion(), gavRequest
             .getClassifier(), "pom", null, null, null, RepositoryPolicy.SNAPSHOT.equals( repository
-            .getRepositoryPolicy() ), false, null );
+            .getRepositoryPolicy() ), false, null, false, null );
 
         try
         {
@@ -285,6 +287,8 @@ public class ArtifactStoreHelper
             null,
             RepositoryPolicy.SNAPSHOT.equals( repository.getRepositoryPolicy() ),
             false,
+            null,
+            false,
             null );
 
         gavRequest.setRequestPath( repository.getGavCalculator().gavToPath( artifactGav ) );
@@ -303,7 +307,7 @@ public class ArtifactStoreHelper
         // delete the artifact
         Gav gav = new Gav( gavRequest.getGroupId(), gavRequest.getArtifactId(), gavRequest.getVersion(), gavRequest
             .getClassifier(), "pom", null, null, null, RepositoryPolicy.SNAPSHOT.equals( repository
-            .getRepositoryPolicy() ), false, null );
+            .getRepositoryPolicy() ), false, null, false, null );
 
         gavRequest.setRequestPath( repository.getGavCalculator().gavToPath( gav ) );
 
@@ -314,13 +318,13 @@ public class ArtifactStoreHelper
         else
         {
             deleteWithChecksums( gavRequest );
-            
+
             if ( withAllSubordinates )
             {
                 deleteAllSubordinates( gavRequest );
             }
         }
-        
+
         try
         {
             repository.getMetadataManager().undeployArtifact( gavRequest, repository );
@@ -343,10 +347,10 @@ public class ArtifactStoreHelper
         Gav gav = new Gav( gavRequest.getGroupId(), gavRequest.getArtifactId(), gavRequest.getVersion(), gavRequest
             .getClassifier(), repository.getArtifactPackagingMapper().getExtensionForPackaging(
             gavRequest.getPackaging() ), null, null, null, RepositoryPolicy.SNAPSHOT.equals( repository
-            .getRepositoryPolicy() ), false, null );
+            .getRepositoryPolicy() ), false, null, false, null );
 
         gavRequest.setRequestPath( repository.getGavCalculator().gavToPath( gav ) );
-        
+
         if ( deleteWholeGav )
         {
             deleteWholeGav( gavRequest );
@@ -354,7 +358,7 @@ public class ArtifactStoreHelper
         else
         {
             deleteWithChecksums( gavRequest );
-    
+
             if ( withAllSubordinates )
             {
                 deleteAllSubordinates( gavRequest );
