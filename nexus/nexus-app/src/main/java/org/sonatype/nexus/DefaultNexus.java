@@ -54,6 +54,7 @@ import org.sonatype.nexus.configuration.model.CRemoteStorage;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.CRepositoryGroup;
 import org.sonatype.nexus.configuration.model.CRepositoryShadow;
+import org.sonatype.nexus.configuration.model.CRepositoryTarget;
 import org.sonatype.nexus.configuration.model.CRouting;
 import org.sonatype.nexus.feeds.FeedRecorder;
 import org.sonatype.nexus.feeds.NexusArtifactEvent;
@@ -252,12 +253,12 @@ public class DefaultNexus
         throws NoSuchRepositoryGroupException
     {
         ContentClass contentClass = repositoryRegistry.getRepositoryGroupContentClass( repoGroupId );
-        
+
         if ( contentClass == null )
         {
             return null;
         }
-        
+
         return contentClass.getId();
     }
 
@@ -581,6 +582,36 @@ public class DefaultNexus
             IOException
     {
         nexusConfiguration.deleteRepositoryGroup( id );
+    }
+
+    public Collection<CRepositoryTarget> listRepositoryTargets()
+    {
+        return nexusConfiguration.listRepositoryTargets();
+    }
+
+    public void createRepositoryTarget( CRepositoryTarget settings )
+        throws IllegalArgumentException,
+            IOException
+    {
+        nexusConfiguration.createRepositoryTarget( settings );
+    }
+
+    public CRepositoryTarget readRepositoryTarget( String id )
+    {
+        return nexusConfiguration.readRepositoryTarget( id );
+    }
+
+    public void updateRepositoryTarget( CRepositoryTarget settings )
+        throws IllegalArgumentException,
+            IOException
+    {
+        nexusConfiguration.updateRepositoryTarget( settings );
+    }
+
+    public void deleteRepositoryTarget( String id )
+        throws IOException
+    {
+        nexusConfiguration.deleteRepositoryTarget( id );
     }
 
     public Collection<CRemoteNexusInstance> listRemoteNexusInstances()
@@ -932,6 +963,14 @@ public class DefaultNexus
         throws IOException
     {
         templatesStore.removeEntry( TEMPLATE_REPOSITORY_SHADOW_PREFIX + id );
+    }
+
+    // ------------------------------------------------------------------
+    // ContentClasses
+
+    public Collection<ContentClass> listRepositoryContentClasses()
+    {
+        return nexusConfiguration.listRepositoryContentClasses();
     }
 
     // ------------------------------------------------------------------

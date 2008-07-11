@@ -42,6 +42,7 @@ import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.CRepositoryGroup;
 import org.sonatype.nexus.configuration.model.CRepositoryGrouping;
 import org.sonatype.nexus.configuration.model.CRepositoryShadow;
+import org.sonatype.nexus.configuration.model.CRepositoryTarget;
 import org.sonatype.nexus.configuration.model.CRouting;
 import org.sonatype.nexus.configuration.model.Configuration;
 import org.sonatype.nexus.configuration.runtime.RuntimeConfigurationBuilder;
@@ -52,6 +53,7 @@ import org.sonatype.nexus.configuration.validator.ValidationResponse;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryGroupException;
 import org.sonatype.nexus.proxy.access.AccessManager;
+import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.registry.InvalidGroupingException;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.LocalStatus;
@@ -102,6 +104,13 @@ public class DefaultNexusConfiguration
      * @plexus.requirement
      */
     private RepositoryRegistry repositoryRegistry;
+
+    /**
+     * The available content classes.
+     * 
+     * @plexus.requirement role="org.sonatype.nexus.proxy.registry.ContentClass"
+     */
+    private List<ContentClass> contentClasses;
 
     /** The global remote storage context. */
     private RemoteStorageContext remoteStorageContext;
@@ -365,6 +374,11 @@ public class DefaultNexusConfiguration
         throws InvalidConfigurationException
     {
         return runtimeConfigurationBuilder.createRepositoryFromModel( configuration, repositoryShadow );
+    }
+
+    public Collection<ContentClass> listRepositoryContentClasses()
+    {
+        return Collections.unmodifiableList( contentClasses );
     }
 
     // ------------------------------------------------------------------
@@ -1117,6 +1131,140 @@ public class DefaultNexusConfiguration
             CRemoteNexusInstance nexusInstance = i.next();
 
             if ( nexusInstance.getAlias().equals( alias ) )
+            {
+                i.remove();
+            }
+        }
+
+        applyAndSaveConfiguration();
+    }
+
+    // Repository Targets
+
+    protected void validateCRepositoryTarget( CRepositoryTarget settings )
+        throws IllegalArgumentException
+    {
+        // ID is mandatory
+        if ( settings.getId() == null )
+        {
+            throw new IllegalArgumentException( "The Repository Target 'ID' may not be null!" );
+        }
+
+        // Name is mandatory
+        if ( settings.getName() == null )
+        {
+            throw new IllegalArgumentException( "The Repository Target 'Name' may not be null!" );
+        }
+
+        // ContentClass is mandatory and should exists
+        if ( settings.getContentClass() == null )
+        {
+            throw new IllegalArgumentException( "The Repository Target 'ContentClass' may not be null!" );
+        }
+
+        boolean contentClassExists = false;
+
+        for ( ContentClass cc : contentClasses )
+        {
+            if ( cc.getId().equals( settings.getContentClass() ) )
+            {
+                contentClassExists = true;
+                break;
+            }
+        }
+
+        if ( !contentClassExists )
+        {
+            throw new IllegalArgumentException(
+                "The Repository Target 'ContentClass' must exists: there is no class with id='"
+                    + settings.getContentClass() + "'!" );
+        }
+
+        // check patterns for real regexp syntax
+        List<String> patterns = settings.getPatterns();
+
+        for ( String pattern : patterns )
+        {
+            Pattern.compile( pattern );
+        }
+    }
+
+    public Collection<CRepositoryTarget> listRepositoryTargets()
+    {
+        List<CRepositoryTarget> result = null;
+
+        if ( getConfiguration().getRepositoryTargets() != null )
+        {
+            result = Collections.unmodifiableList( getConfiguration().getRepositoryTargets() );
+        }
+
+        return result;
+    }
+
+    public void createRepositoryTarget( CRepositoryTarget settings )
+        throws IllegalArgumentException,
+            IOException
+    {
+        validateCRepositoryTarget( settings );
+
+        getConfiguration().addRepositoryTarget( settings );
+
+        applyAndSaveConfiguration();
+    }
+
+    public CRepositoryTarget readRepositoryTarget( String id )
+    {
+        List<CRepositoryTarget> targets = getConfiguration().getRepositoryTargets();
+
+        for ( Iterator<CRepositoryTarget> i = targets.iterator(); i.hasNext(); )
+        {
+            CRepositoryTarget target = i.next();
+
+            if ( target.getId().equals( id ) )
+            {
+                return target;
+            }
+        }
+
+        return null;
+    }
+
+    public void updateRepositoryTarget( CRepositoryTarget settings )
+        throws IllegalArgumentException,
+            IOException
+    {
+        validateCRepositoryTarget( settings );
+
+        CRepositoryTarget oldTarget = readRepositoryTarget( settings.getId() );
+
+        if ( oldTarget != null )
+        {
+            oldTarget.setContentClass( settings.getContentClass() );
+
+            oldTarget.setName( settings.getName() );
+
+            oldTarget.getPatterns().clear();
+
+            oldTarget.getPatterns().addAll( settings.getPatterns() );
+
+            applyAndSaveConfiguration();
+        }
+        else
+        {
+            throw new IllegalArgumentException( "Repository target with ID='" + settings.getId() + "' does not exists!" );
+        }
+    }
+
+    public void deleteRepositoryTarget( String id )
+        throws IOException
+    {
+        List<CRepositoryTarget> targets = getConfiguration().getRepositoryTargets();
+
+        for ( Iterator<CRepositoryTarget> i = targets.iterator(); i.hasNext(); )
+        {
+            CRepositoryTarget target = i.next();
+
+            if ( target.getId().equals( id ) )
             {
                 i.remove();
             }

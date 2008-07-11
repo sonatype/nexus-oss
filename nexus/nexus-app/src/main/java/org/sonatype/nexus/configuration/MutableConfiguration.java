@@ -30,9 +30,11 @@ import org.sonatype.nexus.configuration.model.CRemoteNexusInstance;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.CRepositoryGroup;
 import org.sonatype.nexus.configuration.model.CRepositoryShadow;
+import org.sonatype.nexus.configuration.model.CRepositoryTarget;
 import org.sonatype.nexus.configuration.model.CRouting;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryGroupException;
+import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.registry.InvalidGroupingException;
 
 public interface MutableConfiguration
@@ -51,6 +53,12 @@ public interface MutableConfiguration
     boolean isSimpleSecurityModel();
 
     String getAuthenticationSourceType();
+
+    // ----------------------------------------------------------------------------
+    // ContentClasses
+    // ----------------------------------------------------------------------------
+
+    Collection<ContentClass> listRepositoryContentClasses();
 
     // ----------------------------------------------------------------------------------------------------------
     // REST API
@@ -189,6 +197,23 @@ public interface MutableConfiguration
     void deleteRepositoryGroup( String id )
         throws NoSuchRepositoryGroupException,
             IOException;
+
+    // CRepositoryTarget: CRUD
+
+    Collection<CRepositoryTarget> listRepositoryTargets();
+
+    void createRepositoryTarget( CRepositoryTarget settings )
+        throws IllegalArgumentException,
+            IOException;
+
+    CRepositoryTarget readRepositoryTarget( String id );
+
+    void updateRepositoryTarget( CRepositoryTarget settings )
+        throws IllegalArgumentException,
+            IOException;
+
+    void deleteRepositoryTarget( String id )
+        throws IOException;
 
     // CRemoteNexusInstance
 

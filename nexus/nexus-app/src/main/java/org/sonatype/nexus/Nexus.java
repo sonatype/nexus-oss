@@ -216,10 +216,10 @@ public interface Nexus
     // Scheduler
     // ----------------------------------------------------------------------------
 
-    <T> ScheduledTask<T> store( String name, SchedulerTask<T> task)
+    <T> ScheduledTask<T> store( String name, SchedulerTask<T> task )
         throws RejectedExecutionException,
             NullPointerException;
-    
+
     <T> void submit( String name, SchedulerTask<T> task )
         throws RejectedExecutionException,
             NullPointerException;
@@ -313,5 +313,4 @@ public interface Nexus
 
     FlatSearchResponse searchArtifactFlat( String gTerm, String aTerm, String vTerm, String cTerm, String repositoryId,
         String groupId, Integer from, Integer count );
-
 }
