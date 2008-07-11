@@ -18,10 +18,15 @@ import java.text.SimpleDateFormat;
 
 import junit.framework.TestCase;
 
+import org.sonatype.nexus.DefaultNexusEnforcer;
+import org.sonatype.nexus.NexusEnforcer;
+
 public class M2GavCalculatorTest
     extends TestCase
 {
     private M2GavCalculator gavCalculator;
+    
+    private NexusEnforcer enforcer;
 
     private SimpleDateFormat formatter = new SimpleDateFormat( "yyyyMMdd.HHmmss" );
 
@@ -29,8 +34,10 @@ public class M2GavCalculatorTest
         throws Exception
     {
         super.setUp();
-
+        
         gavCalculator = new M2GavCalculator();
+        
+        enforcer = new DefaultNexusEnforcer();
     }
 
     protected Long parseTimestamp( String timeStamp )
@@ -402,38 +409,67 @@ public class M2GavCalculatorTest
         assertEquals( "/org/apache/maven/artifact/maven-artifact/3.0-SNAPSHOT/maven-artifact-3.0-20080411.005221-75.pom.asc", path );
         
         gav = gavCalculator.pathToGav( "/foo/artifact/SNAPSHOT/artifact-SNAPSHOT.jar" );
-        assertEquals( "foo", gav.getGroupId() );
-        assertEquals( "artifact", gav.getArtifactId() );
-        assertEquals( "SNAPSHOT", gav.getVersion() );
-        assertEquals( "SNAPSHOT", gav.getBaseVersion() );
-        assertEquals( null, gav.getClassifier() );
-        assertEquals( "jar", gav.getExtension() );
-        assertEquals( null, gav.getSnapshotBuildNumber() );
-        assertEquals( null, gav.getSnapshotTimeStamp() );
-        assertEquals( "artifact-SNAPSHOT.jar", gav.getName() );
-        assertEquals( true, gav.isSnapshot() );
-        assertEquals( false, gav.isHash() );
-        assertEquals( null, gav.getHashType() );
         
-        path = gavCalculator.gavToPath( gav );
-        assertEquals( "/foo/artifact/SNAPSHOT/artifact-SNAPSHOT.jar", path );
+        if ( enforcer.isStrict() )
+        {
+            assertEquals( "foo", gav.getGroupId() );
+            assertEquals( "artifact", gav.getArtifactId() );
+            assertEquals( "SNAPSHOT", gav.getVersion() );
+            assertEquals( "SNAPSHOT", gav.getBaseVersion() );
+            assertEquals( null, gav.getClassifier() );
+            assertEquals( "jar", gav.getExtension() );
+            assertEquals( null, gav.getSnapshotBuildNumber() );
+            assertEquals( null, gav.getSnapshotTimeStamp() );
+            assertEquals( "artifact-SNAPSHOT.jar", gav.getName() );
+            assertEquals( false, gav.isSnapshot() );
+            assertEquals( false, gav.isHash() );
+            assertEquals( null, gav.getHashType() );
+            
+            path = gavCalculator.gavToPath( gav );
+            assertEquals( "/foo/artifact/SNAPSHOT/artifact-SNAPSHOT.jar", path );
+        }
+        else
+        {
+            assertEquals( "foo", gav.getGroupId() );
+            assertEquals( "artifact", gav.getArtifactId() );
+            assertEquals( "SNAPSHOT", gav.getVersion() );
+            assertEquals( "SNAPSHOT", gav.getBaseVersion() );
+            assertEquals( null, gav.getClassifier() );
+            assertEquals( "jar", gav.getExtension() );
+            assertEquals( null, gav.getSnapshotBuildNumber() );
+            assertEquals( null, gav.getSnapshotTimeStamp() );
+            assertEquals( "artifact-SNAPSHOT.jar", gav.getName() );
+            assertEquals( true, gav.isSnapshot() );
+            assertEquals( false, gav.isHash() );
+            assertEquals( null, gav.getHashType() );
+            
+            path = gavCalculator.gavToPath( gav );
+            assertEquals( "/foo/artifact/SNAPSHOT/artifact-SNAPSHOT.jar", path );    
+        }
         
         gav = gavCalculator.pathToGav( "/foo/artifact/SNAPSHOT/artifact-20080623.175436-1.jar" );
-        assertEquals( "foo", gav.getGroupId() );
-        assertEquals( "artifact", gav.getArtifactId() );
-        assertEquals( "20080623.175436-1", gav.getVersion() );
-        assertEquals( "SNAPSHOT", gav.getBaseVersion() );
-        assertEquals( null, gav.getClassifier() );
-        assertEquals( "jar", gav.getExtension() );
-        assertEquals( Integer.valueOf( 1 ), gav.getSnapshotBuildNumber() );
-        assertEquals( parseTimestamp( "20080623.175436" ), gav.getSnapshotTimeStamp() );
-        assertEquals( "artifact-20080623.175436-1.jar", gav.getName() );
-        assertEquals( true, gav.isSnapshot() );
-        assertEquals( false, gav.isHash() );
-        assertEquals( null, gav.getHashType() );
-        
-        path = gavCalculator.gavToPath( gav );
-        assertEquals( "/foo/artifact/SNAPSHOT/artifact-20080623.175436-1.jar", path );
+        if ( enforcer.isStrict() )
+        {
+            assertEquals( null, gav );
+        }
+        else
+        {
+            assertEquals( "foo", gav.getGroupId() );
+            assertEquals( "artifact", gav.getArtifactId() );
+            assertEquals( "20080623.175436-1", gav.getVersion() );
+            assertEquals( "SNAPSHOT", gav.getBaseVersion() );
+            assertEquals( null, gav.getClassifier() );
+            assertEquals( "jar", gav.getExtension() );
+            assertEquals( Integer.valueOf( 1 ), gav.getSnapshotBuildNumber() );
+            assertEquals( parseTimestamp( "20080623.175436" ), gav.getSnapshotTimeStamp() );
+            assertEquals( "artifact-20080623.175436-1.jar", gav.getName() );
+            assertEquals( true, gav.isSnapshot() );
+            assertEquals( false, gav.isHash() );
+            assertEquals( null, gav.getHashType() );
+            
+            path = gavCalculator.gavToPath( gav );
+            assertEquals( "/foo/artifact/SNAPSHOT/artifact-20080623.175436-1.jar", path );
+        }
     }
 
     public void testGavExtreme()

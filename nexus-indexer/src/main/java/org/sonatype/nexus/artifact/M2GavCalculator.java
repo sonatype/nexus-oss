@@ -24,6 +24,7 @@ import java.text.SimpleDateFormat;
  * @plexus.component role-hint="maven2"
  */
 public class M2GavCalculator
+    extends AbstractGavCalculator
     implements GavCalculator
 {
     public Gav pathToGav( String str )
@@ -97,7 +98,8 @@ public class M2GavCalculator
                 return null;
             }
 
-            boolean snapshot = v.contains( "-SNAPSHOT" ) || v.equals( "SNAPSHOT" );
+            boolean snapshot = v.contains( "-SNAPSHOT" ) 
+                || ( !getEnforcer().isStrict() && v.equals( "SNAPSHOT" ) );
 
             boolean primary = false;
             String c = null;
@@ -147,11 +149,24 @@ public class M2GavCalculator
                     snapshotBuildNumber = sb.toString();
                     snapBuildNr = Integer.parseInt( bnr.toString() );
 
-                    primary = !checksum
-                        && !signature
-                        && n
-                            .equals( a + "-" + ( ( v.length() > 9 ) ? ( v.substring( 0, v.length() - 9 ) + "-" ) : "" ) 
-                                     + snapshotBuildNumber + "." + ext );
+                    if ( getEnforcer().isStrict() )
+                    {
+                        primary = !checksum
+                            && !signature
+                            && n.equals( 
+                                 a + "-" 
+                                 + v.substring( 0, v.length() - 9 ) + "-" 
+                                 + snapshotBuildNumber + "." + ext );
+                    }
+                    else
+                    {
+                        primary = !checksum
+                            && !signature
+                            && n.equals( 
+                                 a + "-" 
+                                 + ( ( v.length() > 9 ) ? ( v.substring( 0, v.length() - 9 ) + "-" ) : "" ) 
+                                 + snapshotBuildNumber + "." + ext );
+                    }
                     if ( !primary )
                     {
                         if ( checksum || signature )
@@ -173,7 +188,18 @@ public class M2GavCalculator
                     v = bv.substring( 0, bv.length() - 8 ) + snapshotBuildNumber;
                 }
 
-                return new Gav( g, a, v, c, ext, snapBuildNr, snapshotTimestamp, n, snapshot, checksum, checksumType );
+                return new Gav( 
+                    g, 
+                    a, 
+                    v, 
+                    c, 
+                    ext, 
+                    snapBuildNr, 
+                    snapshotTimestamp, 
+                    n, 
+                    snapshot, 
+                    checksum, 
+                    checksumType );
             }
             else
             {
@@ -191,7 +217,18 @@ public class M2GavCalculator
                             c = null;
                         }
                     }
-                    return new Gav( g, a, v, c, ext, null, null, n, snapshot, checksum, checksumType );
+                    return new Gav( 
+                        g, 
+                        a, 
+                        v, 
+                        c, 
+                        ext, 
+                        null, 
+                        null, 
+                        n, 
+                        snapshot, 
+                        checksum, 
+                        checksumType );
                 }
                 else
                 {

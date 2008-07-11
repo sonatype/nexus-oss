@@ -13,6 +13,10 @@
  *******************************************************************************/
 package org.sonatype.nexus.artifact;
 
+import org.sonatype.nexus.DefaultNexusEnforcer;
+import org.sonatype.nexus.NexusEnforcer;
+
+
 public class Gav
 {
     public enum HashType
@@ -43,6 +47,8 @@ public class Gav
     private boolean hash;
 
     private HashType hashType;
+    
+    private NexusEnforcer enforcer = new DefaultNexusEnforcer();
 
     public Gav( String groupId, String artifactId, String version, String classifier, String extension,
         Integer snapshotBuildNumber, Long snapshotTimeStamp, String name, boolean snapshot, boolean hash,
@@ -74,17 +80,27 @@ public class Gav
                 // this is a timestamped version (verified against pattern, see above)
                 // we have XXXXXX-YYYYMMDD.HHMMSS-B
                 // but XXXXXX may contain "-" too!
-                // also there may be no XXXXXX (i.e. when version is strictly named SNAPSHOT
-                String tempBaseVersion = version.substring( 0, version.lastIndexOf( '-' ) );
-                int baseVersionEndPos = tempBaseVersion.lastIndexOf( "-" );
                 
-                if ( baseVersionEndPos >= 0 )
+                if ( enforcer.isStrict() )
                 {
-                    this.baseVersion = tempBaseVersion.substring( 0, baseVersionEndPos ) + "-SNAPSHOT";
+                    this.baseVersion = version.substring( 0, version.lastIndexOf( '-' ) );
+                    this.baseVersion = baseVersion.substring( 0, baseVersion.lastIndexOf( '-' ) ) + "-SNAPSHOT";
                 }
+                // also there may be no XXXXXX (i.e. when version is strictly named SNAPSHOT
+                // BUT this is not the proper scheme, we will simply loosen up here if requested
                 else
                 {
-                    this.baseVersion = "SNAPSHOT";
+                    String tempBaseVersion = version.substring( 0, version.lastIndexOf( '-' ) );
+                    int baseVersionEndPos = tempBaseVersion.lastIndexOf( "-" );
+                    
+                    if ( baseVersionEndPos >= 0 )
+                    {
+                        this.baseVersion = tempBaseVersion.substring( 0, baseVersionEndPos ) + "-SNAPSHOT";
+                    }
+                    else
+                    {
+                        this.baseVersion = "SNAPSHOT";
+                    }   
                 }
             }
         }

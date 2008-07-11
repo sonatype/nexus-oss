@@ -23,21 +23,37 @@ package org.sonatype.nexus.artifact;
 import java.util.regex.Pattern;
 
 import org.apache.maven.artifact.Artifact;
+import org.sonatype.nexus.DefaultNexusEnforcer;
+import org.sonatype.nexus.NexusEnforcer;
 
 public class VersionUtils
 {
+    private static NexusEnforcer enforcer = new DefaultNexusEnforcer();
     // Note that there is an 'OR' to support 2 different patterns.
     // i.e. the proper way 1.0-20080707.124343
     // i.e. the newly supported way 20080707.124343 (no base version, i.e. 1.0)
     private static final Pattern VERSION_FILE_PATTERN = 
         Pattern.compile( "^(.*)-([0-9]{8}.[0-9]{6})-([0-9]+)$|^([0-9]{8}.[0-9]{6})-([0-9]+)$" );
+    private static final Pattern STRICT_VERSION_FILE_PATTERN = 
+        Pattern.compile( "^(.*)-([0-9]{8}.[0-9]{6})-([0-9]+)$" );
     
     public static boolean isSnapshot( String baseVersion )
     {
-        synchronized ( VERSION_FILE_PATTERN )
+        if ( enforcer.isStrict() )
         {
-            return VERSION_FILE_PATTERN.matcher( baseVersion ).matches()
-            || baseVersion.endsWith( Artifact.SNAPSHOT_VERSION );   
+            synchronized ( STRICT_VERSION_FILE_PATTERN )
+            {
+                return STRICT_VERSION_FILE_PATTERN.matcher( baseVersion ).matches()
+                || baseVersion.endsWith( Artifact.SNAPSHOT_VERSION );   
+            }
+        }
+        else
+        {
+            synchronized ( VERSION_FILE_PATTERN )
+            {
+                return VERSION_FILE_PATTERN.matcher( baseVersion ).matches()
+                || baseVersion.endsWith( Artifact.SNAPSHOT_VERSION );   
+            }
         }
     }
 }
