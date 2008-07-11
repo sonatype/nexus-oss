@@ -49,6 +49,8 @@ import org.sonatype.nexus.rest.model.NexusResponse;
 import org.sonatype.nexus.rest.model.RemoteConnectionSettings;
 import org.sonatype.nexus.rest.model.RemoteHttpProxySettings;
 import org.sonatype.nexus.rest.model.RepositoryBaseResource;
+import org.sonatype.nexus.rest.model.RepositoryContentClassListResource;
+import org.sonatype.nexus.rest.model.RepositoryContentClassListResourceResponse;
 import org.sonatype.nexus.rest.model.RepositoryGroupListResource;
 import org.sonatype.nexus.rest.model.RepositoryGroupListResourceResponse;
 import org.sonatype.nexus.rest.model.RepositoryGroupMemberRepository;
@@ -247,6 +249,9 @@ public final class XStreamInitializer
         xstream.omitField( RepositoryTargetListResource.class, "modelEncoding" );
         xstream.omitField( RepositoryTargetResourceResponse.class, "modelEncoding" );
         xstream.omitField( RepositoryTargetResource.class, "modelEncoding" );
+
+        xstream.omitField( RepositoryContentClassListResourceResponse.class, "modelEncoding" );
+        xstream.omitField( RepositoryContentClassListResource.class, "modelEncoding" );
 
         // Maven model
         xstream.omitField( Model.class, "modelEncoding" );

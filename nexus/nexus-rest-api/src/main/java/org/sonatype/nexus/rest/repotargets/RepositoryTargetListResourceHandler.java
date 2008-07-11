@@ -55,7 +55,7 @@ public class RepositoryTargetListResourceHandler
     }
 
     /**
-     * We create the List of Repositories by getting the from Nexus App.
+     * We create the List of targets by getting the from Nexus App.
      */
     public Representation getRepresentationHandler( Variant variant )
     {
@@ -68,6 +68,8 @@ public class RepositoryTargetListResourceHandler
         res.setId( "a" );
 
         res.setName( "AAA" );
+        
+        res.setContentType( "maven2" );
 
         res.setResourceURI( calculateSubReference( "a" ).toString() );
 
@@ -78,6 +80,8 @@ public class RepositoryTargetListResourceHandler
         res.setId( "b" );
 
         res.setName( "BBB" );
+
+        res.setContentType( "eclipse" );
 
         res.setResourceURI( calculateSubReference( "b" ).toString() );
 

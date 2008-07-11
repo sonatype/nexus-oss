@@ -83,7 +83,7 @@ public class RepositoryTargetResourceHandler
     }
 
     /**
-     * Update a user.
+     * Update a target.
      */
     public void put( Representation representation )
     {
@@ -142,6 +142,8 @@ public class RepositoryTargetResourceHandler
         resource.setName( getRepoTargetId() );
 
         resource.setResourceURI( getRequest().getResourceRef().getPath() );
+        
+        resource.setContentType( "maven2" );
         
         resource.addPattern( "pathA" );
         

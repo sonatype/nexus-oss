@@ -38,6 +38,7 @@ import org.sonatype.nexus.rest.authentication.LogoutResourceHandler;
 import org.sonatype.nexus.rest.cache.CacheResourceHandler;
 import org.sonatype.nexus.rest.configurations.ConfigurationsListResourceHandler;
 import org.sonatype.nexus.rest.configurations.ConfigurationsResourceHandler;
+import org.sonatype.nexus.rest.contentclasses.ContentClassesListResourceHandler;
 import org.sonatype.nexus.rest.feeds.FeedResourceHandler;
 import org.sonatype.nexus.rest.feeds.FeedsListResourceHandler;
 import org.sonatype.nexus.rest.global.GlobalConfigurationListResourceHandler;
@@ -352,6 +353,8 @@ public class ApplicationBridge
             router.attach(
                 "/roles/{" + RoleResourceHandler.ROLE_ID_KEY + "}",
                 protectResource( RoleResourceHandler.class ) );
+
+            router.attach( "/repo_content_classes", protectResource( ContentClassesListResourceHandler.class ) );
 
             router.attach( "/repo_targets", protectResource( RepositoryTargetListResourceHandler.class ) );
 
