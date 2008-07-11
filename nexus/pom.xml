@@ -118,7 +118,7 @@
         <jsw.binaries.version>3.2.3.2</jsw.binaries.version>
         <plexus.container.version>1.0-alpha-47</plexus.container.version>
         <plx.plugin.version>1.2-SNAPSHOT</plx.plugin.version>
-        <nexus.indexer.version>1.0-beta-4</nexus.indexer.version>
+        <nexus.indexer.version>1.0-beta-5-SNAPSHOT</nexus.indexer.version>
 	</properties>
 
 	<dependencyManagement>
