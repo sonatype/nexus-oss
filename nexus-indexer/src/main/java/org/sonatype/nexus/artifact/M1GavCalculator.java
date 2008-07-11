@@ -24,7 +24,6 @@ import java.util.regex.Pattern;
  * @plexus.component role-hint="maven1"
  */
 public class M1GavCalculator
-    extends AbstractGavCalculator
     implements GavCalculator
 {
 
@@ -100,19 +99,7 @@ public class M1GavCalculator
                     version = version.substring( 0, version.length() - ( classifier.length() + 1 ) );
                 }
 
-                return new Gav( 
-                    g, 
-                    a, 
-                    version, 
-                    classifier, 
-                    ext, 
-                    null, 
-                    null, 
-                    n, 
-                    snapshot, 
-                    checksum, 
-                    checksumType, 
-                    getEnforcer().isStrict() );
+                return new Gav( g, a, version, classifier, ext, null, null, n, snapshot, checksum, checksumType );
             }
             else
             {
@@ -137,8 +124,7 @@ public class M1GavCalculator
                         n,
                         snapshot,
                         checksum,
-                        checksumType,
-                        getEnforcer().isStrict() );
+                        checksumType );
                 }
                 else
                 {

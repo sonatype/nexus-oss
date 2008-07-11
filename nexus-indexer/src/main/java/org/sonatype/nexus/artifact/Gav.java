@@ -13,7 +13,6 @@
  *******************************************************************************/
 package org.sonatype.nexus.artifact;
 
-
 public class Gav
 {
     public enum HashType
@@ -47,7 +46,7 @@ public class Gav
 
     public Gav( String groupId, String artifactId, String version, String classifier, String extension,
         Integer snapshotBuildNumber, Long snapshotTimeStamp, String name, boolean snapshot, boolean hash,
-        HashType hashType, boolean strict )
+        HashType hashType )
     {
         this.groupId = groupId;
         this.artifactId = artifactId;
@@ -59,7 +58,7 @@ public class Gav
         }
         else
         {
-            if ( !VersionUtils.isSnapshot( version, strict ) )
+            if ( !VersionUtils.isSnapshot( version ) )
             {
                 throw new IllegalArgumentException( "GAV marked as snapshot but the supplied version '" + version
                     + "' is not!" );
@@ -75,27 +74,17 @@ public class Gav
                 // this is a timestamped version (verified against pattern, see above)
                 // we have XXXXXX-YYYYMMDD.HHMMSS-B
                 // but XXXXXX may contain "-" too!
-                
-                if ( strict )
-                {
-                    this.baseVersion = version.substring( 0, version.lastIndexOf( '-' ) );
-                    this.baseVersion = baseVersion.substring( 0, baseVersion.lastIndexOf( '-' ) ) + "-SNAPSHOT";
-                }
                 // also there may be no XXXXXX (i.e. when version is strictly named SNAPSHOT
-                // BUT this is not the proper scheme, we will simply loosen up here if requested
+                String tempBaseVersion = version.substring( 0, version.lastIndexOf( '-' ) );
+                int baseVersionEndPos = tempBaseVersion.lastIndexOf( "-" );
+                
+                if ( baseVersionEndPos >= 0 )
+                {
+                    this.baseVersion = tempBaseVersion.substring( 0, baseVersionEndPos ) + "-SNAPSHOT";
+                }
                 else
                 {
-                    String tempBaseVersion = version.substring( 0, version.lastIndexOf( '-' ) );
-                    int baseVersionEndPos = tempBaseVersion.lastIndexOf( "-" );
-                    
-                    if ( baseVersionEndPos >= 0 )
-                    {
-                        this.baseVersion = tempBaseVersion.substring( 0, baseVersionEndPos ) + "-SNAPSHOT";
-                    }
-                    else
-                    {
-                        this.baseVersion = "SNAPSHOT";
-                    }   
+                    this.baseVersion = "SNAPSHOT";
                 }
             }
         }
