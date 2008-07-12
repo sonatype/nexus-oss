@@ -22,9 +22,11 @@ package org.sonatype.nexus;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Map;
 
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.CRepositoryShadow;
+import org.sonatype.nexus.proxy.registry.ContentClass;
 
 public class DefaultNexusTest
     extends AbstractNexusTestCase
@@ -148,4 +150,18 @@ public class DefaultNexusTest
         assertEquals( 2, stemplates.size() );
     }
 
+    public void testListRepositoryContentClasses()
+        throws Exception
+    {
+        Map<String, ContentClass> plexusContentClasses = getContainer().lookupMap( ContentClass.class );
+
+        Collection<ContentClass> contentClasses = getDefaultNexus().listRepositoryContentClasses();
+
+        assertEquals( plexusContentClasses.size(), contentClasses.size() );
+
+        for ( ContentClass cc : plexusContentClasses.values() )
+        {
+            assertTrue( contentClasses.contains( cc ) );
+        }
+    }
 }
