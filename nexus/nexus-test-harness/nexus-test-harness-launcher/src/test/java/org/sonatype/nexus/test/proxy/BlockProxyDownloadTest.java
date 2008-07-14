@@ -32,7 +32,7 @@ public class BlockProxyDownloadTest extends AbstractNexusIntegrationTest
         
         Gav gav =
             new Gav( this.getClass().getName(), "block-proxy-download-test", "1.1.a", null, "jar", 0,
-                     new Date().getTime(), "Simple Test Artifact", false, false, null );
+                     new Date().getTime(), "Simple Test Artifact", false, false, null, false, null );
      
         // download file
         File originalFile = this.downloadArtifact( gav, "target/downloads/original" );

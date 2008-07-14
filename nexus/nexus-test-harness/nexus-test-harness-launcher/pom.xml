@@ -10,13 +10,19 @@
 	<artifactId>nexus-test-harness-launcher</artifactId>
 	<name>Nexus Test Harness Launcher</name>
 	<properties>
+		
 		<bundle-expanded-dir>target/bundle</bundle-expanded-dir>
 		<config-expanded-dir>target/test-nexus-config</config-expanded-dir>
-		<nexus-basedir>${bundle-expanded-dir}/nexus-webapp-${project.version}</nexus-basedir>
-		<config-target-dir>${nexus-basedir}/runtime/apps/nexus/conf</config-target-dir>
-		<work-target-dir>${nexus-basedir}/runtime/work</work-target-dir>		
-		<proxy-repo-target-dir>${project.build.directory}/proxy-repos/</proxy-repo-target-dir>
-		<nexus-plexus-config-file>${nexus-basedir}/conf/plexus.xml</nexus-plexus-config-file>
+		<!--<nexus-basedir>${bundle-expanded-dir}/nexus-webapp-${project.version}</nexus-basedir>-->
+		
+		<nexus-relative-basedir>${bundle-expanded-dir}/nexus-webapp-${project.version}</nexus-relative-basedir>
+		<nexus-abs-basedir>${project.build.directory}/bundle/nexus-webapp-${project.version}</nexus-abs-basedir>
+		
+		<config-target-dir>${nexus-abs-basedir}/runtime/apps/nexus/conf</config-target-dir>
+		<work-target-dir>${nexus-abs-basedir}/runtime/work</work-target-dir>
+		<proxy-repo-target-dir-name>proxy-repos</proxy-repo-target-dir-name>
+		<proxy-repo-target-dir>${project.build.directory}/${proxy-repo-target-dir-name}/</proxy-repo-target-dir>
+		<nexus-plexus-config-file>${nexus-abs-basedir}/conf/plexus.xml</nexus-plexus-config-file>
 		<proxy-repo-plexus-config-file>${project.build.directory}/test-classes/proxyRepo/conf/ProxyRepoPlexus.xml</proxy-repo-plexus-config-file>
 		<proxy-repo-port>8089</proxy-repo-port>
 		<proxy-repo-base-url>http://localhost:${proxy-repo-port}/remote/</proxy-repo-base-url>
@@ -85,16 +91,35 @@
 	        <filter>src/test/filters/filter.txt</filter>
 	    </filters>
 	    <resources>
+	    
+	    
 	        <resource>
 	            <directory>${config-expanded-dir}</directory>
 	            <filtering>false</filtering>
-	            <targetPath>../../${nexus-basedir}</targetPath>            
+	            <targetPath>../../${nexus-relative-basedir}</targetPath>            
 	        </resource>
 	        <resource>
 	            <directory>${config-expanded-dir}/runtime/apps/nexus/conf</directory>
 	            <filtering>true</filtering>
-	            <targetPath>../../${nexus-basedir}/runtime/apps/nexus/conf</targetPath>            
+	            <targetPath>../../${nexus-relative-basedir}/runtime/apps/nexus/conf</targetPath>            
 	        </resource>
+	        
+	        <!-- <resource>
+				<directory>${config-expanded-dir}/runtime/apps/nexus/conf</directory>
+				<excludes>
+					<exclude>**/log4j.properties</exclude>
+			    </excludes>
+	            <filtering>true</filtering>
+	            <targetPath>${nexus-basedir}/runtime/apps/nexus/conf</targetPath>            
+	        </resource>
+	        <resource>
+	            <directory>${config-expanded-dir}/runtime/apps/nexus/conf</directory>
+	            <includes>
+					<include>**/log4j.properties</include>
+			    </includes>
+	            <filtering>false</filtering>
+	            <targetPath>${nexus-basedir}/runtime/apps/nexus/conf</targetPath>            
+	        </resource> -->
 	    </resources>
 	    <testResources>
 	      <testResource>
@@ -194,17 +219,17 @@
 		                </goals>
 		                <configuration>
 		                    <prependClasspaths>
-		                        <prependClasspath>${basedir}/${config-target-dir}</prependClasspath>
+		                        <prependClasspath>${config-target-dir}</prependClasspath>
 		                    </prependClasspaths>
 		                    <disableBlocking>true</disableBlocking>
 		                    <controlPort>${nexus-control-port}</controlPort>
 		                    <systemProperties>
-		                        <java.util.logging.config.file>${basedir}/${config-target-dir}/jul-logging.properties</java.util.logging.config.file>
-                                <java.io.tmpdir>${basedir}/${work-target-dir}/tmp</java.io.tmpdir>
+		                        <java.util.logging.config.file>${config-target-dir}/jul-logging.properties</java.util.logging.config.file>
+                                <java.io.tmpdir>${work-target-dir}/tmp</java.io.tmpdir>
                                 <plexus.host.control.socket.enabled>true</plexus.host.control.socket.enabled>
                                 <plexus.container.dev.mode>true</plexus.container.dev.mode>
 		                    </systemProperties>
-		                    <basedir>${bundle-expanded-dir}/nexus-webapp-${project.version}</basedir>
+		                    <basedir>${nexus-abs-basedir}</basedir>
 		                    <configuration>${nexus-plexus-config-file}</configuration>
 		                    <includeTestClasspath>true</includeTestClasspath>
 		                    <platformArtifact>
@@ -224,13 +249,13 @@
 		                </goals>
 		                <configuration>
 		                    <prependClasspaths>
-		                        <prependClasspath>${basedir}/${config-target-dir}</prependClasspath>
+		                        <prependClasspath>${config-target-dir}</prependClasspath>
 		                    </prependClasspaths>
 		                    <disableBlocking>true</disableBlocking>
 		                    <controlPort>${proxy-repo-control-port}</controlPort>
 		                    <systemProperties>
 		                        <java.util.logging.config.file>${basedir}/${config-target-dir}/jul-logging.properties</java.util.logging.config.file>
-                                <java.io.tmpdir>${basedir}/target/proxy-repo/tmp</java.io.tmpdir>
+                                <java.io.tmpdir>target/proxy-repo/tmp</java.io.tmpdir>
                                 <plexus.host.control.socket.enabled>true</plexus.host.control.socket.enabled>
                                 <plexus.container.dev.mode>true</plexus.container.dev.mode>
 		                    </systemProperties>
@@ -311,6 +336,7 @@
                             <skip>false</skip>
                             <excludes>
                                 <exclude>**/AbstractNexusIntegrationTest*</exclude>
+                                <!-- <exclude>**/proxy/*</exclude> -->
                             </excludes>
                         </configuration>
                     </execution>

@@ -1,7 +1,6 @@
 package org.sonatype.nexus.test.utils;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import org.apache.commons.httpclient.HttpClient;

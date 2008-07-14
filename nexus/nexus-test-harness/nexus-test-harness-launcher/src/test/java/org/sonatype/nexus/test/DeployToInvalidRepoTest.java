@@ -1,7 +1,5 @@
 package org.sonatype.nexus.test;
 
-import static org.junit.Assert.assertTrue;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -9,17 +7,10 @@ import java.util.Date;
 
 import junit.framework.Assert;
 
-import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.PostMethod;
-import org.apache.commons.httpclient.methods.multipart.FilePart;
-import org.apache.commons.httpclient.methods.multipart.MultipartRequestEntity;
-import org.apache.commons.httpclient.methods.multipart.Part;
-import org.apache.commons.httpclient.methods.multipart.StringPart;
 import org.apache.commons.httpclient.params.HttpMethodParams;
-import org.apache.maven.wagon.ResourceDoesNotExistException;
-import org.apache.maven.wagon.authorization.AuthorizationException;
 import org.junit.Test;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.test.utils.DeployUtils;
@@ -43,7 +34,7 @@ public class DeployToInvalidRepoTest
        
         Gav gav =
             new Gav( "org.sonatype.nexus.test.invalid" + this.getClass().getName(), "simpleArtifact", "1.0.0", null, "xml", 0,
-                     new Date().getTime(), "Simple Test Artifact", false, false, null );
+                     new Date().getTime(), "Simple Test Artifact", false, false, null, false, null );
 
         // file to deploy
         File fileToDeploy =
@@ -88,7 +79,7 @@ public class DeployToInvalidRepoTest
 
         Gav gav =
             new Gav( "org.sonatype.nexus.test." + this.getClass().getName(), "uploadWithGav", "1.0.0", null, "xml", 0,
-                     new Date().getTime(), "Simple Test Artifact", false, false, null );
+                     new Date().getTime(), "Simple Test Artifact", false, false, null, false, null  );
 
         // file to deploy
         File fileToDeploy =
@@ -136,7 +127,7 @@ public class DeployToInvalidRepoTest
 
         Gav gav =
             new Gav( "org.sonatype.nexus.test." + this.getClass().getName(), "uploadWithGav", "1.0.0", null, "xml", 0,
-                     new Date().getTime(), "Simple Test Artifact", false, false, null );
+                     new Date().getTime(), "Simple Test Artifact", false, false, null, false, null  );
 
         // file to deploy
         File fileToDeploy =
@@ -183,7 +174,7 @@ public class DeployToInvalidRepoTest
        
         Gav gav =
             new Gav( "org.sonatype.nexus.test.invalid" + this.getClass().getName(), "simpleArtifact", "1.0.0-SNAPSHOT", null, "xml", 0,
-                     new Date().getTime(), "Simple Test Artifact", false, false, null );
+                     new Date().getTime(), "Simple Test Artifact", false, false, null, false, null  );
 
         // file to deploy
         File fileToDeploy =
@@ -228,7 +219,7 @@ public class DeployToInvalidRepoTest
 
         Gav gav =
             new Gav( "org.sonatype.nexus.test." + this.getClass().getName(), "uploadWithGav", "1.0.0-SNAPSHOT", null, "xml", 0,
-                     new Date().getTime(), "Simple Test Artifact", false, false, null );
+                     new Date().getTime(), "Simple Test Artifact", false, false, null, false, null  );
 
         // file to deploy
         File fileToDeploy =
@@ -276,7 +267,7 @@ public class DeployToInvalidRepoTest
 
         Gav gav =
             new Gav( "org.sonatype.nexus.test." + this.getClass().getName(), "uploadWithGav", "1.0.0-SNAPSHOT", null, "xml", 0,
-                     new Date().getTime(), "Simple Test Artifact", false, false, null );
+                     new Date().getTime(), "Simple Test Artifact", false, false, null, false, null  );
 
         // file to deploy
         File fileToDeploy =

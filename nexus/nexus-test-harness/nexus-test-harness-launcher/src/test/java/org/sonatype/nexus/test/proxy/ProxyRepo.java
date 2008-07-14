@@ -15,7 +15,6 @@ import org.restlet.data.Method;
 import org.restlet.data.Protocol;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
-import org.sonatype.appbooter.ctl.ControlConnectionException;
 import org.sonatype.appbooter.ctl.ControllerClient;
 import org.sonatype.nexus.artifact.Gav;
 
@@ -223,8 +222,10 @@ public class ProxyRepo
 
     public File getLocalFile( String repositoryId, String groupId, String artifact, String version, String type )
     {
-        return new File( this.localStorageDir, repositoryId + "/" + groupId.replace( '.', '/' ) + "/" + artifact + "/"
-            + version + "/" + artifact + "-" + version + "." + type );
+        File result = new File( this.localStorageDir, repositoryId + "/" + groupId.replace( '.', '/' ) + "/" + artifact + "/"
+                                + version + "/" + artifact + "-" + version + "." + type );
+        System.out.println( "Returning file: "+ result );
+        return result;
     }
     
     //TODO: Refactor this into the AbstractNexusIntegrationTest or some util class, to make more generic
@@ -260,7 +261,7 @@ public class ProxyRepo
 
         if ( !response.getStatus().isSuccess() )
         {
-            Assert.fail( "Could not unblock proxy: " + repoId );
+            Assert.fail( "Could not unblock proxy: " + repoId + ", status: "+ response.getStatus().getName() + " (" + response.getStatus().getCode() + ") - " + response.getStatus().getDescription() );
         }
     }
 

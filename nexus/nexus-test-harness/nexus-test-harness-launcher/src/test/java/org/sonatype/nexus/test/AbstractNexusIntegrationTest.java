@@ -31,7 +31,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.UnknownHostException;
@@ -49,7 +48,6 @@ import org.codehaus.plexus.archiver.manager.ArchiverManager;
 import org.codehaus.plexus.archiver.manager.DefaultArchiverManager;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
-import org.sonatype.appbooter.PlexusContainerHost;
 import org.sonatype.appbooter.ctl.ControlConnectionException;
 import org.sonatype.appbooter.ctl.ControllerClient;
 import org.sonatype.nexus.artifact.Gav;
@@ -58,42 +56,52 @@ import org.sonatype.nexus.test.proxy.ProxyRepo;
 public abstract class AbstractNexusIntegrationTest
 {
     private String nexusUrl;
+
     private PlexusContainer container;
+
     private Map context;
+
     private String baseNexusUrl;
+
     private String nexusBundleDir;
 
     private static ControllerClient manager;
+
     private static boolean detach = false;
+
     private static Object waitObj = new Object();
+
     private static final int TEST_CONNECTION_ATTEMPTS = 5;
+
     private static final int TEST_CONNECTION_TIMEOUT = 3000;
+
     private static final int MANAGER_WAIT_TIME = 500;
 
     public static final String REPOSITORY_RELATIVE_URL = "content/repositories/";
+
     public static final String GROUP_REPOSITORY_RELATIVE_URL = "content/groups/";
 
     private static String basedir;
-    
+
     // TODO: need to configure this via the pom
     private static boolean STANDALONE_MODE = false;
 
     /**
      * Sets up the infrastructure for the tests.
+     * 
      * @param nexusUrl The relative url i.e. 'content/groups/nexus-test/'
      */
     public AbstractNexusIntegrationTest( String nexusUrl )
     {
-     // Using ResourceBundle here because its easy
+        // Using ResourceBundle here because its easy
         ResourceBundle rb = ResourceBundle.getBundle( "baseTest" );
-        
+
         this.baseNexusUrl = rb.getString( "nexus.base.url" );
         this.nexusBundleDir = rb.getString( "nexus.bundle.dir" );
 
         this.nexusUrl = baseNexusUrl + nexusUrl;
         setupContainer();
     }
-    
 
     protected void complete()
     {
@@ -103,7 +111,7 @@ public abstract class AbstractNexusIntegrationTest
     @BeforeClass
     public static void oncePerClassSetUp()
     {
-        if( !STANDALONE_MODE )
+        if ( !STANDALONE_MODE )
         {
             synchronized ( waitObj )
             {
@@ -113,9 +121,9 @@ public abstract class AbstractNexusIntegrationTest
                     if ( manager != null )
                     {
                         manager.close();
-                        
+
                     }
-                    
+
                     String controlPortString = ResourceBundle.getBundle( "baseTest" ).getString( "nexus.control.port" );
                     // if this throws the test will fail...
                     manager = new ControllerClient( Integer.parseInt( controlPortString ) );
@@ -149,23 +157,23 @@ public abstract class AbstractNexusIntegrationTest
     @AfterClass
     public static void oncePerClassTearDown()
     {
-        if( !STANDALONE_MODE )
+        if ( !STANDALONE_MODE )
         {
             synchronized ( waitObj )
             {
                 try
                 {
-                    //if detach is true, then the tests passed
+                    // if detach is true, then the tests passed
                     if ( detach )
                     {
                         manager.detachOnClose();
                     }
-    
+
                     manager.close();
                     manager = null;
-    
+
                     ProxyRepo.getInstance().disconnect( detach );
-                    
+
                     Thread.sleep( MANAGER_WAIT_TIME );
                 }
                 catch ( UnknownHostException e )
@@ -296,40 +304,78 @@ public abstract class AbstractNexusIntegrationTest
         }
     }
 
-    protected void restartNexus() throws IOException
+    protected void restartNexus()
+        throws IOException
     {
         stopNexus();
         startNexus();
     }
-    
-    protected File downloadArtifact( Gav gav, String targetDirectory ) throws IOException
+
+    protected File downloadArtifact( Gav gav, String targetDirectory )
+        throws IOException
     {
-        return this.downloadArtifact( gav.getGroupId(), gav.getArtifactId(), gav.getVersion(), gav.getExtension(), targetDirectory );
+        return this.downloadArtifact( gav.getGroupId(), gav.getArtifactId(), gav.getVersion(), gav.getExtension(),
+                                      targetDirectory );
     }
-    
-    protected String getRelitiveArtifactPath( Gav gav ) throws FileNotFoundException
+
+    protected String getRelitiveArtifactPath( Gav gav )
+        throws FileNotFoundException
     {
-        return gav.getGroupId().replace( '.', '/' ) + "/" + gav.getArtifactId() + "/" + gav.getVersion() + "/" + gav.getArtifactId() + "-"
-        + gav.getVersion() + "." + gav.getExtension();
+        return gav.getGroupId().replace( '.', '/' ) + "/" + gav.getArtifactId() + "/" + gav.getVersion() + "/"
+            + gav.getArtifactId() + "-" + gav.getVersion() + "." + gav.getExtension();
     }
-    
 
     protected File downloadArtifact( String groupId, String artifact, String version, String type,
-                                     String targetDirectory ) throws IOException
+                                     String targetDirectory )
+        throws IOException
     {
-        URL url = null;
+        return this.downloadArtifact( this.nexusUrl, groupId, artifact, version, type, targetDirectory );
+    }
+
+    protected File downloadArtifactFromRepository( String repoId, Gav gav, String targetDirectory )
+        throws IOException
+    {
+        return this.downloadArtifact( this.baseNexusUrl + REPOSITORY_RELATIVE_URL + repoId + "/", gav.getGroupId(),
+                                      gav.getArtifactId(), gav.getVersion(), gav.getExtension(), targetDirectory );
+    }
+
+    protected File downloadArtifactFromGroup( String groupId, Gav gav, String targetDirectory )
+        throws IOException
+    {
+        return this.downloadArtifact( this.baseNexusUrl + GROUP_REPOSITORY_RELATIVE_URL + groupId + "/",
+                                      gav.getGroupId(), gav.getArtifactId(), gav.getVersion(), gav.getExtension(),
+                                      targetDirectory );
+    }
+
+    protected File downloadArtifact( String baseUrl, String groupId, String artifact, String version, String type,
+                                     String targetDirectory )
+        throws IOException
+    {
+        URL url =
+            new URL( baseUrl + groupId.replace( '.', '/' ) + "/" + artifact + "/" + version + "/" + artifact + "-"
+                + version + "." + type );
+                
+        return this.downloadFile( url, targetDirectory + "/" + artifact + "-" + version + "." + type );
+    }
+
+    protected File downloadFile( URL url, String targetFile ) throws IOException
+    {
+
         OutputStream out = null;
         URLConnection conn = null;
         InputStream in = null;
 
-        new File( targetDirectory ).mkdirs();
 
-        File downloadedFile = new File( targetDirectory + "/" + artifact + "-" + version + "." + type );
+        File downloadedFile = new File( targetFile );
+        // if this is null then someone was getting really creative with the tests, but hey, we will let them...
+        if( downloadedFile.getParentFile() != null )
+        {
+          downloadedFile.getParentFile().mkdirs();
+        }
+
         try
         {
-            url =
-                new URL( nexusUrl + groupId.replace( '.', '/' ) + "/" + artifact + "/" + version + "/" + artifact + "-"
-                    + version + "." + type );
+
             System.out.println( "Downloading file: " + url );
             out = new BufferedOutputStream( new FileOutputStream( downloadedFile ) );
 
@@ -364,6 +410,7 @@ public abstract class AbstractNexusIntegrationTest
         }
 
         return downloadedFile;
+
     }
 
     protected File unpackArtifact( File artifact, String targetDirectory )
@@ -417,10 +464,11 @@ public abstract class AbstractNexusIntegrationTest
         // ----------------------------------------------------------------------------
 
         ContainerConfiguration containerConfiguration =
-            new DefaultContainerConfiguration()
-                .setName( "test" )
-                .setContext( context )
-                .setContainerConfiguration( getClass().getName().replace( '.', '/' ) + ".xml" );
+            new DefaultContainerConfiguration().setName( "test" ).setContext( context ).setContainerConfiguration(
+                                                                                                                   getClass().getName().replace(
+                                                                                                                                                 '.',
+                                                                                                                                                 '/' )
+                                                                                                                       + ".xml" );
 
         try
         {
@@ -455,33 +503,29 @@ public abstract class AbstractNexusIntegrationTest
         return baseNexusUrl;
     }
 
-    public String getNexusRepositoryURL(String repositoryName)
+    public String getNexusRepositoryURL( String repositoryName )
     {
         return this.getBaseNexusUrl() + REPOSITORY_RELATIVE_URL + repositoryName;
     }
 
-    public String getNexusGroupRepositoryURL(String repositoryName)
+    public String getNexusGroupRepositoryURL( String repositoryName )
     {
         return this.getBaseNexusUrl() + GROUP_REPOSITORY_RELATIVE_URL + repositoryName;
     }
-    
+
     public String getNexusURL()
     {
         return this.nexusUrl;
     }
-
 
     public String getNexusBundleDir()
     {
         return nexusBundleDir;
     }
 
-
     public void setNexusBundleDir( String nexusBundleDir )
     {
         this.nexusBundleDir = nexusBundleDir;
     }
-
-
 
 }

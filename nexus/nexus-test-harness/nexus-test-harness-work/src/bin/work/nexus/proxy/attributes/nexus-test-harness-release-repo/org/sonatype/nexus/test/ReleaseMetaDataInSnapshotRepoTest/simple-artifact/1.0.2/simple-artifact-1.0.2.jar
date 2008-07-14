@@ -1,0 +1,24 @@
+<file>
+  <length>1794</length>
+  <generation>1</generation>
+  <path>/org/sonatype/nexus/test/ReleaseMetaDataInSnapshotRepoTest/simple-artifact/1.0.2/simple-artifact-1.0.2.jar</path>
+  <readable>true</readable>
+  <writable>true</writable>
+  <repositoryId>nexus-test-harness-release-repo</repositoryId>
+  <created>1215714911662</created>
+  <modified>1215714911662</modified>
+  <storedLocally>1215714911663</storedLocally>
+  <lastTouched>1215714911663</lastTouched>
+  <lastRequested>1215714911663</lastRequested>
+  <expired>false</expired>
+  <attributes>
+    <entry>
+      <string>digest.md5</string>
+      <string>b1eefa52f57c460e3139f0820f4c5886</string>
+    </entry>
+    <entry>
+      <string>digest.sha1</string>
+      <string>4ce1d96bd11b8959b32a75c1fa5b738d7b87d408</string>
+    </entry>
+  </attributes>
+</file>

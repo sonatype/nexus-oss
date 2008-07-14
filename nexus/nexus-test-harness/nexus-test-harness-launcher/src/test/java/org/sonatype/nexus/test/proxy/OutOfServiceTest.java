@@ -33,7 +33,7 @@ public class OutOfServiceTest
         // get an artifact
         Gav gav =
             new Gav( this.getClass().getName(), "out-of-service", "0.1.8-four-beta18", null, "jar", 0,
-                     new Date().getTime(), "Simple Test Artifact", false, false, null );
+                     new Date().getTime(), "Simple Test Artifact", false, false, null, false, null );
 
         // download an artifact
         File originalFile = this.downloadArtifact( gav, "target/downloads/original" );
