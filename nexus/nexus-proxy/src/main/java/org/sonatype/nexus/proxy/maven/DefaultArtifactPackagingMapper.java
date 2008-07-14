@@ -41,7 +41,6 @@ public class DefaultArtifactPackagingMapper
 
     {
         typeToExtensions = new HashMap<String, String>();
-        typeToExtensions.put( "ear", "jar" );
         typeToExtensions.put( "ejb-client", "jar" );
         typeToExtensions.put( "ejb", "jar" );
         typeToExtensions.put( "rar", "jar" );

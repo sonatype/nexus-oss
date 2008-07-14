@@ -140,6 +140,8 @@ public interface ArtifactStore
      * deleteWholeGav is true, the whole version will be deleted.
      * 
      * @param gavRequest request.
+     * @param withChecksums if true, will delete all checksum (.sha1 & .md5) and signature (.asc) files associated
+     *        with the artifact.
      * @param withAllSubordinates if true, will delete the all artifact and all of it's "subordinated" GAV with
      *        classifiers.
      * @param deleteWholeGav if true, will delete the whole version of this artifact.
@@ -150,7 +152,7 @@ public interface ArtifactStore
      * @throws StorageException
      * @throws AccessDeniedException
      */
-    void deleteArtifactPom( ArtifactStoreRequest gavRequest, boolean withAllSubordinates, boolean deleteWholeGav )
+    void deleteArtifactPom( ArtifactStoreRequest gavRequest, boolean withChecksums, boolean withAllSubordinates, boolean deleteWholeGav )
         throws UnsupportedStorageOperationException,
             NoSuchResourceStoreException,
             RepositoryNotAvailableException,
@@ -164,6 +166,8 @@ public interface ArtifactStore
      * deleteWholeGav is true, the whole version will be deleted.
      * 
      * @param gavRequest request.
+     * @param withChecksums if true, will delete all checksum (.sha1 & .md5) and signature (.asc) files associated
+     *        with the artifact.
      * @param withAllSubordinates if true, will delete the all artifact and all of it's "subordinated" GAV with
      *        classifiers.
      * @param deleteWholeGav if true, will delete the whole version of this artifact.
@@ -174,7 +178,7 @@ public interface ArtifactStore
      * @throws StorageException
      * @throws AccessDeniedException
      */
-    void deleteArtifact( ArtifactStoreRequest gavRequest, boolean withAllSubordinates, boolean deleteWholeGav )
+    void deleteArtifact( ArtifactStoreRequest gavRequest, boolean withChecksums, boolean withAllSubordinates, boolean deleteWholeGav )
         throws UnsupportedStorageOperationException,
             NoSuchResourceStoreException,
             RepositoryNotAvailableException,

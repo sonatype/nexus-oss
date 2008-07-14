@@ -20,7 +20,6 @@
  */
 package org.sonatype.nexus.maven.tasks;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -38,7 +37,6 @@ import org.sonatype.nexus.artifact.M2ArtifactRecognizer;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryGroupException;
-import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
@@ -351,7 +349,7 @@ public class DefaultSnapshotRemover
                             .getArtifactId(), gavToRemove.getVersion() );
 
                         // remove the whole GAV
-                        repository.deleteArtifact( req, true, true );
+                        repository.deleteArtifact( req, true, true, true );
                     }
                     catch ( Exception e )
                     {
@@ -398,28 +396,22 @@ public class DefaultSnapshotRemover
                             try
                             {
                                 gav = (Gav) file.getItemContext().get( Gav.class.getName() );
+                                                                
+                                ArtifactStoreRequest req = new ArtifactStoreRequest( 
+                                    gav.getGroupId(), 
+                                    gav.getArtifactId(), 
+                                    gav.getVersion(), 
+                                    gav.getExtension(), 
+                                    gav.getClassifier() );
                                 
-                                //In the case of poms, we'll go ahead and undeploy the artifact from metadata
-                                if ( gav.getExtension().equals( "pom" ) )
+                                if ( "pom".equals( gav.getExtension() ))
                                 {
-                                    try
-                                    {
-                                        ArtifactStoreRequest req = new ArtifactStoreRequest( 
-                                            gav.getGroupId(), 
-                                            gav.getArtifactId(), 
-                                            gav.getVersion(), 
-                                            gav.getExtension(), 
-                                            gav.getClassifier() );
-                                        repository.getMetadataManager().undeployArtifact( req, repository );
-                                    }
-                                    catch ( IOException e )
-                                    {
-                                        throw new StorageException( "Could not maintain metadata!", e );
-                                    }
+                                    repository.deleteArtifactPom( req, false, false, false );
                                 }
-
-                                // delete the artifact only
-                                repository.deleteItem( file.getRepositoryItemUid() );
+                                else
+                                {
+                                    repository.deleteArtifact( req, false, false, false );
+                                }
 
                                 deletedFiles++;
                             }
