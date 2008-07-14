@@ -28,7 +28,7 @@
 									<property>
 										<name>resourceBase</name>
 										<value>
-											${proxy-repo-target-dir}/
+											${proxy-repo-target-dir}
 										</value>
 									</property>
 									<property>
