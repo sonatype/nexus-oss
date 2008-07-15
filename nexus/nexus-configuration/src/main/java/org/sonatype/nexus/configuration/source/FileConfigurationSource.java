@@ -141,6 +141,10 @@ public class FileConfigurationSource
 
             configurationDefaulted = true;
         }
+        else
+        {
+            configurationDefaulted = false;
+        }
 
         loadConfiguration( getConfigurationFile() );
 
@@ -154,7 +158,7 @@ public class FileConfigurationSource
 
         ValidationResponse vResponse = getConfigurationValidator().validateModel(
             new ValidationRequest( getConfiguration() ) );
-        
+
         setValidationResponse( vResponse );
 
         if ( vResponse.isValid() )
