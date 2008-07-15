@@ -181,8 +181,7 @@ Sonatype.repoServer.UserEditPanel = function(config){
         minLength: 4,
         minLengthText : "Password must be 4 characters or more",
         maxLength: 25,
-        maxLengthText : "Password must be 25 characters or less",
-        value: Sonatype.utils.passwordPlaceholder
+        maxLengthText : "Password must be 25 characters or less"
       },
       {
         xtype: 'textfield',
@@ -199,7 +198,6 @@ Sonatype.repoServer.UserEditPanel = function(config){
         maxLength: 25,
         maxLengthText : "Password must be 25 characters or less",
         vtype: 'password',
-        value: Sonatype.utils.passwordPlaceholder,
         initialPasswordField: 'password'
       },
       {
@@ -434,13 +432,10 @@ Ext.extend(Sonatype.repoServer.UserEditPanel, Ext.Panel, {
   saveHandler : function(formInfoObj){
     if (formInfoObj.formPanel.form.isValid()) {
       var isNew = formInfoObj.isNew;
-      var createUri = Sonatype.config.repos.urls.users;
-      var updateUri = (formInfoObj.resourceUri) ? formInfoObj.resourceUri : '';
-      var form = formInfoObj.formPanel.form;
     
-      form.doAction('sonatypeSubmit', {
+      formInfoObj.formPanel.form.doAction('sonatypeSubmit', {
         method: (isNew) ? 'POST' : 'PUT',
-        url: isNew ? createUri : updateUri,
+        url: isNew ? Sonatype.config.repos.urls.users : formInfoObj.resourceUri,
         waitMsg: isNew ? 'Creating User...' : 'Updating User...',
         fpanel: formInfoObj.formPanel,
         dataModifiers: this.submitDataModFunc,
@@ -665,9 +660,7 @@ Ext.extend(Sonatype.repoServer.UserEditPanel, Ext.Panel, {
       var isNew = action.options.isNew;
       var receivedData = action.handleResponse(action.response).data;
       if (isNew) {
-        //successful create
-        var sentData = action.output.data;
-        
+        //successful create        
         var dataObj = {
           userId : receivedData.userId,
           name : receivedData.name,
@@ -686,8 +679,6 @@ Ext.extend(Sonatype.repoServer.UserEditPanel, Ext.Panel, {
         this.usersDataStore.addSorted(newRec);
         this.usersDataStore.getSelectionModel().selectRecords([newRec], false);
 
-        //set the hidden id field in the form for subsequent updates
-        action.options.fpanel.find('name', 'id')[0].setValue(receivedData.resourceURI);
         //remove button click listeners
         action.options.fpanel.buttons[0].purgeListeners();
         action.options.fpanel.buttons[1].purgeListeners();
@@ -705,8 +696,6 @@ Ext.extend(Sonatype.repoServer.UserEditPanel, Ext.Panel, {
         action.options.fpanel.buttons[1].on('click', this.cancelHandler.createDelegate(this, [buttonInfoObj]));
       }
       else {
-        var sentData = action.output.data;
-
         var i = this.usersDataStore.indexOfId(action.options.fpanel.id);
         var rec = this.usersDataStore.getAt(i);
 
@@ -715,6 +704,11 @@ Ext.extend(Sonatype.repoServer.UserEditPanel, Ext.Panel, {
         var sortState = this.usersDataStore.getSortState();
         this.usersDataStore.sort(sortState.field, sortState.direction);
       }
+    }
+    //Load
+    else{
+      action.options.fpanel.find('name', 'password')[0].setValue(Sonatype.utils.passwordPlaceholder);
+      action.options.fpanel.find('name', 'reenterPassword')[0].setValue(Sonatype.utils.passwordPlaceholder);
     }
   },
   

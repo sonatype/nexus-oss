@@ -110,6 +110,10 @@ public class LoginResourceHandler
         perms.setConfigUsers( READ | EDIT | DELETE );
         
         perms.setConfigRoles( READ | EDIT | DELETE );
+        
+        perms.setConfigPrivileges( READ | EDIT | DELETE );
+        
+        perms.setConfigRepoTargets( READ | EDIT | DELETE );
 
         resource.setClientPermissions( perms );
 

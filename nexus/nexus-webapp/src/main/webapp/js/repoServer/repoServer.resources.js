@@ -110,11 +110,16 @@ Sonatype.repoServer.resources.help = {
   
   // Roles help
   roles: {
-    id : 'The ID assigned to this role.',
     name : 'The name of this role.',
     description : 'The description of this role.',
     sessionTimeout : 'The number of minutes to wait before timing out a user session.',
     rolesAndPrivileges : 'Roles and privileges contained in this Role.'
+  },
+  
+  // Privileges help
+  privileges: {
+    name : 'The name of this privilege.',
+    type : 'The type of privilege.  Only "Repository Target" type privileges can be managed by the user'.
   },
 
   // Repositories Config help text

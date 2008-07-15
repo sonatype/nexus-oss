@@ -2197,6 +2197,18 @@
 					<type>int</type>
 					<required>true</required>
 				</field>
+				<field>
+                    <name>configPrivileges</name>
+                    <version>1.0.0+</version>
+                    <type>int</type>
+                    <required>true</required>
+                </field>
+                <field>
+                    <name>configRepoTargets</name>
+                    <version>1.0.0+</version>
+                    <type>int</type>
+                    <required>true</required>
+                </field>
 			</fields>
 		</class>
 

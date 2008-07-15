@@ -295,7 +295,7 @@ Sonatype.repoServer.RepoServer = function(){
       if(sp.checkPermission(userPerms.configSchedules, sp.EDIT)){
         cTplData.links.push( {id:'open-config-schedules', title:'Scheduled Tasks'} );
       }
-      if(sp.checkPermission(userPerms.configSchedules, sp.EDIT)){
+      if(sp.checkPermission(userPerms.configRepoTargets, sp.EDIT)){
         cTplData.links.push( {id:'open-config-repoTargets', title:'Repository Targets'} );
       }
       if(cTplData.links.length > 0){
@@ -311,6 +311,9 @@ Sonatype.repoServer.RepoServer = function(){
       }
       if ( sp.checkPermission( userPerms.configRoles, sp.EDIT ) ) {
         sTplData.links.push( { id: 'open-security-roles', title: 'Roles' } );
+      }
+      if ( sp.checkPermission( userPerms.configPrivileges, sp.EDIT ) ) {
+        sTplData.links.push( { id: 'open-security-privileges', title: 'Privileges' } );
       }
       if ( sTplData.links.length > 0 ){
         panelConf = Ext.apply( {}, { title:'Security', id: 'st-nexus-security', html: bodyTpl.apply( sTplData ) }, defaultGroupPanel );
@@ -401,6 +404,10 @@ Sonatype.repoServer.RepoServer = function(){
       'open-security-roles' : function(scope){
         var id = 'security-roles';
         Sonatype.view.mainTabPanel.addOrShowTab(id, Sonatype.repoServer.RoleEditPanel, {title: 'Roles'});
+      },
+      'open-security-privileges' : function(scope){
+        var id = 'security-privileges';
+        Sonatype.view.mainTabPanel.addOrShowTab(id, Sonatype.repoServer.PrivilegeEditPanel, {title: 'Privileges'});
       },
       'open-config-repoTargets' : function(scope){
         var id = 'config-repoTargets';

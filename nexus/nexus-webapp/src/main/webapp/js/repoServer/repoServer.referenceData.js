@@ -267,6 +267,12 @@ Sonatype.repoServer.referenceData = {
     roles : [],
     privileges : []
   },
+  
+  privileges : {
+    id : "",
+    name : "",
+    type : ""
+  },
 
   contentClasses : {
     contentType : "",

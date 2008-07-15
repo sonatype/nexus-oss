@@ -103,6 +103,7 @@ Sonatype.config = function() {
         users: servicePath + '/users',
         usersReset: servicePath + '/users/reset',
         roles: servicePath + '/roles',
+        privileges: servicePath + '/privileges',
         repoTargets: servicePath + '/repo_targets',
         repoContentClasses: servicePath + '/repo_content_classes'
       }
@@ -135,7 +136,9 @@ Sonatype.user.anon = {
     configRepos : 0,
     configSchedules : 0,
     configUsers : 0,
-    configRoles : 0
+    configRoles : 0,
+    configPrivileges : 0,
+    configRepoTargets : 0
   }
 };
 

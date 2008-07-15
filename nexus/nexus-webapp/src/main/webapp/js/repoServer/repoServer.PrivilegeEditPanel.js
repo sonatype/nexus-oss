@@ -19,19 +19,18 @@
  *
  */
 /*
- * Role Edit/Create panel layout and controller
+ * Privilege Edit/Create panel layout and controller
  */
   
-Sonatype.repoServer.RoleEditPanel = function(config){
+Sonatype.repoServer.PrivilegeEditPanel = function(config){
   var config = config || {};
   var defaultConfig = {};
   Ext.apply(this, config, defaultConfig);
   
-  var ht = Sonatype.repoServer.resources.help.roles;
-    
-  //List of privileges
-  //TODO: This will be a list retrieved from server via REST, currently no privilege api, so hardcoding
-  this.privilegeList = [{id : 'privid', name : 'privname'},{id : 'privid2', name : 'privname2'}];
+  var ht = Sonatype.repoServer.resources.help.privileges;
+  
+  //List of user statuses
+  this.typeStore = new Ext.data.SimpleStore({fields:['value','display'], data:[['target','Repository Target'],['application','Application']]});
   
   this.actions = {
     refresh : new Ext.Action({
@@ -49,32 +48,24 @@ Sonatype.repoServer.RoleEditPanel = function(config){
   
   //Methods that will take the incoming json data and map over to the ui controls
   this.loadDataModFunc = {
-    "roles" : this.loadRolesTreeHelper.createDelegate(this),
-    "privileges" : this.loadPrivilegesTreeHelper.createDelegate(this)
   };
   
   //Methods that will take the data from the ui controls and map over to json
   this.submitDataModFunc = {
-    "roles" : this.saveRolesTreeHelper.createDelegate(this),
-    "privileges" : this.savePrivilegesTreeHelper.createDelegate(this)
   };
   
-  this.roleRecordConstructor = Ext.data.Record.create([
+  this.privilegeRecordConstructor = Ext.data.Record.create([
     {name:'resourceURI'},
     {name:'id'},
-    {name:'name', sortType:Ext.data.SortTypes.asUCString},
-    {name:'description'},
-    {name:'sessionTimeout'},
-    {name:'privileges'},
-    {name:'roles'}
+    {name:'name', sortType:Ext.data.SortTypes.asUCString}
   ]);
   
   
-  //Reader and datastore that queries the server for the list of currently defined roles
-  this.rolesReader = new Ext.data.JsonReader({root: 'data', id: 'resourceURI'}, this.roleRecordConstructor );
-  this.rolesDataStore = new Ext.data.Store({
-    url: Sonatype.config.repos.urls.roles,
-    reader: this.rolesReader,
+  //Reader and datastore that queries the server for the list of currently defined privileges
+  this.privilegesReader = new Ext.data.JsonReader({root: 'data', id: 'resourceURI'}, this.privilegeRecordConstructor );
+  this.privilegesDataStore = new Ext.data.Store({
+    url: Sonatype.config.repos.urls.privileges,
+    reader: this.privilegesReader,
     sortInfo: {field: 'id', direction: 'ASC'},
     autoLoad: true
   });
@@ -112,105 +103,26 @@ Sonatype.repoServer.RoleEditPanel = function(config){
         width: this.COMBO_WIDTH
       },
       {
-        xtype: 'textfield',
-        fieldLabel: 'Description',
-        itemCls: 'required-field',
+        xtype: 'combo',
+        fieldLabel: 'Type',
         labelStyle: 'margin-left: 15px; width: 185px;',
-        helpText: ht.description,
-        name: 'description',
-        allowBlank: false,
-        width: this.COMBO_WIDTH
-      },
-      {
-        xtype: 'numberfield',
-        fieldLabel: 'Session Timeout',
         itemCls: 'required-field',
-        labelStyle: 'margin-left: 15px; width: 185px;',
-        helpText: ht.sessionTimeout,
-        name: 'sessionTimeout',
+        helpText: ht.type,
+        name: 'type',
+        store: this.typeStore,
+        displayField:'display',
+        valueField:'value',
+        editable: false,
+        forceSelection: true,
+        mode: 'local',
+        triggerAction: 'all',
+        emptyText:'Select...',
+        selectOnFocus:true,
         allowBlank: false,
         width: this.COMBO_WIDTH,
-        value: 60
-      },
-      {
-        xtype: 'panel',
-        id: 'roles_privs_tree_panel',
-        layout: 'column',
-        autoHeight: true,
-        style: 'padding: 10px 0 0 0',
-        
-        items: [
-          {
-            xtype: 'treepanel',
-            id: 'roles_privs_tree', //note: unique ID is assinged before instantiation
-            title: 'Selected Roles / Privileges',
-            border: true, //note: this seem to have no effect w/in form panel
-            bodyBorder: true, //note: this seem to have no effect w/in form panel
-            //note: this style matches the expected behavior
-            bodyStyle: 'background-color:#FFFFFF; border: 1px solid #B5B8C8',
-            style: 'padding: 0 20px 0 0',
-            width: 225,
-            height: 300,
-            animate:true,
-            lines: false,
-            autoScroll:true,
-            containerScroll: true,
-            //@note: root node must be instantiated uniquely for each instance of treepanel
-            //@ext: can TreeNode be registerd as a component with an xtype so this new root node
-            //      may be instantiated uniquely for each form panel that uses this config?
-            rootVisible: false,
-
-            enableDD: true,
-            ddScroll: true,
-            dropConfig: {
-              allowContainerDrop: true,
-              onContainerDrop: function(source, e, data){
-                this.tree.root.appendChild(data.node);
-                return true;
-              },
-              onContainerOver:function(source, e, data){return this.dropAllowed;},
-              // passign padding to make whole treePanel the drop zone.  This is dependent
-              // on a sonatype fix in the Ext.dd.DropTarget class.  This is necessary
-              // because treepanel.dropZone.setPadding is never available in time to be useful.
-              padding: [0,0,274,0]
-            }
-          },
-          {
-            xtype: 'treepanel',
-            id: 'all_roles_privs_tree', //note: unique ID is assinged before instantiation
-            title: 'Available Roles / Privileges',
-            border: true, //note: this seem to have no effect w/in form panel
-            bodyBorder: true, //note: this seem to have no effect w/in form panel
-            //note: this style matches the expected behavior
-            bodyStyle: 'background-color:#FFFFFF; border: 1px solid #B5B8C8',
-            width: 225,
-            height: Ext.isGecko ? 315 : 300,
-            animate:true,
-            lines: false,
-            autoScroll:true,
-            containerScroll: true,
-            //@note: root node must be instantiated uniquely for each instance of treepanel
-            //@ext: can TreeNode be registerd as a component with an xtype so this new root node
-            //      may be instantiated uniquely for each form panel that uses this config?
-            rootVisible: false,
-
-            enableDD: true,
-            ddScroll: true,
-            dropConfig: {
-              allowContainerDrop: true,
-              onContainerDrop: function(source, e, data){
-                this.tree.root.appendChild(data.node);
-                return true;
-              },
-              onContainerOver:function(source, e, data){return this.dropAllowed;},
-              // passign padding to make whole treePanel the drop zone.  This is dependent
-              // on a sonatype fix in the Ext.dd.DropTarget class.  This is necessary
-              // because treepanel.dropZone.setPadding is never available in time to be useful.
-              padding: [0,0,274,0]
-            }
-          }
-          ]
-        }
+        value: 'target',
+        disabled: true
+      }
       ],
     buttons: [
       {
@@ -224,9 +136,9 @@ Sonatype.repoServer.RoleEditPanel = function(config){
     ]
   };
 
-  this.rolesGridPanel = new Ext.grid.GridPanel({
-    title: 'Roles',
-    id: 'st-roles-grid',
+  this.privilegesGridPanel = new Ext.grid.GridPanel({
+    title: 'Privileges',
+    id: 'st-privileges-grid',
     
     region: 'north',
     layout:'fit',
@@ -239,7 +151,7 @@ Sonatype.repoServer.RoleEditPanel = function(config){
     autoScroll: true,
     tbar: [
       {
-        id: 'role-refresh-btn',
+        id: 'privilege-refresh-btn',
         text: 'Refresh',
         icon: Sonatype.config.resourcePath + '/images/icons/arrow_refresh.png',
         cls: 'x-btn-text-icon',
@@ -247,7 +159,7 @@ Sonatype.repoServer.RoleEditPanel = function(config){
         handler: this.reloadAll
       },
       {
-        id: 'role-add-btn',
+        id: 'privilege-add-btn',
         text:'Add',
         icon: Sonatype.config.resourcePath + '/images/icons/add.png',
         cls: 'x-btn-text-icon',
@@ -255,7 +167,7 @@ Sonatype.repoServer.RoleEditPanel = function(config){
         handler: this.addResourceHandler
       },
       {
-        id: 'role-delete-btn',
+        id: 'privilege-delete-btn',
         text: 'Delete',
         icon: Sonatype.config.resourcePath + '/images/icons/delete.png',
         cls: 'x-btn-text-icon',
@@ -265,35 +177,33 @@ Sonatype.repoServer.RoleEditPanel = function(config){
     ],
 
     //grid view options
-    ds: this.rolesDataStore,
+    ds: this.privilegesDataStore,
     sortInfo:{field: 'name', direction: "ASC"},
     loadMask: true,
     deferredRender: false,
     columns: [
-      {header: 'Name', dataIndex: 'name', width:175, id: 'role-config-name-col'},
-      {header: 'Session Timeout', dataIndex: 'sessionTimeout', width:175, id: 'role-config-session-timeout-col'},
-      {header: 'Description', dataIndex: 'description', width:175, id: 'role-config-description-col'}      
+      {header: 'Name', dataIndex: 'name', width:175, id: 'privilege-config-name-col'}      
     ],
-    autoExpandColumn: 'role-config-description-col',
+    autoExpandColumn: 'privilege-config-name-col',
     disableSelection: false,
     viewConfig: {
-      emptyText: 'Click "Add" to create a new Role.'
+      emptyText: 'Click "Add" to create a new Privilege.'
     }
   });
-  this.rolesGridPanel.on('rowclick', this.rowClick, this);
-  this.rolesGridPanel.on('rowcontextmenu', this.contextClick, this);
+  this.privilegesGridPanel.on('rowclick', this.rowClick, this);
+  this.privilegesGridPanel.on('rowcontextmenu', this.contextClick, this);
 
-  Sonatype.repoServer.RoleEditPanel.superclass.constructor.call(this, {
+  Sonatype.repoServer.PrivilegeEditPanel.superclass.constructor.call(this, {
     layout: 'border',
     autoScroll: false,
     width: '100%',
     height: '100%',
     items: [
-      this.rolesGridPanel,
+      this.privilegesGridPanel,
       {
         xtype: 'panel',
-        id: 'role-config-forms',
-        title: 'Role Configuration',
+        id: 'privilege-config-forms',
+        title: 'Privilege Configuration',
         layout: 'card',
         region: 'center',
         activeItem: 0,
@@ -304,22 +214,22 @@ Sonatype.repoServer.RoleEditPanel = function(config){
           {
             xtype: 'panel',
             layout: 'fit',
-            html: '<div class="little-padding">Select a role to edit it, or click "Add" to create a new one.</div>'
+            html: '<div class="little-padding">Select a privilege to edit it, or click "Add" to create a new one.</div>'
           }
         ]
       }
     ]
   });
 
-  this.formCards = this.findById('role-config-forms');
+  this.formCards = this.findById('privilege-config-forms');
 };
 
 
-Ext.extend(Sonatype.repoServer.RoleEditPanel, Ext.Panel, {
+Ext.extend(Sonatype.repoServer.PrivilegeEditPanel, Ext.Panel, {
   //Dump the currently stored data and requery for everything
   reloadAll : function(){
-    this.rolesDataStore.removeAll();
-    this.rolesDataStore.reload();
+    this.privilegesDataStore.removeAll();
+    this.privilegesDataStore.reload();
     this.formCards.items.each(function(item, i, len){
       if(i>0){this.remove(item, true);}
     }, this.formCards);
@@ -330,17 +240,17 @@ Ext.extend(Sonatype.repoServer.RoleEditPanel, Ext.Panel, {
   saveHandler : function(formInfoObj){
     if (formInfoObj.formPanel.form.isValid()) {
       var isNew = formInfoObj.isNew;
-      var createUri = Sonatype.config.repos.urls.roles;
+      var createUri = Sonatype.config.repos.urls.privileges;
       var updateUri = (formInfoObj.resourceUri) ? formInfoObj.resourceUri : '';
       var form = formInfoObj.formPanel.form;
     
       form.doAction('sonatypeSubmit', {
         method: (isNew) ? 'POST' : 'PUT',
         url: isNew ? createUri : updateUri,
-        waitMsg: isNew ? 'Creating Role...' : 'Updating Role...',
+        waitMsg: isNew ? 'Creating Privilege...' : 'Updating Privilege...',
         fpanel: formInfoObj.formPanel,
         dataModifiers: this.submitDataModFunc,
-        serviceDataObj : Sonatype.repoServer.referenceData.roles,
+        serviceDataObj : Sonatype.repoServer.referenceData.privileges,
         isNew : isNew //extra option to send to callback, instead of conditioning on method
       });
     }
@@ -348,8 +258,8 @@ Ext.extend(Sonatype.repoServer.RoleEditPanel, Ext.Panel, {
   
   cancelHandler : function(formInfoObj) {
     var formLayout = this.formCards.getLayout();
-    var gridSelectModel = this.rolesGridPanel.getSelectionModel();
-    var store = this.rolesGridPanel.getStore();
+    var gridSelectModel = this.privilegesGridPanel.getSelectionModel();
+    var store = this.privilegesGridPanel.getStore();
     
     this.formCards.remove(formInfoObj.formPanel.id, true);
     //select previously selected form, or the default view (index == 0)
@@ -366,7 +276,7 @@ Ext.extend(Sonatype.repoServer.RoleEditPanel, Ext.Panel, {
     var i = store.indexOfId(formLayout.activeItem.id);
     if (i >= 0){
       gridSelectModel.selectRow(i);
-      this.rowClick(this.rolesGridPanel, i, null);
+      this.rowClick(this.privilegesGridPanel, i, null);
     }
     else{
       gridSelectModel.clearSelections();
@@ -374,11 +284,9 @@ Ext.extend(Sonatype.repoServer.RoleEditPanel, Ext.Panel, {
   },
   
   addResourceHandler : function() {
-    var id = 'new_role_' + new Date().getTime();
+    var id = 'new_item_' + new Date().getTime();
 
     var config = Ext.apply({}, this.formConfig, {id:id});
-    
-    config = this.initializeTreeRoots(id, config);
     
     var formPanel = new Ext.FormPanel(config);
     
@@ -397,18 +305,15 @@ Ext.extend(Sonatype.repoServer.RoleEditPanel, Ext.Panel, {
     //cancel button event handler
     formPanel.buttons[1].on('click', this.cancelHandler.createDelegate(this, [buttonInfoObj]));
     
-    this.loadRolesTreeHelper([], {}, formPanel);
-    this.loadPrivilegesTreeHelper([], {}, formPanel);
-    
     //add place holder to grid
-    var newRec = new this.roleRecordConstructor({
-        id : 'new_role_',
-        name : 'New Role',
+    var newRec = new this.privilegeRecordConstructor({
+        id : 'new_item',
+        name : 'New Privilege',
         resourceURI : 'new'
       },
-      id); //use "new_role_" id instead of resourceURI like the reader does
-    this.rolesDataStore.insert(0, [newRec]);
-    this.rolesGridPanel.getSelectionModel().selectRow(0);
+      id); //use "new_item" id instead of resourceURI like the reader does
+    this.privilegesDataStore.insert(0, [newRec]);
+    this.privilegesGridPanel.getSelectionModel().selectRow(0);
     
     //add new form
     this.formCards.add(formPanel);
@@ -435,8 +340,8 @@ Ext.extend(Sonatype.repoServer.RoleEditPanel, Ext.Panel, {
   },
     
   deleteHandler : function(){
-    if (this.ctxRecord || this.rolesGridPanel.getSelectionModel().hasSelection()){
-      var rec = this.ctxRecord ? this.ctxRecord : this.rolesGridPanel.getSelectionModel().getSelected();
+    if (this.ctxRecord || this.privilegesGridPanel.getSelectionModel().hasSelection()){
+      var rec = this.ctxRecord ? this.ctxRecord : this.privilegesGridPanel.getSelectionModel().getSelected();
 
       if(rec.data.resourceURI == 'new'){
         this.cancelHandler({
@@ -455,9 +360,9 @@ Ext.extend(Sonatype.repoServer.RoleEditPanel, Ext.Panel, {
         {single:true});
         
         Sonatype.MessageBox.show({
-          animEl: this.rolesGridPanel.getEl(),
-          title : 'Delete Role?',
-          msg : 'Delete the ' + rec.get('name') + ' Role?',
+          animEl: this.privilegesGridPanel.getEl(),
+          title : 'Delete Privilege?',
+          msg : 'Delete the ' + rec.get('name') + ' Privilege?',
           buttons: Sonatype.MessageBox.YESNO,
           scope: this,
           icon: Sonatype.MessageBox.QUESTION,
@@ -483,8 +388,8 @@ Ext.extend(Sonatype.repoServer.RoleEditPanel, Ext.Panel, {
     if(isSuccess){
       var resourceId = options.cbPassThru.resourceId;
       var formLayout = this.formCards.getLayout();
-      var gridSelectModel = this.rolesGridPanel.getSelectionModel();
-      var store = this.rolesGridPanel.getStore();
+      var gridSelectModel = this.privilegesGridPanel.getSelectionModel();
+      var store = this.privilegesGridPanel.getStore();
 
       if(formLayout.activeItem.id == resourceId){
         this.formCards.remove(resourceId, true);
@@ -509,7 +414,7 @@ Ext.extend(Sonatype.repoServer.RoleEditPanel, Ext.Panel, {
       }
     }
     else {
-      Sonatype.MessageBox.alert('The server did not delete the role.');
+      Sonatype.MessageBox.alert('The server did not delete the privilege.');
     }
   },
       
@@ -522,22 +427,16 @@ Ext.extend(Sonatype.repoServer.RoleEditPanel, Ext.Panel, {
       var receivedData = action.handleResponse(action.response).data;
       if (isNew) {
         //successful create        
-        var dataObj = {
-          id : receivedData.id,
-          name : receivedData.name,
-          resourceURI : receivedData.resourceURI,
-          description : receivedData.description,
-          privileges : receivedData.privileges,
-          roles : receivedData.roles
-        };
-        
-        var newRec = new this.roleRecordConstructor(
-          dataObj,
+        var newRec = new this.privilegesRecordConstructor({
+            id : receivedData.id,
+            name : receivedData.name,
+            resourceURI : receivedData.resourceURI          
+          },
           action.options.fpanel.id);
         
-        this.rolesDataStore.remove(this.rolesDataStore.getById(action.options.fpanel.id)); //remove old one
-        this.rolesDataStore.addSorted(newRec);
-        this.rolesDataStore.getSelectionModel().selectRecords([newRec], false);
+        this.privilegesDataStore.remove(this.privilegesDataStore.getById(action.options.fpanel.id)); //remove old one
+        this.privilegesDataStore.addSorted(newRec);
+        this.privilegesDataStore.getSelectionModel().selectRecords([newRec], false);
 
         //set the hidden id field in the form for subsequent updates
         action.options.fpanel.find('name', 'id')[0].setValue(receivedData.resourceURI);
@@ -558,25 +457,24 @@ Ext.extend(Sonatype.repoServer.RoleEditPanel, Ext.Panel, {
         action.options.fpanel.buttons[1].on('click', this.cancelHandler.createDelegate(this, [buttonInfoObj]));
       }
       else {
-        var i = this.rolesDataStore.indexOfId(action.options.fpanel.id);
-        var rec = this.rolesDataStore.getAt(i);
+        var sentData = action.output.data;
 
-        this.updateRoleRecord(rec, receivedData);
+        var i = this.privilegesDataStore.indexOfId(action.options.fpanel.id);
+        var rec = this.privilegesDataStore.getAt(i);
+
+        this.updatePrivilegeRecord(rec, receivedData);
         
-        var sortState = this.rolesDataStore.getSortState();
-        this.rolesDataStore.sort(sortState.field, sortState.direction);
+        var sortState = this.privilegesDataStore.getSortState();
+        this.privilegesDataStore.sort(sortState.field, sortState.direction);
       }
     }
   },
   
-  updateRoleRecord : function(rec, receivedData){
+  updatePrivilegeRecord : function(rec, receivedData){
         rec.beginEdit();
         rec.set('id', receivedData.id);
         rec.set('name', receivedData.name);
         rec.set('resourceURI', receivedData.resourceURI);
-        rec.set('description', receivedData.description);
-        rec.set('privileges', receivedData.privileges);
-        rec.set('roles', receivedData.roles);
         rec.commit();
         rec.endEdit();
   },
@@ -602,7 +500,7 @@ Ext.extend(Sonatype.repoServer.RoleEditPanel, Ext.Panel, {
   
   beforeFormRenderHandler : function(component){
     var sp = Sonatype.lib.Permissions;
-    if(sp.checkPermission(Sonatype.user.curr.repoServer.configRoles, sp.EDIT)){
+    if(sp.checkPermission(Sonatype.user.curr.repoServer.configPrivileges, sp.EDIT)){
       component.buttons[0].disabled = false;
     }
   },
@@ -619,8 +517,6 @@ Ext.extend(Sonatype.repoServer.RoleEditPanel, Ext.Panel, {
     //assumption: new route forms already exist in formCards, so they won't get into this case
     if(!formPanel){ //create form and populate current data
       var config = Ext.apply({}, this.formConfig, {id:id});
-      
-      config = this.initializeTreeRoots(id, config);
       
       formPanel = new Ext.FormPanel(config);
       formPanel.form.on('actioncomplete', this.actionCompleteHandler, this);
@@ -657,13 +553,13 @@ Ext.extend(Sonatype.repoServer.RoleEditPanel, Ext.Panel, {
     
     if ( e.target.nodeName == 'A' ) return; // no menu on links
     
-    this.ctxRow = this.rolesGridPanel.view.getRow(index);
-    this.ctxRecord = this.rolesGridPanel.store.getAt(index);
+    this.ctxRow = this.privilegesGridPanel.view.getRow(index);
+    this.ctxRecord = this.privilegesGridPanel.store.getAt(index);
     Ext.fly(this.ctxRow).addClass('x-node-ctx');
 
     //@todo: would be faster to pre-render the six variations of the menu for whole instance
     var menu = new Ext.menu.Menu({
-      id:'roles-grid-ctx',
+      id:'privileges-grid-ctx',
       items: [
         this.actions.refresh,
         this.actions.deleteAction
@@ -683,130 +579,5 @@ Ext.extend(Sonatype.repoServer.RoleEditPanel, Ext.Panel, {
       this.ctxRow = null;
       this.ctxRecord = null;
     }
-  },
-  
-  initializeTreeRoots : function(id, config){
-    //@note: there has to be a better way to do this.  Depending on offsets is very error prone
-    var newConfig = config;
-
-    newConfig.items[4].items[0].root = new Ext.tree.TreeNode({text: 'root'});
-    newConfig.items[4].items[1].root = new Ext.tree.TreeNode({text: 'root'});
-
-    return newConfig;
-  },
-    
-  loadRolesTreeHelper : function(arr, srcObj, fpanel){
-    var selectedTree = fpanel.find('id', 'roles_privs_tree')[0];
-    var allTree = fpanel.find('id', 'all_roles_privs_tree')[0];
-
-    var role;
-
-    for(var i=0; i<arr.length; i++){
-      role = arr[i];
-      selectedTree.root.appendChild(
-        new Ext.tree.TreeNode({
-          id: role.id,
-          text: role.name,
-          payload: role, //sonatype added attribute
-          allowChildren: false,
-          draggable: true,
-          leaf: true,
-          nodeType: 'role',
-          icon: Sonatype.config.resourcePath + '/ext-2.0.2/resources/images/default/tree/folder.gif'
-        })
-      );
-    }
-    
-    this.rolesDataStore.each(function(item, i, len){
-      if(typeof(selectedTree.getNodeById(item.data.id)) == 'undefined' && 'new_role_' != item.data.id){
-        allTree.root.appendChild(
-          new Ext.tree.TreeNode({
-            id: item.data.id,
-            text: item.data.name,
-            payload: item.data, //sonatype added attribute
-            allowChildren: false,
-            draggable: true,
-            leaf: true,
-            nodeType: 'role',
-            icon: Sonatype.config.resourcePath + '/ext-2.0.2/resources/images/default/tree/folder.gif'
-          })
-        );
-      }
-    },this);
-    
-    return arr; //return arr, even if empty to comply with sonatypeLoad data modifier requirement
-  },
-  
-  loadPrivilegesTreeHelper : function(arr, srcObj, fpanel){
-    var selectedTree = fpanel.find('id', 'roles_privs_tree')[0];
-    var allTree = fpanel.find('id', 'all_roles_privs_tree')[0];
-
-    var priv;
-
-    for(var i=0; i<arr.length; i++){
-      priv = arr[i];
-      selectedTree.root.appendChild(
-        new Ext.tree.TreeNode({
-          id: priv.id,
-          text: priv.name,
-          payload: priv, //sonatype added attribute
-          allowChildren: false,
-          draggable: true,
-          leaf: true,
-          nodeType: 'priv'
-        })
-      );
-    }
-    
-    for(var i=0; i<this.privilegeList.length; i++){
-      priv = this.privilegeList[i];
-      if(typeof(selectedTree.getNodeById(priv.id)) == 'undefined'){
-        allTree.root.appendChild(
-          new Ext.tree.TreeNode({
-            id: priv.id,
-            text: priv.name,
-            payload: priv, //sonatype added attribute
-            allowChildren: false,
-            draggable: true,
-            leaf: true,
-            nodeType: 'priv'
-          })
-        );
-      }
-    }
-    
-    return arr; //return arr, even if empty to comply with sonatypeLoad data modifier requirement
-  },
-  
-  saveRolesTreeHelper : function(val, fpanel){
-    var tree = fpanel.find('id', 'roles_privs_tree')[0];
-
-    var outputArr = [];
-    var nodes = tree.root.childNodes;
-
-    for(var i = 0; i < nodes.length; i++){
-      if (nodes[i].nodeType == 'role'){
-        outputArr[i] = nodes[i].attributes.payload;
-        Ext.apply(outputArr[i], {'@class':'org.sonatype.nexus.rest.model.RoleContainedRoleResource'});
-      }
-    }
-
-    return outputArr;
-  },
-  
-  savePrivilegesTreeHelper : function(val, fpanel){
-    var tree = fpanel.find('id', 'roles_privs_tree')[0];
-
-    var outputArr = [];
-    var nodes = tree.root.childNodes;
-
-    for(var i = 0; i < nodes.length; i++){
-      if (nodes[i].nodeType == 'priv'){
-        outputArr[i] = nodes[i].attributes.payload;
-        Ext.apply(outputArr[i], {'@class':'org.sonatype.nexus.rest.model.RoleContainedPrivilegeResource'});
-      }
-    }
-
-    return outputArr;
   }
 });
