@@ -219,9 +219,53 @@ public class DefaultNexus
     // SystemStatus
     // ----------------------------------------------------------------------------------------------------------
 
-    public SystemStatus getSystemState()
+    public SystemStatus getSystemStatus()
     {
         return systemStatus;
+    }
+
+    public boolean setState( SystemState state )
+    {
+        SystemState currentState = getSystemStatus().getState();
+
+        // only Stopped or BrokenConfig Nexus may be started
+        if ( SystemState.STARTED.equals( state )
+            && ( SystemState.STOPPED.equals( currentState ) || SystemState.BROKEN_CONFIGURATION.equals( currentState ) ) )
+        {
+            try
+            {
+                start();
+
+                return true;
+            }
+            catch ( StartingException e )
+            {
+                getLogger().error( "Could not start Nexus!", e );
+            }
+
+            return false;
+        }
+        // only Started Nexus may be stopped
+        else if ( SystemState.STOPPED.equals( state ) && SystemState.STARTED.equals( currentState ) )
+        {
+            try
+            {
+                stop();
+
+                return true;
+            }
+            catch ( StoppingException e )
+            {
+                getLogger().error( "Could not stop Nexus!", e );
+            }
+
+            return false;
+        }
+        else
+        {
+            throw new IllegalArgumentException( "Illegal STATE: '" + state.toString() + "', currentState='"
+                + currentState.toString() + "'" );
+        }
     }
 
     // ----------------------------------------------------------------------------------------------------------
@@ -1349,7 +1393,7 @@ public class DefaultNexus
 
             systemStatus.setFirstStart( nexusConfiguration.isConfigurationDefaulted() );
 
-            systemStatus.setInstanceUpgraded( nexusConfiguration.isConfigurationUpgraded() );
+            systemStatus.setInstanceUpgraded( nexusConfiguration.isInstanceUpgraded() );
 
             systemStatus.setConfigurationUpgraded( nexusConfiguration.isConfigurationUpgraded() );
 
@@ -1381,6 +1425,10 @@ public class DefaultNexus
             systemStatus.setState( SystemState.STARTED );
 
             systemStatus.setStartedAt( new Date() );
+
+            getLogger().info( "Started Nexus (version " + systemStatus.getVersion() + ")" );
+
+            nexusConfiguration.notifyConfigurationChangeListeners( new NexusStartedEvent( nexusConfiguration ) );
         }
         catch ( IOException e )
         {
@@ -1408,8 +1456,6 @@ public class DefaultNexus
 
             throw new StartingException( "Could not start Nexus!", e );
         }
-
-        getLogger().info( "Started Nexus (version " + systemStatus.getVersion() + ")" );
     }
 
     public void stop()
@@ -1418,6 +1464,8 @@ public class DefaultNexus
         systemStatus.setState( SystemState.STOPPING );
 
         addSystemEvent( FeedRecorder.SYSTEM_BOOT_ACTION, "Stopping Nexus (version " + systemStatus.getVersion() + ")" );
+
+        nexusConfiguration.notifyConfigurationChangeListeners( new NexusStoppingEvent( nexusConfiguration ) );
 
         httpProxyService.stopService();
 
@@ -1436,6 +1484,8 @@ public class DefaultNexus
 
         cacheManager.stopService();
 
+        dropRepositories();
+
         systemStatus.setState( SystemState.STOPPED );
 
         getLogger().info( "Stopped Nexus (version " + systemStatus.getVersion() + ")" );
@@ -1443,25 +1493,8 @@ public class DefaultNexus
 
     @SuppressWarnings( "unchecked" )
     protected void createRepositories()
-        throws ConfigurationException,
-            IOException
+        throws ConfigurationException
     {
-        // drop all reposes (restarting?)
-        try
-        {
-            // get all IDs
-            List<String> repoIds = repositoryRegistry.getRepositoryIds();
-
-            for ( String repoId : repoIds )
-            {
-                repositoryRegistry.removeRepository( repoId );
-            }
-        }
-        catch ( NoSuchRepositoryException e )
-        {
-            // will not happen
-        }
-
         List<CRepository> reposes = getNexusConfiguration().getConfiguration().getRepositories();
 
         for ( CRepository repo : reposes )
@@ -1511,6 +1544,27 @@ public class DefaultNexus
                 {
                     throw new ConfigurationException( "Configuration contains invalid grouping!", e );
                 }
+            }
+        }
+    }
+
+    protected void dropRepositories()
+    {
+        for ( Repository repository : repositoryRegistry.getRepositories() )
+        {
+            try
+            {
+                repositoryRegistry.removeRepositorySilently( repository.getId() );
+            }
+            catch ( NoSuchRepositoryException e )
+            {
+                // will not happen
+            }
+
+            // unregister it as config listener if needed
+            if ( ConfigurationChangeListener.class.isAssignableFrom( repository.getClass() ) )
+            {
+                nexusConfiguration.removeConfigurationChangeListener( (ConfigurationChangeListener) repository );
             }
         }
     }

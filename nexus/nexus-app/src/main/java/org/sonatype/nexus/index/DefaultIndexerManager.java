@@ -178,7 +178,8 @@ public class DefaultIndexerManager
 
         for ( IndexingContext ctx : nexusIndexer.getIndexingContexts().values() )
         {
-            ctx.close( deleteFiles );
+            nexusIndexer.removeIndexingContext( ctx, false );
+            // ctx.close( deleteFiles );
         }
     }
 
@@ -244,16 +245,14 @@ public class DefaultIndexerManager
         throws IOException,
             NoSuchRepositoryException
     {
-        Repository repository = repositoryRegistry.getRepository( repositoryId );
-
         // remove context for repository
         nexusIndexer.removeIndexingContext( nexusIndexer.getIndexingContexts().get(
-            getLocalContextId( repository.getId() ) ), deleteFiles );
+            getLocalContextId( repositoryId ) ), deleteFiles );
 
-        if ( nexusIndexer.getIndexingContexts().containsKey( getRemoteContextId( repository.getId() ) ) )
+        if ( nexusIndexer.getIndexingContexts().containsKey( getRemoteContextId( repositoryId ) ) )
         {
             nexusIndexer.removeIndexingContext( nexusIndexer.getIndexingContexts().get(
-                getRemoteContextId( repository.getId() ) ), deleteFiles );
+                getRemoteContextId( repositoryId ) ), deleteFiles );
         }
     }
 

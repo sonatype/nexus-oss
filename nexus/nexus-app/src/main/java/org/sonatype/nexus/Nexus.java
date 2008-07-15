@@ -68,8 +68,10 @@ public interface Nexus
     // ------------------------------------------------------------------
     // Status
 
-    SystemStatus getSystemState();
-
+    SystemStatus getSystemStatus();
+    
+    boolean setState(SystemState state);
+    
     // ------------------------------------------------------------------
     // Configuration
 

@@ -164,4 +164,12 @@ public class DefaultNexusTest
             assertTrue( contentClasses.contains( cc ) );
         }
     }
+
+    public void testBounceNexus()
+        throws Exception
+    {
+        getDefaultNexus().stop();
+        
+        getDefaultNexus().start();
+    }
 }

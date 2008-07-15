@@ -28,7 +28,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Vector;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
@@ -131,7 +131,7 @@ public class DefaultNexusConfiguration
     private File wastebasketDirectory;
 
     /** The config event listeners. */
-    private Vector<ConfigurationChangeListener> configurationChangeListeners = new Vector<ConfigurationChangeListener>();
+    private CopyOnWriteArrayList<ConfigurationChangeListener> configurationChangeListeners = new CopyOnWriteArrayList<ConfigurationChangeListener>();
 
     public RemoteStorageContext getRemoteStorageContext()
     {
@@ -239,23 +239,20 @@ public class DefaultNexusConfiguration
 
     public void notifyConfigurationChangeListeners( ConfigurationChangeEvent evt )
     {
-        synchronized ( configurationChangeListeners )
+        for ( ConfigurationChangeListener l : configurationChangeListeners )
         {
-            for ( ConfigurationChangeListener l : configurationChangeListeners )
+            try
             {
-                try
+                if ( getLogger().isDebugEnabled() )
                 {
-                    if ( getLogger().isDebugEnabled() )
-                    {
-                        getLogger().debug( "Notifying component about config change: " + l.getClass().getName() );
-                    }
+                    getLogger().debug( "Notifying component about config change: " + l.getClass().getName() );
+                }
 
-                    l.onConfigurationChange( evt );
-                }
-                catch ( Exception e )
-                {
-                    getLogger().info( "Unexpected exception in listener", e );
-                }
+                l.onConfigurationChange( evt );
+            }
+            catch ( Exception e )
+            {
+                getLogger().info( "Unexpected exception in listener", e );
             }
         }
     }
@@ -274,6 +271,14 @@ public class DefaultNexusConfiguration
         throws IOException
     {
         return configurationSource.getConfigurationAsStream();
+    }
+
+    public boolean isInstanceUpgraded()
+    {
+        // TODO: this is not quite true: we might keep model ver but upgrade JARs of Nexus only in a release
+        // we should store the nexus version somewhere in working storage and trigger some household stuff
+        // if version changes.
+        return configurationSource.isConfigurationUpgraded();
     }
 
     public boolean isConfigurationUpgraded()
