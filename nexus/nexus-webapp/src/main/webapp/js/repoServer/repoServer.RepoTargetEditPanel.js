@@ -45,7 +45,7 @@ Sonatype.repoServer.RepoTargetEditPanel = function(config){
   
   //Methods that will take the incoming json data and map over to the ui controls
   this.loadDataModFunc = {
-    "patterns" : this.loadPatternsTreeHelper.createDelegate(this),
+    "patterns" : this.loadPatternsTreeHelper.createDelegate(this)
   };
   
   //Methods that will take the data from the ui controls and map over to json
@@ -683,6 +683,6 @@ Ext.extend(Sonatype.repoServer.RepoTargetEditPanel, Ext.Panel, {
     }
     
     return arr; //return arr, even if empty to comply with sonatypeLoad data modifier requirement
-  },
+  }
   
 });
