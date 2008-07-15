@@ -45,6 +45,7 @@ Sonatype.repoServer.RepoTargetEditPanel = function(config){
   
   //Methods that will take the incoming json data and map over to the ui controls
   this.loadDataModFunc = {
+    "patterns" : this.loadPatternsTreeHelper.createDelegate(this),
   };
   
   //Methods that will take the data from the ui controls and map over to json
@@ -57,12 +58,27 @@ Sonatype.repoServer.RepoTargetEditPanel = function(config){
     {name:'id'},
     {name:'name', sortType:Ext.data.SortTypes.asUCString}
   ]);
+
+  //A record to hold the contentClasses
+  this.contentClassRecordConstructor = Ext.data.Record.create([
+    {name:'contentType'},
+    {name:'name', sortType:Ext.data.SortTypes.asUCString}
+  ]);
   
-  //Reader and datastore that queries the server for the list of currently defined users
+  //Reader and datastore that queries the server for the list of repo targets
   this.repoTargetsReader = new Ext.data.JsonReader({root: 'data', id: 'resourceURI'}, this.repoTargetRecordConstructor );
   this.repoTargetsDataStore = new Ext.data.Store({
     url: Sonatype.config.repos.urls.repoTargets,
     reader: this.repoTargetsReader,
+    sortInfo: {field: 'name', direction: 'ASC'},
+    autoLoad: true
+  });
+
+  //Reader and datastore that queries the server for the list of content classes
+  this.contentClassesReader = new Ext.data.JsonReader({root: 'data', id: 'contentType'}, this.contentClassRecordConstructor );
+  this.contentClassesDataStore = new Ext.data.Store({
+    url: Sonatype.config.repos.urls.repoContentClasses,
+    reader: this.contentClassesReader,
     sortInfo: {field: 'name', direction: 'ASC'},
     autoLoad: true
   });
@@ -98,8 +114,82 @@ Sonatype.repoServer.RepoTargetEditPanel = function(config){
         name: 'name',
         allowBlank: false,
         width: this.COMBO_WIDTH
+      },
+      {
+        xtype: 'combo',
+        fieldLabel: 'Content Class',
+        itemCls: 'required-field',
+        helpText: ht.contentClass,
+        name: 'contentClass',
+        width: this.COMBO_WIDTH,
+        store: this.contentClassesDataStore,
+        displayField:'name',
+        editable: false,
+        forceSelection: true,
+        mode: 'local',
+        triggerAction: 'all',
+        emptyText:'Select...',
+        selectOnFocus:true,
+        allowBlank: false,
+        listeners: {
+          'select': {
+            fn: function(combo, record, index) {
+            },
+            scope: this
+          }
+        }       
+      },
+      {
+        xtype: 'panel',
+        layout: 'column',
+        autoHeight: true,
+        style: 'padding: 10px 0 0 0',
+        items: [
+          {
+            xtype: 'treepanel',
+            id: 'repoTargets-pattern-list', //note: unique ID is assinged before instantiation
+            title: 'Patterns',
+            cls: 'required-field',
+            border: true, //note: this seem to have no effect w/in form panel
+            bodyBorder: true, //note: this seem to have no effect w/in form panel
+            //note: this style matches the expected behavior
+            bodyStyle: 'background-color:#FFFFFF; border: 1px solid #B5B8C8',
+            style: 'padding: 0 20px 0 0',
+            width: 225,
+            height: 300,
+            animate:true,
+            lines: false,
+            autoScroll:true,
+            containerScroll: true,
+            //@note: root node must be instantiated uniquely for each instance of treepanel
+            //@ext: can TreeNode be registerd as a component with an xtype so this new root node
+            //      may be instantiated uniquely for each form panel that uses this config?
+            rootVisible: false,
+            enableDD: false          
+          },
+	      {
+	        xtype: 'textfield',
+	        fieldLabel: 'Pattern', 
+	        itemCls: 'required-field',
+	        labelStyle: 'margin-left: 15px; width: 185px;',
+	        helpText: ht.name,
+	        name: 'pattern',
+	        allowBlank: false,
+	        width: this.COMBO_WIDTH
+	      },
+	      {
+	        xtype: 'button',
+	        text: 'Add', 
+	        id: 'button-add'
+	      },
+	      {
+	        xtype: 'button',
+	        text: 'Remove', 
+	        id: 'button-remove'
+	      }
+        ]
       }
-       ],
+    ],
     buttons: [
       {
         id: 'savebutton',
@@ -263,6 +353,8 @@ Ext.extend(Sonatype.repoServer.RepoTargetEditPanel, Ext.Panel, {
 
     var config = Ext.apply({}, this.formConfig, {id:id});
     
+    config = this.initializeTreeRoots(id, config);
+        
     var formPanel = new Ext.FormPanel(config);
     
     formPanel.form.on('actioncomplete', this.actionCompleteHandler, this);
@@ -498,6 +590,8 @@ Ext.extend(Sonatype.repoServer.RepoTargetEditPanel, Ext.Panel, {
     if(!formPanel){ //create form and populate current data
       var config = Ext.apply({}, this.formConfig, {id:id});
       
+      config = this.initializeTreeRoots(id, config);
+      
       formPanel = new Ext.FormPanel(config);
       formPanel.form.on('actioncomplete', this.actionCompleteHandler, this);
       formPanel.form.on('actionfailed', this.actionFailedHandler, this);
@@ -556,6 +650,39 @@ Ext.extend(Sonatype.repoServer.RepoTargetEditPanel, Ext.Panel, {
       this.ctxRow = null;
       this.ctxRecord = null;
     }
-  }
+  },
+  
+  initializeTreeRoots : function(id, config){
+    //@note: there has to be a better way to do this.  Depending on offsets is very error prone
+    var newConfig = config;
+
+    newConfig.items[3].items[0].root = new Ext.tree.TreeNode({text: 'root'});
+ 
+    return newConfig;
+  },
+    
+  loadPatternsTreeHelper : function(arr, srcObj, fpanel){
+    var repoPatternsTree = fpanel.find('id', 'repoTargets-pattern-list')[0];
+
+    var pattern;
+
+    for(var i=0; i<arr.length; i++){
+      pattern = arr[i];
+      repoPatternsTree.root.appendChild(
+        new Ext.tree.TreeNode({
+          id: 'id' + i,
+          text: pattern,
+          payload: pattern,
+          allowChildren: false,
+          draggable: false,
+          leaf: true,
+          nodeType: 'pattern',
+          icon: Sonatype.config.resourcePath + '/ext-2.0.2/resources/images/default/tree/folder.gif'
+        })
+      );
+    }
+    
+    return arr; //return arr, even if empty to comply with sonatypeLoad data modifier requirement
+  },
   
 });
