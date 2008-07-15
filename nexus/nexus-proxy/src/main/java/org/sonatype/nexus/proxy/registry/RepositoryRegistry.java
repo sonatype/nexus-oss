@@ -62,6 +62,15 @@ public interface RepositoryRegistry
         throws NoSuchRepositoryException;
 
     /**
+     * Removes "silently" single repository: no events will be emitted.
+     * 
+     * @param repoId the repo id
+     * @throws NoSuchRepositoryException the no such repository exception
+     */
+    void removeRepositorySilently( String repoId )
+        throws NoSuchRepositoryException;
+
+    /**
      * Adds the repository group.
      * 
      * @param groupId the group id

@@ -113,6 +113,16 @@ public class DefaultRepositoryRegistry
     public void removeRepository( String repoId )
         throws NoSuchRepositoryException
     {
+        Repository repository = getRepository( repoId );
+
+        removeRepositorySilently( repoId );
+
+        notifyProximityEventListeners( new RepositoryRegistryEventRemove( repository ) );
+    }
+
+    public void removeRepositorySilently( String repoId )
+        throws NoSuchRepositoryException
+    {
         if ( repositories.containsKey( repoId ) )
         {
             Repository repository = (Repository) repositories.get( repoId );
@@ -130,8 +140,6 @@ public class DefaultRepositoryRegistry
             {
                 ( (EventMulticaster) repository ).removeProximityEventListener( this );
             }
-
-            notifyProximityEventListeners( new RepositoryRegistryEventRemove( repository ) );
 
             getLogger().info( "Removed repository id=" + repository.getId() );
         }
@@ -177,8 +185,8 @@ public class DefaultRepositoryRegistry
             notifyProximityEventListeners( new RepositoryRegistryGroupEventAdd( this, groupId ) );
 
             getLogger().info(
-                "Added repository group ID=" + groupId + " (contentClass=" + 
-                (contentClass != null ? contentClass.getId() : "null")
+                "Added repository group ID=" + groupId + " (contentClass="
+                    + ( contentClass != null ? contentClass.getId() : "null" )
                     + ") with repository members of (in processing order) " + memberRepositories );
         }
         catch ( NoSuchRepositoryException e )

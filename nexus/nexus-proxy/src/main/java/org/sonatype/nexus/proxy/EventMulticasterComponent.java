@@ -20,7 +20,7 @@
  */
 package org.sonatype.nexus.proxy;
 
-import java.util.Vector;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.sonatype.nexus.proxy.events.AbstractEvent;
 import org.sonatype.nexus.proxy.events.EventListener;
@@ -38,48 +38,34 @@ public class EventMulticasterComponent
 {
 
     /** The proximity event listeners. */
-    private Vector<EventListener> proximityEventListeners = new Vector<EventListener>();
+    private CopyOnWriteArrayList<EventListener> proximityEventListeners = new CopyOnWriteArrayList<EventListener>();
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.sonatype.nexus.events.ProximityEventMulticaster#addProximityEventListener(org.sonatype.nexus.events.ProximityEventListener)
-     */
     public void addProximityEventListener( EventListener listener )
     {
         proximityEventListeners.add( listener );
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.sonatype.nexus.events.ProximityEventMulticaster#removeProximityEventListener(org.sonatype.nexus.events.ProximityEventListener)
-     */
     public void removeProximityEventListener( EventListener listener )
     {
         proximityEventListeners.remove( listener );
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.sonatype.nexus.events.ProximityEventMulticaster#notifyProximityEventListeners(org.sonatype.nexus.events.AbstractEvent)
-     */
     public void notifyProximityEventListeners( AbstractEvent evt )
     {
-        synchronized ( proximityEventListeners )
+        for ( EventListener l : proximityEventListeners )
         {
-            for ( EventListener l : proximityEventListeners )
+            try
             {
-                try
+                if ( getLogger().isDebugEnabled() )
                 {
-                    l.onProximityEvent( evt );
+                    getLogger().debug( "Notifying listener about config change: " + l.getClass().getName() );
                 }
-                catch ( Exception e )
-                {
-                    getLogger().info( "Unexpected exception in listener", e );
-                    proximityEventListeners.remove( l );
-                }
+
+                l.onProximityEvent( evt );
+            }
+            catch ( Exception e )
+            {
+                getLogger().info( "Unexpected exception in listener", e );
             }
         }
     }
