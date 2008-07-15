@@ -57,7 +57,7 @@ public abstract class AbstractSystemFeedSource
 
         feed.setDescription( getDescription() );
 
-        feed.setAuthor( "Nexus " + getNexus().getSystemState().getVersion() );
+        feed.setAuthor( "Nexus " + getNexus().getSystemStatus().getVersion() );
 
         feed.setPublishedDate( new Date() );
 
