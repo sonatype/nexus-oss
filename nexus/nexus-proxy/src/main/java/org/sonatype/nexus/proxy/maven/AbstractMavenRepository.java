@@ -247,7 +247,7 @@ public abstract class AbstractMavenRepository
             {
                 storeItem( new DefaultStorageFileItem(
                     this,
-                    item.getPath() + ".sha1",
+                    item.getPath() + ".md5",
                     true,
                     true,
                     new StringContentLocator( md5Hash ) ) );
