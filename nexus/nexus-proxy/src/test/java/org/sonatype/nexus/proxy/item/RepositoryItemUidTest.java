@@ -88,13 +88,13 @@ public class RepositoryItemUidTest
     {
         RepositoryItemUid uidA = new RepositoryItemUid( repository, "/a.txt" );
         
-        Thread thread = new Thread( new RepositoryItemUidLockProcessLauncher( uidA, 100, 20) );
-        Thread thread2 = new Thread( new RepositoryItemUidLockProcessLauncher( uidA, 100, 20) );
+        Thread thread = new Thread( new RepositoryItemUidLockProcessLauncher( uidA, 100, 100) );
+        Thread thread2 = new Thread( new RepositoryItemUidLockProcessLauncher( uidA, 100, 100) );
         
         thread.start();
         thread2.start();
         
-        Thread.sleep( 10 );
+        Thread.sleep( 50 );
         
         assertEquals( 1, RepositoryItemUid.getLockCount() );
         

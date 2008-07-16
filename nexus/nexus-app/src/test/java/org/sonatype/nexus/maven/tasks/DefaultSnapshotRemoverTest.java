@@ -334,23 +334,24 @@ public class DefaultSnapshotRemoverTest
         {
             fail( "This is the release, it should be left!" );
         }
-
-    }
-
-    public void testSnapshotRemoverDefaultValues()
-        throws Exception
-    {
+        
+        /*******************************************
+         * 
+         * Start round 2
+         * 
+         ******************************************/
+        
         fillInRepo();
 
         // and now setup the request
         // process the apacheSnapshots, leave min 1 snap
-        SnapshotRemovalRequest request = new SnapshotRemovalRequest( apacheSnapshots.getId(), null, 2, -1, false );
+        request = new SnapshotRemovalRequest( apacheSnapshots.getId(), null, 2, -1, false );
 
-        SnapshotRemovalResult result = defaultNexus.removeSnapshots( request );
+        result = defaultNexus.removeSnapshots( request );
 
         assertEquals( 1, result.getProcessedRepositories().size() );
         
-        ArtifactStoreRequest gavRequest = null;
+        gavRequest = null;
 
         // test the results by their local availability
         
@@ -540,6 +541,7 @@ public class DefaultSnapshotRemoverTest
         {
             fail( "Should not be deleted!" );
         }
+
     }
 
 }

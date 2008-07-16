@@ -428,6 +428,24 @@ public class M2GavCalculatorTest
 
         path = gavCalculator.gavToPath( gav );
         assertEquals( "/org/apache/maven/artifact/maven-artifact/3.0-SNAPSHOT/maven-artifact-3.0-20080411.005221-75.pom.asc.sha1", path );
+        
+        gav = gavCalculator.pathToGav( "/org/apache/maven/maven-core/2.0.9-SNAPSHOT/maven-core-2.0.9-20080302.032223-6-bin.zip.sha1" );
+        assertEquals( "org.apache.maven", gav.getGroupId() );
+        assertEquals( "maven-core", gav.getArtifactId() );
+        assertEquals( "2.0.9-20080302.032223-6", gav.getVersion() );
+        assertEquals( "2.0.9-SNAPSHOT", gav.getBaseVersion() );
+        assertEquals( "bin", gav.getClassifier() );
+        assertEquals( "zip", gav.getExtension() );
+        assertEquals( Integer.valueOf( 6 ), gav.getSnapshotBuildNumber() );
+        assertEquals( parseTimestamp( "20080302.032223" ), gav.getSnapshotTimeStamp() );
+        assertEquals( "maven-core-2.0.9-20080302.032223-6-bin.zip.sha1", gav.getName() );
+        assertEquals( true, gav.isSnapshot() );
+        assertEquals( true, gav.isHash() );
+        assertEquals( Gav.HashType.sha1, gav.getHashType() );
+        assertEquals( false, gav.isSignature() );
+
+        path = gavCalculator.gavToPath( gav );
+        assertEquals( "/org/apache/maven/maven-core/2.0.9-SNAPSHOT/maven-core-2.0.9-20080302.032223-6-bin.zip.sha1", path );
 
         gav = gavCalculator.pathToGav( "/foo/artifact/SNAPSHOT/artifact-SNAPSHOT.jar" );
         

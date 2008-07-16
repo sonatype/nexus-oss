@@ -166,21 +166,13 @@ public class M2GavCalculator
                                 + ( ( v.length() > 9 ) ? ( v.substring( 0, v.length() - 9 ) + "-" ) : "" )
                                 + snapshotBuildNumber + "." + ext );
                     }
+                    
                     if ( !primary )
                     {
-                        if ( checksum || signature )
+                        if ( vEndPos + a.length() + v.length() - "-SNAPSHOT".length() + 3 + snapshotBuildNumber.length()
+                            < s.lastIndexOf( "." ) )
                         {
-                            c = s.substring(
-                                vEndPos + a.length() + v.length() - 9 + 3 + snapshotBuildNumber.length(),
-                                s.lastIndexOf( '.' ) );
-                            if ( c.length() == 0 )
-                            {
-                                c = null;
-                            }
-                        }
-                        else
-                        {
-                            c = s.substring( s.lastIndexOf( '-' ) + 1, s.lastIndexOf( '.' ) );
+                            c = s.substring( s.lastIndexOf( '-' ) + 1, s.lastIndexOf( '.' ) );   
                         }
                     }
 

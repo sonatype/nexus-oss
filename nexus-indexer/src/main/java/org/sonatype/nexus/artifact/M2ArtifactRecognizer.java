@@ -13,6 +13,9 @@
  *******************************************************************************/
 package org.sonatype.nexus.artifact;
 
+/**
+ * @deprecated
+ */
 public class M2ArtifactRecognizer {
 	/**
 	 * Is this item M2 Checksum?
@@ -22,7 +25,7 @@ public class M2ArtifactRecognizer {
 	}
 
 	/**
-	 * Is this item M2 POM?
+	 * Is this item M2 POM? 
 	 */
 	public static boolean isPom(String path) {
 		return path.endsWith(".pom") || path.endsWith(".pom.sha1") || path.endsWith(".pom.md5");

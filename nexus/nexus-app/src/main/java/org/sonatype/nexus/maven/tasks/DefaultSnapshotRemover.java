@@ -33,7 +33,6 @@ import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.logging.Logger;
 import org.sonatype.nexus.artifact.Gav;
-import org.sonatype.nexus.artifact.M2ArtifactRecognizer;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryGroupException;
@@ -272,14 +271,16 @@ public class DefaultSnapshotRemover
                 for ( StorageItem item : items )
                 {
                     if ( !item.isVirtual() && !StorageCollectionItem.class.isAssignableFrom( item.getClass() ) )
-                    {
+                    {                        
                         gav = ( (MavenRepository) coll.getRepositoryItemUid().getRepository() )
                             .getGavCalculator().pathToGav( item.getPath() );
                         
                         if ( gav != null )
                         {                            
                             // if we find a pom, check for delete on release
-                            if ( M2ArtifactRecognizer.isPom( item.getPath() ) )
+                            if ( !gav.isHash()
+                                && !gav.isSignature()
+                                && gav.getExtension().equals( "pom" ) )
                             {
                                 if ( request.isRemoveIfReleaseExists() && releaseExistsForSnapshot( gav ) )
                                 {
@@ -374,7 +375,7 @@ public class DefaultSnapshotRemover
                                 .keySet() );
 
                             while ( remainingSnapshotsAndFiles.size() < request.getMinCountOfSnapshotsToKeep() )
-                            {
+                            {                                
                                 remainingSnapshotsAndFiles.put( keys.last(), deletableSnapshotsAndFiles.get( keys
                                     .last() ) );
 
@@ -385,10 +386,11 @@ public class DefaultSnapshotRemover
 
                         }
                     }
+                    
                     for ( ArtifactVersion key : deletableSnapshotsAndFiles.keySet() )
                     {
+                        
                         List<StorageFileItem> files = deletableSnapshotsAndFiles.get( key );
-
                         deletedSnapshots++;
 
                         for ( StorageFileItem file : files )
@@ -396,21 +398,31 @@ public class DefaultSnapshotRemover
                             try
                             {
                                 gav = (Gav) file.getItemContext().get( Gav.class.getName() );
-                                                                
-                                ArtifactStoreRequest req = new ArtifactStoreRequest( 
-                                    gav.getGroupId(), 
-                                    gav.getArtifactId(), 
-                                    gav.getVersion(), 
-                                    gav.getExtension(), 
-                                    gav.getClassifier() );
                                 
-                                if ( "pom".equals( gav.getExtension() ))
+                                // If hash or signature, just junk it
+                                if ( gav.isHash()
+                                    || gav.isSignature())
                                 {
-                                    repository.deleteArtifactPom( req, false, false, false );
+                                    repository.deleteItem( file.getRepositoryItemUid() );
                                 }
+                                // Otherwise, go through proper channels to remove.
                                 else
-                                {
-                                    repository.deleteArtifact( req, false, false, false );
+                                {                               
+                                    ArtifactStoreRequest req = new ArtifactStoreRequest( 
+                                        gav.getGroupId(), 
+                                        gav.getArtifactId(), 
+                                        gav.getVersion(), 
+                                        gav.getExtension(), 
+                                        gav.getClassifier() );
+                                    
+                                    if ( "pom".equals( gav.getExtension() ))
+                                    {
+                                        repository.deleteArtifactPom( req, false, false, false );
+                                    }
+                                    else
+                                    {
+                                        repository.deleteArtifact( req, false, false, false );
+                                    }
                                 }
 
                                 deletedFiles++;
