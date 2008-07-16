@@ -30,7 +30,7 @@ Sonatype.repoServer.PrivilegeEditPanel = function(config){
   var ht = Sonatype.repoServer.resources.help.privileges;
   
   //List of user statuses
-  this.typeStore = new Ext.data.SimpleStore({fields:['value','display'], data:[['target','Repository Target'],['application','Application']]});
+  this.typeStore = new Ext.data.SimpleStore({fields:['value','display'], data:[['repositoryTarget','Repository Target'],['application','Application']]});
   
   this.actions = {
     refresh : new Ext.Action({
@@ -55,9 +55,11 @@ Sonatype.repoServer.PrivilegeEditPanel = function(config){
   };
   
   this.privilegeRecordConstructor = Ext.data.Record.create([
-    {name:'resourceURI'},
+    {name:'resourceUri'},
     {name:'id'},
-    {name:'name', sortType:Ext.data.SortTypes.asUCString}
+    {name:'name', sortType:Ext.data.SortTypes.asUCString},
+    {name:'type'},
+    {name:'method'}
   ]);
   
   
@@ -66,7 +68,7 @@ Sonatype.repoServer.PrivilegeEditPanel = function(config){
   this.privilegesDataStore = new Ext.data.Store({
     url: Sonatype.config.repos.urls.privileges,
     reader: this.privilegesReader,
-    sortInfo: {field: 'id', direction: 'ASC'},
+    sortInfo: {field: 'name', direction: 'ASC'},
     autoLoad: true
   });
   
@@ -120,7 +122,7 @@ Sonatype.repoServer.PrivilegeEditPanel = function(config){
         selectOnFocus:true,
         allowBlank: false,
         width: this.COMBO_WIDTH,
-        value: 'target',
+        value: 'repositoryTarget',
         disabled: true
       }
       ],
@@ -182,7 +184,9 @@ Sonatype.repoServer.PrivilegeEditPanel = function(config){
     loadMask: true,
     deferredRender: false,
     columns: [
-      {header: 'Name', dataIndex: 'name', width:175, id: 'privilege-config-name-col'}      
+      {header: 'Name', dataIndex: 'name', width:175, id: 'privilege-config-name-col'},
+      {header: 'Type', dataIndex: 'type', width:175, id: 'privilege-config-type-col'},
+      {header: 'Method', dataIndex: 'method', width:175, id: 'privilege-config-method-col'}
     ],
     autoExpandColumn: 'privilege-config-name-col',
     disableSelection: false,
@@ -190,7 +194,6 @@ Sonatype.repoServer.PrivilegeEditPanel = function(config){
       emptyText: 'Click "Add" to create a new Privilege.'
     }
   });
-  this.privilegesGridPanel.on('rowclick', this.rowClick, this);
   this.privilegesGridPanel.on('rowcontextmenu', this.contextClick, this);
 
   Sonatype.repoServer.PrivilegeEditPanel.superclass.constructor.call(this, {
@@ -214,7 +217,7 @@ Sonatype.repoServer.PrivilegeEditPanel = function(config){
           {
             xtype: 'panel',
             layout: 'fit',
-            html: '<div class="little-padding">Select a privilege to edit it, or click "Add" to create a new one.</div>'
+            html: '<div class="little-padding">Click "Add" to create a new privilege.</div>'
           }
         ]
       }
@@ -250,7 +253,7 @@ Ext.extend(Sonatype.repoServer.PrivilegeEditPanel, Ext.Panel, {
         waitMsg: isNew ? 'Creating Privilege...' : 'Updating Privilege...',
         fpanel: formInfoObj.formPanel,
         dataModifiers: this.submitDataModFunc,
-        serviceDataObj : Sonatype.repoServer.referenceData.privileges,
+        serviceDataObj : Sonatype.repoServer.referenceData.privileges.repositoryTarget,
         isNew : isNew //extra option to send to callback, instead of conditioning on method
       });
     }
@@ -423,50 +426,7 @@ Ext.extend(Sonatype.repoServer.PrivilegeEditPanel, Ext.Panel, {
     //@todo: handle server error response here!!
 
     if (action.type == 'sonatypeSubmit'){
-      var isNew = action.options.isNew;
-      var receivedData = action.handleResponse(action.response).data;
-      if (isNew) {
-        //successful create        
-        var newRec = new this.privilegesRecordConstructor({
-            id : receivedData.id,
-            name : receivedData.name,
-            resourceURI : receivedData.resourceURI          
-          },
-          action.options.fpanel.id);
-        
-        this.privilegesDataStore.remove(this.privilegesDataStore.getById(action.options.fpanel.id)); //remove old one
-        this.privilegesDataStore.addSorted(newRec);
-        this.privilegesDataStore.getSelectionModel().selectRecords([newRec], false);
-
-        //set the hidden id field in the form for subsequent updates
-        action.options.fpanel.find('name', 'id')[0].setValue(receivedData.resourceURI);
-        //remove button click listeners
-        action.options.fpanel.buttons[0].purgeListeners();
-        action.options.fpanel.buttons[1].purgeListeners();
-
-        var buttonInfoObj = {
-            formPanel : action.options.fpanel,
-            isNew : false,
-            resourceUri : dataObj.resourceURI
-          };
-
-        //save button event handler
-        action.options.fpanel.buttons[0].on('click', this.saveHandler.createDelegate(this, [buttonInfoObj]));
-        
-        //cancel button event handler
-        action.options.fpanel.buttons[1].on('click', this.cancelHandler.createDelegate(this, [buttonInfoObj]));
-      }
-      else {
-        var sentData = action.output.data;
-
-        var i = this.privilegesDataStore.indexOfId(action.options.fpanel.id);
-        var rec = this.privilegesDataStore.getAt(i);
-
-        this.updatePrivilegeRecord(rec, receivedData);
-        
-        var sortState = this.privilegesDataStore.getSortState();
-        this.privilegesDataStore.sort(sortState.field, sortState.direction);
-      }
+      this.reloadAll();
     }
   },
   
@@ -504,49 +464,6 @@ Ext.extend(Sonatype.repoServer.PrivilegeEditPanel, Ext.Panel, {
       component.buttons[0].disabled = false;
     }
   },
-
-  formDataLoader : function(formPanel, resourceUri, modFuncs){
-    formPanel.getForm().doAction('sonatypeLoad', {url:resourceUri, method:'GET', fpanel:formPanel, dataModifiers: modFuncs, scope: this});
-  },
-
-  rowClick : function(grid, rowIndex, e){
-    var rec = grid.store.getAt(rowIndex);
-    var id = rec.id; //note: rec.id is unique for new resources and equal to resourceURI for existing ones
-    var formPanel = this.formCards.findById(id);
-    
-    //assumption: new route forms already exist in formCards, so they won't get into this case
-    if(!formPanel){ //create form and populate current data
-      var config = Ext.apply({}, this.formConfig, {id:id});
-      
-      formPanel = new Ext.FormPanel(config);
-      formPanel.form.on('actioncomplete', this.actionCompleteHandler, this);
-      formPanel.form.on('actionfailed', this.actionFailedHandler, this);
-      formPanel.on('beforerender', this.beforeFormRenderHandler, this);
-      formPanel.on('afterlayout', this.afterLayoutFormHandler, this, {single:true});
-      
-      var buttonInfoObj = {
-        formPanel : formPanel,
-        isNew : false, //not a new route form, see assumption
-        resourceUri : rec.data.resourceURI
-      };
-      
-      formPanel.buttons[0].on('click', this.saveHandler.createDelegate(this, [buttonInfoObj]));
-      formPanel.buttons[1].on('click', this.cancelHandler.createDelegate(this, [buttonInfoObj]));
-  
-      this.formDataLoader(formPanel, rec.data.resourceURI, this.loadDataModFunc);
-      
-      this.formCards.add(formPanel);
-      
-      //always set active
-      this.formCards.getLayout().setActiveItem(formPanel);
-      
-      formPanel.doLayout();
-    }
-    else{
-      //always set active
-      this.formCards.getLayout().setActiveItem(formPanel);
-    }
-  },
   
   contextClick : function(grid, index, e){
     this.contextHide();
@@ -561,10 +478,13 @@ Ext.extend(Sonatype.repoServer.PrivilegeEditPanel, Ext.Panel, {
     var menu = new Ext.menu.Menu({
       id:'privileges-grid-ctx',
       items: [
-        this.actions.refresh,
-        this.actions.deleteAction
+        this.actions.refresh
       ]
     });
+    
+    if (this.ctxRecord.data.type != 'application'){
+      menu.add(this.actions.deleteAction);
+    }
     
     //TODO: Add additional menu items
     

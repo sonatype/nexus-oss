@@ -269,9 +269,12 @@ Sonatype.repoServer.referenceData = {
   },
   
   privileges : {
-    id : "",
-    name : "",
-    type : ""
+    repositoryTarget : {
+      name: "",
+      type: "",
+      repositoryTargetId: "",
+      method: []
+    }
   },
 
   contentClasses : {

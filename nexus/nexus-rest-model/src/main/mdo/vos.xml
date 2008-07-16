@@ -1797,6 +1797,172 @@
 				</field>
 			</fields>
 		</class>
+		
+		<!-- Privileges -->
+		<!-- Response/Request wrapper Data -->
+        <class>
+            <name>PrivilegeListResourceResponse</name>
+            <version>1.0.0+</version>
+            <superClass>NexusResponse</superClass>
+            <fields>
+                <field>
+                    <name>data</name>
+                    <version>1.0.0+</version>
+                    <association>
+                        <type>PrivilegeBaseStatusResource</type>
+                        <multiplicity>*</multiplicity>
+                    </association>
+                    <required>true</required>
+                </field>
+            </fields>
+        </class>
+        
+        <class>
+            <name>PrivilegeStatusResourceResponse</name>
+            <version>1.0.0+</version>
+            <superClass>NexusResponse</superClass>
+            <fields>
+                <field>
+                    <name>data</name>
+                    <version>1.0.0+</version>
+                    <association>
+                        <type>PrivilegeBaseStatusResource</type>
+                    </association>
+                    <required>true</required>
+                </field>
+            </fields>
+        </class>
+
+        <class>
+            <name>PrivilegeResourceRequest</name>
+            <version>1.0.0+</version>
+            <superClass>NexusResponse</superClass>
+            <fields>
+                <field>
+                    <name>data</name>
+                    <version>1.0.0+</version>
+                    <association>
+                        <type>PrivilegeBaseResource</type>
+                    </association>
+                    <required>true</required>
+                </field>
+            </fields>
+        </class>
+        
+		<class>
+		    <name>PrivilegeBaseResource</name>
+		    <version>1.0.0+</version>
+		    <fields>
+		        <field>
+		            <name>name</name>
+                    <version>1.0.0+</version>
+                    <type>String</type>
+                    <required>true</required>
+		        </field>
+		        <field>
+                    <name>type</name>
+                    <version>1.0.0+</version>
+                    <type>String</type>
+                    <required>true</required>
+                </field>
+                <field>
+                    <name>method</name>
+                    <version>1.0.0+</version>
+                    <association>
+                        <type>String</type>
+                        <multiplicity>*</multiplicity>
+                    </association>
+                    <required>true</required>
+                </field>
+		    </fields>
+		</class>
+		
+		<class>
+            <name>PrivilegeTargetResource</name>
+            <version>1.0.0+</version>
+            <superClass>PrivilegeBaseResource</superClass>
+            <fields>
+                <field>
+                    <name>repositoryTargetId</name>
+                    <version>1.0.0+</version>
+                    <type>String</type>
+                    <required>true</required>
+                </field>
+            </fields>
+        </class>
+        
+        <!-- Purposefully no PrivilegeApplicationResource as that type of resource cannot be created -->
+        
+        <class>
+            <name>PrivilegeBaseStatusResource</name>
+            <version>1.0.0+</version>
+            <fields>
+                <field>
+                    <name>id</name>
+                    <version>1.0.0+</version>
+                    <type>String</type>
+                    <required>true</required>
+                </field>
+                <field>
+                    <name>resourceUri</name>
+                    <version>1.0.0+</version>
+                    <type>String</type>
+                    <required>true</required>
+                </field>
+                <field>
+                    <name>name</name>
+                    <version>1.0.0+</version>
+                    <type>String</type>
+                    <required>true</required>
+                </field>
+                <field>
+                    <name>type</name>
+                    <version>1.0.0+</version>
+                    <type>String</type>
+                    <required>true</required>
+                </field>
+                <field>
+                    <name>method</name>
+                    <version>1.0.0+</version>
+                    <type>String</type>
+                    <required>true</required>
+                </field>
+            </fields>
+        </class>
+        
+        <class>
+            <name>PrivilegeTargetStatusResource</name>
+            <version>1.0.0+</version>
+            <superClass>PrivilegeBaseStatusResource</superClass>
+            <fields>
+                <field>
+                    <name>repositoryTargetId</name>
+                    <version>1.0.0+</version>
+                    <type>String</type>
+                    <required>true</required>
+                </field>
+                <field>
+                    <name>repositoryTargetName</name>
+                    <version>1.0.0+</version>
+                    <type>String</type>
+                    <required>true</required>
+                </field>
+            </fields>
+        </class>
+        
+        <class>
+            <name>PrivilegeApplicationStatusResource</name>
+            <version>1.0.0+</version>
+            <superClass>PrivilegeBaseStatusResource</superClass>
+            <fields>
+                <field>
+                    <name>path</name>
+                    <version>1.0.0+</version>
+                    <type>String</type>
+                    <required>true</required>
+                </field>
+            </fields>
+        </class>
 
 		<!-- Content -->
 		<class>

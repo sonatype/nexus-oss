@@ -46,6 +46,14 @@ import org.sonatype.nexus.rest.model.NexusArtifact;
 import org.sonatype.nexus.rest.model.NexusError;
 import org.sonatype.nexus.rest.model.NexusErrorResponse;
 import org.sonatype.nexus.rest.model.NexusResponse;
+import org.sonatype.nexus.rest.model.PrivilegeApplicationStatusResource;
+import org.sonatype.nexus.rest.model.PrivilegeBaseResource;
+import org.sonatype.nexus.rest.model.PrivilegeBaseStatusResource;
+import org.sonatype.nexus.rest.model.PrivilegeListResourceResponse;
+import org.sonatype.nexus.rest.model.PrivilegeResourceRequest;
+import org.sonatype.nexus.rest.model.PrivilegeStatusResourceResponse;
+import org.sonatype.nexus.rest.model.PrivilegeTargetResource;
+import org.sonatype.nexus.rest.model.PrivilegeTargetStatusResource;
 import org.sonatype.nexus.rest.model.RemoteConnectionSettings;
 import org.sonatype.nexus.rest.model.RemoteHttpProxySettings;
 import org.sonatype.nexus.rest.model.RepositoryBaseResource;
@@ -111,6 +119,7 @@ import org.sonatype.nexus.rest.model.UserRoleResource;
 import org.sonatype.nexus.rest.model.UserStatusResource;
 import org.sonatype.nexus.rest.model.WastebasketResource;
 import org.sonatype.nexus.rest.model.WastebasketResourceResponse;
+import org.sonatype.nexus.rest.privileges.PrivilegeBaseResourceConverter;
 import org.sonatype.nexus.rest.repositories.RepositoryBaseResourceConverter;
 import org.sonatype.nexus.rest.schedules.ScheduledServiceBaseResourceConverter;
 import org.sonatype.nexus.rest.schedules.ScheduledServicePropertyResourceConverter;
@@ -128,6 +137,9 @@ public final class XStreamInitializer
             .getReflectionProvider() ), XStream.PRIORITY_VERY_HIGH );
 
         xstream.registerConverter( new ScheduledServicePropertyResourceConverter( xstream.getMapper(), xstream
+            .getReflectionProvider() ), XStream.PRIORITY_VERY_HIGH );
+        
+        xstream.registerConverter( new PrivilegeBaseResourceConverter( xstream.getMapper(), xstream
             .getReflectionProvider() ), XStream.PRIORITY_VERY_HIGH );
 
         // aliasaes
@@ -239,7 +251,17 @@ public final class XStreamInitializer
         xstream.omitField( RoleListResourceResponse.class, "modelEncoding" );
         xstream.omitField( RoleResource.class, "modelEncoding" );
         xstream.omitField( RoleResourceRequest.class, "modelEncoding" );
-        xstream.omitField( RoleResourceResponse.class, "modelEncoding" );
+        xstream.omitField( RoleResourceResponse.class, "modelEncoding" );        
+        
+        xstream.omitField( PrivilegeResourceRequest.class, "modelEncoding" );
+        xstream.omitField( PrivilegeBaseStatusResource.class, "modelEncoding" );
+        xstream.omitField( PrivilegeApplicationStatusResource.class, "modelEncoding" );
+        xstream.omitField( PrivilegeTargetStatusResource.class, "modelEncoding" );
+        xstream.omitField( PrivilegeListResourceResponse.class, "modelEncoding" );
+        xstream.omitField( PrivilegeBaseResource.class, "modelEncoding" );
+        xstream.omitField( PrivilegeStatusResourceResponse.class, "modelEncoding" );
+        xstream.omitField( PrivilegeTargetResource.class, "modelEncoding" );
+        
 
         xstream.omitField( NFCResourceResponse.class, "modelEncoding" );
         xstream.omitField( NFCResource.class, "modelEncoding" );

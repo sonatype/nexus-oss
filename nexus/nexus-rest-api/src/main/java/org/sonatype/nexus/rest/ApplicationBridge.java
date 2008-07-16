@@ -53,6 +53,8 @@ import org.sonatype.nexus.rest.identify.IdentifyHashResourceHandler;
 import org.sonatype.nexus.rest.index.IndexResourceHandler;
 import org.sonatype.nexus.rest.logs.LogsListResourceHandler;
 import org.sonatype.nexus.rest.logs.LogsResourceHandler;
+import org.sonatype.nexus.rest.privileges.PrivilegeListResourceHandler;
+import org.sonatype.nexus.rest.privileges.PrivilegeResourceHandler;
 import org.sonatype.nexus.rest.repositories.RepositoryContentResourceHandler;
 import org.sonatype.nexus.rest.repositories.RepositoryListResourceHandler;
 import org.sonatype.nexus.rest.repositories.RepositoryMetaResourceHandler;
@@ -420,6 +422,12 @@ public class ApplicationBridge
 
         router
             .attach( "/roles/{" + RoleResourceHandler.ROLE_ID_KEY + "}", protectResource( RoleResourceHandler.class ) );
+            
+        router.attach( "/privileges", protectResource( PrivilegeListResourceHandler.class ) );
+
+        router.attach(
+                "/privileges/{" + PrivilegeResourceHandler.PRIVILEGE_ID_KEY + "}",
+                protectResource( PrivilegeResourceHandler.class ) );
 
         router.attach( "/repo_content_classes", protectResource( ContentClassesListResourceHandler.class ) );
 
