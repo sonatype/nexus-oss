@@ -55,6 +55,11 @@ public class ValidationResponse
      */
     private List<ValidationMessage> validationWarnings;
 
+    /**
+     * Context for validators to communicate.
+     */
+    private ValidationContext context;
+
     public boolean isValid()
     {
         return valid;
@@ -163,5 +168,20 @@ public class ValidationResponse
         setValid( isValid() && response.isValid() );
 
         setModified( isModified() || response.isModified() );
+    }
+
+    public void setContext( ValidationContext ctx )
+    {
+        this.context = ctx;
+    }
+
+    public ValidationContext getContext()
+    {
+        if ( context == null )
+        {
+            context = new ValidationContext();
+        }
+
+        return context;
     }
 }

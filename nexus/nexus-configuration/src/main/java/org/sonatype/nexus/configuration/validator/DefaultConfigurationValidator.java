@@ -22,20 +22,31 @@ package org.sonatype.nexus.configuration.validator;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.configuration.model.CAuthSource;
 import org.sonatype.nexus.configuration.model.CAuthzSource;
+import org.sonatype.nexus.configuration.model.CGroupsSetting;
 import org.sonatype.nexus.configuration.model.CGroupsSettingPathMappingItem;
 import org.sonatype.nexus.configuration.model.CHttpProxySettings;
+import org.sonatype.nexus.configuration.model.CRemoteAuthentication;
+import org.sonatype.nexus.configuration.model.CRemoteConnectionSettings;
+import org.sonatype.nexus.configuration.model.CRemoteHttpProxySettings;
+import org.sonatype.nexus.configuration.model.CRemoteNexusInstance;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.CRepositoryGroup;
+import org.sonatype.nexus.configuration.model.CRepositoryGrouping;
 import org.sonatype.nexus.configuration.model.CRepositoryShadow;
+import org.sonatype.nexus.configuration.model.CRepositoryTarget;
 import org.sonatype.nexus.configuration.model.CRestApiSettings;
+import org.sonatype.nexus.configuration.model.CRouting;
+import org.sonatype.nexus.configuration.model.CSchedule;
+import org.sonatype.nexus.configuration.model.CScheduledTask;
 import org.sonatype.nexus.configuration.model.CSecurity;
+import org.sonatype.nexus.configuration.model.CTaskConfiguration;
 import org.sonatype.nexus.configuration.model.Configuration;
 
 /**
@@ -48,7 +59,6 @@ public class DefaultConfigurationValidator
     extends AbstractLogEnabled
     implements ConfigurationValidator
 {
-
     @SuppressWarnings( "unchecked" )
     public ValidationResponse validateModel( ValidationRequest request )
     {
@@ -57,204 +67,61 @@ public class DefaultConfigurationValidator
         Configuration model = request.getConfiguration();
 
         // check for security model
-        if ( model.getSecurity() == null )
+        if ( model.getSecurity() != null )
+        {
+            response.append( validateSecurity( response.getContext(), model.getSecurity() ) );
+        }
+        else
         {
             model.setSecurity( new CSecurity() );
 
             response
-                .addValidationWarning( "Security configuration block, which is mandatory, was missing. Replaced with defaults." );
+                .addValidationWarning( "Security configuration block, which is mandatory, was missing. Reset with defaults." );
 
             response.setModified( true );
         }
 
-        // if security enabled, at least auth source must be defined
-        if ( model.getSecurity().isEnabled() )
+        // global conn settings
+        if ( model.getGlobalConnectionSettings() != null )
         {
-            if ( model.getSecurity().getAuthenticationSource() == null )
-            {
-                getLogger().info(
-                    "Security is enabled, but no authenticationSource is set, assuming 'simple' authentication." );
-
-                model.getSecurity().setAnonymousAccessEnabled( true );
-
-                model.getSecurity().setAuthenticationSource( new CAuthSource() );
-
-                model.getSecurity().getAuthenticationSource().setType( "simple" );
-                
-                response
-                    .addValidationWarning( "Security is enabled, but no authenticationSource is set, setting 'simple' authentication source." );
-
-                response.setModified( true );
-            }
-        }
-        
-        // collect existing realms, if any
-        List<String> existingRealms = null;
-        if ( model.getSecurity().isEnabled() && model.getSecurity().getRealms() != null )
-        {
-            existingRealms = new ArrayList<String>( model.getSecurity().getRealms().size() );
-            List<CAuthzSource> realms = model.getSecurity().getRealms();
-            for ( CAuthzSource authz : realms )
-            {
-                existingRealms.add( authz.getId() );
-            }
+            response.append( validateRemoteConnectionSettings( response.getContext(), model
+                .getGlobalConnectionSettings() ) );
         }
         else
         {
-            existingRealms = new ArrayList<String>( 1 );
+            model.setGlobalConnectionSettings( new CRemoteConnectionSettings() );
+
+            response
+                .addValidationWarning( "Global connection settings block, which is mandatory, was missing. Reset with defaults." );
+
+            response.setModified( true );
         }
 
-        // collect existing reposes and check their realms
-        List<String> existingReposes = new ArrayList<String>( model.getRepositories().size() );
-        List<CRepository> reposes = model.getRepositories();
-        for ( CRepository repo : reposes )
+        // global httpproxy settings (optional)
+        if ( model.getGlobalHttpProxySettings() != null )
         {
-            response.append( validateRepository( repo ) );
-
-            if ( existingReposes.contains( repo.getId() ) )
-            {
-                response.addValidationError( "Repository " + repo.getId() + " declared more than once!" );
-            }
-            if ( model.getSecurity() != null && model.getSecurity().isEnabled() && repo.getRealmId() != null )
-            {
-                if ( !existingRealms.contains( repo.getRealmId() ) )
-                {
-                    response.addValidationError( "The " + repo.getId()
-                        + " repository points to a nonexistent security realm!" );
-                }
-            }
-
-            existingReposes.add( repo.getId() );
+            response
+                .append( validateRemoteHttpProxySettings( response.getContext(), model.getGlobalHttpProxySettings() ) );
         }
 
-        // check that shadow reposes are showing to existing authz sources
-        List<String> existingShadows = new ArrayList<String>();
-        if ( model.getRepositoryShadows() != null )
+        // rest api
+        if ( model.getRestApi() != null )
         {
-            List<CRepositoryShadow> shadows = model.getRepositoryShadows();
-
-            for ( CRepositoryShadow shadow : shadows )
-            {
-                response.append( validateRepository( shadow ) );
-
-                if ( existingShadows.contains( shadow.getId() ) )
-                {
-                    response.addValidationError( "Shadow repository " + shadow.getId() + " declared more than once!" );
-                }
-
-                if ( model.getSecurity() != null && model.getSecurity().isEnabled() && shadow.getRealmId() != null )
-                {
-                    if ( !existingReposes.contains( shadow.getShadowOf() ) )
-                    {
-                        response.addValidationError( "The shadow of repository " + shadow.getShadowOf() + " of type "
-                            + shadow.getType() + " points to a nonexistent repository!" );
-                    }
-                    if ( !existingRealms.contains( shadow.getRealmId() ) )
-                    {
-                        response.addValidationError( "The shadow of repository " + shadow.getShadowOf() + " of type "
-                            + shadow.getType() + " points to a nonexistent security realm!" );
-                    }
-                }
-                existingShadows.add( shadow.getId() );
-            }
+            response.append( validateRestApiSettings( response.getContext(), model.getRestApi() ) );
         }
-
-        // check that groups are pointing to existing reposes
-        if ( model.getRepositoryGrouping() != null && model.getRepositoryGrouping().getRepositoryGroups() != null )
+        else
         {
-            List<String> existingGroups = new ArrayList<String>( model
-                .getRepositoryGrouping().getRepositoryGroups().size() );
-            List<CRepositoryGroup> groups = model.getRepositoryGrouping().getRepositoryGroups();
-            for ( CRepositoryGroup group : groups )
-            {
-                if ( StringUtils.isEmpty( group.getGroupId() ) )
-                {
-                    response.addValidationError( "RepositoryGroup ID's may not be empty!" );
-                }
-                if ( StringUtils.isEmpty( group.getName() ) )
-                {
-                    group.setName( group.getGroupId() );
+            model.setRestApi( new CRestApiSettings() );
 
-                    response.addValidationWarning( "RepositoryGroup with ID='" + group.getGroupId()
-                        + "' has no name, defaulted to it's ID." );
+            response.addValidationWarning( "The REST API section was missing from configuration, defaulted it." );
 
-                    response.setModified( true );
-                }
-
-                if ( existingGroups.contains( group.getGroupId() ) )
-                {
-                    response.addValidationError( "The group with GroupID " + group.getGroupId()
-                        + " is defined more than once!" );
-                }
-                List<String> members = group.getRepositories();
-                for ( String repoId : members )
-                {
-                    if ( !existingReposes.contains( repoId ) && !existingShadows.contains( repoId ) )
-                    {
-                        response.addValidationError( "The group with GroupID " + group.getGroupId()
-                            + " refers to a nonexistent repository with ID = " + repoId );
-                    }
-                }
-            }
+            response.setModified( true );
         }
 
-        // check that groupmappings are pointing to existing reposes
-        if ( model.getRepositoryGrouping() != null && model.getRepositoryGrouping().getPathMappings() != null )
-        {
-            List<String> itemIds = new ArrayList<String>( model.getRepositoryGrouping().getPathMappings().size() );
-
-            long fixedCounter = System.currentTimeMillis();
-
-            for ( CGroupsSettingPathMappingItem item : (List<CGroupsSettingPathMappingItem>) model
-                .getRepositoryGrouping().getPathMappings() )
-            {
-                if ( StringUtils.isEmpty( item.getId() ) || "0".equals( item.getId() )
-                    || itemIds.contains( item.getId() ) )
-                {
-                    String newId = Long.toHexString( fixedCounter++ );
-
-                    response.addValidationWarning( "Fixed wrong/duplicate route ID from '" + item.getId() + "' to '"
-                        + newId + "'" );
-
-                    item.setId( newId );
-
-                    response.setModified( true );
-                }
-
-                itemIds.add( item.getId() );
-
-                if ( !item.getRouteType().equals( CGroupsSettingPathMappingItem.INCLUSION_RULE_TYPE )
-                    && !item.getRouteType().equals( CGroupsSettingPathMappingItem.EXCLUSION_RULE_TYPE )
-                    && !item.getRouteType().equals( CGroupsSettingPathMappingItem.BLOCKING_RULE_TYPE ) )
-                {
-                    response.addValidationError( "The groupMapping pattern with ID=" + item.getId()
-                        + " have invalid routeType='" + item.getRouteType() + "'. Valid route types are '"
-                        + CGroupsSettingPathMappingItem.INCLUSION_RULE_TYPE + "', '"
-                        + CGroupsSettingPathMappingItem.EXCLUSION_RULE_TYPE + "' and '"
-                        + CGroupsSettingPathMappingItem.BLOCKING_RULE_TYPE + "'." );
-                }
-
-                for ( String repoId : (List<String>) item.getRepositories() )
-                {
-                    if ( !existingReposes.contains( repoId ) && !existingShadows.contains( repoId ) )
-                    {
-                        response.addValidationError( "The groupMapping pattern with ID=" + item.getId()
-                            + " refers to a nonexistent repository with repoID = " + repoId );
-                    }
-                }
-            }
-        }
-
+        // nexus built-in http proxy
         if ( model.getHttpProxy() != null )
         {
-            if ( !CHttpProxySettings.PROXY_POLICY_PASS_THRU.equals( model.getHttpProxy().getProxyPolicy() )
-                && !CHttpProxySettings.PROXY_POLICY_STRICT.equals( model.getHttpProxy().getProxyPolicy() ) )
-            {
-                response.addValidationError( "The HTTP Proxy policy settings is invalid: '"
-                    + model.getHttpProxy().getProxyPolicy() + "'. Valid policies are '"
-                    + CHttpProxySettings.PROXY_POLICY_STRICT + "' and '" + CHttpProxySettings.PROXY_POLICY_PASS_THRU
-                    + "'." );
-            }
+            response.append( validateHttpProxySettings( response.getContext(), model.getHttpProxy() ) );
         }
         else
         {
@@ -265,17 +132,82 @@ public class DefaultConfigurationValidator
             response.setModified( true );
         }
 
-        if ( model.getRestApi() != null )
+        // routing
+        if ( model.getRouting() != null )
         {
-            // nothing
+            response.append( validateRouting( response.getContext(), model.getRouting() ) );
         }
         else
         {
-            model.setRestApi( new CRestApiSettings() );
+            model.setRouting( new CRouting() );
 
-            response.addValidationWarning( "The REST API section was missing from configuration, defaulted it." );
+            model.getRouting().setGroups( new CGroupsSetting() );
+
+            response.addValidationWarning( "The routing section was missing from configuration, defaulted it." );
 
             response.setModified( true );
+        }
+
+        // check existing reposes and check their realms
+        response.getContext().addExistingRepositoryIds();
+
+        List<CRepository> reposes = model.getRepositories();
+
+        for ( CRepository repo : reposes )
+        {
+            response.append( validateRepository( response.getContext(), repo ) );
+        }
+
+        // check shadow reposes and check their realms (optional section)
+        if ( model.getRepositoryShadows() != null )
+        {
+            response.getContext().addExistingRepositoryShadowIds();
+
+            List<CRepositoryShadow> shadows = model.getRepositoryShadows();
+
+            for ( CRepositoryShadow shadow : shadows )
+            {
+                response.append( validateRepository( response.getContext(), shadow ) );
+            }
+        }
+
+        // check groups (optional section)
+        if ( model.getRepositoryGrouping() != null )
+        {
+            response.append( validateRepositoryGrouping( response.getContext(), model.getRepositoryGrouping() ) );
+        }
+
+        // check remote nexus instances (optional section)
+        if ( model.getRemoteNexusInstances() != null )
+        {
+            List<CRemoteNexusInstance> instances = model.getRemoteNexusInstances();
+
+            for ( CRemoteNexusInstance instance : instances )
+            {
+                response.append( validateRemoteNexusInstance( response.getContext(), instance ) );
+            }
+        }
+
+        // check repo targets (optional section)
+        if ( model.getRepositoryTargets() != null )
+        {
+            List<CRepositoryTarget> targets = model.getRepositoryTargets();
+
+            for ( CRepositoryTarget target : targets )
+            {
+                response.append( validateRepositoryTarget( response.getContext(), target ) );
+            }
+        }
+
+        // check tasks (optional section)
+        if ( model.getTasks() != null )
+        {
+            List<CScheduledTask> tasks = model.getTasks();
+
+            for ( CScheduledTask task : tasks )
+            {
+                response.append( validateScheduledTask( response.getContext(), task ) );
+            }
         }
 
         // summary
@@ -317,9 +249,61 @@ public class DefaultConfigurationValidator
         return response;
     }
 
-    public ValidationResponse validateRepository( CRepository repo )
+    // ---------------
+    // Public
+
+    public ValidationResponse validateSecurity( ValidationContext ctx, CSecurity settings )
     {
         ValidationResponse response = new ValidationResponse();
+
+        if ( ctx != null )
+        {
+            response.setContext( ctx );
+        }
+
+        // if security enabled, at least auth source must be defined
+        if ( settings.isEnabled() )
+        {
+            if ( settings.getAuthenticationSource() == null )
+            {
+                settings.setAnonymousAccessEnabled( true );
+
+                settings.setAuthenticationSource( new CAuthSource() );
+
+                settings.getAuthenticationSource().setType( "simple" );
+
+                response
+                    .addValidationWarning( "Security is enabled, but no authenticationSource is set, setting 'simple' authentication source." );
+
+                response.setModified( true );
+            }
+        }
+
+        // collect existing realms, if any
+        response.getContext().addExistingRealms();
+
+        if ( settings.isEnabled() && settings.getRealms() != null )
+        {
+            List<CAuthzSource> realms = settings.getRealms();
+
+            for ( CAuthzSource authz : realms )
+            {
+                response.getContext().getExistingRealms().add( authz.getId() );
+            }
+        }
+
+        return response;
+    }
+
+    public ValidationResponse validateRepository( ValidationContext ctx, CRepository repo )
+    {
+        ValidationResponse response = new ValidationResponse();
+
+        if ( ctx != null )
+        {
+            response.setContext( ctx );
+        }
+
         if ( StringUtils.isEmpty( repo.getId() ) )
         {
             response.addValidationError( "Repository ID's may not be empty!" );
@@ -381,6 +365,28 @@ public class DefaultConfigurationValidator
                 + "\" only." );
         }
 
+        if ( response.getContext().getExistingRepositoryIds() != null )
+        {
+            if ( response.getContext().getExistingRepositoryIds().contains( repo.getId() ) )
+            {
+                response.addValidationError( "Repository " + repo.getId() + " declared more than once!" );
+            }
+
+            response.getContext().getExistingRepositoryIds().add( repo.getId() );
+        }
+
+        if ( response.getContext().getExistingRealms() != null )
+        {
+            if ( repo.getRealmId() != null )
+            {
+                if ( !ctx.getExistingRealms().contains( repo.getRealmId() ) )
+                {
+                    response.addValidationError( "The " + repo.getId()
+                        + " repository points to a nonexistent security realm!" );
+                }
+            }
+        }
+
         if ( repo.getLocalStorage() != null && repo.getLocalStorage().getUrl() != null )
         {
             try
@@ -403,12 +409,18 @@ public class DefaultConfigurationValidator
                 response.addValidationError( "Repository " + repo.getId() + " has malformed remote storage URL!", e );
             }
         }
+
         return response;
     }
 
-    public ValidationResponse validateRepository( CRepositoryShadow shadow )
+    public ValidationResponse validateRepository( ValidationContext ctx, CRepositoryShadow shadow )
     {
         ValidationResponse response = new ValidationResponse();
+
+        if ( ctx != null )
+        {
+            response.setContext( ctx );
+        }
 
         if ( StringUtils.isEmpty( shadow.getId() ) )
         {
@@ -423,6 +435,38 @@ public class DefaultConfigurationValidator
                 + "' has no name, defaulted to it's ID." );
 
             response.setModified( true );
+        }
+
+        if ( response.getContext().getExistingRepositoryShadowIds() != null )
+        {
+            if ( response.getContext().getExistingRepositoryShadowIds().contains( shadow.getId() ) )
+            {
+                response.addValidationError( "Shadow repository " + shadow.getId() + " declared more than once!" );
+            }
+
+            response.getContext().getExistingRepositoryShadowIds().add( shadow.getId() );
+        }
+
+        if ( response.getContext().getExistingRepositoryIds() != null )
+        {
+            if ( !response.getContext().getExistingRepositoryIds().contains( shadow.getShadowOf() ) )
+            {
+                response.addValidationError( "The shadow with ID='" + shadow.getId() + "' of repository "
+                    + shadow.getShadowOf() + " of type " + shadow.getType() + " points to a nonexistent repository!" );
+            }
+        }
+
+        if ( response.getContext().getExistingRealms() != null )
+        {
+            if ( shadow.getRealmId() != null )
+            {
+                if ( !response.getContext().getExistingRealms().contains( shadow.getRealmId() ) )
+                {
+                    response.addValidationError( "The shadow with ID='" + shadow.getId() + "' of repository "
+                        + shadow.getShadowOf() + " of type " + shadow.getType()
+                        + " points to a nonexistent security realm!" );
+                }
+            }
         }
 
         if ( !validateLocalStatus( shadow.getLocalStatus() ) )
@@ -441,6 +485,308 @@ public class DefaultConfigurationValidator
 
         return response;
     }
+
+    public ValidationResponse validateRepositoryGrouping( ValidationContext ctx, CRepositoryGrouping settings )
+    {
+        ValidationResponse response = new ValidationResponse();
+
+        if ( ctx != null )
+        {
+            response.setContext( ctx );
+        }
+
+        response.getContext().addExistingRepositoryGroupIds();
+
+        if ( settings.getRepositoryGroups() != null )
+        {
+            for ( CRepositoryGroup group : (List<CRepositoryGroup>) settings.getRepositoryGroups() )
+            {
+                response.append( validateRepositoryGroup( response.getContext(), group ) );
+            }
+        }
+
+        response.getContext().addExistingPathMappingIds();
+
+        if ( settings.getPathMappings() != null )
+        {
+            for ( CGroupsSettingPathMappingItem item : (List<CGroupsSettingPathMappingItem>) settings.getPathMappings() )
+            {
+                response.append( validateGroupsSettingPathMappingItem( response.getContext(), item ) );
+            }
+        }
+
+        return response;
+    }
+
+    public ValidationResponse validateGroupsSettingPathMappingItem( ValidationContext ctx,
+        CGroupsSettingPathMappingItem item )
+    {
+        ValidationResponse response = new ValidationResponse();
+
+        if ( ctx != null )
+        {
+            response.setContext( ctx );
+        }
+
+        Random rnd = new Random();
+
+        if ( StringUtils.isEmpty( item.getId() )
+            || "0".equals( item.getId() )
+            || ( response.getContext().getExistingPathMappingIds() != null && response
+                .getContext().getExistingPathMappingIds().contains( item.getId() ) ) )
+        {
+            String newId = Long.toHexString( System.currentTimeMillis() + rnd.nextInt( 2008 ) );
+
+            item.setId( newId );
+
+            response.addValidationWarning( "Fixed wrong route ID from '" + item.getId() + "' to '" + newId + "'" );
+
+            response.setModified( true );
+        }
+
+        if ( response.getContext().getExistingPathMappingIds() != null )
+        {
+            response.getContext().getExistingPathMappingIds().add( item.getId() );
+        }
+
+        if ( !item.getRouteType().equals( CGroupsSettingPathMappingItem.INCLUSION_RULE_TYPE )
+            && !item.getRouteType().equals( CGroupsSettingPathMappingItem.EXCLUSION_RULE_TYPE )
+            && !item.getRouteType().equals( CGroupsSettingPathMappingItem.BLOCKING_RULE_TYPE ) )
+        {
+            response.addValidationError( "The groupMapping pattern with ID=" + item.getId()
+                + " have invalid routeType='" + item.getRouteType() + "'. Valid route types are '"
+                + CGroupsSettingPathMappingItem.INCLUSION_RULE_TYPE + "', '"
+                + CGroupsSettingPathMappingItem.EXCLUSION_RULE_TYPE + "' and '"
+                + CGroupsSettingPathMappingItem.BLOCKING_RULE_TYPE + "'." );
+        }
+
+        if ( response.getContext().getExistingRepositoryIds() != null
+            && response.getContext().getExistingRepositoryShadowIds() != null )
+        {
+            List<String> existingReposes = response.getContext().getExistingRepositoryIds();
+
+            List<String> existingShadows = response.getContext().getExistingRepositoryShadowIds();
+
+            for ( String repoId : (List<String>) item.getRepositories() )
+            {
+                if ( !existingReposes.contains( repoId ) && !existingShadows.contains( repoId ) )
+                {
+                    response.addValidationError( "The groupMapping pattern with ID=" + item.getId()
+                        + " refers to a nonexistent repository with repoID = " + repoId );
+                }
+            }
+        }
+
+        return response;
+    }
+
+    public ValidationResponse validateRepositoryGroup( ValidationContext ctx, CRepositoryGroup group )
+    {
+        ValidationResponse response = new ValidationResponse();
+
+        if ( ctx != null )
+        {
+            response.setContext( ctx );
+        }
+
+        if ( StringUtils.isEmpty( group.getGroupId() ) )
+        {
+            response.addValidationError( "RepositoryGroup ID's may not be empty!" );
+        }
+
+        if ( StringUtils.isEmpty( group.getName() ) )
+        {
+            group.setName( group.getGroupId() );
+
+            response.addValidationWarning( "RepositoryGroup with ID='" + group.getGroupId()
+                + "' has no name, defaulted to it's ID." );
+
+            response.setModified( true );
+        }
+
+        if ( response.getContext().getExistingRepositoryGroupIds() != null )
+        {
+            if ( response.getContext().getExistingRepositoryGroupIds().contains( group.getGroupId() ) )
+            {
+                response.addValidationError( "The group with GroupID " + group.getGroupId()
+                    + " is defined more than once!" );
+            }
+        }
+
+        if ( response.getContext().getExistingRepositoryIds() != null
+            && response.getContext().getExistingRepositoryShadowIds() != null )
+        {
+            List<String> existingReposes = response.getContext().getExistingRepositoryIds();
+
+            List<String> existingShadows = response.getContext().getExistingRepositoryShadowIds();
+
+            List<String> members = group.getRepositories();
+
+            for ( String repoId : members )
+            {
+                if ( !existingReposes.contains( repoId ) && !existingShadows.contains( repoId ) )
+                {
+                    response.addValidationError( "The group with GroupID " + group.getGroupId()
+                        + " refers to a nonexistent repository with ID = " + repoId );
+                }
+            }
+        }
+
+        return response;
+    }
+
+    public ValidationResponse validateHttpProxySettings( ValidationContext ctx, CHttpProxySettings settings )
+    {
+        ValidationResponse response = new ValidationResponse();
+
+        if ( ctx != null )
+        {
+            response.setContext( ctx );
+        }
+
+        if ( settings.getPort() < 80 )
+        {
+            settings.setPort( 8082 );
+
+            response.addValidationWarning( "The HTTP Proxy port is below 80? Settings defaulted." );
+
+            response.setModified( true );
+        }
+
+        if ( !CHttpProxySettings.PROXY_POLICY_PASS_THRU.equals( settings.getProxyPolicy() )
+            && !CHttpProxySettings.PROXY_POLICY_STRICT.equals( settings.getProxyPolicy() ) )
+        {
+            response.addValidationError( "The HTTP Proxy policy settings is invalid: '" + settings.getProxyPolicy()
+                + "'. Valid policies are '" + CHttpProxySettings.PROXY_POLICY_STRICT + "' and '"
+                + CHttpProxySettings.PROXY_POLICY_PASS_THRU + "'." );
+        }
+
+        return response;
+    }
+
+    public ValidationResponse validateRemoteAuthentication( ValidationContext ctx, CRemoteAuthentication settings )
+    {
+        ValidationResponse response = new ValidationResponse();
+
+        if ( ctx != null )
+        {
+            response.setContext( ctx );
+        }
+
+        return response;
+    }
+
+    public ValidationResponse validateRemoteConnectionSettings( ValidationContext ctx,
+        CRemoteConnectionSettings settings )
+    {
+        ValidationResponse response = new ValidationResponse();
+
+        if ( ctx != null )
+        {
+            response.setContext( ctx );
+        }
+
+        return response;
+    }
+
+    public ValidationResponse validateRemoteHttpProxySettings( ValidationContext ctx, CRemoteHttpProxySettings settings )
+    {
+        ValidationResponse response = new ValidationResponse();
+
+        if ( ctx != null )
+        {
+            response.setContext( ctx );
+        }
+
+        return response;
+    }
+
+    public ValidationResponse validateRepositoryTarget( ValidationContext ctx, CRepositoryTarget settings )
+    {
+        ValidationResponse response = new ValidationResponse();
+
+        if ( ctx != null )
+        {
+            response.setContext( ctx );
+        }
+
+        return response;
+    }
+
+    public ValidationResponse validateRestApiSettings( ValidationContext ctx, CRestApiSettings settings )
+    {
+        ValidationResponse response = new ValidationResponse();
+
+        if ( ctx != null )
+        {
+            response.setContext( ctx );
+        }
+
+        return response;
+    }
+
+    public ValidationResponse validateRouting( ValidationContext ctx, CRouting settings )
+    {
+        ValidationResponse response = new ValidationResponse();
+
+        if ( ctx != null )
+        {
+            response.setContext( ctx );
+        }
+
+        return response;
+    }
+
+    public ValidationResponse validateRemoteNexusInstance( ValidationContext ctx, CRemoteNexusInstance settings )
+    {
+        ValidationResponse response = new ValidationResponse();
+
+        if ( ctx != null )
+        {
+            response.setContext( ctx );
+        }
+
+        return response;
+    }
+
+    public ValidationResponse validateSchedule( ValidationContext ctx, CSchedule settings )
+    {
+        ValidationResponse response = new ValidationResponse();
+
+        if ( ctx != null )
+        {
+            response.setContext( ctx );
+        }
+
+        return response;
+    }
+
+    public ValidationResponse validateScheduledTask( ValidationContext ctx, CScheduledTask settings )
+    {
+        ValidationResponse response = new ValidationResponse();
+
+        if ( ctx != null )
+        {
+            response.setContext( ctx );
+        }
+
+        return response;
+    }
+
+    public ValidationResponse validateTaskConfiguration( ValidationContext ctx, CTaskConfiguration settings )
+    {
+        ValidationResponse response = new ValidationResponse();
+
+        if ( ctx != null )
+        {
+            response.setContext( ctx );
+        }
+
+        return response;
+    }
+
+    // --------------
+    // Inner stuff
 
     protected boolean validateLocalStatus( String ls )
     {

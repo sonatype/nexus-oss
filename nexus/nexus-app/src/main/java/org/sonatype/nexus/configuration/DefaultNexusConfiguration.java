@@ -583,7 +583,7 @@ public class DefaultNexusConfiguration
         throws ConfigurationException,
             IOException
     {
-        ValidationResponse vr = configurationValidator.validateRepository( settings );
+        ValidationResponse vr = configurationValidator.validateRepository( null, settings );
 
         if ( vr.isValid() )
         {
@@ -628,7 +628,7 @@ public class DefaultNexusConfiguration
             ConfigurationException,
             IOException
     {
-        ValidationResponse vr = configurationValidator.validateRepository( settings );
+        ValidationResponse vr = configurationValidator.validateRepository( null, settings );
 
         if ( vr.isValid() )
         {
@@ -780,7 +780,7 @@ public class DefaultNexusConfiguration
         throws ConfigurationException,
             IOException
     {
-        ValidationResponse vr = configurationValidator.validateRepository( settings );
+        ValidationResponse vr = configurationValidator.validateRepository( null, settings );
 
         if ( vr.isValid() )
         {
@@ -824,7 +824,7 @@ public class DefaultNexusConfiguration
             ConfigurationException,
             IOException
     {
-        ValidationResponse vr = configurationValidator.validateRepository( settings );
+        ValidationResponse vr = configurationValidator.validateRepository( null, settings );
 
         if ( vr.isValid() )
         {

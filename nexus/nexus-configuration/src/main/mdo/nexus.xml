@@ -221,6 +221,16 @@
 					</association>
 					<required>false</required>
 				</field>
+				<field>
+					<name>tasks</name>
+					<version>1.0.4+</version>
+					<description>Currently defined tasks</description>
+					<required>false</required>
+					<association>
+						<type>CScheduledTask</type>
+						<multiplicity>*</multiplicity>
+					</association>
+				</field>
 			</fields>
 			<codeSegments>
 				<codeSegment>
@@ -272,9 +282,7 @@
 		<class>
 			<name>CRemoteNexusInstance</name>
 			<version>1.0.2+</version>
-			<description>
-				The known remote Nexus instances.
-			</description>
+			<description>The known remote Nexus instances.</description>
 			<fields>
 				<field>
 					<name>alias</name>
@@ -292,7 +300,7 @@
 				</field>
 			</fields>
 		</class>
-		
+
 		<!-- CONNECTION AND PROXIES -->
 		<class>
 			<name>CRemoteConnectionSettings</name>
@@ -1080,9 +1088,7 @@
 					<version>1.0.0+</version>
 					<type>String</type>
 					<required>true</required>
-					<description>
-						Shadow type.
-					</description>
+					<description>Shadow type.</description>
 					<defaultValue>maven1</defaultValue>
 				</field>
 				<field>
@@ -1390,7 +1396,9 @@
 					<version>1.0.3+</version>
 					<type>String</type>
 					<required>true</required>
-					<description>The base URL against to build absolute URLs in REST responses, RSS feeds, mails, etc.</description>
+					<description>
+						The base URL against to build absolute URLs in REST responses, RSS feeds, mails, etc.
+					</description>
 				</field>
 				<field>
 					<name>accessAllowedFrom</name>
@@ -1453,34 +1461,34 @@
 				</codeSegment>
 			</codeSegments>
 		</class>
-		
+
 		<!-- Repository target -->
 		<class>
-            <name>CRepositoryTarget</name>
-            <version>1.0.4+</version>
-            <description>A repository target.</description>
-            <fields>
-                <field>
-                    <name>id</name>
-                    <type>String</type>
-                    <version>1.0.4+</version>
-                    <required>true</required>
-                    <description>The ID of target.</description>
-                </field>
-                <field>
-                    <name>name</name>
-                    <type>String</type>
-                    <version>1.0.4+</version>
-                    <required>true</required>
-                    <description>The name of the Target.</description>
-                </field>
-                <field>
-                    <name>contentClass</name>
-                    <type>String</type>
-                    <version>1.0.4+</version>
-                    <required>true</required>
-                    <description>The repository contentClass this Target is applicable.</description>
-                </field>
+			<name>CRepositoryTarget</name>
+			<version>1.0.4+</version>
+			<description>A repository target.</description>
+			<fields>
+				<field>
+					<name>id</name>
+					<type>String</type>
+					<version>1.0.4+</version>
+					<required>true</required>
+					<description>The ID of target.</description>
+				</field>
+				<field>
+					<name>name</name>
+					<type>String</type>
+					<version>1.0.4+</version>
+					<required>true</required>
+					<description>The name of the Target.</description>
+				</field>
+				<field>
+					<name>contentClass</name>
+					<type>String</type>
+					<version>1.0.4+</version>
+					<required>true</required>
+					<description>The repository contentClass this Target is applicable.</description>
+				</field>
 				<field>
 					<name>patterns</name>
 					<version>1.0.4+</version>
@@ -1491,203 +1499,205 @@
 						<multiplicity>*</multiplicity>
 					</association>
 				</field>
-            </fields>
-        </class>
-		
+			</fields>
+		</class>
+
 		<!-- Scheduled Tasks -->
-		
+		<!-- WARNING! The CTaskConfiguration class should be used only for migration from b4.x to b5! -->
+		<!-- It is frozen to model version 1.0.3 -->
 		<class>
-            <name>CTaskConfiguration</name>
-            <version>1.0.0+</version>
-            <description>The main configuration of the scheduled tasks</description>
-            <fields>
-                <field>
-                    <name>tasks</name>
-                    <version>1.0.0+</version>
-                    <description>Currently defined tasks</description>
-                    <required>false</required>
-                    <association>
-                        <type>CScheduledTask</type>
-                        <multiplicity>*</multiplicity>
-                    </association>
-                </field>            
-            </fields>
-        </class>         
-        
-        <class>
-            <name>CScheduledTask</name>
-            <description>A scheduled task</description>
-            <fields>
-                <field>
-                    <name>id</name>
-                    <type>String</type>
-                    <version>1.0.0+</version>
-                    <required>true</required>
-                    <description>The id of the task</description>
-                </field>
-                <field>
-                    <name>name</name>
-                    <type>String</type>
-                    <version>1.0.0+</version>
-                    <required>true</required>
-                    <description>The name of the task</description>
-                </field>
-                <field>
-                    <name>enabled</name>
-                    <type>boolean</type>
-                    <version>1.0.0+</version>
-                    <required>true</required>
-                    <description>The flag determining if the task should run</description>
-                </field>
-                <field>
-                    <name>type</name>
-                    <type>String</type>
-                    <version>1.0.0+</version>
-                    <required>true</required>
-                    <description>The type of the task</description>
-                </field>
-                <field>
-                    <name>status</name>
-                    <type>String</type>
-                    <version>1.0.0+</version>
-                    <required>true</required>
-                    <description>The current status of the task</description>
-                </field>
-                <field>
-                    <name>lastRun</name>
-                    <type>Date</type>
-                    <version>1.0.0+</version>
-                    <required>true</required>
-                    <description>The date the task last ran</description>
-                </field>
-                <field>
-                    <name>nextRun</name>
-                    <type>Date</type>
-                    <version>1.0.0+</version>
-                    <required>true</required>
-                    <description>The date the task will run next</description>
-                </field>
-                <field>
-                    <name>schedule</name>
-                    <association>
-                        <type>CSchedule</type>
-                    </association>
-                    <version>1.0.0+</version>
-                    <required>true</required>
-                    <description>The schedule that controls the time this task is run</description>
-                </field>
-                <field>
-                    <name>properties</name>
-                    <version>1.0.0+</version>
-                    <description>Properties to configure the task</description>
-                    <required>false</required>
-                    <association>
-                        <type>CProps</type>
-                        <multiplicity>*</multiplicity>
-                    </association>
-                </field>
-            </fields>
-        </class>
-		
+			<name>CTaskConfiguration</name>
+			<version>1.0.3</version>
+			<description>The main configuration of the scheduled tasks</description>
+			<fields>
+				<field>
+					<name>tasks</name>
+					<version>1.0.3</version>
+					<description>Currently defined tasks</description>
+					<required>false</required>
+					<association>
+						<type>CScheduledTask</type>
+						<multiplicity>*</multiplicity>
+					</association>
+				</field>
+			</fields>
+		</class>
+
 		<class>
-            <name>CSchedule</name>
-            <version>1.0.0+</version>
-            <description>A schedule, which can be used to control a task.</description>
-        </class>
-        
-        <class>
-            <name>CRunNowSchedule</name>
-            <superClass>CSchedule</superClass>
-            <version>1.0.0+</version>
-            <description>A special schedule, that doesn't get stored, just runs once, now, and thats it</description>
-        </class>
-        
-        <class>
-            <name>COnceSchedule</name>
-            <superClass>CSchedule</superClass>
-            <version>1.0.0+</version>
-            <description>A schedule, which will run a task once.</description>
-            <fields>
-                <field>
-                    <name>startDate</name>
-                    <type>Date</type>
-                    <version>1.0.0+</version>
-                    <required>true</required>
-                    <description>The schedule that controls the time this task is run</description>
-                </field>
-            </fields>
-        </class>
-        
-        <class>
-            <name>CDailySchedule</name>
-            <superClass>COnceSchedule</superClass>
-            <version>1.0.0+</version>
-            <description>A schedule, which will run a task daily.</description>
-            <fields>
-                <field>
-                    <name>endDate</name>
-                    <type>Date</type>
-                    <version>1.0.0+</version>
-                    <required>true</required>
-                    <description>The schedule that controls the time this task is run</description>
-                </field>
-            </fields>
-        </class>
-        
-        <class>
-            <name>CWeeklySchedule</name>
-            <superClass>CDailySchedule</superClass>
-            <version>1.0.0+</version>
-            <description>A schedule, which will run a task weekly.</description>
-            <fields>
-                <field>
-                    <name>daysOfWeek</name>
-                    <version>1.0.0+</version>
-                    <description>Days of the week to run</description>
-                    <required>true</required>
-                    <association>
-                        <type>String</type>
-                        <multiplicity>*</multiplicity>
-                    </association>
-                </field>
-            </fields>
-        </class>
-        
-        <class>
-            <name>CMonthlySchedule</name>
-            <superClass>CDailySchedule</superClass>
-            <version>1.0.0+</version>
-            <description>A schedule, which will run a task monthly.</description>
-            <fields>
-                <field>
-                    <name>daysOfMonth</name>
-                    <version>1.0.0+</version>
-                    <description>Days of the month to run</description>
-                    <required>true</required>
-                    <association>
-                        <type>String</type>
-                        <multiplicity>*</multiplicity>
-                    </association>
-                </field>
-            </fields>
-        </class>
-        
-        <class>
-            <name>CAdvancedSchedule</name>
-            <superClass>CSchedule</superClass>
-            <version>1.0.0+</version>
-            <description>A schedule, which will run a task using a cron command.</description>
-            <fields>
-                <field>
-                    <name>cronCommand</name>
-                    <type>String</type>
-                    <version>1.0.0+</version>
-                    <description>cron scheduling configuration command</description>
-                    <required>true</required>
-                </field>
-            </fields>
-        </class>
-        
+			<name>CScheduledTask</name>
+			<description>A scheduled task</description>
+			<version>1.0.3+</version>
+			<fields>
+				<field>
+					<name>id</name>
+					<type>String</type>
+					<version>1.0.3+</version>
+					<required>true</required>
+					<description>The id of the task</description>
+				</field>
+				<field>
+					<name>name</name>
+					<type>String</type>
+					<version>1.0.3+</version>
+					<required>true</required>
+					<description>The name of the task</description>
+				</field>
+				<field>
+					<name>enabled</name>
+					<type>boolean</type>
+					<version>1.0.3+</version>
+					<required>true</required>
+					<description>The flag determining if the task should run</description>
+				</field>
+				<field>
+					<name>type</name>
+					<type>String</type>
+					<version>1.0.3+</version>
+					<required>true</required>
+					<description>The type of the task</description>
+				</field>
+				<field>
+					<name>status</name>
+					<type>String</type>
+					<version>1.0.3+</version>
+					<required>true</required>
+					<description>The current status of the task</description>
+				</field>
+				<field>
+					<name>lastRun</name>
+					<type>Date</type>
+					<version>1.0.3+</version>
+					<required>true</required>
+					<description>The date the task last ran</description>
+				</field>
+				<field>
+					<name>nextRun</name>
+					<type>Date</type>
+					<version>1.0.3+</version>
+					<required>true</required>
+					<description>The date the task will run next</description>
+				</field>
+				<field>
+					<name>schedule</name>
+					<association>
+						<type>CSchedule</type>
+					</association>
+					<version>1.0.3+</version>
+					<required>true</required>
+					<description>The schedule that controls the time this task is run</description>
+				</field>
+				<field>
+					<name>properties</name>
+					<version>1.0.3+</version>
+					<description>Properties to configure the task</description>
+					<required>false</required>
+					<association>
+						<type>CProps</type>
+						<multiplicity>*</multiplicity>
+					</association>
+				</field>
+			</fields>
+		</class>
+
+		<class>
+			<name>CSchedule</name>
+			<version>1.0.3+</version>
+			<description>A schedule, which can be used to control a task.</description>
+		</class>
+
+		<class>
+			<name>CRunNowSchedule</name>
+			<superClass>CSchedule</superClass>
+			<version>1.0.3+</version>
+			<description>A special schedule, that doesn't get stored, just runs once, now, and thats it</description>
+		</class>
+
+		<class>
+			<name>COnceSchedule</name>
+			<superClass>CSchedule</superClass>
+			<version>1.0.3+</version>
+			<description>A schedule, which will run a task once.</description>
+			<fields>
+				<field>
+					<name>startDate</name>
+					<type>Date</type>
+					<version>1.0.3+</version>
+					<required>true</required>
+					<description>The schedule that controls the time this task is run</description>
+				</field>
+			</fields>
+		</class>
+
+		<class>
+			<name>CDailySchedule</name>
+			<superClass>COnceSchedule</superClass>
+			<version>1.0.3+</version>
+			<description>A schedule, which will run a task daily.</description>
+			<fields>
+				<field>
+					<name>endDate</name>
+					<type>Date</type>
+					<version>1.0.3+</version>
+					<required>true</required>
+					<description>The schedule that controls the time this task is run</description>
+				</field>
+			</fields>
+		</class>
+
+		<class>
+			<name>CWeeklySchedule</name>
+			<superClass>CDailySchedule</superClass>
+			<version>1.0.3+</version>
+			<description>A schedule, which will run a task weekly.</description>
+			<fields>
+				<field>
+					<name>daysOfWeek</name>
+					<version>1.0.3+</version>
+					<description>Days of the week to run</description>
+					<required>true</required>
+					<association>
+						<type>String</type>
+						<multiplicity>*</multiplicity>
+					</association>
+				</field>
+			</fields>
+		</class>
+
+		<class>
+			<name>CMonthlySchedule</name>
+			<superClass>CDailySchedule</superClass>
+			<version>1.0.3+</version>
+			<description>A schedule, which will run a task monthly.</description>
+			<fields>
+				<field>
+					<name>daysOfMonth</name>
+					<version>1.0.3+</version>
+					<description>Days of the month to run</description>
+					<required>true</required>
+					<association>
+						<type>String</type>
+						<multiplicity>*</multiplicity>
+					</association>
+				</field>
+			</fields>
+		</class>
+
+		<class>
+			<name>CAdvancedSchedule</name>
+			<superClass>CSchedule</superClass>
+			<version>1.0.3+</version>
+			<description>A schedule, which will run a task using a cron command.</description>
+			<fields>
+				<field>
+					<name>cronCommand</name>
+					<type>String</type>
+					<version>1.0.3+</version>
+					<description>cron scheduling configuration command</description>
+					<required>true</required>
+				</field>
+			</fields>
+		</class>
+
 		<!-- UTIL -->
 		<class>
 			<name>CProps</name>
