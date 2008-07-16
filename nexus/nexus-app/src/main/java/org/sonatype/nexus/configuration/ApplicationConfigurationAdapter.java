@@ -21,6 +21,7 @@
 package org.sonatype.nexus.configuration;
 
 import java.io.File;
+import java.io.IOException;
 
 import org.sonatype.nexus.configuration.model.Configuration;
 
@@ -57,7 +58,7 @@ public class ApplicationConfigurationAdapter
     {
         return nexusConfiguration.getTemporaryDirectory();
     }
-    
+
     public File getWastebasketDirectory()
     {
         return nexusConfiguration.getWastebasketDirectory();
@@ -66,6 +67,12 @@ public class ApplicationConfigurationAdapter
     public File getConfigurationDirectory()
     {
         return nexusConfiguration.getConfigurationDirectory();
+    }
+
+    public void saveConfiguration()
+        throws IOException
+    {
+        nexusConfiguration.saveConfiguration();
     }
 
     public void addConfigurationChangeListener( ConfigurationChangeListener listener )

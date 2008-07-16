@@ -21,6 +21,7 @@
 package org.sonatype.nexus.configuration;
 
 import java.io.File;
+import java.io.IOException;
 
 import org.sonatype.nexus.configuration.model.Configuration;
 
@@ -73,6 +74,14 @@ public interface ApplicationConfiguration
      * @return
      */
     Configuration getConfiguration();
+
+    /**
+     * Saves the configuration.
+     * 
+     * @throws IOException
+     */
+    void saveConfiguration()
+        throws IOException;
 
     /**
      * Registers a configuration change listener.

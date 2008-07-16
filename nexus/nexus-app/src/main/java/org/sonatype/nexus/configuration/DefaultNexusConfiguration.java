@@ -208,7 +208,7 @@ public class DefaultNexusConfiguration
         notifyConfigurationChangeListeners();
     }
 
-    protected void saveConfiguration()
+    public void saveConfiguration()
         throws IOException
     {
         configurationSource.storeConfiguration();

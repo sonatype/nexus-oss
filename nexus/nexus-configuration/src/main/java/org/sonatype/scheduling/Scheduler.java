@@ -32,7 +32,7 @@ public interface Scheduler
     extends NexusService
 {
     String ROLE = Scheduler.class.getName();
-    
+
     /**
      * Store a task for future manual run
      * 
@@ -73,7 +73,7 @@ public interface Scheduler
         boolean store )
         throws RejectedExecutionException,
             NullPointerException;
-    
+
     /**
      * Store a task for future manual run
      * 

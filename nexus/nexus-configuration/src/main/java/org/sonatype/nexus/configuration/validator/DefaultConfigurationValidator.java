@@ -46,7 +46,6 @@ import org.sonatype.nexus.configuration.model.CRouting;
 import org.sonatype.nexus.configuration.model.CSchedule;
 import org.sonatype.nexus.configuration.model.CScheduledTask;
 import org.sonatype.nexus.configuration.model.CSecurity;
-import org.sonatype.nexus.configuration.model.CTaskConfiguration;
 import org.sonatype.nexus.configuration.model.Configuration;
 
 /**
@@ -749,18 +748,6 @@ public class DefaultConfigurationValidator
         return response;
     }
 
-    public ValidationResponse validateSchedule( ValidationContext ctx, CSchedule settings )
-    {
-        ValidationResponse response = new ValidationResponse();
-
-        if ( ctx != null )
-        {
-            response.setContext( ctx );
-        }
-
-        return response;
-    }
-
     public ValidationResponse validateScheduledTask( ValidationContext ctx, CScheduledTask settings )
     {
         ValidationResponse response = new ValidationResponse();
@@ -770,10 +757,12 @@ public class DefaultConfigurationValidator
             response.setContext( ctx );
         }
 
+        response.append( validateSchedule( response.getContext(), settings.getSchedule() ) );
+
         return response;
     }
 
-    public ValidationResponse validateTaskConfiguration( ValidationContext ctx, CTaskConfiguration settings )
+    public ValidationResponse validateSchedule( ValidationContext ctx, CSchedule settings )
     {
         ValidationResponse response = new ValidationResponse();
 

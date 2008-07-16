@@ -36,7 +36,6 @@ import org.sonatype.nexus.configuration.model.CRouting;
 import org.sonatype.nexus.configuration.model.CSchedule;
 import org.sonatype.nexus.configuration.model.CScheduledTask;
 import org.sonatype.nexus.configuration.model.CSecurity;
-import org.sonatype.nexus.configuration.model.CTaskConfiguration;
 
 /**
  * The validator used to validate current configuration in boot-up sequence.
@@ -167,14 +166,6 @@ public interface ConfigurationValidator
      * @return
      */
     ValidationResponse validateRepositoryTarget( ValidationContext ctx, CRepositoryTarget settings );
-
-    /**
-     * Validates task configuration.
-     * 
-     * @param settings
-     * @return
-     */
-    ValidationResponse validateTaskConfiguration( ValidationContext ctx, CTaskConfiguration settings );
 
     /**
      * Validates scheduled task.

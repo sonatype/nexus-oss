@@ -21,6 +21,7 @@
 package org.sonatype.nexus.configuration;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Vector;
 
 import org.sonatype.nexus.configuration.model.CGroupsSetting;
@@ -113,6 +114,12 @@ public class SimpleApplicationConfiguration
             result.mkdirs();
         }
         return result;
+    }
+
+    public void saveConfiguration()
+        throws IOException
+    {
+        // NOTHING TO DO HERE
     }
 
 }
