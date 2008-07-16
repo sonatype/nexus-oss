@@ -28,11 +28,7 @@ Sonatype.repoServer.RoleEditPanel = function(config){
   Ext.apply(this, config, defaultConfig);
   
   var ht = Sonatype.repoServer.resources.help.roles;
-    
-  //List of privileges
-  //TODO: This will be a list retrieved from server via REST, currently no privilege api, so hardcoding
-  this.privilegeList = [{id : 'privid', name : 'privname'},{id : 'privid2', name : 'privname2'}];
-  
+      
   this.actions = {
     refresh : new Ext.Action({
       text: 'Refresh',
@@ -69,13 +65,26 @@ Sonatype.repoServer.RoleEditPanel = function(config){
     {name:'roles'}
   ]);
   
+  this.privRecordConstructor = Ext.data.Record.create([
+    {name:'id'},
+    {name:'name', sortType:Ext.data.SortTypes.asUCString}
+  ]);
+  
   
   //Reader and datastore that queries the server for the list of currently defined roles
   this.rolesReader = new Ext.data.JsonReader({root: 'data', id: 'resourceURI'}, this.roleRecordConstructor );
   this.rolesDataStore = new Ext.data.Store({
     url: Sonatype.config.repos.urls.roles,
     reader: this.rolesReader,
-    sortInfo: {field: 'id', direction: 'ASC'},
+    sortInfo: {field: 'name', direction: 'ASC'},
+    autoLoad: true
+  });
+  
+  this.privReader = new Ext.data.JsonReader({root: 'data', id: 'resourceURI'}, this.privRecordConstructor );
+  this.privDataStore = new Ext.data.Store({
+    url: Sonatype.config.repos.urls.privileges,
+    reader: this.privReader,
+    sortInfo: {field: 'name', direction: 'ASC'},
     autoLoad: true
   });
   
@@ -320,6 +329,8 @@ Ext.extend(Sonatype.repoServer.RoleEditPanel, Ext.Panel, {
   reloadAll : function(){
     this.rolesDataStore.removeAll();
     this.rolesDataStore.reload();
+    this.privDataStore.removeAll();
+    this.privDataStore.reload();
     this.formCards.items.each(function(item, i, len){
       if(i>0){this.remove(item, true);}
     }, this.formCards);
@@ -749,7 +760,7 @@ Ext.extend(Sonatype.repoServer.RoleEditPanel, Ext.Panel, {
         new Ext.tree.TreeNode({
           id: priv.id,
           text: priv.name,
-          payload: priv, //sonatype added attribute
+          payload: priv.id, //sonatype added attribute
           allowChildren: false,
           draggable: true,
           leaf: true,
@@ -758,22 +769,20 @@ Ext.extend(Sonatype.repoServer.RoleEditPanel, Ext.Panel, {
       );
     }
     
-    for(var i=0; i<this.privilegeList.length; i++){
-      priv = this.privilegeList[i];
-      if(typeof(selectedTree.getNodeById(priv.id)) == 'undefined'){
+    this.privDataStore.each(function(item, i, len){
+      if(typeof(selectedTree.getNodeById(item.data.id)) == 'undefined'){
         allTree.root.appendChild(
           new Ext.tree.TreeNode({
-            id: priv.id,
-            text: priv.name,
-            payload: priv, //sonatype added attribute
+            id: item.data.id,
+            text: item.data.name,
+            payload: item.data.id, //sonatype added attribute
             allowChildren: false,
             draggable: true,
-            leaf: true,
-            nodeType: 'priv'
+            leaf: true
           })
         );
       }
-    }
+    }, this);
     
     return arr; //return arr, even if empty to comply with sonatypeLoad data modifier requirement
   },
@@ -802,7 +811,7 @@ Ext.extend(Sonatype.repoServer.RoleEditPanel, Ext.Panel, {
 
     for(var i = 0; i < nodes.length; i++){
       if (nodes[i].nodeType == 'priv'){
-        outputArr[i] = nodes[i].attributes.payload;
+        outputArr[i] = {id : nodes[i].attributes.payload};
         Ext.apply(outputArr[i], {'@class':'org.sonatype.nexus.rest.model.RoleContainedPrivilegeResource'});
       }
     }
