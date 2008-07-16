@@ -21,17 +21,22 @@
 package org.sonatype.nexus.configuration.upgrade;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+import org.sonatype.nexus.configuration.model.CAdvancedSchedule;
 import org.sonatype.nexus.configuration.model.CAuthSource;
 import org.sonatype.nexus.configuration.model.CAuthzSource;
+import org.sonatype.nexus.configuration.model.CDailySchedule;
 import org.sonatype.nexus.configuration.model.CGroupsSetting;
 import org.sonatype.nexus.configuration.model.CHttpProxySettings;
 import org.sonatype.nexus.configuration.model.CLocalStorage;
+import org.sonatype.nexus.configuration.model.CMonthlySchedule;
+import org.sonatype.nexus.configuration.model.COnceSchedule;
 import org.sonatype.nexus.configuration.model.CProps;
 import org.sonatype.nexus.configuration.model.CRemoteAuthentication;
 import org.sonatype.nexus.configuration.model.CRemoteConnectionSettings;
@@ -43,10 +48,18 @@ import org.sonatype.nexus.configuration.model.CRepositoryGrouping;
 import org.sonatype.nexus.configuration.model.CRepositoryShadow;
 import org.sonatype.nexus.configuration.model.CRestApiSettings;
 import org.sonatype.nexus.configuration.model.CRouting;
+import org.sonatype.nexus.configuration.model.CRunNowSchedule;
+import org.sonatype.nexus.configuration.model.CSchedule;
+import org.sonatype.nexus.configuration.model.CScheduledTask;
 import org.sonatype.nexus.configuration.model.CSecurity;
+import org.sonatype.nexus.configuration.model.CTaskConfiguration;
+import org.sonatype.nexus.configuration.model.CWeeklySchedule;
 import org.sonatype.nexus.configuration.model.v1_0_3.CGroupsSettingPathMappingItem;
 import org.sonatype.nexus.configuration.model.v1_0_3.Configuration;
 import org.sonatype.nexus.configuration.model.v1_0_3.io.xpp3.NexusConfigurationXpp3Reader;
+
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.io.xml.DomDriver;
 
 /**
  * Upgrades configuration model from version 1.0.3 to 1.0.4.
@@ -57,12 +70,15 @@ import org.sonatype.nexus.configuration.model.v1_0_3.io.xpp3.NexusConfigurationX
 public class Upgrade103to104
     implements Upgrader
 {
+    private CTaskConfiguration tasksConfig;
 
     public Object loadConfiguration( File file )
         throws IOException,
             ConfigurationIsCorruptedException
     {
         FileReader fr = null;
+
+        Configuration conf = null;
 
         try
         {
@@ -71,7 +87,7 @@ public class Upgrade103to104
 
             NexusConfigurationXpp3Reader reader = new NexusConfigurationXpp3Reader();
 
-            return reader.read( fr );
+            conf = reader.read( fr );
         }
         catch ( XmlPullParserException e )
         {
@@ -84,6 +100,47 @@ public class Upgrade103to104
                 fr.close();
             }
         }
+
+        // a special sideeeffect of upgrading from 1.0.3 to 1.0.4: we are
+        // reading the tasks.xml that cropped out in b4 (model 1.0.3), but dissapears in b5 (model 1.0.4)
+
+        File tasksFile = new File( file.getParentFile(), "tasks.xml" );
+
+        if ( tasksFile.exists() )
+        {
+            // a snippet from old TaskConnfigManager
+            XStream xstream = new XStream( new DomDriver() );
+
+            tasksConfig = new CTaskConfiguration();
+
+            FileInputStream fis = null;
+            try
+            {
+                fis = new FileInputStream( tasksFile );
+
+                xstream.fromXML( fis, tasksConfig );
+            }
+            finally
+            {
+                if ( fis != null )
+                {
+                    try
+                    {
+                        fis.close();
+                    }
+                    catch ( IOException e )
+                    {
+                    }
+                }
+            }
+        }
+        else
+        {
+            tasksConfig = null;
+        }
+
+        // and return the config read above tasks
+        return conf;
     }
 
     public void upgrade( UpgradeMessage message )
@@ -243,6 +300,14 @@ public class Upgrade103to104
             }
             repositoryGrouping.setRepositoryGroups( repositoryGroups );
             newc.setRepositoryGrouping( repositoryGrouping );
+        }
+
+        if ( tasksConfig != null && tasksConfig.getTasks().size() > 0 )
+        {
+            // we were using XStream, and it was tasks.xml was persisted.
+            // the model structure wrt tasks did not change between 1.0.3 and 1.0.4,
+            // so it is possible to simply "push" all xstream loaded stuff into new configuration.
+            newc.getTasks().addAll( tasksConfig.getTasks() );
         }
 
         message.setModelVersion( org.sonatype.nexus.configuration.model.Configuration.MODEL_VERSION );

@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?><nexusConfiguration>
+  <version>1.0.4</version>
+  <workingDirectory>${runtime}/work/nexus</workingDirectory>
+  <applicationLogDirectory>${runtime}/apps/nexus/logs</applicationLogDirectory>
+  <security>
+    <enabled>true</enabled>
+    <anonymousAccessEnabled>true</anonymousAccessEnabled>
+    <authenticationSource>
+      <type>simple</type>
+    </authenticationSource>
+  </security>
+  <globalConnectionSettings />
+  <restApi />
+  <httpProxy />
+  <routing>
+    <groups />
+  </routing>
+  <repositories>
+    <repository>
+      <id>central</id>
+      <name>Maven Central</name>
+      <artifactMaxAge>-1</artifactMaxAge>
+      <remoteStorage>
+        <url>http://repo1.maven.org/maven2/</url>
+      </remoteStorage>
+    </repository>
+    <repository>
+      <id>apache-snapshots</id>
+      <name>Apache Snapshots</name>
+      <repositoryPolicy>snapshot</repositoryPolicy>
+      <remoteStorage>
+        <url>http://people.apache.org/repo/m2-snapshot-repository</url>
+      </remoteStorage>
+    </repository>
+    <repository>
+      <id>codehaus-snapshots</id>
+      <name>Codehaus Snapshots</name>
+      <repositoryPolicy>snapshot</repositoryPolicy>
+      <remoteStorage>
+        <url>http://snapshots.repository.codehaus.org/</url>
+      </remoteStorage>
+    </repository>
+    <repository>
+      <id>releases</id>
+      <name>Releases</name>
+      <allowWrite>true</allowWrite>
+      <artifactMaxAge>-1</artifactMaxAge>
+    </repository>
+    <repository>
+      <id>snapshots</id>
+      <name>Snapshots</name>
+      <allowWrite>true</allowWrite>
+      <repositoryPolicy>snapshot</repositoryPolicy>
+    </repository>
+    <repository>
+      <id>thirdparty</id>
+      <name>3rd party</name>
+      <allowWrite>true</allowWrite>
+      <artifactMaxAge>-1</artifactMaxAge>
+    </repository>
+  </repositories>
+  <repositoryShadows>
+    <repositoryShadow>
+      <id>central-m1</id>
+      <name>Central M1 shadow</name>
+      <shadowOf>central</shadowOf>
+    </repositoryShadow>
+  </repositoryShadows>
+  <repositoryGrouping>
+    <pathMappings>
+      <pathMapping>
+        <id>inhouse-stuff</id>
+        <routePattern>.*/(com|org)/somecompany/.*</routePattern>
+        <routeType>inclusive</routeType>
+        <repositories>
+          <repository>snapshots</repository>
+          <repository>releases</repository>
+        </repositories>
+      </pathMapping>
+      <pathMapping>
+        <id>apache-stuff</id>
+        <routePattern>.*/org/some-oss/.*</routePattern>
+        <routeType>exclusive</routeType>
+        <repositories>
+          <repository>releases</repository>
+          <repository>snapshots</repository>
+        </repositories>
+      </pathMapping>
+    </pathMappings>
+    <repositoryGroups>
+      <repositoryGroup>
+        <groupId>public</groupId>
+        <repositories>
+          <repository>releases</repository>
+          <repository>snapshots</repository>
+          <repository>thirdparty</repository>
+          <repository>central</repository>
+        </repositories>
+      </repositoryGroup>
+      <repositoryGroup>
+        <groupId>public-snapshots</groupId>
+        <repositories>
+          <repository>apache-snapshots</repository>
+          <repository>codehaus-snapshots</repository>
+        </repositories>
+      </repositoryGroup>
+    </repositoryGroups>
+  </repositoryGrouping>
+  <tasks>
+    <task>
+      <id>0</id>
+      <name>Snapshot Cleanup</name>
+      <enabled>true</enabled>
+      <type>org.sonatype.nexus.maven.tasks.SnapshotRemoverTask</type>
+      <status>RUNNING</status>
+      <lastRun>1216164600141</lastRun>
+      <nextRun>1216251000000</nextRun>
+      <schedule />
+      <properties>
+        <property>
+          <key>removeOlderThanDays</key>
+          <value>7</value>
+        </property>
+        <property>
+          <key>minSnapshotsToKeep</key>
+          <value>3</value>
+        </property>
+        <property>
+          <key>removeIfReleaseExists</key>
+          <value>true</value>
+        </property>
+        <property>
+          <key>repositoryOrGroupId</key>
+          <value>all_repo</value>
+        </property>
+      </properties>
+    </task>
+    <task>
+      <id>1</id>
+      <name>Refresh Plexus-Releases Index for Promoted Releases</name>
+      <enabled>true</enabled>
+      <type>org.sonatype.nexus.tasks.ReindexTask</type>
+      <status>RUNNING</status>
+      <lastRun>1216242900941</lastRun>
+      <nextRun>1216257300000</nextRun>
+      <schedule />
+      <properties>
+        <property>
+          <key>repositoryOrGroupId</key>
+          <value>repo_plexus.releases</value>
+        </property>
+      </properties>
+    </task>
+  </tasks>
+</nexusConfiguration>

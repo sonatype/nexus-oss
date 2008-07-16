@@ -1504,15 +1504,15 @@
 
 		<!-- Scheduled Tasks -->
 		<!-- WARNING! The CTaskConfiguration class should be used only for migration from b4.x to b5! -->
-		<!-- It is frozen to model version 1.0.3 -->
+		<!-- It is frozen to model version 1.0.4 -->
 		<class>
 			<name>CTaskConfiguration</name>
-			<version>1.0.3</version>
+			<version>1.0.4</version>
 			<description>The main configuration of the scheduled tasks</description>
 			<fields>
 				<field>
 					<name>tasks</name>
-					<version>1.0.3</version>
+					<version>1.0.4</version>
 					<description>Currently defined tasks</description>
 					<required>false</required>
 					<association>

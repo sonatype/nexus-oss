@@ -24,6 +24,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.StringWriter;
 
+import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.sonatype.nexus.configuration.AbstractNexusTestCase;
 import org.sonatype.nexus.configuration.model.Configuration;
@@ -40,6 +41,8 @@ public class DefaultConfigurationUpgraderTest
     {
         super.setUp();
 
+        FileUtils.cleanDirectory( new File( getNexusConfiguration() ).getParentFile() );
+
         this.configurationUpgrader = (ConfigurationUpgrader) lookup( ConfigurationUpgrader.ROLE );
     }
 
@@ -51,9 +54,9 @@ public class DefaultConfigurationUpgraderTest
         StringWriter sw = new StringWriter();
 
         w.write( sw, configuration );
-        
+
         // System.out.println(sw.toString());
-        
+
         String shouldBe = IOUtil.toString( getClass().getResourceAsStream( path + ".result" ) );
 
         assertEquals( shouldBe, sw.toString() );
@@ -167,5 +170,55 @@ public class DefaultConfigurationUpgraderTest
         assertEquals( 4, configuration.getRepositoryGrouping().getPathMappings().size() );
 
         resultIsFine( "/org/sonatype/nexus/configuration/upgrade/nexus-101.xml", configuration );
+    }
+
+    public void testFrom103_1()
+        throws Exception
+    {
+        IOUtil.copy(
+            getClass().getResourceAsStream( "/org/sonatype/nexus/configuration/upgrade/103-1/nexus-103.xml" ),
+            new FileOutputStream( getNexusConfiguration() ) );
+
+        // trick: copying by nexus.xml the tasks.xml too
+        IOUtil.copy(
+            getClass().getResourceAsStream( "/org/sonatype/nexus/configuration/upgrade/103-1/tasks.xml" ),
+            new FileOutputStream( new File( new File( getNexusConfiguration() ).getParentFile(), "tasks.xml" ) ) );
+
+        Configuration configuration = configurationUpgrader.loadOldConfiguration( new File( getNexusConfiguration() ) );
+
+        assertEquals( Configuration.MODEL_VERSION, configuration.getVersion() );
+
+        assertEquals( 6, configuration.getRepositories().size() );
+
+        assertEquals( 1, configuration.getRepositoryShadows().size() );
+
+        assertEquals( 2, configuration.getRepositoryGrouping().getRepositoryGroups().size() );
+
+        assertEquals( 2, configuration.getRepositoryGrouping().getPathMappings().size() );
+
+        resultIsFine( "/org/sonatype/nexus/configuration/upgrade/103-1/nexus-103.xml", configuration );
+    }
+
+    public void testFrom103_2()
+        throws Exception
+    {
+        // same as above, but we have no tasks.xml
+        IOUtil.copy(
+            getClass().getResourceAsStream( "/org/sonatype/nexus/configuration/upgrade/103-2/nexus-103.xml" ),
+            new FileOutputStream( getNexusConfiguration() ) );
+
+        Configuration configuration = configurationUpgrader.loadOldConfiguration( new File( getNexusConfiguration() ) );
+
+        assertEquals( Configuration.MODEL_VERSION, configuration.getVersion() );
+
+        assertEquals( 6, configuration.getRepositories().size() );
+
+        assertEquals( 1, configuration.getRepositoryShadows().size() );
+
+        assertEquals( 2, configuration.getRepositoryGrouping().getRepositoryGroups().size() );
+
+        assertEquals( 2, configuration.getRepositoryGrouping().getPathMappings().size() );
+
+        resultIsFine( "/org/sonatype/nexus/configuration/upgrade/103-2/nexus-103.xml", configuration );
     }
 }
