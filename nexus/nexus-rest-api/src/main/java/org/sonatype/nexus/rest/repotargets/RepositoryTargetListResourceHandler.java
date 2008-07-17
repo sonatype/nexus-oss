@@ -20,11 +20,17 @@
  */
 package org.sonatype.nexus.rest.repotargets;
 
+import java.io.IOException;
+import java.util.Collection;
+import java.util.logging.Level;
+
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
+import org.restlet.data.Status;
 import org.restlet.resource.Representation;
 import org.restlet.resource.Variant;
+import org.sonatype.nexus.configuration.model.CRepositoryTarget;
 import org.sonatype.nexus.rest.model.RepositoryTargetListResource;
 import org.sonatype.nexus.rest.model.RepositoryTargetListResourceResponse;
 import org.sonatype.nexus.rest.model.RepositoryTargetResource;
@@ -61,31 +67,24 @@ public class RepositoryTargetListResourceHandler
     {
         RepositoryTargetListResourceResponse response = new RepositoryTargetListResourceResponse();
 
+        Collection<CRepositoryTarget> targets = getNexus().listRepositoryTargets();
+
         RepositoryTargetListResource res = null;
 
-        res = new RepositoryTargetListResource();
+        for ( CRepositoryTarget target : targets )
+        {
+            res = new RepositoryTargetListResource();
 
-        res.setId( "a" );
+            res.setId( target.getId() );
 
-        res.setName( "AAA" );
-        
-        res.setContentType( "maven2" );
+            res.setName( target.getName() );
 
-        res.setResourceURI( calculateSubReference( "a" ).toString() );
+            res.setContentClass( target.getContentClass() );
 
-        response.addData( res );
+            res.setResourceURI( calculateSubReference( target.getId() ).toString() );
 
-        res = new RepositoryTargetListResource();
-
-        res.setId( "b" );
-
-        res.setName( "BBB" );
-
-        res.setContentType( "eclipse" );
-
-        res.setResourceURI( calculateSubReference( "b" ).toString() );
-
-        response.addData( res );
+            response.addData( res );
+        }
 
         return serialize( variant, response );
     }
@@ -110,25 +109,31 @@ public class RepositoryTargetListResourceHandler
         {
             RepositoryTargetResource resource = request.getData();
 
-            if ( validate( resource, representation ) )
+            if ( validate( true, resource, representation ) )
             {
-                // TODO: actually store the data here
+                try
+                {
+                    CRepositoryTarget target = getRestToNexusResource( resource );
 
-                RepositoryTargetResourceResponse response = new RepositoryTargetResourceResponse();
+                    // create
+                    getNexus().createRepositoryTarget( target );
 
-                response.setData( request.getData() );
+                    // response
+                    RepositoryTargetResourceResponse response = new RepositoryTargetResourceResponse();
 
-                response.getData().setId( "newroleid" );
+                    response.setData( request.getData() );
 
-                getResponse().setEntity( serialize( representation, response ) );
+                    getResponse().setEntity( serialize( representation, response ) );
+                }
+                catch ( IOException e )
+                {
+                    getLogger().log( Level.WARNING, "Got IOException during creation of repository target!", e );
+
+                    getResponse().setStatus(
+                        Status.SERVER_ERROR_INTERNAL,
+                        "Got IOException during creation of repository target!" );
+                }
             }
         }
-    }
-
-    // ==
-
-    protected boolean validate( RepositoryTargetResource resource, Representation representation )
-    {
-        return true;
     }
 }

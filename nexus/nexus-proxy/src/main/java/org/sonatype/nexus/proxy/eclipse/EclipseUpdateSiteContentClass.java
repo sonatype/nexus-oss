@@ -22,6 +22,12 @@ package org.sonatype.nexus.proxy.eclipse;
 
 import org.sonatype.nexus.proxy.registry.AbstractIdContentClass;
 
+/**
+ * The Eclipse Update Site content class.
+ * 
+ * @author cstamas
+ * @plexus.component role-hint="eclipse-update-site"
+ */
 public class EclipseUpdateSiteContentClass
     extends AbstractIdContentClass
 {

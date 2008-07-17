@@ -69,9 +69,17 @@ public class ContentClassesListResourceHandler
         {
             RepositoryContentClassListResource resource = new RepositoryContentClassListResource();
 
-            resource.setContentType( contentClass.getId() );
+            resource.setContentClass( contentClass.getId() );
 
-            resource.setName( contentClass.getId() );
+            // trickery, let's get the Class name for ContentClass name
+            String name = contentClass.getClass().getName();
+
+            if ( name.contains( "." ) )
+            {
+                name = name.substring( name.lastIndexOf( "." ) + 1, name.length() );
+            }
+
+            resource.setName( name );
 
             response.addData( resource );
         }

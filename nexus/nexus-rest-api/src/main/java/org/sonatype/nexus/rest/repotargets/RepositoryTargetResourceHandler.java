@@ -20,11 +20,16 @@
  */
 package org.sonatype.nexus.rest.repotargets;
 
+import java.io.IOException;
+import java.util.logging.Level;
+
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
+import org.restlet.data.Status;
 import org.restlet.resource.Representation;
 import org.restlet.resource.Variant;
+import org.sonatype.nexus.configuration.model.CRepositoryTarget;
 import org.sonatype.nexus.rest.model.RepositoryTargetResource;
 import org.sonatype.nexus.rest.model.RepositoryTargetResourceResponse;
 
@@ -67,11 +72,22 @@ public class RepositoryTargetResourceHandler
     {
         RepositoryTargetResourceResponse response = new RepositoryTargetResourceResponse();
 
-        RepositoryTargetResource resource = getNexusToRestResource();
+        CRepositoryTarget target = getNexus().readRepositoryTarget( getRepoTargetId() );
 
-        response.setData( resource );
+        if ( target != null )
+        {
+            RepositoryTargetResource resource = getNexusToRestResource( target );
 
-        return serialize( variant, response );
+            response.setData( resource );
+
+            return serialize( variant, response );
+        }
+        else
+        {
+            getResponse().setStatus( Status.CLIENT_ERROR_NOT_FOUND, "No such target!" );
+
+            return null;
+        }
     }
 
     /**
@@ -97,16 +113,41 @@ public class RepositoryTargetResourceHandler
         {
             RepositoryTargetResource resource = request.getData();
 
-            if ( validate( resource, representation ) )
+            CRepositoryTarget target = getNexus().readRepositoryTarget( getRepoTargetId() );
+
+            if ( target != null )
             {
-                // TODO: actually store the data here
+                if ( validate( false, resource, representation ) )
+                {
+                    try
+                    {
+                        target = getRestToNexusResource( resource );
 
-                RepositoryTargetResourceResponse response = new RepositoryTargetResourceResponse();
+                        // update
+                        getNexus().updateRepositoryTarget( target );
 
-                response.setData( request.getData() );
+                        // response
+                        RepositoryTargetResourceResponse response = new RepositoryTargetResourceResponse();
 
-                getResponse().setEntity( serialize( representation, response ) );
+                        response.setData( request.getData() );
+
+                        getResponse().setEntity( serialize( representation, response ) );
+                    }
+                    catch ( IOException e )
+                    {
+                        getLogger().log( Level.WARNING, "Got IOException during creation of repository target!", e );
+
+                        getResponse().setStatus(
+                            Status.SERVER_ERROR_INTERNAL,
+                            "Got IOException during creation of repository target!" );
+                    }
+                }
             }
+            else
+            {
+                getResponse().setStatus( Status.CLIENT_ERROR_NOT_FOUND, "No such target!" );
+            }
+
         }
     }
 
@@ -123,33 +164,27 @@ public class RepositoryTargetResourceHandler
      */
     public void delete()
     {
-        // TODO: Delete the target
-    }
+        CRepositoryTarget target = getNexus().readRepositoryTarget( getRepoTargetId() );
 
-    // ==
+        if ( target != null )
+        {
+            try
+            {
+                getNexus().deleteRepositoryTarget( getRepoTargetId() );
+            }
+            catch ( IOException e )
+            {
+                getLogger().log( Level.WARNING, "Got IOException during removal of repository target!", e );
 
-    protected boolean validate( RepositoryTargetResource resource, Representation representation )
-    {
-        return true;
-    }
-
-    protected RepositoryTargetResource getNexusToRestResource()
-    {
-        RepositoryTargetResource resource = new RepositoryTargetResource();
-
-        resource.setId( getRepoTargetId() );
-
-        resource.setName( getRepoTargetId() );
-
-        resource.setResourceURI( getRequest().getResourceRef().getPath() );
-        
-        resource.setContentType( "maven2" );
-        
-        resource.addPattern( "pathA" );
-        
-        resource.addPattern( "pathB" );
-
-        return resource;
+                getResponse().setStatus(
+                    Status.SERVER_ERROR_INTERNAL,
+                    "Got IOException during removal of repository target!" );
+            }
+        }
+        else
+        {
+            getResponse().setStatus( Status.CLIENT_ERROR_NOT_FOUND, "No such target!" );
+        }
     }
 
 }

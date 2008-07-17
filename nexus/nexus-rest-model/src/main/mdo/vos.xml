@@ -2639,7 +2639,7 @@
 					<required>true</required>
 				</field>
 				<field>
-					<name>contentType</name>
+					<name>contentClass</name>
 					<version>1.0.0+</version>
 					<type>String</type>
 					<required>true</required>
@@ -2686,7 +2686,7 @@
 					<required>true</required>
 				</field>
 				<field>
-					<name>contentType</name>
+					<name>contentClass</name>
 					<version>1.0.0+</version>
 					<type>String</type>
 					<required>true</required>
@@ -2726,7 +2726,7 @@
 			<version>1.0.0+</version>
 			<fields>
 				<field>
-					<name>contentType</name>
+					<name>contentClass</name>
 					<version>1.0.0+</version>
 					<type>String</type>
 					<required>true</required>

@@ -20,10 +20,15 @@
  */
 package org.sonatype.nexus.rest.repotargets;
 
+import java.util.List;
+
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
+import org.restlet.resource.Representation;
+import org.sonatype.nexus.configuration.model.CRepositoryTarget;
 import org.sonatype.nexus.rest.AbstractNexusResourceHandler;
+import org.sonatype.nexus.rest.model.RepositoryTargetResource;
 
 public class AbstractRepositoryTargetResourceHandler
     extends AbstractNexusResourceHandler
@@ -40,6 +45,66 @@ public class AbstractRepositoryTargetResourceHandler
     public AbstractRepositoryTargetResourceHandler( Context context, Request request, Response response )
     {
         super( context, request, response );
+    }
+
+    protected RepositoryTargetResource getNexusToRestResource( CRepositoryTarget target )
+    {
+        RepositoryTargetResource resource = new RepositoryTargetResource();
+
+        resource.setId( target.getId() );
+
+        resource.setName( target.getName() );
+
+        resource.setResourceURI( getRequest().getResourceRef().getPath() );
+
+        resource.setContentClass( target.getContentClass() );
+
+        List<String> patterns = target.getPatterns();
+
+        for ( String pattern : patterns )
+        {
+            resource.addPattern( pattern );
+        }
+
+        return resource;
+    }
+
+    protected CRepositoryTarget getRestToNexusResource( RepositoryTargetResource resource )
+    {
+        CRepositoryTarget target = new CRepositoryTarget();
+
+        target.setId( resource.getId() );
+
+        target.setName( resource.getName() );
+
+        target.setContentClass( resource.getContentClass() );
+
+        List<String> patterns = resource.getPatterns();
+
+        for ( String pattern : patterns )
+        {
+            target.addPattern( pattern );
+        }
+
+        return target;
+    }
+
+    protected boolean validate( boolean isNew, RepositoryTargetResource resource, Representation representation )
+    {
+        if ( isNew )
+        {
+            if ( resource.getId() == null )
+            {
+                resource.setId( Long.toHexString( System.currentTimeMillis() ) );
+            }
+        }
+
+        if ( resource.getId() == null )
+        {
+            return false;
+        }
+
+        return true;
     }
 
 }
