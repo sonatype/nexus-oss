@@ -259,15 +259,6 @@ Sonatype.repoServer.referenceData = {
     privileges : []
   },
   
-  repoTargets : {
-    id : "",
-    name : "",
-    description : "",
-    sessionTimeout : 0,
-    roles : [],
-    privileges : []
-  },
-  
   privileges : {
     repositoryTarget : {
       name: "",
@@ -277,8 +268,15 @@ Sonatype.repoServer.referenceData = {
     }
   },
 
+  repoTargets : {
+    id : "",
+    name : "",
+    contentClass : "",
+    patterns : []
+  },
+  
   contentClasses : {
-    contentType : "",
+    contentClass : "",
     name : ""
   }
   
