@@ -129,10 +129,6 @@ public class Upgrade103to104
                 }
             }
         }
-        else
-        {
-            tasksConfig = null;
-        }
 
         // and return the config read above tasks
         return conf;
@@ -309,7 +305,8 @@ public class Upgrade103to104
         message.setConfiguration( newc );
 
         // extra step, remove old tasks.xml
-        if ( tasksFile.exists() )
+        // tasksFile would be null if the upgrade chain started from something older then 1.0.3
+        if ( tasksFile != null && tasksFile.exists() )
         {
             try
             {
