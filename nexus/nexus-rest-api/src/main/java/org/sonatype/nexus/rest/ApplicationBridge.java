@@ -30,6 +30,7 @@ import org.restlet.Router;
 import org.restlet.resource.Resource;
 import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.NexusStartedEvent;
+import org.sonatype.nexus.NexusStoppingEvent;
 import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
 import org.sonatype.nexus.configuration.ConfigurationChangeListener;
 import org.sonatype.nexus.configuration.ConfigurationException;
@@ -153,7 +154,11 @@ public class ApplicationBridge
     {
         if ( NexusStartedEvent.class.isAssignableFrom( evt.getClass() ) )
         {
-            recreateRoot();
+            recreateRoot( true );
+        }
+        else if ( NexusStoppingEvent.class.isAssignableFrom( evt.getClass() ) )
+        {
+            recreateRoot( false );
         }
     }
 
@@ -228,12 +233,12 @@ public class ApplicationBridge
 
         configure();
 
-        recreateRoot();
+        recreateRoot( true );
 
         return root;
     }
 
-    protected final void recreateRoot()
+    protected final void recreateRoot( boolean isStarted )
     {
         // reboot?
         if ( root != null )
@@ -255,11 +260,11 @@ public class ApplicationBridge
                 throw new IllegalStateException( "Cannot create ROOT for Nexus REST Application!", e );
             }
 
-            root.setRoot( doCreateRoot() );
+            root.setRoot( doCreateRoot( isStarted ) );
         }
     }
 
-    protected Restlet doCreateRoot()
+    protected Restlet doCreateRoot( boolean isStarted )
     {
         // TODO: this has to be externalized somehow
 
@@ -287,13 +292,27 @@ public class ApplicationBridge
         // setting the new router to be next instance
         nexusGuard.setNext( router );
 
+        // -----
+        // a little digression here. if !isStarted, we are shutting down everything except /status and /status/command
+
+        router.attach( "/status", StatusResourceHandler.class );
+
+        if ( !isStarted )
+        {
+            router.attach( "/status/command", CommandResourceHandler.class );
+
+            return root;
+        }
+        else
+        {
+            router.attach( "/status/command", protectResource( CommandResourceHandler.class ) );
+        }
+
         // ==========================================================
         // now we are playing with the two router: unprotectedResources for not protected
         // and protectedResources for protected ones
 
         // attaching the restlets to scond router
-        router.attach( "/status", StatusResourceHandler.class );
-
         router.attach( "/feeds", FeedsListResourceHandler.class );
 
         router.attach( "/feeds/{" + FeedResourceHandler.FEED_KEY + "}", FeedResourceHandler.class );
@@ -313,8 +332,6 @@ public class ApplicationBridge
 
         // put one authSource into context attributes
         getContext().getAttributes().put( AUTHENTICATION_SOURCE, authenticationSource );
-
-        router.attach( "/status/command", protectResource( CommandResourceHandler.class ) );
 
         router.attach( "/data_index", protectWriteToResource( IndexResourceHandler.class ) );
 
@@ -422,12 +439,12 @@ public class ApplicationBridge
 
         router
             .attach( "/roles/{" + RoleResourceHandler.ROLE_ID_KEY + "}", protectResource( RoleResourceHandler.class ) );
-            
+
         router.attach( "/privileges", protectResource( PrivilegeListResourceHandler.class ) );
 
         router.attach(
-                "/privileges/{" + PrivilegeResourceHandler.PRIVILEGE_ID_KEY + "}",
-                protectResource( PrivilegeResourceHandler.class ) );
+            "/privileges/{" + PrivilegeResourceHandler.PRIVILEGE_ID_KEY + "}",
+            protectResource( PrivilegeResourceHandler.class ) );
 
         router.attach( "/repo_content_classes", protectResource( ContentClassesListResourceHandler.class ) );
 

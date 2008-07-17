@@ -48,8 +48,13 @@ public class ApplicationContentBridge
     /**
      * Creating restlet application root.
      */
-    protected Restlet doCreateRoot()
+    protected Restlet doCreateRoot( boolean isStarted )
     {
+        if ( !isStarted )
+        {
+            return null;
+        }
+
         // instance filter, that injects proper Nexus instance into request attributes
         LocalNexusInstanceFilter nif = new LocalNexusInstanceFilter( getContext() );
 
