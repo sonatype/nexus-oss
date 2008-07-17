@@ -24,6 +24,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
 import java.util.Random;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.StringUtils;
@@ -543,6 +545,12 @@ public class DefaultConfigurationValidator
             response.setModified( true );
         }
 
+        if ( !isValidRegexp( item.getRoutePattern() ) )
+        {
+            response.addValidationError( "The regexp in Route with ID='" + item.getId() + "' is not valid: "
+                + item.getRoutePattern() );
+        }
+
         if ( response.getContext().getExistingPathMappingIds() != null )
         {
             response.getContext().getExistingPathMappingIds().add( item.getId() );
@@ -709,6 +717,38 @@ public class DefaultConfigurationValidator
             response.setContext( ctx );
         }
 
+        if ( StringUtils.isEmpty( settings.getId() ) )
+        {
+            response.addValidationError( "The RepositoryTarget may have no empty/null ID!" );
+        }
+
+        if ( StringUtils.isEmpty( settings.getName() ) )
+        {
+            settings.setName( settings.getId() );
+
+            response.addValidationWarning( "Repository target with ID='" + settings.getId()
+                + "' had no name, defaulted it to it's ID." );
+
+            response.setModified( true );
+        }
+
+        if ( StringUtils.isEmpty( settings.getContentClass() ) )
+        {
+            response.addValidationError( "Repository target with ID='" + settings.getId()
+                + "' has empty content class!" );
+        }
+
+        List<String> patterns = settings.getPatterns();
+
+        for ( String pattern : patterns )
+        {
+            if ( !isValidRegexp( pattern ) )
+            {
+                response.addValidationError( "Repository target with ID='" + settings.getId()
+                    + "' has invalid regexp pattern: " + pattern );
+            }
+        }
+
         return response;
     }
 
@@ -795,4 +835,17 @@ public class DefaultConfigurationValidator
             || CRepositoryShadow.TYPE_MAVEN2_CONSTRAINED.equals( type );
     }
 
+    protected boolean isValidRegexp( String regexp )
+    {
+        try
+        {
+            Pattern.compile( regexp );
+
+            return true;
+        }
+        catch ( PatternSyntaxException e )
+        {
+            return false;
+        }
+    }
 }
