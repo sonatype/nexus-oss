@@ -27,16 +27,13 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
-import org.sonatype.nexus.configuration.model.CAdvancedSchedule;
 import org.sonatype.nexus.configuration.model.CAuthSource;
 import org.sonatype.nexus.configuration.model.CAuthzSource;
-import org.sonatype.nexus.configuration.model.CDailySchedule;
 import org.sonatype.nexus.configuration.model.CGroupsSetting;
 import org.sonatype.nexus.configuration.model.CHttpProxySettings;
 import org.sonatype.nexus.configuration.model.CLocalStorage;
-import org.sonatype.nexus.configuration.model.CMonthlySchedule;
-import org.sonatype.nexus.configuration.model.COnceSchedule;
 import org.sonatype.nexus.configuration.model.CProps;
 import org.sonatype.nexus.configuration.model.CRemoteAuthentication;
 import org.sonatype.nexus.configuration.model.CRemoteConnectionSettings;
@@ -48,12 +45,8 @@ import org.sonatype.nexus.configuration.model.CRepositoryGrouping;
 import org.sonatype.nexus.configuration.model.CRepositoryShadow;
 import org.sonatype.nexus.configuration.model.CRestApiSettings;
 import org.sonatype.nexus.configuration.model.CRouting;
-import org.sonatype.nexus.configuration.model.CRunNowSchedule;
-import org.sonatype.nexus.configuration.model.CSchedule;
-import org.sonatype.nexus.configuration.model.CScheduledTask;
 import org.sonatype.nexus.configuration.model.CSecurity;
 import org.sonatype.nexus.configuration.model.CTaskConfiguration;
-import org.sonatype.nexus.configuration.model.CWeeklySchedule;
 import org.sonatype.nexus.configuration.model.v1_0_3.CGroupsSettingPathMappingItem;
 import org.sonatype.nexus.configuration.model.v1_0_3.Configuration;
 import org.sonatype.nexus.configuration.model.v1_0_3.io.xpp3.NexusConfigurationXpp3Reader;
@@ -70,6 +63,8 @@ import com.thoughtworks.xstream.io.xml.DomDriver;
 public class Upgrade103to104
     implements Upgrader
 {
+    private File tasksFile;
+
     private CTaskConfiguration tasksConfig;
 
     public Object loadConfiguration( File file )
@@ -104,7 +99,7 @@ public class Upgrade103to104
         // a special sideeeffect of upgrading from 1.0.3 to 1.0.4: we are
         // reading the tasks.xml that cropped out in b4 (model 1.0.3), but dissapears in b5 (model 1.0.4)
 
-        File tasksFile = new File( file.getParentFile(), "tasks.xml" );
+        tasksFile = new File( file.getParentFile(), "tasks.xml" );
 
         if ( tasksFile.exists() )
         {
@@ -312,6 +307,21 @@ public class Upgrade103to104
 
         message.setModelVersion( org.sonatype.nexus.configuration.model.Configuration.MODEL_VERSION );
         message.setConfiguration( newc );
+
+        // extra step, remove old tasks.xml
+        if ( tasksFile.exists() )
+        {
+            try
+            {
+                FileUtils.rename( tasksFile, new File( tasksFile.getParentFile(), "tasks.xml.old" ) );
+            }
+            catch ( IOException e )
+            {
+                // silent?
+                // after succesful upgrade, this file will not be used anymore
+                // it will remain but will be ugly (ie. a file should be deleted in safe manner)
+            }
+        }
     }
 
     protected List<CProps> copyCProps1_0_3( List<org.sonatype.nexus.configuration.model.v1_0_3.CProps> oldprops )
