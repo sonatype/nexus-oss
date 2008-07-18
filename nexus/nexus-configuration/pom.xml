@@ -54,24 +54,40 @@
 				<artifactId>modello-maven-plugin</artifactId>
 				<executions>
 					<execution>
+					    <id>nexus.xml</id>
 						<goals>
 							<goal>java</goal>
 							<goal>xsd</goal>
 							<goal>xpp3-reader</goal>
 							<goal>xpp3-writer</goal>
 						</goals>
+						<configuration>
+		                    <version>1.0.4</version>
+		                    <packagedVersions>
+		                        <packagedVersion>1.0.0</packagedVersion>
+		                        <packagedVersion>1.0.1</packagedVersion>
+		                        <packagedVersion>1.0.2</packagedVersion>
+		                        <packagedVersion>1.0.3</packagedVersion>
+		                    </packagedVersions>
+		                    <model>src/main/mdo/nexus.xml</model>
+		                </configuration>
 					</execution>
+					<execution>
+					    <id>security.xml</id>
+                        <goals>
+                            <goal>java</goal>
+                            <goal>xsd</goal>
+                            <goal>xpp3-reader</goal>
+                            <goal>xpp3-writer</goal>
+                        </goals>
+                        <configuration>
+		                    <version>1.0.0</version>
+		                    <model>src/main/mdo/security.xml</model>
+		                </configuration>
+                    </execution>
 				</executions>
 				<configuration>
-					<version>1.0.4</version>
 					<packageWithVersion>false</packageWithVersion>
-					<packagedVersions>
-						<packagedVersion>1.0.0</packagedVersion>
-						<packagedVersion>1.0.1</packagedVersion>
-						<packagedVersion>1.0.2</packagedVersion>
-						<packagedVersion>1.0.3</packagedVersion>
-					</packagedVersions>
-					<model>src/main/mdo/nexus.xml</model>
 				</configuration>
 				<dependencies>
 					<dependency>
