@@ -99,7 +99,7 @@ Sonatype.view = {
           autoScroll: false, //default
           defaults: {autoScroll:false, closable:true},
           activeTab:0,
-          layoutOnTabChange:false,
+          layoutOnTabChange:true,
           //border: false,
           //bodyBorder: true,
           items:[Sonatype.view.welcomeTab]
