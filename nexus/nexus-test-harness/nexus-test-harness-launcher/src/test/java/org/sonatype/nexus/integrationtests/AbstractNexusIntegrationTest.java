@@ -11,6 +11,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.HashMap;
@@ -38,23 +39,31 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.restlet.Client;
+import org.restlet.data.MediaType;
+import org.restlet.data.Metadata;
+import org.restlet.data.Method;
+import org.restlet.data.Protocol;
+import org.restlet.data.Request;
+import org.restlet.data.Response;
 import org.sonatype.appbooter.ForkedAppBooter;
 import org.sonatype.appbooter.ctl.AppBooterServiceException;
 import org.sonatype.nexus.artifact.Gav;
+import org.sonatype.nexus.rest.model.StatusResourceResponse;
+import org.sonatype.nexus.rest.xstream.XStreamInitializer;
 import org.sonatype.nexus.test.utils.DeployUtils;
+import org.xml.sax.XMLReader;
+
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.io.xml.DomDriver;
+import com.thoughtworks.xstream.io.xml.XppDriver;
 
 /**
- * TODO: add REST restart to make tests faster 
- * <BR/>
- * curl --user admin:admin123 --request PUT http://localhost:8081/nexus/service/local/status/command --data STOP
- * <BR/>
- * curl --user admin:admin123 --request PUT http://localhost:8081/nexus/service/local/status/command --data START
- * <BR/>
- * curl --user admin:admin123 --request PUT http://localhost:8081/nexus/service/local/status/command --data RESTART
- * <BR/> 
- * <BR/>
- * NOTE, this class is not really abstract so I can work around a the <code>@BeforeClass</code>, <code>@AfterClass</code> issues
- * 
+ * TODO: add REST restart to make tests faster <BR/> curl --user admin:admin123 --request PUT
+ * http://localhost:8081/nexus/service/local/status/command --data STOP <BR/> curl --user admin:admin123 --request PUT
+ * http://localhost:8081/nexus/service/local/status/command --data START <BR/> curl --user admin:admin123 --request PUT
+ * http://localhost:8081/nexus/service/local/status/command --data RESTART <BR/> <BR/> NOTE, this class is not really
+ * abstract so I can work around a the <code>@BeforeClass</code>, <code>@AfterClass</code> issues
  */
 public class AbstractNexusIntegrationTest
 {
@@ -67,6 +76,8 @@ public class AbstractNexusIntegrationTest
 
     private static boolean NEEDS_INIT = false;
 
+    private static boolean NEEDS_HARD_STOP = false;
+
     public static final String REPOSITORY_RELATIVE_URL = "content/repositories/";
 
     public static final String GROUP_REPOSITORY_RELATIVE_URL = "content/groups/";
@@ -76,8 +87,12 @@ public class AbstractNexusIntegrationTest
     private String baseNexusUrl;
 
     private String nexusTestRepoUrl;
-    
+
     private String nexusWorkDir;
+
+    private static final String STATUS_STOPPED = "STOPPED";
+
+    private static final String STATUS_STARTED = "STARTED";
 
     public static final String RELATIVE_CONF_DIR = "runtime/apps/nexus/conf";
 
@@ -96,7 +111,7 @@ public class AbstractNexusIntegrationTest
         this.nexusBaseDir = rb.getString( "nexus.base.dir" );
         this.baseNexusUrl = rb.getString( "nexus.base.url" );
         this.nexusWorkDir = rb.getString( "nexus.work.dir" );
-        this.nexusTestRepoUrl = baseNexusUrl + REPOSITORY_RELATIVE_URL + testRepositoryId +"/";
+        this.nexusTestRepoUrl = baseNexusUrl + REPOSITORY_RELATIVE_URL + testRepositoryId + "/";
     }
 
     /**
@@ -116,8 +131,8 @@ public class AbstractNexusIntegrationTest
             if ( NEEDS_INIT )
             {
                 // clean common work dir
-//                this.cleanWorkDir();
-                
+                // this.cleanWorkDir();
+
                 // copy nexus config
                 this.copyNexusConfig();
 
@@ -131,21 +146,21 @@ public class AbstractNexusIntegrationTest
             }
         }
     }
-    
 
-    private void cleanWorkDir() throws IOException
+    private void cleanWorkDir()
+        throws IOException
     {
         File workDir = new File( this.nexusWorkDir );
-        
+
         // to make sure I don't delete all my MP3's and pictures, or totally screw anyone.
         // check for 'target' and not allow any '..'
-        if( workDir.getAbsolutePath().lastIndexOf( "target" ) != -1 && workDir.getAbsolutePath().lastIndexOf( ".." ) == -1 )
+        if ( workDir.getAbsolutePath().lastIndexOf( "target" ) != -1
+            && workDir.getAbsolutePath().lastIndexOf( ".." ) == -1 )
         {
             // delete work dir
             FileUtils.deleteDirectory( workDir );
         }
-        
-        
+
     }
 
     private void deployArtifacts()
@@ -223,26 +238,70 @@ public class AbstractNexusIntegrationTest
     private void startNexus()
         throws Exception
     {
-        ForkedAppBooter appBooter = (ForkedAppBooter) this.lookup( ForkedAppBooter.ROLE, "TestForkedAppBooter" );
-        appBooter.start();
-//        Thread.sleep( 1000 );
+
+        // if nexus is running but stopped we only want to do a softstart
+        // and we don't want to start if it is already running.
+
+        try
+        {
+            if ( this.isNexusRunning() )
+            {
+                // we have nothing to do if its running
+                return;
+            }
+            else
+            {
+                this.doSoftStart();
+            }
+        }
+        catch ( IOException e )
+        {
+            // nexus is not running....
+            // that is ok, most likely someone ran a single test from eclipse
+
+            // we need a hard start
+            NEEDS_HARD_STOP = true;
+            
+            System.out.println( "***************************" );
+            System.out.println( "*\n*" );
+            System.out.println( "*  DOING A HARD START OF NEXUS." );
+            System.out.println( "*  If your not running a single test manually, then something bad happened" );
+            System.out.println( "*\n*" );
+            System.out.println( "***************************" );
+
+            ForkedAppBooter appBooter =
+                (ForkedAppBooter) TestContainer.getInstance().lookup( ForkedAppBooter.ROLE, "TestForkedAppBooter" );
+            appBooter.start();
+        }       
     }
 
     private void stopNexus()
         throws Exception
     {
-        ForkedAppBooter appBooter = (ForkedAppBooter) this.lookup( ForkedAppBooter.ROLE, "TestForkedAppBooter" );
 
-        try
+        // craptastic state machine
+        if ( !NEEDS_HARD_STOP )
         {
-            appBooter.stop();
+            // normal flow is to soft stop
+            this.doSoftStop();
         }
-        catch ( AppBooterServiceException e )
+        else
         {
-            Assert.fail( "Test: "
-                + this.getClass().getSimpleName()
-                + " failed to stop a forked JVM, so, it was either (most likely) not running or an orphaned process that you will need to kill." );
+            // must reset
+            NEEDS_HARD_STOP = false;
+            ForkedAppBooter appBooter =
+                (ForkedAppBooter) TestContainer.getInstance().lookup( ForkedAppBooter.ROLE, "TestForkedAppBooter" );
+
+            try
+            {
+                appBooter.stop();
+            }
+            catch ( AppBooterServiceException e )
+            {
+                Assert.fail( "The Test failed to stop a forked JVM, so, it was either (most likely) not running or an orphaned process that you will need to kill." );
+            }
         }
+
     }
 
     private void copyNexusConfig()
@@ -280,13 +339,12 @@ public class AbstractNexusIntegrationTest
         String resource = this.getTestId() + "/" + relativePath;
         return this.getResource( resource );
     }
-    
+
     protected String getTestId()
     {
         String packageName = this.getClass().getPackage().getName();
         return packageName.substring( packageName.lastIndexOf( '.' ) + 1, packageName.length() );
     }
-    
 
     /**
      * Returns a File if it exists, null otherwise. Files returned by this method must be located in the
@@ -314,11 +372,13 @@ public class AbstractNexusIntegrationTest
     @BeforeClass
     public static void staticOncePerClassSetUp()
     {
+        // hacky state machine
         NEEDS_INIT = true;
     }
 
     @AfterClass
-    public static void oncePerClassTearDown() throws Exception
+    public static void oncePerClassTearDown()
+        throws Exception
     {
         // stop nexus
         new AbstractNexusIntegrationTest().stopNexus();
@@ -484,11 +544,60 @@ public class AbstractNexusIntegrationTest
             catch ( IOException e )
             {
             }
-
         }
-
         return downloadedFile;
+    }
 
+    private void sendNexusStatusCommand( String command )
+    {
+        String serviceURI = this.getBaseNexusUrl() + "service/local/status/command";
+
+        Request request = new Request();
+
+        request.setResourceRef( serviceURI );
+        request.setMethod( Method.PUT );
+        request.setEntity( command, MediaType.TEXT_ALL );
+
+        Client client = new Client( Protocol.HTTP );
+
+        Response response = client.handle( request );
+
+        if ( !response.getStatus().isSuccess() )
+        {
+            Assert.fail( "Could not " + command + " Nexus: (" + response.getStatus() + ")" );
+        }
+    }
+
+    protected void doSoftStop()
+    {
+        this.sendNexusStatusCommand( "STOP" );
+    }
+
+    protected void doSoftStart()
+    {
+        this.sendNexusStatusCommand( "START" );
+    }
+
+    protected void doSoftRestart()
+    {
+        this.sendNexusStatusCommand( "RESTART" );
+    }
+
+    protected boolean isNexusRunning()
+        throws IOException
+    {
+        return ( STATUS_STARTED.equals( this.getNexusStatus().getData().getState() ) );
+    }
+
+    protected StatusResourceResponse getNexusStatus()
+        throws IOException
+    {
+        XStream xstream = new XStream();
+        StatusResourceResponse status = null;
+
+        status =
+            (StatusResourceResponse) xstream.fromXML( new URL( this.getBaseNexusUrl() + "service/local/status" ).openStream() );
+        return status;
     }
 
     public String getBaseNexusUrl()
@@ -510,7 +619,7 @@ public class AbstractNexusIntegrationTest
     {
         this.nexusTestRepoUrl = nexusTestRepoUrl;
     }
-    
+
     public PlexusContainer getContainer()
     {
         return this.container;

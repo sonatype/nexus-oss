@@ -5,6 +5,7 @@ import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
+import org.sonatype.appbooter.ForkedAppBooter;
 import org.sonatype.nexus.integrationtests.nexus166.Nexus166SampleTest;
 import org.sonatype.nexus.integrationtests.nexus167.Nexus167ReleaseToSnapshotTest;
 import org.sonatype.nexus.integrationtests.nexus168.Nexus168SnapshotToReleaseTest;
@@ -30,20 +31,23 @@ import org.sonatype.nexus.integrationtests.proxy.nexus262.Nexus262SimpleProxyTes
     Nexus176DeployToInvalidRepoTest.class, Nexus259SnapshotDeployTest.class, Nexus260MultipleDeployTest.class,
     Nexus261NexusGroupDownloadTest.class, Nexus177OutOfServiceTest.class, Nexus178BlockProxyDownloadTest.class,
     Nexus179RemoteRepoDownTest.class, Nexus262SimpleProxyTest.class } )
+//@SuiteClasses( {Nexus166SampleTest.class} )
 public class IntegrationTestSuite
 {
     //
 
     @BeforeClass
-    public static void beforeSuite()
+    public static void beforeSuite() throws Exception
     {
-        System.out.println( "Starting Suite" );
+        ForkedAppBooter appBooter = (ForkedAppBooter) TestContainer.getInstance().lookup( ForkedAppBooter.ROLE, "TestForkedAppBooter" );
+        appBooter.start();
     }
 
     @AfterClass
-    public static void afterSuite()
+    public static void afterSuite() throws Exception
     {
-        System.out.println( "Ending Suite" );
+        ForkedAppBooter appBooter = (ForkedAppBooter) TestContainer.getInstance().lookup( ForkedAppBooter.ROLE, "TestForkedAppBooter" );
+        appBooter.shutdown();
     }
 
 }
