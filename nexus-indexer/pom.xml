@@ -3,7 +3,7 @@
     <parent>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-parent</artifactId>
-        <version>2</version>
+        <version>3-SNAPSHOT</version>
     </parent>
 
     <groupId>org.sonatype.nexus</groupId>
@@ -55,6 +55,16 @@
         <maven.artifact.version>3.0-SONATYPE-653272</maven.artifact.version>
 	</properties>
      
+     <!--override the snapshot included in maven-->
+     <dependencyManagement>
+       <dependencies>
+         <dependency>
+           <groupId>org.apache.xbean</groupId>
+           <artifactId>xbean-reflect</artifactId>
+           <version>3.4</version>
+         </dependency>
+       </dependencies>
+     </dependencyManagement>
      
     <dependencies>
 
@@ -146,7 +156,7 @@
                   <execution>
                     <id>create-cli-jar</id>
                     <goals>
-                      <goal>attached</goal>
+                      <goal>single</goal>
                     </goals>
                     <phase>package</phase>
                     <configuration>
