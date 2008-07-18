@@ -48,6 +48,7 @@ import org.sonatype.nexus.configuration.model.CDailySchedule;
 import org.sonatype.nexus.configuration.model.CMonthlySchedule;
 import org.sonatype.nexus.configuration.model.COnceSchedule;
 import org.sonatype.nexus.configuration.model.CProps;
+import org.sonatype.nexus.configuration.model.CRunNowSchedule;
 import org.sonatype.nexus.configuration.model.CSchedule;
 import org.sonatype.nexus.configuration.model.CScheduledTask;
 import org.sonatype.nexus.configuration.model.CWeeklySchedule;
@@ -55,6 +56,7 @@ import org.sonatype.scheduling.schedules.CronSchedule;
 import org.sonatype.scheduling.schedules.DailySchedule;
 import org.sonatype.scheduling.schedules.MonthlySchedule;
 import org.sonatype.scheduling.schedules.OnceSchedule;
+import org.sonatype.scheduling.schedules.RunNowSchedule;
 import org.sonatype.scheduling.schedules.Schedule;
 import org.sonatype.scheduling.schedules.WeeklySchedule;
 
@@ -316,6 +318,14 @@ public class DefaultTaskConfigManager
         {
             schedule = new OnceSchedule( ( (COnceSchedule) modelSchedule ).getStartDate() );
         }
+        else if ( CRunNowSchedule.class.isAssignableFrom( modelSchedule.getClass() ) )
+        {
+            schedule = new RunNowSchedule();
+        }
+        else
+        {
+            throw new IllegalArgumentException( "Unknown Schedule type: " + modelSchedule.getClass().getName() );
+        }
 
         if ( lastRun != null )
         {
@@ -356,12 +366,6 @@ public class DefaultTaskConfigManager
                 storeableSchedule = new CAdvancedSchedule();
                 ( (CAdvancedSchedule) storeableSchedule ).setCronCommand( ( (CronSchedule) schedule ).getCronString() );
             }
-            else if ( DailySchedule.class.isAssignableFrom( schedule.getClass() ) )
-            {
-                storeableSchedule = new CDailySchedule();
-                ( (CDailySchedule) storeableSchedule ).setStartDate( ( (DailySchedule) schedule ).getStartDate() );
-                ( (CDailySchedule) storeableSchedule ).setEndDate( ( (DailySchedule) schedule ).getEndDate() );
-            }
             else if ( MonthlySchedule.class.isAssignableFrom( schedule.getClass() ) )
             {
                 storeableSchedule = new CMonthlySchedule();
@@ -376,11 +380,6 @@ public class DefaultTaskConfigManager
                     ( (CMonthlySchedule) storeableSchedule ).addDaysOfMonth( String.valueOf( iter.next() ) );
                 }
             }
-            else if ( OnceSchedule.class.isAssignableFrom( schedule.getClass() ) )
-            {
-                storeableSchedule = new COnceSchedule();
-                ( (COnceSchedule) storeableSchedule ).setStartDate( ( (OnceSchedule) schedule ).getStartDate() );
-            }
             else if ( WeeklySchedule.class.isAssignableFrom( schedule.getClass() ) )
             {
                 storeableSchedule = new CWeeklySchedule();
@@ -394,6 +393,25 @@ public class DefaultTaskConfigManager
                     // needs to be string
                     ( (CWeeklySchedule) storeableSchedule ).addDaysOfWeek( String.valueOf( iter.next() ) );
                 }
+            }
+            else if ( DailySchedule.class.isAssignableFrom( schedule.getClass() ) )
+            {
+                storeableSchedule = new CDailySchedule();
+                ( (CDailySchedule) storeableSchedule ).setStartDate( ( (DailySchedule) schedule ).getStartDate() );
+                ( (CDailySchedule) storeableSchedule ).setEndDate( ( (DailySchedule) schedule ).getEndDate() );
+            }
+            else if ( OnceSchedule.class.isAssignableFrom( schedule.getClass() ) )
+            {
+                storeableSchedule = new COnceSchedule();
+                ( (COnceSchedule) storeableSchedule ).setStartDate( ( (OnceSchedule) schedule ).getStartDate() );
+            }
+            else if ( RunNowSchedule.class.isAssignableFrom( schedule.getClass() ) )
+            {
+                storeableSchedule = new CRunNowSchedule();
+            }
+            else
+            {
+                throw new IllegalArgumentException( "Unknown Schedule type: " + schedule.getClass().getName() );
             }
         }
 
