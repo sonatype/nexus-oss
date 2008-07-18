@@ -526,6 +526,12 @@ public class AbstractArtifactResourceHandler
                     getResponse().setStatus( Status.SUCCESS_CREATED );
 
                 }
+                catch ( NoSuchResourceStoreException e )
+                {
+                    getLogger().log( Level.INFO, "Upload request to nonexistent ResourceStore: " + e.getMessage() );
+
+                    getResponse().setStatus( Status.CLIENT_ERROR_NOT_FOUND, e.getMessage() );
+                }
                 catch ( Exception e )
                 {
                     getLogger().log( Level.SEVERE, "Exception during upload:", e );
