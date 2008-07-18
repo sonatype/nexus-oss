@@ -283,7 +283,10 @@ public class DefaultScheduledTask<T>
             // check for execution
             while ( !( (SchedulerTask<?>) getCallable() ).allowConcurrentExecution( getScheduler().getActiveTasks() ) )
             {
-                Thread.sleep( 10000 );
+                // simply reschedule itself for 10sec
+                getScheduler().getScheduledExecutorService().schedule( this, 10000, TimeUnit.MILLISECONDS );
+                
+                return result;
             };
         }
 

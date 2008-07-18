@@ -20,10 +20,15 @@
  */
 package org.sonatype.nexus.scheduling;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.codehaus.plexus.util.StringUtils;
+import org.sonatype.nexus.proxy.NoSuchResourceStoreException;
+import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.scheduling.ScheduledTask;
 
 public abstract class AbstractNexusRepositoriesTask<T>
@@ -73,33 +78,89 @@ public abstract class AbstractNexusRepositoriesTask<T>
         }
     }
 
-    protected boolean repositorySetIntersectionIsNotEmpty( AbstractNexusRepositoriesTask<?> otherTask )
+    public boolean allowConcurrentExecution( Map<Class<?>, List<ScheduledTask<?>>> activeTasks )
     {
-        return false;
+        return !getSetOfIntersectingTasksThatRuns( activeTasks ).isEmpty();
     }
 
-    protected boolean taskOfThisTypeWithIntersectionExists( Map<Class<?>, List<ScheduledTask<?>>> activeTasks )
+    protected Set<AbstractNexusRepositoriesTask<?>> getSetOfIntersectingTasksThatRuns(
+        Map<Class<?>, List<ScheduledTask<?>>> activeTasks )
     {
-        List<ScheduledTask<?>> tasksOfThisType = activeTasks.get( this.getClass() );
+        HashSet<AbstractNexusRepositoriesTask<?>> result = new HashSet<AbstractNexusRepositoriesTask<?>>();
 
-        if ( tasksOfThisType != null )
+        // get all activeTasks that runs and are descendants of AbstractNexusRepositoriesTask
+        for ( Class<?> taskCls : activeTasks.keySet() )
         {
-            for ( ScheduledTask<?> task : tasksOfThisType )
+            if ( AbstractNexusRepositoriesTask.class.isAssignableFrom( taskCls ) )
             {
-                // this is same class as we are, it is safe to cast
-                if ( repositorySetIntersectionIsNotEmpty( (AbstractNexusRepositoriesTask<?>) task ) )
+                List<ScheduledTask<?>> tasks = activeTasks.get( taskCls );
+
+                for ( ScheduledTask<?> task : tasks )
                 {
-                    return true;
+                    // check against intersection
+                    if ( repositorySetIntersectionIsNotEmpty( (AbstractNexusRepositoriesTask<?>) task ) )
+                    {
+                        result.add( (AbstractNexusRepositoriesTask<?>) task );
+                    }
                 }
             }
         }
 
-        return false;
+        return result;
     }
 
-    protected boolean abstractNexusRepositoriesTaskWithIntersectionExists(
-        Map<Class<?>, List<ScheduledTask<?>>> activeTasks )
+    protected boolean repositorySetIntersectionIsNotEmpty( AbstractNexusRepositoriesTask<?> otherTask )
     {
-        return false;
+        // simplest cases, checking for repoId and groupId equality
+        if ( getRepositoryId() != null && otherTask.getRepositoryId() != null
+            && StringUtils.equals( getRepositoryId(), otherTask.getRepositoryId() ) )
+        {
+            return true;
+        }
+
+        if ( getRepositoryGroupId() != null && otherTask.getRepositoryGroupId() != null
+            && StringUtils.equals( getRepositoryGroupId(), otherTask.getRepositoryGroupId() ) )
+        {
+            return true;
+        }
+
+        try
+        {
+            // complex case: repoA may be in both groupA and groupB as member
+            // so we actually evaluate all tackled reposes for both task and have intersected those
+            List<Repository> thisReposes = new ArrayList<Repository>();
+
+            if ( getRepositoryId() != null )
+            {
+                thisReposes.add( getNexus().getRepository( getRepositoryId() ) );
+            }
+            else
+            {
+                thisReposes.addAll( getNexus().getRepositoryGroup( getRepositoryGroupId() ) );
+            }
+
+            List<Repository> otherReposes = new ArrayList<Repository>();
+
+            if ( otherTask.getRepositoryId() != null )
+            {
+                otherReposes.add( getNexus().getRepository( otherTask.getRepositoryId() ) );
+            }
+            else
+            {
+                otherReposes.addAll( getNexus().getRepositoryGroup( otherTask.getRepositoryGroupId() ) );
+            }
+
+            HashSet<Repository> testSet = new HashSet<Repository>();
+            testSet.addAll( thisReposes );
+            testSet.addAll( otherReposes );
+
+            // the set does not intersects
+            return thisReposes.size() + otherReposes.size() != testSet.size();
+        }
+        catch ( NoSuchResourceStoreException e )
+        {
+            // in this case, one of the tasks will die anyway, let's say false
+            return false;
+        }
     }
 }
