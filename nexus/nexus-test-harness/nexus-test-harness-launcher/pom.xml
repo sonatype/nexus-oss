@@ -1,6 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<?xml version="1.0" encoding="UTF-8"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>org.sonatype.nexus</groupId>
@@ -13,15 +12,14 @@
 		
 		<bundle-expanded-dir>target/bundle</bundle-expanded-dir>
 		<config-expanded-dir>target/test-nexus-config</config-expanded-dir>
-		<!--<nexus-basedir>${bundle-expanded-dir}/nexus-webapp-${project.version}</nexus-basedir>-->
 		
 		<nexus-relative-basedir>${bundle-expanded-dir}/nexus-webapp-${project.version}</nexus-relative-basedir>
 		<nexus-abs-basedir>${project.build.directory}/bundle/nexus-webapp-${project.version}</nexus-abs-basedir>
 		
 		<config-target-dir>${nexus-abs-basedir}/runtime/apps/nexus/conf</config-target-dir>
 		<work-target-dir>${nexus-abs-basedir}/runtime/work</work-target-dir>
-		<proxy-repo-target-dir-name>proxy-repos</proxy-repo-target-dir-name>
-		<proxy-repo-target-dir>${project.build.directory}/${proxy-repo-target-dir-name}/</proxy-repo-target-dir>
+		<proxy-repo-target-dir-name>proxyRepo</proxy-repo-target-dir-name>
+		<proxy-repo-target-dir>${project.build.directory}/test-classes/${proxy-repo-target-dir-name}</proxy-repo-target-dir>
 		<nexus-plexus-config-file>${nexus-abs-basedir}/conf/plexus.xml</nexus-plexus-config-file>
 		<proxy-repo-plexus-config-file>${project.build.directory}/test-classes/proxyRepo/conf/ProxyRepoPlexus.xml</proxy-repo-plexus-config-file>
 		<proxy-repo-port>8089</proxy-repo-port>
@@ -30,31 +28,14 @@
 		<nexus-application-host>localhost</nexus-application-host>
 		<nexus-application-name>nexus</nexus-application-name>
 		<nexus-application-port>8087</nexus-application-port>
+		
+		<nexus-base-url>${nexus-application-protocol}://${nexus-application-host}:${nexus-application-port}/${nexus-application-name}/</nexus-base-url>
+		
 		<nexus-control-port>32001</nexus-control-port>
 		<proxy-repo-control-port>32002</proxy-repo-control-port>
 	</properties>
 	<dependencies>
-		<dependency>
-			<groupId>org.sonatype.nexus</groupId>
-			<artifactId>nexus-test-harness-config</artifactId>
-			<version>${project.version}</version>
-			<type>zip</type>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.sonatype.nexus</groupId>
-			<artifactId>nexus-test-harness-work</artifactId>
-			<version>${project.version}</version>
-			<type>zip</type>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.sonatype.nexus</groupId>
-			<artifactId>nexus-test-harness-proxy-repo</artifactId>
-			<version>${project.version}</version>
-			<type>zip</type>
-			<scope>provided</scope>
-		</dependency>
+
 		<dependency>
             <groupId>org.sonatype.nexus</groupId>
             <artifactId>nexus-webapp</artifactId>
@@ -85,59 +66,41 @@
             <version>1.0-alpha-9</version>
             <scope>test</scope>
 		</dependency>
-	</dependencies>
+	  <dependency>
+      <groupId>org.sonatype.appbooter</groupId>
+      <artifactId>plexus-forked-app-booter</artifactId>
+      <version>1.3-SNAPSHOT</version>
+    </dependency>
+  </dependencies>
 	<build>
 	    <filters>
 	        <filter>src/test/filters/filter.txt</filter>
 	    </filters>
-	    <resources>
-	    
-	    
-	        <resource>
-	            <directory>${config-expanded-dir}</directory>
-	            <filtering>false</filtering>
-	            <targetPath>../../${nexus-relative-basedir}</targetPath>            
-	        </resource>
-	        <resource>
-	            <directory>${config-expanded-dir}/runtime/apps/nexus/conf</directory>
-	            <filtering>true</filtering>
-	            <targetPath>../../${nexus-relative-basedir}/runtime/apps/nexus/conf</targetPath>            
-	        </resource>
-	        
-	        <!-- <resource>
-				<directory>${config-expanded-dir}/runtime/apps/nexus/conf</directory>
-				<excludes>
-					<exclude>**/log4j.properties</exclude>
-			    </excludes>
-	            <filtering>true</filtering>
-	            <targetPath>${nexus-basedir}/runtime/apps/nexus/conf</targetPath>            
-	        </resource>
-	        <resource>
-	            <directory>${config-expanded-dir}/runtime/apps/nexus/conf</directory>
-	            <includes>
-					<include>**/log4j.properties</include>
-			    </includes>
-	            <filtering>false</filtering>
-	            <targetPath>${nexus-basedir}/runtime/apps/nexus/conf</targetPath>            
-	        </resource> -->
-	    </resources>
+
 	    <testResources>
-	      <testResource>
-	      	<directory>src/test/resources</directory>
-	      	<!-- <excludes>
-	      	  <exclude>**/ProxyRepoPlexus.xml</exclude>
-	      	</excludes> -->
-	      	<filtering>true</filtering>
-	      </testResource>
-	      <!-- <testResource>
-	      	<directory>src/test/resources</directory>
-	      	<includes>
-	      	  <include>**/ProxyRepoPlexus.xml</include>
-	      	</includes>
-	      	<filtering>false</filtering>
-	      </testResource> -->
-	    </testResources> 
-		<plugins>
+	    	<testResource>
+	    		<directory>src/test/resources</directory>
+	    		<filtering>true</filtering>
+	    	</testResource>
+
+	    	<testResource>
+	    		<directory>src/test/bundle-conf</directory>
+	    		<filtering>false</filtering>
+	    		<targetPath>../../${nexus-relative-basedir}</targetPath>
+	    	</testResource>
+
+	    	<testResource>
+	    		<directory>
+	    			src/test/bundle-conf/runtime/apps/nexus/conf
+	    		</directory>
+	    		<filtering>true</filtering>
+	    		<targetPath>
+	    			../../${nexus-relative-basedir}/runtime/apps/nexus/conf
+	    		</targetPath>
+	    	</testResource>
+
+	    </testResources>
+	    <plugins>
 		    <plugin>
                 <artifactId>maven-dependency-plugin</artifactId>
                 <version>2.0</version>
@@ -158,189 +121,27 @@
                             <excludes>**/conf/plexus.properties</excludes>                            
                         </configuration>
                     </execution>
-                    <execution>
-                        <id>unpack-config</id>
-                        <phase>generate-resources</phase>
-                        <goals>
-                            <goal>unpack-dependencies</goal>
-                        </goals>
-                        <configuration>
-                            <includeArtifactIds>
-                                nexus-test-harness-config
-                            </includeArtifactIds>
-                            <outputDirectory>
-                                ${config-expanded-dir}
-                            </outputDirectory>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>unpack-work</id>
-                        <phase>generate-resources</phase>
-                        <goals>
-                            <goal>unpack-dependencies</goal>
-                        </goals>
-                        <configuration>
-                            <includeArtifactIds>
-                                nexus-test-harness-work
-                            </includeArtifactIds>
-                            <outputDirectory>
-                                ${work-target-dir}
-                            </outputDirectory>
-                        </configuration>
-                    </execution>
-                    
-                    <execution>
-                        <id>unpack-proxy-repo</id>
-                        <phase>generate-resources</phase>
-                        <goals>
-                            <goal>unpack-dependencies</goal>
-                        </goals>
-                        <configuration>
-                            <includeArtifactIds>
-                                nexus-test-harness-proxy-repo
-                            </includeArtifactIds>
-                            <outputDirectory>
-                                ${proxy-repo-target-dir}
-                            </outputDirectory>
-                        </configuration>
-                    </execution>
-                    
                 </executions>
             </plugin>
-		    <plugin>
-		        <artifactId>plx-maven-plugin</artifactId>
-		        <groupId>org.sonatype.plugins</groupId>
-		        <executions>
-		            <execution>
-		                <id>start-nexus</id>
-		                <phase>pre-integration-test</phase>
-		                <goals>
-		                    <goal>run</goal>
-		                </goals>
-		                <configuration>
-		                    <prependClasspaths>
-		                        <prependClasspath>${config-target-dir}</prependClasspath>
-		                    </prependClasspaths>
-		                    <disableBlocking>true</disableBlocking>
-		                    <controlPort>${nexus-control-port}</controlPort>
-		                    <systemProperties>
-		                        <java.util.logging.config.file>${config-target-dir}/jul-logging.properties</java.util.logging.config.file>
-                                <java.io.tmpdir>${work-target-dir}/tmp</java.io.tmpdir>
-                                <plexus.host.control.socket.enabled>true</plexus.host.control.socket.enabled>
-                                <plexus.container.dev.mode>true</plexus.container.dev.mode>
-		                    </systemProperties>
-		                    <basedir>${nexus-abs-basedir}</basedir>
-		                    <configuration>${nexus-plexus-config-file}</configuration>
-		                    <includeTestClasspath>true</includeTestClasspath>
-		                    <platformArtifact>
-		                        <groupId>org.sonatype.appbooter.plexus-platforms</groupId>
-                                <artifactId>plexus-platform-base</artifactId>
-                                <version>${plexus.appbooter.version}</version>
-		                    </platformArtifact>
-		                </configuration>
-		            </execution>
-		            
-                    
-                    <execution>
-		                <id>start-proxy-repo</id>
-		                <phase>pre-integration-test</phase>
-		                <goals>
-		                    <goal>run</goal>
-		                </goals>
-		                <configuration>
-		                    <prependClasspaths>
-		                        <prependClasspath>${config-target-dir}</prependClasspath>
-		                    </prependClasspaths>
-		                    <disableBlocking>true</disableBlocking>
-		                    <controlPort>${proxy-repo-control-port}</controlPort>
-		                    <systemProperties>
-		                        <java.util.logging.config.file>${basedir}/${config-target-dir}/jul-logging.properties</java.util.logging.config.file>
-                                <java.io.tmpdir>target/proxy-repo/tmp</java.io.tmpdir>
-                                <plexus.host.control.socket.enabled>true</plexus.host.control.socket.enabled>
-                                <plexus.container.dev.mode>true</plexus.container.dev.mode>
-		                    </systemProperties>
-		                    <basedir>${proxy-repo-target-dir}</basedir>
-		                    <configuration>${proxy-repo-plexus-config-file}</configuration>
-		                    <includeTestClasspath>true</includeTestClasspath>
-		                    <platformArtifact>
-		                        <groupId>org.sonatype.appbooter.plexus-platforms</groupId>
-                                <artifactId>plexus-platform-base</artifactId>
-                                <version>${plexus.appbooter.version}</version>
-		                    </platformArtifact>
-		                </configuration>
-		            </execution>
-		            
-		            <execution>
-                        <id>stop-proxy-repo</id>
-                        <phase>post-integration-test</phase>
-                        <goals>
-                            <goal>stop</goal>
-                        </goals>
-                        <configuration>
-                        <controlPort>${proxy-repo-control-port}</controlPort>
-                        </configuration>
-                    </execution>
-                    
-                    <execution>
-                        <id>stop-nexus</id>
-                        <phase>post-integration-test</phase>
-                        <goals>
-                            <goal>stop</goal>
-                        </goals>
-                        <configuration>
-                        <controlPort>${nexus-control-port}</controlPort>
-                        </configuration>
-                    </execution>
-                    
-		        </executions> 
-                    
-		    </plugin>
-		    
-		    
-		    <plugin>
-                <groupId>org.sonatype.plugins</groupId>
-                <artifactId>wait-maven-plugin</artifactId>
-                <version>1.0</version>
-                <executions>
-                    <execution>
-                        <id>wait-for-nexus</id>
-                        <phase>pre-integration-test</phase>
-                        <goals>
-                            <goal>wait</goal>
-                        </goals>
-                        <configuration>
-                            <protocol>${nexus-application-protocol}</protocol>
-                            <host>${nexus-application-hostl}</host>
-                            <port>${nexus-application-port}</port>
-                            <file>/${nexus-application-name}</file>
-                            <maxcount>0</maxcount>
-                            <timeout>5000</timeout>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
-                    <skip>true</skip>
+                	<skip>false</skip>
+                	<includes>
+                	
+                	<include>**/IntegrationTestSuite*</include>
+                	
+                	
+                		<!--<include>**/Nexus261*</include>
+                	
+                	  <include>**/Nexus*</include>-->
+                	</includes>
+                	<excludes>
+                		<!-- <exclude>**/proxy/*</exclude> -->
+                	</excludes>
                 </configuration>
-                <executions>
-                    <execution>
-                        <id>integration-tests</id>
-                        <phase>integration-test</phase>
-                        <goals>
-                            <goal>test</goal>
-                        </goals>
-                        <configuration>
-                            <skip>false</skip>
-                            <excludes>
-                                <exclude>**/AbstractNexusIntegrationTest*</exclude>
-                                <!-- <exclude>**/proxy/*</exclude> -->
-                            </excludes>
-                        </configuration>
-                    </execution>
-                </executions>
             </plugin>
 		</plugins>
 	</build>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.sonatype.nexus.integrationtests.nexus261.Nexus261NexusGroupDownloadTest</groupId>
+  <artifactId>release-jar</artifactId>
+  <name/>
+  <version>1</version>
+  <description/>
+  
+    <distributionManagement>
+  	<repository>
+  		<id>releases</id>
+  		<name>Releases</name>
+  		<url>${nexus-base-url}content/repositories/nexus-test-harness-repo</url>
+  	</repository>
+  </distributionManagement>
+  
+</project>

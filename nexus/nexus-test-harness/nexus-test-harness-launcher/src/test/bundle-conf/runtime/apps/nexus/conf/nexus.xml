@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?><nexusConfiguration>
+  <version>1.0.4</version>
+  <workingDirectory>${nexus.working.directory}</workingDirectory>
+  <applicationLogDirectory>${nexus.log.directory}</applicationLogDirectory>
+  <security />
+  <globalConnectionSettings />
+  <restApi />
+  <httpProxy />
+  <routing>
+    <groups />
+  </routing>
+  <repositories>
+    <repository>
+      <id>nexus-test-harness-repo</id>
+      <name>nexus-test-harness-repo</name>
+      <allowWrite>true</allowWrite>
+    </repository>
+    <repository>
+      <id>nexus-test-harness-repo2</id>
+      <name>nexus-test-harness-repo2</name>
+      <allowWrite>true</allowWrite>
+    </repository>
+    <repository>
+      <id>nexus-test-harness-release-repo</id>
+      <name>nexus-test-harness-release-repo</name>
+      <allowWrite>true</allowWrite>
+    </repository>
+    <repository>
+      <id>nexus-test-harness-snapshot-repo</id>
+      <name>nexus-test-harness-snapshot-repo</name>
+      <allowWrite>true</allowWrite>
+      <repositoryPolicy>snapshot</repositoryPolicy>
+    </repository>
+    <repository>
+      <id>release-proxy-repo-1</id>
+      <name>Jetty Test Server</name>
+      <proxyMode>blockedAuto</proxyMode>
+      <remoteStorage>
+        <url>${proxy-repo-base-url}release-proxy-repo-1</url>
+      </remoteStorage>
+    </repository>
+  </repositories>
+  <repositoryGrouping>
+    <repositoryGroups>
+      <repositoryGroup>
+        <groupId>nexus-test</groupId>
+        <name>nexus-test</name>
+        <repositories>
+          <repository>nexus-test-harness-repo</repository>
+          <repository>nexus-test-harness-repo2</repository>
+          <repository>release-proxy-repo-1</repository>
+        </repositories>
+      </repositoryGroup>
+      <repositoryGroup>
+        <groupId>nexus-test-harness-snapshot-group</groupId>
+        <name>nexus-test-harness-snapshot-group</name>
+        <repositories>
+          <repository>nexus-test-harness-snapshot-repo</repository>
+        </repositories>
+      </repositoryGroup>
+      <repositoryGroup>
+        <groupId>nexus-test-harness-release-group</groupId>
+        <name>nexus-test-harness-release-group</name>
+        <repositories>
+          <repository>nexus-test-harness-release-repo</repository>
+        </repositories>
+      </repositoryGroup>
+    </repositoryGroups>
+  </repositoryGrouping>
+</nexusConfiguration>

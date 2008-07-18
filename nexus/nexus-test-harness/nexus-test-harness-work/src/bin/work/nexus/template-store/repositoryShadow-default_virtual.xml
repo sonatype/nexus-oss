@@ -1,9 +1,0 @@
-<org.sonatype.nexus.configuration.model.CRepositoryShadow>
-  <id>default_virtual</id>
-  <name></name>
-  <localStatus>inService</localStatus>
-  <type>maven1</type>
-  <syncAtStartup>false</syncAtStartup>
-  <modelVersion>1.0.3</modelVersion>
-  <modelEncoding>UTF-8</modelEncoding>
-</org.sonatype.nexus.configuration.model.CRepositoryShadow>

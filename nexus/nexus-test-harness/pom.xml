@@ -13,9 +13,6 @@
 	<name>Nexus Test Harness</name>
 	
 	<modules>
-		<module>nexus-test-harness-config</module>
-		<module>nexus-test-harness-work</module>
-    <module>nexus-test-harness-launcher</module>
-	  <module>nexus-test-harness-proxy-repo</module>
-  </modules>
+        <module>nexus-test-harness-launcher</module>
+    </modules>
 </project>
