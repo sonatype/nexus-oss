@@ -574,7 +574,7 @@ public abstract class AbstractResourceStoreContentResource
         {
             getResponse().setStatus( Status.CLIENT_ERROR_BAD_REQUEST, t.getMessage() );
 
-            getLogger().log( Level.SEVERE, "Illegal argument!", t );
+            getLogger().log( Level.INFO, "ResourceStoreContentResource, illegal argument:" + t.getMessage() );
         }
         else if ( t instanceof StorageException )
         {

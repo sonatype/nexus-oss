@@ -526,11 +526,35 @@ public class AbstractArtifactResourceHandler
                     getResponse().setStatus( Status.SUCCESS_CREATED );
 
                 }
+                catch ( StorageException e )
+                {
+                    getLogger().log( Level.SEVERE, "StorageException during retrieve:", e );
+
+                    getResponse().setStatus( Status.SERVER_ERROR_INTERNAL );
+                }
                 catch ( NoSuchResourceStoreException e )
                 {
-                    getLogger().log( Level.INFO, "Upload request to nonexistent ResourceStore: " + e.getMessage() );
+                    getResponse().setStatus( Status.CLIENT_ERROR_NOT_FOUND, "No repository with id=" + "" );
+                }
+                catch ( RepositoryNotAvailableException e )
+                {
+                    getResponse().setStatus( Status.SERVER_ERROR_SERVICE_UNAVAILABLE );
+                }
+                catch ( AccessDeniedException e )
+                {
+                    getResponse().setStatus( Status.CLIENT_ERROR_FORBIDDEN );
+                }
+                catch ( XmlPullParserException e )
+                {
+                    getLogger().log( Level.SEVERE, "XmlPullParserException during retrieve of POM:", e );
 
-                    getResponse().setStatus( Status.CLIENT_ERROR_NOT_FOUND, e.getMessage() );
+                    getResponse().setStatus( Status.SERVER_ERROR_INTERNAL );
+                }
+                catch ( IOException e )
+                {
+                    getLogger().log( Level.SEVERE, "IOException during retrieve of POM:", e );
+
+                    getResponse().setStatus( Status.SERVER_ERROR_INTERNAL );
                 }
                 catch ( Exception e )
                 {
