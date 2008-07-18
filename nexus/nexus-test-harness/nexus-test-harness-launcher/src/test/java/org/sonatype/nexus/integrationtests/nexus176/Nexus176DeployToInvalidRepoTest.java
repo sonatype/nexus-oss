@@ -49,7 +49,7 @@ public class Nexus176DeployToInvalidRepoTest
 
         int status = DeployUtils.deployUsingGavWithRest( uploadURL, TEST_RELEASE_REPO, gav, fileToDeploy );
 
-        if ( status != HttpStatus.SC_BAD_REQUEST )
+        if ( status != HttpStatus.SC_NOT_FOUND )
         {
             Assert.fail( "Upload attempt should have returned a 400, it returned:  "+ status);
         }
@@ -94,7 +94,7 @@ public class Nexus176DeployToInvalidRepoTest
 
         int status = DeployUtils.deployUsingGavWithRest( uploadURL, TEST_RELEASE_REPO, gav, fileToDeploy );
 
-        if ( status != HttpStatus.SC_BAD_REQUEST )
+        if ( status != HttpStatus.SC_NOT_FOUND )
         {
             Assert.fail( "Upload attempt should have returned a 400, it returned:  "+ status);
         }
@@ -139,7 +139,7 @@ public class Nexus176DeployToInvalidRepoTest
             
         int status = DeployUtils.deployUsingPomWithRest( uploadURL, TEST_RELEASE_REPO, gav, fileToDeploy, pomFile );
         
-        if ( status != HttpStatus.SC_BAD_REQUEST )
+        if ( status != HttpStatus.SC_NOT_FOUND )
         {
             Assert.fail( "Upload attempt should have returned a 400, it returned:  "+ status);
         }
@@ -183,7 +183,7 @@ public class Nexus176DeployToInvalidRepoTest
 
         int status = DeployUtils.deployUsingGavWithRest( uploadURL, TEST_RELEASE_REPO, gav, fileToDeploy );
 
-        if ( status != HttpStatus.SC_BAD_REQUEST )
+        if ( status != HttpStatus.SC_NOT_FOUND )
         {
             Assert.fail( "Upload attempt should have returned a 400, it returned:  "+ status);
         }
@@ -228,7 +228,7 @@ public class Nexus176DeployToInvalidRepoTest
 
         int status = DeployUtils.deployUsingGavWithRest( uploadURL, TEST_RELEASE_REPO, gav, fileToDeploy );
 
-        if ( status != HttpStatus.SC_BAD_REQUEST )
+        if ( status != HttpStatus.SC_NOT_FOUND )
         {
             Assert.fail( "Upload attempt should have returned a 400, it returned:  "+ status);
         }
@@ -273,7 +273,7 @@ public class Nexus176DeployToInvalidRepoTest
             
         int status = DeployUtils.deployUsingPomWithRest( uploadURL, TEST_RELEASE_REPO, gav, fileToDeploy, pomFile );
         
-        if ( status != HttpStatus.SC_BAD_REQUEST )
+        if ( status != HttpStatus.SC_NOT_FOUND )
         {
             Assert.fail( "Upload attempt should have returned a 400, it returned:  "+ status);
         }

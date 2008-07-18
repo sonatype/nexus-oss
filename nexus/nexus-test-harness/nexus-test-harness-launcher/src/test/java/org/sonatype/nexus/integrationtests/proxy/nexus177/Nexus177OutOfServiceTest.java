@@ -40,19 +40,16 @@ public class Nexus177OutOfServiceTest
         this.setOutOfServiceProxy( this.getBaseNexusUrl(), TEST_RELEASE_REPO, true );
         
         // redownload artifact
-        boolean fileWasDownloaded = true;
         try
         {
           // download it
           downloadArtifact( gav, "./target/downloaded-jars" );
+          Assert.fail("Out Of Service Command didn't do anything.");
         }
         catch(FileNotFoundException e)
         {
-            fileWasDownloaded = false;
         }
         
-        Assert.assertFalse( "Out Of Service Command didn't do anything.", fileWasDownloaded );
-
         // put proxy back in service
         this.setOutOfServiceProxy( this.getBaseNexusUrl(), TEST_RELEASE_REPO, false );
         

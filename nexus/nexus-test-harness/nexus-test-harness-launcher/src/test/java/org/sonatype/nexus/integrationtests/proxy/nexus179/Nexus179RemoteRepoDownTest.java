@@ -2,7 +2,6 @@ package org.sonatype.nexus.integrationtests.proxy.nexus179;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.Date;
 
 import junit.framework.Assert;
@@ -44,31 +43,28 @@ public class Nexus179RemoteRepoDownTest
         // make sure this exists first, or the test is invalid anyway.
         Assert.assertTrue( "The File: " + localFile + " does not exist.", localFile.exists() );
 
-        boolean testPassed = false;
         try
         {
             this.downloadArtifact( gav, "target/downloads" );
+            Assert.fail( "A FileNotFoundException should have been thrown." );
         }
         catch ( FileNotFoundException e )
         {
-            testPassed = true;
         }
-        Assert.assertTrue( "A FileNotFoundException should have been thrown.", testPassed );
+        
 
         // Start up the proxy
         this.startProxy();
 
         // should not be able to download artifact after starting proxy, without clearing the cache.
-        testPassed = false;
         try
         {
             this.downloadArtifact( gav, "target/downloads" );
+            Assert.fail( "A FileNotFoundException should have been thrown." );
         }
         catch ( FileNotFoundException e )
         {
-            testPassed = true;
         }
-        Assert.assertTrue( "A FileNotFoundException should have been thrown.", testPassed );
 
         // unblock the proxy
         this.setBlockProxy( this.getBaseNexusUrl(), TEST_RELEASE_REPO, false);
