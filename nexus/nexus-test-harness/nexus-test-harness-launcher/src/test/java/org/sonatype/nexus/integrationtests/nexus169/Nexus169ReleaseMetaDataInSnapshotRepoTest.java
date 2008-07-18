@@ -34,7 +34,7 @@ public class Nexus169ReleaseMetaDataInSnapshotRepoTest
     {
 
         Gav gav =
-            new Gav( this.getClass().getName(), "simple-artifact", "1.0.4", null, "jar", 0, new Date().getTime(),
+            new Gav( this.getTestId(), "simple-artifact", "1.0.4", null, "jar", 0, new Date().getTime(),
                      "Simple Test Artifact", false, false, null, false, null );
 
         // try to download it
@@ -73,11 +73,11 @@ public class Nexus169ReleaseMetaDataInSnapshotRepoTest
         // been stripped out.
 
         URL snapshotRepoMetaDataURL =
-            new URL( this.getNexusTestRepoUrl() + this.getClass().getName().replace( '.', '/' )
+            new URL( this.getNexusTestRepoUrl() + this.getTestId().replace( '.', '/' )
                 + "/simple-artifact/maven-metadata.xml" );
         URL groupMetaDataURL =
             new URL( this.getBaseNexusUrl() + GROUP_REPOSITORY_RELATIVE_URL + TEST_GROUP + "/"
-                + this.getClass().getName().replace( '.', '/' ) + "/simple-artifact/maven-metadata.xml" );
+                + this.getTestId().replace( '.', '/' ) + "/simple-artifact/maven-metadata.xml" );
 
         System.out.println( "snapshotRepoMetaDataURL: " + snapshotRepoMetaDataURL );
         System.out.println( "groupMetaDataURL: " + groupMetaDataURL );

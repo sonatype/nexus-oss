@@ -42,7 +42,7 @@ public class Nexus261NexusGroupDownloadTest
         throws IOException
     {
         Gav gav =
-            new Gav( this.getClass().getName(), "release-jar", "1", null, "jar", 0, new Date().getTime(),
+            new Gav( this.getTestId(), "release-jar", "1", null, "jar", 0, new Date().getTime(),
                      "Release Jar", false, false, null, false, null );
 
         File artifact = downloadArtifactFromGroup( "nexus-test", gav, "./target/downloaded-jars" );

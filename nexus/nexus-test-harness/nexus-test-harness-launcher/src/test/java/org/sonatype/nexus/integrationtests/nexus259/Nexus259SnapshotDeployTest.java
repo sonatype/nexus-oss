@@ -31,7 +31,7 @@ public class Nexus259SnapshotDeployTest
     {
 
         Gav gav =
-            new Gav( this.getClass().getName(), "uploadWithGav", "1.0.0-SNAPSHOT", null, "xml", 0,
+            new Gav( this.getTestId(), "uploadWithGav", "1.0.0-SNAPSHOT", null, "xml", 0,
                      new Date().getTime(), "Simple Test Artifact", false, true, null, false, null );
 
         // file to deploy
@@ -70,7 +70,7 @@ public class Nexus259SnapshotDeployTest
     {
 
         Gav gav =
-            new Gav( this.getClass().getName(), "uploadWithGav", "1.0.0-SNAPSHOT", null, "xml", 0,
+            new Gav( this.getTestId(), "uploadWithGav", "1.0.0-SNAPSHOT", null, "xml", 0,
                      new Date().getTime(), "Simple Test Artifact", false, false, null, false, null );
 
         // file to deploy

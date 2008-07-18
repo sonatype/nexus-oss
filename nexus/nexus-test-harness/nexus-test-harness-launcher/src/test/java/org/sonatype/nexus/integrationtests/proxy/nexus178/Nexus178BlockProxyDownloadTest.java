@@ -29,7 +29,7 @@ public class Nexus178BlockProxyDownloadTest extends AbstractNexusProxyIntegratio
     {
         
         Gav gav =
-            new Gav( this.getClass().getName(), "block-proxy-download-test", "1.1.a", null, "jar", 0,
+            new Gav( this.getTestId(), "block-proxy-download-test", "1.1.a", null, "jar", 0,
                      new Date().getTime(), "Simple Test Artifact", false, false, null, false, null );
      
         // download file

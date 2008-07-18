@@ -33,7 +33,7 @@ public class Nexus168SnapshotToReleaseTest
         throws Exception
     {
         Gav gav =
-            new Gav( this.getClass().getName(), "simpleArtifact", "1.0.0-SNAPSHOT", null, "xml", 0,
+            new Gav( this.getTestId(), "simpleArtifact", "1.0.0-SNAPSHOT", null, "xml", 0,
                      new Date().getTime(), "Simple Test Artifact", false, false, null, false, null );
 
         // file to deploy
@@ -63,7 +63,7 @@ public class Nexus168SnapshotToReleaseTest
     {
 
         Gav gav =
-            new Gav( this.getClass().getName(), "uploadWithGav", "1.0.0-SNAPSHOT", null, "xml", 0,
+            new Gav( this.getTestId(), "uploadWithGav", "1.0.0-SNAPSHOT", null, "xml", 0,
                      new Date().getTime(), "Simple Test Artifact", false, true, null, false, null );
 
         // file to deploy
@@ -107,7 +107,7 @@ public class Nexus168SnapshotToReleaseTest
     {
 
         Gav gav =
-            new Gav( this.getClass().getName(), "uploadWithPom", "1.0.0-SNAPSHOT", null, "xml", 0,
+            new Gav( this.getTestId(), "uploadWithPom", "1.0.0-SNAPSHOT", null, "xml", 0,
                      new Date().getTime(), "Simple Test Artifact", false, true, null, false, null );
 
         // file to deploy

@@ -35,7 +35,7 @@ public class Nexus258ReleaseDeployTest
     {
 
         Gav gav =
-            new Gav( this.getClass().getName(), "uploadWithGav", "1.0.0", null, "xml", 0,
+            new Gav( this.getTestId(), "uploadWithGav", "1.0.0", null, "xml", 0,
                      new Date().getTime(), "Simple Test Artifact", false, false, null, false, null  );
 
         // file to deploy
@@ -71,7 +71,7 @@ public class Nexus258ReleaseDeployTest
     {
 
         Gav gav =
-            new Gav( this.getClass().getName(), "uploadWithGav", "1.0.0", null, "xml", 0,
+            new Gav( this.getTestId(), "uploadWithGav", "1.0.0", null, "xml", 0,
                      new Date().getTime(), "Simple Test Artifact", false, false, null, false, null );
 
         // file to deploy
