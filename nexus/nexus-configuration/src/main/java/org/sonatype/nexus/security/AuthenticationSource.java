@@ -20,7 +20,6 @@
  */
 package org.sonatype.nexus.security;
 
-import org.sonatype.nexus.security.User;
 
 public interface AuthenticationSource
 {

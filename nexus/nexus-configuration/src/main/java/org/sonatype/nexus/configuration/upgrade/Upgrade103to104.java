@@ -29,11 +29,15 @@ import java.util.List;
 
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+import org.sonatype.nexus.configuration.model.CAdvancedSchedule;
 import org.sonatype.nexus.configuration.model.CAuthSource;
 import org.sonatype.nexus.configuration.model.CAuthzSource;
+import org.sonatype.nexus.configuration.model.CDailySchedule;
 import org.sonatype.nexus.configuration.model.CGroupsSetting;
 import org.sonatype.nexus.configuration.model.CHttpProxySettings;
 import org.sonatype.nexus.configuration.model.CLocalStorage;
+import org.sonatype.nexus.configuration.model.CMonthlySchedule;
+import org.sonatype.nexus.configuration.model.COnceSchedule;
 import org.sonatype.nexus.configuration.model.CProps;
 import org.sonatype.nexus.configuration.model.CRemoteAuthentication;
 import org.sonatype.nexus.configuration.model.CRemoteConnectionSettings;
@@ -45,8 +49,12 @@ import org.sonatype.nexus.configuration.model.CRepositoryGrouping;
 import org.sonatype.nexus.configuration.model.CRepositoryShadow;
 import org.sonatype.nexus.configuration.model.CRestApiSettings;
 import org.sonatype.nexus.configuration.model.CRouting;
+import org.sonatype.nexus.configuration.model.CRunNowSchedule;
+import org.sonatype.nexus.configuration.model.CSchedule;
+import org.sonatype.nexus.configuration.model.CScheduledTask;
 import org.sonatype.nexus.configuration.model.CSecurity;
 import org.sonatype.nexus.configuration.model.CTaskConfiguration;
+import org.sonatype.nexus.configuration.model.CWeeklySchedule;
 import org.sonatype.nexus.configuration.model.v1_0_3.CGroupsSettingPathMappingItem;
 import org.sonatype.nexus.configuration.model.v1_0_3.Configuration;
 import org.sonatype.nexus.configuration.model.v1_0_3.io.xpp3.NexusConfigurationXpp3Reader;
@@ -105,6 +113,9 @@ public class Upgrade103to104
         {
             // a snippet from old TaskConnfigManager
             XStream xstream = new XStream( new DomDriver() );
+
+            // alias the versioned class
+            xstream.alias( "org.sonatype.nexus.configuration.model.CTaskConfiguration", CTaskConfiguration.class );
 
             tasksConfig = new CTaskConfiguration();
 
@@ -295,10 +306,124 @@ public class Upgrade103to104
 
         if ( tasksConfig != null && tasksConfig.getTasks().size() > 0 )
         {
-            // we were using XStream, and it was tasks.xml was persisted.
-            // the model structure wrt tasks did not change between 1.0.3 and 1.0.4,
-            // so it is possible to simply "push" all xstream loaded stuff into new configuration.
-            newc.getTasks().addAll( tasksConfig.getTasks() );
+            List<org.sonatype.nexus.configuration.model.CScheduledTask> oldTasks = tasksConfig.getTasks();
+
+            for ( org.sonatype.nexus.configuration.model.CScheduledTask oldTask : oldTasks )
+            {
+                CScheduledTask task = new CScheduledTask();
+
+                task.setId( oldTask.getId() );
+
+                task.setName( oldTask.getName() );
+
+                task.setEnabled( oldTask.isEnabled() );
+
+                task.setLastRun( oldTask.getLastRun() );
+
+                task.setNextRun( oldTask.getNextRun() );
+
+                task.setStatus( oldTask.getStatus() );
+
+                task.setType( oldTask.getType() );
+
+                List<org.sonatype.nexus.configuration.model.CProps> oldProps = oldTask.getProperties();
+
+                for ( org.sonatype.nexus.configuration.model.CProps oldProp : oldProps )
+                {
+                    CProps prop = new CProps();
+
+                    prop.setKey( oldProp.getKey() );
+
+                    prop.setValue( oldProp.getValue() );
+
+                    task.addProperty( prop );
+                }
+
+                CSchedule schedule = null;
+
+                // Manual is null
+                if ( oldTask.getSchedule() != null )
+                {
+                    if ( org.sonatype.nexus.configuration.model.CAdvancedSchedule.class.isAssignableFrom( oldTask
+                        .getSchedule().getClass() ) )
+                    {
+                        CAdvancedSchedule s = new CAdvancedSchedule();
+
+                        s.setCronCommand( ( (org.sonatype.nexus.configuration.model.CAdvancedSchedule) oldTask
+                            .getSchedule() ).getCronCommand() );
+
+                        schedule = s;
+                    }
+                    else if ( org.sonatype.nexus.configuration.model.CRunNowSchedule.class.isAssignableFrom( oldTask
+                        .getSchedule().getClass() ) )
+                    {
+                        CRunNowSchedule s = new CRunNowSchedule();
+
+                        schedule = s;
+                    }
+                    else if ( org.sonatype.nexus.configuration.model.CMonthlySchedule.class.isAssignableFrom( oldTask
+                        .getSchedule().getClass() ) )
+                    {
+                        CMonthlySchedule s = new CMonthlySchedule();
+
+                        s.setStartDate( ( (org.sonatype.nexus.configuration.model.CMonthlySchedule) oldTask
+                            .getSchedule() ).getStartDate() );
+
+                        s
+                            .setEndDate( ( (org.sonatype.nexus.configuration.model.CMonthlySchedule) oldTask
+                                .getSchedule() ).getEndDate() );
+
+                        s.setDaysOfMonth( ( (org.sonatype.nexus.configuration.model.CMonthlySchedule) oldTask
+                            .getSchedule() ).getDaysOfMonth() );
+
+                        schedule = s;
+                    }
+                    else if ( org.sonatype.nexus.configuration.model.CWeeklySchedule.class.isAssignableFrom( oldTask
+                        .getSchedule().getClass() ) )
+                    {
+                        CWeeklySchedule s = new CWeeklySchedule();
+
+                        s.setStartDate( ( (org.sonatype.nexus.configuration.model.CWeeklySchedule) oldTask
+                            .getSchedule() ).getStartDate() );
+
+                        s.setEndDate( ( (org.sonatype.nexus.configuration.model.CWeeklySchedule) oldTask.getSchedule() )
+                            .getEndDate() );
+
+                        s.setDaysOfWeek( ( (org.sonatype.nexus.configuration.model.CWeeklySchedule) oldTask
+                            .getSchedule() ).getDaysOfWeek() );
+
+                        schedule = s;
+                    }
+                    else if ( org.sonatype.nexus.configuration.model.CDailySchedule.class.isAssignableFrom( oldTask
+                        .getSchedule().getClass() ) )
+                    {
+                        CDailySchedule s = new CDailySchedule();
+
+                        s
+                            .setStartDate( ( (org.sonatype.nexus.configuration.model.CDailySchedule) oldTask
+                                .getSchedule() ).getStartDate() );
+
+                        s.setEndDate( ( (org.sonatype.nexus.configuration.model.CDailySchedule) oldTask.getSchedule() )
+                            .getEndDate() );
+
+                        schedule = s;
+                    }
+                    else if ( org.sonatype.nexus.configuration.model.COnceSchedule.class.isAssignableFrom( oldTask
+                        .getSchedule().getClass() ) )
+                    {
+                        COnceSchedule s = new COnceSchedule();
+
+                        s.setStartDate( ( (org.sonatype.nexus.configuration.model.COnceSchedule) oldTask.getSchedule() )
+                            .getStartDate() );
+
+                        schedule = s;
+                    }
+                }
+
+                task.setSchedule( schedule );
+
+                newc.addTask( task );
+            }
         }
 
         message.setModelVersion( org.sonatype.nexus.configuration.model.Configuration.MODEL_VERSION );

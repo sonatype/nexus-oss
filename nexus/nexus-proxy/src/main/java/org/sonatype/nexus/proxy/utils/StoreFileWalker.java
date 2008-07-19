@@ -49,9 +49,9 @@ public abstract class StoreFileWalker
             }
             catch ( Exception ex )
             {
-                if ( logger != null )
+                if ( getLogger() != null )
                 {
-                    logger.warn( "Got exception during file item walking!", ex );
+                    getLogger().warn( "Got exception during file item walking!", ex );
                 }
             }
         }

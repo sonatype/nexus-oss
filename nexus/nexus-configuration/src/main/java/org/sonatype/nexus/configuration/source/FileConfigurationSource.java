@@ -165,7 +165,7 @@ public class FileConfigurationSource
         {
             if ( vResponse.isModified() )
             {
-                getLogger().warn( "Validation has warnings and configuration is fixed, storing the changes." );
+                getLogger().info( "Validation has modified the configuration, storing the changes." );
 
                 storeConfiguration();
             }
@@ -210,8 +210,7 @@ public class FileConfigurationSource
                 + file.getAbsolutePath() + " file with a valid Nexus configuration file." );
         }
 
-        getLogger().info(
-            "Configuration file succesfully upgraded, creating backup from the old file and saving the upgraded one." );
+        getLogger().info( "Creating backup from the old file and saving the upgraded configuration." );
 
         // backup the file
         File backup = new File( file.getParentFile(), file.getName() + ".bak" );
@@ -235,6 +234,8 @@ public class FileConfigurationSource
     private void loadConfiguration( File file )
         throws IOException
     {
+        getLogger().info( "Loading Nexus configuration from " + file.getAbsolutePath() );
+
         FileInputStream fis = null;
         try
         {
@@ -248,18 +249,6 @@ public class FileConfigurationSource
             {
                 fis.close();
             }
-        }
-        if ( getConfiguration() == null || !Configuration.MODEL_VERSION.equals( getConfiguration().getVersion() ) )
-        {
-            getLogger().warn(
-                "Nexus configuration file not loaded from " + file.getAbsolutePath()
-                    + ", it has wrong version or structure." );
-
-            rejectConfiguration();
-        }
-        else
-        {
-            getLogger().info( "Configuration loaded succesfully from " + file.getAbsolutePath() );
         }
     }
 

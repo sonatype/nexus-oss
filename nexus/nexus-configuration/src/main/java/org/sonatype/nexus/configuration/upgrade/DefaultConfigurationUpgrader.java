@@ -80,7 +80,7 @@ public class DefaultConfigurationUpgrader
         }
 
         UpgradeMessage msg = new UpgradeMessage();
-        
+
         msg.setModelVersion( modelVersion );
 
         // a correction for SWX
@@ -93,7 +93,9 @@ public class DefaultConfigurationUpgrader
 
         if ( upgrader != null )
         {
-            getLogger().info( "Loading OLD configuration from " + file.getAbsolutePath() );
+            getLogger().info(
+                "Upgrading old Nexus configuration file (version " + msg.getModelVersion() + ") from "
+                    + file.getAbsolutePath() );
 
             msg.setConfiguration( upgrader.loadConfiguration( file ) );
 
@@ -101,8 +103,6 @@ public class DefaultConfigurationUpgrader
             {
                 if ( upgrader != null )
                 {
-                    getLogger().info( "Upgrading OLD configuration from version " + msg.getModelVersion() );
-
                     upgrader.upgrade( msg );
                 }
                 else
@@ -113,6 +113,9 @@ public class DefaultConfigurationUpgrader
 
                 upgrader = upgraders.get( msg.getModelVersion() );
             }
+
+            getLogger().info(
+                "Nexus configuration file upgraded to current version " + msg.getModelVersion() + " succesfully." );
 
             return (Configuration) msg.getConfiguration();
         }

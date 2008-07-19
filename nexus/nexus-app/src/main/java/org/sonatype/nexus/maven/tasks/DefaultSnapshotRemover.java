@@ -354,7 +354,7 @@ public class DefaultSnapshotRemover
                     }
                     catch ( Exception e )
                     {
-                        logger.warn( "Could not delete whole GAV " + coll.getRepositoryItemUid().toString(), e );
+                        getLogger().warn( "Could not delete whole GAV " + coll.getRepositoryItemUid().toString(), e );
                     }
                 }
                 else
@@ -429,7 +429,7 @@ public class DefaultSnapshotRemover
                             }
                             catch ( Exception e )
                             {
-                                logger.warn( "Could not delete file:", e );
+                                getLogger().warn( "Could not delete file:", e );
                             }
                         }
                     }

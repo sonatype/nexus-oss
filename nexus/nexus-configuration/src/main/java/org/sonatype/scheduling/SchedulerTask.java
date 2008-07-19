@@ -24,8 +24,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
-import org.sonatype.scheduling.ScheduledTask;
-
 public interface SchedulerTask<T>
     extends Callable<T>
 {

@@ -71,7 +71,7 @@ public class EvictUnusedItemsWalker
         }
         catch ( StorageException e )
         {
-            logger.warn( "Got storage exception while evicting " + item.getRepositoryItemUid().toString(), e );
+            getLogger().warn( "Got storage exception while evicting " + item.getRepositoryItemUid().toString(), e );
         }
     }
 

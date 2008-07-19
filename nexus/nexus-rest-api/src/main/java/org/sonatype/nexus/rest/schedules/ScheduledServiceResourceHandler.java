@@ -32,24 +32,14 @@ import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.restlet.resource.Representation;
 import org.restlet.resource.Variant;
-import org.sonatype.nexus.rest.model.ScheduledServiceAdvancedResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceBaseResource;
-import org.sonatype.nexus.rest.model.ScheduledServiceDailyResource;
-import org.sonatype.nexus.rest.model.ScheduledServiceMonthlyResource;
-import org.sonatype.nexus.rest.model.ScheduledServiceOnceResource;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceResourceResponse;
 import org.sonatype.nexus.rest.model.ScheduledServiceResourceStatus;
 import org.sonatype.nexus.rest.model.ScheduledServiceResourceStatusResponse;
-import org.sonatype.nexus.rest.model.ScheduledServiceWeeklyResource;
 import org.sonatype.scheduling.NoSuchTaskException;
 import org.sonatype.scheduling.ScheduledTask;
 import org.sonatype.scheduling.TaskState;
-import org.sonatype.scheduling.schedules.CronSchedule;
-import org.sonatype.scheduling.schedules.DailySchedule;
-import org.sonatype.scheduling.schedules.MonthlySchedule;
-import org.sonatype.scheduling.schedules.OnceSchedule;
-import org.sonatype.scheduling.schedules.WeeklySchedule;
 
 public class ScheduledServiceResourceHandler
     extends AbstractScheduledServiceResourceHandler

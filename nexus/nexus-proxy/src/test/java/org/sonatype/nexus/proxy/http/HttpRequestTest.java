@@ -23,9 +23,9 @@ package org.sonatype.nexus.proxy.http;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
-import org.codehaus.plexus.util.IOUtil;
-
 import junit.framework.TestCase;
+
+import org.codehaus.plexus.util.IOUtil;
 
 public class HttpRequestTest
     extends TestCase

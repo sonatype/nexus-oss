@@ -44,15 +44,22 @@ import org.sonatype.nexus.proxy.repository.Repository;
  */
 public abstract class StoreWalker
 {
-    protected ResourceStore store;
+    private ResourceStore store;
 
-    protected Logger logger;
+    private Logger logger;
 
-    protected boolean running;
+    private boolean running;
 
-    protected Throwable stopCause;
+    private Throwable stopCause;
+
+    private StoreWalkerFilter filter;
 
     public StoreWalker( ResourceStore store, Logger logger )
+    {
+        this( store, logger, new AffirmativeStoreWalkerFilter() );
+    }
+
+    public StoreWalker( ResourceStore store, Logger logger, StoreWalkerFilter filter )
     {
         super();
 
@@ -61,6 +68,18 @@ public abstract class StoreWalker
         this.logger = logger;
 
         this.stopCause = null;
+
+        this.filter = filter;
+    }
+
+    public StoreWalkerFilter getFilter()
+    {
+        return filter;
+    }
+
+    public void setFilter( StoreWalkerFilter filter )
+    {
+        this.filter = filter;
     }
 
     protected Logger getLogger()
@@ -76,6 +95,29 @@ public abstract class StoreWalker
     public Throwable getStopCause()
     {
         return stopCause;
+    }
+
+    public void stop( Throwable cause )
+    {
+        running = false;
+
+        this.stopCause = cause;
+
+        if ( cause != null )
+        {
+            if ( logger.isDebugEnabled() )
+            {
+                logger.debug( "Walking STOPPED on " + store.getId() + " because stop() was called with cause:", cause );
+            }
+        }
+        else
+        {
+            if ( logger.isDebugEnabled() )
+            {
+                logger.debug( "Walking STOPPED on " + store.getId()
+                    + " because stop() was called without submitted cause." );
+            }
+        }
     }
 
     public void walk()
@@ -94,23 +136,6 @@ public abstract class StoreWalker
         throws WalkerException
     {
         walk( null, localOnly, collectionsOnly );
-    }
-
-    public void stop( Throwable cause )
-    {
-        running = false;
-
-        this.stopCause = cause;
-
-        if ( cause != null )
-        {
-            logger.debug( "Walking STOPPED on " + store.getId() + " because stop() was called with cause:", cause );
-        }
-        else
-        {
-            logger
-                .debug( "Walking STOPPED on " + store.getId() + " because stop() was called without submitted cause." );
-        }
     }
 
     public final void walk( String fromPath, boolean localOnly, boolean collectionsOnly )
@@ -243,9 +268,26 @@ public abstract class StoreWalker
             NoSuchResourceStoreException,
             StorageException
     {
-        if ( !shouldProcess( coll ) )
+        if ( !running )
         {
             return collCount;
+        }
+
+        boolean shouldProcess = getFilter().shouldProcess( coll );
+
+        boolean shouldProcessRecursively = getFilter().shouldProcessRecursively( coll );
+
+        if ( !shouldProcess && !shouldProcessRecursively )
+        {
+            return collCount;
+        }
+
+        // user may call stop()
+        if ( shouldProcess )
+        {
+            onCollectionEnter( coll );
+
+            collCount++;
         }
 
         if ( !running )
@@ -253,18 +295,11 @@ public abstract class StoreWalker
             return collCount;
         }
 
-        collCount++;
-
         // user may call stop()
-        onCollectionEnter( coll );
-
-        if ( !running )
+        if ( shouldProcess )
         {
-            return collCount;
+            processItem( coll );
         }
-
-        // user may call stop()
-        processItem( coll );
 
         if ( !running )
         {
@@ -273,52 +308,53 @@ public abstract class StoreWalker
 
         Collection<StorageItem> ls = null;
 
-        if ( Repository.class.isAssignableFrom( store.getClass() ) )
+        if ( shouldProcessRecursively )
         {
-            ls = ( (Repository) store ).list( coll );
-        }
-        else
-        {
-            // we are dealing with router
-            ResourceStoreRequest request = new ResourceStoreRequest( coll.getPath(), localOnly );
-
-            ls = store.list( request );
-        }
-
-        for ( StorageItem i : ls )
-        {
-            if ( !collectionsOnly && !StorageCollectionItem.class.isAssignableFrom( i.getClass() ) )
+            if ( Repository.class.isAssignableFrom( store.getClass() ) )
             {
-                // user may call stop()
-                processItem( i );
+                ls = ( (Repository) store ).list( coll );
+            }
+            else
+            {
+                // we are dealing with router
+                ResourceStoreRequest request = new ResourceStoreRequest( coll.getPath(), localOnly );
 
-                if ( !running )
-                {
-                    return collCount;
-                }
+                ls = store.list( request );
             }
 
-            if ( StorageCollectionItem.class.isAssignableFrom( i.getClass() ) )
+            for ( StorageItem i : ls )
             {
-                // user may call stop()
-                collCount = walkRecursive( collCount, (StorageCollectionItem) i, localOnly, collectionsOnly );
-
-                if ( !running )
+                if ( !collectionsOnly && !StorageCollectionItem.class.isAssignableFrom( i.getClass() ) )
                 {
-                    return collCount;
+                    // user may call stop()
+                    processItem( i );
+
+                    if ( !running )
+                    {
+                        return collCount;
+                    }
+                }
+
+                if ( StorageCollectionItem.class.isAssignableFrom( i.getClass() ) )
+                {
+                    // user may call stop()
+                    collCount = walkRecursive( collCount, (StorageCollectionItem) i, localOnly, collectionsOnly );
+
+                    if ( !running )
+                    {
+                        return collCount;
+                    }
                 }
             }
         }
 
         // user may call stop()
-        onCollectionExit( coll );
+        if ( shouldProcess )
+        {
+            onCollectionExit( coll );
+        }
 
         return collCount;
-    }
-
-    protected boolean shouldProcess( StorageCollectionItem coll )
-    {
-        return true;
     }
 
     protected void beforeWalk()

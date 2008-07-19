@@ -28,7 +28,6 @@ import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.resource.Representation;
 import org.restlet.resource.Variant;
-import org.sonatype.nexus.SystemState;
 import org.sonatype.nexus.SystemStatus;
 import org.sonatype.nexus.configuration.validator.ValidationMessage;
 import org.sonatype.nexus.rest.AbstractNexusResourceHandler;

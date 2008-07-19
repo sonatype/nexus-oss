@@ -59,7 +59,7 @@ public abstract class AbstractConfigurationSource
 
     /** The configuration. */
     private Configuration configuration;
-    
+
     /** The validation response */
     private ValidationResponse validationResponse;
 
@@ -86,9 +86,14 @@ public abstract class AbstractConfigurationSource
     /**
      * Called by subclasses when loaded configuration is rejected for some reason.
      */
-    protected void rejectConfiguration()
+    protected void rejectConfiguration( String message )
     {
         this.configuration = null;
+
+        if ( message != null )
+        {
+            getLogger().warn( message );
+        }
     }
 
     /**
@@ -119,9 +124,12 @@ public abstract class AbstractConfigurationSource
         }
         catch ( XmlPullParserException e )
         {
-            getLogger().warn( "Nexus configuration file was not loaded, it has the wrong structure." );
+            rejectConfiguration( "Nexus configuration file was not loaded, it has the wrong structure." );
 
-            configuration = null;
+            if ( getLogger().isDebugEnabled() )
+            {
+                getLogger().debug( "Nexus.xml is broken:", e );
+            }
         }
         finally
         {
@@ -130,11 +138,16 @@ public abstract class AbstractConfigurationSource
                 fr.close();
             }
         }
+        
+        // check the model version if loaded
         if ( configuration != null && !Configuration.MODEL_VERSION.equals( configuration.getVersion() ) )
         {
-            getLogger().warn( "Nexus configuration file was loaded but discarded, it has the wrong version." );
-
-            configuration = null;
+            rejectConfiguration( "Nexus configuration file was loaded but discarded, it has the wrong version number." );
+        }
+        
+        if ( getConfiguration() != null )
+        {
+            getLogger().info( "Configuration loaded succesfully." );
         }
     }
 
