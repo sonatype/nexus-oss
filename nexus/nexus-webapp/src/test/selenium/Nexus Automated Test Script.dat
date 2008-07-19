@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head profile="http://selenium-ide.openqa.org/profiles/test-case">
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<link rel="selenium.base" href="http://localhost:8081/" />
+<link rel="selenium.base" href="" />
 <title>Nexus Automated Test Script</title>
 </head>
 <body>
@@ -14,7 +14,7 @@
 <tr>
 	<td>open</td>
 	<td>/nexus/</td>
-	<td>500</td>
+	<td></td>
 </tr>
 <tr>
 	<td>click</td>
@@ -128,6 +128,51 @@
 </tr>
 <tr>
 	<td>mouseDown</td>
+	<td>open-view-logs</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>mouseUp</td>
+	<td>open-view-logs</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//td[3]/table/tbody/tr/td[2]/em/button</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>link=nexus.xml</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTextPresent</td>
+	<td>nexus.xml</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//td[2]/table/tbody/tr/td[2]/em/button</td>
+	<td></td>
+</tr>
+<tr>
+	<td>waitForPopUp</td>
+	<td></td>
+	<td>30000</td>
+</tr>
+<tr>
+	<td>mouseDown</td>
 	<td>open-config-repos</td>
 	<td></td>
 </tr>
@@ -172,9 +217,9 @@
 	<td>aaa-hosted-repo</td>
 </tr>
 <tr>
-	<td>clickAndWait</td>
+	<td>click</td>
 	<td>savebutton</td>
-	<td>500</td>
+	<td></td>
 </tr>
 <tr>
 	<td>pause</td>
@@ -272,6 +317,11 @@
 	<td>500</td>
 </tr>
 <tr>
+	<td></td>
+	<td></td>
+	<td></td>
+</tr>
+<tr>
 	<td>click</td>
 	<td>//a[contains(text(),'Empty Trash')]</td>
 	<td></td>
@@ -322,53 +372,13 @@
 	<td>500</td>
 </tr>
 <tr>
-	<td>click</td>
-	<td>//a[contains(text(),'Nexus Home')]</td>
+	<td>mouseDown</td>
+	<td>open-security-users</td>
 	<td></td>
 </tr>
 <tr>
-	<td>click</td>
-	<td>link=Nexus Home</td>
-	<td></td>
-</tr>
-<tr>
-	<td>waitForAllWindowNames</td>
-	<td>http://nexus.sonatype.org/</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyTextPresent</td>
-	<td>Nexus is a powerful and robust Maven repository manager</td>
-	<td></td>
-</tr>
-<tr>
-	<td>selectWindow</td>
-	<td>null</td>
-	<td></td>
-</tr>
-<tr>
-	<td>click</td>
-	<td>login-link</td>
-	<td></td>
-</tr>
-<tr>
-	<td>type</td>
-	<td>usernamefield</td>
-	<td>admin</td>
-</tr>
-<tr>
-	<td>type</td>
-	<td>passwordfield</td>
-	<td>admin123</td>
-</tr>
-<tr>
-	<td>pause</td>
-	<td>500</td>
-	<td>500</td>
-</tr>
-<tr>
-	<td>click</td>
-	<td>loginbutton</td>
+	<td>mouseUp</td>
+	<td>open-security-users</td>
 	<td></td>
 </tr>
 <tr>
@@ -378,278 +388,53 @@
 </tr>
 <tr>
 	<td>click</td>
-	<td>//div[5]/div[1]/div/div/div/div</td>
-	<td></td>
-</tr>
-<tr>
-	<td>selectWindow</td>
-	<td>name=http://nexus.sonatype.org/</td>
+	<td>//div[4]/div/div/div[1]/div[2]/div[1]/div/table/tbody/tr/td[1]/table/tbody/tr/td[2]/em/button</td>
 	<td></td>
 </tr>
 <tr>
 	<td>click</td>
-	<td>//a[contains(text(),'Getting Started')]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>selectWindow</td>
-	<td>name=http://www.sonatype.com/book/reference/repository-manager.html</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyTextPresent</td>
-	<td>Maven: The Definitive Guide</td>
-	<td></td>
-</tr>
-<tr>
-	<td>selectWindow</td>
-	<td>null</td>
-	<td></td>
-</tr>
-<tr>
-	<td>click</td>
-	<td>login-link</td>
+	<td>//div[4]/div/div/div[1]/div[2]/div[1]/div/table/tbody/tr/td[2]/table/tbody/tr/td[2]/em/button</td>
 	<td></td>
 </tr>
 <tr>
 	<td>type</td>
-	<td>usernamefield</td>
-	<td>admin</td>
+	<td>userId</td>
+	<td>User1</td>
 </tr>
 <tr>
 	<td>type</td>
-	<td>passwordfield</td>
-	<td>admin123</td>
+	<td>name</td>
+	<td>User One</td>
 </tr>
 <tr>
-	<td>pause</td>
-	<td>500</td>
-	<td>500</td>
-</tr>
-<tr>
-	<td>click</td>
-	<td>loginbutton</td>
-	<td></td>
-</tr>
-<tr>
-	<td>pause</td>
-	<td>500</td>
-	<td>500</td>
+	<td>type</td>
+	<td>email</td>
+	<td>userone@email.com</td>
 </tr>
 <tr>
 	<td>click</td>
-	<td>//div[5]/div[1]/div/div/div/div</td>
+	<td>//div[4]/div[1]/div/img[1]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>click</td>
-	<td>link=Nexus Wiki</td>
-	<td></td>
-</tr>
-<tr>
-	<td>selectWindow</td>
-	<td>name=https://docs.sonatype.com/display/Nexus/Home</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyTextPresent</td>
-	<td>Add Comment</td>
-	<td></td>
-</tr>
-<tr>
-	<td>selectWindow</td>
-	<td>null</td>
-	<td></td>
-</tr>
-<tr>
-	<td>click</td>
-	<td>login-link</td>
+	<td>//div[27]/div/div[1]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>type</td>
-	<td>usernamefield</td>
-	<td>admin</td>
+	<td>password</td>
+	<td>userone</td>
 </tr>
 <tr>
 	<td>type</td>
-	<td>passwordfield</td>
-	<td>admin123</td>
-</tr>
-<tr>
-	<td>pause</td>
-	<td>500</td>
-	<td>500</td>
+	<td>reenterPassword</td>
+	<td>userone</td>
 </tr>
 <tr>
 	<td>click</td>
-	<td>loginbutton</td>
+	<td>//div[2]/div/div/div/div/div/table/tbody/tr/td[1]/table/tbody/tr/td[2]/em/button</td>
 	<td></td>
-</tr>
-<tr>
-	<td>pause</td>
-	<td>500</td>
-	<td>500</td>
-</tr>
-<tr>
-	<td>click</td>
-	<td>//div[5]/div[1]/div/div/div/div</td>
-	<td></td>
-</tr>
-<tr>
-	<td>click</td>
-	<td>link=Maven Book</td>
-	<td></td>
-</tr>
-<tr>
-	<td>selectWindow</td>
-	<td>name=http://www.sonatype.com/book/reference/public-book.html</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyTextPresent</td>
-	<td>Maven: The Definitive Guide</td>
-	<td></td>
-</tr>
-<tr>
-	<td>selectWindow</td>
-	<td>null</td>
-	<td></td>
-</tr>
-<tr>
-	<td>click</td>
-	<td>login-link</td>
-	<td></td>
-</tr>
-<tr>
-	<td>type</td>
-	<td>usernamefield</td>
-	<td>admin</td>
-</tr>
-<tr>
-	<td>type</td>
-	<td>passwordfield</td>
-	<td>admin123</td>
-</tr>
-<tr>
-	<td>pause</td>
-	<td>500</td>
-	<td>500</td>
-</tr>
-<tr>
-	<td>click</td>
-	<td>loginbutton</td>
-	<td></td>
-</tr>
-<tr>
-	<td>pause</td>
-	<td>500</td>
-	<td>500</td>
-</tr>
-<tr>
-	<td>click</td>
-	<td>//div[5]/div[1]/div/div/div/div</td>
-	<td></td>
-</tr>
-<tr>
-	<td>selectWindow</td>
-	<td>name=null</td>
-	<td></td>
-</tr>
-<tr>
-	<td>click</td>
-	<td>link=Release Notes</td>
-	<td></td>
-</tr>
-<tr>
-	<td>selectWindow</td>
-	<td>name=http://nexus.sonatype.org/changes.html</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyTextPresent</td>
-	<td>Change History</td>
-	<td></td>
-</tr>
-<tr>
-	<td>selectWindow</td>
-	<td>null</td>
-	<td></td>
-</tr>
-<tr>
-	<td>click</td>
-	<td>login-link</td>
-	<td></td>
-</tr>
-<tr>
-	<td>type</td>
-	<td>usernamefield</td>
-	<td>admin</td>
-</tr>
-<tr>
-	<td>type</td>
-	<td>passwordfield</td>
-	<td>admin123</td>
-</tr>
-<tr>
-	<td>pause</td>
-	<td>500</td>
-	<td>500</td>
-</tr>
-<tr>
-	<td>click</td>
-	<td>loginbutton</td>
-	<td></td>
-</tr>
-<tr>
-	<td>pause</td>
-	<td>500</td>
-	<td>500</td>
-</tr>
-<tr>
-	<td>click</td>
-	<td>//div[5]/div[1]/div/div/div/div</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyTextPresent</td>
-	<td>Nexus </td>
-	<td></td>
-</tr>
-<tr>
-	<td>selectWindow</td>
-	<td>null</td>
-	<td></td>
-</tr>
-<tr>
-	<td>click</td>
-	<td>login-link</td>
-	<td></td>
-</tr>
-<tr>
-	<td>type</td>
-	<td>usernamefield</td>
-	<td>admin</td>
-</tr>
-<tr>
-	<td>type</td>
-	<td>passwordfield</td>
-	<td>admin123</td>
-</tr>
-<tr>
-	<td>pause</td>
-	<td>500</td>
-	<td>500</td>
-</tr>
-<tr>
-	<td>click</td>
-	<td>loginbutton</td>
-	<td></td>
-</tr>
-<tr>
-	<td>pause</td>
-	<td>500</td>
-	<td>500</td>
 </tr>
 
 </tbody></table>
