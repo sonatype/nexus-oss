@@ -88,4 +88,9 @@ public class DefaultNexusSchedulerTest
         }
     }
 
+    public void testConcurrentExecutionOfRepositoriesTask()
+        throws Exception
+    {
+    }
+
 }

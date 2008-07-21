@@ -34,16 +34,17 @@ public interface Scheduler
     String ROLE = Scheduler.class.getName();
 
     /**
-     * Store a task for future manual run
+     * Initialize a task on bootup.
      * 
      * @param name
      * @param runnable
+     * @param schedule
      * @param taskParams
+     * @param store
      * @return
-     * @throws RejectedExecutionException
-     * @throws NullPointerException
      */
-    ScheduledTask<Object> store( String name, Runnable runnable, Map<String, String> taskParams )
+    <T> ScheduledTask<T> initialize( String id, String name, Class<?> type, Callable<T> callable, Schedule schedule,
+        Map<String, String> taskParams )
         throws RejectedExecutionException,
             NullPointerException;
 
@@ -69,22 +70,7 @@ public interface Scheduler
      * @param store
      * @return
      */
-    ScheduledTask<Object> schedule( String name, Runnable runnable, Schedule schedule, Map<String, String> taskParams,
-        boolean store )
-        throws RejectedExecutionException,
-            NullPointerException;
-
-    /**
-     * Store a task for future manual run
-     * 
-     * @param name
-     * @param callable
-     * @param taskParams
-     * @return
-     * @throws RejectedExecutionException
-     * @throws NullPointerException
-     */
-    <T> ScheduledTask<T> store( String name, Callable<T> callable, Map<String, String> taskParams )
+    ScheduledTask<Object> schedule( String name, Runnable runnable, Schedule schedule, Map<String, String> taskParams )
         throws RejectedExecutionException,
             NullPointerException;
 
@@ -110,8 +96,7 @@ public interface Scheduler
      * @param store
      * @return
      */
-    <T> ScheduledTask<T> schedule( String name, Callable<T> callable, Schedule schedule,
-        Map<String, String> taskParams, boolean store )
+    <T> ScheduledTask<T> schedule( String name, Callable<T> callable, Schedule schedule, Map<String, String> taskParams )
         throws RejectedExecutionException,
             NullPointerException;
 

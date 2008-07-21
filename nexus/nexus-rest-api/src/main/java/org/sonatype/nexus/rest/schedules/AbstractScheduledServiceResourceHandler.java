@@ -55,6 +55,7 @@ import org.sonatype.scheduling.ScheduledTask;
 import org.sonatype.scheduling.SchedulerTask;
 import org.sonatype.scheduling.schedules.CronSchedule;
 import org.sonatype.scheduling.schedules.DailySchedule;
+import org.sonatype.scheduling.schedules.ManualRunSchedule;
 import org.sonatype.scheduling.schedules.MonthlySchedule;
 import org.sonatype.scheduling.schedules.OnceSchedule;
 import org.sonatype.scheduling.schedules.Schedule;
@@ -157,7 +158,7 @@ public class AbstractScheduledServiceResourceHandler
 
     protected String getScheduleShortName( Schedule schedule )
     {
-        if ( schedule == null )
+        if ( ManualRunSchedule.class.isAssignableFrom( schedule.getClass() ) )
         {
             return SCHEDULE_TYPE_MANUAL;
         }

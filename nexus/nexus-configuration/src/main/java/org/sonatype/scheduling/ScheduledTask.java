@@ -136,13 +136,6 @@ public interface ScheduledTask<T>
     boolean isEnabled();
 
     /**
-     * Returns if the task config should be persisted.
-     * 
-     * @return
-     */
-    boolean isStoreConfig();
-
-    /**
      * Sets enabled.
      * 
      * @param enabled

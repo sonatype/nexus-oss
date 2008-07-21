@@ -31,6 +31,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
@@ -61,6 +62,8 @@ public class DefaultScheduler
     private ScheduledThreadPoolExecutor scheduledExecutorService;
 
     private Map<Class<?>, List<ScheduledTask<?>>> tasksMap;
+
+    private AtomicInteger idGen = new AtomicInteger( 1 );
 
     /**
      * @plexus.requirement
@@ -128,7 +131,7 @@ public class DefaultScheduler
         return scheduledExecutorService;
     }
 
-    protected <T> void addToTasksMap( ScheduledTask<T> task )
+    protected <T> void addToTasksMap( ScheduledTask<T> task, boolean store )
     {
         synchronized ( tasksMap )
         {
@@ -136,9 +139,13 @@ public class DefaultScheduler
             {
                 tasksMap.put( task.getType(), new ArrayList<ScheduledTask<?>>() );
             }
+
             tasksMap.get( task.getType() ).add( task );
 
-            taskConfig.addTask( task );
+            if ( store )
+            {
+                taskConfig.addTask( task );
+            }
         }
     }
 
@@ -162,80 +169,65 @@ public class DefaultScheduler
                 {
                     tasksMap.remove( task.getType() );
                 }
-
-                taskConfig.removeTask( task );
             }
         }
     }
-    
-    public ScheduledTask<Object> store( String name, Runnable runnable, Map<String, String> taskParams )
+
+    protected String generateId()
     {
-        DefaultScheduledTask<Object> drt = new DefaultScheduledTask<Object>(
-            name,
-            runnable.getClass(),
-            this,
-            Executors.callable( runnable ),
-            null,
-            taskParams,
-            true );
-        
-        addToTasksMap( drt );
-        
-        return drt;
+        synchronized ( tasksMap )
+        {
+            String id = String.valueOf( idGen.incrementAndGet() );
+
+            while ( tasksMap.containsKey( id ) )
+            {
+                id = String.valueOf( idGen.getAndIncrement() );
+            }
+
+            return id;
+        }
+    }
+
+    public <T> ScheduledTask<T> initialize( String id, String name, Class<?> type, Callable<T> callable,
+        Schedule schedule, Map<String, String> taskParams )
+    {
+        return schedule( generateId(), name, type, callable, schedule, taskParams, false );
     }
 
     public ScheduledTask<Object> submit( String name, Runnable runnable, Map<String, String> taskParams )
     {
-        return schedule( name, runnable, new RunNowSchedule(), taskParams, false );
+        return schedule( name, runnable, new RunNowSchedule(), taskParams );
     }
 
     public ScheduledTask<Object> schedule( String name, Runnable runnable, Schedule schedule,
-        Map<String, String> taskParams, boolean store )
+        Map<String, String> taskParams )
     {
-        DefaultScheduledTask<Object> drt = new DefaultScheduledTask<Object>( name, runnable.getClass(), this, Executors
-            .callable( runnable ), schedule, taskParams, store );
-
-        addToTasksMap( drt );
-
-        drt.start();
-
-        return drt;
-    }
-    
-    public <T> ScheduledTask<T> store( String name, Callable<T> callable, Map<String, String> taskParams )
-    {
-        DefaultScheduledTask<T> drt = new DefaultScheduledTask<T>(
-            name,
-            callable.getClass(),
-            this,
-            callable,
-            null,
-            taskParams,
-            true );
-        
-        addToTasksMap( drt );
-        
-        return drt;
+        return schedule( name, runnable.getClass(), Executors.callable( runnable ), schedule, taskParams );
     }
 
     public <T> ScheduledTask<T> submit( String name, Callable<T> callable, Map<String, String> taskParams )
     {
-        return schedule( name, callable, new RunNowSchedule(), taskParams, false );
+        return schedule( name, callable, new RunNowSchedule(), taskParams );
     }
 
     public <T> ScheduledTask<T> schedule( String name, Callable<T> callable, Schedule schedule,
-        Map<String, String> taskParams, boolean store )
+        Map<String, String> taskParams )
     {
-        DefaultScheduledTask<T> dct = new DefaultScheduledTask<T>(
-            name,
-            callable.getClass(),
-            this,
-            callable,
-            schedule,
-            taskParams,
-            store );
+        return schedule( name, callable.getClass(), callable, schedule, taskParams );
+    }
 
-        addToTasksMap( dct );
+    protected <T> ScheduledTask<T> schedule( String name, Class<?> type, Callable<T> callable, Schedule schedule,
+        Map<String, String> taskParams )
+    {
+        return schedule( generateId(), name, type, callable, schedule, taskParams, true );
+    }
+
+    protected <T> ScheduledTask<T> schedule( String id, String name, Class<?> type, Callable<T> callable,
+        Schedule schedule, Map<String, String> taskParams, boolean store )
+    {
+        DefaultScheduledTask<T> dct = new DefaultScheduledTask<T>( id, name, type, this, callable, schedule, taskParams );
+
+        addToTasksMap( dct, store );
 
         dct.start();
 

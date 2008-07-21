@@ -48,6 +48,7 @@ import org.sonatype.nexus.configuration.model.CScheduleConfig;
 import org.sonatype.nexus.configuration.model.CScheduledTask;
 import org.sonatype.scheduling.schedules.CronSchedule;
 import org.sonatype.scheduling.schedules.DailySchedule;
+import org.sonatype.scheduling.schedules.ManualRunSchedule;
 import org.sonatype.scheduling.schedules.MonthlySchedule;
 import org.sonatype.scheduling.schedules.OnceSchedule;
 import org.sonatype.scheduling.schedules.RunNowSchedule;
@@ -95,7 +96,8 @@ public class DefaultTaskConfigManager
 
     public void initializeTasks( Scheduler scheduler )
     {
-        List<CScheduledTask> tasks = applicationConfiguration.getConfiguration().getTasks();
+        List<CScheduledTask> tasks = new ArrayList<CScheduledTask>( applicationConfiguration
+            .getConfiguration().getTasks() );
 
         if ( tasks != null )
         {
@@ -106,6 +108,7 @@ public class DefaultTaskConfigManager
             for ( CScheduledTask task : tempList )
             {
                 getLogger().info( "Loading task - " + task.getName() );
+
                 try
                 {
                     SchedulerTask<?> nexusTask = (SchedulerTask<?>) plexusContainer.lookup( SchedulerTask.ROLE, task
@@ -117,20 +120,13 @@ public class DefaultTaskConfigManager
                         nexusTask.addParameter( prop.getKey(), prop.getValue() );
                     }
 
-                    if ( task.getSchedule() == null )
-                    {
-                        scheduler.store( task.getName(), nexusTask, translateFrom( task.getProperties() ) ).setEnabled(
-                            task.isEnabled() );
-                    }
-                    else
-                    {
-                        scheduler.schedule(
-                            task.getName(),
-                            nexusTask,
-                            translateFrom( task.getSchedule(), task.getNextRun() ),
-                            translateFrom( task.getProperties() ),
-                            true ).setEnabled( task.isEnabled() );
-                    }
+                    scheduler.initialize(
+                        task.getId(),
+                        task.getName(),
+                        nexusTask.getClass(),
+                        nexusTask,
+                        translateFrom( task.getSchedule(), task.getNextRun() ),
+                        translateFrom( task.getProperties() ) ).setEnabled( task.isEnabled() );
                 }
                 catch ( ComponentLookupException e )
                 {
@@ -148,7 +144,8 @@ public class DefaultTaskConfigManager
 
     public <T> void addTask( ScheduledTask<T> task )
     {
-        if ( !task.isStoreConfig() )
+        // RunNowSchedules are not saved
+        if ( RunNowSchedule.class.isAssignableFrom( task.getSchedule().getClass()) )
         {
             return;
         }
@@ -308,6 +305,10 @@ public class DefaultTaskConfigManager
         {
             schedule = new RunNowSchedule();
         }
+        else if ( CScheduleConfig.TYPE_MANUAL.equals( modelSchedule.getType() ) )
+        {
+            schedule = new ManualRunSchedule();
+        }
         else
         {
             throw new IllegalArgumentException( "Unknown Schedule type: " + modelSchedule.getClass().getName() );
@@ -402,6 +403,10 @@ public class DefaultTaskConfigManager
             else if ( RunNowSchedule.class.isAssignableFrom( schedule.getClass() ) )
             {
                 storeableSchedule.setType( CScheduleConfig.TYPE_RUN_NOW );
+            }
+            else if ( ManualRunSchedule.class.isAssignableFrom( schedule.getClass() ) )
+            {
+                storeableSchedule.setType( CScheduleConfig.TYPE_MANUAL );
             }
             else
             {

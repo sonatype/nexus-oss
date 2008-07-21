@@ -41,6 +41,7 @@ import org.sonatype.nexus.rest.model.ScheduledServiceResourceStatus;
 import org.sonatype.nexus.rest.model.ScheduledServiceResourceStatusResponse;
 import org.sonatype.scheduling.ScheduledTask;
 import org.sonatype.scheduling.TaskState;
+import org.sonatype.scheduling.schedules.ManualRunSchedule;
 import org.sonatype.scheduling.schedules.Schedule;
 
 public class ScheduledServiceListResourceHandler
@@ -125,9 +126,9 @@ public class ScheduledServiceListResourceHandler
             {
                 Schedule schedule = getModelSchedule( request.getData() );
                 ScheduledTask<?> task = null;
-                
+
                 if ( schedule != null )
-                {                
+                {
                     task = getNexus().schedule(
                         getModelName( request.getData() ),
                         getModelNexusTask( request.getData() ),
@@ -135,14 +136,15 @@ public class ScheduledServiceListResourceHandler
                 }
                 else
                 {
-                    task = getNexus().store(
+                    task = getNexus().schedule(
                         getModelName( request.getData() ),
-                        getModelNexusTask( request.getData() ) );
+                        getModelNexusTask( request.getData() ),
+                        new ManualRunSchedule() );
                 }
 
                 task.setEnabled( request.getData().isEnabled() );
-                
-                //Need to store the enabled flag update
+
+                // Need to store the enabled flag update
                 getNexus().updateSchedule( task );
 
                 ScheduledServiceResourceStatus resourceStatus = new ScheduledServiceResourceStatus();
@@ -165,18 +167,15 @@ public class ScheduledServiceListResourceHandler
             {
                 getLogger().log( Level.SEVERE, "Execution of task " + getModelName( request.getData() ) + " rejected." );
                 getResponse().setStatus( Status.CLIENT_ERROR_CONFLICT, e.getMessage() );
-                
+
                 return;
             }
             catch ( ParseException e )
             {
                 getLogger().log( Level.SEVERE, "Unable to parse data for task " + getModelName( request.getData() ) );
                 getResponse().setStatus( Status.CLIENT_ERROR_BAD_REQUEST, e.getMessage() );
-                
-                getResponse().setEntity(
-                                        serialize( entity, getNexusErrorResponse(
-                                            "cronCommand",
-                                            e.getMessage() ) ) );
+
+                getResponse().setEntity( serialize( entity, getNexusErrorResponse( "cronCommand", e.getMessage() ) ) );
 
                 return;
             }

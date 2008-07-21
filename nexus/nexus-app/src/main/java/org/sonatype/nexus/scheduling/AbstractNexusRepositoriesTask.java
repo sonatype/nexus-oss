@@ -80,7 +80,7 @@ public abstract class AbstractNexusRepositoriesTask<T>
 
     public boolean allowConcurrentExecution( Map<Class<?>, List<ScheduledTask<?>>> activeTasks )
     {
-        return !getSetOfIntersectingTasksThatRuns( activeTasks ).isEmpty();
+        return getSetOfIntersectingTasksThatRuns( activeTasks ).isEmpty();
     }
 
     protected Set<AbstractNexusRepositoriesTask<?>> getSetOfIntersectingTasksThatRuns(

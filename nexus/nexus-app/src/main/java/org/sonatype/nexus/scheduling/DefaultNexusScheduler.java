@@ -69,13 +69,6 @@ public class DefaultNexusScheduler
     {
         return plexusContainer;
     }
-    
-    public <T> ScheduledTask<T> store( String name, SchedulerTask<T> nexusTask )
-        throws RejectedExecutionException, 
-            NullPointerException
-    {
-        return scheduler.store( name, nexusTask, nexusTask.getParameters() );
-    }
 
     public <T> ScheduledTask<T> submit( String name, SchedulerTask<T> nexusTask )
         throws RejectedExecutionException,
@@ -97,7 +90,7 @@ public class DefaultNexusScheduler
     {
         if ( nexusTask.allowConcurrentSubmission( scheduler.getActiveTasks() ) )
         {
-            return scheduler.schedule( name, nexusTask, schedule, nexusTask.getParameters(), true );
+            return scheduler.schedule( name, nexusTask, schedule, nexusTask.getParameters() );
         }
         else
         {

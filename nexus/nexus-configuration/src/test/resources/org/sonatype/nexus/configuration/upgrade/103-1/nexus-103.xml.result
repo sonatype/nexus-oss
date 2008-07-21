@@ -165,6 +165,9 @@
       <status>RUNNING</status>
       <lastRun>1216242900941</lastRun>
       <nextRun>1216257300000</nextRun>
+      <schedule>
+        <type>manual</type>
+      </schedule>
       <properties>
         <property>
           <key>repositoryOrGroupId</key>

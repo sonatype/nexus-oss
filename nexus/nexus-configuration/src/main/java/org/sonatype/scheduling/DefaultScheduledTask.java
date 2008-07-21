@@ -29,16 +29,14 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.sonatype.scheduling.iterators.SchedulerIterator;
+import org.sonatype.scheduling.schedules.ManualRunSchedule;
 import org.sonatype.scheduling.schedules.Schedule;
 
 public class DefaultScheduledTask<T>
     implements ScheduledTask<T>, Callable<T>
 {
-    private static final AtomicInteger ID_GENERATOR = new AtomicInteger( 0 );
-
     private final String id;
 
     private String name;
@@ -60,7 +58,7 @@ public class DefaultScheduledTask<T>
     private boolean enabled;
 
     private Date lastRun;
-    
+
     private Date nextRun;
 
     private List<T> results;
@@ -71,16 +69,14 @@ public class DefaultScheduledTask<T>
 
     private Map<String, String> taskParams;
 
-    private final boolean storeConfig;
+    boolean manualRun;
 
-    private boolean manualRun;
-
-    public DefaultScheduledTask( String name, Class<?> clazz, DefaultScheduler scheduler, Callable<T> callable,
-        Schedule schedule, Map<String, String> taskParams, boolean storeConfig )
+    public DefaultScheduledTask( String id, String name, Class<?> clazz, DefaultScheduler scheduler,
+        Callable<T> callable, Schedule schedule, Map<String, String> taskParams )
     {
         super();
 
-        this.id = String.valueOf( ID_GENERATOR.getAndIncrement() );
+        this.id = id;
 
         this.name = name;
 
@@ -102,11 +98,9 @@ public class DefaultScheduledTask<T>
 
         this.taskParams = taskParams;
 
-        this.storeConfig = storeConfig;
+        this.nextRun = null;
 
         this.manualRun = false;
-        
-        this.nextRun = null;
     }
 
     protected void start()
@@ -149,6 +143,11 @@ public class DefaultScheduledTask<T>
         return callable;
     }
 
+    protected boolean isManualRunScheduled()
+    {
+        return ManualRunSchedule.class.isAssignableFrom( getSchedule().getClass() );
+    }
+
     public String getId()
     {
         return id;
@@ -167,11 +166,6 @@ public class DefaultScheduledTask<T>
     public Date getScheduledAt()
     {
         return scheduledAt;
-    }
-
-    public boolean isStoreConfig()
-    {
-        return storeConfig;
     }
 
     public void cancel()
@@ -240,35 +234,52 @@ public class DefaultScheduledTask<T>
 
     protected Future<T> reschedule()
     {
-        SchedulerIterator iter = getScheduleIterator();
-        
-        if ( iter != null &&  !iter.isFinished() )
+        if ( !isManualRunScheduled() )
         {
-            nextRun = iter.next();
-            
-            long nextTime = nextRun.getTime();
+            SchedulerIterator iter = getScheduleIterator();
 
-            getScheduler().taskRescheduled( this );
+            if ( iter != null && !iter.isFinished() )
+            {
+                nextRun = iter.next();
 
-            return getScheduler().getScheduledExecutorService().schedule(
-                this,
-                nextTime - System.currentTimeMillis(),
-                TimeUnit.MILLISECONDS );
+                long nextTime = 0;
+
+                if ( nextRun != null )
+                {
+                    nextTime = nextRun.getTime();
+                }
+                else
+                {
+                    nextTime = System.currentTimeMillis();
+                }
+
+                getScheduler().taskRescheduled( this );
+
+                return getScheduler().getScheduledExecutorService().schedule(
+                    this,
+                    nextTime - System.currentTimeMillis(),
+                    TimeUnit.MILLISECONDS );
+            }
+            else
+            {
+                nextRun = null;
+
+                return null;
+            }
         }
         else
         {
-            nextRun = null;
-            
             return null;
         }
     }
 
     public void runNow()
     {
-        if ( !manualRun )
+        // if we are not RUNNING
+        if ( !TaskState.RUNNING.equals( getTaskState() ) && !manualRun )
         {
             manualRun = true;
-            // Just set schedule for now, when done processing will reschedule as normal
+
             getScheduler().getScheduledExecutorService().schedule( this, 0, TimeUnit.MILLISECONDS );
         }
     }
@@ -281,11 +292,11 @@ public class DefaultScheduledTask<T>
         if ( SchedulerTask.class.isAssignableFrom( getCallable().getClass() ) )
         {
             // check for execution
-            while ( !( (SchedulerTask<?>) getCallable() ).allowConcurrentExecution( getScheduler().getActiveTasks() ) )
+            if ( !( (SchedulerTask<?>) getCallable() ).allowConcurrentExecution( getScheduler().getActiveTasks() ) )
             {
                 // simply reschedule itself for 10sec
                 getScheduler().getScheduledExecutorService().schedule( this, 10000, TimeUnit.MILLISECONDS );
-                
+
                 return result;
             };
         }
@@ -329,10 +340,11 @@ public class DefaultScheduledTask<T>
 
         Future<T> nextFuture = null;
 
-        // If manually running, just grab the previous future and use that
+        // If manually running, just grab the previous future and use that or create a new one
         if ( manualRun )
         {
             nextFuture = getFuture();
+
             manualRun = false;
         }
         // Otherwise, grab the next one
@@ -341,7 +353,12 @@ public class DefaultScheduledTask<T>
             nextFuture = reschedule();
         }
 
-        if ( nextFuture != null )
+        // If manually running or having future, park this task to waiting
+        if ( isManualRunScheduled() )
+        {
+            setTaskState( TaskState.SUBMITTED );
+        }
+        else if ( nextFuture != null )
         {
             setTaskState( TaskState.WAITING );
 
@@ -349,17 +366,9 @@ public class DefaultScheduledTask<T>
         }
         else
         {
-            if ( getSchedule() != null )
-            {
-                setTaskState( TaskState.FINISHED );
-    
-                getScheduler().removeFromTasksMap( this );
-            }
-            else
-            {
-                // Manual schedule types just stay submitted when not running
-                setTaskState( TaskState.SUBMITTED );
-            }
+            setTaskState( TaskState.FINISHED );
+
+            getScheduler().removeFromTasksMap( this );
         }
 
         return result;
@@ -412,7 +421,7 @@ public class DefaultScheduledTask<T>
         {
             scheduleIterator = getSchedule().getIterator();
         }
-        
+
         return scheduleIterator;
     }
 

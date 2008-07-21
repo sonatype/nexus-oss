@@ -28,6 +28,7 @@ import org.sonatype.nexus.configuration.AbstractNexusTestCase;
 import org.sonatype.scheduling.iterators.DailySchedulerIterator;
 import org.sonatype.scheduling.iterators.SchedulerIterator;
 import org.sonatype.scheduling.schedules.DailySchedule;
+import org.sonatype.scheduling.schedules.ManualRunSchedule;
 import org.sonatype.scheduling.schedules.Schedule;
 
 public class DefaultSchedulerTest
@@ -106,7 +107,7 @@ public class DefaultSchedulerTest
     {
         TestCallable tr = new TestCallable();
 
-        ScheduledTask<Integer> st = defaultScheduler.store( "default", tr, null );
+        ScheduledTask<Integer> st = defaultScheduler.schedule( "default", tr, new ManualRunSchedule(), null );
 
         assertEquals( 1, defaultScheduler.getActiveTasks().size() );
 
@@ -151,7 +152,7 @@ public class DefaultSchedulerTest
 
         Schedule schedule = getEverySecondSchedule( new Date( nearFuture ), new Date( nearFuture + 4900 ) );
 
-        ScheduledTask<Object> st = defaultScheduler.schedule( "default", tr, schedule, null, true );
+        ScheduledTask<Object> st = defaultScheduler.schedule( "default", tr, schedule, null );
 
         assertEquals( 1, defaultScheduler.getActiveTasks().size() );
 
@@ -178,7 +179,7 @@ public class DefaultSchedulerTest
 
         Schedule schedule = getEverySecondSchedule( new Date( nearFuture ), new Date( nearFuture + 4900 ) );
 
-        ScheduledTask<Integer> st = defaultScheduler.schedule( "default", tr, schedule, null, true );
+        ScheduledTask<Integer> st = defaultScheduler.schedule( "default", tr, schedule, null );
 
         assertEquals( 1, defaultScheduler.getActiveTasks().size() );
 
@@ -217,7 +218,7 @@ public class DefaultSchedulerTest
 
         Schedule schedule = getEverySecondSchedule( new Date( nearFuture ), new Date( nearFuture + 4900 ) );
 
-        ScheduledTask<Object> st = defaultScheduler.schedule( "default", tr, schedule, null, true );
+        ScheduledTask<Object> st = defaultScheduler.schedule( "default", tr, schedule, null );
 
         assertEquals( 1, defaultScheduler.getActiveTasks().size() );
 
@@ -243,7 +244,7 @@ public class DefaultSchedulerTest
 
         Schedule schedule = getEverySecondSchedule( new Date( nearFuture ), new Date( nearFuture + 4900 ) );
 
-        ScheduledTask<Integer> st = defaultScheduler.schedule( "default", tr, schedule, null, true );
+        ScheduledTask<Integer> st = defaultScheduler.schedule( "default", tr, schedule, null );
 
         assertEquals( 1, defaultScheduler.getActiveTasks().size() );
 

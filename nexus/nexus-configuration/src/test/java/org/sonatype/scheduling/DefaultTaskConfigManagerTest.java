@@ -157,6 +157,7 @@ public class DefaultTaskConfigManagerTest
         try
         {
             task = createScheduledTask( createSchedule( scheduleType, scheduleProperties ) );
+            
             defaultManager.addTask( task );
 
             // loadConfig();
@@ -224,13 +225,13 @@ public class DefaultTaskConfigManagerTest
     {
         TestCallable callable = new TestCallable();
         return new DefaultScheduledTask<Integer>(
+            "1",
             TASK_NAME,
             callable.getClass(),
             defaultScheduler,
             callable,
             schedule,
-            null,
-            true );
+            null );
     }
 
     private List<CScheduledTask> getTaskConfiguration()
