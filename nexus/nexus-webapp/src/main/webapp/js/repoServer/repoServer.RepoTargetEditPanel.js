@@ -165,8 +165,11 @@ Sonatype.repoServer.RepoTargetEditPanel = function(config){
         	  {
                 xtype: 'button',
                 text: 'Add', 
-                style: 'padding-left: 5px',
-                id: 'button-add'
+                style: 'padding-left: 8px',
+                minWidth: 75,
+                id: 'button-add',
+                handler: this.addNewPattern,
+                scope: this
         	  }
         	]
           }
@@ -208,8 +211,11 @@ Sonatype.repoServer.RepoTargetEditPanel = function(config){
 	          {
 	            xtype: 'button',
 		        text: 'Remove', 
-                style: 'padding-left: 3px',
-		        id: 'button-remove'
+                style: 'padding-left: 6px',
+                minWidth: 75,
+		        id: 'button-remove',
+                handler: this.removePattern,
+                scope: this
 		      }
 	        ]
           }
@@ -694,21 +700,47 @@ Ext.extend(Sonatype.repoServer.RepoTargetEditPanel, Ext.Panel, {
 
     for(var i=0; i<arr.length; i++){
       pattern = arr[i];
-      repoPatternsTree.root.appendChild(
-        new Ext.tree.TreeNode({
-          id: 'id' + i,
-          text: pattern,
-          payload: pattern,
-          allowChildren: false,
-          draggable: false,
-          leaf: true,
-          nodeType: 'pattern',
-          icon: Sonatype.config.resourcePath + '/ext-2.0.2/resources/images/default/tree/folder.gif'
-        })
-      );
+      this.addPatternNode( repoPatternsTree, pattern );
     }
     
     return arr; //return arr, even if empty to comply with sonatypeLoad data modifier requirement
+  },
+  
+  addPatternNode: function( treePanel, pattern ) {
+	var id = Ext.id();
+
+    treePanel.root.appendChild(
+	  new Ext.tree.TreeNode({
+	    id: id,
+	    text: pattern,
+	    payload: pattern,
+	    allowChildren: false,
+	    draggable: false,
+	    leaf: true,
+	    nodeType: 'pattern',
+	    icon: Sonatype.config.resourcePath + '/ext-2.0.2/resources/images/default/tree/folder.gif'
+	  })
+	);
+  },
+  
+  addNewPattern: function() {
+	var fpanel = this.formCards.getLayout().activeItem;
+    var treePanel = fpanel.find('id', 'repoTargets-pattern-list')[0];
+    var pattern = fpanel.find('name','pattern')[0].getRawValue();
+    
+    if ( pattern ) {
+      this.addPatternNode(treePanel, pattern);
+    }
+  },
+  
+  removePattern: function() {
+	var fpanel = this.formCards.getLayout().activeItem;
+    var treePanel = fpanel.find('id', 'repoTargets-pattern-list')[0];
+
+    var selectedNode = treePanel.getSelectionModel().getSelectedNode();
+    if ( selectedNode ) {
+      treePanel.root.removeChild( selectedNode );
+    }
   }
   
 });
