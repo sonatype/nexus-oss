@@ -50,6 +50,7 @@ Sonatype.repoServer.RepoTargetEditPanel = function(config){
   
   //Methods that will take the data from the ui controls and map over to json
   this.submitDataModFunc = {
+    "patterns" : this.exportPatternsTreeHelper.createDelegate(this)
   };
   
   //A record to hold the name and id of a repository
@@ -153,7 +154,6 @@ Sonatype.repoServer.RepoTargetEditPanel = function(config){
                 fieldLabel: 'Pattern Expression', 
                 helpText: ht.pattern,
                 name: 'pattern',
-                allowBlank: false,
                 width: 205
               }
             ]
@@ -201,7 +201,6 @@ Sonatype.repoServer.RepoTargetEditPanel = function(config){
             //@ext: can TreeNode be registerd as a component with an xtype so this new root node
             //      may be instantiated uniquely for each form panel that uses this config?
             rootVisible: false,
-            root: new Ext.tree.TreeNode({text: 'root'}),
             enableDD: false          
           },
           { 
@@ -326,8 +325,7 @@ Sonatype.repoServer.RepoTargetEditPanel = function(config){
 Ext.extend(Sonatype.repoServer.RepoTargetEditPanel, Ext.Panel, {
   //Dump the currently stored data and requery for everything
   reloadAll : function(){
-    this.repoTargetsDataStore.removeAll();
-    this.usersDataStore.reload();
+    this.repoTargetsDataStore.reload();
     this.formCards.items.each(function(item, i, len){
       if(i>0){this.remove(item, true);}
     }, this.formCards);
@@ -566,7 +564,7 @@ Ext.extend(Sonatype.repoServer.RepoTargetEditPanel, Ext.Panel, {
         var i = this.repoTargetsDataStore.indexOfId(action.options.fpanel.id);
         var rec = this.repoTargetsDataStore.getAt(i);
 
-        this.updateRepoTargetRecord(rec, receivedData);
+        this.updateRepoTargetRecord(rec, sentData);
         
         var sortState = this.repoTargetsDataStore.getSortState();
         this.repoTargetsDataStore.sort(sortState.field, sortState.direction);
@@ -688,22 +686,36 @@ Ext.extend(Sonatype.repoServer.RepoTargetEditPanel, Ext.Panel, {
     //@note: there has to be a better way to do this.  Depending on offsets is very error prone
     var newConfig = config;
 
-    newConfig.items[2].items[0].root = new Ext.tree.TreeNode({text: 'root'});
+    newConfig.items[3].items[0].id = id + '_repoTargets-pattern-list';
+    newConfig.items[3].items[0].root = new Ext.tree.TreeNode({text: 'root'});
  
     return newConfig;
   },
     
   loadPatternsTreeHelper : function(arr, srcObj, fpanel){
-    var repoPatternsTree = fpanel.find('id', 'repoTargets-pattern-list')[0];
+    var treePanel = fpanel.findById(fpanel.id + '_repoTargets-pattern-list');
 
     var pattern;
 
     for(var i=0; i<arr.length; i++){
       pattern = arr[i];
-      this.addPatternNode( repoPatternsTree, pattern );
+      this.addPatternNode( treePanel, pattern );
     }
     
     return arr; //return arr, even if empty to comply with sonatypeLoad data modifier requirement
+  },
+  
+  exportPatternsTreeHelper : function(val, fpanel){
+	var treePanel = fpanel.findById(fpanel.id + '_repoTargets-pattern-list');
+    
+    var outputArr = [];
+    var nodes = treePanel.root.childNodes;
+    
+    for(var i = 0; i < nodes.length; i++){
+      outputArr[i] = nodes[i].attributes.payload;
+    }
+    
+    return outputArr;
   },
   
   addPatternNode: function( treePanel, pattern ) {
@@ -718,14 +730,14 @@ Ext.extend(Sonatype.repoServer.RepoTargetEditPanel, Ext.Panel, {
 	    draggable: false,
 	    leaf: true,
 	    nodeType: 'pattern',
-	    icon: Sonatype.config.resourcePath + '/ext-2.0.2/resources/images/default/tree/folder.gif'
+	    icon: Sonatype.config.resourcePath + '/ext-2.0.2/resources/images/default/tree/leaf.gif'
 	  })
 	);
   },
   
   addNewPattern: function() {
 	var fpanel = this.formCards.getLayout().activeItem;
-    var treePanel = fpanel.find('id', 'repoTargets-pattern-list')[0];
+    var treePanel = fpanel.findById(fpanel.id + '_repoTargets-pattern-list');
     var pattern = fpanel.find('name','pattern')[0].getRawValue();
     
     if ( pattern ) {
@@ -735,7 +747,7 @@ Ext.extend(Sonatype.repoServer.RepoTargetEditPanel, Ext.Panel, {
   
   removePattern: function() {
 	var fpanel = this.formCards.getLayout().activeItem;
-    var treePanel = fpanel.find('id', 'repoTargets-pattern-list')[0];
+    var treePanel = fpanel.findById(fpanel.id + '_repoTargets-pattern-list');
 
     var selectedNode = treePanel.getSelectionModel().getSelectedNode();
     if ( selectedNode ) {
