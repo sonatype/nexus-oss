@@ -95,21 +95,20 @@ Sonatype.repoServer.RepoTargetEditPanel = function(config){
     frame: true,
     collapsible: false,
     collapsed: false,
-    labelWidth: 200,
+    labelWidth: 150,
     layoutConfig: {
       labelSeparator: ''
     },
         
     items: [
-      {
-        xtype: 'hidden',
-        name: 'id'
-      },
+//      {
+//        xtype: 'hidden',
+//        name: 'id'
+//      },
       {
         xtype: 'textfield',
         fieldLabel: 'Name', 
         itemCls: 'required-field',
-        labelStyle: 'margin-left: 15px; width: 185px;',
         helpText: ht.name,
         name: 'name',
         allowBlank: false,
@@ -141,10 +140,43 @@ Sonatype.repoServer.RepoTargetEditPanel = function(config){
         }       
       },
       {
+    	xtype: 'panel',
+        style: 'padding-top: 20px',
+    	layout: 'column',
+        items: [
+          {
+           	xtype: 'panel',
+            layout: 'form',
+            items: [
+              {
+                xtype: 'textfield',
+                fieldLabel: 'Pattern Expression', 
+                helpText: ht.pattern,
+                name: 'pattern',
+                allowBlank: false,
+                width: 205
+              }
+            ]
+          },
+          {
+        	xtype: 'panel',
+  		    width: 100,
+        	items: [
+        	  {
+                xtype: 'button',
+                text: 'Add', 
+                style: 'padding-left: 5px',
+                id: 'button-add'
+        	  }
+        	]
+          }
+        ]
+      },
+      {
         xtype: 'panel',
         layout: 'column',
         autoHeight: true,
-        style: 'padding: 10px 0 0 0',
+        style: 'padding-left: 155px',
         items: [
           {
             xtype: 'treepanel',
@@ -166,28 +198,21 @@ Sonatype.repoServer.RepoTargetEditPanel = function(config){
             //@ext: can TreeNode be registerd as a component with an xtype so this new root node
             //      may be instantiated uniquely for each form panel that uses this config?
             rootVisible: false,
+            root: new Ext.tree.TreeNode({text: 'root'}),
             enableDD: false          
           },
-	      {
-	        xtype: 'textfield',
-	        fieldLabel: 'Pattern', 
-	        itemCls: 'required-field',
-	        labelStyle: 'margin-left: 15px; width: 185px;',
-	        helpText: ht.name,
-	        name: 'pattern',
-	        allowBlank: false,
-	        width: this.COMBO_WIDTH
-	      },
-	      {
-	        xtype: 'button',
-	        text: 'Add', 
-	        id: 'button-add'
-	      },
-	      {
-	        xtype: 'button',
-	        text: 'Remove', 
-	        id: 'button-remove'
-	      }
+          { 
+            xtype: 'panel',
+  		    width: 100,
+        	items: [
+	          {
+	            xtype: 'button',
+		        text: 'Remove', 
+                style: 'padding-left: 3px',
+		        id: 'button-remove'
+		      }
+	        ]
+          }
         ]
       }
     ],
@@ -657,7 +682,7 @@ Ext.extend(Sonatype.repoServer.RepoTargetEditPanel, Ext.Panel, {
     //@note: there has to be a better way to do this.  Depending on offsets is very error prone
     var newConfig = config;
 
-    newConfig.items[3].items[0].root = new Ext.tree.TreeNode({text: 'root'});
+    newConfig.items[2].items[0].root = new Ext.tree.TreeNode({text: 'root'});
  
     return newConfig;
   },

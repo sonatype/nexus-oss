@@ -187,7 +187,8 @@ Sonatype.repoServer.resources.help = {
   
   repoTargets: {
     name : 'The name of the repository target.',
-    contentClass : 'The content class of the repository target. It will be matched only against repositories with same content classes.'
+    contentClass : 'The content class of the repository target. It will be matched only against repositories with same content classes.',
+    pattern : 'Enter a pattern expression and click "Add" to add it to the list.'
   }
   
 };
