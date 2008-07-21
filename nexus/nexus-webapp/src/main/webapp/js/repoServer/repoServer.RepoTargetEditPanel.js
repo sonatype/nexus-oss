@@ -102,10 +102,6 @@ Sonatype.repoServer.RepoTargetEditPanel = function(config){
     },
         
     items: [
-//      {
-//        xtype: 'hidden',
-//        name: 'id'
-//      },
       {
         xtype: 'textfield',
         fieldLabel: 'Name', 
@@ -219,6 +215,10 @@ Sonatype.repoServer.RepoTargetEditPanel = function(config){
 	        ]
           }
         ]
+      },
+      {
+        xtype: 'hidden',
+        name: 'id'
       }
     ],
     buttons: [
@@ -279,9 +279,9 @@ Sonatype.repoServer.RepoTargetEditPanel = function(config){
     loadMask: true,
     deferredRender: false,
     columns: [
-      {header: 'Name', dataIndex: 'name', width:175, id: 'user-config-name-col'}
+      {header: 'Name', dataIndex: 'name', width:175, id: 'repo-target-name-col'}
     ],
-    autoExpandColumn: 'user-config-name-col',
+    autoExpandColumn: 'repo-target-name-col',
     disableSelection: false,
     viewConfig: {
       emptyText: 'Click "Add" to create a new Repository Target.'
@@ -458,7 +458,7 @@ Ext.extend(Sonatype.repoServer.RepoTargetEditPanel, Ext.Panel, {
         Sonatype.MessageBox.show({
           animEl: this.repoTargetsGridPanel.getEl(),
           title : 'Delete Target?',
-          msg : 'Delete the ' + rec.get('name') + ' User?',
+          msg : 'Delete the ' + rec.get('name') + ' target?',
           buttons: Sonatype.MessageBox.YESNO,
           scope: this,
           icon: Sonatype.MessageBox.QUESTION,
@@ -531,13 +531,13 @@ Ext.extend(Sonatype.repoServer.RepoTargetEditPanel, Ext.Panel, {
           resourceURI : receivedData.resourceURI
         };
         
-        var newRec = new this.repoTargetsRecordConstructor(
+        var newRec = new this.repoTargetRecordConstructor(
           dataObj,
           action.options.fpanel.id);
         
         this.repoTargetsDataStore.remove(this.repoTargetsDataStore.getById(action.options.fpanel.id)); //remove old one
         this.repoTargetsDataStore.addSorted(newRec);
-        this.repoTargetsDataStore.getSelectionModel().selectRecords([newRec], false);
+        this.repoTargetsGridPanel.getSelectionModel().selectRecords([newRec], false);
 
         //set the hidden id field in the form for subsequent updates
         action.options.fpanel.find('name', 'id')[0].setValue(receivedData.resourceURI);
