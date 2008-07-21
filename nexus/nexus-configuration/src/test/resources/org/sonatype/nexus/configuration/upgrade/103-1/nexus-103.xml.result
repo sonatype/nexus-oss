@@ -115,7 +115,10 @@
       <status>RUNNING</status>
       <lastRun>1216164600141</lastRun>
       <nextRun>1216251000000</nextRun>
-      <schedule />
+      <schedule>
+        <type>daily</type>
+        <startDate>1214350200000</startDate>
+      </schedule>
       <properties>
         <property>
           <key>removeOlderThanDays</key>
@@ -143,7 +146,25 @@
       <status>RUNNING</status>
       <lastRun>1216242900941</lastRun>
       <nextRun>1216257300000</nextRun>
-      <schedule />
+      <schedule>
+        <type>advanced</type>
+        <cronCommand>0 15 0-23/4 * * ?</cronCommand>
+      </schedule>
+      <properties>
+        <property>
+          <key>repositoryOrGroupId</key>
+          <value>repo_plexus.releases</value>
+        </property>
+      </properties>
+    </task>
+    <task>
+      <id>2</id>
+      <name>A manual task</name>
+      <enabled>true</enabled>
+      <type>org.sonatype.nexus.tasks.ReindexTask</type>
+      <status>RUNNING</status>
+      <lastRun>1216242900941</lastRun>
+      <nextRun>1216257300000</nextRun>
       <properties>
         <property>
           <key>repositoryOrGroupId</key>

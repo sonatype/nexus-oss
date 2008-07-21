@@ -45,7 +45,7 @@ import org.sonatype.nexus.configuration.model.CRepositoryShadow;
 import org.sonatype.nexus.configuration.model.CRepositoryTarget;
 import org.sonatype.nexus.configuration.model.CRestApiSettings;
 import org.sonatype.nexus.configuration.model.CRouting;
-import org.sonatype.nexus.configuration.model.CSchedule;
+import org.sonatype.nexus.configuration.model.CScheduleConfig;
 import org.sonatype.nexus.configuration.model.CScheduledTask;
 import org.sonatype.nexus.configuration.model.CSecurity;
 import org.sonatype.nexus.configuration.model.Configuration;
@@ -802,7 +802,7 @@ public class DefaultConfigurationValidator
         return response;
     }
 
-    public ValidationResponse validateSchedule( ValidationContext ctx, CSchedule settings )
+    public ValidationResponse validateSchedule( ValidationContext ctx, CScheduleConfig settings )
     {
         ValidationResponse response = new ValidationResponse();
 

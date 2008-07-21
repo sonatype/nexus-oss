@@ -43,15 +43,9 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationExce
 import org.sonatype.nexus.configuration.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
 import org.sonatype.nexus.configuration.ConfigurationChangeListener;
-import org.sonatype.nexus.configuration.model.CAdvancedSchedule;
-import org.sonatype.nexus.configuration.model.CDailySchedule;
-import org.sonatype.nexus.configuration.model.CMonthlySchedule;
-import org.sonatype.nexus.configuration.model.COnceSchedule;
 import org.sonatype.nexus.configuration.model.CProps;
-import org.sonatype.nexus.configuration.model.CRunNowSchedule;
-import org.sonatype.nexus.configuration.model.CSchedule;
+import org.sonatype.nexus.configuration.model.CScheduleConfig;
 import org.sonatype.nexus.configuration.model.CScheduledTask;
-import org.sonatype.nexus.configuration.model.CWeeklySchedule;
 import org.sonatype.scheduling.schedules.CronSchedule;
 import org.sonatype.scheduling.schedules.DailySchedule;
 import org.sonatype.scheduling.schedules.MonthlySchedule;
@@ -247,26 +241,26 @@ public class DefaultTaskConfigManager
         return map;
     }
 
-    private Schedule translateFrom( CSchedule modelSchedule, Date lastRun )
+    private Schedule translateFrom( CScheduleConfig modelSchedule, Date lastRun )
     {
         Schedule schedule = null;
 
-        if ( CAdvancedSchedule.class.isAssignableFrom( modelSchedule.getClass() ) )
+        if ( CScheduleConfig.TYPE_ADVANCED.equals( modelSchedule.getType() ) )
         {
             try
             {
-                schedule = new CronSchedule( ( (CAdvancedSchedule) modelSchedule ).getCronCommand() );
+                schedule = new CronSchedule( modelSchedule.getCronCommand() );
             }
             catch ( ParseException e )
             {
-                // this will not happen, since it was persisted, hence already sublitted
+                // this will not happen, since it was persisted, hence already submitted
             }
         }
-        else if ( CMonthlySchedule.class.isAssignableFrom( modelSchedule.getClass() ) )
+        else if ( CScheduleConfig.TYPE_MONTHLY.equals( modelSchedule.getType() ) )
         {
             Set<Integer> daysToRun = new HashSet<Integer>();
 
-            for ( Iterator iter = ( (CMonthlySchedule) modelSchedule ).getDaysOfMonth().iterator(); iter.hasNext(); )
+            for ( Iterator iter = modelSchedule.getDaysOfMonth().iterator(); iter.hasNext(); )
             {
                 String day = (String) iter.next();
 
@@ -280,16 +274,13 @@ public class DefaultTaskConfigManager
                 }
             }
 
-            schedule = new MonthlySchedule(
-                ( (CMonthlySchedule) modelSchedule ).getStartDate(),
-                ( (CMonthlySchedule) modelSchedule ).getEndDate(),
-                daysToRun );
+            schedule = new MonthlySchedule( modelSchedule.getStartDate(), modelSchedule.getEndDate(), daysToRun );
         }
-        else if ( CWeeklySchedule.class.isAssignableFrom( modelSchedule.getClass() ) )
+        else if ( CScheduleConfig.TYPE_WEEKLY.equals( modelSchedule.getType() ) )
         {
             Set<Integer> daysToRun = new HashSet<Integer>();
 
-            for ( Iterator iter = ( (CWeeklySchedule) modelSchedule ).getDaysOfWeek().iterator(); iter.hasNext(); )
+            for ( Iterator iter = modelSchedule.getDaysOfWeek().iterator(); iter.hasNext(); )
             {
                 String day = (String) iter.next();
 
@@ -303,22 +294,17 @@ public class DefaultTaskConfigManager
                 }
             }
 
-            schedule = new WeeklySchedule(
-                ( (CWeeklySchedule) modelSchedule ).getStartDate(),
-                ( (CWeeklySchedule) modelSchedule ).getEndDate(),
-                daysToRun );
+            schedule = new WeeklySchedule( modelSchedule.getStartDate(), modelSchedule.getEndDate(), daysToRun );
         }
-        else if ( CDailySchedule.class.isAssignableFrom( modelSchedule.getClass() ) )
+        else if ( CScheduleConfig.TYPE_DAILY.equals( modelSchedule.getType() ) )
         {
-            schedule = new DailySchedule(
-                ( (CDailySchedule) modelSchedule ).getStartDate(),
-                ( (CDailySchedule) modelSchedule ).getEndDate() );
+            schedule = new DailySchedule( modelSchedule.getStartDate(), modelSchedule.getEndDate() );
         }
-        else if ( COnceSchedule.class.isAssignableFrom( modelSchedule.getClass() ) )
+        else if ( CScheduleConfig.TYPE_ONCE.equals( modelSchedule.getType() ) )
         {
-            schedule = new OnceSchedule( ( (COnceSchedule) modelSchedule ).getStartDate() );
+            schedule = new OnceSchedule( modelSchedule.getStartDate() );
         }
-        else if ( CRunNowSchedule.class.isAssignableFrom( modelSchedule.getClass() ) )
+        else if ( CScheduleConfig.TYPE_RUN_NOW.equals( modelSchedule.getType() ) )
         {
             schedule = new RunNowSchedule();
         }
@@ -357,57 +343,65 @@ public class DefaultTaskConfigManager
         }
 
         Schedule schedule = task.getSchedule();
-        CSchedule storeableSchedule = null;
+        CScheduleConfig storeableSchedule = new CScheduleConfig();
 
         if ( schedule != null )
         {
             if ( CronSchedule.class.isAssignableFrom( schedule.getClass() ) )
             {
-                storeableSchedule = new CAdvancedSchedule();
-                ( (CAdvancedSchedule) storeableSchedule ).setCronCommand( ( (CronSchedule) schedule ).getCronString() );
+                storeableSchedule.setType( CScheduleConfig.TYPE_ADVANCED );
+
+                storeableSchedule.setCronCommand( ( (CronSchedule) schedule ).getCronString() );
             }
             else if ( MonthlySchedule.class.isAssignableFrom( schedule.getClass() ) )
             {
-                storeableSchedule = new CMonthlySchedule();
-                ( (CMonthlySchedule) storeableSchedule ).setStartDate( ( (MonthlySchedule) schedule ).getStartDate() );
-                ( (CMonthlySchedule) storeableSchedule ).setEndDate( ( (MonthlySchedule) schedule ).getEndDate() );
+                storeableSchedule.setType( CScheduleConfig.TYPE_MONTHLY );
+
+                storeableSchedule.setStartDate( ( (MonthlySchedule) schedule ).getStartDate() );
+
+                storeableSchedule.setEndDate( ( (MonthlySchedule) schedule ).getEndDate() );
 
                 for ( Iterator iter = ( (MonthlySchedule) schedule ).getDaysToRun().iterator(); iter.hasNext(); )
                 {
                     // TODO: String.valueOf is used because currently the days to run are integers in the monthly
                     // schedule
                     // needs to be string
-                    ( (CMonthlySchedule) storeableSchedule ).addDaysOfMonth( String.valueOf( iter.next() ) );
+                    storeableSchedule.addDaysOfMonth( String.valueOf( iter.next() ) );
                 }
             }
             else if ( WeeklySchedule.class.isAssignableFrom( schedule.getClass() ) )
             {
-                storeableSchedule = new CWeeklySchedule();
-                ( (CWeeklySchedule) storeableSchedule ).setStartDate( ( (WeeklySchedule) schedule ).getStartDate() );
-                ( (CWeeklySchedule) storeableSchedule ).setEndDate( ( (WeeklySchedule) schedule ).getEndDate() );
+                storeableSchedule.setType( CScheduleConfig.TYPE_MONTHLY );
+
+                storeableSchedule.setStartDate( ( (WeeklySchedule) schedule ).getStartDate() );
+
+                storeableSchedule.setEndDate( ( (WeeklySchedule) schedule ).getEndDate() );
 
                 for ( Iterator iter = ( (WeeklySchedule) schedule ).getDaysToRun().iterator(); iter.hasNext(); )
                 {
                     // TODO: String.valueOf is used because currently the days to run are integers in the weekly
                     // schedule
                     // needs to be string
-                    ( (CWeeklySchedule) storeableSchedule ).addDaysOfWeek( String.valueOf( iter.next() ) );
+                    storeableSchedule.addDaysOfWeek( String.valueOf( iter.next() ) );
                 }
             }
             else if ( DailySchedule.class.isAssignableFrom( schedule.getClass() ) )
             {
-                storeableSchedule = new CDailySchedule();
-                ( (CDailySchedule) storeableSchedule ).setStartDate( ( (DailySchedule) schedule ).getStartDate() );
-                ( (CDailySchedule) storeableSchedule ).setEndDate( ( (DailySchedule) schedule ).getEndDate() );
+                storeableSchedule.setType( CScheduleConfig.TYPE_DAILY );
+
+                storeableSchedule.setStartDate( ( (DailySchedule) schedule ).getStartDate() );
+
+                storeableSchedule.setEndDate( ( (DailySchedule) schedule ).getEndDate() );
             }
             else if ( OnceSchedule.class.isAssignableFrom( schedule.getClass() ) )
             {
-                storeableSchedule = new COnceSchedule();
-                ( (COnceSchedule) storeableSchedule ).setStartDate( ( (OnceSchedule) schedule ).getStartDate() );
+                storeableSchedule.setType( CScheduleConfig.TYPE_ONCE );
+
+                storeableSchedule.setStartDate( ( (OnceSchedule) schedule ).getStartDate() );
             }
             else if ( RunNowSchedule.class.isAssignableFrom( schedule.getClass() ) )
             {
-                storeableSchedule = new CRunNowSchedule();
+                storeableSchedule.setType( CScheduleConfig.TYPE_RUN_NOW );
             }
             else
             {

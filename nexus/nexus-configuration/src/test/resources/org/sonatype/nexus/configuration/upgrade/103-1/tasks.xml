@@ -48,5 +48,20 @@
         </org.sonatype.nexus.configuration.model.CProps>
       </properties>
     </org.sonatype.nexus.configuration.model.CScheduledTask>
+    <org.sonatype.nexus.configuration.model.CScheduledTask>
+      <id>2</id>
+      <name>A manual task</name>
+      <enabled>true</enabled>
+      <type>org.sonatype.nexus.tasks.ReindexTask</type>
+      <status>RUNNING</status>
+      <lastRun>2008-07-16 16:15:00.941 CDT</lastRun>
+      <nextRun>2008-07-16 20:15:00.0 CDT</nextRun>
+      <properties>
+        <org.sonatype.nexus.configuration.model.CProps>
+          <key>repositoryOrGroupId</key>
+          <value>repo_plexus.releases</value>
+        </org.sonatype.nexus.configuration.model.CProps>
+      </properties>
+    </org.sonatype.nexus.configuration.model.CScheduledTask>
   </tasks>
 </org.sonatype.nexus.configuration.model.CTaskConfiguration>
