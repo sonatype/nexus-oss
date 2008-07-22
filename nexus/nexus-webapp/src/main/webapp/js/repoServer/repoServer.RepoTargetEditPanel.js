@@ -57,6 +57,7 @@ Sonatype.repoServer.RepoTargetEditPanel = function(config){
   this.repoTargetRecordConstructor = Ext.data.Record.create([
     {name:'resourceURI'},
     {name:'id'},
+    {name:'contentClass'},
     {name:'name', sortType:Ext.data.SortTypes.asUCString}
   ]);
 
@@ -113,13 +114,13 @@ Sonatype.repoServer.RepoTargetEditPanel = function(config){
       },
       {
         xtype: 'combo',
-        fieldLabel: 'Content Class',
+        fieldLabel: 'Repository Type',
         itemCls: 'required-field',
         helpText: ht.contentClass,
         name: 'contentClass',
         width: this.COMBO_WIDTH,
         store: this.contentClassesDataStore,
-        displayField:'name',
+        displayField:'contentClass',
         valueField:'contentClass',
         editable: false,
         forceSelection: true,
@@ -280,9 +281,10 @@ Sonatype.repoServer.RepoTargetEditPanel = function(config){
     loadMask: true,
     deferredRender: false,
     columns: [
-      {header: 'Name', dataIndex: 'name', width:175, id: 'repo-target-name-col'}
+      {header: 'Name', dataIndex: 'name', width:200},
+      {header: 'Repository Type', dataIndex: 'contentClass', width:200, id: 'repo-target-expandable-col'}
     ],
-    autoExpandColumn: 'repo-target-name-col',
+    autoExpandColumn: 'repo-target-expandable-col',
     disableSelection: false,
     viewConfig: {
       emptyText: 'Click "Add" to create a new Repository Target.'
@@ -335,7 +337,15 @@ Ext.extend(Sonatype.repoServer.RepoTargetEditPanel, Ext.Panel, {
   },
   
   saveHandler : function(formInfoObj){
-    if (formInfoObj.formPanel.form.isValid()) {
+   	  var fpanel = formInfoObj.formPanel;
+      var treePanel = fpanel.findById(fpanel.id + '_repoTargets-pattern-list');
+      var patternField = fpanel.find('name','pattern')[0];
+      if (!treePanel.root.hasChildNodes()) {
+    	  patternField.markInvalid('The target should have at least one pattern.');
+    	  return;
+      }
+
+	  if (formInfoObj.formPanel.form.isValid()) {
       var isNew = formInfoObj.isNew;
       var createUri = Sonatype.config.repos.urls.repoTargets;
       var updateUri = (formInfoObj.resourceUri) ? formInfoObj.resourceUri : '';
@@ -529,7 +539,8 @@ Ext.extend(Sonatype.repoServer.RepoTargetEditPanel, Ext.Panel, {
         var dataObj = {
           id : receivedData.id,
           name : receivedData.name,
-          resourceURI : receivedData.resourceURI
+          resourceURI : receivedData.resourceURI,
+          contentClass: receivedData.contentClass
         };
         
         var newRec = new this.repoTargetRecordConstructor(
@@ -577,6 +588,7 @@ Ext.extend(Sonatype.repoServer.RepoTargetEditPanel, Ext.Panel, {
         rec.beginEdit();
         rec.set('name', receivedData.name);
         rec.set('id', receivedData.id);
+        rec.set('contentClass', receivedData.contentClass);
         rec.commit();
         rec.endEdit();
   },
@@ -739,9 +751,18 @@ Ext.extend(Sonatype.repoServer.RepoTargetEditPanel, Ext.Panel, {
   addNewPattern: function() {
 	var fpanel = this.formCards.getLayout().activeItem;
     var treePanel = fpanel.findById(fpanel.id + '_repoTargets-pattern-list');
-    var pattern = fpanel.find('name','pattern')[0].getRawValue();
+    var patternField = fpanel.find('name','pattern')[0];
+    var pattern = patternField.getRawValue();
     
     if ( pattern ) {
+      var nodes = treePanel.root.childNodes;
+      for(var i = 0; i < nodes.length; i++){
+    	if (pattern == nodes[i].attributes.payload) {
+          patternField.markInvalid('This pattern already exists');
+    	  return;
+    	}
+      }
+
       this.addPatternNode(treePanel, pattern);
     }
   },
