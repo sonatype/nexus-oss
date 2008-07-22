@@ -11,9 +11,11 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.net.URLDecoder;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -59,11 +61,7 @@ import com.thoughtworks.xstream.io.xml.DomDriver;
 import com.thoughtworks.xstream.io.xml.XppDriver;
 
 /**
- * TODO: add REST restart to make tests faster <BR/> curl --user admin:admin123 --request PUT
- * http://localhost:8081/nexus/service/local/status/command --data STOP <BR/> curl --user admin:admin123 --request PUT
- * http://localhost:8081/nexus/service/local/status/command --data START <BR/> curl --user admin:admin123 --request PUT
- * http://localhost:8081/nexus/service/local/status/command --data RESTART <BR/> <BR/> NOTE, this class is not really
- * abstract so I can work around a the <code>@BeforeClass</code>, <code>@AfterClass</code> issues
+ * NOTE, this class is not really abstract so I can work around a the <code>@BeforeClass</code>, <code>@AfterClass</code> issues, this should be refactored a little, but it might be ok, if we switch to TestNg
  */
 public class AbstractNexusIntegrationTest
 {
@@ -261,7 +259,7 @@ public class AbstractNexusIntegrationTest
 
             // we need a hard start
             NEEDS_HARD_STOP = true;
-            
+
             System.out.println( "***************************" );
             System.out.println( "*\n*" );
             System.out.println( "*  DOING A HARD START OF NEXUS." );
@@ -272,7 +270,7 @@ public class AbstractNexusIntegrationTest
             ForkedAppBooter appBooter =
                 (ForkedAppBooter) TestContainer.getInstance().lookup( ForkedAppBooter.ROLE, "TestForkedAppBooter" );
             appBooter.start();
-        }       
+        }
     }
 
     private void stopNexus()
@@ -363,7 +361,15 @@ public class AbstractNexusIntegrationTest
         System.out.println( "Looking for resource: " + resource );
         URL classURL = Thread.currentThread().getContextClassLoader().getResource( resource );
         System.out.println( "found: " + classURL );
-        return classURL == null ? null : new File( classURL.getFile() );
+
+        try
+        {
+            return classURL == null ? null : new File( URLDecoder.decode( classURL.getFile(), "UTF-8" ) );
+        }
+        catch ( UnsupportedEncodingException e )
+        {
+            throw new RuntimeException( "This test assumes the use of UTF-8 encoding: " + e.getMessage(), e );
+        }
     }
 
     /**
