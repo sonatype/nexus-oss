@@ -79,6 +79,8 @@ public class AbstractNexusIntegrationTest
     public static final String REPOSITORY_RELATIVE_URL = "content/repositories/";
 
     public static final String GROUP_REPOSITORY_RELATIVE_URL = "content/groups/";
+    
+    public String testRepositoryId;
 
     private String nexusBaseDir;
 
@@ -109,6 +111,7 @@ public class AbstractNexusIntegrationTest
         this.nexusBaseDir = rb.getString( "nexus.base.dir" );
         this.baseNexusUrl = rb.getString( "nexus.base.url" );
         this.nexusWorkDir = rb.getString( "nexus.work.dir" );
+        this.testRepositoryId = testRepositoryId;
         this.nexusTestRepoUrl = baseNexusUrl + REPOSITORY_RELATIVE_URL + testRepositoryId + "/";
     }
 
@@ -145,7 +148,7 @@ public class AbstractNexusIntegrationTest
         }
     }
 
-    private void cleanWorkDir()
+    protected void cleanWorkDir()
         throws IOException
     {
         File workDir = new File( this.nexusWorkDir );
@@ -158,7 +161,6 @@ public class AbstractNexusIntegrationTest
             // delete work dir
             FileUtils.deleteDirectory( workDir );
         }
-
     }
 
     private void deployArtifacts()
@@ -604,6 +606,33 @@ public class AbstractNexusIntegrationTest
         status =
             (StatusResourceResponse) xstream.fromXML( new URL( this.getBaseNexusUrl() + "service/local/status" ).openStream() );
         return status;
+    }
+
+    protected void deleteFromRepository( String groupOrArtifactPath )
+    {
+        this.deleteFromRepository( this.testRepositoryId, groupOrArtifactPath );
+    }
+    
+    protected void deleteFromRepository( String repository, String groupOrArtifactPath )
+    {
+        String serviceURI = this.getBaseNexusUrl() + "service/local/repositories/"+ repository +"/content/" + groupOrArtifactPath;
+        
+        System.out.println( "deleting: "+ serviceURI );
+
+        Request request = new Request();
+
+        request.setResourceRef( serviceURI );
+        request.setMethod( Method.DELETE );
+
+        Client client = new Client( Protocol.HTTP );
+
+        Response response = client.handle( request );
+
+        if ( !response.getStatus().isSuccess() )
+        {
+            System.out.println( "Failed to delete: "+ serviceURI + "  - Status: "+ response.getStatus() );
+        }
+        
     }
 
     public String getBaseNexusUrl()
