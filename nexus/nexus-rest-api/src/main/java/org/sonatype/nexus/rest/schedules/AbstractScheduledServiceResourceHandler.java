@@ -422,12 +422,12 @@ public class AbstractScheduledServiceResourceHandler
 
         return schedule;
     }
-    
+
     public <T> ScheduledServiceBaseResource getServiceRestModel( ScheduledTask<T> task )
     {
         ScheduledServiceBaseResource resource = null;
         
-        if ( task.getSchedule() == null )
+        if ( task.getSchedule() == null || ManualRunSchedule.class.isAssignableFrom( task.getSchedule().getClass() ) )
         {
             resource = new ScheduledServiceBaseResource();
         }

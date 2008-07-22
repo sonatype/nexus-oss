@@ -30,6 +30,7 @@ import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.proxy.NoSuchResourceStoreException;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.scheduling.ScheduledTask;
+import org.sonatype.scheduling.TaskState;
 
 public abstract class AbstractNexusRepositoriesTask<T>
     extends AbstractNexusTask<T>
@@ -97,8 +98,9 @@ public abstract class AbstractNexusRepositoriesTask<T>
 
                 for ( ScheduledTask<?> task : tasks )
                 {
-                    // check against intersection
-                    if ( repositorySetIntersectionIsNotEmpty( (AbstractNexusRepositoriesTask<?>) task ) )
+                    // check against RUNNING intersection
+                    if ( TaskState.RUNNING.equals( task.getTaskState() )
+                        && repositorySetIntersectionIsNotEmpty( (AbstractNexusRepositoriesTask<?>) task ) )
                     {
                         result.add( (AbstractNexusRepositoriesTask<?>) task );
                     }

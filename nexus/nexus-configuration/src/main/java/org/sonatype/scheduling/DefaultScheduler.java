@@ -191,7 +191,7 @@ public class DefaultScheduler
     public <T> ScheduledTask<T> initialize( String id, String name, Class<?> type, Callable<T> callable,
         Schedule schedule, Map<String, String> taskParams )
     {
-        return schedule( generateId(), name, type, callable, schedule, taskParams, false );
+        return schedule( id, name, type, callable, schedule, taskParams, false );
     }
 
     public ScheduledTask<Object> submit( String name, Runnable runnable, Map<String, String> taskParams )
