@@ -1,5 +1,9 @@
 package org.sonatype.nexus.integrationtests;
 
+import java.util.ResourceBundle;
+
+import junit.framework.Assert;
+
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
@@ -31,22 +35,44 @@ import org.sonatype.nexus.integrationtests.proxy.nexus262.Nexus262SimpleProxyTes
     Nexus176DeployToInvalidRepoTest.class, Nexus259SnapshotDeployTest.class, Nexus260MultipleDeployTest.class,
     Nexus261NexusGroupDownloadTest.class, Nexus177OutOfServiceTest.class, Nexus178BlockProxyDownloadTest.class,
     Nexus179RemoteRepoDownTest.class, Nexus262SimpleProxyTest.class } )
-//@SuiteClasses( {Nexus166SampleTest.class} )
+// @SuiteClasses( {Nexus166SampleTest.class} )
 public class IntegrationTestSuite
 {
     //
 
     @BeforeClass
-    public static void beforeSuite() throws Exception
+    public static void beforeSuite()
+        throws Exception
     {
-        ForkedAppBooter appBooter = (ForkedAppBooter) TestContainer.getInstance().lookup( ForkedAppBooter.ROLE, "TestForkedAppBooter" );
+        
+        //FIXME: remove the need for this.
+        // check to see if there is a space in the path...
+        ResourceBundle rb = ResourceBundle.getBundle( "baseTest" );
+        if ( rb.getString( "nexus.base.dir" ).contains( " " ) )
+        {
+
+            String errorMessage =
+                "\n***************************************\n*                                     *\n"
+              + "*               NOTE:                 *\n* This test-harness will not work in  *\n"
+              + "* directories/folders with spaces.    *\n*                                     *\n"
+              + "***************************************";
+
+            // send this to the console so we don't have any confusion... even if its in the log
+            System.out.println( errorMessage );
+            Assert.fail( errorMessage );
+        }
+
+        ForkedAppBooter appBooter =
+            (ForkedAppBooter) TestContainer.getInstance().lookup( ForkedAppBooter.ROLE, "TestForkedAppBooter" );
         appBooter.start();
     }
 
     @AfterClass
-    public static void afterSuite() throws Exception
+    public static void afterSuite()
+        throws Exception
     {
-        ForkedAppBooter appBooter = (ForkedAppBooter) TestContainer.getInstance().lookup( ForkedAppBooter.ROLE, "TestForkedAppBooter" );
+        ForkedAppBooter appBooter =
+            (ForkedAppBooter) TestContainer.getInstance().lookup( ForkedAppBooter.ROLE, "TestForkedAppBooter" );
         appBooter.shutdown();
     }
 
