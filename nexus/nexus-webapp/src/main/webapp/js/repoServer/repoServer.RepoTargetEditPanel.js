@@ -144,6 +144,7 @@ Sonatype.repoServer.RepoTargetEditPanel = function(config){
           {
            	xtype: 'panel',
             layout: 'form',
+            width: 380,
             items: [
               {
                 xtype: 'textfield',
@@ -161,7 +162,7 @@ Sonatype.repoServer.RepoTargetEditPanel = function(config){
         	  {
                 xtype: 'button',
                 text: 'Add', 
-                style: 'padding-left: 8px',
+                style: 'padding-left: 7px',
                 minWidth: 75,
                 id: 'button-add',
                 handler: this.addNewPattern,
