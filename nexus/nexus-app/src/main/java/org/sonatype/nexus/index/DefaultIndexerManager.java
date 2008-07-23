@@ -44,7 +44,7 @@ import org.codehaus.plexus.util.IOUtil;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
 import org.sonatype.nexus.configuration.ConfigurationChangeListener;
-import org.sonatype.nexus.configuration.NexusConfiguration;
+import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.index.context.IndexContextInInconsistentStateException;
 import org.sonatype.nexus.index.context.IndexingContext;

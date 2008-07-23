@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- Default nexus security configuration -->
+<!-- used as default config source -->
+
+<nexusSecurity>
+    <version>1.0.0</version>
+</nexusSecurity>

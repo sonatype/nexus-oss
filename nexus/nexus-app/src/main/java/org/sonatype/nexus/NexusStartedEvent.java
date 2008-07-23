@@ -1,6 +1,6 @@
 package org.sonatype.nexus;
 
-import org.sonatype.nexus.configuration.ApplicationConfiguration;
+import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
 
 /**

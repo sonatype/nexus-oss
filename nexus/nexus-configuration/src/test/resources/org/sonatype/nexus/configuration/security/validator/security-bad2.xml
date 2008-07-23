@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- This configuration will cause 3 validation warnings -->
+<nexusSecurity>
+    <version>1.0.0</version>    
+    <roles>      
+        <!-- invalid id of 0 -->   
+        <role>      
+            <id>0</id>
+        </role>
+        
+        <!-- no id -->
+        <role>
+        </role>
+        
+        <role>
+            <id>arole</id>
+        </role>
+        
+        <!-- Duplicate role id -->      
+        <role>
+            <id>arole</id>
+        </role>        
+    </roles>
+</nexusSecurity>

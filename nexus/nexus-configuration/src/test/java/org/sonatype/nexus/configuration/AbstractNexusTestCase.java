@@ -38,6 +38,7 @@ public abstract class AbstractNexusTestCase
     extends PlexusTestCase
 {
     public static final String NEXUS_CONFIGURATION_KEY = "nexus.configuration";
+    public static final String SECURITY_CONFIGURATION_KEY = "nexus.security.configuration";
     public static final String APPS_CONFIGURATION_KEY = "apps";
 
     protected static final File PLEXUS_HOME = new File( getBasedir(), "target/plexus-home" );
@@ -47,8 +48,11 @@ public abstract class AbstractNexusTestCase
         File nexusConfigFile = new File( PLEXUS_HOME, "/conf/nexus.xml" );
 
         nexusConfigFile.getParentFile().mkdirs();
+        
+        File securityConfigFile = new File( PLEXUS_HOME, "/conf/security.xml" );
 
         ctx.put( NEXUS_CONFIGURATION_KEY, nexusConfigFile.getAbsolutePath() );
+        ctx.put( SECURITY_CONFIGURATION_KEY, securityConfigFile.getAbsolutePath() );
         ctx.put( APPS_CONFIGURATION_KEY, PLEXUS_HOME.getAbsolutePath() );
     }
 
@@ -65,12 +69,33 @@ public abstract class AbstractNexusTestCase
             return null;
         }
     }
+    
+    protected String getSecurityConfiguration()
+    {
+        try
+        {
+            return (String) getContainer().getContext().get( SECURITY_CONFIGURATION_KEY );
+        }
+        catch ( ContextException e )
+        {
+            fail( "JUNit environment problem: " + SECURITY_CONFIGURATION_KEY + " not found in plexus context?" );
+
+            return null;
+        }
+    }
 
     protected void copyDefaultConfigToPlace()
         throws IOException
     {
         IOUtil.copy( getClass().getResourceAsStream( "/META-INF/nexus/nexus.xml" ), new FileOutputStream(
             getNexusConfiguration() ) );
+    }
+    
+    protected void copyDefaultSecurityConfigToPlace()
+    throws IOException
+    {
+        IOUtil.copy( getClass().getResourceAsStream( "/META-INF/nexus/security.xml" ), new FileOutputStream(
+            getSecurityConfiguration() ) );
     }
 
 }

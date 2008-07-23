@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- This config will cause 2 validation errors -->
+
+<nexusSecurity>
+	<version>1.0.0</version>	
+	<users>		
+	    <!-- no id -->
+	    <user>     
+        </user>	
+		<user>		
+			<userId>auser</userId>
+			<name>Alex User</name>
+		</user>
+		
+		<!-- Duplicate user id -->		
+		<user>
+            <userId>auser</userId>
+            <name>Alex User</name>
+        </user>        
+	</users>
+</nexusSecurity>

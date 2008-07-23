@@ -23,47 +23,23 @@ package org.sonatype.nexus.configuration.source;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.sonatype.nexus.configuration.ConfigurationException;
-import org.sonatype.nexus.configuration.model.Configuration;
 import org.sonatype.nexus.configuration.validator.ValidationResponse;
 
 /**
- * The Interface ConfigurationSource, responsible to fetch Nexus user configuration by some means. It also stores one
- * instance of Configuration object maintained thru life of Nexus. This component is also able to persist user config.
+ * The Interface ConfigurationSource.
  * 
  * @author cstamas
  */
 public interface ConfigurationSource
 {
-
     String ROLE = ConfigurationSource.class.getName();
-
-    /**
-     * Gets the current configuration.
-     * 
-     * @return the configuration, null if not loaded
-     * @throws ConfigurationException
-     * @throws IOException
-     */
-    Configuration getConfiguration();
-
+    
     /**
      * Returns the validation response, if any. It is created on the loading of the user configuration.
      * 
      * @return the response or null if not applicable or config was still not loaded.
      */
     ValidationResponse getValidationResponse();
-
-    /**
-     * Forces reloading the user configuration.
-     * 
-     * @return the configuration
-     * @throws ConfigurationException
-     * @throws IOException
-     */
-    Configuration loadConfiguration()
-        throws ConfigurationException,
-            IOException;
 
     /**
      * Persists the current configuration.
@@ -95,12 +71,4 @@ public interface ConfigurationSource
      * @return
      */
     boolean isConfigurationDefaulted();
-
-    /**
-     * Returns the configuration that this configuration uses for defaulting.
-     * 
-     * @return a config source that is default source for this config or null
-     */
-    ConfigurationSource getDefaultsSource();
-
 }

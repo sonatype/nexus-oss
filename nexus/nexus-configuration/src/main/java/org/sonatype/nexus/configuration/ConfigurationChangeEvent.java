@@ -29,13 +29,13 @@ public class ConfigurationChangeEvent
 {
     private final long firedOn;
 
-    private final ApplicationConfiguration applicationConfiguration;
+    private final NotifiableConfiguration configuration;
 
-    public ConfigurationChangeEvent( ApplicationConfiguration applicationConfiguration )
+    public ConfigurationChangeEvent( NotifiableConfiguration configuration )
     {
         this.firedOn = System.currentTimeMillis();
 
-        this.applicationConfiguration = applicationConfiguration;
+        this.configuration = configuration;
     }
 
     public long getFiredOn()
@@ -43,9 +43,9 @@ public class ConfigurationChangeEvent
         return firedOn;
     }
 
-    public ApplicationConfiguration getApplicationConfiguration()
+    public NotifiableConfiguration getNotifiableConfiguration()
     {
-        return applicationConfiguration;
+        return configuration;
     }
 
 }

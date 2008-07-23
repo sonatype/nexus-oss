@@ -24,8 +24,8 @@ import java.io.IOException;
 
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.sonatype.nexus.configuration.ConfigurationException;
+import org.sonatype.nexus.configuration.application.source.ApplicationConfigurationSource;
 import org.sonatype.nexus.configuration.model.Configuration;
-import org.sonatype.nexus.configuration.source.ConfigurationSource;
 
 /**
  * The migration tool.
@@ -46,7 +46,7 @@ public class DefaultMigrationTool
     /**
      * @plexus.requirement role-hint="static"
      */
-    private ConfigurationSource configurationSource;
+    private ApplicationConfigurationSource configurationSource;
 
     public MigrationResult migrate( MigrationRequest req, MigrationMonitor monitor )
         throws IOException

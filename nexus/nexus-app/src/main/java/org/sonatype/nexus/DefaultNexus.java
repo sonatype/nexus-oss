@@ -45,7 +45,7 @@ import org.sonatype.nexus.artifact.NexusItemInfo;
 import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
 import org.sonatype.nexus.configuration.ConfigurationChangeListener;
 import org.sonatype.nexus.configuration.ConfigurationException;
-import org.sonatype.nexus.configuration.NexusConfiguration;
+import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.configuration.model.CGroupsSettingPathMappingItem;
 import org.sonatype.nexus.configuration.model.CRemoteConnectionSettings;
 import org.sonatype.nexus.configuration.model.CRemoteHttpProxySettings;
@@ -56,6 +56,7 @@ import org.sonatype.nexus.configuration.model.CRepositoryGroup;
 import org.sonatype.nexus.configuration.model.CRepositoryShadow;
 import org.sonatype.nexus.configuration.model.CRepositoryTarget;
 import org.sonatype.nexus.configuration.model.CRouting;
+import org.sonatype.nexus.configuration.security.NexusSecurityConfiguration;
 import org.sonatype.nexus.feeds.FeedRecorder;
 import org.sonatype.nexus.feeds.NexusArtifactEvent;
 import org.sonatype.nexus.feeds.SystemEvent;
@@ -128,6 +129,12 @@ public class DefaultNexus
      * @plexus.requirement
      */
     private NexusConfiguration nexusConfiguration;
+    
+    /** The security configuration
+     * 
+     * @plexus.requirement
+     */
+    private NexusSecurityConfiguration nexusSecurityConfiguration;
 
     /**
      * The NexusIndexer.
@@ -275,6 +282,11 @@ public class DefaultNexus
     public NexusConfiguration getNexusConfiguration()
     {
         return nexusConfiguration;
+    }
+    
+    public NexusSecurityConfiguration getNexusSecurityConfiguration()
+    {
+        return nexusSecurityConfiguration;
     }
 
     // ----------------------------------------------------------------------------------------------------------
@@ -689,6 +701,12 @@ public class DefaultNexus
     {
         return nexusConfiguration.getConfigurationAsStream();
     }
+    
+    public InputStream getSecurityConfigurationAsStream()
+        throws IOException
+    {
+        return nexusSecurityConfiguration.getConfigurationAsStream();
+    }
 
     public Collection<String> getApplicationLogFiles()
         throws IOException
@@ -1051,6 +1069,12 @@ public class DefaultNexus
         throws IOException
     {
         return nexusConfiguration.getConfigurationSource().getDefaultsSource().getConfigurationAsStream();
+    }
+    
+    public InputStream getDefaultSecurityConfigurationAsStream()
+        throws IOException
+    {
+        return nexusSecurityConfiguration.getConfigurationSource().getDefaultsSource().getConfigurationAsStream();
     }
 
     public String readDefaultWorkingDirectory()

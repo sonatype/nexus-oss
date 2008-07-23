@@ -29,7 +29,7 @@ import java.util.List;
 
 import org.apache.commons.io.IOUtils;
 import org.codehaus.plexus.util.IOUtil;
-import org.sonatype.nexus.configuration.ApplicationConfiguration;
+import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.proxy.LoggingComponent;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;

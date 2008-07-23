@@ -32,21 +32,21 @@ public class ValidationRequest
     /**
      * The configuration to validate.
      */
-    private Configuration configuration;
+    private Object configuration;
 
-    public ValidationRequest( Configuration configuration )
+    public ValidationRequest( Object configuration )
     {
         super();
 
         this.configuration = configuration;
     }
 
-    public Configuration getConfiguration()
+    public Object getConfiguration()
     {
         return configuration;
     }
 
-    public void setConfiguration( Configuration configuration )
+    public void setConfiguration( Object configuration )
     {
         this.configuration = configuration;
     }

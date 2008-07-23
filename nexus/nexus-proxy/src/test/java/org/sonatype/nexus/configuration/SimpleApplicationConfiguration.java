@@ -24,6 +24,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Vector;
 
+import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.model.CGroupsSetting;
 import org.sonatype.nexus.configuration.model.CRemoteConnectionSettings;
 import org.sonatype.nexus.configuration.model.CRepositoryGrouping;

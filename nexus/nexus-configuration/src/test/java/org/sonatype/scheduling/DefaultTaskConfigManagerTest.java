@@ -29,7 +29,7 @@ import java.util.Set;
 import java.util.concurrent.Callable;
 
 import org.sonatype.nexus.configuration.AbstractNexusTestCase;
-import org.sonatype.nexus.configuration.ApplicationConfiguration;
+import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.model.CScheduledTask;
 import org.sonatype.scheduling.schedules.CronSchedule;
 import org.sonatype.scheduling.schedules.DailySchedule;
