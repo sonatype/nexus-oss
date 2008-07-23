@@ -31,6 +31,7 @@ import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.context.ContextException;
+import org.codehaus.plexus.interpolation.InterpolationException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 import org.sonatype.nexus.configuration.ModelloUtils;
@@ -481,6 +482,11 @@ public class DefaultApplicationRuntimeConfigurationBuilder
                     return am;
                 }
                 catch ( ComponentLookupException e )
+                {
+                    throw new InvalidConfigurationException( "Unsupported authentication source type: "
+                        + authz.getType(), e );
+                }
+                catch ( InterpolationException e )
                 {
                     throw new InvalidConfigurationException( "Unsupported authentication source type: "
                         + authz.getType(), e );

@@ -20,7 +20,7 @@
  */
 package org.sonatype.nexus.util;
 
-import org.codehaus.plexus.util.interpolation.Interpolator;
+import org.codehaus.plexus.interpolation.Interpolator;
 
 /**
  * A simple component to centralize Plexus context access for interpolation needs.
@@ -28,7 +28,6 @@ import org.codehaus.plexus.util.interpolation.Interpolator;
  * @author cstamas
  */
 public interface ApplicationInterpolatorProvider
-    extends Interpolator
 {
     String ROLE = ApplicationInterpolatorProvider.class.getName();
 

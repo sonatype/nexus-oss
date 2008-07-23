@@ -22,11 +22,11 @@ package org.sonatype.nexus.util;
 
 import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.context.ContextException;
+import org.codehaus.plexus.interpolation.Interpolator;
+import org.codehaus.plexus.interpolation.MapBasedValueSource;
+import org.codehaus.plexus.interpolation.RegexBasedInterpolator;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
-import org.codehaus.plexus.util.interpolation.Interpolator;
-import org.codehaus.plexus.util.interpolation.MapBasedValueSource;
-import org.codehaus.plexus.util.interpolation.RegexBasedInterpolator;
-import org.codehaus.plexus.util.interpolation.ValueSource;
+
 
 /**
  * A simple class that holds Regex interpolator and has reference to Plexus context too, to centralize Plexus coupling
@@ -49,24 +49,9 @@ public class DefaultApplicationInterpolatorProvider
         regexBasedInterpolator = new RegexBasedInterpolator();
     }
 
-    public void addValueSource( ValueSource valueSource )
-    {
-        regexBasedInterpolator.addValueSource( valueSource );
-    }
-
-    public void removeValuesSource( ValueSource valueSource )
-    {
-        regexBasedInterpolator.removeValuesSource( valueSource );
-    }
-
-    public String interpolate( String input, String thisPrefixPattern )
-    {
-        return regexBasedInterpolator.interpolate( input, thisPrefixPattern );
-    }
-
     public Interpolator getInterpolator()
     {
-        return this;
+        return regexBasedInterpolator;
     }
 
     public void contextualize( Context context )

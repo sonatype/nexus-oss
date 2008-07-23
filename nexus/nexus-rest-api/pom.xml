@@ -52,22 +52,6 @@
 			<groupId>org.apache.velocity</groupId>
 			<artifactId>velocity</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>com.noelios.restlet</groupId>
-			<artifactId>com.noelios.restlet.ext.servlet</artifactId>
-		</dependency>        
-		<dependency>
-			<groupId>org.restlet</groupId>
-			<artifactId>org.restlet.ext.velocity</artifactId>
-		</dependency>        
-		<dependency>
-			<groupId>org.restlet</groupId>
-			<artifactId>org.restlet.ext.fileupload</artifactId>
-		</dependency>  
-		<dependency>
-			<groupId>org.restlet</groupId>
-			<artifactId>org.restlet</artifactId>
-		</dependency>          
         <dependency>
 			<groupId>org.apache.maven</groupId>
 			<artifactId>maven-model</artifactId>
@@ -111,13 +95,6 @@
 		<dependency>
 			<groupId>com.thoughtworks.xstream</groupId>
 			<artifactId>xstream</artifactId>
-		</dependency>
-
-		<!-- Servlet API -->
-		<dependency>
-			<groupId>org.apache.geronimo.specs</groupId>
-			<artifactId>geronimo-servlet_2.5_spec</artifactId>
-			<optional>true</optional>
 		</dependency>
 
 		<!-- For testing -->

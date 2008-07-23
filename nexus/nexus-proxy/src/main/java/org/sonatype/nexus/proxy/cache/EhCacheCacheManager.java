@@ -27,6 +27,7 @@ import java.io.InputStream;
 import net.sf.ehcache.config.Configuration;
 import net.sf.ehcache.config.ConfigurationFactory;
 
+import org.codehaus.plexus.interpolation.InterpolationException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.StartingException;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.StoppingException;
@@ -53,18 +54,8 @@ public class EhCacheCacheManager
     /** The eh cache manager. */
     private net.sf.ehcache.CacheManager ehCacheManager;
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.sonatype.nexus.proxy.cache.CacheManager#getCache(java.lang.String)
-     */
     public PathCache getPathCache( String cache )
     {
-        if ( ehCacheManager == null )
-        {
-            constructEhCacheManager();
-        }
-
         if ( !ehCacheManager.cacheExists( cache ) )
         {
             ehCacheManager.addCache( cache );
@@ -76,20 +67,28 @@ public class EhCacheCacheManager
     public void startService()
         throws StartingException
     {
-        constructEhCacheManager();
+        try
+        {
+            constructEhCacheManager();
+        }
+        catch ( InterpolationException e )
+        {
+            throw new StartingException( "Could not start EHCacheCacheManager:", e );
+        }
     }
 
     public void stopService()
         throws StoppingException
     {
         getLogger().info( "Shutting down EHCache manager." );
-        
+
         ehCacheManager.removalAll();
 
         ehCacheManager.shutdown();
     }
 
     private void constructEhCacheManager()
+        throws InterpolationException
     {
         InputStream configStream = EhCacheCacheManager.class.getResourceAsStream( "/ehcache.xml" );
 
@@ -137,14 +136,15 @@ public class EhCacheCacheManager
     }
 
     private void configureDiskStore( Configuration ehConfig )
+        throws InterpolationException
     {
         // add plexus awareness with interpolation
         String path = ehConfig.getDiskStoreConfiguration().getPath();
 
-        path = interpolatorProvider.interpolate( path, "" );
-
         try
         {
+            path = interpolatorProvider.getInterpolator().interpolate( path, "" );
+
             path = new File( path ).getCanonicalPath();
         }
         catch ( IOException e )

@@ -28,7 +28,7 @@ import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.Writer;
 
-import org.codehaus.plexus.util.interpolation.InterpolatorFilterReader;
+import org.codehaus.plexus.interpolation.InterpolatorFilterReader;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.sonatype.nexus.configuration.model.Configuration;
 import org.sonatype.nexus.configuration.model.io.xpp3.NexusConfigurationXpp3Reader;
@@ -100,7 +100,7 @@ public abstract class AbstractApplicationConfigurationSource
 
             fr = new InputStreamReader( is );
 
-            InterpolatorFilterReader ip = new InterpolatorFilterReader( fr, interpolatorProvider );
+            InterpolatorFilterReader ip = new InterpolatorFilterReader( fr, interpolatorProvider.getInterpolator() );
 
             // read again with interpolation
             configuration = reader.read( ip );
@@ -121,13 +121,13 @@ public abstract class AbstractApplicationConfigurationSource
                 fr.close();
             }
         }
-        
+
         // check the model version if loaded
         if ( configuration != null && !Configuration.MODEL_VERSION.equals( configuration.getVersion() ) )
         {
             rejectConfiguration( "Nexus configuration file was loaded but discarded, it has the wrong version number." );
         }
-        
+
         if ( getConfiguration() != null )
         {
             getLogger().info( "Configuration loaded succesfully." );

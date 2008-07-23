@@ -24,11 +24,12 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.codehaus.plexus.interpolation.InterpolationException;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
-import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
 import org.sonatype.nexus.configuration.ConfigurationChangeListener;
+import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.proxy.LoggingComponent;
 import org.sonatype.nexus.util.ApplicationInterpolatorProvider;
 
@@ -64,12 +65,13 @@ public abstract class AbstractAccessDecisionVoter
     }
 
     public void setConfiguration( Map<String, String> config )
+        throws InterpolationException
     {
         configuration.clear();
 
         for ( String key : config.keySet() )
         {
-            String interpolated = applicationInterpolatorProvider.interpolate( config.get( key ), "" );
+            String interpolated = applicationInterpolatorProvider.getInterpolator().interpolate( config.get( key ), "" );
 
             configuration.put( key, interpolated );
         }

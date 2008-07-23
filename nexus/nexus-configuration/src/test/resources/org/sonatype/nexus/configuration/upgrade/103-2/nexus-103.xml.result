@@ -1,4 +1,5 @@
-<?xml version="1.0" encoding="UTF-8"?><nexusConfiguration>
+<?xml version="1.0" encoding="UTF-8"?>
+<nexusConfiguration>
   <version>1.0.4</version>
   <workingDirectory>${runtime}/work/nexus</workingDirectory>
   <applicationLogDirectory>${runtime}/apps/nexus/logs</applicationLogDirectory>

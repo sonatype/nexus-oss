@@ -22,6 +22,7 @@ package org.sonatype.nexus.proxy.access;
 
 import java.util.Map;
 
+import org.codehaus.plexus.interpolation.InterpolationException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.repository.Repository;
 
@@ -30,7 +31,6 @@ import org.sonatype.nexus.proxy.repository.Repository;
  */
 public interface AccessDecisionVoter
 {
-
     String ROLE = AccessDecisionVoter.class.getName();
 
     /** Vote for approval. */
@@ -46,7 +46,8 @@ public interface AccessDecisionVoter
     public static final String REQUEST_USER = "request.user";
 
     /** Passes the configuration to voter */
-    void setConfiguration( Map<String, String> config );
+    void setConfiguration( Map<String, String> config )
+        throws InterpolationException;
 
     /**
      * The implementation of this method should return one of the ACCESS_APPROVED, ACCESS_NEUTRAL or ACCESS_DENIED
