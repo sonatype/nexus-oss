@@ -1155,8 +1155,8 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
     }, this.formCards);
     
     this.formCards.getLayout().setActiveItem(0);
-    //Enable add button on refresh
-    this.schedulesGridPanel.getTopToolbar().items.get('schedule-add-btn').enable();
+//    //Enable add button on refresh
+//    this.schedulesGridPanel.getTopToolbar().items.get('schedule-add-btn').enable();
   },
   
   markTreeInvalid : function(tree) {
@@ -1208,8 +1208,8 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
 
     //delete row from grid if canceling a new repo form
     if(formInfoObj.isNew){
-      //Enable add button on new cancel
-      this.schedulesGridPanel.getTopToolbar().items.get('schedule-add-btn').enable();
+//      //Enable add button on new cancel
+//      this.schedulesGridPanel.getTopToolbar().items.get('schedule-add-btn').enable();
       store.remove( store.getById(formInfoObj.formPanel.id) );
     }
     
@@ -1483,8 +1483,8 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
         //disable the service type, only avaiable on add
         action.options.fpanel.find('name', 'typeId')[0].disable();
         
-        //Enable add button on save complete
-        this.schedulesGridPanel.getTopToolbar().items.get('schedule-add-btn').enable();
+//        //Enable add button on save complete
+//        this.schedulesGridPanel.getTopToolbar().items.get('schedule-add-btn').enable();
       }
       else {
         var sentData = action.output.data;
@@ -1619,6 +1619,7 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
     
     //always set active
     this.formCards.getLayout().setActiveItem(formPanel);
+    formPanel.doLayout();
   },
   
   contextClick : function(grid, index, e){
