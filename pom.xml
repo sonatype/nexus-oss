@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>org.sonatype.spice</groupId>
 		<artifactId>spice-parent</artifactId>
-		<version>2</version>
+		<version>5-SNAPSHOT</version>
 	</parent>
 	<groupId>org.sonatype.plexus</groupId>
 	<artifactId>plexus-restlet-bridge</artifactId>
@@ -20,7 +20,7 @@
 		<dependency>
 			<groupId>org.sonatype.plexus</groupId>
 			<artifactId>plexus-jetty6</artifactId>
-			<version>1.0</version>
+			<version>1.1-SNAPSHOT</version>
 		</dependency>
 		<!-- restlet.org -->
 		<dependency>
@@ -85,7 +85,7 @@
 		<dependency>
 			<groupId>org.json</groupId>
 			<artifactId>json</artifactId>
-			<version>20070829</version>
+			<version>20080701</version>
 			<type>jar</type>
 			<scope>compile</scope>
 		</dependency>
