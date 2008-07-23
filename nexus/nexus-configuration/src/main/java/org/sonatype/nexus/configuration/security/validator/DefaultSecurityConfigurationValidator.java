@@ -20,12 +20,14 @@
  */
 package org.sonatype.nexus.configuration.security.validator;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.configuration.security.model.CApplicationPrivilege;
+import org.sonatype.nexus.configuration.security.model.CPrivilege;
 import org.sonatype.nexus.configuration.security.model.CRepoTargetPrivilege;
 import org.sonatype.nexus.configuration.security.model.CRole;
 import org.sonatype.nexus.configuration.security.model.CUser;
@@ -59,7 +61,7 @@ public class DefaultSecurityConfigurationValidator
         {
             for ( CApplicationPrivilege priv : appPrivs )
             {
-                response.append( validatePrivilege( context, priv ) );
+                response.append( validateApplicationPrivilege( context, priv ) );
             }
         }
         
@@ -69,7 +71,7 @@ public class DefaultSecurityConfigurationValidator
         {
             for ( CRepoTargetPrivilege priv : targetPrivs )
             {
-                response.append( validatePrivilege( context, priv ) );
+                response.append( validateRepoTargetPrivilege( context, priv ) );
             }
         }
         
@@ -82,6 +84,8 @@ public class DefaultSecurityConfigurationValidator
                 response.append( validateRole( context, role ) );
             }
         }
+        
+        response.append( validateRoleContainment( context ) );
         
         List<CUser> users = model.getUsers();
         
@@ -132,7 +136,7 @@ public class DefaultSecurityConfigurationValidator
         return response;
     }
     
-    public ValidationResponse validatePrivilege( SecurityValidationContext ctx, CRepoTargetPrivilege privilege )
+    public ValidationResponse validatePrivilege( SecurityValidationContext ctx, CPrivilege privilege )
     {
         ValidationResponse response = new SecurityValidationResponse();
         
@@ -160,7 +164,7 @@ public class DefaultSecurityConfigurationValidator
         {
             String newId = Long.toHexString( System.currentTimeMillis() + rnd.nextInt( 2008 ) );
 
-            response.addValidationWarning( "Fixed wrong repository target privilege ID from '" + 
+            response.addValidationWarning( "Fixed wrong privilege ID from '" + 
                                            privilege.getId() + "' to '" + newId + "'" );
             
             privilege.setId( newId );
@@ -168,12 +172,29 @@ public class DefaultSecurityConfigurationValidator
             response.setModified( true );
         }
         
+        if ( !CPrivilege.METHOD_CREATE.equals( privilege.getMethod() ) 
+            && !CPrivilege.METHOD_DELETE.equals( privilege.getMethod() )
+            && !CPrivilege.METHOD_READ.equals( privilege.getMethod() )
+            && !CPrivilege.METHOD_UPDATE.equals( privilege.getMethod() ) )
+        {
+            response.addValidationError( "Privilege ID '" + privilege.getId() + "' Method is wrong! (Allowed values are: " 
+                                         + CPrivilege.METHOD_CREATE + ", "
+                                         + CPrivilege.METHOD_DELETE + ", " 
+                                         + CPrivilege.METHOD_READ + " and " 
+                                         + CPrivilege.METHOD_UPDATE + ")" );
+        }
+        
+        if ( StringUtils.isEmpty( privilege.getName() ) )
+        {
+            response.addValidationError( "Privilege ID '" + privilege.getId() + "' requires a name." );
+        }
+        
         existingIds.add( privilege.getId() );
         
         return response;
     }
     
-    public ValidationResponse validatePrivilege( SecurityValidationContext ctx, CApplicationPrivilege privilege )
+    public ValidationResponse validateRepoTargetPrivilege( SecurityValidationContext ctx, CRepoTargetPrivilege privilege )
     {
         ValidationResponse response = new SecurityValidationResponse();
         
@@ -184,32 +205,82 @@ public class DefaultSecurityConfigurationValidator
         
         SecurityValidationContext context = ( SecurityValidationContext ) response.getContext();
         
-        Random rnd = new Random();
+        response.append( validatePrivilege( context, privilege ) );
         
-        List<String> existingIds = context.getExistingPrivilegeIds();
-        
-        if ( existingIds == null )
+        if ( StringUtils.isEmpty( privilege.getRepositoryTargetId() ) )
         {
-            context.addExistingPrivilegeIds();
-            
-            existingIds = context.getExistingPrivilegeIds();
-        }
-
-        if ( StringUtils.isEmpty( privilege.getId() )
-            || "0".equals( privilege.getId() )
-            || ( existingIds.contains( privilege.getId() ) ) )
-        {
-            String newId = Long.toHexString( System.currentTimeMillis() + rnd.nextInt( 2008 ) );
-
-            response.addValidationWarning( "Fixed wrong application privilege ID from '" 
-                                           + privilege.getId() + "' to '" + newId + "'" );
-            
-            privilege.setId( newId );
-
-            response.setModified( true );
+            response.addValidationError( "Privilege ID '" + privilege.getId() + "' requires a repositoryTargetId." );
         }
         
-        existingIds.add( privilege.getId() );
+        if ( !StringUtils.isEmpty( privilege.getRepositoryId() )
+            && !StringUtils.isEmpty( privilege.getGroupId() ) )
+        {
+            response.addValidationError( "Privilege ID '" + privilege.getId() + "' cannot be assigned to both a group and repository." 
+                + "  Either assign a group, a repository or neither (which assigns to ALL repositories).");
+        }
+        
+        return response;
+    }
+    
+    public ValidationResponse validateApplicationPrivilege( SecurityValidationContext ctx, CApplicationPrivilege privilege )
+    {
+        ValidationResponse response = new SecurityValidationResponse();
+        
+        if ( ctx != null )
+        {
+            response.setContext( ctx );
+        }
+        
+        SecurityValidationContext context = ( SecurityValidationContext ) response.getContext();
+        
+        response.append( validatePrivilege( context, privilege ) );
+        
+        if ( StringUtils.isEmpty( privilege.getPath() ) )
+        {
+            response.addValidationError( "Privilege ID '" + privilege.getId() + "' Application path cannot be empty." );
+        }
+        
+        return response;
+    }
+    
+    public ValidationResponse validateRoleContainment( SecurityValidationContext ctx )
+    {
+        ValidationResponse response = new SecurityValidationResponse();
+        
+        if ( ctx != null )
+        {
+            response.setContext( ctx );
+        }
+        
+        SecurityValidationContext context = ( SecurityValidationContext ) response.getContext();
+        
+        if ( context.getExistingRoleIds() != null )
+        {
+            for ( String roleId : context.getExistingRoleIds() )
+            {
+                response.append( isRecursive( roleId, roleId, ctx ) );
+            }
+        }
+        
+        return response;
+    }
+    
+    private ValidationResponse isRecursive( String baseRoleId, String roleId, SecurityValidationContext ctx )
+    {
+        ValidationResponse response = new SecurityValidationResponse();
+        
+        List<String> containedRoles = ctx.getRoleContainmentMap().get( roleId );
+        
+        for ( String containedRoleId : containedRoles )
+        {
+            if ( containedRoleId.equals( baseRoleId ) )
+            {
+                response.addValidationError( "Role ID '" + baseRoleId + "' contains itself through Role ID '" + roleId + "'.  This is not valid." );
+                break;
+            }
+            
+            response.append( isRecursive( baseRoleId, containedRoleId, ctx ) );
+        }
         
         return response;
     }
@@ -250,6 +321,56 @@ public class DefaultSecurityConfigurationValidator
             response.setModified( true );
         }
         
+        if ( StringUtils.isEmpty( role.getName() ) )
+        {
+            response.addValidationError( "Role ID '" + role.getId() + "' requires a name." );
+        }
+        
+        if ( 1 > role.getSessionTimeout() )
+        {
+            response.addValidationWarning( "Role ID '" + role.getId() + "' fixed invalid session timeout from '" + 
+                                           role.getSessionTimeout() + "' to '60'." );
+            
+            role.setSessionTimeout( 60 );
+            
+            response.setModified( true );
+        }
+        
+        if ( context.getExistingPrivilegeIds() != null )
+        {
+            List<String> privIds = role.getPrivileges();
+            
+            for ( String privId : privIds )
+            {
+                if ( !context.getExistingPrivilegeIds().contains( privId ) )
+                {
+                    response.addValidationError( "Role ID '" + role.getId() + "' Invalid privilege id '" + privId + "' found." );
+                }
+            }
+        }
+        
+        List<String> roleIds = role.getRoles();
+        
+        List<String> containedRoles = context.getRoleContainmentMap().get( role.getId() );
+        
+        if ( containedRoles == null )
+        {
+            containedRoles = new ArrayList();
+            context.getRoleContainmentMap().put( role.getId(), containedRoles );
+        }
+        
+        for ( String roleId : roleIds )
+        {
+            if ( roleId.equals( role.getId() ) )
+            {
+                response.addValidationError( "Role ID '" + role.getId() + "' Contains itself, this is not valid." );
+            }
+            else if ( context.getRoleContainmentMap() != null )
+            {                
+                containedRoles.add( roleId );
+            }
+        }
+        
         existingIds.add( role.getId() );
         
         return response;
@@ -278,7 +399,34 @@ public class DefaultSecurityConfigurationValidator
         if ( StringUtils.isEmpty( user.getUserId() )
             || existingIds.contains( user.getUserId() ) )
         {
-            response.addValidationError( "The user with ID=" + user.getUserId() + " is invalid.  It is either empty or already in use." );
+            response.addValidationError( "User ID '" + user.getUserId() + "' is invalid.  It is either empty or already in use." );
+        }
+        
+        if ( StringUtils.isEmpty( user.getEmail() ) )
+        {
+            response.addValidationError( "User ID '" + user.getUserId() + "' has no email address" );
+        }
+        
+        if ( !CUser.STATUS_ACTIVE.equals( user.getStatus() ) 
+            && !CUser.STATUS_DISABLED.equals( user.getStatus() )
+            && !CUser.STATUS_LOCKED.equals( user.getStatus() ) )
+        {
+            response.addValidationError( "User ID '" + user.getUserId() + "' has invalid status '" + user.getStatus() + 
+                                         "'.  (Allowed values are: " + CUser.STATUS_ACTIVE + ", "
+                                         + CUser.STATUS_DISABLED + " and " + CUser.STATUS_LOCKED + ")" );
+        }
+        
+        if ( context.getExistingRoleIds() != null )
+        {
+            List<String> roleIds = user.getRoles();
+            
+            for ( String roleId : roleIds )
+            {
+                if ( !context.getExistingRoleIds().contains( roleId ) )
+                {
+                    response.addValidationError( "User ID '" + user.getUserId() + "' Invalid role id '" + roleId + "' found." );
+                }
+            }
         }
         
         existingIds.add( user.getUserId() );

@@ -413,7 +413,7 @@ public class DefaultNexusSecurityConfiguration
         throws ConfigurationException,
             IOException
     {
-        ValidationResponse vr = configurationValidator.validatePrivilege( null, settings );
+        ValidationResponse vr = configurationValidator.validateApplicationPrivilege( null, settings );
 
         if ( vr.isValid() )
         {
@@ -449,7 +449,7 @@ public class DefaultNexusSecurityConfiguration
             ConfigurationException,
             IOException
     {
-        ValidationResponse vr = configurationValidator.validatePrivilege( null, settings );
+        ValidationResponse vr = configurationValidator.validateApplicationPrivilege( null, settings );
 
         if ( vr.isValid() )
         {
@@ -515,7 +515,7 @@ public class DefaultNexusSecurityConfiguration
         throws ConfigurationException,
             IOException
     {
-        ValidationResponse vr = configurationValidator.validatePrivilege( null, settings );
+        ValidationResponse vr = configurationValidator.validateRepoTargetPrivilege( null, settings );
 
         if ( vr.isValid() )
         {
@@ -551,7 +551,7 @@ public class DefaultNexusSecurityConfiguration
             ConfigurationException,
             IOException
     {
-        ValidationResponse vr = configurationValidator.validatePrivilege( null, settings );
+        ValidationResponse vr = configurationValidator.validateRepoTargetPrivilege( null, settings );
 
         if ( vr.isValid() )
         {

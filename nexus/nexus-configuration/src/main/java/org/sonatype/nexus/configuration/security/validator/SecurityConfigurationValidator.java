@@ -61,7 +61,7 @@ public interface SecurityConfigurationValidator extends ConfigurationValidator
      * @param privilege
      * @return
      */
-    ValidationResponse validatePrivilege( SecurityValidationContext ctx, CRepoTargetPrivilege privilege );
+    ValidationResponse validateRepoTargetPrivilege( SecurityValidationContext ctx, CRepoTargetPrivilege privilege );
     
     /**
      * Validate an application privilege configuration
@@ -70,5 +70,5 @@ public interface SecurityConfigurationValidator extends ConfigurationValidator
      * @param privilege
      * @return
      */
-    ValidationResponse validatePrivilege( SecurityValidationContext ctx, CApplicationPrivilege privilege );    
+    ValidationResponse validateApplicationPrivilege( SecurityValidationContext ctx, CApplicationPrivilege privilege );    
 }

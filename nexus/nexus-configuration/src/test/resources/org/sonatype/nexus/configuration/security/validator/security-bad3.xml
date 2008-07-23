@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- This config will cause 5 validation error -->
+<!-- This config will cause 3 validation warnings -->
+
+<nexusSecurity>
+    <version>1.0.0</version>    
+    <applicationPrivileges>
+      <!-- no id -->
+      <!-- no method -->
+      <!-- no name -->
+      <!-- no path -->
+      <applicationPrivilege>
+      </applicationPrivilege>
+      
+      
+      <applicationPrivilege>
+        <id>25</id>
+        <name>priv</name>
+        <method>read</method>
+        <path>/some/path/</path>
+      </applicationPrivilege>
+      
+    </applicationPrivileges>
+    
+    <repositoryTargetPrivileges>
+      <repositoryTargetPrivilege>
+        <id>5</id>
+        <name>priv</name>
+        <method>read</method>
+        <repositoryTargetId>45</repositoryTargetId>
+      </repositoryTargetPrivilege>
+      
+      <!-- duplicate id -->
+      <!-- invalid repository target id -->
+      <!-- invalid repository AND group assignment -->
+      <repositoryTargetPrivilege>
+        <id>5</id>
+        <name>priv</name>
+        <method>create</method>
+        <repositoryId>5</repositoryId>
+        <groupId>4</groupId>
+      </repositoryTargetPrivilege>
+      
+      <!-- duplicate id across privilege types -->
+      <repositoryTargetPrivilege>
+        <id>25</id>
+        <name>priv</name>
+        <method>create</method>
+        <repositoryTargetId>45</repositoryTargetId>
+      </repositoryTargetPrivilege>
+    </repositoryTargetPrivileges>
+</nexusSecurity>

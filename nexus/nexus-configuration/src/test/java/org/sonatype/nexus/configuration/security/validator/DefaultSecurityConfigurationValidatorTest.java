@@ -62,8 +62,10 @@ public class DefaultSecurityConfigurationValidatorTest
                 "/org/sonatype/nexus/configuration/security/validator/security-bad1.xml" ) ) ) );
 
         assertFalse( response.isValid() );
+        
+        assertFalse( response.isModified() );
 
-        assertEquals( 2, response.getValidationErrors().size() );
+        assertEquals( 5, response.getValidationErrors().size() );
     }
 
     public void testBad2()
@@ -73,8 +75,28 @@ public class DefaultSecurityConfigurationValidatorTest
             getConfigurationFromStream( getClass().getResourceAsStream(
                 "/org/sonatype/nexus/configuration/security/validator/security-bad2.xml" ) ) ) );
 
-        assertTrue( response.isValid() );
+        assertFalse( response.isValid() );
+        
+        assertTrue( response.isModified() );
 
+        assertEquals( 4, response.getValidationWarnings().size() );
+        
+        assertEquals( 7, response.getValidationErrors().size() );
+    }
+    
+    public void testBad3()
+        throws Exception
+    {
+        ValidationResponse response = configurationValidator.validateModel( new ValidationRequest(
+            getConfigurationFromStream( getClass().getResourceAsStream(
+                "/org/sonatype/nexus/configuration/security/validator/security-bad3.xml" ) ) ) );
+    
+        assertFalse( response.isValid() );
+        
+        assertTrue( response.isModified() );
+    
         assertEquals( 3, response.getValidationWarnings().size() );
+        
+        assertEquals( 5, response.getValidationErrors().size() );
     }
 }

@@ -1,22 +1,39 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!-- This config will cause 2 validation errors -->
+<!-- This config will cause 5 validation errors -->
 
 <nexusSecurity>
 	<version>1.0.0</version>	
+	<roles>
+	  <role>
+	    <id>id</id>
+	    <name>name</name>
+	    <sessionTimeout>50</sessionTimeout>
+	  </role>
+	</roles>
 	<users>		
 	    <!-- no id -->
+	    <!-- no email address -->
+	    <!-- no status -->
+	    <!-- invalid role id -->
 	    <user>     
+	      <roles>
+	        <role>id1</role>
+	      </roles>
         </user>	
 		<user>		
 			<userId>auser</userId>
 			<name>Alex User</name>
+			<email>auser@auser.com</email>
+			<status>active</status>
 		</user>
 		
 		<!-- Duplicate user id -->		
 		<user>
             <userId>auser</userId>
             <name>Alex User</name>
+            <email>auser@auser.com</email>
+            <status>active</status>
         </user>        
 	</users>
 </nexusSecurity>

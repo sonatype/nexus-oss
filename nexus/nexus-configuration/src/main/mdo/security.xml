@@ -278,10 +278,6 @@
     public static final String METHOD_UPDATE = "update";
     
     public static final String METHOD_DELETE = "delete";
-    
-    public static final String TYPE_APPLICATION = "application";
-    
-    public static final String TYPE_REPO_TARGET = "repositoryTarget";
 ]]></code>
                 </codeSegment>
             </codeSegments>
