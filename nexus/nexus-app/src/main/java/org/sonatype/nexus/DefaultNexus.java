@@ -57,6 +57,13 @@ import org.sonatype.nexus.configuration.model.CRepositoryShadow;
 import org.sonatype.nexus.configuration.model.CRepositoryTarget;
 import org.sonatype.nexus.configuration.model.CRouting;
 import org.sonatype.nexus.configuration.security.NexusSecurityConfiguration;
+import org.sonatype.nexus.configuration.security.NoSuchPrivilegeException;
+import org.sonatype.nexus.configuration.security.NoSuchRoleException;
+import org.sonatype.nexus.configuration.security.NoSuchUserException;
+import org.sonatype.nexus.configuration.security.model.CApplicationPrivilege;
+import org.sonatype.nexus.configuration.security.model.CRepoTargetPrivilege;
+import org.sonatype.nexus.configuration.security.model.CRole;
+import org.sonatype.nexus.configuration.security.model.CUser;
 import org.sonatype.nexus.feeds.FeedRecorder;
 import org.sonatype.nexus.feeds.NexusArtifactEvent;
 import org.sonatype.nexus.feeds.SystemEvent;
@@ -692,6 +699,147 @@ public class DefaultNexus
     {
         nexusConfiguration.deleteRemoteNexusInstance( alias );
     }
+    
+    // Users: CRUD
+    public void createUser( CUser settings )
+        throws ConfigurationException,
+            IOException
+    {
+        nexusSecurityConfiguration.createUser( settings );
+    }
+    
+    public void deleteUser( String id )
+        throws IOException,
+            ConfigurationException,
+            NoSuchUserException
+    {
+        nexusSecurityConfiguration.deleteUser( id );
+    }
+    
+    public Collection<CUser> listUsers()
+    {
+        return nexusSecurityConfiguration.listUsers();
+    }
+    
+    public CUser readUser( String id )
+        throws NoSuchUserException
+    {
+        return nexusSecurityConfiguration.readUser( id );
+    }
+    
+    public void updateUser( CUser settings )
+        throws ConfigurationException,
+            NoSuchUserException,
+            IOException
+    {
+        nexusSecurityConfiguration.updateUser( settings );
+    }
+    
+    // Roles: CRUD
+    public void createRole( CRole settings )
+        throws ConfigurationException,
+            IOException
+    {
+        nexusSecurityConfiguration.createRole( settings );
+    }
+    
+    public void deleteRole( String id )
+        throws IOException,
+            ConfigurationException,
+            NoSuchRoleException
+    {
+        nexusSecurityConfiguration.deleteRole( id );
+    }
+    
+    public Collection<CRole> listRoles()
+    {
+        return nexusSecurityConfiguration.listRoles();
+    }
+    
+    public CRole readRole( String id )
+        throws NoSuchRoleException
+    {
+        return nexusSecurityConfiguration.readRole( id );
+    }
+    
+    public void updateRole( CRole settings )
+        throws ConfigurationException,
+            NoSuchRoleException,
+            IOException
+    {
+        nexusSecurityConfiguration.updateRole( settings );        
+    }
+    
+    // Application Privilege: CRUD
+    public void createApplicationPrivilege( CApplicationPrivilege settings )
+        throws ConfigurationException,
+            IOException
+    {
+        nexusSecurityConfiguration.createApplicationPrivilege( settings );   
+    }
+    
+    public void deleteApplicationPrivilege( String id )
+        throws IOException,
+            ConfigurationException,
+            NoSuchPrivilegeException
+    {
+        nexusSecurityConfiguration.deleteApplicationPrivilege( id );        
+    }
+    
+    public Collection<CApplicationPrivilege> listApplicationPrivileges()
+    {
+        return nexusSecurityConfiguration.listApplicationPrivileges();
+    }
+    
+    public CApplicationPrivilege readApplicationPrivilege( String id )
+        throws NoSuchPrivilegeException
+    {
+        return nexusSecurityConfiguration.readApplicationPrivilege( id );
+    }
+    
+    public void updateApplicationPrivilege( CApplicationPrivilege settings )
+        throws ConfigurationException,
+            NoSuchPrivilegeException,
+            IOException
+    {
+        nexusSecurityConfiguration.updateApplicationPrivilege( settings );   
+    }
+    
+    // Repo Target Privileges: CRUD
+    public void createRepoTargetPrivilege( CRepoTargetPrivilege settings )
+        throws ConfigurationException,
+            IOException
+    {
+        nexusSecurityConfiguration.createRepoTargetPrivilege( settings );   
+    }
+    
+    public void deleteRepoTargetPrivilege( String id )
+        throws IOException,
+            ConfigurationException,
+            NoSuchPrivilegeException
+    {
+        nexusSecurityConfiguration.deleteRepoTargetPrivilege( id ); 
+    }
+    
+    public Collection<CRepoTargetPrivilege> listRepoTargetPrivileges()
+    {
+        return nexusSecurityConfiguration.listRepoTargetPrivileges();
+    }
+    
+    public CRepoTargetPrivilege readRepoTargetPrivilege( String id )
+        throws NoSuchPrivilegeException
+    {
+        return nexusSecurityConfiguration.readRepoTargetPrivilege( id );
+    }
+    
+    public void updateRepoTargetPrivilege( CRepoTargetPrivilege settings )
+        throws ConfigurationException,
+            NoSuchPrivilegeException,
+            IOException
+    {
+        nexusSecurityConfiguration.updateRepoTargetPrivilege( settings );        
+    }
+    
 
     // =============
     // Maintenance
