@@ -436,6 +436,81 @@
 	<td>//div[2]/div/div/div/div/div/table/tbody/tr/td[1]/table/tbody/tr/td[2]/em/button</td>
 	<td></td>
 </tr>
+<tr>
+	<td>mouseDown</td>
+	<td>open-config-server</td>
+	<td></td>
+</tr>
+<tr>
+	<td>mouseUp</td>
+	<td>open-config-server</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>document.forms[0].elements[13]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>document.forms[0].elements[14]</td>
+	<td>http://oconnorhouse:8081/nexus</td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//button</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTextPresent</td>
+	<td>Welcome to the Sonatype Nexus Repository Manager.</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>3000</td>
+	<td></td>
+</tr>
+<tr>
+	<td>mouseDown</td>
+	<td>open-config-server</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>mouseUp</td>
+	<td>open-config-server</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>document.forms[0].elements[13]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//button</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyLocation</td>
+	<td>http://localhost:8081/nexus/</td>
+	<td></td>
+</tr>
 
 </tbody></table>
 </body>
