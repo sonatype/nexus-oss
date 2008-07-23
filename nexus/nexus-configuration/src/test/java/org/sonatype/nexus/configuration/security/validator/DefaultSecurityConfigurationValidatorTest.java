@@ -65,7 +65,7 @@ public class DefaultSecurityConfigurationValidatorTest
         
         assertFalse( response.isModified() );
 
-        assertEquals( 5, response.getValidationErrors().size() );
+        assertEquals( 6, response.getValidationErrors().size() );
     }
 
     public void testBad2()

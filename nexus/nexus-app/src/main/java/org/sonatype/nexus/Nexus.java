@@ -34,8 +34,6 @@ import org.sonatype.nexus.configuration.model.CRemoteHttpProxySettings;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.CRepositoryShadow;
 import org.sonatype.nexus.configuration.model.CRouting;
-import org.sonatype.nexus.configuration.security.MutableNexusSecurityConfiguration;
-import org.sonatype.nexus.configuration.security.NexusSecurityConfiguration;
 import org.sonatype.nexus.feeds.NexusArtifactEvent;
 import org.sonatype.nexus.feeds.SystemEvent;
 import org.sonatype.nexus.feeds.SystemProcess;
@@ -63,7 +61,7 @@ import org.sonatype.scheduling.schedules.Schedule;
  * @author cstamas
  */
 public interface Nexus
-    extends MutableConfiguration, MutableNexusSecurityConfiguration
+    extends MutableConfiguration
 {
     String ROLE = Nexus.class.getName();
 
@@ -78,8 +76,6 @@ public interface Nexus
     // Configuration
 
     NexusConfiguration getNexusConfiguration();
-    
-    NexusSecurityConfiguration getNexusSecurityConfiguration();
 
     // ----------------------------------------------------------------------------
     // Reposes
@@ -121,9 +117,6 @@ public interface Nexus
     // ----------------------------------------------------------------------------
 
     InputStream getConfigurationAsStream()
-        throws IOException;
-        
-    InputStream getSecurityConfigurationAsStream()
         throws IOException;
 
     Collection<String> getApplicationLogFiles()
@@ -273,9 +266,6 @@ public interface Nexus
 
     CRouting readDefaultRouting();
     
-    InputStream getDefaultSecurityConfigurationAsStream()
-        throws IOException;
-
     // ----------------------------------------------------------------------------
     // Repo templates, CRUD
     // ----------------------------------------------------------------------------

@@ -29,6 +29,8 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.codehaus.plexus.logging.AbstractLogEnabled;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.StartingException;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.StoppingException;
 import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
 import org.sonatype.nexus.configuration.ConfigurationChangeListener;
 import org.sonatype.nexus.configuration.ConfigurationException;
@@ -56,7 +58,6 @@ public class DefaultNexusSecurityConfiguration
     implements
         NexusSecurityConfiguration
 {
-
     /**
      * The configuration source.
      * 
@@ -81,6 +82,37 @@ public class DefaultNexusSecurityConfiguration
     /** The config event listeners. */
     private CopyOnWriteArrayList<ConfigurationChangeListener> configurationChangeListeners =
         new CopyOnWriteArrayList<ConfigurationChangeListener>();
+    
+    public void startService()
+        throws StartingException
+    {
+        try
+        {
+            loadConfiguration( true );
+            
+            notifyConfigurationChangeListeners();
+            
+            getLogger().info( "Started Nexus Security" );
+        }
+        catch ( ConfigurationException e )
+        {
+            getLogger().error( "Could not start Nexus Security, user configuration exception!", e );
+
+            throw new StartingException( "Could not start Nexus Security!", e );
+        }
+        catch ( IOException e )
+        {
+            getLogger().error( "Could not start Nexus Security, bad IO exception!", e );
+
+            throw new StartingException( "Could not start Nexus Security!", e );
+        }
+    }
+    
+    public void stopService()
+        throws StoppingException
+    {
+        getLogger().info( "Stopped Nexus Security" );
+    }
 
     public void loadConfiguration()
         throws ConfigurationException,

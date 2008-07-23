@@ -46,11 +46,13 @@ public class DefaultNexusSecurityConfigurationTest
         super.setUp();
 
         securityConfiguration = (DefaultNexusSecurityConfiguration) this.lookup( NexusSecurityConfiguration.ROLE );
+        securityConfiguration.startService();
     }
 
     protected void tearDown()
         throws Exception
     {
+        securityConfiguration.stopService();
         super.tearDown();
     }
 
@@ -114,6 +116,7 @@ public class DefaultNexusSecurityConfigurationTest
         
         CUser user = new CUser();
         user.setEmail( "emailaddress" );
+        user.setPassword( "password" );
         user.setName( "name" );
         user.setStatus( CUser.STATUS_ACTIVE );
         user.setUserId( "id" );
@@ -163,6 +166,7 @@ public class DefaultNexusSecurityConfigurationTest
         
         assertTrue( ( ( CUser ) config.getUsers().get( 0 ) ).getEmail().equals( "emailaddress" ) );
         assertTrue( ( ( CUser ) config.getUsers().get( 0 ) ).getName().equals( "name" ) );
+        assertTrue( ( ( CUser ) config.getUsers().get( 0 ) ).getPassword().equals( "password" ) );
         assertTrue( ( ( CUser ) config.getUsers().get( 0 ) ).getStatus().equals( CUser.STATUS_ACTIVE ) );
         assertTrue( ( ( CUser ) config.getUsers().get( 0 ) ).getUserId().equals( "id" ) );
         assertTrue( ( ( CUser ) config.getUsers().get( 0 ) ).getRoles().size() == 2 );
@@ -209,7 +213,9 @@ public class DefaultNexusSecurityConfigurationTest
     public void testGetConfiguration()
         throws Exception
     {
-        assertEquals( null, securityConfiguration.getConfiguration() );
+        // Since this component is now startable, configuration is auto-loaded
+        // so this is now an invalid test
+        // assertEquals( null, securityConfiguration.getConfiguration() );
 
         securityConfiguration.loadConfiguration();
 

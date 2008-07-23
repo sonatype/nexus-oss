@@ -23,6 +23,7 @@ package org.sonatype.nexus.configuration.security;
 import java.io.IOException;
 import java.io.InputStream;
 
+import org.sonatype.nexus.NexusService;
 import org.sonatype.nexus.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.security.source.SecurityConfigurationSource;
 
@@ -32,7 +33,7 @@ import org.sonatype.nexus.configuration.security.source.SecurityConfigurationSou
  * @author cstamas
  */
 public interface NexusSecurityConfiguration
-    extends SecurityConfiguration, MutableNexusSecurityConfiguration
+    extends SecurityConfiguration, MutableNexusSecurityConfiguration, NexusService
 {
     String ROLE = NexusSecurityConfiguration.class.getName();
 

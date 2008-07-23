@@ -137,6 +137,13 @@
                     <description>Users real life name.</description>
                 </field>
                 <field>
+                    <name>password</name>
+                    <version>1.0.0+</version>
+                    <type>String</type>
+                    <required>true</required>
+                    <description>Users password, note this is just the hash of the password, not the actual password.</description>
+                </field>
+                <field>
                     <name>status</name>
                     <version>1.0.0+</version>
                     <type>String</type>

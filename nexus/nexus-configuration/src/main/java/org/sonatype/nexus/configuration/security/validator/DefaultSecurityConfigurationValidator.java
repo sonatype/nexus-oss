@@ -402,6 +402,11 @@ public class DefaultSecurityConfigurationValidator
             response.addValidationError( "User ID '" + user.getUserId() + "' is invalid.  It is either empty or already in use." );
         }
         
+        if ( StringUtils.isEmpty( user.getPassword() ) )
+        {
+            response.addValidationError( "User ID '" + user.getUserId() + "' has no password." );
+        }
+        
         if ( StringUtils.isEmpty( user.getEmail() ) )
         {
             response.addValidationError( "User ID '" + user.getUserId() + "' has no email address" );

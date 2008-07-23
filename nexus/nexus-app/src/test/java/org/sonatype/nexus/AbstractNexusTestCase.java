@@ -30,7 +30,6 @@ import org.codehaus.plexus.context.ContextException;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
-import org.sonatype.nexus.configuration.security.NexusSecurityConfiguration;
 
 public abstract class AbstractNexusTestCase
     extends PlexusTestCase
@@ -42,7 +41,6 @@ public abstract class AbstractNexusTestCase
     protected static final File PLEXUS_HOME = new File( getBasedir(), "target/plexus-home" );
 
     protected NexusConfiguration nexusConfiguration;
-    protected NexusSecurityConfiguration securityConfiguration;
 
     protected void customizeContext( Context ctx )
     {
@@ -120,12 +118,6 @@ public abstract class AbstractNexusTestCase
             nexusConfiguration.loadConfiguration();
 
             nexusConfiguration.applyConfiguration();
-            
-            securityConfiguration = ( NexusSecurityConfiguration ) lookup( NexusSecurityConfiguration.ROLE );
-            
-            securityConfiguration.loadConfiguration();
-
-            securityConfiguration.applyConfiguration();
         }
     }
 
