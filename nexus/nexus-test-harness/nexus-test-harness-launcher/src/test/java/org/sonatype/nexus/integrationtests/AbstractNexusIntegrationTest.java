@@ -143,6 +143,7 @@ public class AbstractNexusIntegrationTest
                 // deploy artifacts
                 this.deployArtifacts();
 
+                // TODO: we can remove this now that we have the soft restart
                 NEEDS_INIT = false;
             }
         }
