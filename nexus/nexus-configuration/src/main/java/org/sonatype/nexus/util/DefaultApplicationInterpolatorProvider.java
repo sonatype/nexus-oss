@@ -27,7 +27,6 @@ import org.codehaus.plexus.interpolation.MapBasedValueSource;
 import org.codehaus.plexus.interpolation.RegexBasedInterpolator;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 
-
 /**
  * A simple class that holds Regex interpolator and has reference to Plexus context too, to centralize Plexus coupling
  * but make application Plexus interpolation capable too. This interpolator interpolates with Plexus Context,
