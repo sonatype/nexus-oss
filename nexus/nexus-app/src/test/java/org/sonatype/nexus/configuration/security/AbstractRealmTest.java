@@ -122,11 +122,14 @@ public abstract class AbstractRealmTest extends TestCase
         mavenCommitter.setId( "maven-committer" );
         mavenCommitter.addRole( "maven-user" );
         mavenCommitter.addPrivilege( "create-maven" );
+        mavenCommitter.addPrivilege( "admin-users" );
+        mavenCommitter.addPrivilege( "create-repository" );
         securityConfiguration.createRole( mavenCommitter );
 
         CRole mavenUser = new CRole();
         mavenUser.setId( "maven-user" );
         mavenUser.addPrivilege( "read-maven" );
+        mavenUser.addPrivilege( "read-repository" );
         securityConfiguration.createRole( mavenUser );
 
         CRepoTargetPrivilege createMaven = new CRepoTargetPrivilege();
@@ -142,6 +145,23 @@ public abstract class AbstractRealmTest extends TestCase
         readMaven.setRepositoryTargetId( "maven" );
         readMaven.setGroupId( "myGroup" );
         securityConfiguration.createRepoTargetPrivilege( readMaven );
+
+        CApplicationPrivilege createRepository = new CApplicationPrivilege();
+        createRepository.setId( "create-repository" );
+        createRepository.setMethod( "CREATE" );
+        createRepository.setPath( "nexus:repository" );
+        securityConfiguration.createApplicationPrivilege( createRepository );
+
+        CApplicationPrivilege readRepository = new CApplicationPrivilege();
+        readRepository.setId( "read-repository" );
+        readRepository.setMethod( "READ" );
+        readRepository.setPath( "nexus:repository" );
+        securityConfiguration.createApplicationPrivilege( readRepository );
+
+        CApplicationPrivilege adminUsers = new CApplicationPrivilege();
+        adminUsers.setId( "admin-users" );
+        adminUsers.setPath( "nexus:user" );
+        securityConfiguration.createApplicationPrivilege( adminUsers );
 
         realm = new NexusRealm();
         realm.setName( "Nexus" );

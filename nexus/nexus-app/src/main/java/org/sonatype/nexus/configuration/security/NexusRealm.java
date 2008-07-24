@@ -187,9 +187,8 @@ public class NexusRealm extends AuthorizingRealm
         try
         {
             CApplicationPrivilege privilege = securityConfiguration.readApplicationPrivilege( permissionId );
-//            Permission permission = createPermission( privilege );
-//            return Collections.singleton( permission );
-            return Collections.emptySet();
+            Permission permission = createPermission( privilege );
+            return Collections.singleton( permission );
         }
         catch ( NoSuchPrivilegeException ignored )
         {
@@ -209,12 +208,23 @@ public class NexusRealm extends AuthorizingRealm
         return Collections.emptySet();
     }
 
-// URL permissions don't seem to be checked here
-//    protected Permission createPermission( CApplicationPrivilege privilege )
-//    {
-//        WildcardPermission permission = new WildcardPermission( privilege.getPath() + ":" + privilege.getMethod() );
-//        return permission;
-//    }
+    protected Permission createPermission( CApplicationPrivilege privilege )
+    {
+        String path = privilege.getPath();
+        if ( path == null )
+        {
+            path = "*";
+        }
+
+        String method = privilege.getMethod();
+        if ( method == null )
+        {
+            method = "*";
+        }
+
+        WildcardPermission permission = new WildcardPermission( path + ":" + method );
+        return permission;
+    }
 
     protected Set<Permission> createPermissions( CRepoTargetPrivilege targetPrivilege )
     {

@@ -90,6 +90,18 @@ public class NexusRealmTest extends AbstractRealmTest
         assertNotImplied( new WildcardPermission( "maven:codehaus:READ" ), dainPermissions );
         assertNotImplied( new WildcardPermission( "maven:codehaus:CREATE" ), dainPermissions );
 
+        // verify dain has permission to read but not create repository
+        assertImplied( new WildcardPermission( "nexus:repository:READ" ), dainPermissions );
+        assertNotImplied( new WildcardPermission( "nexus:repository:CREATE" ), dainPermissions );
+        assertNotImplied( new WildcardPermission( "nexus:repository:UPDATE" ), dainPermissions );
+        assertNotImplied( new WildcardPermission( "nexus:repository:DELETE" ), dainPermissions );
+
+        // verify dain does not have permissions to admin users
+        assertNotImplied( new WildcardPermission( "nexus:user:READ" ), dainPermissions );
+        assertNotImplied( new WildcardPermission( "nexus:user:CREATE" ), dainPermissions );
+        assertNotImplied( new WildcardPermission( "nexus:user:UPDATE" ), dainPermissions );
+        assertNotImplied( new WildcardPermission( "nexus:user:DELETE" ), dainPermissions );
+
         // get authentication info
         AuthorizationInfo jason = realm.getAuthorizationInfo(
             new SimplePrincipalCollection( "jason", realm.getName() ) );
@@ -106,6 +118,19 @@ public class NexusRealmTest extends AbstractRealmTest
         assertImplied( new WildcardPermission( "maven:myRepository:CREATE" ), jasonPermissions );
         assertNotImplied( new WildcardPermission( "maven:codehaus:READ" ), jasonPermissions );
         assertNotImplied( new WildcardPermission( "maven:codehaus:CREATE" ), jasonPermissions );
+
+        // verify jason has permission to read and create repository, but not update or delete
+        assertImplied( new WildcardPermission( "nexus:repository:READ" ), jasonPermissions );
+        assertImplied( new WildcardPermission( "nexus:repository:CREATE" ), jasonPermissions );
+        assertNotImplied( new WildcardPermission( "nexus:repository:UPDATE" ), dainPermissions );
+        assertNotImplied( new WildcardPermission( "nexus:repository:DELETE" ), dainPermissions );
+
+        // verify jason has permissions to admin users
+        assertImplied( new WildcardPermission( "nexus:user:READ" ), jasonPermissions );
+        assertImplied( new WildcardPermission( "nexus:user:CREATE" ), jasonPermissions );
+        assertImplied( new WildcardPermission( "nexus:user:UPDATE" ), jasonPermissions );
+        assertImplied( new WildcardPermission( "nexus:user:DELETE" ), jasonPermissions );
+
     }
 
     public void testAuthorizerInterface()
@@ -125,6 +150,18 @@ public class NexusRealmTest extends AbstractRealmTest
         assertNotPermitted( dain, "maven:codehaus:READ" );
         assertNotPermitted( dain, "maven:codehaus:CREATE" );
 
+        // verify dain has permission to read but not create repository
+        assertPermitted( dain, "nexus:repository:READ" );
+        assertNotPermitted( dain, "nexus:repository:CREATE" );
+        assertNotPermitted( dain, "nexus:repository:UPDATE" );
+        assertNotPermitted( dain, "nexus:repository:DELETE" );
+
+        // verify dain does not have permissions to admin users
+        assertNotPermitted( dain, "nexus:user:READ" );
+        assertNotPermitted( dain, "nexus:user:CREATE" );
+        assertNotPermitted( dain, "nexus:user:UPDATE" );
+        assertNotPermitted( dain, "nexus:user:DELETE" );
+
 
         SimplePrincipalCollection jason = new SimplePrincipalCollection( "jason", realm.getName() );
 
@@ -140,6 +177,18 @@ public class NexusRealmTest extends AbstractRealmTest
         assertPermitted( jason, "maven:myRepository:CREATE" );
         assertNotPermitted( jason, "maven:codehaus:READ" );
         assertNotPermitted( jason, "maven:codehaus:CREATE" );
+
+        // verify jason has permission to read and create repository, but not update or delete
+        assertPermitted( jason, "nexus:repository:READ" );
+        assertPermitted( jason, "nexus:repository:CREATE" );
+        assertNotPermitted( jason, "nexus:repository:UPDATE" );
+        assertNotPermitted( jason, "nexus:repository:DELETE" );
+
+        // verify jason does not have permissions to admin users
+        assertPermitted( jason, "nexus:user:READ" );
+        assertPermitted( jason, "nexus:user:CREATE" );
+        assertPermitted( jason, "nexus:user:UPDATE" );
+        assertPermitted( jason, "nexus:user:DELETE" );
     }
 
     public void assertPermitted( SimplePrincipalCollection principal, String permission )
