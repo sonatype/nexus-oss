@@ -6,6 +6,8 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 import org.sonatype.appbooter.ForkedAppBooter;
+import org.sonatype.nexus.integrationtests.nexus133.Nexus133TargetCrudJsonTests;
+import org.sonatype.nexus.integrationtests.nexus133.Nexus133TargetCrudXmlTests;
 import org.sonatype.nexus.integrationtests.nexus166.Nexus166SampleTest;
 import org.sonatype.nexus.integrationtests.nexus167.Nexus167ReleaseToSnapshotTest;
 import org.sonatype.nexus.integrationtests.nexus168.Nexus168SnapshotToReleaseTest;
@@ -31,7 +33,8 @@ import org.sonatype.nexus.integrationtests.proxy.nexus262.Nexus262SimpleProxyTes
     Nexus166SampleTest.class, Nexus167ReleaseToSnapshotTest.class, Nexus168SnapshotToReleaseTest.class,
     Nexus176DeployToInvalidRepoTest.class, Nexus259SnapshotDeployTest.class, Nexus260MultipleDeployTest.class,
     Nexus261NexusGroupDownloadTest.class, Nexus177OutOfServiceTest.class, Nexus178BlockProxyDownloadTest.class,
-    Nexus179RemoteRepoDownTest.class, Nexus262SimpleProxyTest.class, Nexus292SoftRestartTest.class } )
+    Nexus179RemoteRepoDownTest.class, Nexus262SimpleProxyTest.class, Nexus292SoftRestartTest.class,
+    Nexus133TargetCrudJsonTests.class, Nexus133TargetCrudXmlTests.class } )
 public class IntegrationTestSuite
 {
     //

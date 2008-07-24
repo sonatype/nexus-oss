@@ -31,9 +31,19 @@ import org.sonatype.plexus.rest.xstream.json.JsonOrgHierarchicalStreamDriver;
 
 import com.thoughtworks.xstream.XStream;
 
-public class Nexus133TargetCrudTests
+public class Nexus133TargetCrudJsonTests
     extends AbstractNexusIntegrationTest
 {
+    
+    // this is not a great use of a super class, but its really easy, and its only a test class.
+    protected XStream xstream;
+    protected MediaType mediaType;
+    
+    public Nexus133TargetCrudJsonTests()
+    {
+        xstream = XStreamInitializer.initialize( new XStream( new JsonOrgHierarchicalStreamDriver() ) );
+        this.mediaType = MediaType.APPLICATION_JSON;
+    }
 
     @SuppressWarnings( "unchecked" )
     @Test
@@ -72,7 +82,7 @@ public class Nexus133TargetCrudTests
         this.verifyTargetsConfig( responseResource );
     }
 
-    @Test
+    
     public void readTest()
         throws IOException
     {
@@ -113,8 +123,6 @@ public class Nexus133TargetCrudTests
         {
             Assert.fail( "Could not GET Repository Target: " + response.getStatus() );
         }
-
-        System.out.println( "response: "+ response.getEntity().getText() );
         
         // get the Resource object
         responseResource = this.getResourceFromResponse( response );
@@ -313,11 +321,10 @@ public class Nexus133TargetCrudTests
         throws IOException
     {
         String responseString = response.getEntity().getText();
-        System.out.println( "response: " + responseString );
+        System.out.println( " getResourceFromResponse: " + responseString );
 
-        XStream xstream = XStreamInitializer.initialize( new XStream( new JsonOrgHierarchicalStreamDriver() ) );
-        XStreamRepresentation representation =
-            new XStreamRepresentation( xstream, responseString, MediaType.APPLICATION_JSON );
+        
+        XStreamRepresentation representation = new XStreamRepresentation( xstream, responseString, mediaType );
 
         RepositoryTargetResourceResponse resourceResponse =
             (RepositoryTargetResourceResponse) representation.getPayload( new RepositoryTargetResourceResponse() );
@@ -329,8 +336,7 @@ public class Nexus133TargetCrudTests
     private Response sendMessage( Method method, RepositoryTargetResource resource )
     {
 
-        XStream xstream = XStreamInitializer.initialize( new XStream( new JsonOrgHierarchicalStreamDriver() ) );
-        XStreamRepresentation representation = new XStreamRepresentation( xstream, "", MediaType.APPLICATION_JSON );
+        XStreamRepresentation representation = new XStreamRepresentation( xstream, "", mediaType );
 
         String repoTargetId = ( resource.getId() == null ) ? "?undefined" : "/" + resource.getId();
 
