@@ -72,7 +72,13 @@
 			<groupId>com.thoughtworks.xstream</groupId>
 			<artifactId>xstream</artifactId>
 		</dependency>
-		<!-- Testing -->
+
+    <dependency>
+      <groupId>org.jsecurity</groupId>
+      <artifactId>jsecurity</artifactId>
+    </dependency>
+        
+        <!-- Testing -->
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>

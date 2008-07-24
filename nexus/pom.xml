@@ -246,6 +246,13 @@
               <version>1.2</version>
             </dependency>
             
+      <!-- JSecurity -->
+      <dependency>
+        <groupId>org.jsecurity</groupId>
+        <artifactId>jsecurity</artifactId>
+        <version>0.9.0-RC1-SNAPSHOT</version>
+      </dependency>
+
 			<!-- SLF4J Logging -->
 			<dependency>
 				<groupId>org.slf4j</groupId>
