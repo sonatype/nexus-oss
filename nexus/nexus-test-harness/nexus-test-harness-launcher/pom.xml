@@ -178,7 +178,7 @@
             
             
             
-            <plugin>
+            <!-- <plugin>
 				<groupId>org.sonatype.maven.plugin</groupId>
 				<artifactId>emma4it-maven-plugin</artifactId>
 				<version>1.0-SNAPSHOT</version>
@@ -223,14 +223,14 @@
 						</goals>
 					</execution>
 				</executions>
-			</plugin>
+			</plugin>-->
             
             
 		</plugins>
 	</build>
 
 
-	<reporting>
+	<!-- <reporting>
 		<plugins>
 			<plugin>
 				<groupId>org.sonatype.maven.plugin</groupId>
@@ -293,6 +293,6 @@
 				</configuration>
 			</plugin>
 		</plugins>
-	</reporting>
+	</reporting>-->
 
 </project>
