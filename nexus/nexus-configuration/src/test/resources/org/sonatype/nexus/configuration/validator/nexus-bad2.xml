@@ -30,7 +30,6 @@
 	
 	<restApi>
 		<accessAllowedFrom>*</accessAllowedFrom>
-		<authTokenExpiration>10080</authTokenExpiration>
 	</restApi>
 	
 	<httpProxy>

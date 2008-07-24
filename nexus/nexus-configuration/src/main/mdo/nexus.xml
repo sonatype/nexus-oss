@@ -1410,7 +1410,15 @@
 				</field>
 				<field>
 					<name>authTokenExpiration</name>
-					<version>1.0.2+</version>
+					<version>1.0.2</version>
+					<type>int</type>
+					<required>true</required>
+					<description>The auth token expiration in minutes. Default is one week.</description>
+					<defaultValue>10080</defaultValue>
+				</field>
+				<field>
+					<name>authTokenExpiration</name>
+					<version>1.0.3</version>
 					<type>int</type>
 					<required>true</required>
 					<description>The auth token expiration in minutes. Default is one week.</description>

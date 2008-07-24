@@ -118,7 +118,9 @@ public class DefaultSessionStore
     {
         if ( sessionExpiration == 0 )
         {
-            setSessionExpiration( applicationConfiguration.getConfiguration().getRestApi().getAuthTokenExpiration() );
+            // setSessionExpiration( applicationConfiguration.getConfiguration().getRestApi().getAuthTokenExpiration()
+            // );
+            setSessionExpiration( 10000 );
         }
         return sessionExpiration;
     }

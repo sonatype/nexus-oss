@@ -35,7 +35,24 @@
 		<filter-class>org.sonatype.plexus.jsecurity.web.filter.PlexusJSecurityFilter</filter-class>
 		<init-param>
 			<param-name>config</param-name>
-			<param-value></param-value>
+			<param-value>
+			[interceptors]
+			authcBasic = org.jsecurity.web.filter.authc.BasicHttpAuthenticationFilter
+			authcBasic.applicationName = Sonatype Nexus Repository Manager
+			
+			roles = org.jsecurity.web.filter.authz.RolesAuthorizationFilter
+			
+			perms = org.jsecurity.web.filter.authz.PermissionsAuthorizationFilter
+			
+			anon = org.jsecurity.web.filter.authc.AnonymousFilter
+			
+			[urls]
+			/local/status = anon
+			/local/feeds** = anon
+			/local/authentication/login = anon
+			/local/authentication/login = anon
+			/local/* = authcBasic, roles[admininstrator]
+			</param-value>
 		</init-param>
 	</filter>
 
@@ -49,7 +66,8 @@
 		<filter-class>org.sonatype.nexus.security.filter.RepositoryTargetJSecurityFilter</filter-class>
 		<init-param>
 			<param-name>config</param-name>
-			<param-value></param-value>
+			<param-value>
+			</param-value>
 		</init-param>
 	</filter>
 
