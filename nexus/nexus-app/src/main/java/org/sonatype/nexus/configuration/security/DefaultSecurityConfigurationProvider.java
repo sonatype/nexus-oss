@@ -1,4 +1,4 @@
-package org.sonatype.nexus.security;
+package org.sonatype.nexus.configuration.security;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,7 +27,7 @@ public class DefaultSecurityConfigurationProvider
         ArrayList<Realm> result = new ArrayList<Realm>();
 
         // hardwired for now, later will use security config
-        result.add( realms.get( "simple" ) );
+        result.add( realms.get( "default" ) );
 
         return result;
     }

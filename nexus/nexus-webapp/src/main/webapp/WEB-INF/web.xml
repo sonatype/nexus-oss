@@ -47,11 +47,12 @@
 			anon = org.jsecurity.web.filter.authc.AnonymousFilter
 			
 			[urls]
-			/local/status = anon
-			/local/feeds** = anon
-			/local/authentication/login = anon
-			/local/authentication/login = anon
-			/local/* = authcBasic, roles[admininstrator]
+			/service/local/status = anon
+			/service/local/feeds = anon
+			/service/local/feeds/* = anon
+			/service/local/authentication/login = anon
+			/service/local/authentication/logout = anon
+			/service/local/* = authcBasic, roles[admininstrator]
 			</param-value>
 		</init-param>
 	</filter>
@@ -67,6 +68,18 @@
 		<init-param>
 			<param-name>config</param-name>
 			<param-value>
+			[interceptors]
+			authcBasic = org.jsecurity.web.filter.authc.BasicHttpAuthenticationFilter
+			authcBasic.applicationName = Sonatype Nexus Repository Manager
+			
+			roles = org.jsecurity.web.filter.authz.RolesAuthorizationFilter
+			
+			perms = org.jsecurity.web.filter.authz.PermissionsAuthorizationFilter
+			
+			anon = org.jsecurity.web.filter.authc.AnonymousFilter
+			
+			[urls]
+			/content/* = authcBasic, roles[deployer]
 			</param-value>
 		</init-param>
 	</filter>

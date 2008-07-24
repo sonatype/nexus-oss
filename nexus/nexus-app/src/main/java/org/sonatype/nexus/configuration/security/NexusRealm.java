@@ -20,6 +20,13 @@
  */
 package org.sonatype.nexus.configuration.security;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
+
 import org.jsecurity.authc.AccountException;
 import org.jsecurity.authc.AuthenticationException;
 import org.jsecurity.authc.AuthenticationInfo;
@@ -42,16 +49,23 @@ import org.sonatype.nexus.configuration.security.model.CUser;
 import org.sonatype.nexus.proxy.NoSuchRepositoryGroupException;
 import org.sonatype.nexus.proxy.repository.Repository;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
-
-public class NexusRealm extends AuthorizingRealm
+/**
+ * The NexusRealm for JSecurity.
+ * 
+ * @author dain
+ * @plexus.component role="org.jsecurity.realm.Realm"
+ */
+public class NexusRealm
+    extends AuthorizingRealm
 {
+    /**
+     * @plexus.requirement role="org.sonatype.nexus.configuration.security.NexusSecurityConfiguration"
+     */
     private MutableNexusSecurityConfiguration securityConfiguration;
+
+    /**
+     * @plexus.requirement
+     */
     private Nexus nexus;
 
     public MutableNexusSecurityConfiguration getSecurityConfiguration()
@@ -74,13 +88,13 @@ public class NexusRealm extends AuthorizingRealm
         this.nexus = nexus;
     }
 
-    protected AuthenticationInfo doGetAuthenticationInfo( AuthenticationToken token ) throws AuthenticationException
+    protected AuthenticationInfo doGetAuthenticationInfo( AuthenticationToken token )
+        throws AuthenticationException
     {
         if ( securityConfiguration == null )
         {
             throw new AuthenticationException( "securityConfiguration has not been set" );
         }
-
 
         UsernamePasswordToken upToken = (UsernamePasswordToken) token;
         String username = upToken.getUsername();
@@ -113,7 +127,6 @@ public class NexusRealm extends AuthorizingRealm
     {
         return new SimpleAuthenticationInfo( username, password, getName() );
     }
-
 
     protected AuthorizationInfo doGetAuthorizationInfo( PrincipalCollection principals )
     {
@@ -243,8 +256,8 @@ public class NexusRealm extends AuthorizingRealm
 
         if ( targetPrivilege.getRepositoryId() != null )
         {
-            WildcardPermission permission = new WildcardPermission(
-                basePermissionString + targetPrivilege.getRepositoryId() + methodString );
+            WildcardPermission permission = new WildcardPermission( basePermissionString
+                + targetPrivilege.getRepositoryId() + methodString );
             permissions.add( permission );
         }
         else if ( targetPrivilege.getGroupId() != null )
@@ -264,8 +277,8 @@ public class NexusRealm extends AuthorizingRealm
 
                 for ( Repository repository : list )
                 {
-                    WildcardPermission permission = new WildcardPermission(
-                        basePermissionString + repository.getId() + methodString );
+                    WildcardPermission permission = new WildcardPermission( basePermissionString + repository.getId()
+                        + methodString );
                     permissions.add( permission );
                 }
             }
