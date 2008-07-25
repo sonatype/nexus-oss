@@ -811,18 +811,20 @@ Ext.extend(Sonatype.repoServer.RoleEditPanel, Ext.Panel, {
 
     for(var i=0; i<arr.length; i++){
       role = this.rolesDataStore.getAt(this.rolesDataStore.find("id",arr[i]));
-      selectedTree.root.appendChild(
-        new Ext.tree.TreeNode({
-          id: role.data.id,
-          text: role.data.name,
-          payload: role.data.id, //sonatype added attribute
-          allowChildren: false,
-          draggable: true,
-          leaf: true,
-          nodeType: 'role',
-          icon: Sonatype.config.resourcePath + '/ext-2.0.2/resources/images/default/tree/folder.gif'
-        })
-      );
+      if (role){
+        selectedTree.root.appendChild(
+          new Ext.tree.TreeNode({
+            id: role.data.id,
+            text: role.data.name,
+            payload: role.data.id, //sonatype added attribute
+            allowChildren: false,
+            draggable: true,
+            leaf: true,
+            nodeType: 'role',
+            icon: Sonatype.config.resourcePath + '/ext-2.0.2/resources/images/default/tree/folder.gif'
+          })
+        );
+      }
     }
     
     this.rolesDataStore.each(function(item, i, len){
@@ -861,17 +863,19 @@ Ext.extend(Sonatype.repoServer.RoleEditPanel, Ext.Panel, {
 
     for(var i=0; i<arr.length; i++){
       priv = this.privDataStore.getAt(this.privDataStore.find("id",arr[i]));
-      selectedTree.root.appendChild(
-        new Ext.tree.TreeNode({
-          id: priv.data.id,
-          text: priv.data.name,
-          payload: priv.data.id, //sonatype added attribute
-          allowChildren: false,
-          draggable: true,
-          leaf: true,
-          nodeType: 'priv'
-        })
-      );
+      if (priv){
+        selectedTree.root.appendChild(
+          new Ext.tree.TreeNode({
+            id: priv.data.id,
+            text: priv.data.name,
+            payload: priv.data.id, //sonatype added attribute
+            allowChildren: false,
+            draggable: true,
+            leaf: true,
+            nodeType: 'priv'
+          })
+        );
+      }
     }
     
     this.privDataStore.each(function(item, i, len){
