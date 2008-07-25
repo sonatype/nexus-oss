@@ -28,7 +28,6 @@ import org.sonatype.nexus.configuration.validator.InvalidConfigurationException;
 import org.sonatype.nexus.proxy.access.AccessManager;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.ShadowRepository;
-import org.sonatype.nexus.security.AuthenticationSource;
 
 /**
  * A component to be slimmed! Actually, it is a "factory" (backed by Plexus) that creates repo and other instances. It
@@ -54,9 +53,6 @@ public interface ApplicationRuntimeConfigurationBuilder
 
     Repository updateRepositoryFromModel( ShadowRepository old, Configuration configuration,
         CRepositoryShadow repositoryShadow )
-        throws InvalidConfigurationException;
-
-    AuthenticationSource getAuthenticationSource( Configuration configuration )
         throws InvalidConfigurationException;
 
     AccessManager getAccessManagerForRealm( Configuration configuration, String realmId )

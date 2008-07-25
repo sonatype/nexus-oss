@@ -47,12 +47,7 @@
 			anon = org.jsecurity.web.filter.authc.AnonymousFilter
 			
 			[urls]
-			/service/local/status = anon
-			/service/local/feeds = anon
-			/service/local/feeds/* = anon
-			/service/local/authentication/login = anon
-			/service/local/authentication/logout = anon
-			/service/local/* = authcBasic, roles[admininstrator]
+			/service/** = anon
 			</param-value>
 		</init-param>
 	</filter>
@@ -79,7 +74,7 @@
 			anon = org.jsecurity.web.filter.authc.AnonymousFilter
 			
 			[urls]
-			/content/* = authcBasic, roles[deployer]
+			/content/** = anon
 			</param-value>
 		</init-param>
 	</filter>

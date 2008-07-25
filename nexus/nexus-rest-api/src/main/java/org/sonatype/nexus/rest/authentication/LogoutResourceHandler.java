@@ -23,14 +23,11 @@ package org.sonatype.nexus.rest.authentication;
 import java.io.IOException;
 
 import org.restlet.Context;
-import org.restlet.data.ChallengeResponse;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.resource.Representation;
 import org.restlet.resource.Variant;
 import org.sonatype.nexus.rest.AbstractNexusResourceHandler;
-import org.sonatype.nexus.rest.NexusAuthenticationGuard;
-import org.sonatype.nexus.session.SessionStore;
 
 /**
  * The logout handler. It removes/invalidates the user token.
@@ -40,34 +37,14 @@ import org.sonatype.nexus.session.SessionStore;
 public class LogoutResourceHandler
     extends AbstractNexusResourceHandler
 {
-    private SessionStore sessionStore;
-
     public LogoutResourceHandler( Context context, Request request, Response response )
     {
         super( context, request, response );
-
-        sessionStore = (SessionStore) lookup( SessionStore.ROLE );
     }
 
     public Representation getRepresentationHandler( Variant variant )
         throws IOException
     {
-        ChallengeResponse cr = getRequest().getChallengeResponse();
-
-        if ( cr != null && NexusAuthenticationGuard.NEXUS_AUTH_TOKEN_SCHEME.equals( cr.getScheme().getName() ) )
-        {
-            String token = getRequest().getChallengeResponse().getCredentials();
-
-            if ( token != null )
-            {
-                // invalidate it
-                sessionStore.removeSession( token );
-            }
-        }
-
-        // remove it from attributes to not be returned as custom header
-        getRequest().getAttributes().remove( NexusAuthenticationGuard.NEXUS_AUTH_TOKEN_KEY );
-
         return null;
     }
 

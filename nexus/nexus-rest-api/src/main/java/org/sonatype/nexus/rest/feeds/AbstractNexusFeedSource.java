@@ -29,8 +29,7 @@ import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.artifact.NexusItemInfo;
 import org.sonatype.nexus.feeds.NexusArtifactEvent;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
-import org.sonatype.nexus.proxy.access.AccessDecisionVoter;
-import org.sonatype.nexus.proxy.access.IpAddressAccessDecisionVoter;
+import org.sonatype.nexus.proxy.access.AccessManager;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 
@@ -138,18 +137,18 @@ public abstract class AbstractNexusFeedSource
 
         for ( NexusArtifactEvent item : items )
         {
-            if ( item.getEventContext().containsKey( AccessDecisionVoter.REQUEST_USER ) )
+            if ( item.getEventContext().containsKey( AccessManager.REQUEST_USER ) )
             {
-                username = (String) item.getEventContext().get( AccessDecisionVoter.REQUEST_USER );
+                username = (String) item.getEventContext().get( AccessManager.REQUEST_USER );
             }
             else
             {
                 username = null;
             }
 
-            if ( item.getEventContext().containsKey( IpAddressAccessDecisionVoter.REQUEST_REMOTE_ADDRESS ) )
+            if ( item.getEventContext().containsKey( AccessManager.REQUEST_REMOTE_ADDRESS ) )
             {
-                ipAddress = (String) item.getEventContext().get( IpAddressAccessDecisionVoter.REQUEST_REMOTE_ADDRESS );
+                ipAddress = (String) item.getEventContext().get( AccessManager.REQUEST_REMOTE_ADDRESS );
             }
             else
             {

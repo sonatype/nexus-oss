@@ -43,7 +43,6 @@ import org.sonatype.nexus.configuration.model.CRepositoryShadowArtifactVersionCo
 import org.sonatype.nexus.configuration.model.Configuration;
 import org.sonatype.nexus.configuration.validator.InvalidConfigurationException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
-import org.sonatype.nexus.proxy.access.AccessDecisionVoter;
 import org.sonatype.nexus.proxy.access.AccessManager;
 import org.sonatype.nexus.proxy.access.OpenAccessManager;
 import org.sonatype.nexus.proxy.maven.ChecksumPolicy;
@@ -58,8 +57,7 @@ import org.sonatype.nexus.proxy.repository.ShadowRepository;
 import org.sonatype.nexus.proxy.storage.local.LocalRepositoryStorage;
 import org.sonatype.nexus.proxy.storage.remote.DefaultRemoteStorageContext;
 import org.sonatype.nexus.proxy.storage.remote.RemoteRepositoryStorage;
-import org.sonatype.nexus.security.AuthenticationSource;
-import org.sonatype.nexus.security.OpenAuthenticationSource;
+import org.sonatype.nexus.util.ApplicationInterpolatorProvider;
 
 /**
  * The Class DefaultRuntimeConfigurationBuilder. Todo: all the bad thing is now concentrated in this class. We are
@@ -80,6 +78,13 @@ public class DefaultApplicationRuntimeConfigurationBuilder
      * @plexus.requirement
      */
     private RepositoryRegistry repositoryRegistry;
+
+    /**
+     * The Interpolation.
+     * 
+     * @plexus.requirement
+     */
+    private ApplicationInterpolatorProvider applicationInterpolatorProvider;
 
     private PlexusContainer plexusContainer;
 
@@ -416,28 +421,6 @@ public class DefaultApplicationRuntimeConfigurationBuilder
         }
     }
 
-    public AuthenticationSource getAuthenticationSource( Configuration configuration )
-        throws InvalidConfigurationException
-    {
-        if ( configuration.getSecurity().isEnabled() )
-        {
-            try
-            {
-                return (AuthenticationSource) plexusContainer.lookup( AuthenticationSource.ROLE, configuration
-                    .getSecurity().getAuthenticationSource().getType() );
-            }
-            catch ( ComponentLookupException e )
-            {
-                throw new InvalidConfigurationException( "Unsupported authentication source type: "
-                    + configuration.getSecurity().getAuthenticationSource().getType(), e );
-            }
-        }
-        else
-        {
-            return new OpenAuthenticationSource();
-        }
-    }
-
     public AccessManager getAccessManagerForRealm( Configuration configuration, String realm )
         throws InvalidConfigurationException
     {
@@ -452,8 +435,6 @@ public class DefaultApplicationRuntimeConfigurationBuilder
                 CAuthzSource authz = null;
                 try
                 {
-                    AccessManager am = (AccessManager) plexusContainer.lookup( AccessManager.ROLE, "affirmative" );
-
                     for ( CAuthzSource authzSource : (List<CAuthzSource>) configuration.getSecurity().getRealms() )
                     {
                         if ( realm.equals( authzSource.getId() ) )
@@ -469,13 +450,17 @@ public class DefaultApplicationRuntimeConfigurationBuilder
                         throw new InvalidConfigurationException( "Could not find realm with ID=" + realm );
                     }
 
-                    AccessDecisionVoter voter = (AccessDecisionVoter) plexusContainer.lookup(
-                        AccessDecisionVoter.ROLE,
-                        authz.getType() );
+                    AccessManager am = (AccessManager) plexusContainer.lookup( AccessManager.ROLE, authz.getType() );
 
-                    voter.setConfiguration( ModelloUtils.getMapFromConfigList( authz.getProperties() ) );
+                    Map<String, String> config = ModelloUtils.getMapFromConfigList( authz.getProperties() );
 
-                    am.getVoters().add( voter );
+                    for ( String key : config.keySet() )
+                    {
+                        config.put( key, applicationInterpolatorProvider.getInterpolator().interpolate(
+                            config.get( key ) ) );
+                    }
+
+                    am.setConfiguration( config );
 
                     accessManagers.put( realm, am );
 

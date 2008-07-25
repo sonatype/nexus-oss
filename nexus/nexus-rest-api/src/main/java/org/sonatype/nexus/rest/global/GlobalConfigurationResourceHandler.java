@@ -38,9 +38,6 @@ import org.sonatype.nexus.rest.model.GlobalConfigurationResource;
 import org.sonatype.nexus.rest.model.GlobalConfigurationResourceResponse;
 import org.sonatype.nexus.rest.model.RemoteConnectionSettings;
 import org.sonatype.nexus.rest.model.RemoteHttpProxySettings;
-import org.sonatype.nexus.security.AuthenticationSource;
-import org.sonatype.nexus.security.MutableAuthenticationSource;
-import org.sonatype.nexus.security.SimpleAuthenticationSource;
 
 /**
  * The GlobalConfiguration resource handler. It simply gets and builds the requested config REST model (DTO) and passes
@@ -61,8 +58,6 @@ public class GlobalConfigurationResourceHandler
     /** Name denoting default Nexus configuration */
     public static final String DEFAULT_CONFIG_NAME = "default";
 
-    private AuthenticationSource authenticationSource;
-
     /**
      * The default Resource constructor.
      * 
@@ -73,15 +68,6 @@ public class GlobalConfigurationResourceHandler
     public GlobalConfigurationResourceHandler( Context context, Request request, Response response )
     {
         super( context, request, response );
-
-        try
-        {
-            authenticationSource = getNexus().getNexusConfiguration().getAuthenticationSource();
-        }
-        catch ( ConfigurationException e )
-        {
-            throw new IllegalStateException( "Cannot get authenticationSource!", e );
-        }
     }
 
     /**
@@ -253,45 +239,6 @@ public class GlobalConfigurationResourceHandler
                             getNexus().setBaseUrl( resource.getBaseUrl() );
                         }
                     }
-
-                    if ( MutableAuthenticationSource.class.isAssignableFrom( authenticationSource.getClass() ) )
-                    {
-                        if ( resource.getAdminPassword() != null )
-                        {
-                            if ( StringUtils.isEmpty( resource.getAdminPassword() ) )
-                            {
-                                // resetting pwd
-                                ( (MutableAuthenticationSource) authenticationSource )
-                                    .unsetPassword( SimpleAuthenticationSource.ADMIN_USERNAME );
-                            }
-                            else
-                            {
-                                // setting pwd
-                                ( (MutableAuthenticationSource) authenticationSource ).setPassword(
-                                    SimpleAuthenticationSource.ADMIN_USERNAME,
-                                    resource.getAdminPassword() );
-                            }
-                        }
-
-                        if ( resource.getDeploymentPassword() != null )
-                        {
-                            if ( StringUtils.isEmpty( resource.getDeploymentPassword() ) )
-                            {
-                                // resetting pwd
-                                ( (MutableAuthenticationSource) authenticationSource )
-                                    .unsetPassword( SimpleAuthenticationSource.DEPLOYMENT_USERNAME );
-                            }
-                            else
-                            {
-                                // setting pwd
-                                ( (MutableAuthenticationSource) authenticationSource ).setPassword(
-                                    SimpleAuthenticationSource.DEPLOYMENT_USERNAME,
-                                    resource.getDeploymentPassword() );
-                            }
-
-                        }
-                    }
-
                 }
                 catch ( ConfigurationException e )
                 {

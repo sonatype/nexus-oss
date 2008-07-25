@@ -27,7 +27,6 @@ package org.sonatype.nexus.proxy.access;
  */
 public class RepositoryPermission
 {
-
     /** The Constant RETRIEVE. */
     public static final RepositoryPermission RETRIEVE = new RepositoryPermission( "proxy.retrieve" );
 
@@ -51,7 +50,7 @@ public class RepositoryPermission
     public RepositoryPermission( String perm )
     {
         super();
-        
+
         this.perm = perm;
     }
 
@@ -79,5 +78,4 @@ public class RepositoryPermission
 
         return perm == null ? false : perm.equals( ( (RepositoryPermission) compare ).getId() );
     }
-
 }

@@ -30,10 +30,8 @@ import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.CRepositoryShadow;
 import org.sonatype.nexus.configuration.model.Configuration;
 import org.sonatype.nexus.configuration.validator.InvalidConfigurationException;
-import org.sonatype.nexus.proxy.access.AccessManager;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
-import org.sonatype.nexus.security.AuthenticationSource;
 
 /**
  * A component responsible for configuration management.
@@ -89,12 +87,6 @@ public interface NexusConfiguration
     File getApplicationLogDirectory();
 
     RemoteStorageContext getRemoteStorageContext();
-
-    AuthenticationSource getAuthenticationSource()
-        throws ConfigurationException;
-
-    AccessManager getAccessManagerForRealm( String realmId )
-        throws ConfigurationException;
 
     Repository createRepositoryFromModel( Configuration configuration, CRepository repository )
         throws InvalidConfigurationException;

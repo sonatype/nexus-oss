@@ -56,9 +56,7 @@ import org.sonatype.nexus.proxy.RepositoryNotListableException;
 import org.sonatype.nexus.proxy.ResourceStore;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
-import org.sonatype.nexus.proxy.access.AccessDecisionVoter;
-import org.sonatype.nexus.proxy.access.CertificateBasedAccessDecisionVoter;
-import org.sonatype.nexus.proxy.access.IpAddressAccessDecisionVoter;
+import org.sonatype.nexus.proxy.access.AccessManager;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
@@ -67,7 +65,6 @@ import org.sonatype.nexus.proxy.item.StorageLinkItem;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.rest.model.ContentListResource;
 import org.sonatype.nexus.rest.model.ContentListResourceResponse;
-import org.sonatype.nexus.security.User;
 
 /**
  * This is an abstract resource handler that uses ResourceStore implementor and publishes those over REST.
@@ -180,20 +177,19 @@ public abstract class AbstractResourceStoreContentResource
             getLogger().log( Level.FINE, "Created ResourceStore request for " + result.getRequestPath() );
         }
 
-        result.getRequestContext().put(
-            IpAddressAccessDecisionVoter.REQUEST_REMOTE_ADDRESS,
-            getRequest().getClientInfo().getAddress() );
+        result
+            .getRequestContext().put( AccessManager.REQUEST_REMOTE_ADDRESS, getRequest().getClientInfo().getAddress() );
 
-        if ( getRequest().getAttributes().containsKey( NexusAuthenticationGuard.REST_USER_KEY ) )
+        if ( getRequest().getChallengeResponse().getIdentifier() != null )
         {
-            User user = (User) getRequest().getAttributes().get( NexusAuthenticationGuard.REST_USER_KEY );
-
-            result.getRequestContext().put( AccessDecisionVoter.REQUEST_USER, user.getUsername() );
+            result.getRequestContext().put(
+                AccessManager.REQUEST_USER,
+                getRequest().getChallengeResponse().getIdentifier() );
         }
 
         if ( getRequest().isConfidential() )
         {
-            result.getRequestContext().put( CertificateBasedAccessDecisionVoter.REQUEST_SECURE, Boolean.TRUE );
+            result.getRequestContext().put( AccessManager.REQUEST_CONFIDENTIAL, Boolean.TRUE );
 
             // X509Certificate[] certs = (X509Certificate[]) context.getHttpServletRequest().getAttribute(
             // "javax.servlet.request.X509Certificate" );
@@ -616,14 +612,7 @@ public abstract class AbstractResourceStoreContentResource
         }
         else if ( t instanceof AccessDeniedException )
         {
-            if ( isRequestAnonymous() )
-            {
-                getResponse().setStatus( Status.CLIENT_ERROR_UNAUTHORIZED, "Authenticate to access this resource!" );
-            }
-            else
-            {
-                getResponse().setStatus( Status.CLIENT_ERROR_FORBIDDEN, "Access to resource is forbidden!" );
-            }
+            getResponse().setStatus( Status.CLIENT_ERROR_UNAUTHORIZED, "Authenticate to access this resource!" );
         }
         else
         {

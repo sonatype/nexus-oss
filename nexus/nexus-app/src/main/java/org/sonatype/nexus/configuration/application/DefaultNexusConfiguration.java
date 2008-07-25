@@ -55,7 +55,6 @@ import org.sonatype.nexus.configuration.validator.InvalidConfigurationException;
 import org.sonatype.nexus.configuration.validator.ValidationResponse;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryGroupException;
-import org.sonatype.nexus.proxy.access.AccessManager;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.registry.InvalidGroupingException;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
@@ -65,7 +64,6 @@ import org.sonatype.nexus.proxy.repository.RepositoryType;
 import org.sonatype.nexus.proxy.repository.ShadowRepository;
 import org.sonatype.nexus.proxy.storage.remote.DefaultRemoteStorageContext;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
-import org.sonatype.nexus.security.AuthenticationSource;
 
 /**
  * The class DefaultNexusConfiguration is responsible for config management. It actually keeps in sync Nexus internal
@@ -358,18 +356,6 @@ public class DefaultNexusConfiguration
             wastebasketDirectory = getWorkingDirectory( "trash" );
         }
         return wastebasketDirectory;
-    }
-
-    public AuthenticationSource getAuthenticationSource()
-        throws ConfigurationException
-    {
-        return runtimeConfigurationBuilder.getAuthenticationSource( getConfiguration() );
-    }
-
-    public AccessManager getAccessManagerForRealm( String realmId )
-        throws ConfigurationException
-    {
-        return runtimeConfigurationBuilder.getAccessManagerForRealm( getConfiguration(), realmId );
     }
 
     public Repository createRepositoryFromModel( Configuration configuration, CRepository repository )

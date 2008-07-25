@@ -28,8 +28,7 @@ import org.restlet.data.MediaType;
 import org.sonatype.nexus.feeds.FeedRecorder;
 import org.sonatype.nexus.feeds.SystemEvent;
 import org.sonatype.nexus.maven.tasks.SnapshotRemoverTask;
-import org.sonatype.nexus.proxy.access.AccessDecisionVoter;
-import org.sonatype.nexus.proxy.access.IpAddressAccessDecisionVoter;
+import org.sonatype.nexus.proxy.access.AccessManager;
 
 import com.sun.syndication.feed.synd.SyndContent;
 import com.sun.syndication.feed.synd.SyndContentImpl;
@@ -80,18 +79,18 @@ public abstract class AbstractSystemFeedSource
         {
             i++;
 
-            if ( item.getEventContext().containsKey( AccessDecisionVoter.REQUEST_USER ) )
+            if ( item.getEventContext().containsKey( AccessManager.REQUEST_USER ) )
             {
-                username = (String) item.getEventContext().get( AccessDecisionVoter.REQUEST_USER );
+                username = (String) item.getEventContext().get( AccessManager.REQUEST_USER );
             }
             else
             {
                 username = null;
             }
 
-            if ( item.getEventContext().containsKey( IpAddressAccessDecisionVoter.REQUEST_REMOTE_ADDRESS ) )
+            if ( item.getEventContext().containsKey( AccessManager.REQUEST_REMOTE_ADDRESS ) )
             {
-                ipAddress = (String) item.getEventContext().get( IpAddressAccessDecisionVoter.REQUEST_REMOTE_ADDRESS );
+                ipAddress = (String) item.getEventContext().get( AccessManager.REQUEST_REMOTE_ADDRESS );
             }
             else
             {
