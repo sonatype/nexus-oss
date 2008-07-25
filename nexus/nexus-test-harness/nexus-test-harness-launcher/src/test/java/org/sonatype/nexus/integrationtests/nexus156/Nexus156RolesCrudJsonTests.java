@@ -6,21 +6,17 @@ import java.util.ArrayList;
 import junit.framework.Assert;
 
 import org.junit.Test;
-import org.restlet.Client;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
-import org.restlet.data.Protocol;
-import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
+import org.sonatype.nexus.integrationtests.nexus142.UserMessageUtil;
 import org.sonatype.nexus.rest.model.RoleResource;
-import org.sonatype.nexus.rest.model.RoleResourceRequest;
 import org.sonatype.nexus.rest.model.RoleResourceResponse;
 import org.sonatype.nexus.rest.model.UserResource;
 import org.sonatype.nexus.rest.model.UserResourceRequest;
 import org.sonatype.nexus.rest.xstream.XStreamInitializer;
 import org.sonatype.nexus.test.utils.SecurityConfigUtil;
-import org.sonatype.plexus.rest.representation.XStreamRepresentation;
 import org.sonatype.plexus.rest.xstream.json.JsonOrgHierarchicalStreamDriver;
 
 import com.thoughtworks.xstream.XStream;
@@ -29,15 +25,13 @@ public class Nexus156RolesCrudJsonTests
     extends AbstractNexusIntegrationTest
 {
 
-    // this is not a great use of a super class, but its really easy, and its only a test class.
-    protected XStream xstream;
-
-    protected MediaType mediaType;
+    protected RoleMessageUtil messageUtil;
 
     public Nexus156RolesCrudJsonTests()
     {
-        xstream = XStreamInitializer.initialize( new XStream( new JsonOrgHierarchicalStreamDriver() ) );
-        this.mediaType = MediaType.APPLICATION_JSON;
+        this.messageUtil =
+            new RoleMessageUtil( XStreamInitializer.initialize( new XStream( new JsonOrgHierarchicalStreamDriver() ) ),
+                                 MediaType.APPLICATION_JSON, this.getBaseNexusUrl() );
     }
 
     @Test
@@ -53,7 +47,7 @@ public class Nexus156RolesCrudJsonTests
         resource.addPrivilege( "priv1" );
         resource.addPrivilege( "priv2" );
 
-        Response response = this.sendMessage( Method.POST, resource );
+        Response response = this.messageUtil.sendMessage( Method.POST, resource );
 
         if ( !response.getStatus().isSuccess() )
         {
@@ -61,7 +55,7 @@ public class Nexus156RolesCrudJsonTests
         }
 
         // get the Resource object
-        RoleResource responseResource = this.getResourceFromResponse( response );
+        RoleResource responseResource = this.messageUtil.getResourceFromResponse( response );
 
         // make sure the id != null
         Assert.assertNotNull( responseResource.getId() );
@@ -90,7 +84,7 @@ public class Nexus156RolesCrudJsonTests
         resource.addPrivilege( "priv3" );
         resource.addPrivilege( "priv4" );
 
-        Response response = this.sendMessage( Method.POST, resource );
+        Response response = this.messageUtil.sendMessage( Method.POST, resource );
 
         if ( !response.getStatus().isSuccess() )
         {
@@ -98,7 +92,7 @@ public class Nexus156RolesCrudJsonTests
         }
 
         // get the Resource object
-        RoleResource responseResource = this.getResourceFromResponse( response );
+        RoleResource responseResource = this.messageUtil.getResourceFromResponse( response );
 
         // make sure the id != null
         Assert.assertNotNull( responseResource.getId() );
@@ -113,7 +107,7 @@ public class Nexus156RolesCrudJsonTests
 
         SecurityConfigUtil.verifyRole( resource );
 
-        response = this.sendMessage( Method.GET, resource );
+        response = this.messageUtil.sendMessage( Method.GET, resource );
 
         if ( !response.getStatus().isSuccess() )
         {
@@ -121,7 +115,7 @@ public class Nexus156RolesCrudJsonTests
         }
 
         // get the Resource object
-        responseResource = this.getResourceFromResponse( response );
+        responseResource = this.messageUtil.getResourceFromResponse( response );
 
         Assert.assertEquals( resource.getId(), responseResource.getId() );
         Assert.assertEquals( resource.getDescription(), responseResource.getDescription() );
@@ -144,7 +138,7 @@ public class Nexus156RolesCrudJsonTests
         resource.addPrivilege( "priv5" );
         resource.addPrivilege( "priv4" );
 
-        Response response = this.sendMessage( Method.POST, resource );
+        Response response = this.messageUtil.sendMessage( Method.POST, resource );
 
         if ( !response.getStatus().isSuccess() )
         {
@@ -152,7 +146,7 @@ public class Nexus156RolesCrudJsonTests
         }
 
         // get the Resource object
-        RoleResource responseResource = this.getResourceFromResponse( response );
+        RoleResource responseResource = this.messageUtil.getResourceFromResponse( response );
 
         // make sure the id != null
         Assert.assertNotNull( responseResource.getId() );
@@ -175,7 +169,7 @@ public class Nexus156RolesCrudJsonTests
         resource.addPrivilege( "priv6" );
         resource.setSessionTimeout( 10 );
 
-        response = this.sendMessage( Method.PUT, resource );
+        response = this.messageUtil.sendMessage( Method.PUT, resource );
 
         if ( !response.getStatus().isSuccess() )
         {
@@ -183,7 +177,7 @@ public class Nexus156RolesCrudJsonTests
         }
 
         // get the Resource object
-        responseResource = this.getResourceFromResponse( response );
+        responseResource = this.messageUtil.getResourceFromResponse( response );
 
         Assert.assertEquals( resource.getId(), responseResource.getId() );
         Assert.assertEquals( resource.getDescription(), responseResource.getDescription() );
@@ -208,7 +202,7 @@ public class Nexus156RolesCrudJsonTests
         resource.addPrivilege( "priv7" );
         resource.addPrivilege( "priv8" );
 
-        Response response = this.sendMessage( Method.POST, resource );
+        Response response = this.messageUtil.sendMessage( Method.POST, resource );
 
         if ( !response.getStatus().isSuccess() )
         {
@@ -216,13 +210,13 @@ public class Nexus156RolesCrudJsonTests
         }
 
         // get the Resource object
-        RoleResource responseResource = this.getResourceFromResponse( response );
+        RoleResource responseResource = this.messageUtil.getResourceFromResponse( response );
 
         // make sure it was added
         SecurityConfigUtil.verifyRole( responseResource );
 
         // use the new ID
-        response = this.sendMessage( Method.DELETE, responseResource );
+        response = this.messageUtil.sendMessage( Method.DELETE, responseResource );
 
         if ( !response.getStatus().isSuccess() )
         {
@@ -231,49 +225,6 @@ public class Nexus156RolesCrudJsonTests
 
         // TODO: check if deleted
         Assert.assertNull( SecurityConfigUtil.getCRole( responseResource.getId() ) );
-    }
-
-    private RoleResource getResourceFromResponse( Response response )
-        throws IOException
-    {
-        String responseString = response.getEntity().getText();
-        System.out.println( " getResourceFromResponse: " + responseString );
-
-        XStreamRepresentation representation = new XStreamRepresentation( xstream, responseString, mediaType );
-
-        // this
-        RoleResourceRequest roleResourceRequest =
-            (RoleResourceRequest) representation.getPayload( new RoleResourceRequest() );
-
-        return roleResourceRequest.getData();
-    }
-
-    private Response sendMessage( Method method, RoleResource resource )
-    {
-
-        XStreamRepresentation representation = new XStreamRepresentation( xstream, "", mediaType );
-
-        String roleId = ( method == Method.POST ) ? "" : "/" + resource.getId();
-
-        String serviceURI = this.getBaseNexusUrl() + "service/local/roles" + roleId;
-        System.out.println( "serviceURI: " + serviceURI );
-
-        Request request = new Request();
-
-        request.setResourceRef( serviceURI );
-
-        request.setMethod( method );
-
-        RoleResourceRequest userRequest = new RoleResourceRequest();
-        userRequest.setData( resource );
-
-        // now set the payload
-        representation.setPayload( userRequest );
-        request.setEntity( representation );
-
-        Client client = new Client( Protocol.HTTP );
-
-        return client.handle( request );
     }
 
 }

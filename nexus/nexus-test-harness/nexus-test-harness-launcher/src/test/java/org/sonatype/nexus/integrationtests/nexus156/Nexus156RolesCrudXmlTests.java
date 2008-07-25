@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import org.junit.Test;
 import org.restlet.data.MediaType;
+import org.sonatype.nexus.integrationtests.nexus142.UserMessageUtil;
 import org.sonatype.nexus.rest.xstream.XStreamInitializer;
 
 import com.thoughtworks.xstream.XStream;
@@ -14,8 +15,7 @@ public class Nexus156RolesCrudXmlTests
 
     public Nexus156RolesCrudXmlTests()
     {
-        xstream = XStreamInitializer.initialize( new XStream( ) );
-        this.mediaType = MediaType.APPLICATION_XML;
+        this.messageUtil = new RoleMessageUtil(XStreamInitializer.initialize( new XStream( ) ), MediaType.APPLICATION_XML, this.getBaseNexusUrl());
     }
     
     @Test
