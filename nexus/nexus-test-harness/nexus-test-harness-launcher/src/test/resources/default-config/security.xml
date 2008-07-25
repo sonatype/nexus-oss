@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?><nexusSecurity>
+  <version>1.0.0</version>
+    <roles>
+    <role>
+      <id>role1</id>
+      <name>RoleOne</name>
+      <description>Role One</description>
+      <sessionTimeout>60</sessionTimeout>
+      <privileges>
+        <privilege>priv1</privilege>
+        <privilege>priv2</privilege>
+      </privileges>
+    </role>
+    <role>
+      <id>role2</id>
+      <name>RoleTwo</name>
+      <description>Role Two</description>
+      <sessionTimeout>60</sessionTimeout>
+      <privileges>
+        <privilege>priv3</privilege>
+        <privilege>priv4</privilege>
+      </privileges>
+    </role>
+  </roles>
+  
+</nexusSecurity>

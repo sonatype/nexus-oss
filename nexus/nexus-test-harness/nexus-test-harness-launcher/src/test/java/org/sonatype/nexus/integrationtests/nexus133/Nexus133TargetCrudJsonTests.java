@@ -262,6 +262,7 @@ public class Nexus133TargetCrudJsonTests
         for ( Iterator<RepositoryTargetResource> iter = targetResources.iterator(); iter.hasNext(); )
         {
             RepositoryTargetResource targetResource = iter.next();
+            boolean found = false;
 
             for ( Iterator<CRepositoryTarget> iterInner = repoTargets.iterator(); iterInner.hasNext(); )
             {
@@ -269,6 +270,7 @@ public class Nexus133TargetCrudJsonTests
 
                 if ( targetResource.getId().equals( repositoryTarget.getId() ) )
                 {
+                    found = true;
                     Assert.assertEquals( targetResource.getId(), repositoryTarget.getId() );
                     Assert.assertEquals( targetResource.getContentClass(), repositoryTarget.getContentClass() );
                     Assert.assertEquals( targetResource.getName(), repositoryTarget.getName() );
@@ -276,6 +278,13 @@ public class Nexus133TargetCrudJsonTests
 
                     break;
                 }
+                
+            }
+            
+            if(!found)
+            {
+                
+                Assert.fail("Target with ID: "+ targetResource.getId() +" could not be found in configuration.");
             }
         }
     }
@@ -294,10 +303,6 @@ public class Nexus133TargetCrudJsonTests
             NexusConfigurationXpp3Reader reader = new NexusConfigurationXpp3Reader();
 
             fr = new InputStreamReader( configURL.openStream() );
-
-//            DefaultApplicationInterpolatorProvider interpolatorProvider = new DefaultApplicationInterpolatorProvider();
-
-//            InterpolatorFilterReader ip = new InterpolatorFilterReader( fr, interpolatorProvider );
 
             // read again with interpolation
             configuration = reader.read( fr );
@@ -349,25 +354,13 @@ public class Nexus133TargetCrudJsonTests
 
         request.setMethod( method );
 
-//        // NOTE: DELETE and GET
-//        if ( method != method.DELETE && method != method.GET )
-//        {
+        RepositoryTargetResourceResponse requestResponse = new RepositoryTargetResourceResponse();
+        requestResponse.setData( resource );
 
-            RepositoryTargetResourceResponse requestResponse = new RepositoryTargetResourceResponse();
-            requestResponse.setData( resource );
-
-            // now set the payload
-            representation.setPayload( requestResponse );
-            request.setEntity( representation );
-            
-            
-//        }
-//        else
-//        {
-//            // so we can get the json string back from 
-//            request.setEntity( representation );
-//        }
-        
+        // now set the payload
+        representation.setPayload( requestResponse );
+        request.setEntity( representation );
+       
 
         Client client = new Client( Protocol.HTTP );
 

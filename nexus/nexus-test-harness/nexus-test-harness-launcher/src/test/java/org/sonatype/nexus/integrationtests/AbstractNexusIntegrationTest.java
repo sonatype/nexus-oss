@@ -61,6 +61,8 @@ import com.thoughtworks.xstream.io.xml.DomDriver;
 import com.thoughtworks.xstream.io.xml.XppDriver;
 
 /**
+ * curl --user admin:admin123 --request PUT http://localhost:8081/nexus/service/local/status/command --data START
+ * 
  * NOTE, this class is not really abstract so I can work around a the <code>@BeforeClass</code>, <code>@AfterClass</code> issues, this should be refactored a little, but it might be ok, if we switch to TestNg
  */
 public class AbstractNexusIntegrationTest
@@ -79,7 +81,7 @@ public class AbstractNexusIntegrationTest
     public static final String REPOSITORY_RELATIVE_URL = "content/repositories/";
 
     public static final String GROUP_REPOSITORY_RELATIVE_URL = "content/groups/";
-    
+
     public String testRepositoryId;
 
     private String nexusBaseDir;
@@ -135,7 +137,10 @@ public class AbstractNexusIntegrationTest
                 // this.cleanWorkDir();
 
                 // copy nexus config
-                this.copyNexusConfig();
+                this.copyConfigFile( "nexus.xml" );
+
+                // copy security config
+                this.copyConfigFile( "security.xml" );
 
                 // start nexus
                 this.startNexus();
@@ -305,27 +310,27 @@ public class AbstractNexusIntegrationTest
 
     }
 
-    private void copyNexusConfig()
+    private void copyConfigFile( String configFile )
         throws IOException
     {
         // the test can override the test config.
-        File testNexusConfig = this.getTestResourceAsFile( "test-config/nexus.xml" );
+        File testConfigFile = this.getTestResourceAsFile( "test-config/" + configFile );
 
         // if the tests doesn't have a different config then use the default.
         // we need to replace every time to make sure no one changes it.
-        if ( testNexusConfig == null || !testNexusConfig.exists() )
+        if ( testConfigFile == null || !testConfigFile.exists() )
         {
-            testNexusConfig = this.getResource( "default-config/nexus.xml" );
+            testConfigFile = this.getResource( "default-config/" + configFile );
         }
         else
         {
-            System.out.println( "This test is using its own nexus.xml: " + testNexusConfig );
+            System.out.println( "This test is using its own " + configFile + " " + testConfigFile );
         }
 
-        System.out.println( "copying nexus.xml to:  "
-            + new File( this.nexusBaseDir + "/" + RELATIVE_CONF_DIR, "nexus.xml" ) );
+        System.out.println( "copying " + configFile + " to:  "
+            + new File( this.nexusBaseDir + "/" + RELATIVE_CONF_DIR, configFile ) );
 
-        FileUtils.copyFile( testNexusConfig, new File( this.nexusBaseDir + "/" + RELATIVE_CONF_DIR, "nexus.xml" ) );
+        FileUtils.copyFile( testConfigFile, new File( this.nexusBaseDir + "/" + RELATIVE_CONF_DIR, configFile ) );
     }
 
     /**
@@ -613,12 +618,13 @@ public class AbstractNexusIntegrationTest
     {
         this.deleteFromRepository( this.testRepositoryId, groupOrArtifactPath );
     }
-    
+
     protected void deleteFromRepository( String repository, String groupOrArtifactPath )
     {
-        String serviceURI = this.getBaseNexusUrl() + "service/local/repositories/"+ repository +"/content/" + groupOrArtifactPath;
-        
-        System.out.println( "deleting: "+ serviceURI );
+        String serviceURI =
+            this.getBaseNexusUrl() + "service/local/repositories/" + repository + "/content/" + groupOrArtifactPath;
+
+        System.out.println( "deleting: " + serviceURI );
 
         Request request = new Request();
 
@@ -631,9 +637,9 @@ public class AbstractNexusIntegrationTest
 
         if ( !response.getStatus().isSuccess() )
         {
-            System.out.println( "Failed to delete: "+ serviceURI + "  - Status: "+ response.getStatus() );
+            System.out.println( "Failed to delete: " + serviceURI + "  - Status: " + response.getStatus() );
         }
-        
+
     }
 
     public String getBaseNexusUrl()
@@ -659,6 +665,11 @@ public class AbstractNexusIntegrationTest
     public PlexusContainer getContainer()
     {
         return this.container;
+    }
+
+    public String getNexusBaseDir()
+    {
+        return nexusBaseDir;
     }
 
 }

@@ -8,6 +8,10 @@ import org.junit.runners.Suite.SuiteClasses;
 import org.sonatype.appbooter.ForkedAppBooter;
 import org.sonatype.nexus.integrationtests.nexus133.Nexus133TargetCrudJsonTests;
 import org.sonatype.nexus.integrationtests.nexus133.Nexus133TargetCrudXmlTests;
+import org.sonatype.nexus.integrationtests.nexus142.Nexus142UserCrudJsonTests;
+import org.sonatype.nexus.integrationtests.nexus142.Nexus142UserCrudXmlTests;
+import org.sonatype.nexus.integrationtests.nexus156.Nexus156RolesCrudJsonTests;
+import org.sonatype.nexus.integrationtests.nexus156.Nexus156RolesCrudXmlTests;
 import org.sonatype.nexus.integrationtests.nexus166.Nexus166SampleTest;
 import org.sonatype.nexus.integrationtests.nexus167.Nexus167ReleaseToSnapshotTest;
 import org.sonatype.nexus.integrationtests.nexus168.Nexus168SnapshotToReleaseTest;
@@ -34,7 +38,8 @@ import org.sonatype.nexus.integrationtests.proxy.nexus262.Nexus262SimpleProxyTes
     Nexus176DeployToInvalidRepoTest.class, Nexus259SnapshotDeployTest.class, Nexus260MultipleDeployTest.class,
     Nexus261NexusGroupDownloadTest.class, Nexus177OutOfServiceTest.class, Nexus178BlockProxyDownloadTest.class,
     Nexus179RemoteRepoDownTest.class, Nexus262SimpleProxyTest.class, Nexus292SoftRestartTest.class,
-    Nexus133TargetCrudJsonTests.class, Nexus133TargetCrudXmlTests.class } )
+    Nexus133TargetCrudJsonTests.class, Nexus133TargetCrudXmlTests.class, Nexus142UserCrudJsonTests.class,
+    Nexus142UserCrudXmlTests.class, Nexus156RolesCrudJsonTests.class, Nexus156RolesCrudXmlTests.class } )
 public class IntegrationTestSuite
 {
     //
