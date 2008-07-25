@@ -29798,7 +29798,7 @@ Ext.extend(Ext.grid.GridView, Ext.util.Observable, {
         if(!ts.cell){
             ts.cell = new Ext.Template(
                     '<td class="x-grid3-col x-grid3-cell x-grid3-td-{id} {css}" style="{style}" tabIndex="0" {cellAttr}>',
-                    '<div class="x-grid3-cell-inner x-grid3-col-{id}" unselectable="on" {attr}>{value}</div>',
+                    '<div id="{colid}" class="x-grid3-cell-inner x-grid3-col-{id}" unselectable="on" {attr}>{value}</div>',
                     "</td>"
                     );
         }
@@ -30075,6 +30075,7 @@ Ext.extend(Ext.grid.GridView, Ext.util.Observable, {
                 if(r.dirty && typeof r.modified[c.name] !== 'undefined'){
                     p.css += ' x-grid3-dirty-cell';
                 }
+                p.colid = this.grid.id + '_' + rs[j].id + '_col' + i;
                 cb[cb.length] = ct.apply(p);
             }
             var alt = [];
