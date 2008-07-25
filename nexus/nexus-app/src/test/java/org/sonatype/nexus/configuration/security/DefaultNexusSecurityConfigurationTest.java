@@ -68,21 +68,11 @@ public class DefaultNexusSecurityConfigurationTest
 
         Configuration config = securityConfiguration.getConfiguration();
         
-        assertTrue( config.getApplicationPrivileges().size() == 0 );
-        
         assertTrue( config.getRepositoryTargetPrivileges().size() == 0 );
         
         assertTrue( config.getRoles().size() == 0 );
         
         assertTrue( config.getUsers().size() == 0 );
-        
-        CApplicationPrivilege appPriv = new CApplicationPrivilege();
-        appPriv.setId( "id1" );
-        appPriv.setMethod( CApplicationPrivilege.METHOD_READ );
-        appPriv.setName( "name" );
-        appPriv.setPermission( "some/path" );
-        
-        config.addApplicationPrivilege( appPriv );
         
         CRepoTargetPrivilege tarPriv = new CRepoTargetPrivilege();
         tarPriv.setId( "id2" );
@@ -98,7 +88,6 @@ public class DefaultNexusSecurityConfigurationTest
         role.setId( "id1" );
         role.setName( "name" );
         role.setSessionTimeout( 60 );
-        role.addPrivilege( "id1" );
         role.addPrivilege( "id2" );
         
         config.addRole( role );
@@ -108,7 +97,6 @@ public class DefaultNexusSecurityConfigurationTest
         role2.setId( "id2" );
         role2.setName( "name" );
         role2.setSessionTimeout( 60 );
-        role2.addPrivilege( "id1" );
         role2.addPrivilege( "id2" );
         role2.addRole( "id1" );
         
@@ -131,13 +119,6 @@ public class DefaultNexusSecurityConfigurationTest
 
         config = securityConfiguration.getConfiguration();
         
-        assertTrue( config.getApplicationPrivileges().size() == 1 );
-        
-        assertTrue( ( ( CApplicationPrivilege ) config.getApplicationPrivileges().get( 0 ) ).getId().equals( "id1" ) );
-        assertTrue( ( ( CApplicationPrivilege ) config.getApplicationPrivileges().get( 0 ) ).getMethod().equals( CApplicationPrivilege.METHOD_READ ) );
-        assertTrue( ( ( CApplicationPrivilege ) config.getApplicationPrivileges().get( 0 ) ).getName().equals( "name" ) );
-        assertTrue( ( ( CApplicationPrivilege ) config.getApplicationPrivileges().get( 0 ) ).getPermission().equals( "some/path" ) );
-        
         assertTrue( config.getRepositoryTargetPrivileges().size() == 1 );
         
         assertTrue( ( ( CRepoTargetPrivilege ) config.getRepositoryTargetPrivileges().get( 0 ) ).getId().equals( "id2" ) );
@@ -152,14 +133,14 @@ public class DefaultNexusSecurityConfigurationTest
         assertTrue( ( ( CRole ) config.getRoles().get( 0 ) ).getId().equals( "id1" ) );
         assertTrue( ( ( CRole ) config.getRoles().get( 0 ) ).getName().equals( "name" ) );
         assertTrue( ( ( CRole ) config.getRoles().get( 0 ) ).getSessionTimeout() == 60 );
-        assertTrue( ( ( CRole ) config.getRoles().get( 0 ) ).getPrivileges().size() == 2 );
+        assertTrue( ( ( CRole ) config.getRoles().get( 0 ) ).getPrivileges().size() == 1 );
         assertTrue( ( ( CRole ) config.getRoles().get( 0 ) ).getRoles().size() == 0 );
         
         assertTrue( ( ( CRole ) config.getRoles().get( 1 ) ).getDescription().equals( "description" ) );
         assertTrue( ( ( CRole ) config.getRoles().get( 1 ) ).getId().equals( "id2" ) );
         assertTrue( ( ( CRole ) config.getRoles().get( 1 ) ).getName().equals( "name" ) );
         assertTrue( ( ( CRole ) config.getRoles().get( 1 ) ).getSessionTimeout() == 60 );
-        assertTrue( ( ( CRole ) config.getRoles().get( 1 ) ).getPrivileges().size() == 2 );
+        assertTrue( ( ( CRole ) config.getRoles().get( 1 ) ).getPrivileges().size() == 1 );
         assertTrue( ( ( CRole ) config.getRoles().get( 1 ) ).getRoles().size() == 1 );
         
         assertTrue( config.getUsers().size() == 1 );

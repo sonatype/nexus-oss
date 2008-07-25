@@ -473,8 +473,6 @@ public class DefaultSecurityConfigurationValidator
         {
             List<String> roleIds = user.getRoles();
             
-            if ( roleIds.size() > 0 )
-            {
             for ( String roleId : roleIds )
             {
                 if ( !context.getExistingRoleIds().contains( roleId ) )
@@ -483,12 +481,12 @@ public class DefaultSecurityConfigurationValidator
                     response.addValidationError( message );
                 }
             }
-            }
-            else
-            {
-                ValidationMessage message = new ValidationMessage( "roles", "User ID '" + user.getUserId() + "' has no roles assigned.", "User requires one or more roles." );
-                response.addValidationError( message );
-            }
+        }
+        
+        if ( user.getRoles().size() == 0 )
+        {
+            ValidationMessage message = new ValidationMessage( "roles", "User ID '" + user.getUserId() + "' has no roles assigned.", "User requires one or more roles." );
+            response.addValidationError( message );
         }
         
         existingIds.add( user.getUserId() );
