@@ -9,7 +9,7 @@
       <!-- no id -->
       <!-- no method -->
       <!-- no name -->
-      <!-- no path -->
+      <!-- no permission -->
       <applicationPrivilege>
       </applicationPrivilege>
       
@@ -18,7 +18,7 @@
         <id>25</id>
         <name>priv</name>
         <method>read</method>
-        <path>/some/path/</path>
+        <permission>/some/path/</permission>
       </applicationPrivilege>
       
     </applicationPrivileges>

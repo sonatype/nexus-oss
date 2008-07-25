@@ -80,7 +80,7 @@ public class DefaultNexusSecurityConfigurationTest
         appPriv.setId( "id1" );
         appPriv.setMethod( CApplicationPrivilege.METHOD_READ );
         appPriv.setName( "name" );
-        appPriv.setPath( "some/path" );
+        appPriv.setPermission( "some/path" );
         
         config.addApplicationPrivilege( appPriv );
         
@@ -136,7 +136,7 @@ public class DefaultNexusSecurityConfigurationTest
         assertTrue( ( ( CApplicationPrivilege ) config.getApplicationPrivileges().get( 0 ) ).getId().equals( "id1" ) );
         assertTrue( ( ( CApplicationPrivilege ) config.getApplicationPrivileges().get( 0 ) ).getMethod().equals( CApplicationPrivilege.METHOD_READ ) );
         assertTrue( ( ( CApplicationPrivilege ) config.getApplicationPrivileges().get( 0 ) ).getName().equals( "name" ) );
-        assertTrue( ( ( CApplicationPrivilege ) config.getApplicationPrivileges().get( 0 ) ).getPath().equals( "some/path" ) );
+        assertTrue( ( ( CApplicationPrivilege ) config.getApplicationPrivileges().get( 0 ) ).getPermission().equals( "some/path" ) );
         
         assertTrue( config.getRepositoryTargetPrivileges().size() == 1 );
         

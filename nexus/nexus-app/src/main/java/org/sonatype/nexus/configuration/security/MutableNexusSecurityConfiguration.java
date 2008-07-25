@@ -48,7 +48,6 @@ public interface MutableNexusSecurityConfiguration
 
     void deleteUser( String id )
         throws IOException,
-            ConfigurationException,
             NoSuchUserException;
 
     //Roles
@@ -68,7 +67,6 @@ public interface MutableNexusSecurityConfiguration
 
     void deleteRole( String id )
         throws IOException,
-            ConfigurationException,
             NoSuchRoleException;
 
     //Application privileges
@@ -88,7 +86,6 @@ public interface MutableNexusSecurityConfiguration
 
     void deleteApplicationPrivilege( String id )
         throws IOException,
-            ConfigurationException,
             NoSuchPrivilegeException;
 
     //Repository Target privileges
@@ -108,6 +105,5 @@ public interface MutableNexusSecurityConfiguration
 
     void deleteRepoTargetPrivilege( String id )
         throws IOException,
-            ConfigurationException,
             NoSuchPrivilegeException;
 }

@@ -179,6 +179,8 @@
     public static final String STATUS_LOCKED = "locked";
     
     public static final String STATUS_ACTIVE = "active";
+    
+    public static final String STATUS_EXPIRED = "expired";
 ]]></code>
                 </codeSegment>
             </codeSegments>
@@ -299,11 +301,11 @@
             </description>
             <fields>
                 <field>
-                    <name>path</name>
+                    <name>permission</name>
                     <version>1.0.0+</version>
                     <type>String</type>
                     <required>true</required>
-                    <description>The application Url that is protected by this privilege</description>
+                    <description>The application permission (i.e. users, repositories, etc.) is protected by this privilege</description>
                 </field>
             </fields>
         </class>

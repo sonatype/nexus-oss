@@ -31,7 +31,7 @@ Sonatype.repoServer.PrivilegeEditPanel = function(config){
   
   this.typeStore = new Ext.data.SimpleStore({fields:['value','display'], data:[['repositoryTarget','Repository Target'],['application','Application']]});
   
-  this.methodStore = new Ext.data.SimpleStore({fields:['value','display'], data:[['read','Read'],['write','Write'],['update','Update'],['delete','Delete']]});
+  this.methodStore = new Ext.data.SimpleStore({fields:['value','display'], data:[['create','Create'],['read','Read'],['update','Update'],['delete','Delete']]});
   
   this.actions = {
     refresh : new Ext.Action({

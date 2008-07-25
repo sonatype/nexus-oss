@@ -149,18 +149,18 @@ public abstract class AbstractRealmTest extends TestCase
         CApplicationPrivilege createRepository = new CApplicationPrivilege();
         createRepository.setId( "create-repository" );
         createRepository.setMethod( "CREATE" );
-        createRepository.setPath( "nexus:repository" );
+        createRepository.setPermission( "nexus:repository" );
         securityConfiguration.createApplicationPrivilege( createRepository );
 
         CApplicationPrivilege readRepository = new CApplicationPrivilege();
         readRepository.setId( "read-repository" );
         readRepository.setMethod( "READ" );
-        readRepository.setPath( "nexus:repository" );
+        readRepository.setPermission( "nexus:repository" );
         securityConfiguration.createApplicationPrivilege( readRepository );
 
         CApplicationPrivilege adminUsers = new CApplicationPrivilege();
         adminUsers.setId( "admin-users" );
-        adminUsers.setPath( "nexus:user" );
+        adminUsers.setPermission( "nexus:user" );
         securityConfiguration.createApplicationPrivilege( adminUsers );
 
         realm = new NexusRealm();
@@ -297,7 +297,7 @@ public abstract class AbstractRealmTest extends TestCase
             throw new UnsupportedOperationException();
         }
 
-        public void deleteUser( String id ) throws IOException, ConfigurationException, NoSuchUserException
+        public void deleteUser( String id ) throws IOException, NoSuchUserException
         {
             throw new UnsupportedOperationException();
         }
@@ -312,7 +312,7 @@ public abstract class AbstractRealmTest extends TestCase
             throw new UnsupportedOperationException();
         }
 
-        public void deleteRole( String id ) throws IOException, ConfigurationException, NoSuchRoleException
+        public void deleteRole( String id ) throws IOException, NoSuchRoleException
         {
             throw new UnsupportedOperationException();
         }
@@ -329,7 +329,7 @@ public abstract class AbstractRealmTest extends TestCase
         }
 
         public void deleteApplicationPrivilege( String id )
-            throws IOException, ConfigurationException, NoSuchPrivilegeException
+            throws IOException, NoSuchPrivilegeException
         {
             throw new UnsupportedOperationException();
         }
@@ -346,7 +346,7 @@ public abstract class AbstractRealmTest extends TestCase
         }
 
         public void deleteRepoTargetPrivilege( String id )
-            throws IOException, ConfigurationException, NoSuchPrivilegeException
+            throws IOException, NoSuchPrivilegeException
         {
             throw new UnsupportedOperationException();
         }

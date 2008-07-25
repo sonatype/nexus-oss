@@ -30,7 +30,7 @@ Sonatype.repoServer.UserEditPanel = function(config){
   var ht = Sonatype.repoServer.resources.help.users;
   
   //List of user statuses
-  this.statusStore = new Ext.data.SimpleStore({fields:['value','display'], data:[['active','Active'],['locked','Locked'],['disabled','Disabled']]});
+  this.statusStore = new Ext.data.SimpleStore({fields:['value','display'], data:[['active','Active'],['disabled','Disabled'],['expired','Expired'],['locked','Locked']]});
     
   this.roleCombiner = function(val, parent) {
     return Sonatype.utils.joinArrayObject(val, 'roleName');
@@ -62,7 +62,6 @@ Sonatype.repoServer.UserEditPanel = function(config){
   
   //Methods that will take the data from the ui controls and map over to json
   this.submitDataModFunc = {
-    "password" : Sonatype.utils.convert.passwordToString,
     "roles" : this.saveTreeHelper.createDelegate(this)
   };
   
@@ -167,38 +166,6 @@ Sonatype.repoServer.UserEditPanel = function(config){
         selectOnFocus:true,
         allowBlank: false,
         width: this.COMBO_WIDTH
-      },
-      {
-        xtype: 'textfield',
-        inputType:'password',
-        fieldLabel: 'Password',
-        itemCls: 'required-field',
-        labelStyle: 'margin-left: 15px; width: 185px;',
-        helpText: ht.password,
-        name: 'password',
-        allowBlank: false,
-        width: this.COMBO_WIDTH,
-        minLength: 4,
-        minLengthText : "Password must be 4 characters or more",
-        maxLength: 25,
-        maxLengthText : "Password must be 25 characters or less"
-      },
-      {
-        xtype: 'textfield',
-        inputType:'password',
-        fieldLabel: 'Re-enter Password',
-        itemCls: 'required-field',
-        labelStyle: 'margin-left: 15px; width: 185px;',
-        helpText: ht.reenterPassword,
-        name: 'reenterPassword',
-        allowBlank: false,
-        width: this.COMBO_WIDTH,
-        minLength: 4,
-        minLengthText : "Password must be 4 characters or more",
-        maxLength: 25,
-        maxLengthText : "Password must be 25 characters or less",
-        vtype: 'password',
-        initialPasswordField: 'password'
       },
       {
         xtype: 'panel',
@@ -430,7 +397,20 @@ Ext.extend(Sonatype.repoServer.UserEditPanel, Ext.Panel, {
   },
   
   saveHandler : function(formInfoObj){
-    if (formInfoObj.formPanel.form.isValid()) {
+    var allValid = false;
+    allValid = formInfoObj.formPanel.form.isValid()
+    
+    //form validation of repository treepanel
+    var selectedTree = formInfoObj.formPanel.find('id', 'roles_tree')[0];
+    var treeValid = selectedTree.validate.call(selectedTree);
+    
+    if (!treeValid) {
+      this.markTreeInvalid(selectedTree);
+    }
+    
+    allValid = (allValid && treeValid);
+    
+    if (allValid) {
       var isNew = formInfoObj.isNew;
     
       formInfoObj.formPanel.form.doAction('sonatypeSubmit', {
@@ -677,7 +657,7 @@ Ext.extend(Sonatype.repoServer.UserEditPanel, Ext.Panel, {
         
         this.usersDataStore.remove(this.usersDataStore.getById(action.options.fpanel.id)); //remove old one
         this.usersDataStore.addSorted(newRec);
-        this.usersDataStore.getSelectionModel().selectRecords([newRec], false);
+        this.usersGridPanel.getSelectionModel().selectRecords([newRec], false);
 
         //remove button click listeners
         action.options.fpanel.buttons[0].purgeListeners();
@@ -707,8 +687,6 @@ Ext.extend(Sonatype.repoServer.UserEditPanel, Ext.Panel, {
     }
     //Load
     else{
-      action.options.fpanel.find('name', 'password')[0].setValue(Sonatype.utils.passwordPlaceholder);
-      action.options.fpanel.find('name', 'reenterPassword')[0].setValue(Sonatype.utils.passwordPlaceholder);
     }
   },
   
@@ -846,8 +824,8 @@ Ext.extend(Sonatype.repoServer.UserEditPanel, Ext.Panel, {
     //@note: there has to be a better way to do this.  Depending on offsets is very error prone
     var newConfig = config;
 
-    newConfig.items[6].items[0].root = new Ext.tree.TreeNode({text: 'root'});
-    newConfig.items[6].items[1].root = new Ext.tree.TreeNode({text: 'root'});
+    newConfig.items[4].items[0].root = new Ext.tree.TreeNode({text: 'root'});
+    newConfig.items[4].items[1].root = new Ext.tree.TreeNode({text: 'root'});
 
     return newConfig;
   },
@@ -859,12 +837,12 @@ Ext.extend(Sonatype.repoServer.UserEditPanel, Ext.Panel, {
     var role;
 
     for(var i=0; i<arr.length; i++){
-      role = arr[i];
+      role = this.roleDataStore.getAt(this.roleDataStore.find("id",arr[i]));
       selectedTree.root.appendChild(
         new Ext.tree.TreeNode({
-          id: role.roleId,
-          text: role.roleName,
-          payload: role.roleId, //sonatype added attribute
+          id: role.data.id,
+          text: role.data.name,
+          payload: role.data.id, //sonatype added attribute
           allowChildren: false,
           draggable: true,
           leaf: true
@@ -898,8 +876,7 @@ Ext.extend(Sonatype.repoServer.UserEditPanel, Ext.Panel, {
     var nodes = tree.root.childNodes;
 
     for(var i = 0; i < nodes.length; i++){
-      outputArr[i] = {roleId : nodes[i].attributes.payload};
-      Ext.apply(outputArr[i], {'@class':'org.sonatype.nexus.rest.model.UserRoleResource'});
+      outputArr[i] = nodes[i].attributes.payload;
     }
 
     return outputArr;

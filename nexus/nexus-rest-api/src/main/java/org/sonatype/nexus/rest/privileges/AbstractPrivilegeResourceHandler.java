@@ -23,11 +23,13 @@ package org.sonatype.nexus.rest.privileges;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
-import org.restlet.resource.Representation;
+import org.sonatype.nexus.configuration.security.model.CApplicationPrivilege;
+import org.sonatype.nexus.configuration.security.model.CPrivilege;
+import org.sonatype.nexus.configuration.security.model.CRepoTargetPrivilege;
 import org.sonatype.nexus.rest.AbstractNexusResourceHandler;
 import org.sonatype.nexus.rest.model.PrivilegeApplicationStatusResource;
-import org.sonatype.nexus.rest.model.PrivilegeBaseResource;
 import org.sonatype.nexus.rest.model.PrivilegeBaseStatusResource;
+import org.sonatype.nexus.rest.model.PrivilegeTargetStatusResource;
 
 public class AbstractPrivilegeResourceHandler
 extends AbstractNexusResourceHandler
@@ -49,26 +51,40 @@ extends AbstractNexusResourceHandler
         super( context, request, response );
     }
     
-    public boolean validateFields( PrivilegeBaseResource resource, Representation representation )
+    public PrivilegeBaseStatusResource nexusToRestModel( CPrivilege privilege )
     {
-        //TODO: validation
-        return true;
-    }
-    
-    public PrivilegeBaseStatusResource nexusToRestModel()
-    {
-        //TODO: ultimately this method will take a parameter which is the nexus object
-        //and will convert to the rest object
-        PrivilegeBaseStatusResource resource = new PrivilegeApplicationStatusResource();
-        resource.setId( "privid" );
-        resource.setName( "privname" );
-        resource.setResourceUri( calculateSubReference( resource.getId() ).toString() );
-        resource.setMethod( "read" );
-        resource.setType( AbstractPrivilegeResourceHandler.TYPE_APPLICATION );
+        PrivilegeBaseStatusResource resource = null;
         
-        if ( resource.getClass().isAssignableFrom( PrivilegeApplicationStatusResource.class ) )
+        if ( CApplicationPrivilege.class.isAssignableFrom( privilege.getClass() ) )
         {
-            ( ( PrivilegeApplicationStatusResource ) resource ).setPath( "/service/local/global_settings" );
+            resource = new PrivilegeApplicationStatusResource();
+            
+            PrivilegeApplicationStatusResource res = ( PrivilegeApplicationStatusResource ) resource;
+            CApplicationPrivilege priv = ( CApplicationPrivilege ) privilege;
+            
+            res.setPermission( priv.getPermission() );
+            res.setType( TYPE_APPLICATION );
+        }
+        else if ( CRepoTargetPrivilege.class.isAssignableFrom( privilege.getClass() ) )
+        {
+            resource = new PrivilegeTargetStatusResource();
+            
+            PrivilegeTargetStatusResource res = ( PrivilegeTargetStatusResource ) resource;
+            CRepoTargetPrivilege priv = ( CRepoTargetPrivilege ) privilege;
+            
+            res.setRepositoryTargetId( priv.getRepositoryTargetId() );
+            res.setRepositoryId( priv.getRepositoryId() );
+            res.setRepositoryGroupId( priv.getGroupId() );
+            
+            res.setType( TYPE_REPO_TARGET );
+        }
+        
+        if ( resource != null )
+        {
+            resource.setId( privilege.getId() );
+            resource.setMethod( privilege.getMethod() );
+            resource.setName( privilege.getName() );
+            resource.setResourceUri( calculateSubReference( resource.getId() ).toString() );
         }
                 
         return resource;

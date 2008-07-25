@@ -23,8 +23,6 @@ package org.sonatype.nexus.rest.roles;
 import junit.framework.TestCase;
 
 import org.restlet.data.MediaType;
-import org.sonatype.nexus.rest.model.RoleContainedPrivilegeResource;
-import org.sonatype.nexus.rest.model.RoleContainedRoleResource;
 import org.sonatype.nexus.rest.model.RoleResource;
 import org.sonatype.nexus.rest.model.RoleResourceRequest;
 import org.sonatype.nexus.rest.model.RoleResourceResponse;
@@ -54,49 +52,13 @@ public class RoleTest
     {
         super.tearDown();
     }
-    
-    public void testResponse()
-        throws Exception
-    {
-        XStreamRepresentation representation = new XStreamRepresentation( xstream , "", MediaType.APPLICATION_JSON );
-        
-        RoleResourceResponse response = new RoleResourceResponse();
-        
-        RoleResource resource = new RoleResource();
-        
-        resource.setDescription( "This is a test role" );
-        resource.setId( "somerole" );
-        resource.setName( "Test Role" );
-        resource.setSessionTimeout( 50 );
-
-        RoleContainedRoleResource role = new RoleContainedRoleResource();
-        role.setId( "roleid" );
-        role.setName( "rolename" );
-        
-        resource.addRole( role );
-        
-        RoleContainedPrivilegeResource priv = new RoleContainedPrivilegeResource();
-        priv.setId( "privid" );
-        priv.setName( "privname" );
-        
-        resource.addPrivilege( priv );
-        
-        response.setData( resource );
-        
-        representation.setPayload( response );
-        
-        assertEquals( "{\"data\":{\"id\":\"somerole\",\"name\":\"Test Role\",\"description\":\"This is a test role\",\"sessionTimeout\":50," +
-        		"\"roles\":[{\"id\":\"roleid\",\"name\":\"rolename\"}],\"privileges\":[{\"id\":\"privid\",\"name\":\"privname\"}]}}", 
-        		representation.getText() );
-    }
 
     public void testRequest()
         throws Exception
     {
         String jsonString =
             "{\"data\":{\"id\":null,\"name\":\"Test Role\",\"description\":\"This is a test role\",\"sessionTimeout\":50," +
-            "\"roles\":[{\"id\":\"roleid\",\"name\":\"rolename\",\"@class\":\"org.sonatype.nexus.rest.model.RoleContainedRoleResource\"}]," +
-            "\"privileges\":[{\"id\":\"privid\",\"name\":\"privname\",\"@class\":\"org.sonatype.nexus.rest.model.RoleContainedPrivilegeResource\"}]}}}";
+            "\"roles\":[\"roleid\"],\"privileges\":[\"privid\"]}}}";
         XStreamRepresentation representation =
             new XStreamRepresentation( xstream, jsonString, MediaType.APPLICATION_JSON );
         
@@ -107,20 +69,8 @@ public class RoleTest
         assert request.getData().getDescription().equals( "This is a test role" );
         assert request.getData().getSessionTimeout() == 50;
         assert request.getData().getRoles().size() == 1;
-        
-        RoleContainedRoleResource role = ( RoleContainedRoleResource ) request.getData().getRoles().get( 0 );
-        
-        assert role != null;
-        assert role.getId().equals( "roleid" );
-        assert role.getName().equals( "rolename" );
-        
+        assert ( ( String ) request.getData().getRoles().get( 0 ) ).equals( "roleid" );        
         assert request.getData().getPrivileges().size() == 1;
-        
-        RoleContainedPrivilegeResource priv = ( RoleContainedPrivilegeResource ) request.getData().getPrivileges().get( 0 );
-        
-        assert priv != null;
-        
-        assert priv.getId().equals( "privid" );
-        assert priv.getName().equals( "privname" );
+        assert ( ( String ) request.getData().getPrivileges().get( 0 ) ).equals( "privid" );
     }
 }

@@ -29,6 +29,7 @@ import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.configuration.model.CRemoteNexusInstance;
+import org.sonatype.nexus.configuration.security.NexusSecurityConfiguration;
 import org.sonatype.plexus.rest.PlexusRestletUtils;
 
 /**
@@ -75,6 +76,20 @@ public class NexusInstanceFilter
         }
 
         request.getAttributes().put( Nexus.ROLE, nexus );
+        
+        request.getAttributes().put( NexusSecurityConfiguration.ROLE, getNexusSecurityConfiguration() );
+    }
+    
+    protected NexusSecurityConfiguration getNexusSecurityConfiguration()
+    {
+        try
+        {
+            return (NexusSecurityConfiguration) PlexusRestletUtils.plexusLookup( getContext(), NexusSecurityConfiguration.ROLE );
+        }
+        catch ( ComponentLookupException e )
+        {
+            throw new IllegalStateException( "Cannot lookup NexusSecurityConfiguration!", e );
+        }
     }
 
     /**

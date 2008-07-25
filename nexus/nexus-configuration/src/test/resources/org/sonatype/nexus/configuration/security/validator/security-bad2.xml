@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!-- This configuration will cause 4 validation warnings -->
-<!-- This configuration will cause 7 validation error -->
+<!-- This configuration will cause 8 validation error -->
 <nexusSecurity>
     <version>1.0.0</version>    
     <roles>      
@@ -89,6 +89,32 @@
           <sessionTimeout>25</sessionTimeout>
           <roles>
             <role>recursive4</role>
+          </roles>
+        </role>
+        
+        <role>
+          <id>errantRole1</id>
+          <name>role</name>
+          <sessionTimeout>25</sessionTimeout>
+          <roles>
+            <role>errantRole2</role>
+          </roles>
+        </role>
+        <role>
+          <id>errantRole2</id>
+          <name>role</name>
+          <sessionTimeout>25</sessionTimeout>
+          <roles>
+            <role>errantRole3</role>
+          </roles>
+        </role>
+        <!-- Invalid roel -->
+        <role>
+          <id>errantRole3</id>
+          <name>role</name>
+          <sessionTimeout>25</sessionTimeout>
+          <roles>
+            <role>errantRoleNotValid</role>
           </roles>
         </role>
     </roles>

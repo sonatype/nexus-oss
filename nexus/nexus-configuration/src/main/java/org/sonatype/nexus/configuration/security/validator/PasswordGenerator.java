@@ -18,10 +18,13 @@
  * along with this program.  If not, see http://www.gnu.org/licenses/.
  *
  */
-package org.sonatype.nexus.configuration.validator;
+package org.sonatype.nexus.configuration.security.validator;
 
-public abstract class AbstractValidationContext
-    implements ValidationContext
+public interface PasswordGenerator
 {
-
+    String ROLE = PasswordGenerator.class.getName();
+    
+    String generatePassword( int minChars, int maxChars );
+    
+    String hashPassword( String password );
 }

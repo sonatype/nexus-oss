@@ -20,13 +20,13 @@
  */
 package org.sonatype.nexus.rest.roles;
 
+import java.util.List;
+
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
-import org.restlet.resource.Representation;
+import org.sonatype.nexus.configuration.security.model.CRole;
 import org.sonatype.nexus.rest.AbstractNexusResourceHandler;
-import org.sonatype.nexus.rest.model.RoleContainedPrivilegeResource;
-import org.sonatype.nexus.rest.model.RoleContainedRoleResource;
 import org.sonatype.nexus.rest.model.RoleResource;
 
 public class AbstractRoleResourceHandler
@@ -46,35 +46,54 @@ extends AbstractNexusResourceHandler
         super( context, request, response );
     }
     
-    public boolean validateFields( RoleResource resource, Representation representation )
-    {
-        //TODO: Need to verify that there are no circular loops of role inclusion
-        return true;
-    }
-    
-    public RoleResource nexusToRestModel()
+    public RoleResource nexusToRestModel( CRole role )
     {
         //TODO: ultimately this method will take a parameter which is the nexus object
         //and will convert to the rest object
         RoleResource resource = new RoleResource();
-        resource.setDescription( "Some role description" );
-        resource.setId( "roleid" );
-        resource.setName( "rolename" );
+        
+        resource.setDescription( role.getDescription() );
+        resource.setId( role.getId() );
+        resource.setName( role.getName() );
         resource.setResourceURI( calculateSubReference( resource.getId() ).toString() );
-        resource.setSessionTimeout( 60 );
-
-        RoleContainedRoleResource roleResource = new RoleContainedRoleResource();
-        roleResource.setId( "roleid2" );
-        roleResource.setName( "rolename2" );
+        resource.setSessionTimeout( role.getSessionTimeout() );
         
-        resource.addRole( roleResource );
+        for ( String roleId : ( List<String>) role.getRoles() )
+        {
+            resource.addRole( roleId );
+        }
         
-        RoleContainedPrivilegeResource privResource = new RoleContainedPrivilegeResource();
-        privResource.setId( "privid" );
-        privResource.setName( "privname" );
-        
-        resource.addPrivilege( privResource );
+        for ( String privId : ( List<String>) role.getPrivileges() )
+        {
+            resource.addPrivilege( privId );
+        }
         
         return resource;
+    }
+    
+    public CRole restToNexusModel( CRole role, RoleResource resource )
+    {
+        if ( role == null )
+        {
+            role = new CRole();
+        }
+        
+        role.setDescription( resource.getDescription() );
+        role.setName( resource.getName() );
+        role.setSessionTimeout( resource.getSessionTimeout() );
+        
+        role.getRoles().clear();        
+        for ( String roleId : ( List<String> ) resource.getRoles() )
+        {
+            role.addRole( roleId );
+        }
+        
+        role.getPrivileges().clear();
+        for ( String privId : ( List<String> ) resource.getPrivileges() )
+        {
+            role.addPrivilege( privId );
+        }
+        
+        return role;
     }
 }

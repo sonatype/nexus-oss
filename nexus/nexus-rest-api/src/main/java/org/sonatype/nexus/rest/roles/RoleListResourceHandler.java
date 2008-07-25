@@ -20,13 +20,17 @@
  */
 package org.sonatype.nexus.rest.roles;
 
+import java.io.IOException;
+import java.util.logging.Level;
+
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
+import org.restlet.data.Status;
 import org.restlet.resource.Representation;
 import org.restlet.resource.Variant;
-import org.sonatype.nexus.rest.model.RoleContainedPrivilegeResource;
-import org.sonatype.nexus.rest.model.RoleContainedRoleResource;
+import org.sonatype.nexus.configuration.ConfigurationException;
+import org.sonatype.nexus.configuration.security.model.CRole;
 import org.sonatype.nexus.rest.model.RoleListResourceResponse;
 import org.sonatype.nexus.rest.model.RoleResource;
 import org.sonatype.nexus.rest.model.RoleResourceRequest;
@@ -63,63 +67,15 @@ extends AbstractRoleResourceHandler
     {
         RoleListResourceResponse response = new RoleListResourceResponse();
 
-        //TODO: Retrieve items from Nexus, currently just hardcoded junk
-        RoleResource resource = new RoleResource();
-        resource.setDescription( "Some role description" );
-        resource.setId( "roleid" );
-        resource.setName( "rolename" );
-        resource.setResourceURI( calculateSubReference( resource.getId() ).toString() );
-        resource.setSessionTimeout( 60 );
-
-        RoleContainedRoleResource roleResource = new RoleContainedRoleResource();
-        roleResource.setId( "roleid2" );
-        roleResource.setName( "rolename2" );
-        
-        resource.addRole( roleResource );
-        
-        RoleContainedPrivilegeResource privResource = new RoleContainedPrivilegeResource();
-        privResource.setId( "privid" );
-        privResource.setName( "privname" );
-        
-        resource.addPrivilege( privResource );
-        
-        response.addData( resource );
-        
-        resource = new RoleResource();
-        resource.setDescription( "Some role description" );
-        resource.setId( "roleid2" );
-        resource.setName( "rolename2" );
-        resource.setResourceURI( calculateSubReference( resource.getId() ).toString() );
-        resource.setSessionTimeout( 60 );
-        
-        privResource = new RoleContainedPrivilegeResource();
-        privResource.setId( "privid" );
-        privResource.setName( "privname" );
-        
-        resource.addPrivilege( privResource );
-        
-        response.addData( resource );
-        
-        resource = new RoleResource();
-        resource.setDescription( "Some role description" );
-        resource.setId( "roleid3" );
-        resource.setName( "rolename3" );
-        resource.setResourceURI( calculateSubReference( resource.getId() ).toString() );
-        resource.setSessionTimeout( 60 );
-        
-        privResource = new RoleContainedPrivilegeResource();
-        privResource.setId( "privid" );
-        privResource.setName( "privname" );
-        
-        resource.addPrivilege( privResource );
-        
-        privResource = new RoleContainedPrivilegeResource();
-        privResource.setId( "privid2" );
-        privResource.setName( "privname2" );
-        
-        resource.addPrivilege( privResource );
-        
-        response.addData( resource );
+        for ( CRole role : getNexusSecurityConfiguration().listRoles() )
+        {
+            RoleResource res = nexusToRestModel( role );
+            
+            if ( res != null )
+            {
+                response.addData( res );
+            }
+        }
         
         return serialize( variant, response );
     }
@@ -144,17 +100,33 @@ extends AbstractRoleResourceHandler
         {
             RoleResource resource = request.getData();
             
-            if ( validateFields( resource, representation ) )
+            CRole role = restToNexusModel( null, resource );
+            
+            try
             {
-                //TODO: actually store the data here
+                getNexusSecurityConfiguration().createRole( role );
                 
                 RoleResourceResponse response = new RoleResourceResponse();
                 
-                response.setData( request.getData() );
+                resource.setId( role.getId() );
                 
-                response.getData().setId( "newroleid" );
+                response.setData( resource );
                 
                 getResponse().setEntity( serialize( representation, response ) );
+            }
+            catch ( ConfigurationException e )
+            {
+                getLogger().log( Level.WARNING, "Configuration error!", e );
+
+                getResponse().setStatus( Status.CLIENT_ERROR_BAD_REQUEST, "Configuration error." );
+                
+                getResponse().setEntity( serialize( representation, getNexusErrorResponse( "*", e.getMessage() ) ) );
+            }
+            catch ( IOException e )
+            {
+                getResponse().setStatus( Status.SERVER_ERROR_INTERNAL );
+
+                getLogger().log( Level.SEVERE, "Got IO Exception!", e );
             }
         }
     }

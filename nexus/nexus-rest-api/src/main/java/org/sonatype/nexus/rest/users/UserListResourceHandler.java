@@ -20,17 +20,21 @@
  */
 package org.sonatype.nexus.rest.users;
 
+import java.io.IOException;
+import java.util.logging.Level;
+
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
+import org.restlet.data.Status;
 import org.restlet.resource.Representation;
 import org.restlet.resource.Variant;
+import org.sonatype.nexus.configuration.ConfigurationException;
+import org.sonatype.nexus.configuration.security.model.CUser;
 import org.sonatype.nexus.rest.model.UserListResourceResponse;
 import org.sonatype.nexus.rest.model.UserResource;
 import org.sonatype.nexus.rest.model.UserResourceRequest;
-import org.sonatype.nexus.rest.model.UserResourceStatusResponse;
-import org.sonatype.nexus.rest.model.UserRoleResource;
-import org.sonatype.nexus.rest.model.UserStatusResource;
+import org.sonatype.nexus.rest.model.UserResourceResponse;
 
 public class UserListResourceHandler
 extends AbstractUserResourceHandler
@@ -63,53 +67,15 @@ extends AbstractUserResourceHandler
     {
         UserListResourceResponse response = new UserListResourceResponse();
 
-        //TODO: Retrieve items from Nexus, currently just hardcoded junk
-        UserStatusResource resource = new UserStatusResource();
-        resource.setEmail( "someemail@someemail.com" );
-        resource.setName( "Real Name" );
-        resource.setStatus( "active" );
-        resource.setUserId( "realuser" );
-        resource.setResourceURI( calculateSubReference( resource.getUserId() ).toString() );
-        
-        UserRoleResource roleResource = new UserRoleResource();
-        roleResource.setRoleId( "roleid" );
-        roleResource.setRoleName( "rolename" );
-        
-        resource.addRole( roleResource );
-        
-        response.addData( resource );
-        
-        resource = new UserStatusResource();
-        
-        resource.setEmail( "someotheremail@someotheremail.com" );
-        resource.setName( "Realer Name" );
-        resource.setStatus( "disabled" );
-        resource.setUserId( "realeruser" );
-        resource.setResourceURI( calculateSubReference( resource.getUserId() ).toString() );
-        
-        roleResource = new UserRoleResource();
-        roleResource.setRoleId( "roleid" );
-        roleResource.setRoleName( "rolename" );
-        
-        resource.addRole( roleResource );
-        
-        response.addData( resource );
-        
-        resource = new UserStatusResource();
-        
-        resource.setEmail( "yetanotheremail@yetanotheremail.com" );
-        resource.setName( "Realest Name" );
-        resource.setStatus( "locked" );
-        resource.setUserId( "realestuser" );
-        resource.setResourceURI( calculateSubReference( resource.getUserId() ).toString() );
-        
-        roleResource = new UserRoleResource();
-        roleResource.setRoleId( "roleid" );
-        roleResource.setRoleName( "rolename" );
-        
-        resource.addRole( roleResource );
-        
-        response.addData( resource );
+        for ( CUser user : getNexusSecurityConfiguration().listUsers() )
+        {
+            UserResource res = nexusToRestModel( user );
+            
+            if ( res != null )
+            {
+                response.addData( res );
+            }
+        }
         
         return serialize( variant, response );
     }
@@ -134,17 +100,31 @@ extends AbstractUserResourceHandler
         {
             UserResource resource = request.getData();
             
-            if ( validateFields( resource, representation ) )
+            CUser user = restToNexusModel( null, resource );
+            
+            try
             {
-                //TODO: actually store the data here
+                getNexusSecurityConfiguration().createUser( user );
                 
-                UserResourceStatusResponse response = new UserResourceStatusResponse();
+                UserResourceResponse response = new UserResourceResponse();
                 
-                response.setData( requestToResponseModel( request.getData() ) );
-                
-                response.getData().setUserId( "newuserid" );
+                response.setData( resource );
                 
                 getResponse().setEntity( serialize( representation, response ) );
+            }
+            catch ( ConfigurationException e )
+            {
+                getLogger().log( Level.WARNING, "Configuration error!", e );
+
+                getResponse().setStatus( Status.CLIENT_ERROR_BAD_REQUEST, "Configuration error." );
+                
+                getResponse().setEntity( serialize( representation, getNexusErrorResponse( "*", e.getMessage() ) ) );
+            }
+            catch ( IOException e )
+            {
+                getResponse().setStatus( Status.SERVER_ERROR_INTERNAL );
+
+                getLogger().log( Level.SEVERE, "Got IO Exception!", e );
             }
         }
     }

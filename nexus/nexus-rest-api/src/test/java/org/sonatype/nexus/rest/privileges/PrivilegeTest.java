@@ -18,19 +18,23 @@
  * along with this program.  If not, see http://www.gnu.org/licenses/.
  *
  */
-package org.sonatype.nexus.rest.users;
+package org.sonatype.nexus.rest.privileges;
 
 import junit.framework.TestCase;
 
 import org.restlet.data.MediaType;
-import org.sonatype.nexus.rest.model.UserResourceRequest;
+import org.sonatype.nexus.rest.model.PrivilegeApplicationStatusResource;
+import org.sonatype.nexus.rest.model.PrivilegeResourceRequest;
+import org.sonatype.nexus.rest.model.PrivilegeStatusResourceResponse;
+import org.sonatype.nexus.rest.model.PrivilegeTargetResource;
+import org.sonatype.nexus.rest.model.PrivilegeTargetStatusResource;
 import org.sonatype.nexus.rest.xstream.XStreamInitializer;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
 import org.sonatype.plexus.rest.xstream.json.JsonOrgHierarchicalStreamDriver;
 
 import com.thoughtworks.xstream.XStream;
 
-public class UserTest
+public class PrivilegeTest
     extends TestCase
 {
 
@@ -50,23 +54,25 @@ public class UserTest
     {
         super.tearDown();
     }
-    
-    public void testRequest()
+
+    public void testTargetRequest()
         throws Exception
     {
         String jsonString =
-            "{\"data\":{\"userId\":\"myuser\",\"name\":\"johnny test\",\"email\":\"test@email.com\",\"status\":\"active\"," +
-            "\"roles\":[\"roleId\"]}}}";
+            "{\"data\":{\"name\":\"Test Priv\",\"type\":\"repositoryTarget\",\"method\":[\"read\",\"create\"]," +
+            "\"repositoryTargetId\":\"targetId\",\"repositoryId\":\"repoId\",\"repositoryGroupId\":\"groupId\"}}";
         XStreamRepresentation representation =
             new XStreamRepresentation( xstream, jsonString, MediaType.APPLICATION_JSON );
         
-        UserResourceRequest request = ( UserResourceRequest ) representation.getPayload( new UserResourceRequest() );
+        PrivilegeResourceRequest request = ( PrivilegeResourceRequest ) representation.getPayload( new PrivilegeResourceRequest() );
 
-        assert request.getData().getUserId().equals( "myuser" );
-        assert request.getData().getName().equals( "johnny test" );
-        assert request.getData().getEmail().equals( "test@email.com" );
-        assert request.getData().getStatus().equals( "active" );
-        assert request.getData().getRoles().size() == 1;
-        assert request.getData().getRoles().get( 0 ).equals( "roleId" );
+        assert request.getData().getName().equals( "Test Priv" );
+        assert request.getData().getType().equals( AbstractPrivilegeResourceHandler.TYPE_REPO_TARGET );
+        assert request.getData().getMethod().size() == 2;
+        assert request.getData().getMethod().contains( "read" );
+        assert request.getData().getMethod().contains( "create" );
+        assert ( ( PrivilegeTargetResource ) request.getData() ).getRepositoryTargetId().equals( "targetId" );
+        assert ( ( PrivilegeTargetResource ) request.getData() ).getRepositoryId().equals( "repoId" );
+        assert ( ( PrivilegeTargetResource ) request.getData() ).getRepositoryGroupId().equals( "groupId" );
     }
 }

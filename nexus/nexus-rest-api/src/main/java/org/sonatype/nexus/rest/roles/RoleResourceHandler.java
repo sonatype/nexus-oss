@@ -20,11 +20,18 @@
  */
 package org.sonatype.nexus.rest.roles;
 
+import java.io.IOException;
+import java.util.logging.Level;
+
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
+import org.restlet.data.Status;
 import org.restlet.resource.Representation;
 import org.restlet.resource.Variant;
+import org.sonatype.nexus.configuration.ConfigurationException;
+import org.sonatype.nexus.configuration.security.NoSuchRoleException;
+import org.sonatype.nexus.configuration.security.model.CRole;
 import org.sonatype.nexus.rest.model.RoleResource;
 import org.sonatype.nexus.rest.model.RoleResourceRequest;
 import org.sonatype.nexus.rest.model.RoleResourceResponse;
@@ -68,9 +75,18 @@ public class RoleResourceHandler
     {
         RoleResourceResponse response = new RoleResourceResponse();
         
-        response.setData( nexusToRestModel() );
-        
-        return serialize( variant, response );
+        try
+        {
+            response.setData( nexusToRestModel( getNexusSecurityConfiguration().readRole( getRoleId() ) ) );
+            
+            return serialize( variant, response );
+        }
+        catch ( NoSuchRoleException e )
+        {
+            getResponse().setStatus( Status.CLIENT_ERROR_NOT_FOUND, e.getMessage() );
+
+            return null;
+        }
     }
 
     /**
@@ -96,15 +112,35 @@ public class RoleResourceHandler
         {
             RoleResource resource = request.getData();
             
-            if ( validateFields( resource, representation ) )
+            try
             {
-                //TODO: actually store the data here
+                CRole role = restToNexusModel( getNexusSecurityConfiguration().readRole( resource.getId() ), resource );
+                
+                getNexusSecurityConfiguration().updateRole( role );
                 
                 RoleResourceResponse response = new RoleResourceResponse();
                 
                 response.setData( request.getData() );
                 
                 getResponse().setEntity( serialize( representation, response ) );
+            }
+            catch ( NoSuchRoleException e )
+            {
+                getResponse().setStatus( Status.CLIENT_ERROR_NOT_FOUND, e.getMessage() );
+            }
+            catch ( ConfigurationException e )
+            {
+                getLogger().log( Level.WARNING, "Configuration error!", e );
+
+                getResponse().setStatus( Status.CLIENT_ERROR_BAD_REQUEST, "Configuration error." );
+                
+                getResponse().setEntity( serialize( representation, getNexusErrorResponse( "*", e.getMessage() ) ) );
+            }
+            catch ( IOException e )
+            {
+                getResponse().setStatus( Status.SERVER_ERROR_INTERNAL );
+
+                getLogger().log( Level.SEVERE, "Got IO Exception!", e );
             }
         }
     }
@@ -118,11 +154,24 @@ public class RoleResourceHandler
     }
 
     /**
-     * Delete a user.
+     * Delete a role.
      */
     public void delete()
     {
-        //TODO: Delete the user
+        try
+        {            
+            getNexusSecurityConfiguration().deleteRole( getRoleId() );
+        }
+        catch ( NoSuchRoleException e )
+        {
+            getResponse().setStatus( Status.CLIENT_ERROR_NOT_FOUND, e.getMessage() );
+        }
+        catch ( IOException e )
+        {
+            getResponse().setStatus( Status.SERVER_ERROR_INTERNAL );
+
+            getLogger().log( Level.SEVERE, "Got IO Exception!", e );
+        }
     }
 
 }

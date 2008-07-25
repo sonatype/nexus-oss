@@ -20,11 +20,17 @@
  */
 package org.sonatype.nexus.rest.privileges;
 
+import java.io.IOException;
+import java.util.logging.Level;
+
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
+import org.restlet.data.Status;
 import org.restlet.resource.Representation;
 import org.restlet.resource.Variant;
+import org.sonatype.nexus.configuration.security.NoSuchPrivilegeException;
+import org.sonatype.nexus.configuration.security.model.CPrivilege;
 import org.sonatype.nexus.rest.model.PrivilegeStatusResourceResponse;
 
 public class PrivilegeResourceHandler
@@ -66,11 +72,25 @@ public class PrivilegeResourceHandler
     {
         PrivilegeStatusResourceResponse response = new PrivilegeStatusResourceResponse();
         
-        //TODO: will need to lookup the details
-        
-        response.setData( nexusToRestModel() );
-        
-        return serialize( variant, response );
+        try
+        {
+            CPrivilege priv = getNexusSecurityConfiguration().readRepoTargetPrivilege( getPrivilegeId() );
+            
+            if ( priv == null )
+            {
+                priv = getNexusSecurityConfiguration().readApplicationPrivilege( getPrivilegeId() );
+            }
+            
+            response.setData( nexusToRestModel( priv ) );
+            
+            return serialize( variant, response );
+        }
+        catch ( NoSuchPrivilegeException e )
+        {
+            getResponse().setStatus( Status.CLIENT_ERROR_NOT_FOUND, e.getMessage() );
+
+            return null;
+        }
     }
 
     /**
@@ -86,6 +106,30 @@ public class PrivilegeResourceHandler
      */
     public void delete()
     {
-        //TODO: Delete the privilege
+        try
+        {
+            getNexusSecurityConfiguration().readApplicationPrivilege( getPrivilegeId() );
+            
+            getResponse().setStatus( Status.CLIENT_ERROR_BAD_REQUEST, "Cannot delete an application type privilege" );
+        }
+        catch ( NoSuchPrivilegeException e )
+        {
+            //This is ok
+        }
+        
+        try
+        {            
+            getNexusSecurityConfiguration().deleteRepoTargetPrivilege( getPrivilegeId() );
+        }
+        catch ( NoSuchPrivilegeException e )
+        {
+            getResponse().setStatus( Status.CLIENT_ERROR_NOT_FOUND, e.getMessage() );
+        }
+        catch ( IOException e )
+        {
+            getResponse().setStatus( Status.SERVER_ERROR_INTERNAL );
+
+            getLogger().log( Level.SEVERE, "Got IO Exception!", e );
+        }
     }
 }

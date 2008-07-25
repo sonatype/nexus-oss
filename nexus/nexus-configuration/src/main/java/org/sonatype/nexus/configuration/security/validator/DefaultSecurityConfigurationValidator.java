@@ -46,6 +46,11 @@ public class DefaultSecurityConfigurationValidator
     extends AbstractLogEnabled
     implements SecurityConfigurationValidator
 {
+    /**
+     * @plexus.requirement
+     */
+    private PasswordGenerator pwGenerator;
+    
     @SuppressWarnings( "unchecked" )
     public ValidationResponse validateModel( ValidationRequest request )
     {
@@ -235,9 +240,9 @@ public class DefaultSecurityConfigurationValidator
         
         response.append( validatePrivilege( context, privilege ) );
         
-        if ( StringUtils.isEmpty( privilege.getPath() ) )
+        if ( StringUtils.isEmpty( privilege.getPermission() ) )
         {
-            response.addValidationError( "Privilege ID '" + privilege.getId() + "' Application path cannot be empty." );
+            response.addValidationError( "Privilege ID '" + privilege.getId() + "' Application permission cannot be empty." );
         }
         
         return response;
@@ -273,13 +278,30 @@ public class DefaultSecurityConfigurationValidator
         
         for ( String containedRoleId : containedRoles )
         {
+            // Only need to do this on the first level
+            if ( baseRoleId.equals( roleId ) )
+            {
+                if ( !ctx.getExistingRoleIds().contains( roleId ) )
+                {
+                    response.addValidationError( "Role ID '" + baseRoleId + "' contains an invalid role" );
+                }
+            }
+            
             if ( containedRoleId.equals( baseRoleId ) )
             {
                 response.addValidationError( "Role ID '" + baseRoleId + "' contains itself through Role ID '" + roleId + "'.  This is not valid." );
                 break;
             }
             
-            response.append( isRecursive( baseRoleId, containedRoleId, ctx ) );
+            if ( ctx.getExistingRoleIds().contains( containedRoleId ) )
+            {            
+                response.append( isRecursive( baseRoleId, containedRoleId, ctx ) );
+            }
+            // Only need to do this on the first level
+            else if ( baseRoleId.equals( roleId ) )
+            {
+                response.addValidationError( "Role ID '" + roleId + "' contains an invalid role ID '" + containedRoleId + "'." );
+            }
         }
         
         return response;
@@ -404,7 +426,11 @@ public class DefaultSecurityConfigurationValidator
         
         if ( StringUtils.isEmpty( user.getPassword() ) )
         {
-            response.addValidationError( "User ID '" + user.getUserId() + "' has no password." );
+            user.setPassword( pwGenerator.generatePassword( 10, 10 ) );
+            user.setStatus( CUser.STATUS_EXPIRED );
+            response.addValidationWarning( "User ID '" + user.getUserId() + "' has no password.  Generated new one and marked user as expired." );
+            
+            response.setModified( true );
         }
         
         if ( StringUtils.isEmpty( user.getEmail() ) )
@@ -414,10 +440,11 @@ public class DefaultSecurityConfigurationValidator
         
         if ( !CUser.STATUS_ACTIVE.equals( user.getStatus() ) 
             && !CUser.STATUS_DISABLED.equals( user.getStatus() )
-            && !CUser.STATUS_LOCKED.equals( user.getStatus() ) )
+            && !CUser.STATUS_LOCKED.equals( user.getStatus() )
+            && !CUser.STATUS_EXPIRED.equals( user.getStatus() ) )
         {
             response.addValidationError( "User ID '" + user.getUserId() + "' has invalid status '" + user.getStatus() + 
-                                         "'.  (Allowed values are: " + CUser.STATUS_ACTIVE + ", "
+                                         "'.  (Allowed values are: " + CUser.STATUS_ACTIVE + ", " + CUser.STATUS_EXPIRED + ", "
                                          + CUser.STATUS_DISABLED + " and " + CUser.STATUS_LOCKED + ")" );
         }
         

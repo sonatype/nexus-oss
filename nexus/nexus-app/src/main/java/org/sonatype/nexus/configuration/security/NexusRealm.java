@@ -223,10 +223,10 @@ public class NexusRealm
 
     protected Permission createPermission( CApplicationPrivilege privilege )
     {
-        String path = privilege.getPath();
-        if ( path == null )
+        String applicationPermission = privilege.getPermission();
+        if ( applicationPermission == null )
         {
-            path = "*";
+            applicationPermission = "*";
         }
 
         String method = privilege.getMethod();
@@ -235,7 +235,7 @@ public class NexusRealm
             method = "*";
         }
 
-        WildcardPermission permission = new WildcardPermission( path + ":" + method );
+        WildcardPermission permission = new WildcardPermission( applicationPermission + ":" + method );
         return permission;
     }
 

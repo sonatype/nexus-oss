@@ -42,6 +42,7 @@ import org.restlet.resource.Representation;
 import org.restlet.resource.StringRepresentation;
 import org.restlet.resource.Variant;
 import org.sonatype.nexus.Nexus;
+import org.sonatype.nexus.configuration.security.NexusSecurityConfiguration;
 import org.sonatype.nexus.index.ArtifactInfo;
 import org.sonatype.nexus.rest.model.NexusArtifact;
 import org.sonatype.nexus.rest.model.NexusError;
@@ -78,6 +79,11 @@ public abstract class AbstractNexusResourceHandler
     protected Nexus getNexus()
     {
         return (Nexus) getRequest().getAttributes().get( Nexus.ROLE );
+    }
+    
+    protected NexusSecurityConfiguration getNexusSecurityConfiguration()
+    {
+        return ( NexusSecurityConfiguration ) getRequest().getAttributes().get( NexusSecurityConfiguration.ROLE );
     }
 
     protected Object lookup( String role )

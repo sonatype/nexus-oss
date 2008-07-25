@@ -53,10 +53,10 @@ public class ApplicationPrivilegeTest extends AbstractRealmTest
         assertNotImplied( new WildcardPermission( "nexus:repository:UPDATE" ), assignedPermission );
     }
 
-    private Permission createAssignedApplicationPermission( String path, String method )
+    private Permission createAssignedApplicationPermission( String applicationPermission, String method )
     {
         CApplicationPrivilege applicationPrivilege = new CApplicationPrivilege();
-        applicationPrivilege.setPath( path );
+        applicationPrivilege.setPermission( applicationPermission );
         applicationPrivilege.setMethod( method );
 
         Permission permission = realm.createPermission( applicationPrivilege );

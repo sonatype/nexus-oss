@@ -20,16 +20,28 @@
  */
 package org.sonatype.nexus.rest.privileges;
 
+import java.io.IOException;
+import java.util.Collection;
+import java.util.List;
+import java.util.logging.Level;
+
+import org.codehaus.plexus.util.StringUtils;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
+import org.restlet.data.Status;
 import org.restlet.resource.Representation;
 import org.restlet.resource.Variant;
-import org.sonatype.nexus.rest.model.PrivilegeApplicationStatusResource;
+import org.sonatype.nexus.configuration.ConfigurationException;
+import org.sonatype.nexus.configuration.security.model.CApplicationPrivilege;
+import org.sonatype.nexus.configuration.security.model.CRepoTargetPrivilege;
+import org.sonatype.nexus.proxy.NoSuchRepositoryException;
+import org.sonatype.nexus.proxy.NoSuchRepositoryGroupException;
 import org.sonatype.nexus.rest.model.PrivilegeBaseResource;
 import org.sonatype.nexus.rest.model.PrivilegeBaseStatusResource;
 import org.sonatype.nexus.rest.model.PrivilegeListResourceResponse;
 import org.sonatype.nexus.rest.model.PrivilegeResourceRequest;
+import org.sonatype.nexus.rest.model.PrivilegeTargetResource;
 
 public class PrivilegeListResourceHandler
 extends AbstractPrivilegeResourceHandler
@@ -61,48 +73,30 @@ extends AbstractPrivilegeResourceHandler
     public Representation getRepresentationHandler( Variant variant )
     {
         PrivilegeListResourceResponse response = new PrivilegeListResourceResponse();
-
-        //TODO: Retrieve items from Nexus, currently just hardcoded junk
-        //TODO: will also be able to call the nexusToRestModel method in parent class
-        PrivilegeBaseStatusResource resource = new PrivilegeApplicationStatusResource();
-        resource.setId( "globalSettings-read" );
-        resource.setName( "Global Settings - Read" );
-        resource.setResourceUri( calculateSubReference( resource.getId() ).toString() );
-        resource.setMethod( "read" );
-        resource.setType( AbstractPrivilegeResourceHandler.TYPE_APPLICATION );
-        ( ( PrivilegeApplicationStatusResource ) resource ).setPath( "/service/local/global_settings" );
         
-        response.addData( resource );
+        Collection<CApplicationPrivilege> appPrivs = getNexusSecurityConfiguration().listApplicationPrivileges();
         
-        resource = new PrivilegeApplicationStatusResource();
-        resource.setId( "globalSettings-write" );
-        resource.setName( "Global Settings - Write" );
-        resource.setResourceUri( calculateSubReference( resource.getId() ).toString() );
-        resource.setMethod( "write" );
-        resource.setType( AbstractPrivilegeResourceHandler.TYPE_APPLICATION );
-        ( ( PrivilegeApplicationStatusResource ) resource ).setPath( "/service/local/global_settings" );
+        for ( CApplicationPrivilege priv : appPrivs )
+        {
+            PrivilegeBaseStatusResource res = nexusToRestModel( priv );
+            
+            if ( res != null )
+            {
+                response.addData( res );
+            }
+        }
         
-        response.addData( resource );
+        Collection<CRepoTargetPrivilege> tarPrivs = getNexusSecurityConfiguration().listRepoTargetPrivileges();
         
-        resource = new PrivilegeApplicationStatusResource();
-        resource.setId( "globalSettings-update" );
-        resource.setName( "Global Settings - Update" );
-        resource.setResourceUri( calculateSubReference( resource.getId() ).toString() );
-        resource.setMethod( "update" );
-        resource.setType( AbstractPrivilegeResourceHandler.TYPE_APPLICATION );
-        ( ( PrivilegeApplicationStatusResource ) resource ).setPath( "/service/local/global_settings" );
-        
-        response.addData( resource );
-        
-        resource = new PrivilegeApplicationStatusResource();
-        resource.setId( "globalSettings-delete" );
-        resource.setName( "Global Settings - Delete" );
-        resource.setResourceUri( calculateSubReference( resource.getId() ).toString() );
-        resource.setMethod( "delete" );
-        resource.setType( AbstractPrivilegeResourceHandler.TYPE_APPLICATION );
-        ( ( PrivilegeApplicationStatusResource ) resource ).setPath( "/service/local/global_settings" );
-        
-        response.addData( resource );
+        for ( CRepoTargetPrivilege priv : tarPrivs )
+        {
+            PrivilegeBaseStatusResource res = nexusToRestModel( priv );
+            
+            if ( res != null )
+            {
+                response.addData( res );
+            }
+        }
                 
         return serialize( variant, response );
     }
@@ -127,9 +121,69 @@ extends AbstractPrivilegeResourceHandler
         {
             PrivilegeBaseResource resource = request.getData();
             
-            if ( validateFields( resource, representation ) )
+            List<String> methods = resource.getMethod();
+            
+            try
             {
-                //TODO: actually store the data here
+                // Add a new privilege for each method
+                for ( String method : methods )
+                {
+                    // Currently can only add new target types, application types are hardcoded
+                    if ( PrivilegeTargetResource.class.isAssignableFrom( resource.getClass() ) )
+                    {
+                        PrivilegeTargetResource res = ( PrivilegeTargetResource ) resource;
+                        
+                        CRepoTargetPrivilege priv = new CRepoTargetPrivilege();
+                        priv.setMethod( method );
+                        priv.setName( res.getName() + " - (" + method + ")");
+                        priv.setRepositoryTargetId( res.getRepositoryTargetId() );
+                        priv.setRepositoryId( res.getRepositoryId() );
+                        priv.setGroupId( res.getRepositoryGroupId() );
+                        
+                        if ( getNexus().readRepositoryTarget( res.getRepositoryTargetId() ) == null )
+                        {
+                            getResponse().setEntity( serialize( representation, getNexusErrorResponse( "repositoryTargetId", "Selected Repository Target does not exist." ) ) );
+                            
+                            return;
+                        }
+                        
+                        // Validate repo exists
+                        if ( !StringUtils.isEmpty( res.getRepositoryId() ) )
+                        {
+                            getNexus().readRepository( res.getRepositoryId() );
+                        }
+                        
+                        // Validate group exists
+                        if ( !StringUtils.isEmpty( res.getRepositoryGroupId() ) )
+                        {
+                            getNexus().readRepositoryGroup( res.getRepositoryGroupId() );
+                        }
+                        
+                        getNexusSecurityConfiguration().createRepoTargetPrivilege( priv );
+                    }
+                }
+            }
+            catch ( ConfigurationException e )
+            {
+                getLogger().log( Level.WARNING, "Configuration error!", e );
+
+                getResponse().setStatus( Status.CLIENT_ERROR_BAD_REQUEST, "Configuration error." );
+                
+                getResponse().setEntity( serialize( representation, getNexusErrorResponse( "*", e.getMessage() ) ) );
+            }
+            catch ( IOException e )
+            {
+                getResponse().setStatus( Status.SERVER_ERROR_INTERNAL );
+
+                getLogger().log( Level.SEVERE, "Got IO Exception!", e );
+            }
+            catch ( NoSuchRepositoryException e )
+            {
+                getResponse().setEntity( serialize( representation, getNexusErrorResponse( "repositoryId", e.getMessage() ) ) );
+            }
+            catch ( NoSuchRepositoryGroupException e )
+            {
+                getResponse().setEntity( serialize( representation, getNexusErrorResponse( "repositoryGroupId", e.getMessage() ) ) );
             }
         }
     }

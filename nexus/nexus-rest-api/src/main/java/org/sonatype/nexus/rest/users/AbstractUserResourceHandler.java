@@ -20,7 +20,7 @@
  */
 package org.sonatype.nexus.rest.users;
 
-import java.util.Iterator;
+import java.util.List;
 import java.util.logging.Level;
 
 import org.restlet.Context;
@@ -28,10 +28,9 @@ import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.restlet.resource.Representation;
+import org.sonatype.nexus.configuration.security.model.CUser;
 import org.sonatype.nexus.rest.AbstractNexusResourceHandler;
 import org.sonatype.nexus.rest.model.UserResource;
-import org.sonatype.nexus.rest.model.UserRoleResource;
-import org.sonatype.nexus.rest.model.UserStatusResource;
 
 public class AbstractUserResourceHandler
 extends AbstractNexusResourceHandler
@@ -74,47 +73,41 @@ extends AbstractNexusResourceHandler
         return true;
     }
     
-    public UserStatusResource nexusToRestModel()
+    public UserResource nexusToRestModel( CUser user )
     {
-        //TODO: ultimately this method will take a parameter which is the nexus object
-        //and will convert to the rest object
-        UserStatusResource resource = new UserStatusResource();
-        resource.setEmail( "someemail@someemail.com" );
-        resource.setName( "Real Name" );
-        resource.setStatus( "active" );
-        resource.setUserId( "realuser" );
+        UserResource resource = new UserResource();
+        resource.setEmail( user.getEmail() );
+        resource.setName( user.getName() );
+        resource.setStatus( user.getStatus() );
+        resource.setUserId( user.getUserId() );
         resource.setResourceURI( calculateSubReference( resource.getUserId() ).toString() );
-
-        UserRoleResource roleResource = new UserRoleResource();
-        roleResource.setRoleId( "roleid" );
-        roleResource.setRoleName( "rolename" );
         
-        resource.addRole( roleResource );
+        for ( String roleId : ( List<String> ) user.getRoles() )
+        {
+            resource.addRole( roleId );
+        }
         
         return resource;
     }
     
-    public UserStatusResource requestToResponseModel( UserResource resource )
+    public CUser restToNexusModel( CUser user, UserResource resource )
     {
-        UserStatusResource statusResource = new UserStatusResource();
-        
-        statusResource.setEmail( resource.getEmail() );
-        statusResource.setName( resource.getName() );
-        statusResource.setResourceURI( calculateSubReference( resource.getUserId() ).toString() );
-        statusResource.setStatus( resource.getStatus() );
-        statusResource.setUserId( resource.getUserId() );
-        
-        for ( Iterator iter = resource.getRoles().iterator(); iter.hasNext(); )
+        if ( user == null )
         {
-            UserRoleResource role = ( UserRoleResource ) iter.next();
-            UserRoleResource statusRole = new UserRoleResource();
-            statusRole.setRoleId( role.getRoleId() );
-            //TODO: This name field will have to be loaded from the object
-            //as it's not required to be sent in from ui
-            statusRole.setRoleName( "temprolename" );
-            statusResource.addRole( statusRole );
+            user = new CUser();
         }
         
-        return statusResource;
+        user.setEmail( resource.getEmail() );
+        user.setName( resource.getName() );
+        user.setStatus( resource.getStatus() );
+        user.setUserId( resource.getUserId() );
+        
+        user.getRoles().clear();        
+        for ( String roleId : ( List<String> ) resource.getRoles() )
+        {
+            user.addRole( roleId );
+        }
+        
+        return user;
     }
 }

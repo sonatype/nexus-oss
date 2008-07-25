@@ -309,8 +309,7 @@ public class DefaultNexusSecurityConfiguration
 
     public void deleteUser( String id )
         throws NoSuchUserException,
-            IOException,
-            ConfigurationException
+            IOException
     {
         List<CUser> users = getConfiguration().getUsers();
 
@@ -411,8 +410,7 @@ public class DefaultNexusSecurityConfiguration
 
     public void deleteRole( String id )
         throws NoSuchRoleException,
-            IOException,
-            ConfigurationException
+            IOException
     {
         List<CRole> roles = getConfiguration().getRoles();
 
@@ -513,8 +511,7 @@ public class DefaultNexusSecurityConfiguration
 
     public void deleteApplicationPrivilege( String id )
         throws NoSuchPrivilegeException,
-            IOException,
-            ConfigurationException
+            IOException
     {
         List<CApplicationPrivilege> privs = getConfiguration().getApplicationPrivileges();
 
@@ -615,8 +612,7 @@ public class DefaultNexusSecurityConfiguration
 
     public void deleteRepoTargetPrivilege( String id )
         throws NoSuchPrivilegeException,
-            IOException,
-            ConfigurationException
+            IOException
     {
         List<CRepoTargetPrivilege> privs = getConfiguration().getRepositoryTargetPrivileges();
 

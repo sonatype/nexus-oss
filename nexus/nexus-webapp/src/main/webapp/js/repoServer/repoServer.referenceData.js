@@ -246,7 +246,6 @@ Sonatype.repoServer.referenceData = {
     name : "",
     email : "",
     status : "",
-    password : "",
     roles : []
   },
   
@@ -264,6 +263,8 @@ Sonatype.repoServer.referenceData = {
       name: "",
       type: "",
       repositoryTargetId: "",
+      repositoryId: "",
+      repositoryGroupId: "",
       method: []
     }
   },

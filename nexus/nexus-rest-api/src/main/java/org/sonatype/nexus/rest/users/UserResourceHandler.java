@@ -20,14 +20,21 @@
  */
 package org.sonatype.nexus.rest.users;
 
+import java.io.IOException;
+import java.util.logging.Level;
+
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
+import org.restlet.data.Status;
 import org.restlet.resource.Representation;
 import org.restlet.resource.Variant;
+import org.sonatype.nexus.configuration.ConfigurationException;
+import org.sonatype.nexus.configuration.security.NoSuchUserException;
+import org.sonatype.nexus.configuration.security.model.CUser;
 import org.sonatype.nexus.rest.model.UserResource;
 import org.sonatype.nexus.rest.model.UserResourceRequest;
-import org.sonatype.nexus.rest.model.UserResourceStatusResponse;
+import org.sonatype.nexus.rest.model.UserResourceResponse;
 
 public class UserResourceHandler
     extends AbstractUserResourceHandler
@@ -66,11 +73,20 @@ public class UserResourceHandler
      */
     public Representation getRepresentationHandler( Variant variant )
     {
-        UserResourceStatusResponse response = new UserResourceStatusResponse();
+        UserResourceResponse response = new UserResourceResponse();
         
-        response.setData( nexusToRestModel() );
-        
-        return serialize( variant, response );
+        try
+        {
+            response.setData( nexusToRestModel( getNexusSecurityConfiguration().readUser( getUserId() ) ) );
+            
+            return serialize( variant, response );
+        }
+        catch ( NoSuchUserException e )
+        {
+            getResponse().setStatus( Status.CLIENT_ERROR_NOT_FOUND, e.getMessage() );
+
+            return null;
+        }
     }
 
     /**
@@ -86,7 +102,7 @@ public class UserResourceHandler
      */
     public void put( Representation representation )
     {
-        UserResourceRequest request = (UserResourceRequest) deserialize( new UserResourceRequest() );
+        UserResourceRequest request = ( UserResourceRequest ) deserialize( new UserResourceRequest() );
 
         if ( request == null )
         {
@@ -96,15 +112,35 @@ public class UserResourceHandler
         {
             UserResource resource = request.getData();
             
-            if ( validateFields( resource, representation ) )
+            try
             {
-                //TODO: actually store the data here
+                CUser user = restToNexusModel( getNexusSecurityConfiguration().readUser( resource.getUserId() ), resource );
                 
-                UserResourceStatusResponse response = new UserResourceStatusResponse();
+                getNexusSecurityConfiguration().updateUser( user );
                 
-                response.setData( requestToResponseModel( request.getData() ) );
+                UserResourceResponse response = new UserResourceResponse();
+                
+                response.setData( request.getData() );
                 
                 getResponse().setEntity( serialize( representation, response ) );
+            }
+            catch ( NoSuchUserException e )
+            {
+                getResponse().setStatus( Status.CLIENT_ERROR_NOT_FOUND, e.getMessage() );
+            }
+            catch ( ConfigurationException e )
+            {
+                getLogger().log( Level.WARNING, "Configuration error!", e );
+
+                getResponse().setStatus( Status.CLIENT_ERROR_BAD_REQUEST, "Configuration error." );
+                
+                getResponse().setEntity( serialize( representation, getNexusErrorResponse( "*", e.getMessage() ) ) );
+            }
+            catch ( IOException e )
+            {
+                getResponse().setStatus( Status.SERVER_ERROR_INTERNAL );
+
+                getLogger().log( Level.SEVERE, "Got IO Exception!", e );
             }
         }
     }
@@ -122,7 +158,19 @@ public class UserResourceHandler
      */
     public void delete()
     {
-        //TODO: Delete the user
-    }
+        try
+        {            
+            getNexusSecurityConfiguration().deleteUser( getUserId() );
+        }
+        catch ( NoSuchUserException e )
+        {
+            getResponse().setStatus( Status.CLIENT_ERROR_NOT_FOUND, e.getMessage() );
+        }
+        catch ( IOException e )
+        {
+            getResponse().setStatus( Status.SERVER_ERROR_INTERNAL );
 
+            getLogger().log( Level.SEVERE, "Got IO Exception!", e );
+        }
+    }
 }

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!-- This config will cause 6 validation errors -->
+<!-- This config will cause 5 validation errors -->
+<!-- This config will cause 1 validation warning -->
 
 <nexusSecurity>
 	<version>1.0.0</version>	
@@ -14,7 +15,6 @@
 	<users>		
 	    <!-- no id -->
 	    <!-- no email address -->
-	    <!-- no status -->
 	    <!-- invalid role id -->
 	    <!-- no password -->
 	    <user>     
@@ -22,6 +22,13 @@
 	        <role>id1</role>
 	      </roles>
         </user>	
+        <!-- invalid status -->
+        <user>      
+            <userId>ausernostatus</userId>
+            <password>fjsf8j4r3</password>
+            <name>Alex User</name>
+            <email>auser@auser.com</email>
+        </user>
 		<user>		
 			<userId>auser</userId>
 			<password>fjsf8j4r3</password>
