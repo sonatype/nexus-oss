@@ -662,6 +662,8 @@ Ext.extend(Sonatype.repoServer.UserEditPanel, Ext.Panel, {
         //remove button click listeners
         action.options.fpanel.buttons[0].purgeListeners();
         action.options.fpanel.buttons[1].purgeListeners();
+        
+        action.options.fpanel.find('name', 'status')[0].setValue(receivedData.status);
 
         var buttonInfoObj = {
             formPanel : action.options.fpanel,

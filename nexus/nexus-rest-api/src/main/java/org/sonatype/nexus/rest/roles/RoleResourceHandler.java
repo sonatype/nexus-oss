@@ -116,13 +116,25 @@ public class RoleResourceHandler
             {
                 CRole role = restToNexusModel( getNexusSecurityConfiguration().readRole( resource.getId() ), resource );
                 
-                getNexusSecurityConfiguration().updateRole( role );
-                
-                RoleResourceResponse response = new RoleResourceResponse();
-                
-                response.setData( request.getData() );
-                
-                getResponse().setEntity( serialize( representation, response ) );
+                // On nexus startup the configuration module handles this check
+                // But because the context wont be built properly on a single add
+                // we need to also do this check here
+                if ( isRoleRecursive( role, role ) )
+                {
+                    getResponse().setEntity( serialize( representation,
+                                                        getNexusErrorResponse( "roles",
+                                                                               "This role is recursively containing itself." ) ) );
+                }
+                else
+                {                
+                    getNexusSecurityConfiguration().updateRole( role );
+                    
+                    RoleResourceResponse response = new RoleResourceResponse();
+                    
+                    response.setData( request.getData() );
+                    
+                    getResponse().setEntity( serialize( representation, response ) );
+                }
             }
             catch ( NoSuchRoleException e )
             {

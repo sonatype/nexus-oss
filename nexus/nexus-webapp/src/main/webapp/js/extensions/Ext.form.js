@@ -38,14 +38,14 @@ Ext.override(Ext.form.Field, {
     }
     
     if(this.helpText){
-     	var helpMark = wrapDiv.createChild({
-     	  tag: 'img',
-     	  src: Sonatype.config.resourcePath + '/images/icons/help.png',
-     	  width: 16,
-     	  height: 16,
-     	  cls: helpClass
-     	});
-     	
+        var helpMark = wrapDiv.createChild({
+          tag: 'img',
+          src: Sonatype.config.resourcePath + '/images/icons/help.png',
+          width: 16,
+          height: 16,
+          cls: helpClass
+        });
+        
       Ext.QuickTips.register({
           target:  helpMark,
           title: '',
@@ -141,9 +141,24 @@ Ext.extend(Ext.form.Action.sonatypeSubmit, Ext.form.Action, {
         this.form.afterAction(this, true);
         return;
       }
-      if(result.errors){
-          this.form.markInvalid(result.errors);
-          this.failureType = Ext.form.Action.SERVER_INVALID;
+      
+      if(result.errors != null){
+        if (this.options.validationModifiers){
+          var remainingErrors = [];
+          for (var i = 0; i < result.errors.length; i++){
+            if (this.options.validationModifiers[result.errors[i].id]){
+              (this.options.validationModifiers[result.errors[i].id])(result.errors[i], this.options.fpanel);
+            }            
+            else{
+              remainingErrors[remainingErrors.length] = result.errors[i];
+            }
+          }
+          
+          result.errors = remainingErrors;
+        }
+          
+        this.form.markInvalid(result.errors);
+        this.failureType = Ext.form.Action.SERVER_INVALID;
       }
       this.form.afterAction(this, false);
     },

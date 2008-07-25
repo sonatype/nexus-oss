@@ -55,6 +55,11 @@ Sonatype.repoServer.RoleEditPanel = function(config){
     "privileges" : this.savePrivilegesTreeHelper.createDelegate(this)
   };
   
+  this.validationFieldModFunc = {
+    "roles" : this.treeValidationError.createDelegate(this),
+    "privileges" : this.treeValidationError.createDelegate(this)
+  };
+  
   this.roleRecordConstructor = Ext.data.Record.create([
     {name:'resourceURI'},
     {name:'id'},
@@ -208,6 +213,14 @@ Sonatype.repoServer.RoleEditPanel = function(config){
                 fn: function(tree, parentNode, removedNode) {
                   if(tree.root.childNodes.length < 1) {
                     this.markTreeInvalid(tree);
+                  }
+                  else if (tree.invalid) {
+                    //remove error messaging
+                    tree.getEl().child('.x-panel-body').setStyle({
+                      'background-color' : '#FFFFFF',
+                      border : '1px solid #B5B8C8'
+                    });
+                    Ext.form.Field.msgFx['normal'].hide(tree.errorEl, tree);
                   }
                 },
                 scope: this
@@ -394,6 +407,7 @@ Ext.extend(Sonatype.repoServer.RoleEditPanel, Ext.Panel, {
         waitMsg: isNew ? 'Creating Role...' : 'Updating Role...',
         fpanel: formInfoObj.formPanel,
         dataModifiers: this.submitDataModFunc,
+        validationModifiers: this.validationFieldModFunc,
         serviceDataObj : Sonatype.repoServer.referenceData.roles,
         isNew : isNew //extra option to send to callback, instead of conditioning on method
       });
@@ -582,7 +596,8 @@ Ext.extend(Sonatype.repoServer.RoleEditPanel, Ext.Panel, {
           resourceURI : receivedData.resourceURI,
           description : receivedData.description,
           privileges : receivedData.privileges,
-          roles : receivedData.roles
+          roles : receivedData.roles,
+          sessionTimeout : receivedData.sessionTimeout
         };
         
         var newRec = new this.roleRecordConstructor(
@@ -795,7 +810,7 @@ Ext.extend(Sonatype.repoServer.RoleEditPanel, Ext.Panel, {
     var role;
 
     for(var i=0; i<arr.length; i++){
-      role = this.roleDataStore.getAt(this.roleDataStore.find("id",arr[i]));
+      role = this.rolesDataStore.getAt(this.rolesDataStore.find("id",arr[i]));
       selectedTree.root.appendChild(
         new Ext.tree.TreeNode({
           id: role.data.id,
@@ -812,7 +827,7 @@ Ext.extend(Sonatype.repoServer.RoleEditPanel, Ext.Panel, {
     
     this.rolesDataStore.each(function(item, i, len){
       var nodeSelected = selectedTree.getNodeById(item.data.id);
-      if(nodeSelected == 'undefined'){
+      if(nodeSelected){
         allTree.root.removeChild(allTree.getNodeById(item.data.id));
       }
     }, this);
@@ -861,7 +876,7 @@ Ext.extend(Sonatype.repoServer.RoleEditPanel, Ext.Panel, {
     
     this.privDataStore.each(function(item, i, len){
       var nodeSelected = selectedTree.getNodeById(item.data.id);
-      if(nodeSelected == 'undefined'){
+      if(nodeSelected){
         allTree.root.removeChild(allTree.getNodeById(item.data.id));
       }
     }, this);
@@ -897,5 +912,11 @@ Ext.extend(Sonatype.repoServer.RoleEditPanel, Ext.Panel, {
     }
 
     return outputArr;
+  },
+  
+  treeValidationError : function(error, fpanel){
+    var tree = fpanel.find('id', 'roles_privs_tree')[0];
+    this.markTreeInvalid(tree);
+    tree.errorEl.update(error.msg);
   }
 });

@@ -25,6 +25,7 @@ import java.util.List;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
+import org.sonatype.nexus.configuration.security.NoSuchRoleException;
 import org.sonatype.nexus.configuration.security.model.CRole;
 import org.sonatype.nexus.rest.AbstractNexusResourceHandler;
 import org.sonatype.nexus.rest.model.RoleResource;
@@ -95,5 +96,37 @@ extends AbstractNexusResourceHandler
         }
         
         return role;
+    }
+    
+    protected boolean isRoleRecursive( CRole baseRole, CRole role )
+    {
+        boolean result = false;
+        
+        for ( String id : ( List<String> ) role.getRoles() )
+        {
+            if ( baseRole.getId().equals( id ) )
+            {
+                result = true;
+                break;
+            }
+            else
+            {
+                try
+                {
+                    result = isRoleRecursive( baseRole, getNexusSecurityConfiguration().readRole( id ) );
+                }
+                catch ( NoSuchRoleException e )
+                {
+                    // Can't get to this state, has already been validated that the role exists
+                }
+                
+                if ( result )
+                {
+                    break;
+                }
+            }
+        }
+        
+        return result;
     }
 }

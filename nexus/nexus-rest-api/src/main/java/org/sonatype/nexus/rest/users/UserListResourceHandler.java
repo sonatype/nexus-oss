@@ -108,6 +108,9 @@ extends AbstractUserResourceHandler
                 
                 UserResourceResponse response = new UserResourceResponse();
                 
+                // Update the status, as that may have changed
+                resource.setStatus( user.getStatus() );
+                
                 response.setData( resource );
                 
                 getResponse().setEntity( serialize( representation, response ) );
