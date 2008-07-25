@@ -92,7 +92,7 @@ public class AbstractArtifactResourceHandler
         result
             .getRequestContext().put( AccessManager.REQUEST_REMOTE_ADDRESS, getRequest().getClientInfo().getAddress() );
 
-        if ( getRequest().getChallengeResponse().getIdentifier() != null )
+        if ( getRequest().getChallengeResponse() != null && getRequest().getChallengeResponse().getIdentifier() != null )
         {
             result.getRequestContext().put(
                 AccessManager.REQUEST_USER,
