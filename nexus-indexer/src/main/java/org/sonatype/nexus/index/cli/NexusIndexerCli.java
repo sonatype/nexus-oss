@@ -136,7 +136,7 @@ public class NexusIndexerCli
             else if ( !cli.hasOption( UPDATE ) )
             {
                 System.err.printf(
-                    "Index folder '%s' already exists. Use 'owerwrite' or 'update' option\n",
+                    "Index folder '%s' already exists. Use 'overwrite' or 'update' option\n",
                     indexDirectoryName );
 
                 return;
