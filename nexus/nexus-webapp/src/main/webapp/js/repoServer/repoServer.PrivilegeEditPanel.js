@@ -350,6 +350,7 @@ Sonatype.repoServer.PrivilegeEditPanel = function(config){
       emptyText: 'Click "Add" to create a new Privilege.'
     }
   });
+  this.privilegesGridPanel.on('rowclick', this.rowClick, this);
   this.privilegesGridPanel.on('rowcontextmenu', this.contextClick, this);
 
   Sonatype.repoServer.PrivilegeEditPanel.superclass.constructor.call(this, {
@@ -396,6 +397,7 @@ Ext.extend(Sonatype.repoServer.PrivilegeEditPanel, Ext.Panel, {
     }, this.formCards);
     
     this.formCards.getLayout().setActiveItem(0);
+    this.rowClick(this.privilegesGridPanel, 0, null);
   },
   
   saveHandler : function(formInfoObj){
@@ -586,6 +588,7 @@ Ext.extend(Sonatype.repoServer.PrivilegeEditPanel, Ext.Panel, {
       var i = store.indexOfId(formLayout.activeItem.id);
       if (i >= 0){
         gridSelectModel.selectRow(i);
+        this.rowClick(this.privilegesGridPanel, i, null);
       }
       else{
         gridSelectModel.clearSelections();
@@ -637,6 +640,22 @@ Ext.extend(Sonatype.repoServer.PrivilegeEditPanel, Ext.Panel, {
     var sp = Sonatype.lib.Permissions;
     if(sp.checkPermission(Sonatype.user.curr.repoServer.configPrivileges, sp.EDIT)){
       component.buttons[0].disabled = false;
+    }
+  },
+  
+  rowClick : function(grid, rowIndex, e){
+    var rec = grid.store.getAt(rowIndex);
+    
+    if (rec){
+      if ( rec.data.type != "application" ){
+        grid.getTopToolbar().items.get('privilege-delete-btn').enable();
+      }
+      else {
+        grid.getTopToolbar().items.get('privilege-delete-btn').disable();
+      }
+    }
+    else {
+      grid.getTopToolbar().items.get('privilege-delete-btn').enable();
     }
   },
   
