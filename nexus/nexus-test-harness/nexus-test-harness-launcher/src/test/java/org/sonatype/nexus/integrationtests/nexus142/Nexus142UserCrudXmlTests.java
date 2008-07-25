@@ -5,6 +5,7 @@ import java.io.IOException;
 import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.sonatype.nexus.rest.xstream.XStreamInitializer;
+import org.sonatype.plexus.rest.xstream.json.JsonOrgHierarchicalStreamDriver;
 
 import com.thoughtworks.xstream.XStream;
 
@@ -14,8 +15,7 @@ public class Nexus142UserCrudXmlTests
 
     public Nexus142UserCrudXmlTests()
     {
-        xstream = XStreamInitializer.initialize( new XStream( ) );
-        this.mediaType = MediaType.APPLICATION_XML;
+        this.messageUtil = new UserMessageUtil(XStreamInitializer.initialize( new XStream( ) ), MediaType.APPLICATION_XML, this.getBaseNexusUrl());
     }
     
     
