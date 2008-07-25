@@ -116,11 +116,7 @@ extends AbstractRoleResourceHandler
             }
             catch ( ConfigurationException e )
             {
-                getLogger().log( Level.WARNING, "Configuration error!", e );
-
-                getResponse().setStatus( Status.CLIENT_ERROR_BAD_REQUEST, "Configuration error." );
-                
-                getResponse().setEntity( serialize( representation, getNexusErrorResponse( "*", e.getMessage() ) ) );
+                handleConfigurationException( e, representation );
             }
             catch ( IOException e )
             {

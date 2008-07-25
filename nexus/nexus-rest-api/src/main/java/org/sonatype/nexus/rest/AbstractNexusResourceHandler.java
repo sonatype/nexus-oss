@@ -42,7 +42,11 @@ import org.restlet.resource.Representation;
 import org.restlet.resource.StringRepresentation;
 import org.restlet.resource.Variant;
 import org.sonatype.nexus.Nexus;
+import org.sonatype.nexus.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.security.NexusSecurityConfiguration;
+import org.sonatype.nexus.configuration.validator.InvalidConfigurationException;
+import org.sonatype.nexus.configuration.validator.ValidationMessage;
+import org.sonatype.nexus.configuration.validator.ValidationResponse;
 import org.sonatype.nexus.index.ArtifactInfo;
 import org.sonatype.nexus.rest.model.NexusArtifact;
 import org.sonatype.nexus.rest.model.NexusError;
@@ -499,6 +503,25 @@ public abstract class AbstractNexusResourceHandler
         sb.insert( 0, baseUrl );
 
         return new Reference( sb.toString() );
+    }
+    
+    protected void handleConfigurationException( ConfigurationException e, Representation representation )
+    {
+        getLogger().log( Level.WARNING, "Configuration error!", e );
+        
+        getResponse().setStatus( Status.CLIENT_ERROR_BAD_REQUEST, "Configuration error." );
+        
+        if ( InvalidConfigurationException.class.isAssignableFrom( e.getClass() ) )
+        {
+            ValidationResponse vr = ( ( InvalidConfigurationException ) e ).getValidationResponse();
+            ValidationMessage vm = vr.getValidationErrors().get( 0 );
+            getResponse().setEntity(
+                serialize( representation, getNexusErrorResponse( vm.getKey(), vm.getShortMessage() ) ) );
+        }
+        else
+        {
+            getResponse().setEntity( serialize( representation, getNexusErrorResponse( "*", e.getMessage() ) ) );
+        }
     }
 
 }

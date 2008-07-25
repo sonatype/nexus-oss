@@ -39,6 +39,11 @@ public class ValidationMessage
      * Message body.
      */
     private String message;
+    
+    /**
+     * The short message, used to send back to UI for validation display
+     */
+    private String shortMessage;
 
     /**
      * The cause of validation problem, if any.
@@ -53,7 +58,19 @@ public class ValidationMessage
      */
     public ValidationMessage( String key, String message )
     {
-        this( key, message, null );
+        this( key, message, ( Throwable ) null );
+    }
+    
+    /**
+     * Creates a validation message without a cause.
+     * 
+     * @param key
+     * @param message
+     * @param shortMessage
+     */
+    public ValidationMessage( String key, String message, String shortMessage )
+    {
+        this ( key, message, shortMessage, null );
     }
 
     /**
@@ -65,9 +82,24 @@ public class ValidationMessage
      */
     public ValidationMessage( String key, String message, Throwable cause )
     {
+        this( key, message, message, cause );
+    }
+    
+    /**
+     * Creates a validation message with cause.
+     * 
+     * @param key
+     * @param message
+     * @param shortMessage
+     * @param cause
+     */
+    public ValidationMessage( String key, String message, String shortMessage, Throwable cause )
+    {
         this.key = key;
 
         this.message = message;
+        
+        this.shortMessage = shortMessage;
 
         this.cause = cause;
     }
@@ -90,6 +122,16 @@ public class ValidationMessage
     public void setMessage( String message )
     {
         this.message = message;
+    }
+    
+    public String getShortMessage()
+    {
+        return shortMessage;
+    }
+    
+    public void setShortMessage( String shortMessage )
+    {
+        this.shortMessage = shortMessage;
     }
 
     public Throwable getCause()

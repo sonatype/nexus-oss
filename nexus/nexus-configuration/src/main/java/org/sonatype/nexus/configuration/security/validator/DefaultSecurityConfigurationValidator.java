@@ -168,9 +168,10 @@ public class DefaultSecurityConfigurationValidator
             || ( existingIds.contains( privilege.getId() ) ) )
         {
             String newId = Long.toHexString( System.currentTimeMillis() + rnd.nextInt( 2008 ) );
-
-            response.addValidationWarning( "Fixed wrong privilege ID from '" + 
-                                           privilege.getId() + "' to '" + newId + "'" );
+            
+            ValidationMessage message = new ValidationMessage( "id", "Fixed wrong privilege ID from '" + 
+                                                               privilege.getId() + "' to '" + newId + "'" );
+            response.addValidationWarning( message );
             
             privilege.setId( newId );
 
@@ -182,16 +183,19 @@ public class DefaultSecurityConfigurationValidator
             && !CPrivilege.METHOD_READ.equals( privilege.getMethod() )
             && !CPrivilege.METHOD_UPDATE.equals( privilege.getMethod() ) )
         {
-            response.addValidationError( "Privilege ID '" + privilege.getId() + "' Method is wrong! (Allowed values are: " 
-                                         + CPrivilege.METHOD_CREATE + ", "
-                                         + CPrivilege.METHOD_DELETE + ", " 
-                                         + CPrivilege.METHOD_READ + " and " 
-                                         + CPrivilege.METHOD_UPDATE + ")" );
+            ValidationMessage message = new ValidationMessage( "method", "Privilege ID '" + privilege.getId() + "' Method is wrong! (Allowed values are: " 
+                                                               + CPrivilege.METHOD_CREATE + ", "
+                                                               + CPrivilege.METHOD_DELETE + ", " 
+                                                               + CPrivilege.METHOD_READ + " and " 
+                                                               + CPrivilege.METHOD_UPDATE + ")", 
+                                                               "Invalid method selected." );            
+            response.addValidationError( message );
         }
         
         if ( StringUtils.isEmpty( privilege.getName() ) )
         {
-            response.addValidationError( "Privilege ID '" + privilege.getId() + "' requires a name." );
+            ValidationMessage message = new ValidationMessage( "name", "Privilege ID '" + privilege.getId() + "' requires a name.", "Name is required." );            
+            response.addValidationError( message );
         }
         
         existingIds.add( privilege.getId() );
@@ -214,14 +218,16 @@ public class DefaultSecurityConfigurationValidator
         
         if ( StringUtils.isEmpty( privilege.getRepositoryTargetId() ) )
         {
-            response.addValidationError( "Privilege ID '" + privilege.getId() + "' requires a repositoryTargetId." );
+            ValidationMessage message = new ValidationMessage( "repositoryTargetId", "Privilege ID '" + privilege.getId() + "' requires a repositoryTargetId.", "Repository Target is required." );
+            response.addValidationError( message );
         }
         
         if ( !StringUtils.isEmpty( privilege.getRepositoryId() )
             && !StringUtils.isEmpty( privilege.getGroupId() ) )
         {
-            response.addValidationError( "Privilege ID '" + privilege.getId() + "' cannot be assigned to both a group and repository." 
-                + "  Either assign a group, a repository or neither (which assigns to ALL repositories).");
+            ValidationMessage message = new ValidationMessage( "repositoryId", "Privilege ID '" + privilege.getId() + "' cannot be assigned to both a group and repository." 
+                                                               + "  Either assign a group, a repository or neither (which assigns to ALL repositories).", "Cannot select both a Repository and Repository Group." );
+            response.addValidationError( message );
         }
         
         return response;
@@ -242,7 +248,9 @@ public class DefaultSecurityConfigurationValidator
         
         if ( StringUtils.isEmpty( privilege.getPermission() ) )
         {
-            response.addValidationError( "Privilege ID '" + privilege.getId() + "' Application permission cannot be empty." );
+            ValidationMessage message = new ValidationMessage( "permission", "Privilege ID '" + privilege.getId() + "' Application permission cannot be empty.", "Permission is required." );
+            
+            response.addValidationError( message );
         }
         
         return response;
@@ -283,13 +291,18 @@ public class DefaultSecurityConfigurationValidator
             {
                 if ( !ctx.getExistingRoleIds().contains( roleId ) )
                 {
-                    response.addValidationError( "Role ID '" + baseRoleId + "' contains an invalid role" );
+                    ValidationMessage message = new ValidationMessage( "roles", "Role ID '" + baseRoleId + "' contains an invalid role", "Role cannot contain invalid role ID '" + roleId + "'." );
+                    
+                    response.addValidationError( message );
                 }
             }
             
             if ( containedRoleId.equals( baseRoleId ) )
             {
-                response.addValidationError( "Role ID '" + baseRoleId + "' contains itself through Role ID '" + roleId + "'.  This is not valid." );
+                ValidationMessage message = new ValidationMessage( "roles", "Role ID '" + baseRoleId + "' contains itself through Role ID '" + roleId + "'.  This is not valid.", "Role cannot contain itself recursively (via role ID '" + roleId + "')." );
+                
+                response.addValidationError( message );
+                
                 break;
             }
             
@@ -300,7 +313,9 @@ public class DefaultSecurityConfigurationValidator
             // Only need to do this on the first level
             else if ( baseRoleId.equals( roleId ) )
             {
-                response.addValidationError( "Role ID '" + roleId + "' contains an invalid role ID '" + containedRoleId + "'." );
+                ValidationMessage message = new ValidationMessage( "roles", "Role ID '" + roleId + "' contains an invalid role ID '" + containedRoleId + "'.", "Role cannot contain invalid role ID '" + containedRoleId + "'." );
+                
+                response.addValidationError( message );
             }
         }
         
@@ -345,7 +360,8 @@ public class DefaultSecurityConfigurationValidator
         
         if ( StringUtils.isEmpty( role.getName() ) )
         {
-            response.addValidationError( "Role ID '" + role.getId() + "' requires a name." );
+            ValidationMessage message = new ValidationMessage( "name", "Role ID '" + role.getId() + "' requires a name.", "Name is required." );
+            response.addValidationError( message );
         }
         
         if ( 1 > role.getSessionTimeout() )
@@ -366,7 +382,8 @@ public class DefaultSecurityConfigurationValidator
             {
                 if ( !context.getExistingPrivilegeIds().contains( privId ) )
                 {
-                    response.addValidationError( "Role ID '" + role.getId() + "' Invalid privilege id '" + privId + "' found." );
+                    ValidationMessage message = new ValidationMessage( "privileges", "Role ID '" + role.getId() + "' Invalid privilege id '" + privId + "' found.", "Role cannot contain invalid privilege ID '" + privId + "'." );
+                    response.addValidationError( message );
                 }
             }
         }
@@ -385,7 +402,8 @@ public class DefaultSecurityConfigurationValidator
         {
             if ( roleId.equals( role.getId() ) )
             {
-                response.addValidationError( "Role ID '" + role.getId() + "' Contains itself, this is not valid." );
+                ValidationMessage message = new ValidationMessage( "roles", "Role ID '" + role.getId() + "' cannot contain itself.", "Role cannot contain itself." );
+                response.addValidationError( message );
             }
             else if ( context.getRoleContainmentMap() != null )
             {                
@@ -421,7 +439,8 @@ public class DefaultSecurityConfigurationValidator
         if ( StringUtils.isEmpty( user.getUserId() )
             || existingIds.contains( user.getUserId() ) )
         {
-            response.addValidationError( "User ID '" + user.getUserId() + "' is invalid.  It is either empty or already in use." );
+            ValidationMessage message = new ValidationMessage( "userId", "User ID '" + user.getUserId() + "' is invalid.  It is either empty or already in use.", "User Id is required and must be unique." );
+            response.addValidationError( message );
         }
         
         if ( StringUtils.isEmpty( user.getPassword() ) )
@@ -435,7 +454,8 @@ public class DefaultSecurityConfigurationValidator
         
         if ( StringUtils.isEmpty( user.getEmail() ) )
         {
-            response.addValidationError( "User ID '" + user.getUserId() + "' has no email address" );
+            ValidationMessage message = new ValidationMessage( "email", "User ID '" + user.getUserId() + "' has no email address", "Email address is required." );
+            response.addValidationError( message );
         }
         
         if ( !CUser.STATUS_ACTIVE.equals( user.getStatus() ) 
@@ -443,21 +463,31 @@ public class DefaultSecurityConfigurationValidator
             && !CUser.STATUS_LOCKED.equals( user.getStatus() )
             && !CUser.STATUS_EXPIRED.equals( user.getStatus() ) )
         {
-            response.addValidationError( "User ID '" + user.getUserId() + "' has invalid status '" + user.getStatus() + 
-                                         "'.  (Allowed values are: " + CUser.STATUS_ACTIVE + ", " + CUser.STATUS_EXPIRED + ", "
-                                         + CUser.STATUS_DISABLED + " and " + CUser.STATUS_LOCKED + ")" );
+            ValidationMessage message = new ValidationMessage( "status", "User ID '" + user.getUserId() + "' has invalid status '" + user.getStatus() + 
+                                                               "'.  (Allowed values are: " + CUser.STATUS_ACTIVE + ", " + CUser.STATUS_EXPIRED + ", "
+                                                               + CUser.STATUS_DISABLED + " and " + CUser.STATUS_LOCKED + ")", "Invalid Status selected." );
+            response.addValidationError( message );
         }
         
         if ( context.getExistingRoleIds() != null )
         {
             List<String> roleIds = user.getRoles();
             
+            if ( roleIds.size() > 0 )
+            {
             for ( String roleId : roleIds )
             {
                 if ( !context.getExistingRoleIds().contains( roleId ) )
                 {
-                    response.addValidationError( "User ID '" + user.getUserId() + "' Invalid role id '" + roleId + "' found." );
+                    ValidationMessage message = new ValidationMessage( "roles", "User ID '" + user.getUserId() + "' Invalid role id '" + roleId + "' found.", "User cannot contain invalid role ID '" + roleId + "'." );
+                    response.addValidationError( message );
                 }
+            }
+            }
+            else
+            {
+                ValidationMessage message = new ValidationMessage( "roles", "User ID '" + user.getUserId() + "' has no roles assigned.", "User requires one or more roles." );
+                response.addValidationError( message );
             }
         }
         
