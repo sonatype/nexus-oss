@@ -103,7 +103,7 @@
 			<groupId>org.mortbay.jetty</groupId>
 			<artifactId>jetty</artifactId>
 		</dependency>
- 		<dependency>
+		<dependency>
 			<groupId>org.mortbay.jetty</groupId>
 			<artifactId>jetty-sslengine</artifactId>
 			<version>${jetty.version}</version>
@@ -132,6 +132,15 @@
 			<groupId>org.json</groupId>
 			<artifactId>json</artifactId>
 			<version>20080701</version>
+			<type>jar</type>
+			<scope>compile</scope>
+		</dependency>
+
+		<!-- Logging -->
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>jul-to-slf4j</artifactId>
+			<version>1.5.2</version>
 			<type>jar</type>
 			<scope>compile</scope>
 		</dependency>
