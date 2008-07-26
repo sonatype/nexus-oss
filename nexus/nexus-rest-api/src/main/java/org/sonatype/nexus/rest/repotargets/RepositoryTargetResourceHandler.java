@@ -29,6 +29,7 @@ import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.restlet.resource.Representation;
 import org.restlet.resource.Variant;
+import org.sonatype.nexus.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.model.CRepositoryTarget;
 import org.sonatype.nexus.rest.model.RepositoryTargetResource;
 import org.sonatype.nexus.rest.model.RepositoryTargetResourceResponse;
@@ -133,6 +134,12 @@ public class RepositoryTargetResourceHandler
 
                         getResponse().setEntity( serialize( representation, response ) );
                     }
+                    catch ( ConfigurationException e )
+                    {
+                        getResponse().setStatus( Status.CLIENT_ERROR_BAD_REQUEST, e.getMessage() );
+
+                        return;
+                    }
                     catch ( IOException e )
                     {
                         getLogger().log( Level.WARNING, "Got IOException during creation of repository target!", e );
@@ -140,6 +147,8 @@ public class RepositoryTargetResourceHandler
                         getResponse().setStatus(
                             Status.SERVER_ERROR_INTERNAL,
                             "Got IOException during creation of repository target!" );
+
+                        return;
                     }
                 }
             }

@@ -69,8 +69,8 @@ public class DefaultApplicationConfigurationValidator
         ValidationResponse response = new ApplicationValidationResponse();
 
         Configuration model = (Configuration) request.getConfiguration();
-        
-        ApplicationValidationContext context = ( ApplicationValidationContext ) response.getContext();
+
+        ApplicationValidationContext context = (ApplicationValidationContext) response.getContext();
 
         // check for security model
         if ( model.getSecurity() != null )
@@ -90,8 +90,7 @@ public class DefaultApplicationConfigurationValidator
         // global conn settings
         if ( model.getGlobalConnectionSettings() != null )
         {
-            response.append( validateRemoteConnectionSettings( context, model
-                .getGlobalConnectionSettings() ) );
+            response.append( validateRemoteConnectionSettings( context, model.getGlobalConnectionSettings() ) );
         }
         else
         {
@@ -106,8 +105,7 @@ public class DefaultApplicationConfigurationValidator
         // global httpproxy settings (optional)
         if ( model.getGlobalHttpProxySettings() != null )
         {
-            response
-                .append( validateRemoteHttpProxySettings( context, model.getGlobalHttpProxySettings() ) );
+            response.append( validateRemoteHttpProxySettings( context, model.getGlobalHttpProxySettings() ) );
         }
 
         // rest api
@@ -286,8 +284,8 @@ public class DefaultApplicationConfigurationValidator
         }
 
         // collect existing realms, if any
-        ApplicationValidationContext context = ( ApplicationValidationContext) response.getContext();
-        
+        ApplicationValidationContext context = (ApplicationValidationContext) response.getContext();
+
         context.addExistingRealms();
 
         if ( settings.isEnabled() && settings.getRealms() != null )
@@ -311,8 +309,8 @@ public class DefaultApplicationConfigurationValidator
         {
             response.setContext( ctx );
         }
-        
-        ApplicationValidationContext context = ( ApplicationValidationContext ) response.getContext();
+
+        ApplicationValidationContext context = (ApplicationValidationContext) response.getContext();
 
         if ( StringUtils.isEmpty( repo.getId() ) )
         {
@@ -431,8 +429,8 @@ public class DefaultApplicationConfigurationValidator
         {
             response.setContext( ctx );
         }
-        
-        ApplicationValidationContext context = ( ApplicationValidationContext ) response.getContext();        
+
+        ApplicationValidationContext context = (ApplicationValidationContext) response.getContext();
 
         if ( StringUtils.isEmpty( shadow.getId() ) )
         {
@@ -506,8 +504,8 @@ public class DefaultApplicationConfigurationValidator
         {
             response.setContext( ctx );
         }
-        
-        ApplicationValidationContext context = ( ApplicationValidationContext ) response.getContext();        
+
+        ApplicationValidationContext context = (ApplicationValidationContext) response.getContext();
 
         context.addExistingRepositoryGroupIds();
 
@@ -541,15 +539,15 @@ public class DefaultApplicationConfigurationValidator
         {
             response.setContext( ctx );
         }
-        
-        ApplicationValidationContext context = ( ApplicationValidationContext ) response.getContext();        
+
+        ApplicationValidationContext context = (ApplicationValidationContext) response.getContext();
 
         Random rnd = new Random();
 
         if ( StringUtils.isEmpty( item.getId() )
             || "0".equals( item.getId() )
-            || ( context.getExistingPathMappingIds() != null 
-                && context.getExistingPathMappingIds().contains( item.getId() ) ) )
+            || ( context.getExistingPathMappingIds() != null && context.getExistingPathMappingIds().contains(
+                item.getId() ) ) )
         {
             String newId = Long.toHexString( System.currentTimeMillis() + rnd.nextInt( 2008 ) );
 
@@ -582,8 +580,7 @@ public class DefaultApplicationConfigurationValidator
                 + CGroupsSettingPathMappingItem.BLOCKING_RULE_TYPE + "'." );
         }
 
-        if ( context.getExistingRepositoryIds() != null
-            && context.getExistingRepositoryShadowIds() != null )
+        if ( context.getExistingRepositoryIds() != null && context.getExistingRepositoryShadowIds() != null )
         {
             List<String> existingReposes = context.getExistingRepositoryIds();
 
@@ -610,8 +607,8 @@ public class DefaultApplicationConfigurationValidator
         {
             response.setContext( ctx );
         }
-        
-        ApplicationValidationContext context = ( ApplicationValidationContext ) response.getContext();        
+
+        ApplicationValidationContext context = (ApplicationValidationContext) response.getContext();
 
         if ( StringUtils.isEmpty( group.getGroupId() ) )
         {
@@ -637,8 +634,7 @@ public class DefaultApplicationConfigurationValidator
             }
         }
 
-        if ( context.getExistingRepositoryIds() != null
-            && context.getExistingRepositoryShadowIds() != null )
+        if ( context.getExistingRepositoryIds() != null && context.getExistingRepositoryShadowIds() != null )
         {
             List<String> existingReposes = context.getExistingRepositoryIds();
 
@@ -667,8 +663,8 @@ public class DefaultApplicationConfigurationValidator
         {
             response.setContext( ctx );
         }
-        
-        ApplicationValidationContext context = ( ApplicationValidationContext ) response.getContext();        
+
+        ApplicationValidationContext context = (ApplicationValidationContext) response.getContext();
 
         if ( settings.getPort() < 80 )
         {
@@ -690,7 +686,8 @@ public class DefaultApplicationConfigurationValidator
         return response;
     }
 
-    public ValidationResponse validateRemoteAuthentication( ApplicationValidationContext ctx, CRemoteAuthentication settings )
+    public ValidationResponse validateRemoteAuthentication( ApplicationValidationContext ctx,
+        CRemoteAuthentication settings )
     {
         ValidationResponse response = new ApplicationValidationResponse();
 
@@ -710,12 +707,13 @@ public class DefaultApplicationConfigurationValidator
         if ( ctx != null )
         {
             response.setContext( ctx );
-        }        
+        }
 
         return response;
     }
 
-    public ValidationResponse validateRemoteHttpProxySettings( ApplicationValidationContext ctx, CRemoteHttpProxySettings settings )
+    public ValidationResponse validateRemoteHttpProxySettings( ApplicationValidationContext ctx,
+        CRemoteHttpProxySettings settings )
     {
         ValidationResponse response = new ApplicationValidationResponse();
 
@@ -734,7 +732,7 @@ public class DefaultApplicationConfigurationValidator
         if ( ctx != null )
         {
             response.setContext( ctx );
-        }        
+        }
 
         if ( StringUtils.isEmpty( settings.getId() ) )
         {
@@ -759,13 +757,21 @@ public class DefaultApplicationConfigurationValidator
 
         List<String> patterns = settings.getPatterns();
 
-        for ( String pattern : patterns )
+        if ( patterns != null && patterns.size() > 0 )
         {
-            if ( !isValidRegexp( pattern ) )
+            for ( String pattern : patterns )
             {
-                response.addValidationError( "Repository target with ID='" + settings.getId()
-                    + "' has invalid regexp pattern: " + pattern );
+                if ( !isValidRegexp( pattern ) )
+                {
+                    response.addValidationError( "Repository target with ID='" + settings.getId()
+                        + "' has invalid regexp pattern: " + pattern );
+                }
             }
+        }
+        else
+        {
+            response.addValidationError( "Repository target with ID='" + settings.getId()
+                + "' has no regexp pattern defined!" );
         }
 
         return response;
@@ -795,7 +801,8 @@ public class DefaultApplicationConfigurationValidator
         return response;
     }
 
-    public ValidationResponse validateRemoteNexusInstance( ApplicationValidationContext ctx, CRemoteNexusInstance settings )
+    public ValidationResponse validateRemoteNexusInstance( ApplicationValidationContext ctx,
+        CRemoteNexusInstance settings )
     {
         ValidationResponse response = new ApplicationValidationResponse();
 
@@ -815,8 +822,8 @@ public class DefaultApplicationConfigurationValidator
         {
             response.setContext( ctx );
         }
-        
-        ApplicationValidationContext context = ( ApplicationValidationContext ) response.getContext();
+
+        ApplicationValidationContext context = (ApplicationValidationContext) response.getContext();
 
         response.append( validateSchedule( context, settings.getSchedule() ) );
 

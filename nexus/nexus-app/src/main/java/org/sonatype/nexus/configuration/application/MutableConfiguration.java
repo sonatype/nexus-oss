@@ -204,13 +204,13 @@ public interface MutableConfiguration
     Collection<CRepositoryTarget> listRepositoryTargets();
 
     void createRepositoryTarget( CRepositoryTarget settings )
-        throws IllegalArgumentException,
+        throws ConfigurationException,
             IOException;
 
     CRepositoryTarget readRepositoryTarget( String id );
 
     void updateRepositoryTarget( CRepositoryTarget settings )
-        throws IllegalArgumentException,
+        throws ConfigurationException,
             IOException;
 
     void deleteRepositoryTarget( String id )

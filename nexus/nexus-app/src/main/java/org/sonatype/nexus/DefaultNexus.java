@@ -642,7 +642,7 @@ public class DefaultNexus
     }
 
     public void createRepositoryTarget( CRepositoryTarget settings )
-        throws IllegalArgumentException,
+        throws ConfigurationException,
             IOException
     {
         nexusConfiguration.createRepositoryTarget( settings );
@@ -654,7 +654,7 @@ public class DefaultNexus
     }
 
     public void updateRepositoryTarget( CRepositoryTarget settings )
-        throws IllegalArgumentException,
+        throws ConfigurationException,
             IOException
     {
         nexusConfiguration.updateRepositoryTarget( settings );

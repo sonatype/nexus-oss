@@ -1136,50 +1136,33 @@ public class DefaultNexusConfiguration
     // Repository Targets
 
     protected void validateCRepositoryTarget( CRepositoryTarget settings )
-        throws IllegalArgumentException
+        throws ConfigurationException
     {
-        // ID is mandatory
-        if ( settings.getId() == null )
-        {
-            throw new IllegalArgumentException( "The Repository Target 'ID' may not be null!" );
-        }
+        ValidationResponse res = configurationValidator.validateRepositoryTarget( null, settings );
 
-        // Name is mandatory
-        if ( settings.getName() == null )
+        if ( res.isValid() )
         {
-            throw new IllegalArgumentException( "The Repository Target 'Name' may not be null!" );
-        }
+            boolean contentClassExists = false;
 
-        // ContentClass is mandatory and should exists
-        if ( settings.getContentClass() == null )
-        {
-            throw new IllegalArgumentException( "The Repository Target 'ContentClass' may not be null!" );
-        }
-
-        boolean contentClassExists = false;
-
-        for ( ContentClass cc : contentClasses )
-        {
-            if ( cc.getId().equals( settings.getContentClass() ) )
+            for ( ContentClass cc : contentClasses )
             {
-                contentClassExists = true;
-                break;
+                if ( cc.getId().equals( settings.getContentClass() ) )
+                {
+                    contentClassExists = true;
+                    break;
+                }
+            }
+
+            if ( !contentClassExists )
+            {
+                throw new ConfigurationException(
+                    "The Repository Target 'ContentClass' must exists: there is no class with id='"
+                        + settings.getContentClass() + "'!" );
             }
         }
-
-        if ( !contentClassExists )
+        else
         {
-            throw new IllegalArgumentException(
-                "The Repository Target 'ContentClass' must exists: there is no class with id='"
-                    + settings.getContentClass() + "'!" );
-        }
-
-        // check patterns for real regexp syntax
-        List<String> patterns = settings.getPatterns();
-
-        for ( String pattern : patterns )
-        {
-            Pattern.compile( pattern );
+            throw new ConfigurationException( "Invalid target definition!" );
         }
     }
 
@@ -1196,7 +1179,7 @@ public class DefaultNexusConfiguration
     }
 
     public void createRepositoryTarget( CRepositoryTarget settings )
-        throws IllegalArgumentException,
+        throws ConfigurationException,
             IOException
     {
         validateCRepositoryTarget( settings );
@@ -1224,7 +1207,7 @@ public class DefaultNexusConfiguration
     }
 
     public void updateRepositoryTarget( CRepositoryTarget settings )
-        throws IllegalArgumentException,
+        throws ConfigurationException,
             IOException
     {
         validateCRepositoryTarget( settings );
