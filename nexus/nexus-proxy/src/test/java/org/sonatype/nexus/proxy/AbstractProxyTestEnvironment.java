@@ -225,8 +225,6 @@ public abstract class AbstractProxyTestEnvironment
 
         LoggerManager loggerManager = getContainer().getLoggerManager();
 
-        loggerManager.setThresholds( Logger.LEVEL_DEBUG );
-
         this.logger = loggerManager.getLoggerForComponent( this.getClass().toString() );
 
         applicationConfiguration = (ApplicationConfiguration) lookup( ApplicationConfiguration.ROLE );
