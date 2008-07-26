@@ -49,6 +49,10 @@ public class ServletRestletApplicationBridge
         return (PlexusContainer) getServletContext().getAttribute( PlexusConstants.PLEXUS_KEY );
     }
 
+    /**
+     * A "dirty" hack to override the "one ServerServlet per webapp context" limitation of Restlet 1.0.x. This happens
+     * since they puts the Application into ServletContext, but using the same key.
+     */
     public String getInitParameter( String name, String defaultValue )
     {
         String prefixedName = getServletConfig().getServletName() + "." + name;

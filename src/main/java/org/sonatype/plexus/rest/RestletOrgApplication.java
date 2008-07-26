@@ -29,7 +29,6 @@ import org.restlet.data.Response;
  */
 public interface RestletOrgApplication
 {
-
     /** See org.restlet.Application.getContext() */
     Context getContext();
 
@@ -37,5 +36,4 @@ public interface RestletOrgApplication
     void handle( Request request, Response response );
 
     PlexusContainer getPlexusContainer();
-
 }

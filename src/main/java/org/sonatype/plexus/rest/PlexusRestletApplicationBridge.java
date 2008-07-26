@@ -31,7 +31,6 @@ public abstract class PlexusRestletApplicationBridge
     extends Application
     implements RestletOrgApplication
 {
-
     public PlexusContainer getPlexusContainer()
     {
         return (PlexusContainer) getContext().getAttributes().get( PlexusConstants.PLEXUS_KEY );

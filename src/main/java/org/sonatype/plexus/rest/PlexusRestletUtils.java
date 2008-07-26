@@ -27,7 +27,6 @@ import org.restlet.Context;
  */
 public class PlexusRestletUtils
 {
-
     public static Object plexusLookup( Context context, String role )
         throws ComponentLookupException
     {
@@ -43,5 +42,4 @@ public class PlexusRestletUtils
 
         return container.lookup( role, roleHint );
     }
-
 }
