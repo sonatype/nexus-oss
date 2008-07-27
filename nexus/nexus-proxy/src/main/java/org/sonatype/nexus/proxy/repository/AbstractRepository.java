@@ -62,6 +62,8 @@ import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.proxy.storage.local.LocalRepositoryStorage;
 import org.sonatype.nexus.proxy.storage.remote.RemoteRepositoryStorage;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
+import org.sonatype.nexus.proxy.target.TargetRegistry;
+import org.sonatype.nexus.proxy.target.TargetSet;
 import org.sonatype.nexus.proxy.utils.StoreFileWalker;
 import org.sonatype.scheduling.Scheduler;
 
@@ -107,6 +109,13 @@ public abstract class AbstractRepository
      * @plexus.requirement
      */
     private Scheduler scheduler;
+
+    /**
+     * The target registry.
+     * 
+     * @plexus.requirement
+     */
+    private TargetRegistry targetRegistry;
 
     /** The id. */
     private String id;
@@ -561,7 +570,9 @@ public abstract class AbstractRepository
                 }
                 catch ( StorageException e )
                 {
-                    getLogger().warn( "Got storage exception while touching " + item.getRepositoryItemUid().toString(), e );
+                    getLogger().warn(
+                        "Got storage exception while touching " + item.getRepositoryItemUid().toString(),
+                        e );
                 }
             }
         };
@@ -790,6 +801,14 @@ public abstract class AbstractRepository
         return items;
     }
 
+    public TargetSet getTargetsForRequest( ResourceStoreRequest request )
+        throws NoSuchResourceStoreException
+    {
+        RepositoryItemUid uid = new RepositoryItemUid( this, request.getRequestPath() );
+
+        return getTargetsForRequest( uid );
+    }
+
     // ===================================================================================
     // Repositry store-like
 
@@ -1016,6 +1035,17 @@ public abstract class AbstractRepository
             StorageException
     {
         return list( item.getRepositoryItemUid(), item.getItemContext() );
+    }
+
+    public TargetSet getTargetsForRequest( RepositoryItemUid uid )
+        throws NoSuchResourceStoreException
+    {
+        if ( getLogger().isDebugEnabled() )
+        {
+            getLogger().debug( "getTargetsForRequest() :: " + uid.toString() );
+        }
+
+        return targetRegistry.getTargetsForRepositoryPath( this, uid.getPath() );
     }
 
     // ===================================================================================

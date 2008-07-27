@@ -51,6 +51,7 @@ import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.item.StorageLinkItem;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
+import org.sonatype.nexus.proxy.target.TargetSet;
 
 /**
  * <p>
@@ -129,15 +130,19 @@ public abstract class AbstractRepositoryRouter
         {
             try
             {
-                DefaultStorageFileItem result = new DefaultStorageFileItem( this, request.getRequestPath(), true, true, new FileInputStream(
-                    fileItem ) );
-                
+                DefaultStorageFileItem result = new DefaultStorageFileItem(
+                    this,
+                    request.getRequestPath(),
+                    true,
+                    true,
+                    new FileInputStream( fileItem ) );
+
                 result.setCreated( fileItem.lastModified() );
-                
+
                 result.setModified( fileItem.lastModified() );
-                
+
                 result.setLength( fileItem.length() );
-                
+
                 return result;
             }
             catch ( FileNotFoundException e )
@@ -293,6 +298,18 @@ public abstract class AbstractRepositoryRouter
         doDeleteItem( request );
     }
 
+    public TargetSet getTargetsForRequest( ResourceStoreRequest request )
+        throws NoSuchResourceStoreException
+    {
+        if ( getLogger().isDebugEnabled() )
+        {
+            getLogger().debug( "getTargetsForRequest() " + request.getRequestPath() );
+        }
+
+        // do it
+        return doGetTargetsForRequest( request );
+    }
+
     public void storeItem( String path, InputStream is )
         throws IOException
     {
@@ -316,7 +333,7 @@ public abstract class AbstractRepositoryRouter
 
                 fos.close();
             }
-            
+
             IOUtil.close( is );
         }
     }
@@ -639,4 +656,13 @@ public abstract class AbstractRepositoryRouter
             StorageException,
             AccessDeniedException;
 
+    /**
+     * Do get the targets.
+     * 
+     * @param request
+     * @return
+     * @throws NoSuchResourceStoreException
+     */
+    protected abstract TargetSet doGetTargetsForRequest( ResourceStoreRequest request )
+        throws NoSuchResourceStoreException;
 }

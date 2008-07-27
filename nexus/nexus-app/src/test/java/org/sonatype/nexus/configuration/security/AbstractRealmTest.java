@@ -76,6 +76,7 @@ import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.proxy.storage.local.LocalRepositoryStorage;
 import org.sonatype.nexus.proxy.storage.remote.RemoteRepositoryStorage;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
+import org.sonatype.nexus.proxy.target.TargetSet;
 import org.sonatype.scheduling.NoSuchTaskException;
 import org.sonatype.scheduling.ScheduledTask;
 import org.sonatype.scheduling.SchedulerTask;
@@ -1327,6 +1328,12 @@ public abstract class AbstractRealmTest extends TestCase
         }
 
         public void onConfigurationChange( ConfigurationChangeEvent evt )
+        {
+            throw new UnsupportedOperationException();
+        }
+
+        public TargetSet getTargetsForRequest( ResourceStoreRequest request )
+            throws NoSuchResourceStoreException
         {
             throw new UnsupportedOperationException();
         }
