@@ -142,6 +142,7 @@
     <pathMappings>
       <pathMapping>
         <id>migrated-E1</id>
+        <groupId>*</groupId>
         <routePattern>.*/com/dec/.*</routePattern>
         <routeType>exclusive</routeType>
         <repositories>
@@ -151,6 +152,7 @@
       </pathMapping>
       <pathMapping>
         <id>migrated-E2</id>
+        <groupId>*</groupId>
         <routePattern>.*/net/someproject/.*</routePattern>
         <routeType>exclusive</routeType>
         <repositories>

@@ -21,15 +21,12 @@
 package org.sonatype.nexus.proxy.mapping;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.regex.Pattern;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
-import org.codehaus.plexus.util.StringUtils;
-import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
+import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.model.CGroupsSettingPathMappingItem;
 import org.sonatype.nexus.proxy.LoggingComponent;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
@@ -67,17 +64,14 @@ public class PathBasedRequestRepositoryMapper
      */
     private ApplicationConfiguration applicationConfiguration;
 
-    /** The compiled. */
-    private boolean compiled = false;
+    /** The compiled flag. */
+    private volatile boolean compiled = false;
 
-    /** The blockings prepared */
-    private List<Pattern> blockings = new ArrayList<Pattern>();
+    private volatile List<RepositoryPathMapping> blockings = new CopyOnWriteArrayList<RepositoryPathMapping>();
 
-    /** The group inclusions prepared. */
-    private Map<Pattern, List<ResourceStore>> inclusionsPrepared = new HashMap<Pattern, List<ResourceStore>>();
+    private volatile List<RepositoryPathMapping> inclusions = new CopyOnWriteArrayList<RepositoryPathMapping>();
 
-    /** The group exclusions prepared. */
-    private Map<Pattern, List<ResourceStore>> exclusionsPrepared = new HashMap<Pattern, List<ResourceStore>>();
+    private volatile List<RepositoryPathMapping> exclusions = new CopyOnWriteArrayList<RepositoryPathMapping>();
 
     public void initialize()
     {
@@ -110,22 +104,23 @@ public class PathBasedRequestRepositoryMapper
         // if include found, add it to the list.
         boolean firstAdd = true;
 
-        for ( Pattern pattern : blockings )
+        for ( RepositoryPathMapping mapping : blockings )
         {
-            if ( pattern.matcher( request.getRequestPath() ).matches() )
+            if ( mapping.matches( request ) )
             {
                 reposList.clear();
 
                 getLogger().info(
-                    "The request path [" + request.getRequestPath() + "] is blocked by rule " + pattern.toString() );
+                    "The request path [" + request.getRequestPath() + "] is blocked by rule "
+                        + mapping.getPattern().toString() + " defined for group='" + mapping.getGroupId() + "'" );
 
                 return reposList;
             }
         }
 
-        for ( Pattern pattern : inclusionsPrepared.keySet() )
+        for ( RepositoryPathMapping mapping : inclusions )
         {
-            if ( pattern.matcher( request.getRequestPath() ).matches() )
+            if ( mapping.matches( request ) )
             {
                 if ( firstAdd )
                 {
@@ -133,13 +128,14 @@ public class PathBasedRequestRepositoryMapper
 
                     firstAdd = false;
                 }
+
                 mapped = true;
 
                 // add only those that are in initial resolvedRepositories list
                 // (preserve groups)
                 for ( ResourceStore repo : resolvedRepositories )
                 {
-                    if ( inclusionsPrepared.get( pattern ).contains( repo ) )
+                    if ( mapping.getResourceStores().contains( repo ) )
                     {
                         reposList.add( repo );
                     }
@@ -148,13 +144,13 @@ public class PathBasedRequestRepositoryMapper
         }
 
         // then, if exlude found, remove it.
-        for ( Pattern pattern : exclusionsPrepared.keySet() )
+        for ( RepositoryPathMapping mapping : exclusions )
         {
-            if ( pattern.matcher( request.getRequestPath() ).matches() )
+            if ( mapping.matches( request ) )
             {
                 mapped = true;
 
-                reposList.removeAll( exclusionsPrepared.get( pattern ) );
+                reposList.removeAll( mapping.getResourceStores() );
             }
         }
         // at the end, if the list is empty, add all repos
@@ -188,22 +184,28 @@ public class PathBasedRequestRepositoryMapper
     /**
      * Compile.
      */
-    protected void compile( RepositoryRegistry registry )
+    protected synchronized void compile( RepositoryRegistry registry )
         throws NoSuchRepositoryException
     {
-        compiled = true;
+        if ( compiled )
+        {
+            return;
+        }
 
         blockings.clear();
 
-        inclusionsPrepared.clear();
+        inclusions.clear();
 
-        exclusionsPrepared.clear();
+        exclusions.clear();
 
         if ( getApplicationConfiguration().getConfiguration() == null
             || getApplicationConfiguration().getConfiguration().getRepositoryGrouping() == null
             || getApplicationConfiguration().getConfiguration().getRepositoryGrouping().getPathMappings() == null )
         {
-            getLogger().info( "No Routes defined." );
+            if ( getLogger().isDebugEnabled() )
+            {
+                getLogger().debug( "No Routes defined, have nothing to compile." );
+            }
 
             return;
         }
@@ -211,81 +213,52 @@ public class PathBasedRequestRepositoryMapper
         List<CGroupsSettingPathMappingItem> pathMappings = getApplicationConfiguration()
             .getConfiguration().getRepositoryGrouping().getPathMappings();
 
-        for ( CGroupsSettingPathMappingItem pathMapping : pathMappings )
+        for ( CGroupsSettingPathMappingItem item : pathMappings )
         {
-            String regexp = pathMapping.getRoutePattern();
+            List<ResourceStore> reposes = null;
 
-            List<ResourceStore> repositories = new ArrayList<ResourceStore>();
-
-            List<String> repoIds = pathMapping.getRepositories();
-
-            if ( repoIds != null )
+            if ( !CGroupsSettingPathMappingItem.BLOCKING_RULE_TYPE.equals( item.getRouteType() ) )
             {
+                List<String> repoIds = item.getRepositories();
+
+                reposes = new ArrayList<ResourceStore>( repoIds.size() );
+
                 for ( String repoId : repoIds )
                 {
                     if ( "*".equals( repoId ) )
                     {
-                        repositories.addAll( registry.getRepositories() );
+                        reposes.addAll( registry.getRepositories() );
                     }
                     else
                     {
-                        if ( !StringUtils.isEmpty( repoId ) )
-                        {
-                            repositories.add( registry.getRepository( repoId ) );
-                        }
+                        reposes.add( registry.getRepository( repoId ) );
                     }
                 }
             }
 
-            if ( CGroupsSettingPathMappingItem.BLOCKING_RULE_TYPE.equals( pathMapping.getRouteType() ) )
+            RepositoryPathMapping mapping = new RepositoryPathMapping( CGroupsSettingPathMappingItem.ALL_GROUPS
+                .equals( item.getGroupId() ), item.getGroupId(), item.getRoutePattern(), reposes );
+
+            if ( CGroupsSettingPathMappingItem.BLOCKING_RULE_TYPE.equals( item.getRouteType() ) )
             {
-                blockings.add( Pattern.compile( regexp ) );
+                blockings.add( mapping );
+            }
+            else if ( CGroupsSettingPathMappingItem.INCLUSION_RULE_TYPE.equals( item.getRouteType() ) )
+            {
+                inclusions.add( mapping );
+            }
+            else if ( CGroupsSettingPathMappingItem.EXCLUSION_RULE_TYPE.equals( item.getRouteType() ) )
+            {
+                exclusions.add( mapping );
             }
             else
             {
-                if ( repositories.size() > 0 )
-                {
-                    if ( CGroupsSettingPathMappingItem.EXCLUSION_RULE_TYPE.equals( pathMapping.getRouteType() ) )
-                    {
-                        exclusionsPrepared.put( Pattern.compile( regexp ), repositories );
-                    }
-                    else if ( CGroupsSettingPathMappingItem.INCLUSION_RULE_TYPE.equals( pathMapping.getRouteType() ) )
-                    {
-                        inclusionsPrepared.put( Pattern.compile( regexp ), repositories );
-                    }
-                }
-                else
-                {
-                    getLogger().warn(
-                        "Route with ID " + pathMapping.getId() + " and with pattern " + pathMapping.getRoutePattern()
-                            + " contains no repository. It is ignored." );
-                }
+                getLogger().warn( "Unknown route type: " + item.getRouteType() );
+
+                throw new IllegalArgumentException( "Unknown route type: " + item.getRouteType() );
             }
         }
+
+        compiled = true;
     }
-
-    public String toString()
-    {
-        StringBuffer sb = new StringBuffer();
-
-        sb.append( "INCLUSIONS:\n" );
-
-        Map<Pattern, List<ResourceStore>> inc = inclusionsPrepared;
-
-        for ( Pattern regexp : inc.keySet() )
-        {
-            sb.append( regexp.toString() ).append( " = " ).append( inc.get( regexp ) ).append( "\n" );
-        }
-
-        sb.append( "EXCLUSIONS:\n" );
-
-        Map<Pattern, List<ResourceStore>> exc = exclusionsPrepared;
-
-        for ( Pattern regexp : exc.keySet() )
-        {
-            sb.append( regexp.toString() ).append( " = " ).append( exc.get( regexp ) ).append( "\n" );
-        }
-        return sb.toString();
-    }
-
 }

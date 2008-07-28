@@ -1209,6 +1209,12 @@
 					<required>true</required>
 				</field>
 				<field>
+					<name>groupId</name>
+					<version>1.0.4+</version>
+					<type>String</type>
+					<required>true</required>
+				</field>
+				<field>
 					<name>routePattern</name>
 					<version>1.0.1+</version>
 					<type>String</type>
@@ -1239,6 +1245,12 @@
     public static final String INCLUSION_RULE_TYPE = "inclusive";
     
     public static final String BLOCKING_RULE_TYPE = "blocking";
+]]></code>
+				</codeSegment>
+				<codeSegment>
+					<version>1.0.4+</version>
+					<code><![CDATA[
+    public static final String ALL_GROUPS = "*";
 ]]></code>
 				</codeSegment>
 			</codeSegments>

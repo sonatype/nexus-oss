@@ -87,6 +87,8 @@ public class RepositoryRouteListResourceHandler
             for ( CGroupsSettingPathMappingItem item : mappings )
             {
                 resource = new RepositoryRouteListResource();
+                
+                resource.setGroupId( item.getGroupId() );
 
                 resource.setResourceURI( calculateSubReference( item.getId() ).toString() );
 
@@ -158,6 +160,8 @@ public class RepositoryRouteListResourceHandler
                 CGroupsSettingPathMappingItem route = new CGroupsSettingPathMappingItem();
 
                 route.setId( resource.getId() );
+                
+                route.setGroupId( resource.getGroupId() );
 
                 route.setRoutePattern( resource.getPattern() );
 

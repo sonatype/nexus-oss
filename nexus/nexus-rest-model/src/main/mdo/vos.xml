@@ -1001,6 +1001,12 @@
 					<required>true</required>
 				</field>
 				<field>
+					<name>groupId</name>
+					<version>1.0.0+</version>
+					<type>String</type>
+					<required>true</required>
+				</field>
+				<field>
 					<name>ruleType</name>
 					<version>1.0.0+</version>
 					<type>String</type>
@@ -1046,6 +1052,12 @@
 			<fields>
 				<field>
 					<name>id</name>
+					<version>1.0.0+</version>
+					<type>String</type>
+					<required>true</required>
+				</field>
+				<field>
+					<name>groupId</name>
 					<version>1.0.0+</version>
 					<type>String</type>
 					<required>true</required>

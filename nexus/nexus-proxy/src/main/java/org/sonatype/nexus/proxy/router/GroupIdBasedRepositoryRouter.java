@@ -178,7 +178,12 @@ public abstract class GroupIdBasedRepositoryRouter
 
             if ( explodedPath.length >= 1 )
             {
-                result = new ArrayList<ResourceStore>( getRepositoryRegistry().getRepositoryGroup( explodedPath[0] ) );
+                String groupId = explodedPath[0];
+
+                result = new ArrayList<ResourceStore>( getRepositoryRegistry().getRepositoryGroup( groupId ) );
+
+                // set the groupId in request for later
+                request.setRequestRepositoryGroupId( groupId );
             }
         }
 

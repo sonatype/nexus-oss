@@ -95,6 +95,7 @@
     <pathMappings>
       <pathMapping>
         <id>migrated-E1</id>
+        <groupId>*</groupId>
         <routePattern>.*/com/abc/.*</routePattern>
         <routeType>exclusive</routeType>
         <repositories>
@@ -104,6 +105,7 @@
       </pathMapping>
       <pathMapping>
         <id>migrated-E2</id>
+        <groupId>*</groupId>
         <routePattern>.*/net/transacttools/.*</routePattern>
         <routeType>exclusive</routeType>
         <repositories>

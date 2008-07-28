@@ -558,6 +558,17 @@ public class DefaultApplicationConfigurationValidator
             response.setModified( true );
         }
 
+        if ( StringUtils.isEmpty( item.getGroupId() ) )
+        {
+            item.setGroupId( CGroupsSettingPathMappingItem.ALL_GROUPS );
+
+            response
+                .addValidationWarning( "Fixed route without groupId set, set to ALL_GROUPS to keep backward comp, ID='"
+                    + item.getId() + "'." );
+
+            response.setModified( true );
+        }
+
         if ( !isValidRegexp( item.getRoutePattern() ) )
         {
             response.addValidationError( "The regexp in Route with ID='" + item.getId() + "' is not valid: "
@@ -578,6 +589,16 @@ public class DefaultApplicationConfigurationValidator
                 + CGroupsSettingPathMappingItem.INCLUSION_RULE_TYPE + "', '"
                 + CGroupsSettingPathMappingItem.EXCLUSION_RULE_TYPE + "' and '"
                 + CGroupsSettingPathMappingItem.BLOCKING_RULE_TYPE + "'." );
+        }
+
+        if ( !item.getRouteType().equals( CGroupsSettingPathMappingItem.BLOCKING_RULE_TYPE ) )
+        {
+            // here we must have a repo list
+            if ( item.getRepositories() == null || item.getRepositories().size() == 0 )
+            {
+                response.addValidationError( "The repository list in Route with ID='" + item.getId()
+                    + "' is not valid: it cannot be empty!" );
+            }
         }
 
         if ( context.getExistingRepositoryIds() != null && context.getExistingRepositoryShadowIds() != null )

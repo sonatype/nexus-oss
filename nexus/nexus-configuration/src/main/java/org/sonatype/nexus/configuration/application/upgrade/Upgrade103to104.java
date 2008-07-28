@@ -305,6 +305,8 @@ public class Upgrade103to104
                     org.sonatype.nexus.configuration.model.CGroupsSettingPathMappingItem newItem = new org.sonatype.nexus.configuration.model.CGroupsSettingPathMappingItem();
 
                     newItem.setId( oldItem.getId() );
+                    
+                    newItem.setGroupId( org.sonatype.nexus.configuration.model.CGroupsSettingPathMappingItem.ALL_GROUPS );
 
                     newItem.setRoutePattern( oldItem.getRoutePattern() );
 

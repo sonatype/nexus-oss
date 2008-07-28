@@ -103,6 +103,7 @@ public class PathBasedRequestRepositoryMapperTest
             {
                 CGroupsSettingPathMappingItem item = new CGroupsSettingPathMappingItem();
                 item.setId( "I" + key );
+                item.setGroupId( CGroupsSettingPathMappingItem.ALL_GROUPS );
                 item.setRoutePattern( key );
                 item.setRouteType( CGroupsSettingPathMappingItem.INCLUSION_RULE_TYPE );
                 item.setRepositories( Arrays.asList( inclusions.get( key ) ) );
@@ -116,6 +117,7 @@ public class PathBasedRequestRepositoryMapperTest
             {
                 CGroupsSettingPathMappingItem item = new CGroupsSettingPathMappingItem();
                 item.setId( "E" + key );
+                item.setGroupId( CGroupsSettingPathMappingItem.ALL_GROUPS );
                 item.setRoutePattern( key );
                 item.setRouteType( CGroupsSettingPathMappingItem.EXCLUSION_RULE_TYPE );
                 item.setRepositories( Arrays.asList( exclusions.get( key ) ) );
@@ -129,6 +131,7 @@ public class PathBasedRequestRepositoryMapperTest
             {
                 CGroupsSettingPathMappingItem item = new CGroupsSettingPathMappingItem();
                 item.setId( "B" + key );
+                item.setGroupId( CGroupsSettingPathMappingItem.ALL_GROUPS );
                 item.setRoutePattern( key );
                 item.setRouteType( CGroupsSettingPathMappingItem.BLOCKING_RULE_TYPE );
                 item.setRepositories( Arrays.asList( blockings.get( key ) ) );
@@ -151,8 +154,6 @@ public class PathBasedRequestRepositoryMapperTest
 
         HashMap<String, String[]> exclusions = new HashMap<String, String[]>();
         exclusions.put( "/e/f/.*", new String[] { "*" } );
-        exclusions.put( "/empty/i/.*", new String[] { "" } );
-        exclusions.put( "/empty/e/.*", new String[] { null } );
 
         PathBasedRequestRepositoryMapper pm = prepare( inclusions, exclusions, null );
 
@@ -190,10 +191,8 @@ public class PathBasedRequestRepositoryMapperTest
         inclusions.put( "/all/.*", new String[] { "*" } );
 
         HashMap<String, String[]> exclusions = new HashMap<String, String[]>();
-        exclusions.put( "/e/f/.*", new String[] { "repoE","repoF" } );
+        exclusions.put( "/e/f/.*", new String[] { "repoE", "repoF" } );
         exclusions.put( "/e/f/all/.*", new String[] { "*" } );
-        exclusions.put( "/empty/i/.*", new String[] { "" } );
-        exclusions.put( "/empty/e/.*", new String[] { null } );
 
         PathBasedRequestRepositoryMapper pm = prepare( inclusions, exclusions, null );
 
@@ -228,7 +227,13 @@ public class PathBasedRequestRepositoryMapperTest
 
     }
 
-    public void testEmptyRules()
+    /**
+     * Empty rules are invalid, they are spitted out by validator anyway. This test is bad, and hence is turned off, but
+     * it is left here for reference. (added 'dont' at the start)
+     * 
+     * @throws Exception
+     */
+    public void dontTestEmptyRules()
         throws Exception
     {
         HashMap<String, String[]> inclusions = new HashMap<String, String[]>();

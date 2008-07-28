@@ -71,6 +71,7 @@
     <pathMappings>
       <pathMapping>
         <id>inhouse-stuff</id>
+        <groupId>*</groupId>
         <routePattern>.*/(com|org)/somecompany/.*</routePattern>
         <routeType>inclusive</routeType>
         <repositories>
@@ -80,6 +81,7 @@
       </pathMapping>
       <pathMapping>
         <id>apache-stuff</id>
+        <groupId>*</groupId>
         <routePattern>.*/org/some-oss/.*</routePattern>
         <routeType>exclusive</routeType>
         <repositories>

@@ -4,7 +4,7 @@
 <!-- used as default config source -->
 
 <nexusConfiguration>
-	<version>1.0.2</version>
+	<version>1.0.4</version>
 	<workingDirectory>${nexus.home}/nexus-work</workingDirectory>
 	<applicationLogDirectory>${nexus.home}/logs</applicationLogDirectory>
 
@@ -154,6 +154,7 @@
 		<pathMappings>
 			<pathMapping>
 				<id>inhouse-stuff</id>
+				<groupId>*</groupId>
 				<routePattern>.*/(com|org)/somecompany/.*</routePattern>
 				<routeType>inclusive</routeType>
 				<repositories>
@@ -163,6 +164,7 @@
 			</pathMapping>
 			<pathMapping>
 				<id>maven-stuff</id>
+				<groupId>*</groupId>
 				<routePattern>.*/org/apache/maven/.*</routePattern>
 				<routeType>inclusive</routeType>
 				<repositories>
@@ -172,6 +174,7 @@
 			</pathMapping>
 			<pathMapping>
 				<id>plexus-stuff</id>
+				<groupId>*</groupId>
 				<routePattern>.*/org/codehaus/plexus/.*</routePattern>
 				<routeType>inclusive</routeType>
 				<repositories>
@@ -181,6 +184,7 @@
 			</pathMapping>
 			<pathMapping>
 				<id>apache-stuff</id>
+				<groupId>*</groupId>
 				<routePattern>.*/org/apache/.*</routePattern>
 				<routeType>exclusive</routeType>
 				<repositories>

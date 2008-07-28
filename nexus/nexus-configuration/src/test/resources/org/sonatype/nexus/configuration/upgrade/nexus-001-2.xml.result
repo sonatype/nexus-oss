@@ -145,6 +145,7 @@
     <pathMappings>
       <pathMapping>
         <id>migrated-I1</id>
+        <groupId>*</groupId>
         <routePattern>.*/org/apache/.*</routePattern>
         <routeType>inclusive</routeType>
         <repositories>
@@ -156,6 +157,7 @@
       </pathMapping>
       <pathMapping>
         <id>migrated-I2</id>
+        <groupId>*</groupId>
         <routePattern>.*/org/codehaus/.*</routePattern>
         <routeType>inclusive</routeType>
         <repositories>
@@ -166,6 +168,7 @@
       </pathMapping>
       <pathMapping>
         <id>migrated-E1</id>
+        <groupId>*</groupId>
         <routePattern>.*/com/dec/.*</routePattern>
         <routeType>exclusive</routeType>
         <repositories>

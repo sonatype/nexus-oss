@@ -147,6 +147,7 @@
     <pathMappings>
       <pathMapping>
         <id>inhouse-stuff</id>
+        <groupId>*</groupId>
         <routePattern>.*/(com|org)/sonatype/.*</routePattern>
         <routeType>inclusive</routeType>
         <repositories>
@@ -157,6 +158,7 @@
       </pathMapping>
       <pathMapping>
         <id>maven-stuff</id>
+        <groupId>*</groupId>
         <routePattern>.*/org/apache/maven/.*</routePattern>
         <routeType>inclusive</routeType>
         <repositories>
@@ -169,6 +171,7 @@
       </pathMapping>
       <pathMapping>
         <id>plexus-stuff</id>
+        <groupId>*</groupId>
         <routePattern>.*/org/codehaus/plexus/.*</routePattern>
         <routeType>inclusive</routeType>
         <repositories>
@@ -181,6 +184,7 @@
       </pathMapping>
       <pathMapping>
         <id>apache-stuff</id>
+        <groupId>*</groupId>
         <routePattern>.*/org/apache/.*</routePattern>
         <routeType>exclusive</routeType>
         <repositories>

@@ -35,7 +35,6 @@ import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 public interface RequestRepositoryMapper
     extends ConfigurationChangeListener
 {
-
     String ROLE = RequestRepositoryMapper.class.getName();
 
     /**

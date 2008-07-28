@@ -95,6 +95,8 @@ public class RepositoryRouteResourceHandler
 
             resource.setId( getRouteId() );
 
+            resource.setGroupId( route.getGroupId() );
+
             resource.setRuleType( config2resourceType( route.getRouteType() ) );
 
             resource.setPattern( route.getRoutePattern() );
@@ -186,6 +188,8 @@ public class RepositoryRouteResourceHandler
                 }
 
                 route.setId( getRouteId() );
+
+                route.setGroupId( resource.getGroupId() );
 
                 route.setRoutePattern( resource.getPattern() );
 
