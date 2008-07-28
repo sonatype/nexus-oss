@@ -1,6 +1,9 @@
 package org.sonatype.nexus.integrationtests.nexus133;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.URL;
@@ -20,10 +23,13 @@ import org.restlet.data.Response;
 import org.sonatype.nexus.configuration.model.CRepositoryTarget;
 import org.sonatype.nexus.configuration.model.Configuration;
 import org.sonatype.nexus.configuration.model.io.xpp3.NexusConfigurationXpp3Reader;
+import org.sonatype.nexus.rest.model.RepositoryTargetListResource;
+import org.sonatype.nexus.rest.model.RepositoryTargetListResourceResponse;
 import org.sonatype.nexus.rest.model.RepositoryTargetResource;
 import org.sonatype.nexus.rest.model.RepositoryTargetResourceResponse;
 import org.sonatype.nexus.rest.model.UserResource;
 import org.sonatype.nexus.rest.model.UserResourceRequest;
+import org.sonatype.nexus.test.utils.SecurityConfigUtil;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
 
 import com.thoughtworks.xstream.XStream;
@@ -71,6 +77,37 @@ public class TargetMessageUtil
         Client client = new Client( Protocol.HTTP );
 
         return client.handle( request );
+    }
+
+    @SuppressWarnings( "unchecked" )
+    public List<RepositoryTargetListResource> getList()
+        throws IOException
+    {
+        String serviceURI = this.baseNexusUrl + "service/local/repo_targets";
+        System.out.println( "serviceURI: " + serviceURI );
+
+        URL serviceURL = new URL( serviceURI );
+
+        InputStream is = serviceURL.openStream();
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+
+        int readChar = -1;
+        while ( ( readChar = is.read() ) != -1 )
+        {
+            out.write( readChar );
+        }
+
+        String responseText = out.toString();
+        System.out.println( "responseText: \n" + responseText );
+
+        XStreamRepresentation representation =
+            new XStreamRepresentation( new XStream(), responseText, MediaType.APPLICATION_XML );
+
+        RepositoryTargetListResourceResponse resourceResponse =
+            (RepositoryTargetListResourceResponse) representation.getPayload( new RepositoryTargetListResourceResponse() );
+
+        return resourceResponse.getData();
+
     }
 
     public RepositoryTargetResource getResourceFromResponse( Response response )
@@ -141,6 +178,48 @@ public class TargetMessageUtil
                 Assert.fail( "Target with ID: " + targetResource.getId() + " could not be found in configuration." );
             }
         }
+    }
+
+    public void verifyCompleteTargetsConfig( List<RepositoryTargetListResource> targets ) throws IOException
+    {
+        // check the nexus.xml
+        Configuration config = this.getNexusConfig();
+
+        List<CRepositoryTarget> repoTargets = config.getRepositoryTargets();
+        // check to see if the size matches
+        Assert.assertTrue( "Configuration had a different number: (" + repoTargets.size()
+            + ") of targets then expected: (" + targets.size() + ")", repoTargets.size() == targets.size() );
+
+        // look for the target by id
+
+        for ( Iterator<RepositoryTargetListResource> iter = targets.iterator(); iter.hasNext(); )
+        {
+            RepositoryTargetListResource targetResource = iter.next();
+            boolean found = false;
+
+            for ( Iterator<CRepositoryTarget> iterInner = repoTargets.iterator(); iterInner.hasNext(); )
+            {
+                CRepositoryTarget repositoryTarget = iterInner.next();
+
+                if ( targetResource.getId().equals( repositoryTarget.getId() ) )
+                {
+                    found = true;
+                    Assert.assertEquals( targetResource.getId(), repositoryTarget.getId() );
+                    Assert.assertEquals( targetResource.getContentClass(), repositoryTarget.getContentClass() );
+                    Assert.assertEquals( targetResource.getName(), repositoryTarget.getName() );
+
+                    break;
+                }
+
+            }
+
+            if ( !found )
+            {
+
+                Assert.fail( "Target with ID: " + targetResource.getId() + " could not be found in configuration." );
+            }
+        }
+
     }
 
     private Configuration getNexusConfig()

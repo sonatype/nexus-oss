@@ -1,6 +1,7 @@
 package org.sonatype.nexus.integrationtests.nexus156;
 
 import java.io.IOException;
+import java.util.List;
 
 import junit.framework.Assert;
 
@@ -10,6 +11,8 @@ import org.restlet.data.Method;
 import org.restlet.data.Response;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.rest.model.RoleResource;
+import org.sonatype.nexus.rest.model.UserListResourceResponse;
+import org.sonatype.nexus.rest.model.UserResource;
 import org.sonatype.nexus.rest.xstream.XStreamInitializer;
 import org.sonatype.nexus.test.utils.SecurityConfigUtil;
 import org.sonatype.plexus.rest.xstream.json.JsonOrgHierarchicalStreamDriver;
@@ -65,6 +68,41 @@ public class Nexus156RolesCrudJsonTests
         resource.setId( responseResource.getId() );
 
         SecurityConfigUtil.verifyRole( resource );
+    }
+
+    @Test
+    public void listTest()
+        throws IOException
+    {
+
+        RoleResource resource = new RoleResource();
+
+        resource.setDescription( "Create Test Role" );
+        resource.setName( "CreateRole" );
+        resource.setSessionTimeout( 30 );
+        resource.addPrivilege( "1" );
+
+        Response response = this.messageUtil.sendMessage( Method.POST, resource );
+
+        if ( !response.getStatus().isSuccess() )
+        {
+            Assert.fail( "Could not create role: " + response.getStatus() );
+        }
+
+        // get the Resource object
+        RoleResource responseResource = this.messageUtil.getResourceFromResponse( response );
+
+        // set the id
+        resource.setId( responseResource.getId() );
+        // make sure it was added
+        SecurityConfigUtil.verifyRole( resource );
+
+        // now that we have at least one element stored (more from other tests, most likely)
+
+        // NEED to work around a GET problem with the REST client
+        List<RoleResource> roles = this.messageUtil.getList();
+        SecurityConfigUtil.verifyRoles( roles );
+
     }
 
     public void readTest()

@@ -1,6 +1,10 @@
 package org.sonatype.nexus.integrationtests.nexus156;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.util.List;
 
 import org.restlet.Client;
 import org.restlet.data.MediaType;
@@ -8,8 +12,10 @@ import org.restlet.data.Method;
 import org.restlet.data.Protocol;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
+import org.sonatype.nexus.rest.model.RoleListResourceResponse;
 import org.sonatype.nexus.rest.model.RoleResource;
 import org.sonatype.nexus.rest.model.RoleResourceRequest;
+import org.sonatype.nexus.rest.model.UserListResourceResponse;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
 
 import com.thoughtworks.xstream.XStream;
@@ -56,6 +62,43 @@ public class RoleMessageUtil
         Client client = new Client( Protocol.HTTP );
     
         return client.handle( request );
+    }
+    
+    /**
+     * This should be replaced with a REST Call, but the REST client does not set the Accept correctly on GET's/
+     * 
+     * @return
+     * @throws IOException
+     */
+    @SuppressWarnings( "unchecked" )
+    public List<RoleResource> getList()
+        throws IOException
+    {
+        String serviceURI = this.baseNexusUrl + "service/local/roles";
+        System.out.println( "serviceURI: " + serviceURI );
+
+        URL serviceURL = new URL( serviceURI );
+
+        InputStream is = serviceURL.openStream();
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+
+        int readChar = -1;
+        while ( ( readChar = is.read() ) != -1 )
+        {
+            out.write( readChar );
+        }
+
+        String responseText = out.toString();
+        System.out.println( "responseText: \n" + responseText );
+
+        XStreamRepresentation representation =
+            new XStreamRepresentation( new XStream(), responseText, MediaType.APPLICATION_XML );
+
+        RoleListResourceResponse resourceResponse =
+            (RoleListResourceResponse) representation.getPayload( new RoleListResourceResponse() );
+
+        return resourceResponse.getData();
+
     }
 
     public RoleResource getResourceFromResponse( Response response )

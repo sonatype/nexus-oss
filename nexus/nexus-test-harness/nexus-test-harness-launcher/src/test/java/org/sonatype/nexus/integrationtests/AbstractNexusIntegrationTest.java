@@ -54,6 +54,7 @@ import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.rest.model.StatusResourceResponse;
 import org.sonatype.nexus.rest.xstream.XStreamInitializer;
 import org.sonatype.nexus.test.utils.DeployUtils;
+import org.sonatype.nexus.test.utils.FileTestingUtils;
 import org.xml.sax.XMLReader;
 
 import com.thoughtworks.xstream.XStream;
@@ -61,9 +62,8 @@ import com.thoughtworks.xstream.io.xml.DomDriver;
 import com.thoughtworks.xstream.io.xml.XppDriver;
 
 /**
- * curl --user admin:admin123 --request PUT http://localhost:8081/nexus/service/local/status/command --data START
- * 
- * NOTE, this class is not really abstract so I can work around a the <code>@BeforeClass</code>, <code>@AfterClass</code> issues, this should be refactored a little, but it might be ok, if we switch to TestNg
+ * curl --user admin:admin123 --request PUT http://localhost:8081/nexus/service/local/status/command --data START NOTE,
+ * this class is not really abstract so I can work around a the <code>@BeforeClass</code>, <code>@AfterClass</code> issues, this should be refactored a little, but it might be ok, if we switch to TestNg
  */
 public class AbstractNexusIntegrationTest
 {
@@ -133,6 +133,9 @@ public class AbstractNexusIntegrationTest
         {
             if ( NEEDS_INIT )
             {
+                HashMap<String, String> variables = new HashMap<String, String>();
+                variables.put( "test-harness-id", this.getTestId() );
+
                 // clean common work dir
                 // this.cleanWorkDir();
 
@@ -141,6 +144,8 @@ public class AbstractNexusIntegrationTest
 
                 // copy security config
                 this.copyConfigFile( "security.xml" );
+
+                this.copyConfigFile( "log4j.properties", variables );
 
                 // start nexus
                 this.startNexus();
@@ -310,7 +315,7 @@ public class AbstractNexusIntegrationTest
 
     }
 
-    private void copyConfigFile( String configFile )
+    private void copyConfigFile( String configFile, Map<String, String> variables )
         throws IOException
     {
         // the test can override the test config.
@@ -330,7 +335,33 @@ public class AbstractNexusIntegrationTest
         System.out.println( "copying " + configFile + " to:  "
             + new File( this.nexusBaseDir + "/" + RELATIVE_CONF_DIR, configFile ) );
 
-        FileUtils.copyFile( testConfigFile, new File( this.nexusBaseDir + "/" + RELATIVE_CONF_DIR, configFile ) );
+        FileTestingUtils.interpolationFileCopy( testConfigFile, new File( this.nexusBaseDir + "/" + RELATIVE_CONF_DIR, configFile ), variables );
+        
+    }
+
+    private void copyConfigFile( String configFile )
+        throws IOException
+    {
+        this.copyConfigFile( configFile, new HashMap<String, String>() );
+        
+//        // the test can override the test config.
+//        File testConfigFile = this.getTestResourceAsFile( "test-config/" + configFile );
+//
+//        // if the tests doesn't have a different config then use the default.
+//        // we need to replace every time to make sure no one changes it.
+//        if ( testConfigFile == null || !testConfigFile.exists() )
+//        {
+//            testConfigFile = this.getResource( "default-config/" + configFile );
+//        }
+//        else
+//        {
+//            System.out.println( "This test is using its own " + configFile + " " + testConfigFile );
+//        }
+//
+//        System.out.println( "copying " + configFile + " to:  "
+//            + new File( this.nexusBaseDir + "/" + RELATIVE_CONF_DIR, configFile ) );
+//
+//        FileUtils.copyFile( testConfigFile, new File( this.nexusBaseDir + "/" + RELATIVE_CONF_DIR, configFile ) );
     }
 
     /**

@@ -20,6 +20,7 @@ import org.sonatype.nexus.configuration.model.CRepositoryTarget;
 import org.sonatype.nexus.configuration.model.Configuration;
 import org.sonatype.nexus.configuration.model.io.xpp3.NexusConfigurationXpp3Reader;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
+import org.sonatype.nexus.rest.model.RepositoryTargetListResource;
 import org.sonatype.nexus.rest.model.RepositoryTargetResource;
 import org.sonatype.nexus.rest.xstream.XStreamInitializer;
 import org.sonatype.plexus.rest.xstream.json.JsonOrgHierarchicalStreamDriver;
@@ -126,6 +127,46 @@ public class Nexus133TargetCrudJsonTests
         Assert.assertEquals( resource.getPatterns(), responseResource.getPatterns() );
 
     }
+    
+    @Test
+    public void listTest() throws IOException
+    {
+        RepositoryTargetResource resource = new RepositoryTargetResource();
+
+        // resource.setId( "listTest" );
+        resource.setContentClass( "maven1" );
+        resource.setName( "listTest" );
+
+        List<String> patterns = new ArrayList<String>();
+        patterns.add( ".*foo.*" );
+        resource.setPatterns( patterns );
+
+        Response response = this.messageUtil.sendMessage( Method.POST, resource );
+
+        if ( !response.getStatus().isSuccess() )
+        {
+            Assert.fail( "Could not create Repository Target: " + response.getStatus() );
+        }
+
+        // get the Resource object
+        RepositoryTargetResource responseResource = this.messageUtil.getResourceFromResponse( response );
+
+        // make sure the id != null
+        Assert.assertTrue( StringUtils.isNotEmpty( responseResource.getId() ) );
+
+        // make sure it was added
+        this.messageUtil.verifyTargetsConfig( responseResource );
+        
+        // now that we have at least one element stored (more from other tests, most likely)
+        
+        
+        // NEED to work around a GET problem with the REST client
+        List<RepositoryTargetListResource> targets = this.messageUtil.getList();
+        // the response is a list of RepositoryTargetListResource, so we need a different compare method.
+        this.messageUtil.verifyCompleteTargetsConfig( targets );
+        
+        
+    }
 
     @Test
     public void udpateTest()
@@ -227,5 +268,7 @@ public class Nexus133TargetCrudJsonTests
 
         this.messageUtil.verifyTargetsConfig( new ArrayList<RepositoryTargetResource>() );
     }
+    
+
 
 }

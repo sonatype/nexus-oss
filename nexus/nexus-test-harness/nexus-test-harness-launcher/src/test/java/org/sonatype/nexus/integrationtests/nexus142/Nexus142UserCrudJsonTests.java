@@ -2,14 +2,19 @@ package org.sonatype.nexus.integrationtests.nexus142;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 import junit.framework.Assert;
 
+import org.codehaus.plexus.util.StringUtils;
 import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
+import org.sonatype.nexus.rest.model.RepositoryTargetListResource;
+import org.sonatype.nexus.rest.model.RepositoryTargetResource;
+import org.sonatype.nexus.rest.model.UserListResourceResponse;
 import org.sonatype.nexus.rest.model.UserResource;
 import org.sonatype.nexus.rest.xstream.XStreamInitializer;
 import org.sonatype.nexus.test.utils.SecurityConfigUtil;
@@ -62,6 +67,39 @@ public class Nexus142UserCrudJsonTests
         SecurityConfigUtil.verifyUser( resource );
     }
     
+    @Test
+    public void listTest() throws IOException
+    {
+        UserResource resource = new UserResource();
+
+        resource.setName( "list Test" );
+        resource.setUserId( "listTest" );
+        resource.setStatus( "expired" );
+        resource.setEmail( "listTest@user.com" );
+        resource.addRole( "role1" );
+        Response response = this.messageUtil.sendMessage( Method.POST, resource );
+
+        if ( !response.getStatus().isSuccess() )
+        {
+            String responseText = response.getEntity().getText();
+            Assert.fail( "Could not create user: " + response.getStatus() +":\n"+ responseText);
+        }
+
+        // get the Resource object
+        UserResource responseResource = this.messageUtil.getResourceFromResponse( response );
+
+        // make sure it was added
+        SecurityConfigUtil.verifyUser( resource );
+        
+        // now that we have at least one element stored (more from other tests, most likely)
+        
+        
+        // NEED to work around a GET problem with the REST client
+        List<UserResource> users = this.messageUtil.getList();
+        SecurityConfigUtil.verifyUsers( users );
+        
+        
+    }
     
     public void readTest()
         throws IOException
