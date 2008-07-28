@@ -146,6 +146,7 @@ Sonatype.repoServer.referenceData = {
   route : {
     id : "",
     ruleType : "",
+    groupId : "",
     pattern : "",
     repositories : []
       //@todo: there's a discrepancy between routes list and state representation of

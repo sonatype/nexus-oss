@@ -50,12 +50,41 @@ Sonatype.repoServer.RoutesEditPanel = function(config){
   this.BLOCKING_TYPE_INDEX = 0;
   this.BLOCKING = 'Blocking';
   this.TREE_PANEL_ID_SUFFIX = '_route-tree-panel';
+
+  //A record to hold the name and id of a repository group
+  this.repositoryGroupRecordConstructor = Ext.data.Record.create([
+    {name:'id'},
+    {name:'name', sortType:Ext.data.SortTypes.asUCString}
+  ]);
+  
+  //Reader and datastore that queries the server for the list of repository groups
+  this.repositoryGroupReader = new Ext.data.JsonReader({root: 'data', id: 'id'}, this.repositoryGroupRecordConstructor );  
+  this.repositoryGroupDataStore = new Ext.data.Store({
+    url: Sonatype.config.repos.urls.groups,
+    reader: this.repositoryGroupReader,
+    sortInfo: {field: 'name', direction: 'ASC'},
+    autoLoad: true,
+    listeners: {
+      'load' : {
+        fn: function() {
+          var allRec = new this.repositoryGroupRecordConstructor({
+              id : 'all_groups',
+              name : 'All Repositories'
+            },
+            'all_groups');
+          this.repositoryGroupDataStore.insert(0, allRec);
+        },
+        scope: this
+      }
+    }
+  });
   
   var ht = Sonatype.repoServer.resources.help.routes;
   
   this.loadDataModFuncs = {
     route : {
       ruleType : Sonatype.utils.capitalize,
+      groupId : Sonatype.utils.capitalize,
       repositories : this.loadRepoListHelper.createDelegate(this)
     }
   };
@@ -63,6 +92,7 @@ Sonatype.repoServer.RoutesEditPanel = function(config){
   this.submitDataModFuncs = {
     route : {
       ruleType : Sonatype.utils.lowercase,
+      groupId : Sonatype.utils.lowercase,
       repositories : this.exportRepoListHelper.createDelegate(this)
     }
   };
@@ -123,6 +153,24 @@ Sonatype.repoServer.RoutesEditPanel = function(config){
           }
         }       
       },
+      {
+          xtype: 'combo',
+          fieldLabel: 'Repository Group',
+          itemCls: 'required-field',
+          helpText: ht.group,
+          name: 'groupId',
+          width: 200,
+          minWidth: 200,
+          store: this.repositoryGroupDataStore,
+          displayField:'name',
+          editable: false,
+          forceSelection: true,
+          mode: 'local',
+          triggerAction: 'all',
+          emptyText:'Select...',
+          selectOnFocus:true,
+          allowBlank: false
+        },
       {
         xtype: 'panel',
         id: this.TREE_PANEL_ID_SUFFIX,
@@ -781,11 +829,11 @@ Ext.extend(Sonatype.repoServer.RoutesEditPanel, Ext.Panel, {
     var newConfig = config;
 
     var trees = [
-      {obj : newConfig.items[3].items[0], postpend : '_route-repos-tree'},
-      {obj : newConfig.items[3].items[1], postpend : '_route-all-repos-tree'}
+      {obj : newConfig.items[4].items[0], postpend : '_route-repos-tree'},
+      {obj : newConfig.items[4].items[1], postpend : '_route-all-repos-tree'}
     ];
 
-    newConfig.items[3].id = id + this.TREE_PANEL_ID_SUFFIX;
+    newConfig.items[4].id = id + this.TREE_PANEL_ID_SUFFIX;
     for (var i = 0; i<trees.length; i++) {
       trees[i].obj.id = id + trees[i].postpend;
       trees[i].obj.root = new Ext.tree.TreeNode({text: 'root'});
