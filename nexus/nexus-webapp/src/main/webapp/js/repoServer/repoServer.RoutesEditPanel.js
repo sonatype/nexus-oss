@@ -394,7 +394,7 @@ Ext.extend(Sonatype.repoServer.RoutesEditPanel, Ext.Panel, {
     Ext.form.Field.msgFx['normal'].show(tree.errorEl, tree);  
   },
   
-  // formInfoObj : {formPanel, isNew, [resourceUri]}
+  // formInfoObj : {formPanel, isNew, [resourceURI]}
   saveHandler : function(formInfoObj){
     var allValid = false;
     allValid = formInfoObj.formPanel.form.isValid()
@@ -411,7 +411,7 @@ Ext.extend(Sonatype.repoServer.RoutesEditPanel, Ext.Panel, {
     
     if (allValid) {
       var isNew = formInfoObj.isNew;
-      var uri = (isNew) ? Sonatype.config.repos.urls.routes : formInfoObj.resourceUri;
+      var uri = (isNew) ? Sonatype.config.repos.urls.routes : formInfoObj.resourceURI;
       var form = formInfoObj.formPanel.form;
 
       form.doAction('sonatypeSubmit', {
@@ -426,7 +426,7 @@ Ext.extend(Sonatype.repoServer.RoutesEditPanel, Ext.Panel, {
     }
   },
 
-  // formInfoObj : {formPanel, isNew, [resourceUri]}
+  // formInfoObj : {formPanel, isNew, [resourceURI]}
   cancelHandler : function(formInfoObj) {
     var formLayout = this.formCards.getLayout();
     var gridSelectModel = this.routesGridPanel.getSelectionModel();
@@ -676,7 +676,7 @@ Ext.extend(Sonatype.repoServer.RoutesEditPanel, Ext.Panel, {
         var buttonInfoObj = {
             formPanel : action.options.fpanel,
             isNew : false,
-            resourceUri : respData.resourceURI
+            resourceURI : respData.resourceURI
           };
 
         //save button event handler
@@ -734,8 +734,8 @@ Ext.extend(Sonatype.repoServer.RoutesEditPanel, Ext.Panel, {
     }
   },
 
-  formDataLoader : function(formPanel, resourceUri, modFuncs){
-    formPanel.getForm().doAction('sonatypeLoad', {url:resourceUri, method:'GET', fpanel:formPanel, dataModifiers: modFuncs, scope: this});
+  formDataLoader : function(formPanel, resourceURI, modFuncs){
+    formPanel.getForm().doAction('sonatypeLoad', {url:resourceURI, method:'GET', fpanel:formPanel, dataModifiers: modFuncs, scope: this});
   },
 
   rowClick : function(grid, rowIndex, e){
@@ -757,7 +757,7 @@ Ext.extend(Sonatype.repoServer.RoutesEditPanel, Ext.Panel, {
       var buttonInfoObj = {
         formPanel : formPanel,
         isNew : false, //not a new route form, see assumption
-        resourceUri : rec.data.resourceURI
+        resourceURI : rec.data.resourceURI
       };
 
       //save button event handler

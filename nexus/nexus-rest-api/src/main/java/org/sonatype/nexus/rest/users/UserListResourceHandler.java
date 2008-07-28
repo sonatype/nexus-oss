@@ -111,6 +111,8 @@ extends AbstractUserResourceHandler
                 // Update the status, as that may have changed
                 resource.setStatus( user.getStatus() );
                 
+                resource.setResourceURI( calculateSubReference( resource.getUserId() ).toString() );
+                
                 response.setData( resource );
                 
                 getResponse().setEntity( serialize( representation, response ) );

@@ -348,7 +348,7 @@ Ext.extend(Sonatype.repoServer.RepoTargetEditPanel, Ext.Panel, {
 	  if (formInfoObj.formPanel.form.isValid()) {
       var isNew = formInfoObj.isNew;
       var createUri = Sonatype.config.repos.urls.repoTargets;
-      var updateUri = (formInfoObj.resourceUri) ? formInfoObj.resourceUri : '';
+      var updateUri = (formInfoObj.resourceURI) ? formInfoObj.resourceURI : '';
       var form = formInfoObj.formPanel.form;
     
       form.doAction('sonatypeSubmit', {
@@ -561,7 +561,7 @@ Ext.extend(Sonatype.repoServer.RepoTargetEditPanel, Ext.Panel, {
         var buttonInfoObj = {
             formPanel : action.options.fpanel,
             isNew : false,
-            resourceUri : dataObj.resourceURI
+            resourceURI : dataObj.resourceURI
           };
 
         //save button event handler
@@ -620,8 +620,8 @@ Ext.extend(Sonatype.repoServer.RepoTargetEditPanel, Ext.Panel, {
     }
   },
 
-  formDataLoader : function(formPanel, resourceUri, modFuncs){
-    formPanel.getForm().doAction('sonatypeLoad', {url:resourceUri, method:'GET', fpanel:formPanel, dataModifiers: modFuncs, scope: this});
+  formDataLoader : function(formPanel, resourceURI, modFuncs){
+    formPanel.getForm().doAction('sonatypeLoad', {url:resourceURI, method:'GET', fpanel:formPanel, dataModifiers: modFuncs, scope: this});
   },
 
   rowClick : function(grid, rowIndex, e){
@@ -644,7 +644,7 @@ Ext.extend(Sonatype.repoServer.RepoTargetEditPanel, Ext.Panel, {
       var buttonInfoObj = {
         formPanel : formPanel,
         isNew : false, //not a new route form, see assumption
-        resourceUri : rec.data.resourceURI
+        resourceURI : rec.data.resourceURI
       };
       
       formPanel.buttons[0].on('click', this.saveHandler.createDelegate(this, [buttonInfoObj]));

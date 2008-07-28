@@ -397,7 +397,7 @@ Ext.extend(Sonatype.repoServer.RoleEditPanel, Ext.Panel, {
     if (allValid) {
       var isNew = formInfoObj.isNew;
       var createUri = Sonatype.config.repos.urls.roles;
-      var updateUri = (formInfoObj.resourceUri) ? formInfoObj.resourceUri : '';
+      var updateUri = (formInfoObj.resourceURI) ? formInfoObj.resourceURI : '';
       var form = formInfoObj.formPanel.form;
     
       form.doAction('sonatypeSubmit', {
@@ -608,7 +608,7 @@ Ext.extend(Sonatype.repoServer.RoleEditPanel, Ext.Panel, {
         this.rolesGridPanel.getSelectionModel().selectRecords([newRec], false);
 
         //set the hidden id field in the form for subsequent updates
-        action.options.fpanel.find('name', 'id')[0].setValue(receivedData.resourceURI);
+        action.options.fpanel.find('name', 'id')[0].setValue(receivedData.id);
         //remove button click listeners
         action.options.fpanel.buttons[0].purgeListeners();
         action.options.fpanel.buttons[1].purgeListeners();
@@ -616,7 +616,7 @@ Ext.extend(Sonatype.repoServer.RoleEditPanel, Ext.Panel, {
         var buttonInfoObj = {
             formPanel : action.options.fpanel,
             isNew : false,
-            resourceUri : dataObj.resourceURI
+            resourceURI : dataObj.resourceURI
           };
 
         //save button event handler
@@ -676,8 +676,8 @@ Ext.extend(Sonatype.repoServer.RoleEditPanel, Ext.Panel, {
     }
   },
 
-  formDataLoader : function(formPanel, resourceUri, modFuncs){
-    formPanel.getForm().doAction('sonatypeLoad', {url:resourceUri, method:'GET', fpanel:formPanel, dataModifiers: modFuncs, scope: this});
+  formDataLoader : function(formPanel, resourceURI, modFuncs){
+    formPanel.getForm().doAction('sonatypeLoad', {url:resourceURI, method:'GET', fpanel:formPanel, dataModifiers: modFuncs, scope: this});
   },
 
   rowClick : function(grid, rowIndex, e){
@@ -700,7 +700,7 @@ Ext.extend(Sonatype.repoServer.RoleEditPanel, Ext.Panel, {
       var buttonInfoObj = {
         formPanel : formPanel,
         isNew : false, //not a new route form, see assumption
-        resourceUri : rec.data.resourceURI
+        resourceURI : rec.data.resourceURI
       };
       
       formPanel.buttons[0].on('click', this.saveHandler.createDelegate(this, [buttonInfoObj]));

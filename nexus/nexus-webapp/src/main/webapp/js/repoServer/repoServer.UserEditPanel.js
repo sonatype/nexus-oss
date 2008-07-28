@@ -415,7 +415,7 @@ Ext.extend(Sonatype.repoServer.UserEditPanel, Ext.Panel, {
     
       formInfoObj.formPanel.form.doAction('sonatypeSubmit', {
         method: (isNew) ? 'POST' : 'PUT',
-        url: isNew ? Sonatype.config.repos.urls.users : formInfoObj.resourceUri,
+        url: isNew ? Sonatype.config.repos.urls.users : formInfoObj.resourceURI,
         waitMsg: isNew ? 'Creating User...' : 'Updating User...',
         fpanel: formInfoObj.formPanel,
         dataModifiers: this.submitDataModFunc,
@@ -668,7 +668,7 @@ Ext.extend(Sonatype.repoServer.UserEditPanel, Ext.Panel, {
         var buttonInfoObj = {
             formPanel : action.options.fpanel,
             isNew : false,
-            resourceUri : dataObj.resourceURI
+            resourceURI : dataObj.resourceURI
           };
 
         //save button event handler
@@ -730,8 +730,8 @@ Ext.extend(Sonatype.repoServer.UserEditPanel, Ext.Panel, {
     }
   },
 
-  formDataLoader : function(formPanel, resourceUri, modFuncs){
-    formPanel.getForm().doAction('sonatypeLoad', {url:resourceUri, method:'GET', fpanel:formPanel, dataModifiers: modFuncs, scope: this});
+  formDataLoader : function(formPanel, resourceURI, modFuncs){
+    formPanel.getForm().doAction('sonatypeLoad', {url:resourceURI, method:'GET', fpanel:formPanel, dataModifiers: modFuncs, scope: this});
   },
 
   rowClick : function(grid, rowIndex, e){
@@ -754,7 +754,7 @@ Ext.extend(Sonatype.repoServer.UserEditPanel, Ext.Panel, {
       var buttonInfoObj = {
         formPanel : formPanel,
         isNew : false, //not a new route form, see assumption
-        resourceUri : rec.data.resourceURI
+        resourceURI : rec.data.resourceURI
       };
       
       formPanel.buttons[0].on('click', this.saveHandler.createDelegate(this, [buttonInfoObj]));

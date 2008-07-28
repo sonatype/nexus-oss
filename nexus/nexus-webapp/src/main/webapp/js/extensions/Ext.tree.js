@@ -81,7 +81,7 @@ Ext.extend(Ext.tree.SonatypeTreeLoader, Ext.tree.TreeLoader, {
           Ext.applyIf(attr, this.baseAttrs);
       }
       if(!attr.id){                                                        //diff
-        attr.id = attr.resourceUri;                                        //diff
+        attr.id = attr.resourceURI;                                        //diff
       }                                                                    //diff
       if(this.applyLoader !== false){
           attr.loader = this;

@@ -1150,13 +1150,13 @@ Ext.extend(Sonatype.repoServer.RepoEditPanel, Sonatype.repoServer.AbstractRepoPa
     }
   },
   
-  // formInfoObj : {formPanel, isNew, repoType, [resourceUri]}
+  // formInfoObj : {formPanel, isNew, repoType, [resourceURI]}
   saveHandler : function(formInfoObj){
     if (formInfoObj.formPanel.form.isValid()) {
       var isNew = formInfoObj.isNew;
       var repoType = formInfoObj.repoType;
       var createUri = Sonatype.config.repos.urls.repositories;
-      var updateUri = (formInfoObj.resourceUri) ? formInfoObj.resourceUri : '';
+      var updateUri = (formInfoObj.resourceURI) ? formInfoObj.resourceURI : '';
       var form = formInfoObj.formPanel.form;
     
       form.doAction('sonatypeSubmit', {
@@ -1171,7 +1171,7 @@ Ext.extend(Sonatype.repoServer.RepoEditPanel, Sonatype.repoServer.AbstractRepoPa
     }
   },
   
-  // formInfoObj : {formPanel, isNew, repoType, [resourceUri]}
+  // formInfoObj : {formPanel, isNew, repoType, [resourceURI]}
   cancelHandler : function(formInfoObj) {
     var formLayout = this.formCards.getLayout();
     var gridSelectModel = this.reposGridPanel.getSelectionModel();
@@ -1420,7 +1420,7 @@ Ext.extend(Sonatype.repoServer.RepoEditPanel, Sonatype.repoServer.AbstractRepoPa
             formPanel : action.options.fpanel,
             isNew : false,
             repoType : sentData.repoType,
-            resourceUri : sentData.resourceURI
+            resourceURI : sentData.resourceURI
           };
       
         //save button event handler
@@ -1593,8 +1593,8 @@ Ext.extend(Sonatype.repoServer.RepoEditPanel, Sonatype.repoServer.AbstractRepoPa
     }
   },
   
-  formDataLoader : function(formPanel, resourceUri, modFuncs){
-    formPanel.getForm().doAction('sonatypeLoad', {url:resourceUri, method:'GET', fpanel:formPanel, dataModifiers: modFuncs, scope: this});
+  formDataLoader : function(formPanel, resourceURI, modFuncs){
+    formPanel.getForm().doAction('sonatypeLoad', {url:resourceURI, method:'GET', fpanel:formPanel, dataModifiers: modFuncs, scope: this});
   },
   
   repoRowClick : function(grid, rowIndex, e){
@@ -1620,7 +1620,7 @@ Ext.extend(Sonatype.repoServer.RepoEditPanel, Sonatype.repoServer.AbstractRepoPa
           formPanel : formPanel,
           isNew : false, //not a new repo form, see assumption
           repoType : rec.data.repoType,
-          resourceUri : rec.data.resourceURI
+          resourceURI : rec.data.resourceURI
         };
       
       //save button event handler

@@ -57,7 +57,7 @@ Sonatype.repoServer.PrivilegeEditPanel = function(config){
   };
   
   this.privilegeRecordConstructor = Ext.data.Record.create([
-    {name:'resourceUri'},
+    {name:'resourceURI'},
     {name:'id'},
     {name:'name', sortType:Ext.data.SortTypes.asUCString},
     {name:'type'},
@@ -71,7 +71,7 @@ Sonatype.repoServer.PrivilegeEditPanel = function(config){
   
   
   //Reader and datastore that queries the server for the list of currently defined privileges
-  this.privilegesReader = new Ext.data.JsonReader({root: 'data', id: 'resourceUri'}, this.privilegeRecordConstructor );
+  this.privilegesReader = new Ext.data.JsonReader({root: 'data', id: 'resourceURI'}, this.privilegeRecordConstructor );
   this.privilegesDataStore = new Ext.data.Store({
     url: Sonatype.config.repos.urls.privileges,
     reader: this.privilegesReader,
@@ -79,7 +79,7 @@ Sonatype.repoServer.PrivilegeEditPanel = function(config){
     autoLoad: true
   });
   
-  this.repoTargetReader = new Ext.data.JsonReader({root: 'data', id: 'resourceUri'}, this.repoTargetRecordConstructor );
+  this.repoTargetReader = new Ext.data.JsonReader({root: 'data', id: 'resourceURI'}, this.repoTargetRecordConstructor );
   this.repoTargetDataStore = new Ext.data.Store({
     url: Sonatype.config.repos.urls.repoTargets,
     reader: this.repoTargetReader,
@@ -417,7 +417,7 @@ Ext.extend(Sonatype.repoServer.PrivilegeEditPanel, Ext.Panel, {
     if (allValid) {
       var isNew = formInfoObj.isNew;
       var createUri = Sonatype.config.repos.urls.privileges;
-      var updateUri = (formInfoObj.resourceUri) ? formInfoObj.resourceUri : '';
+      var updateUri = (formInfoObj.resourceURI) ? formInfoObj.resourceURI : '';
       var form = formInfoObj.formPanel.form;
     
       form.doAction('sonatypeSubmit', {
@@ -489,7 +489,7 @@ Ext.extend(Sonatype.repoServer.PrivilegeEditPanel, Ext.Panel, {
     var newRec = new this.privilegeRecordConstructor({
         id : 'new_item',
         name : 'New Privilege',
-        resourceUri : 'new'
+        resourceURI : 'new'
       },
       id); //use "new_item" id instead of resourceURI like the reader does
     this.privilegesDataStore.insert(0, [newRec]);
@@ -523,7 +523,7 @@ Ext.extend(Sonatype.repoServer.PrivilegeEditPanel, Ext.Panel, {
     if (this.ctxRecord || this.privilegesGridPanel.getSelectionModel().hasSelection()){
       var rec = this.ctxRecord ? this.ctxRecord : this.privilegesGridPanel.getSelectionModel().getSelected();
 
-      if(rec.data.resourceUri == 'new'){
+      if(rec.data.resourceURI == 'new'){
         this.cancelHandler({
           formPanel : Ext.getCmp(rec.id),
           isNew : true
@@ -555,7 +555,7 @@ Ext.extend(Sonatype.repoServer.PrivilegeEditPanel, Ext.Panel, {
                 },
                 scope: this,
                 method: 'DELETE',
-                url:rec.data.resourceUri
+                url:rec.data.resourceURI
               });
             }
           }
@@ -612,7 +612,7 @@ Ext.extend(Sonatype.repoServer.PrivilegeEditPanel, Ext.Panel, {
         rec.beginEdit();
         rec.set('id', receivedData.id);
         rec.set('name', receivedData.name);
-        rec.set('resourceUri', receivedData.resourceUri);
+        rec.set('resourceURI', receivedData.resourceURI);
         rec.commit();
         rec.endEdit();
   },

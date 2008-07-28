@@ -19,15 +19,15 @@
         #foreach( $listItem in $listItems )
           <tr>
             <td>
-              #if( $listItem.resourceUri.endsWith( '/' ) )
-                #set( $uriLength = $listItem.resourceUri.length() - 2 )
-                #set( $startIndex = $listItem.resourceUri.lastIndexOf( '/', $uriLength ) + 1 )
-                #set( $linkName = $listItem.resourceUri.substring( $startIndex ) )
-                <a href="$listItem.resourceUri">$linkName</a>
+              #if( $listItem.resourceURI.endsWith( '/' ) )
+                #set( $uriLength = $listItem.resourceURI.length() - 2 )
+                #set( $startIndex = $listItem.resourceURI.lastIndexOf( '/', $uriLength ) + 1 )
+                #set( $linkName = $listItem.resourceURI.substring( $startIndex ) )
+                <a href="$listItem.resourceURI">$linkName</a>
               #else
-                #set( $startIndex = $listItem.resourceUri.lastIndexOf( '/' ) + 1 )
-                #set( $linkName = $listItem.resourceUri.substring( $startIndex ) )
-                <a href="$listItem.resourceUri">$linkName</a>
+                #set( $startIndex = $listItem.resourceURI.lastIndexOf( '/' ) + 1 )
+                #set( $linkName = $listItem.resourceURI.substring( $startIndex ) )
+                <a href="$listItem.resourceURI">$linkName</a>
               #end
             </td>
             <td align="center">

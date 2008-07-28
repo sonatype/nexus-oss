@@ -22,6 +22,7 @@ package org.sonatype.nexus.configuration.security.validator;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 import org.codehaus.plexus.logging.AbstractLogEnabled;
@@ -448,14 +449,7 @@ public class DefaultSecurityConfigurationValidator
             existingIds = context.getExistingUserIds();
         }
         
-        List<String> existingEmails = context.getExistingEmails();
-        
-        if ( existingEmails == null )
-        {
-            context.addExistingEmails();
-            
-            existingEmails = context.getExistingEmails();
-        }
+        Map<String,String> existingEmailMap = context.getExistingEmailMap();
 
         if ( !update
             && ( StringUtils.isEmpty( user.getUserId() )
@@ -485,14 +479,20 @@ public class DefaultSecurityConfigurationValidator
             ValidationMessage message = new ValidationMessage( "email", "User ID '" + user.getUserId() + "' has no email address", "Email address is required." );
             response.addValidationError( message );
         }
-        else if ( existingEmails.contains( user.getEmail() ) )
-        {
-            ValidationMessage message = new ValidationMessage( "email", "User ID '" + user.getUserId() + "' must have a unique email address.", "Email address must be unique." );
-            response.addValidationError( message );
-        }
         else
         {
-            existingEmails.add( user.getEmail() );
+            for ( String id : existingEmailMap.keySet() )
+            {
+                if ( id != user.getUserId() 
+                    && existingEmailMap.get( id ).equals( user.getEmail() ) )
+                {
+                    ValidationMessage message = new ValidationMessage( "email", "User ID '" + user.getUserId() + "' must have a unique email address.", "Email address must be unique." );
+                    response.addValidationError( message );
+                    break;
+                }
+            }
+            
+            existingEmailMap.put( user.getUserId(), user.getEmail() );
         }
         
         if ( !CUser.STATUS_ACTIVE.equals( user.getStatus() ) 

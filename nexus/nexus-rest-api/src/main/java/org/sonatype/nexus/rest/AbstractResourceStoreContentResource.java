@@ -284,7 +284,7 @@ public abstract class AbstractResourceStoreContentResource
 
                     resource.setLeaf( !StorageCollectionItem.class.isAssignableFrom( child.getClass() ) );
 
-                    resource.setResourceUri( calculateSubReference( child.getName() ).toString()
+                    resource.setResourceURI( calculateSubReference( child.getName() ).toString()
                         + ( resource.isLeaf() ? "" : "/" ) );
 
                     resource.setRelativePath( child.getPath() + ( resource.isLeaf() ? "" : "/" ) );

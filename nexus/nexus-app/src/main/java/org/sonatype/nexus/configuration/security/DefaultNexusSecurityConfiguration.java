@@ -640,14 +640,13 @@ public class DefaultNexusSecurityConfiguration
         SecurityValidationContext context = new SecurityValidationContext();
         
         context.addExistingUserIds();
-        context.addExistingEmails();
         context.addExistingRoleIds();
         context.addExistingPrivilegeIds();
         
         for ( CUser user : listUsers() )
         {
             context.getExistingUserIds().add( user.getUserId() );
-            context.getExistingEmails().add( user.getEmail() );
+            context.getExistingEmailMap().put( user.getUserId(), user.getEmail() );
         }
         
         for ( CRole role : listRoles() )

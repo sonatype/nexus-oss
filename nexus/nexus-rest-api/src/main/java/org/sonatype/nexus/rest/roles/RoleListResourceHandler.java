@@ -110,6 +110,8 @@ extends AbstractRoleResourceHandler
                 
                 resource.setId( role.getId() );
                 
+                resource.setResourceURI( calculateSubReference( resource.getId() ).toString() );
+                
                 response.setData( resource );
                 
                 getResponse().setEntity( serialize( representation, response ) );
