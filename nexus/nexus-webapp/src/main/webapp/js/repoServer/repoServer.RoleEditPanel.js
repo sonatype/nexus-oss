@@ -131,7 +131,7 @@ Sonatype.repoServer.RoleEditPanel = function(config){
         labelStyle: 'margin-left: 15px; width: 185px;',
         helpText: ht.description,
         name: 'description',
-        allowBlank: false,
+        allowBlank: true,
         width: this.COMBO_WIDTH
       },
       {
