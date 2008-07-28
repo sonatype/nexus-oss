@@ -66,7 +66,7 @@ public class DefaultSecurityConfigurationValidator
         {
             for ( CApplicationPrivilege priv : appPrivs )
             {
-                response.append( validateApplicationPrivilege( context, priv ) );
+                response.append( validateApplicationPrivilege( context, priv, false ) );
             }
         }
         
@@ -76,7 +76,7 @@ public class DefaultSecurityConfigurationValidator
         {
             for ( CRepoTargetPrivilege priv : targetPrivs )
             {
-                response.append( validateRepoTargetPrivilege( context, priv ) );
+                response.append( validateRepoTargetPrivilege( context, priv, false ) );
             }
         }
         
@@ -86,7 +86,7 @@ public class DefaultSecurityConfigurationValidator
         {
             for ( CRole role : roles )
             {
-                response.append( validateRole( context, role ) );
+                response.append( validateRole( context, role, false ) );
             }
         }
         
@@ -98,7 +98,7 @@ public class DefaultSecurityConfigurationValidator
         {
             for ( CUser user : users )
             {
-                response.append( validateUser( context, user ) );
+                response.append( validateUser( context, user, false ) );
             }
         }
 
@@ -141,7 +141,7 @@ public class DefaultSecurityConfigurationValidator
         return response;
     }
     
-    public ValidationResponse validatePrivilege( SecurityValidationContext ctx, CPrivilege privilege )
+    public ValidationResponse validatePrivilege( SecurityValidationContext ctx, CPrivilege privilege, boolean update )
     {
         ValidationResponse response = new SecurityValidationResponse();
         
@@ -163,9 +163,10 @@ public class DefaultSecurityConfigurationValidator
             existingIds = context.getExistingPrivilegeIds();
         }
 
-        if ( StringUtils.isEmpty( privilege.getId() )
+        if ( !update
+            && ( StringUtils.isEmpty( privilege.getId() )
             || "0".equals( privilege.getId() )
-            || ( existingIds.contains( privilege.getId() ) ) )
+            || ( existingIds.contains( privilege.getId() ) ) ) )
         {
             String newId = Long.toHexString( System.currentTimeMillis() + rnd.nextInt( 2008 ) );
             
@@ -203,7 +204,7 @@ public class DefaultSecurityConfigurationValidator
         return response;
     }
     
-    public ValidationResponse validateRepoTargetPrivilege( SecurityValidationContext ctx, CRepoTargetPrivilege privilege )
+    public ValidationResponse validateRepoTargetPrivilege( SecurityValidationContext ctx, CRepoTargetPrivilege privilege, boolean update )
     {
         ValidationResponse response = new SecurityValidationResponse();
         
@@ -214,7 +215,7 @@ public class DefaultSecurityConfigurationValidator
         
         SecurityValidationContext context = ( SecurityValidationContext ) response.getContext();
         
-        response.append( validatePrivilege( context, privilege ) );
+        response.append( validatePrivilege( context, privilege, update ) );
         
         if ( StringUtils.isEmpty( privilege.getRepositoryTargetId() ) )
         {
@@ -233,7 +234,7 @@ public class DefaultSecurityConfigurationValidator
         return response;
     }
     
-    public ValidationResponse validateApplicationPrivilege( SecurityValidationContext ctx, CApplicationPrivilege privilege )
+    public ValidationResponse validateApplicationPrivilege( SecurityValidationContext ctx, CApplicationPrivilege privilege, boolean update )
     {
         ValidationResponse response = new SecurityValidationResponse();
         
@@ -244,7 +245,7 @@ public class DefaultSecurityConfigurationValidator
         
         SecurityValidationContext context = ( SecurityValidationContext ) response.getContext();
         
-        response.append( validatePrivilege( context, privilege ) );
+        response.append( validatePrivilege( context, privilege, update ) );
         
         if ( StringUtils.isEmpty( privilege.getPermission() ) )
         {
@@ -322,7 +323,7 @@ public class DefaultSecurityConfigurationValidator
         return response;
     }
     
-    public ValidationResponse validateRole( SecurityValidationContext ctx, CRole role )
+    public ValidationResponse validateRole( SecurityValidationContext ctx, CRole role, boolean update )
     {
         ValidationResponse response = new SecurityValidationResponse();
         
@@ -344,9 +345,10 @@ public class DefaultSecurityConfigurationValidator
             existingIds = context.getExistingRoleIds();
         }
 
-        if ( StringUtils.isEmpty( role.getId() )
+        if ( !update
+            && ( StringUtils.isEmpty( role.getId() )
             || "0".equals( role.getId() )
-            || ( existingIds.contains( role.getId() ) ) )
+            || ( existingIds.contains( role.getId() ) ) ) )
         {
             String newId = Long.toHexString( System.currentTimeMillis() + rnd.nextInt( 2008 ) );
 
@@ -366,12 +368,16 @@ public class DefaultSecurityConfigurationValidator
         
         if ( 1 > role.getSessionTimeout() )
         {
-            response.addValidationWarning( "Role ID '" + role.getId() + "' fixed invalid session timeout from '" + 
-                                           role.getSessionTimeout() + "' to '60'." );
-            
-            role.setSessionTimeout( 60 );
-            
-            response.setModified( true );
+            ValidationMessage message = new ValidationMessage( "sessionTimeout", "Role ID '" + role.getId() + "' requires a Session Timeout greater than 0 minutes.", "Enter a session timeout greater than 0 minutes." );
+            response.addValidationError( message );
+        }
+        
+        // No roles or privs
+        if ( role.getRoles().size() == 0
+             && role.getPrivileges().size() == 0 )
+        {
+            ValidationMessage message = new ValidationMessage( "privileges", "Role ID '" + role.getId() + "' is required to contain at least 1 role or privilege.", "One or more roles/privilegs are required." );
+            response.addValidationError( message );
         }
         
         if ( context.getExistingPrivilegeIds() != null )
@@ -416,7 +422,7 @@ public class DefaultSecurityConfigurationValidator
         return response;
     }
     
-    public ValidationResponse validateUser( SecurityValidationContext ctx, CUser user )
+    public ValidationResponse validateUser( SecurityValidationContext ctx, CUser user, boolean update )
     {
         ValidationResponse response = new SecurityValidationResponse();
         
@@ -436,10 +442,17 @@ public class DefaultSecurityConfigurationValidator
             existingIds = context.getExistingUserIds();
         }
 
-        if ( StringUtils.isEmpty( user.getUserId() )
-            || existingIds.contains( user.getUserId() ) )
+        if ( !update
+            && ( StringUtils.isEmpty( user.getUserId() )
+            || existingIds.contains( user.getUserId() ) ) )
         {
             ValidationMessage message = new ValidationMessage( "userId", "User ID '" + user.getUserId() + "' is invalid.  It is either empty or already in use.", "User Id is required and must be unique." );
+            response.addValidationError( message );
+        }
+        
+        if ( StringUtils.isEmpty( user.getName() ) )
+        {
+            ValidationMessage message = new ValidationMessage( "name", "User ID '" + user.getUserId() + "' has no Name.  This is a required field.", "Name is required." );
             response.addValidationError( message );
         }
         

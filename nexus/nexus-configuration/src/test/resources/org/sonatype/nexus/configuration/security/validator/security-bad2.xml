@@ -1,15 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!-- This configuration will cause 4 validation warnings -->
-<!-- This configuration will cause 8 validation error -->
+<!-- This configuration will cause 3 validation warnings -->
+<!-- This configuration will cause 11 validation error -->
 <nexusSecurity>
     <version>1.0.0</version>    
+    <applicationPrivileges>      
+      <applicationPrivilege>
+        <id>1</id>
+        <name>priv</name>
+        <method>read</method>
+        <permission>/some/path/</permission>
+      </applicationPrivilege>      
+    </applicationPrivileges>    
     <roles>      
         <!-- invalid id of 0 -->   
+        <!-- no privs/roles -->
+        <!-- no session timeout -->
         <role>      
             <id>0</id>
             <name>name</name>
-            <sessionTimeout>50</sessionTimeout>
         </role>
         
         <!-- no id -->
@@ -17,12 +26,18 @@
         <!-- invalid session timeout -->
         <role>
           <sessionTimeout>0</sessionTimeout>
+          <privileges>
+            <privilege>1</privilege>
+          </privileges>
         </role>
         
         <role>
             <id>arole</id>
             <name>name</name>
             <sessionTimeout>25</sessionTimeout>
+            <privileges>
+              <privilege>1</privilege>
+            </privileges>
         </role>
         
         <!-- Duplicate role id -->      
@@ -30,6 +45,9 @@
             <id>arole</id>
             <name>name</name>
             <sessionTimeout>25</sessionTimeout>
+            <privileges>
+              <privilege>1</privilege>
+            </privileges>
         </role>   
         
         <!-- including itself -->

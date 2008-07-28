@@ -1,19 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!-- This config will cause 8 validation errors -->
+<!-- This config will cause 9 validation errors -->
 <!-- This config will cause 1 validation warning -->
 
 <nexusSecurity>
-	<version>1.0.0</version>	
+	<version>1.0.0</version>
+	<applicationPrivileges>      
+      <applicationPrivilege>
+        <id>1</id>
+        <name>priv</name>
+        <method>read</method>
+        <permission>/some/path/</permission>
+      </applicationPrivilege>      
+    </applicationPrivileges>	
 	<roles>
 	  <role>
 	    <id>id</id>
 	    <name>name</name>
 	    <sessionTimeout>50</sessionTimeout>
+	    <privileges>
+	      <privilege>1</privilege>
+	    </privileges>
 	  </role>
 	</roles>
 	<users>		
 	    <!-- no id -->
+	    <!-- no name -->
 	    <!-- no email address -->
 	    <!-- invalid role id -->
 	    <!-- no password -->

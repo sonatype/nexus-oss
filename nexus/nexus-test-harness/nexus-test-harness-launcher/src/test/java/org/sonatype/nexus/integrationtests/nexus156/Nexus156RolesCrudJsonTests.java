@@ -1,7 +1,6 @@
 package org.sonatype.nexus.integrationtests.nexus156;
 
 import java.io.IOException;
-import java.util.ArrayList;
 
 import junit.framework.Assert;
 
@@ -10,11 +9,7 @@ import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
-import org.sonatype.nexus.integrationtests.nexus142.UserMessageUtil;
 import org.sonatype.nexus.rest.model.RoleResource;
-import org.sonatype.nexus.rest.model.RoleResourceResponse;
-import org.sonatype.nexus.rest.model.UserResource;
-import org.sonatype.nexus.rest.model.UserResourceRequest;
 import org.sonatype.nexus.rest.xstream.XStreamInitializer;
 import org.sonatype.nexus.test.utils.SecurityConfigUtil;
 import org.sonatype.plexus.rest.xstream.json.JsonOrgHierarchicalStreamDriver;
@@ -44,14 +39,14 @@ public class Nexus156RolesCrudJsonTests
         resource.setDescription( "Create Test Role" );
         resource.setName( "CreateRole" );
         resource.setSessionTimeout( 30 );
-        resource.addPrivilege( "priv1" );
-        resource.addPrivilege( "priv2" );
+        resource.addPrivilege( "1" );
+        resource.addPrivilege( "2" );
 
         Response response = this.messageUtil.sendMessage( Method.POST, resource );
 
         if ( !response.getStatus().isSuccess() )
         {
-            Assert.fail( "Could not create user: " + response.getStatus() );
+            Assert.fail( "Could not create role: " + response.getStatus() );
         }
 
         // get the Resource object
@@ -81,8 +76,8 @@ public class Nexus156RolesCrudJsonTests
         resource.setDescription( "Read Test Role" );
         resource.setName( "ReadRole" );
         resource.setSessionTimeout( 31 );
-        resource.addPrivilege( "priv3" );
-        resource.addPrivilege( "priv4" );
+        resource.addPrivilege( "3" );
+        resource.addPrivilege( "4" );
 
         Response response = this.messageUtil.sendMessage( Method.POST, resource );
 
@@ -135,14 +130,14 @@ public class Nexus156RolesCrudJsonTests
         resource.setDescription( "Update Test Role" );
         resource.setName( "UpdateRole" );
         resource.setSessionTimeout( 99999 );
-        resource.addPrivilege( "priv5" );
-        resource.addPrivilege( "priv4" );
+        resource.addPrivilege( "5" );
+        resource.addPrivilege( "4" );
 
         Response response = this.messageUtil.sendMessage( Method.POST, resource );
 
         if ( !response.getStatus().isSuccess() )
         {
-            Assert.fail( "Could not create user: " + response.getStatus() );
+            Assert.fail( "Could not create Role: " + response.getStatus() );
         }
 
         // get the Resource object
@@ -161,19 +156,19 @@ public class Nexus156RolesCrudJsonTests
 
         SecurityConfigUtil.verifyRole( resource );
 
-        // update the user
+        // update the Role
         // TODO: add tests that changes the Id
         resource.setName( "UpdateRole Again" );
         resource.setDescription( "Update Test Role Again" );
         resource.getPrivileges().clear(); // clear the privs
-        resource.addPrivilege( "priv6" );
+        resource.addPrivilege( "6" );
         resource.setSessionTimeout( 10 );
 
         response = this.messageUtil.sendMessage( Method.PUT, resource );
 
         if ( !response.getStatus().isSuccess() )
         {
-            Assert.fail( "Could not update user: " + response.getStatus() );
+            Assert.fail( "Could not update Role: " + response.getStatus() );
         }
 
         // get the Resource object
@@ -199,14 +194,14 @@ public class Nexus156RolesCrudJsonTests
         resource.setDescription( "Delete Test Role" );
         resource.setName( "deleteRole" );
         resource.setSessionTimeout( 1 );
-        resource.addPrivilege( "priv7" );
-        resource.addPrivilege( "priv8" );
+        resource.addPrivilege( "7" );
+        resource.addPrivilege( "8" );
 
         Response response = this.messageUtil.sendMessage( Method.POST, resource );
 
         if ( !response.getStatus().isSuccess() )
         {
-            Assert.fail( "Could not create user: " + response.getStatus() );
+            Assert.fail( "Could not create Role: " + response.getStatus() );
         }
 
         // get the Resource object
@@ -220,7 +215,7 @@ public class Nexus156RolesCrudJsonTests
 
         if ( !response.getStatus().isSuccess() )
         {
-            Assert.fail( "Could not delete User: " + response.getStatus() );
+            Assert.fail( "Could not delete Role: " + response.getStatus() );
         }
 
         // TODO: check if deleted

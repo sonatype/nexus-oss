@@ -128,7 +128,6 @@ Sonatype.repoServer.RoleEditPanel = function(config){
       {
         xtype: 'textfield',
         fieldLabel: 'Description',
-        itemCls: 'required-field',
         labelStyle: 'margin-left: 15px; width: 185px;',
         helpText: ht.description,
         name: 'description',

@@ -4,7 +4,6 @@ import java.io.IOException;
 
 import org.junit.Test;
 import org.restlet.data.MediaType;
-import org.sonatype.nexus.integrationtests.nexus142.UserMessageUtil;
 import org.sonatype.nexus.rest.xstream.XStreamInitializer;
 
 import com.thoughtworks.xstream.XStream;

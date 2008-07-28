@@ -77,7 +77,6 @@ public class Nexus142UserValidationTests
     @Test
     public void createUserWithNoUserName() throws IOException
     {
-        
         UserResource resource = new UserResource();
 
 //        resource.setName( "createUserWithNoUserName" );
@@ -289,7 +288,9 @@ public class Nexus142UserValidationTests
         {
             Assert.fail( "User should not have been created: " + response.getStatus() );
         }
-        Assert.assertTrue( response.getEntity().getText().startsWith( "{\"errors\":" ) );
+        
+        // This is actually not a validation error, but a 'not found' error, so result will NOT contain the validation errors
+        // Assert.assertTrue( response.getEntity().getText().startsWith( "{\"errors\":" ) );
     }
     
 

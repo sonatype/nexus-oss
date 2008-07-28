@@ -210,15 +210,14 @@
                     <name>description</name>
                     <version>1.0.0+</version>
                     <type>String</type>
-                    <required>true</required>
+                    <required>false</required>
                     <description>An explanation of the use of the role.</description>
                 </field>
                 <field>
                     <name>sessionTimeout</name>
                     <version>1.0.0+</version>
                     <type>int</type>
-                    <required>false</required>
-                    <defaultValue>60</defaultValue>
+                    <required>true</required>
                     <description>The number of minutes to wait before the session timeouts because of inactivity.</description>
                 </field>
                 <field>

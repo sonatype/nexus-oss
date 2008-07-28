@@ -1,26 +1,316 @@
-<?xml version="1.0" encoding="UTF-8"?><nexusSecurity>
-  <version>1.0.0</version>
-    <roles>
-    <role>
-      <id>role1</id>
-      <name>RoleOne</name>
-      <description>Role One</description>
-      <sessionTimeout>60</sessionTimeout>
-      <privileges>
-        <privilege>priv1</privilege>
-        <privilege>priv2</privilege>
-      </privileges>
-    </role>
-    <role>
-      <id>role2</id>
-      <name>RoleTwo</name>
-      <description>Role Two</description>
-      <sessionTimeout>60</sessionTimeout>
-      <privileges>
-        <privilege>priv3</privilege>
-        <privilege>priv4</privilege>
-      </privileges>
-    </role>
-  </roles>
-  
+<?xml version="1.0" encoding="UTF-8"?>
+<nexusSecurity>
+	<version>1.0.0</version>
+	<roles>
+		<role>
+			<id>role1</id>
+			<name>RoleOne</name>
+			<description>Role One</description>
+			<sessionTimeout>60</sessionTimeout>
+			<privileges>
+				<privilege>1</privilege>
+				<privilege>2</privilege>
+			</privileges>
+		</role>
+		<role>
+			<id>role2</id>
+			<name>RoleTwo</name>
+			<description>Role Two</description>
+			<sessionTimeout>60</sessionTimeout>
+			<privileges>
+				<privilege>3</privilege>
+				<privilege>4</privilege>
+			</privileges>
+		</role>
+	</roles>
+	<applicationPrivileges>
+		<applicationPrivilege>
+			<id>1</id>
+			<name>Status - (read)</name>
+			<method>read</method>
+			<permission>nexus:status</permission>
+		</applicationPrivilege>
+		<applicationPrivilege>
+			<id>2</id>
+			<name>Authentication - (read)</name>
+			<method>read</method>
+			<permission>nexus:authentication</permission>
+		</applicationPrivilege>
+		<applicationPrivilege>
+			<id>3</id>
+			<name>Settings - (read)</name>
+			<method>read</method>
+			<permission>nexus:settings</permission>
+		</applicationPrivilege>
+		<applicationPrivilege>
+			<id>4</id>
+			<name>Settings - (update)</name>
+			<method>update</method>
+			<permission>nexus:settings</permission>
+		</applicationPrivilege>
+		<applicationPrivilege>
+			<id>5</id>
+			<name>Repositories - (create)</name>
+			<method>create</method>
+			<permission>nexus:repositories</permission>
+		</applicationPrivilege>
+		<applicationPrivilege>
+			<id>6</id>
+			<name>Repositories - (read)</name>
+			<method>read</method>
+			<permission>nexus:repositories</permission>
+		</applicationPrivilege>
+		<applicationPrivilege>
+			<id>7</id>
+			<name>Repositories - (update)</name>
+			<method>update</method>
+			<permission>nexus:repositories</permission>
+		</applicationPrivilege>
+		<applicationPrivilege>
+			<id>8</id>
+			<name>Repositories - (delete)</name>
+			<method>delete</method>
+			<permission>nexus:repositories</permission>
+		</applicationPrivilege>
+		<applicationPrivilege>
+			<id>9</id>
+			<name>Repository Templates - (create)</name>
+			<method>create</method>
+			<permission>nexus:repotemplates</permission>
+		</applicationPrivilege>
+		<applicationPrivilege>
+			<id>10</id>
+			<name>Repository Templates - (read)</name>
+			<method>read</method>
+			<permission>nexus:repotemplates</permission>
+		</applicationPrivilege>
+		<applicationPrivilege>
+			<id>11</id>
+			<name>Repository Templates - (update)</name>
+			<method>update</method>
+			<permission>nexus:repotemplates</permission>
+		</applicationPrivilege>
+		<applicationPrivilege>
+			<id>12</id>
+			<name>Repository Templates - (delete)</name>
+			<method>delete</method>
+			<permission>nexus:repotemplates</permission>
+		</applicationPrivilege>
+		<applicationPrivilege>
+			<id>13</id>
+			<name>Repository Groups - (create)</name>
+			<method>create</method>
+			<permission>nexus:repogroups</permission>
+		</applicationPrivilege>
+		<applicationPrivilege>
+			<id>14</id>
+			<name>Repository Groups - (read)</name>
+			<method>read</method>
+			<permission>nexus:repogroups</permission>
+		</applicationPrivilege>
+		<applicationPrivilege>
+			<id>15</id>
+			<name>Repository Groups - (update)</name>
+			<method>update</method>
+			<permission>nexus:repogroups</permission>
+		</applicationPrivilege>
+		<applicationPrivilege>
+			<id>16</id>
+			<name>Repository Groups - (delete)</name>
+			<method>delete</method>
+			<permission>nexus:repogroups</permission>
+		</applicationPrivilege>
+		<applicationPrivilege>
+			<id>17</id>
+			<name>Data Index - (read)</name>
+			<method>read</method>
+			<permission>nexus:index</permission>
+		</applicationPrivilege>
+		<applicationPrivilege>
+			<id>18</id>
+			<name>Data Index - (delete)</name>
+			<method>delete</method>
+			<permission>nexus:index</permission>
+		</applicationPrivilege>
+		<applicationPrivilege>
+			<id>19</id>
+			<name>Identify - (read)</name>
+			<method>read</method>
+			<permission>nexus:identify</permission>
+		</applicationPrivilege>
+		<applicationPrivilege>
+			<id>20</id>
+			<name>Attributes - (delete)</name>
+			<method>delete</method>
+			<permission>nexus:attributes</permission>
+		</applicationPrivilege>
+		<applicationPrivilege>
+			<id>21</id>
+			<name>Cache - (delete)</name>
+			<method>delete</method>
+			<permission>nexus:cache</permission>
+		</applicationPrivilege>
+		<applicationPrivilege>
+			<id>22</id>
+			<name>Repository Routes - (create)</name>
+			<method>create</method>
+			<permission>nexus:routes</permission>
+		</applicationPrivilege>
+		<applicationPrivilege>
+			<id>23</id>
+			<name>Repository Routes - (read)</name>
+			<method>read</method>
+			<permission>nexus:routes</permission>
+		</applicationPrivilege>
+		<applicationPrivilege>
+			<id>24</id>
+			<name>Repository Routes - (update)</name>
+			<method>update</method>
+			<permission>nexus:routes</permission>
+		</applicationPrivilege>
+		<applicationPrivilege>
+			<id>25</id>
+			<name>Repository Routes - (delete)</name>
+			<method>delete</method>
+			<permission>nexus:routes</permission>
+		</applicationPrivilege>
+		<applicationPrivilege>
+			<id>26</id>
+			<name>Scheduled Tasks - (create)</name>
+			<method>create</method>
+			<permission>nexus:tasks</permission>
+		</applicationPrivilege>
+		<applicationPrivilege>
+			<id>27</id>
+			<name>Scheduled Tasks - (read)</name>
+			<method>read</method>
+			<permission>nexus:tasks</permission>
+		</applicationPrivilege>
+		<applicationPrivilege>
+			<id>28</id>
+			<name>Scheduled Tasks - (update)</name>
+			<method>update</method>
+			<permission>nexus:tasks</permission>
+		</applicationPrivilege>
+		<applicationPrivilege>
+			<id>29</id>
+			<name>Scheduled Tasks - (delete)</name>
+			<method>delete</method>
+			<permission>nexus:tasks</permission>
+		</applicationPrivilege>
+		<applicationPrivilege>
+			<id>30</id>
+			<name>Privileges - (create)</name>
+			<method>create</method>
+			<permission>nexus:privileges</permission>
+		</applicationPrivilege>
+		<applicationPrivilege>
+			<id>31</id>
+			<name>Privileges - (read)</name>
+			<method>read</method>
+			<permission>nexus:privileges</permission>
+		</applicationPrivilege>
+		<applicationPrivilege>
+			<id>32</id>
+			<name>Privileges - (update)</name>
+			<method>update</method>
+			<permission>nexus:privileges</permission>
+		</applicationPrivilege>
+		<applicationPrivilege>
+			<id>33</id>
+			<name>Privileges - (delete)</name>
+			<method>delete</method>
+			<permission>nexus:privileges</permission>
+		</applicationPrivilege>
+		<applicationPrivilege>
+			<id>34</id>
+			<name>Roles - (create)</name>
+			<method>create</method>
+			<permission>nexus:roles</permission>
+		</applicationPrivilege>
+		<applicationPrivilege>
+			<id>35</id>
+			<name>Roles - (read)</name>
+			<method>read</method>
+			<permission>nexus:roles</permission>
+		</applicationPrivilege>
+		<applicationPrivilege>
+			<id>36</id>
+			<name>Roles - (update)</name>
+			<method>update</method>
+			<permission>nexus:roles</permission>
+		</applicationPrivilege>
+		<applicationPrivilege>
+			<id>37</id>
+			<name>Roles - (delete)</name>
+			<method>delete</method>
+			<permission>nexus:roles</permission>
+		</applicationPrivilege>
+		<applicationPrivilege>
+			<id>38</id>
+			<name>Users - (create)</name>
+			<method>create</method>
+			<permission>nexus:users</permission>
+		</applicationPrivilege>
+		<applicationPrivilege>
+			<id>39</id>
+			<name>Users - (read)</name>
+			<method>read</method>
+			<permission>nexus:users</permission>
+		</applicationPrivilege>
+		<applicationPrivilege>
+			<id>40</id>
+			<name>Users - (update)</name>
+			<method>update</method>
+			<permission>nexus:users</permission>
+		</applicationPrivilege>
+		<applicationPrivilege>
+			<id>41</id>
+			<name>Users - (delete)</name>
+			<method>delete</method>
+			<permission>nexus:users</permission>
+		</applicationPrivilege>
+		<applicationPrivilege>
+			<id>42</id>
+			<name>Logs - (read)</name>
+			<method>read</method>
+			<permission>nexus:logs</permission>
+		</applicationPrivilege>
+		<applicationPrivilege>
+			<id>43</id>
+			<name>Configuration File - (read)</name>
+			<method>read</method>
+			<permission>nexus:configuration</permission>
+		</applicationPrivilege>
+		<applicationPrivilege>
+			<id>44</id>
+			<name>Data Feeds - (read)</name>
+			<method>read</method>
+			<permission>nexus:feeds</permission>
+		</applicationPrivilege>
+		<applicationPrivilege>
+			<id>45</id>
+			<name>Repository Targets - (create)</name>
+			<method>create</method>
+			<permission>nexus:targets</permission>
+		</applicationPrivilege>
+		<applicationPrivilege>
+			<id>46</id>
+			<name>Repository Targets - (read)</name>
+			<method>read</method>
+			<permission>nexus:targets</permission>
+		</applicationPrivilege>
+		<applicationPrivilege>
+			<id>47</id>
+			<name>Repository Targets - (update)</name>
+			<method>update</method>
+			<permission>nexus:targets</permission>
+		</applicationPrivilege>
+		<applicationPrivilege>
+			<id>48</id>
+			<name>Repository Targets - (delete)</name>
+			<method>delete</method>
+			<permission>nexus:targets</permission>
+		</applicationPrivilege>
+	</applicationPrivileges>
 </nexusSecurity>

@@ -43,7 +43,7 @@ public interface SecurityConfigurationValidator extends ConfigurationValidator
      * @param user
      * @return
      */
-    ValidationResponse validateUser( SecurityValidationContext ctx, CUser user );
+    ValidationResponse validateUser( SecurityValidationContext ctx, CUser user, boolean update );
     
     /**
      * Validate a role configuration
@@ -52,7 +52,7 @@ public interface SecurityConfigurationValidator extends ConfigurationValidator
      * @param role
      * @return
      */
-    ValidationResponse validateRole( SecurityValidationContext ctx, CRole role );
+    ValidationResponse validateRole( SecurityValidationContext ctx, CRole role, boolean update );
     
     /**
      * Validate a repository target privilege configuration
@@ -61,7 +61,7 @@ public interface SecurityConfigurationValidator extends ConfigurationValidator
      * @param privilege
      * @return
      */
-    ValidationResponse validateRepoTargetPrivilege( SecurityValidationContext ctx, CRepoTargetPrivilege privilege );
+    ValidationResponse validateRepoTargetPrivilege( SecurityValidationContext ctx, CRepoTargetPrivilege privilege, boolean update );
     
     /**
      * Validate an application privilege configuration
@@ -70,5 +70,5 @@ public interface SecurityConfigurationValidator extends ConfigurationValidator
      * @param privilege
      * @return
      */
-    ValidationResponse validateApplicationPrivilege( SecurityValidationContext ctx, CApplicationPrivilege privilege );    
+    ValidationResponse validateApplicationPrivilege( SecurityValidationContext ctx, CApplicationPrivilege privilege, boolean update );    
 }

@@ -35,6 +35,7 @@ import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
 import org.sonatype.nexus.configuration.ConfigurationChangeListener;
 import org.sonatype.nexus.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.security.model.CApplicationPrivilege;
+import org.sonatype.nexus.configuration.security.model.CPrivilege;
 import org.sonatype.nexus.configuration.security.model.CRepoTargetPrivilege;
 import org.sonatype.nexus.configuration.security.model.CRole;
 import org.sonatype.nexus.configuration.security.model.CUser;
@@ -42,6 +43,7 @@ import org.sonatype.nexus.configuration.security.model.Configuration;
 import org.sonatype.nexus.configuration.security.runtime.SecurityRuntimeConfigurationBuilder;
 import org.sonatype.nexus.configuration.security.source.SecurityConfigurationSource;
 import org.sonatype.nexus.configuration.security.validator.SecurityConfigurationValidator;
+import org.sonatype.nexus.configuration.security.validator.SecurityValidationContext;
 import org.sonatype.nexus.configuration.validator.InvalidConfigurationException;
 import org.sonatype.nexus.configuration.validator.ValidationResponse;
 
@@ -241,7 +243,7 @@ public class DefaultNexusSecurityConfiguration
         throws ConfigurationException,
             IOException
     {
-        ValidationResponse vr = configurationValidator.validateUser( null, settings );
+        ValidationResponse vr = configurationValidator.validateUser( initializeContext(), settings, false );
 
         if ( vr.isValid() )
         {
@@ -277,7 +279,7 @@ public class DefaultNexusSecurityConfiguration
             ConfigurationException,
             IOException
     {
-        ValidationResponse vr = configurationValidator.validateUser( null, settings );
+        ValidationResponse vr = configurationValidator.validateUser( initializeContext(), settings, true );
 
         if ( vr.isValid() )
         {
@@ -342,7 +344,7 @@ public class DefaultNexusSecurityConfiguration
         throws ConfigurationException,
             IOException
     {
-        ValidationResponse vr = configurationValidator.validateRole( null, settings );
+        ValidationResponse vr = configurationValidator.validateRole( initializeContext(), settings, false );
 
         if ( vr.isValid() )
         {
@@ -378,7 +380,7 @@ public class DefaultNexusSecurityConfiguration
             ConfigurationException,
             IOException
     {
-        ValidationResponse vr = configurationValidator.validateRole( null, settings );
+        ValidationResponse vr = configurationValidator.validateRole( initializeContext(), settings, true );
 
         if ( vr.isValid() )
         {
@@ -443,7 +445,7 @@ public class DefaultNexusSecurityConfiguration
         throws ConfigurationException,
             IOException
     {
-        ValidationResponse vr = configurationValidator.validateApplicationPrivilege( null, settings );
+        ValidationResponse vr = configurationValidator.validateApplicationPrivilege( initializeContext(), settings, false );
 
         if ( vr.isValid() )
         {
@@ -479,7 +481,7 @@ public class DefaultNexusSecurityConfiguration
             ConfigurationException,
             IOException
     {
-        ValidationResponse vr = configurationValidator.validateApplicationPrivilege( null, settings );
+        ValidationResponse vr = configurationValidator.validateApplicationPrivilege( initializeContext(), settings, true );
 
         if ( vr.isValid() )
         {
@@ -544,7 +546,7 @@ public class DefaultNexusSecurityConfiguration
         throws ConfigurationException,
             IOException
     {
-        ValidationResponse vr = configurationValidator.validateRepoTargetPrivilege( null, settings );
+        ValidationResponse vr = configurationValidator.validateRepoTargetPrivilege( initializeContext(), settings, false );
 
         if ( vr.isValid() )
         {
@@ -580,7 +582,7 @@ public class DefaultNexusSecurityConfiguration
             ConfigurationException,
             IOException
     {
-        ValidationResponse vr = configurationValidator.validateRepoTargetPrivilege( null, settings );
+        ValidationResponse vr = configurationValidator.validateRepoTargetPrivilege( initializeContext(), settings, true );
 
         if ( vr.isValid() )
         {
@@ -631,5 +633,36 @@ public class DefaultNexusSecurityConfiguration
         }
 
         throw new NoSuchPrivilegeException( id );
+    }
+    
+    private SecurityValidationContext initializeContext()
+    {
+        SecurityValidationContext context = new SecurityValidationContext();
+        
+        context.addExistingUserIds();
+        context.addExistingRoleIds();
+        context.addExistingPrivilegeIds();
+        
+        for ( CUser user : listUsers() )
+        {
+            context.getExistingUserIds().add( user.getUserId() );
+        }
+        
+        for ( CRole role : listRoles() )
+        {
+            context.getExistingRoleIds().add( role.getId() );
+        }
+        
+        for ( CPrivilege priv : listApplicationPrivileges() )
+        {
+            context.getExistingPrivilegeIds().add( priv.getId() );
+        }
+        
+        for ( CPrivilege priv : listRepoTargetPrivileges() )
+        {
+            context.getExistingPrivilegeIds().add( priv.getId() );
+        }
+        
+        return context;
     }
 }

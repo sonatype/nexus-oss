@@ -65,7 +65,7 @@ public class DefaultSecurityConfigurationValidatorTest
         
         assertTrue( response.isModified() );
 
-        assertEquals( 8, response.getValidationErrors().size() );
+        assertEquals( 9, response.getValidationErrors().size() );
         
         assertEquals( 1, response.getValidationWarnings().size() );
     }
@@ -81,9 +81,9 @@ public class DefaultSecurityConfigurationValidatorTest
         
         assertTrue( response.isModified() );
 
-        assertEquals( 4, response.getValidationWarnings().size() );
+        assertEquals( 3, response.getValidationWarnings().size() );
         
-        assertEquals( 8, response.getValidationErrors().size() );
+        assertEquals( 11, response.getValidationErrors().size() );
     }
     
     public void testBad3()
