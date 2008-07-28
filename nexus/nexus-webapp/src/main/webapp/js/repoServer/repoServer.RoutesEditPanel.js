@@ -68,10 +68,10 @@ Sonatype.repoServer.RoutesEditPanel = function(config){
       'load' : {
         fn: function() {
           var allRec = new this.repositoryGroupRecordConstructor({
-              id : 'all_groups',
+              id : '*',
               name : 'All Repositories'
             },
-            'all_groups');
+            '*');
           this.repositoryGroupDataStore.insert(0, allRec);
         },
         scope: this
@@ -84,7 +84,6 @@ Sonatype.repoServer.RoutesEditPanel = function(config){
   this.loadDataModFuncs = {
     route : {
       ruleType : Sonatype.utils.capitalize,
-      groupId : Sonatype.utils.capitalize,
       repositories : this.loadRepoListHelper.createDelegate(this)
     }
   };
@@ -92,7 +91,6 @@ Sonatype.repoServer.RoutesEditPanel = function(config){
   this.submitDataModFuncs = {
     route : {
       ruleType : Sonatype.utils.lowercase,
-      groupId : Sonatype.utils.lowercase,
       repositories : this.exportRepoListHelper.createDelegate(this)
     }
   };
@@ -163,6 +161,7 @@ Sonatype.repoServer.RoutesEditPanel = function(config){
           minWidth: 200,
           store: this.repositoryGroupDataStore,
           displayField:'name',
+          valueField:'id',
           editable: false,
           forceSelection: true,
           mode: 'local',
@@ -302,6 +301,7 @@ Sonatype.repoServer.RoutesEditPanel = function(config){
     {name:'resourceURI'},
     {name:'pattern', sortType:Ext.data.SortTypes.asUCString},
     {name:'ruleType'},
+    {name:'groupId'},
     {name:'repositories'},
     {name:'sRepositories', mapping:'repositories', convert: this.nameConcatinator}
   ]);
@@ -363,7 +363,8 @@ Sonatype.repoServer.RoutesEditPanel = function(config){
     deferredRender: false,
     columns: [
       {header: 'Route', dataIndex: 'pattern', width:200},
-      {header: 'Rule Type', dataIndex: 'ruleType', width:65},
+      {header: 'Rule Type', dataIndex: 'ruleType', width:100},
+      {header: 'Group', dataIndex: 'groupId', width:100},
       {header: 'Repositories', dataIndex: 'sRepositories', id:'routes-config-repos-col', width:300}
     ],
     autoExpandColumn: 'routes-config-repos-col',
