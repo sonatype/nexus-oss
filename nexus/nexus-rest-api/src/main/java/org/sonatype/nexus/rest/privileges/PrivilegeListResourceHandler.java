@@ -25,7 +25,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.logging.Level;
 
-import org.codehaus.plexus.util.StringUtils;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
@@ -35,8 +34,6 @@ import org.restlet.resource.Variant;
 import org.sonatype.nexus.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.security.model.CApplicationPrivilege;
 import org.sonatype.nexus.configuration.security.model.CRepoTargetPrivilege;
-import org.sonatype.nexus.proxy.NoSuchRepositoryException;
-import org.sonatype.nexus.proxy.NoSuchRepositoryGroupException;
 import org.sonatype.nexus.rest.model.PrivilegeBaseResource;
 import org.sonatype.nexus.rest.model.PrivilegeBaseStatusResource;
 import org.sonatype.nexus.rest.model.PrivilegeListResourceResponse;
@@ -141,26 +138,7 @@ extends AbstractPrivilegeResourceHandler
                         priv.setRepositoryTargetId( res.getRepositoryTargetId() );
                         priv.setRepositoryId( res.getRepositoryId() );
                         priv.setGroupId( res.getRepositoryGroupId() );
-                        
-                        if ( getNexus().readRepositoryTarget( res.getRepositoryTargetId() ) == null )
-                        {
-                            getResponse().setEntity( serialize( representation, getNexusErrorResponse( "repositoryTargetId", "Selected Repository Target does not exist." ) ) );
-                            
-                            return;
-                        }
-                        
-                        // Validate repo exists
-                        if ( !StringUtils.isEmpty( res.getRepositoryId() ) )
-                        {
-                            getNexus().readRepository( res.getRepositoryId() );
-                        }
-                        
-                        // Validate group exists
-                        if ( !StringUtils.isEmpty( res.getRepositoryGroupId() ) )
-                        {
-                            getNexus().readRepositoryGroup( res.getRepositoryGroupId() );
-                        }
-                        
+                                                
                         getNexusSecurityConfiguration().createRepoTargetPrivilege( priv );
                         
                         response.addData( nexusToRestModel( priv ) );
@@ -178,16 +156,6 @@ extends AbstractPrivilegeResourceHandler
                 getResponse().setStatus( Status.SERVER_ERROR_INTERNAL );
 
                 getLogger().log( Level.SEVERE, "Got IO Exception!", e );
-            }
-            catch ( NoSuchRepositoryException e )
-            {
-                getResponse().setStatus( Status.CLIENT_ERROR_BAD_REQUEST, "Configuration error." );
-                getResponse().setEntity( serialize( representation, getNexusErrorResponse( "repositoryId", e.getMessage() ) ) );
-            }
-            catch ( NoSuchRepositoryGroupException e )
-            {
-                getResponse().setStatus( Status.CLIENT_ERROR_BAD_REQUEST, "Configuration error." );
-                getResponse().setEntity( serialize( representation, getNexusErrorResponse( "repositoryGroupId", e.getMessage() ) ) );
             }
         }
     }

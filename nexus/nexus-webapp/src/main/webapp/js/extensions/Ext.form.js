@@ -147,7 +147,14 @@ Ext.extend(Ext.form.Action.sonatypeSubmit, Ext.form.Action, {
           var remainingErrors = [];
           for (var i = 0; i < result.errors.length; i++){
             if (this.options.validationModifiers[result.errors[i].id]){
-              (this.options.validationModifiers[result.errors[i].id])(result.errors[i], this.options.fpanel);
+              if (typeof(this.options.validationModifiers[result.errors[i].id]) == 'function') {
+                (this.options.validationModifiers[result.errors[i].id])(result.errors[i], this.options.fpanel);
+              }
+              else{
+                var errorObj = result.errors[i];
+                errorObj.id = this.options.validationModifiers[result.errors[i].id];
+                remainingErrors[remainingErrors.length] = errorObj;
+              }
             }            
             else{
               remainingErrors[remainingErrors.length] = result.errors[i];

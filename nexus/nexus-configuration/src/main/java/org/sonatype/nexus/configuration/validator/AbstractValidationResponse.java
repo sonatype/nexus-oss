@@ -84,6 +84,22 @@ public abstract class AbstractValidationResponse
         }
         return validationErrors;
     }
+    
+    public ValidationMessage getValidationError( String key )
+    {
+        if ( validationErrors != null )
+        {
+            for ( ValidationMessage vm : validationErrors )
+            {
+                if ( vm.getKey().equals( key ) )
+                {
+                    return vm;
+                }
+            }
+        }
+        
+        return null;
+    }
 
     public void setValidationErrors( List<ValidationMessage> validationErrors )
     {
@@ -111,6 +127,22 @@ public abstract class AbstractValidationResponse
         ValidationMessage e = new ValidationMessage( String.valueOf( key++ ), message, t );
 
         addValidationError( e );
+    }
+    
+    public ValidationMessage getValidationWarning( String key )
+    {
+        if ( validationWarnings != null )
+        {
+            for ( ValidationMessage vm : validationWarnings )
+            {
+                if ( vm.getKey().equals( key ) )
+                {
+                    return vm;
+                }
+            }
+        }
+        
+        return null;
     }
 
     public List<ValidationMessage> getValidationWarnings()
@@ -149,14 +181,20 @@ public abstract class AbstractValidationResponse
     {
         for ( ValidationMessage msg : response.getValidationErrors() )
         {
-            msg.setKey( String.valueOf( key++ ) );
+            if ( getValidationError( msg.getKey() ) != null )
+            {
+                msg.setKey( msg.getKey() + "(" + key++ + ")" );
+            }
 
             addValidationError( msg );
         }
 
         for ( ValidationMessage msg : response.getValidationWarnings() )
         {
-            msg.setKey( String.valueOf( key++ ) );
+            if ( getValidationWarning( msg.getKey() ) != null )
+            {
+                msg.setKey( msg.getKey() + "(" + key++ + ")" );
+            }
 
             addValidationWarning( msg );
         }

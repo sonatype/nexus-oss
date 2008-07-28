@@ -31,9 +31,13 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.StartingException;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.StoppingException;
+import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
 import org.sonatype.nexus.configuration.ConfigurationChangeListener;
 import org.sonatype.nexus.configuration.ConfigurationException;
+import org.sonatype.nexus.configuration.application.NexusConfiguration;
+import org.sonatype.nexus.configuration.model.CRepository;
+import org.sonatype.nexus.configuration.model.CRepositoryTarget;
 import org.sonatype.nexus.configuration.security.model.CApplicationPrivilege;
 import org.sonatype.nexus.configuration.security.model.CPrivilege;
 import org.sonatype.nexus.configuration.security.model.CRepoTargetPrivilege;
@@ -44,8 +48,14 @@ import org.sonatype.nexus.configuration.security.runtime.SecurityRuntimeConfigur
 import org.sonatype.nexus.configuration.security.source.SecurityConfigurationSource;
 import org.sonatype.nexus.configuration.security.validator.SecurityConfigurationValidator;
 import org.sonatype.nexus.configuration.security.validator.SecurityValidationContext;
+import org.sonatype.nexus.configuration.security.validator.SecurityValidationResponse;
 import org.sonatype.nexus.configuration.validator.InvalidConfigurationException;
+import org.sonatype.nexus.configuration.validator.ValidationMessage;
 import org.sonatype.nexus.configuration.validator.ValidationResponse;
+import org.sonatype.nexus.proxy.NoSuchRepositoryException;
+import org.sonatype.nexus.proxy.NoSuchRepositoryGroupException;
+import org.sonatype.nexus.proxy.registry.ContentClass;
+import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 
 /**
  * The class DefaultNexusSecurityConfiguration is responsible for config management. It actually keeps in sync Nexus internal
@@ -60,6 +70,20 @@ public class DefaultNexusSecurityConfiguration
     implements
         NexusSecurityConfiguration
 {
+    /**
+     * The nexus configuration.  Used to initialize the list of repo targets
+     * 
+     * @plexus.requirement
+     */
+    private NexusConfiguration nexusConfiguration;
+    
+    /**
+     * The repository registry.
+     * 
+     * @plexus.requirement
+     */
+    private RepositoryRegistry repositoryRegistry;
+    
     /**
      * The configuration source.
      * 
@@ -541,12 +565,87 @@ public class DefaultNexusSecurityConfiguration
     {
         return new ArrayList<CRepoTargetPrivilege>( getConfiguration().getRepositoryTargetPrivileges() );
     }
+    
+    private ValidationResponse crossValidateRepoTargetPrivilege( CRepoTargetPrivilege settings )
+    {
+        ValidationResponse vr = new SecurityValidationResponse();
+        
+        CRepositoryTarget target = nexusConfiguration.readRepositoryTarget( settings.getRepositoryTargetId() );
+        
+        // Invalid target ID
+        if ( target == null )
+        {
+            ValidationMessage error = new ValidationMessage( "repositoryTargetId", "Privilege ID '" + settings.getId() 
+                                                            + "' has invalid repository target ID '" + settings.getRepositoryTargetId() + "'", 
+                                                            "Repository Target doesn't exist" );
+            vr.addValidationError( error );
+        }
+        else
+        {
+            if ( !StringUtils.isEmpty( settings.getRepositoryId() ) )
+            {
+                try
+                {
+                    CRepository repo = nexusConfiguration.readRepository( settings.getRepositoryId() );
+                    
+                    // Invalid Repo/Target content types
+                    if ( !repo.getRepositoryPolicy().equals( target.getContentClass() ) )
+                    {
+                        ValidationMessage error = new ValidationMessage( "repositoryId", "Privilege ID '" + settings.getId() 
+                                                                        + "' has repository and repository target of different types",
+                                                                        "Content type differs between repository and target.");
+                        vr.addValidationError( error );
+                    }
+                }
+                // Invalid repo selection
+                catch ( NoSuchRepositoryException e )
+                {
+                    ValidationMessage error = new ValidationMessage( "repositoryId", "Privilege ID '" + settings.getId() 
+                                                                    + "' has invalid repository ID '" + settings.getRepositoryId() + "'", 
+                                                                    e.getMessage() );
+                    vr.addValidationError( error );
+                }
+            }
+            else if ( !StringUtils.isEmpty( settings.getGroupId() ) )
+            {
+                try
+                {
+                    ContentClass content = repositoryRegistry.getRepositoryGroupContentClass( settings.getGroupId() );
+                    
+                    // Invalid group/target content types
+                    if ( !content.getId().equals( target.getContentClass() ) )
+                    {
+                        ValidationMessage error = new ValidationMessage( "repositoryGroupId", "Privilege ID '" + settings.getId() 
+                                                                        + "' has repository group and repository target of different types",
+                                                                        "Content type differs between repository group and target.");
+                        vr.addValidationError( error );
+                    }
+                }
+                // Invalid group selection
+                catch ( NoSuchRepositoryGroupException e )
+                {
+                    ValidationMessage error = new ValidationMessage( "repositoryGroupId", "Privilege ID '" + settings.getId() 
+                                                                    + "' has invalid repository group ID '" + settings.getGroupId() + "'", 
+                                                                    e.getMessage() );
+                    vr.addValidationError( error );
+                }
+            }
+            else
+            {
+                //All is well
+            }
+        }
+        
+        return vr;
+    }
 
     public void createRepoTargetPrivilege( CRepoTargetPrivilege settings )
         throws ConfigurationException,
             IOException
     {
         ValidationResponse vr = configurationValidator.validateRepoTargetPrivilege( initializeContext(), settings, false );
+        
+        vr.append( crossValidateRepoTargetPrivilege( settings ) );
 
         if ( vr.isValid() )
         {
@@ -583,6 +682,8 @@ public class DefaultNexusSecurityConfiguration
             IOException
     {
         ValidationResponse vr = configurationValidator.validateRepoTargetPrivilege( initializeContext(), settings, true );
+        
+        vr.append( crossValidateRepoTargetPrivilege( settings ) );
 
         if ( vr.isValid() )
         {

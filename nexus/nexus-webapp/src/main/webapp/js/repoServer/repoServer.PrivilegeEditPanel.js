@@ -53,9 +53,14 @@ Sonatype.repoServer.PrivilegeEditPanel = function(config){
   
   //Methods that will take the data from the ui controls and map over to json
   this.submitDataModFunc = {
-    method : this.saveTreeHelper.createDelegate(this),
-    repositoryId : this.saveRepositoryHelper.createDelegate(this),
-    repositoryGroupId : this.saveGroupHelper.createDelegate(this)
+    "method" : this.saveTreeHelper.createDelegate(this),
+    "repositoryId" : this.saveRepositoryHelper.createDelegate(this),
+    "repositoryGroupId" : this.saveGroupHelper.createDelegate(this)
+  };
+  
+  this.validationFieldModFunc = {
+    "repositoryId" : "repositoryOrGroup",
+    "repositoryGroupId" : "repositoryOrGroup"
   };
   
   this.privilegeRecordConstructor = Ext.data.Record.create([
@@ -217,26 +222,8 @@ Sonatype.repoServer.PrivilegeEditPanel = function(config){
       },
       {
         xtype: 'combo',
-        fieldLabel: 'Repository Target',
-        labelStyle: 'margin-left: 15px; width: 185px;',
-        itemCls: 'required-field',
-        helpText: ht.type,
-        name: 'repositoryTargetId',
-        store: this.repoTargetDataStore,
-        displayField:'name',
-        valueField:'id',
-        editable: false,
-        forceSelection: true,
-        mode: 'local',
-        triggerAction: 'all',
-        emptyText:'Select...',
-        selectOnFocus:true,
-        allowBlank: false,
-        width: this.COMBO_WIDTH
-      },
-      {
-        xtype: 'combo',
         fieldLabel: 'Repository',
+        labelStyle: 'margin-left: 15px; width: 185px;',
         itemCls: 'required-field',
         helpText: ht.repository,
         name: 'repositoryOrGroup',
@@ -253,6 +240,25 @@ Sonatype.repoServer.PrivilegeEditPanel = function(config){
         width: this.COMBO_WIDTH,
         minListWidth: this.COMBO_WIDTH,
         value: "all_repo"
+      },
+      {
+        xtype: 'combo',
+        fieldLabel: 'Repository Target',
+        labelStyle: 'margin-left: 15px; width: 185px;',
+        itemCls: 'required-field',
+        helpText: ht.type,
+        name: 'repositoryTargetId',
+        store: this.repoTargetDataStore,
+        displayField:'name',
+        valueField:'id',
+        editable: false,
+        forceSelection: true,
+        mode: 'local',
+        triggerAction: 'all',
+        emptyText:'Select...',
+        selectOnFocus:true,
+        allowBlank: false,
+        width: this.COMBO_WIDTH
       },
       {
         xtype: 'panel',
@@ -520,6 +526,7 @@ Ext.extend(Sonatype.repoServer.PrivilegeEditPanel, Ext.Panel, {
         waitMsg: isNew ? 'Creating Privilege...' : 'Updating Privilege...',
         fpanel: formInfoObj.formPanel,
         dataModifiers: this.submitDataModFunc,
+        validationModifiers: this.validationFieldModFunc,
         serviceDataObj : Sonatype.repoServer.referenceData.privileges.repositoryTarget,
         isNew : isNew //extra option to send to callback, instead of conditioning on method
       });
@@ -578,6 +585,9 @@ Ext.extend(Sonatype.repoServer.PrivilegeEditPanel, Ext.Panel, {
     formPanel.buttons[0].on('click', this.saveHandler.createDelegate(this, [buttonInfoObj]));
     //cancel button event handler
     formPanel.buttons[1].on('click', this.cancelHandler.createDelegate(this, [buttonInfoObj]));
+    
+    var repoCombo = formPanel.find('name', 'repositoryOrGroup')[0];
+    repoCombo.on('select', this.repositorySelectHandler, formPanel);
     
     //add place holder to grid
     var newRec = new this.privilegeRecordConstructor({
@@ -873,5 +883,8 @@ Ext.extend(Sonatype.repoServer.PrivilegeEditPanel, Ext.Panel, {
     }
     
     return result;
+  },
+  
+  repositorySelectHandler : function(combo, record, index){
   }
 });
