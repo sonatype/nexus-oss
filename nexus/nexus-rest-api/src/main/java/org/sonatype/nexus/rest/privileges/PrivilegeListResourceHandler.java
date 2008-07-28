@@ -119,6 +119,8 @@ extends AbstractPrivilegeResourceHandler
         }
         else
         {
+            PrivilegeListResourceResponse response = new PrivilegeListResourceResponse();
+            
             PrivilegeBaseResource resource = request.getData();
             
             List<String> methods = resource.getMethod();
@@ -160,8 +162,12 @@ extends AbstractPrivilegeResourceHandler
                         }
                         
                         getNexusSecurityConfiguration().createRepoTargetPrivilege( priv );
+                        
+                        response.addData( nexusToRestModel( priv ) );
                     }
                 }
+                
+                getResponse().setEntity( serialize( representation, response ) );
             }
             catch ( ConfigurationException e )
             {                
