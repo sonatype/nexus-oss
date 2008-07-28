@@ -181,10 +181,12 @@ extends AbstractPrivilegeResourceHandler
             }
             catch ( NoSuchRepositoryException e )
             {
+                getResponse().setStatus( Status.CLIENT_ERROR_BAD_REQUEST, "Configuration error." );
                 getResponse().setEntity( serialize( representation, getNexusErrorResponse( "repositoryId", e.getMessage() ) ) );
             }
             catch ( NoSuchRepositoryGroupException e )
             {
+                getResponse().setStatus( Status.CLIENT_ERROR_BAD_REQUEST, "Configuration error." );
                 getResponse().setEntity( serialize( representation, getNexusErrorResponse( "repositoryGroupId", e.getMessage() ) ) );
             }
         }
