@@ -53,7 +53,9 @@ Sonatype.repoServer.PrivilegeEditPanel = function(config){
   
   //Methods that will take the data from the ui controls and map over to json
   this.submitDataModFunc = {
-    method : this.saveTreeHelper.createDelegate(this)
+    method : this.saveTreeHelper.createDelegate(this),
+    repositoryId : this.saveRepositoryHelper.createDelegate(this),
+    repositoryGroupId : this.saveGroupHelper.createDelegate(this)
   };
   
   this.privilegeRecordConstructor = Ext.data.Record.create([
@@ -65,6 +67,21 @@ Sonatype.repoServer.PrivilegeEditPanel = function(config){
   ]);
   
   this.repoTargetRecordConstructor = Ext.data.Record.create([
+    {name:'id'},
+    {name:'name', sortType:Ext.data.SortTypes.asUCString}
+  ]);
+  
+  this.repositoryRecordConstructor = Ext.data.Record.create([
+    {name:'id'},
+    {name:'name', sortType:Ext.data.SortTypes.asUCString}
+  ]);
+  
+  this.repositoryGroupRecordConstructor = Ext.data.Record.create([
+    {name:'id'},
+    {name:'name', sortType:Ext.data.SortTypes.asUCString}
+  ]);
+  
+  this.repositoryOrGroupRecordConstructor = Ext.data.Record.create([
     {name:'id'},
     {name:'name', sortType:Ext.data.SortTypes.asUCString}
   ]);
@@ -85,6 +102,63 @@ Sonatype.repoServer.PrivilegeEditPanel = function(config){
     reader: this.repoTargetReader,
     sortInfo: {field: 'name', direction: 'ASC'},
     autoLoad: true
+  });
+  
+  //Datastore that will hold both repos and repogroups
+  this.repoOrGroupDataStore = new Ext.data.SimpleStore({fields:['id','name'], id:'id'});
+  
+  //Reader and datastore that queries the server for the list of repositories
+  this.repositoryReader = new Ext.data.JsonReader({root: 'data', id: 'id'}, this.repositoryRecordConstructor );  
+  this.repositoryDataStore = new Ext.data.Store({
+    url: Sonatype.config.repos.urls.repositories,
+    reader: this.repositoryReader,
+    sortInfo: {field: 'name', direction: 'ASC'},
+    autoLoad: true,
+    listeners: {
+      'load' : {
+        fn: function() {
+          this.repositoryDataStore.each(function(item,i,len){
+            var newRec = new this.repositoryOrGroupRecordConstructor({
+                id : 'repo_' + item.data.id,
+                name : item.data.name + ' (Repo)'
+              },
+              'repo_' + item.id);
+            this.repoOrGroupDataStore.add([newRec]);
+          },this);
+          var allRec = new this.repositoryRecordConstructor({
+            id : 'all_repo',
+            name : 'All Repositories'
+          },
+          'all_repo');
+          this.repoOrGroupDataStore.insert(0, allRec);
+        },
+        scope: this
+      }
+    }
+  });
+  
+  //Reader and datastore that queries the server for the list of repository groups
+  this.repositoryGroupReader = new Ext.data.JsonReader({root: 'data', id: 'id'}, this.repositoryGroupRecordConstructor );  
+  this.repositoryGroupDataStore = new Ext.data.Store({
+    url: Sonatype.config.repos.urls.groups,
+    reader: this.repositoryGroupReader,
+    sortInfo: {field: 'name', direction: 'ASC'},
+    autoLoad: true,
+    listeners: {
+      'load' : {
+        fn: function() {
+          this.repositoryGroupDataStore.each(function(item,i,len){
+            var newRec = new this.repositoryOrGroupRecordConstructor({
+                id : 'group_' + item.data.id,
+                name : item.data.name + ' (Group)'
+              },
+              'group_' + item.id);
+            this.repoOrGroupDataStore.add([newRec]);
+          },this);
+        },
+        scope: this
+      }
+    }
   });
   
   this.COMBO_WIDTH = 300;
@@ -159,6 +233,26 @@ Sonatype.repoServer.PrivilegeEditPanel = function(config){
         selectOnFocus:true,
         allowBlank: false,
         width: this.COMBO_WIDTH
+      },
+      {
+        xtype: 'combo',
+        fieldLabel: 'Repository',
+        itemCls: 'required-field',
+        helpText: ht.repository,
+        name: 'repositoryOrGroup',
+        store: this.repoOrGroupDataStore,
+        displayField:'name',
+        valueField:'id',
+        editable: false,
+        forceSelection: true,
+        mode: 'local',
+        triggerAction: 'all',
+        emptyText:'Select...',
+        selectOnFocus:true,
+        allowBlank: false,
+        width: this.COMBO_WIDTH,
+        minListWidth: this.COMBO_WIDTH,
+        value: "all_repo"
       },
       {
         xtype: 'panel',
@@ -731,8 +825,8 @@ Ext.extend(Sonatype.repoServer.PrivilegeEditPanel, Ext.Panel, {
     //@note: there has to be a better way to do this.  Depending on offsets is very error prone
     var newConfig = config;
 
-    newConfig.items[4].items[1].items[0].root = new Ext.tree.TreeNode({text: 'root'});
-    newConfig.items[4].items[1].items[1].root = new Ext.tree.TreeNode({text: 'root'});
+    newConfig.items[5].items[1].items[0].root = new Ext.tree.TreeNode({text: 'root'});
+    newConfig.items[5].items[1].items[1].root = new Ext.tree.TreeNode({text: 'root'});
 
     return newConfig;
   },
@@ -751,5 +845,33 @@ Ext.extend(Sonatype.repoServer.PrivilegeEditPanel, Ext.Panel, {
       border : '1px solid #dd7870'
     });
     Ext.form.Field.msgFx['normal'].show(tree.errorEl, tree);  
+  },
+  
+  saveRepositoryHelper : function(val, fpanel){
+    var combobox = fpanel.find('name', 'repositoryOrGroup')[0];
+    
+    var value = combobox.getValue();
+    
+    var result = "";
+    
+    if (value.indexOf("repo_") == 0){
+      result = value.substring("repo_".length);
+    }
+    
+    return result;
+  },
+  
+  saveGroupHelper : function(val, fpanel){
+    var combobox = fpanel.find('name', 'repositoryOrGroup')[0];
+    
+    var value = combobox.getValue();
+    
+    var result = "";
+    
+    if (value.indexOf("group_") == 0){
+      result = value.substring("group_".length);
+    }
+    
+    return result;
   }
 });
