@@ -139,6 +139,75 @@ public class Nexus142UserValidationTests
         Assert.assertTrue( response.getEntity().getText().startsWith( "{\"errors\":" ) );
     }
     
+    @Test
+    public void createUserDuplicateUserId() throws IOException
+    {
+        UserResource resource = new UserResource();
+        
+        resource.setEmail( "test@email.com" );
+        resource.setName( "name" );
+        resource.setStatus( "expired" );
+        resource.setUserId( "dup-user" );
+        resource.addRole( "role1" );
+        
+        Response response = this.messageUtil.sendMessage( Method.POST, resource );
+
+        if ( !response.getStatus().isSuccess() )
+        {
+            Assert.fail( "User should have been created: " + response.getStatus() );
+        }
+        
+        resource = new UserResource();
+        
+        resource.setEmail( "test2@email.com" );
+        resource.setName( "name" );
+        resource.setStatus( "expired" );
+        resource.setUserId( "dup-user" );
+        resource.addRole( "role1" );
+        
+        response = this.messageUtil.sendMessage( Method.POST, resource );
+
+        if ( response.getStatus().isSuccess() )
+        {
+            Assert.fail( "User should not have been created: " + response.getStatus() );
+        }
+        Assert.assertTrue( response.getEntity().getText().startsWith( "{\"errors\":" ) );
+    }
+    
+    public void createUserDuplicateEmail() throws IOException
+    {
+        UserResource resource = new UserResource();
+        
+        resource.setEmail( "dup@email.com" );
+        resource.setName( "name" );
+        resource.setStatus( "expired" );
+        resource.setUserId( "user1" );
+        resource.addRole( "role1" );
+        
+        Response response = this.messageUtil.sendMessage( Method.POST, resource );
+
+        if ( !response.getStatus().isSuccess() )
+        {
+            Assert.fail( "User should have been created: " + response.getStatus() );
+        }
+        
+        resource = new UserResource();
+        
+        resource.setEmail( "dup@email.com" );
+        resource.setName( "name" );
+        resource.setStatus( "expired" );
+        resource.setUserId( "user2" );
+        resource.addRole( "role1" );
+        
+        response = this.messageUtil.sendMessage( Method.POST, resource );
+
+        if ( response.getStatus().isSuccess() )
+        {
+            Assert.fail( "User should not have been created: " + response.getStatus() );
+        }
+        Assert.assertTrue( response.getEntity().getText().startsWith( "{\"errors\":" ) );
+    }
+    
     
     @Test
     public void updateValidation()
@@ -291,6 +360,34 @@ public class Nexus142UserValidationTests
         
         // This is actually not a validation error, but a 'not found' error, so result will NOT contain the validation errors
         // Assert.assertTrue( response.getEntity().getText().startsWith( "{\"errors\":" ) );
+        
+        /**
+         * DUPLICATE EMAIL
+         */
+        UserResource duplicateResource = new UserResource();
+        
+        duplicateResource.setEmail( "dup@email.com" );
+        duplicateResource.setName( "dupname" );
+        duplicateResource.setStatus( "expired" );
+        duplicateResource.setUserId( "dup-user2" );
+        duplicateResource.addRole( "role1" );
+        
+        response = this.messageUtil.sendMessage( Method.POST, duplicateResource );
+
+        if ( !response.getStatus().isSuccess() )
+        {
+            Assert.fail( "User should have been created: " + response.getStatus() );
+        }
+        
+        resource.setUserId( responseResource.getUserId() );
+        resource.setEmail( "dup@email.com" );
+        
+        response = this.messageUtil.sendMessage( Method.PUT, resource );
+
+        if ( response.getStatus().isSuccess() )
+        {
+            Assert.fail( "User should not have been created: " + response.getStatus() );
+        }
     }
     
 

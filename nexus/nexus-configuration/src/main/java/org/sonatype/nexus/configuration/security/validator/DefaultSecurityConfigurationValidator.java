@@ -447,6 +447,15 @@ public class DefaultSecurityConfigurationValidator
             
             existingIds = context.getExistingUserIds();
         }
+        
+        List<String> existingEmails = context.getExistingEmails();
+        
+        if ( existingEmails == null )
+        {
+            context.addExistingEmails();
+            
+            existingEmails = context.getExistingEmails();
+        }
 
         if ( !update
             && ( StringUtils.isEmpty( user.getUserId() )
@@ -475,6 +484,15 @@ public class DefaultSecurityConfigurationValidator
         {
             ValidationMessage message = new ValidationMessage( "email", "User ID '" + user.getUserId() + "' has no email address", "Email address is required." );
             response.addValidationError( message );
+        }
+        else if ( existingEmails.contains( user.getEmail() ) )
+        {
+            ValidationMessage message = new ValidationMessage( "email", "User ID '" + user.getUserId() + "' must have a unique email address.", "Email address must be unique." );
+            response.addValidationError( message );
+        }
+        else
+        {
+            existingEmails.add( user.getEmail() );
         }
         
         if ( !CUser.STATUS_ACTIVE.equals( user.getStatus() ) 
@@ -508,7 +526,10 @@ public class DefaultSecurityConfigurationValidator
             response.addValidationError( message );
         }
         
-        existingIds.add( user.getUserId() );
+        if ( !StringUtils.isEmpty( user.getUserId() ) )
+        {
+            existingIds.add( user.getUserId() );
+        }
         
         return response;
     }

@@ -36,6 +36,8 @@ public class SecurityValidationContext extends AbstractValidationContext
     
     private List<String> existingUserIds;
     
+    private List<String> existingEmails;
+    
     private Map<String,List<String>> roleContainmentMap;
     
     public void addExistingPrivilegeIds()
@@ -67,6 +69,14 @@ public class SecurityValidationContext extends AbstractValidationContext
         }
     }
     
+    public void addExistingEmails()
+    {
+        if ( this.existingEmails == null )
+        {
+            this.existingEmails = new ArrayList<String>();
+        }
+    }
+    
     public List<String> getExistingPrivilegeIds()
     {
         return existingPrivilegeIds;
@@ -80,6 +90,11 @@ public class SecurityValidationContext extends AbstractValidationContext
     public List<String> getExistingUserIds()
     {
         return existingUserIds;
+    }
+    
+    public List<String> getExistingEmails()
+    {
+        return existingEmails;
     }
     
     public Map<String,List<String>> getRoleContainmentMap()
