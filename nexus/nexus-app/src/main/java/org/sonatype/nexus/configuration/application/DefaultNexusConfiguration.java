@@ -64,6 +64,8 @@ import org.sonatype.nexus.proxy.repository.RepositoryType;
 import org.sonatype.nexus.proxy.repository.ShadowRepository;
 import org.sonatype.nexus.proxy.storage.remote.DefaultRemoteStorageContext;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
+import org.sonatype.nexus.proxy.target.Target;
+import org.sonatype.nexus.proxy.target.TargetRegistry;
 
 /**
  * The class DefaultNexusConfiguration is responsible for config management. It actually keeps in sync Nexus internal
@@ -105,6 +107,13 @@ public class DefaultNexusConfiguration
      * @plexus.requirement
      */
     private RepositoryRegistry repositoryRegistry;
+
+    /**
+     * The target registry.
+     * 
+     * @plexus.requirement
+     */
+    private TargetRegistry targetRegistry;
 
     /**
      * The available content classes.
@@ -437,6 +446,141 @@ public class DefaultNexusConfiguration
         }
 
         applyAndSaveConfiguration();
+    }
+
+    // ------------------------------------------------------------------
+    // Booting
+
+    public void createInternals()
+        throws ConfigurationException
+    {
+        createRepositories();
+
+        createRepositoryTargets();
+    }
+
+    public void dropInternals()
+    {
+        dropRepositories();
+
+        dropRepositoryTargets();
+    }
+
+    @SuppressWarnings( "unchecked" )
+    protected void createRepositories()
+        throws ConfigurationException
+    {
+        List<CRepository> reposes = getConfiguration().getRepositories();
+
+        for ( CRepository repo : reposes )
+        {
+            Repository repository = createRepositoryFromModel( getConfiguration(), repo );
+
+            repositoryRegistry.addRepository( repository );
+        }
+
+        if ( getConfiguration().getRepositoryShadows() != null )
+        {
+            List<CRepositoryShadow> shadows = getConfiguration().getRepositoryShadows();
+            for ( CRepositoryShadow shadow : shadows )
+            {
+                Repository repository = createRepositoryFromModel( getConfiguration(), shadow );
+
+                // shadows has no index
+                repositoryRegistry.addRepository( repository );
+            }
+        }
+
+        if ( getConfiguration().getRepositoryGrouping() != null
+            && getConfiguration().getRepositoryGrouping().getRepositoryGroups() != null )
+        {
+            List<CRepositoryGroup> groups = getConfiguration().getRepositoryGrouping().getRepositoryGroups();
+
+            for ( CRepositoryGroup group : groups )
+            {
+                if ( group.getName() == null )
+                {
+                    group.setName( group.getGroupId() );
+                }
+                try
+                {
+                    repositoryRegistry.addRepositoryGroup( group.getGroupId(), group.getRepositories() );
+                }
+                catch ( NoSuchRepositoryException e )
+                {
+                    throw new ConfigurationException( "Cannot register repository groups!", e );
+                }
+                catch ( InvalidGroupingException e )
+                {
+                    throw new ConfigurationException( "Configuration contains invalid grouping!", e );
+                }
+            }
+        }
+    }
+
+    protected void dropRepositories()
+    {
+        for ( Repository repository : repositoryRegistry.getRepositories() )
+        {
+            try
+            {
+                repositoryRegistry.removeRepositorySilently( repository.getId() );
+            }
+            catch ( NoSuchRepositoryException e )
+            {
+                // will not happen
+            }
+
+            // unregister it as config listener if needed
+            if ( ConfigurationChangeListener.class.isAssignableFrom( repository.getClass() ) )
+            {
+                removeConfigurationChangeListener( (ConfigurationChangeListener) repository );
+            }
+        }
+    }
+
+    @SuppressWarnings( "unchecked" )
+    protected void createRepositoryTargets()
+        throws ConfigurationException
+    {
+        List<CRepositoryTarget> targets = getConfiguration().getRepositoryTargets();
+
+        if ( targets == null )
+        {
+            return;
+        }
+
+        for ( CRepositoryTarget settings : targets )
+        {
+            ContentClass contentClass = null;
+
+            for ( ContentClass cl : contentClasses )
+            {
+                if ( settings.getContentClass().equals( cl.getId() ) )
+                {
+                    contentClass = cl;
+
+                    break;
+                }
+            }
+
+            if ( contentClass == null )
+            {
+                throw new ConfigurationException( "Could not find ContentClass with ID='" + settings.getContentClass()
+                    + "'" );
+            }
+
+            targetRegistry.addRepositoryTarget( new Target(
+                settings.getId(),
+                settings.getName(),
+                contentClass,
+                settings.getPatterns() ) );
+        }
+    }
+
+    protected void dropRepositoryTargets()
+    {
+        // nothing?
     }
 
     // ------------------------------------------------------------------
@@ -1184,6 +1328,27 @@ public class DefaultNexusConfiguration
     {
         validateCRepositoryTarget( settings );
 
+        ContentClass contentClass = null;
+
+        for ( ContentClass cl : contentClasses )
+        {
+            if ( settings.getContentClass().equals( cl.getId() ) )
+            {
+                contentClass = cl;
+
+                break;
+            }
+        }
+
+        if ( contentClass == null )
+        {
+            throw new ConfigurationException( "Could not find ContentClass with ID='" + settings.getContentClass()
+                + "'" );
+        }
+
+        targetRegistry.addRepositoryTarget( new Target( settings.getId(), settings.getName(), contentClass, settings
+            .getPatterns() ) );
+
         getConfiguration().addRepositoryTarget( settings );
 
         applyAndSaveConfiguration();
@@ -1224,6 +1389,30 @@ public class DefaultNexusConfiguration
 
             oldTarget.getPatterns().addAll( settings.getPatterns() );
 
+            ContentClass contentClass = null;
+
+            for ( ContentClass cl : contentClasses )
+            {
+                if ( oldTarget.getContentClass().equals( cl.getId() ) )
+                {
+                    contentClass = cl;
+
+                    break;
+                }
+            }
+
+            if ( contentClass == null )
+            {
+                throw new ConfigurationException( "Could not find ContentClass with ID='" + oldTarget.getContentClass()
+                    + "'" );
+            }
+
+            targetRegistry.addRepositoryTarget( new Target(
+                oldTarget.getId(),
+                oldTarget.getName(),
+                contentClass,
+                oldTarget.getPatterns() ) );
+
             applyAndSaveConfiguration();
         }
         else
@@ -1235,6 +1424,8 @@ public class DefaultNexusConfiguration
     public void deleteRepositoryTarget( String id )
         throws IOException
     {
+        targetRegistry.removeRepositoryTarget( id );
+
         List<CRepositoryTarget> targets = getConfiguration().getRepositoryTargets();
 
         for ( Iterator<CRepositoryTarget> i = targets.iterator(); i.hasNext(); )

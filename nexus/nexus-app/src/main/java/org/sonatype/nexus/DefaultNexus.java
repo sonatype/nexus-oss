@@ -1374,7 +1374,7 @@ public class DefaultNexus
             // applies configuration and notifies listeners
             nexusConfiguration.loadConfiguration( true );
 
-            createRepositories();
+            nexusConfiguration.createInternals();
 
             nexusConfiguration.notifyConfigurationChangeListeners();
             
@@ -1489,89 +1489,11 @@ public class DefaultNexus
 
         cacheManager.stopService();
 
-        dropRepositories();
+        nexusConfiguration.dropInternals();
 
         systemStatus.setState( SystemState.STOPPED );
 
         getLogger().info( "Stopped Nexus (version " + systemStatus.getVersion() + ")" );
-    }
-
-    @SuppressWarnings( "unchecked" )
-    protected void createRepositories()
-        throws ConfigurationException
-    {
-        List<CRepository> reposes = getNexusConfiguration().getConfiguration().getRepositories();
-
-        for ( CRepository repo : reposes )
-        {
-            Repository repository = getNexusConfiguration().createRepositoryFromModel(
-                getNexusConfiguration().getConfiguration(),
-                repo );
-
-            repositoryRegistry.addRepository( repository );
-        }
-
-        if ( getNexusConfiguration().getConfiguration().getRepositoryShadows() != null )
-        {
-            List<CRepositoryShadow> shadows = getNexusConfiguration().getConfiguration().getRepositoryShadows();
-            for ( CRepositoryShadow shadow : shadows )
-            {
-                Repository repository = getNexusConfiguration().createRepositoryFromModel(
-                    getNexusConfiguration().getConfiguration(),
-                    shadow );
-
-                // shadows has no index
-                repositoryRegistry.addRepository( repository );
-            }
-        }
-
-        if ( getNexusConfiguration().getConfiguration().getRepositoryGrouping() != null
-            && getNexusConfiguration().getConfiguration().getRepositoryGrouping().getRepositoryGroups() != null )
-        {
-            List<CRepositoryGroup> groups = getNexusConfiguration()
-                .getConfiguration().getRepositoryGrouping().getRepositoryGroups();
-
-            for ( CRepositoryGroup group : groups )
-            {
-                if ( group.getName() == null )
-                {
-                    group.setName( group.getGroupId() );
-                }
-                try
-                {
-                    repositoryRegistry.addRepositoryGroup( group.getGroupId(), group.getRepositories() );
-                }
-                catch ( NoSuchRepositoryException e )
-                {
-                    throw new ConfigurationException( "Cannot register repository groups!", e );
-                }
-                catch ( InvalidGroupingException e )
-                {
-                    throw new ConfigurationException( "Configuration contains invalid grouping!", e );
-                }
-            }
-        }
-    }
-
-    protected void dropRepositories()
-    {
-        for ( Repository repository : repositoryRegistry.getRepositories() )
-        {
-            try
-            {
-                repositoryRegistry.removeRepositorySilently( repository.getId() );
-            }
-            catch ( NoSuchRepositoryException e )
-            {
-                // will not happen
-            }
-
-            // unregister it as config listener if needed
-            if ( ConfigurationChangeListener.class.isAssignableFrom( repository.getClass() ) )
-            {
-                nexusConfiguration.removeConfigurationChangeListener( (ConfigurationChangeListener) repository );
-            }
-        }
     }
 
     private void createDefaultTemplate( String id, boolean shouldRecreate )

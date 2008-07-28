@@ -94,4 +94,11 @@ public interface NexusConfiguration
     Repository createRepositoryFromModel( Configuration configuration, CRepositoryShadow repositoryShadow )
         throws InvalidConfigurationException;
 
+    // ------------------------------------------------------------------
+    // Booting
+
+    void createInternals()
+        throws ConfigurationException;
+
+    void dropInternals();
 }
