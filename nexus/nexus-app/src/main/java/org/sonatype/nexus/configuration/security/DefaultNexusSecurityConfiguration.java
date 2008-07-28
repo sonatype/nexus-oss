@@ -651,6 +651,12 @@ public class DefaultNexusSecurityConfiguration
         for ( CRole role : listRoles() )
         {
             context.getExistingRoleIds().add( role.getId() );
+            
+            ArrayList<String> containedRoles = new ArrayList<String>();
+            
+            containedRoles.addAll( role.getRoles() );
+            
+            context.getRoleContainmentMap().put( role.getId(), containedRoles );
         }
         
         for ( CPrivilege priv : listApplicationPrivileges() )

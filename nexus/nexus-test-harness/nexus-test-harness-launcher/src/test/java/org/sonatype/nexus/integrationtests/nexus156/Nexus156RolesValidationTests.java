@@ -92,6 +92,71 @@ public class Nexus156RolesValidationTests extends AbstractNexusIntegrationTest
     }
     
     @Test
+    public void createRecursiveContainment()
+        throws IOException
+    {
+        RoleResource resourceA = new RoleResource();
+        resourceA.setName( "recursive1" );
+        resourceA.setSessionTimeout( 60 );
+        resourceA.addPrivilege( "1" );
+        
+        Response response = this.messageUtil.sendMessage( Method.POST, resourceA );
+        
+        if ( !response.getStatus().isSuccess() )
+        {
+            Assert.fail( "Role should have been created: " + response.getStatus() );
+        }
+        
+        // get the Resource object
+        RoleResource responseResourceA = this.messageUtil.getResourceFromResponse( response );
+        
+        RoleResource resourceB = new RoleResource();
+        resourceB = new RoleResource();
+        resourceB.setName( "recursive2" );
+        resourceB.setSessionTimeout( 60 );
+        resourceB.addRole( responseResourceA.getId() );
+        
+        response = this.messageUtil.sendMessage( Method.POST, resourceB );
+        
+        if ( !response.getStatus().isSuccess() )
+        {
+            Assert.fail( "Role should have been created: " + response.getStatus() );
+        }
+        
+        // get the Resource object
+        RoleResource responseResourceB = this.messageUtil.getResourceFromResponse( response );
+        
+        RoleResource resourceC = new RoleResource();
+        resourceC = new RoleResource();
+        resourceC.setName( "recursive2" );
+        resourceC.setSessionTimeout( 60 );
+        resourceC.addRole( responseResourceB.getId() );
+        
+        response = this.messageUtil.sendMessage( Method.POST, resourceC );
+        
+        if ( !response.getStatus().isSuccess() )
+        {
+            Assert.fail( "Role should have been created: " + response.getStatus() );
+        }
+        
+        // get the Resource object
+        RoleResource responseResourceC = this.messageUtil.getResourceFromResponse( response );
+        
+        resourceA.setId( responseResourceA.getId() );
+        resourceA.getRoles().clear();
+        resourceA.addRole( responseResourceC.getId() );
+        
+        response = this.messageUtil.sendMessage( Method.PUT, resourceA );
+
+        if ( response.getStatus().isSuccess() )
+        {
+            Assert.fail( "Role should not have been updated: " + response.getStatus() );
+        }
+        
+        Assert.assertTrue( response.getEntity().getText().startsWith( "{\"errors\":" ) );
+    }
+    
+    @Test
     public void updateValidationTests() throws IOException
     {
         RoleResource resource = new RoleResource();

@@ -394,6 +394,12 @@ public class DefaultSecurityConfigurationValidator
             }
         }
         
+        // It is expected that a full context is built upon update
+        if ( update )
+        {
+            response.append( isRecursive( role.getId(), role.getId(), context ) );
+        }
+        
         List<String> roleIds = role.getRoles();
         
         List<String> containedRoles = context.getRoleContainmentMap().get( role.getId() );
