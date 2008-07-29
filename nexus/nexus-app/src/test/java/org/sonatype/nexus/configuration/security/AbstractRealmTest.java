@@ -21,11 +21,15 @@
 package org.sonatype.nexus.configuration.security;
 
 import junit.framework.TestCase;
+
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.StartingException;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.StoppingException;
 import org.jsecurity.authz.Permission;
 import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.SystemState;
 import org.sonatype.nexus.SystemStatus;
 import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
+import org.sonatype.nexus.configuration.ConfigurationChangeListener;
 import org.sonatype.nexus.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.configuration.model.CGroupsSettingPathMappingItem;
@@ -41,6 +45,8 @@ import org.sonatype.nexus.configuration.security.model.CApplicationPrivilege;
 import org.sonatype.nexus.configuration.security.model.CRepoTargetPrivilege;
 import org.sonatype.nexus.configuration.security.model.CRole;
 import org.sonatype.nexus.configuration.security.model.CUser;
+import org.sonatype.nexus.configuration.security.model.Configuration;
+import org.sonatype.nexus.configuration.security.source.SecurityConfigurationSource;
 import org.sonatype.nexus.feeds.NexusArtifactEvent;
 import org.sonatype.nexus.feeds.SystemEvent;
 import org.sonatype.nexus.feeds.SystemProcess;
@@ -207,7 +213,7 @@ public abstract class AbstractRealmTest
     }
 
     public static class MockMutableNexusSecurityConfiguration
-        implements MutableNexusSecurityConfiguration
+        implements NexusSecurityConfiguration
     {
         public final Map<String, CUser> users = new TreeMap<String, CUser>();
 
@@ -380,6 +386,94 @@ public abstract class AbstractRealmTest
                 NoSuchPrivilegeException
         {
             throw new UnsupportedOperationException();
+        }
+
+        public void applyConfiguration()
+            throws ConfigurationException,
+                IOException
+        {
+            throw new UnsupportedOperationException();
+        }
+
+        public InputStream getConfigurationAsStream()
+            throws IOException
+        {
+            throw new UnsupportedOperationException();
+        }
+
+        public SecurityConfigurationSource getConfigurationSource()
+        {
+            throw new UnsupportedOperationException();
+        }
+
+        public boolean isConfigurationDefaulted()
+        {
+            throw new UnsupportedOperationException();
+        }
+
+        public boolean isConfigurationUpgraded()
+        {
+            throw new UnsupportedOperationException();
+        }
+
+        public boolean isInstanceUpgraded()
+        {
+            throw new UnsupportedOperationException();
+        }
+
+        public void loadConfiguration()
+            throws ConfigurationException,
+                IOException
+        {
+            throw new UnsupportedOperationException();
+        }
+
+        public void loadConfiguration( boolean forceReload )
+            throws ConfigurationException,
+                IOException
+        {
+            throw new UnsupportedOperationException();
+        }
+
+        public Configuration getConfiguration()
+        {
+            throw new UnsupportedOperationException();
+        }
+
+        public void addConfigurationChangeListener( ConfigurationChangeListener listener )
+        {
+            throw new UnsupportedOperationException();
+        }
+
+        public void notifyConfigurationChangeListeners()
+        {
+            throw new UnsupportedOperationException();
+        }
+
+        public void notifyConfigurationChangeListeners( ConfigurationChangeEvent evt )
+        {
+            throw new UnsupportedOperationException();
+        }
+
+        public void removeConfigurationChangeListener( ConfigurationChangeListener listener )
+        {
+            throw new UnsupportedOperationException();
+        }
+
+        public void saveConfiguration()
+            throws IOException
+        {
+            throw new UnsupportedOperationException();
+        }
+
+        public void startService()
+            throws StartingException
+        {
+        }
+
+        public void stopService()
+            throws StoppingException
+        {
         }
     }
 

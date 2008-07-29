@@ -16,6 +16,17 @@
 				<role>admin</role>
 			</roles>
 		</user>
+		<user>
+			<userId>anonymous</userId>
+			<name>Nexus Anonynmous User</name>
+			<!-- anonymous -->
+			<password>0a92fab3230134cca6eadd9898325b9b2ae67998</password>
+			<status>active</status>
+			<email>nexus-dev1@sonatype.org</email>
+			<roles>
+				<role>anonymous</role>
+			</roles>
+		</user>
 	</users>
 	<roles>
 		<role>
@@ -24,63 +35,37 @@
 			<description>Administration role for Nexus</description>
 			<sessionTimeout>30</sessionTimeout>
 			<privileges>
+				<privilege>1000</privilege>
+			</privileges>
+			<roles />
+		</role>
+		<role>
+			<id>anonymous</id>
+			<name>Nexus Anonymous Role</name>
+			<description>Anonymous role for Nexus</description>
+			<sessionTimeout>60</sessionTimeout>
+			<privileges>
 				<privilege>1</privilege>
-				<privilege>2</privilege>
-				<privilege>3</privilege>
-				<privilege>4</privilege>
-				<privilege>5</privilege>
 				<privilege>6</privilege>
-				<privilege>7</privilege>
-				<privilege>8</privilege>
-				<privilege>9</privilege>
-				<privilege>10</privilege>
-				<privilege>11</privilege>
-				<privilege>12</privilege>
-				<privilege>13</privilege>
 				<privilege>14</privilege>
-				<privilege>15</privilege>
-				<privilege>16</privilege>
 				<privilege>17</privilege>
-				<privilege>18</privilege>
 				<privilege>19</privilege>
-				<privilege>20</privilege>
-				<privilege>21</privilege>
-				<privilege>22</privilege>
-				<privilege>23</privilege>
-				<privilege>24</privilege>
-				<privilege>25</privilege>
-				<privilege>26</privilege>
-				<privilege>27</privilege>
-				<privilege>28</privilege>
-				<privilege>29</privilege>
-				<privilege>30</privilege>
-				<privilege>31</privilege>
-				<privilege>32</privilege>
-				<privilege>33</privilege>
-				<privilege>34</privilege>
-				<privilege>35</privilege>
-				<privilege>36</privilege>
-				<privilege>37</privilege>
-				<privilege>38</privilege>
-				<privilege>39</privilege>
-				<privilege>40</privilege>
-				<privilege>41</privilege>
-				<privilege>42</privilege>
-				<privilege>43</privilege>
 				<privilege>44</privilege>
-				<privilege>45</privilege>
-				<privilege>46</privilege>
-				<privilege>47</privilege>
-				<privilege>48</privilege>
-				<privilege>49</privilege>
-				<privilege>50</privilege>
-				<privilege>51</privilege>
-				<privilege>52</privilege>
+				<privilege>53</privilege>
+				<privilege>54</privilege>
+				<privilege>55</privilege>
+				<privilege>56</privilege>
 			</privileges>
 			<roles />
 		</role>
 	</roles>
 	<applicationPrivileges>
+		<applicationPrivilege>
+			<id>1000</id>
+			<name>Nexus Administrator privilege (ALL)</name>
+			<method>*</method>
+			<permission>nexus:*</permission>
+		</applicationPrivilege>
 		<applicationPrivilege>
 			<id>1</id>
 			<name>Status - (read)</name>
@@ -392,6 +377,30 @@
 			<name>Attributes - (delete)</name>
 			<method>delete</method>
 			<permission>nexus:attributes</permission>
+		</applicationPrivilege>
+		<applicationPrivilege>
+			<id>53</id>
+			<name>Feeds - (read)</name>
+			<method>read</method>
+			<permission>nexus:feeds</permission>
+		</applicationPrivilege>
+		<applicationPrivilege>
+			<id>54</id>
+			<name>Artifact - (read)</name>
+			<method>read</method>
+			<permission>nexus:artifact</permission>
+		</applicationPrivilege>
+		<applicationPrivilege>
+			<id>55</id>
+			<name>Repository Statuses - (read)</name>
+			<method>read</method>
+			<permission>nexus:repostatus</permission>
+		</applicationPrivilege>
+		<applicationPrivilege>
+			<id>56</id>
+			<name>Repository Content Classes - (read)</name>
+			<method>read</method>
+			<permission>nexus:repocontentclasses</permission>
 		</applicationPrivilege>
 	</applicationPrivileges>
 </nexusSecurity>

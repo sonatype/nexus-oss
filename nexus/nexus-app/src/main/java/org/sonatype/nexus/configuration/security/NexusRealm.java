@@ -28,7 +28,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
 import org.jsecurity.authc.AccountException;
 import org.jsecurity.authc.AuthenticationException;
 import org.jsecurity.authc.AuthenticationInfo;
@@ -45,6 +44,8 @@ import org.jsecurity.authz.permission.WildcardPermission;
 import org.jsecurity.realm.AuthorizingRealm;
 import org.jsecurity.subject.PrincipalCollection;
 import org.sonatype.nexus.Nexus;
+import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
+import org.sonatype.nexus.configuration.ConfigurationChangeListener;
 import org.sonatype.nexus.configuration.security.model.CApplicationPrivilege;
 import org.sonatype.nexus.configuration.security.model.CRepoTargetPrivilege;
 import org.sonatype.nexus.configuration.security.model.CRole;
@@ -60,11 +61,14 @@ import org.sonatype.nexus.proxy.repository.Repository;
  */
 public class NexusRealm
     extends AuthorizingRealm
+    implements ConfigurationChangeListener, Initializable
 {
+    public static final String ANONYMOUS_USERNAME = "anonymous";
+
     /**
-     * @plexus.requirement role="org.sonatype.nexus.configuration.security.NexusSecurityConfiguration"
+     * @plexus.requirement
      */
-    private MutableNexusSecurityConfiguration securityConfiguration;
+    private NexusSecurityConfiguration securityConfiguration;
 
     /**
      * @plexus.requirement
@@ -77,12 +81,23 @@ public class NexusRealm
         setCredentialsMatcher( new Sha1CredentialsMatcher() );
     }
 
+    public void initialize()
+    {
+        securityConfiguration.addConfigurationChangeListener( this );
+    }
+
+    public void onConfigurationChange( ConfigurationChangeEvent evt )
+    {
+        // flush the caches to make it load the potential changes again
+        getAuthorizationCache().clear();
+    }
+
     public MutableNexusSecurityConfiguration getSecurityConfiguration()
     {
         return securityConfiguration;
     }
 
-    public void setSecurityConfiguration( MutableNexusSecurityConfiguration securityConfiguration )
+    public void setSecurityConfiguration( NexusSecurityConfiguration securityConfiguration )
     {
         this.securityConfiguration = securityConfiguration;
     }
@@ -124,6 +139,7 @@ public class NexusRealm
             }
 
             AuthenticationInfo authenticationInfo = buildAuthenticationInfo( username, password.toCharArray() );
+            
             return authenticationInfo;
         }
         catch ( NoSuchUserException e )

@@ -70,11 +70,11 @@ public class DefaultNexusSecurityConfigurationTest
         
         assertTrue( config.getRepositoryTargetPrivileges().size() == 0 );
         
-        // admin role
-        assertTrue( config.getRoles().size() == 1 );
+        // admin and anon role
+        assertTrue( config.getRoles().size() == 2 );
         
-        // admin user
-        assertTrue( config.getUsers().size() == 1 );
+        // admin and anon user
+        assertTrue( config.getUsers().size() == 2 );
         
         CRepoTargetPrivilege tarPriv = new CRepoTargetPrivilege();
         tarPriv.setId( "id2" );
@@ -129,30 +129,30 @@ public class DefaultNexusSecurityConfigurationTest
         assertTrue( ( ( CRepoTargetPrivilege ) config.getRepositoryTargetPrivileges().get( 0 ) ).getRepositoryTargetId().equals( "targetId" ) );
         assertTrue( ( ( CRepoTargetPrivilege ) config.getRepositoryTargetPrivileges().get( 0 ) ).getRepositoryId().equals( "repoId" ) );
         
-        assertTrue( config.getRoles().size() == 3 );
-        
-        assertTrue( ( ( CRole ) config.getRoles().get( 1 ) ).getDescription().equals( "description" ) );
-        assertTrue( ( ( CRole ) config.getRoles().get( 1 ) ).getId().equals( "id1" ) );
-        assertTrue( ( ( CRole ) config.getRoles().get( 1 ) ).getName().equals( "name" ) );
-        assertTrue( ( ( CRole ) config.getRoles().get( 1 ) ).getSessionTimeout() == 60 );
-        assertTrue( ( ( CRole ) config.getRoles().get( 1 ) ).getPrivileges().size() == 1 );
-        assertTrue( ( ( CRole ) config.getRoles().get( 1 ) ).getRoles().size() == 0 );
+        assertTrue( config.getRoles().size() == 4 );
         
         assertTrue( ( ( CRole ) config.getRoles().get( 2 ) ).getDescription().equals( "description" ) );
-        assertTrue( ( ( CRole ) config.getRoles().get( 2 ) ).getId().equals( "id2" ) );
+        assertTrue( ( ( CRole ) config.getRoles().get( 2 ) ).getId().equals( "id1" ) );
         assertTrue( ( ( CRole ) config.getRoles().get( 2 ) ).getName().equals( "name" ) );
         assertTrue( ( ( CRole ) config.getRoles().get( 2 ) ).getSessionTimeout() == 60 );
         assertTrue( ( ( CRole ) config.getRoles().get( 2 ) ).getPrivileges().size() == 1 );
-        assertTrue( ( ( CRole ) config.getRoles().get( 2 ) ).getRoles().size() == 1 );
+        assertTrue( ( ( CRole ) config.getRoles().get( 2 ) ).getRoles().size() == 0 );
         
-        assertTrue( config.getUsers().size() == 2 );
+        assertTrue( ( ( CRole ) config.getRoles().get( 3 ) ).getDescription().equals( "description" ) );
+        assertTrue( ( ( CRole ) config.getRoles().get( 3 ) ).getId().equals( "id2" ) );
+        assertTrue( ( ( CRole ) config.getRoles().get( 3 ) ).getName().equals( "name" ) );
+        assertTrue( ( ( CRole ) config.getRoles().get( 3 ) ).getSessionTimeout() == 60 );
+        assertTrue( ( ( CRole ) config.getRoles().get( 3 ) ).getPrivileges().size() == 1 );
+        assertTrue( ( ( CRole ) config.getRoles().get( 3 ) ).getRoles().size() == 1 );
         
-        assertTrue( ( ( CUser ) config.getUsers().get( 1 ) ).getEmail().equals( "emailaddress" ) );
-        assertTrue( ( ( CUser ) config.getUsers().get( 1 ) ).getName().equals( "name" ) );
-        assertTrue( ( ( CUser ) config.getUsers().get( 1 ) ).getPassword().equals( "password" ) );
-        assertTrue( ( ( CUser ) config.getUsers().get( 1 ) ).getStatus().equals( CUser.STATUS_ACTIVE ) );
-        assertTrue( ( ( CUser ) config.getUsers().get( 1 ) ).getUserId().equals( "id" ) );
-        assertTrue( ( ( CUser ) config.getUsers().get( 1 ) ).getRoles().size() == 2 );
+        assertTrue( config.getUsers().size() == 3 );
+        
+        assertTrue( ( ( CUser ) config.getUsers().get( 2 ) ).getEmail().equals( "emailaddress" ) );
+        assertTrue( ( ( CUser ) config.getUsers().get( 2 ) ).getName().equals( "name" ) );
+        assertTrue( ( ( CUser ) config.getUsers().get( 2 ) ).getPassword().equals( "password" ) );
+        assertTrue( ( ( CUser ) config.getUsers().get( 2 ) ).getStatus().equals( CUser.STATUS_ACTIVE ) );
+        assertTrue( ( ( CUser ) config.getUsers().get( 2 ) ).getUserId().equals( "id" ) );
+        assertTrue( ( ( CUser ) config.getUsers().get( 2 ) ).getRoles().size() == 2 );
     }
 
     public void testLoadConfiguration()

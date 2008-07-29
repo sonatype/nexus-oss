@@ -38,42 +38,45 @@
 			<param-name>config</param-name>
 			<param-value>
 			[filters]
-			authcBasic = org.sonatype.nexus.security.filter.NexusHttpAuthenticationFilter
-			authcBasic.applicationName = Sonatype Nexus Repository Manager
-			
+			authcBasic = org.sonatype.nexus.security.filter.authc.NexusHttpAuthenticationFilter
+			authcBasic.applicationName = Sonatype Nexus Repository Manager API
+
+			logout = org.sonatype.nexus.security.filter.authc.LogoutAuthenticationFilter
+
+			perms = org.sonatype.nexus.security.filter.authz.HttpVerbMappingAuthorizationFilter
+
 			[urls]
-			/service/local/status/command = authcBasic,perms[nexus:status:write]
-			/service/local/status = anon
-			/service/local/feeds/** = anon
-			/service/local/feeds = anon
-			/service/local/authentication/login = authcBasic
-			/service/local/authentication/logout = anon
-			/service/local/identify/** = anon
-			/service/local/artifact/maven/** = anon
-			/service/local/artifact/maven = anon
-			/service/local/data_index/** = anon
-			/service/local/data_index = anon
-			/service/local/data_cache/** = authcBasic,perms[nexus:cache:read]
-			/service/local/data_cache = authcBasic,perms[nexus:cache:read]
-			/service/local/wastebasket/** = authcBasic,perms[nexus:wastebasket:read]
-			/service/local/wastebasket = authcBasic,perms[nexus:wastebasket:read]
-			/service/local/attributes/** = authcBasic,perms[nexus:attributes:delete]
-			/service/local/attributes = authcBasic,perms[nexus:attributes:delete]
-			/service/local/repository_statuses = anon
-			/service/local/repositories = anon
-			/service/local/repo_groups = anon
-			/service/local/repo_content_classes = anon
-			/service/local/repo_targets = authcBasic,perms[nexus:targets:read]
-			/service/local/configs = authcBasic,perms[nexus:settings:read]
-			/service/local/global_settings = authcBasic,perms[nexus:configuration:read]
-			/service/local/repo_routes = authcBasic,perms[nexus:routes:read]
-			/service/local/templates = authcBasic,perms[nexus:repotemplates:read]
-			/service/local/schedules = authcBasic,perms[nexus:tasks:read]
-			/service/local/users = authcBasic,perms[nexus:users:read]
-			/service/local/roles = authcBasic,perms[nexus:roles:read]
-			/service/local/privileges = authcBasic,perms[nexus:privileges:read]
-			/service/local/logs = authcBasic,perms[nexus:logs:read]
-			/service/local/logs/** = authcBasic,perms[nexus:logs:read]
+			/service/local/status/command = authcBasic,perms[nexus:status]
+			/service/local/status = authcBasic,perms[nexus:status]
+			/service/local/feeds/** = authcBasic,perms[nexus:feeds]
+			/service/local/feeds = authcBasic,perms[nexus:feeds]
+			/service/local/authentication/login = authcBasic,perms[nexus:authentication]
+			/service/local/authentication/logout = logout
+			/service/local/identify/** = authcBasic,perms[nexus:identify]
+			/service/local/artifact/** = authcBasic,perms[nexus:artifact]
+			/service/local/data_index/** = authcBasic,perms[nexus:index]
+			/service/local/data_index = authcBasic,perms[nexus:index]
+			/service/local/data_cache/** = authcBasic,perms[nexus:cache]
+			/service/local/data_cache = authcBasic,perms[nexus:cache]
+			/service/local/wastebasket/** = authcBasic,perms[nexus:wastebasket]
+			/service/local/wastebasket = authcBasic,perms[nexus:wastebasket]
+			/service/local/attributes/** = authcBasic,perms[nexus:attributes]
+			/service/local/attributes = authcBasic,perms[nexus:attributes]
+			/service/local/repository_statuses = authcBasic,perms[nexus:repostatus]
+			/service/local/repositories = authcBasic,perms[nexus:repositories]
+			/service/local/repo_groups = authcBasic,perms[nexus:repogroups]
+			/service/local/repo_content_classes = authcBasic,perms[nexus:repocontentclasses]
+			/service/local/repo_targets = authcBasic,perms[nexus:targets]
+			/service/local/configs = authcBasic,perms[nexus:settings]
+			/service/local/global_settings = authcBasic,perms[nexus:configuration]
+			/service/local/repo_routes = authcBasic,perms[nexus:routes]
+			/service/local/templates = authcBasic,perms[nexus:repotemplates]
+			/service/local/schedules = authcBasic,perms[nexus:tasks]
+			/service/local/users = authcBasic,perms[nexus:users]
+			/service/local/roles = authcBasic,perms[nexus:roles]
+			/service/local/privileges = authcBasic,perms[nexus:privileges]
+			/service/local/logs = authcBasic,perms[nexus:logs]
+			/service/local/logs/** = authcBasic,perms[nexus:logs]
 			</param-value>
 		</init-param>
 	</filter>
@@ -90,9 +93,11 @@
 			<param-name>config</param-name>
 			<param-value>
 			[filters]
-			authcBasic = org.sonatype.nexus.security.filter.NexusHttpAuthenticationFilter
+			authcBasic = org.sonatype.nexus.security.filter.authc.NexusHttpAuthenticationFilter
 			authcBasic.applicationName = Sonatype Nexus Repository Manager
-			
+
+			perms = org.sonatype.nexus.security.filter.authz.HttpVerbMappingAuthorizationFilter
+
 			[urls]
 			/content/** = anon
 			</param-value>
