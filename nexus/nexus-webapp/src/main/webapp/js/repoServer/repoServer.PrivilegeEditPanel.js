@@ -285,9 +285,8 @@ Sonatype.repoServer.PrivilegeEditPanel = function(config){
                 bodyBorder: true, //note: this seem to have no effect w/in form panel
                 //note: this style matches the expected behavior
                 bodyStyle: 'background-color:#FFFFFF; border: 1px solid #B5B8C8',
-                style: 'padding: 0 20px 0 0',
                 width: 225,
-                height: 150,
+                height: 200,
                 animate:true,
                 lines: false,
                 autoScroll:true,
@@ -342,6 +341,9 @@ Sonatype.repoServer.PrivilegeEditPanel = function(config){
                 }
               },
               {
+              	xtype: 'twinpanelcontroller'
+              },
+              {
                 xtype: 'treepanel',
                 id: 'all_methods_tree', 
                 title: 'Available Methods',
@@ -350,7 +352,7 @@ Sonatype.repoServer.PrivilegeEditPanel = function(config){
                 //note: this style matches the expected behavior
                 bodyStyle: 'background-color:#FFFFFF; border: 1px solid #B5B8C8',
                 width: 225,
-                height: 150,
+                height: Ext.isGecko ? 215 : 200,
                 animate:true,
                 lines: false,
                 autoScroll:true,
@@ -836,7 +838,7 @@ Ext.extend(Sonatype.repoServer.PrivilegeEditPanel, Ext.Panel, {
     var newConfig = config;
 
     newConfig.items[5].items[1].items[0].root = new Ext.tree.TreeNode({text: 'root'});
-    newConfig.items[5].items[1].items[1].root = new Ext.tree.TreeNode({text: 'root'});
+    newConfig.items[5].items[1].items[2].root = new Ext.tree.TreeNode({text: 'root'});
 
     return newConfig;
   },
