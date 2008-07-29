@@ -274,7 +274,7 @@ public class ApplicationBridge
 
         router.attach( "/feeds/{" + FeedResourceHandler.FEED_KEY + "}", FeedResourceHandler.class );
 
-        router.attach( "/repository_statuses", RepositoryStatusesListResourceHandler.class );
+        router.attach( "/authentication/login", LoginResourceHandler.class );
 
         router.attach( "/authentication/logout", LogoutResourceHandler.class );
 
@@ -306,6 +306,8 @@ public class ApplicationBridge
         router.attach( "/attributes/{" + AttributesResourceHandler.DOMAIN + "}/{" + AttributesResourceHandler.TARGET_ID
             + "}/content", AttributesResourceHandler.class );
 
+        router.attach( "/repository_statuses", RepositoryStatusesListResourceHandler.class );
+
         router.attach(
             "/repositories/{" + RepositoryResourceHandler.REPOSITORY_ID_KEY + "}/content",
             RepositoryContentResourceHandler.class );
@@ -313,8 +315,6 @@ public class ApplicationBridge
         router.attach(
             "/repo_groups/{" + RepositoryGroupResourceHandler.GROUP_ID_KEY + "}/content",
             RepositoryGroupContentResourceHandler.class );
-
-        router.attach( "/authentication/login", LoginResourceHandler.class );
 
         router.attach( "/logs", LogsListResourceHandler.class );
 

@@ -2,7 +2,6 @@
 
 <!-- Default nexus security configuration -->
 <!-- used as default config source -->
-
 <nexusSecurity>
 	<version>1.0.0</version>
 	<users>
@@ -73,6 +72,10 @@
 				<privilege>46</privilege>
 				<privilege>47</privilege>
 				<privilege>48</privilege>
+				<privilege>49</privilege>
+				<privilege>50</privilege>
+				<privilege>51</privilege>
+				<privilege>52</privilege>
 			</privileges>
 			<roles />
 		</role>
@@ -365,6 +368,30 @@
 			<name>Repository Targets - (delete)</name>
 			<method>delete</method>
 			<permission>nexus:targets</permission>
+		</applicationPrivilege>
+		<applicationPrivilege>
+			<id>49</id>
+			<name>Status - (write)</name>
+			<method>write</method>
+			<permission>nexus:status</permission>
+		</applicationPrivilege>
+		<applicationPrivilege>
+			<id>50</id>
+			<name>Wastebasket - (read)</name>
+			<method>read</method>
+			<permission>nexus:wastebasket</permission>
+		</applicationPrivilege>
+		<applicationPrivilege>
+			<id>51</id>
+			<name>Wastebasket - (write)</name>
+			<method>write</method>
+			<permission>nexus:wastebasket</permission>
+		</applicationPrivilege>
+		<applicationPrivilege>
+			<id>52</id>
+			<name>Attributes - (delete)</name>
+			<method>delete</method>
+			<permission>nexus:attributes</permission>
 		</applicationPrivilege>
 	</applicationPrivileges>
 </nexusSecurity>

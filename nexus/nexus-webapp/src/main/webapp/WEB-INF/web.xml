@@ -37,10 +37,43 @@
 		<init-param>
 			<param-name>config</param-name>
 			<param-value>
+			[filters]
+			authcBasic = org.sonatype.nexus.security.filter.NexusHttpAuthenticationFilter
+			authcBasic.applicationName = Sonatype Nexus Repository Manager
+			
 			[urls]
+			/service/local/status/command = authcBasic,perms[nexus:status:write]
+			/service/local/status = anon
+			/service/local/feeds/** = anon
+			/service/local/feeds = anon
+			/service/local/authentication/login = authcBasic
+			/service/local/authentication/logout = anon
+			/service/local/identify/** = anon
+			/service/local/artifact/maven/** = anon
+			/service/local/artifact/maven = anon
+			/service/local/data_index/** = anon
+			/service/local/data_index = anon
+			/service/local/data_cache/** = authcBasic,perms[nexus:cache:read]
+			/service/local/data_cache = authcBasic,perms[nexus:cache:read]
+			/service/local/wastebasket/** = authcBasic,perms[nexus:wastebasket:read]
+			/service/local/wastebasket = authcBasic,perms[nexus:wastebasket:read]
+			/service/local/attributes/** = authcBasic,perms[nexus:attributes:delete]
+			/service/local/attributes = authcBasic,perms[nexus:attributes:delete]
+			/service/local/repository_statuses = anon
+			/service/local/repositories = anon
+			/service/local/repo_groups = anon
+			/service/local/repo_content_classes = anon
+			/service/local/repo_targets = authcBasic,perms[nexus:targets:read]
+			/service/local/configs = authcBasic,perms[nexus:settings:read]
+			/service/local/global_settings = authcBasic,perms[nexus:configuration:read]
+			/service/local/repo_routes = authcBasic,perms[nexus:routes:read]
+			/service/local/templates = authcBasic,perms[nexus:repotemplates:read]
+			/service/local/schedules = authcBasic,perms[nexus:tasks:read]
+			/service/local/users = authcBasic,perms[nexus:users:read]
+			/service/local/roles = authcBasic,perms[nexus:roles:read]
+			/service/local/privileges = authcBasic,perms[nexus:privileges:read]
 			/service/local/logs = authcBasic,perms[nexus:logs:read]
-			/service/local/logs/** = authcBasic,roles[admin]
-			/service/** = anon
+			/service/local/logs/** = authcBasic,perms[nexus:logs:read]
 			</param-value>
 		</init-param>
 	</filter>
@@ -56,15 +89,9 @@
 		<init-param>
 			<param-name>config</param-name>
 			<param-value>
-			[interceptors]
-			authcBasic = org.jsecurity.web.filter.authc.BasicHttpAuthenticationFilter
+			[filters]
+			authcBasic = org.sonatype.nexus.security.filter.NexusHttpAuthenticationFilter
 			authcBasic.applicationName = Sonatype Nexus Repository Manager
-			
-			roles = org.jsecurity.web.filter.authz.RolesAuthorizationFilter
-			
-			perms = org.jsecurity.web.filter.authz.PermissionsAuthorizationFilter
-			
-			anon = org.jsecurity.web.filter.authc.AnonymousFilter
 			
 			[urls]
 			/content/** = anon
