@@ -116,6 +116,7 @@ import org.sonatype.nexus.rest.model.UserResourceResponse;
 import org.sonatype.nexus.rest.model.WastebasketResource;
 import org.sonatype.nexus.rest.model.WastebasketResourceResponse;
 import org.sonatype.nexus.rest.privileges.PrivilegeBaseResourceConverter;
+import org.sonatype.nexus.rest.privileges.PrivilegeBaseStatusResourceConverter;
 import org.sonatype.nexus.rest.repositories.RepositoryBaseResourceConverter;
 import org.sonatype.nexus.rest.schedules.ScheduledServiceBaseResourceConverter;
 import org.sonatype.nexus.rest.schedules.ScheduledServicePropertyResourceConverter;
@@ -136,6 +137,9 @@ public final class XStreamInitializer
             .getReflectionProvider() ), XStream.PRIORITY_VERY_HIGH );
         
         xstream.registerConverter( new PrivilegeBaseResourceConverter( xstream.getMapper(), xstream
+            .getReflectionProvider() ), XStream.PRIORITY_VERY_HIGH );
+        
+        xstream.registerConverter( new PrivilegeBaseStatusResourceConverter( xstream.getMapper(), xstream
             .getReflectionProvider() ), XStream.PRIORITY_VERY_HIGH );
 
         // aliasaes

@@ -76,19 +76,31 @@ public class PrivilegesMessageUtil
         return client.handle( request );
     }
 
-    public PrivilegeBaseResource getResourceFromResponse( Response response )
+    public PrivilegeBaseStatusResource getResourceFromResponse( Response response )
         throws IOException
     {
         String responseString = response.getEntity().getText();
-        System.out.println( " getResourceFromResponse: " + responseString );
 
         XStreamRepresentation representation = new XStreamRepresentation( xstream, responseString, mediaType );
 
+        PrivilegeStatusResourceResponse resourceResponse =
+            (PrivilegeStatusResourceResponse) representation.getPayload( new PrivilegeStatusResourceResponse() );
+
+        return (PrivilegeBaseStatusResource) resourceResponse.getData();
+
+    }
+    
+    public List<PrivilegeBaseStatusResource> getResourceListFromResponse( Response response )
+        throws IOException
+    {
+        String responseString = response.getEntity().getText();
+    
+        XStreamRepresentation representation = new XStreamRepresentation( xstream, responseString, mediaType );
+    
         PrivilegeListResourceResponse resourceResponse =
             (PrivilegeListResourceResponse) representation.getPayload( new PrivilegeListResourceResponse() );
-
-        return (PrivilegeBaseResource) resourceResponse.getData();
-
+    
+        return resourceResponse.getData();
     }
 
     public void verifyPrivilegeConfig( PrivilegeBaseStatusResource privilegeResource )
