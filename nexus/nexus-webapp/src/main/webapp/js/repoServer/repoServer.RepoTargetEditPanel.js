@@ -164,7 +164,7 @@ Sonatype.repoServer.RepoTargetEditPanel = function(config){
                 xtype: 'button',
                 text: 'Add', 
                 style: 'padding-left: 7px',
-                minWidth: 75,
+                minWidth: 85,
                 id: 'button-add',
                 handler: this.addNewPattern,
                 scope: this
@@ -209,9 +209,18 @@ Sonatype.repoServer.RepoTargetEditPanel = function(config){
 	            xtype: 'button',
 		        text: 'Remove', 
                 style: 'padding-left: 6px',
-                minWidth: 75,
+                minWidth: 85,
 		        id: 'button-remove',
                 handler: this.removePattern,
+                scope: this
+		      },
+	          {
+	            xtype: 'button',
+		        text: 'Remove All', 
+                style: 'padding-left: 6px; margin-top: 5px',
+                minWidth: 85,
+		        id: 'button-remove-all',
+                handler: this.removeAllPatterns,
                 scope: this
 		      }
 	        ]
@@ -774,6 +783,16 @@ Ext.extend(Sonatype.repoServer.RepoTargetEditPanel, Ext.Panel, {
     var selectedNode = treePanel.getSelectionModel().getSelectedNode();
     if ( selectedNode ) {
       treePanel.root.removeChild( selectedNode );
+    }
+  },
+  
+  removeAllPatterns: function() {
+	var fpanel = this.formCards.getLayout().activeItem;
+    var treePanel = fpanel.findById(fpanel.id + '_repoTargets-pattern-list');
+    var treeRoot = treePanel.root;
+
+    while ( treeRoot.lastChild ) {
+      treeRoot.removeChild( treeRoot.lastChild );
     }
   }
   
