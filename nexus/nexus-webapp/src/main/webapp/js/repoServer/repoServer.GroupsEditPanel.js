@@ -116,7 +116,6 @@ Sonatype.repoServer.GroupsEditPanel = function(config){
             bodyBorder: true, //note: this seem to have no effect w/in form panel
             //note: this style matches the expected behavior
             bodyStyle: 'background-color:#FFFFFF; border: 1px solid #B5B8C8',
-            style: 'padding: 0 20px 0 0',
             width: 225,
             height: 300,
             animate:true,
@@ -181,6 +180,9 @@ Sonatype.repoServer.GroupsEditPanel = function(config){
               }
             }
             
+          },
+          {
+          	xtype: 'twinpanelcontroller'
           },
           {
             xtype: 'treepanel',
@@ -826,7 +828,7 @@ Ext.extend(Sonatype.repoServer.GroupsEditPanel, Ext.Panel, {
 
     var trees = [
       {obj : newConfig.items[2].items[0], postpend : '_group-repos-tree'},
-      {obj : newConfig.items[2].items[1], postpend : '_group-all-repos-tree'}
+      {obj : newConfig.items[2].items[2], postpend : '_group-all-repos-tree'}
     ];
 
     for (var i = 0; i<trees.length; i++) {
