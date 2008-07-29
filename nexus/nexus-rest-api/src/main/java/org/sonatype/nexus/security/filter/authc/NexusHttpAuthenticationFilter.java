@@ -1,10 +1,7 @@
 package org.sonatype.nexus.security.filter.authc;
 
-import static org.jsecurity.web.WebUtils.toHttp;
-
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletRequest;
 
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
