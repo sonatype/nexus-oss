@@ -77,6 +77,7 @@ import org.sonatype.nexus.proxy.storage.local.LocalRepositoryStorage;
 import org.sonatype.nexus.proxy.storage.remote.RemoteRepositoryStorage;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 import org.sonatype.nexus.proxy.target.TargetSet;
+import org.sonatype.nexus.util.StringDigester;
 import org.sonatype.scheduling.NoSuchTaskException;
 import org.sonatype.scheduling.ScheduledTask;
 import org.sonatype.scheduling.SchedulerTask;
@@ -91,11 +92,13 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.RejectedExecutionException;
 
-public abstract class AbstractRealmTest extends TestCase
+public abstract class AbstractRealmTest
+    extends TestCase
 {
     protected NexusRealm realm;
 
-    protected void setUp() throws Exception
+    protected void setUp()
+        throws Exception
     {
         super.setUp();
 
@@ -109,13 +112,13 @@ public abstract class AbstractRealmTest extends TestCase
 
         CUser jason = new CUser();
         jason.setUserId( "jason" );
-        jason.setPassword( "nosaj" );
+        jason.setPassword( StringDigester.getSha1Digest( "nosaj" ) );
         jason.addRole( "maven-committer" );
         securityConfiguration.createUser( jason );
 
         CUser dain = new CUser();
         dain.setUserId( "dain" );
-        dain.setPassword( "niad" );
+        dain.setPassword( StringDigester.getSha1Digest( "niad") );
         dain.addRole( "maven-user" );
         securityConfiguration.createUser( dain );
 
@@ -203,14 +206,19 @@ public abstract class AbstractRealmTest extends TestCase
         }
     }
 
-    public static class MockMutableNexusSecurityConfiguration implements MutableNexusSecurityConfiguration
+    public static class MockMutableNexusSecurityConfiguration
+        implements MutableNexusSecurityConfiguration
     {
         public final Map<String, CUser> users = new TreeMap<String, CUser>();
+
         public final Map<String, CRole> roles = new TreeMap<String, CRole>();
+
         public final Map<String, CRepoTargetPrivilege> repoTargetPrivileges = new TreeMap<String, CRepoTargetPrivilege>();
+
         public final Map<String, CApplicationPrivilege> applicationPrivileges = new TreeMap<String, CApplicationPrivilege>();
 
-        public CUser readUser( String id ) throws NoSuchUserException
+        public CUser readUser( String id )
+            throws NoSuchUserException
         {
             CUser user = users.get( id );
             if ( user == null )
@@ -220,7 +228,8 @@ public abstract class AbstractRealmTest extends TestCase
             return user;
         }
 
-        public void createUser( CUser user ) throws ConfigurationException
+        public void createUser( CUser user )
+            throws ConfigurationException
         {
             if ( user.getUserId() == null )
             {
@@ -229,7 +238,8 @@ public abstract class AbstractRealmTest extends TestCase
             users.put( user.getUserId(), user );
         }
 
-        public CRole readRole( String id ) throws NoSuchRoleException
+        public CRole readRole( String id )
+            throws NoSuchRoleException
         {
             CRole role = roles.get( id );
             if ( role == null )
@@ -239,7 +249,8 @@ public abstract class AbstractRealmTest extends TestCase
             return role;
         }
 
-        public void createRole( CRole role ) throws ConfigurationException
+        public void createRole( CRole role )
+            throws ConfigurationException
         {
             if ( role.getId() == null )
             {
@@ -248,7 +259,8 @@ public abstract class AbstractRealmTest extends TestCase
             roles.put( role.getId(), role );
         }
 
-        public CApplicationPrivilege readApplicationPrivilege( String id ) throws NoSuchPrivilegeException
+        public CApplicationPrivilege readApplicationPrivilege( String id )
+            throws NoSuchPrivilegeException
         {
             CApplicationPrivilege applicationPrivilege = applicationPrivileges.get( id );
             if ( applicationPrivilege == null )
@@ -268,7 +280,8 @@ public abstract class AbstractRealmTest extends TestCase
             applicationPrivileges.put( applicationPrivilege.getId(), applicationPrivilege );
         }
 
-        public CRepoTargetPrivilege readRepoTargetPrivilege( String id ) throws NoSuchPrivilegeException
+        public CRepoTargetPrivilege readRepoTargetPrivilege( String id )
+            throws NoSuchPrivilegeException
         {
             CRepoTargetPrivilege targetPrivilege = repoTargetPrivileges.get( id );
             if ( targetPrivilege == null )
@@ -278,7 +291,8 @@ public abstract class AbstractRealmTest extends TestCase
             return targetPrivilege;
         }
 
-        public void createRepoTargetPrivilege( CRepoTargetPrivilege targetPrivilege ) throws ConfigurationException
+        public void createRepoTargetPrivilege( CRepoTargetPrivilege targetPrivilege )
+            throws ConfigurationException
         {
             if ( targetPrivilege.getId() == null )
             {
@@ -293,12 +307,17 @@ public abstract class AbstractRealmTest extends TestCase
             throw new UnsupportedOperationException();
         }
 
-        public void updateUser( CUser settings ) throws ConfigurationException, NoSuchUserException, IOException
+        public void updateUser( CUser settings )
+            throws ConfigurationException,
+                NoSuchUserException,
+                IOException
         {
             throw new UnsupportedOperationException();
         }
 
-        public void deleteUser( String id ) throws IOException, NoSuchUserException
+        public void deleteUser( String id )
+            throws IOException,
+                NoSuchUserException
         {
             throw new UnsupportedOperationException();
         }
@@ -308,12 +327,17 @@ public abstract class AbstractRealmTest extends TestCase
             throw new UnsupportedOperationException();
         }
 
-        public void updateRole( CRole settings ) throws ConfigurationException, NoSuchRoleException, IOException
+        public void updateRole( CRole settings )
+            throws ConfigurationException,
+                NoSuchRoleException,
+                IOException
         {
             throw new UnsupportedOperationException();
         }
 
-        public void deleteRole( String id ) throws IOException, NoSuchRoleException
+        public void deleteRole( String id )
+            throws IOException,
+                NoSuchRoleException
         {
             throw new UnsupportedOperationException();
         }
@@ -324,13 +348,16 @@ public abstract class AbstractRealmTest extends TestCase
         }
 
         public void updateApplicationPrivilege( CApplicationPrivilege settings )
-            throws ConfigurationException, NoSuchPrivilegeException, IOException
+            throws ConfigurationException,
+                NoSuchPrivilegeException,
+                IOException
         {
             throw new UnsupportedOperationException();
         }
 
         public void deleteApplicationPrivilege( String id )
-            throws IOException, NoSuchPrivilegeException
+            throws IOException,
+                NoSuchPrivilegeException
         {
             throw new UnsupportedOperationException();
         }
@@ -341,27 +368,31 @@ public abstract class AbstractRealmTest extends TestCase
         }
 
         public void updateRepoTargetPrivilege( CRepoTargetPrivilege settings )
-            throws ConfigurationException, NoSuchPrivilegeException, IOException
+            throws ConfigurationException,
+                NoSuchPrivilegeException,
+                IOException
         {
             throw new UnsupportedOperationException();
         }
 
         public void deleteRepoTargetPrivilege( String id )
-            throws IOException, NoSuchPrivilegeException
+            throws IOException,
+                NoSuchPrivilegeException
         {
             throw new UnsupportedOperationException();
         }
     }
 
-    public static class MockNexus implements Nexus
+    public static class MockNexus
+        implements Nexus
     {
         public final Map<String, List<Repository>> repositoryGroups = new TreeMap<String, List<Repository>>();
 
-        public List<Repository> getRepositoryGroup( String repoGroupId ) throws NoSuchRepositoryGroupException
+        public List<Repository> getRepositoryGroup( String repoGroupId )
+            throws NoSuchRepositoryGroupException
         {
             return repositoryGroups.get( repoGroupId );
         }
-
 
         // Unimplemented methods
         public SystemStatus getSystemStatus()
@@ -379,12 +410,14 @@ public abstract class AbstractRealmTest extends TestCase
             throw new UnsupportedOperationException();
         }
 
-        public Repository getRepository( String repoId ) throws NoSuchRepositoryException
+        public Repository getRepository( String repoId )
+            throws NoSuchRepositoryException
         {
             throw new UnsupportedOperationException();
         }
 
-        public String getRepositoryGroupType( String repoGroupId ) throws NoSuchRepositoryGroupException
+        public String getRepositoryGroupType( String repoGroupId )
+            throws NoSuchRepositoryGroupException
         {
             throw new UnsupportedOperationException();
         }
@@ -395,38 +428,47 @@ public abstract class AbstractRealmTest extends TestCase
         }
 
         public StorageItem dereferenceLinkItem( StorageItem item )
-            throws NoSuchRepositoryException, ItemNotFoundException,
-            AccessDeniedException, RepositoryNotAvailableException, StorageException
+            throws NoSuchRepositoryException,
+                ItemNotFoundException,
+                AccessDeniedException,
+                RepositoryNotAvailableException,
+                StorageException
         {
             throw new UnsupportedOperationException();
         }
 
-        public long getWastebasketItemCount() throws IOException
+        public long getWastebasketItemCount()
+            throws IOException
         {
             throw new UnsupportedOperationException();
         }
 
-        public long getWastebasketSize() throws IOException
+        public long getWastebasketSize()
+            throws IOException
         {
             throw new UnsupportedOperationException();
         }
 
-        public void wastebasketPurge() throws IOException
+        public void wastebasketPurge()
+            throws IOException
         {
             throw new UnsupportedOperationException();
         }
 
-        public InputStream getConfigurationAsStream() throws IOException
+        public InputStream getConfigurationAsStream()
+            throws IOException
         {
             throw new UnsupportedOperationException();
         }
 
-        public Collection<String> getApplicationLogFiles() throws IOException
+        public Collection<String> getApplicationLogFiles()
+            throws IOException
         {
             throw new UnsupportedOperationException();
         }
 
-        public InputStream getApplicationLogAsStream( String logFile ) throws IOException
+        public InputStream getApplicationLogAsStream( String logFile )
+            throws IOException
         {
             throw new UnsupportedOperationException();
         }
@@ -436,7 +478,8 @@ public abstract class AbstractRealmTest extends TestCase
             throw new UnsupportedOperationException();
         }
 
-        public void clearRepositoryCaches( String path, String repositoryId ) throws NoSuchRepositoryException
+        public void clearRepositoryCaches( String path, String repositoryId )
+            throws NoSuchRepositoryException
         {
             throw new UnsupportedOperationException();
         }
@@ -447,73 +490,90 @@ public abstract class AbstractRealmTest extends TestCase
             throw new UnsupportedOperationException();
         }
 
-        public void reindexAllRepositories() throws IOException
+        public void reindexAllRepositories()
+            throws IOException
         {
             throw new UnsupportedOperationException();
         }
 
-        public void reindexRepository( String repositoryId ) throws NoSuchRepositoryException, IOException
+        public void reindexRepository( String repositoryId )
+            throws NoSuchRepositoryException,
+                IOException
         {
             throw new UnsupportedOperationException();
         }
 
         public void reindexRepositoryGroup( String repositoryGroupId )
-            throws NoSuchRepositoryGroupException, IOException
+            throws NoSuchRepositoryGroupException,
+                IOException
         {
             throw new UnsupportedOperationException();
         }
 
-        public void publishAllIndex() throws IOException
+        public void publishAllIndex()
+            throws IOException
         {
             throw new UnsupportedOperationException();
         }
 
-        public void publishRepositoryIndex( String repositoryId ) throws IOException, NoSuchRepositoryException
+        public void publishRepositoryIndex( String repositoryId )
+            throws IOException,
+                NoSuchRepositoryException
         {
             throw new UnsupportedOperationException();
         }
 
         public void publishRepositoryGroupIndex( String repositoryGroupId )
-            throws IOException, NoSuchRepositoryGroupException
+            throws IOException,
+                NoSuchRepositoryGroupException
         {
             throw new UnsupportedOperationException();
         }
 
-        public void rebuildAttributesAllRepositories() throws IOException
+        public void rebuildAttributesAllRepositories()
+            throws IOException
         {
             throw new UnsupportedOperationException();
         }
 
-        public void rebuildAttributesRepository( String repositoryId ) throws NoSuchRepositoryException, IOException
+        public void rebuildAttributesRepository( String repositoryId )
+            throws NoSuchRepositoryException,
+                IOException
         {
             throw new UnsupportedOperationException();
         }
 
         public void rebuildAttributesRepositoryGroup( String repositoryGroupId )
-            throws NoSuchRepositoryGroupException, IOException
+            throws NoSuchRepositoryGroupException,
+                IOException
         {
             throw new UnsupportedOperationException();
         }
 
-        public Collection<String> evictAllUnusedProxiedItems( long timestamp ) throws IOException
+        public Collection<String> evictAllUnusedProxiedItems( long timestamp )
+            throws IOException
         {
             throw new UnsupportedOperationException();
         }
 
         public Collection<String> evictRepositoryUnusedProxiedItems( long timestamp, String repositoryId )
-            throws NoSuchRepositoryException, IOException
+            throws NoSuchRepositoryException,
+                IOException
         {
             throw new UnsupportedOperationException();
         }
 
         public Collection<String> evictRepositoryGroupUnusedProxiedItems( long timestamp, String repositoryGroupId )
-            throws NoSuchRepositoryGroupException, IOException
+            throws NoSuchRepositoryGroupException,
+                IOException
         {
             throw new UnsupportedOperationException();
         }
 
         public SnapshotRemovalResult removeSnapshots( SnapshotRemovalRequest request )
-            throws NoSuchRepositoryException, NoSuchRepositoryGroupException, IllegalArgumentException
+            throws NoSuchRepositoryException,
+                NoSuchRepositoryGroupException,
+                IllegalArgumentException
         {
             throw new UnsupportedOperationException();
         }
@@ -579,19 +639,22 @@ public abstract class AbstractRealmTest extends TestCase
         }
 
         public <T> void submit( String name, SchedulerTask<T> task )
-            throws RejectedExecutionException, NullPointerException
+            throws RejectedExecutionException,
+                NullPointerException
         {
             throw new UnsupportedOperationException();
         }
 
         public <T> ScheduledTask<T> schedule( String name, SchedulerTask<T> nexusTask, Schedule schedule )
-            throws RejectedExecutionException, NullPointerException
+            throws RejectedExecutionException,
+                NullPointerException
         {
             throw new UnsupportedOperationException();
         }
 
         public <T> ScheduledTask<T> updateSchedule( ScheduledTask<T> task )
-            throws RejectedExecutionException, NullPointerException
+            throws RejectedExecutionException,
+                NullPointerException
         {
             throw new UnsupportedOperationException();
         }
@@ -606,17 +669,20 @@ public abstract class AbstractRealmTest extends TestCase
             throw new UnsupportedOperationException();
         }
 
-        public ScheduledTask<?> getTaskById( String id ) throws NoSuchTaskException
+        public ScheduledTask<?> getTaskById( String id )
+            throws NoSuchTaskException
         {
             throw new UnsupportedOperationException();
         }
 
-        public SchedulerTask<?> createTaskInstance( String taskType ) throws IllegalArgumentException
+        public SchedulerTask<?> createTaskInstance( String taskType )
+            throws IllegalArgumentException
         {
             throw new UnsupportedOperationException();
         }
 
-        public SchedulerTask<?> createTaskInstance( Class<?> taskType ) throws IllegalArgumentException
+        public SchedulerTask<?> createTaskInstance( Class<?> taskType )
+            throws IllegalArgumentException
         {
             throw new UnsupportedOperationException();
         }
@@ -636,7 +702,8 @@ public abstract class AbstractRealmTest extends TestCase
             throw new UnsupportedOperationException();
         }
 
-        public InputStream getDefaultConfigurationAsStream() throws IOException
+        public InputStream getDefaultConfigurationAsStream()
+            throws IOException
         {
             throw new UnsupportedOperationException();
         }
@@ -666,83 +733,86 @@ public abstract class AbstractRealmTest extends TestCase
             throw new UnsupportedOperationException();
         }
 
-        public Collection<CRepository> listRepositoryTemplates() throws IOException
+        public Collection<CRepository> listRepositoryTemplates()
+            throws IOException
         {
             throw new UnsupportedOperationException();
         }
 
-        public void createRepositoryTemplate( CRepository settings ) throws IOException
+        public void createRepositoryTemplate( CRepository settings )
+            throws IOException
         {
             throw new UnsupportedOperationException();
         }
 
-        public CRepository readRepositoryTemplate( String id ) throws IOException
+        public CRepository readRepositoryTemplate( String id )
+            throws IOException
         {
             throw new UnsupportedOperationException();
         }
 
-        public void updateRepositoryTemplate( CRepository settings ) throws IOException
+        public void updateRepositoryTemplate( CRepository settings )
+            throws IOException
         {
             throw new UnsupportedOperationException();
         }
 
-        public void deleteRepositoryTemplate( String id ) throws IOException
+        public void deleteRepositoryTemplate( String id )
+            throws IOException
         {
             throw new UnsupportedOperationException();
         }
 
-        public Collection<CRepositoryShadow> listRepositoryShadowTemplates() throws IOException
+        public Collection<CRepositoryShadow> listRepositoryShadowTemplates()
+            throws IOException
         {
             throw new UnsupportedOperationException();
         }
 
-        public void createRepositoryShadowTemplate( CRepositoryShadow settings ) throws IOException
+        public void createRepositoryShadowTemplate( CRepositoryShadow settings )
+            throws IOException
         {
             throw new UnsupportedOperationException();
         }
 
-        public CRepositoryShadow readRepositoryShadowTemplate( String id ) throws IOException
+        public CRepositoryShadow readRepositoryShadowTemplate( String id )
+            throws IOException
         {
             throw new UnsupportedOperationException();
         }
 
-        public void updateRepositoryShadowTemplate( CRepositoryShadow settings ) throws IOException
+        public void updateRepositoryShadowTemplate( CRepositoryShadow settings )
+            throws IOException
         {
             throw new UnsupportedOperationException();
         }
 
-        public void deleteRepositoryShadowTemplate( String id ) throws IOException
+        public void deleteRepositoryShadowTemplate( String id )
+            throws IOException
         {
             throw new UnsupportedOperationException();
         }
 
-        public ArtifactInfo identifyArtifact( String type, String checksum ) throws IOException
+        public ArtifactInfo identifyArtifact( String type, String checksum )
+            throws IOException
         {
             throw new UnsupportedOperationException();
         }
 
-        public FlatSearchResponse searchArtifactFlat( String term,
-                                                      String repositoryId,
-                                                      String groupId,
-                                                      Integer from,
-                                                      Integer count )
+        public FlatSearchResponse searchArtifactFlat( String term, String repositoryId, String groupId, Integer from,
+            Integer count )
         {
             throw new UnsupportedOperationException();
         }
 
-        public FlatSearchResponse searchArtifactFlat( String gTerm,
-                                                      String aTerm,
-                                                      String vTerm,
-                                                      String cTerm,
-                                                      String repositoryId,
-                                                      String groupId,
-                                                      Integer from,
-                                                      Integer count )
+        public FlatSearchResponse searchArtifactFlat( String gTerm, String aTerm, String vTerm, String cTerm,
+            String repositoryId, String groupId, Integer from, Integer count )
         {
             throw new UnsupportedOperationException();
         }
 
-        public void setSecurity( boolean enabled, String authenticationSourceType ) throws IOException
+        public void setSecurity( boolean enabled, String authenticationSourceType )
+            throws IOException
         {
             throw new UnsupportedOperationException();
         }
@@ -777,7 +847,8 @@ public abstract class AbstractRealmTest extends TestCase
             throw new UnsupportedOperationException();
         }
 
-        public void setBaseUrl( String baseUrl ) throws IOException
+        public void setBaseUrl( String baseUrl )
+            throws IOException
         {
             throw new UnsupportedOperationException();
         }
@@ -787,7 +858,8 @@ public abstract class AbstractRealmTest extends TestCase
             throw new UnsupportedOperationException();
         }
 
-        public void updateWorkingDirectory( String settings ) throws IOException
+        public void updateWorkingDirectory( String settings )
+            throws IOException
         {
             throw new UnsupportedOperationException();
         }
@@ -797,7 +869,8 @@ public abstract class AbstractRealmTest extends TestCase
             throw new UnsupportedOperationException();
         }
 
-        public void updateApplicationLogDirectory( String settings ) throws IOException
+        public void updateApplicationLogDirectory( String settings )
+            throws IOException
         {
             throw new UnsupportedOperationException();
         }
@@ -808,13 +881,15 @@ public abstract class AbstractRealmTest extends TestCase
         }
 
         public void updateGlobalRemoteConnectionSettings( CRemoteConnectionSettings settings )
-            throws ConfigurationException, IOException
+            throws ConfigurationException,
+                IOException
         {
             throw new UnsupportedOperationException();
         }
 
         public void createGlobalRemoteHttpProxySettings( CRemoteHttpProxySettings settings )
-            throws ConfigurationException, IOException
+            throws ConfigurationException,
+                IOException
         {
             throw new UnsupportedOperationException();
         }
@@ -825,12 +900,14 @@ public abstract class AbstractRealmTest extends TestCase
         }
 
         public void updateGlobalRemoteHttpProxySettings( CRemoteHttpProxySettings settings )
-            throws ConfigurationException, IOException
+            throws ConfigurationException,
+                IOException
         {
             throw new UnsupportedOperationException();
         }
 
-        public void deleteGlobalRemoteHttpProxySettings() throws IOException
+        public void deleteGlobalRemoteHttpProxySettings()
+            throws IOException
         {
             throw new UnsupportedOperationException();
         }
@@ -840,7 +917,9 @@ public abstract class AbstractRealmTest extends TestCase
             throw new UnsupportedOperationException();
         }
 
-        public void updateRouting( CRouting settings ) throws ConfigurationException, IOException
+        public void updateRouting( CRouting settings )
+            throws ConfigurationException,
+                IOException
         {
             throw new UnsupportedOperationException();
         }
@@ -850,23 +929,31 @@ public abstract class AbstractRealmTest extends TestCase
             throw new UnsupportedOperationException();
         }
 
-        public void createRepository( CRepository settings ) throws ConfigurationException, IOException
+        public void createRepository( CRepository settings )
+            throws ConfigurationException,
+                IOException
         {
             throw new UnsupportedOperationException();
         }
 
-        public CRepository readRepository( String id ) throws NoSuchRepositoryException
+        public CRepository readRepository( String id )
+            throws NoSuchRepositoryException
         {
             throw new UnsupportedOperationException();
         }
 
         public void updateRepository( CRepository settings )
-            throws NoSuchRepositoryException, ConfigurationException, IOException
+            throws NoSuchRepositoryException,
+                ConfigurationException,
+                IOException
         {
             throw new UnsupportedOperationException();
         }
 
-        public void deleteRepository( String id ) throws NoSuchRepositoryException, IOException, ConfigurationException
+        public void deleteRepository( String id )
+            throws NoSuchRepositoryException,
+                IOException,
+                ConfigurationException
         {
             throw new UnsupportedOperationException();
         }
@@ -876,23 +963,30 @@ public abstract class AbstractRealmTest extends TestCase
             throw new UnsupportedOperationException();
         }
 
-        public void createRepositoryShadow( CRepositoryShadow settings ) throws ConfigurationException, IOException
+        public void createRepositoryShadow( CRepositoryShadow settings )
+            throws ConfigurationException,
+                IOException
         {
             throw new UnsupportedOperationException();
         }
 
-        public CRepositoryShadow readRepositoryShadow( String id ) throws NoSuchRepositoryException
+        public CRepositoryShadow readRepositoryShadow( String id )
+            throws NoSuchRepositoryException
         {
             throw new UnsupportedOperationException();
         }
 
         public void updateRepositoryShadow( CRepositoryShadow settings )
-            throws NoSuchRepositoryException, ConfigurationException, IOException
+            throws NoSuchRepositoryException,
+                ConfigurationException,
+                IOException
         {
             throw new UnsupportedOperationException();
         }
 
-        public void deleteRepositoryShadow( String id ) throws NoSuchRepositoryException, IOException
+        public void deleteRepositoryShadow( String id )
+            throws NoSuchRepositoryException,
+                IOException
         {
             throw new UnsupportedOperationException();
         }
@@ -903,23 +997,29 @@ public abstract class AbstractRealmTest extends TestCase
         }
 
         public void createGroupsSettingPathMapping( CGroupsSettingPathMappingItem settings )
-            throws NoSuchRepositoryException, ConfigurationException, IOException
+            throws NoSuchRepositoryException,
+                ConfigurationException,
+                IOException
         {
             throw new UnsupportedOperationException();
         }
 
-        public CGroupsSettingPathMappingItem readGroupsSettingPathMapping( String id ) throws IOException
+        public CGroupsSettingPathMappingItem readGroupsSettingPathMapping( String id )
+            throws IOException
         {
             throw new UnsupportedOperationException();
         }
 
         public void updateGroupsSettingPathMapping( CGroupsSettingPathMappingItem settings )
-            throws NoSuchRepositoryException, ConfigurationException, IOException
+            throws NoSuchRepositoryException,
+                ConfigurationException,
+                IOException
         {
             throw new UnsupportedOperationException();
         }
 
-        public void deleteGroupsSettingPathMapping( String id ) throws IOException
+        public void deleteGroupsSettingPathMapping( String id )
+            throws IOException
         {
             throw new UnsupportedOperationException();
         }
@@ -930,23 +1030,31 @@ public abstract class AbstractRealmTest extends TestCase
         }
 
         public void createRepositoryGroup( CRepositoryGroup settings )
-            throws NoSuchRepositoryException, InvalidGroupingException, IOException
+            throws NoSuchRepositoryException,
+                InvalidGroupingException,
+                IOException
         {
             throw new UnsupportedOperationException();
         }
 
-        public CRepositoryGroup readRepositoryGroup( String id ) throws NoSuchRepositoryGroupException
+        public CRepositoryGroup readRepositoryGroup( String id )
+            throws NoSuchRepositoryGroupException
         {
             throw new UnsupportedOperationException();
         }
 
         public void updateRepositoryGroup( CRepositoryGroup settings )
-            throws NoSuchRepositoryException, NoSuchRepositoryGroupException, InvalidGroupingException, IOException
+            throws NoSuchRepositoryException,
+                NoSuchRepositoryGroupException,
+                InvalidGroupingException,
+                IOException
         {
             throw new UnsupportedOperationException();
         }
 
-        public void deleteRepositoryGroup( String id ) throws NoSuchRepositoryGroupException, IOException
+        public void deleteRepositoryGroup( String id )
+            throws NoSuchRepositoryGroupException,
+                IOException
         {
             throw new UnsupportedOperationException();
         }
@@ -956,7 +1064,9 @@ public abstract class AbstractRealmTest extends TestCase
             throw new UnsupportedOperationException();
         }
 
-        public void createRepositoryTarget( CRepositoryTarget settings ) throws IllegalArgumentException, IOException
+        public void createRepositoryTarget( CRepositoryTarget settings )
+            throws IllegalArgumentException,
+                IOException
         {
             throw new UnsupportedOperationException();
         }
@@ -966,12 +1076,15 @@ public abstract class AbstractRealmTest extends TestCase
             throw new UnsupportedOperationException();
         }
 
-        public void updateRepositoryTarget( CRepositoryTarget settings ) throws IllegalArgumentException, IOException
+        public void updateRepositoryTarget( CRepositoryTarget settings )
+            throws IllegalArgumentException,
+                IOException
         {
             throw new UnsupportedOperationException();
         }
 
-        public void deleteRepositoryTarget( String id ) throws IOException
+        public void deleteRepositoryTarget( String id )
+            throws IOException
         {
             throw new UnsupportedOperationException();
         }
@@ -981,23 +1094,27 @@ public abstract class AbstractRealmTest extends TestCase
             throw new UnsupportedOperationException();
         }
 
-        public CRemoteNexusInstance readRemoteNexusInstance( String alias ) throws IOException
+        public CRemoteNexusInstance readRemoteNexusInstance( String alias )
+            throws IOException
         {
             throw new UnsupportedOperationException();
         }
 
-        public void createRemoteNexusInstance( CRemoteNexusInstance settings ) throws IOException
+        public void createRemoteNexusInstance( CRemoteNexusInstance settings )
+            throws IOException
         {
             throw new UnsupportedOperationException();
         }
 
-        public void deleteRemoteNexusInstance( String alias ) throws IOException
+        public void deleteRemoteNexusInstance( String alias )
+            throws IOException
         {
             throw new UnsupportedOperationException();
         }
     }
 
-    public static class MockRepository implements Repository
+    public static class MockRepository
+        implements Repository
     {
         private String id;
 
@@ -1215,51 +1332,68 @@ public abstract class AbstractRealmTest extends TestCase
         }
 
         public InputStream retrieveItemContent( RepositoryItemUid uid )
-            throws RepositoryNotAvailableException, ItemNotFoundException, StorageException
+            throws RepositoryNotAvailableException,
+                ItemNotFoundException,
+                StorageException
         {
             throw new UnsupportedOperationException();
         }
 
         public StorageItem retrieveItem( boolean localOnly, RepositoryItemUid uid )
-            throws RepositoryNotAvailableException, ItemNotFoundException, StorageException
+            throws RepositoryNotAvailableException,
+                ItemNotFoundException,
+                StorageException
         {
             throw new UnsupportedOperationException();
         }
 
         public void copyItem( RepositoryItemUid from, RepositoryItemUid to )
             throws UnsupportedStorageOperationException,
-            RepositoryNotAvailableException, ItemNotFoundException, StorageException
+                RepositoryNotAvailableException,
+                ItemNotFoundException,
+                StorageException
         {
             throw new UnsupportedOperationException();
         }
 
         public void moveItem( RepositoryItemUid from, RepositoryItemUid to )
             throws UnsupportedStorageOperationException,
-            RepositoryNotAvailableException, ItemNotFoundException, StorageException
+                RepositoryNotAvailableException,
+                ItemNotFoundException,
+                StorageException
         {
             throw new UnsupportedOperationException();
         }
 
-        public void deleteItem( RepositoryItemUid uid ) throws UnsupportedStorageOperationException,
-            RepositoryNotAvailableException, ItemNotFoundException, StorageException
+        public void deleteItem( RepositoryItemUid uid )
+            throws UnsupportedStorageOperationException,
+                RepositoryNotAvailableException,
+                ItemNotFoundException,
+                StorageException
         {
             throw new UnsupportedOperationException();
         }
 
         public void storeItem( AbstractStorageItem item )
-            throws UnsupportedStorageOperationException, RepositoryNotAvailableException, StorageException
+            throws UnsupportedStorageOperationException,
+                RepositoryNotAvailableException,
+                StorageException
         {
             throw new UnsupportedOperationException();
         }
 
         public Collection<StorageItem> list( RepositoryItemUid uid, Map<String, Object> context )
-            throws RepositoryNotAvailableException, ItemNotFoundException, StorageException
+            throws RepositoryNotAvailableException,
+                ItemNotFoundException,
+                StorageException
         {
             throw new UnsupportedOperationException();
         }
 
         public Collection<StorageItem> list( StorageCollectionItem item )
-            throws RepositoryNotAvailableException, ItemNotFoundException, StorageException
+            throws RepositoryNotAvailableException,
+                ItemNotFoundException,
+                StorageException
         {
             throw new UnsupportedOperationException();
         }
@@ -1279,50 +1413,76 @@ public abstract class AbstractRealmTest extends TestCase
             throw new UnsupportedOperationException();
         }
 
-        public StorageItem retrieveItem( ResourceStoreRequest request ) throws NoSuchResourceStoreException,
-            RepositoryNotAvailableException, ItemNotFoundException, StorageException, AccessDeniedException
+        public StorageItem retrieveItem( ResourceStoreRequest request )
+            throws NoSuchResourceStoreException,
+                RepositoryNotAvailableException,
+                ItemNotFoundException,
+                StorageException,
+                AccessDeniedException
         {
             throw new UnsupportedOperationException();
         }
 
-        public void copyItem( ResourceStoreRequest from, ResourceStoreRequest to ) throws
-            UnsupportedStorageOperationException, NoSuchResourceStoreException, RepositoryNotAvailableException,
-            ItemNotFoundException, StorageException, AccessDeniedException
+        public void copyItem( ResourceStoreRequest from, ResourceStoreRequest to )
+            throws UnsupportedStorageOperationException,
+                NoSuchResourceStoreException,
+                RepositoryNotAvailableException,
+                ItemNotFoundException,
+                StorageException,
+                AccessDeniedException
         {
             throw new UnsupportedOperationException();
         }
 
-        public void moveItem( ResourceStoreRequest from, ResourceStoreRequest to ) throws
-            UnsupportedStorageOperationException, NoSuchResourceStoreException, RepositoryNotAvailableException,
-            ItemNotFoundException, StorageException, AccessDeniedException
+        public void moveItem( ResourceStoreRequest from, ResourceStoreRequest to )
+            throws UnsupportedStorageOperationException,
+                NoSuchResourceStoreException,
+                RepositoryNotAvailableException,
+                ItemNotFoundException,
+                StorageException,
+                AccessDeniedException
         {
             throw new UnsupportedOperationException();
         }
 
-        public void deleteItem( ResourceStoreRequest request ) throws UnsupportedStorageOperationException,
-            NoSuchResourceStoreException, RepositoryNotAvailableException, ItemNotFoundException, StorageException,
-            AccessDeniedException
+        public void deleteItem( ResourceStoreRequest request )
+            throws UnsupportedStorageOperationException,
+                NoSuchResourceStoreException,
+                RepositoryNotAvailableException,
+                ItemNotFoundException,
+                StorageException,
+                AccessDeniedException
         {
             throw new UnsupportedOperationException();
         }
 
-        public void storeItem( ResourceStoreRequest request, InputStream is, Map<String, String> userAttributes ) throws
-            UnsupportedStorageOperationException, NoSuchResourceStoreException, RepositoryNotAvailableException,
-            StorageException, AccessDeniedException
+        public void storeItem( ResourceStoreRequest request, InputStream is, Map<String, String> userAttributes )
+            throws UnsupportedStorageOperationException,
+                NoSuchResourceStoreException,
+                RepositoryNotAvailableException,
+                StorageException,
+                AccessDeniedException
         {
             throw new UnsupportedOperationException();
         }
 
-        public void createCollection( ResourceStoreRequest request, Map<String, String> userAttributes ) throws
-            UnsupportedStorageOperationException, NoSuchResourceStoreException, RepositoryNotAvailableException,
-            StorageException, AccessDeniedException
+        public void createCollection( ResourceStoreRequest request, Map<String, String> userAttributes )
+            throws UnsupportedStorageOperationException,
+                NoSuchResourceStoreException,
+                RepositoryNotAvailableException,
+                StorageException,
+                AccessDeniedException
         {
             throw new UnsupportedOperationException();
         }
 
-        public Collection<StorageItem> list( ResourceStoreRequest request ) throws NoSuchResourceStoreException,
-            RepositoryNotAvailableException, RepositoryNotListableException, ItemNotFoundException, StorageException,
-            AccessDeniedException
+        public Collection<StorageItem> list( ResourceStoreRequest request )
+            throws NoSuchResourceStoreException,
+                RepositoryNotAvailableException,
+                RepositoryNotListableException,
+                ItemNotFoundException,
+                StorageException,
+                AccessDeniedException
         {
             throw new UnsupportedOperationException();
         }

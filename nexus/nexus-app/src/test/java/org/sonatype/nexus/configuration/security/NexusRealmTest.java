@@ -28,23 +28,25 @@ import org.jsecurity.authz.AuthorizationInfo;
 import org.jsecurity.authz.Permission;
 import org.jsecurity.authz.permission.WildcardPermission;
 import org.jsecurity.subject.SimplePrincipalCollection;
+import org.sonatype.nexus.util.StringDigester;
 
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 
-public class NexusRealmTest extends AbstractRealmTest
+public class NexusRealmTest
+    extends AbstractRealmTest
 {
 
     public void testAuthenticationInfo()
     {
-        AuthenticationInfo authenticationInfo = realm.getAuthenticationInfo(
-            new UsernamePasswordToken( "dain", "niad" ) );
+        AuthenticationInfo authenticationInfo = realm
+            .getAuthenticationInfo( new UsernamePasswordToken( "dain", "niad" ) );
         assertNotNull( "authenticationInfo is null", authenticationInfo );
         String username = (String) authenticationInfo.getPrincipals().fromRealm( realm.getName() ).iterator().next();
         assertEquals( "dain", username );
         String password = new String( (char[]) authenticationInfo.getCredentials() );
-        assertEquals( "niad", password );
+        assertEquals( StringDigester.getSha1Digest( "niad" ), password );
     }
 
     public void testBadPassword()
@@ -74,8 +76,7 @@ public class NexusRealmTest extends AbstractRealmTest
     public void testAuthorizationInfo()
     {
         // get authentication info
-        AuthorizationInfo dain = realm.getAuthorizationInfo(
-            new SimplePrincipalCollection( "dain", realm.getName() ) );
+        AuthorizationInfo dain = realm.getAuthorizationInfo( new SimplePrincipalCollection( "dain", realm.getName() ) );
         assertNotNull( "authorizationInfo is null", dain );
 
         // dain is only a member of maven-user
@@ -103,8 +104,8 @@ public class NexusRealmTest extends AbstractRealmTest
         assertNotImplied( new WildcardPermission( "nexus:user:DELETE" ), dainPermissions );
 
         // get authentication info
-        AuthorizationInfo jason = realm.getAuthorizationInfo(
-            new SimplePrincipalCollection( "jason", realm.getName() ) );
+        AuthorizationInfo jason = realm
+            .getAuthorizationInfo( new SimplePrincipalCollection( "jason", realm.getName() ) );
         assertNotNull( "authorizationInfo is null", jason );
 
         // jason is a member of maven-user and maven-committer
@@ -162,7 +163,6 @@ public class NexusRealmTest extends AbstractRealmTest
         assertNotPermitted( dain, "nexus:user:UPDATE" );
         assertNotPermitted( dain, "nexus:user:DELETE" );
 
-
         SimplePrincipalCollection jason = new SimplePrincipalCollection( "jason", realm.getName() );
 
         // jason is a member of maven-user and maven-committer
@@ -193,18 +193,22 @@ public class NexusRealmTest extends AbstractRealmTest
 
     public void assertPermitted( SimplePrincipalCollection principal, String permission )
     {
-        assertTrue( "Principal " + permission + " should be permitted to " + permission,
-            realm.isPermitted( principal, permission ) );
-        assertTrue( "Principal " + permission + " should be permitted to " + permission,
-            realm.isPermitted( principal, new WildcardPermission( permission ) ) );
+        assertTrue( "Principal " + permission + " should be permitted to " + permission, realm.isPermitted(
+            principal,
+            permission ) );
+        assertTrue( "Principal " + permission + " should be permitted to " + permission, realm.isPermitted(
+            principal,
+            new WildcardPermission( permission ) ) );
     }
 
     public void assertNotPermitted( SimplePrincipalCollection principal, String permission )
     {
-        assertFalse( "Principal " + permission + " should not be permitted to " + permission,
-            realm.isPermitted( principal, permission ) );
-        assertFalse( "Principal " + permission + " should not be permitted to " + permission,
-            realm.isPermitted( principal, new WildcardPermission( permission ) ) );
+        assertFalse( "Principal " + permission + " should not be permitted to " + permission, realm.isPermitted(
+            principal,
+            permission ) );
+        assertFalse( "Principal " + permission + " should not be permitted to " + permission, realm.isPermitted(
+            principal,
+            new WildcardPermission( permission ) ) );
     }
 
 }

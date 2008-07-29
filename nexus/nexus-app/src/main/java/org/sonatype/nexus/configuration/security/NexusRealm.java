@@ -27,6 +27,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
 import org.jsecurity.authc.AccountException;
 import org.jsecurity.authc.AuthenticationException;
 import org.jsecurity.authc.AuthenticationInfo;
@@ -34,6 +36,7 @@ import org.jsecurity.authc.AuthenticationToken;
 import org.jsecurity.authc.SimpleAuthenticationInfo;
 import org.jsecurity.authc.UnknownAccountException;
 import org.jsecurity.authc.UsernamePasswordToken;
+import org.jsecurity.authc.credential.Sha1CredentialsMatcher;
 import org.jsecurity.authz.AuthorizationException;
 import org.jsecurity.authz.AuthorizationInfo;
 import org.jsecurity.authz.Permission;
@@ -67,6 +70,12 @@ public class NexusRealm
      * @plexus.requirement
      */
     private Nexus nexus;
+
+    public NexusRealm()
+    {
+        // Nexus is using SHA1 for now, set it
+        setCredentialsMatcher( new Sha1CredentialsMatcher() );
+    }
 
     public MutableNexusSecurityConfiguration getSecurityConfiguration()
     {
@@ -296,4 +305,5 @@ public class NexusRealm
 
         return permissions;
     }
+
 }

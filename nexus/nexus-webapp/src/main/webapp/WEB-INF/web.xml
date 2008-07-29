@@ -18,7 +18,8 @@
 	* You should have received a copy of the GNU General Public License
 	* along with this program.  If not, see http://www.gnu.org/licenses/.
 	*
-	*/ -->
+	*/
+-->
 <web-app version="2.4" xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
 
@@ -36,17 +37,9 @@
 		<init-param>
 			<param-name>config</param-name>
 			<param-value>
-			[interceptors]
-			authcBasic = org.jsecurity.web.filter.authc.BasicHttpAuthenticationFilter
-			authcBasic.applicationName = Sonatype Nexus Repository Manager
-			
-			roles = org.jsecurity.web.filter.authz.RolesAuthorizationFilter
-			
-			perms = org.jsecurity.web.filter.authz.PermissionsAuthorizationFilter
-			
-			anon = org.jsecurity.web.filter.authc.AnonymousFilter
-			
 			[urls]
+			/service/local/logs = authcBasic,perms[nexus:logs:read]
+			/service/local/logs/** = authcBasic,roles[admin]
 			/service/** = anon
 			</param-value>
 		</init-param>
@@ -85,16 +78,12 @@
 	</filter-mapping>
 
 	<!-- REST Content -->
-	<!-- servlet>
-		<servlet-name>content</servlet-name>
-		<servlet-class>org.sonatype.nexus.rest.ContentRestServlet</servlet-class>
-		<load-on-startup>1</load-on-startup>
-		</servlet-->
 	<servlet>
 		<servlet-name>content</servlet-name>
 		<servlet-class>org.sonatype.plexus.rest.ServletRestletApplicationBridge</servlet-class>
 		<init-param>
-			<!-- A stupid hack to avoid OneServletServerPerWebapp limitation, see ServletRestletApplicationBridge#getInitParameter -->
+			<!-- A stupid hack to avoid OneServletServerPerWebapp limitation, see ServletRestletApplicationBridge#getInitParameter
+-->
 			<param-name>content.org.restlet.application</param-name>
 			<param-value>org.sonatype.nexus.rest.ApplicationContentBridge</param-value>
 		</init-param>
@@ -111,7 +100,8 @@
 		<servlet-name>service</servlet-name>
 		<servlet-class>org.sonatype.plexus.rest.ServletRestletApplicationBridge</servlet-class>
 		<init-param>
-			<!-- A stupid hack to avoid OneServletServerPerWebapp limitation, see ServletRestletApplicationBridge#getInitParameter -->
+			<!-- A stupid hack to avoid OneServletServerPerWebapp limitation, see ServletRestletApplicationBridge#getInitParameter
+-->
 			<param-name>service.org.restlet.application</param-name>
 			<param-value>org.sonatype.nexus.rest.ApplicationBridge</param-value>
 		</init-param>
