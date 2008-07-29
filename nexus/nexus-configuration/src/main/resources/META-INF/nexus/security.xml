@@ -371,8 +371,8 @@
 		</applicationPrivilege>
 		<applicationPrivilege>
 			<id>49</id>
-			<name>Status - (write)</name>
-			<method>write</method>
+			<name>Status - (update)</name>
+			<method>update</method>
 			<permission>nexus:status</permission>
 		</applicationPrivilege>
 		<applicationPrivilege>
@@ -383,8 +383,8 @@
 		</applicationPrivilege>
 		<applicationPrivilege>
 			<id>51</id>
-			<name>Wastebasket - (write)</name>
-			<method>write</method>
+			<name>Wastebasket - (delete)</name>
+			<method>delete</method>
 			<permission>nexus:wastebasket</permission>
 		</applicationPrivilege>
 		<applicationPrivilege>
