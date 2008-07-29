@@ -162,7 +162,6 @@ Sonatype.repoServer.RoleEditPanel = function(config){
             bodyBorder: true, //note: this seem to have no effect w/in form panel
             //note: this style matches the expected behavior
             bodyStyle: 'background-color:#FFFFFF; border: 1px solid #B5B8C8',
-            style: 'padding: 0 20px 0 0',
             width: 225,
             height: 300,
             animate:true,
@@ -227,6 +226,9 @@ Sonatype.repoServer.RoleEditPanel = function(config){
             }
           },
           {
+          	xtype: 'twinpanelcontroller'
+          },
+          {
             xtype: 'treepanel',
             id: 'all_roles_privs_tree', //note: unique ID is assinged before instantiation
             title: 'Available Roles / Privileges',
@@ -235,7 +237,7 @@ Sonatype.repoServer.RoleEditPanel = function(config){
             //note: this style matches the expected behavior
             bodyStyle: 'background-color:#FFFFFF; border: 1px solid #B5B8C8',
             width: 225,
-            height: Ext.isGecko ? 315 : 300,
+            height: Ext.isGecko ? 340 : 300,
             animate:true,
             lines: false,
             autoScroll:true,
@@ -778,7 +780,7 @@ Ext.extend(Sonatype.repoServer.RoleEditPanel, Ext.Panel, {
     var newConfig = config;
 
     newConfig.items[4].items[0].root = new Ext.tree.TreeNode({text: 'root'});
-    newConfig.items[4].items[1].root = new Ext.tree.TreeNode({text: 'root'});
+    newConfig.items[4].items[2].root = new Ext.tree.TreeNode({text: 'root'});
 
     return newConfig;
   },
