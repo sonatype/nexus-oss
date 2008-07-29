@@ -187,7 +187,6 @@ Sonatype.repoServer.RoutesEditPanel = function(config){
             bodyBorder: true, //note: this seem to have no effect w/in form panel
             //note: this style matches the expected behavior
             bodyStyle: 'background-color:#FFFFFF; border: 1px solid #B5B8C8',
-            style: 'padding: 0 20px 0 0',
             width: 225,
             height: 300,
             animate:true,
@@ -244,6 +243,9 @@ Sonatype.repoServer.RoutesEditPanel = function(config){
             }
           },
           {
+        	xtype: 'twinpanelcontroller'
+          },
+          {
             xtype: 'treepanel',
             id: id + '_route_all-repos-tree', //note: unique ID is assinged before instantiation
             title: 'Available Repositories',
@@ -258,7 +260,7 @@ Sonatype.repoServer.RoutesEditPanel = function(config){
             autoScroll:true,
             containerScroll: true,
             //@note: root node must be instantiated uniquely for each instance of treepanel
-            //@ext: can TreeNode be registerd as a component with an xtype so this new root node
+             //@ext: can TreeNode be registerd as a component with an xtype so this new root node
             //      may be instantiated uniquely for each form panel that uses this config?
             rootVisible: false,
 
@@ -831,7 +833,7 @@ Ext.extend(Sonatype.repoServer.RoutesEditPanel, Ext.Panel, {
 
     var trees = [
       {obj : newConfig.items[4].items[0], postpend : '_route-repos-tree'},
-      {obj : newConfig.items[4].items[1], postpend : '_route-all-repos-tree'}
+      {obj : newConfig.items[4].items[2], postpend : '_route-all-repos-tree'}
     ];
 
     newConfig.items[4].id = id + this.TREE_PANEL_ID_SUFFIX;
