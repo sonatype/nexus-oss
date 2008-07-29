@@ -30,6 +30,10 @@ Sonatype.ext.TwinPanelController = function(config){
   Sonatype.ext.TwinPanelController.superclass.constructor.call(this, {
   	layout: 'table',
 	style: 'padding-top: 100px; padding-right: 10px; padding-left: 10px',
+	width: 45,
+	defaults: {
+	  style: 'margin-bottom: 3px'
+    },
 	layoutConfig: {
 	  columns: 1
     },
