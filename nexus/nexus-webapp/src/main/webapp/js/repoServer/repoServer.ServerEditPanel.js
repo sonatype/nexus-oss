@@ -302,6 +302,7 @@ Sonatype.repoServer.ServerEditPanel = function(config){
                 xtype: 'textfield',
                 fieldLabel: 'Password',
                 helpText: ht.password,
+                inputType:'password',
                 name: 'globalHttpProxySettings.authentication.password',
                 width: 100,
                 allowBlank:true
@@ -318,6 +319,7 @@ Sonatype.repoServer.ServerEditPanel = function(config){
                 xtype: 'textfield',
                 fieldLabel: 'Key Passphrase',
                 helpText: ht.passphrase,
+                inputType:'password',
                 name: 'globalHttpProxySettings.authentication.passphrase',
                 width: 100,
                 allowBlank:true
