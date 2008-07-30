@@ -50,7 +50,8 @@ public class Nexus142UserCrudJsonTests
 
         if ( !response.getStatus().isSuccess() )
         {
-            Assert.fail( "Could not create user: " + response.getStatus() );
+            String responseText = response.getEntity().getText();
+            Assert.fail( "Could not create user: " + response.getStatus() +":\n"+ responseText);
         }
 
         // get the Resource object
@@ -117,7 +118,8 @@ public class Nexus142UserCrudJsonTests
 
         if ( !response.getStatus().isSuccess() )
         {
-            Assert.fail( "Could not create user: " + response.getStatus() );
+            String responseText = response.getEntity().getText();
+            Assert.fail( "Could not create user: " + response.getStatus() +":\n"+ responseText);
         }
 
         // get the Resource object
@@ -169,7 +171,8 @@ public class Nexus142UserCrudJsonTests
 
         if ( !response.getStatus().isSuccess() )
         {
-            Assert.fail( "Could not create user: " + response.getStatus() );
+            String responseText = response.getEntity().getText();
+            Assert.fail( "Could not create user: " + response.getStatus() +":\n"+ responseText);
         }
 
         // get the Resource object
@@ -233,7 +236,8 @@ public class Nexus142UserCrudJsonTests
 
         if ( !response.getStatus().isSuccess() )
         {
-            Assert.fail( "Could not create user: " + response.getStatus() );
+            String responseText = response.getEntity().getText();
+            Assert.fail( "Could not create user: " + response.getStatus() +":\n"+ responseText);
         }
 
         // get the Resource object

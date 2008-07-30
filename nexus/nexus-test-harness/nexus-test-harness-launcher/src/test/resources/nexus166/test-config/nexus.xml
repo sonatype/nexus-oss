@@ -2,7 +2,8 @@
   <version>1.0.4</version>
   <workingDirectory>${nexus.working.directory}</workingDirectory>
   <applicationLogDirectory>${nexus.log.directory}</applicationLogDirectory>
-  <smtpConfiguration>
+    
+      <smtpConfiguration>
     <host>smtp-host</host>
     <port>1234</port>
     <sslEnabled>false</sslEnabled>
@@ -11,9 +12,14 @@
     <password>smtp-password</password>
     <debugMode>false</debugMode>
     <systemEmailAddress>system@nexus.org</systemEmailAddress>
-  </smtpConfiguration>  
-  <security>
-    <configurationFile>${runtime}/apps/nexus/conf/security.xml</configurationFile>
+  </smtpConfiguration>
+    
+    <security>
+    <enabled>false</enabled>
+    <anonymousAccessEnabled>true</anonymousAccessEnabled>
+    <authenticationSource>
+      <type>simple</type>
+    </authenticationSource>
   </security>
   <globalConnectionSettings />
   <restApi />

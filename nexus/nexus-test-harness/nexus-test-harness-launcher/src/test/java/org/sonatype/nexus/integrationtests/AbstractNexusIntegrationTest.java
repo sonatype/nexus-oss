@@ -55,6 +55,8 @@ import org.sonatype.nexus.rest.model.StatusResourceResponse;
 import org.sonatype.nexus.rest.xstream.XStreamInitializer;
 import org.sonatype.nexus.test.utils.DeployUtils;
 import org.sonatype.nexus.test.utils.FileTestingUtils;
+import org.sonatype.nexus.test.utils.NexusStateUtil;
+import org.sonatype.nexus.test.utils.TestProperties;
 import org.xml.sax.XMLReader;
 
 import com.thoughtworks.xstream.XStream;
@@ -92,9 +94,7 @@ public class AbstractNexusIntegrationTest
 
     private String nexusWorkDir;
 
-    private static final String STATUS_STOPPED = "STOPPED";
 
-    private static final String STATUS_STARTED = "STARTED";
 
     public static final String RELATIVE_CONF_DIR = "runtime/apps/nexus/conf";
 
@@ -108,11 +108,9 @@ public class AbstractNexusIntegrationTest
         this.setupContainer();
 
         // we also need to setup a couple fields, that need to be pulled out of a bundle
-        ResourceBundle rb = ResourceBundle.getBundle( "baseTest" );
-
-        this.nexusBaseDir = rb.getString( "nexus.base.dir" );
-        this.baseNexusUrl = rb.getString( "nexus.base.url" );
-        this.nexusWorkDir = rb.getString( "nexus.work.dir" );
+        this.nexusBaseDir = TestProperties.getString( "nexus.base.dir" );
+        this.baseNexusUrl = TestProperties.getString( "nexus.base.url" );
+        this.nexusWorkDir = TestProperties.getString( "nexus.work.dir" );
         this.testRepositoryId = testRepositoryId;
         this.nexusTestRepoUrl = baseNexusUrl + REPOSITORY_RELATIVE_URL + testRepositoryId + "/";
     }
@@ -255,14 +253,14 @@ public class AbstractNexusIntegrationTest
 
         try
         {
-            if ( this.isNexusRunning() )
+            if ( NexusStateUtil.isNexusRunning() )
             {
                 // we have nothing to do if its running
                 return;
             }
             else
             {
-                this.doSoftStart();
+                NexusStateUtil.doSoftStart();
             }
         }
         catch ( IOException e )
@@ -294,7 +292,7 @@ public class AbstractNexusIntegrationTest
         if ( !NEEDS_HARD_STOP )
         {
             // normal flow is to soft stop
-            this.doSoftStop();
+            NexusStateUtil.doSoftStop();
         }
         else
         {
@@ -593,57 +591,7 @@ public class AbstractNexusIntegrationTest
         return downloadedFile;
     }
 
-    private void sendNexusStatusCommand( String command )
-    {
-        String serviceURI = this.getBaseNexusUrl() + "service/local/status/command";
-
-        Request request = new Request();
-
-        request.setResourceRef( serviceURI );
-        request.setMethod( Method.PUT );
-        request.setEntity( command, MediaType.TEXT_ALL );
-
-        Client client = new Client( Protocol.HTTP );
-
-        Response response = client.handle( request );
-
-        if ( !response.getStatus().isSuccess() )
-        {
-            Assert.fail( "Could not " + command + " Nexus: (" + response.getStatus() + ")" );
-        }
-    }
-
-    protected void doSoftStop()
-    {
-        this.sendNexusStatusCommand( "STOP" );
-    }
-
-    protected void doSoftStart()
-    {
-        this.sendNexusStatusCommand( "START" );
-    }
-
-    protected void doSoftRestart()
-    {
-        this.sendNexusStatusCommand( "RESTART" );
-    }
-
-    protected boolean isNexusRunning()
-        throws IOException
-    {
-        return ( STATUS_STARTED.equals( this.getNexusStatus().getData().getState() ) );
-    }
-
-    protected StatusResourceResponse getNexusStatus()
-        throws IOException
-    {
-        XStream xstream = new XStream();
-        StatusResourceResponse status = null;
-
-        status =
-            (StatusResourceResponse) xstream.fromXML( new URL( this.getBaseNexusUrl() + "service/local/status" ).openStream() );
-        return status;
-    }
+    
 
     protected void deleteFromRepository( String groupOrArtifactPath )
     {

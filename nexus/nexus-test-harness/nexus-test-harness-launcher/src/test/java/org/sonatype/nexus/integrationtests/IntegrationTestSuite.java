@@ -30,15 +30,17 @@ import org.sonatype.nexus.integrationtests.proxy.nexus177.Nexus177OutOfServiceTe
 import org.sonatype.nexus.integrationtests.proxy.nexus178.Nexus178BlockProxyDownloadTest;
 import org.sonatype.nexus.integrationtests.proxy.nexus179.Nexus179RemoteRepoDownTest;
 import org.sonatype.nexus.integrationtests.proxy.nexus262.Nexus262SimpleProxyTest;
+import org.sonatype.nexus.test.utils.NexusStateUtil;
 
 /**
  * NOTE: the class Nexus258ReleaseDeployTest needs to be at the start of the test, something happens, ( I don't know
  * what yet) if its not near, the top of this list it will fail to deploy its artifacts. It doesn't seem to be a timing
- * issue. And its not a work dir problem, any thoughts, I am all ears!
+ * issue. And its not a work dir problem, any thoughts, I am all ears! I think i fixed the above problem, but i am going
+ * to leave this note here untill i am sure.
  */
 @RunWith( Suite.class )
-@SuiteClasses( { Nexus258ReleaseDeployTest.class, Nexus169ReleaseMetaDataInSnapshotRepoTest.class,
-    Nexus166SampleTest.class, Nexus167ReleaseToSnapshotTest.class, Nexus168SnapshotToReleaseTest.class,
+@SuiteClasses( { Nexus166SampleTest.class, Nexus169ReleaseMetaDataInSnapshotRepoTest.class,
+    Nexus258ReleaseDeployTest.class, Nexus167ReleaseToSnapshotTest.class, Nexus168SnapshotToReleaseTest.class,
     Nexus176DeployToInvalidRepoTest.class, Nexus259SnapshotDeployTest.class, Nexus260MultipleDeployTest.class,
     Nexus261NexusGroupDownloadTest.class, Nexus177OutOfServiceTest.class, Nexus178BlockProxyDownloadTest.class,
     Nexus179RemoteRepoDownTest.class, Nexus262SimpleProxyTest.class, Nexus292SoftRestartTest.class,
@@ -57,6 +59,10 @@ public class IntegrationTestSuite
         ForkedAppBooter appBooter =
             (ForkedAppBooter) TestContainer.getInstance().lookup( ForkedAppBooter.ROLE, "TestForkedAppBooter" );
         appBooter.start();
+
+        // now to make everything work correctly we actually have to "soft-stop" nexus
+        NexusStateUtil.doSoftStop();
+
     }
 
     @AfterClass

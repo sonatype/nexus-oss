@@ -49,12 +49,17 @@ public class PrivilegesMessageUtil
 
     public Response sendMessage( Method method, PrivilegeBaseResource resource )
     {
+        return this.sendMessage( method, resource, "" );
+    }
+
+    public Response sendMessage( Method method, PrivilegeBaseResource resource, String id )
+    {
 
         XStreamRepresentation representation = new XStreamRepresentation( xstream, "", mediaType );
 
-        String privName = ( method == Method.POST ) ? "" : "/" + resource.getName();
+        String privId = ( method == Method.POST ) ? "" : "/" + id;
 
-        String serviceURI = this.baseNexusUrl + "service/local/privileges" + privName;
+        String serviceURI = this.baseNexusUrl + "service/local/privileges" + privId;
         System.out.println( "serviceURI: " + serviceURI );
 
         Request request = new Request();
@@ -63,13 +68,16 @@ public class PrivilegesMessageUtil
 
         request.setMethod( method );
 
-        PrivilegeResourceRequest requestResponse = new PrivilegeResourceRequest();
-        requestResponse.setData( resource );
+        if ( method == Method.POST )
+        {
+            PrivilegeResourceRequest requestResponse = new PrivilegeResourceRequest();
+            requestResponse.setData( resource );
 
-        // now set the payload
-        representation.setPayload( requestResponse );
-        System.out.println( method.getName() + ": "+ representation.getText() );
-        request.setEntity( representation );
+            // now set the payload
+            representation.setPayload( requestResponse );
+            System.out.println( method.getName() + ": " + representation.getText() );
+            request.setEntity( representation );
+        }
 
         Client client = new Client( Protocol.HTTP );
 
@@ -89,17 +97,17 @@ public class PrivilegesMessageUtil
         return (PrivilegeBaseStatusResource) resourceResponse.getData();
 
     }
-    
+
     public List<PrivilegeBaseStatusResource> getResourceListFromResponse( Response response )
         throws IOException
     {
         String responseString = response.getEntity().getText();
-    
+
         XStreamRepresentation representation = new XStreamRepresentation( xstream, responseString, mediaType );
-    
+
         PrivilegeListResourceResponse resourceResponse =
             (PrivilegeListResourceResponse) representation.getPayload( new PrivilegeListResourceResponse() );
-    
+
         return resourceResponse.getData();
     }
 
@@ -140,10 +148,10 @@ public class PrivilegesMessageUtil
                 if ( targetResource.getId().equals( repositoryTarget.getId() ) )
                 {
                     found = true;
-//                    Assert.assertEquals( targetResource.getId(), repositoryTarget.getId() );
-//                    Assert.assertEquals( targetResource.getContentClass(), repositoryTarget.getContentClass() );
-//                    Assert.assertEquals( targetResource.getName(), repositoryTarget.getName() );
-//                    Assert.assertEquals( targetResource.getPatterns(), repositoryTarget.getPatterns() );
+                    // Assert.assertEquals( targetResource.getId(), repositoryTarget.getId() );
+                    // Assert.assertEquals( targetResource.getContentClass(), repositoryTarget.getContentClass() );
+                    // Assert.assertEquals( targetResource.getName(), repositoryTarget.getName() );
+                    // Assert.assertEquals( targetResource.getPatterns(), repositoryTarget.getPatterns() );
 
                     break;
                 }

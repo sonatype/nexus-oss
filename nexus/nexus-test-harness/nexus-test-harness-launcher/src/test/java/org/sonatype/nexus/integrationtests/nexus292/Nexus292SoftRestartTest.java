@@ -8,6 +8,7 @@ import junit.framework.Assert;
 import org.junit.Test;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
+import org.sonatype.nexus.test.utils.NexusStateUtil;
 
 /**
  * This test-harness uses the start/stop internally. This test will just poke at the state after the methods are called.
@@ -22,13 +23,13 @@ public class Nexus292SoftRestartTest
     {
 
         // make sure Nexus is running
-        Assert.assertTrue( this.isNexusRunning() );
+        Assert.assertTrue( NexusStateUtil.isNexusRunning() );
 
         // restart
-        this.doSoftRestart();
+        NexusStateUtil.doSoftRestart();
 
         // make sure Nexus is running
-        Assert.assertTrue( this.isNexusRunning() );
+        Assert.assertTrue( NexusStateUtil.isNexusRunning() );
 
         // now that we know the status comes back as STARTED, now we need to see if the rest of nexus will work at
         // all...
@@ -48,13 +49,13 @@ public class Nexus292SoftRestartTest
     {
 
         // make sure Nexus is running
-        Assert.assertTrue( this.isNexusRunning() );
+        Assert.assertTrue( NexusStateUtil.isNexusRunning() );
 
         // restart
-        this.doSoftStop();
+        NexusStateUtil.doSoftStop();
 
         // make sure Nexus is not running
-        Assert.assertFalse( this.isNexusRunning() );
+        Assert.assertFalse( NexusStateUtil.isNexusRunning() );
 
         // now that we know the status comes back as STARTED, now we need to see if the rest of nexus will work at
         // all...
@@ -74,10 +75,10 @@ public class Nexus292SoftRestartTest
         }
 
         // restart
-        this.doSoftStart();
+        NexusStateUtil.doSoftStart();
 
         // make sure Nexus is running
-        Assert.assertTrue( this.isNexusRunning() );
+        Assert.assertTrue( NexusStateUtil.isNexusRunning() );
 
         // this will hurl if something bad happens
         this.downloadArtifact( gav, "target/downloads" );
