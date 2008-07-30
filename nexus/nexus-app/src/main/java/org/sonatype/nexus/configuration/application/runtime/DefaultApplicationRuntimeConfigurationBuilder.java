@@ -278,6 +278,10 @@ public class DefaultApplicationRuntimeConfigurationBuilder
 
             return updateRepositoryFromModel( shadowRepository, configuration, shadow );
         }
+        catch ( IllegalArgumentException e )
+        {
+            throw new InvalidConfigurationException( e.getMessage(), e );
+        }
         catch ( ComponentLookupException e )
         {
             throw new InvalidConfigurationException( "Could not lookup a new instance of Repository!", e );
