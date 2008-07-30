@@ -17,9 +17,9 @@
     <security>
     <enabled>false</enabled>
     <anonymousAccessEnabled>true</anonymousAccessEnabled>
-    <authenticationSource>
-      <type>simple</type>
-    </authenticationSource>
+    <realms>
+      <realm>default</realm>
+    </realms>
   </security>
   <globalConnectionSettings />
   <restApi />
