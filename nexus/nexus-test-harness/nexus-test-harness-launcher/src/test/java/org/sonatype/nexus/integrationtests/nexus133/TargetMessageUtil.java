@@ -1,6 +1,5 @@
 package org.sonatype.nexus.integrationtests.nexus133;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -27,9 +26,7 @@ import org.sonatype.nexus.rest.model.RepositoryTargetListResource;
 import org.sonatype.nexus.rest.model.RepositoryTargetListResourceResponse;
 import org.sonatype.nexus.rest.model.RepositoryTargetResource;
 import org.sonatype.nexus.rest.model.RepositoryTargetResourceResponse;
-import org.sonatype.nexus.rest.model.UserResource;
-import org.sonatype.nexus.rest.model.UserResourceRequest;
-import org.sonatype.nexus.test.utils.SecurityConfigUtil;
+import org.sonatype.nexus.test.utils.NexusConfigUtil;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
 
 import com.thoughtworks.xstream.XStream;
@@ -138,7 +135,7 @@ public class TargetMessageUtil
         throws IOException
     {
         // check the nexus.xml
-        Configuration config = this.getNexusConfig();
+        Configuration config = NexusConfigUtil.getNexusConfig();
 
         List<CRepositoryTarget> repoTargets = config.getRepositoryTargets();
 
@@ -183,7 +180,7 @@ public class TargetMessageUtil
     public void verifyCompleteTargetsConfig( List<RepositoryTargetListResource> targets ) throws IOException
     {
         // check the nexus.xml
-        Configuration config = this.getNexusConfig();
+        Configuration config = NexusConfigUtil.getNexusConfig();
 
         List<CRepositoryTarget> repoTargets = config.getRepositoryTargets();
         // check to see if the size matches
@@ -222,37 +219,6 @@ public class TargetMessageUtil
 
     }
 
-    private Configuration getNexusConfig()
-        throws IOException
-    {
-
-        URL configURL = new URL( this.baseNexusUrl + "service/local/configs/current" );
-
-        Reader fr = null;
-        Configuration configuration = null;
-
-        try
-        {
-            NexusConfigurationXpp3Reader reader = new NexusConfigurationXpp3Reader();
-
-            fr = new InputStreamReader( configURL.openStream() );
-
-            // read again with interpolation
-            configuration = reader.read( fr );
-
-        }
-        catch ( XmlPullParserException e )
-        {
-            Assert.fail( "could not parse nexus.xml: " + e.getMessage() );
-        }
-        finally
-        {
-            if ( fr != null )
-            {
-                fr.close();
-            }
-        }
-        return configuration;
-    }
+    
 
 }
