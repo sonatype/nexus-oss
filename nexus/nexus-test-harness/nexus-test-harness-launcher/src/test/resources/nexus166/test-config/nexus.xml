@@ -17,6 +17,7 @@
     <security>
     <enabled>false</enabled>
     <anonymousAccessEnabled>true</anonymousAccessEnabled>
+    <configurationFile>${nexus.conf.directory}/security.xml</configurationFile>
     <realms>
       <realm>default</realm>
     </realms>

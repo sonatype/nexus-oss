@@ -143,7 +143,7 @@ public class DefaultNexusSecurityConfiguration
     
     public void onConfigurationChange( ConfigurationChangeEvent evt )
     {
-        getLogger().info( "Nexus Configuration Loaded, now loading Security Configuration" );
+        getLogger().debug( "Nexus Configuration Loaded, now loading Security Configuration" );
         try
         {
             configurationFile = null;
@@ -194,7 +194,7 @@ public class DefaultNexusSecurityConfiguration
     {
         if ( force || configurationSource.getConfiguration() == null )
         {
-            getLogger().info( "Loading Nexus Security Configuration..." );
+            getLogger().debug( "Loading Nexus Security Configuration..." );
             
             configurationFile = null;
 
@@ -210,7 +210,7 @@ public class DefaultNexusSecurityConfiguration
     public void applyConfiguration()
         throws IOException
     {
-        getLogger().info( "Applying Nexus Security Configuration..." );
+        getLogger().debug( "Applying Nexus Security Configuration..." );
         
         configurationFile = null;
 
