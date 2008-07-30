@@ -117,8 +117,6 @@ public class NexusConfigurationBuilder
                 }
                 repository.setMetadataMaxAge( getTTLValue( repoLogicBean, "metadataExpirationPeriodInSeconds" ) );
 
-                // Proximity have no standard security solution
-                repository.setRealmId( null );
                 // Proximity did not have this feature
                 repository.setMaintainProxiedRepositoryMetadata( false );
 

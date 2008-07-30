@@ -20,8 +20,6 @@
  */
 package org.sonatype.nexus.proxy.access;
 
-import java.util.Map;
-
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.repository.Repository;
@@ -60,11 +58,4 @@ public interface AccessManager
      */
     void decide( ResourceStoreRequest request, Repository repository, RepositoryPermission permission )
         throws AccessDeniedException;
-
-    /**
-     * Sets configuration.
-     * 
-     * @param config
-     */
-    void setConfiguration( Map<String, String> config );
 }

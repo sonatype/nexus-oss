@@ -22,10 +22,12 @@
 	<security>
 		<enabled>true</enabled>
 		<anonymousAccessEnabled>true</anonymousAccessEnabled>
+		<anonymousUsername>anonymous</anonymousUsername>
+		<anonymousPassword>anonymous</anonymousPassword>
 		<configurationFile>${runtime}/apps/nexus/conf/security.xml</configurationFile>
-		<authenticationSource>
-			<type>simple</type>
-		</authenticationSource>
+		<realms>
+			<realm>default</realm>
+		</realms>
 	</security>
 
 	<globalConnectionSettings>

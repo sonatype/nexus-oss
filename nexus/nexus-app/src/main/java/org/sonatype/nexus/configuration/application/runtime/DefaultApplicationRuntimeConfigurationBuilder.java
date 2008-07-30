@@ -31,20 +31,15 @@ import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.context.ContextException;
-import org.codehaus.plexus.interpolation.InterpolationException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
-import org.sonatype.nexus.configuration.ModelloUtils;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
-import org.sonatype.nexus.configuration.model.CAuthzSource;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.CRepositoryShadow;
 import org.sonatype.nexus.configuration.model.CRepositoryShadowArtifactVersionConstraint;
 import org.sonatype.nexus.configuration.model.Configuration;
 import org.sonatype.nexus.configuration.validator.InvalidConfigurationException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
-import org.sonatype.nexus.proxy.access.AccessManager;
-import org.sonatype.nexus.proxy.access.OpenAccessManager;
 import org.sonatype.nexus.proxy.maven.ChecksumPolicy;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
@@ -57,11 +52,10 @@ import org.sonatype.nexus.proxy.repository.ShadowRepository;
 import org.sonatype.nexus.proxy.storage.local.LocalRepositoryStorage;
 import org.sonatype.nexus.proxy.storage.remote.DefaultRemoteStorageContext;
 import org.sonatype.nexus.proxy.storage.remote.RemoteRepositoryStorage;
-import org.sonatype.nexus.util.ApplicationInterpolatorProvider;
 
 /**
  * The Class DefaultRuntimeConfigurationBuilder. Todo: all the bad thing is now concentrated in this class. We are
- * playing container instead of container. TODO: Slim this class and rely onto Plexus!
+ * playing container instead of container.
  * 
  * @author cstamas
  * @plexus.component
@@ -79,18 +73,9 @@ public class DefaultApplicationRuntimeConfigurationBuilder
      */
     private RepositoryRegistry repositoryRegistry;
 
-    /**
-     * The Interpolation.
-     * 
-     * @plexus.requirement
-     */
-    private ApplicationInterpolatorProvider applicationInterpolatorProvider;
-
     private PlexusContainer plexusContainer;
 
     private NexusConfiguration nexusConfiguration;
-
-    private HashMap<String, AccessManager> accessManagers = new HashMap<String, AccessManager>();
 
     public void contextualize( Context ctx )
         throws ContextException
@@ -209,8 +194,6 @@ public class DefaultApplicationRuntimeConfigurationBuilder
             }
 
             // Setting common things on a repository
-
-            repository.setAccessManager( getAccessManagerForRealm( configuration, repo.getRealmId() ) );
 
             // NX-198: filling up the default variable to store the "default" local URL
             File defaultStorageFile = new File( new File( configuration.getWorkingDirectory(), "storage" ), repository
@@ -406,8 +389,6 @@ public class DefaultApplicationRuntimeConfigurationBuilder
             shadowRepository
                 .setLocalStorage( getLocalRepositoryStorage( shadowRepository.getId(), DEFAULT_LS_PROVIDER ) );
 
-            shadowRepository.setAccessManager( getAccessManagerForRealm( configuration, shadow.getRealmId() ) );
-
             if ( shadow.isSyncAtStartup() )
             {
                 shadowRepository.synchronizeWithMaster();
@@ -418,69 +399,6 @@ public class DefaultApplicationRuntimeConfigurationBuilder
         catch ( MalformedURLException e )
         {
             throw new InvalidConfigurationException( "Malformed local storage URL!", e );
-        }
-    }
-
-    public AccessManager getAccessManagerForRealm( Configuration configuration, String realm )
-        throws InvalidConfigurationException
-    {
-        if ( configuration.getSecurity().isEnabled() && realm != null )
-        {
-            if ( accessManagers.containsKey( realm ) )
-            {
-                return accessManagers.get( realm );
-            }
-            else
-            {
-                CAuthzSource authz = null;
-                try
-                {
-                    for ( CAuthzSource authzSource : (List<CAuthzSource>) configuration.getSecurity().getRealms() )
-                    {
-                        if ( realm.equals( authzSource.getId() ) )
-                        {
-                            authz = authzSource;
-
-                            break;
-                        }
-                    }
-
-                    if ( authz == null )
-                    {
-                        throw new InvalidConfigurationException( "Could not find realm with ID=" + realm );
-                    }
-
-                    AccessManager am = (AccessManager) plexusContainer.lookup( AccessManager.ROLE, authz.getType() );
-
-                    Map<String, String> config = ModelloUtils.getMapFromConfigList( authz.getProperties() );
-
-                    for ( String key : config.keySet() )
-                    {
-                        config.put( key, applicationInterpolatorProvider.getInterpolator().interpolate(
-                            config.get( key ) ) );
-                    }
-
-                    am.setConfiguration( config );
-
-                    accessManagers.put( realm, am );
-
-                    return am;
-                }
-                catch ( ComponentLookupException e )
-                {
-                    throw new InvalidConfigurationException( "Unsupported authentication source type: "
-                        + authz.getType(), e );
-                }
-                catch ( InterpolationException e )
-                {
-                    throw new InvalidConfigurationException( "Unsupported authentication source type: "
-                        + authz.getType(), e );
-                }
-            }
-        }
-        else
-        {
-            return new OpenAccessManager();
         }
     }
 

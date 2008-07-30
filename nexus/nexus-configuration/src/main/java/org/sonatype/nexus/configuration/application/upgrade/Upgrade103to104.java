@@ -28,11 +28,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.net.SMTPAppender;
+import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
-import org.sonatype.nexus.configuration.model.CAuthSource;
-import org.sonatype.nexus.configuration.model.CAuthzSource;
 import org.sonatype.nexus.configuration.model.CGroupsSetting;
 import org.sonatype.nexus.configuration.model.CHttpProxySettings;
 import org.sonatype.nexus.configuration.model.CLocalStorage;
@@ -182,7 +181,7 @@ public class Upgrade103to104
         newc.setVersion( org.sonatype.nexus.configuration.model.Configuration.MODEL_VERSION );
         newc.setWorkingDirectory( oldc.getWorkingDirectory() );
         newc.setApplicationLogDirectory( oldc.getApplicationLogDirectory() );
-        
+
         // Just add some default config
         CSmtpConfiguration smtp = new CSmtpConfiguration();
         smtp.setHost( "smtp-host" );
@@ -190,51 +189,16 @@ public class Upgrade103to104
         smtp.setPort( 1234 );
         smtp.setSystemEmailAddress( "system@nexus.org" );
         smtp.setUsername( "smtp-username" );
-        
+
         newc.setSmtpConfiguration( smtp );
 
         CSecurity security = new CSecurity();
 
-        if ( oldc.getSecurity().isEnabled() )
-        {
-            // someone already had security enabled
-            security.setEnabled( oldc.getSecurity().isEnabled() );
-            security.setAnonymousAccessEnabled( oldc.getSecurity().isAnonymousAccessEnabled() );
-            if ( oldc.getSecurity().getAuthenticationSource() != null )
-            {
-                CAuthSource authenticationSource = new CAuthSource();
-                authenticationSource.setType( oldc.getSecurity().getAuthenticationSource().getType() );
-                if ( oldc.getSecurity().getAuthenticationSource().getProperties() != null )
-                {
-                    authenticationSource.setProperties( copyCProps1_0_3( oldc
-                        .getSecurity().getAuthenticationSource().getProperties() ) );
-                }
-                security.setAuthenticationSource( authenticationSource );
-            }
-            if ( oldc.getSecurity().getRealms() != null )
-            {
-                List<CAuthzSource> realms = new ArrayList<CAuthzSource>( oldc.getSecurity().getRealms().size() );
-                for ( org.sonatype.nexus.configuration.model.v1_0_3.CAuthzSource oldrealm : (List<org.sonatype.nexus.configuration.model.v1_0_3.CAuthzSource>) oldc
-                    .getSecurity().getRealms() )
-                {
-                    CAuthzSource newrealm = new CAuthzSource();
-                    newrealm.setId( oldrealm.getId() );
-                    newrealm.setType( oldrealm.getType() );
-                    newrealm.setProperties( copyCProps1_0_3( oldrealm.getProperties() ) );
-                    realms.add( newrealm );
-                }
-                security.setRealms( realms );
-            }
-        }
-        else
-        {
-            // defaulting to "simple" model
-            security.setEnabled( true );
-            security.setAnonymousAccessEnabled( true );
-            security.setAuthenticationSource( new CAuthSource() );
-            security.getAuthenticationSource().setType( "simple" );
-        }
-        
+        // someone already had security enabled
+        security.setEnabled( oldc.getSecurity().isEnabled() );
+        security.setAnonymousAccessEnabled( oldc.getSecurity().isAnonymousAccessEnabled() );
+        security.addRealm( PlexusConstants.PLEXUS_DEFAULT_HINT );
+
         // Add the new config file
         security.setConfigurationFile( "${runtime}/apps/nexus/conf/security.xml" );
 
@@ -303,7 +267,6 @@ public class Upgrade103to104
                 newshadow.setShadowOf( oldshadow.getShadowOf() );
                 newshadow.setType( oldshadow.getType() );
                 newshadow.setSyncAtStartup( oldshadow.isSyncAtStartup() );
-                newshadow.setRealmId( oldshadow.getRealmId() );
                 repositoryShadows.add( newshadow );
             }
             newc.setRepositoryShadows( repositoryShadows );
@@ -320,8 +283,9 @@ public class Upgrade103to104
                     org.sonatype.nexus.configuration.model.CGroupsSettingPathMappingItem newItem = new org.sonatype.nexus.configuration.model.CGroupsSettingPathMappingItem();
 
                     newItem.setId( oldItem.getId() );
-                    
-                    newItem.setGroupId( org.sonatype.nexus.configuration.model.CGroupsSettingPathMappingItem.ALL_GROUPS );
+
+                    newItem
+                        .setGroupId( org.sonatype.nexus.configuration.model.CGroupsSettingPathMappingItem.ALL_GROUPS );
 
                     newItem.setRoutePattern( oldItem.getRoutePattern() );
 
@@ -590,7 +554,6 @@ public class Upgrade103to104
         newrepos.setNotFoundCacheTTL( oldrepos.getNotFoundCacheTTL() );
         newrepos.setArtifactMaxAge( oldrepos.getArtifactMaxAge() );
         newrepos.setMetadataMaxAge( oldrepos.getMetadataMaxAge() );
-        newrepos.setRealmId( oldrepos.getRealmId() );
         newrepos.setMaintainProxiedRepositoryMetadata( oldrepos.isMaintainProxiedRepositoryMetadata() );
 
         if ( oldrepos.getLocalStorage() != null )

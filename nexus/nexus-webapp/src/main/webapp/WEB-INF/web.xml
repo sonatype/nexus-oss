@@ -99,7 +99,7 @@
 			perms = org.sonatype.nexus.security.filter.authz.HttpVerbMappingAuthorizationFilter
 
 			[urls]
-			/content/** = anon
+			/content/** = authcBasic,perms[nexus:targets]
 			</param-value>
 		</init-param>
 	</filter>

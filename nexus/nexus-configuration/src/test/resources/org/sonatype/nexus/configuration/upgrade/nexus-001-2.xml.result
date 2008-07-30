@@ -7,9 +7,9 @@
     <enabled>true</enabled>
     <anonymousAccessEnabled>true</anonymousAccessEnabled>
     <configurationFile>${runtime}/apps/nexus/conf/security.xml</configurationFile>
-    <authenticationSource>
-      <type>simple</type>
-    </authenticationSource>
+    <realms>
+      <realm>default</realm>
+    </realms>
   </security>
   <globalConnectionSettings />
   <globalHttpProxySettings>

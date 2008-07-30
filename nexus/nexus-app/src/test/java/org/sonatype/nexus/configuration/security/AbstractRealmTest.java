@@ -815,11 +815,6 @@ public abstract class AbstractRealmTest
             throw new UnsupportedOperationException();
         }
 
-        public String getDefaultAuthenticationSourceType()
-        {
-            throw new UnsupportedOperationException();
-        }
-
         public InputStream getDefaultConfigurationAsStream()
             throws IOException
         {
@@ -929,28 +924,12 @@ public abstract class AbstractRealmTest
             throw new UnsupportedOperationException();
         }
 
-        public void setSecurity( boolean enabled, String authenticationSourceType )
-            throws IOException
-        {
-            throw new UnsupportedOperationException();
-        }
-
         public boolean isSecurityEnabled()
         {
             throw new UnsupportedOperationException();
         }
 
         public boolean isAnonymousAccessEnabled()
-        {
-            throw new UnsupportedOperationException();
-        }
-
-        public boolean isSimpleSecurityModel()
-        {
-            throw new UnsupportedOperationException();
-        }
-
-        public String getAuthenticationSourceType()
         {
             throw new UnsupportedOperationException();
         }
@@ -1225,6 +1204,45 @@ public abstract class AbstractRealmTest
         }
 
         public void deleteRemoteNexusInstance( String alias )
+            throws IOException
+        {
+            throw new UnsupportedOperationException();
+        }
+
+        public String getAnonymousPassword()
+        {
+            throw new UnsupportedOperationException();
+        }
+
+        public String getAnonymousUsername()
+        {
+            throw new UnsupportedOperationException();
+        }
+
+        public List<String> getRealms()
+        {
+            throw new UnsupportedOperationException();
+        }
+
+        public void setAnonymousAccessEnabled( boolean enabled )
+            throws IOException
+        {
+            throw new UnsupportedOperationException();
+        }
+
+        public void setAnonymousPassword( String val )
+            throws IOException
+        {
+            throw new UnsupportedOperationException();
+        }
+
+        public void setAnonymousUsername( String val )
+            throws IOException
+        {
+            throw new UnsupportedOperationException();
+        }
+
+        public void setSecurityEnabled( boolean enabled )
             throws IOException
         {
             throw new UnsupportedOperationException();

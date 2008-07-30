@@ -94,8 +94,6 @@ public class AbstractRepositoryResourceHandler
 
         resource.setSyncAtStartup( model.isSyncAtStartup() );
 
-        resource.setRealmId( model.getRealmId() );
-
         return resource;
     }
 
@@ -123,8 +121,6 @@ public class AbstractRepositoryResourceHandler
         target.setShadowOf( model.getShadowOf() );
 
         target.setSyncAtStartup( model.isSyncAtStartup() );
-
-        target.setRealmId( model.getRealmId() );
 
         target.setType( model.getFormat() );
 
@@ -162,8 +158,6 @@ public class AbstractRepositoryResourceHandler
         resource.setIndexable( model.isIndexable() );
 
         resource.setNotFoundCacheTTL( model.getNotFoundCacheTTL() );
-
-        resource.setRealmId( model.getRealmId() );
 
         resource.setDefaultLocalStorageUrl( model.defaultLocalStorageUrl );
 
@@ -240,8 +234,6 @@ public class AbstractRepositoryResourceHandler
         target.setChecksumPolicy( model.getChecksumPolicy() );
 
         target.setDownloadRemoteIndexes( model.isDownloadRemoteIndexes() );
-
-        target.setRealmId( model.getRealmId() );
 
         if ( model.getOverrideLocalStorageUrl() != null )
         {

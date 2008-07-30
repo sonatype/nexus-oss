@@ -27,10 +27,9 @@ import java.util.Random;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
+import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.StringUtils;
-import org.sonatype.nexus.configuration.model.CAuthSource;
-import org.sonatype.nexus.configuration.model.CAuthzSource;
 import org.sonatype.nexus.configuration.model.CGroupsSetting;
 import org.sonatype.nexus.configuration.model.CGroupsSettingPathMappingItem;
 import org.sonatype.nexus.configuration.model.CHttpProxySettings;
@@ -214,7 +213,7 @@ public class DefaultApplicationConfigurationValidator
                 response.append( validateScheduledTask( context, task ) );
             }
         }
-        
+
         response.append( validateSmtpConfiguration( context, model.getSmtpConfiguration() ) );
 
         // summary
@@ -268,44 +267,26 @@ public class DefaultApplicationConfigurationValidator
             response.setContext( ctx );
         }
 
-        // if security enabled, at least auth source must be defined
+        // if security enabled, at least one realm should exist
         if ( settings.isEnabled() )
         {
-            if ( settings.getAuthenticationSource() == null )
+            if ( settings.getRealms().size() == 0 )
             {
-                settings.setAnonymousAccessEnabled( true );
+                settings.addRealm( PlexusConstants.PLEXUS_DEFAULT_HINT );
 
-                settings.setAuthenticationSource( new CAuthSource() );
-
-                settings.getAuthenticationSource().setType( "simple" );
-
-                response
-                    .addValidationWarning( "Security is enabled, but no authenticationSource is set, setting 'simple' authentication source." );
+                response.addValidationWarning( "Security is enabled, but no realm is set, setting 'default' realm." );
 
                 response.setModified( true );
             }
         }
-        
+
         if ( StringUtils.isEmpty( settings.getConfigurationFile() ) )
         {
-            response.addValidationWarning( " Security Configuration File not set, using default." );
+            response.addValidationWarning( "Security Configuration File not set, using default." );
+
             settings.setConfigurationFile( "${runtime}/apps/nexus/conf/security.xml" );
+
             response.setModified( true );
-        }
-
-        // collect existing realms, if any
-        ApplicationValidationContext context = (ApplicationValidationContext) response.getContext();
-
-        context.addExistingRealms();
-
-        if ( settings.isEnabled() && settings.getRealms() != null )
-        {
-            List<CAuthzSource> realms = settings.getRealms();
-
-            for ( CAuthzSource authz : realms )
-            {
-                context.getExistingRealms().add( authz.getId() );
-            }
         }
 
         return response;
@@ -393,18 +374,6 @@ public class DefaultApplicationConfigurationValidator
             context.getExistingRepositoryIds().add( repo.getId() );
         }
 
-        if ( context.getExistingRealms() != null )
-        {
-            if ( repo.getRealmId() != null )
-            {
-                if ( !ctx.getExistingRealms().contains( repo.getRealmId() ) )
-                {
-                    response.addValidationError( "The " + repo.getId()
-                        + " repository points to a nonexistent security realm!" );
-                }
-            }
-        }
-
         if ( repo.getLocalStorage() != null && repo.getLocalStorage().getUrl() != null )
         {
             try
@@ -473,19 +442,6 @@ public class DefaultApplicationConfigurationValidator
             {
                 response.addValidationError( "The shadow with ID='" + shadow.getId() + "' of repository "
                     + shadow.getShadowOf() + " of type " + shadow.getType() + " points to a nonexistent repository!" );
-            }
-        }
-
-        if ( context.getExistingRealms() != null )
-        {
-            if ( shadow.getRealmId() != null )
-            {
-                if ( !context.getExistingRealms().contains( shadow.getRealmId() ) )
-                {
-                    response.addValidationError( "The shadow with ID='" + shadow.getId() + "' of repository "
-                        + shadow.getShadowOf() + " of type " + shadow.getType()
-                        + " points to a nonexistent security realm!" );
-                }
             }
         }
 
@@ -872,7 +828,7 @@ public class DefaultApplicationConfigurationValidator
 
         return response;
     }
-    
+
     public ValidationResponse validateSmtpConfiguration( ApplicationValidationContext ctx, CSmtpConfiguration settings )
     {
         ValidationResponse response = new ApplicationValidationResponse();
@@ -881,19 +837,21 @@ public class DefaultApplicationConfigurationValidator
         {
             response.setContext( ctx );
         }
-        
+
         if ( StringUtils.isEmpty( settings.getHost() ) )
         {
             ValidationMessage msg = new ValidationMessage( "host", "SMTP Host is empty." );
             response.addValidationError( msg );
         }
-        
+
         if ( settings.getPort() < 0 )
         {
-            ValidationMessage msg = new ValidationMessage( "port", "SMTP Port is inavlid.  Enter a port greater than 0." );
+            ValidationMessage msg = new ValidationMessage(
+                "port",
+                "SMTP Port is inavlid.  Enter a port greater than 0." );
             response.addValidationError( msg );
         }
-        
+
         if ( StringUtils.isEmpty( settings.getSystemEmailAddress() ) )
         {
             ValidationMessage msg = new ValidationMessage( "systemEmailAddress", "System Email Address is empty." );

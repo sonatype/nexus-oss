@@ -20,8 +20,6 @@
  */
 package org.sonatype.nexus.proxy.access;
 
-import java.util.Map;
-
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.repository.Repository;
@@ -40,10 +38,5 @@ public class OpenAccessManager
     {
         // this access manager is open, everybody has access to everything since
         // it never throws AccessDeniedEx
-    }
-
-    public void setConfiguration( Map<String, String> config )
-    {
-        // nothing
     }
 }

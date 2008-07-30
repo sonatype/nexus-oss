@@ -13,19 +13,9 @@ import org.sonatype.nexus.security.filter.NexusJSecurityFilter;
 public class NexusHttpAuthenticationFilter
     extends BasicHttpAuthenticationFilter
 {
-    protected boolean isAnonymousAccessAllowed( ServletRequest request )
+    protected Nexus getNexus( ServletRequest request )
     {
-        Nexus nexus = (Nexus) request.getAttribute( Nexus.class.getName() );
-
-        if ( nexus == null )
-        {
-            return false;
-        }
-        else
-        {
-            return nexus.isAnonymousAccessEnabled();
-        }
-
+        return (Nexus) request.getAttribute( Nexus.class.getName() );
     }
 
     protected boolean onAccessDenied( ServletRequest request, ServletResponse response )
@@ -40,7 +30,7 @@ public class NexusHttpAuthenticationFilter
         if ( !loggedIn )
         {
             // let the user "fall thru" until we get some permission problem
-            if ( isAnonymousAccessAllowed( request ) )
+            if ( getNexus( request ).isAnonymousAccessEnabled() )
             {
                 loggedIn = executeAnonymousLogin( request, response );
             }
@@ -63,8 +53,10 @@ public class NexusHttpAuthenticationFilter
 
         Subject subject = getSubject( request, response );
 
-        // TODO: make this configurable
-        UsernamePasswordToken usernamePasswordToken = new UsernamePasswordToken( "anonymous", "anonymous" );
+        Nexus nexus = getNexus( request );
+
+        UsernamePasswordToken usernamePasswordToken = new UsernamePasswordToken( nexus.getAnonymousUsername(), nexus
+            .getAnonymousUsername() );
 
         try
         {

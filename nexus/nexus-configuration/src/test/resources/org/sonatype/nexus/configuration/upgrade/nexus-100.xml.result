@@ -7,9 +7,9 @@
     <enabled>true</enabled>
     <anonymousAccessEnabled>true</anonymousAccessEnabled>
     <configurationFile>${runtime}/apps/nexus/conf/security.xml</configurationFile>
-    <authenticationSource>
-      <type>simple</type>
-    </authenticationSource>
+    <realms>
+      <realm>default</realm>
+    </realms>
   </security>
   <globalConnectionSettings />
   <globalHttpProxySettings>
@@ -28,7 +28,6 @@
       <notFoundCacheTTL>86400</notFoundCacheTTL>
       <artifactMaxAge>518400</artifactMaxAge>
       <metadataMaxAge>518400</metadataMaxAge>
-      <realmId>dec.central</realmId>
       <remoteStorage>
         <url>http://192.168.228.40:8443/nexus/groups/public</url>
       </remoteStorage>
@@ -40,7 +39,6 @@
       <artifactMaxAge>60</artifactMaxAge>
       <metadataMaxAge>60</metadataMaxAge>
       <repositoryPolicy>snapshot</repositoryPolicy>
-      <realmId>dec.central</realmId>
       <remoteStorage>
         <url>http://192.168.228.40:8443/nexus/groups/snapshot</url>
       </remoteStorage>
@@ -52,7 +50,6 @@
       <notFoundCacheTTL>86400</notFoundCacheTTL>
       <artifactMaxAge>86400</artifactMaxAge>
       <metadataMaxAge>86400</metadataMaxAge>
-      <realmId>dec.release</realmId>
     </repository>
     <repository>
       <id>commercial</id>
@@ -61,7 +58,6 @@
       <notFoundCacheTTL>86400</notFoundCacheTTL>
       <artifactMaxAge>86400</artifactMaxAge>
       <metadataMaxAge>86400</metadataMaxAge>
-      <realmId>dec.oss-com</realmId>
     </repository>
     <repository>
       <id>team</id>
@@ -70,7 +66,6 @@
       <notFoundCacheTTL>86400</notFoundCacheTTL>
       <artifactMaxAge>86400</artifactMaxAge>
       <metadataMaxAge>86400</metadataMaxAge>
-      <realmId>dec.dev</realmId>
     </repository>
     <repository>
       <id>snapshot</id>
@@ -80,7 +75,6 @@
       <artifactMaxAge>86400</artifactMaxAge>
       <metadataMaxAge>86400</metadataMaxAge>
       <repositoryPolicy>snapshot</repositoryPolicy>
-      <realmId>dec.dev</realmId>
     </repository>
     <repository>
       <id>opensource</id>
@@ -89,7 +83,6 @@
       <notFoundCacheTTL>86400</notFoundCacheTTL>
       <artifactMaxAge>86400</artifactMaxAge>
       <metadataMaxAge>86400</metadataMaxAge>
-      <realmId>dec.oss-com</realmId>
     </repository>
   </repositories>
   <repositoryGrouping>

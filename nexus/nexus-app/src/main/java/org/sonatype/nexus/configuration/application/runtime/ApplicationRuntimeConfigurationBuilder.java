@@ -25,7 +25,6 @@ import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.CRepositoryShadow;
 import org.sonatype.nexus.configuration.model.Configuration;
 import org.sonatype.nexus.configuration.validator.InvalidConfigurationException;
-import org.sonatype.nexus.proxy.access.AccessManager;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.ShadowRepository;
 
@@ -37,7 +36,6 @@ import org.sonatype.nexus.proxy.repository.ShadowRepository;
  */
 public interface ApplicationRuntimeConfigurationBuilder
 {
-
     String ROLE = ApplicationRuntimeConfigurationBuilder.class.getName();
 
     void initialize( NexusConfiguration configuration );
@@ -53,8 +51,5 @@ public interface ApplicationRuntimeConfigurationBuilder
 
     Repository updateRepositoryFromModel( ShadowRepository old, Configuration configuration,
         CRepositoryShadow repositoryShadow )
-        throws InvalidConfigurationException;
-
-    AccessManager getAccessManagerForRealm( Configuration configuration, String realmId )
         throws InvalidConfigurationException;
 }

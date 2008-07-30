@@ -130,7 +130,7 @@ public class DefaultNexus
      * @plexus.requirement
      */
     private NexusConfiguration nexusConfiguration;
-    
+
     /**
      * The NexusIndexer.
      * 
@@ -193,7 +193,7 @@ public class DefaultNexus
      * @plexus.requirement
      */
     private CacheManager cacheManager;
-    
+
     /**
      * The SecurityConfiguration component.
      * 
@@ -364,11 +364,17 @@ public class DefaultNexus
     }
 
     // ------------------------------------------------------------------
-    // CRUD-like ops on config sections
+    // Security
 
-    public String getAuthenticationSourceType()
+    public boolean isSecurityEnabled()
     {
-        return nexusConfiguration.getAuthenticationSourceType();
+        return nexusConfiguration.isSecurityEnabled();
+    }
+
+    public void setSecurityEnabled( boolean enabled )
+        throws IOException
+    {
+        nexusConfiguration.setSecurityEnabled( enabled );
     }
 
     public boolean isAnonymousAccessEnabled()
@@ -376,21 +382,41 @@ public class DefaultNexus
         return nexusConfiguration.isAnonymousAccessEnabled();
     }
 
-    public boolean isSecurityEnabled()
-    {
-        return nexusConfiguration.isSecurityEnabled();
-    }
-
-    public boolean isSimpleSecurityModel()
-    {
-        return nexusConfiguration.isSimpleSecurityModel();
-    }
-
-    public void setSecurity( boolean enabled, String authenticationSourceType )
+    public void setAnonymousAccessEnabled( boolean enabled )
         throws IOException
     {
-        nexusConfiguration.setSecurity( enabled, authenticationSourceType );
+        nexusConfiguration.setAnonymousAccessEnabled( enabled );
     }
+
+    public String getAnonymousUsername()
+    {
+        return nexusConfiguration.getAnonymousUsername();
+    }
+
+    public void setAnonymousUsername( String val )
+        throws IOException
+    {
+        nexusConfiguration.setAnonymousUsername( val );
+    }
+
+    public String getAnonymousPassword()
+    {
+        return nexusConfiguration.getAnonymousPassword();
+    }
+
+    public void setAnonymousPassword( String val )
+        throws IOException
+    {
+        nexusConfiguration.setAnonymousPassword( val );
+    }
+
+    public List<String> getRealms()
+    {
+        return nexusConfiguration.getRealms();
+    }
+
+    // ------------------------------------------------------------------
+    // CRUD-like ops on config sections
 
     public String getBaseUrl()
     {
@@ -689,19 +715,19 @@ public class DefaultNexus
     {
         nexusConfiguration.deleteRemoteNexusInstance( alias );
     }
-    
+
     public CSmtpConfiguration readSmtpConfiguration()
     {
         return nexusConfiguration.readSmtpConfiguration();
     }
-    
+
     public void updateSmtpConfiguration( CSmtpConfiguration settings )
         throws ConfigurationException,
             IOException
     {
         nexusConfiguration.updateSmtpConfiguration( settings );
     }
-    
+
     // =============
     // Maintenance
 
@@ -710,7 +736,7 @@ public class DefaultNexus
     {
         return nexusConfiguration.getConfigurationAsStream();
     }
-    
+
     public Collection<String> getApplicationLogFiles()
         throws IOException
     {
@@ -1041,21 +1067,6 @@ public class DefaultNexus
     // ------------------------------------------------------------------
     // Configuration defaults
 
-    public String getDefaultAuthenticationSourceType()
-    {
-        if ( nexusConfiguration
-            .getConfigurationSource().getDefaultsSource().getConfiguration().getSecurity().getAuthenticationSource() != null )
-        {
-            return nexusConfiguration
-                .getConfigurationSource().getDefaultsSource().getConfiguration().getSecurity()
-                .getAuthenticationSource().getType();
-        }
-        else
-        {
-            return null;
-        }
-    }
-
     public boolean isDefaultAnonymousAccessEnabled()
     {
         return nexusConfiguration
@@ -1073,7 +1084,7 @@ public class DefaultNexus
     {
         return nexusConfiguration.getConfigurationSource().getDefaultsSource().getConfigurationAsStream();
     }
-    
+
     public String readDefaultWorkingDirectory()
     {
         return nexusConfiguration.getConfigurationSource().getDefaultsSource().getConfiguration().getWorkingDirectory();
@@ -1101,10 +1112,11 @@ public class DefaultNexus
     {
         return nexusConfiguration.getConfigurationSource().getDefaultsSource().getConfiguration().getRouting();
     }
-    
+
     public CSmtpConfiguration readDefaultSmtpConfiguration()
     {
-        return nexusConfiguration.getConfigurationSource().getDefaultsSource().getConfiguration().getSmtpConfiguration();
+        return nexusConfiguration
+            .getConfigurationSource().getDefaultsSource().getConfiguration().getSmtpConfiguration();
     }
 
     // =============
@@ -1395,7 +1407,7 @@ public class DefaultNexus
             nexusConfiguration.createInternals();
 
             nexusConfiguration.notifyConfigurationChangeListeners();
-            
+
             securityConfiguration.startService();
 
             cacheManager.startService();
@@ -1491,7 +1503,7 @@ public class DefaultNexus
         httpProxyService.stopService();
 
         nexusScheduler.stopService();
-        
+
         securityConfiguration.stopService();
 
         try

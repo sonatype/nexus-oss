@@ -22,6 +22,7 @@ package org.sonatype.nexus.configuration.application;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.List;
 
 import org.sonatype.nexus.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.model.CGroupsSettingPathMappingItem;
@@ -45,16 +46,27 @@ public interface MutableConfiguration
     // Repositories
     // ----------------------------------------------------------------------------------------------------------
 
-    void setSecurity( boolean enabled, String authenticationSourceType )
-        throws IOException;
-
     boolean isSecurityEnabled();
+
+    void setSecurityEnabled( boolean enabled )
+        throws IOException;
 
     boolean isAnonymousAccessEnabled();
 
-    boolean isSimpleSecurityModel();
+    void setAnonymousAccessEnabled( boolean enabled )
+        throws IOException;
 
-    String getAuthenticationSourceType();
+    String getAnonymousUsername();
+
+    void setAnonymousUsername( String val )
+        throws IOException;
+
+    String getAnonymousPassword();
+
+    void setAnonymousPassword( String val )
+        throws IOException;
+
+    List<String> getRealms();
 
     // ----------------------------------------------------------------------------
     // ContentClasses
@@ -229,7 +241,7 @@ public interface MutableConfiguration
 
     void deleteRemoteNexusInstance( String alias )
         throws IOException;
-    
+
     // Smtp settings
     CSmtpConfiguration readSmtpConfiguration();
 

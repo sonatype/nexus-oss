@@ -252,8 +252,6 @@ public interface Nexus
 
     boolean isDefaultAnonymousAccessEnabled();
 
-    String getDefaultAuthenticationSourceType();
-
     InputStream getDefaultConfigurationAsStream()
         throws IOException;
 

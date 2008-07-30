@@ -210,20 +210,15 @@ public class GlobalConfigurationResourceHandler
                         getNexus().updateGlobalRemoteHttpProxySettings( null );
                     }
 
-                    if ( resource.getSecurityConfiguration() != null )
+                    getNexus().setSecurityEnabled( resource.isSecurityEnabled() );
+
+                    getNexus().setAnonymousAccessEnabled( resource.isSecurityAnonymousAccessEnabled() );
+
+                    if ( resource.getSecurityAnonymousUsername() != null )
                     {
-                        if ( "off".equalsIgnoreCase( resource.getSecurityConfiguration() ) )
-                        {
-                            getNexus().setSecurity( false, null );
-                        }
-                        else if ( "simple".equalsIgnoreCase( resource.getSecurityConfiguration() ) )
-                        {
-                            getNexus().setSecurity( true, "simple" );
-                        }
-                        else if ( "custom".equalsIgnoreCase( resource.getSecurityConfiguration() ) )
-                        {
-                            getNexus().setSecurity( true, "properties" );
-                        }
+                        getNexus().setAnonymousUsername( resource.getSecurityAnonymousUsername() );
+
+                        getNexus().setAnonymousPassword( resource.getSecurityAnonymousPassword() );
                     }
 
                     if ( resource.getBaseUrl() != null )
@@ -271,9 +266,6 @@ public class GlobalConfigurationResourceHandler
      */
     protected void fillDefaultConfiguration( GlobalConfigurationResource resource )
     {
-        resource.setSecurityConfiguration( getSecurityConfiguration( getNexus().isDefaultSecurityEnabled(), getNexus()
-            .getDefaultAuthenticationSourceType() ) );
-
         resource.setWorkingDirectory( getNexus().readDefaultWorkingDirectory() );
 
         resource.setLogDirectory( getNexus().readDefaultApplicationLogDirectory() );
@@ -290,9 +282,6 @@ public class GlobalConfigurationResourceHandler
      */
     protected void fillCurrentConfiguration( GlobalConfigurationResource resource )
     {
-        resource.setSecurityConfiguration( getSecurityConfiguration( getNexus().isSecurityEnabled(), getNexus()
-            .getAuthenticationSourceType() ) );
-
         resource.setWorkingDirectory( getNexus().readWorkingDirectory() );
 
         resource.setLogDirectory( getNexus().readApplicationLogDirectory() );

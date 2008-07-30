@@ -256,33 +256,29 @@
 ]]></code>
 				</codeSegment>
 				<codeSegment>
-					<version>1.0.2</version>
+					<version>1.0.2+</version>
 					<code><![CDATA[
-    public static final String MODEL_VERSION = "1.0.2";
-    
     public static final String LOCAL_STATUS_IN_SERVICE = "inService";
 
     public static final String LOCAL_STATUS_OUT_OF_SERVICE = "outOfService";
+]]></code>
+				</codeSegment>
+				<codeSegment>
+					<version>1.0.2</version>
+					<code><![CDATA[
+    public static final String MODEL_VERSION = "1.0.2";
 ]]></code>
 				</codeSegment>
 				<codeSegment>
 					<version>1.0.3</version>
 					<code><![CDATA[
     public static final String MODEL_VERSION = "1.0.3";
-    
-    public static final String LOCAL_STATUS_IN_SERVICE = "inService";
-
-    public static final String LOCAL_STATUS_OUT_OF_SERVICE = "outOfService";
 ]]></code>
 				</codeSegment>
 				<codeSegment>
 					<version>1.0.4</version>
 					<code><![CDATA[
     public static final String MODEL_VERSION = "1.0.4";
-    
-    public static final String LOCAL_STATUS_IN_SERVICE = "inService";
-
-    public static final String LOCAL_STATUS_OUT_OF_SERVICE = "outOfService";
 ]]></code>
 				</codeSegment>
 			</codeSegments>
@@ -737,18 +733,7 @@
 				</field>
 				<field>
 					<name>offline</name>
-					<version>1.0.0</version>
-					<type>boolean</type>
-					<required>true</required>
-					<description>
-						If true, repository will never try to reach it's remote peer. Will offer the content it has in
-						cache/local store.
-					</description>
-					<defaultValue>false</defaultValue>
-				</field>
-				<field>
-					<name>offline</name>
-					<version>1.0.1</version>
+					<version>1.0.0/1.0.1</version>
 					<type>boolean</type>
 					<required>true</required>
 					<description>
@@ -874,7 +859,7 @@
 				</field>
 				<field>
 					<name>realmId</name>
-					<version>1.0.0+</version>
+					<version>1.0.0/1.0.3</version>
 					<type>String</type>
 					<required>false</required>
 					<description>The ID of defined realm from "security" section of configuration.</description>
@@ -1112,7 +1097,7 @@
 				</field>
 				<field>
 					<name>realmId</name>
-					<version>1.0.0+</version>
+					<version>1.0.0/1.0.3</version>
 					<type>String</type>
 					<required>false</required>
 					<description>The ID of defined realm from "security" section of configuration.</description>
@@ -1329,6 +1314,28 @@
 					<defaultValue>false</defaultValue>
 				</field>
 				<field>
+					<name>anonymousUsername</name>
+					<version>1.0.4+</version>
+					<type>String</type>
+					<required>true</required>
+					<description>
+						The username used to log in as anonymous user. The account should be enabled and existing according to the
+						used JSecurity realm!
+					</description>
+					<defaultValue>anonymous</defaultValue>
+				</field>
+				<field>
+					<name>anonymousPassword</name>
+					<version>1.0.4+</version>
+					<type>String</type>
+					<required>true</required>
+					<description>
+						The username used to log in as anonymous user. The account should be enabled and existing according to the
+						used JSecurity realm!
+					</description>
+					<defaultValue>anonymous</defaultValue>
+				</field>
+				<field>
 				    <name>configurationFile</name>
 				    <version>1.0.4+</version>
 				    <type>String</type>
@@ -1338,8 +1345,18 @@
 				    </description>
 				</field>
 				<field>
+					<name>realms</name>
+					<version>1.0.4+</version>
+					<description>The list of JSecurity realms used in Nexus.</description>
+					<association>
+						<type>String</type>
+						<multiplicity>*</multiplicity>
+					</association>
+					<required>true</required>
+				</field>
+				<field>
 					<name>authenticationSource</name>
-					<version>1.0.0+</version>
+					<version>1.0.0/1.0.3</version>
 					<description>The authentication source to use with Nexus.</description>
 					<association>
 						<type>CAuthSource</type>
@@ -1348,7 +1365,7 @@
 				</field>
 				<field>
 					<name>realms</name>
-					<version>1.0.0+</version>
+					<version>1.0.0/1.0.3</version>
 					<description>The list of realms used to Nexus.</description>
 					<association>
 						<type>CAuthzSource</type>
@@ -1360,7 +1377,7 @@
 		</class>
 		<class>
 			<name>CAuthSource</name>
-			<version>1.0.0+</version>
+			<version>1.0.0/1.0.3</version>
 			<description>Authentication source definition.</description>
 			<fields>
 				<field>
@@ -1385,7 +1402,7 @@
 		</class>
 		<class>
 			<name>CAuthzSource</name>
-			<version>1.0.0+</version>
+			<version>1.0.0/1.0.3</version>
 			<description>Authorization source definition (realm).</description>
 			<fields>
 				<field>
@@ -1440,15 +1457,7 @@
 				</field>
 				<field>
 					<name>authTokenExpiration</name>
-					<version>1.0.2</version>
-					<type>int</type>
-					<required>true</required>
-					<description>The auth token expiration in minutes. Default is one week.</description>
-					<defaultValue>10080</defaultValue>
-				</field>
-				<field>
-					<name>authTokenExpiration</name>
-					<version>1.0.3</version>
+					<version>1.0.2/1.0.3</version>
 					<type>int</type>
 					<required>true</required>
 					<description>The auth token expiration in minutes. Default is one week.</description>
