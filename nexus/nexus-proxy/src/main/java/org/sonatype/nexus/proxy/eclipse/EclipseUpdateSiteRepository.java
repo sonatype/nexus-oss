@@ -32,7 +32,7 @@ import org.sonatype.nexus.proxy.repository.DefaultRepository;
  * 
  * @see http://help.eclipse.org/help33/index.jsp?topic=/org.eclipse.platform.doc.isv/reference/misc/update_sitemap.html
  * @author cstamas
- * @plexus.component instantiation-strategy="per-lookup" role-hint="eclipse-update-site"
+ * plexus.component instantiation-strategy="per-lookup" role-hint="eclipse-update-site"
  */
 public class EclipseUpdateSiteRepository
     extends DefaultRepository
