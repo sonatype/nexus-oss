@@ -266,6 +266,14 @@ public class GlobalConfigurationResourceHandler
      */
     protected void fillDefaultConfiguration( GlobalConfigurationResource resource )
     {
+        resource.setSecurityEnabled( getNexus().isDefaultSecurityEnabled() );
+
+        resource.setSecurityAnonymousAccessEnabled( getNexus().isDefaultAnonymousAccessEnabled() );
+
+        resource.setSecurityAnonymousUsername( getNexus().getDefaultAnonymousUsername() );
+
+        resource.setSecurityAnonymousPassword( getNexus().getDefaultAnonymousPassword() );
+
         resource.setWorkingDirectory( getNexus().readDefaultWorkingDirectory() );
 
         resource.setLogDirectory( getNexus().readDefaultApplicationLogDirectory() );
@@ -282,6 +290,14 @@ public class GlobalConfigurationResourceHandler
      */
     protected void fillCurrentConfiguration( GlobalConfigurationResource resource )
     {
+        resource.setSecurityEnabled( getNexus().isSecurityEnabled() );
+
+        resource.setSecurityAnonymousAccessEnabled( getNexus().isAnonymousAccessEnabled() );
+
+        resource.setSecurityAnonymousUsername( getNexus().getAnonymousUsername() );
+
+        resource.setSecurityAnonymousPassword( getNexus().getAnonymousPassword() );
+
         resource.setWorkingDirectory( getNexus().readWorkingDirectory() );
 
         resource.setLogDirectory( getNexus().readApplicationLogDirectory() );

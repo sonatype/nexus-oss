@@ -1067,16 +1067,34 @@ public class DefaultNexus
     // ------------------------------------------------------------------
     // Configuration defaults
 
+    public boolean isDefaultSecurityEnabled()
+    {
+        return nexusConfiguration
+            .getConfigurationSource().getDefaultsSource().getConfiguration().getSecurity().isEnabled();
+    }
+
     public boolean isDefaultAnonymousAccessEnabled()
     {
         return nexusConfiguration
             .getConfigurationSource().getDefaultsSource().getConfiguration().getSecurity().isAnonymousAccessEnabled();
     }
 
-    public boolean isDefaultSecurityEnabled()
+    public String getDefaultAnonymousUsername()
     {
         return nexusConfiguration
-            .getConfigurationSource().getDefaultsSource().getConfiguration().getSecurity().isEnabled();
+            .getConfigurationSource().getDefaultsSource().getConfiguration().getSecurity().getAnonymousUsername();
+    }
+
+    public String getDefaultAnonymousPassword()
+    {
+        return nexusConfiguration
+            .getConfigurationSource().getDefaultsSource().getConfiguration().getSecurity().getAnonymousPassword();
+    }
+
+    public List<String> getDefaultRealms()
+    {
+        return nexusConfiguration
+            .getConfigurationSource().getDefaultsSource().getConfiguration().getSecurity().getRealms();
     }
 
     public InputStream getDefaultConfigurationAsStream()

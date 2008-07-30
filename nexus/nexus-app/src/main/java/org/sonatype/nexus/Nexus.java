@@ -70,9 +70,9 @@ public interface Nexus
     // Status
 
     SystemStatus getSystemStatus();
-    
-    boolean setState(SystemState state);
-    
+
+    boolean setState( SystemState state );
+
     // ------------------------------------------------------------------
     // Configuration
 
@@ -252,6 +252,12 @@ public interface Nexus
 
     boolean isDefaultAnonymousAccessEnabled();
 
+    String getDefaultAnonymousUsername();
+
+    String getDefaultAnonymousPassword();
+
+    List<String> getDefaultRealms();
+
     InputStream getDefaultConfigurationAsStream()
         throws IOException;
 
@@ -262,11 +268,11 @@ public interface Nexus
     CRemoteConnectionSettings readDefaultGlobalRemoteConnectionSettings();
 
     CRemoteHttpProxySettings readDefaultGlobalRemoteHttpProxySettings();
-    
+
     CSmtpConfiguration readDefaultSmtpConfiguration();
 
     CRouting readDefaultRouting();
-    
+
     // ----------------------------------------------------------------------------
     // Repo templates, CRUD
     // ----------------------------------------------------------------------------
