@@ -511,7 +511,406 @@
 	<td>http://localhost:8081/nexus/</td>
 	<td></td>
 </tr>
-
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>mouseDown</td>
+	<td>open-config-groups</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>mouseUp</td>
+	<td>open-config-groups</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//table[@id='group-add-btn']/tbody/tr/td[2]/em/button</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>document.forms[0].elements[0]</td>
+	<td>Test Group One</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>document.forms[0].elements[1]</td>
+	<td>Test Group One</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>document.forms[0].elements[3]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//table[@id='savebutton']/tbody/tr/td[2]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTextPresent</td>
+	<td>No spaces allowed in ID</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>document.forms[0].elements[0]</td>
+	<td>Test_Group_One</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//div[2]/div/div/div/div/div/table/tbody/tr/td[1]/table/tbody/tr/td[2]/em/button</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTextPresent</td>
+	<td>Repository referenced by Repository Group does not share same content type!</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//div[@id='extdd-1']/a/span</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>document.forms[0].elements[4]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//div[@id='extdd-10']/a/span</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>document.forms[0].elements[4]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//div[@id='extdd-13']/a/span</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>document.forms[0].elements[4]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//div[@id='extdd-16']/a/span</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>document.forms[0].elements[4]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//div[@id='extdd-19']/a/span</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>document.forms[0].elements[4]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//div[2]/div/div/div/div/div/table/tbody/tr/td[1]/table/tbody/tr/td[2]/em/button</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//table[@id='group-refresh-btn']/tbody/tr/td[2]/em/button</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTextPresent</td>
+	<td>Select a Repository Group to edit it, or click &quot;Add&quot; to create a new one.</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//table[@id='group-add-btn']/tbody/tr/td[2]/em/button</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//div[@id='extdd-31']/a/span</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>document.forms[0].elements[0]</td>
+	<td>Test_Group_Two</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>document.forms[0].elements[2]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//div[2]/div/div/div/div/div/table/tbody/tr/td[1]/table/tbody/tr/td[2]/em/button</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTextPresent</td>
+	<td>This field is required</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>document.forms[0].elements[1]</td>
+	<td>Test Group Two</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//div[2]/div/div/div/div/div/table/tbody/tr/td[1]/table/tbody/tr/td[2]/em/button</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//table[@id='group-refresh-btn']/tbody/tr/td[2]/em/button</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTextPresent</td>
+	<td>Select a Repository Group to edit it, or click &quot;Add&quot; to create a new one.</td>
+	<td></td>
+</tr>
+<tr>
+	<td>mouseDown</td>
+	<td>st-groups-grid_http://localhost:8081/nexus/service/local/repo_groups/Test_Group_Two_col0</td>
+	<td></td>
+</tr>
+<tr>
+	<td>mouseUp</td>
+	<td>st-groups-grid_http://localhost:8081/nexus/service/local/repo_groups/Test_Group_Two_col0</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//button[text()='Delete']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>1000</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//button[text()='Yes']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>mouseDown</td>
+	<td>open-config-schedules</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>mouseUp</td>
+	<td>open-config-schedules</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//table[@id='schedule-add-btn']/tbody/tr/td[2]/em/button</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>document.forms[0].elements[2]</td>
+	<td>Test Scheduled Task with Group</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//div[3]/div[1]/div/img[1]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//div[20]/div/div[1]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//fieldset[2]/div/div/div[1]/div[1]/div/img[1]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//div/div[11]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>document.forms[0].elements[24]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//div[22]/div/div[2]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//div[2]/div[1]/div/img[1]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//div[2]/div/div/div/div/div/table/tbody/tr/td[1]/table/tbody/tr/td[2]/em/button</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//div[3]/div/div/div[1]/div[2]/div[1]/div/table/tbody/tr/td[1]/table/tbody/tr/td[2]/em/button</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTextPresent</td>
+	<td>Select a scheduled task to edit it, or click &quot;Add&quot; to create a new one.</td>
+	<td></td>
+</tr>
+<tr>
+	<td>mouseDown</td>
+	<td>open-config-groups</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>mouseUp</td>
+	<td>open-config-groups</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//table[@id='group-add-btn']/tbody/tr/td[2]/em/button</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>document.forms[0].elements[0]</td>
+	<td>Test_Group_Three</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//div[@id='extdd-82']/a/span</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>document.forms[0].elements[2]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//div[2]/div/div/div/div/div/table/tbody/tr/td[1]/table/tbody/tr/td[2]/em/button</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTextPresent</td>
+	<td>This field is required</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>document.forms[0].elements[1]</td>
+	<td>Test Group Three</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//table[@id='savebutton']/tbody/tr/td[2]/em/button</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTextPresent</td>
+	<td>Central M1 shadow</td>
+	<td></td>
+</tr>
 </tbody></table>
 </body>
 </html>
