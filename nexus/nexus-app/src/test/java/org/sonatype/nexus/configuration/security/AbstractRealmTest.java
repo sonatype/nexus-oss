@@ -1247,6 +1247,21 @@ public abstract class AbstractRealmTest
         {
             throw new UnsupportedOperationException();
         }
+
+        public String getDefaultAnonymousPassword()
+        {
+            throw new UnsupportedOperationException();
+        }
+
+        public String getDefaultAnonymousUsername()
+        {
+            throw new UnsupportedOperationException();
+        }
+
+        public List<String> getDefaultRealms()
+        {
+            throw new UnsupportedOperationException();
+        }
     }
 
     public static class MockRepository
