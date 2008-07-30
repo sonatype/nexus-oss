@@ -20,6 +20,7 @@
  */
 package org.sonatype.nexus.configuration.security.source;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -30,7 +31,11 @@ public class FileConfigurationSourceTest
     protected SecurityConfigurationSource getConfigurationSource()
         throws Exception
     {
-        return ( SecurityConfigurationSource ) lookup( SecurityConfigurationSource.ROLE, "file" );
+        FileConfigurationSource source = ( FileConfigurationSource ) lookup( SecurityConfigurationSource.ROLE, "file" );
+        
+        source.setConfigurationFile( new File( getSecurityConfiguration() ) );
+        
+        return source;
     }
 
     protected InputStream getOriginatingConfigurationInputStream()

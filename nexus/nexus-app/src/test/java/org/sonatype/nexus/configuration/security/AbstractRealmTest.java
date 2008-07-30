@@ -90,6 +90,7 @@ import org.sonatype.scheduling.ScheduledTask;
 import org.sonatype.scheduling.SchedulerTask;
 import org.sonatype.scheduling.schedules.Schedule;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -223,7 +224,7 @@ public abstract class AbstractRealmTest
         public final Map<String, CRepoTargetPrivilege> repoTargetPrivileges = new TreeMap<String, CRepoTargetPrivilege>();
 
         public final Map<String, CApplicationPrivilege> applicationPrivileges = new TreeMap<String, CApplicationPrivilege>();
-
+        
         public CUser readUser( String id )
             throws NoSuchUserException
         {
@@ -309,6 +310,11 @@ public abstract class AbstractRealmTest
         }
 
         // Unimplemented methods
+        public File getConfigurationFile()
+        {
+            throw new UnsupportedOperationException();
+        }
+        
         public Collection<CUser> listUsers()
         {
             throw new UnsupportedOperationException();

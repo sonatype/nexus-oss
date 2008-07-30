@@ -20,6 +20,7 @@
  */
 package org.sonatype.nexus.configuration.security;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Vector;
 
@@ -39,6 +40,13 @@ public class SimpleSecurityConfiguration
         super();
 
         this.configuration = new Configuration();
+    }
+    
+    public File getConfigurationFile()
+    {
+        File result = new File( "/target/plexus-home/conf/security.xml" );
+        
+        return result;
     }
 
     public Configuration getConfiguration()

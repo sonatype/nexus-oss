@@ -50,7 +50,6 @@ public class FileConfigurationSource
     /**
      * The configuration file.
      * 
-     * @plexus.configuration default-value="${nexus.security.configuration}"
      */
     private File configurationFile;
 
@@ -133,7 +132,7 @@ public class FileConfigurationSource
         if ( getConfigurationFile() == null || getConfigurationFile().getAbsolutePath().contains( "${" ) )
         {
             throw new ConfigurationException( "The configuration file is not set or resolved properly: "
-                + getConfigurationFile().getAbsolutePath() );
+                + ( getConfigurationFile() == null ? "null" : getConfigurationFile().getAbsolutePath() ) );
         }
 
         if ( !getConfigurationFile().exists() )

@@ -24,6 +24,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
@@ -43,10 +44,10 @@ public class DefaultNexusSecurityConfigurationTest
     protected void setUp()
         throws Exception
     {
-        super.setUp();
-
         securityConfiguration = (DefaultNexusSecurityConfiguration) this.lookup( NexusSecurityConfiguration.ROLE );
         securityConfiguration.startService();
+        
+        super.setUp();
     }
 
     protected void tearDown()
@@ -58,7 +59,7 @@ public class DefaultNexusSecurityConfigurationTest
 
     protected boolean loadConfigurationAtSetUp()
     {
-        return false;
+        return true;
     }
 
     public void testSaveConfiguration()
@@ -163,9 +164,14 @@ public class DefaultNexusSecurityConfigurationTest
 
         // get it
         Configuration config = securityConfiguration.getConfiguration();
-
-        // modify it
-        config.setVersion( "junk.version" );
+        
+        CApplicationPrivilege priv = new CApplicationPrivilege();
+        priv.setId( "testid" );
+        priv.setMethod( "read" );
+        priv.setName( "testname" );
+        priv.setPermission( "a:test:permission" );
+        
+        config.addApplicationPrivilege( priv );
         
         // save it
         securityConfiguration.saveConfiguration();
@@ -190,7 +196,13 @@ public class DefaultNexusSecurityConfigurationTest
         config = securityConfiguration.getConfiguration();
 
         // it again contains default value, coz we overwritten it before
-        assertFalse( config.getVersion().equals( "junk.version" ) );
+        for ( CApplicationPrivilege appPriv : ( List<CApplicationPrivilege> ) config.getApplicationPrivileges() )
+        {
+            if ( appPriv.getId().equals( "testid" ) )
+            {
+                fail( "Existing config found, should have been overwritten" );
+            }
+        }
     }
 
     public void testGetConfiguration()

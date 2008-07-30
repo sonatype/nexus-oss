@@ -23,6 +23,7 @@ package org.sonatype.nexus.configuration;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.context.Context;
@@ -38,7 +39,6 @@ public abstract class AbstractNexusTestCase
     extends PlexusTestCase
 {
     public static final String NEXUS_CONFIGURATION_KEY = "nexus.configuration";
-    public static final String SECURITY_CONFIGURATION_KEY = "nexus.security.configuration";
     public static final String APPS_CONFIGURATION_KEY = "apps";
 
     protected static final File PLEXUS_HOME = new File( getBasedir(), "target/plexus-home" );
@@ -48,11 +48,8 @@ public abstract class AbstractNexusTestCase
         File nexusConfigFile = new File( PLEXUS_HOME, "/conf/nexus.xml" );
 
         nexusConfigFile.getParentFile().mkdirs();
-        
-        File securityConfigFile = new File( PLEXUS_HOME, "/conf/security.xml" );
 
         ctx.put( NEXUS_CONFIGURATION_KEY, nexusConfigFile.getAbsolutePath() );
-        ctx.put( SECURITY_CONFIGURATION_KEY, securityConfigFile.getAbsolutePath() );
         ctx.put( APPS_CONFIGURATION_KEY, PLEXUS_HOME.getAbsolutePath() );
     }
 
@@ -72,16 +69,7 @@ public abstract class AbstractNexusTestCase
     
     protected String getSecurityConfiguration()
     {
-        try
-        {
-            return (String) getContainer().getContext().get( SECURITY_CONFIGURATION_KEY );
-        }
-        catch ( ContextException e )
-        {
-            fail( "JUNit environment problem: " + SECURITY_CONFIGURATION_KEY + " not found in plexus context?" );
-
-            return null;
-        }
+        return PLEXUS_HOME + "/conf/security.xml";
     }
 
     protected void copyDefaultConfigToPlace()
@@ -94,6 +82,12 @@ public abstract class AbstractNexusTestCase
     protected void copyDefaultSecurityConfigToPlace()
     throws IOException
     {
+        File file = new File ( getSecurityConfiguration() );
+        
+        file.getParentFile().mkdirs();
+        
+        file.createNewFile();
+        
         IOUtil.copy( getClass().getResourceAsStream( "/META-INF/nexus/security.xml" ), new FileOutputStream(
             getSecurityConfiguration() ) );
     }

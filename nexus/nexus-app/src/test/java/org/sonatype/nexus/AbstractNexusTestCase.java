@@ -34,7 +34,6 @@ import org.sonatype.nexus.configuration.application.NexusConfiguration;
 public abstract class AbstractNexusTestCase
     extends PlexusTestCase
 {
-    public static final String NEXUS_SECURITY_CONFIGURATION_KEY = "nexus.security.configuration";
     public static final String NEXUS_CONFIGURATION_KEY = "nexus.configuration";
     public static final String APPS_CONFIGURATION_KEY = "apps";
 
@@ -45,12 +44,11 @@ public abstract class AbstractNexusTestCase
     protected void customizeContext( Context ctx )
     {
         File nexusConfigFile = new File( PLEXUS_HOME, "/conf/nexus.xml" );
-        File nexusSecurityConfigFile = new File( PLEXUS_HOME, "/conf/security.xml" );
+        File nexusSecurityConfigFile = new File( PLEXUS_HOME, "/apps/nexus/conf/security.xml" );
 
         nexusConfigFile.getParentFile().mkdirs();
         nexusSecurityConfigFile.getParentFile().mkdirs();
 
-        ctx.put( NEXUS_SECURITY_CONFIGURATION_KEY, nexusSecurityConfigFile.getAbsolutePath() );
         ctx.put( NEXUS_CONFIGURATION_KEY, nexusConfigFile.getAbsolutePath() );
         ctx.put( APPS_CONFIGURATION_KEY, PLEXUS_HOME.getAbsolutePath() );
 
@@ -73,16 +71,7 @@ public abstract class AbstractNexusTestCase
     
     protected String getNexusSecurityConfiguration()
     {
-        try
-        {
-            return (String) getContainer().getContext().get( NEXUS_SECURITY_CONFIGURATION_KEY );
-        }
-        catch ( ContextException e )
-        {
-            fail( "JUNit environment problem: " + NEXUS_SECURITY_CONFIGURATION_KEY + " not found in plexus context?" );
-
-            return null;
-        }
+        return PLEXUS_HOME + "/apps/nexus/conf/security.xml";
     }
 
     protected void copyDefaultConfigToPlace()

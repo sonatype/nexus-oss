@@ -20,6 +20,7 @@
  */
 package org.sonatype.nexus.configuration.security;
 
+import java.io.File;
 import java.io.IOException;
 
 import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
@@ -35,6 +36,7 @@ import org.sonatype.nexus.configuration.security.model.Configuration;
 public class NexusSecurityConfigurationAdapter
     implements SecurityConfiguration
 {
+    
     /**
      * @plexus.requirement
      */
@@ -43,6 +45,11 @@ public class NexusSecurityConfigurationAdapter
     public Configuration getConfiguration()
     {
         return nexusConfiguration.getConfiguration();
+    }
+    
+    public File getConfigurationFile()
+    {
+        return nexusConfiguration.getConfigurationFile();
     }
     
     public void saveConfiguration()

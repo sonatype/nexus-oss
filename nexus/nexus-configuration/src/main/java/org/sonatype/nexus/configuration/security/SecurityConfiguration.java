@@ -20,6 +20,8 @@
  */
 package org.sonatype.nexus.configuration.security;
 
+import java.io.File;
+
 import org.sonatype.nexus.configuration.NotifiableConfiguration;
 import org.sonatype.nexus.configuration.security.model.Configuration;
 
@@ -34,4 +36,11 @@ public interface SecurityConfiguration extends NotifiableConfiguration
      * Get the configuration object
      */
     Configuration getConfiguration();
+    
+    /**
+     * Get the configuration file
+     * 
+     * @return
+     */
+    File getConfigurationFile();
 }

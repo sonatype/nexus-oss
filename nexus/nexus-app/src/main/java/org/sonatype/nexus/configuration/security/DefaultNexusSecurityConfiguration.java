@@ -20,6 +20,7 @@
  */
 package org.sonatype.nexus.configuration.security;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -45,6 +46,7 @@ import org.sonatype.nexus.configuration.security.model.CRole;
 import org.sonatype.nexus.configuration.security.model.CUser;
 import org.sonatype.nexus.configuration.security.model.Configuration;
 import org.sonatype.nexus.configuration.security.runtime.SecurityRuntimeConfigurationBuilder;
+import org.sonatype.nexus.configuration.security.source.FileConfigurationSource;
 import org.sonatype.nexus.configuration.security.source.SecurityConfigurationSource;
 import org.sonatype.nexus.configuration.security.validator.SecurityConfigurationValidator;
 import org.sonatype.nexus.configuration.security.validator.SecurityValidationContext;
@@ -67,10 +69,12 @@ import org.sonatype.nexus.smtp.SmtpClientException;
  * @author cstamas
  * @plexus.component
  */
+
 public class DefaultNexusSecurityConfiguration
     extends AbstractLogEnabled
     implements
-        NexusSecurityConfiguration
+        NexusSecurityConfiguration,
+        ConfigurationChangeListener
 {
     /**
      * The nexus configuration.  Used to initialize the list of repo targets
@@ -118,34 +122,57 @@ public class DefaultNexusSecurityConfiguration
      * @plexus.requirement
      */
     private SecurityRuntimeConfigurationBuilder runtimeConfigurationBuilder;
+    
+    private File configurationFile = null;
 
     /** The config event listeners. */
     private CopyOnWriteArrayList<ConfigurationChangeListener> configurationChangeListeners =
         new CopyOnWriteArrayList<ConfigurationChangeListener>();
     
-    public void startService()
-        throws StartingException
+    public File getConfigurationFile()
     {
+        if ( configurationFile == null )
+        {
+            configurationFile = new File( nexusConfiguration.getConfiguration().getSecurity().getConfigurationFile() );
+            
+            configurationFile.getParentFile().mkdirs();
+        }
+        
+        return configurationFile;
+    }
+    
+    public void onConfigurationChange( ConfigurationChangeEvent evt )
+    {
+        getLogger().info( "Nexus Configuration Loaded, now loading Security Configuration" );
         try
         {
+            configurationFile = null;
+            
+            if ( FileConfigurationSource.class.isAssignableFrom( configurationSource.getClass() ) )
+            {
+                ( ( FileConfigurationSource ) configurationSource ).setConfigurationFile( getConfigurationFile() );
+            }
+            
             loadConfiguration( true );
             
             notifyConfigurationChangeListeners();
-            
-            getLogger().info( "Started Nexus Security" );
         }
         catch ( ConfigurationException e )
         {
             getLogger().error( "Could not start Nexus Security, user configuration exception!", e );
-
-            throw new StartingException( "Could not start Nexus Security!", e );
         }
         catch ( IOException e )
         {
             getLogger().error( "Could not start Nexus Security, bad IO exception!", e );
-
-            throw new StartingException( "Could not start Nexus Security!", e );
         }
+    }
+    
+    public void startService()
+        throws StartingException
+    {
+        nexusConfiguration.addConfigurationChangeListener( this );
+        
+        getLogger().info( "Started Nexus Security" );
     }
     
     public void stopService()
@@ -168,6 +195,8 @@ public class DefaultNexusSecurityConfiguration
         if ( force || configurationSource.getConfiguration() == null )
         {
             getLogger().info( "Loading Nexus Security Configuration..." );
+            
+            configurationFile = null;
 
             configurationSource.loadConfiguration();
 
@@ -182,6 +211,8 @@ public class DefaultNexusSecurityConfiguration
         throws IOException
     {
         getLogger().info( "Applying Nexus Security Configuration..." );
+        
+        configurationFile = null;
 
         notifyConfigurationChangeListeners();
     }
