@@ -20,7 +20,8 @@ import org.sonatype.nexus.integrationtests.nexus167.Nexus167ReleaseToSnapshotTes
 import org.sonatype.nexus.integrationtests.nexus168.Nexus168SnapshotToReleaseTest;
 import org.sonatype.nexus.integrationtests.nexus169.Nexus169ReleaseMetaDataInSnapshotRepoTest;
 import org.sonatype.nexus.integrationtests.nexus176.Nexus176DeployToInvalidRepoTest;
-import org.sonatype.nexus.integrationtests.nexus233.Nexus233PrivilegesCrudTests;
+import org.sonatype.nexus.integrationtests.nexus233.Nexus233PrivilegesCrudXMLTests;
+import org.sonatype.nexus.integrationtests.nexus233.Nexus233PrivilegesValidationTests;
 import org.sonatype.nexus.integrationtests.nexus258.Nexus258ReleaseDeployTest;
 import org.sonatype.nexus.integrationtests.nexus259.Nexus259SnapshotDeployTest;
 import org.sonatype.nexus.integrationtests.nexus260.Nexus260MultipleDeployTest;
@@ -47,7 +48,7 @@ import org.sonatype.nexus.test.utils.NexusStateUtil;
     Nexus133TargetCrudJsonTests.class, Nexus133TargetCrudXmlTests.class, Nexus142UserCrudJsonTests.class,
     Nexus142UserCrudXmlTests.class, Nexus156RolesCrudJsonTests.class, Nexus156RolesCrudXmlTests.class,
     Nexus142UserValidationTests.class, Nexus156RolesValidationTests.class, Nexus133TargetValidationTests.class,
-    Nexus233PrivilegesCrudTests.class } )
+    Nexus233PrivilegesCrudXMLTests.class, Nexus233PrivilegesValidationTests.class } )
 public class IntegrationTestSuite
 {
     //

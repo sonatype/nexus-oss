@@ -17,17 +17,16 @@ import org.sonatype.nexus.rest.model.PrivilegeTargetResource;
 import org.sonatype.nexus.rest.model.PrivilegeTargetStatusResource;
 import org.sonatype.nexus.rest.xstream.XStreamInitializer;
 import org.sonatype.nexus.test.utils.SecurityConfigUtil;
-import org.sonatype.plexus.rest.xstream.json.JsonOrgHierarchicalStreamDriver;
 
 import com.thoughtworks.xstream.XStream;
 
-public class Nexus233PrivilegesCrudTests
+public class Nexus233PrivilegesCrudXMLTests
     extends AbstractNexusIntegrationTest
 {
 
     protected PrivilegesMessageUtil messageUtil;
 
-    public Nexus233PrivilegesCrudTests()
+    public Nexus233PrivilegesCrudXMLTests()
     {
         this.messageUtil =
             new PrivilegesMessageUtil( XStreamInitializer.initialize( new XStream() ), MediaType.APPLICATION_XML,

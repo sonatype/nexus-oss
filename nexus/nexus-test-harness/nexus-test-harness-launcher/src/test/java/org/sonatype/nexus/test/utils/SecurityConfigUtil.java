@@ -160,6 +160,25 @@ public class SecurityConfigUtil
         }
         return null;
     }
+    
+    @SuppressWarnings( "unchecked" )
+    public static CRepoTargetPrivilege getCRepoTargetPrivilegeByName( String privilegeName )
+        throws IOException
+    {
+        Configuration securityConfig = getSecurityConfig();
+        List<CRepoTargetPrivilege> secPrivs = securityConfig.getRepositoryTargetPrivileges();
+
+        for ( Iterator<CRepoTargetPrivilege> iter = secPrivs.iterator(); iter.hasNext(); )
+        {
+            CRepoTargetPrivilege cPriv = iter.next();
+
+            if ( privilegeName.equals( cPriv.getName() ) )
+            {
+                return cPriv;
+            }
+        }
+        return null;
+    }
 
     @SuppressWarnings( "unchecked" )
     public static CApplicationPrivilege getCApplicationPrivilege( String privilegeId )
