@@ -22,6 +22,8 @@ package org.sonatype.nexus.configuration.security;
 
 import java.util.Random;
 
+import org.sonatype.nexus.util.StringDigester;
+
 /**
  * @plexus.component
  */
@@ -60,8 +62,7 @@ public class DefaultPasswordGenerator
 
     public String hashPassword( String password )
     {
-        // TODO Auto-generated method stub
-        return password;
+        return StringDigester.getSha1Digest( password );
     }
 
 }
