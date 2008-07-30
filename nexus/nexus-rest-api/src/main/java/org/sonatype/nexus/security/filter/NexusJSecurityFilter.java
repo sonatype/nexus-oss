@@ -55,7 +55,6 @@ public class NexusJSecurityFilter
     protected boolean shouldNotFilter( ServletRequest request )
         throws ServletException
     {
-        log.info( "SECURITY IS ENABLED: " + getNexus().isSecurityEnabled() );
         return !getNexus().isSecurityEnabled();
     }
 
