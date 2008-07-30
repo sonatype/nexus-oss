@@ -56,7 +56,7 @@ public class NexusHttpAuthenticationFilter
         Nexus nexus = getNexus( request );
 
         UsernamePasswordToken usernamePasswordToken = new UsernamePasswordToken( nexus.getAnonymousUsername(), nexus
-            .getAnonymousUsername() );
+            .getAnonymousPassword() );
 
         try
         {
