@@ -24,7 +24,8 @@ public class LogoutAuthenticationFilter
     }
 
     /**
-     * We are letting the processing chain to continue.
+     * We are letting the processing chain to continue (must implement it is abstract in superclass but we will never
+     * get here).
      */
     @Override
     protected boolean onAccessDenied( ServletRequest request, ServletResponse response )

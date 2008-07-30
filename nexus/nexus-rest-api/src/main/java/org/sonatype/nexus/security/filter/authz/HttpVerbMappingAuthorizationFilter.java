@@ -10,7 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.codehaus.plexus.util.StringUtils;
 import org.jsecurity.web.filter.authz.PermissionsAuthorizationFilter;
-import org.sonatype.nexus.security.filter.authc.NexusHttpAuthenticationFilter;
+import org.sonatype.nexus.security.filter.NexusJSecurityFilter;
 
 /**
  * A filter that maps the action from the HTTP Verb.
@@ -74,7 +74,7 @@ public class HttpVerbMappingAuthorizationFilter
     protected boolean onAccessDenied( ServletRequest request, ServletResponse response )
         throws IOException
     {
-        request.setAttribute( NexusHttpAuthenticationFilter.IS_REJECTED, Boolean.TRUE );
+        request.setAttribute( NexusJSecurityFilter.REQUEST_IS_AUTHZ_REJECTED, Boolean.TRUE );
 
         return false;
     }

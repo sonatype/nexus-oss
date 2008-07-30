@@ -3,41 +3,29 @@ package org.sonatype.nexus.security.filter.authc;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 
-import org.codehaus.plexus.PlexusConstants;
-import org.codehaus.plexus.PlexusContainer;
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.jsecurity.authc.AuthenticationException;
 import org.jsecurity.authc.UsernamePasswordToken;
 import org.jsecurity.subject.Subject;
 import org.jsecurity.web.filter.authc.BasicHttpAuthenticationFilter;
 import org.sonatype.nexus.Nexus;
+import org.sonatype.nexus.security.filter.NexusJSecurityFilter;
 
 public class NexusHttpAuthenticationFilter
     extends BasicHttpAuthenticationFilter
 {
-    public static final String IS_REJECTED = "request.is.rejected";
-
-    private Nexus nexus;
-
-    protected Nexus getNexus()
+    protected boolean isAnonymousAccessAllowed( ServletRequest request )
     {
+        Nexus nexus = (Nexus) request.getAttribute( Nexus.class.getName() );
+
         if ( nexus == null )
         {
-            PlexusContainer plexus = (PlexusContainer) getAttribute( PlexusConstants.PLEXUS_KEY );
-
-            try
-            {
-                nexus = (Nexus) plexus.lookup( Nexus.class );
-            }
-            catch ( ComponentLookupException e )
-            {
-                log.error( "Cannot lookup Nexus!", e );
-
-                throw new IllegalStateException( "Cannot lookup Nexus!", e );
-            }
+            return false;
+        }
+        else
+        {
+            return nexus.isAnonymousAccessEnabled();
         }
 
-        return nexus;
     }
 
     protected boolean onAccessDenied( ServletRequest request, ServletResponse response )
@@ -52,7 +40,7 @@ public class NexusHttpAuthenticationFilter
         if ( !loggedIn )
         {
             // let the user "fall thru" until we get some permission problem
-            if ( getNexus().isAnonymousAccessEnabled() )
+            if ( isAnonymousAccessAllowed( request ) )
             {
                 loggedIn = executeAnonymousLogin( request, response );
             }
@@ -104,7 +92,8 @@ public class NexusHttpAuthenticationFilter
     public void postHandle( ServletRequest request, ServletResponse response )
         throws Exception
     {
-        if ( request.getAttribute( IS_REJECTED ) != null )
+        // we should check is the user anonymous or not?
+        if ( request.getAttribute( NexusJSecurityFilter.REQUEST_IS_AUTHZ_REJECTED ) != null )
         {
             Subject subject = getSubject( request, response );
 

@@ -33,7 +33,7 @@
 	<!-- Filters -->
 	<filter>
 		<filter-name>apiFilter</filter-name>
-		<filter-class>org.sonatype.plexus.jsecurity.web.filter.PlexusJSecurityFilter</filter-class>
+		<filter-class>org.sonatype.nexus.security.filter.NexusJSecurityFilter</filter-class>
 		<init-param>
 			<param-name>config</param-name>
 			<param-value>
@@ -47,7 +47,7 @@
 
 			[urls]
 			/service/local/status/command = authcBasic,perms[nexus:status]
-			/service/local/status = authcBasic,perms[nexus:status]
+			/service/local/status = anon
 			/service/local/feeds/** = authcBasic,perms[nexus:feeds]
 			/service/local/feeds = authcBasic,perms[nexus:feeds]
 			/service/local/authentication/login = authcBasic,perms[nexus:authentication]

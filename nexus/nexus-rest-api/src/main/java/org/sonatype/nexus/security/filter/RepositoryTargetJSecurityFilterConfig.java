@@ -2,10 +2,8 @@ package org.sonatype.nexus.security.filter;
 
 import javax.servlet.ServletRequest;
 
-import org.sonatype.plexus.jsecurity.web.filter.PlexusConfiguration;
-
 public class RepositoryTargetJSecurityFilterConfig
-    extends PlexusConfiguration
+    extends NexusFilterConfiguration
 {
     protected String getPathWithinApplication( ServletRequest request )
     {

@@ -1,9 +1,7 @@
 package org.sonatype.nexus.security.filter;
 
-import org.sonatype.plexus.jsecurity.web.filter.PlexusJSecurityFilter;
-
 public class RepositoryTargetJSecurityFilter
-    extends PlexusJSecurityFilter
+    extends NexusJSecurityFilter
 {
     public RepositoryTargetJSecurityFilter()
     {
