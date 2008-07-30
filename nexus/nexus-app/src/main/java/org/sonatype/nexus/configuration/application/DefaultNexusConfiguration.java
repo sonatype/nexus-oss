@@ -50,6 +50,7 @@ import org.sonatype.nexus.configuration.model.CRepositoryGrouping;
 import org.sonatype.nexus.configuration.model.CRepositoryShadow;
 import org.sonatype.nexus.configuration.model.CRepositoryTarget;
 import org.sonatype.nexus.configuration.model.CRouting;
+import org.sonatype.nexus.configuration.model.CSmtpConfiguration;
 import org.sonatype.nexus.configuration.model.Configuration;
 import org.sonatype.nexus.configuration.validator.InvalidConfigurationException;
 import org.sonatype.nexus.configuration.validator.ValidationResponse;
@@ -1440,5 +1441,18 @@ public class DefaultNexusConfiguration
 
         applyAndSaveConfiguration();
     }
+    
+    public CSmtpConfiguration readSmtpConfiguration()
+    {
+        return getConfiguration().getSmtpConfiguration();
+    }
+    
+    public void updateSmtpConfiguration( CSmtpConfiguration settings )
+        throws ConfigurationException,
+            IOException
+    {
+        getConfiguration().setSmtpConfiguration( settings );
 
+        applyAndSaveConfiguration();
+    }
 }

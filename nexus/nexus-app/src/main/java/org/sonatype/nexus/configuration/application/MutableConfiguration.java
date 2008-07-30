@@ -33,6 +33,7 @@ import org.sonatype.nexus.configuration.model.CRepositoryGroup;
 import org.sonatype.nexus.configuration.model.CRepositoryShadow;
 import org.sonatype.nexus.configuration.model.CRepositoryTarget;
 import org.sonatype.nexus.configuration.model.CRouting;
+import org.sonatype.nexus.configuration.model.CSmtpConfiguration;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryGroupException;
 import org.sonatype.nexus.proxy.registry.ContentClass;
@@ -228,4 +229,11 @@ public interface MutableConfiguration
 
     void deleteRemoteNexusInstance( String alias )
         throws IOException;
+    
+    // Smtp settings
+    CSmtpConfiguration readSmtpConfiguration();
+
+    void updateSmtpConfiguration( CSmtpConfiguration settings )
+        throws ConfigurationException,
+            IOException;
 }

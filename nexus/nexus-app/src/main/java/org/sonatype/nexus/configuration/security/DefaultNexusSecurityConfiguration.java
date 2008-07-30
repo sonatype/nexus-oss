@@ -56,6 +56,8 @@ import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryGroupException;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
+import org.sonatype.nexus.smtp.SmtpClient;
+import org.sonatype.nexus.smtp.SmtpClientException;
 
 /**
  * The class DefaultNexusSecurityConfiguration is responsible for config management. It actually keeps in sync Nexus internal
@@ -90,6 +92,13 @@ public class DefaultNexusSecurityConfiguration
      * @plexus.requirement role-hint="file"
      */
     private SecurityConfigurationSource configurationSource;
+    
+    /**
+     * The smtp client for sending mails.
+     * 
+     * @plexus.requirement
+     */
+    private SmtpClient smtpClient;
 
     /**
      * The config validator.
@@ -97,6 +106,11 @@ public class DefaultNexusSecurityConfiguration
      * @plexus.requirement
      */
     private SecurityConfigurationValidator configurationValidator;
+    
+    /**
+     * @plexus.requirement
+     */
+    private PasswordGenerator pwGenerator;
 
     /**
      * The runtime configuration builder.
@@ -267,14 +281,32 @@ public class DefaultNexusSecurityConfiguration
         throws ConfigurationException,
             IOException
     {
+        //On create we need to generate a new password, and email the user their new password
+        
+        String password = pwGenerator.generatePassword( 5, 25 );
+        
+        settings.setPassword( pwGenerator.hashPassword( password ) );
+        
+        settings.setStatus( CUser.STATUS_EXPIRED );
+        
         ValidationResponse vr = configurationValidator.validateUser( initializeContext(), settings, false );
 
         if ( vr.isValid() )
         {
             //TODO: anything needs to be done for the runtime configuration?
             getConfiguration().getUsers().add( settings );
-
+            
             applyAndSaveConfiguration();
+            
+            try
+            {
+                smtpClient.sendEmail( settings.getEmail(), null, "Nexus: New user account created.", "User Account " + settings.getUserId() + " has been created.  Another email will be sent shortly containing your password." );
+                smtpClient.sendEmail( settings.getEmail(), null, "Nexus: New user account created.", "Your new password is " + password );
+            }
+            catch ( SmtpClientException e )
+            {
+                getLogger().error( "Unable to notify user by email for new user creation", e );
+            }
         }
         else
         {

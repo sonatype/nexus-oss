@@ -6,6 +6,7 @@
   <security>
     <enabled>true</enabled>
     <anonymousAccessEnabled>true</anonymousAccessEnabled>
+    <configurationFile>${runtime}/apps/nexus/conf/security.xml</configurationFile>
     <authenticationSource>
       <type>simple</type>
     </authenticationSource>
@@ -179,4 +180,11 @@
       </properties>
     </task>
   </tasks>
+  <smtpConfiguration>
+    <host>smtp-host</host>
+    <port>1234</port>
+    <username>smtp-username</username>
+    <password>smtp-password</password>
+    <systemEmailAddress>system@nexus.org</systemEmailAddress>
+  </smtpConfiguration>
 </nexusConfiguration>

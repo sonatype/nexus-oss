@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!-- This config will cause 11 validation errors -->
-<!-- This config will cause 1 validation warning -->
+<!-- This config will cause 13 validation errors -->
+<!-- This config will cause 0 validation warnings -->
 
 <nexusSecurity>
 	<version>1.0.0</version>
@@ -29,6 +29,7 @@
 	    <!-- no email address -->
 	    <!-- invalid role id -->
 	    <!-- no password -->
+	    <!-- invalid status -->
 	    <user>     
 	      <roles>
 	        <role>id1</role>

@@ -7,6 +7,17 @@
 	<version>1.0.4</version>
 	<workingDirectory>${nexus.home}/nexus-work</workingDirectory>
 	<applicationLogDirectory>${nexus.home}/logs</applicationLogDirectory>
+	
+    <smtpConfiguration>
+        <host>smtp-host</host>
+        <port>1234</port>
+        <sslEnabled>false</sslEnabled>
+        <tlsEnabled>false</tlsEnabled>
+        <username>smtp-username</username>
+        <password>smtp-password</password>
+        <debugMode>false</debugMode>
+        <systemEmailAddress>system@nexus.org</systemEmailAddress>
+    </smtpConfiguration>
 
 	<security>
 		<enabled>false</enabled>

@@ -18,13 +18,18 @@
  * along with this program.  If not, see http://www.gnu.org/licenses/.
  *
  */
-package org.sonatype.nexus.configuration.security.validator;
+package org.sonatype.nexus.smtp;
 
-public interface PasswordGenerator
+public class SmtpClientException
+    extends Exception
 {
-    String ROLE = PasswordGenerator.class.getName();
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 18978900789L;
     
-    String generatePassword( int minChars, int maxChars );
-    
-    String hashPassword( String password );
+    public SmtpClientException( String message, Throwable t )
+    {
+        super( message, t );
+    }
 }

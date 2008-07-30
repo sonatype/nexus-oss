@@ -34,6 +34,7 @@ import org.sonatype.nexus.configuration.model.CRemoteHttpProxySettings;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.CRepositoryShadow;
 import org.sonatype.nexus.configuration.model.CRouting;
+import org.sonatype.nexus.configuration.model.CSmtpConfiguration;
 import org.sonatype.nexus.feeds.NexusArtifactEvent;
 import org.sonatype.nexus.feeds.SystemEvent;
 import org.sonatype.nexus.feeds.SystemProcess;
@@ -263,6 +264,8 @@ public interface Nexus
     CRemoteConnectionSettings readDefaultGlobalRemoteConnectionSettings();
 
     CRemoteHttpProxySettings readDefaultGlobalRemoteHttpProxySettings();
+    
+    CSmtpConfiguration readDefaultSmtpConfiguration();
 
     CRouting readDefaultRouting();
     

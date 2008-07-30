@@ -18,7 +18,7 @@
  * along with this program.  If not, see http://www.gnu.org/licenses/.
  *
  */
-package org.sonatype.nexus.configuration.security.validator;
+package org.sonatype.nexus.configuration.security;
 
 import java.util.Random;
 

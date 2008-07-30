@@ -1,11 +1,13 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>org.sonatype.nexus</groupId>
 		<artifactId>nexus-parent</artifactId>
 		<version>3-SNAPSHOT</version>
 	</parent>
+
 	<artifactId>nexus</artifactId>
 	<packaging>pom</packaging>
 	<name>Nexus Repository Manager</name>
@@ -13,12 +15,14 @@
 	<description>Sonatype Nexus Repository Manager</description>
 	<inceptionYear>2007</inceptionYear>
 	<mailingLists />
+
 	<licenses>
 		<license>
 			<name>GNU General Public License</name>
 			<url>http://www.gnu.org/licenses/gpl.txt</url>
 		</license>
 	</licenses>
+
 	<developers>
 		<developer>
 			<id>cstamas</id>
@@ -71,6 +75,7 @@
 			<timezone>-9</timezone>
 		</developer>
 	</developers>
+
 	<contributors>
 		<contributor>
 			<name>John Casey</name>
@@ -78,6 +83,7 @@
 			<organization>Sonatype</organization>
 		</contributor>
 	</contributors>
+
 	<modules>
 		<module>nexus-configuration</module>
 		<module>nexus-proxy</module>
@@ -87,6 +93,7 @@
 		<module>nexus-migration-tool</module>
 		<module>nexus-webapp</module>
 	</modules>
+
 	<profiles>
 		<profile>
 			<id>test-harness</id>
@@ -111,8 +118,10 @@
 		<jsw.binaries.version>3.2.3.2</jsw.binaries.version>
 		<plexus.container.version>1.0-alpha-47</plexus.container.version>
 		<plx.plugin.version>1.2-SNAPSHOT</plx.plugin.version>
-		<nexus.indexer.version>1.0-beta-5-SNAPSHOT</nexus.indexer.version>
+		<nexus.indexer.version>1.0-beta-5-SNAPSHOT</nexus.indexer.version>		
+		<plexus.mail.sender.version>1.0-alpha-7</plexus.mail.sender.version>
 	</properties>
+
 	<dependencyManagement>
 		<dependencies>
 
@@ -220,6 +229,22 @@
 				</exclusions>
 			</dependency>
 			<dependency>
+			    <groupId>org.codehaus.plexus</groupId>
+			    <artifactId>plexus-mail-sender-simple</artifactId>
+			    <version>${plexus.mail.sender.version}</version>
+			    <exclusions>
+			        <exclusion>
+                        <groupId>org.codehaus.plexus</groupId>
+                        <artifactId>plexus-utils</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.codehaus.plexus</groupId>
+                        <artifactId>plexus-component-api</artifactId>
+                    </exclusion>
+                </exclusions>
+			</dependency>
+
+			<dependency>
 				<groupId>commons-cli</groupId>
 				<artifactId>commons-cli</artifactId>
 				<version>1.0</version>
@@ -230,6 +255,7 @@
 					</exclusion>
 				</exclusions>
 			</dependency>
+
 			<dependency>
 				<groupId>commons-codec</groupId>
 				<artifactId>commons-codec</artifactId>
@@ -272,6 +298,7 @@
 				<type>jar</type>
 				<scope>runtime</scope>
 			</dependency>
+
 			<dependency>
 				<groupId>log4j</groupId>
 				<artifactId>log4j</artifactId>
@@ -436,6 +463,7 @@
 				<type>jar</type>
 				<scope>runtime</scope>
 			</dependency>
+
 			<dependency>
 				<groupId>org.apache.lucene</groupId>
 				<artifactId>lucene-core</artifactId>
@@ -532,7 +560,9 @@
 										<!--     <exclude>*:velocity:1.4</exclude>
 											<exclude>*:velocity-dep:1.4</exclude>-->
 									</excludes>
-									<message> commons-logging conflicts with slf4j. You probably added a dependency that is missing the exclusions. 
+									<message>
+										commons-logging conflicts with slf4j. You probably added a dependency that is
+										missing the exclusions.
 									</message>
 								</bannedDependencies>
 								<!--  <requirePluginVersions>
@@ -541,19 +571,6 @@
 							</rules>
 							<fail>true</fail>
 						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-source-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>attach-sources</id>
-						<phase>verify</phase>
-						<goals>
-							<goal>jar</goal>
-						</goals>
 					</execution>
 				</executions>
 			</plugin>

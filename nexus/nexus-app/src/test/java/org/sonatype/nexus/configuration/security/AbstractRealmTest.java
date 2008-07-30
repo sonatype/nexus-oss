@@ -41,6 +41,7 @@ import org.sonatype.nexus.configuration.model.CRepositoryGroup;
 import org.sonatype.nexus.configuration.model.CRepositoryShadow;
 import org.sonatype.nexus.configuration.model.CRepositoryTarget;
 import org.sonatype.nexus.configuration.model.CRouting;
+import org.sonatype.nexus.configuration.model.CSmtpConfiguration;
 import org.sonatype.nexus.configuration.security.model.CApplicationPrivilege;
 import org.sonatype.nexus.configuration.security.model.CRepoTargetPrivilege;
 import org.sonatype.nexus.configuration.security.model.CRole;
@@ -503,6 +504,11 @@ public abstract class AbstractRealmTest
         {
             throw new UnsupportedOperationException();
         }
+        
+        public CSmtpConfiguration readDefaultSmtpConfiguration()
+        {
+            throw new UnsupportedOperationException();
+        }
 
         public Repository getRepository( String repoId )
             throws NoSuchRepositoryException
@@ -517,6 +523,18 @@ public abstract class AbstractRealmTest
         }
 
         public Collection<Repository> getRepositories()
+        {
+            throw new UnsupportedOperationException();
+        }
+        
+        public CSmtpConfiguration readSmtpConfiguration()
+        {
+            throw new UnsupportedOperationException();
+        }
+        
+        public void updateSmtpConfiguration( CSmtpConfiguration settings )
+            throws ConfigurationException,
+                IOException
         {
             throw new UnsupportedOperationException();
         }

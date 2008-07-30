@@ -231,6 +231,15 @@
 						<multiplicity>*</multiplicity>
 					</association>
 				</field>
+				<field>
+                    <name>smtpConfiguration</name>
+                    <version>1.0.4+</version>
+                    <description>SMTP Parameters</description>
+                    <required>true</required>
+                    <association>
+                        <type>CSmtpConfiguration</type>
+                    </association>
+                </field>
 			</fields>
 			<codeSegments>
 				<codeSegment>
@@ -1320,6 +1329,15 @@
 					<defaultValue>false</defaultValue>
 				</field>
 				<field>
+				    <name>configurationFile</name>
+				    <version>1.0.4+</version>
+				    <type>String</type>
+				    <required>false</required>
+				    <description>
+				        The location of the security configuration file.  This file will configure the default nexus security.
+				    </description>
+				</field>
+				<field>
 					<name>authenticationSource</name>
 					<version>1.0.0+</version>
 					<description>The authentication source to use with Nexus.</description>
@@ -1802,6 +1820,92 @@
 				</field>
 			</fields>
 		</class>
+		
+		<!-- SMTP Settings -->
+        <class>
+            <name>CSmtpConfiguration</name>
+            <version>1.0.4+</version>
+            <description>The SMTP Settings.</description>
+            <fields>
+                <field>
+                    <name>host</name>
+                    <version>1.0.4+</version>
+                    <type>String</type>
+                    <required>true</required>
+                    <description>
+                        The host of the smtp server.
+                    </description>
+                </field>
+                <field>
+                    <name>port</name>
+                    <version>1.0.4+</version>
+                    <type>int</type>
+                    <required>true</required>
+                    <description>
+                        The port of the smtp server.
+                    </description>
+                    <defaultValue>-1</defaultValue>
+                </field>
+                <field>
+                    <name>sslEnabled</name>
+                    <version>1.0.4+</version>
+                    <type>boolean</type>
+                    <required>false</required>
+                    <description>
+                        Enable ssl.
+                    </description>
+                    <defaultValue>false</defaultValue>
+                </field>
+                <field>
+                    <name>tlsEnabled</name>
+                    <version>1.0.4+</version>
+                    <type>boolean</type>
+                    <required>false</required>
+                    <description>
+                        Enable tls.
+                    </description>
+                    <defaultValue>false</defaultValue>
+                </field>
+                <field>
+                    <name>username</name>
+                    <version>1.0.4+</version>
+                    <type>String</type>
+                    <required>false</required>
+                    <description>
+                        Username to access smtp server.
+                    </description>
+                </field>
+                <field>
+                    <name>password</name>
+                    <version>1.0.4+</version>
+                    <type>String</type>
+                    <required>false</required>
+                    <description>
+                        Password to access smtp server.
+                    </description>
+                </field>
+                <field>
+                    <name>debugMode</name>
+                    <version>1.0.4+</version>
+                    <type>boolean</type>
+                    <required>false</required>
+                    <description>
+                        Enable debug mode.
+                    </description>
+                    <defaultValue>false</defaultValue>
+                </field>
+                <field>
+                    <name>systemEmailAddress</name>
+                    <version>1.0.4+</version>
+                    <type>String</type>
+                    <required>true</required>
+                    <description>
+                        Email addresses that Nexus will use to send emails from.
+                    </description>
+                    <defaultValue>nexus-system@sonatype.org</defaultValue>
+                </field>
+            </fields>
+        </class>
 
 		<!-- UTIL -->
 		<class>

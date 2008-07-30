@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.log4j.net.SMTPAppender;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
@@ -49,6 +50,7 @@ import org.sonatype.nexus.configuration.model.CRouting;
 import org.sonatype.nexus.configuration.model.CScheduleConfig;
 import org.sonatype.nexus.configuration.model.CScheduledTask;
 import org.sonatype.nexus.configuration.model.CSecurity;
+import org.sonatype.nexus.configuration.model.CSmtpConfiguration;
 import org.sonatype.nexus.configuration.model.v1_0_3.CAdvancedSchedule;
 import org.sonatype.nexus.configuration.model.v1_0_3.CDailySchedule;
 import org.sonatype.nexus.configuration.model.v1_0_3.CGroupsSettingPathMappingItem;
@@ -180,6 +182,16 @@ public class Upgrade103to104
         newc.setVersion( org.sonatype.nexus.configuration.model.Configuration.MODEL_VERSION );
         newc.setWorkingDirectory( oldc.getWorkingDirectory() );
         newc.setApplicationLogDirectory( oldc.getApplicationLogDirectory() );
+        
+        // Just add some default config
+        CSmtpConfiguration smtp = new CSmtpConfiguration();
+        smtp.setHost( "smtp-host" );
+        smtp.setPassword( "smtp-password" );
+        smtp.setPort( 1234 );
+        smtp.setSystemEmailAddress( "system@nexus.org" );
+        smtp.setUsername( "smtp-username" );
+        
+        newc.setSmtpConfiguration( smtp );
 
         CSecurity security = new CSecurity();
 
@@ -222,6 +234,9 @@ public class Upgrade103to104
             security.setAuthenticationSource( new CAuthSource() );
             security.getAuthenticationSource().setType( "simple" );
         }
+        
+        // Add the new config file
+        security.setConfigurationFile( "${runtime}/apps/nexus/conf/security.xml" );
 
         newc.setSecurity( security );
 

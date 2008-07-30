@@ -36,6 +36,7 @@ import org.sonatype.nexus.configuration.model.CRouting;
 import org.sonatype.nexus.configuration.model.CScheduleConfig;
 import org.sonatype.nexus.configuration.model.CScheduledTask;
 import org.sonatype.nexus.configuration.model.CSecurity;
+import org.sonatype.nexus.configuration.model.CSmtpConfiguration;
 import org.sonatype.nexus.configuration.validator.ConfigurationValidator;
 import org.sonatype.nexus.configuration.validator.ValidationResponse;
 
@@ -176,4 +177,13 @@ public interface ApplicationConfigurationValidator extends ConfigurationValidato
      * @return
      */
     ValidationResponse validateSchedule( ApplicationValidationContext ctx, CScheduleConfig settings );
+    
+    /**
+     * Validates smtp
+     * 
+     * @param ctx
+     * @param settings
+     * @return
+     */
+    ValidationResponse validateSmtpConfiguration( ApplicationValidationContext ctx, CSmtpConfiguration settings );
 }

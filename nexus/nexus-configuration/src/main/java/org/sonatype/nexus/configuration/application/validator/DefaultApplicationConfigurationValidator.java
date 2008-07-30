@@ -48,6 +48,7 @@ import org.sonatype.nexus.configuration.model.CRouting;
 import org.sonatype.nexus.configuration.model.CScheduleConfig;
 import org.sonatype.nexus.configuration.model.CScheduledTask;
 import org.sonatype.nexus.configuration.model.CSecurity;
+import org.sonatype.nexus.configuration.model.CSmtpConfiguration;
 import org.sonatype.nexus.configuration.model.Configuration;
 import org.sonatype.nexus.configuration.validator.ValidationMessage;
 import org.sonatype.nexus.configuration.validator.ValidationRequest;
@@ -213,6 +214,8 @@ public class DefaultApplicationConfigurationValidator
                 response.append( validateScheduledTask( context, task ) );
             }
         }
+        
+        response.append( validateSmtpConfiguration( context, model.getSmtpConfiguration() ) );
 
         // summary
         if ( response.getValidationErrors().size() > 0 || response.getValidationWarnings().size() > 0 )
@@ -858,6 +861,36 @@ public class DefaultApplicationConfigurationValidator
         if ( ctx != null )
         {
             response.setContext( ctx );
+        }
+
+        return response;
+    }
+    
+    public ValidationResponse validateSmtpConfiguration( ApplicationValidationContext ctx, CSmtpConfiguration settings )
+    {
+        ValidationResponse response = new ApplicationValidationResponse();
+
+        if ( ctx != null )
+        {
+            response.setContext( ctx );
+        }
+        
+        if ( StringUtils.isEmpty( settings.getHost() ) )
+        {
+            ValidationMessage msg = new ValidationMessage( "host", "SMTP Host is empty." );
+            response.addValidationError( msg );
+        }
+        
+        if ( settings.getPort() < 0 )
+        {
+            ValidationMessage msg = new ValidationMessage( "port", "SMTP Port is inavlid.  Enter a port greater than 0." );
+            response.addValidationError( msg );
+        }
+        
+        if ( StringUtils.isEmpty( settings.getSystemEmailAddress() ) )
+        {
+            ValidationMessage msg = new ValidationMessage( "systemEmailAddress", "System Email Address is empty." );
+            response.addValidationError( msg );
         }
 
         return response;

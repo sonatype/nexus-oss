@@ -56,6 +56,7 @@ import org.sonatype.nexus.configuration.model.CRepositoryGroup;
 import org.sonatype.nexus.configuration.model.CRepositoryShadow;
 import org.sonatype.nexus.configuration.model.CRepositoryTarget;
 import org.sonatype.nexus.configuration.model.CRouting;
+import org.sonatype.nexus.configuration.model.CSmtpConfiguration;
 import org.sonatype.nexus.configuration.security.NexusSecurityConfiguration;
 import org.sonatype.nexus.feeds.FeedRecorder;
 import org.sonatype.nexus.feeds.NexusArtifactEvent;
@@ -689,6 +690,18 @@ public class DefaultNexus
         nexusConfiguration.deleteRemoteNexusInstance( alias );
     }
     
+    public CSmtpConfiguration readSmtpConfiguration()
+    {
+        return nexusConfiguration.readSmtpConfiguration();
+    }
+    
+    public void updateSmtpConfiguration( CSmtpConfiguration settings )
+        throws ConfigurationException,
+            IOException
+    {
+        nexusConfiguration.updateSmtpConfiguration( settings );
+    }
+    
     // =============
     // Maintenance
 
@@ -1087,6 +1100,11 @@ public class DefaultNexus
     public CRouting readDefaultRouting()
     {
         return nexusConfiguration.getConfigurationSource().getDefaultsSource().getConfiguration().getRouting();
+    }
+    
+    public CSmtpConfiguration readDefaultSmtpConfiguration()
+    {
+        return nexusConfiguration.getConfigurationSource().getDefaultsSource().getConfiguration().getSmtpConfiguration();
     }
 
     // =============
