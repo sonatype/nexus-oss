@@ -28,6 +28,8 @@ import org.codehaus.plexus.mailsender.MailSender;
 import org.codehaus.plexus.mailsender.MailSenderException;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
+import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
+import org.sonatype.nexus.configuration.ConfigurationChangeListener;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.configuration.model.CSmtpConfiguration;
 
@@ -36,7 +38,7 @@ import org.sonatype.nexus.configuration.model.CSmtpConfiguration;
  */
 public class DefaultSmtpClient
     implements
-        SmtpClient, Initializable
+        SmtpClient, Initializable, ConfigurationChangeListener
 {
     /**
      * @plexus.requirement
@@ -50,17 +52,33 @@ public class DefaultSmtpClient
      */
     private NexusConfiguration nexusConfiguration;
     
+    private boolean initialized = false;
+    
     public void initialize()
         throws InitializationException
     {
-        //CSmtpConfiguration config = nexusConfiguration.getConfiguration().getSmtpConfiguration();
-        
-        //sender.setSmtpHost( config.getHost() );
-        //sender.setSmtpPort( config.getPort() );
-        //sender.setSslMode( config.isSslEnabled(), config.isTlsEnabled() );
-        //sender.setUsername( config.getUsername() );
-        //sender.setPassword( config.getPassword() );
-        //sender.setDebugMode( config.isDebugMode() );
+        nexusConfiguration.addConfigurationChangeListener( this );
+    }
+    
+    public void onConfigurationChange( ConfigurationChangeEvent evt )
+    {
+        initialize( true );
+    }
+    
+    public void initialize( boolean force )
+    {
+        if ( force || !initialized )
+        {
+            CSmtpConfiguration config = nexusConfiguration.getConfiguration().getSmtpConfiguration();
+            
+            sender.setSmtpHost( config.getHost() );
+            sender.setSmtpPort( config.getPort() );
+            sender.setSslMode( config.isSslEnabled(), config.isTlsEnabled() );
+            sender.setUsername( config.getUsername() );
+            sender.setPassword( config.getPassword() );
+            sender.setDebugMode( config.isDebugMode() );
+            initialized = true;
+        }
     }
     
     public void sendEmail( String to, String from, String subject, String body )
@@ -77,6 +95,8 @@ public class DefaultSmtpClient
     {   
         try
         {
+            initialize( false );
+            
             MailMessage message = new MailMessage();
             
             for ( String to : toList )
