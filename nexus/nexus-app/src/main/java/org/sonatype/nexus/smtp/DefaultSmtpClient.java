@@ -104,7 +104,7 @@ public class DefaultSmtpClient
                 message.addTo( to, null );
             }
             
-            message.setFrom( from, null );
+            message.setFrom( from == null ? nexusConfiguration.getConfiguration().getSmtpConfiguration().getSystemEmailAddress() : from , null );
             message.setSubject( subject );
             message.setContent( body );
     
