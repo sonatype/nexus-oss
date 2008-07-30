@@ -22,6 +22,7 @@ public class HttpVerbMappingAuthorizationFilter
 {
     private Map<String, String> mapping = new HashMap<String, String>();
     {
+        mapping.put( "head", "read" );
         mapping.put( "get", "read" );
         mapping.put( "put", "update" );
         mapping.put( "post", "create" );
@@ -29,16 +30,14 @@ public class HttpVerbMappingAuthorizationFilter
 
     protected String getActionFromHttpVerb( HttpServletRequest request )
     {
-        String method = request.getMethod().toLowerCase();
+        String action = request.getMethod().toLowerCase();
 
-        if ( mapping.containsKey( method ) )
+        if ( mapping.containsKey( action ) )
         {
-            return mapping.get( method );
+            action = mapping.get( action );
         }
-        else
-        {
-            return method;
-        }
+
+        return action;
     }
 
     public boolean isAccessAllowed( ServletRequest request, ServletResponse response, Object mappedValue )
