@@ -1332,7 +1332,7 @@
 				    <name>configurationFile</name>
 				    <version>1.0.4+</version>
 				    <type>String</type>
-				    <required>false</required>
+				    <required>true</required>
 				    <description>
 				        The location of the security configuration file.  This file will configure the default nexus security.
 				    </description>

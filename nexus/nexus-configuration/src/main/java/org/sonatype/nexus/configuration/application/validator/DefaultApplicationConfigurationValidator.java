@@ -285,6 +285,13 @@ public class DefaultApplicationConfigurationValidator
                 response.setModified( true );
             }
         }
+        
+        if ( StringUtils.isEmpty( settings.getConfigurationFile() ) )
+        {
+            response.addValidationWarning( " Security Configuration File not set, using default." );
+            settings.setConfigurationFile( "${runtime}/apps/nexus/conf/security.xml" );
+            response.setModified( true );
+        }
 
         // collect existing realms, if any
         ApplicationValidationContext context = (ApplicationValidationContext) response.getContext();

@@ -68,6 +68,8 @@ public class DefaultApplicationConfigurationValidatorTest
         assertTrue( response.isModified() );
 
         assertEquals( 1, response.getValidationErrors().size() );
+        
+        assertEquals( 4, response.getValidationWarnings().size() );
     }
 
     public void testBad2()
