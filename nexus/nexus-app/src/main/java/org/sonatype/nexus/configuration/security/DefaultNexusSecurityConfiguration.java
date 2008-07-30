@@ -283,7 +283,7 @@ public class DefaultNexusSecurityConfiguration
     {
         //On create we need to generate a new password, and email the user their new password
         
-        String password = pwGenerator.generatePassword( 5, 25 );
+        String password = pwGenerator.generatePassword( 10, 10 );
         
         settings.setPassword( pwGenerator.hashPassword( password ) );
         

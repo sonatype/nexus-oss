@@ -61,7 +61,7 @@ public class DefaultPasswordGenerator
     public String hashPassword( String password )
     {
         // TODO Auto-generated method stub
-        return null;
+        return password;
     }
 
 }
