@@ -63,6 +63,7 @@ public class NexusHttpAuthenticationFilter
 
         Subject subject = getSubject( request, response );
 
+        // TODO: make this configurable
         UsernamePasswordToken usernamePasswordToken = new UsernamePasswordToken( "anonymous", "anonymous" );
 
         try
