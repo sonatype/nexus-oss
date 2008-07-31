@@ -114,6 +114,11 @@ public class LoginResourceHandler
 
     protected int getFlagsForPermission( Subject subject, String domain )
     {
+        if ( subject == null )
+        {
+            return NONE;
+        }
+
         Permission readPerm = new WildcardPermission( domain + ":" + CPrivilege.METHOD_READ );
 
         Permission createPerm = new WildcardPermission( domain + ":" + CPrivilege.METHOD_CREATE );
