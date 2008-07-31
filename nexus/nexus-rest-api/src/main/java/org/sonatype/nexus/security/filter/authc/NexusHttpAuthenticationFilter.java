@@ -2,7 +2,10 @@ package org.sonatype.nexus.security.filter.authc;
 
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.jsecurity.authc.AuthenticationException;
 import org.jsecurity.authc.UsernamePasswordToken;
 import org.jsecurity.subject.Subject;
@@ -13,6 +16,38 @@ import org.sonatype.nexus.security.filter.NexusJSecurityFilter;
 public class NexusHttpAuthenticationFilter
     extends BasicHttpAuthenticationFilter
 {
+    private static final String FAKE_AUTH_SCHEME = "NxBASIC";
+
+    private final Log logger = LogFactory.getLog( this.getClass() );
+
+    private boolean fakeAuthScheme;
+
+    protected Log getLogger()
+    {
+        return logger;
+    }
+
+    public boolean isFakeAuthScheme()
+    {
+        return fakeAuthScheme;
+    }
+
+    public void setFakeAuthScheme( boolean fakeAuthScheme )
+    {
+        this.fakeAuthScheme = fakeAuthScheme;
+
+        if ( fakeAuthScheme )
+        {
+            setAuthcHeaderScheme( FAKE_AUTH_SCHEME );
+            setAuthzHeaderScheme( FAKE_AUTH_SCHEME );
+        }
+        else
+        {
+            setAuthcHeaderScheme( HttpServletRequest.BASIC_AUTH );
+            setAuthzHeaderScheme( HttpServletRequest.BASIC_AUTH );
+        }
+    }
+
     protected Nexus getNexus( ServletRequest request )
     {
         return (Nexus) request.getAttribute( Nexus.class.getName() );
@@ -44,11 +79,26 @@ public class NexusHttpAuthenticationFilter
         return loggedIn;
     }
 
+    protected boolean isLoginAttempt( String authzHeader )
+    {
+        // handle BASIC in the same way as our faked one
+        String authzHeaderScheme = getAuthzHeaderScheme().toLowerCase();
+
+        if ( authzHeader.toLowerCase().startsWith( HttpServletRequest.BASIC_AUTH.toLowerCase() ) )
+        {
+            return true;
+        }
+        else
+        {
+            return super.isLoginAttempt( authzHeaderScheme );
+        }
+    }
+
     protected boolean executeAnonymousLogin( ServletRequest request, ServletResponse response )
     {
-        if ( log.isDebugEnabled() )
+        if ( getLogger().isDebugEnabled() )
         {
-            log.debug( "Attempting to authenticate Subject as Anonymous request..." );
+            getLogger().debug( "Attempting to authenticate Subject as Anonymous request..." );
         }
 
         Subject subject = getSubject( request, response );
@@ -62,18 +112,18 @@ public class NexusHttpAuthenticationFilter
         {
             subject.login( usernamePasswordToken );
 
-            if ( log.isDebugEnabled() )
+            if ( getLogger().isDebugEnabled() )
             {
-                log.debug( "Successfully logged in as anonymous" );
+                getLogger().debug( "Successfully logged in as anonymous" );
             }
 
             return true;
         }
         catch ( AuthenticationException ae )
         {
-            if ( log.isDebugEnabled() )
+            if ( getLogger().isDebugEnabled() )
             {
-                log.debug( "Unable to log in subject as anonymous", ae );
+                getLogger().debug( "Unable to log in subject as anonymous", ae );
             }
         }
 
@@ -92,9 +142,9 @@ public class NexusHttpAuthenticationFilter
 
             subject.logout();
 
-            if ( log.isDebugEnabled() )
+            if ( getLogger().isDebugEnabled() )
             {
-                log.debug( "Request processing is rejected coz lacking of perms/roles, rechallenging..." );
+                getLogger().debug( "Request processing is rejected coz lacking of perms/roles, rechallenging..." );
             }
 
             sendChallenge( request, response );

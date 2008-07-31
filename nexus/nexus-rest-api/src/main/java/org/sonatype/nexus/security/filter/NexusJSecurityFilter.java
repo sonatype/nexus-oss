@@ -42,8 +42,6 @@ public class NexusJSecurityFilter
             }
             catch ( ComponentLookupException e )
             {
-                log.error( "Cannot lookup Nexus!", e );
-
                 throw new IllegalStateException( "Cannot lookup Nexus!", e );
             }
         }
