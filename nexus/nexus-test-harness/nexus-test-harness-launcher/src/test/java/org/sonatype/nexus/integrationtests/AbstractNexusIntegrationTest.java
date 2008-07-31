@@ -16,12 +16,14 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLDecoder;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.ResourceBundle;
 
 import junit.framework.Assert;
 
+import org.apache.commons.httpclient.HttpStatus;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.wagon.ConnectionException;
@@ -65,7 +67,8 @@ import com.thoughtworks.xstream.io.xml.XppDriver;
 
 /**
  * curl --user admin:admin123 --request PUT http://localhost:8081/nexus/service/local/status/command --data START NOTE,
- * this class is not really abstract so I can work around a the <code>@BeforeClass</code>, <code>@AfterClass</code> issues, this should be refactored a little, but it might be ok, if we switch to TestNg
+ * this class is not really abstract so I can work around a the <code>@BeforeClass</code>, <code>@AfterClass</code>
+ * issues, this should be refactored a little, but it might be ok, if we switch to TestNg
  */
 public class AbstractNexusIntegrationTest
 {
@@ -94,8 +97,6 @@ public class AbstractNexusIntegrationTest
 
     private String nexusWorkDir;
 
-
-
     public static final String RELATIVE_CONF_DIR = "runtime/apps/nexus/conf";
 
     protected AbstractNexusIntegrationTest()
@@ -118,9 +119,10 @@ public class AbstractNexusIntegrationTest
     /**
      * To me this seems like a bad hack around this problem. I don't have any other thoughts though. <BR/>If you see
      * this and think: "Wow, why did he to that instead of XYZ, please let me know." <BR/> The issue is that we want to
-     * init the tests once (to start/stop the app) and the <code>@BeforeClass</code> is static, so we don't have access to the package name of the running tests. We are going to
-     *              use the package name to find resources for additional setup. NOTE: With this setup running multiple
-     *              Test at the same time is not possible.
+     * init the tests once (to start/stop the app) and the <code>@BeforeClass</code> is static, so we don't have access
+     * to the package name of the running tests. We are going to use the package name to find resources for additional
+     * setup. NOTE: With this setup running multiple Test at the same time is not possible.
+     *
      * @throws Exception
      */
     @Before
@@ -215,6 +217,7 @@ public class AbstractNexusIntegrationTest
                 {
                     Assert.fail( "The test artifact is either missing or has an invalid Distribution Management section." );
                 }
+                String repositoryId = model.getDistributionManagement().getRepository().getId();
                 String deployUrl = model.getDistributionManagement().getRepository().getUrl();
 
                 // FIXME, this needs to be fluffed up a little, should add the classifier, etc.
@@ -223,14 +226,17 @@ public class AbstractNexusIntegrationTest
 
                 System.out.println( "wow, this is working: " + artifactFile );
 
-                // deploy pom
-                DeployUtils.deployWithWagon( this.container, "http", deployUrl, pom,
-                                             this.getRelitiveArtifactPath( model.getGroupId(), model.getArtifactId(),
-                                                                           model.getVersion(), "pom" ) );
-                // deploy artifact
-                DeployUtils.deployWithWagon( this.container, "http", deployUrl, artifactFile,
-                                             this.getRelitiveArtifactPath( model.getGroupId(), model.getArtifactId(),
-                                                                           model.getVersion(), model.getPackaging() ) );
+                Gav gav =
+                    new Gav( model.getGroupId(), model.getArtifactId(), model.getVersion(), null, model.getPackaging(),
+                             0, new Date().getTime(), model.getName(), false, false, null, false, null );
+
+                // the Restlet Client does not support multipart forms:
+                // http://restlet.tigris.org/issues/show_bug.cgi?id=71
+
+                int status = DeployUtils.deployUsingPomWithRest( deployUrl, repositoryId, gav, artifactFile, pom );
+
+                // TODO should I check this status?
+                Assert.assertFalse( status == HttpStatus.SC_BAD_REQUEST );
 
             }
 
@@ -333,39 +339,40 @@ public class AbstractNexusIntegrationTest
         System.out.println( "copying " + configFile + " to:  "
             + new File( this.nexusBaseDir + "/" + RELATIVE_CONF_DIR, configFile ) );
 
-        FileTestingUtils.interpolationFileCopy( testConfigFile, new File( this.nexusBaseDir + "/" + RELATIVE_CONF_DIR, configFile ), variables );
-        
+        FileTestingUtils.interpolationFileCopy( testConfigFile, new File( this.nexusBaseDir + "/" + RELATIVE_CONF_DIR,
+                                                                          configFile ), variables );
+
     }
 
     private void copyConfigFile( String configFile )
         throws IOException
     {
         this.copyConfigFile( configFile, new HashMap<String, String>() );
-        
-//        // the test can override the test config.
-//        File testConfigFile = this.getTestResourceAsFile( "test-config/" + configFile );
-//
-//        // if the tests doesn't have a different config then use the default.
-//        // we need to replace every time to make sure no one changes it.
-//        if ( testConfigFile == null || !testConfigFile.exists() )
-//        {
-//            testConfigFile = this.getResource( "default-config/" + configFile );
-//        }
-//        else
-//        {
-//            System.out.println( "This test is using its own " + configFile + " " + testConfigFile );
-//        }
-//
-//        System.out.println( "copying " + configFile + " to:  "
-//            + new File( this.nexusBaseDir + "/" + RELATIVE_CONF_DIR, configFile ) );
-//
-//        FileUtils.copyFile( testConfigFile, new File( this.nexusBaseDir + "/" + RELATIVE_CONF_DIR, configFile ) );
+
+        // // the test can override the test config.
+        // File testConfigFile = this.getTestResourceAsFile( "test-config/" + configFile );
+        //
+        // // if the tests doesn't have a different config then use the default.
+        // // we need to replace every time to make sure no one changes it.
+        // if ( testConfigFile == null || !testConfigFile.exists() )
+        // {
+        // testConfigFile = this.getResource( "default-config/" + configFile );
+        // }
+        // else
+        // {
+        // System.out.println( "This test is using its own " + configFile + " " + testConfigFile );
+        // }
+        //
+        // System.out.println( "copying " + configFile + " to:  "
+        // + new File( this.nexusBaseDir + "/" + RELATIVE_CONF_DIR, configFile ) );
+        //
+        // FileUtils.copyFile( testConfigFile, new File( this.nexusBaseDir + "/" + RELATIVE_CONF_DIR, configFile ) );
     }
 
     /**
      * Returns a File if it exists, null otherwise. Files returned by this method must be located in the
      * "src/test/resourcs/nexusXXX/" folder.
-     * 
+     *
      * @param relativePath path relative to the nexusXXX directory.
      * @return A file specified by the relativePath. or null if it does not exist.
      */
@@ -384,7 +391,7 @@ public class AbstractNexusIntegrationTest
     /**
      * Returns a File if it exists, null otherwise. Files returned by this method must be located in the
      * "src/test/resourcs/nexusXXX/files/" folder.
-     * 
+     *
      * @param relativePath path relative to the files directory.
      * @return A file specified by the relativePath. or null if it does not exist.
      */
@@ -590,8 +597,6 @@ public class AbstractNexusIntegrationTest
         }
         return downloadedFile;
     }
-
-    
 
     protected void deleteFromRepository( String groupOrArtifactPath )
     {

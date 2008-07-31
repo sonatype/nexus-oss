@@ -10,10 +10,9 @@
 
     <distributionManagement>
   	<repository>
-  		<id>releases</id>
-  		<name>Releases</name>
-  		<!--<<url>http://localhost:8081/nexus/content/repositories/snapshots</url>-->
-  		<url>${nexus-base-url}content/repositories/nexus-test-harness-repo</url>
+  		<id>nexus-test-harness-repo</id>
+  		<!--<url>${nexus-base-url}content/repositories/nexus-test-harness-repo</url>-->
+  		<url>${nexus-base-url}service/local/artifact/maven/content</url>
   	</repository>
   </distributionManagement>
 
