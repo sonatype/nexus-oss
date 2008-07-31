@@ -23,7 +23,7 @@
 		<proxy-repo-target-dir>${project.build.directory}/test-classes/${proxy-repo-target-dir-name}</proxy-repo-target-dir>
 		<nexus-plexus-config-file>${nexus-abs-basedir}/conf/plexus.xml</nexus-plexus-config-file>
 		<proxy-repo-plexus-config-file>${project.build.directory}/test-classes/proxyRepo/conf/ProxyRepoPlexus.xml</proxy-repo-plexus-config-file>
-		<proxy-repo-port>8089</proxy-repo-port>
+		<proxy-repo-port>8090</proxy-repo-port>
 		<proxy-repo-base-url>http://localhost:${proxy-repo-port}/remote/</proxy-repo-base-url>
 		<nexus-application-protocol>http</nexus-application-protocol>
 		<nexus-application-host>localhost</nexus-application-host>
