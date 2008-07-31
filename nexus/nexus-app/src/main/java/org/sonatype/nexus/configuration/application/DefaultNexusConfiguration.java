@@ -139,6 +139,9 @@ public class DefaultNexusConfiguration
 
     /** The trash */
     private File wastebasketDirectory;
+    
+    /** The security config file */
+    private File securityConfigurationFile;
 
     /** The config event listeners. */
     private CopyOnWriteArrayList<ConfigurationChangeListener> configurationChangeListeners = new CopyOnWriteArrayList<ConfigurationChangeListener>();
@@ -179,6 +182,8 @@ public class DefaultNexusConfiguration
             temporaryDirectory = null;
 
             wastebasketDirectory = null;
+            
+            securityConfigurationFile = null;
 
             // create shared remote ctx
             remoteStorageContext = new DefaultRemoteStorageContext();
@@ -214,6 +219,8 @@ public class DefaultNexusConfiguration
         temporaryDirectory = null;
 
         wastebasketDirectory = null;
+        
+        securityConfigurationFile = null;
 
         notifyConfigurationChangeListeners();
     }
@@ -318,6 +325,20 @@ public class DefaultNexusConfiguration
     public File getWorkingDirectory( String key )
     {
         return new File( getWorkingDirectory(), key );
+    }
+    
+    public File getSecurityConfigurationFile()
+    {
+        if ( securityConfigurationFile == null )
+        {
+            securityConfigurationFile = new File( getConfiguration().getSecurity().getConfigurationFile() );
+            
+            if ( !securityConfigurationFile.exists() )
+            {
+                securityConfigurationFile.getParentFile().mkdirs();
+            }
+        }
+        return securityConfigurationFile;
     }
 
     public File getTemporaryDirectory()
@@ -616,6 +637,19 @@ public class DefaultNexusConfiguration
     {
         getConfiguration().setWorkingDirectory( settings );
 
+        applyAndSaveConfiguration();
+    }
+    
+    public String readSecurityConfigurationFile()
+    {
+        return getConfiguration().getSecurity().getConfigurationFile();
+    }
+    
+    public void updateSecurityConfigurationFile( String settings )
+        throws IOException
+    {
+        getConfiguration().getSecurity().setConfigurationFile( settings );
+        
         applyAndSaveConfiguration();
     }
 

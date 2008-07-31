@@ -122,35 +122,19 @@ public class DefaultNexusSecurityConfiguration
      * @plexus.requirement
      */
     private SecurityRuntimeConfigurationBuilder runtimeConfigurationBuilder;
-    
-    private File configurationFile = null;
 
     /** The config event listeners. */
     private CopyOnWriteArrayList<ConfigurationChangeListener> configurationChangeListeners =
         new CopyOnWriteArrayList<ConfigurationChangeListener>();
-    
-    public File getConfigurationFile()
-    {
-        if ( configurationFile == null )
-        {
-            configurationFile = new File( nexusConfiguration.getConfiguration().getSecurity().getConfigurationFile() );
-            
-            configurationFile.getParentFile().mkdirs();
-        }
         
-        return configurationFile;
-    }
-    
     public void onConfigurationChange( ConfigurationChangeEvent evt )
     {
         getLogger().debug( "Nexus Configuration Loaded, now loading Security Configuration" );
         try
-        {
-            configurationFile = null;
-            
+        {            
             if ( FileConfigurationSource.class.isAssignableFrom( configurationSource.getClass() ) )
             {
-                ( ( FileConfigurationSource ) configurationSource ).setConfigurationFile( getConfigurationFile() );
+                ( ( FileConfigurationSource ) configurationSource ).setConfigurationFile( new File( nexusConfiguration.readSecurityConfigurationFile() ) );
             }
             
             loadConfiguration( true );
@@ -195,8 +179,6 @@ public class DefaultNexusSecurityConfiguration
         if ( force || configurationSource.getConfiguration() == null )
         {
             getLogger().debug( "Loading Nexus Security Configuration..." );
-            
-            configurationFile = null;
 
             configurationSource.loadConfiguration();
 
@@ -211,8 +193,6 @@ public class DefaultNexusSecurityConfiguration
         throws IOException
     {
         getLogger().debug( "Applying Nexus Security Configuration..." );
-        
-        configurationFile = null;
 
         notifyConfigurationChangeListeners();
     }

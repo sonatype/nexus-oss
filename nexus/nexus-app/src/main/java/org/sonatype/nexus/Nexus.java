@@ -262,8 +262,10 @@ public interface Nexus
         throws IOException;
 
     String readDefaultWorkingDirectory();
-
+    
     String readDefaultApplicationLogDirectory();
+    
+    String readDefaultSecurityConfigurationFile();
 
     CRemoteConnectionSettings readDefaultGlobalRemoteConnectionSettings();
 

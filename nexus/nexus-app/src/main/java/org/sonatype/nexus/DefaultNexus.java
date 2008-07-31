@@ -441,6 +441,17 @@ public class DefaultNexus
     {
         nexusConfiguration.updateWorkingDirectory( settings );
     }
+    
+    public String readSecurityConfigurationFile()
+    {
+        return nexusConfiguration.readSecurityConfigurationFile();
+    }
+
+    public void updateSecurityConfigurationFile( String settings )
+        throws IOException
+    {
+        nexusConfiguration.updateSecurityConfigurationFile( settings );
+    }
 
     public String readApplicationLogDirectory()
     {
@@ -1106,6 +1117,11 @@ public class DefaultNexus
     public String readDefaultWorkingDirectory()
     {
         return nexusConfiguration.getConfigurationSource().getDefaultsSource().getConfiguration().getWorkingDirectory();
+    }
+    
+    public String readDefaultSecurityConfigurationFile()
+    {
+        return nexusConfiguration.getConfigurationSource().getDefaultsSource().getConfiguration().getSecurity().getConfigurationFile();
     }
 
     public String readDefaultApplicationLogDirectory()

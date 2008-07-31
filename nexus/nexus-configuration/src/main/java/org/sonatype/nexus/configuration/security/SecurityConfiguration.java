@@ -36,11 +36,4 @@ public interface SecurityConfiguration extends NotifiableConfiguration
      * Get the configuration object
      */
     Configuration getConfiguration();
-    
-    /**
-     * Get the configuration file
-     * 
-     * @return
-     */
-    File getConfigurationFile();
 }

@@ -20,6 +20,15 @@
  */
 package org.sonatype.nexus.configuration.security;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+import java.util.concurrent.RejectedExecutionException;
+
 import junit.framework.TestCase;
 
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.StartingException;
@@ -89,16 +98,6 @@ import org.sonatype.scheduling.NoSuchTaskException;
 import org.sonatype.scheduling.ScheduledTask;
 import org.sonatype.scheduling.SchedulerTask;
 import org.sonatype.scheduling.schedules.Schedule;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
-import java.util.concurrent.RejectedExecutionException;
 
 public abstract class AbstractRealmTest
     extends TestCase
@@ -310,10 +309,6 @@ public abstract class AbstractRealmTest
         }
 
         // Unimplemented methods
-        public File getConfigurationFile()
-        {
-            throw new UnsupportedOperationException();
-        }
         
         public Collection<CUser> listUsers()
         {
@@ -493,6 +488,22 @@ public abstract class AbstractRealmTest
             throws NoSuchRepositoryGroupException
         {
             return repositoryGroups.get( repoGroupId );
+        }
+        
+        public String readDefaultSecurityConfigurationFile()
+        {
+            throw new UnsupportedOperationException();
+        }
+        
+        public String readSecurityConfigurationFile()
+        {
+            throw new UnsupportedOperationException();
+        }
+        
+        public void updateSecurityConfigurationFile( String settings )
+            throws IOException
+        {
+            throw new UnsupportedOperationException();
         }
 
         // Unimplemented methods
