@@ -47,54 +47,59 @@
 	<td>500</td>
 </tr>
 <tr>
+	<td>type</td>
+	<td>quick-search--field</td>
+	<td>maven</td>
+</tr>
+<tr>
 	<td>click</td>
-	<td>OK</td>
+	<td>//img</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTextPresent</td>
+	<td>Search</td>
+	<td></td>
+</tr>
+<tr>
+	<td>mouseDown</td>
+	<td>open-view-logs</td>
 	<td></td>
 </tr>
 <tr>
 	<td>pause</td>
 	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>mouseUp</td>
+	<td>open-view-logs</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
 	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//td[3]/table/tbody/tr/td[2]/em/button</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>link=nexus.xml</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>login-link</td>
+	<td></td>
 </tr>
 <tr>
 	<td>type</td>
 	<td>usernamefield</td>
-	<td>admin</td>
-</tr>
-<tr>
-	<td>type</td>
-	<td>passwordfield</td>
-	<td>pwtest</td>
-</tr>
-<tr>
-	<td>pause</td>
-	<td>500</td>
-	<td>500</td>
-</tr>
-<tr>
-	<td>click</td>
-	<td>loginbutton</td>
-	<td></td>
-</tr>
-<tr>
-	<td>pause</td>
-	<td>500</td>
-	<td>500</td>
-</tr>
-<tr>
-	<td>click</td>
-	<td>OK</td>
-	<td></td>
-</tr>
-<tr>
-	<td>pause</td>
-	<td>500</td>
-	<td>500</td>
-</tr>
-<tr>
-	<td>type</td>
-	<td>usernamefield</td>
-	<td>admin</td>
+	<td>untest</td>
 </tr>
 <tr>
 	<td>type</td>
@@ -110,6 +115,11 @@
 	<td>click</td>
 	<td>loginbutton</td>
 	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td>500</td>
 </tr>
 <tr>
 	<td>type</td>
@@ -157,28 +167,83 @@
 	<td></td>
 </tr>
 <tr>
+	<td>mouseDown</td>
+	<td>open-config-repos</td>
+	<td></td>
+</tr>
+<tr>
+	<td>mouseUp</td>
+	<td>open-config-repos</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td>500</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>repo-add-btn</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td>500</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>link=Hosted</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td>500</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>document.forms[1].elements[0]</td>
+	<td>aaa hosted repo</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//div[2]/div[2]/div/div/div/div/div/table/tbody/tr/td[1]/table/tbody/tr/td[2]/em/button</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td>500</td>
+</tr>
+<tr>
 	<td>verifyTextPresent</td>
-	<td>nexus.xml</td>
+	<td>No spaces allowed in ID</td>
 	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>document.forms[1].elements[0]</td>
+	<td>aaa-hosted-repo</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>document.forms[1].elements[1]</td>
+	<td>aaa-hosted-repo</td>
 </tr>
 <tr>
 	<td>click</td>
-	<td>//td[2]/table/tbody/tr/td[2]/em/button</td>
+	<td>savebutton</td>
 	<td></td>
 </tr>
 <tr>
-	<td>waitForPopUp</td>
-	<td></td>
-	<td>30000</td>
+	<td>pause</td>
+	<td>500</td>
+	<td>500</td>
 </tr>
 <tr>
-	<td>mouseDown</td>
-	<td>open-config-repos</td>
-	<td></td>
-</tr>
-<tr>
-	<td>mouseUp</td>
-	<td>open-config-repos</td>
+	<td>click</td>
+	<td>//table[@id='repo-refresh-btn']/tbody/tr/td[2]/em/button</td>
 	<td></td>
 </tr>
 <tr>
@@ -198,7 +263,7 @@
 </tr>
 <tr>
 	<td>click</td>
-	<td>link=Hosted</td>
+	<td>link=Proxy</td>
 	<td></td>
 </tr>
 <tr>
@@ -208,32 +273,32 @@
 </tr>
 <tr>
 	<td>type</td>
-	<td>document.forms[0].elements[0]</td>
-	<td>aaa-hosted-repo</td>
+	<td>document.forms[1].elements[0]</td>
+	<td>bbb-proxy-repo</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//div[2]/div[2]/div/div/div/div/div/table/tbody/tr/td[1]/table/tbody/tr/td[2]/em/button</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td>500</td>
+</tr>
+<tr>
+	<td>verifyTextPresent</td>
+	<td>This field is required</td>
+	<td></td>
 </tr>
 <tr>
 	<td>type</td>
-	<td>document.forms[0].elements[1]</td>
-	<td>aaa-hosted-repo</td>
+	<td>document.forms[1].elements[1]</td>
+	<td>bbb-proxy-repo</td>
 </tr>
 <tr>
 	<td>click</td>
-	<td>savebutton</td>
-	<td></td>
-</tr>
-<tr>
-	<td>pause</td>
-	<td>500</td>
-	<td>500</td>
-</tr>
-<tr>
-	<td>pause</td>
-	<td>500</td>
-	<td>500</td>
-</tr>
-<tr>
-	<td>click</td>
-	<td>repo-add-btn</td>
+	<td>//div[2]/div[2]/div/div/div/div/div/table/tbody/tr/td[1]/table/tbody/tr/td[2]/em/button</td>
 	<td></td>
 </tr>
 <tr>
@@ -243,133 +308,33 @@
 </tr>
 <tr>
 	<td>click</td>
-	<td>link=Hosted</td>
+	<td>//table[@id='repo-refresh-btn']/tbody/tr/td[2]/em/button</td>
 	<td></td>
 </tr>
 <tr>
-	<td>pause</td>
-	<td>500</td>
-	<td>500</td>
+	<td>click</td>
+	<td>//div[2]/div[1]/div/table/tbody/tr/td[2]/table/tbody/tr/td[2]/em</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>link=Virtual</td>
+	<td></td>
 </tr>
 <tr>
 	<td>type</td>
-	<td>document.forms[0].elements[0]</td>
-	<td>bbb-hosted-repo</td>
-</tr>
-<tr>
-	<td>type</td>
-	<td>document.forms[0].elements[1]</td>
-	<td>bbb-hosted-repo</td>
+	<td>document.forms[1].elements[0]</td>
+	<td>ccc-virtual-repo</td>
 </tr>
 <tr>
 	<td>click</td>
-	<td>savebutton</td>
+	<td>//div[2]/div[2]/div/div/div/div/div/table/tbody/tr/td[1]/table/tbody/tr/td[2]/em/button</td>
 	<td></td>
 </tr>
 <tr>
 	<td>pause</td>
-	<td>500</td>
-	<td>500</td>
-</tr>
-<tr>
-	<td>click</td>
-	<td>repo-delete-btn</td>
+	<td>1000</td>
 	<td></td>
-</tr>
-<tr>
-	<td>pause</td>
-	<td>500</td>
-	<td>500</td>
-</tr>
-<tr>
-	<td>click</td>
-	<td>No</td>
-	<td></td>
-</tr>
-<tr>
-	<td>pause</td>
-	<td>500</td>
-	<td>500</td>
-</tr>
-<tr>
-	<td>click</td>
-	<td>repo-delete-btn</td>
-	<td></td>
-</tr>
-<tr>
-	<td>pause</td>
-	<td>500</td>
-	<td>500</td>
-</tr>
-<tr>
-	<td>click</td>
-	<td>Yes</td>
-	<td></td>
-</tr>
-<tr>
-	<td>click</td>
-	<td>repo-trash-btn</td>
-	<td></td>
-</tr>
-<tr>
-	<td>pause</td>
-	<td>500</td>
-	<td>500</td>
-</tr>
-<tr>
-	<td></td>
-	<td></td>
-	<td></td>
-</tr>
-<tr>
-	<td>click</td>
-	<td>//a[contains(text(),'Empty Trash')]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>pause</td>
-	<td>500</td>
-	<td>500</td>
-</tr>
-<tr>
-	<td>click</td>
-	<td>No</td>
-	<td></td>
-</tr>
-<tr>
-	<td>pause</td>
-	<td>500</td>
-	<td>500</td>
-</tr>
-<tr>
-	<td>click</td>
-	<td>repo-trash-btn</td>
-	<td></td>
-</tr>
-<tr>
-	<td>pause</td>
-	<td>500</td>
-	<td>500</td>
-</tr>
-<tr>
-	<td>click</td>
-	<td>//a[contains(text(),'Empty Trash')]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>pause</td>
-	<td>500</td>
-	<td>500</td>
-</tr>
-<tr>
-	<td>click</td>
-	<td>Yes</td>
-	<td></td>
-</tr>
-<tr>
-	<td>pause</td>
-	<td>500</td>
-	<td>500</td>
 </tr>
 <tr>
 	<td>mouseDown</td>
@@ -388,12 +353,7 @@
 </tr>
 <tr>
 	<td>click</td>
-	<td>//div[4]/div/div/div[1]/div[2]/div[1]/div/table/tbody/tr/td[1]/table/tbody/tr/td[2]/em/button</td>
-	<td></td>
-</tr>
-<tr>
-	<td>click</td>
-	<td>//div[4]/div/div/div[1]/div[2]/div[1]/div/table/tbody/tr/td[2]/table/tbody/tr/td[2]/em/button</td>
+	<td>//table[@id='user-add-btn']/tbody/tr/td[2]/em/button</td>
 	<td></td>
 </tr>
 <tr>
@@ -413,7 +373,7 @@
 </tr>
 <tr>
 	<td>click</td>
-	<td>//div[4]/div[1]/div/img[1]</td>
+	<td>//div[5]/div/div/div[2]/div[2]/div/div[2]/div[2]/div[1]/div/div/div/form/div[4]/div[1]/div/img[1]</td>
 	<td></td>
 </tr>
 <tr>
@@ -422,18 +382,38 @@
 	<td></td>
 </tr>
 <tr>
-	<td>type</td>
-	<td>password</td>
-	<td>userone</td>
+	<td>click</td>
+	<td>roles_tree_panel</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//li[2]/div/a/span</td>
+	<td></td>
 </tr>
 <tr>
 	<td>type</td>
-	<td>reenterPassword</td>
-	<td>userone</td>
+	<td>document.forms[2].elements[1]</td>
+	<td>User One</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>document.forms[2].elements[4]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//div[5]/div/div/div[2]/div[2]/div/div[2]/div[2]/div[2]/div/div/div/div/div/table/tbody/tr/td[1]/table/tbody/tr/td[2]/em/button</td>
+	<td></td>
 </tr>
 <tr>
 	<td>click</td>
 	<td>//div[2]/div/div/div/div/div/table/tbody/tr/td[1]/table/tbody/tr/td[2]/em/button</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
 	<td></td>
 </tr>
 <tr>
@@ -911,6 +891,7 @@
 	<td>Central M1 shadow</td>
 	<td></td>
 </tr>
+
 </tbody></table>
 </body>
 </html>
