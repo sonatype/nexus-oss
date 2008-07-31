@@ -9,14 +9,14 @@
 	<artifactId>nexus-test-harness-launcher</artifactId>
 	<name>Nexus Test Harness Launcher</name>
 	<properties>
-		
+
 		<bundle-expanded-dir>target/bundle</bundle-expanded-dir>
 		<config-expanded-dir>target/test-nexus-config</config-expanded-dir>
-		
+
 		<nexus-relative-basedir>${bundle-expanded-dir}/nexus-webapp-${project.version}</nexus-relative-basedir>
 		<nexus-abs-basedir>${project.build.directory}/bundle/nexus-webapp-${project.version}</nexus-abs-basedir>
 		<emma-sources-base>target/emma/sources</emma-sources-base>
-		
+
 		<config-target-dir>${nexus-abs-basedir}/runtime/apps/nexus/conf</config-target-dir>
 		<work-target-dir>${nexus-abs-basedir}/runtime/work</work-target-dir>
 		<proxy-repo-target-dir-name>proxyRepo</proxy-repo-target-dir-name>
@@ -29,9 +29,9 @@
 		<nexus-application-host>localhost</nexus-application-host>
 		<nexus-application-name>nexus</nexus-application-name>
 		<nexus-application-port>8087</nexus-application-port>
-		
+
 		<nexus-base-url>${nexus-application-protocol}://${nexus-application-host}:${nexus-application-port}/${nexus-application-name}/</nexus-base-url>
-		
+
 		<nexus-control-port>32001</nexus-control-port>
 		<proxy-repo-control-port>32002</proxy-repo-control-port>
 	</properties>
@@ -45,9 +45,9 @@
             <type>zip</type>
             <scope>provided</scope>
         </dependency>
-        
-        
-        
+
+
+
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
@@ -75,14 +75,14 @@
       <artifactId>plexus-forked-app-booter</artifactId>
       <version>1.3-SNAPSHOT</version>
     </dependency>
-    
+
     <!--<dependency>
       <groupId>emma</groupId>
       <artifactId>emma</artifactId>
       <version>2.0.5312</version>
     </dependency>-->
-    
-    
+
+
   </dependencies>
 	<build>
 		<filters>
@@ -110,7 +110,7 @@
 					../../${nexus-relative-basedir}/runtime/apps/nexus/conf
 				</targetPath>
 			</testResource>
-			
+
 			<testResource>
 				<directory>
 					src/test/resources/default-config
@@ -264,7 +264,7 @@
 
 
 						<!--<include>**/Nexus261*</include>
-							
+
 							<include>**/Nexus*</include>-->
 					</includes>
 					<excludes>
@@ -282,82 +282,6 @@
 
 
 
-		<pluginManagement>
-			<plugins>
-				<plugin>
-					<groupId>org.sonatype.maven.plugin</groupId>
-					<artifactId>emma4it-maven-plugin</artifactId>
-					<version>1.0-SNAPSHOT</version>
-					<configuration>
-
-						<searchPath>${basedir}</searchPath>
-
-						<sourceFolders>
-							<sourceFolder>
-								${emma-sources-base}/nexus-proxy
-							</sourceFolder>
-							<sourceFolder>
-								${emma-sources-base}/nexus-app
-							</sourceFolder>
-							<sourceFolder>
-								${emma-sources-base}/nexus-configuration
-							</sourceFolder>
-							<sourceFolder>
-								${emma-sources-base}/nexus-rest-api
-							</sourceFolder>
-							<sourceFolder>
-								${emma-sources-base}/nexus-rest-model
-							</sourceFolder>
-							<sourceFolder>
-								${emma-sources-base}/nexus-indexer
-							</sourceFolder>
-						</sourceFolders>
-
-						<jarFiles>
-							<jarFile>
-								${nexus-abs-basedir}/runtime/apps/nexus/lib/nexus-proxy-${project.version}.jar
-							</jarFile>
-							<jarFile>
-								${nexus-abs-basedir}/runtime/apps/nexus/lib/nexus-app-${project.version}.jar
-							</jarFile>
-							<jarFile>
-								${nexus-abs-basedir}/runtime/apps/nexus/lib/nexus-configuration-${project.version}.jar
-							</jarFile>
-							<jarFile>
-								${nexus-abs-basedir}/runtime/apps/nexus/lib/nexus-rest-api-${project.version}.jar
-							</jarFile>
-							<jarFile>
-								${nexus-abs-basedir}/runtime/apps/nexus/lib/nexus-rest-model-${project.version}.jar
-							</jarFile>
-							<jarFile>
-								${nexus-abs-basedir}/runtime/apps/nexus/lib/nexus-indexer-${nexus.indexer.version}.jar
-							</jarFile>
-
-						</jarFiles>
-
-					</configuration>
-					<executions>
-						<execution>
-							<id>instrument-plugins</id>
-							<goals>
-								<goal>instrument</goal>
-							</goals>
-						</execution>
-						<execution>
-							<id>merge-coverage-result</id>
-							<phase>post-integration-test</phase>
-							<goals>
-								<goal>merge</goal>
-							</goals>
-						</execution>
-					</executions>
-				</plugin>
-
-
-			</plugins>
-		</pluginManagement>
-
-
 	</build>
 
 
@@ -366,6 +290,55 @@
 			<plugin>
 				<groupId>org.sonatype.maven.plugin</groupId>
 				<artifactId>emma4it-maven-plugin</artifactId>
+				<version>1.0-SNAPSHOT</version>
+				<configuration>
+
+					<searchPath>${basedir}</searchPath>
+
+					<sourceFolders>
+						<sourceFolder>
+							${emma-sources-base}/nexus-proxy
+						</sourceFolder>
+						<sourceFolder>
+							${emma-sources-base}/nexus-app
+						</sourceFolder>
+						<sourceFolder>
+							${emma-sources-base}/nexus-configuration
+						</sourceFolder>
+						<sourceFolder>
+							${emma-sources-base}/nexus-rest-api
+						</sourceFolder>
+						<sourceFolder>
+							${emma-sources-base}/nexus-rest-model
+						</sourceFolder>
+						<sourceFolder>
+							${emma-sources-base}/nexus-indexer
+						</sourceFolder>
+					</sourceFolders>
+
+					<jarFiles>
+						<jarFile>
+							${nexus-abs-basedir}/runtime/apps/nexus/lib/nexus-proxy-${project.version}.jar
+						</jarFile>
+						<jarFile>
+							${nexus-abs-basedir}/runtime/apps/nexus/lib/nexus-app-${project.version}.jar
+						</jarFile>
+						<jarFile>
+							${nexus-abs-basedir}/runtime/apps/nexus/lib/nexus-configuration-${project.version}.jar
+						</jarFile>
+						<jarFile>
+							${nexus-abs-basedir}/runtime/apps/nexus/lib/nexus-rest-api-${project.version}.jar
+						</jarFile>
+						<jarFile>
+							${nexus-abs-basedir}/runtime/apps/nexus/lib/nexus-rest-model-${project.version}.jar
+						</jarFile>
+						<jarFile>
+							${nexus-abs-basedir}/runtime/apps/nexus/lib/nexus-indexer-${nexus.indexer.version}.jar
+						</jarFile>
+
+					</jarFiles>
+
+				</configuration>
 			</plugin>
 		</plugins>
 	</reporting>
