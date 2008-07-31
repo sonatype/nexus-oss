@@ -55,6 +55,8 @@ public class LoginResourceHandler
 
     private static final int CREATE = 8;
 
+    private static final int ALL = READ | UPDATE | DELETE | CREATE;
+
     public LoginResourceHandler( Context context, Request request, Response response )
     {
         super( context, request, response );
@@ -116,7 +118,16 @@ public class LoginResourceHandler
     {
         if ( subject == null )
         {
-            return NONE;
+            if ( getNexus().isSecurityEnabled() )
+            {
+                // WTF? How is it here then?
+                return NONE;
+            }
+            else
+            {
+                // Security is OFF
+                return ALL;
+            }
         }
 
         Permission readPerm = new WildcardPermission( domain + ":" + CPrivilege.METHOD_READ );
