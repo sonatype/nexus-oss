@@ -122,40 +122,59 @@ extends AbstractPrivilegeResourceHandler
             
             List<String> methods = resource.getMethod();
             
-            try
+            if ( methods == null || methods.size() == 0 )
             {
-                // Add a new privilege for each method
-                for ( String method : methods )
+                getResponse().setStatus( Status.CLIENT_ERROR_BAD_REQUEST, "Configuration error." );
+                getResponse().setEntity( serialize( representation, getNexusErrorResponse( "method", "No method(s) supplied, must select at least one method." ) ) );
+            }
+            else
+            {
+                try
                 {
-                    // Currently can only add new target types, application types are hardcoded
-                    if ( PrivilegeTargetResource.class.isAssignableFrom( resource.getClass() ) )
+                    boolean success = true;
+                    // Add a new privilege for each method
+                    for ( String method : methods )
                     {
-                        PrivilegeTargetResource res = ( PrivilegeTargetResource ) resource;
-                        
-                        CRepoTargetPrivilege priv = new CRepoTargetPrivilege();
-                        priv.setMethod( method );
-                        priv.setName( res.getName() + " - (" + method + ")");
-                        priv.setRepositoryTargetId( res.getRepositoryTargetId() );
-                        priv.setRepositoryId( res.getRepositoryId() );
-                        priv.setGroupId( res.getRepositoryGroupId() );
-                                                
-                        getNexusSecurityConfiguration().createRepoTargetPrivilege( priv );
-                        
-                        response.addData( nexusToRestModel( priv ) );
+                        // Currently can only add new target types, application types are hardcoded
+                        if ( PrivilegeTargetResource.class.isAssignableFrom( resource.getClass() ) )
+                        {
+                            PrivilegeTargetResource res = ( PrivilegeTargetResource ) resource;
+                            
+                            CRepoTargetPrivilege priv = new CRepoTargetPrivilege();
+                            priv.setMethod( method );
+                            priv.setName( res.getName() != null ? res.getName() + " - (" + method + ")" : null );
+                            priv.setRepositoryTargetId( res.getRepositoryTargetId() );
+                            priv.setRepositoryId( res.getRepositoryId() );
+                            priv.setGroupId( res.getRepositoryGroupId() );
+                                                    
+                            getNexusSecurityConfiguration().createRepoTargetPrivilege( priv );
+                            
+                            response.addData( nexusToRestModel( priv ) );
+                        }
+                        else
+                        {
+                            success = false;
+                            getResponse().setStatus( Status.CLIENT_ERROR_BAD_REQUEST, "Configuration error." );
+                            getResponse().setEntity( serialize( representation, getNexusErrorResponse( "type", "An invalid type was entered." ) ) );
+                            break;
+                        }
+                    }
+                    
+                    if ( success )
+                    {
+                        getResponse().setEntity( serialize( representation, response ) );
                     }
                 }
-                
-                getResponse().setEntity( serialize( representation, response ) );
-            }
-            catch ( ConfigurationException e )
-            {                
-                handleConfigurationException( e, representation );
-            }
-            catch ( IOException e )
-            {
-                getResponse().setStatus( Status.SERVER_ERROR_INTERNAL );
-
-                getLogger().log( Level.SEVERE, "Got IO Exception!", e );
+                catch ( ConfigurationException e )
+                {                
+                    handleConfigurationException( e, representation );
+                }
+                catch ( IOException e )
+                {
+                    getResponse().setStatus( Status.SERVER_ERROR_INTERNAL );
+    
+                    getLogger().log( Level.SEVERE, "Got IO Exception!", e );
+                }
             }
         }
     }
