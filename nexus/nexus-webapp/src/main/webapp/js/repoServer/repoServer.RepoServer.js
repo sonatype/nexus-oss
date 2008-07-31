@@ -124,13 +124,14 @@ Sonatype.repoServer.RepoServer = function(){
         handler:function(){
           this.loginWindow.getEl().mask("Logging you in...");
 
+          var token = Sonatype.utils.base64.encode(this.loginForm.find('name', 'username')[0].getValue() + ':' + this.loginForm.find('name', 'password')[0].getValue()); 
           Ext.Ajax.request({
             scope: this,
             method: 'GET',
             cbPassThru : {
               username : this.loginForm.find('name', 'username')[0].getValue()
             },
-            headers: {'Authorization' : 'Basic ' + Sonatype.utils.base64.encode(this.loginForm.find('name', 'username')[0].getValue() + ':' + this.loginForm.find('name', 'password')[0].getValue())}, //@todo: send HTTP basic auth data
+            headers: {'Authorization' : 'Basic ' + token}, //@todo: send HTTP basic auth data
             url: Sonatype.config.repos.urls.login,
             success: function(response, options){
               //get user permissions
@@ -138,13 +139,14 @@ Sonatype.repoServer.RepoServer = function(){
               var newUserPerms = respObj.data.clientPermissions;
 
               Sonatype.user.curr.username = options.cbPassThru.username;
-              Sonatype.user.curr.authToken = respObj.data.authToken;
+//              Sonatype.user.curr.authToken = respObj.data.authToken;
               Sonatype.user.curr.repoServer = newUserPerms;
               
-              Sonatype.state.CookieProvider.set('authToken', Sonatype.user.curr.authToken);
+//              Sonatype.state.CookieProvider.set('authToken', Sonatype.user.curr.authToken);
               Sonatype.state.CookieProvider.set('username', Sonatype.user.curr.username);
               
-              Ext.lib.Ajax.defaultHeaders.Authorization = 'NexusAuthToken ' + Sonatype.user.curr.authToken;
+//              Ext.lib.Ajax.defaultHeaders.Authorization = 'NexusAuthToken ' + Sonatype.user.curr.authToken;
+              Ext.lib.Ajax.defaultHeaders.Authorization = 'Basic ' + token;
               
               Sonatype.user.curr.isLoggedIn = true;
               Sonatype.view.updateLoginLinkText();
@@ -190,7 +192,11 @@ Sonatype.repoServer.RepoServer = function(){
       });
       
       this.loginWindow.on('show', function(){
-        this.loginForm.find('name', 'username')[0].focus(true, 100);
+    	var field = this.loginForm.find('name', 'username')[0];
+    	if ( field.getRawValue() ) {
+    	  field = this.loginForm.find('name', 'password')[0]
+    	}
+        field.focus(true, 100);
       }, this);
       
       this.loginWindow.on('close', function(){
@@ -427,8 +433,8 @@ Sonatype.repoServer.RepoServer = function(){
             //      if the token was expired (403), we can still go to anonymous client state
             delete Ext.lib.Ajax.defaultHeaders.Authorization;
 
-            Sonatype.state.CookieProvider.clear('authToken');
-            Sonatype.state.CookieProvider.clear('username');
+//            Sonatype.state.CookieProvider.clear('authToken');
+//            Sonatype.state.CookieProvider.clear('username');
             
             this.resetMainTabPanel();
             
@@ -441,6 +447,11 @@ Sonatype.repoServer.RepoServer = function(){
       }
       else {
         this.loginForm.getForm().clearInvalid();
+        var cp = Sonatype.state.CookieProvider;
+        var username = cp.get('username', null);
+        if ( username ) {
+          this.loginForm.find( 'name', 'username' )[0].setValue( username );
+        }
         this.loginWindow.show();
       }
     },

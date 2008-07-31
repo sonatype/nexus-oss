@@ -108,8 +108,8 @@ Sonatype.utils = {
       }
       else {
         delete Ext.lib.Ajax.defaultHeaders.Authorization;
-        Sonatype.state.CookieProvider.clear('authToken');
-        Sonatype.state.CookieProvider.clear('username');
+//        Sonatype.state.CookieProvider.clear('authToken');
+//        Sonatype.state.CookieProvider.clear('username');
         Sonatype.MessageBox.show( {
           title: 'Authentication Error',
           msg: 'Your login is incorrect or your session has expired.<br />' +
