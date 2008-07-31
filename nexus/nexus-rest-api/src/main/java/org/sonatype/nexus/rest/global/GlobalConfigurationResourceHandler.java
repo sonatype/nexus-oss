@@ -177,6 +177,8 @@ public class GlobalConfigurationResourceHandler
                         config.setTlsEnabled( settings.isTlsEnabled() );
                         
                         config.setUsername( settings.getUsername() );
+                        
+                        getNexus().updateSmtpConfiguration( config );
                     }
 
                     if ( resource.getGlobalConnectionSettings() != null )
