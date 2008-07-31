@@ -33,7 +33,7 @@ window.Sonatype = function(){
       var cp = Sonatype.state.CookieProvider;
       
 //      var authToken = cp.get('authToken', null);
-      var jsessionid = cp.get('jsessionid', null);
+      var jsessionid = null;// cp.get('jsessionid', null);
       var username = cp.get('username', null);
 
       if(jsessionid) {
