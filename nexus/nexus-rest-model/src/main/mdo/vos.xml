@@ -2270,12 +2270,6 @@
 			<version>1.0.0+</version>
 			<fields>
 				<field>
-					<name>authToken</name>
-					<version>1.0.0+</version>
-					<type>String</type>
-					<required>true</required>
-				</field>
-				<field>
 					<name>clientPermissions</name>
 					<version>1.0.0+</version>
 					<association>
