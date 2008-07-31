@@ -287,6 +287,17 @@ public class DefaultNexusSecurityConfiguration
     {
         return new ArrayList<CUser>( getConfiguration().getUsers() );
     }
+    
+    private String generateNewPassword( CUser settings )
+    {
+        String password = pwGenerator.generatePassword( 10, 10 );
+        
+        settings.setPassword( pwGenerator.hashPassword( password ) );
+        
+        settings.setStatus( CUser.STATUS_EXPIRED );
+        
+        return password;
+    }
 
     public void createUser( CUser settings )
         throws ConfigurationException,
@@ -294,11 +305,7 @@ public class DefaultNexusSecurityConfiguration
     {
         //On create we need to generate a new password, and email the user their new password
         
-        String password = pwGenerator.generatePassword( 10, 10 );
-        
-        settings.setPassword( pwGenerator.hashPassword( password ) );
-        
-        settings.setStatus( CUser.STATUS_EXPIRED );
+        String password = generateNewPassword( settings );
         
         ValidationResponse vr = configurationValidator.validateUser( initializeContext(), settings, false );
 
@@ -397,6 +404,66 @@ public class DefaultNexusSecurityConfiguration
         }
 
         throw new NoSuchUserException( id );
+    }
+    
+    public void resetPassword( String id )
+        throws IOException,
+            NoSuchUserException
+    {
+        CUser user = readUser( id );
+        
+        String password = generateNewPassword( user );
+        
+        applyAndSaveConfiguration();
+        
+        try
+        {
+            smtpClient.sendEmail( user.getEmail(), null, "Nexus: User account notification.", "Your password has been reset.  Your new password is: " + password );
+        }
+        catch ( SmtpClientException e )
+        {
+            getLogger().error( "Unable to notify user by email password reset", e );
+        }
+    }
+    
+    public void forgotPassword( String userId, String email )
+        throws IOException,
+            NoSuchUserException
+    {
+        CUser user = readUser( userId );
+        
+        if ( user.getEmail().equals( email ) )
+        {
+            resetPassword( userId );
+        }
+    }
+    
+    public void forgotUserId( String email )
+        throws IOException,
+            NoSuchUserException
+    {
+        List<CUser> users = getConfiguration().getUsers();
+
+        for ( Iterator<CUser> i = users.iterator(); i.hasNext(); )
+        {
+            CUser user = i.next();
+
+            if ( user.getEmail().equals( email ) )
+            {
+                try
+                {
+                    smtpClient.sendEmail( user.getEmail(), null, "Nexus: User account notification.", " Your User ID is: " + user.getUserId() );
+                }
+                catch ( SmtpClientException e )
+                {
+                    getLogger().error( "Unable to notify user by email for username reminder", e );
+                }
+
+                return;
+            }
+        }
+
+        throw new NoSuchUserException();
     }
     
     /**

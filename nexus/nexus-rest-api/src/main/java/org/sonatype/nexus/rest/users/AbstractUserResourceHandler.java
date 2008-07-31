@@ -36,6 +36,7 @@ public class AbstractUserResourceHandler
 extends AbstractNexusResourceHandler
 {
     public static final String USER_ID_KEY = "userId";
+    public static final String USER_EMAIL_KEY = "email";
     private static final String ROLE_VALIDATION_ERROR = "The user cannot have zero roles!";
 
     /**

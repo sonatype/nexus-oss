@@ -110,6 +110,8 @@ import org.sonatype.nexus.rest.model.SmtpSettings;
 import org.sonatype.nexus.rest.model.StatusConfigurationValidationResponse;
 import org.sonatype.nexus.rest.model.StatusResource;
 import org.sonatype.nexus.rest.model.StatusResourceResponse;
+import org.sonatype.nexus.rest.model.UserForgotPasswordRequest;
+import org.sonatype.nexus.rest.model.UserForgotPasswordResource;
 import org.sonatype.nexus.rest.model.UserListResourceResponse;
 import org.sonatype.nexus.rest.model.UserResource;
 import org.sonatype.nexus.rest.model.UserResourceRequest;
@@ -245,6 +247,8 @@ public final class XStreamInitializer
         xstream.omitField( UserResourceRequest.class, "modelEncoding" );
         xstream.omitField( UserResourceResponse.class, "modelEncoding" );
         xstream.omitField( UserResource.class, "modelEncoding" );
+        xstream.omitField( UserForgotPasswordRequest.class, "modelEncoding" );
+        xstream.omitField( UserForgotPasswordResource.class, "modelEncoding" );
 
         xstream.omitField( RoleListResourceResponse.class, "modelEncoding" );
         xstream.omitField( RoleResource.class, "modelEncoding" );

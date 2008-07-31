@@ -49,6 +49,18 @@ public interface MutableNexusSecurityConfiguration
     void deleteUser( String id )
         throws IOException,
             NoSuchUserException;
+    
+    void resetPassword( String id )
+        throws IOException,
+            NoSuchUserException;
+    
+    void forgotUserId( String email )
+        throws IOException,
+            NoSuchUserException;
+    
+    void forgotPassword( String userId, String email )
+        throws IOException,
+            NoSuchUserException;
 
     //Roles
     Collection<CRole> listRoles();

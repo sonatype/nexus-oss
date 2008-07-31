@@ -1638,6 +1638,22 @@
 				</field>
 			</fields>
 		</class>
+		
+		<class>
+		    <name>UserForgotPasswordRequest</name>
+            <version>1.0.0+</version>
+            <superClass>NexusResponse</superClass>
+            <fields>
+                <field>
+                    <name>data</name>
+                    <version>1.0.0+</version>
+                    <association>
+                        <type>UserForgotPasswordResource</type>
+                    </association>
+                    <required>true</required>
+                </field>
+            </fields>
+		</class>
 
 		<!-- Response Data Contents -->
 
@@ -1686,6 +1702,25 @@
 				</field>
 			</fields>
 		</class>
+		
+		<class>
+            <name>UserForgotPasswordResource</name>
+            <version>1.0.0+</version>
+            <fields>
+                <field>
+                    <name>email</name>
+                    <version>1.0.0+</version>
+                    <type>String</type>
+                    <required>true</required>
+                </field>
+                <field>
+                    <name>userId</name>
+                    <version>1.0.0+</version>
+                    <type>String</type>
+                    <required>true</required>
+                </field>
+            </fields>
+        </class>
 
 		<!-- Roles -->
 

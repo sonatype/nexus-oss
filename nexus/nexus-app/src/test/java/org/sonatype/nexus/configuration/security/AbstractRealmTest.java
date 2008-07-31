@@ -309,6 +309,26 @@ public abstract class AbstractRealmTest
         }
 
         // Unimplemented methods
+        public void resetPassword( String id )
+            throws IOException,
+                NoSuchUserException
+        {
+            throw new UnsupportedOperationException();
+        }
+        
+        public void forgotPassword( String userId, String email )
+            throws IOException,
+                NoSuchUserException
+        {
+            throw new UnsupportedOperationException();
+        }
+        
+        public void forgotUserId( String email )
+            throws IOException,
+                NoSuchUserException
+        {
+            throw new UnsupportedOperationException();
+        }
         
         public Collection<CUser> listUsers()
         {

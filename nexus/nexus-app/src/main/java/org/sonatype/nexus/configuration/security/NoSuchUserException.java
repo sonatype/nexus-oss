@@ -30,6 +30,11 @@ public class NoSuchUserException
 {
 
     private static final long serialVersionUID = 294536984704055394L;
+    
+    public NoSuchUserException()
+    {
+        super( "User not found!" );
+    }
 
     public NoSuchUserException( String userId )
     {
