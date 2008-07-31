@@ -512,13 +512,12 @@ Ext.extend(Sonatype.repoServer.ServerEditPanel, Ext.Panel, {
   
   saveBtnHandler : function() {
     var wkDirField = this.find('name', 'workingDirectory')[0];
-    var securityConfigField = this.find('name', 'securityEnabled')[0];
     var baseUrlField = this.find('name', 'baseUrl')[0];
     if (this.form.isValid()) {
       if (baseUrlField.isDirty()) {
         this.baseUrlChanged = true;
       }
-      if (wkDirField.isDirty() || securityConfigField.isDirty()) {
+      if (wkDirField.isDirty()) {
         //@note: this handler selects the "No" button as the default
         //@todo: could extend Sonatype.MessageBox to take the button to select as a param
         Sonatype.MessageBox.getDialog().on('show', function(){
@@ -530,8 +529,8 @@ Ext.extend(Sonatype.repoServer.ServerEditPanel, Ext.Panel, {
       
         Sonatype.MessageBox.show({
           animEl: this,
-          title : 'Change Working Directory? or Security Model?',
-          msg : 'Changing the Working Directory or Security Model requires a manual restart of Nexus.<br/><br/>Do you want to continue?',
+          title : 'Change Working Directory?',
+          msg : 'Changing the Working Directory requires a manual restart of Nexus.<br/><br/>Do you want to continue?',
           buttons: Sonatype.MessageBox.YESNO,
           scope: this,
           icon: Sonatype.MessageBox.QUESTION,
@@ -629,7 +628,7 @@ Ext.extend(Sonatype.repoServer.ServerEditPanel, Ext.Panel, {
       if (action.options.restartRequired) {
         Sonatype.MessageBox.show({
           title : 'Restart Required',
-          msg : 'Nexus must now be restarted for the Working Directory and/or Security Model change to take effect',
+          msg : 'Nexus must now be restarted for the Working Directory change to take effect',
           buttons: false,
           closable: false,
           icon: Sonatype.MessageBox.WARNING
