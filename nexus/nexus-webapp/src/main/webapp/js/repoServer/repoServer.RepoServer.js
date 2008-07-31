@@ -147,6 +147,9 @@ Sonatype.repoServer.RepoServer = function(){
               
 //              Ext.lib.Ajax.defaultHeaders.Authorization = 'NexusAuthToken ' + Sonatype.user.curr.authToken;
               Ext.lib.Ajax.defaultHeaders.Authorization = 'Basic ' + token;
+  
+              var jsessionid = Sonatype.utils.getCookie('JSESSIONID');
+              Sonatype.state.CookieProvider.set('jsessionid', jsessionid);
               
               Sonatype.user.curr.isLoggedIn = true;
               Sonatype.view.updateLoginLinkText();
@@ -435,6 +438,7 @@ Sonatype.repoServer.RepoServer = function(){
 
 //            Sonatype.state.CookieProvider.clear('authToken');
 //            Sonatype.state.CookieProvider.clear('username');
+            Sonatype.state.CookieProvider.clear('jsessionid');
             
             this.resetMainTabPanel();
             

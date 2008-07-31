@@ -110,6 +110,7 @@ Sonatype.utils = {
         delete Ext.lib.Ajax.defaultHeaders.Authorization;
 //        Sonatype.state.CookieProvider.clear('authToken');
 //        Sonatype.state.CookieProvider.clear('username');
+        Sonatype.state.CookieProvider.clear('jsessionid');
         Sonatype.MessageBox.show( {
           title: 'Authentication Error',
           msg: 'Your login is incorrect or your session has expired.<br />' +
@@ -291,7 +292,24 @@ Sonatype.utils = {
       Sonatype.MessageBox.getDialog(),
       {single:true}
     );
-  }
+  },
+  
+  getCookie: function(cookieName) {
+    var c = document.cookie + ";";
+    var re = /\s?(.*?)=(.*?);/g;
+    var matches;
+    while((matches = re.exec(c)) != null){
+      if ( matches[1] == cookieName ) {
+    	return matches[2];
+      }
+    }
+    return null;
+  },
+  
+  setCookie: function(cookieName, value) {
+    document.cookie = cookieName + "=" + value +
+	  "; path=" + Sonatype.config.resourcePath
+  }  
 };
 
 })();
