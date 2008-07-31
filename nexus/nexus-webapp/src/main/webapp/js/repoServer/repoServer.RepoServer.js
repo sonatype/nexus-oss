@@ -72,7 +72,7 @@ Sonatype.repoServer.RepoServer = function(){
           fieldLabel:'Username', 
           name:'username',
           tabIndex: 1,
-          width: 150,
+          width: 200,
           allowBlank:false 
         },
         { 
@@ -81,8 +81,14 @@ Sonatype.repoServer.RepoServer = function(){
           name:'password',
           tabIndex: 2, 
           inputType:'password', 
-          width: 150,
+          width: 200,
           allowBlank:false 
+        },
+        {
+          xtype: 'panel',
+          id: 'recovery-panel',
+          style: 'padding-left: 70px',
+          html: 'Forgot your <a id="recover-username" href="#">username</a> or <a id="recover-password" href="#">password</a>?'
         }
       ]
       //buttons added later to provide scope to handler
@@ -185,7 +191,7 @@ Sonatype.repoServer.RepoServer = function(){
         closable: true,
         closeAction: 'hide',
         autoWidth: false,
-        width: 250,
+        width: 300,
         autoHeight: true,
         modal:true,
         constrain: true,
@@ -195,10 +201,18 @@ Sonatype.repoServer.RepoServer = function(){
       });
       
       this.loginWindow.on('show', function(){
-    	var field = this.loginForm.find('name', 'username')[0];
-    	if ( field.getRawValue() ) {
-    	  field = this.loginForm.find('name', 'password')[0]
-    	}
+        var panel = this.loginWindow.findById( 'recovery-panel' );
+        if (!panel.clickListenerAdded) {
+          // these listeners only work if added after the window is created
+          panel.body.on('click', Ext.emptyFn, null, {delegate:'a', preventDefault:true});
+          panel.body.on('mousedown', this.recoverLogin, this, {delegate:'a'});
+          panel.clickListenerAdded = true;
+        }
+
+        var field = this.loginForm.find('name', 'username')[0];
+        if ( field.getRawValue() ) {
+          field = this.loginForm.find('name', 'password')[0]
+        }
         field.focus(true, 100);
       }, this);
       
@@ -468,6 +482,170 @@ Sonatype.repoServer.RepoServer = function(){
       
       Sonatype.view.mainTabPanel.add(Sonatype.view.welcomeTab);
       Sonatype.view.mainTabPanel.setActiveTab(Sonatype.view.welcomeTab);
+    },
+
+    recoverLogin : function(e, target){
+      e.stopEvent();
+      if (this.loginWindow.isVisible()) {
+    	this.loginWindow.hide();
+      }
+      
+      var action = target.id;
+      if (action == 'recover-username') {
+    	this.recoverUsername();
+      }
+      else if (action == 'recover-password') {
+      	this.recoverPassword();
+      }
+    },
+    
+    recoverUsername: function() {
+      var w = new Ext.Window({
+        title: 'Username Recovery',
+        closable: true,
+        autoWidth: false,
+        width: 300,
+        autoHeight: true,
+        modal:true,
+        constrain: true,
+        resizable: false,
+        draggable: false,
+        items: [
+          {
+            xtype: 'form',
+            labelAlign: 'right',
+            labelWidth:60,
+            frame:true,  
+            defaultType:'textfield',
+            monitorValid:true,
+            items:[
+              {
+                xtype: 'panel',
+                style: 'padding-left: 70px; padding-bottom: 10px',
+                html: 'Please enter the e-mail address you used to register your account and we will send you your username.'
+              },
+              {
+                fieldLabel: 'E-mail', 
+                name: 'email',
+                width: 200,
+                allowBlank: false 
+              }
+            ],
+            buttons: [
+              {
+                text: 'E-mail Username',
+                formBind: true,
+                scope: this,
+                handler: function(){
+                  var email = w.find('name', 'email')[0].getValue();
+
+                  Ext.Ajax.request({
+                    scope: this,
+                    method: 'POST',
+                    url: Sonatype.config.repos.urls.usersForgotId + '/' + email,
+                    success: function(response, options){
+                      w.close();
+                    },
+                    failure: function(response, options){
+                      Sonatype.utils.connectionError( response, 'There is an error retrieving your username.' )
+                    }
+                  });
+                }
+              },
+              {
+                text: 'Cancel',
+                formBind: false,
+                scope: this,
+                handler: function(){
+                  w.close();
+                }
+              }
+            ]
+          }
+        ]
+      });
+
+      w.show();
+    },
+    
+    recoverPassword: function() {
+      var w = new Ext.Window({
+        title: 'Password Recovery',
+        closable: true,
+        autoWidth: false,
+        width: 300,
+        autoHeight: true,
+        modal:true,
+        constrain: true,
+        resizable: false,
+        draggable: false,
+        items: [
+          {
+            xtype: 'form',
+            labelAlign: 'right',
+            labelWidth:60,
+            frame:true,  
+            defaultType:'textfield',
+            monitorValid:true,
+            items:[
+              {
+                xtype: 'panel',
+                style: 'padding-left: 70px; padding-bottom: 10px',
+                html: 'Please enter your username and e-mail address below. We will send you a new password shortly.'
+              },
+              { 
+                fieldLabel: 'Username', 
+                name: 'username',
+                width: 200,
+                allowBlank: false 
+              },
+              { 
+                fieldLabel: 'E-mail', 
+                name: 'email',
+                width: 200,
+                allowBlank: false 
+              }
+            ],
+            buttons: [
+              {
+                text: 'Reset Password',
+                formBind: true,
+                scope: this,
+                handler: function(){
+                  var username = w.find('name', 'username')[0].getValue();
+                  var email = w.find('name', 'email')[0].getValue();
+  
+                  Ext.Ajax.request({
+                    scope: this,
+                    method: 'POST',
+                    jsonData: {
+                      userId: username,
+                      email: email
+                    },
+                    url: Sonatype.config.repos.urls.usersForgotPassword,
+                    success: function(response, options){
+                      w.close();
+                    },
+                    failure: function(response, options){
+                      Sonatype.utils.connectionError( response, 'There is an error resetting your password.' )
+                    }
+                  });
+                }
+              },
+              {
+                text: 'Cancel',
+                formBind: false,
+                scope: this,
+                handler: function(){
+                  w.close();
+                }
+              }
+            ]
+          }
+        ]
+      });
+
+      w.show();
     }
      
   };
