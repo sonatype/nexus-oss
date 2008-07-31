@@ -29,12 +29,23 @@
 
 Sonatype.repoServer.referenceData = {
   globalSettingsState : {
-    adminPassword: "",
-    deploymentPassword: "",
-    securityConfiguration: "Simple",
+    securityAnonymousUsername: "",
+    securityAnonymousPassword: "",
+    securityEnabled: false,
+    securityAnonymousAccessEnabled: false, 
     workingDirectory: "",
+    securityConfigurationFile: "",
     logDirectory: "",
     baseUrl: "",
+    smtpSettings: {
+      host: "",
+      port: 25,
+      username: "",
+      password: "",
+      systemEmailAddress: "",
+      sslEnabled: "",
+      tlsEnabled: ""
+    },
     globalConnectionSettings: {
       connectionTimeout: 0,
       retrievalRetryCount: 0,

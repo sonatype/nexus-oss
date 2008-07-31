@@ -166,6 +166,58 @@
 				</field>
 			</fields>
 		</class>
+		
+		<class>
+            <name>SmtpSettings</name>
+            <version>1.0.0+</version>
+            <description>
+                The connections settings for an smtp server.
+            </description>
+            <fields>
+                <field>
+                    <name>host</name>
+                    <version>1.0.0+</version>
+                    <type>String</type>
+                    <required>true</required>
+                </field>
+                <field>
+                    <name>port</name>
+                    <version>1.0.0+</version>
+                    <type>int</type>
+                    <required>true</required>
+                </field>
+                <field>
+                    <name>username</name>
+                    <version>1.0.0+</version>
+                    <type>String</type>
+                    <required>false</required>
+                </field>
+                <field>
+                    <name>password</name>
+                    <version>1.0.0+</version>
+                    <type>String</type>
+                    <required>false</required>
+                </field>
+                <field>
+                    <name>systemEmailAddress</name>
+                    <version>1.0.0+</version>
+                    <type>String</type>
+                    <required>true</required>
+                </field>
+                <field>
+                    <name>sslEnabled</name>
+                    <version>1.0.0+</version>
+                    <type>boolean</type>
+                    <required>false</required>
+                </field>
+                <field>
+                    <name>tlsEnabled</name>
+                    <version>1.0.0+</version>
+                    <type>boolean</type>
+                    <required>false</required>
+                </field>
+            </fields>
+        </class>
 
 		<class>
 			<name>RemoteHttpProxySettings</name>
@@ -277,6 +329,12 @@
 					<required>true</required>
 				</field>
 				<field>
+                    <name>securityConfigurationFile</name>
+                    <version>1.0.0+</version>
+                    <type>String</type>
+                    <required>true</required>
+                </field>
+				<field>
 					<name>workingDirectory</name>
 					<version>1.0.0+</version>
 					<type>String</type>
@@ -302,6 +360,14 @@
 					</association>
 					<required>true</required>
 				</field>
+				<field>
+                    <name>smtpSettings</name>
+                    <version>1.0.0+</version>
+                    <association>
+                        <type>SmtpSettings</type>
+                    </association>
+                    <required>true</required>
+                </field>
 				<field>
 					<name>globalHttpProxySettings</name>
 					<version>1.0.0+</version>

@@ -34,10 +34,12 @@ import org.sonatype.nexus.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.model.CRemoteAuthentication;
 import org.sonatype.nexus.configuration.model.CRemoteConnectionSettings;
 import org.sonatype.nexus.configuration.model.CRemoteHttpProxySettings;
+import org.sonatype.nexus.configuration.model.CSmtpConfiguration;
 import org.sonatype.nexus.rest.model.GlobalConfigurationResource;
 import org.sonatype.nexus.rest.model.GlobalConfigurationResourceResponse;
 import org.sonatype.nexus.rest.model.RemoteConnectionSettings;
 import org.sonatype.nexus.rest.model.RemoteHttpProxySettings;
+import org.sonatype.nexus.rest.model.SmtpSettings;
 
 /**
  * The GlobalConfiguration resource handler. It simply gets and builds the requested config REST model (DTO) and passes
@@ -155,6 +157,27 @@ public class GlobalConfigurationResourceHandler
                     getNexus().updateWorkingDirectory( resource.getWorkingDirectory() );
 
                     getNexus().updateApplicationLogDirectory( resource.getLogDirectory() );
+                    
+                    getNexus().updateSecurityConfigurationFile( resource.getSecurityConfigurationFile() );
+                    
+                    if ( resource.getSmtpSettings() != null )
+                    {
+                        SmtpSettings settings = resource.getSmtpSettings();
+                        
+                        CSmtpConfiguration config = new CSmtpConfiguration();
+                        
+                        config.setHost( settings.getHost() );
+                        
+                        config.setPassword( settings.getPassword() );
+                        
+                        config.setPort( settings.getPort() );
+                        
+                        config.setSslEnabled( settings.isSslEnabled() );
+                        
+                        config.setTlsEnabled( settings.isTlsEnabled() );
+                        
+                        config.setUsername( settings.getUsername() );
+                    }
 
                     if ( resource.getGlobalConnectionSettings() != null )
                     {
@@ -281,6 +304,10 @@ public class GlobalConfigurationResourceHandler
         resource.setGlobalConnectionSettings( convert( getNexus().readDefaultGlobalRemoteConnectionSettings() ) );
 
         resource.setGlobalHttpProxySettings( convert( getNexus().readDefaultGlobalRemoteHttpProxySettings() ) );
+        
+        resource.setSecurityConfigurationFile( getNexus().readDefaultSecurityConfigurationFile() );
+        
+        resource.setSmtpSettings( convert( getNexus().readDefaultSmtpConfiguration() ) );
     }
 
     /**
@@ -307,6 +334,10 @@ public class GlobalConfigurationResourceHandler
         resource.setGlobalHttpProxySettings( convert( getNexus().readGlobalRemoteHttpProxySettings() ) );
 
         resource.setBaseUrl( getNexus().getBaseUrl() );
+        
+        resource.setSecurityConfigurationFile( getNexus().readSecurityConfigurationFile() );
+        
+        resource.setSmtpSettings( convert( getNexus().readSmtpConfiguration() ) );
     }
 
     protected String getSecurityConfiguration( boolean enabled, String authSourceType )

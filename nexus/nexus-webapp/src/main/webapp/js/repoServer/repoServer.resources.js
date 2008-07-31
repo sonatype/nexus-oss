@@ -49,12 +49,14 @@ Sonatype.repoServer.resources.help = {
 
   // Server Config help text
   server : {
-    adminPassword : 'Field to set the new Admin user password.',
-    deploymentPassword : 'Field to set the new Deployment password.',
-    securityConfiguration : 'The Security Model to use.  Options include Simple, Custom and Off.', 
+    anonUsername : 'The username that will be applied to anonymous users.',
+    anonPassword : 'The password that will be applied to anonymous users.',
+    anonymous : 'Allow anonymous access into the system, will be treated with the credentials of the user below.',
+    security : 'Whether to enable security or not.', 
     workingDirectory : 'The base folder where Nexus will store all of its data. For easier upgrades, it is recommended that this be in a folder outside your Nexus binary installation. Nexus must be restarted after changing this value.',
     logDirectory : 'This is the location of your log files. It must correspond to the location specified by - runtime/apps/nexus/conf/log4j.properties.',
     baseUrl : 'This is the Base URL of the Nexus web application.  i.e. http://localhost:8081/nexus',
+    securityConfigurationFile : 'The location of the file that holds the nexus security configuraiton.',
 
     //use default nexus text
     userAgentString : userAgentString,
@@ -70,7 +72,15 @@ Sonatype.repoServer.resources.help = {
     privateKey : privateKey,
     passphrase : passphrase,
     ntlmHost : ntlmHost,
-    ntlmDomain : ntlmDomain
+    ntlmDomain : ntlmDomain,
+    
+    smtphost : 'The host name of an SMTP server.',
+    smtpport : 'The port the SMTP server is listening on.',
+    smtpuser : 'The username used to access the SMTP server.',
+    smtppass : 'The password used to access the SMTP server.',
+    smtpssl : 'Enable SSL.',
+    smtptls : 'Enable TLS.',
+    smtpsysemail : 'Default System email address.  This is who the "From" address will be.'
   },
 
   // Groups Config help text
@@ -120,7 +130,9 @@ Sonatype.repoServer.resources.help = {
   // Privileges help
   privileges: {
     name : 'The name of this privilege.',
-    type : 'The type of privilege.  Only "Repository Target" type privileges can be managed by the user.'
+    type : 'The type of privilege.  Only "Repository Target" type privileges can be managed by the user.',
+    repositoryOrGroup : 'The repository or repository group this privilege will be associated with.',
+    repositoryTarget : 'The Repository Target that will be applied with this privilege.'
   },
 
   // Repositories Config help text

@@ -26,10 +26,12 @@ import org.restlet.data.Response;
 import org.sonatype.nexus.configuration.model.CRemoteAuthentication;
 import org.sonatype.nexus.configuration.model.CRemoteConnectionSettings;
 import org.sonatype.nexus.configuration.model.CRemoteHttpProxySettings;
+import org.sonatype.nexus.configuration.model.CSmtpConfiguration;
 import org.sonatype.nexus.rest.AbstractNexusResourceHandler;
 import org.sonatype.nexus.rest.model.AuthenticationSettings;
 import org.sonatype.nexus.rest.model.RemoteConnectionSettings;
 import org.sonatype.nexus.rest.model.RemoteHttpProxySettings;
+import org.sonatype.nexus.rest.model.SmtpSettings;
 
 /**
  * The base class for global configuration resources.
@@ -48,6 +50,32 @@ public abstract class AbstractGlobalConfigurationResourceHandler
     public AbstractGlobalConfigurationResourceHandler( Context context, Request request, Response response )
     {
         super( context, request, response );
+    }
+    
+    public static SmtpSettings convert( CSmtpConfiguration settings )
+    {
+        if ( settings == null )
+        {
+            return null;
+        }
+        
+        SmtpSettings result = new SmtpSettings();
+        
+        result.setHost( settings.getHost() );
+        
+        result.setPassword( settings.getPassword() );
+        
+        result.setPort( settings.getPort() );
+        
+        result.setSslEnabled( settings.isSslEnabled() );
+        
+        result.setSystemEmailAddress( settings.getSystemEmailAddress() );
+        
+        result.setTlsEnabled( settings.isTlsEnabled() );
+        
+        result.setUsername( settings.getUsername() );
+        
+        return result;
     }
 
     /**

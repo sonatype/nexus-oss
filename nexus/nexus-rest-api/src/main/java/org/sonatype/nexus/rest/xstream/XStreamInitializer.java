@@ -106,6 +106,7 @@ import org.sonatype.nexus.rest.model.ScheduledServiceTypeResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceTypeResourceResponse;
 import org.sonatype.nexus.rest.model.ScheduledServiceWeeklyResource;
 import org.sonatype.nexus.rest.model.SearchResponse;
+import org.sonatype.nexus.rest.model.SmtpSettings;
 import org.sonatype.nexus.rest.model.StatusConfigurationValidationResponse;
 import org.sonatype.nexus.rest.model.StatusResource;
 import org.sonatype.nexus.rest.model.StatusResourceResponse;
@@ -197,6 +198,7 @@ public final class XStreamInitializer
         xstream.omitField( RemoteConnectionSettings.class, "modelEncoding" );
         xstream.omitField( RemoteHttpProxySettings.class, "modelEncoding" );
         xstream.omitField( AuthenticationSettings.class, "modelEncoding" );
+        xstream.omitField( SmtpSettings.class, "modelEncoding" );
 
         xstream.omitField( WastebasketResource.class, "modelEncoding" );
         xstream.omitField( WastebasketResourceResponse.class, "modelEncoding" );
