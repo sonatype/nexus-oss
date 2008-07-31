@@ -73,22 +73,26 @@ Sonatype.repoServer.PrivilegeEditPanel = function(config){
   
   this.repoTargetRecordConstructor = Ext.data.Record.create([
     {name:'id'},
-    {name:'name', sortType:Ext.data.SortTypes.asUCString}
+    {name:'name', sortType:Ext.data.SortTypes.asUCString},
+    {name:'contentClass'}
   ]);
   
   this.repositoryRecordConstructor = Ext.data.Record.create([
     {name:'id'},
-    {name:'name', sortType:Ext.data.SortTypes.asUCString}
+    {name:'name', sortType:Ext.data.SortTypes.asUCString},
+    {name:'format'}
   ]);
   
   this.repositoryGroupRecordConstructor = Ext.data.Record.create([
     {name:'id'},
-    {name:'name', sortType:Ext.data.SortTypes.asUCString}
+    {name:'name', sortType:Ext.data.SortTypes.asUCString},
+    {name:'format'}
   ]);
   
   this.repositoryOrGroupRecordConstructor = Ext.data.Record.create([
     {name:'id'},
-    {name:'name', sortType:Ext.data.SortTypes.asUCString}
+    {name:'name', sortType:Ext.data.SortTypes.asUCString},
+    {name:'format'}
   ]);
   
   
@@ -125,7 +129,8 @@ Sonatype.repoServer.PrivilegeEditPanel = function(config){
           this.repositoryDataStore.each(function(item,i,len){
             var newRec = new this.repositoryOrGroupRecordConstructor({
                 id : 'repo_' + item.data.id,
-                name : item.data.name + ' (Repo)'
+                name : item.data.name + ' (Repo)',
+                format : item.data.format
               },
               'repo_' + item.id);
             this.repoOrGroupDataStore.add([newRec]);
@@ -155,7 +160,8 @@ Sonatype.repoServer.PrivilegeEditPanel = function(config){
           this.repositoryGroupDataStore.each(function(item,i,len){
             var newRec = new this.repositoryOrGroupRecordConstructor({
                 id : 'group_' + item.data.id,
-                name : item.data.name + ' (Group)'
+                name : item.data.name + ' (Group)',
+                format : item.data.format
               },
               'group_' + item.id);
             this.repoOrGroupDataStore.add([newRec]);
@@ -183,7 +189,6 @@ Sonatype.repoServer.PrivilegeEditPanel = function(config){
     layoutConfig: {
       labelSeparator: ''
     },
-        
     items: [
       {
         xtype: 'hidden',
@@ -225,7 +230,7 @@ Sonatype.repoServer.PrivilegeEditPanel = function(config){
         fieldLabel: 'Repository',
         labelStyle: 'margin-left: 15px; width: 185px;',
         itemCls: 'required-field',
-        helpText: ht.repository,
+        helpText: ht.repositoryOrGroup,
         name: 'repositoryOrGroup',
         store: this.repoOrGroupDataStore,
         displayField:'name',
@@ -246,7 +251,7 @@ Sonatype.repoServer.PrivilegeEditPanel = function(config){
         fieldLabel: 'Repository Target',
         labelStyle: 'margin-left: 15px; width: 185px;',
         itemCls: 'required-field',
-        helpText: ht.type,
+        helpText: ht.repositoryTarget,
         name: 'repositoryTargetId',
         store: this.repoTargetDataStore,
         displayField:'name',
@@ -888,5 +893,6 @@ Ext.extend(Sonatype.repoServer.PrivilegeEditPanel, Ext.Panel, {
   },
   
   repositorySelectHandler : function(combo, record, index){
+    var a = 0;
   }
 });

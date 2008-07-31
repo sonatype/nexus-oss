@@ -699,7 +699,7 @@ public class DefaultNexusSecurityConfiguration
                     CRepository repo = nexusConfiguration.readRepository( settings.getRepositoryId() );
                     
                     // Invalid Repo/Target content types
-                    if ( !repo.getRepositoryPolicy().equals( target.getContentClass() ) )
+                    if ( !repo.getType().equals( target.getContentClass() ) )
                     {
                         ValidationMessage error = new ValidationMessage( "repositoryId", "Privilege ID '" + settings.getId() 
                                                                         + "' has repository and repository target of different types",
