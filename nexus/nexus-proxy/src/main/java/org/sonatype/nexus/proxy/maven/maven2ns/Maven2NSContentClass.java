@@ -26,7 +26,8 @@ import org.sonatype.nexus.proxy.registry.AbstractIdContentClass;
  * The Maven2 content class.
  * 
  * @author cstamas
- * @plexus.component role-hint="maven2-namespace"
+ * DISABLED PLEXUS COMPONENT, UNUSED
+ * plexus.component role-hint="maven2-namespace"
  */
 public class Maven2NSContentClass
     extends AbstractIdContentClass

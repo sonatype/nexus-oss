@@ -51,7 +51,8 @@ import org.sonatype.nexus.util.StorageItemComparator;
  * The Class M2NamespaceBasedRepositoryRouter.
  * 
  * @author cstamas
- * @plexus.component role-hint="m2namespace"
+ * DISABLED PLEXUS COMPONENT, UNUSED
+ * plexus.component role-hint="m2namespace"
  */
 public class M2NamespaceBasedRepositoryRouter
     extends AbstractSearchableBasedRepositoryRouter
