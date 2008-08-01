@@ -21,7 +21,6 @@
 package org.sonatype.nexus.rest.users;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.logging.Level;
 
 import org.restlet.Context;
@@ -30,25 +29,15 @@ import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.restlet.resource.Representation;
 import org.sonatype.nexus.configuration.security.NoSuchUserException;
-import org.sonatype.nexus.configuration.security.model.CUser;
 import org.sonatype.nexus.rest.model.UserForgotPasswordRequest;
 import org.sonatype.nexus.rest.model.UserForgotPasswordResource;
 
 public class UserForgotPasswordResourceHandler
     extends AbstractUserResourceHandler
-{    
-    private String userId;
-    
+{
     public UserForgotPasswordResourceHandler( Context context, Request request, Response response )
     {
         super( context, request, response );
-        
-        this.userId = getRequest().getAttributes().get( USER_ID_KEY ).toString();
-    }
-    
-    protected String getUserId()
-    {
-        return this.userId;
     }
     
     @Override
@@ -70,32 +59,21 @@ public class UserForgotPasswordResourceHandler
         {
             UserForgotPasswordResource resource = request.getData();
             
-            List<CUser> users = ( List<CUser> ) getNexusSecurityConfiguration().listUsers();
-            
-            for ( CUser user : users )
+            try
             {
-                if ( user.getUserId().equals( resource.getUserId() ) 
-                    && user.getEmail().equals( resource.getEmail() ) )
-                {
-                    try
-                    {
-                        getNexusSecurityConfiguration().forgotPassword( resource.getUserId(), resource.getEmail() );
-                    }
-                    catch ( IOException e )
-                    {
-                        getResponse().setStatus( Status.SERVER_ERROR_INTERNAL );
+                getNexusSecurityConfiguration().forgotPassword( resource.getUserId(), resource.getEmail() );
+            }
+            catch ( IOException e )
+            {
+                getResponse().setStatus( Status.SERVER_ERROR_INTERNAL );
 
-                        getLogger().log( Level.SEVERE, "Got IO Exception!", e );
-                    }
-                    catch ( NoSuchUserException e )
-                    {
-                        getResponse().setStatus( Status.CLIENT_ERROR_BAD_REQUEST, "Invalid user ID." );
+                getLogger().log( Level.SEVERE, "Got IO Exception!", e );
+            }
+            catch ( NoSuchUserException e )
+            {
+                getResponse().setStatus( Status.CLIENT_ERROR_BAD_REQUEST, "Invalid user ID." );
 
-                        getLogger().log( Level.FINE, "Invalid user ID!", e );
-                    }
-                    
-                    break;
-                }
+                getLogger().log( Level.FINE, "Invalid user ID!", e );
             }
         }
     }

@@ -103,7 +103,7 @@ Sonatype.config = function() {
         users: servicePath + '/users',
         usersReset: servicePath + '/users/reset',
         usersForgotId: servicePath + '/users/forgotid',
-        usersForgotPassword: servicePath + '/users/forgotpw',
+        usersForgotPassword: servicePath + '/users/forgotpw/',
         usersChangePassword: servicePath + '/users/changepw',
         roles: servicePath + '/roles',
         privileges: servicePath + '/privileges',

@@ -632,8 +632,10 @@ Sonatype.repoServer.RepoServer = function(){
                     scope: this,
                     method: 'POST',
                     jsonData: {
-                      userId: username,
-                      email: email
+                      data: {
+                        userId: username,
+                        email: email
+                      }
                     },
                     url: Sonatype.config.repos.urls.usersForgotPassword,
                     success: function(response, options){

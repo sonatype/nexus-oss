@@ -55,6 +55,9 @@
 				<privilege>54</privilege>
 				<privilege>55</privilege>
 				<privilege>56</privilege>
+				<privilege>57</privilege>
+				<privilege>58</privilege>
+				<privilege>59</privilege>
 				<privilege>T1</privilege>
 				<privilege>T2</privilege>
 			</privileges>
@@ -424,5 +427,23 @@
 			<method>read</method>
 			<permission>nexus:repocontentclasses</permission>
 		</applicationPrivilege>
+		<applicationPrivilege>
+            <id>57</id>
+            <name>User Forgot Password - (create)</name>
+            <method>create</method>
+            <permission>nexus:usersforgotpw</permission>
+        </applicationPrivilege>
+        <applicationPrivilege>
+            <id>58</id>
+            <name>User Forgot User Id - (create)</name>
+            <method>create</method>
+            <permission>nexus:usersforgotid</permission>
+        </applicationPrivilege>
+        <applicationPrivilege>
+            <id>59</id>
+            <name>User Reset Password - (delete)</name>
+            <method>delete</method>
+            <permission>nexus:usersreset</permission>
+        </applicationPrivilege>
 	</applicationPrivileges>
 </nexusSecurity>
