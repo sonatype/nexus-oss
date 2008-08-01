@@ -2,18 +2,13 @@ package org.sonatype.nexus.integrationtests;
 
 import static org.junit.Assert.fail;
 
-import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
-import java.net.URLConnection;
 import java.net.URLDecoder;
 import java.util.Date;
 import java.util.HashMap;
@@ -57,7 +52,8 @@ import org.sonatype.nexus.test.utils.TestProperties;
 
 /**
  * curl --user admin:admin123 --request PUT http://localhost:8081/nexus/service/local/status/command --data START NOTE,
- * this class is not really abstract so I can work around a the <code>@BeforeClass</code>, <code>@AfterClass</code> issues, this should be refactored a little, but it might be ok, if we switch to TestNg
+ * this class is not really abstract so I can work around a the <code>@BeforeClass</code>, <code>@AfterClass</code>
+ * issues, this should be refactored a little, but it might be ok, if we switch to TestNg
  */
 public class AbstractNexusIntegrationTest
 {
@@ -108,9 +104,10 @@ public class AbstractNexusIntegrationTest
     /**
      * To me this seems like a bad hack around this problem. I don't have any other thoughts though. <BR/>If you see
      * this and think: "Wow, why did he to that instead of XYZ, please let me know." <BR/> The issue is that we want to
-     * init the tests once (to start/stop the app) and the <code>@BeforeClass</code> is static, so we don't have access to the package name of the running tests. We are going to
-     *              use the package name to find resources for additional setup. NOTE: With this setup running multiple
-     *              Test at the same time is not possible.
+     * init the tests once (to start/stop the app) and the <code>@BeforeClass</code> is static, so we don't have access
+     * to the package name of the running tests. We are going to use the package name to find resources for additional
+     * setup. NOTE: With this setup running multiple Test at the same time is not possible.
+     *
      * @throws Exception
      */
     @Before
@@ -235,7 +232,7 @@ public class AbstractNexusIntegrationTest
 
                 // Check to makes sure we get a 201
                 Assert.assertTrue( "Test-Harness failed to deploy artifact: " + model.getArtifactId()
-                    + ", with a status code of: " + status +", expected: 201", status == HttpStatus.SC_CREATED );
+                    + ", with a status code of: " + status + ", expected: 201", status == HttpStatus.SC_CREATED );
 
             }
 
@@ -359,7 +356,7 @@ public class AbstractNexusIntegrationTest
     /**
      * Returns a File if it exists, null otherwise. Files returned by this method must be located in the
      * "src/test/resourcs/nexusXXX/" folder.
-     * 
+     *
      * @param relativePath path relative to the nexusXXX directory.
      * @return A file specified by the relativePath. or null if it does not exist.
      */
@@ -378,7 +375,7 @@ public class AbstractNexusIntegrationTest
     /**
      * Returns a File if it exists, null otherwise. Files returned by this method must be located in the
      * "src/test/resourcs/nexusXXX/files/" folder.
-     * 
+     *
      * @param relativePath path relative to the files directory.
      * @return A file specified by the relativePath. or null if it does not exist.
      */
@@ -538,53 +535,53 @@ public class AbstractNexusIntegrationTest
     {
 
         return RequestFacade.downloadFile( url, targetFile );
-        
-//        OutputStream out = null;
-//        URLConnection conn = null;
-//        InputStream in = null;
-//
-//        File downloadedFile = new File( targetFile );
-//        // if this is null then someone was getting really creative with the tests, but hey, we will let them...
-//        if ( downloadedFile.getParentFile() != null )
-//        {
-//            downloadedFile.getParentFile().mkdirs();
-//        }
-//
-//        try
-//        {
-//
-//            System.out.println( "Downloading file: " + url );
-//            out = new BufferedOutputStream( new FileOutputStream( downloadedFile ) );
-//
-//            conn = url.openConnection();
-//            in = conn.getInputStream();
-//            byte[] buffer = new byte[1024];
-//            int numRead;
-//            long numWritten = 0;
-//            while ( ( numRead = in.read( buffer ) ) != -1 )
-//            {
-//                out.write( buffer, 0, numRead );
-//                numWritten += numRead;
-//            }
-//        }
-//        finally
-//        {
-//            try
-//            {
-//                if ( out != null )
-//                {
-//                    out.close();
-//                }
-//                if ( in != null )
-//                {
-//                    in.close();
-//                }
-//            }
-//            catch ( IOException e )
-//            {
-//            }
-//        }
-//        return downloadedFile;
+
+        // OutputStream out = null;
+        // URLConnection conn = null;
+        // InputStream in = null;
+        //
+        // File downloadedFile = new File( targetFile );
+        // // if this is null then someone was getting really creative with the tests, but hey, we will let them...
+        // if ( downloadedFile.getParentFile() != null )
+        // {
+        // downloadedFile.getParentFile().mkdirs();
+        // }
+        //
+        // try
+        // {
+        //
+        // System.out.println( "Downloading file: " + url );
+        // out = new BufferedOutputStream( new FileOutputStream( downloadedFile ) );
+        //
+        // conn = url.openConnection();
+        // in = conn.getInputStream();
+        // byte[] buffer = new byte[1024];
+        // int numRead;
+        // long numWritten = 0;
+        // while ( ( numRead = in.read( buffer ) ) != -1 )
+        // {
+        // out.write( buffer, 0, numRead );
+        // numWritten += numRead;
+        // }
+        // }
+        // finally
+        // {
+        // try
+        // {
+        // if ( out != null )
+        // {
+        // out.close();
+        // }
+        // if ( in != null )
+        // {
+        // in.close();
+        // }
+        // }
+        // catch ( IOException e )
+        // {
+        // }
+        // }
+        // return downloadedFile;
     }
 
     protected void deleteFromRepository( String groupOrArtifactPath )
