@@ -35,6 +35,9 @@ import org.jsecurity.authc.AccountException;
 import org.jsecurity.authc.AuthenticationException;
 import org.jsecurity.authc.AuthenticationInfo;
 import org.jsecurity.authc.AuthenticationToken;
+import org.jsecurity.authc.DisabledAccountException;
+import org.jsecurity.authc.ExpiredCredentialsException;
+import org.jsecurity.authc.LockedAccountException;
 import org.jsecurity.authc.SimpleAuthenticationInfo;
 import org.jsecurity.authc.UnknownAccountException;
 import org.jsecurity.authc.UsernamePasswordToken;
@@ -136,6 +139,7 @@ public class NexusRealm
         }
 
         UsernamePasswordToken upToken = (UsernamePasswordToken) token;
+
         String username = upToken.getUsername();
 
         // Null username is invalid
@@ -147,15 +151,36 @@ public class NexusRealm
         try
         {
             CUser user = securityConfiguration.readUser( username );
-            String password = user.getPassword();
-            if ( password == null )
+
+            if ( CUser.STATUS_ACTIVE.equals( user.getStatus() ) )
             {
-                throw new UnknownAccountException( "No account found for user [" + username + "]" );
+                String password = user.getPassword();
+
+                if ( password == null )
+                {
+                    throw new UnknownAccountException( "No account found for user [" + username + "]" );
+                }
+
+                AuthenticationInfo authenticationInfo = buildAuthenticationInfo( username, password.toCharArray() );
+
+                return authenticationInfo;
             }
-
-            AuthenticationInfo authenticationInfo = buildAuthenticationInfo( username, password.toCharArray() );
-
-            return authenticationInfo;
+            else if ( CUser.STATUS_DISABLED.equals( user.getStatus() ) )
+            {
+                throw new DisabledAccountException( "Account for user ['" + username + "'] is disabled!" );
+            }
+            else if ( CUser.STATUS_EXPIRED.equals( user.getStatus() ) )
+            {
+                throw new ExpiredCredentialsException( "Credentials for user['" + username + "'] has expired!" );
+            }
+            else if ( CUser.STATUS_LOCKED.equals( user.getStatus() ) )
+            {
+                throw new LockedAccountException( "Account for user ['" + username + "'] is locked!" );
+            }
+            else
+            {
+                throw new AccountException( "Account is in illegal status=['" + user.getStatus() + "']" );
+            }
         }
         catch ( NoSuchUserException e )
         {
