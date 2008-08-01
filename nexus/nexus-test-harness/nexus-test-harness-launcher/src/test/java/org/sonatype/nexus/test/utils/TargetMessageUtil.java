@@ -1,4 +1,4 @@
-package org.sonatype.nexus.integrationtests.nexus133;
+package org.sonatype.nexus.test.utils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -19,14 +19,15 @@ import org.restlet.data.Method;
 import org.restlet.data.Protocol;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
+import org.restlet.resource.StringRepresentation;
 import org.sonatype.nexus.configuration.model.CRepositoryTarget;
 import org.sonatype.nexus.configuration.model.Configuration;
 import org.sonatype.nexus.configuration.model.io.xpp3.NexusConfigurationXpp3Reader;
+import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.rest.model.RepositoryTargetListResource;
 import org.sonatype.nexus.rest.model.RepositoryTargetListResourceResponse;
 import org.sonatype.nexus.rest.model.RepositoryTargetResource;
 import org.sonatype.nexus.rest.model.RepositoryTargetResourceResponse;
-import org.sonatype.nexus.test.utils.NexusConfigUtil;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
 
 import com.thoughtworks.xstream.XStream;
@@ -48,53 +49,29 @@ public class TargetMessageUtil
         this.baseNexusUrl = baseNexusUrl;
     }
 
-    public Response sendMessage( Method method, RepositoryTargetResource resource )
+    public Response sendMessage( Method method, RepositoryTargetResource resource ) throws IOException
     {
-
+       
         XStreamRepresentation representation = new XStreamRepresentation( xstream, "", mediaType );
 
         String repoTargetId = ( resource.getId() == null ) ? "?undefined" : "/" + resource.getId();
 
-        String serviceURI = this.baseNexusUrl + "service/local/repo_targets" + repoTargetId;
-        System.out.println( "serviceURI: " + serviceURI );
-
-        Request request = new Request();
-
-        request.setResourceRef( serviceURI );
-
-        request.setMethod( method );
-
+        String serviceURI = "service/local/repo_targets" + repoTargetId;
+        
         RepositoryTargetResourceResponse requestResponse = new RepositoryTargetResourceResponse();
         requestResponse.setData( resource );
-
-        // now set the payload
+     // now set the payload
         representation.setPayload( requestResponse );
-        request.setEntity( representation );
-
-        Client client = new Client( Protocol.HTTP );
-
-        return client.handle( request );
+        
+        return RequestFacade.sendMessage( serviceURI, method, representation );
     }
 
     @SuppressWarnings( "unchecked" )
     public List<RepositoryTargetListResource> getList()
         throws IOException
     {
-        String serviceURI = this.baseNexusUrl + "service/local/repo_targets";
-        System.out.println( "serviceURI: " + serviceURI );
 
-        URL serviceURL = new URL( serviceURI );
-
-        InputStream is = serviceURL.openStream();
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-
-        int readChar = -1;
-        while ( ( readChar = is.read() ) != -1 )
-        {
-            out.write( readChar );
-        }
-
-        String responseText = out.toString();
+        String responseText = RequestFacade.doGetRequest( "service/local/repo_targets" ).getEntity().getText();
         System.out.println( "responseText: \n" + responseText );
 
         XStreamRepresentation representation =

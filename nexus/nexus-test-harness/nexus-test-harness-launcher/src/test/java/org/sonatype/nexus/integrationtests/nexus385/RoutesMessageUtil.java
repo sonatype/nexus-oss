@@ -7,14 +7,11 @@ import java.util.List;
 import junit.framework.Assert;
 
 import org.codehaus.plexus.util.StringUtils;
-import org.restlet.Client;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
-import org.restlet.data.Protocol;
-import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.sonatype.nexus.configuration.model.CGroupsSettingPathMappingItem;
-import org.sonatype.nexus.configuration.model.Configuration;
+import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.rest.model.NexusError;
 import org.sonatype.nexus.rest.model.NexusErrorResponse;
 import org.sonatype.nexus.rest.model.RepositoryRouteMemberRepository;
@@ -41,20 +38,12 @@ public class RoutesMessageUtil
         this.baseNexusUrl = baseNexusUrl;
     }
 
-    public Response sendMessage( Method method, RepositoryRouteResource resource )
+    public Response sendMessage( Method method, RepositoryRouteResource resource ) throws IOException
     {
         XStreamRepresentation representation = new XStreamRepresentation( xstream, "", mediaType );
 
         String resourceId = ( resource.getId() == null ) ? "" : "/" + resource.getId();
-
-        String serviceURI = this.baseNexusUrl + "service/local/repo_routes" + resourceId;
-        System.out.println( "serviceURI: " + serviceURI );
-
-        Request request = new Request();
-
-        request.setResourceRef( serviceURI );
-
-        request.setMethod( method );
+        String serviceURI = "service/local/repo_routes" + resourceId;
 
         if ( method != Method.GET || method != Method.DELETE )
         {
@@ -63,13 +52,9 @@ public class RoutesMessageUtil
 
             // now set the payload
             representation.setPayload( requestResponse );
-            System.out.println( method.getName() + ": " + representation.getText() );
-            request.setEntity( representation );
         }
 
-        Client client = new Client( Protocol.HTTP );
-
-        return client.handle( request );
+        return RequestFacade.sendMessage( serviceURI, method, representation );
     }
 
     public RepositoryRouteResource getResourceFromResponse( Response response ) throws IOException

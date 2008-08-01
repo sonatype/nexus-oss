@@ -1,16 +1,22 @@
 package org.sonatype.nexus.test.utils;
 
 import java.io.IOException;
+import java.net.ConnectException;
+import java.net.MalformedURLException;
 import java.net.URL;
 
 import junit.framework.Assert;
 
 import org.restlet.Client;
+import org.restlet.data.ChallengeResponse;
+import org.restlet.data.ChallengeScheme;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Protocol;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
+import org.restlet.resource.StringRepresentation;
+import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.rest.model.StatusResourceResponse;
 
 import com.thoughtworks.xstream.XStream;
@@ -29,37 +35,45 @@ public class NexusStateUtil
     
     
 
-    public static void sendNexusStatusCommand( String command )
+    public static void sendNexusStatusCommand( String command ) throws IOException
     {
-        String serviceURI = TestProperties.getString( "nexus.base.url" ) + "service/local/status/command";
-
-        Request request = new Request();
-
-        request.setResourceRef( serviceURI );
-        request.setMethod( Method.PUT );
-        request.setEntity( command, MediaType.TEXT_ALL );
-
-        Client client = new Client( Protocol.HTTP );
-
-        Response response = client.handle( request );
+        
+        Response response = RequestFacade.sendMessage( "service/local/status/command", Method.PUT, new StringRepresentation(command, MediaType.TEXT_ALL) );
 
         if ( !response.getStatus().isSuccess() )
         {
             Assert.fail( "Could not " + command + " Nexus: (" + response.getStatus() + ")" );
         }
     }
+    
+    public static StatusResourceResponse getNexusStatus() throws IOException
+    {
+        Response response = RequestFacade.doGetRequest( "service/local/status" );
 
-    public static void doSoftStop()
+        if ( !response.getStatus().isSuccess() )
+        {
+            throw new ConnectException( response.getStatus().toString() );
+        }
+        
+        XStream xstream = new XStream();
+        StatusResourceResponse status = null;
+
+        status =
+            (StatusResourceResponse) xstream.fromXML( response.getEntity().getText() );
+        return status;
+    }
+
+    public static void doSoftStop() throws IOException
     {
         sendNexusStatusCommand( "STOP" );
     }
 
-    public static void doSoftStart()
+    public static void doSoftStart() throws IOException
     {
         sendNexusStatusCommand( "START" );
     }
 
-    public static void doSoftRestart()
+    public static void doSoftRestart() throws IOException
     {
         sendNexusStatusCommand( "RESTART" );
     }
@@ -70,15 +84,5 @@ public class NexusStateUtil
         return ( STATUS_STARTED.equals( getNexusStatus().getData().getState() ) );
     }
 
-    public static StatusResourceResponse getNexusStatus()
-        throws IOException
-    {
-        XStream xstream = new XStream();
-        StatusResourceResponse status = null;
-
-        status =
-            (StatusResourceResponse) xstream.fromXML( new URL( TestProperties.getString( "nexus.base.url" ) + "service/local/status" ).openStream() );
-        return status;
-    }
     
 }

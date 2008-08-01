@@ -12,6 +12,7 @@ import org.restlet.data.Method;
 import org.restlet.data.Protocol;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
+import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.rest.model.RepositoryTargetListResource;
 import org.sonatype.nexus.rest.model.RepositoryTargetListResourceResponse;
 import org.sonatype.nexus.rest.model.UserListResourceResponse;
@@ -38,32 +39,22 @@ public class UserMessageUtil
         this.baseNexusUrl = baseNexusUrl;
     }
 
-    public Response sendMessage( Method method, UserResource resource )
+    public Response sendMessage( Method method, UserResource resource ) throws IOException
     {
     
         XStreamRepresentation representation = new XStreamRepresentation( xstream, "", mediaType );
     
         String userId = ( method == Method.POST ) ? "" : "/" + resource.getUserId();
     
-        String serviceURI = this.baseNexusUrl + "service/local/users" + userId;
-        System.out.println( "serviceURI: " + serviceURI );
-    
-        Request request = new Request();
-    
-        request.setResourceRef( serviceURI );
-    
-        request.setMethod( method );
+        String serviceURI = "service/local/users" + userId;
     
         UserResourceRequest userRequest = new UserResourceRequest();
         userRequest.setData( resource );
     
         // now set the payload
         representation.setPayload( userRequest );
-        request.setEntity( representation );
     
-        Client client = new Client( Protocol.HTTP );
-    
-        return client.handle( request );
+        return RequestFacade.sendMessage( serviceURI, method, representation );
     }
     
     /**
@@ -76,21 +67,7 @@ public class UserMessageUtil
     public List<UserResource> getList()
         throws IOException
     {
-        String serviceURI = this.baseNexusUrl + "service/local/users";
-        System.out.println( "serviceURI: " + serviceURI );
-
-        URL serviceURL = new URL( serviceURI );
-
-        InputStream is = serviceURL.openStream();
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-
-        int readChar = -1;
-        while ( ( readChar = is.read() ) != -1 )
-        {
-            out.write( readChar );
-        }
-
-        String responseText = out.toString();
+        String responseText = RequestFacade.doGetRequest( "service/local/users" ).getEntity().getText();
         System.out.println( "responseText: \n" + responseText );
 
         XStreamRepresentation representation =

@@ -16,7 +16,7 @@ public class Nexus387RoutesTests
     extends AbstractNexusIntegrationTest
 {
 
-//    @Test
+    @Test
     public void testExclusive()
         throws IOException
     {
@@ -50,7 +50,7 @@ public class Nexus387RoutesTests
 
     }
 
-//    @Test
+    @Test
     public void testInclusive()
         throws IOException
     {

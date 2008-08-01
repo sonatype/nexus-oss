@@ -12,6 +12,7 @@ import org.restlet.data.Method;
 import org.restlet.data.Protocol;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
+import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.rest.model.RoleListResourceResponse;
 import org.sonatype.nexus.rest.model.RoleResource;
 import org.sonatype.nexus.rest.model.RoleResourceRequest;
@@ -36,32 +37,22 @@ public class RoleMessageUtil
         this.baseNexusUrl = baseNexusUrl;
     }
 
-    public Response sendMessage( Method method, RoleResource resource )
+    public Response sendMessage( Method method, RoleResource resource ) throws IOException
     {
     
         XStreamRepresentation representation = new XStreamRepresentation( xstream, "", mediaType );
     
         String roleId = ( method == Method.POST ) ? "" : "/" + resource.getId();
     
-        String serviceURI = this.baseNexusUrl + "service/local/roles" + roleId;
-        System.out.println( "serviceURI: " + serviceURI );
-    
-        Request request = new Request();
-    
-        request.setResourceRef( serviceURI );
-    
-        request.setMethod( method );
+        String serviceURI = "service/local/roles" + roleId;
     
         RoleResourceRequest userRequest = new RoleResourceRequest();
         userRequest.setData( resource );
     
         // now set the payload
         representation.setPayload( userRequest );
-        request.setEntity( representation );
     
-        Client client = new Client( Protocol.HTTP );
-    
-        return client.handle( request );
+        return RequestFacade.sendMessage( serviceURI, method, representation );
     }
     
     /**
@@ -74,22 +65,7 @@ public class RoleMessageUtil
     public List<RoleResource> getList()
         throws IOException
     {
-        String serviceURI = this.baseNexusUrl + "service/local/roles";
-        System.out.println( "serviceURI: " + serviceURI );
-
-        URL serviceURL = new URL( serviceURI );
-
-        InputStream is = serviceURL.openStream();
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-
-        int readChar = -1;
-        while ( ( readChar = is.read() ) != -1 )
-        {
-            out.write( readChar );
-        }
-
-        String responseText = out.toString();
-        System.out.println( "responseText: \n" + responseText );
+        String responseText = RequestFacade.doGetRequest( "service/local/roles" ).getEntity().getText();
 
         XStreamRepresentation representation =
             new XStreamRepresentation( new XStream(), responseText, MediaType.APPLICATION_XML );

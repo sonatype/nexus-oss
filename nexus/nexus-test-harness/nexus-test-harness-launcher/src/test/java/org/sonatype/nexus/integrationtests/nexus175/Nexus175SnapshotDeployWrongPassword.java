@@ -16,13 +16,13 @@ import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.test.utils.DeployUtils;
 import org.sonatype.nexus.test.utils.FileTestingUtils;
 
-public class Nexus173SnapshotDeployWrongPassword
+public class Nexus175SnapshotDeployWrongPassword
     extends AbstractNexusIntegrationTest
 {
 
     private static final String TEST_RELEASE_REPO = "nexus-test-harness-release-repo";
 
-    public Nexus173SnapshotDeployWrongPassword()
+    public Nexus175SnapshotDeployWrongPassword()
     {
         super( TEST_RELEASE_REPO );
     }

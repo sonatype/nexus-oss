@@ -16,6 +16,8 @@ public class TestContainer
 {
 
     private static TestContainer SELF = null;
+    
+    private TestContext testContext = new TestContext();
 
     private PlexusContainer container;
 
@@ -77,6 +79,11 @@ public class TestContainer
         throws Exception
     {
         return container.lookup( role, id );
+    }
+
+    public TestContext getTestContext()
+    {
+        return testContext;
     }
 
 }

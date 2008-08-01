@@ -10,10 +10,10 @@
   
     <distributionManagement>
   	<repository>
-  		<id>releases</id>
+  		<id>repo1</id>
   		<name>Releases</name>
   		<!--<<url>http://localhost:8081/nexus/content/repositories/snapshots</url>-->
-  		<url>${nexus-base-url}content/repositories/repo1</url>
+  		<url>${nexus-base-url}service/local/artifact/maven/content</url>
   	</repository>
   </distributionManagement>
   

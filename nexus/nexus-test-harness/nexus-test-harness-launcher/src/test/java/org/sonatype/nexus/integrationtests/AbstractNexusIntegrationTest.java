@@ -12,14 +12,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLDecoder;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.ResourceBundle;
 
 import junit.framework.Assert;
 
@@ -44,8 +42,6 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.restlet.Client;
-import org.restlet.data.MediaType;
-import org.restlet.data.Metadata;
 import org.restlet.data.Method;
 import org.restlet.data.Protocol;
 import org.restlet.data.Request;
@@ -53,22 +49,15 @@ import org.restlet.data.Response;
 import org.sonatype.appbooter.ForkedAppBooter;
 import org.sonatype.appbooter.ctl.AppBooterServiceException;
 import org.sonatype.nexus.artifact.Gav;
-import org.sonatype.nexus.rest.model.StatusResourceResponse;
-import org.sonatype.nexus.rest.xstream.XStreamInitializer;
 import org.sonatype.nexus.test.utils.DeployUtils;
 import org.sonatype.nexus.test.utils.FileTestingUtils;
+import org.sonatype.nexus.test.utils.NexusConfigUtil;
 import org.sonatype.nexus.test.utils.NexusStateUtil;
 import org.sonatype.nexus.test.utils.TestProperties;
-import org.xml.sax.XMLReader;
-
-import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.io.xml.DomDriver;
-import com.thoughtworks.xstream.io.xml.XppDriver;
 
 /**
  * curl --user admin:admin123 --request PUT http://localhost:8081/nexus/service/local/status/command --data START NOTE,
- * this class is not really abstract so I can work around a the <code>@BeforeClass</code>, <code>@AfterClass</code>
- * issues, this should be refactored a little, but it might be ok, if we switch to TestNg
+ * this class is not really abstract so I can work around a the <code>@BeforeClass</code>, <code>@AfterClass</code> issues, this should be refactored a little, but it might be ok, if we switch to TestNg
  */
 public class AbstractNexusIntegrationTest
 {
@@ -119,10 +108,9 @@ public class AbstractNexusIntegrationTest
     /**
      * To me this seems like a bad hack around this problem. I don't have any other thoughts though. <BR/>If you see
      * this and think: "Wow, why did he to that instead of XYZ, please let me know." <BR/> The issue is that we want to
-     * init the tests once (to start/stop the app) and the <code>@BeforeClass</code> is static, so we don't have access
-     * to the package name of the running tests. We are going to use the package name to find resources for additional
-     * setup. NOTE: With this setup running multiple Test at the same time is not possible.
-     *
+     * init the tests once (to start/stop the app) and the <code>@BeforeClass</code> is static, so we don't have access to the package name of the running tests. We are going to
+     *              use the package name to find resources for additional setup. NOTE: With this setup running multiple
+     *              Test at the same time is not possible.
      * @throws Exception
      */
     @Before
@@ -139,16 +127,21 @@ public class AbstractNexusIntegrationTest
                 // clean common work dir
                 // this.cleanWorkDir();
 
-                // copy nexus config
                 this.copyConfigFile( "nexus.xml" );
+
+                // enable security
+                NexusConfigUtil.enableSecurity( this.isSecurityTest() );
 
                 // copy security config
                 this.copyConfigFile( "security.xml" );
 
                 this.copyConfigFile( "log4j.properties", variables );
 
+                // always use the user/pass when starting nexus
+                TestContainer.getInstance().getTestContext().setSecureTest( true );
                 // start nexus
                 this.startNexus();
+                TestContainer.getInstance().getTestContext().setSecureTest( this.isSecurityTest() );
 
                 // deploy artifacts
                 this.deployArtifacts();
@@ -157,6 +150,11 @@ public class AbstractNexusIntegrationTest
                 NEEDS_INIT = false;
             }
         }
+    }
+
+    private boolean isSecurityTest()
+    {
+        return this instanceof SecurityTest;
     }
 
     protected void cleanWorkDir()
@@ -235,8 +233,9 @@ public class AbstractNexusIntegrationTest
 
                 int status = DeployUtils.deployUsingPomWithRest( deployUrl, repositoryId, gav, artifactFile, pom );
 
-                // TODO should I check this status?
-                Assert.assertFalse( status == HttpStatus.SC_BAD_REQUEST );
+                // Check to makes sure we get a 201
+                Assert.assertTrue( "Test-Harness failed to deploy artifact: " + model.getArtifactId()
+                    + ", with a status code of: " + status +", expected: 201", status == HttpStatus.SC_CREATED );
 
             }
 
@@ -322,6 +321,13 @@ public class AbstractNexusIntegrationTest
     private void copyConfigFile( String configFile, Map<String, String> variables )
         throws IOException
     {
+        this.copyConfigFile( configFile, configFile, variables );
+
+    }
+
+    private void copyConfigFile( String configFile, String destShortName, Map<String, String> variables )
+        throws IOException
+    {
         // the test can override the test config.
         File testConfigFile = this.getTestResourceAsFile( "test-config/" + configFile );
 
@@ -340,7 +346,7 @@ public class AbstractNexusIntegrationTest
             + new File( this.nexusBaseDir + "/" + RELATIVE_CONF_DIR, configFile ) );
 
         FileTestingUtils.interpolationFileCopy( testConfigFile, new File( this.nexusBaseDir + "/" + RELATIVE_CONF_DIR,
-                                                                          configFile ), variables );
+                                                                          destShortName ), variables );
 
     }
 
@@ -348,31 +354,12 @@ public class AbstractNexusIntegrationTest
         throws IOException
     {
         this.copyConfigFile( configFile, new HashMap<String, String>() );
-
-        // // the test can override the test config.
-        // File testConfigFile = this.getTestResourceAsFile( "test-config/" + configFile );
-        //
-        // // if the tests doesn't have a different config then use the default.
-        // // we need to replace every time to make sure no one changes it.
-        // if ( testConfigFile == null || !testConfigFile.exists() )
-        // {
-        // testConfigFile = this.getResource( "default-config/" + configFile );
-        // }
-        // else
-        // {
-        // System.out.println( "This test is using its own " + configFile + " " + testConfigFile );
-        // }
-        //
-        // System.out.println( "copying " + configFile + " to:  "
-        // + new File( this.nexusBaseDir + "/" + RELATIVE_CONF_DIR, configFile ) );
-        //
-        // FileUtils.copyFile( testConfigFile, new File( this.nexusBaseDir + "/" + RELATIVE_CONF_DIR, configFile ) );
     }
 
     /**
      * Returns a File if it exists, null otherwise. Files returned by this method must be located in the
      * "src/test/resourcs/nexusXXX/" folder.
-     *
+     * 
      * @param relativePath path relative to the nexusXXX directory.
      * @return A file specified by the relativePath. or null if it does not exist.
      */
@@ -391,7 +378,7 @@ public class AbstractNexusIntegrationTest
     /**
      * Returns a File if it exists, null otherwise. Files returned by this method must be located in the
      * "src/test/resourcs/nexusXXX/files/" folder.
-     *
+     * 
      * @param relativePath path relative to the files directory.
      * @return A file specified by the relativePath. or null if it does not exist.
      */
@@ -550,52 +537,54 @@ public class AbstractNexusIntegrationTest
         throws IOException
     {
 
-        OutputStream out = null;
-        URLConnection conn = null;
-        InputStream in = null;
-
-        File downloadedFile = new File( targetFile );
-        // if this is null then someone was getting really creative with the tests, but hey, we will let them...
-        if ( downloadedFile.getParentFile() != null )
-        {
-            downloadedFile.getParentFile().mkdirs();
-        }
-
-        try
-        {
-
-            System.out.println( "Downloading file: " + url );
-            out = new BufferedOutputStream( new FileOutputStream( downloadedFile ) );
-
-            conn = url.openConnection();
-            in = conn.getInputStream();
-            byte[] buffer = new byte[1024];
-            int numRead;
-            long numWritten = 0;
-            while ( ( numRead = in.read( buffer ) ) != -1 )
-            {
-                out.write( buffer, 0, numRead );
-                numWritten += numRead;
-            }
-        }
-        finally
-        {
-            try
-            {
-                if ( out != null )
-                {
-                    out.close();
-                }
-                if ( in != null )
-                {
-                    in.close();
-                }
-            }
-            catch ( IOException e )
-            {
-            }
-        }
-        return downloadedFile;
+        return RequestFacade.downloadFile( url, targetFile );
+        
+//        OutputStream out = null;
+//        URLConnection conn = null;
+//        InputStream in = null;
+//
+//        File downloadedFile = new File( targetFile );
+//        // if this is null then someone was getting really creative with the tests, but hey, we will let them...
+//        if ( downloadedFile.getParentFile() != null )
+//        {
+//            downloadedFile.getParentFile().mkdirs();
+//        }
+//
+//        try
+//        {
+//
+//            System.out.println( "Downloading file: " + url );
+//            out = new BufferedOutputStream( new FileOutputStream( downloadedFile ) );
+//
+//            conn = url.openConnection();
+//            in = conn.getInputStream();
+//            byte[] buffer = new byte[1024];
+//            int numRead;
+//            long numWritten = 0;
+//            while ( ( numRead = in.read( buffer ) ) != -1 )
+//            {
+//                out.write( buffer, 0, numRead );
+//                numWritten += numRead;
+//            }
+//        }
+//        finally
+//        {
+//            try
+//            {
+//                if ( out != null )
+//                {
+//                    out.close();
+//                }
+//                if ( in != null )
+//                {
+//                    in.close();
+//                }
+//            }
+//            catch ( IOException e )
+//            {
+//            }
+//        }
+//        return downloadedFile;
     }
 
     protected void deleteFromRepository( String groupOrArtifactPath )

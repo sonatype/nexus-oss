@@ -7,12 +7,10 @@ import java.util.List;
 import junit.framework.Assert;
 
 import org.codehaus.plexus.util.StringUtils;
-import org.restlet.Client;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
-import org.restlet.data.Protocol;
-import org.restlet.data.Request;
 import org.restlet.data.Response;
+import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.rest.model.NexusError;
 import org.sonatype.nexus.rest.model.NexusErrorResponse;
 import org.sonatype.nexus.rest.model.PrivilegeBaseResource;
@@ -41,26 +39,18 @@ public class PrivilegesMessageUtil
         this.baseNexusUrl = baseNexusUrl;
     }
 
-    public Response sendMessage( Method method, PrivilegeBaseResource resource )
+    public Response sendMessage( Method method, PrivilegeBaseResource resource ) throws IOException
     {
         return this.sendMessage( method, resource, "" );
     }
 
-    public Response sendMessage( Method method, PrivilegeBaseResource resource, String id )
+    public Response sendMessage( Method method, PrivilegeBaseResource resource, String id ) throws IOException
     {
 
         XStreamRepresentation representation = new XStreamRepresentation( xstream, "", mediaType );
 
         String privId = ( method == Method.POST ) ? "" : "/" + id;
-
-        String serviceURI = this.baseNexusUrl + "service/local/privileges" + privId;
-        System.out.println( "serviceURI: " + serviceURI );
-
-        Request request = new Request();
-
-        request.setResourceRef( serviceURI );
-
-        request.setMethod( method );
+        String serviceURI = "service/local/privileges" + privId;
 
         if ( method == Method.POST )
         {
@@ -70,12 +60,9 @@ public class PrivilegesMessageUtil
             // now set the payload
             representation.setPayload( requestResponse );
             System.out.println( method.getName() + ": " + representation.getText() );
-            request.setEntity( representation );
         }
 
-        Client client = new Client( Protocol.HTTP );
-
-        return client.handle( request );
+        return RequestFacade.sendMessage( serviceURI, method, representation );
     }
 
     public PrivilegeBaseStatusResource getResourceFromResponse( Response response )

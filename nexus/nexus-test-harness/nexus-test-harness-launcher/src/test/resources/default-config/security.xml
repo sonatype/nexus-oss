@@ -20,7 +20,7 @@
       <status>active</status>
       <email>nexus-dev1@sonatype.org</email>
       <roles>
-        <role>admin</role>
+        <role>anonymous</role>
       </roles>
     </user>
   </users>
