@@ -100,6 +100,11 @@ public class NexusHttpAuthenticationFilter
         }
     }
 
+    protected boolean isRememberMeEnabled( ServletRequest request )
+    {
+        return true;
+    }
+
     protected boolean executeAnonymousLogin( ServletRequest request, ServletResponse response )
     {
         if ( getLogger().isDebugEnabled() )
