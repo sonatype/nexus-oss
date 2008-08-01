@@ -8,8 +8,8 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 
+import org.jsecurity.subject.Subject;
 import org.jsecurity.web.WebUtils;
-import org.sonatype.nexus.proxy.NoSuchResourceStoreException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.target.TargetMatch;
 import org.sonatype.nexus.proxy.target.TargetSet;
@@ -36,18 +36,14 @@ public class NexusTargetMappingAuthorizationFilter
 
     public String getResourceStorePath( ServletRequest request )
     {
+        String path = WebUtils.getPathWithinApplication( (HttpServletRequest) request );
+
         if ( getPathPrefix() != null )
         {
-            String path = WebUtils.getPathWithinApplication( (HttpServletRequest) request );
-
             path = path.replaceFirst( getPathPrefix(), "" );
-
-            return path;
         }
-        else
-        {
-            return null;
-        }
+        
+        return path;
     }
 
     public String[] getTargetPerms( TargetSet matched )
@@ -71,33 +67,58 @@ public class NexusTargetMappingAuthorizationFilter
         throws IOException
     {
         // let check the mappedValues 1st
+        boolean result = false;
 
-        boolean result = super.isAccessAllowed( request, response, mappedValue );
-
-        // if we are not allowed at start, forbid it
-        if ( !result )
+        if ( mappedValue != null )
         {
-            return false;
+            result = super.isAccessAllowed( request, response, mappedValue );
+
+            // if we are not allowed at start, forbid it
+            if ( !result )
+            {
+                return false;
+            }
         }
 
         // if we are allowed to go forward, let's check the target perms
+        // create a ResourceStoreRequest using the request path
         ResourceStoreRequest rsr = new ResourceStoreRequest( getResourceStorePath( request ), true );
 
+        // collect the targetSet/matches for the request
         TargetSet matched = getNexus( request ).getRootRouter().getTargetsForRequest( rsr );
 
+        // did we hit repositories at all?
         if ( matched.getMatchedRepositoryIds().size() > 0 )
         {
+            // we had reposes affected, check the targets
+            // make perms from TargetSet
             String[] targetPerms = getTargetPerms( matched );
 
+            // get the action from HTTP verb
             String action = getActionFromHttpVerb( request );
 
+            // append the action to the end of targetPerms
             String[] mappedPerms = mapPerms( targetPerms, action );
 
-            return super.isAccessAllowed( request, response, mappedPerms );
+            // get the subject for testing perms
+            Subject subject = getSubject( request, response );
+
+            // iterator over perms, and if any of them is permitted for subject
+            // allow access
+            for ( String perm : mappedPerms )
+            {
+                if ( subject.isPermitted( perm ) )
+                {
+                    return true;
+                }
+            }
+
+            // did not hit any of perms, so the subject is not allowed to do this
+            return false;
         }
         else
         {
-            // this will hit no repos, it is a virtual path, allow access
+            // we hit no repos, it is a virtual path, allow access
             return true;
         }
     }
