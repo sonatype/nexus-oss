@@ -58,6 +58,7 @@
 				<privilege>57</privilege>
 				<privilege>58</privilege>
 				<privilege>59</privilege>
+				<privilege>60</privilege>
 				<privilege>T1</privilege>
 				<privilege>T2</privilege>
 			</privileges>
@@ -444,6 +445,30 @@
             <name>User Reset Password - (delete)</name>
             <method>delete</method>
             <permission>nexus:usersreset</permission>
+        </applicationPrivilege>
+        <applicationPrivilege>
+            <id>60</id>
+            <name>Nexus Content Access - (read)</name>
+            <method>read</method>
+            <permission>nexus:content</permission>
+        </applicationPrivilege>
+        <applicationPrivilege>
+            <id>61</id>
+            <name>Nexus Content Access - (create)</name>
+            <method>create</method>
+            <permission>nexus:content</permission>
+        </applicationPrivilege>
+        <applicationPrivilege>
+            <id>62</id>
+            <name>Nexus Content Access - (update)</name>
+            <method>update</method>
+            <permission>nexus:content</permission>
+        </applicationPrivilege>
+        <applicationPrivilege>
+            <id>63</id>
+            <name>Nexus Content Access - (delete)</name>
+            <method>delete</method>
+            <permission>nexus:content</permission>
         </applicationPrivilege>
 	</applicationPrivileges>
 </nexusSecurity>
