@@ -845,7 +845,12 @@ Ext.extend(Sonatype.repoServer.UserEditPanel, Ext.Panel, {
     var role;
 
     for(var i=0; i<arr.length; i++){
-      role = this.roleDataStore.getAt(this.roleDataStore.find("id",arr[i]));
+	role = this.roleDataStore.getAt(this.roleDataStore.findBy(function(record, id){
+        if (record.data.id == arr[i]){
+          return true;
+        }
+        return false;
+      }));
       selectedTree.root.appendChild(
         new Ext.tree.TreeNode({
           id: role.data.id,

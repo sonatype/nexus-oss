@@ -815,7 +815,12 @@ Ext.extend(Sonatype.repoServer.RoleEditPanel, Ext.Panel, {
     var role;
 
     for(var i=0; i<arr.length; i++){
-      role = this.rolesDataStore.getAt(this.rolesDataStore.find("id",arr[i]));
+      role = this.rolesDataStore.getAt(this.rolesDataStore.findBy(function(record, id){
+          if (record.data.id == arr[i]){
+            return true;
+          }
+          return false;
+        }));
       if (role){
         selectedTree.root.appendChild(
           new Ext.tree.TreeNode({
@@ -867,7 +872,12 @@ Ext.extend(Sonatype.repoServer.RoleEditPanel, Ext.Panel, {
     var priv;
 
     for(var i=0; i<arr.length; i++){
-      priv = this.privDataStore.getAt(this.privDataStore.find("id",arr[i]));
+      priv = this.privDataStore.getAt(this.privDataStore.findBy(function(record, id){
+        if (record.data.id == arr[i]){
+          return true;
+        }
+        return false;
+      }));
       if (priv){
         selectedTree.root.appendChild(
           new Ext.tree.TreeNode({

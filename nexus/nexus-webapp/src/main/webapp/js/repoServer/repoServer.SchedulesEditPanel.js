@@ -1443,7 +1443,12 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
           name : receivedData.resource.name,
           id : receivedData.resource.id,
           resourceURI : receivedData.resourceURI,
-          typeName : this.serviceTypeDataStore.getAt(this.serviceTypeDataStore.find('id',receivedData.resource.typeId)).data.name,
+          typeName : this.serviceTypeDataStore.getAt(this.serviceTypeDataStore.findBy(function(record, id){
+              if (record.data.id == receivedData.resource.typeId){
+                  return true;
+                }
+                return false;
+              })).data.name,
           typeId : receivedData.resource.typeId,
           status : receivedData.status,
           schedule : receivedData.resource.schedule,
@@ -1508,7 +1513,12 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
         rec.beginEdit();
         rec.set('name', receivedData.resource.name);
         rec.set('typeId', receivedData.resource.typeId);
-        rec.set('typeName', this.serviceTypeDataStore.getAt(this.serviceTypeDataStore.find('id',receivedData.resource.typeId)).data.name);
+        rec.set('typeName', this.serviceTypeDataStore.getAt(this.serviceTypeDataStore.findBy(function(record, id){
+            if (record.data.id == receivedData.resource.typeId){
+                return true;
+              }
+              return false;
+            })).data.name);
         rec.set('schedule', receivedData.resource.schedule);
         rec.set('status', receivedData.status);
         rec.set('nextRunTime', receivedData.nextRunTime);
