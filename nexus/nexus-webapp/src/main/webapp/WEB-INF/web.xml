@@ -89,7 +89,7 @@
 
 	<filter>
 		<filter-name>contentFilter</filter-name>
-		<filter-class>org.sonatype.nexus.security.filter.RepositoryTargetJSecurityFilter</filter-class>
+		<filter-class>org.sonatype.nexus.security.filter.NexusJSecurityFilter</filter-class>
 		<init-param>
 			<param-name>config</param-name>
 			<param-value>
