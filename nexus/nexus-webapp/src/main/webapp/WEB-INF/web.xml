@@ -46,6 +46,9 @@
 
 			perms = org.sonatype.nexus.security.filter.authz.HttpVerbMappingAuthorizationFilter
 
+			tperms = org.sonatype.nexus.security.filter.authz.NexusTargetMappingAuthorizationFilter
+			tperms.pathPrefix = /service/local/repositories/(a-zA-Z_0-9)+/content
+
 			[urls]
 			/service/local/status/command = authcBasic,perms[nexus:status]
 			/service/local/status = anon
@@ -64,7 +67,11 @@
 			/service/local/attributes/** = authcBasic,perms[nexus:attributes]
 			/service/local/attributes = authcBasic,perms[nexus:attributes]
 			/service/local/repository_statuses = authcBasic,perms[nexus:repostatus]
+			/service/local/repositories/*/content/** = authcBasic,tperms
+			/service/local/repositories/*/content = authcBasic,tperms
 			/service/local/repositories = authcBasic,perms[nexus:repositories]
+			/service/local/repo_groups/*/content/** = authcBasic,tperms
+			/service/local/repo_groups/*/content = authcBasic,tperms
 			/service/local/repo_groups = authcBasic,perms[nexus:repogroups]
 			/service/local/repo_content_classes = authcBasic,perms[nexus:repocontentclasses]
 			/service/local/repo_targets = authcBasic,perms[nexus:targets]
@@ -101,9 +108,9 @@
 			logout = org.sonatype.nexus.security.filter.authc.LogoutAuthenticationFilter
 
 			tperms = org.sonatype.nexus.security.filter.authz.NexusTargetMappingAuthorizationFilter
+			tperms.pathPrefix = /content
 
 			[urls]
-			/content/logout = logout
 			/content/** = authcBasic,tperms
 			/content = authcBasic,tperms
 			</param-value>

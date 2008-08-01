@@ -25,6 +25,34 @@ public class NexusTargetMappingAuthorizationFilter
 {
     private static final String[] FAKE_PERMS = new String[] { "nexus:admin" };
 
+    private String pathPrefix;
+
+    public String getPathPrefix()
+    {
+        return pathPrefix;
+    }
+
+    public void setPathPrefix( String pathPrefix )
+    {
+        this.pathPrefix = pathPrefix;
+    }
+
+    public String getResourceStorePath( ServletRequest request )
+    {
+        if ( getPathPrefix() != null )
+        {
+            String path = WebUtils.getPathWithinApplication( (HttpServletRequest) request );
+
+            path = path.replaceFirst( getPathPrefix(), "" );
+
+            return path;
+        }
+        else
+        {
+            return null;
+        }
+    }
+
     public boolean isAccessAllowed( ServletRequest request, ServletResponse response, Object mappedValue )
         throws IOException
     {
@@ -34,12 +62,8 @@ public class NexusTargetMappingAuthorizationFilter
         // permissions that are of form:
         // targetId : repoId
         // (and the superclass will append the action based on HTTP verb)
-        // TODO: BAD, a lot of hardoced stuff!
-        String path = StringUtils.stripStart(
-            WebUtils.getPathWithinApplication( (HttpServletRequest) request ),
-            "/content" );
 
-        ResourceStoreRequest rsr = new ResourceStoreRequest( path, true );
+        ResourceStoreRequest rsr = new ResourceStoreRequest( getResourceStorePath( request ), true );
 
         TargetSet matched = null;
 

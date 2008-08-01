@@ -18,6 +18,8 @@ public class NexusHttpAuthenticationFilter
 {
     private static final String FAKE_AUTH_SCHEME = "NxBASIC";
 
+    private static final String ANONYMOUS_LOGIN = "nexus.anonynmous";
+
     private final Log logger = LogFactory.getLog( this.getClass() );
 
     private boolean fakeAuthScheme;
@@ -116,6 +118,8 @@ public class NexusHttpAuthenticationFilter
         {
             subject.login( usernamePasswordToken );
 
+            request.setAttribute( ANONYMOUS_LOGIN, Boolean.TRUE );
+
             if ( getLogger().isDebugEnabled() )
             {
                 getLogger().debug( "Successfully logged in as anonymous" );
@@ -139,13 +143,17 @@ public class NexusHttpAuthenticationFilter
     public void postHandle( ServletRequest request, ServletResponse response )
         throws Exception
     {
+        Subject subject = getSubject( request, response );
+
+        if ( request.getAttribute( ANONYMOUS_LOGIN ) != null
+            || request.getAttribute( NexusJSecurityFilter.REQUEST_IS_AUTHZ_REJECTED ) != null )
+        {
+            subject.logout();
+        }
+
         // we should check is the user anonymous or not?
         if ( request.getAttribute( NexusJSecurityFilter.REQUEST_IS_AUTHZ_REJECTED ) != null )
         {
-            Subject subject = getSubject( request, response );
-
-            subject.logout();
-
             if ( getLogger().isDebugEnabled() )
             {
                 getLogger().debug( "Request processing is rejected coz lacking of perms/roles, rechallenging..." );
