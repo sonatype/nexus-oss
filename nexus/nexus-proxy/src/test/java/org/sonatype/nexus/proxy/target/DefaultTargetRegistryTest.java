@@ -81,7 +81,7 @@ public class DefaultTargetRegistryTest
         // adding them 
         ts.addTargetSet( ts1 );
         
-        assertEquals( 3, ts.getMatches().size() );
+        assertEquals( 2, ts.getMatches().size() );
         
         assertEquals( 1, ts.getMatchedRepositoryIds().size() );
     }

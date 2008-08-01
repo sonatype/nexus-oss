@@ -29,6 +29,17 @@ public class TargetSet
 
     public void addTargetMatch( TargetMatch tm )
     {
+        // TODO: a very crude solution!
+        for ( TargetMatch t : matches )
+        {
+            if ( t.getTarget().equals( tm.getTarget() )
+                && t.getRepository().getId().equals( tm.getRepository().getId() ) )
+            {
+                return;
+            }
+
+        }
+
         matches.add( tm );
 
         matchedRepositoryIds.add( tm.getRepository().getId() );
@@ -36,9 +47,10 @@ public class TargetSet
 
     public void addTargetSet( TargetSet ts )
     {
-        matches.addAll( ts.getMatches() );
-
-        matchedRepositoryIds.addAll( ts.getMatchedRepositoryIds() );
+        for ( TargetMatch tm : ts.getMatches() )
+        {
+            addTargetMatch( tm );
+        }
     }
 
     boolean isPathContained( Repository repository, String path )
