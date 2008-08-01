@@ -84,12 +84,12 @@ public class NexusRealmTest
 
         // verify dain has permission to read but not create artifacts
         Collection<Permission> dainPermissions = dain.getObjectPermissions();
-        assertImplied( new WildcardPermission( "maven:central:READ" ), dainPermissions );
-        assertNotImplied( new WildcardPermission( "maven:central:CREATE" ), dainPermissions );
-        assertImplied( new WildcardPermission( "maven:myRepository:READ" ), dainPermissions );
-        assertNotImplied( new WildcardPermission( "maven:myRepository:CREATE" ), dainPermissions );
-        assertNotImplied( new WildcardPermission( "maven:codehaus:READ" ), dainPermissions );
-        assertNotImplied( new WildcardPermission( "maven:codehaus:CREATE" ), dainPermissions );
+        assertImplied( new WildcardPermission( "nexus:target:maven:central:READ" ), dainPermissions );
+        assertNotImplied( new WildcardPermission( "nexus:target:maven:central:CREATE" ), dainPermissions );
+        assertImplied( new WildcardPermission( "nexus:target:maven:myRepository:READ" ), dainPermissions );
+        assertNotImplied( new WildcardPermission( "nexus:target:maven:myRepository:CREATE" ), dainPermissions );
+        assertNotImplied( new WildcardPermission( "nexus:target:maven:codehaus:READ" ), dainPermissions );
+        assertNotImplied( new WildcardPermission( "nexus:target:maven:codehaus:CREATE" ), dainPermissions );
 
         // verify dain has permission to read but not create repository
         assertImplied( new WildcardPermission( "nexus:repository:READ" ), dainPermissions );
@@ -113,12 +113,12 @@ public class NexusRealmTest
 
         // verify jason has permission to read and create artifacts
         Collection<Permission> jasonPermissions = jason.getObjectPermissions();
-        assertImplied( new WildcardPermission( "maven:central:READ" ), jasonPermissions );
-        assertImplied( new WildcardPermission( "maven:central:CREATE" ), jasonPermissions );
-        assertImplied( new WildcardPermission( "maven:myRepository:READ" ), jasonPermissions );
-        assertImplied( new WildcardPermission( "maven:myRepository:CREATE" ), jasonPermissions );
-        assertNotImplied( new WildcardPermission( "maven:codehaus:READ" ), jasonPermissions );
-        assertNotImplied( new WildcardPermission( "maven:codehaus:CREATE" ), jasonPermissions );
+        assertImplied( new WildcardPermission( "nexus:target:maven:central:READ" ), jasonPermissions );
+        assertImplied( new WildcardPermission( "nexus:target:maven:central:CREATE" ), jasonPermissions );
+        assertImplied( new WildcardPermission( "nexus:target:maven:myRepository:READ" ), jasonPermissions );
+        assertImplied( new WildcardPermission( "nexus:target:maven:myRepository:CREATE" ), jasonPermissions );
+        assertNotImplied( new WildcardPermission( "nexus:target:maven:codehaus:READ" ), jasonPermissions );
+        assertNotImplied( new WildcardPermission( "nexus:target:maven:codehaus:CREATE" ), jasonPermissions );
 
         // verify jason has permission to read and create repository, but not update or delete
         assertImplied( new WildcardPermission( "nexus:repository:READ" ), jasonPermissions );
@@ -144,12 +144,12 @@ public class NexusRealmTest
         assertFalse( realm.hasRole( dain, "unknown" ) );
 
         // verify dain has permission to read but not create artifacts
-        assertPermitted( dain, "maven:central:READ" );
-        assertNotPermitted( dain, "maven:central:CREATE" );
-        assertPermitted( dain, "maven:myRepository:READ" );
-        assertNotPermitted( dain, "maven:myRepository:CREATE" );
-        assertNotPermitted( dain, "maven:codehaus:READ" );
-        assertNotPermitted( dain, "maven:codehaus:CREATE" );
+        assertPermitted( dain, "nexus:target:maven:central:READ" );
+        assertNotPermitted( dain, "nexus:target:maven:central:CREATE" );
+        assertPermitted( dain, "nexus:target:maven:myRepository:READ" );
+        assertNotPermitted( dain, "nexus:target:maven:myRepository:CREATE" );
+        assertNotPermitted( dain, "nexus:target:maven:codehaus:READ" );
+        assertNotPermitted( dain, "nexus:target:maven:codehaus:CREATE" );
 
         // verify dain has permission to read but not create repository
         assertPermitted( dain, "nexus:repository:READ" );
@@ -171,12 +171,12 @@ public class NexusRealmTest
         assertFalse( realm.hasRole( jason, "unknown" ) );
 
         // verify jason has permission to read and create artifacts
-        assertPermitted( jason, "maven:central:READ" );
-        assertPermitted( jason, "maven:central:CREATE" );
-        assertPermitted( jason, "maven:myRepository:READ" );
-        assertPermitted( jason, "maven:myRepository:CREATE" );
-        assertNotPermitted( jason, "maven:codehaus:READ" );
-        assertNotPermitted( jason, "maven:codehaus:CREATE" );
+        assertPermitted( jason, "nexus:target:maven:central:READ" );
+        assertPermitted( jason, "nexus:target:maven:central:CREATE" );
+        assertPermitted( jason, "nexus:target:maven:myRepository:READ" );
+        assertPermitted( jason, "nexus:target:maven:myRepository:CREATE" );
+        assertNotPermitted( jason, "nexus:target:maven:codehaus:READ" );
+        assertNotPermitted( jason, "nexus:target:maven:codehaus:CREATE" );
 
         // verify jason has permission to read and create repository, but not update or delete
         assertPermitted( jason, "nexus:repository:READ" );

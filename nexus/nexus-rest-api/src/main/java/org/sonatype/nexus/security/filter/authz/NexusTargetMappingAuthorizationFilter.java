@@ -59,7 +59,7 @@ public class NexusTargetMappingAuthorizationFilter
         // nexus : 'target' + targetId : repoId
         for ( TargetMatch match : matched.getMatches() )
         {
-            perms.add( "nexus:target" + match.getTarget().getId() + ":" + match.getRepository().getId() );
+            perms.add( "nexus:target:" + match.getTarget().getId() + ":" + match.getRepository().getId() );
         }
 
         result = perms.toArray( new String[perms.size()] );

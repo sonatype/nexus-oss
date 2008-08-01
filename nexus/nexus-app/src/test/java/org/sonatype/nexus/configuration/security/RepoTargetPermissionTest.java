@@ -31,59 +31,59 @@ public class RepoTargetPermissionTest extends AbstractRealmTest
     public void testAnyMethodOrRepositoryPermission()
     {
         Permission assignedPermission = createAssignedTargetPermission( "maven", null, null );
-        assertImplied( new WildcardPermission( "maven:central:CREATE" ), assignedPermission );
-        assertImplied( new WildcardPermission( "maven:central:UPDATE" ), assignedPermission );
-        assertImplied( new WildcardPermission( "maven:codehaus:CREATE" ), assignedPermission );
-        assertImplied( new WildcardPermission( "maven:codehaus:UPDATE" ), assignedPermission );
+        assertImplied( new WildcardPermission( "nexus:target:maven:central:CREATE" ), assignedPermission );
+        assertImplied( new WildcardPermission( "nexus:target:maven:central:UPDATE" ), assignedPermission );
+        assertImplied( new WildcardPermission( "nexus:target:maven:codehaus:CREATE" ), assignedPermission );
+        assertImplied( new WildcardPermission( "nexus:target:maven:codehaus:UPDATE" ), assignedPermission );
     }
 
     public void testAnyRepositoryPermission()
     {
         Permission assignedPermission = createAssignedTargetPermission( "maven", null, "CREATE" );
-        assertImplied( new WildcardPermission( "maven:central:CREATE" ), assignedPermission );
-        assertNotImplied( new WildcardPermission( "maven:central:UPDATE" ), assignedPermission );
-        assertImplied( new WildcardPermission( "maven:codehaus:CREATE" ), assignedPermission );
-        assertNotImplied( new WildcardPermission( "maven:codehaus:UPDATE" ), assignedPermission );
+        assertImplied( new WildcardPermission( "nexus:target:maven:central:CREATE" ), assignedPermission );
+        assertNotImplied( new WildcardPermission( "nexus:target:maven:central:UPDATE" ), assignedPermission );
+        assertImplied( new WildcardPermission( "nexus:target:maven:codehaus:CREATE" ), assignedPermission );
+        assertNotImplied( new WildcardPermission( "nexus:target:maven:codehaus:UPDATE" ), assignedPermission );
     }
 
     public void testAnyMethodInTargetPermission()
     {
         Permission assignedPermission = createAssignedTargetPermission( "maven", "central", null );
-        assertImplied( new WildcardPermission( "maven:central:CREATE" ), assignedPermission );
-        assertImplied( new WildcardPermission( "maven:central:UPDATE" ), assignedPermission );
-        assertNotImplied( new WildcardPermission( "maven:codehaus:CREATE" ), assignedPermission );
-        assertNotImplied( new WildcardPermission( "maven:codehaus:UPDATE" ), assignedPermission );
+        assertImplied( new WildcardPermission( "nexus:target:maven:central:CREATE" ), assignedPermission );
+        assertImplied( new WildcardPermission( "nexus:target:maven:central:UPDATE" ), assignedPermission );
+        assertNotImplied( new WildcardPermission( "nexus:target:maven:codehaus:CREATE" ), assignedPermission );
+        assertNotImplied( new WildcardPermission( "nexus:target:maven:codehaus:UPDATE" ), assignedPermission );
     }
 
     public void testSingleMethodInTargetPermission()
     {
         Permission assignedPermission = createAssignedTargetPermission( "maven", "central", "CREATE" );
-        assertImplied( new WildcardPermission( "maven:central:CREATE" ), assignedPermission );
-        assertNotImplied( new WildcardPermission( "maven:central:UPDATE" ), assignedPermission );
-        assertNotImplied( new WildcardPermission( "maven:codehaus:CREATE" ), assignedPermission );
-        assertNotImplied( new WildcardPermission( "maven:codehaus:UPDATE" ), assignedPermission );
+        assertImplied( new WildcardPermission( "nexus:target:maven:central:CREATE" ), assignedPermission );
+        assertNotImplied( new WildcardPermission( "nexus:target:maven:central:UPDATE" ), assignedPermission );
+        assertNotImplied( new WildcardPermission( "nexus:target:maven:codehaus:CREATE" ), assignedPermission );
+        assertNotImplied( new WildcardPermission( "nexus:target:maven:codehaus:UPDATE" ), assignedPermission );
     }
 
     public void testAnyMethodInGroupPermission()
     {
         Set<Permission> assignedPermissions = createAssignedGroupPermissions( "maven", "myGroup", null );
-        assertImplied( new WildcardPermission( "maven:central:CREATE" ), assignedPermissions );
-        assertImplied( new WildcardPermission( "maven:central:UPDATE" ), assignedPermissions );
-        assertImplied( new WildcardPermission( "maven:myRepository:CREATE" ), assignedPermissions );
-        assertImplied( new WildcardPermission( "maven:myRepository:UPDATE" ), assignedPermissions );
-        assertNotImplied( new WildcardPermission( "maven:codehaus:CREATE" ), assignedPermissions );
-        assertNotImplied( new WildcardPermission( "maven:codehaus:UPDATE" ), assignedPermissions );
+        assertImplied( new WildcardPermission( "nexus:target:maven:central:CREATE" ), assignedPermissions );
+        assertImplied( new WildcardPermission( "nexus:target:maven:central:UPDATE" ), assignedPermissions );
+        assertImplied( new WildcardPermission( "nexus:target:maven:myRepository:CREATE" ), assignedPermissions );
+        assertImplied( new WildcardPermission( "nexus:target:maven:myRepository:UPDATE" ), assignedPermissions );
+        assertNotImplied( new WildcardPermission( "nexus:target:maven:codehaus:CREATE" ), assignedPermissions );
+        assertNotImplied( new WildcardPermission( "nexus:target:maven:codehaus:UPDATE" ), assignedPermissions );
     }
 
     public void testSingleMethodInGroupPermission()
     {
         Set<Permission> assignedPermissions = createAssignedGroupPermissions( "maven", "myGroup", "CREATE" );
-        assertImplied( new WildcardPermission( "maven:central:CREATE" ), assignedPermissions );
-        assertNotImplied( new WildcardPermission( "maven:central:UPDATE" ), assignedPermissions );
-        assertImplied( new WildcardPermission( "maven:myRepository:CREATE" ), assignedPermissions );
-        assertNotImplied( new WildcardPermission( "maven:myRepository:UPDATE" ), assignedPermissions );
-        assertNotImplied( new WildcardPermission( "maven:codehaus:CREATE" ), assignedPermissions );
-        assertNotImplied( new WildcardPermission( "maven:codehaus:UPDATE" ), assignedPermissions );
+        assertImplied( new WildcardPermission( "nexus:target:maven:central:CREATE" ), assignedPermissions );
+        assertNotImplied( new WildcardPermission( "nexus:target:maven:central:UPDATE" ), assignedPermissions );
+        assertImplied( new WildcardPermission( "nexus:target:maven:myRepository:CREATE" ), assignedPermissions );
+        assertNotImplied( new WildcardPermission( "nexus:target:maven:myRepository:UPDATE" ), assignedPermissions );
+        assertNotImplied( new WildcardPermission( "nexus:target:maven:codehaus:CREATE" ), assignedPermissions );
+        assertNotImplied( new WildcardPermission( "nexus:target:maven:codehaus:UPDATE" ), assignedPermissions );
     }
 
     private Permission createAssignedTargetPermission( String repositoryTargetId,

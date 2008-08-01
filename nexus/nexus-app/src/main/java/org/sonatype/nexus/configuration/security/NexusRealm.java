@@ -284,12 +284,12 @@ public class NexusRealm
     }
 
     // permission is of format:
-    // 'nexus' : 'target' + targetId : repoId : action
+    // 'nexus' : 'target' : targetId : repoId : action
     protected Set<Permission> createPermissions( CRepoTargetPrivilege targetPrivilege )
     {
         Set<Permission> permissions = new LinkedHashSet<Permission>();
 
-        String basePermissionString = "nexus:target" + targetPrivilege.getRepositoryTargetId() + ":";
+        String basePermissionString = "nexus:target:" + targetPrivilege.getRepositoryTargetId() + ":";
 
         String methodString;
         if ( !StringUtils.isEmpty( targetPrivilege.getMethod() ) )
