@@ -104,7 +104,7 @@ Sonatype.config = function() {
         usersReset: servicePath + '/users/reset',
         usersForgotId: servicePath + '/users/forgotid',
         usersForgotPassword: servicePath + '/users/forgotpw/',
-        usersChangePassword: servicePath + '/users/changepw',
+        usersChangePassword: servicePath + '/users/changepw/',
         roles: servicePath + '/roles',
         privileges: servicePath + '/privileges',
         repoTargets: servicePath + '/repo_targets',

@@ -737,8 +737,11 @@ Sonatype.repoServer.RepoServer = function(){
                     scope: this,
                     method: 'POST',
                     jsonData: {
-                      oldPw: currentPassword,
-                      newPw: newPassword
+                	  data: {
+                	    userId: Sonatype.user.curr.username,
+                        oldPassword: currentPassword,
+                        newPassword: newPassword
+                      }
                     },
                     url: Sonatype.config.repos.urls.usersChangePassword,
                     success: function(response, options){
