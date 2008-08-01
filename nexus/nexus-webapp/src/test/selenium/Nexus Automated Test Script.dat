@@ -363,27 +363,12 @@
 </tr>
 <tr>
 	<td>type</td>
-	<td>name</td>
-	<td>User One</td>
-</tr>
-<tr>
-	<td>type</td>
 	<td>email</td>
-	<td>userone@email.com</td>
+	<td>koconnor@sonatype.com</td>
 </tr>
 <tr>
 	<td>click</td>
 	<td>//div[5]/div/div/div[2]/div[2]/div/div[2]/div[2]/div[1]/div/div/div/form/div[4]/div[1]/div/img[1]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>click</td>
-	<td>//div[27]/div/div[1]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>click</td>
-	<td>roles_tree_panel</td>
 	<td></td>
 </tr>
 <tr>
@@ -408,17 +393,47 @@
 </tr>
 <tr>
 	<td>click</td>
+	<td>//div[26]/div/div[1]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
 	<td>//div[2]/div/div/div/div/div/table/tbody/tr/td[1]/table/tbody/tr/td[2]/em/button</td>
 	<td></td>
 </tr>
 <tr>
+	<td>click</td>
+	<td>//div[@id='extdd-1']/a/span</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>document.forms[2].elements[4]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>document.forms[2].elements[1]</td>
+	<td>User One</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//div[5]/div/div/div[2]/div[2]/div/div[2]/div[2]/div[2]/div/div/div/div/div/table/tbody/tr/td[1]/table/tbody/tr/td[2]</td>
+	<td></td>
+</tr>
+<tr>
 	<td>pause</td>
-	<td>500</td>
+	<td>1000</td>
 	<td></td>
 </tr>
 <tr>
 	<td>mouseDown</td>
 	<td>open-config-server</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
 	<td></td>
 </tr>
 <tr>
@@ -433,27 +448,17 @@
 </tr>
 <tr>
 	<td>click</td>
-	<td>document.forms[0].elements[13]</td>
+	<td>//input[contains(@name,&quot;applicationServerSettings-checkbox&quot;)]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>type</td>
-	<td>document.forms[0].elements[14]</td>
+	<td>//input[@name=&quot;baseUrl&quot;]</td>
 	<td>http://oconnorhouse:8081/nexus</td>
 </tr>
 <tr>
-	<td>pause</td>
-	<td>500</td>
-	<td></td>
-</tr>
-<tr>
 	<td>click</td>
-	<td>//button</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyTextPresent</td>
-	<td>Welcome to the Sonatype Nexus Repository Manager.</td>
+	<td>//button[text()=&quot;Save&quot;]</td>
 	<td></td>
 </tr>
 <tr>
@@ -462,6 +467,51 @@
 	<td></td>
 </tr>
 <tr>
+	<td>verifyTextPresent</td>
+	<td>You may browse and search the repositories using the options on the left. Administrators may login via the link on the top right.</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>login-link</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>usernamefield</td>
+	<td>admin</td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>passwordfield</td>
+	<td>admin123</td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//button</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>1000</td>
+	<td></td>
+</tr>
+<tr>
 	<td>mouseDown</td>
 	<td>open-config-server</td>
 	<td></td>
@@ -477,23 +527,63 @@
 	<td></td>
 </tr>
 <tr>
-	<td>click</td>
-	<td>document.forms[0].elements[13]</td>
+	<td>pause</td>
+	<td>500</td>
 	<td></td>
 </tr>
 <tr>
 	<td>click</td>
-	<td>//button</td>
+	<td>//input[contains(@name,&quot;applicationServerSettings-checkbox&quot;)]</td>
 	<td></td>
 </tr>
 <tr>
-	<td>verifyLocation</td>
-	<td>http://localhost:8081/nexus/</td>
+	<td>type</td>
+	<td>//input[@name=&quot;baseUrl&quot;]</td>
+	<td>http://localhost:8081/nexus</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//button[text()=&quot;Save&quot;]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>4000</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>login-link</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>usernamefield</td>
+	<td>untest</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>passwordfield</td>
+	<td>admin123</td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td>500</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>loginbutton</td>
 	<td></td>
 </tr>
 <tr>
 	<td>pause</td>
 	<td>500</td>
+	<td>500</td>
+</tr>
+<tr>
+	<td>verifyTextPresent</td>
+	<td>You may browse and search the repositories using the options on the left. Administrators may login via the link on the top right.</td>
 	<td></td>
 </tr>
 <tr>
@@ -522,6 +612,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
 	<td>type</td>
 	<td>document.forms[0].elements[0]</td>
 	<td>Test Group One</td>
@@ -530,21 +625,6 @@
 	<td>type</td>
 	<td>document.forms[0].elements[1]</td>
 	<td>Test Group One</td>
-</tr>
-<tr>
-	<td>click</td>
-	<td>document.forms[0].elements[3]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>click</td>
-	<td>//table[@id='savebutton']/tbody/tr/td[2]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>pause</td>
-	<td>500</td>
-	<td></td>
 </tr>
 <tr>
 	<td>verifyTextPresent</td>
@@ -558,72 +638,17 @@
 </tr>
 <tr>
 	<td>click</td>
-	<td>//div[2]/div/div/div/div/div/table/tbody/tr/td[1]/table/tbody/tr/td[2]/em/button</td>
-	<td></td>
-</tr>
-<tr>
-	<td>pause</td>
-	<td>500</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyTextPresent</td>
-	<td>Repository referenced by Repository Group does not share same content type!</td>
-	<td></td>
-</tr>
-<tr>
-	<td>click</td>
-	<td>//div[@id='extdd-1']/a/span</td>
-	<td></td>
-</tr>
-<tr>
-	<td>click</td>
-	<td>document.forms[0].elements[4]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>click</td>
-	<td>//div[@id='extdd-10']/a/span</td>
-	<td></td>
-</tr>
-<tr>
-	<td>click</td>
-	<td>document.forms[0].elements[4]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>click</td>
-	<td>//div[@id='extdd-13']/a/span</td>
-	<td></td>
-</tr>
-<tr>
-	<td>click</td>
-	<td>document.forms[0].elements[4]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>click</td>
 	<td>//div[@id='extdd-16']/a/span</td>
 	<td></td>
 </tr>
 <tr>
 	<td>click</td>
-	<td>document.forms[0].elements[4]</td>
+	<td>document.forms[0].elements[2]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>click</td>
-	<td>//div[@id='extdd-19']/a/span</td>
-	<td></td>
-</tr>
-<tr>
-	<td>click</td>
-	<td>document.forms[0].elements[4]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>click</td>
-	<td>//div[2]/div/div/div/div/div/table/tbody/tr/td[1]/table/tbody/tr/td[2]/em/button</td>
+	<td>//div[7]/div/div/div[2]/div[2]/div/div[2]/div[2]/div[2]/div/div/div/div/div/table/tbody/tr/td[1]/table/tbody/tr/td[2]/em/button</td>
 	<td></td>
 </tr>
 <tr>
@@ -657,23 +682,18 @@
 	<td></td>
 </tr>
 <tr>
-	<td>click</td>
-	<td>//div[@id='extdd-31']/a/span</td>
-	<td></td>
-</tr>
-<tr>
 	<td>type</td>
 	<td>document.forms[0].elements[0]</td>
 	<td>Test_Group_Two</td>
 </tr>
 <tr>
 	<td>click</td>
-	<td>document.forms[0].elements[2]</td>
+	<td>document.forms[0].elements[3]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>click</td>
-	<td>//div[2]/div/div/div/div/div/table/tbody/tr/td[1]/table/tbody/tr/td[2]/em/button</td>
+	<td>//div[7]/div/div/div[2]/div[2]/div/div[2]/div[2]/div[2]/div/div/div/div/div/table/tbody/tr/td[1]/table/tbody/tr/td[2]/em/button</td>
 	<td></td>
 </tr>
 <tr>
@@ -693,7 +713,32 @@
 </tr>
 <tr>
 	<td>click</td>
-	<td>//div[2]/div/div/div/div/div/table/tbody/tr/td[1]/table/tbody/tr/td[2]/em/button</td>
+	<td>//div[7]/div/div/div[2]/div[2]/div/div[2]/div[2]/div[2]/div/div/div/div/div/table/tbody/tr/td[1]/table/tbody/tr/td[2]/em/button</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTextPresent</td>
+	<td>Repository referenced by Repository Group does not share same content type!</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>document.forms[0].elements[5]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//li[7]/div/a/span</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>document.forms[0].elements[2]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//div[7]/div/div/div[2]/div[2]/div/div[2]/div[2]/div[2]/div/div/div/div/div/table/tbody/tr/td[1]/table/tbody/tr/td[2]/em/button</td>
 	<td></td>
 </tr>
 <tr>
@@ -709,186 +754,6 @@
 <tr>
 	<td>verifyTextPresent</td>
 	<td>Select a Repository Group to edit it, or click &quot;Add&quot; to create a new one.</td>
-	<td></td>
-</tr>
-<tr>
-	<td>mouseDown</td>
-	<td>st-groups-grid_http://localhost:8081/nexus/service/local/repo_groups/Test_Group_Two_col0</td>
-	<td></td>
-</tr>
-<tr>
-	<td>mouseUp</td>
-	<td>st-groups-grid_http://localhost:8081/nexus/service/local/repo_groups/Test_Group_Two_col0</td>
-	<td></td>
-</tr>
-<tr>
-	<td>pause</td>
-	<td>500</td>
-	<td></td>
-</tr>
-<tr>
-	<td>click</td>
-	<td>//button[text()='Delete']</td>
-	<td></td>
-</tr>
-<tr>
-	<td>pause</td>
-	<td>1000</td>
-	<td></td>
-</tr>
-<tr>
-	<td>click</td>
-	<td>//button[text()='Yes']</td>
-	<td></td>
-</tr>
-<tr>
-	<td>mouseDown</td>
-	<td>open-config-schedules</td>
-	<td></td>
-</tr>
-<tr>
-	<td>pause</td>
-	<td>500</td>
-	<td></td>
-</tr>
-<tr>
-	<td>mouseUp</td>
-	<td>open-config-schedules</td>
-	<td></td>
-</tr>
-<tr>
-	<td>pause</td>
-	<td>500</td>
-	<td></td>
-</tr>
-<tr>
-	<td>click</td>
-	<td>//table[@id='schedule-add-btn']/tbody/tr/td[2]/em/button</td>
-	<td></td>
-</tr>
-<tr>
-	<td>pause</td>
-	<td>500</td>
-	<td></td>
-</tr>
-<tr>
-	<td>type</td>
-	<td>document.forms[0].elements[2]</td>
-	<td>Test Scheduled Task with Group</td>
-</tr>
-<tr>
-	<td>click</td>
-	<td>//div[3]/div[1]/div/img[1]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>click</td>
-	<td>//div[20]/div/div[1]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>click</td>
-	<td>//fieldset[2]/div/div/div[1]/div[1]/div/img[1]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>click</td>
-	<td>//div/div[11]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>click</td>
-	<td>document.forms[0].elements[24]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>click</td>
-	<td>//div[22]/div/div[2]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>click</td>
-	<td>//div[2]/div[1]/div/img[1]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>click</td>
-	<td>//div[2]/div/div/div/div/div/table/tbody/tr/td[1]/table/tbody/tr/td[2]/em/button</td>
-	<td></td>
-</tr>
-<tr>
-	<td>click</td>
-	<td>//div[3]/div/div/div[1]/div[2]/div[1]/div/table/tbody/tr/td[1]/table/tbody/tr/td[2]/em/button</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyTextPresent</td>
-	<td>Select a scheduled task to edit it, or click &quot;Add&quot; to create a new one.</td>
-	<td></td>
-</tr>
-<tr>
-	<td>mouseDown</td>
-	<td>open-config-groups</td>
-	<td></td>
-</tr>
-<tr>
-	<td>pause</td>
-	<td>500</td>
-	<td></td>
-</tr>
-<tr>
-	<td>mouseUp</td>
-	<td>open-config-groups</td>
-	<td></td>
-</tr>
-<tr>
-	<td>pause</td>
-	<td>500</td>
-	<td></td>
-</tr>
-<tr>
-	<td>click</td>
-	<td>//table[@id='group-add-btn']/tbody/tr/td[2]/em/button</td>
-	<td></td>
-</tr>
-<tr>
-	<td>type</td>
-	<td>document.forms[0].elements[0]</td>
-	<td>Test_Group_Three</td>
-</tr>
-<tr>
-	<td>click</td>
-	<td>//div[@id='extdd-82']/a/span</td>
-	<td></td>
-</tr>
-<tr>
-	<td>click</td>
-	<td>document.forms[0].elements[2]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>click</td>
-	<td>//div[2]/div/div/div/div/div/table/tbody/tr/td[1]/table/tbody/tr/td[2]/em/button</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyTextPresent</td>
-	<td>This field is required</td>
-	<td></td>
-</tr>
-<tr>
-	<td>type</td>
-	<td>document.forms[0].elements[1]</td>
-	<td>Test Group Three</td>
-</tr>
-<tr>
-	<td>click</td>
-	<td>//table[@id='savebutton']/tbody/tr/td[2]/em/button</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyTextPresent</td>
-	<td>Central M1 shadow</td>
 	<td></td>
 </tr>
 
