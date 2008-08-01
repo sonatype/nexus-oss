@@ -27,6 +27,7 @@ import org.sonatype.nexus.integrationtests.nexus259.Nexus259SnapshotDeployTest;
 import org.sonatype.nexus.integrationtests.nexus260.Nexus260MultipleDeployTest;
 import org.sonatype.nexus.integrationtests.nexus261.Nexus261NexusGroupDownloadTest;
 import org.sonatype.nexus.integrationtests.nexus292.Nexus292SoftRestartTest;
+import org.sonatype.nexus.integrationtests.nexus383.Nexus383SearchTest;
 import org.sonatype.nexus.integrationtests.nexus385.Nexus385RoutesCrudXmlTests;
 import org.sonatype.nexus.integrationtests.nexus385.Nexus385RoutesValidationTests;
 import org.sonatype.nexus.integrationtests.nexus387.Nexus387RoutesTests;
@@ -51,8 +52,8 @@ import org.sonatype.nexus.test.utils.NexusStateUtil;
     Nexus133TargetCrudJsonTests.class, Nexus133TargetCrudXmlTests.class, Nexus142UserCrudJsonTests.class,
     Nexus142UserCrudXmlTests.class, Nexus156RolesCrudJsonTests.class, Nexus156RolesCrudXmlTests.class,
     Nexus142UserValidationTests.class, Nexus156RolesValidationTests.class, Nexus133TargetValidationTests.class,
-    Nexus233PrivilegesCrudXMLTests.class, Nexus233PrivilegesValidationTests.class, Nexus385RoutesCrudXmlTests.class,
-    Nexus385RoutesValidationTests.class, Nexus387RoutesTests.class } )
+    Nexus233PrivilegesCrudXMLTests.class, Nexus233PrivilegesValidationTests.class, Nexus383SearchTest.class,
+    Nexus385RoutesCrudXmlTests.class, Nexus385RoutesValidationTests.class, Nexus387RoutesTests.class } )
 public class IntegrationTestSuite
 {
     //

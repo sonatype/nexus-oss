@@ -31,7 +31,13 @@ public class RequestFacade
     public static Response doGetRequest( String serviceURIpart )
         throws IOException
     {
-        return sendMessage( serviceURIpart, Method.GET, null );
+        return sendMessage( serviceURIpart, Method.GET );
+    }
+
+    public static Response sendMessage( String serviceURIpart, Method method )
+        throws IOException
+    {
+        return sendMessage( serviceURIpart, method, null );
     }
 
     public static Response sendMessage( String serviceURIpart, Method method, Representation representation )
@@ -78,9 +84,9 @@ public class RequestFacade
         {
             Response response = sendMessage( url, Method.GET, null );
 
-            if( !response.getStatus().isSuccess())
+            if ( !response.getStatus().isSuccess() )
             {
-                throw new FileNotFoundException(response.getStatus() + " - " + url);
+                throw new FileNotFoundException( response.getStatus() + " - " + url );
             }
 
             // if this is null then someone was getting really creative with the tests, but hey, we will let them...
