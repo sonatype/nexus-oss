@@ -20,8 +20,16 @@
  */
 package org.sonatype.nexus.configuration.security;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.LinkedHashSet;
+
+import org.jsecurity.authc.AccountException;
 import org.jsecurity.authc.AuthenticationInfo;
+import org.jsecurity.authc.DisabledAccountException;
+import org.jsecurity.authc.ExpiredCredentialsException;
 import org.jsecurity.authc.IncorrectCredentialsException;
+import org.jsecurity.authc.LockedAccountException;
 import org.jsecurity.authc.UnknownAccountException;
 import org.jsecurity.authc.UsernamePasswordToken;
 import org.jsecurity.authz.AuthorizationInfo;
@@ -29,10 +37,6 @@ import org.jsecurity.authz.Permission;
 import org.jsecurity.authz.permission.WildcardPermission;
 import org.jsecurity.subject.SimplePrincipalCollection;
 import org.sonatype.nexus.util.StringDigester;
-
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.LinkedHashSet;
 
 public class NexusRealmTest
     extends AbstractRealmTest
@@ -47,6 +51,70 @@ public class NexusRealmTest
         assertEquals( "dain", username );
         String password = new String( (char[]) authenticationInfo.getCredentials() );
         assertEquals( StringDigester.getSha1Digest( "niad" ), password );
+    }
+
+    public void testLockedAuthenticationInfo()
+    {
+        try
+        {
+            AuthenticationInfo authenticationInfo = realm.getAuthenticationInfo( new UsernamePasswordToken(
+                "locked",
+                "locked" ) );
+
+            fail();
+        }
+        catch ( LockedAccountException e )
+        {
+            // cool
+        }
+    }
+
+    public void testExpiredAuthenticationInfo()
+    {
+        try
+        {
+            AuthenticationInfo authenticationInfo = realm.getAuthenticationInfo( new UsernamePasswordToken(
+                "expired",
+                "expired" ) );
+
+            fail();
+        }
+        catch ( ExpiredCredentialsException e )
+        {
+            // cool
+        }
+    }
+
+    public void testDisabledAuthenticationInfo()
+    {
+        try
+        {
+            AuthenticationInfo authenticationInfo = realm.getAuthenticationInfo( new UsernamePasswordToken(
+                "disabled",
+                "disabled" ) );
+
+            fail();
+        }
+        catch ( DisabledAccountException e )
+        {
+            // cool
+        }
+    }
+    
+    public void testIllegalStatusAuthenticationInfo()
+    {
+        try
+        {
+            AuthenticationInfo authenticationInfo = realm.getAuthenticationInfo( new UsernamePasswordToken(
+                "illegalStatus",
+                "illegalStatus" ) );
+
+            fail();
+        }
+        catch ( AccountException e )
+        {
+            // cool
+        }
     }
 
     public void testBadPassword()

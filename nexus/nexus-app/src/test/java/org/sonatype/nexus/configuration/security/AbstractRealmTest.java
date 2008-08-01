@@ -122,13 +122,43 @@ public abstract class AbstractRealmTest
         jason.setUserId( "jason" );
         jason.setPassword( StringDigester.getSha1Digest( "nosaj" ) );
         jason.addRole( "maven-committer" );
+        jason.setStatus( CUser.STATUS_ACTIVE );
         securityConfiguration.createUser( jason );
 
         CUser dain = new CUser();
         dain.setUserId( "dain" );
-        dain.setPassword( StringDigester.getSha1Digest( "niad") );
+        dain.setPassword( StringDigester.getSha1Digest( "niad" ) );
         dain.addRole( "maven-user" );
+        dain.setStatus( CUser.STATUS_ACTIVE );
         securityConfiguration.createUser( dain );
+
+        CUser locked = new CUser();
+        locked.setUserId( "locked" );
+        locked.setPassword( StringDigester.getSha1Digest( "locked" ) );
+        locked.addRole( "maven-user" );
+        locked.setStatus( CUser.STATUS_LOCKED );
+        securityConfiguration.createUser( locked );
+
+        CUser disabled = new CUser();
+        disabled.setUserId( "disabled" );
+        disabled.setPassword( StringDigester.getSha1Digest( "disabled" ) );
+        disabled.addRole( "maven-user" );
+        disabled.setStatus( CUser.STATUS_DISABLED );
+        securityConfiguration.createUser( disabled );
+
+        CUser expired = new CUser();
+        expired.setUserId( "expired" );
+        expired.setPassword( StringDigester.getSha1Digest( "expired" ) );
+        expired.addRole( "maven-user" );
+        expired.setStatus( CUser.STATUS_EXPIRED );
+        securityConfiguration.createUser( expired );
+
+        CUser illegalStatus = new CUser();
+        illegalStatus.setUserId( "illegalStatus" );
+        illegalStatus.setPassword( StringDigester.getSha1Digest( "illegalStatus" ) );
+        illegalStatus.addRole( "maven-user" );
+        illegalStatus.setStatus( "some completely flakey status" );
+        securityConfiguration.createUser( illegalStatus );
 
         CRole mavenCommitter = new CRole();
         mavenCommitter.setId( "maven-committer" );
@@ -224,7 +254,7 @@ public abstract class AbstractRealmTest
         public final Map<String, CRepoTargetPrivilege> repoTargetPrivileges = new TreeMap<String, CRepoTargetPrivilege>();
 
         public final Map<String, CApplicationPrivilege> applicationPrivileges = new TreeMap<String, CApplicationPrivilege>();
-        
+
         public CUser readUser( String id )
             throws NoSuchUserException
         {
@@ -312,33 +342,33 @@ public abstract class AbstractRealmTest
         // Unimplemented methods
         public void changePassword( String userId, String oldPassword, String newPassword )
             throws IOException,
-            NoSuchUserException,
-            InvalidCredentialsException
+                NoSuchUserException,
+                InvalidCredentialsException
         {
             throw new UnsupportedOperationException();
         }
-        
+
         public void resetPassword( String id )
             throws IOException,
                 NoSuchUserException
         {
             throw new UnsupportedOperationException();
         }
-        
+
         public void forgotPassword( String userId, String email )
             throws IOException,
                 NoSuchUserException
         {
             throw new UnsupportedOperationException();
         }
-        
+
         public void forgotUserId( String email )
             throws IOException,
                 NoSuchUserException
         {
             throw new UnsupportedOperationException();
         }
-        
+
         public Collection<CUser> listUsers()
         {
             throw new UnsupportedOperationException();
@@ -518,17 +548,17 @@ public abstract class AbstractRealmTest
         {
             return repositoryGroups.get( repoGroupId );
         }
-        
+
         public String readDefaultSecurityConfigurationFile()
         {
             throw new UnsupportedOperationException();
         }
-        
+
         public String readSecurityConfigurationFile()
         {
             throw new UnsupportedOperationException();
         }
-        
+
         public void updateSecurityConfigurationFile( String settings )
             throws IOException
         {
@@ -550,7 +580,7 @@ public abstract class AbstractRealmTest
         {
             throw new UnsupportedOperationException();
         }
-        
+
         public CSmtpConfiguration readDefaultSmtpConfiguration()
         {
             throw new UnsupportedOperationException();
@@ -572,12 +602,12 @@ public abstract class AbstractRealmTest
         {
             throw new UnsupportedOperationException();
         }
-        
+
         public CSmtpConfiguration readSmtpConfiguration()
         {
             throw new UnsupportedOperationException();
         }
-        
+
         public void updateSmtpConfiguration( CSmtpConfiguration settings )
             throws ConfigurationException,
                 IOException
