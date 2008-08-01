@@ -36,6 +36,7 @@ import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
 import org.sonatype.nexus.configuration.ConfigurationChangeListener;
 import org.sonatype.nexus.configuration.ConfigurationException;
+import org.sonatype.nexus.configuration.application.MutableConfiguration;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.CRepositoryTarget;
@@ -122,38 +123,52 @@ public class DefaultNexusSecurityConfiguration
      * @plexus.requirement
      */
     private SecurityRuntimeConfigurationBuilder runtimeConfigurationBuilder;
+    
+    private boolean forceInit = true;
 
     /** The config event listeners. */
     private CopyOnWriteArrayList<ConfigurationChangeListener> configurationChangeListeners =
         new CopyOnWriteArrayList<ConfigurationChangeListener>();
         
     public void onConfigurationChange( ConfigurationChangeEvent evt )
-    {
-        getLogger().debug( "Nexus Configuration Loaded, now loading Security Configuration" );
-        try
-        {            
-            if ( FileConfigurationSource.class.isAssignableFrom( configurationSource.getClass() ) )
+    {          
+        if ( FileConfigurationSource.class.isAssignableFrom( configurationSource.getClass() ) )
+        {
+            
+            File newFile = new File( ( ( MutableConfiguration ) evt.getNotifiableConfiguration() ).readSecurityConfigurationFile() );
+            
+            if ( forceInit
+                || !newFile.equals( ( ( FileConfigurationSource ) configurationSource ).getConfigurationFile() ) )
             {
-                ( ( FileConfigurationSource ) configurationSource ).setConfigurationFile( new File( nexusConfiguration.readSecurityConfigurationFile() ) );
+            	getLogger().info( "Nexus Configuration Security Configuration File changed, now re-loading Security Configuration" );
+            	
+            	( ( FileConfigurationSource ) configurationSource ).setConfigurationFile( new File( nexusConfiguration.readSecurityConfigurationFile() ) );
+            	
+            	try 
+            	{
+					loadConfiguration( true );
+					
+					notifyConfigurationChangeListeners();
+            	}
+				catch ( ConfigurationException e )
+			    {
+			        getLogger().error( "Could not start Nexus Security, user configuration exception!", e );
+			    }
+			    catch ( IOException e )
+			    {
+			        getLogger().error( "Could not start Nexus Security, bad IO exception!", e );
+			    }
+			    
+			    forceInit = false;
             }
-            
-            loadConfiguration( true );
-            
-            notifyConfigurationChangeListeners();
-        }
-        catch ( ConfigurationException e )
-        {
-            getLogger().error( "Could not start Nexus Security, user configuration exception!", e );
-        }
-        catch ( IOException e )
-        {
-            getLogger().error( "Could not start Nexus Security, bad IO exception!", e );
         }
     }
     
     public void startService()
         throws StartingException
     {
+    	forceInit = true;
+    	
         nexusConfiguration.addConfigurationChangeListener( this );
         
         getLogger().info( "Started Nexus Security" );
@@ -464,6 +479,21 @@ public class DefaultNexusSecurityConfiguration
         }
 
         throw new NoSuchUserException();
+    }
+    
+    public void changePassword( String userId, String oldPassword, String newPassword )
+        throws IOException, NoSuchUserException, InvalidCredentialsException
+    {
+        CUser user = readUser( userId );
+        
+        String validate = pwGenerator.hashPassword( oldPassword );
+        
+        if ( !validate.equals( user.getPassword() ) )
+        {
+            throw new InvalidCredentialsException();
+        }
+        
+        user.setPassword( pwGenerator.hashPassword( newPassword ) );
     }
     
     /**

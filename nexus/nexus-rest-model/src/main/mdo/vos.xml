@@ -1654,6 +1654,22 @@
                 </field>
             </fields>
 		</class>
+		
+		<class>
+		    <name>UserChangePasswordRequest</name>
+            <version>1.0.0+</version>
+            <superClass>NexusResponse</superClass>
+            <fields>
+                <field>
+                    <name>data</name>
+                    <version>1.0.0+</version>
+                    <association>
+                        <type>UserChangePasswordResource</type>
+                    </association>
+                    <required>true</required>
+                </field>
+            </fields>
+		</class>
 
 		<!-- Response Data Contents -->
 
@@ -1715,6 +1731,31 @@
                 </field>
                 <field>
                     <name>userId</name>
+                    <version>1.0.0+</version>
+                    <type>String</type>
+                    <required>true</required>
+                </field>
+            </fields>
+        </class>
+        
+        <class>
+            <name>UserChangePasswordResource</name>
+            <version>1.0.0+</version>
+            <fields>
+                <field>
+                    <name>userId</name>
+                    <version>1.0.0+</version>
+                    <type>String</type>
+                    <required>true</required>
+                </field>
+                <field>
+                    <name>oldPassword</name>
+                    <version>1.0.0+</version>
+                    <type>String</type>
+                    <required>true</required>
+                </field>
+                <field>
+                    <name>newPassword</name>
                     <version>1.0.0+</version>
                     <type>String</type>
                     <required>true</required>

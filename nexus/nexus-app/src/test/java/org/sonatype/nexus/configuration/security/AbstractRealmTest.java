@@ -310,6 +310,14 @@ public abstract class AbstractRealmTest
         }
 
         // Unimplemented methods
+        public void changePassword( String userId, String oldPassword, String newPassword )
+            throws IOException,
+            NoSuchUserException,
+            InvalidCredentialsException
+        {
+            throw new UnsupportedOperationException();
+        }
+        
         public void resetPassword( String id )
             throws IOException,
                 NoSuchUserException

@@ -470,5 +470,11 @@
             <method>delete</method>
             <permission>nexus:content</permission>
         </applicationPrivilege>
+        <applicationPrivilege>
+            <id>64</id>
+            <name>User Change Password - (create)</name>
+            <method>create</method>
+            <permission>nexus:userschangepw</permission>
+        </applicationPrivilege>
 	</applicationPrivileges>
 </nexusSecurity>

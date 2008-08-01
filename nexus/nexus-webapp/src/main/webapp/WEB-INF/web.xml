@@ -80,6 +80,10 @@
 			/service/local/repo_routes = authcBasic,perms[nexus:routes]
 			/service/local/templates = authcBasic,perms[nexus:repotemplates]
 			/service/local/schedules = authcBasic,perms[nexus:tasks]
+			/service/local/users/changepw = authcBasic,perms[nexus:userschangepw]
+			/service/local/users/forgotpw = authcBasic,perms[nexus:usersforgotpw]
+			/service/local/users/forgotid = authcBasic,perms[nexus:usersforgotid]
+			/service/local/users/reset = authcBasic,perms[nexus:usersreset]
 			/service/local/users = authcBasic,perms[nexus:users]
 			/service/local/roles = authcBasic,perms[nexus:roles]
 			/service/local/privileges = authcBasic,perms[nexus:privileges]
@@ -174,6 +178,5 @@
 		<param-value>false</param-value>
 		</init-param>
 		</servlet>
-	-->
-
+-->
 </web-app>

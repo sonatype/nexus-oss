@@ -61,6 +61,11 @@ public interface MutableNexusSecurityConfiguration
     void forgotPassword( String userId, String email )
         throws IOException,
             NoSuchUserException;
+    
+    void changePassword( String userId, String oldPassword, String newPassword )
+        throws IOException,
+            NoSuchUserException,
+            InvalidCredentialsException;
 
     //Roles
     Collection<CRole> listRoles();

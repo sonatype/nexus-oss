@@ -74,6 +74,7 @@ import org.sonatype.nexus.rest.status.CommandResourceHandler;
 import org.sonatype.nexus.rest.status.StatusResourceHandler;
 import org.sonatype.nexus.rest.templates.repositories.RepositoryTemplateListResourceHandler;
 import org.sonatype.nexus.rest.templates.repositories.RepositoryTemplateResourceHandler;
+import org.sonatype.nexus.rest.users.UserChangePasswordResourceHandler;
 import org.sonatype.nexus.rest.users.UserForgotIdResourceHandler;
 import org.sonatype.nexus.rest.users.UserForgotPasswordResourceHandler;
 import org.sonatype.nexus.rest.users.UserListResourceHandler;
@@ -390,6 +391,8 @@ public class ApplicationBridge
         router.attach( "/users/forgotid/{" + UserResourceHandler.USER_EMAIL_KEY + "}", UserForgotIdResourceHandler.class );
         
         router.attach( "/users/forgotpw/", UserForgotPasswordResourceHandler.class );
+        
+        router.attach( "/users/changepw/", UserChangePasswordResourceHandler.class );
 
         router.attach( "/roles", RoleListResourceHandler.class );
 
