@@ -67,11 +67,11 @@
 			/service/local/attributes/** = authcBasic,perms[nexus:attributes]
 			/service/local/attributes = authcBasic,perms[nexus:attributes]
 			/service/local/repository_statuses = authcBasic,perms[nexus:repostatus]
-			/service/local/repositories/*/content/** = authcBasic,tperms
-			/service/local/repositories/*/content = authcBasic,tperms
+			/service/local/repositories/*/content/** = authcBasic,tperms[nexus:content]
+			/service/local/repositories/*/content = authcBasic,tperms[nexus:content]
 			/service/local/repositories = authcBasic,perms[nexus:repositories]
-			/service/local/repo_groups/*/content/** = authcBasic,tperms
-			/service/local/repo_groups/*/content = authcBasic,tperms
+			/service/local/repo_groups/*/content/** = authcBasic,tperms[nexus:content]
+			/service/local/repo_groups/*/content = authcBasic,tperms[nexus:content]
 			/service/local/repo_groups = authcBasic,perms[nexus:repogroups]
 			/service/local/repo_content_classes = authcBasic,perms[nexus:repocontentclasses]
 			/service/local/repo_targets = authcBasic,perms[nexus:targets]
@@ -111,8 +111,8 @@
 			tperms.pathPrefix = /content
 
 			[urls]
-			/content/** = authcBasic,tperms
-			/content = authcBasic,tperms
+			/content/** = authcBasic,tperms[nexus:content]
+			/content = authcBasic,tperms[nexus:content]
 			</param-value>
 		</init-param>
 	</filter>
