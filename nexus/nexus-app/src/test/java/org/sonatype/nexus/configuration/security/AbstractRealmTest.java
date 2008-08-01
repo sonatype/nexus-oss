@@ -88,6 +88,7 @@ import org.sonatype.nexus.proxy.repository.ProxyMode;
 import org.sonatype.nexus.proxy.repository.RemoteStatus;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RepositoryType;
+import org.sonatype.nexus.proxy.router.RepositoryRouter;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.proxy.storage.local.LocalRepositoryStorage;
 import org.sonatype.nexus.proxy.storage.remote.RemoteRepositoryStorage;
@@ -1290,6 +1291,11 @@ public abstract class AbstractRealmTest
         }
 
         public List<String> getDefaultRealms()
+        {
+            throw new UnsupportedOperationException();
+        }
+
+        public RepositoryRouter getRootRouter()
         {
             throw new UnsupportedOperationException();
         }

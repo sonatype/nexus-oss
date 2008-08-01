@@ -69,7 +69,8 @@ public class DefaultNexusSecurityConfigurationTest
 
         Configuration config = securityConfiguration.getConfiguration();
         
-        assertTrue( config.getRepositoryTargetPrivileges().size() == 0 );
+        // the m1 and m2 repo perm
+        assertTrue( config.getRepositoryTargetPrivileges().size() == 2 );
         
         // admin and anon role
         assertTrue( config.getRoles().size() == 2 );
@@ -122,13 +123,13 @@ public class DefaultNexusSecurityConfigurationTest
 
         config = securityConfiguration.getConfiguration();
         
-        assertTrue( config.getRepositoryTargetPrivileges().size() == 1 );
+        assertTrue( config.getRepositoryTargetPrivileges().size() == 3 );
         
-        assertTrue( ( ( CRepoTargetPrivilege ) config.getRepositoryTargetPrivileges().get( 0 ) ).getId().equals( "id2" ) );
-        assertTrue( ( ( CRepoTargetPrivilege ) config.getRepositoryTargetPrivileges().get( 0 ) ).getMethod().equals( CApplicationPrivilege.METHOD_CREATE ) );
-        assertTrue( ( ( CRepoTargetPrivilege ) config.getRepositoryTargetPrivileges().get( 0 ) ).getName().equals( "name" ) );
-        assertTrue( ( ( CRepoTargetPrivilege ) config.getRepositoryTargetPrivileges().get( 0 ) ).getRepositoryTargetId().equals( "targetId" ) );
-        assertTrue( ( ( CRepoTargetPrivilege ) config.getRepositoryTargetPrivileges().get( 0 ) ).getRepositoryId().equals( "repoId" ) );
+        assertTrue( ( ( CRepoTargetPrivilege ) config.getRepositoryTargetPrivileges().get( 2 ) ).getId().equals( "id2" ) );
+        assertTrue( ( ( CRepoTargetPrivilege ) config.getRepositoryTargetPrivileges().get( 2 ) ).getMethod().equals( CApplicationPrivilege.METHOD_CREATE ) );
+        assertTrue( ( ( CRepoTargetPrivilege ) config.getRepositoryTargetPrivileges().get( 2 ) ).getName().equals( "name" ) );
+        assertTrue( ( ( CRepoTargetPrivilege ) config.getRepositoryTargetPrivileges().get( 2 ) ).getRepositoryTargetId().equals( "targetId" ) );
+        assertTrue( ( ( CRepoTargetPrivilege ) config.getRepositoryTargetPrivileges().get( 2 ) ).getRepositoryId().equals( "repoId" ) );
         
         assertTrue( config.getRoles().size() == 4 );
         

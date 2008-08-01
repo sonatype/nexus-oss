@@ -103,6 +103,7 @@ import org.sonatype.nexus.proxy.repository.ProxyMode;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RepositoryType;
 import org.sonatype.nexus.proxy.repository.ShadowRepository;
+import org.sonatype.nexus.proxy.router.RepositoryRouter;
 import org.sonatype.nexus.proxy.wastebasket.Wastebasket;
 import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.nexus.store.DefaultEntry;
@@ -200,6 +201,13 @@ public class DefaultNexus
      * @plexus.requirement
      */
     private NexusSecurityConfiguration securityConfiguration;
+
+    /**
+     * The SecurityConfiguration component.
+     * 
+     * @plexus.requirement role="org.sonatype.nexus.proxy.router.RootRepositoryRouter"
+     */
+    private RepositoryRouter rootRepositoryRouter;
 
     /**
      * System status.
@@ -341,6 +349,11 @@ public class DefaultNexus
         }
     }
 
+    public RepositoryRouter getRootRouter()
+    {
+        return rootRepositoryRouter;
+    }
+
     // ----------------------------------------------------------------------------------------------------------
     // Wastebasket
     // ----------------------------------------------------------------------------------------------------------
@@ -441,7 +454,7 @@ public class DefaultNexus
     {
         nexusConfiguration.updateWorkingDirectory( settings );
     }
-    
+
     public String readSecurityConfigurationFile()
     {
         return nexusConfiguration.readSecurityConfigurationFile();
@@ -1118,10 +1131,11 @@ public class DefaultNexus
     {
         return nexusConfiguration.getConfigurationSource().getDefaultsSource().getConfiguration().getWorkingDirectory();
     }
-    
+
     public String readDefaultSecurityConfigurationFile()
     {
-        return nexusConfiguration.getConfigurationSource().getDefaultsSource().getConfiguration().getSecurity().getConfigurationFile();
+        return nexusConfiguration
+            .getConfigurationSource().getDefaultsSource().getConfiguration().getSecurity().getConfigurationFile();
     }
 
     public String readDefaultApplicationLogDirectory()

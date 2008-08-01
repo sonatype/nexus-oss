@@ -596,7 +596,12 @@ public abstract class AbstractRegistryDrivenRepositoryRouter
             {
                 try
                 {
-                    result.addAll( store.getTargetsForRequest( request ) );
+                    TargetSet rsTargets = store.getTargetsForRequest( request );
+                    
+                    result.addAll( rsTargets );
+
+                    result.setInvolvedRepositories( result.getInvolvedRepositories()
+                        + rsTargets.getInvolvedRepositories() );
                 }
                 catch ( Exception ex )
                 {

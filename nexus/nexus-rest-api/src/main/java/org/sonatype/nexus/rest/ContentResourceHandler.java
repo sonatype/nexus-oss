@@ -27,7 +27,6 @@ import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryGroupException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryRouterException;
 import org.sonatype.nexus.proxy.ResourceStore;
-import org.sonatype.nexus.proxy.router.ResourceStoreIdBasedRepositoryRouter;
 
 public class ContentResourceHandler
     extends AbstractResourceStoreContentResource
@@ -44,8 +43,8 @@ public class ContentResourceHandler
             NoSuchRepositoryGroupException,
             NoSuchRepositoryRouterException
     {
-        // we are returning the "super router"
-        return (ResourceStore) lookup( ResourceStoreIdBasedRepositoryRouter.ROLE );
+        // we are returning the "super router" -- the root
+        return getNexus().getRootRouter();
     }
 
 }

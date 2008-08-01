@@ -55,10 +55,32 @@
 				<privilege>54</privilege>
 				<privilege>55</privilege>
 				<privilege>56</privilege>
+				<privilege>T1</privilege>
+				<privilege>T2</privilege>
 			</privileges>
 			<roles />
 		</role>
 	</roles>
+	
+	<repositoryTargetPrivileges>
+		<repositoryTargetPrivilege>
+			<repositoryTargetId>1</repositoryTargetId>
+			<repositoryId></repositoryId>
+			<groupId></groupId>
+			<id>T1</id>
+			<name>Read All M2 Repositories - (read)</name>
+			<method>read</method>
+		</repositoryTargetPrivilege>
+		<repositoryTargetPrivilege>
+			<repositoryTargetId>2</repositoryTargetId>
+			<repositoryId></repositoryId>
+			<groupId></groupId>
+			<id>T2</id>
+			<name>Read All M1 Repositories - (read)</name>
+			<method>read</method>
+		</repositoryTargetPrivilege>
+	</repositoryTargetPrivileges>
+	
 	<applicationPrivileges>
 		<applicationPrivilege>
 			<id>1000</id>

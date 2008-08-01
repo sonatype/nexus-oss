@@ -72,7 +72,7 @@ public class DefaultTargetRegistryTest
 
         assertEquals( 1, ts.size() );
 
-        assertEquals( "maven2-with-sources", ts.iterator().next().getId() );
+        assertEquals( "maven2-with-sources", ts.iterator().next().getTarget().getId() );
     }
 
     public void testSimpleM1()

@@ -8,7 +8,10 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.jsecurity.web.filter.authz.PermissionsAuthorizationFilter;
+import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.security.filter.NexusJSecurityFilter;
 
 /**
@@ -19,12 +22,24 @@ import org.sonatype.nexus.security.filter.NexusJSecurityFilter;
 public class HttpVerbMappingAuthorizationFilter
     extends PermissionsAuthorizationFilter
 {
+    private final Log logger = LogFactory.getLog( this.getClass() );
+
     private Map<String, String> mapping = new HashMap<String, String>();
     {
         mapping.put( "head", "read" );
         mapping.put( "get", "read" );
         mapping.put( "put", "update" );
         mapping.put( "post", "create" );
+    }
+
+    protected Log getLogger()
+    {
+        return logger;
+    }
+
+    protected Nexus getNexus( ServletRequest request )
+    {
+        return (Nexus) request.getAttribute( Nexus.class.getName() );
     }
 
     protected String getActionFromHttpVerb( HttpServletRequest request )
@@ -39,16 +54,10 @@ public class HttpVerbMappingAuthorizationFilter
         return action;
     }
 
-    public boolean isAccessAllowed( ServletRequest request, ServletResponse response, Object mappedValue )
-        throws IOException
+    protected String[] mapPerms( String[] perms, String action )
     {
-        String action = getActionFromHttpVerb( (HttpServletRequest) request );
-
-        String[] perms = (String[]) mappedValue;
-
-        if ( perms != null && perms.length > 0 )
+        if ( perms != null && perms.length > 0 && action != null )
         {
-
             String[] mappedPerms = new String[perms.length];
 
             for ( int i = 0; i < perms.length; i++ )
@@ -56,12 +65,37 @@ public class HttpVerbMappingAuthorizationFilter
                 mappedPerms[i] = perms[i] + ":" + action;
             }
 
-            return super.isAccessAllowed( request, response, mappedPerms );
+            if ( getLogger().isDebugEnabled() )
+            {
+                StringBuffer sb = new StringBuffer();
+
+                for ( int i = 0; i < mappedPerms.length; i++ )
+                {
+                    sb.append( mappedPerms[i] );
+
+                    sb.append( ", " );
+                }
+
+                getLogger().debug(
+                    "MAPPED '" + action + "' action to permission: " + sb.toString().substring( 0, sb.length() - 2 ) );
+            }
+
+            return mappedPerms;
         }
         else
         {
-            return super.isAccessAllowed( request, response, mappedValue );
+            return perms;
         }
+    }
+
+    public boolean isAccessAllowed( ServletRequest request, ServletResponse response, Object mappedValue )
+        throws IOException
+    {
+        String action = getActionFromHttpVerb( (HttpServletRequest) request );
+
+        String[] perms = (String[]) mappedValue;
+
+        return super.isAccessAllowed( request, response, mapPerms( perms, action ) );
     }
 
     protected boolean onAccessDenied( ServletRequest request, ServletResponse response )

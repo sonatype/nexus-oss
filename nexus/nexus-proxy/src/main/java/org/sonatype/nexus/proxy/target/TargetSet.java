@@ -11,14 +11,27 @@ import org.sonatype.nexus.proxy.repository.Repository;
  * @author cstamas
  */
 public class TargetSet
-    extends HashSet<Target>
-    implements Set<Target>
+    extends HashSet<TargetMatch>
+    implements Set<TargetMatch>
 {
+    private int involvedRepositories;
+
+    public int getInvolvedRepositories()
+    {
+        return involvedRepositories;
+    }
+
+    public void setInvolvedRepositories( int involvedRepositories )
+    {
+        this.involvedRepositories = involvedRepositories;
+    }
+
     boolean isPathContained( Repository repository, String path )
     {
-        for ( Target target : this )
+        for ( TargetMatch targetMatch : this )
         {
-            if ( target.isPathContained( repository, path ) )
+            if ( targetMatch.getRepository().getId().equals( repository.getId() )
+                && targetMatch.getTarget().isPathContained( repository, path ) )
             {
                 return true;
             }

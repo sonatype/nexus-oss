@@ -50,6 +50,7 @@ import org.sonatype.nexus.proxy.RepositoryNotAvailableException;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.proxy.router.RepositoryRouter;
 import org.sonatype.scheduling.NoSuchTaskException;
 import org.sonatype.scheduling.ScheduledTask;
 import org.sonatype.scheduling.SchedulerTask;
@@ -99,6 +100,8 @@ public interface Nexus
             AccessDeniedException,
             RepositoryNotAvailableException,
             StorageException;
+    
+    RepositoryRouter getRootRouter();
 
     // ----------------------------------------------------------------------------
     // Wastebasket

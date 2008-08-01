@@ -27,14 +27,18 @@ public class NexusHttpAuthenticationFilter
         return logger;
     }
 
-    public boolean isFakeAuthScheme()
+    // TODO: this should be boolean, but see
+    // http://issues.jsecurity.org/browse/JSEC-119
+    public String isFakeAuthScheme()
     {
-        return fakeAuthScheme;
+        return Boolean.toString( fakeAuthScheme );
     }
 
-    public void setFakeAuthScheme( boolean fakeAuthScheme )
+    // TODO: this should be boolean, but see
+    // http://issues.jsecurity.org/browse/JSEC-119
+    public void setFakeAuthScheme( String fakeAuthSchemeStr )
     {
-        this.fakeAuthScheme = fakeAuthScheme;
+        this.fakeAuthScheme = Boolean.parseBoolean( fakeAuthSchemeStr );
 
         if ( fakeAuthScheme )
         {

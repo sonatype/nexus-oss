@@ -76,7 +76,7 @@ public class AbstractRepositoryTargetResourceHandler
         target.setId( resource.getId() );
 
         target.setName( resource.getName() );
-
+        
         target.setContentClass( resource.getContentClass() );
 
         List<String> patterns = resource.getPatterns();

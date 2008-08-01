@@ -27,7 +27,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import org.codehaus.plexus.logging.LogEnabled;
+import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
+import org.codehaus.plexus.util.StringUtils;
 import org.jsecurity.authc.AccountException;
 import org.jsecurity.authc.AuthenticationException;
 import org.jsecurity.authc.AuthenticationInfo;
@@ -61,9 +64,11 @@ import org.sonatype.nexus.proxy.repository.Repository;
  */
 public class NexusRealm
     extends AuthorizingRealm
-    implements ConfigurationChangeListener, Initializable
+    implements ConfigurationChangeListener, Initializable, LogEnabled
 {
     public static final String ANONYMOUS_USERNAME = "anonymous";
+
+    private Logger logger;
 
     /**
      * @plexus.requirement
@@ -90,6 +95,16 @@ public class NexusRealm
     {
         // flush the caches to make it load the potential changes again
         getAuthorizationCache().clear();
+    }
+
+    public void enableLogging( Logger logger )
+    {
+        this.logger = logger;
+    }
+
+    protected Logger getLogger()
+    {
+        return logger;
     }
 
     public MutableNexusSecurityConfiguration getSecurityConfiguration()
@@ -139,7 +154,7 @@ public class NexusRealm
             }
 
             AuthenticationInfo authenticationInfo = buildAuthenticationInfo( username, password.toCharArray() );
-            
+
             return authenticationInfo;
         }
         catch ( NoSuchUserException e )
@@ -217,6 +232,7 @@ public class NexusRealm
 
         SimpleAuthorizationInfo info = new SimpleAuthorizationInfo( roleNames );
         info.setObjectPermissions( permissions );
+
         return info;
     }
 
@@ -249,28 +265,34 @@ public class NexusRealm
     protected Permission createPermission( CApplicationPrivilege privilege )
     {
         String applicationPermission = privilege.getPermission();
-        if ( applicationPermission == null )
+
+        if ( StringUtils.isEmpty( applicationPermission ) )
         {
-            applicationPermission = "*";
+            applicationPermission = "*:*";
         }
 
         String method = privilege.getMethod();
-        if ( method == null )
+
+        if ( StringUtils.isEmpty( method ) )
         {
             method = "*";
         }
 
         WildcardPermission permission = new WildcardPermission( applicationPermission + ":" + method );
+
         return permission;
     }
 
+    // permission is of format:
+    // targetId : repoId : action
     protected Set<Permission> createPermissions( CRepoTargetPrivilege targetPrivilege )
     {
         Set<Permission> permissions = new LinkedHashSet<Permission>();
+
         String basePermissionString = targetPrivilege.getRepositoryTargetId() + ":";
 
         String methodString;
-        if ( targetPrivilege.getMethod() != null )
+        if ( !StringUtils.isEmpty( targetPrivilege.getMethod() ) )
         {
             methodString = ":" + targetPrivilege.getMethod();
         }
@@ -279,18 +301,20 @@ public class NexusRealm
             methodString = ":*";
         }
 
-        if ( targetPrivilege.getRepositoryId() != null )
+        if ( !StringUtils.isEmpty( targetPrivilege.getRepositoryId() ) )
         {
             WildcardPermission permission = new WildcardPermission( basePermissionString
                 + targetPrivilege.getRepositoryId() + methodString );
+
             permissions.add( permission );
         }
-        else if ( targetPrivilege.getGroupId() != null )
+        else if ( !StringUtils.isEmpty( targetPrivilege.getGroupId() ) )
         {
             // explode group permission into a collection of permissions
             try
             {
                 List<Repository> list;
+
                 if ( nexus != null )
                 {
                     list = nexus.getRepositoryGroup( targetPrivilege.getGroupId() );
@@ -316,6 +340,7 @@ public class NexusRealm
         else
         {
             WildcardPermission permission = new WildcardPermission( basePermissionString + "*" + methodString );
+
             permissions.add( permission );
         }
 

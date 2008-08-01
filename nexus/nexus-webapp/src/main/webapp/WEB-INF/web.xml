@@ -40,6 +40,7 @@
 			[filters]
 			authcBasic = org.sonatype.nexus.security.filter.authc.NexusHttpAuthenticationFilter
 			authcBasic.applicationName = Sonatype Nexus Repository Manager API
+			authcBasic.fakeAuthScheme = true
 
 			logout = org.sonatype.nexus.security.filter.authc.LogoutAuthenticationFilter
 
@@ -95,11 +96,16 @@
 			[filters]
 			authcBasic = org.sonatype.nexus.security.filter.authc.NexusHttpAuthenticationFilter
 			authcBasic.applicationName = Sonatype Nexus Repository Manager
+			authcBasic.fakeAuthScheme = false
 
-			perms = org.sonatype.nexus.security.filter.authz.HttpVerbMappingAuthorizationFilter
+			logout = org.sonatype.nexus.security.filter.authc.LogoutAuthenticationFilter
+
+			tperms = org.sonatype.nexus.security.filter.authz.NexusTargetMappingAuthorizationFilter
 
 			[urls]
-			/content/** = authcBasic,perms[nexus:targets]
+			/content/logout = logout
+			/content/** = authcBasic,tperms
+			/content = authcBasic,tperms
 			</param-value>
 		</init-param>
 	</filter>
