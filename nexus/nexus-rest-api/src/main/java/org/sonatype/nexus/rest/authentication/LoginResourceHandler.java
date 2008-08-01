@@ -104,6 +104,16 @@ public class LoginResourceHandler
         perms.setConfigPrivileges( getFlagsForPermission( subject, "nexus:privileges" ) );
 
         perms.setConfigRepoTargets( getFlagsForPermission( subject, "nexus:targets" ) );
+        
+        perms.setActionChangePassword( getFlagsForPermission( subject, "nexus:userschangepw" ) );
+        
+        perms.setActionForgotPassword( getFlagsForPermission( subject, "nexus:usersforgotpw" ) );
+        
+        perms.setActionForgotUserid( getFlagsForPermission( subject, "nexus:usersforgotid" ) );
+        
+        perms.setActionResetPassword( getFlagsForPermission( subject, "nexus:usersreset" ) );
+        
+        perms.setActionEmptyTrash( getFlagsForPermission( subject, "nexus:wastebasket" ) );
 
         resource.setClientPermissions( perms );
 

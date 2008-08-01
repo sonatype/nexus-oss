@@ -141,7 +141,12 @@ Sonatype.user.anon = {
     configUsers : 0,
     configRoles : 0,
     configPrivileges : 0,
-    configRepoTargets : 0
+    configRepoTargets : 0,
+    actionForgotPassword: 8,
+    actionForgotUserid: 8,
+    actionChangePassword: 0,
+    actionResetPassword: 4,
+    actionEmptyTrash: 0
   }
 };
 

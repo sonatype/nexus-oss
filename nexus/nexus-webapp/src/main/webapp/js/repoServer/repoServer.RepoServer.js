@@ -83,12 +83,6 @@ Sonatype.repoServer.RepoServer = function(){
           inputType:'password', 
           width: 200,
           allowBlank:false 
-        },
-        {
-          xtype: 'panel',
-          id: 'recovery-panel',
-          style: 'padding-left: 70px',
-          html: 'Forgot your <a id="recover-username" href="#">username</a> or <a id="recover-password" href="#">password</a>?'
         }
       ]
       //buttons added later to provide scope to handler
@@ -121,6 +115,32 @@ Sonatype.repoServer.RepoServer = function(){
       this.createSubComponents();
       
       Sonatype.view.serverTabPanel.add(this.nexusPanel);
+      
+      var htmlString = null;
+      
+      if(sp.checkPermission(Sonatype.user.curr.repoServer.actionForgotUserid, sp.CREATE)){
+        htmlString = 'Forgot your <a id="recover-username" href="#">username</a>'
+      }
+      if(sp.checkPermission(Sonatype.user.curr.repoServer.actionForgotPassword, sp.CREATE)){
+    	if (htmlString != null){
+          htmlString += ' or ';
+    	}
+    	else{
+          htmlString = 'Forgot your ';
+    	}
+    	htmlString += '<a id="recover-password" href="#">password</a>';
+      }
+      if (htmlString != null){
+    	htmlString += '?';
+    	this.loginFormConfig.items[2] = 
+    	  {
+    		xtype: 'panel',
+    		id: 'recovery-panel',
+    		style: 'padding-left: 70px',
+    		html: htmlString
+    	  };
+      }
+      
       this.loginFormConfig.buttons = [{ 
         id:'loginbutton',
         text:'Log In',
@@ -329,7 +349,7 @@ Sonatype.repoServer.RepoServer = function(){
 
       //Security Group **************************************************
       var sTplData = {links:[]};
-      if ( Sonatype.user.curr.isLoggedIn ) {
+      if ( sp.checkPermission( userPerms.actionChangePassword, sp.CREATE ) ) {
         sTplData.links.push( { id: 'open-security-password', title: 'Change Password' } );
       }
       if( sp.checkPermission( userPerms.configUsers, sp.EDIT ) ) {

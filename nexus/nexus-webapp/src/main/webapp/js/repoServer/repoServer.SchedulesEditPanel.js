@@ -875,6 +875,8 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
       }
     ]
   };
+  
+  this.sp = Sonatype.lib.Permissions;
 
   this.schedulesGridPanel = new Ext.grid.GridPanel({
     title: 'Scheduled Tasks',
@@ -904,7 +906,8 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
         icon: Sonatype.config.resourcePath + '/images/icons/add.png',
         cls: 'x-btn-text-icon',
         scope: this,
-        handler: this.addResourceHandler
+        handler: this.addResourceHandler,
+        disabled: !this.sp.checkPermission(Sonatype.user.curr.repoServer.configSchedules, this.sp.CREATE)
       },
       {
         id: 'schedule-delete-btn',
@@ -912,7 +915,8 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
         icon: Sonatype.config.resourcePath + '/images/icons/delete.png',
         cls: 'x-btn-text-icon',
         scope:this,
-        handler: this.deleteHandler
+        handler: this.deleteHandler,
+        disabled: !this.sp.checkPermission(Sonatype.user.curr.repoServer.configSchedules, this.sp.DELETE)
       }
     ],
 

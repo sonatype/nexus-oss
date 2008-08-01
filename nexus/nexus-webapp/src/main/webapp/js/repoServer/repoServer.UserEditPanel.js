@@ -290,6 +290,8 @@ Sonatype.repoServer.UserEditPanel = function(config){
       }
     ]
   };
+  
+  this.sp = Sonatype.lib.Permissions;
 
   this.usersGridPanel = new Ext.grid.GridPanel({
     title: 'Users',
@@ -319,7 +321,8 @@ Sonatype.repoServer.UserEditPanel = function(config){
         icon: Sonatype.config.resourcePath + '/images/icons/add.png',
         cls: 'x-btn-text-icon',
         scope: this,
-        handler: this.addResourceHandler
+        handler: this.addResourceHandler,
+        disabled: !this.sp.checkPermission(Sonatype.user.curr.repoServer.configUsers, this.sp.CREATE)
       },
       {
         id: 'user-delete-btn',
@@ -327,7 +330,8 @@ Sonatype.repoServer.UserEditPanel = function(config){
         icon: Sonatype.config.resourcePath + '/images/icons/delete.png',
         cls: 'x-btn-text-icon',
         scope:this,
-        handler: this.deleteHandler
+        handler: this.deleteHandler,
+        disabled: !this.sp.checkPermission(Sonatype.user.curr.repoServer.configUsers, this.sp.DELETE)
       }
     ],
 

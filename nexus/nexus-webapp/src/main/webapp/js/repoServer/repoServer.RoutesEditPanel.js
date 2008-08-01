@@ -318,6 +318,8 @@ Sonatype.repoServer.RoutesEditPanel = function(config){
     autoLoad: true
   });
 
+  this.sp = Sonatype.lib.Permissions;
+  
   this.routesGridPanel = new Ext.grid.GridPanel({
     title: 'Repository Routes',
     id: 'st-routes-grid',
@@ -346,7 +348,8 @@ Sonatype.repoServer.RoutesEditPanel = function(config){
         icon: Sonatype.config.resourcePath + '/images/icons/add.png',
         cls: 'x-btn-text-icon',
         scope: this,
-        handler: this.addResourceHandler
+        handler: this.addResourceHandler,
+        disabled: !this.sp.checkPermission(Sonatype.user.curr.repoServer.configRules, this.sp.CREATE)
       },
       {
         id: 'route-delete-btn',
@@ -354,7 +357,8 @@ Sonatype.repoServer.RoutesEditPanel = function(config){
         icon: Sonatype.config.resourcePath + '/images/icons/delete.png',
         cls: 'x-btn-text-icon',
         scope:this,
-        handler: this.deleteResourceHandler
+        handler: this.deleteResourceHandler,
+        disabled: !this.sp.checkPermission(Sonatype.user.curr.repoServer.configRules, this.sp.DELETE)
       }
     ],
 

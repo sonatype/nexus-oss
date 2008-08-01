@@ -265,6 +265,8 @@ Sonatype.repoServer.GroupsEditPanel = function(config){
     sortInfo: {field: 'name', direction: 'ASC'},
     autoLoad: true
   });
+  
+  this.sp = Sonatype.lib.Permissions;
 
   this.groupsGridPanel = new Ext.grid.GridPanel({
     title: 'Repository Groups',
@@ -294,7 +296,8 @@ Sonatype.repoServer.GroupsEditPanel = function(config){
         icon: Sonatype.config.resourcePath + '/images/icons/add.png',
         cls: 'x-btn-text-icon',
         scope: this,
-        handler: this.addResourceHandler
+        handler: this.addResourceHandler,
+        disabled: !this.sp.checkPermission(Sonatype.user.curr.repoServer.configGroups, this.sp.CREATE)
       },
       {
         id: 'group-delete-btn',
@@ -302,7 +305,8 @@ Sonatype.repoServer.GroupsEditPanel = function(config){
         icon: Sonatype.config.resourcePath + '/images/icons/delete.png',
         cls: 'x-btn-text-icon',
         scope:this,
-        handler: this.deleteResourceHandler
+        handler: this.deleteResourceHandler,
+        disabled: !this.sp.checkPermission(Sonatype.user.curr.repoServer.configGroups, this.sp.DELETE)
       }
     ],
 

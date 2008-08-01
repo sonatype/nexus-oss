@@ -2461,6 +2461,36 @@
                     <type>int</type>
                     <required>true</required>
                 </field>
+                <field>
+                    <name>actionForgotPassword</name>
+                    <version>1.0.0+</version>
+                    <type>int</type>
+                    <required>true</required>
+                </field>
+                <field>
+                    <name>actionForgotUserid</name>
+                    <version>1.0.0+</version>
+                    <type>int</type>
+                    <required>true</required>
+                </field>
+                <field>
+                    <name>actionChangePassword</name>
+                    <version>1.0.0+</version>
+                    <type>int</type>
+                    <required>true</required>
+                </field>
+                <field>
+                    <name>actionResetPassword</name>
+                    <version>1.0.0+</version>
+                    <type>int</type>
+                    <required>true</required>
+                </field>
+                <field>
+                    <name>actionEmptyTrash</name>
+                    <version>1.0.0+</version>
+                    <type>int</type>
+                    <required>true</required>
+                </field>                
 			</fields>
 		</class>
 

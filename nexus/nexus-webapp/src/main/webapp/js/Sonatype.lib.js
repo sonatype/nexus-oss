@@ -21,11 +21,12 @@
 (function(){
 
 Sonatype.lib.Permissions = {
-    READ : 1,   // 001
-    EDIT : 2,   // 010
-    DELETE : 4, // 100
-    ALL : 7,    // 111
-    NONE : 0,   // 000
+    READ : 1,   // 0001
+    EDIT : 2,   // 0010
+    DELETE : 4, // 0100
+    CREATE : 8, // 1000
+    ALL : 15,   // 1111
+    NONE : 0,   // 0000
     
     // returns bool indicating if value has all perms
     // all values are base 10 representations of the n-bit representation

@@ -944,6 +944,8 @@ Sonatype.repoServer.RepoEditPanel = function(config){
     sortInfo: {field: 'name', direction: 'ASC'},
     autoLoad: true
   });
+  
+  this.sp = Sonatype.lib.Permissions;
 
   this.reposGridPanel = new Ext.grid.GridPanel({
     title: 'Repositories',
@@ -991,7 +993,8 @@ Sonatype.repoServer.RepoEditPanel = function(config){
               handler: this.addRepoHandler.createDelegate(this, ['virtual'])
             }
           ]
-        }
+        },
+        disabled: !this.sp.checkPermission(Sonatype.user.curr.repoServer.configRepos, this.sp.CREATE)
       },
       {
         id: 'repo-delete-btn',
@@ -999,7 +1002,8 @@ Sonatype.repoServer.RepoEditPanel = function(config){
         icon: Sonatype.config.resourcePath + '/images/icons/delete.png',
         cls: 'x-btn-text-icon',
         scope:this,
-        handler: this.deleteRepoHandler
+        handler: this.deleteRepoHandler,
+        disabled: !this.sp.checkPermission(Sonatype.user.curr.repoServer.configRepos, this.sp.DELETE)
       },
       {
         id: 'repo-trash-btn',
@@ -1015,7 +1019,8 @@ Sonatype.repoServer.RepoEditPanel = function(config){
               handler: this.deleteTrashHandler.createDelegate(this)
             }
           ]
-        }
+        },
+        disabled: !this.sp.checkPermission(Sonatype.user.curr.repoServer.actionEmptyTrash, this.sp.DELETE)
       }
     ],
 
