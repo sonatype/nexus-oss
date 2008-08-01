@@ -227,7 +227,6 @@ public class DummyRepositoryRouter
     }
 
     public TargetSet getTargetsForRequest( ResourceStoreRequest request )
-        throws NoSuchResourceStoreException
     {
         return new TargetSet();
     }

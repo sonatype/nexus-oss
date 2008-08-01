@@ -42,9 +42,9 @@ public class HttpVerbMappingAuthorizationFilter
         return (Nexus) request.getAttribute( Nexus.class.getName() );
     }
 
-    protected String getActionFromHttpVerb( HttpServletRequest request )
+    protected String getActionFromHttpVerb( ServletRequest request )
     {
-        String action = request.getMethod().toLowerCase();
+        String action = ( (HttpServletRequest) request ).getMethod().toLowerCase();
 
         if ( mapping.containsKey( action ) )
         {
@@ -91,7 +91,7 @@ public class HttpVerbMappingAuthorizationFilter
     public boolean isAccessAllowed( ServletRequest request, ServletResponse response, Object mappedValue )
         throws IOException
     {
-        String action = getActionFromHttpVerb( (HttpServletRequest) request );
+        String action = getActionFromHttpVerb( request );
 
         String[] perms = (String[]) mappedValue;
 

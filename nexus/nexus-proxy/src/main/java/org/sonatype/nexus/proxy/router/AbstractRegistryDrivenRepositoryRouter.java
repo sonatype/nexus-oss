@@ -553,7 +553,6 @@ public abstract class AbstractRegistryDrivenRepositoryRouter
     }
 
     protected TargetSet doGetTargetsForRequest( ResourceStoreRequest request )
-        throws NoSuchResourceStoreException
     {
         TargetSet result = new TargetSet();
 
@@ -569,6 +568,11 @@ public abstract class AbstractRegistryDrivenRepositoryRouter
             // will handle below
 
             stores = null;
+        }
+        catch ( NoSuchResourceStoreException e )
+        {
+            // nothing here
+            return result;
         }
 
         if ( stores == null )
@@ -597,11 +601,8 @@ public abstract class AbstractRegistryDrivenRepositoryRouter
                 try
                 {
                     TargetSet rsTargets = store.getTargetsForRequest( request );
-                    
-                    result.addAll( rsTargets );
 
-                    result.setInvolvedRepositories( result.getInvolvedRepositories()
-                        + rsTargets.getInvolvedRepositories() );
+                    result.addTargetSet( rsTargets );
                 }
                 catch ( Exception ex )
                 {

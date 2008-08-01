@@ -802,7 +802,6 @@ public abstract class AbstractRepository
     }
 
     public TargetSet getTargetsForRequest( ResourceStoreRequest request )
-        throws NoSuchResourceStoreException
     {
         RepositoryItemUid uid = new RepositoryItemUid( this, request.getRequestPath() );
 
@@ -1038,14 +1037,13 @@ public abstract class AbstractRepository
     }
 
     public TargetSet getTargetsForRequest( RepositoryItemUid uid )
-        throws NoSuchResourceStoreException
     {
         if ( getLogger().isDebugEnabled() )
         {
             getLogger().debug( "getTargetsForRequest() :: " + uid.toString() );
         }
 
-        return targetRegistry.getTargetsForRepositoryPath( this, uid.getPath() );
+        return targetRegistry.getTargetsForRepositoryPath( uid.getRepository(), uid.getPath() );
     }
 
     // ===================================================================================

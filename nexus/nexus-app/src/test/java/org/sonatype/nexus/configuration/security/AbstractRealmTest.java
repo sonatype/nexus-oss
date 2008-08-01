@@ -1689,7 +1689,11 @@ public abstract class AbstractRealmTest
         }
 
         public TargetSet getTargetsForRequest( ResourceStoreRequest request )
-            throws NoSuchResourceStoreException
+        {
+            throw new UnsupportedOperationException();
+        }
+
+        public TargetSet getTargetsForRequest( RepositoryItemUid uid )
         {
             throw new UnsupportedOperationException();
         }

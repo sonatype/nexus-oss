@@ -1,5 +1,6 @@
 package org.sonatype.nexus.proxy.target;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -11,24 +12,38 @@ import org.sonatype.nexus.proxy.repository.Repository;
  * @author cstamas
  */
 public class TargetSet
-    extends HashSet<TargetMatch>
-    implements Set<TargetMatch>
 {
-    private int involvedRepositories;
+    private final Set<TargetMatch> matches = new HashSet<TargetMatch>();
 
-    public int getInvolvedRepositories()
+    private final Set<String> matchedRepositoryIds = new HashSet<String>();
+
+    public Set<TargetMatch> getMatches()
     {
-        return involvedRepositories;
+        return Collections.unmodifiableSet( matches );
     }
 
-    public void setInvolvedRepositories( int involvedRepositories )
+    public Set<String> getMatchedRepositoryIds()
     {
-        this.involvedRepositories = involvedRepositories;
+        return Collections.unmodifiableSet( matchedRepositoryIds );
+    }
+
+    public void addTargetMatch( TargetMatch tm )
+    {
+        matches.add( tm );
+
+        matchedRepositoryIds.add( tm.getRepository().getId() );
+    }
+
+    public void addTargetSet( TargetSet ts )
+    {
+        matches.addAll( ts.getMatches() );
+
+        matchedRepositoryIds.addAll( ts.getMatchedRepositoryIds() );
     }
 
     boolean isPathContained( Repository repository, String path )
     {
-        for ( TargetMatch targetMatch : this )
+        for ( TargetMatch targetMatch : matches )
         {
             if ( targetMatch.getRepository().getId().equals( repository.getId() )
                 && targetMatch.getTarget().isPathContained( repository, path ) )

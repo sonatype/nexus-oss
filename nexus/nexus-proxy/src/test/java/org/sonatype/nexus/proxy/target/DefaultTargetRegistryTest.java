@@ -62,17 +62,28 @@ public class DefaultTargetRegistryTest
 
         assertNotNull( ts );
 
-        assertEquals( 2, ts.size() );
+        assertEquals( 2, ts.getMatches().size() );
+        
+        assertEquals(1, ts.getMatchedRepositoryIds().size());
+        
+        assertEquals( "dummy", ts.getMatchedRepositoryIds().iterator().next() );
 
-        ts = targetRegistry.getTargetsForRepositoryPath(
+        TargetSet ts1 = targetRegistry.getTargetsForRepositoryPath(
             repository,
             "/org/apache/maven/maven-core/2.0.9/maven-core-2.0.9-sources.jar" );
 
-        assertNotNull( ts );
+        assertNotNull( ts1 );
 
-        assertEquals( 1, ts.size() );
+        assertEquals( 1, ts1.getMatches().size() );
 
-        assertEquals( "maven2-with-sources", ts.iterator().next().getTarget().getId() );
+        assertEquals( "maven2-with-sources", ts1.getMatches().iterator().next().getTarget().getId() );
+        
+        // adding them 
+        ts.addTargetSet( ts1 );
+        
+        assertEquals( 2, ts.getMatches().size() );
+        
+        assertEquals( 1, ts.getMatchedRepositoryIds().size() );
     }
 
     public void testSimpleM1()
@@ -89,7 +100,7 @@ public class DefaultTargetRegistryTest
 
         assertNotNull( ts );
 
-        assertEquals( 1, ts.size() );
+        assertEquals( 1, ts.getMatches().size() );
 
         ts = targetRegistry.getTargetsForRepositoryPath(
             repository,
@@ -97,7 +108,7 @@ public class DefaultTargetRegistryTest
 
         assertNotNull( ts );
 
-        assertEquals( 0, ts.size() );
+        assertEquals( 0, ts.getMatches().size() );
     }
 
 }

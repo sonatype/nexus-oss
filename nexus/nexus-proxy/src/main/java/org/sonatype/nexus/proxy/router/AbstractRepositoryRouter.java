@@ -299,7 +299,6 @@ public abstract class AbstractRepositoryRouter
     }
 
     public TargetSet getTargetsForRequest( ResourceStoreRequest request )
-        throws NoSuchResourceStoreException
     {
         if ( getLogger().isDebugEnabled() )
         {
@@ -661,8 +660,6 @@ public abstract class AbstractRepositoryRouter
      * 
      * @param request
      * @return
-     * @throws NoSuchResourceStoreException
      */
-    protected abstract TargetSet doGetTargetsForRequest( ResourceStoreRequest request )
-        throws NoSuchResourceStoreException;
+    protected abstract TargetSet doGetTargetsForRequest( ResourceStoreRequest request );
 }

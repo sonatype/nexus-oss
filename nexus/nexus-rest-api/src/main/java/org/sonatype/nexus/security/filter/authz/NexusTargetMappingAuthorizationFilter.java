@@ -8,7 +8,6 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 
-import org.codehaus.plexus.util.StringUtils;
 import org.jsecurity.web.WebUtils;
 import org.sonatype.nexus.proxy.NoSuchResourceStoreException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
@@ -23,8 +22,6 @@ import org.sonatype.nexus.proxy.target.TargetSet;
 public class NexusTargetMappingAuthorizationFilter
     extends HttpVerbMappingAuthorizationFilter
 {
-    private static final String[] FAKE_PERMS = new String[] { "nexus:admin" };
-
     private String pathPrefix;
 
     public String getPathPrefix()
@@ -53,69 +50,55 @@ public class NexusTargetMappingAuthorizationFilter
         }
     }
 
+    public String[] getTargetPerms( TargetSet matched )
+    {
+        String[] result = null;
+
+        List<String> perms = new ArrayList<String>( matched.getMatches().size() );
+
+        // nexus : 'target' + targetId : repoId
+        for ( TargetMatch match : matched.getMatches() )
+        {
+            perms.add( "nexus:target" + match.getTarget().getId() + ":" + match.getRepository().getId() );
+        }
+
+        result = perms.toArray( new String[perms.size()] );
+
+        return result;
+    }
+
     public boolean isAccessAllowed( ServletRequest request, ServletResponse response, Object mappedValue )
         throws IOException
     {
-        // we have no mappedValue here! it is simply neglected, and we are building our own
-        // perms based on request
-        // we are building based on request path
-        // permissions that are of form:
-        // targetId : repoId
-        // (and the superclass will append the action based on HTTP verb)
+        // let check the mappedValues 1st
 
+        boolean result = super.isAccessAllowed( request, response, mappedValue );
+
+        // if we are not allowed at start, forbid it
+        if ( !result )
+        {
+            return false;
+        }
+
+        // if we are allowed to go forward, let's check the target perms
         ResourceStoreRequest rsr = new ResourceStoreRequest( getResourceStorePath( request ), true );
 
-        TargetSet matched = null;
+        TargetSet matched = getNexus( request ).getRootRouter().getTargetsForRequest( rsr );
 
-        String[] result = null;
-
-        try
+        if ( matched.getMatchedRepositoryIds().size() > 0 )
         {
-            matched = getNexus( request ).getRootRouter().getTargetsForRequest( rsr );
+            String[] targetPerms = getTargetPerms( matched );
 
-            List<String> perms = new ArrayList<String>( matched.size() );
+            String action = getActionFromHttpVerb( request );
 
-            // targetId : repoId
-            for ( TargetMatch match : matched )
-            {
-                perms.add( match.getTarget().getId() + ":" + match.getRepository().getId() );
-            }
+            String[] mappedPerms = mapPerms( targetPerms, action );
 
-            result = perms.toArray( new String[perms.size()] );
-        }
-        catch ( NoSuchResourceStoreException e )
-        {
-            // what here?
-            // it will be 404 later
-            // TODO: this should be 404!
-        }
-
-        if ( result != null && result.length > 0 )
-        {
-            return super.isAccessAllowed( request, response, result );
+            return super.isAccessAllowed( request, response, mappedPerms );
         }
         else
         {
-            if ( matched == null )
-            {
-                return false;
-            }
-            else
-            {
-                // we have a virtual path, allow it since if it here, it is probably anon or any other
-                // already authenticated user
-                if ( matched.getInvolvedRepositories() == 0 )
-                {
-                    return true;
-                }
-                else
-                {
-                    // no perms
-                    // doing it with a fake perm, admin will match it anyway but nobody else :)
-                    return super.isAccessAllowed( request, response, FAKE_PERMS );
-                }
-            }
+            // this will hit no repos, it is a virtual path, allow access
+            return true;
         }
-
     }
 }

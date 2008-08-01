@@ -62,8 +62,8 @@ public interface ResourceStore
             AccessDeniedException;
 
     /**
-     * Copies the item from <code>from</code> to <code>to</code>. Retrieval may involve remote access unless
-     * request forbids it, the storing involves local storage only.
+     * Copies the item from <code>from</code> to <code>to</code>. Retrieval may involve remote access unless request
+     * forbids it, the storing involves local storage only.
      * 
      * @param from the from
      * @param to the to
@@ -183,8 +183,6 @@ public interface ResourceStore
      * 
      * @param request
      * @return
-     * @throws NoSuchResourceStoreException
      */
-    TargetSet getTargetsForRequest( ResourceStoreRequest request )
-        throws NoSuchResourceStoreException;
+    TargetSet getTargetsForRequest( ResourceStoreRequest request );
 }

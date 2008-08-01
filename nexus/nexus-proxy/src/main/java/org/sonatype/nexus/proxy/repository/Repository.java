@@ -42,6 +42,7 @@ import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.proxy.storage.local.LocalRepositoryStorage;
 import org.sonatype.nexus.proxy.storage.remote.RemoteRepositoryStorage;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
+import org.sonatype.nexus.proxy.target.TargetSet;
 
 /**
  * Repository interface used by Proximity. It is an extension of ResourceStore iface, allowing to make direct
@@ -439,4 +440,11 @@ public interface Repository
             ItemNotFoundException,
             StorageException;
 
+    /**
+     * Gets the target set for UID.
+     * 
+     * @param uid
+     * @return
+     */
+    TargetSet getTargetsForRequest( RepositoryItemUid uid );
 }

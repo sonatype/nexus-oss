@@ -62,11 +62,9 @@ public class DefaultTargetRegistry
         {
             if ( t.isPathContained( repository, path ) )
             {
-                result.add( new TargetMatch( t, repository ) );
+                result.addTargetMatch( new TargetMatch( t, repository ) );
             }
         }
-
-        result.setInvolvedRepositories( 1 );
 
         return result;
     }

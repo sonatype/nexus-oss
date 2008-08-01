@@ -204,8 +204,8 @@ public abstract class AbstractSearchableBasedRepositoryRouter
     }
 
     protected TargetSet doGetTargetsForRequest( ResourceStoreRequest request )
-        throws NoSuchResourceStoreException
     {
+        // this imple simply returns empty
         return new TargetSet();
     }
 

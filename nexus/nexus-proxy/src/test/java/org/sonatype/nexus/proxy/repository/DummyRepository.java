@@ -627,7 +627,11 @@ public class DummyRepository
     }
 
     public TargetSet getTargetsForRequest( ResourceStoreRequest request )
-        throws NoSuchResourceStoreException
+    {
+        return new TargetSet();
+    }
+
+    public TargetSet getTargetsForRequest( RepositoryItemUid uid )
     {
         return new TargetSet();
     }
