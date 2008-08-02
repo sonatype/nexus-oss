@@ -48,8 +48,22 @@ public class DefaultArtifactContextProducer
     public ArtifactContext getArtifactContext( IndexingContext context, File file )
     {
         // TODO shouldn't this use repository layout instead?
-        Gav gav = gavCalculator.pathToGav( file.getAbsolutePath().substring(
-            context.getRepository().getAbsolutePath().length() + 1 ).replace( '\\', '/' ) );
+        String path = null;
+
+        // protection from IndexOutOfBounds
+        if ( file.getAbsoluteFile().length() > context.getRepository().getAbsolutePath().length() )
+        {
+            path = file.getAbsolutePath().substring( context.getRepository().getAbsolutePath().length() + 1 ).replace(
+                '\\',
+                '/' );
+        }
+        else
+        {
+            // this is junk path?
+            return null;
+        }
+        
+        Gav gav = gavCalculator.pathToGav( path );
 
         if ( gav == null )
         {
@@ -83,10 +97,10 @@ public class DefaultArtifactContextProducer
 
             pom = pl.locate( file, gav );
 
-//            if ( !pom.exists() )
-//            {
-//                return null;
-//            }
+            // if ( !pom.exists() )
+            // {
+            // return null;
+            // }
         }
 
         ArtifactInfo ai = new ArtifactInfo( context.getRepositoryId(), groupId, artifactId, version, classifier );
