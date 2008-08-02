@@ -64,9 +64,10 @@ public class DefaultSearchEngine
 
             int start = from == UNDEFINED ? 0 : from;
 
-            int end = aiCount == UNDEFINED ? hits.length() : Math.min( hits.length(), from + aiCount );
+            int found = 0;
 
-            for ( int i = start; i < end; i++ )
+            // we have to pack the results as long: a) we have found aiCount ones b) we depleted hits
+            for ( int i = start; i < hits.length(); i++ )
             {
                 Document doc = hits.doc( i );
 
@@ -78,13 +79,25 @@ public class DefaultSearchEngine
 
                     artifactInfo.context = indexingContext.getId();
 
-                    if ( !result.add( artifactInfo ) )
+                    if ( result.add( artifactInfo ) )
                     {
-                        // fix the hitCount accordingly
+                        // increase the founds
+                        found++;
+                    }
+                    else
+                    {
+                        // fix the total hitCount accordingly
                         hitCount--;
+                    }
+
+                    if ( found == aiCount )
+                    {
+                        // escape then
+                        break;
                     }
                 }
             }
+            
             return hitCount;
         }
         else
