@@ -8,7 +8,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jsecurity.authc.AuthenticationException;
 import org.jsecurity.authc.UsernamePasswordToken;
-import org.jsecurity.codec.Base64;
 import org.jsecurity.subject.Subject;
 import org.jsecurity.web.filter.authc.BasicHttpAuthenticationFilter;
 import org.sonatype.nexus.Nexus;
@@ -45,13 +44,13 @@ public class NexusHttpAuthenticationFilter
 
         if ( fakeAuthScheme )
         {
-            setAuthcHeaderScheme( FAKE_AUTH_SCHEME );
-            setAuthzHeaderScheme( FAKE_AUTH_SCHEME );
+            setAuthcScheme( FAKE_AUTH_SCHEME );
+            setAuthzScheme( FAKE_AUTH_SCHEME );
         }
         else
         {
-            setAuthcHeaderScheme( HttpServletRequest.BASIC_AUTH );
-            setAuthzHeaderScheme( HttpServletRequest.BASIC_AUTH );
+            setAuthcScheme( HttpServletRequest.BASIC_AUTH );
+            setAuthzScheme( HttpServletRequest.BASIC_AUTH );
         }
     }
 
@@ -89,7 +88,7 @@ public class NexusHttpAuthenticationFilter
     protected boolean isLoginAttempt( String authzHeader )
     {
         // handle BASIC in the same way as our faked one
-        String authzHeaderScheme = getAuthzHeaderScheme().toLowerCase();
+        String authzHeaderScheme = getAuthzScheme().toLowerCase();
 
         if ( authzHeader.toLowerCase().startsWith( HttpServletRequest.BASIC_AUTH.toLowerCase() ) )
         {
@@ -104,28 +103,6 @@ public class NexusHttpAuthenticationFilter
     protected boolean isRememberMeEnabled( ServletRequest request )
     {
         return true;
-    }
-
-    // copied from superclass, to avooid scheme filtering
-    protected String[] getPrincipalsAndCredentials( String authorizationHeader, ServletRequest request )
-    {
-        if ( authorizationHeader == null )
-        {
-            return null;
-        }
-        
-        String[] authTokens = authorizationHeader.split( " " );
-        
-        // we are ignoring scheme, since we handle both, basic and nxbasic in same manner
-        //String scheme = getAuthcHeaderScheme();
-        if ( authTokens == null || authTokens.length < 2)// || !authTokens[0].equalsIgnoreCase( scheme ) )
-        {
-            return null;
-        }
-
-        String encodedCredentials = authTokens[1];
-        String decodedCredentials = Base64.decodeToString( encodedCredentials );
-        return decodedCredentials.split( ":" );
     }
 
     protected boolean executeAnonymousLogin( ServletRequest request, ServletResponse response )
