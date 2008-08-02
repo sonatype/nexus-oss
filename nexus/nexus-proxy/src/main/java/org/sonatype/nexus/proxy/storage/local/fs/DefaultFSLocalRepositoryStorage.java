@@ -62,9 +62,6 @@ public class DefaultFSLocalRepositoryStorage
     extends AbstractLocalRepositoryStorage
     implements LocalRepositoryStorage
 {
-
-    public static final String FS_FILE = "fs.file";
-
     private static final String LINK_PREFIX = "LINK to ";
 
     /**
@@ -116,7 +113,7 @@ public class DefaultFSLocalRepositoryStorage
      * @param uid the uid
      * @return the file from base
      */
-    protected File getFileFromBase( RepositoryItemUid uid )
+    public File getFileFromBase( RepositoryItemUid uid )
         throws StorageException
     {
         File repoBase = getBaseDir( uid.getRepository() );
@@ -225,8 +222,6 @@ public class DefaultFSLocalRepositoryStorage
         {
             throw new ItemNotFoundException( uid );
         }
-
-        result.getItemContext().put( FS_FILE, target );
 
         return result;
     }
@@ -375,7 +370,6 @@ public class DefaultFSLocalRepositoryStorage
                     + item.getRepositoryItemUid().toString(), ex );
             }
         }
-        item.getItemContext().put( FS_FILE, target );
     }
 
     public void shredItem( RepositoryItemUid uid )

@@ -95,11 +95,11 @@ public class ArtifactStoreHelper
     {
         RepositoryItemUid uid = new RepositoryItemUid( repository, request.getRequestPath() );
 
-        repository.deleteItemWithChecksums( uid );
+        repository.deleteItemWithChecksums( uid, request.getRequestContext() );
 
         return uid;
     }
-    
+
     protected RepositoryItemUid deleteWithoutChecksums( ArtifactStoreRequest request )
         throws UnsupportedStorageOperationException,
             RepositoryNotAvailableException,
@@ -107,9 +107,9 @@ public class ArtifactStoreHelper
             StorageException
     {
         RepositoryItemUid uid = new RepositoryItemUid( repository, request.getRequestPath() );
-    
-        repository.deleteItem( uid );
-    
+
+        repository.deleteItem( uid, request.getRequestContext() );
+
         return uid;
     }
 
@@ -248,7 +248,7 @@ public class ArtifactStoreHelper
         {
             // check for POM existence
             repository.retrieveItem( true, new RepositoryItemUid( repository, repository.getGavCalculator().gavToPath(
-                pomGav ) ) );
+                pomGav ) ), gavRequest.getRequestContext() );
         }
         catch ( ItemNotFoundException e )
         {
@@ -316,7 +316,8 @@ public class ArtifactStoreHelper
         storeItemWithChecksums( gavRequest, new PreparedContentLocator( is ), attributes );
     }
 
-    public void deleteArtifactPom( ArtifactStoreRequest gavRequest, boolean withChecksums, boolean withAllSubordinates, boolean deleteWholeGav )
+    public void deleteArtifactPom( ArtifactStoreRequest gavRequest, boolean withChecksums, boolean withAllSubordinates,
+        boolean deleteWholeGav )
         throws UnsupportedStorageOperationException,
             NoSuchResourceStoreException,
             RepositoryNotAvailableException,
@@ -328,15 +329,26 @@ public class ArtifactStoreHelper
         Gav gav = new Gav( gavRequest.getGroupId(), gavRequest.getArtifactId(), gavRequest.getVersion(), gavRequest
             .getClassifier(), "pom", null, null, null, RepositoryPolicy.SNAPSHOT.equals( repository
             .getRepositoryPolicy() ), false, null, false, null );
-    
+
         gavRequest.setRequestPath( repository.getGavCalculator().gavToPath( gav ) );;
-        
-        //First undeploy, we will read the pom contents to build the gav
+
+        // First undeploy, we will read the pom contents to build the gav
         try
         {
-            gav = new Gav( gavRequest.getGroupId(), gavRequest.getArtifactId(), gavRequest.getVersion(), gavRequest
-                .getClassifier(), getPackagingFromPom( gavRequest.getRequestPath() ), null, null, null, 
-                RepositoryPolicy.SNAPSHOT.equals( repository.getRepositoryPolicy() ), false, null, false, null );
+            gav = new Gav(
+                gavRequest.getGroupId(),
+                gavRequest.getArtifactId(),
+                gavRequest.getVersion(),
+                gavRequest.getClassifier(),
+                getPackagingFromPom( gavRequest.getRequestPath() ),
+                null,
+                null,
+                null,
+                RepositoryPolicy.SNAPSHOT.equals( repository.getRepositoryPolicy() ),
+                false,
+                null,
+                false,
+                null );
         }
         catch ( IOException e )
         {
@@ -346,7 +358,7 @@ public class ArtifactStoreHelper
         {
             throw new StorageException( "Could not read pom file!", e );
         }
-        
+
         gavRequest.setRequestPath( repository.getGavCalculator().gavToPath( gav ) );
 
         try
@@ -357,19 +369,19 @@ public class ArtifactStoreHelper
         {
             throw new StorageException( "Could not maintain metadata!", e );
         }
-        
-        
-        //Now delete the pom
+
+        // Now delete the pom
         gav = new Gav( gavRequest.getGroupId(), gavRequest.getArtifactId(), gavRequest.getVersion(), gavRequest
             .getClassifier(), "pom", null, null, null, RepositoryPolicy.SNAPSHOT.equals( repository
             .getRepositoryPolicy() ), false, null, false, null );
 
         gavRequest.setRequestPath( repository.getGavCalculator().gavToPath( gav ) );
-        
+
         handleDelete( gavRequest, deleteWholeGav, withChecksums, withAllSubordinates );
     }
 
-    public void deleteArtifact( ArtifactStoreRequest gavRequest, boolean withChecksums, boolean withAllSubordinates, boolean deleteWholeGav )
+    public void deleteArtifact( ArtifactStoreRequest gavRequest, boolean withChecksums, boolean withAllSubordinates,
+        boolean deleteWholeGav )
         throws UnsupportedStorageOperationException,
             NoSuchResourceStoreException,
             RepositoryNotAvailableException,
@@ -384,16 +396,17 @@ public class ArtifactStoreHelper
             .getRepositoryPolicy() ), false, null, false, null );
 
         gavRequest.setRequestPath( repository.getGavCalculator().gavToPath( gav ) );
-        
+
         handleDelete( gavRequest, deleteWholeGav, withChecksums, withAllSubordinates );
     }
-    
-    private void handleDelete( ArtifactStoreRequest gavRequest, boolean deleteWholeGav, boolean withChecksums, boolean withAllSubordinates ) 
-        throws StorageException, 
-            UnsupportedStorageOperationException, 
-            NoSuchResourceStoreException, 
-            RepositoryNotAvailableException, 
-            AccessDeniedException, 
+
+    private void handleDelete( ArtifactStoreRequest gavRequest, boolean deleteWholeGav, boolean withChecksums,
+        boolean withAllSubordinates )
+        throws StorageException,
+            UnsupportedStorageOperationException,
+            NoSuchResourceStoreException,
+            RepositoryNotAvailableException,
+            AccessDeniedException,
             ItemNotFoundException
     {
         if ( deleteWholeGav )
@@ -410,7 +423,7 @@ public class ArtifactStoreHelper
             {
                 deleteWithoutChecksums( gavRequest );
             }
-    
+
             if ( withAllSubordinates )
             {
                 deleteAllSubordinates( gavRequest );
@@ -443,7 +456,10 @@ public class ArtifactStoreHelper
         try
         {
             // get the parent collection
-            StorageCollectionItem parentColl = (StorageCollectionItem) repository.retrieveItem( true, parentCollUid );
+            StorageCollectionItem parentColl = (StorageCollectionItem) repository.retrieveItem(
+                true,
+                parentCollUid,
+                gavRequest.getRequestContext() );
 
             // list it
             Collection<StorageItem> items = repository.list( parentColl );
@@ -461,7 +477,7 @@ public class ArtifactStoreHelper
                         && gavRequest.getArtifactId().equals( gav.getArtifactId() )
                         && gavRequest.getVersion().equals( gav.getVersion() ) && gav.getClassifier() != null )
                     {
-                        repository.deleteItem( item.getRepositoryItemUid() );
+                        repository.deleteItem( item.getRepositoryItemUid(), gavRequest.getRequestContext() );
                     }
                     else if ( !item.getPath().endsWith( "maven-metadata.xml" ) )
                     {
@@ -476,7 +492,7 @@ public class ArtifactStoreHelper
 
             if ( !hadSubdirectoryOrOtherFiles )
             {
-                repository.deleteItem( parentCollUid );
+                repository.deleteItem( parentCollUid, gavRequest.getRequestContext() );
             }
         }
         catch ( ItemNotFoundException e )
@@ -502,7 +518,10 @@ public class ArtifactStoreHelper
         try
         {
             // get the parent collection
-            StorageCollectionItem parentColl = (StorageCollectionItem) repository.retrieveItem( true, parentCollUid );
+            StorageCollectionItem parentColl = (StorageCollectionItem) repository.retrieveItem(
+                true,
+                parentCollUid,
+                gavRequest.getRequestContext() );
 
             // list it
             Collection<StorageItem> items = repository.list( parentColl );
@@ -514,7 +533,7 @@ public class ArtifactStoreHelper
             {
                 if ( !StorageCollectionItem.class.isAssignableFrom( item.getClass() ) )
                 {
-                    repository.deleteItem( item.getRepositoryItemUid() );
+                    repository.deleteItem( item.getRepositoryItemUid(), gavRequest.getRequestContext() );
                 }
                 else if ( !item.getPath().endsWith( "maven-metadata.xml" ) )
                 {
@@ -524,7 +543,7 @@ public class ArtifactStoreHelper
 
             if ( !hadSubdirectory )
             {
-                repository.deleteItem( parentCollUid );
+                repository.deleteItem( parentCollUid, gavRequest.getRequestContext() );
             }
         }
         catch ( ItemNotFoundException e )
@@ -542,31 +561,31 @@ public class ArtifactStoreHelper
                 + gavRequest.getVersion() + "')" );
         }
     }
-    
+
     private String getPackagingFromPom( String requestPath )
         throws IOException,
-            XmlPullParserException, 
-            RepositoryNotAvailableException, 
+            XmlPullParserException,
+            RepositoryNotAvailableException,
             ItemNotFoundException
     {
         String packaging = "jar";
-        
+
         RepositoryItemUid uid = new RepositoryItemUid( repository, requestPath );
-        
+
         Reader reader = null;
 
         try
         {
             reader = ReaderFactory.newXmlReader( repository.retrieveItemContent( uid ) );
-            
+
             XmlPullParser parser = new MXParser();
-            
+
             parser.setInput( reader );
-        
+
             boolean foundRoot = false;
-        
+
             int eventType = parser.getEventType();
-        
+
             while ( eventType != XmlPullParser.END_DOCUMENT )
             {
                 if ( eventType == XmlPullParser.START_TAG )
@@ -589,7 +608,7 @@ public class ArtifactStoreHelper
                         throw new XmlPullParserException( "Unrecognised tag: '" + parser.getName() + "'", parser, null );
                     }
                 }
-        
+
                 eventType = parser.next();
             }
         }
@@ -597,7 +616,7 @@ public class ArtifactStoreHelper
         {
             IOUtil.close( reader );
         }
-    
+
         return packaging;
     }
 }

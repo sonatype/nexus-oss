@@ -1727,5 +1727,50 @@ public abstract class AbstractRealmTest
         {
             throw new UnsupportedOperationException();
         }
+
+        public void copyItem( RepositoryItemUid from, RepositoryItemUid to, Map<String, Object> context )
+            throws UnsupportedStorageOperationException,
+                RepositoryNotAvailableException,
+                ItemNotFoundException,
+                StorageException
+        {
+            // TODO Auto-generated method stub
+            
+        }
+
+        public void deleteItem( RepositoryItemUid uid, Map<String, Object> context )
+            throws UnsupportedStorageOperationException,
+                RepositoryNotAvailableException,
+                ItemNotFoundException,
+                StorageException
+        {
+            // TODO Auto-generated method stub
+            
+        }
+
+        public TargetSet getTargetsForRequest( RepositoryItemUid uid, Map<String, Object> context )
+        {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        public void moveItem( RepositoryItemUid from, RepositoryItemUid to, Map<String, Object> context )
+            throws UnsupportedStorageOperationException,
+                RepositoryNotAvailableException,
+                ItemNotFoundException,
+                StorageException
+        {
+            // TODO Auto-generated method stub
+            
+        }
+
+        public StorageItem retrieveItem( boolean localOnly, RepositoryItemUid uid, Map<String, Object> context )
+            throws RepositoryNotAvailableException,
+                ItemNotFoundException,
+                StorageException
+        {
+            // TODO Auto-generated method stub
+            return null;
+        }
     }
 }

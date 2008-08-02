@@ -173,7 +173,7 @@ public abstract class StoreWalker
 
                 try
                 {
-                    item = ( (Repository) store ).retrieveItem( localOnly, uid );
+                    item = ( (Repository) store ).retrieveItem( localOnly, uid, null );
                 }
                 catch ( ItemNotFoundException e )
                 {

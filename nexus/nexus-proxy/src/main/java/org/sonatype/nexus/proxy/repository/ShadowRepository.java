@@ -120,11 +120,17 @@ public abstract class ShadowRepository
                     {
                         DefaultStorageLinkItem link = new DefaultStorageLinkItem( this, tuid, true, true, ievt
                             .getItemUid().toString() );
+
+                        if ( ievt.getContext() != null )
+                        {
+                            link.getItemContext().putAll( ievt.getContext() );
+                        }
+
                         storeItem( link );
                     }
                     else if ( ievt instanceof RepositoryItemEventDelete )
                     {
-                        deleteItem( new RepositoryItemUid( this, tuid ) );
+                        deleteItem( new RepositoryItemUid( this, tuid ), ievt.getContext() );
                     }
                 }
                 catch ( Exception e )

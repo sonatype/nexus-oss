@@ -26,10 +26,8 @@ import org.apache.lucene.search.Query;
 import org.sonatype.nexus.index.context.IndexContextInInconsistentStateException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryGroupException;
-import org.sonatype.nexus.proxy.events.EventListener;
 
 public interface IndexerManager
-    extends EventListener
 {
     String ROLE = IndexerManager.class.getName();
 

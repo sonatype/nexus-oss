@@ -403,7 +403,7 @@ public class DefaultSnapshotRemover
                                 if ( gav.isHash()
                                     || gav.isSignature())
                                 {
-                                    repository.deleteItem( file.getRepositoryItemUid() );
+                                    repository.deleteItem( file.getRepositoryItemUid(), file.getItemContext() );
                                 }
                                 // Otherwise, go through proper channels to remove.
                                 else
@@ -441,7 +441,7 @@ public class DefaultSnapshotRemover
             {
                 if ( repository.list( coll ).size() == 0 )
                 {
-                    repository.deleteItem( coll.getRepositoryItemUid() );
+                    repository.deleteItem( coll.getRepositoryItemUid(), coll.getItemContext() );
                 }
             }
             catch ( ItemNotFoundException e )

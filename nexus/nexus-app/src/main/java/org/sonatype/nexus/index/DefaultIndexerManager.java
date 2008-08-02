@@ -28,9 +28,11 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
@@ -54,6 +56,7 @@ import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryGroupException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.events.AbstractEvent;
+import org.sonatype.nexus.proxy.events.EventListener;
 import org.sonatype.nexus.proxy.events.RepositoryItemEvent;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventCache;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventDelete;
@@ -87,7 +90,8 @@ import org.sonatype.nexus.tasks.ReindexTask;
  */
 public class DefaultIndexerManager
     extends AbstractLogEnabled
-    implements IndexerManager, Initializable, ConfigurationChangeListener
+    implements IndexerManager, Initializable, ConfigurationChangeListener, EventListener
+
 {
     /** Context id local suffix */
     public static final String CTX_LOCAL_SUFIX = "-local";
@@ -246,8 +250,9 @@ public class DefaultIndexerManager
             NoSuchRepositoryException
     {
         // remove context for repository
-        nexusIndexer.removeIndexingContext( nexusIndexer.getIndexingContexts().get(
-            getLocalContextId( repositoryId ) ), deleteFiles );
+        nexusIndexer.removeIndexingContext(
+            nexusIndexer.getIndexingContexts().get( getLocalContextId( repositoryId ) ),
+            deleteFiles );
 
         if ( nexusIndexer.getIndexingContexts().containsKey( getRemoteContextId( repositoryId ) ) )
         {
@@ -440,6 +445,8 @@ public class DefaultIndexerManager
             // only proxies have remote indexes
             if ( RepositoryType.PROXY.equals( repository.getRepositoryType() ) )
             {
+                Map<String, Object> ctx = new HashMap<String, Object>();
+
                 try
                 {
                     CRepository repoModel = nexusConfiguration.readRepository( repository.getId() );
@@ -467,11 +474,11 @@ public class DefaultIndexerManager
                         propsUid = new RepositoryItemUid( repository, "/.index/" + IndexingContext.INDEX_FILE
                             + ".properties" );
 
-                        StorageFileItem fitem = (StorageFileItem) repository.retrieveItem( false, propsUid );
+                        StorageFileItem fitem = (StorageFileItem) repository.retrieveItem( false, propsUid, ctx );
 
                         zipUid = new RepositoryItemUid( repository, "/.index/" + IndexingContext.INDEX_FILE + ".zip" );
 
-                        fitem = (StorageFileItem) repository.retrieveItem( false, zipUid );
+                        fitem = (StorageFileItem) repository.retrieveItem( false, zipUid, ctx );
 
                         RAMDirectory directory = new RAMDirectory();
 
@@ -510,7 +517,7 @@ public class DefaultIndexerManager
                         {
                             try
                             {
-                                repository.deleteItem( propsUid );
+                                repository.deleteItem( propsUid, ctx );
                             }
                             catch ( ItemNotFoundException ex )
                             {
@@ -527,7 +534,7 @@ public class DefaultIndexerManager
                         {
                             try
                             {
-                                repository.deleteItem( zipUid );
+                                repository.deleteItem( zipUid, ctx );
                             }
                             catch ( ItemNotFoundException ex )
                             {
@@ -1054,6 +1061,11 @@ public class DefaultIndexerManager
 
     public void onProximityEvent( AbstractEvent evt )
     {
+        if ( getLogger().isDebugEnabled() )
+        {
+            getLogger().debug( "Processing event (" + evt.toString() + ")" );
+        }
+
         if ( RepositoryRegistryEvent.class.isAssignableFrom( evt.getClass() ) )
         {
             try
@@ -1110,6 +1122,11 @@ public class DefaultIndexerManager
                 // from where we get the event is a maven2 repo
                 if ( !MavenRepository.class.isAssignableFrom( ievt.getRepository().getClass() ) )
                 {
+                    if ( getLogger().isDebugEnabled() )
+                    {
+                        getLogger().debug( "This is not a MavenRepository instance, will not process it." );
+                    }
+
                     return;
                 }
 
@@ -1129,9 +1146,11 @@ public class DefaultIndexerManager
                     if ( context != null && gav != null )
                     {
                         // if we have a valid indexing context and have access to a File
-                        if ( ievt.getContext().containsKey( DefaultFSLocalRepositoryStorage.FS_FILE ) )
+                        if ( DefaultFSLocalRepositoryStorage.class.isAssignableFrom( ievt
+                            .getItemUid().getRepository().getLocalStorage().getClass() ) )
                         {
-                            File file = (File) ievt.getContext().get( DefaultFSLocalRepositoryStorage.FS_FILE );
+                            File file = ( (DefaultFSLocalRepositoryStorage) ievt.getRepository().getLocalStorage() )
+                                .getFileFromBase( ievt.getItemUid() );
 
                             if ( file.exists() )
                             {
@@ -1139,6 +1158,12 @@ public class DefaultIndexerManager
 
                                 if ( ac != null )
                                 {
+                                    if ( getLogger().isDebugEnabled() )
+                                    {
+                                        getLogger()
+                                            .debug( "The ArtifactContext created from file is fine, continuing." );
+                                    }
+
                                     ArtifactInfo ai = ac.getArtifactInfo();
 
                                     if ( ievt instanceof RepositoryItemEventCache )

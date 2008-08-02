@@ -70,8 +70,8 @@ public class SimpleRemoteLeakTest
             checkForFileAndMatchContents( item2 );
 
             // to force refetch
-            getRepositoryRegistry().getRepository( item1.getRepositoryId() ).deleteItem( item1.getRepositoryItemUid() );
-            getRepositoryRegistry().getRepository( item2.getRepositoryId() ).deleteItem( item2.getRepositoryItemUid() );
+            getRepositoryRegistry().getRepository( item1.getRepositoryId() ).deleteItem( item1.getRepositoryItemUid(), item1.getItemContext() );
+            getRepositoryRegistry().getRepository( item2.getRepositoryId() ).deleteItem( item2.getRepositoryItemUid(), item2.getItemContext() );
         }
 
         // get the default context, since they used it

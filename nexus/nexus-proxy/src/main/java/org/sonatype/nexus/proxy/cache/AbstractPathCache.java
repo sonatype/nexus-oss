@@ -49,7 +49,14 @@ public abstract class AbstractPathCache
 
     public final boolean remove( String path )
     {
-        return doRemove( makeKeyFromPath( path ) );
+        if ( contains( path ) )
+        {
+            return doRemove( makeKeyFromPath( path ) );
+        }
+        else
+        {
+            return false;
+        }
     }
 
     public final boolean removeWithParents( String path )

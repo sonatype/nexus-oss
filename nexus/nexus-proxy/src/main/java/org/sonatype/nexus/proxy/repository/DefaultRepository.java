@@ -20,7 +20,6 @@
  */
 package org.sonatype.nexus.proxy.repository;
 
-import java.io.IOException;
 import java.util.Collection;
 import java.util.Map;
 
@@ -29,11 +28,8 @@ import org.sonatype.nexus.proxy.RepositoryNotAvailableException;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventCache;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
-import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
-import org.sonatype.nexus.proxy.item.PreparedContentLocator;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
-import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 
@@ -242,7 +238,7 @@ public abstract class DefaultRepository
             StorageException
     {
         AbstractStorageItem result = null;
-        
+
         try
         {
             result = getRemoteStorage().retrieveItem( uid );
@@ -278,11 +274,15 @@ public abstract class DefaultRepository
                 getLogger().debug(
                     "Caching item " + item.getRepositoryItemUid().toString() + " in local storage of repository." );
             }
+
             getLocalStorage().storeItem( item );
+
             removeFromNotFoundCache( item.getRepositoryItemUid().getPath() );
-            notifyProximityEventListeners( new RepositoryItemEventCache( item.getRepositoryItemUid(), item
-                .getItemContext() ) );
+
             result = getLocalStorage().retrieveItem( item.getRepositoryItemUid() );
+
+            notifyProximityEventListeners( new RepositoryItemEventCache( result ) );
+
             result.getItemContext().putAll( item.getItemContext() );
         }
         catch ( ItemNotFoundException ex )
@@ -297,34 +297,6 @@ public abstract class DefaultRepository
         }
 
         return result;
-    }
-
-    protected void doCopyItem( RepositoryItemUid fromUid, RepositoryItemUid toUid )
-        throws UnsupportedStorageOperationException,
-            RepositoryNotAvailableException,
-            ItemNotFoundException,
-            StorageException
-    {
-        AbstractStorageItem item = getLocalStorage().retrieveItem( fromUid );
-
-        if ( StorageFileItem.class.isAssignableFrom( item.getClass() ) )
-        {
-            try
-            {
-                DefaultStorageFileItem target = new DefaultStorageFileItem(
-                    this,
-                    toUid.getPath(),
-                    true,
-                    true,
-                    new PreparedContentLocator( ( (StorageFileItem) item ).getInputStream() ) );
-
-                getLocalStorage().storeItem( target );
-            }
-            catch ( IOException e )
-            {
-                throw new StorageException( "Could not get the content of source file (is it file?)!", e );
-            }
-        }
     }
 
     protected void doDeleteItem( RepositoryItemUid uid )

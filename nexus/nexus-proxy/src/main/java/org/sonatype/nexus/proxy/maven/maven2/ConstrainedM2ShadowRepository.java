@@ -214,7 +214,8 @@ public class ConstrainedM2ShadowRepository
                 throw new StorageException( "Could not get the content from the ContentLocator!", e );
             }
 
-            StorageFileItem storedFile = (StorageFileItem) retrieveItem( true, item.getRepositoryItemUid() );
+            StorageFileItem storedFile = (StorageFileItem) retrieveItem( true, item.getRepositoryItemUid(), item
+                .getItemContext() );
 
             String sha1Hash = storedFile.getAttributes().get( DigestCalculatingInspector.DIGEST_SHA1_KEY );
 
@@ -246,7 +247,7 @@ public class ConstrainedM2ShadowRepository
         }
     }
 
-    public void deleteItemWithChecksums( RepositoryItemUid uid )
+    public void deleteItemWithChecksums( RepositoryItemUid uid, Map<String, Object> context )
         throws UnsupportedStorageOperationException,
             RepositoryNotAvailableException,
             ItemNotFoundException,
@@ -257,13 +258,13 @@ public class ConstrainedM2ShadowRepository
             getLogger().debug( "deleteItemWithChecksums() :: " + uid.toString() );
         }
 
-        deleteItem( uid );
+        deleteItem( uid, context );
 
         RepositoryItemUid sha1Uid = new RepositoryItemUid( this, uid.getPath() + ".sha1" );
 
         try
         {
-            deleteItem( sha1Uid );
+            deleteItem( sha1Uid, context );
         }
         catch ( ItemNotFoundException e )
         {
@@ -274,7 +275,7 @@ public class ConstrainedM2ShadowRepository
 
         try
         {
-            deleteItem( md5Uid );
+            deleteItem( md5Uid, context );
         }
         catch ( ItemNotFoundException e )
         {
@@ -336,7 +337,8 @@ public class ConstrainedM2ShadowRepository
         getArtifactStoreHelper().storeArtifactWithGeneratedPom( gavRequest, is, attributes );
     }
 
-    public void deleteArtifactPom( ArtifactStoreRequest gavRequest, boolean withChecksums, boolean withAllSubordinates, boolean deleteWholeGav )
+    public void deleteArtifactPom( ArtifactStoreRequest gavRequest, boolean withChecksums, boolean withAllSubordinates,
+        boolean deleteWholeGav )
         throws UnsupportedStorageOperationException,
             NoSuchResourceStoreException,
             RepositoryNotAvailableException,
@@ -347,7 +349,8 @@ public class ConstrainedM2ShadowRepository
         getArtifactStoreHelper().deleteArtifactPom( gavRequest, withChecksums, withAllSubordinates, deleteWholeGav );
     }
 
-    public void deleteArtifact( ArtifactStoreRequest gavRequest, boolean withChecksums, boolean withAllSubordinates, boolean deleteWholeGav )
+    public void deleteArtifact( ArtifactStoreRequest gavRequest, boolean withChecksums, boolean withAllSubordinates,
+        boolean deleteWholeGav )
         throws UnsupportedStorageOperationException,
             NoSuchResourceStoreException,
             RepositoryNotAvailableException,

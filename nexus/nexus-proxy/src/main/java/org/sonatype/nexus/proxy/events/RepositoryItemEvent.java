@@ -20,10 +20,10 @@
  */
 package org.sonatype.nexus.proxy.events;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
+import org.sonatype.nexus.proxy.item.StorageItem;
 
 /**
  * The Class RepositoryItemEvent.
@@ -31,11 +31,7 @@ import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 public abstract class RepositoryItemEvent
     extends RepositoryEvent
 {
-
-    /** The uid. */
-    private final RepositoryItemUid uid;
-
-    private Map<String, Object> context;
+    private final StorageItem item;
 
     /**
      * Instantiates a new repository item event.
@@ -43,11 +39,10 @@ public abstract class RepositoryItemEvent
      * @param repository the repository
      * @param uid the uid
      */
-    public RepositoryItemEvent( final RepositoryItemUid uid, final Map<String, Object> context )
+    public RepositoryItemEvent( final StorageItem item )
     {
-        super( uid.getRepository() );
-        this.uid = uid;
-        this.context = context;
+        super( item.getRepositoryItemUid().getRepository() );
+        this.item = item;
     }
 
     /**
@@ -57,7 +52,7 @@ public abstract class RepositoryItemEvent
      */
     public RepositoryItemUid getItemUid()
     {
-        return uid;
+        return item.getRepositoryItemUid();
     }
 
     /**
@@ -67,12 +62,17 @@ public abstract class RepositoryItemEvent
      */
     public Map<String, Object> getContext()
     {
-        if ( context == null )
-        {
-            context = new HashMap<String, Object>();
-        }
-        
-        return context;
+        return item.getItemContext();
+    }
+
+    /**
+     * Gets the involved item.
+     * 
+     * @return
+     */
+    public StorageItem getItem()
+    {
+        return item;
     }
 
 }

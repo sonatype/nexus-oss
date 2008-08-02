@@ -227,7 +227,8 @@ public abstract class AbstractMavenRepository
                 throw new StorageException( "Could not get the content from the ContentLocator!", e );
             }
 
-            StorageFileItem storedFile = (StorageFileItem) retrieveItem( true, item.getRepositoryItemUid() );
+            StorageFileItem storedFile = (StorageFileItem) retrieveItem( true, item.getRepositoryItemUid(), item
+                .getItemContext() );
 
             String sha1Hash = storedFile.getAttributes().get( DigestCalculatingInspector.DIGEST_SHA1_KEY );
 
@@ -259,7 +260,7 @@ public abstract class AbstractMavenRepository
         }
     }
 
-    public void deleteItemWithChecksums( RepositoryItemUid uid )
+    public void deleteItemWithChecksums( RepositoryItemUid uid, Map<String, Object> context )
         throws UnsupportedStorageOperationException,
             RepositoryNotAvailableException,
             ItemNotFoundException,
@@ -272,13 +273,13 @@ public abstract class AbstractMavenRepository
 
         try
         {
-            deleteItem( uid );
+            deleteItem( uid, context );
         }
         catch ( ItemNotFoundException e )
         {
             if ( uid.getPath().endsWith( ".asc" ) )
             {
-                //Do nothing no guarantee that the .asc files will exist
+                // Do nothing no guarantee that the .asc files will exist
             }
             else
             {
@@ -290,7 +291,7 @@ public abstract class AbstractMavenRepository
 
         try
         {
-            deleteItem( sha1Uid );
+            deleteItem( sha1Uid, context );
         }
         catch ( ItemNotFoundException e )
         {
@@ -301,18 +302,18 @@ public abstract class AbstractMavenRepository
 
         try
         {
-            deleteItem( md5Uid );
+            deleteItem( md5Uid, context );
         }
         catch ( ItemNotFoundException e )
         {
             // ignore not found
         }
-        
-        //Now remove the .asc files, and the checksums stored with them as well
-        //Note this is a recursive call, hence the check for .asc
+
+        // Now remove the .asc files, and the checksums stored with them as well
+        // Note this is a recursive call, hence the check for .asc
         if ( !uid.getPath().endsWith( ".asc" ) )
         {
-            deleteItemWithChecksums( new RepositoryItemUid( this, uid.getPath() + ".asc" ) );
+            deleteItemWithChecksums( new RepositoryItemUid( this, uid.getPath() + ".asc" ), context );
         }
     }
 
@@ -320,7 +321,7 @@ public abstract class AbstractMavenRepository
     {
         this.feedRecorder = feedRecorder;
     }
-    
+
     public MetadataManager getMetadataManager()
     {
         return metadataManager;
@@ -391,7 +392,8 @@ public abstract class AbstractMavenRepository
         getArtifactStoreHelper().storeArtifactWithGeneratedPom( gavRequest, is, attributes );
     }
 
-    public void deleteArtifactPom( ArtifactStoreRequest gavRequest, boolean withChecksums, boolean withAllSubordinates, boolean deleteWholeGav )
+    public void deleteArtifactPom( ArtifactStoreRequest gavRequest, boolean withChecksums, boolean withAllSubordinates,
+        boolean deleteWholeGav )
         throws UnsupportedStorageOperationException,
             NoSuchResourceStoreException,
             RepositoryNotAvailableException,
@@ -402,7 +404,8 @@ public abstract class AbstractMavenRepository
         getArtifactStoreHelper().deleteArtifactPom( gavRequest, withChecksums, withAllSubordinates, deleteWholeGav );
     }
 
-    public void deleteArtifact( ArtifactStoreRequest gavRequest, boolean withChecksums, boolean withAllSubordinates, boolean deleteWholeGav )
+    public void deleteArtifact( ArtifactStoreRequest gavRequest, boolean withChecksums, boolean withAllSubordinates,
+        boolean deleteWholeGav )
         throws UnsupportedStorageOperationException,
             NoSuchResourceStoreException,
             RepositoryNotAvailableException,

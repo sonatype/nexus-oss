@@ -20,6 +20,8 @@
  */
 package org.sonatype.nexus.proxy.maven;
 
+import java.util.Map;
+
 import org.sonatype.nexus.artifact.GavCalculator;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.RepositoryNotAvailableException;
@@ -63,7 +65,7 @@ public interface MavenRepository
     boolean isFixRepositoryChecksums();
 
     void setFixRepositoryChecksums( boolean fixRepositoryChecksums );
-    
+
     MetadataManager getMetadataManager();
 
     void storeItemWithChecksums( AbstractStorageItem item )
@@ -71,7 +73,7 @@ public interface MavenRepository
             RepositoryNotAvailableException,
             StorageException;
 
-    void deleteItemWithChecksums( RepositoryItemUid uid )
+    void deleteItemWithChecksums( RepositoryItemUid uid, Map<String, Object> context )
         throws UnsupportedStorageOperationException,
             RepositoryNotAvailableException,
             ItemNotFoundException,

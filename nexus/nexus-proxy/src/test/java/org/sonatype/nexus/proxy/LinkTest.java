@@ -71,7 +71,7 @@ public class LinkTest
         assertEquals( DefaultStorageLinkItem.class, item.getClass() );
 
         RepositoryItemUid uid = new RepositoryItemUid( getRepositoryRegistry(), ( (StorageLinkItem) item ).getTarget() );
-        StorageFileItem item1 = (StorageFileItem) repo1.retrieveItem( true, uid );
+        StorageFileItem item1 = (StorageFileItem) repo1.retrieveItem( true, uid, null);
         checkForFileAndMatchContents( item1, new ByteArrayInputStream( contentString.getBytes() ) );
 
     }

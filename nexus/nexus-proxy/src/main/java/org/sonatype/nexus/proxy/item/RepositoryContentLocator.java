@@ -34,7 +34,6 @@ import org.sonatype.nexus.proxy.StorageException;
 public class RepositoryContentLocator
     implements ContentLocator
 {
-
     private RepositoryItemUid uid;
 
     public RepositoryContentLocator( RepositoryItemUid uid )
@@ -60,5 +59,4 @@ public class RepositoryContentLocator
     {
         return true;
     }
-
 }

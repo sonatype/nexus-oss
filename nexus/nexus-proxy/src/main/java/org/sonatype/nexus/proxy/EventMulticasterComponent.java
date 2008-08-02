@@ -58,7 +58,9 @@ public class EventMulticasterComponent
             {
                 if ( getLogger().isDebugEnabled() )
                 {
-                    getLogger().debug( "Notifying listener about config change: " + l.getClass().getName() );
+                    getLogger().debug(
+                        "Notifying EventListener " + l.getClass().getName() + " about event "
+                            + evt.getClass().getName() + " fired (" + evt.toString() + ")" );
                 }
 
                 l.onProximityEvent( evt );

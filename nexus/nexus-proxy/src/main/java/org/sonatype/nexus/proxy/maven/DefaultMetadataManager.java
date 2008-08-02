@@ -7,6 +7,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.TimeZone;
 
 import org.apache.maven.artifact.repository.metadata.Metadata;
@@ -50,7 +51,7 @@ public class DefaultMetadataManager
         df.setTimeZone( TimeZone.getTimeZone( "UTC" ) );
     }
 
-    protected Metadata readOrCreateMetadata( RepositoryItemUid uid )
+    protected Metadata readOrCreateMetadata( RepositoryItemUid uid, Map<String, Object> ctx )
         throws RepositoryNotAvailableException,
             IOException,
             XmlPullParserException
@@ -59,7 +60,7 @@ public class DefaultMetadataManager
 
         try
         {
-            StorageItem item = uid.getRepository().retrieveItem( true, uid );
+            StorageItem item = uid.getRepository().retrieveItem( true, uid, ctx );
 
             if ( StorageFileItem.class.isAssignableFrom( item.getClass() ) )
             {
@@ -103,7 +104,7 @@ public class DefaultMetadataManager
         return result;
     }
 
-    protected Metadata readOrCreateGAVMetadata( MavenRepository repository, Gav gav )
+    protected Metadata readOrCreateGAVMetadata( MavenRepository repository, Gav gav, Map<String, Object> ctx )
         throws RepositoryNotAvailableException,
             IOException,
             XmlPullParserException
@@ -115,7 +116,7 @@ public class DefaultMetadataManager
 
         RepositoryItemUid uid = new RepositoryItemUid( repository, mdPath );
 
-        Metadata result = readOrCreateMetadata( uid );
+        Metadata result = readOrCreateMetadata( uid, ctx );
 
         result.setGroupId( gav.getGroupId() );
 
@@ -126,7 +127,7 @@ public class DefaultMetadataManager
         return result;
     }
 
-    protected Metadata readOrCreateGAMetadata( MavenRepository repository, Gav gav )
+    protected Metadata readOrCreateGAMetadata( MavenRepository repository, Gav gav, Map<String, Object> ctx )
         throws RepositoryNotAvailableException,
             IOException,
             XmlPullParserException
@@ -141,7 +142,7 @@ public class DefaultMetadataManager
 
         RepositoryItemUid uid = new RepositoryItemUid( repository, mdPath );
 
-        Metadata result = readOrCreateMetadata( uid );
+        Metadata result = readOrCreateMetadata( uid, ctx );
 
         result.setGroupId( gav.getGroupId() );
 
@@ -152,7 +153,7 @@ public class DefaultMetadataManager
         return result;
     }
 
-    protected Metadata readOrCreatePluginMetadata( MavenRepository repository, Gav gav )
+    protected Metadata readOrCreatePluginMetadata( MavenRepository repository, Gav gav, Map<String, Object> ctx )
         throws RepositoryNotAvailableException,
             IOException,
             XmlPullParserException
@@ -170,7 +171,7 @@ public class DefaultMetadataManager
 
         RepositoryItemUid uid = new RepositoryItemUid( repository, mdPath );
 
-        Metadata result = readOrCreateMetadata( uid );
+        Metadata result = readOrCreateMetadata( uid, ctx );
 
         result.setGroupId( null );
 
@@ -181,7 +182,7 @@ public class DefaultMetadataManager
         return result;
     }
 
-    protected void saveGAVMetadata( MavenRepository repository, Gav gav, Metadata md )
+    protected void saveGAVMetadata( MavenRepository repository, Gav gav, Metadata md, Map<String, Object> ctx )
         throws UnsupportedStorageOperationException,
             RepositoryNotAvailableException,
             IOException
@@ -199,10 +200,17 @@ public class DefaultMetadataManager
 
         StringContentLocator locator = new StringContentLocator( sw.toString() );
 
-        repository.storeItemWithChecksums( new DefaultStorageFileItem( repository, mdPath, true, true, locator ) );
+        DefaultStorageFileItem file = new DefaultStorageFileItem( repository, mdPath, true, true, locator );
+
+        if ( ctx != null )
+        {
+            file.getItemContext().putAll( ctx );
+        }
+
+        repository.storeItemWithChecksums( file );
     }
 
-    protected void saveGAMetadata( MavenRepository repository, Gav gav, Metadata md )
+    protected void saveGAMetadata( MavenRepository repository, Gav gav, Metadata md, Map<String, Object> ctx )
         throws UnsupportedStorageOperationException,
             RepositoryNotAvailableException,
             IOException
@@ -223,10 +231,17 @@ public class DefaultMetadataManager
 
         StringContentLocator locator = new StringContentLocator( sw.toString() );
 
-        repository.storeItemWithChecksums( new DefaultStorageFileItem( repository, mdPath, true, true, locator ) );
+        DefaultStorageFileItem file = new DefaultStorageFileItem( repository, mdPath, true, true, locator );
+
+        if ( ctx != null )
+        {
+            file.getItemContext().putAll( ctx );
+        }
+
+        repository.storeItemWithChecksums( file );
     }
 
-    protected void savePluginMetadata( MavenRepository repository, Gav gav, Metadata md )
+    protected void savePluginMetadata( MavenRepository repository, Gav gav, Metadata md, Map<String, Object> ctx )
         throws UnsupportedStorageOperationException,
             RepositoryNotAvailableException,
             IOException
@@ -250,7 +265,14 @@ public class DefaultMetadataManager
 
         StringContentLocator locator = new StringContentLocator( sw.toString() );
 
-        repository.storeItemWithChecksums( new DefaultStorageFileItem( repository, mdPath, true, true, locator ) );
+        DefaultStorageFileItem file = new DefaultStorageFileItem( repository, mdPath, true, true, locator );
+
+        if ( ctx != null )
+        {
+            file.getItemContext().putAll( ctx );
+        }
+
+        repository.storeItemWithChecksums( file );
     }
 
     public void deployArtifact( ArtifactStoreRequest req, MavenRepository repository )
@@ -289,14 +311,14 @@ public class DefaultMetadataManager
 
         try
         {
-            gavMd = readOrCreateGAVMetadata( repository, gav );
+            gavMd = readOrCreateGAVMetadata( repository, gav, req.getRequestContext() );
 
             if ( gavMd.getVersioning() == null )
             {
                 gavMd.setVersioning( new Versioning() );
             }
 
-            gaMd = readOrCreateGAMetadata( repository, gav );
+            gaMd = readOrCreateGAMetadata( repository, gav, req.getRequestContext() );
 
             if ( gaMd.getVersioning() == null )
             {
@@ -402,10 +424,10 @@ public class DefaultMetadataManager
         // save it
         if ( gavMd != null )
         {
-            saveGAVMetadata( repository, gav, gavMd );
+            saveGAVMetadata( repository, gav, gavMd, req.getRequestContext() );
         }
 
-        saveGAMetadata( repository, gav, gaMd );
+        saveGAMetadata( repository, gav, gaMd, req.getRequestContext() );
 
         if ( "maven-plugin".equals( req.getPackaging() ) )
         {
@@ -449,14 +471,14 @@ public class DefaultMetadataManager
 
         try
         {
-            gavMd = readOrCreateGAVMetadata( repository, gav );
+            gavMd = readOrCreateGAVMetadata( repository, gav, req.getRequestContext() );
 
             if ( gavMd.getVersioning() == null )
             {
                 gavMd.setVersioning( new Versioning() );
             }
 
-            gaMd = readOrCreateGAMetadata( repository, gav );
+            gaMd = readOrCreateGAMetadata( repository, gav, req.getRequestContext() );
 
             if ( gaMd.getVersioning() == null )
             {
@@ -495,8 +517,8 @@ public class DefaultMetadataManager
         gaMd.getVersioning().updateTimestamp();
 
         // save it
-        saveGAVMetadata( repository, gav, gavMd );
-        saveGAMetadata( repository, gav, gaMd );
+        saveGAVMetadata( repository, gav, gavMd, req.getRequestContext() );
+        saveGAMetadata( repository, gav, gaMd, req.getRequestContext() );
 
         if ( "maven-plugin".equals( req.getPackaging() ) )
         {
@@ -578,7 +600,7 @@ public class DefaultMetadataManager
 
             plugin.setArtifactId( pd.getArtifactId() );
 
-            md = readOrCreatePluginMetadata( repository, gav );
+            md = readOrCreatePluginMetadata( repository, gav, req.getRequestContext() );
         }
         catch ( XmlPullParserException e )
         {
@@ -602,7 +624,7 @@ public class DefaultMetadataManager
 
         md.addPlugin( plugin );
 
-        savePluginMetadata( repository, gav, md );
+        savePluginMetadata( repository, gav, md, req.getRequestContext() );
     }
 
     public void undeployPlugin( ArtifactStoreRequest req, MavenRepository repository )
@@ -673,7 +695,7 @@ public class DefaultMetadataManager
         {
             pd = extractPluginDescriptor( pomFile.getInputStream() );
 
-            md = readOrCreatePluginMetadata( repository, gav );
+            md = readOrCreatePluginMetadata( repository, gav, req.getRequestContext() );
         }
         catch ( XmlPullParserException e )
         {
@@ -695,7 +717,7 @@ public class DefaultMetadataManager
             }
         }
 
-        savePluginMetadata( repository, gav, md );
+        savePluginMetadata( repository, gav, md, req.getRequestContext() );
     }
 
     protected PluginDescriptor extractPluginDescriptor( InputStream is )

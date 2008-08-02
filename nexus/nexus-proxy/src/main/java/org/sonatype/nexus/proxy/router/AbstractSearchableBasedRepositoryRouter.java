@@ -133,8 +133,10 @@ public abstract class AbstractSearchableBasedRepositoryRouter
             {
                 getLogger().debug( "Dereferencing link " + link.getTarget() );
             }
+
             RepositoryItemUid uid = new RepositoryItemUid( getRepositoryRegistry(), link.getTarget() );
-            return uid.getRepository().retrieveItem( false, uid );
+
+            return uid.getRepository().retrieveItem( false, uid, link.getItemContext() );
         }
     }
 

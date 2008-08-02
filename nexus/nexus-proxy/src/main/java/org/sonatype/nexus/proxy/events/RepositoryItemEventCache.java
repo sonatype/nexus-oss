@@ -20,9 +20,7 @@
  */
 package org.sonatype.nexus.proxy.events;
 
-import java.util.Map;
-
-import org.sonatype.nexus.proxy.item.RepositoryItemUid;
+import org.sonatype.nexus.proxy.item.StorageItem;
 
 /**
  * The Class RepositoryItemEventCache.
@@ -37,9 +35,9 @@ public class RepositoryItemEventCache
      * @param repository the repository
      * @param uid the uid
      */
-    public RepositoryItemEventCache( final RepositoryItemUid uid, final Map<String, Object> context )
+    public RepositoryItemEventCache( final StorageItem item )
     {
-        super( uid, context );
+        super( item );
     }
 
 }

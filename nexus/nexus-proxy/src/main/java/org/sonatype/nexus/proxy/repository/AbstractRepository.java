@@ -20,6 +20,7 @@
  */
 package org.sonatype.nexus.proxy.repository;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.HashMap;
@@ -27,8 +28,8 @@ import java.util.Map;
 import java.util.concurrent.Callable;
 
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
-import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
+import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.EventMulticasterComponent;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
@@ -54,6 +55,7 @@ import org.sonatype.nexus.proxy.events.RepositoryItemEventStore;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.DefaultStorageCollectionItem;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
+import org.sonatype.nexus.proxy.item.PreparedContentLocator;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
@@ -643,7 +645,7 @@ public abstract class AbstractRepository
 
         RepositoryItemUid uid = new RepositoryItemUid( this, request.getRequestPath() );
 
-        StorageItem item = retrieveItem( request.isRequestLocalOnly(), uid );
+        StorageItem item = retrieveItem( request.isRequestLocalOnly(), uid, request.getRequestContext() );
 
         if ( StorageCollectionItem.class.isAssignableFrom( item.getClass() ) && !isBrowseable() )
         {
@@ -653,11 +655,6 @@ public abstract class AbstractRepository
 
             throw new ItemNotFoundException( uid );
         }
-
-        item.getItemContext().putAll( request.getRequestContext() );
-
-        notifyProximityEventListeners( new RepositoryItemEventRetrieve( item.getRepositoryItemUid(), item
-            .getItemContext() ) );
 
         return item;
     }
@@ -678,9 +675,7 @@ public abstract class AbstractRepository
 
         RepositoryItemUid toUid = new RepositoryItemUid( this, to.getRequestPath() );
 
-        copyItem( fromUid, toUid );
-
-        notifyProximityEventListeners( new RepositoryItemEventStore( toUid, to.getRequestContext() ) );
+        copyItem( fromUid, toUid, to.getRequestContext() );
     }
 
     public void moveItem( ResourceStoreRequest from, ResourceStoreRequest to )
@@ -701,11 +696,7 @@ public abstract class AbstractRepository
 
         RepositoryItemUid toUid = new RepositoryItemUid( this, to.getRequestPath() );
 
-        notifyProximityEventListeners( new RepositoryItemEventDelete( fromUid, from.getRequestContext() ) );
-
         moveItem( fromUid, toUid, to.getRequestContext() );
-
-        notifyProximityEventListeners( new RepositoryItemEventStore( toUid, to.getRequestContext() ) );
     }
 
     public void deleteItem( ResourceStoreRequest request )
@@ -743,9 +734,6 @@ public abstract class AbstractRepository
         }
 
         storeItem( fItem );
-
-        notifyProximityEventListeners( new RepositoryItemEventStore( fItem.getRepositoryItemUid(), fItem
-            .getItemContext() ) );
     }
 
     public void createCollection( ResourceStoreRequest request, Map<String, String> userAttributes )
@@ -771,8 +759,6 @@ public abstract class AbstractRepository
         }
 
         storeItem( coll );
-
-        notifyProximityEventListeners( new RepositoryItemEventStore( coll.getRepositoryItemUid(), coll.getItemContext() ) );
     }
 
     public Collection<StorageItem> list( ResourceStoreRequest request )
@@ -805,7 +791,7 @@ public abstract class AbstractRepository
     {
         RepositoryItemUid uid = new RepositoryItemUid( this, request.getRequestPath() );
 
-        return getTargetsForRequest( uid );
+        return getTargetsForRequest( uid, request.getRequestContext() );
     }
 
     // ===================================================================================
@@ -831,7 +817,7 @@ public abstract class AbstractRepository
         return getLocalStorage().retrieveItemContent( uid );
     }
 
-    public StorageItem retrieveItem( boolean localOnly, RepositoryItemUid uid )
+    public StorageItem retrieveItem( boolean localOnly, RepositoryItemUid uid, Map<String, Object> context )
         throws RepositoryNotAvailableException,
             ItemNotFoundException,
             StorageException
@@ -854,10 +840,17 @@ public abstract class AbstractRepository
         {
             StorageItem item = doRetrieveItem( localOnly, uid, new HashMap<String, Object>() );
 
+            if ( context != null )
+            {
+                item.getItemContext().putAll( context );
+            }
+
             if ( getLogger().isDebugEnabled() )
             {
                 getLogger().debug( getId() + " retrieveItem() :: FOUND " + uid.toString() );
             }
+
+            notifyProximityEventListeners( new RepositoryItemEventRetrieve( item ) );
 
             return item;
         }
@@ -877,7 +870,7 @@ public abstract class AbstractRepository
         }
     }
 
-    public void copyItem( RepositoryItemUid from, RepositoryItemUid to )
+    public void copyItem( RepositoryItemUid from, RepositoryItemUid to, Map<String, Object> context )
         throws UnsupportedStorageOperationException,
             RepositoryNotAvailableException,
             ItemNotFoundException,
@@ -895,7 +888,28 @@ public abstract class AbstractRepository
 
         maintainNotFoundCache( from.getPath() );
 
-        doCopyItem( from, to );
+        StorageItem item = retrieveItem( true, from, context );
+
+        if ( StorageFileItem.class.isAssignableFrom( item.getClass() ) )
+        {
+            try
+            {
+                DefaultStorageFileItem target = new DefaultStorageFileItem(
+                    this,
+                    to.getPath(),
+                    true,
+                    true,
+                    new PreparedContentLocator( ( (StorageFileItem) item ).getInputStream() ) );
+
+                target.getItemContext().putAll( item.getItemContext() );
+
+                storeItem( target );
+            }
+            catch ( IOException e )
+            {
+                throw new StorageException( "Could not get the content of source file (is it file?)!", e );
+            }
+        }
 
         // remove the "to" item from n-cache if there
         removeFromNotFoundCache( to.getPath() );
@@ -917,18 +931,9 @@ public abstract class AbstractRepository
             throw new RepositoryNotAvailableException( this.getId() );
         }
 
-        copyItem( from, to );
+        copyItem( from, to, context );
 
         deleteItem( from, context );
-    }
-
-    public void moveItem( RepositoryItemUid from, RepositoryItemUid to )
-        throws UnsupportedStorageOperationException,
-            RepositoryNotAvailableException,
-            ItemNotFoundException,
-            StorageException
-    {
-        moveItem( from, to, null );
     }
 
     public void deleteItem( RepositoryItemUid uid, Map<String, Object> context )
@@ -950,7 +955,10 @@ public abstract class AbstractRepository
         maintainNotFoundCache( uid.getPath() );
 
         // determine is the thing to be deleted a collection or not
-        StorageItem item = retrieveItem( true, uid );
+        StorageItem item = retrieveItem( true, uid, context );
+
+        // fire the event for file being deleted
+        notifyProximityEventListeners( new RepositoryItemEventDelete( item ) );
 
         if ( StorageCollectionItem.class.isAssignableFrom( item.getClass() ) )
         {
@@ -959,25 +967,14 @@ public abstract class AbstractRepository
                 getLogger().debug(
                     "We are deleting a collection, starting a walker to send delete notifications per-file." );
             }
+
             // it is collection, walk it and below and fire events for all files
             DeletionNotifierWalker dnw = new DeletionNotifierWalker( this, getLogger(), context );
 
             dnw.walk( uid.getPath() );
         }
 
-        // fire the event for file being deleted
-        notifyProximityEventListeners( new RepositoryItemEventDelete( uid, context ) );
-
         doDeleteItem( uid );
-    }
-
-    public void deleteItem( RepositoryItemUid uid )
-        throws UnsupportedStorageOperationException,
-            RepositoryNotAvailableException,
-            ItemNotFoundException,
-            StorageException
-    {
-        deleteItem( uid, null );
     }
 
     public void storeItem( AbstractStorageItem item )
@@ -999,6 +996,8 @@ public abstract class AbstractRepository
 
         // remove the "request" item from n-cache if there
         removeFromNotFoundCache( item.getRepositoryItemUid().getPath() );
+
+        notifyProximityEventListeners( new RepositoryItemEventStore( item ) );
     }
 
     public Collection<StorageItem> list( RepositoryItemUid uid, Map<String, Object> context )
@@ -1036,7 +1035,7 @@ public abstract class AbstractRepository
         return list( item.getRepositoryItemUid(), item.getItemContext() );
     }
 
-    public TargetSet getTargetsForRequest( RepositoryItemUid uid )
+    public TargetSet getTargetsForRequest( RepositoryItemUid uid, Map<String, Object> context )
     {
         if ( getLogger().isDebugEnabled() )
         {
@@ -1155,24 +1154,6 @@ public abstract class AbstractRepository
      */
     protected abstract StorageItem doRetrieveItem( boolean localOnly, RepositoryItemUid uid, Map<String, Object> context )
         throws RepositoryNotAvailableException,
-            ItemNotFoundException,
-            StorageException;
-
-    /**
-     * Do copy item.
-     * 
-     * @param from the from
-     * @param fromUid the from uid
-     * @param to the to
-     * @param toUid the to uid
-     * @throws RepositoryNotAvailableException the repository not available exception
-     * @throws ItemNotFoundException the item not found exception
-     * @throws StorageException the storage exception
-     * @throws UnsupportedStorageOperationException
-     */
-    protected abstract void doCopyItem( RepositoryItemUid fromUid, RepositoryItemUid toUid )
-        throws UnsupportedStorageOperationException,
-            RepositoryNotAvailableException,
             ItemNotFoundException,
             StorageException;
 

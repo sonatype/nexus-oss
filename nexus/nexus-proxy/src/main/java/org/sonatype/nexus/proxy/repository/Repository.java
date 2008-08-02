@@ -365,18 +365,18 @@ public interface Repository
      * @throws StorageException the storage exception
      * @throws AccessDeniedException the access denied exception
      */
-    StorageItem retrieveItem( boolean localOnly, RepositoryItemUid uid )
+    StorageItem retrieveItem( boolean localOnly, RepositoryItemUid uid, Map<String, Object> context )
         throws RepositoryNotAvailableException,
             ItemNotFoundException,
             StorageException;
 
-    void copyItem( RepositoryItemUid from, RepositoryItemUid to )
+    void copyItem( RepositoryItemUid from, RepositoryItemUid to, Map<String, Object> context )
         throws UnsupportedStorageOperationException,
             RepositoryNotAvailableException,
             ItemNotFoundException,
             StorageException;
 
-    void moveItem( RepositoryItemUid from, RepositoryItemUid to )
+    void moveItem( RepositoryItemUid from, RepositoryItemUid to, Map<String, Object> context )
         throws UnsupportedStorageOperationException,
             RepositoryNotAvailableException,
             ItemNotFoundException,
@@ -392,7 +392,7 @@ public interface Repository
      * @throws AccessDeniedException the access denied exception
      * @throws UnsupportedStorageOperationException the unsupported storage operation exception
      */
-    void deleteItem( RepositoryItemUid uid )
+    void deleteItem( RepositoryItemUid uid, Map<String, Object> context )
         throws UnsupportedStorageOperationException,
             RepositoryNotAvailableException,
             ItemNotFoundException,
@@ -446,5 +446,5 @@ public interface Repository
      * @param uid
      * @return
      */
-    TargetSet getTargetsForRequest( RepositoryItemUid uid );
+    TargetSet getTargetsForRequest( RepositoryItemUid uid, Map<String, Object> context );
 }

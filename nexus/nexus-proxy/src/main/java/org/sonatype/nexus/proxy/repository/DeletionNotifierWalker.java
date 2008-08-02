@@ -52,8 +52,7 @@ public class DeletionNotifierWalker
         }
 
         // just fire it, and someone will eventually catch it
-        repository.notifyProximityEventListeners( new RepositoryItemEventDelete( item.getRepositoryItemUid(), item
-            .getItemContext() ) );
+        repository.notifyProximityEventListeners( new RepositoryItemEventDelete( item ) );
     }
 
 }

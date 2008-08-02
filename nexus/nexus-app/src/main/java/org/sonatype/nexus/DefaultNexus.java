@@ -341,7 +341,7 @@ public class DefaultNexus
             // it is a link
             RepositoryItemUid uid = new RepositoryItemUid( repositoryRegistry, ( (StorageLinkItem) item ).getTarget() );
 
-            return uid.getRepository().retrieveItem( false, uid );
+            return uid.getRepository().retrieveItem( false, uid, item.getItemContext() );
         }
         else
         {
@@ -1407,8 +1407,11 @@ public class DefaultNexus
 
         repositoryRegistry.addProximityEventListener( this );
 
-        repositoryRegistry.addProximityEventListener( indexerManager );
-
+        if ( EventListener.class.isAssignableFrom( indexerManager.getClass() ) )
+        {
+            repositoryRegistry.addProximityEventListener( (EventListener) indexerManager );
+        }
+        
         systemStatus.setState( SystemState.STOPPED );
 
         systemStatus.setOperationMode( OperationMode.STANDALONE );
@@ -1694,14 +1697,19 @@ public class DefaultNexus
             {
                 RepositoryItemEvent ievt = (RepositoryItemEvent) evt;
 
+                if ( ievt instanceof RepositoryItemEventRetrieve )
+                {
+                    // RETRIEVE event creates a lot of noise in events,
+                    // so we are not processing those
+                    return;
+                }
+
                 if ( ievt.getItemUid().getPath().endsWith( ".pom" ) || ievt.getItemUid().getPath().endsWith( ".jar" ) )
                 {
-                    StorageItem item = ievt.getRepository().retrieveItem( true, ievt.getItemUid() );
-
                     // filter out links and dirs/collections
-                    if ( StorageFileItem.class.isAssignableFrom( item.getClass() ) )
+                    if ( StorageFileItem.class.isAssignableFrom( ievt.getItem().getClass() ) )
                     {
-                        StorageFileItem pomItem = (StorageFileItem) item;
+                        StorageFileItem pomItem = (StorageFileItem) ievt.getItem();
 
                         NexusArtifactEvent nae = new NexusArtifactEvent();
                         NexusItemInfo ai = new NexusItemInfo();
@@ -1724,10 +1732,8 @@ public class DefaultNexus
                         {
                             nae.setAction( NexusArtifactEvent.ACTION_DELETED );
                         }
-                        else if ( ievt instanceof RepositoryItemEventRetrieve )
+                        else
                         {
-                            // this creates a lot of noise in feed
-                            // nae.setAction( NexusArtifactEvent.ACTION_RETRIEVED );
                             return;
                         }
 

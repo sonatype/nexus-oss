@@ -143,7 +143,7 @@ public abstract class AbstractRegistryDrivenRepositoryRouter
 
             RepositoryItemUid uid = new RepositoryItemUid( getRepositoryRegistry(), link.getTarget() );
 
-            return uid.getRepository().retrieveItem( false, uid );
+            return uid.getRepository().retrieveItem( false, uid, link.getItemContext() );
         }
     }
 

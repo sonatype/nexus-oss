@@ -50,7 +50,7 @@ public class EvictUnusedItemsWalker
         {
             if ( item.getLastRequested() < timestamp )
             {
-                getRepository().deleteItem( item.getRepositoryItemUid() );
+                getRepository().deleteItem( item.getRepositoryItemUid(), item.getItemContext() );
 
                 files.add( item.getPath() );
             }
@@ -83,7 +83,7 @@ public class EvictUnusedItemsWalker
         {
             if ( ( (Repository) getResourceStore() ).list( coll ).size() == 0 )
             {
-                getRepository().deleteItem( coll.getRepositoryItemUid() );
+                getRepository().deleteItem( coll.getRepositoryItemUid(), coll.getItemContext() );
             }
         }
         catch ( RepositoryNotAvailableException e )
