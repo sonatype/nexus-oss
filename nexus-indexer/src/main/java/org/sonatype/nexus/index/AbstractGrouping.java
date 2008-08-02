@@ -37,7 +37,7 @@ public abstract class AbstractGrouping
         this.comparator = comparator;
     }
 
-    public void addArtifactInfo( Map<String, ArtifactInfoGroup> result, ArtifactInfo artifactInfo )
+    public boolean addArtifactInfo( Map<String, ArtifactInfoGroup> result, ArtifactInfo artifactInfo )
     {
         String key = getGroupKey( artifactInfo );
 
@@ -46,10 +46,11 @@ public abstract class AbstractGrouping
         if ( group == null )
         {
             group = new ArtifactInfoGroup( key, comparator );
+            
             result.put( key, group );
         }
 
-        group.addArtifactInfo( artifactInfo );
+        return group.addArtifactInfo( artifactInfo );
     }
 
     protected abstract String getGroupKey( ArtifactInfo artifactInfo );

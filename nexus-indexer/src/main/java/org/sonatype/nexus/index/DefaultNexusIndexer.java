@@ -724,7 +724,6 @@ public class DefaultNexusIndexer
         {
             throw new IOException( "Unable to calculate digest" );
         }
-
     }
 
     public ArtifactInfo identify( String field, String query )
@@ -745,11 +744,15 @@ public class DefaultNexusIndexer
         throws IOException,
             IndexContextInInconsistentStateException
     {
-        Set<ArtifactInfo> result = searcher.searchFlat( ArtifactInfo.VERSION_COMPARATOR, contexts, query );
+        Set<ArtifactInfo> result = searcher.searchFlatPaged(
+            new FlatSearchRequest( query, ArtifactInfo.VERSION_COMPARATOR ),
+            indexingContexts.values() ).getResults();
+
         if ( result.size() == 1 )
         {
             return result.iterator().next();
         }
+
         return null;
     }
 

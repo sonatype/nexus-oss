@@ -28,7 +28,8 @@ public interface Grouping
      * 
      * @param result
      * @param artifactInfo
+     * @return true, if the Grouping changed by addition of new artifactInfo
      */
-    void addArtifactInfo( Map<String, ArtifactInfoGroup> result, ArtifactInfo artifactInfo );
+    boolean addArtifactInfo( Map<String, ArtifactInfoGroup> result, ArtifactInfo artifactInfo );
 
 }

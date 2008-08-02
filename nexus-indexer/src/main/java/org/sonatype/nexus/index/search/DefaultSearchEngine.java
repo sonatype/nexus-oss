@@ -60,6 +60,8 @@ public class DefaultSearchEngine
 
         if ( hits != null && hits.length() != 0 )
         {
+            int hitCount = hits.length();
+
             int start = from == UNDEFINED ? 0 : from;
 
             int end = aiCount == UNDEFINED ? hits.length() : Math.min( hits.length(), from + aiCount );
@@ -67,7 +69,7 @@ public class DefaultSearchEngine
             for ( int i = start; i < end; i++ )
             {
                 Document doc = hits.doc( i );
-                
+
                 ArtifactInfo artifactInfo = indexingContext.constructArtifactInfo( doc );
 
                 if ( artifactInfo != null )
@@ -76,10 +78,14 @@ public class DefaultSearchEngine
 
                     artifactInfo.context = indexingContext.getId();
 
-                    result.add( artifactInfo );
+                    if ( !result.add( artifactInfo ) )
+                    {
+                        // fix the hitCount accordingly
+                        hitCount--;
+                    }
                 }
             }
-            return hits.length();
+            return hitCount;
         }
         else
         {
@@ -98,6 +104,8 @@ public class DefaultSearchEngine
 
         if ( hits != null && hits.length() != 0 )
         {
+            int hitCount = hits.length();
+
             for ( int i = 0; i < hits.length(); i++ )
             {
                 ArtifactInfo artifactInfo = indexingContext.constructArtifactInfo( hits.doc( i ) );
@@ -108,10 +116,14 @@ public class DefaultSearchEngine
 
                     artifactInfo.context = indexingContext.getId();
 
-                    grouping.addArtifactInfo( result, artifactInfo );
+                    if ( !grouping.addArtifactInfo( result, artifactInfo ) )
+                    {
+                        // fix the hitCount accordingly
+                        hitCount--;
+                    }
                 }
             }
-            return hits.length();
+            return hitCount;
         }
         else
         {

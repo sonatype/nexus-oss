@@ -36,6 +36,7 @@ public class ArtifactInfoGroup
     public ArtifactInfoGroup( String groupKey, Comparator<ArtifactInfo> comparator )
     {
         this.groupKey = groupKey;
+
         this.artifactInfos = new TreeSet<ArtifactInfo>( comparator );
     }
 
@@ -44,9 +45,9 @@ public class ArtifactInfoGroup
         return groupKey;
     }
 
-    public void addArtifactInfo( ArtifactInfo artifactInfo )
+    public boolean addArtifactInfo( ArtifactInfo artifactInfo )
     {
-        artifactInfos.add( artifactInfo );
+        return artifactInfos.add( artifactInfo );
     }
 
     public Set<ArtifactInfo> getArtifactInfos()
