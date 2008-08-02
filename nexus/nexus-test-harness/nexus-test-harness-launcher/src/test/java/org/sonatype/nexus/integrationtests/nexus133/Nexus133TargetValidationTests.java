@@ -360,7 +360,8 @@ public class Nexus133TargetValidationTests
     }
 
     @SuppressWarnings( "unchecked" )
-    @Test
+    //@Test
+    // eclipseContentClass is disabled for beta5!
     public void eclipseContentClassTest()
         throws IOException
     {
@@ -396,7 +397,8 @@ public class Nexus133TargetValidationTests
     }
 
     @SuppressWarnings( "unchecked" )
-    @Test
+    //@Test
+    // m2NamespaceContentclass is disabled for beta5!
     public void m2NamespaceContentClassTest()
         throws IOException
     {

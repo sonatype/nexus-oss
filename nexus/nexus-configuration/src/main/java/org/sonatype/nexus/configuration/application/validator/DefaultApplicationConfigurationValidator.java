@@ -728,12 +728,7 @@ public class DefaultApplicationConfigurationValidator
 
         if ( StringUtils.isEmpty( settings.getName() ) )
         {
-            settings.setName( settings.getId() );
-
-            response.addValidationWarning( "Repository target with ID='" + settings.getId()
-                + "' had no name, defaulted it to it's ID." );
-
-            response.setModified( true );
+            response.addValidationError( "The RepositoryTarget may have no empty/null Name!" );
         }
 
         if ( StringUtils.isEmpty( settings.getContentClass() ) )
@@ -884,6 +879,11 @@ public class DefaultApplicationConfigurationValidator
 
     protected boolean isValidRegexp( String regexp )
     {
+        if ( regexp == null )
+        {
+            return false;
+        }
+        
         try
         {
             Pattern.compile( regexp );

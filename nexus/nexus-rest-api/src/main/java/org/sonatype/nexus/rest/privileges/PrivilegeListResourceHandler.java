@@ -41,7 +41,7 @@ import org.sonatype.nexus.rest.model.PrivilegeResourceRequest;
 import org.sonatype.nexus.rest.model.PrivilegeTargetResource;
 
 public class PrivilegeListResourceHandler
-extends AbstractPrivilegeResourceHandler
+    extends AbstractPrivilegeResourceHandler
 {
 
     /**
@@ -70,31 +70,31 @@ extends AbstractPrivilegeResourceHandler
     public Representation getRepresentationHandler( Variant variant )
     {
         PrivilegeListResourceResponse response = new PrivilegeListResourceResponse();
-        
+
         Collection<CApplicationPrivilege> appPrivs = getNexusSecurityConfiguration().listApplicationPrivileges();
-        
+
         for ( CApplicationPrivilege priv : appPrivs )
         {
             PrivilegeBaseStatusResource res = nexusToRestModel( priv );
-            
+
             if ( res != null )
             {
                 response.addData( res );
             }
         }
-        
+
         Collection<CRepoTargetPrivilege> tarPrivs = getNexusSecurityConfiguration().listRepoTargetPrivileges();
-        
+
         for ( CRepoTargetPrivilege priv : tarPrivs )
         {
             PrivilegeBaseStatusResource res = nexusToRestModel( priv );
-            
+
             if ( res != null )
             {
                 response.addData( res );
             }
         }
-                
+
         return serialize( variant, response );
     }
 
@@ -117,15 +117,26 @@ extends AbstractPrivilegeResourceHandler
         else
         {
             PrivilegeListResourceResponse response = new PrivilegeListResourceResponse();
-            
+
             PrivilegeBaseResource resource = request.getData();
-            
+
+            // currently we are allowing only of repotarget privs, so enforcing checkfor it
+            if ( !TYPE_REPO_TARGET.equals( resource.getType() ) )
+            {
+                getResponse().setStatus( Status.CLIENT_ERROR_BAD_REQUEST, "Configuration error." );
+                getResponse().setEntity(
+                    serialize( representation, getNexusErrorResponse( "type", "Not allowed privilege type!" ) ) );
+            }
+
             List<String> methods = resource.getMethod();
-            
+
             if ( methods == null || methods.size() == 0 )
             {
                 getResponse().setStatus( Status.CLIENT_ERROR_BAD_REQUEST, "Configuration error." );
-                getResponse().setEntity( serialize( representation, getNexusErrorResponse( "method", "No method(s) supplied, must select at least one method." ) ) );
+                getResponse().setEntity(
+                    serialize( representation, getNexusErrorResponse(
+                        "method",
+                        "No method(s) supplied, must select at least one method." ) ) );
             }
             else
             {
@@ -138,41 +149,44 @@ extends AbstractPrivilegeResourceHandler
                         // Currently can only add new target types, application types are hardcoded
                         if ( PrivilegeTargetResource.class.isAssignableFrom( resource.getClass() ) )
                         {
-                            PrivilegeTargetResource res = ( PrivilegeTargetResource ) resource;
-                            
+                            PrivilegeTargetResource res = (PrivilegeTargetResource) resource;
+
                             CRepoTargetPrivilege priv = new CRepoTargetPrivilege();
                             priv.setMethod( method );
                             priv.setName( res.getName() != null ? res.getName() + " - (" + method + ")" : null );
                             priv.setRepositoryTargetId( res.getRepositoryTargetId() );
                             priv.setRepositoryId( res.getRepositoryId() );
                             priv.setGroupId( res.getRepositoryGroupId() );
-                                                    
+
                             getNexusSecurityConfiguration().createRepoTargetPrivilege( priv );
-                            
+
                             response.addData( nexusToRestModel( priv ) );
                         }
                         else
                         {
                             success = false;
                             getResponse().setStatus( Status.CLIENT_ERROR_BAD_REQUEST, "Configuration error." );
-                            getResponse().setEntity( serialize( representation, getNexusErrorResponse( "type", "An invalid type was entered." ) ) );
+                            getResponse().setEntity(
+                                serialize( representation, getNexusErrorResponse(
+                                    "type",
+                                    "An invalid type was entered." ) ) );
                             break;
                         }
                     }
-                    
+
                     if ( success )
                     {
                         getResponse().setEntity( serialize( representation, response ) );
                     }
                 }
                 catch ( ConfigurationException e )
-                {                
+                {
                     handleConfigurationException( e, representation );
                 }
                 catch ( IOException e )
                 {
                     getResponse().setStatus( Status.SERVER_ERROR_INTERNAL );
-    
+
                     getLogger().log( Level.SEVERE, "Got IO Exception!", e );
                 }
             }

@@ -130,6 +130,12 @@ public class RepositoryTargetListResourceHandler
                 {
                     getResponse().setStatus( Status.CLIENT_ERROR_BAD_REQUEST, e.getMessage() );
 
+                    getResponse().setStatus(
+                        Status.CLIENT_ERROR_BAD_REQUEST,
+                        "Configuration unacceptable for targetId=" + resource.getId() );
+
+                    getResponse().setEntity( serialize( representation, getNexusErrorResponse( "*", e.getMessage() ) ) );
+                    
                     return;
                 }
                 catch ( IOException e )

@@ -29,8 +29,6 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.regex.Pattern;
-import java.util.regex.PatternSyntaxException;
 
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
@@ -139,7 +137,7 @@ public class DefaultNexusConfiguration
 
     /** The trash */
     private File wastebasketDirectory;
-    
+
     /** The security config file */
     private File securityConfigurationFile;
 
@@ -182,7 +180,7 @@ public class DefaultNexusConfiguration
             temporaryDirectory = null;
 
             wastebasketDirectory = null;
-            
+
             securityConfigurationFile = null;
 
             // create shared remote ctx
@@ -219,7 +217,7 @@ public class DefaultNexusConfiguration
         temporaryDirectory = null;
 
         wastebasketDirectory = null;
-        
+
         securityConfigurationFile = null;
 
         notifyConfigurationChangeListeners();
@@ -326,13 +324,13 @@ public class DefaultNexusConfiguration
     {
         return new File( getWorkingDirectory(), key );
     }
-    
+
     public File getSecurityConfigurationFile()
     {
         if ( securityConfigurationFile == null )
         {
             securityConfigurationFile = new File( getConfiguration().getSecurity().getConfigurationFile() );
-            
+
             if ( !securityConfigurationFile.exists() )
             {
                 securityConfigurationFile.getParentFile().mkdirs();
@@ -639,17 +637,17 @@ public class DefaultNexusConfiguration
 
         applyAndSaveConfiguration();
     }
-    
+
     public String readSecurityConfigurationFile()
     {
         return getConfiguration().getSecurity().getConfigurationFile();
     }
-    
+
     public void updateSecurityConfigurationFile( String settings )
         throws IOException
     {
         getConfiguration().getSecurity().setConfigurationFile( settings );
-        
+
         applyAndSaveConfiguration();
     }
 
@@ -1069,15 +1067,12 @@ public class DefaultNexusConfiguration
     protected void validateRoutePattern( CGroupsSettingPathMappingItem settings )
         throws ConfigurationException
     {
-        try
-        {
-            Pattern.compile( settings.getRoutePattern() );
-        }
-        catch ( PatternSyntaxException e )
-        {
-            throw new ConfigurationException( "Malformed regexp pattern!", e );
-        }
+        ValidationResponse res = configurationValidator.validateGroupsSettingPathMappingItem( null, settings );
 
+        if ( !res.isValid() )
+        {
+            throw new ConfigurationException( "Invalid target definition!" );
+        }
     }
 
     public Collection<CGroupsSettingPathMappingItem> listGroupsSettingPathMapping()
