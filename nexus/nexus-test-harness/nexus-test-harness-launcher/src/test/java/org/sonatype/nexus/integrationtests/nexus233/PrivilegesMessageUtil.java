@@ -94,6 +94,11 @@ public class PrivilegesMessageUtil
 
     public void validateResponseErrorXml( String xml )
     {
+        // to trick xstream
+        // REMEMBER! You cannot use the XStreamInitializer 1:1 from Server!
+        // It does n->1 mapping (maps different types to field data), while the client
+        // has to do 1->n mapping (it knows what _will_ 'data' field contain)
+        xstream.alias( "data", org.sonatype.nexus.rest.model.PrivilegeListResourceResponse.class );
 
         NexusErrorResponse errorResponse = (NexusErrorResponse) xstream.fromXML( xml, new NexusErrorResponse() );
 
