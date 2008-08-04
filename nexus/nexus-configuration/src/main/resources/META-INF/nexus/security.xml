@@ -17,6 +17,17 @@
 			</roles>
 		</user>
 		<user>
+			<userId>deployment</userId>
+			<name>Deployment User</name>
+			<!-- deployment123 -->
+			<password>b2a0e378437817cebdf753d7dff3dd75483af9e0</password>
+			<status>active</status>
+			<email>changeme@yourcompany.com</email>
+			<roles>
+				<role>deployment</role>
+			</roles>
+		</user>
+		<user>
 			<userId>anonymous</userId>
 			<name>Nexus Anonynmous User</name>
 			<!-- anonymous -->
@@ -38,6 +49,25 @@
 				<privilege>1000</privilege>
 			</privileges>
 			<roles />
+		</role>
+		<role>
+			<id>deployment</id>
+			<name>Nexus Deployment Role</name>
+			<description>Deployment role for Nexus</description>
+			<sessionTimeout>60</sessionTimeout>
+			<privileges>
+				<privilege>T1</privilege>
+				<privilege>T2</privilege>
+				<privilege>T3</privilege>
+				<privilege>T4</privilege>
+				<privilege>T5</privilege>
+				<privilege>T6</privilege>
+				<privilege>T7</privilege>
+				<privilege>T8</privilege>
+			</privileges>
+			<roles>
+				<role>anonymous</role>
+			</roles>
 		</role>
 		<role>
 			<id>anonymous</id>
