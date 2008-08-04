@@ -11,7 +11,7 @@
 			<!-- admin123 -->
 			<password>f865b53623b121fd34ee5426c792e5c33af8c227</password>
 			<status>active</status>
-			<email>nexus-dev@sonatype.org</email>
+			<email>changeme@yourcompany.com</email>
 			<roles>
 				<role>admin</role>
 			</roles>
@@ -22,7 +22,7 @@
 			<!-- anonymous -->
 			<password>0a92fab3230134cca6eadd9898325b9b2ae67998</password>
 			<status>active</status>
-			<email>nexus-dev1@sonatype.org</email>
+			<email>changeme1@yourcompany.com</email>
 			<roles>
 				<role>anonymous</role>
 			</roles>
@@ -71,7 +71,7 @@
 			<repositoryId></repositoryId>
 			<groupId></groupId>
 			<id>T1</id>
-			<name>Read All M2 Repositories - (read)</name>
+			<name>All M2 Repositories - (read)</name>
 			<method>read</method>
 		</repositoryTargetPrivilege>
 		<repositoryTargetPrivilege>
@@ -79,8 +79,56 @@
 			<repositoryId></repositoryId>
 			<groupId></groupId>
 			<id>T2</id>
-			<name>Read All M1 Repositories - (read)</name>
+			<name>All M1 Repositories - (read)</name>
 			<method>read</method>
+		</repositoryTargetPrivilege>
+        <repositoryTargetPrivilege>
+			<repositoryTargetId>1</repositoryTargetId>
+			<repositoryId></repositoryId>
+			<groupId></groupId>
+			<id>T3</id>
+			<name>All M2 Repositories - (update)</name>
+			<method>update</method>
+		</repositoryTargetPrivilege>
+		<repositoryTargetPrivilege>
+			<repositoryTargetId>2</repositoryTargetId>
+			<repositoryId></repositoryId>
+			<groupId></groupId>
+			<id>T4</id>
+			<name>All M1 Repositories - (update)</name>
+			<method>update</method>
+		</repositoryTargetPrivilege>
+        <repositoryTargetPrivilege>
+			<repositoryTargetId>1</repositoryTargetId>
+			<repositoryId></repositoryId>
+			<groupId></groupId>
+			<id>T5</id>
+			<name>All M2 Repositories - (create)</name>
+			<method>create</method>
+		</repositoryTargetPrivilege>
+		<repositoryTargetPrivilege>
+			<repositoryTargetId>2</repositoryTargetId>
+			<repositoryId></repositoryId>
+			<groupId></groupId>
+			<id>T6</id>
+			<name>All M1 Repositories - (create)</name>
+			<method>create</method>
+		</repositoryTargetPrivilege>
+        <repositoryTargetPrivilege>
+			<repositoryTargetId>1</repositoryTargetId>
+			<repositoryId></repositoryId>
+			<groupId></groupId>
+			<id>T7</id>
+			<name>All M2 Repositories - (delete)</name>
+			<method>delete</method>
+		</repositoryTargetPrivilege>
+		<repositoryTargetPrivilege>
+			<repositoryTargetId>2</repositoryTargetId>
+			<repositoryId></repositoryId>
+			<groupId></groupId>
+			<id>T8</id>
+			<name>All M1 Repositories - (delete)</name>
+			<method>delete</method>
 		</repositoryTargetPrivilege>
 	</repositoryTargetPrivileges>
 	
