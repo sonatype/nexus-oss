@@ -867,7 +867,8 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
     buttons: [
       {
         id: 'savebutton',
-        text: 'Save'
+        text: 'Save',
+        disabled: true
       },
       {
         id: 'cancelbutton',
@@ -1649,13 +1650,17 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
     var menu = new Ext.menu.Menu({
       id:'schedules-grid-ctx',
       items: [
-        this.actions.refresh,
-        this.actions.deleteAction
+        this.actions.refresh
       ]
     });
     
-    if (this.ctxRecord.data.status == 'SUBMITTED'
-      || this.ctxRecord.data.status == 'WAITING') {
+    if (this.sp.checkPermission(Sonatype.user.curr.repoServer.configSchedules, this.sp.DELETE)){
+        menu.add(this.actions.deleteAction);
+    }
+    
+    if (this.sp.checkPermission(Sonatype.user.curr.repoServer.actionRunTask, this.sp.READ)
+      && (this.ctxRecord.data.status == 'SUBMITTED'
+      || this.ctxRecord.data.status == 'WAITING')) {
       menu.add(this.actions.run);
     }
     

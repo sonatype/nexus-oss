@@ -392,7 +392,8 @@ Sonatype.repoServer.PrivilegeEditPanel = function(config){
     buttons: [
       {
         id: 'savebutton',
-        text: 'Save'
+        text: 'Save',
+        disabled: true
       },
       {
         id: 'cancelbutton',
@@ -791,7 +792,8 @@ Ext.extend(Sonatype.repoServer.PrivilegeEditPanel, Ext.Panel, {
       ]
     });
     
-    if (this.ctxRecord.data.type != 'application'){
+    if (this.ctxRecord.data.type != 'application'
+    	&& this.sp.checkPermission(Sonatype.user.curr.repoServer.configPrivileges, this.sp.DELETE)){
       menu.add(this.actions.deleteAction);
     }
     

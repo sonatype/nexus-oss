@@ -316,7 +316,8 @@ Sonatype.repoServer.RepoEditPanel = function(config){
     buttons: [
       {
         id: 'savebutton',
-        text: 'Save'
+        text: 'Save',
+        disabled: true
       },
       {
         id: 'cancelbutton',
@@ -821,7 +822,8 @@ Sonatype.repoServer.RepoEditPanel = function(config){
     ],
     buttons: [
       {
-        text: 'Save'
+        text: 'Save',
+        disabled: true
       },
       {
         text: 'Cancel'
@@ -1118,7 +1120,16 @@ Ext.extend(Sonatype.repoServer.RepoEditPanel, Sonatype.repoServer.AbstractRepoPa
   onContextClickHandler : function(grid, index, e){
     this.onContextHideHandler();
     
-    if ( e.target.nodeName == 'A' ) return; // no menu on links
+    var clearcachPriv = this.sp.checkPermission(Sonatype.user.curr.repoServer.actionDeleteCache, this.sp.DELETE);
+    var reindexPriv = this.sp.checkPermission(Sonatype.user.curr.repoServer.actionReindex, this.sp.DELETE);
+    var attributesPriv = this.sp.checkPermission(Sonatype.user.curr.repoServer.actionRebuildAttribs, this.sp.DELETE);
+    var uploadPriv = this.sp.checkPermission(Sonatype.user.curr.repoServer.actionUploadArtifact, this.sp.CREATE);
+    
+    if ( e.target.nodeName == 'A' ||
+            ( !clearcachPriv &&
+              !reindexPriv &&
+              !attributesPriv &&
+              !uploadPriv ) ) return; // no menu on links or no privs
     
     this.ctxRow = this.reposGridPanel.view.getRow(index);
     this.ctxRecord = this.reposGridPanel.store.getAt(index);
@@ -1130,15 +1141,22 @@ Ext.extend(Sonatype.repoServer.RepoEditPanel, Sonatype.repoServer.AbstractRepoPa
       items: []
     });
     
-    if(this.ctxRecord.get('repoType') != 'virtual'){
+    if( clearcachPriv
+        && this.ctxRecord.get('repoType') != 'virtual'){
       menu.add(this.actions.clearCache);
     }
     
-    menu.add(this.actions.reIndex);
-    menu.add(this.actions.rebuildAttributes);
-
-    if (this.ctxRecord.get('repoType') == 'hosted'
-    && this.ctxRecord.get('repoPolicy') == 'release'){
+    if (reindexPriv){
+        menu.add(this.actions.reIndex);
+    }
+    
+    if (attributesPriv){
+        menu.add(this.actions.rebuildAttributes);
+    }
+    
+    if (uploadPriv
+        && this.ctxRecord.get('repoType') == 'hosted'
+        && this.ctxRecord.get('repoPolicy') == 'release'){
       menu.add(this.actions.uploadArtifact);
     }
     

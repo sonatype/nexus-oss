@@ -323,22 +323,22 @@ Sonatype.repoServer.RepoServer = function(){
 
       //Config Group **************************************************
       var cTplData = {links:[]};
-      if(sp.checkPermission(userPerms.configServer, sp.EDIT)){
+      if(sp.checkPermission(userPerms.configServer, sp.READ)){
         cTplData.links.push( {id:'open-config-server', title:'Server'} );
       }
-      if(sp.checkPermission(userPerms.configRepos, sp.EDIT)){
+      if(sp.checkPermission(userPerms.configRepos, sp.READ)){
         cTplData.links.push( {id:'open-config-repos', title:'Repositories'} );
       }
-      if(sp.checkPermission(userPerms.configGroups, sp.EDIT)){
+      if(sp.checkPermission(userPerms.configGroups, sp.READ)){
         cTplData.links.push( {id:'open-config-groups', title:'Groups'} );
       }
-      if(sp.checkPermission(userPerms.configRules, sp.EDIT)){
+      if(sp.checkPermission(userPerms.configRules, sp.READ)){
         cTplData.links.push( {id:'open-config-rules', title:'Routing'} );
       }
-      if(sp.checkPermission(userPerms.configSchedules, sp.EDIT)){
+      if(sp.checkPermission(userPerms.configSchedules, sp.READ)){
         cTplData.links.push( {id:'open-config-schedules', title:'Scheduled Tasks'} );
       }
-      if(sp.checkPermission(userPerms.configRepoTargets, sp.EDIT)){
+      if(sp.checkPermission(userPerms.configRepoTargets, sp.READ)){
         cTplData.links.push( {id:'open-config-repoTargets', title:'Repository Targets'} );
       }
       if(cTplData.links.length > 0){
@@ -352,13 +352,13 @@ Sonatype.repoServer.RepoServer = function(){
       if ( sp.checkPermission( userPerms.actionChangePassword, sp.CREATE ) ) {
         sTplData.links.push( { id: 'open-security-password', title: 'Change Password' } );
       }
-      if( sp.checkPermission( userPerms.configUsers, sp.EDIT ) ) {
+      if( sp.checkPermission( userPerms.configUsers, sp.READ ) ) {
         sTplData.links.push( { id: 'open-security-users', title: 'Users' } );
       }
-      if ( sp.checkPermission( userPerms.configRoles, sp.EDIT ) ) {
+      if ( sp.checkPermission( userPerms.configRoles, sp.READ ) ) {
         sTplData.links.push( { id: 'open-security-roles', title: 'Roles' } );
       }
-      if ( sp.checkPermission( userPerms.configPrivileges, sp.EDIT ) ) {
+      if ( sp.checkPermission( userPerms.configPrivileges, sp.READ ) ) {
         sTplData.links.push( { id: 'open-security-privileges', title: 'Privileges' } );
       }
       if ( sTplData.links.length > 0 ){

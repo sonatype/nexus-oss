@@ -2490,6 +2490,36 @@
                     <version>1.0.0+</version>
                     <type>int</type>
                     <required>true</required>
+                </field>
+                <field>
+                    <name>actionRunTask</name>
+                    <version>1.0.0+</version>
+                    <type>int</type>
+                    <required>true</required>
+                </field>
+                <field>
+                    <name>actionDeleteCache</name>
+                    <version>1.0.0+</version>
+                    <type>int</type>
+                    <required>true</required>
+                </field>
+                <field>
+                    <name>actionRebuildAttribs</name>
+                    <version>1.0.0+</version>
+                    <type>int</type>
+                    <required>true</required>
+                </field>
+                <field>
+                    <name>actionUploadArtifact</name>
+                    <version>1.0.0+</version>
+                    <type>int</type>
+                    <required>true</required>
+                </field>
+                <field>
+                    <name>actionReindex</name>
+                    <version>1.0.0+</version>
+                    <type>int</type>
+                    <required>true</required>
                 </field>                
 			</fields>
 		</class>

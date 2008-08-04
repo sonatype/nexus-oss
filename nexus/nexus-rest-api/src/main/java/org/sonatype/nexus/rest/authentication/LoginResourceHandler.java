@@ -114,6 +114,16 @@ public class LoginResourceHandler
         perms.setActionResetPassword( getFlagsForPermission( subject, "nexus:usersreset" ) );
         
         perms.setActionEmptyTrash( getFlagsForPermission( subject, "nexus:wastebasket" ) );
+        
+        perms.setActionDeleteCache( getFlagsForPermission( subject, "nexus:cache") );
+        
+        perms.setActionRebuildAttribs( getFlagsForPermission( subject, "nexus:attributes") );
+        
+        perms.setActionRunTask( getFlagsForPermission( subject, "nexus:runtask") );
+        
+        perms.setActionUploadArtifact( getFlagsForPermission( subject, "nexus:artifact") );
+        
+        perms.setActionReindex( getFlagsForPermission( subject, "nexus:index" ) );
 
         resource.setClientPermissions( perms );
 

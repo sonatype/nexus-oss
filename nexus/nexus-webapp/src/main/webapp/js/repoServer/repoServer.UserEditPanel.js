@@ -282,7 +282,8 @@ Sonatype.repoServer.UserEditPanel = function(config){
     buttons: [
       {
         id: 'savebutton',
-        text: 'Save'
+        text: 'Save',
+        disabled: true
       },
       {
         id: 'cancelbutton',
@@ -791,11 +792,17 @@ Ext.extend(Sonatype.repoServer.UserEditPanel, Ext.Panel, {
     var menu = new Ext.menu.Menu({
       id:'users-grid-ctx',
       items: [
-        this.actions.refresh,
-        this.actions.deleteAction,
-        this.actions.resetPasswordAction
+        this.actions.refresh
       ]
     });
+    
+    if (this.sp.checkPermission(Sonatype.user.curr.repoServer.configUsers, this.sp.DELETE)){
+        menu.add(this.actions.deleteAction);
+    }
+    
+    if (this.sp.checkPermission(Sonatype.user.curr.repoServer.actionResetPassword, this.sp.DELETE)){
+        menu.add(this.actions.resetPasswordAction);
+    }
     
     //TODO: Add additional menu items
     

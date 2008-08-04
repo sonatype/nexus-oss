@@ -79,6 +79,7 @@
 			/service/local/global_settings = authcBasic,perms[nexus:configuration]
 			/service/local/repo_routes = authcBasic,perms[nexus:routes]
 			/service/local/templates = authcBasic,perms[nexus:repotemplates]
+			/service/local/schedules/run = authcBasic,perms[nexus:runtask]
 			/service/local/schedules = authcBasic,perms[nexus:tasks]
 			/service/local/users/changepw = authcBasic,perms[nexus:userschangepw]
 			/service/local/users/forgotpw = authcBasic,perms[nexus:usersforgotpw]

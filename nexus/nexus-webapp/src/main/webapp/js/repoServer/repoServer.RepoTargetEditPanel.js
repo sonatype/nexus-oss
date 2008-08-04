@@ -235,7 +235,8 @@ Sonatype.repoServer.RepoTargetEditPanel = function(config){
     buttons: [
       {
         id: 'savebutton',
-        text: 'Save'
+        text: 'Save',
+        disabled: true
       },
       {
         id: 'cancelbutton',
@@ -628,7 +629,7 @@ Ext.extend(Sonatype.repoServer.RepoTargetEditPanel, Ext.Panel, {
   beforeFormRenderHandler : function(component){
     var sp = Sonatype.lib.Permissions;
     // TODO
-    if(sp.checkPermission(Sonatype.user.curr.repoServer.configUsers, sp.EDIT)){
+    if(sp.checkPermission(Sonatype.user.curr.repoServer.configRepoTarget, sp.EDIT)){
       component.buttons[0].disabled = false;
     }
   },
@@ -688,10 +689,13 @@ Ext.extend(Sonatype.repoServer.RepoTargetEditPanel, Ext.Panel, {
     var menu = new Ext.menu.Menu({
       id:'repoTarget-grid-ctx',
       items: [
-        this.actions.refresh,
-        this.actions.deleteAction
+        this.actions.refresh
       ]
     });
+    
+    if (this.sp.checkPermission(Sonatype.user.curr.repoServer.configRepoTargets, this.sp.DELETE)){
+        menu.add(this.actions.deleteAction);
+    }
     
     //TODO: Add additional menu items
     

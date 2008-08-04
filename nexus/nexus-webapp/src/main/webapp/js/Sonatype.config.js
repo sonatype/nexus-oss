@@ -146,7 +146,12 @@ Sonatype.user.anon = {
     actionForgotUserid: 8,
     actionChangePassword: 0,
     actionResetPassword: 4,
-    actionEmptyTrash: 0
+    actionEmptyTrash: 0,
+    actionRunTask: 0,
+    actionDeleteCache: 0,
+    actionRebuildAttribs: 0,
+    actionUploadArtifact: 0,
+    actionReindex: 0
   }
 };
 

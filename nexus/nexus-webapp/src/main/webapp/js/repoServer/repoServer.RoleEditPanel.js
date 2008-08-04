@@ -268,7 +268,8 @@ Sonatype.repoServer.RoleEditPanel = function(config){
     buttons: [
       {
         id: 'savebutton',
-        text: 'Save'
+        text: 'Save',
+        disabled: true
       },
       {
         id: 'cancelbutton',
@@ -743,10 +744,13 @@ Ext.extend(Sonatype.repoServer.RoleEditPanel, Ext.Panel, {
     var menu = new Ext.menu.Menu({
       id:'roles-grid-ctx',
       items: [
-        this.actions.refresh,
-        this.actions.deleteAction
+        this.actions.refresh
       ]
     });
+    
+    if (this.sp.checkPermission(Sonatype.user.curr.repoServer.configRoles, this.sp.DELETE)){
+        menu.add(this.actions.deleteAction);
+    }
     
     //TODO: Add additional menu items
     
