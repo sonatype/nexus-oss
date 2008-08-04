@@ -262,6 +262,12 @@
 				<groupId>org.sonatype.plexus</groupId>
 				<artifactId>plexus-jsecurity</artifactId>
 				<version>1.0-SNAPSHOT</version>
+				<exclusions>
+					<exclusion>
+						<groupId>commons-logging</groupId>
+						<artifactId>commons-logging</artifactId>
+					</exclusion>
+				</exclusions>
 			</dependency>
 			<dependency>
 				<groupId>org.jsecurity</groupId>
