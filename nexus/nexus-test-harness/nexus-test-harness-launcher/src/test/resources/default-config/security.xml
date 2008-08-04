@@ -1,8 +1,6 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<nexusSecurity>
-	<version>1.0.0</version>
-	
-	<users>
+<?xml version="1.0" encoding="UTF-8"?><nexusSecurity>
+  <version>1.0.0</version>
+  <users>
     <user>
       <userId>admin</userId>
       <name>Administrator</name>
@@ -50,6 +48,11 @@
         <privilege>54</privilege>
         <privilege>55</privilege>
         <privilege>56</privilege>
+        <privilege>57</privilege>
+        <privilege>58</privilege>
+        <privilege>59</privilege>
+        <privilege>T1</privilege>
+        <privilege>T2</privilege>
       </privileges>
     </role>
 		<role>
@@ -73,6 +76,24 @@
 			</privileges>
 		</role>
 	</roles>
+  <repositoryTargetPrivileges>
+    <repositoryTargetPrivilege>
+      <repositoryTargetId>1</repositoryTargetId>
+      <repositoryId></repositoryId>
+      <groupId></groupId>
+      <id>T1</id>
+      <name>Read All M2 Repositories - (read)</name>
+      <method>read</method>
+    </repositoryTargetPrivilege>
+    <repositoryTargetPrivilege>
+      <repositoryTargetId>2</repositoryTargetId>
+      <repositoryId></repositoryId>
+      <groupId></groupId>
+      <id>T2</id>
+      <name>Read All M1 Repositories - (read)</name>
+      <method>read</method>
+    </repositoryTargetPrivilege>
+  </repositoryTargetPrivileges>
   <applicationPrivileges>
     <applicationPrivilege>
       <permission>nexus:*</permission>
@@ -415,6 +436,30 @@
       <id>56</id>
       <name>Repository Content Classes - (read)</name>
       <method>read</method>
+    </applicationPrivilege>
+    <applicationPrivilege>
+      <permission>nexus:usersforgotpw</permission>
+      <id>57</id>
+      <name>User Forgot Password - (create)</name>
+      <method>create</method>
+    </applicationPrivilege>
+    <applicationPrivilege>
+      <permission>nexus:usersforgotid</permission>
+      <id>58</id>
+      <name>User Forgot User Id - (create)</name>
+      <method>create</method>
+    </applicationPrivilege>
+    <applicationPrivilege>
+      <permission>nexus:usersreset</permission>
+      <id>59</id>
+      <name>User Reset Password - (delete)</name>
+      <method>delete</method>
+    </applicationPrivilege>
+    <applicationPrivilege>
+      <permission>nexus:userschangepw</permission>
+      <id>64</id>
+      <name>User Change Password - (create)</name>
+      <method>create</method>
     </applicationPrivilege>
   </applicationPrivileges>
 </nexusSecurity>

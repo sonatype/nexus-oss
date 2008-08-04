@@ -8,11 +8,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
+import org.apache.commons.httpclient.auth.AuthPolicy;
 import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.maven.wagon.authentication.AuthenticationInfo;
 import org.restlet.Client;
@@ -139,9 +142,15 @@ public class RequestFacade
         if ( context.isSecureTest() )
         {
             client.getState().setCredentials(
-                                              new AuthScope( url.getHost(), url.getPort(), null ),
+                                              AuthScope.ANY,
                                               new UsernamePasswordCredentials( context.getUsername(),
                                                                                context.getPassword() ) );
+
+            List<String> authPrefs = new ArrayList<String>( 1 );
+            authPrefs.add( AuthPolicy.BASIC );
+            client.getParams().setParameter( AuthPolicy.AUTH_SCHEME_PRIORITY, authPrefs );
+            client.getParams().setAuthenticationPreemptive( true );
+            
         }
         try
         {

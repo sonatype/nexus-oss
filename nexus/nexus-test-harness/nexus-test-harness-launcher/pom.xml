@@ -260,7 +260,7 @@
 					<skip>false</skip>
 					<includes>
 
-						<include>**/IntegrationTestSuite*</include>
+						<include>**/IntegrationTestSuite.java</include>
 
 
 						<!--<include>**/Nexus261*</include>

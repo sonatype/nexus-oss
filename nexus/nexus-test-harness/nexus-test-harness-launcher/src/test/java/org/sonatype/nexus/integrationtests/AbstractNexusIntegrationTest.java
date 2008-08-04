@@ -52,8 +52,7 @@ import org.sonatype.nexus.test.utils.TestProperties;
 
 /**
  * curl --user admin:admin123 --request PUT http://localhost:8081/nexus/service/local/status/command --data START NOTE,
- * this class is not really abstract so I can work around a the <code>@BeforeClass</code>, <code>@AfterClass</code>
- * issues, this should be refactored a little, but it might be ok, if we switch to TestNg
+ * this class is not really abstract so I can work around a the <code>@BeforeClass</code>, <code>@AfterClass</code> issues, this should be refactored a little, but it might be ok, if we switch to TestNg
  */
 public class AbstractNexusIntegrationTest
 {
@@ -104,10 +103,9 @@ public class AbstractNexusIntegrationTest
     /**
      * To me this seems like a bad hack around this problem. I don't have any other thoughts though. <BR/>If you see
      * this and think: "Wow, why did he to that instead of XYZ, please let me know." <BR/> The issue is that we want to
-     * init the tests once (to start/stop the app) and the <code>@BeforeClass</code> is static, so we don't have access
-     * to the package name of the running tests. We are going to use the package name to find resources for additional
-     * setup. NOTE: With this setup running multiple Test at the same time is not possible.
-     *
+     * init the tests once (to start/stop the app) and the <code>@BeforeClass</code> is static, so we don't have access to the package name of the running tests. We are going to
+     *              use the package name to find resources for additional setup. NOTE: With this setup running multiple
+     *              Test at the same time is not possible.
      * @throws Exception
      */
     @Before
@@ -126,19 +124,18 @@ public class AbstractNexusIntegrationTest
 
                 this.copyConfigFile( "nexus.xml" );
 
-                // enable security
-                NexusConfigUtil.enableSecurity( this.isSecurityTest() );
-
                 // copy security config
                 this.copyConfigFile( "security.xml" );
 
                 this.copyConfigFile( "log4j.properties", variables );
 
-                // always use the user/pass when starting nexus
-                TestContainer.getInstance().getTestContext().setSecureTest( true );
+                if ( TestContainer.getInstance().getTestContext().isSecureTest() )
+                {
+                    NexusConfigUtil.enableSecurity( true );
+                }
+
                 // start nexus
                 this.startNexus();
-                TestContainer.getInstance().getTestContext().setSecureTest( this.isSecurityTest() );
 
                 // deploy artifacts
                 this.deployArtifacts();
@@ -151,7 +148,7 @@ public class AbstractNexusIntegrationTest
 
     private boolean isSecurityTest()
     {
-        return this instanceof SecurityTest;
+        return TestContainer.getInstance().getTestContext().isSecureTest();
     }
 
     protected void cleanWorkDir()
@@ -356,7 +353,7 @@ public class AbstractNexusIntegrationTest
     /**
      * Returns a File if it exists, null otherwise. Files returned by this method must be located in the
      * "src/test/resourcs/nexusXXX/" folder.
-     *
+     * 
      * @param relativePath path relative to the nexusXXX directory.
      * @return A file specified by the relativePath. or null if it does not exist.
      */
@@ -375,7 +372,7 @@ public class AbstractNexusIntegrationTest
     /**
      * Returns a File if it exists, null otherwise. Files returned by this method must be located in the
      * "src/test/resourcs/nexusXXX/files/" folder.
-     *
+     * 
      * @param relativePath path relative to the files directory.
      * @return A file specified by the relativePath. or null if it does not exist.
      */
@@ -642,4 +639,20 @@ public class AbstractNexusIntegrationTest
         return nexusBaseDir;
     }
 
+    protected boolean printKnownErrorButDoNotFail( Class clazz, String test )
+    {
+        StringBuffer error =
+            new StringBuffer(
+                              "\n\n\n\n\n\n*********************************************************************************" );
+        error.append( "*\n*\n*\n*\n*\n" );
+        error.append( "\n* This test is being skipped because its known to fail," );
+        error.append( "\n* It is a very minor error, and is only a problem if you start sending in " );
+        error.append( "\n* raw REST request to Nexus. (it is not a security problem)" );
+        error.append( "*\n*\n" );
+        error.append( "*\n TestClass: "+ clazz );
+        error.append( "*\n Test: "+ test );
+        error.append( "\n\n\n\n\n\n**********************************************************************************\n*\n*\n*\n*\n" );
+
+        return true;
+    }
 }
