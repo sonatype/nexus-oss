@@ -146,11 +146,18 @@ public abstract class DefaultRepository
                     if ( shouldGetRemote )
                     {
                         // this will GET it unconditionally
-                        remoteItem = doRetrieveRemoteItem( uid, context );
-
-                        if ( getLogger().isDebugEnabled() )
+                        try
                         {
-                            getLogger().debug( "Item " + uid.toString() + " found in remote storage." );
+                            remoteItem = doRetrieveRemoteItem( uid, context );
+
+                            if ( getLogger().isDebugEnabled() )
+                            {
+                                getLogger().debug( "Item " + uid.toString() + " found in remote storage." );
+                            }
+                        }
+                        catch ( StorageException e )
+                        {
+                            remoteItem  = null;
                         }
                     }
                     else
@@ -256,7 +263,7 @@ public abstract class DefaultRepository
 
             autoBlockProxying( ex );
 
-            return null;
+            throw ex;
         }
 
         return doCacheItem( result );

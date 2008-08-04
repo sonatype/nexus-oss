@@ -633,9 +633,10 @@ public abstract class AbstractMavenRepository
                 return result;
             }
         }
+
         // this is not a checksum for sure (see doRetrieveItem in this class), hence go remote as should
         // but use remote maven repo checksum to verify transport success
-
+        
         if ( getChecksumPolicy().shouldCheckChecksum() && StorageFileItem.class.isAssignableFrom( result.getClass() ) )
         {
             String hashKey = null;
