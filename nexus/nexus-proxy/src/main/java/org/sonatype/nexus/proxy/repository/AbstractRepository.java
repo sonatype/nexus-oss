@@ -303,7 +303,7 @@ public abstract class AbstractRepository
 
             // if this is proxy
             // and was !shouldProxy() and the new is shouldProxy()
-            if ( this.proxyMode != null && !this.proxyMode.shouldProxy() && proxyMode.shouldProxy() )
+            if ( this.proxyMode != null && !this.proxyMode.shouldProxy() && oldProxyMode.shouldProxy() )
             {
                 if ( getLogger().isDebugEnabled() )
                 {
