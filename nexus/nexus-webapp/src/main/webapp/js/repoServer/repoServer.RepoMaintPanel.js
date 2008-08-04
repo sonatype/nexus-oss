@@ -52,16 +52,16 @@ Sonatype.repoServer.RepoMaintPanel = function(config){
       scope:this,
       handler: this.reloadAll
     }),
-    download : new Ext.Action({
+    download : {
       text: 'Download',
       scope:this,
       handler: this.downloadHandler
-    }),
-    downloadFromRemote : new Ext.Action({
+    },
+    downloadFromRemote : {
       text: 'Download From Remote',
       scope:this,
       handler: this.downloadFromRemoteHandler
-    }),
+    },
     viewRemote : new Ext.Action({
       text: 'View Remote',
       scope:this,
@@ -502,8 +502,11 @@ Ext.extend(Sonatype.repoServer.RepoMaintPanel, Sonatype.repoServer.AbstractRepoP
       
       if (node.isLeaf()){
         if (isProxyRepo){
+          var rec = (this.ctxRecord) ? this.ctxRecord : this.reposGridPanel.getSelectionModel().getSelected();      
+          this.actions.downloadFromRemote.href = this.restToRemoteUrl(node.id,rec);
           menu.add(this.actions.downloadFromRemote);
         }
+        this.actions.download.href = this.restToContentUrl(node.id);
         menu.add(this.actions.download);
       }
       
