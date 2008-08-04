@@ -22,7 +22,7 @@
 			<!-- deployment123 -->
 			<password>b2a0e378437817cebdf753d7dff3dd75483af9e0</password>
 			<status>active</status>
-			<email>changeme@yourcompany.com</email>
+			<email>changeme1@yourcompany.com</email>
 			<roles>
 				<role>deployment</role>
 			</roles>
@@ -33,7 +33,7 @@
 			<!-- anonymous -->
 			<password>0a92fab3230134cca6eadd9898325b9b2ae67998</password>
 			<status>active</status>
-			<email>changeme1@yourcompany.com</email>
+			<email>changeme2@yourcompany.com</email>
 			<roles>
 				<role>anonymous</role>
 			</roles>
