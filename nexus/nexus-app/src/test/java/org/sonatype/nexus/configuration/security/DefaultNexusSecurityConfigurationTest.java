@@ -46,7 +46,7 @@ public class DefaultNexusSecurityConfigurationTest
     {
         securityConfiguration = (DefaultNexusSecurityConfiguration) this.lookup( NexusSecurityConfiguration.ROLE );
         securityConfiguration.startService();
-        
+
         super.setUp();
     }
 
@@ -68,34 +68,34 @@ public class DefaultNexusSecurityConfigurationTest
         securityConfiguration.loadConfiguration();
 
         Configuration config = securityConfiguration.getConfiguration();
-        
+
         // the m1 and m2 repo perm
-        assertTrue( config.getRepositoryTargetPrivileges().size() == 2 );
-        
+        assertEquals("Expected repoTargetPrivs count", 8, config.getRepositoryTargetPrivileges().size() );
+
         // admin and anon role
-        assertTrue( config.getRoles().size() == 2 );
-        
+        assertEquals( "Expected roles count", 3, config.getRoles().size() );
+
         // admin and anon user
-        assertTrue( config.getUsers().size() == 2 );
-        
+        assertEquals( "Expected users count", 3, config.getUsers().size() );
+
         CRepoTargetPrivilege tarPriv = new CRepoTargetPrivilege();
         tarPriv.setId( "id2" );
         tarPriv.setMethod( CApplicationPrivilege.METHOD_CREATE );
         tarPriv.setName( "name" );
         tarPriv.setRepositoryTargetId( "targetId" );
         tarPriv.setRepositoryId( "repoId" );
-        
+
         config.addRepositoryTargetPrivilege( tarPriv );
-        
+
         CRole role = new CRole();
         role.setDescription( "description" );
         role.setId( "id1" );
         role.setName( "name" );
         role.setSessionTimeout( 60 );
         role.addPrivilege( "id2" );
-        
+
         config.addRole( role );
-        
+
         CRole role2 = new CRole();
         role2.setDescription( "description" );
         role2.setId( "id2" );
@@ -103,9 +103,9 @@ public class DefaultNexusSecurityConfigurationTest
         role2.setSessionTimeout( 60 );
         role2.addPrivilege( "id2" );
         role2.addRole( "id1" );
-        
+
         config.addRole( role2 );
-        
+
         CUser user = new CUser();
         user.setEmail( "emailaddress" );
         user.setPassword( "password" );
@@ -114,7 +114,7 @@ public class DefaultNexusSecurityConfigurationTest
         user.setUserId( "id" );
         user.addRole( "id1" );
         user.addRole( "id2" );
-        
+
         config.addUser( user );
 
         securityConfiguration.saveConfiguration();
@@ -122,39 +122,41 @@ public class DefaultNexusSecurityConfigurationTest
         securityConfiguration.loadConfiguration();
 
         config = securityConfiguration.getConfiguration();
-        
-        assertTrue( config.getRepositoryTargetPrivileges().size() == 3 );
-        
-        assertTrue( ( ( CRepoTargetPrivilege ) config.getRepositoryTargetPrivileges().get( 2 ) ).getId().equals( "id2" ) );
-        assertTrue( ( ( CRepoTargetPrivilege ) config.getRepositoryTargetPrivileges().get( 2 ) ).getMethod().equals( CApplicationPrivilege.METHOD_CREATE ) );
-        assertTrue( ( ( CRepoTargetPrivilege ) config.getRepositoryTargetPrivileges().get( 2 ) ).getName().equals( "name" ) );
-        assertTrue( ( ( CRepoTargetPrivilege ) config.getRepositoryTargetPrivileges().get( 2 ) ).getRepositoryTargetId().equals( "targetId" ) );
-        assertTrue( ( ( CRepoTargetPrivilege ) config.getRepositoryTargetPrivileges().get( 2 ) ).getRepositoryId().equals( "repoId" ) );
-        
-        assertTrue( config.getRoles().size() == 4 );
-        
-        assertTrue( ( ( CRole ) config.getRoles().get( 2 ) ).getDescription().equals( "description" ) );
-        assertTrue( ( ( CRole ) config.getRoles().get( 2 ) ).getId().equals( "id1" ) );
-        assertTrue( ( ( CRole ) config.getRoles().get( 2 ) ).getName().equals( "name" ) );
-        assertTrue( ( ( CRole ) config.getRoles().get( 2 ) ).getSessionTimeout() == 60 );
-        assertTrue( ( ( CRole ) config.getRoles().get( 2 ) ).getPrivileges().size() == 1 );
-        assertTrue( ( ( CRole ) config.getRoles().get( 2 ) ).getRoles().size() == 0 );
-        
-        assertTrue( ( ( CRole ) config.getRoles().get( 3 ) ).getDescription().equals( "description" ) );
-        assertTrue( ( ( CRole ) config.getRoles().get( 3 ) ).getId().equals( "id2" ) );
-        assertTrue( ( ( CRole ) config.getRoles().get( 3 ) ).getName().equals( "name" ) );
-        assertTrue( ( ( CRole ) config.getRoles().get( 3 ) ).getSessionTimeout() == 60 );
-        assertTrue( ( ( CRole ) config.getRoles().get( 3 ) ).getPrivileges().size() == 1 );
-        assertTrue( ( ( CRole ) config.getRoles().get( 3 ) ).getRoles().size() == 1 );
-        
-        assertTrue( config.getUsers().size() == 3 );
-        
-        assertTrue( ( ( CUser ) config.getUsers().get( 2 ) ).getEmail().equals( "emailaddress" ) );
-        assertTrue( ( ( CUser ) config.getUsers().get( 2 ) ).getName().equals( "name" ) );
-        assertTrue( ( ( CUser ) config.getUsers().get( 2 ) ).getPassword().equals( "password" ) );
-        assertTrue( ( ( CUser ) config.getUsers().get( 2 ) ).getStatus().equals( CUser.STATUS_ACTIVE ) );
-        assertTrue( ( ( CUser ) config.getUsers().get( 2 ) ).getUserId().equals( "id" ) );
-        assertTrue( ( ( CUser ) config.getUsers().get( 2 ) ).getRoles().size() == 2 );
+
+        assertTrue( ( (CRepoTargetPrivilege) config.getRepositoryTargetPrivileges().get( 8 ) ).getId().equals( "id2" ) );
+        assertTrue( ( (CRepoTargetPrivilege) config.getRepositoryTargetPrivileges().get( 8 ) ).getMethod().equals(
+            CApplicationPrivilege.METHOD_CREATE ) );
+        assertTrue( ( (CRepoTargetPrivilege) config.getRepositoryTargetPrivileges().get( 8 ) )
+            .getName().equals( "name" ) );
+        assertTrue( ( (CRepoTargetPrivilege) config.getRepositoryTargetPrivileges().get( 8 ) )
+            .getRepositoryTargetId().equals( "targetId" ) );
+        assertTrue( ( (CRepoTargetPrivilege) config.getRepositoryTargetPrivileges().get( 8 ) )
+            .getRepositoryId().equals( "repoId" ) );
+
+        assertEquals( "Role count after adding 2", 5, config.getRoles().size() );
+
+        assertTrue( ( (CRole) config.getRoles().get( 3 ) ).getDescription().equals( "description" ) );
+        assertTrue( ( (CRole) config.getRoles().get( 3 ) ).getId().equals( "id1" ) );
+        assertTrue( ( (CRole) config.getRoles().get( 3 ) ).getName().equals( "name" ) );
+        assertTrue( ( (CRole) config.getRoles().get( 3 ) ).getSessionTimeout() == 60 );
+        assertTrue( ( (CRole) config.getRoles().get( 3 ) ).getPrivileges().size() == 1 );
+        assertTrue( ( (CRole) config.getRoles().get( 3 ) ).getRoles().size() == 0 );
+
+        assertTrue( ( (CRole) config.getRoles().get( 4 ) ).getDescription().equals( "description" ) );
+        assertTrue( ( (CRole) config.getRoles().get( 4 ) ).getId().equals( "id2" ) );
+        assertTrue( ( (CRole) config.getRoles().get( 4 ) ).getName().equals( "name" ) );
+        assertTrue( ( (CRole) config.getRoles().get( 4 ) ).getSessionTimeout() == 60 );
+        assertTrue( ( (CRole) config.getRoles().get( 4 ) ).getPrivileges().size() == 1 );
+        assertTrue( ( (CRole) config.getRoles().get( 4 ) ).getRoles().size() == 1 );
+
+        assertEquals( "User count after adding one", 4, config.getUsers().size()  );
+
+        assertTrue( ( (CUser) config.getUsers().get( 3 ) ).getEmail().equals( "emailaddress" ) );
+        assertTrue( ( (CUser) config.getUsers().get( 3 ) ).getName().equals( "name" ) );
+        assertTrue( ( (CUser) config.getUsers().get( 3 ) ).getPassword().equals( "password" ) );
+        assertTrue( ( (CUser) config.getUsers().get( 3 ) ).getStatus().equals( CUser.STATUS_ACTIVE ) );
+        assertTrue( ( (CUser) config.getUsers().get( 3 ) ).getUserId().equals( "id" ) );
+        assertTrue( ( (CUser) config.getUsers().get( 3 ) ).getRoles().size() == 2 );
     }
 
     public void testLoadConfiguration()
@@ -165,15 +167,15 @@ public class DefaultNexusSecurityConfigurationTest
 
         // get it
         Configuration config = securityConfiguration.getConfiguration();
-        
+
         CApplicationPrivilege priv = new CApplicationPrivilege();
         priv.setId( "testid" );
         priv.setMethod( "read" );
         priv.setName( "testname" );
         priv.setPermission( "a:test:permission" );
-        
+
         config.addApplicationPrivilege( priv );
-        
+
         // save it
         securityConfiguration.saveConfiguration();
 
@@ -197,7 +199,7 @@ public class DefaultNexusSecurityConfigurationTest
         config = securityConfiguration.getConfiguration();
 
         // it again contains default value, coz we overwritten it before
-        for ( CApplicationPrivilege appPriv : ( List<CApplicationPrivilege> ) config.getApplicationPrivileges() )
+        for ( CApplicationPrivilege appPriv : (List<CApplicationPrivilege>) config.getApplicationPrivileges() )
         {
             if ( appPriv.getId().equals( "testid" ) )
             {
