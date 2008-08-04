@@ -54,20 +54,13 @@ public class SearchMessageUtil
 
         String responseText = RequestFacade.doGetRequest( serviceURI ).getEntity().getText();
 
+        System.out.println( "responseText: \n" + responseText );
+
         if ( StringUtils.isEmpty( responseText ) )
         {
             return null;
         }
 
-        System.out.println( "responseText: \n" + responseText );
-        // FIXME check with toby if I need to use this.
-        // XStreamRepresentation representation = new XStreamRepresentation(
-        // xstream, responseText, MediaType.APPLICATION_XML);
-        //
-        // SearchResponse searchResponde = (SearchResponse) representation
-        // .getPayload(new SearchResponse());
-        //
-        // return searchResponde.getData();
         return (NexusArtifact) xstream.fromXML( responseText );
     }
 

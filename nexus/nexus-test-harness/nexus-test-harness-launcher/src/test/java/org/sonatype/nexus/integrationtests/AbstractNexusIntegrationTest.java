@@ -73,13 +73,19 @@ public class AbstractNexusIntegrationTest
 
     public String testRepositoryId;
 
-    private String nexusBaseDir;
+    protected static String nexusBaseDir;
 
-    private String baseNexusUrl;
+    protected static String baseNexusUrl;
 
     private String nexusTestRepoUrl;
 
-    private String nexusWorkDir;
+    protected static String nexusWorkDir;
+
+    static {
+        nexusBaseDir = TestProperties.getString( "nexus.base.dir" );
+        baseNexusUrl = TestProperties.getString( "nexus.base.url" );
+        nexusWorkDir = TestProperties.getString( "nexus.work.dir" );
+    }
 
     public static final String RELATIVE_CONF_DIR = "runtime/apps/nexus/conf";
 
@@ -93,9 +99,6 @@ public class AbstractNexusIntegrationTest
         this.setupContainer();
 
         // we also need to setup a couple fields, that need to be pulled out of a bundle
-        this.nexusBaseDir = TestProperties.getString( "nexus.base.dir" );
-        this.baseNexusUrl = TestProperties.getString( "nexus.base.url" );
-        this.nexusWorkDir = TestProperties.getString( "nexus.work.dir" );
         this.testRepositoryId = testRepositoryId;
         this.nexusTestRepoUrl = baseNexusUrl + REPOSITORY_RELATIVE_URL + testRepositoryId + "/";
     }
@@ -151,10 +154,10 @@ public class AbstractNexusIntegrationTest
         return TestContainer.getInstance().getTestContext().isSecureTest();
     }
 
-    protected void cleanWorkDir()
+    protected static void cleanWorkDir()
         throws IOException
     {
-        File workDir = new File( this.nexusWorkDir );
+        File workDir = new File( AbstractNexusIntegrationTest.nexusWorkDir );
 
         // to make sure I don't delete all my MP3's and pictures, or totally screw anyone.
         // check for 'target' and not allow any '..'
@@ -337,9 +340,9 @@ public class AbstractNexusIntegrationTest
         }
 
         System.out.println( "copying " + configFile + " to:  "
-            + new File( this.nexusBaseDir + "/" + RELATIVE_CONF_DIR, configFile ) );
+            + new File( AbstractNexusIntegrationTest.nexusBaseDir + "/" + RELATIVE_CONF_DIR, configFile ) );
 
-        FileTestingUtils.interpolationFileCopy( testConfigFile, new File( this.nexusBaseDir + "/" + RELATIVE_CONF_DIR,
+        FileTestingUtils.interpolationFileCopy( testConfigFile, new File( AbstractNexusIntegrationTest.nexusBaseDir + "/" + RELATIVE_CONF_DIR,
                                                                           destShortName ), variables );
 
     }
@@ -353,7 +356,7 @@ public class AbstractNexusIntegrationTest
     /**
      * Returns a File if it exists, null otherwise. Files returned by this method must be located in the
      * "src/test/resourcs/nexusXXX/" folder.
-     * 
+     *
      * @param relativePath path relative to the nexusXXX directory.
      * @return A file specified by the relativePath. or null if it does not exist.
      */
@@ -372,7 +375,7 @@ public class AbstractNexusIntegrationTest
     /**
      * Returns a File if it exists, null otherwise. Files returned by this method must be located in the
      * "src/test/resourcs/nexusXXX/files/" folder.
-     * 
+     *
      * @param relativePath path relative to the files directory.
      * @return A file specified by the relativePath. or null if it does not exist.
      */
@@ -504,14 +507,14 @@ public class AbstractNexusIntegrationTest
     protected File downloadArtifactFromRepository( String repoId, Gav gav, String targetDirectory )
         throws IOException
     {
-        return this.downloadArtifact( this.baseNexusUrl + REPOSITORY_RELATIVE_URL + repoId + "/", gav.getGroupId(),
+        return this.downloadArtifact( AbstractNexusIntegrationTest.baseNexusUrl + REPOSITORY_RELATIVE_URL + repoId + "/", gav.getGroupId(),
                                       gav.getArtifactId(), gav.getVersion(), gav.getExtension(), targetDirectory );
     }
 
     protected File downloadArtifactFromGroup( String groupId, Gav gav, String targetDirectory )
         throws IOException
     {
-        return this.downloadArtifact( this.baseNexusUrl + GROUP_REPOSITORY_RELATIVE_URL + groupId + "/",
+        return this.downloadArtifact( AbstractNexusIntegrationTest.baseNexusUrl + GROUP_REPOSITORY_RELATIVE_URL + groupId + "/",
                                       gav.getGroupId(), gav.getArtifactId(), gav.getVersion(), gav.getExtension(),
                                       targetDirectory );
     }
@@ -614,9 +617,9 @@ public class AbstractNexusIntegrationTest
         return baseNexusUrl;
     }
 
-    public void setBaseNexusUrl( String baseNexusUrl )
+    public static void setBaseNexusUrl( String baseNexusUrl )
     {
-        this.baseNexusUrl = baseNexusUrl;
+        AbstractNexusIntegrationTest.baseNexusUrl = baseNexusUrl;
     }
 
     public String getNexusTestRepoUrl()

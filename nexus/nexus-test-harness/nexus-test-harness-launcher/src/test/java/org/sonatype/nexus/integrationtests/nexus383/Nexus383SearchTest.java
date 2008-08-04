@@ -6,7 +6,7 @@ import java.util.List;
 
 import junit.framework.Assert;
 
-import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
@@ -30,14 +30,6 @@ public class Nexus383SearchTest
         this.messageUtil = new SearchMessageUtil();
     }
 
-    @Before
-    // FIXME Need index update while nexus398 is not fixed
-    public void updateIndex()
-        throws Exception
-    {
-        this.messageUtil.updateIndexes( NEXUS_TEST_HARNESS_REPO );
-    }
-
     @Test
     // 1. deploy an known artifact. and search for it. using group Id and artifact Id.
     public void searchFor()
@@ -46,8 +38,7 @@ public class Nexus383SearchTest
 
         // groupId
         List<NexusArtifact> results = messageUtil.searchFor( "nexus383" );
-        //FIXME the result can be 2 or 3.  Need a full repo clean up
-        //Assert.assertEquals( 2, results.size() );
+        Assert.assertEquals( 2, results.size() );
 
         // 3. negative test
         results = messageUtil.searchFor( "nexus-383" );
@@ -86,40 +77,6 @@ public class Nexus383SearchTest
         // velo's picture
         result = messageUtil.searchForSHA1( "612c17de73fdc8b9e3f6a063154d89946eb7c6f2" );
         Assert.assertNull( result );
-    }
-
-    @Test
-    // 4. deploy same artifact to multiple repos, and search
-    public void crossRepositorySearch()
-        throws Exception
-    {
-        Gav gav =
-            new Gav( this.getTestId(), "crossArtifact", "1.0.0", null, "jar", 0, new Date().getTime(),
-                     "A Cross Repository Deploy Artifact", false, false, null, false, null );
-
-        // file to deploy
-        File fileToDeploy = this.getTestFile( gav.getArtifactId() + ".jar" );
-        File pomFile = this.getTestFile( gav.getArtifactId() + ".pom" );
-
-        // url to upload to
-        String uploadURL = this.getBaseNexusUrl() + "service/local/artifact/maven/content";
-
-        // Multi repository deploy
-        DeployUtils.deployUsingPomWithRest( uploadURL, NEXUS_TEST_HARNESS_REPO, gav, fileToDeploy, pomFile );
-        DeployUtils.deployUsingPomWithRest( uploadURL, NEXUS_TEST_HARNESS_REPO2, gav, fileToDeploy, pomFile );
-        DeployUtils.deployUsingPomWithRest( uploadURL, NEXUS_TEST_HARNESS_RELEASE_REPO, gav, fileToDeploy, pomFile );
-
-        // if you deploy the same item multiple times to the same repo, that is only a single item
-        DeployUtils.deployUsingPomWithRest( uploadURL, NEXUS_TEST_HARNESS_RELEASE_REPO, gav, fileToDeploy, pomFile );
-        DeployUtils.deployUsingPomWithRest( uploadURL, NEXUS_TEST_HARNESS_RELEASE_REPO, gav, fileToDeploy, pomFile );
-
-        this.messageUtil.updateIndexes( NEXUS_TEST_HARNESS_REPO, NEXUS_TEST_HARNESS_REPO2,
-                                        NEXUS_TEST_HARNESS_RELEASE_REPO );
-
-        List<NexusArtifact> results = messageUtil.searchFor( "crossArtifact" );
-        // FIXME issue nexus407 Assert.assertEquals( 3,
-        results.size();
-
     }
 
     @Test
@@ -203,6 +160,44 @@ public class Nexus383SearchTest
 
         // All searchs should run ok
         searchFor();
+    }
+
+    @Test
+    // 4. deploy same artifact to multiple repos, and search
+    public void crossRepositorySearch()
+        throws Exception
+    {
+        Gav gav =
+            new Gav( this.getTestId(), "crossArtifact", "1.0.0", null, "jar", 0, new Date().getTime(),
+                     "A Cross Repository Deploy Artifact", false, false, null, false, null );
+
+        // file to deploy
+        File fileToDeploy = this.getTestFile( gav.getArtifactId() + ".jar" );
+        File pomFile = this.getTestFile( gav.getArtifactId() + ".pom" );
+
+        // url to upload to
+        String uploadURL = this.getBaseNexusUrl() + "service/local/artifact/maven/content";
+
+        // Multi repository deploy
+        DeployUtils.deployUsingPomWithRest( uploadURL, NEXUS_TEST_HARNESS_REPO, gav, fileToDeploy, pomFile );
+        DeployUtils.deployUsingPomWithRest( uploadURL, NEXUS_TEST_HARNESS_REPO2, gav, fileToDeploy, pomFile );
+        DeployUtils.deployUsingPomWithRest( uploadURL, NEXUS_TEST_HARNESS_RELEASE_REPO, gav, fileToDeploy, pomFile );
+
+        // if you deploy the same item multiple times to the same repo, that is only a single item
+        DeployUtils.deployUsingPomWithRest( uploadURL, NEXUS_TEST_HARNESS_RELEASE_REPO, gav, fileToDeploy, pomFile );
+        DeployUtils.deployUsingPomWithRest( uploadURL, NEXUS_TEST_HARNESS_RELEASE_REPO, gav, fileToDeploy, pomFile );
+
+        this.messageUtil.updateIndexes( NEXUS_TEST_HARNESS_REPO, NEXUS_TEST_HARNESS_REPO2,
+                                        NEXUS_TEST_HARNESS_RELEASE_REPO );
+
+        List<NexusArtifact> results = messageUtil.searchFor( "crossArtifact" );
+        Assert.assertEquals( 3, results.size() );
+
+    }
+
+    @BeforeClass
+    public static void cleanWorkFolder() throws Exception {
+        cleanWorkDir();
     }
 
 }
