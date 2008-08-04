@@ -81,7 +81,6 @@
 				<privilege>17</privilege>
 				<privilege>19</privilege>
 				<privilege>44</privilege>
-				<privilege>53</privilege>
 				<privilege>54</privilege>
 				<privilege>55</privilege>
 				<privilege>56</privilege>
@@ -165,7 +164,7 @@
 	<applicationPrivileges>
 		<applicationPrivilege>
 			<id>1000</id>
-			<name>Nexus Administrator privilege (ALL)</name>
+			<name>Administrator privilege (ALL)</name>
 			<method>*</method>
 			<permission>nexus:*</permission>
 		</applicationPrivilege>
@@ -177,19 +176,19 @@
 		</applicationPrivilege>
 		<applicationPrivilege>
 			<id>2</id>
-			<name>Authentication - (read)</name>
+			<name>Login to UI</name>
 			<method>read</method>
 			<permission>nexus:authentication</permission>
 		</applicationPrivilege>
 		<applicationPrivilege>
 			<id>3</id>
-			<name>Settings - (read)</name>
+			<name>Server Settings - (read)</name>
 			<method>read</method>
 			<permission>nexus:settings</permission>
 		</applicationPrivilege>
 		<applicationPrivilege>
 			<id>4</id>
-			<name>Settings - (update)</name>
+			<name>Server Settings - (update)</name>
 			<method>update</method>
 			<permission>nexus:settings</permission>
 		</applicationPrivilege>
@@ -267,31 +266,31 @@
 		</applicationPrivilege>
 		<applicationPrivilege>
 			<id>17</id>
-			<name>Data Index - (read)</name>
+			<name>??Data Index - (read)</name>
 			<method>read</method>
 			<permission>nexus:index</permission>
 		</applicationPrivilege>
 		<applicationPrivilege>
 			<id>18</id>
-			<name>Data Index - (delete)</name>
+			<name>Reindex</name>
 			<method>delete</method>
 			<permission>nexus:index</permission>
 		</applicationPrivilege>
 		<applicationPrivilege>
 			<id>19</id>
-			<name>Identify - (read)</name>
+			<name>??Identify - (read)</name>
 			<method>read</method>
 			<permission>nexus:identify</permission>
 		</applicationPrivilege>
 		<applicationPrivilege>
 			<id>20</id>
-			<name>Attributes - (delete)</name>
+			<name>??Attributes - (delete)</name>
 			<method>delete</method>
 			<permission>nexus:attributes</permission>
 		</applicationPrivilege>
 		<applicationPrivilege>
 			<id>21</id>
-			<name>Cache - (delete)</name>
+			<name>Clear Cache</name>
 			<method>delete</method>
 			<permission>nexus:cache</permission>
 		</applicationPrivilege>
@@ -345,49 +344,49 @@
 		</applicationPrivilege>
 		<applicationPrivilege>
 			<id>30</id>
-			<name>Privileges - (create)</name>
+			<name>User Privileges - (create)</name>
 			<method>create</method>
 			<permission>nexus:privileges</permission>
 		</applicationPrivilege>
 		<applicationPrivilege>
 			<id>31</id>
-			<name>Privileges - (read)</name>
+			<name>User Privileges - (read)</name>
 			<method>read</method>
 			<permission>nexus:privileges</permission>
 		</applicationPrivilege>
 		<applicationPrivilege>
 			<id>32</id>
-			<name>Privileges - (update)</name>
+			<name>User Privileges - (update)</name>
 			<method>update</method>
 			<permission>nexus:privileges</permission>
 		</applicationPrivilege>
 		<applicationPrivilege>
 			<id>33</id>
-			<name>Privileges - (delete)</name>
+			<name>User Privileges - (delete)</name>
 			<method>delete</method>
 			<permission>nexus:privileges</permission>
 		</applicationPrivilege>
 		<applicationPrivilege>
 			<id>34</id>
-			<name>Roles - (create)</name>
+			<name>User Roles - (create)</name>
 			<method>create</method>
 			<permission>nexus:roles</permission>
 		</applicationPrivilege>
 		<applicationPrivilege>
 			<id>35</id>
-			<name>Roles - (read)</name>
+			<name>User Roles - (read)</name>
 			<method>read</method>
 			<permission>nexus:roles</permission>
 		</applicationPrivilege>
 		<applicationPrivilege>
 			<id>36</id>
-			<name>Roles - (update)</name>
+			<name>User Roles - (update)</name>
 			<method>update</method>
 			<permission>nexus:roles</permission>
 		</applicationPrivilege>
 		<applicationPrivilege>
 			<id>37</id>
-			<name>Roles - (delete)</name>
+			<name>User Roles - (delete)</name>
 			<method>delete</method>
 			<permission>nexus:roles</permission>
 		</applicationPrivilege>
@@ -429,7 +428,7 @@
 		</applicationPrivilege>
 		<applicationPrivilege>
 			<id>44</id>
-			<name>Data Feeds - (read)</name>
+			<name>RSS Feeds - (read)</name>
 			<method>read</method>
 			<permission>nexus:feeds</permission>
 		</applicationPrivilege>
@@ -459,7 +458,7 @@
 		</applicationPrivilege>
 		<applicationPrivilege>
 			<id>49</id>
-			<name>Status - (update)</name>
+			<name>Server Status - (update)</name>
 			<method>update</method>
 			<permission>nexus:status</permission>
 		</applicationPrivilege>
@@ -477,31 +476,27 @@
 		</applicationPrivilege>
 		<applicationPrivilege>
 			<id>52</id>
-			<name>Attributes - (delete)</name>
+			<name>??Attributes - (delete)</name>
 			<method>delete</method>
 			<permission>nexus:attributes</permission>
 		</applicationPrivilege>
-		<applicationPrivilege>
-			<id>53</id>
-			<name>Feeds - (read)</name>
-			<method>read</method>
-			<permission>nexus:feeds</permission>
-		</applicationPrivilege>
+		<!--Removed dup permission-->
+        
 		<applicationPrivilege>
 			<id>54</id>
-			<name>Artifact - (read)</name>
+			<name>??Artifact - (read)</name>
 			<method>read</method>
 			<permission>nexus:artifact</permission>
 		</applicationPrivilege>
 		<applicationPrivilege>
 			<id>55</id>
-			<name>Repository Statuses - (read)</name>
+			<name>??Repository Statuses - (read)</name>
 			<method>read</method>
 			<permission>nexus:repostatus</permission>
 		</applicationPrivilege>
 		<applicationPrivilege>
 			<id>56</id>
-			<name>Repository Content Classes - (read)</name>
+			<name>??Repository Content Classes - (read)</name>
 			<method>read</method>
 			<permission>nexus:repocontentclasses</permission>
 		</applicationPrivilege>
@@ -531,7 +526,7 @@
         </applicationPrivilege>
         <applicationPrivilege>
             <id>65</id>
-            <name>Artifact - (create)</name>
+            <name>??Artifact - (create)</name>
             <method>create</method>
             <permission>nexus:artifact</permission>
         </applicationPrivilege>
