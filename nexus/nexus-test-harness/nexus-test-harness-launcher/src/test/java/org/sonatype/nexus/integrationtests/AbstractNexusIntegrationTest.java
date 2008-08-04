@@ -642,7 +642,7 @@ public class AbstractNexusIntegrationTest
         return nexusBaseDir;
     }
 
-    protected boolean printKnownErrorButDoNotFail( Class clazz, String test )
+    protected static boolean printKnownErrorButDoNotFail( Class<? extends AbstractNexusIntegrationTest> clazz, String...tests )
     {
         StringBuffer error =
             new StringBuffer(
@@ -653,7 +653,10 @@ public class AbstractNexusIntegrationTest
         error.append( "\n* raw REST request to Nexus. (it is not a security problem)" );
         error.append( "*\n*\n" );
         error.append( "*\n TestClass: "+ clazz );
-        error.append( "*\n Test: "+ test );
+        for ( String test : tests )
+        {
+            error.append( "*\n Test: "+ test );
+        }
         error.append( "\n\n\n\n\n\n**********************************************************************************\n*\n*\n*\n*\n" );
 
         return true;
