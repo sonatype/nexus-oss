@@ -23,13 +23,8 @@ package org.sonatype.nexus.smtp;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.codehaus.plexus.mailsender.MailMessage;
-import org.codehaus.plexus.mailsender.MailSender;
-import org.codehaus.plexus.mailsender.MailSenderException;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
-import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
-import org.sonatype.nexus.configuration.ConfigurationChangeListener;
+import org.apache.commons.mail.EmailException;
+import org.apache.commons.mail.SimpleEmail;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.configuration.model.CSmtpConfiguration;
 
@@ -38,48 +33,14 @@ import org.sonatype.nexus.configuration.model.CSmtpConfiguration;
  */
 public class DefaultSmtpClient
     implements
-        SmtpClient, Initializable, ConfigurationChangeListener
-{
-    /**
-     * @plexus.requirement
-     */
-    private MailSender sender;
-    
+        SmtpClient
+{    
     /**
      * The nexus configuration.
      * 
      * @plexus.requirement
      */
     private NexusConfiguration nexusConfiguration;
-    
-    private boolean initialized = false;
-    
-    public void initialize()
-        throws InitializationException
-    {
-        nexusConfiguration.addConfigurationChangeListener( this );
-    }
-    
-    public void onConfigurationChange( ConfigurationChangeEvent evt )
-    {
-        initialize( true );
-    }
-    
-    public void initialize( boolean force )
-    {
-        if ( force || !initialized )
-        {
-            CSmtpConfiguration config = nexusConfiguration.getConfiguration().getSmtpConfiguration();
-            
-            sender.setSmtpHost( config.getHost() );
-            sender.setSmtpPort( config.getPort() );
-            sender.setSslMode( config.isSslEnabled(), config.isTlsEnabled() );
-            sender.setUsername( config.getUsername() );
-            sender.setPassword( config.getPassword() );
-            sender.setDebugMode( config.isDebugMode() );
-            initialized = true;
-        }
-    }
     
     public void sendEmail( String to, String from, String subject, String body )
         throws SmtpClientException
@@ -95,22 +56,27 @@ public class DefaultSmtpClient
     {   
         try
         {
-            initialize( false );
-            
-            MailMessage message = new MailMessage();
+            CSmtpConfiguration smtp = nexusConfiguration.getConfiguration().getSmtpConfiguration();
+            SimpleEmail email = new SimpleEmail();
+            email.setHostName( smtp.getHost() );
+            email.setSmtpPort( smtp.getPort() );
+            email.setAuthentication( smtp.getUsername(), smtp.getPassword() );
+            email.setDebug( smtp.isDebugMode() );
+            email.setSSL( smtp.isTlsEnabled() );
+            email.setTLS( smtp.isTlsEnabled() );
             
             for ( String to : toList )
             {
-                message.addTo( to, null );
+                email.addTo( to );
             }
             
-            message.setFrom( from == null ? nexusConfiguration.getConfiguration().getSmtpConfiguration().getSystemEmailAddress() : from , null );
-            message.setSubject( subject );
-            message.setContent( body );
+            email.setFrom( from == null ? smtp.getSystemEmailAddress() : from );
+            email.setSubject( subject );
+            email.setMsg( body );
     
-            sender.send( message );
+            email.send();
         }
-        catch ( MailSenderException e )
+        catch ( EmailException e )
         {
             throw new SmtpClientException( "Error handling smtp request", e );
         }

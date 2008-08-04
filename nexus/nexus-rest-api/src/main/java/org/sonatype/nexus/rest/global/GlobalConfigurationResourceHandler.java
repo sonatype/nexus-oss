@@ -178,6 +178,8 @@ public class GlobalConfigurationResourceHandler
                         
                         config.setUsername( settings.getUsername() );
                         
+                        config.setSystemEmailAddress( settings.getSystemEmailAddress() );
+                        
                         getNexus().updateSmtpConfiguration( config );
                     }
 

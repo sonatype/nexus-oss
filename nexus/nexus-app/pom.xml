@@ -48,9 +48,9 @@
 			<groupId>org.sonatype.nexus</groupId>
 			<artifactId>nexus-proxy</artifactId>
 		</dependency>
-		<dependency>
-            <groupId>org.codehaus.plexus</groupId>
-            <artifactId>plexus-mail-sender-simple</artifactId>
+        <dependency>
+        	<groupId>org.apache.commons</groupId>
+	        <artifactId>commons-email</artifactId>
         </dependency>
 		<dependency>
 			<groupId>org.codehaus.plexus</groupId>
