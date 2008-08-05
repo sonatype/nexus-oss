@@ -62,7 +62,7 @@ public class DefaultSmtpClient
             email.setSmtpPort( smtp.getPort() );
             email.setAuthentication( smtp.getUsername(), smtp.getPassword() );
             email.setDebug( smtp.isDebugMode() );
-            email.setSSL( smtp.isTlsEnabled() );
+            email.setSSL( smtp.isSslEnabled() );
             email.setTLS( smtp.isTlsEnabled() );
             
             for ( String to : toList )
