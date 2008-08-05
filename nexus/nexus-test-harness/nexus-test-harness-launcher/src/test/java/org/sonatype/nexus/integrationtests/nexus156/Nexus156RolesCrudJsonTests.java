@@ -14,6 +14,7 @@ import org.sonatype.nexus.rest.model.RoleResource;
 import org.sonatype.nexus.rest.model.UserListResourceResponse;
 import org.sonatype.nexus.rest.model.UserResource;
 import org.sonatype.nexus.rest.xstream.XStreamInitializer;
+import org.sonatype.nexus.test.utils.RoleMessageUtil;
 import org.sonatype.nexus.test.utils.SecurityConfigUtil;
 import org.sonatype.plexus.rest.xstream.json.JsonOrgHierarchicalStreamDriver;
 
@@ -29,7 +30,7 @@ public class Nexus156RolesCrudJsonTests
     {
         this.messageUtil =
             new RoleMessageUtil( XStreamInitializer.initialize( new XStream( new JsonOrgHierarchicalStreamDriver() ) ),
-                                 MediaType.APPLICATION_JSON, this.getBaseNexusUrl() );
+                                 MediaType.APPLICATION_JSON );
     }
 
     @Test
@@ -45,29 +46,7 @@ public class Nexus156RolesCrudJsonTests
         resource.addPrivilege( "1" );
         resource.addPrivilege( "2" );
 
-        Response response = this.messageUtil.sendMessage( Method.POST, resource );
-
-        if ( !response.getStatus().isSuccess() )
-        {
-            Assert.fail( "Could not create role: " + response.getStatus() );
-        }
-
-        // get the Resource object
-        RoleResource responseResource = this.messageUtil.getResourceFromResponse( response );
-
-        // make sure the id != null
-        Assert.assertNotNull( responseResource.getId() );
-
-        Assert.assertEquals( resource.getDescription(), responseResource.getDescription() );
-        Assert.assertEquals( resource.getName(), responseResource.getName() );
-        Assert.assertEquals( resource.getSessionTimeout(), responseResource.getSessionTimeout() );
-        Assert.assertEquals( resource.getPrivileges(), responseResource.getPrivileges() );
-        Assert.assertEquals( resource.getRoles(), responseResource.getRoles() );
-
-        // set the id
-        resource.setId( responseResource.getId() );
-
-        SecurityConfigUtil.verifyRole( resource );
+        this.messageUtil.createRole( resource );
     }
 
     @Test
@@ -82,20 +61,8 @@ public class Nexus156RolesCrudJsonTests
         resource.setSessionTimeout( 30 );
         resource.addPrivilege( "1" );
 
-        Response response = this.messageUtil.sendMessage( Method.POST, resource );
-
-        if ( !response.getStatus().isSuccess() )
-        {
-            Assert.fail( "Could not create role: " + response.getStatus() );
-        }
-
-        // get the Resource object
-        RoleResource responseResource = this.messageUtil.getResourceFromResponse( response );
-
-        // set the id
-        resource.setId( responseResource.getId() );
-        // make sure it was added
-        SecurityConfigUtil.verifyRole( resource );
+        // create a role
+        this.messageUtil.createRole( resource );
 
         // now that we have at least one element stored (more from other tests, most likely)
 
@@ -116,39 +83,10 @@ public class Nexus156RolesCrudJsonTests
         resource.setSessionTimeout( 31 );
         resource.addPrivilege( "3" );
         resource.addPrivilege( "4" );
-
-        Response response = this.messageUtil.sendMessage( Method.POST, resource );
-
-        if ( !response.getStatus().isSuccess() )
-        {
-            Assert.fail( "Could not create role: " + response.getStatus() );
-        }
+        resource = this.messageUtil.createRole( resource );
 
         // get the Resource object
-        RoleResource responseResource = this.messageUtil.getResourceFromResponse( response );
-
-        // make sure the id != null
-        Assert.assertNotNull( responseResource.getId() );
-
-        resource.setId( responseResource.getId() );
-
-        Assert.assertEquals( resource.getDescription(), responseResource.getDescription() );
-        Assert.assertEquals( resource.getName(), responseResource.getName() );
-        Assert.assertEquals( resource.getSessionTimeout(), responseResource.getSessionTimeout() );
-        Assert.assertEquals( resource.getPrivileges(), responseResource.getPrivileges() );
-        Assert.assertEquals( resource.getRoles(), responseResource.getRoles() );
-
-        SecurityConfigUtil.verifyRole( resource );
-
-        response = this.messageUtil.sendMessage( Method.GET, resource );
-
-        if ( !response.getStatus().isSuccess() )
-        {
-            Assert.fail( "Could not GET Role: " + response.getStatus() );
-        }
-
-        // get the Resource object
-        responseResource = this.messageUtil.getResourceFromResponse( response );
+        RoleResource responseResource = this.messageUtil.getRole( resource.getId() );
 
         Assert.assertEquals( resource.getId(), responseResource.getId() );
         Assert.assertEquals( resource.getDescription(), responseResource.getDescription() );
@@ -171,38 +109,18 @@ public class Nexus156RolesCrudJsonTests
         resource.addPrivilege( "5" );
         resource.addPrivilege( "4" );
 
-        Response response = this.messageUtil.sendMessage( Method.POST, resource );
-
-        if ( !response.getStatus().isSuccess() )
-        {
-            Assert.fail( "Could not create Role: " + response.getStatus() );
-        }
-
-        // get the Resource object
-        RoleResource responseResource = this.messageUtil.getResourceFromResponse( response );
-
-        // make sure the id != null
-        Assert.assertNotNull( responseResource.getId() );
-
-        resource.setId( responseResource.getId() );
-
-        Assert.assertEquals( resource.getDescription(), responseResource.getDescription() );
-        Assert.assertEquals( resource.getName(), responseResource.getName() );
-        Assert.assertEquals( resource.getSessionTimeout(), responseResource.getSessionTimeout() );
-        Assert.assertEquals( resource.getPrivileges(), responseResource.getPrivileges() );
-        Assert.assertEquals( resource.getRoles(), responseResource.getRoles() );
-
-        SecurityConfigUtil.verifyRole( resource );
-
+        RoleResource responseResource = this.messageUtil.createRole( resource );
+        
         // update the Role
         // TODO: add tests that changes the Id
+        resource.setId( responseResource.getId() );
         resource.setName( "UpdateRole Again" );
         resource.setDescription( "Update Test Role Again" );
         resource.getPrivileges().clear(); // clear the privs
         resource.addPrivilege( "6" );
         resource.setSessionTimeout( 10 );
 
-        response = this.messageUtil.sendMessage( Method.PUT, resource );
+        Response response = this.messageUtil.sendMessage( Method.PUT, resource );
 
         if ( !response.getStatus().isSuccess() )
         {
@@ -235,21 +153,10 @@ public class Nexus156RolesCrudJsonTests
         resource.addPrivilege( "7" );
         resource.addPrivilege( "8" );
 
-        Response response = this.messageUtil.sendMessage( Method.POST, resource );
-
-        if ( !response.getStatus().isSuccess() )
-        {
-            Assert.fail( "Could not create Role: " + response.getStatus() );
-        }
-
-        // get the Resource object
-        RoleResource responseResource = this.messageUtil.getResourceFromResponse( response );
-
-        // make sure it was added
-        SecurityConfigUtil.verifyRole( responseResource );
+        RoleResource responseResource = this.messageUtil.createRole( resource );
 
         // use the new ID
-        response = this.messageUtil.sendMessage( Method.DELETE, responseResource );
+        Response response = this.messageUtil.sendMessage( Method.DELETE, responseResource );
 
         if ( !response.getStatus().isSuccess() )
         {

@@ -21,7 +21,6 @@
         <role>anonymous</role>
       </roles>
     </user>
-    
     <user>
       <userId>test-user</userId>
       <name>Test User</name>
@@ -29,10 +28,40 @@
       <status>active</status>
       <email>nexus-dev2@sonatype.org</email>
       <roles>
-        <role>anonymous</role>
+        <role>role1</role>
       </roles>
     </user>
-    
+    <user>
+      <userId>all-but-deploy</userId>
+      <name>all-but-deploy</name>
+      <password>f865b53623b121fd34ee5426c792e5c33af8c227</password>
+      <status>active</status>
+      <email>all-but@email.foo</email>
+      <roles>
+        <role>all-but-deploy</role>
+      </roles>
+    </user>
+    <user>
+      <userId>just-deploy</userId>
+      <name>just-deploy</name>
+      <password>f865b53623b121fd34ee5426c792e5c33af8c227</password>
+      <status>active</status>
+      <email>just-deploy@email.foo</email>
+      <roles>
+        <role>just-deploy</role>
+      </roles>
+    </user>
+    <user>
+      <userId>foo</userId>
+      <name>foo</name>
+      <password>d5bca8e8c374d1fa947323249e9e107305642d10</password>
+      <status>expired</status>
+      <email>foo@nexus-test.org</email>
+      <roles>
+        <role>role1</role>
+        <role>role1</role>
+      </roles>
+    </user>
   </users>
   <roles>
     <role>
@@ -43,6 +72,25 @@
       <privileges>
         <privilege>1000</privilege>
       </privileges>
+    </role>
+    <role>
+      <id>deployment</id>
+      <name>Nexus Deployment Role</name>
+      <description>Deployment role for Nexus</description>
+      <sessionTimeout>60</sessionTimeout>
+      <privileges>
+        <privilege>T1</privilege>
+        <privilege>T2</privilege>
+        <privilege>T3</privilege>
+        <privilege>T4</privilege>
+        <privilege>T5</privilege>
+        <privilege>T6</privilege>
+        <privilege>T7</privilege>
+        <privilege>T8</privilege>
+      </privileges>
+      <roles>
+        <role>anonymous</role>
+      </roles>
     </role>
     <role>
       <id>anonymous</id>
@@ -67,34 +115,123 @@
         <privilege>T2</privilege>
       </privileges>
     </role>
-		<role>
-			<id>role1</id>
-			<name>RoleOne</name>
-			<description>Role One</description>
-			<sessionTimeout>60</sessionTimeout>
-			<privileges>
-				<privilege>1</privilege>
-				<privilege>2</privilege>
-			</privileges>
-		</role>
-		<role>
-			<id>role2</id>
-			<name>RoleTwo</name>
-			<description>Role Two</description>
-			<sessionTimeout>60</sessionTimeout>
-			<privileges>
-				<privilege>3</privilege>
-				<privilege>4</privilege>
-			</privileges>
-		</role>
-	</roles>
+    <role>
+      <id>role1</id>
+      <name>RoleOne</name>
+      <description>Role One</description>
+      <sessionTimeout>60</sessionTimeout>
+      <privileges>
+        <privilege>1</privilege>
+        <privilege>2</privilege>
+      </privileges>
+    </role>
+    <role>
+      <id>role2</id>
+      <name>RoleTwo</name>
+      <description>Role Two</description>
+      <sessionTimeout>60</sessionTimeout>
+      <privileges>
+        <privilege>3</privilege>
+        <privilege>4</privilege>
+      </privileges>
+    </role>
+    <role>
+      <id>all-but-deploy</id>
+      <name>all-but-deploy</name>
+      <sessionTimeout>60</sessionTimeout>
+      <privileges>
+        <privilege>54</privilege>
+        <privilege>20</privilege>
+        <privilege>52</privilege>
+        <privilege>2</privilege>
+        <privilege>21</privilege>
+        <privilege>43</privilege>
+        <privilege>44</privilege>
+        <privilege>18</privilege>
+        <privilege>17</privilege>
+        <privilege>53</privilege>
+        <privilege>19</privilege>
+        <privilege>42</privilege>
+        <privilege>30</privilege>
+        <privilege>33</privilege>
+        <privilege>31</privilege>
+        <privilege>32</privilege>
+        <privilege>T2</privilege>
+        <privilege>T1</privilege>
+        <privilege>47</privilege>
+        <privilege>45</privilege>
+        <privilege>5</privilege>
+        <privilege>8</privilege>
+        <privilege>6</privilege>
+        <privilege>7</privilege>
+        <privilege>56</privilege>
+        <privilege>13</privilege>
+        <privilege>16</privilege>
+        <privilege>14</privilege>
+        <privilege>15</privilege>
+        <privilege>22</privilege>
+        <privilege>25</privilege>
+        <privilege>23</privilege>
+        <privilege>24</privilege>
+        <privilege>55</privilege>
+        <privilege>48</privilege>
+        <privilege>46</privilege>
+        <privilege>9</privilege>
+        <privilege>12</privilege>
+        <privilege>10</privilege>
+        <privilege>11</privilege>
+        <privilege>34</privilege>
+        <privilege>37</privilege>
+        <privilege>35</privilege>
+        <privilege>36</privilege>
+        <privilege>26</privilege>
+        <privilege>29</privilege>
+        <privilege>27</privilege>
+        <privilege>28</privilege>
+        <privilege>3</privilege>
+        <privilege>4</privilege>
+        <privilege>1</privilege>
+        <privilege>49</privilege>
+        <privilege>64</privilege>
+        <privilege>57</privilege>
+        <privilege>58</privilege>
+        <privilege>59</privilege>
+        <privilege>38</privilege>
+        <privilege>41</privilege>
+        <privilege>39</privilege>
+        <privilege>40</privilege>
+        <privilege>51</privilege>
+        <privilege>50</privilege>
+      </privileges>
+    </role>
+    <role>
+      <id>just-deploy</id>
+      <name>just-deploy</name>
+      <sessionTimeout>60</sessionTimeout>
+      <privileges>
+        <!-- <privilege>T0</privilege> -->
+        
+        <privilege>T1</privilege>
+        <privilege>T2</privilege>
+        <privilege>T3</privilege>
+        <privilege>T4</privilege>
+        <privilege>T5</privilege>
+        <privilege>T6</privilege>
+        <privilege>T7</privilege>
+        <privilege>T8</privilege>
+        
+      </privileges>
+    </role>
+  </roles>
   <repositoryTargetPrivileges>
+  
+  
     <repositoryTargetPrivilege>
       <repositoryTargetId>1</repositoryTargetId>
       <repositoryId></repositoryId>
       <groupId></groupId>
       <id>T1</id>
-      <name>Read All M2 Repositories - (read)</name>
+      <name>All M2 Repositories - (read)</name>
       <method>read</method>
     </repositoryTargetPrivilege>
     <repositoryTargetPrivilege>
@@ -102,8 +239,56 @@
       <repositoryId></repositoryId>
       <groupId></groupId>
       <id>T2</id>
-      <name>Read All M1 Repositories - (read)</name>
+      <name>All M1 Repositories - (read)</name>
       <method>read</method>
+    </repositoryTargetPrivilege>
+    <repositoryTargetPrivilege>
+      <repositoryTargetId>1</repositoryTargetId>
+      <repositoryId></repositoryId>
+      <groupId></groupId>
+      <id>T3</id>
+      <name>All M2 Repositories - (update)</name>
+      <method>update</method>
+    </repositoryTargetPrivilege>
+    <repositoryTargetPrivilege>
+      <repositoryTargetId>2</repositoryTargetId>
+      <repositoryId></repositoryId>
+      <groupId></groupId>
+      <id>T4</id>
+      <name>All M1 Repositories - (update)</name>
+      <method>update</method>
+    </repositoryTargetPrivilege>
+    <repositoryTargetPrivilege>
+      <repositoryTargetId>1</repositoryTargetId>
+      <repositoryId></repositoryId>
+      <groupId></groupId>
+      <id>T5</id>
+      <name>All M2 Repositories - (create)</name>
+      <method>create</method>
+    </repositoryTargetPrivilege>
+    <repositoryTargetPrivilege>
+      <repositoryTargetId>2</repositoryTargetId>
+      <repositoryId></repositoryId>
+      <groupId></groupId>
+      <id>T6</id>
+      <name>All M1 Repositories - (create)</name>
+      <method>create</method>
+    </repositoryTargetPrivilege>
+    <repositoryTargetPrivilege>
+      <repositoryTargetId>1</repositoryTargetId>
+      <repositoryId></repositoryId>
+      <groupId></groupId>
+      <id>T7</id>
+      <name>All M2 Repositories - (delete)</name>
+      <method>delete</method>
+    </repositoryTargetPrivilege>
+    <repositoryTargetPrivilege>
+      <repositoryTargetId>2</repositoryTargetId>
+      <repositoryId></repositoryId>
+      <groupId></groupId>
+      <id>T8</id>
+      <name>All M1 Repositories - (delete)</name>
+      <method>delete</method>
     </repositoryTargetPrivilege>
   </repositoryTargetPrivileges>
   <applicationPrivileges>

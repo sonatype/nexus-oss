@@ -96,6 +96,34 @@
         <pattern>.*test.*</pattern>
       </patterns>
     </repositoryTarget>
+    
+    <repositoryTarget>
+      <id>allRepos</id>
+      <name>All M2 Repositories</name>
+      <contentClass>maven2</contentClass>
+      <patterns>
+        <pattern>.*</pattern>
+      </patterns>
+    </repositoryTarget>
+    
+    <repositoryTarget>
+      <id>1</id>
+      <name>All (Maven2)</name>
+      <contentClass>maven2</contentClass>
+      <patterns>
+        <pattern>.*</pattern>
+      </patterns>
+    </repositoryTarget>
+    <repositoryTarget>
+      <id>2</id>
+      <name>All (Maven1)</name>
+      <contentClass>maven1</contentClass>
+      <patterns>
+        <pattern>.*</pattern>
+      </patterns>
+    </repositoryTarget>
+    
+    
   </repositoryTargets>
   
 </nexusConfiguration>

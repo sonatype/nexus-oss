@@ -2,6 +2,7 @@ package org.sonatype.nexus.integrationtests.proxy.nexus179;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.Date;
 
 import junit.framework.Assert;
@@ -13,6 +14,8 @@ import org.restlet.data.Protocol;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.sonatype.nexus.artifact.Gav;
+import org.sonatype.nexus.integrationtests.RequestFacade;
+import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.integrationtests.proxy.AbstractNexusProxyIntegrationTest;
 import org.sonatype.nexus.test.utils.FileTestingUtils;
 
@@ -77,21 +80,12 @@ public class Nexus179RemoteRepoDownTest
         Assert.assertTrue( FileTestingUtils.compareFileSHA1s( artifact, localFile ) );
     }
 
-    private void clearProxyCache()
+    private void clearProxyCache() throws IOException
     {
 
-        String serviceURI =
-            this.getBaseNexusUrl() + "service/local/data_cache/repositories/" + TEST_RELEASE_REPO + "/content";
+        String serviceURI = "service/local/data_cache/repositories/" + TEST_RELEASE_REPO + "/content";
 
-        Request request = new Request();
-
-        request.setResourceRef( serviceURI );
-
-        request.setMethod( Method.DELETE );
-
-        Client client = new Client( Protocol.HTTP );
-
-        Response response = client.handle( request );
+        Response response = RequestFacade.sendMessage( serviceURI, Method.DELETE );
 
         if ( !response.getStatus().isSuccess() )
         {

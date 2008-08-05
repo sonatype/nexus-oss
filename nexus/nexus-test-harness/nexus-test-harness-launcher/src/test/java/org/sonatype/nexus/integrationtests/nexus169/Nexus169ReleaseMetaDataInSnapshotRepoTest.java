@@ -1,5 +1,7 @@
 package org.sonatype.nexus.integrationtests.nexus169;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -93,12 +95,14 @@ public class Nexus169ReleaseMetaDataInSnapshotRepoTest
         // check the versions of the file
         MetadataXpp3Reader r = new MetadataXpp3Reader();
 
-        InputStream is = snapshotRepoMetaDataURL.openStream();
+        File snapShotMetaDataFile = this.downloadFile( snapshotRepoMetaDataURL, "./target/downloads/snapshotMetaData.xml" );
+        
+        InputStream is = new FileInputStream(snapShotMetaDataFile);
         Metadata snapshotRepoMetaData = r.read( is );
         is.close();
 
-        // TODO: we don't need to do the next 3 lines if line 86 works out
-        is = groupMetaDataURL.openStream();
+        File groupMetaDataFile = this.downloadFile( snapshotRepoMetaDataURL, "./target/downloads/groupMetaData.xml" );
+        is = new FileInputStream(groupMetaDataFile);
         Metadata groupMetaData = r.read( is );
         is.close();
 

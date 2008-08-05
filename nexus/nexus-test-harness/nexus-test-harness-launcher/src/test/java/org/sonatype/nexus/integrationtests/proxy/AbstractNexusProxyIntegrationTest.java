@@ -1,6 +1,7 @@
 package org.sonatype.nexus.integrationtests.proxy;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ResourceBundle;
 
 import junit.framework.Assert;
@@ -13,9 +14,11 @@ import org.restlet.data.Method;
 import org.restlet.data.Protocol;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
+import org.restlet.resource.StringRepresentation;
 import org.sonatype.jettytestsuite.ServletServer;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
+import org.sonatype.nexus.integrationtests.RequestFacade;
 
 public abstract class AbstractNexusProxyIntegrationTest
     extends AbstractNexusIntegrationTest
@@ -74,16 +77,10 @@ public abstract class AbstractNexusProxyIntegrationTest
 
     // TODO: Refactor this into the AbstractNexusIntegrationTest or some util class, to make more generic
 
-    public void setBlockProxy( String nexusBaseUrl, String repoId, boolean block )
+    public void setBlockProxy( String nexusBaseUrl, String repoId, boolean block ) throws IOException
     {
 
-        String serviceURI = nexusBaseUrl + "service/local/repositories/" + repoId + "/status?undefined";
-
-        Request request = new Request();
-
-        request.setResourceRef( serviceURI );
-
-        request.setMethod( Method.PUT );
+        String serviceURI = "service/local/repositories/" + repoId + "/status?undefined";
 
         // unblock string
         String blockOrNotCommand = "\"unavailable\",\"proxyMode\":\"allow\"";
@@ -93,13 +90,13 @@ public abstract class AbstractNexusProxyIntegrationTest
             blockOrNotCommand = "\"available\",\"proxyMode\":\"blockedManual\"";
         }
 
-        request.setEntity( "{\"data\":{\"id\":\"" + repoId
-            + "\",\"repoType\":\"proxy\",\"localStatus\":\"inService\",\"remoteStatus\":" + blockOrNotCommand + "}}",
-                           MediaType.APPLICATION_JSON );
+        StringRepresentation representation = new StringRepresentation("{\"data\":{\"id\":\"" + repoId
+                                 + "\",\"repoType\":\"proxy\",\"localStatus\":\"inService\",\"remoteStatus\":" + blockOrNotCommand + "}}",
+                                 MediaType.APPLICATION_JSON);
 
-        Client client = new Client( Protocol.HTTP );
 
-        Response response = client.handle( request );
+        
+        Response response = RequestFacade.sendMessage( serviceURI, Method.PUT, representation );
 
         if ( !response.getStatus().isSuccess() )
         {
@@ -108,26 +105,18 @@ public abstract class AbstractNexusProxyIntegrationTest
         }
     }
 
-    public void setOutOfServiceProxy( String nexusBaseUrl, String repoId, boolean outOfService )
+    public void setOutOfServiceProxy( String nexusBaseUrl, String repoId, boolean outOfService ) throws IOException
     {
 
-        String serviceURI = nexusBaseUrl + "service/local/repositories/" + repoId + "/status?undefined";
-
-        Request request = new Request();
-
-        request.setResourceRef( serviceURI );
-
-        request.setMethod( Method.PUT );
-
+        String serviceURI = "service/local/repositories/" + repoId + "/status?undefined";
+        
         // unblock string
         String servicePart = outOfService ? "outOfService" : "inService";
 
-        request.setEntity( "{\"data\":{\"id\":\"" + repoId + "\",\"repoType\":\"proxy\",\"localStatus\":\""
+        StringRepresentation representation = new StringRepresentation("{\"data\":{\"id\":\"" + repoId + "\",\"repoType\":\"proxy\",\"localStatus\":\""
             + servicePart + "\"}}", MediaType.APPLICATION_JSON );
-
-        Client client = new Client( Protocol.HTTP );
-
-        Response response = client.handle( request );
+        
+        Response response = RequestFacade.sendMessage( serviceURI, Method.PUT, representation );
 
         if ( !response.getStatus().isSuccess() )
         {

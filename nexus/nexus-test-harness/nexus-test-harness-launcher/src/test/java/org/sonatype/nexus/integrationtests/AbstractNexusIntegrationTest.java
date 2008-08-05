@@ -584,26 +584,18 @@ public class AbstractNexusIntegrationTest
         // return downloadedFile;
     }
 
-    protected void deleteFromRepository( String groupOrArtifactPath )
+    protected void deleteFromRepository( String groupOrArtifactPath ) throws IOException
     {
         this.deleteFromRepository( this.testRepositoryId, groupOrArtifactPath );
     }
 
-    protected void deleteFromRepository( String repository, String groupOrArtifactPath )
+    protected void deleteFromRepository( String repository, String groupOrArtifactPath ) throws IOException
     {
-        String serviceURI =
-            this.getBaseNexusUrl() + "service/local/repositories/" + repository + "/content/" + groupOrArtifactPath;
+        String serviceURI = "service/local/repositories/" + repository + "/content/" + groupOrArtifactPath;
 
         System.out.println( "deleting: " + serviceURI );
 
-        Request request = new Request();
-
-        request.setResourceRef( serviceURI );
-        request.setMethod( Method.DELETE );
-
-        Client client = new Client( Protocol.HTTP );
-
-        Response response = client.handle( request );
+        Response response = RequestFacade.sendMessage( serviceURI, Method.DELETE );
 
         if ( !response.getStatus().isSuccess() )
         {

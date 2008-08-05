@@ -72,6 +72,7 @@ public class RequestFacade
 
         Client client = new Client( Protocol.HTTP );
 
+        System.out.println( "sendMessage: "+ url );
         return client.handle( request );
     }
 

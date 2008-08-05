@@ -17,7 +17,7 @@ public class Nexus133TargetCrudXmlTests
     {
         this.messageUtil =
             new TargetMessageUtil( XStreamInitializer.initialize( new XStream() ),
-                                 MediaType.APPLICATION_XML, this.getBaseNexusUrl() );
+                                 MediaType.APPLICATION_XML );
     }
     
     

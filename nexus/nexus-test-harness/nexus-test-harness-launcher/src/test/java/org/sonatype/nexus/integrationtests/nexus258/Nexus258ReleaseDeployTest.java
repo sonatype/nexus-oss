@@ -66,7 +66,7 @@ public class Nexus258ReleaseDeployTest
     
     
     @Test
-    public void deploywithPomUsingRest()
+    public void deployWithPomUsingRest()
         throws HttpException, IOException
     {
 

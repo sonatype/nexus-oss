@@ -18,6 +18,7 @@ import org.sonatype.nexus.rest.model.PrivilegeBaseStatusResource;
 import org.sonatype.nexus.rest.model.PrivilegeListResourceResponse;
 import org.sonatype.nexus.rest.model.PrivilegeResourceRequest;
 import org.sonatype.nexus.rest.model.PrivilegeStatusResourceResponse;
+import org.sonatype.nexus.rest.model.PrivilegeTargetStatusResource;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
 
 import com.thoughtworks.xstream.XStream;
@@ -29,16 +30,24 @@ public class PrivilegesMessageUtil
 
     private MediaType mediaType;
 
-    private String baseNexusUrl;
 
-    public PrivilegesMessageUtil( XStream xstream, MediaType mediaType, String baseNexusUrl )
+    public PrivilegesMessageUtil( XStream xstream, MediaType mediaType )
     {
         super();
         this.xstream = xstream;
         this.mediaType = mediaType;
-        this.baseNexusUrl = baseNexusUrl;
     }
 
+    public PrivilegeBaseStatusResource getPrivilegeResource( String id ) throws IOException
+    {
+        Response response = this.sendMessage( Method.GET, null, id );
+        if ( !response.getStatus().isSuccess() )
+        {
+            Assert.fail( "Could not get Privilege: " + response.getStatus() +"\n" + response.getEntity().getText());
+        }
+        return this.getResourceFromResponse( response );
+    }
+    
     public Response sendMessage( Method method, PrivilegeBaseResource resource ) throws IOException
     {
         return this.sendMessage( method, resource, "" );

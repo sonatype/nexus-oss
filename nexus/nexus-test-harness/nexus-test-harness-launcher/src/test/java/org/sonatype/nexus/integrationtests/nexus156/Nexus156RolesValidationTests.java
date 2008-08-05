@@ -11,6 +11,7 @@ import org.restlet.data.Response;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.rest.model.RoleResource;
 import org.sonatype.nexus.rest.xstream.XStreamInitializer;
+import org.sonatype.nexus.test.utils.RoleMessageUtil;
 import org.sonatype.nexus.test.utils.SecurityConfigUtil;
 import org.sonatype.plexus.rest.xstream.json.JsonOrgHierarchicalStreamDriver;
 
@@ -25,7 +26,7 @@ public class Nexus156RolesValidationTests extends AbstractNexusIntegrationTest
     {
         this.messageUtil =
             new RoleMessageUtil( XStreamInitializer.initialize( new XStream( new JsonOrgHierarchicalStreamDriver() ) ),
-                                 MediaType.APPLICATION_JSON, this.getBaseNexusUrl() );
+                                 MediaType.APPLICATION_JSON );
     }
 
     @Test

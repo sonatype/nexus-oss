@@ -76,6 +76,16 @@ public class DeployUtils
                 new FilePart( pomFile.getName(), pomFile ), new FilePart( fileToDeploy.getName(), fileToDeploy ), };
 
         filePost.setRequestEntity( new MultipartRequestEntity( parts, filePost.getParams() ) );
+        
+        
+        System.out.println( "URL:  "+ restServiceURL );
+        System.out.println( "Method: Post" );
+        System.out.println( "params: " );
+        System.out.println( "\tr: "+ repositoryId );
+        System.out.println( "\thasPom: true" );
+        System.out.println( "\tpom: "+ pomFile );
+        System.out.println( "\tfileToDeploy: "+ fileToDeploy );
+        
         return RequestFacade.executeHTTPClientMethod( new URL( restServiceURL ), filePost );
     }
 

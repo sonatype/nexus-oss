@@ -39,14 +39,11 @@ public class TargetMessageUtil
 
     private MediaType mediaType;
 
-    private String baseNexusUrl;
-
-    public TargetMessageUtil( XStream xstream, MediaType mediaType, String baseNexusUrl )
+    public TargetMessageUtil( XStream xstream, MediaType mediaType )
     {
         super();
         this.xstream = xstream;
         this.mediaType = mediaType;
-        this.baseNexusUrl = baseNexusUrl;
     }
 
     public Response sendMessage( Method method, RepositoryTargetResource resource ) throws IOException
