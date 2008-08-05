@@ -26,7 +26,10 @@ import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.restlet.Context;
 import org.restlet.Restlet;
+import org.restlet.Route;
 import org.restlet.Router;
+import org.restlet.resource.Resource;
+import org.restlet.util.Template;
 import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.NexusStartedEvent;
 import org.sonatype.nexus.NexusStoppingEvent;
@@ -248,7 +251,7 @@ public class ApplicationBridge
         NexusInstanceFilter nif = new NexusInstanceFilter( getContext() );
 
         // attaching filter to a root on given URI
-        root.attach( "/{" + NexusInstanceFilter.NEXUS_INSTANCE_KEY + "}", nif );
+        attach( root, false, "/{" + NexusInstanceFilter.NEXUS_INSTANCE_KEY + "}", nif );
 
         // creating _another_ router, that will be next isntance called after filtering
         Router router = new Router( getContext() );
@@ -259,9 +262,9 @@ public class ApplicationBridge
         // -----
         // a little digression here. if !isStarted, we are shutting down everything except /status and /status/command
 
-        router.attach( "/status", StatusResourceHandler.class );
+        attach( router, true, "/status", StatusResourceHandler.class );
 
-        router.attach( "/status/command", CommandResourceHandler.class );
+        attach( router, true, "/status/command", CommandResourceHandler.class );
 
         if ( !isStarted )
         {
@@ -273,146 +276,197 @@ public class ApplicationBridge
         // and protectedResources for protected ones
 
         // attaching the restlets to scond router
-        router.attach( "/feeds", FeedsListResourceHandler.class );
+        attach( router, true, "/feeds", FeedsListResourceHandler.class );
 
-        router.attach( "/feeds/{" + FeedResourceHandler.FEED_KEY + "}", FeedResourceHandler.class );
+        attach( router, true, "/feeds/{" + FeedResourceHandler.FEED_KEY + "}", FeedResourceHandler.class );
 
-        router.attach( "/authentication/login", LoginResourceHandler.class );
+        attach( router, true, "/authentication/login", LoginResourceHandler.class );
 
-        router.attach( "/authentication/logout", LogoutResourceHandler.class );
+        attach( router, true, "/authentication/logout", LogoutResourceHandler.class );
 
-        router.attach( "/identify/{" + IdentifyHashResourceHandler.ALGORITHM_KEY + "}/{"
+        attach( router, true, "/identify/{" + IdentifyHashResourceHandler.ALGORITHM_KEY + "}/{"
             + IdentifyHashResourceHandler.HASH_KEY + "}", IdentifyHashResourceHandler.class );
 
-        router.attach( "/artifact/maven", ArtifactResourceHandler.class );
+        attach( router, true, "/artifact/maven", ArtifactResourceHandler.class );
 
-        router.attach( "/artifact/maven/content", ArtifactResourceContentHandler.class );
+        attach( router, true, "/artifact/maven/content", ArtifactResourceContentHandler.class );
 
         // protected resources
 
-        router.attach( "/data_index", IndexResourceHandler.class );
+        attach( router, true, "/data_index", IndexResourceHandler.class );
 
-        router.attach(
-            "/data_index/{" + IndexResourceHandler.DOMAIN + "}/{" + IndexResourceHandler.TARGET_ID + "}",
-            IndexResourceHandler.class );
+        attach( router, true, "/data_index/{" + IndexResourceHandler.DOMAIN + "}/{" + IndexResourceHandler.TARGET_ID
+            + "}", IndexResourceHandler.class );
 
-        router.attach( "/data_index/{" + IndexResourceHandler.DOMAIN + "}/{" + IndexResourceHandler.TARGET_ID
+        attach( router, false, "/data_index/{" + IndexResourceHandler.DOMAIN + "}/{" + IndexResourceHandler.TARGET_ID
             + "}/content", IndexResourceHandler.class );
 
-        router.attach( "/wastebasket", WastebasketResourceHandler.class );
+        attach( router, false, "/data_cache/{" + CacheResourceHandler.DOMAIN + "}/{" + CacheResourceHandler.TARGET_ID
+            + "}/content", CacheResourceHandler.class );
 
-        router.attach( "/attributes", AttributesResourceHandler.class );
+        attach( router, true, "/wastebasket", WastebasketResourceHandler.class );
 
-        router.attach( "/attributes/{" + AttributesResourceHandler.DOMAIN + "}/{" + AttributesResourceHandler.TARGET_ID
-            + "}", AttributesResourceHandler.class );
+        attach( router, true, "/attributes", AttributesResourceHandler.class );
 
-        router.attach( "/attributes/{" + AttributesResourceHandler.DOMAIN + "}/{" + AttributesResourceHandler.TARGET_ID
-            + "}/content", AttributesResourceHandler.class );
+        attach( router, true, "/attributes/{" + AttributesResourceHandler.DOMAIN + "}/{"
+            + AttributesResourceHandler.TARGET_ID + "}", AttributesResourceHandler.class );
 
-        router.attach( "/repository_statuses", RepositoryStatusesListResourceHandler.class );
+        attach( router, false, "/attributes/{" + AttributesResourceHandler.DOMAIN + "}/{"
+            + AttributesResourceHandler.TARGET_ID + "}/content", AttributesResourceHandler.class );
 
-        router.attach(
-            "/repositories/{" + RepositoryResourceHandler.REPOSITORY_ID_KEY + "}/content",
-            RepositoryContentResourceHandler.class );
+        attach( router, true, "/repository_statuses", RepositoryStatusesListResourceHandler.class );
 
-        router.attach(
-            "/repo_groups/{" + RepositoryGroupResourceHandler.GROUP_ID_KEY + "}/content",
-            RepositoryGroupContentResourceHandler.class );
+        attach( router, true, "/repositories", RepositoryListResourceHandler.class );
 
-        router.attach( "/logs", LogsListResourceHandler.class );
-
-        router.attach( "/logs/{" + LogsResourceHandler.FILE_NAME_KEY + "}", LogsResourceHandler.class );
-
-        router.attach( "/configs", ConfigurationsListResourceHandler.class );
-
-        router.attach(
-            "/configs/{" + GlobalConfigurationResourceHandler.CONFIG_NAME_KEY + "}",
-            ConfigurationsResourceHandler.class );
-
-        router.attach( "/global_settings", GlobalConfigurationListResourceHandler.class );
-
-        router.attach(
-            "/global_settings/{" + GlobalConfigurationResourceHandler.CONFIG_NAME_KEY + "}",
-            GlobalConfigurationResourceHandler.class );
-
-        router.attach( "/repositories", RepositoryListResourceHandler.class );
-
-        router.attach(
+        attach(
+            router,
+            true,
             "/repositories/{" + RepositoryResourceHandler.REPOSITORY_ID_KEY + "}",
             RepositoryResourceHandler.class );
 
-        router.attach(
+        attach(
+            router,
+            true,
             "/repositories/{" + RepositoryResourceHandler.REPOSITORY_ID_KEY + "}/status",
             RepositoryStatusResourceHandler.class );
 
-        router.attach(
+        attach(
+            router,
+            true,
             "/repositories/{" + RepositoryResourceHandler.REPOSITORY_ID_KEY + "}/meta",
             RepositoryMetaResourceHandler.class );
 
-        router.attach( "/repo_groups", RepositoryGroupListResourceHandler.class );
+        attach(
+            router,
+            false,
+            "/repositories/{" + RepositoryResourceHandler.REPOSITORY_ID_KEY + "}/content",
+            RepositoryContentResourceHandler.class );
 
-        router.attach(
+        attach( router, true, "/repo_groups", RepositoryGroupListResourceHandler.class );
+
+        attach(
+            router,
+            true,
             "/repo_groups/{" + RepositoryGroupResourceHandler.GROUP_ID_KEY + "}",
             RepositoryGroupResourceHandler.class );
 
-        router.attach( "/repo_routes", RepositoryRouteListResourceHandler.class );
+        attach(
+            router,
+            false,
+            "/repo_groups/{" + RepositoryGroupResourceHandler.GROUP_ID_KEY + "}/content",
+            RepositoryGroupContentResourceHandler.class );
 
-        router.attach(
+        attach( router, true, "/logs", LogsListResourceHandler.class );
+
+        attach( router, true, "/logs/{" + LogsResourceHandler.FILE_NAME_KEY + "}", LogsResourceHandler.class );
+
+        attach( router, true, "/configs", ConfigurationsListResourceHandler.class );
+
+        attach(
+            router,
+            true,
+            "/configs/{" + GlobalConfigurationResourceHandler.CONFIG_NAME_KEY + "}",
+            ConfigurationsResourceHandler.class );
+
+        attach( router, true, "/global_settings", GlobalConfigurationListResourceHandler.class );
+
+        attach(
+            router,
+            true,
+            "/global_settings/{" + GlobalConfigurationResourceHandler.CONFIG_NAME_KEY + "}",
+            GlobalConfigurationResourceHandler.class );
+
+        attach( router, true, "/repo_routes", RepositoryRouteListResourceHandler.class );
+
+        attach(
+            router,
+            true,
             "/repo_routes/{" + RepositoryRouteResourceHandler.ROUTE_ID_KEY + "}",
             RepositoryRouteResourceHandler.class );
 
-        router.attach( "/templates/repositories", RepositoryTemplateListResourceHandler.class );
+        attach( router, true, "/templates/repositories", RepositoryTemplateListResourceHandler.class );
 
-        router.attach(
+        attach(
+            router,
+            true,
             "/templates/repositories/{" + RepositoryTemplateResourceHandler.REPOSITORY_ID_KEY + "}",
             RepositoryTemplateResourceHandler.class );
 
-        router.attach( "/data_cache/{" + CacheResourceHandler.DOMAIN + "}/{" + CacheResourceHandler.TARGET_ID
-            + "}/content", CacheResourceHandler.class );
+        attach( router, true, "/schedules", ScheduledServiceListResourceHandler.class );
 
-        router.attach( "/schedules", ScheduledServiceListResourceHandler.class );
+        attach( router, true, "/schedules/types", ScheduledServiceTypeResourceHandler.class );
 
-        router.attach( "/schedules/types", ScheduledServiceTypeResourceHandler.class );
-
-        router.attach(
+        attach(
+            router,
+            true,
             "/schedules/run/{" + ScheduledServiceRunResourceHandler.SCHEDULED_SERVICE_ID_KEY + "}",
             ScheduledServiceRunResourceHandler.class );
 
-        router.attach(
+        attach(
+            router,
+            true,
             "/schedules/{" + ScheduledServiceResourceHandler.SCHEDULED_SERVICE_ID_KEY + "}",
             ScheduledServiceResourceHandler.class );
 
-        router.attach( "/users", UserListResourceHandler.class );
+        attach( router, true, "/users", UserListResourceHandler.class );
 
-        router.attach( "/users/{" + UserResourceHandler.USER_ID_KEY + "}", UserResourceHandler.class );
+        attach( router, true, "/users/{" + UserResourceHandler.USER_ID_KEY + "}", UserResourceHandler.class );
 
-        router.attach( "/users/reset/{" + UserResourceHandler.USER_ID_KEY + "}", UserResetResourceHandler.class );
-        
-        router.attach( "/users/forgotid/{" + UserResourceHandler.USER_EMAIL_KEY + "}", UserForgotIdResourceHandler.class );
-        
-        router.attach( "/users/forgotpw/", UserForgotPasswordResourceHandler.class );
-        
-        router.attach( "/users/changepw/", UserChangePasswordResourceHandler.class );
+        attach( router, true, "/users_reset/{" + UserResourceHandler.USER_ID_KEY + "}", UserResetResourceHandler.class );
 
-        router.attach( "/roles", RoleListResourceHandler.class );
+        attach(
+            router,
+            true,
+            "/users_forgotid/{" + UserResourceHandler.USER_EMAIL_KEY + "}",
+            UserForgotIdResourceHandler.class );
 
-        router.attach( "/roles/{" + RoleResourceHandler.ROLE_ID_KEY + "}", RoleResourceHandler.class );
+        attach( router, true, "/users_forgotpw", UserForgotPasswordResourceHandler.class );
 
-        router.attach( "/privileges", PrivilegeListResourceHandler.class );
+        attach( router, true, "/users_changepw", UserChangePasswordResourceHandler.class );
 
-        router.attach(
+        attach( router, true, "/roles", RoleListResourceHandler.class );
+
+        attach( router, true, "/roles/{" + RoleResourceHandler.ROLE_ID_KEY + "}", RoleResourceHandler.class );
+
+        attach( router, true, "/privileges", PrivilegeListResourceHandler.class );
+
+        attach(
+            router,
+            true,
             "/privileges/{" + PrivilegeResourceHandler.PRIVILEGE_ID_KEY + "}",
             PrivilegeResourceHandler.class );
 
-        router.attach( "/repo_content_classes", ContentClassesListResourceHandler.class );
+        attach( router, true, "/repo_targets", RepositoryTargetListResourceHandler.class );
 
-        router.attach( "/repo_targets", RepositoryTargetListResourceHandler.class );
-
-        router.attach(
+        attach(
+            router,
+            true,
             "/repo_targets/{" + RepositoryTargetResourceHandler.REPO_TARGET_ID_KEY + "}",
             RepositoryTargetResourceHandler.class );
 
+        attach( router, true, "/repo_content_classes", ContentClassesListResourceHandler.class );
+
         // returning root
         return root;
+    }
+
+    protected void attach( Router router, boolean strict, String uriPattern, Class<? extends Resource> targetClass )
+    {
+        Route route = router.attach( uriPattern, targetClass );
+
+        if ( strict )
+        {
+            route.getTemplate().setMatchingMode( Template.MODE_EQUALS );
+        }
+    }
+
+    protected void attach( Router router, boolean strict, String uriPattern, Restlet target )
+    {
+        Route route = router.attach( uriPattern, target );
+
+        if ( strict )
+        {
+            route.getTemplate().setMatchingMode( Template.MODE_EQUALS );
+        }
     }
 }
