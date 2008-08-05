@@ -85,12 +85,16 @@ Sonatype.repoServer.SearchPanel = function(config){
   
   this.filenameLabel = null;
   
-  this.searchToolbar = new Ext.Toolbar({
-    ctCls:'search-all-tbar',
-    items: [
-      'Search:',
-      this.searchField,
-      { xtype: 'tbspacer' },
+  this.sp = Sonatype.lib.Permissions;
+  
+  var toolbaritems = [
+    'Search:',
+    this.searchField,
+    { xtype: 'tbspacer' }
+  ];
+  
+  if (this.sp.checkPermission(Sonatype.user.curr.repoServer.actionChecksumSearch, this.sp.READ)){
+      toolbaritems[3] =
       new Ext.ux.form.BrowseButton({
         text: 'Checksum Search...',
         appletPanel: true,
@@ -126,10 +130,13 @@ Sonatype.repoServer.SearchPanel = function(config){
             f.defer( 200, b, [b, filename] );
           }
         }
-      })
-    ]
-  });
+      });
+  }
   
+  this.searchToolbar = new Ext.Toolbar({
+      ctCls:'search-all-tbar',
+      items: toolbaritems
+   });
   
   Sonatype.repoServer.SearchPanel.superclass.constructor.call(this, {
 //  id: 'st-nexus-search-panel',

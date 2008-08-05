@@ -2520,7 +2520,13 @@
                     <version>1.0.0+</version>
                     <type>int</type>
                     <required>true</required>
-                </field>                
+                </field>
+                <field>
+                    <name>actionChecksumSearch</name>
+                    <version>1.0.0+</version>
+                    <type>int</type>
+                    <required>true</required>
+                </field>                    
 			</fields>
 		</class>
 

@@ -222,7 +222,7 @@ Sonatype.repoServer.RepoServer = function(){
       
       this.loginWindow.on('show', function(){
         var panel = this.loginWindow.findById( 'recovery-panel' );
-        if (!panel.clickListenerAdded) {
+        if (panel && !panel.clickListenerAdded) {
           // these listeners only work if added after the window is created
           panel.body.on('click', Ext.emptyFn, null, {delegate:'a', preventDefault:true});
           panel.body.on('mousedown', this.recoverLogin, this, {delegate:'a'});

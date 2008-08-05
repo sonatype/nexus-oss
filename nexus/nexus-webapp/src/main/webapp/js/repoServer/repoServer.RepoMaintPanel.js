@@ -288,6 +288,8 @@ Sonatype.repoServer.RepoMaintPanel = function(config){
       }
     }
   });
+  
+  this.sp = Sonatype.lib.Permissions;
 
   this.reposGridPanel = new Ext.grid.GridPanel({
     //title: 'Repositories',
@@ -421,6 +423,12 @@ Ext.extend(Sonatype.repoServer.RepoMaintPanel, Sonatype.repoServer.AbstractRepoP
   onContextClickHandler : function(grid, index, e){
     this.onContextHideHandler();
     
+    var clearcachPriv = this.sp.checkPermission(Sonatype.user.curr.repoServer.actionDeleteCache, this.sp.DELETE);
+    var reindexPriv = this.sp.checkPermission(Sonatype.user.curr.repoServer.actionReindex, this.sp.DELETE);
+    var attributesPriv = this.sp.checkPermission(Sonatype.user.curr.repoServer.actionRebuildAttribs, this.sp.DELETE);
+    var uploadPriv = this.sp.checkPermission(Sonatype.user.curr.repoServer.actionUploadArtifact, this.sp.CREATE);
+    var repoStatusPriv = this.sp.checkPermission(Sonatype.user.curr.repoServer.setMaintRepos, this.sp.EDIT);
+    
     if ( e.target.nodeName == 'A' ) return; // no menu on links
     
     this.ctxRow = this.reposGridPanel.view.getRow(index);
@@ -438,28 +446,32 @@ Ext.extend(Sonatype.repoServer.RepoMaintPanel, Sonatype.repoServer.AbstractRepoP
     });
     
     if (this.editMode) {
-      if(this.ctxRecord.get('repoType') != 'virtual'){
+      if(clearcachPriv && this.ctxRecord.get('repoType') != 'virtual'){
         menu.add(this.actions.clearCache);
       }
       
-      menu.add(this.actions.reIndex);
-      menu.add(this.actions.rebuildAttributes);
+      if (reindexPriv){
+        menu.add(this.actions.reIndex);
+      }
+      if (attributesPriv){
+        menu.add(this.actions.rebuildAttributes);
+      }
 
-      if(this.ctxRecord.get('repoType') == 'proxy'){
+      if(repoStatusPriv && this.ctxRecord.get('repoType') == 'proxy'){
         menu.add((this.ctxRecord.get('proxyMode') == 'allow')
                    ? this.actions.blockProxy
                    : this.actions.allowProxy
                 );
       }
       
-      if ( !isGroup ) {
+      if (repoStatusPriv && !isGroup ) {
         menu.add((this.ctxRecord.get('localStatus') == 'inService') 
                  ? this.actions.putOutOfService
                  : this.actions.putInService
               );
       }
 
-      if (this.ctxRecord.get('repoType') == 'hosted'
+      if (uploadPriv && this.ctxRecord.get('repoType') == 'hosted'
       && this.ctxRecord.get('repoPolicy') == 'release'){
         menu.add(this.actions.uploadArtifact);
       }
@@ -481,6 +493,12 @@ Ext.extend(Sonatype.repoServer.RepoMaintPanel, Sonatype.repoServer.AbstractRepoP
   onBrowseContextClickHandler : function(node, e){
     this.onBrowseContextHideHandler();
     
+    var clearcachPriv = this.sp.checkPermission(Sonatype.user.curr.repoServer.actionDeleteCache, this.sp.DELETE);
+    var reindexPriv = this.sp.checkPermission(Sonatype.user.curr.repoServer.actionReindex, this.sp.DELETE);
+    var attributesPriv = this.sp.checkPermission(Sonatype.user.curr.repoServer.actionRebuildAttribs, this.sp.DELETE);
+    var uploadPriv = this.sp.checkPermission(Sonatype.user.curr.repoServer.actionUploadArtifact, this.sp.CREATE);
+    var repoStatusPriv = this.sp.checkPermission(Sonatype.user.curr.repoServer.setMaintRepos, this.sp.EDIT);
+    
     var isVirtualRepo = (node.getOwnerTree().root.attributes.repoType == 'virtual');
     var isProxyRepo = (node.getOwnerTree().root.attributes.repoType == 'proxy');
     var isGroup = (node.getOwnerTree().root.attributes.repoType == 'group');
@@ -493,11 +511,15 @@ Ext.extend(Sonatype.repoServer.RepoMaintPanel, Sonatype.repoServer.AbstractRepoP
       });
       
       if (this.editMode) {
-        if (!isVirtualRepo){
+        if (clearcachPriv && !isVirtualRepo){
           menu.add(this.actions.clearCache);
         }
-        menu.add(this.actions.reIndex);
-        menu.add(this.actions.rebuildAttributes);
+        if (reindexPriv){
+          menu.add(this.actions.reIndex);
+        }
+        if (attributesPriv){
+          menu.add(this.actions.rebuildAttributes);
+        }
       }
       
       if (node.isLeaf()){

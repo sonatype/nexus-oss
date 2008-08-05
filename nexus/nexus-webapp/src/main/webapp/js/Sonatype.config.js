@@ -125,12 +125,12 @@ Sonatype.user.anon = {
   isLoggedIn : false,
   authToken : null,
   repoServer : {
-    viewSearch : 1,
+    viewSearch : 0,
     viewUpdatedArtifacts : 0,
-    viewCachedArtifacts : 1,
-    viewDeployedArtifacts : 1,
-    viewSystemChanges : 1,
-    maintRepos : 1,
+    viewCachedArtifacts : 0,
+    viewDeployedArtifacts : 0,
+    viewSystemChanges : 0,
+    maintRepos : 0,
     maintLogs : 0,
     maintConfig : 0,
     configServer : 0,
@@ -142,16 +142,17 @@ Sonatype.user.anon = {
     configRoles : 0,
     configPrivileges : 0,
     configRepoTargets : 0,
-    actionForgotPassword: 8,
-    actionForgotUserid: 8,
+    actionForgotPassword: 0,
+    actionForgotUserid: 0,
     actionChangePassword: 0,
-    actionResetPassword: 4,
+    actionResetPassword: 0,
     actionEmptyTrash: 0,
     actionRunTask: 0,
     actionDeleteCache: 0,
     actionRebuildAttribs: 0,
     actionUploadArtifact: 0,
-    actionReindex: 0
+    actionReindex: 0,
+    actionChecksumSearch: 0
   }
 };
 

@@ -67,6 +67,7 @@
 			/service/local/attributes/** = authcBasic,perms[nexus:attributes]
 			/service/local/attributes = authcBasic,perms[nexus:attributes]
 			/service/local/repository_statuses = authcBasic,perms[nexus:repostatus]
+			/service/local/repositories/*/status = authcBasic,perms[nexus:repostatus]
 			/service/local/repositories/*/content/** = authcBasic,tperms
 			/service/local/repositories/*/content = authcBasic,tperms
 			/service/local/repositories = authcBasic,perms[nexus:repositories]

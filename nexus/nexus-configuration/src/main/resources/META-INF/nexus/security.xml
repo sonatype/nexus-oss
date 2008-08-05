@@ -266,7 +266,7 @@
 		</applicationPrivilege>
 		<applicationPrivilege>
 			<id>17</id>
-			<name>??Data Index - (read)</name>
+			<name>Search Repositories</name>
 			<method>read</method>
 			<permission>nexus:index</permission>
 		</applicationPrivilege>
@@ -278,19 +278,19 @@
 		</applicationPrivilege>
 		<applicationPrivilege>
 			<id>19</id>
-			<name>??Identify - (read)</name>
+			<name>Checksum Search</name>
 			<method>read</method>
 			<permission>nexus:identify</permission>
 		</applicationPrivilege>
 		<applicationPrivilege>
 			<id>20</id>
-			<name>??Attributes - (delete)</name>
+			<name>Rebuild Repository Attributes</name>
 			<method>delete</method>
 			<permission>nexus:attributes</permission>
 		</applicationPrivilege>
 		<applicationPrivilege>
 			<id>21</id>
-			<name>Clear Cache</name>
+			<name>Clear Repository Cache</name>
 			<method>delete</method>
 			<permission>nexus:cache</permission>
 		</applicationPrivilege>
@@ -473,24 +473,16 @@
 			<name>Wastebasket - (delete)</name>
 			<method>delete</method>
 			<permission>nexus:wastebasket</permission>
-		</applicationPrivilege>
-		<applicationPrivilege>
-			<id>52</id>
-			<name>??Attributes - (delete)</name>
-			<method>delete</method>
-			<permission>nexus:attributes</permission>
-		</applicationPrivilege>
-		<!--Removed dup permission-->
-        
+		</applicationPrivilege>        
 		<applicationPrivilege>
 			<id>54</id>
-			<name>??Artifact - (read)</name>
+			<name>Artifact Download</name>
 			<method>read</method>
 			<permission>nexus:artifact</permission>
 		</applicationPrivilege>
 		<applicationPrivilege>
 			<id>55</id>
-			<name>??Repository Statuses - (read)</name>
+			<name>Read Repository Status</name>
 			<method>read</method>
 			<permission>nexus:repostatus</permission>
 		</applicationPrivilege>
@@ -526,7 +518,7 @@
         </applicationPrivilege>
         <applicationPrivilege>
             <id>65</id>
-            <name>??Artifact - (create)</name>
+            <name>Artifact Upload</name>
             <method>create</method>
             <permission>nexus:artifact</permission>
         </applicationPrivilege>

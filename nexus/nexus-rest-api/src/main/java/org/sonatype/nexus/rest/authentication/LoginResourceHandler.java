@@ -85,7 +85,7 @@ public class LoginResourceHandler
 
         perms.setMaintConfig( getFlagsForPermission( subject, "nexus:configuration" ) );
 
-        perms.setMaintRepos( getFlagsForPermission( subject, "nexus:feeds" ) );
+        perms.setMaintRepos( getFlagsForPermission( subject, "nexus:repostatus" ) );
 
         perms.setConfigServer( getFlagsForPermission( subject, "nexus:configuration" ) );
 
@@ -124,6 +124,8 @@ public class LoginResourceHandler
         perms.setActionUploadArtifact( getFlagsForPermission( subject, "nexus:artifact") );
         
         perms.setActionReindex( getFlagsForPermission( subject, "nexus:index" ) );
+        
+        perms.setActionChecksumSearch( getFlagsForPermission( subject, "nexus:identify" ) );
 
         resource.setClientPermissions( perms );
 
