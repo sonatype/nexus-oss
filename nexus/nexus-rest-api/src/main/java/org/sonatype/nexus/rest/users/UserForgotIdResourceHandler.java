@@ -28,7 +28,7 @@ import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.restlet.resource.Representation;
-import org.sonatype.nexus.configuration.security.NoSuchUserException;
+import org.sonatype.nexus.configuration.security.NoSuchEmailException;
 
 public class UserForgotIdResourceHandler
     extends AbstractUserResourceHandler
@@ -65,7 +65,7 @@ public class UserForgotIdResourceHandler
 
             getLogger().log( Level.SEVERE, "Got IO Exception!", e );
         }
-        catch ( NoSuchUserException e )
+        catch ( NoSuchEmailException e )
         {
             getResponse().setStatus( Status.CLIENT_ERROR_BAD_REQUEST, "Email address not found!" );
             

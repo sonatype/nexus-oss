@@ -28,6 +28,7 @@ import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.restlet.resource.Representation;
+import org.sonatype.nexus.configuration.security.NoSuchEmailException;
 import org.sonatype.nexus.configuration.security.NoSuchUserException;
 import org.sonatype.nexus.rest.model.UserForgotPasswordRequest;
 import org.sonatype.nexus.rest.model.UserForgotPasswordResource;
@@ -71,9 +72,15 @@ public class UserForgotPasswordResourceHandler
             }
             catch ( NoSuchUserException e )
             {
-                getResponse().setStatus( Status.CLIENT_ERROR_BAD_REQUEST, "Invalid user ID." );
+                getResponse().setStatus( Status.CLIENT_ERROR_BAD_REQUEST, "Invalid user ID!" );
 
                 getLogger().log( Level.FINE, "Invalid user ID!", e );
+            }
+            catch ( NoSuchEmailException e )
+            {
+                getResponse().setStatus( Status.CLIENT_ERROR_BAD_REQUEST, "Email address not found!" );
+
+                getLogger().log( Level.FINE, "Invalid email!", e );
             }
         }
     }

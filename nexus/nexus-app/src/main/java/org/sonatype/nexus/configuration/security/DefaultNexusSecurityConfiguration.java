@@ -443,7 +443,8 @@ public class DefaultNexusSecurityConfiguration
     
     public void forgotPassword( String userId, String email )
         throws IOException,
-            NoSuchUserException
+            NoSuchUserException,
+            NoSuchEmailException
     {
         CUser user = readUser( userId );
         
@@ -451,11 +452,15 @@ public class DefaultNexusSecurityConfiguration
         {
             resetPassword( userId );
         }
+        else
+        {
+            throw new NoSuchEmailException( email );
+        }
     }
     
     public void forgotUserId( String email )
         throws IOException,
-            NoSuchUserException
+        NoSuchEmailException
     {
         List<CUser> users = getConfiguration().getUsers();
 
@@ -478,7 +483,7 @@ public class DefaultNexusSecurityConfiguration
             }
         }
 
-        throw new NoSuchUserException();
+        throw new NoSuchEmailException( email );
     }
     
     public void changePassword( String userId, String oldPassword, String newPassword )

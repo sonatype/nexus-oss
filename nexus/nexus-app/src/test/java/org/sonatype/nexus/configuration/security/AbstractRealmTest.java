@@ -357,14 +357,15 @@ public abstract class AbstractRealmTest
 
         public void forgotPassword( String userId, String email )
             throws IOException,
-                NoSuchUserException
+                NoSuchUserException,
+                NoSuchEmailException
         {
             throw new UnsupportedOperationException();
         }
 
         public void forgotUserId( String email )
             throws IOException,
-                NoSuchUserException
+                NoSuchEmailException
         {
             throw new UnsupportedOperationException();
         }

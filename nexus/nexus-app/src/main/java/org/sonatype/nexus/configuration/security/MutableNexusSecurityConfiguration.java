@@ -56,11 +56,12 @@ public interface MutableNexusSecurityConfiguration
     
     void forgotUserId( String email )
         throws IOException,
-            NoSuchUserException;
+            NoSuchEmailException;
     
     void forgotPassword( String userId, String email )
         throws IOException,
-            NoSuchUserException;
+            NoSuchUserException,
+            NoSuchEmailException;
     
     void changePassword( String userId, String oldPassword, String newPassword )
         throws IOException,
