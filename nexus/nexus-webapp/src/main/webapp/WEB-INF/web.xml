@@ -46,13 +46,16 @@
 
 			perms = org.sonatype.nexus.security.filter.authz.HttpVerbMappingAuthorizationFilter
 
-			tperms = org.sonatype.nexus.security.filter.authz.NexusTargetMappingAuthorizationFilter
-			tperms.pathPrefix = /service/local/repositories/(a-zA-Z_0-9)+/content
+			trperms = org.sonatype.nexus.security.filter.authz.NexusTargetMappingAuthorizationFilter
+			trperms.pathPrefix = /service/local/repositories/(a-zA-Z_0-9)+/content
+
+			tgperms = org.sonatype.nexus.security.filter.authz.NexusTargetMappingAuthorizationFilter
+			tgperms.pathPrefix = /service/local/repo_groups/(a-zA-Z_0-9)+/content
 
 			[urls]
-			/service/local/status/command = authcBasic,perms[nexus:status]
-			/service/local/status = anon
-			/service/local/feeds/** = authcBasic,perms[nexus:feeds]
+			/service/local/status/command = authcBasic,perms[nexus:command]
+			/service/local/status = authcBasic,perms[nexus:status]
+			/service/local/feeds/* = authcBasic,perms[nexus:feeds]
 			/service/local/feeds = authcBasic,perms[nexus:feeds]
 			/service/local/authentication/login = authcBasic,perms[nexus:authentication]
 			/service/local/authentication/logout = logout
@@ -68,29 +71,43 @@
 			/service/local/attributes = authcBasic,perms[nexus:attributes]
 			/service/local/repository_statuses = authcBasic,perms[nexus:repostatus]
 			/service/local/repositories/*/status = authcBasic,perms[nexus:repostatus]
-			/service/local/repositories/*/content/** = authcBasic,tperms
-			/service/local/repositories/*/content = authcBasic,tperms
+			/service/local/repositories/*/meta = authcBasic,perms[nexus:repometa]
+			/service/local/repositories/*/content/** = authcBasic,trperms
+			/service/local/repositories/*/content = authcBasic,trperms
+			/service/local/repositories/* = authcBasic,perms[nexus:repositories]
 			/service/local/repositories = authcBasic,perms[nexus:repositories]
-			/service/local/repo_groups/*/content/** = authcBasic,tperms
-			/service/local/repo_groups/*/content = authcBasic,tperms
+			/service/local/repo_groups/*/content/** = authcBasic,tgperms
+			/service/local/repo_groups/*/content = authcBasic,tgperms
+			/service/local/repo_groups/* = authcBasic,perms[nexus:repogroups]
 			/service/local/repo_groups = authcBasic,perms[nexus:repogroups]
 			/service/local/repo_content_classes = authcBasic,perms[nexus:repocontentclasses]
+			/service/local/repo_targets/* = authcBasic,perms[nexus:targets]
 			/service/local/repo_targets = authcBasic,perms[nexus:targets]
+			/service/local/configs/* = authcBasic,perms[nexus:settings]
 			/service/local/configs = authcBasic,perms[nexus:settings]
+			/service/local/global_settings/* = authcBasic,perms[nexus:configuration]
 			/service/local/global_settings = authcBasic,perms[nexus:configuration]
+			/service/local/repo_routes/* = authcBasic,perms[nexus:routes]
 			/service/local/repo_routes = authcBasic,perms[nexus:routes]
-			/service/local/templates = authcBasic,perms[nexus:repotemplates]
-			/service/local/schedules/run = authcBasic,perms[nexus:runtask]
+			/service/local/templates/repositories/* = authcBasic,perms[nexus:repotemplates]
+			/service/local/templates/repositories = authcBasic,perms[nexus:repotemplates]
+			/service/local/schedules/types = authcBasic,perms[nexus:tasks]
+			/service/local/schedules/run/* = authcBasic,perms[nexus:runtask]
+			/service/local/schedules/* = authcBasic,perms[nexus:tasks]
 			/service/local/schedules = authcBasic,perms[nexus:tasks]
 			/service/local/users_changepw = authcBasic,perms[nexus:userschangepw]
 			/service/local/users_forgotpw = authcBasic,perms[nexus:usersforgotpw]
 			/service/local/users_forgotid = authcBasic,perms[nexus:usersforgotid]
 			/service/local/users_reset = authcBasic,perms[nexus:usersreset]
+			/service/local/users/* = authcBasic,perms[nexus:users]
 			/service/local/users = authcBasic,perms[nexus:users]
+			/service/local/roles/* = authcBasic,perms[nexus:roles]
 			/service/local/roles = authcBasic,perms[nexus:roles]
+			/service/local/privileges/* = authcBasic,perms[nexus:privileges]
 			/service/local/privileges = authcBasic,perms[nexus:privileges]
+			/service/local/logs/* = authcBasic,perms[nexus:logs]
 			/service/local/logs = authcBasic,perms[nexus:logs]
-			/service/local/logs/** = authcBasic,perms[nexus:logs]
+			/service/local/** = authcBasic,perms[nexus:someFreakinStupidPermToCatchAllUnprotectedsAndOnlyAdminWillHaveItSinceItHaveAStar]
 			</param-value>
 		</init-param>
 	</filter>

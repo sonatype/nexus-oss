@@ -522,5 +522,17 @@
             <method>create</method>
             <permission>nexus:artifact</permission>
         </applicationPrivilege>
+        <applicationPrivilege>
+            <id>66</id>
+            <name>Nexus Remote Control</name>
+            <method>update</method>
+            <permission>nexus:command</permission>
+        </applicationPrivilege>
+		<applicationPrivilege>
+			<id>67</id>
+			<name>Read Repository Metadata</name>
+			<method>read</method>
+			<permission>nexus:repometa</permission>
+		</applicationPrivilege>
 	</applicationPrivileges>
 </nexusSecurity>

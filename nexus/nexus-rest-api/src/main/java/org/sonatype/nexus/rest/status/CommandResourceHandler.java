@@ -24,6 +24,11 @@ public class CommandResourceHandler
 
         getVariants().add( new Variant( MediaType.TEXT_PLAIN ) );
     }
+    
+    public boolean allowGet()
+    {
+        return false;
+    }
 
     public boolean allowPut()
     {
