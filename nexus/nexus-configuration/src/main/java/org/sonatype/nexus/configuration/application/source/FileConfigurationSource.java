@@ -27,11 +27,11 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.codehaus.plexus.util.FileUtils;
+import org.codehaus.plexus.util.IOUtil;
 import org.sonatype.nexus.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.application.upgrade.ApplicationConfigurationUpgrader;
 import org.sonatype.nexus.configuration.application.validator.ApplicationConfigurationValidator;
 import org.sonatype.nexus.configuration.model.Configuration;
-import org.sonatype.nexus.configuration.source.ConfigurationSource;
 import org.sonatype.nexus.configuration.validator.ConfigurationValidator;
 import org.sonatype.nexus.configuration.validator.InvalidConfigurationException;
 import org.sonatype.nexus.configuration.validator.ValidationRequest;
@@ -98,10 +98,11 @@ public class FileConfigurationSource
     {
         if ( !ApplicationConfigurationValidator.class.isAssignableFrom( configurationValidator.getClass() ) )
         {
-            throw new IllegalArgumentException( "ConfigurationValidator is invalid type " + configurationValidator.getClass().getName() );
+            throw new IllegalArgumentException( "ConfigurationValidator is invalid type "
+                + configurationValidator.getClass().getName() );
         }
-        
-        this.configurationValidator = ( ApplicationConfigurationValidator ) configurationValidator;
+
+        this.configurationValidator = (ApplicationConfigurationValidator) configurationValidator;
     }
 
     /**
@@ -270,27 +271,31 @@ public class FileConfigurationSource
     {
         FileOutputStream fos = null;
 
+        File backupFile = new File( file.getParentFile(), file.getName() + ".old" );
+
         try
         {
             file.getParentFile().mkdirs();
+
+            // copy the current nexus config file as file.bak
+            if ( file.exists() )
+            {
+                FileUtils.copyFile( file, backupFile );
+            }
 
             fos = new FileOutputStream( file );
 
             saveConfiguration( fos, getConfiguration() );
 
             fos.flush();
-
-            fos.close();
         }
         finally
         {
-            if ( fos != null )
-            {
-                fos.flush();
-
-                fos.close();
-            }
+            IOUtil.close( fos );
         }
+
+        // if all went well, delete the bak file
+        backupFile.delete();
     }
 
     /**
