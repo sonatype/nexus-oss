@@ -112,7 +112,7 @@
   </repositoryGrouping>
   <smtpConfiguration>
     <host>smtp-host</host>
-    <port>1234</port>
+    <port>25</port>
     <username>smtp-username</username>
     <password>smtp-password</password>
     <systemEmailAddress>system@nexus.org</systemEmailAddress>

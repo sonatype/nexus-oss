@@ -186,7 +186,7 @@ public class Upgrade103to104
         CSmtpConfiguration smtp = new CSmtpConfiguration();
         smtp.setHost( "smtp-host" );
         smtp.setPassword( "smtp-password" );
-        smtp.setPort( 1234 );
+        smtp.setPort( 25 );
         smtp.setSystemEmailAddress( "system@nexus.org" );
         smtp.setUsername( "smtp-username" );
 
