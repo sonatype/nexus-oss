@@ -597,13 +597,13 @@ public abstract class AbstractRepository
         return walker.getFiles();
     }
 
-    public boolean recreateAttributes( final Map<String, String> initialData )
+    public boolean recreateAttributes( String path, final Map<String, String> initialData )
     {
         getLogger().info( "Recreating attributes on repository " + getId() );
 
         RecreateAttributesWalker walker = new RecreateAttributesWalker( this, getLogger(), initialData );
 
-        walker.walk( true, false );
+        walker.walk( path, true, false );
 
         notifyProximityEventListeners( new RepositoryEventRecreateAttributes( this ) );
 

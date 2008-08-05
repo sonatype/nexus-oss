@@ -147,6 +147,8 @@ public class IndexResourceHandler
 
         task.setRepositoryGroupId( getRepositoryGroupId() );
 
+        task.setResourceStorePath( getResourceStorePath() );
+
         super.handleDelete( task );
     }
 

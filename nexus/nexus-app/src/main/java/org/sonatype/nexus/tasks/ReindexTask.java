@@ -21,7 +21,7 @@
 package org.sonatype.nexus.tasks;
 
 import org.sonatype.nexus.feeds.FeedRecorder;
-import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesTask;
+import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesPathAwareTask;
 
 /**
  * Reindex task.
@@ -31,22 +31,22 @@ import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesTask;
  *                   instantiation-strategy="per-lookup"
  */
 public class ReindexTask
-    extends AbstractNexusRepositoriesTask<Object>
+    extends AbstractNexusRepositoriesPathAwareTask<Object>
 {
     public Object doRun()
         throws Exception
     {
         if ( getRepositoryGroupId() != null )
         {
-            getNexus().reindexRepositoryGroup( getRepositoryGroupId() );
+            getNexus().reindexRepositoryGroup( getResourceStorePath(), getRepositoryGroupId() );
         }
         else if ( getRepositoryId() != null )
         {
-            getNexus().reindexRepository( getRepositoryId() );
+            getNexus().reindexRepository( getResourceStorePath(), getRepositoryId() );
         }
         else
         {
-            getNexus().reindexAllRepositories();
+            getNexus().reindexAllRepositories( getResourceStorePath() );
         }
 
         return null;

@@ -292,7 +292,7 @@ public interface Repository
      * @param initialData the initial data
      * @return true, if recreate attributes
      */
-    boolean recreateAttributes( Map<String, String> initialData );
+    boolean recreateAttributes( String fromPath, Map<String, String> initialData );
 
     /**
      * Returns the repository level AccessManager. Per repository instance may exists.

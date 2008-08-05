@@ -755,7 +755,7 @@ public class DefaultIndexerManager
     // Reindexing related
     // ----------------------------------------------------------------------------
 
-    public void reindexAllRepositories()
+    public void reindexAllRepositories( String path )
         throws IOException
     {
         List<Repository> reposes = repositoryRegistry.getRepositories();
@@ -768,7 +768,7 @@ public class DefaultIndexerManager
         publishAllIndex();
     }
 
-    public void reindexRepository( String repositoryId )
+    public void reindexRepository( String path, String repositoryId )
         throws NoSuchRepositoryException,
             IOException
     {
@@ -779,7 +779,7 @@ public class DefaultIndexerManager
         publishRepositoryIndex( repositoryId );
     }
 
-    public void reindexRepositoryGroup( String repositoryGroupId )
+    public void reindexRepositoryGroup( String path, String repositoryGroupId )
         throws NoSuchRepositoryGroupException,
             IOException
     {

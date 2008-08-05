@@ -679,20 +679,20 @@ public abstract class AbstractRealmTest
             throw new UnsupportedOperationException();
         }
 
-        public void reindexAllRepositories()
+        public void reindexAllRepositories( String path )
             throws IOException
         {
             throw new UnsupportedOperationException();
         }
 
-        public void reindexRepository( String repositoryId )
+        public void reindexRepository( String path, String repositoryId )
             throws NoSuchRepositoryException,
                 IOException
         {
             throw new UnsupportedOperationException();
         }
 
-        public void reindexRepositoryGroup( String repositoryGroupId )
+        public void reindexRepositoryGroup( String path, String repositoryGroupId )
             throws NoSuchRepositoryGroupException,
                 IOException
         {
@@ -719,20 +719,20 @@ public abstract class AbstractRealmTest
             throw new UnsupportedOperationException();
         }
 
-        public void rebuildAttributesAllRepositories()
+        public void rebuildAttributesAllRepositories( String path )
             throws IOException
         {
             throw new UnsupportedOperationException();
         }
 
-        public void rebuildAttributesRepository( String repositoryId )
+        public void rebuildAttributesRepository( String path, String repositoryId )
             throws NoSuchRepositoryException,
                 IOException
         {
             throw new UnsupportedOperationException();
         }
 
-        public void rebuildAttributesRepositoryGroup( String repositoryGroupId )
+        public void rebuildAttributesRepositoryGroup( String path, String repositoryGroupId )
             throws NoSuchRepositoryGroupException,
                 IOException
         {
@@ -1523,7 +1523,7 @@ public abstract class AbstractRealmTest
             throw new UnsupportedOperationException();
         }
 
-        public boolean recreateAttributes( Map<String, String> initialData )
+        public boolean recreateAttributes( String path, Map<String, String> initialData )
         {
             throw new UnsupportedOperationException();
         }
@@ -1736,7 +1736,7 @@ public abstract class AbstractRealmTest
                 StorageException
         {
             // TODO Auto-generated method stub
-            
+
         }
 
         public void deleteItem( RepositoryItemUid uid, Map<String, Object> context )
@@ -1746,7 +1746,7 @@ public abstract class AbstractRealmTest
                 StorageException
         {
             // TODO Auto-generated method stub
-            
+
         }
 
         public TargetSet getTargetsForRequest( RepositoryItemUid uid, Map<String, Object> context )
@@ -1762,7 +1762,7 @@ public abstract class AbstractRealmTest
                 StorageException
         {
             // TODO Auto-generated method stub
-            
+
         }
 
         public StorageItem retrieveItem( boolean localOnly, RepositoryItemUid uid, Map<String, Object> context )

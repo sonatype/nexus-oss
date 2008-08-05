@@ -20,11 +20,11 @@
  */
 package org.sonatype.nexus.configuration.security;
 
+import java.util.Set;
+
 import org.jsecurity.authz.Permission;
 import org.jsecurity.authz.permission.WildcardPermission;
 import org.sonatype.nexus.configuration.security.model.CRepoTargetPrivilege;
-
-import java.util.Set;
 
 public class RepoTargetPermissionTest extends AbstractRealmTest
 {

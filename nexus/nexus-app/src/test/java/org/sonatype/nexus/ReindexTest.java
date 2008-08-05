@@ -38,13 +38,13 @@ public class ReindexTest
 
         defaultNexus = (DefaultNexus) lookup( Nexus.ROLE );
     }
-    
+
     protected void tearDown()
         throws Exception
     {
         super.tearDown();
     }
-    
+
     protected boolean loadConfigurationAtSetUp()
     {
         return false;
@@ -59,7 +59,7 @@ public class ReindexTest
     {
         this.defaultNexus = defaultNexus;
     }
-        
+
     public void testRepositoryReindex()
         throws IOException
     {
@@ -69,8 +69,8 @@ public class ReindexTest
             newRepo.setId( "test" );
             newRepo.setName( "Test" );
             getDefaultNexus().createRepository( newRepo );
-            
-            getDefaultNexus().reindexRepository( "test" );
+
+            getDefaultNexus().reindexRepository( null, "test" );
         }
         catch ( ConfigurationException e )
         {

@@ -1301,24 +1301,24 @@ public class DefaultNexus
     // =============
     // Search and indexing related
 
-    public void reindexAllRepositories()
+    public void reindexAllRepositories( String path )
         throws IOException
     {
-        indexerManager.reindexAllRepositories();
+        indexerManager.reindexAllRepositories( path );
     }
 
-    public void reindexRepository( String repositoryId )
+    public void reindexRepository( String path, String repositoryId )
         throws NoSuchRepositoryException,
             IOException
     {
-        indexerManager.reindexRepository( repositoryId );
+        indexerManager.reindexRepository( path, repositoryId );
     }
 
-    public void reindexRepositoryGroup( String repositoryGroupId )
+    public void reindexRepositoryGroup( String path, String repositoryGroupId )
         throws NoSuchRepositoryGroupException,
             IOException
     {
-        indexerManager.reindexRepositoryGroup( repositoryGroupId );
+        indexerManager.reindexRepositoryGroup( path, repositoryGroupId );
     }
 
     public void publishAllIndex()
@@ -1341,25 +1341,25 @@ public class DefaultNexus
         indexerManager.publishRepositoryGroupIndex( repositoryGroupId );
     }
 
-    public void rebuildAttributesAllRepositories()
+    public void rebuildAttributesAllRepositories( String path )
         throws IOException
     {
         List<Repository> reposes = repositoryRegistry.getRepositories();
 
         for ( Repository repo : reposes )
         {
-            repo.recreateAttributes( null );
+            repo.recreateAttributes( path, null );
         }
     }
 
-    public void rebuildAttributesRepository( String repositoryId )
+    public void rebuildAttributesRepository( String path, String repositoryId )
         throws NoSuchRepositoryException,
             IOException
     {
-        repositoryRegistry.getRepository( repositoryId ).recreateAttributes( null );
+        repositoryRegistry.getRepository( repositoryId ).recreateAttributes( path, null );
     }
 
-    public void rebuildAttributesRepositoryGroup( String repositoryGroupId )
+    public void rebuildAttributesRepositoryGroup( String path, String repositoryGroupId )
         throws NoSuchRepositoryGroupException,
             IOException
     {
@@ -1367,7 +1367,7 @@ public class DefaultNexus
 
         for ( Repository repo : reposes )
         {
-            repo.recreateAttributes( null );
+            repo.recreateAttributes( path, null );
         }
     }
 
@@ -1411,7 +1411,7 @@ public class DefaultNexus
         {
             repositoryRegistry.addProximityEventListener( (EventListener) indexerManager );
         }
-        
+
         systemStatus.setState( SystemState.STOPPED );
 
         systemStatus.setOperationMode( OperationMode.STANDALONE );

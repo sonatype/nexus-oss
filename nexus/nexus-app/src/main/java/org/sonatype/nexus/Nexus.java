@@ -100,7 +100,7 @@ public interface Nexus
             AccessDeniedException,
             RepositoryNotAvailableException,
             StorageException;
-    
+
     RepositoryRouter getRootRouter();
 
     // ----------------------------------------------------------------------------
@@ -137,14 +137,14 @@ public interface Nexus
     void clearRepositoryGroupCaches( String path, String repositoryGroupId )
         throws NoSuchRepositoryGroupException;
 
-    void reindexAllRepositories()
+    void reindexAllRepositories( String path )
         throws IOException;
 
-    void reindexRepository( String repositoryId )
+    void reindexRepository( String path, String repositoryId )
         throws NoSuchRepositoryException,
             IOException;
 
-    void reindexRepositoryGroup( String repositoryGroupId )
+    void reindexRepositoryGroup( String path, String repositoryGroupId )
         throws NoSuchRepositoryGroupException,
             IOException;
 
@@ -159,14 +159,14 @@ public interface Nexus
         throws IOException,
             NoSuchRepositoryGroupException;
 
-    void rebuildAttributesAllRepositories()
+    void rebuildAttributesAllRepositories( String path )
         throws IOException;
 
-    void rebuildAttributesRepository( String repositoryId )
+    void rebuildAttributesRepository( String path, String repositoryId )
         throws NoSuchRepositoryException,
             IOException;
 
-    void rebuildAttributesRepositoryGroup( String repositoryGroupId )
+    void rebuildAttributesRepositoryGroup( String path, String repositoryGroupId )
         throws NoSuchRepositoryGroupException,
             IOException;
 
@@ -265,9 +265,9 @@ public interface Nexus
         throws IOException;
 
     String readDefaultWorkingDirectory();
-    
+
     String readDefaultApplicationLogDirectory();
-    
+
     String readDefaultSecurityConfigurationFile();
 
     CRemoteConnectionSettings readDefaultGlobalRemoteConnectionSettings();

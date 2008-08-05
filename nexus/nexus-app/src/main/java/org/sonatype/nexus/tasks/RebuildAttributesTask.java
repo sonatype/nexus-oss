@@ -21,7 +21,7 @@
 package org.sonatype.nexus.tasks;
 
 import org.sonatype.nexus.feeds.FeedRecorder;
-import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesTask;
+import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesPathAwareTask;
 
 /**
  * Rebuild attributes task.
@@ -31,22 +31,22 @@ import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesTask;
  *                   role-hint="org.sonatype.nexus.tasks.RebuildAttributesTask" instantiation-strategy="per-lookup"
  */
 public class RebuildAttributesTask
-    extends AbstractNexusRepositoriesTask<Object>
+    extends AbstractNexusRepositoriesPathAwareTask<Object>
 {
     public Object doRun()
         throws Exception
     {
         if ( getRepositoryGroupId() != null )
         {
-            getNexus().rebuildAttributesRepositoryGroup( getRepositoryGroupId() );
+            getNexus().rebuildAttributesRepositoryGroup( getResourceStorePath(), getRepositoryGroupId() );
         }
         else if ( getRepositoryId() != null )
         {
-            getNexus().rebuildAttributesRepository( getRepositoryId() );
+            getNexus().rebuildAttributesRepository( getResourceStorePath(), getRepositoryId() );
         }
         else
         {
-            getNexus().rebuildAttributesAllRepositories();
+            getNexus().rebuildAttributesAllRepositories( getResourceStorePath() );
         }
 
         return null;

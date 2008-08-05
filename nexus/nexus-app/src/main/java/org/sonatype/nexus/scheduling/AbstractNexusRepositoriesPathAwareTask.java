@@ -18,35 +18,20 @@
  * along with this program.  If not, see http://www.gnu.org/licenses/.
  *
  */
-package org.sonatype.nexus.rest.attributes;
+package org.sonatype.nexus.scheduling;
 
-import org.restlet.Context;
-import org.restlet.data.Request;
-import org.restlet.data.Response;
-import org.sonatype.nexus.rest.restore.AbstractRestoreResourceHandler;
-import org.sonatype.nexus.tasks.RebuildAttributesTask;
-
-public class AttributesResourceHandler
-    extends AbstractRestoreResourceHandler
+public abstract class AbstractNexusRepositoriesPathAwareTask<T>
+    extends AbstractNexusRepositoriesTask<T>
 {
+    public static final String RESOURCE_STORE_PATH_KEY = "resourceStorePath";
 
-    public AttributesResourceHandler( Context context, Request request, Response response )
+    public String getResourceStorePath()
     {
-        super( context, request, response );
+        return getParameters().get( RESOURCE_STORE_PATH_KEY );
     }
 
-    public void handleDelete()
+    public void setResourceStorePath( String resourceStorePath )
     {
-        RebuildAttributesTask task = (RebuildAttributesTask) getNexus()
-            .createTaskInstance( RebuildAttributesTask.class );
-
-        task.setRepositoryId( getRepositoryId() );
-
-        task.setRepositoryGroupId( getRepositoryGroupId() );
-        
-        task.setResourceStorePath( getResourceStorePath() );
-
-        super.handleDelete( task );
+        getParameters().put( RESOURCE_STORE_PATH_KEY, resourceStorePath );
     }
-
 }

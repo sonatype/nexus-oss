@@ -81,14 +81,14 @@ public interface IndexerManager
     // Reindexing related
     // ----------------------------------------------------------------------------
 
-    void reindexAllRepositories()
+    void reindexAllRepositories( String path )
         throws IOException;
 
-    void reindexRepository( String repositoryId )
+    void reindexRepository( String path, String repositoryId )
         throws NoSuchRepositoryException,
             IOException;
 
-    void reindexRepositoryGroup( String repositoryGroupId )
+    void reindexRepositoryGroup( String path, String repositoryGroupId )
         throws NoSuchRepositoryGroupException,
             IOException;
 

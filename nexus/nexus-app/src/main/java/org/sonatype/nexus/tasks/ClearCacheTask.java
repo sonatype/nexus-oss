@@ -21,7 +21,7 @@
 package org.sonatype.nexus.tasks;
 
 import org.sonatype.nexus.feeds.FeedRecorder;
-import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesTask;
+import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesPathAwareTask;
 
 /**
  * Clear caches task.
@@ -31,20 +31,8 @@ import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesTask;
  *                   instantiation-strategy="per-lookup"
  */
 public class ClearCacheTask
-    extends AbstractNexusRepositoriesTask<Object>
+    extends AbstractNexusRepositoriesPathAwareTask<Object>
 {
-    public static final String RESOURCE_STORE_PATH_KEY = "resourceStorePath";
-
-    public String getResourceStorePath()
-    {
-        return getParameters().get( RESOURCE_STORE_PATH_KEY );
-    }
-
-    public void setResourceStorePath( String resourceStorePath )
-    {
-        getParameters().put( RESOURCE_STORE_PATH_KEY, resourceStorePath );
-    }
-
     public Object doRun()
         throws Exception
     {

@@ -28,9 +28,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
-import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
 import org.sonatype.nexus.configuration.ConfigurationChangeListener;
+import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.store.DefaultEntry;
 import org.sonatype.nexus.store.Entry;
 import org.sonatype.nexus.store.Store;

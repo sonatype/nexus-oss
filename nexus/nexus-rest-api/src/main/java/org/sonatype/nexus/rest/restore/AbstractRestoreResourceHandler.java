@@ -22,6 +22,7 @@ package org.sonatype.nexus.rest.restore;
 
 import java.util.concurrent.RejectedExecutionException;
 
+import org.codehaus.plexus.util.StringUtils;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
@@ -46,6 +47,8 @@ public abstract class AbstractRestoreResourceHandler
 
     private final String repositoryGroupId;
 
+    private final String resourceStorePath;
+
     public AbstractRestoreResourceHandler( Context context, Request request, Response response )
     {
         super( context, request, response );
@@ -69,6 +72,32 @@ public abstract class AbstractRestoreResourceHandler
         repositoryId = repoId;
 
         repositoryGroupId = groupId;
+
+        String path = null;
+
+        if ( getRepositoryId() != null || getRepositoryGroupId() != null )
+        {
+            path = getRequest().getResourceRef().getRemainingPart();
+
+            // get rid of query part
+            if ( path.contains( "?" ) )
+            {
+                path = path.substring( 0, path.indexOf( '?' ) );
+            }
+
+            // get rid of reference part
+            if ( path.contains( "#" ) )
+            {
+                path = path.substring( 0, path.indexOf( '#' ) );
+            }
+
+            if ( StringUtils.isEmpty( path ) )
+            {
+                path = "/";
+            }
+        }
+
+        this.resourceStorePath = path;
     }
 
     protected String getRepositoryId()
@@ -79,6 +108,11 @@ public abstract class AbstractRestoreResourceHandler
     protected String getRepositoryGroupId()
     {
         return repositoryGroupId;
+    }
+
+    protected String getResourceStorePath()
+    {
+        return resourceStorePath;
     }
 
     /**

@@ -303,7 +303,7 @@ public class DummyRepository
         throw new UnsupportedOperationException( "This is dummy!" );
     }
 
-    public boolean recreateAttributes( Map<String, String> initialData )
+    public boolean recreateAttributes( String path, Map<String, String> initialData )
     {
         throw new UnsupportedOperationException( "This is dummy!" );
     }
@@ -643,7 +643,7 @@ public class DummyRepository
             StorageException
     {
         // TODO Auto-generated method stub
-        
+
     }
 
     public void deleteItem( RepositoryItemUid uid, Map<String, Object> context )
@@ -653,7 +653,7 @@ public class DummyRepository
             StorageException
     {
         // TODO Auto-generated method stub
-        
+
     }
 
     public TargetSet getTargetsForRequest( RepositoryItemUid uid, Map<String, Object> context )
@@ -669,7 +669,7 @@ public class DummyRepository
             StorageException
     {
         // TODO Auto-generated method stub
-        
+
     }
 
     public StorageItem retrieveItem( boolean localOnly, RepositoryItemUid uid, Map<String, Object> context )

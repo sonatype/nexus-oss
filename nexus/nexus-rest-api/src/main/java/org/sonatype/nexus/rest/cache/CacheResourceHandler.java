@@ -22,7 +22,6 @@ package org.sonatype.nexus.rest.cache;
 
 import java.io.IOException;
 
-import org.codehaus.plexus.util.StringUtils;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
@@ -44,37 +43,9 @@ import org.sonatype.nexus.tasks.ClearCacheTask;
 public class CacheResourceHandler
     extends AbstractRestoreResourceHandler
 {
-    protected final String resourceStorePath;
-
     public CacheResourceHandler( Context context, Request request, Response response )
     {
         super( context, request, response );
-
-        String path = null;
-
-        if ( getRepositoryId() != null || getRepositoryGroupId() != null )
-        {
-            path = getRequest().getResourceRef().getRemainingPart();
-
-            // get rid of query part
-            if ( path.contains( "?" ) )
-            {
-                path = path.substring( 0, path.indexOf( '?' ) );
-            }
-
-            // get rid of reference part
-            if ( path.contains( "#" ) )
-            {
-                path = path.substring( 0, path.indexOf( '#' ) );
-            }
-
-            if ( StringUtils.isEmpty( path ) )
-            {
-                path = "/";
-            }
-        }
-
-        this.resourceStorePath = path;
     }
 
     public boolean allowGet()
@@ -149,7 +120,7 @@ public class CacheResourceHandler
 
         task.setRepositoryGroupId( getRepositoryGroupId() );
 
-        task.setResourceStorePath( resourceStorePath );
+        task.setResourceStorePath( getResourceStorePath() );
 
         super.handleDelete( task );
     }

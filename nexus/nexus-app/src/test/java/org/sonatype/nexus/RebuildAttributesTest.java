@@ -70,7 +70,7 @@ public class RebuildAttributesTest
             newRepo.setName( "Test" );
             getDefaultNexus().createRepository( newRepo );
             
-            getDefaultNexus().rebuildAttributesRepository( "test" );
+            getDefaultNexus().rebuildAttributesRepository( null, "test" );
         }
         catch ( ConfigurationException e )
         {

@@ -81,7 +81,7 @@ public class DefaultAttributesHandlerTest
         assertFalse( ( (DefaultAttributeStorage) attributesHandler.getAttributeStorage() )
             .getFileFromBase( uid ).exists() );
 
-        repository.recreateAttributes( null );
+        repository.recreateAttributes( null, null );
 
         assertTrue( ( (DefaultAttributeStorage) attributesHandler.getAttributeStorage() )
             .getFileFromBase( uid ).exists() );
@@ -99,7 +99,7 @@ public class DefaultAttributesHandlerTest
         customAttrs.put( "one", "1" );
         customAttrs.put( "two", "2" );
 
-        repository.recreateAttributes( customAttrs );
+        repository.recreateAttributes( null, customAttrs );
 
         assertTrue( ( (DefaultAttributeStorage) attributesHandler.getAttributeStorage() )
             .getFileFromBase( uid ).exists() );
