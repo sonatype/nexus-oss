@@ -2,6 +2,8 @@ package org.sonatype.nexus.security.filter.authc;
 
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 import org.jsecurity.subject.Subject;
 import org.jsecurity.web.filter.authc.AuthenticationFilter;
@@ -46,6 +48,16 @@ public class LogoutAuthenticationFilter
         if ( subject != null )
         {
             subject.logout();
+        }
+
+        if ( HttpServletRequest.class.isAssignableFrom( request.getClass() ) )
+        {
+            HttpSession session = ( (HttpServletRequest) request ).getSession( false );
+            
+            if ( session != null )
+            {
+                session.invalidate();
+            }
         }
     }
 }

@@ -3,6 +3,7 @@ package org.sonatype.nexus.security.filter.authc;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -154,9 +155,19 @@ public class NexusHttpAuthenticationFilter
             || request.getAttribute( NexusJSecurityFilter.REQUEST_IS_AUTHZ_REJECTED ) != null )
         {
             subject.logout();
+
+            if ( HttpServletRequest.class.isAssignableFrom( request.getClass() ) )
+            {
+                HttpSession session = ( (HttpServletRequest) request ).getSession( false );
+
+                if ( session != null )
+                {
+                    session.invalidate();
+                }
+            }
         }
 
-        // we should check is the user anonymous or not?
+        // is perms elevation needed?
         if ( request.getAttribute( NexusJSecurityFilter.REQUEST_IS_AUTHZ_REJECTED ) != null )
         {
             if ( getLogger().isDebugEnabled() )
