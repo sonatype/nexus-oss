@@ -96,11 +96,21 @@ Sonatype.utils = {
   },
 
   connectionError: function( response, message, offerRestart ) {
+    var serverMessage = ''; 
+    var r = response.responseText;
+    if ( r ) {
+      var n1 = r.toLowerCase().indexOf( '<h3>' ) + 4;
+      var n2 = r.toLowerCase().indexOf( '</h3>' );
+      if ( n2 > n1 ) {
+        serverMessage = '<br /><br />' + r.substring( n1, n2 );
+      }
+    }
+
     if ( response.status == 403 ) {
       if ( Sonatype.repoServer.RepoServer.loginWindow.isVisible() ) {
         Sonatype.MessageBox.show( {
           title: 'Login Error',
-          msg: 'Incorrect username or password.<br />Try again.',
+          msg: 'Incorrect username or password.<br />Try again.' + serverMessage,
           buttons: Sonatype.MessageBox.OK,
           icon: Sonatype.MessageBox.ERROR,
           animEl: 'mb3'
@@ -114,7 +124,7 @@ Sonatype.utils = {
         Sonatype.MessageBox.show( {
           title: 'Authentication Error',
           msg: 'Your login is incorrect or your session has expired.<br />' +
-            'Please login again.',
+            'Please login again.' + serverMessage,
           buttons: Sonatype.MessageBox.OK,
           icon: Sonatype.MessageBox.ERROR,
           animEl: 'mb3',
@@ -126,9 +136,9 @@ Sonatype.utils = {
     }
     else {
       Sonatype.MessageBox.show( {
-        title: "Connection Error",
+        title: "Error",
         msg: (
-          ( message ? message + '<br /><br />' : '' ) + 
+          ( message ? message + serverMessage + '<br /><br />' : '' ) + 
           ( response.status ?
               'Nexus returned an error: ERROR ' + response.status + ': ' + response.statusText
               :

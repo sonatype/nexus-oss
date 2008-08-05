@@ -580,7 +580,7 @@ Sonatype.repoServer.RepoServer = function(){
                       } );
                     },
                     failure: function(response, options){
-                      Sonatype.utils.connectionError( response, 'There is an error retrieving your username.' )
+                      Sonatype.utils.connectionError( response, 'There is a problem retrieving your username.' )
                     }
                   });
                 }
@@ -669,7 +669,7 @@ Sonatype.repoServer.RepoServer = function(){
                       } );
                     },
                     failure: function(response, options){
-                      Sonatype.utils.connectionError( response, 'There is an error resetting your password.' )
+                      Sonatype.utils.connectionError( response, 'There is a problem resetting your password.' )
                     }
                   });
                 }
@@ -775,7 +775,7 @@ Sonatype.repoServer.RepoServer = function(){
                       } );
                     },
                     failure: function(response, options){
-                      Sonatype.utils.connectionError( response, 'There is an error changing your password.' )
+                      Sonatype.utils.connectionError( response, 'There is a problem changing your password.' )
                     }
                   });
                 }
