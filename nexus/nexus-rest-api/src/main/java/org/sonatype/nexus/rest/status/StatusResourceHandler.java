@@ -30,7 +30,7 @@ import org.restlet.resource.Representation;
 import org.restlet.resource.Variant;
 import org.sonatype.nexus.SystemStatus;
 import org.sonatype.nexus.configuration.validator.ValidationMessage;
-import org.sonatype.nexus.rest.AbstractNexusResourceHandler;
+import org.sonatype.nexus.rest.authentication.AbstractUIPermissionCalculatingResource;
 import org.sonatype.nexus.rest.model.StatusConfigurationValidationResponse;
 import org.sonatype.nexus.rest.model.StatusResource;
 import org.sonatype.nexus.rest.model.StatusResourceResponse;
@@ -41,7 +41,7 @@ import org.sonatype.nexus.rest.model.StatusResourceResponse;
  * @author cstamas
  */
 public class StatusResourceHandler
-    extends AbstractNexusResourceHandler
+    extends AbstractUIPermissionCalculatingResource
 {
 
     public StatusResourceHandler( Context context, Request request, Response response )
@@ -99,6 +99,8 @@ public class StatusResourceHandler
                 resource.getConfigurationValidationResponse().addValidationWarning( msg.toString() );
             }
         }
+
+        resource.setClientPermissions( getClientPermissionsForCurrentUser() );
 
         StatusResourceResponse response = new StatusResourceResponse();
 

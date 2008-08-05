@@ -2674,6 +2674,14 @@
 					<type>String</type>
 					<required>false</required>
 				</field>
+				<field>
+					<name>clientPermissions</name>
+					<version>1.0.0+</version>
+					<association>
+						<type>AuthenticationClientPermissions</type>
+					</association>
+					<required>true</required>
+				</field>
 			</fields>
 		</class>
 
