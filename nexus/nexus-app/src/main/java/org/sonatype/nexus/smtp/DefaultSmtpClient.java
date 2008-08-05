@@ -60,7 +60,9 @@ public class DefaultSmtpClient
             SimpleEmail email = new SimpleEmail();
             email.setHostName( smtp.getHost() );
             email.setSmtpPort( smtp.getPort() );
-            email.setAuthentication( smtp.getUsername(), smtp.getPassword() );
+            if ( smtp.getUsername() != null && smtp.getUsername().length() > 0 ) {
+              email.setAuthentication( smtp.getUsername(), smtp.getPassword() );
+            }
             email.setDebug( smtp.isDebugMode() );
             email.setSSL( smtp.isSslEnabled() );
             email.setTLS( smtp.isTlsEnabled() );
