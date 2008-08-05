@@ -62,13 +62,25 @@ Sonatype.repoServer.PrivilegeEditPanel = function(config){
     "repositoryId" : "repositoryOrGroup",
     "repositoryGroupId" : "repositoryOrGroup"
   };
+
+  this.getRepositoryTarget = function(val, parent) {
+    if ( val ) {
+      var rec = this.repoTargetDataStore.getAt( this.repoTargetDataStore.find( 'id', val ) );
+      if ( rec ) {
+        return rec.get( 'name' );
+      }
+    }
+    return '';
+  };
   
   this.privilegeRecordConstructor = Ext.data.Record.create([
     {name:'resourceURI'},
     {name:'id'},
     {name:'name', sortType:Ext.data.SortTypes.asUCString},
     {name:'type'},
-    {name:'method'}
+    {name:'method'},
+    {name:'repositoryTargetId'},
+    {name:'sTarget', mapping:'repositoryTargetId', convert: this.getRepositoryTarget.createDelegate(this)}
   ]);
   
   this.repoTargetRecordConstructor = Ext.data.Record.create([
@@ -95,20 +107,19 @@ Sonatype.repoServer.PrivilegeEditPanel = function(config){
     {name:'format'}
   ]);
   
+  this.repoTargetReader = new Ext.data.JsonReader({root: 'data', id: 'resourceURI'}, this.repoTargetRecordConstructor );
+  this.repoTargetDataStore = new Ext.data.Store({
+    url: Sonatype.config.repos.urls.repoTargets,
+    reader: this.repoTargetReader,
+    sortInfo: {field: 'name', direction: 'ASC'},
+    autoLoad: true
+  });
   
   //Reader and datastore that queries the server for the list of currently defined privileges
   this.privilegesReader = new Ext.data.JsonReader({root: 'data', id: 'resourceURI'}, this.privilegeRecordConstructor );
   this.privilegesDataStore = new Ext.data.Store({
     url: Sonatype.config.repos.urls.privileges,
     reader: this.privilegesReader,
-    sortInfo: {field: 'name', direction: 'ASC'},
-    autoLoad: true
-  });
-  
-  this.repoTargetReader = new Ext.data.JsonReader({root: 'data', id: 'resourceURI'}, this.repoTargetRecordConstructor );
-  this.repoTargetDataStore = new Ext.data.Store({
-    url: Sonatype.config.repos.urls.repoTargets,
-    reader: this.repoTargetReader,
     sortInfo: {field: 'name', direction: 'ASC'},
     autoLoad: true
   });
@@ -454,6 +465,7 @@ Sonatype.repoServer.PrivilegeEditPanel = function(config){
     columns: [
       {header: 'Name', dataIndex: 'name', width:175, id: 'privilege-config-name-col'},
       {header: 'Type', dataIndex: 'type', width:175, id: 'privilege-config-type-col'},
+      {header: 'Target', dataIndex: 'sTarget', width:175, id: 'privilege-config-target-col'},
       {header: 'Method', dataIndex: 'method', width:175, id: 'privilege-config-method-col'}
     ],
     autoExpandColumn: 'privilege-config-name-col',
@@ -500,10 +512,10 @@ Sonatype.repoServer.PrivilegeEditPanel = function(config){
 Ext.extend(Sonatype.repoServer.PrivilegeEditPanel, Ext.Panel, {
   //Dump the currently stored data and requery for everything
   reloadAll : function(){
-    this.privilegesDataStore.removeAll();
-    this.privilegesDataStore.reload();
     this.repoTargetDataStore.removeAll();
     this.repoTargetDataStore.reload();
+    this.privilegesDataStore.removeAll();
+    this.privilegesDataStore.reload();
     this.formCards.items.each(function(item, i, len){
       if(i>0){this.remove(item, true);}
     }, this.formCards);
