@@ -24,7 +24,7 @@
 <tr>
 	<td>type</td>
 	<td>usernamefield</td>
-	<td>untest</td>
+	<td>admin</td>
 </tr>
 <tr>
 	<td>type</td>
@@ -647,11 +647,6 @@
 	<td></td>
 </tr>
 <tr>
-	<td>click</td>
-	<td>//div[7]/div/div/div[2]/div[2]/div/div[2]/div[2]/div[2]/div/div/div/div/div/table/tbody/tr/td[1]/table/tbody/tr/td[2]/em/button</td>
-	<td></td>
-</tr>
-<tr>
 	<td>pause</td>
 	<td>500</td>
 	<td></td>
@@ -754,6 +749,36 @@
 <tr>
 	<td>verifyTextPresent</td>
 	<td>Select a Repository Group to edit it, or click &quot;Add&quot; to create a new one.</td>
+	<td></td>
+</tr>
+<tr>
+	<td>mouseDown</td>
+	<td>open-config-server</td>
+	<td></td>
+</tr>
+<tr>
+	<td>mouseUp</td>
+	<td>open-config-server</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>document.forms[1].elements[8]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>document.forms[1].elements[8]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//div[3]/div/div/div/div[2]/div[2]/div/div/div/div/div/table/tbody/tr/td[1]/table/tbody/tr/td[2]</td>
 	<td></td>
 </tr>
 
