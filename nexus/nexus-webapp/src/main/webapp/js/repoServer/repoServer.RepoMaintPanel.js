@@ -427,7 +427,7 @@ Ext.extend(Sonatype.repoServer.RepoMaintPanel, Sonatype.repoServer.AbstractRepoP
     var reindexPriv = this.sp.checkPermission(Sonatype.user.curr.repoServer.actionReindex, this.sp.DELETE);
     var attributesPriv = this.sp.checkPermission(Sonatype.user.curr.repoServer.actionRebuildAttribs, this.sp.DELETE);
     var uploadPriv = this.sp.checkPermission(Sonatype.user.curr.repoServer.actionUploadArtifact, this.sp.CREATE);
-    var repoStatusPriv = this.sp.checkPermission(Sonatype.user.curr.repoServer.setMaintRepos, this.sp.EDIT);
+    var repoStatusPriv = this.sp.checkPermission(Sonatype.user.curr.repoServer.maintRepos, this.sp.EDIT);
     
     if ( e.target.nodeName == 'A' ) return; // no menu on links
     
