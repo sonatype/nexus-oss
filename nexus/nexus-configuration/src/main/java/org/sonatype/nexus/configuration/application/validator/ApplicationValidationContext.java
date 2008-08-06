@@ -25,7 +25,8 @@ import java.util.List;
 
 import org.sonatype.nexus.configuration.validator.AbstractValidationContext;
 
-public class ApplicationValidationContext extends AbstractValidationContext
+public class ApplicationValidationContext
+    extends AbstractValidationContext
 {
     private List<String> existingRepositoryIds;
 
@@ -36,6 +37,8 @@ public class ApplicationValidationContext extends AbstractValidationContext
     private List<String> existingPathMappingIds;
 
     private List<String> existingRealms;
+
+    private List<String> existingRepositoryTargetIds;
 
     public void addExistingRepositoryIds()
     {
@@ -77,6 +80,14 @@ public class ApplicationValidationContext extends AbstractValidationContext
         }
     }
 
+    public void addExistingRepositoryTargetIds()
+    {
+        if ( this.existingRepositoryTargetIds == null )
+        {
+            this.existingRepositoryTargetIds = new ArrayList<String>();
+        }
+    }
+
     public List<String> getExistingRepositoryIds()
     {
         return existingRepositoryIds;
@@ -101,4 +112,10 @@ public class ApplicationValidationContext extends AbstractValidationContext
     {
         return existingRealms;
     }
+
+    public List<String> getExistingRepositoryTargetIds()
+    {
+        return existingRealms;
+    }
+
 }

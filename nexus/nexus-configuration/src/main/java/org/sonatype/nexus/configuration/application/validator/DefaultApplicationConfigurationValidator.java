@@ -712,6 +712,8 @@ public class DefaultApplicationConfigurationValidator
             response.setContext( ctx );
         }
 
+        ApplicationValidationContext context = (ApplicationValidationContext) response.getContext();
+
         if ( StringUtils.isEmpty( settings.getId() ) )
         {
             response.addValidationError( "The RepositoryTarget may have no empty/null ID!" );
@@ -726,6 +728,18 @@ public class DefaultApplicationConfigurationValidator
         {
             response.addValidationError( "Repository target with ID='" + settings.getId()
                 + "' has empty content class!" );
+        }
+
+        if ( context.getExistingRepositoryTargetIds() != null )
+        {
+            // check for uniqueness
+            for ( String id : context.getExistingRepositoryTargetIds() )
+            {
+                if ( id.equals( settings.getId() ) )
+                {
+                    response.addValidationError( "This target ID is already existing!" );
+                }
+            }
         }
 
         List<String> patterns = settings.getPatterns();
@@ -874,7 +888,7 @@ public class DefaultApplicationConfigurationValidator
         {
             return false;
         }
-        
+
         try
         {
             Pattern.compile( regexp );

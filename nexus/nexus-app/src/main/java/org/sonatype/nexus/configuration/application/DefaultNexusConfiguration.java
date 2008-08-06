@@ -37,6 +37,7 @@ import org.sonatype.nexus.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.application.runtime.ApplicationRuntimeConfigurationBuilder;
 import org.sonatype.nexus.configuration.application.source.ApplicationConfigurationSource;
 import org.sonatype.nexus.configuration.application.validator.ApplicationConfigurationValidator;
+import org.sonatype.nexus.configuration.application.validator.ApplicationValidationContext;
 import org.sonatype.nexus.configuration.model.CGroupsSettingPathMappingItem;
 import org.sonatype.nexus.configuration.model.CRemoteConnectionSettings;
 import org.sonatype.nexus.configuration.model.CRemoteHttpProxySettings;
@@ -637,7 +638,7 @@ public class DefaultNexusConfiguration
 
         applyAndSaveConfiguration();
     }
-    
+
     public String readApplicationLogDirectory()
     {
         return getConfiguration().getApplicationLogDirectory();
@@ -1294,7 +1295,23 @@ public class DefaultNexusConfiguration
     protected void validateCRepositoryTarget( CRepositoryTarget settings )
         throws ConfigurationException
     {
-        ValidationResponse res = configurationValidator.validateRepositoryTarget( null, settings );
+        ApplicationValidationContext ctx = null;
+
+        if ( getConfiguration().getRepositoryTargets() != null )
+        {
+            ctx = new ApplicationValidationContext();
+
+            ctx.addExistingRepositoryTargetIds();
+
+            List<CRepositoryTarget> targets = getConfiguration().getRepositoryTargets();
+
+            for ( CRepositoryTarget target : targets )
+            {
+                ctx.getExistingRepositoryTargetIds().add( target.getId() );
+            }
+        }
+
+        ValidationResponse res = configurationValidator.validateRepositoryTarget( ctx, settings );
 
         if ( res.isValid() )
         {

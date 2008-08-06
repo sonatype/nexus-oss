@@ -36,7 +36,6 @@ import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
 import org.sonatype.nexus.configuration.ConfigurationChangeListener;
 import org.sonatype.nexus.configuration.ConfigurationException;
-import org.sonatype.nexus.configuration.application.MutableConfiguration;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.CRepositoryTarget;
@@ -60,12 +59,11 @@ import org.sonatype.nexus.proxy.NoSuchRepositoryGroupException;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.smtp.SmtpClient;
-import org.sonatype.nexus.smtp.SmtpClientException;
 
 /**
- * The class DefaultNexusSecurityConfiguration is responsible for config management. It actually keeps in sync Nexus internal
- * state with persisted user configuration. All changes incoming thru its iface is reflect/maintained in Nexus current
- * state and Nexus user config.
+ * The class DefaultNexusSecurityConfiguration is responsible for config management. It actually keeps in sync Nexus
+ * internal state with persisted user configuration. All changes incoming thru its iface is reflect/maintained in Nexus
+ * current state and Nexus user config.
  * 
  * @author cstamas
  * @plexus.component
@@ -73,31 +71,29 @@ import org.sonatype.nexus.smtp.SmtpClientException;
 
 public class DefaultNexusSecurityConfiguration
     extends AbstractLogEnabled
-    implements
-        NexusSecurityConfiguration,
-        ConfigurationChangeListener
+    implements NexusSecurityConfiguration, ConfigurationChangeListener
 {
     /**
-     * The nexus configuration.  Used to initialize the list of repo targets
+     * The nexus configuration. Used to initialize the list of repo targets
      * 
      * @plexus.requirement
      */
     private NexusConfiguration nexusConfiguration;
-    
+
     /**
      * The repository registry.
      * 
      * @plexus.requirement
      */
     private RepositoryRegistry repositoryRegistry;
-    
+
     /**
      * The configuration source.
      * 
      * @plexus.requirement role-hint="file"
      */
     private SecurityConfigurationSource configurationSource;
-    
+
     /**
      * The smtp client for sending mails.
      * 
@@ -111,7 +107,7 @@ public class DefaultNexusSecurityConfiguration
      * @plexus.requirement
      */
     private SecurityConfigurationValidator configurationValidator;
-    
+
     /**
      * @plexus.requirement
      */
@@ -123,57 +119,56 @@ public class DefaultNexusSecurityConfiguration
      * @plexus.requirement
      */
     private SecurityRuntimeConfigurationBuilder runtimeConfigurationBuilder;
-    
+
     private boolean initialized = false;
-    
+
     /** The config event listeners. */
-    private CopyOnWriteArrayList<ConfigurationChangeListener> configurationChangeListeners =
-        new CopyOnWriteArrayList<ConfigurationChangeListener>();
-        
+    private CopyOnWriteArrayList<ConfigurationChangeListener> configurationChangeListeners = new CopyOnWriteArrayList<ConfigurationChangeListener>();
+
     public void onConfigurationChange( ConfigurationChangeEvent evt )
-    {          
+    {
         if ( FileConfigurationSource.class.isAssignableFrom( configurationSource.getClass() ) )
         {
-            File newFile = ( ( NexusConfiguration ) evt.getNotifiableConfiguration() ).getSecurityConfigurationFile();
-            
-            File oldFile = ( ( FileConfigurationSource ) configurationSource ).getConfigurationFile();
-            
+            File newFile = ( (NexusConfiguration) evt.getNotifiableConfiguration() ).getSecurityConfigurationFile();
+
+            File oldFile = ( (FileConfigurationSource) configurationSource ).getConfigurationFile();
+
             if ( !initialized || !newFile.equals( oldFile ) )
-            {        	
-            	( ( FileConfigurationSource ) configurationSource ).setConfigurationFile( newFile );
-            	
-            	try 
-            	{
-    				loadConfiguration( true );
-    				
-    				notifyConfigurationChangeListeners();
-    				
-    				getLogger().info( "Loaded Nexus Security" );
-    				
-    				initialized = true;
-            	}
-    			catch ( ConfigurationException e )
-    		    {
-    		        getLogger().error( "Could not start Nexus Security, user configuration exception!", e );
-    		    }
-    		    catch ( IOException e )
-    		    {
-    		        getLogger().error( "Could not start Nexus Security, bad IO exception!", e );
-    		    }
+            {
+                ( (FileConfigurationSource) configurationSource ).setConfigurationFile( newFile );
+
+                try
+                {
+                    loadConfiguration( true );
+
+                    notifyConfigurationChangeListeners();
+
+                    getLogger().info( "Loaded Nexus Security" );
+
+                    initialized = true;
+                }
+                catch ( ConfigurationException e )
+                {
+                    getLogger().error( "Could not start Nexus Security, user configuration exception!", e );
+                }
+                catch ( IOException e )
+                {
+                    getLogger().error( "Could not start Nexus Security, bad IO exception!", e );
+                }
             }
         }
     }
-    
+
     public void startService()
         throws StartingException
-    {    	
+    {
         initialized = false;
-        
+
         nexusConfiguration.addConfigurationChangeListener( this );
-        
+
         getLogger().info( "Started Nexus Security" );
     }
-    
+
     public void stopService()
         throws StoppingException
     {
@@ -297,20 +292,20 @@ public class DefaultNexusSecurityConfiguration
 
     /**
      * User CRUD
-     */ 
+     */
     public Collection<CUser> listUsers()
     {
         return new ArrayList<CUser>( getConfiguration().getUsers() );
     }
-    
+
     private String generateNewPassword( CUser settings )
     {
         String password = pwGenerator.generatePassword( 10, 10 );
-        
+
         settings.setPassword( pwGenerator.hashPassword( password ) );
-        
+
         settings.setStatus( CUser.STATUS_EXPIRED );
-        
+
         return password;
     }
 
@@ -318,21 +313,27 @@ public class DefaultNexusSecurityConfiguration
         throws ConfigurationException,
             IOException
     {
-        //On create we need to generate a new password, and email the user their new password
-        
+        // On create we need to generate a new password, and email the user their new password
+
         String password = generateNewPassword( settings );
-        
+
         ValidationResponse vr = configurationValidator.validateUser( initializeContext(), settings, false );
 
         if ( vr.isValid() )
         {
-            //TODO: anything needs to be done for the runtime configuration?
+            // TODO: anything needs to be done for the runtime configuration?
             getConfiguration().getUsers().add( settings );
-            
+
             applyAndSaveConfiguration();
-            
-            smtpClient.sendEmailAsync( settings.getEmail(), null, "Nexus: New user account created.", "User Account " + settings.getUserId() + " has been created.  Another email will be sent shortly containing your password." );
-            smtpClient.sendEmailAsync( settings.getEmail(), null, "Nexus: New user account created.", "Your new password is " + password );
+
+            smtpClient.sendEmailAsync( settings.getEmail(), null, "Nexus: New user account created.", "User Account "
+                + settings.getUserId()
+                + " has been created.  Another email will be sent shortly containing your password." );
+            smtpClient.sendEmailAsync(
+                settings.getEmail(),
+                null,
+                "Nexus: New user account created.",
+                "Your new password is " + password );
         }
         else
         {
@@ -382,7 +383,7 @@ public class DefaultNexusSecurityConfiguration
                     return;
                 }
             }
-            
+
             throw new NoSuchUserException( settings.getUserId() );
         }
         else
@@ -413,27 +414,33 @@ public class DefaultNexusSecurityConfiguration
 
         throw new NoSuchUserException( id );
     }
-    
+
     public void resetPassword( String id )
         throws IOException,
             NoSuchUserException
     {
         CUser user = readUser( id );
-        
+
+        user.setStatus( CUser.STATUS_ACTIVE );
+
         String password = generateNewPassword( user );
-        
+
         applyAndSaveConfiguration();
-        
-        smtpClient.sendEmailAsync( user.getEmail(), null, "Nexus: User account notification.", "Your password has been reset.  Your new password is: " + password );
+
+        smtpClient.sendEmailAsync(
+            user.getEmail(),
+            null,
+            "Nexus: User account notification.",
+            "Your password has been reset.  Your new password is: " + password );
     }
-    
+
     public void forgotPassword( String userId, String email )
         throws IOException,
             NoSuchUserException,
             NoSuchEmailException
     {
         CUser user = readUser( userId );
-        
+
         if ( user.getEmail().equals( email ) )
         {
             resetPassword( userId );
@@ -443,10 +450,10 @@ public class DefaultNexusSecurityConfiguration
             throw new NoSuchEmailException( email );
         }
     }
-    
+
     public void forgotUserId( String email )
         throws IOException,
-        NoSuchEmailException
+            NoSuchEmailException
     {
         List<CUser> users = getConfiguration().getUsers();
 
@@ -456,7 +463,11 @@ public class DefaultNexusSecurityConfiguration
 
             if ( user.getEmail().equals( email ) )
             {
-                smtpClient.sendEmailAsync( user.getEmail(), null, "Nexus: User account notification.", " Your User ID is: " + user.getUserId() );
+                smtpClient.sendEmailAsync(
+                    user.getEmail(),
+                    null,
+                    "Nexus: User account notification.",
+                    " Your User ID is: " + user.getUserId() );
 
                 return;
             }
@@ -464,25 +475,27 @@ public class DefaultNexusSecurityConfiguration
 
         throw new NoSuchEmailException( email );
     }
-    
+
     public void changePassword( String userId, String oldPassword, String newPassword )
-        throws IOException, NoSuchUserException, InvalidCredentialsException
+        throws IOException,
+            NoSuchUserException,
+            InvalidCredentialsException
     {
         CUser user = readUser( userId );
-        
+
         String validate = pwGenerator.hashPassword( oldPassword );
-        
+
         if ( !validate.equals( user.getPassword() ) )
         {
             throw new InvalidCredentialsException();
         }
-        
+
         user.setPassword( pwGenerator.hashPassword( newPassword ) );
     }
-    
+
     /**
      * Role CRUD
-     */ 
+     */
     public Collection<CRole> listRoles()
     {
         return new ArrayList<CRole>( getConfiguration().getRoles() );
@@ -496,7 +509,7 @@ public class DefaultNexusSecurityConfiguration
 
         if ( vr.isValid() )
         {
-            //TODO: anything needs to be done for the runtime configuration?
+            // TODO: anything needs to be done for the runtime configuration?
             getConfiguration().getRoles().add( settings );
 
             applyAndSaveConfiguration();
@@ -549,7 +562,7 @@ public class DefaultNexusSecurityConfiguration
                     return;
                 }
             }
-            
+
             throw new NoSuchRoleException( settings.getId() );
         }
         else
@@ -580,10 +593,10 @@ public class DefaultNexusSecurityConfiguration
 
         throw new NoSuchRoleException( id );
     }
-    
+
     /**
      * Application Privilege CRUD
-     */ 
+     */
     public Collection<CApplicationPrivilege> listApplicationPrivileges()
     {
         return new ArrayList<CApplicationPrivilege>( getConfiguration().getApplicationPrivileges() );
@@ -593,11 +606,14 @@ public class DefaultNexusSecurityConfiguration
         throws ConfigurationException,
             IOException
     {
-        ValidationResponse vr = configurationValidator.validateApplicationPrivilege( initializeContext(), settings, false );
+        ValidationResponse vr = configurationValidator.validateApplicationPrivilege(
+            initializeContext(),
+            settings,
+            false );
 
         if ( vr.isValid() )
         {
-            //TODO: anything needs to be done for the runtime configuration?
+            // TODO: anything needs to be done for the runtime configuration?
             getConfiguration().getApplicationPrivileges().add( settings );
 
             applyAndSaveConfiguration();
@@ -629,7 +645,10 @@ public class DefaultNexusSecurityConfiguration
             ConfigurationException,
             IOException
     {
-        ValidationResponse vr = configurationValidator.validateApplicationPrivilege( initializeContext(), settings, true );
+        ValidationResponse vr = configurationValidator.validateApplicationPrivilege(
+            initializeContext(),
+            settings,
+            true );
 
         if ( vr.isValid() )
         {
@@ -650,7 +669,7 @@ public class DefaultNexusSecurityConfiguration
                     return;
                 }
             }
-            
+
             throw new NoSuchPrivilegeException( settings.getId() );
         }
         else
@@ -681,27 +700,29 @@ public class DefaultNexusSecurityConfiguration
 
         throw new NoSuchPrivilegeException( id );
     }
-    
+
     /**
      * Repository Target Privilege CRUD
-     */ 
+     */
     public Collection<CRepoTargetPrivilege> listRepoTargetPrivileges()
     {
         return new ArrayList<CRepoTargetPrivilege>( getConfiguration().getRepositoryTargetPrivileges() );
     }
-    
+
     private ValidationResponse crossValidateRepoTargetPrivilege( CRepoTargetPrivilege settings )
     {
         ValidationResponse vr = new SecurityValidationResponse();
-        
+
         CRepositoryTarget target = nexusConfiguration.readRepositoryTarget( settings.getRepositoryTargetId() );
-        
+
         // Invalid target ID
         if ( target == null )
         {
-            ValidationMessage error = new ValidationMessage( "repositoryTargetId", "Privilege ID '" + settings.getId() 
-                                                            + "' has invalid repository target ID '" + settings.getRepositoryTargetId() + "'", 
-                                                            "Repository Target doesn't exist" );
+            ValidationMessage error = new ValidationMessage(
+                "repositoryTargetId",
+                "Privilege ID '" + settings.getId() + "' has invalid repository target ID '"
+                    + settings.getRepositoryTargetId() + "'",
+                "Repository Target doesn't exist" );
             vr.addValidationError( error );
         }
         else
@@ -711,22 +732,24 @@ public class DefaultNexusSecurityConfiguration
                 try
                 {
                     CRepository repo = nexusConfiguration.readRepository( settings.getRepositoryId() );
-                    
+
                     // Invalid Repo/Target content types
                     if ( !repo.getType().equals( target.getContentClass() ) )
                     {
-                        ValidationMessage error = new ValidationMessage( "repositoryId", "Privilege ID '" + settings.getId() 
-                                                                        + "' has repository and repository target of different types",
-                                                                        "Content type differs between repository and target.");
+                        ValidationMessage error = new ValidationMessage(
+                            "repositoryId",
+                            "Privilege ID '" + settings.getId()
+                                + "' has repository and repository target of different types",
+                            "Content type differs between repository and target." );
                         vr.addValidationError( error );
                     }
                 }
                 // Invalid repo selection
                 catch ( NoSuchRepositoryException e )
                 {
-                    ValidationMessage error = new ValidationMessage( "repositoryId", "Privilege ID '" + settings.getId() 
-                                                                    + "' has invalid repository ID '" + settings.getRepositoryId() + "'", 
-                                                                    e.getMessage() );
+                    ValidationMessage error = new ValidationMessage( "repositoryId", "Privilege ID '"
+                        + settings.getId() + "' has invalid repository ID '" + settings.getRepositoryId() + "'", e
+                        .getMessage() );
                     vr.addValidationError( error );
                 }
             }
@@ -735,31 +758,33 @@ public class DefaultNexusSecurityConfiguration
                 try
                 {
                     ContentClass content = repositoryRegistry.getRepositoryGroupContentClass( settings.getGroupId() );
-                    
+
                     // Invalid group/target content types
                     if ( !content.getId().equals( target.getContentClass() ) )
                     {
-                        ValidationMessage error = new ValidationMessage( "repositoryGroupId", "Privilege ID '" + settings.getId() 
-                                                                        + "' has repository group and repository target of different types",
-                                                                        "Content type differs between repository group and target.");
+                        ValidationMessage error = new ValidationMessage(
+                            "repositoryGroupId",
+                            "Privilege ID '" + settings.getId()
+                                + "' has repository group and repository target of different types",
+                            "Content type differs between repository group and target." );
                         vr.addValidationError( error );
                     }
                 }
                 // Invalid group selection
                 catch ( NoSuchRepositoryGroupException e )
                 {
-                    ValidationMessage error = new ValidationMessage( "repositoryGroupId", "Privilege ID '" + settings.getId() 
-                                                                    + "' has invalid repository group ID '" + settings.getGroupId() + "'", 
-                                                                    e.getMessage() );
+                    ValidationMessage error = new ValidationMessage( "repositoryGroupId", "Privilege ID '"
+                        + settings.getId() + "' has invalid repository group ID '" + settings.getGroupId() + "'", e
+                        .getMessage() );
                     vr.addValidationError( error );
                 }
             }
             else
             {
-                //All is well
+                // All is well
             }
         }
-        
+
         return vr;
     }
 
@@ -767,13 +792,16 @@ public class DefaultNexusSecurityConfiguration
         throws ConfigurationException,
             IOException
     {
-        ValidationResponse vr = configurationValidator.validateRepoTargetPrivilege( initializeContext(), settings, false );
-        
+        ValidationResponse vr = configurationValidator.validateRepoTargetPrivilege(
+            initializeContext(),
+            settings,
+            false );
+
         vr.append( crossValidateRepoTargetPrivilege( settings ) );
 
         if ( vr.isValid() )
         {
-            //TODO: anything needs to be done for the runtime configuration?
+            // TODO: anything needs to be done for the runtime configuration?
             getConfiguration().getRepositoryTargetPrivileges().add( settings );
 
             applyAndSaveConfiguration();
@@ -805,8 +833,9 @@ public class DefaultNexusSecurityConfiguration
             ConfigurationException,
             IOException
     {
-        ValidationResponse vr = configurationValidator.validateRepoTargetPrivilege( initializeContext(), settings, true );
-        
+        ValidationResponse vr = configurationValidator
+            .validateRepoTargetPrivilege( initializeContext(), settings, true );
+
         vr.append( crossValidateRepoTargetPrivilege( settings ) );
 
         if ( vr.isValid() )
@@ -828,7 +857,7 @@ public class DefaultNexusSecurityConfiguration
                     return;
                 }
             }
-            
+
             throw new NoSuchPrivilegeException( settings.getId() );
         }
         else
@@ -859,42 +888,42 @@ public class DefaultNexusSecurityConfiguration
 
         throw new NoSuchPrivilegeException( id );
     }
-    
+
     private SecurityValidationContext initializeContext()
     {
         SecurityValidationContext context = new SecurityValidationContext();
-        
+
         context.addExistingUserIds();
         context.addExistingRoleIds();
         context.addExistingPrivilegeIds();
-        
+
         for ( CUser user : listUsers() )
         {
             context.getExistingUserIds().add( user.getUserId() );
             context.getExistingEmailMap().put( user.getUserId(), user.getEmail() );
         }
-        
+
         for ( CRole role : listRoles() )
         {
             context.getExistingRoleIds().add( role.getId() );
-            
+
             ArrayList<String> containedRoles = new ArrayList<String>();
-            
+
             containedRoles.addAll( role.getRoles() );
-            
+
             context.getRoleContainmentMap().put( role.getId(), containedRoles );
         }
-        
+
         for ( CPrivilege priv : listApplicationPrivileges() )
         {
             context.getExistingPrivilegeIds().add( priv.getId() );
         }
-        
+
         for ( CPrivilege priv : listRepoTargetPrivileges() )
         {
             context.getExistingPrivilegeIds().add( priv.getId() );
         }
-        
+
         return context;
     }
 }
