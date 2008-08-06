@@ -351,15 +351,18 @@ Ext.extend(Sonatype.repoServer.RepoTargetEditPanel, Ext.Panel, {
   },
   
   saveHandler : function(formInfoObj){
-   	  var fpanel = formInfoObj.formPanel;
-      var treePanel = fpanel.findById(fpanel.id + '_repoTargets-pattern-list');
-      var patternField = fpanel.find('name','pattern')[0];
-      if (!treePanel.root.hasChildNodes()) {
-    	  patternField.markInvalid('The target should have at least one pattern.');
-    	  return;
-      }
+    // validate the form to make sure all the error messages are present
+    var formIsValid = formInfoObj.formPanel.form.isValid();
+    
+ 	  var fpanel = formInfoObj.formPanel;
+    var treePanel = fpanel.findById(fpanel.id + '_repoTargets-pattern-list');
+    var patternField = fpanel.find('name','pattern')[0];
+    if (!treePanel.root.hasChildNodes()) {
+  	  patternField.markInvalid('The target should have at least one pattern.');
+  	  return;
+    }
 
-	  if (formInfoObj.formPanel.form.isValid()) {
+    if ( formIsValid ) {
       var isNew = formInfoObj.isNew;
       var createUri = Sonatype.config.repos.urls.repoTargets;
       var updateUri = (formInfoObj.resourceURI) ? formInfoObj.resourceURI : '';
