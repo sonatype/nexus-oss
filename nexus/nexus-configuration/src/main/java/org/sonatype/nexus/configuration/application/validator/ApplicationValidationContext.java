@@ -115,7 +115,7 @@ public class ApplicationValidationContext
 
     public List<String> getExistingRepositoryTargetIds()
     {
-        return existingRealms;
+        return existingRepositoryTargetIds;
     }
 
 }
