@@ -11,6 +11,7 @@ import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
+import org.sonatype.nexus.rest.model.PrivilegeBaseResource;
 import org.sonatype.nexus.rest.model.PrivilegeTargetResource;
 import org.sonatype.nexus.rest.xstream.XStreamInitializer;
 import org.sonatype.nexus.test.utils.SecurityConfigUtil;
@@ -114,21 +115,14 @@ public class Nexus233PrivilegesValidationTests
     public void createNoTypeTest()
         throws IOException
     {
-
-        // FIXME: this test is known to fail, but is commented out so the CI builds are useful
-        if ( this.printKnownErrorButDoNotFail( this.getClass(), "createNoTypeTest" ) )
-        {
-            return;
-        }
-
-        PrivilegeTargetResource resource = new PrivilegeTargetResource();
+        PrivilegeBaseResource resource = new PrivilegeBaseResource();
 
         List methods = new ArrayList<String>();
         methods.add( "read" );
         resource.setMethod( methods );
         resource.setName( "createNoTypeTest" );
         // resource.setType( "repositoryTarget" );
-        resource.setRepositoryTargetId( "testTarget" );
+        //resource.setRepositoryTargetId( "testTarget" );
 
         Response response = this.messageUtil.sendMessage( Method.POST, resource );
         String responseText = response.getEntity().getText();
@@ -204,17 +198,11 @@ public class Nexus233PrivilegesValidationTests
     public void createApplicationResource()
         throws IOException
     {
-        // FIXME: this test is known to fail, but is commented out so the CI builds are useful
-        if ( this.printKnownErrorButDoNotFail( this.getClass(), "createApplicationResource" ) )
-        {
-            return;
-        }
-
-        PrivilegeTargetResource resource = new PrivilegeTargetResource();
+        PrivilegeBaseResource resource = new PrivilegeTargetResource();
         resource.addMethod( "read" );
         resource.setName( "createApplicationResource" );
         resource.setType( "application" );
-        resource.setRepositoryTargetId( "testTarget" );
+        //resource.setRepositoryTargetId( "testTarget" );
 
         Response response = this.messageUtil.sendMessage( Method.POST, resource );
         String responseText = response.getEntity().getText();
