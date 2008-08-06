@@ -3,13 +3,17 @@ package org.sonatype.nexus.security.filter.authc;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jsecurity.authc.AuthenticationException;
+import org.jsecurity.authc.AuthenticationToken;
+import org.jsecurity.authc.ExpiredCredentialsException;
 import org.jsecurity.authc.UsernamePasswordToken;
 import org.jsecurity.subject.Subject;
+import org.jsecurity.web.WebUtils;
 import org.jsecurity.web.filter.authc.BasicHttpAuthenticationFilter;
 import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.security.filter.NexusJSecurityFilter;
@@ -104,6 +108,49 @@ public class NexusHttpAuthenticationFilter
     protected boolean isRememberMeEnabled( ServletRequest request )
     {
         return true;
+    }
+
+    protected boolean executeLogin( AuthenticationToken token, ServletRequest request, ServletResponse response )
+    {
+        Subject subject = getSubject( request, response );
+
+        if ( token != null && subject != null )
+        {
+            try
+            {
+                subject.login( token );
+
+                if ( getLogger().isDebugEnabled() )
+                {
+                    getLogger().debug( "Successfully logged in user [" + token.getPrincipal() + "]" );
+                }
+
+                return true;
+            }
+            catch ( AuthenticationException ae )
+            {
+                if ( getLogger().isDebugEnabled() )
+                {
+                    getLogger().debug( "Unable to log in user [" + token.getPrincipal() + "]", ae );
+                }
+
+                onAuthenticationException( token, ae, request, response );
+            }
+        }
+
+        // always default to false - authentication attempt never occurred or wasn't successful:
+        return false;
+    }
+
+    protected void onAuthenticationException( AuthenticationToken token, AuthenticationException ae,
+        ServletRequest request, ServletResponse response )
+    {
+        HttpServletResponse httpResponse = WebUtils.toHttp( response );
+
+        if ( ExpiredCredentialsException.class.isAssignableFrom( ae.getClass() ) )
+        {
+            httpResponse.addHeader( "X-Nexus-Reason", "expired" );
+        }
     }
 
     protected boolean executeAnonymousLogin( ServletRequest request, ServletResponse response )
