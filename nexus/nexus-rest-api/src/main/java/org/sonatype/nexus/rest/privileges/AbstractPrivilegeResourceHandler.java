@@ -84,6 +84,7 @@ extends AbstractNexusResourceHandler
             resource.setId( privilege.getId() );
             resource.setMethod( privilege.getMethod() );
             resource.setName( privilege.getName() );
+            resource.setDescription( privilege.getDescription() );
             resource.setResourceURI( calculateSubReference( resource.getId() ).toString() );
         }
                 

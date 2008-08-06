@@ -80,6 +80,7 @@ Sonatype.repoServer.PrivilegeEditPanel = function(config){
     {name:'type'},
     {name:'method'},
     {name:'repositoryTargetId'},
+    {name:'description'},
     {name:'sTarget', mapping:'repositoryTargetId', convert: this.getRepositoryTarget.createDelegate(this)}
   ]);
   
@@ -215,6 +216,16 @@ Sonatype.repoServer.PrivilegeEditPanel = function(config){
         allowBlank: false,
         width: this.COMBO_WIDTH
       },
+      {
+          xtype: 'textfield',
+          fieldLabel: 'Description',
+          itemCls: 'required-field',
+          labelStyle: 'margin-left: 15px; width: 185px;',
+          helpText: ht.description,
+          name: 'description',
+          allowBlank: false,
+          width: this.COMBO_WIDTH
+        },
       {
         xtype: 'combo',
         fieldLabel: 'Type',
@@ -741,6 +752,7 @@ Ext.extend(Sonatype.repoServer.PrivilegeEditPanel, Ext.Panel, {
         rec.set('id', receivedData.id);
         rec.set('name', receivedData.name);
         rec.set('resourceURI', receivedData.resourceURI);
+        rec.set('description', receivedData.description);
         rec.commit();
         rec.endEdit();
   },
@@ -772,20 +784,44 @@ Ext.extend(Sonatype.repoServer.PrivilegeEditPanel, Ext.Panel, {
   },
   
   rowClick : function(grid, rowIndex, e){
-    var rec = grid.store.getAt(rowIndex);
-    
-    if (rec){
-      if ( rec.data.type != "application" ){
-        grid.getTopToolbar().items.get('privilege-delete-btn').enable();
+      var rec = grid.store.getAt(rowIndex);
+      
+      if (rec){
+          if ( rec.data.type != "application" ){
+            grid.getTopToolbar().items.get('privilege-delete-btn').enable();
+          }
+          else {
+            grid.getTopToolbar().items.get('privilege-delete-btn').disable();
+          }
+        }
+        else {
+          grid.getTopToolbar().items.get('privilege-delete-btn').enable();
+        }
+      
+      var id = rec.id; //note: rec.id is unique for new resources and equal to resourceURI for existing ones
+      var panel = this.formCards.findById(id);
+      
+      //assumption: new route forms already exist in formCards, so they won't get into this case
+      if(!panel){ //create form and populate current data
+        panel = new Ext.Panel(
+            {
+                html: rec.data.description,
+                border: false,
+                style: 'padding-left: 20px; padding-top: 20px'
+            });
+        
+        this.formCards.add(panel);
+        
+        //always set active
+        this.formCards.getLayout().setActiveItem(panel);
+        
+        panel.doLayout();
       }
-      else {
-        grid.getTopToolbar().items.get('privilege-delete-btn').disable();
+      else{
+        //always set active
+        this.formCards.getLayout().setActiveItem(panel);
       }
-    }
-    else {
-      grid.getTopToolbar().items.get('privilege-delete-btn').enable();
-    }
-  },
+    },
   
   contextClick : function(grid, index, e){
     this.contextHide();
@@ -860,8 +896,8 @@ Ext.extend(Sonatype.repoServer.PrivilegeEditPanel, Ext.Panel, {
     //@note: there has to be a better way to do this.  Depending on offsets is very error prone
     var newConfig = config;
 
-    newConfig.items[5].items[1].items[0].root = new Ext.tree.TreeNode({text: 'root'});
-    newConfig.items[5].items[1].items[2].root = new Ext.tree.TreeNode({text: 'root'});
+    newConfig.items[6].items[1].items[0].root = new Ext.tree.TreeNode({text: 'root'});
+    newConfig.items[6].items[1].items[2].root = new Ext.tree.TreeNode({text: 'root'});
 
     return newConfig;
   },

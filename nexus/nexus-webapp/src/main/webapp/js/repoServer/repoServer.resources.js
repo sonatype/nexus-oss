@@ -129,6 +129,7 @@ Sonatype.repoServer.resources.help = {
   // Privileges help
   privileges: {
     name : 'The name of this privilege.',
+    description : 'The description of this privilege.',
     type : 'The type of privilege.  Only "Repository Target" type privileges can be managed by the user.',
     repositoryOrGroup : 'The repository or repository group this privilege will be associated with.',
     repositoryTarget : 'The Repository Target that will be applied with this privilege.'

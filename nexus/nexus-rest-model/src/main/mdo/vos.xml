@@ -1934,6 +1934,12 @@
                     <required>true</required>
                 </field>
                 <field>
+                    <name>description</name>
+                    <version>1.0.0+</version>
+                    <type>String</type>
+                    <required>false</required>
+                </field>
+                <field>
                     <name>method</name>
                     <version>1.0.0+</version>
                     <association>
@@ -1994,6 +2000,12 @@
                     <version>1.0.0+</version>
                     <type>String</type>
                     <required>true</required>
+                </field>
+                <field>
+                    <name>description</name>
+                    <version>1.0.0+</version>
+                    <type>String</type>
+                    <required>false</required>
                 </field>
                 <field>
                     <name>type</name>

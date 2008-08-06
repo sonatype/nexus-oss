@@ -154,6 +154,7 @@ public class PrivilegeListResourceHandler
                             CRepoTargetPrivilege priv = new CRepoTargetPrivilege();
                             priv.setMethod( method );
                             priv.setName( res.getName() != null ? res.getName() + " - (" + method + ")" : null );
+                            priv.setDescription( res.getDescription() );
                             priv.setRepositoryTargetId( res.getRepositoryTargetId() );
                             priv.setRepositoryId( res.getRepositoryId() );
                             priv.setGroupId( res.getRepositoryGroupId() );
