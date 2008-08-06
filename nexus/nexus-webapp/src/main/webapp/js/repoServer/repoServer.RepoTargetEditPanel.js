@@ -110,7 +110,8 @@ Sonatype.repoServer.RepoTargetEditPanel = function(config){
         helpText: ht.name,
         name: 'name',
         allowBlank: false,
-        width: this.COMBO_WIDTH
+        width: this.COMBO_WIDTH,
+        validator: this.checkForDuplicates.createDelegate(this)
       },
       {
         xtype: 'combo',
@@ -805,6 +806,17 @@ Ext.extend(Sonatype.repoServer.RepoTargetEditPanel, Ext.Panel, {
     while ( treeRoot.lastChild ) {
       treeRoot.removeChild( treeRoot.lastChild );
     }
+  },
+  
+  checkForDuplicates: function( value ) {
+    var selectedRec = this.repoTargetsGridPanel.getSelectionModel().getSelected();
+    var result = this.repoTargetsDataStore.findBy( function(rec, id) {
+        return selectedRec != rec && rec.get('name') == value;
+      });
+    if ( result >= 0 ) {
+      return 'A target with this name already exists.';
+    }
+    return true;
   }
   
 });
