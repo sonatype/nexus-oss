@@ -347,22 +347,40 @@ Sonatype.repoServer.RepoServer = function(){
 
       //Config Group **************************************************
       var cTplData = {links:[]};
-      if(sp.checkPermission(userPerms.configServer, sp.READ)){
+      if(sp.checkPermission(userPerms.configServer, sp.READ)
+          && (sp.checkPermission(userPerms.configServer, sp.CREATE)
+              || sp.checkPermission(userPerms.configServer, sp.DELETE)
+              || sp.checkPermission(userPerms.configServer, sp.EDIT))){
         cTplData.links.push( {id:'open-config-server', title:'Server'} );
       }
-      if(sp.checkPermission(userPerms.configRepos, sp.READ)){
+      if(sp.checkPermission(userPerms.configRepos, sp.READ)
+          && (sp.checkPermission(userPerms.configRepos, sp.CREATE)
+                  || sp.checkPermission(userPerms.configRepos, sp.DELETE)
+                  || sp.checkPermission(userPerms.configRepos, sp.EDIT))){
         cTplData.links.push( {id:'open-config-repos', title:'Repositories'} );
       }
-      if(sp.checkPermission(userPerms.configGroups, sp.READ)){
+      if(sp.checkPermission(userPerms.configGroups, sp.READ)
+          && (sp.checkPermission(userPerms.configGroups, sp.CREATE)
+                  || sp.checkPermission(userPerms.configGroups, sp.DELETE)
+                  || sp.checkPermission(userPerms.configGroups, sp.EDIT))){
         cTplData.links.push( {id:'open-config-groups', title:'Groups'} );
       }
-      if(sp.checkPermission(userPerms.configRules, sp.READ)){
+      if(sp.checkPermission(userPerms.configRules, sp.READ)
+          && (sp.checkPermission(userPerms.configRules, sp.CREATE)
+                  || sp.checkPermission(userPerms.configRules, sp.DELETE)
+                  || sp.checkPermission(userPerms.configRules, sp.EDIT))){
         cTplData.links.push( {id:'open-config-rules', title:'Routing'} );
       }
-      if(sp.checkPermission(userPerms.configSchedules, sp.READ)){
+      if(sp.checkPermission(userPerms.configSchedules, sp.READ)
+          && (sp.checkPermission(userPerms.configSchedules, sp.CREATE)
+                  || sp.checkPermission(userPerms.configSchedules, sp.DELETE)
+                  || sp.checkPermission(userPerms.configSchedules, sp.EDIT))){
         cTplData.links.push( {id:'open-config-schedules', title:'Scheduled Tasks'} );
       }
-      if(sp.checkPermission(userPerms.configRepoTargets, sp.READ)){
+      if(sp.checkPermission(userPerms.configRepoTargets, sp.READ)
+          && (sp.checkPermission(userPerms.configRepoTargets, sp.CREATE)
+                  || sp.checkPermission(userPerms.configRepoTargets, sp.DELETE)
+                  || sp.checkPermission(userPerms.configRepoTargets, sp.EDIT))){
         cTplData.links.push( {id:'open-config-repoTargets', title:'Repository Targets'} );
       }
       if(cTplData.links.length > 0){
@@ -376,13 +394,22 @@ Sonatype.repoServer.RepoServer = function(){
       if ( sp.checkPermission( userPerms.actionChangePassword, sp.CREATE ) ) {
         sTplData.links.push( { id: 'open-security-password', title: 'Change Password' } );
       }
-      if( sp.checkPermission( userPerms.configUsers, sp.READ ) ) {
+      if( sp.checkPermission( userPerms.configUsers, sp.READ ) 
+          && (sp.checkPermission(userPerms.configUsers, sp.CREATE)
+                  || sp.checkPermission(userPerms.configUsers, sp.DELETE)
+                  || sp.checkPermission(userPerms.configUsers, sp.EDIT))){
         sTplData.links.push( { id: 'open-security-users', title: 'Users' } );
       }
-      if ( sp.checkPermission( userPerms.configRoles, sp.READ ) ) {
+      if ( sp.checkPermission( userPerms.configRoles, sp.READ ) 
+          && (sp.checkPermission(userPerms.configRoles, sp.CREATE)
+                  || sp.checkPermission(userPerms.configRoles, sp.DELETE)
+                  || sp.checkPermission(userPerms.configRoles, sp.EDIT))){
         sTplData.links.push( { id: 'open-security-roles', title: 'Roles' } );
       }
-      if ( sp.checkPermission( userPerms.configPrivileges, sp.READ ) ) {
+      if ( sp.checkPermission( userPerms.configPrivileges, sp.READ ) 
+          && (sp.checkPermission(userPerms.configPrivileges, sp.CREATE)
+                  || sp.checkPermission(userPerms.configPrivileges, sp.DELETE)
+                  || sp.checkPermission(userPerms.configPrivileges, sp.EDIT))){
         sTplData.links.push( { id: 'open-security-privileges', title: 'Privileges' } );
       }
       if ( sTplData.links.length > 0 ){
