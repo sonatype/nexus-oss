@@ -26,6 +26,7 @@ import java.util.List;
 import org.apache.commons.mail.EmailException;
 import org.apache.commons.mail.SimpleEmail;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
+import org.codehaus.plexus.logging.Logger;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.configuration.model.CSmtpConfiguration;
 
@@ -96,13 +97,12 @@ public class DefaultSmtpClient
     
     public void sendEmailAsync( List<String> toList, String from, String subject, String body )
     {
-        Thread thread = new Thread( new EmailRunnable( toList, from, subject, body, nexusConfiguration.readSmtpConfiguration() ) );
+        Thread thread = new Thread( new EmailRunnable( toList, from, subject, body, nexusConfiguration.readSmtpConfiguration(), getLogger() ) );
         
         thread.start();
     }
     
-    private static final class EmailRunnable 
-        extends AbstractLogEnabled
+    private static final class EmailRunnable
         implements Runnable
     {
         private List<String> toList;
@@ -110,14 +110,16 @@ public class DefaultSmtpClient
         private String subject;
         private String body;
         private CSmtpConfiguration smtp;
+        private Logger logger;
         
-        public EmailRunnable( List<String> toList, String from, String subject, String body, CSmtpConfiguration smtpConfig )
+        public EmailRunnable( List<String> toList, String from, String subject, String body, CSmtpConfiguration smtpConfig, Logger logger )
         {
             this.toList = toList;
             this.from = from;
             this.subject = subject;
             this.body = body;
             this.smtp = smtpConfig;
+            this.logger = logger;
         }
         
         public void run()
@@ -147,7 +149,7 @@ public class DefaultSmtpClient
             }
             catch ( EmailException e )
             {
-                getLogger().error( "Error handling smtp request", e );
+                this.logger.error( "Error handling smtp request", e );
             }   
         }
     }
