@@ -58,6 +58,7 @@ import org.sonatype.nexus.configuration.security.model.CRole;
 import org.sonatype.nexus.configuration.security.model.CUser;
 import org.sonatype.nexus.proxy.NoSuchRepositoryGroupException;
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.smtp.SmtpClient;
 
 /**
  * The NexusRealm for JSecurity.
@@ -82,6 +83,13 @@ public class NexusRealm
      * @plexus.requirement
      */
     private Nexus nexus;
+
+    /**
+     * The smtp client for sending mails.
+     * 
+     * @plexus.requirement
+     */
+    private SmtpClient smtpClient;
 
     public NexusRealm()
     {
@@ -175,6 +183,13 @@ public class NexusRealm
             }
             else if ( CUser.STATUS_LOCKED.equals( user.getStatus() ) )
             {
+                if ( !StringUtils.isEmpty( user.getEmail() ) )
+                {
+                    smtpClient.sendEmailAsync( user.getEmail(), null, "Nexus: Account for user '" + user.getUserId()
+                        + "' is locked", "User Account " + user.getUserId()
+                        + " has been locked. Please contact your Nexus Administrator for further steps. Thank you!" );
+                }
+
                 throw new LockedAccountException( "Account for user ['" + username + "'] is locked!" );
             }
             else
