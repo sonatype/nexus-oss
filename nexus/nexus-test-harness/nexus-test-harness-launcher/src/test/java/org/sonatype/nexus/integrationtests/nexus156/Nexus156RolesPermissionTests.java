@@ -91,7 +91,7 @@ public class Nexus156RolesPermissionTests extends AbstractPrivilegeTest
         TestContainer.getInstance().getTestContext().setUsername( "admin" );
         TestContainer.getInstance().getTestContext().setPassword( "admin123" );
 
-        // now give create
+        // now give update
         this.giveUserPrivilege( "test-user", "36" );
 
         TestContainer.getInstance().getTestContext().setUsername( "test-user" );
@@ -114,6 +114,115 @@ public class Nexus156RolesPermissionTests extends AbstractPrivilegeTest
         // delete should fail
         response = this.roleUtil.sendMessage( Method.DELETE, role );
         Assert.assertEquals( "Response status: ", 401, response.getStatus().getCode() );
+        
+        
+    }
+    
+    @Test
+    public void testReadPermission()
+        throws IOException
+    {
+
+        TestContainer.getInstance().getTestContext().setUsername( "admin" );
+        TestContainer.getInstance().getTestContext().setPassword( "admin123" );
+
+        RoleResource role = new RoleResource();
+        role.setDescription( "testReadPermission" );
+        role.setName( "testReadPermission" );
+        role.setSessionTimeout( 30 );
+        role.addPrivilege( "1" );
+
+        Response response = this.roleUtil.sendMessage( Method.POST, role );
+        Assert.assertEquals( "Response status: ", 200, response.getStatus().getCode() );
+
+        TestContainer.getInstance().getTestContext().setUsername( "test-user" );
+        TestContainer.getInstance().getTestContext().setPassword( "admin123" );
+
+        response = this.roleUtil.sendMessage( Method.GET, role );
+        Assert.assertEquals( "Response status: ", 401, response.getStatus().getCode() );
+
+        // use admin
+        TestContainer.getInstance().getTestContext().setUsername( "admin" );
+        TestContainer.getInstance().getTestContext().setPassword( "admin123" );
+
+        // now give read
+        this.giveUserPrivilege( "test-user", "35" );
+
+        TestContainer.getInstance().getTestContext().setUsername( "test-user" );
+        TestContainer.getInstance().getTestContext().setPassword( "admin123" );
+
+        // should work now...
+        
+        // update user
+        response = this.roleUtil.sendMessage( Method.PUT, role );
+        Assert.assertEquals( "Response status: ", 401, response.getStatus().getCode() );
+
+        // read should fail
+        response = this.roleUtil.sendMessage( Method.GET, role );
+        Assert.assertEquals( "Response status: ", 200, response.getStatus().getCode() );
+        
+        // update should fail
+        response = this.roleUtil.sendMessage( Method.POST, role );
+        Assert.assertEquals( "Response status: ", 401, response.getStatus().getCode() );
+        
+        // delete should fail
+        response = this.roleUtil.sendMessage( Method.DELETE, role );
+        Assert.assertEquals( "Response status: ", 401, response.getStatus().getCode() );
+        
+        
+    }
+    
+    @Test
+    public void testDeletePermission()
+        throws IOException
+    {
+
+        TestContainer.getInstance().getTestContext().setUsername( "admin" );
+        TestContainer.getInstance().getTestContext().setPassword( "admin123" );
+
+        RoleResource role = new RoleResource();
+        role.setDescription( "testUpdatePermission" );
+        role.setName( "testUpdatePermission" );
+        role.setSessionTimeout( 30 );
+        role.addPrivilege( "1" );
+
+        Response response = this.roleUtil.sendMessage( Method.POST, role );
+        Assert.assertEquals( "Response status: ", 200, response.getStatus().getCode() );
+
+        TestContainer.getInstance().getTestContext().setUsername( "test-user" );
+        TestContainer.getInstance().getTestContext().setPassword( "admin123" );
+
+
+        response = this.roleUtil.sendMessage( Method.DELETE, role );
+        Assert.assertEquals( "Response status: ", 401, response.getStatus().getCode() );
+
+        // use admin
+        TestContainer.getInstance().getTestContext().setUsername( "admin" );
+        TestContainer.getInstance().getTestContext().setPassword( "admin123" );
+
+        // now give create
+        this.giveUserPrivilege( "test-user", "37" );
+
+        TestContainer.getInstance().getTestContext().setUsername( "test-user" );
+        TestContainer.getInstance().getTestContext().setPassword( "admin123" );
+
+        // should work now...
+        
+        // update user
+        response = this.roleUtil.sendMessage( Method.PUT, role );
+        Assert.assertEquals( "Response status: ", 401, response.getStatus().getCode() );
+
+        // read should fail
+        response = this.roleUtil.sendMessage( Method.GET, role );
+        Assert.assertEquals( "Response status: ", 401, response.getStatus().getCode() );
+        
+        // update should fail
+        response = this.roleUtil.sendMessage( Method.POST, role );
+        Assert.assertEquals( "Response status: ", 401, response.getStatus().getCode() );
+        
+        // delete should fail
+        response = this.roleUtil.sendMessage( Method.DELETE, role );
+        Assert.assertEquals( "Response status: ", 200, response.getStatus().getCode() );
         
         
     }

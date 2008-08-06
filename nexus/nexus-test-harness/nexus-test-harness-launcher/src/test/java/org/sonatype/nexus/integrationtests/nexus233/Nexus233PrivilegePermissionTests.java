@@ -34,7 +34,6 @@ public class Nexus233PrivilegePermissionTests
 
         Response response = this.privUtil.sendMessage( Method.POST, privilege );
         Assert.assertEquals( "Response status: ", 401, response.getStatus().getCode() );
-        PrivilegeBaseStatusResource responsePrivilege = this.privUtil.getResourceFromResponse( response );
 
         // use admin
         TestContainer.getInstance().getTestContext().setUsername( "admin" );
@@ -49,6 +48,7 @@ public class Nexus233PrivilegePermissionTests
 
         response = this.privUtil.sendMessage( Method.POST, privilege );
         Assert.assertEquals( "Response status: ", 200, response.getStatus().getCode() );
+        PrivilegeBaseStatusResource responsePrivilege = this.privUtil.getResourceFromResponse( response );
 
         // read should fail
         response = this.privUtil.sendMessage( Method.GET, null, responsePrivilege.getId() );
@@ -87,7 +87,6 @@ public class Nexus233PrivilegePermissionTests
 
 
         response = this.privUtil.sendMessage( Method.GET, null, responsePrivilege.getId() );
-        System.out.println( "PROBLEM: " + this.userUtil.getUser( "test-user" ) );
         Assert.assertEquals( "Response status: ", 401, response.getStatus().getCode() );
 
         // use admin
@@ -115,6 +114,58 @@ public class Nexus233PrivilegePermissionTests
         // delete should fail
         response = this.privUtil.sendMessage( Method.DELETE, null, responsePrivilege.getId() );
         Assert.assertEquals( "Response status: ", 401, response.getStatus().getCode() );
+
+    }
+    
+    @Test
+    public void testDeletePermission()
+        throws IOException
+    {
+
+        TestContainer.getInstance().getTestContext().setUsername( "admin" );
+        TestContainer.getInstance().getTestContext().setPassword( "admin123" );
+
+        PrivilegeTargetResource privilege = new PrivilegeTargetResource();
+        privilege.addMethod( "read" );
+        privilege.setName( "createReadMethodTest" );
+        privilege.setType( "repositoryTarget" );
+        privilege.setRepositoryTargetId( "testTarget" );
+
+        Response response = this.privUtil.sendMessage( Method.POST, privilege );
+        Assert.assertEquals( "Response status: ", 200, response.getStatus().getCode() );
+        PrivilegeBaseStatusResource responsePrivilege = this.privUtil.getResourceFromResponse( response );
+        
+        TestContainer.getInstance().getTestContext().setUsername( "test-user" );
+        TestContainer.getInstance().getTestContext().setPassword( "admin123" );
+
+        response = this.privUtil.sendMessage( Method.DELETE, null, responsePrivilege.getId() );
+        Assert.assertEquals( "Response status: ", 401, response.getStatus().getCode() );
+
+        // use admin
+        TestContainer.getInstance().getTestContext().setUsername( "admin" );
+        TestContainer.getInstance().getTestContext().setPassword( "admin123" );
+
+        // now give delete
+        this.giveUserPrivilege( "test-user", "33" );
+
+        TestContainer.getInstance().getTestContext().setUsername( "test-user" );
+        TestContainer.getInstance().getTestContext().setPassword( "admin123" );
+
+        // should work now...
+        response = this.privUtil.sendMessage( Method.PUT, privilege, responsePrivilege.getId() );
+        Assert.assertEquals( "Response status: ", 401, response.getStatus().getCode() );
+
+        // read should fail
+        response = this.privUtil.sendMessage( Method.GET, null, responsePrivilege.getId() );
+        Assert.assertEquals( "Response status: ", 401, response.getStatus().getCode() );
+
+        // update should fail
+        response = this.privUtil.sendMessage( Method.POST, privilege );
+        Assert.assertEquals( "Response status: ", 401, response.getStatus().getCode() );
+
+        // delete should fail
+        response = this.privUtil.sendMessage( Method.DELETE, null, responsePrivilege.getId() );
+        Assert.assertEquals( "Response status: ", 200, response.getStatus().getCode() );
 
     }
 

@@ -1,4 +1,4 @@
-package org.sonatype.nexus.integrationtests.nexus385;
+package org.sonatype.nexus.test.utils;
 
 import java.io.IOException;
 import java.util.Iterator;
@@ -17,7 +17,6 @@ import org.sonatype.nexus.rest.model.NexusErrorResponse;
 import org.sonatype.nexus.rest.model.RepositoryRouteMemberRepository;
 import org.sonatype.nexus.rest.model.RepositoryRouteResource;
 import org.sonatype.nexus.rest.model.RepositoryRouteResourceResponse;
-import org.sonatype.nexus.test.utils.NexusConfigUtil;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
 
 import com.thoughtworks.xstream.XStream;
@@ -28,14 +27,11 @@ public class RoutesMessageUtil
 
     private MediaType mediaType;
 
-    private String baseNexusUrl;
-
-    public RoutesMessageUtil( XStream xstream, MediaType mediaType, String baseNexusUrl )
+    public RoutesMessageUtil( XStream xstream, MediaType mediaType )
     {
         super();
         this.xstream = xstream;
         this.mediaType = mediaType;
-        this.baseNexusUrl = baseNexusUrl;
     }
 
     public Response sendMessage( Method method, RepositoryRouteResource resource ) throws IOException

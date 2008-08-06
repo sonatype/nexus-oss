@@ -13,6 +13,7 @@ import org.sonatype.nexus.rest.model.RepositoryRouteMemberRepository;
 import org.sonatype.nexus.rest.model.RepositoryRouteResource;
 import org.sonatype.nexus.rest.xstream.XStreamInitializer;
 import org.sonatype.nexus.test.utils.NexusConfigUtil;
+import org.sonatype.nexus.test.utils.RoutesMessageUtil;
 
 import com.thoughtworks.xstream.XStream;
 
@@ -25,8 +26,7 @@ public class Nexus385RoutesValidationTests
     public Nexus385RoutesValidationTests()
     {
         this.messageUtil =
-            new RoutesMessageUtil( XStreamInitializer.initialize( new XStream() ), MediaType.APPLICATION_XML,
-                                   this.getBaseNexusUrl() );
+            new RoutesMessageUtil( XStreamInitializer.initialize( new XStream() ), MediaType.APPLICATION_XML );
     }
 
     @SuppressWarnings( "unchecked" )

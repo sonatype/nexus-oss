@@ -13,6 +13,7 @@ import org.sonatype.nexus.rest.model.RoleResource;
 import org.sonatype.nexus.rest.model.UserResource;
 import org.sonatype.nexus.rest.xstream.XStreamInitializer;
 import org.sonatype.nexus.test.utils.RoleMessageUtil;
+import org.sonatype.nexus.test.utils.RoutesMessageUtil;
 import org.sonatype.nexus.test.utils.SecurityConfigUtil;
 import org.sonatype.nexus.test.utils.TargetMessageUtil;
 import org.sonatype.nexus.test.utils.UserMessageUtil;
@@ -31,6 +32,8 @@ public abstract class AbstractPrivilegeTest
 
     protected TargetMessageUtil targetUtil;
 
+    protected RoutesMessageUtil routeUtil;
+
     public AbstractPrivilegeTest()
     {
         this.userUtil = new UserMessageUtil( XStreamInitializer.initialize( new XStream() ), MediaType.APPLICATION_XML );
@@ -39,6 +42,7 @@ public abstract class AbstractPrivilegeTest
             new PrivilegesMessageUtil( XStreamInitializer.initialize( new XStream() ), MediaType.APPLICATION_XML );
         this.targetUtil = new TargetMessageUtil( XStreamInitializer.initialize( new XStream() ), MediaType.APPLICATION_XML );
         TestContainer.getInstance().getTestContext().setSecureTest( true );
+        this.routeUtil = new RoutesMessageUtil( XStreamInitializer.initialize( new XStream() ), MediaType.APPLICATION_XML );
     }
 
     @Before
@@ -101,8 +105,8 @@ public abstract class AbstractPrivilegeTest
 
         // now give create
         RoleResource role = new RoleResource();
-        role.setDescription( "Create User Role" );
-        role.setName( "createUserRole" );
+        role.setDescription( priv +" Role" );
+        role.setName( priv +"Role" );
         role.setSessionTimeout( 60 );
         role.addPrivilege( priv );
         // save it

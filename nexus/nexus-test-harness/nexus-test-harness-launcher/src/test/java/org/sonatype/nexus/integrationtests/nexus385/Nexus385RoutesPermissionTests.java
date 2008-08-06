@@ -1,4 +1,4 @@
-package org.sonatype.nexus.integrationtests.nexus133;
+package org.sonatype.nexus.integrationtests.nexus385;
 
 import java.io.IOException;
 
@@ -9,52 +9,54 @@ import org.restlet.data.Method;
 import org.restlet.data.Response;
 import org.sonatype.nexus.integrationtests.AbstractPrivilegeTest;
 import org.sonatype.nexus.integrationtests.TestContainer;
-import org.sonatype.nexus.rest.model.RepositoryTargetResource;
+import org.sonatype.nexus.rest.model.RepositoryRouteMemberRepository;
+import org.sonatype.nexus.rest.model.RepositoryRouteResource;
+import org.sonatype.nexus.rest.model.RoleResource;
 
-public class Nexus133TargetPermissionTests
-    extends AbstractPrivilegeTest
+public class Nexus385RoutesPermissionTests extends AbstractPrivilegeTest
 {
-
+    
     @Test
     public void testCreatePermission()
         throws IOException
     {
-        RepositoryTargetResource target = new RepositoryTargetResource();
-        target.setContentClass( "maven2" );
-        target.setName( "testCreatePermission" );
-        target.addPattern( ".*testCreatePermission.*" );
+        RepositoryRouteResource route = new RepositoryRouteResource();
+        route.setGroupId( "nexus-test" );
+        route.setPattern( ".*testCreatePermission.*" );
+        route.setRuleType( "blocking" );
 
         TestContainer.getInstance().getTestContext().setUsername( "test-user" );
         TestContainer.getInstance().getTestContext().setPassword( "admin123" );
 
-        Response response = this.targetUtil.sendMessage( Method.POST, target );
+        Response response = this.routeUtil.sendMessage( Method.POST, route );
         Assert.assertEquals( "Response status: ", 401, response.getStatus().getCode() );
-        
+
         // use admin
         TestContainer.getInstance().getTestContext().setUsername( "admin" );
         TestContainer.getInstance().getTestContext().setPassword( "admin123" );
 
         // now give create
-        this.giveUserPrivilege( "test-user", "45" );
+        this.giveUserPrivilege( "test-user", "22" );
+        
 
         // now.... it should work...
         TestContainer.getInstance().getTestContext().setUsername( "test-user" );
         TestContainer.getInstance().getTestContext().setPassword( "admin123" );
 
-        response = this.targetUtil.sendMessage( Method.POST, target );
+        response = this.routeUtil.sendMessage( Method.POST, route );
         Assert.assertEquals( "Response status: ", 200, response.getStatus().getCode() );
-        target = this.targetUtil.getResourceFromResponse( response );
+        route = this.routeUtil.getResourceFromResponse( response );
 
         // read should fail
-        response = this.targetUtil.sendMessage( Method.GET, target );
+        response = this.routeUtil.sendMessage( Method.GET, route );
         Assert.assertEquals( "Response status: ", 401, response.getStatus().getCode() );
-
+        
         // update should fail
-        response = this.targetUtil.sendMessage( Method.PUT, target );
+        response = this.routeUtil.sendMessage( Method.PUT, route );
         Assert.assertEquals( "Response status: ", 401, response.getStatus().getCode() );
-
+        
         // delete should fail
-        response = this.targetUtil.sendMessage( Method.DELETE, target );
+        response = this.routeUtil.sendMessage( Method.DELETE, route );
         Assert.assertEquals( "Response status: ", 401, response.getStatus().getCode() );
 
     }
@@ -67,49 +69,53 @@ public class Nexus133TargetPermissionTests
         TestContainer.getInstance().getTestContext().setUsername( "admin" );
         TestContainer.getInstance().getTestContext().setPassword( "admin123" );
 
-        RepositoryTargetResource target = new RepositoryTargetResource();
-        target.setContentClass( "maven2" );
-        target.setName( "testUpdatePermission" );
-        target.addPattern( ".*testUpdatePermission.*" );
+        RepositoryRouteResource route = new RepositoryRouteResource();
+        route.setGroupId( "nexus-test" );
+        route.setPattern( ".*testUpdatePermission.*" );
+        route.setRuleType( "blocking" );
 
-        Response response = this.targetUtil.sendMessage( Method.POST, target );
+        Response response = this.routeUtil.sendMessage( Method.POST, route );
         Assert.assertEquals( "Response status: ", 200, response.getStatus().getCode() );
-        target = this.targetUtil.getResourceFromResponse( response );
+        route = this.routeUtil.getResourceFromResponse( response );
 
         TestContainer.getInstance().getTestContext().setUsername( "test-user" );
         TestContainer.getInstance().getTestContext().setPassword( "admin123" );
 
         // update user
-        target.setName( "tesUpdatePermission2" );
-        response = this.targetUtil.sendMessage( Method.PUT, target );
+        route.setPattern( ".*testUpdatePermission2.*" );
+        response = this.routeUtil.sendMessage( Method.PUT, route );
+//        System.out.println( "PROBLEM: "+ this.userUtil.getUser( "test-user" ) );
         Assert.assertEquals( "Response status: ", 401, response.getStatus().getCode() );
 
         // use admin
         TestContainer.getInstance().getTestContext().setUsername( "admin" );
         TestContainer.getInstance().getTestContext().setPassword( "admin123" );
 
-        // now give create
-        this.giveUserPrivilege( "test-user", "47" );
+        // now give update
+        this.giveUserPrivilege( "test-user", "24" );
 
         TestContainer.getInstance().getTestContext().setUsername( "test-user" );
         TestContainer.getInstance().getTestContext().setPassword( "admin123" );
 
         // should work now...
-        response = this.targetUtil.sendMessage( Method.PUT, target );
+        
+        // update user
+        response = this.routeUtil.sendMessage( Method.PUT, route );
         Assert.assertEquals( "Response status: ", 200, response.getStatus().getCode() );
 
         // read should fail
-        response = this.targetUtil.sendMessage( Method.GET, target );
+        response = this.routeUtil.sendMessage( Method.GET, route );
         Assert.assertEquals( "Response status: ", 401, response.getStatus().getCode() );
-
+        
         // update should fail
-        response = this.targetUtil.sendMessage( Method.POST, target );
+        response = this.routeUtil.sendMessage( Method.POST, route );
         Assert.assertEquals( "Response status: ", 401, response.getStatus().getCode() );
-
+        
         // delete should fail
-        response = this.targetUtil.sendMessage( Method.DELETE, target );
+        response = this.routeUtil.sendMessage( Method.DELETE, route );
         Assert.assertEquals( "Response status: ", 401, response.getStatus().getCode() );
-
+        
+        
     }
     
     @Test
@@ -120,51 +126,51 @@ public class Nexus133TargetPermissionTests
         TestContainer.getInstance().getTestContext().setUsername( "admin" );
         TestContainer.getInstance().getTestContext().setPassword( "admin123" );
 
-        RepositoryTargetResource target = new RepositoryTargetResource();
-        target.setContentClass( "maven2" );
-        target.setName( "testReadPermission" );
-        target.addPattern( ".*testReadPermission.*" );
+        RepositoryRouteResource route = new RepositoryRouteResource();
+        route.setGroupId( "nexus-test" );
+        route.setPattern( ".*testUpdatePermission.*" );
+        route.setRuleType( "blocking" );
 
-        Response response = this.targetUtil.sendMessage( Method.POST, target );
+        Response response = this.routeUtil.sendMessage( Method.POST, route );
         Assert.assertEquals( "Response status: ", 200, response.getStatus().getCode() );
-        target = this.targetUtil.getResourceFromResponse( response );
+        route = this.routeUtil.getResourceFromResponse( response );
 
         TestContainer.getInstance().getTestContext().setUsername( "test-user" );
         TestContainer.getInstance().getTestContext().setPassword( "admin123" );
 
-        // update user
-        target.setName( "tesUpdatePermission2" );
-        response = this.targetUtil.sendMessage( Method.GET, target );
+        response = this.routeUtil.sendMessage( Method.GET, route );
         Assert.assertEquals( "Response status: ", 401, response.getStatus().getCode() );
 
         // use admin
         TestContainer.getInstance().getTestContext().setUsername( "admin" );
         TestContainer.getInstance().getTestContext().setPassword( "admin123" );
 
-        // now give create
-        this.giveUserPrivilege( "test-user", "46" );
+        // now give read
+        this.giveUserPrivilege( "test-user", "23" );
 
         TestContainer.getInstance().getTestContext().setUsername( "test-user" );
         TestContainer.getInstance().getTestContext().setPassword( "admin123" );
 
-        // read should fail
-        response = this.targetUtil.sendMessage( Method.GET, target );
-        Assert.assertEquals( "Response status: ", 200, response.getStatus().getCode() );
-
-        // update should fail
-        response = this.targetUtil.sendMessage( Method.POST, target );
+        // should work now...
+        
+        // update user
+        response = this.routeUtil.sendMessage( Method.PUT, route );
         Assert.assertEquals( "Response status: ", 401, response.getStatus().getCode() );
 
-        // delete should fail
-        response = this.targetUtil.sendMessage( Method.PUT, target );
+        // read should fail
+        response = this.routeUtil.sendMessage( Method.GET, route );
+        Assert.assertEquals( "Response status: ", 200, response.getStatus().getCode() );
+        
+        // update should fail
+        response = this.routeUtil.sendMessage( Method.POST, route );
         Assert.assertEquals( "Response status: ", 401, response.getStatus().getCode() );
         
-     // should work now...
-        response = this.targetUtil.sendMessage( Method.DELETE, target );
+        // delete should fail
+        response = this.routeUtil.sendMessage( Method.DELETE, route );
         Assert.assertEquals( "Response status: ", 401, response.getStatus().getCode() );
-
+        
+        
     }
-    
     
     @Test
     public void testDeletePermission()
@@ -174,21 +180,20 @@ public class Nexus133TargetPermissionTests
         TestContainer.getInstance().getTestContext().setUsername( "admin" );
         TestContainer.getInstance().getTestContext().setPassword( "admin123" );
 
-        RepositoryTargetResource target = new RepositoryTargetResource();
-        target.setContentClass( "maven2" );
-        target.setName( "testDeletePermission" );
-        target.addPattern( ".*testDeletePermission.*" );
+        RepositoryRouteResource route = new RepositoryRouteResource();
+        route.setGroupId( "nexus-test" );
+        route.setPattern( ".*testUpdatePermission.*" );
+        route.setRuleType( "blocking" );
 
-        Response response = this.targetUtil.sendMessage( Method.POST, target );
+        Response response = this.routeUtil.sendMessage( Method.POST, route );
         Assert.assertEquals( "Response status: ", 200, response.getStatus().getCode() );
-        target = this.targetUtil.getResourceFromResponse( response );
+        route = this.routeUtil.getResourceFromResponse( response );
 
         TestContainer.getInstance().getTestContext().setUsername( "test-user" );
         TestContainer.getInstance().getTestContext().setPassword( "admin123" );
 
-        // update user
-        target.setName( "tesUpdatePermission2" );
-        response = this.targetUtil.sendMessage( Method.DELETE, target );
+
+        response = this.routeUtil.sendMessage( Method.DELETE, route );
         Assert.assertEquals( "Response status: ", 401, response.getStatus().getCode() );
 
         // use admin
@@ -196,27 +201,31 @@ public class Nexus133TargetPermissionTests
         TestContainer.getInstance().getTestContext().setPassword( "admin123" );
 
         // now give create
-        this.giveUserPrivilege( "test-user", "48" );
+        this.giveUserPrivilege( "test-user", "25" );
 
         TestContainer.getInstance().getTestContext().setUsername( "test-user" );
         TestContainer.getInstance().getTestContext().setPassword( "admin123" );
 
+        // should work now...
+        
+        // update user
+        response = this.routeUtil.sendMessage( Method.PUT, route );
+        Assert.assertEquals( "Response status: ", 401, response.getStatus().getCode() );
+
         // read should fail
-        response = this.targetUtil.sendMessage( Method.GET, target );
-        Assert.assertEquals( "Response status: ", 401, response.getStatus().getCode() );
-
-        // update should fail
-        response = this.targetUtil.sendMessage( Method.POST, target );
-        Assert.assertEquals( "Response status: ", 401, response.getStatus().getCode() );
-
-        // delete should fail
-        response = this.targetUtil.sendMessage( Method.PUT, target );
+        response = this.routeUtil.sendMessage( Method.GET, route );
         Assert.assertEquals( "Response status: ", 401, response.getStatus().getCode() );
         
-     // should work now...
-        response = this.targetUtil.sendMessage( Method.DELETE, target );
+        // update should fail
+        response = this.routeUtil.sendMessage( Method.POST, route );
+        Assert.assertEquals( "Response status: ", 401, response.getStatus().getCode() );
+        
+        // delete should fail
+        response = this.routeUtil.sendMessage( Method.DELETE, route );
         Assert.assertEquals( "Response status: ", 200, response.getStatus().getCode() );
-
+        
+        
     }
-
+    
+    
 }
