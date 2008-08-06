@@ -99,6 +99,43 @@ Sonatype.repoServer.RepoServer = function(){
       );
     },
     
+    buildRecoveryText : function(){
+        var htmlString = null;
+        
+        if(sp.checkPermission(Sonatype.user.curr.repoServer.actionForgotUserid, sp.CREATE)){
+          htmlString = 'Forgot your <a id="recover-username" href="#">username</a>'
+        }
+        if(sp.checkPermission(Sonatype.user.curr.repoServer.actionForgotPassword, sp.CREATE)){
+          if (htmlString != null){
+            htmlString += ' or ';
+          }
+          else{
+            htmlString = 'Forgot your ';
+          }
+          htmlString += '<a id="recover-password" href="#">password</a>';
+        }
+        if (htmlString != null){
+          htmlString += '?';
+        }
+        
+        return htmlString;
+    },
+    
+    statusComplete : function( statusResponse ){        
+        this.resetMainTabPanel();
+        
+        this.createSubComponents(); //update left panel
+        
+        var htmlString = this.buildRecoveryText();
+        
+        this.loginForm.add({
+            xtype: 'panel',
+            id: 'recovery-panel',
+            style: 'padding-left: 70px',
+            html: htmlString
+          });
+    },
+    
     // Each Sonatype server will need one of these 
     initServerTab : function() {
       
@@ -116,22 +153,9 @@ Sonatype.repoServer.RepoServer = function(){
       
       Sonatype.view.serverTabPanel.add(this.nexusPanel);
       
-      var htmlString = null;
+      var htmlString = this.buildRecoveryText();
       
-      if(sp.checkPermission(Sonatype.user.curr.repoServer.actionForgotUserid, sp.CREATE)){
-        htmlString = 'Forgot your <a id="recover-username" href="#">username</a>'
-      }
-      if(sp.checkPermission(Sonatype.user.curr.repoServer.actionForgotPassword, sp.CREATE)){
-    	if (htmlString != null){
-          htmlString += ' or ';
-    	}
-    	else{
-          htmlString = 'Forgot your ';
-    	}
-    	htmlString += '<a id="recover-password" href="#">password</a>';
-      }
       if (htmlString != null){
-    	htmlString += '?';
     	this.loginFormConfig.items[2] = 
     	  {
     		xtype: 'panel',
