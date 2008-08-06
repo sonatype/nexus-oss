@@ -629,7 +629,7 @@ Ext.extend(Sonatype.repoServer.RepoTargetEditPanel, Ext.Panel, {
   beforeFormRenderHandler : function(component){
     var sp = Sonatype.lib.Permissions;
     // TODO
-    if(sp.checkPermission(Sonatype.user.curr.repoServer.configRepoTarget, sp.EDIT)){
+    if(sp.checkPermission(Sonatype.user.curr.repoServer.configRepoTargets, sp.EDIT)){
       component.buttons[0].disabled = false;
     }
   },
