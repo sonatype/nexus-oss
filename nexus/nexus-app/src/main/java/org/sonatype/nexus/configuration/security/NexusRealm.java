@@ -160,17 +160,17 @@ public class NexusRealm
         {
             CUser user = securityConfiguration.readUser( username );
 
+            String password = user.getPassword();
+
+            if ( password == null )
+            {
+                throw new UnknownAccountException( "No account found for user [" + username + "]" );
+            }
+
+            AuthenticationInfo authenticationInfo = buildAuthenticationInfo( username, password.toCharArray() );
+
             if ( CUser.STATUS_ACTIVE.equals( user.getStatus() ) )
             {
-                String password = user.getPassword();
-
-                if ( password == null )
-                {
-                    throw new UnknownAccountException( "No account found for user [" + username + "]" );
-                }
-
-                AuthenticationInfo authenticationInfo = buildAuthenticationInfo( username, password.toCharArray() );
-
                 return authenticationInfo;
             }
             else if ( CUser.STATUS_DISABLED.equals( user.getStatus() ) )
@@ -179,18 +179,41 @@ public class NexusRealm
             }
             else if ( CUser.STATUS_EXPIRED.equals( user.getStatus() ) )
             {
-                throw new ExpiredCredentialsException( "Credentials for user['" + username + "'] has expired!" );
+                if ( getCredentialsMatcher().doCredentialsMatch( token, authenticationInfo ) )
+                {
+                    throw new ExpiredCredentialsException( "Credentials for user['" + username + "'] has expired!" );
+                }
+                else
+                {
+                    // not throwing ExpiredCredentialsException to prevent phishing
+                    throw new AccountException( "Credentials for user['" + username
+                        + "'] has expired and is accessed with wrong credentials!" );
+                }
             }
             else if ( CUser.STATUS_LOCKED.equals( user.getStatus() ) )
             {
-                if ( !StringUtils.isEmpty( user.getEmail() ) )
+                if ( getCredentialsMatcher().doCredentialsMatch( token, authenticationInfo ) )
                 {
-                    smtpClient.sendEmailAsync( user.getEmail(), null, "Nexus: Account for user '" + user.getUserId()
-                        + "' is locked", "User Account " + user.getUserId()
-                        + " has been locked. Please contact your Nexus Administrator for further steps. Thank you!" );
-                }
+                    if ( !StringUtils.isEmpty( user.getEmail() ) )
+                    {
+                        smtpClient
+                            .sendEmailAsync(
+                                user.getEmail(),
+                                null,
+                                "Nexus: Account for user '" + user.getUserId() + "' is locked",
+                                "User Account "
+                                    + user.getUserId()
+                                    + " has been locked. Please contact your Nexus Administrator for further steps. Thank you!" );
+                    }
 
-                throw new LockedAccountException( "Account for user ['" + username + "'] is locked!" );
+                    throw new LockedAccountException( "Account for user ['" + username + "'] is locked!" );
+                }
+                else
+                {
+                    // not throwing ExpiredCredentialsException to prevent phishing
+                    throw new AccountException( "Account for user ['" + username
+                        + "'] is locked and is accessed with wrong credentials!" );
+                }
             }
             else
             {
