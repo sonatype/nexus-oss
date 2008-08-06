@@ -329,7 +329,7 @@ public class DefaultNexusConfiguration
     {
         if ( securityConfigurationFile == null )
         {
-            securityConfigurationFile = new File( getConfiguration().getSecurity().getConfigurationFile() );
+            securityConfigurationFile = new File( getConfigurationDirectory(), "security.xml" );
 
             if ( !securityConfigurationFile.exists() )
             {
@@ -637,20 +637,7 @@ public class DefaultNexusConfiguration
 
         applyAndSaveConfiguration();
     }
-
-    public String readSecurityConfigurationFile()
-    {
-        return getConfiguration().getSecurity().getConfigurationFile();
-    }
-
-    public void updateSecurityConfigurationFile( String settings )
-        throws IOException
-    {
-        getConfiguration().getSecurity().setConfigurationFile( settings );
-
-        applyAndSaveConfiguration();
-    }
-
+    
     public String readApplicationLogDirectory()
     {
         return getConfiguration().getApplicationLogDirectory();

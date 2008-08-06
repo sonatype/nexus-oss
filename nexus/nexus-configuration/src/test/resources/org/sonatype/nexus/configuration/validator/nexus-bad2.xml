@@ -21,7 +21,6 @@
     
 	<security>
 		<enabled>false</enabled>
-		<configurationFile>${runtime}/apps/nexus/conf/security.xml</configurationFile>
 	</security>
 
 	<globalConnectionSettings>

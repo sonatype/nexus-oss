@@ -34,7 +34,6 @@ Sonatype.repoServer.referenceData = {
     securityEnabled: false,
     securityAnonymousAccessEnabled: false, 
     workingDirectory: "",
-    securityConfigurationFile: "",
     logDirectory: "",
     baseUrl: "",
     smtpSettings: {

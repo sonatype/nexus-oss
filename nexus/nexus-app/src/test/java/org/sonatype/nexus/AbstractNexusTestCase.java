@@ -44,7 +44,7 @@ public abstract class AbstractNexusTestCase
     protected void customizeContext( Context ctx )
     {
         File nexusConfigFile = new File( PLEXUS_HOME, "/conf/nexus.xml" );
-        File nexusSecurityConfigFile = new File( PLEXUS_HOME, "/apps/nexus/conf/security.xml" );
+        File nexusSecurityConfigFile = new File( PLEXUS_HOME, "/conf/security.xml" );
 
         nexusConfigFile.getParentFile().mkdirs();
         nexusSecurityConfigFile.getParentFile().mkdirs();
@@ -71,7 +71,7 @@ public abstract class AbstractNexusTestCase
     
     protected String getNexusSecurityConfiguration()
     {
-        return PLEXUS_HOME + "/apps/nexus/conf/security.xml";
+        return PLEXUS_HOME + "/work/nexus/conf/security.xml";
     }
 
     protected void copyDefaultConfigToPlace()

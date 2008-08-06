@@ -65,6 +65,11 @@ public class SimpleApplicationConfiguration
     {
         return new File( configuration.getWorkingDirectory() );
     }
+    
+    public File getSecurityConfigurationFile()
+    {
+        return new File( getWorkingDirectory(), "security.xml" );
+    }
 
     public File getWorkingDirectory( String key )
     {

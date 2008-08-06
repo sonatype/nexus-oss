@@ -88,6 +88,8 @@ public class AbstractNexusIntegrationTest
     }
 
     public static final String RELATIVE_CONF_DIR = "runtime/apps/nexus/conf";
+    
+    public static final String RELATIVE_WORK_CONF_DIR = "runtime/work/nexus/conf";
 
     protected AbstractNexusIntegrationTest()
     {
@@ -128,7 +130,7 @@ public class AbstractNexusIntegrationTest
                 this.copyConfigFile( "nexus.xml" );
 
                 // copy security config
-                this.copyConfigFile( "security.xml" );
+                this.copyConfigFile( "security.xml", RELATIVE_WORK_CONF_DIR );
 
                 this.copyConfigFile( "log4j.properties", variables );
 
@@ -315,14 +317,7 @@ public class AbstractNexusIntegrationTest
 
     }
 
-    private void copyConfigFile( String configFile, Map<String, String> variables )
-        throws IOException
-    {
-        this.copyConfigFile( configFile, configFile, variables );
-
-    }
-
-    private void copyConfigFile( String configFile, String destShortName, Map<String, String> variables )
+    private void copyConfigFile( String configFile, String destShortName, Map<String, String> variables, String path )
         throws IOException
     {
         // the test can override the test config.
@@ -342,15 +337,37 @@ public class AbstractNexusIntegrationTest
         System.out.println( "copying " + configFile + " to:  "
             + new File( AbstractNexusIntegrationTest.nexusBaseDir + "/" + RELATIVE_CONF_DIR, configFile ) );
 
-        FileTestingUtils.interpolationFileCopy( testConfigFile, new File( AbstractNexusIntegrationTest.nexusBaseDir + "/" + RELATIVE_CONF_DIR,
+        FileTestingUtils.interpolationFileCopy( testConfigFile, new File( AbstractNexusIntegrationTest.nexusBaseDir + "/" + 
+                                                                          ( path == null ? RELATIVE_CONF_DIR : path ),
                                                                           destShortName ), variables );
 
     }
-
+    
+    //Overloaded helpers
     private void copyConfigFile( String configFile )
         throws IOException
     {
-        this.copyConfigFile( configFile, new HashMap<String, String>() );
+        this.copyConfigFile( configFile, ( String ) null );
+    }
+
+    private void copyConfigFile( String configFile, String path )
+        throws IOException
+    {
+        this.copyConfigFile( configFile, new HashMap<String, String>(), path );
+    }
+    
+    private void copyConfigFile( String configFile, Map<String, String> variables )
+        throws IOException
+    {
+        this.copyConfigFile( configFile, configFile, variables, null );
+    
+    }
+    
+    private void copyConfigFile( String configFile, Map<String, String> variables, String path )
+        throws IOException
+    {
+        this.copyConfigFile( configFile, configFile, variables, path );
+    
     }
 
     /**

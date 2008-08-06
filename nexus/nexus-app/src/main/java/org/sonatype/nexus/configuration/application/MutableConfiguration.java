@@ -92,11 +92,6 @@ public interface MutableConfiguration
 
     void updateWorkingDirectory( String settings )
         throws IOException;
-    
-    String readSecurityConfigurationFile();
-
-    void updateSecurityConfigurationFile( String settings )
-        throws IOException;
 
     String readApplicationLogDirectory();
 

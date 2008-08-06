@@ -124,8 +124,8 @@ public class DefaultNexusSecurityConfiguration
      */
     private SecurityRuntimeConfigurationBuilder runtimeConfigurationBuilder;
     
-    private boolean forceInit = true;
-
+    private boolean initialized = false;
+    
     /** The config event listeners. */
     private CopyOnWriteArrayList<ConfigurationChangeListener> configurationChangeListeners =
         new CopyOnWriteArrayList<ConfigurationChangeListener>();
@@ -134,41 +134,41 @@ public class DefaultNexusSecurityConfiguration
     {          
         if ( FileConfigurationSource.class.isAssignableFrom( configurationSource.getClass() ) )
         {
+            File newFile = ( ( NexusConfiguration ) evt.getNotifiableConfiguration() ).getSecurityConfigurationFile();
             
-            File newFile = new File( ( ( MutableConfiguration ) evt.getNotifiableConfiguration() ).readSecurityConfigurationFile() );
+            File oldFile = ( ( FileConfigurationSource ) configurationSource ).getConfigurationFile();
             
-            if ( forceInit
-                || !newFile.equals( ( ( FileConfigurationSource ) configurationSource ).getConfigurationFile() ) )
-            {
-            	getLogger().info( "Nexus Configuration Security Configuration File changed, now re-loading Security Configuration" );
-            	
-            	( ( FileConfigurationSource ) configurationSource ).setConfigurationFile( new File( nexusConfiguration.readSecurityConfigurationFile() ) );
+            if ( !initialized || !newFile.equals( oldFile ) )
+            {        	
+            	( ( FileConfigurationSource ) configurationSource ).setConfigurationFile( newFile );
             	
             	try 
             	{
-					loadConfiguration( true );
-					
-					notifyConfigurationChangeListeners();
+    				loadConfiguration( true );
+    				
+    				notifyConfigurationChangeListeners();
+    				
+    				getLogger().info( "Loaded Nexus Security" );
+    				
+    				initialized = true;
             	}
-				catch ( ConfigurationException e )
-			    {
-			        getLogger().error( "Could not start Nexus Security, user configuration exception!", e );
-			    }
-			    catch ( IOException e )
-			    {
-			        getLogger().error( "Could not start Nexus Security, bad IO exception!", e );
-			    }
-			    
-			    forceInit = false;
+    			catch ( ConfigurationException e )
+    		    {
+    		        getLogger().error( "Could not start Nexus Security, user configuration exception!", e );
+    		    }
+    		    catch ( IOException e )
+    		    {
+    		        getLogger().error( "Could not start Nexus Security, bad IO exception!", e );
+    		    }
             }
         }
     }
     
     public void startService()
         throws StartingException
-    {
-    	forceInit = true;
-    	
+    {    	
+        initialized = false;
+        
         nexusConfiguration.addConfigurationChangeListener( this );
         
         getLogger().info( "Started Nexus Security" );

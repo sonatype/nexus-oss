@@ -1336,15 +1336,6 @@
 					<defaultValue>anonymous</defaultValue>
 				</field>
 				<field>
-				    <name>configurationFile</name>
-				    <version>1.0.4+</version>
-				    <type>String</type>
-				    <required>true</required>
-				    <description>
-				        The location of the security configuration file.  This file will configure the default nexus security.
-				    </description>
-				</field>
-				<field>
 					<name>realms</name>
 					<version>1.0.4+</version>
 					<description>The list of JSecurity realms used in Nexus.</description>

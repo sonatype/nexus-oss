@@ -6,7 +6,6 @@
   <security>
     <enabled>true</enabled>
     <anonymousAccessEnabled>true</anonymousAccessEnabled>
-    <configurationFile>${runtime}/apps/nexus/conf/security.xml</configurationFile>
     <realms>
       <realm>default</realm>
     </realms>

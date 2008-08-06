@@ -24,7 +24,6 @@
 		<anonymousAccessEnabled>true</anonymousAccessEnabled>
 		<anonymousUsername>anonymous</anonymousUsername>
 		<anonymousPassword>anonymous</anonymousPassword>
-		<configurationFile>${runtime}/apps/nexus/conf/security.xml</configurationFile>
 		<realms>
 			<realm>default</realm>
 		</realms>

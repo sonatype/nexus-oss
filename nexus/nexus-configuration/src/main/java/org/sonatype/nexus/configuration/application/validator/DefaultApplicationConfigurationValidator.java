@@ -280,15 +280,6 @@ public class DefaultApplicationConfigurationValidator
             }
         }
 
-        if ( StringUtils.isEmpty( settings.getConfigurationFile() ) )
-        {
-            response.addValidationWarning( "Security Configuration File not set, using default." );
-
-            settings.setConfigurationFile( "${runtime}/apps/nexus/conf/security.xml" );
-
-            response.setModified( true );
-        }
-
         return response;
     }
 

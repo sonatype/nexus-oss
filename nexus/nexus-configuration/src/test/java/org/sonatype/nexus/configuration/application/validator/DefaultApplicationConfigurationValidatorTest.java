@@ -69,7 +69,7 @@ public class DefaultApplicationConfigurationValidatorTest
 
         assertEquals( 1, response.getValidationErrors().size() );
         
-        assertEquals( 4, response.getValidationWarnings().size() );
+        assertEquals( 3, response.getValidationWarnings().size() );
     }
 
     public void testBad2()

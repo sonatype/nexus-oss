@@ -158,8 +158,6 @@ public class GlobalConfigurationResourceHandler
 
                     getNexus().updateApplicationLogDirectory( resource.getLogDirectory() );
                     
-                    getNexus().updateSecurityConfigurationFile( resource.getSecurityConfigurationFile() );
-                    
                     if ( resource.getSmtpSettings() != null )
                     {
                         SmtpSettings settings = resource.getSmtpSettings();
@@ -309,8 +307,6 @@ public class GlobalConfigurationResourceHandler
 
         resource.setGlobalHttpProxySettings( convert( getNexus().readDefaultGlobalRemoteHttpProxySettings() ) );
         
-        resource.setSecurityConfigurationFile( getNexus().readDefaultSecurityConfigurationFile() );
-        
         resource.setSmtpSettings( convert( getNexus().readDefaultSmtpConfiguration() ) );
     }
 
@@ -338,8 +334,6 @@ public class GlobalConfigurationResourceHandler
         resource.setGlobalHttpProxySettings( convert( getNexus().readGlobalRemoteHttpProxySettings() ) );
 
         resource.setBaseUrl( getNexus().getBaseUrl() );
-        
-        resource.setSecurityConfigurationFile( getNexus().readSecurityConfigurationFile() );
         
         resource.setSmtpSettings( convert( getNexus().readSmtpConfiguration() ) );
     }

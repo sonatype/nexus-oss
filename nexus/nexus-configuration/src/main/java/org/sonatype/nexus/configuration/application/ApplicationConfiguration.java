@@ -31,6 +31,13 @@ import org.sonatype.nexus.configuration.model.Configuration;
 public interface ApplicationConfiguration extends NotifiableConfiguration
 {
     String ROLE = ApplicationConfiguration.class.getName();
+    
+    /**
+     * Gets the location of the security.xml file.  The parent directories are created if necessary
+     * 
+     * @return
+     */
+    File getSecurityConfigurationFile();
 
     /**
      * Gets the working directory as file. The directory is created if needed and is guaranteed to exists.

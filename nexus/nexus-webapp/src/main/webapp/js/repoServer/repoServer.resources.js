@@ -56,7 +56,6 @@ Sonatype.repoServer.resources.help = {
     workingDirectory : 'The base folder where Nexus will store all of its data. For easier upgrades, it is recommended that this be in a folder outside your Nexus binary installation. Nexus must be restarted after changing this value.',
     logDirectory : 'This is the location of your log files. It must correspond to the location specified by - runtime/apps/nexus/conf/log4j.properties.',
     baseUrl : 'This is the Base URL of the Nexus web application.  i.e. http://localhost:8081/nexus',
-    securityConfigurationFile : 'The location of the file that holds the nexus security configuraiton.',
 
     //use default nexus text
     userAgentString : userAgentString,

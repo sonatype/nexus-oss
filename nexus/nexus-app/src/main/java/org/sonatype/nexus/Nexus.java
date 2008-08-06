@@ -268,8 +268,6 @@ public interface Nexus
 
     String readDefaultApplicationLogDirectory();
 
-    String readDefaultSecurityConfigurationFile();
-
     CRemoteConnectionSettings readDefaultGlobalRemoteConnectionSettings();
 
     CRemoteHttpProxySettings readDefaultGlobalRemoteHttpProxySettings();

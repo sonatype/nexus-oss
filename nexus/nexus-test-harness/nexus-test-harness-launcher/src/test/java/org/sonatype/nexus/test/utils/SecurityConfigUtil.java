@@ -224,7 +224,7 @@ public class SecurityConfigUtil
 
         ResourceBundle rb = ResourceBundle.getBundle( "baseTest" );
 
-        File secConfigFile = new File( rb.getString( "nexus.base.dir" ), "runtime/apps/nexus/conf/security.xml" );
+        File secConfigFile = new File( rb.getString( "nexus.base.dir" ), "runtime/work/nexus/conf/security.xml" );
 
         Reader fr = null;
         Configuration configuration = null;

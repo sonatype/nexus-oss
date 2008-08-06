@@ -199,9 +199,6 @@ public class Upgrade103to104
         security.setAnonymousAccessEnabled( oldc.getSecurity().isAnonymousAccessEnabled() );
         security.addRealm( PlexusConstants.PLEXUS_DEFAULT_HINT );
 
-        // Add the new config file
-        security.setConfigurationFile( "${runtime}/apps/nexus/conf/security.xml" );
-
         newc.setSecurity( security );
 
         if ( oldc.getGlobalConnectionSettings() != null )

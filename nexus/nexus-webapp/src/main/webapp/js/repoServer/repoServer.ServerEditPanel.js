@@ -237,15 +237,6 @@ Sonatype.repoServer.ServerEditPanel = function(config){
             allowBlank: false
           },
           {
-            xtype: 'textfield',
-            fieldLabel: 'Security Configuration File',
-            itemCls: 'required-field',
-            helpText: ht.securityConfigurationFile,
-            name: 'securityConfigurationFile',
-            allowBlank:false,
-            anchor: Sonatype.view.FIELD_OFFSET
-          },
-          {
             xtype: 'checkbox',
             fieldLabel: 'Anonymous Access',
             helpText: ht.anonymous,

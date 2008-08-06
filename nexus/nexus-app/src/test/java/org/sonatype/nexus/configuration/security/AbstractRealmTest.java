@@ -550,22 +550,6 @@ public abstract class AbstractRealmTest
             return repositoryGroups.get( repoGroupId );
         }
 
-        public String readDefaultSecurityConfigurationFile()
-        {
-            throw new UnsupportedOperationException();
-        }
-
-        public String readSecurityConfigurationFile()
-        {
-            throw new UnsupportedOperationException();
-        }
-
-        public void updateSecurityConfigurationFile( String settings )
-            throws IOException
-        {
-            throw new UnsupportedOperationException();
-        }
-
         // Unimplemented methods
         public SystemStatus getSystemStatus()
         {

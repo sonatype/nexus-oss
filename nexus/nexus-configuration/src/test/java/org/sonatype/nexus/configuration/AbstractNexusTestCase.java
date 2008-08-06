@@ -69,7 +69,7 @@ public abstract class AbstractNexusTestCase
     
     protected String getSecurityConfiguration()
     {
-        return PLEXUS_HOME + "/conf/security.xml";
+        return PLEXUS_HOME + "/security.xml";
     }
 
     protected void copyDefaultConfigToPlace()

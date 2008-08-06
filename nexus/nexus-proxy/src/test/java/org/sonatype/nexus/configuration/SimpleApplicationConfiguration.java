@@ -116,6 +116,11 @@ public class SimpleApplicationConfiguration
         }
         return result;
     }
+    
+    public File getSecurityConfigurationFile()
+    {
+        return new File( getConfigurationDirectory(), "security.xml" );
+    }
 
     public void saveConfiguration()
         throws IOException
