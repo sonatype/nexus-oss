@@ -207,7 +207,7 @@ public class DefaultNexusSecurityConfiguration
     public void applyConfiguration()
         throws IOException
     {
-        getLogger().debug( "Applying Nexus Security Configuration..." );
+        getLogger().info( "Applying Nexus Security Configuration..." );
 
         notifyConfigurationChangeListeners();
     }
