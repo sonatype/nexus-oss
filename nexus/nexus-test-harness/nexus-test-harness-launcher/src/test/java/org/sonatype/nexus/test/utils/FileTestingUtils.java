@@ -2,8 +2,6 @@ package org.sonatype.nexus.test.utils;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -13,7 +11,6 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Map;
 
-import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.InterpolationFilterReader;
 
 /**
@@ -167,6 +164,13 @@ public class FileTestingUtils
     public static void interpolationFileCopy( File from, File dest, Map<String, String> variables )
         throws IOException
     {
+        
+        // we may also need to create any parent directories
+        if( dest.getParentFile() != null && !dest.getParentFile().exists())
+        {
+            dest.getParentFile().mkdirs();
+        }
+        
         FileReader fileReader = new FileReader( from );
         InterpolationFilterReader filterReader = new InterpolationFilterReader( fileReader, variables );
 
