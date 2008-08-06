@@ -106,21 +106,26 @@ Sonatype.utils = {
       }
     }
 
-    if ( response.status == 403 ) {
+    if ( response.status == 403 || response.status == 401 ) {
       if ( Sonatype.repoServer.RepoServer.loginWindow.isVisible() ) {
-        Sonatype.MessageBox.show( {
-          title: 'Login Error',
-          msg: 'Incorrect username or password.<br />Try again.' + serverMessage,
-          buttons: Sonatype.MessageBox.OK,
-          icon: Sonatype.MessageBox.ERROR,
-          animEl: 'mb3'
-        } );
+        if ( response.getResponseHeader['X-Nexus-Reason'] == 'expired' ) {
+          Sonatype.repoServer.RepoServer.loginWindow.hide();
+          Sonatype.utils.recoverPassword( true );
+        }
+        else {
+          Sonatype.MessageBox.show( {
+            title: 'Login Error',
+            msg: 'Incorrect username or password.<br />Try again.' + serverMessage,
+            buttons: Sonatype.MessageBox.OK,
+            icon: Sonatype.MessageBox.ERROR,
+            animEl: 'mb3'
+          } );
+        }
       }
       else {
         delete Ext.lib.Ajax.defaultHeaders.Authorization;
 //        Sonatype.state.CookieProvider.clear('authToken');
 //        Sonatype.state.CookieProvider.clear('username');
-        Sonatype.state.CookieProvider.clear('jsessionid');
         Sonatype.MessageBox.show( {
           title: 'Authentication Error',
           msg: 'Your login is incorrect or your session has expired.<br />' +
@@ -319,7 +324,283 @@ Sonatype.utils = {
   setCookie: function(cookieName, value) {
     document.cookie = cookieName + "=" + value +
 	  "; path=" + Sonatype.config.resourcePath
-  }  
+  },
+  
+  recoverUsername: function() {
+    var w = new Ext.Window({
+      title: 'Username Recovery',
+      closable: true,
+      autoWidth: false,
+      width: 300,
+      autoHeight: true,
+      modal:true,
+      constrain: true,
+      resizable: false,
+      draggable: false,
+      items: [
+        {
+          xtype: 'form',
+          labelAlign: 'right',
+          labelWidth:60,
+          frame:true,  
+          defaultType:'textfield',
+          monitorValid:true,
+          items:[
+            {
+              xtype: 'panel',
+              style: 'padding-left: 70px; padding-bottom: 10px',
+              html: 'Please enter the e-mail address you used to register your account and we will send you your username.'
+            },
+            {
+              fieldLabel: 'E-mail', 
+              name: 'email',
+              width: 200,
+              allowBlank: false 
+            }
+          ],
+          buttons: [
+            {
+              text: 'E-mail Username',
+              formBind: true,
+              scope: this,
+              handler: function(){
+                var email = w.find('name', 'email')[0].getValue();
+
+                Ext.Ajax.request({
+                  scope: this,
+                  method: 'POST',
+                  url: Sonatype.config.repos.urls.usersForgotId + '/' + email,
+                  success: function(response, options){
+                    w.close();
+                    Sonatype.MessageBox.show( {
+                      title: 'Username Recovery',
+                      msg: 'Username request completed successfully.' +
+                        '<br /><br />' +
+                        'Check your mailbox, the username reminder should arrive in a few minutes.',
+                      buttons: Sonatype.MessageBox.OK,
+                      icon: Sonatype.MessageBox.INFO,
+                      animEl: 'mb3'
+                    } );
+                  },
+                  failure: function(response, options){
+                    Sonatype.utils.connectionError( response, 'There is a problem retrieving your username.' )
+                  }
+                });
+              }
+            },
+            {
+              text: 'Cancel',
+              formBind: false,
+              scope: this,
+              handler: function(){
+                w.close();
+              }
+            }
+          ]
+        }
+      ]
+    });
+
+    w.show();
+  },
+  
+  recoverPassword: function( isExpired ) {
+    var w = new Ext.Window({
+      title: 'Password Recovery',
+      closable: true,
+      autoWidth: false,
+      width: 300,
+      autoHeight: true,
+      modal:true,
+      constrain: true,
+      resizable: false,
+      draggable: false,
+      items: [
+        {
+          xtype: 'form',
+          labelAlign: 'right',
+          labelWidth:60,
+          frame:true,  
+          defaultType:'textfield',
+          monitorValid:true,
+          items:[
+            {
+              xtype: 'panel',
+              style: 'padding-left: 70px; padding-bottom: 10px',
+              html: ( isExpired ? 'Your password has expired, you need to reset it. ' : '' ) +
+                'Please enter your username and e-mail address below. We will send you a new password.'
+            },
+            { 
+              fieldLabel: 'Username', 
+              name: 'username',
+              width: 200,
+              allowBlank: false 
+            },
+            { 
+              fieldLabel: 'E-mail', 
+              name: 'email',
+              width: 200,
+              allowBlank: false 
+            }
+          ],
+          buttons: [
+            {
+              text: 'Reset Password',
+              formBind: true,
+              scope: this,
+              handler: function(){
+                var username = w.find('name', 'username')[0].getValue();
+                var email = w.find('name', 'email')[0].getValue();
+
+                Ext.Ajax.request({
+                  scope: this,
+                  method: 'POST',
+                  jsonData: {
+                    data: {
+                      userId: username,
+                      email: email
+                    }
+                  },
+                  url: Sonatype.config.repos.urls.usersForgotPassword,
+                  success: function(response, options){
+                    w.close();
+                    Sonatype.MessageBox.show( {
+                      title: 'Reset Password',
+                      msg: 'Password request completed successfully.' +
+                        '<br /><br />' +
+                        'Check your mailbox, your new password should arrive in a few minutes.',
+                      buttons: Sonatype.MessageBox.OK,
+                      icon: Sonatype.MessageBox.INFO,
+                      animEl: 'mb3'
+                    } );
+                  },
+                  failure: function(response, options){
+                    Sonatype.utils.connectionError( response, 'There is a problem resetting your password.' )
+                  }
+                });
+              }
+            },
+            {
+              text: 'Cancel',
+              formBind: false,
+              scope: this,
+              handler: function(){
+                w.close();
+              }
+            }
+          ]
+        }
+      ]
+    });
+
+    w.show();
+  },
+  
+  changePassword: function() {
+    var w = new Ext.Window({
+      title: 'Change Password',
+      closable: true,
+      autoWidth: false,
+      width: 350,
+      autoHeight: true,
+      modal:true,
+      constrain: true,
+      resizable: false,
+      draggable: false,
+      items: [
+        {
+          xtype: 'form',
+          labelAlign: 'right',
+          labelWidth:110,
+          frame:true,  
+          defaultType:'textfield',
+          monitorValid:true,
+          items:[
+            {
+              xtype: 'panel',
+              style: 'padding-left: 70px; padding-bottom: 10px',
+              html: 'Please enter your current password and then the new password twice to confirm.'
+            },
+            { 
+              fieldLabel: 'Current Password', 
+              inputType: 'password',
+              name: 'currentPassword',
+              width: 200,
+              allowBlank: false 
+            },
+            { 
+              fieldLabel: 'New Password', 
+              inputType: 'password',
+              name: 'newPassword',
+              width: 200,
+              allowBlank: false 
+            },
+            { 
+              fieldLabel: 'Confirm Password', 
+              inputType: 'password',
+              name: 'confirmPassword',
+              width: 200,
+              allowBlank: false,
+              validator: function( s ) {
+                var firstField = this.ownerCt.find( 'name', 'newPassword' )[0];
+                if ( firstField && firstField.getRawValue() != s ) {
+                  return "Passwords don't match";
+                }
+                return true;
+              }
+            }
+          ],
+          buttons: [
+            {
+              text: 'Change Password',
+              formBind: true,
+              scope: this,
+              handler: function(){
+                var currentPassword = w.find('name', 'currentPassword')[0].getValue();
+                var newPassword = w.find('name', 'newPassword')[0].getValue();
+
+                Ext.Ajax.request({
+                  scope: this,
+                  method: 'POST',
+                  jsonData: {
+                  data: {
+                    userId: Sonatype.user.curr.username,
+                      oldPassword: currentPassword,
+                      newPassword: newPassword
+                    }
+                  },
+                  url: Sonatype.config.repos.urls.usersChangePassword,
+                  success: function(response, options){
+                    w.close();
+                    Sonatype.MessageBox.show( {
+                      title: 'Password Changed',
+                      msg: 'Password change request completed successfully.',
+                      buttons: Sonatype.MessageBox.OK,
+                      icon: Sonatype.MessageBox.INFO,
+                      animEl: 'mb3'
+                    } );
+                  },
+                  failure: function(response, options){
+                    Sonatype.utils.connectionError( response, 'There is a problem changing your password.' )
+                  }
+                });
+              }
+            },
+            {
+              text: 'Cancel',
+              formBind: false,
+              scope: this,
+              handler: function(){
+                w.close();
+              }
+            }
+          ]
+        }
+      ]
+    });
+
+    w.show();
+  }
 };
 
 })();

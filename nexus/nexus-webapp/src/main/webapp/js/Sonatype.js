@@ -33,12 +33,7 @@ window.Sonatype = function(){
       var cp = Sonatype.state.CookieProvider;
       
 //      var authToken = cp.get('authToken', null);
-      var jsessionid = null;// cp.get('jsessionid', null);
       var username = cp.get('username', null);
-
-      if(jsessionid) {
-       	Sonatype.utils.setCookie('JSESSIONID',jsessionid);
-      }
       
       Ext.Ajax.request({
         scope: this,
@@ -65,7 +60,7 @@ window.Sonatype = function(){
         }
       });
       
-      if ( jsessionid && username ) {
+      if ( username && false ) {
         Ext.Ajax.request({
           scope: this,
           method: 'GET',
@@ -93,7 +88,6 @@ window.Sonatype = function(){
             delete Ext.lib.Ajax.defaultHeaders.Authorization;
 //            Sonatype.state.CookieProvider.clear('authToken');
 //            Sonatype.state.CookieProvider.clear('username');
-            Sonatype.state.CookieProvider.clear('jsessionid');
             Sonatype.view.init();
           }
 
