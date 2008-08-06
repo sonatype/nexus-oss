@@ -31,4 +31,8 @@ public interface SmtpClient
     
     void sendEmail( List<String> toList, String from, String subject, String body )
         throws SmtpClientException;
+    
+    void sendEmailAsync( String to, String from, String subject, String body );
+
+    void sendEmailAsync( List<String> toList, String from, String subject, String body );
 }

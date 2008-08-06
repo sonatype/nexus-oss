@@ -25,6 +25,7 @@ import java.util.List;
 
 import org.apache.commons.mail.EmailException;
 import org.apache.commons.mail.SimpleEmail;
+import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.configuration.model.CSmtpConfiguration;
 
@@ -32,6 +33,7 @@ import org.sonatype.nexus.configuration.model.CSmtpConfiguration;
  * @plexus.component
  */
 public class DefaultSmtpClient
+    extends AbstractLogEnabled
     implements
         SmtpClient
 {    
@@ -81,6 +83,72 @@ public class DefaultSmtpClient
         catch ( EmailException e )
         {
             throw new SmtpClientException( "Error handling smtp request", e );
+        }
+    }
+    
+    public void sendEmailAsync( String to, String from, String subject, String body )
+    {
+        List<String> toList = new ArrayList<String>();
+        toList.add( to );
+        
+        sendEmailAsync( toList, from, subject, body );
+    }
+    
+    public void sendEmailAsync( List<String> toList, String from, String subject, String body )
+    {
+        Thread thread = new Thread( new EmailRunnable( toList, from, subject, body, nexusConfiguration.readSmtpConfiguration() ) );
+        
+        thread.start();
+    }
+    
+    private static final class EmailRunnable 
+        extends AbstractLogEnabled
+        implements Runnable
+    {
+        private List<String> toList;
+        private String from;
+        private String subject;
+        private String body;
+        private CSmtpConfiguration smtp;
+        
+        public EmailRunnable( List<String> toList, String from, String subject, String body, CSmtpConfiguration smtpConfig )
+        {
+            this.toList = toList;
+            this.from = from;
+            this.subject = subject;
+            this.body = body;
+            this.smtp = smtpConfig;
+        }
+        
+        public void run()
+        {
+            try
+            {
+                SimpleEmail email = new SimpleEmail();
+                email.setHostName( smtp.getHost() );
+                email.setSmtpPort( smtp.getPort() );
+                if ( smtp.getUsername() != null && smtp.getUsername().length() > 0 ) {
+                  email.setAuthentication( smtp.getUsername(), smtp.getPassword() );
+                }
+                email.setDebug( smtp.isDebugMode() );
+                email.setSSL( smtp.isSslEnabled() );
+                email.setTLS( smtp.isTlsEnabled() );
+                
+                for ( String to : toList )
+                {
+                    email.addTo( to );
+                }
+                
+                email.setFrom( from == null ? smtp.getSystemEmailAddress() : from );
+                email.setSubject( subject );
+                email.setMsg( body );
+        
+                email.send();
+            }
+            catch ( EmailException e )
+            {
+                getLogger().error( "Error handling smtp request", e );
+            }   
         }
     }
 }

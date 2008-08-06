@@ -331,15 +331,8 @@ public class DefaultNexusSecurityConfiguration
             
             applyAndSaveConfiguration();
             
-            try
-            {
-                smtpClient.sendEmail( settings.getEmail(), null, "Nexus: New user account created.", "User Account " + settings.getUserId() + " has been created.  Another email will be sent shortly containing your password." );
-                smtpClient.sendEmail( settings.getEmail(), null, "Nexus: New user account created.", "Your new password is " + password );
-            }
-            catch ( SmtpClientException e )
-            {
-                getLogger().error( "Unable to notify user by email for new user creation", e );
-            }
+            smtpClient.sendEmailAsync( settings.getEmail(), null, "Nexus: New user account created.", "User Account " + settings.getUserId() + " has been created.  Another email will be sent shortly containing your password." );
+            smtpClient.sendEmailAsync( settings.getEmail(), null, "Nexus: New user account created.", "Your new password is " + password );
         }
         else
         {
@@ -431,14 +424,7 @@ public class DefaultNexusSecurityConfiguration
         
         applyAndSaveConfiguration();
         
-        try
-        {
-            smtpClient.sendEmail( user.getEmail(), null, "Nexus: User account notification.", "Your password has been reset.  Your new password is: " + password );
-        }
-        catch ( SmtpClientException e )
-        {
-            getLogger().error( "Unable to notify user by email password reset", e );
-        }
+        smtpClient.sendEmailAsync( user.getEmail(), null, "Nexus: User account notification.", "Your password has been reset.  Your new password is: " + password );
     }
     
     public void forgotPassword( String userId, String email )
@@ -470,14 +456,7 @@ public class DefaultNexusSecurityConfiguration
 
             if ( user.getEmail().equals( email ) )
             {
-                try
-                {
-                    smtpClient.sendEmail( user.getEmail(), null, "Nexus: User account notification.", " Your User ID is: " + user.getUserId() );
-                }
-                catch ( SmtpClientException e )
-                {
-                    getLogger().error( "Unable to notify user by email for username reminder", e );
-                }
+                smtpClient.sendEmailAsync( user.getEmail(), null, "Nexus: User account notification.", " Your User ID is: " + user.getUserId() );
 
                 return;
             }
