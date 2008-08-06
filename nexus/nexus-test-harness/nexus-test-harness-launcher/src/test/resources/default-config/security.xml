@@ -6,9 +6,20 @@
       <name>Administrator</name>
       <password>f865b53623b121fd34ee5426c792e5c33af8c227</password>
       <status>active</status>
-      <email>nexus-dev@sonatype.org</email>
+      <email>changeme@yourcompany.com</email>
       <roles>
         <role>admin</role>
+      </roles>
+    </user>
+    <user>
+      <userId>deployment</userId>
+      <name>Deployment User</name>
+      <password>b2a0e378437817cebdf753d7dff3dd75483af9e0</password>
+      <status>active</status>
+      <email>changeme1@yourcompany.com</email>
+      <roles>
+        <role>deployment</role>
+        <role>11b99a138b6</role>
       </roles>
     </user>
     <user>
@@ -16,13 +27,13 @@
       <name>Nexus Anonynmous User</name>
       <password>0a92fab3230134cca6eadd9898325b9b2ae67998</password>
       <status>active</status>
-      <email>nexus-dev1@sonatype.org</email>
+      <email>changeme2@yourcompany.com</email>
       <roles>
         <role>anonymous</role>
       </roles>
     </user>
     
-    <user>
+        <user>
       <userId>test-user</userId>
       <name>Test User</name>
       <password>f865b53623b121fd34ee5426c792e5c33af8c227</password>
@@ -45,6 +56,25 @@
       </privileges>
     </role>
     <role>
+      <id>deployment</id>
+      <name>Nexus Deployment Role</name>
+      <description>Deployment role for Nexus</description>
+      <sessionTimeout>60</sessionTimeout>
+      <privileges>
+        <privilege>T1</privilege>
+        <privilege>T2</privilege>
+        <privilege>T3</privilege>
+        <privilege>T4</privilege>
+        <privilege>T5</privilege>
+        <privilege>T6</privilege>
+        <privilege>T7</privilege>
+        <privilege>T8</privilege>
+      </privileges>
+      <roles>
+        <role>anonymous</role>
+      </roles>
+    </role>
+    <role>
       <id>anonymous</id>
       <name>Nexus Anonymous Role</name>
       <description>Anonymous role for Nexus</description>
@@ -56,7 +86,6 @@
         <privilege>17</privilege>
         <privilege>19</privilege>
         <privilege>44</privilege>
-        <privilege>53</privilege>
         <privilege>54</privilege>
         <privilege>55</privilege>
         <privilege>56</privilege>
@@ -94,7 +123,7 @@
       <repositoryId></repositoryId>
       <groupId></groupId>
       <id>T1</id>
-      <name>Read All M2 Repositories - (read)</name>
+      <name>All M2 Repositories - (read)</name>
       <method>read</method>
     </repositoryTargetPrivilege>
     <repositoryTargetPrivilege>
@@ -102,15 +131,63 @@
       <repositoryId></repositoryId>
       <groupId></groupId>
       <id>T2</id>
-      <name>Read All M1 Repositories - (read)</name>
+      <name>All M1 Repositories - (read)</name>
       <method>read</method>
+    </repositoryTargetPrivilege>
+    <repositoryTargetPrivilege>
+      <repositoryTargetId>1</repositoryTargetId>
+      <repositoryId></repositoryId>
+      <groupId></groupId>
+      <id>T3</id>
+      <name>All M2 Repositories - (update)</name>
+      <method>update</method>
+    </repositoryTargetPrivilege>
+    <repositoryTargetPrivilege>
+      <repositoryTargetId>2</repositoryTargetId>
+      <repositoryId></repositoryId>
+      <groupId></groupId>
+      <id>T4</id>
+      <name>All M1 Repositories - (update)</name>
+      <method>update</method>
+    </repositoryTargetPrivilege>
+    <repositoryTargetPrivilege>
+      <repositoryTargetId>1</repositoryTargetId>
+      <repositoryId></repositoryId>
+      <groupId></groupId>
+      <id>T5</id>
+      <name>All M2 Repositories - (create)</name>
+      <method>create</method>
+    </repositoryTargetPrivilege>
+    <repositoryTargetPrivilege>
+      <repositoryTargetId>2</repositoryTargetId>
+      <repositoryId></repositoryId>
+      <groupId></groupId>
+      <id>T6</id>
+      <name>All M1 Repositories - (create)</name>
+      <method>create</method>
+    </repositoryTargetPrivilege>
+    <repositoryTargetPrivilege>
+      <repositoryTargetId>1</repositoryTargetId>
+      <repositoryId></repositoryId>
+      <groupId></groupId>
+      <id>T7</id>
+      <name>All M2 Repositories - (delete)</name>
+      <method>delete</method>
+    </repositoryTargetPrivilege>
+    <repositoryTargetPrivilege>
+      <repositoryTargetId>2</repositoryTargetId>
+      <repositoryId></repositoryId>
+      <groupId></groupId>
+      <id>T8</id>
+      <name>All M1 Repositories - (delete)</name>
+      <method>delete</method>
     </repositoryTargetPrivilege>
   </repositoryTargetPrivileges>
   <applicationPrivileges>
     <applicationPrivilege>
       <permission>nexus:*</permission>
       <id>1000</id>
-      <name>Nexus Administrator privilege (ALL)</name>
+      <name>Administrator privilege (ALL)</name>
       <method>*</method>
     </applicationPrivilege>
     <applicationPrivilege>
@@ -122,19 +199,19 @@
     <applicationPrivilege>
       <permission>nexus:authentication</permission>
       <id>2</id>
-      <name>Authentication - (read)</name>
+      <name>Login to UI</name>
       <method>read</method>
     </applicationPrivilege>
     <applicationPrivilege>
       <permission>nexus:settings</permission>
       <id>3</id>
-      <name>Settings - (read)</name>
+      <name>Server Settings - (read)</name>
       <method>read</method>
     </applicationPrivilege>
     <applicationPrivilege>
       <permission>nexus:settings</permission>
       <id>4</id>
-      <name>Settings - (update)</name>
+      <name>Server Settings - (update)</name>
       <method>update</method>
     </applicationPrivilege>
     <applicationPrivilege>
@@ -212,31 +289,31 @@
     <applicationPrivilege>
       <permission>nexus:index</permission>
       <id>17</id>
-      <name>Data Index - (read)</name>
+      <name>Search Repositories</name>
       <method>read</method>
     </applicationPrivilege>
     <applicationPrivilege>
       <permission>nexus:index</permission>
       <id>18</id>
-      <name>Data Index - (delete)</name>
+      <name>Reindex</name>
       <method>delete</method>
     </applicationPrivilege>
     <applicationPrivilege>
       <permission>nexus:identify</permission>
       <id>19</id>
-      <name>Identify - (read)</name>
+      <name>Checksum Search</name>
       <method>read</method>
     </applicationPrivilege>
     <applicationPrivilege>
       <permission>nexus:attributes</permission>
       <id>20</id>
-      <name>Attributes - (delete)</name>
+      <name>Rebuild Repository Attributes</name>
       <method>delete</method>
     </applicationPrivilege>
     <applicationPrivilege>
       <permission>nexus:cache</permission>
       <id>21</id>
-      <name>Cache - (delete)</name>
+      <name>Clear Repository Cache</name>
       <method>delete</method>
     </applicationPrivilege>
     <applicationPrivilege>
@@ -290,49 +367,49 @@
     <applicationPrivilege>
       <permission>nexus:privileges</permission>
       <id>30</id>
-      <name>Privileges - (create)</name>
+      <name>User Privileges - (create)</name>
       <method>create</method>
     </applicationPrivilege>
     <applicationPrivilege>
       <permission>nexus:privileges</permission>
       <id>31</id>
-      <name>Privileges - (read)</name>
+      <name>User Privileges - (read)</name>
       <method>read</method>
     </applicationPrivilege>
     <applicationPrivilege>
       <permission>nexus:privileges</permission>
       <id>32</id>
-      <name>Privileges - (update)</name>
+      <name>User Privileges - (update)</name>
       <method>update</method>
     </applicationPrivilege>
     <applicationPrivilege>
       <permission>nexus:privileges</permission>
       <id>33</id>
-      <name>Privileges - (delete)</name>
+      <name>User Privileges - (delete)</name>
       <method>delete</method>
     </applicationPrivilege>
     <applicationPrivilege>
       <permission>nexus:roles</permission>
       <id>34</id>
-      <name>Roles - (create)</name>
+      <name>User Roles - (create)</name>
       <method>create</method>
     </applicationPrivilege>
     <applicationPrivilege>
       <permission>nexus:roles</permission>
       <id>35</id>
-      <name>Roles - (read)</name>
+      <name>User Roles - (read)</name>
       <method>read</method>
     </applicationPrivilege>
     <applicationPrivilege>
       <permission>nexus:roles</permission>
       <id>36</id>
-      <name>Roles - (update)</name>
+      <name>User Roles - (update)</name>
       <method>update</method>
     </applicationPrivilege>
     <applicationPrivilege>
       <permission>nexus:roles</permission>
       <id>37</id>
-      <name>Roles - (delete)</name>
+      <name>User Roles - (delete)</name>
       <method>delete</method>
     </applicationPrivilege>
     <applicationPrivilege>
@@ -374,7 +451,7 @@
     <applicationPrivilege>
       <permission>nexus:feeds</permission>
       <id>44</id>
-      <name>Data Feeds - (read)</name>
+      <name>RSS Feeds - (read)</name>
       <method>read</method>
     </applicationPrivilege>
     <applicationPrivilege>
@@ -404,7 +481,7 @@
     <applicationPrivilege>
       <permission>nexus:status</permission>
       <id>49</id>
-      <name>Status - (update)</name>
+      <name>Server Status - (update)</name>
       <method>update</method>
     </applicationPrivilege>
     <applicationPrivilege>
@@ -420,33 +497,21 @@
       <method>delete</method>
     </applicationPrivilege>
     <applicationPrivilege>
-      <permission>nexus:attributes</permission>
-      <id>52</id>
-      <name>Attributes - (delete)</name>
-      <method>delete</method>
-    </applicationPrivilege>
-    <applicationPrivilege>
-      <permission>nexus:feeds</permission>
-      <id>53</id>
-      <name>Feeds - (read)</name>
-      <method>read</method>
-    </applicationPrivilege>
-    <applicationPrivilege>
       <permission>nexus:artifact</permission>
       <id>54</id>
-      <name>Artifact - (read)</name>
+      <name>Artifact Download</name>
       <method>read</method>
     </applicationPrivilege>
     <applicationPrivilege>
       <permission>nexus:repostatus</permission>
       <id>55</id>
-      <name>Repository Statuses - (read)</name>
+      <name>Read Repository Status</name>
       <method>read</method>
     </applicationPrivilege>
     <applicationPrivilege>
       <permission>nexus:repocontentclasses</permission>
       <id>56</id>
-      <name>Repository Content Classes - (read)</name>
+      <name>??Repository Content Classes - (read)</name>
       <method>read</method>
     </applicationPrivilege>
     <applicationPrivilege>
@@ -472,6 +537,24 @@
       <id>64</id>
       <name>User Change Password - (create)</name>
       <method>create</method>
+    </applicationPrivilege>
+    <applicationPrivilege>
+      <permission>nexus:artifact</permission>
+      <id>65</id>
+      <name>Artifact Upload</name>
+      <method>create</method>
+    </applicationPrivilege>
+    <applicationPrivilege>
+      <permission>nexus:command</permission>
+      <id>66</id>
+      <name>Nexus Remote Control</name>
+      <method>update</method>
+    </applicationPrivilege>
+    <applicationPrivilege>
+      <permission>nexus:repometa</permission>
+      <id>67</id>
+      <name>Read Repository Metadata</name>
+      <method>read</method>
     </applicationPrivilege>
   </applicationPrivileges>
 </nexusSecurity>

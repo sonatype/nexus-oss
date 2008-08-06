@@ -10,6 +10,12 @@ public class TestContext
     private String username = "admin";
 
     private String password = "admin123";
+    
+    private String adminUsername = "admin";
+
+    private String adminPassword = "admin123";
+    
+    private boolean useAdminForRequests = true;
 
     private HashMap<String, Object> map = new HashMap<String, Object>();
 
@@ -62,5 +68,34 @@ public class TestContext
     {
         this.password = password;
     }
+
+    public String getAdminUsername()
+    {
+        return adminUsername;
+    }
+
+    public void setAdminUsername( String adminUsername )
+    {
+        this.adminUsername = adminUsername;
+    }
+
+    public String getAdminPassword()
+    {
+        return adminPassword;
+    }
+
+    public void setAdminPassword( String adminPassword )
+    {
+        this.adminPassword = adminPassword;
+    }
+
+
+    public void useAdminForRequests()
+    {
+        this.username = this.adminUsername;
+        this.password = this.adminPassword;
+    }
+    
+    
 
 }

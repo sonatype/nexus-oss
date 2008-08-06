@@ -31,8 +31,7 @@ public class Nexus133TargetPermissionTests
         Assert.assertEquals( "Response status: ", 401, response.getStatus().getCode() );
         
         // use admin
-        TestContainer.getInstance().getTestContext().setUsername( "admin" );
-        TestContainer.getInstance().getTestContext().setPassword( "admin123" );
+        TestContainer.getInstance().getTestContext().useAdminForRequests();
 
         // now give create
         this.giveUserPrivilege( "test-user", "45" );
@@ -64,8 +63,7 @@ public class Nexus133TargetPermissionTests
         throws IOException
     {
 
-        TestContainer.getInstance().getTestContext().setUsername( "admin" );
-        TestContainer.getInstance().getTestContext().setPassword( "admin123" );
+        TestContainer.getInstance().getTestContext().useAdminForRequests();
 
         RepositoryTargetResource target = new RepositoryTargetResource();
         target.setContentClass( "maven2" );
@@ -85,8 +83,7 @@ public class Nexus133TargetPermissionTests
         Assert.assertEquals( "Response status: ", 401, response.getStatus().getCode() );
 
         // use admin
-        TestContainer.getInstance().getTestContext().setUsername( "admin" );
-        TestContainer.getInstance().getTestContext().setPassword( "admin123" );
+        TestContainer.getInstance().getTestContext().useAdminForRequests();
 
         // now give create
         this.giveUserPrivilege( "test-user", "47" );
@@ -117,8 +114,7 @@ public class Nexus133TargetPermissionTests
         throws IOException
     {
 
-        TestContainer.getInstance().getTestContext().setUsername( "admin" );
-        TestContainer.getInstance().getTestContext().setPassword( "admin123" );
+        TestContainer.getInstance().getTestContext().useAdminForRequests();
 
         RepositoryTargetResource target = new RepositoryTargetResource();
         target.setContentClass( "maven2" );
@@ -138,8 +134,7 @@ public class Nexus133TargetPermissionTests
         Assert.assertEquals( "Response status: ", 401, response.getStatus().getCode() );
 
         // use admin
-        TestContainer.getInstance().getTestContext().setUsername( "admin" );
-        TestContainer.getInstance().getTestContext().setPassword( "admin123" );
+        TestContainer.getInstance().getTestContext().useAdminForRequests();
 
         // now give create
         this.giveUserPrivilege( "test-user", "46" );
@@ -171,8 +166,7 @@ public class Nexus133TargetPermissionTests
         throws IOException
     {
 
-        TestContainer.getInstance().getTestContext().setUsername( "admin" );
-        TestContainer.getInstance().getTestContext().setPassword( "admin123" );
+        TestContainer.getInstance().getTestContext().useAdminForRequests();
 
         RepositoryTargetResource target = new RepositoryTargetResource();
         target.setContentClass( "maven2" );
@@ -192,8 +186,7 @@ public class Nexus133TargetPermissionTests
         Assert.assertEquals( "Response status: ", 401, response.getStatus().getCode() );
 
         // use admin
-        TestContainer.getInstance().getTestContext().setUsername( "admin" );
-        TestContainer.getInstance().getTestContext().setPassword( "admin123" );
+        TestContainer.getInstance().getTestContext().useAdminForRequests();
 
         // now give create
         this.giveUserPrivilege( "test-user", "48" );

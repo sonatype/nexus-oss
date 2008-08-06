@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import org.junit.After;
 import org.junit.Before;
 import org.restlet.data.MediaType;
 import org.sonatype.nexus.configuration.security.model.CApplicationPrivilege;
@@ -34,8 +35,22 @@ public abstract class AbstractPrivilegeTest
 
     protected RoutesMessageUtil routeUtil;
 
+    public AbstractPrivilegeTest( String testRepositoryId)
+    {
+      super( testRepositoryId );
+      this.init();
+    }
+    
     public AbstractPrivilegeTest()
     {
+        this.init();
+    }
+    
+    private void init()
+    {
+        // turn on security for the test
+        TestContainer.getInstance().getTestContext().setSecureTest( true );
+        
         this.userUtil = new UserMessageUtil( XStreamInitializer.initialize( new XStream() ), MediaType.APPLICATION_XML );
         this.roleUtil = new RoleMessageUtil( XStreamInitializer.initialize( new XStream() ), MediaType.APPLICATION_XML );
         this.privUtil =
@@ -44,13 +59,15 @@ public abstract class AbstractPrivilegeTest
         TestContainer.getInstance().getTestContext().setSecureTest( true );
         this.routeUtil = new RoutesMessageUtil( XStreamInitializer.initialize( new XStream() ), MediaType.APPLICATION_XML );
     }
+    
+    
+    
 
     @Before
     public void resetTestUserPrivs()
         throws IOException
     {
-        TestContainer.getInstance().getTestContext().setUsername( "admin" );
-        TestContainer.getInstance().getTestContext().setPassword( "admin123" );
+        TestContainer.getInstance().getTestContext().useAdminForRequests();
         
         UserResource testUser = this.userUtil.getUser( "test-user" );
         testUser.getRoles().clear();
@@ -100,8 +117,7 @@ public abstract class AbstractPrivilegeTest
         throws IOException
     {
         // use admin
-        TestContainer.getInstance().getTestContext().setUsername( "admin" );
-        TestContainer.getInstance().getTestContext().setPassword( "admin123" );
+        TestContainer.getInstance().getTestContext().useAdminForRequests();
 
         // now give create
         RoleResource role = new RoleResource();
@@ -112,10 +128,26 @@ public abstract class AbstractPrivilegeTest
         // save it
         role = this.roleUtil.createRole( role );
 
-        // add it
+        // add it       
+        this.giveUserRole( userId, role.getId() );
+    }
+    
+    protected void giveUserRole( String userId, String roleId ) throws IOException
+    {
+     // use admin
+        TestContainer.getInstance().getTestContext().useAdminForRequests();
+        
+     // add it
         UserResource testUser = this.userUtil.getUser( userId );
-        testUser.addRole( role.getId() );
+        testUser.addRole( roleId );
         this.userUtil.updateUser( testUser );
     }
 
+    @After
+    public void afterTest()
+        throws Exception
+    {
+        // reset any password
+        TestContainer.getInstance().getTestContext().useAdminForRequests();
+    }
 }
