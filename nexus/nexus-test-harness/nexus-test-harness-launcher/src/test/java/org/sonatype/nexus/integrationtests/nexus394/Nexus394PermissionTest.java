@@ -10,11 +10,6 @@ public class Nexus394PermissionTest
     extends AbstractPrivilegeTest
 {
 
-    static
-    {
-        printKnownErrorButDoNotFail( Nexus394PermissionTest.class, "resetWithoutPermission" );
-    }
-
     @Test
     public void withPermission()
         throws Exception
