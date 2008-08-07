@@ -20,7 +20,7 @@
  */
 //Instance of Ext.FormPanel
 Sonatype.repoServer.ServerEditPanel = function(config){
-  var baseUrlChanged = false;
+
   var config = config || {};
   var defaultConfig = {autoScroll:true};
   Ext.apply(this, config, defaultConfig);
@@ -505,9 +505,7 @@ Ext.extend(Sonatype.repoServer.ServerEditPanel, Ext.Panel, {
     var wkDirField = this.find('name', 'workingDirectory')[0];
     var baseUrlField = this.find('name', 'baseUrl')[0];
     if (this.form.isValid()) {
-      if (baseUrlField.isDirty()) {
-        this.baseUrlChanged = true;
-      }
+
       if (wkDirField.isDirty()) {
         //@note: this handler selects the "No" button as the default
         //@todo: could extend Sonatype.MessageBox to take the button to select as a param
@@ -625,9 +623,7 @@ Ext.extend(Sonatype.repoServer.ServerEditPanel, Ext.Panel, {
           icon: Sonatype.MessageBox.WARNING
         });
       }
-      else if (action.options.fpanel.baseUrlChanged){
-        window.location = action.options.fpanel.find('name', 'baseUrl')[0].getValue();
-      }
+
       action.options.fpanel.find('name', 'securityAnonymousPassword')[0].setValue(Sonatype.utils.passwordPlaceholder);
     }
     
