@@ -34,11 +34,14 @@ import org.codehaus.plexus.context.ContextException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
+import org.sonatype.nexus.configuration.application.validator.ApplicationValidationResponse;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.CRepositoryShadow;
 import org.sonatype.nexus.configuration.model.CRepositoryShadowArtifactVersionConstraint;
 import org.sonatype.nexus.configuration.model.Configuration;
 import org.sonatype.nexus.configuration.validator.InvalidConfigurationException;
+import org.sonatype.nexus.configuration.validator.ValidationMessage;
+import org.sonatype.nexus.configuration.validator.ValidationResponse;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.maven.ChecksumPolicy;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
@@ -280,7 +283,14 @@ public class DefaultApplicationRuntimeConfigurationBuilder
         }
         catch ( IllegalArgumentException e )
         {
-            throw new InvalidConfigurationException( e.getMessage(), e );
+            // TODO: Resolve this hack...
+            // This exception seemsto only be thrown when shadowOf parameter is invalid, so that will be
+            // sent back as the cause field
+            ValidationMessage message = new ValidationMessage( "shadowOf", e.getMessage(), "The source nexus repository is of an invalid Format.  If Virtual format is Maven 2, source repository must be of format Maven 1, and vice versa." );
+            ValidationResponse response = new ApplicationValidationResponse();
+            response.addValidationError( message );
+            
+            throw new InvalidConfigurationException( response );
         }
         catch ( ComponentLookupException e )
         {

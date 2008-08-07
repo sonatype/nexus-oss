@@ -184,13 +184,7 @@ public class RepositoryResourceHandler
             }
             catch ( ConfigurationException e )
             {
-                getLogger().log( Level.WARNING, "Configuration unacceptable, repoId=" + getRepositoryId(), e );
-
-                getResponse().setStatus(
-                    Status.CLIENT_ERROR_BAD_REQUEST,
-                    "Configuration unacceptable, repoId=" + getRepositoryId() );
-
-                getResponse().setEntity( serialize( representation, getNexusErrorResponse( "*", e.getMessage() ) ) );
+                handleConfigurationException( e, representation );
             }
             catch ( IOException e )
             {
