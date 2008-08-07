@@ -10,7 +10,8 @@ public class Nexus393PermissionTest
     extends AbstractPrivilegeTest
 {
 
-    static {
+    static
+    {
         printKnownErrorButDoNotFail( Nexus393PermissionTest.class, "resetWithoutPermission" );
     }
 
@@ -18,7 +19,7 @@ public class Nexus393PermissionTest
     public void resetWithPermission()
         throws Exception
     {
-        overwriteUserRole( "test-user", "anonymous-with-login-reset", "1", "2" /* login */, "6", "14", "17", "19",
+        overwriteUserRole( TEST_USER_NAME, "anonymous-with-login-reset", "1", "2" /* login */, "6", "14", "17", "19",
                            "44", "54", "55", "56", "57", "58", "59"/* reset */, "T1", "T2" );
 
         TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
@@ -30,7 +31,7 @@ public class Nexus393PermissionTest
         Assert.assertTrue( status.isSuccess() );
 
         // Should be able to reset my own password
-        username = "test-user";
+        username = TEST_USER_NAME;
         status = ResetPasswordUtils.resetPassword( username );
         Assert.assertTrue( status.isSuccess() );
 
@@ -40,8 +41,8 @@ public class Nexus393PermissionTest
     public void resetWithoutPermission()
         throws Exception
     {
-        overwriteUserRole( "test-user", "anonymous-with-login", "1", "2" /* login */, "6", "14", "17", "19", "44",
-                           "54", "55", "56", "57", "58", /* "59" reset , */"T1", "T2" );
+        overwriteUserRole( TEST_USER_NAME, "anonymous-with-login-but-reset", "1", "2" /* login */, "6", "14", "17",
+                           "19", "44", "54", "55", "56", "57", "58", /* "59" reset , */"T1", "T2" );
 
         TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
         TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
@@ -52,10 +53,9 @@ public class Nexus393PermissionTest
         Assert.assertEquals( 401, status.getCode() );
 
         // NOT Should be able to reset my own password
-/*  // TODO issue nexus-469
-        username = "test-user";
+        username = TEST_USER_NAME;
         status = ResetPasswordUtils.resetPassword( username );
         Assert.assertEquals( 401, status.getCode() );
-*/
+
     }
 }
