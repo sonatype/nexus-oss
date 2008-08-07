@@ -2,15 +2,12 @@ package org.sonatype.nexus.integrationtests;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Set;
 
 import org.junit.After;
 import org.junit.Before;
 import org.restlet.data.MediaType;
 import org.sonatype.nexus.configuration.security.model.CApplicationPrivilege;
-import org.sonatype.nexus.configuration.security.model.CRepoTargetPrivilege;
 import org.sonatype.nexus.integrationtests.nexus233.PrivilegesMessageUtil;
 import org.sonatype.nexus.rest.model.PrivilegeBaseStatusResource;
 import org.sonatype.nexus.rest.model.RoleResource;
@@ -78,7 +75,7 @@ public abstract class AbstractPrivilegeTest
     {
         TestContainer.getInstance().getTestContext().useAdminForRequests();
 
-        UserResource testUser = this.userUtil.getUser( "test-user" );
+        UserResource testUser = this.userUtil.getUser( TEST_USER_NAME );
         testUser.getRoles().clear();
         testUser.addRole( "anonymous" );
         this.userUtil.updateUser( testUser );
