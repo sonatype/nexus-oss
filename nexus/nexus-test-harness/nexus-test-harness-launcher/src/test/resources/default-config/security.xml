@@ -19,7 +19,7 @@
       <email>changeme1@yourcompany.com</email>
       <roles>
         <role>deployment</role>
-        <role>11b99a138b6</role>
+        <!-- FIXME role note found <role>11b99a138b6</role> -->
       </roles>
     </user>
     <user>
@@ -32,8 +32,8 @@
         <role>anonymous</role>
       </roles>
     </user>
-    
-        <user>
+
+    <user>
       <userId>test-user</userId>
       <name>Test User</name>
       <password>f865b53623b121fd34ee5426c792e5c33af8c227</password>
@@ -43,7 +43,7 @@
         <role>anonymous</role>
       </roles>
     </user>
-    
+
   </users>
   <roles>
     <role>
@@ -199,7 +199,7 @@
     <applicationPrivilege>
       <permission>nexus:authentication</permission>
       <id>2</id>
-      <name>Login to UI</name>
+      <name>Authentication / Login - (read)</name>
       <method>read</method>
     </applicationPrivilege>
     <applicationPrivilege>

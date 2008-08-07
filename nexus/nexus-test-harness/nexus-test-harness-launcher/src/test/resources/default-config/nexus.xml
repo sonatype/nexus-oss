@@ -4,8 +4,8 @@
   <applicationLogDirectory>${nexus.log.directory}</applicationLogDirectory>
   
     <smtpConfiguration>
-    <host>smtp-host</host>
-    <port>1234</port>
+    <host>localhost</host>
+    <port>3025</port>
     <sslEnabled>false</sslEnabled>
     <tlsEnabled>false</tlsEnabled>
     <username>smtp-username</username>
