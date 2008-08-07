@@ -6,12 +6,15 @@ import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 import org.sonatype.nexus.integrationtests.nexus133.Nexus133TargetCrudJsonTests;
 import org.sonatype.nexus.integrationtests.nexus133.Nexus133TargetCrudXmlTests;
+import org.sonatype.nexus.integrationtests.nexus133.Nexus133TargetPermissionTests;
 import org.sonatype.nexus.integrationtests.nexus133.Nexus133TargetValidationTests;
 import org.sonatype.nexus.integrationtests.nexus142.Nexus142UserCrudJsonTests;
 import org.sonatype.nexus.integrationtests.nexus142.Nexus142UserCrudXmlTests;
+import org.sonatype.nexus.integrationtests.nexus142.Nexus142UserPermissionTests;
 import org.sonatype.nexus.integrationtests.nexus142.Nexus142UserValidationTests;
 import org.sonatype.nexus.integrationtests.nexus156.Nexus156RolesCrudJsonTests;
 import org.sonatype.nexus.integrationtests.nexus156.Nexus156RolesCrudXmlTests;
+import org.sonatype.nexus.integrationtests.nexus156.Nexus156RolesPermissionTests;
 import org.sonatype.nexus.integrationtests.nexus156.Nexus156RolesValidationTests;
 import org.sonatype.nexus.integrationtests.nexus166.Nexus166SampleTest;
 import org.sonatype.nexus.integrationtests.nexus167.Nexus167ReleaseToSnapshotTest;
@@ -26,6 +29,7 @@ import org.sonatype.nexus.integrationtests.nexus260.Nexus260MultipleDeployTest;
 import org.sonatype.nexus.integrationtests.nexus261.Nexus261NexusGroupDownloadTest;
 import org.sonatype.nexus.integrationtests.nexus292.Nexus292SoftRestartTest;
 import org.sonatype.nexus.integrationtests.nexus385.Nexus385RoutesCrudXmlTests;
+import org.sonatype.nexus.integrationtests.nexus385.Nexus385RoutesPermissionTests;
 import org.sonatype.nexus.integrationtests.nexus385.Nexus385RoutesValidationTests;
 import org.sonatype.nexus.integrationtests.nexus387.Nexus387RoutesTests;
 import org.sonatype.nexus.integrationtests.nexus429.Nexus429UploadArtifactPrivilegeTest;
@@ -33,7 +37,6 @@ import org.sonatype.nexus.integrationtests.proxy.nexus177.Nexus177OutOfServiceTe
 import org.sonatype.nexus.integrationtests.proxy.nexus178.Nexus178BlockProxyDownloadTest;
 import org.sonatype.nexus.integrationtests.proxy.nexus179.Nexus179RemoteRepoDownTest;
 import org.sonatype.nexus.integrationtests.proxy.nexus262.Nexus262SimpleProxyTest;
-import org.sonatype.nexus.test.utils.NexusConfigUtil;
 
 @RunWith( Suite.class )
 @SuiteClasses( { Nexus166SampleTest.class, Nexus169ReleaseMetaDataInSnapshotRepoTest.class,
@@ -45,16 +48,18 @@ import org.sonatype.nexus.test.utils.NexusConfigUtil;
     Nexus142UserCrudXmlTests.class, Nexus156RolesCrudJsonTests.class, Nexus156RolesCrudXmlTests.class,
     Nexus142UserValidationTests.class, Nexus156RolesValidationTests.class, Nexus133TargetValidationTests.class,
     Nexus233PrivilegesCrudXMLTests.class, Nexus233PrivilegesValidationTests.class, Nexus385RoutesCrudXmlTests.class,
-    Nexus385RoutesValidationTests.class, Nexus387RoutesTests.class, Nexus429UploadArtifactPrivilegeTest.class })
-public class IntegrationTestSuiteClassesSecurity 
+    Nexus385RoutesValidationTests.class, Nexus387RoutesTests.class, Nexus429UploadArtifactPrivilegeTest.class,
+    Nexus133TargetPermissionTests.class, Nexus142UserPermissionTests.class, Nexus156RolesPermissionTests.class,
+    Nexus385RoutesPermissionTests.class } )
+public class IntegrationTestSuiteClassesSecurity
 {
     @BeforeClass
     public static void beforeSuite()
         throws Exception
     {
-        
+
         System.out.println( "\n\n\n*****************\n    HELLO \n\n\n*************" );
-        
+
         // enable security
         TestContainer.getInstance().getTestContext().setSecureTest( true );
 

@@ -650,6 +650,12 @@ public class AbstractNexusIntegrationTest
     {
         return nexusBaseDir;
     }
+    
+
+    public String getTestRepositoryId()
+    {
+        return testRepositoryId;
+    }
 
     protected static boolean printKnownErrorButDoNotFail( Class<? extends AbstractNexusIntegrationTest> clazz, String...tests )
     {
