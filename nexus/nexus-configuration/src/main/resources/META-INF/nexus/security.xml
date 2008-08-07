@@ -64,6 +64,8 @@
 				<privilege>T6</privilege>
 				<privilege>T7</privilege>
 				<privilege>T8</privilege>
+				<privilege>2</privilege>
+				<privilege>64</privilege>
 			</privileges>
 			<roles>
 				<role>anonymous</role>
