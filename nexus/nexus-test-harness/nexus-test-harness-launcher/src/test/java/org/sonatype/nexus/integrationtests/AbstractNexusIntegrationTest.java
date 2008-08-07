@@ -618,7 +618,6 @@ public class AbstractNexusIntegrationTest
         {
             System.out.println( "Failed to delete: " + serviceURI + "  - Status: " + response.getStatus() );
         }
-
     }
 
     public String getBaseNexusUrl()

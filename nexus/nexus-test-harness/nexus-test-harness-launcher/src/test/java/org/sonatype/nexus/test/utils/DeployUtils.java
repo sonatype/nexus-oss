@@ -46,7 +46,7 @@ public class DeployUtils
     
     public static int deployUsingGavWithRest( String repositoryId, Gav gav, File fileToDeploy ) throws HttpException, IOException
     {
-        return deployUsingGavWithRest( TestProperties.getString( "nexus.base.url" ), repositoryId, gav, fileToDeploy);
+        return deployUsingGavWithRest( TestProperties.getString( "nexus.base.url" ) + "service/local/artifact/maven/content", repositoryId, gav, fileToDeploy);
     }
 
     public static int deployUsingGavWithRest( String restServiceURL, String repositoryId, Gav gav, File fileToDeploy )
