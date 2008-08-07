@@ -187,6 +187,8 @@ Sonatype.repoServer.RepoServer = function(){
               //get user permissions
               var respObj = Ext.decode(response.responseText);
               var newUserPerms = respObj.data.clientPermissions;
+              
+//              var rememberMe = Sonatype.utils.getCookie('nxRememberMe');
 
               Sonatype.user.curr.username = options.cbPassThru.username;
 //              Sonatype.user.curr.authToken = respObj.data.authToken;

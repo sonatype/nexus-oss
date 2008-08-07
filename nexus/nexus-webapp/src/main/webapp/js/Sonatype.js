@@ -35,6 +35,8 @@ window.Sonatype = function(){
 //      var authToken = cp.get('authToken', null);
       var username = cp.get('username', null);
       
+      Sonatype.utils.clearCookie('JSESSIONID');
+      
       Ext.Ajax.request({
         scope: this,
         method: 'GET',

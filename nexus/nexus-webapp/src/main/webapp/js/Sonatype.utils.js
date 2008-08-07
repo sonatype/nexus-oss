@@ -323,7 +323,12 @@ Sonatype.utils = {
   
   setCookie: function(cookieName, value) {
     document.cookie = cookieName + "=" + value +
-	  "; path=" + Sonatype.config.resourcePath
+	    "; path=" + Sonatype.config.resourcePath
+  },
+
+  clearCookie : function(cookieName){
+    document.cookie = cookieName + "=null; expires=Thu, 01-Jan-70 00:00:01 GMT" +
+      "; path=" + Sonatype.config.resourcePath
   },
   
   recoverUsername: function() {
