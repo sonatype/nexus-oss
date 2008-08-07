@@ -128,14 +128,14 @@ public class RepositoryTargetListResourceHandler
                 }
                 catch ( ConfigurationException e )
                 {
-                    getResponse().setStatus( Status.CLIENT_ERROR_BAD_REQUEST, e.getMessage() );
+                    getLogger().log( Level.INFO, "Configuration unacceptable for targetId=" + resource.getId(), e );
 
                     getResponse().setStatus(
                         Status.CLIENT_ERROR_BAD_REQUEST,
                         "Configuration unacceptable for targetId=" + resource.getId() );
 
                     getResponse().setEntity( serialize( representation, getNexusErrorResponse( "*", e.getMessage() ) ) );
-                    
+
                     return;
                 }
                 catch ( IOException e )

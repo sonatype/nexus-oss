@@ -1059,7 +1059,7 @@ public class DefaultNexusConfiguration
 
         if ( !res.isValid() )
         {
-            throw new ConfigurationException( "Invalid target definition!" );
+            throw new ConfigurationException( "Invalid route definition!" );
         }
     }
 
@@ -1292,12 +1292,13 @@ public class DefaultNexusConfiguration
 
     // Repository Targets
 
-    protected void validateCRepositoryTarget( CRepositoryTarget settings )
+    protected void validateCRepositoryTarget( CRepositoryTarget settings, boolean create )
         throws ConfigurationException
     {
         ApplicationValidationContext ctx = null;
 
-        if ( getConfiguration().getRepositoryTargets() != null )
+        // checking for uniqueness only on CREATE event
+        if ( create && getConfiguration().getRepositoryTargets() != null )
         {
             ctx = new ApplicationValidationContext();
 
@@ -1355,7 +1356,7 @@ public class DefaultNexusConfiguration
         throws ConfigurationException,
             IOException
     {
-        validateCRepositoryTarget( settings );
+        validateCRepositoryTarget( settings, true );
 
         ContentClass contentClass = null;
 
@@ -1404,7 +1405,7 @@ public class DefaultNexusConfiguration
         throws ConfigurationException,
             IOException
     {
-        validateCRepositoryTarget( settings );
+        validateCRepositoryTarget( settings, false );
 
         CRepositoryTarget oldTarget = readRepositoryTarget( settings.getId() );
 

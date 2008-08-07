@@ -81,6 +81,7 @@
 			/service/*/repo_groups/* = authcBasic,perms[nexus:repogroups]
 			/service/*/repo_groups = authcBasic,perms[nexus:repogroups]
 			/service/*/repo_content_classes = authcBasic,perms[nexus:repocontentclasses]
+			/service/*/repo_targets/* = authcBasic,perms[nexus:targets]
 			/service/*/repo_targets = authcBasic,perms[nexus:targets]
 			/service/*/configs/* = authcBasic,perms[nexus:settings]
 			/service/*/configs = authcBasic,perms[nexus:settings]
