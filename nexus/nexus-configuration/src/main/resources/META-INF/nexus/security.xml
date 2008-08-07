@@ -303,28 +303,28 @@
 			<name>Reindex</name>
 			<method>delete</method>
 			<permission>nexus:index</permission>
-			<description>Give permission to Reindex repository content.</description>
+			<description>Give permission to Reindex repository content.  The extents of this privilege are related to the allowed targets.</description>
 		</applicationPrivilege>
 		<applicationPrivilege>
 			<id>19</id>
 			<name>Checksum Search</name>
 			<method>read</method>
 			<permission>nexus:identify</permission>
-			<description>Give permission to perform checksum type searches of repository content.</description>
+			<description>Give permission to perform checksum type searches of repository content.  The extents of this privilege are related to the allowed targets.</description>
 		</applicationPrivilege>
 		<applicationPrivilege>
 			<id>20</id>
 			<name>Rebuild Repository Attributes</name>
 			<method>delete</method>
 			<permission>nexus:attributes</permission>
-			<description>Give permission to rebuild the attributes of repository content.</description>
+			<description>Give permission to rebuild the attributes of repository content.  The extents of this privilege are related to the allowed targets.</description>
 		</applicationPrivilege>
 		<applicationPrivilege>
 			<id>21</id>
 			<name>Clear Repository Cache</name>
 			<method>delete</method>
 			<permission>nexus:cache</permission>
-			<description>Give permission to clear the content of a repositories not found cache.</description>
+			<description>Give permission to clear the content of a repositories not found cache.  The extents of this privilege are related to the allowed targets.</description>
 		</applicationPrivilege>
 		<applicationPrivilege>
 			<id>22</id>
@@ -485,7 +485,7 @@
 			<name>RSS Feeds - (read)</name>
 			<method>read</method>
 			<permission>nexus:feeds</permission>
-			<description>Give permission to view the different RSS feeds.</description>
+			<description>Give permission to view the different RSS feeds.  The extents of this privilege are related to the allowed targets.</description>
 		</applicationPrivilege>
 		<applicationPrivilege>
 			<id>45</id>
@@ -541,7 +541,7 @@
 			<name>Artifact Download</name>
 			<method>read</method>
 			<permission>nexus:artifact</permission>
-			<description>Give permission to download artifacts (using /artifact service, not the /content url).</description>
+			<description>Give permission to download artifacts (using /artifact service, not the /content url).  The extents of this privilege are related to the allowed targets.</description>
 		</applicationPrivilege>
 		<applicationPrivilege>
 			<id>55</id>
@@ -590,7 +590,7 @@
             <name>Artifact Upload</name>
             <method>create</method>
             <permission>nexus:artifact</permission>
-            <description>Give permission to upload artifacts (using /artifact service, not the /content service).</description>
+            <description>Give permission to upload artifacts (using /artifact service, not the /content service).  The extents of this privilege are related to the allowed targets.</description>
         </applicationPrivilege>
         <applicationPrivilege>
             <id>66</id>
