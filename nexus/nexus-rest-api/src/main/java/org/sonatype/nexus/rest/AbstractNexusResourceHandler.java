@@ -475,9 +475,18 @@ public abstract class AbstractNexusResourceHandler
         if ( InvalidConfigurationException.class.isAssignableFrom( e.getClass() ) )
         {
             ValidationResponse vr = ( (InvalidConfigurationException) e ).getValidationResponse();
-            ValidationMessage vm = vr.getValidationErrors().get( 0 );
-            getResponse().setEntity(
-                serialize( representation, getNexusErrorResponse( vm.getKey(), vm.getShortMessage() ) ) );
+            
+            if ( vr != null && vr.getValidationErrors().size() > 0 )
+            {
+                ValidationMessage vm = vr.getValidationErrors().get( 0 );
+                getResponse().setEntity(
+                    serialize( representation, getNexusErrorResponse( vm.getKey(), vm.getShortMessage() ) ) );
+            }
+            else
+            {
+                getResponse().setEntity(
+                    serialize( representation, getNexusErrorResponse( "*", e.getMessage() ) ) );
+            }
         }
         else
         {
