@@ -2,7 +2,9 @@ package org.sonatype.nexus.integrationtests;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Set;
 
 import org.junit.After;
 import org.junit.Before;
@@ -25,6 +27,10 @@ public abstract class AbstractPrivilegeTest
     extends AbstractNexusIntegrationTest
 {
 
+    protected static final String TEST_USER_NAME = "test-user";
+
+    protected static final String TEST_USER_PASSWORD = "admin123";
+
     protected UserMessageUtil userUtil;
 
     protected RoleMessageUtil roleUtil;
@@ -40,35 +46,37 @@ public abstract class AbstractPrivilegeTest
       super( testRepositoryId );
       this.init();
     }
-    
+
     public AbstractPrivilegeTest()
     {
         this.init();
     }
-    
+
     private void init()
     {
         // turn on security for the test
         TestContainer.getInstance().getTestContext().setSecureTest( true );
-        
+
         this.userUtil = new UserMessageUtil( XStreamInitializer.initialize( new XStream() ), MediaType.APPLICATION_XML );
         this.roleUtil = new RoleMessageUtil( XStreamInitializer.initialize( new XStream() ), MediaType.APPLICATION_XML );
         this.privUtil =
             new PrivilegesMessageUtil( XStreamInitializer.initialize( new XStream() ), MediaType.APPLICATION_XML );
-        this.targetUtil = new TargetMessageUtil( XStreamInitializer.initialize( new XStream() ), MediaType.APPLICATION_XML );
+        this.targetUtil =
+            new TargetMessageUtil( XStreamInitializer.initialize( new XStream() ), MediaType.APPLICATION_XML );
         TestContainer.getInstance().getTestContext().setSecureTest( true );
-        this.routeUtil = new RoutesMessageUtil( XStreamInitializer.initialize( new XStream() ), MediaType.APPLICATION_XML );
+        this.routeUtil =
+            new RoutesMessageUtil( XStreamInitializer.initialize( new XStream() ), MediaType.APPLICATION_XML );
     }
-    
-    
-    
+
+
+
 
     @Before
     public void resetTestUserPrivs()
         throws IOException
     {
         TestContainer.getInstance().getTestContext().useAdminForRequests();
-        
+
         UserResource testUser = this.userUtil.getUser( "test-user" );
         testUser.getRoles().clear();
         testUser.addRole( "anonymous" );
@@ -121,25 +129,52 @@ public abstract class AbstractPrivilegeTest
 
         // now give create
         RoleResource role = new RoleResource();
-        role.setDescription( priv +" Role" );
-        role.setName( priv +"Role" );
+        role.setDescription( priv + " Role" );
+        role.setName( priv + "Role" );
         role.setSessionTimeout( 60 );
         role.addPrivilege( priv );
         // save it
         role = this.roleUtil.createRole( role );
 
-        // add it       
+        // add it
         this.giveUserRole( userId, role.getId() );
     }
-    
+
     protected void giveUserRole( String userId, String roleId ) throws IOException
     {
      // use admin
         TestContainer.getInstance().getTestContext().useAdminForRequests();
-        
+
      // add it
         UserResource testUser = this.userUtil.getUser( userId );
         testUser.addRole( roleId );
+        this.userUtil.updateUser( testUser );
+    }
+
+
+    protected void overwriteUserRole( String userId, String newRoleName, String... permissions )
+        throws Exception
+    {
+        // use admin
+        TestContainer.getInstance().getTestContext().setUsername( "admin" );
+        TestContainer.getInstance().getTestContext().setPassword( "admin123" );
+
+        // now give create
+        RoleResource role = new RoleResource();
+        role.setDescription( newRoleName );
+        role.setName( newRoleName );
+        role.setSessionTimeout( 60 );
+        for ( String priv : permissions )
+        {
+            role.addPrivilege( priv );
+        }
+        // save it
+        role = this.roleUtil.createRole( role );
+
+        // add it
+        UserResource testUser = this.userUtil.getUser( userId );
+        testUser.getRoles().clear();
+        testUser.addRole( role.getId() );
         this.userUtil.updateUser( testUser );
     }
 

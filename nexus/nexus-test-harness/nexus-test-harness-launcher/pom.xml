@@ -82,6 +82,12 @@
       <version>2.0.5312</version>
     </dependency>-->
 
+	<dependency>
+	    <groupId>com.icegreen</groupId>
+	    <artifactId>greenmail</artifactId>
+	    <version>1.3</version>
+        <!-- TODO test scope is not transitive <scope>test</scope> -->
+	</dependency>
 
   </dependencies>
 	<build>
