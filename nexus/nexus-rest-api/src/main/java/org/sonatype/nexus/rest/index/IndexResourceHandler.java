@@ -60,6 +60,8 @@ public class IndexResourceHandler
 
         String query = form.getFirstValue( "q" );
 
+        String className = form.getFirstValue( "cn" );
+
         String g = form.getFirstValue( "g" );
 
         String a = form.getFirstValue( "a" );
@@ -105,6 +107,15 @@ public class IndexResourceHandler
             searchResult = getNexus()
                 .searchArtifactFlat( query, getRepositoryId(), getRepositoryGroupId(), from, count );
         }
+        else if ( className != null )
+        {
+            searchResult = getNexus().searchArtifactClassFlat(
+                className,
+                getRepositoryId(),
+                getRepositoryGroupId(),
+                from,
+                count );
+        }
         else if ( g != null || a != null || v != null || c != null )
         {
             searchResult = getNexus().searchArtifactFlat(
@@ -119,7 +130,9 @@ public class IndexResourceHandler
         }
         else
         {
-            getResponse().setStatus( Status.CLIENT_ERROR_BAD_REQUEST, "Search query not found in request!" );
+            getResponse().setStatus(
+                Status.CLIENT_ERROR_BAD_REQUEST,
+                "Search query not found in request! (q OR cn OR g,a,v,c)" );
 
             return null;
         }

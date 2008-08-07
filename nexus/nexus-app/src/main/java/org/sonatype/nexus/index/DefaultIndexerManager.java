@@ -43,6 +43,7 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
+import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
 import org.sonatype.nexus.configuration.ConfigurationChangeListener;
@@ -881,6 +882,71 @@ public class DefaultIndexerManager
             else
             {
                 req = new FlatSearchRequest( bq, ArtifactInfo.REPOSITORY_VERSION_COMPARATOR, context );
+            }
+
+            if ( from != null )
+            {
+                req.setStart( from );
+            }
+
+            if ( count != null )
+            {
+                req.setAiCount( count );
+            }
+
+            FlatSearchResponse result = nexusIndexer.searchFlat( req );
+
+            postprocessResults( result.getResults() );
+
+            return result;
+        }
+        catch ( IndexContextInInconsistentStateException e )
+        {
+            getLogger().error( "Inconsistent index context state while searching for query \"" + term + "\"", e );
+        }
+        catch ( IOException e )
+        {
+            getLogger().error( "Got I/O exception while searching for query \"" + term + "\"", e );
+        }
+
+        return new FlatSearchResponse( req.getQuery(), 0, new HashSet<ArtifactInfo>() );
+    }
+
+    public FlatSearchResponse searchArtifactClassFlat( String term, String repositoryId, String groupId, Integer from,
+        Integer count )
+    {
+        IndexingContext context = null;
+
+        if ( groupId != null )
+        {
+            context = nexusIndexer.getIndexingContexts().get( getLocalContextId( groupId ) );
+        }
+
+        if ( repositoryId != null )
+        {
+            context = nexusIndexer.getIndexingContexts().get( getLocalContextId( repositoryId ) );
+        }
+
+        FlatSearchRequest req = null;
+
+        try
+        {
+            if ( term.endsWith( ".class" ) )
+            {
+                term = term.substring( 0, term.length() - 6 );
+            }
+
+            term = StringUtils.replace( term, '.', '/' );
+
+            Query q = nexusIndexer.constructQuery( ArtifactInfo.NAMES, term );
+
+            if ( context == null )
+            {
+                req = new FlatSearchRequest( q, ArtifactInfo.REPOSITORY_VERSION_COMPARATOR );
+            }
+            else
+            {
+                req = new FlatSearchRequest( q, ArtifactInfo.REPOSITORY_VERSION_COMPARATOR, context );
             }
 
             if ( from != null )

@@ -1374,6 +1374,12 @@ public class DefaultNexus
         return indexerManager.searchArtifactFlat( term, repositoryId, groupId, from, count );
     }
 
+    public FlatSearchResponse searchArtifactClassFlat( String term, String repositoryId, String groupId, Integer from,
+        Integer count )
+    {
+        return indexerManager.searchArtifactClassFlat( term, repositoryId, groupId, from, count );
+    }
+
     public FlatSearchResponse searchArtifactFlat( String gTerm, String aTerm, String vTerm, String cTerm,
         String repositoryId, String groupId, Integer from, Integer count )
     {

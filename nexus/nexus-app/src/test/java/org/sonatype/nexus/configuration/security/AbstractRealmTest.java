@@ -1322,6 +1322,12 @@ public abstract class AbstractRealmTest
         {
             throw new UnsupportedOperationException();
         }
+
+        public FlatSearchResponse searchArtifactClassFlat( String term, String repositoryId, String groupId,
+            Integer from, Integer count )
+        {
+            throw new UnsupportedOperationException();
+        }
     }
 
     public static class MockRepository
