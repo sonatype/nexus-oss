@@ -71,19 +71,18 @@ public class NexusHttpAuthenticationFilter
         if ( isLoginAttempt( request, response ) )
         {
             loggedIn = executeLogin( request, response );
-        }
 
-        if ( !loggedIn )
+            if ( !loggedIn )
+            {
+                sendChallenge( request, response );
+            }
+        }
+        else
         {
             // let the user "fall thru" until we get some permission problem
             if ( getNexus( request ).isAnonymousAccessEnabled() )
             {
                 loggedIn = executeAnonymousLogin( request, response );
-            }
-
-            if ( !loggedIn )
-            {
-                sendChallenge( request, response );
             }
         }
 
