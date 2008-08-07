@@ -536,5 +536,17 @@
 			<method>read</method>
 			<permission>nexus:repometa</permission>
 		</applicationPrivilege>
+		      <applicationPrivilege>
+            <id>68</id>
+            <name>Scheduled Tasks - (run)</name>
+            <method>read</method>
+            <permission>nexus:tasksrun</permission>
+        </applicationPrivilege>
+        <applicationPrivilege>
+            <id>69</id>
+            <name>Scheduled Task Types - (read)</name>
+            <method>read</method>
+            <permission>nexus:tasktypes</permission>
+        </applicationPrivilege>
 	</applicationPrivileges>
 </nexusSecurity>

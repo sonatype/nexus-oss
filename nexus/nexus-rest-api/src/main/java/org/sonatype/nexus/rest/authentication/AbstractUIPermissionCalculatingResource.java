@@ -85,7 +85,7 @@ public abstract class AbstractUIPermissionCalculatingResource
 
         perms.setActionRebuildAttribs( getFlagsForPermission( subject, "nexus:attributes" ) );
 
-        perms.setActionRunTask( getFlagsForPermission( subject, "nexus:runtask" ) );
+        perms.setActionRunTask( getFlagsForPermission( subject, "nexus:tasksrun" ) );
 
         perms.setActionUploadArtifact( getFlagsForPermission( subject, "nexus:artifact" ) );
 

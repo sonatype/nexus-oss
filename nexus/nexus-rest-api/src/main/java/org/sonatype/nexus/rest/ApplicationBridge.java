@@ -394,12 +394,12 @@ public class ApplicationBridge
 
         attach( router, false, "/schedules", ScheduledServiceListResourceHandler.class );
 
-        attach( router, false, "/schedules/types", ScheduledServiceTypeResourceHandler.class );
+        attach( router, false, "/schedule_types", ScheduledServiceTypeResourceHandler.class );
 
         attach(
             router,
             false,
-            "/schedules/run/{" + ScheduledServiceRunResourceHandler.SCHEDULED_SERVICE_ID_KEY + "}",
+            "/schedule_run/{" + ScheduledServiceRunResourceHandler.SCHEDULED_SERVICE_ID_KEY + "}",
             ScheduledServiceRunResourceHandler.class );
 
         attach(
