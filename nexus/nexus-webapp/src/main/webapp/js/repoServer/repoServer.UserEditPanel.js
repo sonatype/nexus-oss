@@ -33,7 +33,20 @@ Sonatype.repoServer.UserEditPanel = function(config){
   this.statusStore = new Ext.data.SimpleStore({fields:['value','display'], data:[['active','Active'],['disabled','Disabled'],['expired','Expired'],['locked','Locked']]});
     
   this.roleCombiner = function(val, parent) {
-    return Sonatype.utils.joinArrayObject(val, 'roleName');
+    var s = '';
+    if ( val ) {
+      for ( var i = 0; i < val.length; i++ ) {
+        var rec = this.roleDataStore.getAt( this.roleDataStore.find( 'id', val[i] ) );
+        if ( rec ) {
+          if ( s ) {
+            s += ', ';
+          }
+          s += rec.get( 'name' );
+        }
+      }
+    }
+
+    return s;
   };
   
   this.actions = {
@@ -73,7 +86,7 @@ Sonatype.repoServer.UserEditPanel = function(config){
     {name:'email'},
     {name:'status'},
     {name:'roles'},
-    {name:'displayRoles', mapping:'roles', convert: this.roleCombiner}
+    {name:'displayRoles', mapping:'roles', convert: this.roleCombiner.createDelegate(this)}
   ]);
   
   //A record to hold the name and id of a role
@@ -83,20 +96,20 @@ Sonatype.repoServer.UserEditPanel = function(config){
   ]);
   
   
+  this.roleReader = new Ext.data.JsonReader({root: 'data', id: 'id'}, this.roleRecordConstructor );  
+  this.roleDataStore = new Ext.data.Store({
+    url: Sonatype.config.repos.urls.roles,
+    reader: this.roleReader,
+    sortInfo: {field: 'name', direction: 'ASC'},
+    autoLoad: true
+  });
+  
   //Reader and datastore that queries the server for the list of currently defined users
   this.usersReader = new Ext.data.JsonReader({root: 'data', id: 'resourceURI'}, this.userRecordConstructor );
   this.usersDataStore = new Ext.data.Store({
     url: Sonatype.config.repos.urls.users,
     reader: this.usersReader,
     sortInfo: {field: 'userId', direction: 'ASC'},
-    autoLoad: true
-  });
-  
-  this.roleReader = new Ext.data.JsonReader({root: 'data', id: 'id'}, this.roleRecordConstructor );  
-  this.roleDataStore = new Ext.data.Store({
-    url: Sonatype.config.repos.urls.roles,
-    reader: this.roleReader,
-    sortInfo: {field: 'name', direction: 'ASC'},
     autoLoad: true
   });
   
@@ -342,10 +355,10 @@ Sonatype.repoServer.UserEditPanel = function(config){
     loadMask: true,
     deferredRender: false,
     columns: [
-      {header: 'User ID', dataIndex: 'userId', width:175, id: 'user-config-userid-col'},
+      {header: 'User ID', dataIndex: 'userId', width:120, id: 'user-config-userid-col'},
       {header: 'Name', dataIndex: 'name', width:175, id: 'user-config-name-col'},
       {header: 'Email', dataIndex: 'email', width:175, id: 'user-config-email-col'},
-      {header: 'Status', dataIndex: 'status', width:175, id: 'user-config-status-col'},
+      {header: 'Status', dataIndex: 'status', width:75, id: 'user-config-status-col'},
       {header: 'Roles', dataIndex: 'displayRoles', width:175, id: 'user-config-roles-col'}
     ],
     autoExpandColumn: 'user-config-roles-col',
