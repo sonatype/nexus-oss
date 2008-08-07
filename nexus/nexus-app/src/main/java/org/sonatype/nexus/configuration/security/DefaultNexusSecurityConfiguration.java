@@ -421,7 +421,7 @@ public class DefaultNexusSecurityConfiguration
     {
         CUser user = readUser( id );
 
-        user.setStatus( CUser.STATUS_ACTIVE );
+        user.setStatus( CUser.STATUS_EXPIRED );
 
         String password = generateNewPassword( user );
 
@@ -489,7 +489,8 @@ public class DefaultNexusSecurityConfiguration
         {
             throw new InvalidCredentialsException();
         }
-
+        
+        user.setStatus( CUser.STATUS_ACTIVE );
         user.setPassword( pwGenerator.hashPassword( newPassword ) );
     }
 
