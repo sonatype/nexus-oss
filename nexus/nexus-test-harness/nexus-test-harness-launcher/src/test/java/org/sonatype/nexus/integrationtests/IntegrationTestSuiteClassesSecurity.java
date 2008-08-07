@@ -32,6 +32,8 @@ import org.sonatype.nexus.integrationtests.nexus385.Nexus385RoutesCrudXmlTests;
 import org.sonatype.nexus.integrationtests.nexus385.Nexus385RoutesPermissionTests;
 import org.sonatype.nexus.integrationtests.nexus385.Nexus385RoutesValidationTests;
 import org.sonatype.nexus.integrationtests.nexus387.Nexus387RoutesTests;
+import org.sonatype.nexus.integrationtests.nexus393.Nexus393PermissionTest;
+import org.sonatype.nexus.integrationtests.nexus394.Nexus394PermissionTest;
 import org.sonatype.nexus.integrationtests.nexus429.Nexus429UploadArtifactPrivilegeTest;
 import org.sonatype.nexus.integrationtests.proxy.nexus177.Nexus177OutOfServiceTest;
 import org.sonatype.nexus.integrationtests.proxy.nexus178.Nexus178BlockProxyDownloadTest;
@@ -50,7 +52,7 @@ import org.sonatype.nexus.integrationtests.proxy.nexus262.Nexus262SimpleProxyTes
     Nexus233PrivilegesCrudXMLTests.class, Nexus233PrivilegesValidationTests.class, Nexus385RoutesCrudXmlTests.class,
     Nexus385RoutesValidationTests.class, Nexus387RoutesTests.class, Nexus429UploadArtifactPrivilegeTest.class,
     Nexus133TargetPermissionTests.class, Nexus142UserPermissionTests.class, Nexus156RolesPermissionTests.class,
-    Nexus385RoutesPermissionTests.class } )
+    Nexus393PermissionTest.class, Nexus394PermissionTest.class, Nexus385RoutesPermissionTests.class } )
 public class IntegrationTestSuiteClassesSecurity
 {
     @BeforeClass

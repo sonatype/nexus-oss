@@ -27,6 +27,8 @@ import org.sonatype.nexus.integrationtests.nexus292.Nexus292SoftRestartTest;
 import org.sonatype.nexus.integrationtests.nexus385.Nexus385RoutesCrudXmlTests;
 import org.sonatype.nexus.integrationtests.nexus385.Nexus385RoutesValidationTests;
 import org.sonatype.nexus.integrationtests.nexus387.Nexus387RoutesTests;
+import org.sonatype.nexus.integrationtests.nexus393.Nexus393ResetPasswordTest;
+import org.sonatype.nexus.integrationtests.nexus394.Nexus394ForgotPasswordTest;
 import org.sonatype.nexus.integrationtests.proxy.nexus177.Nexus177OutOfServiceTest;
 import org.sonatype.nexus.integrationtests.proxy.nexus178.Nexus178BlockProxyDownloadTest;
 import org.sonatype.nexus.integrationtests.proxy.nexus179.Nexus179RemoteRepoDownTest;
@@ -47,8 +49,9 @@ import org.sonatype.nexus.integrationtests.proxy.nexus262.Nexus262SimpleProxyTes
     Nexus133TargetCrudJsonTests.class, Nexus133TargetCrudXmlTests.class, Nexus142UserCrudJsonTests.class,
     Nexus142UserCrudXmlTests.class, Nexus156RolesCrudJsonTests.class, Nexus156RolesCrudXmlTests.class,
     Nexus142UserValidationTests.class, Nexus156RolesValidationTests.class, Nexus133TargetValidationTests.class,
-    Nexus233PrivilegesCrudXMLTests.class, Nexus233PrivilegesValidationTests.class, Nexus385RoutesCrudXmlTests.class,
-    Nexus385RoutesValidationTests.class, Nexus387RoutesTests.class} )
+    Nexus233PrivilegesCrudXMLTests.class, Nexus233PrivilegesValidationTests.class, Nexus393ResetPasswordTest.class,
+    Nexus394ForgotPasswordTest.class, Nexus385RoutesCrudXmlTests.class, Nexus385RoutesValidationTests.class,
+    Nexus387RoutesTests.class } )
 public class IntegrationTestSuiteClasses
 {
 
