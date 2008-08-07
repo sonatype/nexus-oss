@@ -53,7 +53,7 @@ public abstract class AbstractUIPermissionCalculatingResource
 
         perms.setMaintRepos( getFlagsForPermission( subject, "nexus:repostatus" ) );
 
-        perms.setConfigServer( getFlagsForPermission( subject, "nexus:configuration" ) );
+        perms.setConfigServer( getFlagsForPermission( subject, "nexus:settings" ) );
 
         perms.setConfigGroups( getFlagsForPermission( subject, "nexus:repogroups" ) );
 
