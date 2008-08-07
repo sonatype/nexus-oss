@@ -104,6 +104,7 @@
 			<id>T1</id>
 			<name>All M2 Repositories - (read)</name>
 			<method>read</method>
+			<description>Give permission to read any content in any Maven 2 type repositories.</description>
 		</repositoryTargetPrivilege>
 		<repositoryTargetPrivilege>
 			<repositoryTargetId>2</repositoryTargetId>
@@ -112,6 +113,7 @@
 			<id>T2</id>
 			<name>All M1 Repositories - (read)</name>
 			<method>read</method>
+			<description>Give permission to read any content in any Maven 1 type repositories.</description>
 		</repositoryTargetPrivilege>
         <repositoryTargetPrivilege>
 			<repositoryTargetId>1</repositoryTargetId>
@@ -120,6 +122,7 @@
 			<id>T3</id>
 			<name>All M2 Repositories - (update)</name>
 			<method>update</method>
+			<description>Give permission to update any content in any Maven 2 type repositories.</description>
 		</repositoryTargetPrivilege>
 		<repositoryTargetPrivilege>
 			<repositoryTargetId>2</repositoryTargetId>
@@ -128,6 +131,7 @@
 			<id>T4</id>
 			<name>All M1 Repositories - (update)</name>
 			<method>update</method>
+			<description>Give permission to update any content in any Maven 1 type repositories.</description>
 		</repositoryTargetPrivilege>
         <repositoryTargetPrivilege>
 			<repositoryTargetId>1</repositoryTargetId>
@@ -136,6 +140,7 @@
 			<id>T5</id>
 			<name>All M2 Repositories - (create)</name>
 			<method>create</method>
+			<description>Give permission to create any content in any Maven 2 type repositories.</description>
 		</repositoryTargetPrivilege>
 		<repositoryTargetPrivilege>
 			<repositoryTargetId>2</repositoryTargetId>
@@ -144,6 +149,7 @@
 			<id>T6</id>
 			<name>All M1 Repositories - (create)</name>
 			<method>create</method>
+			<description>Give permission to create any content in any Maven 1 type repositories.</description>
 		</repositoryTargetPrivilege>
         <repositoryTargetPrivilege>
 			<repositoryTargetId>1</repositoryTargetId>
@@ -152,6 +158,7 @@
 			<id>T7</id>
 			<name>All M2 Repositories - (delete)</name>
 			<method>delete</method>
+			<description>Give permission to delete any content in any Maven 2 type repositories.</description>
 		</repositoryTargetPrivilege>
 		<repositoryTargetPrivilege>
 			<repositoryTargetId>2</repositoryTargetId>
@@ -160,6 +167,7 @@
 			<id>T8</id>
 			<name>All M1 Repositories - (delete)</name>
 			<method>delete</method>
+			<description>Give permission to delete any content in any Maven 1 type repositories.</description>
 		</repositoryTargetPrivilege>
 	</repositoryTargetPrivileges>
 	
@@ -169,384 +177,448 @@
 			<name>Administrator privilege (ALL)</name>
 			<method>*</method>
 			<permission>nexus:*</permission>
+			<description>Give permission to everything available in nexus.</description>
 		</applicationPrivilege>
 		<applicationPrivilege>
 			<id>1</id>
 			<name>Status - (read)</name>
 			<method>read</method>
 			<permission>nexus:status</permission>
+			<description>Give permission to query the nexus server for it's status.</description>
 		</applicationPrivilege>
 		<applicationPrivilege>
 			<id>2</id>
 			<name>Login to UI</name>
 			<method>read</method>
 			<permission>nexus:authentication</permission>
+			<description>Give permission to allow a user to login to nexus.</description>
 		</applicationPrivilege>
 		<applicationPrivilege>
 			<id>3</id>
 			<name>Server Settings - (read)</name>
 			<method>read</method>
 			<permission>nexus:settings</permission>
+			<description>Give permission to read the nexus server settings.</description>
 		</applicationPrivilege>
 		<applicationPrivilege>
 			<id>4</id>
 			<name>Server Settings - (update)</name>
 			<method>update</method>
 			<permission>nexus:settings</permission>
+			<description>Give permission to update the nexus server settings.</description>
 		</applicationPrivilege>
 		<applicationPrivilege>
 			<id>5</id>
 			<name>Repositories - (create)</name>
 			<method>create</method>
 			<permission>nexus:repositories</permission>
+			<description>Give permission to create new repositories.</description>
 		</applicationPrivilege>
 		<applicationPrivilege>
 			<id>6</id>
 			<name>Repositories - (read)</name>
 			<method>read</method>
 			<permission>nexus:repositories</permission>
+			<description>Give permission to read existing repository configuration.</description>
 		</applicationPrivilege>
 		<applicationPrivilege>
 			<id>7</id>
 			<name>Repositories - (update)</name>
 			<method>update</method>
 			<permission>nexus:repositories</permission>
+			<description>Give permission to update existing repository configuration.</description>
 		</applicationPrivilege>
 		<applicationPrivilege>
 			<id>8</id>
 			<name>Repositories - (delete)</name>
 			<method>delete</method>
 			<permission>nexus:repositories</permission>
+			<description>Give permission to delete existing repositories.</description>
 		</applicationPrivilege>
 		<applicationPrivilege>
 			<id>9</id>
 			<name>Repository Templates - (create)</name>
 			<method>create</method>
 			<permission>nexus:repotemplates</permission>
+			<description>Give permission to create new repository templates.</description>
 		</applicationPrivilege>
 		<applicationPrivilege>
 			<id>10</id>
 			<name>Repository Templates - (read)</name>
 			<method>read</method>
 			<permission>nexus:repotemplates</permission>
+			<description>Give permission to read existing repository template configuration.</description>
 		</applicationPrivilege>
 		<applicationPrivilege>
 			<id>11</id>
 			<name>Repository Templates - (update)</name>
 			<method>update</method>
 			<permission>nexus:repotemplates</permission>
+			<description>Give permission to update existing repository template configuration.</description>
 		</applicationPrivilege>
 		<applicationPrivilege>
 			<id>12</id>
 			<name>Repository Templates - (delete)</name>
 			<method>delete</method>
 			<permission>nexus:repotemplates</permission>
+			<description>Give permission to delete existing repository templates.</description>
 		</applicationPrivilege>
 		<applicationPrivilege>
 			<id>13</id>
 			<name>Repository Groups - (create)</name>
 			<method>create</method>
 			<permission>nexus:repogroups</permission>
+			<description>Give permission to create new repository groups.</description>
 		</applicationPrivilege>
 		<applicationPrivilege>
 			<id>14</id>
 			<name>Repository Groups - (read)</name>
 			<method>read</method>
 			<permission>nexus:repogroups</permission>
+			<description>Give permission to read existing repository group configuration.</description>
 		</applicationPrivilege>
 		<applicationPrivilege>
 			<id>15</id>
 			<name>Repository Groups - (update)</name>
 			<method>update</method>
 			<permission>nexus:repogroups</permission>
+			<description>Give permission to update existing repository group configuration.</description>
 		</applicationPrivilege>
 		<applicationPrivilege>
 			<id>16</id>
 			<name>Repository Groups - (delete)</name>
 			<method>delete</method>
 			<permission>nexus:repogroups</permission>
+			<description>Give permission to delete existing repository groups.</description>
 		</applicationPrivilege>
 		<applicationPrivilege>
 			<id>17</id>
 			<name>Search Repositories</name>
 			<method>read</method>
 			<permission>nexus:index</permission>
+			<description>Give permission to perform searches of repository content.</description>
 		</applicationPrivilege>
 		<applicationPrivilege>
 			<id>18</id>
 			<name>Reindex</name>
 			<method>delete</method>
 			<permission>nexus:index</permission>
+			<description>Give permission to Reindex repository content.</description>
 		</applicationPrivilege>
 		<applicationPrivilege>
 			<id>19</id>
 			<name>Checksum Search</name>
 			<method>read</method>
 			<permission>nexus:identify</permission>
+			<description>Give permission to perform checksum type searches of repository content.</description>
 		</applicationPrivilege>
 		<applicationPrivilege>
 			<id>20</id>
 			<name>Rebuild Repository Attributes</name>
 			<method>delete</method>
 			<permission>nexus:attributes</permission>
+			<description>Give permission to rebuild the attributes of repository content.</description>
 		</applicationPrivilege>
 		<applicationPrivilege>
 			<id>21</id>
 			<name>Clear Repository Cache</name>
 			<method>delete</method>
 			<permission>nexus:cache</permission>
+			<description>Give permission to clear the content of a repositories not found cache.</description>
 		</applicationPrivilege>
 		<applicationPrivilege>
 			<id>22</id>
 			<name>Repository Routes - (create)</name>
 			<method>create</method>
 			<permission>nexus:routes</permission>
+			<description>Give permission to create repository routes.</description>
 		</applicationPrivilege>
 		<applicationPrivilege>
 			<id>23</id>
 			<name>Repository Routes - (read)</name>
 			<method>read</method>
 			<permission>nexus:routes</permission>
+			<description>Give permission to read existing repository route configuration.</description>
 		</applicationPrivilege>
 		<applicationPrivilege>
 			<id>24</id>
 			<name>Repository Routes - (update)</name>
 			<method>update</method>
 			<permission>nexus:routes</permission>
+			<description>Give permission to update existing repository route configuration.</description>
 		</applicationPrivilege>
 		<applicationPrivilege>
 			<id>25</id>
 			<name>Repository Routes - (delete)</name>
 			<method>delete</method>
 			<permission>nexus:routes</permission>
+			<description>Give permission to delete existing repository routes.</description>
 		</applicationPrivilege>
 		<applicationPrivilege>
 			<id>26</id>
 			<name>Scheduled Tasks - (create)</name>
 			<method>create</method>
 			<permission>nexus:tasks</permission>
+			<description>Give permission to create scheduled tasks.</description>
 		</applicationPrivilege>
 		<applicationPrivilege>
 			<id>27</id>
 			<name>Scheduled Tasks - (read)</name>
 			<method>read</method>
 			<permission>nexus:tasks</permission>
+			<description>Give permission to read existing scheduled task configuration.</description>
 		</applicationPrivilege>
 		<applicationPrivilege>
 			<id>28</id>
 			<name>Scheduled Tasks - (update)</name>
 			<method>update</method>
 			<permission>nexus:tasks</permission>
+			<description>Give permission to update existing scheduled task configuration.</description>
 		</applicationPrivilege>
 		<applicationPrivilege>
 			<id>29</id>
 			<name>Scheduled Tasks - (delete)</name>
 			<method>delete</method>
 			<permission>nexus:tasks</permission>
+			<description>Give permission to delete existing scheduled tasks.</description>
 		</applicationPrivilege>
 		<applicationPrivilege>
 			<id>30</id>
 			<name>User Privileges - (create)</name>
 			<method>create</method>
 			<permission>nexus:privileges</permission>
+			<description>Give permission to create privileges.</description>
 		</applicationPrivilege>
 		<applicationPrivilege>
 			<id>31</id>
 			<name>User Privileges - (read)</name>
 			<method>read</method>
 			<permission>nexus:privileges</permission>
+			<description>Give permission to read existing privilege configuration.</description>
 		</applicationPrivilege>
 		<applicationPrivilege>
 			<id>32</id>
 			<name>User Privileges - (update)</name>
 			<method>update</method>
 			<permission>nexus:privileges</permission>
+			<description>Give permission to update existing privilege configuration.</description>
 		</applicationPrivilege>
 		<applicationPrivilege>
 			<id>33</id>
 			<name>User Privileges - (delete)</name>
 			<method>delete</method>
 			<permission>nexus:privileges</permission>
+			<description>Give permission to delete existing privileges.</description>
 		</applicationPrivilege>
 		<applicationPrivilege>
 			<id>34</id>
 			<name>User Roles - (create)</name>
 			<method>create</method>
 			<permission>nexus:roles</permission>
+			<description>Give permission to create user roles.</description>
 		</applicationPrivilege>
 		<applicationPrivilege>
 			<id>35</id>
 			<name>User Roles - (read)</name>
 			<method>read</method>
 			<permission>nexus:roles</permission>
+			<description>Give permission to read existing user role configuration.</description>
 		</applicationPrivilege>
 		<applicationPrivilege>
 			<id>36</id>
 			<name>User Roles - (update)</name>
 			<method>update</method>
 			<permission>nexus:roles</permission>
+			<description>Give permission to update existing user role configuration.</description>
 		</applicationPrivilege>
 		<applicationPrivilege>
 			<id>37</id>
 			<name>User Roles - (delete)</name>
 			<method>delete</method>
 			<permission>nexus:roles</permission>
+			<description>Give permission to delete existing user roles.</description>
 		</applicationPrivilege>
 		<applicationPrivilege>
 			<id>38</id>
 			<name>Users - (create)</name>
 			<method>create</method>
 			<permission>nexus:users</permission>
+			<description>Give permission to create users.</description>
 		</applicationPrivilege>
 		<applicationPrivilege>
 			<id>39</id>
 			<name>Users - (read)</name>
 			<method>read</method>
 			<permission>nexus:users</permission>
+			<description>Give permission to read existing user configuration.</description>
 		</applicationPrivilege>
 		<applicationPrivilege>
 			<id>40</id>
 			<name>Users - (update)</name>
 			<method>update</method>
 			<permission>nexus:users</permission>
+			<description>Give permission to update existing user configuration.</description>
 		</applicationPrivilege>
 		<applicationPrivilege>
 			<id>41</id>
 			<name>Users - (delete)</name>
 			<method>delete</method>
 			<permission>nexus:users</permission>
+			<description>Give permission to delete existing users.</description>
 		</applicationPrivilege>
 		<applicationPrivilege>
 			<id>42</id>
 			<name>Logs - (read)</name>
 			<method>read</method>
 			<permission>nexus:logs</permission>
+			<description>Give permission to retrieve the nexus log files.</description>
 		</applicationPrivilege>
 		<applicationPrivilege>
 			<id>43</id>
 			<name>Configuration File - (read)</name>
 			<method>read</method>
 			<permission>nexus:configuration</permission>
+			<description>Give permission to retrieve the nexus.xml configuration file.</description>
 		</applicationPrivilege>
 		<applicationPrivilege>
 			<id>44</id>
 			<name>RSS Feeds - (read)</name>
 			<method>read</method>
 			<permission>nexus:feeds</permission>
+			<description>Give permission to view the different RSS feeds.</description>
 		</applicationPrivilege>
 		<applicationPrivilege>
 			<id>45</id>
 			<name>Repository Targets - (create)</name>
 			<method>create</method>
 			<permission>nexus:targets</permission>
+			<description>Give permission to create repository targets.</description>
 		</applicationPrivilege>
 		<applicationPrivilege>
 			<id>46</id>
 			<name>Repository Targets - (read)</name>
 			<method>read</method>
 			<permission>nexus:targets</permission>
+			<description>Give permission to read existing repository target configuration.</description>
 		</applicationPrivilege>
 		<applicationPrivilege>
 			<id>47</id>
 			<name>Repository Targets - (update)</name>
 			<method>update</method>
 			<permission>nexus:targets</permission>
+			<description>Give permission to update existing repository target configuration.</description>
 		</applicationPrivilege>
 		<applicationPrivilege>
 			<id>48</id>
 			<name>Repository Targets - (delete)</name>
 			<method>delete</method>
 			<permission>nexus:targets</permission>
+			<description>Give permission to delete existing repository targets.</description>
 		</applicationPrivilege>
 		<applicationPrivilege>
 			<id>49</id>
 			<name>Server Status - (update)</name>
 			<method>update</method>
 			<permission>nexus:status</permission>
+			<description>Give permission to update the status of the nexus server.</description>
 		</applicationPrivilege>
 		<applicationPrivilege>
 			<id>50</id>
 			<name>Wastebasket - (read)</name>
 			<method>read</method>
 			<permission>nexus:wastebasket</permission>
+			<description>Give permission to read the contents of the nexus trash.</description>
 		</applicationPrivilege>
 		<applicationPrivilege>
 			<id>51</id>
 			<name>Wastebasket - (delete)</name>
 			<method>delete</method>
 			<permission>nexus:wastebasket</permission>
+			<description>Give permission to delete the contents of the nexus trash.</description>
 		</applicationPrivilege>        
 		<applicationPrivilege>
 			<id>54</id>
 			<name>Artifact Download</name>
 			<method>read</method>
 			<permission>nexus:artifact</permission>
+			<description>Give permission to download artifacts (using /artifact service, not the /content url).</description>
 		</applicationPrivilege>
 		<applicationPrivilege>
 			<id>55</id>
 			<name>Read Repository Status</name>
 			<method>read</method>
 			<permission>nexus:repostatus</permission>
+			<description>Give permission to retrieve the status of a repository.</description>
 		</applicationPrivilege>
 		<applicationPrivilege>
 			<id>56</id>
-			<name>??Repository Content Classes - (read)</name>
+			<name>Repository Content Classes - (read)</name>
 			<method>read</method>
 			<permission>nexus:repocontentclasses</permission>
+			<description>Give permission to retrieve the list of repository content classes supported by nexus.</description>
 		</applicationPrivilege>
 		<applicationPrivilege>
             <id>57</id>
             <name>User Forgot Password - (create)</name>
             <method>create</method>
             <permission>nexus:usersforgotpw</permission>
+            <description>Give permission to request that a password be generated an emailed to a certain user.</description>
         </applicationPrivilege>
         <applicationPrivilege>
             <id>58</id>
             <name>User Forgot User Id - (create)</name>
             <method>create</method>
             <permission>nexus:usersforgotid</permission>
+            <description>Give permission to request that a username be emailed to a certain email address.</description>
         </applicationPrivilege>
         <applicationPrivilege>
             <id>59</id>
             <name>User Reset Password - (delete)</name>
             <method>delete</method>
             <permission>nexus:usersreset</permission>
+            <description>Give permission to reset any user's password.</description>
         </applicationPrivilege>
         <applicationPrivilege>
             <id>64</id>
             <name>User Change Password - (create)</name>
             <method>create</method>
             <permission>nexus:userschangepw</permission>
+            <description>Give permission to change a user's password.</description>
         </applicationPrivilege>
         <applicationPrivilege>
             <id>65</id>
             <name>Artifact Upload</name>
             <method>create</method>
             <permission>nexus:artifact</permission>
+            <description>Give permission to upload artifacts (using /artifact service, not the /content service).</description>
         </applicationPrivilege>
         <applicationPrivilege>
             <id>66</id>
             <name>Nexus Remote Control</name>
             <method>update</method>
             <permission>nexus:command</permission>
+            <description>Give permission to remotely control nexus server (start, stop, etc.).</description>
         </applicationPrivilege>
 		<applicationPrivilege>
 			<id>67</id>
 			<name>Read Repository Metadata</name>
 			<method>read</method>
 			<permission>nexus:repometa</permission>
+			<description>Give permission to read the repository metadata.</description>
 		</applicationPrivilege>
 		      <applicationPrivilege>
             <id>68</id>
             <name>Scheduled Tasks - (run)</name>
             <method>read</method>
             <permission>nexus:tasksrun</permission>
+            <description>Give permission to run existing scheduled tasks manually.</description>
         </applicationPrivilege>
         <applicationPrivilege>
             <id>69</id>
             <name>Scheduled Task Types - (read)</name>
             <method>read</method>
             <permission>nexus:tasktypes</permission>
+            <description>Give permission to retrieve list of support task types available in nexus.</description>
         </applicationPrivilege>
 	</applicationPrivileges>
 </nexusSecurity>
