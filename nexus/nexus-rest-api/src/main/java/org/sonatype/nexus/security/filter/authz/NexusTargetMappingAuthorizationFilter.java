@@ -3,6 +3,8 @@ package org.sonatype.nexus.security.filter.authz;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
@@ -22,7 +24,11 @@ import org.sonatype.nexus.proxy.target.TargetSet;
 public class NexusTargetMappingAuthorizationFilter
     extends HttpVerbMappingAuthorizationFilter
 {
+    private Pattern pathPrefixPattern;
+
     private String pathPrefix;
+
+    private String pathReplacement;
 
     public String getPathPrefix()
     {
@@ -32,6 +38,26 @@ public class NexusTargetMappingAuthorizationFilter
     public void setPathPrefix( String pathPrefix )
     {
         this.pathPrefix = pathPrefix;
+
+        if ( pathPrefix != null )
+        {
+            pathPrefixPattern = Pattern.compile( pathPrefix );
+        }
+    }
+
+    public String getPathReplacement()
+    {
+        if ( pathReplacement == null )
+        {
+            pathReplacement = "";
+        }
+
+        return pathReplacement;
+    }
+
+    public void setPathReplacement( String pathReplacement )
+    {
+        this.pathReplacement = pathReplacement;
     }
 
     public String getResourceStorePath( ServletRequest request )
@@ -40,9 +66,20 @@ public class NexusTargetMappingAuthorizationFilter
 
         if ( getPathPrefix() != null )
         {
-            path = path.replaceFirst( getPathPrefix(), "" );
+            Matcher m = pathPrefixPattern.matcher( path );
+
+            if ( m.matches() )
+            {
+                // TODO: hardcoded currently
+                path = getPathReplacement().replaceAll( "@1", m.group( 1 ) ).replaceAll( "@2", m.group( 2 ) );
+            }
+            else
+            {
+                throw new IllegalArgumentException(
+                    "The request path does not matches the incoming request? This is misconfiguration in web.xml!" );
+            }
         }
-        
+
         return path;
     }
 

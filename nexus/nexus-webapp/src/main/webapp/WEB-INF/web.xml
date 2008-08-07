@@ -47,10 +47,12 @@
 			perms = org.sonatype.nexus.security.filter.authz.HttpVerbMappingAuthorizationFilter
 
 			trperms = org.sonatype.nexus.security.filter.authz.NexusTargetMappingAuthorizationFilter
-			trperms.pathPrefix = /service/local/repositories/(a-zA-Z_0-9)+/content
+			trperms.pathPrefix = /service/local/repositories/(.*)/content(.*)
+			trperms.pathReplacement = /repositories/@1@2
 
 			tgperms = org.sonatype.nexus.security.filter.authz.NexusTargetMappingAuthorizationFilter
-			tgperms.pathPrefix = /service/local/repo_groups/(a-zA-Z_0-9)+/content
+			tgperms.pathPrefix = /service/local/repo_groups/(.*)/content(.*)
+			tgperms.pathReplacement = /groups/@1@2
 
 			[urls]
 			/service/*/status/command = authcBasic,perms[nexus:command]
