@@ -838,7 +838,18 @@ public abstract class AbstractRepository
 
         try
         {
-            StorageItem item = doRetrieveItem( localOnly, uid, new HashMap<String, Object>() );
+            StorageItem item = null;
+            
+            try
+            {
+                uid.lock();
+                
+                item = doRetrieveItem( localOnly, uid, new HashMap<String, Object>() );
+            }
+            finally
+            {
+                uid.unlock();
+            }
 
             if ( context != null )
             {

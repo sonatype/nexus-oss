@@ -46,18 +46,18 @@ import org.sonatype.nexus.configuration.validator.ValidationResponse;
 public class DefaultSecurityConfigurationValidator
     extends AbstractLogEnabled
     implements SecurityConfigurationValidator
-{   
+{
     @SuppressWarnings( "unchecked" )
     public ValidationResponse validateModel( ValidationRequest request )
     {
         ValidationResponse response = new SecurityValidationResponse();
 
         Configuration model = (Configuration) request.getConfiguration();
-        
-        SecurityValidationContext context = ( SecurityValidationContext ) response.getContext();
-        
+
+        SecurityValidationContext context = (SecurityValidationContext) response.getContext();
+
         List<CApplicationPrivilege> appPrivs = model.getApplicationPrivileges();
-        
+
         if ( appPrivs != null )
         {
             for ( CApplicationPrivilege priv : appPrivs )
@@ -65,9 +65,9 @@ public class DefaultSecurityConfigurationValidator
                 response.append( validateApplicationPrivilege( context, priv, false ) );
             }
         }
-        
+
         List<CRepoTargetPrivilege> targetPrivs = model.getRepositoryTargetPrivileges();
-        
+
         if ( targetPrivs != null )
         {
             for ( CRepoTargetPrivilege priv : targetPrivs )
@@ -75,9 +75,9 @@ public class DefaultSecurityConfigurationValidator
                 response.append( validateRepoTargetPrivilege( context, priv, false ) );
             }
         }
-        
+
         List<CRole> roles = model.getRoles();
-        
+
         if ( roles != null )
         {
             for ( CRole role : roles )
@@ -85,11 +85,11 @@ public class DefaultSecurityConfigurationValidator
                 response.append( validateRole( context, role, false ) );
             }
         }
-        
+
         response.append( validateRoleContainment( context ) );
-        
+
         List<CUser> users = model.getUsers();
-        
+
         if ( users != null )
         {
             for ( CUser user : users )
@@ -136,26 +136,26 @@ public class DefaultSecurityConfigurationValidator
 
         return response;
     }
-    
+
     public ValidationResponse validatePrivilege( SecurityValidationContext ctx, CPrivilege privilege, boolean update )
     {
         ValidationResponse response = new SecurityValidationResponse();
-        
+
         if ( ctx != null )
         {
             response.setContext( ctx );
         }
-        
-        SecurityValidationContext context = ( SecurityValidationContext ) response.getContext();
-        
+
+        SecurityValidationContext context = (SecurityValidationContext) response.getContext();
+
         Random rnd = new Random();
-        
+
         List<String> existingIds = context.getExistingPrivilegeIds();
-        
+
         if ( existingIds == null )
         {
             context.addExistingPrivilegeIds();
-            
+
             existingIds = context.getExistingPrivilegeIds();
         }
 
@@ -164,64 +164,97 @@ public class DefaultSecurityConfigurationValidator
                 .contains( privilege.getId() ) ) ) )
         {
             String newId = Long.toHexString( System.currentTimeMillis() + rnd.nextInt( 2008 ) );
-            
+
             ValidationMessage message = new ValidationMessage( "id", "Fixed wrong privilege ID from '"
                 + privilege.getId() + "' to '" + newId + "'" );
             response.addValidationWarning( message );
-            
+
             privilege.setId( newId );
 
             response.setModified( true );
         }
-        
-        if ( !CPrivilege.METHOD_CREATE.equals( privilege.getMethod() ) 
-            && !CPrivilege.METHOD_DELETE.equals( privilege.getMethod() )
-            && !CPrivilege.METHOD_READ.equals( privilege.getMethod() )
-            && !CPrivilege.METHOD_UPDATE.equals( privilege.getMethod() )
-            && !"*".equals( privilege.getMethod() ) )
+
+        // validate method
+        // method is of form ('*' | 'read' | 'create' | 'update' | 'delete' [, method]* )
+        // so, 'read' method is correct, but so is also 'create,update,delete'
+        // '*' means ALL POSSIBLE value for this "field"
+        if ( StringUtils.isEmpty( privilege.getMethod() ) )
         {
-            ValidationMessage message = new ValidationMessage(
-                "method",
-                "Privilege ID '" + privilege.getId() + "' Method is wrong! (Allowed values are: "
-                    + CPrivilege.METHOD_CREATE + ", " + CPrivilege.METHOD_DELETE + ", " + CPrivilege.METHOD_READ
-                    + " and " + CPrivilege.METHOD_UPDATE + ")",
-                                                               "Invalid method selected." );            
-            response.addValidationError( message );
+            response.addValidationError( "Method cannot be empty on a privilege!" );
         }
-        
+        else
+        {
+            String[] methods = null;
+
+            if ( privilege.getMethod().contains( "," ) )
+            {
+                // it is a list of methods
+                methods = privilege.getMethod().split( "," );
+            }
+            else
+            {
+                // it is a single method
+                methods = new String[] { privilege.getMethod() };
+            }
+
+            boolean valid = true;
+
+            for ( String method : methods )
+            {
+                if ( !CPrivilege.METHOD_CREATE.equals( method ) && !CPrivilege.METHOD_DELETE.equals( method )
+                    && !CPrivilege.METHOD_READ.equals( method ) && !CPrivilege.METHOD_UPDATE.equals( method )
+                    && !"*".equals( method ) )
+                {
+                    valid = false;
+
+                    break;
+                }
+            }
+
+            if ( !valid )
+            {
+                ValidationMessage message = new ValidationMessage( "method", "Privilege ID '" + privilege.getId()
+                    + "' Method is wrong! (Allowed methods are: " + CPrivilege.METHOD_CREATE + ", "
+                    + CPrivilege.METHOD_DELETE + ", " + CPrivilege.METHOD_READ + " and " + CPrivilege.METHOD_UPDATE
+                    + ")", "Invalid method selected." );
+                response.addValidationError( message );
+            }
+
+        }
+
         if ( StringUtils.isEmpty( privilege.getName() ) )
         {
             ValidationMessage message = new ValidationMessage( "name", "Privilege ID '" + privilege.getId()
                 + "' requires a name.", "Name is required." );
             response.addValidationError( message );
         }
-        
+
         existingIds.add( privilege.getId() );
-        
+
         return response;
     }
-    
+
     public ValidationResponse validateRepoTargetPrivilege( SecurityValidationContext ctx,
         CRepoTargetPrivilege privilege, boolean update )
     {
         ValidationResponse response = new SecurityValidationResponse();
-        
+
         if ( ctx != null )
         {
             response.setContext( ctx );
         }
-        
-        SecurityValidationContext context = ( SecurityValidationContext ) response.getContext();
-        
+
+        SecurityValidationContext context = (SecurityValidationContext) response.getContext();
+
         response.append( validatePrivilege( context, privilege, update ) );
-        
+
         if ( StringUtils.isEmpty( privilege.getRepositoryTargetId() ) )
         {
             ValidationMessage message = new ValidationMessage( "repositoryTargetId", "Privilege ID '"
                 + privilege.getId() + "' requires a repositoryTargetId.", "Repository Target is required." );
             response.addValidationError( message );
         }
-        
+
         if ( !StringUtils.isEmpty( privilege.getRepositoryId() ) && !StringUtils.isEmpty( privilege.getGroupId() ) )
         {
             ValidationMessage message = new ValidationMessage(
@@ -231,46 +264,46 @@ public class DefaultSecurityConfigurationValidator
                 "Cannot select both a Repository and Repository Group." );
             response.addValidationError( message );
         }
-        
+
         return response;
     }
-    
+
     public ValidationResponse validateApplicationPrivilege( SecurityValidationContext ctx,
         CApplicationPrivilege privilege, boolean update )
     {
         ValidationResponse response = new SecurityValidationResponse();
-        
+
         if ( ctx != null )
         {
             response.setContext( ctx );
         }
-        
-        SecurityValidationContext context = ( SecurityValidationContext ) response.getContext();
-        
+
+        SecurityValidationContext context = (SecurityValidationContext) response.getContext();
+
         response.append( validatePrivilege( context, privilege, update ) );
-        
+
         if ( StringUtils.isEmpty( privilege.getPermission() ) )
         {
             ValidationMessage message = new ValidationMessage( "permission", "Privilege ID '" + privilege.getId()
                 + "' Application permission cannot be empty.", "Permission is required." );
-            
+
             response.addValidationError( message );
         }
-        
+
         return response;
     }
-    
+
     public ValidationResponse validateRoleContainment( SecurityValidationContext ctx )
     {
         ValidationResponse response = new SecurityValidationResponse();
-        
+
         if ( ctx != null )
         {
             response.setContext( ctx );
         }
-        
-        SecurityValidationContext context = ( SecurityValidationContext ) response.getContext();
-        
+
+        SecurityValidationContext context = (SecurityValidationContext) response.getContext();
+
         if ( context.getExistingRoleIds() != null )
         {
             for ( String roleId : context.getExistingRoleIds() )
@@ -278,16 +311,16 @@ public class DefaultSecurityConfigurationValidator
                 response.append( isRecursive( roleId, roleId, ctx ) );
             }
         }
-        
+
         return response;
     }
-    
+
     private ValidationResponse isRecursive( String baseRoleId, String roleId, SecurityValidationContext ctx )
     {
         ValidationResponse response = new SecurityValidationResponse();
-        
+
         List<String> containedRoles = ctx.getRoleContainmentMap().get( roleId );
-        
+
         for ( String containedRoleId : containedRoles )
         {
             // Only need to do this on the first level
@@ -297,11 +330,11 @@ public class DefaultSecurityConfigurationValidator
                 {
                     ValidationMessage message = new ValidationMessage( "roles", "Role ID '" + baseRoleId
                         + "' contains an invalid role", "Role cannot contain invalid role ID '" + roleId + "'." );
-                    
+
                     response.addValidationError( message );
                 }
             }
-            
+
             if ( containedRoleId.equals( baseRoleId ) )
             {
                 ValidationMessage message = new ValidationMessage(
@@ -309,14 +342,14 @@ public class DefaultSecurityConfigurationValidator
                     "Role ID '" + baseRoleId + "' contains itself through Role ID '" + roleId
                         + "'.  This is not valid.",
                     "Role cannot contain itself recursively (via role ID '" + roleId + "')." );
-                
+
                 response.addValidationError( message );
-                
+
                 break;
             }
-            
+
             if ( ctx.getExistingRoleIds().contains( containedRoleId ) )
-            {            
+            {
                 response.append( isRecursive( baseRoleId, containedRoleId, ctx ) );
             }
             // Only need to do this on the first level
@@ -326,33 +359,33 @@ public class DefaultSecurityConfigurationValidator
                     "roles",
                     "Role ID '" + roleId + "' contains an invalid role ID '" + containedRoleId + "'.",
                     "Role cannot contain invalid role ID '" + containedRoleId + "'." );
-                
+
                 response.addValidationError( message );
             }
         }
-        
+
         return response;
     }
-    
+
     public ValidationResponse validateRole( SecurityValidationContext ctx, CRole role, boolean update )
     {
         ValidationResponse response = new SecurityValidationResponse();
-        
+
         if ( ctx != null )
         {
             response.setContext( ctx );
         }
-        
-        SecurityValidationContext context = ( SecurityValidationContext ) response.getContext();
-        
+
+        SecurityValidationContext context = (SecurityValidationContext) response.getContext();
+
         Random rnd = new Random();
-        
+
         List<String> existingIds = context.getExistingRoleIds();
-        
+
         if ( existingIds == null )
         {
             context.addExistingRoleIds();
-            
+
             existingIds = context.getExistingRoleIds();
         }
 
@@ -363,19 +396,19 @@ public class DefaultSecurityConfigurationValidator
             String newId = Long.toHexString( System.currentTimeMillis() + rnd.nextInt( 2008 ) );
 
             response.addValidationWarning( "Fixed wrong role ID from '" + role.getId() + "' to '" + newId + "'" );
-            
+
             role.setId( newId );
 
             response.setModified( true );
         }
-        
+
         if ( StringUtils.isEmpty( role.getName() ) )
         {
             ValidationMessage message = new ValidationMessage( "name", "Role ID '" + role.getId()
                 + "' requires a name.", "Name is required." );
             response.addValidationError( message );
         }
-        
+
         if ( 1 > role.getSessionTimeout() )
         {
             ValidationMessage message = new ValidationMessage(
@@ -384,7 +417,7 @@ public class DefaultSecurityConfigurationValidator
                 "Enter a session timeout greater than 0 minutes." );
             response.addValidationError( message );
         }
-        
+
         // No roles or privs
         if ( role.getRoles().size() == 0 && role.getPrivileges().size() == 0 )
         {
@@ -392,11 +425,11 @@ public class DefaultSecurityConfigurationValidator
                 + "' is required to contain at least 1 role or privilege.", "One or more roles/privilegs are required." );
             response.addValidationError( message );
         }
-        
+
         if ( context.getExistingPrivilegeIds() != null )
         {
             List<String> privIds = role.getPrivileges();
-            
+
             for ( String privId : privIds )
             {
                 if ( !context.getExistingPrivilegeIds().contains( privId ) )
@@ -409,23 +442,23 @@ public class DefaultSecurityConfigurationValidator
                 }
             }
         }
-        
+
         // It is expected that a full context is built upon update
         if ( update )
         {
             response.append( isRecursive( role.getId(), role.getId(), context ) );
         }
-        
+
         List<String> roleIds = role.getRoles();
-        
+
         List<String> containedRoles = context.getRoleContainmentMap().get( role.getId() );
-        
+
         if ( containedRoles == null )
         {
             containedRoles = new ArrayList();
             context.getRoleContainmentMap().put( role.getId(), containedRoles );
         }
-        
+
         for ( String roleId : roleIds )
         {
             if ( roleId.equals( role.getId() ) )
@@ -435,37 +468,37 @@ public class DefaultSecurityConfigurationValidator
                 response.addValidationError( message );
             }
             else if ( context.getRoleContainmentMap() != null )
-            {                
+            {
                 containedRoles.add( roleId );
             }
         }
-        
+
         existingIds.add( role.getId() );
-        
+
         return response;
     }
-    
+
     public ValidationResponse validateUser( SecurityValidationContext ctx, CUser user, boolean update )
     {
         ValidationResponse response = new SecurityValidationResponse();
-        
+
         if ( ctx != null )
         {
             response.setContext( ctx );
         }
-        
-        SecurityValidationContext context = ( SecurityValidationContext ) response.getContext();
-        
+
+        SecurityValidationContext context = (SecurityValidationContext) response.getContext();
+
         List<String> existingIds = context.getExistingUserIds();
-        
+
         if ( existingIds == null )
         {
             context.addExistingUserIds();
-            
+
             existingIds = context.getExistingUserIds();
         }
-        
-        Map<String,String> existingEmailMap = context.getExistingEmailMap();
+
+        Map<String, String> existingEmailMap = context.getExistingEmailMap();
 
         if ( !update && ( StringUtils.isEmpty( user.getUserId() ) || existingIds.contains( user.getUserId() ) ) )
         {
@@ -473,20 +506,21 @@ public class DefaultSecurityConfigurationValidator
                 + "' is invalid.  It is either empty or already in use.", "User Id is required and must be unique." );
             response.addValidationError( message );
         }
-        
+
         if ( StringUtils.isEmpty( user.getName() ) )
         {
             ValidationMessage message = new ValidationMessage( "name", "User ID '" + user.getUserId()
                 + "' has no Name.  This is a required field.", "Name is required." );
             response.addValidationError( message );
         }
-        
+
         if ( StringUtils.isEmpty( user.getPassword() ) )
         {
-            ValidationMessage message = new ValidationMessage( "password", "User ID '" + user.getUserId() + "' has no password.  This is a required field.", "Password is required." );
+            ValidationMessage message = new ValidationMessage( "password", "User ID '" + user.getUserId()
+                + "' has no password.  This is a required field.", "Password is required." );
             response.addValidationError( message );
         }
-        
+
         if ( StringUtils.isEmpty( user.getEmail() ) )
         {
             ValidationMessage message = new ValidationMessage( "email", "User ID '" + user.getUserId()
@@ -505,10 +539,10 @@ public class DefaultSecurityConfigurationValidator
                     break;
                 }
             }
-            
+
             existingEmailMap.put( user.getUserId(), user.getEmail() );
         }
-        
+
         if ( !CUser.STATUS_ACTIVE.equals( user.getStatus() ) && !CUser.STATUS_DISABLED.equals( user.getStatus() )
             && !CUser.STATUS_LOCKED.equals( user.getStatus() ) && !CUser.STATUS_EXPIRED.equals( user.getStatus() ) )
         {
@@ -520,11 +554,11 @@ public class DefaultSecurityConfigurationValidator
                 "Invalid Status selected." );
             response.addValidationError( message );
         }
-        
+
         if ( context.getExistingRoleIds() != null )
         {
             List<String> roleIds = user.getRoles();
-            
+
             for ( String roleId : roleIds )
             {
                 if ( !context.getExistingRoleIds().contains( roleId ) )
@@ -536,19 +570,19 @@ public class DefaultSecurityConfigurationValidator
                 }
             }
         }
-        
+
         if ( user.getRoles().size() == 0 )
         {
             ValidationMessage message = new ValidationMessage( "roles", "User ID '" + user.getUserId()
                 + "' has no roles assigned.", "User requires one or more roles." );
             response.addValidationError( message );
         }
-        
+
         if ( !StringUtils.isEmpty( user.getUserId() ) )
         {
             existingIds.add( user.getUserId() );
         }
-        
+
         return response;
     }
 }
