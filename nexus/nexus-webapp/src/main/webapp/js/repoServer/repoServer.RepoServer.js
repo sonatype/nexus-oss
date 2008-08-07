@@ -172,52 +172,9 @@ Sonatype.repoServer.RepoServer = function(){
         formBind: true,
         scope: this,
         handler:function(){
-          this.loginWindow.getEl().mask("Logging you in...");
-
-          var token = Sonatype.utils.base64.encode(this.loginForm.find('name', 'username')[0].getValue() + ':' + this.loginForm.find('name', 'password')[0].getValue()); 
-          Ext.Ajax.request({
-            scope: this,
-            method: 'GET',
-            cbPassThru : {
-              username : this.loginForm.find('name', 'username')[0].getValue()
-            },
-            headers: {'Authorization' : 'Basic ' + token}, //@todo: send HTTP basic auth data
-            url: Sonatype.config.repos.urls.login,
-            success: function(response, options){
-              //get user permissions
-              var respObj = Ext.decode(response.responseText);
-              var newUserPerms = respObj.data.clientPermissions;
-              
-//              var rememberMe = Sonatype.utils.getCookie('nxRememberMe');
-
-              Sonatype.user.curr.username = options.cbPassThru.username;
-//              Sonatype.user.curr.authToken = respObj.data.authToken;
-              Sonatype.user.curr.repoServer = newUserPerms;
-              
-//              Sonatype.state.CookieProvider.set('authToken', Sonatype.user.curr.authToken);
-              Sonatype.state.CookieProvider.set('username', Sonatype.user.curr.username);
-              
-//              Ext.lib.Ajax.defaultHeaders.Authorization = 'NexusAuthToken ' + Sonatype.user.curr.authToken;
-              Ext.lib.Ajax.defaultHeaders.Authorization = 'Basic ' + token;
-  
-              Sonatype.user.curr.isLoggedIn = true;
-              Sonatype.view.updateLoginLinkText();
-
-              this.resetMainTabPanel();
-              
-              this.loginWindow.hide();
-              this.loginWindow.getEl().unmask();
-              this.loginForm.getForm().reset();
-              
-              this.createSubComponents(); //update left panel
-            },
-            failure: function(response, options){
-              this.loginWindow.getEl().unmask();
-              this.loginForm.find('name', 'password')[0].focus(true);
-            }
-
-          });
-
+          Sonatype.utils.doLogin( this.loginWindow,
+            this.loginForm.find('name', 'username')[0].getValue(),
+            this.loginForm.find('name', 'password')[0].getValue()); 
         } 
       }];
       
