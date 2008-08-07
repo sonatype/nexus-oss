@@ -126,7 +126,8 @@ public abstract class AbstractNexusResourceHandler
         {
             return null;
         }
-
+        
+        // TODO: a big fcken TODO!
         StringBuffer path = new StringBuffer( StringUtils.replace( ai.groupId, ".", "/" ) )
             .append( "/" ).append( ai.artifactId ).append( "/" ).append( ai.version ).append( "/" ).append(
                 ai.artifactId ).append( "-" ).append( ai.version ).append( ".pom" );
