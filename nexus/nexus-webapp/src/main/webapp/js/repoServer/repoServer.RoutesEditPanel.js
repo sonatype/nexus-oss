@@ -785,7 +785,7 @@ Ext.extend(Sonatype.repoServer.RoutesEditPanel, Ext.Panel, {
 
   beforeFormRenderHandler : function(component){
     var sp = Sonatype.lib.Permissions;
-    if(sp.checkPermission(Sonatype.user.curr.repoServer.configRoutes, sp.EDIT)){
+    if(sp.checkPermission(Sonatype.user.curr.repoServer.configRules, sp.EDIT)){
       component.buttons[0].disabled = false;
     }
   },
