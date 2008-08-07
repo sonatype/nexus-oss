@@ -184,7 +184,7 @@
 			<name>Status - (read)</name>
 			<method>read</method>
 			<permission>nexus:status</permission>
-			<description>Give permission to query the nexus server for it's status.</description>
+			<description>Give permission to query the nexus server for it's status.  This privilege is required by the anonymous user so that the UI can retrieve anonymous permissions on startup.</description>
 		</applicationPrivilege>
 		<applicationPrivilege>
 			<id>2</id>
@@ -240,28 +240,28 @@
 			<name>Repository Templates - (create)</name>
 			<method>create</method>
 			<permission>nexus:repotemplates</permission>
-			<description>Give permission to create new repository templates.</description>
+			<description>Give permission to create new repository templates.  Note that this privilege is not currently invoked by the Nexus UI.</description>
 		</applicationPrivilege>
 		<applicationPrivilege>
 			<id>10</id>
 			<name>Repository Templates - (read)</name>
 			<method>read</method>
 			<permission>nexus:repotemplates</permission>
-			<description>Give permission to read existing repository template configuration.</description>
+			<description>Give permission to read existing repository template configuration.  This privilege is required to add a new Repository in the UI, as the default values are retrieved from the template on the server.</description>
 		</applicationPrivilege>
 		<applicationPrivilege>
 			<id>11</id>
 			<name>Repository Templates - (update)</name>
 			<method>update</method>
 			<permission>nexus:repotemplates</permission>
-			<description>Give permission to update existing repository template configuration.</description>
+			<description>Give permission to update existing repository template configuration.  Note that this privilege is not currently invoked by the Nexus UI.</description>
 		</applicationPrivilege>
 		<applicationPrivilege>
 			<id>12</id>
 			<name>Repository Templates - (delete)</name>
 			<method>delete</method>
 			<permission>nexus:repotemplates</permission>
-			<description>Give permission to delete existing repository templates.</description>
+			<description>Give permission to delete existing repository templates.  Note that this privilege is not currently invoked by the Nexus UI.</description>
 		</applicationPrivilege>
 		<applicationPrivilege>
 			<id>13</id>
@@ -520,14 +520,14 @@
 			<name>Server Status - (update)</name>
 			<method>update</method>
 			<permission>nexus:status</permission>
-			<description>Give permission to update the status of the nexus server.</description>
+			<description>Give permission to update the status of the nexus server.  Note that this privilege is not currently invoked by the Nexus UI.</description>
 		</applicationPrivilege>
 		<applicationPrivilege>
 			<id>50</id>
 			<name>Wastebasket - (read)</name>
 			<method>read</method>
 			<permission>nexus:wastebasket</permission>
-			<description>Give permission to read the contents of the nexus trash.</description>
+			<description>Give permission to read the contents of the nexus trash.  Note that this privilege is not currently invoked by the Nexus UI.</description>
 		</applicationPrivilege>
 		<applicationPrivilege>
 			<id>51</id>
@@ -541,7 +541,7 @@
 			<name>Artifact Download</name>
 			<method>read</method>
 			<permission>nexus:artifact</permission>
-			<description>Give permission to download artifacts (using /artifact service, not the /content url).  The extents of this privilege are related to the allowed targets.</description>
+			<description>Give permission to download artifacts (using /artifact service, not the /content url).  The extents of this privilege are related to the allowed targets..  Note that this privilege is not currently invoked by the Nexus UI.</description>
 		</applicationPrivilege>
 		<applicationPrivilege>
 			<id>55</id>
@@ -597,14 +597,14 @@
             <name>Nexus Remote Control</name>
             <method>update</method>
             <permission>nexus:command</permission>
-            <description>Give permission to remotely control nexus server (start, stop, etc.).</description>
+            <description>Give permission to remotely control nexus server (start, stop, etc.).  Note that this privilege is not currently invoked by the Nexus UI.</description>
         </applicationPrivilege>
 		<applicationPrivilege>
 			<id>67</id>
 			<name>Read Repository Metadata</name>
 			<method>read</method>
 			<permission>nexus:repometa</permission>
-			<description>Give permission to read the repository metadata.</description>
+			<description>Give permission to read the repository metadata.  Note that this privilege is not currently invoked by the Nexus UI.</description>
 		</applicationPrivilege>
 		      <applicationPrivilege>
             <id>68</id>
