@@ -84,10 +84,10 @@ public abstract class AbstractNexusResourceHandler
     {
         return (Nexus) getRequest().getAttributes().get( Nexus.ROLE );
     }
-    
+
     protected NexusSecurityConfiguration getNexusSecurityConfiguration()
     {
-        return ( NexusSecurityConfiguration ) getRequest().getAttributes().get( NexusSecurityConfiguration.ROLE );
+        return (NexusSecurityConfiguration) getRequest().getAttributes().get( NexusSecurityConfiguration.ROLE );
     }
 
     protected Object lookup( String role )
@@ -455,7 +455,7 @@ public abstract class AbstractNexusResourceHandler
      */
     protected Reference calculateReference( Reference base, String relPart )
     {
-        Reference ref = new Reference( mangleBase( base ), relPart );
+        Reference ref = new Reference( base, relPart );
 
         if ( !ref.getBaseRef().getPath().endsWith( "/" ) )
         {
@@ -465,55 +465,15 @@ public abstract class AbstractNexusResourceHandler
         return ref.getTargetRef();
     }
 
-    /**
-     * Calculates the service base in respect to user set baseUrl.
-     * 
-     * @return
-     */
-    private Reference mangleBase( Reference reference )
-    {
-        if ( getNexus().getBaseUrl() == null )
-        {
-            // used did not set it
-            return reference;
-        }
-
-        // http://localhost:8081/nexus
-        String root = getRequest().getRootRef().getParentRef().toString();
-
-        // make it not ending with "/"
-        if ( root.endsWith( "/" ) )
-        {
-            root = root.substring( 0, root.length() - 1 );
-        }
-
-        // http://repository.sonatype.org
-        String baseUrl = getNexus().getBaseUrl();
-
-        // make it not ending with "/"
-        if ( baseUrl.endsWith( "/" ) )
-        {
-            baseUrl = baseUrl.substring( 0, baseUrl.length() - 1 );
-        }
-
-        StringBuffer sb = new StringBuffer( reference.toString() );
-
-        sb.delete( 0, root.length() );
-
-        sb.insert( 0, baseUrl );
-
-        return new Reference( sb.toString() );
-    }
-    
     protected void handleConfigurationException( ConfigurationException e, Representation representation )
     {
         getLogger().log( Level.WARNING, "Configuration error!", e );
-        
+
         getResponse().setStatus( Status.CLIENT_ERROR_BAD_REQUEST, "Configuration error." );
-        
+
         if ( InvalidConfigurationException.class.isAssignableFrom( e.getClass() ) )
         {
-            ValidationResponse vr = ( ( InvalidConfigurationException ) e ).getValidationResponse();
+            ValidationResponse vr = ( (InvalidConfigurationException) e ).getValidationResponse();
             ValidationMessage vm = vr.getValidationErrors().get( 0 );
             getResponse().setEntity(
                 serialize( representation, getNexusErrorResponse( vm.getKey(), vm.getShortMessage() ) ) );
