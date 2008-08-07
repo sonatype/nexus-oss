@@ -12,6 +12,7 @@ import org.restlet.data.MediaType;
 import org.sonatype.nexus.configuration.security.model.CApplicationPrivilege;
 import org.sonatype.nexus.configuration.security.model.CRepoTargetPrivilege;
 import org.sonatype.nexus.integrationtests.nexus233.PrivilegesMessageUtil;
+import org.sonatype.nexus.rest.model.PrivilegeBaseStatusResource;
 import org.sonatype.nexus.rest.model.RoleResource;
 import org.sonatype.nexus.rest.model.UserResource;
 import org.sonatype.nexus.rest.xstream.XStreamInitializer;
@@ -106,8 +107,8 @@ public abstract class AbstractPrivilegeTest
                 }
                 else
                 {
-                    CRepoTargetPrivilege cpriv = SecurityConfigUtil.getCRepoTargetPrivilege( privId );
-                    privs.add( cpriv.getName() );
+                    PrivilegeBaseStatusResource basePriv = this.privUtil.getPrivilegeResource( privId );
+                    privs.add( basePriv.getName() );
                 }
 
             }
