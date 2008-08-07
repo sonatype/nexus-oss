@@ -390,7 +390,8 @@ Sonatype.repoServer.RepoServer = function(){
 
       //Security Group **************************************************
       var sTplData = {links:[]};
-      if ( sp.checkPermission( userPerms.actionChangePassword, sp.CREATE ) ) {
+      if ( Sonatype.user.curr.isLoggedIn 
+              && sp.checkPermission( userPerms.actionChangePassword, sp.CREATE ) ) {
         sTplData.links.push( { id: 'open-security-password', title: 'Change Password' } );
       }
       if( sp.checkPermission( userPerms.configUsers, sp.READ ) 
