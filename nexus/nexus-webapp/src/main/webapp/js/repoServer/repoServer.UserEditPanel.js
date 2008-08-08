@@ -96,21 +96,29 @@ Sonatype.repoServer.UserEditPanel = function(config){
   ]);
   
   
-  this.roleReader = new Ext.data.JsonReader({root: 'data', id: 'id'}, this.roleRecordConstructor );  
-  this.roleDataStore = new Ext.data.Store({
-    url: Sonatype.config.repos.urls.roles,
-    reader: this.roleReader,
-    sortInfo: {field: 'name', direction: 'ASC'},
-    autoLoad: true
-  });
-  
   //Reader and datastore that queries the server for the list of currently defined users
   this.usersReader = new Ext.data.JsonReader({root: 'data', id: 'resourceURI'}, this.userRecordConstructor );
   this.usersDataStore = new Ext.data.Store({
     url: Sonatype.config.repos.urls.users,
     reader: this.usersReader,
     sortInfo: {field: 'userId', direction: 'ASC'},
-    autoLoad: true
+    autoLoad: false
+  });
+  
+  this.roleReader = new Ext.data.JsonReader({root: 'data', id: 'id'}, this.roleRecordConstructor );  
+  this.roleDataStore = new Ext.data.Store({
+    url: Sonatype.config.repos.urls.roles,
+    reader: this.roleReader,
+    sortInfo: {field: 'name', direction: 'ASC'},
+    autoLoad: true,
+    listeners: {
+      'load': {
+        fn: function() {
+          this.usersDataStore.reload(); 
+        },
+        scope: this
+      }
+    }
   });
   
   this.COMBO_WIDTH = 300;
@@ -405,9 +413,8 @@ Sonatype.repoServer.UserEditPanel = function(config){
 Ext.extend(Sonatype.repoServer.UserEditPanel, Ext.Panel, {
   //Dump the currently stored data and requery for everything
   reloadAll : function(){
-    this.usersDataStore.removeAll();
-    this.usersDataStore.reload();
     this.roleDataStore.removeAll();
+    this.usersDataStore.removeAll();
     this.roleDataStore.reload();
     this.formCards.items.each(function(item, i, len){
       if(i>0){this.remove(item, true);}
