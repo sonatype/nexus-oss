@@ -375,6 +375,11 @@ Sonatype.utils = {
                 Ext.Ajax.request({
                   scope: this,
                   method: 'POST',
+                  jsonData: {
+                    data: {
+                      email: email
+                    }
+                  },
                   url: Sonatype.config.repos.urls.usersForgotId + '/' + email,
                   success: function(response, options){
                     w.close();
