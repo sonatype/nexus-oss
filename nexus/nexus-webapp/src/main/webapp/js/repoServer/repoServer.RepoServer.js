@@ -384,7 +384,7 @@ Sonatype.repoServer.RepoServer = function(){
             links: [
               { href: 'http://nexus.sonatype.org/', title: 'Nexus Home' },
               { href: 'http://www.sonatype.com/book/reference/repository-manager.html', title: 'Getting Started' },
-              { href: 'https://docs.sonatype.com/display/Nexus/Home', title: 'Nexus Wiki' },
+              { href: 'https://docs.sonatype.com/display/NX/Home', title: 'Nexus Wiki' },
               { href: 'http://www.sonatype.com/book/reference/public-book.html', title: 'Maven Book' },
               { href: 'http://nexus.sonatype.org/changes.html', title: 'Release Notes' },
               { href: 'http://issues.sonatype.org/browse/NEXUS', title: 'Report Issues' }
