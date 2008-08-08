@@ -8,7 +8,7 @@
 
     <groupId>org.sonatype.nexus</groupId>
     <artifactId>nexus-indexer</artifactId>
-    <version>1.0-beta-5</version>
+    <version>1.0-beta-6-SNAPSHOT</version>
     <name>Sonatype Nexus: Indexer</name>
 
     <licenses>
@@ -226,10 +226,4 @@
             </plugin>
         </plugins>
     </build>
-
-  <scm>
-    <connection>scm:svn:http://svn.sonatype.org/nexus/tags/nexus-indexer-1.0-beta-5</connection>
-    <developerConnection>scm:svn:https://svn.sonatype.org/nexus/tags/nexus-indexer-1.0-beta-5</developerConnection>
-    <url>http://svn.sonatype.org/nexus/tags/nexus-indexer-1.0-beta-5</url>
-  </scm>
 </project>
