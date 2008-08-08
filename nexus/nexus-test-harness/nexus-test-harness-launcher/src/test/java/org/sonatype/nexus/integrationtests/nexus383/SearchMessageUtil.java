@@ -31,13 +31,19 @@ public class SearchMessageUtil
         XStreamInitializer.initialize( xstream );
     }
 
-    @SuppressWarnings( "unchecked" )
-    public List<NexusArtifact> searchFor( String query )
+    public Response doSearchFor( String query )
         throws Exception
     {
         String serviceURI = "service/local/data_index?q=" + query;
 
-        String responseText = RequestFacade.doGetRequest( serviceURI ).getEntity().getText();
+        return RequestFacade.doGetRequest( serviceURI );
+    }
+
+    @SuppressWarnings( "unchecked" )
+    public List<NexusArtifact> searchFor( String query )
+        throws Exception
+    {
+        String responseText = doSearchFor( query ).getEntity().getText();
 
         XStreamRepresentation representation =
             new XStreamRepresentation( xstream, responseText, MediaType.APPLICATION_XML );
