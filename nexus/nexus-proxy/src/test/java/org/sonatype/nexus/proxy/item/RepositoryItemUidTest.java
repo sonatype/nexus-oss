@@ -22,6 +22,7 @@ package org.sonatype.nexus.proxy.item;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.sonatype.nexus.proxy.AbstractNexusTestCase;
 import org.sonatype.nexus.proxy.repository.DummyRepository;
@@ -30,7 +31,7 @@ public class RepositoryItemUidTest
     extends AbstractNexusTestCase
 {
     protected DummyRepository repository = new DummyRepository( "dummy" );
-    
+
     public void testLocks()
         throws Exception
     {
@@ -40,104 +41,99 @@ public class RepositoryItemUidTest
         RepositoryItemUid uidD = new RepositoryItemUid( repository, "/d.txt" );
         RepositoryItemUid uidE = new RepositoryItemUid( repository, "/e.txt" );
 
-        try
-        {
-            uidA.lock();
-            assert RepositoryItemUid.getLockCount() == 1;
+        ReentrantLock lockA = null;
+        ReentrantLock lockB = null;
+        ReentrantLock lockC = null;
+        ReentrantLock lockD = null;
+        ReentrantLock lockE = null;
 
-            uidB.lock();
-            assert RepositoryItemUid.getLockCount() == 2;
+        lockA = uidA.lock();
+        assert RepositoryItemUid.getLockCount() == 1;
 
-            uidC.lock();
-            assert RepositoryItemUid.getLockCount() == 3;
+        lockB = uidB.lock();
+        assert RepositoryItemUid.getLockCount() == 2;
 
-            uidD.lock();
-            assert RepositoryItemUid.getLockCount() == 4;
+        lockC = uidC.lock();
+        assert RepositoryItemUid.getLockCount() == 3;
 
-            uidE.lock();
-            assert RepositoryItemUid.getLockCount() == 5;
+        lockD = uidD.lock();
+        assert RepositoryItemUid.getLockCount() == 4;
 
-            uidA.unlock();
-            assert RepositoryItemUid.getLockCount() == 4;
+        lockE = uidE.lock();
+        assert RepositoryItemUid.getLockCount() == 5;
 
-            uidB.unlock();
-            assert RepositoryItemUid.getLockCount() == 3;
+        uidA.unlock( lockA );
+        assert RepositoryItemUid.getLockCount() == 4;
 
-            uidC.unlock();
-            assert RepositoryItemUid.getLockCount() == 2;
+        uidB.unlock( lockB );
+        assert RepositoryItemUid.getLockCount() == 3;
 
-            uidD.unlock();
-            assert RepositoryItemUid.getLockCount() == 1;
+        uidC.unlock( lockC );
+        assert RepositoryItemUid.getLockCount() == 2;
 
-            uidE.unlock();
-            assert RepositoryItemUid.getLockCount() == 0;
-        }
-        finally
-        {
-            // just in case
-            uidA.unlock();
-            uidB.unlock();
-            uidC.unlock();
-            uidD.unlock();
-            uidE.unlock();
-        }
+        uidD.unlock( lockD );
+        assert RepositoryItemUid.getLockCount() == 1;
+
+        uidE.unlock( lockE );
+        assert RepositoryItemUid.getLockCount() == 0;
     }
-    
+
     public void testConcurrentLocksOfSameUid()
         throws Exception
     {
         RepositoryItemUid uidA = new RepositoryItemUid( repository, "/a.txt" );
-        
-        Thread thread = new Thread( new RepositoryItemUidLockProcessLauncher( uidA, 100, 100) );
-        Thread thread2 = new Thread( new RepositoryItemUidLockProcessLauncher( uidA, 100, 100) );
-        
+
+        Thread thread = new Thread( new RepositoryItemUidLockProcessLauncher( uidA, 100, 100 ) );
+        Thread thread2 = new Thread( new RepositoryItemUidLockProcessLauncher( uidA, 100, 100 ) );
+
         thread.start();
         thread2.start();
-        
+
         Thread.sleep( 50 );
-        
+
         assertEquals( 1, RepositoryItemUid.getLockCount() );
-        
+
         thread.join();
         thread2.join();
-        
+
         assertEquals( 0, RepositoryItemUid.getLockCount() );
     }
-    
+
     private static final class RepositoryItemUidLockProcessLauncher
-        implements
-            Runnable
+        implements Runnable
     {
         private RepositoryItemUid uid;
+
         private int threadCount;
+
         private long timeout;
-        
+
         public RepositoryItemUidLockProcessLauncher( RepositoryItemUid uid, int threadCount, long timeout )
         {
             this.uid = uid;
             this.threadCount = threadCount;
             this.timeout = timeout;
         }
-        
+
         public void run()
         {
             ArrayList<Thread> threads = new ArrayList<Thread>();
-            
-            for ( int i = 0 ; i < threadCount ; i++ )
+
+            for ( int i = 0; i < threadCount; i++ )
             {
                 threads.add( new Thread( new RepositoryItemUidLockProcess( this.uid, timeout ) ) );
             }
-            
-            for ( Iterator<Thread> iter = threads.iterator() ; iter.hasNext() ; )
+
+            for ( Iterator<Thread> iter = threads.iterator(); iter.hasNext(); )
             {
                 iter.next().start();
             }
-            
+
             try
             {
                 Thread.sleep( 5 );
-                
-                for ( Iterator<Thread> iter = threads.iterator() ; iter.hasNext() ; )
+
+                for ( Iterator<Thread> iter = threads.iterator(); iter.hasNext(); )
                 {
                     iter.next().join();
                 }
@@ -149,8 +145,7 @@ public class RepositoryItemUidTest
     }
 
     private static final class RepositoryItemUidLockProcess
-        implements
-            Runnable
+        implements Runnable
     {
         private RepositoryItemUid uid;
 
@@ -164,9 +159,10 @@ public class RepositoryItemUidTest
 
         public void run()
         {
+            ReentrantLock lock = this.uid.lock();
+
             try
             {
-                this.uid.lock();
                 Thread.sleep( timeout );
             }
             catch ( InterruptedException e )
@@ -175,7 +171,7 @@ public class RepositoryItemUidTest
             }
             finally
             {
-                this.uid.unlock();
+                this.uid.unlock( lock );
             }
         }
     }

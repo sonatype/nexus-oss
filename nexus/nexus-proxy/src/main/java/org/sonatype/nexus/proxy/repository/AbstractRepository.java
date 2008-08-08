@@ -26,6 +26,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Callable;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
@@ -839,16 +840,16 @@ public abstract class AbstractRepository
         try
         {
             StorageItem item = null;
-            
+
+            ReentrantLock lock = uid.lock();
+
             try
             {
-                uid.lock();
-                
                 item = doRetrieveItem( localOnly, uid, new HashMap<String, Object>() );
             }
             finally
             {
-                uid.unlock();
+                uid.unlock( lock );
             }
 
             if ( context != null )

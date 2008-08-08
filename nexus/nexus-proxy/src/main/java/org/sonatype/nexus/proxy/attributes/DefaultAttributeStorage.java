@@ -24,12 +24,13 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.commons.io.FilenameUtils;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.util.IOUtil;
-import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
+import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.proxy.LoggingComponent;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.DefaultStorageCollectionItem;
@@ -85,7 +86,7 @@ public class DefaultAttributeStorage
     public void onConfigurationChange( ConfigurationChangeEvent evt )
     {
         this.workingDirectory = null;
-    }    
+    }
 
     /**
      * Gets the base dir.
@@ -129,7 +130,7 @@ public class DefaultAttributeStorage
 
     public boolean deleteAttributes( RepositoryItemUid uid )
     {
-        uid.lock();
+        ReentrantLock lock = uid.lock();
 
         try
         {
@@ -155,13 +156,13 @@ public class DefaultAttributeStorage
         }
         finally
         {
-            uid.unlock();
+            uid.unlock( lock );
         }
     }
 
     public AbstractStorageItem getAttributes( RepositoryItemUid uid )
     {
-        uid.lock();
+        ReentrantLock lock = uid.lock();
 
         try
         {
@@ -186,13 +187,13 @@ public class DefaultAttributeStorage
         }
         finally
         {
-            uid.unlock();
+            uid.unlock( lock );
         }
     }
 
     public void putAttribute( AbstractStorageItem item )
     {
-        item.getRepositoryItemUid().lock();
+        ReentrantLock lock = item.getRepositoryItemUid().lock();
 
         try
         {
@@ -261,7 +262,7 @@ public class DefaultAttributeStorage
         }
         finally
         {
-            item.getRepositoryItemUid().unlock();
+            item.getRepositoryItemUid().unlock( lock );
         }
     }
 

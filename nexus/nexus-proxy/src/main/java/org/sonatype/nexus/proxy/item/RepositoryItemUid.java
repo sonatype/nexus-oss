@@ -35,7 +35,7 @@ import org.sonatype.nexus.proxy.repository.Repository;
 public class RepositoryItemUid
 {
     private static final ConcurrentHashMap<String, ReentrantLock> locks = new ConcurrentHashMap<String, ReentrantLock>();
-    
+
     /** Constant to denote a separator in Proximity paths. */
     public static final String PATH_SEPARATOR = "/";
 
@@ -144,33 +144,36 @@ public class RepositoryItemUid
     {
         return getRepository().getId() + ":" + getPath();
     }
-    
+
     public static int getLockCount()
     {
         return locks.size();
     }
 
-    public void lock()
+    public ReentrantLock lock()
     {
         ReentrantLock newLock = new ReentrantLock();
+
         ReentrantLock oldLock = locks.putIfAbsent( toString(), newLock );
-        
-        ( ( oldLock ==  null ) ? newLock : oldLock ).lock();
+
+        ReentrantLock lock = ( oldLock == null ) ? newLock : oldLock;
+
+        lock.lock();
+
+        return lock;
     }
-    
-    public void unlock()
+
+    public void unlock( ReentrantLock lock )
     {
         synchronized ( locks )
         {
-            ReentrantLock lock = locks.get( toString() );
-            
             if ( lock != null )
             {
                 if ( !lock.hasQueuedThreads() )
                 {
                     locks.remove( toString() );
                 }
-                
+
                 lock.unlock();
             }
         }
