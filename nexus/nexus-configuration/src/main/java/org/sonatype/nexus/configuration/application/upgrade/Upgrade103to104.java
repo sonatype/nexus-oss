@@ -27,7 +27,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.net.SMTPAppender;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.FileUtils;
@@ -44,6 +43,7 @@ import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.CRepositoryGroup;
 import org.sonatype.nexus.configuration.model.CRepositoryGrouping;
 import org.sonatype.nexus.configuration.model.CRepositoryShadow;
+import org.sonatype.nexus.configuration.model.CRepositoryTarget;
 import org.sonatype.nexus.configuration.model.CRestApiSettings;
 import org.sonatype.nexus.configuration.model.CRouting;
 import org.sonatype.nexus.configuration.model.CScheduleConfig;
@@ -456,6 +456,23 @@ public class Upgrade103to104
                 newc.addTask( task );
             }
         }
+
+        // and final one
+        // Targets are new ones:
+        // adding default ones (as in default nexus.xml)
+        CRepositoryTarget target = new CRepositoryTarget();
+        target.setId( "1" );
+        target.setName( "All (Maven2)" );
+        target.setContentClass( "maven2" );
+        target.addPattern( ".*" );
+        newc.addRepositoryTarget( target );
+
+        target = new CRepositoryTarget();
+        target.setId( "2" );
+        target.setName( "All (Maven1)" );
+        target.setContentClass( "maven1" );
+        target.addPattern( ".*" );
+        newc.addRepositoryTarget( target );
 
         message.setModelVersion( org.sonatype.nexus.configuration.model.Configuration.MODEL_VERSION );
         message.setConfiguration( newc );
