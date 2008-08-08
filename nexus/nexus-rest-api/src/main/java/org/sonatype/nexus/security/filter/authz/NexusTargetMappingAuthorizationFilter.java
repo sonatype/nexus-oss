@@ -70,8 +70,19 @@ public class NexusTargetMappingAuthorizationFilter
 
             if ( m.matches() )
             {
+                path = getPathReplacement();
+
                 // TODO: hardcoded currently
-                path = getPathReplacement().replaceAll( "@1", m.group( 1 ) ).replaceAll( "@2", m.group( 2 ) );
+                if ( path.contains( "@1" ) )
+                {
+                    path = path.replaceAll( "@1", m.group( 1 ) );
+                }
+
+                if ( path.contains( "@2" ) )
+                {
+                    path = getPathReplacement().replaceAll( "@2", m.group( 2 ) );
+                }
+                // and so on... this will be reworked to be dynamic
             }
             else
             {
