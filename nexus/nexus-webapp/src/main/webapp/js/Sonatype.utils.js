@@ -108,7 +108,8 @@ Sonatype.utils = {
 
     if ( response.status == 403 || response.status == 401 ) {
       if ( Sonatype.repoServer.RepoServer.loginWindow.isVisible() ) {
-        if ( response.getResponseHeader['X-Nexus-Reason'] == 'expired' ) {
+        var nexusReason = response.getResponseHeader['X-Nexus-Reason']; 
+        if ( nexusReason && nexusReason.substring(0,7) == 'expired' ) {
           Sonatype.repoServer.RepoServer.loginWindow.hide();
           Sonatype.utils.changePassword( Sonatype.repoServer.RepoServer.loginForm.find('name', 'username')[0].getValue() );
         }
