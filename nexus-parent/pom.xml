@@ -4,11 +4,11 @@
 	<parent>
 		<groupId>org.sonatype.forge</groupId>
 		<artifactId>forge-parent</artifactId>
-		<version>2-SNAPSHOT</version>
+		<version>2</version>
 	</parent>
 	<groupId>org.sonatype.nexus</groupId>
 	<artifactId>nexus-parent</artifactId>
-	<version>3-SNAPSHOT</version>
+	<version>3</version>
 	<packaging>pom</packaging>
 	<name>Sonatype Nexus Parent</name>
 
