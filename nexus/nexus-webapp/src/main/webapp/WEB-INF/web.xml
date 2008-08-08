@@ -133,7 +133,8 @@
 			logout = org.sonatype.nexus.security.filter.authc.LogoutAuthenticationFilter
 
 			tperms = org.sonatype.nexus.security.filter.authz.NexusTargetMappingAuthorizationFilter
-			tperms.pathPrefix = /content
+			tperms.pathPrefix = /content(.*)
+			tperms.pathReplacement = @1
 
 			[urls]
 			/content/** = authcBasic,tperms
