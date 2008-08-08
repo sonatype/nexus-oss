@@ -43,7 +43,7 @@ public class Nexus142UserCrudJsonTests
 
         resource.setName( "Create User" );
         resource.setUserId( "createUser" );
-        resource.setStatus( "expired" );
+        resource.setStatus( "active" );
         resource.setEmail( "nexus@user.com" );
         resource.addRole( "role1" );
 
@@ -58,7 +58,7 @@ public class Nexus142UserCrudJsonTests
 
         resource.setName( "list Test" );
         resource.setUserId( "listTest" );
-        resource.setStatus( "expired" );
+        resource.setStatus( "active" );
         resource.setEmail( "listTest@user.com" );
         resource.addRole( "role1" );
         
@@ -83,7 +83,7 @@ public class Nexus142UserCrudJsonTests
 
         resource.setName( "Read User" );
         resource.setUserId( "readUser" );
-        resource.setStatus( "expired" );
+        resource.setStatus( "active" );
         resource.setEmail( "read@user.com" );
         resource.addRole( "role1" );
 
@@ -103,7 +103,7 @@ public class Nexus142UserCrudJsonTests
 
         Assert.assertEquals( resource.getName(), responseResource.getName() );
         Assert.assertEquals( resource.getUserId(), responseResource.getUserId() );
-        Assert.assertEquals( "expired", responseResource.getStatus() );
+        Assert.assertEquals( "active", responseResource.getStatus() );
         Assert.assertEquals( resource.getEmail(), responseResource.getEmail() );
         Assert.assertEquals( resource.getRoles(), responseResource.getRoles() );
     }
@@ -118,7 +118,7 @@ public class Nexus142UserCrudJsonTests
 
         resource.setName( "Update User" );
         resource.setUserId( "updateUser" );
-        resource.setStatus( "expired" );
+        resource.setStatus( "active" );
         resource.setEmail( "updateUser@user.com" );
         resource.addRole( "role1" );
 
@@ -128,7 +128,7 @@ public class Nexus142UserCrudJsonTests
         // TODO: add tests that changes the userId
         resource.setName( "Update UserAgain" );
         resource.setUserId( "updateUser" );
-        resource.setStatus( "expired" );
+        resource.setStatus( "active" );
         resource.setEmail( "updateUser@user2.com" );
         resource.getRoles().clear();
         resource.addRole( "role2" );
@@ -147,7 +147,7 @@ public class Nexus142UserCrudJsonTests
 
         resource.setName( "Delete User" );
         resource.setUserId( "deleteUser" );
-        resource.setStatus( "expired" );
+        resource.setStatus( "active" );
         resource.setEmail( "deleteUser@user.com" );
         resource.addRole( "role2" );
 

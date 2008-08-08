@@ -132,12 +132,12 @@ public abstract class AbstractRealmTest
         dain.setStatus( CUser.STATUS_ACTIVE );
         securityConfiguration.createUser( dain );
 
-        CUser locked = new CUser();
+        /*CUser locked = new CUser();
         locked.setUserId( "locked" );
         locked.setPassword( StringDigester.getSha1Digest( "locked" ) );
         locked.addRole( "maven-user" );
         locked.setStatus( CUser.STATUS_LOCKED );
-        securityConfiguration.createUser( locked );
+        securityConfiguration.createUser( locked );*/
 
         CUser disabled = new CUser();
         disabled.setUserId( "disabled" );
@@ -146,12 +146,12 @@ public abstract class AbstractRealmTest
         disabled.setStatus( CUser.STATUS_DISABLED );
         securityConfiguration.createUser( disabled );
 
-        CUser expired = new CUser();
+        /*CUser expired = new CUser();
         expired.setUserId( "expired" );
         expired.setPassword( StringDigester.getSha1Digest( "expired" ) );
         expired.addRole( "maven-user" );
         expired.setStatus( CUser.STATUS_EXPIRED );
-        securityConfiguration.createUser( expired );
+        securityConfiguration.createUser( expired );*/
 
         CUser illegalStatus = new CUser();
         illegalStatus.setUserId( "illegalStatus" );

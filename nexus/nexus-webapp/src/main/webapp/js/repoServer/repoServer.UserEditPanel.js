@@ -30,7 +30,7 @@ Sonatype.repoServer.UserEditPanel = function(config){
   var ht = Sonatype.repoServer.resources.help.users;
   
   //List of user statuses
-  this.statusStore = new Ext.data.SimpleStore({fields:['value','display'], data:[['active','Active'],['disabled','Disabled'],['expired','Expired'],['locked','Locked']]});
+  this.statusStore = new Ext.data.SimpleStore({fields:['value','display'], data:[['active','Active'],['disabled','Disabled']]});
     
   this.roleCombiner = function(val, parent) {
     var s = '';

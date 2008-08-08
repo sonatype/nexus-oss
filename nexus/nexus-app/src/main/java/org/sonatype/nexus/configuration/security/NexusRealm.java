@@ -177,7 +177,8 @@ public class NexusRealm
             {
                 throw new DisabledAccountException( "Account for user ['" + username + "'] is disabled!" );
             }
-            else if ( CUser.STATUS_EXPIRED.equals( user.getStatus() ) )
+            //Not currently supported
+            /*else if ( CUser.STATUS_EXPIRED.equals( user.getStatus() ) )
             {
                 if ( getCredentialsMatcher().doCredentialsMatch( token, authenticationInfo ) )
                 {
@@ -214,7 +215,7 @@ public class NexusRealm
                     throw new AccountException( "Account for user ['" + username
                         + "'] is locked and is accessed with wrong credentials!" );
                 }
-            }
+            }*/
             else
             {
                 throw new AccountException( "Account is in illegal status=['" + user.getStatus() + "']" );

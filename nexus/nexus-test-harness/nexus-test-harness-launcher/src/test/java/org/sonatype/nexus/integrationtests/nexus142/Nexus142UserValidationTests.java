@@ -38,7 +38,7 @@ public class Nexus142UserValidationTests
 
         resource.setName( "createUserWithNoRoles" );
         resource.setUserId( "createUserWithNoRoles" );
-        resource.setStatus( "expired" );
+        resource.setStatus( "active" );
         resource.setEmail( "nexus@user.com" );
         // no roles
 //        resource.addRole( "role1" );
@@ -61,7 +61,7 @@ public class Nexus142UserValidationTests
 
         resource.setName( "createUserWithNoUserId" );
 //        resource.setUserId( "createUserWithNoUserId" );
-        resource.setStatus( "expired" );
+        resource.setStatus( "active" );
         resource.setEmail( "nexus@user.com" );
         resource.addRole( "role1" );
 
@@ -82,7 +82,7 @@ public class Nexus142UserValidationTests
 
 //        resource.setName( "createUserWithNoUserName" );
         resource.setUserId( "createUserWithNoUserName" );
-        resource.setStatus( "expired" );
+        resource.setStatus( "active" );
         resource.setEmail( "nexus@user.com" );
         resource.addRole( "role1" );
 
@@ -105,7 +105,7 @@ public class Nexus142UserValidationTests
 
         resource.setName( "createUserWithNoEmail" );
         resource.setUserId( "createUserWithNoEmail" );
-        resource.setStatus( "expired" );
+        resource.setStatus( "active" );
 //        resource.setEmail( "nexus@user.com" );
         resource.addRole( "role1" );
 
@@ -127,7 +127,7 @@ public class Nexus142UserValidationTests
 
         resource.setName( "createUserInvalidRole" );
         resource.setUserId( "createUserInvalidRole" );
-        resource.setStatus( "expired" );
+        resource.setStatus( "active" );
         resource.setEmail( "nexus@user.com" );
         resource.addRole( "INVALID-ROLE" );
 
@@ -147,7 +147,7 @@ public class Nexus142UserValidationTests
         
         resource.setEmail( "test@email.com" );
         resource.setName( "name" );
-        resource.setStatus( "expired" );
+        resource.setStatus( "active" );
         resource.setUserId( "dup-user" );
         resource.addRole( "role1" );
         
@@ -162,7 +162,7 @@ public class Nexus142UserValidationTests
         
         resource.setEmail( "test2@email.com" );
         resource.setName( "name" );
-        resource.setStatus( "expired" );
+        resource.setStatus( "active" );
         resource.setUserId( "dup-user" );
         resource.addRole( "role1" );
         
@@ -181,7 +181,7 @@ public class Nexus142UserValidationTests
         
         resource.setEmail( "dup@email.com" );
         resource.setName( "name" );
-        resource.setStatus( "expired" );
+        resource.setStatus( "active" );
         resource.setUserId( "user1" );
         resource.addRole( "role1" );
         
@@ -196,7 +196,7 @@ public class Nexus142UserValidationTests
         
         resource.setEmail( "dup@email.com" );
         resource.setName( "name" );
-        resource.setStatus( "expired" );
+        resource.setStatus( "active" );
         resource.setUserId( "user2" );
         resource.addRole( "role1" );
         
@@ -219,7 +219,7 @@ public class Nexus142UserValidationTests
 
         resource.setName( "updateValidation" );
         resource.setUserId( "updateValidation" );
-        resource.setStatus( "expired" );
+        resource.setStatus( "active" );
         resource.setEmail( "nexus@user.com" );
         resource.addRole( "role1" );
 
@@ -245,7 +245,7 @@ public class Nexus142UserValidationTests
 
         resource.setName( "updateValidation" );
         resource.setUserId( "updateValidation" );
-        resource.setStatus( "expired" );
+        resource.setStatus( "active" );
         resource.setEmail( "" );
         resource.addRole( "role1" );
 
@@ -283,7 +283,7 @@ public class Nexus142UserValidationTests
          */
         resource.setName( "updateValidation" );
         resource.setUserId( "updateValidation" );
-        resource.setStatus( "expired" );
+        resource.setStatus( "active" );
         resource.setEmail( "nexus@user.com" );
         resource.getRoles().clear();
 
@@ -304,7 +304,7 @@ public class Nexus142UserValidationTests
          */
         resource.setName( "updateValidation" );
         resource.setUserId( "updateValidation" );
-        resource.setStatus( "expired" );
+        resource.setStatus( "active" );
         resource.setEmail( "nexus@user.com" );
         resource.addRole( "INVALID_ROLE" );
 
@@ -326,7 +326,7 @@ public class Nexus142UserValidationTests
          */
         resource.setName( "" );
         resource.setUserId( "updateValidation" );
-        resource.setStatus( "expired" );
+        resource.setStatus( "active" );
         resource.setEmail( "nexus@user.com" );
         resource.addRole( "role1" );
 
@@ -347,7 +347,7 @@ public class Nexus142UserValidationTests
          */
         resource.setName( "updateValidation" );
         resource.setUserId( null );
-        resource.setStatus( "expired" );
+        resource.setStatus( "active" );
         resource.setEmail( "nexus@user.com" );
         resource.addRole( "role1" );
 
@@ -369,7 +369,7 @@ public class Nexus142UserValidationTests
         
         duplicateResource.setEmail( "dup@email.com" );
         duplicateResource.setName( "dupname" );
-        duplicateResource.setStatus( "expired" );
+        duplicateResource.setStatus( "active" );
         duplicateResource.setUserId( "dup-user2" );
         duplicateResource.addRole( "role1" );
         

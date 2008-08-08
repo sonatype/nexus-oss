@@ -53,7 +53,7 @@ public class NexusRealmTest
         assertEquals( StringDigester.getSha1Digest( "niad" ), password );
     }
 
-    public void testLockedAuthenticationInfo()
+    /*public void testLockedAuthenticationInfo()
     {
         try
         {
@@ -83,7 +83,7 @@ public class NexusRealmTest
         {
             // cool
         }
-    }
+    }*/
 
     public void testDisabledAuthenticationInfo()
     {

@@ -25,7 +25,7 @@ public class Nexus142UserPermissionTests
         user.setEmail( "tesCreatePermission@foo.org" );
         user.setName( "tesCreatePermission" );
         user.setUserId( "tesCreatePermission" );
-        user.setStatus( "expired" );
+        user.setStatus( "active" );
         user.addRole( "anonymous" );
 
         TestContainer.getInstance().getTestContext().setUsername( "test-user" );
@@ -77,7 +77,7 @@ public class Nexus142UserPermissionTests
         user.setEmail( "tesUpdatePermission@foo.org" );
         user.setName( "tesUpdatePermission" );
         user.setUserId( "tesUpdatePermission" );
-        user.setStatus( "expired" );
+        user.setStatus( "active" );
         user.addRole( "anonymous" );
 
         Response response = this.userUtil.sendMessage( Method.POST, user );
@@ -134,7 +134,7 @@ public class Nexus142UserPermissionTests
         user.setEmail( "testReadPermission@foo.org" );
         user.setName( "testReadPermission" );
         user.setUserId( "testReadPermission" );
-        user.setStatus( "expired" );
+        user.setStatus( "active" );
         user.addRole( "anonymous" );
 
         Response response = this.userUtil.sendMessage( Method.POST, user );
@@ -190,7 +190,7 @@ public class Nexus142UserPermissionTests
         user.setEmail( "testDeletePermission@foo.org" );
         user.setName( "testDeletePermission" );
         user.setUserId( "testDeletePermission" );
-        user.setStatus( "expired" );
+        user.setStatus( "active" );
         user.addRole( "anonymous" );
 
         Response response = this.userUtil.sendMessage( Method.POST, user );

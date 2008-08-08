@@ -304,7 +304,7 @@ public class DefaultNexusSecurityConfiguration
 
         settings.setPassword( pwGenerator.hashPassword( password ) );
 
-        settings.setStatus( CUser.STATUS_EXPIRED );
+        //settings.setStatus( CUser.STATUS_EXPIRED );
 
         return password;
     }
@@ -421,7 +421,8 @@ public class DefaultNexusSecurityConfiguration
     {
         CUser user = readUser( id );
 
-        user.setStatus( CUser.STATUS_EXPIRED );
+        //Not currently supported
+        //user.setStatus( CUser.STATUS_EXPIRED );
 
         String password = generateNewPassword( user );
 

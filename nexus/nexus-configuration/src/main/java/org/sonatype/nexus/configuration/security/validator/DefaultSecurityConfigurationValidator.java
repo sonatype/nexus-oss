@@ -543,14 +543,12 @@ public class DefaultSecurityConfigurationValidator
             existingEmailMap.put( user.getUserId(), user.getEmail() );
         }
 
-        if ( !CUser.STATUS_ACTIVE.equals( user.getStatus() ) && !CUser.STATUS_DISABLED.equals( user.getStatus() )
-            && !CUser.STATUS_LOCKED.equals( user.getStatus() ) && !CUser.STATUS_EXPIRED.equals( user.getStatus() ) )
+        if ( !CUser.STATUS_ACTIVE.equals( user.getStatus() ) && !CUser.STATUS_DISABLED.equals( user.getStatus() ) )
         {
             ValidationMessage message = new ValidationMessage(
                 "status",
                 "User ID '" + user.getUserId() + "' has invalid status '" + user.getStatus()
-                    + "'.  (Allowed values are: " + CUser.STATUS_ACTIVE + ", " + CUser.STATUS_EXPIRED + ", "
-                    + CUser.STATUS_DISABLED + " and " + CUser.STATUS_LOCKED + ")",
+                    + "'.  (Allowed values are: " + CUser.STATUS_ACTIVE + " and " + CUser.STATUS_DISABLED + ")",
                 "Invalid Status selected." );
             response.addValidationError( message );
         }

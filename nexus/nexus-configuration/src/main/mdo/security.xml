@@ -175,12 +175,13 @@
                     <version>1.0.0+</version>
                     <code><![CDATA[
     public static final String STATUS_DISABLED = "disabled";
-
-    public static final String STATUS_LOCKED = "locked";
     
     public static final String STATUS_ACTIVE = "active";
     
-    public static final String STATUS_EXPIRED = "expired";
+    //Not currently supported
+    //public static final String STATUS_LOCKED = "locked";
+    
+    //public static final String STATUS_EXPIRED = "expired";
 ]]></code>
                 </codeSegment>
             </codeSegments>
