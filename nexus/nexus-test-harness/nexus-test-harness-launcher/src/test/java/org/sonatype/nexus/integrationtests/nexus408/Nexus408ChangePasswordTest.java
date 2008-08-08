@@ -13,7 +13,7 @@ public class Nexus408ChangePasswordTest
     public void changeUserPassword()
         throws Exception
     {
-        Status status = ChangePasswordUtils.recoverUsername( "test-user", "admin123", "123admin" );
+        Status status = ChangePasswordUtils.changePassword( "test-user", "admin123", "123admin" );
         Assert.assertEquals( Status.SUCCESS_OK.getCode(), status.getCode() );
     }
 

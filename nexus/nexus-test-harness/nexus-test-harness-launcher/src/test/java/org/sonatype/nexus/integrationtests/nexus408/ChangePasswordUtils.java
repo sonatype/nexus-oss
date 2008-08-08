@@ -23,7 +23,7 @@ public class ChangePasswordUtils
         XStreamInitializer.initialize( xstream );
     }
 
-    public static Status recoverUsername( String username, String oldPassword, String newPassword )
+    public static Status changePassword( String username, String oldPassword, String newPassword )
         throws Exception
     {
         String serviceURI = "service/local/users_changepw";
