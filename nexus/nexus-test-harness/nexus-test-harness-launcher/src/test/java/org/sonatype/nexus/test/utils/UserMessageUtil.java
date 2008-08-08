@@ -8,6 +8,7 @@ import junit.framework.Assert;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
+import org.restlet.data.Status;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.rest.model.UserListResourceResponse;
 import org.sonatype.nexus.rest.model.UserResource;
@@ -22,24 +23,24 @@ public class UserMessageUtil
     private XStream xstream;
 
     private MediaType mediaType;
-        
+
     public UserMessageUtil( XStream xstream, MediaType mediaType )
     {
         super();
         this.xstream = xstream;
         this.mediaType = mediaType;
     }
-    
-    
-    public UserResource createUser( UserResource user ) throws IOException
+
+    public UserResource createUser( UserResource user )
+        throws IOException
     {
-        
+
         Response response = this.sendMessage( Method.POST, user );
 
         if ( !response.getStatus().isSuccess() )
         {
             String responseText = response.getEntity().getText();
-            Assert.fail( "Could not create user: " + response.getStatus() +":\n"+ responseText);
+            Assert.fail( "Could not create user: " + response.getStatus() + ":\n" + responseText );
         }
 
         // get the Resource object
@@ -54,14 +55,15 @@ public class UserMessageUtil
         Assert.assertEquals( user.getRoles(), responseResource.getRoles() );
 
         SecurityConfigUtil.verifyUser( user );
-        
+
         return user;
     }
-    
-    public UserResource getUser( String userId ) throws IOException
+
+    public UserResource getUser( String userId )
+        throws IOException
     {
-     
-        String responseText = RequestFacade.doGetRequest( "service/local/users/"+ userId ).getEntity().getText();
+
+        String responseText = RequestFacade.doGetRequest( "service/local/users/" + userId ).getEntity().getText();
         System.out.println( "responseText: \n" + responseText );
 
         XStreamRepresentation representation =
@@ -72,19 +74,20 @@ public class UserMessageUtil
 
         return resourceResponse.getData();
     }
-    
-    public UserResource updateUser( UserResource user ) throws IOException
+
+    public UserResource updateUser( UserResource user )
+        throws IOException
     {
         Response response = this.sendMessage( Method.PUT, user );
 
         if ( !response.getStatus().isSuccess() )
         {
             String responseText = response.getEntity().getText();
-            Assert.fail( "Could not update user: " + response.getStatus() +"\n"+ responseText );
+            Assert.fail( "Could not update user: " + response.getStatus() + "\n" + responseText );
         }
 
         // get the Resource object
-       UserResource responseResource = this.getResourceFromResponse( response );
+        UserResource responseResource = this.getResourceFromResponse( response );
 
         // make sure the id != null
 
@@ -97,28 +100,29 @@ public class UserMessageUtil
         SecurityConfigUtil.verifyUser( user );
         return responseResource;
     }
-    
-    public Response sendMessage( Method method, UserResource resource ) throws IOException
+
+    public Response sendMessage( Method method, UserResource resource )
+        throws IOException
     {
-    
+
         XStreamRepresentation representation = new XStreamRepresentation( xstream, "", mediaType );
-    
+
         String userId = ( method == Method.POST ) ? "" : "/" + resource.getUserId();
-    
+
         String serviceURI = "service/local/users" + userId;
-    
+
         UserResourceRequest userRequest = new UserResourceRequest();
         userRequest.setData( resource );
-    
+
         // now set the payload
         representation.setPayload( userRequest );
-    
+
         return RequestFacade.sendMessage( serviceURI, method, representation );
     }
-    
+
     /**
      * This should be replaced with a REST Call, but the REST client does not set the Accept correctly on GET's/
-     * 
+     *
      * @return
      * @throws IOException
      */
@@ -144,14 +148,26 @@ public class UserMessageUtil
     {
         String responseString = response.getEntity().getText();
         System.out.println( " getResourceFromResponse: " + responseString );
-    
+
         XStreamRepresentation representation = new XStreamRepresentation( xstream, responseString, mediaType );
-    
+
         // this
         UserResourceRequest resourceResponse =
             (UserResourceRequest) representation.getPayload( new UserResourceRequest() );
-    
+
         return resourceResponse.getData();
+    }
+
+    /**
+     * @param userId
+     * @return Returns true when the user was deleted and false when it was not deleted
+     * @throws Exception
+     */
+    public boolean removeUser( String userId )
+        throws IOException
+    {
+        Status status = RequestFacade.sendMessage( "service/local/users/" + userId, Method.DELETE ).getStatus();
+        return status.isSuccess();
     }
 
 }
