@@ -73,7 +73,7 @@
 	  <dependency>
       <groupId>org.sonatype.appbooter</groupId>
       <artifactId>plexus-forked-app-booter</artifactId>
-      <version>1.3-SNAPSHOT</version>
+      <version>${plexus.appbooter.version}</version>
     </dependency>
 
     <!--<dependency>
@@ -296,7 +296,7 @@
 			<plugin>
 				<groupId>org.sonatype.maven.plugin</groupId>
 				<artifactId>emma4it-maven-plugin</artifactId>
-				<version>1.0-SNAPSHOT</version>
+				<version>1.0</version>
 				<configuration>
 
 					<searchPath>${basedir}</searchPath>
