@@ -7,13 +7,13 @@
 	</parent>
 	<groupId>org.sonatype.plexus</groupId>
 	<artifactId>plexus-restlet-bridge</artifactId>
-	<version>1.2</version>
+	<version>1.3-SNAPSHOT</version>
 	<name>Plexus Restlet.org Bridge Component</name>
 
 	<scm>
-		<connection>scm:svn:http://svn.sonatype.org/spice/tags/plexus-restlet-bridge-1.2</connection>
-		<url>http://svn.sonatype.org/spice/tags/plexus-restlet-bridge-1.2</url>
-		<developerConnection>scm:svn:https://svn.sonatype.org/spice/tags/plexus-restlet-bridge-1.2</developerConnection>
+		<connection>scm:svn:http://svn.sonatype.org/spice/tags/plexus-restlet-bridge-1.1</connection>
+		<url>http://svn.sonatype.org/spice/tags/plexus-restlet-bridge-1.1</url>
+		<developerConnection>scm:svn:https://svn.sonatype.org/spice/tags/plexus-restlet-bridge-1.1</developerConnection>
 	</scm>
 
 	<dependencies>
