@@ -34,6 +34,43 @@ Sonatype.repoServer.RepoEditPanel = function(config){
 
   var ht = Sonatype.repoServer.resources.help.repos;
 
+  this.restToContentUrl = function(r) {
+    if (r.indexOf(Sonatype.config.host) > -1) {
+      return r.replace(Sonatype.config.repos.urls.repositories, Sonatype.config.content.repositories);
+    }
+    else {
+      return Sonatype.config.host + r.replace(Sonatype.config.repos.urls.repositories, Sonatype.config.content.repositories);
+    }
+  };
+  
+  this.convertId = function( value, parent ) {
+    if ( ! value ) {
+      value = parent.resourceURI.substring(parent.resourceURI.lastIndexOf('/')+1);
+    }
+    return value;
+  };
+
+  // START: Repo list ******************************************************
+  this.repoRecordConstructor = Ext.data.Record.create([
+    {name:'id', convert: this.convertId },
+    {name:'repoType'},
+    {name:'resourceURI'},
+    {name:'name', sortType:Ext.data.SortTypes.asUCString},
+    {name:'repoPolicy'},
+//  {name:'effectiveLocalStorageUrl'},
+    {name:'contentUri', mapping:'resourceURI', convert: this.restToContentUrl }
+  ]);
+
+  this.reposReader = new Ext.data.JsonReader({root: 'data', id: 'resourceURI'}, this.repoRecordConstructor );
+
+  //@ext: must use data.Store (not JsonStore) to pass in reader instead of using fields config array
+  this.reposDataStore = new Ext.data.Store({
+    url: Sonatype.config.repos.urls.repositories,
+    reader: this.reposReader,
+    sortInfo: {field: 'name', direction: 'ASC'},
+    autoLoad: true
+  });
+  
   this.actions = {
     clearCache : new Ext.Action({
       text: 'Clear Cache',
@@ -878,7 +915,8 @@ Sonatype.repoServer.RepoEditPanel = function(config){
       helpText: ht.format,
       name: 'format',
       //hiddenName: 'connectionTimeout',
-      width: 150,
+      width: 200,
+      midWidth: 200,
       store: formatStore,
       displayField:'value',
       editable: false,
@@ -891,13 +929,30 @@ Sonatype.repoServer.RepoEditPanel = function(config){
       disabled: true          
     },
     {
-      xtype: 'textfield',
+      xtype: 'combo',
       fieldLabel: 'Source Nexus Repository ID',
       itemCls: 'required-field',
       helpText: ht.shadowOf,
       name: 'shadowOf',
-      width: 100,
-      allowBlank:false
+      width: 200,
+      midWidth: 200,
+      store: this.reposDataStore,
+      displayField:'name',
+      valueField: 'id',
+      editable: false,
+      forceSelection: true,
+      mode: 'local',
+      triggerAction: 'all',
+      emptyText:'Select...',
+      selectOnFocus:true,
+      allowBlank: false,
+      validator: function( v ) {
+        var rec = this.store.getAt( this.selectedIndex );
+        if ( rec && rec.id.substring( 0, 8 ) == 'new_repo' ) {
+          return 'Cannot source from a non-existent repository';
+        }
+        return true;
+      }
     },
     {
       xtype: 'combo',
@@ -918,34 +973,6 @@ Sonatype.repoServer.RepoEditPanel = function(config){
       allowBlank: false          
     }
   ];
-
-  this.restToContentUrl = function(r) {
-    if (r.indexOf(Sonatype.config.host) > -1) {
-      return r.replace(Sonatype.config.repos.urls.repositories, Sonatype.config.content.repositories);
-    }
-    else {
-      return Sonatype.config.host + r.replace(Sonatype.config.repos.urls.repositories, Sonatype.config.content.repositories);
-    }
-  };
-  // START: Repo list ******************************************************
-  this.repoRecordConstructor = Ext.data.Record.create([
-    {name:'repoType'},
-    {name:'resourceURI'},
-    {name:'name', sortType:Ext.data.SortTypes.asUCString},
-    {name:'repoPolicy'},
-//  {name:'effectiveLocalStorageUrl'},
-    {name:'contentUri', mapping:'resourceURI', convert: this.restToContentUrl }
-  ]);
-
-  this.reposReader = new Ext.data.JsonReader({root: 'data', id: 'resourceURI'}, this.repoRecordConstructor );
-
-  //@ext: must use data.Store (not JsonStore) to pass in reader instead of using fields config array
-  this.reposDataStore = new Ext.data.Store({
-    url: Sonatype.config.repos.urls.repositories,
-    reader: this.reposReader,
-    sortInfo: {field: 'name', direction: 'ASC'},
-    autoLoad: true
-  });
   
   this.sp = Sonatype.lib.Permissions;
 
