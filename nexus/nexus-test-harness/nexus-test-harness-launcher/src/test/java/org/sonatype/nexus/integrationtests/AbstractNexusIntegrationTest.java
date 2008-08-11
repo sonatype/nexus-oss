@@ -81,14 +81,15 @@ public class AbstractNexusIntegrationTest
 
     protected static String nexusWorkDir;
 
-    static {
+    static
+    {
         nexusBaseDir = TestProperties.getString( "nexus.base.dir" );
         baseNexusUrl = TestProperties.getString( "nexus.base.url" );
         nexusWorkDir = TestProperties.getString( "nexus.work.dir" );
     }
 
     public static final String RELATIVE_CONF_DIR = "runtime/apps/nexus/conf";
-    
+
     public static final String RELATIVE_WORK_CONF_DIR = "runtime/work/nexus/conf";
 
     protected AbstractNexusIntegrationTest()
@@ -103,6 +104,7 @@ public class AbstractNexusIntegrationTest
         // we also need to setup a couple fields, that need to be pulled out of a bundle
         this.testRepositoryId = testRepositoryId;
         this.nexusTestRepoUrl = baseNexusUrl + REPOSITORY_RELATIVE_URL + testRepositoryId + "/";
+
     }
 
     /**
@@ -245,7 +247,8 @@ public class AbstractNexusIntegrationTest
     public void afterTest()
         throws Exception
     {
-
+        // reset this for each test
+        TestContainer.getInstance().getTestContext().useAdminForRequests();
     }
 
     private void startNexus()
@@ -317,37 +320,43 @@ public class AbstractNexusIntegrationTest
 
     }
 
-    private void copyConfigFile( String configFile, String destShortName, Map<String, String> variables, String path )
-        throws IOException
+    protected File getOverridableFile( String file )
     {
         // the test can override the test config.
-        File testConfigFile = this.getTestResourceAsFile( "test-config/" + configFile );
+        File testConfigFile = this.getTestResourceAsFile( "test-config/" + file );
 
         // if the tests doesn't have a different config then use the default.
         // we need to replace every time to make sure no one changes it.
         if ( testConfigFile == null || !testConfigFile.exists() )
         {
-            testConfigFile = this.getResource( "default-config/" + configFile );
+            testConfigFile = this.getResource( "default-config/" + file );
         }
         else
         {
-            System.out.println( "This test is using its own " + configFile + " " + testConfigFile );
+            System.out.println( "This test is using its own " + file + " " + testConfigFile );
         }
+        return testConfigFile;
+    }
+
+    private void copyConfigFile( String configFile, String destShortName, Map<String, String> variables, String path )
+        throws IOException
+    {
+        // the test can override the test config.
+        File testConfigFile = this.getOverridableFile( configFile );
 
         System.out.println( "copying " + configFile + " to:  "
             + new File( AbstractNexusIntegrationTest.nexusBaseDir + "/" + RELATIVE_CONF_DIR, configFile ) );
 
-        FileTestingUtils.interpolationFileCopy( testConfigFile, new File( AbstractNexusIntegrationTest.nexusBaseDir + "/" + 
-                                                                          ( path == null ? RELATIVE_CONF_DIR : path ),
-                                                                          destShortName ), variables );
+        FileTestingUtils.interpolationFileCopy( testConfigFile, new File( AbstractNexusIntegrationTest.nexusBaseDir
+            + "/" + ( path == null ? RELATIVE_CONF_DIR : path ), destShortName ), variables );
 
     }
-    
-    //Overloaded helpers
+
+    // Overloaded helpers
     private void copyConfigFile( String configFile )
         throws IOException
     {
-        this.copyConfigFile( configFile, ( String ) null );
+        this.copyConfigFile( configFile, (String) null );
     }
 
     private void copyConfigFile( String configFile, String path )
@@ -355,25 +364,25 @@ public class AbstractNexusIntegrationTest
     {
         this.copyConfigFile( configFile, new HashMap<String, String>(), path );
     }
-    
+
     private void copyConfigFile( String configFile, Map<String, String> variables )
         throws IOException
     {
         this.copyConfigFile( configFile, configFile, variables, null );
-    
+
     }
-    
+
     private void copyConfigFile( String configFile, Map<String, String> variables, String path )
         throws IOException
     {
         this.copyConfigFile( configFile, configFile, variables, path );
-    
+
     }
 
     /**
      * Returns a File if it exists, null otherwise. Files returned by this method must be located in the
      * "src/test/resourcs/nexusXXX/" folder.
-     *
+     * 
      * @param relativePath path relative to the nexusXXX directory.
      * @return A file specified by the relativePath. or null if it does not exist.
      */
@@ -392,7 +401,7 @@ public class AbstractNexusIntegrationTest
     /**
      * Returns a File if it exists, null otherwise. Files returned by this method must be located in the
      * "src/test/resourcs/nexusXXX/files/" folder.
-     *
+     * 
      * @param relativePath path relative to the files directory.
      * @return A file specified by the relativePath. or null if it does not exist.
      */
@@ -524,15 +533,15 @@ public class AbstractNexusIntegrationTest
     protected File downloadArtifactFromRepository( String repoId, Gav gav, String targetDirectory )
         throws IOException
     {
-        return this.downloadArtifact( AbstractNexusIntegrationTest.baseNexusUrl + REPOSITORY_RELATIVE_URL + repoId + "/", gav.getGroupId(),
-                                      gav.getArtifactId(), gav.getVersion(), gav.getExtension(), targetDirectory );
+        return this.downloadArtifact( AbstractNexusIntegrationTest.baseNexusUrl + REPOSITORY_RELATIVE_URL + repoId
+            + "/", gav.getGroupId(), gav.getArtifactId(), gav.getVersion(), gav.getExtension(), targetDirectory );
     }
 
     protected File downloadArtifactFromGroup( String groupId, Gav gav, String targetDirectory )
         throws IOException
     {
-        return this.downloadArtifact( AbstractNexusIntegrationTest.baseNexusUrl + GROUP_REPOSITORY_RELATIVE_URL + groupId + "/",
-                                      gav.getGroupId(), gav.getArtifactId(), gav.getVersion(), gav.getExtension(),
+        return this.downloadArtifact( AbstractNexusIntegrationTest.baseNexusUrl + GROUP_REPOSITORY_RELATIVE_URL
+            + groupId + "/", gav.getGroupId(), gav.getArtifactId(), gav.getVersion(), gav.getExtension(),
                                       targetDirectory );
     }
 
@@ -601,12 +610,14 @@ public class AbstractNexusIntegrationTest
         // return downloadedFile;
     }
 
-    protected void deleteFromRepository( String groupOrArtifactPath ) throws IOException
+    protected void deleteFromRepository( String groupOrArtifactPath )
+        throws IOException
     {
         this.deleteFromRepository( this.testRepositoryId, groupOrArtifactPath );
     }
 
-    protected void deleteFromRepository( String repository, String groupOrArtifactPath ) throws IOException
+    protected void deleteFromRepository( String repository, String groupOrArtifactPath )
+        throws IOException
     {
         String serviceURI = "service/local/repositories/" + repository + "/content/" + groupOrArtifactPath;
 
@@ -649,14 +660,14 @@ public class AbstractNexusIntegrationTest
     {
         return nexusBaseDir;
     }
-    
 
     public String getTestRepositoryId()
     {
         return testRepositoryId;
     }
 
-    protected static boolean printKnownErrorButDoNotFail( Class<? extends AbstractNexusIntegrationTest> clazz, String...tests )
+    protected static boolean printKnownErrorButDoNotFail( Class<? extends AbstractNexusIntegrationTest> clazz,
+                                                          String... tests )
     {
         StringBuffer error =
             new StringBuffer(
@@ -666,15 +677,15 @@ public class AbstractNexusIntegrationTest
         error.append( "\n* It is a very minor error, and is only a problem if you start sending in " );
         error.append( "\n* raw REST request to Nexus. (it is not a security problem)" );
         error.append( "*\n*\n" );
-        error.append( "*\n* TestClass: "+ clazz );
+        error.append( "*\n* TestClass: " + clazz );
         for ( String test : tests )
         {
-            error.append( "*\n* Test: "+ test );
+            error.append( "*\n* Test: " + test );
         }
         error.append( "*\n*\n*\n*\n*\n**********************************************************************************" );
-        
+
         System.out.println( error.toString() );
-        
+
         return true;
     }
 }

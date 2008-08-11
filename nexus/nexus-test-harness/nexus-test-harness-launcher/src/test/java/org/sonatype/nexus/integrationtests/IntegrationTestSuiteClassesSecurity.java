@@ -37,6 +37,7 @@ import org.sonatype.nexus.integrationtests.nexus394.Nexus394ForgotPasswordPermis
 import org.sonatype.nexus.integrationtests.nexus395.Nexus395ForgotUsernamePermissionTest;
 import org.sonatype.nexus.integrationtests.nexus408.Nexus408ChangePasswordPermissionTest;
 import org.sonatype.nexus.integrationtests.nexus429.Nexus429UploadArtifactPrivilegeTest;
+import org.sonatype.nexus.integrationtests.nexus429.Nexus429WagonDeployPrivilegeTest;
 import org.sonatype.nexus.integrationtests.nexus450.Nexus450UserCreationTest;
 import org.sonatype.nexus.integrationtests.proxy.nexus177.Nexus177OutOfServiceTest;
 import org.sonatype.nexus.integrationtests.proxy.nexus178.Nexus178BlockProxyDownloadTest;
@@ -55,8 +56,10 @@ import org.sonatype.nexus.integrationtests.proxy.nexus262.Nexus262SimpleProxyTes
     Nexus233PrivilegesCrudXMLTests.class, Nexus233PrivilegesValidationTests.class, Nexus385RoutesCrudXmlTests.class,
     Nexus385RoutesValidationTests.class, Nexus387RoutesTests.class, Nexus429UploadArtifactPrivilegeTest.class,
     Nexus133TargetPermissionTests.class, Nexus142UserPermissionTests.class, Nexus156RolesPermissionTests.class,
-    Nexus393ResetPasswordPermissionTest.class, Nexus394ForgotPasswordPermissionTest.class, Nexus385RoutesPermissionTests.class,
-    Nexus395ForgotUsernamePermissionTest.class, Nexus408ChangePasswordPermissionTest.class, Nexus450UserCreationTest.class } )
+    Nexus385RoutesPermissionTests.class, Nexus429WagonDeployPrivilegeTest.class,
+    Nexus393ResetPasswordPermissionTest.class, Nexus394ForgotPasswordPermissionTest.class,
+    Nexus385RoutesPermissionTests.class, Nexus395ForgotUsernamePermissionTest.class,
+    Nexus408ChangePasswordPermissionTest.class, Nexus450UserCreationTest.class } )
 public class IntegrationTestSuiteClassesSecurity
 {
     @BeforeClass

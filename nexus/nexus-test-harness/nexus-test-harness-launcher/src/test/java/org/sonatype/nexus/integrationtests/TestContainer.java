@@ -86,4 +86,11 @@ public class TestContainer
         return testContext;
     }
 
+    public PlexusContainer getContainer()
+    {
+        return container;
+    }
+    
+    
+
 }

@@ -17,7 +17,7 @@ public class Nexus393ResetPasswordTest
     public void resetPassword()
         throws Exception
     {
-        String username = "admin";
+        String username = "test-user";
         Status status = ResetPasswordUtils.resetPassword( username );
         Assert.assertTrue( status.isSuccess() );
 

@@ -2,6 +2,8 @@ package org.sonatype.nexus.test.utils;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.Authenticator;
+import java.net.PasswordAuthentication;
 import java.net.URL;
 
 import org.apache.commons.httpclient.HttpException;
@@ -21,8 +23,10 @@ import org.apache.maven.wagon.authorization.AuthorizationException;
 import org.apache.maven.wagon.repository.Repository;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
+import org.codehaus.plexus.util.cli.CommandLineException;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.integrationtests.RequestFacade;
+import org.sonatype.nexus.integrationtests.TestContainer;
 
 public class DeployUtils
 {
@@ -30,23 +34,32 @@ public class DeployUtils
     public static void deployWithWagon( PlexusContainer container, String wagonHint, String repositoryUrl,
                                         File fileToDeploy, String artifactPath )
         throws ComponentLookupException, ConnectionException, AuthenticationException, TransferFailedException,
-        ResourceDoesNotExistException, AuthorizationException
+        ResourceDoesNotExistException, AuthorizationException, InterruptedException, CommandLineException
     {
-
-        Wagon wagon = (Wagon) container.lookup( Wagon.ROLE, wagonHint );
-
-        Repository repository = new Repository();
-        repository.setUrl( repositoryUrl );
-
-        wagon.connect( repository, RequestFacade.getWagonAuthenticationInfo() );
-        wagon.put( fileToDeploy, artifactPath );
-        wagon.disconnect();
+        // must fork due to bug: http://forums.sun.com/thread.jspa?threadID=567697&messageID=2805259
+        new WagonDeployer( wagonHint, TestContainer.getInstance().getTestContext().getUsername(),
+                           TestContainer.getInstance().getTestContext().getPassword(), repositoryUrl, fileToDeploy,
+                           artifactPath ).deploy();
 
     }
     
-    public static int deployUsingGavWithRest( String repositoryId, Gav gav, File fileToDeploy ) throws HttpException, IOException
+//    public static void forkDeployWithWagon( PlexusContainer container, String wagonHint, String repositoryUrl,
+//                                        File fileToDeploy, String artifactPath )
+//        throws ComponentLookupException, ConnectionException, AuthenticationException, TransferFailedException,
+//        ResourceDoesNotExistException, AuthorizationException, InterruptedException, CommandLineException
+//    {
+//        // must fork due to bug: http://forums.sun.com/thread.jspa?threadID=567697&messageID=2805259
+//        new WagonDeployer( wagonHint, TestContainer.getInstance().getTestContext().getUsername(),
+//                           TestContainer.getInstance().getTestContext().getPassword(), repositoryUrl, fileToDeploy,
+//                           artifactPath ).forkDeploy(container);
+//
+//    }
+
+    public static int deployUsingGavWithRest( String repositoryId, Gav gav, File fileToDeploy )
+        throws HttpException, IOException
     {
-        return deployUsingGavWithRest( TestProperties.getString( "nexus.base.url" ) + "service/local/artifact/maven/content", repositoryId, gav, fileToDeploy);
+        return deployUsingGavWithRest( TestProperties.getString( "nexus.base.url" )
+            + "service/local/artifact/maven/content", repositoryId, gav, fileToDeploy );
     }
 
     public static int deployUsingGavWithRest( String restServiceURL, String repositoryId, Gav gav, File fileToDeploy )
@@ -82,16 +95,15 @@ public class DeployUtils
                 new FilePart( pomFile.getName(), pomFile ), new FilePart( fileToDeploy.getName(), fileToDeploy ), };
 
         filePost.setRequestEntity( new MultipartRequestEntity( parts, filePost.getParams() ) );
-        
-        
-        System.out.println( "URL:  "+ restServiceURL );
+
+        System.out.println( "URL:  " + restServiceURL );
         System.out.println( "Method: Post" );
         System.out.println( "params: " );
-        System.out.println( "\tr: "+ repositoryId );
+        System.out.println( "\tr: " + repositoryId );
         System.out.println( "\thasPom: true" );
-        System.out.println( "\tpom: "+ pomFile );
-        System.out.println( "\tfileToDeploy: "+ fileToDeploy );
-        
+        System.out.println( "\tpom: " + pomFile );
+        System.out.println( "\tfileToDeploy: " + fileToDeploy );
+
         return RequestFacade.executeHTTPClientMethod( new URL( restServiceURL ), filePost );
     }
 
