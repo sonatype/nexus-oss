@@ -9,17 +9,17 @@ import org.sonatype.nexus.integrationtests.AbstractPrivilegeTest;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.rest.model.NexusArtifact;
 
-public class Nexus383PermissionTest
+public class Nexus383SearchPermissionTest
     extends AbstractPrivilegeTest
 {
     protected SearchMessageUtil messageUtil;
 
     static
     {
-        printKnownErrorButDoNotFail( Nexus383PermissionTest.class, "withoutRepositoryReadPermission" );
+        printKnownErrorButDoNotFail( Nexus383SearchPermissionTest.class, "withoutRepositoryReadPermission" );
     }
 
-    public Nexus383PermissionTest()
+    public Nexus383SearchPermissionTest()
     {
         this.messageUtil = new SearchMessageUtil();
     }

@@ -6,13 +6,13 @@ import org.restlet.data.Status;
 import org.sonatype.nexus.integrationtests.AbstractPrivilegeTest;
 import org.sonatype.nexus.integrationtests.TestContainer;
 
-public class Nexus393PermissionTest
+public class Nexus393ResetPasswordPermissionTest
     extends AbstractPrivilegeTest
 {
 
     static
     {
-        printKnownErrorButDoNotFail( Nexus393PermissionTest.class, "resetWithoutPermission" );
+        printKnownErrorButDoNotFail( Nexus393ResetPasswordPermissionTest.class, "resetWithoutPermission" );
     }
 
     @Test

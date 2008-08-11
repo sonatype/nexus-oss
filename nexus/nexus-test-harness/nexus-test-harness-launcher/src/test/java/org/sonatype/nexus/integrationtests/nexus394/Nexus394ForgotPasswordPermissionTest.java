@@ -6,7 +6,7 @@ import org.restlet.data.Status;
 import org.sonatype.nexus.integrationtests.AbstractPrivilegeTest;
 import org.sonatype.nexus.integrationtests.TestContainer;
 
-public class Nexus394PermissionTest
+public class Nexus394ForgotPasswordPermissionTest
     extends AbstractPrivilegeTest
 {
 
