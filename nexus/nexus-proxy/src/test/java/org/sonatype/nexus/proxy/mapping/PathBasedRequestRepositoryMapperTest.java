@@ -20,6 +20,8 @@
  */
 package org.sonatype.nexus.proxy.mapping;
 
+import static org.easymock.EasyMock.*;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -31,8 +33,9 @@ import org.sonatype.nexus.configuration.model.CGroupsSettingPathMappingItem;
 import org.sonatype.nexus.proxy.AbstractNexusTestEnvironment;
 import org.sonatype.nexus.proxy.ResourceStore;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
+import org.sonatype.nexus.proxy.events.EventListener;
+import org.sonatype.nexus.proxy.maven.maven2.Maven2ContentClass;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
-import org.sonatype.nexus.proxy.repository.DummyRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 
 public class PathBasedRequestRepositoryMapperTest
@@ -67,18 +70,41 @@ public class PathBasedRequestRepositoryMapperTest
 
         // clean this up?
 
-        repoA = new DummyRepository();
-        repoA.setId( "repoA" );
-        repoB = new DummyRepository();
-        repoB.setId( "repoB" );
-        repoC = new DummyRepository();
-        repoC.setId( "repoC" );
-        repoD = new DummyRepository();
-        repoD.setId( "repoD" );
-        repoE = new DummyRepository();
-        repoE.setId( "repoE" );
-        repoF = new DummyRepository();
-        repoF.setId( "repoF" );
+        repoA = createMock( Repository.class );
+        expect( repoA.getId() ).andReturn( "repoA" ).anyTimes();
+        repoB = createMock( Repository.class );
+        expect( repoB.getId() ).andReturn( "repoB" ).anyTimes();
+        repoC = createMock( Repository.class );
+        expect( repoC.getId() ).andReturn( "repoC" ).anyTimes();
+        repoD = createMock( Repository.class );
+        expect( repoD.getId() ).andReturn( "repoD" ).anyTimes();
+        repoE = createMock( Repository.class );
+        expect( repoE.getId() ).andReturn( "repoE" ).anyTimes();
+        repoF = createMock( Repository.class );
+        expect( repoF.getId() ).andReturn( "repoF" ).anyTimes();
+
+        expect( repoA.getRepositoryContentClass() ).andReturn( new Maven2ContentClass() ).anyTimes();
+        expect( repoB.getRepositoryContentClass() ).andReturn( new Maven2ContentClass() ).anyTimes();
+        expect( repoC.getRepositoryContentClass() ).andReturn( new Maven2ContentClass() ).anyTimes();
+        expect( repoD.getRepositoryContentClass() ).andReturn( new Maven2ContentClass() ).anyTimes();
+        expect( repoE.getRepositoryContentClass() ).andReturn( new Maven2ContentClass() ).anyTimes();
+        expect( repoF.getRepositoryContentClass() ).andReturn( new Maven2ContentClass() ).anyTimes();
+
+        repoA.addProximityEventListener( (EventListener) registry );
+        repoB.addProximityEventListener( (EventListener) registry );
+        repoC.addProximityEventListener( (EventListener) registry );
+        repoD.addProximityEventListener( (EventListener) registry );
+        repoE.addProximityEventListener( (EventListener) registry );
+        repoF.addProximityEventListener( (EventListener) registry );
+
+        repoA.removeProximityEventListener( (EventListener) registry );
+        repoB.removeProximityEventListener( (EventListener) registry );
+        repoC.removeProximityEventListener( (EventListener) registry );
+        repoD.removeProximityEventListener( (EventListener) registry );
+        repoE.removeProximityEventListener( (EventListener) registry );
+        repoF.removeProximityEventListener( (EventListener) registry );
+
+        replay( repoA, repoB, repoC, repoD, repoE, repoF );
 
         registry.addRepository( repoA );
         registry.addRepository( repoB );

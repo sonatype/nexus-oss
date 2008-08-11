@@ -30,7 +30,6 @@ import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 public class ItemNotFoundException
     extends Exception
 {
-
     private static final long serialVersionUID = -4964273361722823796L;
 
     public ItemNotFoundException( String path )

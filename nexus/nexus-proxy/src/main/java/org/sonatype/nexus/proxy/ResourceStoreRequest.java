@@ -33,7 +33,6 @@ import org.sonatype.nexus.proxy.item.RepositoryItemUid;
  */
 public class ResourceStoreRequest
 {
-
     /** The path we want to retrieve. */
     private String requestPath;
 

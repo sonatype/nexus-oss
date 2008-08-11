@@ -20,6 +20,9 @@
  */
 package org.sonatype.nexus.proxy.item;
 
+import static org.easymock.EasyMock.*;
+import static org.easymock.EasyMock.replay;
+
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 
@@ -31,11 +34,19 @@ public class DefaultStorageFileItemTest
     public void testNonVirtualFileSimple()
         throws Exception
     {
-        DefaultStorageFileItem file = new DefaultStorageFileItem( getRepository(), "/a.txt", true, true );
-        checkAbstractStorageItem( getRepository(), file, false, "a.txt", "/a.txt", "/" );
+        expect( repository.getId() ).andReturn( "dummy" ).anyTimes();
+        expect( repository.createUidForPath( "/a.txt" ) ).andReturn(
+            getRepositoryItemUidFactory().createUid( repository, "/a.txt" ) );
+        expect( repository.retrieveItemContent( isA( RepositoryItemUid.class ) ) ).andReturn(
+            new ByteArrayInputStream( "/a.txt".getBytes() ) );
+
+        replay( repository );
+
+        DefaultStorageFileItem file = new DefaultStorageFileItem( repository, "/a.txt", true, true );
+        checkAbstractStorageItem( repository, file, false, "a.txt", "/a.txt", "/" );
 
         // content
-        InputStream is = getRepository().retrieveItemContent( file.getRepositoryItemUid() );
+        InputStream is = repository.retrieveItemContent( file.getRepositoryItemUid() );
         assertEquals( true, IOUtil.contentEquals( is, new ByteArrayInputStream( file
             .getRepositoryItemUid().getPath().getBytes() ) ) );
     }
@@ -43,16 +54,24 @@ public class DefaultStorageFileItemTest
     public void testNonVirtualFileWithContentSimple()
         throws Exception
     {
+        expect( repository.getId() ).andReturn( "dummy" ).anyTimes();
+        expect( repository.createUidForPath( "/a.txt" ) ).andReturn(
+            getRepositoryItemUidFactory().createUid( repository, "/a.txt" ) );
+        expect( repository.retrieveItemContent( isA( RepositoryItemUid.class ) ) ).andReturn(
+            new ByteArrayInputStream( "/a.txt".getBytes() ) );
+
+        replay( repository );
+        
         DefaultStorageFileItem file = new DefaultStorageFileItem(
-            getRepository(),
+            repository,
             "/a.txt",
             true,
             true,
             new ByteArrayInputStream( "THIS IS CONTENT".getBytes() ) );
-        checkAbstractStorageItem( getRepository(), file, false, "a.txt", "/a.txt", "/" );
+        checkAbstractStorageItem( repository, file, false, "a.txt", "/a.txt", "/" );
 
         // content
-        InputStream ris = getRepository().retrieveItemContent( file.getRepositoryItemUid() );
+        InputStream ris = repository.retrieveItemContent( file.getRepositoryItemUid() );
         InputStream fis = file.getInputStream();
         assertEquals( true, IOUtil.contentEquals( ris, new ByteArrayInputStream( file
             .getRepositoryItemUid().getPath().getBytes() ) ) );
@@ -62,21 +81,19 @@ public class DefaultStorageFileItemTest
     public void testNonVirtualFileDeep()
         throws Exception
     {
-        DefaultStorageFileItem file = new DefaultStorageFileItem(
-            getRepository(),
-            "/some/dir/hierarchy/a.txt",
-            true,
-            true );
-        checkAbstractStorageItem(
-            getRepository(),
-            file,
-            false,
-            "a.txt",
-            "/some/dir/hierarchy/a.txt",
-            "/some/dir/hierarchy" );
+        expect( repository.getId() ).andReturn( "dummy" ).anyTimes();
+        expect( repository.createUidForPath( "/some/dir/hierarchy/a.txt" ) ).andReturn(
+            getRepositoryItemUidFactory().createUid( repository, "/some/dir/hierarchy/a.txt" ) );
+        expect( repository.retrieveItemContent( isA( RepositoryItemUid.class ) ) ).andReturn(
+            new ByteArrayInputStream( "/some/dir/hierarchy/a.txt".getBytes() ) );
+
+        replay( repository );
+        
+        DefaultStorageFileItem file = new DefaultStorageFileItem( repository, "/some/dir/hierarchy/a.txt", true, true );
+        checkAbstractStorageItem( repository, file, false, "a.txt", "/some/dir/hierarchy/a.txt", "/some/dir/hierarchy" );
 
         // content
-        InputStream is = getRepository().retrieveItemContent( file.getRepositoryItemUid() );
+        InputStream is = repository.retrieveItemContent( file.getRepositoryItemUid() );
         assertEquals( true, IOUtil.contentEquals( is, new ByteArrayInputStream( file
             .getRepositoryItemUid().getPath().getBytes() ) ) );
     }
@@ -84,22 +101,24 @@ public class DefaultStorageFileItemTest
     public void testNonVirtualFileWithContentDeep()
         throws Exception
     {
+        expect( repository.getId() ).andReturn( "dummy" ).anyTimes();
+        expect( repository.createUidForPath( "/some/dir/hierarchy/a.txt" ) ).andReturn(
+            getRepositoryItemUidFactory().createUid( repository, "/some/dir/hierarchy/a.txt" ) );
+        expect( repository.retrieveItemContent( isA( RepositoryItemUid.class ) ) ).andReturn(
+            new ByteArrayInputStream( "/some/dir/hierarchy/a.txt".getBytes() ) );
+
+        replay( repository );
+        
         DefaultStorageFileItem file = new DefaultStorageFileItem(
-            getRepository(),
+            repository,
             "/some/dir/hierarchy/a.txt",
             true,
             true,
             new ByteArrayInputStream( "THIS IS CONTENT".getBytes() ) );
-        checkAbstractStorageItem(
-            getRepository(),
-            file,
-            false,
-            "a.txt",
-            "/some/dir/hierarchy/a.txt",
-            "/some/dir/hierarchy" );
+        checkAbstractStorageItem( repository, file, false, "a.txt", "/some/dir/hierarchy/a.txt", "/some/dir/hierarchy" );
 
         // content
-        InputStream ris = getRepository().retrieveItemContent( file.getRepositoryItemUid() );
+        InputStream ris = repository.retrieveItemContent( file.getRepositoryItemUid() );
         InputStream fis = file.getInputStream();
         assertEquals( true, IOUtil.contentEquals( ris, new ByteArrayInputStream( file
             .getRepositoryItemUid().getPath().getBytes() ) ) );

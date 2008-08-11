@@ -35,7 +35,7 @@ public class DefaultStorageLinkItem
     private static final long serialVersionUID = 4494595788515460394L;
 
     /** The target. */
-    private String target;
+    private transient RepositoryItemUid targetUid;
 
     /**
      * Instantiates a new default storage link item.
@@ -47,10 +47,11 @@ public class DefaultStorageLinkItem
      * @param targetUid the target uid
      */
     public DefaultStorageLinkItem( Repository repository, String path, boolean canRead, boolean canWrite,
-        String targetUid )
+        RepositoryItemUid targetUid )
     {
         super( repository, path, canRead, canWrite );
-        this.target = targetUid;
+
+        setTarget( targetUid );
     }
 
     /**
@@ -63,37 +64,34 @@ public class DefaultStorageLinkItem
      * @param targetUid the target uid
      */
     public DefaultStorageLinkItem( RepositoryRouter router, String path, boolean canRead, boolean canWrite,
-        String targetUid )
+        RepositoryItemUid targetUid )
     {
         super( router, path, canRead, canWrite );
-        this.target = targetUid;
+
+        setTarget( targetUid );
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.sonatype.nexus.item.StorageLinkItem#getTarget()
-     */
-    public String getTarget()
+    public RepositoryItemUid getTarget()
     {
-        return target;
+        return targetUid;
     }
 
-    /**
-     * Sets the target.
-     * 
-     * @param target the new target
-     */
-    public void setTarget( String target )
+    public void setTarget( RepositoryItemUid target )
     {
-        this.target = target;
+        this.targetUid = target;
     }
 
     public void overlay( StorageItem item )
         throws IllegalArgumentException
     {
         super.overlay( item );
-        setTarget( ( (StorageLinkItem) item ).getTarget() );
+
+        StorageLinkItem otherLink = (StorageLinkItem) item;
+
+        if ( otherLink.getTarget() != null )
+        {
+            setTarget( otherLink.getTarget() );
+        }
     }
 
 }

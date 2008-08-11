@@ -24,7 +24,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.commons.io.FilenameUtils;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
@@ -130,7 +129,7 @@ public class DefaultAttributeStorage
 
     public boolean deleteAttributes( RepositoryItemUid uid )
     {
-        ReentrantLock lock = uid.lock();
+        uid.lock();
 
         try
         {
@@ -156,13 +155,13 @@ public class DefaultAttributeStorage
         }
         finally
         {
-            uid.unlock( lock );
+            uid.unlock();
         }
     }
 
     public AbstractStorageItem getAttributes( RepositoryItemUid uid )
     {
-        ReentrantLock lock = uid.lock();
+        uid.lock();
 
         try
         {
@@ -187,13 +186,13 @@ public class DefaultAttributeStorage
         }
         finally
         {
-            uid.unlock( lock );
+            uid.unlock();
         }
     }
 
     public void putAttribute( AbstractStorageItem item )
     {
-        ReentrantLock lock = item.getRepositoryItemUid().lock();
+        item.getRepositoryItemUid().lock();
 
         try
         {
@@ -262,7 +261,7 @@ public class DefaultAttributeStorage
         }
         finally
         {
-            item.getRepositoryItemUid().unlock( lock );
+            item.getRepositoryItemUid().unlock();
         }
     }
 

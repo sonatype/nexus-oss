@@ -46,9 +46,11 @@ import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryGroupException;
+import org.sonatype.nexus.proxy.NoSuchResourceStoreException;
 import org.sonatype.nexus.proxy.RepositoryNotAvailableException;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.item.StorageItem;
+import org.sonatype.nexus.proxy.item.StorageLinkItem;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.router.RepositoryRouter;
 import org.sonatype.scheduling.NoSuchTaskException;
@@ -94,8 +96,8 @@ public interface Nexus
 
     Collection<Repository> getRepositories();
 
-    StorageItem dereferenceLinkItem( StorageItem item )
-        throws NoSuchRepositoryException,
+    StorageItem dereferenceLinkItem( StorageLinkItem item )
+        throws NoSuchResourceStoreException,
             ItemNotFoundException,
             AccessDeniedException,
             RepositoryNotAvailableException,

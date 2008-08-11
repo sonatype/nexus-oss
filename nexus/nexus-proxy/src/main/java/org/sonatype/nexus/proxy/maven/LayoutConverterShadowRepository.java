@@ -182,7 +182,7 @@ public abstract class LayoutConverterShadowRepository
 
         deleteItem( uid, ctx );
 
-        RepositoryItemUid sha1Uid = new RepositoryItemUid( this, uid.getPath() + ".sha1" );
+        RepositoryItemUid sha1Uid = createUidForPath( uid.getPath() + ".sha1" );
 
         try
         {
@@ -193,7 +193,7 @@ public abstract class LayoutConverterShadowRepository
             // ignore not found
         }
 
-        RepositoryItemUid md5Uid = new RepositoryItemUid( this, uid.getPath() + ".md5" );
+        RepositoryItemUid md5Uid = createUidForPath( uid.getPath() + ".md5" );
 
         try
         {

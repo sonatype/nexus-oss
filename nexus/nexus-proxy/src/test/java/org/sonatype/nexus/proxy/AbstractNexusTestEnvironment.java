@@ -1,12 +1,15 @@
 package org.sonatype.nexus.proxy;
 
 import org.sonatype.nexus.proxy.cache.CacheManager;
+import org.sonatype.nexus.proxy.item.RepositoryItemUidFactory;
 
-public class AbstractNexusTestEnvironment
+public abstract class AbstractNexusTestEnvironment
     extends AbstractNexusTestCase
 {
     /** The cache manager. */
     private CacheManager cacheManager;
+
+    private RepositoryItemUidFactory repositoryItemUidFactory;
 
     protected void setUp()
         throws Exception
@@ -16,6 +19,8 @@ public class AbstractNexusTestEnvironment
         cacheManager = (CacheManager) lookup( CacheManager.ROLE );
 
         cacheManager.startService();
+
+        repositoryItemUidFactory = (RepositoryItemUidFactory) lookup( RepositoryItemUidFactory.class );
     }
 
     protected void tearDown()
@@ -34,6 +39,11 @@ public class AbstractNexusTestEnvironment
     protected CacheManager getCacheManager()
     {
         return cacheManager;
+    }
+
+    protected RepositoryItemUidFactory getRepositoryItemUidFactory()
+    {
+        return repositoryItemUidFactory;
     }
 
 }

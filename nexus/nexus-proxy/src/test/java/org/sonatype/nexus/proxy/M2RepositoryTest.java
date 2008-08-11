@@ -163,29 +163,31 @@ public class M2RepositoryTest
     {
         M2Repository repository = (M2Repository) getResourceStore();
 
-        RepositoryItemUid releasePom = new RepositoryItemUid(
+        RepositoryItemUid releasePom = getRepositoryItemUidFactory().createUid(
             repository,
             "/org/codehaus/plexus/plexus-container-default/1.0-alpha-40/plexus-container-default-1.0-alpha-40.pom" );
-        RepositoryItemUid releaseArtifact = new RepositoryItemUid(
+        RepositoryItemUid releaseArtifact = getRepositoryItemUidFactory().createUid(
             repository,
             "/org/codehaus/plexus/plexus-container-default/1.0-alpha-40/plexus-container-default-1.0-alpha-40.jar" );
-        RepositoryItemUid snapshotPom = new RepositoryItemUid(
-            repository,
-            "/org/codehaus/plexus/plexus-container-default/1.0-alpha-41-SNAPSHOT/plexus-container-default-1.0-alpha-41-20071205.190351-1.pom" );
-        RepositoryItemUid snapshotArtifact = new RepositoryItemUid(
-            repository,
-            "/org/codehaus/plexus/plexus-container-default/1.0-alpha-41-SNAPSHOT/plexus-container-default-1.0-alpha-41-20071205.190351-1.jar" );
-        RepositoryItemUid metadata1 = new RepositoryItemUid(
+        RepositoryItemUid snapshotPom = getRepositoryItemUidFactory()
+            .createUid(
+                repository,
+                "/org/codehaus/plexus/plexus-container-default/1.0-alpha-41-SNAPSHOT/plexus-container-default-1.0-alpha-41-20071205.190351-1.pom" );
+        RepositoryItemUid snapshotArtifact = getRepositoryItemUidFactory()
+            .createUid(
+                repository,
+                "/org/codehaus/plexus/plexus-container-default/1.0-alpha-41-SNAPSHOT/plexus-container-default-1.0-alpha-41-20071205.190351-1.jar" );
+        RepositoryItemUid metadata1 = getRepositoryItemUidFactory().createUid(
             repository,
             "/org/codehaus/plexus/plexus-container-default/maven-metadata.xml" );
-        RepositoryItemUid metadataR = new RepositoryItemUid(
+        RepositoryItemUid metadataR = getRepositoryItemUidFactory().createUid(
             repository,
             "/org/codehaus/plexus/plexus-container-default/1.0-alpha-40/maven-metadata.xml" );
-        RepositoryItemUid metadataS = new RepositoryItemUid(
+        RepositoryItemUid metadataS = getRepositoryItemUidFactory().createUid(
             repository,
             "/org/codehaus/plexus/plexus-container-default/1.0-alpha-41-SNAPSHOT/maven-metadata.xml" );
-        RepositoryItemUid someDirectory = new RepositoryItemUid( repository, "/classworlds/" );
-        RepositoryItemUid anyNonArtifactFile = new RepositoryItemUid( repository, "/any/file.txt" );
+        RepositoryItemUid someDirectory = getRepositoryItemUidFactory().createUid( repository, "/classworlds/" );
+        RepositoryItemUid anyNonArtifactFile = getRepositoryItemUidFactory().createUid( repository, "/any/file.txt" );
 
         // it is equiv of repo type: RELEASE
         repository.setRepositoryPolicy( RepositoryPolicy.RELEASE );

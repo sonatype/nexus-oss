@@ -1,10 +1,14 @@
 package org.sonatype.nexus.proxy.target;
 
+import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.replay;
+
 import java.util.Arrays;
 
 import org.codehaus.plexus.PlexusTestCase;
 import org.sonatype.nexus.proxy.registry.ContentClass;
-import org.sonatype.nexus.proxy.repository.DummyRepository;
+import org.sonatype.nexus.proxy.repository.Repository;
 
 public class DefaultTargetRegistryTest
     extends PlexusTestCase
@@ -51,10 +55,11 @@ public class DefaultTargetRegistryTest
     public void testSimpleM2()
     {
         // create a dummy
-        DummyRepository repository = new DummyRepository();
+        Repository repository = createMock( Repository.class );
+        expect( repository.getRepositoryContentClass() ).andReturn( maven2 ).anyTimes();
+        expect( repository.getId() ).andReturn( "dummy" ).anyTimes();
 
-        // set the contentClass
-        repository.setRepositoryContentClass( maven2 );
+        replay( repository );
 
         TargetSet ts = targetRegistry.getTargetsForRepositoryPath(
             repository,
@@ -63,9 +68,9 @@ public class DefaultTargetRegistryTest
         assertNotNull( ts );
 
         assertEquals( 2, ts.getMatches().size() );
-        
-        assertEquals(1, ts.getMatchedRepositoryIds().size());
-        
+
+        assertEquals( 1, ts.getMatchedRepositoryIds().size() );
+
         assertEquals( "dummy", ts.getMatchedRepositoryIds().iterator().next() );
 
         TargetSet ts1 = targetRegistry.getTargetsForRepositoryPath(
@@ -77,22 +82,23 @@ public class DefaultTargetRegistryTest
         assertEquals( 1, ts1.getMatches().size() );
 
         assertEquals( "maven2-with-sources", ts1.getMatches().iterator().next().getTarget().getId() );
-        
-        // adding them 
+
+        // adding them
         ts.addTargetSet( ts1 );
-        
+
         assertEquals( 2, ts.getMatches().size() );
-        
+
         assertEquals( 1, ts.getMatchedRepositoryIds().size() );
     }
 
     public void testSimpleM1()
     {
         // create a dummy
-        DummyRepository repository = new DummyRepository();
+        Repository repository = createMock( Repository.class );
+        expect( repository.getRepositoryContentClass() ).andReturn( maven1 ).anyTimes();
+        expect( repository.getId() ).andReturn( "dummy" ).anyTimes();
 
-        // set the contentClass
-        repository.setRepositoryContentClass( maven1 );
+        replay( repository );
 
         TargetSet ts = targetRegistry.getTargetsForRepositoryPath(
             repository,

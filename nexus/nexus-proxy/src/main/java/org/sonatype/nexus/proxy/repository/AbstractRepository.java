@@ -26,7 +26,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Callable;
-import java.util.concurrent.locks.ReentrantLock;
 
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
@@ -58,6 +57,7 @@ import org.sonatype.nexus.proxy.item.DefaultStorageCollectionItem;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.PreparedContentLocator;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
+import org.sonatype.nexus.proxy.item.RepositoryItemUidFactory;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
@@ -119,6 +119,13 @@ public abstract class AbstractRepository
      * @plexus.requirement
      */
     private TargetRegistry targetRegistry;
+
+    /**
+     * Factory for UIDs.
+     * 
+     * @plexus.requirement
+     */
+    private RepositoryItemUidFactory repositoryItemUidFactory;
 
     /** The id. */
     private String id;
@@ -644,7 +651,7 @@ public abstract class AbstractRepository
     {
         checkConditions( request, RepositoryPermission.RETRIEVE );
 
-        RepositoryItemUid uid = new RepositoryItemUid( this, request.getRequestPath() );
+        RepositoryItemUid uid = createUidForPath( request.getRequestPath() );
 
         StorageItem item = retrieveItem( request.isRequestLocalOnly(), uid, request.getRequestContext() );
 
@@ -672,9 +679,9 @@ public abstract class AbstractRepository
 
         checkConditions( to, RepositoryPermission.STORE );
 
-        RepositoryItemUid fromUid = new RepositoryItemUid( this, from.getRequestPath() );
+        RepositoryItemUid fromUid = createUidForPath( from.getRequestPath() );
 
-        RepositoryItemUid toUid = new RepositoryItemUid( this, to.getRequestPath() );
+        RepositoryItemUid toUid = createUidForPath( to.getRequestPath() );
 
         copyItem( fromUid, toUid, to.getRequestContext() );
     }
@@ -693,9 +700,9 @@ public abstract class AbstractRepository
 
         checkConditions( to, RepositoryPermission.STORE );
 
-        RepositoryItemUid fromUid = new RepositoryItemUid( this, from.getRequestPath() );
+        RepositoryItemUid fromUid = createUidForPath( from.getRequestPath() );
 
-        RepositoryItemUid toUid = new RepositoryItemUid( this, to.getRequestPath() );
+        RepositoryItemUid toUid = createUidForPath( to.getRequestPath() );
 
         moveItem( fromUid, toUid, to.getRequestContext() );
     }
@@ -711,7 +718,7 @@ public abstract class AbstractRepository
     {
         checkConditions( request, RepositoryPermission.DELETE );
 
-        RepositoryItemUid uid = new RepositoryItemUid( this, request.getRequestPath() );
+        RepositoryItemUid uid = createUidForPath( request.getRequestPath() );
 
         deleteItem( uid, request.getRequestContext() );
     }
@@ -772,7 +779,7 @@ public abstract class AbstractRepository
     {
         checkConditions( request, RepositoryPermission.LIST );
 
-        RepositoryItemUid uid = new RepositoryItemUid( this, request.getRequestPath() );
+        RepositoryItemUid uid = createUidForPath( request.getRequestPath() );
 
         Collection<StorageItem> items = null;
 
@@ -790,7 +797,7 @@ public abstract class AbstractRepository
 
     public TargetSet getTargetsForRequest( ResourceStoreRequest request )
     {
-        RepositoryItemUid uid = new RepositoryItemUid( this, request.getRequestPath() );
+        RepositoryItemUid uid = createUidForPath( request.getRequestPath() );
 
         return getTargetsForRequest( uid, request.getRequestContext() );
     }
@@ -841,7 +848,7 @@ public abstract class AbstractRepository
         {
             StorageItem item = null;
 
-            ReentrantLock lock = uid.lock();
+            uid.lock();
 
             try
             {
@@ -849,7 +856,7 @@ public abstract class AbstractRepository
             }
             finally
             {
-                uid.unlock( lock );
+                uid.unlock();
             }
 
             if ( context != null )
@@ -1057,6 +1064,16 @@ public abstract class AbstractRepository
         return targetRegistry.getTargetsForRepositoryPath( uid.getRepository(), uid.getPath() );
     }
 
+    public RepositoryItemUid createUidForPath( String path )
+    {
+        return repositoryItemUidFactory.createUid( this, path );
+    }
+
+    public void release( RepositoryItemUid uid )
+    {
+        repositoryItemUidFactory.release( uid );
+    }
+
     // ===================================================================================
     // Inner stuff
 
@@ -1144,12 +1161,12 @@ public abstract class AbstractRepository
         {
             throw new RepositoryNotAvailableException( this.getId() );
         }
+
         if ( !isAllowWrite() && ( RepositoryPermission.STORE.equals( permission ) ) )
         {
-            throw new AccessDeniedException(
-                new RepositoryItemUid( this, request.getRequestPath() ),
-                "Repository is READ ONLY!!" );
+            throw new AccessDeniedException( request, "Repository is READ ONLY!!" );
         }
+
         getAccessManager().decide( request, this, permission );
     }
 

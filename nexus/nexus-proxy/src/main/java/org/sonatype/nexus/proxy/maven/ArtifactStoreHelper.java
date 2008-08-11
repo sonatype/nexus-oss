@@ -93,7 +93,7 @@ public class ArtifactStoreHelper
             ItemNotFoundException,
             StorageException
     {
-        RepositoryItemUid uid = new RepositoryItemUid( repository, request.getRequestPath() );
+        RepositoryItemUid uid = repository.createUidForPath( request.getRequestPath() );
 
         repository.deleteItemWithChecksums( uid, request.getRequestContext() );
 
@@ -106,7 +106,7 @@ public class ArtifactStoreHelper
             ItemNotFoundException,
             StorageException
     {
-        RepositoryItemUid uid = new RepositoryItemUid( repository, request.getRequestPath() );
+        RepositoryItemUid uid = repository.createUidForPath( request.getRequestPath() );
 
         repository.deleteItem( uid, request.getRequestContext() );
 
@@ -247,8 +247,8 @@ public class ArtifactStoreHelper
         try
         {
             // check for POM existence
-            repository.retrieveItem( true, new RepositoryItemUid( repository, repository.getGavCalculator().gavToPath(
-                pomGav ) ), gavRequest.getRequestContext() );
+            repository.retrieveItem( true, repository.createUidForPath( repository
+                .getGavCalculator().gavToPath( pomGav ) ), gavRequest.getRequestContext() );
         }
         catch ( ItemNotFoundException e )
         {
@@ -449,7 +449,7 @@ public class ArtifactStoreHelper
         // delete all "below", meaning: classifiers of the GAV
         // watch for subdirs
         // delete dir if empty
-        RepositoryItemUid parentCollUid = new RepositoryItemUid( repository, gavRequest.getRequestPath().substring(
+        RepositoryItemUid parentCollUid = repository.createUidForPath( gavRequest.getRequestPath().substring(
             0,
             gavRequest.getRequestPath().indexOf( RepositoryItemUid.PATH_SEPARATOR ) ) );
 
@@ -511,7 +511,7 @@ public class ArtifactStoreHelper
         // delete all in this directory
         // watch for subdirs
         // delete dir if empty
-        RepositoryItemUid parentCollUid = new RepositoryItemUid( repository, gavRequest.getRequestPath().substring(
+        RepositoryItemUid parentCollUid = repository.createUidForPath( gavRequest.getRequestPath().substring(
             0,
             gavRequest.getRequestPath().lastIndexOf( RepositoryItemUid.PATH_SEPARATOR ) ) );
 
@@ -570,7 +570,7 @@ public class ArtifactStoreHelper
     {
         String packaging = "jar";
 
-        RepositoryItemUid uid = new RepositoryItemUid( repository, requestPath );
+        RepositoryItemUid uid = repository.createUidForPath( requestPath );
 
         Reader reader = null;
 

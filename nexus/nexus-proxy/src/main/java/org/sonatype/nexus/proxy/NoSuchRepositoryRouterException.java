@@ -28,7 +28,6 @@ package org.sonatype.nexus.proxy;
 public class NoSuchRepositoryRouterException
     extends NoSuchResourceStoreException
 {
-
     private static final long serialVersionUID = 299346983704055394L;
 
     public NoSuchRepositoryRouterException( String id )

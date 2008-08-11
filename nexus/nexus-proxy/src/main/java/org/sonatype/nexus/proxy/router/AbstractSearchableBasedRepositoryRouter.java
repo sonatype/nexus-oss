@@ -33,9 +33,7 @@ import org.sonatype.nexus.proxy.NoSuchResourceStoreException;
 import org.sonatype.nexus.proxy.RepositoryNotAvailableException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
-import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageItem;
-import org.sonatype.nexus.proxy.item.StorageLinkItem;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.target.TargetSet;
 
@@ -101,43 +99,6 @@ public abstract class AbstractSearchableBasedRepositoryRouter
     public void setRepositoryRegistry( RepositoryRegistry repositoryRegistry )
     {
         this.repositoryRegistry = repositoryRegistry;
-    }
-
-    /**
-     * A better alternative, since we now have RepositoryRegistry, it allows us to implement more performant way to
-     * retrieve non-virtual items.
-     * 
-     * @param link the link
-     * @return the storage item
-     * @throws NoSuchRepositoryException the no such repository exception
-     * @throws NoSuchRepositoryGroupException the no such repository group exception
-     * @throws AccessDeniedException the access denied exception
-     * @throws ItemNotFoundException the item not found exception
-     * @throws RepositoryNotAvailableException the repository not available exception
-     * @see org.sonatype.nexus.proxy.proxy.router.AbstractRepositoryRouter#dereferenceLink(org.sonatype.nexus.proxy.proxy.item.StorageLinkItem)
-     */
-    protected StorageItem dereferenceLink( StorageLinkItem link )
-        throws NoSuchResourceStoreException,
-            AccessDeniedException,
-            ItemNotFoundException,
-            RepositoryNotAvailableException,
-            StorageException
-    {
-        if ( link.isVirtual() )
-        {
-            return super.dereferenceLink( link );
-        }
-        else
-        {
-            if ( getLogger().isDebugEnabled() )
-            {
-                getLogger().debug( "Dereferencing link " + link.getTarget() );
-            }
-
-            RepositoryItemUid uid = new RepositoryItemUid( getRepositoryRegistry(), link.getTarget() );
-
-            return uid.getRepository().retrieveItem( false, uid, link.getItemContext() );
-        }
     }
 
     // =====================================================================

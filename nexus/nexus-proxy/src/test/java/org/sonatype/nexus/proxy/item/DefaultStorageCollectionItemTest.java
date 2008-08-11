@@ -20,27 +20,60 @@
  */
 package org.sonatype.nexus.proxy.item;
 
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.isA;
+import static org.easymock.EasyMock.replay;
+
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
+
+import org.sonatype.nexus.proxy.ResourceStoreRequest;
 
 public class DefaultStorageCollectionItemTest
     extends AbstractStorageItemTest
 {
-
     public void testNonVirtualCollectionSimple()
     {
-        DefaultStorageCollectionItem coll = new DefaultStorageCollectionItem( getRepository(), "/", true, true );
-        checkAbstractStorageItem( getRepository(), coll, false, "", "/", "/" );
+        expect( repository.getId() ).andReturn( "dummy" ).anyTimes();
+        expect( repository.createUidForPath( "/" ) ).andReturn(
+            getRepositoryItemUidFactory().createUid( repository, "/" ) );
+
+        replay( repository );
+
+        DefaultStorageCollectionItem coll = new DefaultStorageCollectionItem( repository, "/", true, true );
+        checkAbstractStorageItem( repository, coll, false, "", "/", "/" );
     }
 
     public void testNonVirtualCollectionList()
         throws Exception
     {
+        List<StorageItem> result = new ArrayList<StorageItem>();
+
+        expect( repository.getId() ).andReturn( "dummy" ).anyTimes();
+        expect( repository.createUidForPath( "/a/some/dir/coll" ) ).andReturn(
+            getRepositoryItemUidFactory().createUid( repository, "/a/some/dir/coll" ) );
+        expect( repository.createUidForPath( "/a/some/dir/coll/A" ) ).andReturn(
+            getRepositoryItemUidFactory().createUid( repository, "/a/some/dir/coll/A" ) );
+        expect( repository.createUidForPath( "/a/some/dir/coll/B" ) ).andReturn(
+            getRepositoryItemUidFactory().createUid( repository, "/a/some/dir/coll/B" ) );
+        expect( repository.createUidForPath( "/a/some/dir/coll/C" ) ).andReturn(
+            getRepositoryItemUidFactory().createUid( repository, "/a/some/dir/coll/C" ) );
+        expect( repository.list( isA( ResourceStoreRequest.class ) ) ).andReturn( result );
+
+        replay( repository );
+
+        // and now fill in result, since repo is active
+        result.add( new DefaultStorageFileItem( repository, "/a/some/dir/coll/A", true, true ) );
+        result.add( new DefaultStorageFileItem( repository, "/a/some/dir/coll/B", true, true ) );
+        result.add( new DefaultStorageFileItem( repository, "/a/some/dir/coll/C", true, true ) );
+
         DefaultStorageCollectionItem coll = new DefaultStorageCollectionItem(
-            getRepository(),
+            repository,
             "/a/some/dir/coll",
             true,
             true );
-        checkAbstractStorageItem( getRepository(), coll, false, "coll", "/a/some/dir/coll", "/a/some/dir" );
+        checkAbstractStorageItem( repository, coll, false, "coll", "/a/some/dir/coll", "/a/some/dir" );
 
         Collection<StorageItem> items = coll.list();
         assertEquals( 3, items.size() );
@@ -48,19 +81,40 @@ public class DefaultStorageCollectionItemTest
 
     public void testVirtualCollectionSimple()
     {
-        DefaultStorageCollectionItem coll = new DefaultStorageCollectionItem( getRouter(), "/", true, true );
-        checkAbstractStorageItem( getRouter(), coll, true, "", "/", "/" );
+        expect( router.getId() ).andReturn( "dummyRouter" ).anyTimes();
+
+        replay( router );
+
+        DefaultStorageCollectionItem coll = new DefaultStorageCollectionItem( router, "/", true, true );
+        checkAbstractStorageItem( router, coll, true, "", "/", "/" );
     }
 
     public void testVirtualCollectionList()
         throws Exception
     {
-        DefaultStorageCollectionItem coll = new DefaultStorageCollectionItem(
-            getRouter(),
-            "/and/another/coll",
+        List<StorageItem> result = new ArrayList<StorageItem>();
+
+        expect( router.getId() ).andReturn( "dummyRouter" ).anyTimes();
+        expect( router.list( isA( ResourceStoreRequest.class ) ) ).andReturn( result );
+
+        replay( router );
+
+        // and now fill in result, since repo is active
+        result.add( new DefaultStorageFileItem(
+            router,
+            "/a/some/dir/coll/A",
             true,
-            true );
-        checkAbstractStorageItem( getRouter(), coll, true, "coll", "/and/another/coll", "/and/another" );
+            true,
+            new StringContentLocator( "A" ) ) );
+        result.add( new DefaultStorageFileItem(
+            router,
+            "/a/some/dir/coll/B",
+            true,
+            true,
+            new StringContentLocator( "B" ) ) );
+
+        DefaultStorageCollectionItem coll = new DefaultStorageCollectionItem( router, "/and/another/coll", true, true );
+        checkAbstractStorageItem( router, coll, true, "coll", "/and/another/coll", "/and/another" );
 
         Collection<StorageItem> items = coll.list();
         assertEquals( 2, items.size() );

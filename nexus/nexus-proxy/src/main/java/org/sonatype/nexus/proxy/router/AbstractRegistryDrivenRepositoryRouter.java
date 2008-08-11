@@ -44,7 +44,6 @@ import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
-import org.sonatype.nexus.proxy.item.StorageLinkItem;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
@@ -106,45 +105,6 @@ public abstract class AbstractRegistryDrivenRepositoryRouter
     public void setRepositoryRegistry( RepositoryRegistry repositoryRegistry )
     {
         this.repositoryRegistry = repositoryRegistry;
-    }
-
-    /**
-     * A better alternative to dereference links, since we now have RepositoryRegistry, it allows us to implement more
-     * performant way to retrieve non-virtual items.
-     * 
-     * @param link the link
-     * @return the storage item
-     * @throws NoSuchRepositoryException the no such repository exception
-     * @throws NoSuchRepositoryGroupException the no such repository group exception
-     * @throws AccessDeniedException the access denied exception
-     * @throws ItemNotFoundException the item not found exception
-     * @throws RepositoryNotAvailableException the repository not available exception
-     * @see org.sonatype.nexus.proxy.proxy.router.AbstractRepositoryRouter#dereferenceLink(org.sonatype.nexus.proxy.proxy.item.StorageLinkItem)
-     */
-    protected StorageItem dereferenceLink( StorageLinkItem link )
-        throws NoSuchResourceStoreException,
-            AccessDeniedException,
-            ItemNotFoundException,
-            RepositoryNotAvailableException,
-            StorageException
-    {
-        if ( link.isVirtual() )
-        {
-            // virtual links are the ones spoofed in by routers, hence we stay with "old" method.
-            return super.dereferenceLink( link );
-        }
-        else
-        {
-            // links created by reposes have UIDs as targets, hence we can use them
-            if ( getLogger().isDebugEnabled() )
-            {
-                getLogger().debug( "Dereferencing link " + link.getTarget() );
-            }
-
-            RepositoryItemUid uid = new RepositoryItemUid( getRepositoryRegistry(), link.getTarget() );
-
-            return uid.getRepository().retrieveItem( false, uid, link.getItemContext() );
-        }
     }
 
     // =====================================================================

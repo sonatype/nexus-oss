@@ -20,13 +20,17 @@
  */
 package org.sonatype.nexus.proxy.attributes;
 
+import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.replay;
+
 import java.io.ByteArrayInputStream;
 
 import org.codehaus.plexus.util.FileUtils;
 import org.sonatype.nexus.proxy.AbstractNexusTestEnvironment;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
-import org.sonatype.nexus.proxy.repository.DummyRepository;
+import org.sonatype.nexus.proxy.repository.Repository;
 
 /**
  * AttributeStorage implementation driven by XStream.
@@ -38,8 +42,8 @@ public class DefaultAttributeStorageTest
 {
 
     protected DefaultAttributeStorage attributeStorage;
-    
-    protected DummyRepository repository;
+
+    protected Repository repository;
 
     public void setUp()
         throws Exception
@@ -47,10 +51,29 @@ public class DefaultAttributeStorageTest
         super.setUp();
 
         attributeStorage = (DefaultAttributeStorage) lookup( AttributeStorage.ROLE );
-        
-        repository = new DummyRepository( "dummy" );
 
         FileUtils.deleteDirectory( attributeStorage.getWorkingDirectory() );
+
+        repository = createMock( Repository.class );
+
+        RepositoryItemUid uid = createMock( RepositoryItemUid.class );
+
+        uid.lock();
+        uid.unlock();
+
+        expect( uid.getRepository() ).andReturn( repository ).anyTimes();
+        expect( uid.getPath() ).andReturn( "/a.txt" ).anyTimes();
+
+        expect( repository.getId() ).andReturn( "dummy" ).anyTimes();
+
+        expect( repository.createUidForPath( "/a.txt" ) ).andReturn(
+            getRepositoryItemUidFactory().createUid( repository, "/a.txt" ) );
+        expect( repository.createUidForPath( "/b.txt" ) ).andReturn(
+            getRepositoryItemUidFactory().createUid( repository, "/b.txt" ) );
+
+        replay( repository );
+
+        replay( uid );
     }
 
     public void testSimplePutGet()
@@ -67,7 +90,7 @@ public class DefaultAttributeStorageTest
 
         attributeStorage.putAttribute( file );
 
-        RepositoryItemUid uid = new RepositoryItemUid( repository, "/a.txt" );
+        RepositoryItemUid uid = getRepositoryItemUidFactory().createUid( repository, "/a.txt" );
         DefaultStorageFileItem file1 = (DefaultStorageFileItem) attributeStorage.getAttributes( uid );
 
         assertTrue( file1.getAttributes().containsKey( "kuku" ) );
@@ -88,7 +111,7 @@ public class DefaultAttributeStorageTest
 
         attributeStorage.putAttribute( file );
 
-        RepositoryItemUid uid = new RepositoryItemUid( repository, "/b.txt" );
+        RepositoryItemUid uid = getRepositoryItemUidFactory().createUid( repository, "/b.txt" );
 
         assertTrue( attributeStorage.getFileFromBase( uid ).exists() );
 

@@ -20,28 +20,28 @@
  */
 package org.sonatype.nexus.proxy.item;
 
+import static org.easymock.EasyMock.createMock;
+
 import org.sonatype.nexus.proxy.AbstractNexusTestEnvironment;
 import org.sonatype.nexus.proxy.ResourceStore;
-import org.sonatype.nexus.proxy.repository.DummyRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.proxy.router.DummyRepositoryRouter;
+import org.sonatype.nexus.proxy.router.RepositoryRouter;
 
-public class AbstractStorageItemTest
+public abstract class AbstractStorageItemTest
     extends AbstractNexusTestEnvironment
 {
+    protected Repository repository;
 
-    protected DummyRepository repository = new DummyRepository();
+    protected RepositoryRouter router;
 
-    protected DummyRepositoryRouter router = new DummyRepositoryRouter();
-
-    public DummyRepository getRepository()
+    public void setUp()
+        throws Exception
     {
-        return repository;
-    }
+        super.setUp();
 
-    public DummyRepositoryRouter getRouter()
-    {
-        return router;
+        repository = createMock( Repository.class );
+
+        router = createMock( RepositoryRouter.class );
     }
 
     public void checkAbstractStorageItem( ResourceStore store, AbstractStorageItem item, boolean isVirtual,
@@ -57,13 +57,13 @@ public class AbstractStorageItemTest
         if ( Repository.class.isAssignableFrom( store.getClass() ) )
         {
             // repo stuff eq
-            assertEquals( getRepository().getId(), item.getRepositoryId() );
-            assertEquals( getRepository().getId(), item.getStore().getId() );
+            assertEquals( repository.getId(), item.getRepositoryId() );
+            assertEquals( repository.getId(), item.getStore().getId() );
         }
         else
         {
             assertEquals( null, item.getRepositoryId() );
-            assertEquals( getRouter().getId(), item.getStore().getId() );
+            assertEquals( router.getId(), item.getStore().getId() );
         }
 
         // path
@@ -71,8 +71,9 @@ public class AbstractStorageItemTest
         assertEquals( shouldBePath, item.getPath() );
         assertEquals( shouldBeParentPath, item.getParentPath() );
     }
-    
-    public void testDummy() {
+
+    public void testDummy()
+    {
         assertEquals( "a", "a" );
     }
 

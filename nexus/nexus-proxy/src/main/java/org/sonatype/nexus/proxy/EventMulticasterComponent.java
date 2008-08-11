@@ -36,7 +36,6 @@ public class EventMulticasterComponent
     extends LoggingComponent
     implements EventMulticaster
 {
-
     /** The proximity event listeners. */
     private CopyOnWriteArrayList<EventListener> proximityEventListeners = new CopyOnWriteArrayList<EventListener>();
 

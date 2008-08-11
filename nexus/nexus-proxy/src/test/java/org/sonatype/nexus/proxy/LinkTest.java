@@ -34,7 +34,6 @@ import org.sonatype.nexus.proxy.repository.Repository;
 public class LinkTest
     extends AbstractProxyTestEnvironment
 {
-
     private M2TestsuiteEnvironmentBuilder jettyTestsuiteEnvironmentBuilder;
 
     @Override
@@ -64,14 +63,17 @@ public class LinkTest
         repo1.storeItem( file );
 
         DefaultStorageLinkItem link = new DefaultStorageLinkItem( repo1, "/b.txt", true, true, file
-            .getRepositoryItemUid().toString() );
+            .getRepositoryItemUid() );
         repo1.getLocalStorage().storeItem( link );
 
         StorageItem item = repo1.retrieveItem( new ResourceStoreRequest( "/b.txt", true ) );
         assertEquals( DefaultStorageLinkItem.class, item.getClass() );
 
-        RepositoryItemUid uid = new RepositoryItemUid( getRepositoryRegistry(), ( (StorageLinkItem) item ).getTarget() );
-        StorageFileItem item1 = (StorageFileItem) repo1.retrieveItem( true, uid, null);
+        RepositoryItemUid uid = getRepositoryItemUidFactory().createUid(
+            ( (StorageLinkItem) item ).getTarget().getRepository(),
+            ( (StorageLinkItem) item ).getTarget().getPath() );
+
+        StorageFileItem item1 = (StorageFileItem) repo1.retrieveItem( true, uid, null );
         checkForFileAndMatchContents( item1, new ByteArrayInputStream( contentString.getBytes() ) );
 
     }

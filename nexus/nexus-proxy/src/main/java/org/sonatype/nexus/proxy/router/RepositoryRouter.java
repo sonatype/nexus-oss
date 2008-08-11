@@ -24,7 +24,14 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.sonatype.nexus.configuration.ConfigurationChangeListener;
+import org.sonatype.nexus.proxy.AccessDeniedException;
+import org.sonatype.nexus.proxy.ItemNotFoundException;
+import org.sonatype.nexus.proxy.NoSuchResourceStoreException;
+import org.sonatype.nexus.proxy.RepositoryNotAvailableException;
 import org.sonatype.nexus.proxy.ResourceStore;
+import org.sonatype.nexus.proxy.StorageException;
+import org.sonatype.nexus.proxy.item.StorageItem;
+import org.sonatype.nexus.proxy.item.StorageLinkItem;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.Repository;
@@ -48,6 +55,23 @@ public interface RepositoryRouter
      * @return
      */
     ContentClass getHandledContentClass();
+
+    /**
+     * Dereferences the link.
+     * 
+     * @param item
+     * @return
+     * @throws AccessDeniedException
+     * @throws ItemNotFoundException
+     * @throws RepositoryNotAvailableException
+     * @throws StorageException
+     */
+    StorageItem dereferenceLink( StorageLinkItem item )
+        throws NoSuchResourceStoreException,
+            AccessDeniedException,
+            ItemNotFoundException,
+            RepositoryNotAvailableException,
+            StorageException;
 
     /**
      * Storing an item in router is simply "spoofing" all repo items beneath that path.

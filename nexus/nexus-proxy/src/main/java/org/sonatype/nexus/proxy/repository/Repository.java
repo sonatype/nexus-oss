@@ -53,7 +53,6 @@ import org.sonatype.nexus.proxy.target.TargetSet;
 public interface Repository
     extends EventMulticaster, ResourceStore, ConfigurationChangeListener
 {
-
     String ROLE = Repository.class.getName();
 
     /**
@@ -447,4 +446,14 @@ public interface Repository
      * @return
      */
     TargetSet getTargetsForRequest( RepositoryItemUid uid, Map<String, Object> context );
+
+    /**
+     * Creates an UID within this Repository.
+     */
+    RepositoryItemUid createUidForPath( String path );
+
+    /**
+     * Releases an UID within this Repository.
+     */
+    void release( RepositoryItemUid uid );
 }

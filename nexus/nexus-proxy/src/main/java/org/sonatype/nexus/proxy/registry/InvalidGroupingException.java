@@ -28,13 +28,9 @@ package org.sonatype.nexus.proxy.registry;
 public class InvalidGroupingException
     extends Exception
 {
-    public InvalidGroupingException( String message, Throwable cause )
+    public InvalidGroupingException( ContentClass c1, ContentClass c2 )
     {
-        super( message, cause );
-    }
-
-    public InvalidGroupingException( String message )
-    {
-        super( message );
+        super( "The content classes are not groupable! '" + c1.getId() + "' and '" + c2.getId()
+            + "' are not compatible!" );
     }
 }

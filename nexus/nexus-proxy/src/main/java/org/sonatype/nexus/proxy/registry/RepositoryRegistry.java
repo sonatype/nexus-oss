@@ -110,6 +110,13 @@ public interface RepositoryRegistry
     List<Repository> getRepositories();
 
     /**
+     * Returns the list of existing repository group IDs.
+     * 
+     * @return
+     */
+    List<String> getRepositoryGroupIds();
+
+    /**
      * Returns the requested Repository by ID.
      * 
      * @param repoId the repo id
@@ -139,22 +146,6 @@ public interface RepositoryRegistry
      */
     ContentClass getRepositoryGroupContentClass( String groupId )
         throws NoSuchRepositoryGroupException;
-
-    /**
-     * Returns the list of Repositor ID's known by Proximity. The repo order within list follows repo rank, so
-     * processing is possible by simply iterating over resulting list.
-     * 
-     * @return List(<String>)
-     */
-    List<String> getRepositoryIds();
-
-    /**
-     * Returns the list of known groupIds configured within Proximity. The repo order within list follows repo rank, so
-     * processing is possible by simply iterating over resulting list.
-     * 
-     * @return List<String> of the known groupIds.
-     */
-    List<String> getRepositoryGroupIds();
 
     /**
      * Checks for the existence of given repositoryId within this registry.

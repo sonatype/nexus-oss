@@ -171,7 +171,7 @@ public class DefaultRepositoryRegistry
                     }
                     else if ( !contentClass.isCompatible( repository.getRepositoryContentClass() ) )
                     {
-                        throw new InvalidGroupingException( "The repositories in the group are not compatible classes" );
+                        throw new InvalidGroupingException( contentClass, repository.getRepositoryContentClass() );
                     }
 
                     groupOrder.add( repository.getId() );
@@ -263,6 +263,18 @@ public class DefaultRepositoryRegistry
         return Collections.unmodifiableList( result );
     }
 
+    public List<String> getRepositoryGroupIds()
+    {
+        List<String> result = new ArrayList<String>( repositoryGroups.size() );
+
+        for ( String repoGroupId : repositoryGroups.keySet() )
+        {
+            result.add( repoGroupId );
+        }
+
+        return Collections.unmodifiableList( result );
+    }
+
     public List<Repository> getRepositoryGroup( String groupId )
         throws NoSuchRepositoryGroupException
     {
@@ -298,30 +310,6 @@ public class DefaultRepositoryRegistry
         }
     }
 
-    public List<String> getRepositoryIds()
-    {
-        List<String> result = new ArrayList<String>( repositories.keySet().size() );
-
-        for ( String repoId : repositories.keySet() )
-        {
-            result.add( repoId );
-        }
-
-        return Collections.unmodifiableList( result );
-    }
-
-    public List<String> getRepositoryGroupIds()
-    {
-        List<String> result = new ArrayList<String>( repositoryGroups.size() );
-
-        for ( String repoGroupId : repositoryGroups.keySet() )
-        {
-            result.add( repoGroupId );
-        }
-
-        return Collections.unmodifiableList( result );
-    }
-
     public boolean repositoryIdExists( String repositoryId )
     {
         return repositories.containsKey( repositoryId );
@@ -330,11 +318,6 @@ public class DefaultRepositoryRegistry
     public boolean repositoryGroupIdExists( String repositoryGroupId )
     {
         return repositoryGroups.containsKey( repositoryGroupId );
-    }
-
-    public void onProximityEvent( AbstractEvent evt )
-    {
-        this.notifyProximityEventListeners( evt );
     }
 
     public List<String> getGroupsOfRepository( String repositoryId )
@@ -353,4 +336,13 @@ public class DefaultRepositoryRegistry
 
         return result;
     }
+
+    /**
+     * Simply "aggregating" repo events, and passing them over.
+     */
+    public void onProximityEvent( AbstractEvent evt )
+    {
+        this.notifyProximityEventListeners( evt );
+    }
+
 }

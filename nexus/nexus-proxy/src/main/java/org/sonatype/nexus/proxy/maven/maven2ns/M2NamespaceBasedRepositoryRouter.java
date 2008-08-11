@@ -50,9 +50,7 @@ import org.sonatype.nexus.util.StorageItemComparator;
 /**
  * The Class M2NamespaceBasedRepositoryRouter.
  * 
- * @author cstamas
- * DISABLED PLEXUS COMPONENT, UNUSED
- * plexus.component role-hint="m2namespace"
+ * @author cstamas DISABLED PLEXUS COMPONENT, UNUSED plexus.component role-hint="m2namespace"
  */
 public class M2NamespaceBasedRepositoryRouter
     extends AbstractSearchableBasedRepositoryRouter
@@ -254,7 +252,8 @@ public class M2NamespaceBasedRepositoryRouter
             if ( name != null )
             {
                 // file needed
-                DefaultStorageLinkItem file = new DefaultStorageLinkItem( this, name, true, false, "NOT_IMPLEMENTED" );
+                // TODO: this is work in progress and this DOES NOT WORK
+                DefaultStorageLinkItem file = new DefaultStorageLinkItem( this, name, true, false, null );
 
                 artifactList.add( file );
             }

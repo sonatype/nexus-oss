@@ -69,10 +69,7 @@ public abstract class AbstractRepositoryGroupResourceHandler
             {
                 if ( !cc.isCompatible( repo.getRepositoryContentClass() ) )
                 {
-                    throw new InvalidGroupingException(
-                        "The repositories in the group are not compatible classes! The first repo listed in this group has Content '"
-                            + cc.getId() + "', but repository '" + repo.getName() + "' (ID=" + repo.getId()
-                            + ") has incompatible Content '" + repo.getRepositoryContentClass().getId() + "'" );
+                    throw new InvalidGroupingException( cc, repo.getRepositoryContentClass() );
                 }
             }
 

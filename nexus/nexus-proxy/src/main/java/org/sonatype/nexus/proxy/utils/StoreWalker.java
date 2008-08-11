@@ -31,7 +31,6 @@ import org.sonatype.nexus.proxy.RepositoryNotListableException;
 import org.sonatype.nexus.proxy.ResourceStore;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
-import org.sonatype.nexus.proxy.item.DefaultStorageCollectionItem;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
@@ -168,26 +167,11 @@ public abstract class StoreWalker
             if ( Repository.class.isAssignableFrom( store.getClass() ) )
             {
                 // we are dealing with repository
-                // this way we avoid security context processing
-                RepositoryItemUid uid = new RepositoryItemUid( (Repository) store, fromPath );
+                // this way we avoid security context processing!!!
+                // TODO: enable somehow ability to pass-over the req context!
+                RepositoryItemUid uid = ( (Repository) store ).createUidForPath( fromPath );
 
-                try
-                {
-                    item = ( (Repository) store ).retrieveItem( localOnly, uid, null );
-                }
-                catch ( ItemNotFoundException e )
-                {
-                    // TODO: FIX THIS!
-                    if ( !( (Repository) store ).isBrowseable() )
-                    {
-                        // this is a coll
-                        item = new DefaultStorageCollectionItem( (Repository) store, fromPath, true, true );
-                    }
-                    else
-                    {
-                        throw e;
-                    }
-                }
+                item = ( (Repository) store ).retrieveItem( localOnly, uid, null );
             }
             else
             {

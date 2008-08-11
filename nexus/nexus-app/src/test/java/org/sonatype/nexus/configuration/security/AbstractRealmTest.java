@@ -81,6 +81,7 @@ import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
+import org.sonatype.nexus.proxy.item.StorageLinkItem;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.registry.InvalidGroupingException;
 import org.sonatype.nexus.proxy.repository.LocalStatus;
@@ -1328,6 +1329,17 @@ public abstract class AbstractRealmTest
         {
             throw new UnsupportedOperationException();
         }
+
+        public StorageItem dereferenceLinkItem( StorageLinkItem item )
+            throws NoSuchResourceStoreException,
+                ItemNotFoundException,
+                AccessDeniedException,
+                RepositoryNotAvailableException,
+                StorageException
+        {
+            // TODO Auto-generated method stub
+            return null;
+        }
     }
 
     public static class MockRepository
@@ -1725,8 +1737,7 @@ public abstract class AbstractRealmTest
                 ItemNotFoundException,
                 StorageException
         {
-            // TODO Auto-generated method stub
-
+            throw new UnsupportedOperationException();
         }
 
         public void deleteItem( RepositoryItemUid uid, Map<String, Object> context )
@@ -1735,14 +1746,12 @@ public abstract class AbstractRealmTest
                 ItemNotFoundException,
                 StorageException
         {
-            // TODO Auto-generated method stub
-
+            throw new UnsupportedOperationException();
         }
 
         public TargetSet getTargetsForRequest( RepositoryItemUid uid, Map<String, Object> context )
         {
-            // TODO Auto-generated method stub
-            return null;
+            throw new UnsupportedOperationException();
         }
 
         public void moveItem( RepositoryItemUid from, RepositoryItemUid to, Map<String, Object> context )
@@ -1751,8 +1760,7 @@ public abstract class AbstractRealmTest
                 ItemNotFoundException,
                 StorageException
         {
-            // TODO Auto-generated method stub
-
+            throw new UnsupportedOperationException();
         }
 
         public StorageItem retrieveItem( boolean localOnly, RepositoryItemUid uid, Map<String, Object> context )
@@ -1760,8 +1768,17 @@ public abstract class AbstractRealmTest
                 ItemNotFoundException,
                 StorageException
         {
-            // TODO Auto-generated method stub
-            return null;
+            throw new UnsupportedOperationException();
+        }
+
+        public RepositoryItemUid createUidForPath( String path )
+        {
+            throw new UnsupportedOperationException();
+        }
+
+        public void release( RepositoryItemUid uid )
+        {
+            throw new UnsupportedOperationException();
         }
     }
 }

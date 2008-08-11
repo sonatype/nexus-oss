@@ -82,9 +82,8 @@ public class RecreateMavenAttributesWalker
             UnsupportedStorageOperationException,
             RepositoryNotAvailableException
     {
-        RepositoryItemUid hashUid = new RepositoryItemUid( file.getRepositoryItemUid().getRepository(), file
-            .getRepositoryItemUid().getPath()
-            + "." + ext );
+        RepositoryItemUid hashUid = file.getRepositoryItemUid().getRepository().createUidForPath(
+            file.getRepositoryItemUid().getPath() + "." + ext );
 
         Repository repository = file.getRepositoryItemUid().getRepository();
 

@@ -20,12 +20,17 @@
  */
 package org.sonatype.nexus.proxy.registry;
 
+import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.replay;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import org.sonatype.nexus.proxy.AbstractNexusTestEnvironment;
 import org.sonatype.nexus.proxy.NoSuchRepositoryGroupException;
-import org.sonatype.nexus.proxy.repository.DummyRepository;
+import org.sonatype.nexus.proxy.events.EventListener;
+import org.sonatype.nexus.proxy.maven.maven2.Maven2ContentClass;
 import org.sonatype.nexus.proxy.repository.Repository;
 
 public class DefaultRepositoryRegistryTest
@@ -51,9 +56,33 @@ public class DefaultRepositoryRegistryTest
     public void testSimple()
         throws Exception
     {
-        repositoryRegistry.addRepository( new DummyRepository( "A" ) );
-        repositoryRegistry.addRepository( new DummyRepository( "B" ) );
-        repositoryRegistry.addRepository( new DummyRepository( "C" ) );
+        Repository repoA = createMock( Repository.class );
+        Repository repoB = createMock( Repository.class );
+        Repository repoC = createMock( Repository.class );
+
+        // id will be called twice
+        expect( repoA.getId() ).andReturn( "A" ).anyTimes();
+        expect( repoB.getId() ).andReturn( "B" ).anyTimes();
+        expect( repoC.getId() ).andReturn( "C" ).anyTimes();
+
+        expect( repoA.getRepositoryContentClass() ).andReturn( new Maven2ContentClass() ).anyTimes();
+        expect( repoB.getRepositoryContentClass() ).andReturn( new Maven2ContentClass() ).anyTimes();
+        expect( repoC.getRepositoryContentClass() ).andReturn( new Maven2ContentClass() ).anyTimes();
+
+        repoA.addProximityEventListener( (EventListener) repositoryRegistry );
+        repoB.addProximityEventListener( (EventListener) repositoryRegistry );
+        repoC.addProximityEventListener( (EventListener) repositoryRegistry );
+
+        repoA.removeProximityEventListener( (EventListener) repositoryRegistry );
+        repoB.removeProximityEventListener( (EventListener) repositoryRegistry );
+        repoC.removeProximityEventListener( (EventListener) repositoryRegistry );
+
+        replay( repoA, repoB, repoC );
+
+        repositoryRegistry.addRepository( repoA );
+        repositoryRegistry.addRepository( repoB );
+        repositoryRegistry.addRepository( repoC );
+
         List<String> gl = new ArrayList<String>();
         gl.add( "A" );
         gl.add( "B" );
@@ -69,27 +98,26 @@ public class DefaultRepositoryRegistryTest
         assertEquals( "C", repoMembers.get( 2 ).getId() );
 
         // and remove them all
-        gl = repositoryRegistry.getRepositoryIds();
+        List<Repository> repositories = repositoryRegistry.getRepositories();
 
-        for ( String repoId : gl )
+        for ( Repository repo : repositories )
         {
-            repositoryRegistry.removeRepository( repoId );
+            repositoryRegistry.removeRepository( repo.getId() );
         }
 
         try
         {
             repoMembers = repositoryRegistry.getRepositoryGroup( "ALL" );
-            
+
             assertEquals( 0, repoMembers.size() );
         }
         catch ( NoSuchRepositoryGroupException e )
         {
-            fail("Repo group should remain as empty group!");
+            fail( "Repo group should remain as empty group!" );
         }
 
         repoMembers = repositoryRegistry.getRepositories();
 
         assertEquals( 0, repoMembers.size() );
     }
-
 }

@@ -76,7 +76,9 @@ public class DefaultAttributesHandlerTest
     public void testRecreateAttrs()
         throws Exception
     {
-        RepositoryItemUid uid = new RepositoryItemUid( repository, "/activemq/activemq-core/1.2/activemq-core-1.2.jar" );
+        RepositoryItemUid uid = getRepositoryItemUidFactory().createUid(
+            repository,
+            "/activemq/activemq-core/1.2/activemq-core-1.2.jar" );
 
         assertFalse( ( (DefaultAttributeStorage) attributesHandler.getAttributeStorage() )
             .getFileFromBase( uid ).exists() );
@@ -90,7 +92,9 @@ public class DefaultAttributesHandlerTest
     public void testRecreateAttrsWithCustomAttrs()
         throws Exception
     {
-        RepositoryItemUid uid = new RepositoryItemUid( repository, "/activemq/activemq-core/1.2/activemq-core-1.2.jar" );
+        RepositoryItemUid uid = getRepositoryItemUidFactory().createUid(
+            repository,
+            "/activemq/activemq-core/1.2/activemq-core-1.2.jar" );
 
         assertFalse( ( (DefaultAttributeStorage) attributesHandler.getAttributeStorage() )
             .getFileFromBase( uid ).exists() );

@@ -472,12 +472,12 @@ public class DefaultIndexerManager
                         // this will force redownload
                         repository.clearCaches( "/.index" );
 
-                        propsUid = new RepositoryItemUid( repository, "/.index/" + IndexingContext.INDEX_FILE
-                            + ".properties" );
+                        propsUid = repository
+                            .createUidForPath( "/.index/" + IndexingContext.INDEX_FILE + ".properties" );
 
                         StorageFileItem fitem = (StorageFileItem) repository.retrieveItem( false, propsUid, ctx );
 
-                        zipUid = new RepositoryItemUid( repository, "/.index/" + IndexingContext.INDEX_FILE + ".zip" );
+                        zipUid = repository.createUidForPath( "/.index/" + IndexingContext.INDEX_FILE + ".zip" );
 
                         fitem = (StorageFileItem) repository.retrieveItem( false, zipUid, ctx );
 
@@ -546,6 +546,12 @@ public class DefaultIndexerManager
                                 getLogger().warn( "Cannot delete index part:", e );
                             }
                         }
+                    }
+                    finally
+                    {
+                        repository.release( propsUid );
+                        
+                        repository.release( zipUid );
                     }
                 }
             }
@@ -1007,17 +1013,17 @@ public class DefaultIndexerManager
 
             if ( gTerm != null )
             {
-                bq.add( nexusIndexer.constructQuery( ArtifactInfo.GROUP_ID, gTerm ), BooleanClause.Occur.SHOULD );
+                bq.add( nexusIndexer.constructQuery( ArtifactInfo.GROUP_ID, gTerm ), BooleanClause.Occur.MUST );
             }
 
             if ( aTerm != null )
             {
-                bq.add( nexusIndexer.constructQuery( ArtifactInfo.ARTIFACT_ID, aTerm ), BooleanClause.Occur.SHOULD );
+                bq.add( nexusIndexer.constructQuery( ArtifactInfo.ARTIFACT_ID, aTerm ), BooleanClause.Occur.MUST );
             }
 
             if ( vTerm != null )
             {
-                bq.add( nexusIndexer.constructQuery( ArtifactInfo.VERSION, vTerm ), BooleanClause.Occur.SHOULD );
+                bq.add( nexusIndexer.constructQuery( ArtifactInfo.VERSION, vTerm ), BooleanClause.Occur.MUST );
             }
 
             if ( cTerm != null )

@@ -73,6 +73,7 @@ import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryGroupException;
+import org.sonatype.nexus.proxy.NoSuchResourceStoreException;
 import org.sonatype.nexus.proxy.RepositoryNotAvailableException;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.cache.CacheManager;
@@ -91,7 +92,6 @@ import org.sonatype.nexus.proxy.events.RepositoryRegistryEventAdd;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventRemove;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventUpdate;
 import org.sonatype.nexus.proxy.http.HttpProxyService;
-import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.item.StorageLinkItem;
@@ -328,25 +328,15 @@ public class DefaultNexus
         return repositoryRegistry.getRepositories();
     }
 
-    public StorageItem dereferenceLinkItem( StorageItem item )
-        throws NoSuchRepositoryException,
+    public StorageItem dereferenceLinkItem( StorageLinkItem item )
+        throws NoSuchResourceStoreException,
             ItemNotFoundException,
             AccessDeniedException,
             RepositoryNotAvailableException,
             StorageException
 
     {
-        if ( StorageLinkItem.class.isAssignableFrom( item.getClass() ) )
-        {
-            // it is a link
-            RepositoryItemUid uid = new RepositoryItemUid( repositoryRegistry, ( (StorageLinkItem) item ).getTarget() );
-
-            return uid.getRepository().retrieveItem( false, uid, item.getItemContext() );
-        }
-        else
-        {
-            return item;
-        }
+        return getRootRouter().dereferenceLink( item );
     }
 
     public RepositoryRouter getRootRouter()

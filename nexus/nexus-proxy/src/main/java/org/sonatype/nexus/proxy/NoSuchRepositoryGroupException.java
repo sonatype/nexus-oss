@@ -28,7 +28,6 @@ package org.sonatype.nexus.proxy;
 public class NoSuchRepositoryGroupException
     extends NoSuchResourceStoreException
 {
-
     private static final long serialVersionUID = -4870545792242056284L;
 
     public NoSuchRepositoryGroupException( String groupId )

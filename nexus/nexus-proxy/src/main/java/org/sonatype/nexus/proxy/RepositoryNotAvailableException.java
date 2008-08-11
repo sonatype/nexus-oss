@@ -32,7 +32,7 @@ public class RepositoryNotAvailableException
 
     public RepositoryNotAvailableException( String repoId )
     {
-        super( "Repository with repoId=[" + repoId + "] is not available!" );
+        super( "Repository with repoId='" + repoId + "' is not available!" );
     }
 
 }

@@ -32,6 +32,6 @@ public interface StorageLinkItem
      * 
      * @return the target
      */
-    String getTarget();
+    RepositoryItemUid getTarget();
 
 }

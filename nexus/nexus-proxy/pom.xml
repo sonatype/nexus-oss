@@ -105,6 +105,11 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
+			<groupId>org.easymock</groupId>
+			<artifactId>easymock</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
 			<groupId>org.sonatype.plexus</groupId>
 			<artifactId>plexus-jetty-testsuite</artifactId>
 			<scope>test</scope>

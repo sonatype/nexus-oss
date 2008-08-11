@@ -110,16 +110,17 @@ public abstract class ShadowRepository
         if ( evt instanceof RepositoryItemEvent )
         {
             RepositoryItemEvent ievt = (RepositoryItemEvent) evt;
+
             if ( ievt.getItemUid().getPath().endsWith( ".pom" ) || ievt.getItemUid().getPath().endsWith( ".jar" ) )
             {
                 try
                 {
-                    String tuid = transformMaster2Shadow( ievt.getItemUid().getPath() );
+                    String shadowPath = transformMaster2Shadow( ievt.getItemUid().getPath() );
 
                     if ( ievt instanceof RepositoryItemEventStore || ievt instanceof RepositoryItemEventCache )
                     {
-                        DefaultStorageLinkItem link = new DefaultStorageLinkItem( this, tuid, true, true, ievt
-                            .getItemUid().toString() );
+                        DefaultStorageLinkItem link = new DefaultStorageLinkItem( this, shadowPath, true, true, ievt
+                            .getItemUid() );
 
                         if ( ievt.getContext() != null )
                         {
@@ -130,7 +131,7 @@ public abstract class ShadowRepository
                     }
                     else if ( ievt instanceof RepositoryItemEventDelete )
                     {
-                        deleteItem( new RepositoryItemUid( this, tuid ), ievt.getContext() );
+                        deleteItem( createUidForPath( shadowPath ), ievt.getContext() );
                     }
                 }
                 catch ( Exception e )
@@ -165,7 +166,7 @@ public abstract class ShadowRepository
             }
 
             // delegate the call to the master
-            RepositoryItemUid tuid = new RepositoryItemUid( getMasterRepository(), transformedPath );
+            RepositoryItemUid tuid = getMasterRepository().createUidForPath( transformedPath );
 
             return ( (AbstractRepository) getMasterRepository() ).doRetrieveItem( localOnly, tuid, context );
         }
@@ -245,7 +246,7 @@ public abstract class ShadowRepository
                     String tuid = transformMaster2Shadow( item.getRepositoryItemUid().getPath() );
 
                     DefaultStorageLinkItem link = new DefaultStorageLinkItem( repository, tuid, true, true, item
-                        .getRepositoryItemUid().toString() );
+                        .getRepositoryItemUid() );
 
                     storeItem( link );
                 }

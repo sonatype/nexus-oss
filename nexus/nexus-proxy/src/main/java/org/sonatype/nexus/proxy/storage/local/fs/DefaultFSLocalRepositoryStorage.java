@@ -37,12 +37,14 @@ import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
+import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.DefaultStorageCollectionItem;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.DefaultStorageLinkItem;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
+import org.sonatype.nexus.proxy.item.RepositoryItemUidFactory;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
@@ -65,6 +67,13 @@ public class DefaultFSLocalRepositoryStorage
     private static final String LINK_PREFIX = "LINK to ";
 
     /**
+     * The UID factory.
+     * 
+     * @plexus.requirement
+     */
+    private RepositoryItemUidFactory repositoryItemUidFactory;
+
+    /**
      * Instantiates a new default FS local repository storage.
      */
     public DefaultFSLocalRepositoryStorage()
@@ -80,7 +89,7 @@ public class DefaultFSLocalRepositoryStorage
     public File getBaseDir( Repository repository )
         throws StorageException
     {
-        URL url = getAbsoluteUrlFromBase( new RepositoryItemUid( repository, RepositoryItemUid.PATH_ROOT ) );
+        URL url = getAbsoluteUrlFromBase( repository.createUidForPath( RepositoryItemUid.PATH_ROOT ) );
         File file;
         try
         {
@@ -179,7 +188,7 @@ public class DefaultFSLocalRepositoryStorage
             path = RepositoryItemUid.PATH_ROOT;
         }
 
-        RepositoryItemUid uid = new RepositoryItemUid( tuid.getRepository(), path );
+        RepositoryItemUid uid = tuid.getRepository().createUidForPath( path );
 
         AbstractStorageItem result = null;
         if ( target.exists() && target.isDirectory() )
@@ -200,12 +209,27 @@ public class DefaultFSLocalRepositoryStorage
         {
             if ( checkBeginOfFile( LINK_PREFIX, target ) )
             {
-                DefaultStorageLinkItem link = new DefaultStorageLinkItem( uid.getRepository(), uid.getPath(), target
-                    .canRead(), target.canWrite(), getLinkTarget( target ) );
-                getAttributesHandler().fetchAttributes( link );
-                link.setModified( target.lastModified() );
-                link.setCreated( target.lastModified() );
-                result = link;
+                try
+                {
+                    DefaultStorageLinkItem link = new DefaultStorageLinkItem(
+                        uid.getRepository(),
+                        uid.getPath(),
+                        target.canRead(),
+                        target.canWrite(),
+                        getLinkTarget( target ) );
+                    getAttributesHandler().fetchAttributes( link );
+                    link.setModified( target.lastModified() );
+                    link.setCreated( target.lastModified() );
+                    result = link;
+                }
+                catch ( NoSuchRepositoryException e )
+                {
+                    getLogger().warn( "Stale link object found on UID: " + uid.toString() + ", deleting it." );
+
+                    target.delete();
+
+                    throw new ItemNotFoundException( uid );
+                }
             }
             else
             {
@@ -428,12 +452,12 @@ public class DefaultFSLocalRepositoryStorage
 
                             if ( uid.getPath().endsWith( RepositoryItemUid.PATH_SEPARATOR ) )
                             {
-                                tuid = new RepositoryItemUid( uid.getRepository(), uid.getPath() + files[i].getName() );
+                                tuid = uid.getRepository().createUidForPath( uid.getPath() + files[i].getName() );
                             }
                             else
                             {
-                                tuid = new RepositoryItemUid( uid.getRepository(), uid.getPath()
-                                    + RepositoryItemUid.PATH_SEPARATOR + files[i].getName() );
+                                tuid = uid.getRepository().createUidForPath(
+                                    uid.getPath() + RepositoryItemUid.PATH_SEPARATOR + files[i].getName() );
                             }
 
                             result.add( retrieveItemFromFile( tuid, files[i] ) );
@@ -503,7 +527,8 @@ public class DefaultFSLocalRepositoryStorage
         }
     }
 
-    protected String getLinkTarget( File file )
+    protected RepositoryItemUid getLinkTarget( File file )
+        throws NoSuchRepositoryException
     {
         if ( file != null && file.length() > LINK_PREFIX.length() )
         {
@@ -515,7 +540,9 @@ public class DefaultFSLocalRepositoryStorage
 
                 String link = IOUtil.toString( fis );
 
-                return link.substring( LINK_PREFIX.length(), link.length() );
+                String uidStr = link.substring( LINK_PREFIX.length(), link.length() );
+
+                return repositoryItemUidFactory.createUid( uidStr );
             }
             catch ( IOException e )
             {

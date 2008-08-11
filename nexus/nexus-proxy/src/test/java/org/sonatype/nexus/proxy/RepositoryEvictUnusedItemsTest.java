@@ -24,7 +24,6 @@ import java.util.Collection;
 
 import org.sonatype.jettytestsuite.ServletServer;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
-import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.repository.Repository;
 
 public class RepositoryEvictUnusedItemsTest
@@ -59,7 +58,7 @@ public class RepositoryEvictUnusedItemsTest
 
         // now mangle the attributes of one of them
         AbstractStorageItem mangledItem = repo1.getLocalStorage().retrieveItem(
-            new RepositoryItemUid( repo1, "/activemq/activemq-core/1.2/activemq-core-1.2.jar" ) );
+            getRepositoryItemUidFactory().createUid( repo1, "/activemq/activemq-core/1.2/activemq-core-1.2.jar" ) );
 
         // make it last requested before 3 days
         mangledItem.setLastRequested( System.currentTimeMillis() - ( 3 * DAY ) );

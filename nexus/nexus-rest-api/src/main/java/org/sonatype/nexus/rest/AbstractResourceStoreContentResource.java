@@ -243,7 +243,7 @@ public abstract class AbstractResourceStoreContentResource
             // TODO: we should be able to do HTTP redirects too! (parametrize the dereferencing?)
             try
             {
-                return renderItem( variant, getNexus().dereferenceLinkItem( item ) );
+                return renderItem( variant, getNexus().dereferenceLinkItem( (StorageLinkItem) item ) );
             }
             catch ( Exception e )
             {

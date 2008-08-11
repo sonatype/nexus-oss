@@ -33,8 +33,8 @@ import java.util.Map;
 
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.util.IOUtil;
-import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
+import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.EventMulticasterComponent;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
@@ -372,7 +372,7 @@ public abstract class AbstractRepositoryRouter
      * @throws ItemNotFoundException the item not found exception
      * @throws RepositoryNotAvailableException the repository not available exception
      */
-    protected StorageItem dereferenceLink( StorageLinkItem link )
+    public final StorageItem dereferenceLink( StorageLinkItem link )
         throws NoSuchResourceStoreException,
             AccessDeniedException,
             ItemNotFoundException,
@@ -384,14 +384,11 @@ public abstract class AbstractRepositoryRouter
             getLogger().debug( "Dereferencing link " + link.getTarget() );
         }
 
-        // create a request
-        ResourceStoreRequest request = new ResourceStoreRequest( link.getTarget(), true );
+        ResourceStoreRequest req = new ResourceStoreRequest( link.getTarget(), false );
 
-        // pass it over the existing item context (ie. auth stuff, etc)
-        request.getRequestContext().putAll( link.getItemContext() );
-
-        // and retrieve it
-        return retrieveItem( request );
+        req.getRequestContext().putAll( link.getItemContext() );
+        
+        return link.getTarget().getRepository().retrieveItem( req );
     }
 
     // =====================================================================
