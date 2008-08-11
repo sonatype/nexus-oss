@@ -39,6 +39,7 @@ import org.sonatype.nexus.integrationtests.nexus408.Nexus408ChangePasswordPermis
 import org.sonatype.nexus.integrationtests.nexus429.Nexus429UploadArtifactPrivilegeTest;
 import org.sonatype.nexus.integrationtests.nexus429.Nexus429WagonDeployPrivilegeTest;
 import org.sonatype.nexus.integrationtests.nexus450.Nexus450UserCreationTest;
+import org.sonatype.nexus.integrationtests.nexus502.Nexus502MavenExecutionTest;
 import org.sonatype.nexus.integrationtests.proxy.nexus177.Nexus177OutOfServiceTest;
 import org.sonatype.nexus.integrationtests.proxy.nexus178.Nexus178BlockProxyDownloadTest;
 import org.sonatype.nexus.integrationtests.proxy.nexus179.Nexus179RemoteRepoDownTest;
@@ -59,7 +60,7 @@ import org.sonatype.nexus.integrationtests.proxy.nexus262.Nexus262SimpleProxyTes
     Nexus385RoutesPermissionTests.class, Nexus429WagonDeployPrivilegeTest.class,
     Nexus393ResetPasswordPermissionTest.class, Nexus394ForgotPasswordPermissionTest.class,
     Nexus385RoutesPermissionTests.class, Nexus395ForgotUsernamePermissionTest.class,
-    Nexus408ChangePasswordPermissionTest.class, Nexus450UserCreationTest.class } )
+    Nexus408ChangePasswordPermissionTest.class, Nexus450UserCreationTest.class, Nexus502MavenExecutionTest.class } )
 public class IntegrationTestSuiteClassesSecurity
 {
     @BeforeClass

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<settings xmlns="http://maven.apache.org/settings/1.0.0"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://maven.apache.org/setrings/1.0.0
+          http://maven.apache.org/xsd/settings-1.0.0.xsd">
+
+  <profiles>
+    <profile>
+      <id>nexus</id>
+      <repositories>
+	    <repository>
+	      <id>nexus-test-harness-repo</id>
+	      <url>http://localhost:8087/nexus/content/repositories/nexus-test-harness-repo</url>
+          <releases><enabled>true</enabled></releases>
+	    </repository>
+	    <repository>
+	      <id>nexus-test-harness-repo2</id>
+	      <url>http://localhost:8087/nexus/content/repositories/nexus-test-harness-repo2</url>
+          <releases><enabled>true</enabled></releases>
+	    </repository>
+	    <repository>
+	      <id>nexus-test-harness-release-repo</id>
+	      <url>http://localhost:8087/nexus/content/repositories/nexus-test-harness-release-repo</url>
+          <releases><enabled>true</enabled></releases>
+	    </repository>
+      </repositories>
+    </profile>
+  </profiles>
+
+  <activeProfiles>
+    <activeProfile>nexus</activeProfile>
+  </activeProfiles>
+
+</settings>

@@ -89,6 +89,13 @@
         <!-- TODO test scope is not transitive <scope>test</scope> -->
 	</dependency>
 
+	<dependency>
+		<groupId>org.apache.maven.its</groupId>
+		<artifactId>maven-integration-test-helper</artifactId>
+		<version>2.1-SNAPSHOT</version>
+        <!-- TODO test scope is not transitive <scope>test</scope> -->
+	</dependency>
+
   </dependencies>
 	<build>
 		<filters>
