@@ -163,7 +163,7 @@ public class UserMessageUtil
      * @return Returns true when the user was deleted and false when it was not deleted
      * @throws Exception
      */
-    public boolean removeUser( String userId )
+    public static boolean removeUser( String userId )
         throws IOException
     {
         Status status = RequestFacade.sendMessage( "service/local/users/" + userId, Method.DELETE ).getStatus();
