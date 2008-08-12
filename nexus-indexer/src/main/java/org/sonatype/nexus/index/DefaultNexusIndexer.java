@@ -14,7 +14,10 @@
 package org.sonatype.nexus.index;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -35,9 +38,8 @@ import org.apache.lucene.search.Hits;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.store.Directory;
-import org.codehaus.plexus.digest.DigesterException;
-import org.codehaus.plexus.digest.Sha1Digester;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
+import org.codehaus.plexus.util.IOUtil;
 import org.sonatype.nexus.index.context.DefaultIndexingContext;
 import org.sonatype.nexus.index.context.IndexContextInInconsistentStateException;
 import org.sonatype.nexus.index.context.IndexingContext;
@@ -62,6 +64,9 @@ public class DefaultNexusIndexer
     extends AbstractLogEnabled
     implements NexusIndexer
 {
+    
+    private static final char[] DIGITS = "0123456789ABCDEF".toCharArray();
+
     /** @plexus.requirement */
     private Scanner scanner;
 
@@ -714,16 +719,53 @@ public class DefaultNexusIndexer
         throws IOException,
             IndexContextInInconsistentStateException
     {
+        FileInputStream is = null;
+        
         try
         {
-            String sha1 = new Sha1Digester().calc( artifact );
+            MessageDigest sha1 = MessageDigest.getInstance("SHA-1");
 
-            return identify( ArtifactInfo.SHA1, sha1 );
+            is = new FileInputStream(artifact);
+            
+            byte[] buff = new byte[ 4096 ];
+            
+            int n;
+            
+            while ( ( n = is.read( buff ) ) > -1 ) 
+            {
+                sha1.update( buff, 0, n );
+            }
+            
+            byte[] digest = sha1.digest();
+            
+            // String sha1 = new Sha1Digester().calc( artifact );
+
+            return identify( ArtifactInfo.SHA1, encode( digest ) );
         }
-        catch ( DigesterException ex )
+        catch (NoSuchAlgorithmException ex) 
         {
             throw new IOException( "Unable to calculate digest" );
         }
+        finally
+        {
+            IOUtil.close( is );
+        }
+
+    }
+
+    private String encode( byte[] digest ) 
+    {
+        char[] buff = new char[ digest.length * 2 ];
+        
+        int n = 0;
+        
+        for (byte b : digest) 
+        {
+            buff[ n++ ] = DIGITS[ ( 0xF0 & b ) >> 4 ];  
+            buff[ n++ ] = DIGITS[ 0x0F & b ];  
+        }
+        
+        return new String( buff );
     }
 
     public ArtifactInfo identify( String field, String query )
@@ -752,7 +794,6 @@ public class DefaultNexusIndexer
         {
             return result.iterator().next();
         }
-
         return null;
     }
 
