@@ -39,6 +39,10 @@ public class Nexus502MavenExecutionTest
     {
         verifier = new Verifier( getTestFile( "maven-project" ).getAbsolutePath(), false );
 
+        File mvnRepo = getTestFile( "mvn_repo" );
+        mvnRepo.mkdirs();
+        verifier.setLocalRepo( mvnRepo.getAbsolutePath() );
+
         verifier.deleteArtifact( "nexus502", "artifact-1", "1.0.0", "jar" );
         verifier.deleteArtifact( "nexus502", "artifact-1", "1.0.0", "pom" );
         verifier.deleteArtifact( "nexus502", "artifact-2", "1.0.0", "jar" );
@@ -59,8 +63,15 @@ public class Nexus502MavenExecutionTest
     public void dependencyDownload()
         throws Exception
     {
-        verifier.executeGoal( "dependency:resolve" );
-        verifier.verifyErrorFreeLog();
+        try
+        {
+            verifier.executeGoal( "dependency:resolve" );
+            verifier.verifyErrorFreeLog();
+        }
+        catch ( VerificationException e )
+        {
+            failTest();
+        }
     }
 
     @Test
@@ -76,14 +87,25 @@ public class Nexus502MavenExecutionTest
         {
             verifier.executeGoal( "dependency:resolve" );
             verifier.verifyErrorFreeLog();
-            File logFile = new File( verifier.getBasedir(), "log.txt" );
-            String log = FileUtils.readFileToString( logFile );
-            Assert.fail(log);
+            failTest();
         }
         catch ( VerificationException e )
         {
 
         }
+    }
+
+    /**
+     * Workaround to get more details when tests fails
+     *
+     * @throws IOException
+     */
+    private void failTest()
+        throws IOException
+    {
+        File logFile = new File( verifier.getBasedir(), "log.txt" );
+        String log = FileUtils.readFileToString( logFile );
+        Assert.fail( log );
     }
 
     private UserResource disableUser( String userId )
