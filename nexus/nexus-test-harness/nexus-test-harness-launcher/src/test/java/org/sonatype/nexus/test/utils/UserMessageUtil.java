@@ -166,6 +166,12 @@ public class UserMessageUtil
     public static boolean removeUser( String userId )
         throws IOException
     {
+
+        if ( "anonymous".equals( userId ) )
+        {
+            throw new IllegalArgumentException( "Unable to delete anonymous user" );
+        }
+
         Status status = RequestFacade.sendMessage( "service/local/users/" + userId, Method.DELETE ).getStatus();
         return status.isSuccess();
     }
