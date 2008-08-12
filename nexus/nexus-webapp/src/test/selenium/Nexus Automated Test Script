@@ -1,0 +1,992 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head profile="http://selenium-ide.openqa.org/profiles/test-case">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<link rel="selenium.base" href="http://localhost:8081/nexus/" />
+<title>automated script Two</title>
+</head>
+<body>
+<table cellpadding="1" cellspacing="1" border="1">
+<thead>
+<tr><td rowspan="1" colspan="3">automated script Two</td></tr>
+</thead><tbody>
+<tr>
+	<td>click</td>
+	<td>login-link</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>usernamefield</td>
+	<td>test</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>passwordfield</td>
+	<td>test</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>loginbutton</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>1000</td>
+	<td>1000</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>OK</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>usernamefield</td>
+	<td>admin</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>passwordfield</td>
+	<td>admin123</td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td>500</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>loginbutton</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>1000</td>
+	<td>1000</td>
+</tr>
+<tr>
+	<td>verifyTextPresent</td>
+	<td>Welcome to the Sonatype Nexus Repository Manager.</td>
+	<td></td>
+</tr>
+<tr>
+	<td>mouseDown</td>
+	<td>open-config-server</td>
+	<td></td>
+</tr>
+<tr>
+	<td>mouseUp</td>
+	<td>open-config-server</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td>500</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>document.forms[0].elements[4]</td>
+	<td>mailout.easydns.com</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>document.forms[0].elements[5]</td>
+	<td>465</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>document.forms[0].elements[6]</td>
+	<td>infinity.nu</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>document.forms[0].elements[7]</td>
+	<td>infinity</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>smtpSettings.sslEnabled</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>savebutton</td>
+	<td></td>
+</tr>
+<tr>
+	<td>mouseDown</td>
+	<td>open-security-privileges</td>
+	<td></td>
+</tr>
+<tr>
+	<td>mouseUp</td>
+	<td>open-security-privileges</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//div[2]/div[1]/div/table/tbody/tr/td[2]/table/tbody/tr/td[2]/em/button</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>document.forms[1].elements[1]</td>
+	<td>Test Privilige</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//div[2]/div[2]/div[2]/div/div/div/div/div/table/tbody/tr/td[1]/table/tbody/tr/td[2]/em/button</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTextPresent</td>
+	<td>One or more method(s) are required</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>document.forms[1].elements[2]</td>
+	<td>This is a test privilege</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//form/div[5]/div[1]/div[1]/img[1]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//div[29]/div/div[2]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTextPresent</td>
+	<td>One or more method(s) are required</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//a/span</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>document.forms[1].elements[6]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//div[2]/div[2]/div[2]/div/div/div/div/div/table/tbody/tr/td[1]/table/tbody/tr/td[2]/em/button</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>mouseDown</td>
+	<td>open-security-roles</td>
+	<td></td>
+</tr>
+<tr>
+	<td>mouseUp</td>
+	<td>open-security-roles</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//div[4]/div/div/div[1]/div[2]/div[1]/div/table/tbody/tr/td[2]/table/tbody/tr/td[2]/em/button</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>name</td>
+	<td>user1</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>description</td>
+	<td>User One</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>sessionTimeout</td>
+	<td>10</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>document.forms[1].elements[4]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//a/span</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>document.forms[1].elements[4]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//div[2]/div[2]/div[2]/div/div/div/div/div/table/tbody/tr/td[1]/table/tbody/tr/td[2]/em/button</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//table[@id='role-refresh-btn']/tbody/tr/td[2]/em/button</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>st-roles-grid_http://localhost:8081/nexus/service/local/roles/11bb7c54971_col0</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>document.forms[1].elements[3]</td>
+	<td>15</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//div[2]/div[2]/div[2]/div/div/div/div/div/table/tbody/tr/td[1]/table/tbody/tr/td[2]/em/button</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//table[@id='role-refresh-btn']/tbody/tr/td[2]/em/button</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>mouseDown</td>
+	<td>open-security-users</td>
+	<td></td>
+</tr>
+<tr>
+	<td>mouseUp</td>
+	<td>open-security-users</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTextPresent</td>
+	<td>Select a user to edit it, or click &quot;Add&quot; to create a new one.</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//table[@id='user-add-btn']/tbody/tr/td[2]/em/button</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>userId</td>
+	<td>user1</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>name</td>
+	<td>User One</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>email</td>
+	<td>koconnor@sonatype.com</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//div[39]/div/div[1]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//a/span</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//li[4]/div/a/span</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//tr[3]/td/table/tbody/tr/td[3]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>document.forms[1].elements[4]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//div[2]/div[2]/div[2]/div/div/div/div/div/table/tbody/tr/td[1]/table/tbody/tr/td[2]/em/button</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//div[5]/div/div/div[1]/div[2]/div[1]/div/table/tbody/tr/td[1]/table/tbody/tr/td[2]/em/button</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTextPresent</td>
+	<td>Select a user to edit it, or click &quot;Add&quot; to create a new one.</td>
+	<td></td>
+</tr>
+<tr>
+	<td>mouseDown</td>
+	<td>open-config-repos</td>
+	<td></td>
+</tr>
+<tr>
+	<td>mouseUp</td>
+	<td>open-config-repos</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>st-repos-grid_http://localhost:8081/nexus/service/local/repositories/central_col0</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//fieldset[1]/div/div/div[2]/div[1]/div/img[1]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//div[42]/div/div[1]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//div[2]/div[2]/div[2]/div/div/div/div/div/table/tbody/tr/td[1]/table/tbody/tr/td[2]/em/button</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>mouseDown</td>
+	<td>open-config-schedules</td>
+	<td></td>
+</tr>
+<tr>
+	<td>mouseUp</td>
+	<td>open-config-schedules</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//table[@id='schedule-add-btn']/tbody/tr/td[2]/em/button</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>document.forms[3].elements[2]</td>
+	<td>Task One</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//form/div[3]/div[1]/div/img[1]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//div[57]/div/div[7]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//div[58]/div/div[1]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//div[59]/div/div[2]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//div[8]/div/div/div[2]/div[2]/div/div[2]/div[2]/div[2]/div/div/div/div/div/table/tbody/tr/td[1]/table/tbody/tr/td[2]/em/button</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//table[@id='schedule-refresh-btn']/tbody/tr/td[2]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTextPresent</td>
+	<td>Select a scheduled task to edit it, or click &quot;Add&quot; to create a new one.</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>50000</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>quick-search--field</td>
+	<td>maven</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//img</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>2000</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//a[@href='http://localhost:8081/nexus/service/local/repositories/central/content/andromda/maven-andromda-plugin/2.1/maven-andromda-plugin-2.1.pom']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>openWindowAndWait</td>
+	<td>http://localhost:8081/nexus/</td>
+	<td>1000</td>
+</tr>
+<tr>
+	<td>verifyTextPresent</td>
+	<td>You may browse and search the repositories using the options on the left. Administrators may login via the link on the top right.</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>login-link</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>usernamefield</td>
+	<td>admin</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>passwordfield</td>
+	<td>admin123</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>loginbutton</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>1000</td>
+	<td>1000</td>
+</tr>
+<tr>
+	<td>mouseDown</td>
+	<td>open-system-changes</td>
+	<td></td>
+</tr>
+<tr>
+	<td>mouseUp</td>
+	<td>open-system-changes</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>st-feeds-grid_http://localhost:8081/nexus/service/local/feeds/recentChanges_col0</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td>500</td>
+</tr>
+<tr>
+	<td>verifyTextPresent</td>
+	<td>andromda : maven-andromda-plugin</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>st-feeds-grid_http://localhost:8081/nexus/service/local/feeds/systemChanges_col0</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td>500</td>
+</tr>
+<tr>
+	<td>verifyTextPresent</td>
+	<td>Reindexing</td>
+	<td></td>
+</tr>
+<tr>
+	<td>mouseDown</td>
+	<td>open-view-logs</td>
+	<td></td>
+</tr>
+<tr>
+	<td>mouseUp</td>
+	<td>open-view-logs</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//td[3]/table/tbody/tr/td[2]/em/button</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//a[contains(text(),'nexus.log')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td>500</td>
+</tr>
+<tr>
+	<td>verifyTextPresent</td>
+	<td></td>
+	<td>[WrapperListener_start_runner:]</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//button</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//td[3]/table/tbody/tr/td[2]/em/button</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//a[contains(text(),'nexus.xml')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTextPresent</td>
+	<td></td>
+	<td>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</td>
+</tr>
+<tr>
+	<td>mouseDown</td>
+	<td>open-config-server</td>
+	<td></td>
+</tr>
+<tr>
+	<td>mouseUp</td>
+	<td>open-config-server</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>document.forms[1].elements[8]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//div[2]/div[2]/div/div/div/div/div/table/tbody/tr/td[1]/table/tbody/tr/td[2]/em/button</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>document.forms[1].elements[22]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>document.forms[1].elements[23]</td>
+	<td>http://oconnorhouse:8081/nexus</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//div[2]/div[2]/div/div/div/div/div/table/tbody/tr/td[1]/table/tbody/tr/td[2]/em/button</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTextPresent</td>
+	<td></td>
+	<td>http://oconnorhouse:8081/nexus</td>
+</tr>
+<tr>
+	<td>verifyLocation</td>
+	<td>http://localhost:8081/nexus/</td>
+	<td></td>
+</tr>
+<tr>
+	<td>mouseDown</td>
+	<td>open-repos-maint</td>
+	<td></td>
+</tr>
+<tr>
+	<td>mouseUp</td>
+	<td>open-repos-maint</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>st-repos-maint-grid_http://localhost:8081/nexus/service/local/repositories/central_col0</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//li[2]/div/img[1]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//li[2]/ul/li/div/img[1]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//li[2]/ul/li/ul/li/div/img[1]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTextPresent</td>
+	<td>maven-andromda</td>
+	<td></td>
+</tr>
+<tr>
+	<td>mouseDownRight</td>
+	<td>//li[2]/ul/li/ul/li/ul/li[1]/div/a/span</td>
+	<td></td>
+</tr>
+<tr>
+	<td>mouseUpRight</td>
+	<td>//li[2]/ul/li/ul/li/ul/li[1]/div/a/span</td>
+	<td></td>
+</tr>
+<tr>
+	<td>mouseDown</td>
+	<td>open-config-server</td>
+	<td></td>
+</tr>
+<tr>
+	<td>mouseUp</td>
+	<td>open-config-server</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//div[23]/div/div[1]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//button</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>login-link</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTextPresent</td>
+	<td>Welcome to the Sonatype Nexus Repository Manager.</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>login-link</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>usernamefield</td>
+	<td>test</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>passwordfield</td>
+	<td>test</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>loginbutton</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTextPresent</td>
+	<td>Server</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>quick-search--field</td>
+	<td>maven</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//img</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>1000</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTextPresent</td>
+	<td>Maven Central (Remote)</td>
+	<td></td>
+</tr>
+<tr>
+	<td>mouseDown</td>
+	<td>open-config-server</td>
+	<td></td>
+</tr>
+<tr>
+	<td>mouseUp</td>
+	<td>open-config-server</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>document.forms[0].elements[17]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//div[26]/div/div[2]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>document.forms[0].elements[18]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//td[1]/table/tbody/tr/td[2]/em/button</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>login-link</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>quick-search--field</td>
+	<td>maven</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//img</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTextPresent</td>
+	<td>Displaying 0 of 0 records</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>login-link</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>usernamefield</td>
+	<td>test</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>passwordfield</td>
+	<td>test</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>loginbutton</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>OK</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>usernamefield</td>
+	<td>admin</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>passwordfield</td>
+	<td>admin123</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>loginbutton</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTextPresent</td>
+	<td>Server</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>document.forms[0].elements[18]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//table[@id='savebutton']/tbody/tr/td[2]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>login-link</td>
+	<td></td>
+</tr>
+
+</tbody></table>
+</body>
+</html>
