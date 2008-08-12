@@ -1,9 +1,13 @@
 package org.sonatype.nexus.integrationtests.nexus502;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import junit.framework.Assert;
+
+import org.apache.commons.io.FileUtils;
 import org.apache.maven.it.VerificationException;
 import org.apache.maven.it.Verifier;
 import org.junit.Before;
@@ -59,7 +63,7 @@ public class Nexus502MavenExecutionTest
         verifier.verifyErrorFreeLog();
     }
 
-    @Test( expected = VerificationException.class )
+    @Test
     public void dependencyDownloadPrivateServer()
         throws Exception
     {
@@ -68,8 +72,19 @@ public class Nexus502MavenExecutionTest
 
         verifier = new Verifier( getTestFile( "maven-project2" ).getAbsolutePath(), false );
         verifier.resetStreams();
-        verifier.executeGoal( "dependency:resolve" );
-        verifier.verifyErrorFreeLog();
+        try
+        {
+            verifier.executeGoal( "dependency:resolve" );
+            verifier.verifyErrorFreeLog();
+            File logFile = new File( verifier.getBasedir(), "log.txt" );
+            String log = FileUtils.readFileToString( logFile );
+            System.out.println( log );
+            Assert.fail();
+        }
+        catch ( VerificationException e )
+        {
+
+        }
     }
 
     private UserResource disableUser( String userId )
@@ -77,7 +92,7 @@ public class Nexus502MavenExecutionTest
     {
         UserMessageUtil util =
             new UserMessageUtil( XStreamInitializer.initialize( new XStream() ), MediaType.APPLICATION_XML );
-        return util.disableUser(userId);
+        return util.disableUser( userId );
     }
 
     // Depends on nexus-508
