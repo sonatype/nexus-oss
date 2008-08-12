@@ -87,6 +87,11 @@ public interface FeedRecorder
     public static final String SYSTEM_CLEARCACHE_ACTION = "CLEARCACHE";
 
     /**
+     * System event action: shadow sync
+     */
+    public static final String SYSTEM_SYNC_SHADOW_ACTION = "SYNC_SHADOW";
+
+    /**
      * System event action: evict unused proxied items
      */
     public static final String SYSTEM_EVICT_UNUSED_PROXIED_ITEMS = "EVICT_UNUSED_PROXIED_ITEMS";

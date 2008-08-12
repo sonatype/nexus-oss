@@ -402,13 +402,6 @@ public class DefaultApplicationRuntimeConfigurationBuilder
 
             shadowRepository
                 .setLocalStorage( getLocalRepositoryStorage( shadowRepository.getId(), DEFAULT_LS_PROVIDER ) );
-
-            if ( shadow.isSyncAtStartup() )
-            {
-                shadowRepository.synchronizeWithMaster();
-            }
-            return shadowRepository;
-
         }
         catch ( MalformedURLException e )
         {

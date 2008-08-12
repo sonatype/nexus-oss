@@ -199,10 +199,6 @@ public abstract class ShadowRepository
         SyncWalker sw = new SyncWalker( this, getMasterRepository(), getLogger() );
 
         sw.walk( true, false );
-
-        // delete all links
-        // walk master repo
-        // recreate links
     }
 
     /**

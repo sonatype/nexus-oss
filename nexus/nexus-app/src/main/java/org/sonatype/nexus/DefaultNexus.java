@@ -109,6 +109,7 @@ import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.nexus.store.DefaultEntry;
 import org.sonatype.nexus.store.Entry;
 import org.sonatype.nexus.store.Store;
+import org.sonatype.nexus.tasks.SynchronizeShadowsTask;
 import org.sonatype.scheduling.NoSuchTaskException;
 import org.sonatype.scheduling.ScheduledTask;
 import org.sonatype.scheduling.SchedulerTask;
@@ -1485,6 +1486,9 @@ public class DefaultNexus
                 // TODO: perform upgrade or something
             }
 
+            // sync shadows now, those needed
+            synchronizeShadowsAtStartup();
+
             systemStatus.setState( SystemState.STARTED );
 
             systemStatus.setStartedAt( new Date() );
@@ -1554,6 +1558,38 @@ public class DefaultNexus
         systemStatus.setState( SystemState.STOPPED );
 
         getLogger().info( "Stopped Nexus (version " + systemStatus.getVersion() + ")" );
+    }
+
+    private void synchronizeShadowsAtStartup()
+    {
+        Collection<CRepositoryShadow> shadows = listRepositoryShadows();
+
+        if ( shadows == null )
+        {
+            return;
+        }
+
+        for ( CRepositoryShadow shadow : shadows )
+        {
+            if ( shadow.isSyncAtStartup() )
+            {
+                try
+                {
+                    ShadowRepository shadowRepo = (ShadowRepository) getRepository( shadow.getId() );
+
+                    SynchronizeShadowsTask task = (SynchronizeShadowsTask) nexusScheduler
+                        .createTaskInstance( SynchronizeShadowsTask.class );
+
+                    task.setShadowRepository( shadowRepo );
+
+                    nexusScheduler.submit( "Shadow Sync (" + shadow.getId() + ")", task );
+                }
+                catch ( NoSuchRepositoryException e )
+                {
+                    // will not be thrown
+                }
+            }
+        }
     }
 
     private void createDefaultTemplate( String id, boolean shouldRecreate )
