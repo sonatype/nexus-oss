@@ -71,11 +71,6 @@ public class NexusHttpAuthenticationFilter
         if ( isLoginAttempt( request, response ) )
         {
             loggedIn = executeLogin( request, response );
-
-            if ( !loggedIn )
-            {
-                sendChallenge( request, response );
-            }
         }
         else
         {
@@ -84,6 +79,11 @@ public class NexusHttpAuthenticationFilter
             {
                 loggedIn = executeAnonymousLogin( request, response );
             }
+        }
+
+        if ( !loggedIn )
+        {
+            sendChallenge( request, response );
         }
 
         return loggedIn;
