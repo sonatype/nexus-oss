@@ -78,8 +78,7 @@ public class Nexus502MavenExecutionTest
             verifier.verifyErrorFreeLog();
             File logFile = new File( verifier.getBasedir(), "log.txt" );
             String log = FileUtils.readFileToString( logFile );
-            System.out.println( log );
-            Assert.fail();
+            Assert.fail(log);
         }
         catch ( VerificationException e )
         {
