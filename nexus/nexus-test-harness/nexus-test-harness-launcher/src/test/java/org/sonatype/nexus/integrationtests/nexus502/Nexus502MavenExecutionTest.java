@@ -8,9 +8,14 @@ import org.apache.maven.it.VerificationException;
 import org.apache.maven.it.Verifier;
 import org.junit.Before;
 import org.junit.Test;
+import org.restlet.data.MediaType;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.TestContainer;
+import org.sonatype.nexus.rest.model.UserResource;
+import org.sonatype.nexus.rest.xstream.XStreamInitializer;
 import org.sonatype.nexus.test.utils.UserMessageUtil;
+
+import com.thoughtworks.xstream.XStream;
 
 public class Nexus502MavenExecutionTest
     extends AbstractNexusIntegrationTest
@@ -59,10 +64,20 @@ public class Nexus502MavenExecutionTest
         throws Exception
     {
         // Disable anonymous
-        UserMessageUtil.removeUser( "anonymous" );
+        disableUser( "anonymous" );
 
+        verifier = new Verifier( getTestFile( "maven-project2" ).getAbsolutePath(), false );
+        verifier.resetStreams();
         verifier.executeGoal( "dependency:resolve" );
         verifier.verifyErrorFreeLog();
+    }
+
+    private UserResource disableUser( String userId )
+        throws IOException
+    {
+        UserMessageUtil util =
+            new UserMessageUtil( XStreamInitializer.initialize( new XStream() ), MediaType.APPLICATION_XML );
+        return util.disableUser(userId);
     }
 
     // Depends on nexus-508
@@ -71,7 +86,7 @@ public class Nexus502MavenExecutionTest
     // throws Exception
     // {
     // // Disable anonymous
-    // UserMessageUtil.removeUser( "anonymous" );
+    // disableUser( "anonymous" );
     //
     // List<String> options = new ArrayList<String>();
     // options.add( "-s " + getTestFile( "repositoriesWithAuthentication.xml" ).getAbsolutePath() );

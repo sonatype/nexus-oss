@@ -176,4 +176,18 @@ public class UserMessageUtil
         return status.isSuccess();
     }
 
+    /**
+     * @param userId user to be disable
+     * @return returns the disabled user instance
+     * @throws IOException
+     */
+    public UserResource disableUser( String userId )
+        throws IOException
+    {
+        UserResource user = getUser( "anonymous" );
+        user.setStatus( "disabled" );
+        updateUser( user );
+        return user;
+    }
+
 }
