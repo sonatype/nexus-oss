@@ -10,6 +10,7 @@ import junit.framework.Assert;
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.it.VerificationException;
 import org.apache.maven.it.Verifier;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.restlet.data.MediaType;
@@ -39,9 +40,31 @@ public class Nexus502MavenExecutionTest
     {
         verifier = new Verifier( getTestFile( "maven-project" ).getAbsolutePath(), false );
 
-        File mvnRepo = getTestFile( "mvn_repo" );
-        mvnRepo.mkdirs();
-        verifier.setLocalRepo( mvnRepo.getAbsolutePath() );
+        cleanRepository();
+
+        verifier.resetStreams();
+
+        List<String> options = new ArrayList<String>();
+        options.add( "-s " + getTestFile( "repositories.xml" ).getAbsolutePath() );
+        verifier.setCliOptions( options );
+    }
+
+    @After
+    public void cleanRepository()
+        throws IOException
+    {
+        if ( verifier == null )
+        {
+            return;
+        }
+
+        File localRepo = new File( verifier.localRepo );
+        if ( !localRepo.exists() )
+        {
+            Assert.fail( "File not found " + localRepo.getAbsolutePath() );
+        }
+        File nexus502 = new File( localRepo, "nexus502" );
+        FileUtils.deleteDirectory( nexus502 );
 
         verifier.deleteArtifact( "nexus502", "artifact-1", "1.0.0", "jar" );
         verifier.deleteArtifact( "nexus502", "artifact-1", "1.0.0", "pom" );
@@ -51,12 +74,6 @@ public class Nexus502MavenExecutionTest
         verifier.deleteArtifact( "nexus502", "artifact-3", "1.0.0", "pom" );
         verifier.deleteArtifact( "nexus502", "maven-execution", "1.0.0", "jar" );
         verifier.deleteArtifact( "nexus502", "maven-execution", "1.0.0", "pom" );
-
-        verifier.resetStreams();
-
-        List<String> options = new ArrayList<String>();
-        options.add( "-s " + getTestFile( "repositories.xml" ).getAbsolutePath() );
-        verifier.setCliOptions( options );
     }
 
     @Test
