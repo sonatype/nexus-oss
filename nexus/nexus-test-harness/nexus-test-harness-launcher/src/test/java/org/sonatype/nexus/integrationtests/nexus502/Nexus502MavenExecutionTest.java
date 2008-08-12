@@ -18,6 +18,7 @@ import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.rest.model.UserResource;
 import org.sonatype.nexus.rest.xstream.XStreamInitializer;
+import org.sonatype.nexus.test.utils.TestProperties;
 import org.sonatype.nexus.test.utils.UserMessageUtil;
 
 import com.thoughtworks.xstream.XStream;
@@ -39,6 +40,8 @@ public class Nexus502MavenExecutionTest
         throws VerificationException, IOException
     {
         verifier = new Verifier( getTestFile( "maven-project" ).getAbsolutePath(), false );
+        String nexusLocalRepo = getTestFile( "mvn_repo" ).getAbsolutePath();
+        verifier.setLocalRepo( nexusLocalRepo );
 
         cleanRepository();
 
@@ -46,6 +49,7 @@ public class Nexus502MavenExecutionTest
 
         List<String> options = new ArrayList<String>();
         options.add( "-s " + getTestFile( "repositories.xml" ).getAbsolutePath() );
+        options.add( "-Dmaven.repo.local=" + nexusLocalRepo );
         verifier.setCliOptions( options );
     }
 
