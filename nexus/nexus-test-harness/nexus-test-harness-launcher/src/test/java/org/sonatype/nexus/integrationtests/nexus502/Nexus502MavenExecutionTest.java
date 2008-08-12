@@ -98,8 +98,6 @@ public class Nexus502MavenExecutionTest
         // Disable anonymous
         disableUser( "anonymous" );
 
-        verifier = new Verifier( getTestFile( "maven-project2" ).getAbsolutePath(), false );
-        verifier.resetStreams();
         try
         {
             verifier.executeGoal( "dependency:resolve" );
