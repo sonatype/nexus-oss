@@ -21,6 +21,16 @@
         <role>deployment</role>
       </roles>
     </user>
+	<user>
+      <userId>anonymous</userId>
+      <name>Nexus Anonynmous User</name>
+      <password>0a92fab3230134cca6eadd9898325b9b2ae67998</password>
+      <status>active</status>
+      <email>changeme2@yourcompany.com</email>
+      <roles>
+        <role>anonymous</role>
+      </roles>
+    </user>
 
     <user>
       <userId>test-user</userId>

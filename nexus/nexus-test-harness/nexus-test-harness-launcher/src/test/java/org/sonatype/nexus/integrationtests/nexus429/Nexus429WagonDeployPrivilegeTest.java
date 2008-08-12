@@ -14,8 +14,11 @@ import org.apache.maven.wagon.authorization.AuthorizationException;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.util.cli.CommandLineException;
 import org.junit.Test;
+import org.restlet.data.Method;
+import org.restlet.data.Response;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.integrationtests.AbstractPrivilegeTest;
+import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.test.utils.DeployUtils;
 import org.sonatype.nexus.test.utils.MavenDeployer;
@@ -58,9 +61,6 @@ public class Nexus429WagonDeployPrivilegeTest
         TestContainer.getInstance().getTestContext().setUsername( "test-user" );
         TestContainer.getInstance().getTestContext().setPassword( "admin123" );
 
-        // url to upload to
-        String uploadURL = this.getBaseNexusUrl() + "service/local/artifact/maven/content";
-
         // with pom should fail
 
         try
@@ -90,7 +90,15 @@ public class Nexus429WagonDeployPrivilegeTest
         TestContainer.getInstance().getTestContext().setUsername( "test-user" );
         TestContainer.getInstance().getTestContext().setPassword( "admin123" );
 
+        // if this fails it will throw an error
         MavenDeployer.deploy( gav, this.getNexusTestRepoUrl(), fileToDeploy, this.getOverridableFile( "settings.xml" ) );
+        
+        
+        
+        // make sure delete does not work
+        Response response = RequestFacade.sendMessage( "content/repositories/" + this.getTestRepositoryId() + "/" +  this.getTestId(), Method.DELETE );
+        Assert.assertEquals( "Artifact should have been deleted", 401, response.getStatus().getCode() );
+        
 
     }
 
