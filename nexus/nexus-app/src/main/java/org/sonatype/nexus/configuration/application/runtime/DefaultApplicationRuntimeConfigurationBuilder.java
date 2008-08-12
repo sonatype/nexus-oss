@@ -402,6 +402,8 @@ public class DefaultApplicationRuntimeConfigurationBuilder
 
             shadowRepository
                 .setLocalStorage( getLocalRepositoryStorage( shadowRepository.getId(), DEFAULT_LS_PROVIDER ) );
+            
+            return shadowRepository;
         }
         catch ( MalformedURLException e )
         {
