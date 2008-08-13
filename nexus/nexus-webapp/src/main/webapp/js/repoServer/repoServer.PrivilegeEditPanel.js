@@ -783,45 +783,44 @@ Ext.extend(Sonatype.repoServer.PrivilegeEditPanel, Ext.Panel, {
     }
   },
   
-  rowClick : function(grid, rowIndex, e){
-      var rec = grid.store.getAt(rowIndex);
-      
-      if (rec){
-          if ( rec.data.type != "application" ){
-            grid.getTopToolbar().items.get('privilege-delete-btn').enable();
-          }
-          else {
-            grid.getTopToolbar().items.get('privilege-delete-btn').disable();
-          }
-        }
-        else {
-          grid.getTopToolbar().items.get('privilege-delete-btn').enable();
-        }
-      
-      var id = rec.id; //note: rec.id is unique for new resources and equal to resourceURI for existing ones
+  rowClick : function(grid, rowIndex, e) {
+    var rec = grid.store.getAt(rowIndex);
+
+    if (rec) {
+      if (rec.data.type != "application") {
+        grid.getTopToolbar().items.get('privilege-delete-btn').enable();
+      } else {
+        grid.getTopToolbar().items.get('privilege-delete-btn')
+            .disable();
+      }
+
+      var id = rec.id; // note: rec.id is unique for new resources and
+                        // equal to resourceURI for existing ones
       var panel = this.formCards.findById(id);
-      
-      //assumption: new route forms already exist in formCards, so they won't get into this case
-      if(!panel){ //create form and populate current data
-        panel = new Ext.Panel(
-            {
-                html: rec.data.description,
-                border: false,
-                style: 'padding-left: 20px; padding-top: 20px'
-            });
-        
+  
+      // assumption: new route forms already exist in formCards, so they
+      // won't get into this case
+      if (!panel) { // create form and populate current data
+        panel = new Ext.Panel( {
+          html :rec.data.description,
+          border :false,
+          style :'padding-left: 20px; padding-top: 20px'
+        });
+  
         this.formCards.add(panel);
-        
-        //always set active
+  
+        // always set active
         this.formCards.getLayout().setActiveItem(panel);
-        
+  
         panel.doLayout();
-      }
-      else{
-        //always set active
+      } else {
+        // always set active
         this.formCards.getLayout().setActiveItem(panel);
       }
-    },
+    } else {
+      grid.getTopToolbar().items.get('privilege-delete-btn').disable();
+    }
+  },
   
   contextClick : function(grid, index, e){
     this.contextHide();
