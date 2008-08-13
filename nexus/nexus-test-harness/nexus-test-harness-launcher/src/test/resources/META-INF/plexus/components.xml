@@ -17,7 +17,7 @@
         <launcher-class>org.sonatype.appbooter.PlexusContainerHost</launcher-class>
         <configuration>${nexus-plexus-config-file}</configuration>
         <basedir>${nexus-abs-basedir}</basedir>
-        <temp-dir>${project.build.directory}</temp-dir>
+        <temp-dir>${project.build.directory}/appbooter.tmp/</temp-dir>
         <control-port>-1</control-port>
         <platform-file>${nexus-abs-basedir}/lib/plexus-platform-jsw-*.jar</platform-file>
         <class-path-elements>${nexus-abs-basedir}/runtime/apps/nexus/conf, ${nexus-abs-basedir}/runtime/apps/nexus/lib/*.jar</class-path-elements>
