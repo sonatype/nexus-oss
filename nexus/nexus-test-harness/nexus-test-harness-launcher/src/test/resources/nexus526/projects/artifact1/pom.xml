@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>nexus526</groupId>
+  <artifactId>artifact1</artifactId>
+  <name>Artifact 1</name>
+  <version>1.0.0</version>
+  <description/>
+
+    <distributionManagement>
+  	<repository>
+  		<id>nexus-test-harness-repo</id>
+  		<url>${nexus-base-url}service/local/artifact/maven/content</url>
+  		<!--<url>${nexus-base-url}content/repositories/sample-test-case-repo</url>-->
+  	</repository>
+  </distributionManagement>
+
+</project>
