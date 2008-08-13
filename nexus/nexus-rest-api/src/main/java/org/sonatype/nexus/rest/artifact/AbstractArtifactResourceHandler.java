@@ -506,6 +506,8 @@ public class AbstractArtifactResourceHandler
                             }
                             catch ( IllegalArgumentException e )
                             {
+                                getLogger().log( Level.INFO, "Cannot upload!", e );
+
                                 getResponse().setStatus( Status.CLIENT_ERROR_BAD_REQUEST, e.getMessage() );
 
                                 return;
