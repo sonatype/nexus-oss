@@ -4,12 +4,12 @@
 <head profile="http://selenium-ide.openqa.org/profiles/test-case">
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <link rel="selenium.base" href="http://localhost:8081/nexus/" />
-<title>automated script Two</title>
+<title>Nexus Automated Test Script</title>
 </head>
 <body>
 <table cellpadding="1" cellspacing="1" border="1">
 <thead>
-<tr><td rowspan="1" colspan="3">automated script Two</td></tr>
+<tr><td rowspan="1" colspan="3">Nexus Automated Test Script</td></tr>
 </thead><tbody>
 <tr>
 	<td>click</td>
@@ -25,6 +25,11 @@
 	<td>type</td>
 	<td>passwordfield</td>
 	<td>test</td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>1000</td>
+	<td>1000</td>
 </tr>
 <tr>
 	<td>click</td>
@@ -133,22 +138,22 @@
 </tr>
 <tr>
 	<td>click</td>
-	<td>//div[2]/div[1]/div/table/tbody/tr/td[2]/table/tbody/tr/td[2]/em/button</td>
+	<td>//button[text()='Add']</td>
 	<td></td>
 </tr>
 <tr>
 	<td>type</td>
-	<td>document.forms[1].elements[1]</td>
+	<td>//input[@name='name']</td>
 	<td>Test Privilige</td>
 </tr>
 <tr>
 	<td>click</td>
-	<td>//div[2]/div[2]/div[2]/div/div/div/div/div/table/tbody/tr/td[1]/table/tbody/tr/td[2]/em/button</td>
+	<td>//button[text()='Save']</td>
 	<td></td>
 </tr>
 <tr>
 	<td>pause</td>
-	<td>500</td>
+	<td>1000</td>
 	<td></td>
 </tr>
 <tr>
@@ -158,17 +163,12 @@
 </tr>
 <tr>
 	<td>type</td>
-	<td>document.forms[1].elements[2]</td>
+	<td>//input[@name='description']</td>
 	<td>This is a test privilege</td>
 </tr>
 <tr>
-	<td>click</td>
-	<td>//form/div[5]/div[1]/div[1]/img[1]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>click</td>
-	<td>//div[29]/div/div[2]</td>
+	<td>mouseDown</td>
+	<td>//input[@name='repositoryTargetId']</td>
 	<td></td>
 </tr>
 <tr>
@@ -177,28 +177,33 @@
 	<td></td>
 </tr>
 <tr>
-	<td>verifyTextPresent</td>
-	<td>One or more method(s) are required</td>
+	<td>click</td>
+	<td>//div/div[text()='All (Maven1)']</td>
 	<td></td>
 </tr>
 <tr>
 	<td>click</td>
-	<td>//a/span</td>
+	<td>//a/span[text()='Read']</td>
 	<td></td>
 </tr>
 <tr>
 	<td>click</td>
-	<td>document.forms[1].elements[6]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>click</td>
-	<td>//div[2]/div[2]/div[2]/div/div/div/div/div/table/tbody/tr/td[1]/table/tbody/tr/td[2]/em/button</td>
+	<td>//button[@style='background-image: url(/nexus/ext-2.0.2/resources/images/default/grid/page-prev.gif);']</td>
 	<td></td>
 </tr>
 <tr>
 	<td>pause</td>
-	<td>500</td>
+	<td>1000</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//button[text()='Save']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>1000</td>
 	<td></td>
 </tr>
 <tr>
@@ -218,12 +223,12 @@
 </tr>
 <tr>
 	<td>click</td>
-	<td>//div[4]/div/div/div[1]/div[2]/div[1]/div/table/tbody/tr/td[2]/table/tbody/tr/td[2]/em/button</td>
+	<td>//table[@id='role-add-btn']/tbody/tr/td[2]/em/button</td>
 	<td></td>
 </tr>
 <tr>
 	<td>pause</td>
-	<td>500</td>
+	<td>1000</td>
 	<td></td>
 </tr>
 <tr>
@@ -243,17 +248,12 @@
 </tr>
 <tr>
 	<td>click</td>
-	<td>document.forms[1].elements[4]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>click</td>
 	<td>//a/span</td>
 	<td></td>
 </tr>
 <tr>
 	<td>click</td>
-	<td>document.forms[1].elements[4]</td>
+	<td>document.forms[0].elements[4]</td>
 	<td></td>
 </tr>
 <tr>
@@ -263,37 +263,7 @@
 </tr>
 <tr>
 	<td>pause</td>
-	<td>500</td>
-	<td></td>
-</tr>
-<tr>
-	<td>click</td>
-	<td>//table[@id='role-refresh-btn']/tbody/tr/td[2]/em/button</td>
-	<td></td>
-</tr>
-<tr>
-	<td>pause</td>
-	<td>500</td>
-	<td></td>
-</tr>
-<tr>
-	<td>click</td>
-	<td>st-roles-grid_http://localhost:8081/nexus/service/local/roles/11bb7c54971_col0</td>
-	<td></td>
-</tr>
-<tr>
-	<td>type</td>
-	<td>document.forms[1].elements[3]</td>
-	<td>15</td>
-</tr>
-<tr>
-	<td>click</td>
-	<td>//div[2]/div[2]/div[2]/div/div/div/div/div/table/tbody/tr/td[1]/table/tbody/tr/td[2]/em/button</td>
-	<td></td>
-</tr>
-<tr>
-	<td>pause</td>
-	<td>500</td>
+	<td>1000</td>
 	<td></td>
 </tr>
 <tr>
@@ -323,7 +293,7 @@
 </tr>
 <tr>
 	<td>verifyTextPresent</td>
-	<td>Select a user to edit it, or click &quot;Add&quot; to create a new one.</td>
+	<td>Select a user to edit it</td>
 	<td></td>
 </tr>
 <tr>
@@ -338,7 +308,7 @@
 </tr>
 <tr>
 	<td>type</td>
-	<td>name</td>
+	<td>document.forms[1].elements[1]</td>
 	<td>User One</td>
 </tr>
 <tr>
@@ -347,8 +317,18 @@
 	<td>koconnor@sonatype.com</td>
 </tr>
 <tr>
+	<td>mouseDown</td>
+	<td>//input[@name='status']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
 	<td>click</td>
-	<td>//div[39]/div/div[1]</td>
+	<td>//div/div[text()='Active']</td>
 	<td></td>
 </tr>
 <tr>
@@ -358,7 +338,7 @@
 </tr>
 <tr>
 	<td>click</td>
-	<td>//li[4]/div/a/span</td>
+	<td>document.forms[1].elements[4]</td>
 	<td></td>
 </tr>
 <tr>
@@ -418,7 +398,7 @@
 </tr>
 <tr>
 	<td>click</td>
-	<td>//div[42]/div/div[1]</td>
+	<td>//div/div[text()='True']</td>
 	<td></td>
 </tr>
 <tr>
@@ -453,7 +433,7 @@
 </tr>
 <tr>
 	<td>type</td>
-	<td>document.forms[3].elements[2]</td>
+	<td>name</td>
 	<td>Task One</td>
 </tr>
 <tr>
@@ -463,22 +443,7 @@
 </tr>
 <tr>
 	<td>click</td>
-	<td>//div[57]/div/div[7]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>click</td>
-	<td>//div[58]/div/div[1]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>click</td>
-	<td>//div[59]/div/div[2]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>click</td>
-	<td>//div[8]/div/div/div[2]/div[2]/div/div[2]/div[2]/div[2]/div/div/div/div/div/table/tbody/tr/td[1]/table/tbody/tr/td[2]/em/button</td>
+	<td>//div/div[text()='Reindex Repositories']</td>
 	<td></td>
 </tr>
 <tr>
@@ -497,11 +462,6 @@
 	<td></td>
 </tr>
 <tr>
-	<td>pause</td>
-	<td>50000</td>
-	<td></td>
-</tr>
-<tr>
 	<td>type</td>
 	<td>quick-search--field</td>
 	<td>maven</td>
@@ -513,7 +473,7 @@
 </tr>
 <tr>
 	<td>pause</td>
-	<td>2000</td>
+	<td>5000</td>
 	<td></td>
 </tr>
 <tr>
@@ -532,31 +492,6 @@
 	<td></td>
 </tr>
 <tr>
-	<td>click</td>
-	<td>login-link</td>
-	<td></td>
-</tr>
-<tr>
-	<td>type</td>
-	<td>usernamefield</td>
-	<td>admin</td>
-</tr>
-<tr>
-	<td>type</td>
-	<td>passwordfield</td>
-	<td>admin123</td>
-</tr>
-<tr>
-	<td>click</td>
-	<td>loginbutton</td>
-	<td></td>
-</tr>
-<tr>
-	<td>pause</td>
-	<td>1000</td>
-	<td>1000</td>
-</tr>
-<tr>
 	<td>mouseDown</td>
 	<td>open-system-changes</td>
 	<td></td>
@@ -567,8 +502,13 @@
 	<td></td>
 </tr>
 <tr>
+	<td>pause</td>
+	<td>500</td>
+	<td>500</td>
+</tr>
+<tr>
 	<td>click</td>
-	<td>st-feeds-grid_http://localhost:8081/nexus/service/local/feeds/recentChanges_col0</td>
+	<td>//div[5]/table/tbody/tr/td[1]/div</td>
 	<td></td>
 </tr>
 <tr>
@@ -595,6 +535,46 @@
 	<td>verifyTextPresent</td>
 	<td>Reindexing</td>
 	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>login-link</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>usernamefield</td>
+	<td>admin</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>passwordfield</td>
+	<td>admin123</td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>1000</td>
+	<td>1000</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>loginbutton</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>1000</td>
+	<td>1000</td>
 </tr>
 <tr>
 	<td>mouseDown</td>
@@ -728,17 +708,17 @@
 </tr>
 <tr>
 	<td>click</td>
-	<td>//li[2]/div/img[1]</td>
+	<td>//li/ul/li/div/img[1]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>click</td>
-	<td>//li[2]/ul/li/div/img[1]</td>
+	<td>//li/ul/li/ul/li/div/img[1]</td>
 	<td></td>
 </tr>
 <tr>
 	<td>click</td>
-	<td>//li[2]/ul/li/ul/li/div/img[1]</td>
+	<td>//li/ul/li/ul/li/ul/li/div/img[1]</td>
 	<td></td>
 </tr>
 <tr>
