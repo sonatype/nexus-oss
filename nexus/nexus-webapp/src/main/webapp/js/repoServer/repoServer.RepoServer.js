@@ -491,6 +491,7 @@ Sonatype.repoServer.RepoServer = function(){
 
 //            Sonatype.state.CookieProvider.clear('authToken');
 //            Sonatype.state.CookieProvider.clear('username');
+            Sonatype.utils.clearCookie('JSESSIONID');
             
             this.resetMainTabPanel();
             Sonatype.user.curr = Sonatype.utils.cloneObj(Sonatype.user.anon);

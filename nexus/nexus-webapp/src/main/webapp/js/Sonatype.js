@@ -37,10 +37,8 @@ window.Sonatype = function(){
       
       Sonatype.utils.clearCookie('JSESSIONID');
       
-      Sonatype.utils.loadNexusStatus( this, function() {
-        Sonatype.user.anon.repoServer = Sonatype.utils.cloneObj(Sonatype.user.curr.repoServer);
-      });
-      
+      Sonatype.utils.loadNexusStatus();
+
       if ( username && false ) {
         Ext.Ajax.request({
           scope: this,
