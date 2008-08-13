@@ -60,7 +60,7 @@ public class WeeklySchedulerIterator
         {
             getCalendar().add( Calendar.DAY_OF_WEEK, 1 );
 
-            while ( weekdaysToRun.contains( getCalendar().get( Calendar.DAY_OF_WEEK ) ) )
+            while ( !weekdaysToRun.contains( getCalendar().get( Calendar.DAY_OF_WEEK ) ) )
             {
                 getCalendar().add( Calendar.DAY_OF_WEEK, 1 );
             }

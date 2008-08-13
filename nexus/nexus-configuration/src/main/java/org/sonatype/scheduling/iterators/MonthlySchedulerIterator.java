@@ -60,7 +60,8 @@ public class MonthlySchedulerIterator
         {
             getCalendar().add( Calendar.DAY_OF_MONTH, 1 );
 
-            while ( monthdaysToRun.contains( getCalendar().get( Calendar.DAY_OF_MONTH ) ) )
+            // step over the days not in when to run
+            while ( !monthdaysToRun.contains( getCalendar().get( Calendar.DAY_OF_MONTH ) ) )
             {
                 getCalendar().add( Calendar.DAY_OF_MONTH, 1 );
             }

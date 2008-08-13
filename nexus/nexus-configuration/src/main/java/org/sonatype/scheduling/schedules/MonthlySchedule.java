@@ -29,6 +29,8 @@ import org.sonatype.scheduling.iterators.SchedulerIterator;
 public class MonthlySchedule
     extends AbstractSchedule
 {
+    public static final Integer DAY_OF_MONTH_LAST = new Integer( 999 );
+
     private final Set<Integer> daysToRun;
 
     public MonthlySchedule( Date startDate, Date endDate, Set<Integer> daysToRun )

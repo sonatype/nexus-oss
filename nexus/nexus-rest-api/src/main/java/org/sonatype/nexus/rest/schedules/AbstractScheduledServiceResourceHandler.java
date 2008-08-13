@@ -123,8 +123,6 @@ public class AbstractScheduledServiceResourceHandler
      */
     public static final String PROPERTY_TYPE_REPO_OR_GROUP = "repo-or-group";
 
-    public static final Integer DAY_OF_MONTH_LAST = new Integer( 999 );
-
     private DateFormat timeFormat = new SimpleDateFormat( "HH:mm" );
 
     protected Map<Class<?>, String> serviceNames = new HashMap<Class<?>, String>();
@@ -314,7 +312,7 @@ public class AbstractScheduledServiceResourceHandler
 
         for ( Integer day : days )
         {
-            if ( DAY_OF_MONTH_LAST.equals( day ) )
+            if ( MonthlySchedule.DAY_OF_MONTH_LAST.equals( day ) )
             {
                 list.add( "last" );
             }
@@ -335,7 +333,7 @@ public class AbstractScheduledServiceResourceHandler
         {
             if ( "last".equals( day ) )
             {
-                set.add( DAY_OF_MONTH_LAST );
+                set.add( MonthlySchedule.DAY_OF_MONTH_LAST );
             }
             else
             {
