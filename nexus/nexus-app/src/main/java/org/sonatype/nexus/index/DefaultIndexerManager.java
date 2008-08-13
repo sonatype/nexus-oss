@@ -456,63 +456,81 @@ public class DefaultIndexerManager
                 }
                 catch ( NoSuchRepositoryException e )
                 {
+                    // TODO: heee?
                     shouldDownloadRemoteIndex = false;
                 }
 
-                if ( shouldDownloadRemoteIndex )
+                RepositoryItemUid propsUid = repository.createUid( "/.index/" + IndexingContext.INDEX_FILE
+                    + ".properties" );
+
+                RepositoryItemUid zipUid = repository.createUid( "/.index/" + IndexingContext.INDEX_FILE + ".zip" );
+
+                try
                 {
-                    RepositoryItemUid propsUid = null;
-
-                    RepositoryItemUid zipUid = null;
-
-                    try
+                    if ( shouldDownloadRemoteIndex )
                     {
-                        getLogger().info( "Trying to get remote index for repository " + repository.getId() );
+                        try
+                        {
+                            getLogger().info( "Trying to get remote index for repository " + repository.getId() );
 
-                        // this will force redownload
-                        repository.clearCaches( "/.index" );
+                            // this will force redownload
+                            repository.clearCaches( "/.index" );
 
-                        propsUid = repository
-                            .createUid( "/.index/" + IndexingContext.INDEX_FILE + ".properties" );
+                            StorageFileItem fitem = (StorageFileItem) repository.retrieveItem( false, propsUid, ctx );
 
-                        StorageFileItem fitem = (StorageFileItem) repository.retrieveItem( false, propsUid, ctx );
+                            fitem = (StorageFileItem) repository.retrieveItem( false, zipUid, ctx );
 
-                        zipUid = repository.createUid( "/.index/" + IndexingContext.INDEX_FILE + ".zip" );
+                            RAMDirectory directory = new RAMDirectory();
 
-                        fitem = (StorageFileItem) repository.retrieveItem( false, zipUid, ctx );
+                            BufferedInputStream is = new BufferedInputStream( fitem.getInputStream(), 4096 );
 
-                        RAMDirectory directory = new RAMDirectory();
+                            IndexUtils.unpackIndexArchive( is, directory );
 
-                        BufferedInputStream is = new BufferedInputStream( fitem.getInputStream(), 4096 );
+                            IndexingContext context = nexusIndexer.getIndexingContexts().get(
+                                getRemoteContextId( repository.getId() ) );
 
-                        IndexUtils.unpackIndexArchive( is, directory );
+                            context.replace( directory );
 
+                            context.updateTimestamp();
+
+                            getLogger().info(
+                                "Remote indexes published and imported succesfully for repository "
+                                    + repository.getId() );
+
+                            hasRemoteIndex = true;
+                        }
+                        catch ( ItemNotFoundException e )
+                        {
+                            getLogger().info(
+                                "Repository " + repository.getId()
+                                    + " has no available remote indexes but it is set to download them." );
+
+                            hasRemoteIndex = false;
+                        }
+                        catch ( Exception e )
+                        {
+                            getLogger().warn( "Cannot fetch remote index:", e );
+
+                            hasRemoteIndex = false;
+
+                        }
+                    }
+                    else
+                    {
+                        // make empty the remote context
                         IndexingContext context = nexusIndexer.getIndexingContexts().get(
                             getRemoteContextId( repository.getId() ) );
 
-                        context.replace( directory );
-
-                        context.updateTimestamp();
-
-                        getLogger().info(
-                            "Remote indexes published and imported succesfully for repository " + repository.getId() );
-
-                        hasRemoteIndex = true;
-                    }
-                    catch ( ItemNotFoundException e )
-                    {
-                        getLogger().info(
-                            "Repository " + repository.getId()
-                                + " has no available remote indexes but it is set to download them." );
+                        context.purge();
 
                         hasRemoteIndex = false;
                     }
-                    catch ( Exception e )
+
+                    // clean up then
+                    // if was exception, to clean partially downloaded stuff
+                    // if was downloadRemoteIndexes false, to remove obsolete files
+                    if ( !hasRemoteIndex )
                     {
-                        getLogger().warn( "Cannot fetch remote index:", e );
-
-                        hasRemoteIndex = false;
-
                         // delete the potentially partially downloaded files
                         if ( propsUid != null )
                         {
@@ -526,7 +544,7 @@ public class DefaultIndexerManager
                             }
                             catch ( Exception ex )
                             {
-                                getLogger().warn( "Cannot delete index part:", e );
+                                getLogger().warn( "Cannot delete index part:", ex );
                             }
                         }
 
@@ -543,16 +561,16 @@ public class DefaultIndexerManager
                             }
                             catch ( Exception ex )
                             {
-                                getLogger().warn( "Cannot delete index part:", e );
+                                getLogger().warn( "Cannot delete index part:", ex );
                             }
                         }
                     }
-                    finally
-                    {
-                        repository.releaseUid( propsUid );
-                        
-                        repository.releaseUid( zipUid );
-                    }
+                }
+                finally
+                {
+                    repository.releaseUid( propsUid );
+
+                    repository.releaseUid( zipUid );
                 }
             }
 
