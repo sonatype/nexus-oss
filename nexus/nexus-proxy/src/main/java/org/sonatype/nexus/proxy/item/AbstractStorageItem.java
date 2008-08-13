@@ -116,7 +116,7 @@ public abstract class AbstractStorageItem
     {
         this( path, readable, writable );
         this.store = repository;
-        this.repositoryItemUid = repository.createUidForPath( path );
+        this.repositoryItemUid = repository.createUid( path );
         this.repositoryId = repository.getId();
     }
 

@@ -131,7 +131,7 @@ public abstract class ShadowRepository
                     }
                     else if ( ievt instanceof RepositoryItemEventDelete )
                     {
-                        deleteItem( createUidForPath( shadowPath ), ievt.getContext() );
+                        deleteItem( createUid( shadowPath ), ievt.getContext() );
                     }
                 }
                 catch ( Exception e )
@@ -166,7 +166,7 @@ public abstract class ShadowRepository
             }
 
             // delegate the call to the master
-            RepositoryItemUid tuid = getMasterRepository().createUidForPath( transformedPath );
+            RepositoryItemUid tuid = getMasterRepository().createUid( transformedPath );
 
             return ( (AbstractRepository) getMasterRepository() ).doRetrieveItem( localOnly, tuid, context );
         }

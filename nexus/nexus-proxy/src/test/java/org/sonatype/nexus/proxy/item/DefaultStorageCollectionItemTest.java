@@ -36,8 +36,8 @@ public class DefaultStorageCollectionItemTest
     public void testNonVirtualCollectionSimple()
     {
         expect( repository.getId() ).andReturn( "dummy" ).anyTimes();
-        expect( repository.createUidForPath( "/" ) ).andReturn(
-            getRepositoryItemUidFactory().createUid( repository, "/" ) );
+        expect( repository.createUid( "/" ) ).andReturn(
+            new DefaultRepositoryItemUid(getRepositoryItemUidFactory(), repository, "/" ) );
 
         replay( repository );
 
@@ -51,14 +51,14 @@ public class DefaultStorageCollectionItemTest
         List<StorageItem> result = new ArrayList<StorageItem>();
 
         expect( repository.getId() ).andReturn( "dummy" ).anyTimes();
-        expect( repository.createUidForPath( "/a/some/dir/coll" ) ).andReturn(
-            getRepositoryItemUidFactory().createUid( repository, "/a/some/dir/coll" ) );
-        expect( repository.createUidForPath( "/a/some/dir/coll/A" ) ).andReturn(
-            getRepositoryItemUidFactory().createUid( repository, "/a/some/dir/coll/A" ) );
-        expect( repository.createUidForPath( "/a/some/dir/coll/B" ) ).andReturn(
-            getRepositoryItemUidFactory().createUid( repository, "/a/some/dir/coll/B" ) );
-        expect( repository.createUidForPath( "/a/some/dir/coll/C" ) ).andReturn(
-            getRepositoryItemUidFactory().createUid( repository, "/a/some/dir/coll/C" ) );
+        expect( repository.createUid( "/a/some/dir/coll" ) ).andReturn(
+            new DefaultRepositoryItemUid(getRepositoryItemUidFactory(),  repository, "/a/some/dir/coll" ) );
+        expect( repository.createUid( "/a/some/dir/coll/A" ) ).andReturn(
+            new DefaultRepositoryItemUid(getRepositoryItemUidFactory(),  repository, "/a/some/dir/coll/A" ) );
+        expect( repository.createUid( "/a/some/dir/coll/B" ) ).andReturn(
+            new DefaultRepositoryItemUid(getRepositoryItemUidFactory(),  repository, "/a/some/dir/coll/B" ) );
+        expect( repository.createUid( "/a/some/dir/coll/C" ) ).andReturn(
+            new DefaultRepositoryItemUid(getRepositoryItemUidFactory(),  repository, "/a/some/dir/coll/C" ) );
         expect( repository.list( isA( ResourceStoreRequest.class ) ) ).andReturn( result );
 
         replay( repository );

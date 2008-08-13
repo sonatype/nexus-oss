@@ -473,11 +473,11 @@ public class DefaultIndexerManager
                         repository.clearCaches( "/.index" );
 
                         propsUid = repository
-                            .createUidForPath( "/.index/" + IndexingContext.INDEX_FILE + ".properties" );
+                            .createUid( "/.index/" + IndexingContext.INDEX_FILE + ".properties" );
 
                         StorageFileItem fitem = (StorageFileItem) repository.retrieveItem( false, propsUid, ctx );
 
-                        zipUid = repository.createUidForPath( "/.index/" + IndexingContext.INDEX_FILE + ".zip" );
+                        zipUid = repository.createUid( "/.index/" + IndexingContext.INDEX_FILE + ".zip" );
 
                         fitem = (StorageFileItem) repository.retrieveItem( false, zipUid, ctx );
 
@@ -549,9 +549,9 @@ public class DefaultIndexerManager
                     }
                     finally
                     {
-                        repository.release( propsUid );
+                        repository.releaseUid( propsUid );
                         
-                        repository.release( zipUid );
+                        repository.releaseUid( zipUid );
                     }
                 }
             }

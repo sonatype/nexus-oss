@@ -28,6 +28,7 @@ import java.io.ByteArrayInputStream;
 
 import org.codehaus.plexus.util.FileUtils;
 import org.sonatype.nexus.proxy.AbstractNexusTestEnvironment;
+import org.sonatype.nexus.proxy.item.DefaultRepositoryItemUid;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.repository.Repository;
@@ -58,20 +59,20 @@ public class DefaultAttributeStorageTest
 
         RepositoryItemUid uid = createMock( RepositoryItemUid.class );
 
-        uid.lock();
-        uid.unlock();
-
         expect( uid.getRepository() ).andReturn( repository ).anyTimes();
         expect( uid.getPath() ).andReturn( "/a.txt" ).anyTimes();
 
         expect( repository.getId() ).andReturn( "dummy" ).anyTimes();
 
-        expect( repository.createUidForPath( "/a.txt" ) ).andReturn(
-            getRepositoryItemUidFactory().createUid( repository, "/a.txt" ) );
-        expect( repository.createUidForPath( "/b.txt" ) ).andReturn(
-            getRepositoryItemUidFactory().createUid( repository, "/b.txt" ) );
+        expect( repository.createUid( "/a.txt" ) ).andReturn(
+            new DefaultRepositoryItemUid(getRepositoryItemUidFactory(),  repository, "/a.txt" ) );
+        expect( repository.createUid( "/b.txt" ) ).andReturn(
+            new DefaultRepositoryItemUid(getRepositoryItemUidFactory(),  repository, "/b.txt" ) );
 
         replay( repository );
+        
+        getRepositoryItemUidFactory().createUid( repository, "/a.txt" );
+        getRepositoryItemUidFactory().createUid( repository, "/b.txt" );
 
         replay( uid );
     }

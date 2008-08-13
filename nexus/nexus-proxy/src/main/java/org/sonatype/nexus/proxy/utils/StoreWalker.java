@@ -169,7 +169,7 @@ public abstract class StoreWalker
                 // we are dealing with repository
                 // this way we avoid security context processing!!!
                 // TODO: enable somehow ability to pass-over the req context!
-                RepositoryItemUid uid = ( (Repository) store ).createUidForPath( fromPath );
+                RepositoryItemUid uid = ( (Repository) store ).createUid( fromPath );
 
                 item = ( (Repository) store ).retrieveItem( localOnly, uid, null );
             }

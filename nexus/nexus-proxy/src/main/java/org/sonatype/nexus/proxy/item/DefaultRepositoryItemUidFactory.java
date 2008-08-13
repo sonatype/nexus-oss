@@ -1,5 +1,8 @@
 package org.sonatype.nexus.proxy.item;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.codehaus.plexus.util.StringUtils;
@@ -23,6 +26,10 @@ public class DefaultRepositoryItemUidFactory
      */
     private RepositoryRegistry repositoryRegistry;
 
+    private final ConcurrentHashMap<String, List<RepositoryItemUid>> uidMap = new ConcurrentHashMap<String, List<RepositoryItemUid>>();
+
+    private final ConcurrentHashMap<String, ReentrantLock> lockMap = new ConcurrentHashMap<String, ReentrantLock>();
+
     public RepositoryItemUid createUid( Repository repository, String path )
     {
         // path corrections
@@ -38,10 +45,12 @@ public class DefaultRepositoryItemUidFactory
             path = RepositoryItemUid.PATH_ROOT;
         }
 
-        // get the lock
-        ReentrantLock lock = null;
+        RepositoryItemUid result = new DefaultRepositoryItemUid( this, repository, path );
 
-        return new DefaultRepositoryItemUid( lock, repository, path );
+        // get the lock
+        register( result );
+
+        return result;
     }
 
     public RepositoryItemUid createUid( String uidStr )
@@ -71,18 +80,59 @@ public class DefaultRepositoryItemUidFactory
         }
     }
 
-    public void release( RepositoryItemUid uid )
+    public void releaseUid( RepositoryItemUid uid )
     {
-        if ( uid instanceof DefaultRepositoryItemUid )
-        {
-            ReentrantLock lock = ( (DefaultRepositoryItemUid) uid ).getLock();
-        }
+        deregister( uid );
+    }
+
+    public void lock( RepositoryItemUid uid )
+    {
+        lockMap.get( uid.toString() ).lock();
+    }
+
+    public void unlock( RepositoryItemUid uid )
+    {
+        lockMap.get( uid.toString() ).unlock();
     }
 
     public int getLockCount()
     {
-        // TODO Auto-generated method stub
-        return 0;
+        return lockMap.size();
+    }
+
+    // =====
+
+    private synchronized void register( RepositoryItemUid uid )
+    {
+        String key = uid.toString();
+
+        // maintain locks
+        ReentrantLock lock = new ReentrantLock();
+
+        lockMap.putIfAbsent( key, lock );
+
+        // maintain uidlists
+        ArrayList<RepositoryItemUid> uidList = new ArrayList<RepositoryItemUid>();
+
+        uidMap.putIfAbsent( key, uidList );
+
+        uidMap.get( key ).add( uid );
+    }
+
+    private synchronized void deregister( RepositoryItemUid uid )
+    {
+        String key = uid.toString();
+
+        // maintain uidlists
+        if ( uidMap.get( key ).remove( uid ) )
+        {
+            if ( uidMap.get( key ).size() == 0 )
+            {
+                uidMap.remove( key );
+
+                lockMap.remove( key );
+            }
+        }
     }
 
 }

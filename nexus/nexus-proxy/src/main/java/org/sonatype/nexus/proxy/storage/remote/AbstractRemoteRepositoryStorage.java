@@ -124,7 +124,7 @@ public abstract class AbstractRemoteRepositoryStorage
     public boolean isReachable( Repository repository )
         throws StorageException
     {
-        return containsItem( repository.createUidForPath( RepositoryItemUid.PATH_ROOT ) );
+        return containsItem( repository.createUid( RepositoryItemUid.PATH_ROOT ) );
     }
 
     public boolean containsItem( RepositoryItemUid uid )

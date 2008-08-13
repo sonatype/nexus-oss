@@ -20,7 +20,8 @@
  */
 package org.sonatype.nexus.proxy.item;
 
-import static org.easymock.EasyMock.*;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.isA;
 import static org.easymock.EasyMock.replay;
 
 import java.io.ByteArrayInputStream;
@@ -35,12 +36,16 @@ public class DefaultStorageFileItemTest
         throws Exception
     {
         expect( repository.getId() ).andReturn( "dummy" ).anyTimes();
-        expect( repository.createUidForPath( "/a.txt" ) ).andReturn(
-            getRepositoryItemUidFactory().createUid( repository, "/a.txt" ) );
+        expect( repository.createUid( "/a.txt" ) ).andReturn(
+            new DefaultRepositoryItemUid( getRepositoryItemUidFactory(), repository, "/a.txt" ) );
         expect( repository.retrieveItemContent( isA( RepositoryItemUid.class ) ) ).andReturn(
             new ByteArrayInputStream( "/a.txt".getBytes() ) );
 
         replay( repository );
+        
+        getRepositoryItemUidFactory().createUid( repository, "/a.txt" );
+        
+        //
 
         DefaultStorageFileItem file = new DefaultStorageFileItem( repository, "/a.txt", true, true );
         checkAbstractStorageItem( repository, file, false, "a.txt", "/a.txt", "/" );
@@ -55,12 +60,16 @@ public class DefaultStorageFileItemTest
         throws Exception
     {
         expect( repository.getId() ).andReturn( "dummy" ).anyTimes();
-        expect( repository.createUidForPath( "/a.txt" ) ).andReturn(
-            getRepositoryItemUidFactory().createUid( repository, "/a.txt" ) );
+        expect( repository.createUid( "/a.txt" ) ).andReturn(
+            new DefaultRepositoryItemUid(getRepositoryItemUidFactory(), repository, "/a.txt" ) );
         expect( repository.retrieveItemContent( isA( RepositoryItemUid.class ) ) ).andReturn(
             new ByteArrayInputStream( "/a.txt".getBytes() ) );
 
         replay( repository );
+
+        getRepositoryItemUidFactory().createUid( repository, "/a.txt" );
+        
+        //
         
         DefaultStorageFileItem file = new DefaultStorageFileItem(
             repository,
@@ -82,12 +91,16 @@ public class DefaultStorageFileItemTest
         throws Exception
     {
         expect( repository.getId() ).andReturn( "dummy" ).anyTimes();
-        expect( repository.createUidForPath( "/some/dir/hierarchy/a.txt" ) ).andReturn(
-            getRepositoryItemUidFactory().createUid( repository, "/some/dir/hierarchy/a.txt" ) );
+        expect( repository.createUid( "/some/dir/hierarchy/a.txt" ) ).andReturn(
+            new DefaultRepositoryItemUid(getRepositoryItemUidFactory(), repository, "/some/dir/hierarchy/a.txt" ) );
         expect( repository.retrieveItemContent( isA( RepositoryItemUid.class ) ) ).andReturn(
             new ByteArrayInputStream( "/some/dir/hierarchy/a.txt".getBytes() ) );
 
         replay( repository );
+        
+        getRepositoryItemUidFactory().createUid( repository, "/some/dir/hierarchy/a.txt"  );
+
+        //
         
         DefaultStorageFileItem file = new DefaultStorageFileItem( repository, "/some/dir/hierarchy/a.txt", true, true );
         checkAbstractStorageItem( repository, file, false, "a.txt", "/some/dir/hierarchy/a.txt", "/some/dir/hierarchy" );
@@ -102,12 +115,16 @@ public class DefaultStorageFileItemTest
         throws Exception
     {
         expect( repository.getId() ).andReturn( "dummy" ).anyTimes();
-        expect( repository.createUidForPath( "/some/dir/hierarchy/a.txt" ) ).andReturn(
-            getRepositoryItemUidFactory().createUid( repository, "/some/dir/hierarchy/a.txt" ) );
+        expect( repository.createUid( "/some/dir/hierarchy/a.txt" ) ).andReturn(
+            new DefaultRepositoryItemUid(getRepositoryItemUidFactory(), repository, "/some/dir/hierarchy/a.txt" ) );
         expect( repository.retrieveItemContent( isA( RepositoryItemUid.class ) ) ).andReturn(
             new ByteArrayInputStream( "/some/dir/hierarchy/a.txt".getBytes() ) );
 
         replay( repository );
+        
+        getRepositoryItemUidFactory().createUid( repository, "/some/dir/hierarchy/a.txt"  );
+
+        //
         
         DefaultStorageFileItem file = new DefaultStorageFileItem(
             repository,

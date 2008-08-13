@@ -260,7 +260,7 @@ public class ConstrainedM2ShadowRepository
 
         deleteItem( uid, context );
 
-        RepositoryItemUid sha1Uid = createUidForPath( uid.getPath() + ".sha1" );
+        RepositoryItemUid sha1Uid = createUid( uid.getPath() + ".sha1" );
 
         try
         {
@@ -271,7 +271,7 @@ public class ConstrainedM2ShadowRepository
             // ignore not found
         }
 
-        RepositoryItemUid md5Uid = createUidForPath( uid.getPath() + ".md5" );
+        RepositoryItemUid md5Uid = createUid( uid.getPath() + ".md5" );
 
         try
         {

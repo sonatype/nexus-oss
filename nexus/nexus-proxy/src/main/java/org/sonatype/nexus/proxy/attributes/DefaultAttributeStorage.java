@@ -36,6 +36,7 @@ import org.sonatype.nexus.proxy.item.DefaultStorageCollectionItem;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.DefaultStorageLinkItem;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
+import org.sonatype.nexus.proxy.item.RepositoryItemUidFactory;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 
 import com.thoughtworks.xstream.XStream;
@@ -51,11 +52,15 @@ public class DefaultAttributeStorage
     extends LoggingComponent
     implements AttributeStorage, Initializable
 {
-
     /**
      * @plexus.requirement
      */
     private ApplicationConfiguration applicationConfiguration;
+
+    /**
+     * @plexus.requirement
+     */
+    private RepositoryItemUidFactory repositoryItemUidFactory;
 
     /**
      * The base dir.
@@ -129,7 +134,7 @@ public class DefaultAttributeStorage
 
     public boolean deleteAttributes( RepositoryItemUid uid )
     {
-        uid.lock();
+        repositoryItemUidFactory.lock( uid );
 
         try
         {
@@ -155,13 +160,13 @@ public class DefaultAttributeStorage
         }
         finally
         {
-            uid.unlock();
+            repositoryItemUidFactory.unlock( uid );
         }
     }
 
     public AbstractStorageItem getAttributes( RepositoryItemUid uid )
     {
-        uid.lock();
+        repositoryItemUidFactory.lock( uid );
 
         try
         {
@@ -186,13 +191,15 @@ public class DefaultAttributeStorage
         }
         finally
         {
-            uid.unlock();
+            repositoryItemUidFactory.unlock( uid );
         }
     }
 
     public void putAttribute( AbstractStorageItem item )
     {
-        item.getRepositoryItemUid().lock();
+        RepositoryItemUid origUid = item.getRepositoryItemUid();
+
+        repositoryItemUidFactory.lock( origUid );
 
         try
         {
@@ -261,7 +268,7 @@ public class DefaultAttributeStorage
         }
         finally
         {
-            item.getRepositoryItemUid().unlock();
+            repositoryItemUidFactory.unlock( origUid );
         }
     }
 

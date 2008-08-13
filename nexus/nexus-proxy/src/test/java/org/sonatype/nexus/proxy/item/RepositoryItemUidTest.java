@@ -20,6 +20,7 @@
  */
 package org.sonatype.nexus.proxy.item;
 
+import static org.easymock.EasyMock.*;
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -33,28 +34,40 @@ public class RepositoryItemUidTest
 
     public void testDummy()
     {
-        
+
     }
-    
-    public void nontestConcurrentLocksOfSameUid()
+
+    public void testConcurrentLocksOfSameUid()
         throws Exception
     {
+        Repository repository = createMock(Repository.class);
+        
+        expect(repository.getId()).andReturn( "dummy" ).anyTimes();
+        
+        replay(repository);
+        
+        //
+        
+        RepositoryItemUidFactory repositoryItemUidFactory = (RepositoryItemUidFactory) lookup( RepositoryItemUidFactory.class );
+
         RepositoryItemUid uidA = getRepositoryItemUidFactory().createUid( repository, "/a.txt" );
 
-        Thread thread = new Thread( new RepositoryItemUidLockProcessLauncher( uidA, 100, 100 ) );
-        Thread thread2 = new Thread( new RepositoryItemUidLockProcessLauncher( uidA, 100, 100 ) );
+        Thread thread1 = new Thread(
+            new RepositoryItemUidLockProcessLauncher( repositoryItemUidFactory, uidA, 100, 100 ) );
+        Thread thread2 = new Thread(
+            new RepositoryItemUidLockProcessLauncher( repositoryItemUidFactory, uidA, 100, 100 ) );
 
-        thread.start();
+        thread1.start();
         thread2.start();
 
         Thread.sleep( 50 );
 
         assertEquals( 1, getRepositoryItemUidFactory().getLockCount() );
 
-        thread.join();
+        thread1.join();
         thread2.join();
 
-        getRepositoryItemUidFactory().release( uidA );
+        getRepositoryItemUidFactory().releaseUid( uidA );
 
         assertEquals( 0, getRepositoryItemUidFactory().getLockCount() );
     }
@@ -62,13 +75,16 @@ public class RepositoryItemUidTest
     private static final class RepositoryItemUidLockProcessLauncher
         implements Runnable
     {
+        private RepositoryItemUidFactory repositoryItemUidFactory;
+
         private RepositoryItemUid uid;
 
         private int threadCount;
 
         private long timeout;
 
-        public RepositoryItemUidLockProcessLauncher( RepositoryItemUid uid, int threadCount, long timeout )
+        public RepositoryItemUidLockProcessLauncher( RepositoryItemUidFactory repositoryItemUidFactory,
+            RepositoryItemUid uid, int threadCount, long timeout )
         {
             this.uid = uid;
             this.threadCount = threadCount;
@@ -81,7 +97,7 @@ public class RepositoryItemUidTest
 
             for ( int i = 0; i < threadCount; i++ )
             {
-                threads.add( new Thread( new RepositoryItemUidLockProcess( this.uid, timeout ) ) );
+                threads.add( new Thread( new RepositoryItemUidLockProcess( repositoryItemUidFactory, uid, timeout ) ) );
             }
 
             for ( Iterator<Thread> iter = threads.iterator(); iter.hasNext(); )
@@ -107,19 +123,23 @@ public class RepositoryItemUidTest
     private static final class RepositoryItemUidLockProcess
         implements Runnable
     {
+        private RepositoryItemUidFactory repositoryItemUidFactory;
+
         private RepositoryItemUid uid;
 
         private long timeout;
 
-        public RepositoryItemUidLockProcess( RepositoryItemUid uid, long timeout )
+        public RepositoryItemUidLockProcess( RepositoryItemUidFactory repositoryItemUidFactory, RepositoryItemUid uid,
+            long timeout )
         {
+            this.repositoryItemUidFactory = repositoryItemUidFactory;
             this.uid = uid;
             this.timeout = timeout;
         }
 
         public void run()
         {
-            this.uid.lock();
+            repositoryItemUidFactory.lock( uid );
 
             try
             {
@@ -131,7 +151,7 @@ public class RepositoryItemUidTest
             }
             finally
             {
-                this.uid.unlock();
+                repositoryItemUidFactory.unlock( uid );
             }
         }
     }

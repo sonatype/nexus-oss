@@ -287,7 +287,7 @@ public abstract class AbstractMavenRepository
             }
         }
 
-        RepositoryItemUid sha1Uid = createUidForPath( uid.getPath() + ".sha1" );
+        RepositoryItemUid sha1Uid = createUid( uid.getPath() + ".sha1" );
 
         try
         {
@@ -298,7 +298,7 @@ public abstract class AbstractMavenRepository
             // ignore not found
         }
 
-        RepositoryItemUid md5Uid = createUidForPath( uid.getPath() + ".md5" );
+        RepositoryItemUid md5Uid = createUid( uid.getPath() + ".md5" );
 
         try
         {
@@ -313,7 +313,7 @@ public abstract class AbstractMavenRepository
         // Note this is a recursive call, hence the check for .asc
         if ( !uid.getPath().endsWith( ".asc" ) )
         {
-            deleteItemWithChecksums( createUidForPath( uid.getPath() + ".asc" ), context );
+            deleteItemWithChecksums( createUid( uid.getPath() + ".asc" ), context );
         }
     }
 
@@ -453,7 +453,7 @@ public abstract class AbstractMavenRepository
                     ownerPath = uid.getPath().substring( 0, uid.getPath().length() - 4 );
                 }
 
-                RepositoryItemUid ownerUid = createUidForPath( ownerPath );
+                RepositoryItemUid ownerUid = createUid( ownerPath );
 
                 StorageItem ownerItem = super.doRetrieveItem( localOnly, ownerUid, context );
 
@@ -548,7 +548,7 @@ public abstract class AbstractMavenRepository
                     }
                     try
                     {
-                        getLocalStorage().deleteItem( uid.getRepository().createUidForPath( uid.getPath() + ".sha1" ) );
+                        getLocalStorage().deleteItem( uid.getRepository().createUid( uid.getPath() + ".sha1" ) );
                     }
                     catch ( ItemNotFoundException e )
                     {
@@ -556,7 +556,7 @@ public abstract class AbstractMavenRepository
                     }
                     try
                     {
-                        getLocalStorage().deleteItem( uid.getRepository().createUidForPath( uid.getPath() + ".md5" ) );
+                        getLocalStorage().deleteItem( uid.getRepository().createUid( uid.getPath() + ".md5" ) );
                     }
                     catch ( ItemNotFoundException e )
                     {
@@ -648,7 +648,7 @@ public abstract class AbstractMavenRepository
             {
                 hashKey = DigestCalculatingInspector.DIGEST_SHA1_KEY;
 
-                hashUid = uid.getRepository().createUidForPath( uid.getPath() + ".sha1" );
+                hashUid = uid.getRepository().createUid( uid.getPath() + ".sha1" );
 
                 hashItem = (DefaultStorageFileItem) doRetrieveRemoteItem( hashUid, context );
 
@@ -660,7 +660,7 @@ public abstract class AbstractMavenRepository
                 {
                     hashKey = DigestCalculatingInspector.DIGEST_MD5_KEY;
 
-                    hashUid = uid.getRepository().createUidForPath( uid.getPath() + ".md5" );
+                    hashUid = uid.getRepository().createUid( uid.getPath() + ".md5" );
 
                     hashItem = (DefaultStorageFileItem) doRetrieveRemoteItem( hashUid, context );
 
@@ -781,14 +781,14 @@ public abstract class AbstractMavenRepository
     {
         super.markItemRemotelyChecked( uid );
 
-        RepositoryItemUid sha1Uid = uid.getRepository().createUidForPath( uid.getPath() + ".sha1" );
+        RepositoryItemUid sha1Uid = uid.getRepository().createUid( uid.getPath() + ".sha1" );
 
         if ( getLocalStorage().containsItem( sha1Uid ) )
         {
             super.markItemRemotelyChecked( sha1Uid );
         }
 
-        RepositoryItemUid md5Uid = uid.getRepository().createUidForPath( uid.getPath() + ".md5" );
+        RepositoryItemUid md5Uid = uid.getRepository().createUid( uid.getPath() + ".md5" );
 
         if ( getLocalStorage().containsItem( md5Uid ) )
         {

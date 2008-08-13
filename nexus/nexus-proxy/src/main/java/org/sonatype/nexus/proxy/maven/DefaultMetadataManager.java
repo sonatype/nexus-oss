@@ -114,7 +114,7 @@ public class DefaultMetadataManager
         // GAV
         mdPath = mdPath.substring( 0, mdPath.lastIndexOf( RepositoryItemUid.PATH_SEPARATOR ) ) + "/maven-metadata.xml";
 
-        RepositoryItemUid uid = repository.createUidForPath( mdPath );
+        RepositoryItemUid uid = repository.createUid( mdPath );
 
         Metadata result = readOrCreateMetadata( uid, ctx );
 
@@ -140,7 +140,7 @@ public class DefaultMetadataManager
         // GA
         mdPath = mdPath.substring( 0, mdPath.lastIndexOf( RepositoryItemUid.PATH_SEPARATOR ) ) + "/maven-metadata.xml";
 
-        RepositoryItemUid uid = repository.createUidForPath( mdPath );
+        RepositoryItemUid uid = repository.createUid( mdPath );
 
         Metadata result = readOrCreateMetadata( uid, ctx );
 
@@ -169,7 +169,7 @@ public class DefaultMetadataManager
         // G
         mdPath = mdPath.substring( 0, mdPath.lastIndexOf( RepositoryItemUid.PATH_SEPARATOR ) ) + "/maven-metadata.xml";
 
-        RepositoryItemUid uid = repository.createUidForPath( mdPath );
+        RepositoryItemUid uid = repository.createUid( mdPath );
 
         Metadata result = readOrCreateMetadata( uid, ctx );
 

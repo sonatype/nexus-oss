@@ -93,7 +93,7 @@ public class ArtifactStoreHelper
             ItemNotFoundException,
             StorageException
     {
-        RepositoryItemUid uid = repository.createUidForPath( request.getRequestPath() );
+        RepositoryItemUid uid = repository.createUid( request.getRequestPath() );
 
         repository.deleteItemWithChecksums( uid, request.getRequestContext() );
 
@@ -106,7 +106,7 @@ public class ArtifactStoreHelper
             ItemNotFoundException,
             StorageException
     {
-        RepositoryItemUid uid = repository.createUidForPath( request.getRequestPath() );
+        RepositoryItemUid uid = repository.createUid( request.getRequestPath() );
 
         repository.deleteItem( uid, request.getRequestContext() );
 
@@ -247,7 +247,7 @@ public class ArtifactStoreHelper
         try
         {
             // check for POM existence
-            repository.retrieveItem( true, repository.createUidForPath( repository
+            repository.retrieveItem( true, repository.createUid( repository
                 .getGavCalculator().gavToPath( pomGav ) ), gavRequest.getRequestContext() );
         }
         catch ( ItemNotFoundException e )
@@ -449,7 +449,7 @@ public class ArtifactStoreHelper
         // delete all "below", meaning: classifiers of the GAV
         // watch for subdirs
         // delete dir if empty
-        RepositoryItemUid parentCollUid = repository.createUidForPath( gavRequest.getRequestPath().substring(
+        RepositoryItemUid parentCollUid = repository.createUid( gavRequest.getRequestPath().substring(
             0,
             gavRequest.getRequestPath().indexOf( RepositoryItemUid.PATH_SEPARATOR ) ) );
 
@@ -511,7 +511,7 @@ public class ArtifactStoreHelper
         // delete all in this directory
         // watch for subdirs
         // delete dir if empty
-        RepositoryItemUid parentCollUid = repository.createUidForPath( gavRequest.getRequestPath().substring(
+        RepositoryItemUid parentCollUid = repository.createUid( gavRequest.getRequestPath().substring(
             0,
             gavRequest.getRequestPath().lastIndexOf( RepositoryItemUid.PATH_SEPARATOR ) ) );
 
@@ -570,7 +570,7 @@ public class ArtifactStoreHelper
     {
         String packaging = "jar";
 
-        RepositoryItemUid uid = repository.createUidForPath( requestPath );
+        RepositoryItemUid uid = repository.createUid( requestPath );
 
         Reader reader = null;
 

@@ -89,7 +89,7 @@ public class DefaultFSLocalRepositoryStorage
     public File getBaseDir( Repository repository )
         throws StorageException
     {
-        URL url = getAbsoluteUrlFromBase( repository.createUidForPath( RepositoryItemUid.PATH_ROOT ) );
+        URL url = getAbsoluteUrlFromBase( repository.createUid( RepositoryItemUid.PATH_ROOT ) );
         File file;
         try
         {
@@ -188,7 +188,7 @@ public class DefaultFSLocalRepositoryStorage
             path = RepositoryItemUid.PATH_ROOT;
         }
 
-        RepositoryItemUid uid = tuid.getRepository().createUidForPath( path );
+        RepositoryItemUid uid = tuid.getRepository().createUid( path );
 
         AbstractStorageItem result = null;
         if ( target.exists() && target.isDirectory() )
@@ -452,11 +452,11 @@ public class DefaultFSLocalRepositoryStorage
 
                             if ( uid.getPath().endsWith( RepositoryItemUid.PATH_SEPARATOR ) )
                             {
-                                tuid = uid.getRepository().createUidForPath( uid.getPath() + files[i].getName() );
+                                tuid = uid.getRepository().createUid( uid.getPath() + files[i].getName() );
                             }
                             else
                             {
-                                tuid = uid.getRepository().createUidForPath(
+                                tuid = uid.getRepository().createUid(
                                     uid.getPath() + RepositoryItemUid.PATH_SEPARATOR + files[i].getName() );
                             }
 

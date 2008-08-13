@@ -450,10 +450,10 @@ public interface Repository
     /**
      * Creates an UID within this Repository.
      */
-    RepositoryItemUid createUidForPath( String path );
+    RepositoryItemUid createUid( String path );
 
     /**
      * Releases an UID within this Repository.
      */
-    void release( RepositoryItemUid uid );
+    void releaseUid( RepositoryItemUid uid );
 }

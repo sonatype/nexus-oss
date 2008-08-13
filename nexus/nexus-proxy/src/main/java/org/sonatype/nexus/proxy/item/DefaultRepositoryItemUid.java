@@ -20,8 +20,6 @@
  */
 package org.sonatype.nexus.proxy.item;
 
-import java.util.concurrent.locks.ReentrantLock;
-
 import org.sonatype.nexus.proxy.repository.Repository;
 
 /**
@@ -31,8 +29,8 @@ import org.sonatype.nexus.proxy.repository.Repository;
 public class DefaultRepositoryItemUid
     implements RepositoryItemUid
 {
-    /** The lock used for locking UID */
-    private final ReentrantLock lock;
+    /** My factory */
+    private final RepositoryItemUidFactory factory;
 
     /** The repository. */
     private final Repository repository;
@@ -40,11 +38,11 @@ public class DefaultRepositoryItemUid
     /** The path. */
     private final String path;
 
-    protected DefaultRepositoryItemUid( ReentrantLock lock, Repository repository, String path )
+    public DefaultRepositoryItemUid( RepositoryItemUidFactory factory, Repository repository, String path )
     {
         super();
 
-        this.lock = lock;
+        this.factory = factory;
 
         this.repository = repository;
 
@@ -61,30 +59,9 @@ public class DefaultRepositoryItemUid
         return path;
     }
 
-    public void lock()
+    public void release()
     {
-        if ( lock != null )
-        {
-            lock.lock();
-        }
-    }
-
-    public void unlock()
-    {
-        if ( lock != null )
-        {
-            lock.unlock();
-        }
-    }
-
-    public ReentrantLock getLock()
-    {
-        return lock;
-    }
-
-    public int getQueueLength()
-    {
-        return lock.getQueueLength();
+        factory.releaseUid( this );
     }
 
     /**

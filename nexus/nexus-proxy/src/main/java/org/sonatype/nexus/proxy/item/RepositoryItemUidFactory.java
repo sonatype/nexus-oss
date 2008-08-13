@@ -28,12 +28,21 @@ public interface RepositoryItemUidFactory
             NoSuchRepositoryException;
 
     /**
-     * Releases the UID from this factory.
-     * 
-     * @param uid
+     * Release this UID.
      */
-    public void release( RepositoryItemUid uid );
+    void releaseUid( RepositoryItemUid uid );
 
+    /**
+     * Performs a lock on this UID, and by that, potentionally locks all other threads if needed, that are working on
+     * the same UID as this one.
+     */
+    void lock( RepositoryItemUid uid );
+
+    /**
+     * Unlocks this UID.
+     */
+    void unlock( RepositoryItemUid uid );
+    
     /**
      * For testing/debugging purposes.
      * 

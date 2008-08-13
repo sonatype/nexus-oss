@@ -32,13 +32,7 @@ public interface RepositoryItemUid
     String getPath();
 
     /**
-     * Performs a lock on this UID, and by that, potentionally locks all other threads if needed, that are working on
-     * the same UID as this one.
+     * Does internal cleanup. Must be called when thes UIS is not used anymore.
      */
-    void lock();
-
-    /**
-     * Unlocks this UID.
-     */
-    void unlock();
+    void release();
 }
