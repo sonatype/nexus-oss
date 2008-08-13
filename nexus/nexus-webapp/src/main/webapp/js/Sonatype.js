@@ -37,29 +37,8 @@ window.Sonatype = function(){
       
       Sonatype.utils.clearCookie('JSESSIONID');
       
-      Ext.Ajax.request({
-        scope: this,
-        method: 'GET',
-        url: Sonatype.config.repos.urls.status,
-        success: function(response, options){
-          var respObj = Ext.decode(response.responseText);
-          Sonatype.utils.version = respObj.data.version;
-          Ext.get('version').update(Sonatype.utils.version);
-          
-          Sonatype.user.anon.repoServer = respObj.data.clientPermissions;
-          Sonatype.user.curr.repoServer = respObj.data.clientPermissions;
-          
-          var availSvrs = Sonatype.config.installedServers;
-          for(var srv in availSvrs) {
-            if (availSvrs[srv] && typeof(Sonatype[srv]) != 'undefined') {
-              Sonatype[srv][Sonatype.utils.capitalize(srv)].statusComplete(respObj);
-            }
-          }          
-        },
-        failure: function(response, options){
-          Sonatype.utils.version = 'Version unavailable';
-          Ext.get('version').update(Sonatype.utils.version);
-        }
+      Sonatype.utils.loadNexusStatus( this, function() {
+        Sonatype.user.anon.repoServer = Sonatype.utils.cloneObj(Sonatype.user.curr.repoServer);
       });
       
       if ( username && false ) {

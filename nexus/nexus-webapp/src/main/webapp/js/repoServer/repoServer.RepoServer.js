@@ -128,6 +128,11 @@ Sonatype.repoServer.RepoServer = function(){
         
         var htmlString = this.buildRecoveryText();
         
+        var recoveryPanel = this.loginForm.findById('recovery-panel');
+        if ( recoveryPanel ) {
+          this.loginForm.remove( recoveryPanel );
+          recoveryPanel.destroy();
+        }
         this.loginForm.add({
             xtype: 'panel',
             id: 'recovery-panel',
@@ -488,10 +493,12 @@ Sonatype.repoServer.RepoServer = function(){
 //            Sonatype.state.CookieProvider.clear('username');
             
             this.resetMainTabPanel();
-            
             Sonatype.user.curr = Sonatype.utils.cloneObj(Sonatype.user.anon);
-            Sonatype.view.updateLoginLinkText();
-            this.createSubComponents(); //update left panel
+
+            Sonatype.utils.loadNexusStatus( this, function() {
+              Sonatype.view.updateLoginLinkText();
+              this.createSubComponents(); //update left panel
+            } );
           }
         });
         

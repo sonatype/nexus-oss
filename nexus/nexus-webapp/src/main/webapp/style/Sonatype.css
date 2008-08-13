@@ -32,6 +32,7 @@ body {
   float: right;
   font-size: 14px;
   display:inline;
+  text-align: right;
 }
 
 #username {

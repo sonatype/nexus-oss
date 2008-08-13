@@ -95,7 +95,7 @@ Sonatype.utils = {
     return sOut.substring(0, sOut.length - sep.length);
   },
 
-  connectionError: function( response, message, offerRestart ) {
+  connectionError: function( response, message, offerRestart, options ) {
     var serverMessage = ''; 
     var r = response.responseText;
     if ( r ) {
@@ -107,6 +107,10 @@ Sonatype.utils = {
     }
 
     if ( response.status == 403 || response.status == 401 ) {
+      if ( options && options.options && options.options.ignore401 ) {
+        return;
+      }
+      
       if ( Sonatype.repoServer.RepoServer.loginWindow.isVisible() ) {
         var nexusReason = response.getResponseHeader['X-Nexus-Reason']; 
         if ( nexusReason && nexusReason.substring(0,7) == 'expired' ) {
@@ -659,6 +663,8 @@ Sonatype.utils = {
         }
         
         Sonatype.repoServer.RepoServer.createSubComponents(); //update left panel
+
+        Sonatype.utils.loadNexusStatus();
       },
       failure: function(response, options){
         activeWindow.getEl().unmask();
@@ -667,6 +673,39 @@ Sonatype.utils = {
         }
       }
 
+    });
+  },
+  
+  loadNexusStatus: function( scope, afterRequest ) {
+    Ext.Ajax.request({
+      method: 'GET',
+      scope: scope,
+      options: { ignore401: true },
+      url: Sonatype.config.repos.urls.status,
+      callback: function(options, success, response){
+        if ( success ) {
+          var respObj = Ext.decode(response.responseText);
+  
+          Sonatype.utils.version = respObj.data.version;
+          Ext.get('version').update(Sonatype.utils.version);
+          
+          Sonatype.user.curr.repoServer = respObj.data.clientPermissions;
+          
+          var availSvrs = Sonatype.config.installedServers;
+          for(var srv in availSvrs) {
+            if (availSvrs[srv] && typeof(Sonatype[srv]) != 'undefined') {
+              Sonatype[srv][Sonatype.utils.capitalize(srv)].statusComplete(respObj);
+            }
+          }
+        }
+        else {
+          Sonatype.user.curr = Sonatype.utils.cloneObj(Sonatype.user.anon);
+          Sonatype.utils.version = 'Version unavailable';
+          Ext.get('version').update(Sonatype.utils.version);
+        }
+        
+        if ( afterRequest ) afterRequest.createDelegate(scope)();
+      }
     });
   }
 };
