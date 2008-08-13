@@ -228,10 +228,7 @@ public abstract class AbstractProxyTestEnvironment
         this.logger = loggerManager.getLoggerForComponent( this.getClass().toString() );
 
         applicationConfiguration = (ApplicationConfiguration) lookup( ApplicationConfiguration.ROLE );
-
-        applicationConfiguration.getConfiguration().setWorkingDirectory(
-            new File( getBasedir(), "target/plexus-home" ).getAbsolutePath() );
-
+        
         // deleting files
         FileUtils.forceDelete( getApplicationConfiguration().getWorkingDirectory() );
 

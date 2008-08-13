@@ -58,9 +58,6 @@ public class StaticConfigurationSource
         if ( configuration != null )
         {
             // make path corrections to make them asolute, since we probable have some interpolation
-            configuration.setWorkingDirectory( new File( configuration.getWorkingDirectory() ).getCanonicalPath() );
-
-            // make path corrections to make them asolute, since we probable have some interpolation
             configuration.setApplicationLogDirectory( new File( configuration.getApplicationLogDirectory() )
                 .getCanonicalPath() );
         }

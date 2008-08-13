@@ -1,21 +1,41 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
+<!-- Default nexus configuration -->
+
 <nexusConfiguration>
-  <version>1.0.5</version>
-  <applicationLogDirectory>${nexus.home}/logs</applicationLogDirectory>
-  <security>
-    <enabled>true</enabled>
-    <anonymousAccessEnabled>true</anonymousAccessEnabled>
-    <realms>
-      <realm>default</realm>
-    </realms>
-  </security>
-  <globalConnectionSettings />
-  <restApi />
-  <httpProxy />
-  <routing>
-    <groups />
-  </routing>
-  <repositories>
+    <version>1.0.4</version>
+    <workingDirectory>${runtime}/work/nexus</workingDirectory>
+    <applicationLogDirectory>${nexus.home}/logs</applicationLogDirectory>
+    
+    <smtpConfiguration>
+        <host>smtp-host</host>
+        <port>25</port>
+        <username>smtp-username</username>
+        <password>smtp-password</password>
+        <systemEmailAddress>system@nexus.org</systemEmailAddress>
+    </smtpConfiguration>
+
+    <security>
+        <enabled>true</enabled>
+        <anonymousAccessEnabled>true</anonymousAccessEnabled>
+        <anonymousUsername>anonymous2</anonymousUsername>
+        <anonymousPassword>anonymous2</anonymousPassword>
+        <realms>
+            <realm>default</realm>
+        </realms>
+    </security>
+
+    <globalConnectionSettings/>
+
+    <routing>
+        <groups/>
+    </routing>
+
+    <restApi/>
+
+    <httpProxy/>
+
+<repositories>
     <repository>
       <id>sonatype-releases</id>
       <name>Sonatype Releases</name>
@@ -256,11 +276,4 @@
       </patterns>
     </repositoryTarget>
   </repositoryTargets>
-  <smtpConfiguration>
-    <host>smtp-host</host>
-    <port>25</port>
-    <username>smtp-username</username>
-    <password>smtp-password</password>
-    <systemEmailAddress>system@nexus.org</systemEmailAddress>
-  </smtpConfiguration>
 </nexusConfiguration>

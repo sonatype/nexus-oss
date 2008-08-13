@@ -199,7 +199,7 @@ public class DefaultApplicationRuntimeConfigurationBuilder
             // Setting common things on a repository
 
             // NX-198: filling up the default variable to store the "default" local URL
-            File defaultStorageFile = new File( new File( configuration.getWorkingDirectory(), "storage" ), repository
+            File defaultStorageFile = new File( new File( nexusConfiguration.getWorkingDirectory(), "storage" ), repository
                 .getId() );
 
             repo.defaultLocalStorageUrl = defaultStorageFile.toURL().toString();
@@ -391,7 +391,7 @@ public class DefaultApplicationRuntimeConfigurationBuilder
 
             // NX-198: filling up the default variable to store the "default" local URL
             File defaultStorageFile = new File(
-                new File( configuration.getWorkingDirectory(), "storage" ),
+                new File( nexusConfiguration.getWorkingDirectory(), "storage" ),
                 shadowRepository.getId() );
 
             defaultStorageFile.mkdirs();

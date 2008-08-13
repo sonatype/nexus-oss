@@ -4,8 +4,7 @@
 <!-- used as default config source -->
 
 <nexusConfiguration>
-	<version>1.0.4</version>
-	<workingDirectory>${runtime}/work/nexus</workingDirectory>
+	<version>1.0.5</version>
 	<applicationLogDirectory>${runtime}/apps/nexus/logs</applicationLogDirectory>
 	
 	<smtpConfiguration>

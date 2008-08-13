@@ -62,14 +62,6 @@ Sonatype.repoServer.ServerEditPanel = function(config){
         items: [
           {
             xtype: 'textfield',
-            fieldLabel: 'Working Directory',
-            itemCls: 'required-field',
-            helpText: ht.workingDirectory,
-            name: 'workingDirectory',
-            anchor: Sonatype.view.FIELD_OFFSET,
-            allowBlank:false
-          },{
-            xtype: 'textfield',
             fieldLabel: 'Log Directory',
             helpText: ht.logDirectory,
             name: 'logDirectory',
@@ -502,37 +494,8 @@ Ext.extend(Sonatype.repoServer.ServerEditPanel, Ext.Panel, {
   },
   
   saveBtnHandler : function() {
-    var wkDirField = this.find('name', 'workingDirectory')[0];
-    var baseUrlField = this.find('name', 'baseUrl')[0];
     if (this.form.isValid()) {
-
-      if (wkDirField.isDirty()) {
-        //@note: this handler selects the "No" button as the default
-        //@todo: could extend Sonatype.MessageBox to take the button to select as a param
-        Sonatype.MessageBox.getDialog().on('show', function(){
-          this.focusEl = this.buttons[2]; //ack! we're offset dependent here
-          this.focus();
-        },
-        Sonatype.MessageBox.getDialog(),
-        {single:true});
-      
-        Sonatype.MessageBox.show({
-          animEl: this,
-          title : 'Change Working Directory?',
-          msg : 'Changing the Working Directory requires a manual restart of Nexus.<br/><br/>Do you want to continue?',
-          buttons: Sonatype.MessageBox.YESNO,
-          scope: this,
-          icon: Sonatype.MessageBox.QUESTION,
-          fn: function(btnName){
-            if (btnName == 'yes' || btnName == 'ok') {
-              this.save({restartRequired:true});
-            }
-          }
-        });
-      }
-      else {
-        this.save();
-      }
+      this.save();
     }
   },
   
@@ -617,7 +580,7 @@ Ext.extend(Sonatype.repoServer.ServerEditPanel, Ext.Panel, {
       if (action.options.restartRequired) {
         Sonatype.MessageBox.show({
           title : 'Restart Required',
-          msg : 'Nexus must now be restarted for the Working Directory change to take effect',
+          msg : 'Nexus must now be restarted for the change to take effect',
           buttons: false,
           closable: false,
           icon: Sonatype.MessageBox.WARNING
@@ -631,8 +594,6 @@ Ext.extend(Sonatype.repoServer.ServerEditPanel, Ext.Panel, {
       //@note: this is a work around to get proper use of the isDirty() function of this field
       //@todo: could/should extend sonatypeLoad to set the originalValue on all fields to the value it loads
       //        default behavior sets the original value to whatever is specified in the config.
-      var wkDirField = this.find('name', 'workingDirectory')[0];
-      wkDirField.originalValue = wkDirField.getValue();
       var disableAnonFields = true;
       if (action.options.fpanel.find('name', 'securityAnonymousAccessEnabled')[0].getValue() == true) {
         disableAnonFields = false;

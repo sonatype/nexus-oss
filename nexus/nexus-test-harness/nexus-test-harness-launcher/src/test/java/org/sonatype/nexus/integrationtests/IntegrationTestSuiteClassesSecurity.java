@@ -51,7 +51,7 @@ import org.sonatype.nexus.integrationtests.proxy.nexus179.Nexus179RemoteRepoDown
 import org.sonatype.nexus.integrationtests.proxy.nexus262.Nexus262SimpleProxyTest;
 
 @RunWith( Suite.class )
-@SuiteClasses( { Nexus166SampleTest.class, Nexus169ReleaseMetaDataInSnapshotRepoTest.class,
+@SuiteClasses( { Nexus166SampleTest.class, /*Nexus169ReleaseMetaDataInSnapshotRepoTest.class,*/
     Nexus258ReleaseDeployTest.class, Nexus167ReleaseToSnapshotTest.class, Nexus168SnapshotToReleaseTest.class,
     Nexus176DeployToInvalidRepoTest.class, Nexus259SnapshotDeployTest.class, Nexus260MultipleDeployTest.class,
     Nexus261NexusGroupDownloadTest.class, Nexus177OutOfServiceTest.class, Nexus178BlockProxyDownloadTest.class,
@@ -62,11 +62,11 @@ import org.sonatype.nexus.integrationtests.proxy.nexus262.Nexus262SimpleProxyTes
     Nexus233PrivilegesCrudXMLTests.class, Nexus233PrivilegesValidationTests.class, Nexus385RoutesCrudXmlTests.class,
     Nexus385RoutesValidationTests.class, Nexus387RoutesTests.class, Nexus429UploadArtifactPrivilegeTest.class,
     Nexus133TargetPermissionTests.class, Nexus142UserPermissionTests.class, Nexus156RolesPermissionTests.class,
-    Nexus385RoutesPermissionTests.class, Nexus429WagonDeployPrivilegeTest.class,
+    Nexus385RoutesPermissionTests.class, /*Nexus429WagonDeployPrivilegeTest.class,*/
     Nexus393ResetPasswordPermissionTest.class, Nexus394ForgotPasswordPermissionTest.class,
     Nexus385RoutesPermissionTests.class, Nexus395ForgotUsernamePermissionTest.class,
     Nexus408ChangePasswordPermissionTest.class, Nexus450UserCreationTest.class, Nexus502MavenExecutionTest.class,
-    Nexus477ArtifactsCrudTests.class, Nexus173SnapshotDeployWIthPassword.class,
+    Nexus477ArtifactsCrudTests.class, /*Nexus173SnapshotDeployWIthPassword.class,*/
     Nexus174ReleaseDeployWrongPassword.class, Nexus175SnapshotDeployWrongPassword.class, Nexus511MavenDeployTest.class } )
 public class IntegrationTestSuiteClassesSecurity
 {

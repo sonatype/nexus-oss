@@ -46,8 +46,6 @@ public class SimpleApplicationConfiguration
 
         this.configuration = new Configuration();
 
-        configuration.setWorkingDirectory( "target/plexus-home/" );
-
         configuration.setSecurity( new CSecurity() );
         configuration.setGlobalConnectionSettings( new CRemoteConnectionSettings() );
         // configuration.setGlobalHttpProxySettings( new CRemoteHttpProxySettings() );
@@ -63,12 +61,7 @@ public class SimpleApplicationConfiguration
 
     public File getWorkingDirectory()
     {
-        return new File( configuration.getWorkingDirectory() );
-    }
-    
-    public File getSecurityConfigurationFile()
-    {
-        return new File( getWorkingDirectory(), "security.xml" );
+        return new File( "target/plexus-home/" );
     }
 
     public File getWorkingDirectory( String key )
@@ -115,7 +108,7 @@ public class SimpleApplicationConfiguration
 
     public File getConfigurationDirectory()
     {
-        File result = new File( configuration.getWorkingDirectory(), "conf" );
+        File result = new File( getWorkingDirectory(), "conf" );
         if ( !result.exists() )
         {
             result.mkdirs();

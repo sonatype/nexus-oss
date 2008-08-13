@@ -222,4 +222,18 @@ public class DefaultApplicationConfigurationUpgraderTest
 
         resultIsFine( "/org/sonatype/nexus/configuration/upgrade/103-2/nexus-103.xml", configuration );
     }
+    
+    public void testFrom104()
+        throws Exception
+    {
+        IOUtil.copy(
+            getClass().getResourceAsStream( "/org/sonatype/nexus/configuration/upgrade/nexus-104.xml" ),
+            new FileOutputStream( getNexusConfiguration() ) );
+
+        Configuration configuration = configurationUpgrader.loadOldConfiguration( new File( getNexusConfiguration() ) );
+
+        assertEquals( Configuration.MODEL_VERSION, configuration.getVersion() );
+
+        resultIsFine( "/org/sonatype/nexus/configuration/upgrade/nexus-104.xml", configuration );
+    }
 }

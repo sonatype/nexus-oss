@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?><nexusConfiguration>
-  <version>1.0.4</version>
-  <workingDirectory>${project.build.directory}/test-classes/nexus169/work-dir</workingDirectory>
+  <version>1.0.5</version>
   <applicationLogDirectory>${nexus.log.directory}</applicationLogDirectory>
   
   <smtpConfiguration>

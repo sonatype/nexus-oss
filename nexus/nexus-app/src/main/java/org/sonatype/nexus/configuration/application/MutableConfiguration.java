@@ -88,11 +88,6 @@ public interface MutableConfiguration
 
     // Globals are mandatory: RU
 
-    String readWorkingDirectory();
-
-    void updateWorkingDirectory( String settings )
-        throws IOException;
-
     String readApplicationLogDirectory();
 
     void updateApplicationLogDirectory( String settings )

@@ -31,6 +31,7 @@ import org.sonatype.nexus.configuration.model.CRepositoryGrouping;
 import org.sonatype.nexus.configuration.model.CRouting;
 import org.sonatype.nexus.configuration.model.CSecurity;
 import org.sonatype.nexus.configuration.model.Configuration;
+import org.sonatype.nexus.proxy.AbstractNexusTestCase;
 
 public class SimpleApplicationConfiguration
     implements ApplicationConfiguration
@@ -44,8 +45,6 @@ public class SimpleApplicationConfiguration
         super();
 
         this.configuration = new Configuration();
-
-        configuration.setWorkingDirectory( "target/plexus-home/" );
 
         configuration.setSecurity( new CSecurity() );
         configuration.setGlobalConnectionSettings( new CRemoteConnectionSettings() );
@@ -62,7 +61,7 @@ public class SimpleApplicationConfiguration
 
     public File getWorkingDirectory()
     {
-        return new File( configuration.getWorkingDirectory() );
+        return AbstractNexusTestCase.WORK_HOME;
     }
 
     public File getWorkingDirectory( String key )

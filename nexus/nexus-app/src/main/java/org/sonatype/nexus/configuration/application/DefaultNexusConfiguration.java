@@ -596,19 +596,6 @@ public class DefaultNexusConfiguration
     // CRUD-like ops on config sections
     // Globals are mandatory: RU
 
-    public String readWorkingDirectory()
-    {
-        return getConfiguration().getWorkingDirectory();
-    }
-
-    public void updateWorkingDirectory( String settings )
-        throws IOException
-    {
-        getConfiguration().setWorkingDirectory( settings );
-
-        applyAndSaveConfiguration();
-    }
-
     public String readApplicationLogDirectory()
     {
         return getConfiguration().getApplicationLogDirectory();

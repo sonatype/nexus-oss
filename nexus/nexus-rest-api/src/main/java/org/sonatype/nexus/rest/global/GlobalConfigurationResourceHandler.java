@@ -154,8 +154,6 @@ public class GlobalConfigurationResourceHandler
 
                 try
                 {
-                    getNexus().updateWorkingDirectory( resource.getWorkingDirectory() );
-
                     getNexus().updateApplicationLogDirectory( resource.getLogDirectory() );
                     
                     if ( resource.getSmtpSettings() != null )
@@ -299,8 +297,6 @@ public class GlobalConfigurationResourceHandler
 
         resource.setSecurityAnonymousPassword( getNexus().getDefaultAnonymousPassword() );
 
-        resource.setWorkingDirectory( getNexus().readDefaultWorkingDirectory() );
-
         resource.setLogDirectory( getNexus().readDefaultApplicationLogDirectory() );
 
         resource.setGlobalConnectionSettings( convert( getNexus().readDefaultGlobalRemoteConnectionSettings() ) );
@@ -324,8 +320,6 @@ public class GlobalConfigurationResourceHandler
         resource.setSecurityAnonymousUsername( getNexus().getAnonymousUsername() );
 
         resource.setSecurityAnonymousPassword( getNexus().getAnonymousPassword() );
-
-        resource.setWorkingDirectory( getNexus().readWorkingDirectory() );
 
         resource.setLogDirectory( getNexus().readApplicationLogDirectory() );
 

@@ -268,8 +268,6 @@ public interface Nexus
     NexusStreamResponse getDefaultConfigurationAsStream()
         throws IOException;
 
-    String readDefaultWorkingDirectory();
-
     String readDefaultApplicationLogDirectory();
 
     CRemoteConnectionSettings readDefaultGlobalRemoteConnectionSettings();

@@ -40,9 +40,9 @@ public abstract class AbstractNexusTestCase
     public static final String WORK_CONFIGURATION_KEY = "nexus-work";
     public static final String APPS_CONFIGURATION_KEY = "apps";
 
-    protected static final File PLEXUS_HOME = new File( getBasedir(), "target/plexus-home" );
-    protected static final File WORK_HOME = new File( PLEXUS_HOME, "nexus-work" );
-    protected static final File CONF_HOME = new File( WORK_HOME, "conf" );
+    public static final File PLEXUS_HOME = new File( getBasedir(), "target/plexus-home" );
+    public static final File WORK_HOME = new File( PLEXUS_HOME, "nexus-work" );
+    public static final File CONF_HOME = new File( WORK_HOME, "conf" );
 
     protected void customizeContext( Context ctx )
     {

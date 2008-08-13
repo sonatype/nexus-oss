@@ -72,7 +72,6 @@ public class DefaultMigrationTool
         // strip off shadows
         configuration.getRepositoryShadows().clear();
         // default it back
-        configuration.setWorkingDirectory( "${runtime}/work/nexus" );
         configuration.setApplicationLogDirectory( "${runtime}/apps/nexus/logs" );
 
         MigrationResult res = new MigrationResult( configuration );
