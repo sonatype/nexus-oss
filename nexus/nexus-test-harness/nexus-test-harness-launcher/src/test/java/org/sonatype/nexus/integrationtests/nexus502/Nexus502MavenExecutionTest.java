@@ -23,7 +23,6 @@ public class Nexus502MavenExecutionTest
     static
     {
         TestContainer.getInstance().getTestContext().setSecureTest( true );
-        printKnownErrorButDoNotFail( Nexus502MavenExecutionTest.class, "dependencyDownloadProtectedServer" );
     }
 
     private Verifier verifier;
