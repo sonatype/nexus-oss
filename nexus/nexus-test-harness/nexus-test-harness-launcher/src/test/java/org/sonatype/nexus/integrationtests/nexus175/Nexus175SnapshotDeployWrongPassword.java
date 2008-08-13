@@ -10,11 +10,13 @@ import junit.framework.Assert;
 
 import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.httpclient.HttpStatus;
+import org.codehaus.plexus.util.cli.CommandLineException;
 import org.junit.Test;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.test.utils.DeployUtils;
 import org.sonatype.nexus.test.utils.FileTestingUtils;
+import org.sonatype.nexus.test.utils.MavenDeployer;
 
 public class Nexus175SnapshotDeployWrongPassword
     extends AbstractNexusIntegrationTest
@@ -28,59 +30,36 @@ public class Nexus175SnapshotDeployWrongPassword
     }
 
     @Test
-    public void deploywithGavUsingRest()
-        throws HttpException, IOException
+    public void deployWithMaven() throws IOException, InterruptedException, CommandLineException
     {
 
-        // FIXME
-        Assert.fail();
-
+        // GAV
         Gav gav =
-            new Gav( this.getTestId(), "uploadWithGav", "1.0.0", null, "xml", 0, new Date().getTime(),
-                     "Simple Test Artifact", false, false, null, false, null );
+            new Gav( this.getTestId(), "artifact", "1.0.0-SNAPSHOT", null, "xml", 0, new Date().getTime(), "", false,
+                     false, null, false, null );
 
         // file to deploy
         File fileToDeploy = this.getTestFile( gav.getArtifactId() + "." + gav.getExtension() );
 
-        // the Restlet Client does not support multipart forms: http://restlet.tigris.org/issues/show_bug.cgi?id=71
+        // we need to delete the files...
+        this.deleteFromRepository( this.getTestId() + "/" );
 
-        // url to upload to
-        String uploadURL = this.getBaseNexusUrl() + "service/local/artifact/maven/content";
-
-        int status = DeployUtils.deployUsingGavWithRest( uploadURL, TEST_RELEASE_REPO, gav, fileToDeploy );
-
-        //TODO: set error code
-        if ( status != HttpStatus.SC_FORBIDDEN )
+        try
         {
-            Assert.fail( "File should not have been uploaded, status code: " + status );
+            // DeployUtils.forkDeployWithWagon( this.getContainer(), "http", this.getNexusTestRepoUrl(), fileToDeploy,
+            // this.getRelitiveArtifactPath( gav ));
+            MavenDeployer.deploy( gav, this.getNexusTestRepoUrl(), fileToDeploy,
+                                  this.getOverridableFile( "settings.xml" ) );
+            Assert.fail( "File should NOT have been deployed" );
         }
-    }
-
-    @Test
-    public void deploywithPomUsingRest()
-        throws HttpException, IOException
-    {
-
-        Gav gav =
-            new Gav( this.getTestId(), "uploadWithGav", "1.0.0", null, "xml", 0, new Date().getTime(),
-                     "Simple Test Artifact", false, false, null, false, null );
-
-        // file to deploy
-        File fileToDeploy = this.getTestFile( gav.getArtifactId() + "." + gav.getExtension() );
-
-        File pomFile = this.getTestFile( "pom.xml" );
-
-        // the Restlet Client does not support multipart forms: http://restlet.tigris.org/issues/show_bug.cgi?id=71
-
-        // url to upload to
-        String uploadURL = this.getBaseNexusUrl() + "service/local/artifact/maven/content";
-
-        int status = DeployUtils.deployUsingPomWithRest( uploadURL, TEST_RELEASE_REPO, gav, fileToDeploy, pomFile );
-
-        //TODO: set error code
-        if ( status != HttpStatus.SC_FORBIDDEN )
+        // catch ( TransferFailedException e )
+        // {
+        // // expected 401
+        // }
+        catch ( CommandLineException e )
         {
-            Assert.fail( "File should not have been uploaded, status code: " + status );
+            // expected 401
+            // MavenDeployer, either fails or not, we can't check the cause of the problem
         }
 
     }

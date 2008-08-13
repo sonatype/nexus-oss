@@ -20,6 +20,9 @@ import org.sonatype.nexus.integrationtests.nexus166.Nexus166SampleTest;
 import org.sonatype.nexus.integrationtests.nexus167.Nexus167ReleaseToSnapshotTest;
 import org.sonatype.nexus.integrationtests.nexus168.Nexus168SnapshotToReleaseTest;
 import org.sonatype.nexus.integrationtests.nexus169.Nexus169ReleaseMetaDataInSnapshotRepoTest;
+import org.sonatype.nexus.integrationtests.nexus173.Nexus173SnapshotDeployWIthPassword;
+import org.sonatype.nexus.integrationtests.nexus174.Nexus174ReleaseDeployWrongPassword;
+import org.sonatype.nexus.integrationtests.nexus175.Nexus175SnapshotDeployWrongPassword;
 import org.sonatype.nexus.integrationtests.nexus176.Nexus176DeployToInvalidRepoTest;
 import org.sonatype.nexus.integrationtests.nexus233.Nexus233PrivilegesCrudXMLTests;
 import org.sonatype.nexus.integrationtests.nexus233.Nexus233PrivilegesValidationTests;
@@ -58,10 +61,12 @@ import org.sonatype.nexus.integrationtests.proxy.nexus262.Nexus262SimpleProxyTes
     Nexus233PrivilegesCrudXMLTests.class, Nexus233PrivilegesValidationTests.class, Nexus385RoutesCrudXmlTests.class,
     Nexus385RoutesValidationTests.class, Nexus387RoutesTests.class, Nexus429UploadArtifactPrivilegeTest.class,
     Nexus133TargetPermissionTests.class, Nexus142UserPermissionTests.class, Nexus156RolesPermissionTests.class,
-    Nexus385RoutesPermissionTests.class, Nexus429WagonDeployPrivilegeTest.class, 
+    Nexus385RoutesPermissionTests.class, Nexus429WagonDeployPrivilegeTest.class,
     Nexus393ResetPasswordPermissionTest.class, Nexus394ForgotPasswordPermissionTest.class,
     Nexus385RoutesPermissionTests.class, Nexus395ForgotUsernamePermissionTest.class,
-    Nexus408ChangePasswordPermissionTest.class, Nexus450UserCreationTest.class, Nexus502MavenExecutionTest.class, Nexus477ArtifactsCrudTests.class } )
+    Nexus408ChangePasswordPermissionTest.class, Nexus450UserCreationTest.class, Nexus502MavenExecutionTest.class,
+    Nexus477ArtifactsCrudTests.class, Nexus173SnapshotDeployWIthPassword.class,
+    Nexus174ReleaseDeployWrongPassword.class, Nexus175SnapshotDeployWrongPassword.class } )
 public class IntegrationTestSuiteClassesSecurity
 {
     @BeforeClass

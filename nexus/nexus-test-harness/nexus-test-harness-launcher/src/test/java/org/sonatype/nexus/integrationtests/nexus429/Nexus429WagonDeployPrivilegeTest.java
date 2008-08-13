@@ -49,13 +49,8 @@ public class Nexus429WagonDeployPrivilegeTest
         // file to deploy
         File fileToDeploy = this.getTestFile( gav.getArtifactId() + "." + gav.getExtension() );
 
-        File pomFile = this.getTestFile( "pom.xml" );
-
         // we need to delete the files...
-
         this.deleteFromRepository( this.getTestId() + "/" );
-
-        this.printUserPrivs( "test-user" );
 
         // deploy
         TestContainer.getInstance().getTestContext().setUsername( "test-user" );
@@ -92,8 +87,6 @@ public class Nexus429WagonDeployPrivilegeTest
 
         // if this fails it will throw an error
         MavenDeployer.deploy( gav, this.getNexusTestRepoUrl(), fileToDeploy, this.getOverridableFile( "settings.xml" ) );
-        
-        
         
         // make sure delete does not work
         Response response = RequestFacade.sendMessage( "content/repositories/" + this.getTestRepositoryId() + "/" +  this.getTestId(), Method.DELETE );

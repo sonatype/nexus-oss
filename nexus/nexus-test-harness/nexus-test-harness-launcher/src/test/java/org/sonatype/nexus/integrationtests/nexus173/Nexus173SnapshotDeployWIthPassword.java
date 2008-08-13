@@ -1,7 +1,5 @@
 package org.sonatype.nexus.integrationtests.nexus173;
 
-import static org.junit.Assert.assertTrue;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.Date;
@@ -9,18 +7,21 @@ import java.util.Date;
 import junit.framework.Assert;
 
 import org.apache.commons.httpclient.HttpException;
-import org.apache.commons.httpclient.HttpStatus;
+import org.codehaus.plexus.util.cli.CommandLineException;
 import org.junit.Test;
+import org.restlet.data.Method;
+import org.restlet.data.Response;
 import org.sonatype.nexus.artifact.Gav;
-import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
-import org.sonatype.nexus.test.utils.DeployUtils;
-import org.sonatype.nexus.test.utils.FileTestingUtils;
+import org.sonatype.nexus.integrationtests.AbstractPrivilegeTest;
+import org.sonatype.nexus.integrationtests.RequestFacade;
+import org.sonatype.nexus.integrationtests.TestContainer;
+import org.sonatype.nexus.test.utils.MavenDeployer;
 
 public class Nexus173SnapshotDeployWIthPassword
-    extends AbstractNexusIntegrationTest
+    extends AbstractPrivilegeTest
 {
 
-    private static final String TEST_RELEASE_REPO = "nexus-test-harness-release-repo";
+    private static final String TEST_RELEASE_REPO = "nexus-test-harness-snapshot-repo";
 
     public Nexus173SnapshotDeployWIthPassword()
     {
@@ -28,76 +29,61 @@ public class Nexus173SnapshotDeployWIthPassword
     }
 
     @Test
-    public void deploywithGavUsingRest()
-        throws HttpException, IOException
+    public void deployWithMaven() throws IOException, InterruptedException, CommandLineException
     {
 
-        // FIXME
-        Assert.fail();
-
+        // GAV
         Gav gav =
-            new Gav( this.getTestId(), "uploadWithGav", "1.0.0", null, "xml", 0, new Date().getTime(),
-                     "Simple Test Artifact", false, false, null, false, null );
+            new Gav( this.getTestId(), "artifact", "1.0.0-SNAPSHOT", null, "xml", 0, new Date().getTime(), "", false,
+                     false, null, false, null );
 
         // file to deploy
         File fileToDeploy = this.getTestFile( gav.getArtifactId() + "." + gav.getExtension() );
 
-        // the Restlet Client does not support multipart forms: http://restlet.tigris.org/issues/show_bug.cgi?id=71
+        // we need to delete the files...
+        this.deleteFromRepository( this.getTestId() + "/" );
 
-        // url to upload to
-        String uploadURL = this.getBaseNexusUrl() + "service/local/artifact/maven/content";
+        // deploy
+        TestContainer.getInstance().getTestContext().setUsername( "test-user" );
+        TestContainer.getInstance().getTestContext().setPassword( "admin123" );
 
-        int status = DeployUtils.deployUsingGavWithRest( uploadURL, TEST_RELEASE_REPO, gav, fileToDeploy );
+        // with pom should fail
 
-        if ( status != HttpStatus.SC_CREATED )
+        try
         {
-            Assert.fail( "File did not upload successfully, status code: " + status );
+            // DeployUtils.forkDeployWithWagon( this.getContainer(), "http", this.getNexusTestRepoUrl(), fileToDeploy,
+            // this.getRelitiveArtifactPath( gav ));
+            MavenDeployer.deploy( gav, this.getNexusTestRepoUrl(), fileToDeploy,
+                                  this.getOverridableFile( "settings.xml" ) );
+            Assert.fail( "File should NOT have been deployed" );
+        }
+        // catch ( TransferFailedException e )
+        // {
+        // // expected 401
+        // }
+        catch ( CommandLineException e )
+        {
+            // expected 401
+            // MavenDeployer, either fails or not, we can't check the cause of the problem
         }
 
-        // download it
-        File artifact = downloadArtifact( gav, "./target/downloaded-jars" );
+        // give deployment role
+        TestContainer.getInstance().getTestContext().useAdminForRequests();
+        // this.giveUserPrivilege( "test-user", "T5" );
+        this.giveUserPrivilege( "test-user", "T3" ); // the Wagon does a PUT not a POST, so this is correct
 
-        // make sure its here
-        assertTrue( artifact.exists() );
+        // try again
+        TestContainer.getInstance().getTestContext().setUsername( "test-user" );
+        TestContainer.getInstance().getTestContext().setPassword( "admin123" );
 
-        // make sure it is what we expect.
-        assertTrue( FileTestingUtils.compareFileSHA1s( fileToDeploy, artifact ) );
-    }
+        // if this fails it will throw an error
+        MavenDeployer.deploy( gav, this.getNexusTestRepoUrl(), fileToDeploy, this.getOverridableFile( "settings.xml" ) );
 
-    @Test
-    public void deploywithPomUsingRest()
-        throws HttpException, IOException
-    {
-
-        Gav gav =
-            new Gav( this.getTestId(), "uploadWithGav", "1.0.0", null, "xml", 0, new Date().getTime(),
-                     "Simple Test Artifact", false, false, null, false, null );
-
-        // file to deploy
-        File fileToDeploy = this.getTestFile( gav.getArtifactId() + "." + gav.getExtension() );
-
-        File pomFile = this.getTestFile( "pom.xml" );
-
-        // the Restlet Client does not support multipart forms: http://restlet.tigris.org/issues/show_bug.cgi?id=71
-
-        // url to upload to
-        String uploadURL = this.getBaseNexusUrl() + "service/local/artifact/maven/content";
-
-        int status = DeployUtils.deployUsingPomWithRest( uploadURL, TEST_RELEASE_REPO, gav, fileToDeploy, pomFile );
-
-        if ( status != HttpStatus.SC_CREATED )
-        {
-            Assert.fail( "File did not upload successfully, status code: " + status );
-        }
-
-        // download it
-        File artifact = downloadArtifact( gav, "./target/downloaded-jars" );
-
-        // make sure its here
-        assertTrue( artifact.exists() );
-
-        // make sure it is what we expect.
-        assertTrue( FileTestingUtils.compareFileSHA1s( fileToDeploy, artifact ) );
+        // make sure delete does not work
+        Response response =
+            RequestFacade.sendMessage( "content/repositories/" + this.getTestRepositoryId() + "/" + this.getTestId(),
+                                       Method.DELETE );
+        Assert.assertEquals( "Artifact should have been deleted", 401, response.getStatus().getCode() );
 
     }
 
