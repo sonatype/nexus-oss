@@ -21,16 +21,18 @@
 package org.sonatype.nexus.rest.logs;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.logging.Level;
 
+import org.codehaus.plexus.util.StringUtils;
 import org.restlet.Context;
+import org.restlet.data.Form;
 import org.restlet.data.MediaType;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.restlet.resource.Representation;
 import org.restlet.resource.Variant;
+import org.sonatype.nexus.NexusStreamResponse;
 import org.sonatype.nexus.rest.AbstractNexusResourceHandler;
 import org.sonatype.plexus.rest.representation.InputStreamRepresentation;
 
@@ -71,11 +73,32 @@ public class LogsResourceHandler
     {
         String logFile = getRequest().getAttributes().get( FILE_NAME_KEY ).toString();
 
-        InputStream logFileStream = getNexus().getApplicationLogAsStream( logFile );
+        Form params = getRequest().getResourceRef().getQueryAsForm();
 
-        if ( logFileStream != null )
+        String fromStr = params.getFirstValue( "from" );
+
+        String countStr = params.getFirstValue( "count" );
+
+        long from = 0;
+
+        long count = Long.MAX_VALUE;
+
+        if ( !StringUtils.isEmpty( fromStr ) )
         {
-            return new InputStreamRepresentation( MediaType.TEXT_PLAIN, logFileStream );
+            from = Long.valueOf( fromStr );
+        }
+
+        if ( !StringUtils.isEmpty( countStr ) )
+        {
+            count = Long.valueOf( countStr );
+        }
+
+        NexusStreamResponse response = getNexus().getApplicationLogAsStream( logFile, from, count );
+
+        if ( response != null )
+        {
+            return new InputStreamRepresentation( MediaType.valueOf( response.getMimeType() ), response
+                .getInputStream() );
         }
         else
         {

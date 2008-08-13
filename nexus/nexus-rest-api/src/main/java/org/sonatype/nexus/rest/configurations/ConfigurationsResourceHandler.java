@@ -21,7 +21,6 @@
 package org.sonatype.nexus.rest.configurations;
 
 import java.io.IOException;
-import java.io.InputStream;
 
 import org.restlet.Context;
 import org.restlet.data.MediaType;
@@ -30,6 +29,7 @@ import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.restlet.resource.Representation;
 import org.restlet.resource.Variant;
+import org.sonatype.nexus.NexusStreamResponse;
 import org.sonatype.nexus.rest.AbstractNexusResourceHandler;
 import org.sonatype.nexus.rest.global.GlobalConfigurationResourceHandler;
 import org.sonatype.plexus.rest.representation.InputStreamRepresentation;
@@ -76,20 +76,21 @@ public class ConfigurationsResourceHandler
         }
         else
         {
-            InputStream is = null;
+            NexusStreamResponse response;
 
             if ( GlobalConfigurationResourceHandler.DEFAULT_CONFIG_NAME.equals( configurationName ) )
             {
-                is = getNexus().getDefaultConfigurationAsStream();
+                response = getNexus().getDefaultConfigurationAsStream();
             }
             else
             {
-                is = getNexus().getConfigurationAsStream();
+                response = getNexus().getConfigurationAsStream();
             }
 
-            if ( is != null )
+            if ( response != null )
             {
-                return new InputStreamRepresentation( MediaType.TEXT_XML, is );
+                return new InputStreamRepresentation( MediaType.valueOf( response.getMimeType() ), response
+                    .getInputStream() );
             }
             else
             {

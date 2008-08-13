@@ -28,6 +28,7 @@ import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.resource.Representation;
 import org.restlet.resource.Variant;
+import org.sonatype.nexus.NexusStreamResponse;
 import org.sonatype.nexus.rest.AbstractNexusResourceHandler;
 import org.sonatype.nexus.rest.model.LogsListResource;
 import org.sonatype.nexus.rest.model.LogsListResourceResponse;
@@ -60,17 +61,21 @@ public class LogsListResourceHandler
     public Representation getRepresentationHandler( Variant variant )
         throws IOException
     {
-        Collection<String> logFiles = getNexus().getApplicationLogFiles();
+        Collection<NexusStreamResponse> logFiles = getNexus().getApplicationLogFiles();
 
         LogsListResourceResponse response = new LogsListResourceResponse();
 
-        for ( String fileName : logFiles )
+        for ( NexusStreamResponse logFile : logFiles )
         {
             LogsListResource resource = new LogsListResource();
 
-            resource.setResourceURI( calculateSubReference( fileName ).toString() );
+            resource.setResourceURI( calculateSubReference( logFile.getName() ).toString() );
 
-            resource.setName( fileName );
+            resource.setName( logFile.getName() );
+            
+            resource.setSize( logFile.getSize() );
+            
+            resource.setMimeType( logFile.getMimeType() );
 
             response.addData( resource );
         }

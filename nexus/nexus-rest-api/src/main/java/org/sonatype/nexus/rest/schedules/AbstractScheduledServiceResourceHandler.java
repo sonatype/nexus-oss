@@ -51,6 +51,7 @@ import org.sonatype.nexus.tasks.PublishIndexesTask;
 import org.sonatype.nexus.tasks.PurgeTimeline;
 import org.sonatype.nexus.tasks.RebuildAttributesTask;
 import org.sonatype.nexus.tasks.ReindexTask;
+import org.sonatype.nexus.tasks.SynchronizeShadowsTask;
 import org.sonatype.scheduling.ScheduledTask;
 import org.sonatype.scheduling.SchedulerTask;
 import org.sonatype.scheduling.schedules.CronSchedule;
@@ -108,6 +109,11 @@ public class AbstractScheduledServiceResourceHandler
     public static final String PROPERTY_TYPE_REPO = "repo";
 
     /**
+     * Type property resource: shadow/virtual repository
+     */
+    public static final String PROPERTY_TYPE_SHADOW = "repo";
+
+    /**
      * Type property resource: repositoryGroup
      */
     public static final String PROPERTY_TYPE_REPO_GROUP = "group";
@@ -130,6 +136,7 @@ public class AbstractScheduledServiceResourceHandler
         serviceNames.put( SnapshotRemoverTask.class, "Remove Snapshots From Repository" );
         serviceNames.put( EvictUnusedProxiedItemsTask.class, "Evict Unused Proxied Items From Repository Caches" );
         serviceNames.put( PurgeTimeline.class, "Purge Nexus Timeline" );
+        serviceNames.put( SynchronizeShadowsTask.class, "Synchronize Shadow Repository" );
     }
 
     /**

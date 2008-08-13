@@ -33,16 +33,16 @@ import org.sonatype.nexus.scheduling.AbstractNexusTask;
 public class SynchronizeShadowsTask
     extends AbstractNexusTask<Object>
 {
-    private String shadowRepositoryId;
+    public static final String SHADOW_REPOSITORY_ID = "shadowRepositoryId";
 
     public String getShadowRepositoryId()
     {
-        return shadowRepositoryId;
+        return getParameters().get( SHADOW_REPOSITORY_ID );
     }
 
     public void setShadowRepositoryId( String shadowRepositoryId )
     {
-        this.shadowRepositoryId = shadowRepositoryId;
+        getParameters().put( SHADOW_REPOSITORY_ID, shadowRepositoryId );
     }
 
     @Override

@@ -735,13 +735,24 @@ public class DefaultNexus
     // =============
     // Maintenance
 
-    public InputStream getConfigurationAsStream()
+    public NexusStreamResponse getConfigurationAsStream()
         throws IOException
     {
-        return nexusConfiguration.getConfigurationAsStream();
+        NexusStreamResponse response = new NexusStreamResponse();
+
+        response.setName( "current" );
+
+        response.setMimeType( "text/xml" );
+
+        // TODO:
+        response.setSize( 0 );
+
+        response.setInputStream( nexusConfiguration.getConfigurationAsStream() );
+
+        return response;
     }
 
-    public Collection<String> getApplicationLogFiles()
+    public Collection<NexusStreamResponse> getApplicationLogFiles()
         throws IOException
     {
         getLogger().info( "List log files." );
@@ -766,11 +777,22 @@ public class DefaultNexus
 
         if ( dir != null )
         {
-            ArrayList<String> result = new ArrayList<String>( dir.length );
+            ArrayList<NexusStreamResponse> result = new ArrayList<NexusStreamResponse>( dir.length );
 
             for ( int i = 0; i < dir.length; i++ )
             {
-                result.add( dir[i].getName() );
+                NexusStreamResponse response = new NexusStreamResponse();
+
+                response.setName( dir[i].getName() );
+
+                // TODO: 
+                response.setMimeType( "text/plain" );
+
+                response.setSize( dir[i].length() );
+
+                response.setInputStream( null );
+
+                result.add( response );
             }
 
             return result;
@@ -789,7 +811,7 @@ public class DefaultNexus
      * @param logFile path of the file to retrieve
      * @returns InputStream to the file or null if the file is not allowed or doesn't exist.
      */
-    public InputStream getApplicationLogAsStream( String logFile )
+    public NexusStreamResponse getApplicationLogAsStream( String logFile, long from, long count )
         throws IOException
     {
         if ( !logFile.contains( File.pathSeparator ) )
@@ -802,7 +824,19 @@ public class DefaultNexus
             if ( log.exists()
                 && log.getAbsolutePath().startsWith( nexusConfiguration.getApplicationLogDirectory().getAbsolutePath() ) )
             {
-                return new FileInputStream( log );
+                // TODO: honor from + count
+                NexusStreamResponse response = new NexusStreamResponse();
+
+                response.setName( logFile );
+
+                // TODO:
+                response.setMimeType( "text/plain" );
+
+                response.setSize( log.length() );
+
+                response.setInputStream( new FileInputStream( log ) );
+
+                return response;
             }
         }
 
@@ -1117,10 +1151,22 @@ public class DefaultNexus
             .getConfigurationSource().getDefaultsSource().getConfiguration().getSecurity().getRealms();
     }
 
-    public InputStream getDefaultConfigurationAsStream()
+    public NexusStreamResponse getDefaultConfigurationAsStream()
         throws IOException
     {
-        return nexusConfiguration.getConfigurationSource().getDefaultsSource().getConfigurationAsStream();
+        NexusStreamResponse response = new NexusStreamResponse();
+
+        response.setName( "default" );
+
+        response.setMimeType( "text/xml" );
+
+        // TODO:
+        response.setSize( 0 );
+
+        response.setInputStream( nexusConfiguration
+            .getConfigurationSource().getDefaultsSource().getConfigurationAsStream() );
+
+        return response;
     }
 
     public String readDefaultWorkingDirectory()

@@ -21,7 +21,6 @@
 package org.sonatype.nexus;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -122,13 +121,13 @@ public interface Nexus
     // Maintenance
     // ----------------------------------------------------------------------------
 
-    InputStream getConfigurationAsStream()
+    NexusStreamResponse getConfigurationAsStream()
         throws IOException;
 
-    Collection<String> getApplicationLogFiles()
+    Collection<NexusStreamResponse> getApplicationLogFiles()
         throws IOException;
 
-    InputStream getApplicationLogAsStream( String logFile )
+    NexusStreamResponse getApplicationLogAsStream( String logFile, long fromByte, long bytesCount )
         throws IOException;
 
     void clearAllCaches( String path );
@@ -266,7 +265,7 @@ public interface Nexus
 
     List<String> getDefaultRealms();
 
-    InputStream getDefaultConfigurationAsStream()
+    NexusStreamResponse getDefaultConfigurationAsStream()
         throws IOException;
 
     String readDefaultWorkingDirectory();

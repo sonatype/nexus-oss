@@ -37,6 +37,7 @@ import org.sonatype.nexus.tasks.PublishIndexesTask;
 import org.sonatype.nexus.tasks.PurgeTimeline;
 import org.sonatype.nexus.tasks.RebuildAttributesTask;
 import org.sonatype.nexus.tasks.ReindexTask;
+import org.sonatype.nexus.tasks.SynchronizeShadowsTask;
 
 public class ScheduledServiceTypeResourceHandler
     extends AbstractScheduledServiceResourceHandler
@@ -80,6 +81,18 @@ public class ScheduledServiceTypeResourceHandler
         property.setType( PROPERTY_TYPE_REPO_OR_GROUP );
         property.setRequired( true );
         property.setHelpText( "Select the repository or repository group to assign to this task." );
+        type.addProperty( property );
+        response.addData( type );
+
+        type = new ScheduledServiceTypeResource();
+        type.setId( SynchronizeShadowsTask.class.getName() );
+        type.setName( getServiceTypeName( SynchronizeShadowsTask.class ) );
+        property = new ScheduledServiceTypePropertyResource();
+        property.setId( SynchronizeShadowsTask.SHADOW_REPOSITORY_ID );
+        property.setName( "Shadow Repository" );
+        property.setType( PROPERTY_TYPE_SHADOW );
+        property.setRequired( true );
+        property.setHelpText( "Select the repository shadow to assign to this task." );
         type.addProperty( property );
         response.addData( type );
 
