@@ -20,7 +20,7 @@
 									<property>
 										<name>resourceBase</name>
 										<value>
-											${basedir}/target/test-classes/org/sonatype/nexus/maven/tasks/reposes/central
+											${basedir}/target/test-classes/reposes/central
 										</value>
 									</property>
 									<property>
@@ -43,7 +43,7 @@
 									<property>
 										<name>resourceBase</name>
 										<value>
-											${basedir}/target/test-classes/org/sonatype/nexus/maven/tasks/reposes/apache-snapshots
+											${basedir}/target/test-classes/reposes/apache-snapshots
 										</value>
 									</property>
 									<property>
