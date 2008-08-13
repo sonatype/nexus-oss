@@ -2,29 +2,22 @@ package org.sonatype.nexus.integrationtests.nexus502;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
-import junit.framework.Assert;
-
-import org.apache.commons.io.FileUtils;
 import org.apache.maven.it.VerificationException;
 import org.apache.maven.it.Verifier;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.restlet.data.MediaType;
-import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
+import org.sonatype.nexus.integrationtests.AbstractMavenNexusIT;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.rest.model.UserResource;
 import org.sonatype.nexus.rest.xstream.XStreamInitializer;
-import org.sonatype.nexus.test.utils.TestProperties;
 import org.sonatype.nexus.test.utils.UserMessageUtil;
 
 import com.thoughtworks.xstream.XStream;
 
 public class Nexus502MavenExecutionTest
-    extends AbstractNexusIntegrationTest
+    extends AbstractMavenNexusIT
 {
 
     static
@@ -37,47 +30,12 @@ public class Nexus502MavenExecutionTest
 
     @Before
     public void createVerifier()
-        throws VerificationException, IOException
+        throws Exception
     {
-        verifier = new Verifier( getTestFile( "maven-project" ).getAbsolutePath(), false );
-        String nexusLocalRepo = getTestFile( "mvn_repo" ).getAbsolutePath();
-        verifier.setLocalRepo( nexusLocalRepo );
-
-        cleanRepository();
-
-        verifier.resetStreams();
-
-        List<String> options = new ArrayList<String>();
-        options.add( "-s " + getTestFile( "repositories.xml" ).getAbsolutePath() );
-        options.add( "-Dmaven.repo.local=" + nexusLocalRepo );
-        verifier.setCliOptions( options );
-    }
-
-    @After
-    public void cleanRepository()
-        throws IOException
-    {
-        if ( verifier == null )
-        {
-            return;
-        }
-
-        File localRepo = new File( verifier.localRepo );
-        if ( !localRepo.exists() )
-        {
-            Assert.fail( "File not found " + localRepo.getAbsolutePath() );
-        }
-        File nexus502 = new File( localRepo, "nexus502" );
-        FileUtils.deleteDirectory( nexus502 );
-
-        verifier.deleteArtifact( "nexus502", "artifact-1", "1.0.0", "jar" );
-        verifier.deleteArtifact( "nexus502", "artifact-1", "1.0.0", "pom" );
-        verifier.deleteArtifact( "nexus502", "artifact-2", "1.0.0", "jar" );
-        verifier.deleteArtifact( "nexus502", "artifact-2", "1.0.0", "pom" );
-        verifier.deleteArtifact( "nexus502", "artifact-3", "1.0.0", "jar" );
-        verifier.deleteArtifact( "nexus502", "artifact-3", "1.0.0", "pom" );
-        verifier.deleteArtifact( "nexus502", "maven-execution", "1.0.0", "jar" );
-        verifier.deleteArtifact( "nexus502", "maven-execution", "1.0.0", "pom" );
+        File mavenProject = getTestFile( "maven-project" );
+        File mvnRepo = getTestFile( "mvn_repo" );
+        File settings = getTestFile( "repositories.xml" );
+        verifier = createVerifier( mavenProject, mvnRepo, settings );
     }
 
     @Test
@@ -91,7 +49,7 @@ public class Nexus502MavenExecutionTest
         }
         catch ( VerificationException e )
         {
-            failTest();
+            failTest( verifier );
         }
     }
 
@@ -106,27 +64,12 @@ public class Nexus502MavenExecutionTest
         {
             verifier.executeGoal( "dependency:resolve" );
             verifier.verifyErrorFreeLog();
-            failTest();
+            failTest( verifier );
         }
         catch ( VerificationException e )
         {
-
+            // Expected exception
         }
-    }
-
-    /**
-     * Workaround to get more details when tests fails
-     *
-     * @throws IOException
-     */
-    private void failTest()
-        throws IOException
-    {
-        File logFile = new File( verifier.getBasedir(), "log.txt" );
-        String log = FileUtils.readFileToString( logFile );
-        log += "\n";
-        log += new XStream().toXML( verifier );
-        Assert.fail( log );
     }
 
     private UserResource disableUser( String userId )
@@ -138,18 +81,20 @@ public class Nexus502MavenExecutionTest
     }
 
     // Depends on nexus-508
-    // @Test
-    // public void dependencyDownloadProtectedServer()
-    // throws Exception
-    // {
-    // // Disable anonymous
-    // disableUser( "anonymous" );
-    //
-    // List<String> options = new ArrayList<String>();
-    // options.add( "-s " + getTestFile( "repositoriesWithAuthentication.xml" ).getAbsolutePath() );
-    // verifier.setCliOptions( options );
-    // verifier.executeGoal( "dependency:resolve" );
-    // verifier.verifyErrorFreeLog();
-    // }
+    @Test
+    public void dependencyDownloadProtectedServer()
+        throws Exception
+    {
+        // Disable anonymous
+        disableUser( "anonymous" );
+
+        File mavenProject = getTestFile( "maven-project" );
+        File mvnRepo = getTestFile( "mvn_repo" );
+        File settings = getTestFile( "repositoriesWithAuthentication.xml" );
+
+        Verifier verifier = createVerifier( mavenProject, mvnRepo, settings );
+        verifier.executeGoal( "dependency:resolve" );
+        verifier.verifyErrorFreeLog();
+    }
 
 }
