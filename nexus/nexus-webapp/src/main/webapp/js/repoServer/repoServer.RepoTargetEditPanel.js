@@ -778,13 +778,14 @@ Ext.extend(Sonatype.repoServer.RepoTargetEditPanel, Ext.Panel, {
     if ( pattern ) {
       var nodes = treePanel.root.childNodes;
       for(var i = 0; i < nodes.length; i++){
-    	if (pattern == nodes[i].attributes.payload) {
+        if (pattern == nodes[i].attributes.payload) {
           patternField.markInvalid('This pattern already exists');
-    	  return;
-    	}
+          return;
+        }
       }
 
       this.addPatternNode(treePanel, pattern);
+      patternField.setRawValue('');
     }
   },
   
