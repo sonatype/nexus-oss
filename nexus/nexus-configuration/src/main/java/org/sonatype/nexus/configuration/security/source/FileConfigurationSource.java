@@ -50,6 +50,8 @@ public class FileConfigurationSource
 
     /**
      * The configuration file.
+     * 
+     * @plexus.configuration default-value="${nexus-work}/conf/security.xml"
      */
     private File configurationFile;
 

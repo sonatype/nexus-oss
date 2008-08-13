@@ -40,7 +40,7 @@ public class StaticConfigurationSourceTest
     {
         return getClass().getResourceAsStream( "/META-INF/nexus/nexus.xml" );
     }
-
+    
     public void testStoreConfiguration()
         throws Exception
     {

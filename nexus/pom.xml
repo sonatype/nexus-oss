@@ -114,7 +114,7 @@
 		<slf4j.version>1.5.2</slf4j.version>
 		<maven.version>2.1-SONATYPE-653485</maven.version>
 		<maven.artifact.version>3.0-SONATYPE-653272</maven.artifact.version>
-		<plexus.appbooter.version>1.3</plexus.appbooter.version>
+		<plexus.appbooter.version>1.4-SNAPSHOT</plexus.appbooter.version>
 		<jsw.binaries.version>3.2.3.2</jsw.binaries.version>
 		<plexus.container.version>1.0-alpha-47</plexus.container.version>
         <plexus.jsecurity.version>1.0</plexus.jsecurity.version>

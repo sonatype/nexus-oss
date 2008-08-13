@@ -87,7 +87,7 @@ public class AbstractNexusIntegrationTest
 
     public static final String RELATIVE_CONF_DIR = "runtime/apps/nexus/conf";
 
-    public static final String RELATIVE_WORK_CONF_DIR = "runtime/work/nexus/conf";
+    public static final String RELATIVE_WORK_CONF_DIR = "runtime/work/conf";
 
     protected AbstractNexusIntegrationTest()
     {
@@ -126,7 +126,7 @@ public class AbstractNexusIntegrationTest
                 // clean common work dir
                 // this.cleanWorkDir();
 
-                this.copyConfigFile( "nexus.xml" );
+                this.copyConfigFile( "nexus.xml", RELATIVE_WORK_CONF_DIR );
 
                 // copy security config
                 this.copyConfigFile( "security.xml", RELATIVE_WORK_CONF_DIR );

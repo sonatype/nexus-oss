@@ -85,7 +85,7 @@ public class NexusConfigUtil
     private static File getNexusFile()
     {
         return new File(TestProperties.getString( "nexus.base.dir" ) + "/"
-                        + AbstractNexusIntegrationTest.RELATIVE_CONF_DIR, "nexus.xml");
+                        + AbstractNexusIntegrationTest.RELATIVE_WORK_CONF_DIR, "nexus.xml");
     }
 
     @SuppressWarnings( "unchecked" )

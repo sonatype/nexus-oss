@@ -51,7 +51,7 @@ public class FileConfigurationSource
     /**
      * The configuration file.
      * 
-     * @plexus.configuration default-value="${nexus.configuration}"
+     * @plexus.configuration default-value="${nexus-work}/conf/nexus.xml"
      */
     private File configurationFile;
 

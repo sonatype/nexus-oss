@@ -1551,7 +1551,14 @@ public class DefaultNexus
 
         feedRecorder.stopService();
 
-        cacheManager.stopService();
+        try
+        {
+            cacheManager.stopService();   
+        }
+        catch ( IllegalStateException e )
+        {
+            getLogger().error( "Error while stopping CacheManager:", e );
+        }
 
         nexusConfiguration.dropInternals();
 

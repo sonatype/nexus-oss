@@ -44,16 +44,17 @@ public class DefaultNexusSecurityConfigurationTest
     protected void setUp()
         throws Exception
     {
+        super.setUp();
+        
         securityConfiguration = (DefaultNexusSecurityConfiguration) this.lookup( NexusSecurityConfiguration.ROLE );
         securityConfiguration.startService();
-
-        super.setUp();
     }
 
     protected void tearDown()
         throws Exception
     {
         securityConfiguration.stopService();
+        
         super.tearDown();
     }
 

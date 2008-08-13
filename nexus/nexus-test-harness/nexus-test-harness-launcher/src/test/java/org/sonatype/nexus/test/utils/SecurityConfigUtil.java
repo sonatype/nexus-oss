@@ -19,6 +19,7 @@ import org.sonatype.nexus.configuration.security.model.CRole;
 import org.sonatype.nexus.configuration.security.model.CUser;
 import org.sonatype.nexus.configuration.security.model.Configuration;
 import org.sonatype.nexus.configuration.security.model.io.xpp3.NexusSecurityConfigurationXpp3Reader;
+import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.rest.model.PrivilegeApplicationStatusResource;
 import org.sonatype.nexus.rest.model.PrivilegeBaseStatusResource;
 import org.sonatype.nexus.rest.model.PrivilegeTargetResource;
@@ -224,7 +225,10 @@ public class SecurityConfigUtil
 
         ResourceBundle rb = ResourceBundle.getBundle( "baseTest" );
 
-        File secConfigFile = new File( rb.getString( "nexus.base.dir" ), "runtime/work/nexus/conf/security.xml" );
+        File secConfigFile = new File( rb.getString( "nexus.base.dir" ) 
+                                       + "/"
+                                       + AbstractNexusIntegrationTest.RELATIVE_WORK_CONF_DIR
+                                       , "security.xml" );
 
         Reader fr = null;
         Configuration configuration = null;

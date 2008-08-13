@@ -37,33 +37,22 @@ import org.codehaus.plexus.util.IOUtil;
 public abstract class AbstractNexusTestCase
     extends PlexusTestCase
 {
-    public static final String NEXUS_CONFIGURATION_KEY = "nexus.configuration";
+    public static final String WORK_CONFIGURATION_KEY = "nexus-work";
     public static final String APPS_CONFIGURATION_KEY = "apps";
 
     protected static final File PLEXUS_HOME = new File( getBasedir(), "target/plexus-home" );
+    protected static final File WORK_HOME = new File( PLEXUS_HOME, "nexus-work" );
+    protected static final File CONF_HOME = new File( WORK_HOME, "conf" );
 
     protected void customizeContext( Context ctx )
     {
-        File nexusConfigFile = new File( PLEXUS_HOME, "/conf/nexus.xml" );
-
-        nexusConfigFile.getParentFile().mkdirs();
-
-        ctx.put( NEXUS_CONFIGURATION_KEY, nexusConfigFile.getAbsolutePath() );
+        ctx.put( WORK_CONFIGURATION_KEY, WORK_HOME.getAbsolutePath() );
         ctx.put( APPS_CONFIGURATION_KEY, PLEXUS_HOME.getAbsolutePath() );
     }
 
     protected String getNexusConfiguration()
     {
-        try
-        {
-            return (String) getContainer().getContext().get( NEXUS_CONFIGURATION_KEY );
-        }
-        catch ( ContextException e )
-        {
-            fail( "JUNit environment problem: " + NEXUS_CONFIGURATION_KEY + " not found in plexus context?" );
-
-            return null;
-        }
+        return CONF_HOME + "/nexus.xml";
     }
 
     protected void copyDefaultConfigToPlace()

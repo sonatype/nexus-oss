@@ -124,7 +124,11 @@ public class DefaultNexusConfiguration
     /** The global remote storage context. */
     private RemoteStorageContext remoteStorageContext;
 
-    /** The working directory. */
+    /**  
+     * The working directory.
+     * 
+     * @plexus.configuration default-value="${nexus-work}"
+     */    
     private File workingDirectory;
 
     /** The app log dir */
@@ -138,9 +142,6 @@ public class DefaultNexusConfiguration
 
     /** The trash */
     private File wastebasketDirectory;
-
-    /** The security config file */
-    private File securityConfigurationFile;
 
     /** The config event listeners. */
     private CopyOnWriteArrayList<ConfigurationChangeListener> configurationChangeListeners = new CopyOnWriteArrayList<ConfigurationChangeListener>();
@@ -172,8 +173,6 @@ public class DefaultNexusConfiguration
 
             configurationSource.loadConfiguration();
 
-            workingDirectory = null;
-
             applicationLogDirectory = null;
 
             configurationDirectory = null;
@@ -181,8 +180,6 @@ public class DefaultNexusConfiguration
             temporaryDirectory = null;
 
             wastebasketDirectory = null;
-
-            securityConfigurationFile = null;
 
             // create shared remote ctx
             remoteStorageContext = new DefaultRemoteStorageContext();
@@ -209,8 +206,6 @@ public class DefaultNexusConfiguration
     {
         getLogger().info( "Applying Nexus Configuration..." );
 
-        workingDirectory = null;
-
         applicationLogDirectory = null;
 
         configurationDirectory = null;
@@ -218,8 +213,6 @@ public class DefaultNexusConfiguration
         temporaryDirectory = null;
 
         wastebasketDirectory = null;
-
-        securityConfigurationFile = null;
 
         notifyConfigurationChangeListeners();
     }
@@ -309,35 +302,12 @@ public class DefaultNexusConfiguration
 
     public File getWorkingDirectory()
     {
-        if ( workingDirectory == null )
-        {
-            workingDirectory = new File( getConfiguration().getWorkingDirectory() );
-
-            if ( !workingDirectory.exists() )
-            {
-                workingDirectory.mkdirs();
-            }
-        }
         return workingDirectory;
     }
 
     public File getWorkingDirectory( String key )
     {
         return new File( getWorkingDirectory(), key );
-    }
-
-    public File getSecurityConfigurationFile()
-    {
-        if ( securityConfigurationFile == null )
-        {
-            securityConfigurationFile = new File( getConfigurationDirectory(), "security.xml" );
-
-            if ( !securityConfigurationFile.exists() )
-            {
-                securityConfigurationFile.getParentFile().mkdirs();
-            }
-        }
-        return securityConfigurationFile;
     }
 
     public File getTemporaryDirectory()

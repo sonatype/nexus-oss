@@ -71,7 +71,7 @@ import org.sonatype.nexus.smtp.SmtpClient;
 
 public class DefaultNexusSecurityConfiguration
     extends AbstractLogEnabled
-    implements NexusSecurityConfiguration, ConfigurationChangeListener
+    implements NexusSecurityConfiguration
 {
     /**
      * The nexus configuration. Used to initialize the list of repo targets
@@ -120,53 +120,29 @@ public class DefaultNexusSecurityConfiguration
      */
     private SecurityRuntimeConfigurationBuilder runtimeConfigurationBuilder;
 
-    private boolean initialized = false;
-
     /** The config event listeners. */
     private CopyOnWriteArrayList<ConfigurationChangeListener> configurationChangeListeners = new CopyOnWriteArrayList<ConfigurationChangeListener>();
-
-    public void onConfigurationChange( ConfigurationChangeEvent evt )
-    {
-        if ( FileConfigurationSource.class.isAssignableFrom( configurationSource.getClass() ) )
-        {
-            File newFile = ( (NexusConfiguration) evt.getNotifiableConfiguration() ).getSecurityConfigurationFile();
-
-            File oldFile = ( (FileConfigurationSource) configurationSource ).getConfigurationFile();
-
-            if ( !initialized || !newFile.equals( oldFile ) )
-            {
-                ( (FileConfigurationSource) configurationSource ).setConfigurationFile( newFile );
-
-                try
-                {
-                    loadConfiguration( true );
-
-                    notifyConfigurationChangeListeners();
-
-                    getLogger().info( "Loaded Nexus Security" );
-
-                    initialized = true;
-                }
-                catch ( ConfigurationException e )
-                {
-                    getLogger().error( "Could not start Nexus Security, user configuration exception!", e );
-                }
-                catch ( IOException e )
-                {
-                    getLogger().error( "Could not start Nexus Security, bad IO exception!", e );
-                }
-            }
-        }
-    }
 
     public void startService()
         throws StartingException
     {
-        initialized = false;
+        try
+        {
+            loadConfiguration( true );
+            
+            notifyConfigurationChangeListeners();
 
-        nexusConfiguration.addConfigurationChangeListener( this );
-
-        getLogger().info( "Started Nexus Security" );
+            getLogger().info( "Started Nexus Security" );
+        }
+        catch ( ConfigurationException e )
+        {
+            getLogger().error( "FAILED Starting Nexus Security", e );
+        }
+        catch ( IOException e )
+        {
+            // TODO Auto-generated catch block
+            getLogger().error( "FAILED Starting Nexus Security", e );
+        }
     }
 
     public void stopService()

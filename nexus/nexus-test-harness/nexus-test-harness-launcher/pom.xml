@@ -130,8 +130,12 @@
 				</directory>
 				<filtering>true</filtering>
 				<targetPath>
-					../../${nexus-relative-basedir}/runtime/apps/nexus/conf
+					../../${nexus-relative-basedir}/runtime/work/conf
 				</targetPath>
+				<excludes>
+				    <exclude>**/settings.xml</exclude>
+				    <exclude>**/log4j.properties</exclude>
+				</excludes>
 			</testResource>
 
 		</testResources>

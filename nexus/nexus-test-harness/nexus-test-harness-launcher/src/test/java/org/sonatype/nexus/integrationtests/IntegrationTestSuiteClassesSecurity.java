@@ -58,7 +58,7 @@ import org.sonatype.nexus.integrationtests.proxy.nexus262.Nexus262SimpleProxyTes
     Nexus233PrivilegesCrudXMLTests.class, Nexus233PrivilegesValidationTests.class, Nexus385RoutesCrudXmlTests.class,
     Nexus385RoutesValidationTests.class, Nexus387RoutesTests.class, Nexus429UploadArtifactPrivilegeTest.class,
     Nexus133TargetPermissionTests.class, Nexus142UserPermissionTests.class, Nexus156RolesPermissionTests.class,
-    Nexus385RoutesPermissionTests.class, Nexus429WagonDeployPrivilegeTest.class,
+    Nexus385RoutesPermissionTests.class, Nexus429WagonDeployPrivilegeTest.class, 
     Nexus393ResetPasswordPermissionTest.class, Nexus394ForgotPasswordPermissionTest.class,
     Nexus385RoutesPermissionTests.class, Nexus395ForgotUsernamePermissionTest.class,
     Nexus408ChangePasswordPermissionTest.class, Nexus450UserCreationTest.class, Nexus502MavenExecutionTest.class, Nexus477ArtifactsCrudTests.class } )

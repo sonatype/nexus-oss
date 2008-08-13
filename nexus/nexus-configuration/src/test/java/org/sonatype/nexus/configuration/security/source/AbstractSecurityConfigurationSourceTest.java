@@ -23,7 +23,6 @@ package org.sonatype.nexus.configuration.security.source;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.sonatype.nexus.configuration.AbstractNexusTestCase;
 
@@ -37,14 +36,6 @@ public abstract class AbstractSecurityConfigurationSourceTest
 
     protected abstract InputStream getOriginatingConfigurationInputStream()
         throws IOException;
-
-    public void setUp()
-        throws Exception
-    {
-        super.setUp();
-
-        FileUtils.deleteDirectory( PLEXUS_HOME );
-    }
 
     public void testConfigStream()
         throws Exception

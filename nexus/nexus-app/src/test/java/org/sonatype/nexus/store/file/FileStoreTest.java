@@ -55,7 +55,7 @@ public class FileStoreTest
 
     protected String getStoreDir()
     {
-        return getBasedir() + "/target/plexus-home/work/nexus/template-store";
+        return WORK_HOME + "/template-store";
     }
 
     protected void createDefaultTwoObject()

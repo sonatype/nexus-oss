@@ -70,11 +70,6 @@ public class ApplicationConfigurationAdapter
     {
         return nexusConfiguration.getConfigurationDirectory();
     }
-    
-    public File getSecurityConfigurationFile()
-    {
-        return nexusConfiguration.getSecurityConfigurationFile();
-    }
 
     public void saveConfiguration()
         throws IOException
