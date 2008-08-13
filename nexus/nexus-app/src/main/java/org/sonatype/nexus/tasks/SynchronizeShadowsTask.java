@@ -21,7 +21,6 @@
 package org.sonatype.nexus.tasks;
 
 import org.sonatype.nexus.feeds.FeedRecorder;
-import org.sonatype.nexus.proxy.repository.ShadowRepository;
 import org.sonatype.nexus.scheduling.AbstractNexusTask;
 
 /**
@@ -34,23 +33,23 @@ import org.sonatype.nexus.scheduling.AbstractNexusTask;
 public class SynchronizeShadowsTask
     extends AbstractNexusTask<Object>
 {
-    private ShadowRepository shadowRepository;
+    private String shadowRepositoryId;
 
-    public ShadowRepository getShadowRepository()
+    public String getShadowRepositoryId()
     {
-        return shadowRepository;
+        return shadowRepositoryId;
     }
 
-    public void setShadowRepository( ShadowRepository shadowRepository )
+    public void setShadowRepositoryId( String shadowRepositoryId )
     {
-        this.shadowRepository = shadowRepository;
+        this.shadowRepositoryId = shadowRepositoryId;
     }
 
     @Override
     protected Object doRun()
         throws Exception
     {
-        getShadowRepository().synchronizeWithMaster();
+        getNexus().synchronizeShadow( getShadowRepositoryId() );
 
         return null;
     }
@@ -64,10 +63,7 @@ public class SynchronizeShadowsTask
     @Override
     protected String getMessage()
     {
-        return "Synchronizing virtual repository '" + getShadowRepository().getName() + "' (ID='"
-            + getShadowRepository().getId() + "') with it's master repository '"
-            + getShadowRepository().getMasterRepository().getName() + "' (ID='"
-            + getShadowRepository().getMasterRepository().getId() + "')";
+        return "Synchronizing virtual repository ID='" + getShadowRepositoryId() + "') with it's master repository.";
     }
 
 }

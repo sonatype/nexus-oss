@@ -188,6 +188,9 @@ public interface Nexus
             NoSuchRepositoryGroupException,
             IllegalArgumentException;
 
+    void synchronizeShadow( String shadowRepositoryId )
+        throws NoSuchRepositoryException;
+
     // ----------------------------------------------------------------------------
     // Feeds
     // ----------------------------------------------------------------------------
@@ -321,7 +324,8 @@ public interface Nexus
 
     FlatSearchResponse searchArtifactFlat( String term, String repositoryId, String groupId, Integer from, Integer count );
 
-    FlatSearchResponse searchArtifactClassFlat( String term, String repositoryId, String groupId, Integer from, Integer count );
+    FlatSearchResponse searchArtifactClassFlat( String term, String repositoryId, String groupId, Integer from,
+        Integer count );
 
     FlatSearchResponse searchArtifactFlat( String gTerm, String aTerm, String vTerm, String cTerm, String repositoryId,
         String groupId, Integer from, Integer count );

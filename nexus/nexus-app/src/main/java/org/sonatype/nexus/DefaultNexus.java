@@ -899,6 +899,22 @@ public class DefaultNexus
         return snapshotRemover.removeSnapshots( request );
     }
 
+    public void synchronizeShadow( String shadowRepositoryId )
+        throws NoSuchRepositoryException
+    {
+        try
+        {
+            ShadowRepository shadowRepo = (ShadowRepository) getRepository( shadowRepositoryId );
+
+            shadowRepo.synchronizeWithMaster();
+        }
+        catch ( ClassCastException e )
+        {
+            // the repo exists but is not shadow???
+            throw new NoSuchRepositoryException( shadowRepositoryId );
+        }
+    }
+
     // ------------------------------------------------------------------
     // Repo templates, CRUD
 
@@ -1553,7 +1569,7 @@ public class DefaultNexus
 
         try
         {
-            cacheManager.stopService();   
+            cacheManager.stopService();
         }
         catch ( IllegalStateException e )
         {
@@ -1578,23 +1594,15 @@ public class DefaultNexus
 
         for ( CRepositoryShadow shadow : shadows )
         {
+            // spawn tasks to do it
             if ( shadow.isSyncAtStartup() )
             {
-                try
-                {
-                    ShadowRepository shadowRepo = (ShadowRepository) getRepository( shadow.getId() );
+                SynchronizeShadowsTask task = (SynchronizeShadowsTask) nexusScheduler
+                    .createTaskInstance( SynchronizeShadowsTask.class );
 
-                    SynchronizeShadowsTask task = (SynchronizeShadowsTask) nexusScheduler
-                        .createTaskInstance( SynchronizeShadowsTask.class );
+                task.setShadowRepositoryId( shadow.getId() );
 
-                    task.setShadowRepository( shadowRepo );
-
-                    nexusScheduler.submit( "Shadow Sync (" + shadow.getId() + ")", task );
-                }
-                catch ( NoSuchRepositoryException e )
-                {
-                    // will not be thrown
-                }
+                nexusScheduler.submit( "Shadow Sync (" + shadow.getId() + ")", task );
             }
         }
     }
