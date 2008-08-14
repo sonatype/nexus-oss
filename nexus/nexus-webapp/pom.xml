@@ -125,6 +125,68 @@
       </plugin>
       
       <plugin>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <executions>
+          <execution>
+            <phase>generate-sources</phase>
+            <configuration>
+              <tasks>
+                <property name="targetRoot" value="${basedir}/target/gzip-web-content"/>
+                <property name="sourceRoot" value="${basedir}/src/main/webapp"/>
+                <mkdir dir="${targetRoot}/ext-2.0.2/resources/css"/>
+                <mkdir dir="${targetRoot}/style"/>
+                <mkdir dir="${targetRoot}/ext-2.0.2/adapter/ext"/>
+                <mkdir dir="${targetRoot}/js/filetree/js"/>
+                <mkdir dir="${targetRoot}/js/extensions"/>
+                <mkdir dir="${targetRoot}/js/repoServer"/>
+                <gzip src="${sourceRoot}/ext-2.0.2/resources/css/ext-all.css" destfile="${targetRoot}/ext-2.0.2/resources/css/ext-all.css.gz"/>
+                <gzip src="${sourceRoot}/ext-2.0.2/resources/css/xtheme-gray.css" destfile="${targetRoot}/ext-2.0.2/resources/css/xtheme-gray.css.gz"/>
+                <gzip src="${sourceRoot}/style/Sonatype.css" destfile="${targetRoot}/style/Sonatype.css.gz"/>
+                <gzip src="${sourceRoot}/ext-2.0.2/adapter/ext/ext-base-debug-sonatype.js" destfile="${targetRoot}/ext-2.0.2/adapter/ext/ext-base-debug-sonatype.js.gz"/>
+                <gzip src="${sourceRoot}/ext-2.0.2/ext-all-debug-sonatype.js" destfile="${targetRoot}/ext-2.0.2/ext-all-debug-sonatype.js.gz"/>
+                <gzip src="${sourceRoot}/js/filetree/js/Ext.ux.form.BrowseButton.js" destfile="${targetRoot}/js/filetree/js/Ext.ux.form.BrowseButton.js.gz"/>
+                <gzip src="${sourceRoot}/js/Sonatype.js" destfile="${targetRoot}/js/Sonatype.js.gz"/>
+                <gzip src="${sourceRoot}/js/extensions/Ext.messagebox.js" destfile="${targetRoot}/js/extensions/Ext.messagebox.js.gz"/>
+                <gzip src="${sourceRoot}/js/extensions/Ext.form.js" destfile="${targetRoot}/js/extensions/Ext.form.js.gz"/>
+                <gzip src="${sourceRoot}/js/extensions/SearchField.js" destfile="${targetRoot}/js/extensions/SearchField.js.gz"/>
+                <gzip src="${sourceRoot}/js/extensions/Sonatype.ext.FeedGrid.js" destfile="${targetRoot}/js/extensions/Sonatype.ext.FeedGrid.js.gz"/>
+                <gzip src="${sourceRoot}/js/extensions/Ext.tree.js" destfile="${targetRoot}/js/extensions/Ext.tree.js.gz"/>
+                <gzip src="${sourceRoot}/js/extensions/TwinPanelController.js" destfile="${targetRoot}/js/extensions/TwinPanelController.js.gz"/>                
+                <gzip src="${sourceRoot}/js/Sonatype.utils.js" destfile="${targetRoot}/js/Sonatype.utils.js.gz"/>
+                <gzip src="${sourceRoot}/js/Sonatype.config.js" destfile="${targetRoot}/js/Sonatype.config.js.gz"/>
+                <gzip src="${sourceRoot}/js/Sonatype.lib.js" destfile="${targetRoot}/js/Sonatype.lib.js.gz"/>
+                <gzip src="${sourceRoot}/js/Sonatype.resources.js" destfile="${targetRoot}/js/Sonatype.resources.js.gz"/>
+                <gzip src="${sourceRoot}/js/Sonatype.view.js" destfile="${targetRoot}/js/Sonatype.view.js.gz"/>
+                <gzip src="${sourceRoot}/js/repoServer/repoServer.referenceData.js" destfile="${targetRoot}/js/repoServer/repoServer.referenceData.js.gz"/>
+                <gzip src="${sourceRoot}/js/repoServer/repoServer.resources.js" destfile="${targetRoot}/js/repoServer/repoServer.resources.js.gz"/>
+                <gzip src="${sourceRoot}/js/repoServer/repoServer.FeedViewPanel.js" destfile="${targetRoot}/js/repoServer/repoServer.FeedViewPanel.js.gz"/>
+                <gzip src="${sourceRoot}/js/repoServer/repoServer.SearchResultGrid.js" destfile="${targetRoot}/js/repoServer/repoServer.SearchResultGrid.js.gz"/>
+                <gzip src="${sourceRoot}/js/repoServer/repoServer.SearchPanel.js" destfile="${targetRoot}/js/repoServer/repoServer.SearchPanel.js.gz"/>
+                <gzip src="${sourceRoot}/js/repoServer/repoServer.LogsViewPanel.js" destfile="${targetRoot}/js/repoServer/repoServer.LogsViewPanel.js.gz"/>
+                <gzip src="${sourceRoot}/js/repoServer/repoServer.ServerEditPanel.js" destfile="${targetRoot}/js/repoServer/repoServer.ServerEditPanel.js.gz"/>
+                <gzip src="${sourceRoot}/js/repoServer/repoServer.GroupsEditPanel.js" destfile="${targetRoot}/js/repoServer/repoServer.GroupsEditPanel.js.gz"/>
+                <gzip src="${sourceRoot}/js/repoServer/repoServer.RoutesEditPanel.js" destfile="${targetRoot}/js/repoServer/repoServer.RoutesEditPanel.js.gz"/>
+                <gzip src="${sourceRoot}/js/repoServer/repoServer.SchedulesEditPanel.js" destfile="${targetRoot}/js/repoServer/repoServer.SchedulesEditPanel.js.gz"/>
+                <gzip src="${sourceRoot}/js/repoServer/repoServer.UserEditPanel.js" destfile="${targetRoot}/js/repoServer/repoServer.UserEditPanel.js.gz"/>
+                <gzip src="${sourceRoot}/js/repoServer/repoServer.RoleEditPanel.js" destfile="${targetRoot}/js/repoServer/repoServer.RoleEditPanel.js.gz"/>
+                <gzip src="${sourceRoot}/js/repoServer/repoServer.PrivilegeEditPanel.js" destfile="${targetRoot}/js/repoServer/repoServer.PrivilegeEditPanel.js.gz"/>
+                <gzip src="${sourceRoot}/js/repoServer/repoServer.AbstractRepoPanel.js" destfile="${targetRoot}/js/repoServer/repoServer.AbstractRepoPanel.js.gz"/>
+                <gzip src="${sourceRoot}/js/repoServer/repoServer.RepoEditPanel.js" destfile="${targetRoot}/js/repoServer/repoServer.RepoEditPanel.js.gz"/>
+                <gzip src="${sourceRoot}/js/repoServer/repoServer.FileUploadPanel.js" destfile="${targetRoot}/js/repoServer/repoServer.FileUploadPanel.js.gz"/>  
+                <gzip src="${sourceRoot}/js/repoServer/repoServer.RepoMaintPanel.js" destfile="${targetRoot}/js/repoServer/repoServer.RepoMaintPanel.js.gz"/>
+                <gzip src="${sourceRoot}/js/repoServer/repoServer.RepoServer.js" destfile="${targetRoot}/js/repoServer/repoServer.RepoServer.js.gz"/>  
+                <gzip src="${sourceRoot}/js/repoServer/repoServer.RepoTargetEditPanel.js" destfile="${targetRoot}/js/repoServer/repoServer.RepoTargetEditPanel.js.gz"/>
+              </tasks>
+            </configuration>
+            <goals>
+              <goal>run</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      
+      
+      <plugin>
         <artifactId>maven-assembly-plugin</artifactId>
         <executions>
           <execution>

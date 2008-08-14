@@ -21,5 +21,9 @@
       <outputDirectory>/runtime/apps/nexus/tools</outputDirectory>
       <fileMode>0644</fileMode>
     </fileSet>
+    <fileSet>
+      <directory>target/gzip-web-content</directory>
+      <outputDirectory>/runtime/apps/nexus/webapp</outputDirectory>
+    </fileSet>
   </fileSets>
 </component>
