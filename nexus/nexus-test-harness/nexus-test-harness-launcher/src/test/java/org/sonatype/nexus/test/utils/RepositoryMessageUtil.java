@@ -11,6 +11,8 @@ import org.restlet.data.Method;
 import org.restlet.data.Response;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.integrationtests.RequestFacade;
+import org.sonatype.nexus.rest.model.RepositoryListResource;
+import org.sonatype.nexus.rest.model.RepositoryListResourceResponse;
 import org.sonatype.nexus.rest.model.RepositoryProxyResource;
 import org.sonatype.nexus.rest.model.RepositoryResource;
 import org.sonatype.nexus.rest.model.RepositoryResourceResponse;
@@ -51,7 +53,7 @@ public class RepositoryMessageUtil
         // currently create doesn't return anything, it should see NEXUS-540
         // the work around is to call get at this point
         RepositoryResource responseResource = this.getRepository( repo.getId() ); // GET always uses XML, due to a
-                                                                                    // problem in the RESTlet client
+        // problem in the RESTlet client
 
         this.validateResourceResponse( repo, responseResource );
 
@@ -66,24 +68,24 @@ public class RepositoryMessageUtil
         Assert.assertEquals( repo.getName(), responseResource.getName() );
         // Assert.assertEquals( repo.getDefaultLocalStorageUrl(), responseResource.getDefaultLocalStorageUrl() ); //
         // TODO: add check for this
-        
+
         // TODO: sometimes the storage dir ends with a '/' SEE: NEXUS-542
-        if( responseResource.getDefaultLocalStorageUrl().endsWith( "/" ))
+        if ( responseResource.getDefaultLocalStorageUrl().endsWith( "/" ) )
         {
-        Assert.assertTrue( "Unexpected defaultLocalStorage: <expected to end with> " + "runtime/work/storage/"
-            + repo.getId() + "/  <actual>" + responseResource.getDefaultLocalStorageUrl(),
-                           responseResource.getDefaultLocalStorageUrl().endsWith(
-                                                                                  "runtime/work/storage/"
-                                                                                      + repo.getId() + "/" ) );
+            Assert.assertTrue( "Unexpected defaultLocalStorage: <expected to end with> " + "runtime/work/storage/"
+                + repo.getId() + "/  <actual>" + responseResource.getDefaultLocalStorageUrl(),
+                               responseResource.getDefaultLocalStorageUrl().endsWith(
+                                                                                      "runtime/work/storage/"
+                                                                                          + repo.getId() + "/" ) );
         }
         // NOTE one of these blocks should be removed
         else
         {
             Assert.assertTrue( "Unexpected defaultLocalStorage: <expected to end with> " + "runtime/work/storage/"
-                               + repo.getId() + "  <actual>" + responseResource.getDefaultLocalStorageUrl(),
-                                              responseResource.getDefaultLocalStorageUrl().endsWith(
-                                                                                                     "runtime/work/storage/"
-                                                                                                         + repo.getId() ) );
+                + repo.getId() + "  <actual>" + responseResource.getDefaultLocalStorageUrl(),
+                               responseResource.getDefaultLocalStorageUrl().endsWith(
+                                                                                      "runtime/work/storage/"
+                                                                                          + repo.getId() ) );
         }
         Assert.assertEquals( repo.getFormat(), responseResource.getFormat() );
         Assert.assertEquals( repo.getNotFoundCacheTTL(), responseResource.getNotFoundCacheTTL() );
@@ -126,12 +128,12 @@ public class RepositoryMessageUtil
         }
 
         // this doesn't return any objects, it should....
-//        // get the Resource object
-//        RepositoryResource responseResource = this.getResourceFromResponse( response );
+        // // get the Resource object
+        // RepositoryResource responseResource = this.getResourceFromResponse( response );
 
         // for now call GET
         RepositoryResource responseResource = this.getRepository( repo.getId() );
-        
+
         this.validateResourceResponse( repo, responseResource );
 
         return responseResource;
@@ -158,28 +160,29 @@ public class RepositoryMessageUtil
         return RequestFacade.sendMessage( serviceURI, method, representation );
     }
 
-    // /**
-    // * This should be replaced with a REST Call, but the REST client does not set the Accept correctly on GET's/
-    // *
-    // * @return
-    // * @throws IOException
-    // */
-    // @SuppressWarnings( "unchecked" )
-    // public List<UserResource> getList()
-    // throws IOException
-    // {
-    // String responseText = RequestFacade.doGetRequest( "service/local/repositories" ).getEntity().getText();
-    // System.out.println( "responseText: \n" + responseText );
-    //
-    // XStreamRepresentation representation =
-    // new XStreamRepresentation( new XStream(), responseText, MediaType.APPLICATION_XML );
-    //
-    // UserListResourceResponse resourceResponse =
-    // (UserListResourceResponse) representation.getPayload( new UserListResourceResponse() );
-    //
-    // return resourceResponse.getData();
-    //
-    // }
+    /**
+     * This should be replaced with a REST Call, but the REST client does not set the Accept correctly on GET's/
+     * 
+     * @return
+     * @throws IOException
+     */
+    @SuppressWarnings( "unchecked" )
+    public List<RepositoryListResource> getList()
+        throws IOException
+    {
+        String responseText = RequestFacade.doGetRequest( "service/local/repositories" ).getEntity().getText();
+        System.out.println( "responseText: \n" + responseText );
+
+        XStreamRepresentation representation =
+            new XStreamRepresentation( new XStream(), responseText, MediaType.APPLICATION_XML );
+
+        
+        RepositoryListResourceResponse resourceResponse =
+            (RepositoryListResourceResponse) representation.getPayload( new RepositoryListResourceResponse() );
+
+        return resourceResponse.getData();
+
+    }
 
     public RepositoryResource getResourceFromResponse( Response response )
         throws IOException
