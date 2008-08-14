@@ -23,13 +23,13 @@ package org.sonatype.nexus.configuration.application.validator;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
-import java.util.Random;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.StringUtils;
+import org.sonatype.nexus.configuration.ConfigurationIdGenerator;
 import org.sonatype.nexus.configuration.model.CGroupsSetting;
 import org.sonatype.nexus.configuration.model.CGroupsSettingPathMappingItem;
 import org.sonatype.nexus.configuration.model.CHttpProxySettings;
@@ -63,6 +63,11 @@ public class DefaultApplicationConfigurationValidator
     extends AbstractLogEnabled
     implements ApplicationConfigurationValidator
 {
+    /**
+     * @plexus.requirement
+     */
+    private ConfigurationIdGenerator idGenerator;
+    
     @SuppressWarnings( "unchecked" )
     public ValidationResponse validateModel( ValidationRequest request )
     {
@@ -499,14 +504,12 @@ public class DefaultApplicationConfigurationValidator
 
         ApplicationValidationContext context = (ApplicationValidationContext) response.getContext();
 
-        Random rnd = new Random();
-
         if ( StringUtils.isEmpty( item.getId() )
             || "0".equals( item.getId() )
             || ( context.getExistingPathMappingIds() != null && context.getExistingPathMappingIds().contains(
                 item.getId() ) ) )
         {
-            String newId = Long.toHexString( System.currentTimeMillis() + rnd.nextInt( 2008 ) );
+            String newId = idGenerator.generateId();
 
             item.setId( newId );
 

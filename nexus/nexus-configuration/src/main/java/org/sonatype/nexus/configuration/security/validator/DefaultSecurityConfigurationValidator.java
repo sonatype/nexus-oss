@@ -23,10 +23,10 @@ package org.sonatype.nexus.configuration.security.validator;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.StringUtils;
+import org.sonatype.nexus.configuration.ConfigurationIdGenerator;
 import org.sonatype.nexus.configuration.security.model.CApplicationPrivilege;
 import org.sonatype.nexus.configuration.security.model.CPrivilege;
 import org.sonatype.nexus.configuration.security.model.CRepoTargetPrivilege;
@@ -47,6 +47,11 @@ public class DefaultSecurityConfigurationValidator
     extends AbstractLogEnabled
     implements SecurityConfigurationValidator
 {
+    /**
+     * @plexus.requirement
+     */
+    private ConfigurationIdGenerator idGenerator;
+    
     @SuppressWarnings( "unchecked" )
     public ValidationResponse validateModel( ValidationRequest request )
     {
@@ -148,8 +153,6 @@ public class DefaultSecurityConfigurationValidator
 
         SecurityValidationContext context = (SecurityValidationContext) response.getContext();
 
-        Random rnd = new Random();
-
         List<String> existingIds = context.getExistingPrivilegeIds();
 
         if ( existingIds == null )
@@ -163,7 +166,7 @@ public class DefaultSecurityConfigurationValidator
             && ( StringUtils.isEmpty( privilege.getId() ) || "0".equals( privilege.getId() ) || ( existingIds
                 .contains( privilege.getId() ) ) ) )
         {
-            String newId = Long.toHexString( System.currentTimeMillis() + rnd.nextInt( 2008 ) );
+            String newId = idGenerator.generateId();
 
             ValidationMessage message = new ValidationMessage( "id", "Fixed wrong privilege ID from '"
                 + privilege.getId() + "' to '" + newId + "'" );
@@ -378,8 +381,6 @@ public class DefaultSecurityConfigurationValidator
 
         SecurityValidationContext context = (SecurityValidationContext) response.getContext();
 
-        Random rnd = new Random();
-
         List<String> existingIds = context.getExistingRoleIds();
 
         if ( existingIds == null )
@@ -393,7 +394,7 @@ public class DefaultSecurityConfigurationValidator
             && ( StringUtils.isEmpty( role.getId() ) || "0".equals( role.getId() ) || ( existingIds.contains( role
                 .getId() ) ) ) )
         {
-            String newId = Long.toHexString( System.currentTimeMillis() + rnd.nextInt( 2008 ) );
+            String newId = idGenerator.generateId();
 
             response.addValidationWarning( "Fixed wrong role ID from '" + role.getId() + "' to '" + newId + "'" );
 
