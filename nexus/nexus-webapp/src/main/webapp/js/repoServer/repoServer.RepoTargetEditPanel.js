@@ -551,13 +551,11 @@ Ext.extend(Sonatype.repoServer.RepoTargetEditPanel, Ext.Panel, {
       var isNew = action.options.isNew;
       var receivedData = action.handleResponse(action.response).data;
       if (isNew) {
-        //successful create
-        var sentData = action.output.data;
-        
+
         var dataObj = {
           id : receivedData.id,
           name : receivedData.name,
-          resourceURI : receivedData.resourceURI,
+          resourceURI : action.getUrl() + '/' + receivedData.id,
           contentClass: receivedData.contentClass
         };
         
@@ -570,7 +568,7 @@ Ext.extend(Sonatype.repoServer.RepoTargetEditPanel, Ext.Panel, {
         this.repoTargetsGridPanel.getSelectionModel().selectRecords([newRec], false);
 
         //set the hidden id field in the form for subsequent updates
-        action.options.fpanel.find('name', 'id')[0].setValue(receivedData.resourceURI);
+        action.options.fpanel.find('name', 'id')[0].setValue(receivedData.id);
 
         //remove button click listeners
         action.options.fpanel.buttons[0].purgeListeners();
