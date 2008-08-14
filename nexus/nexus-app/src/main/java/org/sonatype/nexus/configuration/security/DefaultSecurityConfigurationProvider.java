@@ -52,8 +52,6 @@ public class DefaultSecurityConfigurationProvider
 
         CookieAttribute<String> attr = new CookieAttribute<String>( DEFAULT_REMEMBER_ME_COOKIE_NAME );
 
-        attr.setSecure( true );
-
         rmm.setIdentityAttribute( attr );
 
         return rmm;
