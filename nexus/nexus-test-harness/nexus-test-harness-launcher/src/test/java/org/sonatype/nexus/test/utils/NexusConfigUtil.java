@@ -17,6 +17,7 @@ import junit.framework.Assert;
 
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.sonatype.nexus.configuration.model.CGroupsSettingPathMappingItem;
+import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.Configuration;
 import org.sonatype.nexus.configuration.model.io.xpp3.NexusConfigurationXpp3Reader;
 import org.sonatype.nexus.configuration.model.io.xpp3.NexusConfigurationXpp3Writer;
@@ -120,6 +121,23 @@ public class NexusConfigUtil
             saveConfig( config );
         }
 
+    }
+    
+    public static CRepository getRepo( String repoId ) throws IOException
+    {
+        List<CRepository> repos = getNexusConfig().getRepositories();
+        
+        for ( Iterator<CRepository> iter = repos.iterator(); iter.hasNext(); )
+        {
+            CRepository cRepo = iter.next();
+            
+            // check id
+            if ( cRepo.getId().equals( repoId ) )
+            {
+                return cRepo;
+            }
+        }
+        return null;
     }
 
 }
