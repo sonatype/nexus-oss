@@ -350,7 +350,7 @@ public class DefaultSnapshotRemover
                             .getArtifactId(), gavToRemove.getVersion() );
 
                         // remove the whole GAV
-                        repository.deleteArtifact( req, true, true, true );
+                        repository.deleteArtifactPom( req, true, true, true );
                     }
                     catch ( Exception e )
                     {

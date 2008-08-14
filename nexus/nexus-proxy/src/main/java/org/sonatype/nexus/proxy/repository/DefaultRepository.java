@@ -157,7 +157,21 @@ public abstract class DefaultRepository
                         }
                         catch ( StorageException e )
                         {
-                            remoteItem  = null;
+                            remoteItem = null;
+
+                            // cleanup if any remnant is here
+                            try
+                            {
+                                deleteItem( uid, context );
+                            }
+                            catch ( ItemNotFoundException ex1 )
+                            {
+                                // ignore
+                            }
+                            catch ( UnsupportedStorageOperationException ex2 )
+                            {
+                                // will not happen
+                            }
                         }
                     }
                     else

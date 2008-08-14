@@ -330,8 +330,8 @@ public class ArtifactStoreHelper
             .getClassifier(), "pom", null, null, null, RepositoryPolicy.SNAPSHOT.equals( repository
             .getRepositoryPolicy() ), false, null, false, null );
 
-        gavRequest.setRequestPath( repository.getGavCalculator().gavToPath( gav ) );;
-
+        gavRequest.setRequestPath( repository.getGavCalculator().gavToPath( gav ) );
+/*
         // First undeploy, we will read the pom contents to build the gav
         try
         {
@@ -361,14 +361,8 @@ public class ArtifactStoreHelper
 
         gavRequest.setRequestPath( repository.getGavCalculator().gavToPath( gav ) );
 
-        try
-        {
-            repository.getMetadataManager().undeployArtifact( gavRequest, repository );
-        }
-        catch ( IOException e )
-        {
-            throw new StorageException( "Could not maintain metadata!", e );
-        }
+        // delete the pom's artifact
+        handleDelete( gavRequest, deleteWholeGav, withChecksums, withAllSubordinates );
 
         // Now delete the pom
         gav = new Gav( gavRequest.getGroupId(), gavRequest.getArtifactId(), gavRequest.getVersion(), gavRequest
@@ -376,6 +370,7 @@ public class ArtifactStoreHelper
             .getRepositoryPolicy() ), false, null, false, null );
 
         gavRequest.setRequestPath( repository.getGavCalculator().gavToPath( gav ) );
+*/
 
         handleDelete( gavRequest, deleteWholeGav, withChecksums, withAllSubordinates );
     }
@@ -409,6 +404,15 @@ public class ArtifactStoreHelper
             AccessDeniedException,
             ItemNotFoundException
     {
+        try
+        {
+            repository.getMetadataManager().undeployArtifact( gavRequest, repository );
+        }
+        catch ( IOException e )
+        {
+            throw new StorageException( "Could not maintain metadata!", e );
+        }
+
         if ( deleteWholeGav )
         {
             deleteWholeGav( gavRequest );

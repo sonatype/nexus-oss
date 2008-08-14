@@ -84,7 +84,7 @@ public class DefaultScheduler
         plexusThreadFactory = new PlexusThreadFactory( plexusContainer );
 
         scheduledExecutorService = (ScheduledThreadPoolExecutor) Executors.newScheduledThreadPool(
-            10,
+            20,
             plexusThreadFactory );
 
         taskConfig.initializeTasks( this );

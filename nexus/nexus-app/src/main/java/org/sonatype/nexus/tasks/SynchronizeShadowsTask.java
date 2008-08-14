@@ -37,7 +37,7 @@ public class SynchronizeShadowsTask
 
     public String getShadowRepositoryId()
     {
-        return getParameters().get( SHADOW_REPOSITORY_ID );
+        return getParameter( SHADOW_REPOSITORY_ID );
     }
 
     public void setShadowRepositoryId( String shadowRepositoryId )

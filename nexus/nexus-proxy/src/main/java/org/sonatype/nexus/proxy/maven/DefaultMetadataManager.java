@@ -509,7 +509,7 @@ public class DefaultMetadataManager
             // TODO:
         }
 
-        if ( !gaMd.getVersioning().getVersions().contains( gav.getBaseVersion() ) )
+        if ( gaMd.getVersioning().getVersions().contains( gav.getBaseVersion() ) )
         {
             gaMd.getVersioning().removeVersion( gav.getBaseVersion() );
         }

@@ -143,7 +143,7 @@ public abstract class AbstractRepository
     private long remoteStatusUpdated = 0;
 
     /** Is checking in progress? */
-    private boolean remoteStatusChecking = false;
+    private volatile boolean remoteStatusChecking = false;
 
     /** The name. */
     private String name;
