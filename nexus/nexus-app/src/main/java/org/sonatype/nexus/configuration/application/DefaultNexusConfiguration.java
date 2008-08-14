@@ -124,11 +124,11 @@ public class DefaultNexusConfiguration
     /** The global remote storage context. */
     private RemoteStorageContext remoteStorageContext;
 
-    /**  
+    /**
      * The working directory.
      * 
      * @plexus.configuration default-value="${nexus-work}"
-     */    
+     */
     private File workingDirectory;
 
     /** The app log dir */
@@ -182,7 +182,8 @@ public class DefaultNexusConfiguration
             wastebasketDirectory = null;
 
             // create shared remote ctx
-            remoteStorageContext = new DefaultRemoteStorageContext();
+            // this one has no parent
+            remoteStorageContext = new DefaultRemoteStorageContext( null );
 
             if ( getConfiguration().getGlobalConnectionSettings() != null )
             {

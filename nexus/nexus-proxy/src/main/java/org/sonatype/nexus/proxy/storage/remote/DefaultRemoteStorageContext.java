@@ -48,13 +48,6 @@ public class DefaultRemoteStorageContext
 
     private RemoteStorageContext defaults;
 
-    public DefaultRemoteStorageContext()
-    {
-        super();
-
-        this.defaults = null;
-    }
-
     public DefaultRemoteStorageContext( RemoteStorageContext defaults )
     {
         super();

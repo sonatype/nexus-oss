@@ -215,7 +215,6 @@ public abstract class AbstractProxyTestEnvironment
 
     /*
      * (non-Javadoc)
-     * 
      * @see org.codehaus.plexus.PlexusTestCase#setUp()
      */
     public void setUp()
@@ -228,7 +227,7 @@ public abstract class AbstractProxyTestEnvironment
         this.logger = loggerManager.getLoggerForComponent( this.getClass().toString() );
 
         applicationConfiguration = (ApplicationConfiguration) lookup( ApplicationConfiguration.ROLE );
-        
+
         // deleting files
         FileUtils.forceDelete( getApplicationConfiguration().getWorkingDirectory() );
 
@@ -245,7 +244,7 @@ public abstract class AbstractProxyTestEnvironment
 
         localRepositoryStorage = (LocalRepositoryStorage) lookup( LocalRepositoryStorage.ROLE, "file" );
 
-        remoteStorageContext = new DefaultRemoteStorageContext();
+        remoteStorageContext = new DefaultRemoteStorageContext( null );
 
         remoteRepositoryStorage = (RemoteRepositoryStorage) lookup( RemoteRepositoryStorage.ROLE, "apacheHttpClient3x" );
 
@@ -262,7 +261,6 @@ public abstract class AbstractProxyTestEnvironment
 
     /*
      * (non-Javadoc)
-     * 
      * @see org.codehaus.plexus.PlexusTestCase#tearDown()
      */
     public void tearDown()

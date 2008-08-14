@@ -52,10 +52,10 @@ public class RemoteAuthTest
         CRemoteAuthentication dras2 = new CRemoteAuthentication();
         dras2.setUsername( "cstamas" );
         dras2.setPassword( "cstamas123" );
-        DefaultRemoteStorageContext ctx2 = new DefaultRemoteStorageContext();
+        DefaultRemoteStorageContext ctx2 = new DefaultRemoteStorageContext( null );
         ctx2.setRemoteAuthenticationSettings( dras2 );
         getRepositoryRegistry().getRepository( "repo2" ).setRemoteStorageContext( ctx2 );
-        
+
         item = getRepositoryRegistry().getRepository( "repo2" ).retrieveItem(
             new ResourceStoreRequest( "/repo2.txt", false ) );
         checkForFileAndMatchContents( item );
@@ -64,7 +64,7 @@ public class RemoteAuthTest
         CRemoteAuthentication dras3 = new CRemoteAuthentication();
         dras3.setUsername( "brian" );
         dras3.setPassword( "brian123" );
-        DefaultRemoteStorageContext ctx3 = new DefaultRemoteStorageContext();
+        DefaultRemoteStorageContext ctx3 = new DefaultRemoteStorageContext( null );
         ctx3.setRemoteAuthenticationSettings( dras3 );
         getRepositoryRegistry().getRepository( "repo3" ).setRemoteStorageContext( ctx3 );
 

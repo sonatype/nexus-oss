@@ -78,7 +78,7 @@ public class M2TestsuiteEnvironmentBuilder
                 CommonsHttpClientRemoteStorage rs = new CommonsHttpClientRemoteStorage();
                 rs.enableLogging( env.getLogger().getChildLogger( "RS" + repo.getId() ) );
                 repo.setRemoteStorage( rs );
-                repo.setRemoteStorageContext( new DefaultRemoteStorageContext() );
+                repo.setRemoteStorageContext( new DefaultRemoteStorageContext( env.getRemoteStorageContext() ) );
             }
             else
             {
