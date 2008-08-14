@@ -396,7 +396,8 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
                 width: 75,                
                 disabled:true,
                 allowBlank:false,
-                value: new Date().format('g:i A')
+                format:'H:i',
+                value: new Date().format('H:i')
               }
             ]
           },
@@ -431,7 +432,8 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
                 width: 75,
                 disabled:true,
                 allowBlank:false,
-                value: new Date().format('g:i A')
+                format:'H:i',
+                value: new Date().format('H:i')
               }
             ]
           },
@@ -466,7 +468,8 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
                 width: 75,
                 disabled:true,
                 allowBlank:false,
-                value: new Date().format('g:i A')
+                format:'H:i',
+                value: new Date().format('H:i')
               },
               {
                 xtype: 'panel',
@@ -609,7 +612,8 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
                 width: 75,
                 disabled:true,
                 allowBlank:false,
-                value: new Date().format('g:i A')
+                format:'H:i',
+                value: new Date().format('H:i')
               },
               {
                 xtype: 'panel',
@@ -1829,7 +1833,7 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
     }
     
     //rest api is using 24 hour clock
-    var hours = parseInt(selectedStartTime.getValue().substring(0, selectedStartTime.getValue().indexOf(':'))) + (selectedStartTime.getValue().indexOf('AM') == -1 ? 12 : 0);
+    var hours = parseInt(selectedStartTime.getValue().substring(0, selectedStartTime.getValue().indexOf(':')));
     var minutes = selectedStartTime.getValue().substring(selectedStartTime.getValue().indexOf(':') + 1, selectedStartTime.getValue().indexOf(':') + 3);
     
     return hours + ':' + minutes;
@@ -1847,7 +1851,7 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
     }
     
     //rest api is using 24 hour clock
-    var hours = parseInt(selectedRecurringTime.getValue().substring(0, selectedRecurringTime.getValue().indexOf(':'))) + (selectedRecurringTime.getValue().indexOf('AM') == -1 ? 12 : 0);
+    var hours = parseInt(selectedRecurringTime.getValue().substring(0, selectedRecurringTime.getValue().indexOf(':')));
     var minutes = selectedRecurringTime.getValue().substring(selectedRecurringTime.getValue().indexOf(':') + 1, selectedRecurringTime.getValue().indexOf(':') + 3);
     
     return hours + ':' + minutes;
@@ -1950,15 +1954,9 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
       }
     }
     var hours = parseInt(val.substring(0, val.indexOf(':')));
-    var minutes = val.substring(val.indexOf(':') + 1, val.indexOf(':') + 3);    
-    var afternoon = false;
+    var minutes = val.substring(val.indexOf(':') + 1, val.indexOf(':') + 3);
     
-    //Note api uses 24 hour format, ui is currently showing 12 hour format, so conversion here
-    if (hours > 12){
-      hours = hours - 12;
-      afternoon = true;
-    }
-    var importedTime = hours + ':' + minutes + (afternoon ? ' PM' : ' AM');
+    var importedTime = hours + ':' + minutes;
     selectedStartTime.setValue(importedTime);
     return importedTime;
   },
@@ -1974,15 +1972,9 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
       }
     }
     var hours = parseInt(val.substring(0, val.indexOf(':')));
-    var minutes = val.substring(val.indexOf(':') + 1, val.indexOf(':') + 3);    
-    var afternoon = false;
+    var minutes = val.substring(val.indexOf(':') + 1, val.indexOf(':') + 3);
     
-    //Note api uses 24 hour format, ui is currently showing 12 hour format, so conversion here
-    if (hours > 12){
-      hours = hours - 12;
-      afternoon = true;
-    }
-    var importedTime = hours + ':' + minutes + (afternoon ? ' PM' : ' AM');
+    var importedTime = hours + ':' + minutes;
     selectedRecurringTime.setValue(importedTime);
     return importedTime;
   },
