@@ -267,6 +267,14 @@ Sonatype.repoServer.RepoServer = function(){
                     var v = this.getRawValue();
                     if ( v.length > 0 ) {
                       var panel = this.repoPanel.actions['open-search-all'](this.repoPanel);
+                      var searchType = 'quick';
+                      if ( v.search(/^[0-9a-f]{40}$/) == 0 ) {
+                        searchType = 'checksum';
+                      }
+                      else if ( v.search(/^[A-Z]/) == 0 ) {
+                        searchType = 'classname';
+                      }
+                      panel.setSearchType( panel, searchType );
                       panel.searchField.setRawValue( this.getRawValue() );
                       panel.startSearch( panel );
                     }

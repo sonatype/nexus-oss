@@ -14,6 +14,9 @@ Ext.app.SearchField = Ext.extend(Ext.form.TwinTriggerField, {
           this.onTrigger2Click();
       }
     }, this);
+    if ( this.searchPanel ) {
+      this.searchPanel.searchField = this;
+    }
   },
 
   validationEvent:false,
@@ -22,15 +25,12 @@ Ext.app.SearchField = Ext.extend(Ext.form.TwinTriggerField, {
   trigger2Class:'x-form-search-trigger',
   hideTrigger1:true,
   width:180,
-  hasSearch : false,
   paramName : 'q',
 
   onTrigger1Click : function(){
-    if(this.hasSearch){
+    if(this.getRawValue()){
       this.el.dom.value = '';
-      //var o = {start: 0};
       this.triggers[0].hide();
-      this.searchPanel.resetSearch( this.searchPanel );
       this.hasSearch = false;
     }
   },
@@ -45,3 +45,5 @@ Ext.app.SearchField = Ext.extend(Ext.form.TwinTriggerField, {
     this.searchPanel.startSearch( this.searchPanel );
   }
 });
+
+Ext.reg('nexussearchfield', Ext.app.SearchField);

@@ -140,6 +140,8 @@ Sonatype.repoServer.SearchResultGrid = function(config) {
 
   this.fetchMoreButton = new Ext.SplitButton({
     text: 'Fetch Next 50',
+    icon: Sonatype.config.resourcePath + '/images/icons/search.gif',
+    cls: 'x-btn-text-icon',
     value: '50',
     handler: this.fetchMoreRows,
     disabled: true,
@@ -175,9 +177,23 @@ Sonatype.repoServer.SearchResultGrid = function(config) {
     
   });
 
+  this.clearButton = new Ext.Button({
+    text: 'Clear Results',
+    icon: Sonatype.config.resourcePath + '/images/icons/clear.gif',
+    cls: 'x-btn-text-icon',
+    handler: this.clearResults,
+    disabled: true,
+    scope: this
+  });
+
   this.fetchMoreBar = new Ext.Toolbar({
     ctCls: 'search-all-tbar',
-    items: [ 'Displaying 0 of 0 records', this.fetchMoreButton ]
+    items: [ 
+      'Displaying 0 of 0 records',
+      this.fetchMoreButton,
+      { xtype: 'tbspacer' },
+      this.clearButton
+    ]
   });
 
   Sonatype.repoServer.SearchResultGrid.superclass.constructor.call(this, {
@@ -266,13 +282,23 @@ Ext.extend(Sonatype.repoServer.SearchResultGrid, Ext.grid.GridPanel, {
   
   updateRowTotals: function( p ) {
     var count = p.store.getCount();
+    
+    p.clearButton.setDisabled( count == 0 );
+    
     if ( count == 0 || count > p.totalRecords ) {
       p.totalRecords = count;
     }
     
     p.fetchMoreBar.items.items[0].destroy();
+    p.fetchMoreBar.items.removeAt( 0 );
     p.fetchMoreBar.insertButton( 0, new Ext.Toolbar.TextItem( 'Displaying ' + count + ' of ' + p.totalRecords + ' records' ) );
 
     p.fetchMoreButton.setDisabled( count >= p.totalRecords );
+  },
+  
+  clearResults: function() {
+    this.store.baseParams = {};
+    this.store.removeAll();
+    this.updateRowTotals( this );
   }
 });

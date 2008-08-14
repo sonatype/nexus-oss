@@ -71,11 +71,94 @@ Sonatype.repoServer.SearchPanel = function(config){
     
   });
   this.paramName = 'q';
+
+  this.searchComponents = {
+    'quick' : [
+      {
+        xtype: 'nexussearchfield',
+        name: 'search-all-field',
+        paramName: 'q',
+        searchPanel: this,
+        value: 'bebebe',
+        width: 300
+      }
+    ],
+    'classname' : [
+      {
+        xtype: 'nexussearchfield',
+        id: 'search-all-field',
+        paramName: 'cn',
+        searchPanel: this,
+        width: 300
+      }
+    ],
+    'gav' : [
+      'Group:',
+      { 
+        xtype: 'textfield',
+        id: 'gavsearch-group',
+        size: 100,
+        listeners: {
+          'specialkey': {
+            fn: this.gavEnterHandler,
+            scope: this
+          }
+        }
+      },
+      { xtype: 'tbspacer' },
+      'Artifact:',
+      { 
+        xtype: 'textfield',
+        id: 'gavsearch-artifact',
+        size: 100,
+        listeners: {
+          'specialkey': {
+            fn: this.gavEnterHandler,
+            scope: this
+          }
+        }
+      },
+      { xtype: 'tbspacer' },
+      'Version:',
+      { 
+        xtype: 'textfield',
+        id: 'gavsearch-version',
+        size: 100,
+        listeners: {
+          'specialkey': {
+            fn: this.gavEnterHandler,
+            scope: this
+          }
+        }
+      },
+      { xtype: 'tbspacer' },
+      'Classifier:',
+      { 
+        xtype: 'textfield',
+        id: 'gavsearch-classifier',
+        size: 100,
+        listeners: {
+          'specialkey': {
+            fn: this.gavEnterHandler,
+            scope: this
+          }
+        }
+      },
+      { xtype: 'tbspacer' },
+      {
+        icon: Sonatype.config.resourcePath + '/images/icons/search.gif',
+        cls: 'x-btn-icon',
+        scope: this,
+        handler: this.startGAVSearch
+      }
+    ]
+  };
   
   this.searchField = new Ext.app.SearchField({
     id: 'search-all-field',
+    paramName: 'q',
     searchPanel: this,
-    width: 400
+    width: 300
   });
 
   this.appletPanel = new Ext.Panel({
@@ -86,18 +169,49 @@ Sonatype.repoServer.SearchPanel = function(config){
   this.filenameLabel = null;
   
   this.sp = Sonatype.lib.Permissions;
-  
-  var toolbaritems = [
-    'Search:',
-    this.searchField,
-    { xtype: 'tbspacer' }
-  ];
-  
+
+  this.searchTypeButtonConfig = {
+    text: 'Quick Search',
+    value: 'quick',
+    tooltip: 'Click for more search options',
+    handler: this.switchSearchType,
+    scope: this,
+    menu: {
+      items: [
+        {
+          text: 'Quick Search',
+          value: 'quick',
+          scope: this,
+          handler: this.switchSearchType
+        },
+        {
+          text: 'Classname Search',
+          value: 'classname',
+          scope: this,
+          handler: this.switchSearchType
+        },
+        {
+          text: 'GAV Search',
+          value: 'gav',
+          scope: this,
+          handler: this.switchSearchType
+        }
+      ]
+    }
+  };
+
   if (this.sp.checkPermission(Sonatype.user.curr.repoServer.actionChecksumSearch, this.sp.READ)){
-      toolbaritems[3] =
-      new Ext.ux.form.BrowseButton({
-        text: 'Checksum Search...',
-        appletPanel: true,
+    this.searchComponents['checksum'] = [
+      {
+        xtype: 'nexussearchfield',
+        id: 'search-all-field',
+        paramName: 'sha1',
+        searchPanel: this,
+        width: 300
+      },
+      {
+        xtype: 'browsebutton',
+        text: 'Browse...',
         searchPanel: this,
         tooltip: 'Click to select a file. It will not be uploaded to the ' +
           'remote server, an SHA1 checksum is calculated locally and sent to ' +
@@ -106,15 +220,14 @@ Sonatype.repoServer.SearchPanel = function(config){
         handler: function( b ) {
           var filename = b.detachInputFile().getValue();
 
-          if ( b.appletPanel ) {
-            b.searchPanel.searchToolbar.addText(
+          if ( ! document.digestApplet ) {
+            b.searchPanel.grid.fetchMoreBar.addText(
               '<div id="checksumContainer" style="width:10px">' +
                 '<applet code="org/sonatype/nexus/applet/DigestApplet.class" ' +
                   'archive="' + Sonatype.config.resourcePath + '/digestapplet.jar" ' +
                   'width="1" height="1" name="digestApplet"></applet>' +
                 '</div>'
             ); 
-            b.appletPanel = false;
           }
 
           b.disable();
@@ -130,8 +243,25 @@ Sonatype.repoServer.SearchPanel = function(config){
             f.defer( 200, b, [b, filename] );
           }
         }
-      });
+      }
+    ];
+    this.searchTypeButtonConfig.menu.items[3] = {
+      text: 'Checksum Search',
+      value: 'checksum',
+      scope: this,
+      handler: this.switchSearchType
+    };
   }
+  
+  this.gavFields = [];
+  this.gavParams = [ 'g', 'a', 'v', 'c' ];
+
+  this.searchTypeButton = new Ext.Button( this.searchTypeButtonConfig );
+
+  var toolbaritems = [
+    this.searchTypeButton,
+    this.searchField
+  ];
   
   this.searchToolbar = new Ext.Toolbar({
       ctCls:'search-all-tbar',
@@ -177,49 +307,23 @@ Sonatype.repoServer.SearchPanel = function(config){
 
 //@todo: generalize this search panel for other ST servers to use by providing their own store & reader
 Ext.extend(Sonatype.repoServer.SearchPanel, Ext.Panel, {
-  
-  resetSearch: function( p ) {
-    p.grid.store.baseParams = p.grid.store.baseParams || {};
-    p.grid.store.baseParams[p.paramName] = '';
-    //p.grid.store.reload({params:o});
-    p.grid.store.removeAll();
-    p.grid.updateRowTotals( p.grid );
-    p.setFilenameLabel( p );
-  },
 
   startSearch: function( p ) {
-    p.searchField.hasSearch = true;
     p.searchField.triggers[0].show();
 
-    var v = p.searchField.getRawValue();
-    if ( v.search(/^[0-9a-f]{40}$/) == 0 ) {
-      p.grid.store.removeAll();
-      Ext.Ajax.request( {
-        url: Sonatype.config.repos.urls.identify + '/' + v,
-        callback: function(options, success, response) {
-          if ( success && response.responseText ) {
-            var statusResp = Ext.decode(response.responseText);
-            if ( statusResp ) {
-              this.grid.store.loadData({data:[statusResp]});
-            }
-          }
-          this.grid.totalRecords = 0;
-          this.grid.updateRowTotals( this.grid );
-        },
-        scope: p
-      } );
-    }
-    else {
-      p.grid.store.baseParams = p.grid.store.baseParams || {};
-      p.grid.store.baseParams[p.paramName] = v;
-      p.grid.totalRecords = 0;
-      p.grid.store.load({
-        params: {
-          from: 0,
-          count: 50
-        }
-      });//{params:o});
-    }
+    p.grid.store.baseParams = {};
+    p.grid.store.baseParams[p.searchField.paramName] = p.searchField.getRawValue();
+    p.fetchFirst50( p );
+  },
+  
+  fetchFirst50: function( p ) {
+    p.grid.totalRecords = 0;
+    p.grid.store.load({
+      params: {
+        from: 0,
+        count: 50
+      }
+    });
   },
   
   setFilenameLabel: function( p, s ) {
@@ -227,5 +331,84 @@ Ext.extend(Sonatype.repoServer.SearchPanel, Ext.Panel, {
       p.filenameLabel.destroy();
     }
     p.filenameLabel = s ? p.searchToolbar.addText( '<span style="color:#808080;">'+s+'</span>' ) : null;
+  },
+  
+  switchSearchType: function( button, event ) {
+    this.setSearchType( this, button.value );
+  },
+
+  setSearchType: function( panel, t ) {
+    if ( t != panel.searchTypeButton.value ) {
+      var items = panel.searchTypeButtonConfig.menu.items;
+      panel.searchTypeButton.value = t;
+      for ( var i = 0; i < items.length; i++ ) {
+        if ( items[i].value == t ) {
+          panel.searchTypeButton.setText( items[i].text );
+        }
+      }
+      
+      panel.createToolbarItems( panel, t );
+    }
+  },
+  
+  createToolbarItems: function( panel, searchType ) {
+    var oldSearchValue = '';
+    if ( panel.searchField ) {
+      oldSearchValue = panel.searchField.getRawValue();
+    }
+
+    while ( panel.searchToolbar.items.length > 1 ) {
+      var item = panel.searchToolbar.items.last();
+      panel.searchToolbar.items.remove( item );
+      item.destroy();
+    }
+
+    if ( searchType == 'gav' ) {
+      this.gavFields = [];
+    }
+    
+    var items = panel.searchComponents[searchType];
+    for ( var i = 0; i < items.length; i++ ) {
+      var item = items[i];
+
+      if ( item.xtype == 'nexussearchfield' ) {
+        item = new Ext.app.SearchField( item ); 
+      }
+      else if ( item.xtype == 'textfield' ) {
+        item = new Ext.form.TextField( item );
+        this.gavFields[this.gavFields.length] = item;
+      }
+
+      panel.searchToolbar.add( item );
+    }
+
+    if ( oldSearchValue ) {
+      panel.searchField.setRawValue( oldSearchValue );
+      panel.searchField.triggers[0].show();
+    }
+  },
+
+  startGAVSearch: function() {
+    this.grid.store.baseParams = {};
+    
+    var n = 0;
+    for ( var i = 0; i < this.gavFields.length; i++ ) {
+      var v = this.gavFields[i].getRawValue();
+      if ( v ) {
+        this.grid.store.baseParams[this.gavParams[i]] = v;
+        n++;
+      }
+    }
+    
+    if ( n ) {
+      this.fetchFirst50( this );
+    }
+  },
+  
+  gavEnterHandler: function(f, e) {
+    if(e.getKey() == e.ENTER){
+        this.startGAVSearch();
+    }
   }
+
 });
