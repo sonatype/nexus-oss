@@ -79,7 +79,6 @@ Sonatype.repoServer.SearchPanel = function(config){
         name: 'search-all-field',
         paramName: 'q',
         searchPanel: this,
-        value: 'bebebe',
         width: 300
       }
     ],
