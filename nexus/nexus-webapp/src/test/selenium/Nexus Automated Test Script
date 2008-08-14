@@ -727,16 +727,6 @@
 	<td></td>
 </tr>
 <tr>
-	<td>mouseDownRight</td>
-	<td>//li[2]/ul/li/ul/li/ul/li[1]/div/a/span</td>
-	<td></td>
-</tr>
-<tr>
-	<td>mouseUpRight</td>
-	<td>//li[2]/ul/li/ul/li/ul/li[1]/div/a/span</td>
-	<td></td>
-</tr>
-<tr>
 	<td>mouseDown</td>
 	<td>open-config-server</td>
 	<td></td>
@@ -753,12 +743,12 @@
 </tr>
 <tr>
 	<td>click</td>
-	<td>//div[23]/div/div[1]</td>
+	<td>securityAnonymousAccessEnabled</td>
 	<td></td>
 </tr>
 <tr>
 	<td>click</td>
-	<td>//button</td>
+	<td>//table[@id='savebutton']/tbody/tr/td[2]</td>
 	<td></td>
 </tr>
 <tr>
@@ -772,123 +762,8 @@
 	<td></td>
 </tr>
 <tr>
-	<td>pause</td>
-	<td>500</td>
-	<td></td>
-</tr>
-<tr>
 	<td>verifyTextPresent</td>
-	<td>Welcome to the Sonatype Nexus Repository Manager.</td>
-	<td></td>
-</tr>
-<tr>
-	<td>click</td>
-	<td>login-link</td>
-	<td></td>
-</tr>
-<tr>
-	<td>type</td>
-	<td>usernamefield</td>
-	<td>test</td>
-</tr>
-<tr>
-	<td>type</td>
-	<td>passwordfield</td>
-	<td>test</td>
-</tr>
-<tr>
-	<td>click</td>
-	<td>loginbutton</td>
-	<td></td>
-</tr>
-<tr>
-	<td>pause</td>
-	<td>500</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyTextPresent</td>
-	<td>Server</td>
-	<td></td>
-</tr>
-<tr>
-	<td>type</td>
-	<td>quick-search--field</td>
-	<td>maven</td>
-</tr>
-<tr>
-	<td>click</td>
-	<td>//img</td>
-	<td></td>
-</tr>
-<tr>
-	<td>pause</td>
-	<td>1000</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyTextPresent</td>
-	<td>Maven Central (Remote)</td>
-	<td></td>
-</tr>
-<tr>
-	<td>mouseDown</td>
-	<td>open-config-server</td>
-	<td></td>
-</tr>
-<tr>
-	<td>mouseUp</td>
-	<td>open-config-server</td>
-	<td></td>
-</tr>
-<tr>
-	<td>pause</td>
-	<td>500</td>
-	<td></td>
-</tr>
-<tr>
-	<td>click</td>
-	<td>document.forms[0].elements[17]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>click</td>
-	<td>//div[26]/div/div[2]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>click</td>
-	<td>document.forms[0].elements[18]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>click</td>
-	<td>//td[1]/table/tbody/tr/td[2]/em/button</td>
-	<td></td>
-</tr>
-<tr>
-	<td>click</td>
-	<td>login-link</td>
-	<td></td>
-</tr>
-<tr>
-	<td>type</td>
-	<td>quick-search--field</td>
-	<td>maven</td>
-</tr>
-<tr>
-	<td>click</td>
-	<td>//img</td>
-	<td></td>
-</tr>
-<tr>
-	<td>pause</td>
-	<td>500</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyTextPresent</td>
-	<td>Displaying 0 of 0 records</td>
+	<td>Version unavailable</td>
 	<td></td>
 </tr>
 <tr>
@@ -947,8 +822,23 @@
 	<td></td>
 </tr>
 <tr>
+	<td>mouseDown</td>
+	<td>open-config-server</td>
+	<td></td>
+</tr>
+<tr>
+	<td>mouseUp</td>
+	<td>open-config-server</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
 	<td>click</td>
-	<td>document.forms[0].elements[18]</td>
+	<td>securityAnonymousAccessEnabled</td>
 	<td></td>
 </tr>
 <tr>
@@ -964,6 +854,76 @@
 <tr>
 	<td>click</td>
 	<td>login-link</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>quick-search--field</td>
+	<td>maven</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//img</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>1000</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTextPresent</td>
+	<td>Displaying 50</td>
+	<td></td>
+</tr>
+<tr>
+	<td>mouseDown</td>
+	<td>open-repos-maint-readonly</td>
+	<td></td>
+</tr>
+<tr>
+	<td>mouseUp</td>
+	<td>open-repos-maint-readonly</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//div[2]/div/div[1]/div[2]/div/div[3]/table/tbody/tr/td[1]/div</td>
+	<td></td>
+</tr>
+<tr>
+	<td>mouseDown</td>
+	<td>open-system-changes</td>
+	<td></td>
+</tr>
+<tr>
+	<td>mouseUp</td>
+	<td>open-system-changes</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>st-feeds-grid_http://localhost:8081/nexus/service/local/feeds/systemChanges_col0</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTextPresent</td>
+	<td>Configuration change</td>
 	<td></td>
 </tr>
 
