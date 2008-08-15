@@ -558,53 +558,6 @@ public class AbstractNexusIntegrationTest
     {
 
         return RequestFacade.downloadFile( url, targetFile );
-
-        // OutputStream out = null;
-        // URLConnection conn = null;
-        // InputStream in = null;
-        //
-        // File downloadedFile = new File( targetFile );
-        // // if this is null then someone was getting really creative with the tests, but hey, we will let them...
-        // if ( downloadedFile.getParentFile() != null )
-        // {
-        // downloadedFile.getParentFile().mkdirs();
-        // }
-        //
-        // try
-        // {
-        //
-        // System.out.println( "Downloading file: " + url );
-        // out = new BufferedOutputStream( new FileOutputStream( downloadedFile ) );
-        //
-        // conn = url.openConnection();
-        // in = conn.getInputStream();
-        // byte[] buffer = new byte[1024];
-        // int numRead;
-        // long numWritten = 0;
-        // while ( ( numRead = in.read( buffer ) ) != -1 )
-        // {
-        // out.write( buffer, 0, numRead );
-        // numWritten += numRead;
-        // }
-        // }
-        // finally
-        // {
-        // try
-        // {
-        // if ( out != null )
-        // {
-        // out.close();
-        // }
-        // if ( in != null )
-        // {
-        // in.close();
-        // }
-        // }
-        // catch ( IOException e )
-        // {
-        // }
-        // }
-        // return downloadedFile;
     }
 
     protected void deleteFromRepository( String groupOrArtifactPath )
@@ -666,6 +619,11 @@ public class AbstractNexusIntegrationTest
     public String getRepositoryUrl( String repoId )
     {
         return baseNexusUrl + REPOSITORY_RELATIVE_URL + repoId + "/";
+    }
+    
+    public String getGroupUrl( String groupId )
+    {
+        return baseNexusUrl + GROUP_REPOSITORY_RELATIVE_URL + groupId + "/";
     }
 
     protected static boolean printKnownErrorButDoNotFail( Class<? extends AbstractNexusIntegrationTest> clazz,

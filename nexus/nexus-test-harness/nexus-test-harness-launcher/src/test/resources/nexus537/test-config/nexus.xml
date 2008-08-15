@@ -63,6 +63,16 @@
   </repositories>
   <repositoryGrouping>
     <repositoryGroups>
+
+     <repositoryGroup>
+       <groupId>test-group</groupId>
+       <name>test-group</name>
+       <repositories>
+         <repository>repo1</repository>
+         <repository>repo2</repository>
+       </repositories>
+     </repositoryGroup>
+
       <repositoryGroup>
         <groupId>nexus-test</groupId>
         <name>nexus-test</name>

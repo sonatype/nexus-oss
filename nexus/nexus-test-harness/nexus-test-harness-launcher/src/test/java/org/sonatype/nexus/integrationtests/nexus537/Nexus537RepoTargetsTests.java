@@ -44,6 +44,14 @@ public class Nexus537RepoTargetsTests
 
     private String barPrivDeleteId;
 
+    private String groupFooPrivCreateId;
+
+    private String groupFooPrivReadId;
+
+    private String groupFooPrivUpdateId;
+
+    private String groupFooPrivDeleteId;
+
     private Gav repo1BarArtifact;
 
     private Gav repo1FooArtifact;
@@ -51,7 +59,7 @@ public class Nexus537RepoTargetsTests
     private Gav repo2BarArtifact;
 
     private Gav repo2FooArtifact;
-    
+
     private Gav repo1BarArtifactDelete;
 
     private Gav repo1FooArtifactDelete;
@@ -78,8 +86,7 @@ public class Nexus537RepoTargetsTests
         repo2FooArtifact =
             new Gav( this.getTestId(), "repo2-foo-artifact", "1.0.0", null, "jar", 0, new Date().getTime(),
                      "repo1-bar-artifact", false, false, null, false, null );
-        
-        
+
         repo1BarArtifactDelete =
             new Gav( this.getTestId(), "repo1-bar-artifact-delete", "1.0.0", null, "jar", 0, new Date().getTime(),
                      "repo1-bar-artifact-delete", false, false, null, false, null );
@@ -94,7 +101,7 @@ public class Nexus537RepoTargetsTests
                      "repo1-bar-artifact-delete", false, false, null, false, null );
     }
 
-     @Test
+    @Test
     public void doReadTest()
         throws Exception
     {
@@ -109,14 +116,14 @@ public class Nexus537RepoTargetsTests
         this.download( REPO2_ID, repo2FooArtifact, false );
 
         // now give
-        this.overwriteUserRole( TEST_USER_NAME, "fooPrivReadId", this.fooPrivReadId );
+        this.overwriteUserRole( TEST_USER_NAME, "fooPrivReadId", this.fooPrivReadId);
 
         TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
         TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
 
         this.download( REPO1_ID, repo1BarArtifact, false );
         this.download( REPO2_ID, repo2BarArtifact, false );
-        this.download( REPO2_ID, repo2FooArtifact, true );
+        this.download( REPO2_ID, repo2FooArtifact, false );
         this.download( REPO1_ID, repo1FooArtifact, true );
 
         // now give
@@ -126,10 +133,27 @@ public class Nexus537RepoTargetsTests
         TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
 
         this.download( REPO1_ID, repo1BarArtifact, true );
-        this.download( REPO2_ID, repo2BarArtifact, true );
+        this.download( REPO2_ID, repo2BarArtifact, false );
         this.download( REPO2_ID, repo2FooArtifact, false );
         this.download( REPO1_ID, repo1FooArtifact, false );
 
+        // now give
+        this.overwriteUserRole( TEST_USER_NAME, "groupPrivReadId", this.groupFooPrivReadId );
+
+        TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
+        TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
+
+        // we should not be able to hit any of the repos directly
+        this.groupDownload( repo1BarArtifact, false );
+        this.groupDownload( repo2BarArtifact, false );
+        this.groupDownload( repo2FooArtifact, true );
+        this.groupDownload( repo1FooArtifact, true );
+        
+        this.download( REPO1_ID, repo1BarArtifact, false );
+        this.download( REPO2_ID, repo2BarArtifact, false );
+        this.download( REPO2_ID, repo2FooArtifact, false );
+        this.download( REPO1_ID, repo1FooArtifact, false );
+        
     }
 
      @Test
@@ -155,7 +179,7 @@ public class Nexus537RepoTargetsTests
         this.deploy( repo1BarArtifact, REPO1_ID, this.getTestFile( "repo1-bar-artifact.jar" ), false );
         this.deploy( repo1FooArtifact, REPO1_ID, this.getTestFile( "repo1-foo-artifact.jar" ), true );
         this.deploy( repo2BarArtifact, REPO2_ID, this.getTestFile( "repo2-bar-artifact.jar" ), false );
-        this.deploy( repo1FooArtifact, REPO2_ID, this.getTestFile( "repo2-foo-artifact.jar" ), true );
+        this.deploy( repo1FooArtifact, REPO2_ID, this.getTestFile( "repo2-foo-artifact.jar" ), false );
 
         // now give
         this.overwriteUserRole( TEST_USER_NAME, "barPrivUpdateId", this.barPrivUpdateId );
@@ -165,7 +189,18 @@ public class Nexus537RepoTargetsTests
 
         this.deploy( repo1BarArtifact, REPO1_ID, this.getTestFile( "repo1-bar-artifact.jar" ), true );
         this.deploy( repo1FooArtifact, REPO1_ID, this.getTestFile( "repo1-foo-artifact.jar" ), false );
-        this.deploy( repo2BarArtifact, REPO2_ID, this.getTestFile( "repo2-bar-artifact.jar" ), true );
+        this.deploy( repo2BarArtifact, REPO2_ID, this.getTestFile( "repo2-bar-artifact.jar" ), false );
+        this.deploy( repo1FooArtifact, REPO2_ID, this.getTestFile( "repo2-foo-artifact.jar" ), false );
+
+        // now give
+        this.overwriteUserRole( TEST_USER_NAME, "groupFooPrivUpdateId", this.groupFooPrivUpdateId );
+
+        TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
+        TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
+
+        this.deploy( repo1BarArtifact, REPO1_ID, this.getTestFile( "repo1-bar-artifact.jar" ), false );
+        this.deploy( repo1FooArtifact, REPO1_ID, this.getTestFile( "repo1-foo-artifact.jar" ), false );
+        this.deploy( repo2BarArtifact, REPO2_ID, this.getTestFile( "repo2-bar-artifact.jar" ), false );
         this.deploy( repo1FooArtifact, REPO2_ID, this.getTestFile( "repo2-foo-artifact.jar" ), false );
 
     }
@@ -174,13 +209,18 @@ public class Nexus537RepoTargetsTests
     public void doDeleteTest()
         throws Exception
     {
-        
-        // deploy the artifacts first, we need to use different once because i have no idea how to order the tests with JUnit
-        DeployUtils.deployUsingGavWithRest( REPO1_ID, repo1BarArtifactDelete, this.getTestFile( "repo1-bar-artifact.jar" ) );
-        DeployUtils.deployUsingGavWithRest( REPO1_ID, repo1FooArtifactDelete, this.getTestFile( "repo1-foo-artifact.jar" ) );
-        DeployUtils.deployUsingGavWithRest( REPO2_ID, repo2BarArtifactDelete, this.getTestFile( "repo2-bar-artifact.jar" ) );
-        DeployUtils.deployUsingGavWithRest( REPO2_ID, repo2FooArtifactDelete, this.getTestFile( "repo2-foo-artifact.jar" ) );
-        
+
+        // deploy the artifacts first, we need to use different once because i have no idea how to order the tests with
+        // JUnit
+        DeployUtils.deployUsingGavWithRest( REPO1_ID, repo1BarArtifactDelete,
+                                            this.getTestFile( "repo1-bar-artifact.jar" ) );
+        DeployUtils.deployUsingGavWithRest( REPO1_ID, repo1FooArtifactDelete,
+                                            this.getTestFile( "repo1-foo-artifact.jar" ) );
+        DeployUtils.deployUsingGavWithRest( REPO2_ID, repo2BarArtifactDelete,
+                                            this.getTestFile( "repo2-bar-artifact.jar" ) );
+        DeployUtils.deployUsingGavWithRest( REPO2_ID, repo2FooArtifactDelete,
+                                            this.getTestFile( "repo2-foo-artifact.jar" ) );
+
         TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
         TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
 
@@ -194,24 +234,25 @@ public class Nexus537RepoTargetsTests
 
         TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
         TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
-        
+
         this.delete( repo1BarArtifactDelete, REPO1_ID, false );
         this.delete( repo1FooArtifactDelete, REPO1_ID, true );
         this.delete( repo2BarArtifactDelete, REPO2_ID, false );
-        this.delete( repo2FooArtifactDelete, REPO2_ID, true );
+        this.delete( repo2FooArtifactDelete, REPO2_ID, false );
 
         // now give
         this.overwriteUserRole( TEST_USER_NAME, "fooPrivDeleteId", this.barPrivDeleteId );
 
         TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
         TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
-        
+
         this.delete( repo1BarArtifactDelete, REPO1_ID, true );
         this.delete( repo1FooArtifactDelete, REPO1_ID, false );
-        this.delete( repo2BarArtifactDelete, REPO2_ID, true );
+        this.delete( repo2BarArtifactDelete, REPO2_ID, false );
         this.delete( repo2FooArtifactDelete, REPO2_ID, false );
 
     }
+
 
     private File download( String repoId, Gav gav, boolean shouldDownload )
     {
@@ -248,34 +289,49 @@ public class Nexus537RepoTargetsTests
 
     private void delete( Gav gav, String repoId, boolean shouldDelete )
         throws IOException
-    {   
+    {
         URL url = new URL( this.getRepositoryUrl( repoId ) + this.getRelitiveArtifactPath( gav ) );
 
         int initialGet = RequestFacade.sendMessage( url, Method.GET, null ).getStatus().getCode();
-        
+
         Response reponse = RequestFacade.sendMessage( url, Method.DELETE, null );
         String responseText = reponse.getEntity().getText();
         int statusCode = reponse.getStatus().getCode();
 
         if ( !shouldDelete )
         {
-            Assert.assertEquals( "Response Status: " + responseText, 401,
-                                 statusCode );
+            Assert.assertEquals( "Response Status: " + responseText, 401, statusCode );
         }
         else
         {
-            Assert.assertEquals( "Response Status: " + responseText, 200,
-                                 statusCode );
+            Assert.assertEquals( "Response Status: " + responseText, 200, statusCode );
             Assert.assertEquals( "GET of artifact before DELETE:", 200, initialGet );
             // we should have read also
             reponse = RequestFacade.sendMessage( url, Method.GET, null );
             responseText = reponse.getEntity().getText();
             statusCode = reponse.getStatus().getCode();
-            Assert.assertEquals( "File should have been deleted from: "+ url +"\n"+responseText, 404, statusCode );
+            Assert.assertEquals( "File should have been deleted from: " + url + "\n" + responseText, 404, statusCode );
         }
 
     }
+    
+    private File groupDownload( Gav gav, boolean shouldDownload )
+    {
+        File result = null;
+        try
+        {
+            result = this.downloadArtifactFromGroup( "test-group", gav, "target/nexus537jars/" );
+            Assert.assertTrue( "Artifact download should have thrown exception", shouldDownload );
+        }
+        catch ( IOException e )
+        {
+            Assert.assertFalse( "Artifact should have downloaded: \n" + e.getMessage(), shouldDownload );
+        }
 
+        return result;
+    }
+
+    
     /*
      * (non-Javadoc)
      * 
@@ -308,6 +364,7 @@ public class Nexus537RepoTargetsTests
         fooPriv.setName( "FooPriv" );
         fooPriv.setType( "repositoryTarget" );
         fooPriv.setRepositoryTargetId( fooTarget.getId() );
+        fooPriv.setRepositoryId( "repo1" );
         // get the Resource object
         List<PrivilegeBaseStatusResource> fooPrivs = this.privUtil.createPrivileges( fooPriv );
 
@@ -337,6 +394,8 @@ public class Nexus537RepoTargetsTests
         barPriv.setName( "BarPriv" );
         barPriv.setType( "repositoryTarget" );
         barPriv.setRepositoryTargetId( barTarget.getId() );
+        barPriv.setRepositoryId( "repo1" );
+
         // get the Resource object
         List<PrivilegeBaseStatusResource> barPrivs = this.privUtil.createPrivileges( barPriv );
 
@@ -356,6 +415,38 @@ public class Nexus537RepoTargetsTests
                 Assert.fail( "Unknown Privilege found, id: " + privilegeBaseStatusResource.getId() + " method: "
                     + privilegeBaseStatusResource.getMethod() );
         }
+
+        // now create a couple privs
+        PrivilegeTargetResource groupPriv = new PrivilegeTargetResource();
+        groupPriv.addMethod( "create" );
+        groupPriv.addMethod( "read" );
+        groupPriv.addMethod( "update" );
+        groupPriv.addMethod( "delete" );
+        groupPriv.setName( "GroupPriv" );
+        groupPriv.setType( "repositoryTarget" );
+        groupPriv.setRepositoryTargetId( fooTarget.getId() );
+        groupPriv.setRepositoryGroupId( "test-group" );
+
+        // get the Resource object
+        List<PrivilegeBaseStatusResource> groupPrivs = this.privUtil.createPrivileges( groupPriv );
+
+        for ( Iterator<PrivilegeBaseStatusResource> iter = groupPrivs.iterator(); iter.hasNext(); )
+        {
+            PrivilegeBaseStatusResource privilegeBaseStatusResource = iter.next();
+
+            if ( privilegeBaseStatusResource.getMethod().equals( "create" ) )
+                groupFooPrivCreateId = privilegeBaseStatusResource.getId();
+            else if ( privilegeBaseStatusResource.getMethod().equals( "read" ) )
+                groupFooPrivReadId = privilegeBaseStatusResource.getId();
+            else if ( privilegeBaseStatusResource.getMethod().equals( "update" ) )
+                groupFooPrivUpdateId = privilegeBaseStatusResource.getId();
+            else if ( privilegeBaseStatusResource.getMethod().equals( "delete" ) )
+                groupFooPrivDeleteId = privilegeBaseStatusResource.getId();
+            else
+                Assert.fail( "Unknown Privilege found, id: " + privilegeBaseStatusResource.getId() + " method: "
+                    + privilegeBaseStatusResource.getMethod() );
+        }
+
     }
 
 }
