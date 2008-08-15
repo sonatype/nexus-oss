@@ -16,6 +16,7 @@
   <security>
     <enabled>false</enabled>
     <anonymousAccessEnabled>true</anonymousAccessEnabled>
+    <anonymousUsername>anonymous</anonymousUsername>
     <realms>
       <realm>default</realm>
     </realms>
