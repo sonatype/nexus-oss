@@ -29,6 +29,7 @@ import java.util.logging.Level;
 
 import org.apache.commons.fileupload.FileItemFactory;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
+import org.codehaus.plexus.util.StringUtils;
 import org.jsecurity.mgt.SecurityManager;
 import org.restlet.Application;
 import org.restlet.Context;
@@ -147,6 +148,15 @@ public abstract class AbstractNexusResourceHandler
             if ( MavenRepository.class.isAssignableFrom( repository.getClass() ) )
             {
                 MavenRepository mr = (MavenRepository) repository;
+
+                // TODO: NEXUS-XXX
+                // to avoid nexus-indexer bug
+                String packaging = ai.packaging;
+
+                if ( StringUtils.isEmpty( packaging ) || "null".equals( packaging ) )
+                {
+                    ai.packaging = "jar";
+                }
 
                 Gav gav = new Gav(
                     ai.groupId,
