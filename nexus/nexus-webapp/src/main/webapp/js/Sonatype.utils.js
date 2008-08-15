@@ -128,9 +128,9 @@ Sonatype.utils = {
         }
       }
       else {
-        delete Ext.lib.Ajax.defaultHeaders.Authorization;
-//        Sonatype.state.CookieProvider.clear('authToken');
-//        Sonatype.state.CookieProvider.clear('username');
+        Sonatype.utils.clearCookie('JSESSIONID');
+        Sonatype.utils.clearCookie('nxRememberMe');
+
         Sonatype.MessageBox.show( {
           title: 'Authentication Error',
           msg: 'Your login is incorrect or your session has expired.<br />' +
@@ -638,34 +638,11 @@ Sonatype.utils = {
       headers: {'Authorization' : 'Basic ' + token}, //@todo: send HTTP basic auth data
       url: Sonatype.config.repos.urls.login,
       success: function(response, options){
-        //get user permissions
-        var respObj = Ext.decode(response.responseText);
-        var newUserPerms = respObj.data.clientPermissions;
-        
-//        var rememberMe = Sonatype.utils.getCookie('nxRememberMe');
-
-        Sonatype.user.curr.username = options.cbPassThru.username;
-//        Sonatype.user.curr.authToken = respObj.data.authToken;
-        Sonatype.user.curr.repoServer = newUserPerms;
-        
-//        Sonatype.state.CookieProvider.set('authToken', Sonatype.user.curr.authToken);
-        Sonatype.state.CookieProvider.set('username', Sonatype.user.curr.username);
-        
-//        Ext.lib.Ajax.defaultHeaders.Authorization = 'NexusAuthToken ' + Sonatype.user.curr.authToken;
-        Ext.lib.Ajax.defaultHeaders.Authorization = 'Basic ' + token;
-
-        Sonatype.user.curr.isLoggedIn = true;
-        Sonatype.view.updateLoginLinkText();
-
-        Sonatype.repoServer.RepoServer.resetMainTabPanel();
-        
         activeWindow.getEl().unmask();
         if ( Sonatype.repoServer.RepoServer.loginWindow.isVisible() ) {
           Sonatype.repoServer.RepoServer.loginWindow.hide();
           Sonatype.repoServer.RepoServer.loginForm.getForm().reset();
         }
-        
-        Sonatype.repoServer.RepoServer.createSubComponents(); //update left panel
 
         Sonatype.utils.loadNexusStatus();
       },
@@ -679,10 +656,11 @@ Sonatype.utils = {
     });
   },
   
-  loadNexusStatus: function( scope, afterRequest ) {
+  loadNexusStatus: function() {
+    Sonatype.user.curr = Sonatype.utils.cloneObj(Sonatype.user.anon);
+
     Ext.Ajax.request({
       method: 'GET',
-      scope: scope,
       options: { ignore401: true },
       url: Sonatype.config.repos.urls.status,
       callback: function(options, success, response){
@@ -690,9 +668,10 @@ Sonatype.utils = {
           var respObj = Ext.decode(response.responseText);
   
           Sonatype.utils.version = respObj.data.version;
-          Ext.get('version').update(Sonatype.utils.version);
           
           Sonatype.user.curr.repoServer = respObj.data.clientPermissions;
+          Sonatype.user.curr.isLoggedIn = respObj.data.clientPermissions.loggedIn;
+          Sonatype.user.curr.username = respObj.data.clientPermissions.loggedInUsername;
           
           var availSvrs = Sonatype.config.installedServers;
           for(var srv in availSvrs) {
@@ -702,12 +681,13 @@ Sonatype.utils = {
           }
         }
         else {
-          Sonatype.user.curr = Sonatype.utils.cloneObj(Sonatype.user.anon);
           Sonatype.utils.version = 'Version unavailable';
-          Ext.get('version').update(Sonatype.utils.version);
         }
         
-        if ( afterRequest ) afterRequest.createDelegate(scope)();
+        Ext.get('version').update(Sonatype.utils.version);
+        Sonatype.view.updateLoginLinkText();
+        Sonatype.repoServer.RepoServer.resetMainTabPanel();
+        Sonatype.repoServer.RepoServer.createSubComponents();
       }
     });
   }

@@ -31,54 +31,13 @@ window.Sonatype = function(){
       });
       
       var cp = Sonatype.state.CookieProvider;
-      
-//      var authToken = cp.get('authToken', null);
       var username = cp.get('username', null);
-      
-      Sonatype.utils.clearCookie('JSESSIONID');
+//      Sonatype.utils.clearCookie('JSESSIONID');
+
+      Sonatype.view.init();
       
       Sonatype.utils.loadNexusStatus();
-
-      if ( username && false ) {
-        Ext.Ajax.request({
-          scope: this,
-          method: 'GET',
-          cbPassThru : {
-            username : username
-          },
-          url: Sonatype.config.repos.urls.login,
-          success: function(response, options){
-            //get user permissions
-            var respObj = Ext.decode(response.responseText);
-            var newUserPerms = respObj.data.clientPermissions;
-            
-            Sonatype.user.curr.username = options.cbPassThru.username;
-//            Sonatype.user.curr.authToken = respObj.data.authToken;
-            Sonatype.user.curr.repoServer = newUserPerms;
-            
-//            Sonatype.state.CookieProvider.set('authToken', Sonatype.user.curr.authToken);
-
-//            Ext.lib.Ajax.defaultHeaders.Authorization = 'NexusAuthToken ' + Sonatype.user.curr.authToken;
-            
-            Sonatype.user.curr.isLoggedIn = true;
-            Sonatype.view.init();
-          },
-          failure: function(response, options){
-            delete Ext.lib.Ajax.defaultHeaders.Authorization;
-//            Sonatype.state.CookieProvider.clear('authToken');
-//            Sonatype.state.CookieProvider.clear('username');
-            Sonatype.view.init();
-          }
-
-        });
-      }
-      else {
-        Sonatype.user.curr.isLoggedIn = false;
-        Sonatype.view.init();
-      }
     }
-    
-    
     
   };
 }();

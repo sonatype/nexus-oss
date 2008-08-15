@@ -493,21 +493,9 @@ Sonatype.repoServer.RepoServer = function(){
           method: 'GET',
           url: Sonatype.config.repos.urls.logout,
           callback: function(options, success, response){
-            //note: we don't care about success or failure from the server here.
-            //      if the token was expired (403), we can still go to anonymous client state
-            delete Ext.lib.Ajax.defaultHeaders.Authorization;
-
-//            Sonatype.state.CookieProvider.clear('authToken');
-//            Sonatype.state.CookieProvider.clear('username');
             Sonatype.utils.clearCookie('JSESSIONID');
-            
-            this.resetMainTabPanel();
-            Sonatype.user.curr = Sonatype.utils.cloneObj(Sonatype.user.anon);
-
-            Sonatype.utils.loadNexusStatus( this, function() {
-              Sonatype.view.updateLoginLinkText();
-              this.createSubComponents(); //update left panel
-            } );
+            Sonatype.utils.clearCookie('nxRememberMe');
+            Sonatype.utils.loadNexusStatus();
           }
         });
         
