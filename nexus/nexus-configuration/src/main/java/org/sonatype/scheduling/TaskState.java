@@ -53,6 +53,8 @@ public enum TaskState
 
     public boolean isEndingState()
     {
-        return this.equals( FINISHED ) || this.equals( BROKEN ) || this.equals( CANCELLED );
+        /* I don't think BROKEN should apply, broken simply means an exception was thrown.
+         * So what?  let the user attempt to do it again, maybe an fs perm problem that they resolved */
+        return this.equals( FINISHED ) || this.equals( CANCELLED );
     }
 }

@@ -424,6 +424,10 @@ public class AbstractScheduledServiceResourceHandler
                 ( (ScheduledServiceOnceResource) model ).getStartDate(),
                 ( (ScheduledServiceOnceResource) model ).getStartTime() ) );
         }
+        else
+        {
+            schedule = new ManualRunSchedule();
+        }
 
         return schedule;
     }

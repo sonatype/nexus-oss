@@ -318,12 +318,11 @@ public class DefaultScheduledTask<T>
             }
             catch ( Throwable e )
             {
+                manualRun = false;
+                
                 setBrokenCause( e );
 
                 setTaskState( TaskState.BROKEN );
-
-                // TODO: Should we remove brokeneds?
-                // getScheduler().removeFromTasksMap( this );
 
                 if ( Exception.class.isAssignableFrom( e.getClass() ) )
                 {
