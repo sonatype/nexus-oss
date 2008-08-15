@@ -49,8 +49,8 @@ public interface NexusIndexer
      * The minimal set of index creators.
      */
     public static final List<? extends IndexCreator> MINIMAL_INDEX =
-    // Collections.singletonList(new MinimalArtifactInfoIndexCreator());
-    Arrays.asList( new MinimalArtifactInfoIndexCreator() );
+        Arrays.asList( new MinimalArtifactInfoIndexCreator() );
+        // Collections.singletonList(new MinimalArtifactInfoIndexCreator());
 
     /**
      * The "default" set of index creators. It adds Jar contents (classes) to minimal index.

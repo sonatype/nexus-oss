@@ -90,20 +90,4 @@ public class MinimalIndexNexusIndexerTest
         assertEquals( "tricky-params", goals.get( 13 ) );
     }
 
-    public void testArchetype()
-        throws Exception 
-    {
-        String term = "proptest";
-  
-        Query bq = new PrefixQuery( new Term( ArtifactInfo.GROUP_ID, term ) );
-        TermQuery tq = new TermQuery( new Term( ArtifactInfo.PACKAGING, "maven-archetype" ) );
-        Query query = new FilteredQuery( tq, new QueryWrapperFilter( bq ) );
-    
-        FlatSearchResponse response = nexusIndexer.searchFlat( new FlatSearchRequest( query ) );
-        
-        Collection<ArtifactInfo> r = response.getResults(); 
-    
-        assertEquals( r.toString(), 1, r.size() );
-    }
-    
 }

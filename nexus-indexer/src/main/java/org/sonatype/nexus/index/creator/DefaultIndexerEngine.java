@@ -114,10 +114,14 @@ public class DefaultIndexerEngine
         for ( IndexCreator indexCreator : context.getIndexCreators() )
         {
             indexCreator.populateArtifactInfo( indexingContext );
-            
-            indexCreator.updateDocument( indexingContext, doc );
         }
 
+        // need a second pass in case index creators updated document attributes
+        for ( IndexCreator indexCreator : context.getIndexCreators() )
+        {
+            indexCreator.updateDocument( indexingContext, doc );
+        }
+        
         return doc;
     }
 

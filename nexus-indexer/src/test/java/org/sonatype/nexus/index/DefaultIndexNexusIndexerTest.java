@@ -24,7 +24,10 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.lucene.index.Term;
+import org.apache.lucene.search.FilteredQuery;
+import org.apache.lucene.search.PrefixQuery;
 import org.apache.lucene.search.Query;
+import org.apache.lucene.search.QueryWrapperFilter;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
@@ -163,7 +166,7 @@ public class DefaultIndexNexusIndexerTest
 
         Collection<ArtifactInfo> r = nexusIndexer.searchFlat( ArtifactInfo.VERSION_COMPARATOR, query );
 
-        assertEquals( 3, r.size() );
+        assertEquals( 4, r.size() );
 
         Iterator<ArtifactInfo> it = r.iterator();
         {
@@ -171,6 +174,12 @@ public class DefaultIndexNexusIndexerTest
             assertEquals( "org.apache.directory.server", ai.groupId );
             assertEquals( "apacheds-schema-archetype", ai.artifactId );
             assertEquals( "1.0.2", ai.version );
+        }
+        {
+            ArtifactInfo ai = it.next();
+            assertEquals( "org.apache.servicemix.tooling", ai.groupId );
+            assertEquals( "servicemix-service-engine", ai.artifactId );
+            assertEquals( "3.1", ai.version );
         }
         {
             ArtifactInfo ai = it.next();
@@ -184,7 +193,6 @@ public class DefaultIndexNexusIndexerTest
           assertEquals( "proptest-archetype", ai.artifactId );
           assertEquals( "1.0", ai.version );
         }
-
     }
 
     public void testIndexTimestamp()
@@ -257,6 +265,23 @@ public class DefaultIndexNexusIndexerTest
         newContext.close( true );
 
         assertFalse( new File( newIndex, "timestamp" ).exists() );
+    }
+
+    public void testArchetype() throws Exception 
+    {
+        String term = "proptest";
+    
+        Query bq = new PrefixQuery(new Term(ArtifactInfo.GROUP_ID, term));
+        TermQuery tq = new TermQuery(new Term(ArtifactInfo.PACKAGING,
+            "maven-archetype"));
+        Query query = new FilteredQuery(tq, new QueryWrapperFilter(bq));
+    
+        FlatSearchResponse response = nexusIndexer
+            .searchFlat(new FlatSearchRequest(query));
+    
+        Collection<ArtifactInfo> r = response.getResults();
+    
+        assertEquals(r.toString(), 1, r.size());
     }
 
 }

@@ -43,7 +43,7 @@ public class JarFileContentsIndexCreator
 
         if ( artifactFile != null && artifactFile.exists() && artifactFile.getName().endsWith( ".jar" ) )
         {
-            ai.classNames = getClasses( artifactFile );
+            updateArtifactInfo( ai, artifactFile );
         }
     }
   
@@ -71,7 +71,7 @@ public class JarFileContentsIndexCreator
         return false;
     }
 
-    private String getClasses( File f )
+    private void updateArtifactInfo( ArtifactInfo ai, File f )
         throws IOException
     {
         int totalClasses = 0;
@@ -106,9 +106,15 @@ public class JarFileContentsIndexCreator
                         sb.append( name.substring( 0, name.length() - 6 ) ).append( "\n" );
                     }
                 }
+                else if ( "META-INF/archetype.xml".equals( name )
+                    || "META-INF/maven/archetype.xml".equals( name )
+                    || "META-INF/maven/archetype-metadata.xml".equals( name ) )
+                {
+                    ai.packaging = "maven-archetype";
+                }
             }
 
-            return sb.toString();
+            ai.classNames = sb.toString(); 
         }
         finally
         {

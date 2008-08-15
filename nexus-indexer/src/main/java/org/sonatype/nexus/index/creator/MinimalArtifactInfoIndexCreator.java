@@ -129,8 +129,6 @@ public class MinimalArtifactInfoIndexCreator
                 : ArtifactAvailablility.NOT_PRESENT;
         }
         
-        checkArchetype( ai, artifact );
-        
         checkMavenPlugin( ai, artifact );
         
         if ( artifact != null )
@@ -180,36 +178,6 @@ public class MinimalArtifactInfoIndexCreator
             {
                 close( jf );
                 IOUtil.close( is );
-            }
-        }
-    }
-
-    private void checkArchetype(ArtifactInfo ai, File artifact) 
-    {
-        if ( !"maven-archetype".equals( ai.packaging ) && //
-            artifact != null && //
-            ( "maven-plugin".equals( ai.packaging ) // 
-                || ai.artifactId.indexOf( "archetype" ) > -1 //
-            || ai.groupId.indexOf( "archetype" ) > -1 ) )
-        {
-            ZipFile jf = null;
-            try
-            {
-                jf = new ZipFile( artifact );
-  
-                if ( jf.getEntry( "META-INF/archetype.xml" ) != null //
-                    || jf.getEntry( "META-INF/maven/archetype.xml" ) != null
-                    || jf.getEntry( "META-INF/maven/archetype-metadata.xml" ) != null )
-                {
-                    ai.packaging = "maven-archetype";
-                }
-            }
-            catch ( Exception e )
-            {
-            }
-            finally
-            {
-                close( jf );
             }
         }
     }

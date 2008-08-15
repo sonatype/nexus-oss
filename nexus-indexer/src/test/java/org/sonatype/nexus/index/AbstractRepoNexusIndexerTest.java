@@ -46,13 +46,13 @@ public abstract class AbstractRepoNexusIndexerTest
 
         assertGroup( 1, "commons-cli", context );
 
-        assertGroup( 12, "org", context );
+        assertGroup( 13, "org", context );
 
         assertGroup( 4, "org.slf4j", context );
 
         assertGroup( 3, "org.testng", context );
 
-        assertGroup( 2, "org.apache", context );
+        assertGroup( 3, "org.apache", context );
 
         assertGroup( 1, "org.apache.directory", context );
         assertGroup( 1, "org.apache.directory.server", context );
@@ -73,7 +73,7 @@ public abstract class AbstractRepoNexusIndexerTest
 
         FlatSearchResponse response = nexusIndexer.searchFlat( request );
 
-        assertEquals( 12, response.getTotalHits() );
+        assertEquals( 13, response.getTotalHits() );
     }
 
     public void testSearchFlat()
@@ -210,59 +210,50 @@ public abstract class AbstractRepoNexusIndexerTest
     public void testPaging()
         throws Exception
     {
-        // we have 12 artifact for this search
-        Query q = nexusIndexer.constructQuery( ArtifactInfo.GROUP_ID, "org" );
-
+        // we have 13 artifact for this search
+        int total = 13;
+        
         int pageSize = 4;
+        
+        Query q = nexusIndexer.constructQuery( ArtifactInfo.GROUP_ID, "org" );
 
         FlatSearchRequest req = new FlatSearchRequest( q );
 
-        // start from the 1st page
-        req.setStart( 0 );
-
-        // have pagesize of 4, that will make us 3 pages
+        // have page size of 4, that will make us 4 pages
         req.setAiCount( pageSize );
+        
+        List<ArtifactInfo> constructedPageList = new ArrayList<ArtifactInfo>();
+        
+        int offset = 0;
+        
+        while( true ) 
+        {
+            req.setStart( offset );
+            
+            FlatSearchResponse resp = nexusIndexer.searchFlat( req );
+      
+            assertEquals( total, resp.getTotalHits() );
+      
+            Collection<ArtifactInfo> p = resp.getResults();
+      
+            assertEquals( Math.min( pageSize, total - offset ), p.size() );
 
-        FlatSearchResponse resp1 = nexusIndexer.searchFlat( req );
-
-        assertEquals( 12, resp1.getTotalHits() );
-
-        Collection<ArtifactInfo> p1 = resp1.getResults();
-
-        assertEquals( pageSize, p1.size() );
-
-        req.setStart( req.getStart() + pageSize );
-
-        FlatSearchResponse resp2 = nexusIndexer.searchFlat( req );
-
-        assertEquals( 12, resp2.getTotalHits() );
-
-        Collection<ArtifactInfo> p2 = resp2.getResults();
-
-        assertEquals( pageSize, p2.size() );
-
-        req.setStart( req.getStart() + pageSize );
-
-        FlatSearchResponse resp3 = nexusIndexer.searchFlat( req );
-
-        assertEquals( 12, resp3.getTotalHits() );
-
-        Collection<ArtifactInfo> p3 = resp3.getResults();
-
-        assertEquals( pageSize, p3.size() );
-
-        // construct one list from the three
-        List<ArtifactInfo> constructedPageList = new ArrayList<ArtifactInfo>( p1 );
-
-        constructedPageList.addAll( p2 );
-
-        constructedPageList.addAll( p3 );
-
+            constructedPageList.addAll( p );
+            
+            offset += pageSize;
+            
+            if( offset > total )
+            {
+                break;
+            }
+        }
+        
+        // 
         Collection<ArtifactInfo> onePage = nexusIndexer.searchFlat( q );
 
         List<ArtifactInfo> onePageList = new ArrayList<ArtifactInfo>( onePage );
 
-        // onePage and constructedPage should hold equal elems in equal order
+        // onePage and constructedPage should hold equal elems in the same order
         assertTrue( resultsAreEqual( onePageList, constructedPageList ) );
     }
 
@@ -274,7 +265,7 @@ public abstract class AbstractRepoNexusIndexerTest
 
         Collection<ArtifactInfo> p1 = nexusIndexer.searchFlat( q );
 
-        assertEquals( 12, p1.size() );
+        assertEquals( 13, p1.size() );
 
         context.purge();
 

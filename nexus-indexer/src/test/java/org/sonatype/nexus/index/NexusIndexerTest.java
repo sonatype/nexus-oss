@@ -98,7 +98,7 @@ public class NexusIndexerTest
         Collection<ArtifactInfo> infos = nexus.searchFlat( ArtifactInfo.VERSION_COMPARATOR, new WildcardQuery(
             new Term( ArtifactInfo.UINFO, "*testng*" ) ) );
 
-        assertEquals( 3, infos.size() );
+        assertEquals( infos.toString(), 3, infos.size() );
 
         BooleanQuery bq = new BooleanQuery( true );
         bq.add( new WildcardQuery( new Term( ArtifactInfo.GROUP_ID, "testng*" ) ), Occur.SHOULD );
@@ -107,7 +107,7 @@ public class NexusIndexerTest
 
         Collection<ArtifactInfo> infos1 = nexus.searchFlat( ArtifactInfo.VERSION_COMPARATOR, bq );
 
-        assertEquals( 3, infos1.size() );
+        assertEquals( infos1.toString(), 3, infos1.size() );
     }
 
     public void testSearchPackaging()
@@ -118,7 +118,7 @@ public class NexusIndexerTest
         Collection<ArtifactInfo> infos = nexus.searchFlat( ArtifactInfo.VERSION_COMPARATOR, new WildcardQuery(
             new Term( ArtifactInfo.PACKAGING, "maven-plugin" ) ) );
 
-        assertEquals( 1, infos.size() );
+        assertEquals( infos.toString(), 1, infos.size() );
     }
 
     public void testIdentity()
@@ -230,7 +230,7 @@ public class NexusIndexerTest
         Collection<ArtifactInfo> infos = indexer.searchFlat( ArtifactInfo.VERSION_COMPARATOR, new WildcardQuery(
             new Term( ArtifactInfo.PACKAGING, "maven-plugin" ) ) );
 
-        assertEquals( 1, infos.size() );
+        assertEquals( infos.toString(), 1, infos.size() );
     }
 
     private NexusIndexer prepare()
@@ -246,9 +246,7 @@ public class NexusIndexerTest
 
         File repo = new File( getBasedir(), "src/test/repo" );
 
-        List<IndexCreator> indexCreators = new ArrayList<IndexCreator>( 1 );
-        indexCreators.add( new MinimalArtifactInfoIndexCreator() );
-        context = indexer.addIndexingContext( "test", "test", repo, indexDir, null, null, indexCreators, false );
+        context = indexer.addIndexingContext( "test", "test", repo, indexDir, null, null, NexusIndexer.DEFAULT_INDEX, false );
         indexer.scan( context );
 
 //        IndexReader indexReader = context.getIndexSearcher().getIndexReader();
