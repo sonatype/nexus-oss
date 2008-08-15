@@ -93,22 +93,22 @@
 </tr>
 <tr>
 	<td>type</td>
-	<td>document.forms[0].elements[4]</td>
+	<td>smtpSettings.host</td>
 	<td>mailout.easydns.com</td>
 </tr>
 <tr>
 	<td>type</td>
-	<td>document.forms[0].elements[5]</td>
+	<td>smtpSettings.port</td>
 	<td>465</td>
 </tr>
 <tr>
 	<td>type</td>
-	<td>document.forms[0].elements[6]</td>
+	<td>smtpSettings.username</td>
 	<td>infinity.nu</td>
 </tr>
 <tr>
 	<td>type</td>
-	<td>document.forms[0].elements[7]</td>
+	<td>smtpSettings.password</td>
 	<td>infinity</td>
 </tr>
 <tr>
@@ -462,6 +462,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>pause</td>
+	<td>50000</td>
+	<td></td>
+</tr>
+<tr>
 	<td>type</td>
 	<td>quick-search--field</td>
 	<td>maven</td>
@@ -473,7 +478,7 @@
 </tr>
 <tr>
 	<td>pause</td>
-	<td>5000</td>
+	<td>50000</td>
 	<td></td>
 </tr>
 <tr>
@@ -2554,6 +2559,751 @@
 <tr>
 	<td>verifyTextPresent</td>
 	<td>Select a target to edit it, or click &quot;Add&quot; to create a new one</td>
+	<td></td>
+</tr>
+<tr>
+	<td>mouseDown</td>
+	<td>open-config-rules</td>
+	<td></td>
+</tr>
+<tr>
+	<td>mouseUp</td>
+	<td>open-config-rules</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//div[6]/div/div/div[1]/div[2]/div[1]/div/table/tbody/tr/td[2]/table/tbody/tr/td[2]/em/button</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>pattern</td>
+	<td>.*/com/sonatype/maven</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//form/div[2]/div[1]/div/img[1]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//div/div[text()='Inclusive']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//form/div[3]/div[1]/div/img[1]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//div/div[text()='Virtual Public']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//li[9]/div/a/span</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>document.forms[1].elements[4]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//div[6]/div/div/div[2]/div[2]/div/div[2]/div[2]/div[2]/div/div/div/div/div/table/tbody/tr/td[1]/table/tbody/tr/td[2]/em/button</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//div[6]/div/div/div[1]/div[2]/div[1]/div/table/tbody/tr/td[1]/table/tbody/tr/td[2]/em/button</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTextPresent</td>
+	<td>Select a Repository Route to edit it</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//div[6]/div/div/div[1]/div[2]/div[1]/div/table/tbody/tr/td[2]/table/tbody/tr/td[2]/em/button</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>pattern</td>
+	<td>.*/com/sonatype</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//form/div[2]/div[1]/div/img[1]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//div/div[text()='Exclusive']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//form/div[3]/div[1]/div/img[1]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//div/div[text()='All Repositories']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>document.forms[1].elements[5]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//div[6]/div/div/div[2]/div[2]/div/div[2]/div[2]/div[2]/div/div/div/div/div/table/tbody/tr/td[1]/table/tbody/tr/td[2]/em/button</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//div[6]/div/div/div[1]/div[2]/div[1]/div/table/tbody/tr/td[1]/table/tbody/tr/td[2]/em/button</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//div[6]/div/div/div[1]/div[2]/div[1]/div/table/tbody/tr/td[2]/table/tbody/tr/td[2]/em/button</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>pattern</td>
+	<td>.*/com/anypath</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//div[6]/div/div/div[2]/div[2]/div/div[2]/div[2]/div[2]/div/div/div/div/div/table/tbody/tr/td[1]/table/tbody/tr/td[2]/em/button</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTextPresent</td>
+	<td>One or more repository is required</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//form/div[2]/div[1]/div/img[1]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//div/div[text()='Blocking']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//form/div[3]/div[1]/div/img[1]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//div/div[text()='Public Repositories']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//div[6]/div/div/div[2]/div[2]/div/div[2]/div[2]/div[2]/div/div/div/div/div/table/tbody/tr/td[1]/table/tbody/tr/td[2]/em/button</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//div[6]/div/div/div[1]/div[2]/div[1]/div/table/tbody/tr/td[1]/table/tbody/tr/td[2]/em/button</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>st-routes-grid_http://localhost:8081/nexus/service/local/repo_routes/apache-stuff_col0</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//div[6]/div/div/div[1]/div[2]/div[1]/div/table/tbody/tr/td[3]/table/tbody/tr/td[2]/em/button</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>Yes</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//div[6]/div/div/div[1]/div[2]/div[1]/div/table/tbody/tr/td[1]/table/tbody/tr/td[2]/em/button</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>mouseDown</td>
+	<td>open-security-roles</td>
+	<td></td>
+</tr>
+<tr>
+	<td>mouseUp</td>
+	<td>open-security-roles</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//table[@id='role-add-btn']/tbody/tr/td[2]/em/button</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>name</td>
+	<td>Role 1</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//div[2]/div[2]/div[2]/div/div/div/div/div/table/tbody/tr/td[1]/table/tbody/tr/td[2]/em/button</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTextPresent</td>
+	<td>One or more roles or privileges are required</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//li[4]/div/a/span</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>document.forms[3].elements[4]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//div[2]/div[2]/div[2]/div/div/div/div/div/table/tbody/tr/td[1]/table/tbody/tr/td[2]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//table[@id='role-refresh-btn']/tbody/tr/td[2]/em/button</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTextPresent</td>
+	<td>Select a role to edit it, or click &quot;Add&quot; to create a new</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//table[@id='role-add-btn']/tbody/tr/td[2]/em/button</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//div[3]/div[2]/div[2]/div/div/div/div/div/table/tbody/tr/td[1]/table/tbody/tr/td[2]/em/button</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTextPresent</td>
+	<td>This field is required</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>name</td>
+	<td>Role 2</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>description</td>
+	<td>Second Role</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//div[3]/div[2]/div[1]/div/div/div/form/div[4]/div/div/div/div[3]/div[2]/div/ul/div/li[2]/div/a/span</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>document.forms[4].elements[3]</td>
+	<td>30</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>document.forms[4].elements[4]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//div[3]/div[2]/div[2]/div/div/div/div/div/table/tbody/tr/td[1]/table/tbody/tr/td[2]/em/button</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//table[@id='role-refresh-btn']/tbody/tr/td[2]/em/button</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//div[2]/div[2]/div/div[1]/div[2]/div/div[5]/table/tbody/tr/td[1]/div</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>document.forms[3].elements[7]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTextPresent</td>
+	<td>One or more roles or privileges are required</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//div/li[2]/div/a/span</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>document.forms[3].elements[4]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//div[2]/div[2]/div[2]/div/div/div/div/div/table/tbody/tr/td[1]/table/tbody/tr/td[2]/em/button</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//div[2]/div[2]/div/div[1]/div[2]/div/div[4]/table/tbody/tr/td[1]/div</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//table[@id='role-delete-btn']/tbody/tr/td[2]/em/button</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>No</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//table[@id='role-delete-btn']/tbody/tr/td[2]/em/button</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTextPresent</td>
+	<td>Delete the Role 1 Role?</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>Yes</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//table[@id='role-add-btn']/tbody/tr/td[2]/em/button</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>name</td>
+	<td>role 3</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>description</td>
+	<td>Role Three</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//li[5]/div/a/span</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>document.forms[3].elements[3]</td>
+	<td>5</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//div[4]/div/div/div/div[2]/div/div/table/tbody/tr[1]/td/table/tbody/tr/td[2]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//li[13]/div/a/span</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>document.forms[3].elements[4]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//li[14]/div/a/span</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>document.forms[3].elements[4]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//div[2]/div[2]/div[2]/div/div/div/div/div/table/tbody/tr/td[1]/table/tbody/tr/td[2]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//table[@id='role-refresh-btn']/tbody/tr/td[2]/em/button</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//div[2]/div[2]/div/div[1]/div[2]/div/div[5]/table/tbody/tr/td[1]/div</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//li[3]/div/a/span</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>document.forms[3].elements[6]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//div[2]/div[2]/div[2]/div/div/div/div/div/table/tbody/tr/td[1]/table/tbody/tr/td[2]/em/button</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>mouseDown</td>
+	<td>open-security-users</td>
+	<td></td>
+</tr>
+<tr>
+	<td>mouseUp</td>
+	<td>open-security-users</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//table[@id='user-add-btn']/tbody/tr/td[2]/em/button</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>userId</td>
+	<td>User with Role</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>name</td>
+	<td>Test of a User with a newly added role</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>email</td>
+	<td>testrole@test.com</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//div[5]/div/div/div/div[3]/div[2]/div/ul/div/li[4]/div/a/span</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>document.forms[4].elements[4]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//div[6]/div/div/div[2]/div[2]/div/div[2]/div[2]/div[2]/div/div/div/div/div/table/tbody/tr/td[1]/table/tbody/tr/td[2]/em/button</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTextPresent</td>
+	<td>This field is required</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//input[@name='status']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//div/div[text()='Active']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//div[6]/div/div/div[2]/div[2]/div/div[2]/div[2]/div[2]/div/div/div/div/div/table/tbody/tr/td[1]/table/tbody/tr/td[2]/em/button</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//table[@id='user-refresh-btn']/tbody/tr/td[2]/em/button</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//table[@id='user-add-btn']/tbody/tr/td[2]/em/button</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>userId</td>
+	<td>User with Another Role</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>document.forms[4].elements[1]</td>
+	<td>Test of a Second User with a newly added role</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>email</td>
+	<td>testrole2@test.com</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//div[5]/div/div/div/div[3]/div[2]/div/ul/div/li[5]/div/a/span</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>document.forms[4].elements[4]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//input[@name='status']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//div/div[text()='Disabled']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//div[6]/div/div/div[2]/div[2]/div/div[2]/div[2]/div[2]/div/div/div/div/div/table/tbody/tr/td[1]/table/tbody/tr/td[2]/em/button</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//table[@id='user-refresh-btn']/tbody/tr/td[2]/em/button</td>
 	<td></td>
 </tr>
 
