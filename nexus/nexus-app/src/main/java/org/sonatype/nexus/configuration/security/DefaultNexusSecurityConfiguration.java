@@ -20,7 +20,6 @@
  */
 package org.sonatype.nexus.configuration.security;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -46,7 +45,6 @@ import org.sonatype.nexus.configuration.security.model.CRole;
 import org.sonatype.nexus.configuration.security.model.CUser;
 import org.sonatype.nexus.configuration.security.model.Configuration;
 import org.sonatype.nexus.configuration.security.runtime.SecurityRuntimeConfigurationBuilder;
-import org.sonatype.nexus.configuration.security.source.FileConfigurationSource;
 import org.sonatype.nexus.configuration.security.source.SecurityConfigurationSource;
 import org.sonatype.nexus.configuration.security.validator.SecurityConfigurationValidator;
 import org.sonatype.nexus.configuration.security.validator.SecurityValidationContext;
