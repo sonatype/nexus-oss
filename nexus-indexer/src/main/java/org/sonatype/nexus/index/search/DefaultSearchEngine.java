@@ -58,52 +58,50 @@ public class DefaultSearchEngine
             query,
             new Sort( new SortField( ArtifactInfo.UINFO, SortField.STRING ) ) );
 
-        if ( hits != null && hits.length() != 0 )
-        {
-            int hitCount = hits.length();
-
-            int start = from == UNDEFINED ? 0 : from;
-
-            int found = 0;
-
-            // we have to pack the results as long: a) we have found aiCount ones b) we depleted hits
-            for ( int i = start; i < hits.length(); i++ )
-            {
-                Document doc = hits.doc( i );
-
-                ArtifactInfo artifactInfo = indexingContext.constructArtifactInfo( doc );
-
-                if ( artifactInfo != null )
-                {
-                    artifactInfo.repository = indexingContext.getRepositoryId();
-
-                    artifactInfo.context = indexingContext.getId();
-
-                    if ( result.add( artifactInfo ) )
-                    {
-                        // increase the founds
-                        found++;
-                    }
-                    else
-                    {
-                        // fix the total hitCount accordingly
-                        hitCount--;
-                    }
-
-                    if ( found == aiCount )
-                    {
-                        // escape then
-                        break;
-                    }
-                }
-            }
-            
-            return hitCount;
-        }
-        else
+        if ( hits == null || hits.length() == 0 ) 
         {
             return 0;
         }
+        
+        int hitCount = hits.length();
+
+        int start = from == UNDEFINED ? 0 : from;
+
+        int found = 0;
+
+        // we have to pack the results as long: a) we have found aiCount ones b) we depleted hits
+        for ( int i = start; i < hits.length(); i++ )
+        {
+            Document doc = hits.doc( i );
+
+            ArtifactInfo artifactInfo = indexingContext.constructArtifactInfo( doc );
+
+            if ( artifactInfo != null )
+            {
+                artifactInfo.repository = indexingContext.getRepositoryId();
+
+                artifactInfo.context = indexingContext.getId();
+
+                if ( result.add( artifactInfo ) )
+                {
+                    // increase the founds
+                    found++;
+                }
+                else
+                {
+                    // fix the total hitCount accordingly
+                    hitCount--;
+                }
+
+                if ( found == aiCount )
+                {
+                    // escape then
+                    break;
+                }
+            }
+        }
+        
+        return hitCount;
     }
 
     protected int searchGrouped( Map<String, ArtifactInfoGroup> result, Grouping grouping,
