@@ -255,7 +255,6 @@ Sonatype.repoServer.ServerEditPanel = function(config){
             minLengthText : "Password must be 4 characters or more",
             maxLength: 25,
             maxLengthText : "Password must be 25 characters or less",
-            value: Sonatype.utils.passwordPlaceholder,
             anchor: Sonatype.view.FIELD_OFFSET 
           }
         ]
@@ -520,7 +519,6 @@ Ext.extend(Sonatype.repoServer.ServerEditPanel, Ext.Panel, {
         "routing.followLinks" : Sonatype.utils.convert.stringContextToBool,
         "routing.groups.stopItemSearchOnFirstFoundFile" : Sonatype.utils.convert.stringContextToBool,
         "routing.groups.mergeMetadata" : Sonatype.utils.convert.stringContextToBool,
-        "securityAnonymousPassword" : Sonatype.utils.convert.passwordToString,
         "baseUrl" : Sonatype.utils.returnValidStr
       },
       serviceDataObj : Sonatype.repoServer.referenceData.globalSettingsState
@@ -586,8 +584,6 @@ Ext.extend(Sonatype.repoServer.ServerEditPanel, Ext.Panel, {
           icon: Sonatype.MessageBox.WARNING
         });
       }
-
-      action.options.fpanel.find('name', 'securityAnonymousPassword')[0].setValue(Sonatype.utils.passwordPlaceholder);
     }
     
     if (action.type == 'sonatypeLoad'){
