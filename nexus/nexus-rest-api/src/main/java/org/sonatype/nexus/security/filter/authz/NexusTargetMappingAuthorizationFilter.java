@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.jsecurity.subject.Subject;
 import org.jsecurity.web.WebUtils;
+import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.target.TargetMatch;
 import org.sonatype.nexus.proxy.target.TargetSet;
@@ -111,6 +112,42 @@ public class NexusTargetMappingAuthorizationFilter
         return result;
     }
 
+    protected String getActionFromHttpVerb( ServletRequest request )
+    {
+        String action = ( (HttpServletRequest) request ).getMethod().toLowerCase();
+
+        if ( "put".equals( action ) )
+        {
+            // heavy handed thing
+            // doing a LOCAL ONLY request to check is this exists?
+            try
+            {
+                getNexus( request ).getRootRouter().retrieveItem( getResourceStoreRequest( request, true ) );
+            }
+            catch ( ItemNotFoundException e )
+            {
+                // the path does not exists, it is a CREATE
+                action = "post";
+            }
+            catch ( Exception e )
+            {
+                // huh?
+            }
+
+            // the path exists, this is UPDATE
+            return super.getActionFromHttpVerb( action );
+        }
+        else
+        {
+            return super.getActionFromHttpVerb( request );
+        }
+    }
+
+    protected ResourceStoreRequest getResourceStoreRequest( ServletRequest request, boolean localOnly )
+    {
+        return new ResourceStoreRequest( getResourceStorePath( request ), localOnly );
+    }
+
     public boolean isAccessAllowed( ServletRequest request, ServletResponse response, Object mappedValue )
         throws IOException
     {
@@ -128,12 +165,9 @@ public class NexusTargetMappingAuthorizationFilter
             }
         }
 
-        // if we are allowed to go forward, let's check the target perms
-        // create a ResourceStoreRequest using the request path
-        ResourceStoreRequest rsr = new ResourceStoreRequest( getResourceStorePath( request ), true );
-
         // collect the targetSet/matches for the request
-        TargetSet matched = getNexus( request ).getRootRouter().getTargetsForRequest( rsr );
+        TargetSet matched = getNexus( request ).getRootRouter().getTargetsForRequest(
+            getResourceStoreRequest( request, true ) );
 
         // did we hit repositories at all?
         if ( matched.getMatchedRepositoryIds().size() > 0 )

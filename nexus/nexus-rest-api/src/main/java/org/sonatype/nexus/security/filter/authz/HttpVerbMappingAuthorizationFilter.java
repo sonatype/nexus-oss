@@ -42,16 +42,23 @@ public class HttpVerbMappingAuthorizationFilter
         return (Nexus) request.getAttribute( Nexus.class.getName() );
     }
 
-    protected String getActionFromHttpVerb( ServletRequest request )
+    protected String getActionFromHttpVerb( String method )
     {
-        String action = ( (HttpServletRequest) request ).getMethod().toLowerCase();
+        method = method.toLowerCase();
 
-        if ( mapping.containsKey( action ) )
+        if ( mapping.containsKey( method ) )
         {
-            action = mapping.get( action );
+            method = mapping.get( method );
         }
 
-        return action;
+        return method;
+    }
+
+    protected String getActionFromHttpVerb( ServletRequest request )
+    {
+        String action = ( (HttpServletRequest) request ).getMethod();
+
+        return getActionFromHttpVerb( action );
     }
 
     protected String[] mapPerms( String[] perms, String action )
