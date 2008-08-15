@@ -29,7 +29,6 @@ import java.util.logging.Level;
 
 import org.apache.commons.fileupload.FileItemFactory;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
-import org.codehaus.plexus.util.StringUtils;
 import org.jsecurity.mgt.SecurityManager;
 import org.restlet.Application;
 import org.restlet.Context;
@@ -43,12 +42,18 @@ import org.restlet.resource.Representation;
 import org.restlet.resource.StringRepresentation;
 import org.restlet.resource.Variant;
 import org.sonatype.nexus.Nexus;
+import org.sonatype.nexus.artifact.Gav;
+import org.sonatype.nexus.artifact.VersionUtils;
 import org.sonatype.nexus.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.security.NexusSecurityConfiguration;
 import org.sonatype.nexus.configuration.validator.InvalidConfigurationException;
 import org.sonatype.nexus.configuration.validator.ValidationMessage;
 import org.sonatype.nexus.configuration.validator.ValidationResponse;
 import org.sonatype.nexus.index.ArtifactInfo;
+import org.sonatype.nexus.proxy.NoSuchRepositoryException;
+import org.sonatype.nexus.proxy.item.RepositoryItemUid;
+import org.sonatype.nexus.proxy.maven.MavenRepository;
+import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.rest.model.NexusArtifact;
 import org.sonatype.nexus.rest.model.NexusError;
 import org.sonatype.nexus.rest.model.NexusErrorResponse;
@@ -133,18 +138,51 @@ public abstract class AbstractNexusResourceHandler
             return null;
         }
 
-        // TODO: a big fcken TODO!
-        StringBuffer path = new StringBuffer( StringUtils.replace( ai.groupId, ".", "/" ) )
-            .append( "/" ).append( ai.artifactId ).append( "/" ).append( ai.version ).append( "/" ).append(
-                ai.artifactId ).append( "-" ).append( ai.version ).append( ".pom" );
-
         NexusArtifact a = new NexusArtifact();
 
-        // TODO: hardcoded URIs!!!
-        Reference repoRoot = new Reference( getRequest().getRootRef(), "service/local/repositories/" + ai.repository
-            + "/content" );
+        try
+        {
+            Repository repository = getNexus().getRepository( ai.repository );
 
-        a.setResourceURI( calculateReference( repoRoot, path.toString() ).toString() );
+            if ( MavenRepository.class.isAssignableFrom( repository.getClass() ) )
+            {
+                MavenRepository mr = (MavenRepository) repository;
+
+                Gav gav = new Gav(
+                    ai.groupId,
+                    ai.artifactId,
+                    ai.version,
+                    ai.classifier,
+                    mr.getArtifactPackagingMapper().getExtensionForPackaging(
+                        ai.packaging != null ? ai.packaging : "jar" ),
+                    null,
+                    null,
+                    null,
+                    VersionUtils.isSnapshot( ai.version ),
+                    false,
+                    null,
+                    false,
+                    null );
+
+                String path = mr.getGavCalculator().gavToPath( gav );
+
+                // make path relative
+                if ( path.startsWith( RepositoryItemUid.PATH_ROOT ) )
+                {
+                    path = path.substring( RepositoryItemUid.PATH_ROOT.length() );
+                }
+
+                path = "content/" + path;
+
+                Reference repoRoot = calculateRepositoryReference( ai.repository );
+
+                a.setResourceURI( calculateReference( repoRoot, path ).toString() );
+            }
+        }
+        catch ( NoSuchRepositoryException e )
+        {
+            return null;
+        }
 
         a.setGroupId( ai.groupId );
 

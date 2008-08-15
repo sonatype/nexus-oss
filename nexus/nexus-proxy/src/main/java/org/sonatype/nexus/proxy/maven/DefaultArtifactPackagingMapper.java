@@ -47,6 +47,7 @@ public class DefaultArtifactPackagingMapper
         typeToExtensions.put( "par", "jar" );
         typeToExtensions.put( "maven-plugin", "jar" );
         typeToExtensions.put( "maven-archetype", "jar" );
+        typeToExtensions.put( "plexus-application", "jar" );
     }
 
     public String getExtensionForPackaging( String packaging )
