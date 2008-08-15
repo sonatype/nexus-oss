@@ -106,7 +106,16 @@ public class NexusHttpAuthenticationFilter
 
     protected boolean isRememberMeEnabled( ServletRequest request )
     {
-        return true;
+        if ( request.getAttribute( ANONYMOUS_LOGIN ) == null )
+        {
+            // it is not an anonymous login
+            return true;
+        }
+        else
+        {
+            // it is anon login. no rembemberMe
+            return false;
+        }
     }
 
     protected boolean executeLogin( AuthenticationToken token, ServletRequest request, ServletResponse response )
@@ -168,9 +177,9 @@ public class NexusHttpAuthenticationFilter
 
         try
         {
-            subject.login( usernamePasswordToken );
-
             request.setAttribute( ANONYMOUS_LOGIN, Boolean.TRUE );
+
+            subject.login( usernamePasswordToken );
 
             if ( getLogger().isDebugEnabled() )
             {
