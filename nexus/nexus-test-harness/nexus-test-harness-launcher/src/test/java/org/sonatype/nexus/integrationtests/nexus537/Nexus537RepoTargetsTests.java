@@ -80,18 +80,18 @@ public class Nexus537RepoTargetsTests
                      "repo1-bar-artifact", false, false, null, false, null );
         
         
-//        repo1BarArtifactDelete =
-//            new Gav( this.getTestId(), "repo1-bar-artifact-delete", "1.0.0", null, "jar", 0, new Date().getTime(),
-//                     "repo1-bar-artifact-delete", false, false, null, false, null );
-//        repo1FooArtifactDelete =
-//            new Gav( this.getTestId(), "repo1-foo-artifact-delete", "1.0.0", null, "jar", 0, new Date().getTime(),
-//                     "repo1-foo-artifact-delete", false, false, null, false, null );
-//        repo2BarArtifactDelete =
-//            new Gav( this.getTestId(), "repo2-bar-artifact-delete", "1.0.0", null, "jar", 0, new Date().getTime(),
-//                     "repo1-bar-artifact-delete", false, false, null, false, null );
-//        repo2FooArtifactDelete =
-//            new Gav( this.getTestId(), "repo2-foo-artifact-delete", "1.0.0", null, "jar", 0, new Date().getTime(),
-//                     "repo1-bar-artifact-delete", false, false, null, false, null );
+        repo1BarArtifactDelete =
+            new Gav( this.getTestId(), "repo1-bar-artifact-delete", "1.0.0", null, "jar", 0, new Date().getTime(),
+                     "repo1-bar-artifact-delete", false, false, null, false, null );
+        repo1FooArtifactDelete =
+            new Gav( this.getTestId(), "repo1-foo-artifact-delete", "1.0.0", null, "jar", 0, new Date().getTime(),
+                     "repo1-foo-artifact-delete", false, false, null, false, null );
+        repo2BarArtifactDelete =
+            new Gav( this.getTestId(), "repo2-bar-artifact-delete", "1.0.0", null, "jar", 0, new Date().getTime(),
+                     "repo1-bar-artifact-delete", false, false, null, false, null );
+        repo2FooArtifactDelete =
+            new Gav( this.getTestId(), "repo2-foo-artifact-delete", "1.0.0", null, "jar", 0, new Date().getTime(),
+                     "repo1-bar-artifact-delete", false, false, null, false, null );
     }
 
      @Test
@@ -141,10 +141,10 @@ public class Nexus537RepoTargetsTests
         TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
 
         // test-user should not be able to upload anything.
-        this.deploy( repo1BarArtifact, REPO1_ID, this.getTestFile( "repo1-bar-artifact.xml" ), false );
-        this.deploy( repo1FooArtifact, REPO1_ID, this.getTestFile( "repo1-foo-artifact.xml" ), false );
-        this.deploy( repo2BarArtifact, REPO2_ID, this.getTestFile( "repo2-bar-artifact.xml" ), false );
-        this.deploy( repo1FooArtifact, REPO2_ID, this.getTestFile( "repo2-foo-artifact.xml" ), false );
+        this.deploy( repo1BarArtifact, REPO1_ID, this.getTestFile( "repo1-bar-artifact.jar" ), false );
+        this.deploy( repo1FooArtifact, REPO1_ID, this.getTestFile( "repo1-foo-artifact.jar" ), false );
+        this.deploy( repo2BarArtifact, REPO2_ID, this.getTestFile( "repo2-bar-artifact.jar" ), false );
+        this.deploy( repo1FooArtifact, REPO2_ID, this.getTestFile( "repo2-foo-artifact.jar" ), false );
 
         // now give
         this.overwriteUserRole( TEST_USER_NAME, "fooPrivUpdateId", this.fooPrivUpdateId );
@@ -152,10 +152,10 @@ public class Nexus537RepoTargetsTests
         TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
         TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
 
-        this.deploy( repo1BarArtifact, REPO1_ID, this.getTestFile( "repo1-bar-artifact.xml" ), false );
-        this.deploy( repo1FooArtifact, REPO1_ID, this.getTestFile( "repo1-foo-artifact.xml" ), true );
-        this.deploy( repo2BarArtifact, REPO2_ID, this.getTestFile( "repo2-bar-artifact.xml" ), false );
-        this.deploy( repo1FooArtifact, REPO2_ID, this.getTestFile( "repo2-foo-artifact.xml" ), true );
+        this.deploy( repo1BarArtifact, REPO1_ID, this.getTestFile( "repo1-bar-artifact.jar" ), false );
+        this.deploy( repo1FooArtifact, REPO1_ID, this.getTestFile( "repo1-foo-artifact.jar" ), true );
+        this.deploy( repo2BarArtifact, REPO2_ID, this.getTestFile( "repo2-bar-artifact.jar" ), false );
+        this.deploy( repo1FooArtifact, REPO2_ID, this.getTestFile( "repo2-foo-artifact.jar" ), true );
 
         // now give
         this.overwriteUserRole( TEST_USER_NAME, "barPrivUpdateId", this.barPrivUpdateId );
@@ -163,10 +163,10 @@ public class Nexus537RepoTargetsTests
         TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
         TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
 
-        this.deploy( repo1BarArtifact, REPO1_ID, this.getTestFile( "repo1-bar-artifact.xml" ), true );
-        this.deploy( repo1FooArtifact, REPO1_ID, this.getTestFile( "repo1-foo-artifact.xml" ), false );
-        this.deploy( repo2BarArtifact, REPO2_ID, this.getTestFile( "repo2-bar-artifact.xml" ), true );
-        this.deploy( repo1FooArtifact, REPO2_ID, this.getTestFile( "repo2-foo-artifact.xml" ), false );
+        this.deploy( repo1BarArtifact, REPO1_ID, this.getTestFile( "repo1-bar-artifact.jar" ), true );
+        this.deploy( repo1FooArtifact, REPO1_ID, this.getTestFile( "repo1-foo-artifact.jar" ), false );
+        this.deploy( repo2BarArtifact, REPO2_ID, this.getTestFile( "repo2-bar-artifact.jar" ), true );
+        this.deploy( repo1FooArtifact, REPO2_ID, this.getTestFile( "repo2-foo-artifact.jar" ), false );
 
     }
 
@@ -176,10 +176,10 @@ public class Nexus537RepoTargetsTests
     {
         
         // deploy the artifacts first, we need to use different once because i have no idea how to order the tests with JUnit
-        DeployUtils.deployUsingGavWithRest( REPO1_ID, repo1BarArtifactDelete, this.getTestFile( "repo1-bar-artifact.xml" ) );
-        DeployUtils.deployUsingGavWithRest( REPO1_ID, repo1FooArtifactDelete, this.getTestFile( "repo1-foo-artifact.xml" ) );
-        DeployUtils.deployUsingGavWithRest( REPO2_ID, repo2BarArtifactDelete, this.getTestFile( "repo2-bar-artifact.xml" ) );
-        DeployUtils.deployUsingGavWithRest( REPO2_ID, repo2FooArtifactDelete, this.getTestFile( "repo2-foo-artifact.xml" ) );
+        DeployUtils.deployUsingGavWithRest( REPO1_ID, repo1BarArtifactDelete, this.getTestFile( "repo1-bar-artifact.jar" ) );
+        DeployUtils.deployUsingGavWithRest( REPO1_ID, repo1FooArtifactDelete, this.getTestFile( "repo1-foo-artifact.jar" ) );
+        DeployUtils.deployUsingGavWithRest( REPO2_ID, repo2BarArtifactDelete, this.getTestFile( "repo2-bar-artifact.jar" ) );
+        DeployUtils.deployUsingGavWithRest( REPO2_ID, repo2FooArtifactDelete, this.getTestFile( "repo2-foo-artifact.jar" ) );
         
         TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
         TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
