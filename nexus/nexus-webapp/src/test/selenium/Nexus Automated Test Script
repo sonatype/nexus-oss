@@ -448,12 +448,17 @@
 </tr>
 <tr>
 	<td>pause</td>
-	<td>500</td>
+	<td>1000</td>
 	<td></td>
 </tr>
 <tr>
 	<td>click</td>
 	<td>//table[@id='schedule-refresh-btn']/tbody/tr/td[2]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
 	<td></td>
 </tr>
 <tr>
@@ -3304,6 +3309,466 @@
 <tr>
 	<td>click</td>
 	<td>//table[@id='user-refresh-btn']/tbody/tr/td[2]/em/button</td>
+	<td></td>
+</tr>
+<tr>
+	<td>mouseDown</td>
+	<td>open-repos-maint</td>
+	<td></td>
+</tr>
+<tr>
+	<td>mouseUp</td>
+	<td>open-repos-maint</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>contextMenu</td>
+	<td>//div[text()='Codehaus Snapshots']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//a[contains(text(),'Clear Cache')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>mouseDown</td>
+	<td>open-system-changes</td>
+	<td></td>
+</tr>
+<tr>
+	<td>mouseUp</td>
+	<td>open-system-changes</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>st-feeds-grid_http://localhost:8081/nexus/service/local/feeds/systemChanges_col0</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTextPresent</td>
+	<td>Clearing caches</td>
+	<td></td>
+</tr>
+<tr>
+	<td>mouseDown</td>
+	<td>open-repos-maint</td>
+	<td></td>
+</tr>
+<tr>
+	<td>mouseUp</td>
+	<td>open-repos-maint</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>contextMenu</td>
+	<td>//div[text()='Public Repositories']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//a[contains(text(),'Rebuild Attributes')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>mouseDown</td>
+	<td>open-system-changes</td>
+	<td></td>
+</tr>
+<tr>
+	<td>mouseUp</td>
+	<td>open-system-changes</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>st-feeds-grid_http://localhost:8081/nexus/service/local/feeds/systemChanges_col0</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTextPresent</td>
+	<td>Rebuilding Attributes</td>
+	<td></td>
+</tr>
+<tr>
+	<td>mouseDown</td>
+	<td>open-repos-maint</td>
+	<td></td>
+</tr>
+<tr>
+	<td>mouseUp</td>
+	<td>open-repos-maint</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>contextMenu</td>
+	<td>//div[text()='Snapshots']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//a[contains(text(),'Put Out of Service')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTextPresent</td>
+	<td>Out of Service</td>
+	<td></td>
+</tr>
+<tr>
+	<td>mouseDown</td>
+	<td>open-system-changes</td>
+	<td></td>
+</tr>
+<tr>
+	<td>mouseUp</td>
+	<td>open-system-changes</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>st-feeds-grid_http://localhost:8081/nexus/service/local/feeds/systemRepositoryStatusChanges_col0</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTextPresent</td>
+	<td>Repository local status change</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>st-feeds-grid_http://localhost:8081/nexus/service/local/feeds/systemChanges_col0</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTextPresent</td>
+	<td>Repository local status change</td>
+	<td></td>
+</tr>
+<tr>
+	<td>mouseDown</td>
+	<td>open-repos-maint</td>
+	<td></td>
+</tr>
+<tr>
+	<td>mouseUp</td>
+	<td>open-repos-maint</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>contextMenu</td>
+	<td>//div[text()='Releases']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//a[contains(text(),'View')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTextPresent</td>
+	<td>Releases Repository Content</td>
+	<td></td>
+</tr>
+<tr>
+	<td>mouseDown</td>
+	<td>open-repos-maint</td>
+	<td></td>
+</tr>
+<tr>
+	<td>mouseUp</td>
+	<td>open-repos-maint</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>contextMenu</td>
+	<td>//div[text()='Snapshots']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>OK</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>ext-gen1920</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//a[contains(text(),'Put In Service')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//button</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>st-repos-maint-grid_http://localhost:8081/nexus/service/local/repositories/snapshots_col0</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTextNotPresent</td>
+	<td>Out of Service</td>
+	<td></td>
+</tr>
+<tr>
+	<td>mouseDown</td>
+	<td>open-system-changes</td>
+	<td></td>
+</tr>
+<tr>
+	<td>mouseUp</td>
+	<td>open-system-changes</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>st-feeds-grid_http://localhost:8081/nexus/service/local/feeds/systemRepositoryStatusChanges_col0</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTextPresent</td>
+	<td>IN SERVICE</td>
+	<td></td>
+</tr>
+<tr>
+	<td>mouseDown</td>
+	<td>open-repos-maint</td>
+	<td></td>
+</tr>
+<tr>
+	<td>mouseUp</td>
+	<td>open-repos-maint</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>contextMenu</td>
+	<td>//div[text()='Apache Snapshots']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//a[contains(text(),'Block Proxy')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTextPresent</td>
+	<td>Remote Manually Blocked and Available</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>mouseDown</td>
+	<td>open-system-changes</td>
+	<td></td>
+</tr>
+<tr>
+	<td>mouseUp</td>
+	<td>open-system-changes</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>st-feeds-grid_http://localhost:8081/nexus/service/local/feeds/systemRepositoryStatusChanges_col0</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTextPresent</td>
+	<td>Repository proxy mode change</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>mouseDown</td>
+	<td>open-repos-maint</td>
+	<td></td>
+</tr>
+<tr>
+	<td>mouseUp</td>
+	<td>open-repos-maint</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>contextMenu</td>
+	<td>//div[text()='Apache Snapshots']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//a[contains(text(),'Allow Proxy')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>1500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTextNotPresent</td>
+	<td>Remote Manually Blocked and Available</td>
+	<td></td>
+</tr>
+<tr>
+	<td>mouseDown</td>
+	<td>open-system-changes</td>
+	<td></td>
+</tr>
+<tr>
+	<td>mouseUp</td>
+	<td>open-system-changes</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>st-feeds-grid_http://localhost:8081/nexus/service/local/feeds/systemRepositoryStatusChanges_col0</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTextPresent</td>
+	<td>set to Allow</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
 	<td></td>
 </tr>
 
