@@ -139,9 +139,6 @@
 			<metadataMaxAge>1440</metadataMaxAge>
 			<maintainProxiedRepositoryMetadata>false</maintainProxiedRepositoryMetadata>
 			<repositoryPolicy>snapshot</repositoryPolicy>
-			<localStorage>
-              <url>file:///c:/blah/blah</url>
-            </localStorage>
 		</repository>
 
 		<repository>
@@ -156,9 +153,6 @@
 			<metadataMaxAge>1440</metadataMaxAge>
 			<maintainProxiedRepositoryMetadata>false</maintainProxiedRepositoryMetadata>
 			<repositoryPolicy>release</repositoryPolicy>
-			<localStorage>
-              <url>file:/c:/blah/blah</url>
-            </localStorage>
 		</repository>
 
 	</repositories>
