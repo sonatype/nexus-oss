@@ -841,11 +841,11 @@ Ext.extend(Sonatype.repoServer.RepoMaintPanel, Sonatype.repoServer.AbstractRepoP
   },
   
   onRepoChange: function() {
-    this.reloadAll( null, null, true );
+    this.reloadAll();
   },
 
-  reloadAll : function( button, event, dontForceStatuses ){
-    if ( ! dontForceStatuses ) {
+  reloadAll : function( button, event ){
+    if ( button ) {
       this.forceStatuses = true;
     }
 
