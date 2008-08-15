@@ -41,6 +41,8 @@ public class RepositoryItemUidTest
         throws Exception
     {
         Repository repository = createMock(Repository.class);
+
+        makeThreadSafe( repository, true );
         
         expect(repository.getId()).andReturn( "dummy" ).anyTimes();
         
@@ -89,6 +91,7 @@ public class RepositoryItemUidTest
             this.uid = uid;
             this.threadCount = threadCount;
             this.timeout = timeout;
+            this.repositoryItemUidFactory = repositoryItemUidFactory;
         }
 
         public void run()

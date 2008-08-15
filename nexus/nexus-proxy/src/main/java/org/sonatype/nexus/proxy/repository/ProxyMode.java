@@ -35,6 +35,16 @@ public enum ProxyMode
         return ALLOW.equals( this );
     }
 
+    public boolean shouldCheckRemoteStatus()
+    {
+        return ALLOW.equals( this ) || BLOCKED_AUTO.equals( this );
+    }
+
+    public boolean shouldAutoUnblock()
+    {
+        return BLOCKED_AUTO.equals( this );
+    }
+
     public static ProxyMode fromModel( String string )
     {
         if ( CRepository.PROXY_MODE_ALLOW.equals( string ) )
@@ -59,7 +69,7 @@ public enum ProxyMode
     {
         return proxyMode.toString();
     }
-    
+
     public String toString()
     {
         if ( ALLOW.equals( this ) )

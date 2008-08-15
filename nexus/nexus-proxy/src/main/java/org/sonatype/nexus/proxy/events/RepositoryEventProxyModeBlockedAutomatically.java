@@ -24,18 +24,13 @@ import org.sonatype.nexus.proxy.repository.ProxyMode;
 import org.sonatype.nexus.proxy.repository.Repository;
 
 /**
- * The Class RepositoryEventEvictUnusedItems.
+ * The Class RepositoryEventProxyModeBlockedAutomatically.
  */
 public class RepositoryEventProxyModeBlockedAutomatically
     extends RepositoryEventProxyModeChanged
 {
     private final Throwable cause;
 
-    /**
-     * Instantiates a new repository event evict unused items.
-     * 
-     * @param repository the repository
-     */
     public RepositoryEventProxyModeBlockedAutomatically( final Repository repository, final ProxyMode oldProxyMode,
         final Throwable cause )
     {

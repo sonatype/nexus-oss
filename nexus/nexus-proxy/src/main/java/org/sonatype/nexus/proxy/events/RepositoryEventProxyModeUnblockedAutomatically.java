@@ -24,22 +24,23 @@ import org.sonatype.nexus.proxy.repository.ProxyMode;
 import org.sonatype.nexus.proxy.repository.Repository;
 
 /**
- * The Class RepositoryEventProxyModeChanged.
+ * The Class RepositoryEventProxyModeUnblockedAutomatically.
  */
-public class RepositoryEventProxyModeChanged
-    extends RepositoryEvent
+public class RepositoryEventProxyModeUnblockedAutomatically
+    extends RepositoryEventProxyModeChanged
 {
-    private final ProxyMode oldProxyMode;
+    private final Throwable cause;
 
-    public RepositoryEventProxyModeChanged( final Repository repository, final ProxyMode oldProxyMode )
+    public RepositoryEventProxyModeUnblockedAutomatically( final Repository repository, final ProxyMode oldProxyMode,
+        final Throwable cause )
     {
-        super( repository );
+        super( repository, oldProxyMode );
 
-        this.oldProxyMode = oldProxyMode;
+        this.cause = cause;
     }
 
-    public ProxyMode getOldProxyMode()
+    public Throwable getCause()
     {
-        return oldProxyMode;
+        return cause;
     }
 }

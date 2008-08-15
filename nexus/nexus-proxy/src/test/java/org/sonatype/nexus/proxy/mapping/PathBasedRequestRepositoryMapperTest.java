@@ -71,17 +71,30 @@ public class PathBasedRequestRepositoryMapperTest
         // clean this up?
 
         repoA = createMock( Repository.class );
+        makeThreadSafe( repoA, true );
         expect( repoA.getId() ).andReturn( "repoA" ).anyTimes();
         repoB = createMock( Repository.class );
+        makeThreadSafe( repoB, true );
         expect( repoB.getId() ).andReturn( "repoB" ).anyTimes();
         repoC = createMock( Repository.class );
+        makeThreadSafe( repoC, true );
         expect( repoC.getId() ).andReturn( "repoC" ).anyTimes();
         repoD = createMock( Repository.class );
+        makeThreadSafe( repoD, true );
         expect( repoD.getId() ).andReturn( "repoD" ).anyTimes();
         repoE = createMock( Repository.class );
+        makeThreadSafe( repoE, true );
         expect( repoE.getId() ).andReturn( "repoE" ).anyTimes();
         repoF = createMock( Repository.class );
+        makeThreadSafe( repoF, true );
         expect( repoF.getId() ).andReturn( "repoF" ).anyTimes();
+        
+        expect(repoA.getProxyMode()).andReturn( null ).anyTimes();
+        expect(repoB.getProxyMode()).andReturn( null ).anyTimes();
+        expect(repoC.getProxyMode()).andReturn( null ).anyTimes();
+        expect(repoD.getProxyMode()).andReturn( null ).anyTimes();
+        expect(repoE.getProxyMode()).andReturn( null ).anyTimes();
+        expect(repoF.getProxyMode()).andReturn( null ).anyTimes();
 
         expect( repoA.getRepositoryContentClass() ).andReturn( new Maven2ContentClass() ).anyTimes();
         expect( repoB.getRepositoryContentClass() ).andReturn( new Maven2ContentClass() ).anyTimes();

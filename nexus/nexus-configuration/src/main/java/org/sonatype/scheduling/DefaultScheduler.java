@@ -80,7 +80,7 @@ public class DefaultScheduler
         throws StartingException
     {
         tasksMap = new HashMap<Class<?>, List<ScheduledTask<?>>>();
-
+        
         plexusThreadFactory = new PlexusThreadFactory( plexusContainer );
 
         scheduledExecutorService = (ScheduledThreadPoolExecutor) Executors.newScheduledThreadPool(

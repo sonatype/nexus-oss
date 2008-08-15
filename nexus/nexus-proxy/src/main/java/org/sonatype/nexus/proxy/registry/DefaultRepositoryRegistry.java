@@ -38,6 +38,7 @@ import org.sonatype.nexus.proxy.events.RepositoryRegistryEventUpdate;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryGroupEventAdd;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryGroupEventRemove;
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.proxy.repository.RepositoryStatusCheckerThread;
 
 /**
  * The repo registry. It holds handles to registered repositories and sorts them properly. This class is used to get a
@@ -60,13 +61,16 @@ public class DefaultRepositoryRegistry
     /** The repo register, [Repository.getId, Repository] */
     private Map<String, Repository> repositories = new HashMap<String, Repository>();
 
+    /** The repo status checkrs */
+    private Map<String, RepositoryStatusCheckerThread> repositoryStatusCheckers = new HashMap<String, RepositoryStatusCheckerThread>();
+
     /** The group repo register, (key=Repository.getGroupId, value=List of RepoId's) */
     private Map<String, List<String>> repositoryGroups = new HashMap<String, List<String>>();
 
     /** The group repo register, (key=Repository.getGroupId, value=List of RepoId's) */
     private Map<String, ContentClass> repositoryGroupContentClasses = new HashMap<String, ContentClass>();
 
-    public void addRepository( Repository repository )
+    protected void insertRepository( Repository repository, boolean notify )
     {
         repositories.put( repository.getId(), repository );
 
@@ -75,7 +79,25 @@ public class DefaultRepositoryRegistry
             ( (EventMulticaster) repository ).addProximityEventListener( this );
         }
 
-        notifyProximityEventListeners( new RepositoryRegistryEventAdd( repository ) );
+        RepositoryStatusCheckerThread thread = new RepositoryStatusCheckerThread( repository );
+
+        repositoryStatusCheckers.put( repository.getId(), thread );
+
+        if ( notify )
+        {
+            notifyProximityEventListeners( new RepositoryRegistryEventAdd( repository ) );
+        }
+
+        thread.setActive( true );
+
+        thread.setDaemon( true );
+
+        thread.start();
+    }
+
+    public void addRepository( Repository repository )
+    {
+        insertRepository( repository, true );
 
         getLogger().info(
             "Added repository ID=" + repository.getId() + " (contentClass="
@@ -87,16 +109,11 @@ public class DefaultRepositoryRegistry
     {
         if ( repositories.containsKey( repository.getId() ) )
         {
-            // is this a new instance of the same (keyed by ID) repo?
-            if ( repository != repositories.get( repository.getId() ) )
-            {
-                repositories.put( repository.getId(), repository );
+            RepositoryStatusCheckerThread thread = repositoryStatusCheckers.get( repository.getId() );
 
-                if ( repository instanceof EventMulticaster )
-                {
-                    ( (EventMulticaster) repository ).addProximityEventListener( this );
-                }
-            }
+            thread.setActive( false );
+
+            insertRepository( repository, false );
 
             notifyProximityEventListeners( new RepositoryRegistryEventUpdate( repository ) );
 
@@ -135,6 +152,10 @@ public class DefaultRepositoryRegistry
             }
 
             repositories.remove( repository.getId() );
+
+            RepositoryStatusCheckerThread thread = repositoryStatusCheckers.remove( repository.getId() );
+
+            thread.setActive( false );
 
             if ( repository instanceof EventMulticaster )
             {

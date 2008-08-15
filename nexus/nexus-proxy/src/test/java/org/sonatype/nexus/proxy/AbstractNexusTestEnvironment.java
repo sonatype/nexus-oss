@@ -3,12 +3,15 @@ package org.sonatype.nexus.proxy;
 import org.codehaus.plexus.util.FileUtils;
 import org.sonatype.nexus.proxy.cache.CacheManager;
 import org.sonatype.nexus.proxy.item.RepositoryItemUidFactory;
+import org.sonatype.scheduling.Scheduler;
 
 public abstract class AbstractNexusTestEnvironment
     extends AbstractNexusTestCase
 {
     /** The cache manager. */
     private CacheManager cacheManager;
+    
+    private Scheduler scheduler;
 
     private RepositoryItemUidFactory repositoryItemUidFactory;
 
@@ -23,6 +26,10 @@ public abstract class AbstractNexusTestEnvironment
         WORK_HOME.mkdirs();
         CONF_HOME.mkdirs();
 
+        scheduler = (Scheduler) lookup( Scheduler.ROLE );
+        
+        scheduler.startService();
+        
         cacheManager = (CacheManager) lookup( CacheManager.ROLE );
 
         cacheManager.startService();
@@ -34,6 +41,8 @@ public abstract class AbstractNexusTestEnvironment
         throws Exception
     {
         cacheManager.stopService();
+        
+        scheduler.stopService();
 
         super.tearDown();
     }

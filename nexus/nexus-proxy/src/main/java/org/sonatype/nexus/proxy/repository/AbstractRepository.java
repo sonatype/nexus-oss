@@ -26,6 +26,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
@@ -48,6 +50,7 @@ import org.sonatype.nexus.proxy.events.RepositoryEventEvictUnusedItems;
 import org.sonatype.nexus.proxy.events.RepositoryEventLocalStatusChanged;
 import org.sonatype.nexus.proxy.events.RepositoryEventProxyModeBlockedAutomatically;
 import org.sonatype.nexus.proxy.events.RepositoryEventProxyModeChanged;
+import org.sonatype.nexus.proxy.events.RepositoryEventProxyModeUnblockedAutomatically;
 import org.sonatype.nexus.proxy.events.RepositoryEventRecreateAttributes;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventDelete;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventRetrieve;
@@ -68,7 +71,6 @@ import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 import org.sonatype.nexus.proxy.target.TargetRegistry;
 import org.sonatype.nexus.proxy.target.TargetSet;
 import org.sonatype.nexus.proxy.utils.StoreFileWalker;
-import org.sonatype.scheduling.Scheduler;
 
 /**
  * <p>
@@ -92,7 +94,9 @@ public abstract class AbstractRepository
     implements Repository, Initializable
 {
     /** The time while we do NOT check an already known remote status: 5 mins */
-    private static final long REMOTE_STATUS_RETAIN_TIME = 5L * 60L * 1000L;
+    protected static final long REMOTE_STATUS_RETAIN_TIME = 5L * 60L * 1000L;
+
+    private static final ExecutorService exec = Executors.newCachedThreadPool();
 
     /**
      * @plexus.requirement
@@ -105,13 +109,6 @@ public abstract class AbstractRepository
      * @plexus.requirement
      */
     private CacheManager cacheManager;
-
-    /**
-     * The Scheduler.
-     * 
-     * @plexus.requirement
-     */
-    private Scheduler scheduler;
 
     /**
      * The target registry.
@@ -131,16 +128,16 @@ public abstract class AbstractRepository
     private String id;
 
     /** The local status */
-    private LocalStatus localStatus = LocalStatus.IN_SERVICE;
+    private volatile LocalStatus localStatus = LocalStatus.IN_SERVICE;
 
     /** The proxy mode */
-    private ProxyMode proxyMode = ProxyMode.ALLOW;
+    private volatile ProxyMode proxyMode = ProxyMode.ALLOW;
 
     /** The proxy remote status */
-    private RemoteStatus remoteStatus = RemoteStatus.UNKNOWN;
+    private volatile RemoteStatus remoteStatus = RemoteStatus.UNKNOWN;
 
     /** Last time remote status was updated */
-    private long remoteStatusUpdated = 0;
+    private volatile long remoteStatusUpdated = 0;
 
     /** Is checking in progress? */
     private volatile boolean remoteStatusChecking = false;
@@ -242,11 +239,12 @@ public abstract class AbstractRepository
                 remoteStatusUpdated = System.currentTimeMillis();
             }
 
-            if ( getProxyMode() != null && getProxyMode().shouldProxy() && RemoteStatus.UNKNOWN.equals( remoteStatus )
-                && !remoteStatusChecking )
+            if ( getProxyMode() != null && getProxyMode().shouldCheckRemoteStatus()
+                && RemoteStatus.UNKNOWN.equals( remoteStatus ) && !remoteStatusChecking )
             {
                 // check for thread and go check it
-                scheduler.submit( getId() + " remote status check", new Callable<Object>()
+
+                exec.submit( new Callable<Object>()
                 {
                     public Object call()
                         throws Exception
@@ -257,11 +255,11 @@ public abstract class AbstractRepository
                         {
                             if ( isRemoteStorageReachable() )
                             {
-                                remoteStatus = RemoteStatus.AVAILABLE;
+                                setRemoteStatus( RemoteStatus.AVAILABLE );
                             }
                             else
                             {
-                                remoteStatus = RemoteStatus.UNAVAILABLE;
+                                setRemoteStatus( RemoteStatus.UNAVAILABLE );
                             }
                         }
                         finally
@@ -271,9 +269,9 @@ public abstract class AbstractRepository
 
                         return null;
                     }
-                }, null );
+                } );
             }
-            else if ( getProxyMode() != null && !getProxyMode().shouldProxy()
+            else if ( getProxyMode() != null && !getProxyMode().shouldCheckRemoteStatus()
                 && RemoteStatus.UNKNOWN.equals( remoteStatus ) && !remoteStatusChecking )
             {
                 remoteStatus = RemoteStatus.UNAVAILABLE;
@@ -286,6 +284,23 @@ public abstract class AbstractRepository
         else
         {
             return null;
+        }
+    }
+
+    private void setRemoteStatus( RemoteStatus remoteStatus )
+    {
+        this.remoteStatus = remoteStatus;
+
+        if ( RemoteStatus.AVAILABLE.equals( remoteStatus ) )
+        {
+            if ( getProxyMode() != null && getProxyMode().shouldAutoUnblock() )
+            {
+                ProxyMode oldMode = getProxyMode();
+
+                setProxyMode( ProxyMode.ALLOW, false );
+
+                notifyProximityEventListeners( new RepositoryEventProxyModeUnblockedAutomatically( this, oldMode, null ) );
+            }
         }
     }
 
@@ -496,6 +511,11 @@ public abstract class AbstractRepository
     public void setRemoteStorageContext( RemoteStorageContext remoteStorageContext )
     {
         this.remoteStorageContext = remoteStorageContext;
+
+        if ( getProxyMode() != null && getProxyMode().shouldAutoUnblock() )
+        {
+            setProxyMode( ProxyMode.ALLOW );
+        }
     }
 
     // ===================================================================================
