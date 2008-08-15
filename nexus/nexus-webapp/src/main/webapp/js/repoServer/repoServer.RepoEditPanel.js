@@ -267,8 +267,9 @@ Sonatype.repoServer.RepoEditPanel = function(config){
         anchor: Sonatype.view.FIELD_OFFSET_WITH_SCROLL,
         allowBlank:true,
         validator: function(v){
-          if(v.match(/^(?:file):\//i)){ return true; }
-          else{ return 'Protocol must be file:// ( or file:/X:/ if running in Windows, where X is the drive letter)'; }
+          if(  v.match(/^file:\/(\/\/)?\w:\/.*/i)
+            || v.match(/^file:\/\/.*/i)){ return true }
+          else{ return 'Protocol must be file://some/path ( or file:///X:/some/path if running in Windows, where X is the drive letter)'; }
         }
       },
       {
@@ -463,8 +464,9 @@ Sonatype.repoServer.RepoEditPanel = function(config){
         anchor: Sonatype.view.FIELD_OFFSET_WITH_SCROLL,
         allowBlank:true,
         validator: function(v){
-          if(v.match(/^(?:file):\//i)){ return true; }
-          else{ return 'Protocol must be file://'; }
+          if(  v.match(/^file:\/(\/\/)?\w:\/.*/i)
+            || v.match(/^file:\/\/.*/i)){ return true }
+          else{ return 'Protocol must be file://some/path ( or file:///X:/some/path if running in Windows, where X is the drive letter)'; }
         }
       },
       {
