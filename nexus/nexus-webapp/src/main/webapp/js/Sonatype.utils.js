@@ -95,7 +95,7 @@ Sonatype.utils = {
     return sOut.substring(0, sOut.length - sep.length);
   },
 
-  connectionError: function( response, message, offerRestart, options ) {
+  connectionError: function( response, message, offerRestart, options, responseText ) {
     var serverMessage = ''; 
     var r = response.responseText;
     if ( r ) {
@@ -148,12 +148,15 @@ Sonatype.utils = {
       Sonatype.MessageBox.show( {
         title: "Error",
         msg: (
-          ( message ? message + serverMessage + '<br /><br />' : '' ) + 
+          ( message ? message + serverMessage + '<br /><br />' : '' ) +
+          ( response.status == '400' && responseText ? 
+              response.responseText
+              :
           ( response.status ?
               'Nexus returned an error: ERROR ' + response.status + ': ' + response.statusText
               :
               'There was an error connecting to Nexus: ' + response.statusText + '<br />' +
-              'Check your network connection, make sure Nexus is running.' ) +
+              'Check your network connection, make sure Nexus is running.' ) ) +
           ( offerRestart ?
               '<br /><br />Click OK to reload the console or ' +
               'CANCEL if you wish to retry the same action in a little while.'

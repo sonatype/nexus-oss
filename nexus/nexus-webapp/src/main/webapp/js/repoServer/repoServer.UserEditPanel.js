@@ -655,7 +655,7 @@ Ext.extend(Sonatype.repoServer.UserEditPanel, Ext.Panel, {
       }
     }
     else {
-      Sonatype.MessageBox.alert('The server did not delete the user.');
+      Sonatype.utils.connectionError( response, 'The server did not delete the user.', null, null, true );
     }
   },
       
