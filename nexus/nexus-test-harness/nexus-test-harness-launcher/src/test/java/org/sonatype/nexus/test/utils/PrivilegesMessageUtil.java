@@ -1,4 +1,4 @@
-package org.sonatype.nexus.integrationtests.nexus233;
+package org.sonatype.nexus.test.utils;
 
 import java.io.IOException;
 import java.util.Iterator;
@@ -36,6 +36,22 @@ public class PrivilegesMessageUtil
         super();
         this.xstream = xstream;
         this.mediaType = mediaType;
+    }
+    
+    public List<PrivilegeBaseStatusResource> createPrivileges( PrivilegeBaseResource resource ) throws IOException
+    {
+        Response response = this.sendMessage( Method.POST, resource );
+
+        if ( !response.getStatus().isSuccess() )
+        {
+            Assert.fail( "Could not create privilege: " + response.getStatus() );
+        }
+
+        // get the Resource object
+        List<PrivilegeBaseStatusResource> statusResources = this.getResourceListFromResponse( response );
+        SecurityConfigUtil.verifyRepoTargetPrivileges( statusResources );
+        
+        return statusResources;
     }
 
     public PrivilegeBaseStatusResource getPrivilegeResource( String id ) throws IOException

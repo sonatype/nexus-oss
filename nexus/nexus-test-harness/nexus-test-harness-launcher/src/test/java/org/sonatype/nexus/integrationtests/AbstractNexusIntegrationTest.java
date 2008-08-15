@@ -662,6 +662,11 @@ public class AbstractNexusIntegrationTest
     {
         return testRepositoryId;
     }
+    
+    public String getRepositoryUrl( String repoId )
+    {
+        return baseNexusUrl + REPOSITORY_RELATIVE_URL + repoId + "/";
+    }
 
     protected static boolean printKnownErrorButDoNotFail( Class<? extends AbstractNexusIntegrationTest> clazz,
                                                           String... tests )

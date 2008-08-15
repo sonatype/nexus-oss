@@ -8,11 +8,11 @@ import org.junit.After;
 import org.junit.Before;
 import org.restlet.data.MediaType;
 import org.sonatype.nexus.configuration.security.model.CApplicationPrivilege;
-import org.sonatype.nexus.integrationtests.nexus233.PrivilegesMessageUtil;
 import org.sonatype.nexus.rest.model.PrivilegeBaseStatusResource;
 import org.sonatype.nexus.rest.model.RoleResource;
 import org.sonatype.nexus.rest.model.UserResource;
 import org.sonatype.nexus.rest.xstream.XStreamInitializer;
+import org.sonatype.nexus.test.utils.PrivilegesMessageUtil;
 import org.sonatype.nexus.test.utils.RoleMessageUtil;
 import org.sonatype.nexus.test.utils.RoutesMessageUtil;
 import org.sonatype.nexus.test.utils.SecurityConfigUtil;
@@ -154,9 +154,8 @@ public abstract class AbstractPrivilegeTest
         throws Exception
     {
         // use admin
-        TestContainer.getInstance().getTestContext().setUsername( "admin" );
-        TestContainer.getInstance().getTestContext().setPassword( "admin123" );
-
+        TestContainer.getInstance().getTestContext().useAdminForRequests();
+        
         // now give create
         RoleResource role = new RoleResource();
         role.setDescription( newRoleName );

@@ -1,28 +1,18 @@
 package org.sonatype.nexus.test.utils;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
 import junit.framework.Assert;
 
-import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
-import org.restlet.Client;
+import org.codehaus.plexus.util.StringUtils;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
-import org.restlet.data.Protocol;
-import org.restlet.data.Request;
 import org.restlet.data.Response;
-import org.restlet.resource.StringRepresentation;
 import org.sonatype.nexus.configuration.model.CRepositoryTarget;
 import org.sonatype.nexus.configuration.model.Configuration;
-import org.sonatype.nexus.configuration.model.io.xpp3.NexusConfigurationXpp3Reader;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.rest.model.RepositoryTargetListResource;
 import org.sonatype.nexus.rest.model.RepositoryTargetListResourceResponse;
@@ -46,20 +36,47 @@ public class TargetMessageUtil
         this.mediaType = mediaType;
     }
 
-    public Response sendMessage( Method method, RepositoryTargetResource resource ) throws IOException
+    public RepositoryTargetResource createTarget( RepositoryTargetResource target )
+        throws IOException
     {
-       
+        Response response = this.sendMessage( Method.POST, target );
+
+        if ( !response.getStatus().isSuccess() )
+        {
+            Assert.fail( "Could not create Repository Target: " + response.getStatus() );
+        }
+
+        // get the Resource object
+        RepositoryTargetResource responseResource = this.getResourceFromResponse( response );
+
+        // validate
+        // make sure the id != null
+        Assert.assertTrue( StringUtils.isNotEmpty( responseResource.getId() ) );
+
+        Assert.assertEquals( target.getContentClass(), responseResource.getContentClass() );
+        Assert.assertEquals( target.getName(), responseResource.getName() );
+        Assert.assertEquals( target.getPatterns(), responseResource.getPatterns() );
+
+        this.verifyTargetsConfig( responseResource );
+
+        return responseResource;
+    }
+
+    public Response sendMessage( Method method, RepositoryTargetResource resource )
+        throws IOException
+    {
+
         XStreamRepresentation representation = new XStreamRepresentation( xstream, "", mediaType );
 
         String repoTargetId = ( resource.getId() == null ) ? "?undefined" : "/" + resource.getId();
 
         String serviceURI = "service/local/repo_targets" + repoTargetId;
-        
+
         RepositoryTargetResourceResponse requestResponse = new RepositoryTargetResourceResponse();
         requestResponse.setData( resource );
-     // now set the payload
+        // now set the payload
         representation.setPayload( requestResponse );
-        
+
         return RequestFacade.sendMessage( serviceURI, method, representation );
     }
 
@@ -151,7 +168,8 @@ public class TargetMessageUtil
         }
     }
 
-    public void verifyCompleteTargetsConfig( List<RepositoryTargetListResource> targets ) throws IOException
+    public void verifyCompleteTargetsConfig( List<RepositoryTargetListResource> targets )
+        throws IOException
     {
         // check the nexus.xml
         Configuration config = NexusConfigUtil.getNexusConfig();
@@ -192,7 +210,5 @@ public class TargetMessageUtil
         }
 
     }
-
-    
 
 }

@@ -59,24 +59,7 @@ public class Nexus133TargetCrudJsonTests
         patterns.add( ".*bar.*" );
         resource.setPatterns( patterns );
 
-        Response response = this.messageUtil.sendMessage( Method.POST, resource );
-
-        if ( !response.getStatus().isSuccess() )
-        {
-            Assert.fail( "Could not create Repository Target: " + response.getStatus() );
-        }
-
-        // get the Resource object
-        RepositoryTargetResource responseResource = this.messageUtil.getResourceFromResponse( response );
-
-        // make sure the id != null
-        Assert.assertTrue( StringUtils.isNotEmpty( responseResource.getId() ) );
-
-        Assert.assertEquals( resource.getContentClass(), responseResource.getContentClass() );
-        Assert.assertEquals( resource.getName(), responseResource.getName() );
-        Assert.assertEquals( resource.getPatterns(), responseResource.getPatterns() );
-
-        this.messageUtil.verifyTargetsConfig( responseResource );
+        this.messageUtil.createTarget( resource );
     }
 
     public void readTest()
@@ -185,7 +168,15 @@ public class Nexus133TargetCrudJsonTests
         patterns.add( ".*bar.*" );
         resource.setPatterns( patterns );
 
-        Response response = this.messageUtil.sendMessage( Method.POST, resource );
+        resource = this.messageUtil.createTarget( resource );
+
+        resource.setName( "udpateTestRenamed" );
+        resource.setContentClass( "maven2" );
+        patterns.clear();
+        patterns.add( ".*new.*" );
+        patterns.add( ".*patterns.*" );
+
+        Response response = this.messageUtil.sendMessage( Method.PUT, resource );
 
         if ( !response.getStatus().isSuccess() )
         {
@@ -194,31 +185,6 @@ public class Nexus133TargetCrudJsonTests
 
         // get the Resource object
         RepositoryTargetResource responseResource = this.messageUtil.getResourceFromResponse( response );
-
-        // make sure the id != null
-        Assert.assertTrue( StringUtils.isNotEmpty( responseResource.getId() ) );
-
-        // make sure it was added
-        this.messageUtil.verifyTargetsConfig( responseResource );
-
-        // update the Id
-        resource.setId( responseResource.getId() );
-
-        resource.setName( "udpateTestRenamed" );
-        resource.setContentClass( "maven2" );
-        patterns.clear();
-        patterns.add( ".*new.*" );
-        patterns.add( ".*patterns.*" );
-
-        response = this.messageUtil.sendMessage( Method.PUT, resource );
-
-        if ( !response.getStatus().isSuccess() )
-        {
-            Assert.fail( "Could not create Repository Target: " + response.getStatus() );
-        }
-
-        // get the Resource object
-        responseResource = this.messageUtil.getResourceFromResponse( response );
 
         // make sure it was updated
         this.messageUtil.verifyTargetsConfig( responseResource );

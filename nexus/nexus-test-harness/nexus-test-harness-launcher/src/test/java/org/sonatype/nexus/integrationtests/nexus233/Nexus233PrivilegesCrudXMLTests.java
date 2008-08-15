@@ -16,6 +16,7 @@ import org.sonatype.nexus.rest.model.PrivilegeBaseStatusResource;
 import org.sonatype.nexus.rest.model.PrivilegeTargetResource;
 import org.sonatype.nexus.rest.model.PrivilegeTargetStatusResource;
 import org.sonatype.nexus.rest.xstream.XStreamInitializer;
+import org.sonatype.nexus.test.utils.PrivilegesMessageUtil;
 import org.sonatype.nexus.test.utils.SecurityConfigUtil;
 
 import com.thoughtworks.xstream.XStream;
@@ -46,15 +47,8 @@ public class Nexus233PrivilegesCrudXMLTests
         resource.setType( "repositoryTarget" );
         resource.setRepositoryTargetId( "testTarget" );
 
-        Response response = this.messageUtil.sendMessage( Method.POST, resource );
-
-        if ( !response.getStatus().isSuccess() )
-        {
-            Assert.fail( "Could not create privilege: " + response.getStatus() );
-        }
-
         // get the Resource object
-        List<PrivilegeBaseStatusResource> statusResources = this.messageUtil.getResourceListFromResponse( response );
+        List<PrivilegeBaseStatusResource> statusResources = this.messageUtil.createPrivileges( resource );
 
         Assert.assertTrue( statusResources.size() == 1 );
 
@@ -85,15 +79,8 @@ public class Nexus233PrivilegesCrudXMLTests
         resource.setType( "repositoryTarget" );
         resource.setRepositoryTargetId( "testTarget" );
 
-        Response response = this.messageUtil.sendMessage( Method.POST, resource );
-
-        if ( !response.getStatus().isSuccess() )
-        {
-            Assert.fail( "Could not create privilege: " + response.getStatus() );
-        }
-
-        // get the Resource object
-        List<PrivilegeBaseStatusResource> statusResources = this.messageUtil.getResourceListFromResponse( response );
+     // get the Resource object
+        List<PrivilegeBaseStatusResource> statusResources = this.messageUtil.createPrivileges( resource );
 
         Assert.assertTrue( statusResources.size() == 1 );
 
@@ -125,15 +112,8 @@ public class Nexus233PrivilegesCrudXMLTests
         resource.setType( "repositoryTarget" );
         resource.setRepositoryTargetId( "testTarget" );
 
-        Response response = this.messageUtil.sendMessage( Method.POST, resource );
-
-        if ( !response.getStatus().isSuccess() )
-        {
-            Assert.fail( "Could not create privilege: " + response.getStatus() );
-        }
-
-        // get the Resource object
-        List<PrivilegeBaseStatusResource> statusResources = this.messageUtil.getResourceListFromResponse( response );
+     // get the Resource object
+        List<PrivilegeBaseStatusResource> statusResources = this.messageUtil.createPrivileges( resource );
 
         Assert.assertTrue( statusResources.size() == 1 );
 
@@ -165,15 +145,8 @@ public class Nexus233PrivilegesCrudXMLTests
         resource.setType( "repositoryTarget" );
         resource.setRepositoryTargetId( "testTarget" );
 
-        Response response = this.messageUtil.sendMessage( Method.POST, resource );
-
-        if ( !response.getStatus().isSuccess() )
-        {
-            Assert.fail( "Could not create privilege: " + response.getStatus() );
-        }
-
-        // get the Resource object
-        List<PrivilegeBaseStatusResource> statusResources = this.messageUtil.getResourceListFromResponse( response );
+     // get the Resource object
+        List<PrivilegeBaseStatusResource> statusResources = this.messageUtil.createPrivileges( resource );
 
         Assert.assertTrue( statusResources.size() == 1 );
 
@@ -208,15 +181,8 @@ public class Nexus233PrivilegesCrudXMLTests
         resource.setType( "repositoryTarget" );
         resource.setRepositoryTargetId( "testTarget" );
 
-        Response response = this.messageUtil.sendMessage( Method.POST, resource );
-
-        if ( !response.getStatus().isSuccess() )
-        {
-            Assert.fail( "Could not create privilege: " + response.getStatus() );
-        }
-
-        // get the Resource object
-        List<PrivilegeBaseStatusResource> statusResources = this.messageUtil.getResourceListFromResponse( response );
+     // get the Resource object
+        List<PrivilegeBaseStatusResource> statusResources = this.messageUtil.createPrivileges( resource );
 
         Assert.assertTrue( statusResources.size() == 4 );
 
@@ -288,15 +254,8 @@ public class Nexus233PrivilegesCrudXMLTests
         resource.setType( "repositoryTarget" );
         resource.setRepositoryTargetId( "testTarget" );
 
-        Response response = this.messageUtil.sendMessage( Method.POST, resource );
-
-        if ( !response.getStatus().isSuccess() )
-        {
-            Assert.fail( "Could not create privilege: " + response.getStatus() );
-        }
-
-        // get the Resource object
-        List<PrivilegeBaseStatusResource> statusResources = this.messageUtil.getResourceListFromResponse( response );
+     // get the Resource object
+        List<PrivilegeBaseStatusResource> statusResources = this.messageUtil.createPrivileges( resource );
 
         Assert.assertTrue( statusResources.size() == 1 );
 
@@ -312,7 +271,7 @@ public class Nexus233PrivilegesCrudXMLTests
         Assert.assertEquals( ( (PrivilegeTargetStatusResource) statusResources.get( 0 ) ).getRepositoryTargetId(),
                              "testTarget" );
 
-        response = this.messageUtil.sendMessage( Method.POST, resource, readPrivId );
+        Response response = this.messageUtil.sendMessage( Method.POST, resource, readPrivId );
 
         if ( !response.getStatus().isSuccess() )
         {
@@ -351,15 +310,8 @@ public class Nexus233PrivilegesCrudXMLTests
         resource.setType( "repositoryTarget" );
         resource.setRepositoryTargetId( "testTarget" );
 
-        Response response = this.messageUtil.sendMessage( Method.POST, resource );
-
-        if ( !response.getStatus().isSuccess() )
-        {
-            Assert.fail( "Could not create privilege: " + response.getStatus() );
-        }
-
-        // get the Resource object
-        List<PrivilegeBaseStatusResource> statusResources = this.messageUtil.getResourceListFromResponse( response );
+     // get the Resource object
+        List<PrivilegeBaseStatusResource> statusResources = this.messageUtil.createPrivileges( resource );
 
         Assert.assertTrue( statusResources.size() == 1 );
 
@@ -376,7 +328,7 @@ public class Nexus233PrivilegesCrudXMLTests
         Assert.assertEquals( ( (PrivilegeTargetStatusResource) statusResources.get( 0 ) ).getRepositoryTargetId(),
                              "testTarget" );
 
-        response = this.messageUtil.sendMessage( Method.PUT, resource, readPrivId );
+        Response response = this.messageUtil.sendMessage( Method.PUT, resource, readPrivId );
 
         if ( response.getStatus().getCode() != 405 ) // Method Not Allowed
         {
@@ -399,15 +351,8 @@ public class Nexus233PrivilegesCrudXMLTests
         resource.setType( "repositoryTarget" );
         resource.setRepositoryTargetId( "testTarget" );
 
-        Response response = this.messageUtil.sendMessage( Method.POST, resource );
-
-        if ( !response.getStatus().isSuccess() )
-        {
-            Assert.fail( "Could not create privilege: " + response.getStatus() );
-        }
-
-        // get the Resource object
-        List<PrivilegeBaseStatusResource> statusResources = this.messageUtil.getResourceListFromResponse( response );
+     // get the Resource object
+        List<PrivilegeBaseStatusResource> statusResources = this.messageUtil.createPrivileges( resource );
 
         Assert.assertTrue( statusResources.size() == 1 );
 
@@ -424,7 +369,7 @@ public class Nexus233PrivilegesCrudXMLTests
         Assert.assertEquals( ( (PrivilegeTargetStatusResource) statusResources.get( 0 ) ).getRepositoryTargetId(),
                              "testTarget" );
 
-        response = this.messageUtil.sendMessage( Method.DELETE, resource, readPrivId );
+        Response response = this.messageUtil.sendMessage( Method.DELETE, resource, readPrivId );
 
         if ( !response.getStatus().isSuccess() ) // Method Not Allowed
         {
@@ -449,15 +394,8 @@ public class Nexus233PrivilegesCrudXMLTests
         resource.setType( "repositoryTarget" );
         resource.setRepositoryTargetId( "testTarget" );
 
-        Response response = this.messageUtil.sendMessage( Method.POST, resource );
-
-        if ( !response.getStatus().isSuccess() )
-        {
-            Assert.fail( "Could not create privilege: " + response.getStatus() );
-        }
-
-        // get the Resource object
-        List<PrivilegeBaseStatusResource> statusResources = this.messageUtil.getResourceListFromResponse( response );
+     // get the Resource object
+        List<PrivilegeBaseStatusResource> statusResources = this.messageUtil.createPrivileges( resource );
 
         Assert.assertTrue( statusResources.size() == 1 );
 
@@ -475,7 +413,7 @@ public class Nexus233PrivilegesCrudXMLTests
 
         // now we have something in the repo. now lets get it all...
 
-        response = this.messageUtil.sendMessage( Method.GET, resource );
+        Response response = this.messageUtil.sendMessage( Method.GET, resource );
 
         // get the Resource object
         statusResources = this.messageUtil.getResourceListFromResponse( response );
