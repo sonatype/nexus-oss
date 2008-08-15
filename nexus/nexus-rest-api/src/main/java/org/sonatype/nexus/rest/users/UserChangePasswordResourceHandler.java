@@ -40,13 +40,13 @@ public class UserChangePasswordResourceHandler
     {
         super( context, request, response );
     }
-    
+
     @Override
     public boolean allowPost()
     {
         return true;
     }
-    
+
     @Override
     public void post( Representation representation )
     {
@@ -59,10 +59,22 @@ public class UserChangePasswordResourceHandler
         else
         {
             UserChangePasswordResource resource = request.getData();
-            
+
             try
             {
-                getNexusSecurityConfiguration().changePassword( resource.getUserId(), resource.getOldPassword(), resource.getNewPassword() );
+                if ( !isAnonymousUser( resource.getUserId() ) )
+                {
+                    getNexusSecurityConfiguration().changePassword(
+                        resource.getUserId(),
+                        resource.getOldPassword(),
+                        resource.getNewPassword() );
+                }
+                else
+                {
+                    getResponse().setStatus( Status.CLIENT_ERROR_BAD_REQUEST, "Anonymous user cannot change password!" );
+
+                    getLogger().log( Level.FINE, "Anonymous user password change is blocked!" );
+                }
             }
             catch ( IOException e )
             {

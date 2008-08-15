@@ -23,6 +23,7 @@ package org.sonatype.nexus.rest;
 import java.io.IOException;
 
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
+import org.jsecurity.mgt.SecurityManager;
 import org.restlet.Context;
 import org.restlet.Filter;
 import org.restlet.data.Request;
@@ -44,7 +45,7 @@ public class NexusInstanceFilter
 
     /** Key to store nexus instance, */
     public static final String NEXUS_INSTANCE_KEY = "instanceName";
-    
+
     /**
      * The filter constructor.
      * 
@@ -76,15 +77,34 @@ public class NexusInstanceFilter
         }
 
         request.getAttributes().put( Nexus.ROLE, nexus );
-        
+
         request.getAttributes().put( NexusSecurityConfiguration.ROLE, getNexusSecurityConfiguration() );
+
+        request.getAttributes().put( SecurityManager.class.getName(), getSecurityManager() );
     }
-    
+
     protected NexusSecurityConfiguration getNexusSecurityConfiguration()
     {
         try
         {
-            return (NexusSecurityConfiguration) PlexusRestletUtils.plexusLookup( getContext(), NexusSecurityConfiguration.ROLE );
+            return (NexusSecurityConfiguration) PlexusRestletUtils.plexusLookup(
+                getContext(),
+                NexusSecurityConfiguration.ROLE );
+        }
+        catch ( ComponentLookupException e )
+        {
+            throw new IllegalStateException( "Cannot lookup NexusSecurityConfiguration!", e );
+        }
+    }
+
+    protected SecurityManager getSecurityManager()
+    {
+        try
+        {
+            return (SecurityManager) PlexusRestletUtils.plexusLookup(
+                getContext(),
+                SecurityManager.class.getName(),
+                "default-web" );
         }
         catch ( ComponentLookupException e )
         {

@@ -2372,6 +2372,18 @@
 			<version>1.0.0+</version>
 			<fields>
 				<field>
+					<name>loggedIn</name>
+					<version>1.0.0+</version>
+					<type>boolean</type>
+					<required>true</required>
+				</field>
+				<field>
+					<name>loggedInUsername</name>
+					<version>1.0.0+</version>
+					<type>String</type>
+					<required>true</required>
+				</field>
+				<field>
 					<name>viewSearch</name>
 					<version>1.0.0+</version>
 					<type>int</type>

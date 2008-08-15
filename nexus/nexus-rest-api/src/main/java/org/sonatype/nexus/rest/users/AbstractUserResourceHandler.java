@@ -33,10 +33,12 @@ import org.sonatype.nexus.rest.AbstractNexusResourceHandler;
 import org.sonatype.nexus.rest.model.UserResource;
 
 public class AbstractUserResourceHandler
-extends AbstractNexusResourceHandler
+    extends AbstractNexusResourceHandler
 {
     public static final String USER_ID_KEY = "userId";
+
     public static final String USER_EMAIL_KEY = "email";
+
     private static final String ROLE_VALIDATION_ERROR = "The user cannot have zero roles!";
 
     /**
@@ -50,31 +52,25 @@ extends AbstractNexusResourceHandler
     {
         super( context, request, response );
     }
-    
-    public boolean validateFields( UserResource resource, Representation representation )
-    {        
+
+    protected boolean validateFields( UserResource resource, Representation representation )
+    {
         if ( resource.getRoles() == null || resource.getRoles().size() == 0 )
         {
-            getLogger().log(
-                Level.INFO,
-                "The userId (" + resource.getUserId() + ") cannot have 0 roles!" );
-            
-            getResponse().setStatus(
-                Status.CLIENT_ERROR_BAD_REQUEST,
-                ROLE_VALIDATION_ERROR );
+            getLogger().log( Level.INFO, "The userId (" + resource.getUserId() + ") cannot have 0 roles!" );
+
+            getResponse().setStatus( Status.CLIENT_ERROR_BAD_REQUEST, ROLE_VALIDATION_ERROR );
 
             getResponse().setEntity(
-                serialize( representation, getNexusErrorResponse(
-                "users",
-                ROLE_VALIDATION_ERROR ) ) );
+                serialize( representation, getNexusErrorResponse( "users", ROLE_VALIDATION_ERROR ) ) );
 
             return false;
-        }   
-        
+        }
+
         return true;
     }
-    
-    public UserResource nexusToRestModel( CUser user )
+
+    protected UserResource nexusToRestModel( CUser user )
     {
         UserResource resource = new UserResource();
         resource.setEmail( user.getEmail() );
@@ -82,33 +78,38 @@ extends AbstractNexusResourceHandler
         resource.setStatus( user.getStatus() );
         resource.setUserId( user.getUserId() );
         resource.setResourceURI( calculateSubReference( resource.getUserId() ).toString() );
-        
-        for ( String roleId : ( List<String> ) user.getRoles() )
+
+        for ( String roleId : (List<String>) user.getRoles() )
         {
             resource.addRole( roleId );
         }
-        
+
         return resource;
     }
-    
-    public CUser restToNexusModel( CUser user, UserResource resource )
+
+    protected CUser restToNexusModel( CUser user, UserResource resource )
     {
         if ( user == null )
         {
             user = new CUser();
         }
-        
+
         user.setEmail( resource.getEmail() );
         user.setName( resource.getName() );
         user.setStatus( resource.getStatus() );
         user.setUserId( resource.getUserId() );
-        
-        user.getRoles().clear();        
-        for ( String roleId : ( List<String> ) resource.getRoles() )
+
+        user.getRoles().clear();
+        for ( String roleId : (List<String>) resource.getRoles() )
         {
             user.addRole( roleId );
         }
-        
+
         return user;
+    }
+
+    protected boolean isAnonymousUser( String username )
+    {
+        return getNexus().isAnonymousAccessEnabled() && getNexus().getAnonymousUsername().equals( username );
     }
 }

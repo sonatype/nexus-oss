@@ -30,6 +30,7 @@ import java.util.logging.Level;
 import org.apache.commons.fileupload.FileItemFactory;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.util.StringUtils;
+import org.jsecurity.mgt.SecurityManager;
 import org.restlet.Application;
 import org.restlet.Context;
 import org.restlet.data.CharacterSet;
@@ -90,6 +91,11 @@ public abstract class AbstractNexusResourceHandler
         return (NexusSecurityConfiguration) getRequest().getAttributes().get( NexusSecurityConfiguration.ROLE );
     }
 
+    protected SecurityManager getSecurityManager()
+    {
+        return (SecurityManager) getRequest().getAttributes().get( SecurityManager.class.getName() );
+    }
+
     protected Object lookup( String role )
     {
         try
@@ -126,7 +132,7 @@ public abstract class AbstractNexusResourceHandler
         {
             return null;
         }
-        
+
         // TODO: a big fcken TODO!
         StringBuffer path = new StringBuffer( StringUtils.replace( ai.groupId, ".", "/" ) )
             .append( "/" ).append( ai.artifactId ).append( "/" ).append( ai.version ).append( "/" ).append(
@@ -475,7 +481,7 @@ public abstract class AbstractNexusResourceHandler
         if ( InvalidConfigurationException.class.isAssignableFrom( e.getClass() ) )
         {
             ValidationResponse vr = ( (InvalidConfigurationException) e ).getValidationResponse();
-            
+
             if ( vr != null && vr.getValidationErrors().size() > 0 )
             {
                 ValidationMessage vm = vr.getValidationErrors().get( 0 );
@@ -484,8 +490,7 @@ public abstract class AbstractNexusResourceHandler
             }
             else
             {
-                getResponse().setEntity(
-                    serialize( representation, getNexusErrorResponse( "*", e.getMessage() ) ) );
+                getResponse().setEntity( serialize( representation, getNexusErrorResponse( "*", e.getMessage() ) ) );
             }
         }
         else

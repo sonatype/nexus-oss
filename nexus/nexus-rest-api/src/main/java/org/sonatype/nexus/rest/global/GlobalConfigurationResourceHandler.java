@@ -24,6 +24,8 @@ import java.io.IOException;
 import java.util.logging.Level;
 
 import org.codehaus.plexus.util.StringUtils;
+import org.jsecurity.authc.AuthenticationException;
+import org.jsecurity.authc.UsernamePasswordToken;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
@@ -155,27 +157,27 @@ public class GlobalConfigurationResourceHandler
                 try
                 {
                     getNexus().updateApplicationLogDirectory( resource.getLogDirectory() );
-                    
+
                     if ( resource.getSmtpSettings() != null )
                     {
                         SmtpSettings settings = resource.getSmtpSettings();
-                        
+
                         CSmtpConfiguration config = new CSmtpConfiguration();
-                        
+
                         config.setHost( settings.getHost() );
-                        
+
                         config.setPassword( settings.getPassword() );
-                        
+
                         config.setPort( settings.getPort() );
-                        
+
                         config.setSslEnabled( settings.isSslEnabled() );
-                        
+
                         config.setTlsEnabled( settings.isTlsEnabled() );
-                        
+
                         config.setUsername( settings.getUsername() );
-                        
+
                         config.setSystemEmailAddress( settings.getSystemEmailAddress() );
-                        
+
                         getNexus().updateSmtpConfiguration( config );
                     }
 
@@ -237,8 +239,32 @@ public class GlobalConfigurationResourceHandler
 
                     getNexus().setAnonymousAccessEnabled( resource.isSecurityAnonymousAccessEnabled() );
 
-                    if ( resource.getSecurityAnonymousUsername() != null )
+                    if ( resource.isSecurityAnonymousAccessEnabled() && resource.getSecurityAnonymousUsername() != null )
                     {
+                        try
+                        {
+                            // try to "log in" with supplied credentials
+                            // the anon user a) should exists b) the pwd must work
+                            getSecurityManager().authenticate(
+                                new UsernamePasswordToken( resource.getSecurityAnonymousUsername(), resource
+                                    .getSecurityAnonymousPassword() ) );
+                        }
+                        catch ( AuthenticationException e )
+                        {
+                            // the supplied anon auth info is wrong
+                            getLogger().log(
+                                Level.WARNING,
+                                "Nexus refused to apply configuration, the supplied anonymous information is wrong.",
+                                e );
+
+                            getResponse().setStatus( Status.CLIENT_ERROR_BAD_REQUEST, e.getMessage() );
+
+                            getResponse().setEntity(
+                                serialize( entity, getNexusErrorResponse( "securityAnonymousUsername", e.getMessage() ) ) );
+
+                            return;
+                        }
+
                         getNexus().setAnonymousUsername( resource.getSecurityAnonymousUsername() );
 
                         getNexus().setAnonymousPassword( resource.getSecurityAnonymousPassword() );
@@ -302,7 +328,7 @@ public class GlobalConfigurationResourceHandler
         resource.setGlobalConnectionSettings( convert( getNexus().readDefaultGlobalRemoteConnectionSettings() ) );
 
         resource.setGlobalHttpProxySettings( convert( getNexus().readDefaultGlobalRemoteHttpProxySettings() ) );
-        
+
         resource.setSmtpSettings( convert( getNexus().readDefaultSmtpConfiguration() ) );
     }
 
@@ -328,7 +354,7 @@ public class GlobalConfigurationResourceHandler
         resource.setGlobalHttpProxySettings( convert( getNexus().readGlobalRemoteHttpProxySettings() ) );
 
         resource.setBaseUrl( getNexus().getBaseUrl() );
-        
+
         resource.setSmtpSettings( convert( getNexus().readSmtpConfiguration() ) );
     }
 

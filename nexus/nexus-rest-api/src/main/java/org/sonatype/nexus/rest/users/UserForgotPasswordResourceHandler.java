@@ -40,13 +40,13 @@ public class UserForgotPasswordResourceHandler
     {
         super( context, request, response );
     }
-    
+
     @Override
     public boolean allowPost()
     {
         return true;
     }
-    
+
     @Override
     public void post( Representation representation )
     {
@@ -59,10 +59,19 @@ public class UserForgotPasswordResourceHandler
         else
         {
             UserForgotPasswordResource resource = request.getData();
-            
+
             try
             {
-                getNexusSecurityConfiguration().forgotPassword( resource.getUserId(), resource.getEmail() );
+                if ( !isAnonymousUser( resource.getUserId() ) )
+                {
+                    getNexusSecurityConfiguration().forgotPassword( resource.getUserId(), resource.getEmail() );
+                }
+                else
+                {
+                    getResponse().setStatus( Status.CLIENT_ERROR_BAD_REQUEST, "Anonymous user cannot forgot password!" );
+
+                    getLogger().log( Level.FINE, "Anonymous user forgot password is blocked!" );
+                }
             }
             catch ( IOException e )
             {

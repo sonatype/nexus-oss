@@ -37,6 +37,35 @@ public abstract class AbstractUIPermissionCalculatingResource
 
         Subject subject = SecurityUtils.getSubject();
 
+        if ( getNexus().isAnonymousAccessEnabled() )
+        {
+            // we must decide is the user logged in the anon user and we must tell "false" if it is
+            if ( getNexus().getAnonymousUsername().equals( subject.getPrincipal() ) )
+            {
+                perms.setLoggedIn( false );
+            }
+            else
+            {
+                perms.setLoggedIn( true );
+            }
+        }
+        else
+        {
+            // anon access is disabled, simply ask JSecurity about this
+            perms.setLoggedIn( subject != null && subject.isAuthenticated() );
+        }
+
+        if ( perms.isLoggedIn() )
+        {
+            // try to set the loggedInUsername
+            Object principal = subject.getPrincipal();
+
+            if ( principal != null )
+            {
+                perms.setLoggedInUsername( principal.toString() );
+            }
+        }
+
         perms.setViewSearch( getFlagsForPermission( subject, "nexus:index" ) );
 
         perms.setViewUpdatedArtifacts( getFlagsForPermission( subject, "nexus:feeds" ) );

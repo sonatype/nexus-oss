@@ -24,10 +24,12 @@ import java.io.IOException;
 import java.util.logging.Level;
 
 import org.restlet.Context;
+import org.restlet.data.MediaType;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.restlet.resource.Representation;
+import org.restlet.resource.StringRepresentation;
 import org.restlet.resource.Variant;
 import org.sonatype.nexus.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.security.NoSuchUserException;
@@ -74,11 +76,11 @@ public class UserResourceHandler
     public Representation getRepresentationHandler( Variant variant )
     {
         UserResourceResponse response = new UserResourceResponse();
-        
+
         try
         {
             response.setData( nexusToRestModel( getNexusSecurityConfiguration().readUser( getUserId() ) ) );
-            
+
             return serialize( variant, response );
         }
         catch ( NoSuchUserException e )
@@ -102,7 +104,7 @@ public class UserResourceHandler
      */
     public void put( Representation representation )
     {
-        UserResourceRequest request = ( UserResourceRequest ) deserialize( new UserResourceRequest() );
+        UserResourceRequest request = (UserResourceRequest) deserialize( new UserResourceRequest() );
 
         if ( request == null )
         {
@@ -111,17 +113,19 @@ public class UserResourceHandler
         else
         {
             UserResource resource = request.getData();
-            
+
             try
             {
-                CUser user = restToNexusModel( getNexusSecurityConfiguration().readUser( resource.getUserId() ), resource );
-                
+                CUser user = restToNexusModel(
+                    getNexusSecurityConfiguration().readUser( resource.getUserId() ),
+                    resource );
+
                 getNexusSecurityConfiguration().updateUser( user );
-                
+
                 UserResourceResponse response = new UserResourceResponse();
-                
+
                 response.setData( request.getData() );
-                
+
                 getResponse().setEntity( serialize( representation, response ) );
             }
             catch ( NoSuchUserException e )
@@ -155,8 +159,28 @@ public class UserResourceHandler
     public void delete()
     {
         try
-        {            
-            getNexusSecurityConfiguration().deleteUser( getUserId() );
+        {
+            if ( !isAnonymousUser( getUserId() ) )
+            {
+                getNexusSecurityConfiguration().deleteUser( getUserId() );
+            }
+            else
+            {
+                getResponse()
+                    .setEntity(
+                        new StringRepresentation(
+                            "The user with user ID ["
+                                + getUserId()
+                                + "] cannot be deleted, since it is marked user used for Anonymous access in Server Administration. To delete this user, disable anonymous access or, change the anonymous username and password to another valid values!",
+                            MediaType.TEXT_HTML ) );
+
+                getResponse().setStatus( Status.CLIENT_ERROR_BAD_REQUEST );
+
+                getLogger()
+                    .log(
+                        Level.INFO,
+                        "Anonymous user cannot be deleted! Unset the Allow Anonymous access first in Server Administration!" );
+            }
         }
         catch ( NoSuchUserException e )
         {
