@@ -1733,7 +1733,7 @@
 </tr>
 <tr>
 	<td>verifyTextPresent</td>
-	<td>Displaying 50 </td>
+	<td>Displaying 50</td>
 	<td></td>
 </tr>
 <tr>
@@ -1793,7 +1793,7 @@
 </tr>
 <tr>
 	<td>type</td>
-	<td>name</td>
+	<td>document.forms[1].elements[1]</td>
 	<td>User One</td>
 </tr>
 <tr>
@@ -1839,6 +1839,721 @@
 <tr>
 	<td>pause</td>
 	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//table[@id='user-add-btn']/tbody/tr/td[2]/em/button</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>userId</td>
+	<td>user2</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>document.forms[1].elements[1]</td>
+	<td>User Two</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>email</td>
+	<td>usertwo@test.com</td>
+</tr>
+<tr>
+	<td>mouseDown</td>
+	<td>//input[@name='status']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//div/div[text()='Disabled']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//li[2]/div/a/span</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>document.forms[1].elements[4]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//div[4]/div/div/div[2]/div[2]/div/div[2]/div[2]/div[2]/div/div/div/div/div/table/tbody/tr/td[1]/table/tbody/tr/td[2]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//div[4]/div/div/div[1]/div[2]/div[1]/div/table/tbody/tr/td[1]/table/tbody/tr/td[2]/em/button</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//table[@id='user-add-btn']/tbody/tr/td[2]/em/button</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>userId</td>
+	<td>user3</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>document.forms[1].elements[1]</td>
+	<td>User Three</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>email</td>
+	<td>userthree@test.com</td>
+</tr>
+<tr>
+	<td>mouseDown</td>
+	<td>//input[@name='status']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//div/div[text()='Active']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//li[3]/div/a/span</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>document.forms[1].elements[4]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//div[4]/div/div/div[2]/div[2]/div/div[2]/div[2]/div[2]/div/div/div/div/div/table/tbody/tr/td[1]/table/tbody/tr/td[2]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//div[4]/div/div/div[1]/div[2]/div[1]/div/table/tbody/tr/td[1]/table/tbody/tr/td[2]/em/button</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//table[@id='user-add-btn']/tbody/tr/td[2]/em/button</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>userId</td>
+	<td>user4</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>document.forms[1].elements[1]</td>
+	<td>User Four</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>email</td>
+	<td>userfour@test.com</td>
+</tr>
+<tr>
+	<td>mouseDown</td>
+	<td>//input[@name='status']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//div/div[text()='Disabled']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//li[3]/div/a/span</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>document.forms[1].elements[4]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//div[4]/div/div/div[2]/div[2]/div/div[2]/div[2]/div[2]/div/div/div/div/div/table/tbody/tr/td[1]/table/tbody/tr/td[2]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//div[4]/div/div/div[1]/div[2]/div[1]/div/table/tbody/tr/td[1]/table/tbody/tr/td[2]/em/button</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//table[@id='user-add-btn']/tbody/tr/td[2]/em/button</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>userId</td>
+	<td>user5</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>document.forms[1].elements[1]</td>
+	<td>User Five</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>email</td>
+	<td>userfive@test.com</td>
+</tr>
+<tr>
+	<td>mouseDown</td>
+	<td>//input[@name='status']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//div/div[text()='Active']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//a/span</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>document.forms[1].elements[4]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//div[4]/div/div/div[2]/div[2]/div/div[2]/div[2]/div[2]/div/div/div/div/div/table/tbody/tr/td[1]/table/tbody/tr/td[2]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//div[4]/div/div/div[1]/div[2]/div[1]/div/table/tbody/tr/td[1]/table/tbody/tr/td[2]/em/button</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//table[@id='user-add-btn']/tbody/tr/td[2]/em/button</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>userId</td>
+	<td>user6</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>document.forms[1].elements[1]</td>
+	<td>User Six</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>email</td>
+	<td>usersix@test.com</td>
+</tr>
+<tr>
+	<td>mouseDown</td>
+	<td>//input[@name='status']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//div/div[text()='Disabled']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//a/span</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>document.forms[1].elements[4]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//div[4]/div/div/div[2]/div[2]/div/div[2]/div[2]/div[2]/div/div/div/div/div/table/tbody/tr/td[1]/table/tbody/tr/td[2]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//div[4]/div/div/div[1]/div[2]/div[1]/div/table/tbody/tr/td[1]/table/tbody/tr/td[2]/em/button</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//table[@id='user-add-btn']/tbody/tr/td[2]/em/button</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>userId</td>
+	<td>user1</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>document.forms[1].elements[1]</td>
+	<td>Duplicate Name Test</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>email</td>
+	<td>userone@test.com</td>
+</tr>
+<tr>
+	<td>mouseDown</td>
+	<td>//input[@name='status']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//div/div[text()='Disabled']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//a/span</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>document.forms[1].elements[4]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//div[4]/div/div/div[2]/div[2]/div/div[2]/div[2]/div[2]/div/div/div/div/div/table/tbody/tr/td[1]/table/tbody/tr/td[2]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTextPresent</td>
+	<td>User Id is required and must be unique</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>userId</td>
+	<td>user7</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//div[4]/div/div/div[2]/div[2]/div/div[2]/div[2]/div[2]/div/div/div/div/div/table/tbody/tr/td[1]/table/tbody/tr/td[2]/em/button</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTextPresent</td>
+	<td>Email address must be unique</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>email</td>
+	<td>userseven@test.com</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//div[4]/div/div/div[2]/div[2]/div/div[2]/div[2]/div[2]/div/div/div/div/div/table/tbody/tr/td[1]/table/tbody/tr/td[2]/em/button</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//div[4]/div/div/div[1]/div[2]/div[1]/div/table/tbody/tr/td[1]/table/tbody/tr/td[2]/em/button</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTextPresent</td>
+	<td>Select a user to edit it, or click &quot;Add&quot; to create a new one</td>
+	<td></td>
+</tr>
+<tr>
+	<td>mouseDown</td>
+	<td>open-config-repoTargets</td>
+	<td></td>
+</tr>
+<tr>
+	<td>mouseUp</td>
+	<td>open-config-repoTargets</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//div[5]/div/div/div[1]/div[2]/div[1]/div/table/tbody/tr/td[2]/table/tbody/tr/td[2]/em/button</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>document.forms[1].elements[0]</td>
+	<td>Repo Target One</td>
+</tr>
+<tr>
+	<td>mouseDown</td>
+	<td>//form/div[2]/div[1]/div/img[1]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//div/div[text()='maven2']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//div[5]/div/div/div[2]/div[2]/div/div[2]/div[2]/div[2]/div/div/div/div/div/table/tbody/tr/td[1]/table/tbody/tr/td[2]/em/button</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTextPresent</td>
+	<td>The target should have at least one pattern</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>pattern</td>
+	<td>com.somecompany</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>document.forms[1].elements[3]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>pattern</td>
+	<td>com.somecompany</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>document.forms[1].elements[3]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTextPresent</td>
+	<td>This pattern already exists</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>document.forms[1].elements[5]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//div[5]/div/div/div[2]/div[2]/div/div[2]/div[2]/div[2]/div/div/div/div/div/table/tbody/tr/td[1]/table/tbody/tr/td[2]/em/button</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTextPresent</td>
+	<td>The target should have at least one pattern</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//form/div[3]/div/div/div</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//table[@id='savebutton']/tbody/tr/td[2]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//table[@id='repoTarget-refresh-btn']/tbody/tr/td[2]/em/button</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTextPresent</td>
+	<td>Select a target to edit it, or click &quot;Add&quot; to create a new one</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//div[5]/div/div/div[1]/div[2]/div[1]/div/table/tbody/tr/td[2]/table/tbody/tr/td[2]/em/button</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>document.forms[1].elements[0]</td>
+	<td>Repo Target Two</td>
+</tr>
+<tr>
+	<td>mouseDown</td>
+	<td>//form/div[2]/div[1]/div/img[1]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//div/div[text()='maven1']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//div[5]/div/div/div[2]/div[2]/div/div[2]/div[2]/div[2]/div/div/div/div/div/table/tbody/tr/td[1]/table/tbody/tr/td[2]/em/button</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTextPresent</td>
+	<td>The target should have at least one pattern</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>pattern</td>
+	<td>com.yourcompany</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>document.forms[1].elements[3]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//a/span</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>document.forms[1].elements[4]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//div[5]/div/div/div[2]/div[2]/div/div[2]/div[2]/div[2]/div/div/div/div/div/table/tbody/tr/td[1]/table/tbody/tr/td[2]/em/button</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTextPresent</td>
+	<td>The target should have at least one pattern</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>pattern</td>
+	<td>com.yourcompany</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>document.forms[1].elements[3]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//table[@id='savebutton']/tbody/tr/td[2]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//table[@id='repoTarget-refresh-btn']/tbody/tr/td[2]/em/button</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//div[5]/div/div/div[1]/div[2]/div[1]/div/table/tbody/tr/td[2]/table/tbody/tr/td[2]/em/button</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>document.forms[1].elements[0]</td>
+	<td>Repo Target Three</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//form/div[2]/div[1]/div/img[1]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//div/div[text()='maven1']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>pattern</td>
+	<td>com.yourothercompany</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>document.forms[1].elements[3]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//table[@id='savebutton']/tbody/tr/td[2]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//table[@id='repoTarget-refresh-btn']/tbody/tr/td[2]/em/button</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>st-repoTargets-grid_http://localhost:8081/nexus/service/local/repo_targets/11bc46a29fc_col0</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//div[5]/div/div/div[1]/div[2]/div[1]/div/table/tbody/tr/td[3]/table/tbody/tr/td[2]/em/button</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>Yes</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>500</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTextPresent</td>
+	<td>Select a target to edit it, or click &quot;Add&quot; to create a new one</td>
 	<td></td>
 </tr>
 
