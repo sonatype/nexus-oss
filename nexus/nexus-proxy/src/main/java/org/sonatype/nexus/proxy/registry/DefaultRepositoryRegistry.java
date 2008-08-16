@@ -70,21 +70,21 @@ public class DefaultRepositoryRegistry
     /** The group repo register, (key=Repository.getGroupId, value=List of RepoId's) */
     private Map<String, ContentClass> repositoryGroupContentClasses = new HashMap<String, ContentClass>();
 
-    protected void insertRepository( Repository repository, boolean notify )
+    protected void insertRepository( Repository repository, boolean newlyAdded )
     {
         repositories.put( repository.getId(), repository );
-
-        if ( repository instanceof EventMulticaster )
-        {
-            ( (EventMulticaster) repository ).addProximityEventListener( this );
-        }
 
         RepositoryStatusCheckerThread thread = new RepositoryStatusCheckerThread( repository );
 
         repositoryStatusCheckers.put( repository.getId(), thread );
 
-        if ( notify )
+        if ( newlyAdded )
         {
+            if ( repository instanceof EventMulticaster )
+            {
+                ( (EventMulticaster) repository ).addProximityEventListener( this );
+            }
+
             notifyProximityEventListeners( new RepositoryRegistryEventAdd( repository ) );
         }
 

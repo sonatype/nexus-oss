@@ -334,7 +334,7 @@ public abstract class AbstractRepository
                 resetRemoteStatus();
             }
 
-            if ( sendNotification && !this.proxyMode.equals( oldProxyMode ) )
+            if ( sendNotification && !proxyMode.equals( oldProxyMode ) )
             {
                 notifyProximityEventListeners( new RepositoryEventProxyModeChanged( this, oldProxyMode, cause ) );
             }
@@ -551,6 +551,11 @@ public abstract class AbstractRepository
                 if ( getLogger().isDebugEnabled() )
                 {
                     getLogger().debug( "isRemoteStorageReachable :: StorageException", e );
+                }
+
+                if ( getProxyMode() != null )
+                {
+                    setProxyMode( ProxyMode.BLOCKED_AUTO, true, e );
                 }
 
                 return false;

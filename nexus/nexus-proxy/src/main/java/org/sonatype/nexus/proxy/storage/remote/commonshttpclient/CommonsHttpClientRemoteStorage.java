@@ -265,6 +265,8 @@ public class CommonsHttpClientRemoteStorage
         if ( ctx.getRemoteAuthenticationSettings() != null
             && ctx.getRemoteAuthenticationSettings().getUsername() != null )
         {
+            // we have proxy authentication, let's do it preemptive
+            httpClient.getParams().setAuthenticationPreemptive( true );
 
             List<String> authPrefs = new ArrayList<String>( 2 );
             authPrefs.add( AuthPolicy.DIGEST );
@@ -313,9 +315,6 @@ public class CommonsHttpClientRemoteStorage
             if ( ctx.getRemoteHttpProxySettings().getAuthentication() != null
                 && ctx.getRemoteHttpProxySettings().getAuthentication().getUsername() != null )
             {
-                // we have proxy authentication, let's do it preemptive
-                httpClient.getParams().setAuthenticationPreemptive( true );
-
                 List<String> authPrefs = new ArrayList<String>( 2 );
                 authPrefs.add( AuthPolicy.DIGEST );
                 authPrefs.add( AuthPolicy.BASIC );
