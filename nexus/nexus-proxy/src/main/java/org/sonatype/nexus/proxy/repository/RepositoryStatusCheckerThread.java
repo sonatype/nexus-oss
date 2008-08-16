@@ -35,9 +35,24 @@ public class RepositoryStatusCheckerThread
         {
             while ( isActive() && getRepository().getProxyMode() != null )
             {
-                if ( getRepository().getLocalStatus().shouldServiceRequest() )
+                if ( RepositoryStatusCheckMode.ALWAYS.equals( getRepository().getRepositoryStatusCheckMode() ) )
                 {
-                    getRepository().getRemoteStatus( false );
+                    if ( getRepository().getLocalStatus().shouldServiceRequest() )
+                    {
+                        getRepository().getRemoteStatus( false );
+                    }
+                }
+                else if ( RepositoryStatusCheckMode.AUTO_BLOCKED_ONLY.equals( getRepository()
+                    .getRepositoryStatusCheckMode() ) )
+                {
+                    if ( getRepository().getProxyMode().shouldAutoUnblock() )
+                    {
+                        getRepository().getRemoteStatus( false );
+                    }
+                }
+                else if ( RepositoryStatusCheckMode.NEVER.equals( getRepository().getRepositoryStatusCheckMode() ) )
+                {
+                    // nothing
                 }
 
                 Thread.sleep( AbstractRepository.REMOTE_STATUS_RETAIN_TIME );

@@ -178,6 +178,20 @@ public interface Repository
     void setProxyMode( ProxyMode val );
 
     /**
+     * Gets the RepositoryStatusCheckMode.
+     * 
+     * @return
+     */
+    RepositoryStatusCheckMode getRepositoryStatusCheckMode();
+
+    /**
+     * Sets the RepositoryStatusCheckMode.
+     * 
+     * @param mode
+     */
+    void setRepositoryStatusCheckMode( RepositoryStatusCheckMode mode );
+
+    /**
      * Is Repository listable?.
      * 
      * @return true if is listable, otherwise false.

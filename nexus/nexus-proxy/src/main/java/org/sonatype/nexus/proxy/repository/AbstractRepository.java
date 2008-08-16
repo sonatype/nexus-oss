@@ -136,6 +136,9 @@ public abstract class AbstractRepository
     /** The proxy remote status */
     private volatile RemoteStatus remoteStatus = RemoteStatus.UNKNOWN;
 
+    /** The repo status check mode */
+    private volatile RepositoryStatusCheckMode repositoryStatusCheckMode = RepositoryStatusCheckMode.AUTO_BLOCKED_ONLY;
+
     /** Last time remote status was updated */
     private volatile long remoteStatusUpdated = 0;
 
@@ -360,6 +363,16 @@ public abstract class AbstractRepository
 
             notifyProximityEventListeners( new RepositoryEventProxyModeBlockedAutomatically( this, oldMode, cause ) );
         }
+    }
+
+    public RepositoryStatusCheckMode getRepositoryStatusCheckMode()
+    {
+        return repositoryStatusCheckMode;
+    }
+
+    public void setRepositoryStatusCheckMode( RepositoryStatusCheckMode mode )
+    {
+        this.repositoryStatusCheckMode = mode;
     }
 
     public boolean isAllowWrite()
