@@ -552,14 +552,16 @@ Ext.extend(Sonatype.repoServer.RepoMaintPanel, Sonatype.repoServer.AbstractRepoP
   },
   
   //for downloading artifacts from the browse view
-  downloadHandler : function(){
+  downloadHandler : function( button, event ){
+    event.stopEvent();
     if(this.ctxBrowseNode){
       window.open(this.restToContentUrl(this.ctxBrowseNode.id));
     }
   },
   
   //for downloading artifacts from the browse view of the remote repository
-  downloadFromRemoteHandler : function(){
+  downloadFromRemoteHandler : function( button, event ){
+    event.stopEvent();
     if(this.ctxBrowseNode){
       var rec = (this.ctxRecord) ? this.ctxRecord : this.reposGridPanel.getSelectionModel().getSelected();      
       window.open(this.restToRemoteUrl(this.ctxBrowseNode.id,rec));
