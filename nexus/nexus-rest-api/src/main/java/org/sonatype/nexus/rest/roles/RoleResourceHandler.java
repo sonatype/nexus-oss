@@ -122,6 +122,8 @@ public class RoleResourceHandler
                 
                 response.setData( request.getData() );
                 
+                response.getData().setResourceURI( calculateSubReference( resource.getId() ).toString() );
+                
                 getResponse().setEntity( serialize( representation, response ) );
             }
             catch ( NoSuchRoleException e )

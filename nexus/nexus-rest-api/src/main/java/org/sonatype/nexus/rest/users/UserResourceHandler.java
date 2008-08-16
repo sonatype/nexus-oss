@@ -125,6 +125,8 @@ public class UserResourceHandler
                 UserResourceResponse response = new UserResourceResponse();
 
                 response.setData( request.getData() );
+                
+                response.getData().setResourceURI( calculateSubReference( resource.getUserId() ).toString() );
 
                 getResponse().setEntity( serialize( representation, response ) );
             }

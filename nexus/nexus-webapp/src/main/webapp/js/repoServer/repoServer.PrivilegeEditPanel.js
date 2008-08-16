@@ -301,11 +301,12 @@ Sonatype.repoServer.PrivilegeEditPanel = function(config){
           },
           {
             xtype: 'panel',
+            id: '_methods_tree_panel',
             layout: 'column',
             items: [
               {
                 xtype: 'treepanel',
-                id: 'methods_tree',
+                id: '_methods_tree',
                 title: 'Selected Methods',
                 cls: 'required-field',
                 border: true, //note: this seem to have no effect w/in form panel
@@ -372,7 +373,7 @@ Sonatype.repoServer.PrivilegeEditPanel = function(config){
               },
               {
                 xtype: 'treepanel',
-                id: 'all_methods_tree', 
+                id: '_all_methods_tree', 
                 title: 'Available Methods',
                 border: true, //note: this seem to have no effect w/in form panel
                 bodyBorder: true, //note: this seem to have no effect w/in form panel
@@ -540,7 +541,7 @@ Ext.extend(Sonatype.repoServer.PrivilegeEditPanel, Ext.Panel, {
     allValid = formInfoObj.formPanel.form.isValid()
     
     //form validation of repository treepanel
-    var selectedTree = formInfoObj.formPanel.find('id', 'methods_tree')[0];
+    var selectedTree = Ext.getCmp(formInfoObj.formPanel.id + '_methods_tree');
     var treeValid = selectedTree.validate.call(selectedTree);
     
     if (!treeValid) {
@@ -572,26 +573,28 @@ Ext.extend(Sonatype.repoServer.PrivilegeEditPanel, Ext.Panel, {
     var formLayout = this.formCards.getLayout();
     var gridSelectModel = this.privilegesGridPanel.getSelectionModel();
     var store = this.privilegesGridPanel.getStore();
-    
+      
     this.formCards.remove(formInfoObj.formPanel.id, true);
-    //select previously selected form, or the default view (index == 0)
-    var newIndex = this.formCards.items.length - 1;
-    newIndex = (newIndex >= 0) ? newIndex : 0;
-    formLayout.setActiveItem(newIndex);
+      
+    if (this.formCards.items.length > 1){
+      formLayout.setActiveItem(this.formCards.items.length - 1);
+      //select the coordinating row in the grid, or none if back to default
+      var i = store.indexOfId(formLayout.activeItem.id);
+      if (i >= 0){
+        gridSelectModel.selectRow(i);
+      }
+      else{
+        gridSelectModel.clearSelections();
+      }
+    }
+    else{
+      formLayout.setActiveItem(0);
+      gridSelectModel.clearSelections();
+    }
 
     //delete row from grid if canceling a new repo form
     if(formInfoObj.isNew){
       store.remove( store.getById(formInfoObj.formPanel.id) );
-    }
-    
-    //select the coordinating row in the grid, or none if back to default
-    var i = store.indexOfId(formLayout.activeItem.id);
-    if (i >= 0){
-      gridSelectModel.selectRow(i);
-      this.rowClick(this.privilegesGridPanel, i, null);
-    }
-    else{
-      gridSelectModel.clearSelections();
     }
   },
   
@@ -712,29 +715,30 @@ Ext.extend(Sonatype.repoServer.PrivilegeEditPanel, Ext.Panel, {
 
       if(formLayout.activeItem.id == resourceId){
         this.formCards.remove(resourceId, true);
-        //select previously selected form, or the default view (index == 0)
-        var newIndex = this.formCards.items.length - 1;
-        newIndex = (newIndex >= 0) ? newIndex : 0;
-        formLayout.setActiveItem(newIndex);
+        if (this.formCards.items.length > 0){
+          formLayout.setActiveItem(this.formCards.items.length - 1);
+          //select the coordinating row in the grid, or none if back to default
+          var i = store.indexOfId(formLayout.activeItem.id);
+          if (i >= 0){
+            gridSelectModel.selectRow(i);
+          }
+          else{
+            gridSelectModel.clearSelections();
+          }
+        }
+        else{
+            formLayout.setActiveItem(0);
+            gridSelectModel.clearSelections();
+        }
       }
       else {
         this.formCards.remove(resourceId, true);
       }
 
       store.remove( store.getById(resourceId) );
-
-      //select the coordinating row in the grid, or none if back to default
-      var i = store.indexOfId(formLayout.activeItem.id);
-      if (i >= 0){
-        gridSelectModel.selectRow(i);
-        this.rowClick(this.privilegesGridPanel, i, null);
-      }
-      else{
-        gridSelectModel.clearSelections();
-      }
     }
     else {
-      Sonatype.MessageBox.alert('The server did not delete the privilege.');
+      Sonatype.utils.connectionError( response, 'The server did not delete the privilege.', null, null, true );
     }
   },
       
@@ -860,7 +864,7 @@ Ext.extend(Sonatype.repoServer.PrivilegeEditPanel, Ext.Panel, {
   },
   
   populateTree : function(fpanel) {
-    var allTree = fpanel.find('id', 'all_methods_tree')[0];
+    var allTree = Ext.getCmp(fpanel.id + '_all_methods_tree');
     
     this.methodStore.each(function(item, i, len){
       allTree.root.appendChild(
@@ -877,7 +881,7 @@ Ext.extend(Sonatype.repoServer.PrivilegeEditPanel, Ext.Panel, {
   },
   
   saveTreeHelper : function(val, fpanel){
-    var selectedTree = fpanel.find('id', 'methods_tree')[0];
+    var selectedTree = Ext.getCmp(fpanel.id + '_methods_tree');
 
     var outputArr = [];
     var nodes = selectedTree.root.childNodes;
@@ -897,6 +901,12 @@ Ext.extend(Sonatype.repoServer.PrivilegeEditPanel, Ext.Panel, {
 
     newConfig.items[6].items[1].items[0].root = new Ext.tree.TreeNode({text: 'root'});
     newConfig.items[6].items[1].items[2].root = new Ext.tree.TreeNode({text: 'root'});
+    
+    newConfig.items[6].items[1].id = id + '_methods_tree_panel';
+    newConfig.items[6].items[1].items[0].root = new Ext.tree.TreeNode({text: 'root'});
+    newConfig.items[6].items[1].items[0].id = id + '_methods_tree';
+    newConfig.items[6].items[1].items[2].root = new Ext.tree.TreeNode({text: 'root'});
+    newConfig.items[6].items[1].items[2].id = id + '_all_methods_tree';
 
     return newConfig;
   },

@@ -147,7 +147,7 @@ Sonatype.repoServer.RoleEditPanel = function(config){
       },
       {
         xtype: 'panel',
-        id: 'roles_privs_tree_panel',
+        id: '_roles_privs_tree_panel',
         layout: 'column',
         autoHeight: true,
         style: 'padding: 10px 0 0 0',
@@ -155,7 +155,7 @@ Sonatype.repoServer.RoleEditPanel = function(config){
         items: [
           {
             xtype: 'treepanel',
-            id: 'roles_privs_tree', //note: unique ID is assinged before instantiation
+            id: '_roles_privs_tree', //note: unique ID is assinged before instantiation
             title: 'Selected Roles / Privileges',
             cls: 'required-field',
             border: true, //note: this seem to have no effect w/in form panel
@@ -230,7 +230,7 @@ Sonatype.repoServer.RoleEditPanel = function(config){
           },
           {
             xtype: 'treepanel',
-            id: 'all_roles_privs_tree', //note: unique ID is assinged before instantiation
+            id: '_all_roles_privs_tree', //note: unique ID is assinged before instantiation
             title: 'Available Roles / Privileges',
             border: true, //note: this seem to have no effect w/in form panel
             bodyBorder: true, //note: this seem to have no effect w/in form panel
@@ -392,7 +392,7 @@ Ext.extend(Sonatype.repoServer.RoleEditPanel, Ext.Panel, {
     allValid = formInfoObj.formPanel.form.isValid()
     
     //form validation of repository treepanel
-    var selectedTree = formInfoObj.formPanel.find('id', 'roles_privs_tree')[0];
+    var selectedTree = Ext.getCmp(formInfoObj.formPanel.id + '_roles_privs_tree');
     var treeValid = selectedTree.validate.call(selectedTree);
     
     if (!treeValid) {
@@ -426,24 +426,26 @@ Ext.extend(Sonatype.repoServer.RoleEditPanel, Ext.Panel, {
     var store = this.rolesGridPanel.getStore();
     
     this.formCards.remove(formInfoObj.formPanel.id, true);
-    //select previously selected form, or the default view (index == 0)
-    var newIndex = this.formCards.items.length - 1;
-    newIndex = (newIndex >= 0) ? newIndex : 0;
-    formLayout.setActiveItem(newIndex);
+    
+    if (this.formCards.items.length > 1){
+      formLayout.setActiveItem(this.formCards.items.length - 1);
+      //select the coordinating row in the grid, or none if back to default
+      var i = store.indexOfId(formLayout.activeItem.id);
+      if (i >= 0){
+        gridSelectModel.selectRow(i);
+      }
+      else{
+        gridSelectModel.clearSelections();
+      }
+    }
+    else{
+      formLayout.setActiveItem(0);
+      gridSelectModel.clearSelections();
+    }
 
     //delete row from grid if canceling a new repo form
     if(formInfoObj.isNew){
       store.remove( store.getById(formInfoObj.formPanel.id) );
-    }
-    
-    //select the coordinating row in the grid, or none if back to default
-    var i = store.indexOfId(formLayout.activeItem.id);
-    if (i >= 0){
-      gridSelectModel.selectRow(i);
-      this.rowClick(this.rolesGridPanel, i, null);
-    }
-    else{
-      gridSelectModel.clearSelections();
     }
   },
   
@@ -562,28 +564,30 @@ Ext.extend(Sonatype.repoServer.RoleEditPanel, Ext.Panel, {
 
       if(formLayout.activeItem.id == resourceId){
         this.formCards.remove(resourceId, true);
-        //select previously selected form, or the default view (index == 0)
-        var newIndex = this.formCards.items.length - 1;
-        newIndex = (newIndex >= 0) ? newIndex : 0;
-        formLayout.setActiveItem(newIndex);
+        if (this.formCards.items.length > 0){
+          formLayout.setActiveItem(this.formCards.items.length - 1);
+          //select the coordinating row in the grid, or none if back to default
+          var i = store.indexOfId(formLayout.activeItem.id);
+          if (i >= 0){
+            gridSelectModel.selectRow(i);
+          }
+          else{
+            gridSelectModel.clearSelections();
+          }
+        }
+        else{
+            formLayout.setActiveItem(0);
+            gridSelectModel.clearSelections();
+        }
       }
       else {
         this.formCards.remove(resourceId, true);
       }
 
       store.remove( store.getById(resourceId) );
-
-      //select the coordinating row in the grid, or none if back to default
-      var i = store.indexOfId(formLayout.activeItem.id);
-      if (i >= 0){
-        gridSelectModel.selectRow(i);
-      }
-      else{
-        gridSelectModel.clearSelections();
-      }
     }
     else {
-      Sonatype.MessageBox.alert('The server did not delete the role.');
+      Sonatype.utils.connectionError( response, 'The server did not delete the role.', null, null, true );
     }
   },
       
@@ -787,14 +791,17 @@ Ext.extend(Sonatype.repoServer.RoleEditPanel, Ext.Panel, {
     //@note: there has to be a better way to do this.  Depending on offsets is very error prone
     var newConfig = config;
 
+    newConfig.items[4].id = id + '_roles_privs_tree_panel';
     newConfig.items[4].items[0].root = new Ext.tree.TreeNode({text: 'root'});
+    newConfig.items[4].items[0].id = id + '_roles_privs_tree';
     newConfig.items[4].items[2].root = new Ext.tree.TreeNode({text: 'root'});
+    newConfig.items[4].items[2].id = id + '_all_roles_privs_tree';
 
     return newConfig;
   },
   
   initializeRolesTreeHelper : function(fpanel){
-    var allTree = fpanel.find('id', 'all_roles_privs_tree')[0];
+    var allTree = Ext.getCmp(fpanel.id + '_all_roles_privs_tree');
     
     this.rolesDataStore.each(function(item, i, len){
       allTree.root.appendChild(
@@ -813,8 +820,8 @@ Ext.extend(Sonatype.repoServer.RoleEditPanel, Ext.Panel, {
   },
     
   loadRolesTreeHelper : function(arr, srcObj, fpanel){
-    var selectedTree = fpanel.find('id', 'roles_privs_tree')[0];
-    var allTree = fpanel.find('id', 'all_roles_privs_tree')[0];
+    var selectedTree = Ext.getCmp(fpanel.id + '_roles_privs_tree');
+    var allTree = Ext.getCmp(fpanel.id + '_all_roles_privs_tree');
 
     var role;
 
@@ -852,7 +859,7 @@ Ext.extend(Sonatype.repoServer.RoleEditPanel, Ext.Panel, {
   },
   
   initializePrivilegesTreeHelper : function(fpanel){
-    var allTree = fpanel.find('id', 'all_roles_privs_tree')[0];
+    var allTree = Ext.getCmp(fpanel.id + '_all_roles_privs_tree');
     
     this.privDataStore.each(function(item, i, len){
       allTree.root.appendChild(
@@ -870,8 +877,8 @@ Ext.extend(Sonatype.repoServer.RoleEditPanel, Ext.Panel, {
   },
   
   loadPrivilegesTreeHelper : function(arr, srcObj, fpanel){
-    var selectedTree = fpanel.find('id', 'roles_privs_tree')[0];
-    var allTree = fpanel.find('id', 'all_roles_privs_tree')[0];
+    var selectedTree = Ext.getCmp(fpanel.id + '_roles_privs_tree');
+    var allTree = Ext.getCmp(fpanel.id + '_all_roles_privs_tree');
 
     var priv;
 
@@ -908,7 +915,7 @@ Ext.extend(Sonatype.repoServer.RoleEditPanel, Ext.Panel, {
   },
   
   saveRolesTreeHelper : function(val, fpanel){
-    var tree = fpanel.find('id', 'roles_privs_tree')[0];
+    var tree = Ext.getCmp(fpanel.id + '_roles_privs_tree');
 
     var outputArr = [];
     var nodes = tree.root.childNodes;
@@ -923,8 +930,8 @@ Ext.extend(Sonatype.repoServer.RoleEditPanel, Ext.Panel, {
   },
   
   savePrivilegesTreeHelper : function(val, fpanel){
-    var tree = fpanel.find('id', 'roles_privs_tree')[0];
-
+    var tree = Ext.getCmp(fpanel.id + '_roles_privs_tree');
+    
     var outputArr = [];
     var nodes = tree.root.childNodes;
 
@@ -938,7 +945,7 @@ Ext.extend(Sonatype.repoServer.RoleEditPanel, Ext.Panel, {
   },
   
   treeValidationError : function(error, fpanel){
-    var tree = fpanel.find('id', 'roles_privs_tree')[0];
+    var tree = Ext.getCmp(fpanel.id + '_roles_privs_tree');
     this.markTreeInvalid(tree);
     tree.errorEl.update(error.msg);
   }
