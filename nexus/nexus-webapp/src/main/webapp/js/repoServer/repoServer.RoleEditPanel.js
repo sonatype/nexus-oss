@@ -72,6 +72,7 @@ Sonatype.repoServer.RoleEditPanel = function(config){
   
   this.privRecordConstructor = Ext.data.Record.create([
     {name:'id'},
+    {name:'description'},
     {name:'name', sortType:Ext.data.SortTypes.asUCString}
   ]);
   
@@ -812,6 +813,7 @@ Ext.extend(Sonatype.repoServer.RoleEditPanel, Ext.Panel, {
           allowChildren: false,
           draggable: true,
           leaf: true,
+          qtip: item.data.description,
           nodeType: 'role',
           icon: Sonatype.config.resourcePath + '/ext-2.0.2/resources/images/default/tree/folder.gif'
         })
@@ -841,6 +843,7 @@ Ext.extend(Sonatype.repoServer.RoleEditPanel, Ext.Panel, {
             allowChildren: false,
             draggable: true,
             leaf: true,
+            qtip: role.data.description,
             nodeType: 'role',
             icon: Sonatype.config.resourcePath + '/ext-2.0.2/resources/images/default/tree/folder.gif'
           })
@@ -870,6 +873,7 @@ Ext.extend(Sonatype.repoServer.RoleEditPanel, Ext.Panel, {
           allowChildren: false,
           draggable: true,
           leaf: true,
+          qtip: item.data.description,
           nodeType: 'priv'
         })
       );
@@ -898,6 +902,7 @@ Ext.extend(Sonatype.repoServer.RoleEditPanel, Ext.Panel, {
             allowChildren: false,
             draggable: true,
             leaf: true,
+            qtip: priv.data.description,
             nodeType: 'priv'
           })
         );
