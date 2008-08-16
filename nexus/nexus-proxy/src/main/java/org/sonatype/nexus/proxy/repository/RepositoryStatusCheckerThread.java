@@ -5,23 +5,11 @@ public class RepositoryStatusCheckerThread
 {
     private final Repository repository;
 
-    private boolean active;
-
     public RepositoryStatusCheckerThread( Repository repository )
     {
         super();
 
         this.repository = repository;
-    }
-
-    public boolean isActive()
-    {
-        return active;
-    }
-
-    public void setActive( boolean active )
-    {
-        this.active = active;
     }
 
     public Repository getRepository()
@@ -33,7 +21,7 @@ public class RepositoryStatusCheckerThread
     {
         try
         {
-            while ( isActive() && getRepository().getProxyMode() != null )
+            while ( !isInterrupted() && getRepository().getProxyMode() != null )
             {
                 if ( RepositoryStatusCheckMode.ALWAYS.equals( getRepository().getRepositoryStatusCheckMode() ) )
                 {

@@ -48,9 +48,7 @@ import org.sonatype.nexus.proxy.cache.PathCache;
 import org.sonatype.nexus.proxy.events.RepositoryEventClearCaches;
 import org.sonatype.nexus.proxy.events.RepositoryEventEvictUnusedItems;
 import org.sonatype.nexus.proxy.events.RepositoryEventLocalStatusChanged;
-import org.sonatype.nexus.proxy.events.RepositoryEventProxyModeBlockedAutomatically;
 import org.sonatype.nexus.proxy.events.RepositoryEventProxyModeChanged;
-import org.sonatype.nexus.proxy.events.RepositoryEventProxyModeUnblockedAutomatically;
 import org.sonatype.nexus.proxy.events.RepositoryEventRecreateAttributes;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventDelete;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventRetrieve;
@@ -142,9 +140,6 @@ public abstract class AbstractRepository
     /** Last time remote status was updated */
     private volatile long remoteStatusUpdated = 0;
 
-    /** Is checking in progress? */
-    private volatile boolean remoteStatusChecking = false;
-
     /** The name. */
     private String name;
 
@@ -230,6 +225,9 @@ public abstract class AbstractRepository
         remoteStatusUpdated = 0;
     }
 
+    /** Is checking in progress? */
+    private volatile boolean _remoteStatusChecking = false;
+
     public RemoteStatus getRemoteStatus( boolean forceCheck )
     {
         if ( RepositoryType.PROXY.equals( getRepositoryType() ) )
@@ -243,17 +241,16 @@ public abstract class AbstractRepository
             }
 
             if ( getProxyMode() != null && getProxyMode().shouldCheckRemoteStatus()
-                && RemoteStatus.UNKNOWN.equals( remoteStatus ) && !remoteStatusChecking )
+                && RemoteStatus.UNKNOWN.equals( remoteStatus ) && !_remoteStatusChecking )
             {
                 // check for thread and go check it
+                _remoteStatusChecking = true;
 
                 exec.submit( new Callable<Object>()
                 {
                     public Object call()
                         throws Exception
                     {
-                        remoteStatusChecking = true;
-
                         try
                         {
                             if ( isRemoteStorageReachable() )
@@ -267,7 +264,7 @@ public abstract class AbstractRepository
                         }
                         finally
                         {
-                            remoteStatusChecking = false;
+                            _remoteStatusChecking = false;
                         }
 
                         return null;
@@ -275,11 +272,11 @@ public abstract class AbstractRepository
                 } );
             }
             else if ( getProxyMode() != null && !getProxyMode().shouldCheckRemoteStatus()
-                && RemoteStatus.UNKNOWN.equals( remoteStatus ) && !remoteStatusChecking )
+                && RemoteStatus.UNKNOWN.equals( remoteStatus ) && !_remoteStatusChecking )
             {
                 remoteStatus = RemoteStatus.UNAVAILABLE;
 
-                remoteStatusChecking = false;
+                _remoteStatusChecking = false;
             }
 
             return remoteStatus;
@@ -298,11 +295,7 @@ public abstract class AbstractRepository
         {
             if ( getProxyMode() != null && getProxyMode().shouldAutoUnblock() )
             {
-                ProxyMode oldMode = getProxyMode();
-
-                setProxyMode( ProxyMode.ALLOW, false );
-
-                notifyProximityEventListeners( new RepositoryEventProxyModeUnblockedAutomatically( this, oldMode, null ) );
+                setProxyMode( ProxyMode.ALLOW, true, null );
             }
         }
     }
@@ -319,7 +312,7 @@ public abstract class AbstractRepository
         }
     }
 
-    protected void setProxyMode( ProxyMode proxyMode, boolean sendNotification )
+    protected void setProxyMode( ProxyMode proxyMode, boolean sendNotification, Throwable cause )
     {
         if ( RepositoryType.PROXY.equals( getRepositoryType() ) )
         {
@@ -341,27 +334,23 @@ public abstract class AbstractRepository
                 resetRemoteStatus();
             }
 
-            if ( sendNotification && !oldProxyMode.equals( proxyMode ) )
+            if ( sendNotification && !this.proxyMode.equals( oldProxyMode ) )
             {
-                notifyProximityEventListeners( new RepositoryEventProxyModeChanged( this, oldProxyMode ) );
+                notifyProximityEventListeners( new RepositoryEventProxyModeChanged( this, oldProxyMode, cause ) );
             }
         }
     }
 
     public void setProxyMode( ProxyMode proxyMode )
     {
-        setProxyMode( proxyMode, true );
+        setProxyMode( proxyMode, true, null );
     }
 
     protected void autoBlockProxying( Throwable cause )
     {
         if ( RepositoryType.PROXY.equals( getRepositoryType() ) )
         {
-            ProxyMode oldMode = getProxyMode();
-
-            setProxyMode( ProxyMode.BLOCKED_AUTO, false );
-
-            notifyProximityEventListeners( new RepositoryEventProxyModeBlockedAutomatically( this, oldMode, cause ) );
+            setProxyMode( ProxyMode.BLOCKED_AUTO, true, cause );
         }
     }
 
@@ -527,6 +516,7 @@ public abstract class AbstractRepository
 
         if ( getProxyMode() != null && getProxyMode().shouldAutoUnblock() )
         {
+            // perm changes? retry if autoBlocked
             setProxyMode( ProxyMode.ALLOW );
         }
     }
@@ -562,8 +552,6 @@ public abstract class AbstractRepository
                 {
                     getLogger().debug( "isRemoteStorageReachable :: StorageException", e );
                 }
-
-                autoBlockProxying( e );
 
                 return false;
             }

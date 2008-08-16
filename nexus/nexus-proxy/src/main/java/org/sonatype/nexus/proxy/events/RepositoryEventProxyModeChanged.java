@@ -31,15 +31,25 @@ public class RepositoryEventProxyModeChanged
 {
     private final ProxyMode oldProxyMode;
 
-    public RepositoryEventProxyModeChanged( final Repository repository, final ProxyMode oldProxyMode )
+    private final Throwable cause;
+
+    public RepositoryEventProxyModeChanged( final Repository repository, final ProxyMode oldProxyMode,
+        final Throwable cause )
     {
         super( repository );
 
         this.oldProxyMode = oldProxyMode;
+
+        this.cause = cause;
     }
 
     public ProxyMode getOldProxyMode()
     {
         return oldProxyMode;
+    }
+
+    public Throwable getCause()
+    {
+        return cause;
     }
 }

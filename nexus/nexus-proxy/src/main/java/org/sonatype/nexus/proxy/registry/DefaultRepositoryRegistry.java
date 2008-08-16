@@ -88,8 +88,6 @@ public class DefaultRepositoryRegistry
             notifyProximityEventListeners( new RepositoryRegistryEventAdd( repository ) );
         }
 
-        thread.setActive( true );
-
         thread.setDaemon( true );
 
         thread.start();
@@ -111,7 +109,7 @@ public class DefaultRepositoryRegistry
         {
             RepositoryStatusCheckerThread thread = repositoryStatusCheckers.get( repository.getId() );
 
-            thread.setActive( false );
+            thread.interrupt();
 
             insertRepository( repository, false );
 
@@ -155,7 +153,7 @@ public class DefaultRepositoryRegistry
 
             RepositoryStatusCheckerThread thread = repositoryStatusCheckers.remove( repository.getId() );
 
-            thread.setActive( false );
+            thread.interrupt();
 
             if ( repository instanceof EventMulticaster )
             {

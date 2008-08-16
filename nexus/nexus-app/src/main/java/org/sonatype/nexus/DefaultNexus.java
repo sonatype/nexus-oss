@@ -80,7 +80,6 @@ import org.sonatype.nexus.proxy.cache.CacheManager;
 import org.sonatype.nexus.proxy.events.AbstractEvent;
 import org.sonatype.nexus.proxy.events.EventListener;
 import org.sonatype.nexus.proxy.events.RepositoryEventLocalStatusChanged;
-import org.sonatype.nexus.proxy.events.RepositoryEventProxyModeBlockedAutomatically;
 import org.sonatype.nexus.proxy.events.RepositoryEventProxyModeChanged;
 import org.sonatype.nexus.proxy.events.RepositoryItemEvent;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventCache;
@@ -774,7 +773,7 @@ public class DefaultNexus
 
                 response.setName( dir[i].getName() );
 
-                // TODO: 
+                // TODO:
                 response.setMimeType( "text/plain" );
 
                 response.setSize( dir[i].length() );
@@ -1900,47 +1899,6 @@ public class DefaultNexus
 
                 addSystemEvent( FeedRecorder.SYSTEM_REPO_LSTATUS_CHANGES_ACTION, sb.toString() );
             }
-            else if ( evt instanceof RepositoryEventProxyModeBlockedAutomatically )
-            {
-                RepositoryEventProxyModeBlockedAutomatically revt = (RepositoryEventProxyModeBlockedAutomatically) evt;
-
-                StringBuffer sb = new StringBuffer( "Warning: User intervention required! The proxy repository '" );
-
-                sb.append( revt.getRepository().getName() );
-
-                sb.append( "' (ID='" ).append( revt.getRepository().getId() ).append(
-                    "') was having connection problems, and Nexus set it's ProxyMode to 'Blocked'." );
-
-                if ( revt.getCause() != null )
-                {
-                    sb.append( " Last detected transport error: " ).append( revt.getCause().getMessage() );
-                }
-
-                addSystemEvent( FeedRecorder.SYSTEM_REPO_PSTATUS_AUTO_CHANGES_ACTION, sb.toString() );
-
-                // TODO: this should be handled by reposes when they use their models 1:1
-                try
-                {
-                    CRepository repositoryModel = readRepository( revt.getRepository().getId() );
-
-                    repositoryModel.setProxyMode( ProxyMode.toModel( revt.getRepository().getProxyMode() ) );
-
-                    updateRepository( repositoryModel );
-                }
-                catch ( ConfigurationException e )
-                {
-                    // should not happen
-                }
-                catch ( NoSuchRepositoryException e )
-                {
-                    // should not happen
-                }
-                catch ( IOException e )
-                {
-                    getLogger().warn( "Could not save repo changes!", e );
-                }
-                // TODO ends here
-            }
             else if ( evt instanceof RepositoryEventProxyModeChanged )
             {
                 RepositoryEventProxyModeChanged revt = (RepositoryEventProxyModeChanged) evt;
@@ -1985,6 +1943,11 @@ public class DefaultNexus
                 else
                 {
                     sb.append( revt.getOldProxyMode().toString() ).append( "." );
+                }
+
+                if ( revt.getCause() != null )
+                {
+                    sb.append( " Last detected transport error: " ).append( revt.getCause().getMessage() );
                 }
 
                 addSystemEvent( FeedRecorder.SYSTEM_REPO_PSTATUS_CHANGES_ACTION, sb.toString() );
