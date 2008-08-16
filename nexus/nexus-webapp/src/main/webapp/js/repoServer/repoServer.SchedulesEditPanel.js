@@ -475,12 +475,13 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
                 xtype: 'panel',
                 layout: 'column',
                 autoHeight: true,
+                id: '_weekdays_tree_panel',
                 style: 'padding: 10px 0 0 0',
                 
                 items: [
                   {
                     xtype: 'treepanel',
-                    id: 'weekdays_tree',
+                    id: '_weekdays_tree',
                     title: 'Selected Days',
                     cls: 'required-field',
                     border: true, //note: this seem to have no effect w/in form panel
@@ -545,7 +546,7 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
                   },
                   {
                     xtype: 'treepanel',
-                    id: 'all_weekdays_tree', 
+                    id: '_all_weekdays_tree', 
                     title: 'Available Days',
                     border: true, //note: this seem to have no effect w/in form panel
                     bodyBorder: true, //note: this seem to have no effect w/in form panel
@@ -1208,27 +1209,28 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
     var formLayout = this.formCards.getLayout();
     var gridSelectModel = this.schedulesGridPanel.getSelectionModel();
     var store = this.schedulesGridPanel.getStore();
-    
+      
     this.formCards.remove(formInfoObj.formPanel.id, true);
-    //select previously selected form, or the default view (index == 0)
-    var newIndex = this.formCards.items.length - 1;
-    newIndex = (newIndex >= 0) ? newIndex : 0;
-    formLayout.setActiveItem(newIndex);
+      
+    if (this.formCards.items.length > 1){
+      formLayout.setActiveItem(this.formCards.items.length - 1);
+      //select the coordinating row in the grid, or none if back to default
+      var i = store.indexOfId(formLayout.activeItem.id);
+      if (i >= 0){
+        gridSelectModel.selectRow(i);
+      }
+      else{
+        gridSelectModel.clearSelections();
+      }
+    }
+    else{
+      formLayout.setActiveItem(0);
+      gridSelectModel.clearSelections();
+    }
 
     //delete row from grid if canceling a new repo form
     if(formInfoObj.isNew){
-//      //Enable add button on new cancel
-//      this.schedulesGridPanel.getTopToolbar().items.get('schedule-add-btn').enable();
       store.remove( store.getById(formInfoObj.formPanel.id) );
-    }
-    
-    //select the coordinating row in the grid, or none if back to default
-    var i = store.indexOfId(formLayout.activeItem.id);
-    if (i >= 0){
-      gridSelectModel.selectRow(i);
-    }
-    else{
-      gridSelectModel.clearSelections();
     }
   },
   
@@ -1352,28 +1354,30 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
 
       if(formLayout.activeItem.id == resourceId){
         this.formCards.remove(resourceId, true);
-        //select previously selected form, or the default view (index == 0)
-        var newIndex = this.formCards.items.length - 1;
-        newIndex = (newIndex >= 0) ? newIndex : 0;
-        formLayout.setActiveItem(newIndex);
+        if (this.formCards.items.length > 0){
+          formLayout.setActiveItem(this.formCards.items.length - 1);
+          //select the coordinating row in the grid, or none if back to default
+          var i = store.indexOfId(formLayout.activeItem.id);
+          if (i >= 0){
+            gridSelectModel.selectRow(i);
+          }
+          else{
+            gridSelectModel.clearSelections();
+          }
+        }
+        else{
+            formLayout.setActiveItem(0);
+            gridSelectModel.clearSelections();
+        }
       }
       else {
         this.formCards.remove(resourceId, true);
       }
 
       store.remove( store.getById(resourceId) );
-
-      //select the coordinating row in the grid, or none if back to default
-      var i = store.indexOfId(formLayout.activeItem.id);
-      if (i >= 0){
-        gridSelectModel.selectRow(i);
-      }
-      else{
-        gridSelectModel.clearSelections();
-      }
     }
     else {
-      Sonatype.MessageBox.alert('The server did not delete the scheduled task.');
+      Sonatype.utils.connectionError( response, 'The server did not delete the task.', null, null, true );
     }
   },
   
@@ -1739,9 +1743,12 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
     var newConfig = config;
     
     this.assignItemIds( id, newConfig.items );
-
+    
+    newConfig.items[6].items[3].items[2].id = id + '_weekdays_tree_panel';
     newConfig.items[6].items[3].items[2].items[0].root = new Ext.tree.TreeNode({text: 'root'});
+    newConfig.items[6].items[3].items[2].items[0].id = id + '_weekdays_tree';
     newConfig.items[6].items[3].items[2].items[1].root = new Ext.tree.TreeNode({text: 'root'});
+    newConfig.items[6].items[3].items[2].items[1].id = id + '_all_weekdays_tree';
 
     return newConfig;
   },
@@ -1762,8 +1769,8 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
   },
 
   loadWeekdayListHelper : function(arr, srcObj, fpanel){
-    var selectedTree = fpanel.findById(fpanel.id + '_weekdays_tree');
-    var allTree = fpanel.findById(fpanel.id + '_all_weekdays_tree');
+    var selectedTree = Ext.getCmp(fpanel.id + '_weekdays_tree');
+    var allTree = Ext.getCmp(fpanel.id + '_all_weekdays_tree');
 
     var weekday;
 
@@ -1857,7 +1864,7 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
     return hours + ':' + minutes;
   },
   exportRecurringDayHelper : function(val, fpanel){
-    var selectedTree = fpanel.findById(fpanel.id + '_weekdays_tree');
+    var selectedTree = Ext.getCmp(fpanel.id + '_weekdays_tree');
 
     var outputArr = [];
     var nodes = selectedTree.root.childNodes;
@@ -1979,8 +1986,8 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
     return importedTime;
   },
   importRecurringDayHelper : function(arr, srcObj, fpanel){
-    var selectedTree = fpanel.findById(fpanel.id + '_weekdays_tree');
-    var allTree = fpanel.findById(fpanel.id + '_all_weekdays_tree');
+    var selectedTree = Ext.getCmp(fpanel.id + '_weekdays_tree');
+    var allTree = Ext.getCmp(fpanel.id + '_all_weekdays_tree');
 
     //Iterate through the list, and add any selected items to the selected tree
     for(var i=0; i<arr.length; i++){
