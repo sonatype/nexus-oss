@@ -52,6 +52,9 @@ public class DefaultSecurityConfigurationProvider
 
         CookieAttribute<String> attr = new CookieAttribute<String>( DEFAULT_REMEMBER_ME_COOKIE_NAME );
 
+        // 7 days (seconds!)
+        attr.setMaxAge( 60 * 60 * 24 * 7 );
+
         rmm.setIdentityAttribute( attr );
 
         return rmm;
