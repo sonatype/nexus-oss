@@ -400,7 +400,7 @@ Sonatype.repoServer.RepoServer = function(){
               { href: 'https://docs.sonatype.com/display/NX/Home', title: 'Nexus Wiki' },
               { href: 'http://www.sonatype.com/book/reference/public-book.html', title: 'Maven Book' },
               { href: 'http://nexus.sonatype.org/changes.html', title: 'Release Notes' },
-              { href: 'http://issues.sonatype.org/browse/NEXUS', title: 'Report Issues' }
+              { href: 'http://issues.sonatype.org/secure/CreateIssue!default.jspa', title: 'Report Issue' }
             ]
           }) 
         },
