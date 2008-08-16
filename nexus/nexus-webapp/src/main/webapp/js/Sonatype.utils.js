@@ -155,8 +155,8 @@ Sonatype.utils = {
           ( response.status ?
               'Nexus returned an error: ERROR ' + response.status + ': ' + response.statusText
               :
-              'There was an error connecting to Nexus: ' + response.statusText + '<br />' +
-              'Check your network connection, make sure Nexus is running.' ) ) +
+              'There was an error communicating with the Nexus server: ' + response.statusText + '<br />' +
+              'Check the status of the server, and log in to the application again.' ) ) +
           ( offerRestart ?
               '<br /><br />Click OK to reload the console or ' +
               'CANCEL if you wish to retry the same action in a little while.'
