@@ -82,7 +82,7 @@ public abstract class AbstractRemoteRepositoryStorage
      */
     protected abstract void updateContext( RemoteStorageContext context );
 
-    public RemoteStorageContext getRemoteStorageContext( Repository repository )
+    protected synchronized RemoteStorageContext getRemoteStorageContext( Repository repository )
     {
         if ( repository.getRemoteStorageContext() != null )
         {
