@@ -37,33 +37,42 @@ public abstract class AbstractUIPermissionCalculatingResource
 
         Subject subject = SecurityUtils.getSubject();
 
-        if ( getNexus().isAnonymousAccessEnabled() )
+        if ( getNexus().isSecurityEnabled() )
         {
-            // we must decide is the user logged in the anon user and we must tell "false" if it is
-            if ( getNexus().getAnonymousUsername().equals( subject.getPrincipal() ) )
+            if ( getNexus().isAnonymousAccessEnabled() )
             {
-                perms.setLoggedIn( false );
+                // we must decide is the user logged in the anon user and we must tell "false" if it is
+                if ( getNexus().getAnonymousUsername().equals( subject.getPrincipal() ) )
+                {
+                    perms.setLoggedIn( false );
+                }
+                else
+                {
+                    perms.setLoggedIn( true );
+                }
             }
             else
             {
-                perms.setLoggedIn( true );
+                // anon access is disabled, simply ask JSecurity about this
+                perms.setLoggedIn( subject != null && subject.isAuthenticated() );
+            }
+
+            if ( perms.isLoggedIn() )
+            {
+                // try to set the loggedInUsername
+                Object principal = subject.getPrincipal();
+
+                if ( principal != null )
+                {
+                    perms.setLoggedInUsername( principal.toString() );
+                }
             }
         }
         else
         {
-            // anon access is disabled, simply ask JSecurity about this
-            perms.setLoggedIn( subject != null && subject.isAuthenticated() );
-        }
+            perms.setLoggedIn( true );
 
-        if ( perms.isLoggedIn() )
-        {
-            // try to set the loggedInUsername
-            Object principal = subject.getPrincipal();
-
-            if ( principal != null )
-            {
-                perms.setLoggedInUsername( principal.toString() );
-            }
+            perms.setLoggedInUsername( "anonymous" );
         }
 
         perms.setViewSearch( getFlagsForPermission( subject, "nexus:index" ) );
