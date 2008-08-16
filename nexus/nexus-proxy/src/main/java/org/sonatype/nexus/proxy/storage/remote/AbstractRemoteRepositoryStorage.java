@@ -92,15 +92,15 @@ public abstract class AbstractRemoteRepositoryStorage
                 if ( repository.getRemoteStorageContext().getLastChanged() > repositoryContexts
                     .get( repository.getId() ).longValue() )
                 {
-                    repositoryContexts.put( repository.getId(), Long.valueOf( repository
-                        .getRemoteStorageContext().getLastChanged() ) );
-
                     if ( getLogger().isDebugEnabled() )
                     {
                         getLogger().debug( "Remote storage settings change detected, updating..." );
                     }
 
                     updateContext( repository.getRemoteStorageContext() );
+
+                    repositoryContexts.put( repository.getId(), Long.valueOf( repository
+                        .getRemoteStorageContext().getLastChanged() ) );
                 }
             }
             else
@@ -110,10 +110,10 @@ public abstract class AbstractRemoteRepositoryStorage
                     getLogger().debug( "Remote storage settings change detected, updating..." );
                 }
 
+                updateContext( repository.getRemoteStorageContext() );
+
                 repositoryContexts.put( repository.getId(), Long.valueOf( repository
                     .getRemoteStorageContext().getLastChanged() ) );
-
-                updateContext( repository.getRemoteStorageContext() );
             }
 
         }
