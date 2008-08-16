@@ -16,12 +16,18 @@ import java.util.List;
 import junit.framework.Assert;
 
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+import org.sonatype.nexus.configuration.application.validator.ApplicationConfigurationValidator;
+import org.sonatype.nexus.configuration.application.validator.DefaultApplicationConfigurationValidator;
 import org.sonatype.nexus.configuration.model.CGroupsSettingPathMappingItem;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.Configuration;
 import org.sonatype.nexus.configuration.model.io.xpp3.NexusConfigurationXpp3Reader;
 import org.sonatype.nexus.configuration.model.io.xpp3.NexusConfigurationXpp3Writer;
+import org.sonatype.nexus.configuration.validator.InvalidConfigurationException;
+import org.sonatype.nexus.configuration.validator.ValidationRequest;
+import org.sonatype.nexus.configuration.validator.ValidationResponse;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
+import org.sonatype.nexus.integrationtests.TestContainer;
 
 public class NexusConfigUtil
 {
@@ -30,7 +36,7 @@ public class NexusConfigUtil
         throws IOException
     {
 
-//        URL configURL = new URL( TestProperties.getString( "nexus.base.url" ) + "service/local/configs/current" );
+        // URL configURL = new URL( TestProperties.getString( "nexus.base.url" ) + "service/local/configs/current" );
 
         Reader fr = null;
         Configuration configuration = null;
@@ -65,8 +71,7 @@ public class NexusConfigUtil
         Writer fw = null;
         try
         {
-            FileOutputStream fos =
-                new FileOutputStream( getNexusFile() );
+            FileOutputStream fos = new FileOutputStream( getNexusFile() );
             fw = new OutputStreamWriter( fos );
 
             NexusConfigurationXpp3Writer writer = new NexusConfigurationXpp3Writer();
@@ -82,11 +87,11 @@ public class NexusConfigUtil
             }
         }
     }
-    
+
     private static File getNexusFile()
     {
-        return new File(TestProperties.getString( "nexus.base.dir" ) + "/"
-                        + AbstractNexusIntegrationTest.RELATIVE_WORK_CONF_DIR, "nexus.xml");
+        return new File( TestProperties.getString( "nexus.base.dir" ) + "/"
+            + AbstractNexusIntegrationTest.RELATIVE_WORK_CONF_DIR, "nexus.xml" );
     }
 
     @SuppressWarnings( "unchecked" )
@@ -116,21 +121,22 @@ public class NexusConfigUtil
         if ( config.getSecurity().isEnabled() != enabled )
         {
             config.getSecurity().setEnabled( enabled );
-            
+
             // save it
             saveConfig( config );
         }
 
     }
-    
-    public static CRepository getRepo( String repoId ) throws IOException
+
+    public static CRepository getRepo( String repoId )
+        throws IOException
     {
         List<CRepository> repos = getNexusConfig().getRepositories();
-        
+
         for ( Iterator<CRepository> iter = repos.iterator(); iter.hasNext(); )
         {
             CRepository cRepo = iter.next();
-            
+
             // check id
             if ( cRepo.getId().equals( repoId ) )
             {
@@ -138,6 +144,19 @@ public class NexusConfigUtil
             }
         }
         return null;
+    }
+
+    public static void validateConfig() throws Exception
+    {
+        ApplicationConfigurationValidator validator = (ApplicationConfigurationValidator) TestContainer.getInstance().lookup( ApplicationConfigurationValidator.ROLE );
+        ValidationResponse vResponse =
+            validator.validateModel( new ValidationRequest( getNexusConfig() ) );
+
+        if ( !vResponse.isValid() )
+        {
+            throw new InvalidConfigurationException( vResponse );
+        }
+
     }
 
 }

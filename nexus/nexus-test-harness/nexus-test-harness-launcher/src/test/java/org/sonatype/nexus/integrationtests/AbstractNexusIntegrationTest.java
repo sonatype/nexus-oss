@@ -137,6 +137,9 @@ public class AbstractNexusIntegrationTest
                 {
                     NexusConfigUtil.enableSecurity( true );
                 }
+                
+                // we need to make sure the config is valid, so we don't need to hunt through log files
+                NexusConfigUtil.validateConfig();
 
                 // start nexus
                 this.startNexus();

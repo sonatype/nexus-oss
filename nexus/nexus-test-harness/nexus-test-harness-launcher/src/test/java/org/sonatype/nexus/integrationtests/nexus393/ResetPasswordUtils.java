@@ -8,12 +8,11 @@ import org.sonatype.nexus.integrationtests.RequestFacade;
 public class ResetPasswordUtils
 {
 
-    public static Status resetPassword( String username )
+    public static Response resetPassword( String username )
         throws Exception
     {
         String serviceURI = "service/local/users_reset/" + username;
-        Response response = RequestFacade.sendMessage( serviceURI, Method.DELETE );
-        return response.getStatus();
+        return RequestFacade.sendMessage( serviceURI, Method.DELETE );
     }
 
 }

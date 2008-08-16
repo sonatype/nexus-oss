@@ -2,6 +2,7 @@ package org.sonatype.nexus.integrationtests.nexus394;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.sonatype.nexus.integrationtests.AbstractPrivilegeTest;
 import org.sonatype.nexus.integrationtests.TestContainer;
@@ -21,12 +22,12 @@ public class Nexus394ForgotPasswordPermissionTest
         TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
 
         // Should be able to forgot my own password
-        Status status = ForgotPasswordUtils.recoverUserPassword( TEST_USER_NAME, "nexus-dev2@sonatype.org" );
-        Assert.assertTrue( status.isSuccess() );
+        Response response = ForgotPasswordUtils.recoverUserPassword( TEST_USER_NAME, "nexus-dev2@sonatype.org" );
+        Assert.assertTrue( "Status", response.getStatus().isSuccess() );
 
         // NOT Should be able to forgot anyone password
-        status = ForgotPasswordUtils.recoverUserPassword( "anonymous", "changeme2@yourcompany.com" );
-        Assert.assertEquals( 401, status.getCode() );
+        response = ForgotPasswordUtils.recoverUserPassword( "anonymous", "changeme2@yourcompany.com" );
+        Assert.assertEquals( "Status", 401, response.getStatus().getCode() );
 
     }
 
@@ -41,12 +42,12 @@ public class Nexus394ForgotPasswordPermissionTest
         TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
 
         // NOT Should be able to forgot anyone password
-        Status status = ForgotPasswordUtils.recoverUserPassword( "anonymous", "changeme2@yourcompany.com" );
-        Assert.assertEquals( 401, status.getCode() );
+        Response response = ForgotPasswordUtils.recoverUserPassword( "anonymous", "changeme2@yourcompany.com" );
+        Assert.assertEquals( "Status", 401, response.getStatus().getCode() );
 
         // NOT Should be able to forgot my own password
-        status = ForgotPasswordUtils.recoverUserPassword( TEST_USER_NAME, "nexus-dev2@sonatype.org" );
-        Assert.assertEquals( 401, status.getCode() );
+        response = ForgotPasswordUtils.recoverUserPassword( TEST_USER_NAME, "nexus-dev2@sonatype.org" );
+        Assert.assertEquals( "Status", 401, response.getStatus().getCode() );
 
     }
 }

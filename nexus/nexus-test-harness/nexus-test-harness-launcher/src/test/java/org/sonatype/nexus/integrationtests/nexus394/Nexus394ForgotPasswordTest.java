@@ -4,22 +4,24 @@ import javax.mail.internet.MimeMessage;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.sonatype.nexus.integrationtests.AbstractEmailServerNexusIT;
+import org.sonatype.nexus.integrationtests.TestContainer;
 
 import com.icegreen.greenmail.util.GreenMailUtil;
 
 public class Nexus394ForgotPasswordTest
     extends AbstractEmailServerNexusIT
 {
-
+    
     @Test
     public void recoverUserPassword()
         throws Exception
     {
-        Status status = ForgotPasswordUtils.recoverUserPassword( "anonymous", "changeme2@yourcompany.com" );
-        Assert.assertTrue( status.isSuccess() );
-
+        Response response = ForgotPasswordUtils.recoverUserPassword( "test-user", "nexus-dev2@sonatype.org" );
+        Assert.assertEquals( "Status: "+response.getStatus() +"\n"+ response.getEntity().getText(), 200, response.getStatus().getCode() );
+        
         // Need 1 message
         server.waitForIncomingEmail( 1000, 1 );
 
