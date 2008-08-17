@@ -66,7 +66,13 @@ public class NexusHttpAuthenticationFilter
 
     protected boolean onAccessDenied( ServletRequest request, ServletResponse response )
     {
-        boolean loggedIn = false; // false by default or we wouldn't be in this method
+        // this will be true if cookie is sent with request and it is valid
+        boolean loggedIn = getSubject( request, response ).getPrincipal() != null;
+
+        if ( loggedIn )
+        {
+            return true;
+        }
 
         if ( isLoginAttempt( request, response ) )
         {
