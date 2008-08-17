@@ -157,8 +157,7 @@ public abstract class AbstractNexusFeedSource
 
             gav = getGav( item.getNexusItemInfo() );
 
-            StringBuffer msg = new StringBuffer( "On " )
-                .append( formatDate( item.getEventDate() ) ).append( " the " ).append( gav ).append(
+            StringBuffer msg = new StringBuffer( "The " ).append( gav ).append(
                     " artifact in repository " ).append( item.getNexusItemInfo().getRepositoryId() ).append( " is " );
 
             if ( NexusArtifactEvent.ACTION_CACHED.equals( item.getAction() ) )

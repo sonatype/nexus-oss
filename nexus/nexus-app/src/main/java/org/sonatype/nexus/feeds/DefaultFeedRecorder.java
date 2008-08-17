@@ -265,7 +265,7 @@ public class DefaultFeedRecorder
 
         addToTimeline( event );
 
-        getLogger().info( event.toString() );
+        getLogger().info( event.getMessage() );
 
         return event;
     }
@@ -276,7 +276,7 @@ public class DefaultFeedRecorder
 
         addToTimeline( prc );
 
-        getLogger().info( prc.toString() );
+        getLogger().info( prc.getMessage() );
     }
 
     public void systemProcessBroken( SystemProcess prc, Throwable e )
@@ -285,7 +285,7 @@ public class DefaultFeedRecorder
 
         addToTimeline( prc );
 
-        getLogger().info( prc.toString(), e );
+        getLogger().info( prc.getMessage(), e );
     }
 
     protected void addToTimeline( SystemEvent se )

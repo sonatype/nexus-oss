@@ -97,8 +97,7 @@ public abstract class AbstractSystemFeedSource
                 ipAddress = null;
             }
 
-            StringBuffer msg = new StringBuffer( item.toString() ).append( " On " ).append(
-                formatDate( item.getEventDate() ) ).append( ". " );
+            StringBuffer msg = new StringBuffer( item.getMessage() ).append( ". " );
 
             if ( username != null )
             {

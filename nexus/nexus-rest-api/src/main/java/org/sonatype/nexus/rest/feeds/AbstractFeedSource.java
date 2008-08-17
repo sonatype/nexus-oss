@@ -20,10 +20,6 @@
  */
 package org.sonatype.nexus.rest.feeds;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.TimeZone;
-
 import org.sonatype.nexus.Nexus;
 
 import com.sun.syndication.feed.synd.SyndFeed;
@@ -39,22 +35,6 @@ public abstract class AbstractFeedSource
 {
     /** @plexus.requirement */
     private Nexus nexus;
-
-    /**
-     * Simple date format for the creation date ISO representation (partial).
-     */
-    private static final SimpleDateFormat creationDateFormat = new SimpleDateFormat( "EEE, dd MMM yyyy HH:mm:ss zzz" );
-
-    /** Static initializers for the GMT time zone. */
-    static
-    {
-        creationDateFormat.setTimeZone( TimeZone.getTimeZone( "GMT" ) );
-    }
-
-    protected String formatDate( Date date )
-    {
-        return creationDateFormat.format( date );
-    }
 
     public Nexus getNexus()
     {
