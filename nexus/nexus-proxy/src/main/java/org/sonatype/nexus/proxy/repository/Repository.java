@@ -293,13 +293,6 @@ public interface Repository
     Collection<String> evictUnusedItems( long timestamp );
 
     /**
-     * Checks whether the remote storage of this repo is reachable.
-     * 
-     * @return true if remote is reachable.
-     */
-    boolean isRemoteStorageReachable();
-
-    /**
      * Forces the recreation of attributes on this repository.
      * 
      * @param initialData the initial data

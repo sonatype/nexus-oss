@@ -107,7 +107,7 @@ public class IndexResourceHandler
 
         if ( sha1 != null )
         {
-            na = ai2Na( getNexus().identifyArtifact( ArtifactInfo.SHA1, sha1 ) );
+            na = ai2Na( getNexus().identifyArtifact( ArtifactInfo.SHA1, sha1 ), false );
         }
         else if ( query != null )
         {
@@ -155,7 +155,7 @@ public class IndexResourceHandler
 
             result.setCount( count == null ? -1 : count.intValue() );
 
-            result.setData( new ArrayList<NexusArtifact>( ai2NaColl( searchResult.getResults() ) ) );
+            result.setData( new ArrayList<NexusArtifact>( ai2NaColl( searchResult.getResults(), false ) ) );
         }
         else if ( na != null )
         {

@@ -91,8 +91,6 @@ public class CommonsHttpClientRemoteStorage
         try
         {
             response = executeMethod( uid, method );
-
-            method.releaseConnection();
         }
         catch ( StorageException e )
         {
@@ -103,6 +101,8 @@ public class CommonsHttpClientRemoteStorage
         }
         finally
         {
+            method.releaseConnection();
+
             // HEAD returned error, but not exception, try GET before failing
             if ( doGet == false && response != HttpStatus.SC_OK )
             {
@@ -116,11 +116,16 @@ public class CommonsHttpClientRemoteStorage
             // create a GET
             method = new GetMethod( getAbsoluteUrlFromBase( uid ).toString() );
 
-            // execute it
-            response = executeMethod( uid, method );
-
-            // and release it immediately
-            method.releaseConnection();
+            try
+            {
+                // execute it
+                response = executeMethod( uid, method );
+            }
+            finally
+            {
+                // and release it immediately
+                method.releaseConnection();
+            }
         }
 
         if ( response == HttpStatus.SC_OK )
@@ -206,13 +211,13 @@ public class CommonsHttpClientRemoteStorage
             catch ( IOException ex )
             {
                 method.releaseConnection();
-                
+
                 throw new StorageException( "IO Error during response stream handling!", ex );
             }
             catch ( RuntimeException ex )
             {
                 method.releaseConnection();
-                
+
                 throw ex;
             }
         }
@@ -255,7 +260,7 @@ public class CommonsHttpClientRemoteStorage
 
         getLogger().info( "Creating CommonsHttpClient instance" );
         httpRetryHandler = new DefaultHttpMethodRetryHandler( ctx
-            .getRemoteConnectionSettings().getRetrievalRetryCount(), true );
+            .getRemoteConnectionSettings().getRetrievalRetryCount(), false );
         httpClient = new HttpClient( new MultiThreadedHttpConnectionManager() );
         httpClient.getParams().setConnectionManagerTimeout( ctx.getRemoteConnectionSettings().getConnectionTimeout() );
 

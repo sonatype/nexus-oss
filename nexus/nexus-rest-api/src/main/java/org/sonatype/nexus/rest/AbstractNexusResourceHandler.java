@@ -132,7 +132,7 @@ public abstract class AbstractNexusResourceHandler
      * @param ai
      * @return
      */
-    protected NexusArtifact ai2Na( ArtifactInfo ai )
+    protected NexusArtifact ai2Na( ArtifactInfo ai, boolean toParentCollection )
     {
         if ( ai == null )
         {
@@ -183,7 +183,7 @@ public abstract class AbstractNexusResourceHandler
                 }
 
                 path = "content/" + path;
-
+                
                 Reference repoRoot = calculateRepositoryReference( ai.repository );
 
                 a.setResourceURI( calculateReference( repoRoot, path ).toString() );
@@ -215,7 +215,7 @@ public abstract class AbstractNexusResourceHandler
      * @param aic
      * @return
      */
-    protected Collection<NexusArtifact> ai2NaColl( Collection<ArtifactInfo> aic )
+    protected Collection<NexusArtifact> ai2NaColl( Collection<ArtifactInfo> aic, boolean toParentCollection )
     {
         if ( aic == null )
         {
@@ -224,7 +224,7 @@ public abstract class AbstractNexusResourceHandler
         List<NexusArtifact> result = new ArrayList<NexusArtifact>( aic.size() );
         for ( ArtifactInfo ai : aic )
         {
-            result.add( ai2Na( ai ) );
+            result.add( ai2Na( ai, toParentCollection ) );
         }
         return result;
     }

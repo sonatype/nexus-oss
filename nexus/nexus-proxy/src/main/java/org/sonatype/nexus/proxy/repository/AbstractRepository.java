@@ -225,6 +225,20 @@ public abstract class AbstractRepository
         remoteStatusUpdated = 0;
     }
 
+    protected boolean isRemoteStorageReachable()
+        throws StorageException
+    {
+        if ( !RepositoryType.PROXY.equals( getRepositoryType() ) )
+        {
+            return false;
+        }
+        else
+        {
+            return getRemoteStorage().isReachable( this );
+        }
+
+    }
+
     /** Is checking in progress? */
     private volatile boolean _remoteStatusChecking = false;
 
@@ -236,8 +250,6 @@ public abstract class AbstractRepository
             if ( forceCheck || System.currentTimeMillis() - remoteStatusUpdated > REMOTE_STATUS_RETAIN_TIME )
             {
                 remoteStatus = RemoteStatus.UNKNOWN;
-
-                remoteStatusUpdated = System.currentTimeMillis();
             }
 
             if ( getProxyMode() != null && getProxyMode().shouldCheckRemoteStatus()
@@ -253,13 +265,20 @@ public abstract class AbstractRepository
                     {
                         try
                         {
-                            if ( isRemoteStorageReachable() )
+                            try
                             {
-                                setRemoteStatus( RemoteStatus.AVAILABLE );
+                                if ( isRemoteStorageReachable() )
+                                {
+                                    setRemoteStatus( RemoteStatus.AVAILABLE, null );
+                                }
+                                else
+                                {
+                                    setRemoteStatus( RemoteStatus.UNAVAILABLE, new ItemNotFoundException( "/" ) );
+                                }
                             }
-                            else
+                            catch ( StorageException e )
                             {
-                                setRemoteStatus( RemoteStatus.UNAVAILABLE );
+                                setRemoteStatus( RemoteStatus.UNAVAILABLE, e );
                             }
                         }
                         finally
@@ -274,7 +293,7 @@ public abstract class AbstractRepository
             else if ( getProxyMode() != null && !getProxyMode().shouldCheckRemoteStatus()
                 && RemoteStatus.UNKNOWN.equals( remoteStatus ) && !_remoteStatusChecking )
             {
-                remoteStatus = RemoteStatus.UNAVAILABLE;
+                setRemoteStatus( RemoteStatus.UNAVAILABLE, null );
 
                 _remoteStatusChecking = false;
             }
@@ -287,15 +306,26 @@ public abstract class AbstractRepository
         }
     }
 
-    private void setRemoteStatus( RemoteStatus remoteStatus )
+    private void setRemoteStatus( RemoteStatus remoteStatus, Throwable cause )
     {
         this.remoteStatus = remoteStatus;
 
         if ( RemoteStatus.AVAILABLE.equals( remoteStatus ) )
         {
+            this.remoteStatusUpdated = System.currentTimeMillis();
+
             if ( getProxyMode() != null && getProxyMode().shouldAutoUnblock() )
             {
-                setProxyMode( ProxyMode.ALLOW, true, null );
+                setProxyMode( ProxyMode.ALLOW, true, cause );
+            }
+        }
+        else if ( RemoteStatus.UNAVAILABLE.equals( remoteStatus ) )
+        {
+            this.remoteStatusUpdated = System.currentTimeMillis();
+
+            if ( getProxyMode() != null && getProxyMode().shouldProxy() )
+            {
+                setProxyMode( ProxyMode.BLOCKED_AUTO, true, cause );
             }
         }
     }
@@ -350,7 +380,7 @@ public abstract class AbstractRepository
     {
         if ( RepositoryType.PROXY.equals( getRepositoryType() ) )
         {
-            setProxyMode( ProxyMode.BLOCKED_AUTO, true, cause );
+            setRemoteStatus( RemoteStatus.UNAVAILABLE, cause );
         }
     }
 
@@ -532,36 +562,6 @@ public abstract class AbstractRepository
     public void setAccessManager( AccessManager accessManager )
     {
         this.accessManager = accessManager;
-    }
-
-    public boolean isRemoteStorageReachable()
-    {
-        if ( !RepositoryType.PROXY.equals( getRepositoryType() ) )
-        {
-            return false;
-        }
-        else
-        {
-            try
-            {
-                return getRemoteStorage().isReachable( this );
-            }
-            catch ( StorageException e )
-            {
-                if ( getLogger().isDebugEnabled() )
-                {
-                    getLogger().debug( "isRemoteStorageReachable :: StorageException", e );
-                }
-
-                if ( getProxyMode() != null )
-                {
-                    setProxyMode( ProxyMode.BLOCKED_AUTO, true, e );
-                }
-
-                return false;
-            }
-        }
-
     }
 
     public void clearCaches( String path )

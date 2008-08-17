@@ -61,11 +61,11 @@ public class IdentifyHashResourceHandler
 
         if ( "md5".equalsIgnoreCase( alg ) )
         {
-            na = ai2Na( getNexus().identifyArtifact( ArtifactInfo.MD5, checksum ) );
+            na = ai2Na( getNexus().identifyArtifact( ArtifactInfo.MD5, checksum ), false );
         }
         else if ( "sha1".equalsIgnoreCase( alg ) )
         {
-            na = ai2Na( getNexus().identifyArtifact( ArtifactInfo.SHA1, checksum ) );
+            na = ai2Na( getNexus().identifyArtifact( ArtifactInfo.SHA1, checksum ), false );
         }
 
         if ( na != null )
