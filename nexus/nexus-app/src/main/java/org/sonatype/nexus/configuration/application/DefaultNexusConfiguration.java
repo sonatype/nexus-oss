@@ -679,7 +679,53 @@ public class DefaultNexusConfiguration
         applyAndSaveConfiguration();
     }
 
+    // CRepository and CreposioryShadow helper
+
+    protected ApplicationValidationContext getRepositoryValidationContext()
+    {
+        ApplicationValidationContext result = new ApplicationValidationContext();
+
+        result.addExistingRepositoryIds();
+
+        List<CRepository> repositories = getConfiguration().getRepositories();
+
+        if ( repositories != null )
+        {
+            for ( CRepository repo : repositories )
+            {
+                result.getExistingRepositoryIds().add( repo.getId() );
+            }
+        }
+
+        result.addExistingRepositoryShadowIds();
+
+        List<CRepositoryShadow> repositoryShadows = getConfiguration().getRepositoryShadows();
+
+        if ( repositoryShadows != null )
+        {
+            for ( CRepositoryShadow repo : repositoryShadows )
+            {
+                result.getExistingRepositoryIds().add( repo.getId() );
+            }
+        }
+
+        return result;
+    }
+
     // CRepository: CRUD
+
+    protected void validateRepository( CRepository settings )
+        throws ConfigurationException
+    {
+        ApplicationValidationContext ctx = getRepositoryValidationContext();
+
+        ValidationResponse vr = configurationValidator.validateRepository( ctx, settings );
+
+        if ( !vr.isValid() )
+        {
+            throw new InvalidConfigurationException( vr );
+        }
+    }
 
     public Collection<CRepository> listRepositories()
     {
@@ -690,24 +736,15 @@ public class DefaultNexusConfiguration
         throws ConfigurationException,
             IOException
     {
-        ValidationResponse vr = configurationValidator.validateRepository( null, settings );
+        validateRepository( settings );
 
-        if ( vr.isValid() )
-        {
+        Repository repository = runtimeConfigurationBuilder.createRepositoryFromModel( getConfiguration(), settings );
 
-            Repository repository = runtimeConfigurationBuilder
-                .createRepositoryFromModel( getConfiguration(), settings );
+        repositoryRegistry.addRepository( repository );
 
-            repositoryRegistry.addRepository( repository );
+        getConfiguration().getRepositories().add( settings );
 
-            getConfiguration().getRepositories().add( settings );
-
-            applyAndSaveConfiguration();
-        }
-        else
-        {
-            throw new InvalidConfigurationException( vr );
-        }
+        applyAndSaveConfiguration();
     }
 
     public CRepository readRepository( String id )
@@ -735,49 +772,42 @@ public class DefaultNexusConfiguration
             ConfigurationException,
             IOException
     {
-        ValidationResponse vr = configurationValidator.validateRepository( null, settings );
+        validateRepository( settings );
 
-        if ( vr.isValid() )
+        Repository repository = repositoryRegistry.getRepository( settings.getId() );
+
+        if ( !RepositoryType.SHADOW.equals( repository.getRepositoryType() ) )
         {
-            Repository repository = repositoryRegistry.getRepository( settings.getId() );
+            Repository newRepository = runtimeConfigurationBuilder.updateRepositoryFromModel(
+                repository,
+                getConfiguration(),
+                settings );
 
-            if ( !RepositoryType.SHADOW.equals( repository.getRepositoryType() ) )
+            // replace it with new one
+            repositoryRegistry.updateRepository( newRepository );
+
+            List<CRepository> reposes = getConfiguration().getRepositories();
+
+            for ( int i = 0; i < reposes.size(); i++ )
             {
-                Repository newRepository = runtimeConfigurationBuilder.updateRepositoryFromModel(
-                    repository,
-                    getConfiguration(),
-                    settings );
+                CRepository repo = reposes.get( i );
 
-                // replace it with new one
-                repositoryRegistry.updateRepository( newRepository );
-
-                List<CRepository> reposes = getConfiguration().getRepositories();
-
-                for ( int i = 0; i < reposes.size(); i++ )
+                if ( repo.getId().equals( settings.getId() ) )
                 {
-                    CRepository repo = reposes.get( i );
+                    reposes.remove( i );
 
-                    if ( repo.getId().equals( settings.getId() ) )
-                    {
-                        reposes.remove( i );
+                    reposes.add( i, settings );
 
-                        reposes.add( i, settings );
+                    applyAndSaveConfiguration();
 
-                        applyAndSaveConfiguration();
-
-                        return;
-                    }
+                    return;
                 }
-            }
-            else
-            {
-                throw new ConfigurationException( "Repository with ID=" + settings.getId()
-                    + " is not a hosted/proxy repository!" );
             }
         }
         else
         {
-            throw new InvalidConfigurationException( vr );
+            throw new ConfigurationException( "Repository with ID=" + settings.getId()
+                + " is not a hosted/proxy repository!" );
         }
     }
 
@@ -878,6 +908,19 @@ public class DefaultNexusConfiguration
 
     // CRepositoryShadow: CRUD
 
+    protected void validateRepositoryShadow( CRepositoryShadow settings )
+        throws ConfigurationException
+    {
+        ApplicationValidationContext ctx = getRepositoryValidationContext();
+
+        ValidationResponse vr = configurationValidator.validateRepository( ctx, settings );
+
+        if ( !vr.isValid() )
+        {
+            throw new InvalidConfigurationException( vr );
+        }
+    }
+
     public Collection<CRepositoryShadow> listRepositoryShadows()
     {
         return new ArrayList<CRepositoryShadow>( getConfiguration().getRepositoryShadows() );
@@ -887,24 +930,15 @@ public class DefaultNexusConfiguration
         throws ConfigurationException,
             IOException
     {
-        ValidationResponse vr = configurationValidator.validateRepository( null, settings );
+        validateRepositoryShadow( settings );
 
-        if ( vr.isValid() )
-        {
+        Repository repository = runtimeConfigurationBuilder.createRepositoryFromModel( getConfiguration(), settings );
 
-            Repository repository = runtimeConfigurationBuilder
-                .createRepositoryFromModel( getConfiguration(), settings );
+        repositoryRegistry.addRepository( repository );
 
-            repositoryRegistry.addRepository( repository );
+        getConfiguration().getRepositoryShadows().add( settings );
 
-            getConfiguration().getRepositoryShadows().add( settings );
-
-            applyAndSaveConfiguration();
-        }
-        else
-        {
-            throw new InvalidConfigurationException( vr );
-        }
+        applyAndSaveConfiguration();
     }
 
     public CRepositoryShadow readRepositoryShadow( String id )
@@ -931,49 +965,42 @@ public class DefaultNexusConfiguration
             ConfigurationException,
             IOException
     {
-        ValidationResponse vr = configurationValidator.validateRepository( null, settings );
+        validateRepositoryShadow( settings );
 
-        if ( vr.isValid() )
+        Repository repository = repositoryRegistry.getRepository( settings.getId() );
+
+        if ( ShadowRepository.class.isAssignableFrom( repository.getClass() ) )
         {
-            Repository repository = repositoryRegistry.getRepository( settings.getId() );
+            Repository newRepository = runtimeConfigurationBuilder.updateRepositoryFromModel(
+                (ShadowRepository) repository,
+                getConfiguration(),
+                settings );
 
-            if ( ShadowRepository.class.isAssignableFrom( repository.getClass() ) )
+            // replace it with new one
+            repositoryRegistry.updateRepository( newRepository );
+
+            List<CRepositoryShadow> reposes = getConfiguration().getRepositoryShadows();
+
+            for ( int i = 0; i < reposes.size(); i++ )
             {
-                Repository newRepository = runtimeConfigurationBuilder.updateRepositoryFromModel(
-                    (ShadowRepository) repository,
-                    getConfiguration(),
-                    settings );
+                CRepositoryShadow repo = reposes.get( i );
 
-                // replace it with new one
-                repositoryRegistry.updateRepository( newRepository );
-
-                List<CRepositoryShadow> reposes = getConfiguration().getRepositoryShadows();
-
-                for ( int i = 0; i < reposes.size(); i++ )
+                if ( repo.getId().equals( settings.getId() ) )
                 {
-                    CRepositoryShadow repo = reposes.get( i );
+                    reposes.remove( i );
 
-                    if ( repo.getId().equals( settings.getId() ) )
-                    {
-                        reposes.remove( i );
+                    reposes.add( i, settings );
 
-                        reposes.add( i, settings );
+                    applyAndSaveConfiguration();
 
-                        applyAndSaveConfiguration();
-
-                        return;
-                    }
+                    return;
                 }
-            }
-            else
-            {
-                throw new ConfigurationException( "Repository with ID=" + settings.getId()
-                    + " is not a virtual repository!" );
             }
         }
         else
         {
-            throw new InvalidConfigurationException( vr );
+            throw new ConfigurationException( "Repository with ID=" + settings.getId()
+                + " is not a virtual repository!" );
         }
     }
 

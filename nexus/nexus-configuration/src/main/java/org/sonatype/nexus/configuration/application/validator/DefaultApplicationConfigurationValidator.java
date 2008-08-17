@@ -374,6 +374,15 @@ public class DefaultApplicationConfigurationValidator
             context.getExistingRepositoryIds().add( repo.getId() );
         }
 
+        if ( context.getExistingRepositoryShadowIds() != null )
+        {
+            if ( context.getExistingRepositoryShadowIds().contains( repo.getId() ) )
+            {
+                response.addValidationError( "Repository " + repo.getId()
+                    + " conflicts woth existing Shadow with same ID='" + repo.getId() + "'!" );
+            }
+        }
+
         if ( repo.getLocalStorage() != null && repo.getLocalStorage().getUrl() != null
             && repo.getLocalStorage().getUrl().length() > 0 )
         {
@@ -454,16 +463,6 @@ public class DefaultApplicationConfigurationValidator
             response.setModified( true );
         }
 
-        if ( context.getExistingRepositoryShadowIds() != null )
-        {
-            if ( context.getExistingRepositoryShadowIds().contains( shadow.getId() ) )
-            {
-                response.addValidationError( "Shadow repository " + shadow.getId() + " declared more than once!" );
-            }
-
-            context.getExistingRepositoryShadowIds().add( shadow.getId() );
-        }
-
         if ( context.getExistingRepositoryIds() != null )
         {
             if ( !context.getExistingRepositoryIds().contains( shadow.getShadowOf() ) )
@@ -485,6 +484,25 @@ public class DefaultApplicationConfigurationValidator
             response.addValidationError( "Type of repository shadow with ID='" + shadow.getId() + "' is wrong: '"
                 + shadow.getType() + "'! (Allowed values are: '" + CRepositoryShadow.TYPE_MAVEN2 + "', '"
                 + CRepositoryShadow.TYPE_MAVEN1 + "', '" + CRepositoryShadow.TYPE_MAVEN2_CONSTRAINED + "')" );
+        }
+
+        if ( context.getExistingRepositoryShadowIds() != null )
+        {
+            if ( context.getExistingRepositoryShadowIds().contains( shadow.getId() ) )
+            {
+                response.addValidationError( "Repository shadow " + shadow.getId() + " declared more than once!" );
+            }
+
+            context.getExistingRepositoryShadowIds().add( shadow.getId() );
+        }
+
+        if ( context.getExistingRepositoryIds() != null )
+        {
+            if ( context.getExistingRepositoryIds().contains( shadow.getId() ) )
+            {
+                response.addValidationError( "Repository shadow " + shadow.getId()
+                    + " conflicts with existing Repository with same ID='" + shadow.getId() + "'!" );
+            }
         }
 
         return response;
@@ -583,7 +601,7 @@ public class DefaultApplicationConfigurationValidator
                 + CGroupsSettingPathMappingItem.BLOCKING_RULE_TYPE + "'." );
         }
 
-        if ( !CGroupsSettingPathMappingItem.BLOCKING_RULE_TYPE.equals( item.getRouteType()) )
+        if ( !CGroupsSettingPathMappingItem.BLOCKING_RULE_TYPE.equals( item.getRouteType() ) )
         {
             // here we must have a repo list
             if ( item.getRepositories() == null || item.getRepositories().size() == 0 )
