@@ -136,9 +136,7 @@ public class RepositoryTargetResourceHandler
                     }
                     catch ( ConfigurationException e )
                     {
-                        getLogger().log( Level.INFO, "Configuration unacceptable for targetId=" + resource.getId(), e );
-
-                        getResponse().setStatus( Status.CLIENT_ERROR_BAD_REQUEST, e.getMessage() );
+                        handleConfigurationException( e, representation );
 
                         return;
                     }

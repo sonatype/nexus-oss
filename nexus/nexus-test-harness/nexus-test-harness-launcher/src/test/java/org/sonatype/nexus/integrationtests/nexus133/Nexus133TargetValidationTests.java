@@ -189,12 +189,6 @@ public class Nexus133TargetValidationTests
     public void updateValidation()
         throws IOException
     {
-        //FIXME: this test is known to fail, but is commented out so the CI builds are useful
-        if( this.printKnownErrorButDoNotFail(this.getClass(), "updateValidation") )
-        {
-            return;
-        }
-        
         RepositoryTargetResource resource = new RepositoryTargetResource();
         // resource.setId( "createTest" );
         resource.setContentClass( "maven1" );

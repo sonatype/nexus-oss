@@ -1017,7 +1017,7 @@ public class DefaultNexusConfiguration
 
         if ( !res.isValid() )
         {
-            throw new ConfigurationException( "Invalid route definition!" );
+            throw new InvalidConfigurationException( res );
         }
     }
 
@@ -1294,7 +1294,7 @@ public class DefaultNexusConfiguration
         }
         else
         {
-            throw new ConfigurationException( "Invalid target definition!" );
+            throw new InvalidConfigurationException( res );
         }
     }
 

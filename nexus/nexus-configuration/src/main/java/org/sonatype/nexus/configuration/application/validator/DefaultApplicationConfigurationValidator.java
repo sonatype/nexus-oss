@@ -20,13 +20,9 @@
  */
 package org.sonatype.nexus.configuration.application.validator;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
@@ -71,10 +67,11 @@ public class DefaultApplicationConfigurationValidator
      * @plexus.requirement
      */
     private ConfigurationIdGenerator idGenerator;
-                                                      
-    private Pattern winPattern = Pattern.compile("^file:\\/(\\/\\/)?\\w:\\/.*", Pattern.CASE_INSENSITIVE);
-    private Pattern defaultPattern = Pattern.compile("^file:\\/{1,2}.*", Pattern.CASE_INSENSITIVE);
-    
+
+    private Pattern winPattern = Pattern.compile( "^file:\\/(\\/\\/)?\\w:\\/.*", Pattern.CASE_INSENSITIVE );
+
+    private Pattern defaultPattern = Pattern.compile( "^file:\\/{1,2}.*", Pattern.CASE_INSENSITIVE );
+
     @SuppressWarnings( "unchecked" )
     public ValidationResponse validateModel( ValidationRequest request )
     {
@@ -377,37 +374,44 @@ public class DefaultApplicationConfigurationValidator
             context.getExistingRepositoryIds().add( repo.getId() );
         }
 
-        if ( repo.getLocalStorage() != null && repo.getLocalStorage().getUrl() != null && repo.getLocalStorage().getUrl().length() > 0 )
+        if ( repo.getLocalStorage() != null && repo.getLocalStorage().getUrl() != null
+            && repo.getLocalStorage().getUrl().length() > 0 )
         {
             try
             {
                 String url = repo.getLocalStorage().getUrl();
-                
+
                 new URL( url );
-                
+
                 String os = System.getProperty( "os.name" );
-                
+
                 if ( os.contains( "Windows" ) )
-                {    
+                {
                     if ( !winPattern.matcher( url ).matches() )
                     {
-                        ValidationMessage msg = new ValidationMessage( "overrideLocalStorageUrl", "Repository " + repo.getId() + " has invalid local storage URL!" , "Invalid windows file url, must be in format file:///X:/path/to/repo where X is the drive letter" );
-                        response.addValidationError( msg );        
+                        ValidationMessage msg = new ValidationMessage(
+                            "overrideLocalStorageUrl",
+                            "Repository " + repo.getId() + " has invalid local storage URL!",
+                            "Invalid windows file url, must be in format file:///X:/path/to/repo where X is the drive letter" );
+                        response.addValidationError( msg );
                     }
                 }
                 else
                 {
                     if ( !defaultPattern.matcher( url ).matches() )
                     {
-                        ValidationMessage msg = new ValidationMessage( "overrideLocalStorageUrl", "Repository " + repo.getId() + " has invalid local storage URL!" , "Invalid file url, must be in format file://path/to/repo" );
-                        response.addValidationError( msg );        
+                        ValidationMessage msg = new ValidationMessage(
+                            "overrideLocalStorageUrl",
+                            "Repository " + repo.getId() + " has invalid local storage URL!",
+                            "Invalid file url, must be in format file://path/to/repo" );
+                        response.addValidationError( msg );
                     }
                 }
             }
             catch ( MalformedURLException e )
             {
                 response.addValidationError( "Repository " + repo.getId() + " has malformed local storage URL!", e );
-            }            
+            }
         }
         if ( repo.getRemoteStorage() != null && repo.getRemoteStorage().getUrl() != null )
         {
@@ -568,9 +572,9 @@ public class DefaultApplicationConfigurationValidator
             context.getExistingPathMappingIds().add( item.getId() );
         }
 
-        if ( !item.getRouteType().equals( CGroupsSettingPathMappingItem.INCLUSION_RULE_TYPE )
-            && !item.getRouteType().equals( CGroupsSettingPathMappingItem.EXCLUSION_RULE_TYPE )
-            && !item.getRouteType().equals( CGroupsSettingPathMappingItem.BLOCKING_RULE_TYPE ) )
+        if ( !CGroupsSettingPathMappingItem.INCLUSION_RULE_TYPE.equals( item.getRouteType() )
+            && !CGroupsSettingPathMappingItem.EXCLUSION_RULE_TYPE.equals( item.getRouteType() )
+            && !CGroupsSettingPathMappingItem.BLOCKING_RULE_TYPE.equals( item.getRouteType() ) )
         {
             response.addValidationError( "The groupMapping pattern with ID=" + item.getId()
                 + " have invalid routeType='" + item.getRouteType() + "'. Valid route types are '"
@@ -579,7 +583,7 @@ public class DefaultApplicationConfigurationValidator
                 + CGroupsSettingPathMappingItem.BLOCKING_RULE_TYPE + "'." );
         }
 
-        if ( !item.getRouteType().equals( CGroupsSettingPathMappingItem.BLOCKING_RULE_TYPE ) )
+        if ( !CGroupsSettingPathMappingItem.BLOCKING_RULE_TYPE.equals( item.getRouteType()) )
         {
             // here we must have a repo list
             if ( item.getRepositories() == null || item.getRepositories().size() == 0 )

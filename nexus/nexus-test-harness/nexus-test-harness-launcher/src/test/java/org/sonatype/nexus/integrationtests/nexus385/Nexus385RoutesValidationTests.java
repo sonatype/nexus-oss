@@ -12,7 +12,6 @@ import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.rest.model.RepositoryRouteMemberRepository;
 import org.sonatype.nexus.rest.model.RepositoryRouteResource;
 import org.sonatype.nexus.rest.xstream.XStreamInitializer;
-import org.sonatype.nexus.test.utils.NexusConfigUtil;
 import org.sonatype.nexus.test.utils.RoutesMessageUtil;
 
 import com.thoughtworks.xstream.XStream;
@@ -25,8 +24,9 @@ public class Nexus385RoutesValidationTests
 
     public Nexus385RoutesValidationTests()
     {
-        this.messageUtil =
-            new RoutesMessageUtil( XStreamInitializer.initialize( new XStream() ), MediaType.APPLICATION_XML );
+        this.messageUtil = new RoutesMessageUtil(
+            XStreamInitializer.initialize( new XStream() ),
+            MediaType.APPLICATION_XML );
     }
 
     @SuppressWarnings( "unchecked" )
@@ -34,11 +34,9 @@ public class Nexus385RoutesValidationTests
     public void createNoGroupIdTest()
         throws IOException
     {
-     // FIXME: this test is known to fail, but is commented out so the CI builds are useful
-        if ( this.printKnownErrorButDoNotFail( this.getClass(), "createNoGroupIdTest" ) )
-        {
-            return;
-        }
+        // EXPLANATION
+        // When no groupId sent with route, Nexus _defaults_ it to '*', meaning
+        // all repositories to "mimic" the pre-this-change behaviour
         
         RepositoryRouteResource resource = new RepositoryRouteResource();
         // resource.setGroupId( "nexus-test" );
@@ -52,32 +50,23 @@ public class Nexus385RoutesValidationTests
         Response response = this.messageUtil.sendMessage( Method.POST, resource );
 
         String responseText = response.getEntity().getText();
-        if ( response.getStatus().getCode() != 400 )
+        if ( response.getStatus().getCode() != 200 || !responseText.contains( "<groupId>*</groupId>" ) )
         {   
-            Assert.fail( "Should have returned a 400, but returned: " + response.getStatus() + "\nresponse:\n"
-                + responseText );
+            Assert.fail( "Should have returned a 200, but returned: " + response.getStatus() + "\nresponse:\n"
+                + responseText + ", and the omitted groupId should be defaulted with '*'" );
         }
-        
-        this.messageUtil.validateResponseErrorXml(responseText);
-
     }
-    
+
     @SuppressWarnings( "unchecked" )
     @Test
     public void createNoRuleTypeTest()
         throws IOException
     {
-        
-     // FIXME: this test is known to fail, but is commented out so the CI builds are useful
-        if ( this.printKnownErrorButDoNotFail( this.getClass(), "createNoRuleTypeTest" ) )
-        {
-            return;
-        }
-        
+
         RepositoryRouteResource resource = new RepositoryRouteResource();
-         resource.setGroupId( "nexus-test" );
+        resource.setGroupId( "nexus-test" );
         resource.setPattern( ".*createNoRuleTypeTest.*" );
-//        resource.setRuleType( "exclusive" );
+        // resource.setRuleType( "exclusive" );
 
         RepositoryRouteMemberRepository memberRepo1 = new RepositoryRouteMemberRepository();
         memberRepo1.setId( "nexus-test-harness-repo" );
@@ -87,23 +76,23 @@ public class Nexus385RoutesValidationTests
 
         String responseText = response.getEntity().getText();
         if ( response.getStatus().getCode() != 400 )
-        {   
+        {
             Assert.fail( "Should have returned a 400, but returned: " + response.getStatus() + "\nresponse:\n"
                 + responseText );
         }
-        
-        this.messageUtil.validateResponseErrorXml(responseText);
+
+        this.messageUtil.validateResponseErrorXml( responseText );
 
     }
-    
+
     @SuppressWarnings( "unchecked" )
     @Test
     public void createNoPatternTest()
         throws IOException
     {
         RepositoryRouteResource resource = new RepositoryRouteResource();
-         resource.setGroupId( "nexus-test" );
-//        resource.setPattern( ".*createNoPatternTest.*" );
+        resource.setGroupId( "nexus-test" );
+        // resource.setPattern( ".*createNoPatternTest.*" );
         resource.setRuleType( "exclusive" );
 
         RepositoryRouteMemberRepository memberRepo1 = new RepositoryRouteMemberRepository();
@@ -114,22 +103,22 @@ public class Nexus385RoutesValidationTests
 
         String responseText = response.getEntity().getText();
         if ( response.getStatus().getCode() != 400 )
-        {   
+        {
             Assert.fail( "Should have returned a 400, but returned: " + response.getStatus() + "\nresponse:\n"
                 + responseText );
         }
-        
-        this.messageUtil.validateResponseErrorXml(responseText);
+
+        this.messageUtil.validateResponseErrorXml( responseText );
 
     }
-    
+
     @SuppressWarnings( "unchecked" )
     @Test
     public void createWithInvalidPatternTest()
         throws IOException
     {
         RepositoryRouteResource resource = new RepositoryRouteResource();
-         resource.setGroupId( "nexus-test" );
+        resource.setGroupId( "nexus-test" );
         resource.setPattern( "*.createWithInvalidPatternTest.*" );
         resource.setRuleType( "exclusive" );
 
@@ -141,22 +130,22 @@ public class Nexus385RoutesValidationTests
 
         String responseText = response.getEntity().getText();
         if ( response.getStatus().getCode() != 400 )
-        {   
+        {
             Assert.fail( "Should have returned a 400, but returned: " + response.getStatus() + "\nresponse:\n"
                 + responseText );
         }
-        
-        this.messageUtil.validateResponseErrorXml(responseText);
+
+        this.messageUtil.validateResponseErrorXml( responseText );
 
     }
-    
+
     @SuppressWarnings( "unchecked" )
     @Test
     public void createWithInvalidGroupTest()
         throws IOException
     {
         RepositoryRouteResource resource = new RepositoryRouteResource();
-         resource.setGroupId( "INVALID" );
+        resource.setGroupId( "INVALID" );
         resource.setPattern( "*.createWithInvalidPatternTest.*" );
         resource.setRuleType( "exclusive" );
 
@@ -168,28 +157,22 @@ public class Nexus385RoutesValidationTests
 
         String responseText = response.getEntity().getText();
         if ( response.getStatus().getCode() != 400 )
-        {   
+        {
             Assert.fail( "Should have returned a 400, but returned: " + response.getStatus() + "\nresponse:\n"
                 + responseText );
         }
-        
-        this.messageUtil.validateResponseErrorXml(responseText);
+
+        this.messageUtil.validateResponseErrorXml( responseText );
     }
-    
+
     @SuppressWarnings( "unchecked" )
     @Test
     public void createWithInvalidRuleTypeTest()
         throws IOException
     {
-        
-     // FIXME: this test is known to fail, but is commented out so the CI builds are useful
-        if ( this.printKnownErrorButDoNotFail( this.getClass(), "createWithInvalidRuleTypeTest" ) )
-        {
-            return;
-        }
-        
+
         RepositoryRouteResource resource = new RepositoryRouteResource();
-         resource.setGroupId( "nexus-test" );
+        resource.setGroupId( "nexus-test" );
         resource.setPattern( "*.createWithInvalidRuleTypeTest.*" );
         resource.setRuleType( "createWithInvalidRuleTypeTest" );
 
@@ -201,47 +184,47 @@ public class Nexus385RoutesValidationTests
 
         String responseText = response.getEntity().getText();
         if ( response.getStatus().getCode() != 400 )
-        {   
+        {
             Assert.fail( "Should have returned a 400, but returned: " + response.getStatus() + "\nresponse:\n"
                 + responseText );
         }
-        
-        this.messageUtil.validateResponseErrorXml(responseText);
+
+        this.messageUtil.validateResponseErrorXml( responseText );
     }
-    
+
     @SuppressWarnings( "unchecked" )
     @Test
     public void createNoReposTest()
         throws IOException
     {
         RepositoryRouteResource resource = new RepositoryRouteResource();
-         resource.setGroupId( "nexus-test" );
+        resource.setGroupId( "nexus-test" );
         resource.setPattern( "*.createWithInvalidRuleTypeTest.*" );
         resource.setRuleType( "exclusive" );
 
-//        RepositoryRouteMemberRepository memberRepo1 = new RepositoryRouteMemberRepository();
-//        memberRepo1.setId( "nexus-test-harness-repo" );
-//        resource.addRepository( memberRepo1 );
+        // RepositoryRouteMemberRepository memberRepo1 = new RepositoryRouteMemberRepository();
+        // memberRepo1.setId( "nexus-test-harness-repo" );
+        // resource.addRepository( memberRepo1 );
 
         Response response = this.messageUtil.sendMessage( Method.POST, resource );
 
         String responseText = response.getEntity().getText();
         if ( response.getStatus().getCode() != 400 )
-        {   
+        {
             Assert.fail( "Should have returned a 400, but returned: " + response.getStatus() + "\nresponse:\n"
                 + responseText );
         }
-        
-        this.messageUtil.validateResponseErrorXml(responseText);
+
+        this.messageUtil.validateResponseErrorXml( responseText );
     }
-    
+
     @SuppressWarnings( "unchecked" )
     @Test
     public void createWithInvalidReposTest()
         throws IOException
     {
         RepositoryRouteResource resource = new RepositoryRouteResource();
-         resource.setGroupId( "nexus-test" );
+        resource.setGroupId( "nexus-test" );
         resource.setPattern( "*.createWithInvalidRuleTypeTest.*" );
         resource.setRuleType( "exclusive" );
 
@@ -253,14 +236,12 @@ public class Nexus385RoutesValidationTests
 
         String responseText = response.getEntity().getText();
         if ( response.getStatus().getCode() != 400 )
-        {   
+        {
             Assert.fail( "Should have returned a 400, but returned: " + response.getStatus() + "\nresponse:\n"
                 + responseText );
         }
-        
-        this.messageUtil.validateResponseErrorXml(responseText);
+
+        this.messageUtil.validateResponseErrorXml( responseText );
     }
-    
-    
 
 }

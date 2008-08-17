@@ -178,6 +178,8 @@ public class RepositoryRouteListResourceHandler
                 route.setRepositories( repositories );
 
                 getNexus().createGroupsSettingPathMapping( route );
+                
+                resource.setGroupId( route.getGroupId() );
 
                 getResponse().setEntity( serialize( entity, response ) );
             }
