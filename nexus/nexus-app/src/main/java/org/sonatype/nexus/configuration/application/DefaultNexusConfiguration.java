@@ -68,7 +68,7 @@ import org.sonatype.nexus.proxy.target.TargetRegistry;
 
 /**
  * The class DefaultNexusConfiguration is responsible for config management. It actually keeps in sync Nexus internal
- * state with persisted user configuration. All changes incoming thru its iface is reflect/maintained in Nexus current
+ * state with p ersisted user configuration. All changes incoming thru its iface is reflect/maintained in Nexus current
  * state and Nexus user config.
  * 
  * @author cstamas
