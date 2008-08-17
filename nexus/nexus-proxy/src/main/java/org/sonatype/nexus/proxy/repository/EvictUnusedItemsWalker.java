@@ -37,6 +37,11 @@ public class EvictUnusedItemsWalker
         return repository;
     }
 
+    public long getTimestamp()
+    {
+        return timestamp;
+    }
+
     public List<String> getFiles()
     {
         return files;
@@ -48,11 +53,11 @@ public class EvictUnusedItemsWalker
         // expiring found files
         try
         {
-            if ( item.getLastRequested() < timestamp )
+            if ( item.getLastRequested() < getTimestamp() )
             {
                 getRepository().deleteItem( item.getRepositoryItemUid(), item.getItemContext() );
 
-                files.add( item.getPath() );
+                getFiles().add( item.getPath() );
             }
         }
         catch ( RepositoryNotAvailableException e )
