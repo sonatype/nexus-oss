@@ -27,7 +27,6 @@ import java.util.Map;
 
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.util.StringUtils;
-import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryGroupException;
 import org.sonatype.nexus.proxy.ResourceStore;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
@@ -103,8 +102,6 @@ public class ResourceStoreIdBasedRepositoryRouter
      * We are rendering "other routers".
      */
     protected List<StorageItem> renderVirtualPath( ResourceStoreRequest request, boolean list )
-        throws NoSuchRepositoryException,
-            NoSuchRepositoryGroupException
     {
         List<StorageItem> result = new ArrayList<StorageItem>();
 
@@ -124,7 +121,7 @@ public class ResourceStoreIdBasedRepositoryRouter
                 result.add( coll );
             }
         }
-        else
+        else if ( !list )
         {
             // creating a simple CollectionItem that is actually the "root" of this router.
             if ( getLogger().isDebugEnabled() )
@@ -161,8 +158,6 @@ public class ResourceStoreIdBasedRepositoryRouter
 
             if ( explodedPath.length >= 1 )
             {
-                result = new ArrayList<ResourceStore>( 1 );
-
                 ResourceStore store = null;
 
                 ResourceStore defaultHandler = null;
@@ -204,6 +199,7 @@ public class ResourceStoreIdBasedRepositoryRouter
                             store = defaultHandler;
                         }
                     }
+                    result = new ArrayList<ResourceStore>( 1 );
 
                     result.add( store );
                 }

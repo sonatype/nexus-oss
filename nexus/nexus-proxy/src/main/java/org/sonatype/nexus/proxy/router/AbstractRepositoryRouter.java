@@ -250,7 +250,8 @@ public abstract class AbstractRepositoryRouter
     }
 
     public void storeItem( ResourceStoreRequest request, InputStream is, Map<String, String> userAttributes )
-        throws UnsupportedStorageOperationException,
+        throws ItemNotFoundException,
+            UnsupportedStorageOperationException,
             NoSuchResourceStoreException,
             RepositoryNotAvailableException,
             StorageException,
@@ -266,7 +267,8 @@ public abstract class AbstractRepositoryRouter
     }
 
     public void createCollection( ResourceStoreRequest request, Map<String, String> userAttributes )
-        throws UnsupportedStorageOperationException,
+        throws ItemNotFoundException,
+            UnsupportedStorageOperationException,
             NoSuchResourceStoreException,
             RepositoryNotAvailableException,
             StorageException,
@@ -387,7 +389,7 @@ public abstract class AbstractRepositoryRouter
         ResourceStoreRequest req = new ResourceStoreRequest( link.getTarget(), false );
 
         req.getRequestContext().putAll( link.getItemContext() );
-        
+
         return link.getTarget().getRepository().retrieveItem( req );
     }
 
@@ -604,7 +606,8 @@ public abstract class AbstractRepositoryRouter
      */
     protected abstract void doStoreItem( ResourceStoreRequest request, InputStream is,
         Map<String, String> userAttributes )
-        throws UnsupportedStorageOperationException,
+        throws ItemNotFoundException,
+            UnsupportedStorageOperationException,
             NoSuchResourceStoreException,
             RepositoryNotAvailableException,
             StorageException,
@@ -623,7 +626,8 @@ public abstract class AbstractRepositoryRouter
      * @throws AccessDeniedException the access denied exception
      */
     protected void doCreateCollection( ResourceStoreRequest request, Map<String, String> userAttributes )
-        throws UnsupportedStorageOperationException,
+        throws ItemNotFoundException,
+            UnsupportedStorageOperationException,
             NoSuchResourceStoreException,
             RepositoryNotAvailableException,
             StorageException,

@@ -25,6 +25,7 @@ import java.util.List;
 
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryGroupException;
+import org.sonatype.nexus.proxy.NoSuchResourceStoreException;
 import org.sonatype.nexus.proxy.ResourceStore;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.item.DefaultStorageCollectionItem;
@@ -47,8 +48,7 @@ public abstract class RepoIdBasedRepositoryRouter
      * We are rendering registered reposes.
      */
     protected List<StorageItem> renderVirtualPath( ResourceStoreRequest request, boolean list )
-        throws NoSuchRepositoryException,
-            NoSuchRepositoryGroupException
+        throws NoSuchResourceStoreException
     {
         List<StorageItem> result = new ArrayList<StorageItem>();
 
@@ -79,6 +79,33 @@ public abstract class RepoIdBasedRepositoryRouter
                     result.add( coll );
                 }
             }
+            else if ( request.getRequestRepositoryGroupId() != null )
+            {
+                // we have a targeted request at group
+                // list all group member reposes as "root"
+                for ( Repository repository : getRepositoryRegistry().getRepositoryGroup(
+                    request.getRequestRepositoryGroupId() ) )
+                {
+                    if ( repository.getLocalStatus().shouldServiceRequest() )
+                    {
+                        if ( getLogger().isDebugEnabled() )
+                        {
+                            getLogger().debug(
+                                "Adding repository " + repository.getId() + " to virtual path "
+                                    + request.getRequestPath() );
+                        }
+                        DefaultStorageCollectionItem coll = new DefaultStorageCollectionItem(
+                            this,
+                            RepositoryItemUid.PATH_ROOT + repository.getId(),
+                            true,
+                            false );
+
+                        coll.setRepositoryId( repository.getId() );
+
+                        result.add( coll );
+                    }
+                }
+            }
             else
             {
                 // list all reposes as "root"
@@ -105,7 +132,7 @@ public abstract class RepoIdBasedRepositoryRouter
                 }
             }
         }
-        else
+        else if ( !list )
         {
             if ( getLogger().isDebugEnabled() )
             {

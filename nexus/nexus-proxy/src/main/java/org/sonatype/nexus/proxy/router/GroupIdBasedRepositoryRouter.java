@@ -74,10 +74,10 @@ public abstract class GroupIdBasedRepositoryRouter
     }
 
     protected List<StorageItem> renderVirtualPath( ResourceStoreRequest request, boolean list )
-        throws NoSuchRepositoryException,
-            NoSuchRepositoryGroupException
+        throws NoSuchResourceStoreException
     {
         List<StorageItem> result = new ArrayList<StorageItem>();
+
         if ( list )
         {
             if ( request.getRequestRepositoryGroupId() != null )
@@ -107,7 +107,7 @@ public abstract class GroupIdBasedRepositoryRouter
                 }
             }
         }
-        else
+        else if ( !list )
         {
             DefaultStorageCollectionItem coll = new DefaultStorageCollectionItem(
                 this,

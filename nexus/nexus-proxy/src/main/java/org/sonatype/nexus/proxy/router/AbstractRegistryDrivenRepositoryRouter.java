@@ -39,7 +39,6 @@ import org.sonatype.nexus.proxy.ResourceStore;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
-import org.sonatype.nexus.proxy.item.DefaultStorageCollectionItem;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
@@ -130,6 +129,13 @@ public abstract class AbstractRegistryDrivenRepositoryRouter
 
         if ( stores == null )
         {
+            // we must ensure this is a request to ROOT, otherwise this means some non-real path is entered and
+            // we don't want to list contents as root
+            if ( !RepositoryItemUid.PATH_ROOT.equals( req.getRequestPath() ) )
+            {
+                throw new ItemNotFoundException( req.getRequestPath() );
+            }
+
             // we handle "virtual" paths, not backed by real Reposes since no repos found to serve this request
             if ( getLogger().isDebugEnabled() )
             {
@@ -230,14 +236,14 @@ public abstract class AbstractRegistryDrivenRepositoryRouter
             }
             else
             {
-                if ( stores != null && stores.size() == 0 )
-                {
-                    return new DefaultStorageCollectionItem( this, req.getRequestPath(), true, true );
-                }
-                else
-                {
-                    throw new ItemNotFoundException( req.getRequestPath() );
-                }
+                // if ( stores != null && stores.size() == 0 )
+                // {
+                // return new DefaultStorageCollectionItem( this, req.getRequestPath(), true, true );
+                // }
+                // else
+                // {
+                throw new ItemNotFoundException( req.getRequestPath() );
+                // }
             }
         }
     }
@@ -259,6 +265,13 @@ public abstract class AbstractRegistryDrivenRepositoryRouter
 
         if ( stores == null )
         {
+            // we must ensure this is a request to ROOT, otherwise this means some non-real path is entered and
+            // we don't want to list contents as root
+            if ( !RepositoryItemUid.PATH_ROOT.equals( req.getRequestPath() ) )
+            {
+                throw new ItemNotFoundException( req.getRequestPath() );
+            }
+
             // we handle "virtual" paths, not backed by real Reposes
             if ( getLogger().isDebugEnabled() )
             {
@@ -355,9 +368,13 @@ public abstract class AbstractRegistryDrivenRepositoryRouter
     {
         List<ResourceStore> sourceList = resolveResourceStoreByRequest( f );
 
-        if ( sourceList.size() != 1 )
+        if ( sourceList == null )
         {
-            throw new IllegalArgumentException( "You must address one ResourceStore with this operation!" );
+            throw new ItemNotFoundException( f.getRequestPath() );
+        }
+        else if ( sourceList.size() != 1 )
+        {
+            throw new AccessDeniedException( f, "You must address one ResourceStore with this operation!" );
         }
 
         ResourceStore source = sourceList.get( 0 );
@@ -366,9 +383,13 @@ public abstract class AbstractRegistryDrivenRepositoryRouter
 
         List<ResourceStore> destList = resolveResourceStoreByRequest( t );
 
-        if ( destList.size() != 1 )
+        if ( destList == null )
         {
-            throw new IllegalArgumentException( "You must address one ResourceStore with this operation!" );
+            throw new ItemNotFoundException( t.getRequestPath() );
+        }
+        else if ( destList.size() != 1 )
+        {
+            throw new AccessDeniedException( t, "You must address one ResourceStore with this operation!" );
         }
 
         ResourceStore destination = destList.get( 0 );
@@ -423,66 +444,62 @@ public abstract class AbstractRegistryDrivenRepositoryRouter
      * Storing an item. Getting the list of affected reposes and ensuring we have only one.
      */
     protected void doStoreItem( ResourceStoreRequest req, InputStream is, Map<String, String> userAttributes )
-        throws UnsupportedStorageOperationException,
+        throws ItemNotFoundException,
+            UnsupportedStorageOperationException,
             NoSuchResourceStoreException,
             RepositoryNotAvailableException,
             StorageException,
             AccessDeniedException
     {
-        try
+        List<ResourceStore> stores = resolveResourceStoreByRequest( req );
+
+        if ( stores == null )
         {
-            List<ResourceStore> stores = resolveResourceStoreByRequest( req );
-
-            if ( stores.size() != 1 )
-            {
-                throw new IllegalArgumentException( "You must address one ResourceStore with this operation!" );
-            }
-
-            ResourceStore store = stores.get( 0 );
-
-            req.pushRequestPath( router2substore( req.getRequestPath() ) );
-
-            store.storeItem( req, is, userAttributes );
-
-            req.popRequestPath();
+            throw new ItemNotFoundException( req.getRequestPath() );
         }
-        catch ( ItemNotFoundException e )
+        else if ( stores.size() != 1 )
         {
-            throw new IllegalArgumentException( "You must address one ResourceStore with this operation!", e );
+            throw new AccessDeniedException( req, "You must address one ResourceStore with this operation!" );
         }
+
+        ResourceStore store = stores.get( 0 );
+
+        req.pushRequestPath( router2substore( req.getRequestPath() ) );
+
+        store.storeItem( req, is, userAttributes );
+
+        req.popRequestPath();
     }
 
     /**
      * Creating a collection. Getting the list of affected reposes and ensuring we have only one.
      */
     protected void doCreateCollection( ResourceStoreRequest req, Map<String, String> userAttributes )
-        throws UnsupportedStorageOperationException,
+        throws ItemNotFoundException,
+            UnsupportedStorageOperationException,
             NoSuchResourceStoreException,
             RepositoryNotAvailableException,
             StorageException,
             AccessDeniedException
     {
-        try
+        List<ResourceStore> stores = resolveResourceStoreByRequest( req );
+
+        if ( stores == null )
         {
-            List<ResourceStore> stores = resolveResourceStoreByRequest( req );
-
-            if ( stores.size() != 1 )
-            {
-                throw new IllegalArgumentException( "You must address one ResourceStore with this operation!" );
-            }
-
-            ResourceStore store = stores.get( 0 );
-
-            req.pushRequestPath( router2substore( req.getRequestPath() ) );
-
-            store.createCollection( req, userAttributes );
-
-            req.popRequestPath();
+            throw new ItemNotFoundException( req.getRequestPath() );
         }
-        catch ( ItemNotFoundException e )
+        else if ( stores.size() != 1 )
         {
-            throw new IllegalArgumentException( "You must address one ResourceStore with this operation!", e );
+            throw new AccessDeniedException( req, "You must address one ResourceStore with this operation!" );
         }
+
+        ResourceStore store = stores.get( 0 );
+
+        req.pushRequestPath( router2substore( req.getRequestPath() ) );
+
+        store.createCollection( req, userAttributes );
+
+        req.popRequestPath();
     }
 
     /**
@@ -498,9 +515,13 @@ public abstract class AbstractRegistryDrivenRepositoryRouter
     {
         List<ResourceStore> stores = resolveResourceStoreByRequest( request );
 
-        if ( stores.size() != 1 )
+        if ( stores == null )
         {
-            throw new IllegalArgumentException( "You must address one ResourceStore with this operation!" );
+            throw new ItemNotFoundException( request.getRequestPath() );
+        }
+        else if ( stores.size() != 1 )
+        {
+            throw new AccessDeniedException( request, "You must address one ResourceStore with this operation!" );
         }
 
         ResourceStore repository = stores.get( 0 );
@@ -640,7 +661,7 @@ public abstract class AbstractRegistryDrivenRepositoryRouter
     }
 
     /**
-     * Render virtual path.
+     * Render virtual path. Either the "root" of this router or some child.
      * 
      * @param request the request
      * @param isList is list or just an item requested
