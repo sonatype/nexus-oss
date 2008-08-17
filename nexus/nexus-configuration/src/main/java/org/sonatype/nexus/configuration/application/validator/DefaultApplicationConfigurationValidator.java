@@ -73,7 +73,7 @@ public class DefaultApplicationConfigurationValidator
     private ConfigurationIdGenerator idGenerator;
                                                       
     private Pattern winPattern = Pattern.compile("^file:\\/(\\/\\/)?\\w:\\/.*", Pattern.CASE_INSENSITIVE);
-    private Pattern defaultPattern = Pattern.compile("^file:\\/\\/.*", Pattern.CASE_INSENSITIVE);
+    private Pattern defaultPattern = Pattern.compile("^file:\\/{1,2}.*", Pattern.CASE_INSENSITIVE);
     
     @SuppressWarnings( "unchecked" )
     public ValidationResponse validateModel( ValidationRequest request )
