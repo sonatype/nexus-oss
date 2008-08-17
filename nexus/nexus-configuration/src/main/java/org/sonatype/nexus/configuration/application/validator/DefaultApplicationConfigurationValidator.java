@@ -54,7 +54,7 @@ import org.sonatype.nexus.configuration.validator.ValidationRequest;
 import org.sonatype.nexus.configuration.validator.ValidationResponse;
 
 /**
- * The default configuration validator provider. It checks the model for semantical validity.
+ * The default configuration  validator provider. It checks the model for semantical validity.
  * 
  * @author cstamas
  * @plexus.component
