@@ -31,6 +31,7 @@ import org.sonatype.nexus.integrationtests.nexus259.Nexus259SnapshotDeployTest;
 import org.sonatype.nexus.integrationtests.nexus260.Nexus260MultipleDeployTest;
 import org.sonatype.nexus.integrationtests.nexus261.Nexus261NexusGroupDownloadTest;
 import org.sonatype.nexus.integrationtests.nexus292.Nexus292SoftRestartTest;
+import org.sonatype.nexus.integrationtests.nexus379.Nexus379VirtualRepoSameId;
 import org.sonatype.nexus.integrationtests.nexus385.Nexus385RoutesCrudXmlTests;
 import org.sonatype.nexus.integrationtests.nexus385.Nexus385RoutesPermissionTests;
 import org.sonatype.nexus.integrationtests.nexus385.Nexus385RoutesValidationTests;
@@ -41,6 +42,7 @@ import org.sonatype.nexus.integrationtests.nexus395.Nexus395ForgotUsernamePermis
 import org.sonatype.nexus.integrationtests.nexus408.Nexus408ChangePasswordPermissionTest;
 import org.sonatype.nexus.integrationtests.nexus429.Nexus429UploadArtifactPrivilegeTest;
 import org.sonatype.nexus.integrationtests.nexus429.Nexus429WagonDeployPrivilegeTest;
+import org.sonatype.nexus.integrationtests.nexus448.Nexus448PrivilegeURLTest;
 import org.sonatype.nexus.integrationtests.nexus450.Nexus450UserCreationTest;
 import org.sonatype.nexus.integrationtests.nexus477.Nexus477ArtifactsCrudTests;
 import org.sonatype.nexus.integrationtests.nexus502.Nexus502MavenExecutionTest;
@@ -70,7 +72,8 @@ import org.sonatype.nexus.integrationtests.proxy.nexus262.Nexus262SimpleProxyTes
     Nexus408ChangePasswordPermissionTest.class, Nexus450UserCreationTest.class, Nexus502MavenExecutionTest.class,
     Nexus477ArtifactsCrudTests.class, Nexus173SnapshotDeployWIthPassword.class,
     Nexus174ReleaseDeployWrongPassword.class, Nexus175SnapshotDeployWrongPassword.class, Nexus511MavenDeployTest.class,
-    Nexus531RepositoryCrudXMLTests.class, Nexus531RepositoryCrudJsonTests.class } )
+    Nexus531RepositoryCrudXMLTests.class, Nexus531RepositoryCrudJsonTests.class, Nexus233PrivilegesCrudXMLTests.class,
+    Nexus379VirtualRepoSameId.class, Nexus448PrivilegeURLTest.class } )
 public class IntegrationTestSuiteClassesSecurity
 {
     @BeforeClass

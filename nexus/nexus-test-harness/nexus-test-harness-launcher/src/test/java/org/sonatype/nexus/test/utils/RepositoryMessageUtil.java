@@ -5,18 +5,16 @@ import java.util.List;
 
 import junit.framework.Assert;
 
-import org.apache.maven.model.RepositoryBase;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.integrationtests.RequestFacade;
+import org.sonatype.nexus.rest.model.RepositoryBaseResource;
 import org.sonatype.nexus.rest.model.RepositoryListResource;
 import org.sonatype.nexus.rest.model.RepositoryListResourceResponse;
-import org.sonatype.nexus.rest.model.RepositoryProxyResource;
 import org.sonatype.nexus.rest.model.RepositoryResource;
 import org.sonatype.nexus.rest.model.RepositoryResourceResponse;
-import org.sonatype.nexus.rest.model.RepositoryShadowResource;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
 
 import com.thoughtworks.xstream.XStream;
@@ -139,7 +137,7 @@ public class RepositoryMessageUtil
         return responseResource;
     }
 
-    public Response sendMessage( Method method, RepositoryResource resource )
+    public Response sendMessage( Method method, RepositoryBaseResource resource )
         throws IOException
     {
 
