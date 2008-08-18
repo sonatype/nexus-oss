@@ -159,6 +159,10 @@ public abstract class AbstractSystemFeedSource
             {
                 entry.setTitle( "Removing snapshots" );
             }
+            else if ( FeedRecorder.SYSTEM_EMPTY_TRASH_ACTION.equals( item.getAction() ) )
+            {
+                entry.setTitle( "Emptying Trash" );
+            }
             else
             {
                 entry.setTitle( item.getAction() );

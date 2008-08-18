@@ -32,6 +32,7 @@ import org.sonatype.nexus.rest.model.ScheduledServiceTypePropertyResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceTypeResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceTypeResourceResponse;
 import org.sonatype.nexus.tasks.ClearCacheTask;
+import org.sonatype.nexus.tasks.EmptyTrashTask;
 import org.sonatype.nexus.tasks.EvictUnusedProxiedItemsTask;
 import org.sonatype.nexus.tasks.PublishIndexesTask;
 import org.sonatype.nexus.tasks.PurgeTimeline;
@@ -207,6 +208,10 @@ public class ScheduledServiceTypeResourceHandler
         property
             .setHelpText( "The job will purge all snapshots that have a corresponding released artifact (same version not including the -SNAPSHOT)." );
         type.addProperty( property );
+        
+        type = new ScheduledServiceTypeResource();
+        type.setId( EmptyTrashTask.class.getName() );
+        type.setName( getServiceTypeName( EmptyTrashTask.class ) );
         response.addData( type );
 
         return serialize( variant, response );

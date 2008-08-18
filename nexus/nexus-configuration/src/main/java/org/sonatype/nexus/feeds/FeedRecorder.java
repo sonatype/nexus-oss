@@ -95,6 +95,11 @@ public interface FeedRecorder
      * System event action: evict unused proxied items
      */
     public static final String SYSTEM_EVICT_UNUSED_PROXIED_ITEMS = "EVICT_UNUSED_PROXIED_ITEMS";
+    
+    /**
+     * System event action: empty trash
+     */
+    public static final String SYSTEM_EMPTY_TRASH_ACTION = "EMPTY_TRASH";
 
     // creating
 

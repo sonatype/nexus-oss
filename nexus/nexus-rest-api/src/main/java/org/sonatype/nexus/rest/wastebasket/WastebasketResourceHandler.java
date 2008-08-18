@@ -32,6 +32,8 @@ import org.restlet.resource.Variant;
 import org.sonatype.nexus.rest.AbstractNexusResourceHandler;
 import org.sonatype.nexus.rest.model.WastebasketResource;
 import org.sonatype.nexus.rest.model.WastebasketResourceResponse;
+import org.sonatype.nexus.tasks.ClearCacheTask;
+import org.sonatype.nexus.tasks.EmptyTrashTask;
 
 /**
  * The Wastebasket resource handler. It returns the status of the wastebasket, and purges it.
@@ -81,16 +83,8 @@ public class WastebasketResourceHandler
 
     public void delete()
     {
-        try
-        {
-            getNexus().wastebasketPurge();
-        }
-        catch ( IOException e )
-        {
-            getResponse().setStatus( Status.SERVER_ERROR_INTERNAL );
-
-            getLogger().log( Level.SEVERE, "Got IO Exception!", e );
-        }
-
+        EmptyTrashTask task = (EmptyTrashTask) getNexus().createTaskInstance( EmptyTrashTask.class );
+        
+        getNexus().submit( "Internal", task );
     }
 }

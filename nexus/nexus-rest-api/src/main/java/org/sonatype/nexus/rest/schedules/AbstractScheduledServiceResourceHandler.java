@@ -46,6 +46,7 @@ import org.sonatype.nexus.rest.model.ScheduledServiceOnceResource;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceWeeklyResource;
 import org.sonatype.nexus.tasks.ClearCacheTask;
+import org.sonatype.nexus.tasks.EmptyTrashTask;
 import org.sonatype.nexus.tasks.EvictUnusedProxiedItemsTask;
 import org.sonatype.nexus.tasks.PublishIndexesTask;
 import org.sonatype.nexus.tasks.PurgeTimeline;
@@ -135,6 +136,7 @@ public class AbstractScheduledServiceResourceHandler
         serviceNames.put( EvictUnusedProxiedItemsTask.class, "Evict Unused Proxied Items From Repository Caches" );
         serviceNames.put( PurgeTimeline.class, "Purge Nexus Timeline" );
         serviceNames.put( SynchronizeShadowsTask.class, "Synchronize Shadow Repository" );
+        serviceNames.put( EmptyTrashTask.class, "Empty Trash" );
     }
 
     /**

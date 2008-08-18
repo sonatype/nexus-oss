@@ -1011,130 +1011,148 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
     //Now add the dynamic content
     this.serviceTypeDataStore.each(function(item, i, len){
       var items = [];
-      for(var j=0;j<item.data.properties.length;j++){
-        var curRec = item.data.properties[j];
-        //Note that each item is disabled initially, this is because the select handler for the serviceType
-        //combo box handles enabling/disabling as necessary, so each inactive card isn't also included in the form
-        if(curRec.type == 'string'){
-          items[j] = 
-          {
-            xtype: 'textfield',
-            fieldLabel: curRec.name,
-            itemCls: curRec.required ? 'required-field' : '',
-            helpText: curRec.helpText,
-            name: 'serviceProperties_' + curRec.id,
-            allowBlank:curRec.required ? false : true,
-            disabled:true,
-            width: this.COMBO_WIDTH
-          };
-        }
-        else if(curRec.type == 'number'){
-          items[j] =
-          {
-            xtype: 'numberfield',
-            fieldLabel: curRec.name,
-            itemCls: curRec.required ? 'required-field' : '',
-            helpText: curRec.helpText,
-            name: 'serviceProperties_' + curRec.id,
-            allowBlank:curRec.required ? false : true,
-            disabled:true,
-            width: this.COMBO_WIDTH
-          };
-        }
-        else if(curRec.type == 'boolean'){
-          items[j] =
-          {
-            xtype: 'checkbox',
-            fieldLabel: curRec.name,
-            helpText: curRec.helpText,
-            name: 'serviceProperties_' + curRec.id,
-            disabled:true
-          };
-        }
-        else if(curRec.type == 'date'){
-          items[j] =
-          {
-            xtype: 'datefield',
-            fieldLabel: curRec.name,
-            itemCls: curRec.required ? 'required-field' : '',
-            helpText: curRec.helpText,
-            name: 'serviceProperties_' + curRec.id,
-            allowBlank:curRec.required ? false : true,
-            disabled:true,
-            value:new Date()
-          };
-        }
-        else if(curRec.type == 'repo'){
-          items[j] =
-          {
-            xtype: 'combo',
-            fieldLabel: curRec.name,
-            itemCls: curRec.required ? 'required-field' : '',
-            helpText: curRec.helpText,
-            name: 'serviceProperties_' + curRec.id,
-            store: this.repositoryDataStore,
-            displayField:'name',
-            valueField:'id',
-            editable: false,
-            forceSelection: true,
-            mode: 'local',
-            triggerAction: 'all',
-            emptyText:'Select...',
-            selectOnFocus:true,
-            allowBlank: curRec.required ? false : true,
-            disabled: true,
-            width: this.COMBO_WIDTH,
-            minListWidth: this.COMBO_WIDTH
-          };
-        }
-        else if(curRec.type == 'group'){
-          items[j] =
-          {
-            xtype: 'combo',
-            fieldLabel: curRec.name,
-            itemCls: curRec.required ? 'required-field' : '',
-            helpText: curRec.helpText,
-            name: 'serviceProperties_' + curRec.id,
-            store: this.repositoryGroupDataStore,
-            displayField:'name',
-            valueField:'id',
-            editable: false,
-            forceSelection: true,
-            mode: 'local',
-            triggerAction: 'all',
-            emptyText:'Select...',
-            selectOnFocus:true,
-            allowBlank: curRec.required ? false : true,
-            disabled: true,
-            width: this.COMBO_WIDTH,
-            minListWidth: this.COMBO_WIDTH
-          };
-        }
-        else if(curRec.type == 'repo-or-group'){
-          items[j] =
-          {
-            xtype: 'combo',
-            fieldLabel: curRec.name,
-            itemCls: curRec.required ? 'required-field' : '',
-            helpText: curRec.helpText,
-            name: 'serviceProperties_' + curRec.id,
-            store: this.repoOrGroupDataStore,
-            displayField:'name',
-            valueField:'id',
-            editable: false,
-            forceSelection: true,
-            mode: 'local',
-            triggerAction: 'all',
-            emptyText:'Select...',
-            selectOnFocus:true,
-            allowBlank: curRec.required ? false : true,
-            disabled: true,
-            width: this.COMBO_WIDTH,
-            minListWidth: this.COMBO_WIDTH
-          };
-        }
-        
-        allItems[i + 1] = {
+      if (item.data.properties.length > 0) {
+          for(var j=0;j<item.data.properties.length;j++){
+            var curRec = item.data.properties[j];
+            //Note that each item is disabled initially, this is because the select handler for the serviceType
+            //combo box handles enabling/disabling as necessary, so each inactive card isn't also included in the form
+            if(curRec.type == 'string'){
+              items[j] = 
+              {
+                xtype: 'textfield',
+                fieldLabel: curRec.name,
+                itemCls: curRec.required ? 'required-field' : '',
+                helpText: curRec.helpText,
+                name: 'serviceProperties_' + curRec.id,
+                allowBlank:curRec.required ? false : true,
+                disabled:true,
+                width: this.COMBO_WIDTH
+              };
+            }
+            else if(curRec.type == 'number'){
+              items[j] =
+              {
+                xtype: 'numberfield',
+                fieldLabel: curRec.name,
+                itemCls: curRec.required ? 'required-field' : '',
+                helpText: curRec.helpText,
+                name: 'serviceProperties_' + curRec.id,
+                allowBlank:curRec.required ? false : true,
+                disabled:true,
+                width: this.COMBO_WIDTH
+              };
+            }
+            else if(curRec.type == 'boolean'){
+              items[j] =
+              {
+                xtype: 'checkbox',
+                fieldLabel: curRec.name,
+                helpText: curRec.helpText,
+                name: 'serviceProperties_' + curRec.id,
+                disabled:true
+              };
+            }
+            else if(curRec.type == 'date'){
+              items[j] =
+              {
+                xtype: 'datefield',
+                fieldLabel: curRec.name,
+                itemCls: curRec.required ? 'required-field' : '',
+                helpText: curRec.helpText,
+                name: 'serviceProperties_' + curRec.id,
+                allowBlank:curRec.required ? false : true,
+                disabled:true,
+                value:new Date()
+              };
+            }
+            else if(curRec.type == 'repo'){
+              items[j] =
+              {
+                xtype: 'combo',
+                fieldLabel: curRec.name,
+                itemCls: curRec.required ? 'required-field' : '',
+                helpText: curRec.helpText,
+                name: 'serviceProperties_' + curRec.id,
+                store: this.repositoryDataStore,
+                displayField:'name',
+                valueField:'id',
+                editable: false,
+                forceSelection: true,
+                mode: 'local',
+                triggerAction: 'all',
+                emptyText:'Select...',
+                selectOnFocus:true,
+                allowBlank: curRec.required ? false : true,
+                disabled: true,
+                width: this.COMBO_WIDTH,
+                minListWidth: this.COMBO_WIDTH
+              };
+            }
+            else if(curRec.type == 'group'){
+              items[j] =
+              {
+                xtype: 'combo',
+                fieldLabel: curRec.name,
+                itemCls: curRec.required ? 'required-field' : '',
+                helpText: curRec.helpText,
+                name: 'serviceProperties_' + curRec.id,
+                store: this.repositoryGroupDataStore,
+                displayField:'name',
+                valueField:'id',
+                editable: false,
+                forceSelection: true,
+                mode: 'local',
+                triggerAction: 'all',
+                emptyText:'Select...',
+                selectOnFocus:true,
+                allowBlank: curRec.required ? false : true,
+                disabled: true,
+                width: this.COMBO_WIDTH,
+                minListWidth: this.COMBO_WIDTH
+              };
+            }
+            else if(curRec.type == 'repo-or-group'){
+              items[j] =
+              {
+                xtype: 'combo',
+                fieldLabel: curRec.name,
+                itemCls: curRec.required ? 'required-field' : '',
+                helpText: curRec.helpText,
+                name: 'serviceProperties_' + curRec.id,
+                store: this.repoOrGroupDataStore,
+                displayField:'name',
+                valueField:'id',
+                editable: false,
+                forceSelection: true,
+                mode: 'local',
+                triggerAction: 'all',
+                emptyText:'Select...',
+                selectOnFocus:true,
+                allowBlank: curRec.required ? false : true,
+                disabled: true,
+                width: this.COMBO_WIDTH,
+                minListWidth: this.COMBO_WIDTH
+              };
+            }
+            
+            allItems[allItems.length] = {
+              xtype:'fieldset',
+              id:id + '_' + item.data.id,
+              checkboxToggle:false,
+              title: 'Task Settings',
+              anchor: Sonatype.view.FIELDSET_OFFSET,
+              collapsible: false,
+              autoHeight:true,
+              labelWidth: 175,
+              layoutConfig: {
+                labelSeparator: ''
+              },
+              items:items
+            };
+          }
+      }  
+      else {
+        allItems[allItems.length] = {
           xtype:'fieldset',
           id:id + '_' + item.data.id,
           checkboxToggle:false,
@@ -1145,10 +1163,9 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
           labelWidth: 175,
           layoutConfig: {
             labelSeparator: ''
-          },
-          items:items
+          }
         };
-      }  
+      }
     }, this);
     
     return allItems;
@@ -1619,9 +1636,11 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
       serviceTypePanel.items.each(function(item,i,len){
         if (item.id == id + '_' + rec.data.typeId){
           serviceTypePanel.activeItem = i;
-          item.items.each(function(item){
-            item.disabled=false;
-          });
+          if (item.items){
+            item.items.each(function(item){
+              item.disabled=false;
+            });
+          }
         }
       });
             
