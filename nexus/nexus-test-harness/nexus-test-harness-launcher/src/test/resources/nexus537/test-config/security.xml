@@ -126,7 +126,7 @@
       <groupId></groupId>
       <id>T3</id>
       <name>All M2 Repositories - (update)</name>
-      <method>update</method>
+      <method>update,read</method>
     </repositoryTargetPrivilege>
     <repositoryTargetPrivilege>
       <repositoryTargetId>2</repositoryTargetId>
@@ -134,7 +134,7 @@
       <groupId></groupId>
       <id>T4</id>
       <name>All M1 Repositories - (update)</name>
-      <method>update</method>
+      <method>update,read</method>
     </repositoryTargetPrivilege>
     <repositoryTargetPrivilege>
       <repositoryTargetId>1</repositoryTargetId>
@@ -142,7 +142,7 @@
       <groupId></groupId>
       <id>T5</id>
       <name>All M2 Repositories - (create)</name>
-      <method>create</method>
+      <method>create,read</method>
     </repositoryTargetPrivilege>
     <repositoryTargetPrivilege>
       <repositoryTargetId>2</repositoryTargetId>
@@ -150,7 +150,7 @@
       <groupId></groupId>
       <id>T6</id>
       <name>All M1 Repositories - (create)</name>
-      <method>create</method>
+      <method>create,read</method>
     </repositoryTargetPrivilege>
     <repositoryTargetPrivilege>
       <repositoryTargetId>1</repositoryTargetId>
@@ -158,7 +158,7 @@
       <groupId></groupId>
       <id>T7</id>
       <name>All M2 Repositories - (delete)</name>
-      <method>delete</method>
+      <method>delete,read</method>
     </repositoryTargetPrivilege>
     <repositoryTargetPrivilege>
       <repositoryTargetId>2</repositoryTargetId>
@@ -166,7 +166,7 @@
       <groupId></groupId>
       <id>T8</id>
       <name>All M1 Repositories - (delete)</name>
-      <method>delete</method>
+      <method>delete,read</method>
     </repositoryTargetPrivilege>
   </repositoryTargetPrivileges>
   <applicationPrivileges>
@@ -198,13 +198,13 @@
       <permission>nexus:settings</permission>
       <id>4</id>
       <name>Server Settings - (update)</name>
-      <method>update</method>
+      <method>update,read</method>
     </applicationPrivilege>
     <applicationPrivilege>
       <permission>nexus:repositories</permission>
       <id>5</id>
       <name>Repositories - (create)</name>
-      <method>create</method>
+      <method>create,read</method>
     </applicationPrivilege>
     <applicationPrivilege>
       <permission>nexus:repositories</permission>
@@ -216,19 +216,19 @@
       <permission>nexus:repositories</permission>
       <id>7</id>
       <name>Repositories - (update)</name>
-      <method>update</method>
+      <method>update,read</method>
     </applicationPrivilege>
     <applicationPrivilege>
       <permission>nexus:repositories</permission>
       <id>8</id>
       <name>Repositories - (delete)</name>
-      <method>delete</method>
+      <method>delete,read</method>
     </applicationPrivilege>
     <applicationPrivilege>
       <permission>nexus:repotemplates</permission>
       <id>9</id>
       <name>Repository Templates - (create)</name>
-      <method>create</method>
+      <method>create,read</method>
     </applicationPrivilege>
     <applicationPrivilege>
       <permission>nexus:repotemplates</permission>
@@ -240,19 +240,19 @@
       <permission>nexus:repotemplates</permission>
       <id>11</id>
       <name>Repository Templates - (update)</name>
-      <method>update</method>
+      <method>update,read</method>
     </applicationPrivilege>
     <applicationPrivilege>
       <permission>nexus:repotemplates</permission>
       <id>12</id>
       <name>Repository Templates - (delete)</name>
-      <method>delete</method>
+      <method>delete,read</method>
     </applicationPrivilege>
     <applicationPrivilege>
       <permission>nexus:repogroups</permission>
       <id>13</id>
       <name>Repository Groups - (create)</name>
-      <method>create</method>
+      <method>create,read</method>
     </applicationPrivilege>
     <applicationPrivilege>
       <permission>nexus:repogroups</permission>
@@ -264,13 +264,13 @@
       <permission>nexus:repogroups</permission>
       <id>15</id>
       <name>Repository Groups - (update)</name>
-      <method>update</method>
+      <method>update,read</method>
     </applicationPrivilege>
     <applicationPrivilege>
       <permission>nexus:repogroups</permission>
       <id>16</id>
       <name>Repository Groups - (delete)</name>
-      <method>delete</method>
+      <method>delete,read</method>
     </applicationPrivilege>
     <applicationPrivilege>
       <permission>nexus:index</permission>
@@ -282,7 +282,7 @@
       <permission>nexus:index</permission>
       <id>18</id>
       <name>Reindex</name>
-      <method>delete</method>
+      <method>delete,read</method>
     </applicationPrivilege>
     <applicationPrivilege>
       <permission>nexus:identify</permission>
@@ -294,19 +294,19 @@
       <permission>nexus:attributes</permission>
       <id>20</id>
       <name>Rebuild Repository Attributes</name>
-      <method>delete</method>
+      <method>delete,read</method>
     </applicationPrivilege>
     <applicationPrivilege>
       <permission>nexus:cache</permission>
       <id>21</id>
       <name>Clear Repository Cache</name>
-      <method>delete</method>
+      <method>delete,read</method>
     </applicationPrivilege>
     <applicationPrivilege>
       <permission>nexus:routes</permission>
       <id>22</id>
       <name>Repository Routes - (create)</name>
-      <method>create</method>
+      <method>create,read</method>
     </applicationPrivilege>
     <applicationPrivilege>
       <permission>nexus:routes</permission>
@@ -318,19 +318,19 @@
       <permission>nexus:routes</permission>
       <id>24</id>
       <name>Repository Routes - (update)</name>
-      <method>update</method>
+      <method>update,read</method>
     </applicationPrivilege>
     <applicationPrivilege>
       <permission>nexus:routes</permission>
       <id>25</id>
       <name>Repository Routes - (delete)</name>
-      <method>delete</method>
+      <method>delete,read</method>
     </applicationPrivilege>
     <applicationPrivilege>
       <permission>nexus:tasks</permission>
       <id>26</id>
       <name>Scheduled Tasks - (create)</name>
-      <method>create</method>
+      <method>create,read</method>
     </applicationPrivilege>
     <applicationPrivilege>
       <permission>nexus:tasks</permission>
@@ -342,19 +342,19 @@
       <permission>nexus:tasks</permission>
       <id>28</id>
       <name>Scheduled Tasks - (update)</name>
-      <method>update</method>
+      <method>update,read</method>
     </applicationPrivilege>
     <applicationPrivilege>
       <permission>nexus:tasks</permission>
       <id>29</id>
       <name>Scheduled Tasks - (delete)</name>
-      <method>delete</method>
+      <method>delete,read</method>
     </applicationPrivilege>
     <applicationPrivilege>
       <permission>nexus:privileges</permission>
       <id>30</id>
       <name>User Privileges - (create)</name>
-      <method>create</method>
+      <method>create,read</method>
     </applicationPrivilege>
     <applicationPrivilege>
       <permission>nexus:privileges</permission>
@@ -366,19 +366,19 @@
       <permission>nexus:privileges</permission>
       <id>32</id>
       <name>User Privileges - (update)</name>
-      <method>update</method>
+      <method>update,read</method>
     </applicationPrivilege>
     <applicationPrivilege>
       <permission>nexus:privileges</permission>
       <id>33</id>
       <name>User Privileges - (delete)</name>
-      <method>delete</method>
+      <method>delete,read</method>
     </applicationPrivilege>
     <applicationPrivilege>
       <permission>nexus:roles</permission>
       <id>34</id>
       <name>User Roles - (create)</name>
-      <method>create</method>
+      <method>create,read</method>
     </applicationPrivilege>
     <applicationPrivilege>
       <permission>nexus:roles</permission>
@@ -390,19 +390,19 @@
       <permission>nexus:roles</permission>
       <id>36</id>
       <name>User Roles - (update)</name>
-      <method>update</method>
+      <method>update,read</method>
     </applicationPrivilege>
     <applicationPrivilege>
       <permission>nexus:roles</permission>
       <id>37</id>
       <name>User Roles - (delete)</name>
-      <method>delete</method>
+      <method>delete,read</method>
     </applicationPrivilege>
     <applicationPrivilege>
       <permission>nexus:users</permission>
       <id>38</id>
       <name>Users - (create)</name>
-      <method>create</method>
+      <method>create,read</method>
     </applicationPrivilege>
     <applicationPrivilege>
       <permission>nexus:users</permission>
@@ -414,13 +414,13 @@
       <permission>nexus:users</permission>
       <id>40</id>
       <name>Users - (update)</name>
-      <method>update</method>
+      <method>update,read</method>
     </applicationPrivilege>
     <applicationPrivilege>
       <permission>nexus:users</permission>
       <id>41</id>
       <name>Users - (delete)</name>
-      <method>delete</method>
+      <method>delete,read</method>
     </applicationPrivilege>
     <applicationPrivilege>
       <permission>nexus:logs</permission>
@@ -444,7 +444,7 @@
       <permission>nexus:targets</permission>
       <id>45</id>
       <name>Repository Targets - (create)</name>
-      <method>create</method>
+      <method>create,read</method>
     </applicationPrivilege>
     <applicationPrivilege>
       <permission>nexus:targets</permission>
@@ -456,19 +456,19 @@
       <permission>nexus:targets</permission>
       <id>47</id>
       <name>Repository Targets - (update)</name>
-      <method>update</method>
+      <method>update,read</method>
     </applicationPrivilege>
     <applicationPrivilege>
       <permission>nexus:targets</permission>
       <id>48</id>
       <name>Repository Targets - (delete)</name>
-      <method>delete</method>
+      <method>delete,read</method>
     </applicationPrivilege>
     <applicationPrivilege>
       <permission>nexus:status</permission>
       <id>49</id>
       <name>Server Status - (update)</name>
-      <method>update</method>
+      <method>update,read</method>
     </applicationPrivilege>
     <applicationPrivilege>
       <permission>nexus:wastebasket</permission>
@@ -480,7 +480,7 @@
       <permission>nexus:wastebasket</permission>
       <id>51</id>
       <name>Wastebasket - (delete)</name>
-      <method>delete</method>
+      <method>delete,read</method>
     </applicationPrivilege>
     <applicationPrivilege>
       <permission>nexus:artifact</permission>
@@ -504,37 +504,37 @@
       <permission>nexus:usersforgotpw</permission>
       <id>57</id>
       <name>User Forgot Password - (create)</name>
-      <method>create</method>
+      <method>create,read</method>
     </applicationPrivilege>
     <applicationPrivilege>
       <permission>nexus:usersforgotid</permission>
       <id>58</id>
       <name>User Forgot User Id - (create)</name>
-      <method>create</method>
+      <method>create,read</method>
     </applicationPrivilege>
     <applicationPrivilege>
       <permission>nexus:usersreset</permission>
       <id>59</id>
       <name>User Reset Password - (delete)</name>
-      <method>delete</method>
+      <method>delete,read</method>
     </applicationPrivilege>
     <applicationPrivilege>
       <permission>nexus:userschangepw</permission>
       <id>64</id>
       <name>User Change Password - (create)</name>
-      <method>create</method>
+      <method>create,read</method>
     </applicationPrivilege>
     <applicationPrivilege>
       <permission>nexus:artifact</permission>
       <id>65</id>
       <name>Artifact Upload</name>
-      <method>create</method>
+      <method>create,read</method>
     </applicationPrivilege>
     <applicationPrivilege>
       <permission>nexus:command</permission>
       <id>66</id>
       <name>Nexus Remote Control</name>
-      <method>update</method>
+      <method>update,read</method>
     </applicationPrivilege>
     <applicationPrivilege>
       <permission>nexus:repometa</permission>

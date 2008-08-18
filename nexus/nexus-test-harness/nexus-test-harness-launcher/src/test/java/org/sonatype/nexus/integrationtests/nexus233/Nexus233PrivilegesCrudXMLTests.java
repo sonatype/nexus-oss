@@ -87,7 +87,7 @@ public class Nexus233PrivilegesCrudXMLTests
         // make sure the id != null
         Assert.assertNotNull( statusResources.get( 0 ).getId() );
 
-        Assert.assertEquals( statusResources.get( 0 ).getMethod(), "create" );
+        Assert.assertEquals( statusResources.get( 0 ).getMethod(), "create,read" );
         Assert.assertEquals( statusResources.get( 0 ).getName(), "createCreateMethodTest - (create)" ); // ' - (read)'
         // is
         // automatically added
@@ -120,7 +120,7 @@ public class Nexus233PrivilegesCrudXMLTests
         // make sure the id != null
         Assert.assertNotNull( statusResources.get( 0 ).getId() );
 
-        Assert.assertEquals( statusResources.get( 0 ).getMethod(), "update" );
+        Assert.assertEquals( statusResources.get( 0 ).getMethod(), "update,read" );
         Assert.assertEquals( statusResources.get( 0 ).getName(), "createUpdateMethodTest - (update)" ); // ' - (read)'
         // is
         // automatically added
@@ -153,7 +153,7 @@ public class Nexus233PrivilegesCrudXMLTests
         // make sure the id != null
         Assert.assertNotNull( statusResources.get( 0 ).getId() );
 
-        Assert.assertEquals( statusResources.get( 0 ).getMethod(), "delete" );
+        Assert.assertEquals( statusResources.get( 0 ).getMethod(), "delete,read" );
         Assert.assertEquals( statusResources.get( 0 ).getName(), "createDeleteMethodTest - (delete)" ); // ' - (read)'
         // is
         // automatically added
@@ -187,10 +187,10 @@ public class Nexus233PrivilegesCrudXMLTests
         Assert.assertTrue( statusResources.size() == 4 );
 
         PrivilegeTargetStatusResource createPriv =
-            (PrivilegeTargetStatusResource) this.getPrivilegeByMethod( "create", statusResources );
+            (PrivilegeTargetStatusResource) this.getPrivilegeByMethod( "create,read", statusResources );
         // make sure the id != null
         Assert.assertNotNull( createPriv.getId() );
-        Assert.assertEquals( createPriv.getMethod(), "create" );
+        Assert.assertEquals( createPriv.getMethod(), "create,read" );
         Assert.assertEquals( createPriv.getName(), "createAllMethodTest - (create)" );
         Assert.assertEquals( createPriv.getType(), "repositoryTarget" );
         Assert.assertEquals( createPriv.getRepositoryTargetId(), "testTarget" );
@@ -205,19 +205,19 @@ public class Nexus233PrivilegesCrudXMLTests
         Assert.assertEquals( readPriv.getRepositoryTargetId(), "testTarget" );
 
         PrivilegeTargetStatusResource updatePriv =
-            (PrivilegeTargetStatusResource) this.getPrivilegeByMethod( "update", statusResources );
+            (PrivilegeTargetStatusResource) this.getPrivilegeByMethod( "update,read", statusResources );
         // make sure the id != null
         Assert.assertNotNull( updatePriv.getId() );
-        Assert.assertEquals( updatePriv.getMethod(), "update" );
+        Assert.assertEquals( updatePriv.getMethod(), "update,read" );
         Assert.assertEquals( updatePriv.getName(), "createAllMethodTest - (update)" );
         Assert.assertEquals( updatePriv.getType(), "repositoryTarget" );
         Assert.assertEquals( updatePriv.getRepositoryTargetId(), "testTarget" );
 
         PrivilegeTargetStatusResource deletePriv =
-            (PrivilegeTargetStatusResource) this.getPrivilegeByMethod( "delete", statusResources );
+            (PrivilegeTargetStatusResource) this.getPrivilegeByMethod( "delete,read", statusResources );
         // make sure the id != null
         Assert.assertNotNull( deletePriv.getId() );
-        Assert.assertEquals( deletePriv.getMethod(), "delete" );
+        Assert.assertEquals( deletePriv.getMethod(), "delete,read" );
         Assert.assertEquals( deletePriv.getName(), "createAllMethodTest - (delete)" );
         Assert.assertEquals( deletePriv.getType(), "repositoryTarget" );
         Assert.assertEquals( deletePriv.getRepositoryTargetId(), "testTarget" );

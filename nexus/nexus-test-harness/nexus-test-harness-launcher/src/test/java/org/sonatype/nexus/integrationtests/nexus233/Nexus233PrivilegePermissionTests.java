@@ -1,8 +1,6 @@
 package org.sonatype.nexus.integrationtests.nexus233;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 import junit.framework.Assert;
 
@@ -13,7 +11,6 @@ import org.sonatype.nexus.integrationtests.AbstractPrivilegeTest;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.rest.model.PrivilegeBaseStatusResource;
 import org.sonatype.nexus.rest.model.PrivilegeTargetResource;
-import org.sonatype.nexus.rest.model.RepositoryTargetResource;
 
 public class Nexus233PrivilegePermissionTests
     extends AbstractPrivilegeTest
@@ -50,9 +47,9 @@ public class Nexus233PrivilegePermissionTests
         Assert.assertEquals( "Response status: ", 200, response.getStatus().getCode() );
         PrivilegeBaseStatusResource responsePrivilege = this.privUtil.getResourceFromResponse( response );
 
-        // read should fail
+        // read should succeed (inherited by create)
         response = this.privUtil.sendMessage( Method.GET, null, responsePrivilege.getId() );
-        Assert.assertEquals( "Response status: ", 401, response.getStatus().getCode() );
+        Assert.assertEquals( "Response status: ", 200, response.getStatus().getCode() );
 
         // update should fail
         response = this.privUtil.sendMessage( Method.PUT, privilege, responsePrivilege.getId() );
@@ -155,9 +152,9 @@ public class Nexus233PrivilegePermissionTests
         response = this.privUtil.sendMessage( Method.PUT, privilege, responsePrivilege.getId() );
         Assert.assertEquals( "Response status: ", 401, response.getStatus().getCode() );
 
-        // read should fail
+        // read should succeed (inherited by delete)
         response = this.privUtil.sendMessage( Method.GET, null, responsePrivilege.getId() );
-        Assert.assertEquals( "Response status: ", 401, response.getStatus().getCode() );
+        Assert.assertEquals( "Response status: ", 200, response.getStatus().getCode() );
 
         // update should fail
         response = this.privUtil.sendMessage( Method.POST, privilege );
@@ -168,5 +165,4 @@ public class Nexus233PrivilegePermissionTests
         Assert.assertEquals( "Response status: ", 200, response.getStatus().getCode() );
 
     }
-
 }

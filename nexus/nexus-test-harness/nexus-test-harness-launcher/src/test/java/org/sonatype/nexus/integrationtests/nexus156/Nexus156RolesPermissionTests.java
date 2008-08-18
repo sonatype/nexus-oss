@@ -46,10 +46,11 @@ public class Nexus156RolesPermissionTests extends AbstractPrivilegeTest
         response = this.roleUtil.sendMessage( Method.POST, role );
         Assert.assertEquals( "Response status: ", 200, response.getStatus().getCode() );
         
-
-        // read should fail
+        role = this.roleUtil.getResourceFromResponse( response );
+        
+        // read should succeed (inherited)
         response = this.roleUtil.sendMessage( Method.GET, role );
-        Assert.assertEquals( "Response status: ", 401, response.getStatus().getCode() );
+        Assert.assertEquals( "Response status: ", 200, response.getStatus().getCode() );
         
         // update should fail
         response = this.roleUtil.sendMessage( Method.PUT, role );
@@ -104,9 +105,9 @@ public class Nexus156RolesPermissionTests extends AbstractPrivilegeTest
         response = this.roleUtil.sendMessage( Method.PUT, role );
         Assert.assertEquals( "Response status: ", 200, response.getStatus().getCode() );
 
-        // read should fail
+        // read should succeed (inherited)
         response = this.roleUtil.sendMessage( Method.GET, role );
-        Assert.assertEquals( "Response status: ", 401, response.getStatus().getCode() );
+        Assert.assertEquals( "Response status: ", 200, response.getStatus().getCode() );
         
         // update should fail
         response = this.roleUtil.sendMessage( Method.POST, role );
@@ -215,9 +216,9 @@ public class Nexus156RolesPermissionTests extends AbstractPrivilegeTest
         response = this.roleUtil.sendMessage( Method.PUT, role );
         Assert.assertEquals( "Response status: ", 401, response.getStatus().getCode() );
 
-        // read should fail
+        // read should succeed (inherited)
         response = this.roleUtil.sendMessage( Method.GET, role );
-        Assert.assertEquals( "Response status: ", 401, response.getStatus().getCode() );
+        Assert.assertEquals( "Response status: ", 200, response.getStatus().getCode() );
         
         // update should fail
         response = this.roleUtil.sendMessage( Method.POST, role );

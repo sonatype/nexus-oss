@@ -44,9 +44,9 @@ public class Nexus133TargetPermissionTests
         Assert.assertEquals( "Response status: ", 200, response.getStatus().getCode() );
         target = this.targetUtil.getResourceFromResponse( response );
 
-        // read should fail
+        // read should succeed (inherited)
         response = this.targetUtil.sendMessage( Method.GET, target );
-        Assert.assertEquals( "Response status: ", 401, response.getStatus().getCode() );
+        Assert.assertEquals( "Response status: ", 200, response.getStatus().getCode() );
 
         // update should fail
         response = this.targetUtil.sendMessage( Method.PUT, target );
@@ -95,9 +95,9 @@ public class Nexus133TargetPermissionTests
         response = this.targetUtil.sendMessage( Method.PUT, target );
         Assert.assertEquals( "Response status: ", 200, response.getStatus().getCode() );
 
-        // read should fail
+        // read should succeed (inherited)
         response = this.targetUtil.sendMessage( Method.GET, target );
-        Assert.assertEquals( "Response status: ", 401, response.getStatus().getCode() );
+        Assert.assertEquals( "Response status: ", 200, response.getStatus().getCode() );
 
         // update should fail
         response = this.targetUtil.sendMessage( Method.POST, target );
@@ -194,9 +194,9 @@ public class Nexus133TargetPermissionTests
         TestContainer.getInstance().getTestContext().setUsername( "test-user" );
         TestContainer.getInstance().getTestContext().setPassword( "admin123" );
 
-        // read should fail
+        // read should succeed (inherited)
         response = this.targetUtil.sendMessage( Method.GET, target );
-        Assert.assertEquals( "Response status: ", 401, response.getStatus().getCode() );
+        Assert.assertEquals( "Response status: ", 200, response.getStatus().getCode() );
 
         // update should fail
         response = this.targetUtil.sendMessage( Method.POST, target );

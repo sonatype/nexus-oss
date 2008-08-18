@@ -51,9 +51,9 @@ public class Nexus142UserPermissionTests
         response = this.userUtil.sendMessage( Method.POST, user );
         Assert.assertEquals( "Response status: ", 200, response.getStatus().getCode() );
 
-        // read should fail
+        // read should succeed (inherited)
         response = this.userUtil.sendMessage( Method.GET, user );
-        Assert.assertEquals( "Response status: ", 401, response.getStatus().getCode() );
+        Assert.assertEquals( "Response status: ", 200, response.getStatus().getCode() );
 
         // update should fail
         response = this.userUtil.sendMessage( Method.PUT, user );
@@ -108,9 +108,9 @@ public class Nexus142UserPermissionTests
         response = this.userUtil.sendMessage( Method.PUT, user );
         Assert.assertEquals( "Response status: ", 200, response.getStatus().getCode() );
 
-        // read should fail
+        // read should succeed (inherited)
         response = this.userUtil.sendMessage( Method.GET, user );
-        Assert.assertEquals( "Response status: ", 401, response.getStatus().getCode() );
+        Assert.assertEquals( "Response status: ", 200, response.getStatus().getCode() );
 
         // update should fail
         response = this.userUtil.sendMessage( Method.POST, user );
@@ -219,9 +219,9 @@ public class Nexus142UserPermissionTests
         response = this.userUtil.sendMessage( Method.PUT, user );
         Assert.assertEquals( "Response status: ", 401, response.getStatus().getCode() );
 
-        // read should fail
+        // read should succeed (inherited)
         response = this.userUtil.sendMessage( Method.GET, user );
-        Assert.assertEquals( "Response status: ", 401, response.getStatus().getCode() );
+        Assert.assertEquals( "Response status: ", 200, response.getStatus().getCode() );
 
         // update should fail
         response = this.userUtil.sendMessage( Method.POST, user );

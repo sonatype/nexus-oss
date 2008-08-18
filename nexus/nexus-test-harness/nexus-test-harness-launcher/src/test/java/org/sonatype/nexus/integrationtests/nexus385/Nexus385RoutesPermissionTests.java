@@ -47,9 +47,9 @@ public class Nexus385RoutesPermissionTests extends AbstractPrivilegeTest
         Assert.assertEquals( "Response status: ", 200, response.getStatus().getCode() );
         route = this.routeUtil.getResourceFromResponse( response );
 
-        // read should fail
+        // read should succeed (inherited)
         response = this.routeUtil.sendMessage( Method.GET, route );
-        Assert.assertEquals( "Response status: ", 401, response.getStatus().getCode() );
+        Assert.assertEquals( "Response status: ", 200, response.getStatus().getCode() );
         
         // update should fail
         response = this.routeUtil.sendMessage( Method.PUT, route );
@@ -103,9 +103,9 @@ public class Nexus385RoutesPermissionTests extends AbstractPrivilegeTest
         response = this.routeUtil.sendMessage( Method.PUT, route );
         Assert.assertEquals( "Response status: ", 200, response.getStatus().getCode() );
 
-        // read should fail
+        // read should succeed (inherited)
         response = this.routeUtil.sendMessage( Method.GET, route );
-        Assert.assertEquals( "Response status: ", 401, response.getStatus().getCode() );
+        Assert.assertEquals( "Response status: ", 200, response.getStatus().getCode() );
         
         // update should fail
         response = this.routeUtil.sendMessage( Method.POST, route );
@@ -212,9 +212,9 @@ public class Nexus385RoutesPermissionTests extends AbstractPrivilegeTest
         response = this.routeUtil.sendMessage( Method.PUT, route );
         Assert.assertEquals( "Response status: ", 401, response.getStatus().getCode() );
 
-        // read should fail
+        // read should succeed (inherited)
         response = this.routeUtil.sendMessage( Method.GET, route );
-        Assert.assertEquals( "Response status: ", 401, response.getStatus().getCode() );
+        Assert.assertEquals( "Response status: ", 200, response.getStatus().getCode() );
         
         // update should fail
         response = this.routeUtil.sendMessage( Method.POST, route );

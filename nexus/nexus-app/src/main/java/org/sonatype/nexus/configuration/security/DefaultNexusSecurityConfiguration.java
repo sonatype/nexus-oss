@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.codehaus.plexus.logging.AbstractLogEnabled;
@@ -117,6 +118,11 @@ public class DefaultNexusSecurityConfiguration
      * @plexus.requirement
      */
     private SecurityRuntimeConfigurationBuilder runtimeConfigurationBuilder;
+    
+    /**
+     * @plexus.requirement
+     */
+    private PrivilegeInheritanceManager privInheritance;
 
     /** The config event listeners. */
     private CopyOnWriteArrayList<ConfigurationChangeListener> configurationChangeListeners = new CopyOnWriteArrayList<ConfigurationChangeListener>();
@@ -581,7 +587,9 @@ public class DefaultNexusSecurityConfiguration
     public void createApplicationPrivilege( CApplicationPrivilege settings )
         throws ConfigurationException,
             IOException
-    {
+    {        
+        addInheritedPrivileges( settings );
+        
         ValidationResponse vr = configurationValidator.validateApplicationPrivilege(
             initializeContext(),
             settings,
@@ -768,6 +776,8 @@ public class DefaultNexusSecurityConfiguration
         throws ConfigurationException,
             IOException
     {
+        addInheritedPrivileges( settings );
+        
         ValidationResponse vr = configurationValidator.validateRepoTargetPrivilege(
             initializeContext(),
             settings,
@@ -785,6 +795,25 @@ public class DefaultNexusSecurityConfiguration
         else
         {
             throw new InvalidConfigurationException( vr );
+        }
+    }
+    
+    private void addInheritedPrivileges( CPrivilege settings )
+    {
+        Set<String> inheritedMethods = privInheritance.getInheritedMethods( settings.getMethod() );
+        
+        StringBuffer buf = new StringBuffer();
+        
+        for ( String method : inheritedMethods )
+        {
+            buf.append( method );
+            buf.append( "," );
+        }
+        
+        if ( buf.length() > 0 )
+        {
+            buf.setLength( buf.length() - 1 );
+            settings.setMethod( buf.toString() );
         }
     }
 
