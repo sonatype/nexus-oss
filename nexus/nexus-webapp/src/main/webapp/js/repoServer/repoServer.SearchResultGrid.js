@@ -253,17 +253,18 @@ Ext.extend(Sonatype.repoServer.SearchResultGrid, Ext.grid.GridPanel, {
   },
 
   formatJarLink: function(value, p, record, rowIndex, colIndex, store) {
-    var link = Sonatype.config.repos.urls.redirect +
+    var url = Sonatype.config.repos.urls.redirect +
       '?r=' + record.get('repoId') +
       '&g=' + record.get('groupId') +
       '&a=' + record.get('artifactId') +
       '&v=' + record.get('version');
+
     var c = record.get('classifier');
-    if ( c ) {
-      link += '&c=' + c;
-    }
-      
-    return String.format('<a target="_blank" href="{0}">Download</a>', link);
+
+    var template = '<a target="_blank" href="{0}">[{1}]</a>';
+
+    return c ? String.format(template, url + '&c=' + c, c) :
+      String.format(template, url, 'jar') + ' ' + String.format(template, url + '&p=pom', 'pom');
   },
   
   formatPomLink: function(value, p, record, rowIndex, colIndex, store) {
