@@ -67,7 +67,11 @@ public class NexusHttpAuthenticationFilter
     protected boolean onAccessDenied( ServletRequest request, ServletResponse response )
     {
         // this will be true if cookie is sent with request and it is valid
-        boolean loggedIn = getSubject( request, response ).getPrincipal() != null;
+        Subject subject = getSubject( request, response );
+
+        // NEXUS-607: fix for cookies, when sent from client. They will expire once
+        // and we are not sending them anymore.
+        boolean loggedIn = subject.isAuthenticated();
 
         if ( loggedIn )
         {
@@ -115,7 +119,10 @@ public class NexusHttpAuthenticationFilter
         if ( request.getAttribute( ANONYMOUS_LOGIN ) == null )
         {
             // it is not an anonymous login
-            return true;
+            // return true;
+            // NEXUS-607: fix for cookies, when sent from client. They will expire once
+            // and we are not sending them anymore.
+            return false;
         }
         else
         {
