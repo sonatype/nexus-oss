@@ -36,8 +36,6 @@ import org.jsecurity.authc.AuthenticationException;
 import org.jsecurity.authc.AuthenticationInfo;
 import org.jsecurity.authc.AuthenticationToken;
 import org.jsecurity.authc.DisabledAccountException;
-import org.jsecurity.authc.ExpiredCredentialsException;
-import org.jsecurity.authc.LockedAccountException;
 import org.jsecurity.authc.SimpleAuthenticationInfo;
 import org.jsecurity.authc.UnknownAccountException;
 import org.jsecurity.authc.UsernamePasswordToken;
@@ -58,7 +56,6 @@ import org.sonatype.nexus.configuration.security.model.CRole;
 import org.sonatype.nexus.configuration.security.model.CUser;
 import org.sonatype.nexus.proxy.NoSuchRepositoryGroupException;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.smtp.SmtpClient;
 
 /**
  * The NexusRealm for JSecurity.
@@ -83,13 +80,6 @@ public class NexusRealm
      * @plexus.requirement
      */
     private Nexus nexus;
-
-    /**
-     * The smtp client for sending mails.
-     * 
-     * @plexus.requirement
-     */
-    private SmtpClient smtpClient;
 
     public NexusRealm()
     {
@@ -177,45 +167,6 @@ public class NexusRealm
             {
                 throw new DisabledAccountException( "Account for user ['" + username + "'] is disabled!" );
             }
-            //Not currently supported
-            /*else if ( CUser.STATUS_EXPIRED.equals( user.getStatus() ) )
-            {
-                if ( getCredentialsMatcher().doCredentialsMatch( token, authenticationInfo ) )
-                {
-                    throw new ExpiredCredentialsException( "Credentials for user['" + username + "'] has expired!" );
-                }
-                else
-                {
-                    // not throwing ExpiredCredentialsException to prevent phishing
-                    throw new AccountException( "Credentials for user['" + username
-                        + "'] has expired and is accessed with wrong credentials!" );
-                }
-            }
-            else if ( CUser.STATUS_LOCKED.equals( user.getStatus() ) )
-            {
-                if ( getCredentialsMatcher().doCredentialsMatch( token, authenticationInfo ) )
-                {
-                    if ( !StringUtils.isEmpty( user.getEmail() ) )
-                    {
-                        smtpClient
-                            .sendEmailAsync(
-                                user.getEmail(),
-                                null,
-                                "Nexus: Account for user '" + user.getUserId() + "' is locked",
-                                "User Account "
-                                    + user.getUserId()
-                                    + " has been locked. Please contact your Nexus Administrator for further steps. Thank you!" );
-                    }
-
-                    throw new LockedAccountException( "Account for user ['" + username + "'] is locked!" );
-                }
-                else
-                {
-                    // not throwing ExpiredCredentialsException to prevent phishing
-                    throw new AccountException( "Account for user ['" + username
-                        + "'] is locked and is accessed with wrong credentials!" );
-                }
-            }*/
             else
             {
                 throw new AccountException( "Account is in illegal status=['" + user.getStatus() + "']" );
