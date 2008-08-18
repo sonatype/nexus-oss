@@ -602,6 +602,13 @@ Ext.extend(Sonatype.repoServer.PrivilegeEditPanel, Ext.Panel, {
     var id = 'new_item_' + new Date().getTime();
 
     var config = Ext.apply({}, this.formConfig, {id:id});
+
+    var targets = new Array();
+    for ( var i = 0; i < this.repoTargetDataStore.getCount(); i++ ) {
+      var t = this.repoTargetDataStore.getAt(i);
+      targets[targets.length] = [t.get('id'), t.get('name'), t.get('contentClass')];
+    }
+    config.items[5].store = new Ext.data.SimpleStore({fields:['id','name','contentClass'], data:targets});
     
     config = this.initializeTreeRoots(id, config);
     
@@ -956,6 +963,13 @@ Ext.extend(Sonatype.repoServer.PrivilegeEditPanel, Ext.Panel, {
   },
   
   repositorySelectHandler : function(combo, record, index){
-    var a = 0;
+    var targetCombo = this.find('name', 'repositoryTargetId')[0];
+    targetCombo.setRawValue(null);
+    targetCombo.store.clearFilter();
+
+    var filterValue = record.get('format');
+    if ( filterValue ) {
+      targetCombo.store.filter('contentClass', filterValue);
+    }
   }
 });
