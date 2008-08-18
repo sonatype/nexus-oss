@@ -285,6 +285,7 @@ Sonatype.repoServer.ServerEditPanel = function(config){
         items: [
           {
             xtype: 'textfield',
+            itemCls: 'required-field',
             fieldLabel: 'Base URL',
             helpText: ht.baseUrl,
             name: 'baseUrl',
