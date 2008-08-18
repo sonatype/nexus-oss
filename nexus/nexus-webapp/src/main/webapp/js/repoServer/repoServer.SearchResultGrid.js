@@ -121,7 +121,7 @@ Sonatype.repoServer.SearchResultGrid = function(config) {
       sortable:true
     },{
       id: 'jar',
-      header: "Link",
+      header: "Download",
       dataIndex: 'resourceURI',
       width: 65,
       sortable:false,
@@ -253,7 +253,17 @@ Ext.extend(Sonatype.repoServer.SearchResultGrid, Ext.grid.GridPanel, {
   },
 
   formatJarLink: function(value, p, record, rowIndex, colIndex, store) {
-      return String.format('<a target="_blank" href="{0}">Download</a>', value);
+    var link = Sonatype.config.repos.urls.redirect +
+      '?r=' + record.get('repoId') +
+      '&g=' + record.get('groupId') +
+      '&a=' + record.get('artifactId') +
+      '&v=' + record.get('version');
+    var c = record.get('classifier');
+    if ( c ) {
+      link += '&c=' + c;
+    }
+      
+    return String.format('<a target="_blank" href="{0}">Download</a>', link);
   },
   
   formatPomLink: function(value, p, record, rowIndex, colIndex, store) {
