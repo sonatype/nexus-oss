@@ -155,5 +155,12 @@ public class DummyLocalRepositoryStorage
         // TODO Auto-generated method stub
         
     }
+    
+    public void validateStorageUrl( String url )
+        throws StorageException
+    {
+        // TODO Auto-generated method stub
+        
+    }
 
 }

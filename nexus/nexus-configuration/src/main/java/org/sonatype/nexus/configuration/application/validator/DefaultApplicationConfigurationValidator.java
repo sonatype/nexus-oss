@@ -68,10 +68,6 @@ public class DefaultApplicationConfigurationValidator
      */
     private ConfigurationIdGenerator idGenerator;
 
-    private Pattern winPattern = Pattern.compile( "^file:\\/(\\/\\/)?\\w:\\/.*", Pattern.CASE_INSENSITIVE );
-
-    private Pattern defaultPattern = Pattern.compile( "^file:\\/{1,2}.*", Pattern.CASE_INSENSITIVE );
-
     @SuppressWarnings( "unchecked" )
     public ValidationResponse validateModel( ValidationRequest request )
     {
@@ -383,45 +379,6 @@ public class DefaultApplicationConfigurationValidator
             }
         }
 
-        if ( repo.getLocalStorage() != null && repo.getLocalStorage().getUrl() != null
-            && repo.getLocalStorage().getUrl().length() > 0 )
-        {
-            try
-            {
-                String url = repo.getLocalStorage().getUrl();
-
-                new URL( url );
-
-                String os = System.getProperty( "os.name" );
-
-                if ( os.contains( "Windows" ) )
-                {
-                    if ( !winPattern.matcher( url ).matches() )
-                    {
-                        ValidationMessage msg = new ValidationMessage(
-                            "overrideLocalStorageUrl",
-                            "Repository " + repo.getId() + " has invalid local storage URL!",
-                            "Invalid windows file url, must be in format file:///X:/path/to/repo where X is the drive letter" );
-                        response.addValidationError( msg );
-                    }
-                }
-                else
-                {
-                    if ( !defaultPattern.matcher( url ).matches() )
-                    {
-                        ValidationMessage msg = new ValidationMessage(
-                            "overrideLocalStorageUrl",
-                            "Repository " + repo.getId() + " has invalid local storage URL!",
-                            "Invalid file url, must be in format file://path/to/repo" );
-                        response.addValidationError( msg );
-                    }
-                }
-            }
-            catch ( MalformedURLException e )
-            {
-                response.addValidationError( "Repository " + repo.getId() + " has malformed local storage URL!", e );
-            }
-        }
         if ( repo.getRemoteStorage() != null && repo.getRemoteStorage().getUrl() != null )
         {
             try

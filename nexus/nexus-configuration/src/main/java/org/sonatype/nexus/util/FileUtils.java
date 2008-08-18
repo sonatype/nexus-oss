@@ -21,6 +21,10 @@
 package org.sonatype.nexus.util;
 
 import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Some utils that should end in plexus-utils.
@@ -29,7 +33,8 @@ import java.io.File;
  */
 public class FileUtils
 {
-
+    private static Set<File> roots = null;
+    
     /**
      * Recursively count files in a directory.
      * 
@@ -79,5 +84,52 @@ public class FileUtils
         }
 
         return count;
+    }
+    
+    public static boolean validFileUrl( String url )
+    {
+        boolean result = true;
+        
+        if ( !validFile( new File( url ) ) )
+        {
+            //Failed w/ straight file, now time to try URL
+            try
+            {                
+                if ( !validFile( new File( new URL( url ).getFile() ) ) )
+                {
+                    result = false;    
+                }
+            }
+            catch ( MalformedURLException e )
+            {
+                result = false;
+            }
+        }
+        
+        return result;
+    }
+    
+    public static boolean validFile( File file )
+    {
+        if ( roots == null )
+        {
+            roots = new HashSet<File>();
+            
+            File[] listedRoots = File.listRoots();
+            
+            for ( int i = 0 ; i < listedRoots.length ; i++ )
+            {
+                roots.add( listedRoots[i] );
+            }   
+        }
+        
+        File root = file;
+        
+        while ( root.getParentFile() != null )
+        {
+            root = root.getParentFile();
+        }
+        
+        return roots.contains( root );
     }
 }

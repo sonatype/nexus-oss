@@ -265,12 +265,7 @@ Sonatype.repoServer.RepoEditPanel = function(config){
         helpText: ht.overrideLocalStorageUrl,
         name: 'overrideLocalStorageUrl',
         anchor: Sonatype.view.FIELD_OFFSET_WITH_SCROLL,
-        allowBlank:true,
-        validator: function(v){
-          if(  v.match(/^file:\/(\/\/)?\w:\/.*/i)
-            || v.match(/^file:\/\/.*/i)){ return true }
-          else{ return 'Protocol must be file://some/path ( or file:///X:/some/path if running in Windows, where X is the drive letter)'; }
-        }
+        allowBlank:true
       },
       {
         xtype: 'fieldset',
@@ -462,12 +457,7 @@ Sonatype.repoServer.RepoEditPanel = function(config){
         helpText: ht.overrideLocalStorageUrl,
         name: 'overrideLocalStorageUrl',
         anchor: Sonatype.view.FIELD_OFFSET_WITH_SCROLL,
-        allowBlank:true,
-        validator: function(v){
-          if(  v.match(/^file:\/(\/\/)?\w:\/.*/i)
-            || v.match(/^file:\/\/.*/i)){ return true }
-          else{ return 'Protocol must be file://some/path ( or file:///X:/some/path if running in Windows, where X is the drive letter)'; }
-        }
+        allowBlank:true
       },
       {
         xtype: 'fieldset',

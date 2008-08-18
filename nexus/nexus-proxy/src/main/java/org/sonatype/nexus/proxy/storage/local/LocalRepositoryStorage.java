@@ -210,5 +210,13 @@ public interface LocalRepositoryStorage
     Collection<StorageItem> listItems( RepositoryItemUid uid )
         throws ItemNotFoundException,
             StorageException;
-
+    
+    /**
+     * Validate that the URL that defines storage location is valid.
+     * 
+     * @param url
+     * @throws StorageException
+     */
+    void validateStorageUrl( String url )
+        throws StorageException;
 }

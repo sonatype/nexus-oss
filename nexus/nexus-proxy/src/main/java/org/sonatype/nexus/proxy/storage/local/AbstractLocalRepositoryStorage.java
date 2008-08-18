@@ -20,6 +20,7 @@
  */
 package org.sonatype.nexus.proxy.storage.local;
 
+import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 
@@ -81,7 +82,14 @@ public abstract class AbstractLocalRepositoryStorage
         }
         catch ( MalformedURLException e )
         {
-            throw new StorageException( "The remote storage has a malformed URL as baseUrl!", e );
+            try
+            {
+                return new File( urlStr.toString() ).toURL();
+            }
+            catch ( MalformedURLException e1 )
+            {
+                throw new StorageException( "The local storage has a malformed URL as baseUrl!", e );
+            }
         }
     }
 

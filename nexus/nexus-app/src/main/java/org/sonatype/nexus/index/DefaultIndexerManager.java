@@ -352,22 +352,28 @@ public class DefaultIndexerManager
      * @throws MalformedURLException
      */
     protected File getRepositoryLocalStorageAsFile( Repository repository )
-        throws MalformedURLException
     {
         File repoRoot = null;
 
         if ( repository.getLocalUrl() != null
             && repository.getLocalStorage() instanceof DefaultFSLocalRepositoryStorage )
         {
-            URL url = new URL( repository.getLocalUrl() );
-
+            URL url = null;
+            
             try
             {
+                url = new URL( repository.getLocalUrl() );
+                
                 repoRoot = new File( url.toURI() );
             }
             catch ( URISyntaxException e )
             {
                 repoRoot = new File( url.getPath() );
+            }
+            catch ( MalformedURLException e )
+            {
+                // Try just a regular file
+                repoRoot = new File( repository.getLocalUrl() );
             }
         }
 

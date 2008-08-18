@@ -59,7 +59,7 @@ public class RepositoryMetaResourceHandler
 
             Repository repository = getNexus().getRepository( getRepositoryId() );
 
-            String localPath = repository.getLocalUrl().substring( repository.getLocalUrl().indexOf( ":" ) + 1 );
+            String localPath = repository.getLocalUrl().substring( repository.getLocalUrl().indexOf( "file:" ) + 1 );
 
             // TODO: clean this up, ot at least centralize somewhere!
             // a stupid trick here

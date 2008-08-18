@@ -41,7 +41,7 @@
       <allowWrite>true</allowWrite>
       <repositoryPolicy>snapshot</repositoryPolicy>
       <localStorage>
-      	<url>file:${project.build.directory}/test-classes/nexus169/storage</url>
+      	<url>${project.build.directory}/test-classes/nexus169/storage</url>
       </localStorage>
     </repository>
 

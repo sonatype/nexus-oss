@@ -43,6 +43,7 @@ import org.sonatype.nexus.configuration.validator.InvalidConfigurationException;
 import org.sonatype.nexus.configuration.validator.ValidationMessage;
 import org.sonatype.nexus.configuration.validator.ValidationResponse;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
+import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.maven.ChecksumPolicy;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
@@ -203,19 +204,37 @@ public class DefaultApplicationRuntimeConfigurationBuilder
                 .getId() );
 
             repo.defaultLocalStorageUrl = defaultStorageFile.toURL().toString();
+            
+            String localUrl = null;
+            LocalRepositoryStorage storage = null;
 
             if ( repo.getLocalStorage() != null )
             {
-                repository.setLocalUrl( repo.getLocalStorage().getUrl() );
-                repository.setLocalStorage( getLocalRepositoryStorage( repo.getId(), repo
-                    .getLocalStorage().getProvider() ) );
-
+                storage = getLocalRepositoryStorage( repo.getId(), repo.getLocalStorage().getProvider() );
+                localUrl = repo.getLocalStorage().getUrl();
             }
             else
             {
+                storage = getLocalRepositoryStorage( repository.getId(), DEFAULT_LS_PROVIDER );
+                localUrl = repo.defaultLocalStorageUrl;
+                
+                //Default dir is going to be valid
                 defaultStorageFile.mkdirs();
-                repository.setLocalUrl( repo.defaultLocalStorageUrl );
-                repository.setLocalStorage( getLocalRepositoryStorage( repository.getId(), DEFAULT_LS_PROVIDER ) );
+            }
+            
+            try
+            {
+                storage.validateStorageUrl( localUrl );
+                
+                repository.setLocalUrl( localUrl );
+                repository.setLocalStorage( storage );
+            }
+            catch ( StorageException e )
+            {
+                ValidationResponse response = new ApplicationValidationResponse();
+                ValidationMessage error = new ValidationMessage( "overrideLocalStorageUrl", "Repository has an invalid local storage URL '" + localUrl, "Invalid file location");
+                response.addValidationError( error );
+                throw new InvalidConfigurationException( response );
             }
 
             if ( repo.getRemoteStorage() != null )
