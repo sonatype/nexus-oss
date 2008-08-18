@@ -79,7 +79,7 @@ public class Nexus233PrivilegesCrudXMLTests
         resource.setType( "repositoryTarget" );
         resource.setRepositoryTargetId( "testTarget" );
 
-     // get the Resource object
+        // get the Resource object
         List<PrivilegeBaseStatusResource> statusResources = this.messageUtil.createPrivileges( resource );
 
         Assert.assertTrue( statusResources.size() == 1 );
@@ -87,7 +87,10 @@ public class Nexus233PrivilegesCrudXMLTests
         // make sure the id != null
         Assert.assertNotNull( statusResources.get( 0 ).getId() );
 
-        Assert.assertEquals( statusResources.get( 0 ).getMethod(), "create,read" );
+        String method = statusResources.get( 0 ).getMethod();
+        Assert.assertEquals( 2, method.split( "," ).length );
+        Assert.assertTrue( method.contains( "create" ) );
+        Assert.assertTrue( method.contains( "read" ) );
         Assert.assertEquals( statusResources.get( 0 ).getName(), "createCreateMethodTest - (create)" ); // ' - (read)'
         // is
         // automatically added
@@ -112,7 +115,7 @@ public class Nexus233PrivilegesCrudXMLTests
         resource.setType( "repositoryTarget" );
         resource.setRepositoryTargetId( "testTarget" );
 
-     // get the Resource object
+        // get the Resource object
         List<PrivilegeBaseStatusResource> statusResources = this.messageUtil.createPrivileges( resource );
 
         Assert.assertTrue( statusResources.size() == 1 );
@@ -145,7 +148,7 @@ public class Nexus233PrivilegesCrudXMLTests
         resource.setType( "repositoryTarget" );
         resource.setRepositoryTargetId( "testTarget" );
 
-     // get the Resource object
+        // get the Resource object
         List<PrivilegeBaseStatusResource> statusResources = this.messageUtil.createPrivileges( resource );
 
         Assert.assertTrue( statusResources.size() == 1 );
@@ -181,16 +184,26 @@ public class Nexus233PrivilegesCrudXMLTests
         resource.setType( "repositoryTarget" );
         resource.setRepositoryTargetId( "testTarget" );
 
-     // get the Resource object
+        // get the Resource object
         List<PrivilegeBaseStatusResource> statusResources = this.messageUtil.createPrivileges( resource );
 
         Assert.assertTrue( statusResources.size() == 4 );
 
         PrivilegeTargetStatusResource createPriv =
             (PrivilegeTargetStatusResource) this.getPrivilegeByMethod( "create,read", statusResources );
+        if ( createPriv == null )
+        {
+            createPriv = (PrivilegeTargetStatusResource) this.getPrivilegeByMethod( "read,create", statusResources );
+        }
+
         // make sure the id != null
         Assert.assertNotNull( createPriv.getId() );
-        Assert.assertEquals( createPriv.getMethod(), "create,read" );
+
+        String method = createPriv.getMethod();
+        Assert.assertEquals( 2, method.split( "," ).length );
+        Assert.assertTrue( method.contains( "create" ) );
+        Assert.assertTrue( method.contains( "read" ) );
+
         Assert.assertEquals( createPriv.getName(), "createAllMethodTest - (create)" );
         Assert.assertEquals( createPriv.getType(), "repositoryTarget" );
         Assert.assertEquals( createPriv.getRepositoryTargetId(), "testTarget" );
@@ -254,7 +267,7 @@ public class Nexus233PrivilegesCrudXMLTests
         resource.setType( "repositoryTarget" );
         resource.setRepositoryTargetId( "testTarget" );
 
-     // get the Resource object
+        // get the Resource object
         List<PrivilegeBaseStatusResource> statusResources = this.messageUtil.createPrivileges( resource );
 
         Assert.assertTrue( statusResources.size() == 1 );
@@ -310,7 +323,7 @@ public class Nexus233PrivilegesCrudXMLTests
         resource.setType( "repositoryTarget" );
         resource.setRepositoryTargetId( "testTarget" );
 
-     // get the Resource object
+        // get the Resource object
         List<PrivilegeBaseStatusResource> statusResources = this.messageUtil.createPrivileges( resource );
 
         Assert.assertTrue( statusResources.size() == 1 );
@@ -351,7 +364,7 @@ public class Nexus233PrivilegesCrudXMLTests
         resource.setType( "repositoryTarget" );
         resource.setRepositoryTargetId( "testTarget" );
 
-     // get the Resource object
+        // get the Resource object
         List<PrivilegeBaseStatusResource> statusResources = this.messageUtil.createPrivileges( resource );
 
         Assert.assertTrue( statusResources.size() == 1 );
@@ -394,7 +407,7 @@ public class Nexus233PrivilegesCrudXMLTests
         resource.setType( "repositoryTarget" );
         resource.setRepositoryTargetId( "testTarget" );
 
-     // get the Resource object
+        // get the Resource object
         List<PrivilegeBaseStatusResource> statusResources = this.messageUtil.createPrivileges( resource );
 
         Assert.assertTrue( statusResources.size() == 1 );
@@ -417,7 +430,7 @@ public class Nexus233PrivilegesCrudXMLTests
 
         // get the Resource object
         statusResources = this.messageUtil.getResourceListFromResponse( response );
-        
+
         SecurityConfigUtil.verifyRepoTargetPrivileges( statusResources );
 
     }

@@ -72,8 +72,8 @@ import org.sonatype.nexus.integrationtests.proxy.nexus262.Nexus262SimpleProxyTes
     Nexus387RoutesTests.class, Nexus395ForgotUsernameTest.class, Nexus408ChangePasswordTest.class,
     Nexus526FeedsTests.class, Nexus531RepositoryCrudXMLTests.class, Nexus531RepositoryCrudJsonTests.class,
     Nexus533TaskManualTest.class, Nexus533TaskOnceTest.class, Nexus533TaskWeeklyTest.class,
-    Nexus533TaskMonthlyTest.class, Nexus533TaskCronTest.class, Nexus533TaskCronTest.class, Nexus233PrivilegesCrudXMLTests.class,
-    Nexus379VirtualRepoSameId.class, Nexus448PrivilegeURLTest.class, Nexus586ValidateConfigurationTest.class,
+    Nexus533TaskMonthlyTest.class, Nexus533TaskCronTest.class, Nexus533TaskCronTest.class,
+    Nexus233PrivilegesCrudXMLTests.class, Nexus379VirtualRepoSameId.class, Nexus448PrivilegeURLTest.class,
     Nexus586AnonymousChangePasswordTest.class, Nexus586AnonymousForgotPasswordTest.class,
     Nexus586AnonymousForgotUserIdTest.class, Nexus586AnonymousResetPasswordTest.class, Nexus532GroupsCrudXmlTests.class } )
 public class IntegrationTestSuiteClasses

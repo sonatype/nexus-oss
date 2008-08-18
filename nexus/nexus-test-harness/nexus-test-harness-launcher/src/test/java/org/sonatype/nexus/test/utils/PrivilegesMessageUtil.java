@@ -18,7 +18,6 @@ import org.sonatype.nexus.rest.model.PrivilegeBaseStatusResource;
 import org.sonatype.nexus.rest.model.PrivilegeListResourceResponse;
 import org.sonatype.nexus.rest.model.PrivilegeResourceRequest;
 import org.sonatype.nexus.rest.model.PrivilegeStatusResourceResponse;
-import org.sonatype.nexus.rest.model.PrivilegeTargetStatusResource;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
 
 import com.thoughtworks.xstream.XStream;

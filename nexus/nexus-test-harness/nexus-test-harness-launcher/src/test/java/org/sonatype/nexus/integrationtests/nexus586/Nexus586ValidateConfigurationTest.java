@@ -17,7 +17,7 @@ public class Nexus586ValidateConfigurationTest
         TestContainer.getInstance().getTestContext().setSecureTest( true );
     }
 
-//    @Test
+    @Test
     public void wrongAnonymousAccount()
         throws Exception
     {
@@ -28,24 +28,6 @@ public class Nexus586ValidateConfigurationTest
 
         Status status = SettingsMessageUtil.save( globalConfig );
         Assert.assertEquals( "Can't set an invalid user as anonymous", 400, status.getCode() );
-    }
-
-    @Test
-    public void wrongAnonymousPassword()
-        throws Exception
-    {
-        if( printKnownErrorButDoNotFail( this.getClass(), "wrongAnonymousPassword" ))
-        {
-            return;
-        }
-        
-        TestContainer.getInstance().getTestContext().useAdminForRequests();
-
-        GlobalConfigurationResource globalConfig = SettingsMessageUtil.getCurrentSettings();
-        globalConfig.setSecurityAnonymousPassword( "anononono" );
-
-        Status status = SettingsMessageUtil.save( globalConfig );
-        Assert.assertEquals( "Can't set wrong password to anonymous account", 400, status.getCode() );
     }
 
 }
