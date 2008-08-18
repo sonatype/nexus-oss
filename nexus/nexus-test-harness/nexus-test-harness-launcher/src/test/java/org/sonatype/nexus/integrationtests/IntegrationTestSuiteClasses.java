@@ -41,6 +41,11 @@ import org.sonatype.nexus.integrationtests.nexus533.Nexus533TaskManualTest;
 import org.sonatype.nexus.integrationtests.nexus533.Nexus533TaskMonthlyTest;
 import org.sonatype.nexus.integrationtests.nexus533.Nexus533TaskOnceTest;
 import org.sonatype.nexus.integrationtests.nexus533.Nexus533TaskWeeklyTest;
+import org.sonatype.nexus.integrationtests.nexus586.Nexus586AnonymousChangePasswordTest;
+import org.sonatype.nexus.integrationtests.nexus586.Nexus586AnonymousForgotPasswordTest;
+import org.sonatype.nexus.integrationtests.nexus586.Nexus586AnonymousForgotUserIdTest;
+import org.sonatype.nexus.integrationtests.nexus586.Nexus586AnonymousResetPasswordTest;
+import org.sonatype.nexus.integrationtests.nexus586.Nexus586ValidateConfigurationTest;
 import org.sonatype.nexus.integrationtests.proxy.nexus177.Nexus177OutOfServiceTest;
 import org.sonatype.nexus.integrationtests.proxy.nexus178.Nexus178BlockProxyDownloadTest;
 import org.sonatype.nexus.integrationtests.proxy.nexus179.Nexus179RemoteRepoDownTest;
@@ -66,8 +71,10 @@ import org.sonatype.nexus.integrationtests.proxy.nexus262.Nexus262SimpleProxyTes
     Nexus387RoutesTests.class, Nexus395ForgotUsernameTest.class, Nexus408ChangePasswordTest.class,
     Nexus526FeedsTests.class, Nexus531RepositoryCrudXMLTests.class, Nexus531RepositoryCrudJsonTests.class,
     Nexus533TaskManualTest.class, Nexus533TaskOnceTest.class, Nexus533TaskWeeklyTest.class,
-    Nexus533TaskMonthlyTest.class, Nexus533TaskCronTest.class, Nexus233PrivilegesCrudXMLTests.class,
-    Nexus379VirtualRepoSameId.class, Nexus448PrivilegeURLTest.class } )
+    Nexus533TaskMonthlyTest.class, Nexus533TaskCronTest.class, Nexus533TaskCronTest.class, Nexus233PrivilegesCrudXMLTests.class,
+    Nexus379VirtualRepoSameId.class, Nexus448PrivilegeURLTest.class, Nexus586ValidateConfigurationTest.class,
+    Nexus586AnonymousChangePasswordTest.class, Nexus586AnonymousForgotPasswordTest.class,
+    Nexus586AnonymousForgotUserIdTest.class, Nexus586AnonymousResetPasswordTest.class } )
 public class IntegrationTestSuiteClasses
 {
 
