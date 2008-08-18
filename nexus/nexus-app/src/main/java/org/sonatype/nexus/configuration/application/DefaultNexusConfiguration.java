@@ -30,6 +30,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import org.apache.commons.lang.StringUtils;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
 import org.sonatype.nexus.configuration.ConfigurationChangeListener;
@@ -714,10 +715,16 @@ public class DefaultNexusConfiguration
 
     // CRepository: CRUD
 
-    protected void validateRepository( CRepository settings )
+    protected void validateRepository( CRepository settings, boolean create )
         throws ConfigurationException
     {
         ApplicationValidationContext ctx = getRepositoryValidationContext();
+
+        if ( !create && !StringUtils.isEmpty( settings.getId() ) )
+        {
+            // remove "itself" from the list to avoid hitting "duplicate repo" problem
+            ctx.getExistingRepositoryIds().remove( settings.getId() );
+        }
 
         ValidationResponse vr = configurationValidator.validateRepository( ctx, settings );
 
@@ -736,7 +743,7 @@ public class DefaultNexusConfiguration
         throws ConfigurationException,
             IOException
     {
-        validateRepository( settings );
+        validateRepository( settings, true );
 
         Repository repository = runtimeConfigurationBuilder.createRepositoryFromModel( getConfiguration(), settings );
 
@@ -772,7 +779,7 @@ public class DefaultNexusConfiguration
             ConfigurationException,
             IOException
     {
-        validateRepository( settings );
+        validateRepository( settings, false );
 
         Repository repository = repositoryRegistry.getRepository( settings.getId() );
 
@@ -908,10 +915,16 @@ public class DefaultNexusConfiguration
 
     // CRepositoryShadow: CRUD
 
-    protected void validateRepositoryShadow( CRepositoryShadow settings )
+    protected void validateRepositoryShadow( CRepositoryShadow settings, boolean create )
         throws ConfigurationException
     {
         ApplicationValidationContext ctx = getRepositoryValidationContext();
+
+        if ( !create && !StringUtils.isEmpty( settings.getId() ) )
+        {
+            // remove "itself" from the list to avoid hitting "duplicate repo" problem
+            ctx.getExistingRepositoryShadowIds().remove( settings.getId() );
+        }
 
         ValidationResponse vr = configurationValidator.validateRepository( ctx, settings );
 
@@ -930,7 +943,7 @@ public class DefaultNexusConfiguration
         throws ConfigurationException,
             IOException
     {
-        validateRepositoryShadow( settings );
+        validateRepositoryShadow( settings, true );
 
         Repository repository = runtimeConfigurationBuilder.createRepositoryFromModel( getConfiguration(), settings );
 
@@ -965,7 +978,7 @@ public class DefaultNexusConfiguration
             ConfigurationException,
             IOException
     {
-        validateRepositoryShadow( settings );
+        validateRepositoryShadow( settings, false );
 
         Repository repository = repositoryRegistry.getRepository( settings.getId() );
 
