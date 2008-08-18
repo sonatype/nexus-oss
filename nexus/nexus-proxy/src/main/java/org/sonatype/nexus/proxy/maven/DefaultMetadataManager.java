@@ -22,8 +22,10 @@ import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.IOUtil;
+import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.sonatype.nexus.artifact.Gav;
+import org.sonatype.nexus.artifact.VersionUtils;
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.NoSuchResourceStoreException;
@@ -719,6 +721,82 @@ public class DefaultMetadataManager
 
         savePluginMetadata( repository, gav, md, req.getRequestContext() );
     }
+
+    public Gav resolveSnapshotLatestVersion( MavenRepository repository, ArtifactStoreRequest req, Gav gav )
+        throws RepositoryNotAvailableException,
+            IOException
+    {
+        if ( !RepositoryPolicy.SNAPSHOT.equals( repository.getRepositoryPolicy() ) )
+        {
+            if ( getLogger().isDebugEnabled() )
+            {
+                getLogger().debug(
+                    "Not a SNAPSHOT repository for resolving GAV: " + gav.getGroupId() + " : " + gav.getArtifactId()
+                        + " : " + gav.getVersion() + " in repository " + repository.getId() );
+            }
+
+            return gav;
+        }
+
+        if ( getLogger().isDebugEnabled() )
+        {
+            getLogger().debug(
+                "Resolving snapshot version for GAV: " + gav.getGroupId() + " : " + gav.getArtifactId() + " : "
+                    + gav.getVersion() + " in repository " + repository.getId() );
+        }
+
+        Metadata gavMd = null;
+
+        try
+        {
+            gavMd = readOrCreateGAVMetadata( repository, gav, req.getRequestContext() );
+
+            if ( gavMd.getVersioning() == null )
+            {
+                gavMd.setVersioning( new Versioning() );
+            }
+        }
+        catch ( XmlPullParserException e )
+        {
+            throw new StorageException( "Could not read the metadatas!", e );
+        }
+
+        String latest = gavMd.getVersioning().getLatest();
+
+        if ( StringUtils.isEmpty( latest ) )
+        {
+            // mvn 2.0.x is like forgotting to maintain latest???
+
+            Snapshot current = gavMd.getVersioning().getSnapshot();
+
+            if ( current != null )
+            {
+                latest = gav.getBaseVersion();
+
+                latest = latest.replace( "SNAPSHOT", current.getTimestamp() + "-" + current.getBuildNumber() );
+            }
+        }
+
+        if ( getLogger().isDebugEnabled() )
+        {
+            getLogger().debug( "Resolved gav version from '" + gav.getVersion() + "' to '" + latest + "'" );
+        }
+
+        if ( !StringUtils.isEmpty( latest ) && VersionUtils.isSnapshot( latest ) )
+        {
+            Gav result = new Gav( gav.getGroupId(), gav.getArtifactId(), latest, gav.getClassifier(), gav
+                .getExtension(), gav.getSnapshotBuildNumber(), gav.getSnapshotTimeStamp(), gav.getName(), gav
+                .isSnapshot(), gav.isHash(), gav.getHashType(), gav.isSignature(), gav.getSignatureType() );
+
+            return result;
+        }
+        else
+        {
+            return gav;
+        }
+    }
+
+    // ====
 
     protected PluginDescriptor extractPluginDescriptor( InputStream is )
         throws IOException,

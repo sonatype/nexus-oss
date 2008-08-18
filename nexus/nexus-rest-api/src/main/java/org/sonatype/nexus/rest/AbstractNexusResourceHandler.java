@@ -201,6 +201,8 @@ public abstract class AbstractNexusResourceHandler
         a.setVersion( ai.version );
 
         a.setClassifier( ai.classifier );
+        
+        a.setPackaging( ai.packaging );
 
         a.setRepoId( ai.repository );
 

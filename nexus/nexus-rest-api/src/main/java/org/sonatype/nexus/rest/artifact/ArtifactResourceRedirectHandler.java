@@ -31,11 +31,11 @@ import org.restlet.resource.Variant;
  * 
  * @author cstamas
  */
-public class ArtifactResourceContentHandler
+public class ArtifactResourceRedirectHandler
     extends AbstractArtifactResourceHandler
 {
 
-    public ArtifactResourceContentHandler( Context context, Request request, Response response )
+    public ArtifactResourceRedirectHandler( Context context, Request request, Response response )
     {
         super( context, request, response );
     }
@@ -48,17 +48,7 @@ public class ArtifactResourceContentHandler
     protected Representation getRepresentationHandler( Variant variant )
         throws Exception
     {
-        return getContent( variant, false );
-    }
-
-    public boolean allowPost()
-    {
-        return true;
-    }
-
-    public void post( Representation representation )
-    {
-        uploadArtifact( representation );
+        return getContent( variant, true );
     }
 
 }

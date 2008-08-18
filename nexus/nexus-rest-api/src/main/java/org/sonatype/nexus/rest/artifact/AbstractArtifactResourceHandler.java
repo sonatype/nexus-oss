@@ -34,6 +34,7 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.restlet.Context;
 import org.restlet.data.Form;
 import org.restlet.data.MediaType;
+import org.restlet.data.Reference;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.data.Status;
@@ -47,6 +48,7 @@ import org.sonatype.nexus.proxy.NoSuchResourceStoreException;
 import org.sonatype.nexus.proxy.RepositoryNotAvailableException;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.access.AccessManager;
+import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.maven.ArtifactStoreRequest;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
@@ -227,7 +229,7 @@ public class AbstractArtifactResourceHandler
 
     }
 
-    protected Representation getContent( Variant variant )
+    protected Representation getContent( Variant variant, boolean redirectTo )
     {
         Form form = getRequest().getResourceRef().getQueryAsForm();
 
@@ -273,9 +275,35 @@ public class AbstractArtifactResourceHandler
 
             StorageFileItem file = ( (MavenRepository) repository ).retrieveArtifact( gavRequest );
 
-            Representation result = new StorageFileItemRepresentation( file );
+            if ( redirectTo )
+            {
+                String filePath = file.getRepositoryItemUid().getPath();
 
-            return result;
+                if ( filePath.startsWith( RepositoryItemUid.PATH_SEPARATOR ) )
+                {
+                    filePath = filePath.substring( 1 );
+                }
+                
+                filePath = "content/" + filePath;
+
+                Reference repoRoot = calculateRepositoryReference( file.getRepositoryItemUid().getRepository().getId() );
+
+                Reference fileReference = calculateReference( repoRoot, filePath );
+
+                getResponse().setRedirectRef( fileReference );
+
+                getResponse().setStatus( Status.REDIRECTION_PERMANENT );
+
+                return null;
+            }
+            else
+            {
+                // TODO: this will not work without content disposition support in restlet!
+                Representation result = new StorageFileItemRepresentation( file );
+
+                return result;
+            }
+
         }
         catch ( StorageException e )
         {
@@ -293,7 +321,7 @@ public class AbstractArtifactResourceHandler
         }
         catch ( ItemNotFoundException e )
         {
-            // nothing
+            getResponse().setStatus( Status.CLIENT_ERROR_NOT_FOUND, "Artifact not found." );
         }
         catch ( AccessDeniedException e )
         {

@@ -2,6 +2,7 @@ package org.sonatype.nexus.proxy.maven;
 
 import java.io.IOException;
 
+import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.proxy.RepositoryNotAvailableException;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 
@@ -48,4 +49,15 @@ public interface MetadataManager
         throws RepositoryNotAvailableException,
             IOException,
             UnsupportedStorageOperationException;
+
+    /**
+     * Resolves the latest snapshot version.
+     * 
+     * @return
+     * @throws RepositoryNotAvailableException
+     * @throws IOException
+     */
+    Gav resolveSnapshotLatestVersion( MavenRepository repository, ArtifactStoreRequest req, Gav gav )
+        throws RepositoryNotAvailableException,
+            IOException;
 }

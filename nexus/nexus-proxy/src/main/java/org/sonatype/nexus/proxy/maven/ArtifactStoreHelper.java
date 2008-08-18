@@ -137,6 +137,19 @@ public class ArtifactStoreHelper
             false,
             null );
 
+        // if it is not "timestamped" version, try to get it
+        if ( gav.isSnapshot() && gav.getVersion().equals( gav.getBaseVersion() ) )
+        {
+            try
+            {
+                gav = repository.getMetadataManager().resolveSnapshotLatestVersion( repository, gavRequest, gav );
+            }
+            catch ( IOException e )
+            {
+                throw new StorageException( "Could not maintain metadata!", e );
+            }
+        }
+
         gavRequest.setRequestPath( repository.getGavCalculator().gavToPath( gav ) );
 
         StorageItem item = repository.retrieveItem( gavRequest );
@@ -164,6 +177,19 @@ public class ArtifactStoreHelper
             .getClassifier(), repository.getArtifactPackagingMapper().getExtensionForPackaging(
             gavRequest.getPackaging() ), null, null, null, RepositoryPolicy.SNAPSHOT.equals( repository
             .getRepositoryPolicy() ), false, null, false, null );
+
+        // if it is not "timestamped" version, try to get it
+        if ( gav.isSnapshot() && gav.getVersion().equals( gav.getBaseVersion() ) )
+        {
+            try
+            {
+                gav = repository.getMetadataManager().resolveSnapshotLatestVersion( repository, gavRequest, gav );
+            }
+            catch ( IOException e )
+            {
+                throw new StorageException( "Could not maintain metadata!", e );
+            }
+        }
 
         gavRequest.setRequestPath( repository.getGavCalculator().gavToPath( gav ) );
 
@@ -247,8 +273,10 @@ public class ArtifactStoreHelper
         try
         {
             // check for POM existence
-            repository.retrieveItem( true, repository.createUid( repository
-                .getGavCalculator().gavToPath( pomGav ) ), gavRequest.getRequestContext() );
+            repository.retrieveItem(
+                true,
+                repository.createUid( repository.getGavCalculator().gavToPath( pomGav ) ),
+                gavRequest.getRequestContext() );
         }
         catch ( ItemNotFoundException e )
         {
@@ -331,46 +359,19 @@ public class ArtifactStoreHelper
             .getRepositoryPolicy() ), false, null, false, null );
 
         gavRequest.setRequestPath( repository.getGavCalculator().gavToPath( gav ) );
-/*
-        // First undeploy, we will read the pom contents to build the gav
-        try
-        {
-            gav = new Gav(
-                gavRequest.getGroupId(),
-                gavRequest.getArtifactId(),
-                gavRequest.getVersion(),
-                gavRequest.getClassifier(),
-                getPackagingFromPom( gavRequest.getRequestPath() ),
-                null,
-                null,
-                null,
-                RepositoryPolicy.SNAPSHOT.equals( repository.getRepositoryPolicy() ),
-                false,
-                null,
-                false,
-                null );
-        }
-        catch ( IOException e )
-        {
-            throw new StorageException( "Could not read pom file!", e );
-        }
-        catch ( XmlPullParserException e )
-        {
-            throw new StorageException( "Could not read pom file!", e );
-        }
-
-        gavRequest.setRequestPath( repository.getGavCalculator().gavToPath( gav ) );
-
-        // delete the pom's artifact
-        handleDelete( gavRequest, deleteWholeGav, withChecksums, withAllSubordinates );
-
-        // Now delete the pom
-        gav = new Gav( gavRequest.getGroupId(), gavRequest.getArtifactId(), gavRequest.getVersion(), gavRequest
-            .getClassifier(), "pom", null, null, null, RepositoryPolicy.SNAPSHOT.equals( repository
-            .getRepositoryPolicy() ), false, null, false, null );
-
-        gavRequest.setRequestPath( repository.getGavCalculator().gavToPath( gav ) );
-*/
+        /*
+         * // First undeploy, we will read the pom contents to build the gav try { gav = new Gav(
+         * gavRequest.getGroupId(), gavRequest.getArtifactId(), gavRequest.getVersion(), gavRequest.getClassifier(),
+         * getPackagingFromPom( gavRequest.getRequestPath() ), null, null, null, RepositoryPolicy.SNAPSHOT.equals(
+         * repository.getRepositoryPolicy() ), false, null, false, null ); } catch ( IOException e ) { throw new
+         * StorageException( "Could not read pom file!", e ); } catch ( XmlPullParserException e ) { throw new
+         * StorageException( "Could not read pom file!", e ); } gavRequest.setRequestPath(
+         * repository.getGavCalculator().gavToPath( gav ) ); // delete the pom's artifact handleDelete( gavRequest,
+         * deleteWholeGav, withChecksums, withAllSubordinates ); // Now delete the pom gav = new Gav(
+         * gavRequest.getGroupId(), gavRequest.getArtifactId(), gavRequest.getVersion(), gavRequest .getClassifier(),
+         * "pom", null, null, null, RepositoryPolicy.SNAPSHOT.equals( repository .getRepositoryPolicy() ), false, null,
+         * false, null ); gavRequest.setRequestPath( repository.getGavCalculator().gavToPath( gav ) );
+         */
 
         handleDelete( gavRequest, deleteWholeGav, withChecksums, withAllSubordinates );
     }

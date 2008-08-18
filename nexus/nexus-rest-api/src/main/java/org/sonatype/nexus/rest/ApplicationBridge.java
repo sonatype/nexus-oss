@@ -37,6 +37,7 @@ import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
 import org.sonatype.nexus.configuration.ConfigurationChangeListener;
 import org.sonatype.nexus.rest.artifact.ArtifactResourceContentHandler;
 import org.sonatype.nexus.rest.artifact.ArtifactResourceHandler;
+import org.sonatype.nexus.rest.artifact.ArtifactResourceRedirectHandler;
 import org.sonatype.nexus.rest.attributes.AttributesResourceHandler;
 import org.sonatype.nexus.rest.authentication.LoginResourceHandler;
 import org.sonatype.nexus.rest.authentication.LogoutResourceHandler;
@@ -289,6 +290,8 @@ public class ApplicationBridge
 
         attach( router, false, "/artifact/maven", ArtifactResourceHandler.class );
 
+        attach( router, false, "/artifact/maven/redirect", ArtifactResourceRedirectHandler.class );
+        
         attach( router, false, "/artifact/maven/content", ArtifactResourceContentHandler.class );
 
         // protected resources
