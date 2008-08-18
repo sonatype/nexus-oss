@@ -95,6 +95,7 @@ public class ScheduledServiceListResourceHandler
                 item.setLastRunTime( task.getLastRun() == null ? "n/a" : task.getLastRun().toString() );
                 item.setNextRunTime( task.getNextRun() == null ? "n/a" : task.getNextRun().toString() );
                 item.setSchedule( getScheduleShortName( task.getSchedule() ) );
+                item.setEnabled( task.isEnabled() );
 
                 response.addData( item );
             }

@@ -157,6 +157,7 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
   //A record that holds the data for each service in the system
   this.scheduleRecordConstructor = Ext.data.Record.create([
     {name:'resourceURI'},
+    {name:'enabled'},
     {name:'id'},
     {name:'name', sortType:Ext.data.SortTypes.asUCString},
     {name:'typeName'},
@@ -932,6 +933,7 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
     loadMask: true,
     deferredRender: false,
     columns: [
+      {header: 'Enabled', dataIndex: 'enabled', width:50, id: 'schedule-config-enabled-col'},
       {header: 'Name', dataIndex: 'name', width:175, id: 'schedule-config-name-col'},
       {header: 'Type', dataIndex: 'typeName', width:175, id: 'schedule-config-service-type-col'},
       {header: 'Status', dataIndex: 'status', width:175, id: 'schedule-config-service-status-col'},
@@ -1450,6 +1452,7 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
         
         var dataObj = {
           name : receivedData.resource.name,
+          enabled : receivedData.resource.enabled,
           id : receivedData.resource.id,
           resourceURI : receivedData.resourceURI,
           typeName : this.serviceTypeDataStore.getAt(this.serviceTypeDataStore.findBy(function(record, id){
@@ -1521,6 +1524,7 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
   updateServiceRecord : function(rec, receivedData){
         rec.beginEdit();
         rec.set('name', receivedData.resource.name);
+        rec.set('enabled', receivedData.resource.enabled);
         rec.set('typeId', receivedData.resource.typeId);
         rec.set('typeName', this.serviceTypeDataStore.getAt(this.serviceTypeDataStore.findBy(function(record, id){
             if (record.data.id == receivedData.resource.typeId){
