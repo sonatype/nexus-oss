@@ -120,7 +120,7 @@ public abstract class AbstractNexusProxyIntegrationTest
 
         if ( !response.getStatus().isSuccess() )
         {
-            Assert.fail( "Could not set proxy out of service status (Error: "+response.getStatus().getCode() + "-"+ response.getStatus().getDescription()+ "): " + repoId );
+            Assert.fail( "Could not set proxy out of service status (Status: "+response.getStatus()+ ": " + repoId + "\n" + response.getEntity().getText());
         }
     }
 }
