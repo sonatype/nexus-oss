@@ -26,6 +26,8 @@ Sonatype.repoServer.LogsViewPanel = function(config){
 
   this.currentLogUrl = null;
   this.currentContentType = null;
+  this.totalSize = 0;
+  this.currentSize = 0;
   
   this.listeners = {
     'beforerender' : function(){
@@ -40,7 +42,54 @@ Sonatype.repoServer.LogsViewPanel = function(config){
     },
     scope: this
   };
-  
+
+  this.fetchMoreButton = new Ext.SplitButton({
+    text: 'Fetch Next 100Kb',
+    icon: Sonatype.config.resourcePath + '/images/icons/search.gif',
+    cls: 'x-btn-text-icon',
+    value: '100',
+    handler: this.fetchMore,
+    disabled: true,
+    scope: this,
+    menu: {
+      items: [
+        {
+          text: 'Fetch Next 100Kb',
+          value: '100',
+          scope: this,
+          handler: this.fetchMore
+        },
+        {
+          text: 'Fetch Next 200Kb',
+          value: '200',
+          scope: this,
+          handler: this.fetchMore
+        },
+        {
+          text: 'Fetch Next 500Kb',
+          value: '500',
+          scope: this,
+          handler: this.fetchMore
+        },
+        {
+          text: 'Fetch All',
+          value: '0',
+          scope: this,
+          handler: this.fetchMore
+        }
+      ]
+    }
+    
+  });
+
+  this.fetchMoreBar = new Ext.Toolbar({
+    ctCls: 'search-all-tbar',
+    items: [ 
+      'Displaying 0 of 0Kb',
+      this.fetchMoreButton
+    ]
+  });
+
   Sonatype.repoServer.LogsViewPanel.superclass.constructor.call(this, {
     autoScroll: false,
     border: false,
@@ -53,7 +102,7 @@ Sonatype.repoServer.LogsViewPanel = function(config){
         tooltip: {text:'Reloads the current document'},
         icon: Sonatype.config.resourcePath + '/images/icons/arrow_refresh.png',
         cls: 'x-btn-text-icon',
-        handler: this.getLogFile,
+        handler: this.reloadLogFile,
         scope: this
       },
       {
@@ -80,6 +129,7 @@ Sonatype.repoServer.LogsViewPanel = function(config){
           items: [
             {
               text: 'nexus.xml',
+              value: 0,
               checked: false,
               group:'rp-group',
               checkHandler: this.logMenuBtnClick.createDelegate(this, [Sonatype.config.repos.urls.configCurrent,'application/xml'], 0),
@@ -89,6 +139,7 @@ Sonatype.repoServer.LogsViewPanel = function(config){
         }
       }      
     ],
+    bbar: this.fetchMoreBar,
     items: [
       {
         xtype: 'textarea',
@@ -113,7 +164,8 @@ Ext.extend(Sonatype.repoServer.LogsViewPanel, Ext.form.FormPanel, {
 
       for (var i=0; i< resp.data.length; i++) {
         myMenu.addMenuItem({
-          text: resp.data[i].name,
+          text: resp.data[i].name + ' (' + this.printKb(resp.data[i].size) + ')',
+          value: resp.data[i].size,
           checked: false,
           group:'rp-group',
           checkHandler: this.logMenuBtnClick.createDelegate(this, [resp.data[i].resourceURI,'text/plain'], 0),
@@ -128,20 +180,36 @@ Ext.extend(Sonatype.repoServer.LogsViewPanel, Ext.form.FormPanel, {
   
   logMenuBtnClick : function(resourceURI, contentType, mItem, pressed){
     if ( ! pressed ) return;
+    this.currentSize = 0;
+    this.totalSize = mItem.value;
     this.currentContentType = contentType;
     this.getTopToolbar().items.get(2).setText(mItem.text);
     this.currentLogUrl = resourceURI;
-    this.getLogFile(contentType);
+    this.getLogFile();
+  },
+  
+  //gets the log file specified by this.currentLogUrl
+  reloadLogFile : function(){
+    this.currentSize = 0;
+    this.getLogFile();
   },
   
   //gets the log file specified by this.currentLogUrl
   getLogFile : function(){
     //Don't bother refreshing if no files are currently shown
     if (this.currentLogUrl){
+      var toFetch = Number(this.fetchMoreButton.value) * 1024;
+      if ( toFetch == 0 ) {
+        toFetch = this.totalSize - this.currentSize;
+      }
       Ext.Ajax.request({
         callback: this.renderLog,
         scope: this,
         method: 'GET',
+        params: {
+          from: this.currentSize,
+          count: toFetch
+        },
         headers: {'accept' : this.currentContentType ? this.currentContentType : 'text/plain'},
         url: this.currentLogUrl
       });
@@ -150,11 +218,50 @@ Ext.extend(Sonatype.repoServer.LogsViewPanel, Ext.form.FormPanel, {
   
   renderLog : function(options, success, response){
     if (success){
-      this.logTextArea.setRawValue(response.responseText);
+      var newValue = this.currentSize == 0 ? response.responseText :
+        this.logTextArea.getRawValue() + response.responseText;
+      this.logTextArea.setRawValue(newValue);
+      this.updateTotals();
     }
     else {
       Sonatype.utils.connectionError( response, 'The file failed to load from the server.' )
     }
+  },
+
+  fetchMore: function( button, event ) {
+    if ( button.value != this.fetchMoreButton.value ) {
+      this.fetchMoreButton.value = button.value;
+      this.fetchMoreButton.setText( button.text );
+    }
+    this.getLogFile();
+  },
+  
+  updateTotals: function() {
+    this.currentSize = this.logTextArea.getRawValue().length;
+    
+    if ( this.currentSize == 0 || this.currentSize > this.totalSize ) {
+      this.totalSize = this.currentSize;
+    }
+    
+    this.fetchMoreBar.items.items[0].destroy();
+    this.fetchMoreBar.items.removeAt( 0 );
+    this.fetchMoreBar.insertButton( 0, new Ext.Toolbar.TextItem(
+      'Displaying ' + this.printKb(this.currentSize) + ' of ' + this.printKb(this.totalSize) ) );
+
+    this.fetchMoreButton.setDisabled( this.currentSize >= this.totalSize );
+  },
+  
+  printKb: function( n ) {
+    var kb = 'b';
+    if ( n > 1024 ) {
+      n = (n/1024).toFixed(0);
+      kb = 'Kb';
+    }
+    if ( n > 1024 ) {
+      n = (n/1024).toFixed(1);
+      kb = 'Mb';
+    }
+    return n + ' ' + kb;
   }
   
 });
