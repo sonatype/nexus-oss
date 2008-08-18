@@ -3,18 +3,12 @@ package org.sonatype.nexus.integrationtests.nexus393;
 import org.junit.Assert;
 import org.junit.Test;
 import org.restlet.data.Response;
-import org.restlet.data.Status;
 import org.sonatype.nexus.integrationtests.AbstractPrivilegeTest;
 import org.sonatype.nexus.integrationtests.TestContainer;
 
 public class Nexus393ResetPasswordPermissionTest
     extends AbstractPrivilegeTest
 {
-
-    static
-    {
-        printKnownErrorButDoNotFail( Nexus393ResetPasswordPermissionTest.class, "resetWithoutPermission" );
-    }
 
     @Test
     public void resetWithPermission()
