@@ -170,6 +170,8 @@ public class DefaultScheduler
                     tasksMap.remove( task.getType() );
                 }
             }
+            
+            taskConfig.removeTask( task );
         }
     }
 

@@ -379,12 +379,22 @@ public abstract class AbstractNexusResourceHandler
     {
         // safe method
         super.handleGet();
+        
+        if ( getResponse().getEntity() == null )
+        {
+            getResponse().setEntity( new StringRepresentation( "", MediaType.TEXT_PLAIN ) );
+        }
     }
 
     public void handleHead()
     {
         // safe method
         super.handleHead();
+        
+        if ( getResponse().getEntity() == null )
+        {
+            getResponse().setEntity( new StringRepresentation( "", MediaType.TEXT_PLAIN ) );
+        }
     }
 
     public void handlePost()
@@ -395,6 +405,11 @@ public abstract class AbstractNexusResourceHandler
         if ( getResponse().getStatus().isSuccess() )
         {
             updateModificationDate( getRequest().getResourceRef() );
+        }
+        
+        if ( getResponse().getEntity() == null )
+        {
+            getResponse().setEntity( new StringRepresentation( "", MediaType.TEXT_PLAIN ) );
         }
     }
 
@@ -409,6 +424,11 @@ public abstract class AbstractNexusResourceHandler
 
             updateModificationDate( getRequest().getResourceRef().getParentRef() );
         }
+        
+        if ( getResponse().getEntity() == null )
+        {
+            getResponse().setEntity( new StringRepresentation( "", MediaType.TEXT_PLAIN ) );
+        }
     }
 
     public void handleDelete()
@@ -421,6 +441,11 @@ public abstract class AbstractNexusResourceHandler
             updateModificationDate( getRequest().getResourceRef() );
 
             updateModificationDate( getRequest().getResourceRef().getParentRef() );
+        }
+        
+        if ( getResponse().getEntity() == null )
+        {
+            getResponse().setEntity( new StringRepresentation( "", MediaType.TEXT_PLAIN ) );
         }
     }
 
