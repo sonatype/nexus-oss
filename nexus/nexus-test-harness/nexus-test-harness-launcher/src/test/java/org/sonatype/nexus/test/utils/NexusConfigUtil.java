@@ -20,6 +20,7 @@ import org.sonatype.nexus.configuration.application.validator.ApplicationConfigu
 import org.sonatype.nexus.configuration.application.validator.DefaultApplicationConfigurationValidator;
 import org.sonatype.nexus.configuration.model.CGroupsSettingPathMappingItem;
 import org.sonatype.nexus.configuration.model.CRepository;
+import org.sonatype.nexus.configuration.model.CRepositoryGroup;
 import org.sonatype.nexus.configuration.model.Configuration;
 import org.sonatype.nexus.configuration.model.io.xpp3.NexusConfigurationXpp3Reader;
 import org.sonatype.nexus.configuration.model.io.xpp3.NexusConfigurationXpp3Writer;
@@ -157,6 +158,23 @@ public class NexusConfigUtil
             throw new InvalidConfigurationException( vResponse );
         }
 
+    }
+
+    public static CRepositoryGroup getGroup( String groupId ) throws IOException
+    {
+        List<CRepositoryGroup> repos = getNexusConfig().getRepositoryGrouping().getRepositoryGroups();
+
+        for ( Iterator<CRepositoryGroup> iter = repos.iterator(); iter.hasNext(); )
+        {
+            CRepositoryGroup cGroup = iter.next();
+
+            // check id
+            if ( cGroup.getGroupId().equals( groupId ) )
+            {
+                return cGroup;
+            }
+        }
+        return null;
     }
 
 }
