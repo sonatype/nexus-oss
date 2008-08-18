@@ -72,25 +72,29 @@ public class PrivilegeResourceHandler
     {
         PrivilegeStatusResourceResponse response = new PrivilegeStatusResourceResponse();
         
+        CPrivilege priv = null;
+        
         try
         {
-            CPrivilege priv = getNexusSecurityConfiguration().readRepoTargetPrivilege( getPrivilegeId() );
-            
-            if ( priv == null )
-            {
-                priv = getNexusSecurityConfiguration().readApplicationPrivilege( getPrivilegeId() );
-            }
-            
-            response.setData( nexusToRestModel( priv ) );
-            
-            return serialize( variant, response );
+            priv = getNexusSecurityConfiguration().readRepoTargetPrivilege( getPrivilegeId() );
         }
         catch ( NoSuchPrivilegeException e )
         {
-            getResponse().setStatus( Status.CLIENT_ERROR_NOT_FOUND, e.getMessage() );
+            try
+            {
+                priv = getNexusSecurityConfiguration().readApplicationPrivilege( getPrivilegeId() );
+            }
+            catch ( NoSuchPrivilegeException e1 )
+            {
+                getResponse().setStatus( Status.CLIENT_ERROR_NOT_FOUND, e.getMessage() );
 
-            return null;
+                return null;
+            }
         }
+        
+        response.setData( nexusToRestModel( priv ) );
+        
+        return serialize( variant, response );
     }
 
     /**
