@@ -812,7 +812,6 @@ public class DefaultNexus
             if ( log.exists()
                 && log.getAbsolutePath().startsWith( nexusConfiguration.getApplicationLogDirectory().getAbsolutePath() ) )
             {
-                // TODO: honor from + count
                 NexusStreamResponse response = new NexusStreamResponse();
 
                 response.setName( logFile );
@@ -822,7 +821,11 @@ public class DefaultNexus
 
                 response.setSize( log.length() );
 
-                response.setInputStream( new FileInputStream( log ) );
+                response.setFromByte( from );
+
+                response.setBytesCount( count );
+
+                response.setInputStream( new LimitedInputStream( new FileInputStream( log ), from, count ) );
 
                 return response;
             }
