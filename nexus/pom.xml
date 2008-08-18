@@ -99,6 +99,7 @@
 		<profile>
 			<id>test-harness</id>
 			<activation>
+			    <activeByDefault>true</activeByDefault>
 				<property>
 					<name>test-harness</name>
 				</property>
