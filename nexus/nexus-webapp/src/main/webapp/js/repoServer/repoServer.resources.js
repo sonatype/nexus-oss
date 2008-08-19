@@ -53,8 +53,6 @@ Sonatype.repoServer.resources.help = {
     anonPassword : 'The password that will be applied to anonymous users.',
     anonymous : 'Allow anonymous access into the system, will be treated with the credentials of the user below.',
     security : 'Whether to enable security or not.', 
-    workingDirectory : 'The base folder where Nexus will store all of its data. For easier upgrades, it is recommended that this be in a folder outside your Nexus binary installation. Nexus must be restarted after changing this value.',
-    logDirectory : 'This is the location of your log files. It must correspond to the location specified by - runtime/apps/nexus/conf/log4j.properties.',
     baseUrl : 'This is the Base URL of the Nexus web application.  i.e. http://localhost:8081/nexus',
 
     //use default nexus text

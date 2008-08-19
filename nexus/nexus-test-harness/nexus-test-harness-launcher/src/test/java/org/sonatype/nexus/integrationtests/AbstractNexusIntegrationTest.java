@@ -76,12 +76,15 @@ public class AbstractNexusIntegrationTest
 
 
     protected static String nexusWorkDir;
+    
+    protected static String nexusLogDir;
 
     static
     {
         nexusBaseDir = TestProperties.getString( "nexus.base.dir" );
         baseNexusUrl = TestProperties.getString( "nexus.base.url" );
         nexusWorkDir = TestProperties.getString( "nexus.work.dir" );
+        nexusLogDir = TestProperties.getString( "nexus.log.dir" );
     }
 
     public static final String RELATIVE_CONF_DIR = "runtime/apps/nexus/conf";

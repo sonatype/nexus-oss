@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <nexusConfiguration>
   <version>1.0.5</version>
-  <applicationLogDirectory>${nexus.home}/logs</applicationLogDirectory>
   <security>
     <enabled>true</enabled>
     <anonymousAccessEnabled>true</anonymousAccessEnabled>

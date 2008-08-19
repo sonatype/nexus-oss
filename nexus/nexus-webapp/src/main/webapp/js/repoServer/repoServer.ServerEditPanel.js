@@ -51,29 +51,6 @@ Sonatype.repoServer.ServerEditPanel = function(config){
       {
         xtype: 'fieldset',
         checkboxToggle:false,
-        title: 'File Settings',
-        anchor: Sonatype.view.FIELDSET_OFFSET,
-        collapsible: true,
-        autoHeight:true,
-        layoutConfig: {
-          labelSeparator: ''
-        },
-
-        items: [
-          {
-            xtype: 'textfield',
-            fieldLabel: 'Log Directory',
-            helpText: ht.logDirectory,
-            name: 'logDirectory',
-            anchor: Sonatype.view.FIELD_OFFSET,
-            allowBlank:false,
-            itemCls: 'required-field'
-          }
-        ]
-      },
-      {
-        xtype: 'fieldset',
-        checkboxToggle:false,
         title: 'SMTP Settings',
         anchor: Sonatype.view.FIELDSET_OFFSET,
         collapsible: true,

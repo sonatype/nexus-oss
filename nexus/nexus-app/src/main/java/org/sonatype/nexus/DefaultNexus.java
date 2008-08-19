@@ -33,6 +33,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import java.util.concurrent.RejectedExecutionException;
 
 import org.codehaus.plexus.logging.AbstractLogEnabled;
@@ -208,6 +209,13 @@ public class DefaultNexus
      * @plexus.requirement role="org.sonatype.nexus.proxy.router.RootRepositoryRouter"
      */
     private RepositoryRouter rootRepositoryRouter;
+    
+    /**
+     * The LogFile Manager
+     * 
+     * @plexus.requirement
+     */
+    private LogFileManager logFileManager;
 
     /**
      * System status.
@@ -433,17 +441,6 @@ public class DefaultNexus
     }
 
     // Globals are mandatory: RU
-
-    public String readApplicationLogDirectory()
-    {
-        return nexusConfiguration.readApplicationLogDirectory();
-    }
-
-    public void updateApplicationLogDirectory( String settings )
-        throws IOException
-    {
-        nexusConfiguration.updateApplicationLogDirectory( settings );
-    }
 
     // CRemoteConnectionSettings are mandatory: RU
 
@@ -744,52 +741,28 @@ public class DefaultNexus
         throws IOException
     {
         getLogger().info( "List log files." );
+        
+        Set<File> files = logFileManager.getLogFiles();
+        
+        ArrayList<NexusStreamResponse> result = new ArrayList<NexusStreamResponse>( files.size() );
 
-        File logDir = nexusConfiguration.getApplicationLogDirectory();
-
-        File[] dir = logDir.listFiles( new FileFilter()
+        for ( File file : files )
         {
-            public boolean accept( File pathname )
-            {
-                // list only ".log" files
-                if ( pathname.getName().endsWith( ".log" ) )
-                {
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
-            }
-        } );
+            NexusStreamResponse response = new NexusStreamResponse();
 
-        if ( dir != null )
-        {
-            ArrayList<NexusStreamResponse> result = new ArrayList<NexusStreamResponse>( dir.length );
+            response.setName( file.getName() );
 
-            for ( int i = 0; i < dir.length; i++ )
-            {
-                NexusStreamResponse response = new NexusStreamResponse();
+            // TODO:
+            response.setMimeType( "text/plain" );
 
-                response.setName( dir[i].getName() );
+            response.setSize( file.length() );
 
-                // TODO:
-                response.setMimeType( "text/plain" );
+            response.setInputStream( null );
 
-                response.setSize( dir[i].length() );
-
-                response.setInputStream( null );
-
-                result.add( response );
-            }
-
-            return result;
+            result.add( response );            
         }
-        else
-        {
-            throw new IOException(
-                "The listing of \"applicationLogDirectory\" was not possible. Does it points to an existing directory?" );
-        }
+        
+        return result;
     }
 
     /**
@@ -806,11 +779,10 @@ public class DefaultNexus
         {
             getLogger().info( "Retrieving " + logFile + " log file." );
 
-            File log = new File( nexusConfiguration.getApplicationLogDirectory(), logFile );
+            File log = logFileManager.getLogFile( logFile );
 
             // "chroot"ing it to nexus log dir
-            if ( log.exists()
-                && log.getAbsolutePath().startsWith( nexusConfiguration.getApplicationLogDirectory().getAbsolutePath() ) )
+            if ( log.exists() )
             {
                 NexusStreamResponse response = new NexusStreamResponse();
 
@@ -1158,12 +1130,6 @@ public class DefaultNexus
             .getConfigurationSource().getDefaultsSource().getConfigurationAsStream() );
 
         return response;
-    }
-
-    public String readDefaultApplicationLogDirectory()
-    {
-        return nexusConfiguration
-            .getConfigurationSource().getDefaultsSource().getConfiguration().getApplicationLogDirectory();
     }
 
     public CRemoteConnectionSettings readDefaultGlobalRemoteConnectionSettings()

@@ -72,7 +72,7 @@
 				</field>
 				<field>
 					<name>applicationLogDirectory</name>
-					<version>1.0.0+</version>
+					<version>1.0.0/1.0.4</version>
 					<description>
 						The Nexus logDirectory should contain log files created by Nexus during work.
 					</description>

@@ -20,7 +20,6 @@
  */
 package org.sonatype.nexus.configuration.application;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -83,8 +82,6 @@ public interface NexusConfiguration
     boolean isConfigurationUpgraded();
 
     boolean isConfigurationDefaulted();
-
-    File getApplicationLogDirectory();
 
     RemoteStorageContext getRemoteStorageContext();
 

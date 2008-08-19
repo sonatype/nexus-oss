@@ -132,9 +132,6 @@ public class DefaultNexusConfiguration
      */
     private File workingDirectory;
 
-    /** The app log dir */
-    private File applicationLogDirectory;
-
     /** The config dir */
     private File configurationDirectory;
 
@@ -174,8 +171,6 @@ public class DefaultNexusConfiguration
 
             configurationSource.loadConfiguration();
 
-            applicationLogDirectory = null;
-
             configurationDirectory = null;
 
             temporaryDirectory = null;
@@ -207,8 +202,6 @@ public class DefaultNexusConfiguration
         throws IOException
     {
         getLogger().info( "Applying Nexus Configuration..." );
-
-        applicationLogDirectory = null;
 
         configurationDirectory = null;
 
@@ -339,15 +332,6 @@ public class DefaultNexusConfiguration
 
         }
         return configurationDirectory;
-    }
-
-    public File getApplicationLogDirectory()
-    {
-        if ( applicationLogDirectory == null )
-        {
-            applicationLogDirectory = new File( getConfiguration().getApplicationLogDirectory() );
-        }
-        return applicationLogDirectory;
     }
 
     public File getWastebasketDirectory()
@@ -597,19 +581,6 @@ public class DefaultNexusConfiguration
     // ------------------------------------------------------------------
     // CRUD-like ops on config sections
     // Globals are mandatory: RU
-
-    public String readApplicationLogDirectory()
-    {
-        return getConfiguration().getApplicationLogDirectory();
-    }
-
-    public void updateApplicationLogDirectory( String settings )
-        throws IOException
-    {
-        getConfiguration().setApplicationLogDirectory( settings );
-
-        applyAndSaveConfiguration();
-    }
 
     // CRemoteConnectionSettings are mandatory: RU
 

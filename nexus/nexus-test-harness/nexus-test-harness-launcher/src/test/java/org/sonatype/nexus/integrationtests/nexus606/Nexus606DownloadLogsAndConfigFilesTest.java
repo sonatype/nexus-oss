@@ -2,7 +2,6 @@ package org.sonatype.nexus.integrationtests.nexus606;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Iterator;
 import java.util.List;
@@ -30,7 +29,7 @@ public class Nexus606DownloadLogsAndConfigFilesTest
     @SuppressWarnings( "unchecked" )
     @Test
     public void getLogsTest()
-        throws IOException
+        throws Exception
     {
 
         Response response = RequestFacade.sendMessage( "service/local/logs", Method.GET );
@@ -84,14 +83,12 @@ public class Nexus606DownloadLogsAndConfigFilesTest
     }
 
     private void downloadAndConfirmLog( String logURI, String name )
-        throws MalformedURLException, IOException
+        throws Exception
     {
         Response response = RequestFacade.sendMessage( new URL( logURI ), Method.GET, null );
         Assert.assertEquals( "Status: ", 200, response.getStatus().getCode() );
-
-        // now get the real log file and compare
-        String logDir = NexusConfigUtil.getNexusConfig().getApplicationLogDirectory();
-        File logFile = new File( logDir, name );
+        
+        File logFile = new File( nexusLogDir, name );
 
         String sha1Expected = FileTestingUtils.createSHA1FromStream( response.getEntity().getStream()  );
         String sha1Actual = FileTestingUtils.createSHA1FromFile( logFile );

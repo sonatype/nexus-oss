@@ -88,11 +88,6 @@ public interface MutableConfiguration
 
     // Globals are mandatory: RU
 
-    String readApplicationLogDirectory();
-
-    void updateApplicationLogDirectory( String settings )
-        throws IOException;
-
     // CRemoteConnectionSettings are mandatory: RU
 
     CRemoteConnectionSettings readGlobalRemoteConnectionSettings();

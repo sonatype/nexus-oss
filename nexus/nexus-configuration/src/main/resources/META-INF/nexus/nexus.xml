@@ -5,7 +5,6 @@
 
 <nexusConfiguration>
 	<version>1.0.5</version>
-	<applicationLogDirectory>${runtime}/apps/nexus/logs</applicationLogDirectory>
 	
 	<smtpConfiguration>
 	    <host>smtp-host</host>

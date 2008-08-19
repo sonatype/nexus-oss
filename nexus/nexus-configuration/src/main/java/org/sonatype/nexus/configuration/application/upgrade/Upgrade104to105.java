@@ -103,9 +103,9 @@ public class Upgrade104to105
         org.sonatype.nexus.configuration.model.Configuration newc = new org.sonatype.nexus.configuration.model.Configuration();
 
         newc.setVersion( org.sonatype.nexus.configuration.model.Configuration.MODEL_VERSION );
-        //Working directory removed in this revision
+        //Working & log directories removed in this revision
         //newc.setWorkingDirectory( oldc.getWorkingDirectory() );
-        newc.setApplicationLogDirectory( oldc.getApplicationLogDirectory() );
+        //newc.setApplicationLogDirectory( oldc.getApplicationLogDirectory() );
         
         newc.setSmtpConfiguration( copyCSmtpConfiguration1_0_4( oldc.getSmtpConfiguration() ) );
         

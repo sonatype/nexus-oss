@@ -53,16 +53,7 @@ public class StaticConfigurationSource
     {
         loadConfiguration( getConfigurationAsStream() );
 
-        Configuration configuration = getConfiguration();
-
-        if ( configuration != null )
-        {
-            // make path corrections to make them asolute, since we probable have some interpolation
-            configuration.setApplicationLogDirectory( new File( configuration.getApplicationLogDirectory() )
-                .getCanonicalPath() );
-        }
-
-        return configuration;
+        return getConfiguration();
     }
 
     /**
