@@ -71,6 +71,11 @@ public class Nexus179RemoteRepoDownTest
         catch ( FileNotFoundException e )
         {
         }
+        
+        clearProxyCache();
+        
+        //Give task a chance to run
+        Thread.sleep( 4000 );
 
         // unblock the proxy
         this.setBlockProxy( this.getBaseNexusUrl(), TEST_RELEASE_REPO, false);
