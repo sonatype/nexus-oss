@@ -514,9 +514,18 @@ Sonatype.repoServer.RepoServer = function(){
     resetMainTabPanel: function() {
       Sonatype.view.mainTabPanel.items.each(function(item, i, len){
         this.remove( item, true );
+        item.destroy();
       }, Sonatype.view.mainTabPanel);
       Sonatype.view.mainTabPanel.activeTab = null;
       
+      Sonatype.view.welcomeTab = new Ext.Panel({
+        title: 'Welcome',
+        html: '<div class="little-padding">' +
+          '<p>Welcome to the Sonatype Nexus Repository Manager.</p>' +
+          '<br/>' +
+          '<p>You may browse and search the repositories using the options on the left. Administrators may login via the link on the top right.<p>' +
+          '</div>'
+      });
       Sonatype.view.mainTabPanel.add(Sonatype.view.welcomeTab);
       Sonatype.view.mainTabPanel.setActiveTab(Sonatype.view.welcomeTab);
     },
