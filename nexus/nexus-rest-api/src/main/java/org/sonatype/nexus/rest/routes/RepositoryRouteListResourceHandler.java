@@ -187,8 +187,6 @@ public class RepositoryRouteListResourceHandler
             }
             catch ( ConfigurationException e )
             {
-                getLogger().log( Level.WARNING, "Configuration error!", e );
-
                 getResponse().setStatus( Status.CLIENT_ERROR_BAD_REQUEST, "Configuration error." );
 
                 if ( e.getCause() != null && e.getCause() instanceof PatternSyntaxException )
@@ -197,7 +195,7 @@ public class RepositoryRouteListResourceHandler
                 }
                 else
                 {
-                    getResponse().setEntity( serialize( entity, getNexusErrorResponse( "*", e.getMessage() ) ) );
+                    handleConfigurationException( e, entity );
                 }
             }
             catch ( NoSuchRepositoryException e )
