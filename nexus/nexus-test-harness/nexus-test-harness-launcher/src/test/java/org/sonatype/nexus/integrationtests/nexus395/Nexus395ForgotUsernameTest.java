@@ -29,7 +29,7 @@ public class Nexus395ForgotUsernameTest
         String body = GreenMailUtil.getBody( msgs[0] );
 
         String username = body.substring( body.lastIndexOf( ' ' ) + 1 );
-        System.out.println( "Username:\n" + username );
+        log.debug( "Username:\n" + username );
 
         Assert.assertNotNull( username );
     }

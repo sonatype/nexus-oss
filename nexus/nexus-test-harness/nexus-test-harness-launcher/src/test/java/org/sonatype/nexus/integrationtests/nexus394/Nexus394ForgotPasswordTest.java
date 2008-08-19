@@ -31,7 +31,7 @@ public class Nexus394ForgotPasswordTest
         String body = GreenMailUtil.getBody( msgs[0] );
 
         String password = body.substring( body.lastIndexOf( ' ' ) + 1 );
-        System.out.println( "New password:\n" + password );
+        log.debug( "New password:\n" + password );
 
         Assert.assertNotNull( password );
     }

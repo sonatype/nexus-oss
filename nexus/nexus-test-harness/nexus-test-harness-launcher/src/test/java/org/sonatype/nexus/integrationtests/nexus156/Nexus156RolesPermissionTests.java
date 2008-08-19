@@ -86,7 +86,7 @@ public class Nexus156RolesPermissionTests extends AbstractPrivilegeTest
         // update user
         role.setName( "testUpdatePermission2" );
         response = this.roleUtil.sendMessage( Method.PUT, role );
-//        System.out.println( "PROBLEM: "+ this.userUtil.getUser( "test-user" ) );
+//        log.debug( "PROBLEM: "+ this.userUtil.getUser( "test-user" ) );
         Assert.assertEquals( "Response status: ", 401, response.getStatus().getCode() );
         
         // use admin

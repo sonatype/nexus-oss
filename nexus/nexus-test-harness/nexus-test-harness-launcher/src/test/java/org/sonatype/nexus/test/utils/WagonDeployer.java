@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.Arrays;
 
 import org.apache.commons.lang.NotImplementedException;
+import org.apache.log4j.Logger;
 import org.apache.maven.wagon.ConnectionException;
 import org.apache.maven.wagon.ResourceDoesNotExistException;
 import org.apache.maven.wagon.TransferFailedException;
@@ -52,6 +53,8 @@ public class WagonDeployer
     private File fileToDeploy;
 
     private String artifactPath;
+    
+    private static final Logger LOG = Logger.getLogger( WagonDeployer.class );
 
     public WagonDeployer( String protocol, String username, String password, String repositoryUrl, File fileToDeploy,
                           String artifactPath )
@@ -250,11 +253,11 @@ public class WagonDeployer
 
     public static void main( String[] args )
     {
-        System.out.println( "sweet!" );
+        LOG.debug( "sweet!" );
 
         if ( args == null || args.length != 6 )
         {
-            System.out.println( "Usage: java " + WagonDeployer.class.getName()
+            LOG.debug( "Usage: java " + WagonDeployer.class.getName()
                 + " <protocol> <username> <password> <repositoryUrl> <fileToDeploy> <artifactPath>" );
             System.exit( 1 );
         }

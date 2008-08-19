@@ -7,8 +7,8 @@ import junit.framework.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
-import org.sonatype.nexus.integrationtests.nexus383.SearchMessageUtil;
 import org.sonatype.nexus.rest.model.NexusArtifact;
+import org.sonatype.nexus.test.utils.SearchMessageUtil;
 
 public class Nexus384DotAndDashSearchTest
     extends AbstractNexusIntegrationTest
@@ -18,9 +18,6 @@ public class Nexus384DotAndDashSearchTest
         throws Exception
     {
         cleanWorkDir();
-        printKnownErrorButDoNotFail( Nexus384DotAndDashSearchTest.class, "searchDash", "searchDot", "searchDashAndDot",
-                                     "searchGroupDashed", "searchGroupDoted", "searchGroupdDashedAndDoted",
-                                     "searchMixed", "searchMixedNexus83" );
     }
 
     protected SearchMessageUtil messageUtil;
@@ -28,6 +25,14 @@ public class Nexus384DotAndDashSearchTest
     public Nexus384DotAndDashSearchTest()
     {
         this.messageUtil = new SearchMessageUtil();
+        
+        if( printKnownErrorButDoNotFail( Nexus384DotAndDashSearchTest.class, "searchDash", "searchDot", "searchDashAndDot",
+                                     "searchGroupDashed", "searchGroupDoted", "searchGroupdDashedAndDoted",
+                                     "searchMixed", "searchMixedNexus83" ))
+        {
+            return;
+        }
+        
     }
 
     @Test

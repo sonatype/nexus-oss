@@ -1,22 +1,24 @@
 package org.sonatype.nexus.integrationtests.nexus586;
 
+import org.junit.Assert;
 import org.junit.Test;
+import org.restlet.data.Status;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
+import org.sonatype.nexus.integrationtests.nexus395.ForgotUsernameUtils;
 
 public class Nexus586AnonymousForgotUserIdTest
     extends AbstractNexusIntegrationTest
 {
 
-    static
-    {
-        printKnownErrorButDoNotFail( Nexus586AnonymousResetPasswordTest.class, "forgotUsername" );
-    }
-
     @Test
     public void forgotUsername()
         throws Exception
     {
-        // Status status = ForgotUsernameUtils.recoverUsername( "changeme2@yourcompany.com" );
-        // Assert.assertEquals( 400, status.getCode() );
+        if( printKnownErrorButDoNotFail( Nexus586AnonymousResetPasswordTest.class, "forgotUsername" ))
+        {
+            return;
+        }
+         Status status = ForgotUsernameUtils.recoverUsername( "changeme2@yourcompany.com" );
+         Assert.assertEquals( 400, status.getCode() );
     }
 }

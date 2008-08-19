@@ -72,7 +72,7 @@ public class Nexus450UserCreationTest
             if ( body.startsWith( "Your new password is " ) )
             {
                 password = body.substring( body.lastIndexOf( ' ' ) + 1 );
-                System.out.println( "New password:\n" + password );
+                log.debug( "New password:\n" + password );
                 break;
             }
         }

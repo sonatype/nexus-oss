@@ -71,7 +71,7 @@ public abstract class AbstractNexusProxyIntegrationTest
         File result =
             new File( this.localStorageDir, repositoryId + "/" + groupId.replace( '.', '/' ) + "/" + artifact + "/"
                 + version + "/" + artifact + "-" + version + "." + type );
-        System.out.println( "Returning file: " + result );
+        log.debug( "Returning file: " + result );
         return result;
     }
 

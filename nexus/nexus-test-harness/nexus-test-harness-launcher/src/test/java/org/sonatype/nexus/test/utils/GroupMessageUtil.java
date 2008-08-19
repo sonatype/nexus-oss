@@ -6,6 +6,7 @@ import java.util.List;
 
 import junit.framework.Assert;
 
+import org.apache.log4j.Logger;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
@@ -30,6 +31,8 @@ public class GroupMessageUtil
     private XStream xstream;
 
     private MediaType mediaType;
+    
+    private static final Logger LOG = Logger.getLogger( GroupMessageUtil.class );
 
     public GroupMessageUtil( XStream xstream, MediaType mediaType )
     {
@@ -70,8 +73,8 @@ public class GroupMessageUtil
         Assert.assertEquals( group.getName(), responseResource.getName() );
         Assert.assertEquals( group.getFormat(), responseResource.getFormat() );
 
-        System.out.println( "group repos: " + group.getRepositories() );
-        System.out.println( "other repos: " + responseResource.getRepositories() );
+        LOG.debug( "group repos: " + group.getRepositories() );
+        LOG.debug( "other repos: " + responseResource.getRepositories() );
 
         validateRepoLists( group.getRepositories(), responseResource.getRepositories() );
 
@@ -112,7 +115,7 @@ public class GroupMessageUtil
     {
 
         String responseText = RequestFacade.doGetRequest( SERVICE_PART + "/" + repoId ).getEntity().getText();
-        System.out.println( "responseText: \n" + responseText );
+        LOG.debug( "responseText: \n" + responseText );
 
         // this should use call to: getResourceFromResponse
         XStreamRepresentation representation =
@@ -163,7 +166,7 @@ public class GroupMessageUtil
         // now set the payload
         representation.setPayload( repoResponseRequest );
 
-        System.out.println( "sendMessage: " + representation.getText() );
+        LOG.debug( "sendMessage: " + representation.getText() );
 
         return RequestFacade.sendMessage( serviceURI, method, representation );
     }
@@ -179,7 +182,7 @@ public class GroupMessageUtil
         throws IOException
     {
         String responseText = RequestFacade.doGetRequest( SERVICE_PART ).getEntity().getText();
-        System.out.println( "responseText: \n" + responseText );
+        LOG.debug( "responseText: \n" + responseText );
 
         XStreamRepresentation representation =
             new XStreamRepresentation( new XStream(), responseText, MediaType.APPLICATION_XML );
@@ -195,7 +198,7 @@ public class GroupMessageUtil
         throws IOException
     {
         String responseString = response.getEntity().getText();
-        System.out.println( " getResourceFromResponse: " + responseString );
+        LOG.debug( " getResourceFromResponse: " + responseString );
 
         XStreamRepresentation representation = new XStreamRepresentation( xstream, responseString, mediaType );
         RepositoryGroupResourceResponse resourceResponse =

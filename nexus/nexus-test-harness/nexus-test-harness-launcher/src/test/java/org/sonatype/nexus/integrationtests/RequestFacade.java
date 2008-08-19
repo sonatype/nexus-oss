@@ -17,6 +17,7 @@ import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.auth.AuthPolicy;
 import org.apache.commons.httpclient.auth.AuthScope;
+import org.apache.log4j.Logger;
 import org.apache.maven.wagon.authentication.AuthenticationInfo;
 import org.restlet.Client;
 import org.restlet.data.ChallengeResponse;
@@ -30,6 +31,7 @@ import org.sonatype.nexus.test.utils.TestProperties;
 
 public class RequestFacade
 {
+    private static final Logger LOG = Logger.getLogger( RequestFacade.class );
 
     public static Response doGetRequest( String serviceURIpart )
         throws IOException
@@ -72,7 +74,7 @@ public class RequestFacade
 
         Client client = new Client( Protocol.HTTP );
 
-        System.out.println( "sendMessage: " + method.getName() + " "+ url );
+        LOG.debug( "sendMessage: " + method.getName() + " "+ url );
         return client.handle( request );
     }
 

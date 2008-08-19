@@ -13,6 +13,7 @@ import org.apache.commons.httpclient.methods.multipart.MultipartRequestEntity;
 import org.apache.commons.httpclient.methods.multipart.Part;
 import org.apache.commons.httpclient.methods.multipart.StringPart;
 import org.apache.commons.httpclient.params.HttpMethodParams;
+import org.apache.log4j.Logger;
 import org.apache.maven.wagon.ConnectionException;
 import org.apache.maven.wagon.ResourceDoesNotExistException;
 import org.apache.maven.wagon.TransferFailedException;
@@ -30,6 +31,8 @@ import org.sonatype.nexus.integrationtests.TestContainer;
 
 public class DeployUtils
 {
+    
+    private static final Logger LOG = Logger.getLogger( DeployUtils.class );
 
     public static void deployWithWagon( PlexusContainer container, String wagonHint, String repositoryUrl,
                                         File fileToDeploy, String artifactPath )
@@ -96,13 +99,13 @@ public class DeployUtils
 
         filePost.setRequestEntity( new MultipartRequestEntity( parts, filePost.getParams() ) );
 
-        System.out.println( "URL:  " + restServiceURL );
-        System.out.println( "Method: Post" );
-        System.out.println( "params: " );
-        System.out.println( "\tr: " + repositoryId );
-        System.out.println( "\thasPom: true" );
-        System.out.println( "\tpom: " + pomFile );
-        System.out.println( "\tfileToDeploy: " + fileToDeploy );
+        LOG.debug( "URL:  " + restServiceURL );
+        LOG.debug( "Method: Post" );
+        LOG.debug( "params: " );
+        LOG.debug( "\tr: " + repositoryId );
+        LOG.debug( "\thasPom: true" );
+        LOG.debug( "\tpom: " + pomFile );
+        LOG.debug( "\tfileToDeploy: " + fileToDeploy );
 
         return RequestFacade.executeHTTPClientMethod( new URL( restServiceURL ), filePost );
     }

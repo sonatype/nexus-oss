@@ -23,7 +23,7 @@ public class Nexus262SimpleProxyTest extends AbstractNexusProxyIntegrationTest
     {
         File localFile = this.getLocalFile( "release-proxy-repo-1", "simple.artifact", "simpleXMLArtifact", "1.0.0", "xml" );
                                                                                               
-        System.out.println( "localFile: "+ localFile.getAbsolutePath() );
+        log.debug( "localFile: "+ localFile.getAbsolutePath() );
         
         File artifact = this.downloadArtifact( "simple.artifact", "simpleXMLArtifact", "1.0.0", "xml", "target/downloads" );
         

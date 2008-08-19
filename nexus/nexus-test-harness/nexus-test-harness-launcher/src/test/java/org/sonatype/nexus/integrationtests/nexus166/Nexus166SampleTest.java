@@ -17,8 +17,8 @@ public class Nexus166SampleTest extends AbstractNexusIntegrationTest
     @Test
     public void doTest() throws IOException
     {
-        System.out.println( "This is just an example test" );
-        System.out.println( "I will show you how to do a few simple things..." );
+        log.debug( "This is just an example test" );
+        log.debug( "I will show you how to do a few simple things..." );
         
         File exampleFile = this.getTestFile( "example.txt" );
         
@@ -29,7 +29,7 @@ public class Nexus166SampleTest extends AbstractNexusIntegrationTest
         reader.close();
         
         // you get the point...
-        System.out.println( "exampleText: "+ exampleText );
+        log.debug( "exampleText: "+ exampleText );
     }
     
 }

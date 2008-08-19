@@ -12,6 +12,7 @@ import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.rest.model.NexusArtifact;
 import org.sonatype.nexus.test.utils.DeployUtils;
+import org.sonatype.nexus.test.utils.SearchMessageUtil;
 
 public class Nexus383SearchTest
     extends AbstractNexusIntegrationTest

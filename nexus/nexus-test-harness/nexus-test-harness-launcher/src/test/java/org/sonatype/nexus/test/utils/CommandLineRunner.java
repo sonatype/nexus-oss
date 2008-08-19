@@ -1,5 +1,6 @@
 package org.sonatype.nexus.test.utils;
 
+import org.apache.log4j.Logger;
 import org.codehaus.plexus.util.cli.CommandLineException;
 import org.codehaus.plexus.util.cli.Commandline;
 import org.codehaus.plexus.util.cli.StreamConsumer;
@@ -8,6 +9,7 @@ import org.codehaus.plexus.util.cli.StreamPumper;
 public class CommandLineRunner
 {
 
+    private static final Logger LOG = Logger.getLogger( CommandLineRunner.class );
     private final StringBuffer buffer = new StringBuffer();
     
     
@@ -27,7 +29,7 @@ public class CommandLineRunner
 
         try
         {
-            System.out.println( "executing: " + cli.toString() );
+            LOG.debug( "executing: " + cli.toString() );
             p = cli.execute();
 
             // we really don't need the stream pumps... but just in case... and if your into that whole sys-out style of

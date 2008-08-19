@@ -5,6 +5,7 @@ import java.util.List;
 
 import junit.framework.Assert;
 
+import org.apache.log4j.Logger;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
@@ -22,6 +23,8 @@ public class RoleMessageUtil
     private XStream xstream;
 
     private MediaType mediaType;
+    
+    private static final Logger LOG = Logger.getLogger( RoleMessageUtil.class );
 
     public RoleMessageUtil( XStream xstream, MediaType mediaType )
     {
@@ -124,7 +127,7 @@ public class RoleMessageUtil
         throws IOException
     {
         String responseString = response.getEntity().getText();
-        System.out.println( " getResourceFromResponse: " + responseString );
+        LOG.debug( " getResourceFromResponse: " + responseString );
 
         XStreamRepresentation representation = new XStreamRepresentation( xstream, responseString, mediaType );
 

@@ -7,6 +7,7 @@ import java.util.List;
 
 import junit.framework.Assert;
 
+import org.apache.log4j.Logger;
 import org.codehaus.plexus.util.StringUtils;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
@@ -29,6 +30,8 @@ public class TargetMessageUtil
 
     private MediaType mediaType;
 
+    private static final Logger LOG = Logger.getLogger( TargetMessageUtil.class );
+    
     public TargetMessageUtil( XStream xstream, MediaType mediaType )
     {
         super();
@@ -86,7 +89,7 @@ public class TargetMessageUtil
     {
 
         String responseText = RequestFacade.doGetRequest( "service/local/repo_targets" ).getEntity().getText();
-        System.out.println( "responseText: \n" + responseText );
+        LOG.debug( "responseText: \n" + responseText );
 
         XStreamRepresentation representation =
             new XStreamRepresentation( new XStream(), responseText, MediaType.APPLICATION_XML );
@@ -102,7 +105,7 @@ public class TargetMessageUtil
         throws IOException
     {
         String responseString = response.getEntity().getText();
-        System.out.println( " getResourceFromResponse: " + responseString );
+        LOG.debug( " getResourceFromResponse: " + responseString );
 
         XStreamRepresentation representation = new XStreamRepresentation( xstream, responseString, mediaType );
 

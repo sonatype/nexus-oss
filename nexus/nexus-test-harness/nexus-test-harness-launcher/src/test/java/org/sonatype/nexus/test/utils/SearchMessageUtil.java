@@ -1,8 +1,9 @@
-package org.sonatype.nexus.integrationtests.nexus383;
+package org.sonatype.nexus.test.utils;
 
 import java.io.IOException;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.codehaus.plexus.util.StringUtils;
 import org.junit.Assert;
 import org.restlet.data.MediaType;
@@ -22,6 +23,8 @@ import com.thoughtworks.xstream.XStream;
 public class SearchMessageUtil
 {
 
+    private Logger log = Logger.getLogger( getClass() );
+    
     private XStream xstream;
 
     public SearchMessageUtil()
@@ -60,7 +63,7 @@ public class SearchMessageUtil
 
         String responseText = RequestFacade.doGetRequest( serviceURI ).getEntity().getText();
 
-        System.out.println( "responseText: \n" + responseText );
+        log.debug( "responseText: \n" + responseText );
 
         if ( StringUtils.isEmpty( responseText ) )
         {

@@ -84,7 +84,7 @@ public class Nexus385RoutesPermissionTests extends AbstractPrivilegeTest
         // update user
         route.setPattern( ".*testUpdatePermission2.*" );
         response = this.routeUtil.sendMessage( Method.PUT, route );
-//        System.out.println( "PROBLEM: "+ this.userUtil.getUser( "test-user" ) );
+//        log.debug( "PROBLEM: "+ this.userUtil.getUser( "test-user" ) );
         Assert.assertEquals( "Response status: ", 401, response.getStatus().getCode() );
 
         // use admin

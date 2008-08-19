@@ -5,6 +5,7 @@ import java.util.List;
 
 import junit.framework.Assert;
 
+import org.apache.log4j.Logger;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
@@ -23,6 +24,8 @@ public class UserMessageUtil
     private XStream xstream;
 
     private MediaType mediaType;
+    
+    private static final Logger LOG = Logger.getLogger( UserMessageUtil.class );
 
     public UserMessageUtil( XStream xstream, MediaType mediaType )
     {
@@ -64,7 +67,7 @@ public class UserMessageUtil
     {
 
         String responseText = RequestFacade.doGetRequest( "service/local/users/" + userId ).getEntity().getText();
-        System.out.println( "responseText: \n" + responseText );
+        LOG.debug( "responseText: \n" + responseText );
 
         XStreamRepresentation representation =
             new XStreamRepresentation( new XStream(), responseText, MediaType.APPLICATION_XML );
@@ -131,7 +134,7 @@ public class UserMessageUtil
         throws IOException
     {
         String responseText = RequestFacade.doGetRequest( "service/local/users" ).getEntity().getText();
-        System.out.println( "responseText: \n" + responseText );
+        LOG.debug( "responseText: \n" + responseText );
 
         XStreamRepresentation representation =
             new XStreamRepresentation( new XStream(), responseText, MediaType.APPLICATION_XML );
@@ -147,7 +150,7 @@ public class UserMessageUtil
         throws IOException
     {
         String responseString = response.getEntity().getText();
-        System.out.println( " getResourceFromResponse: " + responseString );
+        LOG.debug( " getResourceFromResponse: " + responseString );
 
         XStreamRepresentation representation = new XStreamRepresentation( xstream, responseString, mediaType );
 

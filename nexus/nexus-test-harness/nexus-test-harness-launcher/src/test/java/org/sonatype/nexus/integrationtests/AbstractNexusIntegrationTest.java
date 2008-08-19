@@ -17,6 +17,7 @@ import java.util.Map;
 import junit.framework.Assert;
 
 import org.apache.commons.httpclient.HttpStatus;
+import org.apache.log4j.Logger;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.wagon.ConnectionException;
@@ -74,11 +75,12 @@ public class AbstractNexusIntegrationTest
 
     protected static String baseNexusUrl;
 
-
     protected static String nexusWorkDir;
     
     protected static String nexusLogDir;
 
+    protected Logger log = Logger.getLogger( getClass() );
+    
     static
     {
         nexusBaseDir = TestProperties.getString( "nexus.base.dir" );
@@ -122,6 +124,9 @@ public class AbstractNexusIntegrationTest
         {
             if ( NEEDS_INIT )
             {
+                // tell the console what we are doing, now that there is no output its 
+                System.out.println( "Running Test: "+ this.getClass() );
+                
                 HashMap<String, String> variables = new HashMap<String, String>();
                 variables.put( "test-harness-id", this.getTestId() );
 
@@ -181,7 +186,7 @@ public class AbstractNexusIntegrationTest
     {
         // test the test directory
         File projectsDir = this.getTestResourceAsFile( "projects" );
-        System.out.println( "projectsDir: " + projectsDir );
+        log.debug( "projectsDir: " + projectsDir );
 
         // if null there is nothing to deploy...
         if ( projectsDir != null )
@@ -225,7 +230,7 @@ public class AbstractNexusIntegrationTest
                 String artifactFileName = model.getArtifactId() + "." + model.getPackaging();
                 File artifactFile = new File( project, artifactFileName );
 
-                System.out.println( "wow, this is working: " + artifactFile );
+                log.debug( "wow, this is working: " + artifactFile );
 
                 Gav gav =
                     new Gav( model.getGroupId(), model.getArtifactId(), model.getVersion(), null, model.getPackaging(),
@@ -251,6 +256,9 @@ public class AbstractNexusIntegrationTest
     {
         // reset this for each test
         TestContainer.getInstance().getTestContext().useAdminForRequests();
+        
+        
+        
     }
 
     private void startNexus()
@@ -280,12 +288,12 @@ public class AbstractNexusIntegrationTest
             // we need a hard start
             NEEDS_HARD_STOP = true;
 
-            System.out.println( "***************************" );
-            System.out.println( "*\n*" );
-            System.out.println( "*  DOING A HARD START OF NEXUS." );
-            System.out.println( "*  If your not running a single test manually, then something bad happened" );
-            System.out.println( "*\n*" );
-            System.out.println( "***************************" );
+            log.debug( "***************************" );
+            log.debug( "*\n*" );
+            log.debug( "*  DOING A HARD START OF NEXUS." );
+            log.debug( "*  If your not running a single test manually, then something bad happened" );
+            log.debug( "*\n*" );
+            log.debug( "***************************" );
 
             ForkedAppBooter appBooter =
                 (ForkedAppBooter) TestContainer.getInstance().lookup( ForkedAppBooter.ROLE, "TestForkedAppBooter" );
@@ -335,7 +343,7 @@ public class AbstractNexusIntegrationTest
         }
         else
         {
-            System.out.println( "This test is using its own " + file + " " + testConfigFile );
+            log.debug( "This test is using its own " + file + " " + testConfigFile );
         }
         return testConfigFile;
     }
@@ -346,7 +354,7 @@ public class AbstractNexusIntegrationTest
         // the test can override the test config.
         File testConfigFile = this.getOverridableFile( configFile );
 
-        System.out.println( "copying " + configFile + " to:  "
+        log.debug( "copying " + configFile + " to:  "
             + new File( AbstractNexusIntegrationTest.nexusBaseDir + "/" + RELATIVE_CONF_DIR, configFile ) );
 
         FileTestingUtils.interpolationFileCopy( testConfigFile, new File( AbstractNexusIntegrationTest.nexusBaseDir
@@ -414,9 +422,9 @@ public class AbstractNexusIntegrationTest
 
     protected File getResource( String resource )
     {
-        System.out.println( "Looking for resource: " + resource );
+        log.debug( "Looking for resource: " + resource );
         URL classURL = Thread.currentThread().getContextClassLoader().getResource( resource );
-        System.out.println( "found: " + classURL );
+        log.debug( "found: " + classURL );
 
         try
         {
@@ -576,13 +584,13 @@ public class AbstractNexusIntegrationTest
     {
         String serviceURI = "service/local/repositories/" + repository + "/content/" + groupOrArtifactPath;
 
-        System.out.println( "deleting: " + serviceURI );
+        log.debug( "deleting: " + serviceURI );
 
         Response response = RequestFacade.sendMessage( serviceURI, Method.DELETE );
 
         if ( !response.getStatus().isSuccess() )
         {
-            System.out.println( "Failed to delete: " + serviceURI + "  - Status: " + response.getStatus() );
+            log.debug( "Failed to delete: " + serviceURI + "  - Status: " + response.getStatus() );
         }
     }
 
@@ -632,7 +640,7 @@ public class AbstractNexusIntegrationTest
         return baseNexusUrl + GROUP_REPOSITORY_RELATIVE_URL + groupId + "/";
     }
 
-    protected static boolean printKnownErrorButDoNotFail( Class<? extends AbstractNexusIntegrationTest> clazz,
+    protected boolean printKnownErrorButDoNotFail( Class<? extends AbstractNexusIntegrationTest> clazz,
                                                           String... tests )
     {
         StringBuffer error =
@@ -650,7 +658,7 @@ public class AbstractNexusIntegrationTest
         }
         error.append( "*\n*\n*\n*\n*\n**********************************************************************************" );
 
-        System.out.println( error.toString() );
+        log.debug( error.toString() );
 
         return true;
     }

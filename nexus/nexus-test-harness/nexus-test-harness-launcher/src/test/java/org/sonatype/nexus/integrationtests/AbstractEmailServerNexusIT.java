@@ -1,5 +1,6 @@
 package org.sonatype.nexus.integrationtests;
 
+import org.apache.log4j.Logger;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 
@@ -10,6 +11,8 @@ public abstract class AbstractEmailServerNexusIT
     extends AbstractNexusIntegrationTest
 {
 
+    private static final Logger LOG = Logger.getLogger( AbstractEmailServerNexusIT.class );
+    
     protected static GreenMail server;
 
     @BeforeClass
@@ -18,14 +21,14 @@ public abstract class AbstractEmailServerNexusIT
         // ServerSetup smtp = new ServerSetup( 1234, null, ServerSetup.PROTOCOL_SMTP );
         server = new GreenMail( ServerSetupTest.SMTP );
         server.setUser( "system@nexus.org", "smtp-username", "smtp-password" );
-        System.out.println( "Starting e-mail server" );
+        LOG.debug( "Starting e-mail server" );
         server.start();
     }
 
     @AfterClass
     public static void stopEmailServer()
     {
-        System.out.println( "Stoping e-mail server" );
+        LOG.debug( "Stoping e-mail server" );
         server.stop();
     }
 

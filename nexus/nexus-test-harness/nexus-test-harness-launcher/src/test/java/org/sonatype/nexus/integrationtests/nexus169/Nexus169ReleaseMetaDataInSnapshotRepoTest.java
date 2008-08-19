@@ -81,8 +81,8 @@ public class Nexus169ReleaseMetaDataInSnapshotRepoTest
             new URL( this.getBaseNexusUrl() + GROUP_REPOSITORY_RELATIVE_URL + TEST_GROUP + "/"
                 + this.getTestId().replace( '.', '/' ) + "/simple-artifact/maven-metadata.xml" );
 
-        System.out.println( "snapshotRepoMetaDataURL: " + snapshotRepoMetaDataURL );
-        System.out.println( "groupMetaDataURL: " + groupMetaDataURL );
+        log.debug( "snapshotRepoMetaDataURL: " + snapshotRepoMetaDataURL );
+        log.debug( "groupMetaDataURL: " + groupMetaDataURL );
 
         // // download the two meta data files
         // File snapshotRepoMetaDataFile = this.downloadFile( snapshotRepoMetaDataURL,

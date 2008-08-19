@@ -12,6 +12,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.codehaus.plexus.util.InterpolationFilterReader;
 
 /**
@@ -20,6 +21,8 @@ import org.codehaus.plexus.util.InterpolationFilterReader;
 public class FileTestingUtils
 {
 
+    private static final Logger LOG = Logger.getLogger( FileTestingUtils.class );
+    
     private static final int BUFFER_SIZE = 0x1000;
 
     private static final String SHA1 = "SHA1";
@@ -149,9 +152,9 @@ public class FileTestingUtils
     public static File getTestFile( Class clazz, String filename )
     {
         String resource = clazz.getName().replace( '.', '/' ) + "Resources/" + filename;
-        System.out.println( "Looking for resource: " + resource );
+        LOG.debug( "Looking for resource: " + resource );
         URL classURL = Thread.currentThread().getContextClassLoader().getResource( resource );
-        System.out.println( "found: " + classURL );
+        LOG.debug( "found: " + classURL );
         return new File( classURL.getFile() );
     }
 
@@ -161,18 +164,18 @@ public class FileTestingUtils
 
         if ( args == null || args.length != 1 )
         {
-            System.out.println( usage );
+            LOG.debug( usage );
             return;
         }
 
         try
         {
             URL url = new URL( args[0] );
-            System.out.println( createSHA1FromURL( url ) );
+            LOG.debug( createSHA1FromURL( url ) );
         }
         catch ( Exception e )
         {
-            System.out.println( usage );
+            LOG.debug( usage );
             e.printStackTrace( System.out );
         }
 

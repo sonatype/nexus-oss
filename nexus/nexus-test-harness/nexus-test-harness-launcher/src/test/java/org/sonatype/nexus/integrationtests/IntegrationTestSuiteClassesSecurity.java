@@ -84,7 +84,7 @@ public class IntegrationTestSuiteClassesSecurity
         throws Exception
     {
 
-        System.out.println( "\n\n\n*****************\n   Running Security Tests   \n\n\n*************" );
+        System.out.println( "\n\n\n****************************\n   Running Security Tests   \n****************************\n\n\n" );
 
         // enable security
         TestContainer.getInstance().getTestContext().setSecureTest( true );

@@ -6,6 +6,7 @@ import java.util.List;
 
 import junit.framework.Assert;
 
+import org.apache.log4j.Logger;
 import org.codehaus.plexus.util.StringUtils;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
@@ -26,6 +27,8 @@ public class RoutesMessageUtil
     private XStream xstream;
 
     private MediaType mediaType;
+    
+    private static final Logger LOG = Logger.getLogger( RoutesMessageUtil.class );
 
     public RoutesMessageUtil( XStream xstream, MediaType mediaType )
     {
@@ -56,7 +59,7 @@ public class RoutesMessageUtil
     public RepositoryRouteResource getResourceFromResponse( Response response ) throws IOException
     {
         String responseString = response.getEntity().getText();
-        System.out.println( "responseText: "+ responseString );
+        LOG.debug( "responseText: "+ responseString );
         
         Assert.assertFalse( "Response text was empty.", StringUtils.isEmpty( responseString ) );
 

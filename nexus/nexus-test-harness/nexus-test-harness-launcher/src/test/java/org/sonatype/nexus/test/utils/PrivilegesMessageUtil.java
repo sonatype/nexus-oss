@@ -6,6 +6,7 @@ import java.util.List;
 
 import junit.framework.Assert;
 
+import org.apache.log4j.Logger;
 import org.codehaus.plexus.util.StringUtils;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
@@ -29,6 +30,7 @@ public class PrivilegesMessageUtil
 
     private MediaType mediaType;
 
+    private Logger log = Logger.getLogger( getClass() );
 
     public PrivilegesMessageUtil( XStream xstream, MediaType mediaType )
     {
@@ -83,7 +85,7 @@ public class PrivilegesMessageUtil
 
             // now set the payload
             representation.setPayload( requestResponse );
-            System.out.println( method.getName() + ": " + representation.getText() );
+            log.debug( method.getName() + ": " + representation.getText() );
         }
 
         return RequestFacade.sendMessage( serviceURI, method, representation );

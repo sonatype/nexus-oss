@@ -212,8 +212,8 @@ public class Nexus531RepositoryCrudJsonTests
             Assert.assertEquals( cRepo.getType(), listRepo.getFormat() );
             Assert.assertEquals( cRepo.getRepositoryPolicy(), listRepo.getRepoPolicy() );
 
-            System.out.println( "cRepo.getRemoteStorage(): " + cRepo.getRemoteStorage() );
-            System.out.println( "listRepo.getRemoteUri(): " + listRepo.getRemoteUri() );
+            log.debug( "cRepo.getRemoteStorage(): " + cRepo.getRemoteStorage() );
+            log.debug( "listRepo.getRemoteUri(): " + listRepo.getRemoteUri() );
 
             Assert.assertTrue( ( cRepo.getRemoteStorage() == null && listRepo.getRemoteUri() == null )
                 || ( cRepo.getRemoteStorage().getUrl().equals( listRepo.getRemoteUri() ) ) );
