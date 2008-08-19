@@ -2,12 +2,6 @@ package org.sonatype.nexus.test.utils;
 
 import java.io.File;
 
-import org.apache.maven.wagon.ConnectionException;
-import org.apache.maven.wagon.ResourceDoesNotExistException;
-import org.apache.maven.wagon.TransferFailedException;
-import org.apache.maven.wagon.authentication.AuthenticationException;
-import org.apache.maven.wagon.authorization.AuthorizationException;
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.util.cli.CommandLineException;
 import org.codehaus.plexus.util.cli.Commandline;
 import org.sonatype.nexus.artifact.Gav;
@@ -15,7 +9,7 @@ import org.sonatype.nexus.artifact.Gav;
 public class MavenDeployer
 {
 
-    public static void deploy( Gav gav, String repositoryUrl, File fileToDeploy, File settings )
+    public static String deploy( Gav gav, String repositoryUrl, File fileToDeploy, File settings )
         throws CommandLineException, InterruptedException
     {
         Commandline cli = new Commandline();
@@ -46,6 +40,13 @@ public class MavenDeployer
                 + status + "Process output:\n" + consoleOutput );
         }
 
+        if ( consoleOutput.contains( "BUILD ERROR" ) )
+        {
+            throw new CommandLineException( "Process failed: \n" + cli.toString() + "\nBUILD ERROR token found\n"
+                + "Process output:\n" + consoleOutput );
+        }
+
+        return consoleOutput;
     }
 
 }

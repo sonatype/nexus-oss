@@ -20,7 +20,6 @@ import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.integrationtests.AbstractPrivilegeTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.integrationtests.TestContainer;
-import org.sonatype.nexus.test.utils.DeployUtils;
 import org.sonatype.nexus.test.utils.MavenDeployer;
 
 public class Nexus429WagonDeployPrivilegeTest
@@ -64,9 +63,9 @@ public class Nexus429WagonDeployPrivilegeTest
         {
             // DeployUtils.forkDeployWithWagon( this.getContainer(), "http", this.getNexusTestRepoUrl(), fileToDeploy,
             // this.getRelitiveArtifactPath( gav ));
-            MavenDeployer.deploy( gav, this.getNexusTestRepoUrl(), fileToDeploy,
+            String consoleOutput = MavenDeployer.deploy( gav, this.getNexusTestRepoUrl(), fileToDeploy,
                                   this.getOverridableFile( "settings.xml" ) );
-            Assert.fail( "File should NOT have been deployed" );
+            Assert.fail( "File should NOT have been deployed " + consoleOutput);
         }
         // catch ( TransferFailedException e )
         // {

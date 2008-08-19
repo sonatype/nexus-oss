@@ -1,21 +1,15 @@
 package org.sonatype.nexus.integrationtests.nexus175;
 
-import static org.junit.Assert.assertTrue;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.Date;
 
 import junit.framework.Assert;
 
-import org.apache.commons.httpclient.HttpException;
-import org.apache.commons.httpclient.HttpStatus;
 import org.codehaus.plexus.util.cli.CommandLineException;
 import org.junit.Test;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
-import org.sonatype.nexus.test.utils.DeployUtils;
-import org.sonatype.nexus.test.utils.FileTestingUtils;
 import org.sonatype.nexus.test.utils.MavenDeployer;
 
 public class Nexus175SnapshotDeployWrongPassword
@@ -30,7 +24,8 @@ public class Nexus175SnapshotDeployWrongPassword
     }
 
     @Test
-    public void deployWithMaven() throws IOException, InterruptedException, CommandLineException
+    public void deployWithMaven()
+        throws IOException, InterruptedException, CommandLineException
     {
 
         // GAV
@@ -48,9 +43,10 @@ public class Nexus175SnapshotDeployWrongPassword
         {
             // DeployUtils.forkDeployWithWagon( this.getContainer(), "http", this.getNexusTestRepoUrl(), fileToDeploy,
             // this.getRelitiveArtifactPath( gav ));
-            MavenDeployer.deploy( gav, this.getNexusTestRepoUrl(), fileToDeploy,
-                                  this.getOverridableFile( "settings.xml" ) );
-            Assert.fail( "File should NOT have been deployed" );
+            String consoleOutput =
+                MavenDeployer.deploy( gav, this.getNexusTestRepoUrl(), fileToDeploy,
+                                      this.getOverridableFile( "settings.xml" ) );
+            Assert.fail( "File should NOT have been deployed " + consoleOutput );
         }
         // catch ( TransferFailedException e )
         // {
