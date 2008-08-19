@@ -74,7 +74,7 @@ public class DefaultNexusSecurityConfigurationTest
         assertEquals("Expected repoTargetPrivs count", 8, config.getRepositoryTargetPrivileges().size() );
 
         // admin and anon role
-        assertEquals( "Expected roles count", 4, config.getRoles().size() );
+        assertEquals( "Expected roles count", 18, config.getRoles().size() );
 
         // admin and anon user
         assertEquals( "Expected users count", 3, config.getUsers().size() );
@@ -134,21 +134,21 @@ public class DefaultNexusSecurityConfigurationTest
         assertTrue( ( (CRepoTargetPrivilege) config.getRepositoryTargetPrivileges().get( 8 ) )
             .getRepositoryId().equals( "repoId" ) );
 
-        assertEquals( "Role count after adding 2", 6, config.getRoles().size() );
+        assertEquals( "Role count after adding 2", 20, config.getRoles().size() );
 
-        assertTrue( ( (CRole) config.getRoles().get( 4 ) ).getDescription().equals( "description" ) );
-        assertTrue( ( (CRole) config.getRoles().get( 4 ) ).getId().equals( "id1" ) );
-        assertTrue( ( (CRole) config.getRoles().get( 4 ) ).getName().equals( "name" ) );
-        assertTrue( ( (CRole) config.getRoles().get( 4 ) ).getSessionTimeout() == 60 );
-        assertTrue( ( (CRole) config.getRoles().get( 4 ) ).getPrivileges().size() == 1 );
-        assertTrue( ( (CRole) config.getRoles().get( 4 ) ).getRoles().size() == 0 );
+        assertTrue( ( (CRole) config.getRoles().get( 18 ) ).getDescription().equals( "description" ) );
+        assertTrue( ( (CRole) config.getRoles().get( 18 ) ).getId().equals( "id1" ) );
+        assertTrue( ( (CRole) config.getRoles().get( 18 ) ).getName().equals( "name" ) );
+        assertTrue( ( (CRole) config.getRoles().get( 18 ) ).getSessionTimeout() == 60 );
+        assertTrue( ( (CRole) config.getRoles().get( 18 ) ).getPrivileges().size() == 1 );
+        assertTrue( ( (CRole) config.getRoles().get( 18 ) ).getRoles().size() == 0 );
 
-        assertTrue( ( (CRole) config.getRoles().get( 5 ) ).getDescription().equals( "description" ) );
-        assertTrue( ( (CRole) config.getRoles().get( 5 ) ).getId().equals( "id2" ) );
-        assertTrue( ( (CRole) config.getRoles().get( 5 ) ).getName().equals( "name" ) );
-        assertTrue( ( (CRole) config.getRoles().get( 5 ) ).getSessionTimeout() == 60 );
-        assertTrue( ( (CRole) config.getRoles().get( 5 ) ).getPrivileges().size() == 1 );
-        assertTrue( ( (CRole) config.getRoles().get( 5 ) ).getRoles().size() == 1 );
+        assertTrue( ( (CRole) config.getRoles().get( 19 ) ).getDescription().equals( "description" ) );
+        assertTrue( ( (CRole) config.getRoles().get( 19 ) ).getId().equals( "id2" ) );
+        assertTrue( ( (CRole) config.getRoles().get( 19 ) ).getName().equals( "name" ) );
+        assertTrue( ( (CRole) config.getRoles().get( 19 ) ).getSessionTimeout() == 60 );
+        assertTrue( ( (CRole) config.getRoles().get( 19 ) ).getPrivileges().size() == 1 );
+        assertTrue( ( (CRole) config.getRoles().get( 19 ) ).getRoles().size() == 1 );
 
         assertEquals( "User count after adding one", 4, config.getUsers().size()  );
 
