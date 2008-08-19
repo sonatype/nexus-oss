@@ -18,7 +18,7 @@ public class Nexus395ForgotUsernameTest
         throws Exception
     {
         Status status = ForgotUsernameUtils.recoverUsername( "nexus-dev2@sonatype.org" );
-        Assert.assertEquals( Status.SUCCESS_OK.getCode(), status.getCode() );
+        Assert.assertEquals( Status.SUCCESS_ACCEPTED.getCode(), status.getCode() );
 
         // Need 1 message
         server.waitForIncomingEmail( 1000, 1 );

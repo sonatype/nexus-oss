@@ -211,6 +211,8 @@ public class ScheduledServiceResourceHandler
         try
         {
             getNexus().getTaskById( getScheduledServiceId() ).cancel();
+            
+            getResponse().setStatus( Status.SUCCESS_NO_CONTENT );
         }
         catch ( NoSuchTaskException e )
         {

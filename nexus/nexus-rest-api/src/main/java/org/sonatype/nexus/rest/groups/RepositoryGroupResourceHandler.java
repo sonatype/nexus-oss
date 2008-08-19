@@ -251,6 +251,8 @@ public class RepositoryGroupResourceHandler
         try
         {
             getNexus().deleteRepositoryGroup( getGroupId() );
+            
+            getResponse().setStatus( Status.SUCCESS_NO_CONTENT );
         }
         catch ( NoSuchRepositoryGroupException e )
         {

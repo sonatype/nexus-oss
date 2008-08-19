@@ -42,7 +42,8 @@ public class ArtifactResourceContentHandler
 
     public boolean allowGet()
     {
-        return true;
+        // NEXUS-612: disabled for now, since it _avoids_ permissions
+        return false;
     }
 
     protected Representation getRepresentationHandler( Variant variant )

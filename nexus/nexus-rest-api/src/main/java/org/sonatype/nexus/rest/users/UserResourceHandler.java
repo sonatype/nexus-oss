@@ -165,6 +165,8 @@ public class UserResourceHandler
             if ( !isAnonymousUser( getUserId() ) )
             {
                 getNexusSecurityConfiguration().deleteUser( getUserId() );
+                
+                getResponse().setStatus( Status.SUCCESS_NO_CONTENT );
             }
             else
             {

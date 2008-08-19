@@ -180,6 +180,8 @@ public class RepositoryTargetResourceHandler
             try
             {
                 getNexus().deleteRepositoryTarget( getRepoTargetId() );
+                
+                getResponse().setStatus( Status.SUCCESS_NO_CONTENT );
             }
             catch ( IOException e )
             {

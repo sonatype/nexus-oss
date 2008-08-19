@@ -185,7 +185,7 @@ public class IndexResourceHandler
         return serialize( variant, result );
     }
 
-    public void handleDelete()
+    public void delete()
     {
         ReindexTask task = (ReindexTask) getNexus().createTaskInstance( ReindexTask.class );
 

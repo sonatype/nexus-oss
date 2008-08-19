@@ -49,7 +49,7 @@ public class Nexus142UserPermissionTests
         TestContainer.getInstance().getTestContext().setPassword( "admin123" );
 
         response = this.userUtil.sendMessage( Method.POST, user );
-        Assert.assertEquals( "Response status: ", 200, response.getStatus().getCode() );
+        Assert.assertEquals( "Response status: ", 201, response.getStatus().getCode() );
 
         // read should succeed (inherited)
         response = this.userUtil.sendMessage( Method.GET, user );
@@ -81,7 +81,7 @@ public class Nexus142UserPermissionTests
         user.addRole( "anonymous" );
 
         Response response = this.userUtil.sendMessage( Method.POST, user );
-        Assert.assertEquals( "Response status: ", 200, response.getStatus().getCode() );
+        Assert.assertEquals( "Response status: ", 201, response.getStatus().getCode() );
 
         TestContainer.getInstance().getTestContext().setUsername( "test-user" );
         TestContainer.getInstance().getTestContext().setPassword( "admin123" );
@@ -138,7 +138,7 @@ public class Nexus142UserPermissionTests
         user.addRole( "anonymous" );
 
         Response response = this.userUtil.sendMessage( Method.POST, user );
-        Assert.assertEquals( "Response status: ", 200, response.getStatus().getCode() );
+        Assert.assertEquals( "Response status: ", 201, response.getStatus().getCode() );
 
         TestContainer.getInstance().getTestContext().setUsername( "test-user" );
         TestContainer.getInstance().getTestContext().setPassword( "admin123" );
@@ -194,7 +194,7 @@ public class Nexus142UserPermissionTests
         user.addRole( "anonymous" );
 
         Response response = this.userUtil.sendMessage( Method.POST, user );
-        Assert.assertEquals( "Response status: ", 200, response.getStatus().getCode() );
+        Assert.assertEquals( "Response status: ", 201, response.getStatus().getCode() );
 
         TestContainer.getInstance().getTestContext().setUsername( "test-user" );
         TestContainer.getInstance().getTestContext().setPassword( "admin123" );
@@ -229,7 +229,7 @@ public class Nexus142UserPermissionTests
 
         // delete should fail
         response = this.userUtil.sendMessage( Method.DELETE, user );
-        Assert.assertEquals( "Response status: ", 200, response.getStatus().getCode() );
+        Assert.assertEquals( "Response status: ", 204, response.getStatus().getCode() );
 
     }
 

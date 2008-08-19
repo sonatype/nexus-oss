@@ -20,7 +20,7 @@ public class Nexus394ForgotPasswordTest
         throws Exception
     {
         Response response = ForgotPasswordUtils.recoverUserPassword( "test-user", "nexus-dev2@sonatype.org" );
-        Assert.assertEquals( "Status: "+response.getStatus() +"\n"+ response.getEntity().getText(), 200, response.getStatus().getCode() );
+        Assert.assertEquals( "Status: "+response.getStatus() +"\n"+ response.getEntity().getText(), 202, response.getStatus().getCode() );
         
         // Need 1 message
         server.waitForIncomingEmail( 1000, 1 );

@@ -116,6 +116,8 @@ extends AbstractUserResourceHandler
                 response.setData( resource );
                 
                 getResponse().setEntity( serialize( representation, response ) );
+                
+                getResponse().setStatus( Status.SUCCESS_CREATED );
             }
             catch ( ConfigurationException e )
             {

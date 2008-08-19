@@ -212,6 +212,8 @@ public class RepositoryGroupListResourceHandler
                     }
 
                     getNexus().createRepositoryGroup( group );
+                    
+                    getResponse().setStatus( Status.SUCCESS_CREATED );
                 }
                 catch ( NoSuchRepositoryException e )
                 {

@@ -23,12 +23,12 @@ public class Nexus393ResetPasswordPermissionTest
         // Should be able to reset anyone password
         String username = "another-user";
         Response response = ResetPasswordUtils.resetPassword( username );
-        Assert.assertTrue( "Status: "+ response.getStatus() +"\n"+ response.getEntity().getText(), response.getStatus().isSuccess() );
+        Assert.assertTrue( "Status: "+ response.getStatus(), response.getStatus().isSuccess() );
 
         // Should be able to reset my own password
         username = TEST_USER_NAME;
         response = ResetPasswordUtils.resetPassword( username );
-        Assert.assertTrue( "Status: "+ response.getStatus() +"\n"+ response.getEntity().getText(), response.getStatus().isSuccess() );
+        Assert.assertTrue( "Status: "+ response.getStatus(), response.getStatus().isSuccess() );
 
     }
 

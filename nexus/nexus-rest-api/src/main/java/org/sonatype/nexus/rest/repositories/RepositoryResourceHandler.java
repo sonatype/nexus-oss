@@ -218,6 +218,8 @@ public class RepositoryResourceHandler
             {
                 getNexus().deleteRepositoryShadow( getRepositoryId() );
             }
+            
+            getResponse().setStatus( Status.SUCCESS_NO_CONTENT );
         }
         catch ( ConfigurationException e )
         {

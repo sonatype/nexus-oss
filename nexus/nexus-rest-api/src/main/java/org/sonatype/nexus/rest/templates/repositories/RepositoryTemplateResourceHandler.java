@@ -230,6 +230,8 @@ public class RepositoryTemplateResourceHandler
             }
 
             getNexus().deleteRepositoryTemplate( getRepositoryId() );
+            
+            getResponse().setStatus( Status.SUCCESS_NO_CONTENT );
         }
         catch ( IOException e )
         {

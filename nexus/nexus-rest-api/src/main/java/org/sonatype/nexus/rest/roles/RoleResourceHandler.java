@@ -159,6 +159,8 @@ public class RoleResourceHandler
         try
         {            
             getNexusSecurityConfiguration().deleteRole( getRoleId() );
+            
+            getResponse().setStatus( Status.SUCCESS_NO_CONTENT );
         }
         catch ( NoSuchRoleException e )
         {

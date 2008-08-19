@@ -124,6 +124,8 @@ public class PrivilegeResourceHandler
         try
         {            
             getNexusSecurityConfiguration().deleteRepoTargetPrivilege( getPrivilegeId() );
+            
+            getResponse().setStatus( Status.SUCCESS_NO_CONTENT );
         }
         catch ( NoSuchPrivilegeException e )
         {

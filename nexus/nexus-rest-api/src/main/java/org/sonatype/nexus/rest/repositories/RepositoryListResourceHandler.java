@@ -190,6 +190,8 @@ public class RepositoryListResourceHandler
 
                         getNexus().createRepositoryShadow( shadow );
 
+                        getResponse().setStatus( Status.SUCCESS_CREATED );
+
                         return;
                     }
                 }
@@ -222,6 +224,8 @@ public class RepositoryListResourceHandler
                         CRepository normal = getRepositoryAppModel( (RepositoryResource) resource, null );
 
                         getNexus().createRepository( normal );
+                        
+                        getResponse().setStatus( Status.SUCCESS_CREATED );
 
                         return;
                     }

@@ -14,7 +14,7 @@ public class Nexus408ChangePasswordTest
         throws Exception
     {
         Status status = ChangePasswordUtils.changePassword( "test-user", "admin123", "123admin" );
-        Assert.assertEquals( Status.SUCCESS_OK.getCode(), status.getCode() );
+        Assert.assertEquals( Status.SUCCESS_ACCEPTED.getCode(), status.getCode() );
     }
 
 }

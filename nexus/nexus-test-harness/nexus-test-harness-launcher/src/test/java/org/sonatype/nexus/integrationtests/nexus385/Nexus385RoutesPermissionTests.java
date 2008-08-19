@@ -44,7 +44,7 @@ public class Nexus385RoutesPermissionTests extends AbstractPrivilegeTest
         TestContainer.getInstance().getTestContext().setPassword( "admin123" );
 
         response = this.routeUtil.sendMessage( Method.POST, route );
-        Assert.assertEquals( "Response status: ", 200, response.getStatus().getCode() );
+        Assert.assertEquals( "Response status: ", 201, response.getStatus().getCode() );
         route = this.routeUtil.getResourceFromResponse( response );
 
         // read should succeed (inherited)
@@ -75,7 +75,7 @@ public class Nexus385RoutesPermissionTests extends AbstractPrivilegeTest
         route.setRuleType( "blocking" );
 
         Response response = this.routeUtil.sendMessage( Method.POST, route );
-        Assert.assertEquals( "Response status: ", 200, response.getStatus().getCode() );
+        Assert.assertEquals( "Response status: ", 201, response.getStatus().getCode() );
         route = this.routeUtil.getResourceFromResponse( response );
 
         TestContainer.getInstance().getTestContext().setUsername( "test-user" );
@@ -132,7 +132,7 @@ public class Nexus385RoutesPermissionTests extends AbstractPrivilegeTest
         route.setRuleType( "blocking" );
 
         Response response = this.routeUtil.sendMessage( Method.POST, route );
-        Assert.assertEquals( "Response status: ", 200, response.getStatus().getCode() );
+        Assert.assertEquals( "Response status: ", 201, response.getStatus().getCode() );
         route = this.routeUtil.getResourceFromResponse( response );
 
         TestContainer.getInstance().getTestContext().setUsername( "test-user" );
@@ -186,7 +186,7 @@ public class Nexus385RoutesPermissionTests extends AbstractPrivilegeTest
         route.setRuleType( "blocking" );
 
         Response response = this.routeUtil.sendMessage( Method.POST, route );
-        Assert.assertEquals( "Response status: ", 200, response.getStatus().getCode() );
+        Assert.assertEquals( "Response status: ", 201, response.getStatus().getCode() );
         route = this.routeUtil.getResourceFromResponse( response );
 
         TestContainer.getInstance().getTestContext().setUsername( "test-user" );
@@ -222,7 +222,7 @@ public class Nexus385RoutesPermissionTests extends AbstractPrivilegeTest
         
         // delete should fail
         response = this.routeUtil.sendMessage( Method.DELETE, route );
-        Assert.assertEquals( "Response status: ", 200, response.getStatus().getCode() );
+        Assert.assertEquals( "Response status: ", 204, response.getStatus().getCode() );
         
         
     }

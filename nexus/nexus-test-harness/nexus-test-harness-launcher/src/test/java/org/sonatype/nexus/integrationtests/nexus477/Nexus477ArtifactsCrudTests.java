@@ -99,7 +99,7 @@ public class Nexus477ArtifactsCrudTests
         Assert.assertEquals( "Could not get artifact", 200, response.getStatus().getCode() );
 
          response = RequestFacade.sendMessage( serviceURI, Method.DELETE );
-         Assert.assertEquals( "Artifact should have been deleted", 200, response.getStatus().getCode() );
+         Assert.assertEquals( "Artifact should have been deleted", 204, response.getStatus().getCode() );
 
     }
 

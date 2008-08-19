@@ -86,5 +86,7 @@ public class WastebasketResourceHandler
         EmptyTrashTask task = (EmptyTrashTask) getNexus().createTaskInstance( EmptyTrashTask.class );
         
         getNexus().submit( "Internal", task );
+        
+        getResponse().setStatus( Status.SUCCESS_NO_CONTENT );
     }
 }

@@ -178,6 +178,8 @@ public class PrivilegeListResourceHandler
                     if ( success )
                     {
                         getResponse().setEntity( serialize( representation, response ) );
+                        
+                        getResponse().setStatus( Status.SUCCESS_CREATED );
                     }
                 }
                 catch ( ConfigurationException e )

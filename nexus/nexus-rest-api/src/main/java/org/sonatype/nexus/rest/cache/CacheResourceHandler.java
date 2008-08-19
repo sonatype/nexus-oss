@@ -107,11 +107,6 @@ public class CacheResourceHandler
         }
     }
 
-    public boolean allowDelete()
-    {
-        return true;
-    }
-
     public void delete()
     {
         ClearCacheTask task = (ClearCacheTask) getNexus().createTaskInstance( ClearCacheTask.class );

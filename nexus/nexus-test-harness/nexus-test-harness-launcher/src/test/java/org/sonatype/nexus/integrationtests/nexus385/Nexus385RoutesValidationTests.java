@@ -50,9 +50,9 @@ public class Nexus385RoutesValidationTests
         Response response = this.messageUtil.sendMessage( Method.POST, resource );
 
         String responseText = response.getEntity().getText();
-        if ( response.getStatus().getCode() != 200 || !responseText.contains( "<groupId>*</groupId>" ) )
+        if ( response.getStatus().getCode() != 201 || !responseText.contains( "<groupId>*</groupId>" ) )
         {   
-            Assert.fail( "Should have returned a 200, but returned: " + response.getStatus() + "\nresponse:\n"
+            Assert.fail( "Should have returned a 201, but returned: " + response.getStatus() + "\nresponse:\n"
                 + responseText + ", and the omitted groupId should be defaulted with '*'" );
         }
     }

@@ -145,6 +145,8 @@ public abstract class AbstractRestoreResourceHandler
             }
 
             getNexus().submit( "Internal", task );
+            
+            getResponse().setStatus( Status.SUCCESS_NO_CONTENT );
         }
         catch ( RejectedExecutionException e )
         {

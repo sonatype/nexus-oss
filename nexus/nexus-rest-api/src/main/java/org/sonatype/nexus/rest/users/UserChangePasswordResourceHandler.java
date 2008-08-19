@@ -68,6 +68,8 @@ public class UserChangePasswordResourceHandler
                         resource.getUserId(),
                         resource.getOldPassword(),
                         resource.getNewPassword() );
+                    
+                    getResponse().setStatus( Status.SUCCESS_ACCEPTED );
                 }
                 else
                 {

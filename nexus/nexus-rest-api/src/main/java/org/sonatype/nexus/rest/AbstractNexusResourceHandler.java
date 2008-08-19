@@ -183,7 +183,7 @@ public abstract class AbstractNexusResourceHandler
                 }
 
                 path = "content/" + path;
-                
+
                 Reference repoRoot = calculateRepositoryReference( ai.repository );
 
                 a.setResourceURI( calculateReference( repoRoot, path ).toString() );
@@ -201,7 +201,7 @@ public abstract class AbstractNexusResourceHandler
         a.setVersion( ai.version );
 
         a.setClassifier( ai.classifier );
-        
+
         a.setPackaging( ai.packaging );
 
         a.setRepoId( ai.repository );
@@ -381,7 +381,7 @@ public abstract class AbstractNexusResourceHandler
     {
         // safe method
         super.handleGet();
-        
+
         if ( getResponse().getEntity() == null )
         {
             getResponse().setEntity( new StringRepresentation( "", MediaType.TEXT_PLAIN ) );
@@ -392,7 +392,7 @@ public abstract class AbstractNexusResourceHandler
     {
         // safe method
         super.handleHead();
-        
+
         if ( getResponse().getEntity() == null )
         {
             getResponse().setEntity( new StringRepresentation( "", MediaType.TEXT_PLAIN ) );
@@ -408,7 +408,7 @@ public abstract class AbstractNexusResourceHandler
         {
             updateModificationDate( getRequest().getResourceRef() );
         }
-        
+
         if ( getResponse().getEntity() == null )
         {
             getResponse().setEntity( new StringRepresentation( "", MediaType.TEXT_PLAIN ) );
@@ -426,7 +426,7 @@ public abstract class AbstractNexusResourceHandler
 
             updateModificationDate( getRequest().getResourceRef().getParentRef() );
         }
-        
+
         if ( getResponse().getEntity() == null )
         {
             getResponse().setEntity( new StringRepresentation( "", MediaType.TEXT_PLAIN ) );
@@ -444,7 +444,7 @@ public abstract class AbstractNexusResourceHandler
 
             updateModificationDate( getRequest().getResourceRef().getParentRef() );
         }
-        
+
         if ( getResponse().getEntity() == null )
         {
             getResponse().setEntity( new StringRepresentation( "", MediaType.TEXT_PLAIN ) );

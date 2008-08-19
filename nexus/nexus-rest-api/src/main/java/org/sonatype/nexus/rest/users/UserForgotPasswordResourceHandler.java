@@ -65,6 +65,8 @@ public class UserForgotPasswordResourceHandler
                 if ( !isAnonymousUser( resource.getUserId() ) )
                 {
                     getNexusSecurityConfiguration().forgotPassword( resource.getUserId(), resource.getEmail() );
+                    
+                    getResponse().setStatus( Status.SUCCESS_ACCEPTED );
                 }
                 else
                 {

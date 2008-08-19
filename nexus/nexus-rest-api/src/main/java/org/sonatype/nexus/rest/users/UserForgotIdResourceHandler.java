@@ -58,6 +58,8 @@ public class UserForgotIdResourceHandler
         try
         {
             getNexusSecurityConfiguration().forgotUserId( getEmail() );
+            
+            getResponse().setStatus( Status.SUCCESS_ACCEPTED );
         }
         catch ( IOException e )
         {

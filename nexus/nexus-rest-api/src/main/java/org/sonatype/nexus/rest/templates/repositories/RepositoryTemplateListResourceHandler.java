@@ -172,6 +172,8 @@ public class RepositoryTemplateListResourceHandler
 
                         getNexus().createRepositoryShadowTemplate( shadow );
 
+                        getResponse().setStatus( Status.SUCCESS_CREATED );
+
                         return;
                     }
                     else
@@ -185,9 +187,8 @@ public class RepositoryTemplateListResourceHandler
                             "Virtual repository template with ID=" + resource.getId() + " already exists!" );
 
                         getResponse().setEntity(
-                            serialize( representation, getNexusErrorResponse(
-                                "id",
-                                "Virtual repository with id=" + resource.getId() + " already exists!" ) ) );
+                            serialize( representation, getNexusErrorResponse( "id", "Virtual repository with id="
+                                + resource.getId() + " already exists!" ) ) );
 
                         return;
                     }
@@ -215,9 +216,8 @@ public class RepositoryTemplateListResourceHandler
                             "Repository template with ID=" + resource.getId() + " already exists!" );
 
                         getResponse().setEntity(
-                            serialize( representation, getNexusErrorResponse(
-                                "id",
-                                "Repository with id=" + resource.getId() + " already exists!" ) ) );
+                            serialize( representation, getNexusErrorResponse( "id", "Repository with id="
+                                + resource.getId() + " already exists!" ) ) );
 
                         return;
                     }

@@ -40,6 +40,8 @@ public class UserResetResourceHandler
             if ( !isAnonymousUser( getUserId() ) )
             {
                 getNexusSecurityConfiguration().resetPassword( getUserId() );
+                
+                getResponse().setStatus( Status.SUCCESS_NO_CONTENT );
             }
             else
             {

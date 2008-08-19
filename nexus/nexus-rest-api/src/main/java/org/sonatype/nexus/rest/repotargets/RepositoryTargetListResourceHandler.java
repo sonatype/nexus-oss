@@ -125,6 +125,8 @@ public class RepositoryTargetListResourceHandler
                     response.setData( request.getData() );
 
                     getResponse().setEntity( serialize( representation, response ) );
+                    
+                    getResponse().setStatus( Status.SUCCESS_CREATED );
                 }
                 catch ( ConfigurationException e )
                 {

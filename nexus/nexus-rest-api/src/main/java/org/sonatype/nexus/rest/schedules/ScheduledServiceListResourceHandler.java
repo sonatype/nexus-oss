@@ -163,6 +163,8 @@ public class ScheduledServiceListResourceHandler
                 response.setData( resourceStatus );
 
                 getResponse().setEntity( serialize( entity, response ) );
+                
+                getResponse().setStatus( Status.SUCCESS_CREATED );
             }
             catch ( RejectedExecutionException e )
             {

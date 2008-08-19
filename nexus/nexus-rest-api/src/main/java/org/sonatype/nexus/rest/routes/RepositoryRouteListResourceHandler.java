@@ -182,6 +182,8 @@ public class RepositoryRouteListResourceHandler
                 resource.setGroupId( route.getGroupId() );
 
                 getResponse().setEntity( serialize( entity, response ) );
+                
+                getResponse().setStatus( Status.SUCCESS_CREATED );
             }
             catch ( ConfigurationException e )
             {

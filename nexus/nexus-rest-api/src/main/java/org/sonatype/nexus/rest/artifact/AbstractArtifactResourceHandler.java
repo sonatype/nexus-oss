@@ -283,7 +283,7 @@ public class AbstractArtifactResourceHandler
                 {
                     filePath = filePath.substring( 1 );
                 }
-                
+
                 filePath = "content/" + filePath;
 
                 Reference repoRoot = calculateRepositoryReference( file.getRepositoryItemUid().getRepository().getId() );
@@ -549,7 +549,6 @@ public class AbstractArtifactResourceHandler
                     }
 
                     getResponse().setStatus( Status.SUCCESS_CREATED );
-
                 }
                 catch ( StorageException e )
                 {

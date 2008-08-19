@@ -507,6 +507,8 @@ public abstract class AbstractResourceStoreContentResource
             ResourceStoreRequest req = getResourceStoreRequest();
 
             getResourceStore().storeItem( req, body, null );
+            
+            getResponse().setStatus( Status.SUCCESS_CREATED );
         }
         catch ( Exception t )
         {
@@ -551,6 +553,8 @@ public abstract class AbstractResourceStoreContentResource
             ResourceStoreRequest req = getResourceStoreRequest();
 
             store.deleteItem( req );
+            
+            getResponse().setStatus( Status.SUCCESS_NO_CONTENT );
         }
         catch ( Exception e )
         {

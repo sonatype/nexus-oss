@@ -270,6 +270,8 @@ public class RepositoryRouteResourceHandler
             }
 
             getNexus().deleteGroupsSettingPathMapping( getRouteId() );
+            
+            getResponse().setStatus( Status.SUCCESS_NO_CONTENT );
         }
         catch ( IOException e )
         {

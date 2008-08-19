@@ -41,7 +41,7 @@ public class Nexus133TargetPermissionTests
         TestContainer.getInstance().getTestContext().setPassword( "admin123" );
 
         response = this.targetUtil.sendMessage( Method.POST, target );
-        Assert.assertEquals( "Response status: ", 200, response.getStatus().getCode() );
+        Assert.assertEquals( "Response status: ", 201, response.getStatus().getCode() );
         target = this.targetUtil.getResourceFromResponse( response );
 
         // read should succeed (inherited)
@@ -71,7 +71,7 @@ public class Nexus133TargetPermissionTests
         target.addPattern( ".*testUpdatePermission.*" );
 
         Response response = this.targetUtil.sendMessage( Method.POST, target );
-        Assert.assertEquals( "Response status: ", 200, response.getStatus().getCode() );
+        Assert.assertEquals( "Response status: ", 201, response.getStatus().getCode() );
         target = this.targetUtil.getResourceFromResponse( response );
 
         TestContainer.getInstance().getTestContext().setUsername( "test-user" );
@@ -122,7 +122,7 @@ public class Nexus133TargetPermissionTests
         target.addPattern( ".*testReadPermission.*" );
 
         Response response = this.targetUtil.sendMessage( Method.POST, target );
-        Assert.assertEquals( "Response status: ", 200, response.getStatus().getCode() );
+        Assert.assertEquals( "Response status: ", 201, response.getStatus().getCode() );
         target = this.targetUtil.getResourceFromResponse( response );
 
         TestContainer.getInstance().getTestContext().setUsername( "test-user" );
@@ -174,7 +174,7 @@ public class Nexus133TargetPermissionTests
         target.addPattern( ".*testDeletePermission.*" );
 
         Response response = this.targetUtil.sendMessage( Method.POST, target );
-        Assert.assertEquals( "Response status: ", 200, response.getStatus().getCode() );
+        Assert.assertEquals( "Response status: ", 201, response.getStatus().getCode() );
         target = this.targetUtil.getResourceFromResponse( response );
 
         TestContainer.getInstance().getTestContext().setUsername( "test-user" );
@@ -208,7 +208,7 @@ public class Nexus133TargetPermissionTests
         
      // should work now...
         response = this.targetUtil.sendMessage( Method.DELETE, target );
-        Assert.assertEquals( "Response status: ", 200, response.getStatus().getCode() );
+        Assert.assertEquals( "Response status: ", 204, response.getStatus().getCode() );
 
     }
 
