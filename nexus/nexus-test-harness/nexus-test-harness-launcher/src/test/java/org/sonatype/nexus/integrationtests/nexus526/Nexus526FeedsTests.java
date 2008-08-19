@@ -105,13 +105,12 @@ public class Nexus526FeedsTests
         List<SyndEntry> entries = feed.getEntries();
         Assert.assertTrue( "Feed should have at least 2 entries", entries.size() >= 2 );
 
-        this.validateArtifactInFeedEntries( entries, gav, "pom", "jar" );
-
-        // problems at windows
-        // get last entry
-        // SyndEntry lastEntry = entries.get( 0 );
-        // this.validateArtifactInFeedEntry( lastEntry, gav, "pom" ); // one is the pom
-        // this.validateArtifactInFeedEntry( entries.get( 1 ), gav, "jar" ); // the other the jar
+        // we just want the first 2 because this test only deployed 2 artifacts... although we should beef up this tests....
+        List<SyndEntry> testEntries = new ArrayList<SyndEntry>();
+        testEntries.add( entries.get( 0 ) );
+        testEntries.add( entries.get( 1 ) );
+        
+        this.validateArtifactInFeedEntries( testEntries, gav, "pom", "jar" );
     }
 
     @SuppressWarnings( "unchecked" )
@@ -123,13 +122,12 @@ public class Nexus526FeedsTests
         List<SyndEntry> entries = feed.getEntries();
         Assert.assertTrue( "Feed should have at least 2 entries", entries.size() >= 2 );
 
-        this.validateArtifactInFeedEntries( entries, gav, "pom", "jar" );
-
-        // problems at windows
-        // get last entry
-        // SyndEntry lastEntry = entries.get( 0 );
-        // this.validateArtifactInFeedEntry( lastEntry, gav, "pom" ); // one is the pom
-        // this.validateArtifactInFeedEntry( entries.get( 1 ), gav, "jar" ); // the other the jar
+     // we just want the first 2 because this test only deployed 2 artifacts... although we should beef up this tests....
+        List<SyndEntry> testEntries = new ArrayList<SyndEntry>();
+        testEntries.add( entries.get( 0 ) );
+        testEntries.add( entries.get( 1 ) );
+        
+        this.validateArtifactInFeedEntries( testEntries, gav, "pom", "jar" );
     }
 
     @SuppressWarnings( "unchecked" )
@@ -141,13 +139,12 @@ public class Nexus526FeedsTests
         List<SyndEntry> entries = feed.getEntries();
         Assert.assertTrue( "Feed should have at least 2 entries", entries.size() >= 2 );
 
-        this.validateArtifactInFeedEntries( entries, gav, "pom", "jar" );
-
-        // problems at windows
-        // get last entry
-        // SyndEntry lastEntry = entries.get( 0 );
-        // this.validateArtifactInFeedEntry( lastEntry, gav, "pom" ); // one is the pom
-        // this.validateArtifactInFeedEntry( entries.get( 1 ), gav, "jar" ); // the other the jar
+     // we just want the first 2 because this test only deployed 2 artifacts... although we should beef up this tests....
+        List<SyndEntry> testEntries = new ArrayList<SyndEntry>();
+        testEntries.add( entries.get( 0 ) );
+        testEntries.add( entries.get( 1 ) );
+        
+        this.validateArtifactInFeedEntries( testEntries, gav, "pom", "jar" );
     }
 
     @SuppressWarnings( "unchecked" )
