@@ -20,7 +20,6 @@ import org.sonatype.nexus.integrationtests.nexus166.Nexus166SampleTest;
 import org.sonatype.nexus.integrationtests.nexus167.Nexus167ReleaseToSnapshotTest;
 import org.sonatype.nexus.integrationtests.nexus168.Nexus168SnapshotToReleaseTest;
 import org.sonatype.nexus.integrationtests.nexus169.Nexus169ReleaseMetaDataInSnapshotRepoTest;
-import org.sonatype.nexus.integrationtests.nexus173.Nexus173SnapshotDeployWIthPassword;
 import org.sonatype.nexus.integrationtests.nexus174.Nexus174ReleaseDeployWrongPassword;
 import org.sonatype.nexus.integrationtests.nexus175.Nexus175SnapshotDeployWrongPassword;
 import org.sonatype.nexus.integrationtests.nexus176.Nexus176DeployToInvalidRepoTest;
@@ -49,8 +48,8 @@ import org.sonatype.nexus.integrationtests.nexus502.Nexus502MavenExecutionTest;
 import org.sonatype.nexus.integrationtests.nexus511.Nexus511MavenDeployTest;
 import org.sonatype.nexus.integrationtests.nexus531.Nexus531RepositoryCrudJsonTests;
 import org.sonatype.nexus.integrationtests.nexus531.Nexus531RepositoryCrudXMLTests;
-import org.sonatype.nexus.integrationtests.nexus586.Nexus586ValidateConfigurationTest;
 import org.sonatype.nexus.integrationtests.nexus532.Nexus532GroupsCrudXmlTests;
+import org.sonatype.nexus.integrationtests.nexus586.Nexus586ValidateConfigurationTest;
 import org.sonatype.nexus.integrationtests.nexus606.Nexus606DownloadLogsAndConfigFilesTest;
 import org.sonatype.nexus.integrationtests.proxy.nexus177.Nexus177OutOfServiceTest;
 import org.sonatype.nexus.integrationtests.proxy.nexus178.Nexus178BlockProxyDownloadTest;
@@ -73,11 +72,11 @@ import org.sonatype.nexus.integrationtests.proxy.nexus262.Nexus262SimpleProxyTes
     Nexus393ResetPasswordPermissionTest.class, Nexus394ForgotPasswordPermissionTest.class,
     Nexus385RoutesPermissionTests.class, Nexus395ForgotUsernamePermissionTest.class,
     Nexus408ChangePasswordPermissionTest.class, Nexus450UserCreationTest.class, Nexus502MavenExecutionTest.class,
-    Nexus477ArtifactsCrudTests.class, Nexus173SnapshotDeployWIthPassword.class,
-    Nexus174ReleaseDeployWrongPassword.class, Nexus175SnapshotDeployWrongPassword.class, Nexus511MavenDeployTest.class,
-    Nexus531RepositoryCrudXMLTests.class, Nexus531RepositoryCrudJsonTests.class, Nexus233PrivilegesCrudXMLTests.class,
-    Nexus379VirtualRepoSameId.class, Nexus448PrivilegeURLTest.class, Nexus532GroupsCrudXmlTests.class,
-    Nexus586ValidateConfigurationTest.class, Nexus606DownloadLogsAndConfigFilesTest.class } )
+    Nexus477ArtifactsCrudTests.class, Nexus174ReleaseDeployWrongPassword.class,
+    Nexus175SnapshotDeployWrongPassword.class, Nexus511MavenDeployTest.class, Nexus531RepositoryCrudXMLTests.class,
+    Nexus531RepositoryCrudJsonTests.class, Nexus233PrivilegesCrudXMLTests.class, Nexus379VirtualRepoSameId.class,
+    Nexus448PrivilegeURLTest.class, Nexus532GroupsCrudXmlTests.class, Nexus586ValidateConfigurationTest.class,
+    Nexus606DownloadLogsAndConfigFilesTest.class } )
 public class IntegrationTestSuiteClassesSecurity
 {
     @BeforeClass

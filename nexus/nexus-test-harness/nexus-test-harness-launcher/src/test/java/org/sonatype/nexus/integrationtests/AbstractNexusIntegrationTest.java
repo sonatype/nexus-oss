@@ -74,7 +74,6 @@ public class AbstractNexusIntegrationTest
 
     protected static String baseNexusUrl;
 
-    private String nexusTestRepoUrl;
 
     protected static String nexusWorkDir;
 
@@ -100,7 +99,7 @@ public class AbstractNexusIntegrationTest
 
         // we also need to setup a couple fields, that need to be pulled out of a bundle
         this.testRepositoryId = testRepositoryId;
-        this.nexusTestRepoUrl = baseNexusUrl + REPOSITORY_RELATIVE_URL + testRepositoryId + "/";
+//        this.nexusTestRepoUrl = baseNexusUrl + REPOSITORY_RELATIVE_URL + testRepositoryId + "/";
 
     }
 
@@ -527,7 +526,7 @@ public class AbstractNexusIntegrationTest
                                      String targetDirectory )
         throws IOException
     {
-        return this.downloadArtifact( this.nexusTestRepoUrl, groupId, artifact, version, type, targetDirectory );
+        return this.downloadArtifact( this.getNexusTestRepoUrl(), groupId, artifact, version, type, targetDirectory );
     }
 
     protected File downloadArtifactFromRepository( String repoId, Gav gav, String targetDirectory )
@@ -596,13 +595,9 @@ public class AbstractNexusIntegrationTest
 
     public String getNexusTestRepoUrl()
     {
-        return nexusTestRepoUrl;
+        return baseNexusUrl + REPOSITORY_RELATIVE_URL + testRepositoryId + "/";
     }
 
-    public void setNexusTestRepoUrl( String nexusTestRepoUrl )
-    {
-        this.nexusTestRepoUrl = nexusTestRepoUrl;
-    }
 
     public PlexusContainer getContainer()
     {
@@ -617,6 +612,11 @@ public class AbstractNexusIntegrationTest
     public String getTestRepositoryId()
     {
         return testRepositoryId;
+    }
+    
+    public void setTestRepositoryId(String repoId)
+    {
+        this.testRepositoryId = repoId;
     }
     
     public String getRepositoryUrl( String repoId )

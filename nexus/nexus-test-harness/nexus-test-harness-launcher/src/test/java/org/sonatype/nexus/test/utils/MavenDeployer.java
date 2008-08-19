@@ -1,7 +1,15 @@
 package org.sonatype.nexus.test.utils;
 
 import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 
+import org.apache.maven.it.VerificationException;
+import org.apache.maven.it.Verifier;
 import org.codehaus.plexus.util.cli.CommandLineException;
 import org.codehaus.plexus.util.cli.Commandline;
 import org.sonatype.nexus.artifact.Gav;
@@ -9,6 +17,58 @@ import org.sonatype.nexus.artifact.Gav;
 public class MavenDeployer
 {
 
+    private static Verifier createVerifier( Gav gav, String repositoryUrl, File fileToDeploy, File settings )
+        throws VerificationException, IOException
+    {
+        File mavenProjectDir = new File( "target" );
+        mavenProjectDir.mkdirs();
+
+        Verifier verifier = new Verifier( mavenProjectDir.getAbsolutePath(), false );
+        verifier.setAutoclean( false );
+        verifier.resetStreams();
+        
+        List<String> options = new ArrayList<String>();
+        if ( settings != null )
+        {
+            options.add( "-s " + settings.getAbsolutePath() );
+        }
+        
+        options.add( "-Durl=\'" + repositoryUrl + "\'" );
+        options.add( "-Dfile=\'" + fileToDeploy + "\'" );
+        options.add( "-DgroupId=\'" + gav.getGroupId() + "\'" );
+        options.add( "-DartifactId=\'" + gav.getArtifactId() + "\'" );
+        options.add( "-Dversion=\'" + gav.getVersion() + "\'" );
+        options.add( "-Dpackaging=\'" + gav.getExtension() + "\'" );
+        
+        
+        verifier.setCliOptions( options );
+        return verifier;
+    }
+
+    public static Verifier deployAndGetVerifier( Gav gav, String repositoryUrl, File fileToDeploy, File settings ) throws VerificationException, IOException
+    {
+        Verifier verifier = createVerifier( gav, repositoryUrl, fileToDeploy, settings );
+//        verifier.executeGoal( "deploy:deploy-file" );
+        
+        Map<String, String> args = new HashMap<String, String>();
+        args.put( "url", repositoryUrl );
+        args.put( "file", fileToDeploy.getAbsolutePath() );
+        args.put( "groupId", gav.getGroupId() );
+        args.put( "artifactId", gav.getArtifactId() );
+        args.put( "version", gav.getVersion() );
+        args.put( "packaging", gav.getExtension() );
+        
+        Properties props = new Properties();
+        props.putAll( args );
+        
+        verifier.setSystemProperties( props );
+        
+        verifier.executeGoal( "deploy:deploy-file", args );
+        
+        return verifier;
+        
+    }
+    
     public static String deploy( Gav gav, String repositoryUrl, File fileToDeploy, File settings )
         throws CommandLineException, InterruptedException
     {

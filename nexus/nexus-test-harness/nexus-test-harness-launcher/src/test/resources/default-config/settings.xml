@@ -1,5 +1,7 @@
 <settings>
 
+<localRepository>${project.build.directory}/maven_repo</localRepository>
+
 <servers>
    <server>
     <id>remote-repository</id>

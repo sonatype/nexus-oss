@@ -6,6 +6,9 @@ import java.util.Date;
 
 import junit.framework.Assert;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.maven.it.VerificationException;
+import org.apache.maven.it.Verifier;
 import org.apache.maven.wagon.ConnectionException;
 import org.apache.maven.wagon.ResourceDoesNotExistException;
 import org.apache.maven.wagon.TransferFailedException;
@@ -22,10 +25,13 @@ import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.test.utils.MavenDeployer;
 
+import com.thoughtworks.xstream.XStream;
+
 public class Nexus429WagonDeployPrivilegeTest
     extends AbstractPrivilegeTest
 {
     private static final String TEST_RELEASE_REPO = "nexus-test-harness-release-repo";
+    private static final String TEST_SNAPSHOT_REPO = "nexus-test-harness-snapshot-repo";
 
     public Nexus429WagonDeployPrivilegeTest()
     {
@@ -33,18 +39,40 @@ public class Nexus429WagonDeployPrivilegeTest
     }
 
     @Test
-    public void deployPrivWithWagon()
+    public void doReleaseArtifactTest()
         throws IOException, ConnectionException, AuthenticationException, ResourceDoesNotExistException,
         AuthorizationException, ComponentLookupException, TransferFailedException, InterruptedException,
-        CommandLineException
+        CommandLineException, VerificationException
     {
-        this.resetTestUserPrivs();
-
-        // GAV
         Gav gav =
             new Gav( this.getTestId(), "artifact", "1.0.0", null, "xml", 0, new Date().getTime(), "", false, false,
                      null, false, null );
-        
+        this.setTestRepositoryId(TEST_RELEASE_REPO);
+        this.deployPrivWithWagon( gav );
+    }
+
+    @Test
+    public void doSnapshotArtifactTest()
+        throws IOException, ConnectionException, AuthenticationException, ResourceDoesNotExistException,
+        AuthorizationException, ComponentLookupException, TransferFailedException, InterruptedException,
+        CommandLineException, VerificationException
+    {
+        Gav gav =
+            new Gav( this.getTestId(), "artifact", "1.0.0-SNAPSHOT", null, "xml", 0, new Date().getTime(), "", false,
+                     false, null, false, null );
+        this.setTestRepositoryId(TEST_SNAPSHOT_REPO);
+        this.deployPrivWithWagon( gav );
+    }
+
+    private void deployPrivWithWagon( Gav gav )
+        throws IOException, ConnectionException, AuthenticationException, ResourceDoesNotExistException,
+        AuthorizationException, ComponentLookupException, TransferFailedException, InterruptedException,
+        CommandLineException, VerificationException
+    {
+        this.resetTestUserPrivs();
+
+        Verifier verifier = null;
+
         this.deleteFromRepository( this.getTestId() );
 
         // file to deploy
@@ -61,20 +89,14 @@ public class Nexus429WagonDeployPrivilegeTest
 
         try
         {
-            // DeployUtils.forkDeployWithWagon( this.getContainer(), "http", this.getNexusTestRepoUrl(), fileToDeploy,
-            // this.getRelitiveArtifactPath( gav ));
-            String consoleOutput = MavenDeployer.deploy( gav, this.getNexusTestRepoUrl(), fileToDeploy,
-                                  this.getOverridableFile( "settings.xml" ) );
-            Assert.fail( "File should NOT have been deployed " + consoleOutput);
+            verifier =
+                MavenDeployer.deployAndGetVerifier( gav, this.getTestRepositoryId(), fileToDeploy,
+                                                    this.getOverridableFile( "settings.xml" ) );
+            failTest( verifier );
         }
-        // catch ( TransferFailedException e )
-        // {
-        // // expected 401
-        // }
-        catch ( CommandLineException e )
+        catch ( VerificationException e )
         {
             // expected 401
-            // MavenDeployer, either fails or not, we can't check the cause of the problem
         }
 
         // give deployment role
@@ -84,17 +106,17 @@ public class Nexus429WagonDeployPrivilegeTest
         TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
         TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
 
+        // if this fails it will throw an error
         try
         {
-            // if this fails it will throw an error
-            MavenDeployer.deploy( gav, this.getNexusTestRepoUrl(), fileToDeploy,
-                                  this.getOverridableFile( "settings.xml" ) );
+            verifier =
+                MavenDeployer.deployAndGetVerifier( gav, this.getNexusTestRepoUrl(), fileToDeploy,
+                                                    this.getOverridableFile( "settings.xml" ) );
+            failTest( verifier );
         }
-        catch ( CommandLineException e )
+        catch ( VerificationException e )
         {
             // expected 401
-            // MavenDeployer, either fails or not, we can't check the cause of the problem
-            // the user now needs create priv for new artifacts
         }
 
         // try again
@@ -105,22 +127,25 @@ public class Nexus429WagonDeployPrivilegeTest
         this.giveUserPrivilege( "test-user", "T5" );
 
         // if this fails it will throw an error
-        MavenDeployer.deploy( gav, this.getNexusTestRepoUrl(), fileToDeploy, this.getOverridableFile( "settings.xml" ) );
-        
+        verifier =
+            MavenDeployer.deployAndGetVerifier( gav, this.getNexusTestRepoUrl(), fileToDeploy,
+                                                this.getOverridableFile( "settings.xml" ) );
+        verifier.verifyErrorFreeLog();
+
         // do it again as an update, this should fail
+
+        // if this fails it will throw an error
         try
         {
-            // if this fails it will throw an error
-            MavenDeployer.deploy( gav, this.getNexusTestRepoUrl(), fileToDeploy,
-                                  this.getOverridableFile( "settings.xml" ) );
+            verifier =
+                MavenDeployer.deployAndGetVerifier( gav, this.getNexusTestRepoUrl(), fileToDeploy,
+                                                    this.getOverridableFile( "settings.xml" ) );
+            failTest( verifier );
         }
-        catch ( CommandLineException e )
+        catch ( VerificationException e )
         {
             // expected 401
-            // MavenDeployer, either fails or not, we can't check the cause of the problem
-            // the user now needs create priv for new artifacts
         }
-        
 
         // now the user should be able to redeploy
         TestContainer.getInstance().getTestContext().useAdminForRequests();
@@ -129,7 +154,10 @@ public class Nexus429WagonDeployPrivilegeTest
         TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
         TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
         // if this fails it will throw an error
-        MavenDeployer.deploy( gav, this.getNexusTestRepoUrl(), fileToDeploy, this.getOverridableFile( "settings.xml" ) );
+        verifier =
+            MavenDeployer.deployAndGetVerifier( gav, this.getNexusTestRepoUrl(), fileToDeploy,
+                                                this.getOverridableFile( "settings.xml" ) );
+        verifier.verifyErrorFreeLog();
 
         // make sure delete does not work
         Response response =
@@ -137,6 +165,23 @@ public class Nexus429WagonDeployPrivilegeTest
                                        Method.DELETE );
         Assert.assertEquals( "Artifact should have been deleted", 401, response.getStatus().getCode() );
 
+    }
+
+    // FIXME: refactor AbstractMavenNexusIT and sub class this from there.
+
+    /**
+     * Workaround to get some decent logging when tests fail
+     * 
+     * @throws IOException
+     */
+    protected void failTest( Verifier verifier )
+        throws IOException
+    {
+        File logFile = new File( verifier.getBasedir(), "log.txt" );
+        String log = FileUtils.readFileToString( logFile );
+        log += "\n";
+        log += new XStream().toXML( verifier );
+        Assert.fail( log );
     }
 
 }
