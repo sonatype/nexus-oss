@@ -773,28 +773,37 @@ public class DefaultMetadataManager
             version = resolveRelease( repository, gavRequest, gav );
         }
 
-        gav = new Gav(
-            gavRequest.getGroupId(),
-            gavRequest.getArtifactId(),
-            version,
-            gavRequest.getClassifier(),
-            repository.getArtifactPackagingMapper().getExtensionForPackaging( gavRequest.getPackaging() ),
-            null,
-            null,
-            null,
-            RepositoryPolicy.SNAPSHOT.equals( repository.getRepositoryPolicy() ),
-            false,
-            null,
-            false,
-            null );
-
-        // if it is not "timestamped" version, try to get it
-        if ( gav.isSnapshot() && gav.getVersion().equals( gav.getBaseVersion() ) )
+        if ( Artifact.LATEST_VERSION.equals( version )
+            || Artifact.RELEASE_VERSION.equals( version ) )
         {
-            gav = repository.getMetadataManager().resolveSnapshot( repository, gavRequest, gav );
+            // Nexus was not able to resolve those
+            return null;
         }
+        else
+        {
+            gav = new Gav(
+                gavRequest.getGroupId(),
+                gavRequest.getArtifactId(),
+                version,
+                gavRequest.getClassifier(),
+                repository.getArtifactPackagingMapper().getExtensionForPackaging( gavRequest.getPackaging() ),
+                null,
+                null,
+                null,
+                RepositoryPolicy.SNAPSHOT.equals( repository.getRepositoryPolicy() ),
+                false,
+                null,
+                false,
+                null );
 
-        return gav;
+            // if it is not "timestamped" version, try to get it
+            if ( gav.isSnapshot() && gav.getVersion().equals( gav.getBaseVersion() ) )
+            {
+                gav = repository.getMetadataManager().resolveSnapshot( repository, gavRequest, gav );
+            }
+
+            return gav;
+        }
     }
 
     protected String resolveLatest( MavenRepository repository, ArtifactStoreRequest gavRequest, Gav gav )

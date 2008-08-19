@@ -140,6 +140,12 @@ public class ArtifactStoreHelper
         {
             Gav gav = repository.getMetadataManager().resolveArtifact( repository, gavRequest );
 
+            if ( gav == null )
+            {
+                throw new ItemNotFoundException( "GAV: " + gavRequest.getGroupId() + " : " + gavRequest.getArtifactId()
+                    + " : " + gavRequest.getVersion() );
+            }
+
             gavRequest.setRequestPath( repository.getGavCalculator().gavToPath( gav ) );
         }
         catch ( IOException e )
