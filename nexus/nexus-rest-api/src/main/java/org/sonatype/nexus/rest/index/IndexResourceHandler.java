@@ -179,6 +179,8 @@ public class IndexResourceHandler
 
             result.setData( new ArrayList<NexusArtifact>() );
         }
+        // filtering
+
 
         return serialize( variant, result );
     }

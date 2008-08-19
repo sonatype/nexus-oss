@@ -206,7 +206,7 @@ public class AbstractArtifactResourceHandler
         }
         catch ( ItemNotFoundException e )
         {
-            // nothing
+            getResponse().setStatus( Status.CLIENT_ERROR_NOT_FOUND, "Artifact not found." );
         }
         catch ( AccessDeniedException e )
         {

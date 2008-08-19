@@ -120,48 +120,11 @@ public class ArtifactStoreHelper
             StorageException,
             AccessDeniedException
     {
-        checkRequest( gavRequest );
+        gavRequest.setClassifier( null );
 
-        Gav gav = new Gav(
-            gavRequest.getGroupId(),
-            gavRequest.getArtifactId(),
-            gavRequest.getVersion(),
-            null,
-            "pom",
-            null,
-            null,
-            null,
-            RepositoryPolicy.SNAPSHOT.equals( repository.getRepositoryPolicy() ),
-            false,
-            null,
-            false,
-            null );
+        gavRequest.setPackaging( "pom" );
 
-        // if it is not "timestamped" version, try to get it
-        if ( gav.isSnapshot() && gav.getVersion().equals( gav.getBaseVersion() ) )
-        {
-            try
-            {
-                gav = repository.getMetadataManager().resolveSnapshotLatestVersion( repository, gavRequest, gav );
-            }
-            catch ( IOException e )
-            {
-                throw new StorageException( "Could not maintain metadata!", e );
-            }
-        }
-
-        gavRequest.setRequestPath( repository.getGavCalculator().gavToPath( gav ) );
-
-        StorageItem item = repository.retrieveItem( gavRequest );
-
-        if ( StorageFileItem.class.isAssignableFrom( item.getClass() ) )
-        {
-            return (StorageFileItem) item;
-        }
-        else
-        {
-            throw new StorageException( "The POM retrieval returned non-file, path:" + gavRequest.getRequestPath() );
-        }
+        return retrieveArtifact( gavRequest );
     }
 
     public StorageFileItem retrieveArtifact( ArtifactStoreRequest gavRequest )
@@ -173,25 +136,16 @@ public class ArtifactStoreHelper
     {
         checkRequest( gavRequest );
 
-        Gav gav = new Gav( gavRequest.getGroupId(), gavRequest.getArtifactId(), gavRequest.getVersion(), gavRequest
-            .getClassifier(), repository.getArtifactPackagingMapper().getExtensionForPackaging(
-            gavRequest.getPackaging() ), null, null, null, RepositoryPolicy.SNAPSHOT.equals( repository
-            .getRepositoryPolicy() ), false, null, false, null );
-
-        // if it is not "timestamped" version, try to get it
-        if ( gav.isSnapshot() && gav.getVersion().equals( gav.getBaseVersion() ) )
+        try
         {
-            try
-            {
-                gav = repository.getMetadataManager().resolveSnapshotLatestVersion( repository, gavRequest, gav );
-            }
-            catch ( IOException e )
-            {
-                throw new StorageException( "Could not maintain metadata!", e );
-            }
-        }
+            Gav gav = repository.getMetadataManager().resolveArtifact( repository, gavRequest );
 
-        gavRequest.setRequestPath( repository.getGavCalculator().gavToPath( gav ) );
+            gavRequest.setRequestPath( repository.getGavCalculator().gavToPath( gav ) );
+        }
+        catch ( IOException e )
+        {
+            throw new StorageException( "Could not maintain metadata!", e );
+        }
 
         StorageItem item = repository.retrieveItem( gavRequest );
 

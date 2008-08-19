@@ -51,13 +51,26 @@ public interface MetadataManager
             UnsupportedStorageOperationException;
 
     /**
-     * Resolves the latest snapshot version.
+     * Resolves the artifact, honoring LATEST and RELEASE as version. In case of snapshots, it will try to resolve the
+     * timestamped version too, if needed.
      * 
      * @return
      * @throws RepositoryNotAvailableException
      * @throws IOException
      */
-    Gav resolveSnapshotLatestVersion( MavenRepository repository, ArtifactStoreRequest req, Gav gav )
+    Gav resolveArtifact( MavenRepository repository, ArtifactStoreRequest gavRequest )
+        throws RepositoryNotAvailableException,
+            IOException;
+
+    /**
+     * Resolves the snapshot base version to a timestamped version if possible. So, when a repo is snapshot, and we have
+     * GAV.
+     * 
+     * @return
+     * @throws RepositoryNotAvailableException
+     * @throws IOException
+     */
+    Gav resolveSnapshot( MavenRepository repository, ArtifactStoreRequest gavRequest, Gav gav )
         throws RepositoryNotAvailableException,
             IOException;
 }

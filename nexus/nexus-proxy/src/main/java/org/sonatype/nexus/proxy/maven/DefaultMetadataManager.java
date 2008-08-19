@@ -7,9 +7,11 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
 
+import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.artifact.repository.metadata.Plugin;
 import org.apache.maven.artifact.repository.metadata.Snapshot;
@@ -722,7 +724,207 @@ public class DefaultMetadataManager
         savePluginMetadata( repository, gav, md, req.getRequestContext() );
     }
 
-    public Gav resolveSnapshotLatestVersion( MavenRepository repository, ArtifactStoreRequest req, Gav gav )
+    public Gav resolveArtifact( MavenRepository repository, ArtifactStoreRequest gavRequest )
+        throws RepositoryNotAvailableException,
+            IOException
+    {
+        String version = gavRequest.getVersion();
+
+        Gav gav = null;
+
+        if ( Artifact.LATEST_VERSION.equals( gavRequest.getVersion() ) )
+        {
+            // TODO: a workaround, adding dummy versions, only to make Gav happy
+            gav = new Gav(
+                gavRequest.getGroupId(),
+                gavRequest.getArtifactId(),
+                RepositoryPolicy.SNAPSHOT.equals( repository.getRepositoryPolicy() ) ? "1-SNAPSHOT" : "1",
+                gavRequest.getClassifier(),
+                repository.getArtifactPackagingMapper().getExtensionForPackaging( gavRequest.getPackaging() ),
+                null,
+                null,
+                null,
+                RepositoryPolicy.SNAPSHOT.equals( repository.getRepositoryPolicy() ),
+                false,
+                null,
+                false,
+                null );
+
+            version = resolveLatest( repository, gavRequest, gav );
+        }
+        else if ( Artifact.RELEASE_VERSION.equals( gavRequest.getVersion() ) )
+        {
+            // TODO: a workaround, adding dummy versions, only to make Gav happy
+            gav = new Gav(
+                gavRequest.getGroupId(),
+                gavRequest.getArtifactId(),
+                RepositoryPolicy.SNAPSHOT.equals( repository.getRepositoryPolicy() ) ? "1-SNAPSHOT" : "1",
+                gavRequest.getClassifier(),
+                repository.getArtifactPackagingMapper().getExtensionForPackaging( gavRequest.getPackaging() ),
+                null,
+                null,
+                null,
+                RepositoryPolicy.SNAPSHOT.equals( repository.getRepositoryPolicy() ),
+                false,
+                null,
+                false,
+                null );
+
+            version = resolveRelease( repository, gavRequest, gav );
+        }
+
+        gav = new Gav(
+            gavRequest.getGroupId(),
+            gavRequest.getArtifactId(),
+            version,
+            gavRequest.getClassifier(),
+            repository.getArtifactPackagingMapper().getExtensionForPackaging( gavRequest.getPackaging() ),
+            null,
+            null,
+            null,
+            RepositoryPolicy.SNAPSHOT.equals( repository.getRepositoryPolicy() ),
+            false,
+            null,
+            false,
+            null );
+
+        // if it is not "timestamped" version, try to get it
+        if ( gav.isSnapshot() && gav.getVersion().equals( gav.getBaseVersion() ) )
+        {
+            gav = repository.getMetadataManager().resolveSnapshot( repository, gavRequest, gav );
+        }
+
+        return gav;
+    }
+
+    protected String resolveLatest( MavenRepository repository, ArtifactStoreRequest gavRequest, Gav gav )
+        throws RepositoryNotAvailableException,
+            IOException
+    {
+        if ( RepositoryPolicy.SNAPSHOT.equals( repository.getRepositoryPolicy() ) )
+        {
+            Metadata gaMd = null;
+
+            try
+            {
+                gaMd = readOrCreateGAMetadata( repository, gav, gavRequest.getRequestContext() );
+
+                if ( gaMd.getVersioning() == null )
+                {
+                    gaMd.setVersioning( new Versioning() );
+                }
+            }
+            catch ( XmlPullParserException e )
+            {
+                throw new StorageException( "Could not read the metadatas!", e );
+            }
+
+            String latest = gaMd.getVersioning().getLatest();
+
+            if ( StringUtils.isEmpty( latest ) && gaMd.getVersioning().getVersions() != null )
+            {
+                List<String> versions = gaMd.getVersioning().getVersions();
+
+                // iterate over versions for the end, and grab the first snap found
+                for ( int i = versions.size() - 1; i >= 0; i-- )
+                {
+                    if ( VersionUtils.isSnapshot( versions.get( i ) ) )
+                    {
+                        latest = versions.get( i );
+
+                        break;
+                    }
+                }
+            }
+
+            if ( !StringUtils.isEmpty( latest ) )
+            {
+                return latest;
+            }
+            else
+            {
+                return gavRequest.getVersion();
+            }
+        }
+        else
+        {
+            return resolveRelease( repository, gavRequest, gav );
+        }
+    }
+
+    protected String resolveRelease( MavenRepository repository, ArtifactStoreRequest gavRequest, Gav gav )
+        throws RepositoryNotAvailableException,
+            IOException
+    {
+        if ( RepositoryPolicy.SNAPSHOT.equals( repository.getRepositoryPolicy() ) )
+        {
+            if ( getLogger().isDebugEnabled() )
+            {
+                getLogger().debug(
+                    "Not a RELEASE repository for resolving GAV: " + gav.getGroupId() + " : " + gav.getArtifactId()
+                        + " : " + gav.getVersion() + " in repository " + repository.getId() );
+            }
+
+            return gavRequest.getVersion();
+        }
+
+        if ( getLogger().isDebugEnabled() )
+        {
+            getLogger().debug(
+                "Resolving snapshot version for GAV: " + gavRequest.getGroupId() + " : " + gavRequest.getArtifactId()
+                    + " : " + gavRequest.getVersion() + " in repository " + repository.getId() );
+        }
+
+        Metadata gaMd = null;
+
+        try
+        {
+            gaMd = readOrCreateGAMetadata( repository, gav, gavRequest.getRequestContext() );
+
+            if ( gaMd.getVersioning() == null )
+            {
+                gaMd.setVersioning( new Versioning() );
+            }
+        }
+        catch ( XmlPullParserException e )
+        {
+            throw new StorageException( "Could not read the metadatas!", e );
+        }
+
+        String release = gaMd.getVersioning().getRelease();
+
+        if ( StringUtils.isEmpty( release ) && gaMd.getVersioning().getVersions() != null )
+        {
+            List<String> versions = gaMd.getVersioning().getVersions();
+
+            // iterate over versions for the end, and grab the first snap found
+            for ( int i = versions.size() - 1; i >= 0; i-- )
+            {
+                if ( !VersionUtils.isSnapshot( versions.get( i ) ) )
+                {
+                    release = versions.get( i );
+
+                    break;
+                }
+            }
+        }
+
+        if ( !StringUtils.isEmpty( release ) )
+        {
+            if ( getLogger().isDebugEnabled() )
+            {
+                getLogger().debug( "Resolved gav version from '" + gav.getVersion() + "' to '" + release + "'" );
+            }
+
+            return release;
+        }
+        else
+        {
+            return gavRequest.getVersion();
+        }
+    }
+
+    public Gav resolveSnapshot( MavenRepository repository, ArtifactStoreRequest gavRequest, Gav gav )
         throws RepositoryNotAvailableException,
             IOException
     {
@@ -738,6 +940,12 @@ public class DefaultMetadataManager
             return gav;
         }
 
+        if ( VersionUtils.isSnapshot( gav.getVersion() ) && !gav.getVersion().endsWith( Artifact.SNAPSHOT_VERSION ) )
+        {
+            // it is already a timestamped version, return it unmodified
+            return gav;
+        }
+
         if ( getLogger().isDebugEnabled() )
         {
             getLogger().debug(
@@ -749,7 +957,7 @@ public class DefaultMetadataManager
 
         try
         {
-            gavMd = readOrCreateGAVMetadata( repository, gav, req.getRequestContext() );
+            gavMd = readOrCreateGAVMetadata( repository, gav, gavRequest.getRequestContext() );
 
             if ( gavMd.getVersioning() == null )
             {
@@ -761,29 +969,25 @@ public class DefaultMetadataManager
             throw new StorageException( "Could not read the metadatas!", e );
         }
 
-        String latest = gavMd.getVersioning().getLatest();
+        String latest = null;
 
-        if ( StringUtils.isEmpty( latest ) )
+        Snapshot current = gavMd.getVersioning().getSnapshot();
+
+        if ( current != null )
         {
-            // mvn 2.0.x is like forgotting to maintain latest???
+            latest = gav.getBaseVersion();
 
-            Snapshot current = gavMd.getVersioning().getSnapshot();
-
-            if ( current != null )
-            {
-                latest = gav.getBaseVersion();
-
-                latest = latest.replace( "SNAPSHOT", current.getTimestamp() + "-" + current.getBuildNumber() );
-            }
-        }
-
-        if ( getLogger().isDebugEnabled() )
-        {
-            getLogger().debug( "Resolved gav version from '" + gav.getVersion() + "' to '" + latest + "'" );
+            latest = latest
+                .replace( Artifact.SNAPSHOT_VERSION, current.getTimestamp() + "-" + current.getBuildNumber() );
         }
 
         if ( !StringUtils.isEmpty( latest ) && VersionUtils.isSnapshot( latest ) )
         {
+            if ( getLogger().isDebugEnabled() )
+            {
+                getLogger().debug( "Resolved gav version from '" + gav.getVersion() + "' to '" + latest + "'" );
+            }
+
             Gav result = new Gav( gav.getGroupId(), gav.getArtifactId(), latest, gav.getClassifier(), gav
                 .getExtension(), gav.getSnapshotBuildNumber(), gav.getSnapshotTimeStamp(), gav.getName(), gav
                 .isSnapshot(), gav.isHash(), gav.getHashType(), gav.isSignature(), gav.getSignatureType() );
