@@ -64,7 +64,7 @@ public class DefaultMetadataManager
 
         try
         {
-            StorageItem item = uid.getRepository().retrieveItem( true, uid, ctx );
+            StorageItem item = uid.getRepository().retrieveItem( false, uid, ctx );
 
             if ( StorageFileItem.class.isAssignableFrom( item.getClass() ) )
             {
