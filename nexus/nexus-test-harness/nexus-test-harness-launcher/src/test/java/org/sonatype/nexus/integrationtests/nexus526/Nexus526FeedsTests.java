@@ -4,6 +4,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -49,37 +50,49 @@ public class Nexus526FeedsTests
         SyndFeedInput input = new SyndFeedInput();
         SyndFeed feed = input.build( new XmlReader( this.getFeedUrl( feedId ) ) );
         // sort it by date
-         sortSyndEntryOrderByPublishedDate( feed );
+        sortSyndEntryOrderByPublishedDate( feed );
 
         return feed;
     }
 
-    private void validateArtifactInFeedEntry( SyndEntry entry, Gav gav, String extention )
+    private void validateArtifactInFeedEntries( List<SyndEntry> entries, Gav gav, String... extensions )
         throws FileNotFoundException
     {
 
-        // check if the title contains the groupid, artifactid, and version
-        String title = entry.getTitle();
+        List<String> links = new ArrayList<String>();
 
-        Assert.assertTrue( "Feed title does not contain the groupId. Title was: " + title,
-                           title.contains( gav.getGroupId() ) );
-        Assert.assertTrue( "Feed title does not contain the artifactId. Title was: " + title,
-                           title.contains( gav.getArtifactId() ) );
-        Assert.assertTrue( "Feed title does not contain the version. Title was: " + title,
-                           title.contains( gav.getVersion() ) );
+        for ( SyndEntry entry : entries )
+        {
 
-        // check link
-        String link = entry.getLink();
-        Assert.assertNotNull( "Feed title link was null", link );
+            // check if the title contains the groupid, artifactid, and version
+            String title = entry.getTitle();
 
-        // http://
-        // localhost:8087/nexus/content/repositories/nexus-test-harness-repo/nexus526/artifact1/1.0.0/artifact1-1.0.0.pom
+            Assert.assertTrue( "Feed title does not contain the groupId. Title was: " + title,
+                               title.contains( gav.getGroupId() ) );
+            Assert.assertTrue( "Feed title does not contain the artifactId. Title was: " + title,
+                               title.contains( gav.getArtifactId() ) );
+            Assert.assertTrue( "Feed title does not contain the version. Title was: " + title,
+                               title.contains( gav.getVersion() ) );
 
-        String expectedUrl =
-            this.getBaseNexusUrl() + "content/repositories/" + this.getTestRepositoryId() + "/"
-                + this.getRelitiveArtifactPath( gav );
-        expectedUrl = expectedUrl.replaceAll( gav.getExtension() + "$", extention );
-        Assert.assertEquals( "The feed link was wrong", expectedUrl, link );
+            // check link
+            String link = entry.getLink();
+            Assert.assertNotNull( "Feed title link was null", link );
+
+            // http://
+            //localhost:8087/nexus/content/repositories/nexus-test-harness-repo/nexus526/artifact1/1.0.0/artifact1-1.0.0
+            // .pom
+
+            links.add( link );
+        }
+
+        for ( String extention : extensions )
+        {
+            String expectedUrl =
+                this.getBaseNexusUrl() + "content/repositories/" + this.getTestRepositoryId() + "/"
+                    + this.getRelitiveArtifactPath( gav );
+            expectedUrl = expectedUrl.replaceAll( gav.getExtension() + "$", extention );
+            Assert.assertTrue( "The feed link was wrong", links.contains( expectedUrl ) );
+        }
 
     }
 
@@ -92,10 +105,13 @@ public class Nexus526FeedsTests
         List<SyndEntry> entries = feed.getEntries();
         Assert.assertTrue( "Feed should have at least 2 entries", entries.size() >= 2 );
 
+        this.validateArtifactInFeedEntries( entries, gav, "pom", "jar" );
+
+        // problems at windows
         // get last entry
-        SyndEntry lastEntry = entries.get( 0 );
-        this.validateArtifactInFeedEntry( lastEntry, gav, "pom" ); // one is the pom
-        this.validateArtifactInFeedEntry( entries.get( 1 ), gav, "jar" ); // the other the jar
+        // SyndEntry lastEntry = entries.get( 0 );
+        // this.validateArtifactInFeedEntry( lastEntry, gav, "pom" ); // one is the pom
+        // this.validateArtifactInFeedEntry( entries.get( 1 ), gav, "jar" ); // the other the jar
     }
 
     @SuppressWarnings( "unchecked" )
@@ -107,10 +123,13 @@ public class Nexus526FeedsTests
         List<SyndEntry> entries = feed.getEntries();
         Assert.assertTrue( "Feed should have at least 2 entries", entries.size() >= 2 );
 
+        this.validateArtifactInFeedEntries( entries, gav, "pom", "jar" );
+
+        // problems at windows
         // get last entry
-        SyndEntry lastEntry = entries.get( 0 );
-        this.validateArtifactInFeedEntry( lastEntry, gav, "pom" ); // one is the pom
-        this.validateArtifactInFeedEntry( entries.get( 1 ), gav, "jar" ); // the other the jar
+        // SyndEntry lastEntry = entries.get( 0 );
+        // this.validateArtifactInFeedEntry( lastEntry, gav, "pom" ); // one is the pom
+        // this.validateArtifactInFeedEntry( entries.get( 1 ), gav, "jar" ); // the other the jar
     }
 
     @SuppressWarnings( "unchecked" )
@@ -122,12 +141,16 @@ public class Nexus526FeedsTests
         List<SyndEntry> entries = feed.getEntries();
         Assert.assertTrue( "Feed should have at least 2 entries", entries.size() >= 2 );
 
+        this.validateArtifactInFeedEntries( entries, gav, "pom", "jar" );
+
+        // problems at windows
         // get last entry
-        SyndEntry lastEntry = entries.get( 0 );
-        this.validateArtifactInFeedEntry( lastEntry, gav, "pom" ); // one is the pom
-        this.validateArtifactInFeedEntry( entries.get( 1 ), gav, "jar" ); // the other the jar
+        // SyndEntry lastEntry = entries.get( 0 );
+        // this.validateArtifactInFeedEntry( lastEntry, gav, "pom" ); // one is the pom
+        // this.validateArtifactInFeedEntry( entries.get( 1 ), gav, "jar" ); // the other the jar
     }
 
+    @SuppressWarnings( "unchecked" )
     public static void sortSyndEntryOrderByPublishedDate( SyndFeed feed )
     {
         Collections.sort( feed.getEntries(), new Comparator<SyndEntry>()
