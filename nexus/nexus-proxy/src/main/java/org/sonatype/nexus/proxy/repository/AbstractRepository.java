@@ -135,7 +135,7 @@ public abstract class AbstractRepository
     private volatile RemoteStatus remoteStatus = RemoteStatus.UNKNOWN;
 
     /** The repo status check mode */
-    private volatile RepositoryStatusCheckMode repositoryStatusCheckMode = RepositoryStatusCheckMode.AUTO_BLOCKED_ONLY;
+    private volatile RepositoryStatusCheckMode repositoryStatusCheckMode = RepositoryStatusCheckMode.NEVER;
 
     /** Last time remote status was updated */
     private volatile long remoteStatusUpdated = 0;
@@ -319,7 +319,10 @@ public abstract class AbstractRepository
                 setProxyMode( ProxyMode.ALLOW, true, cause );
             }
         }
-        else if ( RemoteStatus.UNAVAILABLE.equals( remoteStatus ) )
+        /*
+         * AUTO_BLOCK temporarily disabled
+         * 
+         * else if ( RemoteStatus.UNAVAILABLE.equals( remoteStatus ) )
         {
             this.remoteStatusUpdated = System.currentTimeMillis();
 
@@ -327,7 +330,7 @@ public abstract class AbstractRepository
             {
                 setProxyMode( ProxyMode.BLOCKED_AUTO, true, cause );
             }
-        }
+        }*/
     }
 
     public ProxyMode getProxyMode()
