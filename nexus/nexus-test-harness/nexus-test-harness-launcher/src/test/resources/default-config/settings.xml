@@ -15,13 +15,13 @@
       <!--This is used to direct the public snapshots repo in the profile below over to a different nexus group -->
       <id>nexus-public-snapshots</id>
       <mirrorOf>public-snapshots</mirrorOf>
-      <url>${nexus-base-url}nexus/content/groups/public-snapshots</url>
+      <url>${nexus-base-url}content/groups/public-snapshots</url>
     </mirror>
     <mirror>
       <!--This sends everything else to /public -->
       <id>nexus</id>
       <mirrorOf>*</mirrorOf>
-      <url>${nexus-base-url}nexus/content/groups/public</url>
+      <url>${nexus-base-url}content/groups/public</url>
     </mirror>
   </mirrors>
   <profiles>
