@@ -199,7 +199,8 @@ public class ScheduledServiceTypeResourceHandler
         property.setRequired( false );
         property
             .setHelpText( "The job will purge all snapshots older than the entered number of days, but will obey to Min. count of snapshots to keep." );
-        type.addProperty( property );
+        type.addProperty( property );        
+        
         property = new ScheduledServiceTypePropertyResource();
         property.setId( SnapshotRemoverTask.REMOVE_IF_RELEASE_EXISTS_KEY );
         property.setName( "Remove if released" );
@@ -208,6 +209,8 @@ public class ScheduledServiceTypeResourceHandler
         property
             .setHelpText( "The job will purge all snapshots that have a corresponding released artifact (same version not including the -SNAPSHOT)." );
         type.addProperty( property );
+        
+        response.addData( type );
         
         type = new ScheduledServiceTypeResource();
         type.setId( EmptyTrashTask.class.getName() );
