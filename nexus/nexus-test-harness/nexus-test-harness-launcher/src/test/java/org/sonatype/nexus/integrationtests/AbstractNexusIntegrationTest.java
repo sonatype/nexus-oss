@@ -131,7 +131,7 @@ public class AbstractNexusIntegrationTest
                 // copy security config
                 this.copyConfigFile( "security.xml", RELATIVE_WORK_CONF_DIR );
 
-                this.copyConfigFile( "log4j.properties", variables );
+//                this.copyConfigFile( "log4j.properties", variables );
 
                 if ( TestContainer.getInstance().getTestContext().isSecureTest() )
                 {

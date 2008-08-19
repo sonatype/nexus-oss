@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?><nexusConfiguration>
   <version>1.0.5</version>
-  <applicationLogDirectory>${nexus.log.directory}</applicationLogDirectory>
+  <applicationLogDirectory>${project.build.directory}/logs/</applicationLogDirectory>
   
     <smtpConfiguration>
     <host>localhost</host>

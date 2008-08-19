@@ -89,7 +89,7 @@ public class NexusConfigUtil
         }
     }
 
-    private static File getNexusFile()
+    public static File getNexusFile()
     {
         return new File( TestProperties.getString( "nexus.base.dir" ) + "/"
             + AbstractNexusIntegrationTest.RELATIVE_WORK_CONF_DIR, "nexus.xml" );

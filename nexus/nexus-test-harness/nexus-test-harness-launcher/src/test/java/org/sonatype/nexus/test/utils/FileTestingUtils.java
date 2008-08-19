@@ -1,5 +1,6 @@
 package org.sonatype.nexus.test.utils;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;
@@ -68,6 +69,22 @@ public class FileTestingUtils
                 is.close();
             }
         }
+    }
+
+    /**
+     * Creates a SHA1 hash from the contents of a String.
+     * 
+     * @param data the String to be digested.
+     * @return An SHA1 hash based on the contents of the String.
+     * @throws IOException
+     */
+    public static String createSHA1FromString( String data )
+        throws IOException
+    {
+
+        ByteArrayInputStream bais = new ByteArrayInputStream( data.getBytes() );
+        return createSHA1FromStream( bais );
+
     }
 
     /**
@@ -164,24 +181,24 @@ public class FileTestingUtils
     public static void interpolationFileCopy( File from, File dest, Map<String, String> variables )
         throws IOException
     {
-        
+
         // we may also need to create any parent directories
-        if( dest.getParentFile() != null && !dest.getParentFile().exists())
+        if ( dest.getParentFile() != null && !dest.getParentFile().exists() )
         {
             dest.getParentFile().mkdirs();
         }
-        
+
         FileReader fileReader = new FileReader( from );
         InterpolationFilterReader filterReader = new InterpolationFilterReader( fileReader, variables );
 
         FileWriter fos = new FileWriter( dest );
-        
+
         int readChar = -1;
-        while( (readChar = (int) filterReader.read() ) != -1)
+        while ( ( readChar = (int) filterReader.read() ) != -1 )
         {
-         fos.write( readChar );   
+            fos.write( readChar );
         }
-        
+
         // close everything
         fileReader.close();
         fos.close();

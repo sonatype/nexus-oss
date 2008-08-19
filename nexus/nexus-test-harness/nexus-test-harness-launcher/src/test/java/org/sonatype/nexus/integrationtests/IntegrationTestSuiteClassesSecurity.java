@@ -51,6 +51,7 @@ import org.sonatype.nexus.integrationtests.nexus531.Nexus531RepositoryCrudJsonTe
 import org.sonatype.nexus.integrationtests.nexus531.Nexus531RepositoryCrudXMLTests;
 import org.sonatype.nexus.integrationtests.nexus586.Nexus586ValidateConfigurationTest;
 import org.sonatype.nexus.integrationtests.nexus532.Nexus532GroupsCrudXmlTests;
+import org.sonatype.nexus.integrationtests.nexus606.Nexus606DownloadLogsAndConfigFilesTest;
 import org.sonatype.nexus.integrationtests.proxy.nexus177.Nexus177OutOfServiceTest;
 import org.sonatype.nexus.integrationtests.proxy.nexus178.Nexus178BlockProxyDownloadTest;
 import org.sonatype.nexus.integrationtests.proxy.nexus179.Nexus179RemoteRepoDownTest;
@@ -75,7 +76,8 @@ import org.sonatype.nexus.integrationtests.proxy.nexus262.Nexus262SimpleProxyTes
     Nexus477ArtifactsCrudTests.class, Nexus173SnapshotDeployWIthPassword.class,
     Nexus174ReleaseDeployWrongPassword.class, Nexus175SnapshotDeployWrongPassword.class, Nexus511MavenDeployTest.class,
     Nexus531RepositoryCrudXMLTests.class, Nexus531RepositoryCrudJsonTests.class, Nexus233PrivilegesCrudXMLTests.class,
-    Nexus379VirtualRepoSameId.class, Nexus448PrivilegeURLTest.class, Nexus532GroupsCrudXmlTests.class, Nexus586ValidateConfigurationTest.class } )
+    Nexus379VirtualRepoSameId.class, Nexus448PrivilegeURLTest.class, Nexus532GroupsCrudXmlTests.class,
+    Nexus586ValidateConfigurationTest.class, Nexus606DownloadLogsAndConfigFilesTest.class } )
 public class IntegrationTestSuiteClassesSecurity
 {
     @BeforeClass

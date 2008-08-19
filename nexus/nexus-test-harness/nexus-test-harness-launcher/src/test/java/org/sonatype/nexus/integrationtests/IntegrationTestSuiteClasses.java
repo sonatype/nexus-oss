@@ -47,6 +47,7 @@ import org.sonatype.nexus.integrationtests.nexus586.Nexus586AnonymousForgotPassw
 import org.sonatype.nexus.integrationtests.nexus586.Nexus586AnonymousForgotUserIdTest;
 import org.sonatype.nexus.integrationtests.nexus586.Nexus586AnonymousResetPasswordTest;
 import org.sonatype.nexus.integrationtests.nexus586.Nexus586ValidateConfigurationTest;
+import org.sonatype.nexus.integrationtests.nexus606.Nexus606DownloadLogsAndConfigFilesTest;
 import org.sonatype.nexus.integrationtests.proxy.nexus177.Nexus177OutOfServiceTest;
 import org.sonatype.nexus.integrationtests.proxy.nexus178.Nexus178BlockProxyDownloadTest;
 import org.sonatype.nexus.integrationtests.proxy.nexus179.Nexus179RemoteRepoDownTest;
@@ -75,7 +76,8 @@ import org.sonatype.nexus.integrationtests.proxy.nexus262.Nexus262SimpleProxyTes
     Nexus533TaskMonthlyTest.class, Nexus533TaskCronTest.class, Nexus533TaskCronTest.class,
     Nexus233PrivilegesCrudXMLTests.class, Nexus379VirtualRepoSameId.class, Nexus448PrivilegeURLTest.class,
     Nexus586AnonymousChangePasswordTest.class, Nexus586AnonymousForgotPasswordTest.class,
-    Nexus586AnonymousForgotUserIdTest.class, Nexus586AnonymousResetPasswordTest.class, Nexus532GroupsCrudXmlTests.class } )
+    Nexus586AnonymousForgotUserIdTest.class, Nexus586AnonymousResetPasswordTest.class,
+    Nexus532GroupsCrudXmlTests.class, Nexus606DownloadLogsAndConfigFilesTest.class } )
 public class IntegrationTestSuiteClasses
 {
 
