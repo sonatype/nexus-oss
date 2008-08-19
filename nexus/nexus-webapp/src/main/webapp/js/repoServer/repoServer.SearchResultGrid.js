@@ -260,11 +260,23 @@ Ext.extend(Sonatype.repoServer.SearchResultGrid, Ext.grid.GridPanel, {
       '&v=' + record.get('version');
 
     var c = record.get('classifier');
+    var p = record.get('packaging');
 
     var template = '<a target="_blank" href="{0}">[{1}]</a>';
 
-    return c ? String.format(template, url + '&c=' + c, c) :
-      String.format(template, url, 'jar') + ' ' + String.format(template, url + '&p=pom', 'pom');
+    if ( c ) {
+      if ( p ) {
+        url += '&p=' + p;
+      }
+      return String.format(template, url + '&c=' + c, c);
+    }
+    else {
+      if ( ! p ) {
+        p = 'jar';
+      }
+      return String.format(template, url + '&p=' + p, p) + ' ' +
+        String.format(template, url + '&p=pom', 'pom');
+    }
   },
   
   formatPomLink: function(value, p, record, rowIndex, colIndex, store) {
