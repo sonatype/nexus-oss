@@ -5,10 +5,7 @@ import java.util.Date;
 
 import org.apache.commons.lang.time.DateUtils;
 import org.sonatype.nexus.rest.model.ScheduledServiceBaseResource;
-import org.sonatype.nexus.rest.model.ScheduledServiceBaseResource;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
-
-import edu.emory.mathcs.backport.java.util.Arrays;
 
 public class Nexus533TaskManualTest
     extends AbstractNexusTasksIntegrationTest<ScheduledServiceBaseResource>
