@@ -262,19 +262,19 @@ Ext.extend(Sonatype.repoServer.SearchResultGrid, Ext.grid.GridPanel, {
     var c = record.get('classifier');
     var p = record.get('packaging');
 
-    var template = '<a target="_blank" href="{0}">[{1}]</a>';
+    var template = '<a target="_blank" href="{0}">{1}</a>';
 
     if ( c ) {
       if ( p ) {
         url += '&p=' + p;
       }
-      return String.format(template, url + '&c=' + c, c);
+      return String.format(template, url + '&c=' + c, 'artifact');
     }
     else {
       if ( ! p ) {
         p = 'jar';
       }
-      return String.format(template, url + '&p=' + p, p) + ' ' +
+      return String.format(template, url + '&p=' + p, 'artifact') + ', ' +
         String.format(template, url + '&p=pom', 'pom');
     }
   },
