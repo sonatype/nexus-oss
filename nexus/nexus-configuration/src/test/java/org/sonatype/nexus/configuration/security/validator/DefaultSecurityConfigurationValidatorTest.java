@@ -65,7 +65,8 @@ public class DefaultSecurityConfigurationValidatorTest
         
         assertFalse( response.isModified() );
 
-        assertEquals( 13, response.getValidationErrors().size() );
+        // emails are not longer unique!
+        assertEquals( 11, response.getValidationErrors().size() );
         
         assertEquals( 0, response.getValidationWarnings().size() );
     }
