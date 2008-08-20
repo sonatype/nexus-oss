@@ -21,7 +21,6 @@
 package org.sonatype.nexus;
 
 import java.io.File;
-import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -1385,10 +1384,10 @@ public class DefaultNexus
         return indexerManager.searchArtifactClassFlat( term, repositoryId, groupId, from, count );
     }
 
-    public FlatSearchResponse searchArtifactFlat( String gTerm, String aTerm, String vTerm, String cTerm,
+    public FlatSearchResponse searchArtifactFlat( String gTerm, String aTerm, String vTerm, String pTerm, String cTerm,
         String repositoryId, String groupId, Integer from, Integer count )
     {
-        return indexerManager.searchArtifactFlat( gTerm, aTerm, vTerm, cTerm, repositoryId, groupId, from, count );
+        return indexerManager.searchArtifactFlat( gTerm, aTerm, vTerm, pTerm, cTerm, repositoryId, groupId, from, count );
     }
 
     // ===========================

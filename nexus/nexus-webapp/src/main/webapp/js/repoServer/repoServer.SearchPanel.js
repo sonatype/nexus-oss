@@ -131,7 +131,7 @@ Sonatype.repoServer.SearchPanel = function(config){
         }
       },
       { xtype: 'tbspacer' },
-      'Classifier:',
+      'Packaging:',
       { 
         xtype: 'textfield',
         id: 'gavsearch-classifier',
@@ -253,7 +253,7 @@ Sonatype.repoServer.SearchPanel = function(config){
   }
   
   this.gavFields = [];
-  this.gavParams = [ 'g', 'a', 'v', 'c' ];
+  this.gavParams = [ 'g', 'a', 'v', 'p' ];
 
   this.searchTypeButton = new Ext.Button( this.searchTypeButtonConfig );
 

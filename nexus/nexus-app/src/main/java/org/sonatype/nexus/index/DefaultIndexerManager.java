@@ -21,12 +21,16 @@
 package org.sonatype.nexus.index;
 
 import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.security.DigestInputStream;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -34,12 +38,12 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.codec.binary.Hex;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.store.FSDirectory;
-import org.apache.lucene.store.RAMDirectory;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
@@ -819,29 +823,56 @@ public class DefaultIndexerManager
 
                 indexPacker.packIndex( context, targetDir );
 
-                FileInputStream fis = null;
+                FileInputStream fi = null;
+
+                DigestInputStream sha1Is = null;
+
+                DigestInputStream md5Is = null;
 
                 File[] files = targetDir.listFiles();
 
                 if ( files != null )
                 {
-                    for ( File file : files )
+                    try
                     {
-                        fis = new FileInputStream( file );
-
-                        String filePath = DefaultGroupIdBasedRepositoryRouter.ID + "/" + repositoryGroupId + "/.index/"
-                            + file.getName();
-
-                        RepositoryRouter router = (RepositoryRouter) rootRouter.resolveResourceStore(
-                            new ResourceStoreRequest( filePath, true ) ).get( 0 );
-
-                        if ( getLogger().isDebugEnabled() )
+                        for ( File file : files )
                         {
-                            getLogger().debug(
-                                "Storing the " + file.getName() + " file in the " + router.getId() + " router." );
-                        }
+                            fi = new FileInputStream( file );
 
-                        router.storeItem( repositoryGroupId + "/.index/" + file.getName(), fis );
+                            sha1Is = new DigestInputStream( fi, MessageDigest.getInstance( "SHA1" ) );
+
+                            md5Is = new DigestInputStream( sha1Is, MessageDigest.getInstance( "MD5" ) );
+
+                            String filePath = DefaultGroupIdBasedRepositoryRouter.ID + "/" + repositoryGroupId
+                                + "/.index/" + file.getName();
+
+                            RepositoryRouter router = (RepositoryRouter) rootRouter.resolveResourceStore(
+                                new ResourceStoreRequest( filePath, true ) ).get( 0 );
+
+                            if ( getLogger().isDebugEnabled() )
+                            {
+                                getLogger().debug(
+                                    "Storing the " + file.getName() + " file in the " + router.getId() + " router." );
+                            }
+
+                            router.storeItem( repositoryGroupId + "/.index/" + file.getName(), md5Is );
+
+                            String sha1Sum = new String( Hex.encodeHex( sha1Is.getMessageDigest().digest() ) );
+
+                            String md5Sum = new String( Hex.encodeHex( md5Is.getMessageDigest().digest() ) );
+
+                            router.storeItem(
+                                repositoryGroupId + "/.index/" + file.getName() + ".sha1",
+                                new ByteArrayInputStream( sha1Sum.getBytes() ) );
+
+                            router.storeItem(
+                                repositoryGroupId + "/.index/" + file.getName() + ".md5",
+                                new ByteArrayInputStream( md5Sum.getBytes() ) );
+                        }
+                    }
+                    catch ( NoSuchAlgorithmException e )
+                    {
+                        // will not happen
                     }
                 }
             }
@@ -1101,7 +1132,7 @@ public class DefaultIndexerManager
         return new FlatSearchResponse( req.getQuery(), 0, new HashSet<ArtifactInfo>() );
     }
 
-    public FlatSearchResponse searchArtifactFlat( String gTerm, String aTerm, String vTerm, String cTerm,
+    public FlatSearchResponse searchArtifactFlat( String gTerm, String aTerm, String vTerm, String pTerm, String cTerm,
         String repositoryId, String groupId, Integer from, Integer count )
     {
         IndexingContext context = null;
@@ -1142,6 +1173,11 @@ public class DefaultIndexerManager
             if ( vTerm != null )
             {
                 bq.add( nexusIndexer.constructQuery( ArtifactInfo.VERSION, vTerm ), BooleanClause.Occur.MUST );
+            }
+            
+            if ( pTerm != null )
+            {
+                bq.add( nexusIndexer.constructQuery( ArtifactInfo.PACKAGING, vTerm ), BooleanClause.Occur.MUST );
             }
 
             if ( cTerm != null )

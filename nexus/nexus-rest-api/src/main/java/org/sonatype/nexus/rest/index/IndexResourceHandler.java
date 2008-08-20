@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 
+import org.codehaus.plexus.util.StringUtils;
 import org.restlet.Context;
 import org.restlet.data.Form;
 import org.restlet.data.Request;
@@ -71,6 +72,8 @@ public class IndexResourceHandler
 
         String v = form.getFirstValue( "v" );
 
+        String p = form.getFirstValue( "p" );
+
         String c = form.getFirstValue( "c" );
 
         Integer from = null;
@@ -105,16 +108,16 @@ public class IndexResourceHandler
 
         NexusArtifact na = null;
 
-        if ( sha1 != null )
+        if ( !StringUtils.isEmpty( sha1 ) )
         {
             na = ai2Na( getNexus().identifyArtifact( ArtifactInfo.SHA1, sha1 ), false );
         }
-        else if ( query != null )
+        else if ( !StringUtils.isEmpty( query ) )
         {
             searchResult = getNexus()
                 .searchArtifactFlat( query, getRepositoryId(), getRepositoryGroupId(), from, count );
         }
-        else if ( className != null )
+        else if ( !StringUtils.isEmpty( className ) )
         {
             searchResult = getNexus().searchArtifactClassFlat(
                 className,
@@ -123,12 +126,14 @@ public class IndexResourceHandler
                 from,
                 count );
         }
-        else if ( g != null || a != null || v != null || c != null )
+        else if ( !StringUtils.isEmpty( g ) || !StringUtils.isEmpty( a ) || !StringUtils.isEmpty( v )
+            || !StringUtils.isEmpty( p ) || !StringUtils.isEmpty( c ) )
         {
             searchResult = getNexus().searchArtifactFlat(
                 g,
                 a,
                 v,
+                p,
                 c,
                 getRepositoryId(),
                 getRepositoryGroupId(),
@@ -139,7 +144,7 @@ public class IndexResourceHandler
         {
             getResponse().setStatus(
                 Status.CLIENT_ERROR_BAD_REQUEST,
-                "Search query not found in request! (q OR cn OR g,a,v,c)" );
+                "Search query not found in request! (q OR cn OR g,a,v,p,c)" );
 
             return null;
         }
@@ -180,7 +185,6 @@ public class IndexResourceHandler
             result.setData( new ArrayList<NexusArtifact>() );
         }
         // filtering
-
 
         return serialize( variant, result );
     }

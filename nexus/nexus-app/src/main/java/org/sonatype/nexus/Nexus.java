@@ -322,6 +322,6 @@ public interface Nexus
     FlatSearchResponse searchArtifactClassFlat( String term, String repositoryId, String groupId, Integer from,
         Integer count );
 
-    FlatSearchResponse searchArtifactFlat( String gTerm, String aTerm, String vTerm, String cTerm, String repositoryId,
+    FlatSearchResponse searchArtifactFlat( String gTerm, String aTerm, String vTerm, String pTerm, String cTerm, String repositoryId,
         String groupId, Integer from, Integer count );
 }
