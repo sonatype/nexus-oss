@@ -514,7 +514,6 @@ Sonatype.repoServer.RepoServer = function(){
     resetMainTabPanel: function() {
       Sonatype.view.mainTabPanel.items.each(function(item, i, len){
         this.remove( item, true );
-        item.destroy();
       }, Sonatype.view.mainTabPanel);
       Sonatype.view.mainTabPanel.activeTab = null;
       
