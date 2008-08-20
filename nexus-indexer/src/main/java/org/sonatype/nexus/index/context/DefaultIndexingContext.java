@@ -34,6 +34,8 @@ import org.apache.lucene.store.FSDirectory;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.index.ArtifactContext;
 import org.sonatype.nexus.index.ArtifactInfo;
+import org.sonatype.nexus.index.ArtifactInfoFilter;
+import org.sonatype.nexus.index.DocumentFilter;
 import org.sonatype.nexus.index.IndexUtils;
 import org.sonatype.nexus.index.creator.AbstractIndexCreator;
 import org.sonatype.nexus.index.creator.IndexCreator;
@@ -460,9 +462,17 @@ public class DefaultIndexingContext
 
         // reclaim the index as mine
         storeDescriptor();
+
+        updateTimestamp();
     }
 
     public void merge( Directory directory )
+        throws IOException
+    {
+        merge( directory, null );
+    }
+
+    public void merge( Directory directory, DocumentFilter filter )
         throws IOException
     {
         IndexWriter w = getIndexWriter();
@@ -474,6 +484,7 @@ public class DefaultIndexingContext
         try
         {
             int numDocs = r.numDocs();
+
             for ( int i = 0; i < numDocs; i++ )
             {
                 if ( r.isDeleted( i ) )
@@ -482,34 +493,39 @@ public class DefaultIndexingContext
                 }
 
                 Document d = r.document( i );
-                String uinfo = d.get( ArtifactInfo.UINFO );
 
-                if ( uinfo != null )
+                if ( filter == null || filter.accept( d ) )
                 {
-                    Term term = new Term( ArtifactInfo.UINFO, uinfo );
+                    String uinfo = d.get( ArtifactInfo.UINFO );
 
-                    Hits hits = s.search( new TermQuery( term ) );
-
-                    if ( hits.length() == 0 )
+                    if ( uinfo != null )
                     {
-                        ArtifactInfo info = constructArtifactInfo( d );
-                        ArtifactContext artifactContext = new ArtifactContext( null, null, null, info );
-                        ArtifactIndexingContext indexingContext = new DefaultArtifactIndexingContext( artifactContext );
+                        Term term = new Term( ArtifactInfo.UINFO, uinfo );
 
-                        Document doc = new Document();
+                        Hits hits = s.search( new TermQuery( term ) );
 
-                        doc.add( new Field( ArtifactInfo.UINFO, AbstractIndexCreator.getGAV(
-                            info.groupId,
-                            info.artifactId,
-                            info.version,
-                            info.classifier ), Field.Store.YES, Field.Index.UN_TOKENIZED ) );
-
-                        for ( IndexCreator ic : getIndexCreators() )
+                        if ( hits.length() == 0 )
                         {
-                            ic.updateDocument( indexingContext, doc );
-                        }
+                            ArtifactInfo info = constructArtifactInfo( d );
+                            ArtifactContext artifactContext = new ArtifactContext( null, null, null, info );
+                            ArtifactIndexingContext indexingContext = new DefaultArtifactIndexingContext(
+                                artifactContext );
 
-                        w.addDocument( doc );
+                            Document doc = new Document();
+
+                            doc.add( new Field( ArtifactInfo.UINFO, AbstractIndexCreator.getGAV(
+                                info.groupId,
+                                info.artifactId,
+                                info.version,
+                                info.classifier ), Field.Store.YES, Field.Index.UN_TOKENIZED ) );
+
+                            for ( IndexCreator ic : getIndexCreators() )
+                            {
+                                ic.updateDocument( indexingContext, doc );
+                            }
+
+                            w.addDocument( doc );
+                        }
                     }
                 }
             }
@@ -522,6 +538,51 @@ public class DefaultIndexingContext
         {
             r.close();
         }
+
+        updateTimestamp();
+    }
+
+    public void filter( ArtifactInfoFilter filter )
+        throws IOException
+    {
+        IndexWriter w = getIndexWriter();
+
+        IndexReader r = getIndexReader();
+
+        try
+        {
+            int numDocs = r.numDocs();
+
+            for ( int i = 0; i < numDocs; i++ )
+            {
+                if ( r.isDeleted( i ) )
+                {
+                    continue;
+                }
+
+                Document d = r.document( i );
+
+                ArtifactInfo info = constructArtifactInfo( d );
+
+                if ( info != null )
+                {
+                    if ( !filter.accept( info ) )
+                    {
+                        r.deleteDocument( i );
+                    }
+                }
+            }
+
+            w.optimize();
+
+            w.flush();
+        }
+        finally
+        {
+            r.close();
+        }
+
+        updateTimestamp();
     }
 
     public List<IndexCreator> getIndexCreators()

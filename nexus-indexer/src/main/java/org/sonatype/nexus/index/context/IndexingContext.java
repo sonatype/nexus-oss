@@ -25,6 +25,8 @@ import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.store.Directory;
 import org.sonatype.nexus.index.ArtifactInfo;
+import org.sonatype.nexus.index.ArtifactInfoFilter;
+import org.sonatype.nexus.index.DocumentFilter;
 import org.sonatype.nexus.index.creator.IndexCreator;
 
 /**
@@ -185,7 +187,29 @@ public interface IndexingContext
     void merge( Directory directory )
         throws IOException;
 
+    /**
+     * Merges content of given Lucene directory with this context, but filters out the unwanted ones.
+     * 
+     * @param directory - the directory to merge
+     */
+    void merge( Directory directory, DocumentFilter filter )
+        throws IOException;
+
+    /**
+     * Replaces the Lucene index with the one from supplied directory.
+     * 
+     * @param directory
+     * @throws IOException
+     */
     void replace( Directory directory )
+        throws IOException;
+
+    /**
+     * Filter the context with supplied ArtifactInfoFilter.
+     * 
+     * @throws IOException
+     */
+    void filter( ArtifactInfoFilter filter )
         throws IOException;
 
     Directory getIndexDirectory();

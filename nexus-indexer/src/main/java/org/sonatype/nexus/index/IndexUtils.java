@@ -22,6 +22,10 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
+import org.apache.lucene.analysis.SimpleAnalyzer;
+import org.apache.lucene.document.Document;
+import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.IndexInput;
 import org.apache.lucene.store.IndexOutput;
@@ -251,7 +255,7 @@ public class IndexUtils
             while ( haveRead != len )
             {
                 toRead = ( len - haveRead > buf.length ) ? buf.length : len - haveRead;
-                
+
                 in.readBytes( buf, 0, toRead, false );
 
                 zos.write( buf, 0, toRead );
@@ -267,6 +271,54 @@ public class IndexUtils
         zos.flush();
 
         zos.closeEntry();
+    }
+
+    // filter
+
+    public static void filterDirectory( Directory directory, DocumentFilter filter )
+        throws IOException
+    {
+        // analyzer is unimportant, since we are not adding/searching to/on index, only reading/deleting
+        IndexWriter w = null;
+
+        IndexReader r = IndexReader.open( directory );
+
+        try
+        {
+            try
+            {
+                int numDocs = r.numDocs();
+
+                for ( int i = 0; i < numDocs; i++ )
+                {
+                    if ( r.isDeleted( i ) )
+                    {
+                        continue;
+                    }
+
+                    Document d = r.document( i );
+
+                    if ( !filter.accept( d ) )
+                    {
+                        r.deleteDocument( i );
+                    }
+                }
+            }
+            finally
+            {
+                r.close();
+            }
+
+            w = new IndexWriter( directory, new SimpleAnalyzer() );
+
+            w.optimize();
+
+            w.flush();
+        }
+        finally
+        {
+            w.close();
+        }
     }
 
     //

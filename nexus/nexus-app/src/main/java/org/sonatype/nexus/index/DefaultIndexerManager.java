@@ -34,9 +34,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.lucene.document.Document;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.Query;
+import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.store.RAMDirectory;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
@@ -45,12 +47,14 @@ import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.artifact.Gav;
+import org.sonatype.nexus.artifact.VersionUtils;
 import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
 import org.sonatype.nexus.configuration.ConfigurationChangeListener;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.index.context.IndexContextInInconsistentStateException;
 import org.sonatype.nexus.index.context.IndexingContext;
+import org.sonatype.nexus.index.creator.AbstractIndexCreator;
 import org.sonatype.nexus.index.packer.IndexPacker;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
@@ -73,6 +77,7 @@ import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
+import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RepositoryType;
@@ -359,11 +364,11 @@ public class DefaultIndexerManager
             && repository.getLocalStorage() instanceof DefaultFSLocalRepositoryStorage )
         {
             URL url = null;
-            
+
             try
             {
                 url = new URL( repository.getLocalUrl() );
-                
+
                 repoRoot = new File( url.toURI() );
             }
             catch ( URISyntaxException e )
@@ -475,6 +480,8 @@ public class DefaultIndexerManager
                 {
                     if ( shouldDownloadRemoteIndex )
                     {
+                        File tmpdir = null;
+
                         try
                         {
                             getLogger().info( "Trying to get remote index for repository " + repository.getId() );
@@ -486,19 +493,86 @@ public class DefaultIndexerManager
 
                             fitem = (StorageFileItem) repository.retrieveItem( false, zipUid, ctx );
 
-                            RAMDirectory directory = new RAMDirectory();
+                            tmpdir = new File( getTempDirectory(), "nx-remote-index" + System.currentTimeMillis() );
+
+                            tmpdir.mkdirs();
+
+                            FSDirectory directory = FSDirectory.getDirectory( tmpdir );
 
                             BufferedInputStream is = new BufferedInputStream( fitem.getInputStream(), 4096 );
 
                             IndexUtils.unpackIndexArchive( is, directory );
 
+                            if ( MavenRepository.class.isAssignableFrom( repository.getClass() ) )
+                            {
+                                getLogger().info( "Filtering downloaded index..." );
+
+                                MavenRepository mrepository = (MavenRepository) repository;
+
+                                if ( RepositoryPolicy.RELEASE.equals( mrepository.getRepositoryPolicy() ) )
+                                {
+                                    IndexUtils.filterDirectory( directory, new DocumentFilter()
+                                    {
+                                        public boolean accept( Document doc )
+                                        {
+                                            String uinfo = doc.get( ArtifactInfo.UINFO );
+
+                                            if ( uinfo != null )
+                                            {
+                                                String[] r = AbstractIndexCreator.FS_PATTERN.split( uinfo );
+
+                                                String version = r[2];
+
+                                                return !VersionUtils.isSnapshot( version );
+                                            }
+                                            else
+                                            {
+                                                // not an artifactInfo record, accept it
+                                                return true;
+                                            }
+                                        }
+                                    } );
+                                }
+                                else if ( RepositoryPolicy.SNAPSHOT.equals( mrepository.getRepositoryPolicy() ) )
+                                {
+                                    IndexUtils.filterDirectory( directory, new DocumentFilter()
+                                    {
+                                        public boolean accept( Document doc )
+                                        {
+                                            String uinfo = doc.get( ArtifactInfo.UINFO );
+
+                                            if ( uinfo != null )
+                                            {
+                                                String[] r = AbstractIndexCreator.FS_PATTERN.split( uinfo );
+
+                                                String version = r[2];
+
+                                                return VersionUtils.isSnapshot( version );
+                                            }
+                                            else
+                                            {
+                                                // not an artifactInfo record, accept it
+                                                return true;
+                                            }
+                                        }
+                                    } );
+                                }
+                            }
+
                             IndexingContext context = nexusIndexer.getIndexingContexts().get(
                                 getRemoteContextId( repository.getId() ) );
 
                             context.replace( directory );
-
-                            context.updateTimestamp();
-
+                            /*
+                             * if ( MavenRepository.class.isAssignableFrom( repository.getClass() ) ) {
+                             * getLogger().info( "Filtering downloaded index..." ); MavenRepository mrepository =
+                             * (MavenRepository) repository; if ( RepositoryPolicy.RELEASE.equals(
+                             * mrepository.getRepositoryPolicy() ) ) { context.filter( new ArtifactInfoFilter() { public
+                             * boolean accept( ArtifactInfo ai ) { return !VersionUtils.isSnapshot( ai.version ); } } );
+                             * } else if ( RepositoryPolicy.SNAPSHOT.equals( mrepository.getRepositoryPolicy() ) ) {
+                             * context.filter( new ArtifactInfoFilter() { public boolean accept( ArtifactInfo ai ) {
+                             * return VersionUtils.isSnapshot( ai.version ); } } ); } }
+                             */
                             getLogger().info(
                                 "Remote indexes published and imported succesfully for repository "
                                     + repository.getId() );
@@ -519,6 +593,13 @@ public class DefaultIndexerManager
 
                             hasRemoteIndex = false;
 
+                        }
+                        finally
+                        {
+                            if ( tmpdir != null )
+                            {
+                                FileUtils.deleteDirectory( tmpdir );
+                            }
                         }
                     }
                     else
@@ -831,17 +912,25 @@ public class DefaultIndexerManager
 
         IndexingContext tmpContext = null;
 
+        File tmpdir = null;
+
         try
         {
             repository.setIndexable( false );
 
             IndexingContext context = nexusIndexer.getIndexingContexts().get( getLocalContextId( repository.getId() ) );
 
+            tmpdir = new File( getTempDirectory(), "nx-remote-index" + System.currentTimeMillis() );
+
+            tmpdir.mkdirs();
+
+            FSDirectory directory = FSDirectory.getDirectory( tmpdir );
+
             tmpContext = nexusIndexer.addIndexingContextForced(
                 context.getId() + "-tmp",
                 context.getRepositoryId(),
                 context.getRepository(),
-                new RAMDirectory(),
+                directory,
                 context.getRepositoryUrl(),
                 context.getIndexUpdateUrl(),
                 context.getIndexCreators() );
@@ -857,6 +946,11 @@ public class DefaultIndexerManager
             if ( tmpContext != null )
             {
                 nexusIndexer.removeIndexingContext( tmpContext, true );
+            }
+
+            if ( tmpdir != null )
+            {
+                FileUtils.deleteDirectory( tmpdir );
             }
         }
     }
