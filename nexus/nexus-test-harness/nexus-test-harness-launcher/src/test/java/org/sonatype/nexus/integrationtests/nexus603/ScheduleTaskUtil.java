@@ -1,4 +1,4 @@
-package org.sonatype.nexus.integrationtests.proxy.nexus603;
+package org.sonatype.nexus.integrationtests.nexus603;
 
 import java.io.File;
 import java.io.IOException;
@@ -45,7 +45,7 @@ public class ScheduleTaskUtil
         return file;
     }
 
-    public static ScheduledServiceBaseResource runTask( String typeId )
+    public static ScheduledServiceBaseResource runTask( String typeId , ScheduledServicePropertyResource ...properties )
         throws Exception
     {
         ScheduledServiceBaseResource scheduledTask = new ScheduledServiceBaseResource();
@@ -54,15 +54,10 @@ public class ScheduleTaskUtil
         scheduledTask.setName( typeId.substring( 0, typeId.lastIndexOf( '.' ) ) );
         scheduledTask.setTypeId( typeId );
 
-        ScheduledServicePropertyResource prop = new ScheduledServicePropertyResource();
-        prop.setId( "repositoryOrGroupId" );
-        prop.setValue( "all_repo" );
-        scheduledTask.addProperty( prop );
-
-        prop = new ScheduledServicePropertyResource();
-        prop.setId( "resourceStorePath" );
-        prop.setValue( "/" );
-        scheduledTask.addProperty( prop );
+        for ( ScheduledServicePropertyResource property : properties )
+        {
+            scheduledTask.addProperty( property );
+        }
 
         TaskScheduleUtil.create( scheduledTask );
         String taskId = TaskScheduleUtil.getTask( scheduledTask.getName() ).getId();

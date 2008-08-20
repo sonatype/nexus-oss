@@ -9,7 +9,9 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 import org.sonatype.nexus.artifact.Gav;
+import org.sonatype.nexus.integrationtests.nexus603.ScheduleTaskUtil;
 import org.sonatype.nexus.integrationtests.proxy.AbstractNexusProxyIntegrationTest;
+import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.test.utils.MavenDeployer;
 
 public class Nexus603ClearCacheTaskTest
@@ -53,8 +55,16 @@ public class Nexus603ClearCacheTaskTest
         Assert.assertTrue( "Before ClearCache should download artifact 1",// 
                            compareFileSHA1s( secondDownload, artifact1 ) );
 
+        ScheduledServicePropertyResource prop = new ScheduledServicePropertyResource();
+        prop.setId( "repositoryOrGroupId" );
+        prop.setValue( "tasks-snapshot-repo" );
+
+        // prop = new ScheduledServicePropertyResource();
+        // prop.setId( "resourceStorePath" );
+        // prop.setValue( "/" );
+
         // This is THE important part
-        ScheduleTaskUtil.runTask( "org.sonatype.nexus.tasks.ClearCacheTask" );
+        ScheduleTaskUtil.runTask( "org.sonatype.nexus.tasks.ClearCacheTask", prop );
 
         File thirdDownload = resolveArtifact( GAV );
         Assert.assertTrue( "After ClearCache should download artifact 2", //
