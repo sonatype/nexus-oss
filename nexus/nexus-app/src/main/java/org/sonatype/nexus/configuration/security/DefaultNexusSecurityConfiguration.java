@@ -118,7 +118,7 @@ public class DefaultNexusSecurityConfiguration
      * @plexus.requirement
      */
     private SecurityRuntimeConfigurationBuilder runtimeConfigurationBuilder;
-    
+
     /**
      * @plexus.requirement
      */
@@ -133,7 +133,7 @@ public class DefaultNexusSecurityConfiguration
         try
         {
             loadConfiguration( true );
-            
+
             notifyConfigurationChangeListeners();
 
             getLogger().info( "Started Nexus Security" );
@@ -284,7 +284,7 @@ public class DefaultNexusSecurityConfiguration
 
         settings.setPassword( pwGenerator.hashPassword( password ) );
 
-        //settings.setStatus( CUser.STATUS_EXPIRED );
+        // settings.setStatus( CUser.STATUS_EXPIRED );
 
         return password;
     }
@@ -401,8 +401,8 @@ public class DefaultNexusSecurityConfiguration
     {
         CUser user = readUser( id );
 
-        //Not currently supported
-        //user.setStatus( CUser.STATUS_EXPIRED );
+        // Not currently supported
+        // user.setStatus( CUser.STATUS_EXPIRED );
 
         String password = generateNewPassword( user );
 
@@ -438,23 +438,42 @@ public class DefaultNexusSecurityConfiguration
     {
         List<CUser> users = getConfiguration().getUsers();
 
+        ArrayList<String> userIds = new ArrayList<String>();
+
         for ( Iterator<CUser> i = users.iterator(); i.hasNext(); )
         {
             CUser user = i.next();
 
             if ( user.getEmail().equals( email ) )
             {
-                smtpClient.sendEmailAsync(
-                    user.getEmail(),
-                    null,
-                    "Nexus: User account notification.",
-                    " Your User ID is: " + user.getUserId() );
-
-                return;
+                userIds.add( user.getUserId() );
             }
+
         }
 
-        throw new NoSuchEmailException( email );
+        if ( userIds.size() > 0 )
+        {
+            StringBuffer sb = new StringBuffer( "Your email is associated with the following Nexus User Id(s):\n " );
+
+            for ( String userId : userIds )
+            {
+                sb.append( "\n" );
+                
+                sb.append( " o " );
+                
+                sb.append( "'" );
+
+                sb.append( userId );
+
+                sb.append( "'" );
+            }
+
+            smtpClient.sendEmailAsync( email, null, "Nexus: User account notification.", sb.toString() );
+        }
+        else
+        {
+            throw new NoSuchEmailException( email );
+        }
     }
 
     public void changePassword( String userId, String oldPassword, String newPassword )
@@ -470,7 +489,7 @@ public class DefaultNexusSecurityConfiguration
         {
             throw new InvalidCredentialsException();
         }
-        
+
         user.setStatus( CUser.STATUS_ACTIVE );
         user.setPassword( pwGenerator.hashPassword( newPassword ) );
     }
@@ -587,9 +606,9 @@ public class DefaultNexusSecurityConfiguration
     public void createApplicationPrivilege( CApplicationPrivilege settings )
         throws ConfigurationException,
             IOException
-    {        
+    {
         addInheritedPrivileges( settings );
-        
+
         ValidationResponse vr = configurationValidator.validateApplicationPrivilege(
             initializeContext(),
             settings,
@@ -777,7 +796,7 @@ public class DefaultNexusSecurityConfiguration
             IOException
     {
         addInheritedPrivileges( settings );
-        
+
         ValidationResponse vr = configurationValidator.validateRepoTargetPrivilege(
             initializeContext(),
             settings,
@@ -797,19 +816,19 @@ public class DefaultNexusSecurityConfiguration
             throw new InvalidConfigurationException( vr );
         }
     }
-    
+
     private void addInheritedPrivileges( CPrivilege settings )
     {
         Set<String> inheritedMethods = privInheritance.getInheritedMethods( settings.getMethod() );
-        
+
         StringBuffer buf = new StringBuffer();
-        
+
         for ( String method : inheritedMethods )
         {
             buf.append( method );
             buf.append( "," );
         }
-        
+
         if ( buf.length() > 0 )
         {
             buf.setLength( buf.length() - 1 );

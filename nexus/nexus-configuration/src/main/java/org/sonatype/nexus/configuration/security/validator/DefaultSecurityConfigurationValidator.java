@@ -530,17 +530,6 @@ public class DefaultSecurityConfigurationValidator
         }
         else
         {
-            for ( String id : existingEmailMap.keySet() )
-            {
-                if ( id != user.getUserId() && existingEmailMap.get( id ).equals( user.getEmail() ) )
-                {
-                    ValidationMessage message = new ValidationMessage( "email", "User ID '" + user.getUserId()
-                        + "' must have a unique email address.", "Email address must be unique." );
-                    response.addValidationError( message );
-                    break;
-                }
-            }
-
             existingEmailMap.put( user.getUserId(), user.getEmail() );
         }
 
