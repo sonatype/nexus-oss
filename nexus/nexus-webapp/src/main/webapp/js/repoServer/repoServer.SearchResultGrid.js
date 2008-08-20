@@ -125,7 +125,7 @@ Sonatype.repoServer.SearchResultGrid = function(config) {
       dataIndex: 'resourceURI',
       width: 65,
       sortable:false,
-      renderer: this.formatJarLink
+      renderer: this.formatJarLink.createDelegate( this )
     }
 //@note: NX-444 remove POM link functionality until it can work across browsers (firefix issue presently)
 //  ,{
@@ -252,31 +252,36 @@ Ext.extend(Sonatype.repoServer.SearchResultGrid, Ext.grid.GridPanel, {
     return 'x-grid3-row-collapsed';
   },
 
-  formatJarLink: function(value, p, record, rowIndex, colIndex, store) {
-    var url = Sonatype.config.repos.urls.redirect +
-      '?r=' + record.get('repoId') +
-      '&g=' + record.get('groupId') +
-      '&a=' + record.get('artifactId') +
-      '&v=' + record.get('version');
-
-    var c = record.get('classifier');
-    var p = record.get('packaging');
-
-    var template = '<a target="_blank" href="{0}">{1}</a>';
+  formatJarLink: function(value, parent, record, rowIndex, colIndex, store) {
+    var r = record.get( 'repoId' );
+    var g = record.get( 'groupId' );
+    var a = record.get( 'artifactId' );
+    var v = record.get( 'version' );
+    var c = record.get( 'classifier' );
+    var p = record.get( 'packaging' );
 
     if ( c ) {
-      if ( p ) {
-        url += '&p=' + p;
-      }
-      return String.format(template, url + '&c=' + c, 'artifact');
+      return this.makeArtifactLink( r, g, a, v, c, p, 'artifact' );
+    }
+    else if ( p == 'pom' ) {
+      return this.makeArtifactLink( r, g, a, v, c, p, 'pom' );
     }
     else {
-      if ( ! p ) {
-        p = 'jar';
-      }
-      return String.format(template, url + '&p=' + p, 'artifact') + ', ' +
-        String.format(template, url + '&p=pom', 'pom');
+      return this.makeArtifactLink( r, g, a, v, c, p, 'artifact' ) + ', ' +
+      this.makeArtifactLink( r, g, a, v, null, 'pom', 'pom' );
     }
+  },
+
+  makeArtifactLink: function( r, g, a, v, c, p, title ) {
+    var url = Sonatype.config.repos.urls.redirect +
+      '?r=' + r + '&g=' + g + '&a=' + a + '&v=' + v;
+    if ( c ) {
+      url += '&c=' + c;
+    }
+    if ( p ) {
+      url += '&p=' + p;
+    }
+    return String.format( '<a target="_blank" href="{0}">{1}</a>', url, title );
   },
   
   formatPomLink: function(value, p, record, rowIndex, colIndex, store) {
