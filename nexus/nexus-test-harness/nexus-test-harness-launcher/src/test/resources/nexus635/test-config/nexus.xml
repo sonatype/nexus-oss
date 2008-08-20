@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="UTF-8"?><nexusConfiguration>
+  <version>1.0.5</version>
+  <applicationLogDirectory>${project.build.directory}/logs/</applicationLogDirectory>
+  
+    <smtpConfiguration>
+    <host>localhost</host>
+    <port>3025</port>
+    <sslEnabled>false</sslEnabled>
+    <tlsEnabled>false</tlsEnabled>
+    <username>smtp-username</username>
+    <password>smtp-password</password>
+    <debugMode>false</debugMode>
+    <systemEmailAddress>system@nexus.org</systemEmailAddress>
+  </smtpConfiguration>
+  
+  <security>
+    <enabled>false</enabled>
+    <anonymousAccessEnabled>true</anonymousAccessEnabled>
+    <anonymousUsername>anonymous</anonymousUsername>
+	<anonymousPassword>anonymous</anonymousPassword> 
+    <realms>
+      <realm>default</realm>
+    </realms>
+  </security>
+  <globalConnectionSettings />
+  <restApi />
+  <httpProxy />
+  <routing>
+    <groups />
+  </routing>
+  <repositories>
+  <repository>
+            <id>central</id>
+            <name>Maven Central</name>
+            <localStatus>inService</localStatus>
+            <proxyMode>allow</proxyMode>
+            <allowWrite>false</allowWrite>
+            <browseable>true</browseable>
+            <indexable>true</indexable>
+            <notFoundCacheTTL>1440</notFoundCacheTTL>
+            <artifactMaxAge>-1</artifactMaxAge>
+            <metadataMaxAge>1440</metadataMaxAge>
+            <maintainProxiedRepositoryMetadata>false</maintainProxiedRepositoryMetadata>
+            <repositoryPolicy>release</repositoryPolicy>
+            <remoteStorage>
+                <provider>apacheHttpClient3x</provider>
+                <url>http://repo1.maven.org/maven2/</url>
+            </remoteStorage>
+        </repository>
+
+        <!-- SNAPSHOT SNAPSHOT REPOSITORIES -->
+
+        <repository>
+            <id>apache-snapshots</id>
+            <name>Apache Snapshots</name>
+            <localStatus>inService</localStatus>
+            <proxyMode>allow</proxyMode>
+            <allowWrite>false</allowWrite>
+            <browseable>true</browseable>
+            <indexable>true</indexable>
+            <notFoundCacheTTL>1440</notFoundCacheTTL>
+            <artifactMaxAge>1440</artifactMaxAge>
+            <metadataMaxAge>1440</metadataMaxAge>
+            <maintainProxiedRepositoryMetadata>false</maintainProxiedRepositoryMetadata>
+            <repositoryPolicy>snapshot</repositoryPolicy>
+            <remoteStorage>
+                <provider>apacheHttpClient3x</provider>
+                <url>http://people.apache.org/repo/m2-snapshot-repository</url>
+            </remoteStorage>
+        </repository>
+
+        <repository>
+            <id>codehaus-snapshots</id>
+            <name>Codehaus Snapshots</name>
+            <localStatus>inService</localStatus>
+            <proxyMode>allow</proxyMode>
+            <allowWrite>false</allowWrite>
+            <browseable>true</browseable>
+            <indexable>true</indexable>
+            <notFoundCacheTTL>1440</notFoundCacheTTL>
+            <artifactMaxAge>1440</artifactMaxAge>
+            <metadataMaxAge>1440</metadataMaxAge>
+            <maintainProxiedRepositoryMetadata>false</maintainProxiedRepositoryMetadata>
+            <repositoryPolicy>snapshot</repositoryPolicy>
+            <remoteStorage>
+                <provider>apacheHttpClient3x</provider>
+                <url>http://snapshots.repository.codehaus.org/</url>
+            </remoteStorage>
+        </repository>
+    <repository>
+      <id>nexus-test-harness-repo</id>
+      <name>nexus-test-harness-repo</name>
+      <allowWrite>true</allowWrite>
+    </repository>
+    <repository>
+      <id>nexus-test-harness-repo2</id>
+      <name>nexus-test-harness-repo2</name>
+      <allowWrite>true</allowWrite>
+    </repository>
+    <repository>
+      <id>nexus-test-harness-release-repo</id>
+      <name>nexus-test-harness-release-repo</name>
+      <allowWrite>true</allowWrite>
+    </repository>
+    <repository>
+      <id>nexus-test-harness-snapshot-repo</id>
+      <name>nexus-test-harness-snapshot-repo</name>
+      <allowWrite>true</allowWrite>
+      <repositoryPolicy>snapshot</repositoryPolicy>
+    </repository>
+    <repository>
+      <id>tasks-snapshot-repo</id>
+      <name>Jetty Test Server 4 Tasks</name>
+      <repositoryPolicy>snapshot</repositoryPolicy>
+      <proxyMode>allow</proxyMode>
+      <remoteStorage>
+        <url>${proxy-repo-base-url}tasks-snapshot-repo</url>
+      </remoteStorage>
+    </repository>
+  </repositories>
+  <repositoryGrouping>
+    <repositoryGroups>
+            <repositoryGroup>
+                <groupId>public</groupId>
+                <name>Public Repositories</name>
+                <repositories>
+                    <repository>central</repository>
+                </repositories>
+            </repositoryGroup>
+            <repositoryGroup>
+                <groupId>public-snapshots</groupId>
+                <name>Public Snapshot Repositories</name>
+                <repositories>
+                    <repository>apache-snapshots</repository>
+                    <repository>codehaus-snapshots</repository>
+                </repositories>
+            </repositoryGroup>
+      <repositoryGroup>
+        <groupId>nexus-test</groupId>
+        <name>nexus-test</name>
+        <repositories>
+          <repository>nexus-test-harness-repo</repository>
+          <repository>nexus-test-harness-repo2</repository>
+          <repository>tasks-snapshot-repo</repository>
+        </repositories>
+      </repositoryGroup>
+      <repositoryGroup>
+        <groupId>nexus-test-harness-snapshot-group</groupId>
+        <name>nexus-test-harness-snapshot-group</name>
+        <repositories>
+          <repository>nexus-test-harness-snapshot-repo</repository>
+        </repositories>
+      </repositoryGroup>
+      <repositoryGroup>
+        <groupId>nexus-test-harness-release-group</groupId>
+        <name>nexus-test-harness-release-group</name>
+        <repositories>
+          <repository>nexus-test-harness-release-repo</repository>
+        </repositories>
+      </repositoryGroup>
+    </repositoryGroups>
+  </repositoryGrouping>
+  
+  <repositoryTargets>
+    <repositoryTarget>
+      <id>testTarget</id>
+      <name>testTarget</name>
+      <contentClass>maven2</contentClass>
+      <patterns>
+        <pattern>.*test.*</pattern>
+      </patterns>
+    </repositoryTarget>
+    
+    <repositoryTarget>
+      <id>allRepos</id>
+      <name>All M2 Repositories</name>
+      <contentClass>maven2</contentClass>
+      <patterns>
+        <pattern>.*</pattern>
+      </patterns>
+    </repositoryTarget>
+    
+    <repositoryTarget>
+      <id>1</id>
+      <name>All (Maven2)</name>
+      <contentClass>maven2</contentClass>
+      <patterns>
+        <pattern>.*</pattern>
+      </patterns>
+    </repositoryTarget>
+    <repositoryTarget>
+      <id>2</id>
+      <name>All (Maven1)</name>
+      <contentClass>maven1</contentClass>
+      <patterns>
+        <pattern>.*</pattern>
+      </patterns>
+    </repositoryTarget>
+    
+    
+  </repositoryTargets>
+  
+</nexusConfiguration>
