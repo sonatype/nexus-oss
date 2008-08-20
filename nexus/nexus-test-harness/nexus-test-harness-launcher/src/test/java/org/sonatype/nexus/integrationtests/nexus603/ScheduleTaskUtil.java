@@ -1,4 +1,4 @@
-package org.sonatype.nexus.integrationtests.proxy.nexus603;
+package org.sonatype.nexus.integrationtests.nexus603;
 
 import java.io.File;
 import java.io.IOException;
