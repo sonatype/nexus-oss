@@ -51,7 +51,7 @@ Sonatype.repoServer.resources.help = {
   server : {
     anonUsername : 'The username that will be used to authenticate anonymous users against the security realm.',
     anonPassword : 'The password that will be used to authenticate anonymous users against the security realm.',
-    anonymous : 'Allow anonymous access into the system, will be treated with the credentials of the user below.',
+    anonymousAccess: 'These fields are used to authenticate anonymous requests. When a request comes in without credentials, Nexus uses the Anonymous Username and Anonymous Password field as a substitute and pass it through the security subsystem. This is used in conjunction with third party security realm integration. For example if you were authenticating against Active Directory, the username might be "Guest" instead of anonymous. If you are using the default Nexus security realm, then these shouldn\'t be changed.',
     security : 'Whether to enable security or not.', 
     baseUrl : 'This is the Base URL of the Nexus web application.  i.e. http://localhost:8081/nexus. Note that this is only used in emails and rss feeds. Other urls are built based on the incoming request.',
 

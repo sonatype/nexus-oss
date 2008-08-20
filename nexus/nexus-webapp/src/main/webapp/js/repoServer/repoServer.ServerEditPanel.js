@@ -206,33 +206,71 @@ Sonatype.repoServer.ServerEditPanel = function(config){
             allowBlank: false
           },
           {
-            xtype: 'checkbox',
-            fieldLabel: 'Anonymous Access',
-            helpText: ht.anonymous,
-            name: 'securityAnonymousAccessEnabled'
-          },
-          { 
-            xtype: 'textfield',
-            fieldLabel:'Anonymous Username', 
-            name:'securityAnonymousUsername',
-            helpText: ht.anonUsername,
-            width: 100,
-            allowBlank:true,
-            anchor: Sonatype.view.FIELD_OFFSET
-          },
-          { 
-            xtype: 'textfield',
-            fieldLabel:'Anonymous Password', 
-            name:'securityAnonymousPassword', 
-            inputType:'password',
-            helpText: ht.anonPassword,
-            width: 100,
-            allowBlank:true,
-            minLength: 4,
-            minLengthText : "Password must be 4 characters or more",
-            maxLength: 25,
-            maxLengthText : "Password must be 25 characters or less",
-            anchor: Sonatype.view.FIELD_OFFSET 
+            xtype: 'fieldset',
+            checkboxToggle:true,
+            collapsed: true,
+            id: formId + '_' + 'anonymousAccessSettings',
+            title: 'Anonymous Access',
+            anchor: Sonatype.view.FIELDSET_OFFSET,
+            autoHeight:true,
+            layoutConfig: {
+              labelSeparator: ''
+            },
+            listeners: {
+              'expand' : {
+                fn: function(panel) {
+                  panel.find('name', 'securityAnonymousAccessEnabled')[0].setValue('true');
+                  this.optionalFieldsetExpandHandler(panel);
+                },
+                scope: this
+              },
+              'collapse' : {
+                fn: function(panel) {
+                  panel.find('name', 'securityAnonymousAccessEnabled')[0].setValue('false');
+                  panel.find('name', 'securityAnonymousPassword')[0].setValue('');
+                  this.optionalFieldsetCollapseHandler(panel);
+                },
+                scope: this,
+                delay: 100
+              }
+            },
+
+            items: [
+              {
+                xtype: 'hidden',
+                name: 'securityAnonymousAccessEnabled'
+              },
+              {
+                xtype: 'panel',
+                layout: 'fit',
+                html: '<div style="padding-bottom:10px">' + ht.anonymousAccess + '</div>'
+              },
+              { 
+                xtype: 'textfield',
+                fieldLabel:'Anonymous Username', 
+                name:'securityAnonymousUsername',
+                itemCls: 'required-field',
+                helpText: ht.anonUsername,
+                width: 100,
+                allowBlank:true,
+                anchor: Sonatype.view.FIELD_OFFSET
+              },
+              { 
+                xtype: 'textfield',
+                fieldLabel:'Anonymous Password', 
+                name:'securityAnonymousPassword', 
+                itemCls: 'required-field',
+                inputType:'password',
+                helpText: ht.anonPassword,
+                width: 100,
+                allowBlank:true,
+                minLength: 4,
+                minLengthText : "Password must be 4 characters or more",
+                maxLength: 25,
+                maxLengthText : "Password must be 25 characters or less",
+                anchor: Sonatype.view.FIELD_OFFSET 
+              }
+            ]
           }
         ]
       },
@@ -439,8 +477,8 @@ Sonatype.repoServer.ServerEditPanel = function(config){
   var securityConfigField = this.formPanel.find('name', 'securityEnabled')[0];
   securityConfigField.on('select', this.securitySelectHandler, securityConfigField);
   
-  var anonymousField = this.formPanel.find('name', 'securityAnonymousAccessEnabled')[0];
-  anonymousField.on('check', this.anonymousCheckHandler, anonymousField);
+//  var anonymousField = this.formPanel.find('name', 'securityAnonymousAccessEnabled')[0];
+//  anonymousField.on('check', this.anonymousCheckHandler, anonymousField);
 };
 
 Ext.extend(Sonatype.repoServer.ServerEditPanel, Ext.Panel, {
@@ -516,6 +554,7 @@ Ext.extend(Sonatype.repoServer.ServerEditPanel, Ext.Panel, {
   
   afterLayoutHandler : function(){
     var appSettingsPanel = this.findById( this.id + '_applicationServerSettings' );
+    var anonSettingsPanel = this.findById( this.id + '_anonymousAccessSettings' );
     // invoke form data load
     this.getForm().doAction('sonatypeLoad', {
       url:Sonatype.config.repos.urls.globalSettingsState,
@@ -568,12 +607,9 @@ Ext.extend(Sonatype.repoServer.ServerEditPanel, Ext.Panel, {
       //@note: this is a work around to get proper use of the isDirty() function of this field
       //@todo: could/should extend sonatypeLoad to set the originalValue on all fields to the value it loads
       //        default behavior sets the original value to whatever is specified in the config.
-      var disableAnonFields = true;
-      if (action.options.fpanel.find('name', 'securityAnonymousAccessEnabled')[0].getValue() == true) {
-        disableAnonFields = false;
+      if (action.options.fpanel.find('name', 'securityAnonymousAccessEnabled')[0].getValue() == "true") {
+        action.options.fpanel.find('id', (action.options.fpanel.id + '_' + 'anonymousAccessSettings'))[0].expand();
       }
-      action.options.fpanel.find('name', 'securityAnonymousUsername')[0].setDisabled(disableAnonFields);
-      action.options.fpanel.find('name', 'securityAnonymousPassword')[0].setDisabled(disableAnonFields);
       if (!Ext.isEmpty(action.options.fpanel.find('name', 'baseUrl')[0].getValue())) {
         action.options.fpanel.find('id', (action.options.fpanel.id + '_' + 'applicationServerSettings'))[0].expand();
       }
