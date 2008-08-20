@@ -28,17 +28,17 @@
       <repositories>
 	    <repository>
 	      <id>nexus-test-harness-repo</id>
-	      <url>http://localhost:8087/nexus/content/repositories/nexus-test-harness-repo</url>
+	      <url>${nexus-base-url}content/repositories/nexus-test-harness-repo</url>
           <releases><enabled>true</enabled></releases>
 	    </repository>
 	    <repository>
 	      <id>nexus-test-harness-repo2</id>
-	      <url>http://localhost:8087/nexus/content/repositories/nexus-test-harness-repo2</url>
+	      <url>${nexus-base-url}content/repositories/nexus-test-harness-repo2</url>
           <releases><enabled>true</enabled></releases>
 	    </repository>
 	    <repository>
 	      <id>nexus-test-harness-release-repo</id>
-	      <url>http://localhost:8087/nexus/content/repositories/nexus-test-harness-release-repo</url>
+	      <url>${nexus-base-url}content/repositories/nexus-test-harness-release-repo</url>
           <releases><enabled>true</enabled></releases>
 	    </repository>
       </repositories>

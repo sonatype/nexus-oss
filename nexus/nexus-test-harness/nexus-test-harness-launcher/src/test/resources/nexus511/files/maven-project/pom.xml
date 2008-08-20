@@ -9,7 +9,7 @@
   <distributionManagement>
     <repository>
       <id>nexus-test-harness-repo</id>
-      <url>http://localhost:8087/nexus/content/repositories/nexus-test-harness-repo</url>
+      <url>${nexus-base-url}content/repositories/nexus-test-harness-repo</url>
     </repository>
   </distributionManagement>
 

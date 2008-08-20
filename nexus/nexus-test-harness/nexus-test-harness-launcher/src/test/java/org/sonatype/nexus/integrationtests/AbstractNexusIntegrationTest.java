@@ -658,7 +658,7 @@ public class AbstractNexusIntegrationTest
         }
         error.append( "*\n*\n*\n*\n*\n**********************************************************************************" );
 
-        log.debug( error.toString() );
+        System.out.println( error.toString() );
 
         return true;
     }

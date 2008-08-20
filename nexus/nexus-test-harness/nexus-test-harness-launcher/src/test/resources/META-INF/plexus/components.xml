@@ -22,6 +22,9 @@
         <platform-file>${nexus-abs-basedir}/lib/plexus-platform-jsw-*.jar</platform-file>
         <class-path-elements>${nexus-abs-basedir}/runtime/apps/nexus/conf, ${nexus-abs-basedir}/runtime/apps/nexus/lib/*.jar</class-path-elements>
         <sleep-after-start>6000</sleep-after-start>
+        <systemProperties>
+        		<plexus.applicationPort>${nexus-application-port}</plexus.applicationPort>
+        </systemProperties>
       </configuration>
     </component>
     
