@@ -239,7 +239,9 @@ public class GlobalConfigurationResourceHandler
 
                     getNexus().setAnonymousAccessEnabled( resource.isSecurityAnonymousAccessEnabled() );
 
-                    if ( resource.isSecurityAnonymousAccessEnabled() && resource.getSecurityAnonymousUsername() != null )
+                    if ( resource.isSecurityAnonymousAccessEnabled()
+                        && !StringUtils.isEmpty( resource.getSecurityAnonymousUsername() )
+                        && !StringUtils.isEmpty( resource.getSecurityAnonymousPassword() ) )
                     {
                         if ( getNexus().getAnonymousUsername().equals( resource.getSecurityAnonymousUsername() )
                             && !getNexus().getAnonymousPassword().equals( resource.getSecurityAnonymousPassword() ) )
@@ -320,6 +322,23 @@ public class GlobalConfigurationResourceHandler
                         getNexus().setAnonymousUsername( resource.getSecurityAnonymousUsername() );
 
                         getNexus().setAnonymousPassword( resource.getSecurityAnonymousPassword() );
+                    }
+                    else if ( resource.isSecurityAnonymousAccessEnabled() )
+                    {
+                        // the supplied anon auth info is wrong
+                        getLogger()
+                            .log(
+                                Level.WARNING,
+                                "Nexus refused to apply configuration, the supplied anonymous username/pwd information is empty." );
+
+                        getResponse().setStatus( Status.CLIENT_ERROR_BAD_REQUEST );
+
+                        getResponse().setEntity(
+                            serialize( entity, getNexusErrorResponse(
+                                "securityAnonymousUsername",
+                                "Cannot be empty when Anonynous access is enabled" ) ) );
+
+                        return;
                     }
 
                     if ( resource.getBaseUrl() != null )
