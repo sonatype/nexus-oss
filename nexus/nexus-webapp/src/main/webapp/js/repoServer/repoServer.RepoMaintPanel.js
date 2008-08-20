@@ -802,6 +802,9 @@ Ext.extend(Sonatype.repoServer.RepoMaintPanel, Sonatype.repoServer.AbstractRepoP
   
   treeLoadExceptionHandler : function(treeLoader, node, response){
     if (response.status == 503){
+      if ( Sonatype.MessageBox.isVisible() ) {
+        Sonatype.MessageBox.hide();
+      }
       node.setText(node.text + ' (Out of Service)');
     }
     else if ( response.status == 404 ) {
