@@ -49,11 +49,11 @@ Sonatype.repoServer.resources.help = {
 
   // Server Config help text
   server : {
-    anonUsername : 'The username that will be applied to anonymous users.',
-    anonPassword : 'The password that will be applied to anonymous users.',
+    anonUsername : 'The username that will be used to authenticate anonymous users against the security realm.',
+    anonPassword : 'The password that will be used to authenticate anonymous users against the security realm.',
     anonymous : 'Allow anonymous access into the system, will be treated with the credentials of the user below.',
     security : 'Whether to enable security or not.', 
-    baseUrl : 'This is the Base URL of the Nexus web application.  i.e. http://localhost:8081/nexus',
+    baseUrl : 'This is the Base URL of the Nexus web application.  i.e. http://localhost:8081/nexus. Note that this is only used in emails and rss feeds. Other urls are built based on the incoming request.',
 
     //use default nexus text
     userAgentString : userAgentString,
@@ -120,7 +120,7 @@ Sonatype.repoServer.resources.help = {
   roles: {
     name : 'The name of this role.',
     description : 'The description of this role.',
-    sessionTimeout : 'The number of minutes to wait before timing out a user session.',
+    sessionTimeout : 'The number of minutes to wait before timing out an idle user session.',
     rolesAndPrivileges : 'Roles and privileges contained in this Role.'
   },
   
@@ -198,7 +198,7 @@ Sonatype.repoServer.resources.help = {
   
   repoTargets: {
     name : 'The name of the repository target.',
-    contentClass : 'The content class of the repository target. It will be matched only against repositories with same content classes.',
+    contentClass : 'The content class of the repository target. It will be matched only against repositories with the same content class.',
     pattern : 'Enter a pattern expression and click "Add" to add it to the list. Regular expressions are used to match the artifact path. The path is everything after /nexus/content/ so it will include the group or repository name. .* is used to specify all paths. \'.*/com/some/company/.*\' will match any artifact with \'com.some.company\' as the group id or artifact id.'
   }
   
