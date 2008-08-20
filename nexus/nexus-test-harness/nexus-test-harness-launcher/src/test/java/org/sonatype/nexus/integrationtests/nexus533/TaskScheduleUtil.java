@@ -96,4 +96,13 @@ public class TaskScheduleUtil
         return response.getStatus();
     }
 
+    public static Status run( String taskId )
+        throws IOException
+    {
+        String serviceURI = "service/local/schedule_run/" + taskId;
+        Response response = RequestFacade.doGetRequest( serviceURI );
+
+        return response.getStatus();
+    }
+
 }

@@ -105,6 +105,11 @@ public class MavenDeployer
             throw new CommandLineException( "Process failed: \n" + cli.toString() + "\nBUILD ERROR token found\n"
                 + "Process output:\n" + consoleOutput );
         }
+        if ( consoleOutput.contains( "FATAL ERROR" ) )
+        {
+            throw new CommandLineException( "Process failed: \n" + cli.toString() + "\nFATAL ERROR token found\n"
+                                            + "Process output:\n" + consoleOutput );
+        }
 
         return consoleOutput;
     }

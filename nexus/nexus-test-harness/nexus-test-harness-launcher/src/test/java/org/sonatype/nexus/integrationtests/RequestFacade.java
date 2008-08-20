@@ -78,7 +78,7 @@ public class RequestFacade
         return client.handle( request );
     }
 
-    protected static File downloadFile( URL url, String targetFile )
+    public static File downloadFile( URL url, String targetFile )
         throws IOException
     {
 

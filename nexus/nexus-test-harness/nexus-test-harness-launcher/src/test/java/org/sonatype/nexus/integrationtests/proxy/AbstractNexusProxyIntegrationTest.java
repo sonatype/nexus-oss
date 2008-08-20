@@ -26,7 +26,7 @@ public abstract class AbstractNexusProxyIntegrationTest
 
     private String baseURL = null;
 
-    private String localStorageDir = null;
+    protected String localStorageDir = null;
 
     protected AbstractNexusProxyIntegrationTest()
     {
