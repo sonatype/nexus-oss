@@ -553,4 +553,57 @@ public class M2GavCalculatorTest
             .pathToGav( "/org/apache/maven/plugins/maven-dependency-plugin/2.0-SNAPSHOT/maven-dependency-plugin-2.0-alpha-1-20070109.165112-13.jar" );
         assertEquals( null, gav );
     }
+    
+    public void testGavExtensionAndClassifier() throws Exception 
+    {
+      Gav gav;
+      
+      gav = gavCalculator.pathToGav( "/org/sonatype/nexus/nexus-webapp/1.0.0-beta-5/nexus-webapp-1.0.0-beta-5.tar.gz" );
+      assertNotNull( gav );
+      assertEquals( "tar.gz", gav.getExtension() );
+      assertEquals( null, gav.getClassifier() );
+      assertEquals( "1.0.0-beta-5", gav.getVersion() );
+      
+      gav = gavCalculator.pathToGav( "/org/sonatype/nexus/nexus-webapp/1.0.0-beta-5/nexus-webapp-1.0.0-beta-5-bundle.tar.gz" );
+      assertNotNull( gav );
+      assertEquals( "tar.gz", gav.getExtension() );
+      assertEquals( "bundle", gav.getClassifier() );
+      assertEquals( "1.0.0-beta-5", gav.getVersion() );
+      
+      gav = gavCalculator.pathToGav( "/org/codehaus/tycho/tycho-distribution/0.3.0-SNAPSHOT/tycho-distribution-0.3.0-SNAPSHOT-bin.tar.gz" );
+      assertNotNull( gav );
+      assertEquals( "tar.gz", gav.getExtension() );
+      assertEquals( "bin", gav.getClassifier() );
+      assertEquals( "0.3.0-SNAPSHOT", gav.getVersion() );
+      
+      gav = gavCalculator.pathToGav( "/org/codehaus/tycho/tycho-distribution/SNAPSHOT/tycho-distribution-SNAPSHOT-bin.tar.gz" );
+      assertNotNull( gav );
+      assertEquals( "tar.gz", gav.getExtension() );
+      assertEquals( "bin", gav.getClassifier() );
+      assertEquals( "SNAPSHOT", gav.getVersion() );
+      
+      gav = gavCalculator.pathToGav( "/org/codehaus/tycho/tycho-distribution/0.3.0-SNAPSHOT/tycho-distribution-0.3.0-20080818.153246-33-bin.tar.gz" );
+      assertNotNull( gav );
+      assertEquals( "tar.gz", gav.getExtension() );
+      assertEquals( "bin", gav.getClassifier() );
+      assertEquals( "0.3.0-20080818.153246-33", gav.getVersion() );
+      
+      gav = gavCalculator.pathToGav( "/org/sonatype/nexus/nexus-webapp/1.0.0-beta-4.2/nexus-webapp-1.0.0-beta-4.2-javadoc.jar" );
+      assertNotNull( gav );
+      assertEquals( "jar", gav.getExtension() );
+      assertEquals( "javadoc", gav.getClassifier() );
+      assertEquals( "1.0.0-beta-4.2", gav.getVersion() );
+      
+      gav = gavCalculator.pathToGav( "/org/codehaus/tycho/tycho-distribution/0.3.0-SNAPSHOT/tycho-distribution-0.3.0-20080818.153246-33-bin.zip" );
+      assertNotNull( gav );
+      assertEquals( "zip", gav.getExtension() );
+      assertEquals( "bin", gav.getClassifier() );
+      assertEquals( "0.3.0-20080818.153246-33", gav.getVersion() );
+      
+      gav = gavCalculator.pathToGav( "/org/sonatype/nexus/tools/nexus-migration-app/1.0.0-beta-6-SNAPSHOT/nexus-migration-app-1.0.0-beta-6-20080809.181715-2-cli.jar" );
+      assertNotNull( gav );
+      assertEquals( "jar", gav.getExtension() );
+      assertEquals( "cli", gav.getClassifier() );
+      assertEquals( "1.0.0-beta-6-20080809.181715-2", gav.getVersion() );
+    }
 }

@@ -54,10 +54,10 @@ public class M2GavCalculator
                 return null;
             }
 
-            String g = s.substring( 0, gEndPos ).replace( '/', '.' );
-            String a = s.substring( gEndPos + 1, aEndPos );
-            String v = s.substring( aEndPos + 1, vEndPos );
-            String n = s.substring( vEndPos + 1 );
+            String groupId = s.substring( 0, gEndPos ).replace( '/', '.' );
+            String artifactId = s.substring( gEndPos + 1, aEndPos );
+            String version = s.substring( aEndPos + 1, vEndPos );
+            String fileName = s.substring( vEndPos + 1 );
 
             boolean checksum = false;
             boolean signature = false;
@@ -88,147 +88,17 @@ public class M2GavCalculator
                 return null;
             }
 
-            String ext = null;
-
-            // TODO: refine this, the version may contain dot too!
-            if ( n.contains( "." ) )
-            {
-                ext = s.substring( s.lastIndexOf( '.' ) + 1 );
-            }
-            else
-            {
-                // NX-563: not allowing extensionless paths to be interpreted as artifact
-                return null;
-            }
-
-            boolean snapshot = v.contains( "-SNAPSHOT" ) || ( !getEnforcer().isStrict() && v.equals( "SNAPSHOT" ) );
-
-            boolean primary = false;
-            String c = null;
+            boolean snapshot = version.contains( "-SNAPSHOT" ) || ( !getEnforcer().isStrict() && version.equals( "SNAPSHOT" ) );
 
             if ( snapshot )
             {
-                String bv = null;
-                Integer snapBuildNr = null;
-                Long snapshotTimestamp = null;
-
-                String snapshotBuildNumber = null;
-
-                int vSnapshotStart = vEndPos + a.length() + v.length() - 9 + 3;
-                String vSnapshot = s.substring( vSnapshotStart, vSnapshotStart + 8 );
-                if ( "SNAPSHOT".equals( vSnapshot ) )
-                {
-                    // primary?
-                    primary = n.substring( 0, a.length() + v.length() + ext.length() + 2 ).equals(
-                        a + "-" + v + "." + ext );
-                    if ( !primary )
-                    {
-                        c = s.substring( vEndPos + a.length() + v.length() + 3, s.lastIndexOf( '.' ) );
-                    }
-                }
-                else
-                {
-                    bv = v;
-                    StringBuffer sb = new StringBuffer( vSnapshot );
-                    sb.append( s.substring( vSnapshotStart + sb.length(), vSnapshotStart + sb.length() + 8 ) );
-                    try
-                    {
-                        SimpleDateFormat df = new SimpleDateFormat( "yyyyMMdd.HHmmss" );
-                        snapshotTimestamp = Long.valueOf( df.parse( sb.toString() ).getTime() );
-                    }
-                    catch ( ParseException e )
-                    {
-                    }
-
-                    int buildNumberPos = vSnapshotStart + sb.length();
-                    StringBuffer bnr = new StringBuffer();
-                    while ( s.charAt( buildNumberPos ) >= '0' && s.charAt( buildNumberPos ) <= '9' )
-                    {
-                        sb.append( s.charAt( buildNumberPos ) );
-                        bnr.append( s.charAt( buildNumberPos ) );
-                        buildNumberPos++;
-                    }
-                    snapshotBuildNumber = sb.toString();
-                    snapBuildNr = Integer.parseInt( bnr.toString() );
-
-                    if ( getEnforcer().isStrict() )
-                    {
-                        primary = !checksum
-                            && !signature
-                            && n.equals( a + "-" + v.substring( 0, v.length() - 9 ) + "-" + snapshotBuildNumber + "."
-                                + ext );
-                    }
-                    else
-                    {
-                        primary = !checksum
-                            && !signature
-                            && n.equals( a + "-"
-                                + ( ( v.length() > 9 ) ? ( v.substring( 0, v.length() - 9 ) + "-" ) : "" )
-                                + snapshotBuildNumber + "." + ext );
-                    }
-                    
-                    if ( !primary )
-                    {
-                        if ( vEndPos + a.length() + v.length() - "-SNAPSHOT".length() + 3 + snapshotBuildNumber.length()
-                            < s.lastIndexOf( "." ) )
-                        {
-                            c = s.substring( s.lastIndexOf( '-' ) + 1, s.lastIndexOf( '.' ) );   
-                        }
-                    }
-
-                    v = bv.substring( 0, bv.length() - 8 ) + snapshotBuildNumber;
-                }
-
-                return new Gav(
-                    g,
-                    a,
-                    v,
-                    c,
-                    ext,
-                    snapBuildNr,
-                    snapshotTimestamp,
-                    n,
-                    snapshot,
-                    checksum,
-                    checksumType,
-                    signature,
-                    signatureType );
+                return getSnapshotGav(s, vEndPos, groupId, artifactId, version,
+                    fileName, checksum, signature, checksumType, signatureType);
             }
             else
             {
-                if ( n.startsWith( a + "-" + v ) )
-                {
-                    primary = !checksum && n.equals( a + "-" + v + "." + ext );
-                    if ( !primary )
-                    {
-                        if ( vEndPos + a.length() + v.length() + 3 < s.lastIndexOf( '.' ) )
-                        {
-                            c = s.substring( vEndPos + a.length() + v.length() + 3, s.lastIndexOf( '.' ) );
-                        }
-                        else
-                        {
-                            c = null;
-                        }
-                    }
-                    return new Gav(
-                        g,
-                        a,
-                        v,
-                        c,
-                        ext,
-                        null,
-                        null,
-                        n,
-                        snapshot,
-                        checksum,
-                        checksumType,
-                        signature,
-                        signatureType );
-                }
-                else
-                {
-                    return null;
-                }
+                return getReleaseGav(s, vEndPos, groupId, artifactId, version,
+                    fileName, checksum, signature, checksumType, signatureType);
             }
         }
         catch ( NumberFormatException e )
@@ -239,6 +109,152 @@ public class M2GavCalculator
         {
             return null;
         }
+    }
+
+    private Gav getReleaseGav(String s, int vEndPos, String groupId,
+        String artifactId, String version, String fileName, boolean checksum,
+        boolean signature, Gav.HashType checksumType,
+        Gav.SignatureType signatureType) 
+    {
+        if ( !fileName.startsWith( artifactId + "-" + version ) ) 
+        {
+            return null;
+        }
+
+        int nTailPos = vEndPos + artifactId.length() + version.length() + 2;
+        
+        String tail = s.substring( nTailPos );
+        
+        int nExtPos = tail.indexOf( '.' );
+        
+        if ( nExtPos == -1 )
+        {
+            // NX-563: not allowing extensionless paths to be interpreted as artifact
+            return null;
+        }
+        
+        String ext = tail.substring( nExtPos + 1 );
+        
+        String classifier = tail.charAt( 0 ) == '-' ? tail.substring( 1, nExtPos) : null; 
+        
+        return new Gav(
+            groupId,
+            artifactId,
+            version,
+            classifier,
+            ext,
+            null,
+            null,
+            fileName,
+            false,  /* release */
+            checksum,
+            checksumType,
+            signature,
+            signatureType );
+    }
+
+    private Gav getSnapshotGav(String s, int vEndPos, String groupId,
+        String artifactId, String version, String fileName, boolean checksum,
+        boolean signature, Gav.HashType checksumType, Gav.SignatureType signatureType) 
+    {
+      
+      Integer snapshotBuildNo = null;
+      
+      Long snapshotTimestamp = null;
+
+      int vSnapshotStart = vEndPos + artifactId.length() + version.length() - 9 + 3;
+      
+      String vSnapshot = s.substring( vSnapshotStart, vSnapshotStart + 8 );
+      
+      String classifier = null;
+
+      String ext = null;
+      
+      if ( "SNAPSHOT".equals( vSnapshot ) )
+      {
+          int nTailPos = vEndPos + artifactId.length() + version.length() + 2;
+          
+          String tail = s.substring( nTailPos );
+          
+          int nExtPos = tail.indexOf( '.' );
+          
+          if ( nExtPos == -1 )
+          {
+              // NX-563: not allowing extensionless paths to be interpreted as artifact
+              return null;
+          }
+          
+          ext = tail.substring( nExtPos + 1 );
+          
+          classifier = tail.charAt( 0 ) == '-' ? tail.substring( 1, nExtPos) : null; 
+      }
+      else
+      {
+          StringBuffer sb = new StringBuffer( vSnapshot );
+          sb.append( s.substring( vSnapshotStart + sb.length(), vSnapshotStart + sb.length() + 8 ) );
+          
+          try
+          {
+              SimpleDateFormat df = new SimpleDateFormat( "yyyyMMdd.HHmmss" );
+              snapshotTimestamp = Long.valueOf( df.parse( sb.toString() ).getTime() );
+          }
+          catch ( ParseException e )
+          {
+          }
+
+          int buildNumberPos = vSnapshotStart + sb.length();
+          StringBuffer bnr = new StringBuffer();
+          while ( s.charAt( buildNumberPos ) >= '0' && s.charAt( buildNumberPos ) <= '9' )
+          {
+              sb.append( s.charAt( buildNumberPos ) );
+              bnr.append( s.charAt( buildNumberPos ) );
+              buildNumberPos++;
+          }
+          String snapshotBuildNumber = sb.toString();
+          snapshotBuildNo = Integer.parseInt( bnr.toString() );
+
+          int n;
+          
+          if ( getEnforcer().isStrict() ) 
+          {
+              n = version.length() - 9;
+          } 
+          else 
+          {
+              n = version.length() > 9 ? version.length() - 9 + 1 : 0;
+          }
+
+          String tail = s.substring( vEndPos + artifactId.length() + n + snapshotBuildNumber.length() + 2);
+          
+          int nExtPos = tail.indexOf( '.' );
+          
+          if ( nExtPos == -1 )
+          {
+              // NX-563: not allowing extensionless paths to be interpreted as artifact
+              return null;
+          }
+          
+          ext = tail.substring( nExtPos + 1 );
+          
+          classifier = tail.charAt( 0 ) == '-' ? tail.substring( 1, nExtPos) : null; 
+              
+          version = version.substring( 0, version.length() - 8 ) + snapshotBuildNumber;
+      }
+
+      return new Gav(
+          groupId,
+          artifactId,
+          version,
+          classifier,
+          ext,
+          snapshotBuildNo,
+          snapshotTimestamp,
+          fileName,
+          true, /* snapshot */
+          checksum,
+          checksumType,
+          signature,
+          signatureType );
     }
 
     public String gavToPath( Gav gav )
