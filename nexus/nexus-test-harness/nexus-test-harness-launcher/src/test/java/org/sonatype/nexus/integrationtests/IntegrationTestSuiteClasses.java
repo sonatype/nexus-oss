@@ -53,6 +53,7 @@ import org.sonatype.nexus.integrationtests.proxy.nexus177.Nexus177OutOfServiceTe
 import org.sonatype.nexus.integrationtests.proxy.nexus178.Nexus178BlockProxyDownloadTest;
 import org.sonatype.nexus.integrationtests.proxy.nexus179.Nexus179RemoteRepoDownTest;
 import org.sonatype.nexus.integrationtests.proxy.nexus262.Nexus262SimpleProxyTest;
+import org.sonatype.nexus.integrationtests.upgrades.nexus652.Nexus652Beta5To10UpgradeTest;
 
 /**
  * NOTE: the class Nexus258ReleaseDeployTest needs to be at the start of the test, something happens, ( I don't know
@@ -79,12 +80,14 @@ import org.sonatype.nexus.integrationtests.proxy.nexus262.Nexus262SimpleProxyTes
     Nexus586AnonymousChangePasswordTest.class, Nexus586AnonymousForgotPasswordTest.class,
     Nexus586AnonymousForgotUserIdTest.class, Nexus586AnonymousResetPasswordTest.class,
     Nexus532GroupsCrudXmlTests.class, Nexus606DownloadLogsAndConfigFilesTest.class, Nexus643EmptyTrashTaskTest.class,
-    Nexus637PublishIndexTest.class
+    Nexus637PublishIndexTest.class,Nexus652Beta5To10UpgradeTest.class
 /*
  * FIXME velo: tests are working locally, but failing at hudson
  * Nexus635ClearCacheTaskTest.class, Nexus634RemoveAllTest.class,
  * Nexus634KeepNewSnapshotsTest.class, Nexus634KeepTwoSnapshotsTest.class
- */} )
+ */
+    
+    } )
 public class IntegrationTestSuiteClasses
 {
 

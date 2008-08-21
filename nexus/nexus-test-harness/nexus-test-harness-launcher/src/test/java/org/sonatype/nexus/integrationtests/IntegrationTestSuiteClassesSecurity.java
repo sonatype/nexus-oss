@@ -55,6 +55,7 @@ import org.sonatype.nexus.integrationtests.proxy.nexus177.Nexus177OutOfServiceTe
 import org.sonatype.nexus.integrationtests.proxy.nexus178.Nexus178BlockProxyDownloadTest;
 import org.sonatype.nexus.integrationtests.proxy.nexus179.Nexus179RemoteRepoDownTest;
 import org.sonatype.nexus.integrationtests.proxy.nexus262.Nexus262SimpleProxyTest;
+import org.sonatype.nexus.integrationtests.upgrades.nexus652.Nexus652Beta5To10UpgradeTest;
 
 @RunWith( Suite.class )
 @SuiteClasses( { Nexus166SampleTest.class, Nexus169ReleaseMetaDataInSnapshotRepoTest.class,
@@ -76,7 +77,7 @@ import org.sonatype.nexus.integrationtests.proxy.nexus262.Nexus262SimpleProxyTes
     Nexus175SnapshotDeployWrongPassword.class, Nexus511MavenDeployTest.class, Nexus531RepositoryCrudXMLTests.class,
     Nexus531RepositoryCrudJsonTests.class, Nexus233PrivilegesCrudXMLTests.class, Nexus379VirtualRepoSameId.class,
     Nexus448PrivilegeURLTest.class, Nexus532GroupsCrudXmlTests.class, Nexus586ValidateConfigurationTest.class,
-    Nexus606DownloadLogsAndConfigFilesTest.class } )
+    Nexus606DownloadLogsAndConfigFilesTest.class, Nexus652Beta5To10UpgradeTest.class } )
 public class IntegrationTestSuiteClassesSecurity
 {
     @BeforeClass
