@@ -20,41 +20,126 @@
  */
 package org.sonatype.nexus.proxy.maven;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 
 import org.codehaus.plexus.logging.AbstractLogEnabled;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
+import org.codehaus.plexus.util.IOUtil;
+import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 
 /**
- * A very simple artifact packaging mapper, that has everyting wired in this class.
+ * A very simple artifact packaging mapper, that has everyting for quick-start wired in this class. Also, it takes into
+ * account the "${nexus-work}/conf/packaging2extension-mapping.properties" file into account if found. To override the
+ * "defaults" in this class, simply add lines to properties file with same keys.
  * 
  * @author cstamas
  * @plexus.component
  */
 public class DefaultArtifactPackagingMapper
     extends AbstractLogEnabled
-    implements ArtifactPackagingMapper
+    implements ArtifactPackagingMapper, Initializable
 {
-    // TODO: think about externalizing this map to a file, and make it user extendable
+    public static final String MAPPING_PROPERTIES_FILE = "packaging2extension-mapping.properties";
 
-    private final Map<String, String> typeToExtensions;
+    /**
+     * @plexus.requirement
+     */
+    private ApplicationConfiguration applicationConfiguration;
 
+    private Map<String, String> packaging2extensionMapping = new HashMap<String, String>();
+
+    private final static Map<String, String> defaults;
+
+    static
     {
-        typeToExtensions = new HashMap<String, String>();
-        typeToExtensions.put( "ejb-client", "jar" );
-        typeToExtensions.put( "ejb", "jar" );
-        typeToExtensions.put( "rar", "jar" );
-        typeToExtensions.put( "par", "jar" );
-        typeToExtensions.put( "maven-plugin", "jar" );
-        typeToExtensions.put( "maven-archetype", "jar" );
-        typeToExtensions.put( "plexus-application", "jar" );
+        defaults = new HashMap<String, String>();
+        defaults.put( "ejb-client", "jar" );
+        defaults.put( "ejb", "jar" );
+        defaults.put( "rar", "jar" );
+        defaults.put( "par", "jar" );
+        defaults.put( "maven-plugin", "jar" );
+        defaults.put( "maven-archetype", "jar" );
+        defaults.put( "plexus-application", "jar" );
+    }
+
+    public Map<String, String> getPackaging2extensionMapping()
+    {
+        return packaging2extensionMapping;
+    }
+
+    public void setPackaging2extensionMapping( Map<String, String> packaging2extensionMapping )
+    {
+        this.packaging2extensionMapping = packaging2extensionMapping;
+    }
+
+    public Map<String, String> getDefaults()
+    {
+        return defaults;
+    }
+
+    public void initialize()
+        throws InitializationException
+    {
+        // merge defaults
+        getPackaging2extensionMapping().putAll( defaults );
+
+        // if user file exists, add it too
+        File propertiesFile = new File( applicationConfiguration.getConfigurationDirectory(), MAPPING_PROPERTIES_FILE );
+
+        if ( propertiesFile.exists() )
+        {
+            getLogger().info( "Found user mappings file, applying it..." );
+
+            Properties userMappings = new Properties();
+
+            FileInputStream fis = null;
+
+            try
+            {
+                fis = new FileInputStream( propertiesFile );
+
+                userMappings.load( fis );
+
+                if ( userMappings.keySet().size() > 0 )
+                {
+                    for ( Object key : userMappings.keySet() )
+                    {
+                        getPackaging2extensionMapping()
+                            .put( key.toString(), userMappings.getProperty( key.toString() ) );
+                    }
+
+                    getLogger().info(
+                        propertiesFile.getAbsolutePath() + " user mapping file contained "
+                            + userMappings.keySet().size() + " mappings, applied them all succesfully." );
+                }
+            }
+            catch ( IOException e )
+            {
+                throw new InitializationException( "Cannot initialize, got IOException", e );
+            }
+            finally
+            {
+                IOUtil.close( fis );
+            }
+
+        }
+        else
+        {
+            getLogger().info( "User mappings file not found, will work with defaults..." );
+        }
     }
 
     public String getExtensionForPackaging( String packaging )
     {
-        if ( typeToExtensions.containsKey( packaging ) )
+        if ( getPackaging2extensionMapping().containsKey( packaging ) )
         {
-            return typeToExtensions.get( packaging );
+            return getPackaging2extensionMapping().get( packaging );
         }
         else
         {
@@ -62,5 +147,4 @@ public class DefaultArtifactPackagingMapper
             return packaging;
         }
     }
-
 }

@@ -149,22 +149,12 @@ public abstract class AbstractNexusResourceHandler
             {
                 MavenRepository mr = (MavenRepository) repository;
 
-                // TODO: NEXUS-XXX
-                // to avoid nexus-indexer bug
-                String packaging = ai.packaging;
-
-                if ( StringUtils.isEmpty( packaging ) || "null".equals( packaging ) )
-                {
-                    ai.packaging = "jar";
-                }
-
                 Gav gav = new Gav(
                     ai.groupId,
                     ai.artifactId,
                     ai.version,
                     ai.classifier,
-                    mr.getArtifactPackagingMapper().getExtensionForPackaging(
-                        ai.packaging != null ? ai.packaging : "jar" ),
+                    mr.getArtifactPackagingMapper().getExtensionForPackaging( ai.packaging ),
                     null,
                     null,
                     null,
