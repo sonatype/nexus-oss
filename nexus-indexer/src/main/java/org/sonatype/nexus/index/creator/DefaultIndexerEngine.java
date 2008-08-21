@@ -46,7 +46,17 @@ public class DefaultIndexerEngine
     public void index( IndexingContext context, ArtifactContext ac )
         throws IOException
     {
-        context.getIndexWriter().addDocument( createDocument( context, ac ) );
+        // the GAV null means the file to scan is not obeying to repo layout (whether m1 or m2)
+        // skip it
+        if ( ac.getGav() != null )
+        {
+            Document d = createDocument( context, ac );
+
+            if ( d != null )
+            {
+                context.getIndexWriter().addDocument( d );
+            }
+        }
     }
 
     public void endIndexing( IndexingContext context )

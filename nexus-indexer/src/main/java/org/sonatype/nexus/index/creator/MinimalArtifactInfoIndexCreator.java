@@ -35,6 +35,7 @@ import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
+import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.index.ArtifactAvailablility;
 import org.sonatype.nexus.index.ArtifactContext;
 import org.sonatype.nexus.index.ArtifactInfo;
@@ -72,8 +73,10 @@ public class MinimalArtifactInfoIndexCreator
 
         File pom = artifactContext.getPom();
 
+        Gav gav = artifactContext.getGav();
+
         ArtifactInfo ai = artifactContext.getArtifactInfo();
-        
+
         if ( pom != null )
         {
             Model model = modelReader.readModel( pom, ai.groupId, ai.artifactId, ai.version );
@@ -92,7 +95,7 @@ public class MinimalArtifactInfoIndexCreator
             }
         }
 
-        if ( pom != null )
+        if ( pom != null && ai.classifier == null )
         {
             File sources = sl.locate( pom );
             ai.sourcesExists = sources.exists() ? ArtifactAvailablility.PRESENT : ArtifactAvailablility.NOT_PRESENT;
@@ -100,12 +103,18 @@ public class MinimalArtifactInfoIndexCreator
             File javadoc = jl.locate( pom );
             ai.javadocExists = javadoc.exists() ? ArtifactAvailablility.PRESENT : ArtifactAvailablility.NOT_PRESENT;
         }
+        else if ( pom != null && ai.classifier != null )
+        {
+            ai.sourcesExists = ArtifactAvailablility.NOT_AVAILABLE;
+
+            ai.javadocExists = ArtifactAvailablility.NOT_AVAILABLE;
+        }
 
         if ( artifact != null )
         {
             File signature = sigl.locate( artifact );
             ai.signatureExists = signature.exists() ? ArtifactAvailablility.PRESENT : ArtifactAvailablility.NOT_PRESENT;
-            
+
             File sha1 = sha1l.locate( artifact );
 
             if ( sha1.exists() )
@@ -126,21 +135,29 @@ public class MinimalArtifactInfoIndexCreator
 
             if ( ai.packaging == null )
             {
-                String artifactFileName = artifact.getName().toLowerCase();
-
-                // tar.gz? and other "special" combinations?
-                if ( artifactFileName.endsWith( "tar.gz" ) )
+                if ( gav != null )
                 {
-                    ai.packaging = "tar.gz";
-                }
-                else if ( artifactFileName.equals( "tar.bz2" ) )
-                {
-                    ai.packaging = "tar.bz2";
+                    ai.packaging = gav.getExtension();
                 }
                 else
                 {
-                    // javadoc: gets the part _AFTER_ last dot!
-                    ai.packaging = FileUtils.getExtension( artifactFileName );
+                    // last resort, the extension of the file
+                    String artifactFileName = artifact.getName().toLowerCase();
+
+                    // tar.gz? and other "special" combinations?
+                    if ( artifactFileName.endsWith( "tar.gz" ) )
+                    {
+                        ai.packaging = "tar.gz";
+                    }
+                    else if ( artifactFileName.equals( "tar.bz2" ) )
+                    {
+                        ai.packaging = "tar.bz2";
+                    }
+                    else
+                    {
+                        // javadoc: gets the part _AFTER_ last dot!
+                        ai.packaging = FileUtils.getExtension( artifactFileName );
+                    }
                 }
             }
         }

@@ -82,11 +82,16 @@ public class DefaultScanner
                     {
                         String fileName = f.getName();
 
-                        if ( fileName.startsWith( "maven-metadata" ) || fileName.endsWith( "-javadoc.jar" )
-                            || fileName.endsWith( ".properties" ) || fileName.endsWith( "-javadocs.jar" )
-                            || fileName.endsWith( "-sources.jar" ) || fileName.endsWith( ".pom" )
-                            && files.contains( new File( f.getParent(), fileName.replaceAll( "\\.pom$", ".jar" ) ) )
-                            || fileName.endsWith( ".xml" ) || fileName.endsWith( ".asc" ) || fileName.endsWith( ".md5" )
+                        if ( fileName.startsWith( "maven-metadata" )
+                            || fileName.endsWith( ".properties" )
+                            || fileName.endsWith( "-javadoc.jar" )
+                            || fileName.endsWith( "-javadocs.jar" )
+                            || fileName.endsWith( "-sources.jar" )
+                            || ( fileName.endsWith( ".pom" ) && files.contains( new File( f.getParent(), fileName
+                                .replaceAll( "\\.pom$", ".jar" ) ) ) ) 
+                            || fileName.endsWith( ".xml" )
+                            || fileName.endsWith( ".asc" ) 
+                            || fileName.endsWith( ".md5" )
                             || fileName.endsWith( ".sha1" ) )
                         {
                             continue;
