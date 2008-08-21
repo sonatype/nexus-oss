@@ -80,7 +80,7 @@ public class MinimalArtifactInfoIndexCreator
 
         ArtifactInfo ai = artifactContext.getArtifactInfo();
 
-        if ( pom != null ) 
+        if ( pom != null )
         {
             Model model = modelReader.readModel( pom, ai.groupId, ai.artifactId, ai.version );
 
@@ -94,87 +94,105 @@ public class MinimalArtifactInfoIndexCreator
                 {
                     ai.packaging = model.getPackaging();
                 }
-            } 
+            }
         }
-        
-        if ( pom != null ) 
+
+        if ( pom != null )
         {
             Gav gav = gavCalculator.pathToGav( //
                 ai.groupId.replace( '.', '/' ) + '/' //
-                + ai.artifactId + '/' // 
-                + ai.version + '/' //
-                + ( artifact == null ? ai.artifactId + '-' + ai.version + ".jar" : artifact.getName() ) );
-            
+                    + ai.artifactId + '/' // 
+                    + ai.version + '/' //
+                    + ( artifact == null ? ai.artifactId + '-' + ai.version + ".jar" : artifact.getName() ) );
+
             // TODO implement sha1, source and javadoc detection for artifacts without poms
-            File sha1 = sha1l.locate(pom, gav);
-            if ( sha1.exists() ) 
+            File sha1 = sha1l.locate( pom, gav );
+            if ( sha1.exists() )
             {
-                try 
+                try
                 {
-                    ai.sha1 = StringUtils.chomp(FileUtils.fileRead(sha1)).trim().split(" ")[0];
-                } 
-                catch (IOException e) 
+                    ai.sha1 = StringUtils.chomp( FileUtils.fileRead( sha1 ) ).trim().split( " " )[0];
+                }
+                catch ( IOException e )
                 {
                     e.printStackTrace();
                 }
             }
-            File sources = sl.locate(pom, gav);
-            ai.sourcesExists = sources.exists() ? ArtifactAvailablility.PRESENT
-                : ArtifactAvailablility.NOT_PRESENT;
-            File javadoc = jl.locate(pom, gav);
-            ai.javadocExists = javadoc.exists() ? ArtifactAvailablility.PRESENT
-                : ArtifactAvailablility.NOT_PRESENT;
-            File signature = sigl.locate(pom, gav);
-            ai.signatureExists = signature.exists() ? ArtifactAvailablility.PRESENT
-                : ArtifactAvailablility.NOT_PRESENT;
-            
-            if( ai.packaging == null )
+            File sources = sl.locate( pom, gav );
+            ai.sourcesExists = sources.exists() ? ArtifactAvailablility.PRESENT : ArtifactAvailablility.NOT_PRESENT;
+            File javadoc = jl.locate( pom, gav );
+            ai.javadocExists = javadoc.exists() ? ArtifactAvailablility.PRESENT : ArtifactAvailablility.NOT_PRESENT;
+            File signature = sigl.locate( pom, gav );
+            ai.signatureExists = signature.exists() ? ArtifactAvailablility.PRESENT : ArtifactAvailablility.NOT_PRESENT;
+
+            if ( ai.packaging == null && gav != null )
             {
                 ai.packaging = gav.getExtension();
             }
         }
-        
-        checkMavenPlugin( ai, artifact );
-        
-        if( ai.packaging == null )
-        {
-            ai.packaging = "jar";
-        }
-        
+
         if ( artifact != null )
         {
             ai.lastModified = artifact.lastModified();
 
             ai.size = artifact.length();
+
+            if ( ai.packaging == null )
+            {
+                String artifactFileName = artifact.getName().toLowerCase();
+
+                // tar.gz? and other "special" combinations?
+                if ( artifactFileName.endsWith( "tar.gz" ) )
+                {
+                    ai.packaging = "tar.gz";
+                }
+                else if ( artifactFileName.equals( "tar.bz2" ) )
+                {
+                    ai.packaging = "tar.bz2";
+                }
+                else
+                {
+                    // javadoc: gets the part _AFTER_ last dot!
+                    ai.packaging = FileUtils.getExtension( artifactFileName );
+                }
+            }
+        }
+
+        checkMavenPlugin( ai, artifact );
+
+        // last resort -- AND IS WRONG
+        if ( ai.packaging == null )
+        {
+            ai.packaging = "jar";
         }
     }
 
-    private void checkMavenPlugin(ArtifactInfo ai, File artifact) 
+    private void checkMavenPlugin( ArtifactInfo ai, File artifact )
     {
         if ( "maven-plugin".equals( ai.packaging ) && artifact != null )
         {
             ZipFile jf = null;
-  
+
             InputStream is = null;
-  
+
             try
             {
                 jf = new ZipFile( artifact );
-  
+
                 ZipEntry entry = jf.getEntry( "META-INF/maven/plugin.xml" );
-  
+
                 if ( entry != null )
                 {
                     is = jf.getInputStream( entry );
-  
+
                     PluginDescriptorBuilder builder = new PluginDescriptorBuilder();
-  
+
                     PluginDescriptor descriptor = builder.build( new InputStreamReader( is ) );
-  
+
                     ai.prefix = descriptor.getGoalPrefix();
-  
+
                     ai.goals = new ArrayList<String>();
-  
+
                     for ( Object o : descriptor.getMojos() )
                     {
                         ai.goals.add( ( (MojoDescriptor) o ).getGoal() );
