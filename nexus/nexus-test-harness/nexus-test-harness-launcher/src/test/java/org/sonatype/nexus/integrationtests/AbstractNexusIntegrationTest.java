@@ -543,8 +543,10 @@ public class AbstractNexusIntegrationTest
             "service/local/artifact/maven/redirect?r=" + repository + "&g=" + gav.getGroupId() + "&a="
                 + gav.getArtifactId() + "&v=" + gav.getVersion();
         Response response = RequestFacade.doGetRequest( serviceURI );
+        Assert.assertEquals( "Snapshot download should redirect to a new file " + response.getRequest().getResourceRef().toString(), 301, response.getStatus().getCode());
+        
         Reference redirectRef = response.getRedirectRef();
-        Assert.assertNotNull( "Snapshot download should redirect to a new file " + serviceURI, redirectRef );
+        Assert.assertNotNull( "Snapshot download should redirect to a new file " + response.getRequest().getResourceRef().toString(), redirectRef );
         
         serviceURI = redirectRef.toString();
 
