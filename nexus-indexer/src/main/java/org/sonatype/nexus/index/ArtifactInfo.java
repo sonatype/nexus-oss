@@ -232,15 +232,41 @@ public class ArtifactInfo
                 return n;
             }
 
-            String c1 = f1.classifier;
-            String c2 = f2.classifier;
-            if ( c1 == null )
             {
-                return c2 == null ? 0 : -1;
+                String c1 = f1.classifier;
+                String c2 = f2.classifier;
+                if ( c1 == null )
+                {
+                    if (c2 != null)
+                    {
+                        return -1;
+                    }
+                }
+                else
+                {
+                    if (c2 == null) {
+                      return 1;
+                    }
+                    
+                    n = c1.compareTo( c2 );
+                    if ( n != 0 )
+                    {
+                        return n;
+                    }
+                }
             }
-            else
+            
             {
-                return c2 == null ? 1 : c1.compareTo( c2 );
+                String p1 = f1.packaging;
+                String p2 = f2.packaging;
+                if ( p1 == null )
+                {
+                    return p2 == null ? 0 : -1;
+                }
+                else
+                {
+                    return p2 == null ? 1 : p1.compareTo( p2 );
+                }
             }
         }
     }

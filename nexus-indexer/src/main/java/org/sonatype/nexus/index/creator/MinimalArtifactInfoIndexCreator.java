@@ -127,9 +127,19 @@ public class MinimalArtifactInfoIndexCreator
             File signature = sigl.locate(pom, gav);
             ai.signatureExists = signature.exists() ? ArtifactAvailablility.PRESENT
                 : ArtifactAvailablility.NOT_PRESENT;
+            
+            if( ai.packaging == null )
+            {
+                ai.packaging = gav.getExtension();
+            }
         }
         
         checkMavenPlugin( ai, artifact );
+        
+        if( ai.packaging == null )
+        {
+            ai.packaging = "jar";
+        }
         
         if ( artifact != null )
         {
@@ -454,6 +464,7 @@ public class MinimalArtifactInfoIndexCreator
             }
             catch ( Exception e )
             {
+                // e.printStackTrace();
             }
             finally
             {

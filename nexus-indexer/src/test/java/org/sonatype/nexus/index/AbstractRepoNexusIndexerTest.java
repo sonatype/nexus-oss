@@ -46,9 +46,9 @@ public abstract class AbstractRepoNexusIndexerTest
 
         assertGroup( 1, "commons-cli", context );
 
-        assertGroup( 13, "org", context );
+        assertGroup( 15, "org", context );
 
-        assertGroup( 4, "org.slf4j", context );
+        assertGroup( 6, "org.slf4j", context );
 
         assertGroup( 3, "org.testng", context );
 
@@ -73,7 +73,7 @@ public abstract class AbstractRepoNexusIndexerTest
 
         FlatSearchResponse response = nexusIndexer.searchFlat( request );
 
-        assertEquals( 13, response.getTotalHits() );
+        assertEquals( 15, response.getTotalHits() );
     }
 
     public void testSearchFlat()
@@ -210,8 +210,8 @@ public abstract class AbstractRepoNexusIndexerTest
     public void testPaging()
         throws Exception
     {
-        // we have 13 artifact for this search
-        int total = 13;
+        // we have 15 artifact for this search
+        int total = 15;
         
         int pageSize = 4;
         
@@ -260,12 +260,12 @@ public abstract class AbstractRepoNexusIndexerTest
     public void testPurge()
         throws Exception
     {
-        // we have 12 artifact for this search
+        // we have 14 artifact for this search
         Query q = nexusIndexer.constructQuery( ArtifactInfo.GROUP_ID, "org" );
 
         Collection<ArtifactInfo> p1 = nexusIndexer.searchFlat( q );
 
-        assertEquals( 13, p1.size() );
+        assertEquals( 15, p1.size() );
 
         context.purge();
 
