@@ -81,11 +81,10 @@ import org.sonatype.nexus.integrationtests.proxy.nexus635.Nexus635ClearCacheTask
     Nexus233PrivilegesCrudXMLTests.class, Nexus379VirtualRepoSameId.class, Nexus448PrivilegeURLTest.class,
     Nexus586AnonymousChangePasswordTest.class, Nexus586AnonymousForgotPasswordTest.class,
     Nexus586AnonymousForgotUserIdTest.class, Nexus586AnonymousResetPasswordTest.class,
-    Nexus532GroupsCrudXmlTests.class, Nexus606DownloadLogsAndConfigFilesTest.class, 
-//    Nexus643EmptyTrashTaskTest.class,
-    Nexus635ClearCacheTaskTest.class, 
-    Nexus634RemoveAllTest.class, Nexus634KeepNewSnapshotsTest.class, Nexus634KeepTwoSnapshotsTest.class 
-    } )
+    Nexus532GroupsCrudXmlTests.class, Nexus606DownloadLogsAndConfigFilesTest.class,
+    /* Nexus643EmptyTrashTaskTest.class, */
+    Nexus635ClearCacheTaskTest.class, Nexus634RemoveAllTest.class, Nexus634KeepNewSnapshotsTest.class,
+    Nexus634KeepTwoSnapshotsTest.class } )
 public class IntegrationTestSuiteClasses
 {
 
