@@ -1177,7 +1177,7 @@ public class DefaultIndexerManager
             
             if ( pTerm != null )
             {
-                bq.add( nexusIndexer.constructQuery( ArtifactInfo.PACKAGING, vTerm ), BooleanClause.Occur.MUST );
+                bq.add( nexusIndexer.constructQuery( ArtifactInfo.PACKAGING, pTerm ), BooleanClause.Occur.MUST );
             }
 
             if ( cTerm != null )
