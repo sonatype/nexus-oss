@@ -12,6 +12,7 @@ import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.rest.model.NexusArtifact;
 import org.sonatype.nexus.test.utils.DeployUtils;
+import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
 import org.sonatype.nexus.test.utils.SearchMessageUtil;
 
 public class Nexus383SearchTest
@@ -188,7 +189,7 @@ public class Nexus383SearchTest
         DeployUtils.deployUsingPomWithRest( uploadURL, NEXUS_TEST_HARNESS_RELEASE_REPO, gav, fileToDeploy, pomFile );
         DeployUtils.deployUsingPomWithRest( uploadURL, NEXUS_TEST_HARNESS_RELEASE_REPO, gav, fileToDeploy, pomFile );
 
-        this.messageUtil.updateIndexes( NEXUS_TEST_HARNESS_REPO, NEXUS_TEST_HARNESS_REPO2,
+        RepositoryMessageUtil.updateIndexes( NEXUS_TEST_HARNESS_REPO, NEXUS_TEST_HARNESS_REPO2,
                                         NEXUS_TEST_HARNESS_RELEASE_REPO );
 
         List<NexusArtifact> results = messageUtil.searchFor( "crossArtifact" );

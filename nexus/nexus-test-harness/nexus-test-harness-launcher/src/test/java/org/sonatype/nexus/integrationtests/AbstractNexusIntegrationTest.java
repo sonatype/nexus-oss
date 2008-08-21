@@ -50,7 +50,8 @@ import org.sonatype.nexus.test.utils.TestProperties;
 
 /**
  * curl --user admin:admin123 --request PUT http://localhost:8081/nexus/service/local/status/command --data START NOTE,
- * this class is not really abstract so I can work around a the <code>@BeforeClass</code>, <code>@AfterClass</code> issues, this should be refactored a little, but it might be ok, if we switch to TestNg
+ * this class is not really abstract so I can work around a the <code>@BeforeClass</code>, <code>@AfterClass</code>
+ * issues, this should be refactored a little, but it might be ok, if we switch to TestNg
  */
 public class AbstractNexusIntegrationTest
 {
@@ -76,11 +77,11 @@ public class AbstractNexusIntegrationTest
     protected static String baseNexusUrl;
 
     protected static String nexusWorkDir;
-    
+
     protected static String nexusLogDir;
 
     protected Logger log = Logger.getLogger( getClass() );
-    
+
     static
     {
         nexusBaseDir = TestProperties.getString( "nexus.base.dir" );
@@ -104,16 +105,17 @@ public class AbstractNexusIntegrationTest
 
         // we also need to setup a couple fields, that need to be pulled out of a bundle
         this.testRepositoryId = testRepositoryId;
-//        this.nexusTestRepoUrl = baseNexusUrl + REPOSITORY_RELATIVE_URL + testRepositoryId + "/";
+        // this.nexusTestRepoUrl = baseNexusUrl + REPOSITORY_RELATIVE_URL + testRepositoryId + "/";
 
     }
 
     /**
      * To me this seems like a bad hack around this problem. I don't have any other thoughts though. <BR/>If you see
      * this and think: "Wow, why did he to that instead of XYZ, please let me know." <BR/> The issue is that we want to
-     * init the tests once (to start/stop the app) and the <code>@BeforeClass</code> is static, so we don't have access to the package name of the running tests. We are going to
-     *              use the package name to find resources for additional setup. NOTE: With this setup running multiple
-     *              Test at the same time is not possible.
+     * init the tests once (to start/stop the app) and the <code>@BeforeClass</code> is static, so we don't have access
+     * to the package name of the running tests. We are going to use the package name to find resources for additional
+     * setup. NOTE: With this setup running multiple Test at the same time is not possible.
+     * 
      * @throws Exception
      */
     @Before
@@ -126,7 +128,7 @@ public class AbstractNexusIntegrationTest
             {
                 // tell the console what we are doing, now that there is no output its 
                 System.out.println( "Running Test: "+ this.getClass().getSimpleName() );
-                
+
                 HashMap<String, String> variables = new HashMap<String, String>();
                 variables.put( "test-harness-id", this.getTestId() );
 
@@ -138,13 +140,13 @@ public class AbstractNexusIntegrationTest
                 // copy security config
                 this.copyConfigFile( "security.xml", RELATIVE_WORK_CONF_DIR );
 
-//                this.copyConfigFile( "log4j.properties", variables );
+                // this.copyConfigFile( "log4j.properties", variables );
 
                 if ( TestContainer.getInstance().getTestContext().isSecureTest() )
                 {
                     NexusConfigUtil.enableSecurity( true );
                 }
-                
+
                 // we need to make sure the config is valid, so we don't need to hunt through log files
                 NexusConfigUtil.validateConfig();
 
@@ -256,9 +258,7 @@ public class AbstractNexusIntegrationTest
     {
         // reset this for each test
         TestContainer.getInstance().getTestContext().useAdminForRequests();
-        
-        
-        
+
     }
 
     private void startNexus()
@@ -392,7 +392,7 @@ public class AbstractNexusIntegrationTest
     /**
      * Returns a File if it exists, null otherwise. Files returned by this method must be located in the
      * "src/test/resourcs/nexusXXX/" folder.
-     *
+     * 
      * @param relativePath path relative to the nexusXXX directory.
      * @return A file specified by the relativePath. or null if it does not exist.
      */
@@ -411,7 +411,7 @@ public class AbstractNexusIntegrationTest
     /**
      * Returns a File if it exists, null otherwise. Files returned by this method must be located in the
      * "src/test/resourcs/nexusXXX/files/" folder.
-     *
+     * 
      * @param relativePath path relative to the files directory.
      * @return A file specified by the relativePath. or null if it does not exist.
      */
@@ -526,6 +526,30 @@ public class AbstractNexusIntegrationTest
             + extension;
     }
 
+    protected File downloadSnapshotArtifact( String repository, Gav gav, File parentDir )
+        throws IOException
+    {
+        // @see http://issues.sonatype.org/browse/NEXUS-599
+        // r=<repoId> -- mandatory
+        // g=<groupId> -- mandatory
+        // a=<artifactId> -- mandatory
+        // v=<version> -- mandatory
+        // c=<classifier> -- optional
+        // p=<packaging> -- optional, jar is taken as default
+        //http://localhost:8087/nexus/service/local/artifact/maven/redirect?r=tasks-snapshot-repo&g=nexus&a=artifact&
+        // v=1.0-SNAPSHOT
+        String serviceURI =
+            "service/local/artifact/maven/redirect?r=" + repository + "&g=" + gav.getGroupId() + "&a="
+                + gav.getArtifactId() + "&v=" + gav.getVersion();
+        Response response = RequestFacade.doGetRequest( serviceURI );
+        serviceURI = response.getRedirectRef().toString();
+
+        File file = FileUtils.createTempFile( gav.getArtifactId(), '.' + gav.getExtension(), parentDir );
+        RequestFacade.downloadFile( new URL( serviceURI ), file.getAbsolutePath() );
+
+        return file;
+    }
+
     protected File downloadArtifact( Gav gav, String targetDirectory )
         throws IOException
     {
@@ -609,7 +633,6 @@ public class AbstractNexusIntegrationTest
         return baseNexusUrl + REPOSITORY_RELATIVE_URL + testRepositoryId + "/";
     }
 
-
     public PlexusContainer getContainer()
     {
         return this.container;
@@ -624,24 +647,23 @@ public class AbstractNexusIntegrationTest
     {
         return testRepositoryId;
     }
-    
-    public void setTestRepositoryId(String repoId)
+
+    public void setTestRepositoryId( String repoId )
     {
         this.testRepositoryId = repoId;
     }
-    
+
     public String getRepositoryUrl( String repoId )
     {
         return baseNexusUrl + REPOSITORY_RELATIVE_URL + repoId + "/";
     }
-    
+
     public String getGroupUrl( String groupId )
     {
         return baseNexusUrl + GROUP_REPOSITORY_RELATIVE_URL + groupId + "/";
     }
 
-    protected boolean printKnownErrorButDoNotFail( Class<? extends AbstractNexusIntegrationTest> clazz,
-                                                          String... tests )
+    protected boolean printKnownErrorButDoNotFail( Class<? extends AbstractNexusIntegrationTest> clazz, String... tests )
     {
         StringBuffer error =
             new StringBuffer(

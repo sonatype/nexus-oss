@@ -73,22 +73,6 @@ public class SearchMessageUtil
         return (NexusArtifact) xstream.fromXML( responseText );
     }
 
-    public void updateIndexes( String... repositories )
-        throws Exception
-    {
-
-        for ( String repo : repositories )
-        {
-            String serviceURI = "service/local/data_index/repositories/" + repo + "/content";
-            Response response = RequestFacade.sendMessage( serviceURI, Method.DELETE );
-            Status status = response.getStatus();
-            Assert.assertEquals( status.getCode(), 200 );
-        }
-
-        // let s w8 a few time for indexes
-        Thread.sleep( 1000 * repositories.length );
-    }
-
     public void allowBrowsing( String repositoryName, boolean allowBrowsing )
         throws Exception
     {

@@ -9,6 +9,7 @@ import org.apache.log4j.Logger;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
+import org.restlet.data.Status;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.rest.model.RepositoryBaseResource;
@@ -26,7 +27,7 @@ public class RepositoryMessageUtil
     private XStream xstream;
 
     private MediaType mediaType;
-    
+
     private static final Logger LOG = Logger.getLogger( RepositoryMessageUtil.class );
 
     public RepositoryMessageUtil( XStream xstream, MediaType mediaType )
@@ -177,7 +178,6 @@ public class RepositoryMessageUtil
         XStreamRepresentation representation =
             new XStreamRepresentation( new XStream(), responseText, MediaType.APPLICATION_XML );
 
-        
         RepositoryListResourceResponse resourceResponse =
             (RepositoryListResourceResponse) representation.getPayload( new RepositoryListResourceResponse() );
 
@@ -214,6 +214,24 @@ public class RepositoryMessageUtil
 
         // TODO: allow for shadow repos
         // Assert.assertEquals( repo.getRepoType(), cRepo.getType() );
+
+    }
+
+    public static void updateIndexes( String... repositories )
+        throws Exception
+    {
+
+        for ( String repo : repositories )
+        {
+            String serviceURI = "service/local/data_index/repositories/" + repo + "/content";
+            Response response = RequestFacade.sendMessage( serviceURI, Method.DELETE );
+            Status status = response.getStatus();
+            Assert.assertTrue( "Fail to update " + repo + " repository index " + status.getDescription(), 
+                                 status.isSuccess() );
+        }
+
+        // let s w8 a few time for indexes
+        Thread.sleep( 1000 * repositories.length );
 
     }
 

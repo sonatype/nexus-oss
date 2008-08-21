@@ -10,7 +10,7 @@ import org.restlet.data.Method;
 import org.restlet.data.Response;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
-import org.sonatype.nexus.integrationtests.nexus603.ScheduleTaskUtil;
+import org.sonatype.nexus.integrationtests.nexus533.TaskScheduleUtil;
 
 public class Nexus643EmptyTrashTaskTest
     extends AbstractNexusIntegrationTest
@@ -22,11 +22,11 @@ public class Nexus643EmptyTrashTaskTest
 
         delete( "nexus643" );
 
-        File trashContent = new File( nexusBaseDir, "runtime/work/trash/nexus-test-harness-repo/nexus603" );
+        File trashContent = new File( nexusBaseDir, "runtime/work/trash/nexus-test-harness-repo/nexus643" );
         Assert.assertTrue( "Something should be at trash!", trashContent.exists() );
 
         // This is THE important part
-        ScheduleTaskUtil.runTask( "org.sonatype.nexus.tasks.EmptyTrashTask" );
+        TaskScheduleUtil.runTask( "org.sonatype.nexus.tasks.EmptyTrashTask" );
 
         Assert.assertFalse( "Trash should be empty!", trashContent.exists() );
     }
@@ -36,6 +36,6 @@ public class Nexus643EmptyTrashTaskTest
     {
         String serviceURI = "service/local/repositories/nexus-test-harness-repo/content/" + groupId + "/";
         Response response = RequestFacade.sendMessage( serviceURI, Method.DELETE );
-        Assert.assertTrue( "Unable to delete nexus603 artifacts", response.getStatus().isSuccess() );
+        Assert.assertTrue( "Unable to delete nexus643 artifacts", response.getStatus().isSuccess() );
     }
 }

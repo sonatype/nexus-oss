@@ -3,6 +3,8 @@ package org.sonatype.nexus.integrationtests.nexus533;
 import java.io.IOException;
 import java.util.List;
 
+import junit.framework.Assert;
+
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
@@ -11,6 +13,7 @@ import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.rest.model.ScheduledServiceBaseResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceListResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceListResourceResponse;
+import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceResourceResponse;
 import org.sonatype.nexus.rest.xstream.XStreamInitializer;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
@@ -103,6 +106,33 @@ public class TaskScheduleUtil
         Response response = RequestFacade.doGetRequest( serviceURI );
 
         return response.getStatus();
+    }
+
+    public static ScheduledServiceBaseResource runTask( String typeId, ScheduledServicePropertyResource... properties )
+        throws Exception
+    {
+        ScheduledServiceBaseResource scheduledTask = new ScheduledServiceBaseResource();
+        scheduledTask.setEnabled( true );
+        scheduledTask.setId( null );
+        scheduledTask.setName( typeId.substring( 0, typeId.lastIndexOf( '.' ) ) );
+        scheduledTask.setTypeId( typeId );
+
+        for ( ScheduledServicePropertyResource property : properties )
+        {
+            scheduledTask.addProperty( property );
+        }
+
+        Status status = TaskScheduleUtil.create( scheduledTask );
+        Assert.assertTrue( "Unable to create task:" + scheduledTask.getTypeId(), status.isSuccess() );
+
+        String taskId = TaskScheduleUtil.getTask( scheduledTask.getName() ).getId();
+        status = TaskScheduleUtil.run( taskId );
+        Assert.assertTrue( "Unable to run task:" + scheduledTask.getTypeId(), status.isSuccess() );
+
+        // I don't like to rely on this
+        Thread.sleep( 1000 );
+
+        return scheduledTask;
     }
 
 }

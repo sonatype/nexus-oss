@@ -3,13 +3,12 @@ package org.sonatype.nexus.integrationtests.proxy.nexus635;
 import static org.sonatype.nexus.test.utils.FileTestingUtils.compareFileSHA1s;
 
 import java.io.File;
-import java.io.IOException;
 
 import junit.framework.Assert;
 
 import org.junit.Test;
 import org.sonatype.nexus.artifact.Gav;
-import org.sonatype.nexus.integrationtests.nexus603.ScheduleTaskUtil;
+import org.sonatype.nexus.integrationtests.nexus533.TaskScheduleUtil;
 import org.sonatype.nexus.integrationtests.proxy.AbstractNexusProxyIntegrationTest;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.test.utils.MavenDeployer;
@@ -19,7 +18,7 @@ public class Nexus635ClearCacheTaskTest
 {
 
     private static final Gav GAV =
-        new Gav( "nexus603", "artifact", "1.0-SNAPSHOT", null, "jar", 0, 0L, null, true, false, null, false, null );
+        new Gav( "nexus635", "artifact", "1.0-SNAPSHOT", null, "jar", 0, 0L, null, true, false, null, false, null );
 
     public Nexus635ClearCacheTaskTest()
     {
@@ -45,13 +44,13 @@ public class Nexus635ClearCacheTaskTest
         File artifact1 = getTestFile( "artifact-1.jar" );
         addSnapshotArtifactToProxy( artifact1 );
 
-        File firstDownload = resolveArtifact( GAV );
+        File firstDownload = downloadSnapshotArtifact( "tasks-snapshot-repo", GAV, new File( "target/download" ) );
         Assert.assertTrue( "First time, should download artifact 1", // 
                            compareFileSHA1s( firstDownload, artifact1 ) );
 
         File artifact2 = getTestFile( "artifact-2.jar" );
         addSnapshotArtifactToProxy( artifact2 );
-        File secondDownload = resolveArtifact( GAV );
+        File secondDownload = downloadSnapshotArtifact( "tasks-snapshot-repo", GAV, new File( "target/download" ) );
         Assert.assertTrue( "Before ClearCache should download artifact 1",// 
                            compareFileSHA1s( secondDownload, artifact1 ) );
 
@@ -64,17 +63,11 @@ public class Nexus635ClearCacheTaskTest
         // prop.setValue( "/" );
 
         // This is THE important part
-        ScheduleTaskUtil.runTask( "org.sonatype.nexus.tasks.ClearCacheTask", prop );
+        TaskScheduleUtil.runTask( "org.sonatype.nexus.tasks.ClearCacheTask", prop );
 
-        File thirdDownload = resolveArtifact( GAV );
+        File thirdDownload = downloadSnapshotArtifact( "tasks-snapshot-repo", GAV, new File( "target/download" ) );
         Assert.assertTrue( "After ClearCache should download artifact 2", //
                            compareFileSHA1s( thirdDownload, artifact2 ) );
-    }
-
-    private File resolveArtifact( Gav gav )
-        throws IOException
-    {
-        return ScheduleTaskUtil.resolve( "tasks-snapshot-repo", gav, new File( "target/download" ) );
     }
 
 }
