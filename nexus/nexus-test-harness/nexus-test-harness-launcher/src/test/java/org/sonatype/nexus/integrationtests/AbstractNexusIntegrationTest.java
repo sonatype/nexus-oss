@@ -38,6 +38,7 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.restlet.data.Method;
+import org.restlet.data.Reference;
 import org.restlet.data.Response;
 import org.sonatype.appbooter.ForkedAppBooter;
 import org.sonatype.appbooter.ctl.AppBooterServiceException;
@@ -542,7 +543,10 @@ public class AbstractNexusIntegrationTest
             "service/local/artifact/maven/redirect?r=" + repository + "&g=" + gav.getGroupId() + "&a="
                 + gav.getArtifactId() + "&v=" + gav.getVersion();
         Response response = RequestFacade.doGetRequest( serviceURI );
-        serviceURI = response.getRedirectRef().toString();
+        Reference redirectRef = response.getRedirectRef();
+        Assert.assertNotNull( "Snapshot download should redirect to a new file " + serviceURI, redirectRef );
+        
+        serviceURI = redirectRef.toString();
 
         File file = FileUtils.createTempFile( gav.getArtifactId(), '.' + gav.getExtension(), parentDir );
         RequestFacade.downloadFile( new URL( serviceURI ), file.getAbsolutePath() );
