@@ -45,7 +45,7 @@ public class DefaultArtifactContextProducer
         String path = null;
 
         // protection from IndexOutOfBounds
-        if ( file.getAbsoluteFile().length() > context.getRepository().getAbsolutePath().length() )
+        if ( file.getAbsolutePath().length() > context.getRepository().getAbsolutePath().length() )
         {
             path = file.getAbsolutePath().substring( context.getRepository().getAbsolutePath().length() + 1 ).replace(
                 '\\',
