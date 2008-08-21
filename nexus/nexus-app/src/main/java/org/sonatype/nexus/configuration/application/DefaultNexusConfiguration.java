@@ -677,7 +677,7 @@ public class DefaultNexusConfiguration
         {
             for ( CRepositoryShadow repo : repositoryShadows )
             {
-                result.getExistingRepositoryIds().add( repo.getId() );
+                result.getExistingRepositoryShadowIds().add( repo.getId() );
             }
         }
 
