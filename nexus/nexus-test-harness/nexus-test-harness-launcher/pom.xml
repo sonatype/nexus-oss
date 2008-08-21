@@ -76,12 +76,6 @@
       <version>1.4-SNAPSHOT</version>
     </dependency>
 
-    <!--<dependency>
-      <groupId>emma</groupId>
-      <artifactId>emma</artifactId>
-      <version>2.0.5312</version>
-    </dependency>-->
-
 	<dependency>
 	    <groupId>com.icegreen</groupId>
 	    <artifactId>greenmail</artifactId>
@@ -94,6 +88,11 @@
 		<artifactId>maven-integration-test-helper</artifactId>
 		<version>2.1-SNAPSHOT</version>
         <!-- TODO test scope is not transitive <scope>test</scope> -->
+	</dependency>
+	<dependency>
+		<groupId>com.thoughtworks.qdox</groupId>
+		<artifactId>qdox</artifactId>
+		<version>1.6.3</version>
 	</dependency>
 
   </dependencies>

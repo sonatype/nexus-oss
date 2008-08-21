@@ -125,7 +125,7 @@ public class AbstractNexusIntegrationTest
             if ( NEEDS_INIT )
             {
                 // tell the console what we are doing, now that there is no output its 
-                System.out.println( "Running Test: "+ this.getClass() );
+                System.out.println( "Running Test: "+ this.getClass().getSimpleName() );
                 
                 HashMap<String, String> variables = new HashMap<String, String>();
                 variables.put( "test-harness-id", this.getTestId() );
