@@ -53,7 +53,7 @@ public class DefaultIndexerEngine
         throws IOException
     {
         IndexWriter w = context.getIndexWriter();
-        
+
         w.optimize();
 
         w.flush();
@@ -65,11 +65,11 @@ public class DefaultIndexerEngine
         throws IOException
     {
         IndexWriter w = context.getIndexWriter();
-        
+
         w.deleteDocuments( getKeyTerm( ac ) );
 
         w.flush();
-        
+
         context.updateTimestamp();
     }
 
@@ -79,9 +79,9 @@ public class DefaultIndexerEngine
         IndexWriter w = context.getIndexWriter();
 
         w.updateDocument( getKeyTerm( ac ), createDocument( context, ac ) );
-        
+
         w.flush();
-        
+
         context.updateTimestamp();
     }
 
@@ -90,7 +90,7 @@ public class DefaultIndexerEngine
     private Term getKeyTerm( ArtifactContext ac )
     {
         ArtifactInfo ai = ac.getArtifactInfo();
-        
+
         return new Term( ArtifactInfo.UINFO, //
             AbstractIndexCreator.getGAV( ai.groupId, ai.artifactId, ai.version, ai.classifier ) );
     }
@@ -99,18 +99,18 @@ public class DefaultIndexerEngine
         throws IOException
     {
         ArtifactInfo ai = ac.getArtifactInfo();
-      
+
         Document doc = new Document();
 
         // primary key
-        doc.add( new Field(
-            ArtifactInfo.UINFO,
-            AbstractIndexCreator.getGAV( ai.groupId, ai.artifactId, ai.version, ai.classifier ),
-            Field.Store.YES,
-            Field.Index.UN_TOKENIZED ) );
+        doc.add( new Field( ArtifactInfo.UINFO, AbstractIndexCreator.getGAV(
+            ai.groupId,
+            ai.artifactId,
+            ai.version,
+            ai.classifier ), Field.Store.YES, Field.Index.UN_TOKENIZED ) );
 
         ArtifactIndexingContext indexingContext = new DefaultArtifactIndexingContext( ac );
-        
+
         for ( IndexCreator indexCreator : context.getIndexCreators() )
         {
             indexCreator.populateArtifactInfo( indexingContext );
@@ -121,7 +121,7 @@ public class DefaultIndexerEngine
         {
             indexCreator.updateDocument( indexingContext, doc );
         }
-        
+
         return doc;
     }
 

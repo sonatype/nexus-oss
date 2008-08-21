@@ -24,6 +24,7 @@ import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.store.Directory;
+import org.sonatype.nexus.artifact.GavCalculator;
 import org.sonatype.nexus.index.ArtifactInfo;
 import org.sonatype.nexus.index.ArtifactInfoFilter;
 import org.sonatype.nexus.index.DocumentFilter;
@@ -217,15 +218,9 @@ public interface IndexingContext
     File getIndexDirectoryFile();
 
     /**
-     * Returns current identifier in context.
+     * Returns the GavCalculator for this Context. Implies repository layout.
      * 
-     * @return id
+     * @return
      */
-    // String getCurrentId();
-    /**
-     * Map for contextual data.
-     * 
-     * @return data
-     */
-    // Map<String, Object> getData();
+    GavCalculator getGavCalculator();
 }

@@ -1433,7 +1433,7 @@ public class DefaultIndexerManager
 
                                 ai.classifier = gav.getClassifier();
 
-                                ArtifactContext ac = new ArtifactContext( null, null, null, ai );
+                                ArtifactContext ac = new ArtifactContext( null, null, null, ai, null );
 
                                 // remove file from index
                                 getLogger().debug(

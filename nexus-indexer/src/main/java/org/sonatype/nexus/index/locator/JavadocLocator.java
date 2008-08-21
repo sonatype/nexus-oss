@@ -15,13 +15,14 @@ package org.sonatype.nexus.index.locator;
 
 import java.io.File;
 
-import org.sonatype.nexus.artifact.Gav;
-
 /** @author Jason van Zyl */
 public class JavadocLocator
     implements Locator
 {
-    public File locate( File source, Gav gav )
+    /**
+     * Locates the sources bundle relative to POM.
+     */
+    public File locate( File source )
     {
         return new File( source.getAbsolutePath().replaceAll( ".pom", "-javadoc.jar" ) );
     }

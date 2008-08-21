@@ -35,9 +35,6 @@ import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
-import org.sonatype.nexus.artifact.Gav;
-import org.sonatype.nexus.artifact.GavCalculator;
-import org.sonatype.nexus.artifact.M2GavCalculator;
 import org.sonatype.nexus.index.ArtifactAvailablility;
 import org.sonatype.nexus.index.ArtifactContext;
 import org.sonatype.nexus.index.ArtifactInfo;
@@ -57,9 +54,6 @@ import org.sonatype.nexus.index.locator.SourcesLocator;
 public class MinimalArtifactInfoIndexCreator
     extends AbstractIndexCreator
 {
-    /** @plexus.requirement role-hint="maven2" */
-    private GavCalculator gavCalculator = new M2GavCalculator();
-
     private ModelReader modelReader = new ModelReader();
 
     private Locator jl = new JavadocLocator();
@@ -79,7 +73,7 @@ public class MinimalArtifactInfoIndexCreator
         File pom = artifactContext.getPom();
 
         ArtifactInfo ai = artifactContext.getArtifactInfo();
-
+        
         if ( pom != null )
         {
             Model model = modelReader.readModel( pom, ai.groupId, ai.artifactId, ai.version );
@@ -90,8 +84,9 @@ public class MinimalArtifactInfoIndexCreator
 
                 ai.description = model.getDescription();
 
-                if ( model.getPackaging() != null )
+                if ( model.getPackaging() != null && ai.classifier == null )
                 {
+                    // only when this is not a classified artifact
                     ai.packaging = model.getPackaging();
                 }
             }
@@ -99,14 +94,20 @@ public class MinimalArtifactInfoIndexCreator
 
         if ( pom != null )
         {
-            Gav gav = gavCalculator.pathToGav( //
-                ai.groupId.replace( '.', '/' ) + '/' //
-                    + ai.artifactId + '/' // 
-                    + ai.version + '/' //
-                    + ( artifact == null ? ai.artifactId + '-' + ai.version + ".jar" : artifact.getName() ) );
+            File sources = sl.locate( pom );
+            ai.sourcesExists = sources.exists() ? ArtifactAvailablility.PRESENT : ArtifactAvailablility.NOT_PRESENT;
 
-            // TODO implement sha1, source and javadoc detection for artifacts without poms
-            File sha1 = sha1l.locate( pom, gav );
+            File javadoc = jl.locate( pom );
+            ai.javadocExists = javadoc.exists() ? ArtifactAvailablility.PRESENT : ArtifactAvailablility.NOT_PRESENT;
+        }
+
+        if ( artifact != null )
+        {
+            File signature = sigl.locate( artifact );
+            ai.signatureExists = signature.exists() ? ArtifactAvailablility.PRESENT : ArtifactAvailablility.NOT_PRESENT;
+            
+            File sha1 = sha1l.locate( artifact );
+
             if ( sha1.exists() )
             {
                 try
@@ -118,21 +119,7 @@ public class MinimalArtifactInfoIndexCreator
                     e.printStackTrace();
                 }
             }
-            File sources = sl.locate( pom, gav );
-            ai.sourcesExists = sources.exists() ? ArtifactAvailablility.PRESENT : ArtifactAvailablility.NOT_PRESENT;
-            File javadoc = jl.locate( pom, gav );
-            ai.javadocExists = javadoc.exists() ? ArtifactAvailablility.PRESENT : ArtifactAvailablility.NOT_PRESENT;
-            File signature = sigl.locate( pom, gav );
-            ai.signatureExists = signature.exists() ? ArtifactAvailablility.PRESENT : ArtifactAvailablility.NOT_PRESENT;
 
-            if ( ai.packaging == null && gav != null )
-            {
-                ai.packaging = gav.getExtension();
-            }
-        }
-
-        if ( artifact != null )
-        {
             ai.lastModified = artifact.lastModified();
 
             ai.size = artifact.length();
@@ -159,12 +146,6 @@ public class MinimalArtifactInfoIndexCreator
         }
 
         checkMavenPlugin( ai, artifact );
-
-        // last resort -- AND IS WRONG
-        if ( ai.packaging == null )
-        {
-            ai.packaging = "jar";
-        }
     }
 
     private void checkMavenPlugin( ArtifactInfo ai, File artifact )

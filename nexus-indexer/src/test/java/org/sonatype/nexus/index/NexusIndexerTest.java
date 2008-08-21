@@ -189,7 +189,7 @@ public class NexusIndexerTest
 
         // File artifact = new File( fname + ".jar" );
 
-        nexus.addArtifactToIndex( new ArtifactContext( null, null, null, ai ), indexingContext );
+        nexus.addArtifactToIndex( new ArtifactContext( null, null, null, ai, null ), indexingContext );
 
         Collection<ArtifactInfo> res2 = nexus.searchFlat( ArtifactInfo.VERSION_COMPARATOR, query );
 

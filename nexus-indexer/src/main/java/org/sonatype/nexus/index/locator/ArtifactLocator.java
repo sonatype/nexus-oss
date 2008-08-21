@@ -16,12 +16,20 @@ package org.sonatype.nexus.index.locator;
 import java.io.File;
 
 import org.sonatype.nexus.artifact.Gav;
+import org.sonatype.nexus.artifact.GavCalculator;
 
-/** @author Jason van Zyl */
+/**
+ * Artifact locator. DO NOT USE IT!
+ * 
+ * @author Jason van Zyl
+ * @deprecated There is no 100% reliable way to go from pom to artifact unless we are parsing the POM, taking the
+ *             packaging, doing packaging to extension mapping (which is again not complete solution coz of custom
+ *             packagings)... (cstamas)
+ */
 public class ArtifactLocator
-    implements Locator
+    implements GavHelpedLocator
 {
-    public File locate( File source, Gav gav )
+    public File locate( File source, GavCalculator gavCalculator, Gav gav )
     {
         return new File( source.getAbsolutePath().replaceAll( ".pom", ".jar" ) );
     }

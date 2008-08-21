@@ -16,29 +16,15 @@ package org.sonatype.nexus.index.locator;
 import java.io.File;
 
 import org.sonatype.nexus.artifact.Gav;
+import org.sonatype.nexus.artifact.GavCalculator;
 
 public class PomLocator
-    implements Locator
+    implements GavHelpedLocator
 {
-    public File locate( File source, Gav gav )
+    public File locate( File source, GavCalculator gavCalculator, Gav gav )
     {
-        String artifactName = gav.getName();
+        String artifactName = gav.getArtifactId() + "-" + gav.getVersion() + ".pom";
 
-        if ( gav.isHash() )
-        {
-            // correction for last .sha or .md5
-            artifactName = artifactName.substring( 0, artifactName.lastIndexOf( "." ) );
-        }
-
-        // correction for classifier
-        artifactName = artifactName.substring( 0, artifactName.lastIndexOf( "." ) );
-
-        if ( gav.getClassifier() != null )
-        {
-            artifactName = artifactName.substring( 0, artifactName.length() - gav.getClassifier().length() - 1 );
-        }
-
-        return new File( source.getParent(), artifactName + ".pom" );
+        return new File( source.getParent(), artifactName );
     }
-
 }

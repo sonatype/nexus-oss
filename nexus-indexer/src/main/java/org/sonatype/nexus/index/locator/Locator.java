@@ -15,16 +15,15 @@ package org.sonatype.nexus.index.locator;
 
 import java.io.File;
 
-import org.sonatype.nexus.artifact.Gav;
-
 /**
- * Locate an artifactId given it's POM.
- *
+ * Locate an repository "elements" relative to some file. Always is the file that makes "relative to". So, if you are
+ * looking for file SHA1 checksum, than pass the file to Sha1Locator.
+ * 
  * @author Jason van Zyl
  */
 public interface Locator
 {
     String ROLE = Locator.class.getName();
 
-    File locate( File source, Gav gav );
+    File locate( File source );
 }

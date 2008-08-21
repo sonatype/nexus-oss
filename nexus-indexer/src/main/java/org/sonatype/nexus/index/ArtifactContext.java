@@ -15,6 +15,8 @@ package org.sonatype.nexus.index;
 
 import java.io.File;
 
+import org.sonatype.nexus.artifact.Gav;
+
 /**
  * The context of an artifact.
  * 
@@ -31,12 +33,15 @@ public class ArtifactContext
 
     private ArtifactInfo artifactInfo;
 
-    public ArtifactContext( File pom, File artifact, File metadata, ArtifactInfo artifactInfo )
+    private Gav gav;
+
+    public ArtifactContext( File pom, File artifact, File metadata, ArtifactInfo artifactInfo, Gav gav )
     {
         this.pom = pom;
         this.artifact = artifact;
         this.metadata = metadata;
         this.artifactInfo = artifactInfo;
+        this.gav = gav;
     }
 
     public File getPom()
@@ -57,5 +62,15 @@ public class ArtifactContext
     public ArtifactInfo getArtifactInfo()
     {
         return artifactInfo;
+    }
+
+    public Gav getGav()
+    {
+        return gav;
+    }
+
+    public void setGav( Gav gav )
+    {
+        this.gav = gav;
     }
 }

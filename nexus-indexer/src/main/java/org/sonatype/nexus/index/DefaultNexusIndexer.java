@@ -581,7 +581,7 @@ public class DefaultNexusIndexer
                 {
                     ArtifactInfo info = context.constructArtifactInfo( d );
 
-                    ArtifactContext artifactContext = new ArtifactContext( null, null, null, info );
+                    ArtifactContext artifactContext = new ArtifactContext( null, null, null, info, null );
 
                     updateGroups( artifactContext, context );
                 }

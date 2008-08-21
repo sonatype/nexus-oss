@@ -15,13 +15,11 @@ package org.sonatype.nexus.index.locator;
 
 import java.io.File;
 
-import org.sonatype.nexus.artifact.Gav;
-
 /** @author Jason van Zyl */
 public class MetadataLocator
     implements Locator
 {
-    public File locate( File source, Gav gav )
+    public File locate( File source )
     {
         return new File( source.getParentFile().getParentFile(), "maven-metadata.xml" );
     }

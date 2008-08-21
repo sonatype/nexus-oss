@@ -15,14 +15,12 @@ package org.sonatype.nexus.index.locator;
 
 import java.io.File;
 
-import org.sonatype.nexus.artifact.Gav;
-
 /** @author Jason van Zyl */
 public class SignatureLocator
     implements Locator
 {
-    public File locate( File source, Gav gav )
+    public File locate( File source )
     {
-        return new File( source.getAbsolutePath().replaceAll( ".pom", ".jar.asc" ) );
+        return new File( source.getParentFile(), source.getName() + ".asc" );
     }
 }

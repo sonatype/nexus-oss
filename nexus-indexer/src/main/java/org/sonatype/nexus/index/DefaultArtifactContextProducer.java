@@ -16,9 +16,8 @@ package org.sonatype.nexus.index;
 import java.io.File;
 
 import org.sonatype.nexus.artifact.Gav;
-import org.sonatype.nexus.artifact.GavCalculator;
 import org.sonatype.nexus.index.context.IndexingContext;
-import org.sonatype.nexus.index.locator.ArtifactLocator;
+import org.sonatype.nexus.index.locator.GavHelpedLocator;
 import org.sonatype.nexus.index.locator.Locator;
 import org.sonatype.nexus.index.locator.MetadataLocator;
 import org.sonatype.nexus.index.locator.PomLocator;
@@ -33,12 +32,7 @@ import org.sonatype.nexus.index.locator.PomLocator;
 public class DefaultArtifactContextProducer
     implements ArtifactContextProducer
 {
-    /** @plexus.requirement role-hint="maven2" */
-    private GavCalculator gavCalculator;
-
-    private Locator al = new ArtifactLocator();
-
-    private Locator pl = new PomLocator();
+    private GavHelpedLocator pl = new PomLocator();
 
     private Locator ml = new MetadataLocator();
 
@@ -62,13 +56,13 @@ public class DefaultArtifactContextProducer
             // this is junk path?
             return null;
         }
-        
-        Gav gav = gavCalculator.pathToGav( path );
+
+        Gav gav = context.getGavCalculator().pathToGav( path );
 
         if ( gav == null )
         {
             // XXX what then? Without GAV we are screwed (look below).
-            // It should simply stop, since it is not an artifact.
+            // It should simply stop/skip, since it is not an artifact.
             return null;
         }
 
@@ -88,14 +82,18 @@ public class DefaultArtifactContextProducer
         {
             pom = file;
 
-            // XXX this need to be fixed to handle non jar artifacts
-            artifact = al.locate( file, gav );
+            // there is no "reliable" way to go from pom to artifact!
+            // this is completely unimportant here, since if artifact exists,
+            // scan will find it and will do an "update" on existing "pom only" Lucene document.
+            // And API consumers should send artifacts to being added to index, not only poms.
+            // (but if sending both, again, will be ok coz of that above)
+            artifact = null;
         }
         else
         {
             artifact = file;
 
-            pom = pl.locate( file, gav );
+            pom = pl.locate( file, context.getGavCalculator(), gav );
 
             // if ( !pom.exists() )
             // {
@@ -123,9 +121,9 @@ public class DefaultArtifactContextProducer
         // signatureExists,
         // context.getRepositoryId() );
 
-        File metadata = ml.locate( pom, gav );
+        File metadata = ml.locate( pom );
 
-        return new ArtifactContext( pom, artifact, metadata, ai );
+        return new ArtifactContext( pom, artifact, metadata, ai, gav );
     }
 
 }

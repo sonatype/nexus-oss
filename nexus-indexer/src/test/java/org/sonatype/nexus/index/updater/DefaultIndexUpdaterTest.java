@@ -20,6 +20,7 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.RAMDirectory;
 import org.codehaus.plexus.PlexusTestCase;
+import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.index.ArtifactContext;
 import org.sonatype.nexus.index.ArtifactInfo;
 import org.sonatype.nexus.index.NexusIndexer;
@@ -51,7 +52,7 @@ public class DefaultIndexUpdaterTest
             repositoryUrl,
             null,
             NexusIndexer.MINIMAL_INDEX,
-            false);
+            false );
 
         indexer.addArtifactToIndex(
             createArtifactContext( repositoryId, "commons-lang", "commons-lang", "2.2", null ),
@@ -74,7 +75,8 @@ public class DefaultIndexUpdaterTest
             tempIndexDirectory,
             repositoryUrl,
             null,
-            NexusIndexer.MINIMAL_INDEX, false );
+            NexusIndexer.MINIMAL_INDEX,
+            false );
 
         indexer.addArtifactToIndex(
             createArtifactContext( repositoryId, "commons-lang", "commons-lang", "2.3", null ),
@@ -121,7 +123,8 @@ public class DefaultIndexUpdaterTest
             indexDirectory,
             repositoryUrl,
             null,
-            NexusIndexer.MINIMAL_INDEX, false );
+            NexusIndexer.MINIMAL_INDEX,
+            false );
 
         indexer.addArtifactToIndex(
             createArtifactContext( repositoryId, "commons-lang", "commons-lang", "2.2", null ),
@@ -144,7 +147,8 @@ public class DefaultIndexUpdaterTest
             tempIndexDirectory,
             repositoryUrl,
             null,
-            NexusIndexer.MINIMAL_INDEX, false );
+            NexusIndexer.MINIMAL_INDEX,
+            false );
 
         // indexer.addArtifactToIndex(
         // createArtifactContext( repositoryId, "commons-lang", "commons-lang", "2.2", null ),
@@ -185,7 +189,21 @@ public class DefaultIndexUpdaterTest
         File artifact = new File( path + ".jar" );
         File metadata = null;
         ArtifactInfo artifactInfo = new ArtifactInfo( repositoryId, groupId, artifactId, version, classifier );
-        return new ArtifactContext( pomFile, artifact, metadata, artifactInfo );
+        Gav gav = new Gav(
+            groupId,
+            artifactId,
+            version,
+            classifier,
+            "jat",
+            null,
+            null,
+            artifact.getName(),
+            false,
+            false,
+            null,
+            false,
+            null );
+        return new ArtifactContext( pomFile, artifact, metadata, artifactInfo, gav );
     }
 
     private String createPath( String groupId, String artifactId, String version, String classifier )

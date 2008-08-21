@@ -32,6 +32,8 @@ import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.codehaus.plexus.util.StringUtils;
+import org.sonatype.nexus.artifact.GavCalculator;
+import org.sonatype.nexus.artifact.M2GavCalculator;
 import org.sonatype.nexus.index.ArtifactContext;
 import org.sonatype.nexus.index.ArtifactInfo;
 import org.sonatype.nexus.index.ArtifactInfoFilter;
@@ -92,6 +94,9 @@ public class DefaultIndexingContext
 
     private List<? extends IndexCreator> indexCreators;
 
+    /** Currently nexus-indexer knows only M2 reposes */
+    private GavCalculator gavCalculator;
+
     private DefaultIndexingContext( String id, String repositoryId, File repository, //
         String repositoryUrl, String indexUpdateUrl, List<? extends IndexCreator> indexCreators )
     {
@@ -114,6 +119,8 @@ public class DefaultIndexingContext
         this.indexWriter = null;
 
         this.indexCreators = indexCreators;
+
+        this.gavCalculator = new M2GavCalculator();
     }
 
     public DefaultIndexingContext( String id, String repositoryId, File repository, File indexDirectoryFile,
@@ -507,7 +514,7 @@ public class DefaultIndexingContext
                         if ( hits.length() == 0 )
                         {
                             ArtifactInfo info = constructArtifactInfo( d );
-                            ArtifactContext artifactContext = new ArtifactContext( null, null, null, info );
+                            ArtifactContext artifactContext = new ArtifactContext( null, null, null, info, null );
                             ArtifactIndexingContext indexingContext = new DefaultArtifactIndexingContext(
                                 artifactContext );
 
@@ -583,6 +590,11 @@ public class DefaultIndexingContext
         }
 
         updateTimestamp();
+    }
+
+    public GavCalculator getGavCalculator()
+    {
+        return gavCalculator;
     }
 
     public List<IndexCreator> getIndexCreators()
