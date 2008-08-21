@@ -492,6 +492,8 @@ public class DefaultNexusSecurityConfiguration
 
         user.setStatus( CUser.STATUS_ACTIVE );
         user.setPassword( pwGenerator.hashPassword( newPassword ) );
+        
+        applyAndSaveConfiguration();
     }
 
     /**
