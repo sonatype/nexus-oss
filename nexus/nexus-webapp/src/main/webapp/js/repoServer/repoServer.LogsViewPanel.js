@@ -70,12 +70,6 @@ Sonatype.repoServer.LogsViewPanel = function(config){
           value: '500',
           scope: this,
           handler: this.fetchMore
-        },
-        {
-          text: 'Fetch All',
-          value: '0',
-          scope: this,
-          handler: this.fetchMore
         }
       ]
     }
