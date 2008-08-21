@@ -4,7 +4,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.restlet.data.Status;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
-import org.sonatype.nexus.integrationtests.nexus408.ChangePasswordUtils;
+import org.sonatype.nexus.test.utils.ChangePasswordUtils;
 
 public class Nexus586AnonymousChangePasswordTest
     extends AbstractNexusIntegrationTest

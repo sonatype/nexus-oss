@@ -5,6 +5,7 @@ import org.junit.Test;
 import org.restlet.data.Status;
 import org.sonatype.nexus.integrationtests.AbstractPrivilegeTest;
 import org.sonatype.nexus.integrationtests.TestContainer;
+import org.sonatype.nexus.test.utils.ChangePasswordUtils;
 
 public class Nexus408ChangePasswordPermissionTest
     extends AbstractPrivilegeTest

@@ -12,9 +12,9 @@ import org.restlet.data.Status;
 import org.sonatype.nexus.integrationtests.AbstractEmailServerNexusIT;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.integrationtests.TestContext;
-import org.sonatype.nexus.integrationtests.nexus408.ChangePasswordUtils;
 import org.sonatype.nexus.rest.model.UserResource;
 import org.sonatype.nexus.rest.xstream.XStreamInitializer;
+import org.sonatype.nexus.test.utils.ChangePasswordUtils;
 import org.sonatype.nexus.test.utils.UserMessageUtil;
 import org.sonatype.plexus.rest.xstream.json.JsonOrgHierarchicalStreamDriver;
 

@@ -54,6 +54,14 @@ import org.sonatype.nexus.test.utils.TestProperties;
  * this class is not really abstract so I can work around a the <code>@BeforeClass</code>, <code>@AfterClass</code>
  * issues, this should be refactored a little, but it might be ok, if we switch to TestNg
  */
+/**
+ * @author demers
+ *
+ */
+/**
+ * @author demers
+ *
+ */
 public class AbstractNexusIntegrationTest
 {
 
@@ -82,6 +90,12 @@ public class AbstractNexusIntegrationTest
     protected static String nexusLogDir;
 
     protected Logger log = Logger.getLogger( getClass() );
+    
+    
+    /**
+     * Flag that says if we should verify the config before startup, we do not want to do this for upgrade tests.
+     */
+    private boolean verifyNexusConfigBeforeStart = true;
 
     static
     {
@@ -149,8 +163,11 @@ public class AbstractNexusIntegrationTest
                 }
 
                 // we need to make sure the config is valid, so we don't need to hunt through log files
-                NexusConfigUtil.validateConfig();
-
+                if( this.verifyNexusConfigBeforeStart )
+                {
+                    NexusConfigUtil.validateConfig();
+                }
+                
                 // start nexus
                 this.startNexus();
 
@@ -289,12 +306,12 @@ public class AbstractNexusIntegrationTest
             // we need a hard start
             NEEDS_HARD_STOP = true;
 
-            log.debug( "***************************" );
-            log.debug( "*\n*" );
-            log.debug( "*  DOING A HARD START OF NEXUS." );
-            log.debug( "*  If your not running a single test manually, then something bad happened" );
-            log.debug( "*\n*" );
-            log.debug( "***************************" );
+            System.out.println( "***************************" );
+            System.out.println( "*\n*" );
+            System.out.println( "*  DOING A HARD START OF NEXUS." );
+            System.out.println( "*  If your not running a single test manually, then something bad happened" );
+            System.out.println( "*\n*" );
+            System.out.println( "***************************" );
 
             ForkedAppBooter appBooter =
                 (ForkedAppBooter) TestContainer.getInstance().lookup( ForkedAppBooter.ROLE, "TestForkedAppBooter" );
@@ -667,6 +684,18 @@ public class AbstractNexusIntegrationTest
     public String getGroupUrl( String groupId )
     {
         return baseNexusUrl + GROUP_REPOSITORY_RELATIVE_URL + groupId + "/";
+    }
+    
+    
+
+    protected boolean isVerifyNexusConfigBeforeStart()
+    {
+        return verifyNexusConfigBeforeStart;
+    }
+
+    protected void setVerifyNexusConfigBeforeStart( boolean verifyNexusConfigBeforeStart )
+    {
+        this.verifyNexusConfigBeforeStart = verifyNexusConfigBeforeStart;
     }
 
     protected boolean printKnownErrorButDoNotFail( Class<? extends AbstractNexusIntegrationTest> clazz, String... tests )

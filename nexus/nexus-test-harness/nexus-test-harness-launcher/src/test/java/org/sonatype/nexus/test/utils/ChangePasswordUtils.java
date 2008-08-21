@@ -1,4 +1,4 @@
-package org.sonatype.nexus.integrationtests.nexus408;
+package org.sonatype.nexus.test.utils;
 
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
