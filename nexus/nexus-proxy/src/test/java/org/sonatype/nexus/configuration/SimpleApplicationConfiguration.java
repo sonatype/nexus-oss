@@ -64,6 +64,11 @@ public class SimpleApplicationConfiguration
         return AbstractNexusTestCase.WORK_HOME;
     }
 
+    public File getConfigurationDirectory()
+    {
+        return AbstractNexusTestCase.CONF_HOME;
+    }
+
     public File getWorkingDirectory( String key )
     {
         return new File( getWorkingDirectory(), key );
@@ -106,16 +111,6 @@ public class SimpleApplicationConfiguration
         }
     }
 
-    public File getConfigurationDirectory()
-    {
-        File result = new File( getConfigurationDirectory(), "conf" );
-        if ( !result.exists() )
-        {
-            result.mkdirs();
-        }
-        return result;
-    }
-    
     public File getSecurityConfigurationFile()
     {
         return new File( getConfigurationDirectory(), "security.xml" );

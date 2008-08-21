@@ -23,8 +23,6 @@ package org.sonatype.nexus.proxy;
 import java.io.IOException;
 
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.StartingException;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.StoppingException;
 import org.sonatype.jettytestsuite.ServletServer;
 
 /**
@@ -44,14 +42,14 @@ public abstract class AbstractJettyEnvironmentBuilder
         this.servletServer = servletServer;
     }
 
-    public void start()
-        throws StartingException
+    public void startService()
+        throws Exception
     {
         servletServer.start();
     }
 
-    public void stop()
-        throws StoppingException
+    public void stopService()
+        throws Exception
     {
         servletServer.stop();
     }

@@ -256,7 +256,7 @@ public abstract class AbstractProxyTestEnvironment
 
         applicationConfiguration.notifyConfigurationChangeListeners();
 
-        getEnvironmentBuilder().start();
+        getEnvironmentBuilder().startService();
     }
 
     /*
@@ -266,7 +266,7 @@ public abstract class AbstractProxyTestEnvironment
     public void tearDown()
         throws Exception
     {
-        getEnvironmentBuilder().stop();
+        getEnvironmentBuilder().stopService();
 
         super.tearDown();
     }

@@ -23,7 +23,6 @@ package org.sonatype.nexus.proxy;
 import java.io.IOException;
 
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.Startable;
 
 /**
  * The Interface Environment.
@@ -31,7 +30,6 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.Startable;
  * @author cstamas
  */
 public interface EnvironmentBuilder
-    extends Startable
 {
 
     /** The ROLE. */
@@ -41,4 +39,9 @@ public interface EnvironmentBuilder
         throws IOException,
             ComponentLookupException;
 
+    void startService()
+        throws Exception;
+
+    void stopService()
+        throws Exception;
 }

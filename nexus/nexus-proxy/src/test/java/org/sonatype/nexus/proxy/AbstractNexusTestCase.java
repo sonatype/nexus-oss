@@ -26,7 +26,6 @@ import java.io.IOException;
 
 import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.context.Context;
-import org.codehaus.plexus.context.ContextException;
 import org.codehaus.plexus.util.IOUtil;
 
 /**
