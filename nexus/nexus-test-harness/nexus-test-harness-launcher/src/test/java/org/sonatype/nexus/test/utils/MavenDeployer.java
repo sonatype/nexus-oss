@@ -69,6 +69,7 @@ public class MavenDeployer
         
     }
     
+    @Deprecated
     public static String deploy( Gav gav, String repositoryUrl, File fileToDeploy, File settings )
         throws CommandLineException, InterruptedException
     {

@@ -51,7 +51,7 @@ public class AbstractSnapshotRemoverTest
         File fileToDeploy = getTestFile( "artifact-1.jar" );
 
         // Deploying a fresh timestamp artifact
-        MavenDeployer.deploy( gav, getNexusTestRepoUrl(), fileToDeploy, null );
+        MavenDeployer.deployAndGetVerifier( gav, getNexusTestRepoUrl(), fileToDeploy, null );
 
         // Artifacts should be deployed here
         Assert.assertTrue( "nexus643:artifact:1.0-SNAPSHOT folder doesn't exists!", artifactFolder.isDirectory() );
