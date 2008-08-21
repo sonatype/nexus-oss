@@ -33,7 +33,8 @@ Sonatype.repoServer.SearchResultGrid = function(config) {
       {name:'repoId'},
       {name:'resourceURI'},
       {name:'contextId'},
-      {name:'classifier'}
+      {name:'classifier'},
+      {name:'packaging'}
   ]);
 
   var resultReader = new Ext.data.JsonReader({
