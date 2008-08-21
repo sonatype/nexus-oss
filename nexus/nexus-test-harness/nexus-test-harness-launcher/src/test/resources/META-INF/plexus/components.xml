@@ -24,6 +24,10 @@
         <sleep-after-start>6000</sleep-after-start>
         <systemProperties>
         		<plexus.applicationPort>${nexus-application-port}</plexus.applicationPort>
+        		<plexus.runtime>${nexus-abs-basedir}/runtime</plexus.runtime>
+        		<plexus.apps>${nexus-abs-basedir}/runtime/apps</plexus.apps>
+        		<plexus.nexus-work>${nexus-abs-basedir}/runtime/work</plexus.nexus-work>
+        		<plexus.webapp>${nexus-abs-basedir}/runtime/apps/nexus/webapp</plexus.webapp>
         </systemProperties>
       </configuration>
     </component>
