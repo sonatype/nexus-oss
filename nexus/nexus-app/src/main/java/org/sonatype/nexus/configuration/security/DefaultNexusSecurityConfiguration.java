@@ -459,13 +459,13 @@ public class DefaultNexusSecurityConfiguration
             {
                 sb.append( "\n" );
                 
-                sb.append( " o " );
+                sb.append( " - " );
                 
-                sb.append( "'" );
+                sb.append( "\"" );
 
                 sb.append( userId );
 
-                sb.append( "'" );
+                sb.append( "\"" );
             }
 
             smtpClient.sendEmailAsync( email, null, "Nexus: User account notification.", sb.toString() );
