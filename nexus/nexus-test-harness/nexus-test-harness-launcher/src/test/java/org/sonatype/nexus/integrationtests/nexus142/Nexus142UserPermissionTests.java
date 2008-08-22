@@ -42,7 +42,7 @@ public class Nexus142UserPermissionTests
         this.giveUserPrivilege( "test-user", "38" );
 
         // print out the users privs
-        this.printUserPrivs( "test-user" );
+//        this.printUserPrivs( "test-user" );
 
         // now.... it should work...
         TestContainer.getInstance().getTestContext().setUsername( "test-user" );

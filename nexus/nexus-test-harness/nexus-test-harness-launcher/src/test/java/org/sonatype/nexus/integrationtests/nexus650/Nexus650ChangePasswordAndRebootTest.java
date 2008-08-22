@@ -18,8 +18,6 @@ public class Nexus650ChangePasswordAndRebootTest
     {   
         this.giveUserRole( TEST_USER_NAME, "admin" );
         
-        this.printUserPrivs( TEST_USER_NAME );
-        
         TestContext context = TestContainer.getInstance().getTestContext();
         
         context.setUsername( TEST_USER_NAME );
