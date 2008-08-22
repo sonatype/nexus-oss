@@ -11,9 +11,12 @@ import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.nexus533.TaskScheduleUtil;
 import org.sonatype.nexus.rest.model.NexusArtifact;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
-import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
 import org.sonatype.nexus.test.utils.SearchMessageUtil;
 
+/**
+ * @author marvin
+ * @description Test task Reindex Repositories
+ */
 public class Nexus641ReindexTaskTest
     extends AbstractNexusIntegrationTest
 {
@@ -24,6 +27,12 @@ public class Nexus641ReindexTaskTest
     public void testReindex()
         throws Exception
     {
+        // NEXUS-664
+        if ( true )
+        {
+            printKnownErrorButDoNotFail( getClass(), "testReindex" );
+        }
+
         File repositoryPath = new File( nexusBaseDir, "runtime/work/storage/nexus-test-harness-repo" );
         File oldSnapshot = getTestFile( "repo" );
 
@@ -39,8 +48,8 @@ public class Nexus641ReindexTaskTest
         prop.setValue( "nexus-test-harness-repo" );
 
         // reindex
-        // TaskScheduleUtil.runTask( "org.sonatype.nexus.tasks.ReindexTask", prop );
-        RepositoryMessageUtil.updateIndexes( "nexus-test-harness-repo" );
+        TaskScheduleUtil.runTask( "org.sonatype.nexus.tasks.ReindexTask", prop );
+        // RepositoryMessageUtil.updateIndexes( "nexus-test-harness-repo" );
 
         // try to download again and success
         search = messageUtil.searchFor( "nexus641" );
