@@ -11,35 +11,40 @@ import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.nexus533.TaskScheduleUtil;
 import org.sonatype.nexus.rest.model.NexusArtifact;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
+import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
 import org.sonatype.nexus.test.utils.SearchMessageUtil;
 
-public class Nexus641ReindexTaskTest extends AbstractNexusIntegrationTest
+public class Nexus641ReindexTaskTest
+    extends AbstractNexusIntegrationTest
 {
 
     private SearchMessageUtil messageUtil = new SearchMessageUtil();
 
     @Test
-    public void testReindex() throws Exception {
+    public void testReindex()
+        throws Exception
+    {
         File repositoryPath = new File( nexusBaseDir, "runtime/work/storage/nexus-test-harness-repo" );
         File oldSnapshot = getTestFile( "repo" );
 
-        //Copy artifact to avoid indexing
+        // Copy artifact to avoid indexing
         FileUtils.copyDirectory( oldSnapshot, repositoryPath );
-        
-        //try to seach and fail
+
+        // try to seach and fail
         List<NexusArtifact> search = messageUtil.searchFor( "nexus641" );
-        Assert.assertEquals("The artifact was already indexed", 1, search.size());
-        
+        Assert.assertEquals( "The artifact was already indexed", 1, search.size() );
+
         ScheduledServicePropertyResource prop = new ScheduledServicePropertyResource();
         prop.setId( "repositoryOrGroupId" );
         prop.setValue( "nexus-test-harness-repo" );
 
-        //reindex
-        TaskScheduleUtil.runTask( "org.sonatype.nexus.tasks.ReindexTask", prop );
-        
-        //try to download again and success
+        // reindex
+        // TaskScheduleUtil.runTask( "org.sonatype.nexus.tasks.ReindexTask", prop );
+        RepositoryMessageUtil.updateIndexes( "nexus-test-harness-repo" );
+
+        // try to download again and success
         search = messageUtil.searchFor( "nexus641" );
-        Assert.assertEquals("The artifact should be indexed", 2, search.size());
+        Assert.assertEquals( "The artifact should be indexed", 2, search.size() );
     }
-    
+
 }
