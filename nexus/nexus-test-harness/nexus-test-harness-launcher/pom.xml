@@ -73,7 +73,7 @@
 	  <dependency>
       <groupId>org.sonatype.appbooter</groupId>
       <artifactId>plexus-forked-app-booter</artifactId>
-      <version>1.4-SNAPSHOT</version>
+      <version>${plexus.appbooter.version}</version>
     </dependency>
 
 	<dependency>
@@ -109,18 +109,8 @@
 
 			<testResource>
 				<directory>src/test/bundle-conf</directory>
-				<filtering>false</filtering>
-				<targetPath>../../${nexus-relative-basedir}</targetPath>
-			</testResource>
-
-			<testResource>
-				<directory>
-					src/test/bundle-conf/runtime/apps/nexus/conf
-				</directory>
 				<filtering>true</filtering>
-				<targetPath>
-					../../${nexus-relative-basedir}/runtime/apps/nexus/conf
-				</targetPath>
+				<targetPath>../../${nexus-relative-basedir}</targetPath>
 			</testResource>
 
 			<testResource>
