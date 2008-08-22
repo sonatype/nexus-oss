@@ -48,6 +48,9 @@ import org.sonatype.nexus.integrationtests.nexus586.Nexus586AnonymousForgotUserI
 import org.sonatype.nexus.integrationtests.nexus586.Nexus586AnonymousResetPasswordTest;
 import org.sonatype.nexus.integrationtests.nexus602.Nexus602SearchSnapshotArtifactTest;
 import org.sonatype.nexus.integrationtests.nexus606.Nexus606DownloadLogsAndConfigFilesTest;
+import org.sonatype.nexus.integrationtests.nexus634.Nexus634KeepNewSnapshotsTest;
+import org.sonatype.nexus.integrationtests.nexus634.Nexus634KeepTwoSnapshotsTest;
+import org.sonatype.nexus.integrationtests.nexus634.Nexus634RemoveAllTest;
 import org.sonatype.nexus.integrationtests.nexus637.Nexus637PublishIndexTest;
 import org.sonatype.nexus.integrationtests.nexus641.Nexus641ReindexTaskTest;
 import org.sonatype.nexus.integrationtests.nexus643.Nexus643EmptyTrashTaskTest;
@@ -55,6 +58,7 @@ import org.sonatype.nexus.integrationtests.proxy.nexus177.Nexus177OutOfServiceTe
 import org.sonatype.nexus.integrationtests.proxy.nexus178.Nexus178BlockProxyDownloadTest;
 import org.sonatype.nexus.integrationtests.proxy.nexus179.Nexus179RemoteRepoDownTest;
 import org.sonatype.nexus.integrationtests.proxy.nexus262.Nexus262SimpleProxyTest;
+import org.sonatype.nexus.integrationtests.proxy.nexus635.Nexus635ClearCacheTaskTest;
 import org.sonatype.nexus.integrationtests.upgrades.nexus652.Nexus652Beta5To10UpgradeTest;
 
 /**
@@ -85,9 +89,10 @@ import org.sonatype.nexus.integrationtests.upgrades.nexus652.Nexus652Beta5To10Up
     Nexus637PublishIndexTest.class, Nexus652Beta5To10UpgradeTest.class, Nexus641ReindexTaskTest.class,
     Nexus602SearchSnapshotArtifactTest.class
 /*
- * FIXME velo: tests are working locally, but failing at hudson Nexus635ClearCacheTaskTest.class,
- * Nexus634RemoveAllTest.class, Nexus634KeepNewSnapshotsTest.class, Nexus634KeepTwoSnapshotsTest.class
+ * FIXME velo: tests are working locally, but failing at hudson 
  */
+ , Nexus635ClearCacheTaskTest.class,
+  Nexus634RemoveAllTest.class, Nexus634KeepNewSnapshotsTest.class, Nexus634KeepTwoSnapshotsTest.class
 
 } )
 public class IntegrationTestSuiteClasses
