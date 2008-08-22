@@ -569,6 +569,8 @@ public class Upgrade103to104
         newrepos.setArtifactMaxAge( oldrepos.getArtifactMaxAge() );
         newrepos.setMetadataMaxAge( oldrepos.getMetadataMaxAge() );
         newrepos.setMaintainProxiedRepositoryMetadata( oldrepos.isMaintainProxiedRepositoryMetadata() );
+        newrepos.setDownloadRemoteIndexes( oldrepos.isDownloadRemoteIndexes() );
+        newrepos.setChecksumPolicy( oldrepos.getChecksumPolicy() );
 
         if ( oldrepos.getLocalStorage() != null )
         {

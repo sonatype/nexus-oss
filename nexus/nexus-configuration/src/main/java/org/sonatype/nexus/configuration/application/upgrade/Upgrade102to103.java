@@ -328,6 +328,8 @@ public class Upgrade102to103
         newrepos.setMetadataMaxAge( oldrepos.getMetadataMaxAge() );
         newrepos.setRealmId( oldrepos.getRealmId() );
         newrepos.setMaintainProxiedRepositoryMetadata( oldrepos.isMaintainProxiedRepositoryMetadata() );
+        newrepos.setDownloadRemoteIndexes( oldrepos.isDownloadRemoteIndexes() );
+        newrepos.setChecksumPolicy( oldrepos.getChecksumPolicy() );
 
         if ( oldrepos.getLocalStorage() != null )
         {
