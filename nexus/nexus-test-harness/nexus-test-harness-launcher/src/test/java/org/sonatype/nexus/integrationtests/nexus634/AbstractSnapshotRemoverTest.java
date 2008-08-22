@@ -46,15 +46,15 @@ public class AbstractSnapshotRemoverTest
 
         RepositoryMessageUtil.updateIndexes( "nexus-test-harness-snapshot-repo" );
 
-        Gav gav =
-            new Gav( "nexus634", "artifact", "1.0-SNAPSHOT", null, "jar", 0, 0L, null, true, false, null, false, null );
-        File fileToDeploy = getTestFile( "artifact-1.jar" );
-
-        // Deploying a fresh timestamp artifact
-        MavenDeployer.deployAndGetVerifier( gav, getNexusTestRepoUrl(), fileToDeploy, null );
-
-        // Artifacts should be deployed here
-        Assert.assertTrue( "nexus643:artifact:1.0-SNAPSHOT folder doesn't exists!", artifactFolder.isDirectory() );
+//        Gav gav =
+//            new Gav( "nexus634", "artifact", "1.0-SNAPSHOT", null, "jar", 0, 0L, null, true, false, null, false, null );
+//        File fileToDeploy = getTestFile( "artifact-1.jar" );
+//
+//        // Deploying a fresh timestamp artifact
+//        MavenDeployer.deployAndGetVerifier( gav, getNexusTestRepoUrl(), fileToDeploy, null );
+//
+//        // Artifacts should be deployed here
+//        Assert.assertTrue( "nexus643:artifact:1.0-SNAPSHOT folder doesn't exists!", artifactFolder.isDirectory() );
     }
 
     public void initFolders()
