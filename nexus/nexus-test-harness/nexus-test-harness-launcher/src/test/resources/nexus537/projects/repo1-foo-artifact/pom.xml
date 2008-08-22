@@ -1,19 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-
+<project>
   <modelVersion>4.0.0</modelVersion>
   <groupId>nexus537</groupId>
   <artifactId>repo1-foo-artifact</artifactId>
   <name>repo1-foo-artifact</name>
   <version>1.0.0</version>
-  <description/>
-
-    <distributionManagement>
-  	<repository>
-  		<id>repo1</id>
-  		<url>${nexus-base-url}service/local/artifact/maven/content</url>
-  		<!--<url>${nexus-base-url}content/repositories/sample-test-case-repo</url>-->
-  	</repository>
+  <description></description>
+  <distributionManagement>
+    <repository>
+      <id>repo1</id>
+      <url>${nexus-base-url}content/repositories/repo1</url>
+    </repository>
   </distributionManagement>
-
 </project>

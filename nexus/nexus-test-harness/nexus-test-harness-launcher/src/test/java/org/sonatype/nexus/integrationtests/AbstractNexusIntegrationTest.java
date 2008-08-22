@@ -32,6 +32,7 @@ import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.PlexusContainerException;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.util.FileUtils;
+import org.codehaus.plexus.util.cli.CommandLineException;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -47,6 +48,7 @@ import org.sonatype.nexus.test.utils.DeployUtils;
 import org.sonatype.nexus.test.utils.FileTestingUtils;
 import org.sonatype.nexus.test.utils.NexusConfigUtil;
 import org.sonatype.nexus.test.utils.NexusStateUtil;
+import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
 import org.sonatype.nexus.test.utils.TestProperties;
 
 /**
@@ -206,8 +208,7 @@ public class AbstractNexusIntegrationTest
     }
 
     private void deployArtifacts()
-        throws IOException, XmlPullParserException, ConnectionException, AuthenticationException,
-        TransferFailedException, ResourceDoesNotExistException, AuthorizationException, ComponentLookupException
+        throws Exception
     {
         // test the test directory
         File projectsDir = this.getTestResourceAsFile( "projects" );
@@ -264,14 +265,13 @@ public class AbstractNexusIntegrationTest
                 // the Restlet Client does not support multipart forms:
                 // http://restlet.tigris.org/issues/show_bug.cgi?id=71
 
-                int status = DeployUtils.deployUsingPomWithRest( deployUrl, repositoryId, gav, artifactFile, pom );
-
-                // Check to makes sure we get a 201
-                Assert.assertTrue( "Test-Harness failed to deploy artifact: " + model.getArtifactId()
-                    + ", with a status code of: " + status + ", expected: 201", status == HttpStatus.SC_CREATED );
+//                int status = DeployUtils.deployUsingPomWithRest( deployUrl, repositoryId, gav, artifactFile, pom );
+                
+                DeployUtils.deployWithWagon( this.container, "http", deployUrl, artifactFile, this.getRelitiveArtifactPath( gav ) );
+                DeployUtils.deployWithWagon( this.container, "http", deployUrl, pom, this.getRelitivePomPath( gav ) );
 
             }
-
+            
         }
     }
 
@@ -534,6 +534,13 @@ public class AbstractNexusIntegrationTest
     {
         return container.lookup( role, id );
     }
+    
+    protected String getRelitivePomPath( Gav gav )
+    throws FileNotFoundException
+{
+    return this.getRelitiveArtifactPath( gav.getGroupId(), gav.getArtifactId(), gav.getVersion(),
+                                         "pom" );
+}
 
     protected String getRelitiveArtifactPath( Gav gav )
         throws FileNotFoundException
