@@ -64,6 +64,11 @@ import org.sonatype.nexus.test.utils.TestProperties;
  */
 public class AbstractNexusIntegrationTest
 {
+    
+    public static final String REPOSITORY_NEXUS_TEST_HARNESS_REPO = "nexus-test-harness-repo";
+    public static final String REPOSITORY_NEXUS_TEST_HARNESS_REPO2 = "nexus-test-harness-repo2";
+    public static final String REPOSITORY_NEXUS_TEST_HARNESS_RELEASE_REPO = "nexus-test-harness-release-repo";
+    public static final String REPOSITORY_NEXUS_TEST_HARNESS_SNAPSHOT_REPO = "nexus-test-harness-snapshot-repo";
 
     private PlexusContainer container;
 
