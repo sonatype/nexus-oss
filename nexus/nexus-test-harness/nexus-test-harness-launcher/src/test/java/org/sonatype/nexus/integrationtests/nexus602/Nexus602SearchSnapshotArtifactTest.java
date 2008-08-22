@@ -11,7 +11,6 @@ import org.restlet.data.Response;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
-import org.sonatype.nexus.test.utils.MavenDeployer;
 
 public class Nexus602SearchSnapshotArtifactTest
     extends AbstractNexusIntegrationTest
@@ -24,8 +23,6 @@ public class Nexus602SearchSnapshotArtifactTest
     public void searchSnapshot()
         throws Exception
     {
-        deploySnapshot();
-
         String serviceURI =
             "service/local/artifact/maven/redirect?r=" + REPOSITORY_NEXUS_TEST_HARNESS_SNAPSHOT_REPO + "&g="
                 + SNAPSHOT_ARTIFACT.getGroupId() + "&a=" + SNAPSHOT_ARTIFACT.getArtifactId() + "&v="
@@ -43,15 +40,6 @@ public class Nexus602SearchSnapshotArtifactTest
         response = RequestFacade.sendMessage( new URL( serviceURI ), Method.GET, null );
 
         Assert.assertTrue( "Unable to fetch snapshot artifact", response.getStatus().isSuccess() );
-    }
-
-    private void deploySnapshot()
-        throws Exception
-    {
-        // TODO workaround, automatic SNAPSHOT artifacts deploy is not working
-        MavenDeployer.deployAndGetVerifier( SNAPSHOT_ARTIFACT,
-                                            getRepositoryUrl( REPOSITORY_NEXUS_TEST_HARNESS_SNAPSHOT_REPO ),
-                                            getTestFile( "artifact.jar" ), null );
     }
 
     @Test
