@@ -106,19 +106,25 @@ Sonatype.repoServer.SearchResultGrid = function(config) {
       id: 'artifact',
       header: "Artifact",
       dataIndex: 'artifactId',
-      width: 200,
+      width: 160,
       sortable:true
     },{
       id: 'version',
       header: "Version",
       dataIndex: 'version',
-      width: 55,
+      width: 60,
       sortable:true
+    },{
+      id: 'packaging',
+	  header: "Packaging",
+	  dataIndex: 'packaging',
+	  width: 40,
+	  sortable:true
     },{
       id: 'classifier',
       header: "Classifier",
       dataIndex: 'classifier',
-      width: 55,
+      width: 40,
       sortable:true
     },{
       id: 'jar',
