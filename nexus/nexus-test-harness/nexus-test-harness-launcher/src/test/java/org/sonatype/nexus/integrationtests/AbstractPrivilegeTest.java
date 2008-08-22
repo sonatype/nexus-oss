@@ -111,11 +111,11 @@ public abstract class AbstractPrivilegeTest
             }
         }
 
-        log.debug( "User: " + userId );
+        System.out.println( "User: " + userId );
         for ( Iterator iter = privs.iterator(); iter.hasNext(); )
         {
             String privName = (String) iter.next();
-            log.debug( "\t" + privName );
+            System.out.println( "\t" + privName );
         }
     }
 

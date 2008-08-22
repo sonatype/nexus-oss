@@ -9,24 +9,33 @@ import org.sonatype.nexus.integrationtests.TestContext;
 import org.sonatype.nexus.test.utils.ChangePasswordUtils;
 import org.sonatype.nexus.test.utils.NexusStateUtil;
 
-public class Nexus650ChangeAdminPasswordAndRebootTest
+public class Nexus650ChangePasswordAndRebootTest
     extends AbstractPrivilegeTest
 {
 
     @Test
     public void doTest() throws Exception
     {   
+        this.giveUserRole( TEST_USER_NAME, "admin" );
+        
+        this.printUserPrivs( TEST_USER_NAME );
+        
         TestContext context = TestContainer.getInstance().getTestContext();
-        String newPassword = "123admin";
-        Status status = ChangePasswordUtils.changePassword( context.getAdminUsername(), context.getAdminPassword(), newPassword );
+        
+        context.setUsername( TEST_USER_NAME );
+        context.setPassword( TEST_USER_PASSWORD );
+        
+        
+        String newPassword = "123password";
+        Status status = ChangePasswordUtils.changePassword( TEST_USER_NAME, TEST_USER_PASSWORD, newPassword );
         Assert.assertTrue( "Status: ", status.isSuccess() );
          
-        // now change the admin password
-        context.setAdminPassword( newPassword );
+        // now change the password
+        context.setPassword( newPassword );
         
         // reboot
         NexusStateUtil.doSoftRestart();
-        
+
         // now we can verify everything worked out
         Assert.assertTrue( "Nexus is not running", NexusStateUtil.isNexusRunning() );
         

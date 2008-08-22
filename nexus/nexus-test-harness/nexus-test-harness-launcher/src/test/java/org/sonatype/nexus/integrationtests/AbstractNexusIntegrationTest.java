@@ -16,24 +16,15 @@ import java.util.Map;
 
 import junit.framework.Assert;
 
-import org.apache.commons.httpclient.HttpStatus;
 import org.apache.log4j.Logger;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
-import org.apache.maven.wagon.ConnectionException;
-import org.apache.maven.wagon.ResourceDoesNotExistException;
-import org.apache.maven.wagon.TransferFailedException;
-import org.apache.maven.wagon.authentication.AuthenticationException;
-import org.apache.maven.wagon.authorization.AuthorizationException;
 import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.DefaultContainerConfiguration;
 import org.codehaus.plexus.DefaultPlexusContainer;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.PlexusContainerException;
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.util.FileUtils;
-import org.codehaus.plexus.util.cli.CommandLineException;
-import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -48,7 +39,6 @@ import org.sonatype.nexus.test.utils.DeployUtils;
 import org.sonatype.nexus.test.utils.FileTestingUtils;
 import org.sonatype.nexus.test.utils.NexusConfigUtil;
 import org.sonatype.nexus.test.utils.NexusStateUtil;
-import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
 import org.sonatype.nexus.test.utils.TestProperties;
 
 /**
@@ -56,14 +46,7 @@ import org.sonatype.nexus.test.utils.TestProperties;
  * this class is not really abstract so I can work around a the <code>@BeforeClass</code>, <code>@AfterClass</code>
  * issues, this should be refactored a little, but it might be ok, if we switch to TestNg
  */
-/**
- * @author demers
- *
- */
-/**
- * @author demers
- *
- */
+
 public class AbstractNexusIntegrationTest
 {
     
