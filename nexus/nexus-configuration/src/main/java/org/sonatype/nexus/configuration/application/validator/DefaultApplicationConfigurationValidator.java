@@ -560,12 +560,17 @@ public class DefaultApplicationConfigurationValidator
 
         if ( !CGroupsSettingPathMappingItem.BLOCKING_RULE_TYPE.equals( item.getRouteType() ) )
         {
+            // NOT TRUE ANYMORE:
+            // if you delete a repo(ses) that were belonging to a route, we insist on
+            // leaving the route "empty" (to save a users hardly concieved regexp) but with empty
+            // repo list
+            
             // here we must have a repo list
-            if ( item.getRepositories() == null || item.getRepositories().size() == 0 )
-            {
-                response.addValidationError( "The repository list in Route with ID='" + item.getId()
-                    + "' is not valid: it cannot be empty!" );
-            }
+            //if ( item.getRepositories() == null || item.getRepositories().size() == 0 )
+            //{
+            //    response.addValidationError( "The repository list in Route with ID='" + item.getId()
+            //        + "' is not valid: it cannot be empty!" );
+            // }
         }
 
         if ( context.getExistingRepositoryIds() != null && context.getExistingRepositoryShadowIds() != null )
