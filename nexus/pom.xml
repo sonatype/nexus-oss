@@ -124,7 +124,7 @@
         <plexus.jetty.testsuite.version>1.1</plexus.jetty.testsuite.version>
         <plexus.jetty.version>1.1</plexus.jetty.version>
         <plexus.restlet.bridge.version>1.2</plexus.restlet.bridge.version>
-		<nexus.indexer.version>1.0-beta-6-SNAPSHOT</nexus.indexer.version>	
+		<nexus.indexer.version>1.0.0</nexus.indexer.version>	
 		<apache.commons.email.version>1.1</apache.commons.email.version>
         
 	</properties>
