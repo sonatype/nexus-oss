@@ -23,11 +23,13 @@
         <class-path-elements>${nexus-abs-basedir}/runtime/apps/nexus/conf, ${nexus-abs-basedir}/runtime/apps/nexus/lib/*.jar</class-path-elements>
         <sleep-after-start>6000</sleep-after-start>
         <systemProperties>
-        		<plexus.applicationPort>${nexus-application-port}</plexus.applicationPort>
+        		<plexus.application-port>${nexus-application-port}</plexus.application-port>
+        		<plexus.application-host>${jetty-application-host}</plexus.application-host>
         		<plexus.runtime>${nexus-abs-basedir}/runtime</plexus.runtime>
         		<plexus.apps>${nexus-abs-basedir}/runtime/apps</plexus.apps>
         		<plexus.nexus-work>${nexus-abs-basedir}/runtime/work</plexus.nexus-work>
         		<plexus.webapp>${nexus-abs-basedir}/runtime/apps/nexus/webapp</plexus.webapp>
+        		<plexus.webapp-context-path>/nexus</plexus.webapp-context-path>
         </systemProperties>
       </configuration>
     </component>

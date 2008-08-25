@@ -31,14 +31,14 @@
 						<clazz>
 							org.mortbay.jetty.nio.SelectChannelConnector
 						</clazz>
-						<host>0.0.0.0</host>
-						<port>${applicationPort}</port>
+						<host>${application-host}</host>
+						<port>${application-port}</port>
 					</connectorInfo>
 				</connectorInfos>
 				<webappInfos>
 					<webappInfo>
 						<warPath>${webapp}</warPath>
-						<contextPath>/nexus</contextPath>
+						<contextPath>${webapp-context-path}</contextPath>
 					</webappInfo>
 				</webappInfos>
 			</configuration>

@@ -29,6 +29,7 @@
 		<nexus-application-host>localhost</nexus-application-host>
 		<nexus-application-name>nexus</nexus-application-name>
 		<nexus-application-port>8087</nexus-application-port>
+		<jetty-application-host>0.0.0.0</jetty-application-host>
 
 		<nexus-base-url>${nexus-application-protocol}://${nexus-application-host}:${nexus-application-port}/${nexus-application-name}/</nexus-base-url>
 
