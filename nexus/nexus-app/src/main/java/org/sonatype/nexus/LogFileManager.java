@@ -30,4 +30,6 @@ public interface LogFileManager
     Set<File> getLogFiles();
     
     File getLogFile( String filename );
+    
+    void createLogDirectory();
 }

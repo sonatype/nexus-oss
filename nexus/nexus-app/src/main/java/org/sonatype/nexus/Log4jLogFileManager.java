@@ -36,6 +36,11 @@ public class Log4jLogFileManager
     implements
     LogFileManager
 {
+    public Log4jLogFileManager()
+    {
+        createLogDirectory();
+    }
+    
     public File getLogFile( String filename )
     {
         Logger logger = Logger.getRootLogger();
@@ -79,6 +84,19 @@ public class Log4jLogFileManager
         }
         
         return files;
+    }
+    
+    public void createLogDirectory()
+    {
+        for ( File file : getLogFiles() )
+        {
+            File parent = file.getParentFile();
+            
+            if ( parent != null && !parent.exists() )
+            {
+                parent.mkdirs();
+            }
+        }
     }
 
 }
