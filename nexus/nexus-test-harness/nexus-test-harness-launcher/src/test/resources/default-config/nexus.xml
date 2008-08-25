@@ -29,7 +29,7 @@
     <groups />
   </routing>
   <repositories>
-  <repository>
+ <!-- <repository>
             <id>central</id>
             <name>Maven Central</name>
             <localStatus>inService</localStatus>
@@ -46,47 +46,18 @@
                 <provider>apacheHttpClient3x</provider>
                 <url>http://repo1.maven.org/maven2/</url>
             </remoteStorage>
-        </repository>
+        </repository> -->
 
-        <!-- SNAPSHOT SNAPSHOT REPOSITORIES -->
 
-        <repository>
-            <id>apache-snapshots</id>
-            <name>Apache Snapshots</name>
-            <localStatus>inService</localStatus>
-            <proxyMode>allow</proxyMode>
-            <allowWrite>false</allowWrite>
-            <browseable>true</browseable>
-            <indexable>true</indexable>
-            <notFoundCacheTTL>1440</notFoundCacheTTL>
-            <artifactMaxAge>1440</artifactMaxAge>
-            <metadataMaxAge>1440</metadataMaxAge>
-            <maintainProxiedRepositoryMetadata>false</maintainProxiedRepositoryMetadata>
-            <repositoryPolicy>snapshot</repositoryPolicy>
-            <remoteStorage>
-                <provider>apacheHttpClient3x</provider>
-                <url>http://people.apache.org/repo/m2-snapshot-repository</url>
-            </remoteStorage>
-        </repository>
+	<repository>
+      <id>fake-central</id>
+      <name>fake-central</name>
+      <allowWrite>false</allowWrite>
+      <localStorage>
+      	<url>${project.build.directory}/test-classes/fake-central</url>
+      </localStorage>
+    </repository>
 
-        <repository>
-            <id>codehaus-snapshots</id>
-            <name>Codehaus Snapshots</name>
-            <localStatus>inService</localStatus>
-            <proxyMode>allow</proxyMode>
-            <allowWrite>false</allowWrite>
-            <browseable>true</browseable>
-            <indexable>true</indexable>
-            <notFoundCacheTTL>1440</notFoundCacheTTL>
-            <artifactMaxAge>1440</artifactMaxAge>
-            <metadataMaxAge>1440</metadataMaxAge>
-            <maintainProxiedRepositoryMetadata>false</maintainProxiedRepositoryMetadata>
-            <repositoryPolicy>snapshot</repositoryPolicy>
-            <remoteStorage>
-                <provider>apacheHttpClient3x</provider>
-                <url>http://snapshots.repository.codehaus.org/</url>
-            </remoteStorage>
-        </repository>
     <repository>
       <id>nexus-test-harness-repo</id>
       <name>nexus-test-harness-repo</name>
@@ -123,17 +94,15 @@
                 <groupId>public</groupId>
                 <name>Public Repositories</name>
                 <repositories>
-                    <repository>central</repository>
+                    <repository>fake-central</repository>
+                    <repository>nexus-test-harness-repo</repository>
+                    <repository>nexus-test-harness-repo2</repository>
+                    <repository>release-proxy-repo-1</repository>
+                    <repository>nexus-test-harness-release-repo</repository>
+                    <!-- <repository>central</repository> -->
                 </repositories>
             </repositoryGroup>
-            <repositoryGroup>
-                <groupId>public-snapshots</groupId>
-                <name>Public Snapshot Repositories</name>
-                <repositories>
-                    <repository>apache-snapshots</repository>
-                    <repository>codehaus-snapshots</repository>
-                </repositories>
-            </repositoryGroup>
+            
       <repositoryGroup>
         <groupId>nexus-test</groupId>
         <name>nexus-test</name>

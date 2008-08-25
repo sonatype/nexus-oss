@@ -32,9 +32,8 @@ public class Nexus502MavenExecutionTest
         throws Exception
     {
         File mavenProject = getTestFile( "maven-project" );
-        File mvnRepo = getTestFile( "mvn_repo" );
         File settings = getTestFile( "repositories.xml" );
-        verifier = createVerifier( mavenProject, mvnRepo, settings );
+        verifier = createVerifier( mavenProject, settings );
     }
 
     @Test
@@ -88,10 +87,9 @@ public class Nexus502MavenExecutionTest
         disableUser( "anonymous" );
 
         File mavenProject = getTestFile( "maven-project" );
-        File mvnRepo = getTestFile( "mvn_repo" );
         File settings = getTestFile( "repositoriesWithAuthentication.xml" );
 
-        Verifier verifier = createVerifier( mavenProject, mvnRepo, settings );
+        Verifier verifier = createVerifier( mavenProject, settings );
         verifier.executeGoal( "dependency:resolve" );
         verifier.verifyErrorFreeLog();
     }

@@ -25,9 +25,8 @@ public class Nexus511MavenDeployTest
         throws Exception
     {
         File mavenProject = getTestFile( "maven-project" );
-        File mvnRepo = getTestFile( "mvn_repo" );
         File settings = getTestFile( "server.xml" );
-        verifier = createVerifier( mavenProject, mvnRepo, settings );
+        verifier = createVerifier( mavenProject, settings );
     }
 
     @Test
