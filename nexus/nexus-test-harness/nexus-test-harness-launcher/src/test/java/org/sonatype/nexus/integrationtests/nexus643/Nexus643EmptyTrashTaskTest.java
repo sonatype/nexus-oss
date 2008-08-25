@@ -16,7 +16,7 @@ public class Nexus643EmptyTrashTaskTest
     extends AbstractNexusIntegrationTest
 {
     @Test
-    public void checkTask()
+    public void emptyTrashTask()
         throws Exception
     {
 

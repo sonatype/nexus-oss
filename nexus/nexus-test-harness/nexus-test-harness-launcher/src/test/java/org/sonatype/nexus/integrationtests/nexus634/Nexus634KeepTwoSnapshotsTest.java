@@ -16,7 +16,7 @@ public class Nexus634KeepTwoSnapshotsTest
 {
 
     @Test
-    public void keepNewSnapshots()
+    public void keepTwoSnapshots()
         throws Exception
     {
 

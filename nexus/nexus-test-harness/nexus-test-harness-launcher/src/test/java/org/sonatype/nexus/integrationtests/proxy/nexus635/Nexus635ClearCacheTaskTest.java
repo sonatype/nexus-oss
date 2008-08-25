@@ -33,7 +33,7 @@ public class Nexus635ClearCacheTaskTest
     }
 
     @Test
-    public void checkTask()
+    public void clearCacheTask()
         throws Exception
     {
         /*
