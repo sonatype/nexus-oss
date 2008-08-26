@@ -51,6 +51,7 @@ import org.sonatype.nexus.integrationtests.nexus606.Nexus606DownloadLogsAndConfi
 import org.sonatype.nexus.integrationtests.nexus634.Nexus634KeepNewSnapshotsTest;
 import org.sonatype.nexus.integrationtests.nexus634.Nexus634KeepTwoSnapshotsTest;
 import org.sonatype.nexus.integrationtests.nexus634.Nexus634RemoveAllTest;
+import org.sonatype.nexus.integrationtests.nexus636.Nexus636EvictUnusedProxiedTaskTest;
 import org.sonatype.nexus.integrationtests.nexus637.Nexus637PublishIndexTest;
 import org.sonatype.nexus.integrationtests.nexus641.Nexus641ReindexTaskTest;
 import org.sonatype.nexus.integrationtests.nexus643.Nexus643EmptyTrashTaskTest;
@@ -87,14 +88,8 @@ import org.sonatype.nexus.integrationtests.upgrades.nexus652.Nexus652Beta5To10Up
     Nexus586AnonymousForgotUserIdTest.class, Nexus586AnonymousResetPasswordTest.class,
     Nexus532GroupsCrudXmlTests.class, Nexus606DownloadLogsAndConfigFilesTest.class, Nexus643EmptyTrashTaskTest.class,
     Nexus637PublishIndexTest.class, Nexus652Beta5To10UpgradeTest.class, Nexus641ReindexTaskTest.class,
-    Nexus602SearchSnapshotArtifactTest.class
-/*
- * FIXME velo: tests are working locally, but failing at hudson 
- */
- , Nexus635ClearCacheTaskTest.class,
-  Nexus634RemoveAllTest.class, Nexus634KeepNewSnapshotsTest.class, Nexus634KeepTwoSnapshotsTest.class
-
-} )
+    Nexus602SearchSnapshotArtifactTest.class, Nexus635ClearCacheTaskTest.class, Nexus634RemoveAllTest.class,
+    Nexus634KeepNewSnapshotsTest.class, Nexus634KeepTwoSnapshotsTest.class, Nexus636EvictUnusedProxiedTaskTest.class } )
 public class IntegrationTestSuiteClasses
 {
 
