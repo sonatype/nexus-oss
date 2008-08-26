@@ -6,7 +6,7 @@
 
   <servers>
     <server>
-      <id>nexus</id>
+      <id>nexus-test-harness-repo</id>
       <username>admin</username>
       <password>admin123</password>
     </server>
@@ -17,6 +17,12 @@
 
 <mirrors>
     
+    <mirror>
+      <!--This is used to direct the public snapshots repo in the profile below over to a different nexus group -->
+      <id>nexus-public-snapshots</id>
+      <mirrorOf>public-snapshots</mirrorOf>
+      <url>${nexus-base-url}content/groups/public-snapshots</url>
+    </mirror>
     <mirror>
       <!--This sends everything else to /public -->
       <id>nexus</id>
