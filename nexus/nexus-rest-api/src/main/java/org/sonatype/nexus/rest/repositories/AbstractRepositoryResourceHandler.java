@@ -107,24 +107,28 @@ public class AbstractRepositoryResourceHandler
      */
     public CRepositoryShadow getRepositoryShadowAppModel( RepositoryShadowResource model, CRepositoryShadow target )
     {
+        CRepositoryShadow appModel = new CRepositoryShadow();
+        
         if ( target == null )
         {
-            target = new CRepositoryShadow();
-
-            target.setId( model.getId() );
-
-            target.setLocalStatus( Configuration.LOCAL_STATUS_IN_SERVICE );
+            appModel.setLocalStatus( Configuration.LOCAL_STATUS_IN_SERVICE );
         }
+        else
+        {
+            appModel.setLocalStatus( target.getLocalStatus() );
+        }
+        
+        appModel.setId( model.getId() );
 
-        target.setName( model.getName() );
+        appModel.setName( model.getName() );
 
-        target.setShadowOf( model.getShadowOf() );
+        appModel.setShadowOf( model.getShadowOf() );
 
-        target.setSyncAtStartup( model.isSyncAtStartup() );
+        appModel.setSyncAtStartup( model.isSyncAtStartup() );
 
-        target.setType( model.getFormat() );
+        appModel.setType( model.getFormat() );
 
-        return target;
+        return appModel;
     }
 
     /**
@@ -210,51 +214,49 @@ public class AbstractRepositoryResourceHandler
      */
     public CRepository getRepositoryAppModel( RepositoryResource model, CRepository target )
     {
-        if ( target == null )
-        {
-            target = new CRepository();
-
-            target.setId( model.getId() );
+        CRepository appModel = new CRepository();
+        
+        if ( target != null )
+        {            
+            appModel.setLocalStatus( target.getLocalStatus() );
         }
+        
+        appModel.setId( model.getId() );
 
-        target.setName( model.getName() );
+        appModel.setName( model.getName() );
 
-        target.setType( model.getFormat() );
+        appModel.setType( model.getFormat() );
 
-        target.setAllowWrite( model.isAllowWrite() );
+        appModel.setAllowWrite( model.isAllowWrite() );
 
-        target.setBrowseable( model.isBrowseable() );
+        appModel.setBrowseable( model.isBrowseable() );
 
-        target.setIndexable( model.isIndexable() );
+        appModel.setIndexable( model.isIndexable() );
 
-        target.setNotFoundCacheTTL( model.getNotFoundCacheTTL() );
+        appModel.setNotFoundCacheTTL( model.getNotFoundCacheTTL() );
 
-        target.setRepositoryPolicy( model.getRepoPolicy() );
+        appModel.setRepositoryPolicy( model.getRepoPolicy() );
 
-        target.setChecksumPolicy( model.getChecksumPolicy() );
+        appModel.setChecksumPolicy( model.getChecksumPolicy() );
 
-        target.setDownloadRemoteIndexes( model.isDownloadRemoteIndexes() );
+        appModel.setDownloadRemoteIndexes( model.isDownloadRemoteIndexes() );
 
         if ( model.getOverrideLocalStorageUrl() != null )
         {
-            if ( target.getLocalStorage() == null )
-            {
-                target.setLocalStorage( new CLocalStorage() );
-            }
-
-            target.getLocalStorage().setUrl( model.getOverrideLocalStorageUrl() );
+            appModel.setLocalStorage( new CLocalStorage() );
+            appModel.getLocalStorage().setUrl( model.getOverrideLocalStorageUrl() );
         }
         else
         {
-            target.setLocalStorage( null );
+            appModel.setLocalStorage( null );
         }
 
         if ( RepositoryProxyResource.class.isAssignableFrom( model.getClass() ) )
         {
-            target = getRepositoryProxyAppModel( (RepositoryProxyResource) model, target );
+            appModel = getRepositoryProxyAppModel( (RepositoryProxyResource) model, appModel );
         }
 
-        return target;
+        return appModel;
     }
 
     /**
