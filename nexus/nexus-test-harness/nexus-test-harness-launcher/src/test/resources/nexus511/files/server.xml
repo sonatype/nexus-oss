@@ -16,7 +16,6 @@
 <localRepository>${project.build.directory}/maven_repo</localRepository>
 
 <mirrors>
-    
     <mirror>
       <!--This is used to direct the public snapshots repo in the profile below over to a different nexus group -->
       <id>nexus-public-snapshots</id>
