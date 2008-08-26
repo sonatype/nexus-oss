@@ -54,6 +54,7 @@ public class AbstractNexusIntegrationTest
     public static final String REPO_TEST_HARNESS_REPO2 = "nexus-test-harness-repo2";
     public static final String REPO_TEST_HARNESS_RELEASE_REPO = "nexus-test-harness-release-repo";
     public static final String REPO_TEST_HARNESS_SNAPSHOT_REPO = "nexus-test-harness-snapshot-repo";
+    public static final String REPO_RELEASE_PROXY_REPO1= "release-proxy-repo-1";
 
     private PlexusContainer container;
 
@@ -232,7 +233,6 @@ public class AbstractNexusIntegrationTest
                 {
                     Assert.fail( "The test artifact is either missing or has an invalid Distribution Management section." );
                 }
-                String repositoryId = model.getDistributionManagement().getRepository().getId();
                 String deployUrl = model.getDistributionManagement().getRepository().getUrl();
 
                 // FIXME, this needs to be fluffed up a little, should add the classifier, etc.
