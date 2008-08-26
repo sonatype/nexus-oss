@@ -93,8 +93,6 @@ public class AbstractMavenNexusIT
     {
         File logFile = new File( verifier.getBasedir(), "log.txt" );
         String log = FileUtils.readFileToString( logFile );
-        log += "\n";
-        log += new XStream().toXML( verifier );
         Assert.fail( log );
     }
 }
