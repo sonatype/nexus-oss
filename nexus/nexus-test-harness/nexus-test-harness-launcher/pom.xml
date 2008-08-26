@@ -106,7 +106,18 @@
 			<testResource>
 				<directory>src/test/resources</directory>
 				<filtering>true</filtering>
+				<excludes>
+                    <exclude>**/fake-central/**</exclude>
+                </excludes>
 			</testResource>
+			
+			<testResource>
+                <directory>src/test/resources</directory>
+                <filtering>false</filtering>
+                <includes>
+                    <include>**/fake-central/**</include>
+                </includes>
+            </testResource>
 
 			<testResource>
 				<directory>src/test/bundle-conf</directory>
