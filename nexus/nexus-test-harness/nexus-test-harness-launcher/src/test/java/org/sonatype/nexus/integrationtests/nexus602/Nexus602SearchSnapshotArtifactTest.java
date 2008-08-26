@@ -24,7 +24,7 @@ public class Nexus602SearchSnapshotArtifactTest
         throws Exception
     {
         String serviceURI =
-            "service/local/artifact/maven/redirect?r=" + REPOSITORY_NEXUS_TEST_HARNESS_SNAPSHOT_REPO + "&g="
+            "service/local/artifact/maven/redirect?r=" + REPO_TEST_HARNESS_SNAPSHOT_REPO + "&g="
                 + SNAPSHOT_ARTIFACT.getGroupId() + "&a=" + SNAPSHOT_ARTIFACT.getArtifactId() + "&v="
                 + SNAPSHOT_ARTIFACT.getVersion();
         Response response = RequestFacade.doGetRequest( serviceURI );
@@ -47,7 +47,7 @@ public class Nexus602SearchSnapshotArtifactTest
         throws Exception
     {
         String serviceURI =
-            "service/local/artifact/maven/redirect?r=" + REPOSITORY_NEXUS_TEST_HARNESS_REPO + "&g=" + getTestId()
+            "service/local/artifact/maven/redirect?r=" + REPO_TEST_HARNESS_REPO + "&g=" + getTestId()
                 + "&a=" + "artifact" + "&v=" + "1.0";
         Response response = RequestFacade.doGetRequest( serviceURI );
 
@@ -70,7 +70,7 @@ public class Nexus602SearchSnapshotArtifactTest
         throws Exception
     {
         String serviceURI =
-            "service/local/artifact/maven/redirect?r=" + REPOSITORY_NEXUS_TEST_HARNESS_REPO + "&g=" + "invalidGroupId"
+            "service/local/artifact/maven/redirect?r=" + REPO_TEST_HARNESS_REPO + "&g=" + "invalidGroupId"
                 + "&a=" + "invalidArtifact" + "&v=" + "32.64";
         Response response = RequestFacade.doGetRequest( serviceURI );
 
