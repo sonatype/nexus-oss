@@ -210,7 +210,7 @@ public class M2GroupIdBasedRepositoryRouter
                     spoofedContent = is;
                     spoofedLength = bos.size();
 
-                    getLogger().info(
+                    getLogger().debug(
                         "Item for path " + request.getRequestPath() + " merged from "
                             + Integer.toString( listOfStorageItems.size() ) + " found items." );
                 }

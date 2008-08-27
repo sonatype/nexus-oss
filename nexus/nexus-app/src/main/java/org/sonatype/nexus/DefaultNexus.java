@@ -739,7 +739,7 @@ public class DefaultNexus
     public Collection<NexusStreamResponse> getApplicationLogFiles()
         throws IOException
     {
-        getLogger().info( "List log files." );
+        getLogger().debug( "List log files." );
         
         Set<File> files = logFileManager.getLogFiles();
         
@@ -776,7 +776,7 @@ public class DefaultNexus
     {
         if ( !logFile.contains( File.pathSeparator ) )
         {
-            getLogger().info( "Retrieving " + logFile + " log file." );
+            getLogger().debug( "Retrieving " + logFile + " log file." );
 
             File log = logFileManager.getLogFile( logFile );
 

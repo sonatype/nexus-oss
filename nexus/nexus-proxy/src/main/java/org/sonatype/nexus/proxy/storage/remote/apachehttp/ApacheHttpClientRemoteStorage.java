@@ -253,7 +253,7 @@ public class ApacheHttpClientRemoteStorage
 
         HttpHost proxyHttpHost = null;
 
-        getLogger().info( "Creating ApacheHttpClient instance" );
+        getLogger().debug( "Creating ApacheHttpClient instance" );
 
         HttpParams httpParams = new BasicHttpParams();
         HttpConnectionManagerParams.setMaxTotalConnections( httpParams, 20 );

@@ -237,7 +237,7 @@ public class CommonsNetFtpRemoteStorage
         try
         {
             URL remoteUrl = new URL( repository.getRemoteUrl() );
-            getLogger().info( "Creating CommonsNetFTPClient instance" );
+            getLogger().debug( "Creating CommonsNetFTPClient instance" );
             ftpc = new FTPClient();
             ftpc.configure( ftpClientConfig );
             ftpc.connect( remoteUrl.getHost() );

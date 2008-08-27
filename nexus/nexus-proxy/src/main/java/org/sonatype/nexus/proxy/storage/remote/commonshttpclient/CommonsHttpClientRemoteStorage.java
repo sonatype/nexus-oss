@@ -258,7 +258,7 @@ public class CommonsHttpClientRemoteStorage
 
         HostConfiguration httpConfiguration = null;
 
-        getLogger().info( "Creating CommonsHttpClient instance" );
+        getLogger().debug( "Creating CommonsHttpClient instance" );
         httpRetryHandler = new DefaultHttpMethodRetryHandler( ctx
             .getRemoteConnectionSettings().getRetrievalRetryCount(), false );
         httpClient = new HttpClient( new MultiThreadedHttpConnectionManager() );
