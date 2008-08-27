@@ -36,8 +36,8 @@
 		<nexus-control-port>33001</nexus-control-port>
 		<proxy-repo-control-port>33002</proxy-repo-control-port>
 	</properties>
-	<dependencies>
 
+	<dependencies>
 		<dependency>
             <groupId>org.sonatype.nexus</groupId>
             <artifactId>nexus-webapp</artifactId>
