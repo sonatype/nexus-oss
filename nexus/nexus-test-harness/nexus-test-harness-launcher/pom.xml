@@ -107,7 +107,7 @@
 				<directory>src/test/resources</directory>
 				<filtering>true</filtering>
 				<excludes>
-                    <exclude>**/fake-central/**</exclude>
+                    <exclude>**/*.jar</exclude>
                 </excludes>
 			</testResource>
 			
@@ -115,7 +115,7 @@
                 <directory>src/test/resources</directory>
                 <filtering>false</filtering>
                 <includes>
-                    <include>**/fake-central/**</include>
+                    <include>**/*.jar</include>
                 </includes>
             </testResource>
 
