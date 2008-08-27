@@ -22,6 +22,73 @@
  * ExtJS library fix-ups and overrides
  */
 
+/*
+ * ext-base-debug
+ */
+Ext.BLANK_IMAGE_URL="ext-2.0.2/resources/images/default/s.gif";
+
+Ext.lib.Ajax.request = function(method, uri, cb, data, options) {
+  if(options){
+    var hs = options.headers;
+    if(hs){
+      for(var h in hs){
+        if(hs.hasOwnProperty(h)){
+          this.initHeader(h, hs[h], false);
+        }
+      }
+    }
+    if(options.xmlData){
+      this.initHeader('Content-Type', 'text/xml', false);
+      //Sonatype: take method from config to accept PUT or POST
+      //method = 'POST'; 
+      data = options.xmlData;
+    }else if(options.jsonData){
+      this.initHeader('Content-Type', 'text/javascript', false);
+      //Sonatype: take method from config to accept PUT or POST
+      //method = 'POST'; 
+      data = typeof options.jsonData == 'object' ? Ext.encode(options.jsonData) : options.jsonData;
+    }
+  }
+
+  return this.asyncRequest(method, uri, cb, data);
+};
+
+Ext.lib.Ajax.setHeader = function(o) {
+  //Sonatype: Safari and IE don't always overwrite headers correctly, so need to merge default and provide headers before writing
+  if (this.hasDefaultHeaders && this.hasHeaders) {
+    var combinedHeaders = Ext.applyIf(this.headers, this.defaultHeaders);
+    
+    for (var prop in combinedHeaders) {
+      if (combinedHeaders.hasOwnProperty(prop)) {
+        o.conn.setRequestHeader(prop, combinedHeaders[prop]);
+      }
+    }
+    
+    this.headers = {};
+    this.hasHeaders = false;
+  }
+  else if (this.hasDefaultHeaders) {
+    for (var prop in this.defaultHeaders) {
+      if (this.defaultHeaders.hasOwnProperty(prop)) {
+        o.conn.setRequestHeader(prop, this.defaultHeaders[prop]);
+      }
+    }
+  }
+  else if (this.hasHeaders) {
+    for (var prop in this.headers) {
+      if (this.headers.hasOwnProperty(prop)) {
+        o.conn.setRequestHeader(prop, this.headers[prop]);
+      }
+    }
+    this.headers = {};
+    this.hasHeaders = false;
+  }
+};
+
+
+/*
+ * ext-all-debug
+ */
 Ext.override(Ext.data.Connection, {
   request : function(o){
     if (this.fireEvent("beforerequest", this, o) !== false){
