@@ -111,10 +111,17 @@ public class TaskScheduleUtil
     public static ScheduledServiceBaseResource runTask( String typeId, ScheduledServicePropertyResource... properties )
         throws Exception
     {
+        return runTask( typeId.substring( 0, typeId.lastIndexOf( '.' ) ), typeId, properties );
+    }
+
+    public static ScheduledServiceBaseResource runTask( String taskName, String typeId,
+                                                        ScheduledServicePropertyResource... properties )
+        throws Exception
+    {
         ScheduledServiceBaseResource scheduledTask = new ScheduledServiceBaseResource();
         scheduledTask.setEnabled( true );
         scheduledTask.setId( null );
-        scheduledTask.setName( typeId.substring( 0, typeId.lastIndexOf( '.' ) ) );
+        scheduledTask.setName( taskName );
         scheduledTask.setTypeId( typeId );
 
         for ( ScheduledServicePropertyResource property : properties )
