@@ -18,7 +18,7 @@
         <configuration>${nexus-plexus-config-file}</configuration>
         <basedir>${nexus-abs-basedir}</basedir>
         <temp-dir>${project.build.directory}/appbooter.tmp/</temp-dir>
-        <control-port>-1</control-port>
+        <control-port>${nexus-control-port}</control-port>
         <platform-file>${nexus-abs-basedir}/lib/plexus-platform-jsw-*.jar</platform-file>
         <class-path-elements>${nexus-abs-basedir}/runtime/apps/nexus/conf, ${nexus-abs-basedir}/runtime/apps/nexus/lib/*.jar</class-path-elements>
         <sleep-after-start>6000</sleep-after-start>
