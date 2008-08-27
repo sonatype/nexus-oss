@@ -108,6 +108,7 @@
 				<filtering>true</filtering>
 				<excludes>
                     <exclude>**/*.jar</exclude>
+                    <exclude>**/fake-central/**</exclude>
                 </excludes>
 			</testResource>
 			
@@ -116,6 +117,7 @@
                 <filtering>false</filtering>
                 <includes>
                     <include>**/*.jar</include>
+                    <include>**/fake-central/**</include>
                 </includes>
             </testResource>
 
