@@ -7,6 +7,7 @@ import org.apache.log4j.Logger;
 import org.codehaus.plexus.util.StringUtils;
 import org.junit.Assert;
 import org.restlet.data.MediaType;
+import org.restlet.data.Message;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
 import org.restlet.data.Status;
@@ -24,12 +25,11 @@ public class SearchMessageUtil
 {
 
     private Logger log = Logger.getLogger( getClass() );
-    
-    private XStream xstream;
 
-    public SearchMessageUtil()
+    private static XStream xstream;
+
+    static
     {
-        super();
         xstream = new XStream();
         XStreamInitializer.initialize( xstream );
     }
@@ -126,6 +126,28 @@ public class SearchMessageUtil
         repository.setAllowWrite( allowDeploying );
 
         saveRepository( repository, repositoryName );
+    }
+
+    @SuppressWarnings( "unchecked" )
+    public static List<NexusArtifact> searchClassname( String classname )
+        throws Exception
+    {
+        String responseText = doSearchForClassName( classname ).getEntity().getText();
+
+        XStreamRepresentation representation =
+            new XStreamRepresentation( xstream, responseText, MediaType.APPLICATION_XML );
+
+        SearchResponse searchResponde = (SearchResponse) representation.getPayload( new SearchResponse() );
+
+        return searchResponde.getData();
+    }
+
+    private static Response doSearchForClassName( String classname )
+        throws IOException
+    {
+        String serviceURI = "service/local/data_index?cn=" + classname;
+
+        return RequestFacade.doGetRequest( serviceURI );
     }
 
 }
