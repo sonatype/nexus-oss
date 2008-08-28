@@ -813,6 +813,12 @@ Ext.extend(Sonatype.repoServer.RepoMaintPanel, Sonatype.repoServer.AbstractRepoP
       }
       node.setText( node.text + ( node.isRoot ? ' (Not Available)' : ' (Not Found)'));
     }
+    else if ( response.status == 401) {
+      if ( Sonatype.MessageBox.isVisible() ) {
+        Sonatype.MessageBox.hide();   
+      }
+      node.setText( node.text + ' (Access Denied)' );
+    }
   },
 
   statusCallback : function(options, success, response) {
