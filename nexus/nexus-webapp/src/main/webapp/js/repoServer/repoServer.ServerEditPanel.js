@@ -356,7 +356,7 @@ Sonatype.repoServer.ServerEditPanel = function(config){
             allowBlank: true,
             allowDecimals: false,
             allowNegative: false,
-            maxValue: 9999
+            maxValue: 65535
           },
           {
             xtype: 'fieldset',
