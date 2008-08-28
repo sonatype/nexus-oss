@@ -88,6 +88,13 @@
       </remoteStorage>
     </repository>
   </repositories>
+  <repositoryShadows>
+    <repositoryShadow>
+      <id>nexus-test-harness-shadow</id>
+      <name>nexus-test-harness-shadow</name>
+      <shadowOf>nexus-test-harness-repo</shadowOf>
+    </repositoryShadow>
+  </repositoryShadows>
   <repositoryGrouping>
     <repositoryGroups>
             <repositoryGroup>

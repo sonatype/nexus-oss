@@ -55,6 +55,7 @@ public class AbstractNexusIntegrationTest
     public static final String REPO_TEST_HARNESS_RELEASE_REPO = "nexus-test-harness-release-repo";
     public static final String REPO_TEST_HARNESS_SNAPSHOT_REPO = "nexus-test-harness-snapshot-repo";
     public static final String REPO_RELEASE_PROXY_REPO1= "release-proxy-repo-1";
+    public static final String REPO_TEST_HARNESS_SHADOW= "nexus-test-harness-shadow";
 
     private PlexusContainer container;
 
