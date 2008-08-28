@@ -1,4 +1,4 @@
-package org.sonatype.nexus.integrationtests.nexus533;
+package org.sonatype.nexus.test.utils;
 
 import java.io.IOException;
 import java.util.List;

@@ -13,6 +13,7 @@ import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.rest.model.ScheduledServiceBaseResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceListResource;
 import org.sonatype.nexus.test.utils.NexusConfigUtil;
+import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 
 public abstract class AbstractNexusTasksIntegrationTest<E extends ScheduledServiceBaseResource>
     extends AbstractNexusIntegrationTest

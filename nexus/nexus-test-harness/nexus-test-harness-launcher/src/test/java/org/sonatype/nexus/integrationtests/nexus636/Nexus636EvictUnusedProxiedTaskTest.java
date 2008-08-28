@@ -8,8 +8,8 @@ import org.apache.commons.io.FileUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
-import org.sonatype.nexus.integrationtests.nexus533.TaskScheduleUtil;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
+import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 
 public class Nexus636EvictUnusedProxiedTaskTest
     extends AbstractNexusIntegrationTest

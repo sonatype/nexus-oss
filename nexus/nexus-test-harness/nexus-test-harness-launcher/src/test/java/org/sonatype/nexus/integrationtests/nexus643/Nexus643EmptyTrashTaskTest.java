@@ -10,7 +10,7 @@ import org.restlet.data.Method;
 import org.restlet.data.Response;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
-import org.sonatype.nexus.integrationtests.nexus533.TaskScheduleUtil;
+import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 
 public class Nexus643EmptyTrashTaskTest
     extends AbstractNexusIntegrationTest

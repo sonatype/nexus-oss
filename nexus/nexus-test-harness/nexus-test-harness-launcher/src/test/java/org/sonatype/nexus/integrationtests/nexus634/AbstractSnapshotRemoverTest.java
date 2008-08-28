@@ -9,10 +9,10 @@ import org.apache.commons.io.FileUtils;
 import org.junit.Before;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
-import org.sonatype.nexus.integrationtests.nexus533.TaskScheduleUtil;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.test.utils.MavenDeployer;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
+import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 
 public class AbstractSnapshotRemoverTest
     extends AbstractNexusIntegrationTest
