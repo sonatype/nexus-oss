@@ -55,6 +55,7 @@ Sonatype.config = function() {
     host : host,
     servicePath : servicePath,
     resourcePath : resourcePath,
+    extPath : resourcePath + '/ext-2.2',
     contentPath : contentPath,
     cssPath : '/styles',
     jsPath : '/js',

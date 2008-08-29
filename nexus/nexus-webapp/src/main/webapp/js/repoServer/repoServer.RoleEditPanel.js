@@ -815,7 +815,7 @@ Ext.extend(Sonatype.repoServer.RoleEditPanel, Ext.Panel, {
           leaf: true,
           qtip: item.data.description,
           nodeType: 'role',
-          icon: Sonatype.config.resourcePath + '/ext-2.0.2/resources/images/default/tree/folder.gif'
+          icon: Sonatype.config.extPath + '/resources/images/default/tree/folder.gif'
         })
       );
     }, this);
@@ -845,7 +845,7 @@ Ext.extend(Sonatype.repoServer.RoleEditPanel, Ext.Panel, {
             leaf: true,
             qtip: role.data.description,
             nodeType: 'role',
-            icon: Sonatype.config.resourcePath + '/ext-2.0.2/resources/images/default/tree/folder.gif'
+            icon: Sonatype.config.extPath + '/resources/images/default/tree/folder.gif'
           })
         );
       }

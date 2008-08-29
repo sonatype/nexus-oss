@@ -762,7 +762,7 @@ Ext.extend(Sonatype.repoServer.RepoTargetEditPanel, Ext.Panel, {
 	    draggable: false,
 	    leaf: true,
 	    nodeType: 'pattern',
-	    icon: Sonatype.config.resourcePath + '/ext-2.0.2/resources/images/default/tree/leaf.gif'
+	    icon: Sonatype.config.extPath + '/resources/images/default/tree/leaf.gif'
 	  })
 	);
   },

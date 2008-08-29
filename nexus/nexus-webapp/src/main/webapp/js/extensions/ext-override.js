@@ -25,8 +25,8 @@
 /*
  * ext-base-debug
  */
-Ext.BLANK_IMAGE_URL="ext-2.0.2/resources/images/default/s.gif";
-
+Ext.BLANK_IMAGE_URL="ext-2.2/resources/images/default/s.gif";
+/*
 Ext.lib.Ajax.request = function(method, uri, cb, data, options) {
   if(options){
     var hs = options.headers;
@@ -52,7 +52,7 @@ Ext.lib.Ajax.request = function(method, uri, cb, data, options) {
 
   return this.asyncRequest(method, uri, cb, data);
 };
-
+*/
 Ext.lib.Ajax.setHeader = function(o) {
   //Sonatype: Safari and IE don't always overwrite headers correctly, so need to merge default and provide headers before writing
   if (this.hasDefaultHeaders && this.hasHeaders) {
@@ -172,6 +172,7 @@ Ext.override(Ext.data.Node, {
   }
 });
 
+/*
 Date.formatCodeToRegex = function(character, currentGroup) {
   switch (character) {
     case "d":
@@ -326,6 +327,7 @@ Date.formatCodeToRegex = function(character, currentGroup) {
         s:Ext.escapeRe(character)};
   }
 };
+*/
 
 Ext.dd.DropTarget = function(el, config){
   this.el = Ext.get(el);
