@@ -228,37 +228,37 @@ public class AbstractScheduledServiceResourceHandler
         {
             switch ( day.intValue() )
             {
-                case 0:
+                case 1:
                 {
                     list.add( "sunday" );
                     break;
                 }
-                case 1:
+                case 2:
                 {
                     list.add( "monday" );
                     break;
                 }
-                case 2:
+                case 3:
                 {
                     list.add( "tuesday" );
                     break;
                 }
-                case 3:
+                case 4:
                 {
                     list.add( "wednesday" );
                     break;
                 }
-                case 4:
+                case 5:
                 {
                     list.add( "thursday" );
                     break;
                 }
-                case 5:
+                case 6:
                 {
                     list.add( "friday" );
                     break;
                 }
-                case 6:
+                case 7:
                 {
                     list.add( "saturday" );
                     break;
