@@ -133,19 +133,18 @@
               <tasks>
                 <property name="targetRoot" value="${basedir}/target/gzip-web-content"/>
                 <property name="sourceRoot" value="${basedir}/src/main/webapp"/>
-                <mkdir dir="${targetRoot}/ext-2.0.2/resources/css"/>
+                <mkdir dir="${targetRoot}/ext-2.2/resources/css"/>
                 <mkdir dir="${targetRoot}/style"/>
-                <mkdir dir="${targetRoot}/ext-2.0.2/adapter/ext"/>
                 <mkdir dir="${targetRoot}/js/filetree/js"/>
                 <mkdir dir="${targetRoot}/js/extensions"/>
                 <mkdir dir="${targetRoot}/js/repoServer"/>
-                <gzip src="${sourceRoot}/ext-2.0.2/resources/css/ext-all.css" destfile="${targetRoot}/ext-2.0.2/resources/css/ext-all.css.gz"/>
-                <gzip src="${sourceRoot}/ext-2.0.2/resources/css/xtheme-gray.css" destfile="${targetRoot}/ext-2.0.2/resources/css/xtheme-gray.css.gz"/>
+                <gzip src="${sourceRoot}/ext-2.2/resources/css/ext-all.css" destfile="${targetRoot}/ext-2.2/resources/css/ext-all.css.gz"/>
+                <gzip src="${sourceRoot}/ext-2.2/resources/css/xtheme-gray.css" destfile="${targetRoot}/ext-2.2/resources/css/xtheme-gray.css.gz"/>
                 <gzip src="${sourceRoot}/style/Sonatype.css" destfile="${targetRoot}/style/Sonatype.css.gz"/>
-                <gzip src="${sourceRoot}/ext-2.0.2/adapter/ext/ext-base-debug-sonatype.js" destfile="${targetRoot}/ext-2.0.2/adapter/ext/ext-base-debug-sonatype.js.gz"/>
-                <gzip src="${sourceRoot}/ext-2.0.2/ext-all-debug-sonatype.js" destfile="${targetRoot}/ext-2.0.2/ext-all-debug-sonatype.js.gz"/>
+                <gzip src="${sourceRoot}/ext-2.2/ext-trimmed.js" destfile="${targetRoot}/ext-2.2/ext-trimmed.js.gz"/>
                 <gzip src="${sourceRoot}/js/filetree/js/Ext.ux.form.BrowseButton.js" destfile="${targetRoot}/js/filetree/js/Ext.ux.form.BrowseButton.js.gz"/>
                 <gzip src="${sourceRoot}/js/Sonatype.js" destfile="${targetRoot}/js/Sonatype.js.gz"/>
+                <gzip src="${sourceRoot}/js/extensions/ext-override.js" destfile="${targetRoot}/js/extensions/ext-override.js.gz"/>
                 <gzip src="${sourceRoot}/js/extensions/Ext.messagebox.js" destfile="${targetRoot}/js/extensions/Ext.messagebox.js.gz"/>
                 <gzip src="${sourceRoot}/js/extensions/Ext.form.js" destfile="${targetRoot}/js/extensions/Ext.form.js.gz"/>
                 <gzip src="${sourceRoot}/js/extensions/SearchField.js" destfile="${targetRoot}/js/extensions/SearchField.js.gz"/>
