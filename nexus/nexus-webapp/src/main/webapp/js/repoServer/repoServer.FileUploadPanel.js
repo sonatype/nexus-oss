@@ -54,27 +54,61 @@ Sonatype.repoServer.FileUploadPanel = function(config){
       layout: 'card',
       activeItem: this.pomCard, 
       items: [
-        {
-          xtype: 'panel',
-          layout: 'column',
-          hideLabel: true,
-          id: this.pomCard,
-          items: [
-            this.pomnameField,
-            {
-              xtype: 'browsebutton',
-              text: 'Browse...',
-              columnWidth: .2,
-              setSize: function() {}, // column layout requires setSize()
-              uploadPanel: this,
-              handler: function( b ) {
-                b.uploadPanel.pomInput = b.detachInputFile(); 
-                var filename = b.uploadPanel.pomInput.getValue();
-                b.uploadPanel.pomnameField.setRawValue( filename );
-                b.uploadPanel.updateUploadButton( b.uploadPanel );
-              }
-            }
-          ] 
+           {
+               xtype: 'fieldset',
+               id: this.pomCard,
+               labelWidth: 70,
+               checkboxToggle:false,
+               collapsed: false,
+               collapsible: false,
+               autoHeight:true,
+               layoutConfig: {
+                 labelSeparator: ''
+               },
+               items: [
+                 {
+                      xtype: 'panel',
+                      layout: 'column',
+                      hideLabel: true,
+                      items: [
+                              {
+                                  xtype: 'label',
+                                  text: 'POM',
+                                  width: 75
+                              },
+                        this.pomnameField,
+                        {
+                          xtype: 'browsebutton',
+                          text: 'Browse...',
+                          columnWidth: .2,
+                          setSize: function() {}, // column layout requires setSize()
+                          uploadPanel: this,
+                          handler: function( b ) {
+                            b.uploadPanel.pomInput = b.detachInputFile(); 
+                            var filename = b.uploadPanel.pomInput.getValue();
+                            b.uploadPanel.pomnameField.setRawValue( filename );
+                            b.uploadPanel.updateUploadButton( b.uploadPanel );
+                          }
+                        }
+                      ]
+                 },
+                 {
+                   xtype: 'textfield',
+                   fieldLabel: 'Classifier',
+                   helpText: ht.classifier,
+                   anchor: Sonatype.view.FIELD_OFFSET,
+                   name: 'pomc',
+                   allowBlank:true
+                 },
+                 {
+                   xtype: 'textfield',
+                   fieldLabel: 'Extension',
+                   helpText: ht.extension,
+                   anchor: Sonatype.view.FIELD_OFFSET,
+                   name: 'pome',
+                   allowBlank:true
+                 }
+               ] 
         },
         {
           xtype: 'fieldset',
@@ -153,6 +187,14 @@ Sonatype.repoServer.FileUploadPanel = function(config){
               helpText: ht.classifier,
               anchor: Sonatype.view.FIELD_OFFSET,
               name: 'c',
+              allowBlank:true
+            },
+            {
+              xtype: 'textfield',
+              fieldLabel: 'Extension',
+              helpText: ht.extension,
+              anchor: Sonatype.view.FIELD_OFFSET,
+              name: 'e',
               allowBlank:true
             }
           ]
@@ -356,7 +398,19 @@ Ext.extend(Sonatype.repoServer.FileUploadPanel, Ext.FormPanel, {
               type: 'hidden',
               name: 'hasPom',
               value: 'true'
-            }
+            },
+            {
+                tag: 'input',
+                type: 'hidden',
+                name: 'c',
+                value: this.form.findField( 'pomc' ).getValue()
+              },
+              {
+                tag: 'input',
+                type: 'hidden',
+                name: 'e',
+                value: this.form.findField( 'pome' ).getValue()
+              }
           ]
         :
           [
@@ -391,6 +445,12 @@ Ext.extend(Sonatype.repoServer.FileUploadPanel, Ext.FormPanel, {
               type: 'hidden',
               name: 'c',
               value: this.form.findField( 'c' ).getValue()
+            },
+            {
+              tag: 'input',
+              type: 'hidden',
+              name: 'e',
+              value: this.form.findField( 'e' ).getValue()
             }
           ]
     });

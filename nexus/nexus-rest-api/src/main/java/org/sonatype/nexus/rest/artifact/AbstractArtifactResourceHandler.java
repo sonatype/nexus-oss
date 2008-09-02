@@ -30,6 +30,7 @@ import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileItemFactory;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
+import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.restlet.Context;
 import org.restlet.data.Form;
@@ -74,7 +75,7 @@ public class AbstractArtifactResourceHandler
      * @return
      */
     protected ArtifactStoreRequest getResourceStoreRequest( boolean localOnly, String repositoryId,
-        String repositoryGroupId, String g, String a, String v, String p, String c )
+        String repositoryGroupId, String g, String a, String v, String p, String c, String e )
     {
         ArtifactStoreRequest result = new ArtifactStoreRequest(
             localOnly,
@@ -84,7 +85,8 @@ public class AbstractArtifactResourceHandler
             a,
             v,
             p,
-            c );
+            c,
+            e );
 
         if ( getLogger().isLoggable( Level.FINE ) )
         {
@@ -144,7 +146,8 @@ public class AbstractArtifactResourceHandler
             artifactId,
             version,
             null,
-            null );
+            null,
+            null);
 
         try
         {
@@ -244,6 +247,8 @@ public class AbstractArtifactResourceHandler
         String classifier = form.getFirstValue( "c" );
 
         String repositoryId = form.getFirstValue( "r" );
+        
+        String extension = form.getFirstValue( "e" );
 
         if ( groupId == null || artifactId == null || version == null || repositoryId == null )
         {
@@ -260,7 +265,8 @@ public class AbstractArtifactResourceHandler
             artifactId,
             version,
             packaging,
-            classifier );
+            classifier,
+            extension );
 
         try
         {
@@ -379,6 +385,8 @@ public class AbstractArtifactResourceHandler
                     String classifier = null;
 
                     String packaging = null;
+                    
+                    String extension = null;
 
                     PomArtifactManager pomManager = new PomArtifactManager( getNexus()
                         .getNexusConfiguration().getTemporaryDirectory() );
@@ -412,6 +420,10 @@ public class AbstractArtifactResourceHandler
                             {
                                 classifier = fi.getString();
                             }
+                            else if ( "e".equals( fi.getFieldName() ) )
+                            {
+                                extension = fi.getString();
+                            }
                             else if ( "hasPom".equals( fi.getFieldName() ) )
                             {
                                 hasPom = Boolean.parseBoolean( fi.getString() );
@@ -425,15 +437,16 @@ public class AbstractArtifactResourceHandler
                             ArtifactStoreRequest gavRequest;
 
                             if ( hasPom )
-                            {
+                            {                                
                                 if ( isPom )
                                 {
                                     pomManager.storeTempPomFile( fi.getInputStream() );
 
                                     is = pomManager.getTempPomFileInputStream();
+                                    
                                 }
                                 else
-                                {
+                                {   
                                     is = fi.getInputStream();
                                 }
 
@@ -448,7 +461,25 @@ public class AbstractArtifactResourceHandler
                                     "A",
                                     "V",
                                     "P",
-                                    "C" ) );
+                                    null,
+                                    null ) );
+                                
+                                if ( !isPom )
+                                {
+                                    
+                                    // Can't retrieve these details from the pom, so we must expect the user to provide them
+                                    // If now, the classifier will not be appended, and we will use the extension mapped from 
+                                    // the packaging type in the pom (or the packaging type provided
+                                    if ( !StringUtils.isEmpty( extension ) )
+                                    {
+                                        gavRequest.setExtension( extension );
+                                    }
+                                    
+                                    if ( !StringUtils.isEmpty( classifier ) )
+                                    {
+                                        gavRequest.setClassifier( classifier );
+                                    }
+                                }
                             }
                             else
                             {
@@ -462,7 +493,8 @@ public class AbstractArtifactResourceHandler
                                     artifactId,
                                     version,
                                     packaging,
-                                    classifier );
+                                    classifier,
+                                    extension );
                             }
 
                             try

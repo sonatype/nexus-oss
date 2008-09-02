@@ -247,7 +247,8 @@ Sonatype.repoServer.referenceData = {
     a : "",
     v : "",
     p : "",
-    c : ""
+    c : "",
+    e : ""
   },
   
   users : {

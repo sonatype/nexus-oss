@@ -207,7 +207,7 @@ public class ArtifactStoreHelper
         }
 
         Gav gav = new Gav( gavRequest.getGroupId(), gavRequest.getArtifactId(), gavRequest.getVersion(), gavRequest
-            .getClassifier(), repository.getArtifactPackagingMapper().getExtensionForPackaging(
+            .getClassifier(), gavRequest.getExtension() != null ? gavRequest.getExtension() : repository.getArtifactPackagingMapper().getExtensionForPackaging(
             gavRequest.getPackaging() ), null, null, null, RepositoryPolicy.SNAPSHOT.equals( repository
             .getRepositoryPolicy() ), false, null, false, null );
 
@@ -226,8 +226,9 @@ public class ArtifactStoreHelper
     {
         checkRequest( gavRequest );
 
-        Gav pomGav = new Gav( gavRequest.getGroupId(), gavRequest.getArtifactId(), gavRequest.getVersion(), gavRequest
-            .getClassifier(), "pom", null, null, null, RepositoryPolicy.SNAPSHOT.equals( repository
+        // Force classifier to null, as the pom shouldn't have a classifier
+        Gav pomGav = new Gav( gavRequest.getGroupId(), gavRequest.getArtifactId(), gavRequest.getVersion(), null, 
+            "pom", null, null, null, RepositoryPolicy.SNAPSHOT.equals( repository
             .getRepositoryPolicy() ), false, null, false, null );
 
         try
@@ -289,7 +290,9 @@ public class ArtifactStoreHelper
             gavRequest.getArtifactId(),
             gavRequest.getVersion(),
             gavRequest.getClassifier(),
-            repository.getArtifactPackagingMapper().getExtensionForPackaging( gavRequest.getPackaging() ),
+            gavRequest.getExtension() != null ?
+                gavRequest.getExtension() :
+                repository.getArtifactPackagingMapper().getExtensionForPackaging( gavRequest.getPackaging() ),
             null,
             null,
             null,

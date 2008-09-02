@@ -189,7 +189,8 @@ Sonatype.repoServer.resources.help = {
     artifactId: 'Maven artifact ID',
     version: 'Artifact version',
     packaging: 'Packaging type',
-    classifier: 'Classifier (optional)'
+    classifier: 'Classifier of the uploaded artifact.  If not supplied, no classifier will be appended to the artifact.',
+    extension: 'Extension of the uploaded artifact.  If not supplied, the default extension (derived from the packaging type) will be used.'
   },
   
   cronBigHelp: {

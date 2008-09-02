@@ -35,9 +35,11 @@ public class ArtifactStoreRequest
     private String packaging;
 
     private String classifier;
+    
+    private String extension;
 
     public ArtifactStoreRequest( boolean localOnly, String repositoryId, String repositoryGroupId, String g, String a,
-        String v, String p, String c )
+        String v, String p, String c, String e )
     {
         super( "GAV", localOnly, repositoryId, repositoryGroupId );
 
@@ -69,16 +71,25 @@ public class ArtifactStoreRequest
         {
             setClassifier( null );
         }
+        
+        if ( !StringUtils.isEmpty( e ) )
+        {
+            setExtension( e );
+        }
+        else
+        {
+            setExtension( null );
+        }
     }
 
     public ArtifactStoreRequest( String g, String a, String v, String p, String c )
     {
-        this( false, null, null, g, a, v, p, c );
+        this( false, null, null, g, a, v, p, c, null );
     }
 
     public ArtifactStoreRequest( String g, String a, String v )
     {
-        this( false, null, null, g, a, v, null, null );
+        this( false, null, null, g, a, v, null, null, null );
     }
 
     public String getGroupId()
@@ -130,6 +141,16 @@ public class ArtifactStoreRequest
     {
         this.classifier = classifier;
     }
+    
+    public String getExtension()
+    {
+        return extension;
+    }
+    
+    public void setExtension( String extension )
+    {
+        this.extension = extension;
+    }
 
     public String toString()
     {
@@ -142,6 +163,8 @@ public class ArtifactStoreRequest
         sb.append( getClassifier() );
         sb.append( ":" );
         sb.append( getVersion() );
+        sb.append( ":" );
+        sb.append( getExtension() );
 
         return sb.toString();
     }
