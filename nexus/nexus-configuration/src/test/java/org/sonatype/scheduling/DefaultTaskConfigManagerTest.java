@@ -202,7 +202,7 @@ public class DefaultTaskConfigManagerTest
         else if ( SCHEDULE_TYPE_WEEKLY.equals( type ) )
         {
             Set<Integer> daysToRun = new HashSet<Integer>();
-            daysToRun.add( new Integer( 0 ) );
+            daysToRun.add( new Integer( 1 ) );
             return new WeeklySchedule( (Date) properties.get( PROPERTY_KEY_START_DATE ), (Date) properties
                 .get( PROPERTY_KEY_END_DATE ), daysToRun );
         }

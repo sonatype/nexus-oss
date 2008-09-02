@@ -277,31 +277,31 @@ public class AbstractScheduledServiceResourceHandler
         {
             if ( "sunday".equals( day ) )
             {
-                set.add( new Integer( 0 ) );
+                set.add( new Integer( 1 ) );
             }
             else if ( "monday".equals( day ) )
             {
-                set.add( new Integer( 1 ) );
+                set.add( new Integer( 2 ) );
             }
             else if ( "tuesday".equals( day ) )
             {
-                set.add( new Integer( 2 ) );
+                set.add( new Integer( 3 ) );
             }
             else if ( "wednesday".equals( day ) )
             {
-                set.add( new Integer( 3 ) );
+                set.add( new Integer( 4 ) );
             }
             else if ( "thursday".equals( day ) )
             {
-                set.add( new Integer( 4 ) );
+                set.add( new Integer( 5 ) );
             }
             else if ( "friday".equals( day ) )
             {
-                set.add( new Integer( 5 ) );
+                set.add( new Integer( 6 ) );
             }
             else if ( "saturday".equals( day ) )
             {
-                set.add( new Integer( 6 ) );
+                set.add( new Integer( 7 ) );
             }
         }
 
