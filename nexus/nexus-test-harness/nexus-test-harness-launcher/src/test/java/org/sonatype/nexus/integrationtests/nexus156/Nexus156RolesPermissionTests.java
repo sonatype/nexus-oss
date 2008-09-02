@@ -11,6 +11,9 @@ import org.sonatype.nexus.integrationtests.AbstractPrivilegeTest;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.rest.model.RoleResource;
 
+/**
+ * Test the privileges for CRUD operations.
+ */
 public class Nexus156RolesPermissionTests extends AbstractPrivilegeTest
 {
     

@@ -19,6 +19,9 @@ import org.sonatype.nexus.test.utils.SecurityConfigUtil;
 
 import com.thoughtworks.xstream.XStream;
 
+/**
+ * Extra CRUD validation tests.
+ */
 public class Nexus233PrivilegesValidationTests
     extends AbstractNexusIntegrationTest
 {

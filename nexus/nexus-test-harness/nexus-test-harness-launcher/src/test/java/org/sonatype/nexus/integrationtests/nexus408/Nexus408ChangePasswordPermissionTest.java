@@ -7,6 +7,9 @@ import org.sonatype.nexus.integrationtests.AbstractPrivilegeTest;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.test.utils.ChangePasswordUtils;
 
+/**
+ * Test the privilege for changing a users password..
+ */
 public class Nexus408ChangePasswordPermissionTest
     extends AbstractPrivilegeTest
 {

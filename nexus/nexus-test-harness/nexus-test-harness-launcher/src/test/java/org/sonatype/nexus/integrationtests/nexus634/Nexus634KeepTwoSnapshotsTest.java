@@ -8,7 +8,7 @@ import junit.framework.Assert;
 import org.junit.Test;
 
 /**
- * @description Test SnapshotRemoverTask to remove old artifacts but keep updated artifacts
+ * Test SnapshotRemoverTask to remove old artifacts but keep updated artifacts
  * @author marvin
  */
 public class Nexus634KeepTwoSnapshotsTest

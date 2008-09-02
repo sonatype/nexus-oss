@@ -21,6 +21,9 @@ import org.sonatype.nexus.test.utils.SecurityConfigUtil;
 
 import com.thoughtworks.xstream.XStream;
 
+/**
+ * CRUD tests for XML request/response.
+ */
 public class Nexus233PrivilegesCrudXMLTests
     extends AbstractNexusIntegrationTest
 {

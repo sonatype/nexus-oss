@@ -32,6 +32,9 @@ import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.test.utils.DeployUtils;
 
+/**
+ * Test the privilege for CRUD operations.
+ */
 public class Nexus477ArtifactsCrudTests
     extends AbstractPrivilegeTest
 {

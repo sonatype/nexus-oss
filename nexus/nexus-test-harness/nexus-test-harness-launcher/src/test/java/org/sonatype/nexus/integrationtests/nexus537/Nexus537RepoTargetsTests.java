@@ -25,6 +25,9 @@ import org.sonatype.nexus.rest.model.RepositoryTargetResource;
 import org.sonatype.nexus.test.utils.DeployUtils;
 import org.sonatype.nexus.test.utils.MavenDeployer;
 
+/**
+ * Creates a few repo targets and make sure the privileges work correctly.
+ */
 public class Nexus537RepoTargetsTests
     extends AbstractPrivilegeTest
 {

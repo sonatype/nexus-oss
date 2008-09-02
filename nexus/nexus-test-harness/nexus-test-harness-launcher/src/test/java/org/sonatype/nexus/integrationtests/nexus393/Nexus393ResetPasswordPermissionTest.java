@@ -6,6 +6,9 @@ import org.restlet.data.Response;
 import org.sonatype.nexus.integrationtests.AbstractPrivilegeTest;
 import org.sonatype.nexus.integrationtests.TestContainer;
 
+/**
+ * Test the privilege for password reset.
+ */
 public class Nexus393ResetPasswordPermissionTest
     extends AbstractPrivilegeTest
 {

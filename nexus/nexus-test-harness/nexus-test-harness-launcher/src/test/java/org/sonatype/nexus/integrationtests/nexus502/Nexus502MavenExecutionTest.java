@@ -16,6 +16,9 @@ import org.sonatype.nexus.test.utils.UserMessageUtil;
 
 import com.thoughtworks.xstream.XStream;
 
+/**
+ * Put a bunch of artifacts in a repo, and then run a maven project to download them 
+ */
 public class Nexus502MavenExecutionTest
     extends AbstractMavenNexusIT
 {

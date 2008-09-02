@@ -21,6 +21,9 @@ import org.sonatype.nexus.test.utils.NexusConfigUtil;
 
 import com.thoughtworks.xstream.XStream;
 
+/**
+ * CRUD tests for XML request/response.
+ */
 public class Nexus532GroupsCrudXmlTests extends AbstractNexusIntegrationTest
 {
     protected GroupMessageUtil messageUtil;

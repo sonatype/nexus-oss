@@ -13,6 +13,9 @@ import org.sonatype.nexus.rest.model.RepositoryRouteMemberRepository;
 import org.sonatype.nexus.rest.model.RepositoryRouteResource;
 import org.sonatype.nexus.rest.model.RoleResource;
 
+/**
+ * Test the privilege for CRUD operations.
+ */
 public class Nexus385RoutesPermissionTests extends AbstractPrivilegeTest
 {
     

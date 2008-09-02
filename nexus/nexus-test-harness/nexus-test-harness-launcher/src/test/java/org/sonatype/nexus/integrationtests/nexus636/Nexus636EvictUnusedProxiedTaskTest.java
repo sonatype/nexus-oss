@@ -1,6 +1,7 @@
 package org.sonatype.nexus.integrationtests.nexus636;
 
 import java.io.File;
+import java.util.Arrays;
 
 import junit.framework.Assert;
 
@@ -11,6 +12,9 @@ import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 
+/**
+ * Tests evict task.
+ */
 public class Nexus636EvictUnusedProxiedTaskTest
     extends AbstractNexusIntegrationTest
 {
@@ -43,7 +47,7 @@ public class Nexus636EvictUnusedProxiedTaskTest
         executeTask( "clearProxy", "repo_release-proxy-repo-1", 0 );
 
         File[] files = repositoryPath.listFiles();
-        Assert.assertEquals( "All files should be delete from repository", 0, files.length );
+        Assert.assertEquals( "All files should be delete from repository:\n"+ Arrays.asList( files ), 0, files.length );
     }
 
     @Test

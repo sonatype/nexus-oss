@@ -14,6 +14,9 @@ import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.test.utils.DeployUtils;
 
+/**
+ * Deploys a snapshot artifact using a wagon and REST (both gav and pom) REST should fail 
+ */
 public class Nexus259SnapshotDeployTest
     extends AbstractNexusIntegrationTest
 {

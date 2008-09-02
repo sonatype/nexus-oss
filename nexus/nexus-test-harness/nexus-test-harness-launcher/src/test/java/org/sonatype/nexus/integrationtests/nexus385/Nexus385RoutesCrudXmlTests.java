@@ -17,6 +17,9 @@ import org.sonatype.nexus.test.utils.RoutesMessageUtil;
 
 import com.thoughtworks.xstream.XStream;
 
+/**
+ * CRUD tests for XML request/response.
+ */
 public class Nexus385RoutesCrudXmlTests
     extends AbstractNexusIntegrationTest
 {

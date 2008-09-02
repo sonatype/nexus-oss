@@ -20,6 +20,9 @@ import org.sonatype.plexus.rest.xstream.json.JsonOrgHierarchicalStreamDriver;
 
 import com.thoughtworks.xstream.XStream;
 
+/**
+ * CRUD tests for JSON request/response.
+ */
 public class Nexus156RolesCrudJsonTests
     extends AbstractNexusIntegrationTest
 {

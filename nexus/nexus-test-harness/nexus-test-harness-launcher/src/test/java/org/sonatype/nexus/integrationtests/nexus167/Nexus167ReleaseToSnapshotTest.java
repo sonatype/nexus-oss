@@ -18,6 +18,10 @@ import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.test.utils.DeployUtils;
 import org.sonatype.nexus.test.utils.FileTestingUtils;
 
+
+/**
+ * Deploy a release artifact to a snapshot repo.  (should fail) 
+ */
 public class Nexus167ReleaseToSnapshotTest
     extends AbstractNexusIntegrationTest
 {

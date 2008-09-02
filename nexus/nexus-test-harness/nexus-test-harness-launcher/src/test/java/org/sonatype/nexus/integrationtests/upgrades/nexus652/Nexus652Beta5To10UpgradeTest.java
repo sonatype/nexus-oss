@@ -10,6 +10,9 @@ import org.sonatype.nexus.test.utils.NexusConfigUtil;
 import org.sonatype.nexus.test.utils.SecurityConfigUtil;
 import org.sonatype.nexus.test.utils.TestProperties;
 
+/**
+ * Test nexus.xml after and upgrade from 1.0.0-beta-5 to 1.0.0.
+ */
 public class Nexus652Beta5To10UpgradeTest
     extends AbstractNexusIntegrationTest
 {

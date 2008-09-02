@@ -12,6 +12,9 @@ import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 
+/**
+ * Tests empty trash task.
+ */
 public class Nexus643EmptyTrashTaskTest
     extends AbstractNexusIntegrationTest
 {

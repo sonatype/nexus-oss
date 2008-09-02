@@ -16,6 +16,10 @@ import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.test.utils.DeployUtils;
 
+
+/**
+ * Tests for 400 when uploading to a non-existing repository.
+ */
 public class Nexus176DeployToInvalidRepoTest
     extends AbstractNexusIntegrationTest
 {

@@ -19,6 +19,10 @@ import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.integrationtests.proxy.AbstractNexusProxyIntegrationTest;
 import org.sonatype.nexus.test.utils.FileTestingUtils;
 
+/**
+ * Create an http server. Create a proxy repo to http server. Access a file from http server. Stop http server. access
+ * file again (should work.) Clear cache and try it again.
+ */
 public class Nexus179RemoteRepoDownTest
     extends AbstractNexusProxyIntegrationTest
 {
@@ -36,13 +40,13 @@ public class Nexus179RemoteRepoDownTest
     {
         // stop the proxy
         this.stopProxy();
-        
+
         // delete everything under this tests group id
         this.deleteFromRepository( "nexus179/" );
-        
+
         Gav gav =
-            new Gav( this.getTestId(), "repo-down-test-artifact", "1.0.0", null, "xml", 0,
-                     new Date().getTime(), "Simple Test Artifact", false, false, null, false, null );
+            new Gav( this.getTestId(), "repo-down-test-artifact", "1.0.0", null, "xml", 0, new Date().getTime(),
+                     "Simple Test Artifact", false, false, null, false, null );
 
         File localFile = this.getLocalFile( TEST_RELEASE_REPO, gav );
 
@@ -57,7 +61,6 @@ public class Nexus179RemoteRepoDownTest
         catch ( FileNotFoundException e )
         {
         }
-        
 
         // Start up the proxy
         this.startProxy();
@@ -71,21 +74,22 @@ public class Nexus179RemoteRepoDownTest
         catch ( FileNotFoundException e )
         {
         }
-        
+
         clearProxyCache();
-        
-        //Give task a chance to run
+
+        // Give task a chance to run
         Thread.sleep( 4000 );
 
         // unblock the proxy
-        this.setBlockProxy( this.getBaseNexusUrl(), TEST_RELEASE_REPO, false);
+        this.setBlockProxy( this.getBaseNexusUrl(), TEST_RELEASE_REPO, false );
 
         File artifact = this.downloadArtifact( gav, "target/downloads" );
 
         Assert.assertTrue( FileTestingUtils.compareFileSHA1s( artifact, localFile ) );
     }
 
-    private void clearProxyCache() throws IOException
+    private void clearProxyCache()
+        throws IOException
     {
 
         String serviceURI = "service/local/data_cache/repositories/" + TEST_RELEASE_REPO + "/content";
@@ -97,6 +101,5 @@ public class Nexus179RemoteRepoDownTest
             Assert.fail( "Could not clear the cache for repo: " + TEST_RELEASE_REPO );
         }
     }
-    
 
 }

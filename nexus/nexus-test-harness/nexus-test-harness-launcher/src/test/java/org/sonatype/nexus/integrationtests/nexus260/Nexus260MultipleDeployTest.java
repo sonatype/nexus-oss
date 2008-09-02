@@ -10,6 +10,9 @@ import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.test.utils.DeployUtils;
 import org.sonatype.nexus.test.utils.FileTestingUtils;
 
+/**
+ * Deploys an artifact multiple times. (this is allowed)  
+ */
 public class Nexus260MultipleDeployTest
     extends AbstractNexusIntegrationTest
 {

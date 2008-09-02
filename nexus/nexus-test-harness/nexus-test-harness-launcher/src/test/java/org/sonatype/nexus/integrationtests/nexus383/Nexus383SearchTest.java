@@ -15,6 +15,9 @@ import org.sonatype.nexus.test.utils.DeployUtils;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
 import org.sonatype.nexus.test.utils.SearchMessageUtil;
 
+/**
+ * Test Search operations.
+ */
 public class Nexus383SearchTest
     extends AbstractNexusIntegrationTest
 {

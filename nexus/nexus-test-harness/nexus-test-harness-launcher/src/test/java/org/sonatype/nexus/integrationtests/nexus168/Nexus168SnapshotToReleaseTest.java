@@ -17,6 +17,10 @@ import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.test.utils.DeployUtils;
 
+
+/**
+ * Deploy a snapshot artifact to a release repo. (should fail) 
+ */
 public class Nexus168SnapshotToReleaseTest
     extends AbstractNexusIntegrationTest
 {

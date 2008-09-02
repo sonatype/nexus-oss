@@ -11,6 +11,9 @@ import org.sonatype.nexus.integrationtests.TestContainer;
 
 import com.icegreen.greenmail.util.GreenMailUtil;
 
+/**
+ * Test forgot password system.  Check if nexus is sending the e-mail. 
+ */
 public class Nexus394ForgotPasswordTest
     extends AbstractEmailServerNexusIT
 {

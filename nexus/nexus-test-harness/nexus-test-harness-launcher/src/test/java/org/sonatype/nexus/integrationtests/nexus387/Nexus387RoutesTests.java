@@ -12,6 +12,9 @@ import org.junit.Test;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 
+/**
+ * Blocking, Exclusive, Inclusive Routes Tests
+ */
 public class Nexus387RoutesTests
     extends AbstractNexusIntegrationTest
 {

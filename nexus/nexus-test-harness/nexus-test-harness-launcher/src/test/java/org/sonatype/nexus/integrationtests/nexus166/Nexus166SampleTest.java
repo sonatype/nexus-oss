@@ -11,6 +11,9 @@ import org.junit.Test;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 
 
+/**
+ * A sample test and a good starting point: <a href='https://docs.sonatype.com/display/NX/Nexus+Test-Harness'>Nexus Test-Harness</a>
+ */
 public class Nexus166SampleTest extends AbstractNexusIntegrationTest
 {
 

@@ -10,6 +10,9 @@ import org.sonatype.nexus.integrationtests.proxy.AbstractNexusProxyIntegrationTe
 import org.sonatype.nexus.test.utils.FileTestingUtils;
 
 
+/**
+ * One step above the Sample Test, this one adds a 'remote repository': <a href='https://docs.sonatype.com/display/NX/Nexus+Test-Harness'>Nexus Test-Harness</a>
+ */
 public class Nexus262SimpleProxyTest extends AbstractNexusProxyIntegrationTest
 {
 

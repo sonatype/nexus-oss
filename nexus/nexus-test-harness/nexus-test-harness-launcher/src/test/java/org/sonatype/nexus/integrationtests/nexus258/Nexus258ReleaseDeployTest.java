@@ -16,6 +16,10 @@ import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.test.utils.DeployUtils;
 import org.sonatype.nexus.test.utils.FileTestingUtils;
 
+
+/**
+ * Deploys a release artifact using a wagon and REST (both gav and pom) 
+ */
 public class Nexus258ReleaseDeployTest
     extends AbstractNexusIntegrationTest
 {

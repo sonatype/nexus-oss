@@ -9,6 +9,9 @@ import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 
+/**
+ * Tests the rebuild repository attributes task.
+ */
 public class Nexus640RebuildRepositoryAttributesTaskTest
     extends AbstractNexusIntegrationTest
 {

@@ -12,6 +12,9 @@ import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.integrationtests.AbstractPrivilegeTest;
 import org.sonatype.nexus.test.utils.MavenDeployer;
 
+/**
+ * Test deploying artifacts using the wrong password. (expected to fail)
+ */
 public class Nexus174ReleaseDeployWrongPassword
     extends AbstractPrivilegeTest
 {

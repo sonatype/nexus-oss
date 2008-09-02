@@ -22,6 +22,9 @@ import com.sun.syndication.io.FeedException;
 import com.sun.syndication.io.SyndFeedInput;
 import com.sun.syndication.io.XmlReader;
 
+/**
+ * Tests for deployment entries in feeds.
+ */
 public class Nexus526FeedsTests
     extends AbstractNexusIntegrationTest
 {

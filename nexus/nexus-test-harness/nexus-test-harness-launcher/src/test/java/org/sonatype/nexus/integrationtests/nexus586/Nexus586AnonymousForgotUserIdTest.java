@@ -6,6 +6,9 @@ import org.restlet.data.Status;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.nexus395.ForgotUsernameUtils;
 
+/**
+ * Saving the Nexus config needs to validate the anonymous user information 
+ */
 public class Nexus586AnonymousForgotUserIdTest
     extends AbstractNexusIntegrationTest
 {

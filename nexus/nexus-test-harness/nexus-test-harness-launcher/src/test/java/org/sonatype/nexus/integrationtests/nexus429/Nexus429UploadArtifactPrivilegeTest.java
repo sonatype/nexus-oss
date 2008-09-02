@@ -12,6 +12,9 @@ import org.sonatype.nexus.integrationtests.AbstractPrivilegeTest;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.test.utils.DeployUtils;
 
+/**
+ * Test the privilege for manual artifact upload.
+ */
 public class Nexus429UploadArtifactPrivilegeTest
     extends AbstractPrivilegeTest
 {

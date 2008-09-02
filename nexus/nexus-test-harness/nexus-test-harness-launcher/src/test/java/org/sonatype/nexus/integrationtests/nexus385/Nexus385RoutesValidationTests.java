@@ -16,6 +16,9 @@ import org.sonatype.nexus.test.utils.RoutesMessageUtil;
 
 import com.thoughtworks.xstream.XStream;
 
+/**
+ * Extra CRUD validation tests.
+ */
 public class Nexus385RoutesValidationTests
     extends AbstractNexusIntegrationTest
 {

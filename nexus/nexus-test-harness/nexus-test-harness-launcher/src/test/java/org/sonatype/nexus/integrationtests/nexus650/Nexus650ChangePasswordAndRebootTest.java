@@ -9,6 +9,9 @@ import org.sonatype.nexus.integrationtests.TestContext;
 import org.sonatype.nexus.test.utils.ChangePasswordUtils;
 import org.sonatype.nexus.test.utils.NexusStateUtil;
 
+/**
+ * Changes users password, restarts nexus, and verify password is correct.
+ */
 public class Nexus650ChangePasswordAndRebootTest
     extends AbstractPrivilegeTest
 {

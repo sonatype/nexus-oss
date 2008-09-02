@@ -14,8 +14,8 @@ import org.sonatype.nexus.test.utils.SearchMessageUtil;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 
 /**
+ * Test task Reindex Repositories.
  * @author marvin
- * @description Test task Reindex Repositories
  */
 public class Nexus641ReindexTaskTest
     extends AbstractNexusIntegrationTest

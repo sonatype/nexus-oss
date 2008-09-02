@@ -8,6 +8,10 @@ import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.rest.model.GlobalConfigurationResource;
 
+
+/**
+ * Saving the Nexus config needs to validate the anonymous user information 
+ */
 public class Nexus586ValidateConfigurationTest
     extends AbstractNexusIntegrationTest
 {

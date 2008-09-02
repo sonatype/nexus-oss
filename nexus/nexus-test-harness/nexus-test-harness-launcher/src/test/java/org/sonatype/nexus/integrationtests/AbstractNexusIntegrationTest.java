@@ -651,6 +651,11 @@ public class AbstractNexusIntegrationTest
     {
         return baseNexusUrl + REPOSITORY_RELATIVE_URL + testRepositoryId + "/";
     }
+    
+    public String getNexusTestRepoServiceUrl()
+    {
+        return baseNexusUrl + "service/local/repositories/"+ testRepositoryId +"/content/";
+    }
 
     public PlexusContainer getContainer()
     {

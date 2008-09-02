@@ -21,6 +21,10 @@ import org.sonatype.plexus.rest.xstream.json.JsonOrgHierarchicalStreamDriver;
 import com.icegreen.greenmail.util.GreenMailUtil;
 import com.thoughtworks.xstream.XStream;
 
+/**
+ * Using admin account create a new user. Then check for new user creation confirmation e-mail and password. Login and
+ * change password. Confirm if it can login.
+ */
 public class Nexus450UserCreationTest
     extends AbstractEmailServerNexusIT
 {

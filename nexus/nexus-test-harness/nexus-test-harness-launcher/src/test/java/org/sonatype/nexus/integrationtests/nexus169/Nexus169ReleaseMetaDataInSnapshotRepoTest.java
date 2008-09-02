@@ -17,6 +17,9 @@ import org.junit.Test;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 
+/**
+ * Adds metadata in a snapshot repo, then checks to see if it was not changed ( future version of nexus may clean metadata on the fly.) 
+ */
 public class Nexus169ReleaseMetaDataInSnapshotRepoTest
     extends AbstractNexusIntegrationTest
 {

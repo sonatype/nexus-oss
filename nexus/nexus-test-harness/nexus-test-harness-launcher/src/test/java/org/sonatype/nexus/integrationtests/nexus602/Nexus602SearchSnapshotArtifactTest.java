@@ -12,6 +12,9 @@ import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 
+/**
+ * Test snapshot search results can be downloaded.
+ */
 public class Nexus602SearchSnapshotArtifactTest
     extends AbstractNexusIntegrationTest
 {

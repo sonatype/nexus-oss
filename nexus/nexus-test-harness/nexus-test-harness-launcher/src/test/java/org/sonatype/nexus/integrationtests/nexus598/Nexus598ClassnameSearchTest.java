@@ -10,6 +10,9 @@ import org.sonatype.nexus.rest.model.NexusArtifact;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
 import org.sonatype.nexus.test.utils.SearchMessageUtil;
 
+/**
+ * Test class name search functionality.
+ */
 public class Nexus598ClassnameSearchTest
     extends AbstractNexusIntegrationTest
 {

@@ -6,6 +6,9 @@ import org.restlet.data.Status;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.test.utils.ChangePasswordUtils;
 
+/**
+ * Saving the Nexus config needs to validate the anonymous user information 
+ */
 public class Nexus586AnonymousChangePasswordTest
     extends AbstractNexusIntegrationTest
 {

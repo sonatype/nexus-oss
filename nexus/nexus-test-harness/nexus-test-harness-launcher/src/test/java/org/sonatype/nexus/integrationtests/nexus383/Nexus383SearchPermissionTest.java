@@ -11,6 +11,9 @@ import org.sonatype.nexus.integrationtests.nexus586.Nexus586AnonymousResetPasswo
 import org.sonatype.nexus.rest.model.NexusArtifact;
 import org.sonatype.nexus.test.utils.SearchMessageUtil;
 
+/**
+ * Test the privilege for search operations.
+ */
 public class Nexus383SearchPermissionTest
     extends AbstractPrivilegeTest
 {

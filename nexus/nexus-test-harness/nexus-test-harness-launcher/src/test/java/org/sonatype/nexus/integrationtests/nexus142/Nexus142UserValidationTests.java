@@ -17,6 +17,9 @@ import org.sonatype.plexus.rest.xstream.json.JsonOrgHierarchicalStreamDriver;
 
 import com.thoughtworks.xstream.XStream;
 
+/**
+ * Extra CRUD validation tests.
+ */
 public class Nexus142UserValidationTests
     extends AbstractNexusIntegrationTest
 {

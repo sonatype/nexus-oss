@@ -9,6 +9,9 @@ import org.sonatype.nexus.test.utils.RoleMessageUtil;
 
 import com.thoughtworks.xstream.XStream;
 
+/**
+ * CRUD tests for XML request/response.
+ */
 public class Nexus156RolesCrudXmlTests
     extends Nexus156RolesCrudJsonTests
 {

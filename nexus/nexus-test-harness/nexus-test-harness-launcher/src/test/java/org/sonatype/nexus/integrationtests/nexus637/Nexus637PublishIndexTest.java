@@ -10,8 +10,10 @@ import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 
 /**
+ * 
+ * Test task Publish Indexes is working.
+ * 
  * @author marvin
- * @description Test task Publish Indexes is working
  */
 public class Nexus637PublishIndexTest
     extends AbstractNexusIntegrationTest

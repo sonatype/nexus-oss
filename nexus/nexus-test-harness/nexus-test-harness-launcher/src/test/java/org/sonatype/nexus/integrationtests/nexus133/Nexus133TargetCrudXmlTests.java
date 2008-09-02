@@ -9,6 +9,9 @@ import org.sonatype.nexus.test.utils.TargetMessageUtil;
 
 import com.thoughtworks.xstream.XStream;
 
+/**
+ * CRUD tests for XML request/response.
+ */
 public class Nexus133TargetCrudXmlTests
     extends Nexus133TargetCrudJsonTests
 {

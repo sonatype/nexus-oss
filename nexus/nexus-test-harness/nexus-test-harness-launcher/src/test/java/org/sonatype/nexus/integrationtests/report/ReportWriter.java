@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
+import org.codehaus.plexus.util.StringUtils;
 import org.junit.Test;
 
 import com.thoughtworks.qdox.JavaDocBuilder;
@@ -36,12 +37,20 @@ public class ReportWriter
         List<JavaClass> testClasses = new ArrayList<JavaClass>();
         JavaClass[] classes = builder.getClasses();
 
+        List<JavaClass> classesWithoutDescriptions = new ArrayList<JavaClass>();
+
         for ( int ii = 0; ii < classes.length; ii++ )
         {
             JavaClass javaClass = classes[ii];
-            if ( classHasMethodWithTestAnnotation( javaClass ) )
+            if ( !javaClass.isAbstract() && classHasMethodWithTestAnnotation( javaClass ) )
             {
                 testClasses.add( javaClass );
+
+                // check if we have a javadoc comment
+                if ( StringUtils.isEmpty( javaClass.getComment() ) )
+                {
+                    classesWithoutDescriptions.add( javaClass );
+                }
             }
         }
 
@@ -65,6 +74,18 @@ public class ReportWriter
 
         // now write the report // TODO: get from container
         new ConsoleWikiReport().writeReport( beans );
+
+        // print errors here.. this should be handled better, but there are no plans for this 'report' anyway.
+        if ( !classesWithoutDescriptions.isEmpty() )
+        {
+            System.err.println( "\n\n\n\nErrors:\n" );
+
+            for ( Iterator<JavaClass> iter = classesWithoutDescriptions.iterator(); iter.hasNext(); )
+            {
+                JavaClass javaClass = (JavaClass) iter.next();
+                System.err.println( javaClass.getName() + " is missing a javadoc comment." );
+            }
+        }
 
     }
 
@@ -158,14 +179,14 @@ public class ReportWriter
         }
 
         // make sure we have something
-        if( sourceDir == null )
+        if ( sourceDir == null )
         {
             System.err.println( "Could not figre out the source dir: nexus-test-harness-launcher/src/test/java" );
         }
-        
+
         // now we can write the report
         new ReportWriter( sourceDir ).writeReport();
-        
+
     }
 
 }

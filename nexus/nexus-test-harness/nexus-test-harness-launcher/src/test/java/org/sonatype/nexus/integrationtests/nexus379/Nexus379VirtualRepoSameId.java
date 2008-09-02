@@ -15,6 +15,10 @@ import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
 
 import com.thoughtworks.xstream.XStream;
 
+
+/**
+ * Test to make sure a Virtual repo cannot have the same Id as an real repository.
+ */
 public class Nexus379VirtualRepoSameId
     extends AbstractNexusIntegrationTest
 {

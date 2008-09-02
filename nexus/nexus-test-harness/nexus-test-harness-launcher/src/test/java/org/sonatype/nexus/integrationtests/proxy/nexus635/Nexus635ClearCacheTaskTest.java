@@ -13,6 +13,9 @@ import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.test.utils.MavenDeployer;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 
+/**
+ * Tests the clear cache task.
+ */
 public class Nexus635ClearCacheTaskTest
     extends AbstractNexusProxyIntegrationTest
 {

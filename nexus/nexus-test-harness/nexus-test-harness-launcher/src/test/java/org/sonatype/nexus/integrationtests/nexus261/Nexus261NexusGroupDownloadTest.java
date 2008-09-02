@@ -33,6 +33,9 @@ import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.test.utils.FileTestingUtils;
 
+/**
+ * Tests to make sure an artifact deployed in multiple repositories will respect the group order. 
+ */
 public class Nexus261NexusGroupDownloadTest
     extends AbstractNexusIntegrationTest
 {

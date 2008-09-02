@@ -9,6 +9,10 @@ import org.sonatype.nexus.integrationtests.AbstractEmailServerNexusIT;
 
 import com.icegreen.greenmail.util.GreenMailUtil;
 
+
+/**
+ * Test password reset.  Check if nexus is sending the e-mail. 
+ */
 public class Nexus393ResetPasswordTest
     extends AbstractEmailServerNexusIT
 {

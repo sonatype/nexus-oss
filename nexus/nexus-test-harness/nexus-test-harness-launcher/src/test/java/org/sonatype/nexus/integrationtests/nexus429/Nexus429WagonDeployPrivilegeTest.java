@@ -27,6 +27,9 @@ import org.sonatype.nexus.test.utils.MavenDeployer;
 
 import com.thoughtworks.xstream.XStream;
 
+/**
+ * Test the privilege wagon style deployments.
+ */
 public class Nexus429WagonDeployPrivilegeTest
     extends AbstractPrivilegeTest
 {
@@ -48,7 +51,7 @@ public class Nexus429WagonDeployPrivilegeTest
             new Gav( this.getTestId(), "artifact", "1.0.0", null, "xml", 0, new Date().getTime(), "", false, false,
                      null, false, null );
         this.setTestRepositoryId(TEST_RELEASE_REPO);
-        this.deployPrivWithWagon( gav );
+        this.deployPrivWithWagon( gav, this.getNexusTestRepoUrl() );
     }
 
     @Test
@@ -61,10 +64,36 @@ public class Nexus429WagonDeployPrivilegeTest
             new Gav( this.getTestId(), "artifact", "1.0.0-SNAPSHOT", null, "xml", 0, new Date().getTime(), "", false,
                      false, null, false, null );
         this.setTestRepositoryId(TEST_SNAPSHOT_REPO);
-        this.deployPrivWithWagon( gav );
+        this.deployPrivWithWagon( gav, this.getNexusTestRepoUrl() );
+    }
+    
+    @Test
+    public void doServicesReleaseArtifactTest()
+        throws IOException, ConnectionException, AuthenticationException, ResourceDoesNotExistException,
+        AuthorizationException, ComponentLookupException, TransferFailedException, InterruptedException,
+        CommandLineException, VerificationException
+    {
+        Gav gav =
+            new Gav( this.getTestId(), "artifact", "1.0.0", null, "xml", 0, new Date().getTime(), "", false, false,
+                     null, false, null );
+        this.setTestRepositoryId(TEST_RELEASE_REPO);
+        this.deployPrivWithWagon( gav, this.getNexusTestRepoServiceUrl() );
     }
 
-    private void deployPrivWithWagon( Gav gav )
+    @Test
+    public void doServicesSnapshotArtifactTest()
+        throws IOException, ConnectionException, AuthenticationException, ResourceDoesNotExistException,
+        AuthorizationException, ComponentLookupException, TransferFailedException, InterruptedException,
+        CommandLineException, VerificationException
+    {
+        Gav gav =
+            new Gav( this.getTestId(), "artifact", "1.0.0-SNAPSHOT", null, "xml", 0, new Date().getTime(), "", false,
+                     false, null, false, null );
+        this.setTestRepositoryId(TEST_SNAPSHOT_REPO);
+        this.deployPrivWithWagon( gav, this.getNexusTestRepoServiceUrl() );
+    }
+
+    private void deployPrivWithWagon( Gav gav, String repoUrl )
         throws IOException, ConnectionException, AuthenticationException, ResourceDoesNotExistException,
         AuthorizationException, ComponentLookupException, TransferFailedException, InterruptedException,
         CommandLineException, VerificationException
@@ -90,7 +119,7 @@ public class Nexus429WagonDeployPrivilegeTest
         try
         {
             verifier =
-                MavenDeployer.deployAndGetVerifier( gav, this.getTestRepositoryId(), fileToDeploy,
+                MavenDeployer.deployAndGetVerifier( gav, repoUrl, fileToDeploy,
                                                     this.getOverridableFile( "settings.xml" ) );
             failTest( verifier );
         }
@@ -110,7 +139,7 @@ public class Nexus429WagonDeployPrivilegeTest
         try
         {
             verifier =
-                MavenDeployer.deployAndGetVerifier( gav, this.getNexusTestRepoUrl(), fileToDeploy,
+                MavenDeployer.deployAndGetVerifier( gav, repoUrl, fileToDeploy,
                                                     this.getOverridableFile( "settings.xml" ) );
             failTest( verifier );
         }
@@ -128,7 +157,7 @@ public class Nexus429WagonDeployPrivilegeTest
 
         // if this fails it will throw an error
         verifier =
-            MavenDeployer.deployAndGetVerifier( gav, this.getNexusTestRepoUrl(), fileToDeploy,
+            MavenDeployer.deployAndGetVerifier( gav, repoUrl, fileToDeploy,
                                                 this.getOverridableFile( "settings.xml" ) );
         verifier.verifyErrorFreeLog();
 
@@ -138,7 +167,7 @@ public class Nexus429WagonDeployPrivilegeTest
         try
         {
             verifier =
-                MavenDeployer.deployAndGetVerifier( gav, this.getNexusTestRepoUrl(), fileToDeploy,
+                MavenDeployer.deployAndGetVerifier( gav, repoUrl, fileToDeploy,
                                                     this.getOverridableFile( "settings.xml" ) );
             failTest( verifier );
         }
@@ -155,7 +184,7 @@ public class Nexus429WagonDeployPrivilegeTest
         TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
         // if this fails it will throw an error
         verifier =
-            MavenDeployer.deployAndGetVerifier( gav, this.getNexusTestRepoUrl(), fileToDeploy,
+            MavenDeployer.deployAndGetVerifier( gav, repoUrl, fileToDeploy,
                                                 this.getOverridableFile( "settings.xml" ) );
         verifier.verifyErrorFreeLog();
 

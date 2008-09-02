@@ -10,6 +10,9 @@ import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.rest.model.NexusArtifact;
 import org.sonatype.nexus.test.utils.SearchMessageUtil;
 
+/**
+ * Searches for artifact that has a '.' and a '-' in the artifact name.
+ */
 public class Nexus384DotAndDashSearchTest
     extends AbstractNexusIntegrationTest
 {

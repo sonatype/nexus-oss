@@ -9,6 +9,9 @@ import org.junit.Test;
 import org.sonatype.nexus.integrationtests.AbstractMavenNexusIT;
 import org.sonatype.nexus.integrationtests.TestContainer;
 
+/**
+ * Tests deploy to nexus using mvn deploy 
+ */
 public class Nexus511MavenDeployTest
     extends AbstractMavenNexusIT
 {

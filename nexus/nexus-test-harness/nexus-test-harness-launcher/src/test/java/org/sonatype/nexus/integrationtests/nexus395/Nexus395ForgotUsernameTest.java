@@ -9,6 +9,10 @@ import org.sonatype.nexus.integrationtests.AbstractEmailServerNexusIT;
 
 import com.icegreen.greenmail.util.GreenMailUtil;
 
+
+/**
+ * Test forgot username system.  Check if nexus is sending the e-mail. 
+ */
 public class Nexus395ForgotUsernameTest
     extends AbstractEmailServerNexusIT
 {

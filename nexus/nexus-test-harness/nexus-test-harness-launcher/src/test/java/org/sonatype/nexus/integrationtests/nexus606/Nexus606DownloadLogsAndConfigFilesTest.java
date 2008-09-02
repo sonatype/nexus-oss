@@ -22,6 +22,9 @@ import org.sonatype.nexus.test.utils.NexusConfigUtil;
 
 import com.thoughtworks.xstream.XStream;
 
+/**
+ * Tests downloading of log and config files.
+ */
 public class Nexus606DownloadLogsAndConfigFilesTest
     extends AbstractNexusIntegrationTest
 {
