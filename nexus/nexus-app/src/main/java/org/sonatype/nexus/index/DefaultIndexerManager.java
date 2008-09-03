@@ -578,7 +578,7 @@ public class DefaultIndexerManager
                              * return VersionUtils.isSnapshot( ai.version ); } } ); } }
                              */
                             getLogger().info(
-                                "Remote indexes published and imported succesfully for repository "
+                                "Remote indexes published and imported successfully for repository "
                                     + repository.getId() );
 
                             hasRemoteIndex = true;

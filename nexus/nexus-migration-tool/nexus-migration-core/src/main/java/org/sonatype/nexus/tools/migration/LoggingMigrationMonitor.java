@@ -78,13 +78,13 @@ public class LoggingMigrationMonitor
         {
             getLogger().info( "MIGRATION SUCCESFUL" );
             getLogger().info( "----------------------------------------" );
-            getLogger().info( "Migration of " + req.getSourceName() + " configuration succesfully finished." );
+            getLogger().info( "Migration of " + req.getSourceName() + " configuration successfully finished." );
         }
         else
         {
             getLogger().info( "MIGRATION FAILED" );
             getLogger().info( "----------------------------------------" );
-            getLogger().error( "Migration of " + req.getSourceName() + " configuration unsuccesful." );
+            getLogger().error( "Migration of " + req.getSourceName() + " configuration unsuccessful." );
             // TODO: print out the messages
             // result.getErrors();
             // result.getMessages();

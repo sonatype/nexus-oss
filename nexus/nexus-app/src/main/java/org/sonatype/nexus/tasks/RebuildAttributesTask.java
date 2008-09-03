@@ -61,15 +61,15 @@ public class RebuildAttributesTask
     {
         if ( getRepositoryGroupId() != null )
         {
-            return "Rebuilding Attributes of repository group with ID=" + getRepositoryGroupId();
+            return "Rebuilding attributes of repository group with ID=" + getRepositoryGroupId();
         }
         else if ( getRepositoryId() != null )
         {
-            return "Rebuilding Attributes of repository with ID=" + getRepositoryId();
+            return "Rebuilding attributes of repository with ID=" + getRepositoryId();
         }
         else
         {
-            return "Rebuilding Attributes of all registered repositories";
+            return "Rebuilding attributes of all registered repositories";
         }
     }
 

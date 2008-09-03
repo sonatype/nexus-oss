@@ -157,7 +157,7 @@ public class SystemProcess
                 }
                 else if ( Status.FINISHED.equals( status ) )
                 {
-                    sb.append( ", finished succesfully on " ).append( finished.toString() );
+                    sb.append( ", finished successfully on " ).append( finished.toString() );
                 }
             }
             else

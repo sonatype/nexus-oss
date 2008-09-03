@@ -133,7 +133,7 @@ public abstract class AbstractSystemFeedSource
             }
             else if ( FeedRecorder.SYSTEM_REBUILDATTRIBUTES_ACTION.equals( item.getAction() ) )
             {
-                entry.setTitle( "Rebuilding Attributes" );
+                entry.setTitle( "Rebuilding attributes" );
             }
             else if ( FeedRecorder.SYSTEM_REPO_LSTATUS_CHANGES_ACTION.equals( item.getAction() ) )
             {

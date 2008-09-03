@@ -636,7 +636,7 @@ public abstract class AbstractRepository
 
     public boolean recreateAttributes( String path, final Map<String, String> initialData )
     {
-        getLogger().info( "Recreating attributes on repository " + getId() );
+        getLogger().info( "Rebuilding attributes on repository " + getId() );
 
         RecreateAttributesWalker walker = new RecreateAttributesWalker( this, getLogger(), initialData );
 
