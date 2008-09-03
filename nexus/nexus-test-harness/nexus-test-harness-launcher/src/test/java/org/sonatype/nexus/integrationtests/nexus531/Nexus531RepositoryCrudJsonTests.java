@@ -11,9 +11,11 @@ import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
 import org.sonatype.nexus.configuration.model.CRepository;
+import org.sonatype.nexus.configuration.model.CRepositoryShadow;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.rest.model.RepositoryListResource;
 import org.sonatype.nexus.rest.model.RepositoryResource;
+import org.sonatype.nexus.rest.repositories.AbstractRepositoryResourceHandler;
 import org.sonatype.nexus.rest.xstream.XStreamInitializer;
 import org.sonatype.nexus.test.utils.NexusConfigUtil;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
@@ -209,17 +211,29 @@ public class Nexus531RepositoryCrudJsonTests
 
             // now check all agaist the the cRepo
             CRepository cRepo = NexusConfigUtil.getRepo( listRepo.getId() );
+            
+            if ( cRepo != null )
+            {
+                Assert.assertEquals( cRepo.getId(), listRepo.getId() );
+                Assert.assertEquals( cRepo.getName(), listRepo.getName() );
+                Assert.assertEquals( cRepo.getType(), listRepo.getFormat() );
+                Assert.assertEquals( cRepo.getRepositoryPolicy(), listRepo.getRepoPolicy() );
 
-            Assert.assertEquals( cRepo.getId(), listRepo.getId() );
-            Assert.assertEquals( cRepo.getName(), listRepo.getName() );
-            Assert.assertEquals( cRepo.getType(), listRepo.getFormat() );
-            Assert.assertEquals( cRepo.getRepositoryPolicy(), listRepo.getRepoPolicy() );
+                log.debug( "cRepo.getRemoteStorage(): " + cRepo.getRemoteStorage() );
+                log.debug( "listRepo.getRemoteUri(): " + listRepo.getRemoteUri() );
 
-            log.debug( "cRepo.getRemoteStorage(): " + cRepo.getRemoteStorage() );
-            log.debug( "listRepo.getRemoteUri(): " + listRepo.getRemoteUri() );
-
-            Assert.assertTrue( ( cRepo.getRemoteStorage() == null && listRepo.getRemoteUri() == null )
-                || ( cRepo.getRemoteStorage().getUrl().equals( listRepo.getRemoteUri() ) ) );
+                Assert.assertTrue( ( cRepo.getRemoteStorage() == null && listRepo.getRemoteUri() == null )
+                    || ( cRepo.getRemoteStorage().getUrl().equals( listRepo.getRemoteUri() ) ) );   
+            }
+            else
+            {
+                CRepositoryShadow cShadow = NexusConfigUtil.getRepoShadow( listRepo.getId() );
+                
+                Assert.assertEquals( cShadow.getId(), listRepo.getId() );
+                Assert.assertEquals( cShadow.getName(), listRepo.getName() );
+                Assert.assertEquals( cShadow.getType(), listRepo.getFormat() );
+                Assert.assertEquals( AbstractRepositoryResourceHandler.REPO_TYPE_VIRTUAL, listRepo.getRepoType() );
+            }
 
         }
 

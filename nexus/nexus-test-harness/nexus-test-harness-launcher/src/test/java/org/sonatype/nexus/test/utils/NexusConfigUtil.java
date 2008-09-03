@@ -1,15 +1,12 @@
 package org.sonatype.nexus.test.utils;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.Writer;
-import java.net.URL;
 import java.util.Iterator;
 import java.util.List;
 
@@ -17,10 +14,10 @@ import junit.framework.Assert;
 
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.sonatype.nexus.configuration.application.validator.ApplicationConfigurationValidator;
-import org.sonatype.nexus.configuration.application.validator.DefaultApplicationConfigurationValidator;
 import org.sonatype.nexus.configuration.model.CGroupsSettingPathMappingItem;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.CRepositoryGroup;
+import org.sonatype.nexus.configuration.model.CRepositoryShadow;
 import org.sonatype.nexus.configuration.model.Configuration;
 import org.sonatype.nexus.configuration.model.io.xpp3.NexusConfigurationXpp3Reader;
 import org.sonatype.nexus.configuration.model.io.xpp3.NexusConfigurationXpp3Writer;
@@ -127,6 +124,24 @@ public class NexusConfigUtil
             saveConfig( config );
         }
 
+    }
+    
+    public static CRepositoryShadow getRepoShadow( String repoId )
+        throws IOException
+    {
+        List<CRepositoryShadow> repos = getNexusConfig().getRepositoryShadows();
+
+        for ( Iterator<CRepositoryShadow> iter = repos.iterator(); iter.hasNext(); )
+        {
+            CRepositoryShadow cRepo = iter.next();
+
+            // check id
+            if ( cRepo.getId().equals( repoId ) )
+            {
+                return cRepo;
+            }
+        }
+        return null;        
     }
 
     public static CRepository getRepo( String repoId )

@@ -118,6 +118,10 @@ public class RepositoryListResourceHandler
         for ( CRepositoryShadow shadow : shadows )
         {
             repoRes = new RepositoryListResource();
+            
+            repoRes.setId( shadow.getId() );
+            
+            repoRes.setFormat( shadow.getType() );
 
             repoRes.setResourceURI( calculateSubReference( shadow.getId() ).toString() );
 
