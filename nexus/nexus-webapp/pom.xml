@@ -135,13 +135,15 @@
                 <property name="sourceRoot" value="${basedir}/src/main/webapp"/>
                 <mkdir dir="${targetRoot}/ext-2.2/resources/css"/>
                 <mkdir dir="${targetRoot}/style"/>
+                <mkdir dir="${targetRoot}/ext-2.2/adapter/ext"/>
                 <mkdir dir="${targetRoot}/js/filetree/js"/>
                 <mkdir dir="${targetRoot}/js/extensions"/>
                 <mkdir dir="${targetRoot}/js/repoServer"/>
                 <gzip src="${sourceRoot}/ext-2.2/resources/css/ext-all.css" destfile="${targetRoot}/ext-2.2/resources/css/ext-all.css.gz"/>
                 <gzip src="${sourceRoot}/ext-2.2/resources/css/xtheme-gray.css" destfile="${targetRoot}/ext-2.2/resources/css/xtheme-gray.css.gz"/>
                 <gzip src="${sourceRoot}/style/Sonatype.css" destfile="${targetRoot}/style/Sonatype.css.gz"/>
-                <gzip src="${sourceRoot}/ext-2.2/ext-trimmed.js" destfile="${targetRoot}/ext-2.2/ext-trimmed.js.gz"/>
+                <gzip src="${sourceRoot}/ext-2.2/adapter/ext/ext-base.js" destfile="${targetRoot}/ext-2.2/adapter/ext/ext-base.js.gz"/>
+                <gzip src="${sourceRoot}/ext-2.2/ext-all.js" destfile="${targetRoot}/ext-2.2/ext-all.js.gz"/>
                 <gzip src="${sourceRoot}/js/filetree/js/Ext.ux.form.BrowseButton.js" destfile="${targetRoot}/js/filetree/js/Ext.ux.form.BrowseButton.js.gz"/>
                 <gzip src="${sourceRoot}/js/Sonatype.js" destfile="${targetRoot}/js/Sonatype.js.gz"/>
                 <gzip src="${sourceRoot}/js/extensions/ext-override.js" destfile="${targetRoot}/js/extensions/ext-override.js.gz"/>
