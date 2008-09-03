@@ -520,7 +520,7 @@ Sonatype.repoServer.RepoServer = function(){
       Sonatype.view.welcomeTab = new Ext.Panel({
         title: 'Welcome',
         html: '<div class="little-padding">' +
-          '<p>Welcome to the Sonatype Nexus Repository Manager.</p>' +
+          '<p>Welcome to the <a href="http://nexus.sonatype.org" target="new">Sonatype Nexus Maven Repository Manager</a>.</p>' +
           '<br/>' +
           '<p>You may browse and search the repositories using the options on the left. Administrators may login via the link on the top right.<p>' +
           '</div>'
