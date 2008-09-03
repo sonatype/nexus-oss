@@ -85,6 +85,24 @@
 		</contributor>
 	</contributors>
 
+    <repositories>
+      <repository>
+        <id>sonatype-forge</id>
+        <url>http://repository.sonatype.org/content/groups/forge</url>
+        <snapshots><enabled>true</enabled></snapshots>
+        <releases><enabled>true</enabled></releases>
+      </repository>
+    </repositories>
+
+    <pluginRepositories>
+      <pluginRepository>
+        <id>sonatype-forge</id>
+        <url>http://repository.sonatype.org/content/groups/forge</url>
+        <snapshots><enabled>true</enabled></snapshots>
+        <releases><enabled>true</enabled></releases>
+      </pluginRepository>
+    </pluginRepositories>
+    
 	<modules>
 		<module>nexus-configuration</module>
 		<module>nexus-proxy</module>
