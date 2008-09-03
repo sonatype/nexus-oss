@@ -438,11 +438,11 @@ Sonatype.repoServer.RepoServer = function(){
       },
       'open-repos-maint-readonly' : function(scope){
         var id = 'repos-maint-readonly';
-        Sonatype.view.mainTabPanel.addOrShowTab(id, Sonatype.repoServer.RepoMaintPanel, {title: 'Repositories', editMode: false});
+        Sonatype.view.mainTabPanel.addOrShowTab(id, Sonatype.repoServer.RepoMaintPanel, {title: 'Repositories'});
       },
       'open-repos-maint' : function(scope){
         var id = 'repos-maint';
-        Sonatype.view.mainTabPanel.addOrShowTab(id, Sonatype.repoServer.RepoMaintPanel, {title: 'Repositories', editMode: true});
+        Sonatype.view.mainTabPanel.addOrShowTab(id, Sonatype.repoServer.RepoMaintPanel, {title: 'Repositories'});
       },
       'open-config-server' : function(scope){
         var id = 'nexus-config';

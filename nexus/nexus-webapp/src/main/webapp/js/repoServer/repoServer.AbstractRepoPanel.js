@@ -26,7 +26,6 @@
   {
     id: the is of this panel instance [required]
     title: title of this panel (shows in tab)
-    editMode: true, to allow edit control of repositories
   }
 */
 

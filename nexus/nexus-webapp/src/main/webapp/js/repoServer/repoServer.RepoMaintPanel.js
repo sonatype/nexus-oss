@@ -26,7 +26,6 @@
   {
     id: the is of this panel instance [required]
     title: title of this panel (shows in tab)
-    editMode: true, to allow edit control of repositories
   }
 */
 
@@ -41,17 +40,17 @@ Sonatype.repoServer.RepoMaintPanel = function(config){
   Sonatype.Events.addListener( 'groupChanged', this.onRepoChange, this );
 
   this.actions = {
-    view : new Ext.Action({
+    view : {
       text: 'View',
       scope:this,
       handler: this.viewHandler
-    }),
-    refreshList : new Ext.Action({
+    },
+    refreshList : {
       text: 'Refresh',
       iconCls: 'st-icon-refresh',
       scope:this,
       handler: this.reloadAll
-    }),
+    },
     download : {
       text: 'Download',
       scope:this,
@@ -62,63 +61,56 @@ Sonatype.repoServer.RepoMaintPanel = function(config){
       scope:this,
       handler: this.downloadFromRemoteHandler
     },
-    viewRemote : new Ext.Action({
+    viewRemote : {
       text: 'View Remote',
       scope:this,
       handler: this.downloadFromRemoteHandler
-    })
-  };
-  
-  if (this.editMode) {
-    Ext.apply(this.actions,
-      {
-        clearCache : new Ext.Action({
+    },
+        clearCache : {
           text: 'Clear Cache',
           scope:this,
           handler: this.clearCacheHandler
-        }),
-        deleteRepoItem : new Ext.Action({
+        },
+        deleteRepoItem : {
           text: 'Delete',
           scope:this,
           handler: this.deleteRepoItemHandler
-        }),
-        reIndex : new Ext.Action({
+        },
+        reIndex : {
           text: 'Re-Index',
           scope:this,
           handler: this.reIndexHandler
-        }),
-        rebuildAttributes : new Ext.Action({
+        },
+        rebuildAttributes : {
           text: 'Rebuild Attributes',
           scope:this,
           handler: this.rebuildAttributesHandler
-        }),
-        putInService : new Ext.Action({
+        },
+        putInService : {
           text: 'Put in Service',
           scope:this,
           handler: this.putInServiceHandler
-        }),
-        putOutOfService : new Ext.Action({
+        },
+        putOutOfService : {
           text: 'Put Out of Service',
           scope:this,
           handler: this.putOutOfServiceHandler
-        }),
-        allowProxy : new Ext.Action({
+        },
+        allowProxy : {
           text: 'Allow Proxy',
           scope:this,
           handler: this.allowProxyHandler
-        }),
-        blockProxy : new Ext.Action({
+        },
+        blockProxy : {
           text: 'Block Proxy',
           scope:this,
           handler: this.blockProxyHandler
-        }),
-        uploadArtifact: new Ext.Action({
+        },
+        uploadArtifact: {
           text: 'Upload Artifact...',
           scope: this,
           handler: this.uploadArtifactHandler
-        })
-      }
-    );
+        }
   };
   
   this.detailPanelConfig = {
@@ -380,7 +372,6 @@ Sonatype.repoServer.RepoMaintPanel = function(config){
 Ext.extend(Sonatype.repoServer.RepoMaintPanel, Sonatype.repoServer.AbstractRepoPanel, {
   //default values
   title : 'Repositories',
-  editMode : false,
   
 //contentUriColRender: function(value, p, record, rowIndex, colIndex, store) {
 //  return String.format('<a target="_blank" href="{0}">{0}</a>', value);
@@ -426,7 +417,6 @@ Ext.extend(Sonatype.repoServer.RepoMaintPanel, Sonatype.repoServer.AbstractRepoP
     var clearcachPriv = this.sp.checkPermission(Sonatype.user.curr.repoServer.actionDeleteCache, this.sp.DELETE);
     var reindexPriv = this.sp.checkPermission(Sonatype.user.curr.repoServer.actionReindex, this.sp.DELETE);
     var attributesPriv = this.sp.checkPermission(Sonatype.user.curr.repoServer.actionRebuildAttribs, this.sp.DELETE);
-    var uploadPriv = this.sp.checkPermission(Sonatype.user.curr.repoServer.actionUploadArtifact, this.sp.CREATE);
     var repoStatusPriv = this.sp.checkPermission(Sonatype.user.curr.repoServer.maintRepos, this.sp.EDIT);
     
     if ( e.target.nodeName == 'A' ) return; // no menu on links
@@ -445,7 +435,6 @@ Ext.extend(Sonatype.repoServer.RepoMaintPanel, Sonatype.repoServer.AbstractRepoP
       ]
     });
     
-    if (this.editMode) {
       if(clearcachPriv && this.ctxRecord.get('repoType') != 'virtual'){
         menu.add(this.actions.clearCache);
       }
@@ -471,11 +460,10 @@ Ext.extend(Sonatype.repoServer.RepoMaintPanel, Sonatype.repoServer.AbstractRepoP
               );
       }
 
-      if (uploadPriv && this.ctxRecord.get('repoType') == 'hosted'
+      if (this.ctxRecord.get('repoType') == 'hosted'
       && this.ctxRecord.get('repoPolicy') == 'release'){
         menu.add(this.actions.uploadArtifact);
       }
-    }
     
     menu.on('hide', this.onContextHideHandler, this);
     e.stopEvent();
@@ -503,14 +491,12 @@ Ext.extend(Sonatype.repoServer.RepoMaintPanel, Sonatype.repoServer.AbstractRepoP
     var isProxyRepo = (node.getOwnerTree().root.attributes.repoType == 'proxy');
     var isGroup = (node.getOwnerTree().root.attributes.repoType == 'group');
     
-    if (node.isLeaf() || this.editMode){
       this.ctxBrowseNode = node;
       
       var menu = new Ext.menu.Menu({
         id:'repo-maint-browse-ctx'
       });
       
-      if (this.editMode) {
         if (clearcachPriv && !isVirtualRepo){
           menu.add(this.actions.clearCache);
         }
@@ -520,7 +506,6 @@ Ext.extend(Sonatype.repoServer.RepoMaintPanel, Sonatype.repoServer.AbstractRepoP
         if (attributesPriv){
           menu.add(this.actions.rebuildAttributes);
         }
-      }
       
       if (node.isLeaf()){
         if (isProxyRepo){
@@ -532,7 +517,7 @@ Ext.extend(Sonatype.repoServer.RepoMaintPanel, Sonatype.repoServer.AbstractRepoP
         menu.add(this.actions.download);
       }
       
-      if (this.editMode && !node.isRoot && !isGroup){
+      if (!node.isRoot && !isGroup){
         menu.add(this.actions.deleteRepoItem);
         if (isProxyRepo && !node.isLeaf()){
           menu.add(this.actions.viewRemote);
@@ -542,7 +527,6 @@ Ext.extend(Sonatype.repoServer.RepoMaintPanel, Sonatype.repoServer.AbstractRepoP
       menu.on('hide', this.onBrowseContextHideHandler, this);
       e.stopEvent();
       menu.showAt(e.getXY());
-    }
   },
 
   onBrowseContextHideHandler : function(){
