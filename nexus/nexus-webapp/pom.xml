@@ -61,7 +61,7 @@
         <filtering>true</filtering>
       </resource>
       <resource>
-        <directory>src/main/bundle</directory>
+        <directory>src/main/assembly/bundle</directory>
         <filtering>false</filtering>
         <targetPath>../plexus-home</targetPath>
       </resource>

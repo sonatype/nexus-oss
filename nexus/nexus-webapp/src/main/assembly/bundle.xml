@@ -1,4 +1,5 @@
 <assembly>
+ <includeBaseDirectory>false</includeBaseDirectory>
   <id>bundle</id>
   <formats>
     <format>tar.gz</format>

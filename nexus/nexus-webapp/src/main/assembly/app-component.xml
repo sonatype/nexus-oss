@@ -1,20 +1,20 @@
 <component>
   <dependencySets>
     <dependencySet>
-      <outputDirectory>/runtime/apps/nexus/lib</outputDirectory>
+      <outputDirectory>/${pom.build.finalName}/runtime/apps/nexus/lib</outputDirectory>
       <fileMode>0644</fileMode>
       <scope>runtime</scope>
     </dependencySet>
   </dependencySets>
   <fileSets>
     <fileSet>
-      <directory>src/main/bundle</directory>
-      <outputDirectory>/runtime/apps/nexus</outputDirectory>
+      <directory>src/main/assembly/bundle</directory>
+      <outputDirectory>/${pom.build.finalName}/runtime/apps/nexus</outputDirectory>
       <fileMode>0644</fileMode>
     </fileSet>
     <fileSet>
       <directory>src/main/webapp</directory>
-      <outputDirectory>/runtime/apps/nexus/webapp</outputDirectory>
+      <outputDirectory>/${pom.build.finalName}/runtime/apps/nexus/webapp</outputDirectory>
       <includes>
         <include>*</include>
         <include>docs/*</include>
@@ -34,12 +34,12 @@
     </fileSet>
     <fileSet>
       <directory>target/nexus-tools</directory>
-      <outputDirectory>/runtime/apps/nexus/tools</outputDirectory>
+      <outputDirectory>/${pom.build.finalName}/runtime/apps/nexus/tools</outputDirectory>
       <fileMode>0644</fileMode>
     </fileSet>
     <fileSet>
       <directory>target/gzip-web-content</directory>
-      <outputDirectory>/runtime/apps/nexus/webapp</outputDirectory>
+      <outputDirectory>/${pom.build.finalName}/runtime/apps/nexus/webapp</outputDirectory>
     </fileSet>
   </fileSets>
 </component>

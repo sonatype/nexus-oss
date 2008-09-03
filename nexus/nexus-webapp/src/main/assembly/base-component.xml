@@ -1,7 +1,7 @@
 <component>
   <dependencySets>
     <dependencySet>
-      <outputDirectory>/lib</outputDirectory>
+      <outputDirectory>/${pom.build.finalName}/lib</outputDirectory>
       <fileMode>0644</fileMode>
       <scope>provided</scope>
       <includes>
@@ -11,17 +11,21 @@
   </dependencySets>
   <fileSets>
     <fileSet>
-      <directory>src/main/base-bundle</directory>
-      <outputDirectory>/</outputDirectory>
+      <directory>src/main/assembly/base-bundle</directory>
+      <outputDirectory>/${pom.build.finalName}/</outputDirectory>
       <fileMode>0644</fileMode>
     </fileSet>
-    
+        <fileSet>
+      <directory>src/main/assembly/sonatype-work</directory>
+      <outputDirectory>/sonatype-work</outputDirectory>
+      <fileMode>0644</fileMode>
+    </fileSet>
     <!-- Incorporate the unpacked jsw-binaries content, which was filtered during the process-resources phase. 
          NOTE: Only include the wrapper executables here, so we can set the executable file attribute.
     -->
     <fileSet>
       <directory>target/jsw-filtered</directory>
-      <outputDirectory>bin/jsw</outputDirectory>
+      <outputDirectory>/${pom.build.finalName}/bin/jsw</outputDirectory>
       <includes>
         <include>**/wrapper</include>
         <include>**/wrapper.exe</include>
@@ -35,7 +39,7 @@
     -->
     <fileSet>
       <directory>target/jsw-filtered</directory>
-      <outputDirectory>bin/jsw</outputDirectory>
+      <outputDirectory>/${pom.build.finalName}/bin/jsw</outputDirectory>
       <excludes>
         <exclude>**/app</exclude>
         <exclude>**/*.bat</exclude>
@@ -51,86 +55,86 @@
     -->
     <file>
       <source>target/jsw-filtered/linux-ppc-64/app</source>
-      <outputDirectory>bin/jsw/linux-ppc-64</outputDirectory>
+      <outputDirectory>/${pom.build.finalName}/bin/jsw/linux-ppc-64</outputDirectory>
       <destName>nexus</destName>
       <fileMode>0755</fileMode>
     </file>
     <file>
       <source>target/jsw-filtered/linux-x86-32/app</source>
-      <outputDirectory>bin/jsw/linux-x86-32</outputDirectory>
+      <outputDirectory>/${pom.build.finalName}/bin/jsw/linux-x86-32</outputDirectory>
       <destName>nexus</destName>
       <fileMode>0755</fileMode>
     </file>
     <file>
       <source>target/jsw-filtered/linux-x86-64/app</source>
-      <outputDirectory>bin/jsw/linux-x86-64</outputDirectory>
+      <outputDirectory>/${pom.build.finalName}/bin/jsw/linux-x86-64</outputDirectory>
       <destName>nexus</destName>
       <fileMode>0755</fileMode>
     </file>
     <file>
       <source>target/jsw-filtered/macosx-universal-32/app</source>
-      <outputDirectory>bin/jsw/macosx-universal-32</outputDirectory>
+      <outputDirectory>/${pom.build.finalName}/bin/jsw/macosx-universal-32</outputDirectory>
       <destName>nexus</destName>
       <fileMode>0755</fileMode>
     </file>
     <file>
       <source>target/jsw-filtered/solaris-sparc-32/app</source>
-      <outputDirectory>bin/jsw/solaris-sparc-32</outputDirectory>
+      <outputDirectory>/${pom.build.finalName}/bin/jsw/solaris-sparc-32</outputDirectory>
       <destName>nexus</destName>
       <fileMode>0755</fileMode>
     </file>
     <file>
       <source>target/jsw-filtered/solaris-sparc-64/app</source>
-      <outputDirectory>bin/jsw/solaris-sparc-64</outputDirectory>
+      <outputDirectory>/${pom.build.finalName}/bin/jsw/solaris-sparc-64</outputDirectory>
       <destName>nexus</destName>
       <fileMode>0755</fileMode>
     </file>
     <file>
       <source>target/jsw-filtered/solaris-x86-32/app</source>
-      <outputDirectory>bin/jsw/solaris-x86-32</outputDirectory>
+      <outputDirectory>/${pom.build.finalName}/bin/jsw/solaris-x86-32</outputDirectory>
       <destName>nexus</destName>
       <fileMode>0755</fileMode>
     </file>
     <!-- Windows scripts -->
     <file>
       <source>target/jsw-filtered/windows-x86-32/App.bat</source>
-      <outputDirectory>bin/jsw/windows-x86-32</outputDirectory>
+      <outputDirectory>/${pom.build.finalName}/bin/jsw/windows-x86-32</outputDirectory>
       <destName>Nexus.bat</destName>
       <fileMode>0755</fileMode>
     </file>
     <file>
       <source>target/jsw-filtered/windows-x86-32/InstallApp.bat</source>
-      <outputDirectory>bin/jsw/windows-x86-32</outputDirectory>
+      <outputDirectory>/${pom.build.finalName}/bin/jsw/windows-x86-32</outputDirectory>
       <destName>InstallNexus.bat</destName>
       <fileMode>0755</fileMode>
     </file>
     <file>
       <source>target/jsw-filtered/windows-x86-32/PauseApp.bat</source>
-      <outputDirectory>bin/jsw/windows-x86-32</outputDirectory>
+      <outputDirectory>/${pom.build.finalName}/bin/jsw/windows-x86-32</outputDirectory>
       <destName>PauseNexus.bat</destName>
       <fileMode>0755</fileMode>
     </file>
     <file>
       <source>target/jsw-filtered/windows-x86-32/ResumeApp.bat</source>
-      <outputDirectory>bin/jsw/windows-x86-32</outputDirectory>
+      <outputDirectory>/${pom.build.finalName}/bin/jsw/windows-x86-32</outputDirectory>
       <destName>ResumeNexus.bat</destName>
       <fileMode>0755</fileMode>
     </file>
     <file>
       <source>target/jsw-filtered/windows-x86-32/StartApp.bat</source>
-      <outputDirectory>bin/jsw/windows-x86-32</outputDirectory>
+      <outputDirectory>/${pom.build.finalName}/bin/jsw/windows-x86-32</outputDirectory>
       <destName>StartNexus.bat</destName>
       <fileMode>0755</fileMode>
     </file>
     <file>
       <source>target/jsw-filtered/windows-x86-32/StopApp.bat</source>
-      <outputDirectory>bin/jsw/windows-x86-32</outputDirectory>
+      <outputDirectory>/${pom.build.finalName}/bin/jsw/windows-x86-32</outputDirectory>
       <destName>StopNexus.bat</destName>
       <fileMode>0755</fileMode>
     </file>
     <file>
       <source>target/jsw-filtered/windows-x86-32/UninstallApp.bat</source>
-      <outputDirectory>bin/jsw/windows-x86-32</outputDirectory>
+      <outputDirectory>/${pom.build.finalName}/bin/jsw/windows-x86-32</outputDirectory>
       <destName>UninstallNexus.bat</destName>
       <fileMode>0755</fileMode>
     </file>
