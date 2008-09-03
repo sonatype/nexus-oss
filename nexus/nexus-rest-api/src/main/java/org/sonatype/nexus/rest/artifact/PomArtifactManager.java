@@ -28,7 +28,6 @@ import java.io.InputStream;
 import java.io.Reader;
 import java.util.Random;
 
-import org.apache.commons.beanutils.BeanUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.StringUtils;
