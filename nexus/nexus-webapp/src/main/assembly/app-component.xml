@@ -15,6 +15,21 @@
     <fileSet>
       <directory>src/main/webapp</directory>
       <outputDirectory>/runtime/apps/nexus/webapp</outputDirectory>
+      <includes>
+        <include>*</include>
+        <include>docs/*</include>
+        <include>ext-2.2/ext-trimmed.js</include>
+        <include>ext-2.2/resources/css/ext-all.css</include>
+        <include>ext-2.2/resources/css/xtheme-gray.css</include>
+        <include>ext-2.2/resources/images/**</include>
+        <include>images/**</include>
+        <include>js/*</include>
+        <include>js/extensions/*</include>
+        <include>js/filetree/js/Ext.ux.form.BrowseButton.js</include>
+        <include>js/repoServer/*</include>
+        <include>style/Sonatype.css</include>
+        <include>WEB-INF/*</include>
+      </includes>
     </fileSet>
     <fileSet>
       <directory>target/nexus-tools</directory>
