@@ -372,7 +372,7 @@ public class DefaultTaskConfigManager
             }
             else if ( WeeklySchedule.class.isAssignableFrom( schedule.getClass() ) )
             {
-                storeableSchedule.setType( CScheduleConfig.TYPE_MONTHLY );
+                storeableSchedule.setType( CScheduleConfig.TYPE_WEEKLY );
 
                 storeableSchedule.setStartDate( ( (WeeklySchedule) schedule ).getStartDate() );
 
