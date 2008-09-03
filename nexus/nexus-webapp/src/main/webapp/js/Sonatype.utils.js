@@ -120,7 +120,7 @@ Sonatype.utils = {
         else {
           Sonatype.MessageBox.show( {
             title: 'Login Error',
-            msg: 'Incorrect username or password.<br />Try again.' + serverMessage,
+            msg: 'Incorrect username, password or no permission to use the Nexus User Interface.<br />Try again.' + serverMessage,
             buttons: Sonatype.MessageBox.OK,
             icon: Sonatype.MessageBox.ERROR,
             animEl: 'mb3'
