@@ -150,6 +150,8 @@ public class NexusHttpAuthenticationFilter
             }
             catch ( AuthenticationException ae )
             {
+                getLogger().info( "Unable to authenticate user [" + token.getPrincipal() + "] from address/host [" + request.getRemoteAddr() + "/" + request.getRemoteHost() + "]" );
+                
                 if ( getLogger().isDebugEnabled() )
                 {
                     getLogger().debug( "Unable to log in user [" + token.getPrincipal() + "]", ae );
@@ -203,6 +205,8 @@ public class NexusHttpAuthenticationFilter
         }
         catch ( AuthenticationException ae )
         {
+            getLogger().info( "Unable to authenticate user [anonymous] from address/host [" + request.getRemoteAddr() + "/" + request.getRemoteHost() + "]" );
+            
             if ( getLogger().isDebugEnabled() )
             {
                 getLogger().debug( "Unable to log in subject as anonymous", ae );

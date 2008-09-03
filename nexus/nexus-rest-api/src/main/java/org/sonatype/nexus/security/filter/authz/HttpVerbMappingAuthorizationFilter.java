@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.jsecurity.subject.Subject;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
@@ -108,6 +109,19 @@ public class HttpVerbMappingAuthorizationFilter
     protected boolean onAccessDenied( ServletRequest request, ServletResponse response )
         throws IOException
     {
+        Subject subject = getSubject( request, response );
+        
+        getLogger().info( "Unable to authorize user ["
+                          + subject.getPrincipal()
+                          + "] for "
+                          + getActionFromHttpVerb( request ) 
+                          + " to "
+                          + ( (HttpServletRequest) request ).getRequestURI()
+                          + " from address/host [" 
+                          + request.getRemoteAddr() 
+                          + "/" 
+                          + request.getRemoteHost() + "]" );
+        
         request.setAttribute( NexusJSecurityFilter.REQUEST_IS_AUTHZ_REJECTED, Boolean.TRUE );
 
         return false;

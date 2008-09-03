@@ -97,7 +97,7 @@ public class CommonsHttpClientRemoteStorage
             // If HEAD failed, attempt a GET. Some repos may not support HEAD method
             doGet = true;
 
-            getLogger().warn( "HEAD method failed, will attempt GET.  Exception: " + e.getMessage() );
+            getLogger().debug( "HEAD method failed, will attempt GET.  Exception: " + e.getMessage() );
         }
         finally
         {
@@ -107,7 +107,7 @@ public class CommonsHttpClientRemoteStorage
             if ( doGet == false && response != HttpStatus.SC_OK )
             {
                 doGet = true;
-                getLogger().warn( "HEAD method failed, will attempt GET.  Status: " + response );
+                getLogger().debug( "HEAD method failed, will attempt GET.  Status: " + response );
             }
         }
 

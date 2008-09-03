@@ -275,7 +275,17 @@ public class FileConfigurationSource
 
         try
         {
-            file.getParentFile().mkdirs();
+            //Create the dir if doesn't exist, throw runtime exception on failure
+            //bad bad bad
+            if ( !file.getParentFile().exists() && !file.getParentFile().mkdirs() )
+            {
+                String message = "\r\n******************************************************************************\r\n"
+                               + "* Could not create configuration file [ " + file.toString() + "]!!!! *\r\n"
+                               + "* Nexus cannot start properly until the process has read+write permissions to this folder *\r\n"
+                               + "******************************************************************************";
+                
+                getLogger().fatalError( message );
+            }
 
             // copy the current nexus config file as file.bak
             if ( file.exists() )

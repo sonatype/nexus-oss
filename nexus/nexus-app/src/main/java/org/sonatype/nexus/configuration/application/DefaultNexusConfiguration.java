@@ -297,6 +297,18 @@ public class DefaultNexusConfiguration
 
     public File getWorkingDirectory()
     {
+        //Create the dir if doesn't exist, throw runtime exception on failure
+        //bad bad bad
+        if ( !workingDirectory.exists() && !workingDirectory.mkdirs() )
+        {
+            String message = "\r\n******************************************************************************\r\n"
+                           + "* Could not create work directory [ " + workingDirectory.toString() + "]!!!! *\r\n"
+                           + "* Nexus cannot start properly until the process has read+write permissions to this folder *\r\n"
+                           + "******************************************************************************";
+            
+            getLogger().fatalError( message );
+        }
+        
         return workingDirectory;
     }
 

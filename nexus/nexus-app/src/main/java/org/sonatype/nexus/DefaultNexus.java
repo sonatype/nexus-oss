@@ -1505,6 +1505,8 @@ public class DefaultNexus
             systemStatus.setState( SystemState.STARTED );
 
             systemStatus.setStartedAt( new Date() );
+            
+            getLogger().info( "Nexus Work Directory : " + nexusConfiguration.getWorkingDirectory().toString() );
 
             getLogger().info( "Started Nexus (version " + systemStatus.getVersion() + ")" );
 
