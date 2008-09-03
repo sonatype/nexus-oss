@@ -28,6 +28,7 @@ import java.io.InputStream;
 import java.io.Reader;
 import java.util.Random;
 
+import org.apache.commons.beanutils.BeanUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.StringUtils;
@@ -109,6 +110,24 @@ public class PomArtifactManager
 
         return new FileInputStream( tmpPomFile );
     }
+    
+    private ArtifactStoreRequest generateGavRequestClone( ArtifactStoreRequest request )
+    {
+        if ( request == null )
+        {
+            return null;
+        }
+        
+        return new ArtifactStoreRequest( request.isRequestLocalOnly(), 
+                                         request.getRequestRepositoryId(), 
+                                         request.getRequestRepositoryGroupId(), 
+                                         request.getGroupId(),
+                                         request.getArtifactId(),
+                                         request.getVersion(),
+                                         request.getPackaging(),
+                                         request.getClassifier(),
+                                         request.getExtension() );
+    }
 
     public ArtifactStoreRequest getGAVRequestFromTempPomFile( ArtifactStoreRequest request )
         throws IOException,
@@ -121,7 +140,7 @@ public class PomArtifactManager
 
         if ( STATE_GAV_GENERATED == state )
         {
-            return gavRequest;
+            return generateGavRequestClone( gavRequest );
         }
 
         Reader reader = null;
@@ -130,7 +149,7 @@ public class PomArtifactManager
         {
             reader = ReaderFactory.newXmlReader( tmpPomFile );
 
-            gavRequest = request;
+            gavRequest = generateGavRequestClone( request );
 
             parsePom( reader );
 
@@ -141,7 +160,7 @@ public class PomArtifactManager
             IOUtil.close( reader );
         }
 
-        return gavRequest;
+        return generateGavRequestClone( gavRequest );
     }
 
     public void removeTempPomFile()
