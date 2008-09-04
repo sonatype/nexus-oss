@@ -106,6 +106,7 @@ public class QuickRestClientTest
         {
             // expected
         }
+        Assert.assertFalse( "Expected false, repo should have been deleted.", client.isValidRepository( "testCreate" ) );
 
         client.disconnect();
     }
