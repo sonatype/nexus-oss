@@ -418,6 +418,7 @@ Ext.extend(Sonatype.repoServer.RepoMaintPanel, Sonatype.repoServer.AbstractRepoP
     var reindexPriv = this.sp.checkPermission(Sonatype.user.curr.repoServer.actionReindex, this.sp.DELETE);
     var attributesPriv = this.sp.checkPermission(Sonatype.user.curr.repoServer.actionRebuildAttribs, this.sp.DELETE);
     var repoStatusPriv = this.sp.checkPermission(Sonatype.user.curr.repoServer.maintRepos, this.sp.EDIT);
+    var uploadPriv = this.sp.checkPermission(Sonatype.user.curr.repoServer.actionUploadArtifact, this.sp.CREATE);
     
     if ( e.target.nodeName == 'A' ) return; // no menu on links
     
@@ -460,7 +461,8 @@ Ext.extend(Sonatype.repoServer.RepoMaintPanel, Sonatype.repoServer.AbstractRepoP
               );
       }
 
-      if (this.ctxRecord.get('repoType') == 'hosted'
+      if (uploadPriv
+      && this.ctxRecord.get('repoType') == 'hosted'
       && this.ctxRecord.get('repoPolicy') == 'release'){
         menu.add(this.actions.uploadArtifact);
       }
