@@ -624,4 +624,37 @@ public class M2GavCalculatorTest
       assertEquals( "cli", gav.getClassifier() );
       assertEquals( "1.0.0-beta-6-20080809.181715-2", gav.getVersion() );
     }
+    
+    public void testGavSnapshotVersion() throws Exception
+    {
+        Gav gav;
+        
+        gav = gavCalculator.pathToGav( "/org/sonatype/nexus/nexus-webapp/1.0.0-beta-5-SNAPSHOT/nexus-webapp-1.0.0-beta-5-SNAPSHOT.tar.gz" );
+        assertNotNull( gav );
+        assertEquals( "tar.gz", gav.getExtension() );
+        assertEquals( null, gav.getClassifier() );
+        assertEquals( "1.0.0-beta-5-SNAPSHOT", gav.getVersion() );
+        assertTrue( gav.isSnapshot() );
+        
+        gav = gavCalculator.pathToGav( "/org/sonatype/nexus/nexus-webapp/1.0.0-beta-5-SNAPSHOT-1234/nexus-webapp-1.0.0-beta-5-SNAPSHOT-1234.tar.gz" );
+        assertNotNull( gav );
+        assertEquals( "tar.gz", gav.getExtension() );
+        assertEquals( null, gav.getClassifier() );
+        assertEquals( "1.0.0-beta-5-SNAPSHOT-1234", gav.getVersion() );
+        assertFalse( gav.isSnapshot() );
+        
+        gav = gavCalculator.pathToGav( "/org/sonatype/nexus/nexus-webapp/1.0.0-beta-5-SNAPSHOT/nexus-webapp-1.0.0-beta-5-SNAPSHOT-bundle.tar.gz" );
+        assertNotNull( gav );
+        assertEquals( "tar.gz", gav.getExtension() );
+        assertEquals( "bundle", gav.getClassifier() );
+        assertEquals( "1.0.0-beta-5-SNAPSHOT", gav.getVersion() );
+        assertTrue( gav.isSnapshot() );
+        
+        gav = gavCalculator.pathToGav( "/org/sonatype/nexus/nexus-webapp/1.0.0-beta-5-SNAPSHOT-1234/nexus-webapp-1.0.0-beta-5-SNAPSHOT-1234-bundle.tar.gz" );
+        assertNotNull( gav );
+        assertEquals( "tar.gz", gav.getExtension() );
+        assertEquals( "bundle", gav.getClassifier() );
+        assertEquals( "1.0.0-beta-5-SNAPSHOT-1234", gav.getVersion() );
+        assertFalse( gav.isSnapshot() );
+    }
 }
