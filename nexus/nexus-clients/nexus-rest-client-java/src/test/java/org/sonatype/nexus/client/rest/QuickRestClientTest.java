@@ -2,6 +2,8 @@ package org.sonatype.nexus.client.rest;
 import java.util.Iterator;
 import java.util.List;
 
+import org.codehaus.plexus.PlexusTestCase;
+import org.sonatype.nexus.client.NexusClient;
 import org.sonatype.nexus.client.NexusClientException;
 import org.sonatype.nexus.client.NexusConnectionException;
 import org.sonatype.nexus.client.rest.NexusRestClient;
@@ -13,14 +15,13 @@ import org.sonatype.nexus.rest.model.RepositoryResource;
 import junit.framework.Assert;
 import junit.framework.TestCase;
 
-public class QuickRestClientTest
-    extends TestCase
+public class QuickRestClientTest extends PlexusTestCase
 {
 
     public void testGetList()
         throws NexusConnectionException, NexusClientException
     {
-        NexusRestClient client = new NexusRestClient();
+        NexusClient client = new NexusRestClient();
         client.connect( "http://localhost:8081/nexus", "admin", "admin123" );
 
         List<RepositoryListResource> repos = client.getRespositories();
@@ -38,7 +39,7 @@ public class QuickRestClientTest
     public void testIsValidRepository() throws NexusConnectionException, NexusClientException
     {
         
-        NexusRestClient client = new NexusRestClient();
+        NexusClient client = new NexusRestClient();
         client.connect( "http://localhost:8081/nexus", "admin", "admin123" );
 
         Assert.assertTrue("Expected to find 'apache-snapshots' repo:", client.isValidRepository( "apache-snapshots" ));
@@ -53,7 +54,7 @@ public class QuickRestClientTest
     public void testGet()
         throws NexusConnectionException, NexusClientException
     {
-        NexusRestClient client = new NexusRestClient();
+        NexusClient client = new NexusRestClient();
         client.connect( "http://localhost:8081/nexus", "admin", "admin123" );
 
         RepositoryBaseResource repo = client.getRepository( "releases" );
@@ -64,7 +65,7 @@ public class QuickRestClientTest
     public void testCrud()
         throws NexusConnectionException, NexusClientException
     {
-        NexusRestClient client = new NexusRestClient();
+        NexusClient client = new NexusRestClient();
         client.connect( "http://localhost:8081/nexus", "admin", "admin123" );
 
         RepositoryResource repoResoruce = new RepositoryResource();
@@ -117,7 +118,7 @@ public class QuickRestClientTest
     {
         String sha1 = "72844643827b668a791dfef60cf8c0ea7690d583";
         
-        NexusRestClient client = new NexusRestClient();
+        NexusClient client = new NexusRestClient();
         client.connect( "http://localhost:8081/nexus", "admin", "admin123" );
         
         NexusArtifact artifact = client.searchBySHA1( sha1 );
@@ -128,5 +129,25 @@ public class QuickRestClientTest
         client.disconnect();
         
     }
+    
+    public void testSearchByGAV() throws Exception
+    {
+        
+        NexusClient client = (NexusClient) this.lookup( NexusClient.ROLE );;
+        client.connect( "http://localhost:8081/nexus", "admin", "admin123" );
+        
+        NexusArtifact searchParam = new NexusArtifact();
+        searchParam.setArtifactId( "release-deploy" );
+        searchParam.setGroupId( "org.sonatype.nexus.nexus.test.harness" );
+        searchParam.setVersion( "1.0.1" );
+        searchParam.setPackaging( "jar" );
+        searchParam.setClassifier( "not currently working" );
+        
+        System.out.println( "value: "+ client.searchByGAV( searchParam ).get( 0 ) );
+        
+        client.disconnect();
+        
+    }
+
 
 }

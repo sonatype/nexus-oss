@@ -1,7 +1,10 @@
 package org.sonatype.nexus.client.rest;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.client.NexusClient;
 import org.sonatype.nexus.client.NexusClientException;
 import org.sonatype.nexus.client.NexusConnectionException;
@@ -10,7 +13,12 @@ import org.sonatype.nexus.rest.model.RepositoryBaseResource;
 import org.sonatype.nexus.rest.model.RepositoryListResource;
 import org.sonatype.nexus.rest.model.RepositoryListResourceResponse;
 import org.sonatype.nexus.rest.model.RepositoryResourceResponse;
+import org.sonatype.nexus.rest.model.SearchResponse;
 
+/**
+ *
+ * @plexus.component instantiation-strategy="per-lookup" role="org.sonatype.nexus.client.NexusClient"
+ */
 public class NexusRestClient
     implements NexusClient
 {
@@ -171,6 +179,59 @@ public class NexusRestClient
         return null;
 
     }
+    
+    @SuppressWarnings("unchecked")
+    public List<NexusArtifact> searchByGAV( NexusArtifact gav )
+    throws NexusClientException, NexusConnectionException
+{
+        Map<String, String> params = new HashMap<String, String>();
+        // build the url params
+        // group
+        if( StringUtils.isNotEmpty( gav.getGroupId() ))
+        {
+            params.put( "g", gav.getGroupId() );
+        }
+        // artifact
+        if( StringUtils.isNotEmpty( gav.getArtifactId() ))
+        {
+            params.put( "a", gav.getArtifactId() );
+        }
+        // version
+        if( StringUtils.isNotEmpty( gav.getVersion() ))
+        {
+            params.put( "v", gav.getVersion() );
+        }
+        // classifier
+        if( StringUtils.isNotEmpty( gav.getClassifier() ))
+        {
+            params.put( "c", gav.getClassifier() );
+        }
+        // packaging
+        if( StringUtils.isNotEmpty( gav.getPackaging() ))
+        {
+            params.put( "p", gav.getPackaging() );
+        }
+                
+    Object tempObj = this.getClientHelper().get( "data_index", params );
+
+    if ( tempObj != null )
+    {
+
+        // expecting an instance of SearchResponse
+        if ( tempObj instanceof SearchResponse )
+        {
+            return ((SearchResponse) tempObj).getData();
+        }
+        else
+        {
+            throw new NexusClientException(
+                                            "Response from server returned an unexpected object.  Expected: SearchResponse, actual: "
+                                                + tempObj.getClass() );
+        }
+    }
+    return null;
+
+}
 
     private RestClientHelper getClientHelper()
         throws NexusClientException

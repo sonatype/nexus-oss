@@ -9,7 +9,7 @@ import org.sonatype.nexus.rest.model.RepositoryResource;
 
 public interface NexusClient
 {
-    public static final String ROLE = "NexusClient";
+    public static final String ROLE = NexusClient.class.getName();
 
     public void connect( String baseUrl, String username, String password ) throws NexusClientException, NexusConnectionException;
     
@@ -29,4 +29,6 @@ public interface NexusClient
     
     
     public NexusArtifact searchBySHA1(String sha1) throws NexusClientException, NexusConnectionException;
+    
+    public List<NexusArtifact> searchByGAV(NexusArtifact gav) throws NexusClientException, NexusConnectionException;
 }

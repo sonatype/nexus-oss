@@ -1,6 +1,12 @@
 package org.sonatype.nexus.client.rest;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URL;
+import java.net.URLEncoder;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.codehaus.plexus.util.StringUtils;
@@ -62,6 +68,20 @@ public class RestClientHelper
         return urlBuffer.toString();
     }
 
+    private String buildParamString( Map<String, String> args )
+        throws UnsupportedEncodingException
+    {
+        StringBuffer params = new StringBuffer( "?" );
+
+        for ( Iterator<Entry<String, String>> iter = args.entrySet().iterator(); iter.hasNext(); )
+        {
+            Entry<String, String> entry = iter.next();
+            params.append( entry.getKey() ).append( "=" ).append( URLEncoder.encode( entry.getValue(), "UTF-8" ) ).append(
+                                                                                                                           "&" );
+        }
+        return params.toString();
+    }
+
     public void delete( String service, String id )
         throws NexusClientException
     {
@@ -79,6 +99,21 @@ public class RestClientHelper
         throws NexusClientException, NexusConnectionException
     {
         String url = this.buildUrl( service, id );
+        return this.sendMessage( Method.GET, url, (NexusResponse) null );
+    }
+
+    public Object get( String service, Map<String, String> args )
+        throws NexusClientException, NexusConnectionException
+    {
+        String url;
+        try
+        {
+            url = this.buildUrl( service, null ) + this.buildParamString( args );
+        }
+        catch ( UnsupportedEncodingException e )
+        {
+            throw new NexusClientException( e.getMessage(), e );
+        }
         return this.sendMessage( Method.GET, url, (NexusResponse) null );
     }
 
@@ -105,7 +140,7 @@ public class RestClientHelper
 
     public Response sendMessage( Method method, String url, Representation representation )
     {
-        logger.debug("Method: " + method.getName() + " url: " + url );
+        logger.debug( "Method: " + method.getName() + " url: " + url );
 
         Request request = new Request();
         request.setResourceRef( url );
