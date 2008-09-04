@@ -139,7 +139,7 @@ public class NexusRestClient
         
         for ( RepositoryListResource repositoryListResource : repoList )
         {
-            if( repositoryListResource.getId().equals( id ))
+            if( repositoryListResource.getId() != null && repositoryListResource.getId().equals( id ))
             {
                 return true;
             }

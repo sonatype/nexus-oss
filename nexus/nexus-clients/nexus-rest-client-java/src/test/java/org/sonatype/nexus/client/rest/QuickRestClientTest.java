@@ -43,6 +43,8 @@ public class QuickRestClientTest
 
         Assert.assertTrue("Expected to find 'apache-snapshots' repo:", client.isValidRepository( "apache-snapshots" ));
         Assert.assertFalse("Expected not to find 'foobar' repo:", client.isValidRepository( "foobar" ));
+        
+        Assert.assertFalse("Expected not to find 'null' repo:", client.isValidRepository( null ));
                 
         client.disconnect();
         
@@ -71,9 +73,9 @@ public class QuickRestClientTest
         repoResoruce.setName( "Create Test Repo" );
         // repoResoruce.setRepoType( ? )
         repoResoruce.setFormat( "maven2" ); // Repository Format, maven1, maven2, maven-site, eclipse-update-site
-        // repoResoruce.setAllowWrite( true );
-        // repoResoruce.setBrowseable( true );
-        // repoResoruce.setIndexable( true );
+        repoResoruce.setAllowWrite( true );
+        repoResoruce.setBrowseable( true );
+        repoResoruce.setIndexable( true );
         // repoResoruce.setNotFoundCacheTTL( 1440 );
         repoResoruce.setRepoPolicy( "release" ); // [snapshot, release] Note: needs param name change
         // repoResoruce.setRealmnId(?)
