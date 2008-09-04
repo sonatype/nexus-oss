@@ -3,6 +3,7 @@ package org.sonatype.nexus.integrationtests;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
+import org.sonatype.nexus.integrationtests.client.nexus725.Nexus725InitialRestClient;
 import org.sonatype.nexus.integrationtests.nexus133.Nexus133TargetCrudJsonTests;
 import org.sonatype.nexus.integrationtests.nexus133.Nexus133TargetCrudXmlTests;
 import org.sonatype.nexus.integrationtests.nexus133.Nexus133TargetValidationTests;
@@ -92,7 +93,8 @@ import org.sonatype.nexus.integrationtests.upgrades.nexus652.Nexus652Beta5To10Up
     Nexus637PublishIndexTest.class, Nexus652Beta5To10UpgradeTest.class, Nexus641ReindexTaskTest.class,
     Nexus602SearchSnapshotArtifactTest.class, Nexus635ClearCacheTaskTest.class, Nexus634RemoveAllTest.class,
     Nexus634KeepNewSnapshotsTest.class, Nexus634KeepTwoSnapshotsTest.class, Nexus636EvictUnusedProxiedTaskTest.class,
-    Nexus598ClassnameSearchTest.class, Nexus640RebuildRepositoryAttributesTaskTest.class } )
+    Nexus598ClassnameSearchTest.class, Nexus640RebuildRepositoryAttributesTaskTest.class,
+    Nexus725InitialRestClient.class } )
 public class IntegrationTestSuiteClasses
 {
 

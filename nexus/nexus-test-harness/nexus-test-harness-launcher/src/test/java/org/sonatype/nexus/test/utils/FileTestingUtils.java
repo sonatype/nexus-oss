@@ -160,22 +160,23 @@ public class FileTestingUtils
 
     public static void main( String[] args )
     {
+        args = new String[]{"http://localhost:8087/nexus/service/local/artifact/maven/redirect?r=nexus-test-harness-repo&g=nexus725&a=nexus725-artifact-1&v=1.0.1&p=jar"};
         String usage = "Usage: java " + FileTestingUtils.class + " <url>";
 
         if ( args == null || args.length != 1 )
         {
-            LOG.debug( usage );
+            System.out.println( usage );
             return;
         }
 
         try
         {
             URL url = new URL( args[0] );
-            LOG.debug( createSHA1FromURL( url ) );
+            System.out.println( createSHA1FromURL( url ) );
         }
         catch ( Exception e )
         {
-            LOG.debug( usage );
+            System.out.println( usage );
             e.printStackTrace( System.out );
         }
 

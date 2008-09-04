@@ -4,6 +4,7 @@ import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
+import org.sonatype.nexus.integrationtests.client.nexus725.Nexus725InitialRestClient;
 import org.sonatype.nexus.integrationtests.nexus133.Nexus133TargetCrudJsonTests;
 import org.sonatype.nexus.integrationtests.nexus133.Nexus133TargetCrudXmlTests;
 import org.sonatype.nexus.integrationtests.nexus133.Nexus133TargetPermissionTests;
@@ -78,7 +79,8 @@ import org.sonatype.nexus.integrationtests.upgrades.nexus652.Nexus652Beta5To10Up
     Nexus175SnapshotDeployWrongPassword.class, Nexus511MavenDeployTest.class, Nexus531RepositoryCrudXMLTests.class,
     Nexus531RepositoryCrudJsonTests.class, Nexus233PrivilegesCrudXMLTests.class, Nexus379VirtualRepoSameId.class,
     Nexus448PrivilegeURLTest.class, Nexus532GroupsCrudXmlTests.class, Nexus586ValidateConfigurationTest.class,
-    Nexus606DownloadLogsAndConfigFilesTest.class, Nexus652Beta5To10UpgradeTest.class, Nexus650ChangePasswordAndRebootTest.class } )
+    Nexus606DownloadLogsAndConfigFilesTest.class, Nexus652Beta5To10UpgradeTest.class,
+    Nexus650ChangePasswordAndRebootTest.class, Nexus725InitialRestClient.class } )
 public class IntegrationTestSuiteClassesSecurity
 {
     @BeforeClass
