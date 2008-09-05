@@ -8,8 +8,10 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 import org.sonatype.nexus.client.NexusClient;
+import org.sonatype.nexus.client.NexusClientException;
 import org.sonatype.nexus.client.NexusConnectionException;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
+import org.sonatype.nexus.integrationtests.AbstractPrivilegeTest;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.integrationtests.TestContext;
 import org.sonatype.nexus.rest.model.NexusArtifact;
@@ -22,7 +24,7 @@ import org.sonatype.nexus.test.utils.TestProperties;
  * Tests the Nexus java/REST client.
  */
 public class Nexus725InitialRestClient
-    extends AbstractNexusIntegrationTest
+    extends AbstractPrivilegeTest
 {
 
     private NexusClient getConnectedNexusClient()
@@ -71,7 +73,8 @@ public class Nexus725InitialRestClient
 
         NexusClient client = this.getConnectedNexusClient();
 
-        Assert.assertTrue( "Expected to find 'apache-snapshots' repo:", client.isValidRepository( "nexus-test-harness-repo" ) );
+        Assert.assertTrue( "Expected to find 'apache-snapshots' repo:",
+                           client.isValidRepository( "nexus-test-harness-repo" ) );
         Assert.assertFalse( "Expected not to find 'foobar' repo:", client.isValidRepository( "foobar" ) );
 
         Assert.assertFalse( "Expected not to find 'null' repo:", client.isValidRepository( null ) );
@@ -148,11 +151,11 @@ public class Nexus725InitialRestClient
         throws Exception
     {
         // will fail do to problems with the indexer
-        if(this.printKnownErrorButDoNotFail( this.getClass(), "searchBySHA1Test" ))
+        if ( this.printKnownErrorButDoNotFail( this.getClass(), "searchBySHA1Test" ) )
         {
             return;
         }
-        
+
         String sha1 = "72844643827b668a791dfef60cf8c0ea7690d583";
 
         NexusClient client = this.getConnectedNexusClient();
@@ -180,17 +183,81 @@ public class Nexus725InitialRestClient
         searchParam.setPackaging( "jar" );
         searchParam.setClassifier( "not currently working" );
 
-        List<NexusArtifact> results =  client.searchByGAV( searchParam );
+        List<NexusArtifact> results = client.searchByGAV( searchParam );
         Assert.assertEquals( "Search result size", 1, results.size() );
-        
+
         Assert.assertEquals( "Search result artifact id", "nexus725-artifact-1", results.get( 0 ).getArtifactId() );
         Assert.assertEquals( "Search result group id", "nexus725", results.get( 0 ).getGroupId() );
         Assert.assertEquals( "Search result version", "1.0.1", results.get( 0 ).getVersion() );
         Assert.assertEquals( "Search result packaging", "jar", results.get( 0 ).getPackaging() );
-        
 
         client.disconnect();
 
+    }
+
+    @Test
+    public void checkForErrorsInRepsonse()
+        throws Exception
+    {
+
+        NexusClient client = this.getConnectedNexusClient();
+
+        RepositoryResource repoResoruce = new RepositoryResource();
+        repoResoruce.setId( "checkForErrorsInRepsonse" );
+        repoResoruce.setName( "Create Test Repo" );
+        // this will cause a few problems...
+        try
+        {
+            client.createRepository( repoResoruce );
+            Assert.fail( "Expected NexusConnectionException" );
+        }
+        catch ( NexusConnectionException e )
+        {
+            // make sure we have an error
+            Assert.assertTrue( "NexusConnectionException should contain at least 1 NexusError",
+                               e.getErrors().size() > 0 );
+
+            // make sure the error is in the stacktrace
+            Assert.assertTrue( "", e.getMessage().contains( e.getErrors().get( 0 ).getMsg() ) );
+        }
+    }
+
+    @Test
+    public void invalidServer()
+        throws Exception
+    {
+
+        NexusClient client = (NexusClient) TestContainer.getInstance().lookup( NexusClient.ROLE );
+        try
+        {
+            client.connect( "http://nexus.invalid.url/nexus", "", "" );
+            // the REST instance doesn't actually connect until you send a message
+            client.getRepository( "nexus-test-harness-repo" );
+            Assert.fail( "Expected NexusConnectionException" );
+        }
+        catch ( NexusConnectionException e )
+        {
+            e.printStackTrace();
+        }
+
+    }
+
+    @Test
+    public void invalidPassword()
+        throws Exception
+    {
+        NexusClient client = (NexusClient) TestContainer.getInstance().lookup( NexusClient.ROLE );
+        
+        try
+        {
+            client.connect( TestProperties.getString( "nexus.base.url" ), "admin", "wrong-password" );
+            // the REST instance doesn't actually connect until you send a message
+            client.getRepository( "nexus-test-harness-repo" );
+            Assert.fail( "Expected NexusConnectionException" );
+        }
+        catch ( NexusConnectionException e )
+        {
+        }
     }
 
 }

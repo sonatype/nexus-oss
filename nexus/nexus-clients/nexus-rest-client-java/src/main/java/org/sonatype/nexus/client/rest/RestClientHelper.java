@@ -4,7 +4,9 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -21,6 +23,8 @@ import org.restlet.data.Response;
 import org.restlet.resource.Representation;
 import org.sonatype.nexus.client.NexusClientException;
 import org.sonatype.nexus.client.NexusConnectionException;
+import org.sonatype.nexus.rest.model.NexusError;
+import org.sonatype.nexus.rest.model.NexusErrorResponse;
 import org.sonatype.nexus.rest.model.NexusResponse;
 import org.sonatype.nexus.rest.xstream.XStreamInitializer;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
@@ -151,6 +155,7 @@ public class RestClientHelper
         return this.restClient.handle( request );
     }
 
+    @SuppressWarnings("unchecked")
     public Object sendMessage( Method method, String url, NexusResponse nexusResponse )
         throws NexusConnectionException
     {
@@ -167,16 +172,32 @@ public class RestClientHelper
         if ( !response.getStatus().isSuccess() )
         {
             String errorMessage = "Error in response from server: " + response.getStatus() + ".";
+            List<NexusError> errors = new ArrayList<NexusError>();
             try
             {
-                errorMessage += "\nResponse:\n" + response.getEntity().getText();
+                String responseText = response.getEntity().getText();
+               
+                // this is kinda hackish, but this class is already tied to xstream
+                if( responseText.contains( "NexusErrorResponse" ) ) // quick check before we parse the string
+                {
+                  // try to parse the response
+                    NexusErrorResponse errorResponse = (NexusErrorResponse) xstream.fromXML( responseText, new NexusErrorResponse() );
+                    // if we made it this far we can stick the NexusErrors in the Exception
+                    errors = errorResponse.getErrors();
+                }
+                else
+                {
+                    // the response text might be helpful in debugging, so we will add it                    
+                    errorMessage += "\nResponse:\n" + (responseText != null ? responseText : "<empty>");
+                }
             }
-            catch ( IOException e )
+            catch ( Exception e ) // we really don't want our fancy exception to cause another problem.
             {
                 logger.warn( "Error getting the response text: " + e.getMessage(), e );
             }
 
-            throw new NexusConnectionException( errorMessage );
+            // now finally throw it...
+            throw new NexusConnectionException( errorMessage, errors );
         }
 
         Object result = null;
@@ -185,7 +206,7 @@ public class RestClientHelper
             String responseText = response.getEntity().getText();
             if ( StringUtils.isNotEmpty( responseText ) )
             {
-                return xstream.fromXML( responseText );
+                result = xstream.fromXML( responseText );
             }
         }
         catch ( IOException e )

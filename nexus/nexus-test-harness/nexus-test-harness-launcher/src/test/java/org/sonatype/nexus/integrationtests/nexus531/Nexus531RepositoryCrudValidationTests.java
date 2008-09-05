@@ -407,6 +407,7 @@ public class Nexus531RepositoryCrudValidationTests
     {
         Response response = this.messageUtil.sendMessage( method, resource );
         String responseText = response.getEntity().getText();
+        System.out.println( "responseText: "+ responseText );
 
         Assert.assertFalse( "Repo should not have been updated: " + response.getStatus() + "\n" + responseText,
                            response.getStatus().isSuccess() );
