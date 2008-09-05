@@ -76,27 +76,15 @@ public class DefaultScanner
                 {
                     scanDirectory( f, request, result );
                 }
+                // Skip non-indexable files
+                else if ( !AbstractIndexCreator.isIndexable( f ) )
+                {
+                    continue;
+                }
                 else
                 {
                     try
                     {
-                        String fileName = f.getName();
-
-                        if ( fileName.startsWith( "maven-metadata" )
-                            || fileName.endsWith( ".properties" )
-                            || fileName.endsWith( "-javadoc.jar" )
-                            || fileName.endsWith( "-javadocs.jar" )
-                            || fileName.endsWith( "-sources.jar" )
-                            || ( fileName.endsWith( ".pom" ) && files.contains( new File( f.getParent(), fileName
-                                .replaceAll( "\\.pom$", ".jar" ) ) ) ) 
-                            || fileName.endsWith( ".xml" )
-                            || fileName.endsWith( ".asc" ) 
-                            || fileName.endsWith( ".md5" )
-                            || fileName.endsWith( ".sha1" ) )
-                        {
-                            continue;
-                        }
-
                         if ( request.getInfos() != null )
                         {
                             String repoFile = f.getAbsolutePath().substring(
@@ -109,7 +97,8 @@ public class DefaultScanner
                                 String uinfo = AbstractIndexCreator.getGAV( gav.getGroupId(), //
                                     gav.getArtifactId(),
                                     gav.getBaseVersion(),
-                                    gav.getClassifier() );
+                                    gav.getClassifier(),
+                                    gav.getExtension() );
 
                                 if ( request.getInfos().contains( uinfo ) )
                                 {

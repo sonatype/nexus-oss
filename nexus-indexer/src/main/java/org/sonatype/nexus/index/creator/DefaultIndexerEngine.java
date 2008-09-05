@@ -102,7 +102,7 @@ public class DefaultIndexerEngine
         ArtifactInfo ai = ac.getArtifactInfo();
 
         return new Term( ArtifactInfo.UINFO, //
-            AbstractIndexCreator.getGAV( ai.groupId, ai.artifactId, ai.version, ai.classifier ) );
+            AbstractIndexCreator.getGAV( ai.groupId, ai.artifactId, ai.version, ai.classifier, ai.packaging ) );
     }
 
     private Document createDocument( IndexingContext context, ArtifactContext ac )
@@ -117,7 +117,8 @@ public class DefaultIndexerEngine
             ai.groupId,
             ai.artifactId,
             ai.version,
-            ai.classifier ), Field.Store.YES, Field.Index.UN_TOKENIZED ) );
+            ai.classifier,
+            ai.packaging ), Field.Store.YES, Field.Index.UN_TOKENIZED ) );
 
         ArtifactIndexingContext indexingContext = new DefaultArtifactIndexingContext( ac );
 

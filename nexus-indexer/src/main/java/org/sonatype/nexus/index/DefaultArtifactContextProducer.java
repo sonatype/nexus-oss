@@ -15,8 +15,10 @@ package org.sonatype.nexus.index;
 
 import java.io.File;
 
+import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.index.context.IndexingContext;
+import org.sonatype.nexus.index.creator.AbstractIndexCreator;
 import org.sonatype.nexus.index.locator.GavHelpedLocator;
 import org.sonatype.nexus.index.locator.Locator;
 import org.sonatype.nexus.index.locator.MetadataLocator;
@@ -54,6 +56,11 @@ public class DefaultArtifactContextProducer
         else
         {
             // this is junk path?
+            return null;
+        }
+        
+        if ( !AbstractIndexCreator.isIndexable( file ) )
+        {
             return null;
         }
 
@@ -102,6 +109,13 @@ public class DefaultArtifactContextProducer
         }
 
         ArtifactInfo ai = new ArtifactInfo( context.getRepositoryId(), groupId, artifactId, version, classifier );
+        
+        // Assign the packaging if classifier is valid
+        if ( !StringUtils.isEmpty( ai.classifier ) )
+        {
+            ai.packaging = gav.getExtension();
+        }
+
 
         // ArtifactInfo ai = new ArtifactInfo(
         // fname,

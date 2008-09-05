@@ -524,7 +524,8 @@ public class DefaultIndexingContext
                                 info.groupId,
                                 info.artifactId,
                                 info.version,
-                                info.classifier ), Field.Store.YES, Field.Index.UN_TOKENIZED ) );
+                                info.classifier,
+                                info.packaging ), Field.Store.YES, Field.Index.UN_TOKENIZED ) );
 
                             for ( IndexCreator ic : getIndexCreators() )
                             {

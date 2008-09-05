@@ -13,12 +13,14 @@
  *******************************************************************************/
 package org.sonatype.nexus.index.creator;
 
+import java.io.File;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.regex.Pattern;
 
 import org.codehaus.plexus.logging.AbstractLogEnabled;
+import org.codehaus.plexus.util.StringUtils;
 
 /** @author Jason van Zyl */
 public abstract class AbstractIndexCreator
@@ -79,9 +81,41 @@ public abstract class AbstractIndexCreator
 
     public static String getGAV( String groupId, String artifactId, String version, String classifier )
     {
+        return getGAV( groupId, artifactId, version, classifier, null );
+    }
+
+    public static String getGAV( String groupId, String artifactId, String version, String classifier, String packaging )
+    {
         return new StringBuilder()
             .append( groupId ).append( FS ).append( artifactId ).append( FS ).append( version ).append( FS ).append(
-                nvl( classifier ) ).toString();
+                nvl( classifier ) ).append( 
+                  ( ( StringUtils.isEmpty( classifier ) || StringUtils.isEmpty( packaging ) ) ? "" : ( FS + packaging ) ) ).toString();
+    }
+
+    public static boolean isIndexable( File file )
+    {
+        if ( file == null )
+        {
+            return false;
+        }
+        
+        String filename = file.getName();
+        
+        if (   filename.startsWith( "maven-metadata" )
+            || filename.endsWith( "-javadoc.jar" )
+            || filename.endsWith( "-javadocs.jar" )
+            || filename.endsWith( "-sources.jar" )
+            || filename.endsWith( ".properties" )
+            || filename.endsWith( ".xml" )
+            || filename.endsWith( ".asc" ) 
+            || filename.endsWith( ".md5" )
+            || filename.endsWith( ".sha1" )
+            || ( filename.endsWith( ".pom" ) && new File( file.getParent(), filename.replaceAll( "\\.pom$", ".jar" ) ).exists() ) )
+        {
+            return false;
+        }
+        
+        return true;
     }
 
 }
