@@ -36,6 +36,7 @@ import org.sonatype.nexus.integrationtests.nexus408.Nexus408ChangePasswordTest;
 import org.sonatype.nexus.integrationtests.nexus448.Nexus448PrivilegeURLTest;
 import org.sonatype.nexus.integrationtests.nexus526.Nexus526FeedsTests;
 import org.sonatype.nexus.integrationtests.nexus531.Nexus531RepositoryCrudJsonTests;
+import org.sonatype.nexus.integrationtests.nexus531.Nexus531RepositoryCrudValidationTests;
 import org.sonatype.nexus.integrationtests.nexus531.Nexus531RepositoryCrudXMLTests;
 import org.sonatype.nexus.integrationtests.nexus532.Nexus532GroupsCrudXmlTests;
 import org.sonatype.nexus.integrationtests.nexus533.Nexus533TaskCronTest;
@@ -66,10 +67,7 @@ import org.sonatype.nexus.integrationtests.proxy.nexus635.Nexus635ClearCacheTask
 import org.sonatype.nexus.integrationtests.upgrades.nexus652.Nexus652Beta5To10UpgradeTest;
 
 /**
- * NOTE: the class Nexus258ReleaseDeployTest needs to be at the start of the test, something happens, ( I don't know
- * what yet) if its not near, the top of this list it will fail to deploy its artifacts. It doesn't seem to be a timing
- * issue. And its not a work dir problem, any thoughts, I am all ears! I think i fixed the above problem, but i am going
- * to leave this note here untill i am sure.
+ * 
  */
 @RunWith( Suite.class )
 @SuiteClasses( { Nexus166SampleTest.class, Nexus169ReleaseMetaDataInSnapshotRepoTest.class,
@@ -94,7 +92,7 @@ import org.sonatype.nexus.integrationtests.upgrades.nexus652.Nexus652Beta5To10Up
     Nexus602SearchSnapshotArtifactTest.class, Nexus635ClearCacheTaskTest.class, Nexus634RemoveAllTest.class,
     Nexus634KeepNewSnapshotsTest.class, Nexus634KeepTwoSnapshotsTest.class, Nexus636EvictUnusedProxiedTaskTest.class,
     Nexus598ClassnameSearchTest.class, Nexus640RebuildRepositoryAttributesTaskTest.class,
-    Nexus725InitialRestClient.class } )
+    Nexus725InitialRestClient.class, Nexus531RepositoryCrudValidationTests.class } )
 public class IntegrationTestSuiteClasses
 {
 

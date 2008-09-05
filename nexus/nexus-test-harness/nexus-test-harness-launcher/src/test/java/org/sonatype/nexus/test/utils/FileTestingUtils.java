@@ -160,7 +160,6 @@ public class FileTestingUtils
 
     public static void main( String[] args )
     {
-        args = new String[]{"http://localhost:8087/nexus/service/local/artifact/maven/redirect?r=nexus-test-harness-repo&g=nexus725&a=nexus725-artifact-1&v=1.0.1&p=jar"};
         String usage = "Usage: java " + FileTestingUtils.class + " <url>";
 
         if ( args == null || args.length != 1 )

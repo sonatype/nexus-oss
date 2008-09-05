@@ -13,6 +13,7 @@ import org.sonatype.nexus.rest.model.RoleResource;
 import org.sonatype.nexus.rest.model.UserResource;
 import org.sonatype.nexus.rest.xstream.XStreamInitializer;
 import org.sonatype.nexus.test.utils.PrivilegesMessageUtil;
+import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
 import org.sonatype.nexus.test.utils.RoleMessageUtil;
 import org.sonatype.nexus.test.utils.RoutesMessageUtil;
 import org.sonatype.nexus.test.utils.SecurityConfigUtil;
@@ -38,6 +39,8 @@ public abstract class AbstractPrivilegeTest
     protected TargetMessageUtil targetUtil;
 
     protected RoutesMessageUtil routeUtil;
+    
+    protected RepositoryMessageUtil repoUtil;
 
     public AbstractPrivilegeTest( String testRepositoryId)
     {
@@ -64,6 +67,7 @@ public abstract class AbstractPrivilegeTest
         TestContainer.getInstance().getTestContext().setSecureTest( true );
         this.routeUtil =
             new RoutesMessageUtil( XStreamInitializer.initialize( new XStream() ), MediaType.APPLICATION_XML );
+        this.repoUtil = new RepositoryMessageUtil( XStreamInitializer.initialize( new XStream() ), MediaType.APPLICATION_XML );
     }
 
 

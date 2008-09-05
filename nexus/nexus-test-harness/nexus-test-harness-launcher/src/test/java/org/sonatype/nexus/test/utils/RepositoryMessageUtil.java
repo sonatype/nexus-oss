@@ -141,15 +141,14 @@ public class RepositoryMessageUtil
         return responseResource;
     }
 
-    public Response sendMessage( Method method, RepositoryBaseResource resource )
+    public Response sendMessage( Method method, RepositoryBaseResource resource, String id )
         throws IOException
     {
-
         XStreamRepresentation representation = new XStreamRepresentation( xstream, "", mediaType );
 
-        String userId = ( method == Method.POST ) ? "" : "/" + resource.getId();
-
-        String serviceURI = "service/local/repositories" + userId;
+        String idPart = ( method == Method.POST ) ? "" : "/" + id;
+        
+        String serviceURI = "service/local/repositories" + idPart;
 
         RepositoryResourceResponse repoResponseRequest = new RepositoryResourceResponse();
         repoResponseRequest.setData( resource );
@@ -160,6 +159,12 @@ public class RepositoryMessageUtil
         LOG.debug( "sendMessage: " + representation.getText() );
 
         return RequestFacade.sendMessage( serviceURI, method, representation );
+    }
+
+    public Response sendMessage( Method method, RepositoryBaseResource resource )
+        throws IOException
+    {
+        return this.sendMessage( method, resource, resource.getId() );
     }
 
     /**
@@ -226,8 +231,8 @@ public class RepositoryMessageUtil
             String serviceURI = "service/local/data_index/repositories/" + repo + "/content";
             Response response = RequestFacade.sendMessage( serviceURI, Method.DELETE );
             Status status = response.getStatus();
-            Assert.assertTrue( "Fail to update " + repo + " repository index " + status.getDescription(), 
-                                 status.isSuccess() );
+            Assert.assertTrue( "Fail to update " + repo + " repository index " + status.getDescription(),
+                               status.isSuccess() );
         }
 
         // let s w8 a few time for indexes
