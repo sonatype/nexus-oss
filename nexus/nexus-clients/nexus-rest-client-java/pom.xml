@@ -15,13 +15,6 @@
 	<dependencies>
 		<dependency>
 			<groupId>org.sonatype.nexus</groupId>
-			<artifactId>nexus-rest-model</artifactId>
-			<version>${project.version}</version>
-			<scope>compile</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>org.sonatype.nexus</groupId>
 			<artifactId>nexus-rest-api</artifactId>
 			<version>${project.version}</version>
 			<scope>compile</scope>
