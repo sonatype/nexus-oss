@@ -81,7 +81,6 @@
       <sessionTimeout>60</sessionTimeout>
       <privileges>
         <privilege>1</privilege>
-        <privilege>14</privilege>
         <privilege>17</privilege>
         <privilege>19</privilege>
         <privilege>44</privilege>

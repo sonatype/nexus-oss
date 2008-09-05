@@ -12,6 +12,7 @@ import org.sonatype.nexus.rest.model.PrivilegeBaseStatusResource;
 import org.sonatype.nexus.rest.model.RoleResource;
 import org.sonatype.nexus.rest.model.UserResource;
 import org.sonatype.nexus.rest.xstream.XStreamInitializer;
+import org.sonatype.nexus.test.utils.GroupMessageUtil;
 import org.sonatype.nexus.test.utils.PrivilegesMessageUtil;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
 import org.sonatype.nexus.test.utils.RoleMessageUtil;
@@ -41,6 +42,8 @@ public abstract class AbstractPrivilegeTest
     protected RoutesMessageUtil routeUtil;
     
     protected RepositoryMessageUtil repoUtil;
+    
+    protected GroupMessageUtil groupUtil;
 
     public AbstractPrivilegeTest( String testRepositoryId)
     {
@@ -68,6 +71,7 @@ public abstract class AbstractPrivilegeTest
         this.routeUtil =
             new RoutesMessageUtil( XStreamInitializer.initialize( new XStream() ), MediaType.APPLICATION_XML );
         this.repoUtil = new RepositoryMessageUtil( XStreamInitializer.initialize( new XStream() ), MediaType.APPLICATION_XML );
+        this.groupUtil = new GroupMessageUtil( XStreamInitializer.initialize( new XStream() ), MediaType.APPLICATION_XML );
     }
 
 

@@ -1,4 +1,4 @@
-package org.sonatype.nexus.integrationtests.nexus531;
+package org.sonatype.nexus.integrationtests.nexus532;
 
 import java.io.IOException;
 
@@ -9,56 +9,59 @@ import org.restlet.data.Method;
 import org.restlet.data.Response;
 import org.sonatype.nexus.integrationtests.AbstractPrivilegeTest;
 import org.sonatype.nexus.integrationtests.TestContainer;
-import org.sonatype.nexus.rest.model.RepositoryResource;
+import org.sonatype.nexus.rest.model.RepositoryGroupMemberRepository;
+import org.sonatype.nexus.rest.model.RepositoryGroupResource;
 
 /**
- * Test Repo CRUD privileges.
+ * Test Group CRUD privileges.
  */
-public class Nexus531RepositoryCrudPermissionTests extends AbstractPrivilegeTest
+public class Nexus532GroupCrudPermissionTests
+    extends AbstractPrivilegeTest
 {
 
-    
     @Test
     public void testCreatePermission()
         throws IOException
     {
-        RepositoryResource repo = new RepositoryResource();
-        repo.setId( "testCreatePermission" );
-        repo.setName( "testCreatePermission" );
-        repo.setFormat( "maven1" );
-        repo.setRepoPolicy( "snapshot" );
-        repo.setChecksumPolicy( "ignore" );
+        RepositoryGroupResource group = new RepositoryGroupResource();
+        group.setId( "testCreatePermission" );
+        group.setName( "testCreatePermission" );
+        group.setFormat( "maven2" );
+
+        RepositoryGroupMemberRepository member = new RepositoryGroupMemberRepository();
+        member.setId( "nexus-test-harness-repo" );
+        group.addRepository( member );
 
         TestContainer.getInstance().getTestContext().setUsername( "test-user" );
         TestContainer.getInstance().getTestContext().setPassword( "admin123" );
 
-        Response response = this.repoUtil.sendMessage( Method.POST, repo );
+        Response response = this.groupUtil.sendMessage( Method.POST, group );
         Assert.assertEquals( "Response status: ", 401, response.getStatus().getCode() );
-        
+
         // use admin
         TestContainer.getInstance().getTestContext().useAdminForRequests();
 
         // now give create
-        this.giveUserPrivilege( "test-user", "5" );
+        this.giveUserPrivilege( "test-user", "13" );
 
         // now.... it should work...
         TestContainer.getInstance().getTestContext().setUsername( "test-user" );
         TestContainer.getInstance().getTestContext().setPassword( "admin123" );
 
-        response = this.repoUtil.sendMessage( Method.POST, repo );
+        response = this.groupUtil.sendMessage( Method.POST, group );
         Assert.assertEquals( "Response status: ", 201, response.getStatus().getCode() );
-        repo = this.repoUtil.getRepository( repo.getId() );
+        group = this.groupUtil.getGroup( group.getId() );
 
         // read should succeed (inherited)
-        response = this.repoUtil.sendMessage( Method.GET, repo );
+        response = this.groupUtil.sendMessage( Method.GET, group );
         Assert.assertEquals( "Response status: ", 200, response.getStatus().getCode() );
 
         // update should fail
-        response = this.repoUtil.sendMessage( Method.PUT, repo );
+        response = this.groupUtil.sendMessage( Method.PUT, group );
         Assert.assertEquals( "Response status: ", 401, response.getStatus().getCode() );
 
         // delete should fail
-        response = this.repoUtil.sendMessage( Method.DELETE, repo );
+        response = this.groupUtil.sendMessage( Method.DELETE, group );
         Assert.assertEquals( "Response status: ", 401, response.getStatus().getCode() );
 
     }
@@ -70,52 +73,54 @@ public class Nexus531RepositoryCrudPermissionTests extends AbstractPrivilegeTest
 
         TestContainer.getInstance().getTestContext().useAdminForRequests();
 
-        RepositoryResource repo = new RepositoryResource();
-        repo.setId( "testUpdatePermission" );
-        repo.setName( "testUpdatePermission" );
-        repo.setFormat( "maven1" );
-        repo.setRepoPolicy( "snapshot" );
-        repo.setChecksumPolicy( "ignore" );
+        RepositoryGroupResource group = new RepositoryGroupResource();
+        group.setId( "testUpdatePermission" );
+        group.setName( "testUpdatePermission" );
+        group.setFormat( "maven2" );
 
-        Response response = this.repoUtil.sendMessage( Method.POST, repo );
+        RepositoryGroupMemberRepository member = new RepositoryGroupMemberRepository();
+        member.setId( "nexus-test-harness-repo" );
+        group.addRepository( member );
+
+        Response response = this.groupUtil.sendMessage( Method.POST, group );
         Assert.assertEquals( "Response status: ", 201, response.getStatus().getCode() );
-        repo = this.repoUtil.getRepository( repo.getId() );
+        group = this.groupUtil.getGroup( group.getId() );
 
         TestContainer.getInstance().getTestContext().setUsername( "test-user" );
         TestContainer.getInstance().getTestContext().setPassword( "admin123" );
 
         // update repo
-        repo.setName( "tesUpdatePermission2" );
-        response = this.repoUtil.sendMessage( Method.PUT, repo );
+        group.setName( "tesUpdatePermission2" );
+        response = this.groupUtil.sendMessage( Method.PUT, group );
         Assert.assertEquals( "Response status: ", 401, response.getStatus().getCode() );
 
         // use admin
         TestContainer.getInstance().getTestContext().useAdminForRequests();
 
         // now give update
-        this.giveUserPrivilege( "test-user", "7" );
+        this.giveUserPrivilege( "test-user", "15" );
 
         TestContainer.getInstance().getTestContext().setUsername( "test-user" );
         TestContainer.getInstance().getTestContext().setPassword( "admin123" );
 
         // should work now...
-        response = this.repoUtil.sendMessage( Method.PUT, repo );
+        response = this.groupUtil.sendMessage( Method.PUT, group );
         Assert.assertEquals( "Response status: ", 200, response.getStatus().getCode() );
 
         // read should succeed (inherited)
-        response = this.repoUtil.sendMessage( Method.GET, repo );
+        response = this.groupUtil.sendMessage( Method.GET, group );
         Assert.assertEquals( "Response status: ", 200, response.getStatus().getCode() );
 
         // update should fail
-        response = this.repoUtil.sendMessage( Method.POST, repo );
+        response = this.groupUtil.sendMessage( Method.POST, group );
         Assert.assertEquals( "Response status: ", 401, response.getStatus().getCode() );
 
         // delete should fail
-        response = this.repoUtil.sendMessage( Method.DELETE, repo );
+        response = this.groupUtil.sendMessage( Method.DELETE, group );
         Assert.assertEquals( "Response status: ", 401, response.getStatus().getCode() );
 
     }
-    
+
     @Test
     public void testReadPermission()
         throws IOException
@@ -123,53 +128,54 @@ public class Nexus531RepositoryCrudPermissionTests extends AbstractPrivilegeTest
 
         TestContainer.getInstance().getTestContext().useAdminForRequests();
 
-        RepositoryResource repo = new RepositoryResource();
-        repo.setId( "testReadPermission" );
-        repo.setName( "testReadPermission" );
-        repo.setFormat( "maven1" );
-        repo.setRepoPolicy( "snapshot" );
-        repo.setChecksumPolicy( "ignore" );
+        RepositoryGroupResource group = new RepositoryGroupResource();
+        group.setId( "testReadPermission" );
+        group.setName( "testReadPermission" );
+        group.setFormat( "maven2" );
 
-        Response response = this.repoUtil.sendMessage( Method.POST, repo );
+        RepositoryGroupMemberRepository member = new RepositoryGroupMemberRepository();
+        member.setId( "nexus-test-harness-repo" );
+        group.addRepository( member );
+
+        Response response = this.groupUtil.sendMessage( Method.POST, group );
         Assert.assertEquals( "Response status: ", 201, response.getStatus().getCode() );
-        repo = this.repoUtil.getRepository( repo.getId() );
+        group = this.groupUtil.getGroup( group.getId() );
 
         TestContainer.getInstance().getTestContext().setUsername( "test-user" );
         TestContainer.getInstance().getTestContext().setPassword( "admin123" );
 
         // update repo
-        repo.setName( "tesUpdatePermission2" );
-        response = this.repoUtil.sendMessage( Method.GET, repo );
+        group.setName( "tesUpdatePermission2" );
+        response = this.groupUtil.sendMessage( Method.GET, group );
         Assert.assertEquals( "Response status: ", 401, response.getStatus().getCode() );
 
         // use admin
         TestContainer.getInstance().getTestContext().useAdminForRequests();
 
         // now give read
-        this.giveUserPrivilege( "test-user", "6" );
+        this.giveUserPrivilege( "test-user", "14" );
 
         TestContainer.getInstance().getTestContext().setUsername( "test-user" );
         TestContainer.getInstance().getTestContext().setPassword( "admin123" );
 
         // read should fail
-        response = this.repoUtil.sendMessage( Method.GET, repo );
+        response = this.groupUtil.sendMessage( Method.GET, group );
         Assert.assertEquals( "Response status: ", 200, response.getStatus().getCode() );
 
         // update should fail
-        response = this.repoUtil.sendMessage( Method.POST, repo );
+        response = this.groupUtil.sendMessage( Method.POST, group );
         Assert.assertEquals( "Response status: ", 401, response.getStatus().getCode() );
 
         // delete should fail
-        response = this.repoUtil.sendMessage( Method.PUT, repo );
+        response = this.groupUtil.sendMessage( Method.PUT, group );
         Assert.assertEquals( "Response status: ", 401, response.getStatus().getCode() );
-        
-     // should work now...
-        response = this.repoUtil.sendMessage( Method.DELETE, repo );
+
+        // should work now...
+        response = this.groupUtil.sendMessage( Method.DELETE, group );
         Assert.assertEquals( "Response status: ", 401, response.getStatus().getCode() );
 
     }
-    
-    
+
     @Test
     public void testDeletePermission()
         throws IOException
@@ -177,50 +183,52 @@ public class Nexus531RepositoryCrudPermissionTests extends AbstractPrivilegeTest
 
         TestContainer.getInstance().getTestContext().useAdminForRequests();
 
-        RepositoryResource repo = new RepositoryResource();
-        repo.setId( "testDeletePermission" );
-        repo.setName( "testDeletePermission" );
-        repo.setFormat( "maven1" );
-        repo.setRepoPolicy( "snapshot" );
-        repo.setChecksumPolicy( "ignore" );
+        RepositoryGroupResource group = new RepositoryGroupResource();
+        group.setId( "testDeletePermission" );
+        group.setName( "testDeletePermission" );
+        group.setFormat( "maven2" );
 
-        Response response = this.repoUtil.sendMessage( Method.POST, repo );
+        RepositoryGroupMemberRepository member = new RepositoryGroupMemberRepository();
+        member.setId( "nexus-test-harness-repo" );
+        group.addRepository( member );
+
+        Response response = this.groupUtil.sendMessage( Method.POST, group );
         Assert.assertEquals( "Response status: ", 201, response.getStatus().getCode() );
-        repo = this.repoUtil.getRepository( repo.getId() );
+        group = this.groupUtil.getGroup( group.getId() );
 
         TestContainer.getInstance().getTestContext().setUsername( "test-user" );
         TestContainer.getInstance().getTestContext().setPassword( "admin123" );
 
         // update repo
-        repo.setName( "tesUpdatePermission2" );
-        response = this.repoUtil.sendMessage( Method.DELETE, repo );
+        group.setName( "tesUpdatePermission2" );
+        response = this.groupUtil.sendMessage( Method.DELETE, group );
         Assert.assertEquals( "Response status: ", 401, response.getStatus().getCode() );
 
         // use admin
         TestContainer.getInstance().getTestContext().useAdminForRequests();
 
         // now give delete
-        this.giveUserPrivilege( "test-user", "8" );
+        this.giveUserPrivilege( "test-user", "16" );
 
         TestContainer.getInstance().getTestContext().setUsername( "test-user" );
         TestContainer.getInstance().getTestContext().setPassword( "admin123" );
 
         // read should succeed (inherited)
-        response = this.repoUtil.sendMessage( Method.GET, repo );
+        response = this.groupUtil.sendMessage( Method.GET, group );
         Assert.assertEquals( "Response status: ", 200, response.getStatus().getCode() );
 
         // update should fail
-        response = this.repoUtil.sendMessage( Method.POST, repo );
+        response = this.groupUtil.sendMessage( Method.POST, group );
         Assert.assertEquals( "Response status: ", 401, response.getStatus().getCode() );
 
         // delete should fail
-        response = this.repoUtil.sendMessage( Method.PUT, repo );
+        response = this.groupUtil.sendMessage( Method.PUT, group );
         Assert.assertEquals( "Response status: ", 401, response.getStatus().getCode() );
-        
-     // should work now...
-        response = this.repoUtil.sendMessage( Method.DELETE, repo );
+
+        // should work now...
+        response = this.groupUtil.sendMessage( Method.DELETE, group );
         Assert.assertEquals( "Response status: ", 204, response.getStatus().getCode() );
 
     }
-    
+
 }
