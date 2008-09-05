@@ -109,6 +109,7 @@
     <module>nexus-rest-api</module>
     <module>nexus-migration-tool</module>
     <module>nexus-webapp</module>
+    <module>nexus-clients</module>
   </modules>
   <profiles>
     <profile>
