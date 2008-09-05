@@ -33,7 +33,7 @@ Sonatype.repoServer.FileUploadPanel = function(config){
     xtype: 'textfield',
     name: 'filenameField',
     readOnly: true,
-    columnWidth: .85
+    columnWidth: .9
   });
   this.fileInput = null;
 
@@ -69,19 +69,19 @@ Sonatype.repoServer.FileUploadPanel = function(config){
                  {
                       xtype: 'panel',
                       layout: 'column',
+                      style: 'padding-bottom:4px',
                       hideLabel: true,
                       items: [
-                              {
-                                  xtype: 'label',
-                                  text: 'POM',
-                                  width: 75
-                              },
+                        {
+                            xtype: 'label',
+                            text: 'POM',
+                            width: Ext.isIE ? 79 : 75
+                        },
                         this.pomnameField,
                         {
                           xtype: 'browsebutton',
                           text: 'Browse...',
                           columnWidth: .2,
-                          setSize: function() {}, // column layout requires setSize()
                           uploadPanel: this,
                           handler: function( b ) {
                             b.uploadPanel.pomInput = b.detachInputFile(); 
@@ -237,8 +237,7 @@ Sonatype.repoServer.FileUploadPanel = function(config){
               {
                 xtype: 'browsebutton',
                 text: 'Browse...',
-                columnWidth: .2,
-                setSize: function() {}, // column layout requires setSize()
+                columnWidth: .1,
                 uploadPanel: this,
                 handler: function( b ) {
                   b.uploadPanel.fileInput = b.detachInputFile(); 
@@ -338,17 +337,10 @@ Sonatype.repoServer.FileUploadPanel = function(config){
     ]
   });
 
-  this.form.on(
-    'actioncomplete',
-    function( form, action ) {
-      var a;
-    },
-    this
-  );
-  this.form.on(
-    'actionfailed',
-    function( form, action ) {
-      var a;
+  if ( Ext.isIE ) this.filenameField.on(
+    'render',
+    function( c ) {
+      this.filenameField.ownerCt.doLayout();
     },
     this
   );

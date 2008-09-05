@@ -221,10 +221,10 @@ Ext.ux.form.BrowseButton = Ext.extend(Ext.Button, {
 			var width = this.buttonCt.getWidth();
 			var height = this.buttonCt.getHeight();
 			if (Ext.isIE) {
-				width = width + 5;
+				width = width + 10;
 				height = height + 5;
 			} else if (Ext.isGecko) {
-				width = width + 6;
+				width = width + 10;
 				height = height + 6;
 			} else if (Ext.isSafari) {
 				width = width + 6;
@@ -233,6 +233,56 @@ Ext.ux.form.BrowseButton = Ext.extend(Ext.Button, {
 			this.clipEl.setSize(width, height);
 		}
 	},
+
+  /**
+   * Gets the current size of the component's underlying element.
+   * @return {Object} An object containing the element's size {width: (element width), height: (element height)}
+   */
+  getSize : function(){
+    return this.el.getSize();
+  },
+	
+	/**
+   * Sets the width and height of the component.  This method fires the {@link #resize} event.  This method can accept
+   * either width and height as separate numeric arguments, or you can pass a size object like {width:10, height:20}.
+   * @param {Number/Object} width The new width to set, or a size object in the format {width, height}
+   * @param {Number} height The new height to set (not required if a size object is passed as the first arg)
+   * @return {Ext.BoxComponent} this
+   */
+  setSize : function(w, h){
+    // support for standard size objects
+    if(typeof w == 'object'){
+      h = w.height;
+      w = w.width;
+    }
+    // not rendered
+    if(!this.boxReady){
+      this.width = w;
+      this.height = h;
+      return this;
+    }
+
+    // prevent recalcs when not needed
+    if(this.lastSize && this.lastSize.width == w && this.lastSize.height == h){
+      return this;
+    }
+    this.lastSize = {width: w, height: h};
+    var adj = this.adjustSize(w, h);
+    var aw = adj.width, ah = adj.height;
+    if(aw !== undefined || ah !== undefined){ // this code is nasty but performs better with floaters
+      var rz = this.getResizeEl();
+      if(!this.deferHeight && aw !== undefined && ah !== undefined){
+        rz.setSize(aw, ah);
+      }else if(!this.deferHeight && ah !== undefined){
+        rz.setHeight(ah);
+      }else if(aw !== undefined){
+        rz.setWidth(aw);
+      }
+      this.onResize(aw, ah, w, h);
+      this.fireEvent('resize', this, aw, ah, w, h);
+    }
+    return this;
+  },
 	
 	/**
 	 * Creates the input file element and adds it to inputFileCt.
