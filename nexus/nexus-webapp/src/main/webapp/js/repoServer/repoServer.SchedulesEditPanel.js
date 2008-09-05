@@ -1756,6 +1756,9 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
     //Then enable the fields in that card
     schedulePanel.getLayout().activeItem.items.each(function(item){
       item.enable();
+      if ( item.xtype == 'datefield' || item.xtype == 'timefield' ) {
+        item.setValue(item.value);
+      }
     });
     schedulePanel.doLayout();
   },
