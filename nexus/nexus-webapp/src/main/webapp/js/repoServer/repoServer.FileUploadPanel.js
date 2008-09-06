@@ -57,7 +57,7 @@ Sonatype.repoServer.FileUploadPanel = function(config){
            {
                xtype: 'fieldset',
                id: this.pomCard,
-               labelWidth: 70,
+               labelWidth: 80,
                checkboxToggle:false,
                collapsed: false,
                collapsible: false,
@@ -75,7 +75,7 @@ Sonatype.repoServer.FileUploadPanel = function(config){
                         {
                             xtype: 'label',
                             text: 'POM',
-                            width: Ext.isIE ? 79 : 75
+                            width: Ext.isIE ? 84 : 80
                         },
                         this.pomnameField,
                         {
@@ -112,7 +112,7 @@ Sonatype.repoServer.FileUploadPanel = function(config){
         },
         {
           xtype: 'fieldset',
-          labelWidth: 70,
+          labelWidth: 80,
           checkboxToggle:false,
           collapsed: false,
           collapsible: false,
@@ -122,6 +122,17 @@ Sonatype.repoServer.FileUploadPanel = function(config){
             labelSeparator: ''
           },
           items: [
+            {
+              xtype: 'checkbox',
+              fieldLabel: 'Auto Guess',
+              checked: true,
+              name: 'autoguess',
+              helpText: ht.autoguess,
+              handler: function( checkbox, value ) {
+                this.updateFilename( this );
+              },
+              scope: this
+            },
             {
               xtype: 'textfield',
               fieldLabel: 'Group',
@@ -242,12 +253,7 @@ Sonatype.repoServer.FileUploadPanel = function(config){
                 handler: function( b ) {
                   b.uploadPanel.fileInput = b.detachInputFile(); 
                   var filename = b.uploadPanel.fileInput.getValue();
-                  b.uploadPanel.filenameField.setValue( filename );
-                  var extensionIndex = filename.lastIndexOf( '.' );
-                  if ( extensionIndex > 0 ) {
-                    b.uploadPanel.cardPanel.find( 'name', 'p' )[0].setValue( filename.substring( extensionIndex + 1 ) );
-                  }
-                  b.uploadPanel.updateUploadButton( b.uploadPanel );
+                  b.uploadPanel.updateFilename( b.uploadPanel, filename );
                 }
               }
             ] 
@@ -490,6 +496,106 @@ Ext.extend(Sonatype.repoServer.FileUploadPanel, Ext.FormPanel, {
       },
       scope : this
     });
+  },
+  
+  updateFilename: function( uploadPanel, filename ) {
+    if ( filename ) {
+      uploadPanel.filenameField.setValue( filename );
+    }
+    else {
+      if ( ! ( filename = uploadPanel.filenameField.getValue() ) ) {
+        return;
+      }
+    }
+
+    var g = '';
+    var a = '';
+    var v = '';
+    var c = '';
+    var p = '';
+    var e = '';
+
+    if ( uploadPanel.cardPanel.find( 'name', 'autoguess' )[0].checked ) {
     
+      // match extension to guess the packaging
+      var extensionIndex = filename.lastIndexOf( '.' );
+      if ( extensionIndex > 0 ) {
+        p = filename.substring( extensionIndex + 1 );
+        filename = filename.substring( 0, extensionIndex );
+      }
+  
+      // match the path to guess the group
+      if ( filename.indexOf( '\\' ) >= 0 ) {
+        filename = filename.replace( /\\/g, '\/' );
+      }
+      var slashIndex = filename.lastIndexOf( '/' );
+      if ( slashIndex ) {
+        var g = filename.substring( 0, slashIndex );
+  
+        filename = filename.substring( slashIndex + 1 );
+      }
+  
+      // separate the artifact name and version
+      var versionIndex = filename.search( /\-[\d]/ );
+      if ( versionIndex == -1 ) {
+        versionIndex = filename.search( /-LATEST-/i );
+        if ( versionIndex == -1 ) {
+          versionIndex = filename.search( /-CURRENT-/i );
+        }
+      }
+      if ( versionIndex >= 0 ) {
+        a = filename.substring( 0, versionIndex ).toLowerCase();
+  
+        // guess the version
+        filename = filename.substring( versionIndex + 1 );
+        var classifierIndex = filename.lastIndexOf( '-' );
+        if ( classifierIndex >= 0 ) {
+          var classifier = filename.substring( classifierIndex + 1 );
+          if ( classifier && ! ( /^SNAPSHOT$/i.test( classifier ) || /^\d/.test( classifier ) || /^LATEST$/i.test( classifier ) || /^CURRENT$/i.test( classifier ) ) ) {
+            c = classifier;
+            filename = filename.substring( 0, classifierIndex );
+          }
+        }
+        v = filename;
+  
+        if ( g ) {
+          // if group ends with version and artifact name, strip those parts
+          // (useful if uploading from a local maven repo)
+          var i = g.search( new RegExp( '\/' + v + '$' ) );
+          if ( i > -1 ) {
+            g = g.substring( 0, i );
+          }
+          i = g.search( new RegExp( '\/' + a + '$' ) );
+          if ( i > -1 ) {
+            g = g.substring( 0, i );
+          }
+          
+          // strip extra path parts, leave only com.* or org.* or net.* or the last element
+          var i = g.lastIndexOf( '/com/' );
+          if ( i == -1 ) {
+            i = g.lastIndexOf( '/org/' );
+            if ( i == -1 ) {
+              i = g.lastIndexOf( '/net/' );
+              if ( i == -1 ) {
+                i = g.lastIndexOf( '/' );
+              }
+            }
+          }
+          g = g.substring( i + 1 ).replace( /\//g, '.' ).toLowerCase();
+        }
+      }
+      else {
+        g = '';
+      }
+    }
+
+    uploadPanel.cardPanel.find( 'name', 'g' )[0].setValue( g );
+    uploadPanel.cardPanel.find( 'name', 'a' )[0].setValue( a );
+    uploadPanel.cardPanel.find( 'name', 'v' )[0].setValue( v );
+    uploadPanel.cardPanel.find( 'name', 'c' )[0].setValue( c );
+    uploadPanel.cardPanel.find( 'name', 'p' )[0].setValue( p );
+    uploadPanel.cardPanel.find( 'name', 'e' )[0].setValue( e );
+    if ( ! a ) uploadPanel.form.clearInvalid();
+    uploadPanel.updateUploadButton( uploadPanel );
   }
 });
