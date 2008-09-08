@@ -170,11 +170,6 @@ public class Nexus532GroupsCrudXmlTests extends AbstractNexusIntegrationTest
             Assert.assertNotNull( "CRepositoryGroup", cGroup );
             
             this.messageUtil.validateRepoLists( group.getRepositories(), cGroup.getRepositories() );
-            
-
         }
-
     }
-    
-    
 }
