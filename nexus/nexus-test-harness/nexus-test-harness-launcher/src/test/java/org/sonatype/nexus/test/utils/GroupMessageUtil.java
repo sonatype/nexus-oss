@@ -153,12 +153,17 @@ public class GroupMessageUtil
     public Response sendMessage( Method method, RepositoryGroupResource resource )
         throws IOException
     {
+        return this.sendMessage( method, resource, resource.getId() );
+    }
+    
+    public Response sendMessage( Method method, RepositoryGroupResource resource, String id )
+        throws IOException
+    {
 
         XStreamRepresentation representation = new XStreamRepresentation( xstream, "", mediaType );
 
-        String userId = ( method == Method.POST ) ? "" : "/" + resource.getId();
-
-        String serviceURI = SERVICE_PART + userId;
+        String idPart = ( method == Method.POST ) ? "" : "/" + id;
+        String serviceURI = SERVICE_PART + idPart;
 
         RepositoryGroupResourceResponse repoResponseRequest = new RepositoryGroupResourceResponse();
         repoResponseRequest.setData( resource );
