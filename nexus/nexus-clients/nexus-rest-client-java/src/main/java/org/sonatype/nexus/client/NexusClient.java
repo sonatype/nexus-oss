@@ -31,4 +31,12 @@ public interface NexusClient
     public NexusArtifact searchBySHA1(String sha1) throws NexusClientException, NexusConnectionException;
     
     public List<NexusArtifact> searchByGAV(NexusArtifact gav) throws NexusClientException, NexusConnectionException;
+    
+    public boolean isNexusStarted( boolean blocking) throws NexusClientException, NexusConnectionException;
+    
+    public void stopNexus() throws NexusClientException, NexusConnectionException;
+    
+    public void startNexus() throws NexusClientException, NexusConnectionException;
+    
+    public void restartNexus() throws NexusClientException, NexusConnectionException;
 }

@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.client.NexusClient;
 import org.sonatype.nexus.client.NexusClientException;
@@ -14,9 +15,9 @@ import org.sonatype.nexus.rest.model.RepositoryListResource;
 import org.sonatype.nexus.rest.model.RepositoryListResourceResponse;
 import org.sonatype.nexus.rest.model.RepositoryResourceResponse;
 import org.sonatype.nexus.rest.model.SearchResponse;
+import org.sonatype.nexus.rest.model.StatusResourceResponse;
 
 /**
- *
  * @plexus.component instantiation-strategy="per-lookup" role="org.sonatype.nexus.client.NexusClient"
  */
 public class NexusRestClient
@@ -25,7 +26,13 @@ public class NexusRestClient
 
     private static final String REPO_SERVICE = "repositories";
 
+    private static final String STATE_SERVICE = "status";
+
     private RestClientHelper clientHelper = null;
+
+    private Logger logger = Logger.getLogger( getClass() );
+
+    public static final String WAIT_FOR_START_TIMEOUT_KEY = "nexus.client.started.timeout";
 
     public void connect( String baseUrl, String username, String password )
     {
@@ -52,18 +59,12 @@ public class NexusRestClient
             return this.getRepository( repo.getId() );
         }
 
-        // expecting an instance of RepositoryResourceResponse
-        if ( tempObj instanceof RepositoryResourceResponse )
-        {
-            RepositoryResourceResponse repoResponse = (RepositoryResourceResponse) tempObj;
-            return repoResponse.getData();
-        }
-        else
-        {
-            throw new NexusClientException(
-                                            "Response from server returned an unexpected object.  Expected: RepositoryResourceResponse, actual: "
-                                                + tempObj.getClass() );
-        }
+        // type check the object so we can have a meaninful error if needed
+        this.checkType( tempObj, RepositoryResourceResponse.class );
+
+        RepositoryResourceResponse repoResponse = (RepositoryResourceResponse) tempObj;
+        return repoResponse.getData();
+
     }
 
     public void deleteRepository( String id )
@@ -77,18 +78,11 @@ public class NexusRestClient
     {
         Object tempObj = this.getClientHelper().get( REPO_SERVICE, id );
 
-        // expecting an instance of RepositoryResourceResponse
-        if ( tempObj instanceof RepositoryResourceResponse )
-        {
-            RepositoryResourceResponse repoResponse = (RepositoryResourceResponse) tempObj;
-            return repoResponse.getData();
-        }
-        else
-        {
-            throw new NexusClientException(
-                                            "Response from server returned an unexpected object.  Expected: RepositoryResourceResponse, actual: "
-                                                + tempObj.getClass() );
-        }
+        // type check the object so we can have a meaninful error if needed
+        this.checkType( tempObj, RepositoryResourceResponse.class );
+
+        RepositoryResourceResponse repoResponse = (RepositoryResourceResponse) tempObj;
+        return repoResponse.getData();
     }
 
     @SuppressWarnings( "unchecked" )
@@ -97,18 +91,11 @@ public class NexusRestClient
     {
         Object tempObj = this.getClientHelper().getList( REPO_SERVICE );
 
-        // expecting an instance of RepositoryResourceResponse
-        if ( tempObj instanceof RepositoryListResourceResponse )
-        {
-            RepositoryListResourceResponse repoResponse = (RepositoryListResourceResponse) tempObj;
-            return repoResponse.getData();
-        }
-        else
-        {
-            throw new NexusClientException(
-                                            "Response from server returned an unexpected object.  Expected: RepositoryListResourceResponse, actual: "
-                                                + tempObj.getClass() );
-        }
+        // type check the object so we can have a meaninful error if needed
+        this.checkType( tempObj, RepositoryListResourceResponse.class );
+        RepositoryListResourceResponse repoResponse = (RepositoryListResourceResponse) tempObj;
+        return repoResponse.getData();
+
     }
 
     public RepositoryBaseResource updateRepository( RepositoryBaseResource repo )
@@ -125,18 +112,11 @@ public class NexusRestClient
             return this.getRepository( repo.getId() );
         }
 
-        // expecting an instance of RepositoryResourceResponse
-        if ( tempObj instanceof RepositoryResourceResponse )
-        {
-            RepositoryResourceResponse repoResponse = (RepositoryResourceResponse) tempObj;
-            return repoResponse.getData();
-        }
-        else
-        {
-            throw new NexusClientException(
-                                            "Response from server returned an unexpected object.  Expected: RepositoryResourceResponse, actual: "
-                                                + tempObj.getClass() );
-        }
+        // type check the object so we can have a meaninful error if needed
+        this.checkType( tempObj, RepositoryResourceResponse.class );
+
+        RepositoryResourceResponse repoResponse = (RepositoryResourceResponse) tempObj;
+        return repoResponse.getData();
     }
 
     public boolean isValidRepository( String id )
@@ -144,10 +124,10 @@ public class NexusRestClient
     {
 
         List<RepositoryListResource> repoList = this.getRespositories();
-        
+
         for ( RepositoryListResource repositoryListResource : repoList )
         {
-            if( repositoryListResource.getId() != null && repositoryListResource.getId().equals( id ))
+            if ( repositoryListResource.getId() != null && repositoryListResource.getId().equals( id ) )
             {
                 return true;
             }
@@ -163,75 +143,143 @@ public class NexusRestClient
 
         if ( tempObj != null )
         {
-
-            // expecting an instance of NexusArtifact
-            if ( tempObj instanceof NexusArtifact )
-            {
-                return (NexusArtifact) tempObj;
-            }
-            else
-            {
-                throw new NexusClientException(
-                                                "Response from server returned an unexpected object.  Expected: NexusArtifact, actual: "
-                                                    + tempObj.getClass() );
-            }
+            // type check the object so we can have a meaninful error if needed
+            this.checkType( tempObj, NexusArtifact.class );
+            return (NexusArtifact) tempObj;
         }
         return null;
 
     }
-    
-    @SuppressWarnings("unchecked")
+
+    @SuppressWarnings( "unchecked" )
     public List<NexusArtifact> searchByGAV( NexusArtifact gav )
-    throws NexusClientException, NexusConnectionException
-{
+        throws NexusClientException, NexusConnectionException
+    {
         Map<String, String> params = new HashMap<String, String>();
         // build the url params
         // group
-        if( StringUtils.isNotEmpty( gav.getGroupId() ))
+        if ( StringUtils.isNotEmpty( gav.getGroupId() ) )
         {
             params.put( "g", gav.getGroupId() );
         }
         // artifact
-        if( StringUtils.isNotEmpty( gav.getArtifactId() ))
+        if ( StringUtils.isNotEmpty( gav.getArtifactId() ) )
         {
             params.put( "a", gav.getArtifactId() );
         }
         // version
-        if( StringUtils.isNotEmpty( gav.getVersion() ))
+        if ( StringUtils.isNotEmpty( gav.getVersion() ) )
         {
             params.put( "v", gav.getVersion() );
         }
         // classifier
-        if( StringUtils.isNotEmpty( gav.getClassifier() ))
+        if ( StringUtils.isNotEmpty( gav.getClassifier() ) )
         {
             params.put( "c", gav.getClassifier() );
         }
         // packaging
-        if( StringUtils.isNotEmpty( gav.getPackaging() ))
+        if ( StringUtils.isNotEmpty( gav.getPackaging() ) )
         {
             params.put( "p", gav.getPackaging() );
         }
-                
-    Object tempObj = this.getClientHelper().get( "data_index", params );
 
-    if ( tempObj != null )
-    {
+        Object tempObj = this.getClientHelper().get( "data_index", params );
 
-        // expecting an instance of SearchResponse
-        if ( tempObj instanceof SearchResponse )
+        if ( tempObj != null )
         {
-            return ((SearchResponse) tempObj).getData();
+            // type check the object so we can have a meaninful error if needed
+            this.checkType( tempObj, SearchResponse.class );
+            return ( (SearchResponse) tempObj ).getData();
+
         }
-        else
-        {
-            throw new NexusClientException(
-                                            "Response from server returned an unexpected object.  Expected: SearchResponse, actual: "
-                                                + tempObj.getClass() );
-        }
+        return null;
+
     }
-    return null;
 
-}
+    public boolean isNexusStarted( boolean blocking )
+        throws NexusClientException, NexusConnectionException
+    {
+        return blocking ? this.waitforNexusToStart() : this.isNexusStarted();
+    }
+
+    public boolean waitforNexusToStart()
+    {
+        long timeout = 10000;
+        String timeoutProp = System.getProperty( WAIT_FOR_START_TIMEOUT_KEY, Long.toString( timeout ) );
+        try
+        {
+            timeout = Long.valueOf( timeoutProp );
+        }
+        catch ( NumberFormatException e )
+        {
+            logger.warn( "System property '" + WAIT_FOR_START_TIMEOUT_KEY + "' is not a number. defaulting to:  "
+                + timeout );
+        }
+
+        long startTime = System.currentTimeMillis();
+
+        // poll the service every 1/2 sec
+        while ( System.currentTimeMillis() < ( startTime + timeout ) )
+        {
+            // its possible nexus just started, and is not ready to return the status information
+            // so if we run into an error just log it, its possible to hit this error 20 times (default)
+            try
+            {
+                if ( this.isNexusStarted() )
+                {
+                    return true;
+                }
+            }
+            catch ( NexusClientException e )
+            {
+                this.logger.debug( "Error while waiting for nexus to start: " + e.getMessage(), e );
+            }
+            catch ( NexusConnectionException e )
+            {
+                this.logger.debug( "Error while waiting for nexus to start: " + e.getMessage(), e );
+            }
+            try
+            {
+                Thread.sleep( 500 ); // sleep for 1/2 second.
+            }
+            catch ( InterruptedException e )
+            {
+            }
+        }
+        return false;
+    }
+
+    public boolean isNexusStarted()
+        throws NexusClientException, NexusConnectionException
+    {
+        Object tempObj = this.getClientHelper().get( STATE_SERVICE, (String) null );
+
+        // StatusResourceResponse.getData ->StatusResource
+
+        // type check the object so we can have a meaninful error if needed
+        this.checkType( tempObj, StatusResourceResponse.class );
+
+        // everything should be smooth sailing from here.
+        return ( (StatusResourceResponse) tempObj ).getData().getState().endsWith( "STARTED" );
+    }
+
+    public void restartNexus()
+        throws NexusClientException, NexusConnectionException
+    {
+        this.getClientHelper().sendCommand( STATE_SERVICE, "RESTART" );
+    }
+
+    public void startNexus()
+        throws NexusClientException, NexusConnectionException
+    {
+        this.getClientHelper().sendCommand( STATE_SERVICE, "START" );
+    }
+
+    public void stopNexus()
+        throws NexusClientException, NexusConnectionException
+    {
+        this.getClientHelper().sendCommand( STATE_SERVICE, "STOP" );
+    }
 
     private RestClientHelper getClientHelper()
         throws NexusClientException
@@ -243,6 +291,23 @@ public class NexusRestClient
         else
         {
             throw new NexusClientException( "Not connected to a Nexus instance." );
+        }
+    }
+
+    /**
+     * Used to add meaningful exceptions.
+     * 
+     * @throws NexusClientException
+     */
+    @SuppressWarnings( "unchecked" )
+    private void checkType( Object obj, Class expectedType )
+        throws NexusClientException
+    {
+
+        if ( !expectedType.isInstance( obj ) )
+        {
+            throw new NexusClientException( "Response from server returned an unexpected object.  Expected: "
+                + expectedType + ", actual: " + obj.getClass() );
         }
     }
 }
