@@ -30,9 +30,4 @@ public interface RepositoryItemUid
      * @return
      */
     String getPath();
-
-    /**
-     * Does internal cleanup. Must be called when thes UIS is not used anymore.
-     */
-    void release();
 }

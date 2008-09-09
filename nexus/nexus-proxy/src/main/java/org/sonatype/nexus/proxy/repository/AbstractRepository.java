@@ -1098,11 +1098,6 @@ public abstract class AbstractRepository
         return repositoryItemUidFactory.createUid( this, path );
     }
 
-    public void releaseUid( RepositoryItemUid uid )
-    {
-        repositoryItemUidFactory.releaseUid( uid );
-    }
-
     // ===================================================================================
     // Inner stuff
 

@@ -29,20 +29,15 @@ import org.sonatype.nexus.proxy.repository.Repository;
 public class DefaultRepositoryItemUid
     implements RepositoryItemUid
 {
-    /** My factory */
-    private final RepositoryItemUidFactory factory;
-
     /** The repository. */
     private final Repository repository;
 
     /** The path. */
     private final String path;
 
-    public DefaultRepositoryItemUid( RepositoryItemUidFactory factory, Repository repository, String path )
+    public DefaultRepositoryItemUid( Repository repository, String path )
     {
         super();
-
-        this.factory = factory;
 
         this.repository = repository;
 
@@ -57,11 +52,6 @@ public class DefaultRepositoryItemUid
     public String getPath()
     {
         return path;
-    }
-
-    public void release()
-    {
-        factory.releaseUid( this );
     }
 
     /**

@@ -37,7 +37,7 @@ public class DefaultStorageFileItemTest
     {
         expect( repository.getId() ).andReturn( "dummy" ).anyTimes();
         expect( repository.createUid( "/a.txt" ) ).andReturn(
-            new DefaultRepositoryItemUid( getRepositoryItemUidFactory(), repository, "/a.txt" ) );
+            new DefaultRepositoryItemUid( repository, "/a.txt" ) );
         expect( repository.retrieveItemContent( isA( RepositoryItemUid.class ) ) ).andReturn(
             new ByteArrayInputStream( "/a.txt".getBytes() ) );
 
@@ -61,7 +61,7 @@ public class DefaultStorageFileItemTest
     {
         expect( repository.getId() ).andReturn( "dummy" ).anyTimes();
         expect( repository.createUid( "/a.txt" ) ).andReturn(
-            new DefaultRepositoryItemUid(getRepositoryItemUidFactory(), repository, "/a.txt" ) );
+            new DefaultRepositoryItemUid( repository, "/a.txt" ) );
         expect( repository.retrieveItemContent( isA( RepositoryItemUid.class ) ) ).andReturn(
             new ByteArrayInputStream( "/a.txt".getBytes() ) );
 
@@ -92,7 +92,7 @@ public class DefaultStorageFileItemTest
     {
         expect( repository.getId() ).andReturn( "dummy" ).anyTimes();
         expect( repository.createUid( "/some/dir/hierarchy/a.txt" ) ).andReturn(
-            new DefaultRepositoryItemUid(getRepositoryItemUidFactory(), repository, "/some/dir/hierarchy/a.txt" ) );
+            new DefaultRepositoryItemUid( repository, "/some/dir/hierarchy/a.txt" ) );
         expect( repository.retrieveItemContent( isA( RepositoryItemUid.class ) ) ).andReturn(
             new ByteArrayInputStream( "/some/dir/hierarchy/a.txt".getBytes() ) );
 
@@ -116,7 +116,7 @@ public class DefaultStorageFileItemTest
     {
         expect( repository.getId() ).andReturn( "dummy" ).anyTimes();
         expect( repository.createUid( "/some/dir/hierarchy/a.txt" ) ).andReturn(
-            new DefaultRepositoryItemUid(getRepositoryItemUidFactory(), repository, "/some/dir/hierarchy/a.txt" ) );
+            new DefaultRepositoryItemUid( repository, "/some/dir/hierarchy/a.txt" ) );
         expect( repository.retrieveItemContent( isA( RepositoryItemUid.class ) ) ).andReturn(
             new ByteArrayInputStream( "/some/dir/hierarchy/a.txt".getBytes() ) );
 

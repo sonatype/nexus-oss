@@ -65,9 +65,9 @@ public class DefaultAttributeStorageTest
         expect( repository.getId() ).andReturn( "dummy" ).anyTimes();
 
         expect( repository.createUid( "/a.txt" ) ).andReturn(
-            new DefaultRepositoryItemUid(getRepositoryItemUidFactory(),  repository, "/a.txt" ) );
+            new DefaultRepositoryItemUid( repository, "/a.txt" ) );
         expect( repository.createUid( "/b.txt" ) ).andReturn(
-            new DefaultRepositoryItemUid(getRepositoryItemUidFactory(),  repository, "/b.txt" ) );
+            new DefaultRepositoryItemUid( repository, "/b.txt" ) );
 
         replay( repository );
         

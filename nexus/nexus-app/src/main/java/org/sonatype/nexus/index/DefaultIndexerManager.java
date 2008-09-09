@@ -480,188 +480,179 @@ public class DefaultIndexerManager
 
                 RepositoryItemUid zipUid = repository.createUid( "/.index/" + IndexingContext.INDEX_FILE + ".zip" );
 
-                try
+                if ( shouldDownloadRemoteIndex )
                 {
-                    if ( shouldDownloadRemoteIndex )
+                    File tmpdir = null;
+
+                    try
                     {
-                        File tmpdir = null;
+                        getLogger().info( "Trying to get remote index for repository " + repository.getId() );
 
-                        try
+                        // this will force redownload
+                        repository.clearCaches( "/.index" );
+
+                        StorageFileItem fitem = (StorageFileItem) repository.retrieveItem( false, propsUid, ctx );
+
+                        fitem = (StorageFileItem) repository.retrieveItem( false, zipUid, ctx );
+
+                        tmpdir = new File( getTempDirectory(), "nx-remote-index" + System.currentTimeMillis() );
+
+                        tmpdir.mkdirs();
+
+                        FSDirectory directory = FSDirectory.getDirectory( tmpdir );
+
+                        BufferedInputStream is = new BufferedInputStream( fitem.getInputStream(), 4096 );
+
+                        IndexUtils.unpackIndexArchive( is, directory );
+
+                        if ( MavenRepository.class.isAssignableFrom( repository.getClass() ) )
                         {
-                            getLogger().info( "Trying to get remote index for repository " + repository.getId() );
+                            getLogger().info( "Filtering downloaded index..." );
 
-                            // this will force redownload
-                            repository.clearCaches( "/.index" );
+                            MavenRepository mrepository = (MavenRepository) repository;
 
-                            StorageFileItem fitem = (StorageFileItem) repository.retrieveItem( false, propsUid, ctx );
-
-                            fitem = (StorageFileItem) repository.retrieveItem( false, zipUid, ctx );
-
-                            tmpdir = new File( getTempDirectory(), "nx-remote-index" + System.currentTimeMillis() );
-
-                            tmpdir.mkdirs();
-
-                            FSDirectory directory = FSDirectory.getDirectory( tmpdir );
-
-                            BufferedInputStream is = new BufferedInputStream( fitem.getInputStream(), 4096 );
-
-                            IndexUtils.unpackIndexArchive( is, directory );
-
-                            if ( MavenRepository.class.isAssignableFrom( repository.getClass() ) )
+                            if ( RepositoryPolicy.RELEASE.equals( mrepository.getRepositoryPolicy() ) )
                             {
-                                getLogger().info( "Filtering downloaded index..." );
-
-                                MavenRepository mrepository = (MavenRepository) repository;
-
-                                if ( RepositoryPolicy.RELEASE.equals( mrepository.getRepositoryPolicy() ) )
+                                IndexUtils.filterDirectory( directory, new DocumentFilter()
                                 {
-                                    IndexUtils.filterDirectory( directory, new DocumentFilter()
+                                    public boolean accept( Document doc )
                                     {
-                                        public boolean accept( Document doc )
+                                        String uinfo = doc.get( ArtifactInfo.UINFO );
+
+                                        if ( uinfo != null )
                                         {
-                                            String uinfo = doc.get( ArtifactInfo.UINFO );
+                                            String[] r = AbstractIndexCreator.FS_PATTERN.split( uinfo );
 
-                                            if ( uinfo != null )
-                                            {
-                                                String[] r = AbstractIndexCreator.FS_PATTERN.split( uinfo );
+                                            String version = r[2];
 
-                                                String version = r[2];
-
-                                                return !VersionUtils.isSnapshot( version );
-                                            }
-                                            else
-                                            {
-                                                // not an artifactInfo record, accept it
-                                                return true;
-                                            }
+                                            return !VersionUtils.isSnapshot( version );
                                         }
-                                    } );
-                                }
-                                else if ( RepositoryPolicy.SNAPSHOT.equals( mrepository.getRepositoryPolicy() ) )
-                                {
-                                    IndexUtils.filterDirectory( directory, new DocumentFilter()
-                                    {
-                                        public boolean accept( Document doc )
+                                        else
                                         {
-                                            String uinfo = doc.get( ArtifactInfo.UINFO );
-
-                                            if ( uinfo != null )
-                                            {
-                                                String[] r = AbstractIndexCreator.FS_PATTERN.split( uinfo );
-
-                                                String version = r[2];
-
-                                                return VersionUtils.isSnapshot( version );
-                                            }
-                                            else
-                                            {
-                                                // not an artifactInfo record, accept it
-                                                return true;
-                                            }
+                                            // not an artifactInfo record, accept it
+                                            return true;
                                         }
-                                    } );
-                                }
+                                    }
+                                } );
                             }
-
-                            IndexingContext context = nexusIndexer.getIndexingContexts().get(
-                                getRemoteContextId( repository.getId() ) );
-
-                            context.replace( directory );
-                            /*
-                             * if ( MavenRepository.class.isAssignableFrom( repository.getClass() ) ) {
-                             * getLogger().info( "Filtering downloaded index..." ); MavenRepository mrepository =
-                             * (MavenRepository) repository; if ( RepositoryPolicy.RELEASE.equals(
-                             * mrepository.getRepositoryPolicy() ) ) { context.filter( new ArtifactInfoFilter() { public
-                             * boolean accept( ArtifactInfo ai ) { return !VersionUtils.isSnapshot( ai.version ); } } );
-                             * } else if ( RepositoryPolicy.SNAPSHOT.equals( mrepository.getRepositoryPolicy() ) ) {
-                             * context.filter( new ArtifactInfoFilter() { public boolean accept( ArtifactInfo ai ) {
-                             * return VersionUtils.isSnapshot( ai.version ); } } ); } }
-                             */
-                            getLogger().info(
-                                "Remote indexes published and imported successfully for repository "
-                                    + repository.getId() );
-
-                            hasRemoteIndex = true;
-                        }
-                        catch ( ItemNotFoundException e )
-                        {
-                            getLogger().info(
-                                "Repository " + repository.getId()
-                                    + " has no available remote indexes but it is set to download them." );
-
-                            hasRemoteIndex = false;
-                        }
-                        catch ( Exception e )
-                        {
-                            getLogger().warn( "Cannot fetch remote index:", e );
-
-                            hasRemoteIndex = false;
-
-                        }
-                        finally
-                        {
-                            if ( tmpdir != null )
+                            else if ( RepositoryPolicy.SNAPSHOT.equals( mrepository.getRepositoryPolicy() ) )
                             {
-                                FileUtils.deleteDirectory( tmpdir );
+                                IndexUtils.filterDirectory( directory, new DocumentFilter()
+                                {
+                                    public boolean accept( Document doc )
+                                    {
+                                        String uinfo = doc.get( ArtifactInfo.UINFO );
+
+                                        if ( uinfo != null )
+                                        {
+                                            String[] r = AbstractIndexCreator.FS_PATTERN.split( uinfo );
+
+                                            String version = r[2];
+
+                                            return VersionUtils.isSnapshot( version );
+                                        }
+                                        else
+                                        {
+                                            // not an artifactInfo record, accept it
+                                            return true;
+                                        }
+                                    }
+                                } );
                             }
                         }
-                    }
-                    else
-                    {
-                        // make empty the remote context
+
                         IndexingContext context = nexusIndexer.getIndexingContexts().get(
                             getRemoteContextId( repository.getId() ) );
 
-                        context.purge();
+                        context.replace( directory );
+                        /*
+                         * if ( MavenRepository.class.isAssignableFrom( repository.getClass() ) ) {
+                         * getLogger().info( "Filtering downloaded index..." ); MavenRepository mrepository =
+                         * (MavenRepository) repository; if ( RepositoryPolicy.RELEASE.equals(
+                         * mrepository.getRepositoryPolicy() ) ) { context.filter( new ArtifactInfoFilter() { public
+                         * boolean accept( ArtifactInfo ai ) { return !VersionUtils.isSnapshot( ai.version ); } } );
+                         * } else if ( RepositoryPolicy.SNAPSHOT.equals( mrepository.getRepositoryPolicy() ) ) {
+                         * context.filter( new ArtifactInfoFilter() { public boolean accept( ArtifactInfo ai ) {
+                         * return VersionUtils.isSnapshot( ai.version ); } } ); } }
+                         */
+                        getLogger().info(
+                            "Remote indexes published and imported successfully for repository "
+                                + repository.getId() );
+
+                        hasRemoteIndex = true;
+                    }
+                    catch ( ItemNotFoundException e )
+                    {
+                        getLogger().info(
+                            "Repository " + repository.getId()
+                                + " has no available remote indexes but it is set to download them." );
 
                         hasRemoteIndex = false;
                     }
-
-                    // clean up then
-                    // if was exception, to clean partially downloaded stuff
-                    // if was downloadRemoteIndexes false, to remove obsolete files
-                    if ( !hasRemoteIndex )
+                    catch ( Exception e )
                     {
-                        // delete the potentially partially downloaded files
-                        if ( propsUid != null )
-                        {
-                            try
-                            {
-                                repository.deleteItem( propsUid, ctx );
-                            }
-                            catch ( ItemNotFoundException ex )
-                            {
-                                // silent
-                            }
-                            catch ( Exception ex )
-                            {
-                                getLogger().warn( "Cannot delete index part:", ex );
-                            }
-                        }
+                        getLogger().warn( "Cannot fetch remote index:", e );
 
-                        // delete the potentially partially downloaded files
-                        if ( zipUid != null )
+                        hasRemoteIndex = false;
+
+                    }
+                    finally
+                    {
+                        if ( tmpdir != null )
                         {
-                            try
-                            {
-                                repository.deleteItem( zipUid, ctx );
-                            }
-                            catch ( ItemNotFoundException ex )
-                            {
-                                // silent
-                            }
-                            catch ( Exception ex )
-                            {
-                                getLogger().warn( "Cannot delete index part:", ex );
-                            }
+                            FileUtils.deleteDirectory( tmpdir );
                         }
                     }
                 }
-                finally
+                else
                 {
-                    repository.releaseUid( propsUid );
+                    // make empty the remote context
+                    IndexingContext context = nexusIndexer.getIndexingContexts().get(
+                        getRemoteContextId( repository.getId() ) );
 
-                    repository.releaseUid( zipUid );
+                    context.purge();
+
+                    hasRemoteIndex = false;
+                }
+
+                // clean up then
+                // if was exception, to clean partially downloaded stuff
+                // if was downloadRemoteIndexes false, to remove obsolete files
+                if ( !hasRemoteIndex )
+                {
+                    // delete the potentially partially downloaded files
+                    if ( propsUid != null )
+                    {
+                        try
+                        {
+                            repository.deleteItem( propsUid, ctx );
+                        }
+                        catch ( ItemNotFoundException ex )
+                        {
+                            // silent
+                        }
+                        catch ( Exception ex )
+                        {
+                            getLogger().warn( "Cannot delete index part:", ex );
+                        }
+                    }
+
+                    // delete the potentially partially downloaded files
+                    if ( zipUid != null )
+                    {
+                        try
+                        {
+                            repository.deleteItem( zipUid, ctx );
+                        }
+                        catch ( ItemNotFoundException ex )
+                        {
+                            // silent
+                        }
+                        catch ( Exception ex )
+                        {
+                            getLogger().warn( "Cannot delete index part:", ex );
+                        }
+                    }
                 }
             }
 

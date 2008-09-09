@@ -27,10 +27,6 @@ public interface RepositoryItemUidFactory
         throws IllegalArgumentException,
             NoSuchRepositoryException;
 
-    /**
-     * Release this UID.
-     */
-    void releaseUid( RepositoryItemUid uid );
 
     /**
      * Performs a lock on this UID, and by that, potentionally locks all other threads if needed, that are working on
@@ -49,4 +45,11 @@ public interface RepositoryItemUidFactory
      * @return
      */
     public int getLockCount();
+    
+    /**
+     * For testing/debugging purposes.
+     * 
+     * @return
+     */
+    public int getUidCount();
 }

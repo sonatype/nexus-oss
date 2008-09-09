@@ -31,33 +31,83 @@ public class RepositoryItemUidTest
     extends AbstractNexusTestEnvironment
 {
     protected Repository repository;
-
-    public void testDummy()
-    {
-
-    }
-
-    public void testConcurrentLocksOfSameUid()
+    
+    @Override
+    protected void setUp()
         throws Exception
     {
-        Repository repository = createMock(Repository.class);
+        super.setUp();
+        
+        repository = createMock(Repository.class);
 
         makeThreadSafe( repository, true );
         
         expect(repository.getId()).andReturn( "dummy" ).anyTimes();
         
         replay(repository);
+    }
+    
+    public void testReleaseFromMemory()
+        throws Exception
+    {
+        RepositoryItemUidFactory factory = getRepositoryItemUidFactory();
         
-        //
+        RepositoryItemUid uid = factory.createUid( repository, "/a.txt" );
+        RepositoryItemUid uid2 = factory.createUid( repository, "/a.txt" );
+        RepositoryItemUid uid3 = factory.createUid( repository, "/b.txt" );
         
-        RepositoryItemUidFactory repositoryItemUidFactory = (RepositoryItemUidFactory) lookup( RepositoryItemUidFactory.class );
+        // Proof that create isn't putting anything in the internal maps
+        assertEquals( 0, factory.getUidCount() );
+        assertEquals( 0, factory.getLockCount() );
+        
+        factory.lock( uid );
+        
+        // Proof that locking a uid adds it to internal maps
+        assertEquals( 1, factory.getUidCount() );
+        assertEquals( 1, factory.getLockCount() );
+        
+        factory.lock( uid2 );
+        
+        // Proof that locking 2 uids w/ the same item does not increase the internal map count
+        assertEquals( 1, factory.getUidCount() );
+        assertEquals( 1, factory.getLockCount() );
+        
+        factory.lock( uid3 );
+        
+        // Proof that using a different uid creates a new item in internal map
+        assertEquals( 2, factory.getUidCount() );
+        assertEquals( 2, factory.getLockCount() );
+        
+        factory.unlock( uid3 );
+        
+        // Proof that removing an item updates internal maps
+        assertEquals( 1, factory.getUidCount() );
+        assertEquals( 1, factory.getLockCount() );
+        
+        factory.unlock( uid2 );
+        
+        // Proof that removing an item that was added twice, doesn't remove the whole list
+        assertEquals( 1, factory.getUidCount() );
+        assertEquals( 1, factory.getLockCount() );
+        
+        factory.unlock( uid );
+        
+        // Proof that removing the final item (if added more than once) removes whole list
+        assertEquals( 0, factory.getUidCount() );
+        assertEquals( 0, factory.getLockCount() );
+    }
 
-        RepositoryItemUid uidA = getRepositoryItemUidFactory().createUid( repository, "/a.txt" );
+    public void testConcurrentLocksOfSameUid()
+        throws Exception
+    {   
+        RepositoryItemUidFactory factory = getRepositoryItemUidFactory();
+        
+        RepositoryItemUid uidA = factory.createUid( repository, "/a.txt" );
 
         Thread thread1 = new Thread(
-            new RepositoryItemUidLockProcessLauncher( repositoryItemUidFactory, uidA, 100, 100 ) );
+            new RepositoryItemUidLockProcessLauncher( factory, uidA, 100, 100 ) );
         Thread thread2 = new Thread(
-            new RepositoryItemUidLockProcessLauncher( repositoryItemUidFactory, uidA, 100, 100 ) );
+            new RepositoryItemUidLockProcessLauncher( factory, uidA, 100, 100 ) );
 
         thread1.start();
         thread2.start();
@@ -68,8 +118,6 @@ public class RepositoryItemUidTest
 
         thread1.join();
         thread2.join();
-
-        getRepositoryItemUidFactory().releaseUid( uidA );
 
         assertEquals( 0, getRepositoryItemUidFactory().getLockCount() );
     }

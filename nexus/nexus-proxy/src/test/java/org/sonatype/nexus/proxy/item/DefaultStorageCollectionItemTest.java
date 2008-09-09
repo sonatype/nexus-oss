@@ -37,7 +37,7 @@ public class DefaultStorageCollectionItemTest
     {
         expect( repository.getId() ).andReturn( "dummy" ).anyTimes();
         expect( repository.createUid( "/" ) ).andReturn(
-            new DefaultRepositoryItemUid(getRepositoryItemUidFactory(), repository, "/" ) );
+            new DefaultRepositoryItemUid( repository, "/" ) );
 
         replay( repository );
 
@@ -52,13 +52,13 @@ public class DefaultStorageCollectionItemTest
 
         expect( repository.getId() ).andReturn( "dummy" ).anyTimes();
         expect( repository.createUid( "/a/some/dir/coll" ) ).andReturn(
-            new DefaultRepositoryItemUid(getRepositoryItemUidFactory(),  repository, "/a/some/dir/coll" ) );
+            new DefaultRepositoryItemUid( repository, "/a/some/dir/coll" ) );
         expect( repository.createUid( "/a/some/dir/coll/A" ) ).andReturn(
-            new DefaultRepositoryItemUid(getRepositoryItemUidFactory(),  repository, "/a/some/dir/coll/A" ) );
+            new DefaultRepositoryItemUid( repository, "/a/some/dir/coll/A" ) );
         expect( repository.createUid( "/a/some/dir/coll/B" ) ).andReturn(
-            new DefaultRepositoryItemUid(getRepositoryItemUidFactory(),  repository, "/a/some/dir/coll/B" ) );
+            new DefaultRepositoryItemUid( repository, "/a/some/dir/coll/B" ) );
         expect( repository.createUid( "/a/some/dir/coll/C" ) ).andReturn(
-            new DefaultRepositoryItemUid(getRepositoryItemUidFactory(),  repository, "/a/some/dir/coll/C" ) );
+            new DefaultRepositoryItemUid( repository, "/a/some/dir/coll/C" ) );
         expect( repository.list( isA( ResourceStoreRequest.class ) ) ).andReturn( result );
 
         replay( repository );

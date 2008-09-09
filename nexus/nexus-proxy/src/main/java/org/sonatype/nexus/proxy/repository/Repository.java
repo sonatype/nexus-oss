@@ -458,9 +458,4 @@ public interface Repository
      * Creates an UID within this Repository.
      */
     RepositoryItemUid createUid( String path );
-
-    /**
-     * Releases an UID within this Repository.
-     */
-    void releaseUid( RepositoryItemUid uid );
 }

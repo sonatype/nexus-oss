@@ -45,12 +45,7 @@ public class DefaultRepositoryItemUidFactory
             path = RepositoryItemUid.PATH_ROOT;
         }
 
-        RepositoryItemUid result = new DefaultRepositoryItemUid( this, repository, path );
-
-        // get the lock
-        register( result );
-
-        return result;
+        return new DefaultRepositoryItemUid( repository, path );
     }
 
     public RepositoryItemUid createUid( String uidStr )
@@ -80,24 +75,28 @@ public class DefaultRepositoryItemUidFactory
         }
     }
 
-    public void releaseUid( RepositoryItemUid uid )
-    {
-        deregister( uid );
-    }
-
     public void lock( RepositoryItemUid uid )
     {
+        register( uid );
+        
         lockMap.get( uid.toString() ).lock();
     }
 
     public void unlock( RepositoryItemUid uid )
     {
         lockMap.get( uid.toString() ).unlock();
+        
+        deregister( uid );
     }
 
     public int getLockCount()
     {
         return lockMap.size();
+    }
+    
+    public int getUidCount()
+    {
+        return uidMap.size();
     }
 
     // =====
