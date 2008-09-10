@@ -20,6 +20,7 @@
  */
 package org.sonatype.nexus.rest.feeds;
 
+import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.sonatype.nexus.Nexus;
 
 import com.sun.syndication.feed.synd.SyndFeed;
@@ -31,7 +32,8 @@ import com.sun.syndication.feed.synd.SyndFeed;
  * @author cstamas
  */
 public abstract class AbstractFeedSource
-    implements FeedSource
+    extends AbstractLogEnabled
+        implements FeedSource
 {
     /** @plexus.requirement */
     private Nexus nexus;

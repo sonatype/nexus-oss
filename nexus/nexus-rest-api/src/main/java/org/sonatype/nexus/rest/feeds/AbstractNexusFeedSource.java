@@ -32,6 +32,7 @@ import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.access.AccessManager;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.security.NexusArtifactAuthorizer;
 
 import com.sun.syndication.feed.synd.SyndContent;
 import com.sun.syndication.feed.synd.SyndContentImpl;
@@ -49,6 +50,11 @@ import com.sun.syndication.feed.synd.SyndFeedImpl;
 public abstract class AbstractNexusFeedSource
     extends AbstractFeedSource
 {
+    /**
+     * @plexus.requirement
+     */
+    private NexusArtifactAuthorizer artifactAuthorizer;
+    
     /**
      * Creates/formats GAV strings from ArtifactInfo.
      * 
@@ -154,116 +160,129 @@ public abstract class AbstractNexusFeedSource
             {
                 ipAddress = null;
             }
-
-            gav = getGav( item.getNexusItemInfo() );
-
-            StringBuffer msg = new StringBuffer( "The " ).append( gav ).append(
-                    " artifact in repository " ).append( item.getNexusItemInfo().getRepositoryId() ).append( " is " );
-
-            if ( NexusArtifactEvent.ACTION_CACHED.equals( item.getAction() ) )
+            
+            try
             {
-                msg
-                    .append( "cached by Nexus from remote URL " ).append( item.getNexusItemInfo().getRemoteUrl() )
-                    .append( "." );
-
-                if ( username != null )
+                Repository repo = getNexus().getRepository( item.getNexusItemInfo().getRepositoryId() );
+                
+                if ( artifactAuthorizer.authorizePath( repo, item.getNexusItemInfo().getPath() ) )
                 {
-                    msg.append( " Caching happened to fulfill a request from user " ).append( username ).append( "." );
+                    gav = getGav( item.getNexusItemInfo() );            
+    
+                    StringBuffer msg = new StringBuffer( "The " ).append( gav ).append(
+                            " artifact in repository " ).append( item.getNexusItemInfo().getRepositoryId() ).append( " is " );
+    
+                    if ( NexusArtifactEvent.ACTION_CACHED.equals( item.getAction() ) )
+                    {
+                        msg
+                            .append( "cached by Nexus from remote URL " ).append( item.getNexusItemInfo().getRemoteUrl() )
+                            .append( "." );
+    
+                        if ( username != null )
+                        {
+                            msg.append( " Caching happened to fulfill a request from user " ).append( username ).append( "." );
+                        }
+                    }
+                    else if ( NexusArtifactEvent.ACTION_DEPLOYED.equals( item.getAction() ) )
+                    {
+                        msg.append( "deployed onto Nexus." );
+    
+                        if ( username != null )
+                        {
+                            msg.append( " Deployment was initiated by user " ).append( username ).append( "." );
+                        }
+                    }
+                    else if ( NexusArtifactEvent.ACTION_DELETED.equals( item.getAction() ) )
+                    {
+                        msg.append( "deleted from Nexus." );
+    
+                        if ( username != null )
+                        {
+                            msg.append( " Deletion was initiated by user " ).append( username ).append( "." );
+                        }
+                    }
+                    else if ( NexusArtifactEvent.ACTION_BROKEN.equals( item.getAction() ) )
+                    {
+                        msg.append( "broken." );
+    
+                        if ( item.getMessage() != null )
+                        {
+                            msg.append( " Details: \n" );
+    
+                            msg.append( item.getMessage() );
+    
+                            msg.append( "\n" );
+                        }
+    
+                        if ( username != null )
+                        {
+                            msg.append( " Processing was initiated by user " ).append( username ).append( "." );
+                        }
+                    }
+                    else if ( NexusArtifactEvent.ACTION_BROKEN_WRONG_REMOTE_CHECKSUM.equals( item.getAction() ) )
+                    {
+                        msg.append( "proxied, and the remote repository contains wrong checksum for it." );
+    
+                        if ( item.getMessage() != null )
+                        {
+                            msg.append( " Details: \n" );
+    
+                            msg.append( item.getMessage() );
+    
+                            msg.append( "\n" );
+                        }
+    
+                        if ( username != null )
+                        {
+                            msg.append( " Processing was initiated by user " ).append( username ).append( "." );
+                        }
+                    }
+                    else if ( NexusArtifactEvent.ACTION_RETRIEVED.equals( item.getAction() ) )
+                    {
+                        msg.append( "served by Nexus." );
+    
+                        if ( username != null )
+                        {
+                            msg.append( " Request was initiated by user " ).append( username ).append( "." );
+                        }
+                    }
+    
+                    if ( ipAddress != null )
+                    {
+                        msg.append( " The request was originated from IP address " ).append( ipAddress ).append( "." );
+                    }
+    
+                    StringBuffer uriToAppend = new StringBuffer( "content/repositories/" ).append(
+                        item.getNexusItemInfo().getRepositoryId() ).append( item.getNexusItemInfo().getPath() );
+    
+                    itemLink = uriToAppend.toString();
+    
+                    entry = new SyndEntryImpl();
+    
+                    entry.setTitle( getGav( item.getNexusItemInfo() ) );
+    
+                    entry.setLink( itemLink );
+    
+                    entry.setPublishedDate( item.getEventDate() );
+    
+                    entry.setAuthor( username );
+    
+                    content = new SyndContentImpl();
+    
+                    content.setType( MediaType.TEXT_PLAIN.toString() );
+    
+                    content.setValue( msg.toString() );
+    
+                    entry.setDescription( content );
+    
+                    entries.add( entry );
                 }
             }
-            else if ( NexusArtifactEvent.ACTION_DEPLOYED.equals( item.getAction() ) )
+            catch ( NoSuchRepositoryException e )
             {
-                msg.append( "deployed onto Nexus." );
-
-                if ( username != null )
-                {
-                    msg.append( " Deployment was initiated by user " ).append( username ).append( "." );
-                }
+                // Can't get repository for artifact, therefore we can't authorize access, therefore you dont see it
+                getLogger().error( "Feed entry contained invalid repository id " + item.getNexusItemInfo().getRepositoryId(), e );
             }
-            else if ( NexusArtifactEvent.ACTION_DELETED.equals( item.getAction() ) )
-            {
-                msg.append( "deleted from Nexus." );
-
-                if ( username != null )
-                {
-                    msg.append( " Deletion was initiated by user " ).append( username ).append( "." );
-                }
-            }
-            else if ( NexusArtifactEvent.ACTION_BROKEN.equals( item.getAction() ) )
-            {
-                msg.append( "broken." );
-
-                if ( item.getMessage() != null )
-                {
-                    msg.append( " Details: \n" );
-
-                    msg.append( item.getMessage() );
-
-                    msg.append( "\n" );
-                }
-
-                if ( username != null )
-                {
-                    msg.append( " Processing was initiated by user " ).append( username ).append( "." );
-                }
-            }
-            else if ( NexusArtifactEvent.ACTION_BROKEN_WRONG_REMOTE_CHECKSUM.equals( item.getAction() ) )
-            {
-                msg.append( "proxied, and the remote repository contains wrong checksum for it." );
-
-                if ( item.getMessage() != null )
-                {
-                    msg.append( " Details: \n" );
-
-                    msg.append( item.getMessage() );
-
-                    msg.append( "\n" );
-                }
-
-                if ( username != null )
-                {
-                    msg.append( " Processing was initiated by user " ).append( username ).append( "." );
-                }
-            }
-            else if ( NexusArtifactEvent.ACTION_RETRIEVED.equals( item.getAction() ) )
-            {
-                msg.append( "served by Nexus." );
-
-                if ( username != null )
-                {
-                    msg.append( " Request was initiated by user " ).append( username ).append( "." );
-                }
-            }
-
-            if ( ipAddress != null )
-            {
-                msg.append( " The request was originated from IP address " ).append( ipAddress ).append( "." );
-            }
-
-            StringBuffer uriToAppend = new StringBuffer( "content/repositories/" ).append(
-                item.getNexusItemInfo().getRepositoryId() ).append( item.getNexusItemInfo().getPath() );
-
-            itemLink = uriToAppend.toString();
-
-            entry = new SyndEntryImpl();
-
-            entry.setTitle( getGav( item.getNexusItemInfo() ) );
-
-            entry.setLink( itemLink );
-
-            entry.setPublishedDate( item.getEventDate() );
-
-            entry.setAuthor( username );
-
-            content = new SyndContentImpl();
-
-            content.setType( MediaType.TEXT_PLAIN.toString() );
-
-            content.setValue( msg.toString() );
-
-            entry.setDescription( content );
-
-            entries.add( entry );
         }
 
         feed.setEntries( entries );

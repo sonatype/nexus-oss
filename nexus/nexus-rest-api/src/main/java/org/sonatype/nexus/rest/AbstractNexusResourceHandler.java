@@ -29,7 +29,6 @@ import java.util.logging.Level;
 
 import org.apache.commons.fileupload.FileItemFactory;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
-import org.codehaus.plexus.util.StringUtils;
 import org.jsecurity.mgt.SecurityManager;
 import org.restlet.Application;
 import org.restlet.Context;
@@ -58,6 +57,7 @@ import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.rest.model.NexusArtifact;
 import org.sonatype.nexus.rest.model.NexusError;
 import org.sonatype.nexus.rest.model.NexusErrorResponse;
+import org.sonatype.nexus.security.NexusArtifactAuthorizer;
 import org.sonatype.plexus.rest.AbstractPlexusAwareResource;
 import org.sonatype.plexus.rest.PlexusRestletUtils;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
@@ -73,6 +73,8 @@ import com.thoughtworks.xstream.XStream;
 public abstract class AbstractNexusResourceHandler
     extends AbstractPlexusAwareResource
 {
+    private NexusArtifactAuthorizer artifactAuthorizer;
+    
     public AbstractNexusResourceHandler( Context context, Request request, Response response )
     {
         super( context, request, response );
@@ -80,6 +82,8 @@ public abstract class AbstractNexusResourceHandler
         getVariants().add( new Variant( MediaType.APPLICATION_XML ) );
 
         getVariants().add( new Variant( MediaType.APPLICATION_JSON ) );
+        
+        artifactAuthorizer = ( NexusArtifactAuthorizer ) lookup( NexusArtifactAuthorizer.ROLE );
     }
 
     /**
@@ -165,6 +169,11 @@ public abstract class AbstractNexusResourceHandler
                     null );
 
                 String path = mr.getGavCalculator().gavToPath( gav );
+                
+                if ( !artifactAuthorizer.authorizePath( mr, path ) )
+                {
+                    return null;
+                }
 
                 // make path relative
                 if ( path.startsWith( RepositoryItemUid.PATH_ROOT ) )
@@ -216,7 +225,12 @@ public abstract class AbstractNexusResourceHandler
         List<NexusArtifact> result = new ArrayList<NexusArtifact>( aic.size() );
         for ( ArtifactInfo ai : aic )
         {
-            result.add( ai2Na( ai, toParentCollection ) );
+            NexusArtifact na = ai2Na( ai, toParentCollection );
+            
+            if ( na != null )
+            {
+                result.add( na );
+            }
         }
         return result;
     }
