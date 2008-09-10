@@ -75,7 +75,7 @@ Sonatype.repoServer.FileUploadPanel = function(config){
                         {
                             xtype: 'label',
                             text: 'POM',
-                            width: Ext.isIE ? 84 : 80
+                            width: 84
                         },
                         this.pomnameField,
                         {
@@ -589,12 +589,12 @@ Ext.extend(Sonatype.repoServer.FileUploadPanel, Ext.FormPanel, {
       }
     }
 
-    uploadPanel.cardPanel.find( 'name', 'g' )[0].setValue( g );
-    uploadPanel.cardPanel.find( 'name', 'a' )[0].setValue( a );
-    uploadPanel.cardPanel.find( 'name', 'v' )[0].setValue( v );
-    uploadPanel.cardPanel.find( 'name', 'c' )[0].setValue( c );
-    uploadPanel.cardPanel.find( 'name', 'p' )[0].setValue( p );
-    uploadPanel.cardPanel.find( 'name', 'e' )[0].setValue( e );
+    uploadPanel.cardPanel.find( 'name', 'g' )[0].setRawValue( g );
+    uploadPanel.cardPanel.find( 'name', 'a' )[0].setRawValue( a );
+    uploadPanel.cardPanel.find( 'name', 'v' )[0].setRawValue( v );
+    uploadPanel.cardPanel.find( 'name', 'c' )[0].setRawValue( c );
+    uploadPanel.cardPanel.find( 'name', 'p' )[0].setRawValue( p );
+    uploadPanel.cardPanel.find( 'name', 'e' )[0].setRawValue( e );
     if ( ! a ) uploadPanel.form.clearInvalid();
     uploadPanel.updateUploadButton( uploadPanel );
   }
