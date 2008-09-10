@@ -1,8 +1,6 @@
 package org.sonatype.nexus.security.filter.authz;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -10,12 +8,11 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 
-import org.jsecurity.subject.Subject;
 import org.jsecurity.web.WebUtils;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
-import org.sonatype.nexus.proxy.target.TargetMatch;
-import org.sonatype.nexus.proxy.target.TargetSet;
+import org.sonatype.nexus.security.DefaultNexusArtifactAuthorizer;
+import org.sonatype.nexus.security.NexusArtifactAuthorizer;
 
 /**
  * A filter that maps the targetId from the Request.
@@ -24,12 +21,14 @@ import org.sonatype.nexus.proxy.target.TargetSet;
  */
 public class NexusTargetMappingAuthorizationFilter
     extends HttpVerbMappingAuthorizationFilter
-{
+{    
     private Pattern pathPrefixPattern;
 
     private String pathPrefix;
 
     private String pathReplacement;
+    
+    private NexusArtifactAuthorizer authorizer = new DefaultNexusArtifactAuthorizer();
 
     public String getPathPrefix()
     {
@@ -95,23 +94,6 @@ public class NexusTargetMappingAuthorizationFilter
         return path;
     }
 
-    public String[] getTargetPerms( TargetSet matched )
-    {
-        String[] result = null;
-
-        List<String> perms = new ArrayList<String>( matched.getMatches().size() );
-
-        // nexus : 'target' + targetId : repoId
-        for ( TargetMatch match : matched.getMatches() )
-        {
-            perms.add( "nexus:target:" + match.getTarget().getId() + ":" + match.getRepository().getId() );
-        }
-
-        result = perms.toArray( new String[perms.size()] );
-
-        return result;
-    }
-
     protected String getActionFromHttpVerb( ServletRequest request )
     {
         String action = ( (HttpServletRequest) request ).getMethod().toLowerCase();
@@ -165,43 +147,8 @@ public class NexusTargetMappingAuthorizationFilter
             }
         }
 
-        // collect the targetSet/matches for the request
-        TargetSet matched = getNexus( request ).getRootRouter().getTargetsForRequest(
-            getResourceStoreRequest( request, true ) );
-
-        // did we hit repositories at all?
-        if ( matched.getMatchedRepositoryIds().size() > 0 )
-        {
-            // we had reposes affected, check the targets
-            // make perms from TargetSet
-            String[] targetPerms = getTargetPerms( matched );
-
-            // get the action from HTTP verb
-            String action = getActionFromHttpVerb( request );
-
-            // append the action to the end of targetPerms
-            String[] mappedPerms = mapPerms( targetPerms, action );
-
-            // get the subject for testing perms
-            Subject subject = getSubject( request, response );
-
-            // iterator over perms, and if any of them is permitted for subject
-            // allow access
-            for ( String perm : mappedPerms )
-            {
-                if ( subject.isPermitted( perm ) )
-                {
-                    return true;
-                }
-            }
-
-            // did not hit any of perms, so the subject is not allowed to do this
-            return false;
-        }
-        else
-        {
-            // we hit no repos, it is a virtual path, allow access
-            return true;
-        }
+        return authorizer.authorizePath( request, 
+                                         getResourceStoreRequest( request, true ), 
+                                         getActionFromHttpVerb( request ) );
     }
 }
