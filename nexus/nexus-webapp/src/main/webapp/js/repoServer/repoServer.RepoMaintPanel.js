@@ -347,13 +347,31 @@ Sonatype.repoServer.RepoMaintPanel = function(config){
       {
         xtype: 'panel',
         id: 'repo-maint-info',
-        title: 'Repository Information',
+        title: 'Repository Content',
         layout: 'card',
         region: 'center',
         activeItem: 0,
         deferredRender: false,
         autoScroll: false,
         frame: false,
+        tbar: [
+          {
+            text: 'Refresh',
+            iconCls: 'st-icon-refresh',
+            scope:this,
+            handler: function(button, event){
+              var activePanel = this.formCards.getLayout().activeItem;
+              if ( activePanel ) {
+                var treePanel = activePanel.items.first(); 
+                var i = treePanel.root.text.search(/\(.*\)$/);
+                if(i > -1){
+                  treePanel.root.setText(treePanel.root.text.slice(0, i-1));
+                }
+                treePanel.root.reload();
+              }
+            }
+          }
+        ],
         items: [
           {
             xtype: 'panel',
@@ -711,30 +729,15 @@ Ext.extend(Sonatype.repoServer.RepoMaintPanel, Sonatype.repoServer.AbstractRepoP
     {
       anchor: '0 -2',
       id: id + '_repo-browse',
-      title: name + ' Repository Content',
-      border: true,
-      bodyBorder: true,
       loader: null, //note: created uniquely per repo
       //note: this style matches the expected behavior
-      bodyStyle: 'background-color:#FFFFFF; border: 1px solid #99BBE8',
+      bodyStyle: 'background-color:#FFFFFF',//; border: 1px solid #99BBE8',
       animate:true,
       lines: false,
       autoScroll:true,
       containerScroll: true,
       rootVisible: true,
       enableDD: false,
-      tools: [
-        {
-          id: 'refresh',
-          handler: function(e, toolEl, panel){
-            var i = panel.root.text.search(/\(Out of Service\)/);
-            if(i > -1){
-              panel.root.setText(panel.root.text.slice(0, i-1));
-            }
-            panel.root.reload();
-          }
-        }
-      ],
       loader : new Ext.tree.SonatypeTreeLoader({
         dataUrl: '', //note: all node ids are their own full path
         listeners: {
@@ -773,7 +776,7 @@ Ext.extend(Sonatype.repoServer.RepoMaintPanel, Sonatype.repoServer.AbstractRepoP
       id : id + '_repo-browse-top',
       autoScroll: false,
       border: false,
-      frame: true,
+      frame: false,
       collapsible: false,
       collapsed: false,
       labelWidth: 100,
