@@ -147,55 +147,78 @@ public final class XStreamInitializer
         xstream.registerConverter( new PrivilegeBaseStatusResourceConverter( xstream.getMapper(), xstream
             .getReflectionProvider() ), XStream.PRIORITY_VERY_HIGH );
 
-        // aliasaes
-        // NexusResponse
-        xstream.alias( "artifact", NexusArtifact.class );
 
         // Maven POM
         xstream.alias( "project", Model.class );
-
+        
+        
         // omitting modelEncoding
         xstream.omitField( NexusErrorResponse.class, "modelEncoding" );
+//        xstream.addImplicitCollection( NexusErrorResponse.class, "errors", "error", NexusError.class ); // FIXME: this might break the JSON parser, test it before checking in
         xstream.omitField( NexusError.class, "modelEncoding" );
+        xstream.alias( "nexus-error", NexusErrorResponse.class);
+        xstream.alias( "error", NexusError.class);
 
         xstream.omitField( ContentListResourceResponse.class, "modelEncoding" );
         xstream.omitField( ContentListResource.class, "modelEncoding" );
+        xstream.alias( "content", ContentListResourceResponse.class);
+        xstream.alias( "content-item", ContentListResource.class);
+        
 
-        xstream.omitField( RepositoryResourceResponse.class, "modelEncoding" );
+        xstream.omitField( RepositoryResourceResponse.class, "modelEncoding" );        
         xstream.omitField( RepositoryBaseResource.class, "modelEncoding" );
         xstream.omitField( RepositoryResource.class, "modelEncoding" );
         xstream.omitField( RepositoryProxyResource.class, "modelEncoding" );
         xstream.omitField( RepositoryShadowResource.class, "modelEncoding" );
         xstream.omitField( RepositoryResourceRemoteStorage.class, "modelEncoding" );
+        xstream.alias( "repository", RepositoryResourceResponse.class);
+        
 
         xstream.omitField( RepositoryListResourceResponse.class, "modelEncoding" );
         xstream.omitField( RepositoryListResource.class, "modelEncoding" );
+        xstream.alias( "repositories", RepositoryListResourceResponse.class);
+        xstream.alias( "repositories-item", RepositoryListResource.class);
 
         xstream.omitField( RepositoryStatusResourceResponse.class, "modelEncoding" );
         xstream.omitField( RepositoryStatusResource.class, "modelEncoding" );
+        xstream.alias( "repository-status", RepositoryStatusResourceResponse.class);
 
         xstream.omitField( RepositoryStatusListResourceResponse.class, "modelEncoding" );
         xstream.omitField( RepositoryStatusListResource.class, "modelEncoding" );
+        xstream.alias( "repository-status-list", RepositoryStatusListResourceResponse.class);
+        xstream.alias( "repository-status-lis-item", RepositoryStatusListResource.class);
 
         xstream.omitField( RepositoryMetaResourceResponse.class, "modelEncoding" );
         xstream.omitField( RepositoryMetaResource.class, "modelEncoding" );
+        xstream.alias( "repository-meta-data", RepositoryMetaResourceResponse.class);
 
         xstream.omitField( RepositoryGroupListResourceResponse.class, "modelEncoding" );
         xstream.omitField( RepositoryGroupListResource.class, "modelEncoding" );
+        xstream.alias( "repo-group-list", RepositoryGroupListResourceResponse.class);
+        xstream.alias( "repo-group-list-item", RepositoryGroupListResource.class);
+        xstream.alias( "repo-group-memeber", RepositoryGroupMemberRepository.class);
 
         xstream.omitField( RepositoryGroupResourceResponse.class, "modelEncoding" );
         xstream.omitField( RepositoryGroupResource.class, "modelEncoding" );
         xstream.omitField( RepositoryGroupMemberRepository.class, "modelEncoding" );
+        xstream.alias( "repo-group", RepositoryGroupResourceResponse.class);
 
         xstream.omitField( RepositoryRouteListResourceResponse.class, "modelEncoding" );
         xstream.omitField( RepositoryRouteListResource.class, "modelEncoding" );
+        xstream.alias( "repo-routes-list", RepositoryRouteListResourceResponse.class);
+        xstream.alias( "repo-routes-list-item", RepositoryRouteListResource.class);
+        xstream.alias( "repo-routes-member", RepositoryRouteMemberRepository.class);
 
         xstream.omitField( RepositoryRouteResourceResponse.class, "modelEncoding" );
         xstream.omitField( RepositoryRouteResource.class, "modelEncoding" );
         xstream.omitField( RepositoryRouteMemberRepository.class, "modelEncoding" );
+        xstream.alias( "repo-route", RepositoryRouteResourceResponse.class);
 
         xstream.omitField( GlobalConfigurationListResourceResponse.class, "modelEncoding" );
         xstream.omitField( GlobalConfigurationListResource.class, "modelEncoding" );
+        xstream.alias( "global-settings-list", GlobalConfigurationListResourceResponse.class);
+        xstream.alias( "global-settings-list-item", GlobalConfigurationListResource.class);
+        
 
         xstream.omitField( GlobalConfigurationResourceResponse.class, "modelEncoding" );
         xstream.omitField( GlobalConfigurationResource.class, "modelEncoding" );
@@ -203,31 +226,44 @@ public final class XStreamInitializer
         xstream.omitField( RemoteHttpProxySettings.class, "modelEncoding" );
         xstream.omitField( AuthenticationSettings.class, "modelEncoding" );
         xstream.omitField( SmtpSettings.class, "modelEncoding" );
+        xstream.alias( "global-settings", GlobalConfigurationResourceResponse.class);
 
         xstream.omitField( WastebasketResource.class, "modelEncoding" );
         xstream.omitField( WastebasketResourceResponse.class, "modelEncoding" );
-
+        xstream.alias( "wastebasket", WastebasketResourceResponse.class);
+        
         xstream.omitField( LogsListResourceResponse.class, "modelEncoding" );
         xstream.omitField( LogsListResource.class, "modelEncoding" );
+        xstream.alias( "logs-list", LogsListResourceResponse.class);
+        xstream.alias( "logs-list-item", LogsListResource.class);
 
         xstream.omitField( ConfigurationsListResourceResponse.class, "modelEncoding" );
         xstream.omitField( ConfigurationsListResource.class, "modelEncoding" );
+        xstream.alias( "configs-list", ConfigurationsListResourceResponse.class);
+        xstream.alias( "configs-list-tem", ConfigurationsListResource.class);
 
         xstream.omitField( FeedListResourceResponse.class, "modelEncoding" );
         xstream.omitField( FeedListResource.class, "modelEncoding" );
+        xstream.alias( "feeds-list", FeedListResourceResponse.class);
+        xstream.alias( "feeds-list-item", FeedListResource.class);
 
         xstream.omitField( SearchResponse.class, "modelEncoding" );
+        xstream.alias( "search-results", SearchResponse.class);
 
         xstream.omitField( NexusResponse.class, "modelEncoding" );
         xstream.omitField( NexusArtifact.class, "modelEncoding" );
+        xstream.alias( "artifact", NexusArtifact.class );
 
         xstream.omitField( AuthenticationLoginResourceResponse.class, "modelEncoding" );
         xstream.omitField( AuthenticationLoginResource.class, "modelEncoding" );
         xstream.omitField( AuthenticationClientPermissions.class, "modelEncoding" );
+        xstream.alias( "authentication-login", AuthenticationLoginResourceResponse.class );
+        
 
         xstream.omitField( StatusResource.class, "modelEncoding" );
         xstream.omitField( StatusResourceResponse.class, "modelEncoding" );
         xstream.omitField( StatusConfigurationValidationResponse.class, "modelEncoding" );
+        xstream.alias( "status", StatusResourceResponse.class );
 
         xstream.omitField( ScheduledServiceListResource.class, "modelEncoding" );
         xstream.omitField( ScheduledServiceListResourceResponse.class, "modelEncoding" );
@@ -244,7 +280,14 @@ public final class XStreamInitializer
         xstream.omitField( ScheduledServiceTypePropertyResource.class, "modelEncoding" );
         xstream.omitField( ScheduledServiceResourceStatus.class, "modelEncoding" );
         xstream.omitField( ScheduledServiceResourceStatusResponse.class, "modelEncoding" );
-
+        xstream.alias( "schedules-list", ScheduledServiceListResourceResponse.class );
+        xstream.alias( "schedules-list-item", ScheduledServiceListResource.class );
+        xstream.alias( "scheduled-task", ScheduledServiceResourceResponse.class );
+        xstream.alias( "scheduled-task-property", ScheduledServicePropertyResource.class );
+        xstream.alias( "schedule-types", ScheduledServiceTypeResourceResponse.class );
+        xstream.alias( "schedule-type", ScheduledServiceTypeResource.class );
+        xstream.alias( "schedule-type-property", ScheduledServiceTypePropertyResource.class );
+        
         xstream.omitField( UserListResourceResponse.class, "modelEncoding" );
         xstream.omitField( UserResourceRequest.class, "modelEncoding" );
         xstream.omitField( UserResourceResponse.class, "modelEncoding" );
@@ -253,33 +296,55 @@ public final class XStreamInitializer
         xstream.omitField( UserForgotPasswordResource.class, "modelEncoding" );
         xstream.omitField( UserChangePasswordRequest.class, "modelEncoding" );
         xstream.omitField( UserChangePasswordResource.class, "modelEncoding" );
+        xstream.alias( "users-list", UserListResourceResponse.class );
+        xstream.alias( "users-list-item", UserResource.class );
+        xstream.alias( "user-request", UserResourceRequest.class );
+        xstream.alias( "user-response", UserResourceResponse.class );
+        xstream.alias( "user-forgotpw", UserForgotPasswordRequest.class );
+        xstream.alias( "user-changepw", UserChangePasswordRequest.class );
 
         xstream.omitField( RoleListResourceResponse.class, "modelEncoding" );
         xstream.omitField( RoleResource.class, "modelEncoding" );
         xstream.omitField( RoleResourceRequest.class, "modelEncoding" );
-        xstream.omitField( RoleResourceResponse.class, "modelEncoding" );        
+        xstream.omitField( RoleResourceResponse.class, "modelEncoding" );
+        xstream.alias( "roles-list", RoleListResourceResponse.class );
+        xstream.alias( "roles-list-item", RoleResource.class );
+        xstream.alias( "role-request", RoleResourceRequest.class );
+        xstream.alias( "role-response", RoleResourceResponse.class );
         
         xstream.omitField( PrivilegeResourceRequest.class, "modelEncoding" );
+        xstream.omitField( PrivilegeTargetResource.class, "modelEncoding" );
         xstream.omitField( PrivilegeBaseStatusResource.class, "modelEncoding" );
         xstream.omitField( PrivilegeApplicationStatusResource.class, "modelEncoding" );
         xstream.omitField( PrivilegeTargetStatusResource.class, "modelEncoding" );
         xstream.omitField( PrivilegeListResourceResponse.class, "modelEncoding" );
         xstream.omitField( PrivilegeBaseResource.class, "modelEncoding" );
         xstream.omitField( PrivilegeStatusResourceResponse.class, "modelEncoding" );
-        xstream.omitField( PrivilegeTargetResource.class, "modelEncoding" );
+        xstream.alias( "privilege", PrivilegeResourceRequest.class );
+        xstream.alias( "privileges-status-list", PrivilegeListResourceResponse.class );
+        xstream.alias( "privilege-target-status", PrivilegeTargetStatusResource.class );
+        xstream.alias( "privilege-application-status", PrivilegeApplicationStatusResource.class );
+        xstream.alias( "privilege-status", PrivilegeStatusResourceResponse.class );
         
 
         xstream.omitField( NFCResourceResponse.class, "modelEncoding" );
         xstream.omitField( NFCResource.class, "modelEncoding" );
         xstream.omitField( NFCRepositoryResource.class, "modelEncoding" );
+        xstream.alias( "nfc-info", NFCResourceResponse.class );
+        xstream.alias( "nfc-repo-info", NFCRepositoryResource.class );
 
         xstream.omitField( RepositoryTargetListResourceResponse.class, "modelEncoding" );
         xstream.omitField( RepositoryTargetListResource.class, "modelEncoding" );
         xstream.omitField( RepositoryTargetResourceResponse.class, "modelEncoding" );
         xstream.omitField( RepositoryTargetResource.class, "modelEncoding" );
+        xstream.alias( "repo-targets-list", RepositoryTargetListResourceResponse.class );
+        xstream.alias( "repo-targets-list-item", RepositoryTargetListResource.class );
+        xstream.alias( "repo-target", RepositoryTargetResourceResponse.class );
 
         xstream.omitField( RepositoryContentClassListResourceResponse.class, "modelEncoding" );
         xstream.omitField( RepositoryContentClassListResource.class, "modelEncoding" );
+        xstream.alias( "repo-content-classes-list", RepositoryContentClassListResourceResponse.class );
+        xstream.alias( "repo-content-classes-list-item", RepositoryContentClassListResource.class );
 
         // Maven model
         xstream.omitField( Model.class, "modelEncoding" );

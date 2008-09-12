@@ -859,7 +859,7 @@ Ext.extend(Sonatype.repoServer.GroupsEditPanel, Ext.Panel, {
     for(var i=0; i<arr.length; i++){
       repo = arr[i];
       //@todo: adding this field is a temporary crutch for the server
-      Ext.apply(repo, {'@class':'org.sonatype.nexus.rest.model.RepositoryGroupMemberRepository'});
+      Ext.apply(repo, {'@class':'repo-group-memeber'});
       grpTree.root.appendChild(
         new Ext.tree.TreeNode({
           id: repo.id,
@@ -881,7 +881,7 @@ Ext.extend(Sonatype.repoServer.GroupsEditPanel, Ext.Panel, {
         
         if(typeof(grpTree.getNodeById(repo.id)) == 'undefined'){
           //@todo: adding this field is a temporary crutch for the server
-          Ext.apply(repo, {'@class':'org.sonatype.nexus.rest.model.RepositoryGroupMemberRepository'});
+          Ext.apply(repo, {'@class':'repo-group-memeber'});
           
           allTree.root.appendChild(
             new Ext.tree.TreeNode({

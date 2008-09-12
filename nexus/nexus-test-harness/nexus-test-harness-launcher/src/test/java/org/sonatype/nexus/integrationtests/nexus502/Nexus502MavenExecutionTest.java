@@ -77,7 +77,7 @@ public class Nexus502MavenExecutionTest
         throws IOException
     {
         UserMessageUtil util =
-            new UserMessageUtil( XStreamInitializer.initialize( new XStream() ), MediaType.APPLICATION_XML );
+            new UserMessageUtil( this.getXMLXStream(), MediaType.APPLICATION_XML );
         return util.disableUser( userId );
     }
 

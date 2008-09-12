@@ -28,7 +28,7 @@ public class Nexus385RoutesValidationTests
     public Nexus385RoutesValidationTests()
     {
         this.messageUtil = new RoutesMessageUtil(
-            XStreamInitializer.initialize( new XStream() ),
+            XStreamInitializer.initialize( this.getXMLXStream() ),
             MediaType.APPLICATION_XML );
     }
 

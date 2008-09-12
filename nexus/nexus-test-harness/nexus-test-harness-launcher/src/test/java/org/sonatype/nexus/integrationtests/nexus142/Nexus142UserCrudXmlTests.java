@@ -19,7 +19,7 @@ public class Nexus142UserCrudXmlTests
 
     public Nexus142UserCrudXmlTests()
     {
-        this.messageUtil = new UserMessageUtil(XStreamInitializer.initialize( new XStream( ) ), MediaType.APPLICATION_XML );
+        this.messageUtil = new UserMessageUtil(this.getXMLXStream(), MediaType.APPLICATION_XML );
     }
     
     

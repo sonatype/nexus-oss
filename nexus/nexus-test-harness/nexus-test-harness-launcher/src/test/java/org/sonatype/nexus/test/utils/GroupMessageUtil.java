@@ -20,6 +20,7 @@ import org.sonatype.nexus.rest.model.RepositoryGroupResource;
 import org.sonatype.nexus.rest.model.RepositoryGroupResourceResponse;
 import org.sonatype.nexus.rest.model.RepositoryListResource;
 import org.sonatype.nexus.rest.model.RepositoryListResourceResponse;
+import org.sonatype.nexus.rest.xstream.XStreamInitializer;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
 
 import com.thoughtworks.xstream.XStream;
@@ -119,7 +120,7 @@ public class GroupMessageUtil
 
         // this should use call to: getResourceFromResponse
         XStreamRepresentation representation =
-            new XStreamRepresentation( new XStream(), responseText, MediaType.APPLICATION_XML );
+            new XStreamRepresentation( XStreamInitializer.initialize( new XStream() ), responseText, MediaType.APPLICATION_XML );
 
         RepositoryGroupResourceResponse resourceResponse =
             (RepositoryGroupResourceResponse) representation.getPayload( new RepositoryGroupResourceResponse() );
@@ -190,7 +191,7 @@ public class GroupMessageUtil
         LOG.debug( "responseText: \n" + responseText );
 
         XStreamRepresentation representation =
-            new XStreamRepresentation( new XStream(), responseText, MediaType.APPLICATION_XML );
+            new XStreamRepresentation( XStreamInitializer.initialize( new XStream() ), responseText, MediaType.APPLICATION_XML );
 
         RepositoryGroupListResourceResponse resourceResponse =
             (RepositoryGroupListResourceResponse) representation.getPayload( new RepositoryGroupListResourceResponse() );

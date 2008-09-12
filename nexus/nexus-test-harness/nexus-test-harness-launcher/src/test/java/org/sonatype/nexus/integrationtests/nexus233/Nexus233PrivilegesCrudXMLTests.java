@@ -33,7 +33,7 @@ public class Nexus233PrivilegesCrudXMLTests
     public Nexus233PrivilegesCrudXMLTests()
     {
         this.messageUtil =
-            new PrivilegesMessageUtil( XStreamInitializer.initialize( new XStream() ), MediaType.APPLICATION_XML );
+            new PrivilegesMessageUtil( this.getXMLXStream(), MediaType.APPLICATION_XML );
     }
 
     @SuppressWarnings( "unchecked" )

@@ -52,7 +52,8 @@ public class Nexus142UserValidationTests
         {
             Assert.fail( "User should not have been created: " + response.getStatus() );
         }
-        Assert.assertTrue( response.getEntity().getText().startsWith( "{\"errors\":" ) );
+        String responseText = response.getEntity().getText();
+        Assert.assertTrue( "Error message: "+ responseText, responseText.startsWith( "{\"errors\":" ) );
         
     }
     

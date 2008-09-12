@@ -29,7 +29,7 @@ public class Nexus385RoutesCrudXmlTests
     public Nexus385RoutesCrudXmlTests()
     {
         this.messageUtil =
-            new RoutesMessageUtil( XStreamInitializer.initialize( new XStream() ), MediaType.APPLICATION_XML );
+            new RoutesMessageUtil( this.getXMLXStream(), MediaType.APPLICATION_XML );
     }
 
     @Test

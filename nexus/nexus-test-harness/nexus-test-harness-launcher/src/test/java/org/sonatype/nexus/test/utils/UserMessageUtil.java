@@ -14,6 +14,7 @@ import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.rest.model.UserListResourceResponse;
 import org.sonatype.nexus.rest.model.UserResource;
 import org.sonatype.nexus.rest.model.UserResourceRequest;
+import org.sonatype.nexus.rest.xstream.XStreamInitializer;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
 
 import com.thoughtworks.xstream.XStream;
@@ -70,7 +71,7 @@ public class UserMessageUtil
         LOG.debug( "responseText: \n" + responseText );
 
         XStreamRepresentation representation =
-            new XStreamRepresentation( new XStream(), responseText, MediaType.APPLICATION_XML );
+            new XStreamRepresentation( XStreamInitializer.initialize( new XStream() ), responseText, MediaType.APPLICATION_XML );
 
         UserResourceRequest resourceResponse =
             (UserResourceRequest) representation.getPayload( new UserResourceRequest() );
@@ -136,8 +137,9 @@ public class UserMessageUtil
         String responseText = RequestFacade.doGetRequest( "service/local/users" ).getEntity().getText();
         LOG.debug( "responseText: \n" + responseText );
 
+        // must use the XML xstream even if we 'thought' we wanted to use JSON, because REST client doesn't listen to the MediaType in some situations.
         XStreamRepresentation representation =
-            new XStreamRepresentation( new XStream(), responseText, MediaType.APPLICATION_XML );
+            new XStreamRepresentation( XStreamInitializer.initialize( new XStream() ), responseText, MediaType.APPLICATION_XML );
 
         UserListResourceResponse resourceResponse =
             (UserListResourceResponse) representation.getPayload( new UserListResourceResponse() );

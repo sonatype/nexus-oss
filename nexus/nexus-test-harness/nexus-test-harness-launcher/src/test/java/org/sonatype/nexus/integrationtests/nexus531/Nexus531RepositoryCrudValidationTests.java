@@ -25,7 +25,7 @@ public class Nexus531RepositoryCrudValidationTests
     public Nexus531RepositoryCrudValidationTests()
     {
         this.messageUtil =
-            new RepositoryMessageUtil( XStreamInitializer.initialize( new XStream() ), MediaType.APPLICATION_XML );
+            new RepositoryMessageUtil( this.getXMLXStream(), MediaType.APPLICATION_XML );
     }
 
     @Test

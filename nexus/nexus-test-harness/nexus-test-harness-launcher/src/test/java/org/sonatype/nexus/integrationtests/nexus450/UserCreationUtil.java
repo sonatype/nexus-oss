@@ -14,7 +14,7 @@ public class UserCreationUtil
 
     static
     {
-        xstream = new XStream();
+        xstream = XStreamInitializer.initialize( new XStream() );
         XStreamInitializer.initialize( xstream );
     }
 

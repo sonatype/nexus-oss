@@ -865,7 +865,7 @@ Ext.extend(Sonatype.repoServer.RoutesEditPanel, Ext.Panel, {
     for(var i=0; i<arr.length; i++){
       repo = arr[i];
       //@todo: adding this field is a temporary crutch for the server
-      Ext.apply(repo, {'@class':'org.sonatype.nexus.rest.model.RepositoryRouteMemberRepository'});
+      Ext.apply(repo, {'@class':'repo-routes-member'});
       rtTree.root.appendChild(
         new Ext.tree.TreeNode({
           id: repo.id,
@@ -887,7 +887,7 @@ Ext.extend(Sonatype.repoServer.RoutesEditPanel, Ext.Panel, {
 
         if(typeof(rtTree.getNodeById(repo.id)) == 'undefined'){
           //@todo: adding this field is a temporary crutch for the server
-          Ext.apply(repo, {'@class':'org.sonatype.nexus.rest.model.RepositoryRouteMemberRepository'});
+          Ext.apply(repo, {'@class':'repo-routes-member'});
 
           allTree.root.appendChild(
             new Ext.tree.TreeNode({

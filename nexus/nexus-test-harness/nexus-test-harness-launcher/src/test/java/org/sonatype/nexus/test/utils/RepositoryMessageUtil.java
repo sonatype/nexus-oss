@@ -17,6 +17,7 @@ import org.sonatype.nexus.rest.model.RepositoryListResource;
 import org.sonatype.nexus.rest.model.RepositoryListResourceResponse;
 import org.sonatype.nexus.rest.model.RepositoryResource;
 import org.sonatype.nexus.rest.model.RepositoryResourceResponse;
+import org.sonatype.nexus.rest.xstream.XStreamInitializer;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
 
 import com.thoughtworks.xstream.XStream;
@@ -110,7 +111,7 @@ public class RepositoryMessageUtil
 
         // this should use call to: getResourceFromResponse
         XStreamRepresentation representation =
-            new XStreamRepresentation( new XStream(), responseText, MediaType.APPLICATION_XML );
+            new XStreamRepresentation( XStreamInitializer.initialize( new XStream() ), responseText, MediaType.APPLICATION_XML );
 
         RepositoryResourceResponse resourceResponse =
             (RepositoryResourceResponse) representation.getPayload( new RepositoryResourceResponse() );
@@ -181,7 +182,7 @@ public class RepositoryMessageUtil
         LOG.debug( "responseText: \n" + responseText );
 
         XStreamRepresentation representation =
-            new XStreamRepresentation( new XStream(), responseText, MediaType.APPLICATION_XML );
+            new XStreamRepresentation( XStreamInitializer.initialize( new XStream() ), responseText, MediaType.APPLICATION_XML );
 
         RepositoryListResourceResponse resourceResponse =
             (RepositoryListResourceResponse) representation.getPayload( new RepositoryListResourceResponse() );

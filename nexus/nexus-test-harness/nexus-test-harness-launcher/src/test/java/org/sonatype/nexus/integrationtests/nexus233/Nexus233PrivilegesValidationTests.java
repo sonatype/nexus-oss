@@ -31,7 +31,7 @@ public class Nexus233PrivilegesValidationTests
     public Nexus233PrivilegesValidationTests()
     {
         this.messageUtil =
-            new PrivilegesMessageUtil( XStreamInitializer.initialize( new XStream() ), MediaType.APPLICATION_XML );
+            new PrivilegesMessageUtil( this.getXMLXStream(), MediaType.APPLICATION_XML );
     }
 
     @SuppressWarnings( "unchecked" )

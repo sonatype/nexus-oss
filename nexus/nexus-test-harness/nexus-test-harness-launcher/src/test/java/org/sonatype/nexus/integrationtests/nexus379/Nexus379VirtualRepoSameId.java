@@ -29,7 +29,7 @@ public class Nexus379VirtualRepoSameId
     {
         this.messageUtil =
             new RepositoryMessageUtil(
-                                       XStreamInitializer.initialize( new XStream() ),
+                                       this.getXMLXStream(),
                                        MediaType.APPLICATION_XML );
     }
     

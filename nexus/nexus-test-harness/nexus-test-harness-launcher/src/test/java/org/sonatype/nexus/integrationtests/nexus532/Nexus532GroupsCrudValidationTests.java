@@ -25,7 +25,7 @@ public class Nexus532GroupsCrudValidationTests
     public Nexus532GroupsCrudValidationTests()
     {
         this.messageUtil =
-            new GroupMessageUtil( XStreamInitializer.initialize( new XStream() ), MediaType.APPLICATION_XML );
+            new GroupMessageUtil( this.getXMLXStream(), MediaType.APPLICATION_XML );
     }
 
     // @Test

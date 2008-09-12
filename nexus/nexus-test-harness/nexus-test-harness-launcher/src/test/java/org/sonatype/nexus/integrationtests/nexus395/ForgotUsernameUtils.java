@@ -16,7 +16,7 @@ public class ForgotUsernameUtils
 
     static
     {
-        xstream = new XStream();
+        xstream = XStreamInitializer.initialize( new XStream() );
         XStreamInitializer.initialize( xstream );
     }
 

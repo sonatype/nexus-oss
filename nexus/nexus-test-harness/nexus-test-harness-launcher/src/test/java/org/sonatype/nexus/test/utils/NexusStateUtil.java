@@ -18,6 +18,7 @@ import org.restlet.data.Response;
 import org.restlet.resource.StringRepresentation;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.rest.model.StatusResourceResponse;
+import org.sonatype.nexus.rest.xstream.XStreamInitializer;
 
 import com.thoughtworks.xstream.XStream;
 
@@ -55,7 +56,7 @@ public class NexusStateUtil
             throw new ConnectException( response.getStatus().toString() );
         }
         
-        XStream xstream = new XStream();
+        XStream xstream = XStreamInitializer.initialize( new XStream() );
         StatusResourceResponse status = null;
 
         status =

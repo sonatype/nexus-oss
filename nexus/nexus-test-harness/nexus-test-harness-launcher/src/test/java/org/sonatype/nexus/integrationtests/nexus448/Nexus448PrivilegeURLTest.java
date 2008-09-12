@@ -25,7 +25,7 @@ public class Nexus448PrivilegeURLTest extends AbstractNexusIntegrationTest
     public Nexus448PrivilegeURLTest()
     {
         this.messageUtil =
-            new PrivilegesMessageUtil( XStreamInitializer.initialize( new XStream() ), MediaType.APPLICATION_XML );
+            new PrivilegesMessageUtil( this.getXMLXStream(), MediaType.APPLICATION_XML );
     }
     
     @Test

@@ -12,6 +12,6 @@ public class Nexus531RepositoryCrudXMLTests
     public Nexus531RepositoryCrudXMLTests()
     {
         this.messageUtil =
-            new RepositoryMessageUtil( XStreamInitializer.initialize( new XStream() ), MediaType.APPLICATION_XML );
+            new RepositoryMessageUtil( this.getXMLXStream(), MediaType.APPLICATION_XML );
     }
 }

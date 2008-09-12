@@ -193,7 +193,7 @@ public class RestClientHelper
                 String responseText = response.getEntity().getText();
                
                 // this is kinda hackish, but this class is already tied to xstream
-                if( responseText.contains( "NexusErrorResponse" ) ) // quick check before we parse the string
+                if( responseText.contains( "<error" ) ) // quick check before we parse the string
                 {
                   // try to parse the response
                     NexusErrorResponse errorResponse = (NexusErrorResponse) this.xstream.fromXML( responseText, new NexusErrorResponse() );

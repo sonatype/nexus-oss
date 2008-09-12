@@ -35,11 +35,14 @@ import org.restlet.data.Response;
 import org.sonatype.appbooter.ForkedAppBooter;
 import org.sonatype.appbooter.ctl.AppBooterServiceException;
 import org.sonatype.nexus.artifact.Gav;
+import org.sonatype.nexus.rest.xstream.XStreamInitializer;
 import org.sonatype.nexus.test.utils.DeployUtils;
 import org.sonatype.nexus.test.utils.FileTestingUtils;
 import org.sonatype.nexus.test.utils.NexusConfigUtil;
 import org.sonatype.nexus.test.utils.NexusStateUtil;
 import org.sonatype.nexus.test.utils.TestProperties;
+
+import com.thoughtworks.xstream.XStream;
 
 /**
  * curl --user admin:admin123 --request PUT http://localhost:8081/nexus/service/local/status/command --data START NOTE,
@@ -719,5 +722,10 @@ public class AbstractNexusIntegrationTest
         System.out.println( error.toString() );
 
         return true;
+    }
+    
+    public XStream getXMLXStream()
+    {
+        return XStreamInitializer.initialize( new XStream() );
     }
 }

@@ -19,7 +19,7 @@ public class Nexus133TargetCrudXmlTests
     public Nexus133TargetCrudXmlTests()
     {
         this.messageUtil =
-            new TargetMessageUtil( XStreamInitializer.initialize( new XStream() ),
+            new TargetMessageUtil( this.getXMLXStream(),
                                  MediaType.APPLICATION_XML );
     }
     

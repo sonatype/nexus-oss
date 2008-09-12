@@ -60,18 +60,20 @@ public abstract class AbstractPrivilegeTest
     {
         // turn on security for the test
         TestContainer.getInstance().getTestContext().setSecureTest( true );
+        
+        XStream xstream = this.getXMLXStream();
 
-        this.userUtil = new UserMessageUtil( XStreamInitializer.initialize( new XStream() ), MediaType.APPLICATION_XML );
-        this.roleUtil = new RoleMessageUtil( XStreamInitializer.initialize( new XStream() ), MediaType.APPLICATION_XML );
+        this.userUtil = new UserMessageUtil( xstream, MediaType.APPLICATION_XML );
+        this.roleUtil = new RoleMessageUtil( xstream, MediaType.APPLICATION_XML );
         this.privUtil =
-            new PrivilegesMessageUtil( XStreamInitializer.initialize( new XStream() ), MediaType.APPLICATION_XML );
+            new PrivilegesMessageUtil( xstream, MediaType.APPLICATION_XML );
         this.targetUtil =
-            new TargetMessageUtil( XStreamInitializer.initialize( new XStream() ), MediaType.APPLICATION_XML );
+            new TargetMessageUtil( xstream, MediaType.APPLICATION_XML );
         TestContainer.getInstance().getTestContext().setSecureTest( true );
         this.routeUtil =
-            new RoutesMessageUtil( XStreamInitializer.initialize( new XStream() ), MediaType.APPLICATION_XML );
-        this.repoUtil = new RepositoryMessageUtil( XStreamInitializer.initialize( new XStream() ), MediaType.APPLICATION_XML );
-        this.groupUtil = new GroupMessageUtil( XStreamInitializer.initialize( new XStream() ), MediaType.APPLICATION_XML );
+            new RoutesMessageUtil( xstream, MediaType.APPLICATION_XML );
+        this.repoUtil = new RepositoryMessageUtil( xstream, MediaType.APPLICATION_XML );
+        this.groupUtil = new GroupMessageUtil( xstream, MediaType.APPLICATION_XML );
     }
 
 

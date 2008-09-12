@@ -13,6 +13,7 @@ import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.rest.model.RoleListResourceResponse;
 import org.sonatype.nexus.rest.model.RoleResource;
 import org.sonatype.nexus.rest.model.RoleResourceRequest;
+import org.sonatype.nexus.rest.xstream.XStreamInitializer;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
 
 import com.thoughtworks.xstream.XStream;
@@ -114,7 +115,7 @@ public class RoleMessageUtil
         String responseText = RequestFacade.doGetRequest( "service/local/roles" ).getEntity().getText();
 
         XStreamRepresentation representation =
-            new XStreamRepresentation( new XStream(), responseText, MediaType.APPLICATION_XML );
+            new XStreamRepresentation( XStreamInitializer.initialize( new XStream() ), responseText, MediaType.APPLICATION_XML );
 
         RoleListResourceResponse resourceResponse =
             (RoleListResourceResponse) representation.getPayload( new RoleListResourceResponse() );

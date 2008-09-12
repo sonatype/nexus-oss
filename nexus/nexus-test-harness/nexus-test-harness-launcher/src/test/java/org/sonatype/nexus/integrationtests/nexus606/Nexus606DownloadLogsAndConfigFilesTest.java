@@ -40,7 +40,7 @@ public class Nexus606DownloadLogsAndConfigFilesTest
 
         Assert.assertEquals( "Status: \n" + responseText, 200, response.getStatus().getCode() );
 
-        LogsListResourceResponse logListResponse = (LogsListResourceResponse) new XStream().fromXML( responseText );
+        LogsListResourceResponse logListResponse = (LogsListResourceResponse) this.getXMLXStream().fromXML( responseText );
         List<LogsListResource> logList = logListResponse.getData();
         Assert.assertTrue( "Log List should contain at least 1 log.", logList.size() > 0 );
 
@@ -65,7 +65,7 @@ public class Nexus606DownloadLogsAndConfigFilesTest
         Assert.assertEquals( "Status: \n" + responseText, 200, response.getStatus().getCode() );
 
         ConfigurationsListResourceResponse logListResponse =
-            (ConfigurationsListResourceResponse) new XStream().fromXML( responseText );
+            (ConfigurationsListResourceResponse) this.getXMLXStream().fromXML( responseText );
         List<ConfigurationsListResource> configList = logListResponse.getData();
         Assert.assertTrue( "Config List should contain  2 config file: "+ configList, configList.size() == 2 );
 

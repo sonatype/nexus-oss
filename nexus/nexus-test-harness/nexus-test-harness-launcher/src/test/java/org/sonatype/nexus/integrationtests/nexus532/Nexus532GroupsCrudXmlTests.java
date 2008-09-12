@@ -31,8 +31,7 @@ public class Nexus532GroupsCrudXmlTests extends AbstractNexusIntegrationTest
     public Nexus532GroupsCrudXmlTests()
     {
         this.messageUtil =
-            new GroupMessageUtil(
-                                  XStreamInitializer.initialize( new XStream() ),
+            new GroupMessageUtil( this.getXMLXStream(),
                                   MediaType.APPLICATION_XML );
     }
 

@@ -1952,7 +1952,7 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
         value:value
       };
       //The server is currently requiring this, would definitely be nice to not need to know this in the ui
-      Ext.apply(outputArr[i], {'@class':'org.sonatype.nexus.rest.model.ScheduledServicePropertyResource'});
+      Ext.apply(outputArr[i], {'@class':'scheduled-task-property'});
       i++;
     }, servicePropertiesPanel.getLayout().activeItem);
     
