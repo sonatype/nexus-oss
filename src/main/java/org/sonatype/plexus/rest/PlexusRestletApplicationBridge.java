@@ -16,13 +16,17 @@
 package org.sonatype.plexus.rest;
 
 import java.util.Date;
+import java.util.Map;
 
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.restlet.Application;
 import org.restlet.Context;
 import org.restlet.Restlet;
+import org.restlet.Router;
+import org.sonatype.plexus.rest.resource.PlexusResource;
 import org.sonatype.plexus.rest.xstream.json.JsonOrgHierarchicalStreamDriver;
 import org.sonatype.plexus.rest.xstream.json.PrimitiveKeyedMapConverter;
 
@@ -54,6 +58,8 @@ public abstract class PlexusRestletApplicationBridge
 
     /** The root that is changeable as-needed basis */
     private RetargetableRestlet root;
+
+    private Map<String, PlexusResource> plexusResources;
 
     public PlexusContainer getPlexusContainer()
     {
@@ -99,6 +105,16 @@ public abstract class PlexusRestletApplicationBridge
 
         // put fileItemFactory into context
         getContext().getAttributes().put( FILEITEM_FACTORY, new DiskFileItemFactory() );
+
+        // collect the plexusResources
+        try
+        {
+            plexusResources = (Map<String, PlexusResource>) getPlexusContainer().lookupMap( PlexusResource.class );
+        }
+        catch ( ComponentLookupException e )
+        {
+            throw new IllegalStateException( "Cannot collect PlexusResources!", e );
+        }
     }
 
     /**
@@ -131,12 +147,28 @@ public abstract class PlexusRestletApplicationBridge
         // reboot?
         if ( root != null )
         {
-            root.setRoot( doCreateRoot( isStarted ) );
+            // create a new root router
+            Router rootRouter = new Router( getContext() );
+
+            // attach all PlexusResources
+            if ( isStarted )
+            {
+                for ( PlexusResource resource : plexusResources.values() )
+                {
+                    rootRouter.attach( resource.getResourceUri(), new PlexusResourceFinder( getContext(), resource ) );
+                }
+            }
+
+            // allow "manual" resource attachment too
+            doCreateRoot( rootRouter, isStarted );
+
+            // set it
+            root.setRoot( rootRouter );
         }
     }
 
     protected abstract XStream createAndConfigureXstream( HierarchicalStreamDriver driver );
 
-    protected abstract Restlet doCreateRoot( boolean isStarted );
+    protected abstract void doCreateRoot( Router root, boolean isStarted );
 
 }
