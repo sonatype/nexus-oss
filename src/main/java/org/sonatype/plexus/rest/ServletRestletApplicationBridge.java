@@ -23,8 +23,9 @@ import org.restlet.Context;
 import com.noelios.restlet.ext.servlet.ServerServlet;
 
 /**
- * Another Plexus to restlet.org bridge, usable in Servlet environment. This class is only extending ServletServer in
- * way that the Plexus container is pushed into Context, to make it available to other Plexus aware restlets.
+ * Extension of Restlet.org ServerServlet, made to pass over Plexus to application bridge, usable in Servlet
+ * environment. Also, it contains a fix for original ServerServlet, and enables multiple ServerServlet instances in one
+ * webapp.
  * 
  * @author cstamas
  */
@@ -35,6 +36,8 @@ public class ServletRestletApplicationBridge
     {
         // a Plexus aware implementation of createApplication()
         Application application = super.createApplication( context );
+
+        application.setName( getServletConfig().getServletName() );
 
         if ( PlexusRestletApplicationBridge.class.isAssignableFrom( application.getClass() ) )
         {

@@ -23,6 +23,11 @@ import org.codehaus.plexus.util.IOUtil;
 import org.restlet.data.MediaType;
 import org.restlet.resource.OutputRepresentation;
 
+/**
+ * A simple Restlet.org representation based on InputStream.
+ * 
+ * @author cstamas
+ */
 public class InputStreamRepresentation
     extends OutputRepresentation
 {

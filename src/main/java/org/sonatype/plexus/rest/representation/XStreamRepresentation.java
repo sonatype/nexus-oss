@@ -31,7 +31,6 @@ import com.thoughtworks.xstream.XStream;
 public class XStreamRepresentation
     extends StringRepresentation
 {
-
     private XStream xstream;
 
     public XStreamRepresentation( XStream xstream, String text, MediaType mt, Language language,

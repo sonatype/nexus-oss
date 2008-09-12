@@ -24,6 +24,7 @@ import org.restlet.Context;
  * A collection of short static snippets.
  * 
  * @author cstamas
+ * @deprecated Use PlexusResource and use IoC.
  */
 public class PlexusRestletUtils
 {
