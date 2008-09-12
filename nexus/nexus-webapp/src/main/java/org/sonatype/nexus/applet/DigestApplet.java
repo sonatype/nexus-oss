@@ -24,7 +24,9 @@ package org.sonatype.nexus.applet;
 import java.applet.Applet;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.FileDialog;
 import java.awt.FlowLayout;
+import java.awt.Frame;
 import java.awt.Graphics;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -64,6 +66,24 @@ public class DigestApplet extends Applet {
 //    totalBytes = 0L;
 //    repaint();
 //  }
+
+  public String selectFile() {
+    return String.valueOf( AccessController.doPrivileged( new PrivilegedAction() {
+      public Object run() {
+        Frame frame = new Frame();
+        FileDialog fd = new FileDialog( frame );
+        fd.setVisible( true );
+        
+        String filename = fd.getFile();
+        if ( filename == null ) {
+          return "";
+        }
+        else {
+          return fd.getDirectory() + filename;
+        }
+      }
+    } ) );
+  }
   
   public String digest( final String filename ) {
     return String.valueOf( AccessController.doPrivileged( new PrivilegedAction() {

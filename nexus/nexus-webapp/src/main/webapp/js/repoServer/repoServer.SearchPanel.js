@@ -209,7 +209,7 @@ Sonatype.repoServer.SearchPanel = function(config){
         width: 300
       },
       {
-        xtype: 'browsebutton',
+        xtype: Ext.isGecko3 ? 'button' : 'browsebutton',
         text: 'Browse...',
         searchPanel: this,
         tooltip: 'Click to select a file. It will not be uploaded to the ' +
@@ -217,8 +217,6 @@ Sonatype.repoServer.SearchPanel = function(config){
           'Nexus to find a match. This feature requires Java applet ' +
           'support in your web browser.',
         handler: function( b ) {
-          var filename = b.detachInputFile().getValue();
-
           if ( ! document.digestApplet ) {
             b.searchPanel.grid.fetchMoreBar.addText(
               '<div id="checksumContainer" style="width:10px">' +
@@ -229,18 +227,35 @@ Sonatype.repoServer.SearchPanel = function(config){
             ); 
           }
 
-          b.disable();
-          if ( document.digestApplet ) {
-            b.searchPanel.setFilenameLabel( b.searchPanel, 'Loading...' );
-            var f = function( b, filename ) {
-              b.searchPanel.searchField.setRawValue(
-                document.digestApplet.digest( filename ) );
-              b.searchPanel.setFilenameLabel( b.searchPanel, filename );
-              b.enable();
-              b.searchPanel.startSearch( b.searchPanel );
-            }
-            f.defer( 200, b, [b, filename] );
+          var filename = null;
+          
+          if ( Ext.isGecko3 ) {
+            filename = document.digestApplet.selectFile();
           }
+          else {
+            var fileInput = b.detachInputFile();
+            filename = fileInput.getValue();
+          }
+
+          if ( ! filename ) {
+            return;
+          }
+          
+          b.disable();
+          b.searchPanel.setFilenameLabel( b.searchPanel, 'Calculating checksum...' );
+
+          var f = function( b, filename ) {
+            var sha1 = 'error calculating checksum';
+            if ( document.digestApplet ) {
+              sha1 = document.digestApplet.digest( filename );
+            }
+              
+            b.searchPanel.searchField.setRawValue( sha1 );
+            b.searchPanel.setFilenameLabel( b.searchPanel, filename );
+            b.enable();
+            b.searchPanel.startSearch( b.searchPanel );
+          }
+          f.defer( 200, b, [b, filename] );
         }
       }
     ];
@@ -279,23 +294,6 @@ Sonatype.repoServer.SearchPanel = function(config){
     ]
   });
 
-//@note: commented out detail view  
-//this.gsm = this.grid.getSelectionModel();
-//
-//this.gsm.on('rowselect', function(sm, index, record){
-//    detailViewTpl.overwrite(this.detailView.body, record.data);
-//}, this, {buffer:250}); //@todo: reduce the delay for invocation (buffer value)
-//
-//this.grid.store.on({
-//  'datachanged' : function(){
-//    this.detailView.body.update('');
-//  },
-//  'clear' : function(){
-//    this.detailView.body.update('');
-//  },
-//  scope: this
-//});
-  
   this.on({
     'render' : function(){
       this.searchField.focus();
@@ -406,7 +404,7 @@ Ext.extend(Sonatype.repoServer.SearchPanel, Ext.Panel, {
   
   gavEnterHandler: function(f, e) {
     if(e.getKey() == e.ENTER){
-        this.startGAVSearch();
+      this.startGAVSearch();
     }
   }
 
