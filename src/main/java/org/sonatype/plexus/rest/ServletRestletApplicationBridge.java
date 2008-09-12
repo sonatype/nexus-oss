@@ -67,7 +67,7 @@ public class ServletRestletApplicationBridge
             result = getServletConfig().getServletContext().getInitParameter( prefixedName );
         }
 
-        if ( result == null )
+        if ( result == null && defaultValue != null )
         {
             result = getServletConfig().getServletName() + "." + defaultValue;
         }
