@@ -31,6 +31,7 @@ import org.sonatype.plexus.rest.xstream.json.JsonOrgHierarchicalStreamDriver;
 import org.sonatype.plexus.rest.xstream.json.PrimitiveKeyedMapConverter;
 
 import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.io.HierarchicalStreamDriver;
 import com.thoughtworks.xstream.io.xml.DomDriver;
 
 /**
@@ -60,16 +61,11 @@ public class PlexusRestletApplicationBridge
 
     private Map<String, PlexusResource> plexusResources;
 
-    public PlexusContainer getPlexusContainer()
-    {
-        return (PlexusContainer) getContext().getAttributes().get( PlexusConstants.PLEXUS_KEY );
-    }
-
-    public void setPlexusContainer( PlexusContainer plexusContainer )
-    {
-        getContext().getAttributes().put( PlexusConstants.PLEXUS_KEY, plexusContainer );
-    }
-
+    /**
+     * Constructor.
+     * 
+     * @param context
+     */
     public PlexusRestletApplicationBridge( Context context )
     {
         super( context );
@@ -78,17 +74,65 @@ public class PlexusRestletApplicationBridge
     }
 
     /**
+     * Returns the timestamp of instantaniation of this object. This is used as timestamp for transient objects when
+     * they are still unchanged (not modified).
+     * 
+     * @return date
+     */
+    public Date getCreatedOn()
+    {
+        return createdOn;
+    }
+
+    /**
+     * Gets the Plexus from context.
+     * 
+     * @return
+     */
+    public PlexusContainer getPlexusContainer()
+    {
+        return (PlexusContainer) getContext().getAttributes().get( PlexusConstants.PLEXUS_KEY );
+    }
+
+    /**
+     * Puts the Plexus to context.
+     * 
+     * @param plexusContainer
+     */
+    public void setPlexusContainer( PlexusContainer plexusContainer )
+    {
+        getContext().getAttributes().put( PlexusConstants.PLEXUS_KEY, plexusContainer );
+    }
+
+    /**
+     * Invoked from restlet.org Application once, to create root.
+     */
+    public final Restlet createRoot()
+    {
+        if ( root == null )
+        {
+            root = new RetargetableRestlet( getContext() );
+        }
+
+        configure();
+
+        recreateRoot( true );
+
+        return root;
+    }
+
+    /**
      * Creating all sort of shared tools and putting them into context, to make them usable by per-request
      * instantaniated Resource implementors.
      */
-    protected void configure()
+    protected final void configure()
     {
         // we are putting XStream into this Application's Context, since XStream is threadsafe
         // and it is safe to share it across multiple threads. XStream is heavily used by our
         // custom Representation implementation to support XML and JSON.
 
         // create and configure XStream for JSON
-        XStream xstream = configureXstream( new XStream( new JsonOrgHierarchicalStreamDriver() ) );
+        XStream xstream = createAndConfigureXstream( new JsonOrgHierarchicalStreamDriver() );
 
         // for JSON, we use a custom converter for Maps
         xstream.registerConverter( new PrimitiveKeyedMapConverter( xstream.getMapper() ) );
@@ -97,7 +141,7 @@ public class PlexusRestletApplicationBridge
         getContext().getAttributes().put( JSON_XSTREAM, xstream );
 
         // create and configure XStream for XML
-        xstream = configureXstream( new XStream( new DomDriver() ) );
+        xstream = createAndConfigureXstream( new DomDriver() );
 
         // put it into context
         getContext().getAttributes().put( XML_XSTREAM, xstream );
@@ -116,31 +160,8 @@ public class PlexusRestletApplicationBridge
         {
             throw new IllegalStateException( "Cannot collect PlexusResources!", e );
         }
-    }
 
-    /**
-     * Returns the timestamp of instantaniation of this object. This is used as timestamp for transient objects when
-     * they are still unchanged (not modified).
-     * 
-     * @return date
-     */
-    public Date getCreatedOn()
-    {
-        return createdOn;
-    }
-
-    public final Restlet createRoot()
-    {
-        if ( root == null )
-        {
-            root = new RetargetableRestlet( getContext() );
-        }
-
-        configure();
-
-        recreateRoot( true );
-
-        return root;
+        doConfigure();
     }
 
     protected final void recreateRoot( boolean isStarted )
@@ -168,12 +189,44 @@ public class PlexusRestletApplicationBridge
         }
     }
 
-    protected XStream configureXstream( XStream xstream )
+    protected final XStream createAndConfigureXstream( HierarchicalStreamDriver driver )
+    {
+        XStream xstream = new XStream( driver );
+
+        return doConfigureXstream( xstream );
+    }
+
+    // methods to override
+
+    /**
+     * Method to be overridden by subclasses. It will be called only once in the lifetime of this Application. This is
+     * the place when you need to create and add to context some stuff.
+     */
+    protected void doConfigure()
+    {
+        // empty implementation, left for subclasses to do something meaningful
+    }
+
+    /**
+     * Method to be overridden by subclasses. It will be called multiple times with multiple instances of XStream.
+     * Configure it by adding aliases for used DTOs, etc.
+     * 
+     * @param xstream
+     * @return
+     */
+    protected XStream doConfigureXstream( XStream xstream )
     {
         // default implementation does nothing, override if needed
         return xstream;
     }
 
+    /**
+     * Called when the app root needs to be created. Override it if you need "old way" to attach resources, or need to
+     * use the isStarted flag.
+     * 
+     * @param root
+     * @param isStarted
+     */
     protected void doCreateRoot( Router root, boolean isStarted )
     {
         // empty implementation, left for subclasses to do something meaningful
