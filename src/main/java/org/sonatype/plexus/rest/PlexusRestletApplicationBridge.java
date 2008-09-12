@@ -31,7 +31,6 @@ import org.sonatype.plexus.rest.xstream.json.JsonOrgHierarchicalStreamDriver;
 import org.sonatype.plexus.rest.xstream.json.PrimitiveKeyedMapConverter;
 
 import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.io.HierarchicalStreamDriver;
 import com.thoughtworks.xstream.io.xml.DomDriver;
 
 /**
@@ -41,7 +40,7 @@ import com.thoughtworks.xstream.io.xml.DomDriver;
  * 
  * @author cstamas
  */
-public abstract class PlexusRestletApplicationBridge
+public class PlexusRestletApplicationBridge
     extends Application
 {
     /** Key to store JSON driver driven XStream */
@@ -89,7 +88,7 @@ public abstract class PlexusRestletApplicationBridge
         // custom Representation implementation to support XML and JSON.
 
         // create and configure XStream for JSON
-        XStream xstream = createAndConfigureXstream( new JsonOrgHierarchicalStreamDriver() );
+        XStream xstream = configureXstream( new XStream( new JsonOrgHierarchicalStreamDriver() ) );
 
         // for JSON, we use a custom converter for Maps
         xstream.registerConverter( new PrimitiveKeyedMapConverter( xstream.getMapper() ) );
@@ -98,7 +97,7 @@ public abstract class PlexusRestletApplicationBridge
         getContext().getAttributes().put( JSON_XSTREAM, xstream );
 
         // create and configure XStream for XML
-        xstream = createAndConfigureXstream( new DomDriver() );
+        xstream = configureXstream( new XStream( new DomDriver() ) );
 
         // put it into context
         getContext().getAttributes().put( XML_XSTREAM, xstream );
@@ -110,6 +109,8 @@ public abstract class PlexusRestletApplicationBridge
         try
         {
             plexusResources = (Map<String, PlexusResource>) getPlexusContainer().lookupMap( PlexusResource.class );
+
+            getLogger().info( "Discovered " + plexusResources.size() + " PlexusResource components." );
         }
         catch ( ComponentLookupException e )
         {
@@ -167,8 +168,15 @@ public abstract class PlexusRestletApplicationBridge
         }
     }
 
-    protected abstract XStream createAndConfigureXstream( HierarchicalStreamDriver driver );
+    protected XStream configureXstream( XStream xstream )
+    {
+        // default implementation does nothing, override if needed
+        return xstream;
+    }
 
-    protected abstract void doCreateRoot( Router root, boolean isStarted );
+    protected void doCreateRoot( Router root, boolean isStarted )
+    {
+        // empty implementation, left for subclasses to do something meaningful
+    }
 
 }

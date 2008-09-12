@@ -20,6 +20,7 @@ import org.restlet.ext.fileupload.RestletFileUpload;
 import org.restlet.resource.Representation;
 import org.restlet.resource.Resource;
 import org.restlet.resource.ResourceException;
+import org.restlet.resource.StringRepresentation;
 import org.restlet.resource.Variant;
 import org.sonatype.plexus.rest.PlexusRestletApplicationBridge;
 import org.sonatype.plexus.rest.representation.InputStreamRepresentation;
@@ -177,6 +178,11 @@ public class RestletResource
             // inputStream
             return new InputStreamRepresentation( variant.getMediaType(), (InputStream) result );
         }
+        else if ( String.class.isAssignableFrom( result.getClass() ) )
+        {
+            // inputStream
+            return new StringRepresentation( (String) result, variant.getMediaType() );
+        }
         else
         {
             // object, make it a representation
@@ -260,7 +266,7 @@ public class RestletResource
 
             if ( name.contains( "/" ) )
             {
-                name = name.substring( name.lastIndexOf( "/" ), name.length() );
+                name = name.substring( name.lastIndexOf( "/" ) + 1, name.length() );
             }
 
             FileItem file = new FakeFileItem( name, representation );
