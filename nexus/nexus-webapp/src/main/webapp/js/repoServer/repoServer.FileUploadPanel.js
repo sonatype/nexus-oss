@@ -128,10 +128,14 @@ Sonatype.repoServer.FileUploadPanel = function(config){
               checked: true,
               name: 'autoguess',
               helpText: ht.autoguess,
-              handler: function( checkbox, value ) {
-                this.updateFilename( this );
-              },
-              scope: this
+              listeners: {
+                'check': {
+                  fn: function( checkbox, value ) {
+                    this.updateFilename( this );
+                  },
+                  scope: this
+                }
+              }
             },
             {
               xtype: 'textfield',
