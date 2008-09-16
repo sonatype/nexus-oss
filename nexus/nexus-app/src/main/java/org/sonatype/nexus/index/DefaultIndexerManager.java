@@ -940,13 +940,13 @@ public class DefaultIndexerManager
         {
             repository.setIndexable( false );
 
-            IndexingContext context = nexusIndexer.getIndexingContexts().get( getLocalContextId( repository.getId() ) );
-
             tmpdir = new File( getTempDirectory(), "nx-remote-index" + System.currentTimeMillis() );
 
             tmpdir.mkdirs();
 
             FSDirectory directory = FSDirectory.getDirectory( tmpdir );
+
+            IndexingContext context = nexusIndexer.getIndexingContexts().get( getLocalContextId( repository.getId() ) );
 
             tmpContext = nexusIndexer.addIndexingContextForced(
                 context.getId() + "-tmp",

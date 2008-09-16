@@ -74,7 +74,7 @@ public abstract class AbstractNexusResourceHandler
     extends AbstractPlexusAwareResource
 {
     private NexusArtifactAuthorizer artifactAuthorizer;
-    
+
     public AbstractNexusResourceHandler( Context context, Request request, Response response )
     {
         super( context, request, response );
@@ -82,8 +82,8 @@ public abstract class AbstractNexusResourceHandler
         getVariants().add( new Variant( MediaType.APPLICATION_XML ) );
 
         getVariants().add( new Variant( MediaType.APPLICATION_JSON ) );
-        
-        artifactAuthorizer = ( NexusArtifactAuthorizer ) lookup( NexusArtifactAuthorizer.ROLE );
+
+        artifactAuthorizer = (NexusArtifactAuthorizer) lookup( NexusArtifactAuthorizer.ROLE );
     }
 
     /**
@@ -169,7 +169,7 @@ public abstract class AbstractNexusResourceHandler
                     null );
 
                 String path = mr.getGavCalculator().gavToPath( gav );
-                
+
                 if ( !artifactAuthorizer.authorizePath( mr, path ) )
                 {
                     return null;
@@ -226,7 +226,7 @@ public abstract class AbstractNexusResourceHandler
         for ( ArtifactInfo ai : aic )
         {
             NexusArtifact na = ai2Na( ai, toParentCollection );
-            
+
             if ( na != null )
             {
                 result.add( na );
@@ -252,7 +252,7 @@ public abstract class AbstractNexusResourceHandler
 
         if ( result == null )
         {
-            ApplicationBridge application = (ApplicationBridge) getContext().getAttributes().get( Application.KEY );
+            ApplicationBridge application = (ApplicationBridge) Application.getCurrent();
 
             result = application.getCreatedOn();
         }
@@ -388,7 +388,7 @@ public abstract class AbstractNexusResourceHandler
 
         if ( getResponse().getEntity() == null )
         {
-            getResponse().setEntity( new StringRepresentation( "", MediaType.TEXT_PLAIN ) );
+            getResponse().setEntity( new StringRepresentation( "OK", MediaType.TEXT_PLAIN ) );
         }
     }
 
@@ -399,7 +399,7 @@ public abstract class AbstractNexusResourceHandler
 
         if ( getResponse().getEntity() == null )
         {
-            getResponse().setEntity( new StringRepresentation( "", MediaType.TEXT_PLAIN ) );
+            getResponse().setEntity( new StringRepresentation( "OK", MediaType.TEXT_PLAIN ) );
         }
     }
 
@@ -411,11 +411,6 @@ public abstract class AbstractNexusResourceHandler
         if ( getResponse().getStatus().isSuccess() )
         {
             updateModificationDate( getRequest().getResourceRef() );
-        }
-
-        if ( getResponse().getEntity() == null )
-        {
-            getResponse().setEntity( new StringRepresentation( "", MediaType.TEXT_PLAIN ) );
         }
     }
 
@@ -430,11 +425,6 @@ public abstract class AbstractNexusResourceHandler
 
             updateModificationDate( getRequest().getResourceRef().getParentRef() );
         }
-
-        if ( getResponse().getEntity() == null )
-        {
-            getResponse().setEntity( new StringRepresentation( "", MediaType.TEXT_PLAIN ) );
-        }
     }
 
     public void handleDelete()
@@ -448,11 +438,6 @@ public abstract class AbstractNexusResourceHandler
 
             updateModificationDate( getRequest().getResourceRef().getParentRef() );
         }
-
-        if ( getResponse().getEntity() == null )
-        {
-            getResponse().setEntity( new StringRepresentation( "", MediaType.TEXT_PLAIN ) );
-        }
     }
 
     /**
@@ -460,7 +445,7 @@ public abstract class AbstractNexusResourceHandler
      * 
      * @param variant
      */
-    public final Representation getRepresentation( Variant variant )
+    public final Representation represent( Variant variant )
     {
         if ( getRequest().getConditions().hasSome() )
         {
@@ -469,7 +454,6 @@ public abstract class AbstractNexusResourceHandler
             }
             else if ( getRequest().getConditions().getUnmodifiedSince() != null )
             {
-
             }
         }
 

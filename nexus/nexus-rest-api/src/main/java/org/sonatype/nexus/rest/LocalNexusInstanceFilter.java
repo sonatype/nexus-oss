@@ -47,8 +47,10 @@ public class LocalNexusInstanceFilter
     /**
      * A beforeHandle will simply embed in request attributes the local Nexus instance.
      */
-    protected void beforeHandle( Request request, Response response )
+    protected int beforeHandle( Request request, Response response )
     {
         request.getAttributes().put( Nexus.ROLE, getLocalNexus() );
+        
+        return CONTINUE;
     }
 }

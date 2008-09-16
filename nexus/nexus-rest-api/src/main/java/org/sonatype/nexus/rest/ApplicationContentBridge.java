@@ -21,7 +21,6 @@
 package org.sonatype.nexus.rest;
 
 import org.restlet.Context;
-import org.restlet.Restlet;
 import org.restlet.Router;
 
 /**
@@ -32,7 +31,6 @@ import org.restlet.Router;
 public class ApplicationContentBridge
     extends ApplicationBridge
 {
-
     /**
      * Constructor to enable usage in ServletRestletApplicationBridge.
      * 
@@ -41,17 +39,16 @@ public class ApplicationContentBridge
     public ApplicationContentBridge( Context context )
     {
         super( context );
-
     }
 
     /**
      * Creating restlet application root.
      */
-    protected Restlet doCreateRoot( boolean isStarted )
+    protected void doCreateRoot( Router root, boolean isStarted )
     {
         if ( !isStarted )
         {
-            return null;
+            return;
         }
 
         // instance filter, that injects proper Nexus instance into request attributes
@@ -71,8 +68,8 @@ public class ApplicationContentBridge
         // the content
         router.attach( "", ContentResourceHandler.class );
 
-        // returning root
-        return nif;
+        // setting root
+        root.attach( nif );
     }
 
 }

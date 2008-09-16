@@ -20,9 +20,6 @@
  */
 package org.sonatype.nexus.rest;
 
-import java.util.Date;
-
-import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.restlet.Context;
 import org.restlet.Restlet;
@@ -87,14 +84,8 @@ import org.sonatype.nexus.rest.users.UserResourceHandler;
 import org.sonatype.nexus.rest.wastebasket.WastebasketResourceHandler;
 import org.sonatype.nexus.rest.xstream.XStreamInitializer;
 import org.sonatype.plexus.rest.PlexusRestletApplicationBridge;
-import org.sonatype.plexus.rest.PlexusRestletUtils;
-import org.sonatype.plexus.rest.RestletOrgApplication;
-import org.sonatype.plexus.rest.xstream.json.JsonOrgHierarchicalStreamDriver;
-import org.sonatype.plexus.rest.xstream.json.PrimitiveKeyedMapConverter;
 
 import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.io.HierarchicalStreamDriver;
-import com.thoughtworks.xstream.io.xml.DomDriver;
 
 /**
  * Nexus REST bridge. We have the needed Nexus specific customizations made here, such as creation and configuration of
@@ -104,22 +95,9 @@ import com.thoughtworks.xstream.io.xml.DomDriver;
  */
 public class ApplicationBridge
     extends PlexusRestletApplicationBridge
-    implements RestletOrgApplication, ConfigurationChangeListener
+    implements ConfigurationChangeListener
 {
-    /** Key to store JSON driver driven XStream */
-    public static final String JSON_XSTREAM = "nexus.xstream.json";
-
-    /** Key to store XML driver driven XStream */
-    public static final String XML_XSTREAM = "nexus.xstream.xml";
-
-    /** Key to store used Commons Fileupload FileItemFactory */
-    public static final String FILEITEM_FACTORY = "nexus.fileItemFactory";
-
-    /** Date of creation of this application */
-    private final Date createdOn;
-
-    /** The root that is changeable as-needed basis */
-    private RetargetableRestlet root;
+    private Nexus nexus;
 
     /**
      * Constructor to enable usage in ServletRestletApplicationBridge.
@@ -129,19 +107,6 @@ public class ApplicationBridge
     public ApplicationBridge( Context context )
     {
         super( context );
-
-        this.createdOn = new Date();
-    }
-
-    /**
-     * Returns the timestamp of instantaniation of this object. This is used as timestamp for transient objects when
-     * they are still unchanged (not modified).
-     * 
-     * @return date
-     */
-    public Date getCreatedOn()
-    {
-        return createdOn;
     }
 
     /**
@@ -160,94 +125,50 @@ public class ApplicationBridge
     }
 
     /**
-     * Creating all sort of shared tools and putting them into context, to make them usable by per-request
-     * instantaniated Resource implementors.
-     */
-    protected void configure()
-    {
-        getNexus().getNexusConfiguration().addConfigurationChangeListener( this );
-
-        // we are putting XStream into this Application's Context, since XStream is threadsafe
-        // and it is safe to share it across multiple threads. XStream is heavily used by our
-        // custom Representation implementation to support XML and JSON.
-
-        // create and configure XStream for JSON
-        XStream xstream = createAndConfigureXstream( new JsonOrgHierarchicalStreamDriver() );
-
-        // for JSON, we use a custom converter for Maps
-        xstream.registerConverter( new PrimitiveKeyedMapConverter( xstream.getMapper() ) );
-
-        // put it into context
-        getContext().getAttributes().put( JSON_XSTREAM, xstream );
-
-        // create and configure XStream for XML
-        xstream = createAndConfigureXstream( new DomDriver() );
-
-        // put it into context
-        getContext().getAttributes().put( XML_XSTREAM, xstream );
-
-        // put fileItemFactory into context
-        getContext().getAttributes().put( FILEITEM_FACTORY, new DiskFileItemFactory() );
-    }
-
-    /**
-     * Creates and configures XStream instance for Nexus needs.
+     * Lookups Nexus instance in this plexus.
      * 
-     * @param driver
      * @return
      */
-    protected XStream createAndConfigureXstream( HierarchicalStreamDriver driver )
-    {
-        return XStreamInitializer.initialize( new XStream( driver ) );
-    }
-
     protected Nexus getNexus()
     {
-        try
+        if ( nexus == null )
         {
-            return (Nexus) PlexusRestletUtils.plexusLookup( getContext(), Nexus.ROLE );
+            try
+            {
+                nexus = (Nexus) getPlexusContainer().lookup( Nexus.ROLE );
+            }
+            catch ( ComponentLookupException e )
+            {
+                throw new IllegalStateException( "Cannot get Nexus instance!", e );
+            }
         }
-        catch ( ComponentLookupException e )
-        {
-            throw new IllegalStateException( "Cannot get Nexus instance!", e );
-        }
+
+        return nexus;
     }
 
     /**
-     * Creating restlet application root.
+     * Adding this as config change listener.
      */
-    public final Restlet createRoot()
+    protected void doConfigure()
     {
-        if ( root == null )
-        {
-            root = new RetargetableRestlet( getContext() );
-        }
-
-        configure();
-
-        recreateRoot( true );
-
-        return root;
+        getNexus().getNexusConfiguration().addConfigurationChangeListener( this );
     }
 
-    protected final void recreateRoot( boolean isStarted )
+    /**
+     * Configuring xstream with our aliases.
+     */
+    protected XStream doConfigureXstream( XStream xstream )
     {
-        // reboot?
-        if ( root != null )
-        {
-            root.setRoot( doCreateRoot( isStarted ) );
-        }
+        return XStreamInitializer.initialize( xstream );
     }
 
-    protected Restlet doCreateRoot( boolean isStarted )
+    /**
+     * "Decorating" the root with our resources.
+     * 
+     * @TODO Move this to PlexusResources, except Status (see isStarted usage below!)
+     */
+    protected void doCreateRoot( Router root, boolean isStarted )
     {
-        // TODO: this has to be externalized somehow
-
-        // this is 100% what would you do in pure restlet.org Application createRoot() method.
-
-        // The root is a router
-        Router root = new Router( getContext() );
-
         // instance filter, that injects proper Nexus instance into request attributes
         NexusInstanceFilter nif = new NexusInstanceFilter( getContext() );
 
@@ -269,7 +190,7 @@ public class ApplicationBridge
 
         if ( !isStarted )
         {
-            return root;
+            return;
         }
 
         // ==========================================================
@@ -291,7 +212,7 @@ public class ApplicationBridge
         attach( router, false, "/artifact/maven", ArtifactResourceHandler.class );
 
         attach( router, false, "/artifact/maven/redirect", ArtifactResourceRedirectHandler.class );
-        
+
         attach( router, false, "/artifact/maven/content", ArtifactResourceContentHandler.class );
 
         // protected resources
@@ -448,9 +369,6 @@ public class ApplicationBridge
             RepositoryTargetResourceHandler.class );
 
         attach( router, false, "/repo_content_classes", ContentClassesListResourceHandler.class );
-
-        // returning root
-        return root;
     }
 
     protected void attach( Router router, boolean strict, String uriPattern, Class<? extends Resource> targetClass )

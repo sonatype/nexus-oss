@@ -2,7 +2,6 @@ package org.sonatype.nexus.client.rest;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -13,6 +12,7 @@ import java.util.Map.Entry;
 import org.apache.log4j.Logger;
 import org.codehaus.plexus.util.StringUtils;
 import org.restlet.Client;
+import org.restlet.Context;
 import org.restlet.data.ChallengeResponse;
 import org.restlet.data.ChallengeScheme;
 import org.restlet.data.MediaType;
@@ -34,7 +34,9 @@ import com.thoughtworks.xstream.XStream;
 
 public class RestClientHelper
 {
-    private Client restClient = new Client( Protocol.HTTP );
+    private final Context restContext;
+
+    private final Client restClient;
 
     private ChallengeResponse challenge;
 
@@ -43,7 +45,7 @@ public class RestClientHelper
     private static final String SERVICE_URL_PART = "service/local/";
 
     private Logger logger = Logger.getLogger( getClass() );
-    
+
     private XStream xstream = XStreamInitializer.initialize( new XStream() );
 
     public RestClientHelper( String baseUrl, String username, String password )
@@ -52,6 +54,8 @@ public class RestClientHelper
         ChallengeResponse authentication = new ChallengeResponse( scheme, username, password );
         this.challenge = authentication;
         this.baseUrl = baseUrl;
+        this.restContext = new Context();
+        this.restClient = new Client( restContext, Protocol.HTTP );
     }
 
     private String buildUrl( String service, String id )
@@ -83,8 +87,9 @@ public class RestClientHelper
         for ( Iterator<Entry<String, String>> iter = args.entrySet().iterator(); iter.hasNext(); )
         {
             Entry<String, String> entry = iter.next();
-            params.append( entry.getKey() ).append( "=" ).append( URLEncoder.encode( entry.getValue(), "UTF-8" ) ).append(
-                                                                                                                           "&" );
+            params
+                .append( entry.getKey() ).append( "=" ).append( URLEncoder.encode( entry.getValue(), "UTF-8" ) )
+                .append( "&" );
         }
         return params.toString();
     }
@@ -103,14 +108,16 @@ public class RestClientHelper
     }
 
     public Object get( String service, String id )
-        throws NexusClientException, NexusConnectionException
+        throws NexusClientException,
+            NexusConnectionException
     {
         String url = this.buildUrl( service, id );
         return this.sendMessage( Method.GET, url, (NexusResponse) null );
     }
 
     public Object get( String service, Map<String, String> args )
-        throws NexusClientException, NexusConnectionException
+        throws NexusClientException,
+            NexusConnectionException
     {
         String url;
         try
@@ -125,7 +132,8 @@ public class RestClientHelper
     }
 
     public Object getList( String service )
-        throws NexusClientException, NexusConnectionException
+        throws NexusClientException,
+            NexusConnectionException
     {
         String url = this.buildUrl( service, "" );
         return this.sendMessage( Method.GET, url, (NexusResponse) null );
@@ -138,18 +146,21 @@ public class RestClientHelper
 
         // FIXME: The repositories service doesn't return anything for create, see NEXUS-540
     }
-    
+
     public Object update( String service, String id, NexusResponse nexusResponse )
         throws NexusConnectionException
     {
         return this.sendMessage( Method.PUT, this.buildUrl( service, id ), nexusResponse );
     }
 
-    public Object sendCommand( String service, String command) throws NexusConnectionException
+    public Object sendCommand( String service, String command )
+        throws NexusConnectionException
     {
-        return this.sendMessage( Method.PUT, this.buildUrl( service, "command" ), new StringRepresentation(command, MediaType.TEXT_ALL));
+        return this.sendMessage( Method.PUT, this.buildUrl( service, "command" ), new StringRepresentation(
+            command,
+            MediaType.TEXT_ALL ) );
     }
-    
+
     public Response sendRequest( Method method, String url, Representation representation )
     {
         this.logger.debug( "Method: " + method.getName() + " url: " + url );
@@ -157,25 +168,29 @@ public class RestClientHelper
         Request request = new Request();
         request.setResourceRef( url );
         request.setMethod( method );
-        request.setEntity( representation );
+
+        if ( !Method.GET.equals( method ) && !Method.DELETE.equals( method ) )
+        {
+            request.setEntity( representation );
+        }
+
         request.setChallengeResponse( this.challenge );
 
         return this.restClient.handle( request );
     }
-    
-    @SuppressWarnings("unchecked")
+
     public Object sendMessage( Method method, String url, NexusResponse nexusResponse )
         throws NexusConnectionException
     {
         XStreamRepresentation representation = new XStreamRepresentation( this.xstream, "", MediaType.APPLICATION_XML );
-     // now set the payload
+        // now set the payload
         representation.setPayload( nexusResponse );
-        
+
         return this.sendMessage( method, url, representation );
-        
+
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings( "unchecked" )
     public Object sendMessage( Method method, String url, Representation representation )
         throws NexusConnectionException
     {
@@ -190,20 +205,31 @@ public class RestClientHelper
             List<NexusError> errors = new ArrayList<NexusError>();
             try
             {
-                String responseText = response.getEntity().getText();
-               
-                // this is kinda hackish, but this class is already tied to xstream
-                if( responseText.contains( "<error" ) ) // quick check before we parse the string
+                if ( response.getEntity() != null )
                 {
-                  // try to parse the response
-                    NexusErrorResponse errorResponse = (NexusErrorResponse) this.xstream.fromXML( responseText, new NexusErrorResponse() );
-                    // if we made it this far we can stick the NexusErrors in the Exception
-                    errors = errorResponse.getErrors();
+
+                    String responseText = response.getEntity().getText();
+
+                    // this is kinda hackish, but this class is already tied to xstream
+                    if ( responseText.contains( "<error" ) ) // quick check before we parse the string
+                    {
+                        // try to parse the response
+                        NexusErrorResponse errorResponse = (NexusErrorResponse) this.xstream.fromXML(
+                            responseText,
+                            new NexusErrorResponse() );
+                        // if we made it this far we can stick the NexusErrors in the Exception
+                        errors = errorResponse.getErrors();
+                    }
+                    else
+                    {
+                        // the response text might be helpful in debugging, so we will add it
+                        errorMessage += "\nResponse: "
+                            + ( !StringUtils.isEmpty( responseText ) ? "\n" + responseText : "<empty>" );
+                    }
                 }
                 else
                 {
-                    // the response text might be helpful in debugging, so we will add it                    
-                    errorMessage += "\nResponse: " + (!StringUtils.isEmpty( responseText ) ? "\n"+responseText : "<empty>");
+                    errorMessage = response.getStatus().getName();
                 }
             }
             catch ( Exception e ) // we really don't want our fancy exception to cause another problem.

@@ -52,7 +52,7 @@ public class BrowserSensingFilter
      * A beforeHandle will simply embed in request attributes a Nexus interface implemntor, depending on key used to
      * name it.
      */
-    protected void beforeHandle( Request request, Response response )
+    protected int beforeHandle( Request request, Response response )
     {
         String agentInfo = request.getClientInfo().getAgent() != null ? request
             .getClientInfo().getAgent().toLowerCase() : "unknown";
@@ -67,6 +67,8 @@ public class BrowserSensingFilter
             request
                 .getClientInfo().getAcceptedMediaTypes().add( 0, new Preference<MediaType>( MediaType.TEXT_HTML, 1 ) );
         }
+        
+        return CONTINUE;
     }
 
 }

@@ -20,8 +20,6 @@ import org.sonatype.nexus.rest.model.LogsListResourceResponse;
 import org.sonatype.nexus.test.utils.FileTestingUtils;
 import org.sonatype.nexus.test.utils.NexusConfigUtil;
 
-import com.thoughtworks.xstream.XStream;
-
 /**
  * Tests downloading of log and config files.
  */
@@ -82,7 +80,7 @@ public class Nexus606DownloadLogsAndConfigFilesTest
         String sha1Expected = FileTestingUtils.createSHA1FromStream( response.getEntity().getStream() );
         String sha1Actual = FileTestingUtils.createSHA1FromFile( NexusConfigUtil.getNexusFile() );
 
-        Assert.assertEquals( "SHA1 of log files do not match: ", sha1Expected, sha1Actual );
+        Assert.assertEquals( "SHA1 of config files do not match: ", sha1Expected, sha1Actual );
     }
 
     private void downloadAndConfirmLog( String logURI, String name )

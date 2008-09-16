@@ -20,6 +20,7 @@ import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.log4j.Logger;
 import org.apache.maven.wagon.authentication.AuthenticationInfo;
 import org.restlet.Client;
+import org.restlet.Context;
 import org.restlet.data.ChallengeResponse;
 import org.restlet.data.ChallengeScheme;
 import org.restlet.data.Method;
@@ -60,21 +61,29 @@ public class RequestFacade
         Request request = new Request();
         request.setResourceRef( url.toString() );
         request.setMethod( method );
-        request.setEntity( representation );
+
+        if ( !Method.GET.equals( method ) && !Method.DELETE.equals( method ) )
+        {
+            request.setEntity( representation );
+        }
 
         // check the text context to see if this is a secure test
         TestContext context = TestContainer.getInstance().getTestContext();
         if ( context.isSecureTest() )
         {
-            ChallengeScheme scheme = ChallengeScheme.HTTP_BASIC;
-            ChallengeResponse authentication =
-                new ChallengeResponse( scheme, context.getUsername(), context.getPassword() );
+            // ChallengeScheme scheme = new ChallengeScheme( "HTTP_NxBasic", "NxBasic", "Nexus Basic" );
+            ChallengeResponse authentication = new ChallengeResponse(
+                ChallengeScheme.HTTP_BASIC,
+                context.getUsername(),
+                context.getPassword() );
             request.setChallengeResponse( authentication );
         }
 
-        Client client = new Client( Protocol.HTTP );
+        Context ctx = new Context();
 
-        LOG.debug( "sendMessage: " + method.getName() + " "+ url );
+        Client client = new Client( ctx, Protocol.HTTP );
+
+        LOG.debug( "sendMessage: " + method.getName() + " " + url );
         return client.handle( request );
     }
 
@@ -134,7 +143,8 @@ public class RequestFacade
     }
 
     public static int executeHTTPClientMethod( URL url, HttpMethod method )
-        throws HttpException, IOException
+        throws HttpException,
+            IOException
     {
 
         HttpClient client = new HttpClient();
@@ -145,15 +155,14 @@ public class RequestFacade
         if ( context.isSecureTest() )
         {
             client.getState().setCredentials(
-                                              AuthScope.ANY,
-                                              new UsernamePasswordCredentials( context.getUsername(),
-                                                                               context.getPassword() ) );
+                AuthScope.ANY,
+                new UsernamePasswordCredentials( context.getUsername(), context.getPassword() ) );
 
             List<String> authPrefs = new ArrayList<String>( 1 );
             authPrefs.add( AuthPolicy.BASIC );
             client.getParams().setParameter( AuthPolicy.AUTH_SCHEME_PRIORITY, authPrefs );
             client.getParams().setAuthenticationPreemptive( true );
-            
+
         }
         try
         {

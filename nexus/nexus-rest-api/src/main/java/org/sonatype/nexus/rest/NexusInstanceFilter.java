@@ -60,7 +60,7 @@ public class NexusInstanceFilter
      * A beforeHandle will simply embed in request attributes a Nexus interface implemntor, depending on key used to
      * name it.
      */
-    protected void beforeHandle( Request request, Response response )
+    protected int beforeHandle( Request request, Response response )
     {
         String instanceName = request.getAttributes().containsKey( NEXUS_INSTANCE_KEY ) ? (String) request
             .getAttributes().get( NEXUS_INSTANCE_KEY ) : "local";
@@ -81,6 +81,8 @@ public class NexusInstanceFilter
         request.getAttributes().put( NexusSecurityConfiguration.ROLE, getNexusSecurityConfiguration() );
 
         request.getAttributes().put( SecurityManager.class.getName(), getSecurityManager() );
+        
+        return CONTINUE;
     }
 
     protected NexusSecurityConfiguration getNexusSecurityConfiguration()

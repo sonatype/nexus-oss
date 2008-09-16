@@ -137,7 +137,7 @@
     <plx.plugin.version>1.3</plx.plugin.version>
     <plexus.jetty.testsuite.version>1.1</plexus.jetty.testsuite.version>
     <plexus.jetty.version>1.1</plexus.jetty.version>
-    <plexus.restlet.bridge.version>1.2</plexus.restlet.bridge.version>
+    <plexus.restlet.bridge.version>1.3-SNAPSHOT</plexus.restlet.bridge.version>
     <nexus.indexer.version>1.0.1-SNAPSHOT</nexus.indexer.version>
     <apache.commons.email.version>1.1</apache.commons.email.version>
   </properties>
@@ -539,11 +539,6 @@
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-webapp</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.sonatype.nexus</groupId>
-        <artifactId>nexus-rest-model</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>

@@ -26,13 +26,18 @@ public class StorageFileItemRepresentation
         setSize( file.getLength() );
 
         setModificationDate( new Date( file.getModified() ) );
+        
+        setAvailable( true );
+        
+        setDownloadable( true );
+        
+        setDownloadName( file.getName() );
 
         if ( file.getAttributes().containsKey( DigestCalculatingInspector.DIGEST_SHA1_KEY ) )
         {
             setTag( new Tag( file.getAttributes().get( DigestCalculatingInspector.DIGEST_SHA1_KEY ) ) );
         }
 
-        setAvailable( true );
     }
 
     protected StorageFileItem getStorageFileItem()
