@@ -355,6 +355,16 @@ Sonatype.repoServer.RepoMaintPanel = function(config){
         autoScroll: false,
         frame: false,
         tbar: [
+          'Filter:',
+          {
+            disabled: true,
+            xtype: 'nexussearchfield',
+            searchPanel: this,
+            width: 200
+          },
+          {
+            xtype: 'tbspacer'
+          },
           {
             text: 'Refresh',
             iconCls: 'st-icon-refresh',
@@ -370,7 +380,7 @@ Sonatype.repoServer.RepoMaintPanel = function(config){
                 treePanel.root.reload();
               }
             }
-          }
+          } 
         ],
         items: [
           {
@@ -829,9 +839,12 @@ Ext.extend(Sonatype.repoServer.RepoMaintPanel, Sonatype.repoServer.AbstractRepoP
             rec.set('remoteStatus', item.status.remoteStatus);
             rec.set('proxyMode', item.status.proxyMode);
             rec.set('sStatus', this.statusTextMaker(item.status, item));
-            rec.commit();
+            rec.commit(true);
             rec.endEdit();
           }
+        }
+        if ( data.length ) {
+          this.reposGridPanel.getView().refresh();
         }
       }
     }
@@ -860,6 +873,11 @@ Ext.extend(Sonatype.repoServer.RepoMaintPanel, Sonatype.repoServer.AbstractRepoP
       html: '<div class="little-padding">Select a repository to view it</div>'
     });
     this.formCards.getLayout().setActiveItem(0);
+  },
+  
+  startSearch: function( p ) {
+    p.searchField.triggers[0].show();
+    alert( 'filter on' );
   }
 
 });
