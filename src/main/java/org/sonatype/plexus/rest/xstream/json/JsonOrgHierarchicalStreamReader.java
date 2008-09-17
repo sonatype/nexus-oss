@@ -25,6 +25,7 @@ import java.util.List;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.sonatype.plexus.rest.xstream.LookAheadStreamReader;
 
 import com.thoughtworks.xstream.converters.ErrorWriter;
 import com.thoughtworks.xstream.core.util.FastStack;

@@ -29,6 +29,7 @@ import org.restlet.Router;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 import org.sonatype.plexus.rest.xstream.json.JsonOrgHierarchicalStreamDriver;
 import org.sonatype.plexus.rest.xstream.json.PrimitiveKeyedMapConverter;
+import org.sonatype.plexus.rest.xstream.xml.LookAheadXppDriver;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.HierarchicalStreamDriver;
@@ -141,7 +142,7 @@ public class PlexusRestletApplicationBridge
         getContext().getAttributes().put( JSON_XSTREAM, xstream );
 
         // create and configure XStream for XML
-        xstream = createAndConfigureXstream( new DomDriver() );
+        xstream = createAndConfigureXstream( new LookAheadXppDriver() );
 
         // put it into context
         getContext().getAttributes().put( XML_XSTREAM, xstream );

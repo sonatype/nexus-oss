@@ -13,7 +13,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.sonatype.plexus.rest.xstream.json;
+package org.sonatype.plexus.rest.xstream;
 
 public interface LookAheadStreamReader
 {
