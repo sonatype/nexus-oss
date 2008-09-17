@@ -93,7 +93,7 @@ public class TargetMessageUtil
         LOG.debug( "responseText: \n" + responseText );
 
         XStreamRepresentation representation =
-            new XStreamRepresentation( XStreamInitializer.initialize( new XStream() ), responseText, MediaType.APPLICATION_XML );
+            new XStreamRepresentation( XStreamFactory.getXmlXStream(), responseText, MediaType.APPLICATION_XML );
 
         RepositoryTargetListResourceResponse resourceResponse =
             (RepositoryTargetListResourceResponse) representation.getPayload( new RepositoryTargetListResourceResponse() );

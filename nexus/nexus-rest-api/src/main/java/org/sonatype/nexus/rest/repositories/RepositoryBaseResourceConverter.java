@@ -24,7 +24,7 @@ import org.sonatype.nexus.rest.model.RepositoryBaseResource;
 import org.sonatype.nexus.rest.model.RepositoryProxyResource;
 import org.sonatype.nexus.rest.model.RepositoryResource;
 import org.sonatype.nexus.rest.model.RepositoryShadowResource;
-import org.sonatype.plexus.rest.xstream.json.LookAheadStreamReader;
+import org.sonatype.plexus.rest.xstream.LookAheadStreamReader;
 
 import com.thoughtworks.xstream.converters.UnmarshallingContext;
 import com.thoughtworks.xstream.converters.reflection.AbstractReflectionConverter;

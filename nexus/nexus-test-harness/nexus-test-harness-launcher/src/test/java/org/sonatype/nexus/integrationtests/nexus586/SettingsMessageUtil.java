@@ -10,6 +10,7 @@ import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.rest.model.GlobalConfigurationResource;
 import org.sonatype.nexus.rest.model.GlobalConfigurationResourceResponse;
 import org.sonatype.nexus.rest.xstream.XStreamInitializer;
+import org.sonatype.nexus.test.utils.XStreamFactory;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
 
 import com.thoughtworks.xstream.XStream;
@@ -21,7 +22,7 @@ public class SettingsMessageUtil
 
     static
     {
-        xstream = XStreamInitializer.initialize( new XStream() );
+        xstream = XStreamFactory.getXmlXStream();
     }
 
     public static GlobalConfigurationResource getCurrentSettings()

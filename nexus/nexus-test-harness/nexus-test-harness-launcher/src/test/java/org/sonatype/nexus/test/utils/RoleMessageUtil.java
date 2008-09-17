@@ -115,7 +115,7 @@ public class RoleMessageUtil
         String responseText = RequestFacade.doGetRequest( "service/local/roles" ).getEntity().getText();
 
         XStreamRepresentation representation =
-            new XStreamRepresentation( XStreamInitializer.initialize( new XStream() ), responseText, MediaType.APPLICATION_XML );
+            new XStreamRepresentation( XStreamFactory.getXmlXStream(), responseText, MediaType.APPLICATION_XML );
 
         RoleListResourceResponse resourceResponse =
             (RoleListResourceResponse) representation.getPayload( new RoleListResourceResponse() );

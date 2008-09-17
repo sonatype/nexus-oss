@@ -21,7 +21,8 @@ public class Nexus533TaskDailyTest
             scheduledTask = new ScheduledServiceDailyResource();
             scheduledTask.setEnabled( true );
             scheduledTask.setId( null );
-            scheduledTask.setName( "taskOnce" );
+            scheduledTask.setName( "taskDaily" );
+            scheduledTask.setSchedule( "daily" );
             // A future date
             Date startDate = DateUtils.addDays( new Date(), 10 );
             startDate = DateUtils.round( startDate, Calendar.DAY_OF_MONTH );

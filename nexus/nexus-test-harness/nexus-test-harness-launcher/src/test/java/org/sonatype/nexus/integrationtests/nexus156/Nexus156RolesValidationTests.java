@@ -28,8 +28,7 @@ public class Nexus156RolesValidationTests extends AbstractNexusIntegrationTest
     public Nexus156RolesValidationTests()
     {
         this.messageUtil =
-            new RoleMessageUtil( XStreamInitializer.initialize( new XStream( new JsonOrgHierarchicalStreamDriver() ) ),
-                                 MediaType.APPLICATION_JSON );
+            new RoleMessageUtil( this.getJsonXStream(), MediaType.APPLICATION_JSON );
     }
 
     @Test

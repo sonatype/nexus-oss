@@ -30,6 +30,7 @@ public class Nexus637PublishIndexTest
     {
         File repositoryPath = new File( nexusBaseDir, "runtime/work/storage/nexus-test-harness-repo" );
         File index = new File( repositoryPath, ".index" );
+        
         Assert.assertFalse( ".index shouldn't exists before publish index task is run.", index.exists() );
 
         ScheduledServicePropertyResource prop = new ScheduledServicePropertyResource();

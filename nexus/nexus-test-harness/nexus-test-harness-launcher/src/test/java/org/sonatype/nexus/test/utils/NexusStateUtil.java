@@ -49,7 +49,7 @@ public class NexusStateUtil
             throw new ConnectException( response.getStatus().toString() );
         }
         
-        XStream xstream = XStreamInitializer.initialize( new XStream() );
+        XStream xstream = XStreamFactory.getXmlXStream();
         StatusResourceResponse status = null;
 
         status =

@@ -43,8 +43,7 @@ public class Nexus450UserCreationTest
     public void init()
     {
         userUtil =
-            new UserMessageUtil( XStreamInitializer.initialize( new XStream( new JsonOrgHierarchicalStreamDriver() ) ),
-                                 MediaType.APPLICATION_JSON );
+            new UserMessageUtil( this.getJsonXStream(), MediaType.APPLICATION_JSON );
     }
 
     @Test

@@ -116,7 +116,7 @@ public class GroupMessageUtil
 
         // this should use call to: getResourceFromResponse
         XStreamRepresentation representation =
-            new XStreamRepresentation( XStreamInitializer.initialize( new XStream() ), responseText, MediaType.APPLICATION_XML );
+            new XStreamRepresentation( XStreamFactory.getXmlXStream(), responseText, MediaType.APPLICATION_XML );
 
         RepositoryGroupResourceResponse resourceResponse =
             (RepositoryGroupResourceResponse) representation.getPayload( new RepositoryGroupResourceResponse() );
@@ -187,7 +187,7 @@ public class GroupMessageUtil
         LOG.debug( "responseText: \n" + responseText );
 
         XStreamRepresentation representation =
-            new XStreamRepresentation( XStreamInitializer.initialize( new XStream() ), responseText, MediaType.APPLICATION_XML );
+            new XStreamRepresentation( XStreamFactory.getXmlXStream(), responseText, MediaType.APPLICATION_XML );
 
         RepositoryGroupListResourceResponse resourceResponse =
             (RepositoryGroupListResourceResponse) representation.getPayload( new RepositoryGroupListResourceResponse() );

@@ -15,6 +15,7 @@ import org.sonatype.nexus.rest.xstream.XStreamInitializer;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
 
 import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.converters.ConversionException;
 
 public class Nexus531RepositoryCrudValidationTests
     extends AbstractPrivilegeTest
@@ -135,7 +136,7 @@ public class Nexus531RepositoryCrudValidationTests
         RepositoryResource resource = new RepositoryResource();
 
         resource.setId( "createNoRepoTypeTest" );
-        // resource.setRepoType( "hosted" ); // [hosted, proxy, virtual]
+         resource.setRepoType( "hosted" ); // [hosted, proxy, virtual]
         resource.setName( "Create Test Repo" );
         resource.setFormat( "maven2" ); // Repository Format, maven1, maven2, maven-site, eclipse-update-site
         // resource.setAllowWrite( true );
@@ -152,7 +153,42 @@ public class Nexus531RepositoryCrudValidationTests
         Response response = this.messageUtil.sendMessage( Method.POST, resource );
         String responseText = response.getEntity().getText();
 
-        Assert.assertTrue( "Expected RepoType to default.", response.getStatus().isSuccess() );
+        Assert.assertTrue( "Expected RepoType to default: "+ response.getStatus()+"\n"+responseText, response.getStatus().isSuccess() );
+        // change in functionality
+//        Assert.assertFalse( "Expected failure: "+ response.getStatus()+"\n"+responseText, response.getStatus().isSuccess() );
+    }
+    
+    @Test
+    public void noRepoTypeSerializationError()
+        throws IOException
+    {
+
+        RepositoryResource resource = new RepositoryResource();
+
+        resource.setId( "createNoRepoTypeTest" );
+//         resource.setRepoType( "hosted" ); // [hosted, proxy, virtual]
+        resource.setName( "Create Test Repo" );
+        resource.setFormat( "maven2" ); // Repository Format, maven1, maven2, maven-site, eclipse-update-site
+        // resource.setAllowWrite( true );
+        // resource.setBrowseable( true );
+        // resource.setIndexable( true );
+        // resource.setNotFoundCacheTTL( 1440 );
+        resource.setRepoPolicy( "release" ); // [snapshot, release] Note: needs param name change
+        // resource.setRealmnId(?)
+        // resource.setOverrideLocalStorageUrl( "" ); //file://repos/internal
+        // resource.setDefaultLocalStorageUrl( "" ); //file://repos/internal
+        // resource.setDownloadRemoteIndexes( true );
+        resource.setChecksumPolicy( "ignore" ); // [ignore, warn, strictIfExists, strict]
+
+        try
+        {
+            this.messageUtil.sendMessage( Method.POST, resource );
+            Assert.fail( "Expected to throw ConversionException" );
+        }
+        catch( ConversionException e)
+        {
+            // expected
+        }
     }
 
     @Test
@@ -407,7 +443,6 @@ public class Nexus531RepositoryCrudValidationTests
     {
         Response response = this.messageUtil.sendMessage( method, resource );
         String responseText = response.getEntity().getText();
-        System.out.println( "responseText: "+ responseText );
 
         Assert.assertFalse( "Repo should not have been updated: " + response.getStatus() + "\n" + responseText,
                            response.getStatus().isSuccess() );

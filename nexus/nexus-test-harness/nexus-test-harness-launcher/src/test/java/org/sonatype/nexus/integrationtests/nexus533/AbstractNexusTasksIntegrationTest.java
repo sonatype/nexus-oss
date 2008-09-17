@@ -1,10 +1,13 @@
 package org.sonatype.nexus.integrationtests.nexus533;
 
 import java.io.IOException;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import junit.framework.Assert;
 
+import org.apache.commons.lang.time.DateUtils;
 import org.junit.Test;
 import org.restlet.data.Status;
 import org.sonatype.nexus.configuration.model.CScheduledTask;
@@ -12,6 +15,7 @@ import org.sonatype.nexus.configuration.model.Configuration;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.rest.model.ScheduledServiceBaseResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceListResource;
+import org.sonatype.nexus.rest.model.ScheduledServiceOnceResource;
 import org.sonatype.nexus.test.utils.NexusConfigUtil;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 
@@ -32,7 +36,7 @@ public abstract class AbstractNexusTasksIntegrationTest<E extends ScheduledServi
     }
 
     @SuppressWarnings( "unchecked" )
-    private void assertTasks()
+    protected void assertTasks()
         throws IOException
     {
         Configuration nexusConfig = NexusConfigUtil.getNexusConfig();
@@ -53,6 +57,7 @@ public abstract class AbstractNexusTasksIntegrationTest<E extends ScheduledServi
     {
         E scheduledTask = getTaskScheduled();
         ScheduledServiceListResource task = TaskScheduleUtil.getTask( scheduledTask.getName() );
+
         scheduledTask.setId( task.getId() );
         updateTask( scheduledTask );
         Status status = TaskScheduleUtil.update( scheduledTask );
@@ -70,15 +75,39 @@ public abstract class AbstractNexusTasksIntegrationTest<E extends ScheduledServi
         E scheduledTask = getTaskScheduled();
         ScheduledServiceListResource task = TaskScheduleUtil.getTask( scheduledTask.getName() );
 
-        ScheduledServiceBaseResource taskManual = new ScheduledServiceBaseResource();
-        taskManual.setId( task.getId() );
-        taskManual.setName( scheduledTask.getName() );
-        taskManual.setEnabled( true );
-        taskManual.setTypeId( scheduledTask.getTypeId() );
-        taskManual.setProperties( scheduledTask.getProperties() );
+        // if we have a manual task we can't change the schedule to be manual again
+        if ( !task.getSchedule().equals( "manual" ) )
+        {
 
-        Status status = TaskScheduleUtil.update( taskManual );
-        Assert.assertTrue( status.isSuccess() );
+            ScheduledServiceBaseResource taskManual = new ScheduledServiceBaseResource();
+            taskManual.setId( task.getId() );
+            taskManual.setName( scheduledTask.getName() );
+            taskManual.setEnabled( true );
+            taskManual.setTypeId( scheduledTask.getTypeId() );
+            taskManual.setProperties( scheduledTask.getProperties() );
+            taskManual.setSchedule( "manual" );
+
+            Status status = TaskScheduleUtil.update( taskManual );
+            Assert.assertTrue( status.isSuccess() );
+
+        }
+        else
+        {
+            ScheduledServiceOnceResource updatedTask = new ScheduledServiceOnceResource();
+            updatedTask.setId( task.getId() );
+            updatedTask.setName( scheduledTask.getName() );
+            updatedTask.setEnabled( task.isEnabled() );
+            updatedTask.setTypeId( scheduledTask.getTypeId() );
+            updatedTask.setProperties( scheduledTask.getProperties() );
+            updatedTask.setSchedule( "once" );
+            Date startDate = DateUtils.addDays( new Date(), 10 );
+            startDate = DateUtils.round( startDate, Calendar.DAY_OF_MONTH );
+            updatedTask.setStartDate( String.valueOf( startDate.getTime() ) );
+            updatedTask.setStartTime( "03:30" );
+
+            Status status = TaskScheduleUtil.update( updatedTask );
+            Assert.assertTrue( status.isSuccess() );
+        }
 
         assertTasks();
     }

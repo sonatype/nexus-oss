@@ -29,6 +29,7 @@ import org.sonatype.nexus.rest.model.NexusErrorResponse;
 import org.sonatype.nexus.rest.model.NexusResponse;
 import org.sonatype.nexus.rest.xstream.XStreamInitializer;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
+import org.sonatype.plexus.rest.xstream.xml.LookAheadXppDriver;
 
 import com.thoughtworks.xstream.XStream;
 
@@ -46,7 +47,7 @@ public class RestClientHelper
 
     private Logger logger = Logger.getLogger( getClass() );
 
-    private XStream xstream = XStreamInitializer.initialize( new XStream() );
+    private XStream xstream = XStreamInitializer.initialize( new XStream( new LookAheadXppDriver() ) );
 
     public RestClientHelper( String baseUrl, String username, String password )
     {

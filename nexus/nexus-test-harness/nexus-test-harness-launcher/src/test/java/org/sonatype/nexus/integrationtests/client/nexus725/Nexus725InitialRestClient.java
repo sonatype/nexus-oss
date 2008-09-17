@@ -205,6 +205,7 @@ public class Nexus725InitialRestClient
         RepositoryResource repoResoruce = new RepositoryResource();
         repoResoruce.setId( "checkForErrorsInRepsonse" );
         repoResoruce.setName( "Create Test Repo" );
+        repoResoruce.setRepoType( "hosted" ); // TODO: REMOVE this
         // this will cause a few problems...
         try
         {
@@ -218,7 +219,7 @@ public class Nexus725InitialRestClient
                                e.getErrors().size() > 0 );
 
             // make sure the error is in the stacktrace
-            Assert.assertTrue( "", e.getMessage().contains( e.getErrors().get( 0 ).getMsg() ) );
+            Assert.assertTrue( "Expected message in error", e.getMessage().contains( e.getErrors().get( 0 ).getMsg() ) );
         }
     }
 

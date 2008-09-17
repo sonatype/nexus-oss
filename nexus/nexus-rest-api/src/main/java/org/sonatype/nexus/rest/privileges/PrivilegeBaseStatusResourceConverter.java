@@ -21,10 +21,9 @@
 package org.sonatype.nexus.rest.privileges;
 
 import org.sonatype.nexus.rest.model.PrivilegeApplicationStatusResource;
-import org.sonatype.nexus.rest.model.PrivilegeBaseResource;
 import org.sonatype.nexus.rest.model.PrivilegeBaseStatusResource;
 import org.sonatype.nexus.rest.model.PrivilegeTargetStatusResource;
-import org.sonatype.plexus.rest.xstream.json.LookAheadStreamReader;
+import org.sonatype.plexus.rest.xstream.LookAheadStreamReader;
 
 import com.thoughtworks.xstream.converters.UnmarshallingContext;
 import com.thoughtworks.xstream.converters.reflection.AbstractReflectionConverter;

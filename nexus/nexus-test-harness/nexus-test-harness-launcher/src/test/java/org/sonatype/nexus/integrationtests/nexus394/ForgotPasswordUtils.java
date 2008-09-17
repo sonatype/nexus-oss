@@ -1,14 +1,13 @@
 package org.sonatype.nexus.integrationtests.nexus394;
 
-import org.junit.Assert;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
-import org.restlet.data.Status;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.rest.model.UserForgotPasswordRequest;
 import org.sonatype.nexus.rest.model.UserForgotPasswordResource;
 import org.sonatype.nexus.rest.xstream.XStreamInitializer;
+import org.sonatype.nexus.test.utils.XStreamFactory;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
 
 import com.thoughtworks.xstream.XStream;
@@ -19,7 +18,7 @@ public class ForgotPasswordUtils
 
     static
     {
-        xstream = XStreamInitializer.initialize( new XStream() );
+        xstream = XStreamFactory.getXmlXStream();
         XStreamInitializer.initialize( xstream );
     }
 

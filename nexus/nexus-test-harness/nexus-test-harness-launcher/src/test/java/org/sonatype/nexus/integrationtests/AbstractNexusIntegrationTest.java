@@ -41,6 +41,7 @@ import org.sonatype.nexus.test.utils.FileTestingUtils;
 import org.sonatype.nexus.test.utils.NexusConfigUtil;
 import org.sonatype.nexus.test.utils.NexusStateUtil;
 import org.sonatype.nexus.test.utils.TestProperties;
+import org.sonatype.nexus.test.utils.XStreamFactory;
 
 import com.thoughtworks.xstream.XStream;
 
@@ -726,6 +727,12 @@ public class AbstractNexusIntegrationTest
     
     public XStream getXMLXStream()
     {
-        return XStreamInitializer.initialize( new XStream() );
+        return XStreamFactory.getXmlXStream();
     }
+
+    public XStream getJsonXStream()
+    {
+        return XStreamFactory.getJsonXStream();
+    }
+    
 }

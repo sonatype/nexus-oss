@@ -26,7 +26,7 @@ import org.sonatype.nexus.rest.model.ScheduledServiceDailyResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceMonthlyResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceOnceResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceWeeklyResource;
-import org.sonatype.plexus.rest.xstream.json.LookAheadStreamReader;
+import org.sonatype.plexus.rest.xstream.LookAheadStreamReader;
 
 import com.thoughtworks.xstream.converters.UnmarshallingContext;
 import com.thoughtworks.xstream.converters.reflection.AbstractReflectionConverter;

@@ -31,9 +31,7 @@ public class Nexus133TargetValidationTests
     public Nexus133TargetValidationTests()
     {
         this.messageUtil =
-            new TargetMessageUtil(
-                                   XStreamInitializer.initialize( new XStream( new JsonOrgHierarchicalStreamDriver() ) ),
-                                   MediaType.APPLICATION_JSON );
+            new TargetMessageUtil( this.getJsonXStream(), MediaType.APPLICATION_JSON );
     }
 
     @Test

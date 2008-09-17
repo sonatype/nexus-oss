@@ -5,6 +5,7 @@ import java.io.IOException;
 import org.restlet.data.Status;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.rest.xstream.XStreamInitializer;
+import org.sonatype.nexus.test.utils.XStreamFactory;
 
 import com.thoughtworks.xstream.XStream;
 
@@ -14,7 +15,7 @@ public class UserCreationUtil
 
     static
     {
-        xstream = XStreamInitializer.initialize( new XStream() );
+        xstream = XStreamFactory.getXmlXStream();
         XStreamInitializer.initialize( xstream );
     }
 

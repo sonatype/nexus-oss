@@ -22,6 +22,7 @@ public class Nexus533TaskOnceTest
             scheduledTask.setEnabled( true );
             scheduledTask.setId( null );
             scheduledTask.setName( "taskOnce" );
+            scheduledTask.setSchedule( "once" );
             // A future date
             Date startDate = DateUtils.addDays( new Date(), 10 );
             startDate = DateUtils.round( startDate, Calendar.DAY_OF_MONTH );

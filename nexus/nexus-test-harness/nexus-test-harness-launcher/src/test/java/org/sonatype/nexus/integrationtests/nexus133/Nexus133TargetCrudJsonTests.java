@@ -32,9 +32,7 @@ public class Nexus133TargetCrudJsonTests
     public Nexus133TargetCrudJsonTests()
     {
         this.messageUtil =
-            new TargetMessageUtil(
-                                   XStreamInitializer.initialize( new XStream( new JsonOrgHierarchicalStreamDriver() ) ),
-                                   MediaType.APPLICATION_JSON );
+            new TargetMessageUtil( this.getJsonXStream(), MediaType.APPLICATION_JSON );
     }
 
     @SuppressWarnings( "unchecked" )

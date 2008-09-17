@@ -32,8 +32,7 @@ public class Nexus156RolesCrudJsonTests
     public Nexus156RolesCrudJsonTests()
     {
         this.messageUtil =
-            new RoleMessageUtil( XStreamInitializer.initialize( new XStream( new JsonOrgHierarchicalStreamDriver() ) ),
-                                 MediaType.APPLICATION_JSON );
+            new RoleMessageUtil( this.getJsonXStream(), MediaType.APPLICATION_JSON );
     }
 
     @Test

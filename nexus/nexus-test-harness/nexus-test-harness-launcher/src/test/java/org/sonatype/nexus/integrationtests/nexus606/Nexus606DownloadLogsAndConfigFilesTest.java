@@ -1,13 +1,16 @@
 package org.sonatype.nexus.integrationtests.nexus606;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.Iterator;
 import java.util.List;
 
 import junit.framework.Assert;
 
+import org.codehaus.plexus.util.FileUtils;
 import org.junit.Test;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
@@ -90,11 +93,20 @@ public class Nexus606DownloadLogsAndConfigFilesTest
         Assert.assertEquals( "Status: ", 200, response.getStatus().getCode() );
         
         File logFile = new File( nexusLogDir, name );
-
-        String sha1Expected = FileTestingUtils.createSHA1FromStream( response.getEntity().getStream()  );
-        String sha1Actual = FileTestingUtils.createSHA1FromFile( logFile );
-
-        Assert.assertEquals( "SHA1 of log files do not match: ", sha1Expected, sha1Actual );
+        
+        // get the first 10000 chars from the downloaded log
+        InputStreamReader reader = new InputStreamReader(response.getEntity().getStream());
+        BufferedReader bReader = new BufferedReader(reader);
+        
+        StringBuffer downloadedLog = new StringBuffer();
+        
+        int lineCount = 10000;
+        while(bReader.ready() && lineCount-- > 0)
+        {
+            downloadedLog.append( (char) bReader.read() );
+        }
+        String logOnDisk = FileUtils.fileRead( logFile );
+        Assert.assertTrue( "Downloaded log should be similar to log file from disk.\nNOTE: its possible the file could have rolled over.\nTrying to match:\n"+ downloadedLog, logOnDisk.contains( downloadedLog ) );
     }
     
     private ConfigurationsListResource getConfigFromList( List<ConfigurationsListResource> configList, String name )

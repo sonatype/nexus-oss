@@ -35,10 +35,7 @@ public class Nexus531RepositoryCrudJsonTests
     public Nexus531RepositoryCrudJsonTests()
     {
         this.messageUtil =
-            new RepositoryMessageUtil(
-                                       XStreamInitializer.initialize( new XStream(
-                                                                                   new JsonOrgHierarchicalStreamDriver() ) ),
-                                       MediaType.APPLICATION_JSON );
+            new RepositoryMessageUtil( this.getJsonXStream(), MediaType.APPLICATION_JSON );
     }
 
     @Test

@@ -4,32 +4,32 @@ import java.util.Calendar;
 import java.util.Date;
 
 import org.apache.commons.lang.time.DateUtils;
+import org.sonatype.nexus.rest.model.ScheduledServiceAdvancedResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceMonthlyResource;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 
 import edu.emory.mathcs.backport.java.util.Arrays;
 
 public class Nexus533TaskCronTest
-    extends AbstractNexusTasksIntegrationTest<ScheduledServiceMonthlyResource>
+    extends AbstractNexusTasksIntegrationTest<ScheduledServiceAdvancedResource>
 {
 
-    private static ScheduledServiceMonthlyResource scheduledTask;
+    private static ScheduledServiceAdvancedResource scheduledTask;
 
     @Override
-    public ScheduledServiceMonthlyResource getTaskScheduled()
+    public ScheduledServiceAdvancedResource getTaskScheduled()
     {
         if ( scheduledTask == null )
-        {
-            scheduledTask = new ScheduledServiceMonthlyResource();
+        {   
+            scheduledTask = new ScheduledServiceAdvancedResource();
             scheduledTask.setEnabled( true );
             scheduledTask.setId( null );
-            scheduledTask.setName( "taskOnce" );
+            scheduledTask.setName( "taskAdvanced" );
+            scheduledTask.setSchedule( "advanced" );
             // A future date
             Date startDate = DateUtils.addDays( new Date(), 10 );
             startDate = DateUtils.round( startDate, Calendar.DAY_OF_MONTH );
-            scheduledTask.setStartDate( String.valueOf( startDate.getTime() ) );
-            scheduledTask.setRecurringTime( "03:30" );
-            scheduledTask.setRecurringDay( Arrays.asList( new String[] { "1", "9", "17", "25" } ) );
+            scheduledTask.setCronCommand( "0 0 12 ? * WED" );
 
             scheduledTask.setTypeId( "org.sonatype.nexus.tasks.ReindexTask" );
 
@@ -42,9 +42,9 @@ public class Nexus533TaskCronTest
     }
 
     @Override
-    public void updateTask( ScheduledServiceMonthlyResource scheduledTask )
+    public void updateTask( ScheduledServiceAdvancedResource scheduledTask )
     {
-        scheduledTask.setRecurringTime( "00:00" );
+        scheduledTask.setCronCommand( "0 0 12 ? * WED,FRI" );
     }
 
 }

@@ -5,6 +5,7 @@ import org.restlet.data.Method;
 import org.restlet.data.Status;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.rest.xstream.XStreamInitializer;
+import org.sonatype.nexus.test.utils.XStreamFactory;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
 
 import com.thoughtworks.xstream.XStream;
@@ -16,7 +17,7 @@ public class ForgotUsernameUtils
 
     static
     {
-        xstream = XStreamInitializer.initialize( new XStream() );
+        xstream = XStreamFactory.getXmlXStream();
         XStreamInitializer.initialize( xstream );
     }
 

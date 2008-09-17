@@ -25,6 +25,7 @@ public class Nexus531RepositoryCrudPermissionTests extends AbstractPrivilegeTest
         RepositoryResource repo = new RepositoryResource();
         repo.setId( "testCreatePermission" );
         repo.setName( "testCreatePermission" );
+        repo.setRepoType( "hosted" );
         repo.setFormat( "maven1" );
         repo.setRepoPolicy( "snapshot" );
         repo.setChecksumPolicy( "ignore" );
@@ -73,6 +74,7 @@ public class Nexus531RepositoryCrudPermissionTests extends AbstractPrivilegeTest
         RepositoryResource repo = new RepositoryResource();
         repo.setId( "testUpdatePermission" );
         repo.setName( "testUpdatePermission" );
+        repo.setRepoType( "hosted" );
         repo.setFormat( "maven1" );
         repo.setRepoPolicy( "snapshot" );
         repo.setChecksumPolicy( "ignore" );
@@ -126,6 +128,7 @@ public class Nexus531RepositoryCrudPermissionTests extends AbstractPrivilegeTest
         RepositoryResource repo = new RepositoryResource();
         repo.setId( "testReadPermission" );
         repo.setName( "testReadPermission" );
+        repo.setRepoType( "hosted" );
         repo.setFormat( "maven1" );
         repo.setRepoPolicy( "snapshot" );
         repo.setChecksumPolicy( "ignore" );
@@ -180,6 +183,7 @@ public class Nexus531RepositoryCrudPermissionTests extends AbstractPrivilegeTest
         RepositoryResource repo = new RepositoryResource();
         repo.setId( "testDeletePermission" );
         repo.setName( "testDeletePermission" );
+        repo.setRepoType( "hosted" );
         repo.setFormat( "maven1" );
         repo.setRepoPolicy( "snapshot" );
         repo.setChecksumPolicy( "ignore" );

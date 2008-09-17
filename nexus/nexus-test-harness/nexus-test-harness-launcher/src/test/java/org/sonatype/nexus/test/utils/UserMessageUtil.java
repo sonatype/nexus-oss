@@ -71,7 +71,7 @@ public class UserMessageUtil
         LOG.debug( "responseText: \n" + responseText );
 
         XStreamRepresentation representation =
-            new XStreamRepresentation( XStreamInitializer.initialize( new XStream() ), responseText, MediaType.APPLICATION_XML );
+            new XStreamRepresentation( XStreamFactory.getXmlXStream(), responseText, MediaType.APPLICATION_XML );
 
         UserResourceRequest resourceResponse =
             (UserResourceRequest) representation.getPayload( new UserResourceRequest() );
@@ -139,7 +139,7 @@ public class UserMessageUtil
 
         // must use the XML xstream even if we 'thought' we wanted to use JSON, because REST client doesn't listen to the MediaType in some situations.
         XStreamRepresentation representation =
-            new XStreamRepresentation( XStreamInitializer.initialize( new XStream() ), responseText, MediaType.APPLICATION_XML );
+            new XStreamRepresentation( XStreamFactory.getXmlXStream(), responseText, MediaType.APPLICATION_XML );
 
         UserListResourceResponse resourceResponse =
             (UserListResourceResponse) representation.getPayload( new UserListResourceResponse() );

@@ -34,7 +34,7 @@ public class Nexus142UserCrudJsonTests
     
     public Nexus142UserCrudJsonTests()
     {
-        this.messageUtil = new UserMessageUtil(XStreamInitializer.initialize( new XStream( new JsonOrgHierarchicalStreamDriver() ) ), MediaType.APPLICATION_JSON );
+        this.messageUtil = new UserMessageUtil( this.getJsonXStream(), MediaType.APPLICATION_JSON );
     }
 
     @Test

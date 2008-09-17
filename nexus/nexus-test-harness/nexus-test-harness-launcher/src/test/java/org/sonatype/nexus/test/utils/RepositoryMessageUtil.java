@@ -111,7 +111,7 @@ public class RepositoryMessageUtil
 
         // this should use call to: getResourceFromResponse
         XStreamRepresentation representation =
-            new XStreamRepresentation( XStreamInitializer.initialize( new XStream() ), responseText, MediaType.APPLICATION_XML );
+            new XStreamRepresentation( XStreamFactory.getXmlXStream(), responseText, MediaType.APPLICATION_XML );
 
         RepositoryResourceResponse resourceResponse =
             (RepositoryResourceResponse) representation.getPayload( new RepositoryResourceResponse() );
@@ -182,7 +182,7 @@ public class RepositoryMessageUtil
         LOG.debug( "responseText: \n" + responseText );
 
         XStreamRepresentation representation =
-            new XStreamRepresentation( XStreamInitializer.initialize( new XStream() ), responseText, MediaType.APPLICATION_XML );
+            new XStreamRepresentation( XStreamFactory.getXmlXStream(), responseText, MediaType.APPLICATION_XML );
 
         RepositoryListResourceResponse resourceResponse =
             (RepositoryListResourceResponse) representation.getPayload( new RepositoryListResourceResponse() );

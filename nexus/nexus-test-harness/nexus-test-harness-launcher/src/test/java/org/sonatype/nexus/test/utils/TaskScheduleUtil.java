@@ -27,7 +27,7 @@ public class TaskScheduleUtil
 
     static
     {
-        xstream = XStreamInitializer.initialize( new XStream() );
+        xstream = XStreamFactory.getXmlXStream();
     }
 
     public static Status create( ScheduledServiceBaseResource task )
@@ -123,7 +123,8 @@ public class TaskScheduleUtil
         scheduledTask.setId( null );
         scheduledTask.setName( taskName );
         scheduledTask.setTypeId( typeId );
-
+        scheduledTask.setSchedule( "manual" );
+        
         for ( ScheduledServicePropertyResource property : properties )
         {
             scheduledTask.addProperty( property );

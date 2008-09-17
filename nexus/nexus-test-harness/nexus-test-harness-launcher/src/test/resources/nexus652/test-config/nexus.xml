@@ -140,7 +140,7 @@
       <id>6</id>
       <name>Scheduled Task One</name>
       <enabled>true</enabled>
-      <type>org.sonatype.nexus.tasks.ReindexTask</type>
+      <type>ReindexTask</type>
       <status>SUBMITTED</status>
       <nextRun>1219379400000</nextRun>
       <schedule>
@@ -158,7 +158,7 @@
       <id>7</id>
       <name>Scheduled Task Two</name>
       <enabled>true</enabled>
-      <type>org.sonatype.nexus.tasks.ClearCacheTask</type>
+      <type>ClearCacheTask</type>
       <status>SUBMITTED</status>
       <nextRun>1219379400000</nextRun>
       <schedule>

@@ -19,7 +19,7 @@ public class ChangePasswordUtils
 
     static
     {
-        xstream = XStreamInitializer.initialize( new XStream() );
+        xstream = XStreamFactory.getXmlXStream();
         XStreamInitializer.initialize( xstream );
     }
 

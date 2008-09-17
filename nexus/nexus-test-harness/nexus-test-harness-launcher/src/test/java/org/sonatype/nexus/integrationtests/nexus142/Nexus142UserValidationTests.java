@@ -29,8 +29,7 @@ public class Nexus142UserValidationTests
     public Nexus142UserValidationTests()
     {
         this.messageUtil =
-            new UserMessageUtil( XStreamInitializer.initialize( new XStream( new JsonOrgHierarchicalStreamDriver() ) ),
-                                 MediaType.APPLICATION_JSON );
+            new UserMessageUtil( this.getJsonXStream(), MediaType.APPLICATION_JSON );
     }
     
     @Test

@@ -122,9 +122,13 @@ import org.sonatype.nexus.rest.model.WastebasketResource;
 import org.sonatype.nexus.rest.model.WastebasketResourceResponse;
 import org.sonatype.nexus.rest.privileges.PrivilegeBaseResourceConverter;
 import org.sonatype.nexus.rest.privileges.PrivilegeBaseStatusResourceConverter;
+import org.sonatype.nexus.rest.privileges.PrivilegeResourceRequestConverter;
+import org.sonatype.nexus.rest.privileges.PrivilegeStatusResourceResponseConverter;
 import org.sonatype.nexus.rest.repositories.RepositoryBaseResourceConverter;
+import org.sonatype.nexus.rest.repositories.RepositoryResourceResponseConverter;
 import org.sonatype.nexus.rest.schedules.ScheduledServiceBaseResourceConverter;
 import org.sonatype.nexus.rest.schedules.ScheduledServicePropertyResourceConverter;
+import org.sonatype.nexus.rest.schedules.ScheduledServiceResourceResponseConverter;
 
 import com.thoughtworks.xstream.XStream;
 
@@ -134,19 +138,24 @@ public final class XStreamInitializer
     {
         xstream.registerConverter( new RepositoryBaseResourceConverter( xstream.getMapper(), xstream
             .getReflectionProvider() ), XStream.PRIORITY_VERY_HIGH );
-
+        xstream.registerConverter( new RepositoryResourceResponseConverter( xstream.getMapper(), xstream
+            .getReflectionProvider() ), XStream.PRIORITY_VERY_HIGH ); // strips the class="class.name" attribute from data
+        
         xstream.registerConverter( new ScheduledServiceBaseResourceConverter( xstream.getMapper(), xstream
             .getReflectionProvider() ), XStream.PRIORITY_VERY_HIGH );
-
         xstream.registerConverter( new ScheduledServicePropertyResourceConverter( xstream.getMapper(), xstream
             .getReflectionProvider() ), XStream.PRIORITY_VERY_HIGH );
+        xstream.registerConverter( new ScheduledServiceResourceResponseConverter( xstream.getMapper(), xstream
+            .getReflectionProvider() ), XStream.PRIORITY_VERY_HIGH ); // strips the class="class.name" attribute from data
         
         xstream.registerConverter( new PrivilegeBaseResourceConverter( xstream.getMapper(), xstream
             .getReflectionProvider() ), XStream.PRIORITY_VERY_HIGH );
-        
+        xstream.registerConverter( new PrivilegeResourceRequestConverter( xstream.getMapper(), xstream
+             .getReflectionProvider() ), XStream.PRIORITY_VERY_HIGH ); // strips the class="class.name" attribute from data
         xstream.registerConverter( new PrivilegeBaseStatusResourceConverter( xstream.getMapper(), xstream
             .getReflectionProvider() ), XStream.PRIORITY_VERY_HIGH );
-
+        xstream.registerConverter( new PrivilegeStatusResourceResponseConverter( xstream.getMapper(), xstream
+            .getReflectionProvider() ), XStream.PRIORITY_VERY_HIGH ); // strips the class="class.name" attribute from data
 
         // Maven POM
         xstream.alias( "project", Model.class );

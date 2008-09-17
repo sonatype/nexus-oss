@@ -18,6 +18,7 @@ import org.sonatype.nexus.test.utils.PrivilegesMessageUtil;
 import org.sonatype.nexus.test.utils.SecurityConfigUtil;
 
 import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.converters.ConversionException;
 
 /**
  * Extra CRUD validation tests.
@@ -126,19 +127,17 @@ public class Nexus233PrivilegesValidationTests
         resource.setMethod( methods );
         resource.setName( "createNoTypeTest" );
         // resource.setType( "repositoryTarget" );
-        //resource.setRepositoryTargetId( "testTarget" );
+//        resource.setRepositoryTargetId( "testTarget" );
 
-        Response response = this.messageUtil.sendMessage( Method.POST, resource );
-        String responseText = response.getEntity().getText();
-
-        if ( response.getStatus().getCode() != 400 )
+        try
         {
-            Assert.fail( "Privilege should not have been created: " + response.getStatus() + "\nreponse:\n"
-                + responseText );
+          Response response = this.messageUtil.sendMessage( Method.POST, resource );
+          Assert.fail( "Expected to throw a ConversionException" );
         }
-
-        this.messageUtil.validateResponseErrorXml( responseText );
-
+        catch( ConversionException e )
+        {
+            // expected
+        }
     }
 
     @SuppressWarnings( "unchecked" )

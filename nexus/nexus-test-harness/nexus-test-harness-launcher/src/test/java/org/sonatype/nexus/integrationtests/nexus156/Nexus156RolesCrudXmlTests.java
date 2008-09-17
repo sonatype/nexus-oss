@@ -18,7 +18,7 @@ public class Nexus156RolesCrudXmlTests
 
     public Nexus156RolesCrudXmlTests()
     {
-        this.messageUtil = new RoleMessageUtil(XStreamInitializer.initialize( new XStream( ) ), MediaType.APPLICATION_XML );
+        this.messageUtil = new RoleMessageUtil(this.getXMLXStream(), MediaType.APPLICATION_XML );
     }
     
     @Test
