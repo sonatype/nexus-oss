@@ -3,12 +3,15 @@ package org.sonatype.nexus.client.model;
 import java.lang.reflect.Method;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 
 import junit.framework.Assert;
 import junit.framework.TestCase;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
+import org.apache.commons.lang.time.DateUtils;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.rest.model.AuthenticationClientPermissions;
 import org.sonatype.nexus.rest.model.AuthenticationLoginResource;
@@ -73,6 +76,7 @@ import org.sonatype.nexus.rest.model.RoleResource;
 import org.sonatype.nexus.rest.model.RoleResourceRequest;
 import org.sonatype.nexus.rest.model.RoleResourceResponse;
 import org.sonatype.nexus.rest.model.ScheduledServiceAdvancedResource;
+import org.sonatype.nexus.rest.model.ScheduledServiceBaseResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceDailyResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceListResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceListResourceResponse;
@@ -101,8 +105,11 @@ import org.sonatype.nexus.rest.model.WastebasketResource;
 import org.sonatype.nexus.rest.model.WastebasketResourceResponse;
 import org.sonatype.nexus.rest.xstream.XStreamInitializer;
 import org.sonatype.plexus.rest.xstream.json.JsonOrgHierarchicalStreamDriver;
+import org.sonatype.plexus.rest.xstream.xml.LookAheadXppDriver;
 
 import com.thoughtworks.xstream.XStream;
+
+import edu.emory.mathcs.backport.java.util.Arrays;
 
 public class TestMarshalUnmarchal
     extends TestCase
@@ -110,7 +117,7 @@ public class TestMarshalUnmarchal
 
     private SimpleDateFormat dateFormat = new SimpleDateFormat( "MM/dd/yyyy" );
 
-    private XStream xstreamXML = XStreamInitializer.initialize( new XStream() );
+    private XStream xstreamXML = XStreamInitializer.initialize( new XStream( new LookAheadXppDriver() ) );
 
     private XStream xstreamJSON = XStreamInitializer.initialize( new XStream( new JsonOrgHierarchicalStreamDriver() ) );
 
@@ -198,7 +205,7 @@ public class TestMarshalUnmarchal
         RepositoryShadowResource repo = new RepositoryShadowResource();
 
         repo.setId( "createTestRepo" );
-        repo.setRepoType( "hosted" );
+        repo.setRepoType( "virtual" );
         repo.setName( "Create Test Repo" );
         repo.setFormat( "maven2" );
         repo.setShadowOf( "Shadow Of" );
@@ -211,12 +218,12 @@ public class TestMarshalUnmarchal
         this.validateXmlHasNoPackageNames( resourceResponse );
     }
 
-    public void testRepositoryResourc()
+    public void testRepositoryProxyResource()
     {
         RepositoryProxyResource repo = new RepositoryProxyResource();
 
         repo.setId( "createTestRepo" );
-        repo.setRepoType( "hosted" );
+        repo.setRepoType( "proxy" );
         repo.setName( "Create Test Repo" );
         repo.setFormat( "maven2" );
         repo.setAllowWrite( true );
@@ -281,8 +288,7 @@ public class TestMarshalUnmarchal
         resourceResponse.setData( resource );
 
         this.marshalUnmarchalThenCompare( resourceResponse, xstreamXML );
-        this.validateXmlHasNoPackageNames( resourceResponse );
-
+        this.validateXmlHasNoPackageNames( resourceResponse );      
     }
 
     public void testRepositoryStatusListResourceResponse()
@@ -787,6 +793,8 @@ public class TestMarshalUnmarchal
 
         this.marshalUnmarchalThenCompare( resourceResponse, xstreamXML );
         this.validateXmlHasNoPackageNames( resourceResponse );
+
+//        System.out.println( "json:\n"+ this.xstreamJSON.toXML( resourceResponse ));
     }
 
     public void testScheduledServiceListResourceResponse()
@@ -827,13 +835,40 @@ public class TestMarshalUnmarchal
         this.validateXmlHasNoPackageNames( resourceResponse );
     }
 
+    
+    public void testScheduledServiceBaseResource()
+    {
+        ScheduledServiceBaseResource resource = new ScheduledServiceBaseResource();
+        resource.setId( "Id" );
+        resource.setSchedule( "manual" );
+        resource.setTypeId( "TypeId" );
+        resource.setName( "Name" );
+        resource.setEnabled( true );
+
+        ScheduledServicePropertyResource prop1 = new ScheduledServicePropertyResource();
+        prop1.setId( "id1" );
+        prop1.setValue( "value1" );
+        resource.addProperty( prop1 );
+
+        ScheduledServicePropertyResource prop2 = new ScheduledServicePropertyResource();
+        prop2.setId( "id2" );
+        prop2.setValue( "value2" );
+        resource.addProperty( prop2 );
+
+        ScheduledServiceResourceResponse resourceResponse = new ScheduledServiceResourceResponse();
+        resourceResponse.setData( resource );
+
+        this.marshalUnmarchalThenCompare( resourceResponse, xstreamXML );
+        this.validateXmlHasNoPackageNames( resourceResponse );
+    }
+    
     public void testScheduledServiceOnceResource()
     {
         ScheduledServiceOnceResource resource = new ScheduledServiceOnceResource();
         resource.setStartDate( "StartDate" );
         resource.setStartTime( "StartTime" );
         resource.setId( "Id" );
-        resource.setSchedule( "Schedule" );
+        resource.setSchedule( "once" );
         resource.setTypeId( "TypeId" );
         resource.setName( "Name" );
         resource.setEnabled( true );
@@ -860,7 +895,7 @@ public class TestMarshalUnmarchal
         ScheduledServiceDailyResource resource = new ScheduledServiceDailyResource();
         resource.setStartDate( "StartDate" );
         resource.setId( "Id" );
-        resource.setSchedule( "Schedule" );
+        resource.setSchedule( "daily" );
         resource.setTypeId( "TypeId" );
         resource.setName( "Name" );
         resource.setEnabled( true );
@@ -887,7 +922,7 @@ public class TestMarshalUnmarchal
     {
         ScheduledServiceAdvancedResource resource = new ScheduledServiceAdvancedResource();
         resource.setId( "Id" );
-        resource.setSchedule( "Schedule" );
+        resource.setSchedule( "advanced" );
         resource.setTypeId( "TypeId" );
         resource.setName( "Name" );
         resource.setEnabled( true );
@@ -914,7 +949,7 @@ public class TestMarshalUnmarchal
     {
         ScheduledServiceMonthlyResource resource = new ScheduledServiceMonthlyResource();
         resource.setId( "Id" );
-        resource.setSchedule( "Schedule" );
+        resource.setSchedule( "monthly" );
         resource.setTypeId( "TypeId" );
         resource.setName( "Name" );
         resource.setEnabled( true );
@@ -943,7 +978,7 @@ public class TestMarshalUnmarchal
     {
         ScheduledServiceWeeklyResource resource = new ScheduledServiceWeeklyResource();
         resource.setId( "Id" );
-        resource.setSchedule( "Schedule" );
+        resource.setSchedule( "weekly" );
         resource.setTypeId( "TypeId" );
         resource.setName( "Name" );
         resource.setEnabled( true );
@@ -1197,7 +1232,7 @@ public class TestMarshalUnmarchal
         resource.addMethod( "Method1" );
         resource.addMethod( "Method2" );
         resource.setDescription( "Description" );
-        resource.setType( "Type" );
+        resource.setType( "repositoryTarget" );
 
         resourceRequest.setData( resource );
 
@@ -1268,7 +1303,7 @@ public class TestMarshalUnmarchal
         appResource1.setName( "Name1" );
         appResource1.setMethod( "Method1" );
         appResource1.setDescription( "Description1" );
-        appResource1.setType( "Type1" );
+        appResource1.setType( "application" );
 
         PrivilegeStatusResourceResponse resourceResponse = new PrivilegeStatusResourceResponse();
         resourceResponse.setData( appResource1 );
@@ -1289,7 +1324,7 @@ public class TestMarshalUnmarchal
         targetResource1.setName( "Name1" );
         targetResource1.setMethod( "Method1" );
         targetResource1.setDescription( "Description1" );
-        targetResource1.setType( "Type1" );
+        targetResource1.setType( "repositoryTarget" );
 
         PrivilegeStatusResourceResponse resourceResponse = new PrivilegeStatusResourceResponse();
         resourceResponse.setData( targetResource1 );
@@ -1380,6 +1415,48 @@ public class TestMarshalUnmarchal
         this.marshalUnmarchalThenCompare( resourceResponse, xstreamXML );
         this.validateXmlHasNoPackageNames( resourceResponse );
     }
+    
+    
+    
+    
+    public void onHold()
+    {
+        ScheduledServiceWeeklyResource scheduledTask = new ScheduledServiceWeeklyResource();
+        scheduledTask.setSchedule( "weekly" );
+        scheduledTask.setEnabled( true );
+        scheduledTask.setId( null );
+        scheduledTask.setName( "taskOnce" );
+        // A future date
+        Date startDate = DateUtils.addDays( new Date(), 10 );
+        startDate = DateUtils.round( startDate, Calendar.DAY_OF_MONTH );
+        scheduledTask.setStartDate( String.valueOf( startDate.getTime() ) );
+        scheduledTask.setRecurringTime( "03:30" );
+        
+//        scheduledTask.setRecurringDay( Arrays.asList( new String[] { "monday", "wednesday", "friday" } ) );
+        scheduledTask.addRecurringDay( "monday" );
+        scheduledTask.addRecurringDay( "wednesday" );
+        scheduledTask.addRecurringDay( "friday" );
+        
+
+        scheduledTask.setTypeId( "org.sonatype.nexus.tasks.ReindexTask" );
+
+        ScheduledServicePropertyResource prop = new ScheduledServicePropertyResource();
+        prop.setId( "repositoryOrGroupId" );
+        prop.setValue( "all_repo" );
+        scheduledTask.addProperty( prop );
+        
+        
+        ScheduledServiceResourceResponse resourceResponse = new ScheduledServiceResourceResponse();
+        resourceResponse.setData( scheduledTask );
+        
+//        System.out.println( "xml:\n"+ this.xstreamXML.toXML( resourceResponse ) );
+
+        this.marshalUnmarchalThenCompare( resourceResponse, xstreamXML );
+        this.validateXmlHasNoPackageNames( resourceResponse );
+        
+    }
+    
+    
 
     protected void marshalUnmarchalThenCompare( Object obj, XStream xstream )
     {
@@ -1398,11 +1475,13 @@ public class TestMarshalUnmarchal
         int attributeCount = StringUtils.countMatches( xml, "\"org.sonatype" );
 
         // check the counts
-        Assert.assertFalse( "Found package name in XML:\n" + xml, totalCount > attributeCount );
+        Assert.assertFalse( "Found package name in XML:\n" + xml, totalCount > 0 );
         
         // print out each type of method, so i can rafb it
-        System.out.println( "\n\nClass: "+ obj.getClass() +"\n" );
-        System.out.println( xml+"\n" );
+//        System.out.println( "\n\nClass: "+ obj.getClass() +"\n" );
+//        System.out.println( xml+"\n" );
+        
+//        Assert.assertFalse( "Found <string> XML: " + obj.getClass() + "\n" + xml, xml.contains( "<string>" ) );
 
     }
 
@@ -1449,6 +1528,9 @@ public class TestMarshalUnmarchal
             }
 
         }
+                
     }
+    
+    
 
 }
