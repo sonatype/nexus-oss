@@ -29,9 +29,9 @@ public class StorageFileItemRepresentation
         
         setAvailable( true );
         
-        setDownloadable( true );
+        // setDownloadable( true );
         
-        setDownloadName( file.getName() );
+        // setDownloadName( file.getName() );
 
         if ( file.getAttributes().containsKey( DigestCalculatingInspector.DIGEST_SHA1_KEY ) )
         {
