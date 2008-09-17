@@ -10,6 +10,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
+import org.sonatype.nexus.tasks.EvictUnusedProxiedItemsTask;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 
 /**
@@ -71,6 +72,6 @@ public class Nexus636EvictUnusedProxiedTaskTest
         age.setValue( String.valueOf( cacheAge ) );
 
         // clean unused
-        TaskScheduleUtil.runTask( taskName, "org.sonatype.nexus.tasks.EvictUnusedProxiedItemsTask", repo, age );
+        TaskScheduleUtil.runTask( taskName, EvictUnusedProxiedItemsTask.HINT, repo, age );
     }
 }

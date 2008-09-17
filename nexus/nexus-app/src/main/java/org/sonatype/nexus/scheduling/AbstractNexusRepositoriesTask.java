@@ -79,20 +79,21 @@ public abstract class AbstractNexusRepositoriesTask<T>
         }
     }
 
-    public boolean allowConcurrentExecution( Map<Class<?>, List<ScheduledTask<?>>> activeTasks )
+    public boolean allowConcurrentExecution( Map<String, List<ScheduledTask<?>>> activeTasks )
     {
         return getSetOfIntersectingTasksThatRuns( activeTasks ).isEmpty();
     }
 
     protected Set<AbstractNexusRepositoriesTask<?>> getSetOfIntersectingTasksThatRuns(
-        Map<Class<?>, List<ScheduledTask<?>>> activeTasks )
+        Map<String, List<ScheduledTask<?>>> activeTasks )
     {
         HashSet<AbstractNexusRepositoriesTask<?>> result = new HashSet<AbstractNexusRepositoriesTask<?>>();
 
         // get all activeTasks that runs and are descendants of AbstractNexusRepositoriesTask
-        for ( Class<?> taskCls : activeTasks.keySet() )
+        for ( String taskCls : activeTasks.keySet() )
         {
-            if ( AbstractNexusRepositoriesTask.class.isAssignableFrom( taskCls ) )
+            
+            if ( AbstractNexusRepositoriesTask.class.isAssignableFrom( this.getNexus().createTaskInstance( taskCls ).getClass() ) )
             {
                 List<ScheduledTask<?>> tasks = activeTasks.get( taskCls );
 

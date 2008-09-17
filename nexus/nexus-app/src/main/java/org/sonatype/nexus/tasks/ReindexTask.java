@@ -27,12 +27,14 @@ import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesPathAwareTask;
  * Reindex task.
  * 
  * @author cstamas
- * @plexus.component role="org.sonatype.scheduling.SchedulerTask" role-hint="org.sonatype.nexus.tasks.ReindexTask"
+ * @plexus.component role="org.sonatype.scheduling.SchedulerTask" role-hint="ReindexTask"
  *                   instantiation-strategy="per-lookup"
  */
 public class ReindexTask
     extends AbstractNexusRepositoriesPathAwareTask<Object>
 {
+    public static final String HINT = "ReindexTask";
+    
     public Object doRun()
         throws Exception
     {

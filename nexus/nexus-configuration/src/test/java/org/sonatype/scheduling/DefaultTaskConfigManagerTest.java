@@ -227,7 +227,7 @@ public class DefaultTaskConfigManagerTest
         return new DefaultScheduledTask<Integer>(
             "1",
             TASK_NAME,
-            callable.getClass(),
+            callable.getClass().getSimpleName(), //FIXME simple name hack
             defaultScheduler,
             callable,
             schedule,

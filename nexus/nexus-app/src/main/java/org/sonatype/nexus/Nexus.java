@@ -238,9 +238,9 @@ public interface Nexus
         throws RejectedExecutionException,
             NullPointerException;
 
-    Map<Class<?>, List<ScheduledTask<?>>> getAllTasks();
+    Map<String, List<ScheduledTask<?>>> getAllTasks();
 
-    Map<Class<?>, List<ScheduledTask<?>>> getActiveTasks();
+    Map<String, List<ScheduledTask<?>>> getActiveTasks();
 
     ScheduledTask<?> getTaskById( String id )
         throws NoSuchTaskException;
@@ -248,8 +248,8 @@ public interface Nexus
     SchedulerTask<?> createTaskInstance( String taskType )
         throws IllegalArgumentException;
 
-    SchedulerTask<?> createTaskInstance( Class<?> taskType )
-        throws IllegalArgumentException;
+//    SchedulerTask<?> createTaskInstance( Class<?> taskType )
+//        throws IllegalArgumentException;
 
     // ----------------------------------------------------------------------------
     // Default Configuration

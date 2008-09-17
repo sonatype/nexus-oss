@@ -28,11 +28,14 @@ import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesPathAwareTask;
  * 
  * @author cstamas
  * @plexus.component role="org.sonatype.scheduling.SchedulerTask"
- *                   role-hint="org.sonatype.nexus.tasks.RebuildAttributesTask" instantiation-strategy="per-lookup"
+ *                   role-hint="RebuildAttributesTask" instantiation-strategy="per-lookup"
  */
 public class RebuildAttributesTask
     extends AbstractNexusRepositoriesPathAwareTask<Object>
 {
+    
+    public static final String HINT = "RebuildAttributesTask";
+    
     public Object doRun()
         throws Exception
     {

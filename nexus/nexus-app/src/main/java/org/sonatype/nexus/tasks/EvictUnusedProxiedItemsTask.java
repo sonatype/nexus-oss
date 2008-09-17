@@ -30,12 +30,14 @@ import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesTask;
  * 
  * @author cstamas
  * @plexus.component role="org.sonatype.scheduling.SchedulerTask"
- *                   role-hint="org.sonatype.nexus.tasks.EvictUnusedProxiedItemsTask"
+ *                   role-hint="EvictUnusedProxiedItemsTask"
  *                   instantiation-strategy="per-lookup"
  */
 public class EvictUnusedProxiedItemsTask
     extends AbstractNexusRepositoriesTask<Collection<String>>
-{
+{ 
+    public static final String HINT = "EvictUnusedProxiedItemsTask";
+    
     public static final String EVICT_OLDER_CACHE_ITEMS_THEN_KEY = "evictOlderCacheItemsThen";
 
     public int getEvictOlderCacheItemsThen()

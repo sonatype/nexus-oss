@@ -126,17 +126,17 @@ public class AbstractScheduledServiceResourceHandler
 
     private DateFormat timeFormat = new SimpleDateFormat( "HH:mm" );
 
-    protected Map<Class<?>, String> serviceNames = new HashMap<Class<?>, String>();
+    protected Map<String, String> serviceNames = new HashMap<String, String>();
     {
-        serviceNames.put( PublishIndexesTask.class, "Publish Indexes" );
-        serviceNames.put( ReindexTask.class, "Reindex Repositories" );
-        serviceNames.put( RebuildAttributesTask.class, "Rebuild Repository Attributes" );
-        serviceNames.put( ClearCacheTask.class, "Clear Repository Caches" );
-        serviceNames.put( SnapshotRemoverTask.class, "Remove Snapshots From Repository" );
-        serviceNames.put( EvictUnusedProxiedItemsTask.class, "Evict Unused Proxied Items From Repository Caches" );
-        serviceNames.put( PurgeTimeline.class, "Purge Nexus Timeline" );
-        serviceNames.put( SynchronizeShadowsTask.class, "Synchronize Shadow Repository" );
-        serviceNames.put( EmptyTrashTask.class, "Empty Trash" );
+        serviceNames.put( PublishIndexesTask.HINT, "Publish Indexes" );
+        serviceNames.put( ReindexTask.HINT, "Reindex Repositories" );
+        serviceNames.put( RebuildAttributesTask.HINT, "Rebuild Repository Attributes" );
+        serviceNames.put( ClearCacheTask.HINT, "Clear Repository Caches" );
+        serviceNames.put( SnapshotRemoverTask.HINT, "Remove Snapshots From Repository" );
+        serviceNames.put( EvictUnusedProxiedItemsTask.HINT, "Evict Unused Proxied Items From Repository Caches" );
+        serviceNames.put( PurgeTimeline.HINT, "Purge Nexus Timeline" );
+        serviceNames.put( SynchronizeShadowsTask.HINT, "Synchronize Shadow Repository" );
+        serviceNames.put( EmptyTrashTask.HINT, "Empty Trash" );
     }
 
     /**
@@ -151,7 +151,7 @@ public class AbstractScheduledServiceResourceHandler
         super( context, request, response );
     }
 
-    protected String getServiceTypeName( Class<?> serviceTypeId )
+    protected String getServiceTypeName( String serviceTypeId )
     {
         if ( serviceNames.containsKey( serviceTypeId ) )
         {
@@ -159,7 +159,7 @@ public class AbstractScheduledServiceResourceHandler
         }
         else
         {
-            return serviceTypeId.getName();
+            return serviceTypeId;
         }
     }
 
@@ -500,7 +500,7 @@ public class AbstractScheduledServiceResourceHandler
             resource.setEnabled( task.isEnabled() );
             resource.setName( task.getName() );
             resource.setSchedule( getScheduleShortName( task.getSchedule() ) );
-            resource.setTypeId( task.getType().getName() );
+            resource.setTypeId( task.getType() );
             resource.setProperties( formatServiceProperties( task.getTaskParams() ) );
         }
         

@@ -111,7 +111,7 @@ public class TaskScheduleUtil
     public static ScheduledServiceBaseResource runTask( String typeId, ScheduledServicePropertyResource... properties )
         throws Exception
     {
-        return runTask( typeId.substring( 0, typeId.lastIndexOf( '.' ) ), typeId, properties );
+        return runTask( typeId, typeId, properties );
     }
 
     public static ScheduledServiceBaseResource runTask( String taskName, String typeId,

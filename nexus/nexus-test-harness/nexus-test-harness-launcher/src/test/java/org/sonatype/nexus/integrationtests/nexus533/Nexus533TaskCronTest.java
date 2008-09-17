@@ -7,6 +7,7 @@ import org.apache.commons.lang.time.DateUtils;
 import org.sonatype.nexus.rest.model.ScheduledServiceAdvancedResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceMonthlyResource;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
+import org.sonatype.nexus.tasks.ReindexTask;
 
 import edu.emory.mathcs.backport.java.util.Arrays;
 
@@ -31,7 +32,7 @@ public class Nexus533TaskCronTest
             startDate = DateUtils.round( startDate, Calendar.DAY_OF_MONTH );
             scheduledTask.setCronCommand( "0 0 12 ? * WED" );
 
-            scheduledTask.setTypeId( "org.sonatype.nexus.tasks.ReindexTask" );
+            scheduledTask.setTypeId( ReindexTask.HINT );
 
             ScheduledServicePropertyResource prop = new ScheduledServicePropertyResource();
             prop.setId( "repositoryOrGroupId" );

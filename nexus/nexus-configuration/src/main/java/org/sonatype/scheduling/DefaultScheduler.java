@@ -61,7 +61,7 @@ public class DefaultScheduler
 
     private ScheduledThreadPoolExecutor scheduledExecutorService;
 
-    private Map<Class<?>, List<ScheduledTask<?>>> tasksMap;
+    private Map<String, List<ScheduledTask<?>>> tasksMap;
 
     private AtomicInteger idGen = new AtomicInteger( 1 );
 
@@ -79,7 +79,7 @@ public class DefaultScheduler
     public void startService()
         throws StartingException
     {
-        tasksMap = new HashMap<Class<?>, List<ScheduledTask<?>>>();
+        tasksMap = new HashMap<String, List<ScheduledTask<?>>>();
         
         plexusThreadFactory = new PlexusThreadFactory( plexusContainer );
 
@@ -101,7 +101,7 @@ public class DefaultScheduler
 
             if ( !stopped )
             {
-                Map<Class<?>, List<ScheduledTask<?>>> runningTasks = getRunningTasks();
+                Map<String, List<ScheduledTask<?>>> runningTasks = getRunningTasks();
 
                 if ( runningTasks.size() > 0 )
                 {
@@ -190,7 +190,7 @@ public class DefaultScheduler
         }
     }
 
-    public <T> ScheduledTask<T> initialize( String id, String name, Class<?> type, Callable<T> callable,
+    public <T> ScheduledTask<T> initialize( String id, String name, String type, Callable<T> callable,
         Schedule schedule, Map<String, String> taskParams )
     {
         return schedule( id, name, type, callable, schedule, taskParams, false );
@@ -204,7 +204,8 @@ public class DefaultScheduler
     public ScheduledTask<Object> schedule( String name, Runnable runnable, Schedule schedule,
         Map<String, String> taskParams )
     {
-        return schedule( name, runnable.getClass(), Executors.callable( runnable ), schedule, taskParams );
+        // FIXME .. simple name hack
+        return schedule( name, runnable.getClass().getSimpleName(), Executors.callable( runnable ), schedule, taskParams );
     }
 
     public <T> ScheduledTask<T> submit( String name, Callable<T> callable, Map<String, String> taskParams )
@@ -215,16 +216,16 @@ public class DefaultScheduler
     public <T> ScheduledTask<T> schedule( String name, Callable<T> callable, Schedule schedule,
         Map<String, String> taskParams )
     {
-        return schedule( name, callable.getClass(), callable, schedule, taskParams );
+        return schedule( name, callable.getClass().getSimpleName(), callable, schedule, taskParams );
     }
 
-    protected <T> ScheduledTask<T> schedule( String name, Class<?> type, Callable<T> callable, Schedule schedule,
+    protected <T> ScheduledTask<T> schedule( String name, String type, Callable<T> callable, Schedule schedule,
         Map<String, String> taskParams )
     {
         return schedule( generateId(), name, type, callable, schedule, taskParams, true );
     }
 
-    protected <T> ScheduledTask<T> schedule( String id, String name, Class<?> type, Callable<T> callable,
+    protected <T> ScheduledTask<T> schedule( String id, String name, String type, Callable<T> callable,
         Schedule schedule, Map<String, String> taskParams, boolean store )
     {
         DefaultScheduledTask<T> dct = new DefaultScheduledTask<T>( id, name, type, this, callable, schedule, taskParams );
@@ -246,16 +247,16 @@ public class DefaultScheduler
         return task;
     }
 
-    public Map<Class<?>, List<ScheduledTask<?>>> getActiveTasks()
+    public Map<String, List<ScheduledTask<?>>> getActiveTasks()
     {
-        Map<Class<?>, List<ScheduledTask<?>>> result = getAllTasks();
+        Map<String, List<ScheduledTask<?>>> result = getAllTasks();
 
         List<ScheduledTask<?>> tasks = null;
 
         // filter for activeOrSubmitted
-        for ( Iterator<Class<?>> c = result.keySet().iterator(); c.hasNext(); )
+        for ( Iterator<String> c = result.keySet().iterator(); c.hasNext(); )
         {
-            Class<?> cls = c.next();
+            String cls = c.next();
 
             tasks = result.get( cls );
 
@@ -278,16 +279,16 @@ public class DefaultScheduler
         return result;
     }
 
-    public Map<Class<?>, List<ScheduledTask<?>>> getRunningTasks()
+    public Map<String, List<ScheduledTask<?>>> getRunningTasks()
     {
-        Map<Class<?>, List<ScheduledTask<?>>> result = getAllTasks();
+        Map<String, List<ScheduledTask<?>>> result = getAllTasks();
 
         List<ScheduledTask<?>> tasks = null;
 
         // filter for RUNNING
-        for ( Iterator<Class<?>> c = result.keySet().iterator(); c.hasNext(); )
+        for ( Iterator<String> c = result.keySet().iterator(); c.hasNext(); )
         {
-            Class<?> cls = c.next();
+            String cls = c.next();
 
             tasks = result.get( cls );
 
@@ -310,18 +311,18 @@ public class DefaultScheduler
         return result;
     }
 
-    public Map<Class<?>, List<ScheduledTask<?>>> getAllTasks()
+    public Map<String, List<ScheduledTask<?>>> getAllTasks()
     {
-        Map<Class<?>, List<ScheduledTask<?>>> result = null;
+        Map<String, List<ScheduledTask<?>>> result = null;
 
         // create a "snapshots" of active tasks
         synchronized ( tasksMap )
         {
-            result = new HashMap<Class<?>, List<ScheduledTask<?>>>( tasksMap.size() );
+            result = new HashMap<String, List<ScheduledTask<?>>>( tasksMap.size() );
 
             List<ScheduledTask<?>> tasks = null;
 
-            for ( Class<?> cls : tasksMap.keySet() )
+            for ( String cls : tasksMap.keySet() )
             {
                 tasks = new ArrayList<ScheduledTask<?>>();
 

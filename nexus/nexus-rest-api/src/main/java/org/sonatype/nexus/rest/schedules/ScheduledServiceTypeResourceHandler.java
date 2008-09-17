@@ -74,8 +74,8 @@ public class ScheduledServiceTypeResourceHandler
         ScheduledServiceTypeResourceResponse response = new ScheduledServiceTypeResourceResponse();
 
         ScheduledServiceTypeResource type = new ScheduledServiceTypeResource();
-        type.setId( PublishIndexesTask.class.getName() );
-        type.setName( getServiceTypeName( PublishIndexesTask.class ) );
+        type.setId( PublishIndexesTask.HINT );
+        type.setName( getServiceTypeName( PublishIndexesTask.HINT ) );
         ScheduledServiceTypePropertyResource property = new ScheduledServiceTypePropertyResource();
         property.setId( PublishIndexesTask.REPOSITORY_OR_GROUP_ID_KEY );
         property.setName( "Repository/Group" );
@@ -86,8 +86,8 @@ public class ScheduledServiceTypeResourceHandler
         response.addData( type );
 
         type = new ScheduledServiceTypeResource();
-        type.setId( SynchronizeShadowsTask.class.getName() );
-        type.setName( getServiceTypeName( SynchronizeShadowsTask.class ) );
+        type.setId( SynchronizeShadowsTask.HINT );
+        type.setName( getServiceTypeName( SynchronizeShadowsTask.HINT ) );
         property = new ScheduledServiceTypePropertyResource();
         property.setId( SynchronizeShadowsTask.SHADOW_REPOSITORY_ID );
         property.setName( "Shadow Repository" );
@@ -98,8 +98,8 @@ public class ScheduledServiceTypeResourceHandler
         response.addData( type );
 
         type = new ScheduledServiceTypeResource();
-        type.setId( EvictUnusedProxiedItemsTask.class.getName() );
-        type.setName( getServiceTypeName( EvictUnusedProxiedItemsTask.class ) );
+        type.setId( EvictUnusedProxiedItemsTask.HINT );
+        type.setName( getServiceTypeName( EvictUnusedProxiedItemsTask.HINT ) );
         property = new ScheduledServiceTypePropertyResource();
         property.setId( EvictUnusedProxiedItemsTask.REPOSITORY_OR_GROUP_ID_KEY );
         property.setName( "Repository/Group" );
@@ -118,8 +118,8 @@ public class ScheduledServiceTypeResourceHandler
         response.addData( type );
 
         type = new ScheduledServiceTypeResource();
-        type.setId( PurgeTimeline.class.getName() );
-        type.setName( getServiceTypeName( PurgeTimeline.class ) );
+        type.setId( PurgeTimeline.HINT );
+        type.setName( getServiceTypeName( PurgeTimeline.HINT ) );
         property = new ScheduledServiceTypePropertyResource();
         property.setId( PurgeTimeline.PURGE_OLDER_THAN_KEY );
         property.setName( "Purge older items than (days)" );
@@ -132,8 +132,8 @@ public class ScheduledServiceTypeResourceHandler
         // TODO: add params Type and SubType
 
         type = new ScheduledServiceTypeResource();
-        type.setId( ReindexTask.class.getName() );
-        type.setName( getServiceTypeName( ReindexTask.class ) );
+        type.setId( ReindexTask.HINT );
+        type.setName( getServiceTypeName( ReindexTask.HINT ) );
         property = new ScheduledServiceTypePropertyResource();
         property.setId( PublishIndexesTask.REPOSITORY_OR_GROUP_ID_KEY );
         property.setName( "Repository/Group" );
@@ -144,8 +144,8 @@ public class ScheduledServiceTypeResourceHandler
         response.addData( type );
 
         type = new ScheduledServiceTypeResource();
-        type.setId( RebuildAttributesTask.class.getName() );
-        type.setName( getServiceTypeName( RebuildAttributesTask.class ) );
+        type.setId( RebuildAttributesTask.HINT );
+        type.setName( getServiceTypeName( RebuildAttributesTask.HINT ) );
         property = new ScheduledServiceTypePropertyResource();
         property.setId( PublishIndexesTask.REPOSITORY_OR_GROUP_ID_KEY );
         property.setName( "Repository/Group" );
@@ -156,8 +156,8 @@ public class ScheduledServiceTypeResourceHandler
         response.addData( type );
 
         type = new ScheduledServiceTypeResource();
-        type.setId( ClearCacheTask.class.getName() );
-        type.setName( getServiceTypeName( ClearCacheTask.class ) );
+        type.setId( ClearCacheTask.HINT );
+        type.setName( getServiceTypeName( ClearCacheTask.HINT ) );
         property = new ScheduledServiceTypePropertyResource();
         property.setId( ClearCacheTask.REPOSITORY_OR_GROUP_ID_KEY );
         property.setName( "Repository/Group" );
@@ -176,8 +176,8 @@ public class ScheduledServiceTypeResourceHandler
         response.addData( type );
 
         type = new ScheduledServiceTypeResource();
-        type.setId( SnapshotRemoverTask.class.getName() );
-        type.setName( getServiceTypeName( SnapshotRemoverTask.class ) );
+        type.setId( SnapshotRemoverTask.HINT );
+        type.setName( getServiceTypeName( SnapshotRemoverTask.HINT ) );
         property = new ScheduledServiceTypePropertyResource();
         property.setId( PublishIndexesTask.REPOSITORY_OR_GROUP_ID_KEY );
         property.setName( "Repository/Group" );
@@ -213,8 +213,8 @@ public class ScheduledServiceTypeResourceHandler
         response.addData( type );
         
         type = new ScheduledServiceTypeResource();
-        type.setId( EmptyTrashTask.class.getName() );
-        type.setName( getServiceTypeName( EmptyTrashTask.class ) );
+        type.setId( EmptyTrashTask.HINT );
+        type.setName( getServiceTypeName( EmptyTrashTask.HINT ) );
         response.addData( type );
 
         return serialize( variant, response );

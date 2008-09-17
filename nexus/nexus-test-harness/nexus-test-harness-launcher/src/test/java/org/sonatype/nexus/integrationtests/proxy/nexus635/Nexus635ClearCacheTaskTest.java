@@ -10,6 +10,7 @@ import org.junit.Test;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.integrationtests.proxy.AbstractNexusProxyIntegrationTest;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
+import org.sonatype.nexus.tasks.ClearCacheTask;
 import org.sonatype.nexus.test.utils.MavenDeployer;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 
@@ -66,7 +67,7 @@ public class Nexus635ClearCacheTaskTest
         // prop.setValue( "/" );
 
         // This is THE important part
-        TaskScheduleUtil.runTask( "org.sonatype.nexus.tasks.ClearCacheTask", prop );
+        TaskScheduleUtil.runTask( ClearCacheTask.HINT, prop );
 
         File thirdDownload = downloadSnapshotArtifact( "tasks-snapshot-repo", GAV, new File( "target/download" ) );
         Assert.assertTrue( "After ClearCache should download artifact 2", //

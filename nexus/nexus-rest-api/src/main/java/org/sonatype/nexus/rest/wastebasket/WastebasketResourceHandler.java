@@ -83,7 +83,7 @@ public class WastebasketResourceHandler
 
     public void delete()
     {
-        EmptyTrashTask task = (EmptyTrashTask) getNexus().createTaskInstance( EmptyTrashTask.class );
+        EmptyTrashTask task = (EmptyTrashTask) getNexus().createTaskInstance( EmptyTrashTask.HINT );
         
         getNexus().submit( "Internal", task );
         

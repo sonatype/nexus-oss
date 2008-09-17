@@ -10,6 +10,7 @@ import org.junit.Test;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.rest.model.NexusArtifact;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
+import org.sonatype.nexus.tasks.ReindexTask;
 import org.sonatype.nexus.test.utils.SearchMessageUtil;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 
@@ -49,7 +50,7 @@ public class Nexus641ReindexTaskTest
         prop.setValue( "nexus-test-harness-repo" );
 
         // reindex
-        TaskScheduleUtil.runTask( "org.sonatype.nexus.tasks.ReindexTask", prop );
+        TaskScheduleUtil.runTask( ReindexTask.HINT, prop );
         // RepositoryMessageUtil.updateIndexes( "nexus-test-harness-repo" );
 
         // try to download again and success

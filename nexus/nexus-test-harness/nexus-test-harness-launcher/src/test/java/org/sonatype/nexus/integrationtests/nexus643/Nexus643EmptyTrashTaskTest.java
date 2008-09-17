@@ -10,6 +10,7 @@ import org.restlet.data.Method;
 import org.restlet.data.Response;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
+import org.sonatype.nexus.tasks.EmptyTrashTask;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 
 /**
@@ -29,7 +30,7 @@ public class Nexus643EmptyTrashTaskTest
         Assert.assertTrue( "Something should be at trash!", trashContent.exists() );
 
         // This is THE important part
-        TaskScheduleUtil.runTask( "org.sonatype.nexus.tasks.EmptyTrashTask" );
+        TaskScheduleUtil.runTask( EmptyTrashTask.HINT );
 
         Assert.assertFalse( "Trash should be empty!", trashContent.exists() );
     }

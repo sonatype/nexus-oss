@@ -232,7 +232,7 @@ public class RepositoryMessageUtil
             String serviceURI = "service/local/data_index/repositories/" + repo + "/content";
             Response response = RequestFacade.sendMessage( serviceURI, Method.DELETE );
             Status status = response.getStatus();
-            Assert.assertTrue( "Fail to update " + repo + " repository index " + status.getDescription(),
+            Assert.assertTrue( "Fail to update " + repo + " repository index " + status,
                                status.isSuccess() );
         }
 

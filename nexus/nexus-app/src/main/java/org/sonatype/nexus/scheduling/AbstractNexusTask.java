@@ -95,13 +95,13 @@ public abstract class AbstractNexusTask<T>
         return parameters;
     }
 
-    public boolean allowConcurrentSubmission( Map<Class<?>, List<ScheduledTask<?>>> activeTasks )
+    public boolean allowConcurrentSubmission( Map<String, List<ScheduledTask<?>>> activeTasks )
     {
         // concurrent execution will stop us if needed, but user may freely submit
         return true;
     }
 
-    public boolean allowConcurrentExecution( Map<Class<?>, List<ScheduledTask<?>>> activeTasks )
+    public boolean allowConcurrentExecution( Map<String, List<ScheduledTask<?>>> activeTasks )
     {
         // most basic check: simply not allowing multiple execution of instances of this class
         // override if needed

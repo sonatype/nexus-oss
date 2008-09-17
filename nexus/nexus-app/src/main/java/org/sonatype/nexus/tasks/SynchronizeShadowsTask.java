@@ -28,11 +28,14 @@ import org.sonatype.nexus.scheduling.AbstractNexusTask;
  * 
  * @author cstamas
  * @plexus.component role="org.sonatype.scheduling.SchedulerTask"
- *                   role-hint="org.sonatype.nexus.tasks.SynchronizeShadowsTask" instantiation-strategy="per-lookup"
+ *                   role-hint="SynchronizeShadowsTask" instantiation-strategy="per-lookup"
  */
 public class SynchronizeShadowsTask
     extends AbstractNexusTask<Object>
 {
+
+    public static final String HINT = "SynchronizeShadowsTask";
+    
     public static final String SHADOW_REPOSITORY_ID = "shadowRepositoryId";
 
     public String getShadowRepositoryId()

@@ -43,7 +43,7 @@ public interface Scheduler
      * @param store
      * @return
      */
-    <T> ScheduledTask<T> initialize( String id, String name, Class<?> type, Callable<T> callable, Schedule schedule,
+    <T> ScheduledTask<T> initialize( String id, String name, String type, Callable<T> callable, Schedule schedule,
         Map<String, String> taskParams )
         throws RejectedExecutionException,
             NullPointerException;
@@ -116,7 +116,7 @@ public interface Scheduler
      * 
      * @return
      */
-    Map<Class<?>, List<ScheduledTask<?>>> getActiveTasks();
+    Map<String, List<ScheduledTask<?>>> getActiveTasks();
 
     /**
      * Returns the map of all tasks. The resturned collection is an unmodifiable snapshot. It may differ from current
@@ -124,7 +124,7 @@ public interface Scheduler
      * 
      * @return
      */
-    Map<Class<?>, List<ScheduledTask<?>>> getAllTasks();
+    Map<String, List<ScheduledTask<?>>> getAllTasks();
 
     /**
      * Returns an active task by it's ID.

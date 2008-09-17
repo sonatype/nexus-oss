@@ -109,7 +109,7 @@ public class CacheResourceHandler
 
     public void delete()
     {
-        ClearCacheTask task = (ClearCacheTask) getNexus().createTaskInstance( ClearCacheTask.class );
+        ClearCacheTask task = (ClearCacheTask) getNexus().createTaskInstance( ClearCacheTask.HINT );
 
         task.setRepositoryId( getRepositoryId() );
 

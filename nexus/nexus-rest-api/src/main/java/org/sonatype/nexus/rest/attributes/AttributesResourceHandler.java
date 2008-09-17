@@ -38,7 +38,7 @@ public class AttributesResourceHandler
     public void handleDelete()
     {
         RebuildAttributesTask task = (RebuildAttributesTask) getNexus()
-            .createTaskInstance( RebuildAttributesTask.class );
+            .createTaskInstance( RebuildAttributesTask.HINT );
 
         task.setRepositoryId( getRepositoryId() );
 

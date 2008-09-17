@@ -29,9 +29,9 @@ public interface SchedulerTask<T>
 {
     String ROLE = SchedulerTask.class.getName();
 
-    boolean allowConcurrentSubmission( Map<Class<?>, List<ScheduledTask<?>>> currentActiveTasks );
+    boolean allowConcurrentSubmission( Map<String, List<ScheduledTask<?>>> currentActiveTasks );
 
-    boolean allowConcurrentExecution( Map<Class<?>, List<ScheduledTask<?>>> currentActiveTasks );
+    boolean allowConcurrentExecution( Map<String, List<ScheduledTask<?>>> currentActiveTasks );
 
     void addParameter( String key, String value );
 

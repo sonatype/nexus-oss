@@ -57,6 +57,8 @@ import org.sonatype.nexus.integrationtests.nexus532.Nexus532GroupsCrudXmlTests;
 import org.sonatype.nexus.integrationtests.nexus586.Nexus586ValidateConfigurationTest;
 import org.sonatype.nexus.integrationtests.nexus606.Nexus606DownloadLogsAndConfigFilesTest;
 import org.sonatype.nexus.integrationtests.nexus650.Nexus650ChangePasswordAndRebootTest;
+import org.sonatype.nexus.integrationtests.nexus810.Nexus810PackageNamesInNexusConf;
+import org.sonatype.nexus.integrationtests.nexus810.Nexus810PackageNamesInRestMessages;
 import org.sonatype.nexus.integrationtests.proxy.nexus177.Nexus177OutOfServiceTest;
 import org.sonatype.nexus.integrationtests.proxy.nexus178.Nexus178BlockProxyDownloadTest;
 import org.sonatype.nexus.integrationtests.proxy.nexus179.Nexus179RemoteRepoDownTest;
@@ -64,29 +66,69 @@ import org.sonatype.nexus.integrationtests.proxy.nexus262.Nexus262SimpleProxyTes
 import org.sonatype.nexus.integrationtests.upgrades.nexus652.Nexus652Beta5To10UpgradeTest;
 
 @RunWith( Suite.class )
-@SuiteClasses( { Nexus166SampleTest.class, Nexus169ReleaseMetaDataInSnapshotRepoTest.class,
-    Nexus258ReleaseDeployTest.class, Nexus167ReleaseToSnapshotTest.class, Nexus168SnapshotToReleaseTest.class,
-    Nexus176DeployToInvalidRepoTest.class, Nexus259SnapshotDeployTest.class, Nexus260MultipleDeployTest.class,
-    Nexus261NexusGroupDownloadTest.class, Nexus177OutOfServiceTest.class, Nexus178BlockProxyDownloadTest.class,
-    Nexus179RemoteRepoDownTest.class, Nexus262SimpleProxyTest.class, Nexus292SoftRestartTest.class,
-    Nexus133TargetCrudJsonTests.class, Nexus133TargetCrudXmlTests.class, Nexus142UserCrudJsonTests.class,
-    Nexus142UserCrudXmlTests.class, Nexus156RolesCrudJsonTests.class, Nexus156RolesCrudXmlTests.class,
-    Nexus142UserValidationTests.class, Nexus156RolesValidationTests.class, Nexus133TargetValidationTests.class,
-    Nexus233PrivilegesCrudXMLTests.class, Nexus233PrivilegesValidationTests.class, Nexus385RoutesCrudXmlTests.class,
-    Nexus385RoutesValidationTests.class, Nexus387RoutesTests.class, Nexus429UploadArtifactPrivilegeTest.class,
-    Nexus133TargetPermissionTests.class, Nexus142UserPermissionTests.class, Nexus156RolesPermissionTests.class,
-    Nexus385RoutesPermissionTests.class, Nexus429WagonDeployPrivilegeTest.class,
-    Nexus393ResetPasswordPermissionTest.class, Nexus394ForgotPasswordPermissionTest.class,
-    Nexus385RoutesPermissionTests.class, Nexus395ForgotUsernamePermissionTest.class,
-    Nexus408ChangePasswordPermissionTest.class, Nexus450UserCreationTest.class, Nexus502MavenExecutionTest.class,
-    Nexus477ArtifactsCrudTests.class, Nexus174ReleaseDeployWrongPassword.class,
-    Nexus175SnapshotDeployWrongPassword.class, Nexus511MavenDeployTest.class, Nexus531RepositoryCrudXMLTests.class,
-    Nexus531RepositoryCrudJsonTests.class, Nexus233PrivilegesCrudXMLTests.class, Nexus379VirtualRepoSameId.class,
-    Nexus448PrivilegeURLTest.class, Nexus532GroupsCrudXmlTests.class, Nexus586ValidateConfigurationTest.class,
-    Nexus606DownloadLogsAndConfigFilesTest.class, Nexus652Beta5To10UpgradeTest.class,
-    Nexus650ChangePasswordAndRebootTest.class, Nexus725InitialRestClient.class,
-    Nexus531RepositoryCrudValidationTests.class, Nexus531RepositoryCrudPermissionTests.class,
-    Nexus532GroupCrudPermissionTests.class, Nexus758StatusService.class } )
+@SuiteClasses( {
+    Nexus166SampleTest.class,
+    Nexus169ReleaseMetaDataInSnapshotRepoTest.class,
+    Nexus258ReleaseDeployTest.class,
+    Nexus167ReleaseToSnapshotTest.class,
+    Nexus168SnapshotToReleaseTest.class,
+    Nexus176DeployToInvalidRepoTest.class,
+    Nexus259SnapshotDeployTest.class,
+    Nexus260MultipleDeployTest.class,
+    Nexus261NexusGroupDownloadTest.class,
+    Nexus177OutOfServiceTest.class,
+    Nexus178BlockProxyDownloadTest.class,
+    Nexus179RemoteRepoDownTest.class,
+    Nexus262SimpleProxyTest.class,
+    Nexus292SoftRestartTest.class,
+    Nexus133TargetCrudJsonTests.class,
+    Nexus133TargetCrudXmlTests.class,
+    Nexus142UserCrudJsonTests.class,
+    Nexus142UserCrudXmlTests.class,
+    Nexus156RolesCrudJsonTests.class,
+    Nexus156RolesCrudXmlTests.class,
+    Nexus142UserValidationTests.class,
+    Nexus156RolesValidationTests.class,
+    Nexus133TargetValidationTests.class,
+    Nexus233PrivilegesCrudXMLTests.class,
+    Nexus233PrivilegesValidationTests.class,
+    Nexus385RoutesCrudXmlTests.class,
+    Nexus385RoutesValidationTests.class,
+    Nexus387RoutesTests.class,
+    Nexus429UploadArtifactPrivilegeTest.class,
+    Nexus133TargetPermissionTests.class,
+    Nexus142UserPermissionTests.class,
+    Nexus156RolesPermissionTests.class,
+    Nexus385RoutesPermissionTests.class,
+    Nexus429WagonDeployPrivilegeTest.class,
+    Nexus393ResetPasswordPermissionTest.class,
+    Nexus394ForgotPasswordPermissionTest.class,
+    Nexus385RoutesPermissionTests.class,
+    Nexus395ForgotUsernamePermissionTest.class,
+    Nexus408ChangePasswordPermissionTest.class,
+    Nexus450UserCreationTest.class,
+    Nexus502MavenExecutionTest.class,
+    Nexus477ArtifactsCrudTests.class,
+    Nexus174ReleaseDeployWrongPassword.class,
+    Nexus175SnapshotDeployWrongPassword.class,
+    Nexus511MavenDeployTest.class,
+    Nexus531RepositoryCrudXMLTests.class,
+    Nexus531RepositoryCrudJsonTests.class,
+    Nexus233PrivilegesCrudXMLTests.class,
+    Nexus379VirtualRepoSameId.class,
+    Nexus448PrivilegeURLTest.class,
+    Nexus532GroupsCrudXmlTests.class,
+    Nexus586ValidateConfigurationTest.class,
+    Nexus606DownloadLogsAndConfigFilesTest.class,
+    Nexus652Beta5To10UpgradeTest.class,
+    Nexus650ChangePasswordAndRebootTest.class,
+    Nexus725InitialRestClient.class,
+    Nexus531RepositoryCrudValidationTests.class,
+    Nexus531RepositoryCrudPermissionTests.class,
+    Nexus532GroupCrudPermissionTests.class,
+    Nexus758StatusService.class,
+    Nexus810PackageNamesInRestMessages.class,
+    Nexus810PackageNamesInNexusConf.class } )
 public class IntegrationTestSuiteClassesSecurity
 {
     @BeforeClass
@@ -94,7 +136,8 @@ public class IntegrationTestSuiteClassesSecurity
         throws Exception
     {
 
-        System.out.println( "\n\n\n****************************\n   Running Security Tests   \n****************************\n\n\n" );
+        System.out
+            .println( "\n\n\n****************************\n   Running Security Tests   \n****************************\n\n\n" );
 
         // enable security
         TestContainer.getInstance().getTestContext().setSecureTest( true );

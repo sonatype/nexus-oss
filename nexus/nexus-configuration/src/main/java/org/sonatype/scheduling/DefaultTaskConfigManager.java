@@ -123,7 +123,7 @@ public class DefaultTaskConfigManager
                     scheduler.initialize(
                         task.getId(),
                         task.getName(),
-                        nexusTask.getClass(),
+                        nexusTask.getClass().getSimpleName(), //FIXME simple name hack
                         nexusTask,
                         translateFrom( task.getSchedule(), task.getNextRun() ),
                         translateFrom( task.getProperties() ) ).setEnabled( task.isEnabled() );
@@ -329,7 +329,7 @@ public class DefaultTaskConfigManager
         storeableTask.setEnabled( task.isEnabled() );
         storeableTask.setId( task.getId() );
         storeableTask.setName( task.getName() );
-        storeableTask.setType( task.getType().getName() );
+        storeableTask.setType( task.getType() );
         storeableTask.setStatus( task.getTaskState().name() );
         storeableTask.setLastRun( task.getLastRun() );
         storeableTask.setNextRun( task.getNextRun() );

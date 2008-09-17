@@ -110,12 +110,12 @@ public class DefaultNexusScheduler
         return task;
     }
 
-    public Map<Class<?>, List<ScheduledTask<?>>> getAllTasks()
+    public Map<String, List<ScheduledTask<?>>> getAllTasks()
     {
         return scheduler.getAllTasks();
     }
 
-    public Map<Class<?>, List<ScheduledTask<?>>> getActiveTasks()
+    public Map<String, List<ScheduledTask<?>>> getActiveTasks()
     {
         return scheduler.getActiveTasks();
     }
@@ -158,7 +158,8 @@ public class DefaultNexusScheduler
     public SchedulerTask<?> createTaskInstance( Class<?> taskType )
         throws IllegalArgumentException
     {
-        return createTaskInstance( taskType.getName() );
+        // the convention is to use the simple class name as the plexus hint
+        return createTaskInstance( taskType.getSimpleName() );
     }
 
 }

@@ -38,12 +38,12 @@ public class DummyWaitingNexusTask
         return parameters;
     }
 
-    public boolean allowConcurrentSubmission( Map<Class<?>, List<ScheduledTask<?>>> activeTasks )
+    public boolean allowConcurrentSubmission( Map<String, List<ScheduledTask<?>>> activeTasks )
     {
         return allowConcurrentSubmission;
     }
 
-    public boolean allowConcurrentExecution( Map<Class<?>, List<ScheduledTask<?>>> activeTasks )
+    public boolean allowConcurrentExecution( Map<String, List<ScheduledTask<?>>> activeTasks )
     {
         return allowConcurrentExecution;
     }

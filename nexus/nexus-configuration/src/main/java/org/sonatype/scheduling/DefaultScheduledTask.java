@@ -41,7 +41,7 @@ public class DefaultScheduledTask<T>
 
     private String name;
 
-    private final Class<?> clazz;
+    private final String type;
 
     private final DefaultScheduler scheduler;
 
@@ -71,7 +71,7 @@ public class DefaultScheduledTask<T>
 
     boolean manualRun;
 
-    public DefaultScheduledTask( String id, String name, Class<?> clazz, DefaultScheduler scheduler,
+    public DefaultScheduledTask( String id, String name, String type, DefaultScheduler scheduler,
         Callable<T> callable, Schedule schedule, Map<String, String> taskParams )
     {
         super();
@@ -80,7 +80,7 @@ public class DefaultScheduledTask<T>
 
         this.name = name;
 
-        this.clazz = clazz;
+        this.type = type;
 
         this.scheduler = scheduler;
 
@@ -153,9 +153,9 @@ public class DefaultScheduledTask<T>
         return id;
     }
 
-    public Class<?> getType()
+    public String getType()
     {
-        return clazz;
+        return type;
     }
 
     public TaskState getTaskState()

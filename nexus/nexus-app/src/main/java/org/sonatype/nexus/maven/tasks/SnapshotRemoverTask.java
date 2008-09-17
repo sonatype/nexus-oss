@@ -28,11 +28,12 @@ import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesTask;
  * 
  * @author cstamas
  * @plexus.component role="org.sonatype.scheduling.SchedulerTask"
- *                   role-hint="org.sonatype.nexus.maven.tasks.SnapshotRemoverTask" instantiation-strategy="per-lookup"
+ *                   role-hint="SnapshotRemoverTask" instantiation-strategy="per-lookup"
  */
 public class SnapshotRemoverTask
     extends AbstractNexusRepositoriesTask<SnapshotRemovalResult>
 {
+    public static final String HINT = "SnapshotRemoverTask";
     public static final String SYSTEM_REMOVE_SNAPSHOTS_ACTION = "REMOVESNAPSHOTS";
 
     public static final String MIN_SNAPSHOTS_TO_KEEP_KEY = "minSnapshotsToKeep";

@@ -7,6 +7,7 @@ import junit.framework.Assert;
 import org.junit.Test;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
+import org.sonatype.nexus.tasks.PublishIndexesTask;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 
 /**
@@ -37,7 +38,7 @@ public class Nexus637PublishIndexTest
         prop.setId( "repositoryOrGroupId" );
         prop.setValue( "nexus-test-harness-repo" );
 
-        TaskScheduleUtil.runTask( "org.sonatype.nexus.tasks.PublishIndexesTask", prop );
+        TaskScheduleUtil.runTask( PublishIndexesTask.HINT, prop );
 
         Assert.assertTrue( ".index should exists after publish index task was run.", index.exists() );
     }

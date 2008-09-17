@@ -27,12 +27,15 @@ import org.sonatype.nexus.scheduling.AbstractNexusTask;
 /**
  * Empty trash.
  * 
- * @plexus.component role="org.sonatype.scheduling.SchedulerTask" role-hint="org.sonatype.nexus.tasks.EmptyTrashTask"
+ * @plexus.component role="org.sonatype.scheduling.SchedulerTask" role-hint="EmptyTrashTask"
  *                   instantiation-strategy="per-lookup"
  */
 public class EmptyTrashTask
     extends AbstractNexusTask<Object>
 {
+
+    public static final String HINT = "EmptyTrashTask";
+    
     /**
      * The Wastebasket component.
      * 

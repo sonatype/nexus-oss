@@ -30,11 +30,13 @@ import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesTask;
  * 
  * @author cstamas
  * @plexus.component role="org.sonatype.scheduling.SchedulerTask"
- *                   role-hint="org.sonatype.nexus.tasks.PublishIndexesTask" instantiation-strategy="per-lookup"
+ *                   role-hint="PublishIndexesTask" instantiation-strategy="per-lookup"
  */
 public class PublishIndexesTask
     extends AbstractNexusRepositoriesTask<Object>
 {
+    public static final String HINT = "PublishIndexesTask"; 
+    
     @Override
     protected Object doRun()
         throws Exception

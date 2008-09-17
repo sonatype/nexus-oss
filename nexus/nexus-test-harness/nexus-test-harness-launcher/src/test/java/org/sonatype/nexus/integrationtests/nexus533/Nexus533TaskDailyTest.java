@@ -6,6 +6,7 @@ import java.util.Date;
 import org.apache.commons.lang.time.DateUtils;
 import org.sonatype.nexus.rest.model.ScheduledServiceDailyResource;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
+import org.sonatype.nexus.tasks.ReindexTask;
 
 public class Nexus533TaskDailyTest
     extends AbstractNexusTasksIntegrationTest<ScheduledServiceDailyResource>
@@ -29,7 +30,7 @@ public class Nexus533TaskDailyTest
             scheduledTask.setStartDate( String.valueOf( startDate.getTime() ) );
             scheduledTask.setRecurringTime( "03:30" );
 
-            scheduledTask.setTypeId( "org.sonatype.nexus.tasks.ReindexTask" );
+            scheduledTask.setTypeId( ReindexTask.HINT );
 
             ScheduledServicePropertyResource prop = new ScheduledServicePropertyResource();
             prop.setId( "repositoryOrGroupId" );
