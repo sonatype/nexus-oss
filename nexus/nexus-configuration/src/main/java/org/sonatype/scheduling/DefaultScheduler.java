@@ -204,6 +204,7 @@ public class DefaultScheduler
     public ScheduledTask<Object> schedule( String name, Runnable runnable, Schedule schedule,
         Map<String, String> taskParams )
     {
+        // use the name of the class as the type.
         return schedule( name, runnable.getClass().getName(), Executors.callable( runnable ), schedule, taskParams );
     }
 

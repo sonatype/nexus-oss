@@ -6,6 +6,7 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
+import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.rest.model.NexusArtifact;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
 import org.sonatype.nexus.test.utils.SearchMessageUtil;
@@ -16,14 +17,15 @@ import org.sonatype.nexus.test.utils.SearchMessageUtil;
 public class Nexus598ClassnameSearchTest
     extends AbstractNexusIntegrationTest
 {
+    public Nexus598ClassnameSearchTest()
+    {
+//        TestContainer.getInstance().getTestContext().setSecureTest( true );
+    }
 
     @Test
     public void searchDeployedArtifact()
         throws Exception
     {
-        //FIXME remove this when NEXUS-665 is fixed
-        RepositoryMessageUtil.updateIndexes( REPO_TEST_HARNESS_REPO );
-
         List<NexusArtifact> artifacts =
             SearchMessageUtil.searchClassname( "org.sonatype.nexus.test.classnamesearch.ClassnameSearchTestHelper" );
         Assert.assertFalse( "Nexus598 artifact was not found", artifacts.isEmpty() );
@@ -33,9 +35,6 @@ public class Nexus598ClassnameSearchTest
     public void unqualifiedSearchDeployedArtifact()
         throws Exception
     {
-        //FIXME remove this when NEXUS-665 is fixed
-        RepositoryMessageUtil.updateIndexes( REPO_TEST_HARNESS_REPO );
-
         List<NexusArtifact> artifacts = SearchMessageUtil.searchClassname( "ClassnameSearchTestHelper" );
         Assert.assertFalse( "Nexus598 artifact was not found", artifacts.isEmpty() );
     }
