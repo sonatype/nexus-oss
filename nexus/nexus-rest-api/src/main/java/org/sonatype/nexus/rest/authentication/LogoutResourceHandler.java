@@ -26,6 +26,7 @@ import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.resource.Representation;
+import org.restlet.resource.StringRepresentation;
 import org.restlet.resource.Variant;
 import org.sonatype.nexus.rest.AbstractNexusResourceHandler;
 
@@ -45,7 +46,7 @@ public class LogoutResourceHandler
     public Representation getRepresentationHandler( Variant variant )
         throws IOException
     {
-        return null;
+        return new StringRepresentation( "OK", variant.getMediaType() );
     }
 
 }
