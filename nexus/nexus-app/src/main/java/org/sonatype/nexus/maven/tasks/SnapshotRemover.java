@@ -27,6 +27,13 @@ public interface SnapshotRemover
 {
     String ROLE = SnapshotRemover.class.getName();
 
+    /**
+     * A flag to mark that -- even if we are doing something (eg. deleting, see NEXUS-814) within this GAV -- this GAV
+     * is contained multiple times in Repository and this is not the last one, there are more instances (eg. more
+     * snapshot builds) for this GAV still left in Repository.
+     */
+    String MORE_TS_SNAPSHOTS_EXISTS_FOR_GAV = "moreTsSnapshotsExistsForGav";
+
     SnapshotRemovalResult removeSnapshots( SnapshotRemovalRequest request )
         throws NoSuchRepositoryException,
             NoSuchRepositoryGroupException,

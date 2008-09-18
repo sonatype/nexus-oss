@@ -54,7 +54,7 @@ public interface Repository
     extends EventMulticaster, ResourceStore, ConfigurationChangeListener
 {
     String ROLE = Repository.class.getName();
-
+    
     /**
      * This is the "class" of the repository content. It is used in grouping, only same content reposes may be grouped.
      * 

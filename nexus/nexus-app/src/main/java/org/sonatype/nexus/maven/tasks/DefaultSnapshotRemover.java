@@ -350,6 +350,7 @@ public class DefaultSnapshotRemover
                             .getArtifactId(), gavToRemove.getVersion() );
 
                         // remove the whole GAV
+                        // NEXUS-814: this is fine, GAV will be deleted from index as it should
                         repository.deleteArtifactPom( req, true, true, true );
                     }
                     catch ( Exception e )
@@ -387,6 +388,9 @@ public class DefaultSnapshotRemover
                         }
                     }
 
+                    // NEXUS-814: is this GAV have remaining artifacts?
+                    boolean gavHasMoreTimestampedSnapshots = remainingSnapshotsAndFiles.size() > 0;
+
                     for ( ArtifactVersion key : deletableSnapshotsAndFiles.keySet() )
                     {
 
@@ -397,6 +401,13 @@ public class DefaultSnapshotRemover
                         {
                             try
                             {
+                                // NEXUS-814: mark that we are deleting a TS snapshot, but there are still remaining
+                                // ones in repository.
+                                if ( gavHasMoreTimestampedSnapshots )
+                                {
+                                    file.getItemContext().put( MORE_TS_SNAPSHOTS_EXISTS_FOR_GAV, Boolean.TRUE );
+                                }
+
                                 gav = (Gav) file.getItemContext().get( Gav.class.getName() );
 
                                 // If hash or signature, just junk it
@@ -409,6 +420,8 @@ public class DefaultSnapshotRemover
                                 {
                                     ArtifactStoreRequest req = new ArtifactStoreRequest( gav.getGroupId(), gav
                                         .getArtifactId(), gav.getVersion(), gav.getExtension(), gav.getClassifier() );
+
+                                    req.getRequestContext().putAll( file.getItemContext() );
 
                                     if ( "pom".equals( gav.getExtension() ) )
                                     {

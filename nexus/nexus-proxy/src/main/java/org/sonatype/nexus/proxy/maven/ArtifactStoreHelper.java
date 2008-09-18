@@ -530,7 +530,7 @@ public class ArtifactStoreHelper
         }
     }
 
-    private String getPackagingFromPom( String requestPath )
+    protected String getPackagingFromPom( String requestPath )
         throws IOException,
             XmlPullParserException,
             RepositoryNotAvailableException,

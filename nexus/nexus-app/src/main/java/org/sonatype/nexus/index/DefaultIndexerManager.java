@@ -60,6 +60,7 @@ import org.sonatype.nexus.index.context.IndexContextInInconsistentStateException
 import org.sonatype.nexus.index.context.IndexingContext;
 import org.sonatype.nexus.index.creator.AbstractIndexCreator;
 import org.sonatype.nexus.index.packer.IndexPacker;
+import org.sonatype.nexus.maven.tasks.SnapshotRemover;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryGroupException;
@@ -566,18 +567,16 @@ public class DefaultIndexerManager
 
                         context.replace( directory );
                         /*
-                         * if ( MavenRepository.class.isAssignableFrom( repository.getClass() ) ) {
-                         * getLogger().info( "Filtering downloaded index..." ); MavenRepository mrepository =
-                         * (MavenRepository) repository; if ( RepositoryPolicy.RELEASE.equals(
+                         * if ( MavenRepository.class.isAssignableFrom( repository.getClass() ) ) { getLogger().info(
+                         * "Filtering downloaded index..." ); MavenRepository mrepository = (MavenRepository)
+                         * repository; if ( RepositoryPolicy.RELEASE.equals( mrepository.getRepositoryPolicy() ) ) {
+                         * context.filter( new ArtifactInfoFilter() { public boolean accept( ArtifactInfo ai ) { return
+                         * !VersionUtils.isSnapshot( ai.version ); } } ); } else if ( RepositoryPolicy.SNAPSHOT.equals(
                          * mrepository.getRepositoryPolicy() ) ) { context.filter( new ArtifactInfoFilter() { public
-                         * boolean accept( ArtifactInfo ai ) { return !VersionUtils.isSnapshot( ai.version ); } } );
-                         * } else if ( RepositoryPolicy.SNAPSHOT.equals( mrepository.getRepositoryPolicy() ) ) {
-                         * context.filter( new ArtifactInfoFilter() { public boolean accept( ArtifactInfo ai ) {
-                         * return VersionUtils.isSnapshot( ai.version ); } } ); } }
+                         * boolean accept( ArtifactInfo ai ) { return VersionUtils.isSnapshot( ai.version ); } } ); } }
                          */
                         getLogger().info(
-                            "Remote indexes published and imported successfully for repository "
-                                + repository.getId() );
+                            "Remote indexes published and imported successfully for repository " + repository.getId() );
 
                         hasRemoteIndex = true;
                     }
@@ -1165,7 +1164,7 @@ public class DefaultIndexerManager
             {
                 bq.add( nexusIndexer.constructQuery( ArtifactInfo.VERSION, vTerm ), BooleanClause.Occur.MUST );
             }
-            
+
             if ( pTerm != null )
             {
                 bq.add( nexusIndexer.constructQuery( ArtifactInfo.PACKAGING, pTerm ), BooleanClause.Occur.MUST );
@@ -1360,7 +1359,10 @@ public class DefaultIndexerManager
                     Gav gav = ( (MavenRepository) ievt.getRepository() ).getGavCalculator().pathToGav(
                         ievt.getItemUid().getPath() );
 
-                    if ( context != null && gav != null )
+                    // signatures and hashes are not considered for processing
+                    // reason (NEXUS-814 related): the actual artifact and it's POM will (or already did)
+                    // emitted events about modifying them
+                    if ( context != null && gav != null && !gav.isSignature() && !gav.isHash() )
                     {
                         // if we have a valid indexing context and have access to a File
                         if ( DefaultFSLocalRepositoryStorage.class.isAssignableFrom( ievt
@@ -1386,26 +1388,59 @@ public class DefaultIndexerManager
                                     if ( ievt instanceof RepositoryItemEventCache )
                                     {
                                         // add file to index
-                                        getLogger().debug(
-                                            "Adding artifact " + ai.groupId + ":" + ai.artifactId + ":" + ai.version
-                                                + " to index (CACHE)." );
+                                        if ( getLogger().isDebugEnabled() )
+                                        {
+                                            getLogger().debug(
+                                                "Adding artifact " + ai.groupId + ":" + ai.artifactId + ":"
+                                                    + ai.version + " to index (CACHE)." );
+                                        }
+
                                         nexusIndexer.addArtifactToIndex( ac, context );
                                     }
                                     else if ( ievt instanceof RepositoryItemEventStore )
                                     {
                                         // add file to index
-                                        getLogger().debug(
-                                            "Adding artifact " + ai.groupId + ":" + ai.artifactId + ":" + ai.version
-                                                + " to index (STORE)." );
+                                        if ( getLogger().isDebugEnabled() )
+                                        {
+                                            getLogger().debug(
+                                                "Adding artifact " + ai.groupId + ":" + ai.artifactId + ":"
+                                                    + ai.version + " to index (STORE)." );
+                                        }
+
                                         nexusIndexer.addArtifactToIndex( ac, context );
                                     }
                                     else if ( ievt instanceof RepositoryItemEventDelete )
                                     {
-                                        // remove file from index
-                                        getLogger().debug(
-                                            "Deleting artifact " + ai.groupId + ":" + ai.artifactId + ":" + ai.version
-                                                + " from index (DELETE)." );
-                                        nexusIndexer.deleteArtifactFromIndex( ac, context );
+                                        // NEXUS-814: we should not delete always
+                                        if ( !ievt.getItem().getItemContext().containsKey(
+                                            SnapshotRemover.MORE_TS_SNAPSHOTS_EXISTS_FOR_GAV ) )
+                                        {
+                                            // remove file from index
+                                            if ( getLogger().isDebugEnabled() )
+                                            {
+                                                getLogger().debug(
+                                                    "Deleting artifact " + ai.groupId + ":" + ai.artifactId + ":"
+                                                        + ai.version + " from index (DELETE)." );
+                                            }
+
+                                            nexusIndexer.deleteArtifactFromIndex( ac, context );
+                                        }
+                                        else
+                                        {
+                                            // do NOT remove file from index
+                                            if ( getLogger().isDebugEnabled() )
+                                            {
+                                                getLogger()
+                                                    .debug(
+                                                        "NOT deleting artifact "
+                                                            + ai.groupId
+                                                            + ":"
+                                                            + ai.artifactId
+                                                            + ":"
+                                                            + ai.version
+                                                            + " from index (DELETE), since it is a timestamped snapshot and more builds exists." );
+                                            }
+                                        }
                                     }
                                 }
                             }
@@ -1414,23 +1449,48 @@ public class DefaultIndexerManager
                         {
                             if ( ievt instanceof RepositoryItemEventDelete )
                             {
-                                ArtifactInfo ai = new ArtifactInfo();
+                                // NEXUS-814: we should not delete always
+                                if ( !ievt.getItem().getItemContext().containsKey(
+                                    SnapshotRemover.MORE_TS_SNAPSHOTS_EXISTS_FOR_GAV ) )
+                                {
+                                    ArtifactInfo ai = new ArtifactInfo();
 
-                                ai.groupId = gav.getGroupId();
+                                    ai.groupId = gav.getGroupId();
 
-                                ai.artifactId = gav.getArtifactId();
+                                    ai.artifactId = gav.getArtifactId();
 
-                                ai.version = gav.getVersion();
+                                    ai.version = gav.getVersion();
 
-                                ai.classifier = gav.getClassifier();
+                                    ai.classifier = gav.getClassifier();
 
-                                ArtifactContext ac = new ArtifactContext( null, null, null, ai, null );
+                                    ArtifactContext ac = new ArtifactContext( null, null, null, ai, null );
 
-                                // remove file from index
-                                getLogger().debug(
-                                    "Deleting artifact " + ai.groupId + ":" + ai.artifactId + ":" + ai.version
-                                        + " from index (DELETE)." );
-                                nexusIndexer.deleteArtifactFromIndex( ac, context );
+                                    // remove file from index
+                                    if ( getLogger().isDebugEnabled() )
+                                    {
+                                        getLogger().debug(
+                                            "Deleting artifact " + ai.groupId + ":" + ai.artifactId + ":" + ai.version
+                                                + " from index (DELETE)." );
+                                    }
+
+                                    nexusIndexer.deleteArtifactFromIndex( ac, context );
+                                }
+                                else
+                                {
+                                    // do NOT remove file from index
+                                    if ( getLogger().isDebugEnabled() )
+                                    {
+                                        getLogger()
+                                            .debug(
+                                                "NOT deleting artifact "
+                                                    + gav.getGroupId()
+                                                    + ":"
+                                                    + gav.getArtifactId()
+                                                    + ":"
+                                                    + gav.getVersion()
+                                                    + " from index (DELETE), since it is a timestamped snapshot and more builds exists." );
+                                    }
+                                }
                             }
                         }
                     }
