@@ -227,7 +227,8 @@ public class DefaultTaskConfigManagerTest
         return new DefaultScheduledTask<Integer>(
             "1",
             TASK_NAME,
-            callable.getClass().getSimpleName(), //FIXME simple name hack
+            callable.getClass().getSimpleName(), 
+            //TODO this is only use for testing, but we are expecting that the TaskHint matches the Classname.
             defaultScheduler,
             callable,
             schedule,

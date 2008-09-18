@@ -89,7 +89,7 @@ public class DefaultNexusScheduler
             NullPointerException
     {
         if ( nexusTask.allowConcurrentSubmission( scheduler.getActiveTasks() ) )
-        {
+        {   
             return scheduler.schedule( name, nexusTask, schedule, nexusTask.getParameters() );
         }
         else

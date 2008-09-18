@@ -123,7 +123,7 @@ public class DefaultTaskConfigManager
                     scheduler.initialize(
                         task.getId(),
                         task.getName(),
-                        nexusTask.getClass().getSimpleName(), //FIXME simple name hack
+                        task.getType(),
                         nexusTask,
                         translateFrom( task.getSchedule(), task.getNextRun() ),
                         translateFrom( task.getProperties() ) ).setEnabled( task.isEnabled() );

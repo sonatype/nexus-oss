@@ -204,8 +204,7 @@ public class DefaultScheduler
     public ScheduledTask<Object> schedule( String name, Runnable runnable, Schedule schedule,
         Map<String, String> taskParams )
     {
-        // FIXME .. simple name hack
-        return schedule( name, runnable.getClass().getSimpleName(), Executors.callable( runnable ), schedule, taskParams );
+        return schedule( name, runnable.getClass().getName(), Executors.callable( runnable ), schedule, taskParams );
     }
 
     public <T> ScheduledTask<T> submit( String name, Callable<T> callable, Map<String, String> taskParams )
