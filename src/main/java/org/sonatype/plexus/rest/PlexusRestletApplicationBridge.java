@@ -153,8 +153,8 @@ public class PlexusRestletApplicationBridge
         // put fileItemFactory into context
         getContext().getAttributes().put( FILEITEM_FACTORY, new DiskFileItemFactory() );
 
-        boolean shouldCollectPlexusResources = getContext().getAttributes().containsKey( PLEXUS_DISCOVER_RESOURCES )
-            ? Boolean.parseBoolean( (String) getContext().getAttributes().get( PLEXUS_DISCOVER_RESOURCES ) )
+        boolean shouldCollectPlexusResources = getContext().getParameters().getFirstValue( PLEXUS_DISCOVER_RESOURCES ) != null
+            ? Boolean.parseBoolean( (String) getContext().getParameters().getFirstValue( PLEXUS_DISCOVER_RESOURCES ) )
             : true; // the default if not set
 
         if ( shouldCollectPlexusResources )
@@ -175,6 +175,8 @@ public class PlexusRestletApplicationBridge
         {
             // create an empty map
             plexusResources = new HashMap<String, PlexusResource>();
+
+            getLogger().info( "PlexusResource discovery disabled." );
         }
 
         doConfigure();
