@@ -144,6 +144,11 @@
             <param-name>content.org.restlet.application</param-name>
             <param-value>org.sonatype.nexus.rest.ApplicationContentBridge</param-value>
         </init-param>
+        <init-param>
+            <!-- Content servlet should not "discover" plexus resources (default is true)! -->
+            <param-name>plexus.discoverResources</param-name>
+            <param-value>false</param-value>
+        </init-param>
         <load-on-startup>1</load-on-startup>
     </servlet>
 

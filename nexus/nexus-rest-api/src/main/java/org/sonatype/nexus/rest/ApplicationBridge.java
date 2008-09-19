@@ -39,8 +39,6 @@ import org.sonatype.nexus.rest.attributes.AttributesResourceHandler;
 import org.sonatype.nexus.rest.authentication.LoginResourceHandler;
 import org.sonatype.nexus.rest.authentication.LogoutResourceHandler;
 import org.sonatype.nexus.rest.cache.CacheResourceHandler;
-import org.sonatype.nexus.rest.configurations.ConfigurationsListResourceHandler;
-import org.sonatype.nexus.rest.configurations.ConfigurationsResourceHandler;
 import org.sonatype.nexus.rest.contentclasses.ContentClassesListResourceHandler;
 import org.sonatype.nexus.rest.feeds.FeedResourceHandler;
 import org.sonatype.nexus.rest.feeds.FeedsListResourceHandler;
@@ -128,6 +126,7 @@ public class ApplicationBridge
      * Lookups Nexus instance in this plexus.
      * 
      * @return
+     * @deprecated
      */
     protected Nexus getNexus()
     {
@@ -284,14 +283,6 @@ public class ApplicationBridge
 
         attach( router, false, "/logs/{" + LogsResourceHandler.FILE_NAME_KEY + "}", LogsResourceHandler.class );
 
-        attach( router, false, "/configs", ConfigurationsListResourceHandler.class );
-
-        attach(
-            router,
-            false,
-            "/configs/{" + GlobalConfigurationResourceHandler.CONFIG_NAME_KEY + "}",
-            ConfigurationsResourceHandler.class );
-
         attach( router, false, "/global_settings", GlobalConfigurationListResourceHandler.class );
 
         attach(
@@ -371,6 +362,7 @@ public class ApplicationBridge
         attach( router, false, "/repo_content_classes", ContentClassesListResourceHandler.class );
     }
 
+    @Deprecated
     protected void attach( Router router, boolean strict, String uriPattern, Class<? extends Resource> targetClass )
     {
         Route route = router.attach( uriPattern, targetClass );
@@ -381,6 +373,7 @@ public class ApplicationBridge
         }
     }
 
+    @Deprecated
     protected void attach( Router router, boolean strict, String uriPattern, Restlet target )
     {
         Route route = router.attach( uriPattern, target );
