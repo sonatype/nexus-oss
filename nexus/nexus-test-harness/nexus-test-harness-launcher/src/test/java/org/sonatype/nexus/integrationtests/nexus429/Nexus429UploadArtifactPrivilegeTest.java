@@ -48,7 +48,7 @@ public class Nexus429UploadArtifactPrivilegeTest
         String uploadURL = this.getBaseNexusUrl() + "service/local/artifact/maven/content";
 
         // with pom should fail
-        int status = DeployUtils.deployUsingPomWithRest( uploadURL, TEST_RELEASE_REPO, gav, fileToDeploy, pomFile );
+        int status = DeployUtils.deployUsingPomWithRest( uploadURL, TEST_RELEASE_REPO, fileToDeploy, pomFile, null, null );
         Assert.assertEquals( "Status should have been 401", 401, status );
                 
         // give deployment role
@@ -59,7 +59,7 @@ public class Nexus429UploadArtifactPrivilegeTest
         TestContainer.getInstance().getTestContext().setUsername( "test-user" );
         TestContainer.getInstance().getTestContext().setPassword( "admin123" );
         
-        status = DeployUtils.deployUsingPomWithRest( uploadURL, TEST_RELEASE_REPO, gav, fileToDeploy, pomFile );
+        status = DeployUtils.deployUsingPomWithRest( uploadURL, TEST_RELEASE_REPO, fileToDeploy, pomFile, null, null );
         Assert.assertEquals( "Status should have been 201", 201, status );
     }
     

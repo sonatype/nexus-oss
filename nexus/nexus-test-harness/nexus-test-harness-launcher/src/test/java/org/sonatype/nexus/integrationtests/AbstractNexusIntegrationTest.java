@@ -25,6 +25,7 @@ import org.codehaus.plexus.DefaultPlexusContainer;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.PlexusContainerException;
 import org.codehaus.plexus.util.FileUtils;
+import org.codehaus.plexus.util.StringUtils;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -527,20 +528,21 @@ public class AbstractNexusIntegrationTest
     throws FileNotFoundException
 {
     return this.getRelitiveArtifactPath( gav.getGroupId(), gav.getArtifactId(), gav.getVersion(),
-                                         "pom" );
+                                         "pom", null );
 }
 
     protected String getRelitiveArtifactPath( Gav gav )
         throws FileNotFoundException
     {
         return this.getRelitiveArtifactPath( gav.getGroupId(), gav.getArtifactId(), gav.getVersion(),
-                                             gav.getExtension() );
+                                             gav.getExtension(), gav.getClassifier() );
     }
 
-    protected String getRelitiveArtifactPath( String groupId, String artifactId, String version, String extension )
+    protected String getRelitiveArtifactPath( String groupId, String artifactId, String version, String extension, String classifier )
         throws FileNotFoundException
     {
-        return groupId.replace( '.', '/' ) + "/" + artifactId + "/" + version + "/" + artifactId + "-" + version + "."
+        String classifierPart = StringUtils.isEmpty( classifier ) ? "" : "-"+classifier;
+        return groupId.replace( '.', '/' ) + "/" + artifactId + "/" + version + "/" + artifactId + "-" + version + classifierPart + "."
             + extension;
     }
 
@@ -576,41 +578,41 @@ public class AbstractNexusIntegrationTest
     protected File downloadArtifact( Gav gav, String targetDirectory )
         throws IOException
     {
-        return this.downloadArtifact( gav.getGroupId(), gav.getArtifactId(), gav.getVersion(), gav.getExtension(),
+        return this.downloadArtifact( gav.getGroupId(), gav.getArtifactId(), gav.getVersion(), gav.getExtension(), gav.getClassifier(),
                                       targetDirectory );
     }
 
-    protected File downloadArtifact( String groupId, String artifact, String version, String type,
+    protected File downloadArtifact( String groupId, String artifact, String version, String type, String classifier,
                                      String targetDirectory )
         throws IOException
     {
-        return this.downloadArtifact( this.getNexusTestRepoUrl(), groupId, artifact, version, type, targetDirectory );
+        return this.downloadArtifact( this.getNexusTestRepoUrl(), groupId, artifact, version, type, classifier, targetDirectory );
     }
 
     protected File downloadArtifactFromRepository( String repoId, Gav gav, String targetDirectory )
         throws IOException
     {
         return this.downloadArtifact( AbstractNexusIntegrationTest.baseNexusUrl + REPOSITORY_RELATIVE_URL + repoId
-            + "/", gav.getGroupId(), gav.getArtifactId(), gav.getVersion(), gav.getExtension(), targetDirectory );
+            + "/", gav.getGroupId(), gav.getArtifactId(), gav.getVersion(), gav.getExtension(), gav.getClassifier(), targetDirectory );
     }
 
     protected File downloadArtifactFromGroup( String groupId, Gav gav, String targetDirectory )
         throws IOException
     {
         return this.downloadArtifact( AbstractNexusIntegrationTest.baseNexusUrl + GROUP_REPOSITORY_RELATIVE_URL
-            + groupId + "/", gav.getGroupId(), gav.getArtifactId(), gav.getVersion(), gav.getExtension(),
+            + groupId + "/", gav.getGroupId(), gav.getArtifactId(), gav.getVersion(), gav.getExtension(), gav.getClassifier(),
                                       targetDirectory );
     }
 
-    protected File downloadArtifact( String baseUrl, String groupId, String artifact, String version, String type,
+    protected File downloadArtifact( String baseUrl, String groupId, String artifact, String version, String type, String classifier,
                                      String targetDirectory )
         throws IOException
     {
         URL url =
-            new URL( baseUrl + groupId.replace( '.', '/' ) + "/" + artifact + "/" + version + "/" + artifact + "-"
-                + version + "." + type );
+            new URL( baseUrl + this.getRelitiveArtifactPath( groupId, artifact, version, type, classifier ) );
 
-        return this.downloadFile( url, targetDirectory + "/" + artifact + "-" + version + "." + type );
+        String classifierPart = ( classifier != null ) ? "-"+classifier : "";
+        return this.downloadFile( url, targetDirectory + "/" + artifact + "-" + version + classifierPart + "." + type );
     }
 
     protected File downloadFile( URL url, String targetFile )

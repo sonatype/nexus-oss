@@ -85,17 +85,26 @@ public class DeployUtils
 
     }
 
-    public static int deployUsingPomWithRest( String restServiceURL, String repositoryId, Gav gav, File fileToDeploy,
-                                              File pomFile )
+    public static int deployUsingPomWithRest( String repositoryId, File fileToDeploy, File pomFile, String classifier, String extention )
+    throws HttpException, IOException
+    {
+        return deployUsingPomWithRest( TestProperties.getString( "nexus.base.url" )
+            + "service/local/artifact/maven/content", repositoryId, fileToDeploy, pomFile, classifier, extention );
+    }
+    
+    public static int deployUsingPomWithRest( String restServiceURL, String repositoryId, File fileToDeploy, File pomFile, String classifier, String extention )
         throws HttpException, IOException
     {
         // the method we are calling
         PostMethod filePost = new PostMethod( restServiceURL );
         filePost.getParams().setBooleanParameter( HttpMethodParams.USE_EXPECT_CONTINUE, true );
 
+        classifier = (classifier == null) ? "" : classifier;
+        extention = (extention == null) ? "" : extention;
+        
         Part[] parts =
-            { new StringPart( "r", repositoryId ), new StringPart( "hasPom", "true" ),
-                new FilePart( pomFile.getName(), pomFile ), new FilePart( fileToDeploy.getName(), fileToDeploy ), };
+            { new StringPart( "r", repositoryId ), new StringPart("e", extention ), new StringPart("c", classifier ), new StringPart( "hasPom", "true" ),
+                new FilePart( pomFile.getName(), pomFile ), new FilePart( fileToDeploy.getName(), fileToDeploy ) };
 
         filePost.setRequestEntity( new MultipartRequestEntity( parts, filePost.getParams() ) );
 

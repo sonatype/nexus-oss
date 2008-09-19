@@ -28,7 +28,7 @@ public class Nexus262SimpleProxyTest extends AbstractNexusProxyIntegrationTest
                                                                                               
         log.debug( "localFile: "+ localFile.getAbsolutePath() );
         
-        File artifact = this.downloadArtifact( "simple.artifact", "simpleXMLArtifact", "1.0.0", "xml", "target/downloads" );
+        File artifact = this.downloadArtifact( "simple.artifact", "simpleXMLArtifact", "1.0.0", "xml", null, "target/downloads" );
         
         Assert.assertTrue( FileTestingUtils.compareFileSHA1s( artifact, localFile ) );
     }

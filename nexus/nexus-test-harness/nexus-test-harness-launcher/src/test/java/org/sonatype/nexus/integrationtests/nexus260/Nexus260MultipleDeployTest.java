@@ -35,7 +35,7 @@ public class Nexus260MultipleDeployTest
                                      fileToDeploy, "org/sonatype/nexus-integration-tests/multiple-deploy-test/singleDeployTest/1/singleDeployTest-1.xml" );
 
         // download it
-        File artifact = downloadArtifact( "org.sonatype.nexus-integration-tests.multiple-deploy-test", "singleDeployTest", "1", "xml", "./target/downloaded-jars" );
+        File artifact = downloadArtifact( "org.sonatype.nexus-integration-tests.multiple-deploy-test", "singleDeployTest", "1", "xml", null, "./target/downloaded-jars" );
 
         // make sure its here
         assertTrue( artifact.exists() );
@@ -65,7 +65,7 @@ public class Nexus260MultipleDeployTest
                                      fileToDeploy, deployPath );
 
         // download it
-        File artifact = downloadArtifact( "org.sonatype.nexus-integration-tests.multiple-deploy-test", "deploySameFileMultipleTimesTest", "1", "xml", "./target/downloaded-jars" );
+        File artifact = downloadArtifact( "org.sonatype.nexus-integration-tests.multiple-deploy-test", "deploySameFileMultipleTimesTest", "1", "xml", null, "./target/downloaded-jars" );
 
         // make sure its here
         assertTrue( artifact.exists() );
@@ -98,7 +98,7 @@ public class Nexus260MultipleDeployTest
                                      fileToDeploy3, deployPath );
 
         // download it
-        File artifact = downloadArtifact( "org.sonatype.nexus-integration-tests.multiple-deploy-test", "deployChangedFileMultipleTimesTest", "1", "xml", "./target/downloaded-jars" );
+        File artifact = downloadArtifact( "org.sonatype.nexus-integration-tests.multiple-deploy-test", "deployChangedFileMultipleTimesTest", "1", "xml", null, "./target/downloaded-jars" );
 
         // make sure its here
         assertTrue( artifact.exists() );

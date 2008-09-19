@@ -127,7 +127,7 @@ public class Nexus167ReleaseToSnapshotTest
         // url to upload to
         String uploadURL = this.getBaseNexusUrl() + "service/local/artifact/maven/content";
             
-        int status = DeployUtils.deployUsingPomWithRest( uploadURL, TEST_SNAPSHOT_REPO, gav, fileToDeploy, pomFile );
+        int status = DeployUtils.deployUsingPomWithRest( uploadURL, TEST_SNAPSHOT_REPO, fileToDeploy, pomFile, null, null );
 
         if ( status != HttpStatus.SC_BAD_REQUEST )
         {

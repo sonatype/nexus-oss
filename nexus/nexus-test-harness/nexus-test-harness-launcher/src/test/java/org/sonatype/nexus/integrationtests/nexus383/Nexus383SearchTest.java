@@ -184,13 +184,13 @@ public class Nexus383SearchTest
         String uploadURL = this.getBaseNexusUrl() + "service/local/artifact/maven/content";
 
         // Multi repository deploy
-        DeployUtils.deployUsingPomWithRest( uploadURL, NEXUS_TEST_HARNESS_REPO, gav, fileToDeploy, pomFile );
-        DeployUtils.deployUsingPomWithRest( uploadURL, NEXUS_TEST_HARNESS_REPO2, gav, fileToDeploy, pomFile );
-        DeployUtils.deployUsingPomWithRest( uploadURL, NEXUS_TEST_HARNESS_RELEASE_REPO, gav, fileToDeploy, pomFile );
+        DeployUtils.deployUsingPomWithRest( uploadURL, NEXUS_TEST_HARNESS_REPO, fileToDeploy, pomFile, null, null );
+        DeployUtils.deployUsingPomWithRest( uploadURL, NEXUS_TEST_HARNESS_REPO2, fileToDeploy, pomFile, null, null );
+        DeployUtils.deployUsingPomWithRest( uploadURL, NEXUS_TEST_HARNESS_RELEASE_REPO, fileToDeploy, pomFile, null, null );
 
         // if you deploy the same item multiple times to the same repo, that is only a single item
-        DeployUtils.deployUsingPomWithRest( uploadURL, NEXUS_TEST_HARNESS_RELEASE_REPO, gav, fileToDeploy, pomFile );
-        DeployUtils.deployUsingPomWithRest( uploadURL, NEXUS_TEST_HARNESS_RELEASE_REPO, gav, fileToDeploy, pomFile );
+        DeployUtils.deployUsingPomWithRest( uploadURL, NEXUS_TEST_HARNESS_RELEASE_REPO, fileToDeploy, pomFile, null, null );
+        DeployUtils.deployUsingPomWithRest( uploadURL, NEXUS_TEST_HARNESS_RELEASE_REPO, fileToDeploy, pomFile, null, null );
 
         RepositoryMessageUtil.updateIndexes( NEXUS_TEST_HARNESS_REPO, NEXUS_TEST_HARNESS_REPO2,
                                         NEXUS_TEST_HARNESS_RELEASE_REPO );

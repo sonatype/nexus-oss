@@ -59,6 +59,7 @@ import org.sonatype.nexus.integrationtests.nexus637.Nexus637PublishIndexTest;
 import org.sonatype.nexus.integrationtests.nexus640.Nexus640RebuildRepositoryAttributesTaskTest;
 import org.sonatype.nexus.integrationtests.nexus641.Nexus641ReindexTaskTest;
 import org.sonatype.nexus.integrationtests.nexus643.Nexus643EmptyTrashTaskTest;
+import org.sonatype.nexus.integrationtests.nexus782.Nexus782UploadWithClassifier;
 import org.sonatype.nexus.integrationtests.nexus810.Nexus810PackageNamesInNexusConf;
 import org.sonatype.nexus.integrationtests.nexus810.Nexus810PackageNamesInRestMessages;
 import org.sonatype.nexus.integrationtests.proxy.nexus177.Nexus177OutOfServiceTest;
@@ -137,7 +138,8 @@ import org.sonatype.nexus.integrationtests.upgrades.nexus652.Nexus652Beta5To10Up
     Nexus640RebuildRepositoryAttributesTaskTest.class,
     Nexus531RepositoryCrudValidationTests.class,
     Nexus810PackageNamesInRestMessages.class,
-    Nexus810PackageNamesInNexusConf.class } )
+    Nexus810PackageNamesInNexusConf.class,
+    Nexus782UploadWithClassifier.class } )
 public class IntegrationTestSuiteClasses
 {
 
