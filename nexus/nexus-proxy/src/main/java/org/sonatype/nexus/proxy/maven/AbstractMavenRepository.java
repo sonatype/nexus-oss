@@ -710,7 +710,7 @@ public abstract class AbstractMavenRepository
                         nae.setEventContext( result.getItemContext() );
 
                         nae.setMessage( "Warning, the artifact " + result.getPath()
-                            + " has no remote checksu in repository " + result.getRepositoryId() + "!" );
+                            + " has no remote checksum in repository " + result.getRepositoryId() + "!" );
 
                         NexusItemInfo ai = new NexusItemInfo();
 
