@@ -16,6 +16,7 @@
 package org.sonatype.plexus.rest;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
@@ -33,7 +34,6 @@ import org.sonatype.plexus.rest.xstream.xml.LookAheadXppDriver;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.HierarchicalStreamDriver;
-import com.thoughtworks.xstream.io.xml.DomDriver;
 
 /**
  * An abstract Restlet.org application, that should be extended for custom application needs. It will automatically pick
@@ -46,13 +46,16 @@ public class PlexusRestletApplicationBridge
     extends Application
 {
     /** Key to store JSON driver driven XStream */
-    public static final String JSON_XSTREAM = "xstream.json";
+    public static final String JSON_XSTREAM = "plexus.xstream.json";
 
     /** Key to store XML driver driven XStream */
-    public static final String XML_XSTREAM = "xstream.xml";
+    public static final String XML_XSTREAM = "plexus.xstream.xml";
 
     /** Key to store used Commons Fileupload FileItemFactory */
-    public static final String FILEITEM_FACTORY = "nexus.fileItemFactory";
+    public static final String FILEITEM_FACTORY = "plexus.fileItemFactory";
+
+    /** Key to store the flag should plexus discover resource or no */
+    public static final String PLEXUS_DISCOVER_RESOURCES = "plexus.discoverResources";
 
     /** Date of creation of this application */
     private final Date createdOn;
@@ -150,16 +153,28 @@ public class PlexusRestletApplicationBridge
         // put fileItemFactory into context
         getContext().getAttributes().put( FILEITEM_FACTORY, new DiskFileItemFactory() );
 
-        // collect the plexusResources
-        try
-        {
-            plexusResources = (Map<String, PlexusResource>) getPlexusContainer().lookupMap( PlexusResource.class );
+        boolean shouldCollectPlexusResources = getContext().getAttributes().containsKey( PLEXUS_DISCOVER_RESOURCES )
+            ? Boolean.parseBoolean( (String) getContext().getAttributes().get( PLEXUS_DISCOVER_RESOURCES ) )
+            : true; // the default if not set
 
-            getLogger().info( "Discovered " + plexusResources.size() + " PlexusResource components." );
-        }
-        catch ( ComponentLookupException e )
+        if ( shouldCollectPlexusResources )
         {
-            throw new IllegalStateException( "Cannot collect PlexusResources!", e );
+            try
+            {
+                // discover the plexusResources
+                plexusResources = (Map<String, PlexusResource>) getPlexusContainer().lookupMap( PlexusResource.class );
+
+                getLogger().info( "Discovered " + plexusResources.size() + " PlexusResource components." );
+            }
+            catch ( ComponentLookupException e )
+            {
+                throw new IllegalStateException( "Cannot collect PlexusResources!", e );
+            }
+        }
+        else
+        {
+            // create an empty map
+            plexusResources = new HashMap<String, PlexusResource>();
         }
 
         doConfigure();

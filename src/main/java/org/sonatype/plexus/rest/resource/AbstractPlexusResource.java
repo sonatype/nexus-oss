@@ -1,10 +1,12 @@
 package org.sonatype.plexus.rest.resource;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.fileupload.FileItem;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.restlet.Context;
+import org.restlet.data.MediaType;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.data.Status;
@@ -23,11 +25,7 @@ public abstract class AbstractPlexusResource
 
     private boolean negotiateContent = true;
 
-    public abstract String getResourceUri();
-
-    public abstract List<Variant> getVariants();
-
-    public abstract Object getPayloadInstance();
+    // GETTER/SETTERS, will be unlikely overridden
 
     public boolean isAvailable()
     {
@@ -69,9 +67,28 @@ public abstract class AbstractPlexusResource
         this.negotiateContent = negotiateContent;
     }
 
+    // to be implemented subclasses
+
+    public abstract String getResourceUri();
+
+    public abstract Object getPayloadInstance();
+
+    // to be overridden by subclasses if needed
+
+    public List<Variant> getVariants()
+    {
+        ArrayList<Variant> result = new ArrayList<Variant>();
+
+        result.add( new Variant( MediaType.APPLICATION_XML ) );
+
+        result.add( new Variant( MediaType.APPLICATION_JSON ) );
+
+        return result;
+    }
+
     public boolean acceptsUpload()
     {
-        // since this property will not change, it is needed to be overrided
+        // since this property will not change during the lifetime of a resource, it is needed to be overrided
         return false;
     }
 
