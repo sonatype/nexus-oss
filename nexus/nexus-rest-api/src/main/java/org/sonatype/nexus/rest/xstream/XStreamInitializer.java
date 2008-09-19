@@ -195,7 +195,7 @@ public final class XStreamInitializer
         xstream.omitField( RepositoryStatusListResourceResponse.class, "modelEncoding" );
         xstream.omitField( RepositoryStatusListResource.class, "modelEncoding" );
         xstream.alias( "repository-status-list", RepositoryStatusListResourceResponse.class);
-        xstream.alias( "repository-status-lis-item", RepositoryStatusListResource.class);
+        xstream.alias( "repository-status-list-item", RepositoryStatusListResource.class);
 
         xstream.omitField( RepositoryMetaResourceResponse.class, "modelEncoding" );
         xstream.omitField( RepositoryMetaResource.class, "modelEncoding" );

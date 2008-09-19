@@ -248,19 +248,16 @@ public class IndexUtils
         {
             int toRead = 0;
 
-            int haveRead = 0;
+            int bytesLeft = (int) in.length();
 
-            int len = (int) in.length();
-
-            while ( haveRead != len )
+            while ( bytesLeft > 0 )
             {
-                toRead = ( len - haveRead > buf.length ) ? buf.length : len - haveRead;
+                toRead = ( bytesLeft >= buf.length ) ? buf.length : bytesLeft;
+                bytesLeft -= toRead;
 
                 in.readBytes( buf, 0, toRead, false );
 
                 zos.write( buf, 0, toRead );
-
-                haveRead = haveRead + toRead;
             }
         }
         finally
