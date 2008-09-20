@@ -457,13 +457,49 @@ public class Upgrade105to106
 
         if ( oldtask != null )
         {
+            if ( "org.sonatype.nexus.tasks.PublishIndexesTask".equals( oldtask.getType() ) )
+            {
+                task.setType( "PublishIndexesTask" );
+            }
+            else if ( "org.sonatype.nexus.tasks.ReindexTask".equals( oldtask.getType() ) )
+            {
+                task.setType( "ReindexTask" );
+            }
+            else if ( "org.sonatype.nexus.tasks.RebuildAttributesTask".equals( oldtask.getType() ) )
+            {
+                task.setType( "RebuildAttributesTask" );
+            }
+            else if ( "org.sonatype.nexus.tasks.ClearCacheTask".equals( oldtask.getType() ) )
+            {
+                task.setType( "ClearCacheTask" );
+            }
+            else if ( "org.sonatype.nexus.maven.tasks.SnapshotRemoverTask".equals( oldtask.getType() ) )
+            {
+                task.setType( "SnapshotRemoverTask" );
+            }
+            else if ( "org.sonatype.nexus.tasks.EvictUnusedProxiedItemsTask".equals( oldtask.getType() ) )
+            {
+                task.setType( "EvictUnusedProxiedItemsTask" );
+            }
+            else if ( "org.sonatype.nexus.tasks.PurgeTimeline".equals( oldtask.getType() ) )
+            {
+                task.setType( "PurgeTimeline" );
+            }
+            else if ( "org.sonatype.nexus.tasks.SynchronizeShadowsTask".equals( oldtask.getType() ) )
+            {
+                task.setType( "SynchronizeShadowsTask" );
+            }
+            else if ( "org.sonatype.nexus.tasks.EmptyTrashTask".equals( oldtask.getType() ) )
+            {
+                task.setType( "EmptyTrashTask" );
+            }
+            
             task.setEnabled( oldtask.isEnabled() );
             task.setId( oldtask.getId() );
             task.setLastRun( oldtask.getLastRun() );
             task.setNextRun( oldtask.getNextRun() );
             task.setName( oldtask.getName() );
             task.setStatus( oldtask.getStatus() );
-            task.setType( oldtask.getType() );
             task.setProperties( copyCProps1_0_5( (List<org.sonatype.nexus.configuration.model.v1_0_5.CProps>) oldtask
                 .getProperties() ) );
             task.setSchedule( copyCScheduleConfig1_0_5( oldtask.getSchedule() ) );

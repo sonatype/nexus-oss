@@ -146,7 +146,7 @@
       <id>0</id>
       <name>Snapshot Cleanup</name>
       <enabled>true</enabled>
-      <type>org.sonatype.nexus.maven.tasks.SnapshotRemoverTask</type>
+      <type>SnapshotRemoverTask</type>
       <status>RUNNING</status>
       <lastRun>1216164600141</lastRun>
       <nextRun>1216251000000</nextRun>
@@ -177,7 +177,7 @@
       <id>1</id>
       <name>Refresh Plexus-Releases Index for Promoted Releases</name>
       <enabled>true</enabled>
-      <type>org.sonatype.nexus.tasks.ReindexTask</type>
+      <type>ReindexTask</type>
       <status>RUNNING</status>
       <lastRun>1216242900941</lastRun>
       <nextRun>1216257300000</nextRun>
@@ -196,7 +196,7 @@
       <id>2</id>
       <name>A manual task</name>
       <enabled>true</enabled>
-      <type>org.sonatype.nexus.tasks.ReindexTask</type>
+      <type>ReindexTask</type>
       <status>RUNNING</status>
       <lastRun>1216242900941</lastRun>
       <nextRun>1216257300000</nextRun>
