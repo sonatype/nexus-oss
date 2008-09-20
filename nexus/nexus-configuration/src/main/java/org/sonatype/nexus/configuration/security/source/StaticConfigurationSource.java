@@ -23,8 +23,8 @@ package org.sonatype.nexus.configuration.security.source;
 import java.io.IOException;
 import java.io.InputStream;
 
+import org.sonatype.jsecurity.model.Configuration;
 import org.sonatype.nexus.configuration.ConfigurationException;
-import org.sonatype.nexus.configuration.security.model.Configuration;
 
 /**
  * A special "static" configuration source, that always return a factory provided defaults for Nexus configuration. It

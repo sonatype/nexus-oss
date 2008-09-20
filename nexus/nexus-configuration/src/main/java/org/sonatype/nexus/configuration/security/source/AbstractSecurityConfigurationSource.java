@@ -30,9 +30,9 @@ import java.io.Writer;
 
 import org.codehaus.plexus.interpolation.InterpolatorFilterReader;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
-import org.sonatype.nexus.configuration.security.model.Configuration;
-import org.sonatype.nexus.configuration.security.model.io.xpp3.NexusSecurityConfigurationXpp3Reader;
-import org.sonatype.nexus.configuration.security.model.io.xpp3.NexusSecurityConfigurationXpp3Writer;
+import org.sonatype.jsecurity.model.Configuration;
+import org.sonatype.jsecurity.model.io.xpp3.SecurityConfigurationXpp3Reader;
+import org.sonatype.jsecurity.model.io.xpp3.SecurityConfigurationXpp3Writer;
 import org.sonatype.nexus.configuration.source.AbstractConfigurationSource;
 import org.sonatype.nexus.util.ApplicationInterpolatorProvider;
 
@@ -96,7 +96,7 @@ public abstract class AbstractSecurityConfigurationSource
 
         try
         {
-            NexusSecurityConfigurationXpp3Reader reader = new NexusSecurityConfigurationXpp3Reader();
+            SecurityConfigurationXpp3Reader reader = new SecurityConfigurationXpp3Reader();
 
             fr = new InputStreamReader( is );
 
@@ -148,7 +148,7 @@ public abstract class AbstractSecurityConfigurationSource
         {
             fw = new OutputStreamWriter( os );
 
-            NexusSecurityConfigurationXpp3Writer writer = new NexusSecurityConfigurationXpp3Writer();
+            SecurityConfigurationXpp3Writer writer = new SecurityConfigurationXpp3Writer();
 
             writer.write( fw, configuration );
         }

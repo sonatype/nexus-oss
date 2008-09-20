@@ -20,12 +20,15 @@
  */
 package org.sonatype.nexus.rest.privileges;
 
+import java.util.List;
+
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
-import org.sonatype.nexus.configuration.security.model.CApplicationPrivilege;
-import org.sonatype.nexus.configuration.security.model.CPrivilege;
-import org.sonatype.nexus.configuration.security.model.CRepoTargetPrivilege;
+import org.sonatype.jsecurity.model.CPrivilege;
+import org.sonatype.jsecurity.model.CProperty;
+import org.sonatype.nexus.jsecurity.realms.NexusMethodRealm;
+import org.sonatype.nexus.jsecurity.realms.NexusTargetRealm;
 import org.sonatype.nexus.rest.AbstractNexusResourceHandler;
 import org.sonatype.nexus.rest.model.PrivilegeApplicationStatusResource;
 import org.sonatype.nexus.rest.model.PrivilegeBaseStatusResource;
@@ -55,37 +58,60 @@ extends AbstractNexusResourceHandler
     {
         PrivilegeBaseStatusResource resource = null;
         
-        if ( CApplicationPrivilege.class.isAssignableFrom( privilege.getClass() ) )
+        if ( privilege.getType().equals( NexusMethodRealm.PRIVILEGE_TYPE_METHOD ) )
         {
             resource = new PrivilegeApplicationStatusResource();
             
             PrivilegeApplicationStatusResource res = ( PrivilegeApplicationStatusResource ) resource;
-            CApplicationPrivilege priv = ( CApplicationPrivilege ) privilege;
             
-            res.setPermission( priv.getPermission() );
+            for ( CProperty prop : ( List<CProperty> ) privilege.getProperties() )
+            {
+                if ( prop.getKey().equals( NexusMethodRealm.PRIVILEGE_PROPERTY_PERMISSION ) )
+                {
+                    res.setPermission( prop.getValue() );       
+                }
+            }
             res.setType( TYPE_APPLICATION );
         }
-        else if ( CRepoTargetPrivilege.class.isAssignableFrom( privilege.getClass() ) )
+        else if ( privilege.getType().equals( NexusTargetRealm.PRIVILEGE_TYPE_TARGET ) )
         {
             resource = new PrivilegeTargetStatusResource();
             
             PrivilegeTargetStatusResource res = ( PrivilegeTargetStatusResource ) resource;
-            CRepoTargetPrivilege priv = ( CRepoTargetPrivilege ) privilege;
             
-            res.setRepositoryTargetId( priv.getRepositoryTargetId() );
-            res.setRepositoryId( priv.getRepositoryId() );
-            res.setRepositoryGroupId( priv.getGroupId() );
-            
+            for ( CProperty prop : ( List<CProperty> ) privilege.getProperties() )
+            {
+                if ( prop.getKey().equals( NexusTargetRealm.PRIVILEGE_PROPERTY_REPOSITORY_TARGET ) )
+                {
+                    res.setRepositoryTargetId( prop.getValue() );       
+                }
+                else if ( prop.getKey().equals( NexusTargetRealm.PRIVILEGE_PROPERTY_REPOSITORY_ID ) )
+                {
+                    res.setRepositoryId( prop.getValue() );        
+                }
+                else if ( prop.getKey().equals( NexusTargetRealm.PRIVILEGE_PROPERTY_REPOSITORY_GROUP_ID ) )
+                {
+                    res.setRepositoryGroupId( prop.getValue() );        
+                }
+            }
+                        
             res.setType( TYPE_REPO_TARGET );
         }
         
         if ( resource != null )
         {
             resource.setId( privilege.getId() );
-            resource.setMethod( privilege.getMethod() );
             resource.setName( privilege.getName() );
             resource.setDescription( privilege.getDescription() );
             resource.setResourceURI( calculateSubReference( resource.getId() ).toString() );
+            
+            for ( CProperty prop : ( List<CProperty> ) privilege.getProperties() )
+            {
+                if ( prop.getKey().equals( NexusMethodRealm.PRIVILEGE_PROPERTY_METHOD ) )
+                {
+                    resource.setMethod( prop.getValue() );       
+                }
+            }
         }
                 
         return resource;

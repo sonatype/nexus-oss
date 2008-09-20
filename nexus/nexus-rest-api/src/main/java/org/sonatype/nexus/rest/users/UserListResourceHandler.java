@@ -20,17 +20,14 @@
  */
 package org.sonatype.nexus.rest.users;
 
-import java.io.IOException;
-import java.util.logging.Level;
-
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.restlet.resource.Representation;
 import org.restlet.resource.Variant;
-import org.sonatype.nexus.configuration.ConfigurationException;
-import org.sonatype.nexus.configuration.security.model.CUser;
+import org.sonatype.jsecurity.model.CUser;
+import org.sonatype.jsecurity.realms.tools.InvalidConfigurationException;
 import org.sonatype.nexus.rest.model.UserListResourceResponse;
 import org.sonatype.nexus.rest.model.UserResource;
 import org.sonatype.nexus.rest.model.UserResourceRequest;
@@ -66,8 +63,8 @@ extends AbstractUserResourceHandler
     public Representation getRepresentationHandler( Variant variant )
     {
         UserListResourceResponse response = new UserListResourceResponse();
-
-        for ( CUser user : getNexusSecurityConfiguration().listUsers() )
+        
+        for ( CUser user : getNexusSecurity().listUsers() )
         {
             UserResource res = nexusToRestModel( user );
             
@@ -76,7 +73,7 @@ extends AbstractUserResourceHandler
                 response.addData( res );
             }
         }
-        
+
         return serialize( variant, response );
     }
 
@@ -104,7 +101,7 @@ extends AbstractUserResourceHandler
             
             try
             {
-                getNexusSecurityConfiguration().createUser( user );
+                getNexusSecurity().createUser( user );
                 
                 UserResourceResponse response = new UserResourceResponse();
                 
@@ -119,15 +116,9 @@ extends AbstractUserResourceHandler
                 
                 getResponse().setStatus( Status.SUCCESS_CREATED );
             }
-            catch ( ConfigurationException e )
+            catch ( InvalidConfigurationException e )
             {
-                handleConfigurationException( e, representation );
-            }
-            catch ( IOException e )
-            {
-                getResponse().setStatus( Status.SERVER_ERROR_INTERNAL );
-
-                getLogger().log( Level.SEVERE, "Got IO Exception!", e );
+                handleInvalidConfigurationException( e, representation );
             }
         }
     }

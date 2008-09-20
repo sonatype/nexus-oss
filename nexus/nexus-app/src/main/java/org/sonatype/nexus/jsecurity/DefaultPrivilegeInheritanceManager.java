@@ -18,21 +18,39 @@
  * along with this program.  If not, see http://www.gnu.org/licenses/.
  *
  */
-package org.sonatype.nexus.configuration.security;
+package org.sonatype.nexus.jsecurity;
+
+import java.util.HashSet;
+import java.util.Set;
+
+import org.sonatype.nexus.configuration.security.model.CPrivilege;
 
 /**
- * Thrown if the specifically requested role does not exists.
- * 
- * @author cstamas
+ * @plexus.component
  */
-public class NoSuchRoleException
-    extends Exception
+public class DefaultPrivilegeInheritanceManager
+    implements
+    PrivilegeInheritanceManager
 {
-
-    private static final long serialVersionUID = 299543984704055394L;
-
-    public NoSuchRoleException( String roleId )
+    public Set<String> getInheritedMethods( String method )
     {
-        super( "Role with id='" + roleId + "' not found!" );
+        HashSet<String> methods = new HashSet<String>();
+        
+        methods.add( method );
+        
+        if ( CPrivilege.METHOD_CREATE.equals( method ) )
+        {
+            methods.add( CPrivilege.METHOD_READ );
+        }
+        else if ( CPrivilege.METHOD_DELETE.equals( method ) )
+        {
+            methods.add( CPrivilege.METHOD_READ );
+        }
+        else if ( CPrivilege.METHOD_UPDATE.equals( method ) )
+        {
+            methods.add( CPrivilege.METHOD_READ );
+        }
+        
+        return methods;
     }
 }

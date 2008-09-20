@@ -25,7 +25,7 @@ import java.util.List;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
-import org.sonatype.nexus.configuration.security.model.CRole;
+import org.sonatype.jsecurity.model.CRole;
 import org.sonatype.nexus.rest.AbstractNexusResourceHandler;
 import org.sonatype.nexus.rest.model.RoleResource;
 

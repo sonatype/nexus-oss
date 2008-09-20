@@ -28,7 +28,7 @@ import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.restlet.resource.Representation;
-import org.sonatype.nexus.configuration.security.model.CUser;
+import org.sonatype.jsecurity.model.CUser;
 import org.sonatype.nexus.rest.AbstractNexusResourceHandler;
 import org.sonatype.nexus.rest.model.UserResource;
 
@@ -76,7 +76,7 @@ public class AbstractUserResourceHandler
         resource.setEmail( user.getEmail() );
         resource.setName( user.getName() );
         resource.setStatus( user.getStatus() );
-        resource.setUserId( user.getUserId() );
+        resource.setUserId( user.getId() );
         resource.setResourceURI( calculateSubReference( resource.getUserId() ).toString() );
 
         for ( String roleId : (List<String>) user.getRoles() )
@@ -97,7 +97,7 @@ public class AbstractUserResourceHandler
         user.setEmail( resource.getEmail() );
         user.setName( resource.getName() );
         user.setStatus( resource.getStatus() );
-        user.setUserId( resource.getUserId() );
+        user.setId( resource.getUserId() );
 
         user.getRoles().clear();
         for ( String roleId : (List<String>) resource.getRoles() )

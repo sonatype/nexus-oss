@@ -22,8 +22,8 @@ package org.sonatype.nexus.configuration.security.source;
 
 import java.io.IOException;
 
+import org.sonatype.jsecurity.model.Configuration;
 import org.sonatype.nexus.configuration.ConfigurationException;
-import org.sonatype.nexus.configuration.security.model.Configuration;
 import org.sonatype.nexus.configuration.source.ConfigurationSource;
 
 /**

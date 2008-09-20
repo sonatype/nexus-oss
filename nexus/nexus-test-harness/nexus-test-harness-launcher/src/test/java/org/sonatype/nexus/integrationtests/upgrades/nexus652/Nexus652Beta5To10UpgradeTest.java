@@ -6,6 +6,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.sonatype.nexus.configuration.model.Configuration;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
+import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.test.utils.NexusConfigUtil;
 import org.sonatype.nexus.test.utils.SecurityConfigUtil;
 import org.sonatype.nexus.test.utils.TestProperties;
@@ -20,6 +21,8 @@ public class Nexus652Beta5To10UpgradeTest
     public Nexus652Beta5To10UpgradeTest()
     {
         this.setVerifyNexusConfigBeforeStart( false );
+        
+        TestContainer.getInstance().getTestContext().setSecureTest( true );
     }
 
     @Test
@@ -35,12 +38,12 @@ public class Nexus652Beta5To10UpgradeTest
         Assert.assertEquals( "Smtp username:", "void", nexusConfig.getSmtpConfiguration().getUsername() );
         Assert.assertEquals( "Smtp port:", 465, nexusConfig.getSmtpConfiguration().getPort() );
 
-        Assert.assertEquals( "Security anon username:", "user3", nexusConfig.getSecurity().getAnonymousUsername() );
+        Assert.assertEquals( "Security anon username:", "User3", nexusConfig.getSecurity().getAnonymousUsername() );
         Assert.assertEquals( "Security anon password:", "y6i0t9q1e3", nexusConfig.getSecurity().getAnonymousPassword() );
         Assert.assertEquals( "Security anon access:", true, nexusConfig.getSecurity().isAnonymousAccessEnabled() );
         Assert.assertEquals( "Security enabled:", true, nexusConfig.getSecurity().isEnabled() );
         Assert.assertEquals( "Security realm size:", 1, nexusConfig.getSecurity().getRealms().size() );
-        Assert.assertEquals( "Security realm:", "default", nexusConfig.getSecurity().getRealms().get( 0 ) );
+        Assert.assertEquals( "Security realm:", "NexusTargetRealm", nexusConfig.getSecurity().getRealms().get( 0 ) );
 
         Assert.assertEquals( "http proxy:", true, nexusConfig.getHttpProxy().isEnabled() );
 
@@ -67,7 +70,7 @@ public class Nexus652Beta5To10UpgradeTest
     public void checkSecurityConfig()
         throws IOException
     {
-        org.sonatype.nexus.configuration.security.model.Configuration secConfig = SecurityConfigUtil.getSecurityConfig();
+        org.sonatype.jsecurity.model.Configuration secConfig = SecurityConfigUtil.getSecurityConfig();
         
         Assert.assertEquals( "User Count:", 7, secConfig.getUsers().size());
         Assert.assertEquals( "Roles Count:", 4, secConfig.getRoles().size());

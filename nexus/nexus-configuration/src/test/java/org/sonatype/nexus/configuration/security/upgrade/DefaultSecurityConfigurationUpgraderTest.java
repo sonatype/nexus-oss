@@ -21,13 +21,14 @@
 package org.sonatype.nexus.configuration.security.upgrade;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.StringWriter;
 
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
+import org.sonatype.jsecurity.model.Configuration;
+import org.sonatype.jsecurity.model.io.xpp3.SecurityConfigurationXpp3Writer;
 import org.sonatype.nexus.configuration.AbstractNexusTestCase;
-import org.sonatype.nexus.configuration.security.model.Configuration;
-import org.sonatype.nexus.configuration.security.model.io.xpp3.NexusSecurityConfigurationXpp3Writer;
 
 public class DefaultSecurityConfigurationUpgraderTest
     extends AbstractNexusTestCase
@@ -48,23 +49,28 @@ public class DefaultSecurityConfigurationUpgraderTest
     protected void resultIsFine( String path, Configuration configuration )
         throws Exception
     {
-        NexusSecurityConfigurationXpp3Writer w = new NexusSecurityConfigurationXpp3Writer();
-
+        SecurityConfigurationXpp3Writer w = new SecurityConfigurationXpp3Writer();
+        
         StringWriter sw = new StringWriter();
 
         w.write( sw, configuration );
-
-        // System.out.println(sw.toString());
 
         String shouldBe = IOUtil.toString( getClass().getResourceAsStream( path + ".result" ) );
 
         assertEquals( shouldBe, sw.toString() );
     }
     
-    public void testUpgrade()
+    public void testFrom100()
         throws Exception
     {
-        //We can test upgrading once an upgrade is necessary
-        assertTrue( true );
+        IOUtil.copy(
+            getClass().getResourceAsStream( "/org/sonatype/nexus/configuration/security/upgrade/security-100.xml" ),
+            new FileOutputStream( getSecurityConfiguration() ) );
+    
+        Configuration configuration = configurationUpgrader.loadOldConfiguration( new File( getSecurityConfiguration() ) );
+    
+        assertEquals( Configuration.MODEL_VERSION, configuration.getVersion() );
+    
+        resultIsFine( "/org/sonatype/nexus/configuration/security/upgrade/security-100.xml", configuration );
     }
 }

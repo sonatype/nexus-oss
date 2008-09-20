@@ -20,7 +20,6 @@
  */
 package org.sonatype.nexus.rest.users;
 
-import java.io.IOException;
 import java.util.logging.Level;
 
 import org.restlet.Context;
@@ -31,9 +30,9 @@ import org.restlet.data.Status;
 import org.restlet.resource.Representation;
 import org.restlet.resource.StringRepresentation;
 import org.restlet.resource.Variant;
-import org.sonatype.nexus.configuration.ConfigurationException;
-import org.sonatype.nexus.configuration.security.NoSuchUserException;
-import org.sonatype.nexus.configuration.security.model.CUser;
+import org.sonatype.jsecurity.model.CUser;
+import org.sonatype.jsecurity.realms.tools.InvalidConfigurationException;
+import org.sonatype.jsecurity.realms.tools.NoSuchUserException;
 import org.sonatype.nexus.rest.model.UserResource;
 import org.sonatype.nexus.rest.model.UserResourceRequest;
 import org.sonatype.nexus.rest.model.UserResourceResponse;
@@ -76,10 +75,10 @@ public class UserResourceHandler
     public Representation getRepresentationHandler( Variant variant )
     {
         UserResourceResponse response = new UserResourceResponse();
-
+        
         try
         {
-            response.setData( nexusToRestModel( getNexusSecurityConfiguration().readUser( getUserId() ) ) );
+            response.setData( nexusToRestModel( getNexusSecurity().readUser( getUserId() ) ) );
 
             return serialize( variant, response );
         }
@@ -113,19 +112,19 @@ public class UserResourceHandler
         else
         {
             UserResource resource = request.getData();
-
+            
             try
             {
                 CUser user = restToNexusModel(
-                    getNexusSecurityConfiguration().readUser( resource.getUserId() ),
+                    getNexusSecurity().readUser( resource.getUserId() ),
                     resource );
 
-                getNexusSecurityConfiguration().updateUser( user );
+                getNexusSecurity().updateUser( user );
 
                 UserResourceResponse response = new UserResourceResponse();
 
                 response.setData( request.getData() );
-                
+              
                 response.getData().setResourceURI( calculateSubReference( resource.getUserId() ).toString() );
 
                 getResponse().setEntity( serialize( representation, response ) );
@@ -134,15 +133,9 @@ public class UserResourceHandler
             {
                 getResponse().setStatus( Status.CLIENT_ERROR_NOT_FOUND, e.getMessage() );
             }
-            catch ( ConfigurationException e )
+            catch ( InvalidConfigurationException e )
             {
-                handleConfigurationException( e, representation );
-            }
-            catch ( IOException e )
-            {
-                getResponse().setStatus( Status.SERVER_ERROR_INTERNAL );
-
-                getLogger().log( Level.SEVERE, "Got IO Exception!", e );
+                handleInvalidConfigurationException( e, representation );
             }
         }
     }
@@ -164,7 +157,7 @@ public class UserResourceHandler
         {
             if ( !isAnonymousUser( getUserId() ) )
             {
-                getNexusSecurityConfiguration().deleteUser( getUserId() );
+                getNexusSecurity().deleteUser( getUserId() );
                 
                 getResponse().setStatus( Status.SUCCESS_NO_CONTENT );
             }
@@ -189,12 +182,6 @@ public class UserResourceHandler
         catch ( NoSuchUserException e )
         {
             getResponse().setStatus( Status.CLIENT_ERROR_NOT_FOUND, e.getMessage() );
-        }
-        catch ( IOException e )
-        {
-            getResponse().setStatus( Status.SERVER_ERROR_INTERNAL );
-
-            getLogger().log( Level.SEVERE, "Got IO Exception!", e );
         }
     }
 }

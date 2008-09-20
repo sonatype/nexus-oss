@@ -20,7 +20,6 @@
  */
 package org.sonatype.nexus.rest.users;
 
-import java.io.IOException;
 import java.util.logging.Level;
 
 import org.restlet.Context;
@@ -28,8 +27,8 @@ import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.restlet.resource.Representation;
-import org.sonatype.nexus.configuration.security.InvalidCredentialsException;
-import org.sonatype.nexus.configuration.security.NoSuchUserException;
+import org.sonatype.jsecurity.realms.tools.NoSuchUserException;
+import org.sonatype.nexus.jsecurity.InvalidCredentialsException;
 import org.sonatype.nexus.rest.model.UserChangePasswordRequest;
 import org.sonatype.nexus.rest.model.UserChangePasswordResource;
 
@@ -64,7 +63,7 @@ public class UserChangePasswordResourceHandler
             {
                 if ( !isAnonymousUser( resource.getUserId() ) )
                 {
-                    getNexusSecurityConfiguration().changePassword(
+                    getNexusSecurity().changePassword(
                         resource.getUserId(),
                         resource.getOldPassword(),
                         resource.getNewPassword() );
@@ -77,12 +76,6 @@ public class UserChangePasswordResourceHandler
 
                     getLogger().log( Level.FINE, "Anonymous user password change is blocked!" );
                 }
-            }
-            catch ( IOException e )
-            {
-                getResponse().setStatus( Status.SERVER_ERROR_INTERNAL );
-
-                getLogger().log( Level.SEVERE, "Got IO Exception!", e );
             }
             catch ( NoSuchUserException e )
             {

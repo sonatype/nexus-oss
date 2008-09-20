@@ -20,10 +20,8 @@
  */
 package org.sonatype.nexus.rest.privileges;
 
-import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
-import java.util.logging.Level;
 
 import org.restlet.Context;
 import org.restlet.data.Request;
@@ -31,9 +29,9 @@ import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.restlet.resource.Representation;
 import org.restlet.resource.Variant;
-import org.sonatype.nexus.configuration.ConfigurationException;
-import org.sonatype.nexus.configuration.security.model.CApplicationPrivilege;
-import org.sonatype.nexus.configuration.security.model.CRepoTargetPrivilege;
+import org.sonatype.jsecurity.model.CPrivilege;
+import org.sonatype.jsecurity.model.CProperty;
+import org.sonatype.jsecurity.realms.tools.InvalidConfigurationException;
 import org.sonatype.nexus.rest.model.PrivilegeBaseResource;
 import org.sonatype.nexus.rest.model.PrivilegeBaseStatusResource;
 import org.sonatype.nexus.rest.model.PrivilegeListResourceResponse;
@@ -71,9 +69,9 @@ public class PrivilegeListResourceHandler
     {
         PrivilegeListResourceResponse response = new PrivilegeListResourceResponse();
 
-        Collection<CApplicationPrivilege> appPrivs = getNexusSecurityConfiguration().listApplicationPrivileges();
+        Collection<CPrivilege> privs = getNexusSecurity().listPrivileges();
 
-        for ( CApplicationPrivilege priv : appPrivs )
+        for ( CPrivilege priv : privs )
         {
             PrivilegeBaseStatusResource res = nexusToRestModel( priv );
 
@@ -82,19 +80,7 @@ public class PrivilegeListResourceHandler
                 response.addData( res );
             }
         }
-
-        Collection<CRepoTargetPrivilege> tarPrivs = getNexusSecurityConfiguration().listRepoTargetPrivileges();
-
-        for ( CRepoTargetPrivilege priv : tarPrivs )
-        {
-            PrivilegeBaseStatusResource res = nexusToRestModel( priv );
-
-            if ( res != null )
-            {
-                response.addData( res );
-            }
-        }
-
+        
         return serialize( variant, response );
     }
 
@@ -150,17 +136,39 @@ public class PrivilegeListResourceHandler
                         if ( PrivilegeTargetResource.class.isAssignableFrom( resource.getClass() ) )
                         {
                             PrivilegeTargetResource res = (PrivilegeTargetResource) resource;
-
-                            CRepoTargetPrivilege priv = new CRepoTargetPrivilege();
-                            priv.setMethod( method );
+    
+                            CPrivilege priv = new CPrivilege();
+                            
                             priv.setName( res.getName() != null ? res.getName() + " - (" + method + ")" : null );
                             priv.setDescription( res.getDescription() );
-                            priv.setRepositoryTargetId( res.getRepositoryTargetId() );
-                            priv.setRepositoryId( res.getRepositoryId() );
-                            priv.setGroupId( res.getRepositoryGroupId() );
-
-                            getNexusSecurityConfiguration().createRepoTargetPrivilege( priv );
-
+                            priv.setType( "target" );
+                            
+                            CProperty prop = new CProperty();
+                            prop.setKey( "method" );
+                            prop.setValue( method );
+                            
+                            priv.addProperty( prop );
+                            
+                            prop = new CProperty();
+                            prop.setKey( "repositoryTargetId" );
+                            prop.setValue( res.getRepositoryTargetId() );
+                            
+                            priv.addProperty( prop );
+                            
+                            prop = new CProperty();
+                            prop.setKey( "repositoryId" );
+                            prop.setValue( res.getRepositoryId() );
+                            
+                            priv.addProperty( prop );
+                            
+                            prop = new CProperty();
+                            prop.setKey( "repositoryGroupId" );
+                            prop.setValue( res.getRepositoryGroupId() );
+                            
+                            priv.addProperty( prop );
+    
+                            getNexusSecurity().createPrivilege( priv );
+    
                             response.addData( nexusToRestModel( priv ) );
                         }
                         else
@@ -174,7 +182,7 @@ public class PrivilegeListResourceHandler
                             break;
                         }
                     }
-
+                    
                     if ( success )
                     {
                         getResponse().setEntity( serialize( representation, response ) );
@@ -182,15 +190,9 @@ public class PrivilegeListResourceHandler
                         getResponse().setStatus( Status.SUCCESS_CREATED );
                     }
                 }
-                catch ( ConfigurationException e )
+                catch ( InvalidConfigurationException e )
                 {
-                    handleConfigurationException( e, representation );
-                }
-                catch ( IOException e )
-                {
-                    getResponse().setStatus( Status.SERVER_ERROR_INTERNAL );
-
-                    getLogger().log( Level.SEVERE, "Got IO Exception!", e );
+                    handleInvalidConfigurationException( e, representation );
                 }
             }
         }

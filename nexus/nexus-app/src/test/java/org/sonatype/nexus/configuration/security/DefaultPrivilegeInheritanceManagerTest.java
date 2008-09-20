@@ -24,6 +24,8 @@ import java.util.Set;
 
 import org.sonatype.nexus.AbstractNexusTestCase;
 import org.sonatype.nexus.configuration.security.model.CPrivilege;
+import org.sonatype.nexus.jsecurity.DefaultPrivilegeInheritanceManager;
+import org.sonatype.nexus.jsecurity.PrivilegeInheritanceManager;
 
 public class DefaultPrivilegeInheritanceManagerTest
     extends

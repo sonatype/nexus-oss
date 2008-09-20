@@ -37,8 +37,6 @@ import org.sonatype.nexus.configuration.model.CRemoteAuthentication;
 import org.sonatype.nexus.configuration.model.CRemoteConnectionSettings;
 import org.sonatype.nexus.configuration.model.CRemoteHttpProxySettings;
 import org.sonatype.nexus.configuration.model.CSmtpConfiguration;
-import org.sonatype.nexus.configuration.security.InvalidCredentialsException;
-import org.sonatype.nexus.configuration.security.NoSuchUserException;
 import org.sonatype.nexus.rest.model.GlobalConfigurationResource;
 import org.sonatype.nexus.rest.model.GlobalConfigurationResourceResponse;
 import org.sonatype.nexus.rest.model.RemoteConnectionSettings;
@@ -247,47 +245,13 @@ public class GlobalConfigurationResourceHandler
                             && !getNexus().getAnonymousPassword().equals( resource.getSecurityAnonymousPassword() ) )
                         {
                             // no user change, only password
-                            try
-                            {
-                                getNexusSecurityConfiguration().changePassword(
-                                    getNexus().getAnonymousUsername(),
-                                    getNexus().getAnonymousPassword(),
-                                    resource.getSecurityAnonymousPassword() );
-                            }
-                            catch ( InvalidCredentialsException e )
-                            {
-                                // the supplied anon auth info is wrong
-                                getLogger()
-                                    .log(
-                                        Level.WARNING,
-                                        "Nexus refused to apply configuration, the supplied anonymous information is wrong.",
-                                        e );
-
-                                getResponse().setStatus( Status.CLIENT_ERROR_BAD_REQUEST, e.getMessage() );
-
-                                getResponse().setEntity(
-                                    serialize( entity, getNexusErrorResponse( "securityAnonymousPassword", e
-                                        .getMessage() ) ) );
-
-                                return;
-                            }
-                            catch ( NoSuchUserException e )
-                            {
-                                // the supplied anon auth info is wrong
-                                getLogger()
-                                    .log(
-                                        Level.WARNING,
-                                        "Nexus refused to apply configuration, the supplied anonymous information is wrong.",
-                                        e );
-
-                                getResponse().setStatus( Status.CLIENT_ERROR_BAD_REQUEST, e.getMessage() );
-
-                                getResponse().setEntity(
-                                    serialize( entity, getNexusErrorResponse( "securityAnonymousUsername", e
-                                        .getMessage() ) ) );
-
-                                return;
-                            }
+                            
+                            /* TODO
+                            getNexusSecurityConfiguration().changePassword(
+                                getNexus().getAnonymousUsername(),
+                                getNexus().getAnonymousPassword(),
+                                resource.getSecurityAnonymousPassword() );
+                            */                            
                         }
                         else
                         {

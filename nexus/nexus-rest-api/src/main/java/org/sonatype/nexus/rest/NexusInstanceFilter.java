@@ -28,9 +28,10 @@ import org.restlet.Context;
 import org.restlet.Filter;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
+import org.sonatype.jsecurity.realms.PlexusSecurity;
 import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.configuration.model.CRemoteNexusInstance;
-import org.sonatype.nexus.configuration.security.NexusSecurityConfiguration;
+import org.sonatype.nexus.jsecurity.NexusSecurity;
 import org.sonatype.plexus.rest.PlexusRestletUtils;
 
 /**
@@ -77,25 +78,25 @@ public class NexusInstanceFilter
         }
 
         request.getAttributes().put( Nexus.ROLE, nexus );
-
-        request.getAttributes().put( NexusSecurityConfiguration.ROLE, getNexusSecurityConfiguration() );
+        
+        request.getAttributes().put( NexusSecurity.ROLE, getNexusSecurity() );
 
         request.getAttributes().put( SecurityManager.class.getName(), getSecurityManager() );
         
         return CONTINUE;
     }
-
-    protected NexusSecurityConfiguration getNexusSecurityConfiguration()
+    
+    protected NexusSecurity getNexusSecurity()
     {
         try
         {
-            return (NexusSecurityConfiguration) PlexusRestletUtils.plexusLookup(
+            return ( NexusSecurity ) PlexusRestletUtils.plexusLookup(
                 getContext(),
-                NexusSecurityConfiguration.ROLE );
+                NexusSecurity.ROLE );
         }
         catch ( ComponentLookupException e )
         {
-            throw new IllegalStateException( "Cannot lookup NexusSecurityConfiguration!", e );
+            throw new IllegalStateException( "Cannot lookup NexusSecurity!", e );
         }
     }
 
@@ -105,12 +106,11 @@ public class NexusInstanceFilter
         {
             return (SecurityManager) PlexusRestletUtils.plexusLookup(
                 getContext(),
-                SecurityManager.class.getName(),
-                "default-web" );
+                PlexusSecurity.class.getName() );
         }
         catch ( ComponentLookupException e )
         {
-            throw new IllegalStateException( "Cannot lookup NexusSecurityConfiguration!", e );
+            throw new IllegalStateException( "Cannot lookup PlexusSecurity!", e );
         }
     }
 

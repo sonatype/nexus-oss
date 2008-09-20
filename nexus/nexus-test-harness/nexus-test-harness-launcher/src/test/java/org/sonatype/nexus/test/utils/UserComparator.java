@@ -2,7 +2,7 @@ package org.sonatype.nexus.test.utils;
 
 import java.util.Comparator;
 
-import org.sonatype.nexus.configuration.security.model.CUser;
+import org.sonatype.jsecurity.model.CUser;
 
 
 public class UserComparator implements Comparator<CUser>
@@ -63,12 +63,12 @@ public class UserComparator implements Comparator<CUser>
         }
         else if ( !user1.getStatus().equals( user2.getStatus() ) )
             return -1;
-        if ( user1.getUserId() == null )
+        if ( user1.getId() == null )
         {
-            if ( user2.getUserId() != null )
+            if ( user2.getId() != null )
                 return -1;
         }
-        else if ( !user1.getUserId().equals( user2.getUserId() ) )
+        else if ( !user1.getId().equals( user2.getId() ) )
             return -1;
         return 0;
     }

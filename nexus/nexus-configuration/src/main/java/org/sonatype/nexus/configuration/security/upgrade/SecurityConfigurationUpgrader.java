@@ -23,7 +23,7 @@ package org.sonatype.nexus.configuration.security.upgrade;
 import java.io.File;
 import java.io.IOException;
 
-import org.sonatype.nexus.configuration.security.model.Configuration;
+import org.sonatype.jsecurity.model.Configuration;
 import org.sonatype.nexus.configuration.upgrade.ConfigurationIsCorruptedException;
 import org.sonatype.nexus.configuration.upgrade.UnsupportedConfigurationVersionException;
 

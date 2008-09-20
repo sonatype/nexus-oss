@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <nexusConfiguration>
-  <version>1.0.5</version>
+  <version>1.0.6</version>
   <security>
     <enabled>true</enabled>
     <anonymousAccessEnabled>true</anonymousAccessEnabled>
     <realms>
-      <realm>default</realm>
+      <realm>NexusTargetRealm</realm>
     </realms>
   </security>
   <globalConnectionSettings />

@@ -30,7 +30,7 @@ import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
-import org.sonatype.nexus.configuration.security.model.Configuration;
+import org.sonatype.jsecurity.model.Configuration;
 import org.sonatype.nexus.configuration.upgrade.ConfigurationIsCorruptedException;
 import org.sonatype.nexus.configuration.upgrade.UnsupportedConfigurationVersionException;
 import org.sonatype.nexus.configuration.upgrade.UpgradeMessage;
@@ -48,7 +48,7 @@ public class DefaultSecurityConfigurationUpgrader
     implements SecurityConfigurationUpgrader
 {
     /**
-     * @plexus.requirement role="org.sonatype.nexus.configuration.upgrade.Upgrader"
+     * @plexus.requirement role="org.sonatype.nexus.configuration.security.upgrade.SecurityUpgrader"
      */
     private Map<String, Upgrader> upgraders;
 

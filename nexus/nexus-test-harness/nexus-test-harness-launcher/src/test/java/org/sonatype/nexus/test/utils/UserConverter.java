@@ -2,7 +2,7 @@ package org.sonatype.nexus.test.utils;
 
 import java.util.List;
 
-import org.sonatype.nexus.configuration.security.model.CUser;
+import org.sonatype.jsecurity.model.CUser;
 import org.sonatype.nexus.rest.model.UserResource;
 
 public class UserConverter
@@ -14,7 +14,7 @@ public class UserConverter
         resource.setEmail( user.getEmail() );
         resource.setName( user.getName() );
         resource.setStatus( user.getStatus() );
-        resource.setUserId( user.getUserId() );
+        resource.setUserId( user.getId() );
 
         for ( String roleId : (List<String>) user.getRoles() )
         {
@@ -31,7 +31,7 @@ public class UserConverter
         user.setEmail( resource.getEmail() );
         user.setName( resource.getName() );
         user.setStatus( resource.getStatus() );
-        user.setUserId( resource.getUserId() );
+        user.setId( resource.getUserId() );
 
         user.getRoles().clear();
         for ( String roleId : (List<String>) resource.getRoles() )

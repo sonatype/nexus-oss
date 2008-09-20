@@ -20,17 +20,15 @@
  */
 package org.sonatype.nexus.rest.privileges;
 
-import java.io.IOException;
-import java.util.logging.Level;
-
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.restlet.resource.Representation;
 import org.restlet.resource.Variant;
-import org.sonatype.nexus.configuration.security.NoSuchPrivilegeException;
-import org.sonatype.nexus.configuration.security.model.CPrivilege;
+import org.sonatype.jsecurity.model.CPrivilege;
+import org.sonatype.jsecurity.realms.tools.NoSuchPrivilegeException;
+import org.sonatype.nexus.jsecurity.realms.NexusMethodRealm;
 import org.sonatype.nexus.rest.model.PrivilegeStatusResourceResponse;
 
 public class PrivilegeResourceHandler
@@ -76,20 +74,13 @@ public class PrivilegeResourceHandler
         
         try
         {
-            priv = getNexusSecurityConfiguration().readRepoTargetPrivilege( getPrivilegeId() );
+            priv = getNexusSecurity().readPrivilege( getPrivilegeId() );
         }
         catch ( NoSuchPrivilegeException e )
-        {
-            try
-            {
-                priv = getNexusSecurityConfiguration().readApplicationPrivilege( getPrivilegeId() );
-            }
-            catch ( NoSuchPrivilegeException e1 )
-            {
-                getResponse().setStatus( Status.CLIENT_ERROR_NOT_FOUND, e.getMessage() );
+        {            
+            getResponse().setStatus( Status.CLIENT_ERROR_NOT_FOUND, e.getMessage() );
 
-                return null;
-            }
+            return null;
         }
         
         response.setData( nexusToRestModel( priv ) );
@@ -110,32 +101,26 @@ public class PrivilegeResourceHandler
      */
     public void delete()
     {
-        try
-        {
-            getNexusSecurityConfiguration().readApplicationPrivilege( getPrivilegeId() );
-            
-            getResponse().setStatus( Status.CLIENT_ERROR_BAD_REQUEST, "Cannot delete an application type privilege" );
-        }
-        catch ( NoSuchPrivilegeException e )
-        {
-            //This is ok
-        }
+        CPrivilege priv;
         
         try
-        {            
-            getNexusSecurityConfiguration().deleteRepoTargetPrivilege( getPrivilegeId() );
+        {
+            priv = getNexusSecurity().readPrivilege( getPrivilegeId() );
             
-            getResponse().setStatus( Status.SUCCESS_NO_CONTENT );
+            if ( priv.getType().equals( NexusMethodRealm.PRIVILEGE_TYPE_METHOD ) )
+            {
+                getResponse().setStatus( Status.CLIENT_ERROR_BAD_REQUEST, "Cannot delete an application type privilege" );
+            }
+            else
+            {
+                getNexusSecurity().deletePrivilege( getPrivilegeId() );
+                
+                getResponse().setStatus( Status.SUCCESS_NO_CONTENT );
+            }
         }
         catch ( NoSuchPrivilegeException e )
         {
             getResponse().setStatus( Status.CLIENT_ERROR_NOT_FOUND, e.getMessage() );
-        }
-        catch ( IOException e )
-        {
-            getResponse().setStatus( Status.SERVER_ERROR_INTERNAL );
-
-            getLogger().log( Level.SEVERE, "Got IO Exception!", e );
         }
     }
 }

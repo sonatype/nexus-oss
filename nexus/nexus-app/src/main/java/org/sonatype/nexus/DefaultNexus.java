@@ -57,7 +57,6 @@ import org.sonatype.nexus.configuration.model.CRepositoryShadow;
 import org.sonatype.nexus.configuration.model.CRepositoryTarget;
 import org.sonatype.nexus.configuration.model.CRouting;
 import org.sonatype.nexus.configuration.model.CSmtpConfiguration;
-import org.sonatype.nexus.configuration.security.NexusSecurityConfiguration;
 import org.sonatype.nexus.feeds.FeedRecorder;
 import org.sonatype.nexus.feeds.NexusArtifactEvent;
 import org.sonatype.nexus.feeds.SystemEvent;
@@ -66,6 +65,7 @@ import org.sonatype.nexus.index.ArtifactInfo;
 import org.sonatype.nexus.index.FlatSearchResponse;
 import org.sonatype.nexus.index.IndexerManager;
 import org.sonatype.nexus.index.context.IndexContextInInconsistentStateException;
+import org.sonatype.nexus.jsecurity.NexusSecurity;
 import org.sonatype.nexus.maven.tasks.SnapshotRemovalRequest;
 import org.sonatype.nexus.maven.tasks.SnapshotRemovalResult;
 import org.sonatype.nexus.maven.tasks.SnapshotRemover;
@@ -194,13 +194,11 @@ public class DefaultNexus
      * @plexus.requirement
      */
     private CacheManager cacheManager;
-
+    
     /**
-     * The SecurityConfiguration component.
-     * 
      * @plexus.requirement
      */
-    private NexusSecurityConfiguration securityConfiguration;
+    private NexusSecurity security;
 
     /**
      * The SecurityConfiguration component.
@@ -1451,8 +1449,8 @@ public class DefaultNexus
             nexusConfiguration.createInternals();
 
             nexusConfiguration.notifyConfigurationChangeListeners();
-
-            securityConfiguration.startService();
+            
+            security.startService();
 
             cacheManager.startService();
 
@@ -1552,8 +1550,8 @@ public class DefaultNexus
         httpProxyService.stopService();
 
         nexusScheduler.stopService();
-
-        securityConfiguration.stopService();
+        
+        security.stopService();
 
         try
         {

@@ -2,7 +2,7 @@ package org.sonatype.nexus.test.utils;
 
 import java.util.Comparator;
 
-import org.sonatype.nexus.configuration.security.model.CRole;
+import org.sonatype.jsecurity.model.CRole;
 
 /**
  * This only works for equals...

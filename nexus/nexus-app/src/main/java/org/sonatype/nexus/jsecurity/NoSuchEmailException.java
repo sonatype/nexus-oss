@@ -18,51 +18,26 @@
  * along with this program.  If not, see http://www.gnu.org/licenses/.
  *
  */
-package org.sonatype.nexus.configuration.security;
-
-import java.util.Random;
-
-import org.sonatype.nexus.util.StringDigester;
+package org.sonatype.nexus.jsecurity;
 
 /**
- * @plexus.component
+ * Thrown if the specifically requested email does not exists.
+ * 
+ * @author cstamas
  */
-public class DefaultPasswordGenerator
-    implements PasswordGenerator
+public class NoSuchEmailException
+    extends Exception
 {
-    private int getRandom( int min, int max )
-    {
-        Random random = new Random();
-        int total = max - min + 1;
-        int next = Math.abs( random.nextInt() % total );
-        
-        return min + next;
-    }
+
+    private static final long serialVersionUID = 2942353698404055394L;
     
-    public String generatePassword( int minChars, int maxChars)
+    public NoSuchEmailException()
     {
-        int length = getRandom( minChars, maxChars );
-        
-        byte bytes[] = new byte[length];
-        
-        for ( int i = 0 ; i < length ; i++ )
-        {
-            if ( i % 2 == 0 )
-            {
-                bytes[i] = ( byte )getRandom( 'a', 'z' );
-            }
-            else
-            {
-                bytes[i] = ( byte )getRandom( '0', '9' );
-            }
-        }
-        
-        return new String(bytes);
+        super( "Email not found!" );
     }
 
-    public String hashPassword( String password )
+    public NoSuchEmailException( String email )
     {
-        return StringDigester.getSha1Digest( password );
+        super( "Email '" + email + "' not found!" );
     }
-
 }

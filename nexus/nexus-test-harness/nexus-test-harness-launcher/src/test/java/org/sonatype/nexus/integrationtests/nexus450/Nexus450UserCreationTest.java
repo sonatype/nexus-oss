@@ -72,9 +72,11 @@ public class Nexus450UserCreationTest
         {
             // Sample body: Your new password is ********
             String body = GreenMailUtil.getBody( mimeMessage );
-            if ( body.startsWith( "Your new password is " ) )
+            int index = body.indexOf( "Your new password is " );
+            int passwordStartIndex = index + "Your new password is ".length();
+            if ( index != -1 )
             {
-                password = body.substring( body.lastIndexOf( ' ' ) + 1 );
+                password = body.substring( passwordStartIndex, body.indexOf( '\n', passwordStartIndex ) ).trim();
                 log.debug( "New password:\n" + password );
                 break;
             }

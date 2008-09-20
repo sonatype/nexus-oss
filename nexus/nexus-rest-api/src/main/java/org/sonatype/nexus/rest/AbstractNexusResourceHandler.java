@@ -45,11 +45,11 @@ import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.artifact.VersionUtils;
 import org.sonatype.nexus.configuration.ConfigurationException;
-import org.sonatype.nexus.configuration.security.NexusSecurityConfiguration;
 import org.sonatype.nexus.configuration.validator.InvalidConfigurationException;
 import org.sonatype.nexus.configuration.validator.ValidationMessage;
 import org.sonatype.nexus.configuration.validator.ValidationResponse;
 import org.sonatype.nexus.index.ArtifactInfo;
+import org.sonatype.nexus.jsecurity.NexusSecurity;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
@@ -95,10 +95,10 @@ public abstract class AbstractNexusResourceHandler
     {
         return (Nexus) getRequest().getAttributes().get( Nexus.ROLE );
     }
-
-    protected NexusSecurityConfiguration getNexusSecurityConfiguration()
+    
+    protected NexusSecurity getNexusSecurity()
     {
-        return (NexusSecurityConfiguration) getRequest().getAttributes().get( NexusSecurityConfiguration.ROLE );
+        return (NexusSecurity) getRequest().getAttributes().get( NexusSecurity.ROLE );
     }
 
     protected SecurityManager getSecurityManager()
@@ -533,6 +533,26 @@ public abstract class AbstractNexusResourceHandler
         }
 
         return ref.getTargetRef();
+    }
+    
+    protected void handleInvalidConfigurationException( org.sonatype.jsecurity.realms.tools.InvalidConfigurationException e, Representation representation )
+    {
+        getLogger().log( Level.WARNING, "Configuration error!", e );
+
+        getResponse().setStatus( Status.CLIENT_ERROR_BAD_REQUEST, "Configuration error." );
+        
+        org.sonatype.jsecurity.realms.validator.ValidationResponse vr = e.getValidationResponse();
+
+        if ( vr != null && vr.getValidationErrors().size() > 0 )
+        {
+            org.sonatype.jsecurity.realms.validator.ValidationMessage vm = vr.getValidationErrors().get( 0 );
+            getResponse().setEntity(
+                serialize( representation, getNexusErrorResponse( vm.getKey(), vm.getShortMessage() ) ) );
+        }
+        else
+        {
+            getResponse().setEntity( serialize( representation, getNexusErrorResponse( "*", e.getMessage() ) ) );
+        }
     }
 
     protected void handleConfigurationException( ConfigurationException e, Representation representation )

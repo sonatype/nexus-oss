@@ -1,0 +1,30 @@
+<component-set>
+  <components>
+    <component>
+      <role>org.jsecurity.realm.Realm</role>
+      <role-hint>NexusMethodRealm</role-hint>
+      <implementation>org.sonatype.nexus.jsecurity.realms.NexusMethodRealm</implementation>
+      <description></description>
+      <isolated-realm>false</isolated-realm>
+      <requirements>
+        <requirement>
+          <role>org.sonatype.jsecurity.realms.tools.ConfigurationManager</role>
+          <field-name>configuration</field-name>
+        </requirement>
+      </requirements>
+    </component>
+    <component>
+      <role>org.jsecurity.realm.Realm</role>
+      <role-hint>NexusTargetRealm</role-hint>
+      <implementation>org.sonatype.nexus.jsecurity.realms.NexusTargetRealm</implementation>
+      <description></description>
+      <isolated-realm>false</isolated-realm>
+      <requirements>
+        <requirement>
+          <role>org.sonatype.jsecurity.realms.tools.ConfigurationManager</role>
+          <field-name>configuration</field-name>
+        </requirement>
+      </requirements>
+    </component>
+  </components>
+</component-set>

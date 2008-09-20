@@ -18,21 +18,19 @@
  * along with this program.  If not, see http://www.gnu.org/licenses/.
  *
  */
-package org.sonatype.nexus.configuration.security;
+package org.sonatype.nexus.jsecurity;
 
-/**
- * Thrown if the password isn't correct on reset password
- * 
- * @author cstamas
- */
-public class InvalidCredentialsException
-    extends Exception
+import java.util.Set;
+
+public interface PrivilegeInheritanceManager
 {
-
-    private static final long serialVersionUID = 294536984704055394L;
-    
-    public InvalidCredentialsException()
-    {
-        super( "Invalid credentials supplied!" );
-    }
+    String ROLE = PrivilegeInheritanceManager.class.getName();
+        
+    /**
+     * Retrive a list of methods that are inherited by the requested method
+     * 
+     * @param method
+     * @return
+     */
+    Set<String> getInheritedMethods( String method );
 }

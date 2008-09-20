@@ -367,7 +367,7 @@ public class AbstractNexusIntegrationTest
         File testConfigFile = this.getOverridableFile( configFile );
 
         log.debug( "copying " + configFile + " to:  "
-            + new File( AbstractNexusIntegrationTest.nexusBaseDir + "/" + RELATIVE_CONF_DIR, configFile ) );
+            + new File( AbstractNexusIntegrationTest.nexusBaseDir + "/" + ( path == null ? RELATIVE_CONF_DIR : path ), configFile ) );
 
         FileTestingUtils.interpolationFileCopy( testConfigFile, new File( AbstractNexusIntegrationTest.nexusBaseDir
             + "/" + ( path == null ? RELATIVE_CONF_DIR : path ), destShortName ), variables );

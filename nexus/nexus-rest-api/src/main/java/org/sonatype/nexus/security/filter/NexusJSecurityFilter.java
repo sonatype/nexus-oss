@@ -10,8 +10,8 @@ import javax.servlet.ServletResponse;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
+import org.sonatype.jsecurity.web.PlexusJSecurityFilter;
 import org.sonatype.nexus.Nexus;
-import org.sonatype.plexus.jsecurity.web.filter.PlexusJSecurityFilter;
 
 /**
  * This filter simply behaves according Nexus configuration.

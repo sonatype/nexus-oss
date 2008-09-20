@@ -30,26 +30,26 @@ import java.util.Set;
 
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
-import org.sonatype.nexus.configuration.model.CGroupsSetting;
-import org.sonatype.nexus.configuration.model.CGroupsSettingPathMappingItem;
-import org.sonatype.nexus.configuration.model.CHttpProxySettings;
-import org.sonatype.nexus.configuration.model.CLocalStorage;
-import org.sonatype.nexus.configuration.model.CProps;
-import org.sonatype.nexus.configuration.model.CRemoteAuthentication;
-import org.sonatype.nexus.configuration.model.CRemoteConnectionSettings;
-import org.sonatype.nexus.configuration.model.CRemoteHttpProxySettings;
-import org.sonatype.nexus.configuration.model.CRemoteStorage;
-import org.sonatype.nexus.configuration.model.CRepository;
-import org.sonatype.nexus.configuration.model.CRepositoryGroup;
-import org.sonatype.nexus.configuration.model.CRepositoryGrouping;
-import org.sonatype.nexus.configuration.model.CRepositoryShadow;
-import org.sonatype.nexus.configuration.model.CRepositoryTarget;
-import org.sonatype.nexus.configuration.model.CRestApiSettings;
-import org.sonatype.nexus.configuration.model.CRouting;
-import org.sonatype.nexus.configuration.model.CScheduleConfig;
-import org.sonatype.nexus.configuration.model.CScheduledTask;
-import org.sonatype.nexus.configuration.model.CSecurity;
-import org.sonatype.nexus.configuration.model.CSmtpConfiguration;
+import org.sonatype.nexus.configuration.model.v1_0_5.CGroupsSetting;
+import org.sonatype.nexus.configuration.model.v1_0_5.CGroupsSettingPathMappingItem;
+import org.sonatype.nexus.configuration.model.v1_0_5.CHttpProxySettings;
+import org.sonatype.nexus.configuration.model.v1_0_5.CLocalStorage;
+import org.sonatype.nexus.configuration.model.v1_0_5.CProps;
+import org.sonatype.nexus.configuration.model.v1_0_5.CRemoteAuthentication;
+import org.sonatype.nexus.configuration.model.v1_0_5.CRemoteConnectionSettings;
+import org.sonatype.nexus.configuration.model.v1_0_5.CRemoteHttpProxySettings;
+import org.sonatype.nexus.configuration.model.v1_0_5.CRemoteStorage;
+import org.sonatype.nexus.configuration.model.v1_0_5.CRepository;
+import org.sonatype.nexus.configuration.model.v1_0_5.CRepositoryGroup;
+import org.sonatype.nexus.configuration.model.v1_0_5.CRepositoryGrouping;
+import org.sonatype.nexus.configuration.model.v1_0_5.CRepositoryShadow;
+import org.sonatype.nexus.configuration.model.v1_0_5.CRepositoryTarget;
+import org.sonatype.nexus.configuration.model.v1_0_5.CRestApiSettings;
+import org.sonatype.nexus.configuration.model.v1_0_5.CRouting;
+import org.sonatype.nexus.configuration.model.v1_0_5.CScheduleConfig;
+import org.sonatype.nexus.configuration.model.v1_0_5.CScheduledTask;
+import org.sonatype.nexus.configuration.model.v1_0_5.CSecurity;
+import org.sonatype.nexus.configuration.model.v1_0_5.CSmtpConfiguration;
 import org.sonatype.nexus.configuration.model.v1_0_4.Configuration;
 import org.sonatype.nexus.configuration.model.v1_0_4.io.xpp3.NexusConfigurationXpp3Reader;
 import org.sonatype.nexus.configuration.upgrade.ConfigurationIsCorruptedException;
@@ -102,9 +102,9 @@ public class Upgrade104to105
         throws ConfigurationIsCorruptedException
     {
         Configuration oldc = (Configuration) message.getConfiguration();
-        org.sonatype.nexus.configuration.model.Configuration newc = new org.sonatype.nexus.configuration.model.Configuration();
+        org.sonatype.nexus.configuration.model.v1_0_5.Configuration newc = new org.sonatype.nexus.configuration.model.v1_0_5.Configuration();
 
-        newc.setVersion( org.sonatype.nexus.configuration.model.Configuration.MODEL_VERSION );
+        newc.setVersion( org.sonatype.nexus.configuration.model.v1_0_5.Configuration.MODEL_VERSION );
         // Working & log directories removed in this revision
         // newc.setWorkingDirectory( oldc.getWorkingDirectory() );
         // newc.setApplicationLogDirectory( oldc.getApplicationLogDirectory() );
@@ -190,7 +190,7 @@ public class Upgrade104to105
             newc.setRepositoryGrouping( repositoryGrouping );
         }
 
-        message.setModelVersion( org.sonatype.nexus.configuration.model.Configuration.MODEL_VERSION );
+        message.setModelVersion( org.sonatype.nexus.configuration.model.v1_0_5.Configuration.MODEL_VERSION );
         message.setConfiguration( newc );
     }
 

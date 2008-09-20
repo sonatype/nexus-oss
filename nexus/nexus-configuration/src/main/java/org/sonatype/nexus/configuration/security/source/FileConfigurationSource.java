@@ -28,14 +28,9 @@ import java.io.InputStream;
 
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
+import org.sonatype.jsecurity.model.Configuration;
 import org.sonatype.nexus.configuration.ConfigurationException;
-import org.sonatype.nexus.configuration.security.model.Configuration;
 import org.sonatype.nexus.configuration.security.upgrade.SecurityConfigurationUpgrader;
-import org.sonatype.nexus.configuration.security.validator.SecurityConfigurationValidator;
-import org.sonatype.nexus.configuration.validator.ConfigurationValidator;
-import org.sonatype.nexus.configuration.validator.InvalidConfigurationException;
-import org.sonatype.nexus.configuration.validator.ValidationRequest;
-import org.sonatype.nexus.configuration.validator.ValidationResponse;
 
 /**
  * The default configuration source powered by Modello. It will try to load configuration, upgrade if needed and
@@ -56,13 +51,6 @@ public class FileConfigurationSource
     private File configurationFile;
 
     /**
-     * The configuration validator.
-     * 
-     * @plexus.requirement
-     */
-    private SecurityConfigurationValidator configurationValidator;
-
-    /**
      * The configuration upgrader.
      * 
      * @plexus.requirement
@@ -78,32 +66,6 @@ public class FileConfigurationSource
 
     /** Flag to mark defaulted config */
     private boolean configurationDefaulted;
-
-    /**
-     * Gets the configuration validator.
-     * 
-     * @return the configuration validator
-     */
-    public ConfigurationValidator getConfigurationValidator()
-    {
-        return configurationValidator;
-    }
-
-    /**
-     * Sets the configuration validator.
-     * 
-     * @param configurationValidator the new configuration validator
-     */
-    public void setConfigurationValidator( ConfigurationValidator configurationValidator )
-    {
-        if ( !SecurityConfigurationValidator.class.isAssignableFrom( configurationValidator.getClass() ) )
-        {
-            throw new IllegalArgumentException( "ConfigurationValidator is invalid type "
-                + configurationValidator.getClass().getName() );
-        }
-
-        this.configurationValidator = (SecurityConfigurationValidator) configurationValidator;
-    }
 
     /**
      * Gets the configuration file.
@@ -164,26 +126,7 @@ public class FileConfigurationSource
             loadConfiguration( getConfigurationFile() );
         }
 
-        ValidationResponse vResponse = getConfigurationValidator().validateModel(
-            new ValidationRequest( getConfiguration() ) );
-
-        setValidationResponse( vResponse );
-
-        if ( vResponse.isValid() )
-        {
-            if ( vResponse.isModified() )
-            {
-                getLogger().info( "Validation has modified the configuration, storing the changes." );
-
-                storeConfiguration();
-            }
-
-            return getConfiguration();
-        }
-        else
-        {
-            throw new InvalidConfigurationException( vResponse );
-        }
+        return getConfiguration();
     }
 
     public void storeConfiguration()

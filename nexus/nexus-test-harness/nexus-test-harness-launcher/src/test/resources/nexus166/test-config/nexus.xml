@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?><nexusConfiguration>
-  <version>1.0.5</version>
+  <version>1.0.6</version>
   <applicationLogDirectory>${nexus.log.directory}</applicationLogDirectory>
     
       <smtpConfiguration>
@@ -19,7 +19,7 @@
     <anonymousUsername>anonymous</anonymousUsername>
 	<anonymousPassword>anonymous</anonymousPassword> 
     <realms>
-      <realm>default</realm>
+      <realm>NexusTargetRealm</realm>
     </realms>
   </security>
   <globalConnectionSettings />

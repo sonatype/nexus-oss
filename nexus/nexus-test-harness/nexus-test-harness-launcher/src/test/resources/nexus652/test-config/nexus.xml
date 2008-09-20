@@ -5,7 +5,7 @@
   <security>
     <enabled>true</enabled>
     <anonymousAccessEnabled>true</anonymousAccessEnabled>
-    <anonymousUsername>user3</anonymousUsername>
+    <anonymousUsername>User3</anonymousUsername>
     <anonymousPassword>y6i0t9q1e3</anonymousPassword>
     <realms>
       <realm>default</realm>

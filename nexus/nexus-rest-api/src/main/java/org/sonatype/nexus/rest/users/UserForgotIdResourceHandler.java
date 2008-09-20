@@ -20,7 +20,6 @@
  */
 package org.sonatype.nexus.rest.users;
 
-import java.io.IOException;
 import java.util.logging.Level;
 
 import org.restlet.Context;
@@ -28,7 +27,7 @@ import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.restlet.resource.Representation;
-import org.sonatype.nexus.configuration.security.NoSuchEmailException;
+import org.sonatype.nexus.jsecurity.NoSuchEmailException;
 
 public class UserForgotIdResourceHandler
     extends AbstractUserResourceHandler
@@ -57,15 +56,9 @@ public class UserForgotIdResourceHandler
     {
         try
         {
-            getNexusSecurityConfiguration().forgotUserId( getEmail() );
+            getNexusSecurity().forgotUsername( getEmail() );
             
             getResponse().setStatus( Status.SUCCESS_ACCEPTED );
-        }
-        catch ( IOException e )
-        {
-            getResponse().setStatus( Status.SERVER_ERROR_INTERNAL );
-
-            getLogger().log( Level.SEVERE, "Got IO Exception!", e );
         }
         catch ( NoSuchEmailException e )
         {

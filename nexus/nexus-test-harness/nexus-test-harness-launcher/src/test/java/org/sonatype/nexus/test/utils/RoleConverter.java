@@ -3,7 +3,7 @@ package org.sonatype.nexus.test.utils;
 import java.util.List;
 
 import org.restlet.data.Reference;
-import org.sonatype.nexus.configuration.security.model.CRole;
+import org.sonatype.jsecurity.model.CRole;
 import org.sonatype.nexus.rest.model.RoleResource;
 import org.sonatype.nexus.rest.roles.AbstractRoleResourceHandler;
 

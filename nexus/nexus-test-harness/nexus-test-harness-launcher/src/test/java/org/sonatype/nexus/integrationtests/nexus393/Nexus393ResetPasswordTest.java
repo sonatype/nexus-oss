@@ -31,11 +31,17 @@ public class Nexus393ResetPasswordTest
         MimeMessage[] msgs = server.getReceivedMessages();
         MimeMessage msg = msgs[0];
 
+        String password = null;
         // Sample body: Your password has been reset. Your new password is: c1r6g4p8l7
         String body = GreenMailUtil.getBody( msg );
-
-        String password = body.substring( body.lastIndexOf( ' ' ) + 1 );
-        log.debug( "New password:\n" + password );
+        
+        int index = body.indexOf( "Your new password is: " );
+        int passwordStartIndex = index + "Your new password is: ".length();
+        if ( index != -1 )
+        {
+            password = body.substring( passwordStartIndex, body.indexOf( '\n', passwordStartIndex ) ).trim();
+            log.debug( "New password:\n" + password );
+        }
 
         Assert.assertNotNull( password );
     }

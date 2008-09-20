@@ -392,7 +392,7 @@ public class Nexus233PrivilegesCrudXMLTests
             Assert.fail( "Delete failed: " + response.getStatus() );
         }
 
-        Assert.assertNull( SecurityConfigUtil.getCRepoTargetPrivilege( readPrivId ) );
+        Assert.assertNull( SecurityConfigUtil.getCPrivilege( readPrivId ) );
 
     }
 

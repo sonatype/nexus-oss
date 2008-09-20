@@ -67,13 +67,14 @@
 							<goal>xpp3-writer</goal>
 						</goals>
 						<configuration>
-							<version>1.0.5</version>
+							<version>1.0.6</version>
 							<packagedVersions>
 								<packagedVersion>1.0.0</packagedVersion>
 								<packagedVersion>1.0.1</packagedVersion>
 								<packagedVersion>1.0.2</packagedVersion>
 								<packagedVersion>1.0.3</packagedVersion>
 								<packagedVersion>1.0.4</packagedVersion>
+                                <packagedVersion>1.0.5</packagedVersion>
 							</packagedVersions>
 							<model>src/main/mdo/nexus.xml</model>
 						</configuration>
@@ -91,6 +92,19 @@
 							<model>src/main/mdo/security.xml</model>
 						</configuration>
 					</execution>
+                    <execution>
+                        <id>security-new.xml</id>
+                        <goals>
+                            <goal>java</goal>
+                            <goal>xsd</goal>
+                            <goal>xpp3-reader</goal>
+                            <goal>xpp3-writer</goal>
+                        </goals>
+                        <configuration>
+                            <version>2.0.0</version>
+                            <model>src/main/mdo/security-new.xml</model>
+                        </configuration>
+                    </execution>
 				</executions>
 				<configuration>
 					<packageWithVersion>false</packageWithVersion>

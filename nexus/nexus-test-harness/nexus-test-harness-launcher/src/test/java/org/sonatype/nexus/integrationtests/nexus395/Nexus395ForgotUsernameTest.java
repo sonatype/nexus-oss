@@ -29,11 +29,17 @@ public class Nexus395ForgotUsernameTest
 
         MimeMessage[] msgs = server.getReceivedMessages();
 
+        String username = null;
         // Sample body: Your password has been reset. Your new password is: c1r6g4p8l7
         String body = GreenMailUtil.getBody( msgs[0] );
-
-        String username = body.substring( body.lastIndexOf( ' ' ) + 1 );
-        log.debug( "Username:\n" + username );
+        
+        int index = body.indexOf( " - \"" );
+        int usernameStartIndex = index + " - \"".length();
+        if ( index != -1 )
+        {
+            username = body.substring( usernameStartIndex, body.indexOf( '\"', usernameStartIndex ) ).trim();
+            log.debug( "Username:\n" + username );
+        }
 
         Assert.assertNotNull( username );
     }

@@ -13,23 +13,21 @@ import java.util.ResourceBundle;
 import junit.framework.Assert;
 
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
-import org.sonatype.nexus.configuration.security.model.CApplicationPrivilege;
-import org.sonatype.nexus.configuration.security.model.CRepoTargetPrivilege;
-import org.sonatype.nexus.configuration.security.model.CRole;
-import org.sonatype.nexus.configuration.security.model.CUser;
-import org.sonatype.nexus.configuration.security.model.Configuration;
-import org.sonatype.nexus.configuration.security.model.io.xpp3.NexusSecurityConfigurationXpp3Reader;
+import org.sonatype.jsecurity.model.CPrivilege;
+import org.sonatype.jsecurity.model.CProperty;
+import org.sonatype.jsecurity.model.CRole;
+import org.sonatype.jsecurity.model.CUser;
+import org.sonatype.jsecurity.model.Configuration;
+import org.sonatype.jsecurity.model.io.xpp3.SecurityConfigurationXpp3Reader;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.rest.model.PrivilegeApplicationStatusResource;
 import org.sonatype.nexus.rest.model.PrivilegeBaseStatusResource;
-import org.sonatype.nexus.rest.model.PrivilegeTargetResource;
 import org.sonatype.nexus.rest.model.PrivilegeTargetStatusResource;
 import org.sonatype.nexus.rest.model.RoleResource;
 import org.sonatype.nexus.rest.model.UserResource;
 
 public class SecurityConfigUtil
 {
-
     public static void verifyRole( RoleResource role )
         throws IOException
     {
@@ -97,29 +95,57 @@ public class SecurityConfigUtil
 
             if ( privResource instanceof PrivilegeTargetStatusResource )
             {
-                CRepoTargetPrivilege secPriv = getCRepoTargetPrivilege( privResource.getId() );
+                CPrivilege secPriv = getCPrivilege( privResource.getId() );
 
                 Assert.assertNotNull( secPriv );
                 PrivilegeTargetStatusResource targetPriv = (PrivilegeTargetStatusResource) privResource;
 
                 Assert.assertEquals( targetPriv.getId(), secPriv.getId() );
                 Assert.assertEquals( targetPriv.getName(), secPriv.getName() );
-                Assert.assertEquals( targetPriv.getRepositoryGroupId(), secPriv.getGroupId() );
-                Assert.assertEquals( targetPriv.getRepositoryId(), secPriv.getRepositoryId() );
-                Assert.assertEquals( targetPriv.getRepositoryTargetId(), secPriv.getRepositoryTargetId() );
-                Assert.assertEquals( targetPriv.getMethod(), secPriv.getMethod() );
+                Assert.assertEquals( targetPriv.getType(), "repositoryTarget" );
+                
+                for ( CProperty prop : ( List<CProperty> ) secPriv.getProperties() )
+                {
+                    if ( prop.getKey().equals( "repositoryGroupId" ) )
+                    {
+                        Assert.assertEquals( targetPriv.getRepositoryGroupId(), prop.getValue() );
+                    }
+                    else if ( prop.getKey().equals( "repositoryId" ) )
+                    {
+                        Assert.assertEquals( targetPriv.getRepositoryId(), prop.getValue() );
+                    }
+                    else if ( prop.getKey().equals( "repositoryTargetId" ) )
+                    {
+                        Assert.assertEquals( targetPriv.getRepositoryTargetId(), prop.getValue() );
+                    }
+                    else if ( prop.getKey().equals( "method" ) )
+                    {
+                        Assert.assertEquals( targetPriv.getMethod(), prop.getValue() );
+                    }
+                }
             }
             else if ( privResource instanceof PrivilegeApplicationStatusResource )
             {
-                CApplicationPrivilege secPriv = getCApplicationPrivilege( privResource.getId() );
+                CPrivilege secPriv = getCPrivilege( privResource.getId() );
 
                 Assert.assertNotNull( secPriv );
                 PrivilegeApplicationStatusResource targetPriv = (PrivilegeApplicationStatusResource) privResource;
 
                 Assert.assertEquals( targetPriv.getId(), secPriv.getId() );
                 Assert.assertEquals( targetPriv.getName(), secPriv.getName() );
-                Assert.assertEquals( targetPriv.getMethod(), secPriv.getMethod() );
-                Assert.assertEquals( targetPriv.getPermission(), secPriv.getPermission() );
+                Assert.assertEquals( targetPriv.getType(), "application" );
+                
+                for ( CProperty prop : ( List<CProperty> ) secPriv.getProperties() )
+                {
+                    if ( prop.getKey().equals( "permission" ) )
+                    {
+                        Assert.assertEquals( targetPriv.getPermission(), prop.getValue() );
+                    }
+                    else if ( prop.getKey().equals( "method" ) )
+                    {
+                        Assert.assertEquals( targetPriv.getMethod(), prop.getValue() );
+                    }
+                }
             }
         }
     }
@@ -144,15 +170,15 @@ public class SecurityConfigUtil
     }
 
     @SuppressWarnings( "unchecked" )
-    public static CRepoTargetPrivilege getCRepoTargetPrivilege( String privilegeId )
+    public static CPrivilege getCPrivilege( String privilegeId )
         throws IOException
     {
         Configuration securityConfig = getSecurityConfig();
-        List<CRepoTargetPrivilege> secPrivs = securityConfig.getRepositoryTargetPrivileges();
+        List<CPrivilege> secPrivs = securityConfig.getPrivileges();
 
-        for ( Iterator<CRepoTargetPrivilege> iter = secPrivs.iterator(); iter.hasNext(); )
+        for ( Iterator<CPrivilege> iter = secPrivs.iterator(); iter.hasNext(); )
         {
-            CRepoTargetPrivilege cPriv = iter.next();
+            CPrivilege cPriv = iter.next();
 
             if ( privilegeId.equals( cPriv.getId() ) )
             {
@@ -163,36 +189,17 @@ public class SecurityConfigUtil
     }
     
     @SuppressWarnings( "unchecked" )
-    public static CRepoTargetPrivilege getCRepoTargetPrivilegeByName( String privilegeName )
+    public static CPrivilege getCPrivilegeByName( String privilegeName )
         throws IOException
     {
         Configuration securityConfig = getSecurityConfig();
-        List<CRepoTargetPrivilege> secPrivs = securityConfig.getRepositoryTargetPrivileges();
+        List<CPrivilege> secPrivs = securityConfig.getPrivileges();
 
-        for ( Iterator<CRepoTargetPrivilege> iter = secPrivs.iterator(); iter.hasNext(); )
+        for ( Iterator<CPrivilege> iter = secPrivs.iterator(); iter.hasNext(); )
         {
-            CRepoTargetPrivilege cPriv = iter.next();
+            CPrivilege cPriv = iter.next();
 
             if ( privilegeName.equals( cPriv.getName() ) )
-            {
-                return cPriv;
-            }
-        }
-        return null;
-    }
-
-    @SuppressWarnings( "unchecked" )
-    public static CApplicationPrivilege getCApplicationPrivilege( String privilegeId )
-        throws IOException
-    {
-        Configuration securityConfig = getSecurityConfig();
-        List<CApplicationPrivilege> secPrivs = securityConfig.getApplicationPrivileges();
-
-        for ( Iterator<CApplicationPrivilege> iter = secPrivs.iterator(); iter.hasNext(); )
-        {
-            CApplicationPrivilege cPriv = iter.next();
-
-            if ( privilegeId.equals( cPriv.getId() ) )
             {
                 return cPriv;
             }
@@ -211,7 +218,7 @@ public class SecurityConfigUtil
         {
             CUser cUser = iter.next();
 
-            if ( userId.equals( cUser.getUserId() ) )
+            if ( userId.equals( cUser.getId() ) )
             {
                 return cUser;
             }
@@ -235,7 +242,7 @@ public class SecurityConfigUtil
 
         try
         {
-            NexusSecurityConfigurationXpp3Reader reader = new NexusSecurityConfigurationXpp3Reader();
+            SecurityConfigurationXpp3Reader reader = new SecurityConfigurationXpp3Reader();
 
             fr = new InputStreamReader( new FileInputStream( secConfigFile ) );
 

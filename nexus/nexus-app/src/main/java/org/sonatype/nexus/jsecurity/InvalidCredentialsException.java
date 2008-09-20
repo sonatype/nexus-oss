@@ -18,21 +18,21 @@
  * along with this program.  If not, see http://www.gnu.org/licenses/.
  *
  */
-package org.sonatype.nexus.configuration.security;
+package org.sonatype.nexus.jsecurity;
 
 /**
- * Thrown if the specifically requested privilege does not exists.
+ * Thrown if the password isn't correct on reset password
  * 
  * @author cstamas
  */
-public class NoSuchPrivilegeException
+public class InvalidCredentialsException
     extends Exception
 {
 
-    private static final long serialVersionUID = 299346943304055394L;
-
-    public NoSuchPrivilegeException( String privilegeId )
+    private static final long serialVersionUID = 294536984704055394L;
+    
+    public InvalidCredentialsException()
     {
-        super( "Privilege with id='" + privilegeId + "' not found!" );
+        super( "Invalid credentials supplied!" );
     }
 }

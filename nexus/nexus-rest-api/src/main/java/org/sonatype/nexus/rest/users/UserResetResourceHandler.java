@@ -1,13 +1,12 @@
 package org.sonatype.nexus.rest.users;
 
-import java.io.IOException;
 import java.util.logging.Level;
 
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.data.Status;
-import org.sonatype.nexus.configuration.security.NoSuchUserException;
+import org.sonatype.jsecurity.realms.tools.NoSuchUserException;
 
 public class UserResetResourceHandler
     extends AbstractUserResourceHandler
@@ -39,7 +38,7 @@ public class UserResetResourceHandler
         {
             if ( !isAnonymousUser( getUserId() ) )
             {
-                getNexusSecurityConfiguration().resetPassword( getUserId() );
+                getNexusSecurity().resetPassword( getUserId() );
                 
                 getResponse().setStatus( Status.SUCCESS_NO_CONTENT );
             }
@@ -49,12 +48,6 @@ public class UserResetResourceHandler
 
                 getLogger().log( Level.FINE, "Anonymous user password reset is blocked!" );
             }
-        }
-        catch ( IOException e )
-        {
-            getResponse().setStatus( Status.SERVER_ERROR_INTERNAL );
-
-            getLogger().log( Level.SEVERE, "Got IO Exception!", e );
         }
         catch ( NoSuchUserException e )
         {

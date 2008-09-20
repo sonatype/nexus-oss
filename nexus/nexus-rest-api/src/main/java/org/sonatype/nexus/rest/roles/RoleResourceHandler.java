@@ -20,18 +20,15 @@
  */
 package org.sonatype.nexus.rest.roles;
 
-import java.io.IOException;
-import java.util.logging.Level;
-
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.restlet.resource.Representation;
 import org.restlet.resource.Variant;
-import org.sonatype.nexus.configuration.ConfigurationException;
-import org.sonatype.nexus.configuration.security.NoSuchRoleException;
-import org.sonatype.nexus.configuration.security.model.CRole;
+import org.sonatype.jsecurity.model.CRole;
+import org.sonatype.jsecurity.realms.tools.InvalidConfigurationException;
+import org.sonatype.jsecurity.realms.tools.NoSuchRoleException;
 import org.sonatype.nexus.rest.model.RoleResource;
 import org.sonatype.nexus.rest.model.RoleResourceRequest;
 import org.sonatype.nexus.rest.model.RoleResourceResponse;
@@ -77,7 +74,7 @@ public class RoleResourceHandler
         
         try
         {
-            response.setData( nexusToRestModel( getNexusSecurityConfiguration().readRole( getRoleId() ) ) );
+            response.setData( nexusToRestModel( getNexusSecurity().readRole( getRoleId() ) ) );
             
             return serialize( variant, response );
         }
@@ -114,9 +111,9 @@ public class RoleResourceHandler
             
             try
             {
-                CRole role = restToNexusModel( getNexusSecurityConfiguration().readRole( resource.getId() ), resource );
+                CRole role = restToNexusModel( getNexusSecurity().readRole( resource.getId() ), resource );
                 
-                getNexusSecurityConfiguration().updateRole( role );
+                getNexusSecurity().updateRole( role );
                 
                 RoleResourceResponse response = new RoleResourceResponse();
                 
@@ -130,15 +127,9 @@ public class RoleResourceHandler
             {
                 getResponse().setStatus( Status.CLIENT_ERROR_NOT_FOUND, e.getMessage() );
             }
-            catch ( ConfigurationException e )
+            catch ( InvalidConfigurationException e )
             {
-                handleConfigurationException( e, representation );
-            }
-            catch ( IOException e )
-            {
-                getResponse().setStatus( Status.SERVER_ERROR_INTERNAL );
-
-                getLogger().log( Level.SEVERE, "Got IO Exception!", e );
+                handleInvalidConfigurationException( e, representation );
             }
         }
     }
@@ -158,19 +149,13 @@ public class RoleResourceHandler
     {
         try
         {            
-            getNexusSecurityConfiguration().deleteRole( getRoleId() );
+            getNexusSecurity().deleteRole( getRoleId() );
             
             getResponse().setStatus( Status.SUCCESS_NO_CONTENT );
         }
         catch ( NoSuchRoleException e )
         {
             getResponse().setStatus( Status.CLIENT_ERROR_NOT_FOUND, e.getMessage() );
-        }
-        catch ( IOException e )
-        {
-            getResponse().setStatus( Status.SERVER_ERROR_INTERNAL );
-
-            getLogger().log( Level.SEVERE, "Got IO Exception!", e );
         }
     }
 
