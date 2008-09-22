@@ -40,7 +40,7 @@ public class NexusTargetRealm
             
             if ( !privilege.getType().equals( PRIVILEGE_TYPE_TARGET ) )
             {
-                return super.getPermissions( privilegeId );
+                return Collections.emptySet();
             }
             
             String repositoryTarget = getConfigurationManager().getPrivilegeProperty( privilege, PRIVILEGE_PROPERTY_REPOSITORY_TARGET );
