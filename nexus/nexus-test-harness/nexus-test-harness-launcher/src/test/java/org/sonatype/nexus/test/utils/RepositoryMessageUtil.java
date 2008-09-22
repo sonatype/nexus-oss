@@ -93,7 +93,15 @@ public class RepositoryMessageUtil
         Assert.assertEquals( repo.getFormat(), responseResource.getFormat() );
         Assert.assertEquals( repo.getNotFoundCacheTTL(), responseResource.getNotFoundCacheTTL() );
         Assert.assertEquals( repo.getOverrideLocalStorageUrl(), responseResource.getOverrideLocalStorageUrl() );
-        Assert.assertEquals( repo.getRemoteStorage(), responseResource.getRemoteStorage() );
+        
+        if( repo.getRemoteStorage() == null )
+        {
+            Assert.assertNull( responseResource.getRemoteStorage() );
+        }
+        else
+        {
+            Assert.assertEquals( repo.getRemoteStorage().getRemoteStorageUrl(), responseResource.getRemoteStorage().getRemoteStorageUrl() );   
+        }
         Assert.assertEquals( repo.getRepoPolicy(), responseResource.getRepoPolicy() );
         Assert.assertEquals( repo.getRepoType(), responseResource.getRepoType() );
 
@@ -215,7 +223,16 @@ public class RepositoryMessageUtil
         Assert.assertEquals( repo.getFormat(), cRepo.getType() );
         Assert.assertEquals( repo.getNotFoundCacheTTL(), cRepo.getNotFoundCacheTTL() );
         Assert.assertEquals( repo.getOverrideLocalStorageUrl(), cRepo.getLocalStorage() );
-        Assert.assertEquals( repo.getRemoteStorage(), cRepo.getRemoteStorage() );
+        
+        if( repo.getRemoteStorage() == null )
+        {
+            Assert.assertNull( cRepo.getRemoteStorage() );
+        }
+        else
+        {
+            Assert.assertEquals( repo.getRemoteStorage().getRemoteStorageUrl(), cRepo.getRemoteStorage().getUrl() );   
+        }
+        
         Assert.assertEquals( repo.getRepoPolicy(), cRepo.getRepositoryPolicy() );
 
         // TODO: allow for shadow repos

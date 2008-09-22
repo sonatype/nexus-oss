@@ -108,6 +108,7 @@ import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.nexus.store.DefaultEntry;
 import org.sonatype.nexus.store.Entry;
 import org.sonatype.nexus.store.Store;
+import org.sonatype.nexus.tasks.ReindexTask;
 import org.sonatype.nexus.tasks.SynchronizeShadowsTask;
 import org.sonatype.scheduling.NoSuchTaskException;
 import org.sonatype.scheduling.ScheduledTask;
@@ -510,6 +511,15 @@ public class DefaultNexus
         try
         {
             indexerManager.setRepositoryIndexContextSearchable( settings.getId(), settings.isIndexable() );
+
+            // create the initial index
+            if ( settings.isIndexable() )
+            {
+                // Create the initial index for the repository
+                ReindexTask rt = (ReindexTask) nexusScheduler.createTaskInstance( ReindexTask.HINT );
+                rt.setRepositoryId( settings.getId() );
+                nexusScheduler.submit( "Create initial index.", rt );
+            }
         }
         catch ( NoSuchRepositoryException e )
         {
@@ -528,9 +538,21 @@ public class DefaultNexus
             ConfigurationException,
             IOException
     {
+        // check current settings for download Index
+        boolean previousDownloadRemoteIndexes = this.readRepository( settings.getId() ).isDownloadRemoteIndexes();
+
         nexusConfiguration.updateRepository( settings );
 
         indexerManager.setRepositoryIndexContextSearchable( settings.getId(), settings.isIndexable() );
+
+        // create the initial index
+        if ( !previousDownloadRemoteIndexes && settings.isDownloadRemoteIndexes() )
+        {
+            // Create the initial index for the repository
+            ReindexTask rt = (ReindexTask) nexusScheduler.createTaskInstance( ReindexTask.HINT );
+            rt.setRepositoryId( settings.getId() );
+            nexusScheduler.submit( "Download remote index enabled.", rt );
+        }
     }
 
     public void deleteRepository( String id )
@@ -1595,7 +1617,7 @@ public class DefaultNexus
             if ( shadow.isSyncAtStartup() )
             {
                 SynchronizeShadowsTask task = (SynchronizeShadowsTask) nexusScheduler
-                    .createTaskInstance( SynchronizeShadowsTask.class );
+                    .createTaskInstance( SynchronizeShadowsTask.HINT );
 
                 task.setShadowRepositoryId( shadow.getId() );
 
