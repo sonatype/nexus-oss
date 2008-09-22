@@ -2,6 +2,7 @@ package org.sonatype.nexus.jsecurity.realms;
 
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
+import org.jsecurity.authc.AuthenticationToken;
 import org.sonatype.jsecurity.realms.MethodRealm;
 import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
 import org.sonatype.nexus.jsecurity.NexusSecurity;
@@ -28,5 +29,11 @@ public abstract class AbstractNexusRealm
     public void onConfigurationChange( ConfigurationChangeEvent evt )
     {
         this.clearCache();
+    }
+    
+    @Override
+    public boolean supports( AuthenticationToken token )
+    {
+        return false;
     }
 }

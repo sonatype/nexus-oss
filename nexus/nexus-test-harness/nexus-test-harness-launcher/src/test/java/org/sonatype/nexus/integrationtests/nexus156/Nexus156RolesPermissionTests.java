@@ -144,7 +144,7 @@ public class Nexus156RolesPermissionTests extends AbstractPrivilegeTest
         TestContainer.getInstance().getTestContext().setUsername( "test-user" );
         TestContainer.getInstance().getTestContext().setPassword( "admin123" );
 
-        response = this.roleUtil.sendMessage( Method.GET, role );
+        response = this.roleUtil.sendMessage( Method.PUT, role );
         Assert.assertEquals( "Response status: ", 401, response.getStatus().getCode() );
 
         // use admin

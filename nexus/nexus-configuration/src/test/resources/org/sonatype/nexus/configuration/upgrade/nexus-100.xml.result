@@ -5,6 +5,8 @@
     <enabled>true</enabled>
     <anonymousAccessEnabled>true</anonymousAccessEnabled>
     <realms>
+      <realm>SecurityXmlRealm</realm>
+      <realm>NexusMethodRealm</realm>
       <realm>NexusTargetRealm</realm>
     </realms>
   </security>

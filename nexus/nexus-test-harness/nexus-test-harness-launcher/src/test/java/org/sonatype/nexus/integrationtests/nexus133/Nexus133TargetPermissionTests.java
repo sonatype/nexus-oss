@@ -133,7 +133,7 @@ public class Nexus133TargetPermissionTests
 
         // update user
         target.setName( "tesUpdatePermission2" );
-        response = this.targetUtil.sendMessage( Method.GET, target );
+        response = this.targetUtil.sendMessage( Method.PUT, target );
         Assert.assertEquals( "Response status: ", 401, response.getStatus().getCode() );
 
         // use admin

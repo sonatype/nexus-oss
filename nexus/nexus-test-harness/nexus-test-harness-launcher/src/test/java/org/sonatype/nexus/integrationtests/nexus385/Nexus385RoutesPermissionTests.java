@@ -141,7 +141,7 @@ public class Nexus385RoutesPermissionTests extends AbstractPrivilegeTest
         TestContainer.getInstance().getTestContext().setUsername( "test-user" );
         TestContainer.getInstance().getTestContext().setPassword( "admin123" );
 
-        response = this.routeUtil.sendMessage( Method.GET, route );
+        response = this.routeUtil.sendMessage( Method.PUT, route );
         Assert.assertEquals( "Response status: ", 401, response.getStatus().getCode() );
 
         // use admin

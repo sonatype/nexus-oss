@@ -106,7 +106,8 @@ public class NexusInstanceFilter
         {
             return (SecurityManager) PlexusRestletUtils.plexusLookup(
                 getContext(),
-                PlexusSecurity.class.getName() );
+                PlexusSecurity.class.getName(),
+                "web" );
         }
         catch ( ComponentLookupException e )
         {

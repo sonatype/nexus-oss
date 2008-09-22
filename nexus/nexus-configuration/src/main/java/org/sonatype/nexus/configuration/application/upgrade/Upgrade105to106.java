@@ -322,8 +322,11 @@ public class Upgrade105to106
             security.setAnonymousPassword( oldsecurity.getAnonymousPassword() );
             security.setAnonymousUsername( oldsecurity.getAnonymousUsername() );
             security.setEnabled( oldsecurity.isEnabled() );
-            security.addRealm( "NexusTargetRealm" );
         }
+        
+        security.addRealm( "SecurityXmlRealm" );
+        security.addRealm( "NexusMethodRealm" );
+        security.addRealm( "NexusTargetRealm" );
 
         return security;
     }

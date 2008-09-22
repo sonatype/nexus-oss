@@ -146,7 +146,7 @@ public class Nexus532GroupCrudPermissionTests
 
         // update repo
         group.setName( "tesUpdatePermission2" );
-        response = this.groupUtil.sendMessage( Method.GET, group );
+        response = this.groupUtil.sendMessage( Method.PUT, group );
         Assert.assertEquals( "Response status: ", 401, response.getStatus().getCode() );
 
         // use admin

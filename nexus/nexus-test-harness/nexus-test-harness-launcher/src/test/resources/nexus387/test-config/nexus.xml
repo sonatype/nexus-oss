@@ -8,6 +8,8 @@
     <anonymousUsername>anonymous</anonymousUsername>
 	<anonymousPassword>anonymous</anonymousPassword> 
     <realms>
+      <realm>SecurityXmlRealm</realm>
+      <realm>NexusMethodRealm</realm>
       <realm>NexusTargetRealm</realm>
     </realms>
   </security>

@@ -142,7 +142,7 @@ public class Nexus531RepositoryCrudPermissionTests extends AbstractPrivilegeTest
 
         // update repo
         repo.setName( "tesUpdatePermission2" );
-        response = this.repoUtil.sendMessage( Method.GET, repo );
+        response = this.repoUtil.sendMessage( Method.PUT, repo );
         Assert.assertEquals( "Response status: ", 401, response.getStatus().getCode() );
 
         // use admin
