@@ -121,6 +121,13 @@ public class FileUtils
             {
                 roots.add( listedRoots[i] );
             }   
+            
+            // Allow UNC based paths on windows
+            // i.e. \\someserver\repository\central\blah
+            if ( isWindows() )
+            {
+                roots.add( new File("\\\\") );
+            }
         }
         
         File root = file;
@@ -131,5 +138,10 @@ public class FileUtils
         }
         
         return roots.contains( root );
+    }
+    
+    public static boolean isWindows()
+    {
+        return System.getProperty( "os.name" ).indexOf( "Windows" ) != -1;
     }
 }
