@@ -18,6 +18,7 @@ package org.sonatype.plexus.rest.xstream.json;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.Collection;
+import java.util.Date;
 
 import org.json.JSONException;
 import org.json.JSONWriter;
@@ -96,7 +97,7 @@ public class JsonOrgHierarchicalStreamWriter
                 jsonWriter.key( name );
             }
 
-            // OBJECT, ARRAY, NUMBER, STRING, BOOLEAN
+            // OBJECT, ARRAY, NUMBER, STRING, BOOLEAN, DATE
             if ( clazz == null )
             {
                 jsonWriter.value( null );
@@ -123,6 +124,11 @@ public class JsonOrgHierarchicalStreamWriter
             {
                 // string
                 nt = NodeType.STRING;
+            }
+            else if( Date.class.isAssignableFrom( clazz ))
+            {
+                // date
+                nt = NodeType.DATE;
             }
             else
             {
@@ -165,6 +171,9 @@ public class JsonOrgHierarchicalStreamWriter
                     break;
                 case BOOLEAN:
                     jsonWriter.value( Boolean.parseBoolean( text ) );
+                    break;
+                case DATE:
+                    jsonWriter.value( text );
                     break;
             }
         }

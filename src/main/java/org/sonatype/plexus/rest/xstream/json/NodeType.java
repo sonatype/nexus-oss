@@ -23,5 +23,5 @@ package org.sonatype.plexus.rest.xstream.json;
  */
 public enum NodeType
 {
-    OBJECT, ARRAY, NUMBER, STRING, BOOLEAN
+    OBJECT, ARRAY, NUMBER, STRING, BOOLEAN, DATE
 }

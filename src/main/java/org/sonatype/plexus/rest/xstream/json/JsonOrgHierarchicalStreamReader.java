@@ -19,6 +19,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
@@ -221,6 +222,14 @@ public class JsonOrgHierarchicalStreamReader
                 values = new ArrayValuesIterator( (JSONArray) object );
                 attributes = null;
             }
+            else if (object.getClass().isAssignableFrom( Date.class ))
+            {
+                nodeType = NodeType.DATE;
+                valueNull = false;
+                keys = null;
+                values = null;
+                attributes = null;
+            }
             else
             {
                 nodeType = NodeType.OBJECT;
@@ -395,6 +404,8 @@ public class JsonOrgHierarchicalStreamReader
                     return "boolean";
                 case ARRAY:
                     return null;
+                case DATE:
+                    return "date";
                 default:
                     Object obj = ( (JSONObject) currentNode.jsonObject ).opt( "@class" );
                     if ( obj != null )
