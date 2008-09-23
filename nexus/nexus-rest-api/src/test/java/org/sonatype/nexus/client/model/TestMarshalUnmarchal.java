@@ -129,7 +129,7 @@ public class TestMarshalUnmarchal
         error.setMsg( "Error Message" );
         errorResponse.addError( error );
 
-        this.marshalUnmarchalThenCompare( errorResponse, xstreamXML );
+        this.marshalUnmarchalThenCompare( errorResponse );
         
 //        System.out.println( "JSON:\n" + this.xstreamJSON.toXML( errorResponse ));
 //        System.out.println( "XML:\n" + this.xstreamXML.toXML( errorResponse ));
@@ -171,7 +171,7 @@ public class TestMarshalUnmarchal
         responseResponse.addData( resource1 );
         responseResponse.addData( resource2 );
 
-        this.marshalUnmarchalThenCompare( responseResponse, xstreamXML );
+        this.marshalUnmarchalThenCompare( responseResponse, this.xstreamXML ); //FIXME: JSON READER CANNOT PARSE DATES CORRECTLY.
         this.validateXmlHasNoPackageNames( responseResponse );
 
     }
@@ -195,7 +195,7 @@ public class TestMarshalUnmarchal
         RepositoryResourceResponse resourceResponse = new RepositoryResourceResponse();
         resourceResponse.setData( repo );
 
-        this.marshalUnmarchalThenCompare( resourceResponse, xstreamXML );
+        this.marshalUnmarchalThenCompare( resourceResponse );
         // this.marshalUnmarchalThenCompare( resourceResponse, xstreamJSON );
         this.validateXmlHasNoPackageNames( resourceResponse );
     }
@@ -214,7 +214,7 @@ public class TestMarshalUnmarchal
         RepositoryResourceResponse resourceResponse = new RepositoryResourceResponse();
         resourceResponse.setData( repo );
 
-        this.marshalUnmarchalThenCompare( resourceResponse, xstreamXML );
+        this.marshalUnmarchalThenCompare( resourceResponse );
         this.validateXmlHasNoPackageNames( resourceResponse );
     }
 
@@ -239,7 +239,7 @@ public class TestMarshalUnmarchal
         RepositoryResourceResponse resourceResponse = new RepositoryResourceResponse();
         resourceResponse.setData( repo );
 
-        this.marshalUnmarchalThenCompare( resourceResponse, xstreamXML );
+        this.marshalUnmarchalThenCompare( resourceResponse );
         this.validateXmlHasNoPackageNames( resourceResponse );
     }
 
@@ -269,7 +269,7 @@ public class TestMarshalUnmarchal
         listResource2.setResourceURI( "resourceURI2" );
         listResourceResponse.addData( listResource2 );
 
-        this.marshalUnmarchalThenCompare( listResourceResponse, xstreamXML );
+        this.marshalUnmarchalThenCompare( listResourceResponse );
         this.validateXmlHasNoPackageNames( listResourceResponse );
     }
 
@@ -287,7 +287,7 @@ public class TestMarshalUnmarchal
 
         resourceResponse.setData( resource );
 
-        this.marshalUnmarchalThenCompare( resourceResponse, xstreamXML );
+        this.marshalUnmarchalThenCompare( resourceResponse );
         this.validateXmlHasNoPackageNames( resourceResponse );      
     }
 
@@ -332,7 +332,7 @@ public class TestMarshalUnmarchal
         resourceResponse.addData( listResource1 );
         resourceResponse.addData( listResource2 );
 
-        this.marshalUnmarchalThenCompare( resourceResponse, xstreamXML );
+        this.marshalUnmarchalThenCompare( resourceResponse );
         this.validateXmlHasNoPackageNames( resourceResponse );
     }
 
@@ -354,7 +354,7 @@ public class TestMarshalUnmarchal
 
         resourceResponse.setData( metaResource );
 
-        this.marshalUnmarchalThenCompare( resourceResponse, xstreamXML );
+        this.marshalUnmarchalThenCompare( resourceResponse, this.xstreamXML ); //FIXME: Need some sort of type map, for the json reader to figure out if some fields are longs not ints.
         this.validateXmlHasNoPackageNames( resourceResponse );
     }
 
@@ -395,7 +395,7 @@ public class TestMarshalUnmarchal
         resourceResponse.addData( listItem1 );
         resourceResponse.addData( listItem2 );
 
-        this.marshalUnmarchalThenCompare( resourceResponse, xstreamXML );
+        this.marshalUnmarchalThenCompare( resourceResponse );
         this.validateXmlHasNoPackageNames( resourceResponse );
     }
 
@@ -421,7 +421,7 @@ public class TestMarshalUnmarchal
 
         resourceResponse.setData( groupResource );
 
-        this.marshalUnmarchalThenCompare( resourceResponse, xstreamXML );
+        this.marshalUnmarchalThenCompare( resourceResponse );
         this.validateXmlHasNoPackageNames( resourceResponse );
     }
 
@@ -462,7 +462,7 @@ public class TestMarshalUnmarchal
         resourceResponse.addData( item1 );
         resourceResponse.addData( item2 );
 
-        this.marshalUnmarchalThenCompare( resourceResponse, xstreamXML );
+        this.marshalUnmarchalThenCompare( resourceResponse );
         this.validateXmlHasNoPackageNames( resourceResponse );
 
     }
@@ -484,14 +484,14 @@ public class TestMarshalUnmarchal
         resource.addRepository( memberRepository1 );
 
         RepositoryRouteMemberRepository memberRepository2 = new RepositoryRouteMemberRepository();
-        memberRepository1.setId( "member2" );
-        memberRepository1.setName( "memberRepository2" );
-        memberRepository1.setResourceURI( "memberRepositoryURI2" );
+        memberRepository2.setId( "member2" );
+        memberRepository2.setName( "memberRepository2" );
+        memberRepository2.setResourceURI( "memberRepositoryURI2" );
         resource.addRepository( memberRepository2 );
 
         resourceResponse.setData( resource );
 
-        this.marshalUnmarchalThenCompare( resourceResponse, xstreamXML );
+        this.marshalUnmarchalThenCompare( resourceResponse );
         this.validateXmlHasNoPackageNames( resourceResponse );
     }
 
@@ -510,7 +510,7 @@ public class TestMarshalUnmarchal
         resourceResponse.addData( resource1 );
         resourceResponse.addData( resource2 );
 
-        this.marshalUnmarchalThenCompare( resourceResponse, xstreamXML );
+        this.marshalUnmarchalThenCompare( resourceResponse );
         this.validateXmlHasNoPackageNames( resourceResponse );
     }
 
@@ -557,7 +557,7 @@ public class TestMarshalUnmarchal
 
         resourceResponse.setData( resource );
 
-        this.marshalUnmarchalThenCompare( resourceResponse, xstreamXML );
+        this.marshalUnmarchalThenCompare( resourceResponse );
         this.validateXmlHasNoPackageNames( resourceResponse );
     }
 
@@ -571,7 +571,7 @@ public class TestMarshalUnmarchal
 
         resourceResponse.setData( resource );
 
-        this.marshalUnmarchalThenCompare( resourceResponse, xstreamXML );
+        this.marshalUnmarchalThenCompare( resourceResponse, this.xstreamXML ); //FIXME: Need some sort of type map, for the json reader to figure out if some fields are longs not ints.
         this.validateXmlHasNoPackageNames( resourceResponse );
     }
 
@@ -594,7 +594,7 @@ public class TestMarshalUnmarchal
         resourceResponse.addData( item1 );
         resourceResponse.addData( item2 );
 
-        this.marshalUnmarchalThenCompare( resourceResponse, xstreamXML );
+        this.marshalUnmarchalThenCompare( resourceResponse, this.xstreamXML ); //FIXME: Need some sort of type map, for the json reader to figure out if some fields are longs not ints.
         this.validateXmlHasNoPackageNames( resourceResponse );
     }
 
@@ -613,7 +613,7 @@ public class TestMarshalUnmarchal
         resourceResponse.addData( item1 );
         resourceResponse.addData( item2 );
 
-        this.marshalUnmarchalThenCompare( resourceResponse, xstreamXML );
+        this.marshalUnmarchalThenCompare( resourceResponse );
         this.validateXmlHasNoPackageNames( resourceResponse );
     }
 
@@ -632,7 +632,7 @@ public class TestMarshalUnmarchal
         resourceResponse.addData( item1 );
         resourceResponse.addData( item2 );
 
-        this.marshalUnmarchalThenCompare( resourceResponse, xstreamXML );
+        this.marshalUnmarchalThenCompare( resourceResponse );
         this.validateXmlHasNoPackageNames( resourceResponse );
     }
 
@@ -665,7 +665,7 @@ public class TestMarshalUnmarchal
         artifact2.setVersion( "version1" );
         response.addData( artifact2 );
 
-        this.marshalUnmarchalThenCompare( response, xstreamXML );
+        this.marshalUnmarchalThenCompare( response );
         this.validateXmlHasNoPackageNames( response );
     }
 
@@ -681,7 +681,7 @@ public class TestMarshalUnmarchal
         artifact1.setResourceURI( "resourceURI1" );
         artifact1.setVersion( "version1" );
 
-        this.marshalUnmarchalThenCompare( artifact1, xstreamXML );
+        this.marshalUnmarchalThenCompare( artifact1 );
         this.validateXmlHasNoPackageNames( artifact1 );
     }
 
@@ -724,7 +724,7 @@ public class TestMarshalUnmarchal
         loginResource.setClientPermissions( perms );
         resourceResponse.setData( loginResource );
 
-        this.marshalUnmarchalThenCompare( resourceResponse, xstreamXML );
+        this.marshalUnmarchalThenCompare( resourceResponse );
         this.validateXmlHasNoPackageNames( resourceResponse );
     }
 
@@ -791,10 +791,8 @@ public class TestMarshalUnmarchal
 
         resourceResponse.setData( status );
 
-        this.marshalUnmarchalThenCompare( resourceResponse, xstreamXML );
+        this.marshalUnmarchalThenCompare( resourceResponse, this.xstreamXML ); //FIXME: JSON READER CANNOT PARSE DATES CORRECTLY.
         this.validateXmlHasNoPackageNames( resourceResponse );
-
-//        System.out.println( "json:\n"+ this.xstreamJSON.toXML( resourceResponse ));
     }
 
     public void testScheduledServiceListResourceResponse()
@@ -831,7 +829,7 @@ public class TestMarshalUnmarchal
         item2.setTypeName( "typeName2" );
         resourceResponse.addData( item2 );
 
-        this.marshalUnmarchalThenCompare( resourceResponse, xstreamXML );
+        this.marshalUnmarchalThenCompare( resourceResponse );
         this.validateXmlHasNoPackageNames( resourceResponse );
     }
 
@@ -858,8 +856,9 @@ public class TestMarshalUnmarchal
         ScheduledServiceResourceResponse resourceResponse = new ScheduledServiceResourceResponse();
         resourceResponse.setData( resource );
 
-        this.marshalUnmarchalThenCompare( resourceResponse, xstreamXML );
+        this.marshalUnmarchalThenCompare( resourceResponse );
         this.validateXmlHasNoPackageNames( resourceResponse );
+       
     }
     
     public void testScheduledServiceOnceResource()
@@ -886,7 +885,7 @@ public class TestMarshalUnmarchal
         ScheduledServiceResourceResponse resourceResponse = new ScheduledServiceResourceResponse();
         resourceResponse.setData( resource );
 
-        this.marshalUnmarchalThenCompare( resourceResponse, xstreamXML );
+        this.marshalUnmarchalThenCompare( resourceResponse );
         this.validateXmlHasNoPackageNames( resourceResponse );
     }
 
@@ -914,7 +913,7 @@ public class TestMarshalUnmarchal
         ScheduledServiceResourceResponse resourceResponse = new ScheduledServiceResourceResponse();
         resourceResponse.setData( resource );
 
-        this.marshalUnmarchalThenCompare( resourceResponse, xstreamXML );
+        this.marshalUnmarchalThenCompare( resourceResponse );
         this.validateXmlHasNoPackageNames( resourceResponse );
     }
 
@@ -941,7 +940,7 @@ public class TestMarshalUnmarchal
         ScheduledServiceResourceResponse resourceResponse = new ScheduledServiceResourceResponse();
         resourceResponse.setData( resource );
 
-        this.marshalUnmarchalThenCompare( resourceResponse, xstreamXML );
+        this.marshalUnmarchalThenCompare( resourceResponse );
         this.validateXmlHasNoPackageNames( resourceResponse );
     }
 
@@ -970,7 +969,7 @@ public class TestMarshalUnmarchal
         ScheduledServiceResourceResponse resourceResponse = new ScheduledServiceResourceResponse();
         resourceResponse.setData( resource );
 
-        this.marshalUnmarchalThenCompare( resourceResponse, xstreamXML );
+        this.marshalUnmarchalThenCompare( resourceResponse );
         this.validateXmlHasNoPackageNames( resourceResponse );
     }
 
@@ -999,7 +998,7 @@ public class TestMarshalUnmarchal
         ScheduledServiceResourceResponse resourceResponse = new ScheduledServiceResourceResponse();
         resourceResponse.setData( resource );
 
-        this.marshalUnmarchalThenCompare( resourceResponse, xstreamXML );
+        this.marshalUnmarchalThenCompare( resourceResponse );
         this.validateXmlHasNoPackageNames( resourceResponse );
     }
 
@@ -1050,7 +1049,7 @@ public class TestMarshalUnmarchal
         resourceResponse.addData( item1 );
         resourceResponse.addData( item2 );
 
-        this.marshalUnmarchalThenCompare( resourceResponse, xstreamXML );
+        this.marshalUnmarchalThenCompare( resourceResponse );
         this.validateXmlHasNoPackageNames( resourceResponse );
     }
 
@@ -1078,7 +1077,7 @@ public class TestMarshalUnmarchal
         user2.addRole( "role4" );
         resourceResponse.addData( user2 );
 
-        this.marshalUnmarchalThenCompare( resourceResponse, xstreamXML );
+        this.marshalUnmarchalThenCompare( resourceResponse );
         this.validateXmlHasNoPackageNames( resourceResponse );
 
     }
@@ -1097,7 +1096,7 @@ public class TestMarshalUnmarchal
         user1.addRole( "role2" );
         resourceRequest.setData( user1 );
 
-        this.marshalUnmarchalThenCompare( resourceRequest, xstreamXML );
+        this.marshalUnmarchalThenCompare( resourceRequest );
         this.validateXmlHasNoPackageNames( resourceRequest );
     }
 
@@ -1115,7 +1114,7 @@ public class TestMarshalUnmarchal
         user1.addRole( "role2" );
         resourceResponse.setData( user1 );
 
-        this.marshalUnmarchalThenCompare( resourceResponse, xstreamXML );
+        this.marshalUnmarchalThenCompare( resourceResponse );
         this.validateXmlHasNoPackageNames( resourceResponse );
     }
 
@@ -1129,7 +1128,7 @@ public class TestMarshalUnmarchal
 
         request.setData( resource );
 
-        this.marshalUnmarchalThenCompare( request, xstreamXML );
+        this.marshalUnmarchalThenCompare( request );
         this.validateXmlHasNoPackageNames( request );
     }
 
@@ -1144,7 +1143,7 @@ public class TestMarshalUnmarchal
 
         request.setData( resource );
 
-        this.marshalUnmarchalThenCompare( request, xstreamXML );
+        this.marshalUnmarchalThenCompare( request );
         this.validateXmlHasNoPackageNames( request );
     }
 
@@ -1176,7 +1175,7 @@ public class TestMarshalUnmarchal
         item2.setDescription( "Description2" );
         resourceResponse.addData( item2 );
 
-        this.marshalUnmarchalThenCompare( resourceResponse, xstreamXML );
+        this.marshalUnmarchalThenCompare( resourceResponse );
         this.validateXmlHasNoPackageNames( resourceResponse );
     }
 
@@ -1196,7 +1195,7 @@ public class TestMarshalUnmarchal
         item1.setDescription( "Description1" );
         resourceRequest.setData( item1 );
 
-        this.marshalUnmarchalThenCompare( resourceRequest, xstreamXML );
+        this.marshalUnmarchalThenCompare( resourceRequest );
         this.validateXmlHasNoPackageNames( resourceRequest );
     }
 
@@ -1216,7 +1215,7 @@ public class TestMarshalUnmarchal
         item1.setDescription( "Description1" );
         resourceResponse.setData( item1 );
 
-        this.marshalUnmarchalThenCompare( resourceResponse, xstreamXML );
+        this.marshalUnmarchalThenCompare( resourceResponse );
         this.validateXmlHasNoPackageNames( resourceResponse );
     }
 
@@ -1236,7 +1235,7 @@ public class TestMarshalUnmarchal
 
         resourceRequest.setData( resource );
 
-        this.marshalUnmarchalThenCompare( resourceRequest, xstreamXML );
+        this.marshalUnmarchalThenCompare( resourceRequest );
         this.validateXmlHasNoPackageNames( resourceRequest );
     }
 
@@ -1289,7 +1288,7 @@ public class TestMarshalUnmarchal
         resourceResponse.addData( appResource2 );
         resourceResponse.addData( targetResource2 );
 
-        this.marshalUnmarchalThenCompare( resourceResponse, xstreamXML );
+        this.marshalUnmarchalThenCompare( resourceResponse, this.xstreamXML ); //FIXME: list of multiple objects would need a converter
         this.validateXmlHasNoPackageNames( resourceResponse );
     }
 
@@ -1308,7 +1307,7 @@ public class TestMarshalUnmarchal
         PrivilegeStatusResourceResponse resourceResponse = new PrivilegeStatusResourceResponse();
         resourceResponse.setData( appResource1 );
 
-        this.marshalUnmarchalThenCompare( resourceResponse, xstreamXML );
+        this.marshalUnmarchalThenCompare( resourceResponse );
         this.validateXmlHasNoPackageNames( resourceResponse );
     }
 
@@ -1329,7 +1328,7 @@ public class TestMarshalUnmarchal
         PrivilegeStatusResourceResponse resourceResponse = new PrivilegeStatusResourceResponse();
         resourceResponse.setData( targetResource1 );
 
-        this.marshalUnmarchalThenCompare( resourceResponse, xstreamXML );
+        this.marshalUnmarchalThenCompare( resourceResponse );
         this.validateXmlHasNoPackageNames( resourceResponse );
     }
 
@@ -1353,7 +1352,7 @@ public class TestMarshalUnmarchal
 
         resourceResponse.setData( resource );
 
-        this.marshalUnmarchalThenCompare( resourceResponse, xstreamXML );
+        this.marshalUnmarchalThenCompare( resourceResponse );
         this.validateXmlHasNoPackageNames( resourceResponse );
     }
 
@@ -1376,7 +1375,7 @@ public class TestMarshalUnmarchal
         resourceResponse.addData( item1 );
         resourceResponse.addData( item2 );
 
-        this.marshalUnmarchalThenCompare( resourceResponse, xstreamXML );
+        this.marshalUnmarchalThenCompare( resourceResponse );
         this.validateXmlHasNoPackageNames( resourceResponse );
     }
 
@@ -1393,8 +1392,9 @@ public class TestMarshalUnmarchal
         resource.addPattern( "pattern2" );
         resourceResponse.setData( resource );
 
-        this.marshalUnmarchalThenCompare( resourceResponse, xstreamXML );
+        this.marshalUnmarchalThenCompare( resourceResponse );
         this.validateXmlHasNoPackageNames( resourceResponse );
+        
     }
 
     public void testRepositoryContentClassListResourceResponse()
@@ -1412,7 +1412,7 @@ public class TestMarshalUnmarchal
         resourceResponse.addData( item1 );
         resourceResponse.addData( item2 );
 
-        this.marshalUnmarchalThenCompare( resourceResponse, xstreamXML );
+        this.marshalUnmarchalThenCompare( resourceResponse );
         this.validateXmlHasNoPackageNames( resourceResponse );
     }
     
@@ -1451,11 +1451,30 @@ public class TestMarshalUnmarchal
         
 //        System.out.println( "xml:\n"+ this.xstreamXML.toXML( resourceResponse ) );
 
-        this.marshalUnmarchalThenCompare( resourceResponse, xstreamXML );
+        this.marshalUnmarchalThenCompare( resourceResponse );
         this.validateXmlHasNoPackageNames( resourceResponse );
         
     }
     
+    
+    protected void marshalUnmarchalThenCompare( Object obj )
+    {
+        // do xml
+        String xml = this.xstreamXML.toXML( obj );
+        this.compareObjects( obj, xstreamXML.fromXML( xml ) );
+        
+        // do json
+        String json = new StringBuffer( "{ \"" ).append( obj.getClass().getName() ).append( "\" : " ).append( this.xstreamJSON.toXML( obj ) ).append( " }" ).toString();
+        try
+        {
+            this.compareObjects( obj, xstreamJSON.fromXML( json, obj.getClass().newInstance() ) );
+        }
+        catch ( Exception e )
+        {
+            e.printStackTrace();
+           Assert.fail( e.getMessage() +"\nJSON:\n"+ json );
+        }
+    }
     
 
     protected void marshalUnmarchalThenCompare( Object obj, XStream xstream )
@@ -1477,10 +1496,10 @@ public class TestMarshalUnmarchal
         // check the counts
         Assert.assertFalse( "Found package name in XML:\n" + xml, totalCount > 0 );
         
-        // print out each type of method, so i can rafb it
+//        // print out each type of method, so i can rafb it
 //        System.out.println( "\n\nClass: "+ obj.getClass() +"\n" );
 //        System.out.println( xml+"\n" );
-        
+//        
 //        Assert.assertFalse( "Found <string> XML: " + obj.getClass() + "\n" + xml, xml.contains( "<string>" ) );
 
     }

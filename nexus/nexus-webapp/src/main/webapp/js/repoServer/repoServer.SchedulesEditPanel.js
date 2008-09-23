@@ -1951,8 +1951,6 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
         id:item.getName().substring('serviceProperties_'.length),
         value:value
       };
-      //The server is currently requiring this, would definitely be nice to not need to know this in the ui
-      Ext.apply(outputArr[i], {'@class':'scheduled-task-property'});
       i++;
     }, servicePropertiesPanel.getLayout().activeItem);
     
