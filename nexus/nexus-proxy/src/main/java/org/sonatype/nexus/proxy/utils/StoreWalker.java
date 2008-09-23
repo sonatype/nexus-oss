@@ -310,8 +310,11 @@ public abstract class StoreWalker
             {
                 if ( !collectionsOnly && !StorageCollectionItem.class.isAssignableFrom( i.getClass() ) )
                 {
-                    // user may call stop()
-                    processItem( i );
+                    if ( getFilter().shouldProcess( i ) )
+                    {
+                        // user may call stop()
+                        processItem( i );
+                    }
 
                     if ( !running )
                     {

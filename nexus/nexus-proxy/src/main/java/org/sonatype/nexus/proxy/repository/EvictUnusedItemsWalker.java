@@ -55,8 +55,8 @@ public class EvictUnusedItemsWalker
         {
             if ( item.getLastRequested() < getTimestamp() )
             {
-                getRepository().deleteItem( item.getRepositoryItemUid(), item.getItemContext() );
-
+                doDelete( item );
+                
                 getFiles().add( item.getPath() );
             }
         }
@@ -78,6 +78,15 @@ public class EvictUnusedItemsWalker
         {
             getLogger().warn( "Got storage exception while evicting " + item.getRepositoryItemUid().toString(), e );
         }
+    }
+    
+    protected void doDelete( StorageFileItem item ) 
+        throws StorageException, 
+            UnsupportedStorageOperationException, 
+            RepositoryNotAvailableException, 
+            ItemNotFoundException
+    {
+        getRepository().deleteItem( item.getRepositoryItemUid(), item.getItemContext() );
     }
 
     @Override

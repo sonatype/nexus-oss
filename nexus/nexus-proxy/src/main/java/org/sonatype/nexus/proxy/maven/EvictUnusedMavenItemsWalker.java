@@ -5,6 +5,7 @@ import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.RepositoryNotAvailableException;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
+import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.repository.EvictUnusedItemsWalker;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
@@ -21,12 +22,17 @@ public class EvictUnusedMavenItemsWalker
     }
 
     // added filter for maven reposes to exclude .index dirs
+    // and all hash files, as they will be removed if main artifact
+    // is removed
     public class EvictUnusedMavenItemsWalkerFilter
         implements StoreWalkerFilter
     {
         public boolean shouldProcess( StorageItem item )
         {
-            return !item.getPath().startsWith( "/.index" );
+            return !item.getPath().startsWith( "/.index" )
+                && !item.getPath().endsWith( ".asc" )
+                && !item.getPath().endsWith( ".sha1" )
+                && !item.getPath().endsWith( ".md5" );
         }
 
         public boolean shouldProcessRecursively( StorageCollectionItem coll )
@@ -34,6 +40,18 @@ public class EvictUnusedMavenItemsWalker
             // we are "cutting" the .index dir from processing
             return shouldProcess( coll );
         }
+    }
+    
+    @Override
+    protected void doDelete( StorageFileItem item ) 
+        throws StorageException, 
+            UnsupportedStorageOperationException, 
+            RepositoryNotAvailableException, 
+            ItemNotFoundException
+    {
+        MavenRepository repository = ( MavenRepository ) getRepository();
+        
+        repository.deleteItemWithChecksums( item.getRepositoryItemUid(), null );
     }
 
     // on maven repositories, we must use another delete method
