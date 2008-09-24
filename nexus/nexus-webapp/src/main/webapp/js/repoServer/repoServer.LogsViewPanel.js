@@ -189,6 +189,7 @@ Ext.extend(Sonatype.repoServer.LogsViewPanel, Ext.form.FormPanel, {
   logMenuBtnClick : function(resourceURI, contentType, mItem, pressed){
     if ( ! pressed ) return;
     this.currentSize = 0;
+    this.logTextArea.setRawValue('Loading...');
     this.totalSize = mItem.value;
     this.currentContentType = contentType;
     this.getTopToolbar().items.get(2).setText(mItem.text);
@@ -228,7 +229,12 @@ Ext.extend(Sonatype.repoServer.LogsViewPanel, Ext.form.FormPanel, {
     if (success){
       var newValue = this.currentSize == 0 ? response.responseText :
         this.logTextArea.getRawValue() + response.responseText;
+
+      var logDom = this.logTextArea.getEl().dom;
+      var scrollTop = logDom.scrollTop;
       this.logTextArea.setRawValue(newValue);
+      logDom.scrollTop = scrollTop;
+
       this.currentSize += response.responseText.length;
       this.updateTotals();
       this.updateFileList();
