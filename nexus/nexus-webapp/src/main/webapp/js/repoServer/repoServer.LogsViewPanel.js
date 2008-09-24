@@ -28,6 +28,10 @@ Sonatype.repoServer.LogsViewPanel = function(config){
   this.currentContentType = null;
   this.totalSize = 0;
   this.currentSize = 0;
+  this.currentOffset = 0;
+  this.doLoadTail = false;
+  this.tailed = true;
+  this.tailEnabled = true;
   
   this.listeners = {
     'beforerender' : {
@@ -36,6 +40,60 @@ Sonatype.repoServer.LogsViewPanel = function(config){
     }
   };
 
+  this.tailUpdateTask = {
+    run: function() {
+      this.loadTail();
+    },
+    interval: 10000,
+    scope: this,
+    started: false
+  };
+  
+  this.tailUpdateButton = new Ext.SplitButton({
+    text: 'Update Log Tail Manually',
+    icon: Sonatype.config.extPath + '/resources/images/default/grid/refresh.gif',
+    cls: 'x-btn-text-icon',
+    value: '0',
+    handler: this.loadTailButtonHandler,
+    disabled: true,
+    scope: this,
+    menu: {
+      items: [
+        {
+          text: 'Update Log Tail Manually',
+          value: '0',
+          scope: this,
+          handler: this.loadTailButtonHandler
+        },
+        {
+          text: 'Update every 20 seconds',
+          value: '20',
+          scope: this,
+          handler: this.loadTailButtonHandler
+        },
+        {
+          text: 'Update every minute',
+          value: '60',
+          scope: this,
+          handler: this.loadTailButtonHandler
+        },
+        {
+          text: 'Update every 2 minutes',
+          value: '120',
+          scope: this,
+          handler: this.loadTailButtonHandler
+        },
+        {
+          text: 'Update every 5 minutes',
+          value: '300',
+          scope: this,
+          handler: this.loadTailButtonHandler
+        }
+      ]
+    }
+    
+  });
+  
   this.fetchMoreButton = new Ext.SplitButton({
     text: 'Fetch Next 100Kb',
     icon: Sonatype.config.resourcePath + '/images/icons/search.gif',
@@ -43,6 +101,7 @@ Sonatype.repoServer.LogsViewPanel = function(config){
     value: '100',
     handler: this.fetchMore,
     disabled: true,
+    hidden: true,
     scope: this,
     menu: {
       items: [
@@ -66,13 +125,14 @@ Sonatype.repoServer.LogsViewPanel = function(config){
         }
       ]
     }
-    
   });
 
   this.fetchMoreBar = new Ext.Toolbar({
     ctCls: 'search-all-tbar',
     items: [ 
       'Displaying 0 of 0Kb',
+      ' ',
+      this.tailUpdateButton,
       this.fetchMoreButton
     ]
   });
@@ -85,7 +145,7 @@ Sonatype.repoServer.LogsViewPanel = function(config){
     collapsed: false,
     tbar: [
       {
-        text: "Refresh",
+        text: "Reload",
         tooltip: {text:'Reloads the current document'},
         icon: Sonatype.config.resourcePath + '/images/icons/arrow_refresh.png',
         cls: 'x-btn-text-icon',
@@ -124,7 +184,25 @@ Sonatype.repoServer.LogsViewPanel = function(config){
             }
           ]
         }
-      }      
+      },
+      { xtype: 'tbspacer' },
+      ' ',
+      {
+        xtype: 'checkbox',
+        checked: true,
+        listeners: {
+          'check': {
+            fn: function( checkbox, checked ) {
+              this.tailUpdateButton.setVisible( checked );
+              this.fetchMoreButton.setVisible( ! checked );
+              this.tailEnabled = checked;
+              this.fixUpdateTask();
+            },
+            scope: this
+          }
+        }
+      },
+      'Tail'
     ],
     bbar: this.fetchMoreBar,
     items: [
@@ -180,6 +258,11 @@ Ext.extend(Sonatype.repoServer.LogsViewPanel, Ext.form.FormPanel, {
           });
         }
       }
+      
+      if ( this.doUpdateTail ) {
+        this.doUpdateTail = false;
+        this.getLogFile();
+      }
     }
     else {
       Sonatype.MessageBox.alert('Failed to get file list from server.');
@@ -188,18 +271,29 @@ Ext.extend(Sonatype.repoServer.LogsViewPanel, Ext.form.FormPanel, {
   
   logMenuBtnClick : function(resourceURI, contentType, mItem, pressed){
     if ( ! pressed ) return;
+    this.logTextArea.setRawValue('');
     this.currentSize = 0;
-    this.logTextArea.setRawValue('Loading...');
+    this.currentOffset = 0;
     this.totalSize = mItem.value;
     this.currentContentType = contentType;
     this.getTopToolbar().items.get(2).setText(mItem.text);
     this.currentLogUrl = resourceURI;
-    this.getLogFile();
+    this.tailed = this.tailEnabled;
+    
+    if ( this.tailed ) {
+      this.doUpdateTail = true;
+      this.updateFileList();
+    }
+    else {
+      this.getLogFile();
+    }
   },
   
   //gets the log file specified by this.currentLogUrl
   reloadLogFile : function(){
     this.currentSize = 0;
+    this.currentOffset = 0;
+    this.logTextArea.setRawValue('');
     this.getLogFile();
   },
   
@@ -207,16 +301,22 @@ Ext.extend(Sonatype.repoServer.LogsViewPanel, Ext.form.FormPanel, {
   getLogFile : function(){
     //Don't bother refreshing if no files are currently shown
     if (this.currentLogUrl){
-      var toFetch = Number(this.fetchMoreButton.value) * 1024;
+      var toFetch = 0;
+      if ( ! this.tailEnabled ) {
+        toFetch = Number(this.fetchMoreButton.value) * 1024;
+      }
       if ( toFetch == 0 ) {
-        toFetch = this.totalSize - this.currentSize;
+        if ( this.tailed && this.currentOffset == 0 && this.totalSize > 102400 ) { //100Kb
+          this.currentOffset = this.totalSize - 102400;
+        }
+        toFetch = this.totalSize - this.currentOffset;
       }
       Ext.Ajax.request({
         callback: this.renderLog,
         scope: this,
         method: 'GET',
         params: {
-          from: this.currentSize,
+          from: this.currentOffset,
           count: toFetch
         },
         headers: {'accept' : this.currentContentType ? this.currentContentType : 'text/plain'},
@@ -227,15 +327,22 @@ Ext.extend(Sonatype.repoServer.LogsViewPanel, Ext.form.FormPanel, {
   
   renderLog : function(options, success, response){
     if (success){
-      var newValue = this.currentSize == 0 ? response.responseText :
+      var newValue = this.currentSize == 0 ? response.responseText : 
         this.logTextArea.getRawValue() + response.responseText;
 
       var logDom = this.logTextArea.getEl().dom;
       var scrollTop = logDom.scrollTop;
+      var scrollHeight = logDom.scrollHeight;
+      var clientHeight = logDom.clientHeight;
       this.logTextArea.setRawValue(newValue);
+      if ( this.tailEnabled &&
+         ( scrollTop == 0 || scrollTop + clientHeight >= scrollHeight - 20 ) ) {
+        scrollTop = logDom.scrollHeight - clientHeight;
+      }
       logDom.scrollTop = scrollTop;
 
       this.currentSize += response.responseText.length;
+      this.currentOffset += response.responseText.length;
       this.updateTotals();
       this.updateFileList();
     }
@@ -253,16 +360,18 @@ Ext.extend(Sonatype.repoServer.LogsViewPanel, Ext.form.FormPanel, {
   },
   
   updateTotals: function() {
-    if ( this.currentSize == 0 || this.currentSize > this.totalSize ) {
-      this.totalSize = this.currentSize;
+    if ( this.currentOffset > this.totalSize ) {
+      this.totalSize = this.currentOffset;
     }
     
     this.fetchMoreBar.items.items[0].destroy();
     this.fetchMoreBar.items.removeAt( 0 );
     this.fetchMoreBar.insertButton( 0, new Ext.Toolbar.TextItem(
-      'Displaying ' + this.printKb(this.currentSize) + ' of ' + this.printKb(this.totalSize) ) );
+      'Displaying ' + ( this.tailed ? 'last ' : '' ) +
+      this.printKb(this.currentSize) + ' of ' + this.printKb(this.totalSize) ) );
 
-    this.fetchMoreButton.setDisabled( this.currentSize >= this.totalSize );
+    this.tailUpdateButton.setDisabled( this.currentLogUrl == Sonatype.config.repos.urls.configCurrent );
+    this.fetchMoreButton.setDisabled( this.currentOffset >= this.totalSize );
   },
   
   printKb: function( n ) {
@@ -286,5 +395,44 @@ Ext.extend(Sonatype.repoServer.LogsViewPanel, Ext.form.FormPanel, {
       url: Sonatype.config.repos.urls.logs
     });
     return true;
+  },
+  
+  loadTailButtonHandler: function( button, event ) {
+    if ( button.value != this.tailUpdateButton.value ) {
+      this.tailUpdateButton.value = button.value;
+      this.tailUpdateButton.setText( button.text );
+      this.fixUpdateTask();
+    }
+    else if ( button.value == 0 ) {
+      this.loadTail();
+    }
+  },
+  
+  loadTail: function() {
+    this.doUpdateTail = true;
+    if ( ! this.tailed ) {
+      // if the file had been partially read in non-tail mode, reset the counter
+      this.tailed = true;
+      this.currentOffset = 0;
+      this.currentSize = 0;
+    }
+    this.updateFileList();
+  },
+  
+  fixUpdateTask: function() {
+    this.doUpdateTail = false;
+    if ( this.tailUpdateTask.started ) {
+      Ext.TaskMgr.stop( this.tailUpdateTask );
+      this.tailUpdateTask.started = false;
+    }
+
+    if ( this.tailEnabled ) {
+      var n = this.tailUpdateButton.value;
+      if ( n > 0 ) {
+        this.tailUpdateTask.interval = n * 1000;
+        this.tailUpdateTask.started = true;
+        Ext.TaskMgr.start( this.tailUpdateTask );
+      }
+    }
   }
 });
