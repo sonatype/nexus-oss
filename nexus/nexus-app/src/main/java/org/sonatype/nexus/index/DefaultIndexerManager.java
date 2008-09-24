@@ -26,7 +26,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
@@ -376,14 +375,9 @@ public class DefaultIndexerManager
 
                 repoRoot = new File( url.toURI() );
             }
-            catch ( URISyntaxException e )
+            catch ( Throwable t )
             {
                 repoRoot = new File( url.getPath() );
-            }
-            catch ( MalformedURLException e )
-            {
-                // Try just a regular file
-                repoRoot = new File( repository.getLocalUrl() );
             }
         }
 
