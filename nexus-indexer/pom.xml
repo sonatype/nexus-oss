@@ -188,33 +188,85 @@
                     </execution>
                 </executions>
             </plugin>
-            <plugin>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <executions>
-                  <execution>
-                    <id>create-cli-jar</id>
-                    <goals>
-                      <goal>single</goal>
-                    </goals>
-                    <phase>package</phase>
-                    <configuration>
-                    <descriptors>
-                        <descriptor>
-							src/main/assembly/nx-indexer-cli-assembly.xml
-                        </descriptor>
-                    </descriptors>
-                    <archive>
-                        <manifest>
-                            <mainClass>
-								org.sonatype.nexus.index.cli.NexusIndexerCli
-                            </mainClass>
-                        </manifest>
-                    </archive>
-                </configuration>
-                  </execution>
-                </executions>
-            </plugin>
-      
+            
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-shade-plugin</artifactId>
+        <version>1.2-SNAPSHOT</version>
+        <executions>
+          <execution>
+            <id>jdk14</id>
+            <phase>package</phase>
+            <goals>
+              <goal>shade</goal>
+            </goals>
+            <configuration>
+              <finalName>nexus-indexer-cli-${version}-jdk14</finalName>
+              <createDependencyReducedPom>false</createDependencyReducedPom>
+              <keepDependenciesWithProvidedScope>true</keepDependenciesWithProvidedScope>
+              <transformers>
+                <transformer implementation="org.apache.maven.plugins.shade.resource.ComponentsXmlResourceTransformer" />
+                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                  <mainClass>org.sonatype.nexus.index.cli.NexusIndexerCli</mainClass>
+                </transformer>
+              </transformers>
+              <artifactSet>
+                <includes>
+                  <include>aspectj:aspectjrt</include>
+                  <include>net.sf.retrotranslator:retrotranslator-runtime</include>                  
+                  <include>backport-util-concurrent:backport-util-concurrent</include>
+                  <include>commons-cli:commons-cli</include>
+                  <include>net.sf.retrotranslator:retrotranslator-runtime</include>
+                  <include>org.apache.lucene:lucene-core</include>
+                  <include>org.apache.maven.artifact:maven-artifact</include>
+                  <include>org.apache.maven:maven-model</include>
+                  <include>org.apache.maven:maven-plugin-descriptor</include>
+                  <include>org.apache.maven:maven-project</include>
+                  <include>org.apache.xbean:xbean-reflect</include>
+                  <include>org.codehaus.plexus:plexus-classworlds</include>
+                  <include>org.codehaus.plexus:plexus-cli</include>
+                  <include>org.codehaus.plexus:plexus-container-default</include>
+                  <include>org.codehaus.plexus:plexus-utils</include>                
+                </includes>
+              </artifactSet>
+            </configuration>
+          </execution>
+          <execution>
+            <id>jdk15</id>
+            <phase>package</phase>
+            <goals>
+              <goal>shade</goal>
+            </goals>
+            <configuration>
+              <finalName>nexus-indexer-cli-${version}-jdk15</finalName>
+              <createDependencyReducedPom>false</createDependencyReducedPom>
+              <keepDependenciesWithProvidedScope>true</keepDependenciesWithProvidedScope>
+              <transformers>
+                <transformer implementation="org.apache.maven.plugins.shade.resource.ComponentsXmlResourceTransformer" />
+                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                  <mainClass>org.sonatype.nexus.index.cli.NexusIndexerCli</mainClass>
+                </transformer>
+              </transformers>
+              <artifactSet>
+                <includes>
+                  <include>aspectj:aspectjrt</include>
+                  <include>commons-cli:commons-cli</include>                  
+                  <include>org.apache.lucene:lucene-core</include>
+                  <include>org.apache.maven.artifact:maven-artifact</include>
+                  <include>org.apache.maven:maven-model</include>
+                  <include>org.apache.maven:maven-plugin-descriptor</include>
+                  <include>org.apache.maven:maven-project</include>
+                  <include>org.apache.xbean:xbean-reflect</include>
+                  <include>org.codehaus.plexus:plexus-classworlds</include>
+                  <include>org.codehaus.plexus:plexus-cli</include>
+                  <include>org.codehaus.plexus:plexus-container-default</include>
+                  <include>org.codehaus.plexus:plexus-utils</include>                
+                </includes>
+              </artifactSet>
+            </configuration>
+          </execution>          
+        </executions>
+      </plugin>            
       </plugins>
     </build>
 </project>
