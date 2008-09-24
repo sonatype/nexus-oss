@@ -19,6 +19,10 @@ import org.sonatype.nexus.proxy.target.TargetSet;
 public class DefaultNexusArtifactAuthorizer
     implements NexusArtifactAuthorizer
 {
+    
+    /** @plexus.requirement */
+    private Nexus nexus;
+    
     public boolean authorizePath( Repository repository, String path )
     {
         // Get the target(s) that match the path
@@ -30,7 +34,7 @@ public class DefaultNexusArtifactAuthorizer
     public boolean authorizePath( ServletRequest request, ResourceStoreRequest rsr, String action )
     {
         // collect the targetSet/matches for the request
-        TargetSet matched = getNexus( request ).getRootRouter().getTargetsForRequest( rsr );
+        TargetSet matched = getNexus().getRootRouter().getTargetsForRequest( rsr );
     
         // did we hit repositories at all?
         if ( matched.getMatchedRepositoryIds().size() > 0 )
@@ -50,17 +54,27 @@ public class DefaultNexusArtifactAuthorizer
     {
         // Get the current user
         Subject subject = SecurityUtils.getSubject();
+
         
-        // And finally check each of the target permissions and see if the user
-        // has access, all it takes is one
-        for ( String perm : perms )
+        if ( getNexus().isSecurityEnabled() )
         {
-            if ( subject.isPermitted( perm ) )
+
+            // And finally check each of the target permissions and see if the user
+            // has access, all it takes is one
+            for ( String perm : perms )
             {
-                return true;
+                if ( subject.isPermitted( perm ) )
+                {
+                    return true;
+                }
             }
         }
-        
+        else
+        {
+            return true;
+
+        }
+
         return false;
     }
     
@@ -80,9 +94,10 @@ public class DefaultNexusArtifactAuthorizer
 
         return result;
     }
-    
-    protected Nexus getNexus( ServletRequest request )
+
+    public Nexus getNexus()
     {
-        return (Nexus) request.getAttribute( Nexus.class.getName() );
+        return nexus;
     }
+    
 }

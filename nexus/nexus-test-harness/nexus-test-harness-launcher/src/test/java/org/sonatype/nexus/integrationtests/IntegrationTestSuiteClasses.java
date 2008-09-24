@@ -26,6 +26,7 @@ import org.sonatype.nexus.integrationtests.nexus260.Nexus260MultipleDeployTest;
 import org.sonatype.nexus.integrationtests.nexus261.Nexus261NexusGroupDownloadTest;
 import org.sonatype.nexus.integrationtests.nexus292.Nexus292SoftRestartTest;
 import org.sonatype.nexus.integrationtests.nexus379.Nexus379VirtualRepoSameId;
+import org.sonatype.nexus.integrationtests.nexus384.Nexus384DotAndDashSearchTest;
 import org.sonatype.nexus.integrationtests.nexus385.Nexus385RoutesCrudXmlTests;
 import org.sonatype.nexus.integrationtests.nexus385.Nexus385RoutesValidationTests;
 import org.sonatype.nexus.integrationtests.nexus387.Nexus387RoutesTests;
@@ -141,7 +142,8 @@ import org.sonatype.nexus.integrationtests.upgrades.nexus652.Nexus652Beta5To10Up
     Nexus810PackageNamesInRestMessages.class,
     Nexus810PackageNamesInNexusConf.class,
     Nexus782UploadWithClassifier.class,
-    Nexus688ReindexOnRepoAdd.class } )
+    Nexus688ReindexOnRepoAdd.class,
+    Nexus384DotAndDashSearchTest.class } )
 public class IntegrationTestSuiteClasses
 {
 

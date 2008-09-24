@@ -81,8 +81,8 @@ public class Nexus758StatusService
             
             appBooter.setSleepAfterStart( 0 );
             appBooter.start();
-            // set the timeout back to 10 sec
-            System.setProperty( NexusRestClient.WAIT_FOR_START_TIMEOUT_KEY, "10000" );
+            // set the timeout back to 16 sec
+            System.setProperty( NexusRestClient.WAIT_FOR_START_TIMEOUT_KEY, "16000" );
             Assert.assertTrue("Wait for start, timed out.", client.isNexusStarted( true ));
 
         }

@@ -8,7 +8,11 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 
+import org.codehaus.plexus.PlexusConstants;
+import org.codehaus.plexus.PlexusContainer;
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.jsecurity.web.WebUtils;
+import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.security.DefaultNexusArtifactAuthorizer;
@@ -28,7 +32,7 @@ public class NexusTargetMappingAuthorizationFilter
 
     private String pathReplacement;
     
-    private NexusArtifactAuthorizer authorizer = new DefaultNexusArtifactAuthorizer();
+    private NexusArtifactAuthorizer authorizer = null;
 
     public String getPathPrefix()
     {
@@ -144,6 +148,20 @@ public class NexusTargetMappingAuthorizationFilter
             if ( !result )
             {
                 return false;
+            }
+        }
+        
+        if ( authorizer == null )
+        {
+            PlexusContainer plexus = (PlexusContainer) getAttribute( PlexusConstants.PLEXUS_KEY );
+
+            try
+            {
+                authorizer = (NexusArtifactAuthorizer) plexus.lookup( NexusArtifactAuthorizer.ROLE );
+            }
+            catch ( ComponentLookupException e )
+            {
+                throw new IllegalStateException( "Cannot lookup NexusArtifactAuthorizer!", e );
             }
         }
 
