@@ -30,17 +30,10 @@ Sonatype.repoServer.LogsViewPanel = function(config){
   this.currentSize = 0;
   
   this.listeners = {
-    'beforerender' : function(){
-    //note: this isn't pre-render dependent, we just need an early event to start this off
-      Ext.Ajax.request({
-        callback: this.renderLogList,
-        scope: this,
-        method: 'GET',
-        url: Sonatype.config.repos.urls.logs
-      });
-      return true;
-    },
-    scope: this
+    'beforerender' : {
+      fn: this.updateFileList,
+      scope: this
+    }
   };
 
   this.fetchMoreButton = new Ext.SplitButton({
@@ -157,14 +150,35 @@ Ext.extend(Sonatype.repoServer.LogsViewPanel, Ext.form.FormPanel, {
       var myMenu = Ext.menu.MenuMgr.get('log-menu');
 
       for (var i=0; i< resp.data.length; i++) {
-        myMenu.addMenuItem({
-          text: resp.data[i].name + ' (' + this.printKb(resp.data[i].size) + ')',
-          value: resp.data[i].size,
-          checked: false,
-          group:'rp-group',
-          checkHandler: this.logMenuBtnClick.createDelegate(this, [resp.data[i].resourceURI,'text/plain'], 0),
-          scope:this
-        });
+        var name = resp.data[i].name;
+        var size = resp.data[i].size;
+        var text = name + ' (' + this.printKb(size) + ')';
+        var uri = resp.data[i].resourceURI;
+
+        var existingItem = myMenu.items.find( function( o ) {
+          return o.id == uri;
+        } );
+
+        if ( existingItem ) {
+          existingItem.setText( text );
+          existingItem.value = size;
+          if ( this.currentLogUrl == uri ) {
+            this.totalSize = size;
+            this.getTopToolbar().items.get( 2 ).setText( text );
+            this.updateTotals();
+          }
+        }
+        else {
+          myMenu.addMenuItem({
+            id: uri, 
+            text: text,
+            value: size,
+            checked: false,
+            group:'rp-group',
+            checkHandler: this.logMenuBtnClick.createDelegate(this, [uri,'text/plain'], 0),
+            scope:this
+          });
+        }
       }
     }
     else {
@@ -215,7 +229,9 @@ Ext.extend(Sonatype.repoServer.LogsViewPanel, Ext.form.FormPanel, {
       var newValue = this.currentSize == 0 ? response.responseText :
         this.logTextArea.getRawValue() + response.responseText;
       this.logTextArea.setRawValue(newValue);
+      this.currentSize += response.responseText.length;
       this.updateTotals();
+      this.updateFileList();
     }
     else {
       Sonatype.utils.connectionError( response, 'The file failed to load from the server.' )
@@ -231,8 +247,6 @@ Ext.extend(Sonatype.repoServer.LogsViewPanel, Ext.form.FormPanel, {
   },
   
   updateTotals: function() {
-    this.currentSize = this.logTextArea.getRawValue().length;
-    
     if ( this.currentSize == 0 || this.currentSize > this.totalSize ) {
       this.totalSize = this.currentSize;
     }
@@ -256,6 +270,15 @@ Ext.extend(Sonatype.repoServer.LogsViewPanel, Ext.form.FormPanel, {
       kb = 'Mb';
     }
     return n + ' ' + kb;
-  }
+  },
   
+  updateFileList: function() {
+    Ext.Ajax.request({
+      callback: this.renderLogList,
+      scope: this,
+      method: 'GET',
+      url: Sonatype.config.repos.urls.logs
+    });
+    return true;
+  }
 });
