@@ -1,17 +1,14 @@
 /**
- * Copyright (C) 2008 Sonatype Inc. 
- * Sonatype Inc, licenses this file to you under the Apache License,
- * Version 2.0 (the "License"); you may not use this file except in 
- * compliance with the License.  You may obtain a copy of the License at
- *
+ * Copyright (C) 2008 Sonatype Inc. Sonatype Inc, licenses this file to you under the Apache
+ * License, Version 2.0 (the "License"); you may not use this file except in compliance with the
+ * License. You may obtain a copy of the License at
+ * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
+ * 
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
  */
 package org.sonatype.plexus.rest;
 
@@ -26,7 +23,10 @@ import org.codehaus.plexus.component.repository.exception.ComponentLookupExcepti
 import org.restlet.Application;
 import org.restlet.Context;
 import org.restlet.Restlet;
+import org.restlet.Route;
 import org.restlet.Router;
+import org.restlet.resource.Resource;
+import org.restlet.util.Template;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 import org.sonatype.plexus.rest.xstream.json.JsonOrgHierarchicalStreamDriver;
 import org.sonatype.plexus.rest.xstream.json.PrimitiveKeyedMapConverter;
@@ -36,9 +36,10 @@ import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.HierarchicalStreamDriver;
 
 /**
- * An abstract Restlet.org application, that should be extended for custom application needs. It will automatically pick
- * up existing PlexusResources, but is also able to take the "old way" for creating application root. Supports out of
- * the box JSON and XML representations powered by XStream, and also offers help in File Upload handling.
+ * An abstract Restlet.org application, that should be extended for custom application needs. It
+ * will automatically pick up existing PlexusResources, but is also able to take the "old way" for
+ * creating application root. Supports out of the box JSON and XML representations powered by
+ * XStream, and also offers help in File Upload handling.
  * 
  * @author cstamas
  */
@@ -73,13 +74,13 @@ public class PlexusRestletApplicationBridge
     public PlexusRestletApplicationBridge( Context context )
     {
         super( context );
-
+       
         this.createdOn = new Date();
     }
 
     /**
-     * Returns the timestamp of instantaniation of this object. This is used as timestamp for transient objects when
-     * they are still unchanged (not modified).
+     * Returns the timestamp of instantaniation of this object. This is used as timestamp for
+     * transient objects when they are still unchanged (not modified).
      * 
      * @return date
      */
@@ -126,8 +127,8 @@ public class PlexusRestletApplicationBridge
     }
 
     /**
-     * Creating all sort of shared tools and putting them into context, to make them usable by per-request
-     * instantaniated Resource implementors.
+     * Creating all sort of shared tools and putting them into context, to make them usable by
+     * per-request instantaniated Resource implementors.
      */
     protected final void configure()
     {
@@ -153,9 +154,8 @@ public class PlexusRestletApplicationBridge
         // put fileItemFactory into context
         getContext().getAttributes().put( FILEITEM_FACTORY, new DiskFileItemFactory() );
 
-        boolean shouldCollectPlexusResources = getContext().getParameters().getFirstValue( PLEXUS_DISCOVER_RESOURCES ) != null
-            ? Boolean.parseBoolean( (String) getContext().getParameters().getFirstValue( PLEXUS_DISCOVER_RESOURCES ) )
-            : true; // the default if not set
+        boolean shouldCollectPlexusResources = getContext().getParameters().getFirstValue( PLEXUS_DISCOVER_RESOURCES ) != null ? Boolean.parseBoolean( (String) getContext().getParameters()
+            .getFirstValue( PLEXUS_DISCOVER_RESOURCES ) ) : true; // the default if not set
 
         if ( shouldCollectPlexusResources )
         {
@@ -190,19 +190,20 @@ public class PlexusRestletApplicationBridge
             // create a new root router
             Router rootRouter = new Router( getContext() );
 
+            Router applicationRouter = initializeRouter( rootRouter );
+
             // attach all PlexusResources
             if ( isStarted )
             {
                 for ( PlexusResource resource : plexusResources.values() )
                 {
-                    rootRouter.attach( resource.getResourceUri(), new PlexusResourceFinder( getContext(), resource ) );
+                    attach( applicationRouter, false, resource.getResourceUri(), new PlexusResourceFinder( getContext(), resource ) );
                 }
             }
 
-            // allow "manual" resource attachment too
-            doCreateRoot( rootRouter, isStarted );
+            doCreateRoot( applicationRouter, isStarted );
 
-            // set it
+            // set it            
             root.setRoot( rootRouter );
         }
     }
@@ -217,8 +218,8 @@ public class PlexusRestletApplicationBridge
     // methods to override
 
     /**
-     * Method to be overridden by subclasses. It will be called only once in the lifetime of this Application. This is
-     * the place when you need to create and add to context some stuff.
+     * Method to be overridden by subclasses. It will be called only once in the lifetime of this
+     * Application. This is the place when you need to create and add to context some stuff.
      */
     protected void doConfigure()
     {
@@ -226,8 +227,8 @@ public class PlexusRestletApplicationBridge
     }
 
     /**
-     * Method to be overridden by subclasses. It will be called multiple times with multiple instances of XStream.
-     * Configure it by adding aliases for used DTOs, etc.
+     * Method to be overridden by subclasses. It will be called multiple times with multiple
+     * instances of XStream. Configure it by adding aliases for used DTOs, etc.
      * 
      * @param xstream
      * @return
@@ -238,9 +239,14 @@ public class PlexusRestletApplicationBridge
         return xstream;
     }
 
+    protected Router initializeRouter( Router root )
+    {
+        return root;
+    }
+
     /**
-     * Called when the app root needs to be created. Override it if you need "old way" to attach resources, or need to
-     * use the isStarted flag.
+     * Called when the app root needs to be created. Override it if you need "old way" to attach
+     * resources, or need to use the isStarted flag.
      * 
      * @param root
      * @param isStarted
@@ -250,4 +256,25 @@ public class PlexusRestletApplicationBridge
         // empty implementation, left for subclasses to do something meaningful
     }
 
+    @Deprecated
+    protected void attach( Router router, boolean strict, String uriPattern, Class<? extends Resource> targetClass )
+    {
+        Route route = router.attach( uriPattern, targetClass );
+
+        if ( strict )
+        {
+            route.getTemplate().setMatchingMode( Template.MODE_EQUALS );
+        }
+    }
+
+    @Deprecated
+    protected void attach( Router router, boolean strict, String uriPattern, Restlet target )
+    {
+        Route route = router.attach( uriPattern, target );
+
+        if ( strict )
+        {
+            route.getTemplate().setMatchingMode( Template.MODE_EQUALS );
+        }
+    }
 }
