@@ -191,8 +191,6 @@ public class ApplicationBridge
         attach( applicationRouter, false, "/status", StatusResourceHandler.class );
 
         attach( applicationRouter, false, "/status/command", CommandResourceHandler.class );
-
-        System.out.println( "isStart: " + isStarted );
         
         if ( !isStarted )
         {
