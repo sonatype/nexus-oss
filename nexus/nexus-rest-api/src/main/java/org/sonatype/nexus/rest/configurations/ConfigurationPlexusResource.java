@@ -43,7 +43,8 @@ public class ConfigurationPlexusResource
     @Override
     public String getResourceUri()
     {
-        return "/configs/{" + CONFIG_NAME_KEY + "}";
+        return "/{" + NEXUS_INSTANCE_KEY + "}/configs/{" + CONFIG_NAME_KEY + "}";
+        //return "/configs/{" + CONFIG_NAME_KEY + "}";
     }
 
     @Override
