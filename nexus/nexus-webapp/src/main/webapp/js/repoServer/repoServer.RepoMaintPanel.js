@@ -35,6 +35,8 @@ Sonatype.repoServer.RepoMaintPanel = function(config){
   var defaultConfig = {};
   var forceStatuses = false;
   Ext.apply(this, config, defaultConfig);
+  
+  this.oldSearchText = '';
 
   Sonatype.Events.addListener( 'repositoryChanged', this.onRepoChange, this );
   Sonatype.Events.addListener( 'groupChanged', this.onRepoChange, this );
@@ -355,16 +357,6 @@ Sonatype.repoServer.RepoMaintPanel = function(config){
         autoScroll: false,
         frame: false,
         tbar: [
-          'Filter:',
-          {
-            disabled: true,
-            xtype: 'nexussearchfield',
-            searchPanel: this,
-            width: 200
-          },
-          {
-            xtype: 'tbspacer'
-          },
           {
             text: 'Refresh',
             iconCls: 'st-icon-refresh',
@@ -380,7 +372,23 @@ Sonatype.repoServer.RepoMaintPanel = function(config){
                 treePanel.root.reload();
               }
             }
-          } 
+          },
+          ' ',
+          'Find:',
+          {
+            xtype: 'nexussearchfield',
+            searchPanel: this,
+            width: 400,
+            enableKeyEvents: true,
+            listeners: {
+              'keyup': {
+                fn: function( field, event ) {
+                  this.startSearch( this );
+                },
+                scope: this
+              }
+            }
+          }
         ],
         items: [
           {
@@ -876,8 +884,99 @@ Ext.extend(Sonatype.repoServer.RepoMaintPanel, Sonatype.repoServer.AbstractRepoP
   },
   
   startSearch: function( p ) {
-    p.searchField.triggers[0].show();
-    alert( 'filter on' );
+    var field = p.searchField;
+    var searchText = field.getRawValue();
+
+    var activePanel = p.formCards.getLayout().activeItem;
+    if ( activePanel ) {
+      var treePanel = activePanel.items.first();
+      if ( searchText ) {
+        field.triggers[0].show();
+        var findMatchingNodes = function( root, textToMatch ) {
+          var n = textToMatch.indexOf( '/' );
+          var remainder = '';
+          if ( n > -1 ) {
+            remainder = textToMatch.substring( n + 1 );
+            textToMatch = textToMatch.substring( 0, n );
+          }
+
+          var matchingNodes = [];
+          var found = false;
+          for ( var i = 0; i < root.childNodes.length; i++ ) {
+            var node = root.childNodes[i];
+
+            var text = node.text;
+            if ( text == textToMatch ) {
+              node.enable();
+              node.ensureVisible();
+              node.expand();
+              found = true;
+              if ( ! node.isLeaf() ) {
+                var autoComplete = false;
+                if ( ! remainder && node.childNodes.length == 1 ) {
+                  remainder = node.firstChild.text;
+                  autoComplete = true;
+                }
+                if ( remainder ) {
+                  var s = findMatchingNodes( node, remainder );
+                  if ( autoComplete || ( s && s != remainder ) ) {
+                    return textToMatch + '/' + ( s ? s : remainder );
+                  }
+                }
+              }
+            }
+            else if ( text.substring( 0, textToMatch.length ) == textToMatch ) {
+              matchingNodes[matchingNodes.length] = node;
+              node.enable();
+            }
+            else {
+              node.disable();
+              node.collapse( false, false );
+            }
+          }
+          
+          // if only one non-exact match found, suggest the name
+          return ! found && matchingNodes.length == 1 ?
+            matchingNodes[0].text + '/' : null;
+        };
+        
+        var justDeleted = p.oldSearchText.length > searchText.length;
+        var s = findMatchingNodes( treePanel.root, searchText );
+
+        p.oldSearchText = searchText;
+
+        // if auto-complete is suggested, and the user hasn't just started deleting
+        // their own typing, try the suggestion
+        if ( s && ! justDeleted && s != searchText ) {
+          field.setRawValue( s );
+          p.startSearch( p );
+        }
+
+      }
+      else {
+        p.stopSearch( p );
+      }
+    }
+  },
+
+  stopSearch: function( p ) {
+    p.searchField.triggers[0].hide();
+    p.oldSearchText = '';
+
+    var activePanel = p.formCards.getLayout().activeItem;
+    if ( activePanel ) {
+      var treePanel = activePanel.items.first();
+
+      var enableAll = function( root ) {
+        for ( var i = 0; i < root.childNodes.length; i++ ) {
+          var node = root.childNodes[i];
+          node.enable();
+          node.collapse( false, false );
+          enableAll( node );
+        }
+      };
+      enableAll( treePanel.root );
+    }
   }
 
 });

@@ -33,6 +33,9 @@ Ext.app.SearchField = Ext.extend(Ext.form.TwinTriggerField, {
       this.triggers[0].hide();
       this.hasSearch = false;
     }
+    if ( this.searchPanel.stopSearch ) {
+      this.searchPanel.stopSearch( this.searchPanel );
+    }
   },
 
   onTrigger2Click : function(){
