@@ -161,6 +161,7 @@ public class ApplicationBridge
         return XStreamInitializer.initialize( xstream );
     }
 
+    /*
     protected Router initializeRouter( Router root )
     {
         // instance filter, that injects proper Nexus instance into request attributes
@@ -177,6 +178,7 @@ public class ApplicationBridge
         
         return applicationRouter;
     }
+    */
     
     /**
      * "Decorating" the root with our resources.
@@ -184,8 +186,20 @@ public class ApplicationBridge
      * @TODO Move this to PlexusResources, except Status (see isStarted usage below!)
      */
     @SuppressWarnings("deprecation")
-    protected void doCreateRoot( Router applicationRouter, boolean isStarted )
+    protected void doCreateRoot( Router root, boolean isStarted )
     {
+        // instance filter, that injects proper Nexus instance into request attributes
+        NexusInstanceFilter nif = new NexusInstanceFilter( getContext() );
+
+        // attaching filter to a root on given URI
+        attach( root, false, "/{" + NexusInstanceFilter.NEXUS_INSTANCE_KEY + "}", nif );
+
+        // creating _another_ router, that will be next isntance called after filtering
+        Router applicationRouter = new Router( getContext() );
+               
+        // attaching it after nif
+        nif.setNext( applicationRouter );                
+        
         // a little digression here. if !isStarted, we are shutting down everything except /status and /status/command
 
         attach( applicationRouter, false, "/status", StatusResourceHandler.class );
