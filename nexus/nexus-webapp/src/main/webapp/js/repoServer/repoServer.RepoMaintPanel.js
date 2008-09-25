@@ -383,7 +383,11 @@ Sonatype.repoServer.RepoMaintPanel = function(config){
             listeners: {
               'keyup': {
                 fn: function( field, event ) {
-                  this.startSearch( this );
+                  var key = event.getKey();
+                  if ( key != event.LEFT && key != event.RIGHT && key != event.HOME &&
+                      key != event.END && key != event.BACKSPACE && key != event.DELETE ) {
+                    this.startSearch( this );
+                  }
                 },
                 scope: this
               }
@@ -892,6 +896,8 @@ Ext.extend(Sonatype.repoServer.RepoMaintPanel, Sonatype.repoServer.AbstractRepoP
       var treePanel = activePanel.items.first();
       if ( searchText ) {
         field.triggers[0].show();
+        var justEdited = p.oldSearchText.length > searchText.length;
+
         var findMatchingNodes = function( root, textToMatch ) {
           var n = textToMatch.indexOf( '/' );
           var remainder = '';
@@ -940,14 +946,13 @@ Ext.extend(Sonatype.repoServer.RepoMaintPanel, Sonatype.repoServer.AbstractRepoP
             matchingNodes[0].text + '/' : null;
         };
         
-        var justDeleted = p.oldSearchText.length > searchText.length;
         var s = findMatchingNodes( treePanel.root, searchText );
 
         p.oldSearchText = searchText;
 
         // if auto-complete is suggested, and the user hasn't just started deleting
         // their own typing, try the suggestion
-        if ( s && ! justDeleted && s != searchText ) {
+        if ( s && ! justEdited && s != searchText ) {
           field.setRawValue( s );
           p.startSearch( p );
         }
