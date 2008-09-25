@@ -40,6 +40,11 @@ public class ApplicationContentBridge
     {
         super( context );
     }
+    
+    protected Router initializeRouter( Router root )
+    {
+        return root;
+    }
 
     /**
      * Creating restlet application root.
