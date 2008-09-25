@@ -375,6 +375,11 @@ public class DefaultIndexerManager
 
                 repoRoot = new File( url.toURI() );
             }
+            catch ( MalformedURLException e )
+            {
+                // Try just a regular file
+                repoRoot = new File( repository.getLocalUrl() );
+            }
             catch ( Throwable t )
             {
                 repoRoot = new File( url.getPath() );
