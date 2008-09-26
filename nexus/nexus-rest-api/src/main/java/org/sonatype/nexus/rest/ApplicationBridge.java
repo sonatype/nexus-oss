@@ -73,7 +73,6 @@ import org.sonatype.nexus.rest.users.UserForgotPasswordResourceHandler;
 import org.sonatype.nexus.rest.users.UserListResourceHandler;
 import org.sonatype.nexus.rest.users.UserResetResourceHandler;
 import org.sonatype.nexus.rest.users.UserResourceHandler;
-import org.sonatype.nexus.rest.wastebasket.WastebasketResourceHandler;
 import org.sonatype.nexus.rest.xstream.XStreamInitializer;
 import org.sonatype.plexus.rest.PlexusRestletApplicationBridge;
 
@@ -223,8 +222,6 @@ public class ApplicationBridge
 
         attach( applicationRouter, false, "/data_cache/{" + CacheResourceHandler.DOMAIN + "}/{" + CacheResourceHandler.TARGET_ID
             + "}/content", CacheResourceHandler.class );
-
-        attach( applicationRouter, false, "/wastebasket", WastebasketResourceHandler.class );
 
         attach( applicationRouter, false, "/attributes", AttributesResourceHandler.class );
 
