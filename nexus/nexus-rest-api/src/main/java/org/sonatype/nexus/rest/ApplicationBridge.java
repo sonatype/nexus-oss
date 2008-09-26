@@ -22,11 +22,7 @@ package org.sonatype.nexus.rest;
 
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.restlet.Context;
-import org.restlet.Restlet;
-import org.restlet.Route;
 import org.restlet.Router;
-import org.restlet.resource.Resource;
-import org.restlet.util.Template;
 import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.NexusStartedEvent;
 import org.sonatype.nexus.NexusStoppingEvent;
@@ -49,8 +45,6 @@ import org.sonatype.nexus.rest.groups.RepositoryGroupListResourceHandler;
 import org.sonatype.nexus.rest.groups.RepositoryGroupResourceHandler;
 import org.sonatype.nexus.rest.identify.IdentifyHashResourceHandler;
 import org.sonatype.nexus.rest.index.IndexResourceHandler;
-import org.sonatype.nexus.rest.logs.LogsListResourceHandler;
-import org.sonatype.nexus.rest.logs.LogsResourceHandler;
 import org.sonatype.nexus.rest.privileges.PrivilegeListResourceHandler;
 import org.sonatype.nexus.rest.privileges.PrivilegeResourceHandler;
 import org.sonatype.nexus.rest.repositories.RepositoryContentResourceHandler;
@@ -281,10 +275,6 @@ public class ApplicationBridge
             false,
             "/repo_groups/{" + RepositoryGroupResourceHandler.GROUP_ID_KEY + "}/content",
             RepositoryGroupContentResourceHandler.class );
-
-        attach( applicationRouter, false, "/logs", LogsListResourceHandler.class );
-
-        attach( applicationRouter, false, "/logs/{" + LogsResourceHandler.FILE_NAME_KEY + "}", LogsResourceHandler.class );
 
         attach( applicationRouter, false, "/global_settings", GlobalConfigurationListResourceHandler.class );
 

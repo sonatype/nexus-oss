@@ -21,7 +21,8 @@
 package org.sonatype.nexus.rest.logs;
 
 import java.io.IOException;
-import java.util.logging.Level;
+import java.util.Collections;
+import java.util.List;
 
 import org.codehaus.plexus.util.StringUtils;
 import org.restlet.Context;
@@ -30,50 +31,55 @@ import org.restlet.data.MediaType;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.data.Status;
-import org.restlet.resource.Representation;
+import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
 import org.sonatype.nexus.NexusStreamResponse;
-import org.sonatype.nexus.rest.AbstractNexusResourceHandler;
+import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
 import org.sonatype.plexus.rest.representation.InputStreamRepresentation;
 
 /**
  * The log file resource handler. It returns the content of the requested log file on incoming GET methods.
  * 
  * @author cstamas
+ * @plexus.component role-hint="logs"
  */
 public class LogsResourceHandler
-    extends AbstractNexusResourceHandler
+    extends AbstractNexusPlexusResource
 {
     /** Key for retrieving the requested filename from request. */
     public static final String FILE_NAME_KEY = "fileName";
-
-    /**
-     * The resource constructor.
-     * 
-     * @param context
-     * @param request
-     * @param response
-     */
-    public LogsResourceHandler( Context context, Request request, Response response )
+    
+    @Override
+    public List<Variant> getVariants()
     {
-        super( context, request, response );
-
-        getVariants().clear();
-
-        getVariants().add( new Variant( MediaType.TEXT_PLAIN ) );
+        return Collections.singletonList( new Variant( MediaType.TEXT_PLAIN ) );
     }
-
+    
+    @Override
+    public Object getPayloadInstance()
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
+    
+    @Override
+    public String getResourceUri()
+    {
+        return "/logs/{" + FILE_NAME_KEY + "}";
+    }
+    
     /**
      * The default handler. It simply extracts the requested file name and gets the file's InputStream from Nexus
      * instance. If Nexus finds the file appropriate, the handler wraps it into InputStream representation and ships it
      * as "text/plain" media type, otherwise HTTP 404 is returned.
      */
-    public Representation getRepresentationHandler( Variant variant )
-        throws IOException
+    @Override
+    public Object get( Context context, Request request, Response response )
+        throws ResourceException
     {
-        String logFile = getRequest().getAttributes().get( FILE_NAME_KEY ).toString();
+        String logFile = request.getAttributes().get( FILE_NAME_KEY ).toString();
 
-        Form params = getRequest().getResourceRef().getQueryAsForm();
+        Form params = request.getResourceRef().getQueryAsForm();
 
         String fromStr = params.getFirstValue( "from" );
 
@@ -93,20 +99,26 @@ public class LogsResourceHandler
             count = Long.valueOf( countStr );
         }
 
-        NexusStreamResponse response = getNexus().getApplicationLogAsStream( logFile, from, count );
-
-        if ( response != null )
+        NexusStreamResponse result;
+        try
         {
-            return new InputStreamRepresentation( MediaType.valueOf( response.getMimeType() ), response
+            result = getNexusInstance( request ).getApplicationLogAsStream( logFile, from, count );
+        }
+        catch ( IOException e )
+        {
+            throw new ResourceException( e );
+        }
+
+        if ( result != null )
+        {
+            return new InputStreamRepresentation( MediaType.valueOf( result.getMimeType() ), result
                 .getInputStream() );
         }
         else
         {
-            getLogger().log( Level.WARNING, "Log file not found, filename=" + logFile );
-
-            getResponse().setStatus( Status.CLIENT_ERROR_NOT_FOUND, "Log file not found" );
-
-            return null;
+            getLogger().warn( "Log file not found, filename=" + logFile );
+            
+            throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, "Log file not found" );
         }
     }
 }

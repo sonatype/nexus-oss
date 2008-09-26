@@ -26,10 +26,9 @@ import java.util.Collection;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
-import org.restlet.resource.Representation;
-import org.restlet.resource.Variant;
+import org.restlet.resource.ResourceException;
 import org.sonatype.nexus.NexusStreamResponse;
-import org.sonatype.nexus.rest.AbstractNexusResourceHandler;
+import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
 import org.sonatype.nexus.rest.model.LogsListResource;
 import org.sonatype.nexus.rest.model.LogsListResourceResponse;
 
@@ -38,48 +37,55 @@ import org.sonatype.nexus.rest.model.LogsListResourceResponse;
  * application log files.
  * 
  * @author cstamas
+ * 
+ * @plexus.component role-hint="logsList"
  */
 public class LogsListResourceHandler
-    extends AbstractNexusResourceHandler
+    extends AbstractNexusPlexusResource
 {
-
-    /**
-     * The resource constructor.
-     * 
-     * @param context
-     * @param request
-     * @param response
-     */
-    public LogsListResourceHandler( Context context, Request request, Response response )
+    @Override
+    public Object getPayloadInstance()
     {
-        super( context, request, response );
+        // TODO Auto-generated method stub
+        return null;
     }
-
-    /**
-     * The default handler. It simply gets the list of log files from Nexus instance and wraps them into REST DTO.
-     */
-    public Representation getRepresentationHandler( Variant variant )
-        throws IOException
+    
+    @Override
+    public String getResourceUri()
     {
-        Collection<NexusStreamResponse> logFiles = getNexus().getApplicationLogFiles();
-
-        LogsListResourceResponse response = new LogsListResourceResponse();
-
-        for ( NexusStreamResponse logFile : logFiles )
+        return "/logs";
+    }
+    
+    @Override
+    public Object get( Context context, Request request, Response response )
+        throws ResourceException
+    {
+        LogsListResourceResponse result = new LogsListResourceResponse();
+        
+        try
         {
-            LogsListResource resource = new LogsListResource();
-
-            resource.setResourceURI( calculateSubReference( logFile.getName() ).toString() );
-
-            resource.setName( logFile.getName() );
-            
-            resource.setSize( logFile.getSize() );
-            
-            resource.setMimeType( logFile.getMimeType() );
-
-            response.addData( resource );
+            Collection<NexusStreamResponse> logFiles = getNexusInstance( request ).getApplicationLogFiles();
+    
+            for ( NexusStreamResponse logFile : logFiles )
+            {
+                LogsListResource resource = new LogsListResource();
+    
+                resource.setResourceURI( createChildReference( request, logFile.getName() ).toString() );
+    
+                resource.setName( logFile.getName() );
+                
+                resource.setSize( logFile.getSize() );
+                
+                resource.setMimeType( logFile.getMimeType() );
+    
+                result.addData( resource );
+            }
+        }
+        catch( IOException e )
+        {
+            throw new ResourceException( e );
         }
 
-        return serialize( variant, response );
+        return result;
     }
 }
