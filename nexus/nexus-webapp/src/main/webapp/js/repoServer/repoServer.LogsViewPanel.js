@@ -37,6 +37,10 @@ Sonatype.repoServer.LogsViewPanel = function(config){
     'beforerender' : {
       fn: this.updateFileList,
       scope: this
+    },
+    'beforedestroy': {
+      fn: this.stopTailUpdateTask,
+      scope: this
     }
   };
 
@@ -234,7 +238,7 @@ Ext.extend(Sonatype.repoServer.LogsViewPanel, Ext.form.FormPanel, {
         var uri = resp.data[i].resourceURI;
 
         var existingItem = myMenu.items.find( function( o ) {
-          return o.id == uri;
+          return o.logUri == uri;
         } );
 
         if ( existingItem ) {
@@ -248,7 +252,7 @@ Ext.extend(Sonatype.repoServer.LogsViewPanel, Ext.form.FormPanel, {
         }
         else {
           myMenu.addMenuItem({
-            id: uri, 
+            logUri: uri, 
             text: text,
             value: size,
             checked: false,
@@ -421,10 +425,7 @@ Ext.extend(Sonatype.repoServer.LogsViewPanel, Ext.form.FormPanel, {
   
   fixUpdateTask: function() {
     this.doUpdateTail = false;
-    if ( this.tailUpdateTask.started ) {
-      Ext.TaskMgr.stop( this.tailUpdateTask );
-      this.tailUpdateTask.started = false;
-    }
+    this.stopTailUpdateTask();
 
     if ( this.tailEnabled ) {
       var n = this.tailUpdateButton.value;
@@ -433,6 +434,13 @@ Ext.extend(Sonatype.repoServer.LogsViewPanel, Ext.form.FormPanel, {
         this.tailUpdateTask.started = true;
         Ext.TaskMgr.start( this.tailUpdateTask );
       }
+    }
+  },
+  
+  stopTailUpdateTask: function() {
+    if ( this.tailUpdateTask.started ) {
+      Ext.TaskMgr.stop( this.tailUpdateTask );
+      this.tailUpdateTask.started = false;
     }
   }
 });
