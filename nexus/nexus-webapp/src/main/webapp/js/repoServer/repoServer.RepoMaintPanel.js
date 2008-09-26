@@ -374,7 +374,7 @@ Sonatype.repoServer.RepoMaintPanel = function(config){
             }
           },
           ' ',
-          'Find:',
+          'Path Lookup:',
           {
             xtype: 'nexussearchfield',
             searchPanel: this,
