@@ -37,6 +37,7 @@ Sonatype.repoServer.RepoMaintPanel = function(config){
   Ext.apply(this, config, defaultConfig);
   
   this.oldSearchText = '';
+  this.searchTask = new Ext.util.DelayedTask( this.startSearch, this, [this]);
 
   Sonatype.Events.addListener( 'repositoryChanged', this.onRepoChange, this );
   Sonatype.Events.addListener( 'groupChanged', this.onRepoChange, this );
@@ -384,9 +385,8 @@ Sonatype.repoServer.RepoMaintPanel = function(config){
               'keyup': {
                 fn: function( field, event ) {
                   var key = event.getKey();
-                  if ( key != event.LEFT && key != event.RIGHT && key != event.HOME &&
-                      key != event.END && key != event.BACKSPACE && key != event.DELETE ) {
-                    this.startSearch( this );
+                  if ( ! event.isNavKeyPress() ) {
+                    this.searchTask.delay( 200 );
                   }
                 },
                 scope: this
