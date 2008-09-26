@@ -193,8 +193,6 @@ public class ApplicationBridge
         // and protectedResources for protected ones
 
         // attaching the restlets to scond router
-        attach( applicationRouter, false, "/feeds", FeedsListResourceHandler.class );
-
         attach( applicationRouter, false, "/feeds/{" + FeedResourceHandler.FEED_KEY + "}", FeedResourceHandler.class );
 
         attach( applicationRouter, false, "/authentication/login", LoginResourceHandler.class );

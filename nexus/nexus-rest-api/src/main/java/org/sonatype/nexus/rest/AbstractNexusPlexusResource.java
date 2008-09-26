@@ -1,5 +1,8 @@
 package org.sonatype.nexus.rest;
 
+import org.codehaus.plexus.PlexusConstants;
+import org.codehaus.plexus.PlexusContainer;
+import org.restlet.Context;
 import org.restlet.data.Reference;
 import org.restlet.data.Request;
 import org.restlet.data.Status;
@@ -40,4 +43,10 @@ public abstract class AbstractNexusPlexusResource
         return new Reference( request.getResourceRef() ).addSegment( childPath ).getTargetRef();
     }
 
+
+    protected PlexusContainer getPlexusContainer(Context context) {
+        return (PlexusContainer) context.getAttributes().get(
+                PlexusConstants.PLEXUS_KEY);
+    }
+    
 }
