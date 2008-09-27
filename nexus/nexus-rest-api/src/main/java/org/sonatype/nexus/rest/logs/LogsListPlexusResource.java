@@ -40,7 +40,7 @@ import org.sonatype.nexus.rest.model.LogsListResourceResponse;
  * 
  * @plexus.component role-hint="logsList"
  */
-public class LogsListResourceHandler
+public class LogsListPlexusResource
     extends AbstractNexusPlexusResource
 {
     @Override

@@ -43,7 +43,7 @@ import org.sonatype.plexus.rest.representation.InputStreamRepresentation;
  * @author cstamas
  * @plexus.component role-hint="logs"
  */
-public class LogsResourceHandler
+public class LogsPlexusResource
     extends AbstractNexusPlexusResource
 {
     /** Key for retrieving the requested filename from request. */
