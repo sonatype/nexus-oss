@@ -1,10 +1,10 @@
 package org.sonatype.nexus.jsecurity.realms;
 
-import org.sonatype.jsecurity.realms.MutableRealm;
+import org.jsecurity.realm.Realm;
 import org.sonatype.nexus.configuration.ConfigurationChangeListener;
 
-public interface NexusRealm
+public interface NexusAuthorizingRealm
     extends ConfigurationChangeListener,
-        MutableRealm
+        Realm
 {
 }

@@ -2,14 +2,13 @@ package org.sonatype.nexus.jsecurity.realms;
 
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
-import org.jsecurity.authc.AuthenticationToken;
-import org.sonatype.jsecurity.realms.MethodRealm;
+import org.sonatype.jsecurity.realms.XmlMethodAuthorizingRealm;
 import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
 import org.sonatype.nexus.jsecurity.NexusSecurity;
 
-public abstract class AbstractNexusRealm
-    extends MethodRealm
-        implements NexusRealm,
+public abstract class AbstractNexusAuthorizingRealm
+    extends XmlMethodAuthorizingRealm
+        implements NexusAuthorizingRealm,
         Initializable
 {
     /**
@@ -21,19 +20,12 @@ public abstract class AbstractNexusRealm
     public void initialize()
         throws InitializationException
     {
-        super.initialize();
-        
         security.addConfigurationChangeListener( this );
     }
     
     public void onConfigurationChange( ConfigurationChangeEvent evt )
     {
-        this.clearCache();
-    }
-    
-    @Override
-    public boolean supports( AuthenticationToken token )
-    {
-        return false;
+        getAuthorizationCache().clear();
+        getConfigurationManager().clearCache();
     }
 }

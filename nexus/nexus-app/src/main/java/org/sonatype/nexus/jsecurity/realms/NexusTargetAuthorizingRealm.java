@@ -15,11 +15,11 @@ import org.sonatype.nexus.proxy.NoSuchRepositoryGroupException;
 import org.sonatype.nexus.proxy.repository.Repository;
 
 /**
- * @plexus.component role="org.jsecurity.realm.Realm" role-hint="NexusTargetRealm"
+ * @plexus.component role="org.jsecurity.realm.Realm" role-hint="NexusTargetAuthorizingRealm"
  *
  */
-public class NexusTargetRealm
-    extends NexusMethodRealm
+public class NexusTargetAuthorizingRealm
+    extends AbstractNexusAuthorizingRealm
 {
     public static final String PRIVILEGE_TYPE_TARGET = "target";
     

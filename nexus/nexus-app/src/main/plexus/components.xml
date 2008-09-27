@@ -2,8 +2,8 @@
   <components>
     <component>
       <role>org.jsecurity.realm.Realm</role>
-      <role-hint>NexusMethodRealm</role-hint>
-      <implementation>org.sonatype.nexus.jsecurity.realms.NexusMethodRealm</implementation>
+      <role-hint>NexusMethodAuthorizingRealm</role-hint>
+      <implementation>org.sonatype.nexus.jsecurity.realms.NexusMethodAuthorizingRealm</implementation>
       <description></description>
       <isolated-realm>false</isolated-realm>
       <requirements>
@@ -15,8 +15,8 @@
     </component>
     <component>
       <role>org.jsecurity.realm.Realm</role>
-      <role-hint>NexusTargetRealm</role-hint>
-      <implementation>org.sonatype.nexus.jsecurity.realms.NexusTargetRealm</implementation>
+      <role-hint>NexusTargetAuthorizingRealm</role-hint>
+      <implementation>org.sonatype.nexus.jsecurity.realms.NexusTargetAuthorizingRealm</implementation>
       <description></description>
       <isolated-realm>false</isolated-realm>
       <requirements>

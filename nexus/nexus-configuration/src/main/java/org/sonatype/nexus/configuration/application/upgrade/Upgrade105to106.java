@@ -324,9 +324,9 @@ public class Upgrade105to106
             security.setEnabled( oldsecurity.isEnabled() );
         }
         
-        security.addRealm( "SecurityXmlRealm" );
-        security.addRealm( "NexusMethodRealm" );
-        security.addRealm( "NexusTargetRealm" );
+        security.addRealm( "XmlAuthenticatingRealm" );
+        security.addRealm( "NexusMethodAuthorizingRealm" );
+        security.addRealm( "NexusTargetAuthorizingRealm" );
 
         return security;
     }

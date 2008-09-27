@@ -7,9 +7,9 @@
     <anonymousUsername>anonymous2</anonymousUsername>
     <anonymousPassword>anonymous2</anonymousPassword>
     <realms>
-      <realm>SecurityXmlRealm</realm>
-      <realm>NexusMethodRealm</realm>
-      <realm>NexusTargetRealm</realm>
+      <realm>XmlAuthenticatingRealm</realm>
+      <realm>NexusMethodAuthorizingRealm</realm>
+      <realm>NexusTargetAuthorizingRealm</realm>
     </realms>
   </security>
   <globalConnectionSettings />

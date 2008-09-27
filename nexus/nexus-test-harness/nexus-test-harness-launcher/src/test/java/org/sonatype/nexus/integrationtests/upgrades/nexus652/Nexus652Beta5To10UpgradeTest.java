@@ -43,9 +43,9 @@ public class Nexus652Beta5To10UpgradeTest
         Assert.assertEquals( "Security anon access:", true, nexusConfig.getSecurity().isAnonymousAccessEnabled() );
         Assert.assertEquals( "Security enabled:", true, nexusConfig.getSecurity().isEnabled() );
         Assert.assertEquals( "Security realm size:", 3, nexusConfig.getSecurity().getRealms().size() );
-        Assert.assertEquals( "Security realm:", "SecurityXmlRealm", nexusConfig.getSecurity().getRealms().get( 0 ) );
-        Assert.assertEquals( "Security realm:", "NexusMethodRealm", nexusConfig.getSecurity().getRealms().get( 1 ) );
-        Assert.assertEquals( "Security realm:", "NexusTargetRealm", nexusConfig.getSecurity().getRealms().get( 2 ) );
+        Assert.assertEquals( "Security realm:", "XmlAuthenticatingRealm", nexusConfig.getSecurity().getRealms().get( 0 ) );
+        Assert.assertEquals( "Security realm:", "NexusMethodAuthorizingRealm", nexusConfig.getSecurity().getRealms().get( 1 ) );
+        Assert.assertEquals( "Security realm:", "NexusTargetAuthorizingRealm", nexusConfig.getSecurity().getRealms().get( 2 ) );
 
         Assert.assertEquals( "http proxy:", true, nexusConfig.getHttpProxy().isEnabled() );
 

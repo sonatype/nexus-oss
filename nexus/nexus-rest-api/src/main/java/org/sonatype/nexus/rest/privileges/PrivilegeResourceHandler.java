@@ -28,7 +28,7 @@ import org.restlet.resource.Representation;
 import org.restlet.resource.Variant;
 import org.sonatype.jsecurity.model.CPrivilege;
 import org.sonatype.jsecurity.realms.tools.NoSuchPrivilegeException;
-import org.sonatype.nexus.jsecurity.realms.NexusMethodRealm;
+import org.sonatype.nexus.jsecurity.realms.NexusMethodAuthorizingRealm;
 import org.sonatype.nexus.rest.model.PrivilegeStatusResourceResponse;
 
 public class PrivilegeResourceHandler
@@ -107,7 +107,7 @@ public class PrivilegeResourceHandler
         {
             priv = getNexusSecurity().readPrivilege( getPrivilegeId() );
             
-            if ( priv.getType().equals( NexusMethodRealm.PRIVILEGE_TYPE_METHOD ) )
+            if ( priv.getType().equals( NexusMethodAuthorizingRealm.PRIVILEGE_TYPE_METHOD ) )
             {
                 getResponse().setStatus( Status.CLIENT_ERROR_BAD_REQUEST, "Cannot delete an application type privilege" );
             }

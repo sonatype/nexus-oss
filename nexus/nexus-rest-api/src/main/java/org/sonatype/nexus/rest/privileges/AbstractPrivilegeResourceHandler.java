@@ -27,8 +27,8 @@ import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.sonatype.jsecurity.model.CPrivilege;
 import org.sonatype.jsecurity.model.CProperty;
-import org.sonatype.nexus.jsecurity.realms.NexusMethodRealm;
-import org.sonatype.nexus.jsecurity.realms.NexusTargetRealm;
+import org.sonatype.nexus.jsecurity.realms.NexusMethodAuthorizingRealm;
+import org.sonatype.nexus.jsecurity.realms.NexusTargetAuthorizingRealm;
 import org.sonatype.nexus.rest.AbstractNexusResourceHandler;
 import org.sonatype.nexus.rest.model.PrivilegeApplicationStatusResource;
 import org.sonatype.nexus.rest.model.PrivilegeBaseStatusResource;
@@ -58,7 +58,7 @@ extends AbstractNexusResourceHandler
     {
         PrivilegeBaseStatusResource resource = null;
         
-        if ( privilege.getType().equals( NexusMethodRealm.PRIVILEGE_TYPE_METHOD ) )
+        if ( privilege.getType().equals( NexusMethodAuthorizingRealm.PRIVILEGE_TYPE_METHOD ) )
         {
             resource = new PrivilegeApplicationStatusResource();
             
@@ -66,14 +66,14 @@ extends AbstractNexusResourceHandler
             
             for ( CProperty prop : ( List<CProperty> ) privilege.getProperties() )
             {
-                if ( prop.getKey().equals( NexusMethodRealm.PRIVILEGE_PROPERTY_PERMISSION ) )
+                if ( prop.getKey().equals( NexusMethodAuthorizingRealm.PRIVILEGE_PROPERTY_PERMISSION ) )
                 {
                     res.setPermission( prop.getValue() );       
                 }
             }
             res.setType( TYPE_APPLICATION );
         }
-        else if ( privilege.getType().equals( NexusTargetRealm.PRIVILEGE_TYPE_TARGET ) )
+        else if ( privilege.getType().equals( NexusTargetAuthorizingRealm.PRIVILEGE_TYPE_TARGET ) )
         {
             resource = new PrivilegeTargetStatusResource();
             
@@ -81,15 +81,15 @@ extends AbstractNexusResourceHandler
             
             for ( CProperty prop : ( List<CProperty> ) privilege.getProperties() )
             {
-                if ( prop.getKey().equals( NexusTargetRealm.PRIVILEGE_PROPERTY_REPOSITORY_TARGET ) )
+                if ( prop.getKey().equals( NexusTargetAuthorizingRealm.PRIVILEGE_PROPERTY_REPOSITORY_TARGET ) )
                 {
                     res.setRepositoryTargetId( prop.getValue() );       
                 }
-                else if ( prop.getKey().equals( NexusTargetRealm.PRIVILEGE_PROPERTY_REPOSITORY_ID ) )
+                else if ( prop.getKey().equals( NexusTargetAuthorizingRealm.PRIVILEGE_PROPERTY_REPOSITORY_ID ) )
                 {
                     res.setRepositoryId( prop.getValue() );        
                 }
-                else if ( prop.getKey().equals( NexusTargetRealm.PRIVILEGE_PROPERTY_REPOSITORY_GROUP_ID ) )
+                else if ( prop.getKey().equals( NexusTargetAuthorizingRealm.PRIVILEGE_PROPERTY_REPOSITORY_GROUP_ID ) )
                 {
                     res.setRepositoryGroupId( prop.getValue() );        
                 }
@@ -107,7 +107,7 @@ extends AbstractNexusResourceHandler
             
             for ( CProperty prop : ( List<CProperty> ) privilege.getProperties() )
             {
-                if ( prop.getKey().equals( NexusMethodRealm.PRIVILEGE_PROPERTY_METHOD ) )
+                if ( prop.getKey().equals( NexusMethodAuthorizingRealm.PRIVILEGE_PROPERTY_METHOD ) )
                 {
                     resource.setMethod( prop.getValue() );       
                 }
