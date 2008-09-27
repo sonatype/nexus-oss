@@ -36,8 +36,6 @@ import org.sonatype.nexus.rest.authentication.LoginResourceHandler;
 import org.sonatype.nexus.rest.authentication.LogoutResourceHandler;
 import org.sonatype.nexus.rest.cache.CacheResourceHandler;
 import org.sonatype.nexus.rest.contentclasses.ContentClassesListResourceHandler;
-import org.sonatype.nexus.rest.feeds.FeedResourceHandler;
-import org.sonatype.nexus.rest.feeds.FeedsListResourceHandler;
 import org.sonatype.nexus.rest.global.GlobalConfigurationListResourceHandler;
 import org.sonatype.nexus.rest.global.GlobalConfigurationResourceHandler;
 import org.sonatype.nexus.rest.groups.RepositoryGroupContentResourceHandler;
@@ -193,8 +191,6 @@ public class ApplicationBridge
         // and protectedResources for protected ones
 
         // attaching the restlets to scond router
-        attach( applicationRouter, false, "/feeds/{" + FeedResourceHandler.FEED_KEY + "}", FeedResourceHandler.class );
-
         attach( applicationRouter, false, "/authentication/login", LoginResourceHandler.class );
 
         attach( applicationRouter, false, "/authentication/logout", LogoutResourceHandler.class );
