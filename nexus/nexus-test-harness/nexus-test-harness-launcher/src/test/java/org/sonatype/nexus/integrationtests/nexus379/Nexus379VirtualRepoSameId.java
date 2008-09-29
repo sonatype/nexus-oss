@@ -46,7 +46,7 @@ public class Nexus379VirtualRepoSameId
         repo.setFormat( "maven2" );
         repo.setRepoPolicy( "release" );
         repo.setChecksumPolicy( "ignore" ); // [ignore, warn, strictIfExists, strict]
-        repo = this.messageUtil.createRepository( repo );
+        repo = (RepositoryResource) this.messageUtil.createRepository( repo );
         
         // now create a virtual one, this should fail
         

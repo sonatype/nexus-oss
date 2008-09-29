@@ -5,6 +5,7 @@ import java.util.List;
 
 import junit.framework.Assert;
 
+import org.jmock.core.stub.ThrowStub;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
@@ -66,13 +67,52 @@ public class TaskScheduleUtil
     {
         String serviceURI = "service/local/schedules";
         Response response = RequestFacade.doGetRequest( serviceURI );
-        XStreamRepresentation representation =
-            new XStreamRepresentation( xstream, response.getEntity().getText(), MediaType.APPLICATION_XML );
+        XStreamRepresentation representation = new XStreamRepresentation(
+            xstream,
+            response.getEntity().getText(),
+            MediaType.APPLICATION_XML );
 
-        ScheduledServiceListResourceResponse scheduleResponse =
-            (ScheduledServiceListResourceResponse) representation.getPayload( new ScheduledServiceListResourceResponse() );
+        ScheduledServiceListResourceResponse scheduleResponse = (ScheduledServiceListResourceResponse) representation
+            .getPayload( new ScheduledServiceListResourceResponse() );
 
         return scheduleResponse.getData();
+    }
+
+    public static String getStatus( String name )
+        throws Exception
+    {
+        ScheduledServiceListResource task = getTask( name );
+        return task.getLastRunResult();
+    }
+
+    /**
+     * Blocks while waiting for a task to finish.
+     * 
+     * @param name
+     * @return
+     * @throws Exception
+     */
+    public static ScheduledServiceListResource waitForTask( String name )
+        throws Exception
+    {
+        int maxAttempts = 10;
+        long sleep = 100;
+
+        for ( int attempt = 0; attempt < maxAttempts; attempt++ )
+        {
+            ScheduledServiceListResource task = getTask( name );
+            String status = task.getStatus();
+            
+            if ( !status.equals( "RUNNING" ) )
+            {
+                return task;
+            }
+            else
+            {
+                Thread.sleep( sleep );
+            }
+        }
+        return null;
     }
 
     public static Status update( ScheduledServiceBaseResource task )
@@ -108,14 +148,14 @@ public class TaskScheduleUtil
         return response.getStatus();
     }
 
-    public static ScheduledServiceBaseResource runTask( String typeId, ScheduledServicePropertyResource... properties )
+    public static ScheduledServiceListResource runTask( String typeId, ScheduledServicePropertyResource... properties )
         throws Exception
     {
         return runTask( typeId, typeId, properties );
     }
 
-    public static ScheduledServiceBaseResource runTask( String taskName, String typeId,
-                                                        ScheduledServicePropertyResource... properties )
+    public static ScheduledServiceListResource runTask( String taskName, String typeId,
+        ScheduledServicePropertyResource... properties )
         throws Exception
     {
         ScheduledServiceBaseResource scheduledTask = new ScheduledServiceBaseResource();
@@ -124,7 +164,7 @@ public class TaskScheduleUtil
         scheduledTask.setName( taskName );
         scheduledTask.setTypeId( typeId );
         scheduledTask.setSchedule( "manual" );
-        
+
         for ( ScheduledServicePropertyResource property : properties )
         {
             scheduledTask.addProperty( property );
@@ -137,10 +177,7 @@ public class TaskScheduleUtil
         status = TaskScheduleUtil.run( taskId );
         Assert.assertTrue( "Unable to run task:" + scheduledTask.getTypeId(), status.isSuccess() );
 
-        // I don't like to rely on this
-        Thread.sleep( 1000 );
-
-        return scheduledTask;
+        return waitForTask( taskName );
     }
 
 }

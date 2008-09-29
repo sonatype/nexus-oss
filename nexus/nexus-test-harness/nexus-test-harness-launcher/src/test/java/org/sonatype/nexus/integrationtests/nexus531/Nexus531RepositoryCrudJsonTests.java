@@ -91,7 +91,7 @@ public class Nexus531RepositoryCrudJsonTests
         // this also validates
         this.messageUtil.createRepository( resource ); // this currently also calls GET, but that will change
 
-        RepositoryResource responseRepo = this.messageUtil.getRepository( resource.getId() );
+        RepositoryResource responseRepo = (RepositoryResource) this.messageUtil.getRepository( resource.getId() );
 
         // validate they are the same
         this.messageUtil.validateResourceResponse( resource, responseRepo );
@@ -122,7 +122,7 @@ public class Nexus531RepositoryCrudJsonTests
         resource.setChecksumPolicy( "ignore" ); // [ignore, warn, strictIfExists, strict]
 
         // this also validates
-        resource = this.messageUtil.createRepository( resource );
+        resource = (RepositoryResource) this.messageUtil.createRepository( resource );
 
         // udpdate the repo
         resource.setRepoPolicy( "snapshot" );
@@ -154,7 +154,7 @@ public class Nexus531RepositoryCrudJsonTests
         resource.setChecksumPolicy( "ignore" ); // [ignore, warn, strictIfExists, strict]
 
         // this also validates
-        resource = this.messageUtil.createRepository( resource );
+        resource = (RepositoryResource) this.messageUtil.createRepository( resource );
 
         // now delete it...
         // use the new ID
@@ -182,7 +182,7 @@ public class Nexus531RepositoryCrudJsonTests
         repo.setChecksumPolicy( "ignore" ); // [ignore, warn, strictIfExists, strict]
 
         // this also validates
-        repo = this.messageUtil.createRepository( repo );
+        repo = (RepositoryResource) this.messageUtil.createRepository( repo );
 
         // now get the lists
         List<RepositoryListResource> repos = this.messageUtil.getList();

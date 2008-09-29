@@ -48,7 +48,7 @@ public class Nexus531RepositoryCrudPermissionTests extends AbstractPrivilegeTest
 
         response = this.repoUtil.sendMessage( Method.POST, repo );
         Assert.assertEquals( "Response status: ", 201, response.getStatus().getCode() );
-        repo = this.repoUtil.getRepository( repo.getId() );
+        repo = (RepositoryResource) this.repoUtil.getRepository( repo.getId() );
 
         // read should succeed (inherited)
         response = this.repoUtil.sendMessage( Method.GET, repo );
@@ -81,7 +81,7 @@ public class Nexus531RepositoryCrudPermissionTests extends AbstractPrivilegeTest
 
         Response response = this.repoUtil.sendMessage( Method.POST, repo );
         Assert.assertEquals( "Response status: ", 201, response.getStatus().getCode() );
-        repo = this.repoUtil.getRepository( repo.getId() );
+        repo = (RepositoryResource) this.repoUtil.getRepository( repo.getId() );
 
         TestContainer.getInstance().getTestContext().setUsername( "test-user" );
         TestContainer.getInstance().getTestContext().setPassword( "admin123" );
@@ -135,7 +135,7 @@ public class Nexus531RepositoryCrudPermissionTests extends AbstractPrivilegeTest
 
         Response response = this.repoUtil.sendMessage( Method.POST, repo );
         Assert.assertEquals( "Response status: ", 201, response.getStatus().getCode() );
-        repo = this.repoUtil.getRepository( repo.getId() );
+        repo = (RepositoryResource) this.repoUtil.getRepository( repo.getId() );
 
         TestContainer.getInstance().getTestContext().setUsername( "test-user" );
         TestContainer.getInstance().getTestContext().setPassword( "admin123" );
@@ -190,7 +190,7 @@ public class Nexus531RepositoryCrudPermissionTests extends AbstractPrivilegeTest
 
         Response response = this.repoUtil.sendMessage( Method.POST, repo );
         Assert.assertEquals( "Response status: ", 201, response.getStatus().getCode() );
-        repo = this.repoUtil.getRepository( repo.getId() );
+        repo = (RepositoryResource) this.repoUtil.getRepository( repo.getId() );
 
         TestContainer.getInstance().getTestContext().setUsername( "test-user" );
         TestContainer.getInstance().getTestContext().setPassword( "admin123" );

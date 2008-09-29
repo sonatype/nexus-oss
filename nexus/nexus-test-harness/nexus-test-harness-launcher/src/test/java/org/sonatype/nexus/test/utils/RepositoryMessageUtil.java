@@ -11,13 +11,14 @@ import org.restlet.data.Method;
 import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.sonatype.nexus.configuration.model.CRepository;
+import org.sonatype.nexus.configuration.model.CRepositoryShadow;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.rest.model.RepositoryBaseResource;
 import org.sonatype.nexus.rest.model.RepositoryListResource;
 import org.sonatype.nexus.rest.model.RepositoryListResourceResponse;
 import org.sonatype.nexus.rest.model.RepositoryResource;
 import org.sonatype.nexus.rest.model.RepositoryResourceResponse;
-import org.sonatype.nexus.rest.xstream.XStreamInitializer;
+import org.sonatype.nexus.rest.model.RepositoryShadowResource;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
 
 import com.thoughtworks.xstream.XStream;
@@ -38,7 +39,7 @@ public class RepositoryMessageUtil
         this.mediaType = mediaType;
     }
 
-    public RepositoryResource createRepository( RepositoryResource repo )
+    public RepositoryBaseResource createRepository( RepositoryBaseResource repo )
         throws IOException
     {
 
@@ -55,7 +56,7 @@ public class RepositoryMessageUtil
 
         // currently create doesn't return anything, it should see NEXUS-540
         // the work around is to call get at this point
-        RepositoryResource responseResource = this.getRepository( repo.getId() ); // GET always uses XML, due to a
+        RepositoryBaseResource responseResource = this.getRepository( repo.getId() ); // GET always uses XML, due to a
         // problem in the RESTlet client
 
         this.validateResourceResponse( repo, responseResource );
@@ -63,53 +64,72 @@ public class RepositoryMessageUtil
         return responseResource;
     }
 
-    public void validateResourceResponse( RepositoryResource repo, RepositoryResource responseResource )
+    public void validateResourceResponse( RepositoryBaseResource repo, RepositoryBaseResource responseResource )
         throws IOException
     {
         Assert.assertEquals( repo.getId(), responseResource.getId() );
-        Assert.assertEquals( repo.getChecksumPolicy(), responseResource.getChecksumPolicy() );
         Assert.assertEquals( repo.getName(), responseResource.getName() );
         // Assert.assertEquals( repo.getDefaultLocalStorageUrl(), responseResource.getDefaultLocalStorageUrl() ); //
         // TODO: add check for this
 
-        // TODO: sometimes the storage dir ends with a '/' SEE: NEXUS-542
-        if ( responseResource.getDefaultLocalStorageUrl().endsWith( "/" ) )
-        {
-            Assert.assertTrue( "Unexpected defaultLocalStorage: <expected to end with> " + "runtime/work/storage/"
-                + repo.getId() + "/  <actual>" + responseResource.getDefaultLocalStorageUrl(),
-                               responseResource.getDefaultLocalStorageUrl().endsWith(
-                                                                                      "runtime/work/storage/"
-                                                                                          + repo.getId() + "/" ) );
-        }
-        // NOTE one of these blocks should be removed
-        else
-        {
-            Assert.assertTrue( "Unexpected defaultLocalStorage: <expected to end with> " + "runtime/work/storage/"
-                + repo.getId() + "  <actual>" + responseResource.getDefaultLocalStorageUrl(),
-                               responseResource.getDefaultLocalStorageUrl().endsWith(
-                                                                                      "runtime/work/storage/"
-                                                                                          + repo.getId() ) );
-        }
         Assert.assertEquals( repo.getFormat(), responseResource.getFormat() );
-        Assert.assertEquals( repo.getNotFoundCacheTTL(), responseResource.getNotFoundCacheTTL() );
-        Assert.assertEquals( repo.getOverrideLocalStorageUrl(), responseResource.getOverrideLocalStorageUrl() );
+        Assert.assertEquals( repo.getRepoType(), responseResource.getRepoType() );
         
-        if( repo.getRemoteStorage() == null )
+        if( repo.getRepoType().equals( "virtual" ))
         {
-            Assert.assertNull( responseResource.getRemoteStorage() );
+            // check mirror
+            RepositoryShadowResource expected = (RepositoryShadowResource) repo;
+            RepositoryShadowResource actual = (RepositoryShadowResource) responseResource;
+            
+            Assert.assertEquals( expected.getShadowOf(), actual.getShadowOf() );
         }
         else
         {
-            Assert.assertEquals( repo.getRemoteStorage().getRemoteStorageUrl(), responseResource.getRemoteStorage().getRemoteStorageUrl() );   
+            RepositoryResource expected = (RepositoryResource) repo;
+            RepositoryResource actual = (RepositoryResource) responseResource;
+
+            Assert.assertEquals( expected.getChecksumPolicy(), actual.getChecksumPolicy() );
+            
+            // TODO: sometimes the storage dir ends with a '/' SEE: NEXUS-542
+            if ( actual.getDefaultLocalStorageUrl().endsWith( "/" ) )
+            {
+                Assert.assertTrue( "Unexpected defaultLocalStorage: <expected to end with> " + "runtime/work/storage/"
+                    + repo.getId() + "/  <actual>" + actual.getDefaultLocalStorageUrl(),
+                    actual.getDefaultLocalStorageUrl().endsWith(
+                                                                                          "runtime/work/storage/"
+                                                                                              + repo.getId() + "/" ) );
+            }
+            // NOTE one of these blocks should be removed
+            else
+            {
+                Assert.assertTrue( "Unexpected defaultLocalStorage: <expected to end with> " + "runtime/work/storage/"
+                    + repo.getId() + "  <actual>" + actual.getDefaultLocalStorageUrl(),
+                    actual.getDefaultLocalStorageUrl().endsWith(
+                                                                                          "runtime/work/storage/"
+                                                                                              + repo.getId() ) );
+            }
+            
+
+            Assert.assertEquals( expected.getNotFoundCacheTTL(), actual.getNotFoundCacheTTL() );
+            Assert.assertEquals( expected.getOverrideLocalStorageUrl(), actual.getOverrideLocalStorageUrl() );
+            
+            if( expected.getRemoteStorage() == null )
+            {
+                Assert.assertNull( actual.getRemoteStorage() );
+            }
+            else
+            {
+                Assert.assertEquals( expected.getRemoteStorage().getRemoteStorageUrl(), actual.getRemoteStorage().getRemoteStorageUrl() );   
+            }
+            
+            Assert.assertEquals( expected.getRepoPolicy(), actual.getRepoPolicy() );
         }
-        Assert.assertEquals( repo.getRepoPolicy(), responseResource.getRepoPolicy() );
-        Assert.assertEquals( repo.getRepoType(), responseResource.getRepoType() );
 
         // check nexus.xml
         this.validateRepoInNexusConfig( responseResource );
     }
 
-    public RepositoryResource getRepository( String repoId )
+    public RepositoryBaseResource getRepository( String repoId )
         throws IOException
     {
 
@@ -124,10 +144,10 @@ public class RepositoryMessageUtil
         RepositoryResourceResponse resourceResponse =
             (RepositoryResourceResponse) representation.getPayload( new RepositoryResourceResponse() );
 
-        return (RepositoryResource) resourceResponse.getData();
+        return (RepositoryBaseResource) resourceResponse.getData();
     }
 
-    public RepositoryResource updateRepo( RepositoryResource repo )
+    public RepositoryBaseResource updateRepo( RepositoryResource repo )
         throws IOException
     {
         Response response = this.sendMessage( Method.PUT, repo );
@@ -143,7 +163,7 @@ public class RepositoryMessageUtil
         // RepositoryResource responseResource = this.getResourceFromResponse( response );
 
         // for now call GET
-        RepositoryResource responseResource = this.getRepository( repo.getId() );
+        RepositoryBaseResource responseResource = this.getRepository( repo.getId() );
 
         this.validateResourceResponse( repo, responseResource );
 
@@ -212,31 +232,44 @@ public class RepositoryMessageUtil
         return (RepositoryResource) resourceResponse.getData();
     }
 
-    private void validateRepoInNexusConfig( RepositoryResource repo )
+    private void validateRepoInNexusConfig( RepositoryBaseResource repo )
         throws IOException
     {
-        CRepository cRepo = NexusConfigUtil.getRepo( repo.getId() );
-
-        Assert.assertEquals( repo.getId(), cRepo.getId() );
-        Assert.assertEquals( repo.getChecksumPolicy(), cRepo.getChecksumPolicy() );
-        Assert.assertEquals( repo.getName(), cRepo.getName() );
-        Assert.assertEquals( repo.getFormat(), cRepo.getType() );
-        Assert.assertEquals( repo.getNotFoundCacheTTL(), cRepo.getNotFoundCacheTTL() );
-        Assert.assertEquals( repo.getOverrideLocalStorageUrl(), cRepo.getLocalStorage() );
         
-        if( repo.getRemoteStorage() == null )
+        if( repo.getRepoType().equals( "virtual" ))
+        {
+            // check mirror
+            RepositoryShadowResource expected = (RepositoryShadowResource) repo;
+            CRepositoryShadow cRepo = NexusConfigUtil.getRepoShadow( repo.getId() );
+            
+            Assert.assertEquals( expected.getShadowOf(), cRepo.getShadowOf() );
+            Assert.assertEquals( expected.getId(), cRepo.getId() );
+            Assert.assertEquals( expected.getName(), cRepo.getName() );
+            Assert.assertEquals( expected.getFormat(), cRepo.getType() );
+        }
+        else
+        {
+            RepositoryResource expected = (RepositoryResource) repo;
+            CRepository cRepo = NexusConfigUtil.getRepo( repo.getId() );
+
+        Assert.assertEquals( expected.getId(), cRepo.getId() );
+        Assert.assertEquals( expected.getChecksumPolicy(), cRepo.getChecksumPolicy() );
+        Assert.assertEquals( expected.getName(), cRepo.getName() );
+        Assert.assertEquals( expected.getFormat(), cRepo.getType() );
+        Assert.assertEquals( expected.getNotFoundCacheTTL(), cRepo.getNotFoundCacheTTL() );
+        Assert.assertEquals( expected.getOverrideLocalStorageUrl(), cRepo.getLocalStorage() );
+        
+        if( expected.getRemoteStorage() == null )
         {
             Assert.assertNull( cRepo.getRemoteStorage() );
         }
         else
         {
-            Assert.assertEquals( repo.getRemoteStorage().getRemoteStorageUrl(), cRepo.getRemoteStorage().getUrl() );   
+            Assert.assertEquals( expected.getRemoteStorage().getRemoteStorageUrl(), cRepo.getRemoteStorage().getUrl() );   
         }
         
-        Assert.assertEquals( repo.getRepoPolicy(), cRepo.getRepositoryPolicy() );
-
-        // TODO: allow for shadow repos
-        // Assert.assertEquals( repo.getRepoType(), cRepo.getType() );
+        Assert.assertEquals( expected.getRepoPolicy(), cRepo.getRepositoryPolicy() );
+        }
 
     }
 

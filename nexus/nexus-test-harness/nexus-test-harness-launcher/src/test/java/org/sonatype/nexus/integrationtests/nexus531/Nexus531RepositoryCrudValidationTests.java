@@ -362,7 +362,7 @@ public class Nexus531RepositoryCrudValidationTests
         resource.setChecksumPolicy( "ignore" ); // [ignore, warn, strictIfExists, strict]
 
         // this also validates
-        resource = this.messageUtil.createRepository( resource );
+        resource = (RepositoryResource) this.messageUtil.createRepository( resource );
 
         // invalid policy
         resource.setRepoPolicy( "junk" );
