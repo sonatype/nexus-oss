@@ -307,15 +307,7 @@
 					</includes>
 					<excludes>
 						<!-- <exclude>**/proxy/*</exclude> -->
-					</excludes>
-					
-				  <systemproperties>
-	                  <property>
-	                      <name>java.util.logging.config.file</name>
-	                      <value>${nexus-abs-basedir}/conf/jul-logging.properties</value>
-	                  </property>
-	              </systemproperties>
-					
+					</excludes>					
 				</configuration>
 			</plugin>
 

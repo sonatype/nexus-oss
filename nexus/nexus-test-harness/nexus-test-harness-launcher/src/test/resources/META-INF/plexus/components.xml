@@ -30,7 +30,6 @@
         		<plexus.nexus-work>${nexus-abs-basedir}/runtime/work</plexus.nexus-work>
         		<plexus.webapp>${nexus-abs-basedir}/runtime/apps/nexus/webapp</plexus.webapp>
         		<plexus.webapp-context-path>/nexus</plexus.webapp-context-path>
-        		<java.util.logging.config.file>${nexus-abs-basedir}/conf/jul-logging.properties</java.util.logging.config.file>
         </systemProperties>
       </configuration>
     </component>

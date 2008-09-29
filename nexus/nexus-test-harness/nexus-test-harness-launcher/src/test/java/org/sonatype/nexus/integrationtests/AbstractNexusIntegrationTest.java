@@ -33,6 +33,7 @@ import org.junit.BeforeClass;
 import org.restlet.data.Method;
 import org.restlet.data.Reference;
 import org.restlet.data.Response;
+import org.slf4j.bridge.SLF4JBridgeHandler;
 import org.sonatype.appbooter.ForkedAppBooter;
 import org.sonatype.appbooter.ctl.AppBooterServiceException;
 import org.sonatype.nexus.artifact.Gav;
@@ -118,6 +119,9 @@ public class AbstractNexusIntegrationTest
         // we also need to setup a couple fields, that need to be pulled out of a bundle
         this.testRepositoryId = testRepositoryId;
         // this.nexusTestRepoUrl = baseNexusUrl + REPOSITORY_RELATIVE_URL + testRepositoryId + "/";
+        
+        // configure the logging
+        SLF4JBridgeHandler.install();
 
     }
 
