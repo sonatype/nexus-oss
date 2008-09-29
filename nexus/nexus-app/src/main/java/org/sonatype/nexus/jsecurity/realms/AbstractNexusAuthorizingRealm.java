@@ -16,7 +16,6 @@ public abstract class AbstractNexusAuthorizingRealm
      */
     private NexusSecurity security;
     
-    @Override
     public void initialize()
         throws InitializationException
     {
@@ -25,7 +24,13 @@ public abstract class AbstractNexusAuthorizingRealm
     
     public void onConfigurationChange( ConfigurationChangeEvent evt )
     {
-        getAuthorizationCache().clear();
-        getConfigurationManager().clearCache();
+        if ( getAuthorizationCache() != null )
+        {
+            getAuthorizationCache().clear();
+        }
+        if ( getConfigurationManager() != null )
+        {
+            getConfigurationManager().clearCache();
+        }
     }
 }
