@@ -27,6 +27,7 @@ import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.resource.ResourceException;
+import org.restlet.resource.Variant;
 import org.sonatype.nexus.NexusStreamResponse;
 import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
 import org.sonatype.nexus.rest.model.LogsListResource;
@@ -57,7 +58,7 @@ public class LogsListPlexusResource
     }
     
     @Override
-    public Object get( Context context, Request request, Response response )
+    public Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
     {
         LogsListResourceResponse result = new LogsListResourceResponse();

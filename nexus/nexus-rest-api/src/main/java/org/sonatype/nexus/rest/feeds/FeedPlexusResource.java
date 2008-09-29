@@ -31,59 +31,69 @@ import com.sun.syndication.feed.synd.SyndEntry;
 import com.sun.syndication.feed.synd.SyndFeed;
 
 /**
- * Simple class that calculates the feed key by attribute (and it is probably
- * mapped with FEED_KEY in some router).
+ * Simple class that calculates the feed key by attribute (and it is probably mapped with FEED_KEY in some router).
  * 
  * @author cstamas
  * @author dip
  * @plexus.component role-hint="feed"
  */
-public class FeedPlexusResource extends AbstractFeedPlexusResource {
-
+public class FeedPlexusResource
+    extends AbstractFeedPlexusResource
+{
     public static final String FEED_KEY = "feedKey";
 
     @Override
-    public Object getPayloadInstance() {
+    public Object getPayloadInstance()
+    {
         // RO resource, no payload
         return null;
     }
 
     @Override
-    public String getResourceUri() {
+    public String getResourceUri()
+    {
         return "/feeds/{" + FEED_KEY + "}";
     }
 
     @Override
-    protected String getChannelKey(Request request) {
-        return (String) request.getAttributes().get(FEED_KEY);
+    protected String getChannelKey( Request request )
+    {
+        return (String) request.getAttributes().get( FEED_KEY );
     }
 
     @Override
-    protected SyndFeed getFeed(Context context, Request request,
-            String channelKey) throws IOException, ComponentLookupException {
-        SyndFeed feed = super.getFeed(context, request, channelKey);
+    protected SyndFeed getFeed( Context context, Request request, String channelKey )
+        throws IOException,
+            ComponentLookupException
+    {
+        SyndFeed feed = super.getFeed( context, request, channelKey );
 
-        if (feed.getLink() != null) {
+        if ( feed.getLink() != null )
+        {
             // full URLs should not be touched
-            if (!feed.getLink().startsWith("http")) {
-                if (feed.getLink().startsWith("/")) {
-                    feed.setLink(feed.getLink().substring(1));
+            if ( !feed.getLink().startsWith( "http" ) )
+            {
+                if ( feed.getLink().startsWith( "/" ) )
+                {
+                    feed.setLink( feed.getLink().substring( 1 ) );
                 }
-                feed.setLink(createRootReference(request, feed.getLink())
-                        .toString());
+                feed.setLink( createRootReference( request, feed.getLink() ).toString() );
             }
         }
 
         // TODO: A hack: creating "absolute" links
-        for (SyndEntry entry : (List<SyndEntry>) feed.getEntries()) {
-            if (entry.getLink() != null) {
+        for ( SyndEntry entry : (List<SyndEntry>) feed.getEntries() )
+        {
+            if ( entry.getLink() != null )
+            {
                 // full URLs should not be touched
-                if (!entry.getLink().startsWith("http")) {
-                    if (entry.getLink().startsWith("/")) {
-                        entry.setLink(entry.getLink().substring(1));
+                if ( !entry.getLink().startsWith( "http" ) )
+                {
+                    if ( entry.getLink().startsWith( "/" ) )
+                    {
+                        entry.setLink( entry.getLink().substring( 1 ) );
                     }
-                    entry.setLink(createRootReference(request, entry.getLink())
-                            .toString());
+                    entry.setLink( createRootReference( request, entry.getLink() ).toString() );
                 }
             }
         }

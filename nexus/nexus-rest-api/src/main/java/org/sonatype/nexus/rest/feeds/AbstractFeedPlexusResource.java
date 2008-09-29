@@ -36,76 +36,87 @@ import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
 import com.sun.syndication.feed.synd.SyndFeed;
 
 /**
- * A base Resource class for RSS feeds to be published over restlet.org. It
- * overrides the get() method, the user only needs to implement getChannel()
- * method of ChannelSource interface.
+ * A base Resource class for RSS feeds to be published over restlet.org. It overrides the get() method, the user only
+ * needs to implement getChannel() method of ChannelSource interface.
  * 
  * @author cstamas
  * @author dip
  */
-public abstract class AbstractFeedPlexusResource extends
-        AbstractNexusPlexusResource {
-
+public abstract class AbstractFeedPlexusResource
+    extends AbstractNexusPlexusResource
+{
     private static final String RSS_2_0 = "rss_2.0";
 
     private static final String ATOM_1_0 = "atom_1.0";
 
-    private static final String DEFAULT_FEED_TYPE = RSS_2_0;
-
-    public List<Variant> getVariants() {
+    public List<Variant> getVariants()
+    {
         List<Variant> result = super.getVariants();
 
         // the default resource implementation returns
         // application/xml and application/json
-        result.add(new Variant(FeedRepresentation.RSS_MEDIA_TYPE));
-        result.add(new Variant(FeedRepresentation.ATOM_MEDIA_TYPE));
-        result.add(new Variant(MediaType.TEXT_XML));
+        result.add( new Variant( FeedRepresentation.RSS_MEDIA_TYPE ) );
+        result.add( new Variant( FeedRepresentation.ATOM_MEDIA_TYPE ) );
+        result.add( new Variant( MediaType.TEXT_XML ) );
 
         return result;
     }
 
-    public Object get(Context context, Request request, Response response)
-            throws ResourceException {
+    public Object get( Context context, Request request, Response response, Variant variant )
+        throws ResourceException
+    {
+        MediaType mediaType = variant.getMediaType();
 
-        MediaType mediaType = request.getEntity().getMediaType();
-        try {
-            if (!MediaType.APPLICATION_JSON.equals(mediaType, true)) {
-                SyndFeed feed = getFeed(context, request, getChannelKey(request));
+        try
+        {
+            if ( !MediaType.APPLICATION_JSON.equals( mediaType, true ) )
+            {
+                SyndFeed feed = getFeed( context, request, getChannelKey( request ) );
 
-                if (FeedRepresentation.ATOM_MEDIA_TYPE.equals(mediaType, true)) {
-                    feed.setFeedType(ATOM_1_0);
-                } else if (FeedRepresentation.RSS_MEDIA_TYPE.equals(mediaType,
-                        true)) {
-                    feed.setFeedType(RSS_2_0);
-                } else {
-                    feed.setFeedType(DEFAULT_FEED_TYPE);
+                if ( FeedRepresentation.ATOM_MEDIA_TYPE.equals( mediaType, true ) )
+                {
+                    feed.setFeedType( ATOM_1_0 );
+                }
+                else if ( FeedRepresentation.RSS_MEDIA_TYPE.equals( mediaType, true ) )
+                {
+                    feed.setFeedType( RSS_2_0 );
+                }
+                else
+                {
+                    feed.setFeedType( RSS_2_0 );
+
+                    mediaType = FeedRepresentation.RSS_MEDIA_TYPE;
                 }
 
-                feed.setLink(request.getResourceRef().toString());
+                feed.setLink( request.getResourceRef().toString() );
 
-                FeedRepresentation representation = new FeedRepresentation(
-                        mediaType, feed);
+                FeedRepresentation representation = new FeedRepresentation( mediaType, feed );
 
                 return representation;
-            } else {
-                throw new ResourceException(
-                        Status.SERVER_ERROR_NOT_IMPLEMENTED, "Not implemented.");
             }
-        } catch (ComponentLookupException e) {
-            throw new ResourceException(Status.CLIENT_ERROR_NOT_FOUND,
-                    "Channel source not found!", e);
-        } catch (IOException e) {
-            throw new ResourceException(Status.SERVER_ERROR_INTERNAL, e);
+            else
+            {
+                throw new ResourceException( Status.SERVER_ERROR_NOT_IMPLEMENTED, "Not implemented." );
+            }
+        }
+        catch ( ComponentLookupException e )
+        {
+            throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, "Channel source not found!", e );
+        }
+        catch ( IOException e )
+        {
+            throw new ResourceException( Status.SERVER_ERROR_INTERNAL, e );
         }
     }
 
-    protected SyndFeed getFeed(Context context, Request request,
-            String channelKey) throws IOException, ComponentLookupException {
-        FeedSource src = (FeedSource) getPlexusContainer(context).lookup(
-                FeedSource.ROLE, channelKey);
+    protected SyndFeed getFeed( Context context, Request request, String channelKey )
+        throws IOException,
+            ComponentLookupException
+    {
+        FeedSource src = (FeedSource) getPlexusContainer( context ).lookup( FeedSource.ROLE, channelKey );
 
         return src.getFeed();
     }
 
-    protected abstract String getChannelKey(Request request);
+    protected abstract String getChannelKey( Request request );
 }

@@ -60,7 +60,7 @@ public class ConfigurationPlexusResource
     }
 
     @Override
-    public Object get( Context context, Request request, Response response )
+    public Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
     {
         String configurationName = request

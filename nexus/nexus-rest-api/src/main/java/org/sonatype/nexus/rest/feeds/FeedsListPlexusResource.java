@@ -28,6 +28,7 @@ import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
+import org.restlet.resource.Variant;
 import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
 import org.sonatype.nexus.rest.model.FeedListResource;
 import org.sonatype.nexus.rest.model.FeedListResourceResponse;
@@ -39,43 +40,49 @@ import org.sonatype.nexus.rest.model.FeedListResourceResponse;
  * @author dip
  * @plexus.component role-hint="feedList"
  */
-public class FeedsListPlexusResource extends AbstractNexusPlexusResource {
+public class FeedsListPlexusResource
+    extends AbstractNexusPlexusResource
+{
 
     @Override
-    public Object getPayloadInstance() {
+    public Object getPayloadInstance()
+    {
         // RO resource, no payload
         return null;
     }
 
     @Override
-    public String getResourceUri() {
+    public String getResourceUri()
+    {
         return "/feeds";
     }
 
     @Override
-    public Object get(Context context, Request req, Response res)
-            throws ResourceException {
+    public Object get( Context context, Request req, Response res, Variant variant )
+        throws ResourceException
+    {
         FeedListResourceResponse response = new FeedListResourceResponse();
 
-        try {
-            List<FeedSource> sources = (List<FeedSource>) getPlexusContainer(context)
-                    .lookupList(FeedSource.ROLE);
+        try
+        {
+            List<FeedSource> sources = (List<FeedSource>) getPlexusContainer( context ).lookupList( FeedSource.ROLE );
 
-            for (FeedSource source : sources) {
+            for ( FeedSource source : sources )
+            {
                 FeedListResource resource = new FeedListResource();
 
-                resource.setResourceURI(createChildReference(req,
-                        source.getFeedKey()).toString());
+                resource.setResourceURI( createChildReference( req, source.getFeedKey() ).toString() );
 
-                resource.setName(source.getFeedName());
+                resource.setName( source.getFeedName() );
 
-                response.addData(resource);
+                response.addData( resource );
             }
 
             return response;
-        } catch (ComponentLookupException e) {
-            throw new ResourceException(Status.SERVER_ERROR_INTERNAL,
-                    "Error looking up channel source!", e);
+        }
+        catch ( ComponentLookupException e )
+        {
+            throw new ResourceException( Status.SERVER_ERROR_INTERNAL, "Error looking up channel source!", e );
         }
     }
 

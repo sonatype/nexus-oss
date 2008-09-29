@@ -48,33 +48,33 @@ public class LogsPlexusResource
 {
     /** Key for retrieving the requested filename from request. */
     public static final String FILE_NAME_KEY = "fileName";
-    
+
     @Override
     public List<Variant> getVariants()
     {
         return Collections.singletonList( new Variant( MediaType.TEXT_PLAIN ) );
     }
-    
+
     @Override
     public Object getPayloadInstance()
     {
         // TODO Auto-generated method stub
         return null;
     }
-    
+
     @Override
     public String getResourceUri()
     {
         return "/logs/{" + FILE_NAME_KEY + "}";
     }
-    
+
     /**
      * The default handler. It simply extracts the requested file name and gets the file's InputStream from Nexus
      * instance. If Nexus finds the file appropriate, the handler wraps it into InputStream representation and ships it
      * as "text/plain" media type, otherwise HTTP 404 is returned.
      */
     @Override
-    public Object get( Context context, Request request, Response response )
+    public Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
     {
         String logFile = request.getAttributes().get( FILE_NAME_KEY ).toString();
@@ -111,13 +111,12 @@ public class LogsPlexusResource
 
         if ( result != null )
         {
-            return new InputStreamRepresentation( MediaType.valueOf( result.getMimeType() ), result
-                .getInputStream() );
+            return new InputStreamRepresentation( MediaType.valueOf( result.getMimeType() ), result.getInputStream() );
         }
         else
         {
             getLogger().warn( "Log file not found, filename=" + logFile );
-            
+
             throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, "Log file not found" );
         }
     }

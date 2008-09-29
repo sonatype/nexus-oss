@@ -65,6 +65,7 @@ public class NexusHttpAuthenticationFilter
     }
 
     protected boolean onAccessDenied( ServletRequest request, ServletResponse response )
+        throws Exception
     {
         // this will be true if cookie is sent with request and it is valid
         Subject subject = getSubject( request, response );
@@ -150,8 +151,10 @@ public class NexusHttpAuthenticationFilter
             }
             catch ( AuthenticationException ae )
             {
-                getLogger().info( "Unable to authenticate user [" + token.getPrincipal() + "] from address/host [" + request.getRemoteAddr() + "/" + request.getRemoteHost() + "]" );
-                
+                getLogger().info(
+                    "Unable to authenticate user [" + token.getPrincipal() + "] from address/host ["
+                        + request.getRemoteAddr() + "/" + request.getRemoteHost() + "]" );
+
                 if ( getLogger().isDebugEnabled() )
                 {
                     getLogger().debug( "Unable to log in user [" + token.getPrincipal() + "]", ae );
@@ -205,8 +208,10 @@ public class NexusHttpAuthenticationFilter
         }
         catch ( AuthenticationException ae )
         {
-            getLogger().info( "Unable to authenticate user [anonymous] from address/host [" + request.getRemoteAddr() + "/" + request.getRemoteHost() + "]" );
-            
+            getLogger().info(
+                "Unable to authenticate user [anonymous] from address/host [" + request.getRemoteAddr() + "/"
+                    + request.getRemoteHost() + "]" );
+
             if ( getLogger().isDebugEnabled() )
             {
                 getLogger().debug( "Unable to log in subject as anonymous", ae );
