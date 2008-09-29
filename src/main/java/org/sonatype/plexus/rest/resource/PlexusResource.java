@@ -67,18 +67,18 @@ public interface PlexusResource
      */
     boolean acceptsUpload();
 
-    Object get( Context context, Request request, Response response )
+    Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException;
 
-    void post( Context context, Request request, Response response, Object payload )
+    Object post( Context context, Request request, Response response, Object payload )
         throws ResourceException;
 
-    void put( Context context, Request request, Response response, Object payload )
+    Object put( Context context, Request request, Response response, Object payload )
         throws ResourceException;
 
     void delete( Context context, Request request, Response response )
         throws ResourceException;
 
-    void upload( Context context, Request request, Response response, FileItem file )
+    Object upload( Context context, Request request, Response response, List<FileItem> files )
         throws ResourceException;
 }

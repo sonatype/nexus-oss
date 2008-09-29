@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -163,31 +164,37 @@ public class RestletResource
         return result.getPayload( root );
     }
 
-    public Representation represent( Variant variant )
+    protected Representation doRepresent( Object payload, Variant variant )
         throws ResourceException
     {
-        Object result = delegate.get( getContext(), getRequest(), getResponse() );
-
-        if ( Representation.class.isAssignableFrom( result.getClass() ) )
+        if ( Representation.class.isAssignableFrom( payload.getClass() ) )
         {
             // representation
-            return (Representation) result;
+            return (Representation) payload;
         }
-        else if ( InputStream.class.isAssignableFrom( result.getClass() ) )
+        else if ( InputStream.class.isAssignableFrom( payload.getClass() ) )
         {
             // inputStream
-            return new InputStreamRepresentation( variant.getMediaType(), (InputStream) result );
+            return new InputStreamRepresentation( variant.getMediaType(), (InputStream) payload );
         }
-        else if ( String.class.isAssignableFrom( result.getClass() ) )
+        else if ( String.class.isAssignableFrom( payload.getClass() ) )
         {
             // inputStream
-            return new StringRepresentation( (String) result, variant.getMediaType() );
+            return new StringRepresentation( (String) payload, variant.getMediaType() );
         }
         else
         {
             // object, make it a representation
-            return serialize( variant, result );
+            return serialize( variant, payload );
         }
+    }
+
+    public Representation represent( Variant variant )
+        throws ResourceException
+    {
+        Object result = delegate.get( getContext(), getRequest(), getResponse(), variant );
+
+        return doRepresent( result, variant );
     }
 
     public void acceptRepresentation( Representation representation )
@@ -201,7 +208,12 @@ public class RestletResource
         {
             Object payload = deserialize( delegate.getPayloadInstance() );
 
-            delegate.post( getContext(), getRequest(), getResponse(), payload );
+            Object result = delegate.post( getContext(), getRequest(), getResponse(), payload );
+
+            if ( result != null )
+            {
+                getResponse().setEntity( doRepresent( result, representation ) );
+            }
         }
 
         if ( getResponse().getStatus().isSuccess() )
@@ -221,7 +233,12 @@ public class RestletResource
         {
             Object payload = deserialize( delegate.getPayloadInstance() );
 
-            delegate.put( getContext(), getRequest(), getResponse(), payload );
+            Object result = delegate.put( getContext(), getRequest(), getResponse(), payload );
+
+            if ( result != null )
+            {
+                getResponse().setEntity( doRepresent( result, representation ) );
+            }
         }
 
         if ( getResponse().getStatus().isSuccess() )
@@ -248,16 +265,17 @@ public class RestletResource
     public void upload( Representation representation )
         throws ResourceException
     {
+        Object result = null;
+
+        List<FileItem> files = null;
+
         try
         {
             RestletFileUpload uploadRequest = new RestletFileUpload( getFileItemFactory() );
 
-            List<FileItem> files = uploadRequest.parseRepresentation( representation );
+            files = uploadRequest.parseRepresentation( representation );
 
-            for ( FileItem file : files )
-            {
-                delegate.upload( getContext(), getRequest(), getResponse(), file );
-            }
+            result = delegate.upload( getContext(), getRequest(), getResponse(), files );
         }
         catch ( FileUploadException e )
         {
@@ -271,7 +289,16 @@ public class RestletResource
 
             FileItem file = new FakeFileItem( name, representation );
 
-            delegate.upload( getContext(), getRequest(), getResponse(), file );
+            files = new ArrayList<FileItem>();
+
+            files.add( file );
+
+            result = delegate.upload( getContext(), getRequest(), getResponse(), files );
+        }
+
+        if ( result != null )
+        {
+            getResponse().setEntity( doRepresent( result, representation ) );
         }
     }
 

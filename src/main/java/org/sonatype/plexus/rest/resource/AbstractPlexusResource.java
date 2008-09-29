@@ -92,19 +92,19 @@ public abstract class AbstractPlexusResource
         return false;
     }
 
-    public Object get( Context context, Request request, Response response )
+    public Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
     {
         throw new ResourceException( Status.CLIENT_ERROR_METHOD_NOT_ALLOWED );
     }
 
-    public void post( Context context, Request request, Response response, Object payload )
+    public Object post( Context context, Request request, Response response, Object payload )
         throws ResourceException
     {
         throw new ResourceException( Status.CLIENT_ERROR_METHOD_NOT_ALLOWED );
     }
 
-    public void put( Context context, Request request, Response response, Object payload )
+    public Object put( Context context, Request request, Response response, Object payload )
         throws ResourceException
     {
         throw new ResourceException( Status.CLIENT_ERROR_METHOD_NOT_ALLOWED );
@@ -116,7 +116,7 @@ public abstract class AbstractPlexusResource
         throw new ResourceException( Status.CLIENT_ERROR_METHOD_NOT_ALLOWED );
     }
 
-    public void upload( Context context, Request request, Response response, FileItem file )
+    public Object upload( Context context, Request request, Response response, List<FileItem> files )
         throws ResourceException
     {
         throw new ResourceException( Status.SERVER_ERROR_NOT_IMPLEMENTED );

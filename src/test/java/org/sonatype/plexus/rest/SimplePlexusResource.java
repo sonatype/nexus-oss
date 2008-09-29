@@ -3,6 +3,7 @@ package org.sonatype.plexus.rest;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.fileupload.FileItem;
 import org.restlet.Context;
 import org.restlet.data.MediaType;
 import org.restlet.data.Request;
@@ -50,34 +51,44 @@ public class SimplePlexusResource
         return result;
     }
 
-    public Object get( Context context, Request request, Response response )
+    public Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
     {
         return token;
     }
 
-    public void post( Context context, Request request, Response response, Object payload )
+    public Object post( Context context, Request request, Response response, Object payload )
         throws ResourceException
     {
         if ( !token.equals( payload.toString() ) )
         {
             throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST );
         }
+
+        return null;
     }
 
-    public void put( Context context, Request request, Response response, Object payload )
+    public Object put( Context context, Request request, Response response, Object payload )
         throws ResourceException
     {
         if ( !token.equals( payload.toString() ) )
         {
             throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST );
         }
+
+        return null;
     }
 
     public void delete( Context context, Request request, Response response )
         throws ResourceException
     {
         // nothing
+    }
+
+    public Object upload( Context context, Request request, Response response, List<FileItem> files )
+        throws ResourceException
+    {
+        return null;
     }
 
 }
