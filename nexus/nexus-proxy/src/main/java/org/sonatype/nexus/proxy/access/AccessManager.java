@@ -56,6 +56,6 @@ public interface AccessManager
      * @param permission the permission
      * @throws AccessDeniedException the access denied exception
      */
-    void decide( ResourceStoreRequest request, Repository repository, RepositoryPermission permission )
+    void decide( ResourceStoreRequest request, Repository repository, Action action )
         throws AccessDeniedException;
 }

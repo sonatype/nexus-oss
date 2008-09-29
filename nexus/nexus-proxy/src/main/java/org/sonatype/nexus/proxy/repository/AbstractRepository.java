@@ -41,8 +41,8 @@ import org.sonatype.nexus.proxy.RepositoryNotListableException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.access.AccessManager;
+import org.sonatype.nexus.proxy.access.Action;
 import org.sonatype.nexus.proxy.access.OpenAccessManager;
-import org.sonatype.nexus.proxy.access.RepositoryPermission;
 import org.sonatype.nexus.proxy.cache.CacheManager;
 import org.sonatype.nexus.proxy.cache.PathCache;
 import org.sonatype.nexus.proxy.events.RepositoryEventClearCaches;
@@ -122,6 +122,13 @@ public abstract class AbstractRepository
      */
     private RepositoryItemUidFactory repositoryItemUidFactory;
 
+    /**
+     * The access manager.
+     * 
+     * @plexus.requirement
+     */
+    private AccessManager accessManager;
+
     /** The id. */
     private String id;
 
@@ -151,9 +158,6 @@ public abstract class AbstractRepository
 
     /** The indexable. */
     private boolean indexable = true;
-
-    /** The access manager. */
-    private AccessManager accessManager = new OpenAccessManager();
 
     /** The local storage. */
     private LocalRepositoryStorage localStorage;
@@ -320,17 +324,10 @@ public abstract class AbstractRepository
             }
         }
         /*
-         * AUTO_BLOCK temporarily disabled
-         * 
-         * else if ( RemoteStatus.UNAVAILABLE.equals( remoteStatus ) )
-        {
-            this.remoteStatusUpdated = System.currentTimeMillis();
-
-            if ( getProxyMode() != null && getProxyMode().shouldProxy() )
-            {
-                setProxyMode( ProxyMode.BLOCKED_AUTO, true, cause );
-            }
-        }*/
+         * AUTO_BLOCK temporarily disabled else if ( RemoteStatus.UNAVAILABLE.equals( remoteStatus ) ) {
+         * this.remoteStatusUpdated = System.currentTimeMillis(); if ( getProxyMode() != null &&
+         * getProxyMode().shouldProxy() ) { setProxyMode( ProxyMode.BLOCKED_AUTO, true, cause ); } }
+         */
     }
 
     public ProxyMode getProxyMode()
@@ -678,7 +675,7 @@ public abstract class AbstractRepository
             StorageException,
             AccessDeniedException
     {
-        checkConditions( request, RepositoryPermission.RETRIEVE );
+        checkConditions( request, Action.read );
 
         RepositoryItemUid uid = createUid( request.getRequestPath() );
 
@@ -704,9 +701,9 @@ public abstract class AbstractRepository
             StorageException,
             AccessDeniedException
     {
-        checkConditions( from, RepositoryPermission.RETRIEVE );
+        checkConditions( from, Action.read );
 
-        checkConditions( to, RepositoryPermission.STORE );
+        checkConditions( to, getResultingActionOnWrite( to ) );
 
         RepositoryItemUid fromUid = createUid( from.getRequestPath() );
 
@@ -723,11 +720,11 @@ public abstract class AbstractRepository
             StorageException,
             AccessDeniedException
     {
-        checkConditions( from, RepositoryPermission.RETRIEVE );
+        checkConditions( from, Action.read );
 
-        checkConditions( from, RepositoryPermission.DELETE );
+        checkConditions( from, Action.delete );
 
-        checkConditions( to, RepositoryPermission.STORE );
+        checkConditions( to, getResultingActionOnWrite( to ) );
 
         RepositoryItemUid fromUid = createUid( from.getRequestPath() );
 
@@ -745,7 +742,7 @@ public abstract class AbstractRepository
             StorageException,
             AccessDeniedException
     {
-        checkConditions( request, RepositoryPermission.DELETE );
+        checkConditions( request, Action.delete );
 
         RepositoryItemUid uid = createUid( request.getRequestPath() );
 
@@ -759,7 +756,7 @@ public abstract class AbstractRepository
             StorageException,
             AccessDeniedException
     {
-        checkConditions( request, RepositoryPermission.STORE );
+        checkConditions( request, getResultingActionOnWrite( request ) );
 
         DefaultStorageFileItem fItem = new DefaultStorageFileItem( this, request.getRequestPath(), true, true, is );
 
@@ -780,7 +777,7 @@ public abstract class AbstractRepository
             StorageException,
             AccessDeniedException
     {
-        checkConditions( request, RepositoryPermission.STORE );
+        checkConditions( request, getResultingActionOnWrite( request ) );
 
         DefaultStorageCollectionItem coll = new DefaultStorageCollectionItem(
             this,
@@ -806,7 +803,7 @@ public abstract class AbstractRepository
             StorageException,
             AccessDeniedException
     {
-        checkConditions( request, RepositoryPermission.LIST );
+        checkConditions( request, Action.read );
 
         RepositoryItemUid uid = createUid( request.getRequestPath() );
 
@@ -829,6 +826,34 @@ public abstract class AbstractRepository
         RepositoryItemUid uid = createUid( request.getRequestPath() );
 
         return getTargetsForRequest( uid, request.getRequestContext() );
+    }
+
+    public Action getResultingActionOnWrite( ResourceStoreRequest rsr )
+    {
+        try
+        {
+            RepositoryItemUid uid = createUid( rsr.getRequestPath() );
+
+            retrieveItem( true, uid, rsr.getRequestContext() );
+
+            return Action.update;
+        }
+        catch ( ItemNotFoundException e )
+        {
+            return Action.create;
+        }
+        catch ( StorageException e )
+        {
+            getLogger().warn( "Got exception while checking for resulting actionOnWrite", e );
+
+            return null;
+        }
+        catch ( RepositoryNotAvailableException e )
+        {
+            getLogger().warn( "Got exception while checking for resulting actionOnWrite", e );
+
+            return null;
+        }
     }
 
     // ===================================================================================
@@ -1177,7 +1202,7 @@ public abstract class AbstractRepository
      * @throws RepositoryNotAvailableException the repository not available exception
      * @throws AccessDeniedException the access denied exception
      */
-    protected void checkConditions( ResourceStoreRequest request, RepositoryPermission permission )
+    protected void checkConditions( ResourceStoreRequest request, Action action )
         throws RepositoryNotAvailableException,
             AccessDeniedException
     {
@@ -1186,12 +1211,12 @@ public abstract class AbstractRepository
             throw new RepositoryNotAvailableException( this.getId() );
         }
 
-        if ( !isAllowWrite() && ( RepositoryPermission.STORE.equals( permission ) ) )
+        if ( !isAllowWrite() && ( !action.isReadOnly() ) )
         {
             throw new AccessDeniedException( request, "Repository is READ ONLY!!" );
         }
 
-        getAccessManager().decide( request, this, permission );
+        getAccessManager().decide( request, this, action );
     }
 
     /**

@@ -97,4 +97,9 @@ public class ApplicationConfigurationAdapter
         nexusConfiguration.notifyConfigurationChangeListeners( evt );
     }
 
+    public boolean isSecurityEnabled()
+    {
+        return nexusConfiguration.isSecurityEnabled();
+    }
+
 }

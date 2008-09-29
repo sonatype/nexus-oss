@@ -33,7 +33,7 @@ import org.sonatype.nexus.proxy.repository.Repository;
 public class OpenAccessManager
     implements AccessManager
 {
-    public void decide( ResourceStoreRequest request, Repository repository, RepositoryPermission permission )
+    public void decide( ResourceStoreRequest request, Repository repository, Action action )
         throws AccessDeniedException
     {
         // this access manager is open, everybody has access to everything since

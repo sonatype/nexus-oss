@@ -1,44 +1,56 @@
-package org.sonatype.nexus.security;
+package org.sonatype.nexus.proxy.access;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.servlet.ServletRequest;
+import java.util.Map;
 
 import org.jsecurity.SecurityUtils;
 import org.jsecurity.subject.Subject;
-import org.sonatype.nexus.Nexus;
+import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
-import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.proxy.item.RepositoryItemUid;
+import org.sonatype.nexus.proxy.router.RepositoryRouter;
 import org.sonatype.nexus.proxy.target.TargetMatch;
 import org.sonatype.nexus.proxy.target.TargetSet;
 
 /**
+ * Default implementation of Nexus Authorizer, that relies onto JSecurity.
+ * 
  * @plexus.component
  */
-public class DefaultNexusArtifactAuthorizer
-    implements NexusArtifactAuthorizer
+public class DefaultNexusItemAuthorizer
+    implements NexusItemAuthorizer
 {
-    
-    /** @plexus.requirement */
-    private Nexus nexus;
-    
-    public boolean authorizePath( Repository repository, String path )
+    /**
+     * @plexus.requirement
+     */
+    private ApplicationConfiguration applicationConfiguration;
+
+    /**
+     * @plexus.requirement role="org.sonatype.nexus.proxy.router.RootRepositoryRouter"
+     */
+    private RepositoryRouter root;
+
+    public boolean authorizePath( RepositoryItemUid uid, Map<String, Object> context, Action action )
     {
         // Get the target(s) that match the path
-        TargetSet matched = repository.getTargetsForRequest( repository.createUid( path ), null );
-        
-        return isPermitted( getTargetPerms( matched, "read" ) );
+        TargetSet matched = uid.getRepository().getTargetsForRequest( uid, context );
+
+        return authorizePath( matched, action );
     }
-    
-    public boolean authorizePath( ServletRequest request, ResourceStoreRequest rsr, String action )
+
+    public boolean authorizePath( ResourceStoreRequest rsr, Action action )
     {
-        // collect the targetSet/matches for the request
-        TargetSet matched = getNexus().getRootRouter().getTargetsForRequest( rsr );
-    
+        TargetSet matched = root.getTargetsForRequest( rsr );
+
+        return authorizePath( matched, action );
+    }
+
+    protected boolean authorizePath( TargetSet matched, Action action )
+    {
         // did we hit repositories at all?
         if ( matched.getMatchedRepositoryIds().size() > 0 )
-        {                
+        {
             // we had reposes affected, check the targets
             // make perms from TargetSet
             return isPermitted( getTargetPerms( matched, action ) );
@@ -49,16 +61,14 @@ public class DefaultNexusArtifactAuthorizer
             return true;
         }
     }
-    
+
     protected boolean isPermitted( String[] perms )
     {
         // Get the current user
         Subject subject = SecurityUtils.getSubject();
 
-        
-        if ( getNexus().isSecurityEnabled() )
+        if ( applicationConfiguration.isSecurityEnabled() )
         {
-
             // And finally check each of the target permissions and see if the user
             // has access, all it takes is one
             for ( String perm : perms )
@@ -71,14 +81,14 @@ public class DefaultNexusArtifactAuthorizer
         }
         else
         {
+            // sec is disabled, simply say YES
             return true;
-
         }
 
         return false;
     }
-    
-    protected String[] getTargetPerms( TargetSet matched, String method )
+
+    protected String[] getTargetPerms( TargetSet matched, Action action )
     {
         String[] result = null;
 
@@ -87,7 +97,8 @@ public class DefaultNexusArtifactAuthorizer
         // nexus : 'target' + targetId : repoId : read
         for ( TargetMatch match : matched.getMatches() )
         {
-            perms.add( "nexus:target:" + match.getTarget().getId() + ":" + match.getRepository().getId() + ":" + method );
+            perms
+                .add( "nexus:target:" + match.getTarget().getId() + ":" + match.getRepository().getId() + ":" + action );
         }
 
         result = perms.toArray( new String[perms.size()] );
@@ -95,9 +106,4 @@ public class DefaultNexusArtifactAuthorizer
         return result;
     }
 
-    public Nexus getNexus()
-    {
-        return nexus;
-    }
-    
 }

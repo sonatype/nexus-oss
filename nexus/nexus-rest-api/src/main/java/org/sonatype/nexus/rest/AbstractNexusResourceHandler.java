@@ -51,13 +51,14 @@ import org.sonatype.nexus.configuration.validator.ValidationResponse;
 import org.sonatype.nexus.index.ArtifactInfo;
 import org.sonatype.nexus.jsecurity.NexusSecurity;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
+import org.sonatype.nexus.proxy.access.Action;
+import org.sonatype.nexus.proxy.access.NexusItemAuthorizer;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.rest.model.NexusArtifact;
 import org.sonatype.nexus.rest.model.NexusError;
 import org.sonatype.nexus.rest.model.NexusErrorResponse;
-import org.sonatype.nexus.security.NexusArtifactAuthorizer;
 import org.sonatype.plexus.rest.AbstractPlexusAwareResource;
 import org.sonatype.plexus.rest.PlexusRestletUtils;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
@@ -73,7 +74,7 @@ import com.thoughtworks.xstream.XStream;
 public abstract class AbstractNexusResourceHandler
     extends AbstractPlexusAwareResource
 {
-    private NexusArtifactAuthorizer artifactAuthorizer;
+    private NexusItemAuthorizer nexusItemAuthorizer;
 
     public AbstractNexusResourceHandler( Context context, Request request, Response response )
     {
@@ -83,7 +84,7 @@ public abstract class AbstractNexusResourceHandler
 
         getVariants().add( new Variant( MediaType.APPLICATION_JSON ) );
 
-        artifactAuthorizer = (NexusArtifactAuthorizer) lookup( NexusArtifactAuthorizer.ROLE );
+        nexusItemAuthorizer = (NexusItemAuthorizer) lookup( NexusItemAuthorizer.ROLE );
     }
 
     /**
@@ -95,7 +96,7 @@ public abstract class AbstractNexusResourceHandler
     {
         return (Nexus) getRequest().getAttributes().get( Nexus.ROLE );
     }
-    
+
     protected NexusSecurity getNexusSecurity()
     {
         return (NexusSecurity) getRequest().getAttributes().get( NexusSecurity.ROLE );
@@ -170,7 +171,7 @@ public abstract class AbstractNexusResourceHandler
 
                 String path = mr.getGavCalculator().gavToPath( gav );
 
-                if ( !artifactAuthorizer.authorizePath( mr, path ) )
+                if ( !nexusItemAuthorizer.authorizePath( mr.createUid( path ), null, Action.read ) )
                 {
                     return null;
                 }
@@ -534,13 +535,14 @@ public abstract class AbstractNexusResourceHandler
 
         return ref.getTargetRef();
     }
-    
-    protected void handleInvalidConfigurationException( org.sonatype.jsecurity.realms.tools.InvalidConfigurationException e, Representation representation )
+
+    protected void handleInvalidConfigurationException(
+        org.sonatype.jsecurity.realms.tools.InvalidConfigurationException e, Representation representation )
     {
         getLogger().log( Level.WARNING, "Configuration error!", e );
 
         getResponse().setStatus( Status.CLIENT_ERROR_BAD_REQUEST, "Configuration error." );
-        
+
         org.sonatype.jsecurity.realms.validator.ValidationResponse vr = e.getValidationResponse();
 
         if ( vr != null && vr.getValidationErrors().size() > 0 )

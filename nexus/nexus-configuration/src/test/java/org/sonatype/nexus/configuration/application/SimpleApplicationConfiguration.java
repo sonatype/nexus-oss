@@ -77,7 +77,7 @@ public class SimpleApplicationConfiguration
 
         return result;
     }
-    
+
     public File getWastebasketDirectory()
     {
         return getWorkingDirectory( "trash" );
@@ -120,6 +120,11 @@ public class SimpleApplicationConfiguration
         throws IOException
     {
         // DO NOTHING, this is test
+    }
+
+    public boolean isSecurityEnabled()
+    {
+        return false;
     }
 
 }

@@ -12,11 +12,10 @@ import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.jsecurity.web.WebUtils;
-import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
-import org.sonatype.nexus.security.DefaultNexusArtifactAuthorizer;
-import org.sonatype.nexus.security.NexusArtifactAuthorizer;
+import org.sonatype.nexus.proxy.access.Action;
+import org.sonatype.nexus.proxy.access.NexusItemAuthorizer;
 
 /**
  * A filter that maps the targetId from the Request.
@@ -25,14 +24,14 @@ import org.sonatype.nexus.security.NexusArtifactAuthorizer;
  */
 public class NexusTargetMappingAuthorizationFilter
     extends HttpVerbMappingAuthorizationFilter
-{    
+{
     private Pattern pathPrefixPattern;
 
     private String pathPrefix;
 
     private String pathReplacement;
-    
-    private NexusArtifactAuthorizer authorizer = null;
+
+    private NexusItemAuthorizer authorizer = null;
 
     public String getPathPrefix()
     {
@@ -98,7 +97,7 @@ public class NexusTargetMappingAuthorizationFilter
         return path;
     }
 
-    protected String getActionFromHttpVerb( ServletRequest request )
+    protected Action getActionFromHttpVerb( ServletRequest request )
     {
         String action = ( (HttpServletRequest) request ).getMethod().toLowerCase();
 
@@ -118,6 +117,7 @@ public class NexusTargetMappingAuthorizationFilter
             catch ( Exception e )
             {
                 // huh?
+                throw new IllegalStateException( "Got exception during target mapping!", e );
             }
 
             // the path exists, this is UPDATE
@@ -150,14 +150,14 @@ public class NexusTargetMappingAuthorizationFilter
                 return false;
             }
         }
-        
+
         if ( authorizer == null )
         {
             PlexusContainer plexus = (PlexusContainer) getAttribute( PlexusConstants.PLEXUS_KEY );
 
             try
             {
-                authorizer = (NexusArtifactAuthorizer) plexus.lookup( NexusArtifactAuthorizer.ROLE );
+                authorizer = (NexusItemAuthorizer) plexus.lookup( NexusItemAuthorizer.ROLE );
             }
             catch ( ComponentLookupException e )
             {
@@ -165,8 +165,6 @@ public class NexusTargetMappingAuthorizationFilter
             }
         }
 
-        return authorizer.authorizePath( request, 
-                                         getResourceStoreRequest( request, true ), 
-                                         getActionFromHttpVerb( request ) );
+        return authorizer.authorizePath( getResourceStoreRequest( request, true ), getActionFromHttpVerb( request ) );
     }
 }

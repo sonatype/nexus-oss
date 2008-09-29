@@ -4,15 +4,16 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.jsecurity.subject.Subject;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.jsecurity.subject.Subject;
 import org.jsecurity.web.filter.authz.PermissionsAuthorizationFilter;
 import org.sonatype.nexus.Nexus;
+import org.sonatype.nexus.proxy.access.Action;
 import org.sonatype.nexus.security.filter.NexusJSecurityFilter;
 
 /**
@@ -43,7 +44,7 @@ public class HttpVerbMappingAuthorizationFilter
         return (Nexus) request.getAttribute( Nexus.class.getName() );
     }
 
-    protected String getActionFromHttpVerb( String method )
+    protected Action getActionFromHttpVerb( String method )
     {
         method = method.toLowerCase();
 
@@ -52,17 +53,17 @@ public class HttpVerbMappingAuthorizationFilter
             method = mapping.get( method );
         }
 
-        return method;
+        return Action.valueOf( method );
     }
 
-    protected String getActionFromHttpVerb( ServletRequest request )
+    protected Action getActionFromHttpVerb( ServletRequest request )
     {
         String action = ( (HttpServletRequest) request ).getMethod();
 
         return getActionFromHttpVerb( action );
     }
 
-    protected String[] mapPerms( String[] perms, String action )
+    protected String[] mapPerms( String[] perms, Action action )
     {
         if ( perms != null && perms.length > 0 && action != null )
         {
@@ -99,7 +100,7 @@ public class HttpVerbMappingAuthorizationFilter
     public boolean isAccessAllowed( ServletRequest request, ServletResponse response, Object mappedValue )
         throws IOException
     {
-        String action = getActionFromHttpVerb( request );
+        Action action = getActionFromHttpVerb( request );
 
         String[] perms = (String[]) mappedValue;
 
@@ -110,18 +111,12 @@ public class HttpVerbMappingAuthorizationFilter
         throws IOException
     {
         Subject subject = getSubject( request, response );
-        
-        getLogger().info( "Unable to authorize user ["
-                          + subject.getPrincipal()
-                          + "] for "
-                          + getActionFromHttpVerb( request ) 
-                          + " to "
-                          + ( (HttpServletRequest) request ).getRequestURI()
-                          + " from address/host [" 
-                          + request.getRemoteAddr() 
-                          + "/" 
-                          + request.getRemoteHost() + "]" );
-        
+
+        getLogger().info(
+            "Unable to authorize user [" + subject.getPrincipal() + "] for " + getActionFromHttpVerb( request )
+                + " to " + ( (HttpServletRequest) request ).getRequestURI() + " from address/host ["
+                + request.getRemoteAddr() + "/" + request.getRemoteHost() + "]" );
+
         request.setAttribute( NexusJSecurityFilter.REQUEST_IS_AUTHZ_REJECTED, Boolean.TRUE );
 
         return false;

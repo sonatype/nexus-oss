@@ -34,19 +34,23 @@ public abstract class AbstractNexusTestCase
     extends PlexusTestCase
 {
     public static final String RUNTIME_CONFIGURATION_KEY = "runtime";
+
     public static final String WORK_CONFIGURATION_KEY = "nexus-work";
+
     public static final String APPS_CONFIGURATION_KEY = "apps";
 
     protected static final File PLEXUS_HOME = new File( getBasedir(), "target/plexus-home" );
+
     protected static final File WORK_HOME = new File( PLEXUS_HOME, "nexus-work" );
+
     protected static final File CONF_HOME = new File( WORK_HOME, "conf" );
 
     protected NexusConfiguration nexusConfiguration;
 
     protected void customizeContext( Context ctx )
-    {        
+    {
         ctx.put( APPS_CONFIGURATION_KEY, PLEXUS_HOME.getAbsolutePath() );
-        
+
         ctx.put( WORK_CONFIGURATION_KEY, WORK_HOME.getAbsolutePath() );
 
         ctx.put( RUNTIME_CONFIGURATION_KEY, PLEXUS_HOME.getAbsolutePath() );
@@ -56,7 +60,7 @@ public abstract class AbstractNexusTestCase
     {
         return CONF_HOME + "/nexus.xml";
     }
-    
+
     protected String getNexusSecurityConfiguration()
     {
         return CONF_HOME + "/security.xml";
@@ -68,7 +72,7 @@ public abstract class AbstractNexusTestCase
         IOUtil.copy( getClass().getResourceAsStream( "/META-INF/nexus/nexus.xml" ), new FileOutputStream(
             getNexusConfiguration() ) );
     }
-    
+
     protected void copyDefaultSecurityConfigToPlace()
         throws IOException
     {
@@ -87,16 +91,19 @@ public abstract class AbstractNexusTestCase
         super.setUp();
 
         FileUtils.deleteDirectory( PLEXUS_HOME );
-        
+
         PLEXUS_HOME.mkdirs();
         WORK_HOME.mkdirs();
         CONF_HOME.mkdirs();
-        
+
         if ( loadConfigurationAtSetUp() )
         {
             nexusConfiguration = (NexusConfiguration) this.lookup( NexusConfiguration.ROLE );
 
             nexusConfiguration.loadConfiguration();
+
+            // TODO: SEE WHY IS SEC NOT STARTING? (Max, JSec changes)
+            nexusConfiguration.setSecurityEnabled( false );
 
             nexusConfiguration.applyConfiguration();
         }

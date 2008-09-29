@@ -29,8 +29,10 @@ import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.RepositoryNotAvailableException;
 import org.sonatype.nexus.proxy.ResourceStore;
+import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.access.AccessManager;
+import org.sonatype.nexus.proxy.access.Action;
 import org.sonatype.nexus.proxy.cache.PathCache;
 import org.sonatype.nexus.proxy.events.EventMulticaster;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
@@ -54,7 +56,7 @@ public interface Repository
     extends EventMulticaster, ResourceStore, ConfigurationChangeListener
 {
     String ROLE = Repository.class.getName();
-    
+
     /**
      * This is the "class" of the repository content. It is used in grouping, only same content reposes may be grouped.
      * 
@@ -458,4 +460,13 @@ public interface Repository
      * Creates an UID within this Repository.
      */
     RepositoryItemUid createUid( String path );
+
+    /**
+     * Will return the proper Action that will occur on "write" operation: create (if nothing exists on the given path)
+     * or update (if overwrite will happen since the path already exists).
+     * 
+     * @param action
+     * @return
+     */
+    Action getResultingActionOnWrite( ResourceStoreRequest rsr );
 }

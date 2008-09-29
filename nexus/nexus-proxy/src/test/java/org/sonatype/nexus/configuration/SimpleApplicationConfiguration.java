@@ -122,4 +122,9 @@ public class SimpleApplicationConfiguration
         // NOTHING TO DO HERE
     }
 
+    public boolean isSecurityEnabled()
+    {
+        return false;
+    }
+
 }
