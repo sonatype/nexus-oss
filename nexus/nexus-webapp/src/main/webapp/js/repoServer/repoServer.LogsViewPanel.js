@@ -54,7 +54,7 @@ Sonatype.repoServer.LogsViewPanel = function(config){
   };
   
   this.tailUpdateButton = new Ext.SplitButton({
-    text: 'Update Log Tail Manually',
+    text: 'Update log tail manually',
     icon: Sonatype.config.extPath + '/resources/images/default/grid/refresh.gif',
     cls: 'x-btn-text-icon',
     value: '0',
@@ -64,33 +64,43 @@ Sonatype.repoServer.LogsViewPanel = function(config){
     menu: {
       items: [
         {
-          text: 'Update Log Tail Manually',
+          text: 'Update log tail manually',
           value: '0',
           scope: this,
+          checked: true,
+          group: 'tail-update',
           handler: this.loadTailButtonHandler
         },
         {
           text: 'Update every 20 seconds',
           value: '20',
           scope: this,
+          checked: false,
+          group: 'tail-update',
           handler: this.loadTailButtonHandler
         },
         {
           text: 'Update every minute',
           value: '60',
           scope: this,
+          checked: false,
+          group: 'tail-update',
           handler: this.loadTailButtonHandler
         },
         {
           text: 'Update every 2 minutes',
           value: '120',
           scope: this,
+          checked: false,
+          group: 'tail-update',
           handler: this.loadTailButtonHandler
         },
         {
           text: 'Update every 5 minutes',
           value: '300',
           scope: this,
+          checked: false,
+          group: 'tail-update',
           handler: this.loadTailButtonHandler
         }
       ]
@@ -113,18 +123,24 @@ Sonatype.repoServer.LogsViewPanel = function(config){
           text: 'Fetch Next 100Kb',
           value: '100',
           scope: this,
+          checked: true,
+          group: 'fetch-more',
           handler: this.fetchMore
         },
         {
           text: 'Fetch Next 200Kb',
           value: '200',
           scope: this,
+          checked: false,
+          group: 'fetch-more',
           handler: this.fetchMore
         },
         {
           text: 'Fetch Next 500Kb',
           value: '500',
           scope: this,
+          checked: false,
+          group: 'fetch-more',
           handler: this.fetchMore
         }
       ]
