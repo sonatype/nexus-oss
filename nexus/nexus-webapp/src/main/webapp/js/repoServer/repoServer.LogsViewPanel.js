@@ -313,6 +313,7 @@ Ext.extend(Sonatype.repoServer.LogsViewPanel, Ext.form.FormPanel, {
   reloadLogFile : function(){
     this.currentSize = 0;
     this.currentOffset = 0;
+    this.tailed = this.tailEnabled;
     this.logTextArea.setRawValue('');
     this.getLogFile();
   },
