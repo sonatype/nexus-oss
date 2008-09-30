@@ -71,8 +71,10 @@ public abstract class AbstractPlexusResource
 
     public abstract String getResourceUri();
 
-    public abstract Object getPayloadInstance();
+    public abstract String getPermissionPrefix();
 
+    public abstract Object getPayloadInstance();
+    
     // to be overridden by subclasses if needed
 
     public List<Variant> getVariants()
