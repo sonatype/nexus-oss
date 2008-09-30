@@ -24,6 +24,7 @@ import java.io.IOException;
 
 import org.apache.lucene.search.Query;
 import org.sonatype.nexus.index.context.IndexContextInInconsistentStateException;
+import org.sonatype.nexus.index.context.IndexingContext;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryGroupException;
 
@@ -50,6 +51,12 @@ public interface IndexerManager
         throws IOException,
             NoSuchRepositoryException;
 
+    IndexingContext getRepositoryLocalIndexContext( String repositoryId )
+        throws NoSuchRepositoryException;
+
+    IndexingContext getRepositoryRemoteIndexContext( String repositoryId )
+        throws NoSuchRepositoryException;
+
     void addRepositoryGroupIndexContext( String repositoryGroupId )
         throws IOException,
             NoSuchRepositoryGroupException;
@@ -58,9 +65,18 @@ public interface IndexerManager
         throws IOException,
             NoSuchRepositoryGroupException;
 
+    IndexingContext getRepositoryGroupContext( String repositoryGroupId )
+        throws NoSuchRepositoryGroupException;
+
     void setRepositoryIndexContextSearchable( String repositoryId, boolean searchable )
         throws IOException,
             NoSuchRepositoryException;
+
+    // ----------------------------------------------------------------------------
+    // Publish the used NexusIndexer
+    // ----------------------------------------------------------------------------
+
+    NexusIndexer getNexusIndexer();
 
     // ----------------------------------------------------------------------------
     // Publishing index
@@ -109,8 +125,8 @@ public interface IndexerManager
     FlatSearchResponse searchArtifactClassFlat( String term, String repositoryId, String groupId, Integer from,
         Integer count );
 
-    FlatSearchResponse searchArtifactFlat( String gTerm, String aTerm, String vTerm, String pTerm, String cTerm, String repositoryId,
-        String groupId, Integer from, Integer count );
+    FlatSearchResponse searchArtifactFlat( String gTerm, String aTerm, String vTerm, String pTerm, String cTerm,
+        String repositoryId, String groupId, Integer from, Integer count );
 
     // ----------------------------------------------------------------------------
     // Query construction

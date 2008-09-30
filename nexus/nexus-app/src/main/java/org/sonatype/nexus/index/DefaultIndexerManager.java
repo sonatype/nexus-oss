@@ -292,10 +292,35 @@ public class DefaultIndexerManager
         }
     }
 
+    public IndexingContext getRepositoryLocalIndexContext( String repositoryId )
+        throws NoSuchRepositoryException
+    {
+        Repository repository = repositoryRegistry.getRepository( repositoryId );
+
+        // get context for repository
+        IndexingContext ctx = nexusIndexer.getIndexingContexts().get( getLocalContextId( repository.getId() ) );
+
+        return ctx;
+    }
+
+    public IndexingContext getRepositoryRemoteIndexContext( String repositoryId )
+        throws NoSuchRepositoryException
+    {
+        Repository repository = repositoryRegistry.getRepository( repositoryId );
+
+        // get context for repository
+        IndexingContext ctx = nexusIndexer.getIndexingContexts().get( getRemoteContextId( repository.getId() ) );
+
+        return ctx;
+    }
+
     public void addRepositoryGroupIndexContext( String repositoryGroupId )
         throws IOException,
             NoSuchRepositoryGroupException
     {
+        // just to throw NoSuchRepositoryGroupException if not existing
+        repositoryRegistry.getRepositoryGroup( repositoryGroupId );
+
         IndexingContext ctxMerged = nexusIndexer.addIndexingContextForced(
             getMergedContextId( repositoryGroupId ),
             repositoryGroupId,
@@ -321,12 +346,27 @@ public class DefaultIndexerManager
         throws IOException,
             NoSuchRepositoryGroupException
     {
+        // just to throw NoSuchRepositoryGroupException if not existing
+        repositoryRegistry.getRepositoryGroup( repositoryGroupId );
+
         // remove context for repository
         if ( nexusIndexer.getIndexingContexts().containsKey( getMergedContextId( repositoryGroupId ) ) )
         {
             nexusIndexer.removeIndexingContext( nexusIndexer.getIndexingContexts().get(
                 getMergedContextId( repositoryGroupId ) ), deleteFiles );
         }
+    }
+
+    public IndexingContext getRepositoryGroupContext( String repositoryGroupId )
+        throws NoSuchRepositoryGroupException
+    {
+        // just to throw NoSuchRepositoryGroupException if not existing
+        repositoryRegistry.getRepositoryGroup( repositoryGroupId );
+
+        // get context for repository
+        IndexingContext ctx = nexusIndexer.getIndexingContexts().get( getMergedContextId( repositoryGroupId ) );
+
+        return ctx;
     }
 
     public void setRepositoryIndexContextSearchable( String repositoryId, boolean searchable )
@@ -387,6 +427,15 @@ public class DefaultIndexerManager
         }
 
         return repoRoot;
+    }
+
+    // ----------------------------------------------------------------------------
+    // Publish the used NexusIndexer
+    // ----------------------------------------------------------------------------
+
+    public NexusIndexer getNexusIndexer()
+    {
+        return nexusIndexer;
     }
 
     // ----------------------------------------------------------------------------
