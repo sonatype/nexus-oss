@@ -23,6 +23,11 @@ public abstract class AbstractNexusPlexusResource
      * @plexus.requirement
      */
     private Nexus nexus;
+    
+    public String getPermissionPrefix()
+    {
+        return "";
+    }
 
     protected Nexus getNexusInstance( Request request )
         throws ResourceException
