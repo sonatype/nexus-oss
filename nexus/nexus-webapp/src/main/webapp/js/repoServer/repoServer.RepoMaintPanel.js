@@ -330,6 +330,26 @@ Sonatype.repoServer.RepoMaintPanel = function(config){
   // END: Repo List ******************************************************
   // *********************************************************************
 
+  this.browseLocalMenuItem = new Ext.menu.CheckItem(          
+    {
+      text: 'Browse local storage',
+      value: 0,
+      checked: true,
+      group:'browse-group',
+      checkHandler: this.browseSelectorHandler,
+      scope:this
+    }
+  );
+  this.browseIndexMenuItem = new Ext.menu.CheckItem(
+    {
+      text: 'Browse remote index',
+      value: 1,
+      checked: false,
+      group:'browse-group',
+      checkHandler: this.browseSelectorHandler,
+      scope:this
+    }
+  );
   this.browseSelector = new Ext.Toolbar.Button(          
     {
       text: 'Browse local storage',
@@ -340,22 +360,8 @@ Sonatype.repoServer.RepoMaintPanel = function(config){
         id:'browse-content-menu',
         width:200,
         items: [
-          {
-            text: 'Browse local storage',
-            value: 0,
-            checked: true,
-            group:'browse-group',
-            checkHandler: this.browseSelectorHandler,
-            scope:this
-          },
-          {
-            text: 'Browse remote index',
-            value: 1,
-            checked: false,
-            group:'browse-group',
-            checkHandler: this.browseSelectorHandler,
-            scope:this
-          }
+          this.browseLocalMenuItem,
+          this.browseIndexMenuItem
         ]
       }
     }
@@ -688,6 +694,15 @@ Ext.extend(Sonatype.repoServer.RepoMaintPanel, Sonatype.repoServer.AbstractRepoP
   
   //rec is grid store record
   viewRepo : function(rec){
+
+    if ( rec.get('repoType') == 'proxy' ) {
+      this.browseSelector.enable();
+    }
+    else {
+      this.browseLocalMenuItem.setChecked( true );
+      this.browseSelector.disable();
+    }
+    
     //change in behavior.  Always load a new detail view until we work out all the cache
     // and browse dependencies
     
