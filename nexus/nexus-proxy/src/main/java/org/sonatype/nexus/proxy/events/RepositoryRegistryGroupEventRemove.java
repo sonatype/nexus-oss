@@ -23,17 +23,14 @@ package org.sonatype.nexus.proxy.events;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 
 /**
- * The Class RepositoryRegistryEventRemove.
+ * The event fired on group removal from registry.
+ * 
+ * @author cstamas
  */
 public class RepositoryRegistryGroupEventRemove
     extends RepositoryRegistryGroupEvent
 {
 
-    /**
-     * Instantiates a new repository registry event remove.
-     * 
-     * @param repository the repository
-     */
     public RepositoryRegistryGroupEventRemove( RepositoryRegistry repositoryRegistry, String groupId )
     {
         super( repositoryRegistry, groupId );

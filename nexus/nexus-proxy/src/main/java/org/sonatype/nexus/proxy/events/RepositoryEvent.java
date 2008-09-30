@@ -23,22 +23,20 @@ package org.sonatype.nexus.proxy.events;
 import org.sonatype.nexus.proxy.repository.Repository;
 
 /**
- * The Class RepositoryEvent.
+ * The event that is occured within a Repository, such as content changes or other maintenance stuff.
+ * 
+ * @author cstamas
  */
-public abstract class RepositoryEvent extends AbstractEvent
+public abstract class RepositoryEvent
+    extends AbstractEvent
 {
-
-    /** The repository. */
+    /** The repository in question. */
     private final Repository repository;
 
-    /**
-     * Instantiates a new repository event.
-     * 
-     * @param repository the repository
-     */
-    public RepositoryEvent( Repository repository )
+    public RepositoryEvent( final Repository repository )
     {
         super();
+
         this.repository = repository;
     }
 

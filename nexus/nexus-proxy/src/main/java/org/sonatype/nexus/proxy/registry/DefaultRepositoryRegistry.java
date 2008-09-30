@@ -85,7 +85,7 @@ public class DefaultRepositoryRegistry
                 ( (EventMulticaster) repository ).addProximityEventListener( this );
             }
 
-            notifyProximityEventListeners( new RepositoryRegistryEventAdd( repository ) );
+            notifyProximityEventListeners( new RepositoryRegistryEventAdd( this, repository ) );
         }
 
         thread.setDaemon( true );
@@ -113,7 +113,7 @@ public class DefaultRepositoryRegistry
 
             insertRepository( repository, false );
 
-            notifyProximityEventListeners( new RepositoryRegistryEventUpdate( repository ) );
+            notifyProximityEventListeners( new RepositoryRegistryEventUpdate( this, repository ) );
 
             getLogger().info(
                 "Updated repository ID=" + repository.getId() + " (contentClass="
@@ -132,7 +132,7 @@ public class DefaultRepositoryRegistry
 
         removeRepositorySilently( repoId );
 
-        notifyProximityEventListeners( new RepositoryRegistryEventRemove( repository ) );
+        notifyProximityEventListeners( new RepositoryRegistryEventRemove( this, repository ) );
     }
 
     public void removeRepositorySilently( String repoId )

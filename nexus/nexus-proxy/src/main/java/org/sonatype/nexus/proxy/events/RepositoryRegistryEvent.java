@@ -20,37 +20,29 @@
  */
 package org.sonatype.nexus.proxy.events;
 
-import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 
 /**
- * The Class RepositoryRegistryEvent.
+ * The repository registry events superclass.
+ * 
+ * @author cstamas
  */
 public abstract class RepositoryRegistryEvent
     extends AbstractEvent
 {
+    /** The repository registry. */
+    private final RepositoryRegistry repositoryRegistry;
 
-    /** The repository. */
-    private Repository repository;
-
-    /**
-     * Instantiates a new repository registry event.
-     * 
-     * @param repository the repository
-     */
-    public RepositoryRegistryEvent( Repository repository )
+    public RepositoryRegistryEvent( final RepositoryRegistry repositoryRegistry )
     {
         super();
-        this.repository = repository;
+
+        this.repositoryRegistry = repositoryRegistry;
     }
 
-    /**
-     * Gets the repository.
-     * 
-     * @return the repository
-     */
-    public Repository getRepository()
+    public RepositoryRegistry getRepositoryRegistry()
     {
-        return this.repository;
+        return repositoryRegistry;
     }
 
 }

@@ -23,18 +23,14 @@ package org.sonatype.nexus.proxy.events;
 import org.sonatype.nexus.proxy.item.StorageItem;
 
 /**
- * The Class RepositoryItemEventDelete.
+ * The event fired on item delete.
+ * 
+ * @author cstamas
  */
 public class RepositoryItemEventDelete
     extends RepositoryItemEvent
 {
 
-    /**
-     * Instantiates a new repository item event delete.
-     * 
-     * @param repository the repository
-     * @param uid the uid
-     */
     public RepositoryItemEventDelete( final StorageItem item )
     {
         super( item );

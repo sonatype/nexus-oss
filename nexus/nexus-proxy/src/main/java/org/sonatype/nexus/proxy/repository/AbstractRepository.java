@@ -42,7 +42,6 @@ import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.access.AccessManager;
 import org.sonatype.nexus.proxy.access.Action;
-import org.sonatype.nexus.proxy.access.OpenAccessManager;
 import org.sonatype.nexus.proxy.cache.CacheManager;
 import org.sonatype.nexus.proxy.cache.PathCache;
 import org.sonatype.nexus.proxy.events.RepositoryEventClearCaches;
@@ -220,7 +219,7 @@ public abstract class AbstractRepository
 
         if ( !oldStatus.equals( localStatus ) )
         {
-            notifyProximityEventListeners( new RepositoryEventLocalStatusChanged( this, oldStatus ) );
+            notifyProximityEventListeners( new RepositoryEventLocalStatusChanged( this, oldStatus, localStatus ) );
         }
     }
 
@@ -366,7 +365,11 @@ public abstract class AbstractRepository
 
             if ( sendNotification && !proxyMode.equals( oldProxyMode ) )
             {
-                notifyProximityEventListeners( new RepositoryEventProxyModeChanged( this, oldProxyMode, cause ) );
+                notifyProximityEventListeners( new RepositoryEventProxyModeChanged(
+                    this,
+                    oldProxyMode,
+                    proxyMode,
+                    cause ) );
             }
         }
     }

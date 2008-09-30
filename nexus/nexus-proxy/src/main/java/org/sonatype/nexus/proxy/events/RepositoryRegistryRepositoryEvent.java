@@ -21,19 +21,34 @@
 package org.sonatype.nexus.proxy.events;
 
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
+import org.sonatype.nexus.proxy.repository.Repository;
 
 /**
- * The event fired on group addition to registry.
+ * The superclass of repository related registry events.
  * 
  * @author cstamas
  */
-public class RepositoryRegistryGroupEventAdd
-    extends RepositoryRegistryGroupEvent
+public abstract class RepositoryRegistryRepositoryEvent
+    extends RepositoryRegistryEvent
 {
+    /** The repository. */
+    private Repository repository;
 
-    public RepositoryRegistryGroupEventAdd( final RepositoryRegistry repositoryRegistry, final String groupId )
+    public RepositoryRegistryRepositoryEvent( final RepositoryRegistry repositoryRegistry, final Repository repository )
     {
-        super( repositoryRegistry, groupId );
+        super( repositoryRegistry );
+
+        this.repository = repository;
+    }
+
+    /**
+     * Gets the repository.
+     * 
+     * @return the repository
+     */
+    public Repository getRepository()
+    {
+        return this.repository;
     }
 
 }

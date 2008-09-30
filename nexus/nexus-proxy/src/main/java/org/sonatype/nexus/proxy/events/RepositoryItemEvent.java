@@ -26,27 +26,25 @@ import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageItem;
 
 /**
- * The Class RepositoryItemEvent.
+ * The event fired in case of some content changes in Nexus related to an item/file.
+ * 
+ * @author cstamas
  */
 public abstract class RepositoryItemEvent
     extends RepositoryEvent
 {
+    /** The item in question */
     private final StorageItem item;
 
-    /**
-     * Instantiates a new repository item event.
-     * 
-     * @param repository the repository
-     * @param uid the uid
-     */
     public RepositoryItemEvent( final StorageItem item )
     {
         super( item.getRepositoryItemUid().getRepository() );
+
         this.item = item;
     }
 
     /**
-     * Gets the item uid.
+     * Gets the item uid. Shortcut for item.getRepositoryItemUid().
      * 
      * @return the item uid
      */
@@ -56,7 +54,7 @@ public abstract class RepositoryItemEvent
     }
 
     /**
-     * Gets the item context.
+     * Gets the item context. Shortcut for item.getItemContext().
      * 
      * @return the item context
      */

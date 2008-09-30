@@ -70,7 +70,7 @@ import org.sonatype.nexus.proxy.events.RepositoryItemEvent;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventCache;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventDelete;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventStore;
-import org.sonatype.nexus.proxy.events.RepositoryRegistryEvent;
+import org.sonatype.nexus.proxy.events.RepositoryRegistryRepositoryEvent;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventAdd;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventRemove;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventUpdate;
@@ -1330,11 +1330,11 @@ public class DefaultIndexerManager
             getLogger().debug( "Processing event (" + evt.toString() + ")" );
         }
 
-        if ( RepositoryRegistryEvent.class.isAssignableFrom( evt.getClass() ) )
+        if ( RepositoryRegistryRepositoryEvent.class.isAssignableFrom( evt.getClass() ) )
         {
             try
             {
-                Repository repository = ( (RepositoryRegistryEvent) evt ).getRepository();
+                Repository repository = ( (RepositoryRegistryRepositoryEvent) evt ).getRepository();
 
                 // we are handling repo events, like addition and removal
                 if ( RepositoryRegistryEventAdd.class.isAssignableFrom( evt.getClass() ) )

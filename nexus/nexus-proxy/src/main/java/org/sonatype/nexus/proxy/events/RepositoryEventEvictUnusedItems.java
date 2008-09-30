@@ -23,18 +23,17 @@ package org.sonatype.nexus.proxy.events;
 import org.sonatype.nexus.proxy.repository.Repository;
 
 /**
- * The Class RepositoryEventEvictUnusedItems.
+ * The event fired on EvictUnusedItems.
+ * 
+ * @author cstamas
  */
 public class RepositoryEventEvictUnusedItems
-    extends RepositoryEvent
+    extends RepositoryMaintenanceEvent
 {
-    /**
-     * Instantiates a new repository event evict unused items.
-     * 
-     * @param repository the repository
-     */
+
     public RepositoryEventEvictUnusedItems( final Repository repository )
     {
         super( repository );
     }
+
 }

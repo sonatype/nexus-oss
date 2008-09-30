@@ -23,19 +23,16 @@ package org.sonatype.nexus.proxy.events;
 import org.sonatype.nexus.proxy.repository.Repository;
 
 /**
- * The Class RepositoryEventRecreateAttributes.
+ * The event fired on ClearCache.
+ * 
+ * @author cstamas
  */
 public class RepositoryEventClearCaches
-    extends RepositoryEvent
+    extends RepositoryMaintenanceEvent
 {
     /** From where it happened */
     private String path;
 
-    /**
-     * Instantiates a new repository event recreate attributes.
-     * 
-     * @param repository the repository
-     */
     public RepositoryEventClearCaches( final Repository repository, String path )
     {
         super( repository );

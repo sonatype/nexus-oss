@@ -23,18 +23,14 @@ package org.sonatype.nexus.proxy.events;
 import org.sonatype.nexus.proxy.item.StorageItem;
 
 /**
- * The Class RepositoryItemEventStore.
+ * The event fired on item store.
+ * 
+ * @author cstamas
  */
 public class RepositoryItemEventStore
     extends RepositoryItemEvent
 {
 
-    /**
-     * Instantiates a new repository item event store.
-     * 
-     * @param repository the repository
-     * @param uid the uid
-     */
     public RepositoryItemEventStore( final StorageItem item )
     {
         super( item );

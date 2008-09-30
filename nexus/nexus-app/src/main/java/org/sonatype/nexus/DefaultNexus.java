@@ -86,7 +86,7 @@ import org.sonatype.nexus.proxy.events.RepositoryItemEventCache;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventDelete;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventRetrieve;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventStore;
-import org.sonatype.nexus.proxy.events.RepositoryRegistryEvent;
+import org.sonatype.nexus.proxy.events.RepositoryRegistryRepositoryEvent;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventAdd;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventRemove;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventUpdate;
@@ -1791,9 +1791,9 @@ public class DefaultNexus
 
                 }
             }
-            else if ( evt instanceof RepositoryRegistryEvent )
+            else if ( evt instanceof RepositoryRegistryRepositoryEvent )
             {
-                RepositoryRegistryEvent revt = (RepositoryRegistryEvent) evt;
+                RepositoryRegistryRepositoryEvent revt = (RepositoryRegistryRepositoryEvent) evt;
 
                 StringBuffer sb = new StringBuffer( " repository " );
 

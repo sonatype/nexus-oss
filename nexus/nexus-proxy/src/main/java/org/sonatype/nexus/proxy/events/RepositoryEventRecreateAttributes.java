@@ -23,18 +23,17 @@ package org.sonatype.nexus.proxy.events;
 import org.sonatype.nexus.proxy.repository.Repository;
 
 /**
- * The Class RepositoryEventRecreateAttributes.
+ * The event fired on RecreateAttributes.
+ * 
+ * @author cstamas
  */
 public class RepositoryEventRecreateAttributes
-    extends RepositoryEvent
+    extends RepositoryMaintenanceEvent
 {
-    /**
-     * Instantiates a new repository event recreate attributes.
-     * 
-     * @param repository the repository
-     */
+
     public RepositoryEventRecreateAttributes( final Repository repository )
     {
         super( repository );
     }
+
 }

@@ -24,21 +24,25 @@ import org.sonatype.nexus.proxy.repository.ProxyMode;
 import org.sonatype.nexus.proxy.repository.Repository;
 
 /**
- * The Class RepositoryEventProxyModeChanged.
+ * The event fired when a repository's proxy mode changed.
  */
 public class RepositoryEventProxyModeChanged
     extends RepositoryEvent
 {
     private final ProxyMode oldProxyMode;
 
+    private final ProxyMode newProxyMode;
+
     private final Throwable cause;
 
     public RepositoryEventProxyModeChanged( final Repository repository, final ProxyMode oldProxyMode,
-        final Throwable cause )
+        final ProxyMode newProxyMode, final Throwable cause )
     {
         super( repository );
 
         this.oldProxyMode = oldProxyMode;
+
+        this.newProxyMode = newProxyMode;
 
         this.cause = cause;
     }
@@ -46,6 +50,11 @@ public class RepositoryEventProxyModeChanged
     public ProxyMode getOldProxyMode()
     {
         return oldProxyMode;
+    }
+
+    public ProxyMode getNewProxyMode()
+    {
+        return newProxyMode;
     }
 
     public Throwable getCause()

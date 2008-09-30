@@ -24,27 +24,39 @@ import org.sonatype.nexus.proxy.repository.LocalStatus;
 import org.sonatype.nexus.proxy.repository.Repository;
 
 /**
- * The Class RepositoryEventEvictUnusedItems.
+ * The event fired when repository's local status is changed.
+ * 
+ * @author cstamas
  */
 public class RepositoryEventLocalStatusChanged
     extends RepositoryEvent
 {
     private final LocalStatus oldLocalStatus;
 
+    private final LocalStatus newLocalStatus;
+
     /**
      * Instantiates a new repository event evict unused items.
      * 
      * @param repository the repository
      */
-    public RepositoryEventLocalStatusChanged( final Repository repository, final LocalStatus oldLocalStatus )
+    public RepositoryEventLocalStatusChanged( final Repository repository, final LocalStatus oldLocalStatus,
+        final LocalStatus newLocalStatus )
     {
         super( repository );
 
         this.oldLocalStatus = oldLocalStatus;
+
+        this.newLocalStatus = newLocalStatus;
     }
 
     public LocalStatus getOldLocalStatus()
     {
         return oldLocalStatus;
+    }
+
+    public LocalStatus getNewLocalStatus()
+    {
+        return newLocalStatus;
     }
 }

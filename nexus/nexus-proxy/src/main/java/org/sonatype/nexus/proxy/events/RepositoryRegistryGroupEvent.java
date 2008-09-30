@@ -23,50 +23,31 @@ package org.sonatype.nexus.proxy.events;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 
 /**
- * The Class RepositoryRegistryEvent.
+ * The superclass of group related registry events.
+ * 
+ * @author cstamas
  */
 public abstract class RepositoryRegistryGroupEvent
-    extends AbstractEvent
+    extends RepositoryRegistryEvent
 {
-
-    /** The repository. */
-    private RepositoryRegistry repositoryRegistry;
-
     /** The groupId */
-    private String groupId;
+    private final String groupId;
 
     /**
      * Instantiates a new repository registry event.
      * 
      * @param repository the repository
      */
-    public RepositoryRegistryGroupEvent( RepositoryRegistry repositoryRegistry, String groupId )
+    public RepositoryRegistryGroupEvent( final RepositoryRegistry repositoryRegistry, final String groupId )
     {
-        super();
-
-        this.repositoryRegistry = repositoryRegistry;
+        super( repositoryRegistry );
 
         this.groupId = groupId;
-    }
-
-    public RepositoryRegistry getRepositoryRegistry()
-    {
-        return repositoryRegistry;
-    }
-
-    public void setRepositoryRegistry( RepositoryRegistry repositoryRegistry )
-    {
-        this.repositoryRegistry = repositoryRegistry;
     }
 
     public String getGroupId()
     {
         return groupId;
-    }
-
-    public void setGroupId( String groupId )
-    {
-        this.groupId = groupId;
     }
 
 }

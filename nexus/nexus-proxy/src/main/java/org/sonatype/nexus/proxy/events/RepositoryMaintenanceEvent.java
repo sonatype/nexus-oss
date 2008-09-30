@@ -20,20 +20,18 @@
  */
 package org.sonatype.nexus.proxy.events;
 
-import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
+import org.sonatype.nexus.proxy.repository.Repository;
 
 /**
- * The event fired on group addition to registry.
+ * The event fired in case of some maintenance changes in Nexus related to a single repository.
  * 
  * @author cstamas
  */
-public class RepositoryRegistryGroupEventAdd
-    extends RepositoryRegistryGroupEvent
+public abstract class RepositoryMaintenanceEvent
+    extends RepositoryEvent
 {
-
-    public RepositoryRegistryGroupEventAdd( final RepositoryRegistry repositoryRegistry, final String groupId )
+    public RepositoryMaintenanceEvent( final Repository repository )
     {
-        super( repositoryRegistry, groupId );
+        super( repository );
     }
-
 }

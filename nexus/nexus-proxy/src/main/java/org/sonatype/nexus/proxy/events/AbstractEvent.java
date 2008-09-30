@@ -23,11 +23,12 @@ package org.sonatype.nexus.proxy.events;
 import java.util.Date;
 
 /**
- * The Class AbstractEvent.
+ * The superclass for all Nexus events.
+ * 
+ * @author cstamas
  */
 public abstract class AbstractEvent
 {
-
     /** The event date. */
     private final Date eventDate;
 
@@ -37,6 +38,7 @@ public abstract class AbstractEvent
     public AbstractEvent()
     {
         super();
+
         this.eventDate = new Date();
     }
 
@@ -49,5 +51,4 @@ public abstract class AbstractEvent
     {
         return eventDate;
     }
-
 }

@@ -20,23 +20,21 @@
  */
 package org.sonatype.nexus.proxy.events;
 
+import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.Repository;
 
 /**
- * The Class RepositoryRegistryEventAdd.
+ * The event fired when a repository is added to registry.
+ * 
+ * @author cstamas
  */
 public class RepositoryRegistryEventAdd
-    extends RepositoryRegistryEvent
+    extends RepositoryRegistryRepositoryEvent
 {
 
-    /**
-     * Instantiates a new repository registry event add.
-     * 
-     * @param repository the repository
-     */
-    public RepositoryRegistryEventAdd( Repository repository )
+    public RepositoryRegistryEventAdd( final RepositoryRegistry repositoryRegistry, final Repository repository )
     {
-        super( repository );
+        super( repositoryRegistry, repository );
     }
 
 }
