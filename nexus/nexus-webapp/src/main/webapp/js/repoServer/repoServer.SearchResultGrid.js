@@ -159,24 +159,32 @@ Sonatype.repoServer.SearchResultGrid = function(config) {
           text: 'Fetch Next 50',
           value: '50',
           scope: this,
+          checked: true,
+          group: 'fetch-more-records',
           handler: this.fetchMoreRows
         },
         {
           text: 'Fetch Next 100',
           value: '100',
           scope: this,
+          checked: false,
+          group: 'fetch-more-records',
           handler: this.fetchMoreRows
         },
         {
           text: 'Fetch Next 200',
           value: '200',
           scope: this,
-          handler: this.fetchMoreRows
+          checked: false,
+          group: 'fetch-more-records',
+         handler: this.fetchMoreRows
         },
         {
           text: 'Fetch All',
           value: '0',
           scope: this,
+          checked: false,
+          group: 'fetch-more-records',
           handler: this.fetchMoreRows
         }
       ]
