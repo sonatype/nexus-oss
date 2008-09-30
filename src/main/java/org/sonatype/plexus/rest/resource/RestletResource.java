@@ -114,26 +114,31 @@ public class RestletResource
 
         try
         {
-            String text = ( variant instanceof Representation ) ? ( (Representation) variant ).getText() : "";
+            // check is this variant a supported one, to avoid calling getText() on potentially huge representations
+            if ( MediaType.APPLICATION_JSON.equals( variant.getMediaType(), true )
+                || MediaType.APPLICATION_XML.equals( variant.getMediaType(), true ) )
+            {
+                String text = ( variant instanceof Representation ) ? ( (Representation) variant ).getText() : "";
 
-            if ( MediaType.APPLICATION_JSON.equals( variant.getMediaType(), true ) )
-            {
-                representation = new XStreamRepresentation( (XStream) getContext().getAttributes().get(
-                    PlexusRestletApplicationBridge.JSON_XSTREAM ), text, variant.getMediaType() );
-            }
-            else if ( MediaType.APPLICATION_XML.equals( variant.getMediaType(), true ) )
-            {
-                representation = new XStreamRepresentation( (XStream) getContext().getAttributes().get(
-                    PlexusRestletApplicationBridge.XML_XSTREAM ), text, variant.getMediaType() );
+                if ( MediaType.APPLICATION_JSON.equals( variant.getMediaType(), true ) )
+                {
+                    representation = new XStreamRepresentation( (XStream) getContext().getAttributes().get(
+                        PlexusRestletApplicationBridge.JSON_XSTREAM ), text, variant.getMediaType() );
+                }
+                else if ( MediaType.APPLICATION_XML.equals( variant.getMediaType(), true ) )
+                {
+                    representation = new XStreamRepresentation( (XStream) getContext().getAttributes().get(
+                        PlexusRestletApplicationBridge.XML_XSTREAM ), text, variant.getMediaType() );
+                }
+
+                representation.setModificationDate( getModificationDate() );
+
+                return representation;
             }
             else
             {
-                throw new ResourceException( Status.CLIENT_ERROR_NOT_ACCEPTABLE );
+                return null;
             }
-
-            representation.setModificationDate( getModificationDate() );
-
-            return representation;
         }
         catch ( IOException e )
         {
@@ -151,6 +156,12 @@ public class RestletResource
 
         XStreamRepresentation result = createRepresentation( variant );
 
+        if ( result == null )
+        {
+            throw new ResourceException( Status.CLIENT_ERROR_NOT_ACCEPTABLE, "The requested mediaType='"
+                + variant.getMediaType() + "' is unsupported!" );
+        }
+
         result.setPayload( payload );
 
         return result;
@@ -161,7 +172,14 @@ public class RestletResource
     {
         XStreamRepresentation result = createRepresentation( getRequest().getEntity() );
 
-        return result.getPayload( root );
+        if ( result != null )
+        {
+            return result.getPayload( root );
+        }
+        else
+        {
+            return null;
+        }
     }
 
     protected Representation doRepresent( Object payload, Variant variant )
@@ -298,7 +316,8 @@ public class RestletResource
 
         if ( result != null )
         {
-            getResponse().setEntity( doRepresent( result, representation ) );
+            // TODO: representation cannot be returned as multipart! (representation above is possibly multipart)
+            getResponse().setEntity( doRepresent( result, getPreferredVariant() ) );
         }
     }
 
@@ -307,6 +326,8 @@ public class RestletResource
     private class FakeFileItem
         implements FileItem
     {
+        private static final long serialVersionUID = 414885488690939983L;
+
         private final String name;
 
         private final Representation representation;

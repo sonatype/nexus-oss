@@ -41,6 +41,11 @@ public class SimplePlexusResource
         return "/" + token;
     }
 
+    public String getPermissionPrefix()
+    {
+        return "";
+    }
+
     @Override
     public List<Variant> getVariants()
     {

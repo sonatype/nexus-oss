@@ -26,6 +26,13 @@ public interface PlexusResource
     Object getPayloadInstance();
 
     /**
+     * A permission prefix to be applied when securing the resource.
+     * 
+     * @return
+     */
+    String getPermissionPrefix();
+
+    /**
      * Presents a modifiable list of available variants.
      * 
      * @return
@@ -67,18 +74,74 @@ public interface PlexusResource
      */
     boolean acceptsUpload();
 
+    /**
+     * Method invoked on incoming GET request. The method may return: Representation (will be passed unchanged to
+     * restlet engine), InputStream (will be wrapped into InputStreamRepresentation), String (will be wrapped into
+     * StringRepresentation) and Object. If Object is none of those previously listed, an XStream serialization is
+     * applied to it (into variant originally negotiated with client).
+     * 
+     * @param context - the cross-request context
+     * @param request - the request
+     * @param response - the response
+     * @param variant - the result of the content negotiation (for use by PlexusResources that want's to cruft manually
+     *        some Representation).
+     * @return Object to be returned to the client. Object may be: InputStream, restlet.org Representation, String or
+     *         any object. The "any" object will be serialized by XStream to a proper mediaType if possible.
+     * @throws ResourceException
+     */
     Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException;
 
+    /**
+     * Method invoked on incoming POST request. For return Object, see GET method.
+     * 
+     * @param context - the cross-request context
+     * @param request - the request
+     * @param response = the response
+     * @param payload - the deserialized payload (if it was possible to deserialize). Otherwise, the Representation is
+     *        accessible thru request. If deserialization was not possible it is null.
+     * @return
+     * @throws ResourceException
+     */
     Object post( Context context, Request request, Response response, Object payload )
         throws ResourceException;
 
+    /**
+     * Method invoked on incoming PUT request. For return Object, see GET method.
+     * 
+     * @param context - the cross-request context
+     * @param request - the request
+     * @param response = the response
+     * @param payload - the deserialized payload (if it was possible to deserialize). Otherwise, the Representation is
+     *        accessible thru request. If deserialization was not possible it is null.
+     * @return
+     * @throws ResourceException
+     */
     Object put( Context context, Request request, Response response, Object payload )
         throws ResourceException;
 
+    /**
+     * Method invoked on incoming DELETE request.
+     * 
+     * @param context - the cross-request context
+     * @param request - the request
+     * @param response = the response
+     * @throws ResourceException
+     */
     void delete( Context context, Request request, Response response )
         throws ResourceException;
 
+    /**
+     * "Catch all" method if this method accepts uploads (acceptsUpload() returns true). In this case, the PUT and POST
+     * requests will be redirected to this method. For return Object, see GET method.
+     * 
+     * @param context - the cross-request context
+     * @param request - the request
+     * @param response = the response
+     * @param files
+     * @return
+     * @throws ResourceException
+     */
     Object upload( Context context, Request request, Response response, List<FileItem> files )
         throws ResourceException;
 }
