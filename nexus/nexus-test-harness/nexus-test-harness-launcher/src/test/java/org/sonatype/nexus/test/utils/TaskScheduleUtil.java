@@ -95,8 +95,8 @@ public class TaskScheduleUtil
     public static ScheduledServiceListResource waitForTask( String name )
         throws Exception
     {
-        int maxAttempts = 10;
-        long sleep = 100;
+        int maxAttempts = 20;
+        long sleep = 200;
 
         for ( int attempt = 0; attempt < maxAttempts; attempt++ )
         {

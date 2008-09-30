@@ -59,6 +59,7 @@ import org.sonatype.nexus.integrationtests.nexus636.Nexus636EvictUnusedProxiedTa
 import org.sonatype.nexus.integrationtests.nexus637.Nexus637PublishIndexTest;
 import org.sonatype.nexus.integrationtests.nexus640.Nexus640RebuildRepositoryAttributesTaskTest;
 import org.sonatype.nexus.integrationtests.nexus641.Nexus641ReindexTaskTest;
+import org.sonatype.nexus.integrationtests.nexus642.Nexus642SynchShadowTaskTest;
 import org.sonatype.nexus.integrationtests.nexus643.Nexus643EmptyTrashTaskTest;
 import org.sonatype.nexus.integrationtests.nexus688.Nexus688ReindexOnRepoAdd;
 import org.sonatype.nexus.integrationtests.nexus782.Nexus782UploadWithClassifier;
@@ -129,7 +130,6 @@ import org.sonatype.nexus.integrationtests.upgrades.nexus652.Nexus652Beta5To10Up
     Nexus643EmptyTrashTaskTest.class,
     Nexus637PublishIndexTest.class,
     Nexus652Beta5To10UpgradeTest.class,
-    Nexus641ReindexTaskTest.class,
     Nexus602SearchSnapshotArtifactTest.class,
     Nexus635ClearCacheTaskTest.class,
     Nexus634RemoveAllTest.class,
@@ -143,7 +143,8 @@ import org.sonatype.nexus.integrationtests.upgrades.nexus652.Nexus652Beta5To10Up
     Nexus810PackageNamesInNexusConf.class,
     Nexus782UploadWithClassifier.class,
     Nexus688ReindexOnRepoAdd.class,
-    Nexus384DotAndDashSearchTest.class } )
+    Nexus384DotAndDashSearchTest.class,
+    Nexus642SynchShadowTaskTest.class  } )
 public class IntegrationTestSuiteClasses
 {
 

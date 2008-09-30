@@ -57,6 +57,7 @@ import org.sonatype.nexus.integrationtests.nexus532.Nexus532GroupCrudPermissionT
 import org.sonatype.nexus.integrationtests.nexus532.Nexus532GroupsCrudXmlTests;
 import org.sonatype.nexus.integrationtests.nexus586.Nexus586ValidateConfigurationTest;
 import org.sonatype.nexus.integrationtests.nexus606.Nexus606DownloadLogsAndConfigFilesTest;
+import org.sonatype.nexus.integrationtests.nexus642.Nexus642SynchShadowTaskTest;
 import org.sonatype.nexus.integrationtests.nexus650.Nexus650ChangePasswordAndRebootTest;
 import org.sonatype.nexus.integrationtests.nexus688.Nexus688ReindexOnRepoAdd;
 import org.sonatype.nexus.integrationtests.nexus782.Nexus782UploadWithClassifier;
@@ -134,7 +135,8 @@ import org.sonatype.nexus.integrationtests.upgrades.nexus652.Nexus652Beta5To10Up
     Nexus810PackageNamesInNexusConf.class,
     Nexus782UploadWithClassifier.class,
     Nexus688ReindexOnRepoAdd.class,
-    Nexus384DotAndDashSearchTest.class  } )
+    Nexus384DotAndDashSearchTest.class,
+    Nexus642SynchShadowTaskTest.class } )
 public class IntegrationTestSuiteClassesSecurity
 {
     @BeforeClass

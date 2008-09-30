@@ -7,7 +7,7 @@
   <distributionManagement>
     <repository>
       <id>nexus-test-harness-repo</id>
-      <url>${nexus-base-url}content/repositories/nexus-test-harness-repo</url>
+      <url>${nexus-base-url}content/repositories/nexus641</url>
     </repository>
   </distributionManagement>
 </project>

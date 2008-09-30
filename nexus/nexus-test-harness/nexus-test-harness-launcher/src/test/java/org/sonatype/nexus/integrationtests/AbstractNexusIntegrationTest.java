@@ -158,7 +158,8 @@ public class AbstractNexusIntegrationTest
 
                 // this.copyConfigFile( "log4j.properties", variables );
 
-                if ( TestContainer.getInstance().getTestContext().isSecureTest() )
+                if ( TestContainer.getInstance().getTestContext().isSecureTest()
+                    || Boolean.valueOf( System.getProperty( "secure.test" ) ) )
                 {
                     NexusConfigUtil.enableSecurity( true );
                 }
