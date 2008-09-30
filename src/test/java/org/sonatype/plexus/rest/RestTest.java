@@ -22,5 +22,7 @@ public class RestTest
         component.getDefaultHost().attach( app );
 
         component.start();
+        
+        component.stop();
     }
 }
