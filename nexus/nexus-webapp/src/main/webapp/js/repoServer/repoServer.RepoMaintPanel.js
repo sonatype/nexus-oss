@@ -330,6 +330,37 @@ Sonatype.repoServer.RepoMaintPanel = function(config){
   // END: Repo List ******************************************************
   // *********************************************************************
 
+  this.browseSelector = new Ext.Toolbar.Button(          
+    {
+      text: 'Browse local storage',
+      icon: Sonatype.config.resourcePath + '/images/icons/page_white_stack.png',
+      value: 0,
+      cls: 'x-btn-text-icon',
+      menu:{
+        id:'browse-content-menu',
+        width:200,
+        items: [
+          {
+            text: 'Browse local storage',
+            value: 0,
+            checked: true,
+            group:'browse-group',
+            checkHandler: this.browseSelectorHandler,
+            scope:this
+          },
+          {
+            text: 'Browse remote index',
+            value: 1,
+            checked: false,
+            group:'browse-group',
+            checkHandler: this.browseSelectorHandler,
+            scope:this
+          }
+        ]
+      }
+    }
+  );
+  
   Sonatype.repoServer.RepoMaintPanel.superclass.constructor.call(this, {
     layout: 'border',
     autoScroll: false,
@@ -362,17 +393,7 @@ Sonatype.repoServer.RepoMaintPanel = function(config){
             text: 'Refresh',
             iconCls: 'st-icon-refresh',
             scope:this,
-            handler: function(button, event){
-              var activePanel = this.formCards.getLayout().activeItem;
-              if ( activePanel ) {
-                var treePanel = activePanel.items.first(); 
-                var i = treePanel.root.text.search(/\(.*\)$/);
-                if(i > -1){
-                  treePanel.root.setText(treePanel.root.text.slice(0, i-1));
-                }
-                treePanel.root.reload();
-              }
-            }
+            handler: this.reloadTree
           },
           ' ',
           'Path Lookup:',
@@ -392,7 +413,9 @@ Sonatype.repoServer.RepoMaintPanel = function(config){
                 scope: this
               }
             }
-          }
+          },
+          ' ',
+          this.browseSelector
         ],
         items: [
           {
@@ -786,11 +809,12 @@ Ext.extend(Sonatype.repoServer.RepoMaintPanel, Sonatype.repoServer.AbstractRepoP
     
     var rNode = new Ext.tree.AsyncTreeNode({
       text: name,
-      id: id + '/content/',
+      id: this.getBrowsePath( id ),
       singleClickExpand: true,
       expanded: true,
       repoType: repoType
     });
+    rNode.contentUrl = id;
     
     tp.setRootNode(rNode);
     
@@ -981,6 +1005,36 @@ Ext.extend(Sonatype.repoServer.RepoMaintPanel, Sonatype.repoServer.AbstractRepoP
         }
       };
       enableAll( treePanel.root );
+    }
+  },
+  
+  browseSelectorHandler: function( item, e ) {
+    if ( this.browseSelector.value != item.value ) {
+      this.browseSelector.value = item.value;
+      this.browseSelector.setText( item.text );
+      
+      this.reloadTree();
+    }
+  },
+  
+  getBrowsePath: function( baseUrl ) {
+    return ( baseUrl + ( this.browseSelector.value ?
+      Sonatype.config.browseIndexPathSnippet : Sonatype.config.browsePathSnippet ) ) + '/'; 
+  },
+  
+  reloadTree: function() {
+    var activePanel = this.formCards.getLayout().activeItem;
+    if ( activePanel ) {
+      var treePanel = activePanel.items.first();
+      if ( treePanel ) {
+        var root = treePanel.root;
+        var i = root.text.search(/\(.*\)$/);
+        if(i > -1){
+          root.setText(root.text.slice(0, i-1));
+        }
+        root.id = this.getBrowsePath( root.contentUrl );
+        root.reload();
+      }
     }
   }
 

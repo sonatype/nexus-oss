@@ -49,6 +49,7 @@ Sonatype.config = function() {
   var resourcePath = contextPath;
   var contentPath = contextPath + '/content';
   var browsePathSnippet = '/content';
+  var browseIndexPathSnippet = '/index_content';
   
   return {
     isDebug : false, //set to true to enable Firebug console output (getfirebug.com)
@@ -60,6 +61,7 @@ Sonatype.config = function() {
     cssPath : '/styles',
     jsPath : '/js',
     browsePathSnippet : browsePathSnippet,
+    browseIndexPathSnippet : browseIndexPathSnippet,
   
     installedServers : {repoServer:true},
   
