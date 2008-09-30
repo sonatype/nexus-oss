@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>org.sonatype.nexus</groupId>
 		<artifactId>nexus-parent</artifactId>
-		<version>3</version>
+		<version>4-SNAPSHOT</version>
 	</parent>
 	<artifactId>nexus</artifactId>
 	<packaging>pom</packaging>
@@ -205,13 +205,6 @@
 						<artifactId>commons-logging-api</artifactId>
 					</exclusion>
 				</exclusions>
-			</dependency>
-			<dependency>
-				<groupId>org.codehaus.plexus</groupId>
-				<artifactId>plexus-component-annotations</artifactId>
-				<version>1.0-beta-1</version>
-				<scope>compile</scope>
-				<type>jar</type>
 			</dependency>
 			<dependency>
 				<groupId>org.codehaus.plexus</groupId>

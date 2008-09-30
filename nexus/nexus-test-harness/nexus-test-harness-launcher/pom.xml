@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>org.sonatype.nexus</groupId>
@@ -39,19 +40,19 @@
 
 	<dependencies>
 		<dependency>
-            <groupId>org.sonatype.nexus</groupId>
-            <artifactId>nexus-webapp</artifactId>
-            <version>${project.version}</version>
-            <classifier>bundle</classifier>
-            <type>zip</type>
-            <scope>provided</scope>
-        </dependency>
-        
-        <dependency>
-            <groupId>org.sonatype.nexus</groupId>
-            <artifactId>nexus-rest-client-java</artifactId>
-            <version>${project.version}</version>
-        </dependency>
+			<groupId>org.sonatype.nexus</groupId>
+			<artifactId>nexus-webapp</artifactId>
+			<version>${project.version}</version>
+			<classifier>bundle</classifier>
+			<type>zip</type>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.sonatype.nexus</groupId>
+			<artifactId>nexus-rest-client-java</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 
 		<dependency>
 			<groupId>junit</groupId>
@@ -65,49 +66,54 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-            <groupId>org.sonatype.appbooter.plexus-booters</groupId>
-            <artifactId>plexus-app-booter</artifactId>
-            <scope>test</scope>
-        </dependency>
-		<dependency>
-		    <groupId>org.codehaus.plexus</groupId>
-            <artifactId>plexus-archiver</artifactId>
-            <version>1.0-alpha-9</version>
-            <scope>test</scope>
+			<groupId>org.sonatype.appbooter.plexus-booters</groupId>
+			<artifactId>plexus-app-booter</artifactId>
+			<scope>test</scope>
 		</dependency>
-	  <dependency>
-      <groupId>org.sonatype.appbooter</groupId>
-      <artifactId>plexus-forked-app-booter</artifactId>
-      <version>${plexus.appbooter.version}</version>
-    </dependency>
+		<dependency>
+			<groupId>org.codehaus.plexus</groupId>
+			<artifactId>plexus-archiver</artifactId>
+			<version>1.0-alpha-9</version>
+			<scope>test</scope>
+			<exclusions>
+				<exclusion>
+					<groupId>org.codehaus.plexus</groupId>
+					<artifactId>plexus-component-api</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.sonatype.appbooter</groupId>
+			<artifactId>plexus-forked-app-booter</artifactId>
+			<version>${plexus.appbooter.version}</version>
+		</dependency>
 
-	<dependency>
-	    <groupId>com.icegreen</groupId>
-	    <artifactId>greenmail</artifactId>
-	    <version>1.3</version>
-        <!-- TODO test scope is not transitive <scope>test</scope> -->
-	</dependency>
+		<dependency>
+			<groupId>com.icegreen</groupId>
+			<artifactId>greenmail</artifactId>
+			<version>1.3</version>
+			<!-- TODO test scope is not transitive <scope>test</scope> -->
+		</dependency>
 
-	<!-- <dependency>
-		<groupId>org.apache.maven.its</groupId>
-		<artifactId>maven-integration-test-helper</artifactId>
-		<version>2.1-SNAPSHOT</version>
-	</dependency> -->
-	
-	
-	
-	<dependency>
-		<groupId>com.thoughtworks.qdox</groupId>
-		<artifactId>qdox</artifactId>
-		<version>1.6.3</version>
-	</dependency>
-	<dependency>
-		<groupId>org.apache.maven.shared</groupId>
-		<artifactId>maven-verifier</artifactId>
-		<version>1.2-SNAPSHOT</version>
-	</dependency>
+		<!--
+			<dependency> <groupId>org.apache.maven.its</groupId> <artifactId>maven-integration-test-helper</artifactId>
+			<version>2.1-SNAPSHOT</version> </dependency>
+		-->
 
-  </dependencies>
+
+
+		<dependency>
+			<groupId>com.thoughtworks.qdox</groupId>
+			<artifactId>qdox</artifactId>
+			<version>1.6.3</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.maven.shared</groupId>
+			<artifactId>maven-verifier</artifactId>
+			<version>1.2-SNAPSHOT</version>
+		</dependency>
+
+	</dependencies>
 	<build>
 		<filters>
 			<filter>src/test/filters/filter.txt</filter>
@@ -118,19 +124,19 @@
 				<directory>src/test/resources</directory>
 				<filtering>true</filtering>
 				<excludes>
-                    <exclude>**/*.jar</exclude>
-                    <exclude>**/fake-central/**</exclude>
-                </excludes>
+					<exclude>**/*.jar</exclude>
+					<exclude>**/fake-central/**</exclude>
+				</excludes>
 			</testResource>
-			
+
 			<testResource>
-                <directory>src/test/resources</directory>
-                <filtering>false</filtering>
-                <includes>
-                    <include>**/*.jar</include>
-                    <include>**/fake-central/**</include>
-                </includes>
-            </testResource>
+				<directory>src/test/resources</directory>
+				<filtering>false</filtering>
+				<includes>
+					<include>**/*.jar</include>
+					<include>**/fake-central/**</include>
+				</includes>
+			</testResource>
 
 			<testResource>
 				<directory>src/test/bundle-conf</directory>
@@ -147,8 +153,8 @@
 					../../${nexus-relative-basedir}/runtime/work/conf
 				</targetPath>
 				<excludes>
-				    <exclude>**/settings.xml</exclude>
-				    <exclude>**/log4j.properties</exclude>
+					<exclude>**/settings.xml</exclude>
+					<exclude>**/log4j.properties</exclude>
 				</excludes>
 			</testResource>
 
@@ -208,74 +214,74 @@
 						</goals>
 						<configuration>
 
-						<artifactItems>
+							<artifactItems>
 
-							<artifactItem>
-								<groupId>org.sonatype.nexus</groupId>
-								<artifactId>nexus-indexer</artifactId>
-								<version>
-									${nexus.indexer.version}
+								<artifactItem>
+									<groupId>org.sonatype.nexus</groupId>
+									<artifactId>nexus-indexer</artifactId>
+									<version>
+										${nexus.indexer.version}
 								</version>
-								<classifier>sources</classifier>
-								<outputDirectory>
-									${emma-sources-base}/nexus-indexer
+									<classifier>sources</classifier>
+									<outputDirectory>
+										${emma-sources-base}/nexus-indexer
 								</outputDirectory>
-							</artifactItem>
+								</artifactItem>
 
-							<artifactItem>
-								<groupId>org.sonatype.nexus</groupId>
-								<artifactId>
-									nexus-rest-model
+								<artifactItem>
+									<groupId>org.sonatype.nexus</groupId>
+									<artifactId>
+										nexus-rest-model
 								</artifactId>
-								<version>${project.version}</version>
-								<classifier>sources</classifier>
-								<outputDirectory>
-									${emma-sources-base}/nexus-rest-model
+									<version>${project.version}</version>
+									<classifier>sources</classifier>
+									<outputDirectory>
+										${emma-sources-base}/nexus-rest-model
 								</outputDirectory>
-							</artifactItem>
-							<artifactItem>
-								<groupId>org.sonatype.nexus</groupId>
-								<artifactId>nexus-rest-api</artifactId>
-								<version>${project.version}</version>
-								<classifier>sources</classifier>
-								<outputDirectory>
-									${emma-sources-base}/nexus-rest-api
+								</artifactItem>
+								<artifactItem>
+									<groupId>org.sonatype.nexus</groupId>
+									<artifactId>nexus-rest-api</artifactId>
+									<version>${project.version}</version>
+									<classifier>sources</classifier>
+									<outputDirectory>
+										${emma-sources-base}/nexus-rest-api
 								</outputDirectory>
-							</artifactItem>
+								</artifactItem>
 
-							<artifactItem>
-								<groupId>org.sonatype.nexus</groupId>
-								<artifactId>
-									nexus-configuration
+								<artifactItem>
+									<groupId>org.sonatype.nexus</groupId>
+									<artifactId>
+										nexus-configuration
 								</artifactId>
-								<version>${project.version}</version>
-								<classifier>sources</classifier>
-								<outputDirectory>
-									${emma-sources-base}/nexus-configuration
+									<version>${project.version}</version>
+									<classifier>sources</classifier>
+									<outputDirectory>
+										${emma-sources-base}/nexus-configuration
 								</outputDirectory>
-							</artifactItem>
+								</artifactItem>
 
-							<artifactItem>
-								<groupId>org.sonatype.nexus</groupId>
-								<artifactId>nexus-app</artifactId>
-								<version>${project.version}</version>
-								<classifier>sources</classifier>
-								<outputDirectory>
-									${emma-sources-base}/nexus-app
+								<artifactItem>
+									<groupId>org.sonatype.nexus</groupId>
+									<artifactId>nexus-app</artifactId>
+									<version>${project.version}</version>
+									<classifier>sources</classifier>
+									<outputDirectory>
+										${emma-sources-base}/nexus-app
 								</outputDirectory>
-							</artifactItem>
+								</artifactItem>
 
-							<artifactItem>
-								<groupId>org.sonatype.nexus</groupId>
-								<artifactId>nexus-proxy</artifactId>
-								<version>${project.version}</version>
-								<classifier>sources</classifier>
-								<outputDirectory>
-									${emma-sources-base}/nexus-proxy
+								<artifactItem>
+									<groupId>org.sonatype.nexus</groupId>
+									<artifactId>nexus-proxy</artifactId>
+									<version>${project.version}</version>
+									<classifier>sources</classifier>
+									<outputDirectory>
+										${emma-sources-base}/nexus-proxy
 								</outputDirectory>
-							</artifactItem>
+								</artifactItem>
 
-						</artifactItems>
+							</artifactItems>
 
 						</configuration>
 
@@ -307,7 +313,7 @@
 					</includes>
 					<excludes>
 						<!-- <exclude>**/proxy/*</exclude> -->
-					</excludes>					
+					</excludes>
 				</configuration>
 			</plugin>
 
@@ -325,7 +331,7 @@
 					</filesets>
 				</configuration>
 			</plugin>
-		
+
 		</plugins>
 
 

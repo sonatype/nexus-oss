@@ -3,7 +3,7 @@
     <parent>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-parent</artifactId>
-        <version>3</version>
+        <version>4-SNAPSHOT</version>
     </parent>
 
     <groupId>org.sonatype.nexus</groupId>
@@ -74,6 +74,10 @@
             <artifactId>plexus-container-default</artifactId>
             <scope>compile</scope>
         </dependency>
+		<dependency>
+			<groupId>org.codehaus.plexus</groupId>
+			<artifactId>plexus-component-annotations</artifactId>
+		</dependency>
         <dependency>
             <groupId>org.codehaus.plexus</groupId>
             <artifactId>plexus-utils</artifactId>
