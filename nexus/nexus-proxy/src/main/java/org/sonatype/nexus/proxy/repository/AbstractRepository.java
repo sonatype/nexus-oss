@@ -1214,7 +1214,7 @@ public abstract class AbstractRepository
             throw new RepositoryNotAvailableException( this.getId() );
         }
 
-        if ( !isAllowWrite() && ( !action.isReadOnly() ) )
+        if ( !isAllowWrite() && ( action.isWrite() ) )
         {
             throw new AccessDeniedException( request, "Repository is READ ONLY!!" );
         }

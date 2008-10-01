@@ -627,13 +627,13 @@ public class AbstractNexusIntegrationTest
         return RequestFacade.downloadFile( url, targetFile );
     }
 
-    protected void deleteFromRepository( String groupOrArtifactPath )
+    protected boolean deleteFromRepository( String groupOrArtifactPath )
         throws IOException
     {
-        this.deleteFromRepository( this.testRepositoryId, groupOrArtifactPath );
+        return this.deleteFromRepository( this.testRepositoryId, groupOrArtifactPath );
     }
 
-    protected void deleteFromRepository( String repository, String groupOrArtifactPath )
+    protected boolean deleteFromRepository( String repository, String groupOrArtifactPath )
         throws IOException
     {
         String serviceURI = "service/local/repositories/" + repository + "/content/" + groupOrArtifactPath;
@@ -642,10 +642,21 @@ public class AbstractNexusIntegrationTest
 
         Response response = RequestFacade.sendMessage( serviceURI, Method.DELETE );
 
-        if ( !response.getStatus().isSuccess() )
+        boolean deleted = response.getStatus().isSuccess();
+        
+        if ( !deleted )
         {
             log.debug( "Failed to delete: " + serviceURI + "  - Status: " + response.getStatus() );
         }
+        
+        // fake it because the artifact doesn't exist
+        // TODO: clean this up.
+        if( response.getStatus().getCode() == 404 )
+        {
+            deleted = true;
+        }
+        
+        return deleted;
     }
 
     public String getBaseNexusUrl()

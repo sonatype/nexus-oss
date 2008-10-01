@@ -42,7 +42,7 @@ public class Nexus179RemoteRepoDownTest
         this.stopProxy();
 
         // delete everything under this tests group id
-        this.deleteFromRepository( "nexus179/" );
+        Assert.assertTrue( "Expected item to be deleted.", this.deleteFromRepository( "nexus179/" ));
 
         Gav gav =
             new Gav( this.getTestId(), "repo-down-test-artifact", "1.0.0", null, "xml", 0, new Date().getTime(),

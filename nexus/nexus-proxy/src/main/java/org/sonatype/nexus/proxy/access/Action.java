@@ -19,4 +19,9 @@ public enum Action
     {
         return read.equals( this );
     }
+    
+    public boolean isWrite()
+    {
+        return ( create.equals( this ) || update.equals( this ) );
+    }
 }
