@@ -50,9 +50,6 @@ public class MemoryRealm
         perms.add( "nexus:artifact:read" );
         perms.add( "nexus:repostatus:read" );
         perms.add( "nexus:repocontentclasses:read" );
-        perms.add( "nexus:usersforgotpw:create" );
-        perms.add( "nexus:usersforgotid:create" );
-        perms.add( "nexus:userschangepw:create" );
         perms.add( "nexus:target:1:*:read" );
         perms.add( "nexus:target:2:*:read" );
         authorizationMap.put( "anonymous", perms );
@@ -68,9 +65,6 @@ public class MemoryRealm
         perms.add( "nexus:artifact:read" );
         perms.add( "nexus:repostatus:read" );
         perms.add( "nexus:repocontentclasses:read" );
-        perms.add( "nexus:usersforgotpw:create" );
-        perms.add( "nexus:usersforgotid:create" );
-        perms.add( "nexus:userschangepw:create" );
         perms.add( "nexus:target:1:*:read" );
         perms.add( "nexus:target:2:*:read" );
         perms.add( "nexus:target:1:*:update" );
