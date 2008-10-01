@@ -226,7 +226,25 @@ public class RestletResource
         {
             Object payload = deserialize( delegate.getPayloadInstance() );
 
-            Object result = delegate.post( getContext(), getRequest(), getResponse(), payload );
+            Object result = null;
+            
+            try
+            {
+               result = delegate.post( getContext(), getRequest(), getResponse(), payload );
+               // This is a post, so set the status correctly
+               // but only if the status was not changed to be something else, like a 202
+               if( getResponse().getStatus() == Status.SUCCESS_OK )
+               {
+                 getResponse().setStatus( Status.SUCCESS_CREATED );
+               }
+            }
+            catch( PlexusResourceException e)
+            {
+                // set the status
+                getResponse().setStatus(e.getStatus());
+                // try to get the responseObject
+                result = e.getResultObject();
+            }
 
             if ( result != null )
             {
@@ -250,8 +268,20 @@ public class RestletResource
         else
         {
             Object payload = deserialize( delegate.getPayloadInstance() );
+            
+            Object result = null;
+            try
+            {
+                result = delegate.put( getContext(), getRequest(), getResponse(), payload );
 
-            Object result = delegate.put( getContext(), getRequest(), getResponse(), payload );
+            }
+            catch ( PlexusResourceException e )
+            {
+                // set the status
+                getResponse().setStatus( e.getStatus() );
+                // try to get the responseObject
+                result = e.getResultObject();
+            }
 
             if ( result != null )
             {
@@ -271,6 +301,13 @@ public class RestletResource
         throws ResourceException
     {
         delegate.delete( getContext(), getRequest(), getResponse() );
+        
+        // if we have an Entity set, then return a 200 (default)
+        // if not return a 204
+        if ( !getResponse().isEntityAvailable() )
+        {
+            getResponse().setStatus( Status.SUCCESS_NO_CONTENT );
+        }
 
         if ( getResponse().getStatus().isSuccess() )
         {
