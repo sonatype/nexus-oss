@@ -973,6 +973,9 @@ Ext.extend(Sonatype.repoServer.RepoMaintPanel, Sonatype.repoServer.AbstractRepoP
             else if ( text.substring( 0, textToMatch.length ) == textToMatch ) {
               matchingNodes[matchingNodes.length] = node;
               node.enable();
+              if ( matchingNodes.length == 1 ) {
+                node.ensureVisible();
+              }
             }
             else {
               node.disable();
