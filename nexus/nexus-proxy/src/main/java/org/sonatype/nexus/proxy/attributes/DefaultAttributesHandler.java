@@ -28,6 +28,8 @@ import java.io.OutputStream;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.IOUtil;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.proxy.LoggingComponent;
@@ -40,8 +42,8 @@ import org.sonatype.nexus.proxy.item.StorageItem;
  * The Class DefaultAttributesHandler.
  * 
  * @author cstamas
- * @plexus.component
  */
+@Component( role = AttributesHandler.class )
 public class DefaultAttributesHandler
     extends LoggingComponent
     implements AttributesHandler
@@ -49,30 +51,26 @@ public class DefaultAttributesHandler
 
     /**
      * The application configuration.
-     * 
-     * @plexus.requirement
      */
+    @Requirement
     private ApplicationConfiguration applicationConfiguration;
 
     /**
      * The attribute storage.
-     * 
-     * @plexus.requirement
      */
+    @Requirement
     private AttributeStorage attributeStorage;
 
     /**
      * The item inspector list.
-     * 
-     * @plexus.requirement role="org.sonatype.nexus.proxy.attributes.StorageItemInspector"
      */
+    @Requirement( role = StorageItemInspector.class )
     protected List<StorageItemInspector> itemInspectorList;
 
     /**
      * The item inspector list.
-     * 
-     * @plexus.requirement role="org.sonatype.nexus.proxy.attributes.StorageFileItemInspector"
      */
+    @Requirement( role = StorageFileItemInspector.class )
     protected List<StorageFileItemInspector> fileItemInspectorList;
 
     /**

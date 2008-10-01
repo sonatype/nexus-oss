@@ -59,7 +59,7 @@ public class M2TestsuiteEnvironmentBuilder
         List<String> reposes = new ArrayList<String>();
         for ( WebappContext remoteRepo : getServletServer().getWebappContexts() )
         {
-            M2Repository repo = (M2Repository) container.lookup( Repository.ROLE, "maven2" );
+            M2Repository repo = (M2Repository) container.lookup( Repository.class, "maven2" );
 
             // repo.enableLogging( env.getLogger().getChildLogger( "REPO" + repo.getId() ) );
             repo.setId( remoteRepo.getName() );
@@ -93,7 +93,7 @@ public class M2TestsuiteEnvironmentBuilder
         }
 
         // ading one hosted only
-        M2Repository repo = (M2Repository) container.lookup( Repository.ROLE, "maven2" );
+        M2Repository repo = (M2Repository) container.lookup( Repository.class, "maven2" );
         // repo.enableLogging( env.getLogger().getChildLogger( "REPO" + repo.getId() ) );
         repo.setId( "inhouse" );
         repo.setLocalUrl( env

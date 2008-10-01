@@ -259,16 +259,16 @@ public class CommonsHttpClientRemoteStorage
         HostConfiguration httpConfiguration = null;
 
         getLogger().debug( "Creating CommonsHttpClient instance" );
-        httpRetryHandler = new DefaultHttpMethodRetryHandler( ctx
-            .getRemoteConnectionSettings().getRetrievalRetryCount(), false );
+        httpRetryHandler = new DefaultHttpMethodRetryHandler( getRemoteConnectionSettings( ctx )
+            .getRetrievalRetryCount(), false );
         httpClient = new HttpClient( new MultiThreadedHttpConnectionManager() );
-        httpClient.getParams().setConnectionManagerTimeout( ctx.getRemoteConnectionSettings().getConnectionTimeout() );
+        httpClient.getParams().setConnectionManagerTimeout( getRemoteConnectionSettings( ctx ).getConnectionTimeout() );
 
         httpConfiguration = httpClient.getHostConfiguration();
 
         // BASIC and DIGEST auth only
-        if ( ctx.getRemoteAuthenticationSettings() != null
-            && ctx.getRemoteAuthenticationSettings().getUsername() != null )
+        if ( getRemoteAuthenticationSettings( ctx ) != null
+            && getRemoteAuthenticationSettings( ctx ).getUsername() != null )
         {
             // we have proxy authentication, let's do it preemptive
             httpClient.getParams().setAuthenticationPreemptive( true );
@@ -277,22 +277,23 @@ public class CommonsHttpClientRemoteStorage
             authPrefs.add( AuthPolicy.DIGEST );
             authPrefs.add( AuthPolicy.BASIC );
 
-            if ( ctx.getRemoteAuthenticationSettings().getNtlmDomain() != null )
+            if ( getRemoteAuthenticationSettings( ctx ).getNtlmDomain() != null )
             {
                 // Using NTLM auth, adding it as first in policies
                 authPrefs.add( 0, AuthPolicy.NTLM );
 
                 getLogger().info(
                     "... authentication setup for NTLM domain {}"
-                        + ctx.getRemoteAuthenticationSettings().getNtlmDomain() );
-                httpConfiguration.setHost( ctx.getRemoteAuthenticationSettings().getNtlmHost() );
+                        + getRemoteAuthenticationSettings( ctx ).getNtlmDomain() );
+                httpConfiguration.setHost( getRemoteAuthenticationSettings( ctx ).getNtlmHost() );
 
                 httpClient.getState().setCredentials(
                     AuthScope.ANY,
-                    new NTCredentials( ctx.getRemoteAuthenticationSettings().getUsername(), ctx
-                        .getRemoteAuthenticationSettings().getPassword(), ctx
-                        .getRemoteAuthenticationSettings().getNtlmHost(), ctx
-                        .getRemoteAuthenticationSettings().getNtlmDomain() ) );
+                    new NTCredentials(
+                        getRemoteAuthenticationSettings( ctx ).getUsername(),
+                        getRemoteAuthenticationSettings( ctx ).getPassword(),
+                        getRemoteAuthenticationSettings( ctx ).getNtlmHost(),
+                        getRemoteAuthenticationSettings( ctx ).getNtlmDomain() ) );
             }
             else
             {
@@ -300,37 +301,39 @@ public class CommonsHttpClientRemoteStorage
                 // Using Username/Pwd auth, will not add NTLM
                 getLogger().info(
                     "... setting authentication setup for remote storage with username "
-                        + ctx.getRemoteAuthenticationSettings().getUsername() );
+                        + getRemoteAuthenticationSettings( ctx ).getUsername() );
 
                 httpClient.getState().setCredentials(
                     AuthScope.ANY,
-                    new UsernamePasswordCredentials( ctx.getRemoteAuthenticationSettings().getUsername(), ctx
-                        .getRemoteAuthenticationSettings().getPassword() ) );
+                    new UsernamePasswordCredentials(
+                        getRemoteAuthenticationSettings( ctx ).getUsername(),
+                        getRemoteAuthenticationSettings( ctx ).getPassword() ) );
 
             }
             httpClient.getParams().setParameter( AuthPolicy.AUTH_SCHEME_PRIORITY, authPrefs );
         }
 
-        if ( ctx.getRemoteHttpProxySettings() != null && ctx.getRemoteHttpProxySettings().getProxyHostname() != null )
+        if ( getRemoteHttpProxySettings( ctx ) != null && getRemoteHttpProxySettings( ctx ).getProxyHostname() != null )
         {
-            getLogger().info( "... proxy setup with host " + ctx.getRemoteHttpProxySettings().getProxyHostname() );
-            httpConfiguration.setProxy( ctx.getRemoteHttpProxySettings().getProxyHostname(), ctx
-                .getRemoteHttpProxySettings().getProxyPort() );
+            getLogger().info( "... proxy setup with host " + getRemoteHttpProxySettings( ctx ).getProxyHostname() );
+            httpConfiguration.setProxy(
+                getRemoteHttpProxySettings( ctx ).getProxyHostname(),
+                getRemoteHttpProxySettings( ctx ).getProxyPort() );
 
-            if ( ctx.getRemoteHttpProxySettings().getAuthentication() != null
-                && ctx.getRemoteHttpProxySettings().getAuthentication().getUsername() != null )
+            if ( getRemoteHttpProxySettings( ctx ).getAuthentication() != null
+                && getRemoteHttpProxySettings( ctx ).getAuthentication().getUsername() != null )
             {
                 List<String> authPrefs = new ArrayList<String>( 2 );
                 authPrefs.add( AuthPolicy.DIGEST );
                 authPrefs.add( AuthPolicy.BASIC );
 
-                if ( ctx.getRemoteHttpProxySettings().getAuthentication().getNtlmDomain() != null )
+                if ( getRemoteHttpProxySettings( ctx ).getAuthentication().getNtlmDomain() != null )
                 {
 
                     // Using NTLM auth, adding it as first in policies
                     authPrefs.add( 0, AuthPolicy.NTLM );
 
-                    if ( ctx.getRemoteHttpProxySettings().getAuthentication().getUsername() != null )
+                    if ( getRemoteHttpProxySettings( ctx ).getAuthentication().getUsername() != null )
                     {
                         getLogger().warn(
                             "... CommonsHttpClient is unable to use NTLM auth scheme\n"
@@ -341,15 +344,16 @@ public class CommonsHttpClientRemoteStorage
                     }
                     getLogger().info(
                         "... proxy authentication setup for NTLM domain "
-                            + ctx.getRemoteHttpProxySettings().getAuthentication().getNtlmDomain() );
-                    httpConfiguration.setHost( ctx.getRemoteHttpProxySettings().getAuthentication().getNtlmHost() );
+                            + getRemoteHttpProxySettings( ctx ).getAuthentication().getNtlmDomain() );
+                    httpConfiguration.setHost( getRemoteHttpProxySettings( ctx ).getAuthentication().getNtlmHost() );
 
                     httpClient.getState().setProxyCredentials(
                         AuthScope.ANY,
-                        new NTCredentials( ctx.getRemoteHttpProxySettings().getAuthentication().getUsername(), ctx
-                            .getRemoteHttpProxySettings().getAuthentication().getPassword(), ctx
-                            .getRemoteHttpProxySettings().getAuthentication().getNtlmHost(), ctx
-                            .getRemoteHttpProxySettings().getAuthentication().getNtlmDomain() ) );
+                        new NTCredentials(
+                            getRemoteHttpProxySettings( ctx ).getAuthentication().getUsername(),
+                            getRemoteHttpProxySettings( ctx ).getAuthentication().getPassword(),
+                            getRemoteHttpProxySettings( ctx ).getAuthentication().getNtlmHost(),
+                            getRemoteHttpProxySettings( ctx ).getAuthentication().getNtlmDomain() ) );
                 }
                 else
                 {
@@ -357,13 +361,13 @@ public class CommonsHttpClientRemoteStorage
                     // Using Username/Pwd auth, will not add NTLM
                     getLogger().info(
                         "... proxy authentication setup for http proxy "
-                            + ctx.getRemoteHttpProxySettings().getProxyHostname() );
+                            + getRemoteHttpProxySettings( ctx ).getProxyHostname() );
 
                     httpClient.getState().setProxyCredentials(
                         AuthScope.ANY,
-                        new UsernamePasswordCredentials( ctx
-                            .getRemoteHttpProxySettings().getAuthentication().getUsername(), ctx
-                            .getRemoteHttpProxySettings().getAuthentication().getPassword() ) );
+                        new UsernamePasswordCredentials( getRemoteHttpProxySettings( ctx )
+                            .getAuthentication().getUsername(), getRemoteHttpProxySettings( ctx )
+                            .getAuthentication().getPassword() ) );
 
                 }
                 httpClient.getParams().setParameter( AuthPolicy.AUTH_SCHEME_PRIORITY, authPrefs );
@@ -406,10 +410,10 @@ public class CommonsHttpClientRemoteStorage
         HostConfiguration httpConfiguration = (HostConfiguration) ctx.getRemoteConnectionContext().get(
             CTX_KEY_HTTP_CONFIGURATION );
 
-        if ( ctx.getRemoteConnectionSettings().getUserAgentString() != null )
+        if ( getRemoteConnectionSettings( ctx ).getUserAgentString() != null )
         {
             method
-                .setRequestHeader( new Header( "user-agent", ctx.getRemoteConnectionSettings().getUserAgentString() ) );
+                .setRequestHeader( new Header( "user-agent", getRemoteConnectionSettings( ctx ).getUserAgentString() ) );
         }
         method.setRequestHeader( new Header( "accept", "*/*" ) );
         method.setRequestHeader( new Header( "accept-language", "en-us" ) );
@@ -426,9 +430,9 @@ public class CommonsHttpClientRemoteStorage
         method.setFollowRedirects( true );
         method.getParams().setParameter( HttpMethodParams.RETRY_HANDLER, httpRetryHandler );
 
-        if ( !StringUtils.isEmpty( ctx.getRemoteConnectionSettings().getQueryString() ) )
+        if ( !StringUtils.isEmpty( getRemoteConnectionSettings( ctx ).getQueryString() ) )
         {
-            method.setQueryString( ctx.getRemoteConnectionSettings().getQueryString() );
+            method.setQueryString( getRemoteConnectionSettings( ctx ).getQueryString() );
         }
 
         int resultCode = 0;

@@ -26,13 +26,11 @@ import java.util.Map;
 import java.util.Set;
 
 import org.sonatype.nexus.NexusService;
-import org.sonatype.nexus.configuration.ConfigurationChangeListener;
+import org.sonatype.nexus.proxy.events.EventListener;
 
 public interface Timeline
-    extends NexusService, ConfigurationChangeListener
+    extends NexusService, EventListener
 {
-    String ROLE = Timeline.class.getName();
-
     void add( String type, String subType, Map<String, String> data );
 
     void addAll( String type, String subType, Collection<Map<String, String>> data );

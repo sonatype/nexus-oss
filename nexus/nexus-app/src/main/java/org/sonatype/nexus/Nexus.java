@@ -64,10 +64,8 @@ import org.sonatype.scheduling.schedules.Schedule;
  * @author cstamas
  */
 public interface Nexus
-    extends MutableConfiguration
+    extends MutableConfiguration, NexusService
 {
-    String ROLE = Nexus.class.getName();
-
     // ------------------------------------------------------------------
     // Status
 
@@ -248,8 +246,8 @@ public interface Nexus
     SchedulerTask<?> createTaskInstance( String taskType )
         throws IllegalArgumentException;
 
-//    SchedulerTask<?> createTaskInstance( Class<?> taskType )
-//        throws IllegalArgumentException;
+    // SchedulerTask<?> createTaskInstance( Class<?> taskType )
+    // throws IllegalArgumentException;
 
     // ----------------------------------------------------------------------------
     // Default Configuration
@@ -322,6 +320,6 @@ public interface Nexus
     FlatSearchResponse searchArtifactClassFlat( String term, String repositoryId, String groupId, Integer from,
         Integer count );
 
-    FlatSearchResponse searchArtifactFlat( String gTerm, String aTerm, String vTerm, String pTerm, String cTerm, String repositoryId,
-        String groupId, Integer from, Integer count );
+    FlatSearchResponse searchArtifactFlat( String gTerm, String aTerm, String vTerm, String pTerm, String cTerm,
+        String repositoryId, String groupId, Integer from, Integer count );
 }

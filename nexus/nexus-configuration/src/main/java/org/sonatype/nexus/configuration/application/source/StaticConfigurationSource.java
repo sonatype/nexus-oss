@@ -20,10 +20,10 @@
  */
 package org.sonatype.nexus.configuration.application.source;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
+import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.nexus.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.model.Configuration;
 
@@ -32,8 +32,8 @@ import org.sonatype.nexus.configuration.model.Configuration;
  * is unmodifiable, since it actually reads the bundled config file from the module's JAR.
  * 
  * @author cstamas
- * @plexus.component role-hint="static"
  */
+@Component( role = ApplicationConfigurationSource.class, hint = "static" )
 public class StaticConfigurationSource
     extends AbstractApplicationConfigurationSource
 {

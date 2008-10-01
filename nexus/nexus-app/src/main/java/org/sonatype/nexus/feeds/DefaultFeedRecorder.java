@@ -31,9 +31,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.StartingException;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.StoppingException;
 import org.sonatype.nexus.artifact.NexusItemInfo;
 import org.sonatype.nexus.timeline.Timeline;
 
@@ -41,8 +41,8 @@ import org.sonatype.nexus.timeline.Timeline;
  * A feed recorder that uses DefaultNexus to record feeds.
  * 
  * @author cstamas
- * @plexus.component
  */
+@Component( role = FeedRecorder.class )
 public class DefaultFeedRecorder
     extends AbstractLogEnabled
     implements FeedRecorder
@@ -83,9 +83,8 @@ public class DefaultFeedRecorder
 
     /**
      * The timeline for persistent events and feeds.
-     * 
-     * @plexus.requirement
      */
+    @Requirement
     private Timeline timeline;
 
     /**
@@ -94,13 +93,13 @@ public class DefaultFeedRecorder
     private DateFormat eventDateFormat = new SimpleDateFormat( "yyyy-MM-dd HH:mm:ss.SSSZ" );
 
     public void startService()
-        throws StartingException
+        throws Exception
     {
         timeline.startService();
     }
 
     public void stopService()
-        throws StoppingException
+        throws Exception
     {
         timeline.stopService();
     }

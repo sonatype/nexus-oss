@@ -31,8 +31,9 @@ import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
 import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
-import org.sonatype.nexus.configuration.ConfigurationChangeListener;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
+import org.sonatype.nexus.proxy.events.AbstractEvent;
+import org.sonatype.nexus.proxy.events.EventListener;
 
 /**
  * A default HTTP Proxy service. A very simple network service based on Java 5 ExecutorService.
@@ -42,7 +43,7 @@ import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
  */
 public class DefaultHttpProxyService
     extends AbstractLogEnabled
-    implements HttpProxyService, Initializable, ConfigurationChangeListener
+    implements HttpProxyService, Initializable, EventListener
 {
     public static final int DEFAULT_TIMEOUT = 20 * 1000;
 
@@ -76,23 +77,26 @@ public class DefaultHttpProxyService
     public void initialize()
         throws InitializationException
     {
-        applicationConfiguration.addConfigurationChangeListener( this );
+        applicationConfiguration.addProximityEventListener( this );
     }
 
-    public void onConfigurationChange( ConfigurationChangeEvent evt )
+    public void onProximityEvent( AbstractEvent evt )
     {
-        httpProxyPolicy = HttpProxyPolicy.fromModel( applicationConfiguration
-            .getConfiguration().getHttpProxy().getProxyPolicy() );
-        
-        if ( port != applicationConfiguration.getConfiguration().getHttpProxy().getPort() )
+        if ( ConfigurationChangeEvent.class.isAssignableFrom( evt.getClass() ) )
         {
-            port = applicationConfiguration.getConfiguration().getHttpProxy().getPort();
+            httpProxyPolicy = HttpProxyPolicy.fromModel( applicationConfiguration
+                .getConfiguration().getHttpProxy().getProxyPolicy() );
 
-            if ( running )
+            if ( port != applicationConfiguration.getConfiguration().getHttpProxy().getPort() )
             {
-                stopService();
-                
-                startService();
+                port = applicationConfiguration.getConfiguration().getHttpProxy().getPort();
+
+                if ( running )
+                {
+                    stopService();
+
+                    startService();
+                }
             }
         }
     }

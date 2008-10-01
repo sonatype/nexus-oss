@@ -40,10 +40,13 @@ import org.apache.commons.codec.binary.Hex;
 import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Reader;
 import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Writer;
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.nexus.artifact.M2ArtifactRecognizer;
 import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
+import org.sonatype.nexus.proxy.events.AbstractEvent;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.PreparedContentLocator;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
@@ -51,6 +54,7 @@ import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.router.DefaultGroupIdBasedRepositoryRouter;
+import org.sonatype.nexus.proxy.router.RepositoryRouter;
 
 /**
  * Mavenized version of RepoGrouId based router. The only difference with the base class is the maven specific
@@ -58,16 +62,15 @@ import org.sonatype.nexus.proxy.router.DefaultGroupIdBasedRepositoryRouter;
  * we aggregate them. Aggregation happens for repository metadata only.
  * 
  * @author cstamas
- * @plexus.component role-hint="groups-m2"
  */
+@Component( role = RepositoryRouter.class, hint = "groups-m2" )
 public class M2GroupIdBasedRepositoryRouter
     extends DefaultGroupIdBasedRepositoryRouter
 {
     /**
      * The ContentClass.
-     * 
-     * @plexus.requirement role-hint="maven2"
      */
+    @Requirement( hint = "maven2" )
     private ContentClass contentClass;
 
     public ContentClass getHandledContentClass()
@@ -78,11 +81,14 @@ public class M2GroupIdBasedRepositoryRouter
     /** Should the metadata be merged? */
     private boolean mergeMetadata = true;
 
-    public void onConfigurationChange( ConfigurationChangeEvent evt )
+    public void onProximityEvent( AbstractEvent evt )
     {
-        super.onConfigurationChange( evt );
+        if ( ConfigurationChangeEvent.class.isAssignableFrom( evt.getClass() ) )
+        {
+            super.onProximityEvent( evt );
 
-        mergeMetadata = getApplicationConfiguration().getConfiguration().getRouting().getGroups().isMergeMetadata();
+            mergeMetadata = getApplicationConfiguration().getConfiguration().getRouting().getGroups().isMergeMetadata();
+        }
     }
 
     /**

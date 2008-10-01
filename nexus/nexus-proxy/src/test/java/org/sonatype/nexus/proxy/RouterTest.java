@@ -42,7 +42,7 @@ public class RouterTest
 
         repo1.setAllowWrite( true );
 
-        return (ResourceStore) lookup( RepositoryRouter.ROLE, "repositories" );
+        return (ResourceStore) lookup( RepositoryRouter.class, "repositories" );
     }
 
 }

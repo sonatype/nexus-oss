@@ -31,7 +31,7 @@ public class StaticConfigurationSourceTest
     protected SecurityConfigurationSource getConfigurationSource()
         throws Exception
     {
-        return ( SecurityConfigurationSource ) lookup( SecurityConfigurationSource.ROLE, "static" );
+        return ( SecurityConfigurationSource ) lookup( SecurityConfigurationSource.class, "static" );
     }
 
     @Override

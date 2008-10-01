@@ -25,11 +25,9 @@ import java.util.Set;
 
 public interface LogFileManager
 {
-    String ROLE = LogFileManager.class.getName();
-    
     Set<File> getLogFiles();
-    
+
     File getLogFile( String filename );
-    
+
     void createLogDirectory();
 }

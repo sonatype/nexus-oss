@@ -55,19 +55,19 @@ public class DefaultAttributesHandlerTest
             getBasedir(),
             "target/test-reposes/repo1" ) );
 
-        attributesHandler = (DefaultAttributesHandler) lookup( AttributesHandler.ROLE );
+        attributesHandler = (DefaultAttributesHandler) lookup( AttributesHandler.class );
 
         FileUtils.deleteDirectory( ( (DefaultAttributeStorage) attributesHandler.getAttributeStorage() )
             .getWorkingDirectory() );
 
-        repository = (Repository) lookup( Repository.ROLE, "maven2" );
+        repository = (Repository) lookup( Repository.class, "maven2" );
 
         repository.setId( "dummy" );
 
         repository.setLocalUrl( new File( getBasedir(), "target/test-reposes/repo1" ).toURI().toURL().toString() );
 
         DefaultFSLocalRepositoryStorage ls = (DefaultFSLocalRepositoryStorage) lookup(
-            LocalRepositoryStorage.ROLE,
+            LocalRepositoryStorage.class,
             "file" );
 
         repository.setLocalStorage( ls );

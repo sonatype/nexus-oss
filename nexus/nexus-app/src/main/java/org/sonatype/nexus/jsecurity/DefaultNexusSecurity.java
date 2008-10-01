@@ -3,13 +3,13 @@ package org.sonatype.nexus.jsecurity;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.StartingException;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.StoppingException;
-import org.jsecurity.realm.Realm;
 import org.sonatype.jsecurity.model.CPrivilege;
 import org.sonatype.jsecurity.model.CProperty;
 import org.sonatype.jsecurity.model.CRole;
@@ -20,51 +20,40 @@ import org.sonatype.jsecurity.realms.tools.NoSuchPrivilegeException;
 import org.sonatype.jsecurity.realms.tools.NoSuchRoleException;
 import org.sonatype.jsecurity.realms.tools.NoSuchUserException;
 import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
-import org.sonatype.nexus.configuration.ConfigurationChangeListener;
 import org.sonatype.nexus.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.security.source.SecurityConfigurationSource;
 import org.sonatype.nexus.email.NexusEmailer;
+import org.sonatype.nexus.proxy.events.AbstractEvent;
+import org.sonatype.nexus.proxy.events.EventListener;
 
-/**
- *  @plexus.component
- */
+@Component( role = NexusSecurity.class )
 public class DefaultNexusSecurity
     extends AbstractLogEnabled
     implements NexusSecurity
 {
-    /**
-     * @plexus.requirement
-     */
+    @Requirement
     private ConfigurationManager manager;
-    
-    /**
-     * @plexus.requirement role-hint="file"
-     */
+
+    @Requirement( hint = "file" )
     private SecurityConfigurationSource configSource;
-    
-    /**
-     * @plexus.requirement
-     */
+
+    @Requirement
     private PrivilegeInheritanceManager privInheritance;
-    
-    /**
-     * @plexus.requirement
-     */
+
+    @Requirement
     private PasswordGenerator pwGenerator;
-    
-    /**
-     * @plexus.requirement
-     */
+
+    @Requirement
     private NexusEmailer emailer;
-    
-    private List<ConfigurationChangeListener> listeners = new ArrayList<ConfigurationChangeListener>();
-    
+
+    private List<EventListener> listeners = new ArrayList<EventListener>();
+
     public void startService()
         throws StartingException
     {
         // Do this simply to upgrade the configuration if necessary
         try
-        {            
+        {
             clearCache();
             configSource.loadConfiguration();
             getLogger().info( "Security Configuration loaded properly." );
@@ -77,22 +66,22 @@ public class DefaultNexusSecurity
         {
             getLogger().fatalError( "Security Configuration is invalid!!!", e );
         }
-        
+
         getLogger().info( "Started Nexus Security" );
     }
-    
+
     public void stopService()
         throws StoppingException
     {
         getLogger().info( "Stopped Nexus Security" );
     }
-    
+
     public void clearCache()
     {
         manager.clearCache();
     }
 
-    public void createPrivilege( CPrivilege privilege ) 
+    public void createPrivilege( CPrivilege privilege )
         throws InvalidConfigurationException
     {
         addInheritedPrivileges( privilege );
@@ -147,17 +136,17 @@ public class DefaultNexusSecurity
     {
         return manager.getPrivilegeProperty( id, key );
     }
-    
+
     public List<CPrivilege> listPrivileges()
     {
         return manager.listPrivileges();
     }
-    
+
     public List<CRole> listRoles()
     {
         return manager.listRoles();
     }
-    
+
     public List<CUser> listUsers()
     {
         return manager.listUsers();
@@ -184,13 +173,13 @@ public class DefaultNexusSecurity
     public void save()
     {
         manager.save();
-        
-        notifyConfigurationChangeListeners();
+
+        notifyProximityEventListeners( new ConfigurationChangeEvent( this ) );
     }
 
     public void updatePrivilege( CPrivilege privilege )
         throws InvalidConfigurationException,
-        NoSuchPrivilegeException
+            NoSuchPrivilegeException
     {
         manager.updatePrivilege( privilege );
         save();
@@ -198,7 +187,7 @@ public class DefaultNexusSecurity
 
     public void updateRole( CRole role )
         throws InvalidConfigurationException,
-        NoSuchRoleException
+            NoSuchRoleException
     {
         manager.updateRole( role );
         save();
@@ -206,25 +195,25 @@ public class DefaultNexusSecurity
 
     public void updateUser( CUser user )
         throws InvalidConfigurationException,
-        NoSuchUserException
+            NoSuchUserException
     {
         manager.updateUser( user );
         save();
     }
-    
-    public void addConfigurationChangeListener( ConfigurationChangeListener listener )
+
+    public void addProximityEventListener( EventListener listener )
     {
         listeners.add( listener );
     }
-    
-    public void notifyConfigurationChangeListeners()
+
+    public void removeProximityEventListener( EventListener listener )
     {
-        notifyConfigurationChangeListeners( new ConfigurationChangeEvent( this ) );
+        listeners.remove( listener );
     }
-    
-    public void notifyConfigurationChangeListeners( ConfigurationChangeEvent evt )
+
+    public void notifyProximityEventListeners( AbstractEvent evt )
     {
-        for ( ConfigurationChangeListener l : listeners )
+        for ( EventListener l : listeners )
         {
             try
             {
@@ -233,7 +222,7 @@ public class DefaultNexusSecurity
                     getLogger().debug( "Notifying component about security config change: " + l.getClass().getName() );
                 }
 
-                l.onConfigurationChange( evt );
+                l.onProximityEvent( evt );
             }
             catch ( Exception e )
             {
@@ -241,12 +230,7 @@ public class DefaultNexusSecurity
             }
         }
     }
-    
-    public void removeConfigurationChangeListener( ConfigurationChangeListener listener )
-    {
-        listeners.remove( listener );        
-    }
-    
+
     /**
      * @deprecated Use save()
      */
@@ -255,13 +239,13 @@ public class DefaultNexusSecurity
     {
         // Don't use this for security
     }
-    
-    public void changePassword( String userId, String oldPassword, String newPassword ) 
-        throws NoSuchUserException, 
+
+    public void changePassword( String userId, String oldPassword, String newPassword )
+        throws NoSuchUserException,
             InvalidCredentialsException
     {
         CUser user = readUser( userId );
-        
+
         String validate = pwGenerator.hashPassword( oldPassword );
 
         if ( !validate.equals( user.getPassword() ) )
@@ -270,7 +254,7 @@ public class DefaultNexusSecurity
         }
 
         user.setPassword( pwGenerator.hashPassword( newPassword ) );
-        
+
         try
         {
             updateUser( user );
@@ -280,26 +264,26 @@ public class DefaultNexusSecurity
             // Just changing password, can't get into this state
         }
     }
-    
-    public void forgotPassword( String userId, String email ) 
+
+    public void forgotPassword( String userId, String email )
         throws NoSuchUserException,
             NoSuchEmailException
     {
         CUser user = readUser( userId );
-        
+
         if ( !user.getEmail().equals( email ) )
         {
             throw new NoSuchEmailException( email );
         }
-        
+
         resetPassword( userId );
     }
-    
+
     public void forgotUsername( String email )
         throws NoSuchEmailException
     {
         List<String> userIds = new ArrayList<String>();
-        
+
         for ( CUser user : listUsers() )
         {
             if ( user.getEmail().equals( email ) )
@@ -307,7 +291,7 @@ public class DefaultNexusSecurity
                 userIds.add( user.getId() );
             }
         }
-        
+
         if ( userIds.size() > 0 )
         {
             emailer.sendForgotUsername( email, userIds );
@@ -317,16 +301,16 @@ public class DefaultNexusSecurity
             throw new NoSuchEmailException( email );
         }
     }
-    
-    public void resetPassword( String userId ) 
+
+    public void resetPassword( String userId )
         throws NoSuchUserException
     {
         CUser user = readUser( userId );
-        
+
         String password = generatePassword( user );
-        
+
         emailer.sendResetPassword( user.getEmail(), password );
-        
+
         try
         {
             updateUser( user );
@@ -336,12 +320,12 @@ public class DefaultNexusSecurity
             // cant get here, just reseting password
         }
     }
-    
+
     private void addInheritedPrivileges( CPrivilege privilege )
     {
         CProperty methodProperty = null;
-        
-        for ( CProperty property : ( List<CProperty> ) privilege.getProperties() )
+
+        for ( CProperty property : (List<CProperty>) privilege.getProperties() )
         {
             if ( property.getKey().equals( "method" ) )
             {
@@ -349,34 +333,34 @@ public class DefaultNexusSecurity
                 break;
             }
         }
-        
+
         if ( methodProperty != null )
-        {        
+        {
             Set<String> inheritedMethods = privInheritance.getInheritedMethods( methodProperty.getValue() );
-    
+
             StringBuffer buf = new StringBuffer();
-    
+
             for ( String method : inheritedMethods )
             {
                 buf.append( method );
                 buf.append( "," );
             }
-    
+
             if ( buf.length() > 0 )
             {
                 buf.setLength( buf.length() - 1 );
-                
+
                 methodProperty.setValue( buf.toString() );
             }
         }
     }
-    
+
     private String generatePassword( CUser user )
     {
         String password = pwGenerator.generatePassword( 10, 10 );
-        
+
         user.setPassword( pwGenerator.hashPassword( password ) );
-        
+
         return password;
     }
 }

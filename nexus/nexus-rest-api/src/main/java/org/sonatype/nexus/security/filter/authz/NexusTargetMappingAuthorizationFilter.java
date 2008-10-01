@@ -157,7 +157,7 @@ public class NexusTargetMappingAuthorizationFilter
 
             try
             {
-                authorizer = (NexusItemAuthorizer) plexus.lookup( NexusItemAuthorizer.ROLE );
+                authorizer = (NexusItemAuthorizer) plexus.lookup( NexusItemAuthorizer.class );
             }
             catch ( ComponentLookupException e )
             {

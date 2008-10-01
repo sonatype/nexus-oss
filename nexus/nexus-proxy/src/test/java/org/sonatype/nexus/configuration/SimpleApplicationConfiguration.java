@@ -32,13 +32,15 @@ import org.sonatype.nexus.configuration.model.CRouting;
 import org.sonatype.nexus.configuration.model.CSecurity;
 import org.sonatype.nexus.configuration.model.Configuration;
 import org.sonatype.nexus.proxy.AbstractNexusTestCase;
+import org.sonatype.nexus.proxy.events.AbstractEvent;
+import org.sonatype.nexus.proxy.events.EventListener;
 
 public class SimpleApplicationConfiguration
     implements ApplicationConfiguration
 {
     private Configuration configuration;
 
-    private Vector<ConfigurationChangeListener> listeners = new Vector<ConfigurationChangeListener>();
+    private Vector<EventListener> listeners = new Vector<EventListener>();
 
     public SimpleApplicationConfiguration()
     {
@@ -88,29 +90,6 @@ public class SimpleApplicationConfiguration
         return new File( getWorkingDirectory(), "trash" );
     }
 
-    public void addConfigurationChangeListener( ConfigurationChangeListener listener )
-    {
-        listeners.add( listener );
-    }
-
-    public void removeConfigurationChangeListener( ConfigurationChangeListener listener )
-    {
-        listeners.remove( listener );
-    }
-
-    public void notifyConfigurationChangeListeners()
-    {
-        notifyConfigurationChangeListeners( new ConfigurationChangeEvent( this ) );
-    }
-
-    public void notifyConfigurationChangeListeners( ConfigurationChangeEvent evt )
-    {
-        for ( ConfigurationChangeListener l : listeners )
-        {
-            l.onConfigurationChange( evt );
-        }
-    }
-
     public File getSecurityConfigurationFile()
     {
         return new File( getConfigurationDirectory(), "security.xml" );
@@ -125,6 +104,24 @@ public class SimpleApplicationConfiguration
     public boolean isSecurityEnabled()
     {
         return false;
+    }
+
+    public void addProximityEventListener( EventListener listener )
+    {
+        listeners.add( listener );
+    }
+
+    public void removeProximityEventListener( EventListener listener )
+    {
+        listeners.remove( listener );
+    }
+
+    public void notifyProximityEventListeners( AbstractEvent evt )
+    {
+        for ( EventListener l : listeners )
+        {
+            l.onProximityEvent( evt );
+        }
     }
 
 }

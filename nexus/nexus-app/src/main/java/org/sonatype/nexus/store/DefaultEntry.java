@@ -23,7 +23,6 @@ package org.sonatype.nexus.store;
 public class DefaultEntry
     implements Entry
 {
-
     private String id;
 
     private Object content;
@@ -31,9 +30,9 @@ public class DefaultEntry
     public DefaultEntry( String id, Object content )
     {
         super();
-        
+
         this.id = id;
-        
+
         this.content = content;
     }
 

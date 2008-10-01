@@ -30,7 +30,7 @@ public class DefaultSnapshotRemoverTest
 
         servetServer.start();
 
-        defaultNexus = (DefaultNexus) lookup( Nexus.ROLE );
+        defaultNexus = (DefaultNexus) lookup( Nexus.class );
 
         apacheSnapshots = (MavenRepository) defaultNexus.getRepository( "apache-snapshots" );
 

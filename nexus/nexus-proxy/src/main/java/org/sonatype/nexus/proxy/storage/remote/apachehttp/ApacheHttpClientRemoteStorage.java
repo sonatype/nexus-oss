@@ -107,13 +107,13 @@ public class ApacheHttpClientRemoteStorage
             HttpHead head = new HttpHead( targetUrl.getPath() );
 
             HttpResponse response = executeMethod( uid.getRepository(), target, head );
-            
-            //In case the remote repository doesn't support the HEAD method, we will attempt
-            //a GET
+
+            // In case the remote repository doesn't support the HEAD method, we will attempt
+            // a GET
             if ( HttpStatus.SC_OK != response.getStatusLine().getStatusCode() )
             {
                 HttpGet get = new HttpGet( targetUrl.getPath() );
-                
+
                 response = executeMethod( uid.getRepository(), target, get );
             }
 
@@ -128,8 +128,8 @@ public class ApacheHttpClientRemoteStorage
 
     /*
      * (non-Javadoc)
-     * 
-     * @see org.sonatype.nexus.storage.remote.RemoteRepositoryStorage#deleteItem(org.sonatype.nexus.item.RepositoryItemUid)
+     * @see
+     * org.sonatype.nexus.storage.remote.RemoteRepositoryStorage#deleteItem(org.sonatype.nexus.item.RepositoryItemUid)
      */
     public void deleteItem( RepositoryItemUid uid )
         throws ItemNotFoundException,
@@ -143,8 +143,8 @@ public class ApacheHttpClientRemoteStorage
 
     /*
      * (non-Javadoc)
-     * 
-     * @see org.sonatype.nexus.storage.remote.RemoteRepositoryStorage#retrieveItem(org.sonatype.nexus.item.RepositoryItemUid)
+     * @see
+     * org.sonatype.nexus.storage.remote.RemoteRepositoryStorage#retrieveItem(org.sonatype.nexus.item.RepositoryItemUid)
      */
     public AbstractStorageItem retrieveItem( RepositoryItemUid uid )
         throws ItemNotFoundException,
@@ -235,8 +235,8 @@ public class ApacheHttpClientRemoteStorage
 
     /*
      * (non-Javadoc)
-     * 
-     * @see org.sonatype.nexus.storage.remote.RemoteRepositoryStorage#storeItem(org.sonatype.nexus.item.AbstractStorageItem)
+     * @see
+     * org.sonatype.nexus.storage.remote.RemoteRepositoryStorage#storeItem(org.sonatype.nexus.item.AbstractStorageItem)
      */
     public void storeItem( AbstractStorageItem item )
         throws UnsupportedStorageOperationException,
@@ -264,8 +264,9 @@ public class ApacheHttpClientRemoteStorage
         schemeRegistry.register( new Scheme( "https", SSLSocketFactory.getSocketFactory(), 443 ) );
 
         ClientConnectionManager cm = new ThreadSafeClientConnManager( httpParams, schemeRegistry );
-        HttpRequestRetryHandler httpRequestRetryHandler = new DefaultHttpRequestRetryHandler( ctx
-            .getRemoteConnectionSettings().getRetrievalRetryCount(), true );
+        HttpRequestRetryHandler httpRequestRetryHandler = new DefaultHttpRequestRetryHandler(
+            getRemoteConnectionSettings( ctx ).getRetrievalRetryCount(),
+            true );
 
         httpClient = new DefaultHttpClient( cm, httpParams );
         httpClient.setHttpRequestRetryHandler( httpRequestRetryHandler );
@@ -311,44 +312,46 @@ public class ApacheHttpClientRemoteStorage
         } );
 
         // BASIC and DIGEST auth only
-        if ( ctx.getRemoteAuthenticationSettings() != null
-            && ctx.getRemoteAuthenticationSettings().getUsername() != null )
+        if ( getRemoteAuthenticationSettings( ctx ) != null
+            && getRemoteAuthenticationSettings( ctx ).getUsername() != null )
         {
             getLogger().info(
                 "... setting authentication setup for remote storage with username "
-                    + ctx.getRemoteAuthenticationSettings().getUsername() );
+                    + getRemoteAuthenticationSettings( ctx ).getUsername() );
 
             httpClient.getCredentialsProvider().setCredentials(
                 AuthScope.ANY,
-                new UsernamePasswordCredentials( ctx.getRemoteAuthenticationSettings().getUsername(), ctx
-                    .getRemoteAuthenticationSettings().getPassword() ) );
+                new UsernamePasswordCredentials(
+                    getRemoteAuthenticationSettings( ctx ).getUsername(),
+                    getRemoteAuthenticationSettings( ctx ).getPassword() ) );
         }
-        else if ( ctx.getRemoteAuthenticationSettings().getNtlmDomain() != null
-            || ctx.getRemoteAuthenticationSettings().getNtlmHost() != null )
+        else if ( getRemoteAuthenticationSettings( ctx ).getNtlmDomain() != null
+            || getRemoteAuthenticationSettings( ctx ).getNtlmHost() != null )
         {
             getLogger().warn( "NTLM authentication is not supported by " + this.getClass().getName() );
         }
 
-        if ( ctx.getRemoteHttpProxySettings() != null && ctx.getRemoteHttpProxySettings().getProxyHostname() != null )
+        if ( getRemoteHttpProxySettings( ctx ) != null && getRemoteHttpProxySettings( ctx ).getProxyHostname() != null )
         {
-            getLogger().info( "... proxy setup with host " + ctx.getRemoteHttpProxySettings().getProxyHostname() );
-            proxyHttpHost = new HttpHost( ctx.getRemoteHttpProxySettings().getProxyHostname(), ctx
-                .getRemoteHttpProxySettings().getProxyPort() );
+            getLogger().info( "... proxy setup with host " + getRemoteHttpProxySettings( ctx ).getProxyHostname() );
+            proxyHttpHost = new HttpHost(
+                getRemoteHttpProxySettings( ctx ).getProxyHostname(),
+                getRemoteHttpProxySettings( ctx ).getProxyPort() );
 
-            if ( ctx.getRemoteHttpProxySettings().getAuthentication().getUsername() != null )
+            if ( getRemoteHttpProxySettings( ctx ).getAuthentication().getUsername() != null )
             {
                 getLogger().info(
                     "... setting authentication setup for HTTP proxy with username "
-                        + ctx.getRemoteHttpProxySettings().getAuthentication().getUsername() );
+                        + getRemoteHttpProxySettings( ctx ).getAuthentication().getUsername() );
 
                 httpClient.getCredentialsProvider().setCredentials(
                     new AuthScope( proxyHttpHost.getHostName(), proxyHttpHost.getPort() ),
-                    new UsernamePasswordCredentials(
-                        ctx.getRemoteHttpProxySettings().getAuthentication().getUsername(),
-                        ctx.getRemoteHttpProxySettings().getAuthentication().getPassword() ) );
+                    new UsernamePasswordCredentials( getRemoteHttpProxySettings( ctx )
+                        .getAuthentication().getUsername(), getRemoteHttpProxySettings( ctx )
+                        .getAuthentication().getPassword() ) );
             }
-            else if ( ctx.getRemoteHttpProxySettings().getAuthentication().getNtlmDomain() != null
-                || ctx.getRemoteHttpProxySettings().getAuthentication().getNtlmHost() != null )
+            else if ( getRemoteHttpProxySettings( ctx ).getAuthentication().getNtlmDomain() != null
+                || getRemoteHttpProxySettings( ctx ).getAuthentication().getNtlmHost() != null )
             {
                 getLogger().warn( "NTLM proxy authentication is not supported by " + this.getClass().getName() );
             }
@@ -380,9 +383,10 @@ public class ApacheHttpClientRemoteStorage
 
         HttpClient httpClient = (HttpClient) ctx.getRemoteConnectionContext().get( CTX_KEY_CLIENT );
 
-        if ( ctx.getRemoteConnectionSettings().getUserAgentString() != null )
+        if ( getRemoteConnectionSettings( ctx ).getUserAgentString() != null )
         {
-            request.setHeader( new BasicHeader( "user-agent", ctx.getRemoteConnectionSettings().getUserAgentString() ) );
+            request
+                .setHeader( new BasicHeader( "user-agent", getRemoteConnectionSettings( ctx ).getUserAgentString() ) );
         }
         // request.setHeader( new BasicHeader( "accept", "*/*" ) );
         // request.setHeader( new BasicHeader( "accept-language", "en-us" ) );
@@ -409,9 +413,9 @@ public class ApacheHttpClientRemoteStorage
         {
             getLogger().error( "Tranport error while executing " + request.getMethod() + " method", ex );
         }
-        
+
         getLogger().debug( "HTTPClient :: executeMethod() DONE" );
-        
+
         return response;
     }
 
@@ -463,7 +467,6 @@ public class ApacheHttpClientRemoteStorage
 
         /*
          * (non-Javadoc)
-         * 
          * @see org.apache.http.entity.HttpEntityWrapper#getContent()
          */
         public InputStream getContent()
@@ -478,7 +481,6 @@ public class ApacheHttpClientRemoteStorage
 
         /*
          * (non-Javadoc)
-         * 
          * @see org.apache.http.entity.HttpEntityWrapper#getContentLength()
          */
         public long getContentLength()

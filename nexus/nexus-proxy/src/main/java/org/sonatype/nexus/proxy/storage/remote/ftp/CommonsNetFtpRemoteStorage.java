@@ -246,8 +246,9 @@ public class CommonsNetFtpRemoteStorage
             {
                 throw new StorageException( "FTP Server refused connection, reply code = " + reply );
             }
-            if ( ftpc.login( ctx.getRemoteAuthenticationSettings().getUsername(), ctx
-                .getRemoteAuthenticationSettings().getPassword() ) )
+            if ( ftpc.login(
+                getRemoteAuthenticationSettings( ctx ).getUsername(),
+                getRemoteAuthenticationSettings( ctx ).getPassword() ) )
             {
                 ftpc.setFileType( FTPClient.BINARY_FILE_TYPE );
                 return ftpc;

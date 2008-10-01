@@ -25,8 +25,6 @@ import org.sonatype.nexus.proxy.NoSuchRepositoryGroupException;
 
 public interface SnapshotRemover
 {
-    String ROLE = SnapshotRemover.class.getName();
-
     /**
      * A flag to mark that -- even if we are doing something (eg. deleting, see NEXUS-814) within this GAV -- this GAV
      * is contained multiple times in Repository and this is not the last one, there are more instances (eg. more

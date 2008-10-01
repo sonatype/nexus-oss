@@ -40,8 +40,6 @@ import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 public interface NexusConfiguration
     extends ApplicationConfiguration, MutableConfiguration
 {
-    String ROLE = NexusConfiguration.class.getName();
-
     /**
      * Explicit loading of configuration. Does not force reload.
      * 

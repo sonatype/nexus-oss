@@ -23,6 +23,7 @@ package org.sonatype.nexus.proxy.router;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryGroupException;
@@ -48,9 +49,8 @@ public abstract class GroupIdBasedRepositoryRouter
 {
     /**
      * The mapper.
-     * 
-     * @plexus.requirement
      */
+    @Requirement
     private RequestRepositoryMapper requestRepositoryMapper;
 
     /**

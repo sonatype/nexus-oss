@@ -89,7 +89,7 @@ public class DefaultTaskConfigManagerTest
 
         defaultManager = (DefaultTaskConfigManager) lookup( TaskConfigManager.class.getName() );
 
-        applicationConfiguration = (ApplicationConfiguration) lookup( ApplicationConfiguration.ROLE );
+        applicationConfiguration = (ApplicationConfiguration) lookup( ApplicationConfiguration.class );
     }
 
     public void tearDown()

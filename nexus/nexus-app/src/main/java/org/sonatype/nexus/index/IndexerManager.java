@@ -30,8 +30,6 @@ import org.sonatype.nexus.proxy.NoSuchRepositoryGroupException;
 
 public interface IndexerManager
 {
-    String ROLE = IndexerManager.class.getName();
-
     // ----------------------------------------------------------------------------
     // Context management et al
     // ----------------------------------------------------------------------------

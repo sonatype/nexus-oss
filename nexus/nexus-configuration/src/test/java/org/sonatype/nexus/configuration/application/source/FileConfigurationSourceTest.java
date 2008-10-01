@@ -30,7 +30,7 @@ public class FileConfigurationSourceTest
     protected ApplicationConfigurationSource getConfigurationSource()
         throws Exception
     {
-        return (ApplicationConfigurationSource) lookup( ApplicationConfigurationSource.ROLE, "file" );
+        return (ApplicationConfigurationSource) lookup( ApplicationConfigurationSource.class, "file" );
     }
 
     protected InputStream getOriginatingConfigurationInputStream()
@@ -80,7 +80,7 @@ public class FileConfigurationSourceTest
         throws Exception
     {
         copyDefaultConfigToPlace();
-        
+
         configurationSource = getConfigurationSource();
 
         configurationSource.loadConfiguration();

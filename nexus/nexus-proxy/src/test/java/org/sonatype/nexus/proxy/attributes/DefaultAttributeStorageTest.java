@@ -51,7 +51,7 @@ public class DefaultAttributeStorageTest
     {
         super.setUp();
 
-        attributeStorage = (DefaultAttributeStorage) lookup( AttributeStorage.ROLE );
+        attributeStorage = (DefaultAttributeStorage) lookup( AttributeStorage.class );
 
         FileUtils.deleteDirectory( attributeStorage.getWorkingDirectory() );
 

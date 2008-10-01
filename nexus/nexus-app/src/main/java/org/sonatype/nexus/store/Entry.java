@@ -20,7 +20,6 @@
  */
 package org.sonatype.nexus.store;
 
-
 public interface Entry
 {
     String getId();

@@ -24,8 +24,6 @@ import java.util.Set;
 
 public interface PrivilegeInheritanceManager
 {
-    String ROLE = PrivilegeInheritanceManager.class.getName();
-        
     /**
      * Retrive a list of methods that are inherited by the requested method
      * 

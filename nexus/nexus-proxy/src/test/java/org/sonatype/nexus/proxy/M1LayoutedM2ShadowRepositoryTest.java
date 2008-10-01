@@ -24,6 +24,7 @@ import java.io.IOException;
 
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.sonatype.jettytestsuite.ServletServer;
+import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.item.StorageLinkItem;
 import org.sonatype.nexus.proxy.maven.maven1.M1LayoutedM2ShadowRepository;
@@ -51,7 +52,7 @@ public class M1LayoutedM2ShadowRepositoryTest
         for ( Repository master : getRepositoryRegistry().getRepositories() )
         {
             M1LayoutedM2ShadowRepository shadow = (M1LayoutedM2ShadowRepository) getContainer().lookup(
-                Repository.ROLE,
+                Repository.class,
                 "m2-m1-shadow" );
             // shadow.enableLogging( getLogger().getChildLogger( "SHADOW " + master.getId() ) );
             shadow.setMasterRepository( master );
@@ -87,7 +88,8 @@ public class M1LayoutedM2ShadowRepositoryTest
         // we will check stuff on M1 places but,
         // we will get links as responses, since shadow reposes contains links only
         getApplicationConfiguration().getConfiguration().getRouting().setFollowLinks( false );
-        getApplicationConfiguration().notifyConfigurationChangeListeners();
+        getApplicationConfiguration().notifyProximityEventListeners(
+            new ConfigurationChangeEvent( getApplicationConfiguration() ) );
 
         item = getRouter( "repositories" ).retrieveItem(
             new ResourceStoreRequest( "/repo1-m1/activemq/jars/activemq-core-1.2.jar", false ) );
@@ -100,7 +102,8 @@ public class M1LayoutedM2ShadowRepositoryTest
         // and now we will force the router itself to resolve links
         // and will expect the original contents
         getApplicationConfiguration().getConfiguration().getRouting().setFollowLinks( true );
-        getApplicationConfiguration().notifyConfigurationChangeListeners();
+        getApplicationConfiguration().notifyProximityEventListeners(
+            new ConfigurationChangeEvent( getApplicationConfiguration() ) );
 
         item = getRouter( "repositories" ).retrieveItem(
             new ResourceStoreRequest( "/repo1-m1/activemq/jars/activemq-core-1.2.jar", false ) );
@@ -136,7 +139,8 @@ public class M1LayoutedM2ShadowRepositoryTest
         // and after sync, we will check stuff on M1 places but,
         // we will get links as responses, since shadow reposes contains links only
         getApplicationConfiguration().getConfiguration().getRouting().setFollowLinks( false );
-        getApplicationConfiguration().notifyConfigurationChangeListeners();
+        getApplicationConfiguration().notifyProximityEventListeners(
+            new ConfigurationChangeEvent( getApplicationConfiguration() ) );
 
         item = getRouter( "repositories" ).retrieveItem(
             new ResourceStoreRequest( "/repo1-m1/activemq/jars/activemq-core-1.2.jar", false ) );
@@ -149,7 +153,8 @@ public class M1LayoutedM2ShadowRepositoryTest
         // and now we will force the router itself to resolve links
         // and will expect the original contents
         getApplicationConfiguration().getConfiguration().getRouting().setFollowLinks( true );
-        getApplicationConfiguration().notifyConfigurationChangeListeners();
+        getApplicationConfiguration().notifyProximityEventListeners(
+            new ConfigurationChangeEvent( getApplicationConfiguration() ) );
 
         item = getRouter( "repositories" ).retrieveItem(
             new ResourceStoreRequest( "/repo1-m1/activemq/jars/activemq-core-1.2.jar", false ) );

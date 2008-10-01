@@ -28,12 +28,11 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 
-import org.codehaus.plexus.logging.AbstractLogEnabled;
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
-import org.sonatype.nexus.configuration.ConfigurationChangeListener;
 import org.sonatype.nexus.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.application.runtime.ApplicationRuntimeConfigurationBuilder;
 import org.sonatype.nexus.configuration.application.source.ApplicationConfigurationSource;
@@ -53,6 +52,7 @@ import org.sonatype.nexus.configuration.model.CSmtpConfiguration;
 import org.sonatype.nexus.configuration.model.Configuration;
 import org.sonatype.nexus.configuration.validator.InvalidConfigurationException;
 import org.sonatype.nexus.configuration.validator.ValidationResponse;
+import org.sonatype.nexus.proxy.EventMulticasterComponent;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryGroupException;
 import org.sonatype.nexus.proxy.registry.ContentClass;
@@ -73,63 +73,53 @@ import org.sonatype.nexus.proxy.target.TargetRegistry;
  * state and Nexus user config.
  * 
  * @author cstamas
- * @plexus.component
  */
+@Component( role = NexusConfiguration.class )
 public class DefaultNexusConfiguration
-    extends AbstractLogEnabled
+    extends EventMulticasterComponent
     implements NexusConfiguration
 {
 
     /**
      * The configuration source.
-     * 
-     * @plexus.requirement role-hint="file"
      */
+    @Requirement( hint = "file" )
     private ApplicationConfigurationSource configurationSource;
 
     /**
      * The config validator.
-     * 
-     * @plexus.requirement
      */
+    @Requirement
     private ApplicationConfigurationValidator configurationValidator;
 
     /**
      * The runtime configuration builder.
-     * 
-     * @plexus.requirement
      */
+    @Requirement
     private ApplicationRuntimeConfigurationBuilder runtimeConfigurationBuilder;
 
     /**
      * The repository registry.
-     * 
-     * @plexus.requirement
      */
+    @Requirement
     private RepositoryRegistry repositoryRegistry;
 
     /**
      * The target registry.
-     * 
-     * @plexus.requirement
      */
+    @Requirement
     private TargetRegistry targetRegistry;
 
     /**
      * The available content classes.
-     * 
-     * @plexus.requirement role="org.sonatype.nexus.proxy.registry.ContentClass"
      */
+    @Requirement( role = ContentClass.class )
     private List<ContentClass> contentClasses;
 
     /** The global remote storage context. */
     private RemoteStorageContext remoteStorageContext;
 
-    /**
-     * The working directory.
-     * 
-     * @plexus.configuration default-value="${nexus-work}"
-     */
+    @org.codehaus.plexus.component.annotations.Configuration( value = "${nexus-work}" )
     private File workingDirectory;
 
     /** The config dir */
@@ -140,9 +130,6 @@ public class DefaultNexusConfiguration
 
     /** The trash */
     private File wastebasketDirectory;
-
-    /** The config event listeners. */
-    private CopyOnWriteArrayList<ConfigurationChangeListener> configurationChangeListeners = new CopyOnWriteArrayList<ConfigurationChangeListener>();
 
     public RemoteStorageContext getRemoteStorageContext()
     {
@@ -183,18 +170,22 @@ public class DefaultNexusConfiguration
 
             if ( getConfiguration().getGlobalConnectionSettings() != null )
             {
-                remoteStorageContext.setRemoteConnectionSettings( getConfiguration().getGlobalConnectionSettings() );
+                remoteStorageContext.putRemoteConnectionContextObject(
+                    RemoteStorageContext.REMOTE_CONNECTIONS_SETTINGS,
+                    getConfiguration().getGlobalConnectionSettings() );
             }
 
             if ( getConfiguration().getGlobalHttpProxySettings() != null )
             {
-                remoteStorageContext.setRemoteHttpProxySettings( getConfiguration().getGlobalHttpProxySettings() );
+                remoteStorageContext.putRemoteConnectionContextObject(
+                    RemoteStorageContext.REMOTE_HTTP_PROXY_SETTINGS,
+                    getConfiguration().getGlobalHttpProxySettings() );
             }
 
             // and register things
             runtimeConfigurationBuilder.initialize( this );
 
-            notifyConfigurationChangeListeners();
+            notifyProximityEventListeners( new ConfigurationChangeEvent( this ) );
         }
     }
 
@@ -209,7 +200,7 @@ public class DefaultNexusConfiguration
 
         wastebasketDirectory = null;
 
-        notifyConfigurationChangeListeners();
+        notifyProximityEventListeners( new ConfigurationChangeEvent( this ) );
     }
 
     public void saveConfiguration()
@@ -224,41 +215,6 @@ public class DefaultNexusConfiguration
         applyConfiguration();
 
         saveConfiguration();
-    }
-
-    public void addConfigurationChangeListener( ConfigurationChangeListener listener )
-    {
-        configurationChangeListeners.add( listener );
-    }
-
-    public void removeConfigurationChangeListener( ConfigurationChangeListener listener )
-    {
-        configurationChangeListeners.remove( listener );
-    }
-
-    public void notifyConfigurationChangeListeners()
-    {
-        notifyConfigurationChangeListeners( new ConfigurationChangeEvent( this ) );
-    }
-
-    public void notifyConfigurationChangeListeners( ConfigurationChangeEvent evt )
-    {
-        for ( ConfigurationChangeListener l : configurationChangeListeners )
-        {
-            try
-            {
-                if ( getLogger().isDebugEnabled() )
-                {
-                    getLogger().debug( "Notifying component about config change: " + l.getClass().getName() );
-                }
-
-                l.onConfigurationChange( evt );
-            }
-            catch ( Exception e )
-            {
-                getLogger().info( "Unexpected exception in listener", e );
-            }
-        }
     }
 
     public Configuration getConfiguration()
@@ -297,18 +253,18 @@ public class DefaultNexusConfiguration
 
     public File getWorkingDirectory()
     {
-        //Create the dir if doesn't exist, throw runtime exception on failure
-        //bad bad bad
+        // Create the dir if doesn't exist, throw runtime exception on failure
+        // bad bad bad
         if ( !workingDirectory.exists() && !workingDirectory.mkdirs() )
         {
             String message = "\r\n******************************************************************************\r\n"
-                           + "* Could not create work directory [ " + workingDirectory.toString() + "]!!!! *\r\n"
-                           + "* Nexus cannot start properly until the process has read+write permissions to this folder *\r\n"
-                           + "******************************************************************************";
-            
+                + "* Could not create work directory [ " + workingDirectory.toString() + "]!!!! *\r\n"
+                + "* Nexus cannot start properly until the process has read+write permissions to this folder *\r\n"
+                + "******************************************************************************";
+
             getLogger().fatalError( message );
         }
-        
+
         return workingDirectory;
     }
 
@@ -516,10 +472,7 @@ public class DefaultNexusConfiguration
             }
 
             // unregister it as config listener if needed
-            if ( ConfigurationChangeListener.class.isAssignableFrom( repository.getClass() ) )
-            {
-                removeConfigurationChangeListener( (ConfigurationChangeListener) repository );
-            }
+            removeProximityEventListener( repository );
         }
     }
 
@@ -605,7 +558,9 @@ public class DefaultNexusConfiguration
         throws ConfigurationException,
             IOException
     {
-        remoteStorageContext.setRemoteConnectionSettings( settings );
+        remoteStorageContext.putRemoteConnectionContextObject(
+            RemoteStorageContext.REMOTE_CONNECTIONS_SETTINGS,
+            settings );
 
         getConfiguration().setGlobalConnectionSettings( settings );
 
@@ -618,7 +573,9 @@ public class DefaultNexusConfiguration
         throws ConfigurationException,
             IOException
     {
-        remoteStorageContext.setRemoteHttpProxySettings( settings );
+        remoteStorageContext.putRemoteConnectionContextObject(
+            RemoteStorageContext.REMOTE_HTTP_PROXY_SETTINGS,
+            settings );
 
         getConfiguration().setGlobalHttpProxySettings( settings );
 
@@ -640,7 +597,7 @@ public class DefaultNexusConfiguration
     public void deleteGlobalRemoteHttpProxySettings()
         throws IOException
     {
-        remoteStorageContext.setRemoteHttpProxySettings( null );
+        remoteStorageContext.removeRemoteConnectionContextObject( RemoteStorageContext.REMOTE_HTTP_PROXY_SETTINGS );
 
         getConfiguration().setGlobalHttpProxySettings( null );
 

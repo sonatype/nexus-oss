@@ -43,6 +43,8 @@ import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.store.FSDirectory;
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
@@ -52,7 +54,6 @@ import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.artifact.VersionUtils;
 import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
-import org.sonatype.nexus.configuration.ConfigurationChangeListener;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.index.context.IndexContextInInconsistentStateException;
@@ -70,13 +71,13 @@ import org.sonatype.nexus.proxy.events.RepositoryItemEvent;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventCache;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventDelete;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventStore;
-import org.sonatype.nexus.proxy.events.RepositoryRegistryRepositoryEvent;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventAdd;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventRemove;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventUpdate;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryGroupEvent;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryGroupEventAdd;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryGroupEventRemove;
+import org.sonatype.nexus.proxy.events.RepositoryRegistryRepositoryEvent;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
@@ -88,6 +89,7 @@ import org.sonatype.nexus.proxy.repository.RepositoryType;
 import org.sonatype.nexus.proxy.router.DefaultGroupIdBasedRepositoryRouter;
 import org.sonatype.nexus.proxy.router.RepositoryRouter;
 import org.sonatype.nexus.proxy.router.ResourceStoreIdBasedRepositoryRouter;
+import org.sonatype.nexus.proxy.router.RootRepositoryRouter;
 import org.sonatype.nexus.proxy.storage.local.fs.DefaultFSLocalRepositoryStorage;
 import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.nexus.tasks.ReindexTask;
@@ -96,11 +98,11 @@ import org.sonatype.nexus.tasks.ReindexTask;
  * IndexManager
  * 
  * @author cstamas
- * @plexus.component
  */
+@Component( role = IndexerManager.class )
 public class DefaultIndexerManager
     extends AbstractLogEnabled
-    implements IndexerManager, Initializable, ConfigurationChangeListener, EventListener
+    implements IndexerManager, Initializable, EventListener
 
 {
     /** Context id local suffix */
@@ -112,39 +114,25 @@ public class DefaultIndexerManager
     /** Context id merged suffix */
     public static final String CTX_MERGED_SUFIX = "-merged";
 
-    /**
-     * @plexus.requirement role="org.sonatype.nexus.index.ArtifactContextProducer"
-     */
+    @Requirement
     private ArtifactContextProducer artifactContextProducer;
 
-    /**
-     * @plexus.requirement role="org.sonatype.nexus.index.NexusIndexer"
-     */
+     @Requirement
     private NexusIndexer nexusIndexer;
 
-    /**
-     * @plexus.requirement role="org.sonatype.nexus.index.packer.IndexPacker"
-     */
+     @Requirement
     private IndexPacker indexPacker;
 
-    /**
-     * @plexus.requirement
-     */
+     @Requirement
     private NexusConfiguration nexusConfiguration;
 
-    /**
-     * @plexus.requirement
-     */
+     @Requirement
     private RepositoryRegistry repositoryRegistry;
 
-    /**
-     * @plexus.requirement
-     */
+     @Requirement
     private NexusScheduler nexusScheduler;
 
-    /**
-     * @plexus.requirement role="org.sonatype.nexus.proxy.router.RootRepositoryRouter"
-     */
+     @Requirement( role = RootRepositoryRouter.class )
     private ResourceStoreIdBasedRepositoryRouter rootRouter;
 
     private File workingDirectory;
@@ -154,14 +142,9 @@ public class DefaultIndexerManager
     public void initialize()
         throws InitializationException
     {
-        nexusConfiguration.addConfigurationChangeListener( this );
-    }
+        nexusConfiguration.addProximityEventListener( this );
 
-    public void onConfigurationChange( ConfigurationChangeEvent evt )
-    {
-        workingDirectory = null;
-
-        tempDirectory = null;
+        repositoryRegistry.addProximityEventListener( this );
     }
 
     protected File getWorkingDirectory()
@@ -1330,7 +1313,13 @@ public class DefaultIndexerManager
             getLogger().debug( "Processing event (" + evt.toString() + ")" );
         }
 
-        if ( RepositoryRegistryRepositoryEvent.class.isAssignableFrom( evt.getClass() ) )
+        if ( ConfigurationChangeEvent.class.isAssignableFrom( evt.getClass() ) )
+        {
+            workingDirectory = null;
+
+            tempDirectory = null;
+        }
+        else if ( RepositoryRegistryRepositoryEvent.class.isAssignableFrom( evt.getClass() ) )
         {
             try
             {

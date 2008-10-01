@@ -38,7 +38,7 @@ public class DefaultPrivilegeInheritanceManagerTest
     {
         super.setUp();
     
-        manager = (DefaultPrivilegeInheritanceManager) this.lookup( PrivilegeInheritanceManager.ROLE );
+        manager = (DefaultPrivilegeInheritanceManager) this.lookup( PrivilegeInheritanceManager.class );
     }
     
     public void testCreateInherit()

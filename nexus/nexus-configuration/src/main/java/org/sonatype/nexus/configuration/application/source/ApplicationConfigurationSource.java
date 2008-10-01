@@ -27,15 +27,15 @@ import org.sonatype.nexus.configuration.model.Configuration;
 import org.sonatype.nexus.configuration.source.ConfigurationSource;
 
 /**
- * The Interface ApplicationConfigurationSource, responsible to fetch Nexus user configuration by some means. It also stores one
- * instance of Configuration object maintained thru life of Nexus. This component is also able to persist user config.
+ * The Interface ApplicationConfigurationSource, responsible to fetch Nexus user configuration by some means. It also
+ * stores one instance of Configuration object maintained thru life of Nexus. This component is also able to persist
+ * user config.
  * 
  * @author cstamas
  */
-public interface ApplicationConfigurationSource extends ConfigurationSource
+public interface ApplicationConfigurationSource
+    extends ConfigurationSource
 {
-    String ROLE = ApplicationConfigurationSource.class.getName();
-    
     /**
      * Gets the current configuration.
      * 
@@ -44,7 +44,6 @@ public interface ApplicationConfigurationSource extends ConfigurationSource
      * @throws IOException
      */
     Configuration getConfiguration();
-    
 
     /**
      * Forces reloading the user configuration.
@@ -56,7 +55,6 @@ public interface ApplicationConfigurationSource extends ConfigurationSource
     Configuration loadConfiguration()
         throws ConfigurationException,
             IOException;
-    
 
     /**
      * Returns the configuration that this configuration uses for defaulting.

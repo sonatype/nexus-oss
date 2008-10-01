@@ -32,8 +32,6 @@ import org.sonatype.nexus.configuration.validator.ValidationResponse;
  */
 public interface ConfigurationSource
 {
-    String ROLE = ConfigurationSource.class.getName();
-    
     /**
      * Returns the validation response, if any. It is created on the loading of the user configuration.
      * 

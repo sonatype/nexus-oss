@@ -35,6 +35,8 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.RejectedExecutionException;
 
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
@@ -43,7 +45,6 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.StartingException;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.StoppingException;
 import org.sonatype.nexus.artifact.NexusItemInfo;
 import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
-import org.sonatype.nexus.configuration.ConfigurationChangeListener;
 import org.sonatype.nexus.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.configuration.model.CGroupsSettingPathMappingItem;
@@ -79,6 +80,8 @@ import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.cache.CacheManager;
 import org.sonatype.nexus.proxy.events.AbstractEvent;
 import org.sonatype.nexus.proxy.events.EventListener;
+import org.sonatype.nexus.proxy.events.NexusStartedEvent;
+import org.sonatype.nexus.proxy.events.NexusStoppedEvent;
 import org.sonatype.nexus.proxy.events.RepositoryEventLocalStatusChanged;
 import org.sonatype.nexus.proxy.events.RepositoryEventProxyModeChanged;
 import org.sonatype.nexus.proxy.events.RepositoryItemEvent;
@@ -86,10 +89,10 @@ import org.sonatype.nexus.proxy.events.RepositoryItemEventCache;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventDelete;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventRetrieve;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventStore;
-import org.sonatype.nexus.proxy.events.RepositoryRegistryRepositoryEvent;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventAdd;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventRemove;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventUpdate;
+import org.sonatype.nexus.proxy.events.RepositoryRegistryRepositoryEvent;
 import org.sonatype.nexus.proxy.http.HttpProxyService;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
@@ -103,6 +106,7 @@ import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RepositoryType;
 import org.sonatype.nexus.proxy.repository.ShadowRepository;
 import org.sonatype.nexus.proxy.router.RepositoryRouter;
+import org.sonatype.nexus.proxy.router.RootRepositoryRouter;
 import org.sonatype.nexus.proxy.wastebasket.Wastebasket;
 import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.nexus.store.DefaultEntry;
@@ -120,99 +124,88 @@ import org.sonatype.scheduling.schedules.Schedule;
  * 
  * @author Jason van Zyl
  * @author cstamas
- * @plexus.component
  */
+@Component( role = Nexus.class )
 public class DefaultNexus
     extends AbstractLogEnabled
-    implements Nexus, Initializable, Startable, EventListener, ConfigurationChangeListener
+    implements Nexus, Initializable, Startable, EventListener
 {
     /**
      * The nexus configuration.
-     * 
-     * @plexus.requirement
      */
+    @Requirement
     private NexusConfiguration nexusConfiguration;
 
     /**
      * The NexusIndexer.
-     * 
-     * @plexus.requirement
      */
+    @Requirement
     private IndexerManager indexerManager;
 
     /**
      * The repository registry.
-     * 
-     * @plexus.requirement
      */
+    @Requirement
     private RepositoryRegistry repositoryRegistry;
 
     /**
      * The store for templates.
-     * 
-     * @plexus.requirement role-hint="file"
      */
+    @Requirement( hint = "file" )
     private Store templatesStore;
 
     /**
      * The http proxy device.
-     * 
-     * @plexus.requirement
      */
+    @Requirement
     private HttpProxyService httpProxyService;
 
     /**
      * The Scheduler.
-     * 
-     * @plexus.requirement
      */
+    @Requirement
     private NexusScheduler nexusScheduler;
 
     /**
      * The Feed recorder.
-     * 
-     * @plexus.requirement
      */
+    @Requirement
     private FeedRecorder feedRecorder;
 
     /**
      * The snapshot remover component.
-     * 
-     * @plexus.requirement
      */
+    @Requirement
     private SnapshotRemover snapshotRemover;
 
     /**
      * The Wastebasket component.
-     * 
-     * @plexus.requirement
      */
+    @Requirement
     private Wastebasket wastebasket;
 
     /**
      * The CacheManager component.
-     * 
-     * @plexus.requirement
      */
+    @Requirement
     private CacheManager cacheManager;
-    
+
     /**
-     * @plexus.requirement
+     * The NexusSecurity.
      */
+    @Requirement
     private NexusSecurity security;
 
     /**
      * The SecurityConfiguration component.
-     * 
-     * @plexus.requirement role="org.sonatype.nexus.proxy.router.RootRepositoryRouter"
      */
+    @Requirement( role = RootRepositoryRouter.class )
     private RepositoryRouter rootRepositoryRouter;
-    
+
     /**
      * The LogFile Manager
-     * 
-     * @plexus.requirement
      */
+    @Requirement
     private LogFileManager logFileManager;
 
     /**
@@ -760,9 +753,9 @@ public class DefaultNexus
         throws IOException
     {
         getLogger().debug( "List log files." );
-        
+
         Set<File> files = logFileManager.getLogFiles();
-        
+
         ArrayList<NexusStreamResponse> result = new ArrayList<NexusStreamResponse>( files.size() );
 
         for ( File file : files )
@@ -778,9 +771,9 @@ public class DefaultNexus
 
             response.setInputStream( null );
 
-            result.add( response );            
+            result.add( response );
         }
-        
+
         return result;
     }
 
@@ -1407,7 +1400,8 @@ public class DefaultNexus
     public FlatSearchResponse searchArtifactFlat( String gTerm, String aTerm, String vTerm, String pTerm, String cTerm,
         String repositoryId, String groupId, Integer from, Integer count )
     {
-        return indexerManager.searchArtifactFlat( gTerm, aTerm, vTerm, pTerm, cTerm, repositoryId, groupId, from, count );
+        return indexerManager
+            .searchArtifactFlat( gTerm, aTerm, vTerm, pTerm, cTerm, repositoryId, groupId, from, count );
     }
 
     // ===========================
@@ -1419,11 +1413,6 @@ public class DefaultNexus
         systemStatus = new SystemStatus();
 
         repositoryRegistry.addProximityEventListener( this );
-
-        if ( EventListener.class.isAssignableFrom( indexerManager.getClass() ) )
-        {
-            repositoryRegistry.addProximityEventListener( (EventListener) indexerManager );
-        }
 
         systemStatus.setState( SystemState.STOPPED );
 
@@ -1460,6 +1449,32 @@ public class DefaultNexus
     public void start()
         throws StartingException
     {
+        try
+        {
+            startService();
+        }
+        catch ( Exception e )
+        {
+            throw new StartingException( "Could not start Nexus!", e );
+        }
+    }
+
+    public void stop()
+        throws StoppingException
+    {
+        try
+        {
+            stopService();
+        }
+        catch ( Exception e )
+        {
+            throw new StoppingException( "Could not stop Nexus!", e );
+        }
+    }
+
+    public void startService()
+        throws Exception
+    {
         systemStatus.setState( SystemState.STARTING );
 
         try
@@ -1470,8 +1485,8 @@ public class DefaultNexus
 
             nexusConfiguration.createInternals();
 
-            nexusConfiguration.notifyConfigurationChangeListeners();
-            
+            nexusConfiguration.notifyProximityEventListeners( new ConfigurationChangeEvent( nexusConfiguration ) );
+
             security.startService();
 
             cacheManager.startService();
@@ -1525,12 +1540,12 @@ public class DefaultNexus
             systemStatus.setState( SystemState.STARTED );
 
             systemStatus.setStartedAt( new Date() );
-            
+
             getLogger().info( "Nexus Work Directory : " + nexusConfiguration.getWorkingDirectory().toString() );
 
             getLogger().info( "Started Nexus (version " + systemStatus.getVersion() + ")" );
 
-            nexusConfiguration.notifyConfigurationChangeListeners( new NexusStartedEvent( nexusConfiguration ) );
+            nexusConfiguration.notifyProximityEventListeners( new NexusStartedEvent() );
         }
         catch ( IOException e )
         {
@@ -1560,19 +1575,19 @@ public class DefaultNexus
         }
     }
 
-    public void stop()
-        throws StoppingException
+    public void stopService()
+        throws Exception
     {
         systemStatus.setState( SystemState.STOPPING );
 
         addSystemEvent( FeedRecorder.SYSTEM_BOOT_ACTION, "Stopping Nexus (version " + systemStatus.getVersion() + ")" );
 
-        nexusConfiguration.notifyConfigurationChangeListeners( new NexusStoppingEvent( nexusConfiguration ) );
+        nexusConfiguration.notifyProximityEventListeners( new NexusStoppedEvent() );
 
         httpProxyService.stopService();
 
         nexusScheduler.stopService();
-        
+
         security.stopService();
 
         try
@@ -1742,7 +1757,13 @@ public class DefaultNexus
     {
         try
         {
-            if ( evt instanceof RepositoryItemEvent )
+            if ( ConfigurationChangeEvent.class.isAssignableFrom( evt.getClass() ) )
+            {
+                systemStatus.setLastConfigChange( new Date() );
+
+                addSystemEvent( FeedRecorder.SYSTEM_CONFIG_ACTION, "Nexus configuration changed/updated." );
+            }
+            else if ( evt instanceof RepositoryItemEvent )
             {
                 RepositoryItemEvent ievt = (RepositoryItemEvent) evt;
 
@@ -1947,13 +1968,6 @@ public class DefaultNexus
         {
             getLogger().warn( "Error during Nexus event handling:", e );
         }
-    }
-
-    public void onConfigurationChange( ConfigurationChangeEvent evt )
-    {
-        systemStatus.setLastConfigChange( new Date() );
-
-        addSystemEvent( FeedRecorder.SYSTEM_CONFIG_ACTION, "Nexus configuration changed/updated." );
     }
 
 }

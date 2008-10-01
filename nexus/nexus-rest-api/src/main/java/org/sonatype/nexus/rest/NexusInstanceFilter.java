@@ -77,22 +77,20 @@ public class NexusInstanceFilter
             nexus = getRemoteNexus( instanceName );
         }
 
-        request.getAttributes().put( Nexus.ROLE, nexus );
-        
-        request.getAttributes().put( NexusSecurity.ROLE, getNexusSecurity() );
+        request.getAttributes().put( Nexus.class.getName(), nexus );
+
+        request.getAttributes().put( NexusSecurity.class.getName(), getNexusSecurity() );
 
         request.getAttributes().put( SecurityManager.class.getName(), getSecurityManager() );
-        
+
         return CONTINUE;
     }
-    
+
     protected NexusSecurity getNexusSecurity()
     {
         try
         {
-            return ( NexusSecurity ) PlexusRestletUtils.plexusLookup(
-                getContext(),
-                NexusSecurity.ROLE );
+            return (NexusSecurity) PlexusRestletUtils.plexusLookup( getContext(), NexusSecurity.class );
         }
         catch ( ComponentLookupException e )
         {
@@ -124,7 +122,7 @@ public class NexusInstanceFilter
     {
         try
         {
-            return (Nexus) PlexusRestletUtils.plexusLookup( getContext(), Nexus.ROLE );
+            return (Nexus) PlexusRestletUtils.plexusLookup( getContext(), Nexus.class );
         }
         catch ( ComponentLookupException e )
         {

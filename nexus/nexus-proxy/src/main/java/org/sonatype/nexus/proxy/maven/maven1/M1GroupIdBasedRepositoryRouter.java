@@ -20,8 +20,11 @@
  */
 package org.sonatype.nexus.proxy.maven.maven1;
 
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.router.DefaultGroupIdBasedRepositoryRouter;
+import org.sonatype.nexus.proxy.router.RepositoryRouter;
 
 /**
  * Mavenized version of RepoGrouId based router. The only difference with the base class is the maven specific
@@ -29,18 +32,17 @@ import org.sonatype.nexus.proxy.router.DefaultGroupIdBasedRepositoryRouter;
  * we aggregate them. Aggregation happens for repository metadata only.
  * 
  * @author cstamas
- * @plexus.component role-hint="groups-m1"
  */
+@Component( role = RepositoryRouter.class, hint = "groups-m1" )
 public class M1GroupIdBasedRepositoryRouter
     extends DefaultGroupIdBasedRepositoryRouter
 {
     /**
      * The ContentClass.
-     * 
-     * @plexus.requirement role-hint="maven1"
      */
+    @Requirement( hint = "maven1" )
     private ContentClass contentClass;
-    
+
     public ContentClass getHandledContentClass()
     {
         return contentClass;

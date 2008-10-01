@@ -10,10 +10,11 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationExce
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
-import org.sonatype.nexus.configuration.ConfigurationChangeListener;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.StorageException;
+import org.sonatype.nexus.proxy.events.AbstractEvent;
+import org.sonatype.nexus.proxy.events.EventListener;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
@@ -29,7 +30,7 @@ import org.sonatype.nexus.proxy.storage.local.fs.DefaultFSLocalRepositoryStorage
  * @plexus.component role="org.sonatype.nexus.proxy.wastebasket.Wastebasket"
  */
 public class DefaultFSWastebasket
-    implements SmartWastebasket, ConfigurationChangeListener, Initializable
+    implements SmartWastebasket, EventListener, Initializable
 {
     /**
      * @plexus.requirement
@@ -43,12 +44,15 @@ public class DefaultFSWastebasket
     public void initialize()
         throws InitializationException
     {
-        applicationConfiguration.addConfigurationChangeListener( this );
+        applicationConfiguration.addProximityEventListener( this );
     }
 
-    public void onConfigurationChange( ConfigurationChangeEvent evt )
+    public void onProximityEvent( AbstractEvent evt )
     {
-        wastebasketDirectory = null;
+        if ( ConfigurationChangeEvent.class.isAssignableFrom( evt.getClass() ) )
+        {
+            wastebasketDirectory = null;
+        }
     }
 
     protected File getWastebasketDirectory()

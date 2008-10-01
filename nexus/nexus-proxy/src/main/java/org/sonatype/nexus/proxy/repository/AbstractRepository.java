@@ -30,7 +30,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
-import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.EventMulticasterComponent;
@@ -44,6 +43,7 @@ import org.sonatype.nexus.proxy.access.AccessManager;
 import org.sonatype.nexus.proxy.access.Action;
 import org.sonatype.nexus.proxy.cache.CacheManager;
 import org.sonatype.nexus.proxy.cache.PathCache;
+import org.sonatype.nexus.proxy.events.AbstractEvent;
 import org.sonatype.nexus.proxy.events.RepositoryEventClearCaches;
 import org.sonatype.nexus.proxy.events.RepositoryEventEvictUnusedItems;
 import org.sonatype.nexus.proxy.events.RepositoryEventLocalStatusChanged;
@@ -181,10 +181,10 @@ public abstract class AbstractRepository
 
     public void initialize()
     {
-        applicationConfiguration.addConfigurationChangeListener( this );
+        applicationConfiguration.addProximityEventListener( this );
     }
 
-    public void onConfigurationChange( ConfigurationChangeEvent evt )
+    public void onProximityEvent( AbstractEvent evt )
     {
         // TODO
     }
@@ -1214,7 +1214,7 @@ public abstract class AbstractRepository
             throw new RepositoryNotAvailableException( this.getId() );
         }
 
-        if ( !isAllowWrite() && ( action.isWrite() ) )
+        if ( !isAllowWrite() && ( action.isWritingAction() ) )
         {
             throw new AccessDeniedException( request, "Repository is READ ONLY!!" );
         }

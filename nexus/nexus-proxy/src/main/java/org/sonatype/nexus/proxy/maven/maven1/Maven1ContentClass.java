@@ -20,14 +20,16 @@
  */
 package org.sonatype.nexus.proxy.maven.maven1;
 
+import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.nexus.proxy.registry.AbstractIdContentClass;
+import org.sonatype.nexus.proxy.registry.ContentClass;
 
 /**
  * The Maven1 content class.
  * 
  * @author cstamas
- * @plexus.component role-hint="maven1"
  */
+@Component( role = ContentClass.class, hint = "maven1" )
 public class Maven1ContentClass
     extends AbstractIdContentClass
 {

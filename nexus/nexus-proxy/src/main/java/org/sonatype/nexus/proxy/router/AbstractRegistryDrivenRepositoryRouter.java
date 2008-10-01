@@ -27,6 +27,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
@@ -38,6 +39,7 @@ import org.sonatype.nexus.proxy.RepositoryNotListableException;
 import org.sonatype.nexus.proxy.ResourceStore;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
+import org.sonatype.nexus.proxy.events.AbstractEvent;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
@@ -63,17 +65,19 @@ public abstract class AbstractRegistryDrivenRepositoryRouter
 
     /**
      * The repository registry.
-     * 
-     * @plexus.requirement
      */
+    @Requirement
     private RepositoryRegistry repositoryRegistry;
 
-    public void onConfigurationChange( ConfigurationChangeEvent evt )
+    public void onProximityEvent( AbstractEvent evt )
     {
-        super.onConfigurationChange( evt );
+        if ( ConfigurationChangeEvent.class.isAssignableFrom( evt.getClass() ) )
+        {
+            super.onProximityEvent( evt );
 
-        stopItemSearchOnFirstFoundFile = getApplicationConfiguration()
-            .getConfiguration().getRouting().getGroups().isStopItemSearchOnFirstFoundFile();
+            stopItemSearchOnFirstFoundFile = getApplicationConfiguration()
+                .getConfiguration().getRouting().getGroups().isStopItemSearchOnFirstFoundFile();
+        }
     }
 
     /**

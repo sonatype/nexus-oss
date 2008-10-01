@@ -12,7 +12,7 @@ public class DefaultPasswordGeneratorTest
     {
         super.setUp();
 
-        pwGenerator = (DefaultPasswordGenerator) this.lookup( PasswordGenerator.ROLE );
+        pwGenerator = (DefaultPasswordGenerator) this.lookup( PasswordGenerator.class );
     }
     
     public void testGeneratePassword()

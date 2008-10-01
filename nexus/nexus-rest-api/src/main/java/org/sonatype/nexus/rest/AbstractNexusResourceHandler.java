@@ -84,7 +84,7 @@ public abstract class AbstractNexusResourceHandler
 
         getVariants().add( new Variant( MediaType.APPLICATION_JSON ) );
 
-        nexusItemAuthorizer = (NexusItemAuthorizer) lookup( NexusItemAuthorizer.ROLE );
+        nexusItemAuthorizer = (NexusItemAuthorizer) lookup( NexusItemAuthorizer.class );
     }
 
     /**
@@ -94,12 +94,12 @@ public abstract class AbstractNexusResourceHandler
      */
     protected Nexus getNexus()
     {
-        return (Nexus) getRequest().getAttributes().get( Nexus.ROLE );
+        return (Nexus) getRequest().getAttributes().get( Nexus.class.getName() );
     }
 
     protected NexusSecurity getNexusSecurity()
     {
-        return (NexusSecurity) getRequest().getAttributes().get( NexusSecurity.ROLE );
+        return (NexusSecurity) getRequest().getAttributes().get( NexusSecurity.class.getName() );
     }
 
     protected SecurityManager getSecurityManager()
@@ -119,7 +119,31 @@ public abstract class AbstractNexusResourceHandler
         }
     }
 
+    protected Object lookup( Class<?> role )
+    {
+        try
+        {
+            return PlexusRestletUtils.plexusLookup( getContext(), role );
+        }
+        catch ( ComponentLookupException e )
+        {
+            throw new IllegalStateException( "Cannot lookup role " + role, e );
+        }
+    }
+
     protected Object lookup( String role, String roleHint )
+    {
+        try
+        {
+            return PlexusRestletUtils.plexusLookup( getContext(), role, roleHint );
+        }
+        catch ( ComponentLookupException e )
+        {
+            throw new IllegalStateException( "Cannot lookup role " + role + " with roleHint " + roleHint, e );
+        }
+    }
+
+    protected Object lookup( Class<?> role, String roleHint )
     {
         try
         {

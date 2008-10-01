@@ -28,7 +28,7 @@ public class DefaultTargetRegistryTest
 
         maven2 = (ContentClass) lookup( ContentClass.class, "maven2" );
 
-        targetRegistry = (TargetRegistry) lookup( TargetRegistry.ROLE );
+        targetRegistry = (TargetRegistry) lookup( TargetRegistry.class );
 
         // adding two targets
         Target t1 = new Target( "maven2-public", "Maven2 (public)", maven2, Arrays

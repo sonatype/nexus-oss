@@ -31,6 +31,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.util.IOUtil;
 import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
@@ -44,6 +45,7 @@ import org.sonatype.nexus.proxy.NoSuchResourceStoreException;
 import org.sonatype.nexus.proxy.RepositoryNotAvailableException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
+import org.sonatype.nexus.proxy.events.AbstractEvent;
 import org.sonatype.nexus.proxy.item.DefaultStorageCollectionItem;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
@@ -75,9 +77,8 @@ public abstract class AbstractRepositoryRouter
 
     /**
      * ApplicationConfiguration.
-     * 
-     * @plexus.requirement
      */
+    @Requirement
     private ApplicationConfiguration applicationConfiguration;
 
     /** Should links be resolved? */
@@ -88,14 +89,17 @@ public abstract class AbstractRepositoryRouter
 
     public void initialize()
     {
-        applicationConfiguration.addConfigurationChangeListener( this );
+        applicationConfiguration.addProximityEventListener( this );
     }
 
-    public void onConfigurationChange( ConfigurationChangeEvent evt )
+    public void onProximityEvent( AbstractEvent evt )
     {
-        followLinks = applicationConfiguration.getConfiguration().getRouting().isFollowLinks();
+        if ( ConfigurationChangeEvent.class.isAssignableFrom( evt.getClass() ) )
+        {
+            followLinks = applicationConfiguration.getConfiguration().getRouting().isFollowLinks();
 
-        fileStore = applicationConfiguration.getWorkingDirectory( "router-" + getId() );
+            fileStore = applicationConfiguration.getWorkingDirectory( "router-" + getId() );
+        }
     }
 
     protected ApplicationConfiguration getApplicationConfiguration()

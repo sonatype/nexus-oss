@@ -31,6 +31,7 @@ import org.codehaus.plexus.digest.Md5Digester;
 import org.codehaus.plexus.digest.Sha1Digester;
 import org.codehaus.plexus.util.IOUtil;
 import org.sonatype.jettytestsuite.ServletServer;
+import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 
@@ -95,7 +96,8 @@ public class GroupingBehaviourTest
         // highest ranked repo
         // in group (repo1) should provide the file
         getApplicationConfiguration().getConfiguration().getRouting().getGroups().setMergeMetadata( false );
-        getApplicationConfiguration().notifyConfigurationChangeListeners();
+        getApplicationConfiguration().notifyProximityEventListeners(
+            new ConfigurationChangeEvent( getApplicationConfiguration() ) );
 
         StorageItem item = getRouter( "groups-m2" ).retrieveItem(
             new ResourceStoreRequest( "/test" + spoofedPath, false ) );
@@ -115,7 +117,8 @@ public class GroupingBehaviourTest
         Metadata md1, md2;
 
         // get metadata from a gidr router with merging on (default is on), merge should happen
-        getApplicationConfiguration().notifyConfigurationChangeListeners();
+        getApplicationConfiguration().notifyProximityEventListeners(
+            new ConfigurationChangeEvent( getApplicationConfiguration() ) );
 
         StorageItem item = getRouter( "groups-m2" ).retrieveItem(
             new ResourceStoreRequest( "/test" + spoofedPath, false ) );
@@ -155,7 +158,8 @@ public class GroupingBehaviourTest
         // get metadata from a gidr router but switch merging off (default is on), spoofing should happen, and the
         // highest ranked repo in group (repo1) should provide the file
         getApplicationConfiguration().getConfiguration().getRouting().getGroups().setMergeMetadata( false );
-        getApplicationConfiguration().notifyConfigurationChangeListeners();
+        getApplicationConfiguration().notifyProximityEventListeners(
+            new ConfigurationChangeEvent( getApplicationConfiguration() ) );
 
         item = getRouter( "groups-m2" ).retrieveItem( new ResourceStoreRequest( "/test" + spoofedPath, false ) );
         // it should be a file and unmodified

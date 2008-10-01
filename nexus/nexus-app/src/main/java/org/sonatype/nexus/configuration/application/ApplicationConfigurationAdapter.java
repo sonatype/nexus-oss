@@ -23,22 +23,22 @@ package org.sonatype.nexus.configuration.application;
 import java.io.File;
 import java.io.IOException;
 
-import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
-import org.sonatype.nexus.configuration.ConfigurationChangeListener;
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.nexus.configuration.model.Configuration;
+import org.sonatype.nexus.proxy.events.AbstractEvent;
+import org.sonatype.nexus.proxy.events.EventListener;
 
 /**
  * Adapter for NexusConfiguration.
  * 
  * @author cstamas
- * @plexus.component role="org.sonatype.nexus.configuration.application.ApplicationConfiguration"
  */
+@Component( role = ApplicationConfiguration.class )
 public class ApplicationConfigurationAdapter
     implements ApplicationConfiguration
 {
-    /**
-     * @plexus.requirement
-     */
+    @Requirement
     private NexusConfiguration nexusConfiguration;
 
     public Configuration getConfiguration()
@@ -77,24 +77,19 @@ public class ApplicationConfigurationAdapter
         nexusConfiguration.saveConfiguration();
     }
 
-    public void addConfigurationChangeListener( ConfigurationChangeListener listener )
+    public void addProximityEventListener( EventListener listener )
     {
-        nexusConfiguration.addConfigurationChangeListener( listener );
+        nexusConfiguration.addProximityEventListener( listener );
     }
 
-    public void removeConfigurationChangeListener( ConfigurationChangeListener listener )
+    public void removeProximityEventListener( EventListener listener )
     {
-        nexusConfiguration.removeConfigurationChangeListener( listener );
+        nexusConfiguration.removeProximityEventListener( listener );
     }
 
-    public void notifyConfigurationChangeListeners()
+    public void notifyProximityEventListeners( AbstractEvent evt )
     {
-        nexusConfiguration.notifyConfigurationChangeListeners();
-    }
-
-    public void notifyConfigurationChangeListeners( ConfigurationChangeEvent evt )
-    {
-        nexusConfiguration.notifyConfigurationChangeListeners( evt );
+        nexusConfiguration.notifyProximityEventListeners( evt );
     }
 
     public boolean isSecurityEnabled()

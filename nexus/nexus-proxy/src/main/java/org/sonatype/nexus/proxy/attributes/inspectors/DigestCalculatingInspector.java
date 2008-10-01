@@ -28,7 +28,9 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.commons.codec.binary.Hex;
+import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.nexus.proxy.attributes.AbstractStorageFileItemInspector;
+import org.sonatype.nexus.proxy.attributes.StorageFileItemInspector;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 
@@ -37,8 +39,8 @@ import org.sonatype.nexus.proxy.item.StorageItem;
  * attributes.
  * 
  * @author cstamas
- * @plexus.component role-hint="digest"
  */
+@Component( role = StorageFileItemInspector.class, hint = "digest" )
 public class DigestCalculatingInspector
     extends AbstractStorageFileItemInspector
 {
@@ -49,11 +51,6 @@ public class DigestCalculatingInspector
     /** The digest sha1 key. */
     public static String DIGEST_SHA1_KEY = "digest.sha1";
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.sonatype.nexus.attributes.StorageItemInspector#getIndexableKeywords()
-     */
     public Set<String> getIndexableKeywords()
     {
         Set<String> result = new HashSet<String>( 2 );
@@ -62,22 +59,11 @@ public class DigestCalculatingInspector
         return result;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.sonatype.nexus.attributes.StorageItemInspector#isHandled(org.sonatype.nexus.item.StorageItem)
-     */
     public boolean isHandled( StorageItem item )
     {
         return StorageFileItem.class.isAssignableFrom( item.getClass() );
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.sonatype.nexus.attributes.StorageFileItemInspector#processStorageFileItem(org.sonatype.nexus.item.StorageFileItem,
-     *      java.io.File)
-     */
     public void processStorageFileItem( StorageFileItem item, File file )
         throws Exception
     {

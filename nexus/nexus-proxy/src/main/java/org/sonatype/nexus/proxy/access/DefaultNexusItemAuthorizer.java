@@ -4,31 +4,29 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.jsecurity.SecurityUtils;
 import org.jsecurity.subject.Subject;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.router.RepositoryRouter;
+import org.sonatype.nexus.proxy.router.RootRepositoryRouter;
 import org.sonatype.nexus.proxy.target.TargetMatch;
 import org.sonatype.nexus.proxy.target.TargetSet;
 
 /**
  * Default implementation of Nexus Authorizer, that relies onto JSecurity.
- * 
- * @plexus.component
  */
+@Component( role = NexusItemAuthorizer.class )
 public class DefaultNexusItemAuthorizer
     implements NexusItemAuthorizer
 {
-    /**
-     * @plexus.requirement
-     */
+    @Requirement
     private ApplicationConfiguration applicationConfiguration;
 
-    /**
-     * @plexus.requirement role="org.sonatype.nexus.proxy.router.RootRepositoryRouter"
-     */
+    @Requirement( role = RootRepositoryRouter.class )
     private RepositoryRouter root;
 
     public boolean authorizePath( RepositoryItemUid uid, Map<String, Object> context, Action action )

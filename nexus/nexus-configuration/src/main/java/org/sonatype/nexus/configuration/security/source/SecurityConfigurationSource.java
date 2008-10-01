@@ -34,8 +34,6 @@ import org.sonatype.nexus.configuration.source.ConfigurationSource;
  */
 public interface SecurityConfigurationSource extends ConfigurationSource
 {
-    String ROLE = SecurityConfigurationSource.class.getName();
-    
     /**
      * Gets the current configuration.
      * 

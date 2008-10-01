@@ -1,22 +1,20 @@
 package org.sonatype.nexus.jsecurity.locators;
 
+import org.codehaus.plexus.component.annotations.Component;
 import org.jsecurity.subject.RememberMeManager;
 import org.jsecurity.web.WebRememberMeManager;
 import org.jsecurity.web.attr.CookieAttribute;
 import org.sonatype.jsecurity.locators.RememberMeLocator;
 
 /**
- * The nexus remember me locator, will simply return the default JSecurity
- * WebRememberMeManager
- *
- * @plexus.component role="org.sonatype.jsecurity.locators.RememberMeLocator"
+ * The nexus remember me locator, will simply return the default JSecurity WebRememberMeManager
  */
+@Component( role = RememberMeLocator.class )
 public class NexusRememberMeLocator
-    implements
-    RememberMeLocator
+    implements RememberMeLocator
 {
     public static final String DEFAULT_REMEMBER_ME_COOKIE_NAME = "nxRememberMe";
-    
+
     public RememberMeManager getRememberMeManager()
     {
         WebRememberMeManager rmm = new WebRememberMeManager();

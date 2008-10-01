@@ -21,7 +21,7 @@ public class DefaultNexusSchedulerTest
     {
         super.setUp();
 
-        nexusScheduler = (NexusScheduler) lookup( NexusScheduler.ROLE );
+        nexusScheduler = (NexusScheduler) lookup( NexusScheduler.class );
 
         nexusScheduler.startService();
     }

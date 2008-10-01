@@ -41,7 +41,7 @@ public class FileStoreTest
     {
         super.setUp();
 
-        fileStore = (FileStore) lookup( Store.ROLE, "file" );
+        fileStore = (FileStore) lookup( Store.class, "file" );
 
         fileStore.getBaseDir();
     }

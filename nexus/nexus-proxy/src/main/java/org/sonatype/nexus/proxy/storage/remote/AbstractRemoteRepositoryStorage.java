@@ -25,6 +25,9 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.sonatype.nexus.configuration.model.CRemoteAuthentication;
+import org.sonatype.nexus.configuration.model.CRemoteConnectionSettings;
+import org.sonatype.nexus.configuration.model.CRemoteHttpProxySettings;
 import org.sonatype.nexus.proxy.LoggingComponent;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
@@ -131,6 +134,26 @@ public abstract class AbstractRemoteRepositoryStorage
         throws StorageException
     {
         return containsItem( uid, 0 );
+    }
+
+    // helper methods
+
+    protected CRemoteConnectionSettings getRemoteConnectionSettings( RemoteStorageContext ctx )
+    {
+        return (CRemoteConnectionSettings) ctx
+            .getRemoteConnectionContextObject( RemoteStorageContext.REMOTE_CONNECTIONS_SETTINGS );
+    }
+
+    protected CRemoteAuthentication getRemoteAuthenticationSettings( RemoteStorageContext ctx )
+    {
+        return (CRemoteAuthentication) ctx
+            .getRemoteConnectionContextObject( RemoteStorageContext.REMOTE_AUTHENTICATION_SETTINGS );
+    }
+
+    protected CRemoteHttpProxySettings getRemoteHttpProxySettings( RemoteStorageContext ctx )
+    {
+        return (CRemoteHttpProxySettings) ctx
+            .getRemoteConnectionContextObject( RemoteStorageContext.REMOTE_HTTP_PROXY_SETTINGS );
     }
 
 }

@@ -7,16 +7,12 @@ import junit.framework.Assert;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
 import org.junit.Test;
+import org.sonatype.nexus.configuration.RepositoryStatusConverter;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.proxy.maven.maven2.M2Repository;
-import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
-import org.sonatype.nexus.proxy.repository.LocalStatus;
-import org.sonatype.nexus.proxy.repository.ProxyMode;
 import org.sonatype.nexus.proxy.repository.RemoteStatus;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.proxy.storage.local.LocalRepositoryStorage;
-import org.sonatype.nexus.proxy.storage.local.fs.DefaultFSLocalRepositoryStorage;
 import org.sonatype.nexus.proxy.storage.remote.DefaultRemoteStorageContext;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 import org.sonatype.nexus.proxy.storage.remote.commonshttpclient.CommonsHttpClientRemoteStorage;
@@ -74,7 +70,8 @@ public class Nexus412RemoteLeakTest
         repo.setId( cRepo.getId() );
         repo.setItemMaxAge( cRepo.getArtifactMaxAge() );
         // cRepo.getChecksumPolicy() );
-        repo.setLocalStatus( LocalStatus.fromModel( cRepo.getLocalStatus() ) );
+
+        repo.setLocalStatus( RepositoryStatusConverter.localStatusFromModel( cRepo.getLocalStatus() ) );
 
         if ( cRepo.getLocalStorage() != null )
         {
@@ -84,7 +81,7 @@ public class Nexus412RemoteLeakTest
         // repo.set cRepo.getMetadataMaxAge() );
         repo.setName( cRepo.getName() );
         repo.setNotFoundCacheTimeToLive( cRepo.getNotFoundCacheTTL() );
-        repo.setProxyMode( ProxyMode.fromModel( cRepo.getProxyMode() ) );
+        repo.setProxyMode( RepositoryStatusConverter.proxyModeFromModel( cRepo.getProxyMode() ) );
         repo.setRemoteUrl( cRepo.getRemoteStorage().getUrl() );
         // cRepo.getRepositoryPolicy() );
 

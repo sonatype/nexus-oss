@@ -32,13 +32,12 @@ import org.sonatype.nexus.proxy.LoggingComponent;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.ResourceStore;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
+import org.sonatype.nexus.proxy.events.AbstractEvent;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 
 /**
  * The Class PathBasedRequestRepositoryMapper filters repositories to search using supplied list of filter expressions.
- * It is parametrized by java,util.Map, the contents:
- * </p>
- * <tt>
+ * It is parametrized by java,util.Map, the contents: </p> <tt>
  * regexp1=repo1,repo2...
  * regexp2=repo3,repo4...
  * ...
@@ -75,12 +74,15 @@ public class PathBasedRequestRepositoryMapper
 
     public void initialize()
     {
-        applicationConfiguration.addConfigurationChangeListener( this );
+        applicationConfiguration.addProximityEventListener( this );
     }
 
-    public void onConfigurationChange( ConfigurationChangeEvent evt )
+    public void onProximityEvent( AbstractEvent evt )
     {
-        this.compiled = false;
+        if ( ConfigurationChangeEvent.class.isAssignableFrom( evt.getClass() ) )
+        {
+            this.compiled = false;
+        }
     }
 
     protected ApplicationConfiguration getApplicationConfiguration()

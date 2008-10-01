@@ -23,9 +23,7 @@ package org.sonatype.nexus.proxy.storage.remote;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.sonatype.nexus.configuration.model.CRemoteAuthentication;
 import org.sonatype.nexus.configuration.model.CRemoteConnectionSettings;
-import org.sonatype.nexus.configuration.model.CRemoteHttpProxySettings;
 
 /**
  * The default remote storage context.
@@ -35,16 +33,9 @@ import org.sonatype.nexus.configuration.model.CRemoteHttpProxySettings;
 public class DefaultRemoteStorageContext
     implements RemoteStorageContext
 {
-
     private long lastChanged = System.currentTimeMillis();
 
     private HashMap<String, Object> context = new HashMap<String, Object>();
-
-    private CRemoteConnectionSettings remoteConnectionSettings = new CRemoteConnectionSettings();
-
-    private CRemoteHttpProxySettings remoteHttpProxySettings = null;
-
-    private CRemoteAuthentication remoteAuthenticationSettings = null;
 
     private RemoteStorageContext defaults;
 
@@ -53,6 +44,9 @@ public class DefaultRemoteStorageContext
         super();
 
         this.defaults = defaults;
+
+        // TODO: why is this needed?
+        this.putRemoteConnectionContextObject( REMOTE_CONNECTIONS_SETTINGS, new CRemoteConnectionSettings() );
     }
 
     public long getLastChanged()
@@ -65,59 +59,37 @@ public class DefaultRemoteStorageContext
         lastChanged = ts;
     }
 
-    public CRemoteConnectionSettings getRemoteConnectionSettings()
-    {
-        if ( remoteConnectionSettings == null && defaults != null )
-        {
-            return defaults.getRemoteConnectionSettings();
-        }
-        else
-        {
-            return remoteConnectionSettings;
-        }
-    }
-
-    public void setRemoteConnectionSettings( CRemoteConnectionSettings remoteConnectionSettings )
-    {
-        this.remoteConnectionSettings = remoteConnectionSettings;
-
-        lastChanged = System.currentTimeMillis();
-    }
-
-    public CRemoteHttpProxySettings getRemoteHttpProxySettings()
-    {
-        if ( remoteHttpProxySettings == null && defaults != null )
-        {
-            return defaults.getRemoteHttpProxySettings();
-        }
-        else
-        {
-            return remoteHttpProxySettings;
-        }
-    }
-
-    public void setRemoteHttpProxySettings( CRemoteHttpProxySettings remoteHttpProxySettings )
-    {
-        this.remoteHttpProxySettings = remoteHttpProxySettings;
-
-        lastChanged = System.currentTimeMillis();
-    }
-
-    public CRemoteAuthentication getRemoteAuthenticationSettings()
-    {
-        return remoteAuthenticationSettings;
-    }
-
-    public void setRemoteAuthenticationSettings( CRemoteAuthentication remoteAuthenticationSettings )
-    {
-        this.remoteAuthenticationSettings = remoteAuthenticationSettings;
-
-        lastChanged = System.currentTimeMillis();
-    }
-
     public Map<String, Object> getRemoteConnectionContext()
     {
         return context;
+    }
+
+    public Object getRemoteConnectionContextObject( String key )
+    {
+        if ( context.containsKey( key ) )
+        {
+            return context.get( key );
+        }
+        else if ( defaults != null )
+        {
+            return defaults.getRemoteConnectionContextObject( key );
+        }
+        else
+        {
+            return null;
+        }
+    }
+
+    public void removeRemoteConnectionContextObject( String key )
+    {
+        context.remove( key );
+    }
+
+    public void putRemoteConnectionContextObject( String key, Object value )
+    {
+        context.put( key, value );
+
+        lastChanged = System.currentTimeMillis();
     }
 
 }

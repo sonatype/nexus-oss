@@ -1,36 +1,38 @@
 package org.sonatype.nexus.jsecurity.realms;
 
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
 import org.sonatype.jsecurity.realms.XmlMethodAuthorizingRealm;
 import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
 import org.sonatype.nexus.jsecurity.NexusSecurity;
+import org.sonatype.nexus.proxy.events.AbstractEvent;
 
 public abstract class AbstractNexusAuthorizingRealm
     extends XmlMethodAuthorizingRealm
-        implements NexusAuthorizingRealm,
-        Initializable
+    implements NexusAuthorizingRealm, Initializable
 {
-    /**
-     * @plexus.requirement
-     */
+    @Requirement
     private NexusSecurity security;
-    
+
     public void initialize()
         throws InitializationException
     {
-        security.addConfigurationChangeListener( this );
+        security.addProximityEventListener( this );
     }
-    
-    public void onConfigurationChange( ConfigurationChangeEvent evt )
+
+    public void onProximityEvent( AbstractEvent evt )
     {
-        if ( getAuthorizationCache() != null )
+        if ( ConfigurationChangeEvent.class.isAssignableFrom( evt.getClass() ) )
         {
-            getAuthorizationCache().clear();
-        }
-        if ( getConfigurationManager() != null )
-        {
-            getConfigurationManager().clearCache();
+            if ( getAuthorizationCache() != null )
+            {
+                getAuthorizationCache().clear();
+            }
+            if ( getConfigurationManager() != null )
+            {
+                getConfigurationManager().clearCache();
+            }
         }
     }
 }

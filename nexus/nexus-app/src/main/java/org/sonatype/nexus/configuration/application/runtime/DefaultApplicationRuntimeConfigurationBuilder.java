@@ -28,11 +28,14 @@ import java.util.Map;
 
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.context.ContextException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
+import org.sonatype.nexus.configuration.RepositoryStatusConverter;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.configuration.application.validator.ApplicationValidationResponse;
 import org.sonatype.nexus.configuration.model.CRepository;
@@ -49,32 +52,27 @@ import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.proxy.maven.maven2.ConstrainedM2ShadowRepository;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
-import org.sonatype.nexus.proxy.repository.LocalStatus;
-import org.sonatype.nexus.proxy.repository.ProxyMode;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.ShadowRepository;
 import org.sonatype.nexus.proxy.storage.local.LocalRepositoryStorage;
 import org.sonatype.nexus.proxy.storage.remote.DefaultRemoteStorageContext;
 import org.sonatype.nexus.proxy.storage.remote.RemoteRepositoryStorage;
+import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 
 /**
  * The Class DefaultRuntimeConfigurationBuilder. Todo: all the bad thing is now concentrated in this class. We are
  * playing container instead of container.
  * 
  * @author cstamas
- * @plexus.component
  */
+@Component( role = ApplicationRuntimeConfigurationBuilder.class )
 public class DefaultApplicationRuntimeConfigurationBuilder
     extends AbstractLogEnabled
     implements ApplicationRuntimeConfigurationBuilder, Contextualizable
 {
     public static final String DEFAULT_LS_PROVIDER = "file";
 
-    /**
-     * The repository registry.
-     * 
-     * @plexus.requirement
-     */
+    @Requirement
     private RepositoryRegistry repositoryRegistry;
 
     private PlexusContainer plexusContainer;
@@ -101,11 +99,11 @@ public class DefaultApplicationRuntimeConfigurationBuilder
 
             if ( CRepository.TYPE_MAVEN2.equals( repo.getType() ) )
             {
-                repository = (MavenRepository) plexusContainer.lookup( Repository.ROLE, "maven2" );
+                repository = (MavenRepository) plexusContainer.lookup( Repository.class, "maven2" );
             }
             else if ( CRepository.TYPE_MAVEN1.equals( repo.getType() ) )
             {
-                repository = (MavenRepository) plexusContainer.lookup( Repository.ROLE, "maven1" );
+                repository = (MavenRepository) plexusContainer.lookup( Repository.class, "maven1" );
             }
             else
             {
@@ -135,10 +133,10 @@ public class DefaultApplicationRuntimeConfigurationBuilder
 
                 m2repository.setId( repo.getId() );
                 m2repository.setName( repo.getName() );
-                m2repository.setLocalStatus( LocalStatus.fromModel( repo.getLocalStatus() ) );
+                m2repository.setLocalStatus( RepositoryStatusConverter.localStatusFromModel( repo.getLocalStatus() ) );
                 m2repository.setAllowWrite( repo.isAllowWrite() );
                 m2repository.setBrowseable( repo.isBrowseable() );
-                m2repository.setProxyMode( ProxyMode.fromModel( repo.getProxyMode() ) );
+                m2repository.setProxyMode( RepositoryStatusConverter.proxyModeFromModel( repo.getProxyMode() ) );
                 m2repository.setIndexable( repo.isIndexable() );
                 m2repository.setNotFoundCacheTimeToLive( repo.getNotFoundCacheTTL() );
 
@@ -166,10 +164,10 @@ public class DefaultApplicationRuntimeConfigurationBuilder
 
                 m1repository.setId( repo.getId() );
                 m1repository.setName( repo.getName() );
-                m1repository.setLocalStatus( LocalStatus.fromModel( repo.getLocalStatus() ) );
+                m1repository.setLocalStatus( RepositoryStatusConverter.localStatusFromModel( repo.getLocalStatus() ) );
                 m1repository.setAllowWrite( repo.isAllowWrite() );
                 m1repository.setBrowseable( repo.isBrowseable() );
-                m1repository.setProxyMode( ProxyMode.fromModel( repo.getProxyMode() ) );
+                m1repository.setProxyMode( RepositoryStatusConverter.proxyModeFromModel( repo.getProxyMode() ) );
                 m1repository.setIndexable( repo.isIndexable() );
                 m1repository.setNotFoundCacheTimeToLive( repo.getNotFoundCacheTTL() );
 
@@ -200,11 +198,12 @@ public class DefaultApplicationRuntimeConfigurationBuilder
             // Setting common things on a repository
 
             // NX-198: filling up the default variable to store the "default" local URL
-            File defaultStorageFile = new File( new File( nexusConfiguration.getWorkingDirectory(), "storage" ), repository
-                .getId() );
+            File defaultStorageFile = new File(
+                new File( nexusConfiguration.getWorkingDirectory(), "storage" ),
+                repository.getId() );
 
             repo.defaultLocalStorageUrl = defaultStorageFile.toURL().toString();
-            
+
             String localUrl = null;
             LocalRepositoryStorage storage = null;
 
@@ -217,22 +216,25 @@ public class DefaultApplicationRuntimeConfigurationBuilder
             {
                 storage = getLocalRepositoryStorage( repository.getId(), DEFAULT_LS_PROVIDER );
                 localUrl = repo.defaultLocalStorageUrl;
-                
-                //Default dir is going to be valid
+
+                // Default dir is going to be valid
                 defaultStorageFile.mkdirs();
             }
-            
+
             try
             {
                 storage.validateStorageUrl( localUrl );
-                
+
                 repository.setLocalUrl( localUrl );
                 repository.setLocalStorage( storage );
             }
             catch ( StorageException e )
             {
                 ValidationResponse response = new ApplicationValidationResponse();
-                ValidationMessage error = new ValidationMessage( "overrideLocalStorageUrl", "Repository has an invalid local storage URL '" + localUrl, "Invalid file location");
+                ValidationMessage error = new ValidationMessage(
+                    "overrideLocalStorageUrl",
+                    "Repository has an invalid local storage URL '" + localUrl,
+                    "Invalid file location" );
                 response.addValidationError( error );
                 throw new InvalidConfigurationException( response );
             }
@@ -251,11 +253,14 @@ public class DefaultApplicationRuntimeConfigurationBuilder
                     DefaultRemoteStorageContext ctx = new DefaultRemoteStorageContext( nexusConfiguration
                         .getRemoteStorageContext() );
 
-                    ctx.setRemoteConnectionSettings( repo.getRemoteStorage().getConnectionSettings() );
+                    ctx.putRemoteConnectionContextObject( RemoteStorageContext.REMOTE_CONNECTIONS_SETTINGS, repo
+                        .getRemoteStorage().getConnectionSettings() );
 
-                    ctx.setRemoteHttpProxySettings( repo.getRemoteStorage().getHttpProxySettings() );
+                    ctx.putRemoteConnectionContextObject( RemoteStorageContext.REMOTE_HTTP_PROXY_SETTINGS, repo
+                        .getRemoteStorage().getHttpProxySettings() );
 
-                    ctx.setRemoteAuthenticationSettings( repo.getRemoteStorage().getAuthentication() );
+                    ctx.putRemoteConnectionContextObject( RemoteStorageContext.REMOTE_AUTHENTICATION_SETTINGS, repo
+                        .getRemoteStorage().getAuthentication() );
 
                     repository.setRemoteStorageContext( ctx );
                 }
@@ -282,15 +287,15 @@ public class DefaultApplicationRuntimeConfigurationBuilder
 
             if ( CRepositoryShadow.TYPE_MAVEN1.equals( shadow.getType() ) )
             {
-                shadowRepository = (ShadowRepository) plexusContainer.lookup( Repository.ROLE, "m2-m1-shadow" );
+                shadowRepository = (ShadowRepository) plexusContainer.lookup( Repository.class, "m2-m1-shadow" );
             }
             else if ( CRepositoryShadow.TYPE_MAVEN2.equals( shadow.getType() ) )
             {
-                shadowRepository = (ShadowRepository) plexusContainer.lookup( Repository.ROLE, "m1-m2-shadow" );
+                shadowRepository = (ShadowRepository) plexusContainer.lookup( Repository.class, "m1-m2-shadow" );
             }
             else if ( CRepositoryShadow.TYPE_MAVEN2_CONSTRAINED.equals( shadow.getType() ) )
             {
-                shadowRepository = (ShadowRepository) plexusContainer.lookup( Repository.ROLE, "m2-constrained" );
+                shadowRepository = (ShadowRepository) plexusContainer.lookup( Repository.class, "m2-constrained" );
             }
             else
             {
@@ -305,10 +310,13 @@ public class DefaultApplicationRuntimeConfigurationBuilder
             // TODO: Resolve this hack...
             // This exception seemsto only be thrown when shadowOf parameter is invalid, so that will be
             // sent back as the cause field
-            ValidationMessage message = new ValidationMessage( "shadowOf", e.getMessage(), "The source nexus repository is of an invalid Format.  If Virtual format is Maven 2, source repository must be of format Maven 1, and vice versa." );
+            ValidationMessage message = new ValidationMessage(
+                "shadowOf",
+                e.getMessage(),
+                "The source nexus repository is of an invalid Format.  If Virtual format is Maven 2, source repository must be of format Maven 1, and vice versa." );
             ValidationResponse response = new ApplicationValidationResponse();
             response.addValidationError( message );
-            
+
             throw new InvalidConfigurationException( response );
         }
         catch ( ComponentLookupException e )
@@ -344,7 +352,8 @@ public class DefaultApplicationRuntimeConfigurationBuilder
                 shadowRepository.setId( shadow.getId() );
                 shadowRepository.setName( shadow.getName() );
 
-                shadowRepository.setLocalStatus( LocalStatus.fromModel( shadow.getLocalStatus() ) );
+                shadowRepository.setLocalStatus( RepositoryStatusConverter.localStatusFromModel( shadow
+                    .getLocalStatus() ) );
                 shadowRepository.setAllowWrite( false );
                 shadowRepository.setBrowseable( true );
                 shadowRepository.setProxyMode( null );
@@ -361,7 +370,8 @@ public class DefaultApplicationRuntimeConfigurationBuilder
                 shadowRepository.setId( shadow.getId() );
                 shadowRepository.setName( shadow.getName() );
 
-                shadowRepository.setLocalStatus( LocalStatus.fromModel( shadow.getLocalStatus() ) );
+                shadowRepository.setLocalStatus( RepositoryStatusConverter.localStatusFromModel( shadow
+                    .getLocalStatus() ) );
                 shadowRepository.setAllowWrite( false );
                 shadowRepository.setBrowseable( true );
                 shadowRepository.setProxyMode( null );
@@ -378,7 +388,8 @@ public class DefaultApplicationRuntimeConfigurationBuilder
                 shadowRepository.setId( shadow.getId() );
                 shadowRepository.setName( shadow.getName() );
 
-                shadowRepository.setLocalStatus( LocalStatus.fromModel( shadow.getLocalStatus() ) );
+                shadowRepository.setLocalStatus( RepositoryStatusConverter.localStatusFromModel( shadow
+                    .getLocalStatus() ) );
                 shadowRepository.setAllowWrite( false );
                 shadowRepository.setBrowseable( true );
                 shadowRepository.setProxyMode( null );
@@ -421,7 +432,7 @@ public class DefaultApplicationRuntimeConfigurationBuilder
 
             shadowRepository
                 .setLocalStorage( getLocalRepositoryStorage( shadowRepository.getId(), DEFAULT_LS_PROVIDER ) );
-            
+
             return shadowRepository;
         }
         catch ( MalformedURLException e )
@@ -438,7 +449,7 @@ public class DefaultApplicationRuntimeConfigurationBuilder
     {
         try
         {
-            return (LocalRepositoryStorage) plexusContainer.lookup( LocalRepositoryStorage.ROLE, provider );
+            return (LocalRepositoryStorage) plexusContainer.lookup( LocalRepositoryStorage.class, provider );
         }
         catch ( ComponentLookupException e )
         {
@@ -452,7 +463,7 @@ public class DefaultApplicationRuntimeConfigurationBuilder
     {
         try
         {
-            return (RemoteRepositoryStorage) plexusContainer.lookup( RemoteRepositoryStorage.ROLE, provider );
+            return (RemoteRepositoryStorage) plexusContainer.lookup( RemoteRepositoryStorage.class, provider );
         }
         catch ( ComponentLookupException e )
         {

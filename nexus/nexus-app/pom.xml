@@ -25,6 +25,12 @@
 		<dependency>
 			<groupId>org.sonatype.nexus</groupId>
 			<artifactId>nexus-configuration</artifactId>
+			<!-- exclusions>
+				<exclusion>
+					<groupId>org.codehaus.plexus</groupId>
+					<artifactId>plexus-component-annotations</artifactId>
+				</exclusion>
+			</exclusions-->
 		</dependency>
 		<dependency>
 			<groupId>org.sonatype.nexus</groupId>
@@ -47,6 +53,8 @@
 		<dependency>
 			<groupId>org.sonatype.nexus</groupId>
 			<artifactId>nexus-proxy</artifactId>
+			<exclusions>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.codehaus.plexus</groupId>
@@ -78,27 +86,31 @@
 		</dependency>
 
 		<dependency>
-            <groupId>org.sonatype.jsecurity</groupId>
-            <artifactId>method-realm</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.mortbay.jetty</groupId>
-                    <artifactId>servlet-api-2.5</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
+			<groupId>org.sonatype.jsecurity</groupId>
+			<artifactId>method-realm</artifactId>
+			<exclusions>
+				<exclusion>
+					<groupId>org.codehaus.plexus</groupId>
+					<artifactId>plexus-component-annotations</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.mortbay.jetty</groupId>
+					<artifactId>servlet-api-2.5</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
 		<dependency>
 			<groupId>org.jsecurity</groupId>
 			<artifactId>jsecurity</artifactId>
 		</dependency>
-        <dependency>
-            <groupId>org.sonatype.micromailer</groupId>
-            <artifactId>micromailer</artifactId>
-        </dependency>
 		<dependency>
-            <groupId>log4j</groupId>
-            <artifactId>log4j</artifactId>
-        </dependency>
+			<groupId>org.sonatype.micromailer</groupId>
+			<artifactId>micromailer</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
+		</dependency>
 
 		<!-- Testing -->
 		<dependency>
@@ -133,9 +145,48 @@
 		<plugins>
 			<plugin>
 				<groupId>org.codehaus.plexus</groupId>
+				<artifactId>plexus-component-metadata</artifactId>
+				<executions>
+					<execution>
+						<id>default</id>
+						<goals>
+							<goal>generate-metadata</goal>
+						</goals>
+						<phase>process-classes</phase>
+						<configuration>
+							<outputDirectory>
+								${project.build.directory}/plexus
+							</outputDirectory>
+						</configuration>
+					</execution>
+					<!-- this one NPEs!!! execution>
+						<id>merge</id>
+						<goals>
+							<goal>merge-metadata</goal>
+						</goals>
+						<phase>process-classes</phase>
+						<configuration>
+							<descriptors>
+								<descriptor>src/main/plexus/components.xml</descriptor>
+								<descriptor>${project.build.directory}/plexus/META-INF/plexus/components.xml</descriptor>
+							</descriptors>
+							<output>${project.build.outputDirectory}/META-INF/plexus/components.xml</output>
+						</configuration>
+					</execution-->
+				</executions>
+				<dependencies>
+					<dependency>
+						<groupId>org.slf4j</groupId>
+						<artifactId>jcl-over-slf4j</artifactId>
+						<version>1.5.3</version>
+					</dependency>
+				</dependencies>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.plexus</groupId>
 				<artifactId>plexus-maven-plugin</artifactId>
                 <executions>
-                    <execution>
+                    <!-- execution>
                         <id>descriptor</id>
                         <goals>
                             <goal>descriptor</goal>
@@ -143,7 +194,7 @@
                         <configuration>
                             <outputDirectory>${project.build.directory}/plexus</outputDirectory>
                         </configuration>
-                    </execution>
+                    </execution-->
                     <execution>
                         <id>merge</id>
                         <goals>
@@ -158,6 +209,13 @@
                         </configuration>
                     </execution>
                 </executions>
+				<dependencies>
+					<dependency>
+						<groupId>org.slf4j</groupId>
+						<artifactId>jcl-over-slf4j</artifactId>
+						<version>1.5.3</version>
+					</dependency>
+				</dependencies>
 			</plugin>
 
 		</plugins>

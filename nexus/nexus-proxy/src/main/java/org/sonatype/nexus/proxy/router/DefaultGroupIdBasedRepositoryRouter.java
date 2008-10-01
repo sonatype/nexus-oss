@@ -20,19 +20,20 @@
  */
 package org.sonatype.nexus.proxy.router;
 
+import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 
 /**
  * The default grouping router, without any specific postprocessing.
  * 
  * @author cstamas
- * @plexus.component role-hint="groups"
  */
+@Component( role = RepositoryRouter.class, hint = "groups" )
 public class DefaultGroupIdBasedRepositoryRouter
     extends GroupIdBasedRepositoryRouter
 {
     public static final String ID = "groups";
-    
+
     private ContentClass contentClass = new DefaultContentClass();
 
     public String getId()

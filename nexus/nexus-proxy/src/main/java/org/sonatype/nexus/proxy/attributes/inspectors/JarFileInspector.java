@@ -53,7 +53,6 @@ public class JarFileInspector
 
     /*
      * (non-Javadoc)
-     * 
      * @see org.sonatype.nexus.attributes.StorageItemInspector#isHandled(org.sonatype.nexus.item.StorageItem)
      */
     public boolean isHandled( StorageItem item )
@@ -64,7 +63,6 @@ public class JarFileInspector
 
     /*
      * (non-Javadoc)
-     * 
      * @see org.sonatype.nexus.attributes.StorageItemInspector#getIndexableKeywords()
      */
     public Set<String> getIndexableKeywords()
@@ -77,9 +75,9 @@ public class JarFileInspector
 
     /*
      * (non-Javadoc)
-     * 
-     * @see org.sonatype.nexus.attributes.StorageFileItemInspector#processStorageFileItem(org.sonatype.nexus.item.StorageFileItem,
-     *      java.io.File)
+     * @see
+     * org.sonatype.nexus.attributes.StorageFileItemInspector#processStorageFileItem(org.sonatype.nexus.item.StorageFileItem
+     * , java.io.File)
      */
     public void processStorageFileItem( StorageFileItem item, File file )
         throws IOException

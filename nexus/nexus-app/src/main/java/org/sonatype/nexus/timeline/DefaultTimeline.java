@@ -49,6 +49,8 @@ import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.BooleanClause.Occur;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.StartingException;
@@ -56,13 +58,14 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.StoppingException;
 import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.index.context.NexusIndexWriter;
+import org.sonatype.nexus.proxy.events.AbstractEvent;
 
 /**
  * The default implementation of timeline based on Lucene.
  * 
  * @author cstamas
- * @plexus.component
  */
+@Component( role = Timeline.class )
 public class DefaultTimeline
     extends AbstractLogEnabled
     implements Timeline, Initializable
@@ -73,7 +76,7 @@ public class DefaultTimeline
 
     private static final String SUBTYPE = "_2";
 
-    /** @plexus.requirement */
+    @Requirement
     private ApplicationConfiguration applicationConfiguration;
 
     private File timelineDirectory;
@@ -90,27 +93,30 @@ public class DefaultTimeline
 
     public void initialize()
     {
-        applicationConfiguration.addConfigurationChangeListener( this );
+        applicationConfiguration.addProximityEventListener( this );
     }
 
-    public void onConfigurationChange( ConfigurationChangeEvent evt )
+    public void onProximityEvent( AbstractEvent evt )
     {
-        if ( timelineDirectory == null
-            || !timelineDirectory.getPath().startsWith(
-                applicationConfiguration.getWorkingDirectory().getAbsolutePath() ) )
+        if ( ConfigurationChangeEvent.class.isAssignableFrom( evt.getClass() ) )
         {
-            if ( running )
+            if ( timelineDirectory == null
+                || !timelineDirectory.getPath().startsWith(
+                    applicationConfiguration.getWorkingDirectory().getAbsolutePath() ) )
             {
-                // restart to apply port change but not affect the component state "running"
-                try
+                if ( running )
                 {
-                    stopService();
+                    // restart to apply port change but not affect the component state "running"
+                    try
+                    {
+                        stopService();
 
-                    startService();
-                }
-                catch ( Exception e )
-                {
-                    getLogger().error( "Cannot manage Timeline:", e );
+                        startService();
+                    }
+                    catch ( Exception e )
+                    {
+                        getLogger().error( "Cannot manage Timeline:", e );
+                    }
                 }
             }
         }

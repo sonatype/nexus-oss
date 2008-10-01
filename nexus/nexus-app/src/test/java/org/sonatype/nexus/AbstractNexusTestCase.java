@@ -101,7 +101,7 @@ public abstract class AbstractNexusTestCase
 
         if ( loadConfigurationAtSetUp() )
         {
-            nexusConfiguration = (NexusConfiguration) this.lookup( NexusConfiguration.ROLE );
+            nexusConfiguration = (NexusConfiguration) this.lookup( NexusConfiguration.class );
 
             nexusConfiguration.loadConfiguration();
 

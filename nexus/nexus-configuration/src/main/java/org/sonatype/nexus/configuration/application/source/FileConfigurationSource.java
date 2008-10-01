@@ -26,6 +26,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.sonatype.nexus.configuration.ConfigurationException;
@@ -42,38 +44,34 @@ import org.sonatype.nexus.configuration.validator.ValidationResponse;
  * validate it. It also holds the one and only existing Configuration object.
  * 
  * @author cstamas
- * @plexus.component role-hint="file"
  */
+@Component( role = ApplicationConfigurationSource.class, hint = "file" )
 public class FileConfigurationSource
     extends AbstractApplicationConfigurationSource
 {
 
     /**
      * The configuration file.
-     * 
-     * @plexus.configuration default-value="${nexus-work}/conf/nexus.xml"
      */
+    @org.codehaus.plexus.component.annotations.Configuration( value = "${nexus-work}/conf/nexus.xml" )
     private File configurationFile;
 
     /**
      * The configuration validator.
-     * 
-     * @plexus.requirement
      */
+    @Requirement
     private ApplicationConfigurationValidator configurationValidator;
 
     /**
      * The configuration upgrader.
-     * 
-     * @plexus.requirement
      */
+    @Requirement
     private ApplicationConfigurationUpgrader configurationUpgrader;
 
     /**
      * The nexus defaults configuration source.
-     * 
-     * @plexus.requirement role-hint="static"
      */
+    @Requirement( hint = "static" )
     private ApplicationConfigurationSource nexusDefaults;
 
     /** Flag to mark defaulted config */
@@ -275,15 +273,17 @@ public class FileConfigurationSource
 
         try
         {
-            //Create the dir if doesn't exist, throw runtime exception on failure
-            //bad bad bad
+            // Create the dir if doesn't exist, throw runtime exception on failure
+            // bad bad bad
             if ( !file.getParentFile().exists() && !file.getParentFile().mkdirs() )
             {
                 String message = "\r\n******************************************************************************\r\n"
-                               + "* Could not create configuration file [ " + file.toString() + "]!!!! *\r\n"
-                               + "* Nexus cannot start properly until the process has read+write permissions to this folder *\r\n"
-                               + "******************************************************************************";
-                
+                    + "* Could not create configuration file [ "
+                    + file.toString()
+                    + "]!!!! *\r\n"
+                    + "* Nexus cannot start properly until the process has read+write permissions to this folder *\r\n"
+                    + "******************************************************************************";
+
                 getLogger().fatalError( message );
             }
 

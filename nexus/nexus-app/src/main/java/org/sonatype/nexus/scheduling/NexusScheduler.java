@@ -33,8 +33,6 @@ import org.sonatype.scheduling.schedules.Schedule;
 public interface NexusScheduler
     extends NexusService
 {
-    String ROLE = NexusScheduler.class.getName();
-    
     /**
      * Issue a NexusTask for immediate execution, but have a control over it.
      * 

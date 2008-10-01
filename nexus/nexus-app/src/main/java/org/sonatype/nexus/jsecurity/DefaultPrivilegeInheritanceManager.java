@@ -23,21 +23,19 @@ package org.sonatype.nexus.jsecurity;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.nexus.configuration.security.model.CPrivilege;
 
-/**
- * @plexus.component
- */
+@Component( role = PrivilegeInheritanceManager.class )
 public class DefaultPrivilegeInheritanceManager
-    implements
-    PrivilegeInheritanceManager
+    implements PrivilegeInheritanceManager
 {
     public Set<String> getInheritedMethods( String method )
     {
         HashSet<String> methods = new HashSet<String>();
-        
+
         methods.add( method );
-        
+
         if ( CPrivilege.METHOD_CREATE.equals( method ) )
         {
             methods.add( CPrivilege.METHOD_READ );
@@ -50,7 +48,7 @@ public class DefaultPrivilegeInheritanceManager
         {
             methods.add( CPrivilege.METHOD_READ );
         }
-        
+
         return methods;
     }
 }

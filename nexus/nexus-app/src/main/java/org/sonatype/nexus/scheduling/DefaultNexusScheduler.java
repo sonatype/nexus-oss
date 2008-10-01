@@ -26,13 +26,13 @@ import java.util.concurrent.RejectedExecutionException;
 
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.context.ContextException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.StartingException;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.StoppingException;
 import org.sonatype.scheduling.NoSuchTaskException;
 import org.sonatype.scheduling.ScheduledTask;
 import org.sonatype.scheduling.Scheduler;
@@ -43,17 +43,16 @@ import org.sonatype.scheduling.schedules.Schedule;
  * The Nexus scheduler.
  * 
  * @author cstamas
- * @plexus.component
  */
+@Component( role = NexusScheduler.class )
 public class DefaultNexusScheduler
     extends AbstractLogEnabled
     implements NexusScheduler, Contextualizable
 {
     /**
      * The scheduler.
-     * 
-     * @plexus.requirement
      */
+    @Requirement
     private Scheduler scheduler;
 
     /** For task lookups */
@@ -89,7 +88,7 @@ public class DefaultNexusScheduler
             NullPointerException
     {
         if ( nexusTask.allowConcurrentSubmission( scheduler.getActiveTasks() ) )
-        {   
+        {
             return scheduler.schedule( name, nexusTask, schedule, nexusTask.getParameters() );
         }
         else
@@ -127,7 +126,7 @@ public class DefaultNexusScheduler
     }
 
     public void startService()
-        throws StartingException
+        throws Exception
     {
         getLogger().info( "Starting Scheduler" );
 
@@ -135,7 +134,7 @@ public class DefaultNexusScheduler
     }
 
     public void stopService()
-        throws StoppingException
+        throws Exception
     {
         getLogger().info( "Stopping Scheduler" );
 

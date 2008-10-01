@@ -38,7 +38,7 @@ public class DefaultTimelineTest
     {
         super.setUp();
 
-        defaultTimeline = (DefaultTimeline) this.lookup( DefaultTimeline.ROLE );
+        defaultTimeline = (DefaultTimeline) this.lookup( Timeline.class );
 
         defaultTimeline.startService();
     }

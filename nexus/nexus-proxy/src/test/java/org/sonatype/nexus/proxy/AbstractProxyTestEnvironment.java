@@ -34,11 +34,13 @@ import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.logging.LoggerManager;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
+import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.proxy.attributes.AttributesHandler;
 import org.sonatype.nexus.proxy.attributes.DefaultAttributeStorage;
 import org.sonatype.nexus.proxy.events.AbstractEvent;
 import org.sonatype.nexus.proxy.events.EventListener;
+import org.sonatype.nexus.proxy.events.NexusStartedEvent;
 import org.sonatype.nexus.proxy.events.RepositoryItemEvent;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
@@ -226,35 +228,38 @@ public abstract class AbstractProxyTestEnvironment
 
         this.logger = loggerManager.getLoggerForComponent( this.getClass().toString() );
 
-        applicationConfiguration = (ApplicationConfiguration) lookup( ApplicationConfiguration.ROLE );
+        applicationConfiguration = (ApplicationConfiguration) lookup( ApplicationConfiguration.class );
 
         // deleting files
         FileUtils.forceDelete( getApplicationConfiguration().getWorkingDirectory() );
 
-        repositoryRegistry = (RepositoryRegistry) lookup( RepositoryRegistry.ROLE );
+        repositoryRegistry = (RepositoryRegistry) lookup( RepositoryRegistry.class );
 
         testEventListener = new TestItemEventListener();
 
         repositoryRegistry.addProximityEventListener( testEventListener );
 
-        attributesHandler = (AttributesHandler) lookup( AttributesHandler.ROLE );
+        attributesHandler = (AttributesHandler) lookup( AttributesHandler.class );
 
         ( (DefaultAttributeStorage) attributesHandler.getAttributeStorage() )
             .setWorkingDirectory( getApplicationConfiguration().getWorkingDirectory( "proxy/attributes" ) );
 
-        localRepositoryStorage = (LocalRepositoryStorage) lookup( LocalRepositoryStorage.ROLE, "file" );
+        localRepositoryStorage = (LocalRepositoryStorage) lookup( LocalRepositoryStorage.class, "file" );
 
         remoteStorageContext = new DefaultRemoteStorageContext( null );
 
-        remoteRepositoryStorage = (RemoteRepositoryStorage) lookup( RemoteRepositoryStorage.ROLE, "apacheHttpClient3x" );
+        remoteRepositoryStorage = (RemoteRepositoryStorage) lookup( RemoteRepositoryStorage.class, "apacheHttpClient3x" );
 
         rootRouter = (RepositoryRouter) lookup( ResourceStoreIdBasedRepositoryRouter.ROLE );
 
-        routers = getContainer().lookupMap( RepositoryRouter.ROLE );
+        routers = getContainer().lookupMap( RepositoryRouter.class );
 
         getEnvironmentBuilder().buildEnvironment( this );
 
-        applicationConfiguration.notifyConfigurationChangeListeners();
+        applicationConfiguration
+            .notifyProximityEventListeners( new ConfigurationChangeEvent( applicationConfiguration ) );
+
+        applicationConfiguration.notifyProximityEventListeners( new NexusStartedEvent() );
 
         getEnvironmentBuilder().startService();
     }

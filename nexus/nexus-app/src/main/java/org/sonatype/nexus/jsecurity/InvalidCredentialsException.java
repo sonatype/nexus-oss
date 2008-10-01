@@ -28,9 +28,8 @@ package org.sonatype.nexus.jsecurity;
 public class InvalidCredentialsException
     extends Exception
 {
-
     private static final long serialVersionUID = 294536984704055394L;
-    
+
     public InvalidCredentialsException()
     {
         super( "Invalid credentials supplied!" );

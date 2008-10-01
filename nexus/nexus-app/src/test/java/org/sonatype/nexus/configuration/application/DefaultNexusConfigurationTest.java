@@ -33,6 +33,7 @@ import org.sonatype.nexus.configuration.model.CRemoteHttpProxySettings;
 import org.sonatype.nexus.configuration.model.Configuration;
 import org.sonatype.nexus.proxy.maven.maven2.M2GroupIdBasedRepositoryRouter;
 import org.sonatype.nexus.proxy.router.RepositoryRouter;
+import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 
 public class DefaultNexusConfigurationTest
     extends AbstractNexusTestCase
@@ -45,7 +46,7 @@ public class DefaultNexusConfigurationTest
     {
         super.setUp();
 
-        nexusConfiguration = (DefaultNexusConfiguration) this.lookup( NexusConfiguration.ROLE );
+        nexusConfiguration = (DefaultNexusConfiguration) this.lookup( NexusConfiguration.class );
     }
 
     protected void tearDown()
@@ -104,15 +105,19 @@ public class DefaultNexusConfigurationTest
 
         config = nexusConfiguration.getConfiguration();
 
-        assertEquals(
-            nexusConfiguration.getConfiguration().getGlobalHttpProxySettings().getProxyHostname(),
-            ( (DefaultNexusConfiguration) nexusConfiguration )
-                .getRemoteStorageContext().getRemoteHttpProxySettings().getProxyHostname() );
+        String proxyHostName = ( (CRemoteHttpProxySettings) ( (DefaultNexusConfiguration) nexusConfiguration )
+            .getRemoteStorageContext().getRemoteConnectionContextObject(
+                RemoteStorageContext.REMOTE_HTTP_PROXY_SETTINGS ) ).getProxyHostname();
+
+        int proxyPort = ( (CRemoteHttpProxySettings) ( (DefaultNexusConfiguration) nexusConfiguration )
+            .getRemoteStorageContext().getRemoteConnectionContextObject(
+                RemoteStorageContext.REMOTE_HTTP_PROXY_SETTINGS ) ).getProxyPort();
 
         assertEquals(
-            nexusConfiguration.getConfiguration().getGlobalHttpProxySettings().getProxyPort(),
-            ( (DefaultNexusConfiguration) nexusConfiguration )
-                .getRemoteStorageContext().getRemoteHttpProxySettings().getProxyPort() );
+            nexusConfiguration.getConfiguration().getGlobalHttpProxySettings().getProxyHostname(),
+            proxyHostName );
+
+        assertEquals( nexusConfiguration.getConfiguration().getGlobalHttpProxySettings().getProxyPort(), proxyPort );
 
     }
 
@@ -192,7 +197,7 @@ public class DefaultNexusConfigurationTest
         nexusConfiguration.loadConfiguration();
 
         M2GroupIdBasedRepositoryRouter groupRouter = (M2GroupIdBasedRepositoryRouter) lookup(
-            RepositoryRouter.ROLE,
+            RepositoryRouter.class,
             "groups-m2" );
 
         // runtime state should equal to config

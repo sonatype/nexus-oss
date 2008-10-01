@@ -32,7 +32,7 @@ import org.sonatype.nexus.proxy.router.DefaultGroupIdBasedRepositoryRouter;
  * A router for Eclipse Update Sites.
  * 
  * @author cstamas
- * plexus.component role-hint="groups-eclipse-update-site"
+ * OFF plexus.component role-hint="groups-eclipse-update-site"
  */
 public class EclipseUpdateSiteGroupIdBasedRepositoryRouter
     extends DefaultGroupIdBasedRepositoryRouter

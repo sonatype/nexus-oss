@@ -28,6 +28,7 @@ import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.Writer;
 
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.interpolation.InterpolatorFilterReader;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.sonatype.jsecurity.model.Configuration;
@@ -45,12 +46,10 @@ public abstract class AbstractSecurityConfigurationSource
     extends AbstractConfigurationSource
     implements SecurityConfigurationSource
 {
-
     /**
      * The application interpolation provider.
-     * 
-     * @plexus.requirement
      */
+    @Requirement
     private ApplicationInterpolatorProvider interpolatorProvider;
 
     /** The configuration. */

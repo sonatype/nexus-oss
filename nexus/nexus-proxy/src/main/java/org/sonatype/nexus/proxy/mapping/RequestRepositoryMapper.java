@@ -22,10 +22,10 @@ package org.sonatype.nexus.proxy.mapping;
 
 import java.util.List;
 
-import org.sonatype.nexus.configuration.ConfigurationChangeListener;
 import org.sonatype.nexus.proxy.NoSuchResourceStoreException;
 import org.sonatype.nexus.proxy.ResourceStore;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
+import org.sonatype.nexus.proxy.events.EventListener;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 
 /**
@@ -33,7 +33,7 @@ import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
  * repositories using some technique.
  */
 public interface RequestRepositoryMapper
-    extends ConfigurationChangeListener
+    extends EventListener
 {
     String ROLE = RequestRepositoryMapper.class.getName();
 

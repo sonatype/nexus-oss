@@ -20,6 +20,7 @@
  */
 package org.sonatype.nexus.proxy.access;
 
+import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.repository.Repository;
@@ -28,8 +29,8 @@ import org.sonatype.nexus.proxy.repository.Repository;
  * A simple AccessManager implementation that allows everybody to access the Proximity core.
  * 
  * @author t.cservenak
- * @plexus.component instantiation-strategy="per-lookup" role-hint="open"
  */
+@Component( role = AccessManager.class, hint = "open" )
 public class OpenAccessManager
     implements AccessManager
 {

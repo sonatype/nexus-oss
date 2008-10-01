@@ -26,11 +26,14 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 
 import org.apache.commons.io.FilenameUtils;
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.util.IOUtil;
 import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.proxy.LoggingComponent;
+import org.sonatype.nexus.proxy.events.AbstractEvent;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.DefaultStorageCollectionItem;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
@@ -40,26 +43,22 @@ import org.sonatype.nexus.proxy.item.RepositoryItemUidFactory;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 
 import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.core.BaseException;
+import com.thoughtworks.xstream.XStreamException;
 
 /**
  * AttributeStorage implementation driven by XStream.
  * 
  * @author cstamas
- * @plexus.component
  */
+@Component( role = AttributeStorage.class )
 public class DefaultAttributeStorage
     extends LoggingComponent
     implements AttributeStorage, Initializable
 {
-    /**
-     * @plexus.requirement
-     */
+    @Requirement
     private ApplicationConfiguration applicationConfiguration;
 
-    /**
-     * @plexus.requirement
-     */
+    @Requirement
     private RepositoryItemUidFactory repositoryItemUidFactory;
 
     /**
@@ -84,12 +83,15 @@ public class DefaultAttributeStorage
 
     public void initialize()
     {
-        applicationConfiguration.addConfigurationChangeListener( this );
+        applicationConfiguration.addProximityEventListener( this );
     }
 
-    public void onConfigurationChange( ConfigurationChangeEvent evt )
+    public void onProximityEvent( AbstractEvent evt )
     {
-        this.workingDirectory = null;
+        if ( ConfigurationChangeEvent.class.isAssignableFrom( evt.getClass() ) )
+        {
+            this.workingDirectory = null;
+        }
     }
 
     /**
@@ -313,7 +315,7 @@ public class DefaultAttributeStorage
                     result.setLastRequested( System.currentTimeMillis() );
                 }
             }
-            catch ( BaseException e )
+            catch ( XStreamException e )
             {
                 // it is corrupt
                 getLogger().info( "Attributes of " + uid + " are corrupt, deleting it." );

@@ -1,5 +1,7 @@
 package org.sonatype.nexus.proxy.access;
 
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
@@ -9,14 +11,12 @@ import org.sonatype.nexus.proxy.repository.Repository;
  * A default access manager relying onto default NexusAuthorizer.
  * 
  * @author cstamas
- * @plexus.component
  */
+@Component( role = AccessManager.class )
 public class DefaultAccessManager
     implements AccessManager
 {
-    /**
-     * @plexus.requirement
-     */
+    @Requirement
     private NexusItemAuthorizer nexusItemAuthorizer;
 
     public void decide( ResourceStoreRequest request, Repository repository, Action action )

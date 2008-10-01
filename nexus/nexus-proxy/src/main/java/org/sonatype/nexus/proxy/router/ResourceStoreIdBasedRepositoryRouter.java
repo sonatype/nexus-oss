@@ -25,6 +25,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.proxy.NoSuchRepositoryGroupException;
@@ -40,8 +42,8 @@ import org.sonatype.nexus.proxy.registry.ContentClass;
  * Proximity Routers, this Router does not handle aggregations, since they are not needed.
  * 
  * @author cstamas
- * @plexus.component role="org.sonatype.nexus.proxy.router.RootRepositoryRouter"
  */
+@Component( role = RootRepositoryRouter.class )
 public class ResourceStoreIdBasedRepositoryRouter
     extends AbstractRegistryDrivenRepositoryRouter
     implements RepositoryRouter, Initializable
@@ -54,9 +56,8 @@ public class ResourceStoreIdBasedRepositoryRouter
 
     /**
      * The map of routers by their role-hint.
-     * 
-     * @plexus.requirement role="org.sonatype.nexus.proxy.router.RepositoryRouter"
      */
+    @Requirement( role = RepositoryRouter.class )
     private List<RepositoryRouter> routers;
 
     /**

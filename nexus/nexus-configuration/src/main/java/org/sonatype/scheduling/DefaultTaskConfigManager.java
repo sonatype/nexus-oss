@@ -41,11 +41,12 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
 import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
-import org.sonatype.nexus.configuration.ConfigurationChangeListener;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.model.CProps;
 import org.sonatype.nexus.configuration.model.CScheduleConfig;
 import org.sonatype.nexus.configuration.model.CScheduledTask;
+import org.sonatype.nexus.proxy.events.AbstractEvent;
+import org.sonatype.nexus.proxy.events.EventListener;
 import org.sonatype.scheduling.schedules.CronSchedule;
 import org.sonatype.scheduling.schedules.DailySchedule;
 import org.sonatype.scheduling.schedules.ManualRunSchedule;
@@ -63,7 +64,7 @@ import org.sonatype.scheduling.schedules.WeeklySchedule;
  */
 public class DefaultTaskConfigManager
     extends AbstractLogEnabled
-    implements TaskConfigManager, Initializable, Contextualizable, ConfigurationChangeListener
+    implements TaskConfigManager, Initializable, Contextualizable, EventListener
 {
     /**
      * The app config holding tasks.
@@ -86,12 +87,15 @@ public class DefaultTaskConfigManager
     public void initialize()
         throws InitializationException
     {
-        applicationConfiguration.addConfigurationChangeListener( this );
+        applicationConfiguration.addProximityEventListener( this );
     }
 
-    public void onConfigurationChange( ConfigurationChangeEvent e )
+    public void onProximityEvent( AbstractEvent e )
     {
-        // TODO
+        if ( ConfigurationChangeEvent.class.isAssignableFrom( e.getClass() ) )
+        {
+            // TODO
+        }
     }
 
     public void initializeTasks( Scheduler scheduler )
@@ -145,7 +149,7 @@ public class DefaultTaskConfigManager
     public <T> void addTask( ScheduledTask<T> task )
     {
         // RunNowSchedules are not saved
-        if ( RunNowSchedule.class.isAssignableFrom( task.getSchedule().getClass()) )
+        if ( RunNowSchedule.class.isAssignableFrom( task.getSchedule().getClass() ) )
         {
             return;
         }

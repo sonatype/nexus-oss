@@ -28,70 +28,73 @@ import java.util.Set;
 import org.apache.log4j.Appender;
 import org.apache.log4j.FileAppender;
 import org.apache.log4j.Logger;
+import org.codehaus.plexus.component.annotations.Component;
 
 /**
- * @plexus.component
+ * Log4J file manager.
+ * 
+ * @author cstamas
  */
+@Component( role = LogFileManager.class )
 public class Log4jLogFileManager
-    implements
-    LogFileManager
+    implements LogFileManager
 {
     public Log4jLogFileManager()
     {
         createLogDirectory();
     }
-    
+
     public File getLogFile( String filename )
     {
         Logger logger = Logger.getRootLogger();
-        
-        Enumeration<Appender> appenders = ( Enumeration<Appender> ) logger.getAllAppenders();
-        
+
+        Enumeration<Appender> appenders = (Enumeration<Appender>) logger.getAllAppenders();
+
         while ( appenders.hasMoreElements() )
         {
             Appender appender = appenders.nextElement();
-            
+
             if ( FileAppender.class.isAssignableFrom( appender.getClass() ) )
             {
-                File logfile = new File( ( ( FileAppender ) appender ).getFile() );
-                
+                File logfile = new File( ( (FileAppender) appender ).getFile() );
+
                 if ( logfile.getName().equals( filename ) )
                 {
                     return logfile;
                 }
             }
         }
-        
+
         return null;
     }
 
     public Set<File> getLogFiles()
     {
         Logger logger = Logger.getRootLogger();
-        
-        Enumeration<Appender> appenders = ( Enumeration<Appender> ) logger.getAllAppenders();
-        
+
+        Enumeration<Appender> appenders = (Enumeration<Appender>) logger.getAllAppenders();
+
         HashSet<File> files = new HashSet<File>();
-        
+
         while ( appenders.hasMoreElements() )
         {
             Appender appender = appenders.nextElement();
-            
+
             if ( FileAppender.class.isAssignableFrom( appender.getClass() ) )
             {
-                files.add( new File ( ( ( FileAppender ) appender ).getFile() ) );
+                files.add( new File( ( (FileAppender) appender ).getFile() ) );
             }
         }
-        
+
         return files;
     }
-    
+
     public void createLogDirectory()
     {
         for ( File file : getLogFiles() )
         {
             File parent = file.getParentFile();
-            
+
             if ( parent != null && !parent.exists() )
             {
                 parent.mkdirs();

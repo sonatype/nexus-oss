@@ -29,7 +29,7 @@ public class EhCacheCacheManagerTest
     public void testGetCache()
         throws Exception
     {
-        CacheManager cm = (CacheManager) lookup( CacheManager.ROLE );
+        CacheManager cm = (CacheManager) lookup( CacheManager.class );
         
         PathCache c = cm.getPathCache( "test" );
         
@@ -39,7 +39,7 @@ public class EhCacheCacheManagerTest
     public void testRemoveWithParents()
         throws Exception
     {
-        CacheManager cm = (CacheManager) lookup( CacheManager.ROLE );
+        CacheManager cm = (CacheManager) lookup( CacheManager.class );
         
         PathCache c = cm.getPathCache( "test" );
 
@@ -64,7 +64,7 @@ public class EhCacheCacheManagerTest
     public void testPathAsKey()
         throws Exception
     {
-        CacheManager cm = (CacheManager) lookup( CacheManager.ROLE );
+        CacheManager cm = (CacheManager) lookup( CacheManager.class );
         
         PathCache c = cm.getPathCache( "test" );
 

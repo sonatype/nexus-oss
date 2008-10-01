@@ -36,8 +36,6 @@ import org.sonatype.nexus.proxy.repository.ShadowRepository;
  */
 public interface ApplicationRuntimeConfigurationBuilder
 {
-    String ROLE = ApplicationRuntimeConfigurationBuilder.class.getName();
-
     void initialize( NexusConfiguration configuration );
 
     Repository createRepositoryFromModel( Configuration configuration, CRepository repository )

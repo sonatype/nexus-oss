@@ -60,7 +60,7 @@ public class M1TestsuiteEnvironmentBuilder
         for ( WebappContext remoteRepo : getServletServer().getWebappContexts() )
         {
 
-            M1Repository repo = (M1Repository) container.lookup( Repository.ROLE, "maven1" );
+            M1Repository repo = (M1Repository) container.lookup( Repository.class, "maven1" );
             // repo.enableLogging( env.getLogger().getChildLogger( "REPO" + repo.getId() ) );
             repo.setId( remoteRepo.getName() );
             repo.setRemoteUrl( getServletServer().getUrl( remoteRepo.getName() ) );
@@ -93,7 +93,7 @@ public class M1TestsuiteEnvironmentBuilder
         }
 
         // ading one hosted only
-        M1Repository repo = (M1Repository) container.lookup( Repository.ROLE, "maven1" );
+        M1Repository repo = (M1Repository) container.lookup( Repository.class, "maven1" );
         // repo.enableLogging( env.getLogger().getChildLogger( "REPO" + repo.getId() ) );
         repo.setId( "inhouse" );
         repo.setLocalUrl( env

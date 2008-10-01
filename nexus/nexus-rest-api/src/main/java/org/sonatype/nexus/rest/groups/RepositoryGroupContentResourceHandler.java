@@ -58,6 +58,6 @@ public class RepositoryGroupContentResourceHandler
         setResourceStorePath( "/" + groupId + getResourceStorePath() );
 
         // TODO: THIS IS BAD! Dynamic router needed!
-        return (ResourceStore) lookup( RepositoryRouter.ROLE, M2GroupIdBasedRepositoryRouter.ID );
+        return (ResourceStore) lookup( RepositoryRouter.class, M2GroupIdBasedRepositoryRouter.ID );
     }
 }

@@ -20,14 +20,15 @@
  */
 package org.sonatype.nexus.proxy.router;
 
+import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 
 /**
  * The default repoid based router.
  * 
  * @author cstamas
- * @plexus.component role-hint="repositories"
  */
+@Component( role = RepositoryRouter.class, hint = "repositories" )
 public class DefaultRepoIdBasedRepositoryRouter
     extends RepoIdBasedRepositoryRouter
 {

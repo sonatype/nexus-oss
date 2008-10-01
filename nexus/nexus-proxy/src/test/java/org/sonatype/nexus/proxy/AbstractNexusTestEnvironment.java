@@ -26,11 +26,11 @@ public abstract class AbstractNexusTestEnvironment
         WORK_HOME.mkdirs();
         CONF_HOME.mkdirs();
 
-        scheduler = (Scheduler) lookup( Scheduler.ROLE );
+        scheduler = (Scheduler) lookup( Scheduler.class );
         
         scheduler.startService();
         
-        cacheManager = (CacheManager) lookup( CacheManager.ROLE );
+        cacheManager = (CacheManager) lookup( CacheManager.class );
 
         cacheManager.startService();
 

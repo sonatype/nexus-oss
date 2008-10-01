@@ -24,6 +24,7 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.nexus.index.NexusIndexer;
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
@@ -49,16 +50,14 @@ public abstract class AbstractSearchableBasedRepositoryRouter
 
     /**
      * The searchable.
-     * 
-     * @plexus.requirement
      */
+    @Requirement
     private NexusIndexer indexer;
 
     /**
      * The repository registry.
-     * 
-     * @plexus.requirement
      */
+    @Requirement
     private RepositoryRegistry repositoryRegistry;
 
     /**

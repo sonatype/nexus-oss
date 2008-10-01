@@ -49,8 +49,8 @@ public class LocalNexusInstanceFilter
      */
     protected int beforeHandle( Request request, Response response )
     {
-        request.getAttributes().put( Nexus.ROLE, getLocalNexus() );
-        
+        request.getAttributes().put( Nexus.class.getName(), getLocalNexus() );
+
         return CONTINUE;
     }
 }

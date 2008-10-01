@@ -35,10 +35,10 @@ public class NexusBooterListener
         try
         {
             PlexusContainer c = (PlexusContainer) sce.getServletContext().getAttribute( "plexus" );
-            
-            Nexus nexus = (Nexus) c.lookup( Nexus.ROLE );
-            
-            sce.getServletContext().setAttribute( Nexus.ROLE, nexus );
+
+            Nexus nexus = (Nexus) c.lookup( Nexus.class.getName() );
+
+            sce.getServletContext().setAttribute( Nexus.class.getName(), nexus );
         }
         catch ( Exception e )
         {

@@ -30,8 +30,6 @@ import java.util.Collection;
  */
 public interface Store
 {
-    String ROLE = Store.class.getName();
-
     public Entry getEntry( String id )
         throws IOException;
 
@@ -46,5 +44,4 @@ public interface Store
 
     public void removeEntry( String id )
         throws IOException;
-
 }

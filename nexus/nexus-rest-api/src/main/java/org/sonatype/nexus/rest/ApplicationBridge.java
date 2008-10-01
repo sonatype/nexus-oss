@@ -24,10 +24,10 @@ import org.codehaus.plexus.component.repository.exception.ComponentLookupExcepti
 import org.restlet.Context;
 import org.restlet.Router;
 import org.sonatype.nexus.Nexus;
-import org.sonatype.nexus.NexusStartedEvent;
-import org.sonatype.nexus.NexusStoppingEvent;
-import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
-import org.sonatype.nexus.configuration.ConfigurationChangeListener;
+import org.sonatype.nexus.proxy.events.AbstractEvent;
+import org.sonatype.nexus.proxy.events.EventListener;
+import org.sonatype.nexus.proxy.events.NexusStartedEvent;
+import org.sonatype.nexus.proxy.events.NexusStoppedEvent;
 import org.sonatype.nexus.rest.artifact.ArtifactResourceContentHandler;
 import org.sonatype.nexus.rest.artifact.ArtifactResourceHandler;
 import org.sonatype.nexus.rest.artifact.ArtifactResourceRedirectHandler;
@@ -82,7 +82,7 @@ import com.thoughtworks.xstream.XStream;
  */
 public class ApplicationBridge
     extends PlexusRestletApplicationBridge
-    implements ConfigurationChangeListener
+    implements EventListener
 {
     private Nexus nexus;
 
@@ -97,15 +97,15 @@ public class ApplicationBridge
     }
 
     /**
-     * ConfigurationChangeListener.
+     * Listener.
      */
-    public void onConfigurationChange( ConfigurationChangeEvent evt )
+    public void onProximityEvent( AbstractEvent evt )
     {
         if ( NexusStartedEvent.class.isAssignableFrom( evt.getClass() ) )
         {
             recreateRoot( true );
         }
-        else if ( NexusStoppingEvent.class.isAssignableFrom( evt.getClass() ) )
+        else if ( NexusStoppedEvent.class.isAssignableFrom( evt.getClass() ) )
         {
             recreateRoot( false );
         }
@@ -123,7 +123,7 @@ public class ApplicationBridge
         {
             try
             {
-                nexus = (Nexus) getPlexusContainer().lookup( Nexus.ROLE );
+                nexus = (Nexus) getPlexusContainer().lookup( Nexus.class );
             }
             catch ( ComponentLookupException e )
             {
@@ -139,7 +139,7 @@ public class ApplicationBridge
      */
     protected void doConfigure()
     {
-        getNexus().getNexusConfiguration().addConfigurationChangeListener( this );
+        getNexus().getNexusConfiguration().addProximityEventListener( this );
     }
 
     /**
@@ -160,30 +160,30 @@ public class ApplicationBridge
 
         // creating _another_ router, that will be next isntance called after filtering
         Router applicationRouter = new Router( getContext() );
-               
+
         // attaching it after nif
         nif.setNext( applicationRouter );
-        
+
         return applicationRouter;
     }
-    
+
     /**
      * "Decorating" the root with our resources.
      * 
      * @TODO Move this to PlexusResources, except Status (see isStarted usage below!)
      */
-    @SuppressWarnings("deprecation")
+    @SuppressWarnings( "deprecation" )
     protected void doCreateRoot( Router applicationRouter, boolean isStarted )
-    {        
+    {
         attach( applicationRouter, false, "/status", StatusResourceHandler.class );
 
         attach( applicationRouter, false, "/status/command", CommandResourceHandler.class );
-        
+
         if ( !isStarted )
         {
             return;
         }
-        
+
         // ==========================================================
         // now we are playing with the two router: unprotectedResources for not protected
         // and protectedResources for protected ones
@@ -206,14 +206,14 @@ public class ApplicationBridge
 
         attach( applicationRouter, false, "/data_index", IndexResourceHandler.class );
 
-        attach( applicationRouter, false, "/data_index/{" + IndexResourceHandler.DOMAIN + "}/{" + IndexResourceHandler.TARGET_ID
-            + "}", IndexResourceHandler.class );
+        attach( applicationRouter, false, "/data_index/{" + IndexResourceHandler.DOMAIN + "}/{"
+            + IndexResourceHandler.TARGET_ID + "}", IndexResourceHandler.class );
 
-        attach( applicationRouter, false, "/data_index/{" + IndexResourceHandler.DOMAIN + "}/{" + IndexResourceHandler.TARGET_ID
-            + "}/content", IndexResourceHandler.class );
+        attach( applicationRouter, false, "/data_index/{" + IndexResourceHandler.DOMAIN + "}/{"
+            + IndexResourceHandler.TARGET_ID + "}/content", IndexResourceHandler.class );
 
-        attach( applicationRouter, false, "/data_cache/{" + CacheResourceHandler.DOMAIN + "}/{" + CacheResourceHandler.TARGET_ID
-            + "}/content", CacheResourceHandler.class );
+        attach( applicationRouter, false, "/data_cache/{" + CacheResourceHandler.DOMAIN + "}/{"
+            + CacheResourceHandler.TARGET_ID + "}/content", CacheResourceHandler.class );
 
         attach( applicationRouter, false, "/attributes", AttributesResourceHandler.class );
 
@@ -267,11 +267,8 @@ public class ApplicationBridge
 
         attach( applicationRouter, false, "/global_settings", GlobalConfigurationListResourceHandler.class );
 
-        attach(
-            applicationRouter,
-            false,
-            "/global_settings/{" + GlobalConfigurationResourceHandler.CONFIG_NAME_KEY + "}",
-            GlobalConfigurationResourceHandler.class );
+        attach( applicationRouter, false, "/global_settings/{" + GlobalConfigurationResourceHandler.CONFIG_NAME_KEY
+            + "}", GlobalConfigurationResourceHandler.class );
 
         attach( applicationRouter, false, "/repo_routes", RepositoryRouteListResourceHandler.class );
 
@@ -283,11 +280,8 @@ public class ApplicationBridge
 
         attach( applicationRouter, false, "/templates/repositories", RepositoryTemplateListResourceHandler.class );
 
-        attach(
-            applicationRouter,
-            false,
-            "/templates/repositories/{" + RepositoryTemplateResourceHandler.REPOSITORY_ID_KEY + "}",
-            RepositoryTemplateResourceHandler.class );
+        attach( applicationRouter, false, "/templates/repositories/{"
+            + RepositoryTemplateResourceHandler.REPOSITORY_ID_KEY + "}", RepositoryTemplateResourceHandler.class );
 
         attach( applicationRouter, false, "/schedules", ScheduledServiceListResourceHandler.class );
 
@@ -299,17 +293,18 @@ public class ApplicationBridge
             "/schedule_run/{" + ScheduledServiceRunResourceHandler.SCHEDULED_SERVICE_ID_KEY + "}",
             ScheduledServiceRunResourceHandler.class );
 
-        attach(
-            applicationRouter,
-            false,
-            "/schedules/{" + ScheduledServiceResourceHandler.SCHEDULED_SERVICE_ID_KEY + "}",
-            ScheduledServiceResourceHandler.class );
+        attach( applicationRouter, false, "/schedules/{" + ScheduledServiceResourceHandler.SCHEDULED_SERVICE_ID_KEY
+            + "}", ScheduledServiceResourceHandler.class );
 
         attach( applicationRouter, false, "/users", UserListResourceHandler.class );
 
         attach( applicationRouter, false, "/users/{" + UserResourceHandler.USER_ID_KEY + "}", UserResourceHandler.class );
 
-        attach( applicationRouter, false, "/users_reset/{" + UserResourceHandler.USER_ID_KEY + "}", UserResetResourceHandler.class );
+        attach(
+            applicationRouter,
+            false,
+            "/users_reset/{" + UserResourceHandler.USER_ID_KEY + "}",
+            UserResetResourceHandler.class );
 
         attach(
             applicationRouter,

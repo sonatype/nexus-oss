@@ -28,9 +28,8 @@ package org.sonatype.nexus.jsecurity;
 public class NoSuchEmailException
     extends Exception
 {
-
     private static final long serialVersionUID = 2942353698404055394L;
-    
+
     public NoSuchEmailException()
     {
         super( "Email not found!" );

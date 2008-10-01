@@ -36,7 +36,7 @@ public class RebuildAttributesTest
     {
         super.setUp();
 
-        defaultNexus = (DefaultNexus) lookup( Nexus.ROLE );
+        defaultNexus = (DefaultNexus) lookup( Nexus.class );
     }
     
     protected void tearDown()

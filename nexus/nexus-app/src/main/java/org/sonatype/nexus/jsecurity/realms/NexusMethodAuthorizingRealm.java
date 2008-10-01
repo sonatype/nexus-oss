@@ -1,9 +1,9 @@
 package org.sonatype.nexus.jsecurity.realms;
 
-/**
- * @plexus.component role="org.jsecurity.realm.Realm" role-hint="NexusMethodAuthorizingRealm"
- *
- */
+import org.codehaus.plexus.component.annotations.Component;
+import org.jsecurity.realm.Realm;
+
+@Component( role = Realm.class, hint = "NexusMethodAuthorizingRealm" )
 public class NexusMethodAuthorizingRealm
     extends AbstractNexusAuthorizingRealm
 {

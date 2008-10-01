@@ -31,7 +31,7 @@ public class FileConfigurationSourceTest
     protected SecurityConfigurationSource getConfigurationSource()
         throws Exception
     {
-        FileConfigurationSource source = ( FileConfigurationSource ) lookup( SecurityConfigurationSource.ROLE, "file" );
+        FileConfigurationSource source = ( FileConfigurationSource ) lookup( SecurityConfigurationSource.class, "file" );
         
         source.setConfigurationFile( new File( getSecurityConfiguration() ) );
         

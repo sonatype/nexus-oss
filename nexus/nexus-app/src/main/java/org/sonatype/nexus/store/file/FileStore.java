@@ -27,28 +27,31 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
-import org.sonatype.nexus.configuration.ConfigurationChangeListener;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
+import org.sonatype.nexus.proxy.events.AbstractEvent;
+import org.sonatype.nexus.proxy.events.EventListener;
 import org.sonatype.nexus.store.DefaultEntry;
 import org.sonatype.nexus.store.Entry;
 import org.sonatype.nexus.store.Store;
 
 import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.core.BaseException;
+import com.thoughtworks.xstream.XStreamException;
 import com.thoughtworks.xstream.io.xml.XppDriver;
 
 /**
  * The file backed store.
  * 
  * @author cstamas
- * @plexus.component role-hint="file"
  */
+@Component( role = Store.class, hint = "file" )
 public class FileStore
-    implements Store, ConfigurationChangeListener, Initializable
+    implements Store, EventListener, Initializable
 {
-    /** @plexus.requirement */
+    @Requirement
     private ApplicationConfiguration applicationConfiguration;
 
     private File baseDir;
@@ -64,12 +67,15 @@ public class FileStore
 
     public void initialize()
     {
-        applicationConfiguration.addConfigurationChangeListener( this );
+        applicationConfiguration.addProximityEventListener( this );
     }
 
-    public void onConfigurationChange( ConfigurationChangeEvent evt )
+    public void onProximityEvent( AbstractEvent evt )
     {
-        this.baseDir = null;
+        if ( ConfigurationChangeEvent.class.isAssignableFrom( evt.getClass() ) )
+        {
+            this.baseDir = null;
+        }
     }
 
     public void setBaseDir( File baseDir )
@@ -122,7 +128,7 @@ public class FileStore
         File[] files = getBaseDir().listFiles();
 
         ArrayList<Entry> entries = new ArrayList<Entry>( files.length );
-        
+
         for ( int i = 0; i < files.length; i++ )
         {
             entries.add( constructEntry( files[i] ) );
@@ -180,7 +186,7 @@ public class FileStore
 
             result = new DefaultEntry( file.getName().substring( 0, file.getName().length() - 4 ), content );
         }
-        catch ( BaseException e )
+        catch ( XStreamException e )
         {
             // file is corrupt
             file.delete();
