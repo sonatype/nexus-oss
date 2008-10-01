@@ -1,15 +1,26 @@
 package org.sonatype.nexus.rest;
 
+import java.util.logging.Level;
+
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
 import org.restlet.Context;
 import org.restlet.data.Reference;
 import org.restlet.data.Request;
+import org.restlet.data.Response;
 import org.restlet.data.Status;
+import org.restlet.resource.Representation;
 import org.restlet.resource.ResourceException;
 import org.sonatype.nexus.Nexus;
+import org.sonatype.nexus.configuration.ConfigurationException;
+import org.sonatype.nexus.configuration.validator.InvalidConfigurationException;
+import org.sonatype.nexus.configuration.validator.ValidationMessage;
+import org.sonatype.nexus.configuration.validator.ValidationResponse;
+import org.sonatype.nexus.rest.model.NexusError;
+import org.sonatype.nexus.rest.model.NexusErrorResponse;
 import org.sonatype.plexus.rest.resource.AbstractPlexusResource;
 import org.sonatype.plexus.rest.resource.PlexusResource;
+import org.sonatype.plexus.rest.resource.PlexusResourceException;
 
 public abstract class AbstractNexusPlexusResource
     extends AbstractPlexusResource
@@ -70,6 +81,67 @@ public abstract class AbstractNexusPlexusResource
     protected PlexusContainer getPlexusContainer( Context context )
     {
         return (PlexusContainer) context.getAttributes().get( PlexusConstants.PLEXUS_KEY );
+    }
+    
+    
+    protected NexusErrorResponse getNexusErrorResponse( String id, String msg )
+    {
+        NexusErrorResponse ner = new NexusErrorResponse();
+        NexusError ne = new NexusError();
+        ne.setId( id );
+        ne.setMsg( msg );
+        ner.addError( ne );
+        return ner;
+    }
+    
+    protected void handleInvalidConfigurationException(
+        org.sonatype.jsecurity.realms.tools.InvalidConfigurationException e ) throws PlexusResourceException
+    {
+        getLogger().warn( "Configuration error!", e );
+        
+        NexusErrorResponse nexusErrorResponse;
+
+        org.sonatype.jsecurity.realms.validator.ValidationResponse vr = e.getValidationResponse();
+
+        if ( vr != null && vr.getValidationErrors().size() > 0 )
+        {
+            org.sonatype.jsecurity.realms.validator.ValidationMessage vm = vr.getValidationErrors().get( 0 );
+            nexusErrorResponse = getNexusErrorResponse( vm.getKey(), vm.getShortMessage() );
+        }
+        else
+        {
+            nexusErrorResponse = getNexusErrorResponse( "*", e.getMessage() );
+        }
+        
+        throw new PlexusResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Configuration error.", nexusErrorResponse );
+    }
+
+    protected void handleConfigurationException( ConfigurationException e ) throws PlexusResourceException
+    {
+        getLogger().warn( "Configuration error!", e );
+        
+        NexusErrorResponse nexusErrorResponse;
+
+        if ( InvalidConfigurationException.class.isAssignableFrom( e.getClass() ) )
+        {
+            ValidationResponse vr = ( (InvalidConfigurationException) e ).getValidationResponse();
+
+            if ( vr != null && vr.getValidationErrors().size() > 0 )
+            {
+                ValidationMessage vm = vr.getValidationErrors().get( 0 );
+                nexusErrorResponse = getNexusErrorResponse( vm.getKey(), vm.getShortMessage() );
+            }
+            else
+            {
+                nexusErrorResponse = getNexusErrorResponse( "*", e.getMessage() );
+            }
+        }
+        else
+        {
+            nexusErrorResponse = getNexusErrorResponse( "*", e.getMessage() );
+        }
+        
+        throw new PlexusResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Configuration error.", nexusErrorResponse );
     }
 
 }

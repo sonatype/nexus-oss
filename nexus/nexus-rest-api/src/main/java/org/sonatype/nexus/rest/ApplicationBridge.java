@@ -51,8 +51,6 @@ import org.sonatype.nexus.rest.repositories.RepositoryMetaResourceHandler;
 import org.sonatype.nexus.rest.repositories.RepositoryResourceHandler;
 import org.sonatype.nexus.rest.repositories.RepositoryStatusResourceHandler;
 import org.sonatype.nexus.rest.repositorystatuses.RepositoryStatusesListResourceHandler;
-import org.sonatype.nexus.rest.repotargets.RepositoryTargetListResourceHandler;
-import org.sonatype.nexus.rest.repotargets.RepositoryTargetResourceHandler;
 import org.sonatype.nexus.rest.roles.RoleListResourceHandler;
 import org.sonatype.nexus.rest.roles.RoleResourceHandler;
 import org.sonatype.nexus.rest.routes.RepositoryRouteListResourceHandler;
@@ -334,14 +332,6 @@ public class ApplicationBridge
             false,
             "/privileges/{" + PrivilegeResourceHandler.PRIVILEGE_ID_KEY + "}",
             PrivilegeResourceHandler.class );
-
-        attach( applicationRouter, false, "/repo_targets", RepositoryTargetListResourceHandler.class );
-
-        attach(
-            applicationRouter,
-            false,
-            "/repo_targets/{" + RepositoryTargetResourceHandler.REPO_TARGET_ID_KEY + "}",
-            RepositoryTargetResourceHandler.class );
 
         attach( applicationRouter, false, "/repo_content_classes", ContentClassesListResourceHandler.class );
     }
