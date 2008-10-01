@@ -1,0 +1,8 @@
+<component-set>
+	<components>
+		<component>
+			<role>org.sonatype.scheduling.TaskConfigManager</role>
+			<implementation>org.sonatype.scheduling.SimpleTaskConfigManager</implementation>
+		</component>
+	</components>
+</component-set>
