@@ -32,8 +32,7 @@ public class RepositoryTargetPlexusResource
     @Override
     public Object getPayloadInstance()
     {
-        // TODO Auto-generated method stub
-        return null;
+        return new RepositoryTargetResourceResponse();
     }
 
     @Override
