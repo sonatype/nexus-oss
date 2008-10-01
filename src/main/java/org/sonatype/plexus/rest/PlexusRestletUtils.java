@@ -36,7 +36,23 @@ public class PlexusRestletUtils
         return container.lookup( role );
     }
 
+    public static Object plexusLookup( Context context, Class<?> role )
+        throws ComponentLookupException
+    {
+        PlexusContainer container = (PlexusContainer) context.getAttributes().get( PlexusConstants.PLEXUS_KEY );
+
+        return container.lookup( role );
+    }
+
     public static Object plexusLookup( Context context, String role, String roleHint )
+        throws ComponentLookupException
+    {
+        PlexusContainer container = (PlexusContainer) context.getAttributes().get( PlexusConstants.PLEXUS_KEY );
+
+        return container.lookup( role, roleHint );
+    }
+
+    public static Object plexusLookup( Context context, Class<?> role, String roleHint )
         throws ComponentLookupException
     {
         PlexusContainer container = (PlexusContainer) context.getAttributes().get( PlexusConstants.PLEXUS_KEY );
