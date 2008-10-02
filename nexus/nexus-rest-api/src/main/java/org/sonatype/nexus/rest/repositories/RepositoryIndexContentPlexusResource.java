@@ -21,11 +21,15 @@
 package org.sonatype.nexus.rest.repositories;
 
 import java.io.IOException;
-import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
+import org.apache.lucene.index.Term;
+import org.apache.lucene.search.Query;
+import org.apache.lucene.search.TermQuery;
 import org.codehaus.plexus.util.StringUtils;
 import org.restlet.Context;
 import org.restlet.data.Request;
@@ -33,13 +37,18 @@ import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
+import org.sonatype.nexus.index.ArtifactInfo;
+import org.sonatype.nexus.index.FlatSearchRequest;
+import org.sonatype.nexus.index.FlatSearchResponse;
 import org.sonatype.nexus.index.IndexerManager;
 import org.sonatype.nexus.index.NexusIndexer;
+import org.sonatype.nexus.index.context.IndexContextInInconsistentStateException;
 import org.sonatype.nexus.index.context.IndexingContext;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
 import org.sonatype.nexus.rest.model.ContentListResource;
 import org.sonatype.nexus.rest.model.ContentListResourceResponse;
+import org.sonatype.nexus.rest.model.NexusArtifact;
 
 /**
  * Index content resource.
@@ -89,63 +98,179 @@ public class RepositoryIndexContentPlexusResource extends AbstractNexusPlexusRes
     
     protected Object createResponse( Request request, IndexingContext indexingContext )
             throws ResourceException {
+        NexusIndexer indexer = indexerManager.getNexusIndexer();
         String path = parsePathFromUri( request.getResourceRef().getRemainingPart() );
-        Collection<String> groups = getGroups( path, indexingContext ); 
         
         ContentListResourceResponse response = new ContentListResourceResponse();
-
-        for ( String group : groups )
-        {
-            ContentListResource resource = new ContentListResource();
-
-            resource.setText( group );
-            resource.setLeaf( false );
-            resource.setResourceURI( createChildReference( request, group ).toString() + "/" );
-            resource.setRelativePath( path + group + "/" );
-            resource.setLastModified( new Date() );
-            resource.setSizeOnDisk( -1 );
-
-            response.addData( resource );
-        }
         
-        return response;
-    }
-    
-    protected Collection<String> getGroups( String path, IndexingContext indexingContext )
-            throws ResourceException {
-        NexusIndexer indexer = indexerManager.getNexusIndexer();
-        path = path.substring( 1 ); // strip the leading slash
-
         try {
-            if ( path.length() == 0 ) {
-              return indexer.getRootGroups( indexingContext );
+            if ( "/".equals( path ) ) {
+                // get root groups and finish
+                Set<String> rootGroups = indexer.getRootGroups( indexingContext );
+                for ( String group : rootGroups ) {
+                   response.addData( createGroupResource( request, path, group ) );
+                }
             }
             else {
-                path = path.replace( '/', '.' );
-                int n = path.length();
-                Set<String> result = new HashSet<String>();
-                Set<String> groups = indexer.getAllGroups( indexingContext );
-                for ( String group : groups ) {
-                    if ( group.startsWith( path ) ) {
-                        group = group.substring( n );
-                        int nextDot = group.indexOf( '.' );
-                        if ( nextDot > -1 ) {
-                            group = group.substring( 0, nextDot );
-                        }
-                        if ( ! result.contains( group ) ) {
-                            result.add( group );
-                        }
-                    }
-                }
-                return result;
+                Set<String> allGroups = indexer.getAllGroups( indexingContext );
+
+                ContentListResource rootResource = new ContentListResource();
+                rootResource.setRelativePath( path );
+                loadChildren( request, rootResource, indexingContext, allGroups );
+                response.setData( rootResource.getChildren() );
             }
         }
         catch ( IOException e ) {
             throw new ResourceException( Status.SERVER_ERROR_INTERNAL, e );
         }
+        
+        return response;
+    }
+
+    protected void loadChildren( Request request, ContentListResource rootResource, 
+            IndexingContext indexingContext, Set<String> allGroups ) throws ResourceException {
+        String path = rootResource.getRelativePath();
+        Map<String,ContentListResource> folders = new HashMap<String,ContentListResource>(); 
+
+        Set<ArtifactInfo> artifacts = getArtifacts( path, indexingContext );
+        for ( ArtifactInfo ai : artifacts ) {
+            NexusArtifact na = ai2Na( request, ai );
+            if ( na == null ) {
+                continue;
+            }
+
+            String versionKey = ai.artifactId + ":" + ai.version;
+            ContentListResource versionResource = folders.get( versionKey );
+            if ( versionResource == null ) {
+                ContentListResource artifactResource = folders.get( ai.artifactId );
+                if ( artifactResource == null ) {
+                    artifactResource = createArtifactResource( request, path, ai );
+                    rootResource.getChildren().add( artifactResource );
+                    folders.put( ai.artifactId, artifactResource );
+                }
+
+                versionResource = createVersionResource( request, path, ai );
+                artifactResource.getChildren().add( versionResource );
+                folders.put( versionKey, versionResource );
+            }
+            
+            versionResource.getChildren().add( createFileResource( request, path, ai, na.getResourceURI() ) );
+        }
+
+        Set<String> groups = getGroups( path, allGroups ); 
+        for ( String group : groups ) {
+            ContentListResource groupResource = findChild( rootResource, group );
+            if ( groupResource == null ) {
+                groupResource = createGroupResource( request, path, group );
+                rootResource.getChildren().add( groupResource );
+            }
+            else {
+                // if the folder has been created as an artifact name,
+                // we need to check for possible nested groups as well,
+                // otherwise ExtJS will consider the resource loaded,
+                // and will never query it again
+                loadChildren( request, groupResource, indexingContext, allGroups );
+            }
+        }
+    }
+
+    protected ContentListResource createGroupResource( Request request,
+            String path, String group ) {
+        ContentListResource groupResource = new ContentListResource();
+        path += group + "/";
+        groupResource.setText( group );
+        groupResource.setLeaf( false );
+        groupResource.setResourceURI( request.getResourceRef().getBaseRef() + path );
+        groupResource.setRelativePath( path );
+        groupResource.setLastModified( new Date() );
+        groupResource.setSizeOnDisk( -1 );
+        return groupResource;
+    }
+
+    protected ContentListResource createArtifactResource( Request request,
+            String path, ArtifactInfo ai ) {
+        ContentListResource artifactResource = new ContentListResource();
+        path += ai.artifactId + "/";
+        artifactResource.setText( ai.artifactId );
+        artifactResource.setLeaf( false );
+        artifactResource.setResourceURI( request.getResourceRef().getBaseRef() + path );
+        artifactResource.setRelativePath( path );
+        artifactResource.setLastModified( new Date( ai.lastModified ) );
+        artifactResource.setSizeOnDisk( -1 );
+        return artifactResource;
+    }
+
+    protected ContentListResource createVersionResource( Request request,
+            String path, ArtifactInfo ai ) {
+        path += ai.artifactId + "/" + ai.version + "/";
+        ContentListResource versionResource = new ContentListResource();
+        versionResource.setText( ai.version );
+        versionResource.setLeaf( false );
+        versionResource.setResourceURI( request.getResourceRef().getBaseRef() + path );
+        versionResource.setRelativePath( path );
+        versionResource.setLastModified( new Date( ai.lastModified ) );
+        versionResource.setSizeOnDisk( -1 );
+        return versionResource;
+    }
+
+    protected ContentListResource createFileResource( Request request,
+            String path, ArtifactInfo ai, String resourceURI ) {
+        String filename = ai.artifactId + "-" + ai.version + ".jar";
+        path += ai.artifactId + "/" + ai.version + "/" + filename;
+        ContentListResource fileResource = new ContentListResource();
+        fileResource.setText( filename );
+        fileResource.setLeaf( true );
+        fileResource.setResourceURI( resourceURI );//request.getResourceRef().getBaseRef() + path );
+        System.out.println("BEBEBE:resourceURI=" + resourceURI);
+        fileResource.setRelativePath( path );
+        fileResource.setLastModified( new Date( ai.lastModified ) );
+        fileResource.setSizeOnDisk( ai.size );
+        return fileResource;
+    }
+
+    protected Set<String> getGroups( String path, Set<String> allGroups )
+            throws ResourceException {
+        path = path.substring( 1 ).replace( '/', '.' );
+        int n = path.length();
+        Set<String> result = new HashSet<String>();
+        for ( String group : allGroups ) {
+            if ( group.startsWith( path ) ) {
+                group = group.substring( n );
+                int nextDot = group.indexOf( '.' );
+                if ( nextDot > -1 ) {
+                    group = group.substring( 0, nextDot );
+                }
+                if ( ! result.contains( group ) ) {
+                    result.add( group );
+                }
+            }
+        }
+        return result;
     }
     
-    protected String parsePathFromUri(String parsedPath) {
+    protected Set<ArtifactInfo> getArtifacts( String path, IndexingContext indexingContext )
+            throws ResourceException {
+        NexusIndexer indexer = indexerManager.getNexusIndexer();
+
+        path = path.substring( 1 ).replace( '/', '.' );
+        if ( path.endsWith( "." ) ) {
+            path = path.substring( 0, path.length() - 1 );
+        }
+
+        try {
+            Query q = new TermQuery( new Term( ArtifactInfo.GROUP_ID, path ) );
+            FlatSearchRequest searchRequest = new FlatSearchRequest( q, indexingContext );
+            FlatSearchResponse searchResponse = indexer.searchFlat( searchRequest );
+            
+            return searchResponse.getResults();
+        } catch ( IOException e ) {
+            throw new ResourceException( Status.SERVER_ERROR_INTERNAL, e );
+        } catch ( IndexContextInInconsistentStateException e ) {
+            throw new ResourceException( Status.SERVER_ERROR_INTERNAL, e );
+        }
+    }
+    
+    protected String parsePathFromUri( String parsedPath ) {
 
         // get rid of query part
         if (parsedPath.contains("?")) {
@@ -162,5 +287,17 @@ public class RepositoryIndexContentPlexusResource extends AbstractNexusPlexusRes
         }
 
         return parsedPath;
+    }
+    
+    protected ContentListResource findChild( ContentListResource parent, String name ) {
+        for ( Object child : parent.getChildren() ) {
+            if ( child instanceof ContentListResource ) {
+                ContentListResource resource = ( ContentListResource ) child;
+                if ( name.equals( resource.getText() ) ) {
+                    return resource;
+                }
+            } 
+        }
+        return null;
     }
 }
