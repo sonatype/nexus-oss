@@ -35,6 +35,8 @@ Sonatype.repoServer.RepoMaintPanel = function(config){
   var defaultConfig = {};
   var forceStatuses = false;
   Ext.apply(this, config, defaultConfig);
+
+  this.browseIndex = false;
   
   this.oldSearchText = '';
   this.searchTask = new Ext.util.DelayedTask( this.startSearch, this, [this]);
@@ -194,7 +196,7 @@ Sonatype.repoServer.RepoMaintPanel = function(config){
     var isGroup = r.indexOf( Sonatype.config.repos.urls.groups ) > -1;
     var hasHost = r.indexOf(Sonatype.config.host) > -1;
     
-    r = r.replace(Sonatype.config.browsePathSnippet, '');
+    r = r.replace(this.getBrowsePathSnippet ? this.getBrowsePathSnippet() : Sonatype.config.browsePathSnippet, '');
 
     if ( isGroup ) {
       r = r.replace(Sonatype.config.repos.urls.groups, Sonatype.config.content.groups);
@@ -207,7 +209,7 @@ Sonatype.repoServer.RepoMaintPanel = function(config){
   };
   
   this.restToRemoteUrl = function(restUrl, repoRecord) {
-    return repoRecord.get('remoteUri') + restUrl.replace(Sonatype.config.browsePathSnippet, '').replace(repoRecord.get('resourceURI'), '');
+    return repoRecord.get('remoteUri') + restUrl.replace(this.getBrowsePathSnippet(), '').replace(repoRecord.get('resourceURI'), '');
   };
 
   this.groupRecordConstructor = Ext.data.Record.create([
@@ -567,7 +569,8 @@ Ext.extend(Sonatype.repoServer.RepoMaintPanel, Sonatype.repoServer.AbstractRepoP
       var menu = new Ext.menu.Menu({
         id:'repo-maint-browse-ctx'
       });
-      
+
+      if ( ! this.browseIndex ) {
         if (clearcachPriv && !isVirtualRepo){
           menu.add(this.actions.clearCache);
         }
@@ -577,6 +580,7 @@ Ext.extend(Sonatype.repoServer.RepoMaintPanel, Sonatype.repoServer.AbstractRepoP
         if (attributesPriv){
           menu.add(this.actions.rebuildAttributes);
         }
+      }
       
       if (node.isLeaf()){
         if (isProxyRepo){
@@ -589,7 +593,9 @@ Ext.extend(Sonatype.repoServer.RepoMaintPanel, Sonatype.repoServer.AbstractRepoP
       }
       
       if (!node.isRoot && !isGroup){
-        menu.add(this.actions.deleteRepoItem);
+        if ( ! this.browseIndex ) {
+          menu.add(this.actions.deleteRepoItem);
+        }
         if (isProxyRepo && !node.isLeaf()){
           menu.add(this.actions.viewRemote);
         }
@@ -1030,14 +1036,19 @@ Ext.extend(Sonatype.repoServer.RepoMaintPanel, Sonatype.repoServer.AbstractRepoP
     if ( this.browseSelector.value != item.value ) {
       this.browseSelector.value = item.value;
       this.browseSelector.setText( item.text );
-      
+      this.browseIndex = item.value == 1
+
       this.reloadTree();
     }
   },
   
   getBrowsePath: function( baseUrl ) {
-    return ( baseUrl + ( this.browseSelector.value ?
-      Sonatype.config.browseIndexPathSnippet : Sonatype.config.browsePathSnippet ) ) + '/'; 
+    return baseUrl + this.getBrowsePathSnippet() + '/'; 
+  },
+
+  getBrowsePathSnippet: function() {
+    return this.browseIndex ?
+      Sonatype.config.browseIndexPathSnippet : Sonatype.config.browsePathSnippet;
   },
   
   reloadTree: function() {
