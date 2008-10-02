@@ -195,8 +195,9 @@ Sonatype.repoServer.RepoMaintPanel = function(config){
   this.restToContentUrl = function(r) {
     var isGroup = r.indexOf( Sonatype.config.repos.urls.groups ) > -1;
     var hasHost = r.indexOf(Sonatype.config.host) > -1;
-    
-    r = r.replace(this.getBrowsePathSnippet ? this.getBrowsePathSnippet() : Sonatype.config.browsePathSnippet, '');
+
+    var snippet = r.indexOf( Sonatype.config.browseIndexPathSnippet ) == -1 ? Sonatype.config.browsePathSnippet : Sonatype.config.browseIndexPathSnippet;
+    r = r.replace(snippet, '');
 
     if ( isGroup ) {
       r = r.replace(Sonatype.config.repos.urls.groups, Sonatype.config.content.groups);
@@ -208,8 +209,9 @@ Sonatype.repoServer.RepoMaintPanel = function(config){
     return hasHost ? r : ( Sonatype.config.host + r );
   };
   
-  this.restToRemoteUrl = function(restUrl, repoRecord) {
-    return repoRecord.get('remoteUri') + restUrl.replace(this.getBrowsePathSnippet(), '').replace(repoRecord.get('resourceURI'), '');
+  this.restToRemoteUrl = function(node, repoRecord) {
+    var restUrl = node.id.replace( node.isLeaf() ? Sonatype.config.browsePathSnippet : this.getBrowsePathSnippet(), '' );
+    return repoRecord.get('remoteUri') + restUrl.replace(repoRecord.get('resourceURI'), '');
   };
 
   this.groupRecordConstructor = Ext.data.Record.create([
@@ -585,7 +587,7 @@ Ext.extend(Sonatype.repoServer.RepoMaintPanel, Sonatype.repoServer.AbstractRepoP
       if (node.isLeaf()){
         if (isProxyRepo){
           var rec = (this.ctxRecord) ? this.ctxRecord : this.reposGridPanel.getSelectionModel().getSelected();      
-          this.actions.downloadFromRemote.href = this.restToRemoteUrl(node.id,rec);
+          this.actions.downloadFromRemote.href = this.restToRemoteUrl(node,rec);
           menu.add(this.actions.downloadFromRemote);
         }
         this.actions.download.href = this.restToContentUrl(node.id);
@@ -625,7 +627,7 @@ Ext.extend(Sonatype.repoServer.RepoMaintPanel, Sonatype.repoServer.AbstractRepoP
     event.stopEvent();
     if(this.ctxBrowseNode){
       var rec = (this.ctxRecord) ? this.ctxRecord : this.reposGridPanel.getSelectionModel().getSelected();      
-      window.open(this.restToRemoteUrl(this.ctxBrowseNode.id,rec));
+      window.open(this.restToRemoteUrl(this.ctxBrowseNode,rec));
     }
   },  
   
