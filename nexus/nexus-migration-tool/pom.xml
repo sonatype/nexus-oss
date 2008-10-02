@@ -70,47 +70,10 @@
 	<build>
 		<plugins>
 			<plugin>
-				<artifactId>maven-enforcer-plugin</artifactId>
-				<executions>
-					<execution>
-						<goals>
-							<goal>enforce</goal>
-						</goals>
-						<id>ensure-no-commons-logging</id>
-						<configuration>
-							<rules>
-								<bannedDependencies>
-									<excludes>
-										<exclude>
-											commons-logging:*
-										</exclude>
-									</excludes>
-									<message>
-										commons-logging conflicts with
-										slf4j. You probably added a
-										dependency that is missing the
-										exclusions.
-									</message>
-								</bannedDependencies>
-							</rules>
-							<fail>true</fail>
-						</configuration>
-					</execution>
-				</executions>
+				<groupId>org.codehaus.plexus</groupId>
+				<artifactId>plexus-component-metadata</artifactId>
 			</plugin>
 		</plugins>
-		<pluginManagement>
-			<plugins>
-				<plugin>
-					<groupId>org.codehaus.plexus</groupId>
-					<artifactId>plexus-maven-plugin</artifactId>
-				</plugin>
-				<plugin>
-					<groupId>org.codehaus.modello</groupId>
-					<artifactId>modello-maven-plugin</artifactId>
-				</plugin>
-			</plugins>
-		</pluginManagement>
 	</build>
 
 </project>

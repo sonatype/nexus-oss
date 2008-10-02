@@ -87,7 +87,7 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-		<!-- A big hack here -->
+		<!-- commons-logging is needed compile time coz JSecurity derivatives are using it -->
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>jcl-over-slf4j</artifactId>
@@ -135,34 +135,6 @@
 			<plugin>
 				<groupId>org.codehaus.plexus</groupId>
 				<artifactId>plexus-component-metadata</artifactId>
-				<executions>
-					<execution>
-						<id>default</id>
-						<goals>
-							<goal>generate-metadata</goal>
-						</goals>
-						<phase>process-classes</phase>
-						<configuration>
-							<outputDirectory>
-								${project.build.directory}/plexus
-							</outputDirectory>
-						</configuration>
-					</execution>
-					<execution>
-						<id>merge</id>
-						<goals>
-							<goal>merge-metadata</goal>
-						</goals>
-						<phase>process-classes</phase>
-						<configuration>
-							<descriptors>
-								<descriptor>src/main/plexus/components.xml</descriptor>
-								<descriptor>${project.build.directory}/plexus/META-INF/plexus/components.xml</descriptor>
-							</descriptors>
-							<output>${project.build.outputDirectory}/META-INF/plexus/components.xml</output>
-						</configuration>
-					</execution>
-				</executions>
 			</plugin>
 		</plugins>
 	</build>

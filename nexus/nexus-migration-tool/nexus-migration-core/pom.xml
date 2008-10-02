@@ -81,12 +81,6 @@
 				<filtering>true</filtering>
 			</resource>
 		</resources>
-		<plugins>
-			<plugin>
-				<groupId>org.codehaus.plexus</groupId>
-				<artifactId>plexus-maven-plugin</artifactId>
-			</plugin>
-		</plugins>
 	</build>
 
 </project>

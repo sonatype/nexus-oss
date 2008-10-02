@@ -117,24 +117,6 @@
 					</archive>
 				</configuration>
 			</plugin>
-			<plugin>
-				<groupId>org.codehaus.plexus</groupId>
-				<artifactId>plexus-maven-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>descriptor</id>
-						<goals>
-							<goal>descriptor</goal>
-						</goals>
-					</execution>
-					<execution>
-						<id>merge</id>
-						<goals>
-							<goal>merge-descriptors</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
 		</plugins>
 	</build>
 

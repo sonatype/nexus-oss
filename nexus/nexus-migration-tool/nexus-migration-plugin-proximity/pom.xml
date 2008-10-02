@@ -95,10 +95,6 @@
 					</archive>
 				</configuration>
 			</plugin>
-			<plugin>
-				<groupId>org.codehaus.plexus</groupId>
-				<artifactId>plexus-maven-plugin</artifactId>
-			</plugin>
 		</plugins>
 	</build>
 

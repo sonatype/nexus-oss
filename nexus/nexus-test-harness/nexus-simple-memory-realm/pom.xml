@@ -8,14 +8,14 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>nexus-simple-memory-realm</artifactId>
     <name>A sample realm, to test extending security.</name>
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.codehaus.plexus</groupId>
-                <artifactId>plexus-maven-plugin</artifactId>
-            </plugin>
-        </plugins>
-    </build>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.codehaus.plexus</groupId>
+				<artifactId>plexus-component-metadata</artifactId>
+			</plugin>
+		</plugins>
+	</build>
     <dependencies>
         <dependency>
             <groupId>org.jsecurity</groupId>
