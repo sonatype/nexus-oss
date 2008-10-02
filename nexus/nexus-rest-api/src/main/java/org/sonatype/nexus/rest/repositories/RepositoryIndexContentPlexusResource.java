@@ -221,7 +221,6 @@ public class RepositoryIndexContentPlexusResource extends AbstractNexusPlexusRes
         fileResource.setText( filename );
         fileResource.setLeaf( true );
         fileResource.setResourceURI( resourceURI );//request.getResourceRef().getBaseRef() + path );
-        System.out.println("BEBEBE:resourceURI=" + resourceURI);
         fileResource.setRelativePath( path );
         fileResource.setLastModified( new Date( ai.lastModified ) );
         fileResource.setSizeOnDisk( ai.size );
