@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8"?>
+    <!--
+        /* * Nexus: Maven Repository Manager * Copyright (C) 2008 Sonatype Inc. * * This file is part of Nexus. * * This program is free
+        software: you can redistribute it and/or modify * it under the terms of the GNU General Public License as published by * the Free
+        Software Foundation, either version 3 of the License, or * (at your option) any later version. * * This program is distributed in
+        the hope that it will be useful, * but WITHOUT ANY WARRANTY; without even the implied warranty of * MERCHANTABILITY or FITNESS FOR A
+        PARTICULAR PURPOSE. See the * GNU General Public License for more details. * * You should have received a copy of the GNU General
+        Public License * along with this program. If not, see http://www.gnu.org/licenses/. * */
+    -->
+<web-app version="2.4" xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
+
+    <display-name>Nexus Application</display-name>
+
+    <!-- Booter -->
+    <listener>
+    	<listener-class>org.sonatype.nexus.web.PlexusContainerLoadListener</listener-class>
+    </listener>
+    
+    <listener>
+        <listener-class>org.sonatype.nexus.web.NexusBooterListener</listener-class>
+    </listener>
+
+    <!-- Filters -->
+    <filter>
+        <filter-name>apiFilter</filter-name>
+        <filter-class>org.sonatype.nexus.security.filter.NexusJSecurityFilter</filter-class>
+        <init-param>
+            <param-name>config</param-name>
+            <param-value>
+			[filters]
+			authcBasic = org.sonatype.nexus.security.filter.authc.NexusHttpAuthenticationFilter
+			authcBasic.applicationName = Sonatype Nexus Repository Manager API
+			authcBasic.fakeAuthScheme = true
+
+			logout = org.sonatype.nexus.security.filter.authc.LogoutAuthenticationFilter
+
+			perms = org.sonatype.nexus.security.filter.authz.HttpVerbMappingAuthorizationFilter
+
+			trperms = org.sonatype.nexus.security.filter.authz.NexusTargetMappingAuthorizationFilter
+			trperms.pathPrefix = /service/local/repositories/(.*)/content(.*)
+			trperms.pathReplacement = /repositories/@1@2
+
+			tgperms = org.sonatype.nexus.security.filter.authz.NexusTargetMappingAuthorizationFilter
+			tgperms.pathPrefix = /service/local/repo_groups/(.*)/content(.*)
+			tgperms.pathReplacement = /groups/@1@2
+
+			[urls]
+			/service/*/status/command = authcBasic,perms[nexus:command]
+			/service/*/status = authcBasic,perms[nexus:status]
+			/service/*/feeds/* = authcBasic,perms[nexus:feeds]
+			/service/*/feeds = authcBasic,perms[nexus:feeds]
+			/service/*/authentication/login = authcBasic,perms[nexus:authentication]
+			/service/*/authentication/logout = logout
+			/service/*/identify/*/* = authcBasic,perms[nexus:identify]
+			/service/*/artifact/** = authcBasic,perms[nexus:artifact]
+			/service/*/data_index/** = authcBasic,perms[nexus:index]
+			/service/*/data_index = authcBasic,perms[nexus:index]
+			/service/*/data_cache/** = authcBasic,perms[nexus:cache]
+			/service/*/data_cache = authcBasic,perms[nexus:cache]
+			/service/*/wastebasket/** = authcBasic,perms[nexus:wastebasket]
+			/service/*/wastebasket = authcBasic,perms[nexus:wastebasket]
+			/service/*/attributes/** = authcBasic,perms[nexus:attributes]
+			/service/*/attributes = authcBasic,perms[nexus:attributes]
+			/service/*/repository_statuses = authcBasic,perms[nexus:repostatus]
+			/service/*/repositories/*/status = authcBasic,perms[nexus:repostatus]
+			/service/*/repositories/*/meta = authcBasic,perms[nexus:repometa]
+			/service/*/repositories/*/content/** = authcBasic,trperms
+			/service/*/repositories/*/content = authcBasic,trperms
+			/service/*/repositories/* = authcBasic,perms[nexus:repositories]
+			/service/*/repositories = authcBasic,perms[nexus:repositories]
+			/service/*/repo_groups/*/content/** = authcBasic,tgperms
+			/service/*/repo_groups/*/content = authcBasic,tgperms
+			/service/*/repo_groups/* = authcBasic,perms[nexus:repogroups]
+			/service/*/repo_groups = authcBasic,perms[nexus:repogroups]
+			/service/*/repo_content_classes = authcBasic,perms[nexus:repocontentclasses]
+			/service/*/repo_targets/* = authcBasic,perms[nexus:targets]
+			/service/*/repo_targets = authcBasic,perms[nexus:targets]
+			/service/*/configs/* = authcBasic,perms[nexus:configuration]
+			/service/*/configs = authcBasic,perms[nexus:configuration]
+			/service/*/global_settings/* = authcBasic,perms[nexus:settings]
+			/service/*/global_settings = authcBasic,perms[nexus:settings]
+			/service/*/repo_routes/* = authcBasic,perms[nexus:routes]
+			/service/*/repo_routes = authcBasic,perms[nexus:routes]
+			/service/*/templates/repositories/* = authcBasic,perms[nexus:repotemplates]
+			/service/*/templates/repositories = authcBasic,perms[nexus:repotemplates]
+			/service/*/schedule_types = authcBasic,perms[nexus:tasktypes]
+			/service/*/schedule_run/* = authcBasic,perms[nexus:tasksrun]
+			/service/*/schedules/* = authcBasic,perms[nexus:tasks]
+			/service/*/schedules = authcBasic,perms[nexus:tasks]
+			/service/*/users_changepw = authcBasic,perms[nexus:userschangepw]
+			/service/*/users_forgotpw = authcBasic,perms[nexus:usersforgotpw]
+			/service/*/users_forgotid/* = authcBasic,perms[nexus:usersforgotid]
+			/service/*/users_reset/* = authcBasic,perms[nexus:usersreset]
+			/service/*/users/* = authcBasic,perms[nexus:users]
+			/service/*/users = authcBasic,perms[nexus:users]
+			/service/*/roles/* = authcBasic,perms[nexus:roles]
+			/service/*/roles = authcBasic,perms[nexus:roles]
+			/service/*/privileges/* = authcBasic,perms[nexus:privileges]
+			/service/*/privileges = authcBasic,perms[nexus:privileges]
+			/service/*/logs/* = authcBasic,perms[nexus:logs]
+			/service/*/logs = authcBasic,perms[nexus:logs]
+			/service/** = authcBasic,perms[nexus:someFreakinStupidPermToCatchAllUnprotectedsAndOnlyAdminWillHaveItSinceItHaveAStar]
+			</param-value>
+        </init-param>
+    </filter>
+
+    <filter-mapping>
+        <filter-name>apiFilter</filter-name>
+        <url-pattern>/service/*</url-pattern>
+    </filter-mapping>
+
+    <filter>
+        <filter-name>contentFilter</filter-name>
+        <filter-class>org.sonatype.nexus.security.filter.NexusJSecurityFilter</filter-class>
+        <init-param>
+            <param-name>config</param-name>
+            <param-value>
+			[filters]
+			authcBasic = org.sonatype.nexus.security.filter.authc.NexusHttpAuthenticationFilter
+			authcBasic.applicationName = Sonatype Nexus Repository Manager
+			authcBasic.fakeAuthScheme = false
+
+			logout = org.sonatype.nexus.security.filter.authc.LogoutAuthenticationFilter
+
+			tperms = org.sonatype.nexus.security.filter.authz.NexusTargetMappingAuthorizationFilter
+			tperms.pathPrefix = /content(.*)
+			tperms.pathReplacement = @1
+
+			[urls]
+			/content/** = authcBasic,tperms
+			/content = authcBasic,tperms
+			</param-value>
+        </init-param>
+    </filter>
+
+    <filter-mapping>
+        <filter-name>contentFilter</filter-name>
+        <url-pattern>/content/*</url-pattern>
+    </filter-mapping>
+
+    <!-- REST Content -->
+    <servlet>
+        <servlet-name>content</servlet-name>
+        <servlet-class>org.sonatype.plexus.rest.ServletRestletApplicationBridge</servlet-class>
+        <init-param>
+            <!-- A stupid hack to avoid OneServletServerPerWebapp limitation, see ServletRestletApplicationBridge#getInitParameter -->
+            <param-name>content.org.restlet.application</param-name>
+            <param-value>org.sonatype.nexus.rest.ApplicationContentBridge</param-value>
+        </init-param>
+        <init-param>
+            <!-- Content servlet should not "discover" plexus resources (default is true)! -->
+            <param-name>plexus.discoverResources</param-name>
+            <param-value>false</param-value>
+        </init-param>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>content</servlet-name>
+        <url-pattern>/content/*</url-pattern>
+    </servlet-mapping>
+
+    <!-- REST Service -->
+    <servlet>
+        <servlet-name>service</servlet-name>
+        <servlet-class>org.sonatype.plexus.rest.ServletRestletApplicationBridge</servlet-class>
+        <init-param>
+            <!-- A stupid hack to avoid OneServletServerPerWebapp limitation, see ServletRestletApplicationBridge#getInitParameter -->
+            <param-name>service.org.restlet.application</param-name>
+            <param-value>org.sonatype.nexus.rest.ApplicationBridge</param-value>
+        </init-param>
+        <load-on-startup>2</load-on-startup>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>service</servlet-name>
+        <url-pattern>/service/*</url-pattern>
+    </servlet-mapping>
+
+    <!-- Welcome File -->
+    <welcome-file-list>
+        <welcome-file>index.html</welcome-file>
+    </welcome-file-list>
+
+    <!--
+        Uncomment this if you need to edit JavaScript files and other resources while Jetty is running (to prevent it from locking
+        everything). <servlet> <servlet-name>default</servlet-name> <servlet-class>org.mortbay.jetty.servlet.DefaultServlet</servlet-class>
+        <init-param> <param-name>useFileMappedBuffer</param-name> <param-value>false</param-value> </init-param> </servlet>
+    -->
+</web-app>
