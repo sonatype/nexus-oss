@@ -41,5 +41,7 @@ public class PlexusContainerUtils
     public void stopContainer()
     {
         container.dispose();
+
+        container = null;
     }
 }

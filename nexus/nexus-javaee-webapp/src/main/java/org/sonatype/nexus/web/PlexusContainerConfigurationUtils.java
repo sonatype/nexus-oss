@@ -22,6 +22,7 @@
 package org.sonatype.nexus.web;
 
 import java.net.URL;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -30,6 +31,8 @@ import javax.servlet.ServletContext;
 
 import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.DefaultContainerConfiguration;
+import org.codehaus.plexus.interpolation.MapBasedValueSource;
+import org.codehaus.plexus.interpolation.RegexBasedInterpolator;
 import org.codehaus.plexus.util.PropertyUtils;
 import org.codehaus.plexus.util.StringUtils;
 
@@ -60,19 +63,6 @@ public class PlexusContainerConfigurationUtils
 
         Map<String, String> context = new HashMap<String, String>();
 
-        String baseDir = servletContext.getRealPath( "/WEB-INF" );
-
-        if ( !StringUtils.isEmpty( baseDir ) )
-        {
-            servletContext.log( "Setting Plexus basedir to: " + baseDir );
-
-            context.put( PLEXUS_HOME, baseDir );
-        }
-        else
-        {
-            servletContext.log( "CANNOT set Plexus basedir! (are we in unpacked WAR?)" );
-        }
-
         String plexusPropertiesPath = servletContext.getInitParameter( PLEXUS_PROPERTIES_PARAM );
 
         if ( plexusPropertiesPath == null )
@@ -91,9 +81,34 @@ public class PlexusContainerConfigurationUtils
                 throw new Exception( "Could not locate url: " + url.toString() );
             }
 
-            for ( Object key : properties.keySet() )
+            String baseDir = servletContext.getRealPath( "/WEB-INF" );
+
+            if ( !StringUtils.isEmpty( baseDir ) )
             {
-                context.put( key.toString(), properties.getProperty( key.toString() ) );
+                servletContext.log( "Setting Plexus context variable " + PLEXUS_HOME + " to: " + baseDir );
+
+                properties.put( PLEXUS_HOME, baseDir );
+            }
+            else
+            {
+                servletContext.log( "CANNOT set Plexus basedir! (are we in unpacked WAR?)" );
+            }
+
+            RegexBasedInterpolator ip = new RegexBasedInterpolator();
+
+            ip.addValueSource( new MapBasedValueSource( properties ) );
+
+            ip.addValueSource( new MapBasedValueSource( System.getProperties() ) );
+
+            for ( Enumeration n = properties.propertyNames(); n.hasMoreElements(); )
+            {
+                String propertyKey = (String) n.nextElement();
+
+                String propertyValue = ip.interpolate( properties.getProperty( propertyKey ), "" );
+
+                servletContext.log( "Added '" + propertyKey + "=" + propertyValue + "' to Plexus context." );
+
+                context.put( propertyKey, propertyValue );
             }
         }
         catch ( Exception e )

@@ -1,33 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
-    <!--
-        /* * Nexus: Maven Repository Manager * Copyright (C) 2008 Sonatype Inc. * * This file is part of Nexus. * * This program is free
-        software: you can redistribute it and/or modify * it under the terms of the GNU General Public License as published by * the Free
-        Software Foundation, either version 3 of the License, or * (at your option) any later version. * * This program is distributed in
-        the hope that it will be useful, * but WITHOUT ANY WARRANTY; without even the implied warranty of * MERCHANTABILITY or FITNESS FOR A
-        PARTICULAR PURPOSE. See the * GNU General Public License for more details. * * You should have received a copy of the GNU General
-        Public License * along with this program. If not, see http://www.gnu.org/licenses/. * */
-    -->
+	<!--
+		/* * Nexus: Maven Repository Manager * Copyright (C) 2008 Sonatype Inc. * * This file is part of Nexus. * * This program is free software: you can
+		redistribute it and/or modify * it under the terms of the GNU General Public License as published by * the Free Software Foundation, either version
+		3 of the License, or * (at your option) any later version. * * This program is distributed in the hope that it will be useful, * but WITHOUT ANY
+		WARRANTY; without even the implied warranty of * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the * GNU General Public License for more
+		details. * * You should have received a copy of the GNU General Public License * along with this program. If not, see http://www.gnu.org/licenses/.
+		* */
+	-->
 <web-app version="2.4" xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
+	xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
 
-    <display-name>Nexus Application</display-name>
+	<display-name>Nexus Web Application</display-name>
 
-    <!-- Booter -->
-    <listener>
-    	<listener-class>org.sonatype.nexus.web.PlexusContainerContextListener</listener-class>
-    </listener>
-    
-    <listener>
-        <listener-class>org.sonatype.nexus.web.NexusBooterListener</listener-class>
-    </listener>
+	<!-- Booter -->
+	<listener>
+		<listener-class>org.sonatype.nexus.web.PlexusContainerContextListener</listener-class>
+	</listener>
 
-    <!-- Filters -->
-    <filter>
-        <filter-name>apiFilter</filter-name>
-        <filter-class>org.sonatype.nexus.security.filter.NexusJSecurityFilter</filter-class>
-        <init-param>
-            <param-name>config</param-name>
-            <param-value>
+	<listener>
+		<listener-class>org.sonatype.nexus.web.NexusBooterListener</listener-class>
+	</listener>
+
+	<!-- Filters -->
+	<filter>
+		<filter-name>apiFilter</filter-name>
+		<filter-class>org.sonatype.nexus.security.filter.NexusJSecurityFilter</filter-class>
+		<init-param>
+			<param-name>config</param-name>
+			<param-value>
 			[filters]
 			authcBasic = org.sonatype.nexus.security.filter.authc.NexusHttpAuthenticationFilter
 			authcBasic.applicationName = Sonatype Nexus Repository Manager API
@@ -102,20 +102,20 @@
 			/service/*/logs = authcBasic,perms[nexus:logs]
 			/service/** = authcBasic,perms[nexus:someFreakinStupidPermToCatchAllUnprotectedsAndOnlyAdminWillHaveItSinceItHaveAStar]
 			</param-value>
-        </init-param>
-    </filter>
+		</init-param>
+	</filter>
 
-    <filter-mapping>
-        <filter-name>apiFilter</filter-name>
-        <url-pattern>/service/*</url-pattern>
-    </filter-mapping>
+	<filter-mapping>
+		<filter-name>apiFilter</filter-name>
+		<url-pattern>/service/*</url-pattern>
+	</filter-mapping>
 
-    <filter>
-        <filter-name>contentFilter</filter-name>
-        <filter-class>org.sonatype.nexus.security.filter.NexusJSecurityFilter</filter-class>
-        <init-param>
-            <param-name>config</param-name>
-            <param-value>
+	<filter>
+		<filter-name>contentFilter</filter-name>
+		<filter-class>org.sonatype.nexus.security.filter.NexusJSecurityFilter</filter-class>
+		<init-param>
+			<param-name>config</param-name>
+			<param-value>
 			[filters]
 			authcBasic = org.sonatype.nexus.security.filter.authc.NexusHttpAuthenticationFilter
 			authcBasic.applicationName = Sonatype Nexus Repository Manager
@@ -131,61 +131,61 @@
 			/content/** = authcBasic,tperms
 			/content = authcBasic,tperms
 			</param-value>
-        </init-param>
-    </filter>
+		</init-param>
+	</filter>
 
-    <filter-mapping>
-        <filter-name>contentFilter</filter-name>
-        <url-pattern>/content/*</url-pattern>
-    </filter-mapping>
+	<filter-mapping>
+		<filter-name>contentFilter</filter-name>
+		<url-pattern>/content/*</url-pattern>
+	</filter-mapping>
 
-    <!-- REST Content -->
-    <servlet>
-        <servlet-name>content</servlet-name>
-        <servlet-class>org.sonatype.plexus.rest.ServletRestletApplicationBridge</servlet-class>
-        <init-param>
-            <!-- A stupid hack to avoid OneServletServerPerWebapp limitation, see ServletRestletApplicationBridge#getInitParameter -->
-            <param-name>content.org.restlet.application</param-name>
-            <param-value>org.sonatype.nexus.rest.ApplicationContentBridge</param-value>
-        </init-param>
-        <init-param>
-            <!-- Content servlet should not "discover" plexus resources (default is true)! -->
-            <param-name>plexus.discoverResources</param-name>
-            <param-value>false</param-value>
-        </init-param>
-        <load-on-startup>1</load-on-startup>
-    </servlet>
+	<!-- REST Content -->
+	<servlet>
+		<servlet-name>content</servlet-name>
+		<servlet-class>org.sonatype.plexus.rest.ServletRestletApplicationBridge</servlet-class>
+		<init-param>
+			<!-- A stupid hack to avoid OneServletServerPerWebapp limitation, see ServletRestletApplicationBridge#getInitParameter -->
+			<param-name>content.org.restlet.application</param-name>
+			<param-value>org.sonatype.nexus.rest.ApplicationContentBridge</param-value>
+		</init-param>
+		<init-param>
+			<!-- Content servlet should not "discover" plexus resources (default is true)! -->
+			<param-name>plexus.discoverResources</param-name>
+			<param-value>false</param-value>
+		</init-param>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
 
-    <servlet-mapping>
-        <servlet-name>content</servlet-name>
-        <url-pattern>/content/*</url-pattern>
-    </servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>content</servlet-name>
+		<url-pattern>/content/*</url-pattern>
+	</servlet-mapping>
 
-    <!-- REST Service -->
-    <servlet>
-        <servlet-name>service</servlet-name>
-        <servlet-class>org.sonatype.plexus.rest.ServletRestletApplicationBridge</servlet-class>
-        <init-param>
-            <!-- A stupid hack to avoid OneServletServerPerWebapp limitation, see ServletRestletApplicationBridge#getInitParameter -->
-            <param-name>service.org.restlet.application</param-name>
-            <param-value>org.sonatype.nexus.rest.ApplicationBridge</param-value>
-        </init-param>
-        <load-on-startup>2</load-on-startup>
-    </servlet>
+	<!-- REST Service -->
+	<servlet>
+		<servlet-name>service</servlet-name>
+		<servlet-class>org.sonatype.plexus.rest.ServletRestletApplicationBridge</servlet-class>
+		<init-param>
+			<!-- A stupid hack to avoid OneServletServerPerWebapp limitation, see ServletRestletApplicationBridge#getInitParameter -->
+			<param-name>service.org.restlet.application</param-name>
+			<param-value>org.sonatype.nexus.rest.ApplicationBridge</param-value>
+		</init-param>
+		<load-on-startup>2</load-on-startup>
+	</servlet>
 
-    <servlet-mapping>
-        <servlet-name>service</servlet-name>
-        <url-pattern>/service/*</url-pattern>
-    </servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>service</servlet-name>
+		<url-pattern>/service/*</url-pattern>
+	</servlet-mapping>
 
-    <!-- Welcome File -->
-    <welcome-file-list>
-        <welcome-file>index.html</welcome-file>
-    </welcome-file-list>
+	<!-- Welcome File -->
+	<welcome-file-list>
+		<welcome-file>index.html</welcome-file>
+	</welcome-file-list>
 
-    <!--
-        Uncomment this if you need to edit JavaScript files and other resources while Jetty is running (to prevent it from locking
-        everything). <servlet> <servlet-name>default</servlet-name> <servlet-class>org.mortbay.jetty.servlet.DefaultServlet</servlet-class>
-        <init-param> <param-name>useFileMappedBuffer</param-name> <param-value>false</param-value> </init-param> </servlet>
-    -->
+	<!--
+		Uncomment this if you need to edit JavaScript files and other resources while Jetty is running (to prevent it from locking everything). <servlet>
+		<servlet-name>default</servlet-name> <servlet-class>org.mortbay.jetty.servlet.DefaultServlet</servlet-class> <init-param>
+		<param-name>useFileMappedBuffer</param-name> <param-value>false</param-value> </init-param> </servlet>
+	-->
 </web-app>
