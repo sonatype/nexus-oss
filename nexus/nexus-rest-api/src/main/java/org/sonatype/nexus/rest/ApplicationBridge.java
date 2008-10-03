@@ -35,9 +35,6 @@ import org.sonatype.nexus.rest.attributes.AttributesResourceHandler;
 import org.sonatype.nexus.rest.authentication.LoginResourceHandler;
 import org.sonatype.nexus.rest.authentication.LogoutResourceHandler;
 import org.sonatype.nexus.rest.cache.CacheResourceHandler;
-import org.sonatype.nexus.rest.groups.RepositoryGroupContentResourceHandler;
-import org.sonatype.nexus.rest.groups.RepositoryGroupListResourceHandler;
-import org.sonatype.nexus.rest.groups.RepositoryGroupResourceHandler;
 import org.sonatype.nexus.rest.identify.IdentifyHashResourceHandler;
 import org.sonatype.nexus.rest.index.IndexResourceHandler;
 import org.sonatype.nexus.rest.repositories.RepositoryContentResourceHandler;
@@ -230,19 +227,19 @@ public class ApplicationBridge
             "/repositories/{" + RepositoryResourceHandler.REPOSITORY_ID_KEY + "}/content",
             RepositoryContentResourceHandler.class );
 
-        attach( applicationRouter, false, "/repo_groups", RepositoryGroupListResourceHandler.class );
+//        attach( applicationRouter, false, "/repo_groups", RepositoryGroupListResourceHandler.class );
 
-        attach(
-            applicationRouter,
-            false,
-            "/repo_groups/{" + RepositoryGroupResourceHandler.GROUP_ID_KEY + "}",
-            RepositoryGroupResourceHandler.class );
+//        attach(
+//            applicationRouter,
+//            false,
+//            "/repo_groups/{" + RepositoryGroupResourceHandler.GROUP_ID_KEY + "}",
+//            RepositoryGroupResourceHandler.class );
 
-        attach(
-            applicationRouter,
-            false,
-            "/repo_groups/{" + RepositoryGroupResourceHandler.GROUP_ID_KEY + "}/content",
-            RepositoryGroupContentResourceHandler.class );
+//        attach(
+//            applicationRouter,
+//            false,
+//            "/repo_groups/{" + RepositoryGroupResourceHandler.GROUP_ID_KEY + "}/content",
+//            RepositoryGroupContentResourceHandler.class );
 
 //        attach( applicationRouter, false, "/global_settings", GlobalConfigurationListResourceHandler.class );
 

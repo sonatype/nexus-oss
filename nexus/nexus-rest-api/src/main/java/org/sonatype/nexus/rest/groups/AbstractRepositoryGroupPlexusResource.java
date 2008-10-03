@@ -25,41 +25,32 @@ import java.util.Collection;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
+import org.restlet.resource.ResourceException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.registry.InvalidGroupingException;
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
 import org.sonatype.nexus.rest.AbstractNexusResourceHandler;
 import org.sonatype.nexus.rest.model.RepositoryGroupMemberRepository;
 import org.sonatype.nexus.rest.model.RepositoryGroupResource;
 
-public abstract class AbstractRepositoryGroupResourceHandler
-    extends AbstractNexusResourceHandler
+public abstract class AbstractRepositoryGroupPlexusResource
+    extends AbstractNexusPlexusResource
 {
     public static final String GROUP_ID_KEY = "groupId";
 
-    /**
-     * The default constructor.
-     * 
-     * @param context
-     * @param request
-     * @param response
-     */
-    public AbstractRepositoryGroupResourceHandler( Context context, Request request, Response response )
-    {
-        super( context, request, response );
-    }
-
-    public void validateGroup( RepositoryGroupResource resource )
+    public void validateGroup( RepositoryGroupResource resource, Request request )
         throws NoSuchRepositoryException,
-            InvalidGroupingException
+            InvalidGroupingException,
+            ResourceException
     {
         ContentClass cc = null;
 
         for ( RepositoryGroupMemberRepository member : (Collection<RepositoryGroupMemberRepository>) resource
             .getRepositories() )
         {
-            Repository repo = getNexus().getRepository( member.getId() );
+            Repository repo = getNexusInstance( request ).getRepository( member.getId() );
 
             if ( cc == null )
             {

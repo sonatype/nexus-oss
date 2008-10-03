@@ -21,6 +21,7 @@
 package org.sonatype.nexus.rest;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -29,6 +30,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
+import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.fileupload.FileUploadException;
 import org.apache.velocity.app.VelocityEngine;
 import org.apache.velocity.runtime.RuntimeConstants;
 import org.codehaus.plexus.util.StringUtils;
@@ -37,6 +40,7 @@ import org.restlet.data.MediaType;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.data.Status;
+import org.restlet.ext.fileupload.RestletFileUpload;
 import org.restlet.ext.velocity.TemplateRepresentation;
 import org.restlet.resource.Representation;
 import org.restlet.resource.ResourceException;
@@ -74,19 +78,31 @@ public abstract class AbstractResourceStoreContentPlexusResource extends
     public static final String IS_LOCAL_PARAMETER = "isLocal";
 
     
+    protected String getResourceStorePath( Request request )
+    {
+        return parsePathFromUri( request.getResourceRef().getRemainingPart() );
+    }
+    
+    protected boolean isLocal( Request request, String resourceStorePath )
+    {
+     // check do we need local only access
+        boolean isLocal = request.getResourceRef().getQueryAsForm().getFirst( IS_LOCAL_PARAMETER ) != null;
+
+        // overriding isLocal is we know it will be a collection
+        isLocal = isLocal || resourceStorePath.endsWith( RepositoryItemUid.PATH_SEPARATOR );
+        return isLocal;
+    }
+    
+    
     @Override
     public Object get(Context context, Request request, Response response, Variant variant)
             throws ResourceException {
 
         // get the path from request UIR
-        String resourceStorePath = parsePathFromUri( request.getResourceRef().getRemainingPart() );
+        String resourceStorePath = getResourceStorePath(request);
 
-        // check do we need local only access
-        boolean isLocal = request.getResourceRef().getQueryAsForm().getFirst( IS_LOCAL_PARAMETER ) != null;
-
-        // overriding isLocal is we know it will be a collection
-        isLocal = isLocal || resourceStorePath.endsWith( RepositoryItemUid.PATH_SEPARATOR );
-
+        // check do we need local  access
+        boolean isLocal = isLocal( request, resourceStorePath );
 
         try
         {
@@ -106,6 +122,47 @@ public abstract class AbstractResourceStoreContentPlexusResource extends
         }
     }
     
+    @Override
+    public Object post( Context context, Request request, Response response, Object payload )
+        throws ResourceException
+    {
+        //The POST behaviour is equal to PUT behaviour.
+        return put( context, request, response, payload );
+    }
+
+    @Override
+    public Object put( Context context, Request request, Response response, Object payload )
+        throws ResourceException
+    {
+        return super.put( context, request, response, payload );
+    }
+
+    @Override
+    public void delete( Context context, Request request, Response response )
+        throws ResourceException
+    {
+        
+        // get the path from request UIR
+        String resourceStorePath = getResourceStorePath(request);
+
+        // check do we need local  access
+        boolean isLocal = isLocal( request, resourceStorePath );
+        
+        try
+        {
+            ResourceStore store = getResourceStore(request);
+
+            ResourceStoreRequest req = getResourceStoreRequest(request, resourceStorePath, isLocal);
+
+            store.deleteItem( req );
+        }
+        catch ( Exception e )
+        {
+            handleException( e );
+        }
+    }
+
+
     protected String parsePathFromUri(String parsedPath) {
 
         // get rid of query part

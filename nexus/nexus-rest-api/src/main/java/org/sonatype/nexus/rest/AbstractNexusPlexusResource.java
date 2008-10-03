@@ -1,5 +1,6 @@
 package org.sonatype.nexus.rest;
 
+import org.apache.commons.fileupload.FileItemFactory;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
 import org.jsecurity.mgt.SecurityManager;
@@ -78,6 +79,17 @@ public abstract class AbstractNexusPlexusResource
         return (SecurityManager) request.getAttributes().get( SecurityManager.class.getName() );
     }
 
+    /**
+     * For file uploads we are using commons-fileupload integration with restlet.org. We are storing one FileItemFactory
+     * instance in context. This method simply encapsulates gettting it from Resource context.
+     * 
+     * @return
+     */
+    protected FileItemFactory getFileItemFactory( Context context )
+    {
+        return (FileItemFactory) context.getAttributes().get( ApplicationBridge.FILEITEM_FACTORY );
+    }
+    
     protected Reference createChildReference( Request request, String childPath )
     {
         Reference result = new Reference( request.getResourceRef() ).addSegment( childPath ).getTargetRef();
@@ -101,6 +113,7 @@ public abstract class AbstractNexusPlexusResource
 
         return ref.getTargetRef();
     }
+
 
     /**
      * Calculates a reference to Repository based on Repository ID.
