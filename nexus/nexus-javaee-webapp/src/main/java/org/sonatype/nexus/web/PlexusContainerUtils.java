@@ -26,17 +26,20 @@ import org.codehaus.plexus.DefaultPlexusContainer;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.PlexusContainerException;
 
-public class PlexusContainerUtils {
+public class PlexusContainerUtils
+{
+    private PlexusContainer container;
 
-	private PlexusContainer container;
-	
-	public PlexusContainer startContainer(ContainerConfiguration configuration)
-			throws PlexusContainerException{
-		container = new DefaultPlexusContainer(configuration);
-		return container;
-	}
-	
-	public void stopContainer(){
-		container.dispose();
-	}
+    public PlexusContainer startContainer( ContainerConfiguration configuration )
+        throws PlexusContainerException
+    {
+        container = new DefaultPlexusContainer( configuration );
+
+        return container;
+    }
+
+    public void stopContainer()
+    {
+        container.dispose();
+    }
 }

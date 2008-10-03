@@ -14,7 +14,7 @@
 
     <!-- Booter -->
     <listener>
-    	<listener-class>org.sonatype.nexus.web.PlexusContainerLoadListener</listener-class>
+    	<listener-class>org.sonatype.nexus.web.PlexusContainerContextListener</listener-class>
     </listener>
     
     <listener>

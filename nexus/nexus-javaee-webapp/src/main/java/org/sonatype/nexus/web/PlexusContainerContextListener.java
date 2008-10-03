@@ -29,30 +29,36 @@ import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.PlexusContainerException;
 
-public class PlexusContainerContextListener implements ServletContextListener {
+public class PlexusContainerContextListener
+    implements ServletContextListener
+{
+    private static final String KEY_PLEXUS = "plexus";
 
-	private static final String KEY_PLEXUS = "plexus";
-	
-	PlexusContainerConfigurationUtils plexusContainerConfigurationUtils = new PlexusContainerConfigurationUtils();
-	PlexusContainerUtils plexusContainerUtils = new PlexusContainerUtils();
+    PlexusContainerConfigurationUtils plexusContainerConfigurationUtils = new PlexusContainerConfigurationUtils();
 
-	public void contextInitialized(ServletContextEvent sce) {
+    PlexusContainerUtils plexusContainerUtils = new PlexusContainerUtils();
 
-		ServletContext servletContext = sce.getServletContext();
-		ContainerConfiguration plexusContainerConfiguration = 
-			plexusContainerConfigurationUtils.buildContainerConfiguration(servletContext);
-		try{
-			PlexusContainer plexusContainer = plexusContainerUtils.startContainer(plexusContainerConfiguration);
-			servletContext.setAttribute(KEY_PLEXUS, plexusContainer);
-		}
-		catch(PlexusContainerException e){
-			throw new IllegalStateException("Could start plexus container", e);
-		}
-		
-	}
+    public void contextInitialized( ServletContextEvent sce )
+    {
+        ServletContext servletContext = sce.getServletContext();
 
-	public void contextDestroyed(ServletContextEvent sce) {
-		plexusContainerUtils.stopContainer();
+        ContainerConfiguration plexusContainerConfiguration = plexusContainerConfigurationUtils
+            .buildContainerConfiguration( servletContext );
 
-	}
+        try
+        {
+            PlexusContainer plexusContainer = plexusContainerUtils.startContainer( plexusContainerConfiguration );
+
+            servletContext.setAttribute( KEY_PLEXUS, plexusContainer );
+        }
+        catch ( PlexusContainerException e )
+        {
+            throw new IllegalStateException( "Could start plexus container", e );
+        }
+    }
+
+    public void contextDestroyed( ServletContextEvent sce )
+    {
+        plexusContainerUtils.stopContainer();
+    }
 }

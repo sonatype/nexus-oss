@@ -21,8 +21,9 @@
 
 package org.sonatype.nexus.web;
 
-import java.io.File;
 import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 
 import javax.servlet.ServletContext;
@@ -30,73 +31,102 @@ import javax.servlet.ServletContext;
 import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.DefaultContainerConfiguration;
 import org.codehaus.plexus.util.PropertyUtils;
+import org.codehaus.plexus.util.StringUtils;
 
-public class PlexusContainerConfigurationUtils {
+public class PlexusContainerConfigurationUtils
+{
+    public static final String DEFAULT_PLEXUS_PROPERTIES = "/WEB-INF/plexus.properties";
 
-	public static final String DEFAULT_PLEXUS_PROPERTIES = "/WEB-INF/plexus.properties";
-	public static final String DEFAULT_PLEXUS_CONFIG = "/WEB-INF/plexus.xml";
-	public static final String PLEXUS_HOME = "plexus.home";
-	public static final String PLEXUS_PROPERTIES_PARAM = "plexus-properties";
-	public static final String PLEXUS_CONFIG_PARAM = "plexus-config";
-	
-	public ContainerConfiguration buildContainerConfiguration(ServletContext servletContext){
-		
-		ContainerConfiguration configuration = new DefaultContainerConfiguration();
-		
-		configuration.setName(null);
-		configuration.setContext(buildContext(servletContext));
-		configuration.setContainerConfigurationURL(buildConfigurationURL(servletContext));
-		
-		return configuration;
-	}
-	
-	private Properties buildContext(ServletContext servletContext){
-		
-		servletContext.log( "Loading plexus context properties from: '" + DEFAULT_PLEXUS_PROPERTIES + "'" );
-		String plexusPropertiesPath = servletContext.getInitParameter(PLEXUS_PROPERTIES_PARAM);
-		if( plexusPropertiesPath == null){
-			plexusPropertiesPath = DEFAULT_PLEXUS_PROPERTIES;
-		}
-		try
+    public static final String DEFAULT_PLEXUS_CONFIG = "/WEB-INF/plexus.xml";
+
+    public static final String PLEXUS_HOME = "basedir";
+
+    public static final String PLEXUS_PROPERTIES_PARAM = "plexus-properties";
+
+    public static final String PLEXUS_CONFIG_PARAM = "plexus-config";
+
+    public ContainerConfiguration buildContainerConfiguration( ServletContext servletContext )
+    {
+        ContainerConfiguration cc = new DefaultContainerConfiguration()
+            .setName( servletContext.getServletContextName() ).setContainerConfigurationURL(
+                buildConfigurationURL( servletContext ) ).setContext( buildContext( servletContext ) );
+
+        return cc;
+    }
+
+    private Map<String, String> buildContext( ServletContext servletContext )
+    {
+        servletContext.log( "Loading plexus context properties from: '" + DEFAULT_PLEXUS_PROPERTIES + "'" );
+
+        Map<String, String> context = new HashMap<String, String>();
+
+        String baseDir = servletContext.getRealPath( "/WEB-INF" );
+
+        if ( !StringUtils.isEmpty( baseDir ) )
+        {
+            servletContext.log( "Setting Plexus basedir to: " + baseDir );
+
+            context.put( PLEXUS_HOME, baseDir );
+        }
+        else
+        {
+            servletContext.log( "CANNOT set Plexus basedir! (are we in unpacked WAR?)" );
+        }
+
+        String plexusPropertiesPath = servletContext.getInitParameter( PLEXUS_PROPERTIES_PARAM );
+
+        if ( plexusPropertiesPath == null )
+        {
+            plexusPropertiesPath = DEFAULT_PLEXUS_PROPERTIES;
+        }
+
+        try
         {
             URL url = servletContext.getResource( plexusPropertiesPath );
+
             Properties properties = PropertyUtils.loadProperties( url );
-            if(properties == null){
-            	throw new Exception("Could not locate url: " + url.toString());
+
+            if ( properties == null )
+            {
+                throw new Exception( "Could not locate url: " + url.toString() );
             }
-            setPlexusHome(servletContext, properties );
-            return properties;
+
+            for ( Object key : properties.keySet() )
+            {
+                context.put( key.toString(), properties.getProperty( key.toString() ) );
+            }
         }
-        catch ( Exception e ){
-        	throw new RuntimeException("Could not load plexus context properties from: '" + plexusPropertiesPath + "'" , e);
-        }
-	}
-	
-	private URL buildConfigurationURL(ServletContext servletContext){
-       
-		servletContext.log( "Loading plexus configuration from: '" + DEFAULT_PLEXUS_CONFIG + "'" );
-		String plexusConfigPath = servletContext.getInitParameter(PLEXUS_CONFIG_PARAM);
-		if(plexusConfigPath == null){
-			plexusConfigPath = DEFAULT_PLEXUS_CONFIG;
-		}
-		try
+        catch ( Exception e )
         {
-            URL url = servletContext.getResource(plexusConfigPath);
+            throw new RuntimeException(
+                "Could not load plexus context properties from: '" + plexusPropertiesPath + "'",
+                e );
+        }
+
+        return context;
+    }
+
+    private URL buildConfigurationURL( ServletContext servletContext )
+    {
+        servletContext.log( "Loading plexus configuration from: '" + DEFAULT_PLEXUS_CONFIG + "'" );
+
+        String plexusConfigPath = servletContext.getInitParameter( PLEXUS_CONFIG_PARAM );
+
+        if ( plexusConfigPath == null )
+        {
+            plexusConfigPath = DEFAULT_PLEXUS_CONFIG;
+        }
+
+        try
+        {
+            URL url = servletContext.getResource( plexusConfigPath );
+
             return url;
         }
-        catch (Exception e )
+        catch ( Exception e )
         {
-        	throw new RuntimeException("Could not load plexus configuration from: '" + plexusConfigPath + "'" , e);
+            throw new RuntimeException( "Could not load plexus configuration from: '" + plexusConfigPath + "'", e );
         }
-	}
-	
-    /**
-     * Set plexus.home context variable
-     */
-    private void setPlexusHome(ServletContext context, Properties contextProperties) {
-        if ( !contextProperties.containsKey(PLEXUS_HOME )){
-			File file = new File(context.getRealPath("/WEB-INF"));
-			contextProperties.setProperty(PLEXUS_HOME, file.getAbsolutePath());
-        }
-	}
+    }
+
 }
