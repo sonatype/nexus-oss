@@ -27,6 +27,8 @@ import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 import org.codehaus.plexus.PlexusConstants;
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.configuration.ConfigurationIdGenerator;
@@ -54,18 +56,16 @@ import org.sonatype.nexus.configuration.validator.ValidationRequest;
 import org.sonatype.nexus.configuration.validator.ValidationResponse;
 
 /**
- * The default configuration  validator provider. It checks the model for semantical validity.
+ * The default configuration validator provider. It checks the model for semantical validity.
  * 
  * @author cstamas
- * @plexus.component
  */
+@Component( role = ApplicationConfigurationValidator.class )
 public class DefaultApplicationConfigurationValidator
     extends AbstractLogEnabled
     implements ApplicationConfigurationValidator
 {
-    /**
-     * @plexus.requirement
-     */
+    @Requirement
     private ConfigurationIdGenerator idGenerator;
 
     @SuppressWarnings( "unchecked" )
@@ -564,12 +564,12 @@ public class DefaultApplicationConfigurationValidator
             // if you delete a repo(ses) that were belonging to a route, we insist on
             // leaving the route "empty" (to save a users hardly concieved regexp) but with empty
             // repo list
-            
+
             // here we must have a repo list
-            //if ( item.getRepositories() == null || item.getRepositories().size() == 0 )
-            //{
-            //    response.addValidationError( "The repository list in Route with ID='" + item.getId()
-            //        + "' is not valid: it cannot be empty!" );
+            // if ( item.getRepositories() == null || item.getRepositories().size() == 0 )
+            // {
+            // response.addValidationError( "The repository list in Route with ID='" + item.getId()
+            // + "' is not valid: it cannot be empty!" );
             // }
         }
 

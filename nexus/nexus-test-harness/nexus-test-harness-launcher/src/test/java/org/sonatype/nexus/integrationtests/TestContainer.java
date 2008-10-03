@@ -16,7 +16,7 @@ public class TestContainer
 {
 
     private static TestContainer SELF = null;
-    
+
     private TestContext testContext = new TestContext();
 
     private PlexusContainer container;
@@ -55,8 +55,8 @@ public class TestContainer
         // Configuration
         // ----------------------------------------------------------------------------
 
-        ContainerConfiguration containerConfiguration =
-            new DefaultContainerConfiguration().setName( "test" ).setContext( context );
+        ContainerConfiguration containerConfiguration = new DefaultContainerConfiguration()
+            .setName( "test" ).setContext( context );
 
         try
         {
@@ -69,13 +69,25 @@ public class TestContainer
         }
     }
 
-    public Object lookup( String componentKey )
+    public Object lookup( String role )
         throws Exception
     {
-        return container.lookup( componentKey );
+        return container.lookup( role );
+    }
+
+    public Object lookup( Class role )
+        throws Exception
+    {
+        return container.lookup( role );
     }
 
     public Object lookup( String role, String id )
+        throws Exception
+    {
+        return container.lookup( role, id );
+    }
+
+    public Object lookup( Class role, String id )
         throws Exception
     {
         return container.lookup( role, id );
@@ -90,7 +102,5 @@ public class TestContainer
     {
         return container;
     }
-    
-    
 
 }

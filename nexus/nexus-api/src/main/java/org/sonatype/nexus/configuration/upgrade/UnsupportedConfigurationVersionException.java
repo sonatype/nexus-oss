@@ -25,28 +25,18 @@ import java.io.File;
 import org.sonatype.nexus.configuration.ConfigurationException;
 
 /**
- * Thrown when the configuration file is corrupt and cannot be loaded neither upgraded. It has wrong syntax or is
- * unreadable.
+ * Thrown when the configuration has model version but it is unknown to Nexus.
  * 
  * @author cstamas
  */
-public class ConfigurationIsCorruptedException
+public class UnsupportedConfigurationVersionException
     extends ConfigurationException
 {
+    private static final long serialVersionUID = 1965812260368747123L;
 
-    public ConfigurationIsCorruptedException( File file )
+    public UnsupportedConfigurationVersionException( String version, File file )
     {
-        this( file.getAbsolutePath() );
+        super( "Unsupported configuration file in " + file.getAbsolutePath() + " with version: " + version
+            + ". Cannot upgrade." );
     }
-
-    public ConfigurationIsCorruptedException( String filePath )
-    {
-        this( filePath, null );
-    }
-
-    public ConfigurationIsCorruptedException( String filePath, Throwable t )
-    {
-        super( "Could not read or parse Nexus configuration file on path " + filePath + "! It may be corrupted.", t );
-    }
-
 }

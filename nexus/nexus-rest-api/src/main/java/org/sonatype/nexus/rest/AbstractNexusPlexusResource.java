@@ -1,9 +1,5 @@
 package org.sonatype.nexus.rest;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
 import org.restlet.Context;

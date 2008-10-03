@@ -164,7 +164,7 @@ public class NexusConfigUtil
 
     public static void validateConfig() throws Exception
     {
-        ApplicationConfigurationValidator validator = (ApplicationConfigurationValidator) TestContainer.getInstance().lookup( ApplicationConfigurationValidator.ROLE );
+        ApplicationConfigurationValidator validator = (ApplicationConfigurationValidator) TestContainer.getInstance().lookup( ApplicationConfigurationValidator.class );
         ValidationResponse vResponse =
             validator.validateModel( new ValidationRequest( getNexusConfig() ) );
 

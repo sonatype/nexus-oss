@@ -30,8 +30,6 @@ import java.io.IOException;
  */
 public interface Upgrader
 {
-    String ROLE = Upgrader.class.getName();
-
     Object loadConfiguration( File file )
         throws IOException,
             ConfigurationIsCorruptedException;

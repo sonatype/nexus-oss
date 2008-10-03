@@ -20,6 +20,7 @@
  */
 package org.sonatype.nexus.util;
 
+import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.context.ContextException;
 import org.codehaus.plexus.interpolation.Interpolator;
@@ -33,12 +34,11 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
  * Environment variables and System Properties, in this order.
  * 
  * @author cstamas
- * @plexus.component
  */
+@Component( role = ApplicationInterpolatorProvider.class )
 public class DefaultApplicationInterpolatorProvider
     implements ApplicationInterpolatorProvider, Contextualizable
 {
-
     private RegexBasedInterpolator regexBasedInterpolator;
 
     public DefaultApplicationInterpolatorProvider()
@@ -58,8 +58,10 @@ public class DefaultApplicationInterpolatorProvider
     {
         regexBasedInterpolator.addValueSource( new MapBasedValueSource( context.getContextData() ) );
 
+        // FIXME: bad, everything should come from Plexus context
         regexBasedInterpolator.addValueSource( new MapBasedValueSource( System.getenv() ) );
 
+        // FIXME: bad, everything should come from Plexus context
         regexBasedInterpolator.addValueSource( new MapBasedValueSource( System.getProperties() ) );
     }
 

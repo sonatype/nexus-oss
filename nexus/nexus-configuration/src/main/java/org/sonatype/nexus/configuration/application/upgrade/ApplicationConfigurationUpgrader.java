@@ -35,8 +35,6 @@ import org.sonatype.nexus.configuration.upgrade.UnsupportedConfigurationVersionE
  */
 public interface ApplicationConfigurationUpgrader
 {
-    String ROLE = ApplicationConfigurationUpgrader.class.getName();
-
     /**
      * Tries to load an old configuration from file and will try to upgrade it to current model.
      * 

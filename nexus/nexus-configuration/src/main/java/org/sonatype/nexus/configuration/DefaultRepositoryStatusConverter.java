@@ -1,14 +1,22 @@
 package org.sonatype.nexus.configuration;
 
+import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.Configuration;
 import org.sonatype.nexus.proxy.repository.LocalStatus;
 import org.sonatype.nexus.proxy.repository.ProxyMode;
 import org.sonatype.nexus.proxy.repository.RemoteStatus;
 
-public class RepositoryStatusConverter
+/**
+ * A utility component to convert various repository status enumerations to configuration values.
+ * 
+ * @author cstamas
+ */
+@Component( role = RepositoryStatusConverter.class )
+public class DefaultRepositoryStatusConverter
+    implements RepositoryStatusConverter
 {
-    public static LocalStatus localStatusFromModel( String string )
+    public LocalStatus localStatusFromModel( String string )
     {
         if ( Configuration.LOCAL_STATUS_IN_SERVICE.equals( string ) )
         {
@@ -24,7 +32,7 @@ public class RepositoryStatusConverter
         }
     }
 
-    public static String localStatusToModel( LocalStatus localStatus )
+    public String localStatusToModel( LocalStatus localStatus )
     {
         if ( LocalStatus.IN_SERVICE.equals( localStatus ) )
         {
@@ -40,7 +48,7 @@ public class RepositoryStatusConverter
         }
     }
 
-    public static ProxyMode proxyModeFromModel( String string )
+    public ProxyMode proxyModeFromModel( String string )
     {
         if ( CRepository.PROXY_MODE_ALLOW.equals( string ) )
         {
@@ -60,7 +68,7 @@ public class RepositoryStatusConverter
         }
     }
 
-    public static String proxyModeToModel( ProxyMode proxyMode )
+    public String proxyModeToModel( ProxyMode proxyMode )
     {
         if ( ProxyMode.ALLOW.equals( proxyMode ) )
         {
@@ -80,7 +88,7 @@ public class RepositoryStatusConverter
         }
     }
 
-    public static String remoteStatusToModel( RemoteStatus remoteStatus )
+    public String remoteStatusToModel( RemoteStatus remoteStatus )
     {
         if ( RemoteStatus.UNKNOWN.equals( remoteStatus ) )
         {
@@ -99,5 +107,4 @@ public class RepositoryStatusConverter
             return null;
         }
     }
-
 }

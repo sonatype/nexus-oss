@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.sonatype.nexus.configuration.model.v1_0_2.CGroupsSettingPathMappingItem;
 import org.sonatype.nexus.configuration.model.v1_0_2.Configuration;
@@ -55,8 +56,8 @@ import org.sonatype.nexus.configuration.upgrade.Upgrader;
  * Upgrades configuration model from version 1.0.2 to 1.0.3.
  * 
  * @author cstamas
- * @plexus.component role="org.sonatype.nexus.configuration.upgrade.Upgrader" role-hint="1.0.2"
  */
+@Component( role = Upgrader.class, hint = "1.0.2" )
 public class Upgrade102to103
     implements Upgrader
 {

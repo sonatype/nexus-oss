@@ -20,9 +20,12 @@
  */
 package org.sonatype.nexus.configuration;
 
+/**
+ * A simple ID generator.
+ * 
+ * @author cstamas
+ */
 public interface ConfigurationIdGenerator
 {
-    String ROLE = ConfigurationIdGenerator.class.getName();
-    
     String generateId();
 }

@@ -41,7 +41,7 @@ public class DefaultApplicationConfigurationValidatorTest
     {
         super.setUp();
 
-        this.configurationValidator = (ApplicationConfigurationValidator) lookup( ApplicationConfigurationValidator.ROLE );
+        this.configurationValidator = (ApplicationConfigurationValidator) lookup( ApplicationConfigurationValidator.class );
     }
 
     protected Configuration getConfigurationFromStream( InputStream is )

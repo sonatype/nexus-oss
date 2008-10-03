@@ -28,6 +28,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.sonatype.nexus.configuration.model.v1_0_5.CGroupsSetting;
@@ -60,8 +61,8 @@ import org.sonatype.nexus.configuration.upgrade.Upgrader;
  * Upgrades configuration model from version 1.0.4 to 1.0.5.
  * 
  * @author cstamas
- * @plexus.component role="org.sonatype.nexus.configuration.upgrade.Upgrader" role-hint="1.0.4"
  */
+@Component( role = Upgrader.class, hint = "1.0.4" )
 public class Upgrade104to105
     extends AbstractLogEnabled
     implements Upgrader

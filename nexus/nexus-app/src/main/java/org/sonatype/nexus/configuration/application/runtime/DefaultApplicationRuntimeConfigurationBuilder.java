@@ -75,6 +75,9 @@ public class DefaultApplicationRuntimeConfigurationBuilder
     @Requirement
     private RepositoryRegistry repositoryRegistry;
 
+    @Requirement
+    private RepositoryStatusConverter repositoryStatusConverter;
+
     private PlexusContainer plexusContainer;
 
     private NexusConfiguration nexusConfiguration;
@@ -133,10 +136,10 @@ public class DefaultApplicationRuntimeConfigurationBuilder
 
                 m2repository.setId( repo.getId() );
                 m2repository.setName( repo.getName() );
-                m2repository.setLocalStatus( RepositoryStatusConverter.localStatusFromModel( repo.getLocalStatus() ) );
+                m2repository.setLocalStatus( repositoryStatusConverter.localStatusFromModel( repo.getLocalStatus() ) );
                 m2repository.setAllowWrite( repo.isAllowWrite() );
                 m2repository.setBrowseable( repo.isBrowseable() );
-                m2repository.setProxyMode( RepositoryStatusConverter.proxyModeFromModel( repo.getProxyMode() ) );
+                m2repository.setProxyMode( repositoryStatusConverter.proxyModeFromModel( repo.getProxyMode() ) );
                 m2repository.setIndexable( repo.isIndexable() );
                 m2repository.setNotFoundCacheTimeToLive( repo.getNotFoundCacheTTL() );
 
@@ -164,10 +167,10 @@ public class DefaultApplicationRuntimeConfigurationBuilder
 
                 m1repository.setId( repo.getId() );
                 m1repository.setName( repo.getName() );
-                m1repository.setLocalStatus( RepositoryStatusConverter.localStatusFromModel( repo.getLocalStatus() ) );
+                m1repository.setLocalStatus( repositoryStatusConverter.localStatusFromModel( repo.getLocalStatus() ) );
                 m1repository.setAllowWrite( repo.isAllowWrite() );
                 m1repository.setBrowseable( repo.isBrowseable() );
-                m1repository.setProxyMode( RepositoryStatusConverter.proxyModeFromModel( repo.getProxyMode() ) );
+                m1repository.setProxyMode( repositoryStatusConverter.proxyModeFromModel( repo.getProxyMode() ) );
                 m1repository.setIndexable( repo.isIndexable() );
                 m1repository.setNotFoundCacheTimeToLive( repo.getNotFoundCacheTTL() );
 
@@ -352,7 +355,7 @@ public class DefaultApplicationRuntimeConfigurationBuilder
                 shadowRepository.setId( shadow.getId() );
                 shadowRepository.setName( shadow.getName() );
 
-                shadowRepository.setLocalStatus( RepositoryStatusConverter.localStatusFromModel( shadow
+                shadowRepository.setLocalStatus( repositoryStatusConverter.localStatusFromModel( shadow
                     .getLocalStatus() ) );
                 shadowRepository.setAllowWrite( false );
                 shadowRepository.setBrowseable( true );
@@ -370,7 +373,7 @@ public class DefaultApplicationRuntimeConfigurationBuilder
                 shadowRepository.setId( shadow.getId() );
                 shadowRepository.setName( shadow.getName() );
 
-                shadowRepository.setLocalStatus( RepositoryStatusConverter.localStatusFromModel( shadow
+                shadowRepository.setLocalStatus( repositoryStatusConverter.localStatusFromModel( shadow
                     .getLocalStatus() ) );
                 shadowRepository.setAllowWrite( false );
                 shadowRepository.setBrowseable( true );
@@ -388,7 +391,7 @@ public class DefaultApplicationRuntimeConfigurationBuilder
                 shadowRepository.setId( shadow.getId() );
                 shadowRepository.setName( shadow.getName() );
 
-                shadowRepository.setLocalStatus( RepositoryStatusConverter.localStatusFromModel( shadow
+                shadowRepository.setLocalStatus( repositoryStatusConverter.localStatusFromModel( shadow
                     .getLocalStatus() ) );
                 shadowRepository.setAllowWrite( false );
                 shadowRepository.setBrowseable( true );

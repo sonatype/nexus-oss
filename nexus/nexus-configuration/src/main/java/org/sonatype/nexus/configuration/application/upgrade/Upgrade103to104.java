@@ -28,9 +28,21 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.codehaus.plexus.PlexusConstants;
+import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+import org.sonatype.nexus.configuration.model.v1_0_3.CAdvancedSchedule;
+import org.sonatype.nexus.configuration.model.v1_0_3.CDailySchedule;
+import org.sonatype.nexus.configuration.model.v1_0_3.CGroupsSettingPathMappingItem;
+import org.sonatype.nexus.configuration.model.v1_0_3.CMonthlySchedule;
+import org.sonatype.nexus.configuration.model.v1_0_3.COnceSchedule;
+import org.sonatype.nexus.configuration.model.v1_0_3.CRunNowSchedule;
+import org.sonatype.nexus.configuration.model.v1_0_3.CSchedule;
+import org.sonatype.nexus.configuration.model.v1_0_3.CTaskConfiguration;
+import org.sonatype.nexus.configuration.model.v1_0_3.CWeeklySchedule;
+import org.sonatype.nexus.configuration.model.v1_0_3.Configuration;
+import org.sonatype.nexus.configuration.model.v1_0_3.io.xpp3.NexusConfigurationXpp3Reader;
 import org.sonatype.nexus.configuration.model.v1_0_4.CGroupsSetting;
 import org.sonatype.nexus.configuration.model.v1_0_4.CHttpProxySettings;
 import org.sonatype.nexus.configuration.model.v1_0_4.CLocalStorage;
@@ -50,31 +62,20 @@ import org.sonatype.nexus.configuration.model.v1_0_4.CScheduleConfig;
 import org.sonatype.nexus.configuration.model.v1_0_4.CScheduledTask;
 import org.sonatype.nexus.configuration.model.v1_0_4.CSecurity;
 import org.sonatype.nexus.configuration.model.v1_0_4.CSmtpConfiguration;
-import org.sonatype.nexus.configuration.model.v1_0_3.CAdvancedSchedule;
-import org.sonatype.nexus.configuration.model.v1_0_3.CDailySchedule;
-import org.sonatype.nexus.configuration.model.v1_0_3.CGroupsSettingPathMappingItem;
-import org.sonatype.nexus.configuration.model.v1_0_3.CMonthlySchedule;
-import org.sonatype.nexus.configuration.model.v1_0_3.COnceSchedule;
-import org.sonatype.nexus.configuration.model.v1_0_3.CRunNowSchedule;
-import org.sonatype.nexus.configuration.model.v1_0_3.CSchedule;
-import org.sonatype.nexus.configuration.model.v1_0_3.CTaskConfiguration;
-import org.sonatype.nexus.configuration.model.v1_0_3.CWeeklySchedule;
-import org.sonatype.nexus.configuration.model.v1_0_3.Configuration;
-import org.sonatype.nexus.configuration.model.v1_0_3.io.xpp3.NexusConfigurationXpp3Reader;
 import org.sonatype.nexus.configuration.upgrade.ConfigurationIsCorruptedException;
 import org.sonatype.nexus.configuration.upgrade.UpgradeMessage;
 import org.sonatype.nexus.configuration.upgrade.Upgrader;
 
 import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.core.BaseException;
+import com.thoughtworks.xstream.XStreamException;
 import com.thoughtworks.xstream.io.xml.DomDriver;
 
 /**
  * Upgrades configuration model from version 1.0.3 to 1.0.4.
  * 
  * @author cstamas
- * @plexus.component role="org.sonatype.nexus.configuration.upgrade.Upgrader" role-hint="1.0.3"
  */
+@Component( role = Upgrader.class, hint = "1.0.3" )
 public class Upgrade103to104
     extends AbstractLogEnabled
     implements Upgrader
@@ -147,7 +148,7 @@ public class Upgrade103to104
 
                 getLogger().info( "tasks.xml file found and loaded..." );
             }
-            catch ( BaseException e )
+            catch ( XStreamException e )
             {
                 getLogger().warn( "Could not load tasks.xml, IGNORING IT!", e );
 

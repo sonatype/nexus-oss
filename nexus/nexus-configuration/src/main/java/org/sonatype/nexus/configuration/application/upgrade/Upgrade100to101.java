@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.sonatype.nexus.configuration.model.v1_0_0.Configuration;
 import org.sonatype.nexus.configuration.model.v1_0_0.io.xpp3.NexusConfigurationXpp3Reader;
@@ -54,8 +55,8 @@ import org.sonatype.nexus.configuration.upgrade.Upgrader;
  * Upgrades configuration model from version 1.0.0 (SWX: 1.0) to 1.0.1.
  * 
  * @author cstamas
- * @plexus.component role="org.sonatype.nexus.configuration.upgrade.Upgrader" role-hint="1.0.0"
  */
+@Component( role = Upgrader.class, hint = "1.0.0" )
 public class Upgrade100to101
     implements Upgrader
 {

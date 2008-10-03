@@ -8,10 +8,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
-import org.sonatype.nexus.configuration.model.v1_0_5.Configuration;
-import org.sonatype.nexus.configuration.model.v1_0_5.io.xpp3.NexusConfigurationXpp3Reader;
 import org.sonatype.nexus.configuration.model.CGroupsSetting;
 import org.sonatype.nexus.configuration.model.CGroupsSettingPathMappingItem;
 import org.sonatype.nexus.configuration.model.CHttpProxySettings;
@@ -32,6 +31,8 @@ import org.sonatype.nexus.configuration.model.CScheduleConfig;
 import org.sonatype.nexus.configuration.model.CScheduledTask;
 import org.sonatype.nexus.configuration.model.CSecurity;
 import org.sonatype.nexus.configuration.model.CSmtpConfiguration;
+import org.sonatype.nexus.configuration.model.v1_0_5.Configuration;
+import org.sonatype.nexus.configuration.model.v1_0_5.io.xpp3.NexusConfigurationXpp3Reader;
 import org.sonatype.nexus.configuration.upgrade.ConfigurationIsCorruptedException;
 import org.sonatype.nexus.configuration.upgrade.UpgradeMessage;
 import org.sonatype.nexus.configuration.upgrade.Upgrader;
@@ -40,8 +41,8 @@ import org.sonatype.nexus.configuration.upgrade.Upgrader;
  * Upgrades configuration model from version 1.0.5 to 1.0.6.
  * 
  * @author cstamas
- * @plexus.component role="org.sonatype.nexus.configuration.upgrade.Upgrader" role-hint="1.0.5"
  */
+@Component( role = Upgrader.class, hint = "1.0.5" )
 public class Upgrade105to106
     extends AbstractLogEnabled
     implements Upgrader
@@ -323,7 +324,7 @@ public class Upgrade105to106
             security.setAnonymousUsername( oldsecurity.getAnonymousUsername() );
             security.setEnabled( oldsecurity.isEnabled() );
         }
-        
+
         security.addRealm( "XmlAuthenticatingRealm" );
         security.addRealm( "NexusMethodAuthorizingRealm" );
         security.addRealm( "NexusTargetAuthorizingRealm" );
@@ -496,7 +497,7 @@ public class Upgrade105to106
             {
                 task.setType( "EmptyTrashTask" );
             }
-            
+
             task.setEnabled( oldtask.isEnabled() );
             task.setId( oldtask.getId() );
             task.setLastRun( oldtask.getLastRun() );
@@ -579,4 +580,3 @@ public class Upgrade105to106
         return group;
     }
 }
-

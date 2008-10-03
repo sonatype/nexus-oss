@@ -26,6 +26,8 @@ import java.io.IOException;
 import java.io.Reader;
 import java.util.Map;
 
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
@@ -41,15 +43,13 @@ import org.sonatype.nexus.configuration.upgrade.Upgrader;
  * file and apply apropriate modello io stuff to load configuration. It is also aware of changes across model versions.
  * 
  * @author cstamas
- * @plexus.component
  */
+@Component( role = SecurityConfigurationUpgrader.class )
 public class DefaultSecurityConfigurationUpgrader
     extends AbstractLogEnabled
     implements SecurityConfigurationUpgrader
 {
-    /**
-     * @plexus.requirement role="org.sonatype.nexus.configuration.security.upgrade.SecurityUpgrader"
-     */
+    @Requirement( role = SecurityUpgrader.class )
     private Map<String, Upgrader> upgraders;
 
     /**

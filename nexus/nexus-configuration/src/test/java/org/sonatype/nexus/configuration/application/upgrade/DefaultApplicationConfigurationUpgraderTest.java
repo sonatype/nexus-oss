@@ -44,7 +44,7 @@ public class DefaultApplicationConfigurationUpgraderTest
 
         FileUtils.cleanDirectory( new File( getNexusConfiguration() ).getParentFile() );
 
-        this.configurationUpgrader = (ApplicationConfigurationUpgrader) lookup( ApplicationConfigurationUpgrader.ROLE );
+        this.configurationUpgrader = (ApplicationConfigurationUpgrader) lookup( ApplicationConfigurationUpgrader.class );
     }
 
     protected void resultIsFine( String path, Configuration configuration )

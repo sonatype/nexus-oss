@@ -29,8 +29,6 @@ import org.codehaus.plexus.interpolation.Interpolator;
  */
 public interface ApplicationInterpolatorProvider
 {
-    String ROLE = ApplicationInterpolatorProvider.class.getName();
-
     /**
      * Returns the interpolator.
      * 

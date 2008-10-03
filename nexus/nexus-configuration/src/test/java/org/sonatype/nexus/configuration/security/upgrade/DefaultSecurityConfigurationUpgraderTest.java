@@ -43,7 +43,7 @@ public class DefaultSecurityConfigurationUpgraderTest
 
         FileUtils.cleanDirectory( new File( getSecurityConfiguration() ).getParentFile() );
         
-        this.configurationUpgrader = ( SecurityConfigurationUpgrader ) lookup( SecurityConfigurationUpgrader.ROLE );
+        this.configurationUpgrader = ( SecurityConfigurationUpgrader ) lookup( SecurityConfigurationUpgrader.class );
     }
 
     protected void resultIsFine( String path, Configuration configuration )

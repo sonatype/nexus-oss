@@ -33,6 +33,8 @@ import java.util.Set;
 
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.context.ContextException;
@@ -59,18 +61,16 @@ import org.sonatype.scheduling.schedules.WeeklySchedule;
 /**
  * The default implementation of the Task Configuration manager. Will handle writing to and loading from the tasks.xml
  * file. Will also load a default set of tasks if there is no existing configuration
- * 
- * @plexus.component
  */
+@Component( role = TaskConfigManager.class )
 public class DefaultTaskConfigManager
     extends AbstractLogEnabled
     implements TaskConfigManager, Initializable, Contextualizable, EventListener
 {
     /**
      * The app config holding tasks.
-     * 
-     * @plexus.requirement
      */
+    @Requirement
     private ApplicationConfiguration applicationConfiguration;
 
     /**

@@ -3,10 +3,10 @@ package org.sonatype.nexus.util;
 import java.io.File;
 import java.net.URL;
 
-import org.codehaus.plexus.PlexusTestCase;
+import junit.framework.TestCase;
 
 public class FileUtilsTest
-    extends PlexusTestCase
+    extends TestCase
 {
     public void testUNCPath()
         throws Exception

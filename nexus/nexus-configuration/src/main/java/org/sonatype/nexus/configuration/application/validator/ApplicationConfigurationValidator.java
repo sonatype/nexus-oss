@@ -45,10 +45,9 @@ import org.sonatype.nexus.configuration.validator.ValidationResponse;
  * 
  * @author cstamas
  */
-public interface ApplicationConfigurationValidator extends ConfigurationValidator
+public interface ApplicationConfigurationValidator
+    extends ConfigurationValidator
 {
-    String ROLE = ApplicationConfigurationValidator.class.getName();
-
     /**
      * Validates a repository configuration.
      * 
@@ -71,7 +70,8 @@ public interface ApplicationConfigurationValidator extends ConfigurationValidato
      * @param settings
      * @return
      */
-    ValidationResponse validateRemoteConnectionSettings( ApplicationValidationContext ctx, CRemoteConnectionSettings settings );
+    ValidationResponse validateRemoteConnectionSettings( ApplicationValidationContext ctx,
+        CRemoteConnectionSettings settings );
 
     /**
      * Validates security settings.
@@ -87,7 +87,8 @@ public interface ApplicationConfigurationValidator extends ConfigurationValidato
      * @param settings
      * @return
      */
-    ValidationResponse validateRemoteHttpProxySettings( ApplicationValidationContext ctx, CRemoteHttpProxySettings settings );
+    ValidationResponse validateRemoteHttpProxySettings( ApplicationValidationContext ctx,
+        CRemoteHttpProxySettings settings );
 
     /**
      * Validates remote authentication.
@@ -177,7 +178,7 @@ public interface ApplicationConfigurationValidator extends ConfigurationValidato
      * @return
      */
     ValidationResponse validateSchedule( ApplicationValidationContext ctx, CScheduleConfig settings );
-    
+
     /**
      * Validates smtp
      * 

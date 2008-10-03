@@ -70,6 +70,7 @@ import com.thoughtworks.xstream.XStream;
  * instantaniate our custom Representation (serialization/deserialization).
  * 
  * @author cstamas
+ * @deprecated
  */
 public abstract class AbstractNexusResourceHandler
     extends AbstractPlexusAwareResource
