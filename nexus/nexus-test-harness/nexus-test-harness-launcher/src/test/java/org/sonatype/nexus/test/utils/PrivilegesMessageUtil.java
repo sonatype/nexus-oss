@@ -78,7 +78,7 @@ public class PrivilegesMessageUtil
         String privId = ( method == Method.POST ) ? "" : "/" + id;
         String serviceURI = "service/local/privileges" + privId;
 
-        if ( method == Method.POST )
+        if ( method == Method.POST || method == Method.PUT ) // adding put so we can check for the 405, without a resource you get a 400
         {
             PrivilegeResourceRequest requestResponse = new PrivilegeResourceRequest();
             requestResponse.setData( resource );

@@ -64,11 +64,11 @@ public class PrivilegeBaseStatusResourceConverter
             {
                 return super.instantiateNewInstance( reader, context );
             }
-            else if ( AbstractPrivilegeResourceHandler.TYPE_REPO_TARGET.equals( type ))
+            else if ( AbstractPrivilegePlexusResource.TYPE_REPO_TARGET.equals( type ))
             {
                 return new PrivilegeTargetStatusResource();
             }
-            else if ( AbstractPrivilegeResourceHandler.TYPE_APPLICATION.equals( type ))
+            else if ( AbstractPrivilegePlexusResource.TYPE_APPLICATION.equals( type ))
             {
                 return new PrivilegeApplicationStatusResource();
             }

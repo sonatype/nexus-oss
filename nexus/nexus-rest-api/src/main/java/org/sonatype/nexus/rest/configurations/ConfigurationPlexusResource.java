@@ -12,7 +12,7 @@ import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
 import org.sonatype.nexus.NexusStreamResponse;
 import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
-import org.sonatype.nexus.rest.global.GlobalConfigurationResourceHandler;
+import org.sonatype.nexus.rest.global.GlobalConfigurationPlexusResource;
 import org.sonatype.plexus.rest.representation.InputStreamRepresentation;
 
 /**
@@ -64,7 +64,7 @@ public class ConfigurationPlexusResource
         throws ResourceException
     {
         String configurationName = request
-            .getAttributes().get( GlobalConfigurationResourceHandler.CONFIG_NAME_KEY ).toString();
+            .getAttributes().get( GlobalConfigurationPlexusResource.CONFIG_NAME_KEY ).toString();
 
         try
         {

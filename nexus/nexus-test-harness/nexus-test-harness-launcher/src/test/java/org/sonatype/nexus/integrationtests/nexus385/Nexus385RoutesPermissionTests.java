@@ -104,7 +104,7 @@ public class Nexus385RoutesPermissionTests extends AbstractPrivilegeTest
         
         // update user
         response = this.routeUtil.sendMessage( Method.PUT, route );
-        Assert.assertEquals( "Response status: ", 200, response.getStatus().getCode() );
+        Assert.assertEquals( "Response status: ", 204, response.getStatus().getCode() );
 
         // read should succeed (inherited)
         response = this.routeUtil.sendMessage( Method.GET, route );

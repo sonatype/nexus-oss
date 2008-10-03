@@ -1,30 +1,10 @@
-/*
- * Nexus: Maven Repository Manager
- * Copyright (C) 2008 Sonatype Inc.                                                                                                                          
- * 
- * This file is part of Nexus.                                                                                                                                  
- * 
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see http://www.gnu.org/licenses/.
- *
- */
 package org.sonatype.nexus.rest.repositories;
 
-import org.restlet.Context;
 import org.restlet.data.Form;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.data.Status;
+import org.restlet.resource.ResourceException;
 import org.sonatype.nexus.configuration.model.CLocalStorage;
 import org.sonatype.nexus.configuration.model.CRemoteAuthentication;
 import org.sonatype.nexus.configuration.model.CRemoteConnectionSettings;
@@ -35,20 +15,15 @@ import org.sonatype.nexus.configuration.model.CRepositoryShadow;
 import org.sonatype.nexus.configuration.model.Configuration;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.repository.RemoteStatus;
-import org.sonatype.nexus.rest.AbstractNexusResourceHandler;
+import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
 import org.sonatype.nexus.rest.global.AbstractGlobalConfigurationPlexusResource;
 import org.sonatype.nexus.rest.model.RepositoryProxyResource;
 import org.sonatype.nexus.rest.model.RepositoryResource;
 import org.sonatype.nexus.rest.model.RepositoryResourceRemoteStorage;
 import org.sonatype.nexus.rest.model.RepositoryShadowResource;
 
-/**
- * Base class for Repository Resource Handlers.
- * 
- * @author cstamas
- */
-public class AbstractRepositoryResourceHandler
-    extends AbstractNexusResourceHandler
+public abstract class AbstractRepositoryPlexusResource
+    extends AbstractNexusPlexusResource
 {
 
     /** Key to store Repo with which we work against. */
@@ -63,18 +38,7 @@ public class AbstractRepositoryResourceHandler
     /** Repo type virtual (shadow in nexus). */
     public static final String REPO_TYPE_VIRTUAL = "virtual";
 
-    /**
-     * Standard resource constructor.
-     * 
-     * @param context
-     * @param request
-     * @param response
-     */
-    public AbstractRepositoryResourceHandler( Context context, Request request, Response response )
-    {
-        super( context, request, response );
-    }
-
+    
     /**
      * Converting App model to REST DTO.
      */
@@ -460,24 +424,24 @@ public class AbstractRepositoryResourceHandler
         }
     }
 
-    public String getRestRepoRemoteStatus( Object model )
+    public String getRestRepoRemoteStatus( Object model, Request request, Response response ) throws ResourceException
     {
         try
         {
             if ( CRepository.class.isAssignableFrom( model.getClass() ) )
             {
-                Form form = getRequest().getResourceRef().getQueryAsForm();
+                Form form = request.getResourceRef().getQueryAsForm();
 
                 boolean forceCheck = form.getFirst( "forceCheck" ) != null;
 
                 CRepository m = (CRepository) model;
 
-                RemoteStatus rs = getNexus().getRepository( m.getId() ).getRemoteStatus( forceCheck );
+                RemoteStatus rs = getNexusInstance( request ).getRepository( m.getId() ).getRemoteStatus( forceCheck );
 
                 if ( RemoteStatus.UNKNOWN.equals( rs ) )
                 {
                     // set status to ACCEPTED, since we have incomplete info
-                    getResponse().setStatus( Status.SUCCESS_ACCEPTED );
+                    response.setStatus( Status.SUCCESS_ACCEPTED );
                 }
 
                 return rs == null ? null : rs.toString();
@@ -506,5 +470,5 @@ public class AbstractRepositoryResourceHandler
             return null;
         }
     }
-
+    
 }

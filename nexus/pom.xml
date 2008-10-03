@@ -118,7 +118,7 @@
 		<profile>
 			<id>test-harness</id>
 			<activation>
-				<activeByDefault>true</activeByDefault>
+				<activeByDefault>false</activeByDefault>
 				<property>
 					<name>test-harness</name>
 				</property>

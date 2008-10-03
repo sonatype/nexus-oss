@@ -1,23 +1,3 @@
-/*
- * Nexus: Maven Repository Manager
- * Copyright (C) 2008 Sonatype Inc.                                                                                                                          
- * 
- * This file is part of Nexus.                                                                                                                                  
- * 
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see http://www.gnu.org/licenses/.
- *
- */
 package org.sonatype.nexus.rest.global;
 
 import java.io.IOException;
@@ -30,8 +10,9 @@ import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.data.Status;
-import org.restlet.resource.Representation;
+import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
+import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.model.CRemoteAuthentication;
 import org.sonatype.nexus.configuration.model.CRemoteConnectionSettings;
@@ -42,15 +23,18 @@ import org.sonatype.nexus.rest.model.GlobalConfigurationResourceResponse;
 import org.sonatype.nexus.rest.model.RemoteConnectionSettings;
 import org.sonatype.nexus.rest.model.RemoteHttpProxySettings;
 import org.sonatype.nexus.rest.model.SmtpSettings;
+import org.sonatype.plexus.rest.resource.PlexusResourceException;
 
 /**
- * The GlobalConfiguration resource handler. It simply gets and builds the requested config REST model (DTO) and passes
+ * The GlobalConfiguration resource. It simply gets and builds the requested config REST model (DTO) and passes
  * serializes it using underlying representation mechanism.
  * 
  * @author cstamas
+ * @author tstevens
+ * @plexus.component role-hint="GlobalConfigurationPlexusResource"
  */
-public class GlobalConfigurationResourceHandler
-    extends AbstractGlobalConfigurationResourceHandler
+public class GlobalConfigurationPlexusResource
+    extends AbstractGlobalConfigurationPlexusResource
 {
 
     /** The config key used in URI and request attributes */
@@ -62,39 +46,32 @@ public class GlobalConfigurationResourceHandler
     /** Name denoting default Nexus configuration */
     public static final String DEFAULT_CONFIG_NAME = "default";
 
-    /**
-     * The default Resource constructor.
-     * 
-     * @param context
-     * @param request
-     * @param response
-     */
-    public GlobalConfigurationResourceHandler( Context context, Request request, Response response )
+    public GlobalConfigurationPlexusResource()
     {
-        super( context, request, response );
+        this.setModifiable( true );
+    }
+    
+    @Override
+    public Object getPayloadInstance()
+    {
+        return new GlobalConfigurationResourceResponse();
     }
 
-    /**
-     * This handler allows get.
-     */
-    public boolean allowGet()
+    @Override
+    public String getResourceUri()
     {
-        return true;
+        return "/global_settings/{" + CONFIG_NAME_KEY + "}";
     }
 
-    /**
-     * The representation handler executed on GET calls. Here we build a GlobalConfigurationResource object using Nexus
-     * App calls and we ship it back to requestor.
-     */
-    public Representation getRepresentationHandler( Variant variant )
+    @Override
+    public Object get( Context context, Request request, Response response, Variant variant )
+        throws ResourceException
     {
-        String configurationName = getRequest().getAttributes().get( CONFIG_NAME_KEY ).toString();
+        String configurationName = request.getAttributes().get( CONFIG_NAME_KEY ).toString();
 
         if ( !DEFAULT_CONFIG_NAME.equals( configurationName ) && !CURRENT_CONFIG_NAME.equals( configurationName ) )
         {
-            getResponse().setStatus( Status.CLIENT_ERROR_NOT_FOUND );
-
-            return null;
+            throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND );
         }
         else
         {
@@ -102,57 +79,42 @@ public class GlobalConfigurationResourceHandler
 
             if ( DEFAULT_CONFIG_NAME.equals( configurationName ) )
             {
-                fillDefaultConfiguration( resource );
+                fillDefaultConfiguration( resource, this.getNexusInstance( request ) );
             }
             else
             {
-                fillCurrentConfiguration( resource );
+                fillCurrentConfiguration( resource, this.getNexusInstance( request ) );
             }
 
-            GlobalConfigurationResourceResponse response = new GlobalConfigurationResourceResponse();
+            GlobalConfigurationResourceResponse result = new GlobalConfigurationResourceResponse();
 
-            response.setData( resource );
+            result.setData( resource );
 
-            return serialize( variant, response );
+            return result;
         }
     }
 
-    /**
-     * We allow PUT also (modifiying configuration).
-     */
-    public boolean allowPut()
+    @Override
+    public Object put( Context context, Request request, Response response, Object payload )
+        throws ResourceException
     {
-        return true;
-    }
-
-    /**
-     * On HTTP PUT we should have a DTO in representation entity sent from client. We simply deserialize it, convert it
-     * and set the configuration using MutableConfiguration iface. Only the "current" config is PUTtable. On "default"
-     * config we return an HTTP "Error not allowed" error.
-     */
-    public void put( Representation entity )
-    {
-        String configurationName = getRequest().getAttributes().get( CONFIG_NAME_KEY ).toString();
+        String configurationName = request.getAttributes().get( CONFIG_NAME_KEY ).toString();
 
         if ( !DEFAULT_CONFIG_NAME.equals( configurationName ) && !CURRENT_CONFIG_NAME.equals( configurationName ) )
         {
-            getResponse().setStatus( Status.CLIENT_ERROR_NOT_FOUND );
-
-            return;
+            throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND );
         }
         else if ( !CURRENT_CONFIG_NAME.equals( configurationName ) )
         {
-            getResponse().setStatus( Status.CLIENT_ERROR_METHOD_NOT_ALLOWED );
-
-            return;
+            throw new ResourceException( Status.CLIENT_ERROR_METHOD_NOT_ALLOWED );
         }
         else
         {
-            GlobalConfigurationResourceResponse response = (GlobalConfigurationResourceResponse) deserialize( new GlobalConfigurationResourceResponse() );
+            GlobalConfigurationResourceResponse configRequest = (GlobalConfigurationResourceResponse) payload;
 
-            if ( response != null )
+            if ( configRequest != null )
             {
-                GlobalConfigurationResource resource = response.getData();
+                GlobalConfigurationResource resource = configRequest.getData();
 
                 try
                 {
@@ -176,7 +138,7 @@ public class GlobalConfigurationResourceHandler
 
                         config.setSystemEmailAddress( settings.getSystemEmailAddress() );
 
-                        getNexus().updateSmtpConfiguration( config );
+                        getNexusInstance( request ).updateSmtpConfiguration( config );
                     }
 
                     if ( resource.getGlobalConnectionSettings() != null )
@@ -193,7 +155,7 @@ public class GlobalConfigurationResourceHandler
 
                         connection.setUserAgentString( s.getUserAgentString() );
 
-                        getNexus().updateGlobalRemoteConnectionSettings( connection );
+                        getNexusInstance( request ).updateGlobalRemoteConnectionSettings( connection );
                     }
 
                     if ( resource.getGlobalHttpProxySettings() != null
@@ -226,32 +188,33 @@ public class GlobalConfigurationResourceHandler
                             proxy.setAuthentication( auth );
                         }
 
-                        getNexus().updateGlobalRemoteHttpProxySettings( proxy );
+                        getNexusInstance( request ).updateGlobalRemoteHttpProxySettings( proxy );
                     }
                     else
                     {
-                        getNexus().updateGlobalRemoteHttpProxySettings( null );
+                        getNexusInstance( request ).updateGlobalRemoteHttpProxySettings( null );
                     }
 
-                    getNexus().setSecurityEnabled( resource.isSecurityEnabled() );
+                    getNexusInstance( request ).setSecurityEnabled( resource.isSecurityEnabled() );
 
-                    getNexus().setAnonymousAccessEnabled( resource.isSecurityAnonymousAccessEnabled() );
+                    getNexusInstance( request ).setAnonymousAccessEnabled( resource.isSecurityAnonymousAccessEnabled() );
 
                     if ( resource.isSecurityAnonymousAccessEnabled()
                         && !StringUtils.isEmpty( resource.getSecurityAnonymousUsername() )
                         && !StringUtils.isEmpty( resource.getSecurityAnonymousPassword() ) )
                     {
-                        if ( getNexus().getAnonymousUsername().equals( resource.getSecurityAnonymousUsername() )
-                            && !getNexus().getAnonymousPassword().equals( resource.getSecurityAnonymousPassword() ) )
+                        if ( getNexusInstance( request ).getAnonymousUsername().equals(
+                            resource.getSecurityAnonymousUsername() )
+                            && !getNexusInstance( request ).getAnonymousPassword().equals(
+                                resource.getSecurityAnonymousPassword() ) )
                         {
                             // no user change, only password
-                            
-                            /* TODO
-                            getNexusSecurityConfiguration().changePassword(
-                                getNexus().getAnonymousUsername(),
-                                getNexus().getAnonymousPassword(),
-                                resource.getSecurityAnonymousPassword() );
-                            */                            
+
+                            /*
+                             * TODO getNexusSecurityConfiguration().changePassword( getNexusInstance( request
+                             * ).getAnonymousUsername(), getNexusInstance( request ).getAnonymousPassword(),
+                             * resource.getSecurityAnonymousPassword() );
+                             */
                         }
                         else
                         {
@@ -260,7 +223,7 @@ public class GlobalConfigurationResourceHandler
                             {
                                 // try to "log in" with supplied credentials
                                 // the anon user a) should exists b) the pwd must work
-                                getSecurityManager().authenticate(
+                                getSecurityManager( request ).authenticate(
                                     new UsernamePasswordToken( resource.getSecurityAnonymousUsername(), resource
                                         .getSecurityAnonymousPassword() ) );
                             }
@@ -268,41 +231,31 @@ public class GlobalConfigurationResourceHandler
                             {
                                 // the supplied anon auth info is wrong
                                 getLogger()
-                                    .log(
-                                        Level.WARNING,
+                                    .warn(
                                         "Nexus refused to apply configuration, the supplied anonymous information is wrong.",
                                         e );
 
-                                getResponse().setStatus( Status.CLIENT_ERROR_BAD_REQUEST, e.getMessage() );
-
-                                getResponse().setEntity(
-                                    serialize( entity, getNexusErrorResponse( "securityAnonymousUsername", e
-                                        .getMessage() ) ) );
-
-                                return;
+                                throw new PlexusResourceException(
+                                    Status.CLIENT_ERROR_BAD_REQUEST,
+                                    e.getMessage(),
+                                    getNexusErrorResponse( "securityAnonymousUsername", e.getMessage() ) );
                             }
                         }
 
-                        getNexus().setAnonymousUsername( resource.getSecurityAnonymousUsername() );
+                        getNexusInstance( request ).setAnonymousUsername( resource.getSecurityAnonymousUsername() );
 
-                        getNexus().setAnonymousPassword( resource.getSecurityAnonymousPassword() );
+                        getNexusInstance( request ).setAnonymousPassword( resource.getSecurityAnonymousPassword() );
                     }
                     else if ( resource.isSecurityAnonymousAccessEnabled() )
                     {
                         // the supplied anon auth info is wrong
                         getLogger()
-                            .log(
-                                Level.WARNING,
+                            .warn(
                                 "Nexus refused to apply configuration, the supplied anonymous username/pwd information is empty." );
 
-                        getResponse().setStatus( Status.CLIENT_ERROR_BAD_REQUEST );
-
-                        getResponse().setEntity(
-                            serialize( entity, getNexusErrorResponse(
-                                "securityAnonymousUsername",
-                                "Cannot be empty when Anonynous access is enabled" ) ) );
-
-                        return;
+                        throw new PlexusResourceException( Status.CLIENT_ERROR_BAD_REQUEST, getNexusErrorResponse(
+                            "securityAnonymousUsername",
+                            "Cannot be empty when Anonynous access is enabled" ) );
                     }
 
                     if ( resource.getBaseUrl() != null )
@@ -310,37 +263,36 @@ public class GlobalConfigurationResourceHandler
                         if ( StringUtils.isEmpty( resource.getBaseUrl() ) )
                         {
                             // resetting it
-                            getNexus().setBaseUrl( null );
+                            getNexusInstance( request ).setBaseUrl( null );
                         }
                         else
                         {
                             // setting it
-                            getNexus().setBaseUrl( resource.getBaseUrl() );
+                            getNexusInstance( request ).setBaseUrl( resource.getBaseUrl() );
                         }
                     }
                 }
                 catch ( ConfigurationException e )
                 {
-                    getLogger().log( Level.WARNING, "Nexus refused to apply configuration.", e );
+                    getLogger().warn( "Nexus refused to apply configuration.", e );
 
-                    getResponse().setStatus( Status.CLIENT_ERROR_BAD_REQUEST, e.getMessage() );
-
-                    getResponse().setEntity( serialize( entity, getNexusErrorResponse( "*", e.getMessage() ) ) );
-
-                    return;
+                    throw new PlexusResourceException(
+                        Status.CLIENT_ERROR_BAD_REQUEST,
+                        e.getMessage(),
+                        getNexusErrorResponse( "*", e.getMessage() ) );
                 }
                 catch ( IOException e )
                 {
-                    getLogger().log( Level.SEVERE, "Got IO Exception during update of Nexus configuration.", e );
+                    getLogger().warn( "Got IO Exception during update of Nexus configuration.", e );
 
-                    getResponse().setStatus( Status.SERVER_ERROR_INTERNAL );
-
-                    return;
+                    throw new ResourceException( Status.SERVER_ERROR_INTERNAL );
                 }
 
             }
         }
-
+        // TODO: this method needs some serious cleaning up...
+        response.setStatus( Status.SUCCESS_NO_CONTENT );
+        return null;
     }
 
     /**
@@ -348,21 +300,21 @@ public class GlobalConfigurationResourceHandler
      * 
      * @param resource
      */
-    protected void fillDefaultConfiguration( GlobalConfigurationResource resource )
+    protected void fillDefaultConfiguration( GlobalConfigurationResource resource, Nexus nexus )
     {
-        resource.setSecurityEnabled( getNexus().isDefaultSecurityEnabled() );
+        resource.setSecurityEnabled( nexus.isDefaultSecurityEnabled() );
 
-        resource.setSecurityAnonymousAccessEnabled( getNexus().isDefaultAnonymousAccessEnabled() );
+        resource.setSecurityAnonymousAccessEnabled( nexus.isDefaultAnonymousAccessEnabled() );
 
-        resource.setSecurityAnonymousUsername( getNexus().getDefaultAnonymousUsername() );
+        resource.setSecurityAnonymousUsername( nexus.getDefaultAnonymousUsername() );
 
-        resource.setSecurityAnonymousPassword( getNexus().getDefaultAnonymousPassword() );
+        resource.setSecurityAnonymousPassword( nexus.getDefaultAnonymousPassword() );
 
-        resource.setGlobalConnectionSettings( convert( getNexus().readDefaultGlobalRemoteConnectionSettings() ) );
+        resource.setGlobalConnectionSettings( convert( nexus.readDefaultGlobalRemoteConnectionSettings() ) );
 
-        resource.setGlobalHttpProxySettings( convert( getNexus().readDefaultGlobalRemoteHttpProxySettings() ) );
+        resource.setGlobalHttpProxySettings( convert( nexus.readDefaultGlobalRemoteHttpProxySettings() ) );
 
-        resource.setSmtpSettings( convert( getNexus().readDefaultSmtpConfiguration() ) );
+        resource.setSmtpSettings( convert( nexus.readDefaultSmtpConfiguration() ) );
     }
 
     /**
@@ -370,23 +322,23 @@ public class GlobalConfigurationResourceHandler
      * 
      * @param resource
      */
-    protected void fillCurrentConfiguration( GlobalConfigurationResource resource )
+    protected void fillCurrentConfiguration( GlobalConfigurationResource resource, Nexus nexus )
     {
-        resource.setSecurityEnabled( getNexus().isSecurityEnabled() );
+        resource.setSecurityEnabled( nexus.isSecurityEnabled() );
 
-        resource.setSecurityAnonymousAccessEnabled( getNexus().isAnonymousAccessEnabled() );
+        resource.setSecurityAnonymousAccessEnabled( nexus.isAnonymousAccessEnabled() );
 
-        resource.setSecurityAnonymousUsername( getNexus().getAnonymousUsername() );
+        resource.setSecurityAnonymousUsername( nexus.getAnonymousUsername() );
 
-        resource.setSecurityAnonymousPassword( getNexus().getAnonymousPassword() );
+        resource.setSecurityAnonymousPassword( nexus.getAnonymousPassword() );
 
-        resource.setGlobalConnectionSettings( convert( getNexus().readGlobalRemoteConnectionSettings() ) );
+        resource.setGlobalConnectionSettings( convert( nexus.readGlobalRemoteConnectionSettings() ) );
 
-        resource.setGlobalHttpProxySettings( convert( getNexus().readGlobalRemoteHttpProxySettings() ) );
+        resource.setGlobalHttpProxySettings( convert( nexus.readGlobalRemoteHttpProxySettings() ) );
 
-        resource.setBaseUrl( getNexus().getBaseUrl() );
+        resource.setBaseUrl( nexus.getBaseUrl() );
 
-        resource.setSmtpSettings( convert( getNexus().readSmtpConfiguration() ) );
+        resource.setSmtpSettings( convert( nexus.readSmtpConfiguration() ) );
     }
 
     protected String getSecurityConfiguration( boolean enabled, String authSourceType )

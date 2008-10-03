@@ -67,27 +67,27 @@ public class ScheduledServiceBaseResourceConverter
             {
                 return super.instantiateNewInstance( reader, context );
             }
-            else if ( AbstractScheduledServiceResourceHandler.SCHEDULE_TYPE_MANUAL.equals( schedule ))
+            else if ( AbstractScheduledServicePlexusResource.SCHEDULE_TYPE_MANUAL.equals( schedule ))
             {
                 return new ScheduledServiceBaseResource();
             }
-            else if ( AbstractScheduledServiceResourceHandler.SCHEDULE_TYPE_ONCE.equals( schedule ))
+            else if ( AbstractScheduledServicePlexusResource.SCHEDULE_TYPE_ONCE.equals( schedule ))
             {
                 return new ScheduledServiceOnceResource();
             }
-            else if ( AbstractScheduledServiceResourceHandler.SCHEDULE_TYPE_DAILY.equals( schedule ))
+            else if ( AbstractScheduledServicePlexusResource.SCHEDULE_TYPE_DAILY.equals( schedule ))
             {
                 return new ScheduledServiceDailyResource();
             }
-            else if ( AbstractScheduledServiceResourceHandler.SCHEDULE_TYPE_WEEKLY.equals( schedule ))
+            else if ( AbstractScheduledServicePlexusResource.SCHEDULE_TYPE_WEEKLY.equals( schedule ))
             {
                 return new ScheduledServiceWeeklyResource();
             }
-            else if ( AbstractScheduledServiceResourceHandler.SCHEDULE_TYPE_MONTHLY.equals( schedule ))
+            else if ( AbstractScheduledServicePlexusResource.SCHEDULE_TYPE_MONTHLY.equals( schedule ))
             {
                 return new ScheduledServiceMonthlyResource();
             }
-            else if ( AbstractScheduledServiceResourceHandler.SCHEDULE_TYPE_ADVANCED.equals( schedule ))
+            else if ( AbstractScheduledServicePlexusResource.SCHEDULE_TYPE_ADVANCED.equals( schedule ))
             {
                 return new ScheduledServiceAdvancedResource();
             }

@@ -20,14 +20,11 @@
  */
 package org.sonatype.nexus.rest.global;
 
-import org.restlet.Context;
-import org.restlet.data.Request;
-import org.restlet.data.Response;
 import org.sonatype.nexus.configuration.model.CRemoteAuthentication;
 import org.sonatype.nexus.configuration.model.CRemoteConnectionSettings;
 import org.sonatype.nexus.configuration.model.CRemoteHttpProxySettings;
 import org.sonatype.nexus.configuration.model.CSmtpConfiguration;
-import org.sonatype.nexus.rest.AbstractNexusResourceHandler;
+import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
 import org.sonatype.nexus.rest.model.AuthenticationSettings;
 import org.sonatype.nexus.rest.model.RemoteConnectionSettings;
 import org.sonatype.nexus.rest.model.RemoteHttpProxySettings;
@@ -38,19 +35,14 @@ import org.sonatype.nexus.rest.model.SmtpSettings;
  * 
  * @author cstamas
  */
-public abstract class AbstractGlobalConfigurationResourceHandler
-    extends AbstractNexusResourceHandler
+public abstract class AbstractGlobalConfigurationPlexusResource
+    extends AbstractNexusPlexusResource
 {
     public static final String SECURITY_OFF = "off";
 
     public static final String SECURITY_SIMPLE = "simple";
     
     public static final String SECURITY_CUSTOM = "custom";
-    
-    public AbstractGlobalConfigurationResourceHandler( Context context, Request request, Response response )
-    {
-        super( context, request, response );
-    }
     
     public static SmtpSettings convert( CSmtpConfiguration settings )
     {

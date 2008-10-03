@@ -67,7 +67,7 @@ public class PrivilegeTest
         PrivilegeResourceRequest request = ( PrivilegeResourceRequest ) representation.getPayload( new PrivilegeResourceRequest() );
 
         assert request.getData().getName().equals( "Test Priv" );
-        assert request.getData().getType().equals( AbstractPrivilegeResourceHandler.TYPE_REPO_TARGET );
+        assert request.getData().getType().equals( AbstractPrivilegePlexusResource.TYPE_REPO_TARGET );
         assert request.getData().getMethod().size() == 2;
         assert request.getData().getMethod().contains( "read" );
         assert request.getData().getMethod().contains( "create" );

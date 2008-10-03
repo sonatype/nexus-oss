@@ -27,8 +27,10 @@ import org.restlet.Context;
 import org.restlet.data.Reference;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
+import org.restlet.resource.ResourceException;
 import org.sonatype.nexus.configuration.model.CGroupsSettingPathMappingItem;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
+import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
 import org.sonatype.nexus.rest.AbstractNexusResourceHandler;
 import org.sonatype.nexus.rest.model.RepositoryRouteMemberRepository;
 import org.sonatype.nexus.rest.model.RepositoryRouteResource;
@@ -38,21 +40,12 @@ import org.sonatype.nexus.rest.model.RepositoryRouteResource;
  * 
  * @author cstamas
  */
-public abstract class AbstractRepositoryRouteResourceHandler
-    extends AbstractNexusResourceHandler
+public abstract class AbstractRepositoryRoutePlexusResource
+    extends AbstractNexusPlexusResource
 {
-    /**
-     * Standard constructor.
-     * 
-     * @param context
-     * @param request
-     * @param response
-     */
-    public AbstractRepositoryRouteResourceHandler( Context context, Request request, Response response )
-    {
-        super( context, request, response );
-    }
 
+    public static final String ROUTE_ID_KEY = "routeId";
+    
     /**
      * Creating a list of member reposes. Since this method is used in two Resource subclasses too, and those are
      * probably mapped to different bases, a listBase param is needed to generate a correct URI, from the actual
@@ -60,12 +53,14 @@ public abstract class AbstractRepositoryRouteResourceHandler
      * 
      * @param listBase
      * @param reposList
+     * @param request
      * @return
      * @throws NoSuchRepositoryException
+     * @throws ResourceException 
      */
     protected List<RepositoryRouteMemberRepository> getRepositoryRouteMemberRepositoryList( Reference listBase,
-        List<String> reposList )
-        throws NoSuchRepositoryException
+        List<String> reposList, Request request )
+        throws NoSuchRepositoryException, ResourceException
     {
         List<RepositoryRouteMemberRepository> members = new ArrayList<RepositoryRouteMemberRepository>( reposList
             .size() );
@@ -86,9 +81,9 @@ public abstract class AbstractRepositoryRouteResourceHandler
             {
                 member.setId( repoId );
 
-                member.setName( getNexus().getRepository( repoId ).getName() );
+                member.setName( getNexusInstance( request ).getRepository( repoId ).getName() );
 
-                member.setResourceURI( calculateRepositoryReference( repoId ).toString() );
+                member.setResourceURI( createChildReference( request, repoId ).toString() );
             }
 
             members.add( member );

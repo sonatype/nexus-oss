@@ -63,7 +63,7 @@ public class PrivilegeBaseResourceConverter
             {
                 return super.instantiateNewInstance( reader, context );
             }
-            else if ( AbstractPrivilegeResourceHandler.TYPE_REPO_TARGET.equals( type ))
+            else if ( AbstractPrivilegePlexusResource.TYPE_REPO_TARGET.equals( type ))
             {
                 return new PrivilegeTargetResource();
             }

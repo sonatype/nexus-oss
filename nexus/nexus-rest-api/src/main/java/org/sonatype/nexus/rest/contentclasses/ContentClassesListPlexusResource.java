@@ -20,50 +20,50 @@
  */
 package org.sonatype.nexus.rest.contentclasses;
 
-import java.io.IOException;
 import java.util.Collection;
 
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
-import org.restlet.resource.Representation;
+import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
 import org.sonatype.nexus.proxy.registry.ContentClass;
-import org.sonatype.nexus.rest.AbstractNexusResourceHandler;
+import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
 import org.sonatype.nexus.rest.model.RepositoryContentClassListResource;
 import org.sonatype.nexus.rest.model.RepositoryContentClassListResourceResponse;
 
 /**
- * The ContentClasses list resource handler. This handles the GET method only and simply returns the list of existing
+ * The ContentClasses list resource. This handles the GET method only and simply returns the list of existing
  * nexus ContentClasses.
  * 
  * @author cstamas
+ * @author tstevens
+ * @plexus.component role-hint="ContentClassesListPlexusResource"
  */
-public class ContentClassesListResourceHandler
-    extends AbstractNexusResourceHandler
+public class ContentClassesListPlexusResource
+    extends AbstractNexusPlexusResource
 {
 
-    /**
-     * The resource constructor.
-     * 
-     * @param context
-     * @param request
-     * @param response
-     */
-    public ContentClassesListResourceHandler( Context context, Request request, Response response )
+
+    @Override
+    public Object getPayloadInstance()
     {
-        super( context, request, response );
+        return null;
     }
 
-    /**
-     * The default handler. It simply gets the list of log files from Nexus instance and wraps them into REST DTO.
-     */
-    public Representation getRepresentationHandler( Variant variant )
-        throws IOException
+    @Override
+    public String getResourceUri()
     {
-        Collection<ContentClass> contentClasses = getNexus().listRepositoryContentClasses();
+        return "/repo_content_classes";
+    }
+    
+    @Override
+    public Object get( Context context, Request request, Response response, Variant variant )
+        throws ResourceException
+    {
+        Collection<ContentClass> contentClasses = getNexusInstance( request ).listRepositoryContentClasses();
 
-        RepositoryContentClassListResourceResponse response = new RepositoryContentClassListResourceResponse();
+        RepositoryContentClassListResourceResponse result = new RepositoryContentClassListResourceResponse();
 
         for ( ContentClass contentClass : contentClasses )
         {
@@ -81,9 +81,11 @@ public class ContentClassesListResourceHandler
 
             resource.setName( name );
 
-            response.addData( resource );
+            result.addData( resource );
         }
 
-        return serialize( variant, response );
+        return result;
     }
+
+
 }

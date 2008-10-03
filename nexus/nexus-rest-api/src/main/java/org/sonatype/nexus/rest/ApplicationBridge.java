@@ -35,40 +35,19 @@ import org.sonatype.nexus.rest.attributes.AttributesResourceHandler;
 import org.sonatype.nexus.rest.authentication.LoginResourceHandler;
 import org.sonatype.nexus.rest.authentication.LogoutResourceHandler;
 import org.sonatype.nexus.rest.cache.CacheResourceHandler;
-import org.sonatype.nexus.rest.contentclasses.ContentClassesListResourceHandler;
-import org.sonatype.nexus.rest.global.GlobalConfigurationListResourceHandler;
-import org.sonatype.nexus.rest.global.GlobalConfigurationResourceHandler;
 import org.sonatype.nexus.rest.groups.RepositoryGroupContentResourceHandler;
 import org.sonatype.nexus.rest.groups.RepositoryGroupListResourceHandler;
 import org.sonatype.nexus.rest.groups.RepositoryGroupResourceHandler;
 import org.sonatype.nexus.rest.identify.IdentifyHashResourceHandler;
 import org.sonatype.nexus.rest.index.IndexResourceHandler;
-import org.sonatype.nexus.rest.privileges.PrivilegeListResourceHandler;
-import org.sonatype.nexus.rest.privileges.PrivilegeResourceHandler;
 import org.sonatype.nexus.rest.repositories.RepositoryContentResourceHandler;
 import org.sonatype.nexus.rest.repositories.RepositoryListResourceHandler;
 import org.sonatype.nexus.rest.repositories.RepositoryMetaResourceHandler;
 import org.sonatype.nexus.rest.repositories.RepositoryResourceHandler;
 import org.sonatype.nexus.rest.repositories.RepositoryStatusResourceHandler;
 import org.sonatype.nexus.rest.repositorystatuses.RepositoryStatusesListResourceHandler;
-import org.sonatype.nexus.rest.roles.RoleListResourceHandler;
-import org.sonatype.nexus.rest.roles.RoleResourceHandler;
-import org.sonatype.nexus.rest.routes.RepositoryRouteListResourceHandler;
-import org.sonatype.nexus.rest.routes.RepositoryRouteResourceHandler;
-import org.sonatype.nexus.rest.schedules.ScheduledServiceListResourceHandler;
-import org.sonatype.nexus.rest.schedules.ScheduledServiceResourceHandler;
-import org.sonatype.nexus.rest.schedules.ScheduledServiceRunResourceHandler;
-import org.sonatype.nexus.rest.schedules.ScheduledServiceTypeResourceHandler;
 import org.sonatype.nexus.rest.status.CommandResourceHandler;
 import org.sonatype.nexus.rest.status.StatusResourceHandler;
-import org.sonatype.nexus.rest.templates.repositories.RepositoryTemplateListResourceHandler;
-import org.sonatype.nexus.rest.templates.repositories.RepositoryTemplateResourceHandler;
-import org.sonatype.nexus.rest.users.UserChangePasswordResourceHandler;
-import org.sonatype.nexus.rest.users.UserForgotIdResourceHandler;
-import org.sonatype.nexus.rest.users.UserForgotPasswordResourceHandler;
-import org.sonatype.nexus.rest.users.UserListResourceHandler;
-import org.sonatype.nexus.rest.users.UserResetResourceHandler;
-import org.sonatype.nexus.rest.users.UserResourceHandler;
 import org.sonatype.nexus.rest.xstream.XStreamInitializer;
 import org.sonatype.plexus.rest.PlexusRestletApplicationBridge;
 
@@ -265,69 +244,62 @@ public class ApplicationBridge
             "/repo_groups/{" + RepositoryGroupResourceHandler.GROUP_ID_KEY + "}/content",
             RepositoryGroupContentResourceHandler.class );
 
-        attach( applicationRouter, false, "/global_settings", GlobalConfigurationListResourceHandler.class );
+//        attach( applicationRouter, false, "/global_settings", GlobalConfigurationListResourceHandler.class );
 
-        attach( applicationRouter, false, "/global_settings/{" + GlobalConfigurationResourceHandler.CONFIG_NAME_KEY
-            + "}", GlobalConfigurationResourceHandler.class );
+//        attach( applicationRouter, false, "/global_settings/{" + GlobalConfigurationResourceHandler.CONFIG_NAME_KEY
+//            + "}", GlobalConfigurationResourceHandler.class );
 
-        attach( applicationRouter, false, "/repo_routes", RepositoryRouteListResourceHandler.class );
+//        attach( applicationRouter, false, "/repo_routes", RepositoryRouteListResourceHandler.class );
 
-        attach(
-            applicationRouter,
-            false,
-            "/repo_routes/{" + RepositoryRouteResourceHandler.ROUTE_ID_KEY + "}",
-            RepositoryRouteResourceHandler.class );
+//        attach(
+//            applicationRouter,
+//            false,
+//            "/repo_routes/{" + RepositoryRouteResourceHandler.ROUTE_ID_KEY + "}",
+//            RepositoryRouteResourceHandler.class );
 
-        attach( applicationRouter, false, "/templates/repositories", RepositoryTemplateListResourceHandler.class );
+//        attach( applicationRouter, false, "/templates/repositories", RepositoryTemplateListResourceHandler.class );
 
-        attach( applicationRouter, false, "/templates/repositories/{"
-            + RepositoryTemplateResourceHandler.REPOSITORY_ID_KEY + "}", RepositoryTemplateResourceHandler.class );
+//        attach( applicationRouter, false, "/templates/repositories/{"
+//            + RepositoryTemplateResourceHandler.REPOSITORY_ID_KEY + "}", RepositoryTemplateResourceHandler.class );
 
-        attach( applicationRouter, false, "/schedules", ScheduledServiceListResourceHandler.class );
+//        attach( applicationRouter, false, "/schedules", ScheduledServiceListResourceHandler.class );
 
-        attach( applicationRouter, false, "/schedule_types", ScheduledServiceTypeResourceHandler.class );
+//        attach( applicationRouter, false, "/schedule_types", ScheduledServiceTypeResourceHandler.class );
 
-        attach(
-            applicationRouter,
-            false,
-            "/schedule_run/{" + ScheduledServiceRunResourceHandler.SCHEDULED_SERVICE_ID_KEY + "}",
-            ScheduledServiceRunResourceHandler.class );
+//        attach(
+//            applicationRouter,
+//            false,
+//            "/schedule_run/{" + ScheduledServiceRunResourceHandler.SCHEDULED_SERVICE_ID_KEY + "}",
+//            ScheduledServiceRunResourceHandler.class );
 
-        attach( applicationRouter, false, "/schedules/{" + ScheduledServiceResourceHandler.SCHEDULED_SERVICE_ID_KEY
-            + "}", ScheduledServiceResourceHandler.class );
+//        attach( applicationRouter, false, "/schedules/{" + ScheduledServiceResourceHandler.SCHEDULED_SERVICE_ID_KEY
+//            + "}", ScheduledServiceResourceHandler.class );
 
-        attach( applicationRouter, false, "/users", UserListResourceHandler.class );
+//        attach( applicationRouter, false, "/users", UserListResourceHandler.class );
 
-        attach( applicationRouter, false, "/users/{" + UserResourceHandler.USER_ID_KEY + "}", UserResourceHandler.class );
+//        attach( applicationRouter, false, "/users/{" + UserResourceHandler.USER_ID_KEY + "}", UserResourceHandler.class );
 
-        attach(
-            applicationRouter,
-            false,
-            "/users_reset/{" + UserResourceHandler.USER_ID_KEY + "}",
-            UserResetResourceHandler.class );
+//        attach(
+//            applicationRouter,
+//            false,
+//            "/users_reset/{" + UserResourceHandler.USER_ID_KEY + "}",
+//            UserResetResourceHandler.class );
 
-        attach(
-            applicationRouter,
-            false,
-            "/users_forgotid/{" + UserResourceHandler.USER_EMAIL_KEY + "}",
-            UserForgotIdResourceHandler.class );
+//        attach(
+//            applicationRouter,
+//            false,
+//            "/users_forgotid/{" + UserResourceHandler.USER_EMAIL_KEY + "}",
+//            UserForgotIdResourceHandler.class );
 
-        attach( applicationRouter, false, "/users_forgotpw", UserForgotPasswordResourceHandler.class );
+//        attach( applicationRouter, false, "/users_forgotpw", UserForgotPasswordResourceHandler.class );
 
-        attach( applicationRouter, false, "/users_changepw", UserChangePasswordResourceHandler.class );
+//        attach( applicationRouter, false, "/users_changepw", UserChangePasswordResourceHandler.class );
 
-        attach( applicationRouter, false, "/roles", RoleListResourceHandler.class );
+//        attach( applicationRouter, false, "/roles", RoleListResourceHandler.class );
 
-        attach( applicationRouter, false, "/roles/{" + RoleResourceHandler.ROLE_ID_KEY + "}", RoleResourceHandler.class );
+//        attach( applicationRouter, false, "/roles/{" + RoleResourceHandler.ROLE_ID_KEY + "}", RoleResourceHandler.class );
 
-        attach( applicationRouter, false, "/privileges", PrivilegeListResourceHandler.class );
+//        attach( applicationRouter, false, "/privileges", PrivilegeListResourceHandler.class );
 
-        attach(
-            applicationRouter,
-            false,
-            "/privileges/{" + PrivilegeResourceHandler.PRIVILEGE_ID_KEY + "}",
-            PrivilegeResourceHandler.class );
-
-        attach( applicationRouter, false, "/repo_content_classes", ContentClassesListResourceHandler.class );
     }
 }

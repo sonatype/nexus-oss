@@ -2,6 +2,7 @@ package org.sonatype.nexus.rest;
 
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
+import org.jsecurity.mgt.SecurityManager;
 import org.restlet.Context;
 import org.restlet.data.Reference;
 import org.restlet.data.Request;
@@ -15,6 +16,7 @@ import org.sonatype.nexus.configuration.validator.InvalidConfigurationException;
 import org.sonatype.nexus.configuration.validator.ValidationMessage;
 import org.sonatype.nexus.configuration.validator.ValidationResponse;
 import org.sonatype.nexus.index.ArtifactInfo;
+import org.sonatype.nexus.jsecurity.NexusSecurity;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.access.Action;
 import org.sonatype.nexus.proxy.access.NexusItemAuthorizer;
@@ -64,6 +66,16 @@ public abstract class AbstractNexusPlexusResource
             throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, "Nexus instance named '"
                 + request.getAttributes().get( NEXUS_INSTANCE_KEY ) + "' not found!" );
         }
+    }
+    
+    protected NexusSecurity getNexusSecurity( Request request )
+    {
+        return (NexusSecurity) request.getAttributes().get( NexusSecurity.class.getName() );
+    }
+    
+    protected SecurityManager getSecurityManager( Request request )
+    {
+        return (SecurityManager) request.getAttributes().get( SecurityManager.class.getName() );
     }
 
     protected Reference createChildReference( Request request, String childPath )

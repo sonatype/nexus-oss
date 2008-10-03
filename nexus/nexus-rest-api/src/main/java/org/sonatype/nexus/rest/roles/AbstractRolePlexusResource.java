@@ -1,16 +1,17 @@
-package org.sonatype.nexus.test.utils;
+package org.sonatype.nexus.rest.roles;
 
 import java.util.List;
 
+import org.restlet.data.Request;
 import org.sonatype.jsecurity.model.CRole;
+import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
 import org.sonatype.nexus.rest.model.RoleResource;
 
-
-public class RoleConverter
+public abstract class AbstractRolePlexusResource
+    extends AbstractNexusPlexusResource
 {
-    
 
-    public static RoleResource toRoleResource( CRole role )
+    public RoleResource nexusToRestModel( CRole role, Request request )
     {
         //TODO: ultimately this method will take a parameter which is the nexus object
         //and will convert to the rest object
@@ -19,6 +20,7 @@ public class RoleConverter
         resource.setDescription( role.getDescription() );
         resource.setId( role.getId() );
         resource.setName( role.getName() );
+        resource.setResourceURI( this.createChildReference( request, resource.getId() ).toString() );
         resource.setSessionTimeout( role.getSessionTimeout() );
         
         for ( String roleId : ( List<String>) role.getRoles() )
@@ -34,11 +36,13 @@ public class RoleConverter
         return resource;
     }
     
-    public static CRole toCRole( RoleResource resource )
+    public CRole restToNexusModel( CRole role, RoleResource resource )
     {
-        CRole role = new CRole();
+        if ( role == null )
+        {
+            role = new CRole();
+        }
         
-        role.setId( resource.getId()  );
         role.setDescription( resource.getDescription() );
         role.setName( resource.getName() );
         role.setSessionTimeout( resource.getSessionTimeout() );
@@ -57,6 +61,5 @@ public class RoleConverter
         
         return role;
     }
-
 
 }
