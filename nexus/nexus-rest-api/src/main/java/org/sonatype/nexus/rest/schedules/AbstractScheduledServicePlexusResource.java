@@ -6,7 +6,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -15,7 +14,6 @@ import java.util.Set;
 
 import org.restlet.data.Request;
 import org.restlet.resource.ResourceException;
-import org.sonatype.nexus.maven.tasks.SnapshotRemoverTask;
 import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceAdvancedResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceBaseResource;
@@ -24,14 +22,6 @@ import org.sonatype.nexus.rest.model.ScheduledServiceMonthlyResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceOnceResource;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceWeeklyResource;
-import org.sonatype.nexus.tasks.ClearCacheTask;
-import org.sonatype.nexus.tasks.EmptyTrashTask;
-import org.sonatype.nexus.tasks.EvictUnusedProxiedItemsTask;
-import org.sonatype.nexus.tasks.PublishIndexesTask;
-import org.sonatype.nexus.tasks.PurgeTimeline;
-import org.sonatype.nexus.tasks.RebuildAttributesTask;
-import org.sonatype.nexus.tasks.ReindexTask;
-import org.sonatype.nexus.tasks.SynchronizeShadowsTask;
 import org.sonatype.scheduling.ScheduledTask;
 import org.sonatype.scheduling.SchedulerTask;
 import org.sonatype.scheduling.schedules.CronSchedule;
@@ -63,74 +53,9 @@ public abstract class AbstractScheduledServicePlexusResource
     /** Schedule Type Advanced. */
     public static final String SCHEDULE_TYPE_ADVANCED = "advanced";
 
-    /**
-     * Type property resource: string
-     */
-    public static final String PROPERTY_TYPE_STRING = "string";
-
-    /**
-     * Type property resource: number
-     */
-    public static final String PROPERTY_TYPE_NUMBER = "number";
-
-    /**
-     * Type property resource: number
-     */
-    public static final String PROPERTY_TYPE_BOOLEAN = "boolean";
-
-    /**
-     * Type property resource: date
-     */
-    public static final String PROPERTY_TYPE_DATE = "date";
-
-    /**
-     * Type property resource: repository
-     */
-    public static final String PROPERTY_TYPE_REPO = "repo";
-
-    /**
-     * Type property resource: shadow/virtual repository
-     */
-    public static final String PROPERTY_TYPE_SHADOW = "repo";
-
-    /**
-     * Type property resource: repositoryGroup
-     */
-    public static final String PROPERTY_TYPE_REPO_GROUP = "group";
-
-    /**
-     * Type property resource: repo-or-group
-     */
-    public static final String PROPERTY_TYPE_REPO_OR_GROUP = "repo-or-group";
-
     public static final String SCHEDULED_SERVICE_ID_KEY = "scheduledServiceId";
 
     private DateFormat timeFormat = new SimpleDateFormat( "HH:mm" );
-
-    protected Map<String, String> serviceNames = new HashMap<String, String>();
-    {
-        serviceNames.put( PublishIndexesTask.HINT, "Publish Indexes" );
-        serviceNames.put( ReindexTask.HINT, "Reindex Repositories" );
-        serviceNames.put( RebuildAttributesTask.HINT, "Rebuild Repository Attributes" );
-        serviceNames.put( ClearCacheTask.HINT, "Clear Repository Caches" );
-        serviceNames.put( SnapshotRemoverTask.HINT, "Remove Snapshots From Repository" );
-        serviceNames.put( EvictUnusedProxiedItemsTask.HINT, "Evict Unused Proxied Items From Repository Caches" );
-        serviceNames.put( PurgeTimeline.HINT, "Purge Nexus Timeline" );
-        serviceNames.put( SynchronizeShadowsTask.HINT, "Synchronize Shadow Repository" );
-        serviceNames.put( EmptyTrashTask.HINT, "Empty Trash" );
-    }
-
-    protected String getServiceTypeName( String serviceTypeId )
-    {
-        if ( serviceNames.containsKey( serviceTypeId ) )
-        {
-            return serviceNames.get( serviceTypeId );
-        }
-        else
-        {
-            return serviceTypeId;
-        }
-    }
 
     protected String getScheduleShortName( Schedule schedule )
     {

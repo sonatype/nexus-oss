@@ -70,7 +70,7 @@ public class ScheduledServiceListPlexusResource
                 item.setName( task.getName() );
                 item.setStatus( StringUtils.capitalise( task.getTaskState().toString() ) );
                 item.setTypeId( task.getType() );
-                item.setTypeName( getServiceTypeName( task.getType() ) );
+                item.setTypeName( getNexusInstance( request ).getScheduledTaskDescriptor( task.getType() ).getName() );
                 item.setCreated( task.getScheduledAt() == null ? "n/a" : task.getScheduledAt().toString() );
                 item.setLastRunTime( task.getLastRun() == null ? "n/a" : task.getLastRun().toString() );
                 item.setNextRunTime( task.getNextRun() == null ? "n/a" : task.getNextRun().toString() );

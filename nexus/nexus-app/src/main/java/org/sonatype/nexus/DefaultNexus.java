@@ -114,6 +114,7 @@ import org.sonatype.nexus.store.Entry;
 import org.sonatype.nexus.store.Store;
 import org.sonatype.nexus.tasks.ReindexTask;
 import org.sonatype.nexus.tasks.SynchronizeShadowsTask;
+import org.sonatype.nexus.tasks.descriptors.ScheduledTaskDescriptor;
 import org.sonatype.scheduling.NoSuchTaskException;
 import org.sonatype.scheduling.ScheduledTask;
 import org.sonatype.scheduling.SchedulerTask;
@@ -1091,6 +1092,18 @@ public class DefaultNexus
     public Collection<ContentClass> listRepositoryContentClasses()
     {
         return nexusConfiguration.listRepositoryContentClasses();
+    }
+    
+    // ------------------------------------------------------------------
+    // Scheduled Tasks
+    public List<ScheduledTaskDescriptor> listScheduledTaskDescriptors()
+    {
+        return nexusConfiguration.listScheduledTaskDescriptors();
+    }
+    
+    public ScheduledTaskDescriptor getScheduledTaskDescriptor( String id )
+    {
+        return nexusConfiguration.getScheduledTaskDescriptor( id );
     }
 
     // ------------------------------------------------------------------

@@ -39,6 +39,7 @@ import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryGroupException;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.registry.InvalidGroupingException;
+import org.sonatype.nexus.tasks.descriptors.ScheduledTaskDescriptor;
 
 public interface MutableConfiguration
 {
@@ -73,6 +74,14 @@ public interface MutableConfiguration
     // ----------------------------------------------------------------------------
 
     Collection<ContentClass> listRepositoryContentClasses();
+    
+    // ----------------------------------------------------------------------------
+    // Scheduled Tasks
+    // ----------------------------------------------------------------------------
+    
+    List<ScheduledTaskDescriptor> listScheduledTaskDescriptors();
+    
+    ScheduledTaskDescriptor getScheduledTaskDescriptor( String id );
 
     // ----------------------------------------------------------------------------------------------------------
     // REST API

@@ -66,6 +66,7 @@ import org.sonatype.nexus.proxy.storage.remote.DefaultRemoteStorageContext;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 import org.sonatype.nexus.proxy.target.Target;
 import org.sonatype.nexus.proxy.target.TargetRegistry;
+import org.sonatype.nexus.tasks.descriptors.ScheduledTaskDescriptor;
 
 /**
  * The class DefaultNexusConfiguration is responsible for config management. It actually keeps in sync Nexus internal
@@ -115,6 +116,12 @@ public class DefaultNexusConfiguration
      */
     @Requirement( role = ContentClass.class )
     private List<ContentClass> contentClasses;
+    
+    /**
+     * The available scheduled task descriptors
+     */
+    @Requirement( role = ScheduledTaskDescriptor.class )
+    private List<ScheduledTaskDescriptor> scheduledTaskDescriptors;
 
     /** The global remote storage context. */
     private RemoteStorageContext remoteStorageContext;
@@ -326,6 +333,24 @@ public class DefaultNexusConfiguration
     public Collection<ContentClass> listRepositoryContentClasses()
     {
         return Collections.unmodifiableList( contentClasses );
+    }
+    
+    public List<ScheduledTaskDescriptor> listScheduledTaskDescriptors()
+    {
+        return Collections.unmodifiableList( scheduledTaskDescriptors );
+    }
+    
+    public ScheduledTaskDescriptor getScheduledTaskDescriptor( String id )
+    {
+        for ( ScheduledTaskDescriptor descriptor : scheduledTaskDescriptors )
+        {
+            if ( descriptor.getId().equals( id ) )
+            {
+                return descriptor;
+            }
+        }
+        
+        return null;
     }
 
     // ------------------------------------------------------------------
