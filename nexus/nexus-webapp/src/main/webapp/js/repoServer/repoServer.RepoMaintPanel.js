@@ -422,6 +422,12 @@ Sonatype.repoServer.RepoMaintPanel = function(config){
                   }
                 },
                 scope: this
+              },
+              'render': function(c) {
+                Ext.QuickTips.register({
+                  target: c.getEl(),
+                  text: 'Enter a complete path to lookup, for example org/sonatype/nexus'
+                });
               }
             }
           },
