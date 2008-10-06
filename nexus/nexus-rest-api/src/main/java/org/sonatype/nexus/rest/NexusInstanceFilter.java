@@ -22,7 +22,8 @@ package org.sonatype.nexus.rest;
 
 import java.io.IOException;
 
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.jsecurity.mgt.SecurityManager;
 import org.restlet.Context;
 import org.restlet.Filter;
@@ -32,7 +33,7 @@ import org.sonatype.jsecurity.realms.PlexusSecurity;
 import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.configuration.model.CRemoteNexusInstance;
 import org.sonatype.nexus.jsecurity.NexusSecurity;
-import org.sonatype.plexus.rest.PlexusRestletUtils;
+import org.sonatype.nexus.proxy.access.NexusItemAuthorizer;
 
 /**
  * A restlet Filter, that handles "instanceName" attribute to put the correspondent (local or remote/proxied) Nexus
@@ -40,17 +41,35 @@ import org.sonatype.plexus.rest.PlexusRestletUtils;
  * 
  * @author cstamas
  */
+@Component( role = Filter.class, hint = "nexusInstance" )
 public class NexusInstanceFilter
     extends Filter
 {
-
     /** Key to store nexus instance, */
     public static final String NEXUS_INSTANCE_KEY = "instanceName";
 
+    @Requirement
+    private NexusSecurity nexusSecurity;
+
+    @Requirement( hint = "web" )
+    private PlexusSecurity securityManager;
+
+    @Requirement
+    private Nexus nexus;
+
+    @Requirement
+    private NexusItemAuthorizer nexusItemAuthorizer;
+
     /**
      * The filter constructor.
-     * 
-     * @param context
+     */
+    public NexusInstanceFilter()
+    {
+        super();
+    }
+
+    /**
+     * The filter constructor.
      */
     public NexusInstanceFilter( Context context )
     {
@@ -79,38 +98,13 @@ public class NexusInstanceFilter
 
         request.getAttributes().put( Nexus.class.getName(), nexus );
 
-        request.getAttributes().put( NexusSecurity.class.getName(), getNexusSecurity() );
+        request.getAttributes().put( NexusSecurity.class.getName(), nexusSecurity );
 
-        request.getAttributes().put( SecurityManager.class.getName(), getSecurityManager() );
+        request.getAttributes().put( SecurityManager.class.getName(), securityManager );
+
+        request.getAttributes().put( NexusItemAuthorizer.class.getName(), nexusItemAuthorizer );
 
         return CONTINUE;
-    }
-
-    protected NexusSecurity getNexusSecurity()
-    {
-        try
-        {
-            return (NexusSecurity) PlexusRestletUtils.plexusLookup( getContext(), NexusSecurity.class );
-        }
-        catch ( ComponentLookupException e )
-        {
-            throw new IllegalStateException( "Cannot lookup NexusSecurity!", e );
-        }
-    }
-
-    protected SecurityManager getSecurityManager()
-    {
-        try
-        {
-            return (SecurityManager) PlexusRestletUtils.plexusLookup(
-                getContext(),
-                PlexusSecurity.class.getName(),
-                "web" );
-        }
-        catch ( ComponentLookupException e )
-        {
-            throw new IllegalStateException( "Cannot lookup PlexusSecurity!", e );
-        }
     }
 
     /**
@@ -120,14 +114,7 @@ public class NexusInstanceFilter
      */
     protected Nexus getLocalNexus()
     {
-        try
-        {
-            return (Nexus) PlexusRestletUtils.plexusLookup( getContext(), Nexus.class );
-        }
-        catch ( ComponentLookupException e )
-        {
-            throw new IllegalStateException( "Cannot lookup local Nexus!", e );
-        }
+        return nexus;
     }
 
     /**

@@ -9,5 +9,5 @@ public interface EventInspector
 {
     boolean accepts( AbstractEvent evt );
 
-    void process( AbstractEvent evt );
+    void inspect( AbstractEvent evt );
 }

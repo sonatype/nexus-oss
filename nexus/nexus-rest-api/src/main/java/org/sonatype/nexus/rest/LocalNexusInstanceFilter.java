@@ -20,7 +20,10 @@
  */
 package org.sonatype.nexus.rest;
 
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.restlet.Context;
+import org.restlet.Filter;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.sonatype.nexus.Nexus;
@@ -31,13 +34,23 @@ import org.sonatype.nexus.Nexus;
  * 
  * @author cstamas
  */
+@Component( role = Filter.class, hint = "localNexusInstance" )
 public class LocalNexusInstanceFilter
-    extends NexusInstanceFilter
+    extends Filter
 {
+    @Requirement
+    private Nexus nexus;
+
     /**
      * The filter constructor.
-     * 
-     * @param context
+     */
+    public LocalNexusInstanceFilter()
+    {
+        super();
+    }
+
+    /**
+     * The filter constructor.
      */
     public LocalNexusInstanceFilter( Context context )
     {
@@ -49,7 +62,7 @@ public class LocalNexusInstanceFilter
      */
     protected int beforeHandle( Request request, Response response )
     {
-        request.getAttributes().put( Nexus.class.getName(), getLocalNexus() );
+        request.getAttributes().put( Nexus.class.getName(), nexus );
 
         return CONTINUE;
     }

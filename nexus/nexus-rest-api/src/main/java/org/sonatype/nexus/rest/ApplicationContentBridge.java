@@ -20,7 +20,10 @@
  */
 package org.sonatype.nexus.rest;
 
-import org.restlet.Context;
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
+import org.restlet.Application;
+import org.restlet.Filter;
 import org.restlet.Router;
 
 /**
@@ -28,19 +31,13 @@ import org.restlet.Router;
  * 
  * @author cstamas
  */
+@Component( role = Application.class, hint = "content" )
 public class ApplicationContentBridge
     extends ApplicationBridge
 {
-    /**
-     * Constructor to enable usage in ServletRestletApplicationBridge.
-     * 
-     * @param context
-     */
-    public ApplicationContentBridge( Context context )
-    {
-        super( context );
-    }
-    
+    @Requirement( hint = "localNexusInstance" )
+    private Filter nexusInstanceFilter;
+
     protected Router initializeRouter( Router root )
     {
         return root;
@@ -57,12 +54,12 @@ public class ApplicationContentBridge
         }
 
         // instance filter, that injects proper Nexus instance into request attributes
-        LocalNexusInstanceFilter nif = new LocalNexusInstanceFilter( getContext() );
+        nexusInstanceFilter.setContext( getContext() );
 
         BrowserSensingFilter browserFilter = new BrowserSensingFilter( getContext() );
 
         // attaching it after nif
-        nif.setNext( browserFilter );
+        nexusInstanceFilter.setNext( browserFilter );
 
         // creating _another_ router, that will be next isntance called after filtering
         Router router = new Router( getContext() );
@@ -74,7 +71,7 @@ public class ApplicationContentBridge
         router.attach( "", ContentResourceHandler.class );
 
         // setting root
-        root.attach( nif );
+        root.attach( nexusInstanceFilter );
     }
 
 }

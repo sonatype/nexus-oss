@@ -20,8 +20,10 @@
  */
 package org.sonatype.nexus.rest;
 
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
-import org.restlet.Context;
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
+import org.restlet.Application;
+import org.restlet.Filter;
 import org.restlet.Router;
 import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.proxy.events.AbstractEvent;
@@ -50,21 +52,16 @@ import com.thoughtworks.xstream.XStream;
  * 
  * @author cstamas
  */
+@Component( role = Application.class, hint = "service" )
 public class ApplicationBridge
     extends PlexusRestletApplicationBridge
     implements EventListener
 {
+    @Requirement
     private Nexus nexus;
 
-    /**
-     * Constructor to enable usage in ServletRestletApplicationBridge.
-     * 
-     * @param context
-     */
-    public ApplicationBridge( Context context )
-    {
-        super( context );
-    }
+    @Requirement( hint = "nexusInstance" )
+    private Filter nexusInstanceFilter;
 
     /**
      * Listener.
@@ -82,34 +79,11 @@ public class ApplicationBridge
     }
 
     /**
-     * Lookups Nexus instance in this plexus.
-     * 
-     * @return
-     * @deprecated
-     */
-    protected Nexus getNexus()
-    {
-        if ( nexus == null )
-        {
-            try
-            {
-                nexus = (Nexus) getPlexusContainer().lookup( Nexus.class );
-            }
-            catch ( ComponentLookupException e )
-            {
-                throw new IllegalStateException( "Cannot get Nexus instance!", e );
-            }
-        }
-
-        return nexus;
-    }
-
-    /**
      * Adding this as config change listener.
      */
     protected void doConfigure()
     {
-        getNexus().getNexusConfiguration().addProximityEventListener( this );
+        nexus.getNexusConfiguration().addProximityEventListener( this );
     }
 
     /**
@@ -123,16 +97,16 @@ public class ApplicationBridge
     protected Router initializeRouter( Router root )
     {
         // instance filter, that injects proper Nexus instance into request attributes
-        NexusInstanceFilter nif = new NexusInstanceFilter( getContext() );
+        nexusInstanceFilter.setContext( getContext() );
 
         // attaching filter to a root on given URI
-        attach( root, false, "/{" + NexusInstanceFilter.NEXUS_INSTANCE_KEY + "}", nif );
+        attach( root, false, "/{" + NexusInstanceFilter.NEXUS_INSTANCE_KEY + "}", nexusInstanceFilter );
 
         // creating _another_ router, that will be next isntance called after filtering
         Router applicationRouter = new Router( getContext() );
 
         // attaching it after nif
-        nif.setNext( applicationRouter );
+        nexusInstanceFilter.setNext( applicationRouter );
 
         return applicationRouter;
     }
@@ -142,7 +116,6 @@ public class ApplicationBridge
      * 
      * @TODO Move this to PlexusResources, except Status (see isStarted usage below!)
      */
-    @SuppressWarnings( "deprecation" )
     protected void doCreateRoot( Router applicationRouter, boolean isStarted )
     {
         attach( applicationRouter, false, "/status", StatusResourceHandler.class );
@@ -193,104 +166,106 @@ public class ApplicationBridge
         attach( applicationRouter, false, "/attributes/{" + AttributesResourceHandler.DOMAIN + "}/{"
             + AttributesResourceHandler.TARGET_ID + "}/content", AttributesResourceHandler.class );
 
-//        attach( applicationRouter, false, "/repository_statuses", RepositoryStatusesListResourceHandler.class );
+        // attach( applicationRouter, false, "/repository_statuses", RepositoryStatusesListResourceHandler.class );
 
-//        attach( applicationRouter, false, "/repositories", RepositoryListResourceHandler.class );
+        // attach( applicationRouter, false, "/repositories", RepositoryListResourceHandler.class );
 
-//        attach(
-//            applicationRouter,
-//            false,
-//            "/repositories/{" + RepositoryResourceHandler.REPOSITORY_ID_KEY + "}",
-//            RepositoryResourceHandler.class );
+        // attach(
+        // applicationRouter,
+        // false,
+        // "/repositories/{" + RepositoryResourceHandler.REPOSITORY_ID_KEY + "}",
+        // RepositoryResourceHandler.class );
 
-//        attach(
-//            applicationRouter,
-//            false,
-//            "/repositories/{" + RepositoryResourceHandler.REPOSITORY_ID_KEY + "}/status",
-//            RepositoryStatusResourceHandler.class );
+        // attach(
+        // applicationRouter,
+        // false,
+        // "/repositories/{" + RepositoryResourceHandler.REPOSITORY_ID_KEY + "}/status",
+        // RepositoryStatusResourceHandler.class );
 
-//        attach(
-//            applicationRouter,
-//            false,
-//            "/repositories/{" + RepositoryResourceHandler.REPOSITORY_ID_KEY + "}/meta",
-//            RepositoryMetaResourceHandler.class );
+        // attach(
+        // applicationRouter,
+        // false,
+        // "/repositories/{" + RepositoryResourceHandler.REPOSITORY_ID_KEY + "}/meta",
+        // RepositoryMetaResourceHandler.class );
 
-//        attach(
-//            applicationRouter,
-//            false,
-//            "/repositories/{" + RepositoryResourceHandler.REPOSITORY_ID_KEY + "}/content",
-//            RepositoryContentResourceHandler.class );
+        // attach(
+        // applicationRouter,
+        // false,
+        // "/repositories/{" + RepositoryResourceHandler.REPOSITORY_ID_KEY + "}/content",
+        // RepositoryContentResourceHandler.class );
 
-//        attach( applicationRouter, false, "/repo_groups", RepositoryGroupListResourceHandler.class );
+        // attach( applicationRouter, false, "/repo_groups", RepositoryGroupListResourceHandler.class );
 
-//        attach(
-//            applicationRouter,
-//            false,
-//            "/repo_groups/{" + RepositoryGroupResourceHandler.GROUP_ID_KEY + "}",
-//            RepositoryGroupResourceHandler.class );
+        // attach(
+        // applicationRouter,
+        // false,
+        // "/repo_groups/{" + RepositoryGroupResourceHandler.GROUP_ID_KEY + "}",
+        // RepositoryGroupResourceHandler.class );
 
-//        attach(
-//            applicationRouter,
-//            false,
-//            "/repo_groups/{" + RepositoryGroupResourceHandler.GROUP_ID_KEY + "}/content",
-//            RepositoryGroupContentResourceHandler.class );
+        // attach(
+        // applicationRouter,
+        // false,
+        // "/repo_groups/{" + RepositoryGroupResourceHandler.GROUP_ID_KEY + "}/content",
+        // RepositoryGroupContentResourceHandler.class );
 
-//        attach( applicationRouter, false, "/global_settings", GlobalConfigurationListResourceHandler.class );
+        // attach( applicationRouter, false, "/global_settings", GlobalConfigurationListResourceHandler.class );
 
-//        attach( applicationRouter, false, "/global_settings/{" + GlobalConfigurationResourceHandler.CONFIG_NAME_KEY
-//            + "}", GlobalConfigurationResourceHandler.class );
+        // attach( applicationRouter, false, "/global_settings/{" + GlobalConfigurationResourceHandler.CONFIG_NAME_KEY
+        // + "}", GlobalConfigurationResourceHandler.class );
 
-//        attach( applicationRouter, false, "/repo_routes", RepositoryRouteListResourceHandler.class );
+        // attach( applicationRouter, false, "/repo_routes", RepositoryRouteListResourceHandler.class );
 
-//        attach(
-//            applicationRouter,
-//            false,
-//            "/repo_routes/{" + RepositoryRouteResourceHandler.ROUTE_ID_KEY + "}",
-//            RepositoryRouteResourceHandler.class );
+        // attach(
+        // applicationRouter,
+        // false,
+        // "/repo_routes/{" + RepositoryRouteResourceHandler.ROUTE_ID_KEY + "}",
+        // RepositoryRouteResourceHandler.class );
 
-//        attach( applicationRouter, false, "/templates/repositories", RepositoryTemplateListResourceHandler.class );
+        // attach( applicationRouter, false, "/templates/repositories", RepositoryTemplateListResourceHandler.class );
 
-//        attach( applicationRouter, false, "/templates/repositories/{"
-//            + RepositoryTemplateResourceHandler.REPOSITORY_ID_KEY + "}", RepositoryTemplateResourceHandler.class );
+        // attach( applicationRouter, false, "/templates/repositories/{"
+        // + RepositoryTemplateResourceHandler.REPOSITORY_ID_KEY + "}", RepositoryTemplateResourceHandler.class );
 
-//        attach( applicationRouter, false, "/schedules", ScheduledServiceListResourceHandler.class );
+        // attach( applicationRouter, false, "/schedules", ScheduledServiceListResourceHandler.class );
 
-//        attach( applicationRouter, false, "/schedule_types", ScheduledServiceTypeResourceHandler.class );
+        // attach( applicationRouter, false, "/schedule_types", ScheduledServiceTypeResourceHandler.class );
 
-//        attach(
-//            applicationRouter,
-//            false,
-//            "/schedule_run/{" + ScheduledServiceRunResourceHandler.SCHEDULED_SERVICE_ID_KEY + "}",
-//            ScheduledServiceRunResourceHandler.class );
+        // attach(
+        // applicationRouter,
+        // false,
+        // "/schedule_run/{" + ScheduledServiceRunResourceHandler.SCHEDULED_SERVICE_ID_KEY + "}",
+        // ScheduledServiceRunResourceHandler.class );
 
-//        attach( applicationRouter, false, "/schedules/{" + ScheduledServiceResourceHandler.SCHEDULED_SERVICE_ID_KEY
-//            + "}", ScheduledServiceResourceHandler.class );
+        // attach( applicationRouter, false, "/schedules/{" + ScheduledServiceResourceHandler.SCHEDULED_SERVICE_ID_KEY
+        // + "}", ScheduledServiceResourceHandler.class );
 
-//        attach( applicationRouter, false, "/users", UserListResourceHandler.class );
+        // attach( applicationRouter, false, "/users", UserListResourceHandler.class );
 
-//        attach( applicationRouter, false, "/users/{" + UserResourceHandler.USER_ID_KEY + "}", UserResourceHandler.class );
+        // attach( applicationRouter, false, "/users/{" + UserResourceHandler.USER_ID_KEY + "}",
+        // UserResourceHandler.class );
 
-//        attach(
-//            applicationRouter,
-//            false,
-//            "/users_reset/{" + UserResourceHandler.USER_ID_KEY + "}",
-//            UserResetResourceHandler.class );
+        // attach(
+        // applicationRouter,
+        // false,
+        // "/users_reset/{" + UserResourceHandler.USER_ID_KEY + "}",
+        // UserResetResourceHandler.class );
 
-//        attach(
-//            applicationRouter,
-//            false,
-//            "/users_forgotid/{" + UserResourceHandler.USER_EMAIL_KEY + "}",
-//            UserForgotIdResourceHandler.class );
+        // attach(
+        // applicationRouter,
+        // false,
+        // "/users_forgotid/{" + UserResourceHandler.USER_EMAIL_KEY + "}",
+        // UserForgotIdResourceHandler.class );
 
-//        attach( applicationRouter, false, "/users_forgotpw", UserForgotPasswordResourceHandler.class );
+        // attach( applicationRouter, false, "/users_forgotpw", UserForgotPasswordResourceHandler.class );
 
-//        attach( applicationRouter, false, "/users_changepw", UserChangePasswordResourceHandler.class );
+        // attach( applicationRouter, false, "/users_changepw", UserChangePasswordResourceHandler.class );
 
-//        attach( applicationRouter, false, "/roles", RoleListResourceHandler.class );
+        // attach( applicationRouter, false, "/roles", RoleListResourceHandler.class );
 
-//        attach( applicationRouter, false, "/roles/{" + RoleResourceHandler.ROLE_ID_KEY + "}", RoleResourceHandler.class );
+        // attach( applicationRouter, false, "/roles/{" + RoleResourceHandler.ROLE_ID_KEY + "}",
+        // RoleResourceHandler.class );
 
-//        attach( applicationRouter, false, "/privileges", PrivilegeListResourceHandler.class );
+        // attach( applicationRouter, false, "/privileges", PrivilegeListResourceHandler.class );
 
     }
 }

@@ -28,7 +28,6 @@ import java.util.List;
 import java.util.logging.Level;
 
 import org.apache.commons.fileupload.FileItemFactory;
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.jsecurity.mgt.SecurityManager;
 import org.restlet.Application;
 import org.restlet.Context;
@@ -60,7 +59,6 @@ import org.sonatype.nexus.rest.model.NexusArtifact;
 import org.sonatype.nexus.rest.model.NexusError;
 import org.sonatype.nexus.rest.model.NexusErrorResponse;
 import org.sonatype.plexus.rest.AbstractPlexusAwareResource;
-import org.sonatype.plexus.rest.PlexusRestletUtils;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
 
 import com.thoughtworks.xstream.XStream;
@@ -85,7 +83,7 @@ public abstract class AbstractNexusResourceHandler
 
         getVariants().add( new Variant( MediaType.APPLICATION_JSON ) );
 
-        nexusItemAuthorizer = (NexusItemAuthorizer) lookup( NexusItemAuthorizer.class );
+        nexusItemAuthorizer = (NexusItemAuthorizer) request.getAttributes().get( NexusItemAuthorizer.class.getName() );
     }
 
     /**
@@ -106,54 +104,6 @@ public abstract class AbstractNexusResourceHandler
     protected SecurityManager getSecurityManager()
     {
         return (SecurityManager) getRequest().getAttributes().get( SecurityManager.class.getName() );
-    }
-
-    protected Object lookup( String role )
-    {
-        try
-        {
-            return PlexusRestletUtils.plexusLookup( getContext(), role );
-        }
-        catch ( ComponentLookupException e )
-        {
-            throw new IllegalStateException( "Cannot lookup role " + role, e );
-        }
-    }
-
-    protected Object lookup( Class<?> role )
-    {
-        try
-        {
-            return PlexusRestletUtils.plexusLookup( getContext(), role );
-        }
-        catch ( ComponentLookupException e )
-        {
-            throw new IllegalStateException( "Cannot lookup role " + role, e );
-        }
-    }
-
-    protected Object lookup( String role, String roleHint )
-    {
-        try
-        {
-            return PlexusRestletUtils.plexusLookup( getContext(), role, roleHint );
-        }
-        catch ( ComponentLookupException e )
-        {
-            throw new IllegalStateException( "Cannot lookup role " + role + " with roleHint " + roleHint, e );
-        }
-    }
-
-    protected Object lookup( Class<?> role, String roleHint )
-    {
-        try
-        {
-            return PlexusRestletUtils.plexusLookup( getContext(), role, roleHint );
-        }
-        catch ( ComponentLookupException e )
-        {
-            throw new IllegalStateException( "Cannot lookup role " + role + " with roleHint " + roleHint, e );
-        }
     }
 
     /**
