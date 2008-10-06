@@ -28,6 +28,9 @@ import org.restlet.Context;
  */
 public class PlexusRestletUtils
 {
+    /**
+     * @deprecated Use PlexusResource components instead
+     */
     public static Object plexusLookup( Context context, String role )
         throws ComponentLookupException
     {
@@ -36,6 +39,9 @@ public class PlexusRestletUtils
         return container.lookup( role );
     }
 
+    /**
+     * @deprecated Use PlexusResource components instead
+     */
     public static Object plexusLookup( Context context, Class<?> role )
         throws ComponentLookupException
     {
@@ -44,6 +50,9 @@ public class PlexusRestletUtils
         return container.lookup( role );
     }
 
+    /**
+     * @deprecated Use PlexusResource components instead
+     */
     public static Object plexusLookup( Context context, String role, String roleHint )
         throws ComponentLookupException
     {
@@ -52,6 +61,9 @@ public class PlexusRestletUtils
         return container.lookup( role, roleHint );
     }
 
+    /**
+     * @deprecated Use PlexusResource components instead
+     */
     public static Object plexusLookup( Context context, Class<?> role, String roleHint )
         throws ComponentLookupException
     {

@@ -1,9 +1,8 @@
 package org.sonatype.plexus.rest;
 
 import org.codehaus.plexus.PlexusTestCase;
+import org.restlet.Application;
 import org.restlet.Component;
-import org.restlet.Context;
-import org.restlet.Router;
 import org.restlet.data.Protocol;
 
 public class PlexusRestletApplicationBridgeTest
@@ -16,9 +15,7 @@ public class PlexusRestletApplicationBridgeTest
 
         component.getServers().add( Protocol.HTTP, 8182 );
 
-        TestApplication app = new TestApplication( component.getContext().createChildContext() );
-
-        app.setPlexusContainer( getContainer() );
+        TestApplication app = (TestApplication) getContainer().lookup( Application.class, "test" );
 
         component.getDefaultHost().attach( app );
 
@@ -34,20 +31,4 @@ public class PlexusRestletApplicationBridgeTest
 
         component.stop();
     }
-
-    public class TestApplication
-        extends PlexusRestletApplicationBridge
-    {
-
-        public TestApplication( Context context )
-        {
-            super( context );
-        }
-
-        protected void doCreateRoot( Router root, boolean isStarted )
-        {
-            root.attach( "/manual", SimpleRestletResource.class );
-        }
-    }
-
 }

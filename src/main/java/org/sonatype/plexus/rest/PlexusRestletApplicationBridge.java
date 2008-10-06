@@ -17,9 +17,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
-import org.codehaus.plexus.PlexusConstants;
-import org.codehaus.plexus.PlexusContainer;
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.restlet.Application;
 import org.restlet.Context;
 import org.restlet.Restlet;
@@ -36,13 +35,13 @@ import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.HierarchicalStreamDriver;
 
 /**
- * An abstract Restlet.org application, that should be extended for custom application needs. It
- * will automatically pick up existing PlexusResources, but is also able to take the "old way" for
- * creating application root. Supports out of the box JSON and XML representations powered by
- * XStream, and also offers help in File Upload handling.
+ * An abstract Restlet.org application, that should be extended for custom application needs. It will automatically pick
+ * up existing PlexusResources, but is also able to take the "old way" for creating application root. Supports out of
+ * the box JSON and XML representations powered by XStream, and also offers help in File Upload handling.
  * 
  * @author cstamas
  */
+@Component( role = Application.class )
 public class PlexusRestletApplicationBridge
     extends Application
 {
@@ -58,13 +57,24 @@ public class PlexusRestletApplicationBridge
     /** Key to store the flag should plexus discover resource or no */
     public static final String PLEXUS_DISCOVER_RESOURCES = "plexus.discoverResources";
 
+    @Requirement( role = PlexusResource.class )
+    private Map<String, PlexusResource> plexusResources;
+
     /** Date of creation of this application */
     private final Date createdOn;
 
     /** The root that is changeable as-needed basis */
     private RetargetableRestlet root;
 
-    private Map<String, PlexusResource> plexusResources;
+    /**
+     * Constructor.
+     */
+    public PlexusRestletApplicationBridge()
+    {
+        super();
+
+        this.createdOn = new Date();
+    }
 
     /**
      * Constructor.
@@ -73,40 +83,20 @@ public class PlexusRestletApplicationBridge
      */
     public PlexusRestletApplicationBridge( Context context )
     {
-        super( context );
-       
+        super();
+
         this.createdOn = new Date();
     }
 
     /**
-     * Returns the timestamp of instantaniation of this object. This is used as timestamp for
-     * transient objects when they are still unchanged (not modified).
+     * Returns the timestamp of instantaniation of this object. This is used as timestamp for transient objects when
+     * they are still unchanged (not modified).
      * 
      * @return date
      */
     public Date getCreatedOn()
     {
         return createdOn;
-    }
-
-    /**
-     * Gets the Plexus from context.
-     * 
-     * @return
-     */
-    public PlexusContainer getPlexusContainer()
-    {
-        return (PlexusContainer) getContext().getAttributes().get( PlexusConstants.PLEXUS_KEY );
-    }
-
-    /**
-     * Puts the Plexus to context.
-     * 
-     * @param plexusContainer
-     */
-    public void setPlexusContainer( PlexusContainer plexusContainer )
-    {
-        getContext().getAttributes().put( PlexusConstants.PLEXUS_KEY, plexusContainer );
     }
 
     /**
@@ -127,8 +117,8 @@ public class PlexusRestletApplicationBridge
     }
 
     /**
-     * Creating all sort of shared tools and putting them into context, to make them usable by
-     * per-request instantaniated Resource implementors.
+     * Creating all sort of shared tools and putting them into context, to make them usable by per-request
+     * instantaniated Resource implementors.
      */
     protected final void configure()
     {
@@ -154,22 +144,15 @@ public class PlexusRestletApplicationBridge
         // put fileItemFactory into context
         getContext().getAttributes().put( FILEITEM_FACTORY, new DiskFileItemFactory() );
 
-        boolean shouldCollectPlexusResources = getContext().getParameters().getFirstValue( PLEXUS_DISCOVER_RESOURCES ) != null ? Boolean.parseBoolean( (String) getContext().getParameters()
-            .getFirstValue( PLEXUS_DISCOVER_RESOURCES ) ) : true; // the default if not set
+        boolean shouldCollectPlexusResources = getContext().getParameters().getFirstValue( PLEXUS_DISCOVER_RESOURCES ) != null
+            ? Boolean.parseBoolean( (String) getContext().getParameters().getFirstValue( PLEXUS_DISCOVER_RESOURCES ) )
+            : true; // the default if not set
 
         if ( shouldCollectPlexusResources )
         {
-            try
-            {
-                // discover the plexusResources
-                plexusResources = (Map<String, PlexusResource>) getPlexusContainer().lookupMap( PlexusResource.class );
-
-                getLogger().info( "Discovered " + plexusResources.size() + " PlexusResource components." );
-            }
-            catch ( ComponentLookupException e )
-            {
-                throw new IllegalStateException( "Cannot collect PlexusResources!", e );
-            }
+            // discover the plexusResources
+            // TODO: plexus will inject the resources anyway
+            getLogger().info( "Discovered " + plexusResources.size() + " PlexusResource components." );
         }
         else
         {
@@ -197,13 +180,15 @@ public class PlexusRestletApplicationBridge
             {
                 for ( PlexusResource resource : plexusResources.values() )
                 {
-                    attach( applicationRouter, false, resource.getResourceUri(), new PlexusResourceFinder( getContext(), resource ) );
+                    attach( applicationRouter, false, resource.getResourceUri(), new PlexusResourceFinder(
+                        getContext(),
+                        resource ) );
                 }
             }
 
             doCreateRoot( applicationRouter, isStarted );
 
-            // set it            
+            // set it
             root.setRoot( rootRouter );
         }
     }
@@ -215,48 +200,6 @@ public class PlexusRestletApplicationBridge
         return doConfigureXstream( xstream );
     }
 
-    // methods to override
-
-    /**
-     * Method to be overridden by subclasses. It will be called only once in the lifetime of this
-     * Application. This is the place when you need to create and add to context some stuff.
-     */
-    protected void doConfigure()
-    {
-        // empty implementation, left for subclasses to do something meaningful
-    }
-
-    /**
-     * Method to be overridden by subclasses. It will be called multiple times with multiple
-     * instances of XStream. Configure it by adding aliases for used DTOs, etc.
-     * 
-     * @param xstream
-     * @return
-     */
-    protected XStream doConfigureXstream( XStream xstream )
-    {
-        // default implementation does nothing, override if needed
-        return xstream;
-    }
-
-    protected Router initializeRouter( Router root )
-    {
-        return root;
-    }
-
-    /**
-     * Called when the app root needs to be created. Override it if you need "old way" to attach
-     * resources, or need to use the isStarted flag.
-     * 
-     * @param root
-     * @param isStarted
-     */
-    protected void doCreateRoot( Router root, boolean isStarted )
-    {
-        // empty implementation, left for subclasses to do something meaningful
-    }
-
-    @Deprecated
     protected void attach( Router router, boolean strict, String uriPattern, Class<? extends Resource> targetClass )
     {
         Route route = router.attach( uriPattern, targetClass );
@@ -267,7 +210,6 @@ public class PlexusRestletApplicationBridge
         }
     }
 
-    @Deprecated
     protected void attach( Router router, boolean strict, String uriPattern, Restlet target )
     {
         Route route = router.attach( uriPattern, target );
@@ -277,4 +219,52 @@ public class PlexusRestletApplicationBridge
             route.getTemplate().setMatchingMode( Template.MODE_EQUALS );
         }
     }
+
+    // methods to override
+
+    /**
+     * Method to be overridden by subclasses. It will be called only once in the lifetime of this Application. This is
+     * the place when you need to create and add to context some stuff.
+     */
+    protected void doConfigure()
+    {
+        // empty implementation, left for subclasses to do something meaningful
+    }
+
+    /**
+     * Method to be overridden by subclasses. It will be called multiple times with multiple instances of XStream.
+     * Configure it by adding aliases for used DTOs, etc.
+     * 
+     * @param xstream
+     * @return
+     */
+    protected XStream doConfigureXstream( XStream xstream )
+    {
+        // default implementation does nothing, override if needed
+        return xstream;
+    }
+
+    /**
+     * Left for subclass to inject a "prefix" path.
+     * 
+     * @param root
+     * @return
+     */
+    protected Router initializeRouter( Router root )
+    {
+        return root;
+    }
+
+    /**
+     * Called when the app root needs to be created. Override it if you need "old way" to attach resources, or need to
+     * use the isStarted flag.
+     * 
+     * @param root
+     * @param isStarted
+     */
+    protected void doCreateRoot( Router root, boolean isStarted )
+    {
+        // empty implementation, left for subclasses to do something meaningful
+    }
+
 }

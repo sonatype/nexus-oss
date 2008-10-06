@@ -32,7 +32,8 @@ import com.thoughtworks.xstream.XStream;
 /**
  * The delegating resource.
  * 
- * @author Jason van Zyl @author cstamas
+ * @author Jason van Zyl
+ * @author cstamas
  */
 public class RestletResource
     extends Resource
@@ -227,21 +228,21 @@ public class RestletResource
             Object payload = deserialize( delegate.getPayloadInstance() );
 
             Object result = null;
-            
+
             try
             {
-               result = delegate.post( getContext(), getRequest(), getResponse(), payload );
-               // This is a post, so set the status correctly
-               // but only if the status was not changed to be something else, like a 202
-               if( getResponse().getStatus() == Status.SUCCESS_OK )
-               {
-                 getResponse().setStatus( Status.SUCCESS_CREATED );
-               }
+                result = delegate.post( getContext(), getRequest(), getResponse(), payload );
+                // This is a post, so set the status correctly
+                // but only if the status was not changed to be something else, like a 202
+                if ( getResponse().getStatus() == Status.SUCCESS_OK )
+                {
+                    getResponse().setStatus( Status.SUCCESS_CREATED );
+                }
             }
-            catch( PlexusResourceException e)
+            catch ( PlexusResourceException e )
             {
                 // set the status
-                getResponse().setStatus(e.getStatus());
+                getResponse().setStatus( e.getStatus() );
                 // try to get the responseObject
                 result = e.getResultObject();
             }
@@ -268,7 +269,7 @@ public class RestletResource
         else
         {
             Object payload = deserialize( delegate.getPayloadInstance() );
-            
+
             Object result = null;
             try
             {
@@ -301,7 +302,7 @@ public class RestletResource
         throws ResourceException
     {
         delegate.delete( getContext(), getRequest(), getResponse() );
-        
+
         // if we have an Entity set, then return a 200 (default)
         // if not return a 204
         if ( !getResponse().isEntityAvailable() )

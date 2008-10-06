@@ -12,6 +12,7 @@ import org.sonatype.plexus.rest.resource.RestletResource;
  * A finder that holds reference to a PlexusResource (which is a Plexus component) and ties them on incoming request
  * with RestletResource.
  * 
+ * @author jvanzyl
  * @author cstamas
  */
 public class PlexusResourceFinder
