@@ -25,6 +25,7 @@ import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.sonatype.nexus.rest.restore.AbstractRestoreResourceHandler;
 import org.sonatype.nexus.tasks.RebuildAttributesTask;
+import org.sonatype.nexus.tasks.descriptors.RebuildAttributesTaskDescriptor;
 
 public class AttributesResourceHandler
     extends AbstractRestoreResourceHandler
@@ -38,7 +39,7 @@ public class AttributesResourceHandler
     public void handleDelete()
     {
         RebuildAttributesTask task = (RebuildAttributesTask) getNexus()
-            .createTaskInstance( RebuildAttributesTask.HINT );
+            .createTaskInstance( RebuildAttributesTaskDescriptor.ID );
 
         task.setRepositoryId( getRepositoryId() );
 

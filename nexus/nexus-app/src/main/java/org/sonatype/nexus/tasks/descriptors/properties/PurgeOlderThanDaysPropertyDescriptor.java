@@ -26,6 +26,8 @@ import org.codehaus.plexus.component.annotations.Component;
 public class PurgeOlderThanDaysPropertyDescriptor
     extends AbstractNumberPropertyDescriptor
 {
+    public static final String ID = "purgeOlderThan";
+    
     public PurgeOlderThanDaysPropertyDescriptor()
     {
         setHelpText( "Set the number of days, to purge items from Timeline that are older then the given number of days." );
@@ -34,7 +36,7 @@ public class PurgeOlderThanDaysPropertyDescriptor
  
     public String getId()
     {
-        return "purgeOlderThan";
+        return ID;
     }
 
     public String getName()

@@ -1,19 +1,17 @@
 package org.sonatype.nexus.integrationtests.nexus642;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.URL;
 
 import junit.framework.Assert;
 
-import org.apache.maven.model.Repository;
 import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.rest.model.RepositoryShadowResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceListResource;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
-import org.sonatype.nexus.tasks.SynchronizeShadowsTask;
+import org.sonatype.nexus.tasks.descriptors.SynchronizeShadowTaskDescriptor;
 import org.sonatype.nexus.test.utils.FileTestingUtils;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
@@ -69,7 +67,7 @@ public class Nexus642SynchShadowTaskTest
         age.setValue( shadowRepo );
 
         // clean unused
-        return TaskScheduleUtil.runTask( taskName, SynchronizeShadowsTask.HINT, repo, age );
+        return TaskScheduleUtil.runTask( taskName, SynchronizeShadowTaskDescriptor.ID, repo, age );
     }
 
 }

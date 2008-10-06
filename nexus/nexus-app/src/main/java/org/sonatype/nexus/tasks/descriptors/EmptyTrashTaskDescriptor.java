@@ -24,16 +24,17 @@ import java.util.Collections;
 import java.util.List;
 
 import org.codehaus.plexus.component.annotations.Component;
-import org.sonatype.nexus.tasks.EmptyTrashTask;
 import org.sonatype.nexus.tasks.descriptors.properties.ScheduledTaskPropertyDescriptor;
 
 @Component( role = ScheduledTaskDescriptor.class, hint = "EmptyTrash" )
 public class EmptyTrashTaskDescriptor
     implements ScheduledTaskDescriptor
 {    
+    public static final String ID = "EmptyTrashTask";
+    
     public String getId()
     {
-        return EmptyTrashTask.HINT;
+        return ID;
     }
     
     public String getName()

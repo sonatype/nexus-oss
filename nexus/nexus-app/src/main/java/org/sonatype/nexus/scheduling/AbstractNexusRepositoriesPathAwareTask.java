@@ -20,18 +20,18 @@
  */
 package org.sonatype.nexus.scheduling;
 
+import org.sonatype.nexus.tasks.descriptors.properties.ResourceStorePathPropertyDescriptor;
+
 public abstract class AbstractNexusRepositoriesPathAwareTask<T>
     extends AbstractNexusRepositoriesTask<T>
 {
-    public static final String RESOURCE_STORE_PATH_KEY = "resourceStorePath";
-
     public String getResourceStorePath()
     {
-        return getParameters().get( RESOURCE_STORE_PATH_KEY );
+        return getParameters().get( ResourceStorePathPropertyDescriptor.ID );
     }
 
     public void setResourceStorePath( String resourceStorePath )
     {
-        getParameters().put( RESOURCE_STORE_PATH_KEY, resourceStorePath );
+        getParameters().put( ResourceStorePathPropertyDescriptor.ID, resourceStorePath );
     }
 }

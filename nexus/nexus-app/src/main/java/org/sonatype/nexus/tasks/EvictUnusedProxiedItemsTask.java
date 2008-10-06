@@ -22,32 +22,30 @@ package org.sonatype.nexus.tasks;
 
 import java.util.Collection;
 
+import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.nexus.feeds.FeedRecorder;
 import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesTask;
+import org.sonatype.nexus.tasks.descriptors.EvictUnusedItemsTaskDescriptor;
+import org.sonatype.nexus.tasks.descriptors.properties.EvictOlderThanDaysPropertyDescriptor;
+import org.sonatype.scheduling.SchedulerTask;
 
 /**
  * Evicts unused proxied items.
  * 
  * @author cstamas
- * @plexus.component role="org.sonatype.scheduling.SchedulerTask"
- *                   role-hint="EvictUnusedProxiedItemsTask"
- *                   instantiation-strategy="per-lookup"
  */
+@Component( role = SchedulerTask.class, hint = EvictUnusedItemsTaskDescriptor.ID, instantiationStrategy = "per-lookup" )
 public class EvictUnusedProxiedItemsTask
     extends AbstractNexusRepositoriesTask<Collection<String>>
 { 
-    public static final String HINT = "EvictUnusedProxiedItemsTask";
-    
-    public static final String EVICT_OLDER_CACHE_ITEMS_THEN_KEY = "evictOlderCacheItemsThen";
-
     public int getEvictOlderCacheItemsThen()
     {
-        return Integer.parseInt( getParameters().get( EVICT_OLDER_CACHE_ITEMS_THEN_KEY ) );
+        return Integer.parseInt( getParameters().get( EvictOlderThanDaysPropertyDescriptor.ID ) );
     }
 
     public void setEvictOlderCacheItemsThen( int evictOlderCacheItemsThen )
     {
-        getParameters().put( EVICT_OLDER_CACHE_ITEMS_THEN_KEY, Integer.toString( evictOlderCacheItemsThen ) );
+        getParameters().put( EvictOlderThanDaysPropertyDescriptor.ID, Integer.toString( evictOlderCacheItemsThen ) );
     }
 
     @Override

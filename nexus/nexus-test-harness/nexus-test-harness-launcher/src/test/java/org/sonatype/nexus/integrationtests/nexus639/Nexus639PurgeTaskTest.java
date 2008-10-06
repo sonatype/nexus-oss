@@ -8,7 +8,7 @@ import org.junit.Test;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.rest.model.ScheduledServiceListResource;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
-import org.sonatype.nexus.tasks.PurgeTimeline;
+import org.sonatype.nexus.tasks.descriptors.PurgeTimelineTaskDescriptor;
 import org.sonatype.nexus.test.utils.FeedUtil;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 
@@ -33,7 +33,7 @@ public class Nexus639PurgeTaskTest
         ScheduledServicePropertyResource repo = new ScheduledServicePropertyResource();
         repo.setId( "purgeOlderThan" );
         repo.setValue( "0" );
-        ScheduledServiceListResource task = TaskScheduleUtil.runTask( "purge", PurgeTimeline.HINT, repo );
+        ScheduledServiceListResource task = TaskScheduleUtil.runTask( "purge", PurgeTimelineTaskDescriptor.ID, repo );
         
         Assert.assertNotNull( task );
         Assert.assertEquals( "SUBMITTED", task.getStatus() );

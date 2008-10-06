@@ -25,13 +25,14 @@ import java.util.List;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.sonatype.nexus.tasks.EvictUnusedProxiedItemsTask;
 import org.sonatype.nexus.tasks.descriptors.properties.ScheduledTaskPropertyDescriptor;
 
 @Component( role = ScheduledTaskDescriptor.class, hint = "EvictUnusedItems" )
 public class EvictUnusedItemsTaskDescriptor
     implements ScheduledTaskDescriptor
 {
+    public static final String ID = "EvictUnusedProxiedItemsTask";
+    
     @Requirement( role = ScheduledTaskPropertyDescriptor.class, hint = "RepositoryOrGroup" )
     private ScheduledTaskPropertyDescriptor repositoryOrGroupId;
     
@@ -40,7 +41,7 @@ public class EvictUnusedItemsTaskDescriptor
     
     public String getId()
     {
-        return EvictUnusedProxiedItemsTask.HINT;
+        return ID;
     }
     
     public String getName()

@@ -146,7 +146,7 @@ public class DefaultNexusScheduler
     {
         try
         {
-            return (SchedulerTask<?>) getPlexusContainer().lookup( SchedulerTask.ROLE, taskType );
+            return (SchedulerTask<?>) getPlexusContainer().lookup( SchedulerTask.class, taskType );
         }
         catch ( ComponentLookupException e )
         {

@@ -25,19 +25,20 @@ import java.util.List;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.sonatype.nexus.tasks.PurgeTimeline;
 import org.sonatype.nexus.tasks.descriptors.properties.ScheduledTaskPropertyDescriptor;
 
 @Component( role = ScheduledTaskDescriptor.class, hint = "PurgeTimeline" )
 public class PurgeTimelineTaskDescriptor
     implements ScheduledTaskDescriptor
 {
+    public static final String ID = "PurgeTimeline";
+    
     @Requirement( role = ScheduledTaskPropertyDescriptor.class, hint = "PurgeOlderThanDays" )
     private ScheduledTaskPropertyDescriptor olderThan;
     
     public String getId()
     {
-        return PurgeTimeline.HINT;
+        return ID;
     }
     
     public String getName()

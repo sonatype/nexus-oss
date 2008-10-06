@@ -26,6 +26,8 @@ import org.codehaus.plexus.component.annotations.Component;
 public class RepositoryOrGroupPropertyDescriptor
     extends AbstractRepositoryOrGroupPropertyDescriptor
 {
+    public static final String ID = "repositoryOrGroupId";
+    
     public RepositoryOrGroupPropertyDescriptor()
     {
         setHelpText( "Select the repository or repository group to assign to this task." );
@@ -34,7 +36,7 @@ public class RepositoryOrGroupPropertyDescriptor
     
     public String getId()
     {
-        return "repositoryOrGroupId";
+        return ID;
     }
 
     public String getName()

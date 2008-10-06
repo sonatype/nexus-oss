@@ -26,6 +26,8 @@ import org.codehaus.plexus.component.annotations.Component;
 public class RemoveIfReleasedPropertyDescriptor
     extends AbstractBooleanPropertyDescriptor
 {
+    public static final String ID = "removeIfReleaseExists";
+    
     public RemoveIfReleasedPropertyDescriptor()
     {
         setHelpText( "The job will purge all snapshots that have a corresponding released artifact (same version not including the -SNAPSHOT)." );
@@ -34,7 +36,7 @@ public class RemoveIfReleasedPropertyDescriptor
  
     public String getId()
     {
-        return "removeIfReleaseExists";
+        return ID;
     }
 
     public String getName()

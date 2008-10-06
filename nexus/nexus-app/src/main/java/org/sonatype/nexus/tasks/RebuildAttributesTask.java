@@ -20,22 +20,21 @@
  */
 package org.sonatype.nexus.tasks;
 
+import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.nexus.feeds.FeedRecorder;
 import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesPathAwareTask;
+import org.sonatype.nexus.tasks.descriptors.RebuildAttributesTaskDescriptor;
+import org.sonatype.scheduling.SchedulerTask;
 
 /**
  * Rebuild attributes task.
  * 
  * @author cstamas
- * @plexus.component role="org.sonatype.scheduling.SchedulerTask"
- *                   role-hint="RebuildAttributesTask" instantiation-strategy="per-lookup"
  */
+@Component( role = SchedulerTask.class, hint = RebuildAttributesTaskDescriptor.ID, instantiationStrategy = "per-lookup" )
 public class RebuildAttributesTask
     extends AbstractNexusRepositoriesPathAwareTask<Object>
-{
-    
-    public static final String HINT = "RebuildAttributesTask";
-    
+{    
     public Object doRun()
         throws Exception
     {

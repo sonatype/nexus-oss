@@ -36,6 +36,7 @@ import org.sonatype.nexus.rest.model.NFCResource;
 import org.sonatype.nexus.rest.model.NFCResourceResponse;
 import org.sonatype.nexus.rest.restore.AbstractRestoreResourceHandler;
 import org.sonatype.nexus.tasks.ClearCacheTask;
+import org.sonatype.nexus.tasks.descriptors.ClearCacheTaskDescriptor;
 
 /**
  * @author cstamas
@@ -109,7 +110,7 @@ public class CacheResourceHandler
 
     public void delete()
     {
-        ClearCacheTask task = (ClearCacheTask) getNexus().createTaskInstance( ClearCacheTask.HINT );
+        ClearCacheTask task = (ClearCacheTask) getNexus().createTaskInstance( ClearCacheTaskDescriptor.ID );
 
         task.setRepositoryId( getRepositoryId() );
 

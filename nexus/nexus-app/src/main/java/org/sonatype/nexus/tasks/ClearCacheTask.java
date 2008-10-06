@@ -20,22 +20,21 @@
  */
 package org.sonatype.nexus.tasks;
 
+import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.nexus.feeds.FeedRecorder;
 import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesPathAwareTask;
+import org.sonatype.nexus.tasks.descriptors.ClearCacheTaskDescriptor;
+import org.sonatype.scheduling.SchedulerTask;
 
 /**
  * Clear caches task.
  * 
  * @author cstamas
- * @plexus.component role="org.sonatype.scheduling.SchedulerTask" role-hint="ClearCacheTask"
- *                   instantiation-strategy="per-lookup"
  */
+@Component( role = SchedulerTask.class, hint = ClearCacheTaskDescriptor.ID, instantiationStrategy = "per-lookup" )
 public class ClearCacheTask
     extends AbstractNexusRepositoriesPathAwareTask<Object>
-{
-    
-    public static final String HINT = "ClearCacheTask";
-    
+{    
     public Object doRun()
         throws Exception
     {

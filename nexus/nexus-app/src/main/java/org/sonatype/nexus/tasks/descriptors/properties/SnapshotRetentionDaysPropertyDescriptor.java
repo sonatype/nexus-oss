@@ -26,6 +26,8 @@ import org.codehaus.plexus.component.annotations.Component;
 public class SnapshotRetentionDaysPropertyDescriptor
     extends AbstractNumberPropertyDescriptor
 {
+    public static final String ID = "removeOlderThanDays";
+    
     public SnapshotRetentionDaysPropertyDescriptor()
     {
         setHelpText( "The job will purge all snapshots older than the entered number of days, but will obey to Min. count of snapshots to keep." );
@@ -34,7 +36,7 @@ public class SnapshotRetentionDaysPropertyDescriptor
  
     public String getId()
     {
-        return "removeOlderThanDays";
+        return ID;
     }
 
     public String getName()

@@ -20,27 +20,25 @@
  */
 package org.sonatype.nexus.maven.tasks;
 
+import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesTask;
+import org.sonatype.nexus.tasks.descriptors.SnapshotRemovalTaskDescriptor;
+import org.sonatype.nexus.tasks.descriptors.properties.MinimumSnapshotCountPropertyDescriptor;
+import org.sonatype.nexus.tasks.descriptors.properties.RemoveIfReleasedPropertyDescriptor;
+import org.sonatype.nexus.tasks.descriptors.properties.SnapshotRetentionDaysPropertyDescriptor;
+import org.sonatype.scheduling.SchedulerTask;
 
 /**
  * SnapshotRemoverTask
  * 
  * @author cstamas
- * @plexus.component role="org.sonatype.scheduling.SchedulerTask"
- *                   role-hint="SnapshotRemoverTask" instantiation-strategy="per-lookup"
  */
+@Component( role = SchedulerTask.class, hint = SnapshotRemovalTaskDescriptor.ID, instantiationStrategy = "per-lookup" )
 public class SnapshotRemoverTask
     extends AbstractNexusRepositoriesTask<SnapshotRemovalResult>
 {
-    public static final String HINT = "SnapshotRemoverTask";
     public static final String SYSTEM_REMOVE_SNAPSHOTS_ACTION = "REMOVESNAPSHOTS";
-
-    public static final String MIN_SNAPSHOTS_TO_KEEP_KEY = "minSnapshotsToKeep";
-
-    public static final String REMOVE_OLDER_THAN_DAYS_KEY = "removeOlderThanDays";
-
-    public static final String REMOVE_IF_RELEASE_EXISTS_KEY = "removeIfReleaseExists";
     
     public static final int DEFAULT_MIN_SNAPSHOTS_TO_KEEP = 0;
     
@@ -48,7 +46,7 @@ public class SnapshotRemoverTask
 
     public int getMinSnapshotsToKeep()
     {        
-        String param = getParameters().get( MIN_SNAPSHOTS_TO_KEEP_KEY );
+        String param = getParameters().get( MinimumSnapshotCountPropertyDescriptor.ID );
         
         if ( StringUtils.isEmpty( param ) )
         {
@@ -60,12 +58,12 @@ public class SnapshotRemoverTask
 
     public void setMinSnapshotsToKeep( int minSnapshotsToKeep )
     {
-        getParameters().put( MIN_SNAPSHOTS_TO_KEEP_KEY, Integer.toString( minSnapshotsToKeep ) );
+        getParameters().put( MinimumSnapshotCountPropertyDescriptor.ID, Integer.toString( minSnapshotsToKeep ) );
     }
 
     public int getRemoveOlderThanDays()
     {
-        String param = getParameters().get( REMOVE_OLDER_THAN_DAYS_KEY );
+        String param = getParameters().get( SnapshotRetentionDaysPropertyDescriptor.ID );
         
         if ( StringUtils.isEmpty( param ) )
         {
@@ -77,17 +75,17 @@ public class SnapshotRemoverTask
 
     public void setRemoveOlderThanDays( int removeOlderThanDays )
     {
-        getParameters().put( REMOVE_OLDER_THAN_DAYS_KEY, Integer.toString( removeOlderThanDays ) );
+        getParameters().put( SnapshotRetentionDaysPropertyDescriptor.ID, Integer.toString( removeOlderThanDays ) );
     }
 
     public boolean isRemoveIfReleaseExists()
     {
-        return Boolean.parseBoolean( getParameters().get( REMOVE_IF_RELEASE_EXISTS_KEY ) );
+        return Boolean.parseBoolean( getParameters().get( RemoveIfReleasedPropertyDescriptor.ID ) );
     }
 
     public void setRemoveIfReleaseExists( boolean removeIfReleaseExists )
     {
-        getParameters().put( REMOVE_IF_RELEASE_EXISTS_KEY, Boolean.toString( removeIfReleaseExists ) );
+        getParameters().put( RemoveIfReleasedPropertyDescriptor.ID, Boolean.toString( removeIfReleaseExists ) );
     }
 
     public SnapshotRemovalResult doRun()

@@ -27,13 +27,14 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
-import org.sonatype.nexus.tasks.ClearCacheTask;
 import org.sonatype.nexus.tasks.descriptors.properties.ScheduledTaskPropertyDescriptor;
 
 @Component( role = ScheduledTaskDescriptor.class, hint = "ClearCache" )
 public class ClearCacheTaskDescriptor
     implements ScheduledTaskDescriptor, Initializable
 {
+    public static final String ID = "ClearCacheTask";
+    
     @Requirement( role = ScheduledTaskPropertyDescriptor.class, hint = "RepositoryOrGroup" )
     private ScheduledTaskPropertyDescriptor repositoryOrGroupId;
     
@@ -48,7 +49,7 @@ public class ClearCacheTaskDescriptor
     
     public String getId()
     {
-        return ClearCacheTask.HINT;
+        return ID;
     }
     
     public String getName()

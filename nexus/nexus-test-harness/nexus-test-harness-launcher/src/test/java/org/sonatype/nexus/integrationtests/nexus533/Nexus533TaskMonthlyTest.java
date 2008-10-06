@@ -4,11 +4,9 @@ import java.util.Calendar;
 import java.util.Date;
 
 import org.apache.commons.lang.time.DateUtils;
-import org.sonatype.nexus.rest.model.ScheduledServiceAdvancedResource;
-import org.sonatype.nexus.rest.model.ScheduledServiceAdvancedResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceMonthlyResource;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
-import org.sonatype.nexus.tasks.ReindexTask;
+import org.sonatype.nexus.tasks.descriptors.ReindexTaskDescriptor;
 
 import edu.emory.mathcs.backport.java.util.Arrays;
 
@@ -35,7 +33,7 @@ public class Nexus533TaskMonthlyTest
             scheduledTask.setRecurringTime( "03:30" );
             scheduledTask.setRecurringDay( Arrays.asList( new String[] { "1", "9", "17", "25" } ) );
 
-            scheduledTask.setTypeId( ReindexTask.HINT );
+            scheduledTask.setTypeId( ReindexTaskDescriptor.ID );
 
             ScheduledServicePropertyResource prop = new ScheduledServicePropertyResource();
             prop.setId( "repositoryOrGroupId" );

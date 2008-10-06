@@ -22,21 +22,21 @@ package org.sonatype.nexus.tasks;
 
 import java.io.IOException;
 
+import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.nexus.feeds.FeedRecorder;
 import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesTask;
+import org.sonatype.nexus.tasks.descriptors.PublishIndexesTaskDescriptor;
+import org.sonatype.scheduling.SchedulerTask;
 
 /**
  * Publish indexes task.
  * 
  * @author cstamas
- * @plexus.component role="org.sonatype.scheduling.SchedulerTask"
- *                   role-hint="PublishIndexesTask" instantiation-strategy="per-lookup"
  */
+@Component( role = SchedulerTask.class, hint = PublishIndexesTaskDescriptor.ID, instantiationStrategy = "per-lookup" )
 public class PublishIndexesTask
     extends AbstractNexusRepositoriesTask<Object>
 {
-    public static final String HINT = "PublishIndexesTask"; 
-    
     @Override
     protected Object doRun()
         throws Exception

@@ -26,6 +26,8 @@ import org.codehaus.plexus.component.annotations.Component;
 public class ResourceStorePathPropertyDescriptor
     extends AbstractStringPropertyDescriptor
 {
+    public static final String ID = "resourceStorePath";
+    
     public ResourceStorePathPropertyDescriptor()
     {
         setHelpText( "Enter a repository path to run the task in recursively (ie. \"/\" for root or \"/org/apache\")" );
@@ -34,7 +36,7 @@ public class ResourceStorePathPropertyDescriptor
  
     public String getId()
     {
-        return "resourceStorePath";
+        return ID;
     }
 
     public String getName()

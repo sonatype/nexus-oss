@@ -24,42 +24,40 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.feeds.FeedRecorder;
 import org.sonatype.nexus.scheduling.AbstractNexusTask;
+import org.sonatype.nexus.tasks.descriptors.PurgeTimelineTaskDescriptor;
+import org.sonatype.nexus.tasks.descriptors.properties.PurgeOlderThanDaysPropertyDescriptor;
 import org.sonatype.nexus.timeline.Timeline;
+import org.sonatype.scheduling.SchedulerTask;
 
 /**
  * Purge timeline.
  * 
  * @author cstamas
- * @plexus.component role="org.sonatype.scheduling.SchedulerTask" role-hint=PurgeTimeline"
- *                   instantiation-strategy="per-lookup"
  */
+@Component( role = SchedulerTask.class, hint = PurgeTimelineTaskDescriptor.ID, instantiationStrategy = "per-lookup" )
 public class PurgeTimeline
     extends AbstractNexusTask<Object>
 {
-    public static final String HINT = "PurgeTimeline";
-    
-    public static final String PURGE_OLDER_THAN_KEY = "purgeOlderThan";
-
     public static final String TYPES_KEY = "types";
 
     public static final String SUBTYPES_KEY = "subTypes";
 
-    /**
-     * @plexus.requirement
-     */
+    @Requirement( role = Timeline.class )
     private Timeline timeline;
 
     public int getPurgeOlderThan()
     {
-        return Integer.parseInt( getParameters().get( PURGE_OLDER_THAN_KEY ) );
+        return Integer.parseInt( getParameters().get( PurgeOlderThanDaysPropertyDescriptor.ID ) );
     }
 
     public void setPurgeOlderThan( int purgeOlderThan )
     {
-        getParameters().put( PURGE_OLDER_THAN_KEY, Integer.toString( purgeOlderThan ) );
+        getParameters().put( PurgeOlderThanDaysPropertyDescriptor.ID, Integer.toString( purgeOlderThan ) );
     }
 
     public Set<String> getTypes()

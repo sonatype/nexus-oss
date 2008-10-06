@@ -20,32 +20,30 @@
  */
 package org.sonatype.nexus.tasks;
 
+import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.nexus.feeds.FeedRecorder;
 import org.sonatype.nexus.scheduling.AbstractNexusTask;
+import org.sonatype.nexus.tasks.descriptors.SynchronizeShadowTaskDescriptor;
+import org.sonatype.nexus.tasks.descriptors.properties.ShadowPropertyDescriptor;
+import org.sonatype.scheduling.SchedulerTask;
 
 /**
  * Publish indexes task.
  * 
  * @author cstamas
- * @plexus.component role="org.sonatype.scheduling.SchedulerTask"
- *                   role-hint="SynchronizeShadowsTask" instantiation-strategy="per-lookup"
  */
+@Component( role = SchedulerTask.class, hint = SynchronizeShadowTaskDescriptor.ID, instantiationStrategy = "per-lookup" )
 public class SynchronizeShadowsTask
     extends AbstractNexusTask<Object>
 {
-
-    public static final String HINT = "SynchronizeShadowsTask";
-    
-    public static final String SHADOW_REPOSITORY_ID = "shadowRepositoryId";
-
     public String getShadowRepositoryId()
     {
-        return getParameter( SHADOW_REPOSITORY_ID );
+        return getParameter( ShadowPropertyDescriptor.ID );
     }
 
     public void setShadowRepositoryId( String shadowRepositoryId )
     {
-        getParameters().put( SHADOW_REPOSITORY_ID, shadowRepositoryId );
+        getParameters().put( ShadowPropertyDescriptor.ID, shadowRepositoryId );
     }
 
     @Override

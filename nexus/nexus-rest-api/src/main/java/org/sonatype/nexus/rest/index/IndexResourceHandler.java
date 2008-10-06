@@ -38,6 +38,7 @@ import org.sonatype.nexus.rest.model.NexusArtifact;
 import org.sonatype.nexus.rest.model.SearchResponse;
 import org.sonatype.nexus.rest.restore.AbstractRestoreResourceHandler;
 import org.sonatype.nexus.tasks.ReindexTask;
+import org.sonatype.nexus.tasks.descriptors.ReindexTaskDescriptor;
 
 /**
  * @author cstamas
@@ -191,7 +192,7 @@ public class IndexResourceHandler
 
     public void delete()
     {
-        ReindexTask task = (ReindexTask) getNexus().createTaskInstance( ReindexTask.HINT );
+        ReindexTask task = (ReindexTask) getNexus().createTaskInstance( ReindexTaskDescriptor.ID );
 
         task.setRepositoryId( getRepositoryId() );
 

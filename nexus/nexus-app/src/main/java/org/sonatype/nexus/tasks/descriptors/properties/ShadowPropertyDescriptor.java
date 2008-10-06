@@ -26,6 +26,8 @@ import org.codehaus.plexus.component.annotations.Component;
 public class ShadowPropertyDescriptor
     extends AbstractRepositoryPropertyDescriptor
 {
+    public static final String ID = "shadowRepositoryId";
+    
     public ShadowPropertyDescriptor()
     {
         setHelpText( "Select the repository shadow to assign to this task." );
@@ -34,7 +36,7 @@ public class ShadowPropertyDescriptor
  
     public String getId()
     {
-        return "shadowRepositoryId";
+        return ID;
     }
 
     public String getName()

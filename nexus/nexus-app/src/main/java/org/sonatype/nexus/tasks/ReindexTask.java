@@ -20,21 +20,21 @@
  */
 package org.sonatype.nexus.tasks;
 
+import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.nexus.feeds.FeedRecorder;
 import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesPathAwareTask;
+import org.sonatype.nexus.tasks.descriptors.ReindexTaskDescriptor;
+import org.sonatype.scheduling.SchedulerTask;
 
 /**
  * Reindex task.
  * 
  * @author cstamas
- * @plexus.component role="org.sonatype.scheduling.SchedulerTask" role-hint="ReindexTask"
- *                   instantiation-strategy="per-lookup"
  */
+@Component( role = SchedulerTask.class, hint = ReindexTaskDescriptor.ID, instantiationStrategy = "per-lookup" )
 public class ReindexTask
     extends AbstractNexusRepositoriesPathAwareTask<Object>
-{
-    public static final String HINT = "ReindexTask";
-    
+{    
     public Object doRun()
         throws Exception
     {

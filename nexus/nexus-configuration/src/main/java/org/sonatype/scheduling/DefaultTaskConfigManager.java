@@ -115,7 +115,7 @@ public class DefaultTaskConfigManager
 
                 try
                 {
-                    SchedulerTask<?> nexusTask = (SchedulerTask<?>) plexusContainer.lookup( SchedulerTask.ROLE, task
+                    SchedulerTask<?> nexusTask = (SchedulerTask<?>) plexusContainer.lookup( SchedulerTask.class, task
                         .getType() );
 
                     for ( Iterator iter = task.getProperties().iterator(); iter.hasNext(); )

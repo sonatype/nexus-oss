@@ -3,15 +3,11 @@ package org.sonatype.nexus.integrationtests.nexus634;
 import java.io.File;
 import java.util.Collection;
 
-import junit.framework.Assert;
-
 import org.apache.commons.io.FileUtils;
 import org.junit.Before;
-import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
-import org.sonatype.nexus.maven.tasks.SnapshotRemoverTask;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
-import org.sonatype.nexus.test.utils.MavenDeployer;
+import org.sonatype.nexus.tasks.descriptors.SnapshotRemovalTaskDescriptor;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 
@@ -85,7 +81,7 @@ public class AbstractSnapshotRemoverTest
         removeReleasedProp.setId( "removeIfReleaseExists" );
         removeReleasedProp.setValue( String.valueOf( removeIfReleaseExists ) );
 
-        TaskScheduleUtil.runTask( SnapshotRemoverTask.HINT, 
+        TaskScheduleUtil.runTask( SnapshotRemovalTaskDescriptor.ID, 
                                   repositoryProp, keepSnapshotsProp, ageProp, removeReleasedProp );
     }
 

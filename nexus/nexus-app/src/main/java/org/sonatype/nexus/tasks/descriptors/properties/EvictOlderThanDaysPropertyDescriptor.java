@@ -26,6 +26,8 @@ import org.codehaus.plexus.component.annotations.Component;
 public class EvictOlderThanDaysPropertyDescriptor
     extends AbstractNumberPropertyDescriptor
 {
+    public static final String ID = "evictOlderCacheItemsThen";
+    
     public EvictOlderThanDaysPropertyDescriptor()
     {
         setHelpText( "Set the number of days, to evict all unused proxied items that were not used the given number of days." );
@@ -34,7 +36,7 @@ public class EvictOlderThanDaysPropertyDescriptor
  
     public String getId()
     {
-        return "evictOlderCacheItemsThen";
+        return ID;
     }
 
     public String getName()

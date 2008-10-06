@@ -114,7 +114,9 @@ import org.sonatype.nexus.store.Entry;
 import org.sonatype.nexus.store.Store;
 import org.sonatype.nexus.tasks.ReindexTask;
 import org.sonatype.nexus.tasks.SynchronizeShadowsTask;
+import org.sonatype.nexus.tasks.descriptors.ReindexTaskDescriptor;
 import org.sonatype.nexus.tasks.descriptors.ScheduledTaskDescriptor;
+import org.sonatype.nexus.tasks.descriptors.SynchronizeShadowTaskDescriptor;
 import org.sonatype.scheduling.NoSuchTaskException;
 import org.sonatype.scheduling.ScheduledTask;
 import org.sonatype.scheduling.SchedulerTask;
@@ -510,7 +512,7 @@ public class DefaultNexus
             if ( settings.isIndexable() )
             {
                 // Create the initial index for the repository
-                ReindexTask rt = (ReindexTask) nexusScheduler.createTaskInstance( ReindexTask.HINT );
+                ReindexTask rt = (ReindexTask) nexusScheduler.createTaskInstance( ReindexTaskDescriptor.ID );
                 rt.setRepositoryId( settings.getId() );
                 nexusScheduler.submit( "Create initial index.", rt );
             }
@@ -543,7 +545,7 @@ public class DefaultNexus
         if ( !previousDownloadRemoteIndexes && settings.isDownloadRemoteIndexes() )
         {
             // Create the initial index for the repository
-            ReindexTask rt = (ReindexTask) nexusScheduler.createTaskInstance( ReindexTask.HINT );
+            ReindexTask rt = (ReindexTask) nexusScheduler.createTaskInstance( ReindexTaskDescriptor.ID );
             rt.setRepositoryId( settings.getId() );
             nexusScheduler.submit( "Download remote index enabled.", rt );
         }
@@ -1645,7 +1647,7 @@ public class DefaultNexus
             if ( shadow.isSyncAtStartup() )
             {
                 SynchronizeShadowsTask task = (SynchronizeShadowsTask) nexusScheduler
-                    .createTaskInstance( SynchronizeShadowsTask.HINT );
+                    .createTaskInstance( SynchronizeShadowTaskDescriptor.ID );
 
                 task.setShadowRepositoryId( shadow.getId() );
 

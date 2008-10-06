@@ -29,21 +29,20 @@ import java.util.Set;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.proxy.NoSuchResourceStoreException;
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.tasks.descriptors.properties.RepositoryOrGroupPropertyDescriptor;
 import org.sonatype.scheduling.ScheduledTask;
 import org.sonatype.scheduling.TaskState;
 
 public abstract class AbstractNexusRepositoriesTask<T>
     extends AbstractNexusTask<T>
 {
-    public static final String REPOSITORY_OR_GROUP_ID_KEY = "repositoryOrGroupId";
-
     private static final String REPO_PREFIX = "repo_";
 
     private static final String GROUP_PREFIX = "group_";
 
     public String getRepositoryId()
     {
-        String param = getParameters().get( REPOSITORY_OR_GROUP_ID_KEY );
+        String param = getParameters().get( RepositoryOrGroupPropertyDescriptor.ID );
         if ( param != null && param.startsWith( REPO_PREFIX ) )
         {
             return param.substring( REPO_PREFIX.length() );
@@ -56,13 +55,13 @@ public abstract class AbstractNexusRepositoriesTask<T>
     {
         if ( !StringUtils.isEmpty( repositoryId ) )
         {
-            getParameters().put( REPOSITORY_OR_GROUP_ID_KEY, REPO_PREFIX + repositoryId );
+            getParameters().put( RepositoryOrGroupPropertyDescriptor.ID, REPO_PREFIX + repositoryId );
         }
     }
 
     public String getRepositoryGroupId()
     {
-        String param = getParameters().get( REPOSITORY_OR_GROUP_ID_KEY );
+        String param = getParameters().get( RepositoryOrGroupPropertyDescriptor.ID );
         if ( param != null && param.startsWith( GROUP_PREFIX ) )
         {
             return param.substring( GROUP_PREFIX.length() );
@@ -75,7 +74,7 @@ public abstract class AbstractNexusRepositoriesTask<T>
     {
         if ( !StringUtils.isEmpty( repositoryGroupId ) )
         {
-            getParameters().put( REPOSITORY_OR_GROUP_ID_KEY, GROUP_PREFIX + repositoryGroupId );
+            getParameters().put( RepositoryOrGroupPropertyDescriptor.ID, GROUP_PREFIX + repositoryGroupId );
         }
     }
 

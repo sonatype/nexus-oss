@@ -37,14 +37,14 @@ public class DefaultNexusSchedulerTest
     public void testDoubleSubmission()
         throws Exception
     {
-        DummyWaitingNexusTask rt1 = (DummyWaitingNexusTask) lookup( SchedulerTask.ROLE, DummyWaitingNexusTask.class
+        DummyWaitingNexusTask rt1 = (DummyWaitingNexusTask) lookup( SchedulerTask.class, DummyWaitingNexusTask.class
             .getName() );
 
         rt1.setAllowConcurrentSubmission( true );
 
         nexusScheduler.submit( "test1", rt1 );
 
-        DummyWaitingNexusTask rt2 = (DummyWaitingNexusTask) lookup( SchedulerTask.ROLE, DummyWaitingNexusTask.class
+        DummyWaitingNexusTask rt2 = (DummyWaitingNexusTask) lookup( SchedulerTask.class, DummyWaitingNexusTask.class
             .getName() );
 
         rt2.setAllowConcurrentSubmission( false );
@@ -65,14 +65,14 @@ public class DefaultNexusSchedulerTest
     public void testDoubleSubmissionAllowed()
         throws Exception
     {
-        DummyWaitingNexusTask rt1 = (DummyWaitingNexusTask) lookup( SchedulerTask.ROLE, DummyWaitingNexusTask.class
+        DummyWaitingNexusTask rt1 = (DummyWaitingNexusTask) lookup( SchedulerTask.class, DummyWaitingNexusTask.class
             .getName() );
 
         rt1.setAllowConcurrentSubmission( true );
 
         nexusScheduler.submit( "test1", rt1 );
 
-        DummyWaitingNexusTask rt2 = (DummyWaitingNexusTask) lookup( SchedulerTask.ROLE, DummyWaitingNexusTask.class
+        DummyWaitingNexusTask rt2 = (DummyWaitingNexusTask) lookup( SchedulerTask.class, DummyWaitingNexusTask.class
             .getName() );
 
         rt2.setAllowConcurrentSubmission( true );

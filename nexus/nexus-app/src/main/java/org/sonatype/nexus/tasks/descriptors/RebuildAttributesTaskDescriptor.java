@@ -25,19 +25,20 @@ import java.util.List;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.sonatype.nexus.tasks.RebuildAttributesTask;
 import org.sonatype.nexus.tasks.descriptors.properties.ScheduledTaskPropertyDescriptor;
 
 @Component( role = ScheduledTaskDescriptor.class, hint = "RebuildAttributes" )
 public class RebuildAttributesTaskDescriptor
     implements ScheduledTaskDescriptor
 {
+    public static final String ID = "RebuildAttributesTask";
+    
     @Requirement( role = ScheduledTaskPropertyDescriptor.class, hint = "RepositoryOrGroup" )
     private ScheduledTaskPropertyDescriptor repositoryOrGroupId;
     
     public String getId()
     {
-        return RebuildAttributesTask.HINT;
+        return ID;
     }
     
     public String getName()

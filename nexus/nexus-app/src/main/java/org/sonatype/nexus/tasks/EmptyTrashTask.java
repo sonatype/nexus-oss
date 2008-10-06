@@ -20,27 +20,25 @@
  */
 package org.sonatype.nexus.tasks;
 
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.nexus.feeds.FeedRecorder;
 import org.sonatype.nexus.proxy.wastebasket.Wastebasket;
 import org.sonatype.nexus.scheduling.AbstractNexusTask;
+import org.sonatype.nexus.tasks.descriptors.EmptyTrashTaskDescriptor;
+import org.sonatype.scheduling.SchedulerTask;
 
 /**
  * Empty trash.
- * 
- * @plexus.component role="org.sonatype.scheduling.SchedulerTask" role-hint="EmptyTrashTask"
- *                   instantiation-strategy="per-lookup"
  */
+@Component( role = SchedulerTask.class, hint = EmptyTrashTaskDescriptor.ID, instantiationStrategy = "per-lookup" )
 public class EmptyTrashTask
     extends AbstractNexusTask<Object>
-{
-
-    public static final String HINT = "EmptyTrashTask";
-    
+{    
     /**
      * The Wastebasket component.
-     * 
-     * @plexus.requirement
      */
+    @Requirement( role = Wastebasket.class )
     private Wastebasket wastebasket;
     
     @Override

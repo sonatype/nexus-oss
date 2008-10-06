@@ -12,6 +12,7 @@ import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
 import org.sonatype.nexus.rest.model.WastebasketResource;
 import org.sonatype.nexus.rest.model.WastebasketResourceResponse;
 import org.sonatype.nexus.tasks.EmptyTrashTask;
+import org.sonatype.nexus.tasks.descriptors.EmptyTrashTaskDescriptor;
 
 /**
  *
@@ -67,7 +68,7 @@ public class WastebasketPlexusResource
     public void delete( Context context, Request request, Response response )
         throws ResourceException
     {
-        EmptyTrashTask task = (EmptyTrashTask) getNexusInstance( request ).createTaskInstance( EmptyTrashTask.HINT );
+        EmptyTrashTask task = (EmptyTrashTask) getNexusInstance( request ).createTaskInstance( EmptyTrashTaskDescriptor.ID );
 
         getNexusInstance( request ).submit( "Internal", task );
 

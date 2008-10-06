@@ -26,6 +26,8 @@ import org.codehaus.plexus.component.annotations.Component;
 public class MinimumSnapshotCountPropertyDescriptor
     extends AbstractNumberPropertyDescriptor
 {
+    public static final String ID = "minSnapshotsToKeep";
+    
     public MinimumSnapshotCountPropertyDescriptor()
     {
         setHelpText( "Minimum number of snapshots to keep for one GAV." );
@@ -34,7 +36,7 @@ public class MinimumSnapshotCountPropertyDescriptor
  
     public String getId()
     {
-        return "minSnapshotsToKeep";
+        return ID;
     }
 
     public String getName()
