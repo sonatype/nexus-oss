@@ -144,11 +144,16 @@
     <!-- REST Content -->
     <servlet>
         <servlet-name>content</servlet-name>
-        <servlet-class>org.sonatype.plexus.rest.ServletRestletApplicationBridge</servlet-class>
+        <servlet-class>org.sonatype.plexus.rest.PlexusServerServlet</servlet-class>
         <init-param>
             <!-- A stupid hack to avoid OneServletServerPerWebapp limitation, see ServletRestletApplicationBridge#getInitParameter -->
-            <param-name>content.org.restlet.application</param-name>
-            <param-value>org.sonatype.nexus.rest.ApplicationContentBridge</param-value>
+            <param-name>content.role</param-name>
+            <param-value>org.restlet.Application</param-value>
+        </init-param>
+        <init-param>
+            <!-- A stupid hack to avoid OneServletServerPerWebapp limitation, see ServletRestletApplicationBridge#getInitParameter -->
+            <param-name>content.roleHint</param-name>
+            <param-value>content</param-value>
         </init-param>
         <init-param>
             <!-- Content servlet should not "discover" plexus resources (default is true)! -->
@@ -166,11 +171,16 @@
     <!-- REST Service -->
     <servlet>
         <servlet-name>service</servlet-name>
-        <servlet-class>org.sonatype.plexus.rest.ServletRestletApplicationBridge</servlet-class>
+        <servlet-class>org.sonatype.plexus.rest.PlexusServerServlet</servlet-class>
         <init-param>
             <!-- A stupid hack to avoid OneServletServerPerWebapp limitation, see ServletRestletApplicationBridge#getInitParameter -->
-            <param-name>service.org.restlet.application</param-name>
-            <param-value>org.sonatype.nexus.rest.ApplicationBridge</param-value>
+            <param-name>service.role</param-name>
+            <param-value>org.restlet.Application</param-value>
+        </init-param>
+        <init-param>
+            <!-- A stupid hack to avoid OneServletServerPerWebapp limitation, see ServletRestletApplicationBridge#getInitParameter -->
+            <param-name>service.roleHint</param-name>
+            <param-value>service</param-value>
         </init-param>
         <load-on-startup>2</load-on-startup>
     </servlet>
