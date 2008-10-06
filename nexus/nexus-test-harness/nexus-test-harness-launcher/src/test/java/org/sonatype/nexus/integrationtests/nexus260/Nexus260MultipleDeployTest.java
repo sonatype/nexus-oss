@@ -7,6 +7,7 @@ import java.io.File;
 
 import org.junit.Test;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
+import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.test.utils.DeployUtils;
 import org.sonatype.nexus.test.utils.FileTestingUtils;
 
@@ -26,7 +27,7 @@ public class Nexus260MultipleDeployTest
     @Test
     public void singleDeployTest()
         throws Exception
-    {
+    {   
         // file to deploy
         File fileToDeploy = this.getTestFile( "singleDeployTest.xml" );
 
@@ -111,5 +112,44 @@ public class Nexus260MultipleDeployTest
 
     }
 
+    
+    @Test
+    public void deploySameFileMultipleTimesUsingContentUriTest()
+        throws Exception
+    {
+        
+        if( this.printKnownErrorButDoNotFail( this.getClass(), "deploySameFileMultipleTimesUsingContentUriTest" ))
+        {
+            return;
+        }
+        
+        // file to deploy
+        File fileToDeploy = this.getTestFile("deploySameFileMultipleTimesUsingContentUri.xml" );
+
+        String deployPath = "org/sonatype/nexus-integration-tests/multiple-deploy-test/deploySameFileMultipleTimesUsingContentUriTest/1/deploySameFileMultipleTimesUsingContentUriTest-1.xml";
+
+        // deploy it
+        DeployUtils.deployWithWagon( this.getContainer(), "http", this.getNexusTestRepoServiceUrl(),
+                                     fileToDeploy, deployPath );
+
+        // deploy it
+        DeployUtils.deployWithWagon( this.getContainer(), "http", this.getNexusTestRepoServiceUrl(),
+                                     fileToDeploy, deployPath );
+        // deploy it
+        DeployUtils.deployWithWagon( this.getContainer(), "http", this.getNexusTestRepoServiceUrl(),
+                                     fileToDeploy, deployPath );
+
+        // download it
+        File artifact = downloadArtifact( "org.sonatype.nexus-integration-tests.multiple-deploy-test", "deploySameFileMultipleTimesUsingContentUriTest", "1", "xml", null, "./target/downloaded-jars" );
+
+        // make sure its here
+        assertTrue( artifact.exists() );
+
+        // make sure it is what we expect.
+        assertTrue( FileTestingUtils.compareFileSHA1s( fileToDeploy, artifact ) );
+
+    }
+    
+    
 }
 

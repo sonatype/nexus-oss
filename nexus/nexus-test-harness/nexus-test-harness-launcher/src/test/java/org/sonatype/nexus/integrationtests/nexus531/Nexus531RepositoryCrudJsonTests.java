@@ -15,13 +15,9 @@ import org.sonatype.nexus.configuration.model.CRepositoryShadow;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.rest.model.RepositoryListResource;
 import org.sonatype.nexus.rest.model.RepositoryResource;
-import org.sonatype.nexus.rest.repositories.AbstractRepositoryResourceHandler;
-import org.sonatype.nexus.rest.xstream.XStreamInitializer;
+import org.sonatype.nexus.rest.repositories.AbstractRepositoryPlexusResource;
 import org.sonatype.nexus.test.utils.NexusConfigUtil;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
-import org.sonatype.plexus.rest.xstream.json.JsonOrgHierarchicalStreamDriver;
-
-import com.thoughtworks.xstream.XStream;
 
 /**
  * CRUD tests for JSON request/response.
@@ -229,7 +225,7 @@ public class Nexus531RepositoryCrudJsonTests
                 Assert.assertEquals( cShadow.getId(), listRepo.getId() );
                 Assert.assertEquals( cShadow.getName(), listRepo.getName() );
                 Assert.assertEquals( cShadow.getType(), listRepo.getFormat() );
-                Assert.assertEquals( AbstractRepositoryResourceHandler.REPO_TYPE_VIRTUAL, listRepo.getRepoType() );
+                Assert.assertEquals( AbstractRepositoryPlexusResource.REPO_TYPE_VIRTUAL, listRepo.getRepoType() );
             }
 
         }

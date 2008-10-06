@@ -37,12 +37,6 @@ import org.sonatype.nexus.rest.authentication.LogoutResourceHandler;
 import org.sonatype.nexus.rest.cache.CacheResourceHandler;
 import org.sonatype.nexus.rest.identify.IdentifyHashResourceHandler;
 import org.sonatype.nexus.rest.index.IndexResourceHandler;
-import org.sonatype.nexus.rest.repositories.RepositoryContentResourceHandler;
-import org.sonatype.nexus.rest.repositories.RepositoryListResourceHandler;
-import org.sonatype.nexus.rest.repositories.RepositoryMetaResourceHandler;
-import org.sonatype.nexus.rest.repositories.RepositoryResourceHandler;
-import org.sonatype.nexus.rest.repositories.RepositoryStatusResourceHandler;
-import org.sonatype.nexus.rest.repositorystatuses.RepositoryStatusesListResourceHandler;
 import org.sonatype.nexus.rest.status.CommandResourceHandler;
 import org.sonatype.nexus.rest.status.StatusResourceHandler;
 import org.sonatype.nexus.rest.xstream.XStreamInitializer;
@@ -199,33 +193,33 @@ public class ApplicationBridge
         attach( applicationRouter, false, "/attributes/{" + AttributesResourceHandler.DOMAIN + "}/{"
             + AttributesResourceHandler.TARGET_ID + "}/content", AttributesResourceHandler.class );
 
-        attach( applicationRouter, false, "/repository_statuses", RepositoryStatusesListResourceHandler.class );
+//        attach( applicationRouter, false, "/repository_statuses", RepositoryStatusesListResourceHandler.class );
 
-        attach( applicationRouter, false, "/repositories", RepositoryListResourceHandler.class );
+//        attach( applicationRouter, false, "/repositories", RepositoryListResourceHandler.class );
 
-        attach(
-            applicationRouter,
-            false,
-            "/repositories/{" + RepositoryResourceHandler.REPOSITORY_ID_KEY + "}",
-            RepositoryResourceHandler.class );
+//        attach(
+//            applicationRouter,
+//            false,
+//            "/repositories/{" + RepositoryResourceHandler.REPOSITORY_ID_KEY + "}",
+//            RepositoryResourceHandler.class );
 
-        attach(
-            applicationRouter,
-            false,
-            "/repositories/{" + RepositoryResourceHandler.REPOSITORY_ID_KEY + "}/status",
-            RepositoryStatusResourceHandler.class );
+//        attach(
+//            applicationRouter,
+//            false,
+//            "/repositories/{" + RepositoryResourceHandler.REPOSITORY_ID_KEY + "}/status",
+//            RepositoryStatusResourceHandler.class );
 
-        attach(
-            applicationRouter,
-            false,
-            "/repositories/{" + RepositoryResourceHandler.REPOSITORY_ID_KEY + "}/meta",
-            RepositoryMetaResourceHandler.class );
+//        attach(
+//            applicationRouter,
+//            false,
+//            "/repositories/{" + RepositoryResourceHandler.REPOSITORY_ID_KEY + "}/meta",
+//            RepositoryMetaResourceHandler.class );
 
-        attach(
-            applicationRouter,
-            false,
-            "/repositories/{" + RepositoryResourceHandler.REPOSITORY_ID_KEY + "}/content",
-            RepositoryContentResourceHandler.class );
+//        attach(
+//            applicationRouter,
+//            false,
+//            "/repositories/{" + RepositoryResourceHandler.REPOSITORY_ID_KEY + "}/content",
+//            RepositoryContentResourceHandler.class );
 
 //        attach( applicationRouter, false, "/repo_groups", RepositoryGroupListResourceHandler.class );
 

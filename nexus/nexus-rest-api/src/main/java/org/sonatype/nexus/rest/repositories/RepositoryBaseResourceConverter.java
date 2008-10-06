@@ -72,11 +72,11 @@ public class RepositoryBaseResourceConverter
             {
                 return super.instantiateNewInstance( reader, context );
             }
-            else if ( AbstractRepositoryResourceHandler.REPO_TYPE_VIRTUAL.equals( repoType ) )
+            else if ( AbstractRepositoryPlexusResource.REPO_TYPE_VIRTUAL.equals( repoType ) )
             {
                 return new RepositoryShadowResource();
             }
-            else if (AbstractRepositoryResourceHandler.REPO_TYPE_PROXIED.equals( repoType ) )
+            else if (AbstractRepositoryPlexusResource.REPO_TYPE_PROXIED.equals( repoType ) )
             {
                 return new RepositoryProxyResource();
             }

@@ -3,6 +3,7 @@ package org.sonatype.nexus.rest.routes;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.PatternSyntaxException;
 
 import org.restlet.Context;
 import org.restlet.data.Request;
@@ -163,12 +164,22 @@ public class RepositoryRoutePlexusResource
                 route.setRepositories( repositories );
 
                 getNexusInstance( request ).updateGroupsSettingPathMapping( route );
-                
+
                 response.setStatus( Status.SUCCESS_NO_CONTENT );
             }
             catch ( ConfigurationException e )
             {
-                handleConfigurationException( e );
+                if ( e.getCause() != null && e.getCause() instanceof PatternSyntaxException )
+                {
+                    throw new PlexusResourceException(
+                        Status.CLIENT_ERROR_BAD_REQUEST,
+                        "Configuration error.",
+                        getNexusErrorResponse( "pattern", e.getMessage() ) );
+                }
+                else
+                {
+                    handleConfigurationException( e );
+                }
             }
             catch ( NoSuchRepositoryException e )
             {

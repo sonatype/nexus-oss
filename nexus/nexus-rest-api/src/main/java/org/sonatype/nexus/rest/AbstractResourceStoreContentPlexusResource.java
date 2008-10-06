@@ -21,7 +21,6 @@
 package org.sonatype.nexus.rest;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -31,7 +30,6 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.fileupload.FileUploadException;
 import org.apache.velocity.app.VelocityEngine;
 import org.apache.velocity.runtime.RuntimeConstants;
 import org.codehaus.plexus.util.StringUtils;
@@ -40,7 +38,6 @@ import org.restlet.data.MediaType;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.data.Status;
-import org.restlet.ext.fileupload.RestletFileUpload;
 import org.restlet.ext.velocity.TemplateRepresentation;
 import org.restlet.resource.Representation;
 import org.restlet.resource.ResourceException;
@@ -121,22 +118,30 @@ public abstract class AbstractResourceStoreContentPlexusResource extends
             return null;
         }
     }
+
+    @Override
+    public Object upload( Context context, Request request, Response response, List<FileItem> files )
+        throws ResourceException
+    {
+        try
+        {
+            String resourceStorePath = this.getResourceStorePath( request );
+            ResourceStoreRequest req = getResourceStoreRequest( request, resourceStorePath, this.isLocal(
+                request,
+                resourceStorePath ) );
+
+            for ( FileItem fileItem : files )
+            {
+                getResourceStore( request ).storeItem( req, fileItem.getInputStream(), null );
+            }
+        }
+        catch ( Exception t )
+        {
+            handleException( t );
+        }
+        return null;
+    }
     
-    @Override
-    public Object post( Context context, Request request, Response response, Object payload )
-        throws ResourceException
-    {
-        //The POST behaviour is equal to PUT behaviour.
-        return put( context, request, response, payload );
-    }
-
-    @Override
-    public Object put( Context context, Request request, Response response, Object payload )
-        throws ResourceException
-    {
-        return super.put( context, request, response, payload );
-    }
-
     @Override
     public void delete( Context context, Request request, Response response )
         throws ResourceException

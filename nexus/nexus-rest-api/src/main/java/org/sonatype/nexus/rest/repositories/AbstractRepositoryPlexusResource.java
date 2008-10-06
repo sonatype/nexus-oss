@@ -5,6 +5,7 @@ import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
+import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.configuration.model.CLocalStorage;
 import org.sonatype.nexus.configuration.model.CRemoteAuthentication;
 import org.sonatype.nexus.configuration.model.CRemoteConnectionSettings;
@@ -17,9 +18,11 @@ import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.repository.RemoteStatus;
 import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
 import org.sonatype.nexus.rest.global.AbstractGlobalConfigurationPlexusResource;
+import org.sonatype.nexus.rest.model.RepositoryBaseResource;
 import org.sonatype.nexus.rest.model.RepositoryProxyResource;
 import org.sonatype.nexus.rest.model.RepositoryResource;
 import org.sonatype.nexus.rest.model.RepositoryResourceRemoteStorage;
+import org.sonatype.nexus.rest.model.RepositoryResourceResponse;
 import org.sonatype.nexus.rest.model.RepositoryShadowResource;
 
 public abstract class AbstractRepositoryPlexusResource
@@ -38,6 +41,15 @@ public abstract class AbstractRepositoryPlexusResource
     /** Repo type virtual (shadow in nexus). */
     public static final String REPO_TYPE_VIRTUAL = "virtual";
 
+    /**
+     * Pull the repository Id out of the Request.
+     * @param request
+     * @return
+     */
+    protected String getRepositoryId( Request request )
+    {
+        return request.getAttributes().get( REPOSITORY_ID_KEY ).toString();
+    }
     
     /**
      * Converting App model to REST DTO.
@@ -355,16 +367,16 @@ public abstract class AbstractRepositoryPlexusResource
 
             if ( m.getRemoteStorage() != null && m.getRemoteStorage().getUrl() != null )
             {
-                return AbstractRepositoryResourceHandler.REPO_TYPE_PROXIED;
+                return REPO_TYPE_PROXIED;
             }
             else
             {
-                return AbstractRepositoryResourceHandler.REPO_TYPE_HOSTED;
+                return REPO_TYPE_HOSTED;
             }
         }
         else if ( CRepositoryShadow.class.isAssignableFrom( model.getClass() ) )
         {
-            return AbstractRepositoryResourceHandler.REPO_TYPE_VIRTUAL;
+            return REPO_TYPE_VIRTUAL;
         }
         else
         {
@@ -469,6 +481,38 @@ public abstract class AbstractRepositoryPlexusResource
         {
             return null;
         }
+    }
+    
+    
+    protected RepositoryResourceResponse getRepositoryResourceResponse( String repoId, Nexus nexus ) throws ResourceException
+    {
+        RepositoryResourceResponse result = new RepositoryResourceResponse();
+        
+        try
+        {
+            RepositoryBaseResource resource = null;
+            try
+            {
+                CRepository model = nexus.readRepository( repoId );
+
+                resource = getRepositoryRestModel( model );
+            }
+            catch ( NoSuchRepositoryException e )
+            {
+                CRepositoryShadow model = nexus.readRepositoryShadow( repoId );
+
+                resource = getRepositoryShadowRestModel( model );
+            }
+
+            result.setData( resource );
+            }
+        catch ( NoSuchRepositoryException e )
+        {
+            getLogger().warn( "Repository not found, id=" + repoId );
+
+            throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, "Repository Not Found" );
+        }
+        return result;
     }
     
 }

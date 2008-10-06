@@ -3,6 +3,7 @@ package org.sonatype.nexus.rest;
 import org.apache.commons.fileupload.FileItemFactory;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.jsecurity.mgt.SecurityManager;
 import org.restlet.Context;
 import org.restlet.data.Reference;
@@ -42,11 +43,13 @@ public abstract class AbstractNexusPlexusResource
     /**
      * @plexus.requirement
      */
+    @Requirement
     private Nexus nexus;
 
     /**
      * @plexus.requirement
      */
+    @Requirement
     private NexusItemAuthorizer nexusItemAuthorizer;
 
     
