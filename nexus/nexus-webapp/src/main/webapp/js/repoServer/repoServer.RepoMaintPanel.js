@@ -280,6 +280,7 @@ Sonatype.repoServer.RepoMaintPanel = function(config){
     listeners: {
       'load' : {
         fn: function() {
+          this.searchField.triggers[1].hide();
           this.groupsDataStore.reload();
           Ext.TaskMgr.start(this.repoStatusTask);
         },
@@ -710,6 +711,7 @@ Ext.extend(Sonatype.repoServer.RepoMaintPanel, Sonatype.repoServer.AbstractRepoP
       this.browseLocalMenuItem.setChecked( true );
       this.browseSelector.disable();
     }
+    this.searchField.triggers[1].show();
     
     //change in behavior.  Always load a new detail view until we work out all the cache
     // and browse dependencies
