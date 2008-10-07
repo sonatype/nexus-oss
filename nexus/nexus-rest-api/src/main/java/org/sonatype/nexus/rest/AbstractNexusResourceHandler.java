@@ -364,7 +364,9 @@ public abstract class AbstractNexusResourceHandler
 
         if ( getResponse().getEntity() == null )
         {
-            getResponse().setEntity( new StringRepresentation( "OK", MediaType.TEXT_PLAIN ) );
+            getResponse().setEntity(
+                new StringRepresentation( getResponse().getStatus().getCode() + "-"
+                    + getResponse().getStatus().getName(), MediaType.TEXT_PLAIN ) );
         }
     }
 
@@ -375,7 +377,9 @@ public abstract class AbstractNexusResourceHandler
 
         if ( getResponse().getEntity() == null )
         {
-            getResponse().setEntity( new StringRepresentation( "OK", MediaType.TEXT_PLAIN ) );
+            getResponse().setEntity(
+                new StringRepresentation( getResponse().getStatus().getCode() + "-"
+                    + getResponse().getStatus().getName(), MediaType.TEXT_PLAIN ) );
         }
     }
 

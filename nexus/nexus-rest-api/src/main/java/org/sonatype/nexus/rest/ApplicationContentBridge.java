@@ -25,6 +25,15 @@ import org.codehaus.plexus.component.annotations.Requirement;
 import org.restlet.Application;
 import org.restlet.Filter;
 import org.restlet.Router;
+import org.sonatype.nexus.Nexus;
+import org.sonatype.nexus.proxy.events.AbstractEvent;
+import org.sonatype.nexus.proxy.events.EventListener;
+import org.sonatype.nexus.proxy.events.NexusStartedEvent;
+import org.sonatype.nexus.proxy.events.NexusStoppedEvent;
+import org.sonatype.nexus.rest.xstream.XStreamInitializer;
+import org.sonatype.plexus.rest.PlexusRestletApplicationBridge;
+
+import com.thoughtworks.xstream.XStream;
 
 /**
  * Nexus REST content bridge.
@@ -33,14 +42,44 @@ import org.restlet.Router;
  */
 @Component( role = Application.class, hint = "content" )
 public class ApplicationContentBridge
-    extends ApplicationBridge
+    extends PlexusRestletApplicationBridge
+    implements EventListener
 {
+    @Requirement
+    private Nexus nexus;
+
     @Requirement( hint = "localNexusInstance" )
     private Filter nexusInstanceFilter;
 
-    protected Router initializeRouter( Router root )
+    /**
+     * Listener.
+     */
+    public void onProximityEvent( AbstractEvent evt )
     {
-        return root;
+        if ( NexusStartedEvent.class.isAssignableFrom( evt.getClass() ) )
+        {
+            recreateRoot( true );
+        }
+        else if ( NexusStoppedEvent.class.isAssignableFrom( evt.getClass() ) )
+        {
+            recreateRoot( false );
+        }
+    }
+
+    /**
+     * Adding this as config change listener.
+     */
+    protected void doConfigure()
+    {
+        nexus.getNexusConfiguration().addProximityEventListener( this );
+    }
+
+    /**
+     * Configuring xstream with our aliases.
+     */
+    protected XStream doConfigureXstream( XStream xstream )
+    {
+        return XStreamInitializer.initialize( xstream );
     }
 
     /**
