@@ -22,14 +22,15 @@ package org.sonatype.nexus.rest.feeds;
 
 import java.util.List;
 
+import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.nexus.feeds.SystemEvent;
 
 /**
  * The system changes feed.
  * 
  * @author cstamas
- * @plexus.component role-hint="systemChanges"
  */
+@Component( role = FeedSource.class, hint = "systemChanges" )
 public class SystemFeedSource
     extends AbstractSystemFeedSource
 {

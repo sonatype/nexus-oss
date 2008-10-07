@@ -22,14 +22,15 @@ package org.sonatype.nexus.rest.feeds;
 
 import java.util.List;
 
+import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.nexus.feeds.NexusArtifactEvent;
 
 /**
  * The overall deployments feed.
  * 
  * @author cstamas
- * @plexus.component role-hint="recentlyDeployed"
  */
+@Component( role = FeedSource.class, hint = "recentlyDeployed" )
 public class RecentOverallDeploymentsFeedSource
     extends AbstractNexusFeedSource
 {

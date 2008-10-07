@@ -22,7 +22,9 @@ package org.sonatype.nexus.rest.feeds;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.restlet.Context;
 import org.restlet.data.MediaType;
@@ -48,6 +50,9 @@ public abstract class AbstractFeedPlexusResource
     private static final String RSS_2_0 = "rss_2.0";
 
     private static final String ATOM_1_0 = "atom_1.0";
+
+    @Requirement( role = FeedSource.class )
+    private Map<String, FeedSource> feeds;
 
     public List<Variant> getVariants()
     {
@@ -113,7 +118,7 @@ public abstract class AbstractFeedPlexusResource
         throws IOException,
             ComponentLookupException
     {
-        FeedSource src = (FeedSource) getPlexusContainer( context ).lookup( FeedSource.ROLE, channelKey );
+        FeedSource src = feeds.get( channelKey );
 
         return src.getFeed();
     }

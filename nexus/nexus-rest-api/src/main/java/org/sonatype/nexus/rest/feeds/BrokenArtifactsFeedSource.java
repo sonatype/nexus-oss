@@ -22,14 +22,15 @@ package org.sonatype.nexus.rest.feeds;
 
 import java.util.List;
 
+import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.nexus.feeds.NexusArtifactEvent;
 
 /**
  * The brokenArtifacts feed.
  * 
  * @author cstamas
- * @plexus.component role-hint="brokenArtifacts"
  */
+@Component( role = FeedSource.class, hint = "brokenArtifacts" )
 public class BrokenArtifactsFeedSource
     extends AbstractNexusFeedSource
 {

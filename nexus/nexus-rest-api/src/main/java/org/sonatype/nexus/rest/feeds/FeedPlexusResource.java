@@ -23,9 +23,11 @@ package org.sonatype.nexus.rest.feeds;
 import java.io.IOException;
 import java.util.List;
 
+import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.restlet.Context;
 import org.restlet.data.Request;
+import org.sonatype.plexus.rest.resource.PlexusResource;
 
 import com.sun.syndication.feed.synd.SyndEntry;
 import com.sun.syndication.feed.synd.SyndFeed;
@@ -37,6 +39,7 @@ import com.sun.syndication.feed.synd.SyndFeed;
  * @author dip
  * @plexus.component role-hint="feed"
  */
+@Component( role = PlexusResource.class, hint = "feed" )
 public class FeedPlexusResource
     extends AbstractFeedPlexusResource
 {

@@ -31,9 +31,6 @@ import com.sun.syndication.feed.synd.SyndFeed;
  */
 public interface FeedSource
 {
-
-    String ROLE = FeedSource.class.getName();
-
     /**
      * Returns the channel key that identifies this channel.
      * 

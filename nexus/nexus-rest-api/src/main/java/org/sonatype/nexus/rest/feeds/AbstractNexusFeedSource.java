@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.restlet.data.MediaType;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.artifact.NexusItemInfo;
@@ -52,9 +53,7 @@ import com.sun.syndication.feed.synd.SyndFeedImpl;
 public abstract class AbstractNexusFeedSource
     extends AbstractFeedSource
 {
-    /**
-     * @plexus.requirement
-     */
+    @Requirement
     private NexusItemAuthorizer nexusItemAuthorizer;
 
     /**
