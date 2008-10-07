@@ -147,7 +147,7 @@ public class AbstractArtifactResourceHandler
             version,
             null,
             null,
-            null);
+            null );
 
         try
         {
@@ -247,7 +247,7 @@ public class AbstractArtifactResourceHandler
         String classifier = form.getFirstValue( "c" );
 
         String repositoryId = form.getFirstValue( "r" );
-        
+
         String extension = form.getFirstValue( "e" );
 
         if ( groupId == null || artifactId == null || version == null || repositoryId == null )
@@ -296,7 +296,7 @@ public class AbstractArtifactResourceHandler
 
                 Reference fileReference = calculateReference( repoRoot, filePath );
 
-                getResponse().setRedirectRef( fileReference );
+                getResponse().setLocationRef( fileReference );
 
                 getResponse().setStatus( Status.REDIRECTION_PERMANENT );
 
@@ -304,8 +304,11 @@ public class AbstractArtifactResourceHandler
             }
             else
             {
-                // TODO: this will not work without content disposition support in restlet!
                 Representation result = new StorageFileItemRepresentation( file );
+
+                result.setDownloadable( true );
+
+                result.setDownloadName( file.getName() );
 
                 return result;
             }
@@ -385,7 +388,7 @@ public class AbstractArtifactResourceHandler
                     String classifier = null;
 
                     String packaging = null;
-                    
+
                     String extension = null;
 
                     PomArtifactManager pomManager = new PomArtifactManager( getNexus()
@@ -437,16 +440,16 @@ public class AbstractArtifactResourceHandler
                             ArtifactStoreRequest gavRequest;
 
                             if ( hasPom )
-                            {                                
+                            {
                                 if ( isPom )
                                 {
                                     pomManager.storeTempPomFile( fi.getInputStream() );
 
                                     is = pomManager.getTempPomFileInputStream();
-                                    
+
                                 }
                                 else
-                                {   
+                                {
                                     is = fi.getInputStream();
                                 }
 
@@ -463,18 +466,20 @@ public class AbstractArtifactResourceHandler
                                     "P",
                                     null,
                                     null ) );
-                                
+
                                 if ( !isPom )
                                 {
-                                    
-                                    // Can't retrieve these details from the pom, so we must expect the user to provide them
-                                    // If now, the classifier will not be appended, and we will use the extension mapped from 
+
+                                    // Can't retrieve these details from the pom, so we must expect the user to provide
+                                    // them
+                                    // If now, the classifier will not be appended, and we will use the extension mapped
+                                    // from
                                     // the packaging type in the pom (or the packaging type provided
                                     if ( !StringUtils.isEmpty( extension ) )
                                     {
                                         gavRequest.setExtension( extension );
                                     }
-                                    
+
                                     if ( !StringUtils.isEmpty( classifier ) )
                                     {
                                         gavRequest.setClassifier( classifier );
