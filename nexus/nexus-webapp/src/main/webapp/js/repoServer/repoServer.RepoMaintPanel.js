@@ -377,6 +377,7 @@ Sonatype.repoServer.RepoMaintPanel = function(config){
     autoScroll: false,
     width: '100%',
     height: '100%',
+    stateful: true,
     listeners: {
       'beforedestroy': {
         fn: function(){
