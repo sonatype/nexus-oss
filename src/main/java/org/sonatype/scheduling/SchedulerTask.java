@@ -27,8 +27,6 @@ import java.util.concurrent.Callable;
 public interface SchedulerTask<T>
     extends Callable<T>
 {
-    String ROLE = SchedulerTask.class.getName();
-
     boolean allowConcurrentSubmission( Map<String, List<ScheduledTask<?>>> currentActiveTasks );
 
     boolean allowConcurrentExecution( Map<String, List<ScheduledTask<?>>> currentActiveTasks );
