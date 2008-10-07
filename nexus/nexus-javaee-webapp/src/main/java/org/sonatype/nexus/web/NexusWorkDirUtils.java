@@ -24,7 +24,8 @@ package org.sonatype.nexus.web;
 import java.io.File;
 import java.util.Map;
 
-import org.apache.commons.lang.StringUtils;
+import org.codehaus.plexus.util.StringUtils;
+
 
 /**
  * This utils is used to initialize the nexus-work directory location. The order is plexus.xml > system property >
