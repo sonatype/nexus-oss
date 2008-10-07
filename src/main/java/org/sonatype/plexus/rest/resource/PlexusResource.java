@@ -9,6 +9,11 @@ import org.restlet.data.Response;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
 
+/**
+ * An automatically managed Rest Resource.
+ * 
+ * @author cstamas
+ */
 public interface PlexusResource
 {
     /**
