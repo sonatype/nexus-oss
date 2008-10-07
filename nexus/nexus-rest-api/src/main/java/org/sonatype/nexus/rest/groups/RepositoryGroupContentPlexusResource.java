@@ -1,5 +1,6 @@
 package org.sonatype.nexus.rest.groups;
 
+import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.restlet.data.Request;
 import org.restlet.resource.ResourceException;
@@ -8,12 +9,14 @@ import org.sonatype.nexus.proxy.NoSuchRepositoryGroupException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryRouterException;
 import org.sonatype.nexus.proxy.ResourceStore;
 import org.sonatype.nexus.proxy.maven.maven2.M2GroupIdBasedRepositoryRouter;
+import org.sonatype.nexus.proxy.router.RepositoryRouter;
 import org.sonatype.nexus.rest.AbstractResourceStoreContentPlexusResource;
+import org.sonatype.plexus.rest.resource.PlexusResource;
 
 /**
  * @author tstevens
- * @plexus.component role-hint="RepositoryGroupContentPlexusResource"
  */
+@Component( role = PlexusResource.class, hint = "RepositoryGroupContentPlexusResource" )
 public class RepositoryGroupContentPlexusResource
     extends AbstractResourceStoreContentPlexusResource
 {
@@ -23,7 +26,7 @@ public class RepositoryGroupContentPlexusResource
     /**
      * TODO: THIS IS BAD! Dynamic router needed!
      */
-    @Requirement( hint = M2GroupIdBasedRepositoryRouter.ID )
+    @Requirement( role = RepositoryRouter.class, hint = "groups" )
     private ResourceStore resourceStore;
 
     @Override
@@ -43,7 +46,7 @@ public class RepositoryGroupContentPlexusResource
     protected String getResourceStorePath( Request request )
     {
         String groupId = request.getAttributes().get( GROUP_ID_KEY ).toString();
-        return "/" + groupId + getResourceStorePath( request );
+        return "/" + groupId + super.getResourceStorePath( request );
     }
 
     @Override

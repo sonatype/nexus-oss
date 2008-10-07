@@ -35,6 +35,8 @@ import org.sonatype.nexus.rest.model.NFCResourceResponse;
 import org.sonatype.nexus.rest.model.NexusArtifact;
 import org.sonatype.nexus.rest.model.NexusError;
 import org.sonatype.nexus.rest.model.NexusErrorResponse;
+import org.sonatype.nexus.rest.model.PlexusComponentListResource;
+import org.sonatype.nexus.rest.model.PlexusComponentListResourceResponse;
 import org.sonatype.nexus.rest.model.PrivilegeApplicationStatusResource;
 import org.sonatype.nexus.rest.model.PrivilegeListResourceResponse;
 import org.sonatype.nexus.rest.model.PrivilegeResourceRequest;
@@ -1456,6 +1458,26 @@ public class TestMarshalUnmarchal
         
     }
     
+    public void testPlexusComponentListResourceResponse()
+    {
+        PlexusComponentListResourceResponse resourceResponse = new PlexusComponentListResourceResponse();
+        
+        PlexusComponentListResource resource1 = new PlexusComponentListResource();
+        resource1.setDescription( "description1" );
+        resource1.setRole( "role1" );
+        resource1.setRoleHint( "role-hint1" );
+        resourceResponse.addData( resource1 );
+        
+        PlexusComponentListResource resource2 = new PlexusComponentListResource();
+        resource2.setDescription( "description2" );
+        resource2.setRole( "role2" );
+        resource2.setRoleHint( "role-hint2" );
+        resourceResponse.addData( resource2 );
+        
+        this.marshalUnmarchalThenCompare( resourceResponse );
+        this.validateXmlHasNoPackageNames( resourceResponse );
+        
+    }
     
     protected void marshalUnmarchalThenCompare( Object obj )
     {

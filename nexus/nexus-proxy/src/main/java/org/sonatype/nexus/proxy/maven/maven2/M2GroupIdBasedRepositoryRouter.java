@@ -44,6 +44,8 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.nexus.artifact.M2ArtifactRecognizer;
 import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
+import org.sonatype.nexus.proxy.NoSuchResourceStoreException;
+import org.sonatype.nexus.proxy.ResourceStore;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.events.AbstractEvent;
@@ -53,7 +55,9 @@ import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.registry.ContentClass;
+import org.sonatype.nexus.proxy.router.AbstractRegistryDrivenRepositoryRouter;
 import org.sonatype.nexus.proxy.router.DefaultGroupIdBasedRepositoryRouter;
+import org.sonatype.nexus.proxy.router.GroupIdBasedRepositoryRouter;
 import org.sonatype.nexus.proxy.router.RepositoryRouter;
 
 /**
@@ -65,7 +69,7 @@ import org.sonatype.nexus.proxy.router.RepositoryRouter;
  */
 @Component( role = RepositoryRouter.class, hint = "groups-m2" )
 public class M2GroupIdBasedRepositoryRouter
-    extends DefaultGroupIdBasedRepositoryRouter
+    extends GroupIdBasedRepositoryRouter
 {
     /**
      * The ContentClass.
@@ -299,5 +303,12 @@ public class M2GroupIdBasedRepositoryRouter
             fw.close();
         }
     }
+
+    public String getId()
+    {
+        return DefaultGroupIdBasedRepositoryRouter.ID;
+    }
+
+
 
 }

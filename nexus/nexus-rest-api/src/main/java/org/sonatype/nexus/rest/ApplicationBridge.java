@@ -132,18 +132,18 @@ public class ApplicationBridge
         // and protectedResources for protected ones
 
         // attaching the restlets to scond router
-        attach( applicationRouter, false, "/authentication/login", LoginResourceHandler.class );
+//        attach( applicationRouter, false, "/authentication/login", LoginResourceHandler.class );
 
-        attach( applicationRouter, false, "/authentication/logout", LogoutResourceHandler.class );
+//        attach( applicationRouter, false, "/authentication/logout", LogoutResourceHandler.class );
 
-        attach( applicationRouter, false, "/identify/{" + IdentifyHashResourceHandler.ALGORITHM_KEY + "}/{"
-            + IdentifyHashResourceHandler.HASH_KEY + "}", IdentifyHashResourceHandler.class );
+//        attach( applicationRouter, false, "/identify/{" + IdentifyHashResourceHandler.ALGORITHM_KEY + "}/{"
+//            + IdentifyHashResourceHandler.HASH_KEY + "}", IdentifyHashResourceHandler.class );
 
-        attach( applicationRouter, false, "/artifact/maven", ArtifactResourceHandler.class );
+//        attach( applicationRouter, false, "/artifact/maven", ArtifactResourceHandler.class );
 
-        attach( applicationRouter, false, "/artifact/maven/redirect", ArtifactResourceRedirectHandler.class );
+//        attach( applicationRouter, false, "/artifact/maven/redirect", ArtifactResourceRedirectHandler.class );
 
-        attach( applicationRouter, false, "/artifact/maven/content", ArtifactResourceContentHandler.class );
+//        attach( applicationRouter, false, "/artifact/maven/content", ArtifactResourceContentHandler.class );
 
         // protected resources
 
