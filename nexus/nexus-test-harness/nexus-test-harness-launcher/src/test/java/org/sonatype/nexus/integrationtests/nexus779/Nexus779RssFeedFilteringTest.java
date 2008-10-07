@@ -1,0 +1,167 @@
+package org.sonatype.nexus.integrationtests.nexus779;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import junit.framework.Assert;
+
+import org.junit.Test;
+import org.sonatype.nexus.integrationtests.AbstractPrivilegeTest;
+import org.sonatype.nexus.integrationtests.TestContainer;
+import org.sonatype.nexus.rest.model.PrivilegeTargetResource;
+import org.sonatype.nexus.rest.model.PrivilegeTargetStatusResource;
+import org.sonatype.nexus.rest.model.RepositoryTargetResource;
+import org.sonatype.nexus.rest.model.RoleResource;
+import org.sonatype.nexus.rest.model.UserResource;
+import org.sonatype.nexus.test.utils.FeedUtil;
+
+import com.sun.syndication.feed.synd.SyndEntry;
+import com.sun.syndication.feed.synd.SyndFeed;
+
+import edu.emory.mathcs.backport.java.util.Collections;
+
+/**
+ * Test filtering search results based upon security
+ */
+public class Nexus779RssFeedFilteringTest
+    extends AbstractPrivilegeTest
+{    
+    public Nexus779RssFeedFilteringTest()
+    {
+    }
+    
+    @Test
+    public void filteredFeeds()
+        throws Exception
+    {
+        if( printKnownErrorButDoNotFail( Nexus779RssFeedFilteringTest.class, "filteredFeeds" ))
+        {
+            return;
+        }
+        
+        TestContainer.getInstance().getTestContext().useAdminForRequests();
+        
+        // First create the targets
+        RepositoryTargetResource test1Target = createTarget( "filterTarget1", Collections.singletonList( "/nexus778/test1/.*" ) );
+        RepositoryTargetResource test2Target = createTarget( "filterTarget2", Collections.singletonList( "/nexus778/test2/.*" ) );
+        
+        // Then create the privileges
+        PrivilegeTargetStatusResource priv1 = createPrivilege( "filterPriv1", test1Target.getId() );
+        PrivilegeTargetStatusResource priv2 = createPrivilege( "filterPriv2", test2Target.getId() );
+        
+        // Then create the roles
+        List<String> combined = new ArrayList<String>();
+        combined.add( priv1.getId() );
+        combined.add( priv2.getId() );
+        RoleResource role1 = createRole( "filterRole1", Collections.singletonList( priv1.getId() ) );
+        RoleResource role2 = createRole( "filterRole2", Collections.singletonList( priv2.getId() ) );
+        RoleResource role3 = createRole( "filterRole3", combined );
+        
+        // Now update the test user
+        updateUserRole( TEST_USER_NAME, Collections.singletonList( role3.getId() ) );
+        
+        // Now switch to our newly privileged user and get the feeds
+        TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
+        TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
+        
+        // Should be able to see both test1 & test2 artifacts
+        SyndFeed feed = FeedUtil.getFeed( "recentlyDeployed" );
+        List<SyndEntry> entries = feed.getEntries();
+        
+        Assert.assertEquals( entries.size(), 2 );
+        
+        // Now update the test user so that the user can only access test1
+        TestContainer.getInstance().getTestContext().useAdminForRequests();        
+        updateUserRole( TEST_USER_NAME, Collections.singletonList( role1.getId() ) );
+        
+        // Now switch to our newly privileged user and get the feeds
+        TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
+        TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
+        
+        // Should be able to see only test1 artifacts
+        feed = FeedUtil.getFeed( "recentlyDeployed" );
+        entries = feed.getEntries();
+        
+        Assert.assertEquals( entries.size(), 1 );
+        
+        // Now update the test user so that the user can only access test2
+        TestContainer.getInstance().getTestContext().useAdminForRequests();        
+        updateUserRole( TEST_USER_NAME, Collections.singletonList( role2.getId() ) );
+        
+        // Now switch to our newly privileged user and get the feeds
+        TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
+        TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
+        
+        // Should be able to see only test2 artifacts
+        feed = FeedUtil.getFeed( "recentlyDeployed" );
+        entries = feed.getEntries();
+        
+        Assert.assertEquals( entries.size(), 1 );
+    }
+    
+    private RepositoryTargetResource createTarget( String name, List<String> patterns )
+        throws Exception
+    {
+        RepositoryTargetResource resource = new RepositoryTargetResource();
+
+        resource.setContentClass( "maven2" );
+        resource.setName( name );
+
+        resource.setPatterns( patterns );
+
+        return this.targetUtil.createTarget( resource );
+    }
+    
+    private PrivilegeTargetStatusResource createPrivilege( String name, String targetId )
+        throws Exception
+    {
+        PrivilegeTargetResource resource = new PrivilegeTargetResource();
+        
+        resource.setName( name );
+        resource.setDescription( "some description" );
+        resource.setType( "repositoryTarget" );
+        resource.setRepositoryTargetId( targetId );
+        resource.addMethod( "read" );
+        
+        return ( PrivilegeTargetStatusResource ) privUtil.createPrivileges( resource ).iterator().next();
+    }
+    
+    private RoleResource createRole( String name, List<String> privilegeIds )
+        throws Exception
+    {
+        RoleResource role = new RoleResource();
+        role.setName( name );
+        role.setDescription( "some description" );
+        role.setSessionTimeout( 60 );
+        
+        for ( String privilegeId : privilegeIds )
+        {
+            role.addPrivilege( privilegeId );
+        }
+        
+        role.addPrivilege( "1" );
+        role.addPrivilege( "6" );
+        role.addPrivilege( "14" );
+        role.addPrivilege( "17" );
+        role.addPrivilege( "19" );
+        role.addPrivilege( "44" );
+        role.addPrivilege( "54" );
+        role.addPrivilege( "55" );
+        role.addPrivilege( "56" );
+        role.addPrivilege( "57" );
+        role.addPrivilege( "58" );
+        role.addPrivilege( "64" );
+        
+        return this.roleUtil.createRole( role );
+    }
+    
+    private void updateUserRole( String username, List<String> roleIds )
+        throws Exception
+    {
+        UserResource resource = userUtil.getUser( username );
+        
+        resource.setRoles( roleIds );
+        
+        userUtil.updateUser( resource );
+    }
+}
