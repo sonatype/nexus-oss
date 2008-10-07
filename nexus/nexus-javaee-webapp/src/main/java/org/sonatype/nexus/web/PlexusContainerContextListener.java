@@ -21,6 +21,8 @@
 
 package org.sonatype.nexus.web;
 
+import java.util.Map;
+
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
@@ -49,6 +51,10 @@ public class PlexusContainerContextListener
         {
             PlexusContainer plexusContainer = plexusContainerUtils.startContainer( plexusContainerConfiguration );
 
+            Map<Object, String> plexusContext = (Map<Object, String>) plexusContainer.getContext();
+          
+            NexusWorkDirUtils.setUpNexusWorkDir(plexusContext );
+            
             servletContext.setAttribute( KEY_PLEXUS, plexusContainer );
         }
         catch ( PlexusContainerException e )
