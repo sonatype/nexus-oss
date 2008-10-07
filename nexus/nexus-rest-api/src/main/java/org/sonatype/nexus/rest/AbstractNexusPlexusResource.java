@@ -1,5 +1,9 @@
 package org.sonatype.nexus.rest;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
 import org.apache.commons.fileupload.FileItemFactory;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
@@ -216,6 +220,32 @@ public abstract class AbstractNexusPlexusResource
         throw new PlexusResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Configuration error.", nexusErrorResponse );
     }
 
+    
+    /**
+     * Convert a collection of ArtifactInfo's to NexusArtifacts
+     * 
+     * @param aic
+     * @return
+     */
+    protected Collection<NexusArtifact> ai2NaColl( Request request, Collection<ArtifactInfo> aic )
+    {
+        if ( aic == null )
+        {
+            return null;
+        }
+        List<NexusArtifact> result = new ArrayList<NexusArtifact>( aic.size() );
+        for ( ArtifactInfo ai : aic )
+        {
+            NexusArtifact na = ai2Na( request, ai );
+
+            if ( na != null )
+            {
+                result.add( na );
+            }
+        }
+        return result;
+    }
+    
     /**
      * Convert from ArtifactInfo to a NexusArtifact
      * 
