@@ -2934,12 +2934,6 @@
 			<name>PlexusComponentListResource</name>
 			<version>1.0.0+</version>
 			<fields>
-			   <field>
-					<name>role</name>
-					<version>1.0.0+</version>
-					<type>String</type>
-					<required>true</required>
-				</field>
 				<field>
 					<name>roleHint</name>
 					<version>1.0.0+</version>

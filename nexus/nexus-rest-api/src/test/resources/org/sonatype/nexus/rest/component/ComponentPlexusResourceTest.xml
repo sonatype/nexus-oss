@@ -1,0 +1,62 @@
+<plexus>
+	<components>
+		<component>
+			<role>org.sonatype.plexus.rest.resource.PlexusResource</role>
+			<role-hint>ComponentPlexusResource</role-hint>
+			<implementation>
+				org.sonatype.nexus.rest.component.SimpleComponentPlexusResource
+			</implementation>
+			<configuration></configuration>
+		</component>
+		
+		
+		<component>
+			<role>TEST-empty</role>
+			<description></description>
+			<role-hint></role-hint>
+			<implementation>
+				java.lang.Object
+			</implementation>
+			<configuration></configuration>
+		</component>
+		
+				<component>
+			<role>TEST-null</role>
+			<implementation>
+				java.lang.Object
+			</implementation>
+			<configuration></configuration>
+		</component>
+		
+		<component>
+			<role>TEST-ROLE</role>
+			<description>Test Description.</description>
+			<role-hint>test-hint</role-hint>
+			<implementation>
+				java.lang.Object
+			</implementation>
+			<configuration></configuration>
+		</component>
+		
+		<component>
+			<role>MULTI-TEST</role>
+			<description>Description-1</description>
+			<role-hint>hint-1</role-hint>
+			<implementation>
+				java.lang.Object
+			</implementation>
+			<configuration></configuration>
+		</component>
+		
+		<component>
+			<role>MULTI-TEST</role>
+			<description>Description-2</description>
+			<role-hint>hint-2</role-hint>
+			<implementation>
+				java.lang.Object
+			</implementation>
+			<configuration></configuration>
+		</component>
+		
+	</components>
+</plexus>
