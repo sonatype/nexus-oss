@@ -44,14 +44,15 @@ public class PlexusContainerContextListener
     {
         ServletContext servletContext = sce.getServletContext();
 
-        ContainerConfiguration plexusContainerConfiguration = plexusContainerConfigurationUtils
-            .buildContainerConfiguration( servletContext );
-        
-        Map<Object, String> plexusContext = (Map<Object, String>) plexusContainerConfiguration.getContext();
-        NexusWorkDirUtils.setUpNexusWorkDir(plexusContext );
-        
         try
         {
+            ContainerConfiguration plexusContainerConfiguration = plexusContainerConfigurationUtils
+                .buildContainerConfiguration( servletContext );
+
+            NexusWorkDirUtils.setUpNexusWorkDir( plexusContainerConfiguration.getContext() );
+
+            Map<Object, String> plexusContext = (Map<Object, String>) plexusContainerConfiguration.getContext();
+
             PlexusContainer plexusContainer = plexusContainerUtils.startContainer( plexusContainerConfiguration );
 
             servletContext.setAttribute( KEY_PLEXUS, plexusContainer );
