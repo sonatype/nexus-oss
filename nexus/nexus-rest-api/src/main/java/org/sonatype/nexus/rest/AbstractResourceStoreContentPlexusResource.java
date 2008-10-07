@@ -64,41 +64,44 @@ import org.sonatype.nexus.rest.model.ContentListResource;
 import org.sonatype.nexus.rest.model.ContentListResourceResponse;
 
 /**
- * This is an abstract resource handler that uses ResourceStore implementor and
- * publishes those over REST.
+ * This is an abstract resource handler that uses ResourceStore implementor and publishes those over REST.
  * 
  * @author cstamas
  */
-public abstract class AbstractResourceStoreContentPlexusResource extends
-        AbstractNexusPlexusResource {
-
+public abstract class AbstractResourceStoreContentPlexusResource
+    extends AbstractNexusPlexusResource
+{
     public static final String IS_LOCAL_PARAMETER = "isLocal";
 
-    
+    public boolean acceptsUpload()
+    {
+        return true;
+    }
+
     protected String getResourceStorePath( Request request )
     {
         return parsePathFromUri( request.getResourceRef().getRemainingPart() );
     }
-    
+
     protected boolean isLocal( Request request, String resourceStorePath )
     {
-     // check do we need local only access
+        // check do we need local only access
         boolean isLocal = request.getResourceRef().getQueryAsForm().getFirst( IS_LOCAL_PARAMETER ) != null;
 
         // overriding isLocal is we know it will be a collection
         isLocal = isLocal || resourceStorePath.endsWith( RepositoryItemUid.PATH_SEPARATOR );
         return isLocal;
     }
-    
-    
+
     @Override
-    public Object get(Context context, Request request, Response response, Variant variant)
-            throws ResourceException {
+    public Object get( Context context, Request request, Response response, Variant variant )
+        throws ResourceException
+    {
 
         // get the path from request UIR
-        String resourceStorePath = getResourceStorePath(request);
+        String resourceStorePath = getResourceStorePath( request );
 
-        // check do we need local  access
+        // check do we need local access
         boolean isLocal = isLocal( request, resourceStorePath );
 
         try
@@ -141,23 +144,23 @@ public abstract class AbstractResourceStoreContentPlexusResource extends
         }
         return null;
     }
-    
+
     @Override
     public void delete( Context context, Request request, Response response )
         throws ResourceException
     {
-        
-        // get the path from request UIR
-        String resourceStorePath = getResourceStorePath(request);
 
-        // check do we need local  access
+        // get the path from request UIR
+        String resourceStorePath = getResourceStorePath( request );
+
+        // check do we need local access
         boolean isLocal = isLocal( request, resourceStorePath );
-        
+
         try
         {
-            ResourceStore store = getResourceStore(request);
+            ResourceStore store = getResourceStore( request );
 
-            ResourceStoreRequest req = getResourceStoreRequest(request, resourceStorePath, isLocal);
+            ResourceStoreRequest req = getResourceStoreRequest( request, resourceStorePath, isLocal );
 
             store.deleteItem( req );
         }
@@ -167,20 +170,23 @@ public abstract class AbstractResourceStoreContentPlexusResource extends
         }
     }
 
-
-    protected String parsePathFromUri(String parsedPath) {
+    protected String parsePathFromUri( String parsedPath )
+    {
 
         // get rid of query part
-        if (parsedPath.contains("?")) {
-            parsedPath = parsedPath.substring(0, parsedPath.indexOf('?'));
+        if ( parsedPath.contains( "?" ) )
+        {
+            parsedPath = parsedPath.substring( 0, parsedPath.indexOf( '?' ) );
         }
 
         // get rid of reference part
-        if (parsedPath.contains("#")) {
-            parsedPath = parsedPath.substring(0, parsedPath.indexOf('#'));
+        if ( parsedPath.contains( "#" ) )
+        {
+            parsedPath = parsedPath.substring( 0, parsedPath.indexOf( '#' ) );
         }
 
-        if (StringUtils.isEmpty(parsedPath)) {
+        if ( StringUtils.isEmpty( parsedPath ) )
+        {
             parsedPath = "/";
         }
 
@@ -216,14 +222,11 @@ public abstract class AbstractResourceStoreContentPlexusResource extends
             getLogger().info( "Created ResourceStore request for " + result.getRequestPath() );
         }
 
-        result
-            .getRequestContext().put( AccessManager.REQUEST_REMOTE_ADDRESS, request.getClientInfo().getAddress() );
+        result.getRequestContext().put( AccessManager.REQUEST_REMOTE_ADDRESS, request.getClientInfo().getAddress() );
 
         if ( request.getChallengeResponse() != null && request.getChallengeResponse().getIdentifier() != null )
         {
-            result.getRequestContext().put(
-                AccessManager.REQUEST_USER,
-                request.getChallengeResponse().getIdentifier() );
+            result.getRequestContext().put( AccessManager.REQUEST_USER, request.getChallengeResponse().getIdentifier() );
         }
 
         if ( request.isConfidential() )
@@ -240,7 +243,6 @@ public abstract class AbstractResourceStoreContentPlexusResource extends
         return result;
 
     }
-
 
     protected Object renderItem( Context context, Request req, Response res, Variant variant, StorageItem item )
         throws IOException,
@@ -284,7 +286,8 @@ public abstract class AbstractResourceStoreContentPlexusResource extends
             // TODO: we should be able to do HTTP redirects too! (parametrize the dereferencing?)
             try
             {
-                return renderItem( context, req, res, variant, getNexusInstance(req).dereferenceLinkItem( (StorageLinkItem) item ) );
+                return renderItem( context, req, res, variant, getNexusInstance( req ).dereferenceLinkItem(
+                    (StorageLinkItem) item ) );
             }
             catch ( Exception e )
             {
@@ -342,11 +345,13 @@ public abstract class AbstractResourceStoreContentPlexusResource extends
                 }
             }
 
-            if ( MediaType.TEXT_HTML.equals( variant.getMediaType() ) ) {
-              result = serialize( context, req, variant, response );
-              result.setModificationDate( new Date( coll.getModified() ) );
+            if ( MediaType.TEXT_HTML.equals( variant.getMediaType() ) )
+            {
+                result = serialize( context, req, variant, response );
+                result.setModificationDate( new Date( coll.getModified() ) );
             }
-            else {
+            else
+            {
                 return response;
             }
         }
@@ -354,8 +359,8 @@ public abstract class AbstractResourceStoreContentPlexusResource extends
         return result;
     }
 
-
-    protected Representation serialize( Context context, Request req, Variant variant, Object payload ) throws IOException
+    protected Representation serialize( Context context, Request req, Variant variant, Object payload )
+        throws IOException
     {
         // TEXT_HTML is requested by direct browsing (IE)
         // APPLICATION_XML is requested by direct browsing (FF)
@@ -388,7 +393,6 @@ public abstract class AbstractResourceStoreContentPlexusResource extends
         }
         return null;
     }
-
 
     private List<ContentListResource> sortContentListResource( Collection<ContentListResource> list )
     {
@@ -433,7 +437,8 @@ public abstract class AbstractResourceStoreContentPlexusResource extends
      * 
      * @param t
      */
-    protected void handleException( Exception t ) throws ResourceException
+    protected void handleException( Exception t )
+        throws ResourceException
     {
         if ( t instanceof IllegalArgumentException )
         {
