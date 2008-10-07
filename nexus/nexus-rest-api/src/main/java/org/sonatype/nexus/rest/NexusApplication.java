@@ -50,7 +50,8 @@ import org.sonatype.plexus.rest.resource.ManagedPlexusResource;
 import com.thoughtworks.xstream.XStream;
 
 /**
- * Nexus REST Application.
+ * Nexus REST Application. This will ultimately replace the two applications we have now, and provide us plugin UI
+ * extension capability.
  * 
  * @author cstamas
  */
