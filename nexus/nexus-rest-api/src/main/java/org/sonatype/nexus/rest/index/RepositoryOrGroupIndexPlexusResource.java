@@ -11,7 +11,7 @@ public class RepositoryOrGroupIndexPlexusResource
     @Override
     public String getResourceUri()
     {
-        return "/data_index/{" + IndexResourceHandler.DOMAIN + "}/{" + IndexResourceHandler.TARGET_ID + "}";
+        return "/data_index/{" + AbstractIndexPlexusResource.DOMAIN + "}/{" + AbstractIndexPlexusResource.TARGET_ID + "}";
     }
 
 }

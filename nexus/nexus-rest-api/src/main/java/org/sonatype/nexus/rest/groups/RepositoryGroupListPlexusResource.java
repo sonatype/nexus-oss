@@ -41,8 +41,7 @@ public class RepositoryGroupListPlexusResource
     @Override
     public Object getPayloadInstance()
     {
-        // TODO Auto-generated method stub
-        return null;
+        return new RepositoryGroupResourceResponse();
     }
 
     @Override

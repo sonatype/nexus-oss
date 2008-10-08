@@ -31,17 +31,6 @@ import org.sonatype.nexus.proxy.events.AbstractEvent;
 import org.sonatype.nexus.proxy.events.EventListener;
 import org.sonatype.nexus.proxy.events.NexusStartedEvent;
 import org.sonatype.nexus.proxy.events.NexusStoppedEvent;
-import org.sonatype.nexus.rest.artifact.ArtifactResourceContentHandler;
-import org.sonatype.nexus.rest.artifact.ArtifactResourceHandler;
-import org.sonatype.nexus.rest.artifact.ArtifactResourceRedirectHandler;
-import org.sonatype.nexus.rest.attributes.AttributesResourceHandler;
-import org.sonatype.nexus.rest.authentication.LoginResourceHandler;
-import org.sonatype.nexus.rest.authentication.LogoutResourceHandler;
-import org.sonatype.nexus.rest.cache.CacheResourceHandler;
-import org.sonatype.nexus.rest.identify.IdentifyHashResourceHandler;
-import org.sonatype.nexus.rest.index.IndexResourceHandler;
-import org.sonatype.nexus.rest.status.CommandResourceHandler;
-import org.sonatype.nexus.rest.status.StatusResourceHandler;
 import org.sonatype.nexus.rest.xstream.XStreamInitializer;
 import org.sonatype.plexus.rest.PlexusResourceFinder;
 import org.sonatype.plexus.rest.PlexusRestletApplicationBridge;
@@ -165,9 +154,11 @@ public class NexusApplication
      */
     protected void doCreateRoot( Router applicationRouter, boolean isStarted )
     {
-        attach( applicationRouter, false, "/status", StatusResourceHandler.class );
-
-        attach( applicationRouter, false, "/status/command", CommandResourceHandler.class );
+        // converted to PlexusResources
+        
+//        attach( applicationRouter, false, "/status", StatusResourceHandler.class );
+//
+//        attach( applicationRouter, false, "/status/command", CommandResourceHandler.class );
 
         if ( !isStarted )
         {
@@ -183,46 +174,46 @@ public class NexusApplication
             localNexusInstanceFilter.setNext( new PlexusResourceFinder( getContext(), contentResource ) );
         }
 
-        // SERVICE
-
-        // ==========================================================
-        // now we are playing with the two router: unprotectedResources for not protected
-        // and protectedResources for protected ones
-
-        // attaching the restlets to scond router
-        attach( applicationRouter, false, "/authentication/login", LoginResourceHandler.class );
-
-        attach( applicationRouter, false, "/authentication/logout", LogoutResourceHandler.class );
-
-        attach( applicationRouter, false, "/identify/{" + IdentifyHashResourceHandler.ALGORITHM_KEY + "}/{"
-            + IdentifyHashResourceHandler.HASH_KEY + "}", IdentifyHashResourceHandler.class );
-
-        attach( applicationRouter, false, "/artifact/maven", ArtifactResourceHandler.class );
-
-        attach( applicationRouter, false, "/artifact/maven/redirect", ArtifactResourceRedirectHandler.class );
-
-        attach( applicationRouter, false, "/artifact/maven/content", ArtifactResourceContentHandler.class );
-
-        // protected resources
-
-        attach( applicationRouter, false, "/data_index", IndexResourceHandler.class );
-
-        attach( applicationRouter, false, "/data_index/{" + IndexResourceHandler.DOMAIN + "}/{"
-            + IndexResourceHandler.TARGET_ID + "}", IndexResourceHandler.class );
-
-        attach( applicationRouter, false, "/data_index/{" + IndexResourceHandler.DOMAIN + "}/{"
-            + IndexResourceHandler.TARGET_ID + "}/content", IndexResourceHandler.class );
-
-        attach( applicationRouter, false, "/data_cache/{" + CacheResourceHandler.DOMAIN + "}/{"
-            + CacheResourceHandler.TARGET_ID + "}/content", CacheResourceHandler.class );
-
-        attach( applicationRouter, false, "/attributes", AttributesResourceHandler.class );
-
-        attach( applicationRouter, false, "/attributes/{" + AttributesResourceHandler.DOMAIN + "}/{"
-            + AttributesResourceHandler.TARGET_ID + "}", AttributesResourceHandler.class );
-
-        attach( applicationRouter, false, "/attributes/{" + AttributesResourceHandler.DOMAIN + "}/{"
-            + AttributesResourceHandler.TARGET_ID + "}/content", AttributesResourceHandler.class );
+//        // SERVICE
+//
+//        // ==========================================================
+//        // now we are playing with the two router: unprotectedResources for not protected
+//        // and protectedResources for protected ones
+//
+//        // attaching the restlets to scond router
+//        attach( applicationRouter, false, "/authentication/login", LoginResourceHandler.class );
+//
+//        attach( applicationRouter, false, "/authentication/logout", LogoutResourceHandler.class );
+//
+//        attach( applicationRouter, false, "/identify/{" + IdentifyHashResourceHandler.ALGORITHM_KEY + "}/{"
+//            + IdentifyHashResourceHandler.HASH_KEY + "}", IdentifyHashResourceHandler.class );
+//
+//        attach( applicationRouter, false, "/artifact/maven", ArtifactResourceHandler.class );
+//
+//        attach( applicationRouter, false, "/artifact/maven/redirect", ArtifactResourceRedirectHandler.class );
+//
+//        attach( applicationRouter, false, "/artifact/maven/content", ArtifactResourceContentHandler.class );
+//
+//        // protected resources
+//
+//        attach( applicationRouter, false, "/data_index", IndexResourceHandler.class );
+//
+//        attach( applicationRouter, false, "/data_index/{" + IndexResourceHandler.DOMAIN + "}/{"
+//            + IndexResourceHandler.TARGET_ID + "}", IndexResourceHandler.class );
+//
+//        attach( applicationRouter, false, "/data_index/{" + IndexResourceHandler.DOMAIN + "}/{"
+//            + IndexResourceHandler.TARGET_ID + "}/content", IndexResourceHandler.class );
+//
+//        attach( applicationRouter, false, "/data_cache/{" + CacheResourceHandler.DOMAIN + "}/{"
+//            + CacheResourceHandler.TARGET_ID + "}/content", CacheResourceHandler.class );
+//
+//        attach( applicationRouter, false, "/attributes", AttributesResourceHandler.class );
+//
+//        attach( applicationRouter, false, "/attributes/{" + AttributesResourceHandler.DOMAIN + "}/{"
+//            + AttributesResourceHandler.TARGET_ID + "}", AttributesResourceHandler.class );
+//
+//        attach( applicationRouter, false, "/attributes/{" + AttributesResourceHandler.DOMAIN + "}/{"
+//            + AttributesResourceHandler.TARGET_ID + "}/content", AttributesResourceHandler.class );
 
         // attach( applicationRouter, false, "/repository_statuses", RepositoryStatusesListResourceHandler.class );
 

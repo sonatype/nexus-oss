@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import junit.framework.Assert;
+import junit.framework.AssertionFailedError;
 
 import org.apache.log4j.Logger;
 import org.restlet.data.MediaType;
@@ -130,13 +131,16 @@ public class GroupMessageUtil
         return repoIdList;
     }
 
-    public RepositoryGroupResource getGroup( String repoId )
+    public RepositoryGroupResource getGroup( String groupId )
         throws IOException
     {
 
-        String responseText = RequestFacade.doGetRequest( SERVICE_PART + "/" + repoId ).getEntity().getText();
+        Response response = RequestFacade.doGetRequest( SERVICE_PART + "/" + groupId );
+        String responseText = response.getEntity().getText();
         LOG.debug( "responseText: \n" + responseText );
-
+        
+        Assert.assertTrue( "Failed to return Group: "+ groupId+"\nResponse:\n"+ responseText, response.getStatus().isSuccess());
+        
         // this should use call to: getResourceFromResponse
         XStreamRepresentation representation =
             new XStreamRepresentation( XStreamFactory.getXmlXStream(), responseText, MediaType.APPLICATION_XML );

@@ -11,7 +11,7 @@ public class RepositoryOrGroupAttributesPlexusResource
     @Override
     public String getResourceUri()
     {
-        return "/attributes/{" + AttributesResourceHandler.DOMAIN + "}/{" + AttributesResourceHandler.TARGET_ID + "}";
+        return "/attributes/{" + AbstractAttributesPlexusResource.DOMAIN + "}/{" + AbstractAttributesPlexusResource.TARGET_ID + "}";
     }
 
 }

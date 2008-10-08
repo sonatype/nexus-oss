@@ -30,19 +30,9 @@ import org.sonatype.nexus.proxy.events.AbstractEvent;
 import org.sonatype.nexus.proxy.events.EventListener;
 import org.sonatype.nexus.proxy.events.NexusStartedEvent;
 import org.sonatype.nexus.proxy.events.NexusStoppedEvent;
-import org.sonatype.nexus.rest.artifact.ArtifactResourceContentHandler;
-import org.sonatype.nexus.rest.artifact.ArtifactResourceHandler;
-import org.sonatype.nexus.rest.artifact.ArtifactResourceRedirectHandler;
-import org.sonatype.nexus.rest.attributes.AttributesResourceHandler;
-import org.sonatype.nexus.rest.authentication.LoginResourceHandler;
-import org.sonatype.nexus.rest.authentication.LogoutResourceHandler;
-import org.sonatype.nexus.rest.cache.CacheResourceHandler;
-import org.sonatype.nexus.rest.identify.IdentifyHashResourceHandler;
-import org.sonatype.nexus.rest.index.IndexResourceHandler;
-import org.sonatype.nexus.rest.status.CommandResourceHandler;
-import org.sonatype.nexus.rest.status.StatusResourceHandler;
 import org.sonatype.nexus.rest.xstream.XStreamInitializer;
 import org.sonatype.plexus.rest.PlexusRestletApplicationBridge;
+import org.sonatype.plexus.rest.resource.ManagedPlexusResource;
 
 import com.thoughtworks.xstream.XStream;
 
@@ -63,6 +53,12 @@ public class ApplicationBridge
     @Requirement( hint = "nexusInstance" )
     private Filter nexusInstanceFilter;
 
+    @Requirement(hint= "StatusPlexusResource")
+    private ManagedPlexusResource statusPlexusResource;
+    
+    @Requirement(hint= "CommandPlexusResource")
+    private ManagedPlexusResource commandPlexusResource;
+    
     /**
      * Listener.
      */
@@ -118,9 +114,8 @@ public class ApplicationBridge
      */
     protected void doCreateRoot( Router applicationRouter, boolean isStarted )
     {
-        attach( applicationRouter, false, "/status", StatusResourceHandler.class );
-
-        attach( applicationRouter, false, "/status/command", CommandResourceHandler.class );
-
+        attach( applicationRouter, false, this.statusPlexusResource);
+        
+        attach( applicationRouter, false, this.commandPlexusResource);
     }
 }

@@ -1,62 +1,45 @@
-/*
- * Nexus: Maven Repository Manager
- * Copyright (C) 2008 Sonatype Inc.                                                                                                                          
- * 
- * This file is part of Nexus.                                                                                                                                  
- * 
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see http://www.gnu.org/licenses/.
- *
- */
 package org.sonatype.nexus.rest.status;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
+import org.codehaus.plexus.component.annotations.Component;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
-import org.restlet.resource.Representation;
+import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
 import org.sonatype.nexus.SystemStatus;
 import org.sonatype.nexus.configuration.validator.ValidationMessage;
-import org.sonatype.nexus.rest.authentication.AbstractUIPermissionCalculatingResource;
+import org.sonatype.nexus.rest.authentication.AbstractUIPermissionCalculatingPlexusResource;
 import org.sonatype.nexus.rest.model.StatusConfigurationValidationResponse;
 import org.sonatype.nexus.rest.model.StatusResource;
 import org.sonatype.nexus.rest.model.StatusResourceResponse;
+import org.sonatype.plexus.rest.resource.ManagedPlexusResource;
 
-/**
- * The status resource handler that returns Nexus status, version and many more.
- * 
- * @author cstamas
- */
-public class StatusResourceHandler
-    extends AbstractUIPermissionCalculatingResource
+@Component( role = ManagedPlexusResource.class, hint = "StatusPlexusResource" )
+public class StatusPlexusResource
+    extends AbstractUIPermissionCalculatingPlexusResource implements ManagedPlexusResource
 {
 
-    public StatusResourceHandler( Context context, Request request, Response response )
+    @Override
+    public Object getPayloadInstance()
     {
-        super( context, request, response );
+        return null;
     }
 
-    public boolean allowGet()
+    @Override
+    public String getResourceUri()
     {
-        return true;
+        return "/status";
     }
 
-    public Representation getRepresentationHandler( Variant variant )
+    @Override
+    public Object get( Context context, Request request, Response response, Variant variant )
+        throws ResourceException
     {
-        SystemStatus status = getNexus().getSystemStatus();
+
+        SystemStatus status = getNexusInstance( request ).getSystemStatus();
 
         StatusResource resource = new StatusResource();
 
@@ -100,13 +83,13 @@ public class StatusResourceHandler
             }
         }
 
-        resource.setClientPermissions( getClientPermissionsForCurrentUser() );
+        resource.setClientPermissions( getClientPermissionsForCurrentUser( request ) );
 
-        StatusResourceResponse response = new StatusResourceResponse();
+        StatusResourceResponse result = new StatusResourceResponse();
 
-        response.setData( resource );
+        result.setData( resource );
 
-        return serialize( variant, response );
+        return result;
     }
 
     private String spit( Throwable t )
@@ -125,5 +108,4 @@ public class StatusResourceHandler
         }
 
     }
-
 }
