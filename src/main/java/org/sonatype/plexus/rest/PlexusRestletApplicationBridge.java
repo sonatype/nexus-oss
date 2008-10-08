@@ -233,6 +233,11 @@ public class PlexusRestletApplicationBridge
         }
     }
 
+    protected void handlePlexusResourceSecurity( PlexusResource resource )
+    {
+        // empty default imple
+    }
+
     // methods to override
 
     /**

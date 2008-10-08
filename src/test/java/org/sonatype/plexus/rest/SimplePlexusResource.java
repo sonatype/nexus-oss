@@ -12,6 +12,7 @@ import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
 import org.sonatype.plexus.rest.resource.AbstractPlexusResource;
+import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 
 /**
  * A simple testing resource. Will "publish" itself on passed in token URI (/token) and will emit "token" for GETs and
@@ -41,9 +42,9 @@ public class SimplePlexusResource
         return "/" + token;
     }
 
-    public String getPermissionPrefix()
+    public PathProtectionDescriptor getResourceProtection()
     {
-        return "";
+        return null;
     }
 
     @Override

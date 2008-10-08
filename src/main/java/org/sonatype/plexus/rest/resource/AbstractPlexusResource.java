@@ -71,7 +71,7 @@ public abstract class AbstractPlexusResource
 
     public abstract String getResourceUri();
 
-    public abstract String getPermissionPrefix();
+    public abstract PathProtectionDescriptor getResourceProtection();
 
     public abstract Object getPayloadInstance();
     

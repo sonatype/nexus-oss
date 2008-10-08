@@ -35,7 +35,7 @@ public interface PlexusResource
      * 
      * @return
      */
-    String getPermissionPrefix();
+    PathProtectionDescriptor getResourceProtection();
 
     /**
      * Presents a modifiable list of available variants.
