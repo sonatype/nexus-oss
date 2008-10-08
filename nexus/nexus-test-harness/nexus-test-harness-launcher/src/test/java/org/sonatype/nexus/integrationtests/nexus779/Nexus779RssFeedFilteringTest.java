@@ -33,17 +33,12 @@ public class Nexus779RssFeedFilteringTest
     @Test
     public void filteredFeeds()
         throws Exception
-    {
-        if( printKnownErrorButDoNotFail( Nexus779RssFeedFilteringTest.class, "filteredFeeds" ))
-        {
-            return;
-        }
-        
+    {                
         TestContainer.getInstance().getTestContext().useAdminForRequests();
         
         // First create the targets
-        RepositoryTargetResource test1Target = createTarget( "filterTarget1", Collections.singletonList( "/nexus778/test1/.*" ) );
-        RepositoryTargetResource test2Target = createTarget( "filterTarget2", Collections.singletonList( "/nexus778/test2/.*" ) );
+        RepositoryTargetResource test1Target = createTarget( "filterTarget1", Collections.singletonList( ".*/test1/.*" ) );
+        RepositoryTargetResource test2Target = createTarget( "filterTarget2", Collections.singletonList( ".*/test2/.*" ) );
         
         // Then create the privileges
         PrivilegeTargetStatusResource priv1 = createPrivilege( "filterPriv1", test1Target.getId() );
@@ -58,45 +53,66 @@ public class Nexus779RssFeedFilteringTest
         RoleResource role3 = createRole( "filterRole3", combined );
         
         // Now update the test user
-        updateUserRole( TEST_USER_NAME, Collections.singletonList( role3.getId() ) );
-        
-        // Now switch to our newly privileged user and get the feeds
-        TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
-        TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
+        updateUserRole( "anonymous", Collections.singletonList( role3.getId() ) );
         
         // Should be able to see both test1 & test2 artifacts
         SyndFeed feed = FeedUtil.getFeed( "recentlyDeployed" );
         List<SyndEntry> entries = feed.getEntries();
         
-        Assert.assertEquals( entries.size(), 2 );
+        if ( !feedListContainsArtifact( entries, "nexus778", "test1", "1.0.0" ) )
+        {
+            Assert.fail();
+        }
+        if ( !feedListContainsArtifact( entries, "nexus778", "test2", "1.0.0" ) )
+        {
+            Assert.fail();
+        }
         
-        // Now update the test user so that the user can only access test1
-        TestContainer.getInstance().getTestContext().useAdminForRequests();        
-        updateUserRole( TEST_USER_NAME, Collections.singletonList( role1.getId() ) );
-        
-        // Now switch to our newly privileged user and get the feeds
-        TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
-        TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
-        
+        // Now update the test user so that the user can only access test1        
+        updateUserRole( "anonymous", Collections.singletonList( role1.getId() ) );
+                
         // Should be able to see only test1 artifacts
         feed = FeedUtil.getFeed( "recentlyDeployed" );
         entries = feed.getEntries();
         
-        Assert.assertEquals( entries.size(), 1 );
+        if ( !feedListContainsArtifact( entries, "nexus778", "test1", "1.0.0" ) )
+        {
+            Assert.fail();
+        }
+        if ( feedListContainsArtifact( entries, "nexus778", "test2", "1.0.0" ) )
+        {
+            Assert.fail();
+        }
         
-        // Now update the test user so that the user can only access test2
-        TestContainer.getInstance().getTestContext().useAdminForRequests();        
-        updateUserRole( TEST_USER_NAME, Collections.singletonList( role2.getId() ) );
-        
-        // Now switch to our newly privileged user and get the feeds
-        TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
-        TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
-        
+        // Now update the test user so that the user can only access test2        
+        updateUserRole( "anonymous", Collections.singletonList( role2.getId() ) );
+                
         // Should be able to see only test2 artifacts
         feed = FeedUtil.getFeed( "recentlyDeployed" );
         entries = feed.getEntries();
         
-        Assert.assertEquals( entries.size(), 1 );
+        if ( feedListContainsArtifact( entries, "nexus778", "test1", "1.0.0" ) )
+        {
+            Assert.fail();
+        }
+        if ( !feedListContainsArtifact( entries, "nexus778", "test2", "1.0.0" ) )
+        {
+            Assert.fail();
+        }
+    }
+    
+    private boolean feedListContainsArtifact( List<SyndEntry> entries, String groupId, String artifactId, String version )
+    {
+        for ( SyndEntry entry : entries )
+        {
+            if ( entry.getTitle().contains( groupId )
+                && entry.getTitle().contains( artifactId )
+                && entry.getTitle().contains( version ) )
+            {
+                return true;
+            }
+        }
+        return false;
     }
     
     private RepositoryTargetResource createTarget( String name, List<String> patterns )
