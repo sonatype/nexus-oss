@@ -37,7 +37,6 @@ import com.sun.syndication.feed.synd.SyndFeed;
  * 
  * @author cstamas
  * @author dip
- * @plexus.component role-hint="feed"
  */
 @Component( role = PlexusResource.class, hint = "feed" )
 public class FeedPlexusResource
