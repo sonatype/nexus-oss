@@ -200,6 +200,9 @@ public class PlexusRestletApplicationBridge
         return doConfigureXstream( xstream );
     }
 
+    /**
+     * @deprecated use PlexusResources instead
+     */
     protected void attach( Router router, boolean strict, String uriPattern, Class<? extends Resource> targetClass )
     {
         Route route = router.attach( uriPattern, targetClass );
@@ -213,6 +216,16 @@ public class PlexusRestletApplicationBridge
     protected void attach( Router router, boolean strict, String uriPattern, Restlet target )
     {
         Route route = router.attach( uriPattern, target );
+
+        if ( strict )
+        {
+            route.getTemplate().setMatchingMode( Template.MODE_EQUALS );
+        }
+    }
+
+    protected void attach( Router router, boolean strict, PlexusResource resource )
+    {
+        Route route = router.attach( resource.getResourceUri(), new PlexusResourceFinder( getContext(), resource ) );
 
         if ( strict )
         {
