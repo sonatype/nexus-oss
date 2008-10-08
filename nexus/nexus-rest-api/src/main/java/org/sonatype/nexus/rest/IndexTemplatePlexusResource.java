@@ -28,6 +28,7 @@ import org.restlet.resource.Variant;
 import org.sonatype.nexus.plugins.rest.NexusResourceBundle;
 import org.sonatype.plexus.rest.resource.AbstractPlexusResource;
 import org.sonatype.plexus.rest.resource.ManagedPlexusResource;
+import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 
 @Component( role = ManagedPlexusResource.class, hint = "indexTemplate" )
 public class IndexTemplatePlexusResource
@@ -54,7 +55,7 @@ public class IndexTemplatePlexusResource
     }
 
     @Override
-    public String getPermissionPrefix()
+    public PathProtectionDescriptor getResourceProtection()
     {
         return null;
     }

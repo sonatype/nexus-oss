@@ -53,7 +53,7 @@ public class LogoutAuthenticationFilter
         if ( HttpServletRequest.class.isAssignableFrom( request.getClass() ) )
         {
             HttpSession session = ( (HttpServletRequest) request ).getSession( false );
-            
+
             if ( session != null )
             {
                 session.invalidate();

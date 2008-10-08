@@ -17,6 +17,7 @@ import org.sonatype.nexus.plugins.rest.Resource;
 import org.sonatype.plexus.rest.representation.InputStreamRepresentation;
 import org.sonatype.plexus.rest.resource.AbstractPlexusResource;
 import org.sonatype.plexus.rest.resource.ManagedPlexusResource;
+import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 
 @Component( role = ManagedPlexusResource.class, hint = "pluginResources" )
 public class PluginResourcesPlexusResource
@@ -36,7 +37,7 @@ public class PluginResourcesPlexusResource
     }
 
     @Override
-    public String getPermissionPrefix()
+    public PathProtectionDescriptor getResourceProtection()
     {
         return null;
     }

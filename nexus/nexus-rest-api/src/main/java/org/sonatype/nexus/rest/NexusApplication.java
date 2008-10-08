@@ -26,6 +26,9 @@ import org.restlet.Application;
 import org.restlet.Filter;
 import org.restlet.Restlet;
 import org.restlet.Router;
+import org.sonatype.jsecurity.web.PlexusMutableWebConfiguration;
+import org.sonatype.jsecurity.web.PlexusWebConfiguration;
+import org.sonatype.jsecurity.web.SecurityConfigurationException;
 import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.proxy.events.AbstractEvent;
 import org.sonatype.nexus.proxy.events.EventListener;
@@ -35,6 +38,8 @@ import org.sonatype.nexus.rest.xstream.XStreamInitializer;
 import org.sonatype.plexus.rest.PlexusResourceFinder;
 import org.sonatype.plexus.rest.PlexusRestletApplicationBridge;
 import org.sonatype.plexus.rest.resource.ManagedPlexusResource;
+import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
+import org.sonatype.plexus.rest.resource.PlexusResource;
 
 import com.thoughtworks.xstream.XStream;
 
@@ -51,6 +56,9 @@ public class NexusApplication
 {
     @Requirement
     private Nexus nexus;
+
+    @Requirement( hint = "web" )
+    private PlexusWebConfiguration plexusWebConfiguration;
 
     @Requirement( hint = "nexusInstance" )
     private Filter nexusInstanceFilter;
@@ -316,5 +324,29 @@ public class NexusApplication
 
         // attach( applicationRouter, false, "/privileges", PrivilegeListResourceHandler.class );
 
+    }
+
+    protected void handlePlexusResourceSecurity( PlexusResource resource )
+    {
+        PathProtectionDescriptor descriptor = resource.getResourceProtection();
+
+        if ( descriptor == null )
+        {
+            return;
+        }
+
+        if ( PlexusMutableWebConfiguration.class.isAssignableFrom( plexusWebConfiguration.getClass() ) )
+        {
+            try
+            {
+                ( (PlexusMutableWebConfiguration) plexusWebConfiguration ).addProtectedResource( descriptor
+                    .getPathPattern(), descriptor.getFilterExpression() );
+            }
+            catch ( SecurityConfigurationException e )
+            {
+                throw new IllegalStateException( "Could not configure JSecurity to protect resource mounted to "
+                    + resource.getResourceUri() + " of class " + resource.getClass().getName() );
+            }
+        }
     }
 }

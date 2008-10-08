@@ -33,6 +33,7 @@ import org.sonatype.nexus.rest.model.NexusArtifact;
 import org.sonatype.nexus.rest.model.NexusError;
 import org.sonatype.nexus.rest.model.NexusErrorResponse;
 import org.sonatype.plexus.rest.resource.AbstractPlexusResource;
+import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 import org.sonatype.plexus.rest.resource.PlexusResourceException;
 
@@ -57,9 +58,9 @@ public abstract class AbstractNexusPlexusResource
     private NexusItemAuthorizer nexusItemAuthorizer;
 
     
-    public String getPermissionPrefix()
+    public PathProtectionDescriptor getResourceProtection()
     {
-        return "";
+        return null;
     }
 
     protected Nexus getNexusInstance( Request request )

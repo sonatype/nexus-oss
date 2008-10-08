@@ -31,10 +31,11 @@ import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
 import org.sonatype.nexus.rest.model.RepositoryContentClassListResource;
 import org.sonatype.nexus.rest.model.RepositoryContentClassListResourceResponse;
+import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 
 /**
- * The ContentClasses list resource. This handles the GET method only and simply returns the list of existing
- * nexus ContentClasses.
+ * The ContentClasses list resource. This handles the GET method only and simply returns the list of existing nexus
+ * ContentClasses.
  * 
  * @author cstamas
  * @author tstevens
@@ -43,8 +44,6 @@ import org.sonatype.nexus.rest.model.RepositoryContentClassListResourceResponse;
 public class ContentClassesListPlexusResource
     extends AbstractNexusPlexusResource
 {
-
-
     @Override
     public Object getPayloadInstance()
     {
@@ -56,7 +55,14 @@ public class ContentClassesListPlexusResource
     {
         return "/repo_content_classes";
     }
-    
+
+    public PathProtectionDescriptor getResourceProtection()
+    {
+        return new PathProtectionDescriptor(
+            "/service/*/repo_content_classes",
+            "authcBasic,perms[nexus:repocontentclasses]" );
+    }
+
     @Override
     public Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
@@ -86,6 +92,5 @@ public class ContentClassesListPlexusResource
 
         return result;
     }
-
 
 }
