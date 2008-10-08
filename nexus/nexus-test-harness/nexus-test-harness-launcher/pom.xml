@@ -31,6 +31,8 @@
 		<nexus-application-name>nexus</nexus-application-name>
 		<nexus-application-port>8087</nexus-application-port>
 		<jetty-application-host>0.0.0.0</jetty-application-host>
+        
+        <copied-dependencies-dir>${project.build.directory}/copied-dependencies</copied-dependencies-dir>
 
 		<nexus-base-url>${nexus-application-protocol}://${nexus-application-host}:${nexus-application-port}/${nexus-application-name}/</nexus-base-url>
 
@@ -164,6 +166,26 @@
 				<artifactId>maven-dependency-plugin</artifactId>
 				<version>2.0</version>
 				<executions>
+                    <execution>
+                        <id>copy-dependencies</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>copy</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>org.sonatype.nexus</groupId>
+                                    <artifactId>nexus-simple-memory-realm</artifactId>
+                                    <version>${project.version}</version>
+                                    <type>jar</type>
+                                    <overWrite>true</overWrite>
+                                    <outputDirectory>${copied-dependencies-dir}</outputDirectory>
+                                    <destFileName>nexus-simple-memory-realm.jar</destFileName>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
 					<execution>
 						<id>unpack-bundle</id>
 						<phase>generate-resources</phase>

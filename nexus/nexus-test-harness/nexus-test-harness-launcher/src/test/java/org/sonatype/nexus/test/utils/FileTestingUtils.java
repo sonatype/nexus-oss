@@ -180,6 +180,30 @@ public class FileTestingUtils
         }
 
     }
+    
+    public static void fileCopy( File from, File dest )
+        throws IOException
+    {
+        // we may also need to create any parent directories
+        if ( dest.getParentFile() != null && !dest.getParentFile().exists() )
+        {
+            dest.getParentFile().mkdirs();
+        }
+
+        FileReader fileReader = new FileReader( from );
+
+        FileWriter fos = new FileWriter( dest );
+
+        int readChar = -1;
+        while ( ( readChar = (int) fileReader.read() ) != -1 )
+        {
+            fos.write( readChar );
+        }
+
+        // close everything
+        fileReader.close();
+        fos.close();
+    }
 
     public static void interpolationFileCopy( File from, File dest, Map<String, String> variables )
         throws IOException
