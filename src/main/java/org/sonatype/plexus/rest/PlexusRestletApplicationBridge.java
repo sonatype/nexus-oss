@@ -180,9 +180,7 @@ public class PlexusRestletApplicationBridge
             {
                 for ( PlexusResource resource : plexusResources.values() )
                 {
-                    attach( applicationRouter, false, resource.getResourceUri(), new PlexusResourceFinder(
-                        getContext(),
-                        resource ) );
+                    attach( applicationRouter, false, resource );
                 }
             }
 
@@ -231,6 +229,8 @@ public class PlexusRestletApplicationBridge
         {
             route.getTemplate().setMatchingMode( Template.MODE_EQUALS );
         }
+        
+        handlePlexusResourceSecurity( resource );
     }
 
     protected void handlePlexusResourceSecurity( PlexusResource resource )
