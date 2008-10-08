@@ -462,27 +462,29 @@ Ext.extend(Sonatype.repoServer.RepoMaintPanel, Sonatype.repoServer.AbstractRepoP
     if ( ! parent.status ) return '<I>retrieving...</I>';
     
     var s = statusObj;
+    var remoteStatus = (''+s.remoteStatus).toLowerCase();
     var sOut = (s.localStatus == 'inService') ? 'In Service' : 'Out of Service';
     
     if (parent.repoType == 'proxy'){
+
       if(s.proxyMode.search(/blocked/) === 0){
         sOut += (s.proxyMode == 'blockedAuto')
           ? ' - Remote Automatically Blocked'
           : ' - Remote Manually Blocked';
-        sOut += (s.remoteStatus == 'available')
+        sOut += (remoteStatus == 'available')
           ? ' and Available'
           : ' and Unavailable';
       }
       else { //allow
         if (s.localStatus == 'inService'){
-          if (s.remoteStatus != 'available') {
-            sOut += s.remoteStatus == 'unknown'
+          if (remoteStatus != 'available') {
+            sOut += remoteStatus == 'unknown'
               ? ' - <I>checking remote...</I>'
               : ' - Attempting to Proxy and Remote Unavailable';
           }
         }
         else { //Out of service
-          sOut += (s.remoteStatus == 'available')
+          sOut += (remoteStatus == 'available')
             ? ' - Remote Available'
             : ' - Remote Unavailable';
         }
