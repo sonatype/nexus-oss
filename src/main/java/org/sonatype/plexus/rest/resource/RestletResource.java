@@ -232,6 +232,7 @@ public class RestletResource
             try
             {
                 result = delegate.post( getContext(), getRequest(), getResponse(), payload );
+                
                 // This is a post, so set the status correctly
                 // but only if the status was not changed to be something else, like a 202
                 if ( getResponse().getStatus() == Status.SUCCESS_OK )
@@ -246,7 +247,7 @@ public class RestletResource
                 // try to get the responseObject
                 result = e.getResultObject();
             }
-
+            
             if ( result != null )
             {
                 getResponse().setEntity( doRepresent( result, representation ) );
@@ -350,6 +351,12 @@ public class RestletResource
             files.add( file );
 
             result = delegate.upload( getContext(), getRequest(), getResponse(), files );
+        }
+        
+        // only if the status was not changed to be something else, like a 202
+        if ( getResponse().getStatus() == Status.SUCCESS_OK )
+        {
+            getResponse().setStatus( Status.SUCCESS_CREATED );
         }
 
         if ( result != null )
