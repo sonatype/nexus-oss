@@ -17,7 +17,7 @@
 		<nexus-relative-basedir>${bundle-expanded-dir}/nexus-webapp-${project.version}</nexus-relative-basedir>
 		<nexus-abs-basedir>${project.build.directory}/bundle/nexus-webapp-${project.version}</nexus-abs-basedir>
 		<emma-sources-base>target/emma/sources</emma-sources-base>
-
+        <lib-target-dir>${nexus-abs-basedir}/runtime/apps/nexus/lib</lib-target-dir>
 		<config-target-dir>${nexus-abs-basedir}/runtime/apps/nexus/conf</config-target-dir>
 		<work-target-dir>${nexus-abs-basedir}/runtime/work</work-target-dir>
 		<proxy-repo-target-dir-name>proxyRepo</proxy-repo-target-dir-name>
@@ -32,8 +32,6 @@
 		<nexus-application-port>8087</nexus-application-port>
 		<jetty-application-host>0.0.0.0</jetty-application-host>
         
-        <copied-dependencies-dir>${project.build.directory}/copied-dependencies</copied-dependencies-dir>
-
 		<nexus-base-url>${nexus-application-protocol}://${nexus-application-host}:${nexus-application-port}/${nexus-application-name}/</nexus-base-url>
 
 		<nexus-control-port>33001</nexus-control-port>
@@ -166,26 +164,6 @@
 				<artifactId>maven-dependency-plugin</artifactId>
 				<version>2.0</version>
 				<executions>
-                    <execution>
-                        <id>copy-dependencies</id>
-                        <phase>generate-resources</phase>
-                        <goals>
-                            <goal>copy</goal>
-                        </goals>
-                        <configuration>
-                            <artifactItems>
-                                <artifactItem>
-                                    <groupId>org.sonatype.nexus</groupId>
-                                    <artifactId>nexus-simple-memory-realm</artifactId>
-                                    <version>${project.version}</version>
-                                    <type>jar</type>
-                                    <overWrite>true</overWrite>
-                                    <outputDirectory>${copied-dependencies-dir}</outputDirectory>
-                                    <destFileName>nexus-simple-memory-realm.jar</destFileName>
-                                </artifactItem>
-                            </artifactItems>
-                        </configuration>
-                    </execution>
 					<execution>
 						<id>unpack-bundle</id>
 						<phase>generate-resources</phase>
@@ -204,7 +182,25 @@
 							</excludes>
 						</configuration>
 					</execution>
-
+                    <execution>
+                        <id>copy-dependencies</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>copy</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>org.sonatype.nexus</groupId>
+                                    <artifactId>nexus-simple-memory-realm</artifactId>
+                                    <version>${project.version}</version>
+                                    <type>jar</type>
+                                    <overWrite>true</overWrite>
+                                    <outputDirectory>${lib-target-dir}</outputDirectory>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
 					<execution>
 						<id>get-emma</id>
 						<phase>generate-resources</phase>
