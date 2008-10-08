@@ -171,16 +171,32 @@ public class RestletResource
     protected Object deserialize( Object root )
         throws ResourceException
     {
-        XStreamRepresentation result = createRepresentation( getRequest().getEntity() );
+        
+        Object result = null;
 
-        if ( result != null )
+        if ( root != null )
         {
-            return result.getPayload( root );
+
+            if ( String.class.isAssignableFrom( root.getClass() ) )
+            {
+                try
+                {
+                    result = getRequest().getEntity().getText();
+                }
+                catch ( IOException e )
+                {
+                    throw new ResourceException( Status.SERVER_ERROR_INTERNAL, "Cannot get the representation!", e );
+                }
+            }
+
+            XStreamRepresentation representation = createRepresentation( getRequest().getEntity() );
+
+            if ( representation != null )
+            {
+                result = representation.getPayload( root );
+            }
         }
-        else
-        {
-            return null;
-        }
+        return result;
     }
 
     protected Representation doRepresent( Object payload, Variant variant )
