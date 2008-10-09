@@ -11,6 +11,7 @@ import org.sonatype.nexus.rest.model.RoleListResourceResponse;
 import org.sonatype.nexus.rest.model.RoleResource;
 import org.sonatype.nexus.rest.model.RoleResourceRequest;
 import org.sonatype.nexus.rest.model.RoleResourceResponse;
+import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 
 /**
  * @author tstevens
@@ -35,6 +36,12 @@ public class RoleListPlexusResource
     public String getResourceUri()
     {
         return "/roles";
+    }
+
+    @Override
+    public PathProtectionDescriptor getResourceProtection()
+    {
+        return new PathProtectionDescriptor( getResourceUri(), "authcBasic,perms[nexus:roles]" );
     }
 
     @Override

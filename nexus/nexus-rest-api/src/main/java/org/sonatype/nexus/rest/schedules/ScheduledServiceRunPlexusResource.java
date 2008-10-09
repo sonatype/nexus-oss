@@ -9,6 +9,7 @@ import org.restlet.resource.Variant;
 import org.sonatype.nexus.rest.model.ScheduledServiceBaseResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceResourceStatus;
 import org.sonatype.nexus.rest.model.ScheduledServiceResourceStatusResponse;
+import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.scheduling.NoSuchTaskException;
 import org.sonatype.scheduling.ScheduledTask;
 import org.sonatype.scheduling.TaskState;
@@ -31,6 +32,12 @@ public class ScheduledServiceRunPlexusResource
     public String getResourceUri()
     {
         return "/schedule_run/{" + SCHEDULED_SERVICE_ID_KEY + "}";
+    }
+
+    @Override
+    public PathProtectionDescriptor getResourceProtection()
+    {
+        return new PathProtectionDescriptor( "/schedule_run/*", "authcBasic,perms[nexus:tasksrun]" );
     }
 
     @Override
@@ -72,7 +79,8 @@ public class ScheduledServiceRunPlexusResource
         }
         catch ( NoSuchTaskException e )
         {
-            throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, "There is no task with ID=" + scheduledServiceId );
+            throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, "There is no task with ID="
+                + scheduledServiceId );
         }
     }
 

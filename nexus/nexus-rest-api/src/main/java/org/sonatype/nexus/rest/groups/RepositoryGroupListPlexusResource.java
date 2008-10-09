@@ -3,7 +3,6 @@ package org.sonatype.nexus.rest.groups;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
-import java.util.logging.Level;
 
 import org.restlet.Context;
 import org.restlet.data.Request;
@@ -20,12 +19,13 @@ import org.sonatype.nexus.rest.model.RepositoryGroupListResourceResponse;
 import org.sonatype.nexus.rest.model.RepositoryGroupMemberRepository;
 import org.sonatype.nexus.rest.model.RepositoryGroupResource;
 import org.sonatype.nexus.rest.model.RepositoryGroupResourceResponse;
+import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResourceException;
 
 /**
  * A resource list for RepositoryGroup list.
  * 
- * @author cstamas 
+ * @author cstamas
  * @author tstevens
  * @plexus.component role-hint="RepositoryGroupListPlexusResource"
  */
@@ -48,6 +48,12 @@ public class RepositoryGroupListPlexusResource
     public String getResourceUri()
     {
         return "/repo_groups";
+    }
+
+    @Override
+    public PathProtectionDescriptor getResourceProtection()
+    {
+        return new PathProtectionDescriptor( getResourceUri(), "authcBasic,perms[nexus:repogroups]" );
     }
 
     @Override
@@ -163,8 +169,8 @@ public class RepositoryGroupListPlexusResource
                     }
 
                     getNexusInstance( request ).createRepositoryGroup( group );
-//
-//                    response.setStatus( Status.SUCCESS_NO_CONTENT );
+                    //
+                    // response.setStatus( Status.SUCCESS_NO_CONTENT );
                 }
                 catch ( NoSuchRepositoryException e )
                 {

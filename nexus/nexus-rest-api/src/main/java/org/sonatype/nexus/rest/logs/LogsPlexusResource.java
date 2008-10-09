@@ -36,6 +36,7 @@ import org.restlet.resource.Variant;
 import org.sonatype.nexus.NexusStreamResponse;
 import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
 import org.sonatype.plexus.rest.representation.InputStreamRepresentation;
+import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 
 /**
  * The log file resource handler. It returns the content of the requested log file on incoming GET methods.
@@ -66,6 +67,12 @@ public class LogsPlexusResource
     public String getResourceUri()
     {
         return "/logs/{" + FILE_NAME_KEY + "}";
+    }
+
+    @Override
+    public PathProtectionDescriptor getResourceProtection()
+    {
+        return new PathProtectionDescriptor( "/logs/*", "authcBasic,perms[nexus:logs]" );
     }
 
     /**

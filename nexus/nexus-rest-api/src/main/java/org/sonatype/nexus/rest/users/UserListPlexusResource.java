@@ -11,6 +11,7 @@ import org.sonatype.nexus.rest.model.UserListResourceResponse;
 import org.sonatype.nexus.rest.model.UserResource;
 import org.sonatype.nexus.rest.model.UserResourceRequest;
 import org.sonatype.nexus.rest.model.UserResourceResponse;
+import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 
 /**
  * @author tstevens
@@ -24,7 +25,7 @@ public class UserListPlexusResource
     {
         this.setModifiable( true );
     }
-    
+
     @Override
     public Object getPayloadInstance()
     {
@@ -38,12 +39,18 @@ public class UserListPlexusResource
     }
 
     @Override
+    public PathProtectionDescriptor getResourceProtection()
+    {
+        return new PathProtectionDescriptor( getResourceUri(), "authcBasic,perms[nexus:users]" );
+    }
+
+    @Override
     public Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
     {
         UserListResourceResponse result = new UserListResourceResponse();
 
-        for ( CUser user : getNexusSecurity(request).listUsers() )
+        for ( CUser user : getNexusSecurity( request ).listUsers() )
         {
             UserResource res = nexusToRestModel( user, request );
 
@@ -71,7 +78,7 @@ public class UserListPlexusResource
 
             try
             {
-                getNexusSecurity(request).createUser( user );
+                getNexusSecurity( request ).createUser( user );
 
                 result = new UserResourceResponse();
 

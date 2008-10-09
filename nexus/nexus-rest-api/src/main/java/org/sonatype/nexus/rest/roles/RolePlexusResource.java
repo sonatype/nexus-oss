@@ -12,6 +12,7 @@ import org.sonatype.jsecurity.realms.tools.NoSuchRoleException;
 import org.sonatype.nexus.rest.model.RoleResource;
 import org.sonatype.nexus.rest.model.RoleResourceRequest;
 import org.sonatype.nexus.rest.model.RoleResourceResponse;
+import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 
 /**
  * @author tstevens
@@ -38,6 +39,12 @@ public class RolePlexusResource
     public String getResourceUri()
     {
         return "/roles/{" + ROLE_ID_KEY + "}";
+    }
+
+    @Override
+    public PathProtectionDescriptor getResourceProtection()
+    {
+        return new PathProtectionDescriptor( "/roles/*", "authcBasic,perms[nexus:roles]" );
     }
 
     protected String getRoleId( Request request )

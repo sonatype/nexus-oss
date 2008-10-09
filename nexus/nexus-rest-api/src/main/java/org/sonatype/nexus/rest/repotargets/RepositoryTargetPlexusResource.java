@@ -12,6 +12,7 @@ import org.sonatype.nexus.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.model.CRepositoryTarget;
 import org.sonatype.nexus.rest.model.RepositoryTargetResource;
 import org.sonatype.nexus.rest.model.RepositoryTargetResourceResponse;
+import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 
 /**
  * @author tstevens
@@ -39,6 +40,12 @@ public class RepositoryTargetPlexusResource
     {
         // TODO Auto-generated method stub
         return "/repo_targets/{" + REPO_TARGET_ID_KEY + "}";
+    }
+
+    @Override
+    public PathProtectionDescriptor getResourceProtection()
+    {
+        return new PathProtectionDescriptor( "/repo_targets/*", "authcBasic,perms[nexus:targets]" );
     }
 
     private String getRepoTargetId( Request request )

@@ -57,11 +57,6 @@ public abstract class AbstractNexusPlexusResource
     @Requirement
     private NexusItemAuthorizer nexusItemAuthorizer;
 
-    public PathProtectionDescriptor getResourceProtection()
-    {
-        return null;
-    }
-
     protected Nexus getNexusInstance( Request request )
         throws ResourceException
     {

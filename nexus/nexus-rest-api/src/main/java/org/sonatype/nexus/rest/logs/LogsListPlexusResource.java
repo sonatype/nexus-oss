@@ -32,13 +32,13 @@ import org.sonatype.nexus.NexusStreamResponse;
 import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
 import org.sonatype.nexus.rest.model.LogsListResource;
 import org.sonatype.nexus.rest.model.LogsListResourceResponse;
+import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 
 /**
  * The log file list resource handler. This handles the GET method only and simply returns the list of existing nexus
  * application log files.
  * 
  * @author cstamas
- * 
  * @plexus.component role-hint="logsList"
  */
 public class LogsListPlexusResource
@@ -50,39 +50,45 @@ public class LogsListPlexusResource
         // TODO Auto-generated method stub
         return null;
     }
-    
+
     @Override
     public String getResourceUri()
     {
         return "/logs";
     }
-    
+
+    @Override
+    public PathProtectionDescriptor getResourceProtection()
+    {
+        return new PathProtectionDescriptor( getResourceUri(), "authcBasic,perms[nexus:logs]" );
+    }
+
     @Override
     public Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
     {
         LogsListResourceResponse result = new LogsListResourceResponse();
-        
+
         try
         {
             Collection<NexusStreamResponse> logFiles = getNexusInstance( request ).getApplicationLogFiles();
-    
+
             for ( NexusStreamResponse logFile : logFiles )
             {
                 LogsListResource resource = new LogsListResource();
-    
+
                 resource.setResourceURI( createChildReference( request, logFile.getName() ).toString() );
-    
+
                 resource.setName( logFile.getName() );
-                
+
                 resource.setSize( logFile.getSize() );
-                
+
                 resource.setMimeType( logFile.getMimeType() );
-    
+
                 result.addData( resource );
             }
         }
-        catch( IOException e )
+        catch ( IOException e )
         {
             throw new ResourceException( e );
         }

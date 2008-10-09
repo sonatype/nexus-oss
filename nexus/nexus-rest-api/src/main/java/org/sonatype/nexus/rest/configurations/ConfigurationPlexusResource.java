@@ -14,6 +14,7 @@ import org.sonatype.nexus.NexusStreamResponse;
 import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
 import org.sonatype.nexus.rest.global.GlobalConfigurationPlexusResource;
 import org.sonatype.plexus.rest.representation.InputStreamRepresentation;
+import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 
 /**
  * A resource that is able to retrieve configurations as stream.
@@ -43,8 +44,13 @@ public class ConfigurationPlexusResource
     @Override
     public String getResourceUri()
     {
-        //return "/{" + NEXUS_INSTANCE_KEY + "}/configs/{" + CONFIG_NAME_KEY + "}";
         return "/configs/{" + CONFIG_NAME_KEY + "}";
+    }
+
+    @Override
+    public PathProtectionDescriptor getResourceProtection()
+    {
+        return new PathProtectionDescriptor( "/configs/*", "authcBasic,perms[nexus:configuration]" );
     }
 
     @Override

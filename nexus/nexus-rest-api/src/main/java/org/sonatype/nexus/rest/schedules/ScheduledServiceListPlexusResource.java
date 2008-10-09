@@ -18,6 +18,7 @@ import org.sonatype.nexus.rest.model.ScheduledServiceListResourceResponse;
 import org.sonatype.nexus.rest.model.ScheduledServiceResourceResponse;
 import org.sonatype.nexus.rest.model.ScheduledServiceResourceStatus;
 import org.sonatype.nexus.rest.model.ScheduledServiceResourceStatusResponse;
+import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResourceException;
 import org.sonatype.scheduling.ScheduledTask;
 import org.sonatype.scheduling.TaskState;
@@ -36,7 +37,7 @@ public class ScheduledServiceListPlexusResource
     {
         this.setModifiable( true );
     }
-    
+
     @Override
     public Object getPayloadInstance()
     {
@@ -47,6 +48,12 @@ public class ScheduledServiceListPlexusResource
     public String getResourceUri()
     {
         return "/schedules";
+    }
+
+    @Override
+    public PathProtectionDescriptor getResourceProtection()
+    {
+        return new PathProtectionDescriptor( getResourceUri(), "authcBasic,perms[nexus:tasks]" );
     }
 
     @Override

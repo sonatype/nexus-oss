@@ -12,6 +12,7 @@ import org.restlet.resource.Variant;
 import org.sonatype.nexus.index.ArtifactInfo;
 import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
 import org.sonatype.nexus.rest.model.NexusArtifact;
+import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 
 /**
@@ -39,6 +40,12 @@ public class IdentifyHashPlexusResource
     public String getResourceUri()
     {
         return "/identify/{" + ALGORITHM_KEY + "}/{" + HASH_KEY + "}";
+    }
+
+    @Override
+    public PathProtectionDescriptor getResourceProtection()
+    {
+        return new PathProtectionDescriptor( "/identify/*/*", "authcBasic,perms[nexus:identify]" );
     }
 
     @Override

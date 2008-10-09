@@ -15,6 +15,7 @@ import org.sonatype.nexus.rest.model.RepositoryResource;
 import org.sonatype.nexus.rest.model.RepositoryResourceResponse;
 import org.sonatype.nexus.rest.model.RepositoryShadowResource;
 import org.sonatype.nexus.rest.repositories.AbstractRepositoryPlexusResource;
+import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 
 /**
  * @author tstevens
@@ -33,6 +34,12 @@ public class RepositoryTemplatePlexusResource
     public String getResourceUri()
     {
         return "/templates/repositories/{" + REPOSITORY_ID_KEY + "}";
+    }
+
+    @Override
+    public PathProtectionDescriptor getResourceProtection()
+    {
+        return new PathProtectionDescriptor( "/templates/repositories/*", "authcBasic,perms[nexus:repotemplates]" );
     }
 
     protected String getRepositoryId( Request request )
@@ -137,7 +144,7 @@ public class RepositoryTemplatePlexusResource
                 throw new ResourceException( Status.SERVER_ERROR_INTERNAL );
             }
         }
-        
+
         return result;
     }
 

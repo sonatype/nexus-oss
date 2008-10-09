@@ -17,6 +17,7 @@ import org.sonatype.nexus.rest.model.RepositoryBaseResource;
 import org.sonatype.nexus.rest.model.RepositoryResource;
 import org.sonatype.nexus.rest.model.RepositoryResourceResponse;
 import org.sonatype.nexus.rest.model.RepositoryShadowResource;
+import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 
 /**
@@ -24,7 +25,7 @@ import org.sonatype.plexus.rest.resource.PlexusResource;
  * 
  * @author cstamas
  */
-@Component(role=PlexusResource.class, hint="RepositoryPlexusResource")
+@Component( role = PlexusResource.class, hint = "RepositoryPlexusResource" )
 public class RepositoryPlexusResource
     extends AbstractRepositoryPlexusResource
 {
@@ -47,10 +48,16 @@ public class RepositoryPlexusResource
     }
 
     @Override
+    public PathProtectionDescriptor getResourceProtection()
+    {
+        return new PathProtectionDescriptor( "/repositories/*", "authcBasic,perms[nexus:repositories]" );
+    }
+
+    @Override
     public Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
     {
-        return this.getRepositoryResourceResponse( this.getRepositoryId( request ), this.getNexusInstance( request ));
+        return this.getRepositoryResourceResponse( this.getRepositoryId( request ), this.getNexusInstance( request ) );
     }
 
     @Override
@@ -58,9 +65,9 @@ public class RepositoryPlexusResource
         throws ResourceException
     {
         RepositoryResourceResponse repoRequest = (RepositoryResourceResponse) payload;
-        
+
         String repoId = this.getRepositoryId( request );
-        
+
         if ( repoRequest != null )
         {
             try
@@ -109,13 +116,13 @@ public class RepositoryPlexusResource
             catch ( IOException e )
             {
                 getLogger().warn( "Got IO Exception!", e );
-                
+
                 throw new ResourceException( Status.SERVER_ERROR_INTERNAL );
             }
         }
-        
+
         // return current repo
-        return this.getRepositoryResourceResponse( this.getRepositoryId( request ), this.getNexusInstance( request ));
+        return this.getRepositoryResourceResponse( this.getRepositoryId( request ), this.getNexusInstance( request ) );
     }
 
     @Override
@@ -140,7 +147,9 @@ public class RepositoryPlexusResource
         {
             getLogger().warn( "Repository not deletable, it has dependants, id=" + repoId );
 
-            throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Repository is not deletable, it has dependants." );
+            throw new ResourceException(
+                Status.CLIENT_ERROR_BAD_REQUEST,
+                "Repository is not deletable, it has dependants." );
         }
         catch ( NoSuchRepositoryException e )
         {
@@ -151,7 +160,7 @@ public class RepositoryPlexusResource
         catch ( IOException e )
         {
             getLogger().warn( "Got IO Exception!", e );
-            
+
             throw new ResourceException( Status.SERVER_ERROR_INTERNAL );
         }
     }

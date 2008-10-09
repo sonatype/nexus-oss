@@ -30,6 +30,7 @@ import org.sonatype.nexus.proxy.NoSuchRepositoryGroupException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryRouterException;
 import org.sonatype.nexus.proxy.ResourceStore;
 import org.sonatype.plexus.rest.resource.ManagedPlexusResource;
+import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 
 @Component( role = ManagedPlexusResource.class, hint = "content" )
 public class ContentPlexusResource
@@ -49,6 +50,12 @@ public class ContentPlexusResource
     public String getResourceUri()
     {
         return "";
+    }
+
+    @Override
+    public PathProtectionDescriptor getResourceProtection()
+    {
+        return new PathProtectionDescriptor( "**", "contentAuthcBasic,contentTperms" );
     }
 
     @Override

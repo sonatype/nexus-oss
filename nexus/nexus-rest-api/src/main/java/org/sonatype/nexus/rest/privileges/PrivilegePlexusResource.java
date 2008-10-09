@@ -10,6 +10,7 @@ import org.sonatype.jsecurity.model.CPrivilege;
 import org.sonatype.jsecurity.realms.tools.NoSuchPrivilegeException;
 import org.sonatype.nexus.jsecurity.realms.NexusMethodAuthorizingRealm;
 import org.sonatype.nexus.rest.model.PrivilegeStatusResourceResponse;
+import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 
 /**
  * @author tstevens
@@ -18,7 +19,7 @@ import org.sonatype.nexus.rest.model.PrivilegeStatusResourceResponse;
 public class PrivilegePlexusResource
     extends AbstractPrivilegePlexusResource
 {
-    
+
     public PrivilegePlexusResource()
     {
         this.setModifiable( true );
@@ -34,6 +35,12 @@ public class PrivilegePlexusResource
     public String getResourceUri()
     {
         return "/privileges/{" + PRIVILEGE_ID_KEY + "}";
+    }
+
+    @Override
+    public PathProtectionDescriptor getResourceProtection()
+    {
+        return new PathProtectionDescriptor( "/privileges/*", "authcBasic,perms[nexus:privileges]" );
     }
 
     protected String getPrivilegeId( Request request )

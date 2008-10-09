@@ -2,7 +2,6 @@ package org.sonatype.nexus.rest.groups;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.logging.Level;
 
 import org.restlet.Context;
 import org.restlet.data.Request;
@@ -17,10 +16,12 @@ import org.sonatype.nexus.proxy.registry.InvalidGroupingException;
 import org.sonatype.nexus.rest.model.RepositoryGroupMemberRepository;
 import org.sonatype.nexus.rest.model.RepositoryGroupResource;
 import org.sonatype.nexus.rest.model.RepositoryGroupResourceResponse;
+import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResourceException;
 
 /**
  * Resource handler for Repository resource.
+ * 
  * @author tstevens
  * @plexus.component role-hint="RepositoryGroupPlexusResource"
  */
@@ -45,6 +46,12 @@ public class RepositoryGroupPlexusResource
         return "/repo_groups/{" + GROUP_ID_KEY + "}";
     }
 
+    @Override
+    public PathProtectionDescriptor getResourceProtection()
+    {
+        return new PathProtectionDescriptor( "/repo_groups/*", "authcBasic,perms[nexus:repogroups]" );
+    }
+
     protected String getGroupId( Request request )
     {
         return request.getAttributes().get( GROUP_ID_KEY ).toString();
@@ -57,7 +64,7 @@ public class RepositoryGroupPlexusResource
         RepositoryGroupResourceResponse result = new RepositoryGroupResourceResponse();
         try
         {
-            CRepositoryGroup group = getNexusInstance( request ).readRepositoryGroup( getGroupId(request) );
+            CRepositoryGroup group = getNexusInstance( request ).readRepositoryGroup( getGroupId( request ) );
 
             RepositoryGroupResource resource = new RepositoryGroupResource();
 
@@ -94,10 +101,10 @@ public class RepositoryGroupPlexusResource
         }
         catch ( NoSuchRepositoryGroupException e )
         {
-            getLogger().warn( "Repository group not found, id=" + getGroupId(request) );
+            getLogger().warn( "Repository group not found, id=" + getGroupId( request ) );
 
             throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, "Repository Group Not Found" );
-        }            
+        }
         return result;
     }
 
@@ -153,26 +160,26 @@ public class RepositoryGroupPlexusResource
                 getLogger().warn(
                     "Repository referenced by Repository Group Not Found, GroupId=" + getGroupId( request ),
                     e );
-                
-                throw new PlexusResourceException(Status.CLIENT_ERROR_BAD_REQUEST,
-                    "Repository referenced by Repository Group Not Found", getNexusErrorResponse(
-                    "repositories",
-                    "Repository referenced by Repository Group Not Found" ));
+
+                throw new PlexusResourceException(
+                    Status.CLIENT_ERROR_BAD_REQUEST,
+                    "Repository referenced by Repository Group Not Found",
+                    getNexusErrorResponse( "repositories", "Repository referenced by Repository Group Not Found" ) );
             }
             catch ( InvalidGroupingException e )
             {
                 getLogger().warn( "Invalid grouping, GroupId=" + getGroupId( request ), e );
 
-                throw new PlexusResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Invalid grouping, GroupId="
+                throw new PlexusResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Invalid grouping, GroupId="
                     + getGroupId( request ), getNexusErrorResponse(
                     "repositories",
-                    "Repository referenced by Repository Group does not share same content type!" ));
+                    "Repository referenced by Repository Group does not share same content type!" ) );
             }
             catch ( IOException e )
             {
                 getLogger().warn( "Got IO Exception!", e );
-                
-                throw new ResourceException( Status.SERVER_ERROR_INTERNAL );                
+
+                throw new ResourceException( Status.SERVER_ERROR_INTERNAL );
             }
         }
         return result;
@@ -195,7 +202,7 @@ public class RepositoryGroupPlexusResource
         catch ( IOException e )
         {
             getLogger().warn( "Got IO Exception!", e );
-            
+
             throw new ResourceException( Status.SERVER_ERROR_INTERNAL );
         }
     }

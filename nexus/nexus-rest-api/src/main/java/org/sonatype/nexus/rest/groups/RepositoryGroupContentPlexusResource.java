@@ -8,9 +8,9 @@ import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryGroupException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryRouterException;
 import org.sonatype.nexus.proxy.ResourceStore;
-import org.sonatype.nexus.proxy.maven.maven2.M2GroupIdBasedRepositoryRouter;
 import org.sonatype.nexus.proxy.router.RepositoryRouter;
 import org.sonatype.nexus.rest.AbstractResourceStoreContentPlexusResource;
+import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 
 /**
@@ -40,6 +40,12 @@ public class RepositoryGroupContentPlexusResource
     public String getResourceUri()
     {
         return "/repo_groups/{" + GROUP_ID_KEY + "}/content";
+    }
+
+    @Override
+    public PathProtectionDescriptor getResourceProtection()
+    {
+        return new PathProtectionDescriptor( "/repo_groups/*/content**", "authcBasic,tgperms" );
     }
 
     @Override

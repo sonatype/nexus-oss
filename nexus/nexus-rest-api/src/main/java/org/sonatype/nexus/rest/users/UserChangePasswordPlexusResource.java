@@ -9,6 +9,7 @@ import org.sonatype.jsecurity.realms.tools.NoSuchUserException;
 import org.sonatype.nexus.jsecurity.InvalidCredentialsException;
 import org.sonatype.nexus.rest.model.UserChangePasswordRequest;
 import org.sonatype.nexus.rest.model.UserChangePasswordResource;
+import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 
 /**
  * @author tstevens
@@ -22,7 +23,7 @@ public class UserChangePasswordPlexusResource
     {
         this.setModifiable( true );
     }
-    
+
     @Override
     public Object getPayloadInstance()
     {
@@ -33,6 +34,12 @@ public class UserChangePasswordPlexusResource
     public String getResourceUri()
     {
         return "/users_changepw";
+    }
+
+    @Override
+    public PathProtectionDescriptor getResourceProtection()
+    {
+        return new PathProtectionDescriptor( getResourceUri(), "authcBasic,perms[nexus:userschangepw]" );
     }
 
     @Override

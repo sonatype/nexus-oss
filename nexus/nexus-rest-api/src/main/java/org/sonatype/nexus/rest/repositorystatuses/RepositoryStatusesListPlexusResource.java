@@ -14,6 +14,7 @@ import org.sonatype.nexus.rest.model.RepositoryStatusListResource;
 import org.sonatype.nexus.rest.model.RepositoryStatusListResourceResponse;
 import org.sonatype.nexus.rest.model.RepositoryStatusResource;
 import org.sonatype.nexus.rest.repositories.AbstractRepositoryPlexusResource;
+import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 
 @Component( role = PlexusResource.class, hint = "RepositoryStatusesListPlexusResource" )
@@ -31,6 +32,12 @@ public class RepositoryStatusesListPlexusResource
     public String getResourceUri()
     {
         return "/repository_statuses";
+    }
+
+    @Override
+    public PathProtectionDescriptor getResourceProtection()
+    {
+        return new PathProtectionDescriptor( getResourceUri(), "authcBasic,perms[nexus:repostatus]" );
     }
 
     @Override

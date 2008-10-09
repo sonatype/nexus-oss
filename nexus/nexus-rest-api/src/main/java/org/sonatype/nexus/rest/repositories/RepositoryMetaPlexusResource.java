@@ -15,9 +15,10 @@ import org.sonatype.nexus.proxy.cache.CacheStatistics;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.rest.model.RepositoryMetaResource;
 import org.sonatype.nexus.rest.model.RepositoryMetaResourceResponse;
+import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 
-@Component(role=PlexusResource.class, hint="RepositoryMetaPlexusResource")
+@Component( role = PlexusResource.class, hint = "RepositoryMetaPlexusResource" )
 public class RepositoryMetaPlexusResource
     extends AbstractRepositoryPlexusResource
 {
@@ -32,6 +33,12 @@ public class RepositoryMetaPlexusResource
     public String getResourceUri()
     {
         return "/repositories/{" + REPOSITORY_ID_KEY + "}/meta";
+    }
+
+    @Override
+    public PathProtectionDescriptor getResourceProtection()
+    {
+        return new PathProtectionDescriptor( "/repositories/*/meta", "authcBasic,perms[nexus:repometa]" );
     }
 
     @Override
@@ -54,7 +61,7 @@ public class RepositoryMetaPlexusResource
                 CRepository model = getNexusInstance( request ).readRepository( repoId );
 
                 resource.setRepoType( getRestRepoType( model ) );
-                
+
                 resource.setFormat( model.getType() );
             }
             catch ( NoSuchRepositoryException e )
@@ -67,7 +74,7 @@ public class RepositoryMetaPlexusResource
             }
 
             resource.setId( repoId );
-            
+
             try
             {
                 resource.setSizeOnDisk( FileUtils.sizeOfDirectory( localPath ) );

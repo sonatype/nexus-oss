@@ -17,23 +17,24 @@ import org.sonatype.nexus.rest.model.PrivilegeBaseStatusResource;
 import org.sonatype.nexus.rest.model.PrivilegeListResourceResponse;
 import org.sonatype.nexus.rest.model.PrivilegeResourceRequest;
 import org.sonatype.nexus.rest.model.PrivilegeTargetResource;
+import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResourceException;
 
 /**
- *  Handles the GET and POST request for the Nexus privileges.
- *  
+ * Handles the GET and POST request for the Nexus privileges.
+ * 
  * @author tstevens
  * @plexus.component role-hint="PrivilegeListPlexusResource"
  */
 public class PrivilegeListPlexusResource
     extends AbstractPrivilegePlexusResource
 {
-    
+
     public PrivilegeListPlexusResource()
     {
         this.setModifiable( true );
     }
-    
+
     @Override
     public Object getPayloadInstance()
     {
@@ -44,6 +45,12 @@ public class PrivilegeListPlexusResource
     public String getResourceUri()
     {
         return "/privileges";
+    }
+
+    @Override
+    public PathProtectionDescriptor getResourceProtection()
+    {
+        return new PathProtectionDescriptor( getResourceUri(), "authcBasic,perms[nexus:privileges]" );
     }
 
     @Override

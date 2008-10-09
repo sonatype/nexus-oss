@@ -16,10 +16,11 @@ import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.rest.model.RepositoryDependentStatusResource;
 import org.sonatype.nexus.rest.model.RepositoryStatusResource;
 import org.sonatype.nexus.rest.model.RepositoryStatusResourceResponse;
+import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 import org.sonatype.plexus.rest.resource.PlexusResourceException;
 
-@Component(role=PlexusResource.class, hint="RepositoryStatusPlexusResource")
+@Component( role = PlexusResource.class, hint = "RepositoryStatusPlexusResource" )
 public class RepositoryStatusPlexusResource
     extends AbstractRepositoryPlexusResource
 {
@@ -28,7 +29,7 @@ public class RepositoryStatusPlexusResource
     {
         this.setModifiable( true );
     }
-    
+
     @Override
     public Object getPayloadInstance()
     {
@@ -39,6 +40,12 @@ public class RepositoryStatusPlexusResource
     public String getResourceUri()
     {
         return "/repositories/{" + REPOSITORY_ID_KEY + "}/status";
+    }
+
+    @Override
+    public PathProtectionDescriptor getResourceProtection()
+    {
+        return new PathProtectionDescriptor( "/repositories/*/status", "authcBasic,perms[nexus:repostatus]" );
     }
 
     @Override
@@ -106,9 +113,9 @@ public class RepositoryStatusPlexusResource
         RepositoryStatusResourceResponse repoStatusRequest = (RepositoryStatusResourceResponse) payload;
 
         RepositoryStatusResourceResponse result = null;
-        
+
         String repoId = getRepositoryId( request );
-        
+
         if ( repoStatusRequest != null )
         {
             try
@@ -131,8 +138,7 @@ public class RepositoryStatusPlexusResource
 
                     normal.setLocalStatus( resource.getLocalStatus() );
 
-                    if ( REPO_TYPE_PROXIED.equals( getRestRepoType( normal ) )
-                        && resource.getProxyMode() != null )
+                    if ( REPO_TYPE_PROXIED.equals( getRestRepoType( normal ) ) && resource.getProxyMode() != null )
                     {
                         normal.setProxyMode( resource.getProxyMode() );
                     }
@@ -181,9 +187,11 @@ public class RepositoryStatusPlexusResource
             catch ( ConfigurationException e )
             {
                 getLogger().warn( "Configuration unacceptable, repoId=" + repoId, e );
-                
-                throw new PlexusResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Configuration unacceptable, repoId=" + repoId
-                    + ": " + e.getMessage(), getNexusErrorResponse( "*", e.getMessage() ));
+
+                throw new PlexusResourceException(
+                    Status.CLIENT_ERROR_BAD_REQUEST,
+                    "Configuration unacceptable, repoId=" + repoId + ": " + e.getMessage(),
+                    getNexusErrorResponse( "*", e.getMessage() ) );
             }
             catch ( IOException e )
             {

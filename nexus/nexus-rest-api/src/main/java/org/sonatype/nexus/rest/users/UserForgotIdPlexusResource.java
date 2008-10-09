@@ -6,6 +6,7 @@ import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 import org.sonatype.nexus.jsecurity.NoSuchEmailException;
+import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 
 /**
  * @author tstevens
@@ -30,6 +31,12 @@ public class UserForgotIdPlexusResource
     public String getResourceUri()
     {
         return "/users_forgotid/{" + USER_EMAIL_KEY + "}";
+    }
+
+    @Override
+    public PathProtectionDescriptor getResourceProtection()
+    {
+        return new PathProtectionDescriptor( "/users_forgotid/*", "authcBasic,perms[nexus:usersforgotid]" );
     }
 
     @Override

@@ -7,6 +7,7 @@ import org.restlet.data.Response;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
 import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
+import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 
 /**
@@ -29,6 +30,12 @@ public class LogoutPlexusResource
     public String getResourceUri()
     {
         return "/authentication/logout";
+    }
+
+    @Override
+    public PathProtectionDescriptor getResourceProtection()
+    {
+        return new PathProtectionDescriptor( getResourceUri(), "logout" );
     }
 
     @Override

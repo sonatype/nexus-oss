@@ -27,6 +27,7 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.restlet.Context;
 import org.restlet.data.Request;
+import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 
 import com.sun.syndication.feed.synd.SyndEntry;
@@ -61,6 +62,12 @@ public class FeedPlexusResource
     protected String getChannelKey( Request request )
     {
         return (String) request.getAttributes().get( FEED_KEY );
+    }
+
+    @Override
+    public PathProtectionDescriptor getResourceProtection()
+    {
+        return new PathProtectionDescriptor( "/feeds/*", "authcBasic,perms[nexus:feeds]" );
     }
 
     @Override

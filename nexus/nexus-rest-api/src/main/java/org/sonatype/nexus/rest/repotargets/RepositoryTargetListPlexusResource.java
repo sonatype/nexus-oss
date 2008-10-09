@@ -15,21 +15,21 @@ import org.sonatype.nexus.rest.model.RepositoryTargetListResource;
 import org.sonatype.nexus.rest.model.RepositoryTargetListResourceResponse;
 import org.sonatype.nexus.rest.model.RepositoryTargetResource;
 import org.sonatype.nexus.rest.model.RepositoryTargetResourceResponse;
+import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 
 /**
- *
  * @author tstevens
  * @plexus.component role-hint="RepositoryTargetListPlexusResource"
- *
  */
-public class RepositoryTargetListPlexusResource extends AbstractRepositoryTargetPlexusResource
+public class RepositoryTargetListPlexusResource
+    extends AbstractRepositoryTargetPlexusResource
 {
 
     public RepositoryTargetListPlexusResource()
     {
         this.setModifiable( true );
     }
-    
+
     @Override
     public Object getPayloadInstance()
     {
@@ -40,6 +40,12 @@ public class RepositoryTargetListPlexusResource extends AbstractRepositoryTarget
     public String getResourceUri()
     {
         return "/repo_targets";
+    }
+
+    @Override
+    public PathProtectionDescriptor getResourceProtection()
+    {
+        return new PathProtectionDescriptor( getResourceUri(), "authcBasic,perms[nexus:targets]" );
     }
 
     @Override
@@ -104,7 +110,8 @@ public class RepositoryTargetListPlexusResource extends AbstractRepositoryTarget
                 {
                     getLogger().warn( "Got IOException during creation of repository target!", e );
 
-                    throw new ResourceException( Status.SERVER_ERROR_INTERNAL,
+                    throw new ResourceException(
+                        Status.SERVER_ERROR_INTERNAL,
                         "Got IOException during creation of repository target!" );
                 }
             }

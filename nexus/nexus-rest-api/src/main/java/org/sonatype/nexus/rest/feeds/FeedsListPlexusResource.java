@@ -32,6 +32,7 @@ import org.restlet.resource.Variant;
 import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
 import org.sonatype.nexus.rest.model.FeedListResource;
 import org.sonatype.nexus.rest.model.FeedListResourceResponse;
+import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 
 /**
@@ -58,6 +59,12 @@ public class FeedsListPlexusResource
     public String getResourceUri()
     {
         return "/feeds";
+    }
+
+    @Override
+    public PathProtectionDescriptor getResourceProtection()
+    {
+        return new PathProtectionDescriptor( getResourceUri(), "authcBasic,perms[nexus:feeds]" );
     }
 
     @Override

@@ -20,6 +20,7 @@ import org.sonatype.nexus.rest.model.RepositoryRouteListResourceResponse;
 import org.sonatype.nexus.rest.model.RepositoryRouteMemberRepository;
 import org.sonatype.nexus.rest.model.RepositoryRouteResource;
 import org.sonatype.nexus.rest.model.RepositoryRouteResourceResponse;
+import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResourceException;
 
 /**
@@ -32,7 +33,7 @@ import org.sonatype.plexus.rest.resource.PlexusResourceException;
 public class RepositoryRouteListPlexusResource
     extends AbstractRepositoryRoutePlexusResource
 {
-    
+
     public RepositoryRouteListPlexusResource()
     {
         this.setModifiable( true );
@@ -48,6 +49,12 @@ public class RepositoryRouteListPlexusResource
     public String getResourceUri()
     {
         return "/repo_routes";
+    }
+
+    @Override
+    public PathProtectionDescriptor getResourceProtection()
+    {
+        return new PathProtectionDescriptor( getResourceUri(), "authcBasic,perms[nexus:routes]" );
     }
 
     @Override

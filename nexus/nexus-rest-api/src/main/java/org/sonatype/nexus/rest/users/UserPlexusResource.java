@@ -12,6 +12,7 @@ import org.sonatype.jsecurity.realms.tools.NoSuchUserException;
 import org.sonatype.nexus.rest.model.UserResource;
 import org.sonatype.nexus.rest.model.UserResourceRequest;
 import org.sonatype.nexus.rest.model.UserResourceResponse;
+import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResourceException;
 
 /**
@@ -37,6 +38,12 @@ public class UserPlexusResource
     public String getResourceUri()
     {
         return "/users/{" + USER_ID_KEY + "}";
+    }
+
+    @Override
+    public PathProtectionDescriptor getResourceProtection()
+    {
+        return new PathProtectionDescriptor( "/users/*", "authcBasic,perms[nexus:users]" );
     }
 
     protected String getUserId( Request request )

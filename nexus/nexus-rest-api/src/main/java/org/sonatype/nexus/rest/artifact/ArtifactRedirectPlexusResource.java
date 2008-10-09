@@ -6,12 +6,14 @@ import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
+import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 
-/** POM Resource handler.
-* 
-* @author cstamas
-*/
+/**
+ * POM Resource handler.
+ * 
+ * @author cstamas
+ */
 @Component( role = PlexusResource.class, hint = "ArtifactRedirectPlexusResource" )
 public class ArtifactRedirectPlexusResource
     extends AbstractArtifactPlexusResource
@@ -27,6 +29,12 @@ public class ArtifactRedirectPlexusResource
     public String getResourceUri()
     {
         return "/artifact/maven/redirect";
+    }
+
+    @Override
+    public PathProtectionDescriptor getResourceProtection()
+    {
+        return new PathProtectionDescriptor( getResourceUri(), "authcBasic,perms[nexus:artifact]" );
     }
 
     @Override

@@ -12,6 +12,7 @@ import org.sonatype.nexus.rest.model.ScheduledServiceTypeResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceTypeResourceResponse;
 import org.sonatype.nexus.tasks.descriptors.ScheduledTaskDescriptor;
 import org.sonatype.nexus.tasks.descriptors.properties.ScheduledTaskPropertyDescriptor;
+import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 
 /**
  * @author tstevens
@@ -34,19 +35,25 @@ public class ScheduledServiceTypePlexusResource
     }
 
     @Override
+    public PathProtectionDescriptor getResourceProtection()
+    {
+        return new PathProtectionDescriptor( getResourceUri(), "authcBasic,perms[nexus:tasktypes]" );
+    }
+
+    @Override
     public Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
     {
         ScheduledServiceTypeResourceResponse result = new ScheduledServiceTypeResourceResponse();
-        
+
         List<ScheduledTaskDescriptor> taskDescriptors = getNexusInstance( request ).listScheduledTaskDescriptors();
-        
+
         for ( ScheduledTaskDescriptor taskDescriptor : taskDescriptors )
         {
             ScheduledServiceTypeResource type = new ScheduledServiceTypeResource();
             type.setId( taskDescriptor.getId() );
             type.setName( taskDescriptor.getName() );
-            
+
             for ( ScheduledTaskPropertyDescriptor propertyDescriptor : taskDescriptor.getPropertyDescriptors() )
             {
                 ScheduledServiceTypePropertyResource property = new ScheduledServiceTypePropertyResource();
@@ -55,16 +62,14 @@ public class ScheduledServiceTypePlexusResource
                 property.setName( propertyDescriptor.getName() );
                 property.setRequired( propertyDescriptor.isRequired() );
                 property.setType( propertyDescriptor.getType() );
-                
+
                 type.addProperty( property );
             }
-            
+
             result.addData( type );
         }
 
         return result;
     }
-    
-    
 
 }

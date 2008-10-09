@@ -7,10 +7,11 @@ import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
 import org.sonatype.nexus.rest.model.GlobalConfigurationListResource;
 import org.sonatype.nexus.rest.model.GlobalConfigurationListResourceResponse;
+import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 
 /**
- * The GlobalConfigurationList resource. This is a read only resource that simply returns a list of known
- * configuration resources.
+ * The GlobalConfigurationList resource. This is a read only resource that simply returns a list of known configuration
+ * resources.
  * 
  * @author cstamas
  * @author tstevens
@@ -30,6 +31,12 @@ public class GlobalConfigurationListPlexusResource
     public String getResourceUri()
     {
         return "/global_settings";
+    }
+
+    @Override
+    public PathProtectionDescriptor getResourceProtection()
+    {
+        return new PathProtectionDescriptor( getResourceUri(), "authcBasic,perms[nexus:settings]" );
     }
 
     @Override

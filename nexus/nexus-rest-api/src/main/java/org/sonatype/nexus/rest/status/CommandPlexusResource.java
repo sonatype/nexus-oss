@@ -9,6 +9,7 @@ import org.restlet.resource.ResourceException;
 import org.sonatype.nexus.SystemState;
 import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
 import org.sonatype.plexus.rest.resource.ManagedPlexusResource;
+import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 
 @Component( role = ManagedPlexusResource.class, hint = "CommandPlexusResource" )
 public class CommandPlexusResource
@@ -32,6 +33,12 @@ public class CommandPlexusResource
     public String getResourceUri()
     {
         return "/status/command";
+    }
+
+    @Override
+    public PathProtectionDescriptor getResourceProtection()
+    {
+        return new PathProtectionDescriptor( getResourceUri(), "authcBasic,perms[nexus:command]" );
     }
 
     @Override

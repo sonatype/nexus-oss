@@ -17,6 +17,7 @@ import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.rest.model.RepositoryRouteMemberRepository;
 import org.sonatype.nexus.rest.model.RepositoryRouteResource;
 import org.sonatype.nexus.rest.model.RepositoryRouteResourceResponse;
+import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResourceException;
 
 /**
@@ -45,6 +46,12 @@ public class RepositoryRoutePlexusResource
     public String getResourceUri()
     {
         return "/repo_routes/{" + ROUTE_ID_KEY + "}";
+    }
+
+    @Override
+    public PathProtectionDescriptor getResourceProtection()
+    {
+        return new PathProtectionDescriptor( "/repo_routes/*", "authcBasic,perms[nexus:routes]" );
     }
 
     protected String getRouteId( Request request )

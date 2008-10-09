@@ -8,6 +8,7 @@ import org.restlet.resource.Variant;
 import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
 import org.sonatype.nexus.rest.model.ConfigurationsListResource;
 import org.sonatype.nexus.rest.model.ConfigurationsListResourceResponse;
+import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 
 /**
  * A resource that is able to retrieve list of configurations.
@@ -28,8 +29,13 @@ public class ConfigurationListPlexusResource
     @Override
     public String getResourceUri()
     {
-        //return "/{" + NEXUS_INSTANCE_KEY + "}/configs";
         return "/configs";
+    }
+
+    @Override
+    public PathProtectionDescriptor getResourceProtection()
+    {
+        return new PathProtectionDescriptor( getResourceUri(), "authcBasic,perms[nexus:configuration]" );
     }
 
     @Override

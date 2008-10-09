@@ -8,6 +8,7 @@ import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
 import org.sonatype.nexus.rest.model.AuthenticationLoginResource;
 import org.sonatype.nexus.rest.model.AuthenticationLoginResourceResponse;
+import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 
 /**
@@ -30,6 +31,12 @@ public class LoginPlexusResource
     public String getResourceUri()
     {
         return "/authentication/login";
+    }
+
+    @Override
+    public PathProtectionDescriptor getResourceProtection()
+    {
+        return new PathProtectionDescriptor( getResourceUri(), "authcBasic,perms[nexus:authentication]" );
     }
 
     @Override

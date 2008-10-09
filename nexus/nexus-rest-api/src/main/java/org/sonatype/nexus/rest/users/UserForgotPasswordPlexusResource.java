@@ -9,6 +9,7 @@ import org.sonatype.jsecurity.realms.tools.NoSuchUserException;
 import org.sonatype.nexus.jsecurity.NoSuchEmailException;
 import org.sonatype.nexus.rest.model.UserForgotPasswordRequest;
 import org.sonatype.nexus.rest.model.UserForgotPasswordResource;
+import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 
 /**
  * @author tstevens
@@ -33,6 +34,12 @@ public class UserForgotPasswordPlexusResource
     public String getResourceUri()
     {
         return "/users_forgotpw";
+    }
+
+    @Override
+    public PathProtectionDescriptor getResourceProtection()
+    {
+        return new PathProtectionDescriptor( getResourceUri(), "authcBasic,perms[nexus:usersforgotpw]" );
     }
 
     @Override

@@ -8,6 +8,7 @@ import org.sonatype.nexus.proxy.NoSuchRepositoryGroupException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryRouterException;
 import org.sonatype.nexus.proxy.ResourceStore;
 import org.sonatype.nexus.rest.AbstractResourceStoreContentPlexusResource;
+import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 
 /**
@@ -19,7 +20,7 @@ import org.sonatype.plexus.rest.resource.PlexusResource;
 public class RepositoryContentPlexusResource
     extends AbstractResourceStoreContentPlexusResource
 {
-    
+
     public RepositoryContentPlexusResource()
     {
         this.setModifiable( true );
@@ -36,7 +37,13 @@ public class RepositoryContentPlexusResource
     {
         return "/repositories/{" + AbstractRepositoryPlexusResource.REPOSITORY_ID_KEY + "}/content";
     }
-    
+
+    @Override
+    public PathProtectionDescriptor getResourceProtection()
+    {
+        return new PathProtectionDescriptor( "/repositories/*/content**", "authcBasic,trperms" );
+    }
+
     public boolean acceptsUpload()
     {
         return true;

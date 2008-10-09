@@ -20,6 +20,7 @@ import org.sonatype.nexus.rest.model.RepositoryListResourceResponse;
 import org.sonatype.nexus.rest.model.RepositoryResource;
 import org.sonatype.nexus.rest.model.RepositoryResourceResponse;
 import org.sonatype.nexus.rest.model.RepositoryShadowResource;
+import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 import org.sonatype.plexus.rest.resource.PlexusResourceException;
 
@@ -48,6 +49,12 @@ public class RepositoryListPlexusResource
     public String getResourceUri()
     {
         return "/repositories";
+    }
+
+    @Override
+    public PathProtectionDescriptor getResourceProtection()
+    {
+        return new PathProtectionDescriptor( getResourceUri(), "authcBasic,perms[nexus:repositories]" );
     }
 
     @Override
@@ -166,10 +173,10 @@ public class RepositoryListPlexusResource
                         {
                             getLogger().info( "Repository with ID=" + resource.getId() + " already exists!" );
 
-                           throw new PlexusResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Repository with id="
-                               + resource.getId() + " already exists!", getNexusErrorResponse(
-                                   "id",
-                                   "Repository with id=" + resource.getId() + " already exists!" ));
+                            throw new PlexusResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Repository with id="
+                                + resource.getId() + " already exists!", getNexusErrorResponse(
+                                "id",
+                                "Repository with id=" + resource.getId() + " already exists!" ) );
                         }
                     }
                     catch ( NoSuchRepositoryException e )
@@ -187,11 +194,11 @@ public class RepositoryListPlexusResource
             catch ( IOException e )
             {
                 getLogger().warn( "Got IO Exception!", e );
-                
+
                 throw new ResourceException( Status.SERVER_ERROR_INTERNAL );
             }
         }
-        
-        return this.getRepositoryResourceResponse( repoId, this.getNexusInstance( request ));
+
+        return this.getRepositoryResourceResponse( repoId, this.getNexusInstance( request ) );
     }
 }

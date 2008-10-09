@@ -18,6 +18,7 @@ import org.sonatype.nexus.rest.model.RepositoryResource;
 import org.sonatype.nexus.rest.model.RepositoryResourceResponse;
 import org.sonatype.nexus.rest.model.RepositoryShadowResource;
 import org.sonatype.nexus.rest.repositories.AbstractRepositoryPlexusResource;
+import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResourceException;
 
 /**
@@ -37,6 +38,12 @@ public class RepositoryTemplateListPlexusResource
     public String getResourceUri()
     {
         return "/templates/repositories";
+    }
+
+    @Override
+    public PathProtectionDescriptor getResourceProtection()
+    {
+        return new PathProtectionDescriptor( getResourceUri(), "authcBasic,perms[nexus:repotemplates]" );
     }
 
     @Override
@@ -131,7 +138,7 @@ public class RepositoryTemplateListPlexusResource
 
                         CRepositoryShadow resultRepoShadow = getNexusInstance( request ).readRepositoryShadowTemplate(
                             resource.getId() );
-                        
+
                         result.setData( getRepositoryShadowRestModel( resultRepoShadow ) );
                     }
                     else
@@ -157,7 +164,7 @@ public class RepositoryTemplateListPlexusResource
                         getNexusInstance( request ).createRepositoryTemplate( normal );
 
                         CRepository resultRepo = getNexusInstance( request ).readRepositoryTemplate( resource.getId() );
-                        
+
                         result.setData( getRepositoryRestModel( resultRepo ) );
                     }
                     else

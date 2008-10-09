@@ -13,15 +13,14 @@ import org.sonatype.nexus.rest.model.WastebasketResource;
 import org.sonatype.nexus.rest.model.WastebasketResourceResponse;
 import org.sonatype.nexus.tasks.EmptyTrashTask;
 import org.sonatype.nexus.tasks.descriptors.EmptyTrashTaskDescriptor;
+import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 
 /**
- *
  * The Wastebasket resource handler. It returns the status of the wastebasket, and purges it.
- *
+ * 
  * @author cstamas
  * @author tstevens
  * @plexus.component role-hint="wastebasket"
- *
  */
 public class WastebasketPlexusResource
     extends AbstractNexusPlexusResource
@@ -37,6 +36,12 @@ public class WastebasketPlexusResource
     public String getResourceUri()
     {
         return "/wastebasket";
+    }
+
+    @Override
+    public PathProtectionDescriptor getResourceProtection()
+    {
+        return new PathProtectionDescriptor( "/wastebasket**", "authcBasic,perms[nexus:wastebasket]" );
     }
 
     @Override
@@ -68,7 +73,8 @@ public class WastebasketPlexusResource
     public void delete( Context context, Request request, Response response )
         throws ResourceException
     {
-        EmptyTrashTask task = (EmptyTrashTask) getNexusInstance( request ).createTaskInstance( EmptyTrashTaskDescriptor.ID );
+        EmptyTrashTask task = (EmptyTrashTask) getNexusInstance( request ).createTaskInstance(
+            EmptyTrashTaskDescriptor.ID );
 
         getNexusInstance( request ).submit( "Internal", task );
 
@@ -78,11 +84,7 @@ public class WastebasketPlexusResource
     @Override
     public boolean isModifiable()
     {
-       return true;
+        return true;
     }
-    
-    
-    
-    
 
 }

@@ -16,10 +16,12 @@ import org.sonatype.nexus.rest.model.StatusConfigurationValidationResponse;
 import org.sonatype.nexus.rest.model.StatusResource;
 import org.sonatype.nexus.rest.model.StatusResourceResponse;
 import org.sonatype.plexus.rest.resource.ManagedPlexusResource;
+import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 
 @Component( role = ManagedPlexusResource.class, hint = "StatusPlexusResource" )
 public class StatusPlexusResource
-    extends AbstractUIPermissionCalculatingPlexusResource implements ManagedPlexusResource
+    extends AbstractUIPermissionCalculatingPlexusResource
+    implements ManagedPlexusResource
 {
 
     @Override
@@ -32,6 +34,12 @@ public class StatusPlexusResource
     public String getResourceUri()
     {
         return "/status";
+    }
+
+    @Override
+    public PathProtectionDescriptor getResourceProtection()
+    {
+        return new PathProtectionDescriptor( getResourceUri(), "authcBasic,perms[nexus:status]" );
     }
 
     @Override

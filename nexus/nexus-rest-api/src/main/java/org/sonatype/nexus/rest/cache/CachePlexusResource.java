@@ -16,13 +16,13 @@ import org.sonatype.nexus.rest.model.NFCResourceResponse;
 import org.sonatype.nexus.rest.restore.AbstractRestorePlexusResource;
 import org.sonatype.nexus.tasks.ClearCacheTask;
 import org.sonatype.nexus.tasks.descriptors.ClearCacheTaskDescriptor;
+import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 
 @Component( role = PlexusResource.class, hint = "CachePlexusResource" )
 public class CachePlexusResource
     extends AbstractRestorePlexusResource
 {
-
 
     @Override
     public Object getPayloadInstance()
@@ -37,13 +37,15 @@ public class CachePlexusResource
     }
 
     @Override
+    public PathProtectionDescriptor getResourceProtection()
+    {
+        return new PathProtectionDescriptor( "/data_index/*/*/content**", "authcBasic,perms[nexus:cache]" );
+    }
+
+    @Override
     public Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
     {
-
-        String repoId = request.getAttributes().get( TARGET_ID ).toString();
-        String groupId = request.getAttributes().get( TARGET_ID ).toString();
-
         try
         {
             NFCResource resource = new NFCResource();

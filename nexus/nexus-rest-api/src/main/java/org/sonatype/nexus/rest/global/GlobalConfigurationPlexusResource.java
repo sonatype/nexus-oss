@@ -1,7 +1,6 @@
 package org.sonatype.nexus.rest.global;
 
 import java.io.IOException;
-import java.util.logging.Level;
 
 import org.codehaus.plexus.util.StringUtils;
 import org.jsecurity.authc.AuthenticationException;
@@ -23,6 +22,7 @@ import org.sonatype.nexus.rest.model.GlobalConfigurationResourceResponse;
 import org.sonatype.nexus.rest.model.RemoteConnectionSettings;
 import org.sonatype.nexus.rest.model.RemoteHttpProxySettings;
 import org.sonatype.nexus.rest.model.SmtpSettings;
+import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResourceException;
 
 /**
@@ -61,6 +61,12 @@ public class GlobalConfigurationPlexusResource
     public String getResourceUri()
     {
         return "/global_settings/{" + CONFIG_NAME_KEY + "}";
+    }
+
+    @Override
+    public PathProtectionDescriptor getResourceProtection()
+    {
+        return new PathProtectionDescriptor( "/global_settings/*", "authcBasic,perms[nexus:settings]" );
     }
 
     @Override
