@@ -15,6 +15,7 @@ package org.sonatype.plexus.rest;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
 
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.codehaus.plexus.component.annotations.Component;
@@ -199,6 +200,14 @@ public class PlexusRestletApplicationBridge
 
     protected void attach( Router router, boolean strict, String uriPattern, Restlet target )
     {
+        if ( getLogger().isLoggable( Level.FINE ) )
+        {
+            getLogger().log(
+                Level.FINE,
+                "Attaching Restlet of class '" + target.getClass().getName() + "' to URI='" + uriPattern
+                    + "' (strict='" + strict + "')" );
+        }
+
         Route route = router.attach( uriPattern, target );
 
         if ( strict )
@@ -209,6 +218,14 @@ public class PlexusRestletApplicationBridge
 
     protected void attach( Router router, boolean strict, PlexusResource resource )
     {
+        if ( getLogger().isLoggable( Level.FINE ) )
+        {
+            getLogger().log(
+                Level.FINE,
+                "Attaching PlexusResource of class '" + resource.getClass().getName() + "' to URI='"
+                    + resource.getResourceUri() + "' (strict='" + strict + "')" );
+        }
+
         Route route = router.attach( resource.getResourceUri(), new PlexusResourceFinder( getContext(), resource ) );
 
         if ( strict )
