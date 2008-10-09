@@ -206,7 +206,7 @@ public abstract class AbstractRepositoryRouter
             }
 
             // postprocess and replace findings with "group store files" that
-            // are simply overlating those found id reposes NEXUS-914
+            // are simply overlaying those found id reposes NEXUS-914
 
             List<StorageItem> replacements = new ArrayList<StorageItem>();
 
@@ -224,7 +224,7 @@ public abstract class AbstractRepositoryRouter
                     {
                         DefaultStorageFileItem file = new DefaultStorageFileItem(
                             this,
-                            request.getRequestPath(),
+                            item.getPath(),
                             true,
                             true,
                             new FileContentLocator( fileItem ) );
