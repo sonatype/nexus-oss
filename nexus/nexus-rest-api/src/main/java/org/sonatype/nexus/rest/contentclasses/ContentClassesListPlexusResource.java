@@ -59,7 +59,7 @@ public class ContentClassesListPlexusResource
     public PathProtectionDescriptor getResourceProtection()
     {
         return new PathProtectionDescriptor(
-            "/service/*/repo_content_classes",
+            "/repo_content_classes",
             "authcBasic,perms[nexus:repocontentclasses]" );
     }
 

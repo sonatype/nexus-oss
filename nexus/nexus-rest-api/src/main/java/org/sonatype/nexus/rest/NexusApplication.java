@@ -204,8 +204,8 @@ public class NexusApplication
         {
             try
             {
-                ( (PlexusMutableWebConfiguration) plexusWebConfiguration ).addProtectedResource( descriptor
-                    .getPathPattern(), descriptor.getFilterExpression() );
+                ( (PlexusMutableWebConfiguration) plexusWebConfiguration ).addProtectedResource( "/service/*"
+                    + descriptor.getPathPattern(), descriptor.getFilterExpression() );
             }
             catch ( SecurityConfigurationException e )
             {

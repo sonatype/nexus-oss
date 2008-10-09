@@ -7,6 +7,13 @@ import org.apache.velocity.runtime.RuntimeServices;
 import org.apache.velocity.runtime.log.LogChute;
 import org.restlet.Context;
 
+/**
+ * A log chute for TemplateRepresentations that are using Velocity under the hud. This logChute simply redirects
+ * Velocity logging to the same logging engine that is Restlet using and is preventing the commons-logging fallback of
+ * Velocity.
+ * 
+ * @author cstamas
+ */
 public class RestletLogChute
     implements LogChute
 {
