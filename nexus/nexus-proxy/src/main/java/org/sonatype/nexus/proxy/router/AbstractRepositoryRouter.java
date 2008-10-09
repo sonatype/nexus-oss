@@ -48,6 +48,7 @@ import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.events.AbstractEvent;
 import org.sonatype.nexus.proxy.item.DefaultStorageCollectionItem;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
+import org.sonatype.nexus.proxy.item.FileContentLocator;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
@@ -132,27 +133,20 @@ public abstract class AbstractRepositoryRouter
 
         if ( fileItem.exists() && fileItem.isFile() )
         {
-            try
-            {
-                DefaultStorageFileItem result = new DefaultStorageFileItem(
-                    this,
-                    request.getRequestPath(),
-                    true,
-                    true,
-                    new FileInputStream( fileItem ) );
+            DefaultStorageFileItem result = new DefaultStorageFileItem(
+                this,
+                request.getRequestPath(),
+                true,
+                true,
+                new FileContentLocator( fileItem ) );
 
-                result.setCreated( fileItem.lastModified() );
+            result.setCreated( fileItem.lastModified() );
 
-                result.setModified( fileItem.lastModified() );
+            result.setModified( fileItem.lastModified() );
 
-                result.setLength( fileItem.length() );
+            result.setLength( fileItem.length() );
 
-                return result;
-            }
-            catch ( FileNotFoundException e )
-            {
-                throw new StorageException( "Cannot find the file?", e );
-            }
+            return result;
         }
 
         try
