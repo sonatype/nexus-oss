@@ -26,7 +26,7 @@ import java.util.List;
 import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.nexus.tasks.descriptors.properties.ScheduledTaskPropertyDescriptor;
 
-@Component( role = ScheduledTaskDescriptor.class, hint = "EmptyTrash" )
+@Component( role = ScheduledTaskDescriptor.class, hint = "EmptyTrash", description="Empty Trash" )
 public class EmptyTrashTaskDescriptor
     implements ScheduledTaskDescriptor
 {    

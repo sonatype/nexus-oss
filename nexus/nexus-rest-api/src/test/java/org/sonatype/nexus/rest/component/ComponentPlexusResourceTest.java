@@ -15,19 +15,19 @@ public class ComponentPlexusResourceTest
     extends PlexusTestCase
 {
 
-    private AbstractComponentPlexusResource getComponentPlexusResource()
+    private AbstractComponentListPlexusResource getComponentPlexusResource()
         throws Exception
     {
-        return (AbstractComponentPlexusResource) this.lookup( PlexusResource.class, "ComponentPlexusResource" );
+        return (AbstractComponentListPlexusResource) this.lookup( PlexusResource.class, "ComponentPlexusResource" );
     }
 
     private PlexusComponentListResourceResponse runGetForRole( String role )
         throws Exception
     {
-        AbstractComponentPlexusResource componentPlexusResource = this.getComponentPlexusResource();
+        AbstractComponentListPlexusResource componentPlexusResource = this.getComponentPlexusResource();
 
         Request request = new Request();
-        request.getAttributes().put( AbstractComponentPlexusResource.ROLE_ID, role );
+        request.getAttributes().put( AbstractComponentListPlexusResource.ROLE_ID, role );
 
         return (PlexusComponentListResourceResponse) componentPlexusResource.get( null, request, null, null );
     }
@@ -108,7 +108,7 @@ public class ComponentPlexusResourceTest
 
         PlexusComponentListResource resource = (PlexusComponentListResource) result.getData().get( 0 );
 
-        Assert.assertEquals( null, resource.getDescription() );
+        Assert.assertEquals( "default", resource.getDescription() );
         Assert.assertEquals( "default", resource.getRoleHint() );
     }
 
@@ -121,7 +121,7 @@ public class ComponentPlexusResourceTest
 
         PlexusComponentListResource resource = (PlexusComponentListResource) result.getData().get( 0 );
 
-        Assert.assertEquals( "", resource.getDescription() );
+        Assert.assertEquals( "default", resource.getDescription() );
         Assert.assertEquals( "default", resource.getRoleHint() );
     }
 }

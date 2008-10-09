@@ -27,29 +27,29 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.nexus.tasks.descriptors.properties.ScheduledTaskPropertyDescriptor;
 
-@Component( role = ScheduledTaskDescriptor.class, hint = "SnapshotRemoval" )
+@Component( role = ScheduledTaskDescriptor.class, hint = "SnapshotRemoval", description = "Remove Snapshots From Repository" )
 public class SnapshotRemovalTaskDescriptor
     implements ScheduledTaskDescriptor
 {
     public static final String ID = "SnapshotRemoverTask";
-    
+
     @Requirement( role = ScheduledTaskPropertyDescriptor.class, hint = "RepositoryOrGroup" )
     private ScheduledTaskPropertyDescriptor repositoryOrGroupId;
-    
+
     @Requirement( role = ScheduledTaskPropertyDescriptor.class, hint = "MinimumSnapshotCount" )
     private ScheduledTaskPropertyDescriptor minSnapshots;
-    
+
     @Requirement( role = ScheduledTaskPropertyDescriptor.class, hint = "SnapshotRetentionDays" )
     private ScheduledTaskPropertyDescriptor retentionDays;
-    
+
     @Requirement( role = ScheduledTaskPropertyDescriptor.class, hint = "RemoveIfReleased" )
     private ScheduledTaskPropertyDescriptor removeWhenReleased;
-    
+
     public String getId()
     {
         return ID;
     }
-    
+
     public String getName()
     {
         return "Remove Snapshots From Repository";
@@ -58,12 +58,12 @@ public class SnapshotRemovalTaskDescriptor
     public List<ScheduledTaskPropertyDescriptor> getPropertyDescriptors()
     {
         List<ScheduledTaskPropertyDescriptor> properties = new ArrayList<ScheduledTaskPropertyDescriptor>();
-        
+
         properties.add( repositoryOrGroupId );
         properties.add( minSnapshots );
         properties.add( retentionDays );
         properties.add( removeWhenReleased );
-        
+
         return properties;
     }
 }

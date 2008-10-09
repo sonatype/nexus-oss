@@ -65,6 +65,7 @@ import org.sonatype.nexus.integrationtests.nexus779.Nexus779RssFeedFilteringTest
 import org.sonatype.nexus.integrationtests.nexus782.Nexus782UploadWithClassifier;
 import org.sonatype.nexus.integrationtests.nexus810.Nexus810PackageNamesInNexusConf;
 import org.sonatype.nexus.integrationtests.nexus810.Nexus810PackageNamesInRestMessages;
+import org.sonatype.nexus.integrationtests.nexus930.Nexus930AutoDiscoverComponent;
 import org.sonatype.nexus.integrationtests.proxy.nexus177.Nexus177OutOfServiceTest;
 import org.sonatype.nexus.integrationtests.proxy.nexus178.Nexus178BlockProxyDownloadTest;
 import org.sonatype.nexus.integrationtests.proxy.nexus179.Nexus179RemoteRepoDownTest;
@@ -140,7 +141,8 @@ import org.sonatype.nexus.integrationtests.upgrades.nexus652.Nexus652Beta5To10Up
     Nexus384DotAndDashSearchTest.class,
     Nexus642SynchShadowTaskTest.class,
     Nexus778SearchResultsFilteringTest.class,
-    Nexus779RssFeedFilteringTest.class } )
+    Nexus779RssFeedFilteringTest.class,
+    Nexus930AutoDiscoverComponent.class } )
 public class IntegrationTestSuiteClassesSecurity
 {
     @BeforeClass

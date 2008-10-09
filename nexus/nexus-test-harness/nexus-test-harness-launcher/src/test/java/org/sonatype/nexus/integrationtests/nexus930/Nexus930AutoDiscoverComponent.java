@@ -9,12 +9,12 @@ import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
-import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
+import org.sonatype.nexus.integrationtests.AbstractPrivilegeTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
+import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.rest.model.PlexusComponentListResource;
 import org.sonatype.nexus.rest.model.PlexusComponentListResourceResponse;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
-import org.sonatype.plexus.rest.resource.PlexusResource;
 
 import com.thoughtworks.xstream.XStream;
 
@@ -22,7 +22,7 @@ import com.thoughtworks.xstream.XStream;
  * Test the AutoDiscoverComponent a
  */
 public class Nexus930AutoDiscoverComponent
-    extends AbstractNexusIntegrationTest
+    extends AbstractPrivilegeTest
 {
 
     @Test
@@ -32,24 +32,65 @@ public class Nexus930AutoDiscoverComponent
         Response response1 = sendMessage( "JUNK-foo-Bar-JUNK", this.getXMLXStream(), MediaType.APPLICATION_XML );
         Assert.assertTrue( response1.getStatus().isClientError() );
         Assert.assertEquals( 404, response1.getStatus().getCode() );
-
-        // restlet client doesn't set accept on gets
-//        Response response2 = sendMessage( "JUNK-foo-Bar-JUNK", this.getJsonXStream(), MediaType.APPLICATION_JSON );
-//        Assert.assertTrue( response2.getStatus().isClientError() );
-//        Assert.assertEquals( 404, response2.getStatus().getCode() );
     }
 
     @Test
-    public void testPlexusResourceRole()
+    public void testContentClassComponentListPlexusResource()
         throws Exception
     {
-        List<PlexusComponentListResource> result1 = this.getResult( PlexusResource.class.getName(), this
-            .getXMLXStream(), MediaType.APPLICATION_XML );
+        String role = "repo_content_classes";
+        // do admin
+        List<PlexusComponentListResource> result1 = this.getResult(
+            role,
+            this.getXMLXStream(),
+            MediaType.APPLICATION_XML );
+        Assert.assertTrue( "Expected list size equal 2.", result1.size() == 2 );
+
+        // 401 test
+        this.overwriteUserRole( TEST_USER_NAME, "login-only" + role, "2" );
+        TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
+        TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
+        Response response = sendMessage( role, this.getXMLXStream(), MediaType.APPLICATION_XML );
+        Assert.assertTrue( "Expected Error: Status was: " + response.getStatus().getCode(), response
+            .getStatus().isClientError() );
+        Assert.assertEquals( 401, response.getStatus().getCode() );
+
+        // only content class priv
+        this.overwriteUserRole( TEST_USER_NAME, "content-classes" + role, "70" );
+        TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
+        TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
+        response = sendMessage( role, this.getXMLXStream(), MediaType.APPLICATION_XML );
+        Assert.assertTrue( response.getStatus().isSuccess() );
+    }
+
+    @Test
+    public void testScheduledTaskTypeComonentListPlexusResource()
+        throws Exception
+    {
+        String role = "schedule_types";
+        // do admin
+        List<PlexusComponentListResource> result1 = this.getResult(
+            role,
+            this.getXMLXStream(),
+            MediaType.APPLICATION_XML );
         Assert.assertTrue( "Expected list larger then 1.", result1.size() > 1 );
 
-     // restlet client doesn't set accept on gets
-//        List<PlexusComponentListResource>  result2 = this.getResult( PlexusResource.class.getName(), this.getJsonXStream(), MediaType.APPLICATION_JSON );
-//        Assert.assertTrue( "Expected list larger then 1.", result2.size() > 1 );
+        // 401 test
+        this.overwriteUserRole( TEST_USER_NAME, "login-only" + role, "2" );
+        TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
+        TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
+        Response response = sendMessage( role, this.getXMLXStream(), MediaType.APPLICATION_XML );
+        Assert.assertTrue( "Expected Error: Status was: " + response.getStatus().getCode(), response
+            .getStatus().isClientError() );
+        Assert.assertEquals( 401, response.getStatus().getCode() );
+
+        // only content class priv
+        this.overwriteUserRole( TEST_USER_NAME, "schedule_types" + role, "71" );
+        TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
+        TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
+        response = sendMessage( role, this.getXMLXStream(), MediaType.APPLICATION_XML );
+        Assert.assertTrue( response.getStatus().isSuccess() );
+
     }
 
     private List<PlexusComponentListResource> getResult( String role, XStream xstream, MediaType mediaType )
@@ -57,8 +98,6 @@ public class Nexus930AutoDiscoverComponent
     {
         String responseString = this.sendMessage( role, xstream, mediaType ).getEntity().getText();
 
-        System.out.println( "responseString - "+ mediaType +" : "+ responseString );
-        
         XStreamRepresentation representation = new XStreamRepresentation( xstream, responseString, mediaType );
 
         PlexusComponentListResourceResponse resourceResponse = (PlexusComponentListResourceResponse) representation

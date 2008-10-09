@@ -27,20 +27,20 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.nexus.tasks.descriptors.properties.ScheduledTaskPropertyDescriptor;
 
-@Component( role = ScheduledTaskDescriptor.class, hint = "SynchronizeShadow" )
+@Component( role = ScheduledTaskDescriptor.class, hint = "SynchronizeShadow", description = "Synchronize Shadow Repository" )
 public class SynchronizeShadowTaskDescriptor
     implements ScheduledTaskDescriptor
 {
     public static final String ID = "SynchronizeShadowsTask";
-    
+
     @Requirement( role = ScheduledTaskPropertyDescriptor.class, hint = "Shadow" )
     private ScheduledTaskPropertyDescriptor shadowId;
-    
+
     public String getId()
     {
         return ID;
     }
-    
+
     public String getName()
     {
         return "Synchronize Shadow Repository";
@@ -49,9 +49,9 @@ public class SynchronizeShadowTaskDescriptor
     public List<ScheduledTaskPropertyDescriptor> getPropertyDescriptors()
     {
         List<ScheduledTaskPropertyDescriptor> properties = new ArrayList<ScheduledTaskPropertyDescriptor>();
-        
+
         properties.add( shadowId );
-        
+
         return properties;
     }
 }

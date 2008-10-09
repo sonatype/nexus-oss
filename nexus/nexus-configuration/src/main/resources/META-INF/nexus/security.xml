@@ -88,6 +88,7 @@
 				<privilege>57</privilege>
 				<privilege>58</privilege>
 				<privilege>64</privilege>
+				<privilege>70</privilege>
 				<privilege>T1</privilege>
 				<privilege>T2</privilege>
 			</privileges>
@@ -209,6 +210,7 @@
                 <privilege>28</privilege>
                 <privilege>29</privilege>
                 <privilege>69</privilege>
+                <privilege>71</privilege>
             </privileges>
         </role>
         <role>
@@ -222,6 +224,7 @@
                 <privilege>47</privilege>
                 <privilege>48</privilege>
                 <privilege>56</privilege>
+				<privilege>70</privilege>
             </privileges>
         </role>
         <role>
@@ -1431,5 +1434,38 @@
                 </property>
             </properties>
         </privilege>
+        <privilege>
+			<id>70</id>
+            <type>method</type>
+			<name>Repository Content Classes Component - (read)</name>
+			<description>Give permission to retrieve the list of repository content classes supported by nexus.</description>
+            <properties>
+                <property>
+                    <key>method</key>
+                    <value>read</value>
+                </property>
+                <property>
+                    <key>permission</key>
+                    <value>nexus:componentscontentclasses</value>
+                </property>
+            </properties>
+		</privilege>
+        <privilege>
+			<id>71</id>
+            <type>method</type>
+			<name>Scheduled Task Types Component - (read)</name>
+            <description>Give permission to retrieve list of support task types available in nexus.</description>
+            <properties>
+                <property>
+                    <key>method</key>
+                    <value>read</value>
+                </property>
+                <property>
+                    <key>permission</key>
+                    <value>nexus:componentscheduletypes</value>
+                </property>
+            </properties>
+		</privilege>
+        
 	</privileges>
 </security>

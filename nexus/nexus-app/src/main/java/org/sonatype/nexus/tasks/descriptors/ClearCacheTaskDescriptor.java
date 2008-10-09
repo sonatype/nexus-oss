@@ -29,7 +29,7 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
 import org.sonatype.nexus.tasks.descriptors.properties.ScheduledTaskPropertyDescriptor;
 
-@Component( role = ScheduledTaskDescriptor.class, hint = "ClearCache" )
+@Component( role = ScheduledTaskDescriptor.class, hint = "ClearCache", description="Clear Repository Caches" )
 public class ClearCacheTaskDescriptor
     implements ScheduledTaskDescriptor, Initializable
 {

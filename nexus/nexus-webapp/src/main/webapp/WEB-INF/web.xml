@@ -102,6 +102,8 @@
 			/service/*/privileges = authcBasic,perms[nexus:privileges]
 			/service/*/logs/* = authcBasic,perms[nexus:logs]
 			/service/*/logs = authcBasic,perms[nexus:logs]
+			/service/*/components/repo_content_classes = authcBasic,perms[nexus:componentscontentclasses]
+			/service/*/components/schedule_types = authcBasic,perms[nexus:componentscheduletypes]
 			/service/** = authcBasic,perms[nexus:someFreakinStupidPermToCatchAllUnprotectedsAndOnlyAdminWillHaveItSinceItHaveAStar]
 			</param-value>
         </init-param>

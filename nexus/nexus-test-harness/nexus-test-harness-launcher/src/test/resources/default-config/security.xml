@@ -90,6 +90,7 @@
         <privilege>57</privilege>
         <privilege>58</privilege>
         <privilege>59</privilege>
+        <privilege>70</privilege>
         <privilege>T1</privilege>
         <privilege>T2</privilege>
       </privileges>
@@ -1268,5 +1269,37 @@
                 </property>
             </properties>
         </privilege>
+        <privilege>
+			<id>70</id>
+            <type>method</type>
+			<name>Repository Content Classes Component - (read)</name>
+			<description>Give permission to retrieve the list of repository content classes supported by nexus.</description>
+            <properties>
+                <property>
+                    <key>method</key>
+                    <value>read</value>
+                </property>
+                <property>
+                    <key>permission</key>
+                    <value>nexus:componentscontentclasses</value>
+                </property>
+            </properties>
+		</privilege>
+        <privilege>
+			<id>71</id>
+            <type>method</type>
+			<name>Scheduled Task Types Component - (read)</name>
+            <description>Give permission to retrieve list of support task types available in nexus.</description>
+            <properties>
+                <property>
+                    <key>method</key>
+                    <value>read</value>
+                </property>
+                <property>
+                    <key>permission</key>
+                    <value>nexus:componentscheduletypes</value>
+                </property>
+            </properties>
+		</privilege>
   </privileges>
 </security>

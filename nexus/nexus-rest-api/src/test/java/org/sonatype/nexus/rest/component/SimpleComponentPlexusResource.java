@@ -3,7 +3,7 @@ package org.sonatype.nexus.rest.component;
 /**
  * Allows testing of any Role.  Actual implementations should only expose a single role
  */
-public class SimpleComponentPlexusResource extends AbstractComponentPlexusResource
+public class SimpleComponentPlexusResource extends AbstractComponentListPlexusResource
 {
 
     @Override

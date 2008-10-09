@@ -27,20 +27,20 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.nexus.tasks.descriptors.properties.ScheduledTaskPropertyDescriptor;
 
-@Component( role = ScheduledTaskDescriptor.class, hint = "Reindex" )
+@Component( role = ScheduledTaskDescriptor.class, hint = "Reindex", description = "Reindex Repositories" )
 public class ReindexTaskDescriptor
     implements ScheduledTaskDescriptor
 {
     public static final String ID = "ReindexTask";
-    
+
     @Requirement( role = ScheduledTaskPropertyDescriptor.class, hint = "RepositoryOrGroup" )
     private ScheduledTaskPropertyDescriptor repositoryOrGroupId;
-    
+
     public String getId()
     {
         return ID;
     }
-    
+
     public String getName()
     {
         return "Reindex Repositories";
@@ -49,9 +49,9 @@ public class ReindexTaskDescriptor
     public List<ScheduledTaskPropertyDescriptor> getPropertyDescriptors()
     {
         List<ScheduledTaskPropertyDescriptor> properties = new ArrayList<ScheduledTaskPropertyDescriptor>();
-        
+
         properties.add( repositoryOrGroupId );
-        
+
         return properties;
     }
 }

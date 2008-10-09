@@ -27,7 +27,7 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.nexus.tasks.descriptors.properties.ScheduledTaskPropertyDescriptor;
 
-@Component( role = ScheduledTaskDescriptor.class, hint = "EvictUnusedItems" )
+@Component( role = ScheduledTaskDescriptor.class, hint = "EvictUnusedItems", description="Evict Unused Proxied Items From Repository Caches" )
 public class EvictUnusedItemsTaskDescriptor
     implements ScheduledTaskDescriptor
 {
