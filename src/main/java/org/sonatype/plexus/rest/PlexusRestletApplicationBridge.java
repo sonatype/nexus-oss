@@ -24,7 +24,6 @@ import org.restlet.Context;
 import org.restlet.Restlet;
 import org.restlet.Route;
 import org.restlet.Router;
-import org.restlet.resource.Resource;
 import org.restlet.util.Template;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 import org.sonatype.plexus.rest.xstream.json.JsonOrgHierarchicalStreamDriver;
@@ -173,7 +172,7 @@ public class PlexusRestletApplicationBridge
             // create a new root router
             Router rootRouter = new Router( getContext() );
 
-            Router applicationRouter = initializeRouter( rootRouter );
+            Router applicationRouter = initializeRouter( rootRouter, isStarted );
 
             // attach all PlexusResources
             if ( isStarted )
@@ -198,19 +197,6 @@ public class PlexusRestletApplicationBridge
         return doConfigureXstream( xstream );
     }
 
-    /**
-     * @deprecated use PlexusResources instead
-     */
-    protected void attach( Router router, boolean strict, String uriPattern, Class<? extends Resource> targetClass )
-    {
-        Route route = router.attach( uriPattern, targetClass );
-
-        if ( strict )
-        {
-            route.getTemplate().setMatchingMode( Template.MODE_EQUALS );
-        }
-    }
-
     protected void attach( Router router, boolean strict, String uriPattern, Restlet target )
     {
         Route route = router.attach( uriPattern, target );
@@ -229,7 +215,7 @@ public class PlexusRestletApplicationBridge
         {
             route.getTemplate().setMatchingMode( Template.MODE_EQUALS );
         }
-        
+
         handlePlexusResourceSecurity( resource );
     }
 
@@ -268,7 +254,7 @@ public class PlexusRestletApplicationBridge
      * @param root
      * @return
      */
-    protected Router initializeRouter( Router root )
+    protected Router initializeRouter( Router root, boolean isStarted )
     {
         return root;
     }
