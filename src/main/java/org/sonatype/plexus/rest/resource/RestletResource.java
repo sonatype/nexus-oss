@@ -229,7 +229,7 @@ public class RestletResource
     {
         Object result = delegate.get( getContext(), getRequest(), getResponse(), variant );
 
-        return doRepresent( result, variant );
+        return (result != null) ? doRepresent( result, variant ) : null;
     }
 
     public void acceptRepresentation( Representation representation )
