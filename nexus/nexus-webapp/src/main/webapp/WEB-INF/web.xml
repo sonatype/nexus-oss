@@ -17,9 +17,9 @@
         <listener-class>org.sonatype.nexus.web.NexusBooterListener</listener-class>
     </listener>
 
-    <!-- Filters -->
+    <!-- Security filter -->
     <filter>
-        <filter-name>apiFilter</filter-name>
+        <filter-name>nexusFilter</filter-name>
         <filter-class>org.sonatype.nexus.security.filter.NexusJSecurityFilter</filter-class>
         <init-param>
             <param-name>config</param-name>
@@ -45,151 +45,53 @@
 			tgperms.pathPrefix = /service/local/repo_groups/(.*)/content(.*)
 			tgperms.pathReplacement = /groups/@1@2
 
+			contentAuthcBasic = org.sonatype.nexus.security.filter.authc.NexusHttpAuthenticationFilter
+			contentAuthcBasic.applicationName = Sonatype Nexus Repository Manager
+			contentAuthcBasic.fakeAuthScheme = false
+
+			contentTperms = org.sonatype.nexus.security.filter.authz.NexusTargetMappingAuthorizationFilter
+			contentTperms.pathPrefix = /content(.*)
+			contentTperms.pathReplacement = @1
+
 			[urls]
-			/service/*/status/command = authcBasic,perms[nexus:command]
-			/service/*/status = authcBasic,perms[nexus:status]
-			/service/*/feeds/* = authcBasic,perms[nexus:feeds]
-			/service/*/feeds = authcBasic,perms[nexus:feeds]
-			/service/*/authentication/login = authcBasic,perms[nexus:authentication]
-			/service/*/authentication/logout = logout
-			/service/*/identify/*/* = authcBasic,perms[nexus:identify]
-			/service/*/artifact/** = authcBasic,perms[nexus:artifact]
-			/service/*/data_index/** = authcBasic,perms[nexus:index]
-			/service/*/data_index = authcBasic,perms[nexus:index]
-			/service/*/data_cache/** = authcBasic,perms[nexus:cache]
-			/service/*/data_cache = authcBasic,perms[nexus:cache]
-			/service/*/wastebasket/** = authcBasic,perms[nexus:wastebasket]
-			/service/*/wastebasket = authcBasic,perms[nexus:wastebasket]
-			/service/*/attributes/** = authcBasic,perms[nexus:attributes]
-			/service/*/attributes = authcBasic,perms[nexus:attributes]
-			/service/*/repository_statuses = authcBasic,perms[nexus:repostatus]
-			/service/*/repositories/*/status = authcBasic,perms[nexus:repostatus]
-			/service/*/repositories/*/meta = authcBasic,perms[nexus:repometa]
-			/service/*/repositories/*/content/** = authcBasic,trperms
-			/service/*/repositories/*/content = authcBasic,trperms
-			/service/*/repositories/*/index_content/** = authcBasic,tiperms
-			/service/*/repositories/*/index_content = authcBasic,tiperms
-			/service/*/repositories/* = authcBasic,perms[nexus:repositories]
-			/service/*/repositories = authcBasic,perms[nexus:repositories]
-			/service/*/repo_groups/*/content/** = authcBasic,tgperms
-			/service/*/repo_groups/*/content = authcBasic,tgperms
-			/service/*/repo_groups/* = authcBasic,perms[nexus:repogroups]
-			/service/*/repo_groups = authcBasic,perms[nexus:repogroups]
-			/service/*/repo_content_classes = authcBasic,perms[nexus:repocontentclasses]
-			/service/*/repo_targets/* = authcBasic,perms[nexus:targets]
-			/service/*/repo_targets = authcBasic,perms[nexus:targets]
-			/service/*/configs/* = authcBasic,perms[nexus:configuration]
-			/service/*/configs = authcBasic,perms[nexus:configuration]
-			/service/*/global_settings/* = authcBasic,perms[nexus:settings]
-			/service/*/global_settings = authcBasic,perms[nexus:settings]
-			/service/*/repo_routes/* = authcBasic,perms[nexus:routes]
-			/service/*/repo_routes = authcBasic,perms[nexus:routes]
-			/service/*/templates/repositories/* = authcBasic,perms[nexus:repotemplates]
-			/service/*/templates/repositories = authcBasic,perms[nexus:repotemplates]
-			/service/*/schedule_types = authcBasic,perms[nexus:tasktypes]
-			/service/*/schedule_run/* = authcBasic,perms[nexus:tasksrun]
-			/service/*/schedules/* = authcBasic,perms[nexus:tasks]
-			/service/*/schedules = authcBasic,perms[nexus:tasks]
-			/service/*/users_changepw = authcBasic,perms[nexus:userschangepw]
-			/service/*/users_forgotpw = authcBasic,perms[nexus:usersforgotpw]
-			/service/*/users_forgotid/* = authcBasic,perms[nexus:usersforgotid]
-			/service/*/users_reset/* = authcBasic,perms[nexus:usersreset]
-			/service/*/users/* = authcBasic,perms[nexus:users]
-			/service/*/users = authcBasic,perms[nexus:users]
-			/service/*/roles/* = authcBasic,perms[nexus:roles]
-			/service/*/roles = authcBasic,perms[nexus:roles]
-			/service/*/privileges/* = authcBasic,perms[nexus:privileges]
-			/service/*/privileges = authcBasic,perms[nexus:privileges]
-			/service/*/logs/* = authcBasic,perms[nexus:logs]
-			/service/*/logs = authcBasic,perms[nexus:logs]
-			/service/*/components/repo_content_classes = authcBasic,perms[nexus:componentscontentclasses]
-			/service/*/components/schedule_types = authcBasic,perms[nexus:componentscheduletypes]
-			/service/** = authcBasic,perms[nexus:someFreakinStupidPermToCatchAllUnprotectedsAndOnlyAdminWillHaveItSinceItHaveAStar]
+			/** = anon
 			</param-value>
         </init-param>
     </filter>
 
     <filter-mapping>
-        <filter-name>apiFilter</filter-name>
+        <filter-name>nexusFilter</filter-name>
         <url-pattern>/service/*</url-pattern>
     </filter-mapping>
-
-    <filter>
-        <filter-name>contentFilter</filter-name>
-        <filter-class>org.sonatype.nexus.security.filter.NexusJSecurityFilter</filter-class>
-        <init-param>
-            <param-name>config</param-name>
-            <param-value>
-			[filters]
-			authcBasic = org.sonatype.nexus.security.filter.authc.NexusHttpAuthenticationFilter
-			authcBasic.applicationName = Sonatype Nexus Repository Manager
-			authcBasic.fakeAuthScheme = false
-
-			logout = org.sonatype.nexus.security.filter.authc.LogoutAuthenticationFilter
-
-			tperms = org.sonatype.nexus.security.filter.authz.NexusTargetMappingAuthorizationFilter
-			tperms.pathPrefix = /content(.*)
-			tperms.pathReplacement = @1
-
-			[urls]
-			/content/** = authcBasic,tperms
-			/content = authcBasic,tperms
-			</param-value>
-        </init-param>
-    </filter>
-
     <filter-mapping>
-        <filter-name>contentFilter</filter-name>
+        <filter-name>nexusFilter</filter-name>
         <url-pattern>/content/*</url-pattern>
     </filter-mapping>
 
-    <!-- REST Content -->
+    <!-- Nexus REST Application -->
     <servlet>
-        <servlet-name>content</servlet-name>
+        <servlet-name>nexus</servlet-name>
         <servlet-class>org.sonatype.plexus.rest.PlexusServerServlet</servlet-class>
         <init-param>
-            <!-- A stupid hack to avoid OneServletServerPerWebapp limitation, see ServletRestletApplicationBridge#getInitParameter -->
-            <param-name>content.role</param-name>
+            <!-- A stupid hack to avoid OneServletServerPerWebapp limitation, see PlexusServerServlet#getInitParameter -->
+            <param-name>nexus.role</param-name>
             <param-value>org.restlet.Application</param-value>
         </init-param>
         <init-param>
-            <!-- A stupid hack to avoid OneServletServerPerWebapp limitation, see ServletRestletApplicationBridge#getInitParameter -->
-            <param-name>content.roleHint</param-name>
-            <param-value>content</param-value>
+            <!-- A stupid hack to avoid OneServletServerPerWebapp limitation, see PlexusServerServlet#getInitParameter -->
+            <param-name>nexus.roleHint</param-name>
+            <param-value>nexus</param-value>
         </init-param>
         <init-param>
-            <!-- Content servlet should not "discover" plexus resources (default is true)! -->
             <param-name>plexus.discoverResources</param-name>
-            <param-value>false</param-value>
+            <param-value>true</param-value>
         </init-param>
         <load-on-startup>1</load-on-startup>
     </servlet>
 
     <servlet-mapping>
-        <servlet-name>content</servlet-name>
-        <url-pattern>/content/*</url-pattern>
-    </servlet-mapping>
-
-    <!-- REST Service -->
-    <servlet>
-        <servlet-name>service</servlet-name>
-        <servlet-class>org.sonatype.plexus.rest.PlexusServerServlet</servlet-class>
-        <init-param>
-            <!-- A stupid hack to avoid OneServletServerPerWebapp limitation, see ServletRestletApplicationBridge#getInitParameter -->
-            <param-name>service.role</param-name>
-            <param-value>org.restlet.Application</param-value>
-        </init-param>
-        <init-param>
-            <!-- A stupid hack to avoid OneServletServerPerWebapp limitation, see ServletRestletApplicationBridge#getInitParameter -->
-            <param-name>service.roleHint</param-name>
-            <param-value>service</param-value>
-        </init-param>
-        <load-on-startup>2</load-on-startup>
-    </servlet>
-
-    <servlet-mapping>
-        <servlet-name>service</servlet-name>
-        <url-pattern>/service/*</url-pattern>
+        <servlet-name>nexus</servlet-name>
+        <url-pattern>/*</url-pattern>
     </servlet-mapping>
 
     <!-- Welcome File -->
