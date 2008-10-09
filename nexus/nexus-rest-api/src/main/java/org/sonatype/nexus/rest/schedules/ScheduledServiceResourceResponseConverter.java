@@ -1,7 +1,6 @@
 package org.sonatype.nexus.rest.schedules;
 
 import org.codehaus.plexus.util.StringUtils;
-import org.sonatype.nexus.rest.model.PrivilegeResourceRequest;
 import org.sonatype.nexus.rest.model.ScheduledServiceResourceResponse;
 
 import com.thoughtworks.xstream.converters.ConversionException;

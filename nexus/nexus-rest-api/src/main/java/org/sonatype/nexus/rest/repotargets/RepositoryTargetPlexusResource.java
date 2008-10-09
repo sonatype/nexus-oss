@@ -1,7 +1,6 @@
 package org.sonatype.nexus.rest.repotargets;
 
 import java.io.IOException;
-import java.util.logging.Level;
 
 import org.restlet.Context;
 import org.restlet.data.Request;

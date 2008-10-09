@@ -57,7 +57,6 @@ public abstract class AbstractNexusPlexusResource
     @Requirement
     private NexusItemAuthorizer nexusItemAuthorizer;
 
-    
     public PathProtectionDescriptor getResourceProtection()
     {
         return null;
@@ -76,12 +75,12 @@ public abstract class AbstractNexusPlexusResource
                 + request.getAttributes().get( NEXUS_INSTANCE_KEY ) + "' not found!" );
         }
     }
-    
+
     protected NexusSecurity getNexusSecurity( Request request )
     {
         return (NexusSecurity) request.getAttributes().get( NexusSecurity.class.getName() );
     }
-    
+
     protected SecurityManager getSecurityManager( Request request )
     {
         return (SecurityManager) request.getAttributes().get( SecurityManager.class.getName() );
@@ -95,9 +94,9 @@ public abstract class AbstractNexusPlexusResource
      */
     protected FileItemFactory getFileItemFactory( Context context )
     {
-        return (FileItemFactory) context.getAttributes().get( ApplicationBridge.FILEITEM_FACTORY );
+        return (FileItemFactory) context.getAttributes().get( NexusApplication.FILEITEM_FACTORY );
     }
-    
+
     protected Reference createChildReference( Request request, String childPath )
     {
         Reference result = new Reference( request.getResourceRef() ).addSegment( childPath ).getTargetRef();
@@ -121,7 +120,6 @@ public abstract class AbstractNexusPlexusResource
 
         return ref.getTargetRef();
     }
-
 
     /**
      * Calculates a reference to Repository based on Repository ID.
@@ -159,8 +157,7 @@ public abstract class AbstractNexusPlexusResource
     {
         return (PlexusContainer) context.getAttributes().get( PlexusConstants.PLEXUS_KEY );
     }
-    
-    
+
     protected NexusErrorResponse getNexusErrorResponse( String id, String msg )
     {
         NexusErrorResponse ner = new NexusErrorResponse();
@@ -170,12 +167,13 @@ public abstract class AbstractNexusPlexusResource
         ner.addError( ne );
         return ner;
     }
-    
+
     protected void handleInvalidConfigurationException(
-        org.sonatype.jsecurity.realms.tools.InvalidConfigurationException e ) throws PlexusResourceException
+        org.sonatype.jsecurity.realms.tools.InvalidConfigurationException e )
+        throws PlexusResourceException
     {
         getLogger().warn( "Configuration error!", e );
-        
+
         NexusErrorResponse nexusErrorResponse;
 
         org.sonatype.jsecurity.realms.validator.ValidationResponse vr = e.getValidationResponse();
@@ -189,14 +187,15 @@ public abstract class AbstractNexusPlexusResource
         {
             nexusErrorResponse = getNexusErrorResponse( "*", e.getMessage() );
         }
-        
-        throw new PlexusResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Configuration error.", nexusErrorResponse );
+
+        throw new PlexusResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Configuration error.", nexusErrorResponse );
     }
 
-    protected void handleConfigurationException( ConfigurationException e ) throws PlexusResourceException
+    protected void handleConfigurationException( ConfigurationException e )
+        throws PlexusResourceException
     {
         getLogger().warn( "Configuration error!", e );
-        
+
         NexusErrorResponse nexusErrorResponse;
 
         if ( InvalidConfigurationException.class.isAssignableFrom( e.getClass() ) )
@@ -217,11 +216,10 @@ public abstract class AbstractNexusPlexusResource
         {
             nexusErrorResponse = getNexusErrorResponse( "*", e.getMessage() );
         }
-        
-        throw new PlexusResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Configuration error.", nexusErrorResponse );
+
+        throw new PlexusResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Configuration error.", nexusErrorResponse );
     }
 
-    
     /**
      * Convert a collection of ArtifactInfo's to NexusArtifacts
      * 
@@ -246,7 +244,7 @@ public abstract class AbstractNexusPlexusResource
         }
         return result;
     }
-    
+
     /**
      * Convert from ArtifactInfo to a NexusArtifact
      * 

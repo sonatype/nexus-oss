@@ -1,7 +1,5 @@
 package org.sonatype.nexus.rest.repositories;
 
-import java.util.logging.Level;
-
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.util.FileUtils;
 import org.restlet.Context;

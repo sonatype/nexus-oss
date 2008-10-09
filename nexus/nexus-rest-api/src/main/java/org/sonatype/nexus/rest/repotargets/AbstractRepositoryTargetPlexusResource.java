@@ -3,7 +3,6 @@ package org.sonatype.nexus.rest.repotargets;
 import java.util.List;
 
 import org.restlet.data.Request;
-import org.restlet.resource.Representation;
 import org.sonatype.nexus.configuration.model.CRepositoryTarget;
 import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
 import org.sonatype.nexus.rest.model.RepositoryTargetResource;

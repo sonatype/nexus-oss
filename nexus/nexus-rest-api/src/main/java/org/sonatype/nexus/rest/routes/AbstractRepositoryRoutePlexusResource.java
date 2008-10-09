@@ -23,15 +23,12 @@ package org.sonatype.nexus.rest.routes;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.restlet.Context;
 import org.restlet.data.Reference;
 import org.restlet.data.Request;
-import org.restlet.data.Response;
 import org.restlet.resource.ResourceException;
 import org.sonatype.nexus.configuration.model.CGroupsSettingPathMappingItem;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
-import org.sonatype.nexus.rest.AbstractNexusResourceHandler;
 import org.sonatype.nexus.rest.model.RepositoryRouteMemberRepository;
 import org.sonatype.nexus.rest.model.RepositoryRouteResource;
 

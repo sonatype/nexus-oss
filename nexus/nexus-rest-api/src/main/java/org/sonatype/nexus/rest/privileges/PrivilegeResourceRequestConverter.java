@@ -2,7 +2,6 @@ package org.sonatype.nexus.rest.privileges;
 
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.rest.model.PrivilegeResourceRequest;
-import org.sonatype.nexus.rest.model.RepositoryResourceResponse;
 
 import com.thoughtworks.xstream.converters.ConversionException;
 import com.thoughtworks.xstream.converters.MarshallingContext;

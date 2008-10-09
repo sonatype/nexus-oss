@@ -1,7 +1,6 @@
 package org.sonatype.nexus.rest.privileges;
 
 import org.codehaus.plexus.util.StringUtils;
-import org.sonatype.nexus.rest.model.PrivilegeResourceRequest;
 import org.sonatype.nexus.rest.model.PrivilegeStatusResourceResponse;
 
 import com.thoughtworks.xstream.converters.ConversionException;

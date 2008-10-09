@@ -57,7 +57,7 @@ public class NexusApplication
     @Requirement
     private Nexus nexus;
 
-    @Requirement( hint = "web" )
+    @Requirement
     private PlexusWebConfiguration plexusWebConfiguration;
 
     @Requirement( hint = "nexusInstance" )
@@ -206,11 +206,17 @@ public class NexusApplication
             {
                 ( (PlexusMutableWebConfiguration) plexusWebConfiguration ).addProtectedResource( "/service/*"
                     + descriptor.getPathPattern(), descriptor.getFilterExpression() );
+
+                // TODO: recheck this? We are adding a flat wall to be hit if a mapping is missed
+                ( (PlexusMutableWebConfiguration) plexusWebConfiguration )
+                    .addProtectedResource(
+                        "/service/**",
+                        "authcBasic,perms[nexus:someFreakinStupidPermToCatchAllUnprotectedsAndOnlyAdminWillHaveItSinceItHaveAStar]" );
             }
             catch ( SecurityConfigurationException e )
             {
                 throw new IllegalStateException( "Could not configure JSecurity to protect resource mounted to "
-                    + resource.getResourceUri() + " of class " + resource.getClass().getName() );
+                    + resource.getResourceUri() + " of class " + resource.getClass().getName(), e );
             }
         }
     }

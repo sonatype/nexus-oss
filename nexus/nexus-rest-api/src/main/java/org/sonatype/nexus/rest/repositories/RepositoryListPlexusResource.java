@@ -2,7 +2,6 @@ package org.sonatype.nexus.rest.repositories;
 
 import java.io.IOException;
 import java.util.Collection;
-import java.util.logging.Level;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.restlet.Context;
