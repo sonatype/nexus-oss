@@ -65,6 +65,7 @@ import org.sonatype.nexus.integrationtests.nexus688.Nexus688ReindexOnRepoAdd;
 import org.sonatype.nexus.integrationtests.nexus782.Nexus782UploadWithClassifier;
 import org.sonatype.nexus.integrationtests.nexus810.Nexus810PackageNamesInNexusConf;
 import org.sonatype.nexus.integrationtests.nexus810.Nexus810PackageNamesInRestMessages;
+import org.sonatype.nexus.integrationtests.nexus947.Nexus947GroupBrowsing;
 import org.sonatype.nexus.integrationtests.proxy.nexus177.Nexus177OutOfServiceTest;
 import org.sonatype.nexus.integrationtests.proxy.nexus178.Nexus178BlockProxyDownloadTest;
 import org.sonatype.nexus.integrationtests.proxy.nexus179.Nexus179RemoteRepoDownTest;
@@ -144,7 +145,8 @@ import org.sonatype.nexus.integrationtests.upgrades.nexus652.Nexus652Beta5To10Up
     Nexus782UploadWithClassifier.class,
     Nexus688ReindexOnRepoAdd.class,
     Nexus384DotAndDashSearchTest.class,
-    Nexus642SynchShadowTaskTest.class  } )
+    Nexus642SynchShadowTaskTest.class,
+    Nexus947GroupBrowsing.class } )
 public class IntegrationTestSuiteClasses
 {
 

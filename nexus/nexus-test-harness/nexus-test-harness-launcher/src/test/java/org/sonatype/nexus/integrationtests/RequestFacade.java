@@ -32,6 +32,8 @@ import org.sonatype.nexus.test.utils.TestProperties;
 
 public class RequestFacade
 {
+    public static final String SERVICE_LOCAL = "service/local/";
+    
     private static final Logger LOG = Logger.getLogger( RequestFacade.class );
 
     public static Response doGetRequest( String serviceURIpart )
