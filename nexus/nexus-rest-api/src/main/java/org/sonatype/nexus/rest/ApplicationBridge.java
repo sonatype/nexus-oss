@@ -53,12 +53,12 @@ public class ApplicationBridge
     @Requirement( hint = "nexusInstance" )
     private Filter nexusInstanceFilter;
 
-    @Requirement(hint= "StatusPlexusResource")
+    @Requirement( hint = "StatusPlexusResource" )
     private ManagedPlexusResource statusPlexusResource;
-    
-    @Requirement(hint= "CommandPlexusResource")
+
+    @Requirement( hint = "CommandPlexusResource" )
     private ManagedPlexusResource commandPlexusResource;
-    
+
     /**
      * Listener.
      */
@@ -90,7 +90,7 @@ public class ApplicationBridge
         return XStreamInitializer.initialize( xstream );
     }
 
-    protected Router initializeRouter( Router root )
+    protected Router initializeRouter( Router root, boolean isStarted )
     {
         // instance filter, that injects proper Nexus instance into request attributes
         nexusInstanceFilter.setContext( getContext() );
@@ -114,8 +114,8 @@ public class ApplicationBridge
      */
     protected void doCreateRoot( Router applicationRouter, boolean isStarted )
     {
-        attach( applicationRouter, false, this.statusPlexusResource);
-        
-        attach( applicationRouter, false, this.commandPlexusResource);
+        attach( applicationRouter, false, this.statusPlexusResource );
+
+        attach( applicationRouter, false, this.commandPlexusResource );
     }
 }
