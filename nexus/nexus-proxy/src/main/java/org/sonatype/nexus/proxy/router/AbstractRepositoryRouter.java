@@ -21,13 +21,12 @@
 package org.sonatype.nexus.proxy.router;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -205,6 +204,49 @@ public abstract class AbstractRepositoryRouter
                     result = dereferencedResult;
                 }
             }
+
+            // postprocess and replace findings with "group store files" that
+            // are simply overlating those found id reposes NEXUS-914
+
+            List<StorageItem> replacements = new ArrayList<StorageItem>();
+
+            for ( Iterator<StorageItem> i = result.iterator(); i.hasNext(); )
+            {
+                StorageItem item = i.next();
+
+                // check for files only
+                if ( StorageFileItem.class.isAssignableFrom( item.getClass() ) )
+                {
+                    // try to give it from our own file store
+                    File fileItem = getFileStoreFile( item.getPath() );
+
+                    if ( fileItem.exists() && fileItem.isFile() )
+                    {
+                        DefaultStorageFileItem file = new DefaultStorageFileItem(
+                            this,
+                            request.getRequestPath(),
+                            true,
+                            true,
+                            new FileContentLocator( fileItem ) );
+
+                        file.setCreated( fileItem.lastModified() );
+
+                        file.setModified( fileItem.lastModified() );
+
+                        file.setLength( fileItem.length() );
+
+                        replacements.add( file );
+
+                        i.remove();
+                    }
+                }
+            }
+
+            if ( !replacements.isEmpty() )
+            {
+                result.addAll( replacements );
+            }
+
             return result;
         }
         catch ( ItemNotFoundException ex )
