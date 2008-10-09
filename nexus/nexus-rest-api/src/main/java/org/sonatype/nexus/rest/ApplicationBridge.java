@@ -77,6 +77,7 @@ public class ApplicationBridge
     /**
      * Adding this as config change listener.
      */
+    @Override
     protected void doConfigure()
     {
         nexus.getNexusConfiguration().addProximityEventListener( this );
@@ -85,11 +86,13 @@ public class ApplicationBridge
     /**
      * Configuring xstream with our aliases.
      */
+    @Override
     protected XStream doConfigureXstream( XStream xstream )
     {
         return XStreamInitializer.initialize( xstream );
     }
 
+    @Override
     protected Router initializeRouter( Router root, boolean isStarted )
     {
         // instance filter, that injects proper Nexus instance into request attributes
@@ -112,6 +115,7 @@ public class ApplicationBridge
      * 
      * @TODO Move this to PlexusResources, except Status (see isStarted usage below!)
      */
+    @Override
     protected void doCreateRoot( Router applicationRouter, boolean isStarted )
     {
         attach( applicationRouter, false, this.statusPlexusResource );

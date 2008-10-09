@@ -99,6 +99,7 @@ public class NexusApplication
     /**
      * Adding this as config change listener.
      */
+    @Override
     protected void doConfigure()
     {
         nexus.getNexusConfiguration().addProximityEventListener( this );
@@ -107,11 +108,13 @@ public class NexusApplication
     /**
      * Configuring xstream with our aliases.
      */
+    @Override
     protected XStream doConfigureXstream( XStream xstream )
     {
         return XStreamInitializer.initialize( xstream );
     }
 
+    @Override
     protected Router initializeRouter( Router root, boolean isStarted )
     {
         // ===============
@@ -166,6 +169,7 @@ public class NexusApplication
      * 
      * @TODO Move this to PlexusResources, except Status (see isStarted usage below!)
      */
+    @Override
     protected void doCreateRoot( Router applicationRouter, boolean isStarted )
     {
         // SERVICE (two always connected, unrelated to isStarted)
@@ -186,6 +190,7 @@ public class NexusApplication
         }
     }
 
+    @Override
     protected void handlePlexusResourceSecurity( PlexusResource resource )
     {
         PathProtectionDescriptor descriptor = resource.getResourceProtection();

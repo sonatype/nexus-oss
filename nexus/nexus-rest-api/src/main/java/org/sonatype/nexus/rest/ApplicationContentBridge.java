@@ -69,6 +69,7 @@ public class ApplicationContentBridge
     /**
      * Adding this as config change listener.
      */
+    @Override
     protected void doConfigure()
     {
         nexus.getNexusConfiguration().addProximityEventListener( this );
@@ -77,6 +78,7 @@ public class ApplicationContentBridge
     /**
      * Configuring xstream with our aliases.
      */
+    @Override
     protected XStream doConfigureXstream( XStream xstream )
     {
         return XStreamInitializer.initialize( xstream );
@@ -85,6 +87,7 @@ public class ApplicationContentBridge
     /**
      * Creating restlet application root.
      */
+    @Override
     protected void doCreateRoot( Router root, boolean isStarted )
     {
         if ( !isStarted )
