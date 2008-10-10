@@ -6,10 +6,12 @@ import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.restlet.Application;
+import org.restlet.Component;
 import org.restlet.Context;
 
 import com.noelios.restlet.ext.servlet.ServerServlet;
 import com.noelios.restlet.ext.servlet.ServletContextAdapter;
+import com.noelios.restlet.ext.servlet.ServletWarClient;
 
 public class PlexusServerServlet
     extends ServerServlet
@@ -19,6 +21,15 @@ public class PlexusServerServlet
     public PlexusContainer getPlexusContainer()
     {
         return (PlexusContainer) getServletContext().getAttribute( PlexusConstants.PLEXUS_KEY );
+    }
+
+    protected Component createComponent()
+    {
+        Component result = super.createComponent();
+
+        result.getClients().add( new ServletWarClient( result.getContext(), getServletContext() ) );
+
+        return result;
     }
 
     public Application createApplication( Context context )
