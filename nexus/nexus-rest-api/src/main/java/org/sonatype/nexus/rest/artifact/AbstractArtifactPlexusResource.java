@@ -274,6 +274,7 @@ public abstract class AbstractArtifactPlexusResource
                 Representation result = new StorageFileItemRepresentation( file );
 
                 result.setDownloadable( true );
+                
                 result.setDownloadName( file.getName() );
 
                 return result;

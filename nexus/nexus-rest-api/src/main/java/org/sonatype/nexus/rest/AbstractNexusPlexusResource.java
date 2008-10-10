@@ -91,6 +91,18 @@ public abstract class AbstractNexusPlexusResource
         return (FileItemFactory) context.getAttributes().get( NexusApplication.FILEITEM_FACTORY );
     }
 
+    /**
+     * Centralized, since this is the only "dependent" stuff that relies on knowledge where restlet.Application is
+     * mounted (we had a /service => / move).
+     * 
+     * @param request
+     * @return
+     */
+    protected Reference getContextRoot( Request request )
+    {
+        return request.getRootRef();
+    }
+
     protected Reference createChildReference( Request request, String childPath )
     {
         Reference result = new Reference( request.getResourceRef() ).addSegment( childPath ).getTargetRef();
@@ -105,7 +117,7 @@ public abstract class AbstractNexusPlexusResource
 
     protected Reference createRootReference( Request request, String relPart )
     {
-        Reference ref = new Reference( request.getRootRef(), relPart );
+        Reference ref = new Reference( getContextRoot( request ), relPart );
 
         if ( !ref.getBaseRef().getPath().endsWith( "/" ) )
         {
@@ -124,8 +136,7 @@ public abstract class AbstractNexusPlexusResource
      */
     protected Reference createRepositoryReference( Request request, String repoId )
     {
-        return createReference( request.getRootRef().getParentRef(), "service/local/repositories/" + repoId )
-            .getTargetRef();
+        return createReference( getContextRoot( request ), "service/local/repositories/" + repoId ).getTargetRef();
     }
 
     /**
