@@ -133,27 +133,27 @@ public class NexusApplication
         // INDEX.HTML
         attach( root, true, indexTemplateResource );
 
-        Directory docs = new Directory( getContext(), "war:///docs" );
+        Directory docs = new Directory( getContext(), "war:///docs/" );
         docs.setListingAllowed( false );
         docs.setNegotiateContent( false );
         attach( root, false, "/docs/", docs );
 
-        Directory ext = new Directory( getContext(), "war:///ext-2.2" );
+        Directory ext = new Directory( getContext(), "war:///ext-2.2/" );
         ext.setListingAllowed( false );
         ext.setNegotiateContent( false );
         attach( root, false, "/ext-2.2/", ext );
 
-        Directory images = new Directory( getContext(), "war:///images" );
+        Directory images = new Directory( getContext(), "war:///images/" );
         images.setListingAllowed( false );
         images.setNegotiateContent( false );
         attach( root, false, "/images/", images );
 
-        Directory js = new Directory( getContext(), "war:///js" );
-        js.setListingAllowed( false );
-        js.setNegotiateContent( false );
+        Directory js = new Directory( getContext(), "war:///js/" );
+        //js.setListingAllowed( false );
+        //js.setNegotiateContent( false );
         attach( root, false, "/js/", js );
 
-        Directory style = new Directory( getContext(), "war:///style" );
+        Directory style = new Directory( getContext(), "war:///style/" );
         style.setListingAllowed( false );
         style.setNegotiateContent( false );
         attach( root, false, "/style/", style );
