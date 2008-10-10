@@ -20,10 +20,14 @@
  */
 package org.sonatype.nexus.rest;
 
+import java.util.List;
+
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
+import org.restlet.data.MediaType;
 import org.restlet.data.Request;
 import org.restlet.resource.ResourceException;
+import org.restlet.resource.Variant;
 import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryGroupException;
@@ -56,6 +60,16 @@ public class ContentPlexusResource
     public PathProtectionDescriptor getResourceProtection()
     {
         return new PathProtectionDescriptor( "/**", "contentAuthcBasic,contentTperms" );
+    }
+
+    public List<Variant> getVariants()
+    {
+        List<Variant> result = super.getVariants();
+
+        // default this presentation to HTML to enable user browsing
+        result.add( 0, new Variant( MediaType.TEXT_HTML ) );
+
+        return result;
     }
 
     @Override

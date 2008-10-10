@@ -87,16 +87,6 @@ public abstract class AbstractResourceStoreContentPlexusResource
         return true;
     }
 
-    public List<Variant> getVariants()
-    {
-        List<Variant> result = super.getVariants();
-
-        // default this presentation to HTML
-        result.add( 0, new Variant( MediaType.TEXT_HTML ) );
-
-        return result;
-    }
-
     protected String getResourceStorePath( Request request )
     {
         return parsePathFromUri( request.getResourceRef().getRemainingPart() );
