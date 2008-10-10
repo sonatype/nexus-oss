@@ -12,9 +12,13 @@ import org.sonatype.nexus.tasks.descriptors.PurgeTimelineTaskDescriptor;
 import org.sonatype.nexus.test.utils.FeedUtil;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 
+import com.sun.syndication.feed.atom.Entry;
 import com.sun.syndication.feed.synd.SyndEntry;
 import com.sun.syndication.feed.synd.SyndFeed;
 
+/**
+ * Test if the Purge Timeline Task works.
+ */
 public class Nexus639PurgeTaskTest
     extends AbstractNexusIntegrationTest
 {
@@ -43,6 +47,11 @@ public class Nexus639PurgeTaskTest
         feed = FeedUtil.getFeed( "recentlyDeployed" );
         entries = feed.getEntries();
         
+//        for ( SyndEntry syndEntry : entries )
+//        {
+//            System.out.println( "entry: "+ syndEntry.getTitle() );
+//        }
+//        
         Assert.assertTrue("Expected ZERO artifacts in the recentlyDeployed feed.", entries.size() == 0 );
     }
 

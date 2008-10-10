@@ -19,6 +19,8 @@ import org.sonatype.nexus.rest.model.RepositoryListResourceResponse;
 import org.sonatype.nexus.rest.model.RepositoryResource;
 import org.sonatype.nexus.rest.model.RepositoryResourceResponse;
 import org.sonatype.nexus.rest.model.RepositoryShadowResource;
+import org.sonatype.nexus.rest.model.RepositoryStatusResource;
+import org.sonatype.nexus.rest.model.RepositoryStatusResourceResponse;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
 
 import com.thoughtworks.xstream.XStream;
@@ -74,13 +76,13 @@ public class RepositoryMessageUtil
 
         Assert.assertEquals( repo.getFormat(), responseResource.getFormat() );
         Assert.assertEquals( repo.getRepoType(), responseResource.getRepoType() );
-        
-        if( repo.getRepoType().equals( "virtual" ))
+
+        if ( repo.getRepoType().equals( "virtual" ) )
         {
             // check mirror
             RepositoryShadowResource expected = (RepositoryShadowResource) repo;
             RepositoryShadowResource actual = (RepositoryShadowResource) responseResource;
-            
+
             Assert.assertEquals( expected.getShadowOf(), actual.getShadowOf() );
         }
         else
@@ -89,39 +91,35 @@ public class RepositoryMessageUtil
             RepositoryResource actual = (RepositoryResource) responseResource;
 
             Assert.assertEquals( expected.getChecksumPolicy(), actual.getChecksumPolicy() );
-            
+
             // TODO: sometimes the storage dir ends with a '/' SEE: NEXUS-542
             if ( actual.getDefaultLocalStorageUrl().endsWith( "/" ) )
             {
                 Assert.assertTrue( "Unexpected defaultLocalStorage: <expected to end with> " + "runtime/work/storage/"
-                    + repo.getId() + "/  <actual>" + actual.getDefaultLocalStorageUrl(),
-                    actual.getDefaultLocalStorageUrl().endsWith(
-                                                                                          "runtime/work/storage/"
-                                                                                              + repo.getId() + "/" ) );
+                    + repo.getId() + "/  <actual>" + actual.getDefaultLocalStorageUrl(), actual
+                    .getDefaultLocalStorageUrl().endsWith( "runtime/work/storage/" + repo.getId() + "/" ) );
             }
             // NOTE one of these blocks should be removed
             else
             {
                 Assert.assertTrue( "Unexpected defaultLocalStorage: <expected to end with> " + "runtime/work/storage/"
-                    + repo.getId() + "  <actual>" + actual.getDefaultLocalStorageUrl(),
-                    actual.getDefaultLocalStorageUrl().endsWith(
-                                                                                          "runtime/work/storage/"
-                                                                                              + repo.getId() ) );
+                    + repo.getId() + "  <actual>" + actual.getDefaultLocalStorageUrl(), actual
+                    .getDefaultLocalStorageUrl().endsWith( "runtime/work/storage/" + repo.getId() ) );
             }
-            
 
             Assert.assertEquals( expected.getNotFoundCacheTTL(), actual.getNotFoundCacheTTL() );
             Assert.assertEquals( expected.getOverrideLocalStorageUrl(), actual.getOverrideLocalStorageUrl() );
-            
-            if( expected.getRemoteStorage() == null )
+
+            if ( expected.getRemoteStorage() == null )
             {
                 Assert.assertNull( actual.getRemoteStorage() );
             }
             else
             {
-                Assert.assertEquals( expected.getRemoteStorage().getRemoteStorageUrl(), actual.getRemoteStorage().getRemoteStorageUrl() );   
+                Assert.assertEquals( expected.getRemoteStorage().getRemoteStorageUrl(), actual
+                    .getRemoteStorage().getRemoteStorageUrl() );
             }
-            
+
             Assert.assertEquals( expected.getRepoPolicy(), actual.getRepoPolicy() );
         }
 
@@ -133,21 +131,23 @@ public class RepositoryMessageUtil
         throws IOException
     {
 
-        String responseText =
-            RequestFacade.doGetRequest( "service/local/repositories/" + repoId ).getEntity().getText();
+        String responseText = RequestFacade
+            .doGetRequest( "service/local/repositories/" + repoId ).getEntity().getText();
         LOG.debug( "responseText: \n" + responseText );
 
         // this should use call to: getResourceFromResponse
-        XStreamRepresentation representation =
-            new XStreamRepresentation( XStreamFactory.getXmlXStream(), responseText, MediaType.APPLICATION_XML );
+        XStreamRepresentation representation = new XStreamRepresentation(
+            XStreamFactory.getXmlXStream(),
+            responseText,
+            MediaType.APPLICATION_XML );
 
-        RepositoryResourceResponse resourceResponse =
-            (RepositoryResourceResponse) representation.getPayload( new RepositoryResourceResponse() );
+        RepositoryResourceResponse resourceResponse = (RepositoryResourceResponse) representation
+            .getPayload( new RepositoryResourceResponse() );
 
         return (RepositoryBaseResource) resourceResponse.getData();
     }
 
-    public RepositoryBaseResource updateRepo( RepositoryResource repo )
+    public RepositoryBaseResource updateRepo( RepositoryBaseResource repo )
         throws IOException
     {
         Response response = this.sendMessage( Method.PUT, repo );
@@ -176,7 +176,7 @@ public class RepositoryMessageUtil
         XStreamRepresentation representation = new XStreamRepresentation( xstream, "", mediaType );
 
         String idPart = ( method == Method.POST ) ? "" : "/" + id;
-        
+
         String serviceURI = "service/local/repositories" + idPart;
 
         RepositoryResourceResponse repoResponseRequest = new RepositoryResourceResponse();
@@ -209,11 +209,13 @@ public class RepositoryMessageUtil
         String responseText = RequestFacade.doGetRequest( "service/local/repositories" ).getEntity().getText();
         LOG.debug( "responseText: \n" + responseText );
 
-        XStreamRepresentation representation =
-            new XStreamRepresentation( XStreamFactory.getXmlXStream(), responseText, MediaType.APPLICATION_XML );
+        XStreamRepresentation representation = new XStreamRepresentation(
+            XStreamFactory.getXmlXStream(),
+            responseText,
+            MediaType.APPLICATION_XML );
 
-        RepositoryListResourceResponse resourceResponse =
-            (RepositoryListResourceResponse) representation.getPayload( new RepositoryListResourceResponse() );
+        RepositoryListResourceResponse resourceResponse = (RepositoryListResourceResponse) representation
+            .getPayload( new RepositoryListResourceResponse() );
 
         return resourceResponse.getData();
 
@@ -226,8 +228,8 @@ public class RepositoryMessageUtil
         LOG.debug( " getResourceFromResponse: " + responseString );
 
         XStreamRepresentation representation = new XStreamRepresentation( xstream, responseString, mediaType );
-        RepositoryResourceResponse resourceResponse =
-            (RepositoryResourceResponse) representation.getPayload( new RepositoryResourceResponse() );
+        RepositoryResourceResponse resourceResponse = (RepositoryResourceResponse) representation
+            .getPayload( new RepositoryResourceResponse() );
 
         return (RepositoryResource) resourceResponse.getData();
     }
@@ -235,13 +237,13 @@ public class RepositoryMessageUtil
     private void validateRepoInNexusConfig( RepositoryBaseResource repo )
         throws IOException
     {
-        
-        if( repo.getRepoType().equals( "virtual" ))
+
+        if ( repo.getRepoType().equals( "virtual" ) )
         {
             // check mirror
             RepositoryShadowResource expected = (RepositoryShadowResource) repo;
             CRepositoryShadow cRepo = NexusConfigUtil.getRepoShadow( repo.getId() );
-            
+
             Assert.assertEquals( expected.getShadowOf(), cRepo.getShadowOf() );
             Assert.assertEquals( expected.getId(), cRepo.getId() );
             Assert.assertEquals( expected.getName(), cRepo.getName() );
@@ -252,23 +254,24 @@ public class RepositoryMessageUtil
             RepositoryResource expected = (RepositoryResource) repo;
             CRepository cRepo = NexusConfigUtil.getRepo( repo.getId() );
 
-        Assert.assertEquals( expected.getId(), cRepo.getId() );
-        Assert.assertEquals( expected.getChecksumPolicy(), cRepo.getChecksumPolicy() );
-        Assert.assertEquals( expected.getName(), cRepo.getName() );
-        Assert.assertEquals( expected.getFormat(), cRepo.getType() );
-        Assert.assertEquals( expected.getNotFoundCacheTTL(), cRepo.getNotFoundCacheTTL() );
-        Assert.assertEquals( expected.getOverrideLocalStorageUrl(), cRepo.getLocalStorage() );
-        
-        if( expected.getRemoteStorage() == null )
-        {
-            Assert.assertNull( cRepo.getRemoteStorage() );
-        }
-        else
-        {
-            Assert.assertEquals( expected.getRemoteStorage().getRemoteStorageUrl(), cRepo.getRemoteStorage().getUrl() );   
-        }
-        
-        Assert.assertEquals( expected.getRepoPolicy(), cRepo.getRepositoryPolicy() );
+            Assert.assertEquals( expected.getId(), cRepo.getId() );
+            Assert.assertEquals( expected.getChecksumPolicy(), cRepo.getChecksumPolicy() );
+            Assert.assertEquals( expected.getName(), cRepo.getName() );
+            Assert.assertEquals( expected.getFormat(), cRepo.getType() );
+            Assert.assertEquals( expected.getNotFoundCacheTTL(), cRepo.getNotFoundCacheTTL() );
+            Assert.assertEquals( expected.getOverrideLocalStorageUrl(), cRepo.getLocalStorage() );
+
+            if ( expected.getRemoteStorage() == null )
+            {
+                Assert.assertNull( cRepo.getRemoteStorage() );
+            }
+            else
+            {
+                Assert.assertEquals( expected.getRemoteStorage().getRemoteStorageUrl(), cRepo
+                    .getRemoteStorage().getUrl() );
+            }
+
+            Assert.assertEquals( expected.getRepoPolicy(), cRepo.getRepositoryPolicy() );
         }
 
     }
@@ -282,12 +285,48 @@ public class RepositoryMessageUtil
             String serviceURI = "service/local/data_index/repositories/" + repo + "/content";
             Response response = RequestFacade.sendMessage( serviceURI, Method.DELETE );
             Status status = response.getStatus();
-            Assert.assertTrue( "Fail to update " + repo + " repository index " + status,
-                               status.isSuccess() );
+            Assert.assertTrue( "Fail to update " + repo + " repository index " + status, status.isSuccess() );
         }
 
         // let s w8 a few time for indexes
         Thread.sleep( 1000 * repositories.length );
+
+    }
+
+    public RepositoryStatusResource getStatus( String repoId )
+        throws IOException
+    {
+
+        Response response = RequestFacade.sendMessage( RequestFacade.SERVICE_LOCAL + "repositories/" + repoId
+            + "/status", Method.GET );
+        Status status = response.getStatus();
+        Assert.assertTrue( "Fail to getStatus for '" + repoId + "' repository" + status, status.isSuccess() );
+
+        XStreamRepresentation representation = new XStreamRepresentation(
+            this.xstream,
+            response.getEntity().getText(),
+            MediaType.APPLICATION_XML );
+
+        RepositoryStatusResourceResponse resourceResponse = (RepositoryStatusResourceResponse) representation
+            .getPayload( new RepositoryStatusResourceResponse() );
+
+        return resourceResponse.getData();
+    }
+
+    public void updateStatus( RepositoryStatusResource repoStatus )
+        throws IOException
+    {
+        String uriPart = RequestFacade.SERVICE_LOCAL + "repositories/" + repoStatus.getId() + "/status";
+
+        XStreamRepresentation representation = new XStreamRepresentation( this.xstream, "", MediaType.APPLICATION_XML );
+        RepositoryStatusResourceResponse resourceResponse = new RepositoryStatusResourceResponse();
+        resourceResponse.setData( repoStatus );
+        representation.setPayload( resourceResponse );
+
+        Response response = RequestFacade.sendMessage( uriPart, Method.PUT, representation );
+        Status status = response.getStatus();
+        Assert.assertTrue( "Fail to update '" + repoStatus.getId() + "' repository status " + status +"\nResponse:\n"+ response.getEntity().getText() +"\nrepresentation:\n"+ representation.getText(), status
+            .isSuccess() );
 
     }
 

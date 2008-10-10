@@ -92,10 +92,9 @@ public class TaskScheduleUtil
      * @return
      * @throws Exception
      */
-    public static ScheduledServiceListResource waitForTask( String name )
+    public static ScheduledServiceListResource waitForTask( String name, int maxAttempts )
         throws Exception
     {
-        int maxAttempts = 20;
         long sleep = 200;
 
         for ( int attempt = 0; attempt < maxAttempts; attempt++ )
@@ -154,7 +153,7 @@ public class TaskScheduleUtil
         return runTask( typeId, typeId, properties );
     }
 
-    public static ScheduledServiceListResource runTask( String taskName, String typeId,
+    public static ScheduledServiceListResource runTask( String taskName, String typeId, int maxAttempts,
         ScheduledServicePropertyResource... properties )
         throws Exception
     {
@@ -177,7 +176,14 @@ public class TaskScheduleUtil
         status = TaskScheduleUtil.run( taskId );
         Assert.assertTrue( "Unable to run task:" + scheduledTask.getTypeId(), status.isSuccess() );
 
-        return waitForTask( taskName );
+        return waitForTask( taskName, maxAttempts );
+    }
+    
+    public static ScheduledServiceListResource runTask( String taskName, String typeId,
+        ScheduledServicePropertyResource... properties )
+        throws Exception
+    {
+        return runTask( typeId, typeId, 20, properties );
     }
 
 }
