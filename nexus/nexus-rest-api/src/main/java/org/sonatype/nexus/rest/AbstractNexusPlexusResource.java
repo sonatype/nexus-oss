@@ -105,7 +105,7 @@ public abstract class AbstractNexusPlexusResource
 
     protected Reference createRootReference( Request request, String relPart )
     {
-        Reference ref = new Reference( request.getRootRef().getParentRef(), relPart );
+        Reference ref = new Reference( request.getRootRef(), relPart );
 
         if ( !ref.getBaseRef().getPath().endsWith( "/" ) )
         {
