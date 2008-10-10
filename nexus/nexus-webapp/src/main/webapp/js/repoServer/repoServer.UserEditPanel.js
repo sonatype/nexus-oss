@@ -86,6 +86,7 @@ Sonatype.repoServer.UserEditPanel = function(config){
     {name:'email'},
     {name:'status'},
     {name:'roles'},
+    {name:'readOnly'},
     {name:'displayRoles', mapping:'roles', convert: this.roleCombiner.createDelegate(this)}
   ]);
   
@@ -364,6 +365,7 @@ Sonatype.repoServer.UserEditPanel = function(config){
     deferredRender: false,
     columns: [
       {header: 'User ID', dataIndex: 'userId', width:120, id: 'user-config-userid-col'},
+      {header: 'Read only', dataIndex: 'readOnly', width:60, id: 'user-config-readonly-col'},
       {header: 'Name', dataIndex: 'name', width:175, id: 'user-config-name-col'},
       {header: 'Email', dataIndex: 'email', width:175, id: 'user-config-email-col'},
       {header: 'Status', dataIndex: 'status', width:75, id: 'user-config-status-col'},
@@ -680,6 +682,7 @@ Ext.extend(Sonatype.repoServer.UserEditPanel, Ext.Panel, {
           email : receivedData.email,
           status : receivedData.status,
           roles : receivedData.roles,
+          readOnly : receivedData.readOnly,
           displayRoles : this.roleCombiner(receivedData.roles)
         };
         
@@ -731,6 +734,7 @@ Ext.extend(Sonatype.repoServer.UserEditPanel, Ext.Panel, {
         rec.set('email', receivedData.email);
         rec.set('status', receivedData.status);
         rec.set('roles', receivedData.roles);
+        rec.set('readOnly', receivedData.readOnly);
         rec.set('displayRoles', this.roleCombiner(receivedData.roles));
         rec.commit();
         rec.endEdit();

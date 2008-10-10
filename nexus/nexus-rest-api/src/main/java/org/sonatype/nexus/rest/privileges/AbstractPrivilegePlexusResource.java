@@ -74,6 +74,7 @@ public abstract class AbstractPrivilegePlexusResource extends AbstractNexusPlexu
             resource.setName( privilege.getName() );
             resource.setDescription( privilege.getDescription() );
             resource.setResourceURI( this.createChildReference( request, resource.getId() ).toString() );
+            resource.setReadOnly( privilege.isReadOnly() );
             
             for ( CProperty prop : ( List<CProperty> ) privilege.getProperties() )
             {

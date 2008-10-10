@@ -67,7 +67,8 @@ Sonatype.repoServer.RoleEditPanel = function(config){
     {name:'description'},
     {name:'sessionTimeout'},
     {name:'privileges'},
-    {name:'roles'}
+    {name:'roles'},
+    {name:'readOnly'}
   ]);
   
   this.privRecordConstructor = Ext.data.Record.create([
@@ -330,6 +331,7 @@ Sonatype.repoServer.RoleEditPanel = function(config){
     deferredRender: false,
     columns: [
       {header: 'Name', dataIndex: 'name', width:175, id: 'role-config-name-col'},
+      {header: 'Read only', dataIndex: 'readOnly', width:60, id: 'role-config-readonly-col'},
       {header: 'Session Timeout', dataIndex: 'sessionTimeout', width:175, id: 'role-config-session-timeout-col'},
       {header: 'Description', dataIndex: 'description', width:175, id: 'role-config-description-col'}      
     ],
@@ -608,7 +610,8 @@ Ext.extend(Sonatype.repoServer.RoleEditPanel, Ext.Panel, {
           description : receivedData.description,
           privileges : receivedData.privileges,
           roles : receivedData.roles,
-          sessionTimeout : receivedData.sessionTimeout
+          sessionTimeout : receivedData.sessionTimeout,
+          readOnly : receivedData.readOnly
         };
         
         var newRec = new this.roleRecordConstructor(
@@ -658,6 +661,7 @@ Ext.extend(Sonatype.repoServer.RoleEditPanel, Ext.Panel, {
         rec.set('privileges', receivedData.privileges);
         rec.set('sessionTimeout', receivedData.sessionTimeout);
         rec.set('roles', receivedData.roles);
+        rec.set('readOnly', receivedData.readOnly);
         rec.commit();
         rec.endEdit();
   },

@@ -81,6 +81,7 @@ Sonatype.repoServer.PrivilegeEditPanel = function(config){
     {name:'method'},
     {name:'repositoryTargetId'},
     {name:'description'},
+    {name:'readOnly'},
     {name:'sTarget', mapping:'repositoryTargetId', convert: this.getRepositoryTarget.createDelegate(this)}
   ]);
   
@@ -476,6 +477,7 @@ Sonatype.repoServer.PrivilegeEditPanel = function(config){
     deferredRender: false,
     columns: [
       {header: 'Name', dataIndex: 'name', width:175, id: 'privilege-config-name-col'},
+      {header: 'Read only', dataIndex: 'readOnly', width:60 ,id: 'privilege-config-readonly-col'},
       {header: 'Type', dataIndex: 'type', width:175, id: 'privilege-config-type-col'},
       {header: 'Target', dataIndex: 'sTarget', width:175, id: 'privilege-config-target-col'},
       {header: 'Method', dataIndex: 'method', width:175, id: 'privilege-config-method-col'}
@@ -764,6 +766,7 @@ Ext.extend(Sonatype.repoServer.PrivilegeEditPanel, Ext.Panel, {
         rec.set('name', receivedData.name);
         rec.set('resourceURI', receivedData.resourceURI);
         rec.set('description', receivedData.description);
+        rec.set('readOnly', receivedData.readOnly);
         rec.commit();
         rec.endEdit();
   },
