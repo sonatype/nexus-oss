@@ -44,8 +44,6 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.nexus.artifact.M2ArtifactRecognizer;
 import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
-import org.sonatype.nexus.proxy.NoSuchResourceStoreException;
-import org.sonatype.nexus.proxy.ResourceStore;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.events.AbstractEvent;
@@ -55,7 +53,6 @@ import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.registry.ContentClass;
-import org.sonatype.nexus.proxy.router.AbstractRegistryDrivenRepositoryRouter;
 import org.sonatype.nexus.proxy.router.DefaultGroupIdBasedRepositoryRouter;
 import org.sonatype.nexus.proxy.router.GroupIdBasedRepositoryRouter;
 import org.sonatype.nexus.proxy.router.RepositoryRouter;
@@ -220,9 +217,12 @@ public class M2GroupIdBasedRepositoryRouter
                     spoofedContent = is;
                     spoofedLength = bos.size();
 
-                    getLogger().debug(
-                        "Item for path " + request.getRequestPath() + " merged from "
-                            + Integer.toString( listOfStorageItems.size() ) + " found items." );
+                    if ( getLogger().isDebugEnabled() )
+                    {
+                        getLogger().debug(
+                            "Item for path " + request.getRequestPath() + " merged from "
+                                + Integer.toString( listOfStorageItems.size() ) + " found items." );
+                    }
                 }
                 catch ( NoSuchAlgorithmException ex )
                 {
@@ -244,8 +244,11 @@ public class M2GroupIdBasedRepositoryRouter
                     spoofedContent = new FileInputStream( tmpFile );
                     spoofedLength = tmpFile.length();
 
-                    getLogger().info(
-                        "Item for path " + request.getRequestPath() + " SPOOFED with merged metadata checksum." );
+                    if ( getLogger().isDebugEnabled() )
+                    {
+                        getLogger().debug(
+                            "Item for path " + request.getRequestPath() + " SPOOFED with merged metadata checksum." );
+                    }
                 }
                 catch ( FileNotFoundException ex )
                 {
@@ -308,7 +311,5 @@ public class M2GroupIdBasedRepositoryRouter
     {
         return DefaultGroupIdBasedRepositoryRouter.ID;
     }
-
-
 
 }
