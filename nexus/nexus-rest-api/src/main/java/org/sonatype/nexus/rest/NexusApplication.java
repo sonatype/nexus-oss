@@ -149,8 +149,8 @@ public class NexusApplication
         attach( root, false, "/images/", images );
 
         Directory js = new Directory( getContext(), "war:///js/" );
-        //js.setListingAllowed( false );
-        //js.setNegotiateContent( false );
+        js.setListingAllowed( false );
+        js.setNegotiateContent( false );
         attach( root, false, "/js/", js );
 
         Directory style = new Directory( getContext(), "war:///style/" );
@@ -247,6 +247,22 @@ public class NexusApplication
             // CONTENT, attaching it after nif
             localNexusInstanceFilter.setNext( contentRouter );
         }
+
+        if ( PlexusMutableWebConfiguration.class.isAssignableFrom( plexusWebConfiguration.getClass() ) )
+        {
+            try
+            {
+                // TODO: recheck this? We are adding a flat wall to be hit if a mapping is missed
+                ( (PlexusMutableWebConfiguration) plexusWebConfiguration )
+                    .addProtectedResource(
+                        "/service/**",
+                        "authcBasic,perms[nexus:someFreakinStupidPermToCatchAllUnprotectedsAndOnlyAdminWillHaveItSinceItHaveAStar]" );
+            }
+            catch ( SecurityConfigurationException e )
+            {
+                throw new IllegalStateException( "Could not configure JSecurity to add WALL to the end of the chain", e );
+            }
+        }
     }
 
     @Override
@@ -265,12 +281,6 @@ public class NexusApplication
             {
                 ( (PlexusMutableWebConfiguration) plexusWebConfiguration ).addProtectedResource( "/service/*"
                     + descriptor.getPathPattern(), descriptor.getFilterExpression() );
-
-                // TODO: recheck this? We are adding a flat wall to be hit if a mapping is missed
-                ( (PlexusMutableWebConfiguration) plexusWebConfiguration )
-                    .addProtectedResource(
-                        "/service/**",
-                        "authcBasic,perms[nexus:someFreakinStupidPermToCatchAllUnprotectedsAndOnlyAdminWillHaveItSinceItHaveAStar]" );
             }
             catch ( SecurityConfigurationException e )
             {
