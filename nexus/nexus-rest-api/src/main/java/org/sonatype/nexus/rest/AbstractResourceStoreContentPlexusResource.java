@@ -72,6 +72,15 @@ public abstract class AbstractResourceStoreContentPlexusResource
     extends AbstractNexusPlexusResource
 {
     public static final String IS_LOCAL_PARAMETER = "isLocal";
+    
+    public AbstractResourceStoreContentPlexusResource()
+    {
+        super();
+        
+        setReadable( true );
+        
+        setModifiable( true );
+    }
 
     public boolean acceptsUpload()
     {
