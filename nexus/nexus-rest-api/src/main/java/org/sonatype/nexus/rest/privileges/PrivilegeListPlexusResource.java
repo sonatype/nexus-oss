@@ -9,9 +9,9 @@ import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
-import org.sonatype.jsecurity.model.CPrivilege;
-import org.sonatype.jsecurity.model.CProperty;
 import org.sonatype.jsecurity.realms.tools.InvalidConfigurationException;
+import org.sonatype.jsecurity.realms.tools.dao.SecurityPrivilege;
+import org.sonatype.jsecurity.realms.tools.dao.SecurityProperty;
 import org.sonatype.nexus.rest.model.PrivilegeBaseResource;
 import org.sonatype.nexus.rest.model.PrivilegeBaseStatusResource;
 import org.sonatype.nexus.rest.model.PrivilegeListResourceResponse;
@@ -59,9 +59,9 @@ public class PrivilegeListPlexusResource
     {
         PrivilegeListResourceResponse result = new PrivilegeListResourceResponse();
 
-        Collection<CPrivilege> privs = getNexusSecurity( request ).listPrivileges();
+        Collection<SecurityPrivilege> privs = getNexusSecurity( request ).listPrivileges();
 
-        for ( CPrivilege priv : privs )
+        for ( SecurityPrivilege priv : privs )
         {
             PrivilegeBaseStatusResource res = nexusToRestModel( priv, request );
 
@@ -117,31 +117,31 @@ public class PrivilegeListPlexusResource
                         {
                             PrivilegeTargetResource res = (PrivilegeTargetResource) resource;
 
-                            CPrivilege priv = new CPrivilege();
+                            SecurityPrivilege priv = new SecurityPrivilege();
 
                             priv.setName( res.getName() != null ? res.getName() + " - (" + method + ")" : null );
                             priv.setDescription( res.getDescription() );
                             priv.setType( "target" );
 
-                            CProperty prop = new CProperty();
+                            SecurityProperty prop = new SecurityProperty();
                             prop.setKey( "method" );
                             prop.setValue( method );
 
                             priv.addProperty( prop );
 
-                            prop = new CProperty();
+                            prop = new SecurityProperty();
                             prop.setKey( "repositoryTargetId" );
                             prop.setValue( res.getRepositoryTargetId() );
 
                             priv.addProperty( prop );
 
-                            prop = new CProperty();
+                            prop = new SecurityProperty();
                             prop.setKey( "repositoryId" );
                             prop.setValue( res.getRepositoryId() );
 
                             priv.addProperty( prop );
 
-                            prop = new CProperty();
+                            prop = new SecurityProperty();
                             prop.setKey( "repositoryGroupId" );
                             prop.setValue( res.getRepositoryGroupId() );
 

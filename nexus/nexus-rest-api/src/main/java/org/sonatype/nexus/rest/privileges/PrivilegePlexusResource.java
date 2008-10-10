@@ -6,8 +6,8 @@ import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
-import org.sonatype.jsecurity.model.CPrivilege;
 import org.sonatype.jsecurity.realms.tools.NoSuchPrivilegeException;
+import org.sonatype.jsecurity.realms.tools.dao.SecurityPrivilege;
 import org.sonatype.nexus.jsecurity.realms.NexusMethodAuthorizingRealm;
 import org.sonatype.nexus.rest.model.PrivilegeStatusResourceResponse;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
@@ -54,7 +54,7 @@ public class PrivilegePlexusResource
     {
         PrivilegeStatusResourceResponse result = new PrivilegeStatusResourceResponse();
 
-        CPrivilege priv = null;
+        SecurityPrivilege priv = null;
 
         try
         {
@@ -74,7 +74,7 @@ public class PrivilegePlexusResource
     public void delete( Context context, Request request, Response response )
         throws ResourceException
     {
-        CPrivilege priv;
+        SecurityPrivilege priv;
 
         try
         {

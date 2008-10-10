@@ -3,8 +3,8 @@ package org.sonatype.nexus.rest.privileges;
 import java.util.List;
 
 import org.restlet.data.Request;
-import org.sonatype.jsecurity.model.CPrivilege;
 import org.sonatype.jsecurity.model.CProperty;
+import org.sonatype.jsecurity.realms.tools.dao.SecurityPrivilege;
 import org.sonatype.nexus.jsecurity.realms.NexusMethodAuthorizingRealm;
 import org.sonatype.nexus.jsecurity.realms.NexusTargetAuthorizingRealm;
 import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
@@ -24,7 +24,7 @@ public abstract class AbstractPrivilegePlexusResource extends AbstractNexusPlexu
     
     
     @SuppressWarnings("unchecked")
-    public PrivilegeBaseStatusResource nexusToRestModel( CPrivilege privilege, Request request )
+    public PrivilegeBaseStatusResource nexusToRestModel( SecurityPrivilege privilege, Request request )
     {
         PrivilegeBaseStatusResource resource = null;
         

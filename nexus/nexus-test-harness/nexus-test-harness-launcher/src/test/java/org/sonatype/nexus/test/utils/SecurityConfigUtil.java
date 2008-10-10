@@ -248,6 +248,25 @@ public class SecurityConfigUtil
 
             // read again with interpolation
             configuration = reader.read( fr );
+            
+            Configuration staticConfiguration = null;
+            
+            fr = new InputStreamReader( SecurityConfigUtil.class.getResourceAsStream( "/META-INF/nexus/static-security.xml" ) );
+            
+            staticConfiguration = reader.read( fr );
+            
+            for ( CUser user : ( List<CUser> ) staticConfiguration.getUsers() )
+            {
+                configuration.addUser( user );
+            }
+            for ( CRole role : ( List<CRole> ) staticConfiguration.getRoles() )
+            {
+                configuration.addRole( role );
+            }
+            for ( CPrivilege priv : ( List<CPrivilege> ) staticConfiguration.getPrivileges() )
+            {
+                configuration.addPrivilege( priv );
+            }
 
         }
         catch ( XmlPullParserException e )

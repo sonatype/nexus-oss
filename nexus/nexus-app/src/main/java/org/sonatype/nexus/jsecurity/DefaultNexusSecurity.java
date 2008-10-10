@@ -7,18 +7,22 @@ import java.util.Set;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
+import org.codehaus.plexus.context.Context;
+import org.codehaus.plexus.context.ContextException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.StartingException;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.StoppingException;
-import org.sonatype.jsecurity.model.CPrivilege;
 import org.sonatype.jsecurity.model.CProperty;
-import org.sonatype.jsecurity.model.CRole;
-import org.sonatype.jsecurity.model.CUser;
 import org.sonatype.jsecurity.realms.tools.ConfigurationManager;
 import org.sonatype.jsecurity.realms.tools.InvalidConfigurationException;
 import org.sonatype.jsecurity.realms.tools.NoSuchPrivilegeException;
 import org.sonatype.jsecurity.realms.tools.NoSuchRoleException;
 import org.sonatype.jsecurity.realms.tools.NoSuchUserException;
+import org.sonatype.jsecurity.realms.tools.dao.SecurityPrivilege;
+import org.sonatype.jsecurity.realms.tools.dao.SecurityRole;
+import org.sonatype.jsecurity.realms.tools.dao.SecurityUser;
+import org.sonatype.jsecurity.realms.validator.ValidationContext;
 import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
 import org.sonatype.nexus.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.security.source.SecurityConfigurationSource;
@@ -29,9 +33,10 @@ import org.sonatype.nexus.proxy.events.EventListener;
 @Component( role = NexusSecurity.class )
 public class DefaultNexusSecurity
     extends AbstractLogEnabled
-    implements NexusSecurity
+    implements NexusSecurity,
+        Contextualizable
 {
-    @Requirement
+    @Requirement( role = ConfigurationManager.class, hint = "resourceMerging" )
     private ConfigurationManager manager;
 
     @Requirement( hint = "file" )
@@ -47,6 +52,12 @@ public class DefaultNexusSecurity
     private NexusEmailer emailer;
 
     private List<EventListener> listeners = new ArrayList<EventListener>();
+    
+    public void contextualize( Context context )
+        throws ContextException
+    {
+        context.put( "static-security-resource", "META-INF/nexus/static-security.xml" );
+    }
 
     public void startService()
         throws StartingException
@@ -81,26 +92,44 @@ public class DefaultNexusSecurity
         manager.clearCache();
     }
 
-    public void createPrivilege( CPrivilege privilege )
+    public void createPrivilege( SecurityPrivilege privilege )
+        throws InvalidConfigurationException
+    {
+        createPrivilege( privilege, null );
+    }
+    
+    public void createPrivilege( SecurityPrivilege privilege, ValidationContext context )
         throws InvalidConfigurationException
     {
         addInheritedPrivileges( privilege );
-        manager.createPrivilege( privilege );
+        manager.createPrivilege( privilege, context );
         save();
     }
 
-    public void createRole( CRole role )
+    public void createRole( SecurityRole role )
         throws InvalidConfigurationException
     {
-        manager.createRole( role );
+        createRole( role, null );
+    }
+    
+    public void createRole( SecurityRole role, ValidationContext context )
+        throws InvalidConfigurationException
+    {
+        manager.createRole( role, context );
         save();
     }
 
-    public void createUser( CUser user )
+    public void createUser( SecurityUser user )
+        throws InvalidConfigurationException
+    {
+        createUser( user, null );
+    }
+    
+    public void createUser( SecurityUser user, ValidationContext context )
         throws InvalidConfigurationException
     {
         String password = generatePassword( user );
-        manager.createUser( user );
+        manager.createUser( user, context );
         emailer.sendNewUserCreated( user.getEmail(), user.getId(), password );
         save();
     }
@@ -126,7 +155,7 @@ public class DefaultNexusSecurity
         save();
     }
 
-    public String getPrivilegeProperty( CPrivilege privilege, String key )
+    public String getPrivilegeProperty( SecurityPrivilege privilege, String key )
     {
         return manager.getPrivilegeProperty( privilege, key );
     }
@@ -137,34 +166,34 @@ public class DefaultNexusSecurity
         return manager.getPrivilegeProperty( id, key );
     }
 
-    public List<CPrivilege> listPrivileges()
+    public List<SecurityPrivilege> listPrivileges()
     {
         return manager.listPrivileges();
     }
 
-    public List<CRole> listRoles()
+    public List<SecurityRole> listRoles()
     {
         return manager.listRoles();
     }
 
-    public List<CUser> listUsers()
+    public List<SecurityUser> listUsers()
     {
         return manager.listUsers();
     }
 
-    public CPrivilege readPrivilege( String id )
+    public SecurityPrivilege readPrivilege( String id )
         throws NoSuchPrivilegeException
     {
         return manager.readPrivilege( id );
     }
 
-    public CRole readRole( String id )
+    public SecurityRole readRole( String id )
         throws NoSuchRoleException
     {
         return manager.readRole( id );
     }
 
-    public CUser readUser( String id )
+    public SecurityUser readUser( String id )
         throws NoSuchUserException
     {
         return manager.readUser( id );
@@ -177,27 +206,48 @@ public class DefaultNexusSecurity
         notifyProximityEventListeners( new ConfigurationChangeEvent( this ) );
     }
 
-    public void updatePrivilege( CPrivilege privilege )
+    public void updatePrivilege( SecurityPrivilege privilege )
         throws InvalidConfigurationException,
             NoSuchPrivilegeException
     {
-        manager.updatePrivilege( privilege );
+        updatePrivilege( privilege, null );
+    }
+    
+    public void updatePrivilege( SecurityPrivilege privilege, ValidationContext context )
+        throws InvalidConfigurationException,
+            NoSuchPrivilegeException
+    {
+        manager.updatePrivilege( privilege, context );
         save();
     }
 
-    public void updateRole( CRole role )
+    public void updateRole( SecurityRole role )
         throws InvalidConfigurationException,
             NoSuchRoleException
     {
-        manager.updateRole( role );
+        updateRole( role, null );
+    }
+    
+    public void updateRole( SecurityRole role, ValidationContext context )
+        throws InvalidConfigurationException,
+            NoSuchRoleException
+    {
+        manager.updateRole( role, context );
         save();
     }
 
-    public void updateUser( CUser user )
+    public void updateUser( SecurityUser user )
         throws InvalidConfigurationException,
             NoSuchUserException
     {
-        manager.updateUser( user );
+        updateUser( user, null );
+    }
+    
+    public void updateUser( SecurityUser user, ValidationContext context )
+        throws InvalidConfigurationException,
+            NoSuchUserException
+    {
+        manager.updateUser( user, context );
         save();
     }
 
@@ -244,7 +294,7 @@ public class DefaultNexusSecurity
         throws NoSuchUserException,
             InvalidCredentialsException
     {
-        CUser user = readUser( userId );
+        SecurityUser user = readUser( userId );
 
         String validate = pwGenerator.hashPassword( oldPassword );
 
@@ -269,7 +319,7 @@ public class DefaultNexusSecurity
         throws NoSuchUserException,
             NoSuchEmailException
     {
-        CUser user = readUser( userId );
+        SecurityUser user = readUser( userId );
 
         if ( !user.getEmail().equals( email ) )
         {
@@ -284,7 +334,7 @@ public class DefaultNexusSecurity
     {
         List<String> userIds = new ArrayList<String>();
 
-        for ( CUser user : listUsers() )
+        for ( SecurityUser user : listUsers() )
         {
             if ( user.getEmail().equals( email ) )
             {
@@ -305,7 +355,7 @@ public class DefaultNexusSecurity
     public void resetPassword( String userId )
         throws NoSuchUserException
     {
-        CUser user = readUser( userId );
+        SecurityUser user = readUser( userId );
 
         String password = generatePassword( user );
 
@@ -321,7 +371,7 @@ public class DefaultNexusSecurity
         }
     }
 
-    private void addInheritedPrivileges( CPrivilege privilege )
+    private void addInheritedPrivileges( SecurityPrivilege privilege )
     {
         CProperty methodProperty = null;
 
@@ -355,12 +405,17 @@ public class DefaultNexusSecurity
         }
     }
 
-    private String generatePassword( CUser user )
+    private String generatePassword( SecurityUser user )
     {
         String password = pwGenerator.generatePassword( 10, 10 );
 
         user.setPassword( pwGenerator.hashPassword( password ) );
 
         return password;
+    }
+    
+    public ValidationContext initializeContext()
+    {
+        return null;
     }
 }

@@ -3,7 +3,9 @@ package org.sonatype.nexus.configuration.security.upgrade;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.util.StringUtils;
@@ -54,13 +56,13 @@ public class Upgrade100to200
     {
         Configuration oldc = (Configuration) message.getConfiguration();
 
-        org.sonatype.jsecurity.model.Configuration newc = new org.sonatype.jsecurity.model.Configuration();
+        org.sonatype.jsecurity.model.v2_0_0.Configuration newc = new org.sonatype.jsecurity.model.v2_0_0.Configuration();
 
-        newc.setVersion( org.sonatype.jsecurity.model.Configuration.MODEL_VERSION );
+        newc.setVersion( org.sonatype.jsecurity.model.v2_0_0.Configuration.MODEL_VERSION );
 
         for ( CUser oldu : (List<CUser>) oldc.getUsers() )
         {
-            org.sonatype.jsecurity.model.CUser newu = new org.sonatype.jsecurity.model.CUser();
+            org.sonatype.jsecurity.model.v2_0_0.CUser newu = new org.sonatype.jsecurity.model.v2_0_0.CUser();
 
             newu.setEmail( oldu.getEmail() );
             newu.setId( oldu.getUserId() );
@@ -74,7 +76,7 @@ public class Upgrade100to200
 
         for ( CRole oldr : (List<CRole>) oldc.getRoles() )
         {
-            org.sonatype.jsecurity.model.CRole newr = new org.sonatype.jsecurity.model.CRole();
+            org.sonatype.jsecurity.model.v2_0_0.CRole newr = new org.sonatype.jsecurity.model.v2_0_0.CRole();
 
             newr.setDescription( oldr.getDescription() );
             newr.setId( oldr.getId() );
@@ -88,21 +90,21 @@ public class Upgrade100to200
 
         for ( CRepoTargetPrivilege oldp : (List<CRepoTargetPrivilege>) oldc.getRepositoryTargetPrivileges() )
         {
-            org.sonatype.jsecurity.model.CPrivilege newp = new org.sonatype.jsecurity.model.CPrivilege();
+            org.sonatype.jsecurity.model.v2_0_0.CPrivilege newp = new org.sonatype.jsecurity.model.v2_0_0.CPrivilege();
 
             newp.setDescription( oldp.getDescription() );
             newp.setId( oldp.getId() );
             newp.setName( oldp.getName() );
             newp.setType( "target" );
 
-            org.sonatype.jsecurity.model.CProperty prop = new org.sonatype.jsecurity.model.CProperty();
+            org.sonatype.jsecurity.model.v2_0_0.CProperty prop = new org.sonatype.jsecurity.model.v2_0_0.CProperty();
             prop.setKey( "method" );
             prop.setValue( oldp.getMethod() );
             newp.addProperty( prop );
 
             if ( !StringUtils.isEmpty( oldp.getRepositoryId() ) )
             {
-                prop = new org.sonatype.jsecurity.model.CProperty();
+                prop = new org.sonatype.jsecurity.model.v2_0_0.CProperty();
                 prop.setKey( "repositoryGroupId" );
                 prop.setValue( oldp.getGroupId() );
                 newp.addProperty( prop );
@@ -110,13 +112,13 @@ public class Upgrade100to200
 
             if ( !StringUtils.isEmpty( oldp.getRepositoryId() ) )
             {
-                prop = new org.sonatype.jsecurity.model.CProperty();
+                prop = new org.sonatype.jsecurity.model.v2_0_0.CProperty();
                 prop.setKey( "repositoryId" );
                 prop.setValue( oldp.getRepositoryId() );
                 newp.addProperty( prop );
             }
 
-            prop = new org.sonatype.jsecurity.model.CProperty();
+            prop = new org.sonatype.jsecurity.model.v2_0_0.CProperty();
             prop.setKey( "repositoryTargetId" );
             prop.setValue( oldp.getRepositoryTargetId() );
             newp.addProperty( prop );
@@ -126,19 +128,19 @@ public class Upgrade100to200
 
         for ( CApplicationPrivilege oldp : (List<CApplicationPrivilege>) oldc.getApplicationPrivileges() )
         {
-            org.sonatype.jsecurity.model.CPrivilege newp = new org.sonatype.jsecurity.model.CPrivilege();
+            org.sonatype.jsecurity.model.v2_0_0.CPrivilege newp = new org.sonatype.jsecurity.model.v2_0_0.CPrivilege();
 
             newp.setDescription( oldp.getDescription() );
             newp.setId( oldp.getId() );
             newp.setName( oldp.getName() );
             newp.setType( "method" );
 
-            org.sonatype.jsecurity.model.CProperty prop = new org.sonatype.jsecurity.model.CProperty();
+            org.sonatype.jsecurity.model.v2_0_0.CProperty prop = new org.sonatype.jsecurity.model.v2_0_0.CProperty();
             prop.setKey( "method" );
             prop.setValue( oldp.getMethod() );
             newp.addProperty( prop );
 
-            prop = new org.sonatype.jsecurity.model.CProperty();
+            prop = new org.sonatype.jsecurity.model.v2_0_0.CProperty();
             prop.setKey( "permission" );
             prop.setValue( oldp.getPermission() );
             newp.addProperty( prop );
@@ -146,7 +148,7 @@ public class Upgrade100to200
             newc.addPrivilege( newp );
         }
 
-        message.setModelVersion( org.sonatype.jsecurity.model.Configuration.MODEL_VERSION );
+        message.setModelVersion( org.sonatype.jsecurity.model.v2_0_0.Configuration.MODEL_VERSION );
         message.setConfiguration( newc );
     }
 }

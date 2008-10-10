@@ -6,7 +6,6 @@ import org.jsecurity.authz.permission.WildcardPermission;
 import org.jsecurity.subject.Subject;
 import org.restlet.data.Request;
 import org.restlet.resource.ResourceException;
-import org.sonatype.nexus.configuration.security.model.CPrivilege;
 import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
 import org.sonatype.nexus.rest.model.AuthenticationClientPermissions;
 
@@ -144,13 +143,13 @@ public abstract class AbstractUIPermissionCalculatingPlexusResource
             }
         }
 
-        Permission readPerm = new WildcardPermission( domain + ":" + CPrivilege.METHOD_READ );
+        Permission readPerm = new WildcardPermission( domain + ":read" );
 
-        Permission createPerm = new WildcardPermission( domain + ":" + CPrivilege.METHOD_CREATE );
+        Permission createPerm = new WildcardPermission( domain + ":create" );
 
-        Permission updatePerm = new WildcardPermission( domain + ":" + CPrivilege.METHOD_UPDATE );
+        Permission updatePerm = new WildcardPermission( domain + ":update" );
 
-        Permission deletePerm = new WildcardPermission( domain + ":" + CPrivilege.METHOD_DELETE );
+        Permission deletePerm = new WildcardPermission( domain + ":delete" );
 
         int perm = NONE;
 

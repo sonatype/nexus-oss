@@ -6,7 +6,7 @@ import org.restlet.data.Request;
 import org.restlet.data.Status;
 import org.restlet.resource.Representation;
 import org.restlet.resource.ResourceException;
-import org.sonatype.jsecurity.model.CUser;
+import org.sonatype.jsecurity.realms.tools.dao.SecurityUser;
 import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
 import org.sonatype.nexus.rest.model.UserResource;
 import org.sonatype.plexus.rest.resource.PlexusResourceException;
@@ -34,7 +34,7 @@ public abstract class AbstractUserPlexusResource
         return true;
     }
 
-    protected UserResource nexusToRestModel( CUser user, Request request )
+    protected UserResource nexusToRestModel( SecurityUser user, Request request )
     {
         UserResource resource = new UserResource();
         resource.setEmail( user.getEmail() );
@@ -51,11 +51,11 @@ public abstract class AbstractUserPlexusResource
         return resource;
     }
 
-    protected CUser restToNexusModel( CUser user, UserResource resource )
+    protected SecurityUser restToNexusModel( SecurityUser user, UserResource resource )
     {
         if ( user == null )
         {
-            user = new CUser();
+            user = new SecurityUser();
         }
 
         user.setEmail( resource.getEmail() );

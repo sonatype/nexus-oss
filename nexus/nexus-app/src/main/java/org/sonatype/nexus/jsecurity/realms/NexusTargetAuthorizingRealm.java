@@ -11,8 +11,8 @@ import org.codehaus.plexus.util.StringUtils;
 import org.jsecurity.authz.Permission;
 import org.jsecurity.authz.permission.WildcardPermission;
 import org.jsecurity.realm.Realm;
-import org.sonatype.jsecurity.model.CPrivilege;
 import org.sonatype.jsecurity.realms.tools.NoSuchPrivilegeException;
+import org.sonatype.jsecurity.realms.tools.dao.SecurityPrivilege;
 import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.proxy.NoSuchRepositoryGroupException;
 import org.sonatype.nexus.proxy.repository.Repository;
@@ -37,7 +37,7 @@ public class NexusTargetAuthorizingRealm
     {
         try
         {
-            CPrivilege privilege = getConfigurationManager().readPrivilege( privilegeId );
+            SecurityPrivilege privilege = getConfigurationManager().readPrivilege( privilegeId );
 
             if ( !privilege.getType().equals( PRIVILEGE_TYPE_TARGET ) )
             {

@@ -6,9 +6,9 @@ import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
-import org.sonatype.jsecurity.model.CUser;
 import org.sonatype.jsecurity.realms.tools.InvalidConfigurationException;
 import org.sonatype.jsecurity.realms.tools.NoSuchUserException;
+import org.sonatype.jsecurity.realms.tools.dao.SecurityUser;
 import org.sonatype.nexus.rest.model.UserResource;
 import org.sonatype.nexus.rest.model.UserResourceRequest;
 import org.sonatype.nexus.rest.model.UserResourceResponse;
@@ -83,7 +83,7 @@ public class UserPlexusResource
 
             try
             {
-                CUser user = restToNexusModel( getNexusSecurity( request ).readUser( resource.getUserId() ), resource );
+                SecurityUser user = restToNexusModel( getNexusSecurity( request ).readUser( resource.getUserId() ), resource );
 
                 getNexusSecurity( request ).updateUser( user );
 

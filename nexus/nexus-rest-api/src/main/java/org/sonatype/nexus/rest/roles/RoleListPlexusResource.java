@@ -5,8 +5,8 @@ import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
-import org.sonatype.jsecurity.model.CRole;
 import org.sonatype.jsecurity.realms.tools.InvalidConfigurationException;
+import org.sonatype.jsecurity.realms.tools.dao.SecurityRole;
 import org.sonatype.nexus.rest.model.RoleListResourceResponse;
 import org.sonatype.nexus.rest.model.RoleResource;
 import org.sonatype.nexus.rest.model.RoleResourceRequest;
@@ -50,7 +50,7 @@ public class RoleListPlexusResource
     {
         RoleListResourceResponse result = new RoleListResourceResponse();
 
-        for ( CRole role : getNexusSecurity( request ).listRoles() )
+        for ( SecurityRole role : getNexusSecurity( request ).listRoles() )
         {
             RoleResource res = nexusToRestModel( role, request );
 
@@ -74,7 +74,7 @@ public class RoleListPlexusResource
         {
             RoleResource resource = resourceRequest.getData();
 
-            CRole role = restToNexusModel( null, resource );
+            SecurityRole role = restToNexusModel( null, resource );
 
             try
             {

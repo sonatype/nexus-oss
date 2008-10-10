@@ -3,7 +3,7 @@ package org.sonatype.nexus.rest.roles;
 import java.util.List;
 
 import org.restlet.data.Request;
-import org.sonatype.jsecurity.model.CRole;
+import org.sonatype.jsecurity.realms.tools.dao.SecurityRole;
 import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
 import org.sonatype.nexus.rest.model.RoleResource;
 
@@ -11,7 +11,7 @@ public abstract class AbstractRolePlexusResource
     extends AbstractNexusPlexusResource
 {
 
-    public RoleResource nexusToRestModel( CRole role, Request request )
+    public RoleResource nexusToRestModel( SecurityRole role, Request request )
     {
         //TODO: ultimately this method will take a parameter which is the nexus object
         //and will convert to the rest object
@@ -36,11 +36,11 @@ public abstract class AbstractRolePlexusResource
         return resource;
     }
     
-    public CRole restToNexusModel( CRole role, RoleResource resource )
+    public SecurityRole restToNexusModel( SecurityRole role, RoleResource resource )
     {
         if ( role == null )
         {
-            role = new CRole();
+            role = new SecurityRole();
         }
         
         role.setDescription( resource.getDescription() );

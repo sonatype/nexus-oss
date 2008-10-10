@@ -6,9 +6,9 @@ import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
-import org.sonatype.jsecurity.model.CRole;
 import org.sonatype.jsecurity.realms.tools.InvalidConfigurationException;
 import org.sonatype.jsecurity.realms.tools.NoSuchRoleException;
+import org.sonatype.jsecurity.realms.tools.dao.SecurityRole;
 import org.sonatype.nexus.rest.model.RoleResource;
 import org.sonatype.nexus.rest.model.RoleResourceRequest;
 import org.sonatype.nexus.rest.model.RoleResourceResponse;
@@ -84,7 +84,7 @@ public class RolePlexusResource
             
             try
             {
-                CRole role = restToNexusModel( getNexusSecurity( request ).readRole( resource.getId() ), resource );
+                SecurityRole role = restToNexusModel( getNexusSecurity( request ).readRole( resource.getId() ), resource );
                 
                 getNexusSecurity( request ).updateRole( role );
                 

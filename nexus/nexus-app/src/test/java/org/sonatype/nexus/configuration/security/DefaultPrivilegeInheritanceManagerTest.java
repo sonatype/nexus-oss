@@ -23,7 +23,6 @@ package org.sonatype.nexus.configuration.security;
 import java.util.Set;
 
 import org.sonatype.nexus.AbstractNexusTestCase;
-import org.sonatype.nexus.configuration.security.model.CPrivilege;
 import org.sonatype.nexus.jsecurity.DefaultPrivilegeInheritanceManager;
 import org.sonatype.nexus.jsecurity.PrivilegeInheritanceManager;
 
@@ -44,20 +43,20 @@ public class DefaultPrivilegeInheritanceManagerTest
     public void testCreateInherit()
         throws Exception
     {
-        Set<String> methods = manager.getInheritedMethods( CPrivilege.METHOD_CREATE );
+        Set<String> methods = manager.getInheritedMethods( "create" );
         
         assertTrue( methods.size() == 2 );
-        assertTrue( methods.contains( CPrivilege.METHOD_READ ) );
-        assertTrue( methods.contains( CPrivilege.METHOD_CREATE ) );
+        assertTrue( methods.contains( "read" ) );
+        assertTrue( methods.contains( "create" ) );
     }
     
     public void testReadInherit()
         throws Exception
     {
-        Set<String> methods = manager.getInheritedMethods( CPrivilege.METHOD_READ );
+        Set<String> methods = manager.getInheritedMethods( "read" );
         
         assertTrue( methods.size() == 1 );
-        assertTrue( methods.contains( CPrivilege.METHOD_READ ) );
+        assertTrue( methods.contains( "read" ) );
     }
     
  
@@ -65,20 +64,20 @@ public class DefaultPrivilegeInheritanceManagerTest
     public void testUpdateInherit()
         throws Exception
     {
-        Set<String> methods = manager.getInheritedMethods( CPrivilege.METHOD_UPDATE );
+        Set<String> methods = manager.getInheritedMethods( "update" );
             
         assertTrue( methods.size() == 2 );
-        assertTrue( methods.contains( CPrivilege.METHOD_READ ) );
-        assertTrue( methods.contains( CPrivilege.METHOD_UPDATE ) );
+        assertTrue( methods.contains( "read" ) );
+        assertTrue( methods.contains( "update" ) );
     }
     
     public void testDeleteInherit()
         throws Exception
     {
-        Set<String> methods = manager.getInheritedMethods( CPrivilege.METHOD_DELETE );
+        Set<String> methods = manager.getInheritedMethods( "delete" );
         
         assertTrue( methods.size() == 2 );
-        assertTrue( methods.contains( CPrivilege.METHOD_READ ) );
-        assertTrue( methods.contains( CPrivilege.METHOD_DELETE ) );
+        assertTrue( methods.contains( "read" ) );
+        assertTrue( methods.contains( "delete" ) );
     }
 }

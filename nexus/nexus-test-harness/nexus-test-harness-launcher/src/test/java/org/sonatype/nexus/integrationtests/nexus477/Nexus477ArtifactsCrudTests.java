@@ -108,8 +108,9 @@ public class Nexus477ArtifactsCrudTests
 
     @Test
     public void readTest()
-        throws IOException, URISyntaxException, HttpException
+        throws IOException, URISyntaxException, HttpException, Exception
     {
+        this.overwriteUserRole( "test-user", "read-test-role", "1" );
 
         Gav gav =
             new Gav( this.getTestId(), "artifact", "1.0.0", null, "xml", 0, new Date().getTime(), "", false, false,

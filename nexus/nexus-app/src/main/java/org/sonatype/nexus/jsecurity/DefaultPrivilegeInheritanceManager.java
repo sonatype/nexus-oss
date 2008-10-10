@@ -24,7 +24,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.codehaus.plexus.component.annotations.Component;
-import org.sonatype.nexus.configuration.security.model.CPrivilege;
 
 @Component( role = PrivilegeInheritanceManager.class )
 public class DefaultPrivilegeInheritanceManager
@@ -36,17 +35,17 @@ public class DefaultPrivilegeInheritanceManager
 
         methods.add( method );
 
-        if ( CPrivilege.METHOD_CREATE.equals( method ) )
+        if ( "create".equals( method ) )
         {
-            methods.add( CPrivilege.METHOD_READ );
+            methods.add( "read" );
         }
-        else if ( CPrivilege.METHOD_DELETE.equals( method ) )
+        else if ( "delete".equals( method ) )
         {
-            methods.add( CPrivilege.METHOD_READ );
+            methods.add( "read" );
         }
-        else if ( CPrivilege.METHOD_UPDATE.equals( method ) )
+        else if ( "update".equals( method ) )
         {
-            methods.add( CPrivilege.METHOD_READ );
+            methods.add( "read" );
         }
 
         return methods;
