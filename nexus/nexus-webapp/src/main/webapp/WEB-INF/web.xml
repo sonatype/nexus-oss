@@ -83,6 +83,11 @@
             <param-value>nexus</param-value>
         </init-param>
         <init-param>
+            <!-- A stupid hack to avoid OneServletServerPerWebapp limitation, see PlexusServerServlet#getInitParameter -->
+            <param-name>nexus.org.restlet.clients</param-name>
+            <param-value>FILE WAR CLAP</param-value>
+        </init-param>
+        <init-param>
             <param-name>plexus.discoverResources</param-name>
             <param-value>true</param-value>
         </init-param>

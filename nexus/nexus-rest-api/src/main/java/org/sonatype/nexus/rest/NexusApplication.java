@@ -23,6 +23,7 @@ package org.sonatype.nexus.rest;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.restlet.Application;
+import org.restlet.Directory;
 import org.restlet.Filter;
 import org.restlet.Restlet;
 import org.restlet.Router;
@@ -81,6 +82,8 @@ public class NexusApplication
     @Requirement( hint = "CommandPlexusResource" )
     private ManagedPlexusResource commandPlexusResource;
 
+    private Router contentRouter;
+
     /**
      * Listener.
      */
@@ -128,9 +131,40 @@ public class NexusApplication
 
         // ==========
         // INDEX.HTML
-        attach( root, false, indexTemplateResource.getResourceUri(), new PlexusResourceFinder(
-            getContext(),
-            indexTemplateResource ) );
+        attach( root, true, indexTemplateResource );
+
+        Directory docs = new Directory( getContext(), "war:///docs" );
+        docs.setListingAllowed( false );
+        docs.setNegotiateContent( false );
+        attach( root, false, "/docs/", docs );
+
+        Directory ext = new Directory( getContext(), "war:///ext-2.2" );
+        ext.setListingAllowed( false );
+        ext.setNegotiateContent( false );
+        attach( root, false, "/ext-2.2/", ext );
+
+        Directory images = new Directory( getContext(), "war:///images" );
+        images.setListingAllowed( false );
+        images.setNegotiateContent( false );
+        attach( root, false, "/images/", images );
+
+        Directory js = new Directory( getContext(), "war:///js" );
+        js.setListingAllowed( false );
+        js.setNegotiateContent( false );
+        attach( root, false, "/js/", js );
+
+        Directory style = new Directory( getContext(), "war:///style" );
+        style.setListingAllowed( false );
+        style.setNegotiateContent( false );
+        attach( root, false, "/style/", style );
+
+        // docs
+        // ext-2.2
+        // images
+        // js
+        // style
+        // digestapplet
+        // favicon
 
         // ==========
         // PLUGIN "ADDED" RESOURCES
@@ -147,6 +181,31 @@ public class NexusApplication
 
         // mounting it
         attach( root, false, "/content", bsf );
+
+        // manually attaching and invoking security settings here
+
+        contentRouter = new Router( getContext() );
+
+        contentRouter.attach(
+            contentResource.getResourceUri(),
+            new PlexusResourceFinder( getContext(), contentResource ) );
+
+        if ( PlexusMutableWebConfiguration.class.isAssignableFrom( plexusWebConfiguration.getClass() ) )
+        {
+            try
+            {
+                ( (PlexusMutableWebConfiguration) plexusWebConfiguration ).addProtectedResource( "/content"
+                    + contentResource.getResourceProtection().getPathPattern(), contentResource
+                    .getResourceProtection().getFilterExpression() );
+            }
+            catch ( SecurityConfigurationException e )
+            {
+                throw new IllegalStateException( "Could not configure JSecurity to protect resource mounted to "
+                    + contentResource.getResourceUri() + " of class " + contentResource.getClass().getName(), e );
+            }
+        }
+
+        // manually attaching and invoking security settings here
 
         // ========
         // SERVICE
@@ -186,7 +245,7 @@ public class NexusApplication
         else
         {
             // CONTENT, attaching it after nif
-            localNexusInstanceFilter.setNext( new PlexusResourceFinder( getContext(), contentResource ) );
+            localNexusInstanceFilter.setNext( contentRouter );
         }
     }
 

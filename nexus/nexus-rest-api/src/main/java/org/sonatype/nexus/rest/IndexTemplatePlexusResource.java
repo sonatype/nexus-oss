@@ -55,15 +55,15 @@ public class IndexTemplatePlexusResource
     }
 
     @Override
-    public PathProtectionDescriptor getResourceProtection()
-    {
-        return null;
-    }
-
-    @Override
     public String getResourceUri()
     {
         return "/index.html";
+    }
+
+    @Override
+    public PathProtectionDescriptor getResourceProtection()
+    {
+        return null;
     }
 
     public List<Variant> getVariants()
@@ -140,7 +140,9 @@ public class IndexTemplatePlexusResource
 
     protected TemplateRepresentation getTemplateRepresentation( String templateName, Context context )
     {
-        TemplateRepresentation templateRepresentation = new TemplateRepresentation( "index.vm", MediaType.TEXT_HTML );
+        TemplateRepresentation templateRepresentation = new TemplateRepresentation(
+            "/templates/" + templateName,
+            MediaType.TEXT_HTML );
 
         VelocityEngine engine = templateRepresentation.getEngine();
 
