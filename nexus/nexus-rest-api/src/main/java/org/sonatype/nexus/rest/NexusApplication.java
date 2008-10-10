@@ -262,6 +262,9 @@ public class NexusApplication
             {
                 throw new IllegalStateException( "Could not configure JSecurity to add WALL to the end of the chain", e );
             }
+
+            // signal we finished adding resources
+            ( (PlexusMutableWebConfiguration) plexusWebConfiguration ).protectedResourcesAdded();
         }
     }
 
