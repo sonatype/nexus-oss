@@ -52,9 +52,6 @@
 			contentTperms = org.sonatype.nexus.security.filter.authz.NexusTargetMappingAuthorizationFilter
 			contentTperms.pathPrefix = /content(.*)
 			contentTperms.pathReplacement = @1
-
-			[urls]
-			/** = anon
 			</param-value>
         </init-param>
     </filter>
@@ -85,7 +82,7 @@
         <init-param>
             <!-- A stupid hack to avoid OneServletServerPerWebapp limitation, see PlexusServerServlet#getInitParameter -->
             <param-name>nexus.org.restlet.clients</param-name>
-            <param-value>FILE WAR CLAP</param-value>
+            <param-value>FILE CLAP</param-value>
         </init-param>
         <init-param>
             <param-name>plexus.discoverResources</param-name>
