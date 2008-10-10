@@ -55,7 +55,7 @@ public class ContentPlexusResource
     @Override
     public PathProtectionDescriptor getResourceProtection()
     {
-        return new PathProtectionDescriptor( "**", "contentAuthcBasic,contentTperms" );
+        return new PathProtectionDescriptor( "/**", "contentAuthcBasic,contentTperms" );
     }
 
     @Override
