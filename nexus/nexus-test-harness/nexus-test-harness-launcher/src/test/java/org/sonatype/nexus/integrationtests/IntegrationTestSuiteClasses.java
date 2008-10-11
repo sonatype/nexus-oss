@@ -45,6 +45,7 @@ import org.sonatype.nexus.integrationtests.nexus533.Nexus533TaskManualTest;
 import org.sonatype.nexus.integrationtests.nexus533.Nexus533TaskMonthlyTest;
 import org.sonatype.nexus.integrationtests.nexus533.Nexus533TaskOnceTest;
 import org.sonatype.nexus.integrationtests.nexus533.Nexus533TaskWeeklyTest;
+import org.sonatype.nexus.integrationtests.nexus570.Nexus570IndexArchetypeTest;
 import org.sonatype.nexus.integrationtests.nexus586.Nexus586AnonymousChangePasswordTest;
 import org.sonatype.nexus.integrationtests.nexus586.Nexus586AnonymousForgotPasswordTest;
 import org.sonatype.nexus.integrationtests.nexus586.Nexus586AnonymousForgotUserIdTest;
@@ -146,7 +147,8 @@ import org.sonatype.nexus.integrationtests.upgrades.nexus652.Nexus652Beta5To10Up
     Nexus688ReindexOnRepoAdd.class,
     Nexus384DotAndDashSearchTest.class,
     Nexus642SynchShadowTaskTest.class,
-    Nexus947GroupBrowsing.class } )
+    Nexus947GroupBrowsing.class,
+    Nexus570IndexArchetypeTest.class } )
 public class IntegrationTestSuiteClasses
 {
 

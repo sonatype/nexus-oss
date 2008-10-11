@@ -1,7 +1,10 @@
 package org.sonatype.nexus.test.utils;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.codehaus.plexus.util.StringUtils;
@@ -41,12 +44,34 @@ public class SearchMessageUtil
 
         return RequestFacade.doGetRequest( serviceURI );
     }
-
+    
+    public Response doSearchFor( Map<String, String> queryArgs )
+    throws Exception
+{
+    StringBuffer serviceURI = new StringBuffer("service/local/data_index?");
+    
+    for ( Entry<String, String> entry : queryArgs.entrySet() )
+    {
+        serviceURI.append( entry.getKey() ).append( "=" ).append( entry.getValue() ).append( "&" );
+    }
+    
+    return RequestFacade.doGetRequest( serviceURI.toString() );
+}
+    
     @SuppressWarnings( "unchecked" )
     public List<NexusArtifact> searchFor( String query )
         throws Exception
-    {
-        String responseText = doSearchFor( query ).getEntity().getText();
+    {   
+        HashMap<String, String> queryArgs = new HashMap<String, String>();
+        queryArgs.put( "q", query );
+        return searchFor( queryArgs );
+    }
+    
+    @SuppressWarnings( "unchecked" )
+    public List<NexusArtifact> searchFor( Map<String, String> queryArgs )
+        throws Exception
+    {   
+        String responseText = doSearchFor( queryArgs ).getEntity().getText();
 
         XStreamRepresentation representation =
             new XStreamRepresentation( xstream, responseText, MediaType.APPLICATION_XML );
