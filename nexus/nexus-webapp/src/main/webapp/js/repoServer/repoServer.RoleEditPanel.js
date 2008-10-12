@@ -436,6 +436,14 @@ Ext.extend(Sonatype.repoServer.RoleEditPanel, Ext.Panel, {
       var i = store.indexOfId(formLayout.activeItem.id);
       if (i >= 0){
         gridSelectModel.selectRow(i);
+        var rec = store.getById(formLayout.activeItem.id);
+        if (rec.data.readOnly == false){
+        	this.rolesGridPanel.getTopToolbar().items.get('role-delete-btn').enable();
+        }
+        else{
+        	this.rolesGridPanel.getTopToolbar().items.get('role-delete-btn').disable();
+        }
+        	
       }
       else{
         gridSelectModel.clearSelections();
@@ -453,6 +461,7 @@ Ext.extend(Sonatype.repoServer.RoleEditPanel, Ext.Panel, {
   },
   
   addResourceHandler : function() {
+	
     var id = 'new_role_' + new Date().getTime();
 
     var config = Ext.apply({}, this.formConfig, {id:id});
@@ -463,13 +472,14 @@ Ext.extend(Sonatype.repoServer.RoleEditPanel, Ext.Panel, {
     
     formPanel.form.on('actioncomplete', this.actionCompleteHandler, this);
     formPanel.form.on('actionfailed', this.actionFailedHandler, this);
-    formPanel.on('beforerender', this.beforeFormRenderHandler, this);
     formPanel.on('afterlayout', this.afterLayoutFormHandler, this, {single:true});
         
     var buttonInfoObj = {
         formPanel : formPanel,
         isNew : true
       };
+   
+    formPanel.buttons[0].disabled = false;
     
     //save button event handler
     formPanel.buttons[0].on('click', this.saveHandler.createDelegate(this, [buttonInfoObj]));
@@ -483,11 +493,14 @@ Ext.extend(Sonatype.repoServer.RoleEditPanel, Ext.Panel, {
     var newRec = new this.roleRecordConstructor({
         id : 'new_role_',
         name : 'New Role',
-        resourceURI : 'new'
+        resourceURI : 'new',
+        readOnly : false
       },
       id); //use "new_role_" id instead of resourceURI like the reader does
     this.rolesDataStore.insert(0, [newRec]);
     this.rolesGridPanel.getSelectionModel().selectRow(0);
+    
+    this.rolesGridPanel.getTopToolbar().items.get('role-delete-btn').enable();
     
     //add new form
     this.formCards.add(formPanel);
@@ -573,6 +586,14 @@ Ext.extend(Sonatype.repoServer.RoleEditPanel, Ext.Panel, {
           var i = store.indexOfId(formLayout.activeItem.id);
           if (i >= 0){
             gridSelectModel.selectRow(i);
+            var rec = store.getById(formLayout.activeItem.id);
+            if (rec.data.readOnly == false
+            		&& this.sp.checkPermission(Sonatype.user.curr.repoServer.configRoles, this.sp.DELETE)){
+            	this.rolesGridPanel.getTopToolbar().items.get('role-delete-btn').enable();
+            }
+            else{
+            	this.rolesGridPanel.getTopToolbar().items.get('role-delete-btn').disable();
+            }
           }
           else{
             gridSelectModel.clearSelections();
@@ -684,13 +705,6 @@ Ext.extend(Sonatype.repoServer.RoleEditPanel, Ext.Panel, {
 
     //@todo: need global alert mechanism for fatal errors.
   },
-  
-  beforeFormRenderHandler : function(component){
-    var sp = Sonatype.lib.Permissions;
-    if(sp.checkPermission(Sonatype.user.curr.repoServer.configRoles, sp.EDIT)){
-      component.buttons[0].disabled = false;
-    }
-  },
 
   formDataLoader : function(formPanel, resourceURI, modFuncs){
     formPanel.getForm().doAction('sonatypeLoad', {url:resourceURI, method:'GET', fpanel:formPanel, dataModifiers: modFuncs, scope: this});
@@ -698,45 +712,62 @@ Ext.extend(Sonatype.repoServer.RoleEditPanel, Ext.Panel, {
 
   rowClick : function(grid, rowIndex, e){
     var rec = grid.store.getAt(rowIndex);
-    var id = rec.id; //note: rec.id is unique for new resources and equal to resourceURI for existing ones
-    var formPanel = this.formCards.findById(id);
-    
-    //assumption: new route forms already exist in formCards, so they won't get into this case
-    if(!formPanel){ //create form and populate current data
-      var config = Ext.apply({}, this.formConfig, {id:id});
-      
-      config = this.initializeTreeRoots(id, config);
-      
-      formPanel = new Ext.FormPanel(config);
-      formPanel.form.on('actioncomplete', this.actionCompleteHandler, this);
-      formPanel.form.on('actionfailed', this.actionFailedHandler, this);
-      formPanel.on('beforerender', this.beforeFormRenderHandler, this);
-      formPanel.on('afterlayout', this.afterLayoutFormHandler, this, {single:true});
-      
-      var buttonInfoObj = {
-        formPanel : formPanel,
-        isNew : false, //not a new route form, see assumption
-        resourceURI : rec.data.resourceURI
-      };
-      
-      formPanel.buttons[0].on('click', this.saveHandler.createDelegate(this, [buttonInfoObj]));
-      formPanel.buttons[1].on('click', this.cancelHandler.createDelegate(this, [buttonInfoObj]));
-      
-      this.initializeRolesTreeHelper(formPanel);
-      this.initializePrivilegesTreeHelper(formPanel);
-  
-      this.formDataLoader(formPanel, rec.data.resourceURI, this.loadDataModFunc);
-      
-      this.formCards.add(formPanel);
-      
-      //always set active
-      this.formCards.getLayout().setActiveItem(formPanel);
-      
-      formPanel.doLayout();
+    if (rec) {
+	    if (rec.data.readOnly == false
+	    		&& this.sp.checkPermission(Sonatype.user.curr.repoServer.configRoles, this.sp.DELETE)) {
+	      grid.getTopToolbar().items.get('role-delete-btn').enable();
+	    } else {
+	      grid.getTopToolbar().items.get('role-delete-btn')
+	        .disable();
+	    }
+	    var id = rec.id; //note: rec.id is unique for new resources and equal to resourceURI for existing ones
+	    var formPanel = this.formCards.findById(id);
+	    
+	    //assumption: new route forms already exist in formCards, so they won't get into this case
+	    if(!formPanel){ //create form and populate current data
+	      var config = Ext.apply({}, this.formConfig, {id:id});
+	      
+	      config = this.initializeTreeRoots(id, config);
+	      
+	      formPanel = new Ext.FormPanel(config);
+	      formPanel.form.on('actioncomplete', this.actionCompleteHandler, this);
+	      formPanel.form.on('actionfailed', this.actionFailedHandler, this);
+	      formPanel.on('afterlayout', this.afterLayoutFormHandler, this, {single:true});
+	      
+	      if (rec.data.readOnly == false
+            && this.sp.checkPermission(Sonatype.user.curr.repoServer.configRoles, this.sp.EDIT)){
+	          formPanel.buttons[0].disabled = false;
+	      }
+	      
+	      var buttonInfoObj = {
+	        formPanel : formPanel,
+	        isNew : false, //not a new route form, see assumption
+	        resourceURI : rec.data.resourceURI
+	      };
+	      
+	      formPanel.buttons[0].on('click', this.saveHandler.createDelegate(this, [buttonInfoObj]));
+	      formPanel.buttons[1].on('click', this.cancelHandler.createDelegate(this, [buttonInfoObj]));
+	      
+	      this.initializeRolesTreeHelper(formPanel);
+	      this.initializePrivilegesTreeHelper(formPanel);
+	  
+	      this.formDataLoader(formPanel, rec.data.resourceURI, this.loadDataModFunc);
+	      
+	      this.formCards.add(formPanel);
+	      
+	      //always set active
+	      this.formCards.getLayout().setActiveItem(formPanel);
+	      
+	      formPanel.doLayout();
+	    }
+	    else{
+	      //always set active
+	      this.formCards.getLayout().setActiveItem(formPanel);
+	    }
     }
-    else{
-      //always set active
-      this.formCards.getLayout().setActiveItem(formPanel);
+    else {
+    	grid.getTopToolbar().items.get('role-delete-btn')
+        .disable();
     }
   },
   
@@ -757,7 +788,8 @@ Ext.extend(Sonatype.repoServer.RoleEditPanel, Ext.Panel, {
       ]
     });
     
-    if (this.sp.checkPermission(Sonatype.user.curr.repoServer.configRoles, this.sp.DELETE)){
+    if (this.ctxRecord.data.readOnly == false
+    		&& this.sp.checkPermission(Sonatype.user.curr.repoServer.configRoles, this.sp.DELETE)){
         menu.add(this.actions.deleteAction);
     }
     

@@ -801,7 +801,8 @@ Ext.extend(Sonatype.repoServer.PrivilegeEditPanel, Ext.Panel, {
     var rec = grid.store.getAt(rowIndex);
 
     if (rec) {
-      if (rec.data.type != "application") {
+      if (rec.data.type != "application" && rec.data.readOnly == false
+              && this.sp.checkPermission(Sonatype.user.curr.repoServer.configPrivileges, this.sp.DELETE)) {
         grid.getTopToolbar().items.get('privilege-delete-btn').enable();
       } else {
         grid.getTopToolbar().items.get('privilege-delete-btn')
@@ -854,6 +855,7 @@ Ext.extend(Sonatype.repoServer.PrivilegeEditPanel, Ext.Panel, {
     });
     
     if (this.ctxRecord.data.type != 'application'
+    	&& this.ctxRecord.data.readOnly == false
     	&& this.sp.checkPermission(Sonatype.user.curr.repoServer.configPrivileges, this.sp.DELETE)){
       menu.add(this.actions.deleteAction);
     }
