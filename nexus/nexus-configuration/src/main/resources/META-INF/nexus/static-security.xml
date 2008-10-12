@@ -29,10 +29,10 @@
                 <privilege>T6</privilege>
                 <privilege>T7</privilege>
                 <privilege>T8</privilege>
-                <privilege>64</privilege>
             </privileges>
             <roles>
                 <role>anonymous</role>
+                <role>ui-basic</role>
             </roles>
         </role>
         <role>
