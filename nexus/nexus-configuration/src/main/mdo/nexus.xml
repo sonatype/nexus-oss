@@ -1703,6 +1703,8 @@
 
     public static final String TYPE_ONCE = "once";
     
+    public static final String TYPE_HOURLY = "hourly";
+    
     public static final String TYPE_DAILY = "daily";
     
     public static final String TYPE_WEEKLY = "weekly";

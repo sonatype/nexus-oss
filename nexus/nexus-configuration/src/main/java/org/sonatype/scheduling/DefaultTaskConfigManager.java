@@ -51,6 +51,7 @@ import org.sonatype.nexus.proxy.events.AbstractEvent;
 import org.sonatype.nexus.proxy.events.EventListener;
 import org.sonatype.scheduling.schedules.CronSchedule;
 import org.sonatype.scheduling.schedules.DailySchedule;
+import org.sonatype.scheduling.schedules.HourlySchedule;
 import org.sonatype.scheduling.schedules.ManualRunSchedule;
 import org.sonatype.scheduling.schedules.MonthlySchedule;
 import org.sonatype.scheduling.schedules.OnceSchedule;
@@ -301,6 +302,10 @@ public class DefaultTaskConfigManager
         {
             schedule = new DailySchedule( modelSchedule.getStartDate(), modelSchedule.getEndDate() );
         }
+        else if ( CScheduleConfig.TYPE_HOURLY.equals( modelSchedule.getType() ) )
+        {
+            schedule = new HourlySchedule( modelSchedule.getStartDate(), modelSchedule.getEndDate() );
+        }
         else if ( CScheduleConfig.TYPE_ONCE.equals( modelSchedule.getType() ) )
         {
             schedule = new OnceSchedule( modelSchedule.getStartDate() );
@@ -397,6 +402,14 @@ public class DefaultTaskConfigManager
                 storeableSchedule.setStartDate( ( (DailySchedule) schedule ).getStartDate() );
 
                 storeableSchedule.setEndDate( ( (DailySchedule) schedule ).getEndDate() );
+            }
+            else if ( HourlySchedule.class.isAssignableFrom( schedule.getClass() ) )
+            {
+                storeableSchedule.setType( CScheduleConfig.TYPE_HOURLY );
+                
+                storeableSchedule.setStartDate( ( (HourlySchedule) schedule ).getStartDate() );
+                
+                storeableSchedule.setEndDate( ( (HourlySchedule) schedule ).getEndDate() );
             }
             else if ( OnceSchedule.class.isAssignableFrom( schedule.getClass() ) )
             {
