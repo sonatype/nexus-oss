@@ -29,6 +29,7 @@ import org.sonatype.scheduling.schedules.DailySchedule;
 import org.sonatype.scheduling.schedules.ManualRunSchedule;
 import org.sonatype.scheduling.schedules.MonthlySchedule;
 import org.sonatype.scheduling.schedules.OnceSchedule;
+import org.sonatype.scheduling.schedules.RunNowSchedule;
 import org.sonatype.scheduling.schedules.Schedule;
 import org.sonatype.scheduling.schedules.WeeklySchedule;
 
@@ -37,6 +38,9 @@ public abstract class AbstractScheduledServicePlexusResource
 {
     /** Schedule Type Off. */
     public static final String SCHEDULE_TYPE_MANUAL = "manual";
+    
+    /** Schedule type run now */
+    public static final String SCHEDULE_TYPE_RUN_NOW = "internal";
 
     /** Schedule Type Once. */
     public static final String SCHEDULE_TYPE_ONCE = "once";
@@ -62,6 +66,10 @@ public abstract class AbstractScheduledServicePlexusResource
         if ( ManualRunSchedule.class.isAssignableFrom( schedule.getClass() ) )
         {
             return SCHEDULE_TYPE_MANUAL;
+        }
+        else if ( RunNowSchedule.class.isAssignableFrom( schedule.getClass() ) )
+        {
+            return SCHEDULE_TYPE_RUN_NOW;
         }
         else if ( OnceSchedule.class.isAssignableFrom( schedule.getClass() ) )
         {
