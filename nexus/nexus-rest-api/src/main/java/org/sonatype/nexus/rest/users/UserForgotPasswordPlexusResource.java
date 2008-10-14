@@ -62,16 +62,16 @@ public class UserForgotPasswordPlexusResource
                 }
                 else
                 {
-                    response.setStatus( Status.CLIENT_ERROR_BAD_REQUEST, "Anonymous user cannot forgot password!" );
+                    response.setStatus( Status.CLIENT_ERROR_BAD_REQUEST, "Anonymous user cannot forget password!" );
 
                     getLogger().debug( "Anonymous user forgot password is blocked!" );
                 }
             }
             catch ( NoSuchUserException e )
             {
-                getLogger().debug( "Invalid user ID!", e );
+                getLogger().debug( "Invalid username!", e );
 
-                throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Invalid user ID!" );
+                throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Invalid username!" );
             }
             catch ( NoSuchEmailException e )
             {
