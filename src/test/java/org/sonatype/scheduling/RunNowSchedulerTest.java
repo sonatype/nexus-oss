@@ -64,6 +64,8 @@ public class RunNowSchedulerTest
         assertEquals( 1, tr.getRunCount() );
 
         assertEquals( TaskState.FINISHED, st.getTaskState() );
+        
+        assertNull( st.getNextRun() );
 
         assertEquals( 0, defaultScheduler.getActiveTasks().size() );
     }
@@ -89,6 +91,8 @@ public class RunNowSchedulerTest
         assertEquals( Integer.valueOf( 0 ), st.getResults().get( 0 ) );
 
         assertEquals( TaskState.FINISHED, st.getTaskState() );
+        
+        assertNull( st.getNextRun() );
 
         assertEquals( 0, defaultScheduler.getActiveTasks().size() );
     }

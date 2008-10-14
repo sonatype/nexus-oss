@@ -22,11 +22,25 @@ package org.sonatype.scheduling.schedules;
 
 import java.util.Date;
 
+import org.sonatype.scheduling.iterators.RunNowSchedulerIterator;
+import org.sonatype.scheduling.iterators.SchedulerIterator;
+
 public class RunNowSchedule
-    extends OnceSchedule
+    extends AbstractSchedule
 {
     public RunNowSchedule()
+    { 
+        this( new Date( System.currentTimeMillis() + 500 ) );
+    }
+    
+    private RunNowSchedule( Date date )
     {
-        super( new Date( System.currentTimeMillis() + 500 ) );
+        super( date, date );
+    }
+    
+    @Override
+    protected SchedulerIterator createIterator()
+    {
+        return new RunNowSchedulerIterator();
     }
 }
