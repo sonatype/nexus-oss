@@ -509,6 +509,8 @@ Ext.extend(Sonatype.repoServer.UserEditPanel, Ext.Panel, {
         isNew : true
       };
     
+    formPanel.buttons[0].disabled = false;
+    
     //save button event handler
     formPanel.buttons[0].on('click', this.saveHandler.createDelegate(this, [buttonInfoObj]));
     //cancel button event handler
