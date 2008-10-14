@@ -18,6 +18,7 @@ import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceAdvancedResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceBaseResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceDailyResource;
+import org.sonatype.nexus.rest.model.ScheduledServiceHourlyResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceMonthlyResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceOnceResource;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
@@ -26,6 +27,7 @@ import org.sonatype.scheduling.ScheduledTask;
 import org.sonatype.scheduling.SchedulerTask;
 import org.sonatype.scheduling.schedules.CronSchedule;
 import org.sonatype.scheduling.schedules.DailySchedule;
+import org.sonatype.scheduling.schedules.HourlySchedule;
 import org.sonatype.scheduling.schedules.ManualRunSchedule;
 import org.sonatype.scheduling.schedules.MonthlySchedule;
 import org.sonatype.scheduling.schedules.OnceSchedule;
@@ -41,9 +43,12 @@ public abstract class AbstractScheduledServicePlexusResource
     
     /** Schedule type run now */
     public static final String SCHEDULE_TYPE_RUN_NOW = "internal";
-
+    
     /** Schedule Type Once. */
     public static final String SCHEDULE_TYPE_ONCE = "once";
+    
+    /** Schedule type Hourly */
+    public static final String SCHEDULE_TYPE_HOURLY = "hourly";
 
     /** Schedule Type Daily. */
     public static final String SCHEDULE_TYPE_DAILY = "daily";
@@ -74,6 +79,10 @@ public abstract class AbstractScheduledServicePlexusResource
         else if ( OnceSchedule.class.isAssignableFrom( schedule.getClass() ) )
         {
             return SCHEDULE_TYPE_ONCE;
+        }
+        else if ( HourlySchedule.class.isAssignableFrom( schedule.getClass() ) )
+        {
+            return SCHEDULE_TYPE_HOURLY;
         }
         else if ( DailySchedule.class.isAssignableFrom( schedule.getClass() ) )
         {
@@ -324,6 +333,12 @@ public abstract class AbstractScheduledServicePlexusResource
                 ( (ScheduledServiceDailyResource) model ).getStartDate(),
                 ( (ScheduledServiceDailyResource) model ).getRecurringTime() ), null );
         }
+        else if ( ScheduledServiceHourlyResource.class.isAssignableFrom( model.getClass() ) )
+        {
+            schedule = new HourlySchedule( parseDate(
+                ( (ScheduledServiceHourlyResource) model ).getStartDate(),
+                ( (ScheduledServiceHourlyResource) model ).getStartTime() ), null );
+        }
         else if ( ScheduledServiceOnceResource.class.isAssignableFrom( model.getClass() ) )
         {
             schedule = new OnceSchedule( parseDate(
@@ -352,6 +367,16 @@ public abstract class AbstractScheduledServicePlexusResource
 
             OnceSchedule taskSchedule = (OnceSchedule) task.getSchedule();
             ScheduledServiceOnceResource res = (ScheduledServiceOnceResource) resource;
+
+            res.setStartDate( formatDate( taskSchedule.getStartDate() ) );
+            res.setStartTime( formatTime( taskSchedule.getStartDate() ) );
+        }
+        else if ( HourlySchedule.class.isAssignableFrom( task.getSchedule().getClass() ) )
+        {
+            resource = new ScheduledServiceHourlyResource();
+
+            HourlySchedule taskSchedule = (HourlySchedule) task.getSchedule();
+            ScheduledServiceHourlyResource res = (ScheduledServiceHourlyResource) resource;
 
             res.setStartDate( formatDate( taskSchedule.getStartDate() ) );
             res.setStartTime( formatTime( taskSchedule.getStartDate() ) );

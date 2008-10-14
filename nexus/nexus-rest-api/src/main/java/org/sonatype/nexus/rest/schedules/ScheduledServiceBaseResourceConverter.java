@@ -23,6 +23,7 @@ package org.sonatype.nexus.rest.schedules;
 import org.sonatype.nexus.rest.model.ScheduledServiceAdvancedResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceBaseResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceDailyResource;
+import org.sonatype.nexus.rest.model.ScheduledServiceHourlyResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceMonthlyResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceOnceResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceWeeklyResource;
@@ -74,6 +75,10 @@ public class ScheduledServiceBaseResourceConverter
             else if ( AbstractScheduledServicePlexusResource.SCHEDULE_TYPE_ONCE.equals( schedule ))
             {
                 return new ScheduledServiceOnceResource();
+            }
+            else if ( AbstractScheduledServicePlexusResource.SCHEDULE_TYPE_HOURLY.equals( schedule ))
+            {
+                return new ScheduledServiceHourlyResource();
             }
             else if ( AbstractScheduledServicePlexusResource.SCHEDULE_TYPE_DAILY.equals( schedule ))
             {

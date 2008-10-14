@@ -1435,6 +1435,26 @@
 				</field>
 			</fields>
 		</class>
+        
+        <class>
+            <name>ScheduledServiceHourlyResource</name>
+            <superClass>ScheduledServiceBaseResource</superClass>
+            <version>1.0.0+</version>
+            <fields>
+                <field>
+                    <name>startDate</name>
+                    <version>1.0.0+</version>
+                    <type>String</type>
+                    <required>true</required>
+                </field>
+                <field>
+                    <name>startTime</name>
+                    <version>1.0.0+</version>
+                    <type>String</type>
+                    <required>true</required>
+                </field>
+            </fields>
+        </class>
 
 		<class>
 			<name>ScheduledServiceDailyResource</name>
