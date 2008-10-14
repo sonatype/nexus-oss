@@ -1,6 +1,7 @@
 package org.sonatype.nexus.proxy.wastebasket;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -196,5 +197,68 @@ public class DefaultFSWastebasket
     {
         // TODO Auto-generated method stub
     }
+    
+    public void delete( File file )
+        throws IOException
+    {
+        delete( file, "" );
+    }
 
+    public void delete( File file, String base )
+        throws IOException
+    {
+        File basketFile = new File( getWastebasketDirectory(), base + file.getName() );
+
+        if ( file.isDirectory() )
+        {
+            basketFile.mkdir();
+
+            for ( File child : file.listFiles() )
+            {
+                delete( child, base + file.getName() + File.separatorChar );
+            }
+        }
+        else if ( file.isFile() )
+        {
+            moveFileContent( file, basketFile );
+        }
+        file.delete();
+    }
+
+    private void moveFileContent( File from, File to )
+        throws IOException
+    {
+
+        FileInputStream fis = null;
+
+        FileOutputStream fos = null;
+
+        try
+        {
+
+            fis = new FileInputStream( from );
+
+            fos = new FileOutputStream( to );
+
+            IOUtil.copy( fis, fos );
+
+            fos.flush();
+        }
+        catch ( IOException ioe )
+        {
+            throw ioe;
+        }
+        finally
+        {
+            if ( fis != null )
+            {
+                IOUtil.close( fis );
+            }
+            if ( fos != null )
+            {
+                IOUtil.close( fos );
+            }
+        }
+
+    }
 }

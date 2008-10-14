@@ -1,5 +1,6 @@
 package org.sonatype.nexus.proxy.wastebasket;
 
+import java.io.File;
 import java.io.IOException;
 
 import org.sonatype.nexus.proxy.StorageException;
@@ -47,4 +48,12 @@ public interface Wastebasket
      */
     void delete( RepositoryItemUid uid, LocalRepositoryStorage ls )
         throws StorageException;
+    
+    /**
+     * Perform a delete operation. Delete a file or a directory (recursively).
+     * 
+     * @param file
+     */
+    void delete( File file)
+        throws IOException;
 }
