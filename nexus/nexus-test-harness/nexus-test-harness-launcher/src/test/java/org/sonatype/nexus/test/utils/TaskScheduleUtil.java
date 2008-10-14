@@ -183,7 +183,7 @@ public class TaskScheduleUtil
         ScheduledServicePropertyResource... properties )
         throws Exception
     {
-        return runTask( typeId, typeId, 20, properties );
+        return runTask( typeId, typeId, 40, properties );
     }
 
 }
