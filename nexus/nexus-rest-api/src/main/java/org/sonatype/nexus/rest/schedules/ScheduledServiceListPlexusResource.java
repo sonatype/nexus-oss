@@ -80,7 +80,7 @@ public class ScheduledServiceListPlexusResource
                 item.setTypeName( getNexusInstance( request ).getScheduledTaskDescriptor( task.getType() ).getName() );
                 item.setCreated( task.getScheduledAt() == null ? "n/a" : task.getScheduledAt().toString() );
                 item.setLastRunTime( task.getLastRun() == null ? "n/a" : task.getLastRun().toString() );
-                item.setNextRunTime( task.getNextRun() == null ? "n/a" : task.getNextRun().toString() );
+                item.setNextRunTime( getNextRunTime( task ) );
                 item.setSchedule( getScheduleShortName( task.getSchedule() ) );
                 item.setEnabled( task.isEnabled() );
 
