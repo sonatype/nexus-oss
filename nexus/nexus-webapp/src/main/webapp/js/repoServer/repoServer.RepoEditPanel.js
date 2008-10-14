@@ -30,7 +30,6 @@ Sonatype.repoServer.RepoEditPanel = function(config){
   var tfStore = new Ext.data.SimpleStore({fields:['value'], data:[['True'],['False']]});
   var policyStore = new Ext.data.SimpleStore({fields:['value'], data:[['Release'], ['Snapshot']]});
   var checksumPolicyStore = new Ext.data.SimpleStore({fields:['value'], data:[['Ignore'], ['Warn'], ['StrictIfExists'], ['Strict']]});
-  var formatStore = new Ext.data.SimpleStore({fields:['value'], data:[['maven1'],['maven2']]});
 
   var ht = Sonatype.repoServer.resources.help.repos;
 
@@ -70,6 +69,22 @@ Sonatype.repoServer.RepoEditPanel = function(config){
     sortInfo: {field: 'name', direction: 'ASC'},
     autoLoad: true
   });
+
+  //A record to hold the contentClasses
+  this.contentClassRecordConstructor = Ext.data.Record.create([
+    {name:'contentClass'},
+    {name:'name', sortType:Ext.data.SortTypes.asUCString}
+  ]);
+
+  //Reader and datastore that queries the server for the list of content classes
+  this.contentClassesReader = new Ext.data.JsonReader({root: 'data', id: 'contentClass'}, this.contentClassRecordConstructor );
+  this.contentClassesDataStore = new Ext.data.Store({
+    url: Sonatype.config.repos.urls.repoContentClasses,
+    reader: this.contentClassesReader,
+    sortInfo: {field: 'name', direction: 'ASC'},
+    autoLoad: true
+  });
+  
   
   this.actions = {
     clearCache : new Ext.Action({
@@ -221,8 +236,9 @@ Sonatype.repoServer.RepoEditPanel = function(config){
         name: 'format',
         //hiddenName: 'connectionTimeout',
         width: 150,
-        store: formatStore,
-        displayField:'value',
+        store: this.contentClassesDataStore,
+        displayField:'contentClass',
+        valueField:'contentClass',
         editable: false,
         forceSelection: true,
         mode: 'local',
@@ -413,8 +429,9 @@ Sonatype.repoServer.RepoEditPanel = function(config){
         name: 'format',
         //hiddenName: 'connectionTimeout',
         width: 150,
-        store: formatStore,
-        displayField:'value',
+        store: this.contentClassesDataStore,
+        displayField:'contentClass',
+        valueField:'contentClass',
         editable: false,
         forceSelection: true,
         mode: 'local',
@@ -909,8 +926,9 @@ Sonatype.repoServer.RepoEditPanel = function(config){
       //hiddenName: 'connectionTimeout',
       width: 200,
       midWidth: 200,
-      store: formatStore,
-      displayField:'value',
+      store: this.contentClassesDataStore,
+      displayField:'contentClass',
+      valueField:'contentClass',
       editable: false,
       forceSelection: true,
       mode: 'local',
