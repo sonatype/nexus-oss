@@ -66,6 +66,8 @@ public class DefaultScheduler
     private Map<String, List<ScheduledTask<?>>> tasksMap;
 
     private AtomicInteger idGen = new AtomicInteger( 1 );
+    
+    private int threadPriority = Thread.MIN_PRIORITY;
 
     @Requirement
     private TaskConfigManager taskConfig;
@@ -81,7 +83,7 @@ public class DefaultScheduler
     {
         tasksMap = new HashMap<String, List<ScheduledTask<?>>>();
 
-        plexusThreadFactory = new PlexusThreadFactory( plexusContainer );
+        plexusThreadFactory = new PlexusThreadFactory( plexusContainer, threadPriority );
 
         scheduledExecutorService = (ScheduledThreadPoolExecutor) Executors.newScheduledThreadPool(
             20,

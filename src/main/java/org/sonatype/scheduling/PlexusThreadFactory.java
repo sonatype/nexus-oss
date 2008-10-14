@@ -37,8 +37,15 @@ public class PlexusThreadFactory
     private final PlexusContainer plexusContainer;
 
     private final ThreadGroup schedulerThreadGroup;
+    
+    private final int threadPriority;
 
     public PlexusThreadFactory( PlexusContainer plexusContainer )
+    {
+      this( plexusContainer, Thread.MIN_PRIORITY );
+    }
+    
+    public PlexusThreadFactory( PlexusContainer plexusContainer, int threadPriority )
     {
         super();
 
@@ -49,6 +56,8 @@ public class PlexusThreadFactory
         this.schedulerThreadGroup = new ThreadGroup( "Plexus scheduler #" + poolNum );
 
         this.namePrefix = "pxpool-" + poolNum + "-thread-";
+        
+        this.threadPriority = threadPriority;
     }
 
     public Thread newThread( Runnable r )
@@ -58,6 +67,8 @@ public class PlexusThreadFactory
         result.setContextClassLoader( plexusContainer.getLookupRealm() );
 
         result.setDaemon( false );
+        
+        result.setPriority( this.threadPriority );
 
         return result;
     }
