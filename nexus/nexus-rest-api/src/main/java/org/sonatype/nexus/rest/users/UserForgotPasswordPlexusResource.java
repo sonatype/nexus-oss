@@ -69,15 +69,15 @@ public class UserForgotPasswordPlexusResource
             }
             catch ( NoSuchUserException e )
             {
-                getLogger().debug( "Invalid username", e );
+                getLogger().debug( "Invalid Username", e );
 
-                throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Invalid username" );
+                throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Invalid Username" );
             }
             catch ( NoSuchEmailException e )
             {
-                getLogger().debug( "Invalid email", e );
+                getLogger().debug( "Invalid E-mail", e );
 
-                response.setStatus( Status.CLIENT_ERROR_BAD_REQUEST, "Email address not found" );
+                response.setStatus( Status.CLIENT_ERROR_BAD_REQUEST, "E-mail address not found" );
             }
         }
         // return null because the status is 202
