@@ -9,11 +9,11 @@ import org.apache.log4j.Logger;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
+import org.restlet.data.Status;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.rest.model.RoleListResourceResponse;
 import org.sonatype.nexus.rest.model.RoleResource;
 import org.sonatype.nexus.rest.model.RoleResourceRequest;
-import org.sonatype.nexus.rest.xstream.XStreamInitializer;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
 
 import com.thoughtworks.xstream.XStream;
@@ -24,7 +24,7 @@ public class RoleMessageUtil
     private XStream xstream;
 
     private MediaType mediaType;
-    
+
     private static final Logger LOG = Logger.getLogger( RoleMessageUtil.class );
 
     public RoleMessageUtil( XStream xstream, MediaType mediaType )
@@ -139,4 +139,25 @@ public class RoleMessageUtil
         return roleResourceRequest.getData();
     }
 
+    private static XStream xStream;
+
+    static
+    {
+        xStream = XStreamFactory.getXmlXStream();
+    }
+
+    public static Status update( RoleResource role )
+        throws IOException
+    {
+        RoleResourceRequest request = new RoleResourceRequest();
+        request.setData( role );
+
+        XStreamRepresentation representation = new XStreamRepresentation( xStream, "", MediaType.APPLICATION_XML );
+        representation.setPayload( request );
+
+        String serviceURI = "service/local/roles/" + role.getId();
+        Response response = RequestFacade.sendMessage( serviceURI, Method.PUT, representation );
+
+        return response.getStatus();
+    }
 }
