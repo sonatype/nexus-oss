@@ -54,4 +54,11 @@ public class RemoveRepoFolderTaskDescriptor
         return properties;
     }
 
+    /**
+     * This task is invisible to users
+     */
+    public boolean isExposed()
+    {
+        return false;
+    }
 }
