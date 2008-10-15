@@ -99,6 +99,10 @@ public interface FeedRecorder
      */
     public static final String SYSTEM_EMPTY_TRASH_ACTION = "EMPTY_TRASH";
 
+    /**
+     * System event action: remove repository folder
+     */
+    public static final String SYSTEM_REMOVE_REPO_FOLDER = "REMOVE_REPO_FOLDER";
     // creating
 
     void addNexusArtifactEvent( NexusArtifactEvent nae );

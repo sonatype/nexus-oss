@@ -24,6 +24,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -63,6 +64,7 @@ import org.sonatype.nexus.feeds.NexusArtifactEvent;
 import org.sonatype.nexus.feeds.SystemEvent;
 import org.sonatype.nexus.feeds.SystemProcess;
 import org.sonatype.nexus.index.ArtifactInfo;
+import org.sonatype.nexus.index.DefaultIndexerManager;
 import org.sonatype.nexus.index.FlatSearchResponse;
 import org.sonatype.nexus.index.IndexerManager;
 import org.sonatype.nexus.index.context.IndexContextInInconsistentStateException;
@@ -113,8 +115,10 @@ import org.sonatype.nexus.store.DefaultEntry;
 import org.sonatype.nexus.store.Entry;
 import org.sonatype.nexus.store.Store;
 import org.sonatype.nexus.tasks.ReindexTask;
+import org.sonatype.nexus.tasks.RemoveRepoFolderTask;
 import org.sonatype.nexus.tasks.SynchronizeShadowsTask;
 import org.sonatype.nexus.tasks.descriptors.ReindexTaskDescriptor;
+import org.sonatype.nexus.tasks.descriptors.RemoveRepoFolderTaskDescriptor;
 import org.sonatype.nexus.tasks.descriptors.ScheduledTaskDescriptor;
 import org.sonatype.nexus.tasks.descriptors.SynchronizeShadowTaskDescriptor;
 import org.sonatype.scheduling.NoSuchTaskException;
@@ -556,6 +560,30 @@ public class DefaultNexus
             IOException,
             ConfigurationException
     {
+        //File defaultStorageFile = new File( new File( nexusConfiguration.getWorkingDirectory(), "storage" ), id );
+
+       // File localStorgeFile = new File( new URL( repositoryRegistry.getRepository( id ).getLocalUrl() ).getFile() );
+
+        Repository repository = repositoryRegistry.getRepository( id );
+        
+        // only trash repository folder when the default storage case
+       // if ( defaultStorageFile.getAbsolutePath().equals( localStorgeFile.getAbsolutePath() ) )
+       // {
+            // remove the folders for the repository
+            RemoveRepoFolderTask task = (RemoveRepoFolderTask) nexusScheduler
+                .createTaskInstance( RemoveRepoFolderTaskDescriptor.ID );
+
+            task.setRepositoryId( id );
+
+            task.setRepositoryType( repository.getRepositoryType() );
+
+            task.setRepositoryLocalStorage( new File( new URL( repositoryRegistry.getRepository( id ).getLocalUrl() )
+                .getFile() ).getAbsolutePath() );
+
+            nexusScheduler.submit( "Remove repository folder", task );
+       // }
+
+        // delete the configuration
         nexusConfiguration.deleteRepository( id );
     }
 
@@ -1985,4 +2013,50 @@ public class DefaultNexus
         }
     }
 
+    
+    public void removeRepositoryFolder( String repositoryId, RepositoryType type, String localStorage )
+        throws NoSuchRepositoryException
+    {
+        getLogger().info( "Removing storage folder of repository " + repositoryId );
+
+        File defaultStorageFile = new File( new File( nexusConfiguration.getWorkingDirectory(), "storage" ), repositoryId );
+
+        if ( defaultStorageFile.getAbsolutePath().equals( localStorage ) )
+        {
+            try
+            {
+                wastebasket.delete( defaultStorageFile );
+            }
+            catch ( IOException e )
+            {
+                getLogger().warn( "Error during deleting repository storage folder ", e );
+            }
+        }
+
+        File indexerFile = null;
+        
+        if ( type == RepositoryType.HOSTED )
+        {
+            indexerFile = new File( new File( nexusConfiguration.getWorkingDirectory(), "indexer" ), repositoryId
+                + DefaultIndexerManager.CTX_LOCAL_SUFIX );
+        }
+        else if( type == RepositoryType.PROXY){
+            indexerFile = new File( new File( nexusConfiguration.getWorkingDirectory(), "indexer" ), repositoryId
+                + DefaultIndexerManager.CTX_REMOTE_SUFIX );
+        }
+        
+        
+        if ( indexerFile != null )
+        {
+            try
+            {
+                wastebasket.delete( indexerFile );
+            }
+            catch ( IOException e )
+            {
+                getLogger().warn( "Error during deleting repository indexer folder", e );
+            }
+        }
+
+    }
 }

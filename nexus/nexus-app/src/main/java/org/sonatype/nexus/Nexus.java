@@ -51,6 +51,7 @@ import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.item.StorageLinkItem;
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.proxy.repository.RepositoryType;
 import org.sonatype.nexus.proxy.router.RepositoryRouter;
 import org.sonatype.scheduling.NoSuchTaskException;
 import org.sonatype.scheduling.ScheduledTask;
@@ -322,4 +323,12 @@ public interface Nexus
 
     FlatSearchResponse searchArtifactFlat( String gTerm, String aTerm, String vTerm, String pTerm, String cTerm,
         String repositoryId, String groupId, Integer from, Integer count );
+
+    /**
+     * Remove the repository's storage folder
+     * 
+     * @param repositoryId
+     */
+    void removeRepositoryFolder( String repositoryId , RepositoryType type, String localStorage)
+        throws NoSuchRepositoryException;
 }
