@@ -31,7 +31,7 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
   
   //List of schedule types
   //None removed for the time being
-  this.scheduleTypeStore = new Ext.data.SimpleStore({fields:['value'], data:[['Manual'],['Once'],['Daily'],['Weekly'],['Monthly'],['Advanced']]});
+  this.scheduleTypeStore = new Ext.data.SimpleStore({fields:['value'], data:[['Manual'],['Once'],['Hourly'],['Daily'],['Weekly'],['Monthly'],['Advanced']]});
   //List of weekdays
   this.weekdaysList = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
   
@@ -61,6 +61,12 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
       properties : this.importServicePropertiesHelper.createDelegate(this)
     },
     once : {
+      schedule : Sonatype.utils.capitalize,
+      properties : this.importServicePropertiesHelper.createDelegate(this),
+      startDate : this.importStartDateHelper.createDelegate(this),
+      startTime : this.importStartTimeHelper.createDelegate(this)
+    },
+    hourly : {
       schedule : Sonatype.utils.capitalize,
       properties : this.importServicePropertiesHelper.createDelegate(this),
       startDate : this.importStartDateHelper.createDelegate(this),
@@ -99,6 +105,12 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
       properties : this.exportServicePropertiesHelper.createDelegate(this)
     },
     once : {
+      schedule : Sonatype.utils.lowercase,
+      properties : this.exportServicePropertiesHelper.createDelegate(this),
+      startDate : this.exportStartDateHelper.createDelegate(this),
+      startTime : this.exportStartTimeHelper.createDelegate(this)
+    },
+    hourly : {
       schedule : Sonatype.utils.lowercase,
       properties : this.exportServicePropertiesHelper.createDelegate(this),
       startDate : this.exportStartDateHelper.createDelegate(this),
@@ -363,6 +375,42 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
               {
                 xtype: 'label',
                 text: 'Without recurrence, this service can only be run manually.'
+              }
+            ]
+          },
+          {
+            xtype: 'fieldset',
+              checkboxToggle:false,
+              title: 'Schedule Settings',
+              anchor: Sonatype.view.FIELDSET_OFFSET,
+              collapsible: false,
+              autoHeight:true,
+              labelWidth: 175,
+              layoutConfig: {
+                labelSeparator: ''
+              },
+            items: [
+              {
+                xtype: 'datefield',
+                fieldLabel: 'Start Date',
+                itemCls: 'required-field',
+                helpText: ht.startDate,
+                name: 'startDate',
+                disabled:true,
+                allowBlank:false,
+                value:new Date()
+              },
+              {
+                xtype: 'timefield',
+                fieldLabel: 'Start Time',
+                itemCls: 'required-field',
+                helpText: ht.startTime,
+                name: 'startTime',
+                width: 75,                
+                disabled:true,
+                allowBlank:false,
+                format:'H:i',
+                value: new Date().format('H:i')
               }
             ]
           },
@@ -1611,17 +1659,20 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
       if (rec.data.schedule == 'once'){
         schedulePanel.activeItem = 1;
       }
-      else if (rec.data.schedule == 'daily'){
+      else if (rec.data.schedule == 'hourly'){
         schedulePanel.activeItem = 2;
       }
-      else if (rec.data.schedule == 'weekly'){
+      else if (rec.data.schedule == 'daily'){
         schedulePanel.activeItem = 3;
       }
-      else if (rec.data.schedule == 'monthly'){
+      else if (rec.data.schedule == 'weekly'){
         schedulePanel.activeItem = 4;
       }
-      else if (rec.data.schedule == 'advanced'){
+      else if (rec.data.schedule == 'monthly'){
         schedulePanel.activeItem = 5;
+      }
+      else if (rec.data.schedule == 'advanced'){
+        schedulePanel.activeItem = 6;
       }
       //Then enable each field in the active card (after this point, select handler takes care of all
       //enable/disable transitions
@@ -1738,17 +1789,20 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
     if (record.data.value == 'Once'){
       schedulePanel.getLayout().setActiveItem(schedulePanel.items.itemAt(1));
     }
-    else if (record.data.value == 'Daily'){
+    else if (record.data.value == 'Hourly'){
       schedulePanel.getLayout().setActiveItem(schedulePanel.items.itemAt(2));
     }
-    else if (record.data.value == 'Weekly'){
+    else if (record.data.value == 'Daily'){
       schedulePanel.getLayout().setActiveItem(schedulePanel.items.itemAt(3));
     }
-    else if (record.data.value == 'Monthly'){
+    else if (record.data.value == 'Weekly'){
       schedulePanel.getLayout().setActiveItem(schedulePanel.items.itemAt(4));
     }
-    else if (record.data.value == 'Advanced'){
+    else if (record.data.value == 'Monthly'){
       schedulePanel.getLayout().setActiveItem(schedulePanel.items.itemAt(5));
+    }
+    else if (record.data.value == 'Advanced'){
+      schedulePanel.getLayout().setActiveItem(schedulePanel.items.itemAt(6));
     }
     else {
       schedulePanel.getLayout().setActiveItem(schedulePanel.items.itemAt(0));
@@ -1770,11 +1824,11 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
     
     this.assignItemIds( id, newConfig.items );
     
-    newConfig.items[6].items[3].items[2].id = id + '_weekdays_tree_panel';
-    newConfig.items[6].items[3].items[2].items[0].root = new Ext.tree.TreeNode({text: 'root'});
-    newConfig.items[6].items[3].items[2].items[0].id = id + '_weekdays_tree';
-    newConfig.items[6].items[3].items[2].items[1].root = new Ext.tree.TreeNode({text: 'root'});
-    newConfig.items[6].items[3].items[2].items[1].id = id + '_all_weekdays_tree';
+    newConfig.items[6].items[4].items[2].id = id + '_weekdays_tree_panel';
+    newConfig.items[6].items[4].items[2].items[0].root = new Ext.tree.TreeNode({text: 'root'});
+    newConfig.items[6].items[4].items[2].items[0].id = id + '_weekdays_tree';
+    newConfig.items[6].items[4].items[2].items[1].root = new Ext.tree.TreeNode({text: 'root'});
+    newConfig.items[6].items[4].items[2].items[1].id = id + '_all_weekdays_tree';
 
     return newConfig;
   },

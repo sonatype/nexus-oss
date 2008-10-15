@@ -186,6 +186,19 @@ Sonatype.repoServer.referenceData = {
       startDate : "",
       startTime : ""
     },
+    hourly : {
+      id : "",
+      name : "",
+      enabled : "",
+      typeId : "",
+      schedule : "",
+      properties : [{
+        id: "",
+        value: ""
+      }],
+      startDate : "",
+      startTime : ""
+    },
     daily : {
       id : "",
       name : "",
