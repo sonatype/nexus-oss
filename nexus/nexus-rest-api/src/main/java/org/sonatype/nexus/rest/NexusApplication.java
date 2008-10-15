@@ -25,6 +25,7 @@ import org.codehaus.plexus.component.annotations.Requirement;
 import org.restlet.Application;
 import org.restlet.Directory;
 import org.restlet.Filter;
+import org.restlet.Redirector;
 import org.restlet.Restlet;
 import org.restlet.Router;
 import org.sonatype.jsecurity.web.PlexusMutableWebConfiguration;
@@ -131,8 +132,17 @@ public class NexusApplication
 
         // ==========
         // INDEX.HTML
+        // TODO: would be nice to get the resourceUri from indexTemplateResource! (and discover the root of the app!)
+        Redirector redirector = new Redirector( getContext(), "index.html", Redirector.MODE_CLIENT_PERMANENT );
+        attach( root, true, "/", redirector );
+
         attach( root, true, indexTemplateResource );
 
+        Directory rootDir = new Directory( getContext(), "war:///" );
+        rootDir.setListingAllowed( false );
+        rootDir.setNegotiateContent( false );
+        attach( root, false, "/", rootDir );
+        
         Directory docs = new Directory( getContext(), "war:///docs/" );
         docs.setListingAllowed( false );
         docs.setNegotiateContent( false );
@@ -157,6 +167,7 @@ public class NexusApplication
         style.setListingAllowed( false );
         style.setNegotiateContent( false );
         attach( root, false, "/style/", style );
+        
 
         // docs
         // ext-2.2
