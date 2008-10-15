@@ -1,6 +1,7 @@
 <component>
   <dependencySets>
     <dependencySet>
+      <useProjectArtifact>false</useProjectArtifact>
       <outputDirectory>/${pom.build.finalName}/runtime/apps/nexus/lib</outputDirectory>
       <fileMode>0644</fileMode>
       <scope>runtime</scope>

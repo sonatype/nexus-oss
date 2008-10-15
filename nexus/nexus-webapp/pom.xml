@@ -10,7 +10,7 @@
   <!-- a unique name for this project -->
   <artifactId>nexus-webapp</artifactId>
   <!--we don't need this to be a jar except that the app assembler crashes if it's not-->
-  <packaging>jar</packaging>
+  <packaging>war</packaging>
   <!-- a short but descriptive name for the project -->
   <name>Nexus (Web Application frontend)</name>
   <properties>
@@ -20,6 +20,18 @@
     <nexus-tools-input>target/nexus-tools</nexus-tools-input>
   </properties>
   <dependencies>
+		<dependency>
+			<groupId>httpunit</groupId>
+			<artifactId>httpunit</artifactId>
+			<version>1.6.2</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>servlet-api</artifactId>
+			<version>2.5</version>
+			<scope>provided</scope>
+		</dependency>
     <dependency>
       <groupId>org.sonatype.appbooter.plexus-platforms</groupId>
       <artifactId>plexus-platform-jsw</artifactId>
