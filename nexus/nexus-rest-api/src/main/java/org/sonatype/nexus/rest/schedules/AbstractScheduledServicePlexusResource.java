@@ -25,6 +25,7 @@ import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceWeeklyResource;
 import org.sonatype.scheduling.ScheduledTask;
 import org.sonatype.scheduling.SchedulerTask;
+import org.sonatype.scheduling.iterators.MonthlySchedulerIterator;
 import org.sonatype.scheduling.schedules.CronSchedule;
 import org.sonatype.scheduling.schedules.DailySchedule;
 import org.sonatype.scheduling.schedules.HourlySchedule;
@@ -225,7 +226,7 @@ public abstract class AbstractScheduledServicePlexusResource
 
         for ( Integer day : days )
         {
-            if ( MonthlySchedule.DAY_OF_MONTH_LAST.equals( day ) )
+            if ( MonthlySchedulerIterator.LAST_DAY_OF_MONTH.equals( day ) )
             {
                 list.add( "last" );
             }
@@ -246,7 +247,7 @@ public abstract class AbstractScheduledServicePlexusResource
         {
             if ( "last".equals( day ) )
             {
-                set.add( MonthlySchedule.DAY_OF_MONTH_LAST );
+                set.add( MonthlySchedulerIterator.LAST_DAY_OF_MONTH );
             }
             else
             {
