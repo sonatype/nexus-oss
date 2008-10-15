@@ -560,28 +560,20 @@ public class DefaultNexus
             IOException,
             ConfigurationException
     {
-        //File defaultStorageFile = new File( new File( nexusConfiguration.getWorkingDirectory(), "storage" ), id );
-
-       // File localStorgeFile = new File( new URL( repositoryRegistry.getRepository( id ).getLocalUrl() ).getFile() );
-
         Repository repository = repositoryRegistry.getRepository( id );
-        
-        // only trash repository folder when the default storage case
-       // if ( defaultStorageFile.getAbsolutePath().equals( localStorgeFile.getAbsolutePath() ) )
-       // {
-            // remove the folders for the repository
-            RemoveRepoFolderTask task = (RemoveRepoFolderTask) nexusScheduler
-                .createTaskInstance( RemoveRepoFolderTaskDescriptor.ID );
 
-            task.setRepositoryId( id );
+        // remove the folders for the repository
+        RemoveRepoFolderTask task = (RemoveRepoFolderTask) nexusScheduler
+            .createTaskInstance( RemoveRepoFolderTaskDescriptor.ID );
 
-            task.setRepositoryType( repository.getRepositoryType() );
+        task.setRepositoryId( id );
 
-            task.setRepositoryLocalStorage( new File( new URL( repositoryRegistry.getRepository( id ).getLocalUrl() )
-                .getFile() ).getAbsolutePath() );
+        task.setRepositoryType( repository.getRepositoryType() );
 
-            nexusScheduler.submit( "Remove repository folder", task );
-       // }
+        task.setRepositoryLocalStorage( new File( new URL( repositoryRegistry.getRepository( id ).getLocalUrl() )
+            .getFile() ).getAbsolutePath() );
+
+        nexusScheduler.submit( "Remove repository folder", task );
 
         // delete the configuration
         nexusConfiguration.deleteRepository( id );
@@ -2021,6 +2013,7 @@ public class DefaultNexus
 
         File defaultStorageFile = new File( new File( nexusConfiguration.getWorkingDirectory(), "storage" ), repositoryId );
 
+        //only remove the storage folder when in default storage case
         if ( defaultStorageFile.getAbsolutePath().equals( localStorage ) )
         {
             try
