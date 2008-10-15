@@ -602,9 +602,15 @@
 							<rules>
 								<bannedDependencies>
 									<excludes>
+										<exclude>*:velocity:1.4</exclude>
+										<exclude>*:velocity-dep:1.4</exclude>
+									</excludes>
+									<message> Velocity 1.4 is banned, Velocity 1.5 should be used! You probably added a dependency that is missing the
+										exclusions. </message>
+								</bannedDependencies>
+								<bannedDependencies>
+									<excludes>
 										<exclude>commons-logging:*</exclude>
-										<!--     <exclude>*:velocity:1.4</exclude>
-											<exclude>*:velocity-dep:1.4</exclude>-->
 									</excludes>
 									<message> commons-logging conflicts with slf4j. You probably added a dependency that is missing the
 										exclusions. </message>
@@ -612,8 +618,6 @@
 								<bannedDependencies>
 									<excludes>
 										<exclude>*:plexus-component-api</exclude>
-										<!--     <exclude>*:velocity:1.4</exclude>
-											<exclude>*:velocity-dep:1.4</exclude>-->
 									</excludes>
 									<message> plexus-component-api conflicts with newer plexus-container-default. You probably added a dependency that is plexus component made with older plexus container. </message>
 								</bannedDependencies>
