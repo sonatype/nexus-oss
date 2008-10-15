@@ -27,6 +27,8 @@ import java.util.Set;
 public class MonthlySchedulerIterator
     extends AbstractCalendarBasedSchedulerIterator
 {
+    public static final Integer LAST_DAY_OF_MONTH = new Integer( 999 );
+    
     private final Set<Integer> monthdaysToRun;
 
     public MonthlySchedulerIterator( Date startingDate )
@@ -59,10 +61,23 @@ public class MonthlySchedulerIterator
         else
         {
             getCalendar().add( Calendar.DAY_OF_MONTH, 1 );
-
+            
             // step over the days not in when to run
             while ( !monthdaysToRun.contains( getCalendar().get( Calendar.DAY_OF_MONTH ) ) )
             {
+                // first check to see if we are on the last day of the month
+                if ( monthdaysToRun.contains( LAST_DAY_OF_MONTH ) )
+                {
+                    Calendar cal = ( Calendar ) getCalendar().clone();
+                    
+                    cal.add( Calendar.DAY_OF_MONTH, 1 );
+                    
+                    if ( cal.get( Calendar.DAY_OF_MONTH ) == 1 )
+                    {
+                        break;
+                    }
+                }
+                
                 getCalendar().add( Calendar.DAY_OF_MONTH, 1 );
             }
         }
