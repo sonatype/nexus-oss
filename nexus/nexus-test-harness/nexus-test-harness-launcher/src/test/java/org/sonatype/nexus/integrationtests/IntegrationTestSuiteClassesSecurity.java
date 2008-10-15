@@ -48,6 +48,7 @@ import org.sonatype.nexus.integrationtests.nexus448.Nexus448PrivilegeURLTest;
 import org.sonatype.nexus.integrationtests.nexus450.Nexus450UserCreationTest;
 import org.sonatype.nexus.integrationtests.nexus477.Nexus477ArtifactsCrudTests;
 import org.sonatype.nexus.integrationtests.nexus502.Nexus502MavenExecutionTest;
+import org.sonatype.nexus.integrationtests.nexus504.Nexus504ChangeRoleTest;
 import org.sonatype.nexus.integrationtests.nexus511.Nexus511MavenDeployTest;
 import org.sonatype.nexus.integrationtests.nexus531.Nexus531RepositoryCrudJsonTests;
 import org.sonatype.nexus.integrationtests.nexus531.Nexus531RepositoryCrudPermissionTests;
@@ -146,7 +147,8 @@ import org.sonatype.nexus.integrationtests.upgrades.nexus652.Nexus652Beta5To10Up
     Nexus779RssFeedFilteringTest.class,
     Nexus930AutoDiscoverComponent.class,
     Nexus947GroupBrowsing.class,
-    Nexus570IndexArchetypeTest.class  } )
+    Nexus570IndexArchetypeTest.class,
+    Nexus504ChangeRoleTest.class} )
 public class IntegrationTestSuiteClassesSecurity
 {
     @BeforeClass
