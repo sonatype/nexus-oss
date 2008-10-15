@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
@@ -20,6 +21,8 @@ import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
+import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.proxy.repository.RepositoryType;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.proxy.storage.local.LocalRepositoryStorage;
 import org.sonatype.nexus.proxy.storage.local.fs.DefaultFSLocalRepositoryStorage;
@@ -198,13 +201,51 @@ public class DefaultFSWastebasket
         // TODO Auto-generated method stub
     }
     
-    public void delete( File file )
+    
+    public void deleteRepositoryFolders( Repository repository )
+        throws IOException
+    {
+        File localStorageFile = new File( new URL( repository.getLocalUrl() ).getFile() );
+
+        File defaultStorageFile = new File(
+            new File( applicationConfiguration.getWorkingDirectory(), "storage" ),
+            repository.getId() );
+
+        // only remove the storage folder when in default storage case
+        if ( defaultStorageFile.getAbsolutePath().equals( localStorageFile.getAbsolutePath() ) )
+        {
+            delete( defaultStorageFile );
+        }
+
+        File indexerFile = null;
+
+        if ( repository.getRepositoryType() == RepositoryType.HOSTED )
+        {
+            indexerFile = new File( new File( applicationConfiguration.getWorkingDirectory(), "indexer" ), repository
+                .getId()
+                + "-local" );
+        }
+        else if ( repository.getRepositoryType() == RepositoryType.PROXY )
+        {
+            indexerFile = new File( new File( applicationConfiguration.getWorkingDirectory(), "indexer" ), repository
+                .getId()
+                + "-remote" );
+        }
+
+        if ( indexerFile != null )
+        {
+            delete( indexerFile );
+        }
+
+    }
+    
+    protected void delete( File file )
         throws IOException
     {
         delete( file, "" );
     }
 
-    public void delete( File file, String base )
+    protected void delete( File file, String base )
         throws IOException
     {
         File basketFile = new File( getWastebasketDirectory(), base + file.getName() );

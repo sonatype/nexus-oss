@@ -25,9 +25,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
-import org.sonatype.nexus.tasks.descriptors.properties.RepositoryLocalStoragePropertyDescriptor;
-import org.sonatype.nexus.tasks.descriptors.properties.RepositoryTypePropertyDescriptor;
 import org.sonatype.nexus.tasks.descriptors.properties.ScheduledTaskPropertyDescriptor;
 
 /**
@@ -39,15 +36,6 @@ public class RemoveRepoFolderTaskDescriptor
 {
 
     public static final String ID = "RemoveRepoFolderTask";
-
-    @Requirement( role = ScheduledTaskPropertyDescriptor.class, hint = "RepositoryOrGroup" )
-    private ScheduledTaskPropertyDescriptor repositoryOrGroupId;
-
-    @Requirement( role = ScheduledTaskPropertyDescriptor.class, hint = "RepositoryLocalStorage" )
-    private RepositoryLocalStoragePropertyDescriptor repositoryLocalStorage;
-
-    @Requirement( role = ScheduledTaskPropertyDescriptor.class, hint = "RepositoryType" )
-    private RepositoryTypePropertyDescriptor repositoryType;
 
     public String getId()
     {
@@ -62,12 +50,6 @@ public class RemoveRepoFolderTaskDescriptor
     public List<ScheduledTaskPropertyDescriptor> getPropertyDescriptors()
     {
         List<ScheduledTaskPropertyDescriptor> properties = new ArrayList<ScheduledTaskPropertyDescriptor>();
-
-        properties.add( repositoryOrGroupId );
-
-        properties.add( repositoryLocalStorage );
-
-        properties.add( repositoryType );
 
         return properties;
     }

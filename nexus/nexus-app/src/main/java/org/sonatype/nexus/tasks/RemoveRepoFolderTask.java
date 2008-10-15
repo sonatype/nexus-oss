@@ -2,11 +2,9 @@ package org.sonatype.nexus.tasks;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.nexus.feeds.FeedRecorder;
-import org.sonatype.nexus.proxy.repository.RepositoryType;
-import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesTask;
+import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.scheduling.AbstractNexusTask;
 import org.sonatype.nexus.tasks.descriptors.RemoveRepoFolderTaskDescriptor;
-import org.sonatype.nexus.tasks.descriptors.properties.RepositoryLocalStoragePropertyDescriptor;
-import org.sonatype.nexus.tasks.descriptors.properties.RepositoryTypePropertyDescriptor;
 import org.sonatype.scheduling.SchedulerTask;
 
 /**
@@ -16,16 +14,28 @@ import org.sonatype.scheduling.SchedulerTask;
  */
 @Component( role = SchedulerTask.class, hint = RemoveRepoFolderTaskDescriptor.ID, instantiationStrategy = "per-lookup" )
 public class RemoveRepoFolderTask
-    extends AbstractNexusRepositoriesTask<Object>
+    extends AbstractNexusTask<Object>
 {
+
+    private Repository repository;
+
+    public Repository getRepository()
+    {
+        return repository;
+    }
+
+    public void setRepository( Repository repository )
+    {
+        this.repository = repository;
+    }
 
     @Override
     protected Object doRun()
         throws Exception
     {
-        if ( getRepositoryId() != null )
+        if ( repository != null )
         {
-            getNexus().removeRepositoryFolder( getRepositoryId(), getRepositoryType(), getRepositoryLocalStorage() );
+            getNexus().removeRepositoryFolder( repository );
         }
         return null;
     }
@@ -39,50 +49,11 @@ public class RemoveRepoFolderTask
     @Override
     protected String getMessage()
     {
-        if ( getRepositoryId() != null )
+        if ( repository != null )
         {
-            return "Removing folder with repository ID: " + getRepositoryId();
+            return "Removing folder with repository ID: " + repository.getId();
         }
         return null;
     }
 
-    public void setRepositoryType( RepositoryType type )
-    {
-        if ( type != null )
-        {
-            getParameters().put( RepositoryTypePropertyDescriptor.ID, type.name() );
-        }
-    }
-
-    public RepositoryType getRepositoryType()
-    {
-        String param = getParameters().get( RepositoryTypePropertyDescriptor.ID );
-
-        if ( param != null )
-        {
-            return RepositoryType.valueOf( param );
-        }
-
-        return null;
-    }
-
-    public void setRepositoryLocalStorage( String localStorage )
-    {
-        if ( localStorage != null )
-        {
-            getParameters().put( RepositoryLocalStoragePropertyDescriptor.ID, localStorage );
-        }
-    }
-
-    public String getRepositoryLocalStorage()
-    {
-        String param = getParameters().get( RepositoryLocalStoragePropertyDescriptor.ID );
-
-        if ( param != null )
-        {
-            return param;
-        }
-
-        return null;
-    }
 }

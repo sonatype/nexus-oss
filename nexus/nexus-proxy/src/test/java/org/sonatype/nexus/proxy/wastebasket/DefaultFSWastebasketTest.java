@@ -22,18 +22,19 @@
 package org.sonatype.nexus.proxy.wastebasket;
 
 import java.io.File;
-
-import org.apache.commons.io.FileUtils;
+import java.io.IOException;
 
 import junit.framework.TestCase;
+
+import org.apache.commons.io.FileUtils;
 
 /**
  * @author Juven Xu
  */
-public class WastebasketTest
+public class DefaultFSWastebasketTest
     extends TestCase
 {
-    Wastebasket wastebasket;
+    DefaultFSWastebasketForTest wastebasket;
 
     public void setUp()
         throws Exception
@@ -80,6 +81,12 @@ public class WastebasketTest
         public File getWastebasketDirectory()
         {
             return new File( "target/trash" );
+        }
+        
+        public void delete(File file)
+            throws IOException
+        {
+            super.delete( file );
         }
     }
 }

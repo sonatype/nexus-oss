@@ -327,8 +327,7 @@ public interface Nexus
     /**
      * Remove the repository's storage folder
      * 
-     * @param repositoryId
      */
-    void removeRepositoryFolder( String repositoryId , RepositoryType type, String localStorage)
-        throws NoSuchRepositoryException;
+    void removeRepositoryFolder( Repository repository );
+        
 }
