@@ -218,20 +218,7 @@ public class PlexusRestletApplicationBridge
 
     protected void attach( Router router, boolean strict, PlexusResource resource )
     {
-        if ( getLogger().isLoggable( Level.FINE ) )
-        {
-            getLogger().log(
-                Level.FINE,
-                "Attaching PlexusResource of class '" + resource.getClass().getName() + "' to URI='"
-                    + resource.getResourceUri() + "' (strict='" + strict + "')" );
-        }
-
-        Route route = router.attach( resource.getResourceUri(), new PlexusResourceFinder( getContext(), resource ) );
-
-        if ( strict )
-        {
-            route.getTemplate().setMatchingMode( Template.MODE_EQUALS );
-        }
+        attach( router, strict, resource.getResourceUri(), new PlexusResourceFinder( getContext(), resource ) );
 
         handlePlexusResourceSecurity( resource );
     }
