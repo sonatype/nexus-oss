@@ -121,8 +121,8 @@ public abstract class AbstractNexusTasksIntegrationTest<E extends ScheduledServi
         Assert.assertTrue( status.isSuccess() );
 
         // delete is not working, see NEXUS-572
-        // Configuration nexusConfig = NexusConfigUtil.getNexusConfig();
-        // Assert.assertTrue( nexusConfig.getTasks().isEmpty() );
+        Configuration nexusConfig = NexusConfigUtil.getNexusConfig();
+        Assert.assertTrue( nexusConfig.getTasks().isEmpty() );
     }
 
 }
