@@ -323,6 +323,12 @@ Ext.extend(Sonatype.repoServer.AbstractRepoPanel, Ext.Panel, {
               if ( statusResp.data.allowWrite ) {
                 var oldItem = this.formCards.getLayout().activeItem;
                 this.formCards.remove(oldItem, true);
+                
+                if ( this.formCards.tbar ) {
+                  this.formCards.tbar.oldSize = this.formCards.tbar.getSize(); 
+                  this.formCards.tbar.hide();
+                  this.formCards.tbar.setHeight(0);
+                }
 
                 var rec = (this.ctxRecord) ? this.ctxRecord : this.reposGridPanel.getSelectionModel().getSelected();
 

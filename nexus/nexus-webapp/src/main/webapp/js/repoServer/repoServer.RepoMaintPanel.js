@@ -743,6 +743,13 @@ Ext.extend(Sonatype.repoServer.RepoMaintPanel, Sonatype.repoServer.AbstractRepoP
     var oldItem = this.formCards.getLayout().activeItem;
     this.formCards.remove(oldItem, true);
     this.formCards.insert(1, panel);
+
+    if ( this.formCards.tbar ) {
+      if ( this.formCards.tbar.oldSize ) {
+        this.formCards.tbar.setSize( this.formCards.tbar.oldSize );
+      }
+      this.formCards.tbar.show();
+    }
     
     //always set active and re-layout
     this.formCards.getLayout().setActiveItem(panel);
