@@ -50,23 +50,26 @@ public class ScheduledServiceTypePlexusResource
 
         for ( ScheduledTaskDescriptor taskDescriptor : taskDescriptors )
         {
-            ScheduledServiceTypeResource type = new ScheduledServiceTypeResource();
-            type.setId( taskDescriptor.getId() );
-            type.setName( taskDescriptor.getName() );
-
-            for ( ScheduledTaskPropertyDescriptor propertyDescriptor : taskDescriptor.getPropertyDescriptors() )
+            if ( taskDescriptor.isExposed() )
             {
-                ScheduledServiceTypePropertyResource property = new ScheduledServiceTypePropertyResource();
-                property.setHelpText( propertyDescriptor.getHelpText() );
-                property.setId( propertyDescriptor.getId() );
-                property.setName( propertyDescriptor.getName() );
-                property.setRequired( propertyDescriptor.isRequired() );
-                property.setType( propertyDescriptor.getType() );
-
-                type.addProperty( property );
+                ScheduledServiceTypeResource type = new ScheduledServiceTypeResource();
+                type.setId( taskDescriptor.getId() );
+                type.setName( taskDescriptor.getName() );
+    
+                for ( ScheduledTaskPropertyDescriptor propertyDescriptor : taskDescriptor.getPropertyDescriptors() )
+                {
+                    ScheduledServiceTypePropertyResource property = new ScheduledServiceTypePropertyResource();
+                    property.setHelpText( propertyDescriptor.getHelpText() );
+                    property.setId( propertyDescriptor.getId() );
+                    property.setName( propertyDescriptor.getName() );
+                    property.setRequired( propertyDescriptor.isRequired() );
+                    property.setType( propertyDescriptor.getType() );
+    
+                    type.addProperty( property );
+                }
+    
+                result.addData( type );
             }
-
-            result.addData( type );
         }
 
         return result;

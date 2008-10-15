@@ -29,7 +29,7 @@ import org.sonatype.nexus.tasks.descriptors.properties.ScheduledTaskPropertyDesc
 
 @Component( role = ScheduledTaskDescriptor.class, hint = "PublishIndexes", description = "Publish Indexes" )
 public class PublishIndexesTaskDescriptor
-    implements ScheduledTaskDescriptor
+    extends AbstractScheduledTaskDescriptor
 {
     public static final String ID = "PublishIndexesTask";
 

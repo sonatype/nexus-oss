@@ -29,7 +29,7 @@ import org.sonatype.nexus.tasks.descriptors.properties.ScheduledTaskPropertyDesc
 
 @Component( role = ScheduledTaskDescriptor.class, hint = "EvictUnusedItems", description="Evict Unused Proxied Items From Repository Caches" )
 public class EvictUnusedItemsTaskDescriptor
-    implements ScheduledTaskDescriptor
+    extends AbstractScheduledTaskDescriptor
 {
     public static final String ID = "EvictUnusedProxiedItemsTask";
     

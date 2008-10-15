@@ -29,4 +29,5 @@ public interface ScheduledTaskDescriptor
     String getId();
     String getName();
     List<ScheduledTaskPropertyDescriptor> getPropertyDescriptors();
+    boolean isExposed();
 }

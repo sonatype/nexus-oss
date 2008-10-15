@@ -29,7 +29,7 @@ import org.sonatype.nexus.tasks.descriptors.properties.ScheduledTaskPropertyDesc
 
 @Component( role = ScheduledTaskDescriptor.class, hint = "PurgeTimeline", description = "Purge Nexus Timeline" )
 public class PurgeTimelineTaskDescriptor
-    implements ScheduledTaskDescriptor
+    extends AbstractScheduledTaskDescriptor
 {
     public static final String ID = "PurgeTimeline";
 

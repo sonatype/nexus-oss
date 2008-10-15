@@ -35,7 +35,7 @@ import org.sonatype.nexus.tasks.descriptors.properties.ScheduledTaskPropertyDesc
  */
 @Component( role = ScheduledTaskDescriptor.class, hint = "RemoveRepoFolder", description = "Remove Repository Folder" )
 public class RemoveRepoFolderTaskDescriptor
-    implements ScheduledTaskDescriptor
+    extends AbstractScheduledTaskDescriptor
 {
 
     public static final String ID = "RemoveRepoFolderTask";

@@ -29,7 +29,7 @@ import org.sonatype.nexus.tasks.descriptors.properties.ScheduledTaskPropertyDesc
 
 @Component( role = ScheduledTaskDescriptor.class, hint = "RebuildAttributes", description = "Rebuild Repository Attributes" )
 public class RebuildAttributesTaskDescriptor
-    implements ScheduledTaskDescriptor
+    extends AbstractScheduledTaskDescriptor
 {
     public static final String ID = "RebuildAttributesTask";
 

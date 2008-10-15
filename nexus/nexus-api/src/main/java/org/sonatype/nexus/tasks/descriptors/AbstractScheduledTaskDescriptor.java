@@ -20,38 +20,11 @@
  */
 package org.sonatype.nexus.tasks.descriptors;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
-import org.sonatype.nexus.tasks.descriptors.properties.ScheduledTaskPropertyDescriptor;
-
-@Component( role = ScheduledTaskDescriptor.class, hint = "Reindex", description = "Reindex Repositories" )
-public class ReindexTaskDescriptor
-    extends AbstractScheduledTaskDescriptor
+public abstract class AbstractScheduledTaskDescriptor
+    implements ScheduledTaskDescriptor
 {
-    public static final String ID = "ReindexTask";
-
-    @Requirement( role = ScheduledTaskPropertyDescriptor.class, hint = "RepositoryOrGroup" )
-    private ScheduledTaskPropertyDescriptor repositoryOrGroupId;
-
-    public String getId()
+    public boolean isExposed()
     {
-        return ID;
-    }
-
-    public String getName()
-    {
-        return "Reindex Repositories";
-    }
-
-    public List<ScheduledTaskPropertyDescriptor> getPropertyDescriptors()
-    {
-        List<ScheduledTaskPropertyDescriptor> properties = new ArrayList<ScheduledTaskPropertyDescriptor>();
-
-        properties.add( repositoryOrGroupId );
-
-        return properties;
+        return true;
     }
 }

@@ -31,7 +31,8 @@ import org.sonatype.nexus.tasks.descriptors.properties.ScheduledTaskPropertyDesc
 
 @Component( role = ScheduledTaskDescriptor.class, hint = "ClearCache", description="Clear Repository Caches" )
 public class ClearCacheTaskDescriptor
-    implements ScheduledTaskDescriptor, Initializable
+    extends AbstractScheduledTaskDescriptor
+    implements Initializable
 {
     public static final String ID = "ClearCacheTask";
     
