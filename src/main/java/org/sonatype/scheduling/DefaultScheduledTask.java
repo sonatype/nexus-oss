@@ -300,6 +300,8 @@ public class DefaultScheduledTask<T>
                 return result;
             };
         }
+        
+        Future<T> nextFuture = null;
 
         if ( isEnabled() && getTaskState().isActiveOrSubmitted() )
         {
@@ -309,6 +311,22 @@ public class DefaultScheduledTask<T>
 
             try
             {
+                // Note that we need to do this prior to starting, so that the next run time will be updated properly
+                // Rather than having to wait for the task to finish
+                
+                // If manually running, just grab the previous future and use that or create a new one
+                if ( manualRun )
+                {
+                    nextFuture = getFuture();
+
+                    manualRun = false;
+                }
+                // Otherwise, grab the next one
+                else
+                {
+                    nextFuture = reschedule();
+                }
+                
                 result = getCallable().call();
 
                 if ( result != null )
@@ -335,21 +353,6 @@ public class DefaultScheduledTask<T>
                     throw new TaskExecutionException( e );
                 }
             }
-        }
-
-        Future<T> nextFuture = null;
-
-        // If manually running, just grab the previous future and use that or create a new one
-        if ( manualRun )
-        {
-            nextFuture = getFuture();
-
-            manualRun = false;
-        }
-        // Otherwise, grab the next one
-        else
-        {
-            nextFuture = reschedule();
         }
 
         // If manually running or having future, park this task to waiting
