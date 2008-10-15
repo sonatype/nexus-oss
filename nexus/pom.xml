@@ -603,8 +603,8 @@
 							<rules>
 								<bannedDependencies>
 									<excludes>
-										<exclude>*:velocity:1.4</exclude>
-										<exclude>*:velocity-dep:1.4</exclude>
+										<exclude>velocity:velocity:jar:1.4</exclude>
+										<exclude>velocity:velocity-dep:jar:1.4</exclude>
 									</excludes>
 									<message> Velocity 1.4 is banned, Velocity 1.5 should be used! You probably added a dependency that is missing the
 										exclusions. </message>
