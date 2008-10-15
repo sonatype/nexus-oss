@@ -3,7 +3,6 @@ package org.sonatype.nexus.integrationtests;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
-import org.sonatype.nexus.integrationtests.client.nexus725.Nexus725InitialRestClient;
 import org.sonatype.nexus.integrationtests.nexus133.Nexus133TargetCrudJsonTests;
 import org.sonatype.nexus.integrationtests.nexus133.Nexus133TargetCrudXmlTests;
 import org.sonatype.nexus.integrationtests.nexus133.Nexus133TargetValidationTests;
@@ -59,7 +58,6 @@ import org.sonatype.nexus.integrationtests.nexus634.Nexus634RemoveAllTest;
 import org.sonatype.nexus.integrationtests.nexus636.Nexus636EvictUnusedProxiedTaskTest;
 import org.sonatype.nexus.integrationtests.nexus637.Nexus637PublishIndexTest;
 import org.sonatype.nexus.integrationtests.nexus640.Nexus640RebuildRepositoryAttributesTaskTest;
-import org.sonatype.nexus.integrationtests.nexus641.Nexus641ReindexTaskTest;
 import org.sonatype.nexus.integrationtests.nexus642.Nexus642SynchShadowTaskTest;
 import org.sonatype.nexus.integrationtests.nexus643.Nexus643EmptyTrashTaskTest;
 import org.sonatype.nexus.integrationtests.nexus688.Nexus688ReindexOnRepoAdd;
@@ -67,6 +65,7 @@ import org.sonatype.nexus.integrationtests.nexus782.Nexus782UploadWithClassifier
 import org.sonatype.nexus.integrationtests.nexus810.Nexus810PackageNamesInNexusConf;
 import org.sonatype.nexus.integrationtests.nexus810.Nexus810PackageNamesInRestMessages;
 import org.sonatype.nexus.integrationtests.nexus947.Nexus947GroupBrowsing;
+import org.sonatype.nexus.integrationtests.nexus970.Nexus970DeleteRepositoryTest;
 import org.sonatype.nexus.integrationtests.proxy.nexus177.Nexus177OutOfServiceTest;
 import org.sonatype.nexus.integrationtests.proxy.nexus178.Nexus178BlockProxyDownloadTest;
 import org.sonatype.nexus.integrationtests.proxy.nexus179.Nexus179RemoteRepoDownTest;
@@ -75,7 +74,7 @@ import org.sonatype.nexus.integrationtests.proxy.nexus635.Nexus635ClearCacheTask
 import org.sonatype.nexus.integrationtests.upgrades.nexus652.Nexus652Beta5To10UpgradeTest;
 
 /**
- * 
+ *
  */
 @RunWith( Suite.class )
 @SuiteClasses( {
@@ -148,7 +147,8 @@ import org.sonatype.nexus.integrationtests.upgrades.nexus652.Nexus652Beta5To10Up
     Nexus384DotAndDashSearchTest.class,
     Nexus642SynchShadowTaskTest.class,
     Nexus947GroupBrowsing.class,
-    Nexus570IndexArchetypeTest.class } )
+    Nexus570IndexArchetypeTest.class,
+    Nexus970DeleteRepositoryTest.class } )
 public class IntegrationTestSuiteClasses
 {
 
