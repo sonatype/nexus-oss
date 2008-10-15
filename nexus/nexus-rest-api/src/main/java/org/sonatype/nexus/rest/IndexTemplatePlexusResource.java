@@ -12,7 +12,6 @@ import org.apache.velocity.app.VelocityEngine;
 import org.apache.velocity.exception.MethodInvocationException;
 import org.apache.velocity.exception.ParseErrorException;
 import org.apache.velocity.exception.ResourceNotFoundException;
-import org.apache.velocity.runtime.RuntimeConstants;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.StringUtils;
@@ -21,11 +20,11 @@ import org.restlet.data.MediaType;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.data.Status;
-import org.restlet.ext.velocity.TemplateRepresentation;
 import org.restlet.resource.Representation;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
 import org.sonatype.nexus.plugins.rest.NexusResourceBundle;
+import org.sonatype.plexus.rest.representation.VelocityRepresentation;
 import org.sonatype.plexus.rest.resource.AbstractPlexusResource;
 import org.sonatype.plexus.rest.resource.ManagedPlexusResource;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
@@ -83,7 +82,7 @@ public class IndexTemplatePlexusResource
         return render( context, request, response, variant );
     }
 
-    protected TemplateRepresentation render( Context context, Request request, Response response, Variant variant )
+    protected VelocityRepresentation render( Context context, Request request, Response response, Variant variant )
         throws ResourceException
     {
         Map<String, Object> templatingContext = new HashMap<String, Object>();
@@ -92,7 +91,10 @@ public class IndexTemplatePlexusResource
 
         templatingContext.put( "contentBase", "content" );
 
-        TemplateRepresentation templateRepresentation = getTemplateRepresentation( "index.vm", context );
+        VelocityRepresentation templateRepresentation = new VelocityRepresentation(
+            context,
+            "/templates/index.vm",
+            MediaType.TEXT_HTML );
 
         // gather plugin stuff
 
@@ -134,25 +136,6 @@ public class IndexTemplatePlexusResource
         templatingContext.put( "pluginBodyContributions", pluginBodyContributions );
 
         templateRepresentation.setDataModel( templatingContext );
-
-        return templateRepresentation;
-    }
-
-    protected TemplateRepresentation getTemplateRepresentation( String templateName, Context context )
-    {
-        TemplateRepresentation templateRepresentation = new TemplateRepresentation(
-            "/templates/" + templateName,
-            MediaType.TEXT_HTML );
-
-        VelocityEngine engine = templateRepresentation.getEngine();
-
-        engine.setProperty( RuntimeConstants.RUNTIME_LOG_LOGSYSTEM, new RestletLogChute( context ) );
-
-        engine.setProperty( RuntimeConstants.RESOURCE_LOADER, "class" );
-
-        engine.setProperty(
-            "class.resource.loader.class",
-            "org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader" );
 
         return templateRepresentation;
     }

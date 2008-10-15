@@ -30,15 +30,12 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.apache.commons.fileupload.FileItem;
-import org.apache.velocity.app.VelocityEngine;
-import org.apache.velocity.runtime.RuntimeConstants;
 import org.codehaus.plexus.util.StringUtils;
 import org.restlet.Context;
 import org.restlet.data.MediaType;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.data.Status;
-import org.restlet.ext.velocity.TemplateRepresentation;
 import org.restlet.resource.Representation;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
@@ -62,6 +59,7 @@ import org.sonatype.nexus.proxy.item.StorageLinkItem;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.rest.model.ContentListResource;
 import org.sonatype.nexus.rest.model.ContentListResourceResponse;
+import org.sonatype.plexus.rest.representation.VelocityRepresentation;
 
 /**
  * This is an abstract resource handler that uses ResourceStore implementor and publishes those over REST.
@@ -382,21 +380,11 @@ public abstract class AbstractResourceStoreContentPlexusResource
             dataModel.put( "request", req );
 
             // Load up the template, and pass in the data
-            TemplateRepresentation representation = new TemplateRepresentation(
+            VelocityRepresentation representation = new VelocityRepresentation(
+                context,
                 "/templates/repositoryContentHtml.vm",
                 dataModel,
                 variant.getMediaType() );
-
-            // Setup the velocity classloader, to find the template properly
-            VelocityEngine engine = representation.getEngine();
-
-            engine.setProperty( RuntimeConstants.RUNTIME_LOG_LOGSYSTEM, new RestletLogChute( context ) );
-
-            engine.setProperty( RuntimeConstants.RESOURCE_LOADER, "class" );
-
-            engine.setProperty(
-                "class.resource.loader.class",
-                "org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader" );
 
             return representation;
         }
