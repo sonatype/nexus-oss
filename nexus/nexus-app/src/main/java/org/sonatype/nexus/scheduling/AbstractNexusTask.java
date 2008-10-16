@@ -105,9 +105,9 @@ public abstract class AbstractNexusTask<T>
     {
         // most basic check: simply not allowing multiple execution of instances of this class
         // override if needed
-        if ( activeTasks.containsKey( this.getClass() ) )
+        if ( activeTasks.containsKey( this.getClass().getSimpleName() ) )
         {
-            for ( ScheduledTask<?> task : activeTasks.get( this.getClass() ) )
+            for ( ScheduledTask<?> task : activeTasks.get( this.getClass().getSimpleName() ) )
             {
                 if ( TaskState.RUNNING.equals( task.getTaskState() ) )
                 {
