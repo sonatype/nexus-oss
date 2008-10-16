@@ -22,6 +22,7 @@ package org.sonatype.scheduling;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -65,7 +66,7 @@ public class DefaultScheduler
 
     private Map<String, List<ScheduledTask<?>>> tasksMap;
 
-    private AtomicInteger idGen = new AtomicInteger( 1 );
+    private AtomicInteger idGen = new AtomicInteger( 0 );
     
     private int threadPriority = Thread.MIN_PRIORITY;
 
@@ -181,11 +182,31 @@ public class DefaultScheduler
     {
         synchronized ( tasksMap )
         {
-            String id = String.valueOf( idGen.incrementAndGet() );
-
-            while ( tasksMap.containsKey( id ) )
+            String id;
+            
+            if ( idGen.get() == 0 )
             {
-                id = String.valueOf( idGen.getAndIncrement() );
+                ArrayList<Integer> list = new ArrayList<Integer>();
+                
+                for ( List<ScheduledTask<?>> l : tasksMap.values() )
+                {
+                    for ( ScheduledTask<?> s : l )
+                    {
+                        list.add( Integer.parseInt( s.getId() ) );
+                    }
+                }
+                
+                Collections.sort( list );
+                
+                while ( list.contains( idGen.incrementAndGet() ))
+                {
+                }
+                
+                id = String.valueOf( idGen.get() );                    
+            }
+            else
+            {
+                id = String.valueOf( idGen.incrementAndGet() );
             }
 
             return id;
@@ -207,7 +228,7 @@ public class DefaultScheduler
         Map<String, String> taskParams )
     {
         // use the name of the class as the type.
-        return schedule( name, runnable.getClass().getName(), Executors.callable( runnable ), schedule, taskParams );
+        return schedule( name, runnable.getClass().getSimpleName(), Executors.callable( runnable ), schedule, taskParams );
     }
 
     public <T> ScheduledTask<T> submit( String name, Callable<T> callable, Map<String, String> taskParams )

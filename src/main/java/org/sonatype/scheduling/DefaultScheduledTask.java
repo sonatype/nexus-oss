@@ -137,7 +137,7 @@ public class DefaultScheduledTask<T>
     {
         this.throwable = e;
     }
-
+    
     protected Callable<T> getCallable()
     {
         return callable;
@@ -295,7 +295,9 @@ public class DefaultScheduledTask<T>
             if ( !( (SchedulerTask<?>) getCallable() ).allowConcurrentExecution( getScheduler().getActiveTasks() ) )
             {
                 // simply reschedule itself for 10sec
-                getScheduler().getScheduledExecutorService().schedule( this, 10000, TimeUnit.MILLISECONDS );
+                nextRun = new Date( nextRun.getTime() + 10000 );
+                
+                setFuture( getScheduler().getScheduledExecutorService().schedule( this, 10000, TimeUnit.MILLISECONDS ) );
 
                 return result;
             };
