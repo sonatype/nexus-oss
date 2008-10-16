@@ -65,6 +65,7 @@ import org.sonatype.nexus.integrationtests.nexus782.Nexus782UploadWithClassifier
 import org.sonatype.nexus.integrationtests.nexus810.Nexus810PackageNamesInNexusConf;
 import org.sonatype.nexus.integrationtests.nexus810.Nexus810PackageNamesInRestMessages;
 import org.sonatype.nexus.integrationtests.nexus947.Nexus947GroupBrowsing;
+import org.sonatype.nexus.integrationtests.nexus969.Nexus969CacheEvictInteractionTest;
 import org.sonatype.nexus.integrationtests.nexus970.Nexus970DeleteRepositoryTest;
 import org.sonatype.nexus.integrationtests.proxy.nexus177.Nexus177OutOfServiceTest;
 import org.sonatype.nexus.integrationtests.proxy.nexus178.Nexus178BlockProxyDownloadTest;
@@ -148,7 +149,8 @@ import org.sonatype.nexus.integrationtests.upgrades.nexus652.Nexus652Beta5To10Up
     Nexus642SynchShadowTaskTest.class,
     Nexus947GroupBrowsing.class,
     Nexus570IndexArchetypeTest.class,
-    Nexus970DeleteRepositoryTest.class } )
+    Nexus970DeleteRepositoryTest.class,
+    Nexus969CacheEvictInteractionTest.class } )
 public class IntegrationTestSuiteClasses
 {
 
