@@ -37,7 +37,6 @@ import org.slf4j.bridge.SLF4JBridgeHandler;
 import org.sonatype.appbooter.ForkedAppBooter;
 import org.sonatype.appbooter.ctl.AppBooterServiceException;
 import org.sonatype.nexus.artifact.Gav;
-import org.sonatype.nexus.rest.xstream.XStreamInitializer;
 import org.sonatype.nexus.test.utils.DeployUtils;
 import org.sonatype.nexus.test.utils.FileTestingUtils;
 import org.sonatype.nexus.test.utils.NexusConfigUtil;
@@ -55,7 +54,7 @@ import com.thoughtworks.xstream.XStream;
 
 public class AbstractNexusIntegrationTest
 {
-    
+
     public static final String REPO_TEST_HARNESS_REPO = "nexus-test-harness-repo";
     public static final String REPO_TEST_HARNESS_REPO2 = "nexus-test-harness-repo2";
     public static final String REPO_TEST_HARNESS_RELEASE_REPO = "nexus-test-harness-release-repo";
@@ -63,7 +62,7 @@ public class AbstractNexusIntegrationTest
     public static final String REPO_RELEASE_PROXY_REPO1= "release-proxy-repo-1";
     public static final String REPO_TEST_HARNESS_SHADOW= "nexus-test-harness-shadow";
 
-    private PlexusContainer container;
+    protected PlexusContainer container;
 
     private Map<String, Object> context;
 
@@ -88,8 +87,8 @@ public class AbstractNexusIntegrationTest
     protected static String nexusLogDir;
 
     protected Logger log = Logger.getLogger( getClass() );
-    
-    
+
+
     /**
      * Flag that says if we should verify the config before startup, we do not want to do this for upgrade tests.
      */
@@ -119,7 +118,7 @@ public class AbstractNexusIntegrationTest
         // we also need to setup a couple fields, that need to be pulled out of a bundle
         this.testRepositoryId = testRepositoryId;
         // this.nexusTestRepoUrl = baseNexusUrl + REPOSITORY_RELATIVE_URL + testRepositoryId + "/";
-        
+
         // configure the logging
         SLF4JBridgeHandler.install();
 
@@ -131,7 +130,7 @@ public class AbstractNexusIntegrationTest
      * init the tests once (to start/stop the app) and the <code>@BeforeClass</code> is static, so we don't have access
      * to the package name of the running tests. We are going to use the package name to find resources for additional
      * setup. NOTE: With this setup running multiple Test at the same time is not possible.
-     * 
+     *
      * @throws Exception
      */
     @Before
@@ -142,7 +141,7 @@ public class AbstractNexusIntegrationTest
         {
             if ( NEEDS_INIT )
             {
-                // tell the console what we are doing, now that there is no output its 
+                // tell the console what we are doing, now that there is no output its
                 System.out.println( "Running Test: "+ this.getClass().getSimpleName() );
 
                 HashMap<String, String> variables = new HashMap<String, String>();
@@ -169,7 +168,7 @@ public class AbstractNexusIntegrationTest
                 {
                     NexusConfigUtil.validateConfig();
                 }
-                
+
                 // start nexus
                 this.startNexus();
 
@@ -260,12 +259,12 @@ public class AbstractNexusIntegrationTest
                 // http://restlet.tigris.org/issues/show_bug.cgi?id=71
 
 //                int status = DeployUtils.deployUsingPomWithRest( deployUrl, repositoryId, gav, artifactFile, pom );
-                
+
                 DeployUtils.deployWithWagon( this.container, "http", deployUrl, artifactFile, this.getRelitiveArtifactPath( gav ) );
                 DeployUtils.deployWithWagon( this.container, "http", deployUrl, pom, this.getRelitivePomPath( gav ) );
 
             }
-            
+
         }
     }
 
@@ -409,7 +408,7 @@ public class AbstractNexusIntegrationTest
     /**
      * Returns a File if it exists, null otherwise. Files returned by this method must be located in the
      * "src/test/resourcs/nexusXXX/" folder.
-     * 
+     *
      * @param relativePath path relative to the nexusXXX directory.
      * @return A file specified by the relativePath. or null if it does not exist.
      */
@@ -428,7 +427,7 @@ public class AbstractNexusIntegrationTest
     /**
      * Returns a File if it exists, null otherwise. Files returned by this method must be located in the
      * "src/test/resourcs/nexusXXX/files/" folder.
-     * 
+     *
      * @param relativePath path relative to the files directory.
      * @return A file specified by the relativePath. or null if it does not exist.
      */
@@ -528,7 +527,7 @@ public class AbstractNexusIntegrationTest
     {
         return container.lookup( role, id );
     }
-    
+
     protected String getRelitivePomPath( Gav gav )
     throws FileNotFoundException
 {
@@ -568,10 +567,10 @@ public class AbstractNexusIntegrationTest
                 + gav.getArtifactId() + "&v=" + gav.getVersion();
         Response response = RequestFacade.doGetRequest( serviceURI );
         Assert.assertEquals( "Snapshot download should redirect to a new file " + response.getRequest().getResourceRef().toString(), 301, response.getStatus().getCode());
-        
+
         Reference redirectRef = response.getRedirectRef();
         Assert.assertNotNull( "Snapshot download should redirect to a new file " + response.getRequest().getResourceRef().toString(), redirectRef );
-        
+
         serviceURI = redirectRef.toString();
 
         File file = FileUtils.createTempFile( gav.getArtifactId(), '.' + gav.getExtension(), parentDir );
@@ -643,19 +642,19 @@ public class AbstractNexusIntegrationTest
         Response response = RequestFacade.sendMessage( serviceURI, Method.DELETE );
 
         boolean deleted = response.getStatus().isSuccess();
-        
+
         if ( !deleted )
         {
             log.debug( "Failed to delete: " + serviceURI + "  - Status: " + response.getStatus() );
         }
-        
+
         // fake it because the artifact doesn't exist
         // TODO: clean this up.
         if( response.getStatus().getCode() == 404 )
         {
             deleted = true;
         }
-        
+
         return deleted;
     }
 
@@ -673,7 +672,7 @@ public class AbstractNexusIntegrationTest
     {
         return baseNexusUrl + REPOSITORY_RELATIVE_URL + testRepositoryId + "/";
     }
-    
+
     public String getNexusTestRepoServiceUrl()
     {
         return baseNexusUrl + "service/local/repositories/"+ testRepositoryId +"/content/";
@@ -708,8 +707,8 @@ public class AbstractNexusIntegrationTest
     {
         return baseNexusUrl + GROUP_REPOSITORY_RELATIVE_URL + groupId + "/";
     }
-    
-    
+
+
 
     protected boolean isVerifyNexusConfigBeforeStart()
     {
@@ -742,7 +741,7 @@ public class AbstractNexusIntegrationTest
 
         return true;
     }
-    
+
     public XStream getXMLXStream()
     {
         return XStreamFactory.getXmlXStream();
@@ -752,5 +751,5 @@ public class AbstractNexusIntegrationTest
     {
         return XStreamFactory.getJsonXStream();
     }
-    
+
 }
