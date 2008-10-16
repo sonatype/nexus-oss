@@ -3,7 +3,12 @@ package org.sonatype.nexus.plugins.rest;
 import java.io.IOException;
 import java.io.InputStream;
 
-public interface Resource
+/**
+ * This is an abstraction for static resources that the NexusResourceBundle wants to "contribute" to Nexus Web App.
+ * 
+ * @author cstamas
+ */
+public interface StaticResource
 {
     String getPath();
 
