@@ -83,7 +83,7 @@ public class PlexusRestletApplicationBridge
      */
     public PlexusRestletApplicationBridge( Context context )
     {
-        super();
+        super( context );
 
         this.createdOn = new Date();
     }
