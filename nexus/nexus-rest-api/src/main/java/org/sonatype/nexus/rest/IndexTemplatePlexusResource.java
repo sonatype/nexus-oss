@@ -62,6 +62,7 @@ public class IndexTemplatePlexusResource
     @Override
     public PathProtectionDescriptor getResourceProtection()
     {
+        // unprotected
         return null;
     }
 
@@ -113,10 +114,6 @@ public class IndexTemplatePlexusResource
             NexusResourceBundle bundle = bundles.get( key );
 
             pluginContext.put( "bundle", bundle );
-
-            pluginContext.put( "pluginResourcesBase", "plugin_resources/" + key );
-
-            pluginContext.put( "pluginServicesBase", "service/local/plugins/" + key );
 
             evaluateIfNeeded(
                 templateRepresentation.getEngine(),

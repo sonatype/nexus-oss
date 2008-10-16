@@ -20,6 +20,8 @@
  */
 package org.sonatype.nexus.rest;
 
+import java.util.List;
+
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.restlet.Application;
@@ -32,6 +34,8 @@ import org.sonatype.jsecurity.web.PlexusMutableWebConfiguration;
 import org.sonatype.jsecurity.web.PlexusWebConfiguration;
 import org.sonatype.jsecurity.web.SecurityConfigurationException;
 import org.sonatype.nexus.Nexus;
+import org.sonatype.nexus.plugins.rest.NexusResourceBundle;
+import org.sonatype.nexus.plugins.rest.StaticResource;
 import org.sonatype.nexus.proxy.events.AbstractEvent;
 import org.sonatype.nexus.proxy.events.EventListener;
 import org.sonatype.nexus.proxy.events.NexusStartedEvent;
@@ -74,14 +78,14 @@ public class NexusApplication
     @Requirement( hint = "content" )
     private ManagedPlexusResource contentResource;
 
-    @Requirement( hint = "pluginResources" )
-    private ManagedPlexusResource pluginResources;
-
     @Requirement( hint = "StatusPlexusResource" )
     private ManagedPlexusResource statusPlexusResource;
 
     @Requirement( hint = "CommandPlexusResource" )
     private ManagedPlexusResource commandPlexusResource;
+
+    @Requirement( role = NexusResourceBundle.class )
+    private List<NexusResourceBundle> nexusResourceBundles;
 
     private Router contentRouter;
 
@@ -106,7 +110,17 @@ public class NexusApplication
     @Override
     protected void doConfigure()
     {
+        // adding ourselves as listener
         nexus.getNexusConfiguration().addProximityEventListener( this );
+
+        // ===============
+        // INITING FILTERS
+
+        // instance filter, that injects proper Nexus instance into request attributes
+        localNexusInstanceFilter.setContext( getContext() );
+
+        // instance filter, that injects proper Nexus instance into request attributes
+        nexusInstanceFilter.setContext( getContext() );
     }
 
     /**
@@ -121,17 +135,8 @@ public class NexusApplication
     @Override
     protected Router initializeRouter( Router root, boolean isStarted )
     {
-        // ===============
-        // INITING FILTERS
-
-        // instance filter, that injects proper Nexus instance into request attributes
-        localNexusInstanceFilter.setContext( getContext() );
-
-        // instance filter, that injects proper Nexus instance into request attributes
-        nexusInstanceFilter.setContext( getContext() );
-
         // ==========
-        // INDEX.HTML
+        // INDEX.HTML and WAR contents
         // TODO: would be nice to get the resourceUri from indexTemplateResource! (and discover the root of the app!)
         Redirector redirector = new Redirector( getContext(), "index.html", Redirector.MODE_CLIENT_PERMANENT );
         attach( root, true, "/", redirector );
@@ -142,44 +147,6 @@ public class NexusApplication
         rootDir.setListingAllowed( false );
         rootDir.setNegotiateContent( false );
         attach( root, false, "/", rootDir );
-        
-        Directory docs = new Directory( getContext(), "war:///docs/" );
-        docs.setListingAllowed( false );
-        docs.setNegotiateContent( false );
-        attach( root, false, "/docs/", docs );
-
-        Directory ext = new Directory( getContext(), "war:///ext-2.2/" );
-        ext.setListingAllowed( false );
-        ext.setNegotiateContent( false );
-        attach( root, false, "/ext-2.2/", ext );
-
-        Directory images = new Directory( getContext(), "war:///images/" );
-        images.setListingAllowed( false );
-        images.setNegotiateContent( false );
-        attach( root, false, "/images/", images );
-
-        Directory js = new Directory( getContext(), "war:///js/" );
-        js.setListingAllowed( false );
-        js.setNegotiateContent( false );
-        attach( root, false, "/js/", js );
-
-        Directory style = new Directory( getContext(), "war:///style/" );
-        style.setListingAllowed( false );
-        style.setNegotiateContent( false );
-        attach( root, false, "/style/", style );
-        
-
-        // docs
-        // ext-2.2
-        // images
-        // js
-        // style
-        // digestapplet
-        // favicon
-
-        // ==========
-        // PLUGIN "ADDED" RESOURCES
-        attach( root, false, pluginResources.getResourceUri(), new PlexusResourceFinder( getContext(), pluginResources ) );
 
         // =======
         // CONTENT
@@ -216,7 +183,21 @@ public class NexusApplication
             }
         }
 
-        // manually attaching and invoking security settings here
+        // ================
+        // STATIC RESOURCES
+
+        if ( nexusResourceBundles.size() > 0 )
+        {
+            for ( NexusResourceBundle bundle : nexusResourceBundles )
+            {
+                List<StaticResource> resources = bundle.getContributedResouces();
+
+                for ( StaticResource resource : resources )
+                {
+                    attach( root, true, resource.getPath(), new StaticResourceFinder( getContext(), resource ) );
+                }
+            }
+        }
 
         // ========
         // SERVICE
@@ -252,31 +233,36 @@ public class NexusApplication
         {
             // CONTENT, detaching all
             localNexusInstanceFilter.setNext( (Restlet) null );
+
+            return;
         }
         else
         {
             // CONTENT, attaching it after nif
             localNexusInstanceFilter.setNext( contentRouter );
+
+            if ( PlexusMutableWebConfiguration.class.isAssignableFrom( plexusWebConfiguration.getClass() ) )
+            {
+                try
+                {
+                    // TODO: recheck this? We are adding a flat wall to be hit if a mapping is missed
+                    ( (PlexusMutableWebConfiguration) plexusWebConfiguration )
+                        .addProtectedResource(
+                            "/service/**",
+                            "authcBasic,perms[nexus:someFreakinStupidPermToCatchAllUnprotectedsAndOnlyAdminWillHaveItSinceItHaveAStar]" );
+                }
+                catch ( SecurityConfigurationException e )
+                {
+                    throw new IllegalStateException(
+                        "Could not configure JSecurity to add WALL to the end of the chain",
+                        e );
+                }
+
+                // signal we finished adding resources
+                ( (PlexusMutableWebConfiguration) plexusWebConfiguration ).protectedResourcesAdded();
+            }
         }
 
-        if ( PlexusMutableWebConfiguration.class.isAssignableFrom( plexusWebConfiguration.getClass() ) )
-        {
-            try
-            {
-                // TODO: recheck this? We are adding a flat wall to be hit if a mapping is missed
-                ( (PlexusMutableWebConfiguration) plexusWebConfiguration )
-                    .addProtectedResource(
-                        "/service/**",
-                        "authcBasic,perms[nexus:someFreakinStupidPermToCatchAllUnprotectedsAndOnlyAdminWillHaveItSinceItHaveAStar]" );
-            }
-            catch ( SecurityConfigurationException e )
-            {
-                throw new IllegalStateException( "Could not configure JSecurity to add WALL to the end of the chain", e );
-            }
-
-            // signal we finished adding resources
-            ( (PlexusMutableWebConfiguration) plexusWebConfiguration ).protectedResourcesAdded();
-        }
     }
 
     @Override
