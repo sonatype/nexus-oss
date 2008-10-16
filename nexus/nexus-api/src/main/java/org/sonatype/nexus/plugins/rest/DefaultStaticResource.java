@@ -5,17 +5,25 @@ import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
 
-
 public class DefaultStaticResource
     implements StaticResource
 {
     private final URL resourceURL;
 
+    private final String path;
+
     private volatile URLConnection urlConnection;
 
     public DefaultStaticResource( URL url )
     {
+        this( url, null );
+    }
+
+    public DefaultStaticResource( URL url, String path )
+    {
         this.resourceURL = url;
+
+        this.path = path;
     }
 
     protected synchronized boolean checkConnection()
@@ -38,7 +46,14 @@ public class DefaultStaticResource
 
     public String getPath()
     {
-        return resourceURL.getPath();
+        if ( path != null )
+        {
+            return path;
+        }
+        else
+        {
+            return resourceURL.getPath();
+        }
     }
 
     public long getSize()
@@ -71,9 +86,9 @@ public class DefaultStaticResource
         if ( checkConnection() )
         {
             InputStream is = urlConnection.getInputStream();
-            
+
             urlConnection = null;
-            
+
             return is;
         }
         else
