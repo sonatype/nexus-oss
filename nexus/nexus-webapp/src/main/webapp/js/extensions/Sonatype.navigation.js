@@ -93,44 +93,47 @@ Ext.extend( Sonatype.navigation.Section, Ext.Panel, {
       }
       return c2;
     }
-    else if ( c.href ) {
-      // regular external link
-      return {
-        autoHeight: true,
-        html: '<ul class="group-links"><li><a href="' + c.href + '" target="' + c.href + '">' + c.title + '</a></li></ul>'
+    
+    if ( ! c.xtype ) {
+      if ( c.href ) {
+        // regular external link
+        return {
+          autoHeight: true,
+          html: '<ul class="group-links"><li><a href="' + c.href + '" target="' + c.href + '">' + c.title + '</a></li></ul>'
+        }
       }
-    }
-    else if ( c.tabCode || c.handler ) {
-      // panel open action
-      return c.enabled == false ? null :
-      {
-        autoHeight: true,
-        listeners: {
-          render: {
-            fn: function( panel ) {
-              panel.body.on(
-                'click',
-                Ext.emptyFn,
-                null,
-                { delegate: 'a', preventDefault: true } );
-              panel.body.on(
-                'mousedown',
-                function( e, target ) {
-                  e.stopEvent();
-                  if ( c.handler ) {
-                    c.handler();
-                  }
-                  else {
-                    Sonatype.view.mainTabPanel.addOrShowTab( c.tabId, c.tabCode, { title: c.tabTitle ? c.tabTitle : c.title } );
-                  }
-                },
-                c.scope,
-                { delegate: 'a' } );
-            },
-            scope: this
-          }
-        },
-        html: '<ul class="group-links"><li><a href="#">' + c.title + '</a></li></ul>'
+      else if ( c.tabCode || c.handler ) {
+        // panel open action
+        return c.enabled == false ? null :
+        {
+          autoHeight: true,
+          listeners: {
+            render: {
+              fn: function( panel ) {
+                panel.body.on(
+                  'click',
+                  Ext.emptyFn,
+                  null,
+                  { delegate: 'a', preventDefault: true } );
+                panel.body.on(
+                  'mousedown',
+                  function( e, target ) {
+                    e.stopEvent();
+                    if ( c.handler ) {
+                      c.handler();
+                    }
+                    else {
+                      Sonatype.view.mainTabPanel.addOrShowTab( c.tabId, c.tabCode, { title: c.tabTitle ? c.tabTitle : c.title } );
+                    }
+                  },
+                  c.scope,
+                  { delegate: 'a' } );
+              },
+              scope: this
+            }
+          },
+          html: '<ul class="group-links"><li><a href="#">' + c.title + '</a></li></ul>'
+        }
       }
     }
     return c;

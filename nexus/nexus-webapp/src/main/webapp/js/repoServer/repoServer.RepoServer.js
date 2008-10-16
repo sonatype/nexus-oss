@@ -233,7 +233,8 @@ Sonatype.repoServer.RepoServer = function(){
                 onTriggerClick: function(a,b,c){
                   var v = this.getRawValue();
                   if ( v.length > 0 ) {
-                    var panel = this.repoPanel.actions['open-search-all'](this.repoPanel);
+                    var panel = Sonatype.view.mainTabPanel.addOrShowTab(
+                      'st-nexus-search-panel', Sonatype.repoServer.SearchPanel, { title: 'Search' } );
                     var searchType = 'quick';
                     if ( v.search(/^[0-9a-f]{40}$/) == 0 ) {
                       searchType = 'checksum';
