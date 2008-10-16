@@ -24,35 +24,6 @@
 Sonatype.repoServer.RepoServer = function(){
   var cfg = Sonatype.config.repos;
   var sp = Sonatype.lib.Permissions;
-  
-  var defaultGroupPanel = {
-    title: 'Default',
-    id: 'default',
-    cls: 'st-server-sub-container',
-    layout: 'fit',
-    frame: true,
-    collapsible: false,
-    collapsed: false,
-    autoHeight: true,
-    html: '<div>default</div>'
-  };
-  
-  var bodyTpl = new Ext.XTemplate(
-    '<ul class="group-links">',
-    '<tpl for="links">',
-      '<li><a id="{id}" href="#">{title}</a></li>',
-    '</tpl>',
-    '</ul>'
-  );
-
-  var linkTpl = new Ext.XTemplate(
-    '<ul class="group-links">',
-    '<tpl for="links">',
-      '<li><a href="{href}" target="{href}">{title}</a></li>',
-    '</tpl>',
-    '</ul>'
-  );
-
 
 // ************************************  
   return {
@@ -87,16 +58,6 @@ Sonatype.repoServer.RepoServer = function(){
       ]
       //buttons added later to provide scope to handler
        
-    },
-
-    addClickListeners: function( p ) {
-      p.on('render', 
-        function(panel){
-          panel.body.on('click', Ext.emptyFn, null, {delegate:'a', preventDefault:true});
-          panel.body.on('mousedown', this.doAction, this, {delegate:'a'});
-        },
-        this
-      );
     },
     
     buildRecoveryText : function(){
@@ -143,15 +104,13 @@ Sonatype.repoServer.RepoServer = function(){
     
     // Each Sonatype server will need one of these 
     initServerTab : function() {
+
+      Sonatype.Events.addListener( 'nexusNavigationInit', this.addNexusNavigationItems, this );
       
       // Left Panel
-      this.nexusPanel = new Ext.Panel({
+      this.nexusPanel = new Sonatype.navigation.NavigationPanel({
         id: 'st-nexus-tab',
-        title: 'Nexus',
-        cls: 'st-server-panel',
-        layout:'fit',
-        border: false
-        //items: groupConfigs
+        title: 'Nexus'
       });
 
       this.createSubComponents();
@@ -228,7 +187,6 @@ Sonatype.repoServer.RepoServer = function(){
     
     //Add/Replace Nexus left hand components
     createSubComponents : function() {
-      var userPerms = Sonatype.user.curr.repoServer;
       var wasRendered = this.nexusPanel.rendered;
       
       if (wasRendered) {
@@ -237,174 +195,8 @@ Sonatype.repoServer.RepoServer = function(){
           this.remove(item, true);
         }, this.nexusPanel);
       }
-      
-      var groupConfigs = [];
-      var panelConf;
 
-      if(sp.checkPermission(userPerms.viewSearch, sp.READ)){
-        this.addClickListeners( 
-          this.nexusPanel.add( Ext.apply( {},
-            {
-              title: 'Artifact Search',
-              id: 'st-nexus-search',
-              items: [
-                {
-                  xtype: 'trigger',
-                  id: 'quick-search--field',
-                  triggerClass: 'x-form-search-trigger',
-                  repoPanel: this,
-                  width: 150,
-                  listeners: {
-                    'specialkey': {
-                      fn: function(f, e){
-                        if(e.getKey() == e.ENTER){
-                          this.onTriggerClick();
-                        }
-                      }
-                    }
-                  },
-                  onTriggerClick: function(a,b,c){
-                    var v = this.getRawValue();
-                    if ( v.length > 0 ) {
-                      var panel = this.repoPanel.actions['open-search-all'](this.repoPanel);
-                      var searchType = 'quick';
-                      if ( v.search(/^[0-9a-f]{40}$/) == 0 ) {
-                        searchType = 'checksum';
-                      }
-                      else if ( v.search(/^[A-Z]/) == 0 ) {
-                        searchType = 'classname';
-                      }
-                      panel.setSearchType( panel, searchType );
-                      panel.searchField.setRawValue( this.getRawValue() );
-                      panel.startSearch( panel );
-                    }
-                  }
-                }
-              ],
-              html: bodyTpl.apply({
-                links: [
-                  { id:'open-search-all', title: 'Advanced Search' }
-                ]
-              }) 
-            },
-            defaultGroupPanel )
-          )
-        );
-      }
-      
-      //Views Group **************************************************
-      var vTplData = {links:[]};
-      
-      if(sp.checkPermission(userPerms.maintRepos, sp.READ)) {
-        vTplData.links.push({
-          id: sp.checkPermission(userPerms.maintRepos, sp.EDIT) ?
-            'open-repos-maint' : 'open-repos-maint-readonly',
-          title:'Browse Repositories'
-        });
-      }
-      if(sp.checkPermission(userPerms.viewSystemChanges, sp.READ)){
-        vTplData.links.push( {id:'open-system-changes', title:'System Feeds'} );
-      }
-      if(sp.checkPermission(userPerms.maintLogs, sp.READ) || sp.checkPermission(userPerms.maintConfig, sp.READ)){
-         vTplData.links.push( {id:'open-view-logs', title:'Logs and Config Files'} );
-      }
-      if(vTplData.links.length > 0){
-        panelConf = Ext.apply({}, {title:'Views', id:'st-nexus-views', html: bodyTpl.apply(vTplData)}, defaultGroupPanel);
-        this.addClickListeners( this.nexusPanel.add(panelConf) ); 
-        //groupConfigs.push(panelConf);
-      }
-
-      //Config Group **************************************************
-      var cTplData = {links:[]};
-      if(sp.checkPermission(userPerms.configServer, sp.READ)
-          && (sp.checkPermission(userPerms.configServer, sp.CREATE)
-              || sp.checkPermission(userPerms.configServer, sp.DELETE)
-              || sp.checkPermission(userPerms.configServer, sp.EDIT))){
-        cTplData.links.push( {id:'open-config-server', title:'Server'} );
-      }
-      if(sp.checkPermission(userPerms.configRepos, sp.READ)
-          && (sp.checkPermission(userPerms.configRepos, sp.CREATE)
-                  || sp.checkPermission(userPerms.configRepos, sp.DELETE)
-                  || sp.checkPermission(userPerms.configRepos, sp.EDIT))){
-        cTplData.links.push( {id:'open-config-repos', title:'Repositories'} );
-      }
-      if(sp.checkPermission(userPerms.configGroups, sp.READ)
-          && (sp.checkPermission(userPerms.configGroups, sp.CREATE)
-                  || sp.checkPermission(userPerms.configGroups, sp.DELETE)
-                  || sp.checkPermission(userPerms.configGroups, sp.EDIT))){
-        cTplData.links.push( {id:'open-config-groups', title:'Groups'} );
-      }
-      if(sp.checkPermission(userPerms.configRules, sp.READ)
-          && (sp.checkPermission(userPerms.configRules, sp.CREATE)
-                  || sp.checkPermission(userPerms.configRules, sp.DELETE)
-                  || sp.checkPermission(userPerms.configRules, sp.EDIT))){
-        cTplData.links.push( {id:'open-config-rules', title:'Routing'} );
-      }
-      if(sp.checkPermission(userPerms.configSchedules, sp.READ)
-          && (sp.checkPermission(userPerms.configSchedules, sp.CREATE)
-                  || sp.checkPermission(userPerms.configSchedules, sp.DELETE)
-                  || sp.checkPermission(userPerms.configSchedules, sp.EDIT))){
-        cTplData.links.push( {id:'open-config-schedules', title:'Scheduled Tasks'} );
-      }
-      if(sp.checkPermission(userPerms.configRepoTargets, sp.READ)
-          && (sp.checkPermission(userPerms.configRepoTargets, sp.CREATE)
-                  || sp.checkPermission(userPerms.configRepoTargets, sp.DELETE)
-                  || sp.checkPermission(userPerms.configRepoTargets, sp.EDIT))){
-        cTplData.links.push( {id:'open-config-repoTargets', title:'Repository Targets'} );
-      }
-      if(cTplData.links.length > 0){
-        panelConf = Ext.apply({}, {title:'Administration', id:'st-nexus-config', html: bodyTpl.apply(cTplData)}, defaultGroupPanel);
-        this.addClickListeners( this.nexusPanel.add(panelConf) ); 
-        //groupConfigs.push(panelConf);
-      }
-
-      //Security Group **************************************************
-      var sTplData = {links:[]};
-      if ( Sonatype.user.curr.isLoggedIn 
-              && sp.checkPermission( userPerms.actionChangePassword, sp.CREATE ) ) {
-        sTplData.links.push( { id: 'open-security-password', title: 'Change Password' } );
-      }
-      if( sp.checkPermission( userPerms.configUsers, sp.READ ) 
-          && (sp.checkPermission(userPerms.configUsers, sp.CREATE)
-                  || sp.checkPermission(userPerms.configUsers, sp.DELETE)
-                  || sp.checkPermission(userPerms.configUsers, sp.EDIT))){
-        sTplData.links.push( { id: 'open-security-users', title: 'Users' } );
-      }
-      if ( sp.checkPermission( userPerms.configRoles, sp.READ ) 
-          && (sp.checkPermission(userPerms.configRoles, sp.CREATE)
-                  || sp.checkPermission(userPerms.configRoles, sp.DELETE)
-                  || sp.checkPermission(userPerms.configRoles, sp.EDIT))){
-        sTplData.links.push( { id: 'open-security-roles', title: 'Roles' } );
-      }
-      if ( sp.checkPermission( userPerms.configPrivileges, sp.READ ) 
-          && (sp.checkPermission(userPerms.configPrivileges, sp.CREATE)
-                  || sp.checkPermission(userPerms.configPrivileges, sp.DELETE)
-                  || sp.checkPermission(userPerms.configPrivileges, sp.EDIT))){
-        sTplData.links.push( { id: 'open-security-privileges', title: 'Privileges' } );
-      }
-      if ( sTplData.links.length > 0 ){
-        panelConf = Ext.apply( {}, { title:'Security', id: 'st-nexus-security', html: bodyTpl.apply( sTplData ) }, defaultGroupPanel );
-        this.addClickListeners( this.nexusPanel.add(panelConf) );
-      }
-
-      this.nexusPanel.add( Ext.apply( {},
-        {
-          title: 'Help',
-          id: 'st-nexus-docs',
-          collapsible: true,
-          collapsed: true,
-          html: linkTpl.apply({
-            links: [
-              { href: 'http://nexus.sonatype.org/', title: 'Nexus Home' },
-              { href: 'http://www.sonatype.com/book/reference/repository-manager.html', title: 'Getting Started' },
-              { href: 'https://docs.sonatype.com/display/NX/Home', title: 'Nexus Wiki' },
-              { href: 'http://www.sonatype.com/book/reference/public-book.html', title: 'Maven Book' },
-              { href: 'http://nexus.sonatype.org/changes.html', title: 'Release Notes' },
-              { href: 'http://issues.sonatype.org/secure/CreateIssue.jspa?pid=10001&issuetype=1', title: 'Report Issue' }
-            ]
-          }) 
-        },
-        defaultGroupPanel ) );
+      Sonatype.Events.fireEvent( 'nexusNavigationInit', this.nexusPanel );
 
       if (wasRendered) {
         this.nexusPanel.doLayout();
@@ -414,75 +206,212 @@ Sonatype.repoServer.RepoServer = function(){
       
     },
     
-    doAction : function(e, target){
-      e.stopEvent();
-      this.actions[target.id](this);
-    },
-    
-    actions : {
-      'open-search-all' : function(scope) {
-        var id = 'st-nexus-search-panel';
-        return Sonatype.view.mainTabPanel.addOrShowTab(id, Sonatype.repoServer.SearchPanel, {title: 'Search'});
-      },
-      'open-checksum-search' : function(scope) {
-        var id = 'st-nexus-checksum-search-panel';
-        Sonatype.view.mainTabPanel.addOrShowTab(id, Sonatype.repoServer.ChecksumSearchPanel, {title: 'Checksum Search'});
-      },
-      'open-system-changes' : function(scope) {
-        var id = 'feed-view-system_changes';
-        Sonatype.view.mainTabPanel.addOrShowTab(id, Sonatype.repoServer.FeedViewPanel, {title: 'System Feeds'});
-      },      
-      'open-view-logs' : function(scope) {
-        var id = 'view-logs';
-        Sonatype.view.mainTabPanel.addOrShowTab(id, Sonatype.repoServer.LogsViewPanel, {title: 'Logs and Configs'});
-      },
-      'open-repos-maint-readonly' : function(scope){
-        var id = 'repos-maint-readonly';
-        Sonatype.view.mainTabPanel.addOrShowTab(id, Sonatype.repoServer.RepoMaintPanel, {title: 'Repositories'});
-      },
-      'open-repos-maint' : function(scope){
-        var id = 'repos-maint';
-        Sonatype.view.mainTabPanel.addOrShowTab(id, Sonatype.repoServer.RepoMaintPanel, {title: 'Repositories'});
-      },
-      'open-config-server' : function(scope){
-        var id = 'nexus-config';
-        Sonatype.view.mainTabPanel.addOrShowTab(id, Sonatype.repoServer.ServerEditPanel, {title: 'Nexus'});
-      },
-      'open-config-repos' : function(scope){
-        var id = 'repos-config';
-        Sonatype.view.mainTabPanel.addOrShowTab(id, Sonatype.repoServer.RepoEditPanel, {title: 'Repository Config'});
-      },
-      'open-config-groups' : function(scope){
-        var id = 'groups-config';
-        Sonatype.view.mainTabPanel.addOrShowTab(id, Sonatype.repoServer.GroupsEditPanel, {title: 'Groups'});
-      },
-      'open-config-rules' : function(scope){
-        var id = 'routes-config';
-        Sonatype.view.mainTabPanel.addOrShowTab(id, Sonatype.repoServer.RoutesEditPanel, {title: 'Routing'});
-      },
-      'open-config-schedules' : function(scope){
-        var id = 'schedules-config';
-        Sonatype.view.mainTabPanel.addOrShowTab(id, Sonatype.repoServer.SchedulesEditPanel, {title: 'Scheduled Tasks'});
-      },
-      'open-security-password' : function(scope){
-        Sonatype.utils.changePassword();
-      },
-      'open-security-users' : function(scope){
-        var id = 'security-users';
-        Sonatype.view.mainTabPanel.addOrShowTab(id, Sonatype.repoServer.UserEditPanel, {title: 'Users'});
-      },
-      'open-security-roles' : function(scope){
-        var id = 'security-roles';
-        Sonatype.view.mainTabPanel.addOrShowTab(id, Sonatype.repoServer.RoleEditPanel, {title: 'Roles'});
-      },
-      'open-security-privileges' : function(scope){
-        var id = 'security-privileges';
-        Sonatype.view.mainTabPanel.addOrShowTab(id, Sonatype.repoServer.PrivilegeEditPanel, {title: 'Privileges'});
-      },
-      'open-config-repoTargets' : function(scope){
-        var id = 'config-repoTargets';
-        Sonatype.view.mainTabPanel.addOrShowTab(id, Sonatype.repoServer.RepoTargetEditPanel, {title: 'Repository Targets'});
+    addNexusNavigationItems: function( nexusPanel ) {
+      var userPerms = Sonatype.user.curr.repoServer;
+      
+      if(sp.checkPermission(userPerms.viewSearch, sp.READ)){
+        nexusPanel.add(
+          {
+            title: 'Artifact Search',
+            id: 'st-nexus-search',
+            items: [
+              {
+                xtype: 'trigger',
+                id: 'quick-search--field',
+                triggerClass: 'x-form-search-trigger',
+                repoPanel: this,
+                width: 150,
+                listeners: {
+                  'specialkey': {
+                    fn: function(f, e){
+                      if(e.getKey() == e.ENTER){
+                        this.onTriggerClick();
+                      }
+                    }
+                  }
+                },
+                onTriggerClick: function(a,b,c){
+                  var v = this.getRawValue();
+                  if ( v.length > 0 ) {
+                    var panel = this.repoPanel.actions['open-search-all'](this.repoPanel);
+                    var searchType = 'quick';
+                    if ( v.search(/^[0-9a-f]{40}$/) == 0 ) {
+                      searchType = 'checksum';
+                    }
+                    else if ( v.search(/^[A-Z]/) == 0 ) {
+                      searchType = 'classname';
+                    }
+                    panel.setSearchType( panel, searchType );
+                    panel.searchField.setRawValue( this.getRawValue() );
+                    panel.startSearch( panel );
+                  }
+                }
+              },
+              {
+                title: 'Advanced Search',
+                tabCode: Sonatype.repoServer.SearchPanel,
+                tabId: 'st-nexus-search-panel',
+                tabTitle: 'Search'
+              }
+            ]
+          }
+        );
       }
+      
+      //Views Group **************************************************
+      nexusPanel.add( {
+        title: 'Views',
+        id: 'st-nexus-views',
+        items: [
+          {
+            enabled: sp.checkPermission( userPerms.maintRepos, sp.READ ),
+            title: 'Browse Repositories',
+            tabId: 'repos-maint',
+            tabCode: Sonatype.repoServer.RepoMaintPanel,
+            tabTitle: 'Repositories'
+          },
+          {
+            enabled: sp.checkPermission( userPerms.viewSystemChanges, sp.READ ),
+            title: 'System Feeds',
+            tabId: 'feed-view-system_changes',
+            tabCode: Sonatype.repoServer.FeedViewPanel
+          },
+          {
+            enabled: sp.checkPermission( userPerms.maintLogs, sp.READ ) ||
+              sp.checkPermission( userPerms.maintConfig, sp.READ ),
+            title: 'Logs and Config Files',
+            tabId: 'view-logs',
+            tabCode: Sonatype.repoServer.LogsViewPanel,
+            tabTitle: 'Logs and Configs'
+          }
+        ]
+      } );
+
+      //Config Group **************************************************
+      nexusPanel.add( {
+        title: 'Administration',
+        id: 'st-nexus-config',
+        items: [
+          {
+            enabled: sp.checkPermission(userPerms.configServer, sp.READ) &&
+              ( sp.checkPermission(userPerms.configServer, sp.CREATE) ||
+                sp.checkPermission(userPerms.configServer, sp.DELETE)
+              |  sp.checkPermission(userPerms.configServer, sp.EDIT)),
+            title: 'Server',
+            tabId: 'nexus-config',
+            tabCode: Sonatype.repoServer.ServerEditPanel,
+            tabTitle: 'Nexus'
+          },
+          {
+            enabled: sp.checkPermission(userPerms.configRepos, sp.READ) &&
+              ( sp.checkPermission(userPerms.configRepos, sp.CREATE) ||
+                sp.checkPermission(userPerms.configRepos, sp.DELETE) ||
+                sp.checkPermission(userPerms.configRepos, sp.EDIT)),
+            title: 'Repositories',
+            tabId: 'repos-config',
+            tabCode: Sonatype.repoServer.RepoEditPanel,
+            tabTitle: 'Repository Config'
+          },
+          {
+            enabled: sp.checkPermission(userPerms.configGroups, sp.READ) &&
+              ( sp.checkPermission(userPerms.configGroups, sp.CREATE) ||
+                sp.checkPermission(userPerms.configGroups, sp.DELETE) ||
+                sp.checkPermission(userPerms.configGroups, sp.EDIT)),
+            title: 'Groups',
+            tabId: 'groups-config',
+            tabCode: Sonatype.repoServer.GroupsEditPanel
+          },
+          {
+            enabled: sp.checkPermission(userPerms.configRules, sp.READ) &&
+              ( sp.checkPermission(userPerms.configRules, sp.CREATE) ||
+                sp.checkPermission(userPerms.configRules, sp.DELETE) ||
+                sp.checkPermission(userPerms.configRules, sp.EDIT)),
+            title: 'Routing',
+            tabId: 'routes-config',
+            tabCode: Sonatype.repoServer.RoutesEditPanel
+          },
+          {
+            enabled: sp.checkPermission(userPerms.configSchedules, sp.READ) &&
+              ( sp.checkPermission(userPerms.configSchedules, sp.CREATE) ||
+                sp.checkPermission(userPerms.configSchedules, sp.DELETE) ||
+                sp.checkPermission(userPerms.configSchedules, sp.EDIT)),
+            title: 'Scheduled Tasks',
+            tabId: 'schedules-config',
+            tabCode: Sonatype.repoServer.SchedulesEditPanel
+          },
+          {
+            enabled: sp.checkPermission(userPerms.configRepoTargets, sp.READ) &&
+              ( sp.checkPermission(userPerms.configRepoTargets, sp.CREATE) ||
+                sp.checkPermission(userPerms.configRepoTargets, sp.DELETE) ||
+                sp.checkPermission(userPerms.configRepoTargets, sp.EDIT)),
+            title: 'Repository Targets',
+            tabId: 'config-repoTargets',
+            tabCode: Sonatype.repoServer.RepoTargetEditPanel
+          }
+        ]
+      } );
+
+      //Security Group **************************************************
+      nexusPanel.add({
+        title: 'Security',
+        id: 'st-nexus-security',
+        items: [
+          {
+            enabled: Sonatype.user.curr.isLoggedIn && 
+              sp.checkPermission( userPerms.actionChangePassword, sp.CREATE ),
+            title: 'Change Password',
+            handler: Sonatype.utils.changePassword
+          },
+          {
+            enabled: sp.checkPermission( userPerms.configUsers, sp.READ ) && 
+              ( sp.checkPermission(userPerms.configUsers, sp.CREATE) &&
+                sp.checkPermission(userPerms.configUsers, sp.DELETE) &&
+                sp.checkPermission(userPerms.configUsers, sp.EDIT)),
+            title: 'Users',
+            tabId: 'security-users',
+            tabCode: Sonatype.repoServer.UserEditPanel
+          },
+          {
+            enabled: sp.checkPermission( userPerms.configRoles, sp.READ ) && 
+              ( sp.checkPermission(userPerms.configRoles, sp.CREATE) ||
+                sp.checkPermission(userPerms.configRoles, sp.DELETE) ||
+                sp.checkPermission(userPerms.configRoles, sp.EDIT)),
+            title: 'Roles',
+            tabId: 'security-roles',
+            tabCode: Sonatype.repoServer.RoleEditPanel
+          },
+          {
+            enabled: sp.checkPermission( userPerms.configPrivileges, sp.READ ) && 
+              ( sp.checkPermission(userPerms.configPrivileges, sp.CREATE) ||
+                sp.checkPermission(userPerms.configPrivileges, sp.DELETE) ||
+                sp.checkPermission(userPerms.configPrivileges, sp.EDIT)),
+            title: 'Privileges',
+            tabId: 'security-privileges',
+            tabCode: Sonatype.repoServer.PrivilegeEditPanel
+          }
+        ]
+      } );
+
+      nexusPanel.add( {
+        title: 'Help',
+        id: 'st-nexus-docs',
+        collapsible: true,
+        collapsed: true,
+        items: [
+          { title: 'Nexus Home',
+            href: 'http://nexus.sonatype.org/' },
+          { title: 'Getting Started',
+            href: 'http://www.sonatype.com/book/reference/repository-manager.html' },
+          { title: 'Nexus Wiki',
+            href: 'https://docs.sonatype.com/display/NX/Home' },
+          { title: 'Maven Book',
+            href: 'http://www.sonatype.com/book/reference/public-book.html' },
+          { title: 'Release Notes',
+            href: 'http://nexus.sonatype.org/changes.html' },
+          { title: 'Report Issue',
+            href: 'http://issues.sonatype.org/secure/CreateIssue.jspa?pid=10001&issuetype=1' }
+        ]
+      } );
     },
     
     loginHandler : function(){

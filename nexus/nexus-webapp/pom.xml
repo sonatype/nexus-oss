@@ -159,6 +159,8 @@
                 <gzip src="${sourceRoot}/js/extensions/Ext.form.js" destfile="${targetRoot}/js/extensions/Ext.form.js.gz"/>
                 <gzip src="${sourceRoot}/js/extensions/SearchField.js" destfile="${targetRoot}/js/extensions/SearchField.js.gz"/>
                 <gzip src="${sourceRoot}/js/extensions/Sonatype.ext.FeedGrid.js" destfile="${targetRoot}/js/extensions/Sonatype.ext.FeedGrid.js.gz"/>
+                <gzip src="${sourceRoot}/js/extensions/Sonatype.events.js" destfile="${targetRoot}/js/extensions/Sonatype.events.js.gz"/>
+                <gzip src="${sourceRoot}/js/extensions/Sonatype.navigation.js" destfile="${targetRoot}/js/extensions/Sonatype.navigation.js.gz"/>
                 <gzip src="${sourceRoot}/js/extensions/Ext.tree.js" destfile="${targetRoot}/js/extensions/Ext.tree.js.gz"/>
                 <gzip src="${sourceRoot}/js/extensions/TwinPanelController.js" destfile="${targetRoot}/js/extensions/TwinPanelController.js.gz"/>                
                 <gzip src="${sourceRoot}/js/Sonatype.utils.js" destfile="${targetRoot}/js/Sonatype.utils.js.gz"/>

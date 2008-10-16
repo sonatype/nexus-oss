@@ -44,6 +44,8 @@
   <script src="js/extensions/Sonatype.ext.FeedGrid.js" type="text/javascript" charset="utf-8"></script>
   <script src="js/extensions/Ext.tree.js" type="text/javascript" charset="utf-8"></script>
   <script src="js/extensions/TwinPanelController.js" type="text/javascript" charset="utf-8"></script>
+  <script src="js/extensions/Sonatype.events.js" type="text/javascript" charset="utf-8"></script>
+  <script src="js/extensions/Sonatype.navigation.js" type="text/javascript" charset="utf-8"></script>
   
   <script src="js/Sonatype.utils.js" type="text/javascript" charset="utf-8"></script>
   <script src="js/Sonatype.config.js" type="text/javascript" charset="utf-8"></script>

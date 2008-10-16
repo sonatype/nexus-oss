@@ -696,15 +696,6 @@ Sonatype.utils = {
 })();
 
 
-Sonatype.utils.Observable = function(){
-  this.addEvents({
-    'repositoryChanged': true,
-    'groupChanged': true 
-  });
-};
-Ext.extend( Sonatype.utils.Observable, Ext.util.Observable );
-Sonatype.Events = new Sonatype.utils.Observable();
-
 Ext.apply(Ext.form.VTypes, {
   password: function(val, field) {
     if (field.initialPasswordField != null && field.initialPasswordField != 'undefined') {

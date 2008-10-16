@@ -141,7 +141,7 @@ button.st-icon-refresh {
   padding: 2px 4px 2px 4px;
 }
 
-#st-server-tab-panel .st-server-panel .x-panel-body.x-panel-body-noheader {
+#st-server-tab-panel .st-server-panel .x-panel-body.x-panel-body-noheader.x-panel-body-noborder {
   background-color:#F9F9F9;
 }
 
