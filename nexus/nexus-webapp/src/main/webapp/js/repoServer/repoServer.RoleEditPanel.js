@@ -331,7 +331,7 @@ Sonatype.repoServer.RoleEditPanel = function(config){
     deferredRender: false,
     columns: [
       {header: 'Name', dataIndex: 'name', width:175, id: 'role-config-name-col'},
-      {header: 'Read Only', dataIndex: 'readOnly', width:60, id: 'role-config-readonly-col'},
+      {header: 'Read Only', dataIndex: 'readOnly', width:80, id: 'role-config-readonly-col'},
       {header: 'Session Timeout', dataIndex: 'sessionTimeout', width:175, id: 'role-config-session-timeout-col'},
       {header: 'Description', dataIndex: 'description', width:175, id: 'role-config-description-col'}      
     ],
