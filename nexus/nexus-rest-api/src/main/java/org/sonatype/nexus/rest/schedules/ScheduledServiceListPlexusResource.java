@@ -12,6 +12,7 @@ import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
+import org.sonatype.nexus.configuration.validator.InvalidConfigurationException;
 import org.sonatype.nexus.rest.model.ScheduledServiceBaseResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceListResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceListResourceResponse;
@@ -112,7 +113,7 @@ public class ScheduledServiceListPlexusResource
                     task = getNexusInstance( request ).schedule(
                         getModelName( serviceResource ),
                         getModelNexusTask( serviceResource, request ),
-                        getModelSchedule( serviceResource ) );
+                        schedule );
                 }
                 else
                 {
@@ -155,6 +156,10 @@ public class ScheduledServiceListPlexusResource
                     Status.CLIENT_ERROR_BAD_REQUEST,
                     e.getMessage(),
                     getNexusErrorResponse( "cronCommand", e.getMessage() ) );
+            }
+            catch ( InvalidConfigurationException e )
+            {
+                handleConfigurationException( e );
             }
         }
         return result;

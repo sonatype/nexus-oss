@@ -6,6 +6,46 @@
   Note: Ext namespace is maintained
 */
 
+Ext.override(Ext.form.BasicForm, {
+    /**
+     * Override findField to look for enabled field
+     * and return that, otherwise return first found
+     */
+    findField : function(id){
+        var field = null;
+        var fallbackField = null;
+        this.items.each(function(f){
+            if(f.isFormField && (f.dataIndex == id || f.id == id || f.getName() == id)){
+                // Only want to grab the first one found, to match default behaviour
+                if ( fallbackField == null )
+                {
+                    fallbackField = f;
+                }
+                
+                // If the field isn't disabled use it
+                if (f.disabled == false){
+                    field = f;
+                    return false;
+                }
+            }
+        });
+        
+        if ( field == null )
+        {
+            if ( fallbackField != null )
+            {
+                field = fallbackField;
+            }
+            else
+            {
+                field = this.items.get(id);
+            }
+        }
+        
+        return field || null;
+    },
+});
+
 /* Override default form field rendering to include help text quick tip on 
    question mark rendered after field label.
  */

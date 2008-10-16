@@ -14,6 +14,10 @@ import java.util.Set;
 
 import org.restlet.data.Request;
 import org.restlet.resource.ResourceException;
+import org.sonatype.nexus.configuration.application.validator.ApplicationValidationResponse;
+import org.sonatype.nexus.configuration.validator.InvalidConfigurationException;
+import org.sonatype.nexus.configuration.validator.ValidationMessage;
+import org.sonatype.nexus.configuration.validator.ValidationResponse;
 import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceAdvancedResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceBaseResource;
@@ -300,9 +304,44 @@ public abstract class AbstractScheduledServicePlexusResource
 
         return task;
     }
+    
+    public void validateStartDate( String date )
+        throws InvalidConfigurationException
+    {        
+        Calendar cal = Calendar.getInstance();
+        cal.setTime( new Date( Long.parseLong( date ) ) );
+        
+        Calendar nowCal = Calendar.getInstance();
+        nowCal.setTime( new Date() );
+        
+        // This is checking just the year/month/day, time isn't of concern right now
+        if ( cal.before( nowCal )
+            && ( cal.get( Calendar.YEAR ) != nowCal.get( Calendar.YEAR ) 
+            || cal.get( Calendar.MONTH ) != nowCal.get( Calendar.MONTH )
+            || cal.get( Calendar.DAY_OF_YEAR ) != nowCal.get( Calendar.DAY_OF_YEAR ) ) )
+        {
+            ValidationResponse vr = new ApplicationValidationResponse();
+            ValidationMessage vm = new ValidationMessage( "startDate", "Date cannot be in the past." );
+            vr.addValidationError( vm );
+            throw new InvalidConfigurationException( vr );
+        }
+    }
+    
+    public void validateTime( String key, Date date )
+        throws InvalidConfigurationException
+    {
+        if ( date.before( new Date() ) )
+        {
+            ValidationResponse vr = new ApplicationValidationResponse();
+            ValidationMessage vm = new ValidationMessage( key, "Time cannot be in the past." );
+            vr.addValidationError( vm );
+            throw new InvalidConfigurationException( vr );
+        }
+    }
 
     public Schedule getModelSchedule( ScheduledServiceBaseResource model )
-        throws ParseException
+        throws ParseException,
+            InvalidConfigurationException
     {
         Schedule schedule = null;
 
@@ -312,36 +351,68 @@ public abstract class AbstractScheduledServicePlexusResource
         }
         else if ( ScheduledServiceMonthlyResource.class.isAssignableFrom( model.getClass() ) )
         {
+            Date date = parseDate(
+                ( (ScheduledServiceMonthlyResource) model ).getStartDate(),
+                ( (ScheduledServiceMonthlyResource) model ).getRecurringTime() );
+            
+            //validateStartDate( ( (ScheduledServiceMonthlyResource) model ).getStartDate() );
+            
+            //validateTime( "recurringTime", date );
+            
             schedule = new MonthlySchedule(
-                parseDate(
-                    ( (ScheduledServiceMonthlyResource) model ).getStartDate(),
-                    ( (ScheduledServiceMonthlyResource) model ).getRecurringTime() ),
+                date,
                 null,
                 formatRecurringDayOfMonth( ( (ScheduledServiceMonthlyResource) model ).getRecurringDay() ) );
         }
         else if ( ScheduledServiceWeeklyResource.class.isAssignableFrom( model.getClass() ) )
         {
+            Date date = parseDate(
+                ( (ScheduledServiceWeeklyResource) model ).getStartDate(),
+                ( (ScheduledServiceWeeklyResource) model ).getRecurringTime() );
+            
+            //validateStartDate( ( (ScheduledServiceWeeklyResource) model ).getStartDate() );
+            
+            //validateTime( "recurringTime", date );
+            
             schedule = new WeeklySchedule(
-                parseDate(
-                    ( (ScheduledServiceWeeklyResource) model ).getStartDate(),
-                    ( (ScheduledServiceWeeklyResource) model ).getRecurringTime() ),
+                date,
                 null,
                 formatRecurringDayOfWeek( ( (ScheduledServiceWeeklyResource) model ).getRecurringDay() ) );
         }
         else if ( ScheduledServiceDailyResource.class.isAssignableFrom( model.getClass() ) )
         {
-            schedule = new DailySchedule( parseDate(
+            Date date = parseDate(
                 ( (ScheduledServiceDailyResource) model ).getStartDate(),
-                ( (ScheduledServiceDailyResource) model ).getRecurringTime() ), null );
+                ( (ScheduledServiceDailyResource) model ).getRecurringTime() );
+            
+            //validateStartDate( ( (ScheduledServiceDailyResource) model ).getStartDate() );
+            
+            //validateTime( "recurringTime", date );
+            
+            schedule = new DailySchedule( date, null );
         }
         else if ( ScheduledServiceHourlyResource.class.isAssignableFrom( model.getClass() ) )
         {
-            schedule = new HourlySchedule( parseDate(
+            Date date = parseDate(
                 ( (ScheduledServiceHourlyResource) model ).getStartDate(),
-                ( (ScheduledServiceHourlyResource) model ).getStartTime() ), null );
+                ( (ScheduledServiceHourlyResource) model ).getStartTime() );
+            
+            //validateStartDate( ( (ScheduledServiceHourlyResource) model ).getStartDate() );
+            
+            //validateTime( "startTime", date );
+            
+            schedule = new HourlySchedule( date, null );
         }
         else if ( ScheduledServiceOnceResource.class.isAssignableFrom( model.getClass() ) )
         {
+            Date date = parseDate(
+                ( (ScheduledServiceOnceResource) model ).getStartDate(),
+                ( (ScheduledServiceOnceResource) model ).getStartTime() );
+            
+            validateStartDate( ( (ScheduledServiceOnceResource) model ).getStartDate() );
+            
+            validateTime( "startTime", date );
+            
             schedule = new OnceSchedule( parseDate(
                 ( (ScheduledServiceOnceResource) model ).getStartDate(),
                 ( (ScheduledServiceOnceResource) model ).getStartTime() ) );
