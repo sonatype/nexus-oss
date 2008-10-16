@@ -43,7 +43,7 @@ Ext.override(Ext.form.BasicForm, {
         }
         
         return field || null;
-    },
+    }
 });
 
 /* Override default form field rendering to include help text quick tip on 
