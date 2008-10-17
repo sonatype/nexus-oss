@@ -116,7 +116,6 @@
 		<module>nexus-utils</module>
 		<module>nexus-api</module>
 		<module>nexus-configuration</module>
-		<module>nexus-extension-api</module>
 		<module>nexus-proxy</module>
 		<module>nexus-app</module>
 		<module>nexus-rest-api</module>
@@ -559,11 +558,6 @@
 			<dependency>
 				<groupId>org.sonatype.nexus</groupId>
 				<artifactId>nexus-api</artifactId>
-				<version>${project.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.sonatype.nexus</groupId>
-				<artifactId>nexus-extension-api</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>
