@@ -1920,7 +1920,7 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
     }
     
     //rest api is using 24 hour clock
-    var hours = parseInt(selectedStartTime.getValue().substring(0, selectedStartTime.getValue().indexOf(':')));
+    var hours = selectedStartTime.getValue().substring(0, selectedStartTime.getValue().indexOf(':'));
     var minutes = selectedStartTime.getValue().substring(selectedStartTime.getValue().indexOf(':') + 1, selectedStartTime.getValue().indexOf(':') + 3);
     
     return hours + ':' + minutes;
