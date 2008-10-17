@@ -58,6 +58,7 @@ import org.sonatype.nexus.configuration.model.CRepositoryShadow;
 import org.sonatype.nexus.configuration.model.CRepositoryTarget;
 import org.sonatype.nexus.configuration.model.CRouting;
 import org.sonatype.nexus.configuration.model.CSmtpConfiguration;
+import org.sonatype.nexus.events.EventInspectorHost;
 import org.sonatype.nexus.feeds.FeedRecorder;
 import org.sonatype.nexus.feeds.NexusArtifactEvent;
 import org.sonatype.nexus.feeds.SystemEvent;
@@ -214,6 +215,12 @@ public class DefaultNexus
      */
     @Requirement
     private LogFileManager logFileManager;
+
+    /**
+     * The event inspector host.
+     */
+    @Requirement
+    private EventInspectorHost eventInspectorHost;
 
     /**
      * System status.
@@ -1462,6 +1469,15 @@ public class DefaultNexus
         systemStatus = new SystemStatus();
 
         repositoryRegistry.addProximityEventListener( this );
+
+        // EventInspectorHost -- BEGIN
+        // tying in eventInspectorHost to all event producers
+        repositoryRegistry.addProximityEventListener( eventInspectorHost );
+
+        nexusConfiguration.addProximityEventListener( eventInspectorHost );
+
+        security.addProximityEventListener( eventInspectorHost );
+        // EventInspectorHost -- END
 
         systemStatus.setState( SystemState.STOPPED );
 

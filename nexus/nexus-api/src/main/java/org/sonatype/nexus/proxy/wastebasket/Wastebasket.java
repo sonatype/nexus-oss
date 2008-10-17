@@ -1,6 +1,5 @@
 package org.sonatype.nexus.proxy.wastebasket;
 
-import java.io.File;
 import java.io.IOException;
 
 import org.sonatype.nexus.proxy.StorageException;

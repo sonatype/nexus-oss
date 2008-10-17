@@ -38,7 +38,7 @@ public class DefaultEventInspectorHost
             catch ( Throwable e )
             {
                 getLogger().warn(
-                    "EventInspector hinted='" + entry.getKey() + "' class='" + ei.getClass().getName()
+                    "EventInspector hint='" + entry.getKey() + "' class='" + ei.getClass().getName()
                         + "' had problem inspecting an event='" + evt.getClass() + "'",
                     e );
             }

@@ -40,15 +40,10 @@ import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.context.ContextException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
-import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.model.CProps;
 import org.sonatype.nexus.configuration.model.CScheduleConfig;
 import org.sonatype.nexus.configuration.model.CScheduledTask;
-import org.sonatype.nexus.proxy.events.AbstractEvent;
-import org.sonatype.nexus.proxy.events.EventListener;
 import org.sonatype.scheduling.schedules.CronSchedule;
 import org.sonatype.scheduling.schedules.DailySchedule;
 import org.sonatype.scheduling.schedules.HourlySchedule;
@@ -66,7 +61,7 @@ import org.sonatype.scheduling.schedules.WeeklySchedule;
 @Component( role = TaskConfigManager.class )
 public class DefaultTaskConfigManager
     extends AbstractLogEnabled
-    implements TaskConfigManager, Initializable, Contextualizable, EventListener
+    implements TaskConfigManager, Contextualizable
 {
     /**
      * The app config holding tasks.
@@ -85,20 +80,6 @@ public class DefaultTaskConfigManager
         this.plexusContainer = (PlexusContainer) ctx.get( PlexusConstants.PLEXUS_KEY );
     }
 
-    public void initialize()
-        throws InitializationException
-    {
-        applicationConfiguration.addProximityEventListener( this );
-    }
-
-    public void onProximityEvent( AbstractEvent e )
-    {
-        if ( ConfigurationChangeEvent.class.isAssignableFrom( e.getClass() ) )
-        {
-            // TODO
-        }
-    }
-    
     protected PlexusContainer getPlexusContainer()
     {
         return plexusContainer;
