@@ -67,7 +67,7 @@ public class DefaultScheduler
     private Map<String, List<ScheduledTask<?>>> tasksMap;
 
     private AtomicInteger idGen = new AtomicInteger( 0 );
-    
+
     private int threadPriority = Thread.MIN_PRIORITY;
 
     @Requirement
@@ -122,6 +122,18 @@ public class DefaultScheduler
         {
             getLogger().info( "Termination interrupted", e );
         }
+    }
+
+    public SchedulerTask<?> createTaskInstance( String taskType )
+        throws IllegalArgumentException
+    {
+        return taskConfig.createTaskInstance( taskType );
+    }
+
+    public SchedulerTask<?> createTaskInstance( Class<?> taskType )
+        throws IllegalArgumentException
+    {
+        return taskConfig.createTaskInstance( taskType );
     }
 
     public PlexusThreadFactory getPlexusThreadFactory()
@@ -183,11 +195,11 @@ public class DefaultScheduler
         synchronized ( tasksMap )
         {
             String id;
-            
+
             if ( idGen.get() == 0 )
             {
                 ArrayList<Integer> list = new ArrayList<Integer>();
-                
+
                 for ( List<ScheduledTask<?>> l : tasksMap.values() )
                 {
                     for ( ScheduledTask<?> s : l )
@@ -195,14 +207,14 @@ public class DefaultScheduler
                         list.add( Integer.parseInt( s.getId() ) );
                     }
                 }
-                
+
                 Collections.sort( list );
-                
-                while ( list.contains( idGen.incrementAndGet() ))
+
+                while ( list.contains( idGen.incrementAndGet() ) )
                 {
                 }
-                
-                id = String.valueOf( idGen.get() );                    
+
+                id = String.valueOf( idGen.get() );
             }
             else
             {
@@ -228,7 +240,12 @@ public class DefaultScheduler
         Map<String, String> taskParams )
     {
         // use the name of the class as the type.
-        return schedule( name, runnable.getClass().getSimpleName(), Executors.callable( runnable ), schedule, taskParams );
+        return schedule(
+            name,
+            runnable.getClass().getSimpleName(),
+            Executors.callable( runnable ),
+            schedule,
+            taskParams );
     }
 
     public <T> ScheduledTask<T> submit( String name, Callable<T> callable, Map<String, String> taskParams )

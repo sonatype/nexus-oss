@@ -136,4 +136,24 @@ public interface Scheduler
      */
     ScheduledTask<?> getTaskById( String id )
         throws NoSuchTaskException;
+
+    /**
+     * A factory for tasks.
+     * 
+     * @param taskType
+     * @return
+     * @throws IllegalArgumentException
+     */
+    SchedulerTask<?> createTaskInstance( String taskType )
+        throws IllegalArgumentException;
+
+    /**
+     * A factory for tasks.
+     * 
+     * @param taskType
+     * @return
+     * @throws IllegalArgumentException
+     */
+    SchedulerTask<?> createTaskInstance( Class<?> taskType )
+        throws IllegalArgumentException;
 }

@@ -29,4 +29,16 @@ public class SimpleTaskConfigManager
     {
         tasks.remove( task.getId() );
     }
+
+    public SchedulerTask<?> createTaskInstance( String taskType )
+        throws IllegalArgumentException
+    {
+        return null;
+    }
+
+    public SchedulerTask<?> createTaskInstance( Class<?> taskType )
+        throws IllegalArgumentException
+    {
+        return null;
+    }
 }
