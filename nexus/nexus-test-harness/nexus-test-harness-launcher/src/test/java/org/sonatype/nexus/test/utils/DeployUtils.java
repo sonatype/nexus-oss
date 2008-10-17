@@ -7,6 +7,7 @@ import java.net.PasswordAuthentication;
 import java.net.URL;
 
 import org.apache.commons.httpclient.HttpException;
+import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.multipart.FilePart;
 import org.apache.commons.httpclient.methods.multipart.MultipartRequestEntity;
@@ -81,7 +82,7 @@ public class DeployUtils
 
         filePost.setRequestEntity( new MultipartRequestEntity( parts, filePost.getParams() ) );
 
-        return RequestFacade.executeHTTPClientMethod( new URL( restServiceURL ), filePost );
+        return RequestFacade.executeHTTPClientMethod( new URL( restServiceURL ), filePost ).getStatusCode();
 
     }
 
@@ -92,31 +93,43 @@ public class DeployUtils
             + "service/local/artifact/maven/content", repositoryId, fileToDeploy, pomFile, classifier, extention );
     }
     
+    public static HttpMethod deployUsingPomWithRestReturnResult( String repositoryId, File fileToDeploy, File pomFile, String classifier, String extention )
+    throws HttpException, IOException
+    {
+        return deployUsingPomWithRestReturnResult( TestProperties.getString( "nexus.base.url" )
+            + "service/local/artifact/maven/content", repositoryId, fileToDeploy, pomFile, classifier, extention );
+    }
+    
+    public static HttpMethod deployUsingPomWithRestReturnResult( String restServiceURL, String repositoryId, File fileToDeploy, File pomFile, String classifier, String extention )
+    throws HttpException, IOException
+{
+    // the method we are calling
+    PostMethod filePost = new PostMethod( restServiceURL );
+    filePost.getParams().setBooleanParameter( HttpMethodParams.USE_EXPECT_CONTINUE, true );
+
+    classifier = (classifier == null) ? "" : classifier;
+    extention = (extention == null) ? "" : extention;
+    
+    Part[] parts =
+        { new StringPart( "r", repositoryId ), new StringPart("e", extention ), new StringPart("c", classifier ), new StringPart( "hasPom", "true" ),
+            new FilePart( pomFile.getName(), pomFile ), new FilePart( fileToDeploy.getName(), fileToDeploy ) };
+
+    filePost.setRequestEntity( new MultipartRequestEntity( parts, filePost.getParams() ) );
+
+    LOG.debug( "URL:  " + restServiceURL );
+    LOG.debug( "Method: Post" );
+    LOG.debug( "params: " );
+    LOG.debug( "\tr: " + repositoryId );
+    LOG.debug( "\thasPom: true" );
+    LOG.debug( "\tpom: " + pomFile );
+    LOG.debug( "\tfileToDeploy: " + fileToDeploy );
+
+    return RequestFacade.executeHTTPClientMethod( new URL( restServiceURL ), filePost );
+}
+    
     public static int deployUsingPomWithRest( String restServiceURL, String repositoryId, File fileToDeploy, File pomFile, String classifier, String extention )
         throws HttpException, IOException
     {
-        // the method we are calling
-        PostMethod filePost = new PostMethod( restServiceURL );
-        filePost.getParams().setBooleanParameter( HttpMethodParams.USE_EXPECT_CONTINUE, true );
-
-        classifier = (classifier == null) ? "" : classifier;
-        extention = (extention == null) ? "" : extention;
-        
-        Part[] parts =
-            { new StringPart( "r", repositoryId ), new StringPart("e", extention ), new StringPart("c", classifier ), new StringPart( "hasPom", "true" ),
-                new FilePart( pomFile.getName(), pomFile ), new FilePart( fileToDeploy.getName(), fileToDeploy ) };
-
-        filePost.setRequestEntity( new MultipartRequestEntity( parts, filePost.getParams() ) );
-
-        LOG.debug( "URL:  " + restServiceURL );
-        LOG.debug( "Method: Post" );
-        LOG.debug( "params: " );
-        LOG.debug( "\tr: " + repositoryId );
-        LOG.debug( "\thasPom: true" );
-        LOG.debug( "\tpom: " + pomFile );
-        LOG.debug( "\tfileToDeploy: " + fileToDeploy );
-
-        return RequestFacade.executeHTTPClientMethod( new URL( restServiceURL ), filePost );
+        return deployUsingPomWithRestReturnResult( restServiceURL, repositoryId, fileToDeploy, pomFile, classifier, extention ).getStatusCode();
     }
-
 }

@@ -156,7 +156,7 @@ public class RequestFacade
         return downloadedFile;
     }
 
-    public static int executeHTTPClientMethod( URL url, HttpMethod method )
+    public static HttpMethod executeHTTPClientMethod( URL url, HttpMethod method )
         throws HttpException,
             IOException
     {
@@ -176,11 +176,11 @@ public class RequestFacade
             authPrefs.add( AuthPolicy.BASIC );
             client.getParams().setParameter( AuthPolicy.AUTH_SCHEME_PRIORITY, authPrefs );
             client.getParams().setAuthenticationPreemptive( true );
-
         }
         try
         {
-            return client.executeMethod( method );
+            client.executeMethod( method );
+            return method;
         }
         finally
         {
