@@ -45,11 +45,11 @@ import com.sun.syndication.feed.synd.SyndFeedImpl;
 public abstract class AbstractSystemFeedSource
     extends AbstractFeedSource
 {
-    public abstract List<SystemEvent> getEventList();
+    public abstract List<SystemEvent> getEventList( Long from, Integer count );
 
-    public SyndFeed getFeed()
+    public SyndFeed getFeed( Long from, Integer count )
     {
-        List<SystemEvent> items = getEventList();
+        List<SystemEvent> items = getEventList( from, count );
 
         SyndFeedImpl feed = new SyndFeedImpl();
 

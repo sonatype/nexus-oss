@@ -117,9 +117,9 @@ public interface FeedRecorder
 
     // reading
 
-    List<Map<String, String>> getEvents( Set<String> types, Set<String> subtypes, Integer from, Integer count );
+    List<Map<String, String>> getEvents( Set<String> types, Set<String> subtypes, Long from, Integer count );
 
-    List<NexusArtifactEvent> getNexusArtifectEvents( Set<String> subtypes, Integer from, Integer count );
+    List<NexusArtifactEvent> getNexusArtifectEvents( Set<String> subtypes, Long from, Integer count );
 
-    List<SystemEvent> getSystemEvents( Set<String> subtypes, Integer from, Integer count );
+    List<SystemEvent> getSystemEvents( Set<String> subtypes, Long from, Integer count );
 }

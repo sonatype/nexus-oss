@@ -51,7 +51,6 @@ import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.item.StorageLinkItem;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.proxy.repository.RepositoryType;
 import org.sonatype.nexus.proxy.router.RepositoryRouter;
 import org.sonatype.scheduling.NoSuchTaskException;
 import org.sonatype.scheduling.ScheduledTask;
@@ -207,19 +206,19 @@ public interface Nexus
 
     // reading
 
-    List<NexusArtifactEvent> getRecentlyStorageChanges();
+    List<NexusArtifactEvent> getRecentlyStorageChanges( Long from, Integer count );
 
-    List<NexusArtifactEvent> getRecentlyDeployedOrCachedArtifacts();
+    List<NexusArtifactEvent> getRecentlyDeployedOrCachedArtifacts( Long from, Integer count );
 
-    List<NexusArtifactEvent> getRecentlyCachedArtifacts();
+    List<NexusArtifactEvent> getRecentlyCachedArtifacts( Long from, Integer count );
 
-    List<NexusArtifactEvent> getRecentlyDeployedArtifacts();
+    List<NexusArtifactEvent> getRecentlyDeployedArtifacts( Long from, Integer count );
 
-    List<NexusArtifactEvent> getBrokenArtifacts();
+    List<NexusArtifactEvent> getBrokenArtifacts( Long from, Integer count );
 
-    List<SystemEvent> getRepositoryStatusChanges();
+    List<SystemEvent> getRepositoryStatusChanges( Long from, Integer count );
 
-    List<SystemEvent> getSystemEvents();
+    List<SystemEvent> getSystemEvents( Long from, Integer count );
 
     // ----------------------------------------------------------------------------
     // Scheduler
@@ -326,8 +325,7 @@ public interface Nexus
 
     /**
      * Remove the repository's storage folder
-     * 
      */
     void removeRepositoryFolder( Repository repository );
-        
+
 }

@@ -36,9 +36,9 @@ public class SystemFeedSource
 {
     public static final String CHANNEL_KEY = "systemChanges";
 
-    public List<SystemEvent> getEventList()
+    public List<SystemEvent> getEventList( Long from, Integer count )
     {
-        return getNexus().getSystemEvents();
+        return getNexus().getSystemEvents( from, count );
     }
 
     public String getFeedKey()

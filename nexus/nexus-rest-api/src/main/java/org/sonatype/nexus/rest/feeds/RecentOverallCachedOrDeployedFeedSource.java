@@ -53,9 +53,9 @@ public class RecentOverallCachedOrDeployedFeedSource
     }
 
     @Override
-    public List<NexusArtifactEvent> getEventList()
+    public List<NexusArtifactEvent> getEventList( Long from, Integer count )
     {
-        return getNexus().getRecentlyDeployedOrCachedArtifacts();
+        return getNexus().getRecentlyDeployedOrCachedArtifacts( from, count );
     }
 
     @Override

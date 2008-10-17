@@ -51,6 +51,6 @@ public interface FeedSource
      * @return a channel
      * @throws IOException
      */
-    SyndFeed getFeed()
+    SyndFeed getFeed( Long from, Integer count )
         throws IOException;
 }

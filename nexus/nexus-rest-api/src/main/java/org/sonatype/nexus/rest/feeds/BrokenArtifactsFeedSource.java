@@ -53,9 +53,9 @@ public class BrokenArtifactsFeedSource
     }
 
     @Override
-    public List<NexusArtifactEvent> getEventList()
+    public List<NexusArtifactEvent> getEventList( Long from, Integer count )
     {
-        return getNexus().getBrokenArtifacts();
+        return getNexus().getBrokenArtifacts( from, count );
     }
 
     @Override

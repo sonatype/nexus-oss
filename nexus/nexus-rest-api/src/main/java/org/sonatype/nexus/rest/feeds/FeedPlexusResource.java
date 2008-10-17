@@ -71,11 +71,11 @@ public class FeedPlexusResource
     }
 
     @Override
-    protected SyndFeed getFeed( Context context, Request request, String channelKey )
+    protected SyndFeed getFeed( Context context, Request request, String channelKey, Long from, Integer count )
         throws IOException,
             ComponentLookupException
     {
-        SyndFeed feed = super.getFeed( context, request, channelKey );
+        SyndFeed feed = super.getFeed( context, request, channelKey, from, count );
 
         if ( feed.getLink() != null )
         {

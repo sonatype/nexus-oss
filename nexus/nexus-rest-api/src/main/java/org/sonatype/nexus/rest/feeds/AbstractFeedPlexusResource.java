@@ -27,6 +27,7 @@ import java.util.Map;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.restlet.Context;
+import org.restlet.data.Form;
 import org.restlet.data.MediaType;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
@@ -72,11 +73,36 @@ public abstract class AbstractFeedPlexusResource
     {
         MediaType mediaType = variant.getMediaType();
 
+        Form params = request.getResourceRef().getQueryAsForm();
+
+        Long from = null;
+        Integer count = null;
+
+        try
+        {
+            if ( params.getFirstValue( "from" ) != null )
+            {
+                from = Long.valueOf( params.getFirstValue( "from" ) );
+            }
+
+            if ( params.getFirstValue( "count" ) != null )
+            {
+                count = Integer.valueOf( params.getFirstValue( "count" ) );
+            }
+        }
+        catch ( NumberFormatException e )
+        {
+            throw new ResourceException(
+                Status.CLIENT_ERROR_BAD_REQUEST,
+                "The 'from' and 'count' parameters must be numbers!",
+                e );
+        }
+
         try
         {
             if ( !MediaType.APPLICATION_JSON.equals( mediaType, true ) )
             {
-                SyndFeed feed = getFeed( context, request, getChannelKey( request ) );
+                SyndFeed feed = getFeed( context, request, getChannelKey( request ), from, count );
 
                 if ( FeedRepresentation.ATOM_MEDIA_TYPE.equals( mediaType, true ) )
                 {
@@ -114,13 +140,13 @@ public abstract class AbstractFeedPlexusResource
         }
     }
 
-    protected SyndFeed getFeed( Context context, Request request, String channelKey )
+    protected SyndFeed getFeed( Context context, Request request, String channelKey, Long from, Integer count )
         throws IOException,
             ComponentLookupException
     {
         FeedSource src = feeds.get( channelKey );
 
-        return src.getFeed();
+        return src.getFeed( from, count );
     }
 
     protected abstract String getChannelKey( Request request );

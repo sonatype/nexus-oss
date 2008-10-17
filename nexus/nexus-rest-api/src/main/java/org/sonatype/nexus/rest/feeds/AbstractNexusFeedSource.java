@@ -108,15 +108,15 @@ public abstract class AbstractNexusFeedSource
         }
     }
 
-    public abstract List<NexusArtifactEvent> getEventList();
+    public abstract List<NexusArtifactEvent> getEventList( Long from, Integer count );
 
     public abstract String getTitle();
 
     public abstract String getDescription();
 
-    public SyndFeed getFeed()
+    public SyndFeed getFeed( Long from, Integer count )
     {
-        List<NexusArtifactEvent> items = getEventList();
+        List<NexusArtifactEvent> items = getEventList( from, count );
 
         SyndFeedImpl feed = new SyndFeedImpl();
 

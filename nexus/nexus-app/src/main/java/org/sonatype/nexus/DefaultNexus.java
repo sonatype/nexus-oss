@@ -24,7 +24,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -64,7 +63,6 @@ import org.sonatype.nexus.feeds.NexusArtifactEvent;
 import org.sonatype.nexus.feeds.SystemEvent;
 import org.sonatype.nexus.feeds.SystemProcess;
 import org.sonatype.nexus.index.ArtifactInfo;
-import org.sonatype.nexus.index.DefaultIndexerManager;
 import org.sonatype.nexus.index.FlatSearchResponse;
 import org.sonatype.nexus.index.IndexerManager;
 import org.sonatype.nexus.index.context.IndexContextInInconsistentStateException;
@@ -1108,14 +1106,14 @@ public class DefaultNexus
     {
         return nexusConfiguration.listRepositoryContentClasses();
     }
-    
+
     // ------------------------------------------------------------------
     // Scheduled Tasks
     public List<ScheduledTaskDescriptor> listScheduledTaskDescriptors()
     {
         return nexusConfiguration.listScheduledTaskDescriptors();
     }
-    
+
     public ScheduledTaskDescriptor getScheduledTaskDescriptor( String id )
     {
         return nexusConfiguration.getScheduledTaskDescriptor( id );
@@ -1227,51 +1225,51 @@ public class DefaultNexus
 
     // reading
 
-    public List<NexusArtifactEvent> getRecentlyStorageChanges()
+    public List<NexusArtifactEvent> getRecentlyStorageChanges( Long from, Integer count )
     {
         return feedRecorder.getNexusArtifectEvents( new HashSet<String>( Arrays.asList( new String[] {
             NexusArtifactEvent.ACTION_CACHED,
             NexusArtifactEvent.ACTION_DEPLOYED,
-            NexusArtifactEvent.ACTION_DELETED } ) ), null, null );
+            NexusArtifactEvent.ACTION_DELETED } ) ), from, count );
     }
 
-    public List<NexusArtifactEvent> getRecentlyDeployedOrCachedArtifacts()
+    public List<NexusArtifactEvent> getRecentlyDeployedOrCachedArtifacts( Long from, Integer count )
     {
         return feedRecorder.getNexusArtifectEvents( new HashSet<String>( Arrays.asList( new String[] {
             NexusArtifactEvent.ACTION_CACHED,
-            NexusArtifactEvent.ACTION_DEPLOYED } ) ), null, null );
+            NexusArtifactEvent.ACTION_DEPLOYED } ) ), from, count );
     }
 
-    public List<NexusArtifactEvent> getRecentlyCachedArtifacts()
+    public List<NexusArtifactEvent> getRecentlyCachedArtifacts( Long from, Integer count )
     {
         return feedRecorder.getNexusArtifectEvents( new HashSet<String>( Arrays
-            .asList( new String[] { NexusArtifactEvent.ACTION_CACHED } ) ), null, null );
+            .asList( new String[] { NexusArtifactEvent.ACTION_CACHED } ) ), from, count );
     }
 
-    public List<NexusArtifactEvent> getRecentlyDeployedArtifacts()
+    public List<NexusArtifactEvent> getRecentlyDeployedArtifacts( Long from, Integer count )
     {
         return feedRecorder.getNexusArtifectEvents( new HashSet<String>( Arrays
-            .asList( new String[] { NexusArtifactEvent.ACTION_DEPLOYED } ) ), null, null );
+            .asList( new String[] { NexusArtifactEvent.ACTION_DEPLOYED } ) ), from, count );
     }
 
-    public List<NexusArtifactEvent> getBrokenArtifacts()
+    public List<NexusArtifactEvent> getBrokenArtifacts( Long from, Integer count )
     {
         return feedRecorder.getNexusArtifectEvents( new HashSet<String>( Arrays.asList( new String[] {
             NexusArtifactEvent.ACTION_BROKEN,
-            NexusArtifactEvent.ACTION_BROKEN_WRONG_REMOTE_CHECKSUM } ) ), null, null );
+            NexusArtifactEvent.ACTION_BROKEN_WRONG_REMOTE_CHECKSUM } ) ), from, count );
     }
 
-    public List<SystemEvent> getRepositoryStatusChanges()
+    public List<SystemEvent> getRepositoryStatusChanges( Long from, Integer count )
     {
         return feedRecorder.getSystemEvents( new HashSet<String>( Arrays.asList( new String[] {
             FeedRecorder.SYSTEM_REPO_LSTATUS_CHANGES_ACTION,
             FeedRecorder.SYSTEM_REPO_PSTATUS_CHANGES_ACTION,
-            FeedRecorder.SYSTEM_REPO_PSTATUS_AUTO_CHANGES_ACTION } ) ), null, null );
+            FeedRecorder.SYSTEM_REPO_PSTATUS_AUTO_CHANGES_ACTION } ) ), from, count );
     }
 
-    public List<SystemEvent> getSystemEvents()
+    public List<SystemEvent> getSystemEvents( Long from, Integer count )
     {
-        return feedRecorder.getSystemEvents( null, null, null );
+        return feedRecorder.getSystemEvents( null, from, count );
     }
 
     // =============
@@ -1998,7 +1996,6 @@ public class DefaultNexus
         }
     }
 
-    
     public void removeRepositoryFolder( Repository repository )
     {
         getLogger().info( "Removing storage folder of repository " + repository.getId() );

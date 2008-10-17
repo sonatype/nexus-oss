@@ -69,17 +69,17 @@ public class SimpleFeedRecorder
 
     }
 
-    public List<Map<String, String>> getEvents( Set<String> types, Set<String> subtypes, Integer from, Integer count )
+    public List<Map<String, String>> getEvents( Set<String> types, Set<String> subtypes, Long from, Integer count )
     {
         return Collections.emptyList();
     }
 
-    public List<NexusArtifactEvent> getNexusArtifectEvents( Set<String> subtypes, Integer from, Integer count )
+    public List<NexusArtifactEvent> getNexusArtifectEvents( Set<String> subtypes, Long from, Integer count )
     {
         return Collections.emptyList();
     }
 
-    public List<SystemEvent> getSystemEvents( Set<String> subtypes, Integer from, Integer count )
+    public List<SystemEvent> getSystemEvents( Set<String> subtypes, Long from, Integer count )
     {
         return Collections.emptyList();
     }

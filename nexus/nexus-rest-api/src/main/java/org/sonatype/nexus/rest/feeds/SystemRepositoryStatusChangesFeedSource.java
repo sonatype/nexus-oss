@@ -36,9 +36,9 @@ public class SystemRepositoryStatusChangesFeedSource
 {
     public static final String CHANNEL_KEY = "systemRepositoryStatusChanges";
 
-    public List<SystemEvent> getEventList()
+    public List<SystemEvent> getEventList( Long from, Integer count )
     {
-        return getNexus().getRepositoryStatusChanges();
+        return getNexus().getRepositoryStatusChanges( from, count );
     }
 
     public String getFeedKey()

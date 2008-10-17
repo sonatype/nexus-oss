@@ -559,7 +559,7 @@ public class DefaultTimeline
 
     public List<Map<String, String>> retrieve( long from, int count, Set<String> types )
     {
-        return retrieve( buildQuery( from, System.currentTimeMillis(), types, null ), count );
+        return retrieve( from, count, types, null );
     }
 
     public List<Map<String, String>> retrieve( long from, int count, Set<String> types, Set<String> subTypes )
@@ -569,7 +569,7 @@ public class DefaultTimeline
 
     public List<Map<String, String>> retrieveNewest( int count, Set<String> types )
     {
-        return retrieve( buildQuery( 0L, System.currentTimeMillis(), types, null ), count );
+        return retrieveNewest( count, types, null );
     }
 
     public List<Map<String, String>> retrieveNewest( int count, Set<String> types, Set<String> subTypes )

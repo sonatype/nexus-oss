@@ -47,6 +47,8 @@ public class DefaultFeedRecorder
     extends AbstractLogEnabled
     implements FeedRecorder
 {
+    public static final int DEFAULT_PAGE_SIZE = 40;
+
     public static final String REPOSITORY = "r";
 
     public static final String REPOSITORY_PATH = "path";
@@ -190,35 +192,28 @@ public class DefaultFeedRecorder
         return result;
     }
 
-    public List<Map<String, String>> getEvents( Set<String> types, Set<String> subtypes, Integer from, Integer count )
+    public List<Map<String, String>> getEvents( Set<String> types, Set<String> subtypes, Long from, Integer count )
     {
-        return timeline.retrieveNewest( 40, types, subtypes );
-    }
+        int cnt = count != null ? count : DEFAULT_PAGE_SIZE;
 
-    public List<NexusArtifactEvent> getNexusArtifectEvents( Set<String> subtypes, Integer from, Integer count )
-    {
-        // TODO: wire in paging
-        if ( subtypes == null || subtypes.size() == 0 )
+        if ( from != null )
         {
-            return getAisFromMaps( timeline.retrieveNewest( 40, REPO_EVENT_TYPE_SET ) );
+            return timeline.retrieve( from, cnt, subtypes );
         }
         else
         {
-            return getAisFromMaps( timeline.retrieveNewest( 40, REPO_EVENT_TYPE_SET, subtypes ) );
+            return timeline.retrieveNewest( cnt, types, subtypes );
         }
     }
 
-    public List<SystemEvent> getSystemEvents( Set<String> subtypes, Integer from, Integer count )
+    public List<NexusArtifactEvent> getNexusArtifectEvents( Set<String> subtypes, Long from, Integer count )
     {
-        // TODO: wire in paging
-        if ( subtypes == null || subtypes.size() == 0 )
-        {
-            return getSesFromMaps( timeline.retrieveNewest( 40, SYSTEM_EVENT_TYPE_SET ) );
-        }
-        else
-        {
-            return getSesFromMaps( timeline.retrieveNewest( 40, SYSTEM_EVENT_TYPE_SET, subtypes ) );
-        }
+        return getAisFromMaps( getEvents( REPO_EVENT_TYPE_SET, subtypes, from, count ) );
+    }
+
+    public List<SystemEvent> getSystemEvents( Set<String> subtypes, Long from, Integer count )
+    {
+        return getSesFromMaps( getEvents( SYSTEM_EVENT_TYPE_SET, subtypes, from, count ) );
     }
 
     public void addSystemEvent( String action, String message )

@@ -53,9 +53,9 @@ public class RecentOverallChangesFeedSource
     }
 
     @Override
-    public List<NexusArtifactEvent> getEventList()
+    public List<NexusArtifactEvent> getEventList( Long from, Integer count )
     {
-        return getNexus().getRecentlyStorageChanges();
+        return getNexus().getRecentlyStorageChanges( from, count );
     }
 
     @Override

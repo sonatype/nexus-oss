@@ -48,6 +48,5 @@ public abstract class AbstractFeedSource
 
     public abstract String getDescription();
 
-    public abstract SyndFeed getFeed();
-
+    public abstract SyndFeed getFeed( Long from, Integer count );
 }
