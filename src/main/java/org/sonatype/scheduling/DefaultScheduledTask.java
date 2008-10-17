@@ -195,7 +195,7 @@ public class DefaultScheduledTask<T>
     {
         if ( getFuture() != null )
         {
-            getFuture().cancel( true );
+            getFuture().cancel( false );
         }
 
         setTaskState( TaskState.SUBMITTED );
@@ -280,6 +280,8 @@ public class DefaultScheduledTask<T>
         }
         else
         {
+            nextRun = null;
+            
             return null;
         }
     }
