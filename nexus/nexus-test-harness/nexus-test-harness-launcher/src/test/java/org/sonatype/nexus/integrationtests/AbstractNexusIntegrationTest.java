@@ -249,7 +249,7 @@ public class AbstractNexusIntegrationTest
                 String artifactFileName = model.getArtifactId() + "." + model.getPackaging();
                 File artifactFile = new File( project, artifactFileName );
 
-                log.debug( "wow, this is working: " + artifactFile );
+                log.debug( "wow, this is working: " + artifactFile.getName() );
 
                 Gav gav =
                     new Gav( model.getGroupId(), model.getArtifactId(), model.getVersion(), null, model.getPackaging(),
