@@ -17,6 +17,11 @@ public class DummyWaitingNexusTask
     private long sleepTime = 10000;
 
     private Map<String, String> parameters;
+    
+    public boolean isExposed()
+    {
+        return true;
+    }
 
     public void addParameter( String key, String value )
     {

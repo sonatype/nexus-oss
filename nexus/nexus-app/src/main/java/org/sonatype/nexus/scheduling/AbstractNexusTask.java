@@ -51,6 +51,12 @@ public abstract class AbstractNexusTask<T>
     private SystemProcess prc;
 
     private Nexus nexus = null;
+    
+    // override if you have a task that needs to hide itself
+    public boolean isExposed()
+    {
+        return true;
+    }
 
     public void contextualize( Context ctx )
         throws ContextException

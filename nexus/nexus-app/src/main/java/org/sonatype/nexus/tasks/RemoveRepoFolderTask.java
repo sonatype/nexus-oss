@@ -16,7 +16,6 @@ import org.sonatype.scheduling.SchedulerTask;
 public class RemoveRepoFolderTask
     extends AbstractNexusTask<Object>
 {
-
     private Repository repository;
 
     public Repository getRepository()
@@ -27,6 +26,12 @@ public class RemoveRepoFolderTask
     public void setRepository( Repository repository )
     {
         this.repository = repository;
+    }
+    
+    @Override
+    public boolean isExposed()
+    {
+        return false;
     }
 
     @Override

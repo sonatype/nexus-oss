@@ -71,21 +71,24 @@ public class ScheduledServiceListPlexusResource
 
             for ( ScheduledTask<?> task : tasks )
             {
-                ScheduledServiceListResource item = new ScheduledServiceListResource();
-                item.setResourceURI( createChildReference( request, task.getId() ).toString() );
-                item.setLastRunResult( TaskState.BROKEN.equals( task.getTaskState() ) ? "Error" : "Ok" );
-                item.setId( task.getId() );
-                item.setName( task.getName() );
-                item.setStatus( StringUtils.capitalise( task.getTaskState().toString() ) );
-                item.setTypeId( task.getType() );
-                item.setTypeName( getNexusInstance( request ).getScheduledTaskDescriptor( task.getType() ).getName() );
-                item.setCreated( task.getScheduledAt() == null ? "n/a" : task.getScheduledAt().toString() );
-                item.setLastRunTime( task.getLastRun() == null ? "n/a" : task.getLastRun().toString() );
-                item.setNextRunTime( getNextRunTime( task ) );
-                item.setSchedule( getScheduleShortName( task.getSchedule() ) );
-                item.setEnabled( task.isEnabled() );
-
-                result.addData( item );
+                if ( task.isExposed() )
+                {
+                    ScheduledServiceListResource item = new ScheduledServiceListResource();
+                    item.setResourceURI( createChildReference( request, task.getId() ).toString() );
+                    item.setLastRunResult( TaskState.BROKEN.equals( task.getTaskState() ) ? "Error" : "Ok" );
+                    item.setId( task.getId() );
+                    item.setName( task.getName() );
+                    item.setStatus( StringUtils.capitalise( task.getTaskState().toString() ) );
+                    item.setTypeId( task.getType() );
+                    item.setTypeName( getNexusInstance( request ).getScheduledTaskDescriptor( task.getType() ).getName() );
+                    item.setCreated( task.getScheduledAt() == null ? "n/a" : task.getScheduledAt().toString() );
+                    item.setLastRunTime( task.getLastRun() == null ? "n/a" : task.getLastRun().toString() );
+                    item.setNextRunTime( getNextRunTime( task ) );
+                    item.setSchedule( getScheduleShortName( task.getSchedule() ) );
+                    item.setEnabled( task.isEnabled() );
+    
+                    result.addData( item );
+                }
             }
 
         }
