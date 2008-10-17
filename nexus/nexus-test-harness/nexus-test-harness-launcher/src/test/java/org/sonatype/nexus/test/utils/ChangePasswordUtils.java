@@ -43,5 +43,25 @@ public class ChangePasswordUtils
         return response.getStatus();
 
     }
+    
+    public static Status changePassword( String username, String newPassword )
+    throws Exception
+    {
+        String serviceURI = "service/local/users_setpw";
+    
+        UserChangePasswordResource resource = new UserChangePasswordResource();
+        resource.setUserId( username );
+        resource.setNewPassword( newPassword );
+    
+        UserChangePasswordRequest request = new UserChangePasswordRequest();
+        request.setData( resource );
+    
+        XStreamRepresentation representation = new XStreamRepresentation( xstream, "", MediaType.APPLICATION_XML );
+        representation.setPayload( request );
+    
+        Response response = RequestFacade.sendMessage( serviceURI, Method.POST, representation );
+        return response.getStatus();
+    
+    }
 
 }

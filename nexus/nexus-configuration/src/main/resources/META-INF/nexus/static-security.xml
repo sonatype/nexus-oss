@@ -1431,5 +1431,22 @@
                 </property>
             </properties>
 		</privilege>
+		<privilege>
+            <id>72</id>
+            <type>method</type>
+            <name>User Set Password - (create,read)</name>
+            <description>Give permission to set a user's password.</description>
+            <properties>
+                <property>
+                    <key>method</key>
+                    <value>create,read</value>
+                </property>
+                <property>
+                    <key>permission</key>
+                    <value>nexus:userssetpw</value>
+                </property>
+            </properties>
+        </privilege>
+		
     </privileges>
 </security>

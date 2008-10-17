@@ -69,6 +69,7 @@ import org.sonatype.nexus.integrationtests.nexus810.Nexus810PackageNamesInNexusC
 import org.sonatype.nexus.integrationtests.nexus810.Nexus810PackageNamesInRestMessages;
 import org.sonatype.nexus.integrationtests.nexus930.Nexus930AutoDiscoverComponent;
 import org.sonatype.nexus.integrationtests.nexus947.Nexus947GroupBrowsing;
+import org.sonatype.nexus.integrationtests.nexus999.Nexus999SetUsersPassword;
 import org.sonatype.nexus.integrationtests.proxy.nexus177.Nexus177OutOfServiceTest;
 import org.sonatype.nexus.integrationtests.proxy.nexus178.Nexus178BlockProxyDownloadTest;
 import org.sonatype.nexus.integrationtests.proxy.nexus179.Nexus179RemoteRepoDownTest;
@@ -148,7 +149,8 @@ import org.sonatype.nexus.integrationtests.upgrades.nexus652.Nexus652Beta5To10Up
     Nexus930AutoDiscoverComponent.class,
     Nexus947GroupBrowsing.class,
     Nexus570IndexArchetypeTest.class,
-    Nexus504ChangeRoleTest.class} )
+    Nexus504ChangeRoleTest.class, 
+    Nexus999SetUsersPassword.class } )
 public class IntegrationTestSuiteClassesSecurity
 {
     @BeforeClass

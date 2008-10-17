@@ -21,4 +21,7 @@ public interface NexusSecurity
     void changePassword( String userId, String oldPassword, String newPassword )
         throws NoSuchUserException,
             InvalidCredentialsException;
+
+    void changePassword( String userId, String newPassword )
+        throws NoSuchUserException;
 }

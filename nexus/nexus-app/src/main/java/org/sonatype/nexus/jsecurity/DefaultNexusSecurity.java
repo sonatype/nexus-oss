@@ -303,6 +303,20 @@ public class DefaultNexusSecurity
             throw new InvalidCredentialsException();
         }
 
+        // set the password
+        changePassword( user, newPassword );
+    }
+    
+    public void changePassword( String userId, String newPassword ) throws NoSuchUserException
+    {
+        SecurityUser user = readUser( userId );
+        // set the password
+        changePassword( user, newPassword );
+    }
+    
+    public void changePassword( SecurityUser user, String newPassword )
+    throws NoSuchUserException
+    {
         user.setPassword( pwGenerator.hashPassword( newPassword ) );
 
         try
@@ -314,6 +328,7 @@ public class DefaultNexusSecurity
             // Just changing password, can't get into this state
         }
     }
+    
 
     public void forgotPassword( String userId, String email )
         throws NoSuchUserException,
