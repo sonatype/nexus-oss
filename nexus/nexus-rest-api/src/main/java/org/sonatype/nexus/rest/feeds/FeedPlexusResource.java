@@ -22,6 +22,7 @@ package org.sonatype.nexus.rest.feeds;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
@@ -71,11 +72,12 @@ public class FeedPlexusResource
     }
 
     @Override
-    protected SyndFeed getFeed( Context context, Request request, String channelKey, Long from, Integer count )
+    protected SyndFeed getFeed( Context context, Request request, String channelKey, Integer from, Integer count,
+        Map<String, String> params )
         throws IOException,
             ComponentLookupException
     {
-        SyndFeed feed = super.getFeed( context, request, channelKey, from, count );
+        SyndFeed feed = super.getFeed( context, request, channelKey, from, count, params );
 
         if ( feed.getLink() != null )
         {

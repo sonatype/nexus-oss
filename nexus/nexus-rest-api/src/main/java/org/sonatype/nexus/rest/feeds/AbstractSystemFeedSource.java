@@ -23,6 +23,7 @@ package org.sonatype.nexus.rest.feeds;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import org.restlet.data.MediaType;
 import org.sonatype.nexus.feeds.FeedRecorder;
@@ -45,11 +46,11 @@ import com.sun.syndication.feed.synd.SyndFeedImpl;
 public abstract class AbstractSystemFeedSource
     extends AbstractFeedSource
 {
-    public abstract List<SystemEvent> getEventList( Long from, Integer count );
+    public abstract List<SystemEvent> getEventList( Integer from, Integer count, Map<String, String> params );
 
-    public SyndFeed getFeed( Long from, Integer count )
+    public SyndFeed getFeed( Integer from, Integer count, Map<String, String> params )
     {
-        List<SystemEvent> items = getEventList( from, count );
+        List<SystemEvent> items = getEventList( from, count, params );
 
         SyndFeedImpl feed = new SyndFeedImpl();
 

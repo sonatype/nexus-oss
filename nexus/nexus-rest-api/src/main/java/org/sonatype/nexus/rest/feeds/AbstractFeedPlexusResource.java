@@ -75,14 +75,14 @@ public abstract class AbstractFeedPlexusResource
 
         Form params = request.getResourceRef().getQueryAsForm();
 
-        Long from = null;
+        Integer from = null;
         Integer count = null;
 
         try
         {
             if ( params.getFirstValue( "from" ) != null )
             {
-                from = Long.valueOf( params.getFirstValue( "from" ) );
+                from = Integer.valueOf( params.getFirstValue( "from" ) );
             }
 
             if ( params.getFirstValue( "count" ) != null )
@@ -98,11 +98,13 @@ public abstract class AbstractFeedPlexusResource
                 e );
         }
 
+        Map<String, String> par = params.getValuesMap();
+
         try
         {
             if ( !MediaType.APPLICATION_JSON.equals( mediaType, true ) )
             {
-                SyndFeed feed = getFeed( context, request, getChannelKey( request ), from, count );
+                SyndFeed feed = getFeed( context, request, getChannelKey( request ), from, count, par );
 
                 if ( FeedRepresentation.ATOM_MEDIA_TYPE.equals( mediaType, true ) )
                 {
@@ -140,13 +142,14 @@ public abstract class AbstractFeedPlexusResource
         }
     }
 
-    protected SyndFeed getFeed( Context context, Request request, String channelKey, Long from, Integer count )
+    protected SyndFeed getFeed( Context context, Request request, String channelKey, Integer from, Integer count,
+        Map<String, String> params )
         throws IOException,
             ComponentLookupException
     {
         FeedSource src = feeds.get( channelKey );
 
-        return src.getFeed( from, count );
+        return src.getFeed( from, count, params );
     }
 
     protected abstract String getChannelKey( Request request );

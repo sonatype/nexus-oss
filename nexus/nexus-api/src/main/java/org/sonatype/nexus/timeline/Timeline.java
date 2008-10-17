@@ -43,19 +43,25 @@ public interface Timeline
 
     void purgeAll( Set<String> types );
 
-    void purgeAll( Set<String> types, Set<String> subTypes );
+    void purgeAll( Set<String> types, Set<String> subTypes, TimelineFilter filter );
 
     void purgeOlderThan( long timestamp );
 
     void purgeOlderThan( long timestamp, Set<String> types );
 
-    void purgeOlderThan( long timestamp, Set<String> types, Set<String> subTypes );
+    void purgeOlderThan( long timestamp, Set<String> types, Set<String> subTypes, TimelineFilter filter );
 
     List<Map<String, String>> retrieveNewest( int count, Set<String> types );
 
-    List<Map<String, String>> retrieveNewest( int count, Set<String> types, Set<String> subtypes );
+    List<Map<String, String>> retrieveNewest( int count, Set<String> types, Set<String> subtypes, TimelineFilter filter );
 
-    List<Map<String, String>> retrieve( long from, int count, Set<String> types );
+    List<Map<String, String>> retrieve( long fromTs, int count, Set<String> types );
 
-    List<Map<String, String>> retrieve( long from, int count, Set<String> types, Set<String> subtypes );
+    List<Map<String, String>> retrieve( long fromTs, int count, Set<String> types, Set<String> subtypes,
+        TimelineFilter filter );
+
+    List<Map<String, String>> retrieve( int fromItem, int count, Set<String> types );
+
+    List<Map<String, String>> retrieve( int fromItem, int count, Set<String> types, Set<String> subtypes,
+        TimelineFilter filter );
 }

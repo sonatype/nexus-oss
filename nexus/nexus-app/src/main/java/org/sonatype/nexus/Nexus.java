@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.RejectedExecutionException;
 
 import org.sonatype.nexus.configuration.application.MutableConfiguration;
@@ -206,19 +207,19 @@ public interface Nexus
 
     // reading
 
-    List<NexusArtifactEvent> getRecentlyStorageChanges( Long from, Integer count );
+    List<NexusArtifactEvent> getRecentlyStorageChanges( Integer from, Integer count, Set<String> repositoryIds );
 
-    List<NexusArtifactEvent> getRecentlyDeployedOrCachedArtifacts( Long from, Integer count );
+    List<NexusArtifactEvent> getRecentlyDeployedOrCachedArtifacts( Integer from, Integer count, Set<String> repositoryIds );
 
-    List<NexusArtifactEvent> getRecentlyCachedArtifacts( Long from, Integer count );
+    List<NexusArtifactEvent> getRecentlyCachedArtifacts( Integer from, Integer count, Set<String> repositoryIds );
 
-    List<NexusArtifactEvent> getRecentlyDeployedArtifacts( Long from, Integer count );
+    List<NexusArtifactEvent> getRecentlyDeployedArtifacts( Integer from, Integer count, Set<String> repositoryIds );
 
-    List<NexusArtifactEvent> getBrokenArtifacts( Long from, Integer count );
+    List<NexusArtifactEvent> getBrokenArtifacts( Integer from, Integer count, Set<String> repositoryIds );
 
-    List<SystemEvent> getRepositoryStatusChanges( Long from, Integer count );
+    List<SystemEvent> getRepositoryStatusChanges( Integer from, Integer count );
 
-    List<SystemEvent> getSystemEvents( Long from, Integer count );
+    List<SystemEvent> getSystemEvents( Integer from, Integer count );
 
     // ----------------------------------------------------------------------------
     // Scheduler

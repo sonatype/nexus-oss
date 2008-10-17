@@ -28,6 +28,7 @@ import java.util.Set;
 
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.StartingException;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.StoppingException;
+import org.sonatype.nexus.timeline.TimelineFilter;
 
 public class SimpleFeedRecorder
     implements FeedRecorder
@@ -69,17 +70,19 @@ public class SimpleFeedRecorder
 
     }
 
-    public List<Map<String, String>> getEvents( Set<String> types, Set<String> subtypes, Long from, Integer count )
+    public List<Map<String, String>> getEvents( Set<String> types, Set<String> subtypes, Integer from, Integer count,
+        TimelineFilter filter )
     {
         return Collections.emptyList();
     }
 
-    public List<NexusArtifactEvent> getNexusArtifectEvents( Set<String> subtypes, Long from, Integer count )
+    public List<NexusArtifactEvent> getNexusArtifectEvents( Set<String> subtypes, Integer from, Integer count,
+        TimelineFilter filter )
     {
         return Collections.emptyList();
     }
 
-    public List<SystemEvent> getSystemEvents( Set<String> subtypes, Long from, Integer count )
+    public List<SystemEvent> getSystemEvents( Set<String> subtypes, Integer from, Integer count, TimelineFilter filter )
     {
         return Collections.emptyList();
     }

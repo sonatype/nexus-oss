@@ -119,6 +119,8 @@ import org.sonatype.nexus.tasks.descriptors.ReindexTaskDescriptor;
 import org.sonatype.nexus.tasks.descriptors.RemoveRepoFolderTaskDescriptor;
 import org.sonatype.nexus.tasks.descriptors.ScheduledTaskDescriptor;
 import org.sonatype.nexus.tasks.descriptors.SynchronizeShadowTaskDescriptor;
+import org.sonatype.nexus.timeline.RepositoryIdTimelineFilter;
+import org.sonatype.nexus.timeline.TimelineFilter;
 import org.sonatype.scheduling.NoSuchTaskException;
 import org.sonatype.scheduling.ScheduledTask;
 import org.sonatype.scheduling.SchedulerTask;
@@ -1225,51 +1227,72 @@ public class DefaultNexus
 
     // reading
 
-    public List<NexusArtifactEvent> getRecentlyStorageChanges( Long from, Integer count )
+    public List<NexusArtifactEvent> getRecentlyStorageChanges( Integer from, Integer count, Set<String> repositoryIds )
     {
+        TimelineFilter filter = ( repositoryIds == null || repositoryIds.isEmpty() )
+            ? null
+            : new RepositoryIdTimelineFilter( repositoryIds );
+
         return feedRecorder.getNexusArtifectEvents( new HashSet<String>( Arrays.asList( new String[] {
             NexusArtifactEvent.ACTION_CACHED,
             NexusArtifactEvent.ACTION_DEPLOYED,
-            NexusArtifactEvent.ACTION_DELETED } ) ), from, count );
+            NexusArtifactEvent.ACTION_DELETED } ) ), from, count, filter );
     }
 
-    public List<NexusArtifactEvent> getRecentlyDeployedOrCachedArtifacts( Long from, Integer count )
+    public List<NexusArtifactEvent> getRecentlyDeployedOrCachedArtifacts( Integer from, Integer count,
+        Set<String> repositoryIds )
     {
+        TimelineFilter filter = ( repositoryIds == null || repositoryIds.isEmpty() )
+            ? null
+            : new RepositoryIdTimelineFilter( repositoryIds );
+
         return feedRecorder.getNexusArtifectEvents( new HashSet<String>( Arrays.asList( new String[] {
             NexusArtifactEvent.ACTION_CACHED,
-            NexusArtifactEvent.ACTION_DEPLOYED } ) ), from, count );
+            NexusArtifactEvent.ACTION_DEPLOYED } ) ), from, count, filter );
     }
 
-    public List<NexusArtifactEvent> getRecentlyCachedArtifacts( Long from, Integer count )
+    public List<NexusArtifactEvent> getRecentlyCachedArtifacts( Integer from, Integer count, Set<String> repositoryIds )
     {
+        TimelineFilter filter = ( repositoryIds == null || repositoryIds.isEmpty() )
+            ? null
+            : new RepositoryIdTimelineFilter( repositoryIds );
+
         return feedRecorder.getNexusArtifectEvents( new HashSet<String>( Arrays
-            .asList( new String[] { NexusArtifactEvent.ACTION_CACHED } ) ), from, count );
+            .asList( new String[] { NexusArtifactEvent.ACTION_CACHED } ) ), from, count, filter );
     }
 
-    public List<NexusArtifactEvent> getRecentlyDeployedArtifacts( Long from, Integer count )
+    public List<NexusArtifactEvent> getRecentlyDeployedArtifacts( Integer from, Integer count, Set<String> repositoryIds )
     {
+        TimelineFilter filter = ( repositoryIds == null || repositoryIds.isEmpty() )
+            ? null
+            : new RepositoryIdTimelineFilter( repositoryIds );
+
         return feedRecorder.getNexusArtifectEvents( new HashSet<String>( Arrays
-            .asList( new String[] { NexusArtifactEvent.ACTION_DEPLOYED } ) ), from, count );
+            .asList( new String[] { NexusArtifactEvent.ACTION_DEPLOYED } ) ), from, count, filter );
     }
 
-    public List<NexusArtifactEvent> getBrokenArtifacts( Long from, Integer count )
+    public List<NexusArtifactEvent> getBrokenArtifacts( Integer from, Integer count, Set<String> repositoryIds )
     {
+        TimelineFilter filter = ( repositoryIds == null || repositoryIds.isEmpty() )
+            ? null
+            : new RepositoryIdTimelineFilter( repositoryIds );
+
         return feedRecorder.getNexusArtifectEvents( new HashSet<String>( Arrays.asList( new String[] {
             NexusArtifactEvent.ACTION_BROKEN,
-            NexusArtifactEvent.ACTION_BROKEN_WRONG_REMOTE_CHECKSUM } ) ), from, count );
+            NexusArtifactEvent.ACTION_BROKEN_WRONG_REMOTE_CHECKSUM } ) ), from, count, filter );
     }
 
-    public List<SystemEvent> getRepositoryStatusChanges( Long from, Integer count )
+    public List<SystemEvent> getRepositoryStatusChanges( Integer from, Integer count )
     {
         return feedRecorder.getSystemEvents( new HashSet<String>( Arrays.asList( new String[] {
             FeedRecorder.SYSTEM_REPO_LSTATUS_CHANGES_ACTION,
             FeedRecorder.SYSTEM_REPO_PSTATUS_CHANGES_ACTION,
-            FeedRecorder.SYSTEM_REPO_PSTATUS_AUTO_CHANGES_ACTION } ) ), from, count );
+            FeedRecorder.SYSTEM_REPO_PSTATUS_AUTO_CHANGES_ACTION } ) ), from, count, null );
     }
 
-    public List<SystemEvent> getSystemEvents( Long from, Integer count )
+    public List<SystemEvent> getSystemEvents( Integer from, Integer count )
     {
-        return feedRecorder.getSystemEvents( null, from, count );
+        return feedRecorder.getSystemEvents( null, from, count, null );
     }
 
     // =============

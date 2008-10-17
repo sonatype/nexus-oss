@@ -119,7 +119,8 @@ public class PurgeTimeline
             timeline.purgeOlderThan(
                 System.currentTimeMillis() - ( (long) getPurgeOlderThan() * A_DAY ),
                 getTypes(),
-                getSubTypes() );
+                getSubTypes(),
+                null );
         }
 
         return null;

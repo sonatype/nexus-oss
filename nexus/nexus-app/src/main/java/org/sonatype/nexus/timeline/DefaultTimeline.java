@@ -303,7 +303,7 @@ public class DefaultTimeline
         }
     }
 
-    protected List<Map<String, String>> retrieve( Query query, int count )
+    protected List<Map<String, String>> retrieve( Query query, long from, int count, TimelineFilter filter )
     {
         List<Map<String, String>> result = new ArrayList<Map<String, String>>();
 
@@ -315,7 +315,15 @@ public class DefaultTimeline
                     query,
                     new Sort( new SortField( TIMESTAMP, SortField.LONG, true ) ) );
 
-                for ( Iterator<Hit> i = (Iterator<Hit>) hits.iterator(); i.hasNext() && result.size() <= count; )
+                Iterator<Hit> i = (Iterator<Hit>) hits.iterator();
+
+                // step over the unneeded stuff
+                for ( long idx = 0; i.hasNext() && idx < from; idx++ )
+                {
+                    i.next();
+                }
+
+                for ( ; i.hasNext() && result.size() < count; )
                 {
                     Hit hit = i.next();
 
@@ -331,7 +339,14 @@ public class DefaultTimeline
                         }
                     }
 
-                    result.add( map );
+                    if ( filter != null && filter.accept( map ) )
+                    {
+                        result.add( map );
+                    }
+                    else
+                    {
+                        result.add( map );
+                    }
                 }
             }
         }
@@ -529,52 +544,65 @@ public class DefaultTimeline
 
     public void purgeAll()
     {
-        purge( buildQuery( 0L, System.currentTimeMillis(), null, null ) );
+        purgeAll( null );
     }
 
     public void purgeAll( Set<String> types )
     {
-        purge( buildQuery( 0L, System.currentTimeMillis(), types, null ) );
+        purgeAll( types, null, null );
     }
 
-    public void purgeAll( Set<String> types, Set<String> subTypes )
+    public void purgeAll( Set<String> types, Set<String> subTypes, TimelineFilter filter )
     {
         purge( buildQuery( 0L, System.currentTimeMillis(), types, subTypes ) );
     }
 
     public void purgeOlderThan( long timestamp )
     {
-        purge( buildQuery( 0L, timestamp, null, null ) );
+        purgeOlderThan( timestamp, null );
     }
 
     public void purgeOlderThan( long timestamp, Set<String> types )
     {
-        purge( buildQuery( 0L, timestamp, types, null ) );
+        purgeOlderThan( timestamp, types, null, null );
     }
 
-    public void purgeOlderThan( long timestamp, Set<String> types, Set<String> subTypes )
+    public void purgeOlderThan( long timestamp, Set<String> types, Set<String> subTypes, TimelineFilter filter )
     {
         purge( buildQuery( 0L, timestamp, types, subTypes ) );
     }
 
-    public List<Map<String, String>> retrieve( long from, int count, Set<String> types )
+    public List<Map<String, String>> retrieve( long fromTs, int count, Set<String> types )
     {
-        return retrieve( from, count, types, null );
+        return retrieve( fromTs, count, types, null, null );
     }
 
-    public List<Map<String, String>> retrieve( long from, int count, Set<String> types, Set<String> subTypes )
+    public List<Map<String, String>> retrieve( long fromTs, int count, Set<String> types, Set<String> subTypes,
+        TimelineFilter filter )
     {
-        return retrieve( buildQuery( from, System.currentTimeMillis(), types, subTypes ), count );
+        return retrieve( buildQuery( fromTs, System.currentTimeMillis(), types, subTypes ), 0, count, filter );
+    }
+
+    public List<Map<String, String>> retrieve( int fromItem, int count, Set<String> types )
+    {
+        return retrieve( fromItem, count, types, null, null );
+    }
+
+    public List<Map<String, String>> retrieve( int fromItem, int count, Set<String> types, Set<String> subTypes,
+        TimelineFilter filter )
+    {
+        return retrieve( buildQuery( 0L, System.currentTimeMillis(), types, subTypes ), fromItem, count, filter );
     }
 
     public List<Map<String, String>> retrieveNewest( int count, Set<String> types )
     {
-        return retrieveNewest( count, types, null );
+        return retrieveNewest( count, types, null, null );
     }
 
-    public List<Map<String, String>> retrieveNewest( int count, Set<String> types, Set<String> subTypes )
+    public List<Map<String, String>> retrieveNewest( int count, Set<String> types, Set<String> subTypes,
+        TimelineFilter filter )
     {
-        return retrieve( buildQuery( 0L, System.currentTimeMillis(), types, subTypes ), count );
+        return retrieve( buildQuery( 0L, System.currentTimeMillis(), types, subTypes ), 0L, count, filter );
     }
 
 }

@@ -51,7 +51,7 @@ public class DefaultTimelineTest
         super.tearDown();
     }
 
-    public void testSimple()
+    public void testSimpleTimestamp()
     {
         HashMap<String, String> data = new HashMap<String, String>();
         data.put( "a", "a" );
@@ -65,21 +65,107 @@ public class DefaultTimelineTest
             System.currentTimeMillis() - 2L * 60L * 60L * 1000L,
             10,
             new HashSet<String>( Arrays.asList( new String[] { "TEST" } ) ),
-            new HashSet<String>( Arrays.asList( new String[] { "1" } ) ) );
+            new HashSet<String>( Arrays.asList( new String[] { "1" } ) ),
+            null );
 
         assertEquals( 1, res.size() );
 
         res = defaultTimeline.retrieveNewest(
             10,
             new HashSet<String>( Arrays.asList( new String[] { "TEST" } ) ),
-            new HashSet<String>( Arrays.asList( new String[] { "1" } ) ) );
+            new HashSet<String>( Arrays.asList( new String[] { "1" } ) ),
+            null );
 
         assertEquals( 1, res.size() );
 
         res = defaultTimeline.retrieveNewest(
             10,
             new HashSet<String>( Arrays.asList( new String[] { "TEST" } ) ),
-            new HashSet<String>( Arrays.asList( new String[] { "2" } ) ) );
+            new HashSet<String>( Arrays.asList( new String[] { "2" } ) ),
+            null );
+
+        assertEquals( 1, res.size() );
+
+        res = defaultTimeline.retrieveNewest( 10, new HashSet<String>( Arrays.asList( new String[] { "TEST" } ) ) );
+
+        assertEquals( 2, res.size() );
+    }
+
+    public void testSimpleItem()
+    {
+        HashMap<String, String> data = new HashMap<String, String>();
+        data.put( "a", "a" );
+        data.put( "b", "b" );
+
+        defaultTimeline.add( System.currentTimeMillis() - 1L * 60L * 60L * 1000L, "TEST", "1", data );
+
+        defaultTimeline.add( System.currentTimeMillis() - 1L * 60L * 60L * 1000L, "TEST", "2", data );
+
+        List<Map<String, String>> res = defaultTimeline.retrieve( 0, 10, new HashSet<String>( Arrays
+            .asList( new String[] { "TEST" } ) ), null, null );
+
+        assertEquals( 2, res.size() );
+
+        res = defaultTimeline.retrieve(
+            1,
+            10,
+            new HashSet<String>( Arrays.asList( new String[] { "TEST" } ) ),
+            null,
+            null );
+
+        assertEquals( 1, res.size() );
+        assertEquals( "b", res.get( 0 ).get( "b" ) );
+
+        res = defaultTimeline.retrieve(
+            2,
+            10,
+            new HashSet<String>( Arrays.asList( new String[] { "TEST" } ) ),
+            null,
+            null );
+
+        assertEquals( 0, res.size() );
+
+        res = defaultTimeline.retrieve(
+            0,
+            1,
+            new HashSet<String>( Arrays.asList( new String[] { "TEST" } ) ),
+            null,
+            null );
+
+        assertEquals( 1, res.size() );
+        assertEquals( "a", res.get( 0 ).get( "a" ) );
+
+        res = defaultTimeline.retrieve(
+            0,
+            0,
+            new HashSet<String>( Arrays.asList( new String[] { "TEST" } ) ),
+            null,
+            null );
+
+        assertEquals( 0, res.size() );
+
+        res = defaultTimeline.retrieve(
+            0,
+            10,
+            new HashSet<String>( Arrays.asList( new String[] { "TEST" } ) ),
+            new HashSet<String>( Arrays.asList( new String[] { "1" } ) ),
+            null );
+
+        assertEquals( 1, res.size() );
+
+        res = defaultTimeline.retrieveNewest(
+            10,
+            new HashSet<String>( Arrays.asList( new String[] { "TEST" } ) ),
+            new HashSet<String>( Arrays.asList( new String[] { "1" } ) ),
+            null );
+
+        assertEquals( 1, res.size() );
+
+        res = defaultTimeline.retrieveNewest(
+            10,
+            new HashSet<String>( Arrays.asList( new String[] { "TEST" } ) ),
+            new HashSet<String>( Arrays.asList( new String[] { "2" } ) ),
+            null );
 
         assertEquals( 1, res.size() );
 
@@ -101,7 +187,7 @@ public class DefaultTimelineTest
         defaultTimeline.add( System.currentTimeMillis() - 1L * 60L * 60L * 1000L, "TEST", "1", data );
 
         List<Map<String, String>> res = defaultTimeline.retrieveNewest( 10, new HashSet<String>( Arrays
-            .asList( new String[] { "TEST" } ) ), new HashSet<String>( Arrays.asList( new String[] { "1" } ) ) );
+            .asList( new String[] { "TEST" } ) ), new HashSet<String>( Arrays.asList( new String[] { "1" } ) ), null );
 
         assertEquals( 2, res.size() );
 

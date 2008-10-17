@@ -21,6 +21,7 @@
 package org.sonatype.nexus.rest.feeds;
 
 import java.io.IOException;
+import java.util.Map;
 
 import com.sun.syndication.feed.synd.SyndFeed;
 
@@ -51,6 +52,6 @@ public interface FeedSource
      * @return a channel
      * @throws IOException
      */
-    SyndFeed getFeed( Long from, Integer count )
+    SyndFeed getFeed( Integer from, Integer count, Map<String, String> params )
         throws IOException;
 }

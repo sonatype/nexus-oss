@@ -21,6 +21,7 @@
 package org.sonatype.nexus.rest.feeds;
 
 import java.util.List;
+import java.util.Map;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.nexus.feeds.NexusArtifactEvent;
@@ -53,9 +54,9 @@ public class BrokenArtifactsFeedSource
     }
 
     @Override
-    public List<NexusArtifactEvent> getEventList( Long from, Integer count )
+    public List<NexusArtifactEvent> getEventList( Integer from, Integer count, Map<String, String> params )
     {
-        return getNexus().getBrokenArtifacts( from, count );
+        return getNexus().getBrokenArtifacts( from, count, getRepoIdsFromParams( params ) );
     }
 
     @Override

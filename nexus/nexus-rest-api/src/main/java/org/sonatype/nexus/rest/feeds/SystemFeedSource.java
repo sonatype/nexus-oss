@@ -21,6 +21,7 @@
 package org.sonatype.nexus.rest.feeds;
 
 import java.util.List;
+import java.util.Map;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.nexus.feeds.SystemEvent;
@@ -36,7 +37,7 @@ public class SystemFeedSource
 {
     public static final String CHANNEL_KEY = "systemChanges";
 
-    public List<SystemEvent> getEventList( Long from, Integer count )
+    public List<SystemEvent> getEventList( Integer from, Integer count, Map<String, String> params ) 
     {
         return getNexus().getSystemEvents( from, count );
     }

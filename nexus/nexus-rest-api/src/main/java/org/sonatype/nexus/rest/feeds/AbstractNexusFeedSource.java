@@ -21,10 +21,15 @@
 package org.sonatype.nexus.rest.feeds;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.codehaus.plexus.component.annotations.Requirement;
+import org.codehaus.plexus.util.StringUtils;
 import org.restlet.data.MediaType;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.artifact.NexusItemInfo;
@@ -108,15 +113,42 @@ public abstract class AbstractNexusFeedSource
         }
     }
 
-    public abstract List<NexusArtifactEvent> getEventList( Long from, Integer count );
+    protected Set<String> getRepoIdsFromParams( Map<String, String> params )
+    {
+        if ( params != null && params.containsKey( "r" ) )
+        {
+            HashSet<String> result = new HashSet<String>();
+
+            String value = params.get( "r" );
+
+            if ( value.contains( "," ) )
+            {
+                String[] values = StringUtils.split( value, "," );
+
+                result.addAll( Arrays.asList( values ) );
+            }
+            else
+            {
+                result.add( value );
+            }
+
+            return result;
+        }
+        else
+        {
+            return null;
+        }
+    }
+
+    public abstract List<NexusArtifactEvent> getEventList( Integer from, Integer count, Map<String, String> params );
 
     public abstract String getTitle();
 
     public abstract String getDescription();
 
-    public SyndFeed getFeed( Long from, Integer count )
+    public SyndFeed getFeed( Integer from, Integer count, Map<String, String> params )
     {
-        List<NexusArtifactEvent> items = getEventList( from, count );
+        List<NexusArtifactEvent> items = getEventList( from, count, params );
 
         SyndFeedImpl feed = new SyndFeedImpl();
 

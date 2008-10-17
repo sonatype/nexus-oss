@@ -24,8 +24,6 @@ import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.sonatype.nexus.Nexus;
 
-import com.sun.syndication.feed.synd.SyndFeed;
-
 /**
  * And abstract class for NexusArtifactEvent based feeds. This class implements all needed to create a feed,
  * implementors needs only to implement 3 abtract classes.
@@ -47,6 +45,4 @@ public abstract class AbstractFeedSource
     public abstract String getTitle();
 
     public abstract String getDescription();
-
-    public abstract SyndFeed getFeed( Long from, Integer count );
 }

@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.sonatype.nexus.NexusService;
+import org.sonatype.nexus.timeline.TimelineFilter;
 
 /**
  * A recorder for events for later retrieval. This is actually event recorder, not feed recorder.
@@ -103,6 +104,7 @@ public interface FeedRecorder
      * System event action: remove repository folder
      */
     public static final String SYSTEM_REMOVE_REPO_FOLDER = "REMOVE_REPO_FOLDER";
+
     // creating
 
     void addNexusArtifactEvent( NexusArtifactEvent nae );
@@ -117,9 +119,11 @@ public interface FeedRecorder
 
     // reading
 
-    List<Map<String, String>> getEvents( Set<String> types, Set<String> subtypes, Long from, Integer count );
+    List<Map<String, String>> getEvents( Set<String> types, Set<String> subtypes, Integer from, Integer count,
+        TimelineFilter filter );
 
-    List<NexusArtifactEvent> getNexusArtifectEvents( Set<String> subtypes, Long from, Integer count );
+    List<NexusArtifactEvent> getNexusArtifectEvents( Set<String> subtypes, Integer from, Integer count,
+        TimelineFilter filter );
 
-    List<SystemEvent> getSystemEvents( Set<String> subtypes, Long from, Integer count );
+    List<SystemEvent> getSystemEvents( Set<String> subtypes, Integer from, Integer count, TimelineFilter filter );
 }

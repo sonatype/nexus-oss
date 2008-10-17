@@ -36,6 +36,7 @@ import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.sonatype.nexus.artifact.NexusItemInfo;
 import org.sonatype.nexus.timeline.Timeline;
+import org.sonatype.nexus.timeline.TimelineFilter;
 
 /**
  * A feed recorder that uses DefaultNexus to record feeds.
@@ -192,28 +193,30 @@ public class DefaultFeedRecorder
         return result;
     }
 
-    public List<Map<String, String>> getEvents( Set<String> types, Set<String> subtypes, Long from, Integer count )
+    public List<Map<String, String>> getEvents( Set<String> types, Set<String> subtypes, Integer from, Integer count,
+        TimelineFilter filter )
     {
         int cnt = count != null ? count : DEFAULT_PAGE_SIZE;
 
         if ( from != null )
         {
-            return timeline.retrieve( from, cnt, subtypes );
+            return timeline.retrieve( from, cnt, types, subtypes, filter );
         }
         else
         {
-            return timeline.retrieveNewest( cnt, types, subtypes );
+            return timeline.retrieveNewest( cnt, types, subtypes, filter );
         }
     }
 
-    public List<NexusArtifactEvent> getNexusArtifectEvents( Set<String> subtypes, Long from, Integer count )
+    public List<NexusArtifactEvent> getNexusArtifectEvents( Set<String> subtypes, Integer from, Integer count,
+        TimelineFilter filter )
     {
-        return getAisFromMaps( getEvents( REPO_EVENT_TYPE_SET, subtypes, from, count ) );
+        return getAisFromMaps( getEvents( REPO_EVENT_TYPE_SET, subtypes, from, count, filter ) );
     }
 
-    public List<SystemEvent> getSystemEvents( Set<String> subtypes, Long from, Integer count )
+    public List<SystemEvent> getSystemEvents( Set<String> subtypes, Integer from, Integer count, TimelineFilter filter )
     {
-        return getSesFromMaps( getEvents( SYSTEM_EVENT_TYPE_SET, subtypes, from, count ) );
+        return getSesFromMaps( getEvents( SYSTEM_EVENT_TYPE_SET, subtypes, from, count, filter ) );
     }
 
     public void addSystemEvent( String action, String message )
