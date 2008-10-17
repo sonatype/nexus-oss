@@ -1,6 +1,7 @@
 package org.sonatype.nexus.integrationtests.nexus779;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import junit.framework.Assert;
@@ -53,52 +54,62 @@ public class Nexus779RssFeedFilteringTest
         RoleResource role3 = createRole( "filterRole3", combined );
         
         // Now update the test user
-        updateUserRole( "anonymous", Collections.singletonList( role3.getId() ) );
+        updateUserRole( TEST_USER_NAME, Collections.singletonList( role3.getId() ) );
+        
+        TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
+        TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
         
         // Should be able to see both test1 & test2 artifacts
         SyndFeed feed = FeedUtil.getFeed( "recentlyDeployed" );
         List<SyndEntry> entries = feed.getEntries();
         
-        if ( !feedListContainsArtifact( entries, "nexus778", "test1", "1.0.0" ) )
-        {
-            Assert.fail();
-        }
-        if ( !feedListContainsArtifact( entries, "nexus778", "test2", "1.0.0" ) )
-        {
-            Assert.fail();
-        }
+        Assert.assertTrue("Feed should contain entry for nexus779:test1:1.0.0.\nEntries: "+ this.entriesToString(entries), feedListContainsArtifact( entries, "nexus779", "test1", "1.0.0" ) );
+        
+        Assert.assertTrue("Feed should contain entry for nexus779:test2:1.0.0\nEntries: "+ this.entriesToString(entries), feedListContainsArtifact( entries, "nexus779", "test2", "1.0.0" ) );
+
         
         // Now update the test user so that the user can only access test1        
-        updateUserRole( "anonymous", Collections.singletonList( role1.getId() ) );
-                
+        updateUserRole( TEST_USER_NAME, Collections.singletonList( role1.getId() ) );
+        
+        TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
+        TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
+        
         // Should be able to see only test1 artifacts
         feed = FeedUtil.getFeed( "recentlyDeployed" );
         entries = feed.getEntries();
         
-        if ( !feedListContainsArtifact( entries, "nexus778", "test1", "1.0.0" ) )
-        {
-            Assert.fail();
-        }
-        if ( feedListContainsArtifact( entries, "nexus778", "test2", "1.0.0" ) )
-        {
-            Assert.fail();
-        }
+        Assert.assertTrue("Feed should contain entry for nexus779:test1:1.0.0.\nEntries: "+ this.entriesToString(entries), feedListContainsArtifact( entries, "nexus779", "test1", "1.0.0" ) );
+        
+        Assert.assertFalse( "Feed should not contain entry for nexus779:test2:1.0.0\nEntries: "+ this.entriesToString(entries), feedListContainsArtifact( entries, "nexus779", "test2", "1.0.0" ) );
+
         
         // Now update the test user so that the user can only access test2        
-        updateUserRole( "anonymous", Collections.singletonList( role2.getId() ) );
+        updateUserRole( TEST_USER_NAME, Collections.singletonList( role2.getId() ) );
                 
+        
+        TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
+        TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
+        
         // Should be able to see only test2 artifacts
         feed = FeedUtil.getFeed( "recentlyDeployed" );
         entries = feed.getEntries();
         
-        if ( feedListContainsArtifact( entries, "nexus778", "test1", "1.0.0" ) )
+        Assert.assertFalse("Feed should not contain entry for nexus779:test1:1.0.0.\nEntries: "+ this.entriesToString(entries), feedListContainsArtifact( entries, "nexus779", "test1", "1.0.0" ) );
+        
+        Assert.assertTrue( "Feed should contain entry for nexus779:test2:1.0.0\nEntries: "+ this.entriesToString(entries), feedListContainsArtifact( entries, "nexus779", "test2", "1.0.0" ) );
+
+    }
+    
+    private String entriesToString(List<SyndEntry> entries)
+    {
+        StringBuffer buffer = new StringBuffer();
+        
+        for ( SyndEntry syndEntry : entries )
         {
-            Assert.fail();
+            buffer.append( syndEntry.getTitle() ).append( "\n" );
         }
-        if ( !feedListContainsArtifact( entries, "nexus778", "test2", "1.0.0" ) )
-        {
-            Assert.fail();
-        }
+        
+        return buffer.toString();        
     }
     
     private boolean feedListContainsArtifact( List<SyndEntry> entries, String groupId, String artifactId, String version )
@@ -174,6 +185,9 @@ public class Nexus779RssFeedFilteringTest
     private void updateUserRole( String username, List<String> roleIds )
         throws Exception
     {
+        // change to admin so we can update the roles
+        TestContainer.getInstance().getTestContext().useAdminForRequests();
+        
         UserResource resource = userUtil.getUser( username );
         
         resource.setRoles( roleIds );

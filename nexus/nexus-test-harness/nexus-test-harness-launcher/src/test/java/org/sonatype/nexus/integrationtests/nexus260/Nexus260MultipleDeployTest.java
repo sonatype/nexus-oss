@@ -118,11 +118,6 @@ public class Nexus260MultipleDeployTest
         throws Exception
     {
         
-        if( this.printKnownErrorButDoNotFail( this.getClass(), "deploySameFileMultipleTimesUsingContentUriTest" ))
-        {
-            return;
-        }
-        
         // file to deploy
         File fileToDeploy = this.getTestFile("deploySameFileMultipleTimesUsingContentUri.xml" );
 

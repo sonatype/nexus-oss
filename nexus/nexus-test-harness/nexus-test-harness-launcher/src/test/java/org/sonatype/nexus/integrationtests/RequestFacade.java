@@ -23,7 +23,9 @@ import org.restlet.Client;
 import org.restlet.Context;
 import org.restlet.data.ChallengeResponse;
 import org.restlet.data.ChallengeScheme;
+import org.restlet.data.MediaType;
 import org.restlet.data.Method;
+import org.restlet.data.Preference;
 import org.restlet.data.Protocol;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
@@ -67,6 +69,16 @@ public class RequestFacade
         if ( !Method.GET.equals( method ) && !Method.DELETE.equals( method ) )
         {
             request.setEntity( representation );
+        }
+        
+        // change the MediaType if this is a GET, default to application/xml
+        if( Method.GET.equals( method ) )
+        {
+            if( representation != null)
+            {
+                request.getClientInfo().getAcceptedMediaTypes().
+                add(new Preference<MediaType>(representation.getMediaType()));
+            }
         }
 
         // check the text context to see if this is a secure test

@@ -12,8 +12,7 @@ import org.restlet.data.Response;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.rest.model.ContentListResource;
-import org.sonatype.nexus.rest.model.ContentListResourceResponse;
-import org.sonatype.plexus.rest.representation.XStreamRepresentation;
+import org.sonatype.nexus.test.utils.ContentListMessageUtil;
 
 public class Nexus947GroupBrowsing
     extends AbstractNexusIntegrationTest
@@ -22,13 +21,15 @@ public class Nexus947GroupBrowsing
     @Test
     public void doTest() throws IOException
     {
-        List<ContentListResource> items = this.getContentListResource( "public", "/" );
+        ContentListMessageUtil contentUtil = new ContentListMessageUtil(this.getXMLXStream(), MediaType.APPLICATION_XML);
+        
+        List<ContentListResource> items = contentUtil.getContentListResource( "public", "/", true );
         
         // make sure we have a few items
         Assert.assertTrue( "Expected more then 1 item. ", items.size() > 1 );
         
         // now for a bit more control
-        items = this.getContentListResource( "public", "/nexus947/nexus947/3.2.1/");
+        items = contentUtil.getContentListResource( "public", "/nexus947/nexus947/3.2.1/", true );
         
         // exactly 2 items
         Assert.assertEquals( 2, items.size() );
@@ -48,30 +49,4 @@ public class Nexus947GroupBrowsing
         Assert.assertTrue(response.getLocationRef().toString().endsWith( uriPart + "/" ));
         
     }
-
-    protected Response getResponse( String groupId, String path )
-        throws IOException
-    {
-        String uriPart = RequestFacade.SERVICE_LOCAL + "repo_groups/" + groupId + "/content" + path;
-
-        return RequestFacade.sendMessage( uriPart, Method.GET );
-    }
-
-    protected List<ContentListResource> getContentListResource( String groupId,String path )
-        throws IOException
-    {
-        Response response = this.getResponse( groupId, path );
-
-        String responeText = response.getEntity().getText();
-        Assert.assertTrue(
-            "Expected sucess: Status was: " + response.getStatus() + "\nResponse:\n" + responeText,
-            response.getStatus().isSuccess() );
-
-        XStreamRepresentation representation = new XStreamRepresentation(this.getXMLXStream(), responeText, MediaType.APPLICATION_XML);
-        ContentListResourceResponse listRepsonse = (ContentListResourceResponse) representation.getPayload( new ContentListResourceResponse() );
-        
-        return listRepsonse.getData();
-        
-    }
-
 }

@@ -44,14 +44,15 @@ public class TargetMessageUtil
         throws IOException
     {
         Response response = this.sendMessage( Method.POST, target );
+        String responseText = response.getEntity().getText();
 
         if ( !response.getStatus().isSuccess() )
         {
-            Assert.fail( "Could not create Repository Target: " + response.getStatus() );
+            Assert.fail( "Could not create Repository Target: " + response.getStatus() +"\nResponse Text:\n"+responseText );
         }
 
         // get the Resource object
-        RepositoryTargetResource responseResource = this.getResourceFromResponse( response );
+        RepositoryTargetResource responseResource = this.getResourceFromResponse( responseText );
 
         // validate
         // make sure the id != null
@@ -106,16 +107,22 @@ public class TargetMessageUtil
         throws IOException
     {
         String responseString = response.getEntity().getText();
-        LOG.debug( " getResourceFromResponse: " + responseString );
-
-        XStreamRepresentation representation = new XStreamRepresentation( xstream, responseString, mediaType );
-
-        RepositoryTargetResourceResponse resourceResponse =
-            (RepositoryTargetResourceResponse) representation.getPayload( new RepositoryTargetResourceResponse() );
-
-        return resourceResponse.getData();
-
+        return this.getResourceFromResponse( responseString );
     }
+    
+    public RepositoryTargetResource getResourceFromResponse( String responseText )
+    throws IOException
+{
+    LOG.debug( " getResourceFromResponse: " + responseText );
+
+    XStreamRepresentation representation = new XStreamRepresentation( xstream, responseText, mediaType );
+
+    RepositoryTargetResourceResponse resourceResponse =
+        (RepositoryTargetResourceResponse) representation.getPayload( new RepositoryTargetResourceResponse() );
+
+    return resourceResponse.getData();
+
+}
 
     public void verifyTargetsConfig( RepositoryTargetResource targetResource )
         throws IOException

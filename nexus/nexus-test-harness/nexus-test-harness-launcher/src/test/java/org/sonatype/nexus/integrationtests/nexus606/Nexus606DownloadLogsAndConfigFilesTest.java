@@ -90,7 +90,7 @@ public class Nexus606DownloadLogsAndConfigFilesTest
         throws Exception
     {
         Response response = RequestFacade.sendMessage( new URL( logURI ), Method.GET, null );
-        Assert.assertEquals( "Status: ", 200, response.getStatus().getCode() );
+        Assert.assertEquals( "Request URI: "+ logURI +" Status: ", 200, response.getStatus().getCode() );
         
         File logFile = new File( nexusLogDir, name );
         

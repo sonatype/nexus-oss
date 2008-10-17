@@ -7,6 +7,14 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 
+import junit.framework.Assert;
+
+import org.restlet.data.MediaType;
+import org.restlet.data.Method;
+import org.restlet.data.Response;
+import org.restlet.resource.StringRepresentation;
+import org.sonatype.nexus.integrationtests.RequestFacade;
+
 import com.sun.syndication.feed.synd.SyndEntry;
 import com.sun.syndication.feed.synd.SyndFeed;
 import com.sun.syndication.io.FeedException;
@@ -31,7 +39,11 @@ public class FeedUtil
             IOException
     {
         SyndFeedInput input = new SyndFeedInput();
-        SyndFeed feed = input.build( new XmlReader( getFeedUrl( feedId ) ) );
+        
+        Response response = RequestFacade.sendMessage( FEED_URL_PART + feedId, Method.GET );
+        Assert.assertTrue( "Expected content", response.getEntity().isAvailable());
+        
+        SyndFeed feed = input.build( new XmlReader( response.getEntity().getStream() ) );
         // sort it by date
         sortSyndEntryOrderByPublishedDate( feed );
 
