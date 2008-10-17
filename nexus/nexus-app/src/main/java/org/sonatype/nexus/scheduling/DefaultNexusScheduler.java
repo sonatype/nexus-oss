@@ -28,7 +28,6 @@ import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.context.ContextException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
@@ -144,21 +143,13 @@ public class DefaultNexusScheduler
     public SchedulerTask<?> createTaskInstance( String taskType )
         throws IllegalArgumentException
     {
-        try
-        {
-            return (SchedulerTask<?>) getPlexusContainer().lookup( SchedulerTask.class, taskType );
-        }
-        catch ( ComponentLookupException e )
-        {
-            throw new IllegalArgumentException( "Could not create task of type" + taskType, e );
-        }
+        return scheduler.createTaskInstance( taskType );
     }
 
     public SchedulerTask<?> createTaskInstance( Class<?> taskType )
         throws IllegalArgumentException
     {
-        // the convention is to use the simple class name as the plexus hint
-        return createTaskInstance( taskType.getSimpleName() );
+        return scheduler.createTaskInstance( taskType );
     }
 
 }

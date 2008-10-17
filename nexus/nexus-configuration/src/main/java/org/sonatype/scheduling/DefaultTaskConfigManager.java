@@ -98,6 +98,11 @@ public class DefaultTaskConfigManager
             // TODO
         }
     }
+    
+    protected PlexusContainer getPlexusContainer()
+    {
+        return plexusContainer;
+    }
 
     public void initializeTasks( Scheduler scheduler )
     {
@@ -116,8 +121,7 @@ public class DefaultTaskConfigManager
 
                 try
                 {
-                    SchedulerTask<?> nexusTask = (SchedulerTask<?>) plexusContainer.lookup( SchedulerTask.class, task
-                        .getType() );
+                    SchedulerTask<?> nexusTask = createTaskInstance( task.getType() );
 
                     for ( Iterator iter = task.getProperties().iterator(); iter.hasNext(); )
                     {
@@ -133,7 +137,7 @@ public class DefaultTaskConfigManager
                         translateFrom( task.getSchedule(), task.getNextRun() ),
                         translateFrom( task.getProperties() ) ).setEnabled( task.isEnabled() );
                 }
-                catch ( ComponentLookupException e )
+                catch ( IllegalArgumentException e )
                 {
                     // this is bad, Plexus did not find the component, possibly the task.getType() contains bad class
                     // name
@@ -207,6 +211,26 @@ public class DefaultTaskConfigManager
             }
         }
         // TODO: need to also add task to a history file
+    }
+
+    public SchedulerTask<?> createTaskInstance( String taskType )
+        throws IllegalArgumentException
+    {
+        try
+        {
+            return (SchedulerTask<?>) getPlexusContainer().lookup( SchedulerTask.class, taskType );
+        }
+        catch ( ComponentLookupException e )
+        {
+            throw new IllegalArgumentException( "Could not create task of type" + taskType, e );
+        }
+    }
+
+    public SchedulerTask<?> createTaskInstance( Class<?> taskType )
+        throws IllegalArgumentException
+    {
+        // the convention is to use the simple class name as the plexus hint
+        return createTaskInstance( taskType.getSimpleName() );
     }
 
     private CScheduledTask findTask( String id )
@@ -406,9 +430,9 @@ public class DefaultTaskConfigManager
             else if ( HourlySchedule.class.isAssignableFrom( schedule.getClass() ) )
             {
                 storeableSchedule.setType( CScheduleConfig.TYPE_HOURLY );
-                
+
                 storeableSchedule.setStartDate( ( (HourlySchedule) schedule ).getStartDate() );
-                
+
                 storeableSchedule.setEndDate( ( (HourlySchedule) schedule ).getEndDate() );
             }
             else if ( OnceSchedule.class.isAssignableFrom( schedule.getClass() ) )
