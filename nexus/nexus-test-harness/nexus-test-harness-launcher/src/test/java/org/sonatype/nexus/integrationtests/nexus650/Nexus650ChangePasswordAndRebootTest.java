@@ -17,29 +17,29 @@ public class Nexus650ChangePasswordAndRebootTest
 {
 
     @Test
-    public void doTest() throws Exception
-    {   
+    public void changePasswordAndReboot() throws Exception
+    {
         this.giveUserRole( TEST_USER_NAME, "admin" );
-        
+
         TestContext context = TestContainer.getInstance().getTestContext();
-        
+
         context.setUsername( TEST_USER_NAME );
         context.setPassword( TEST_USER_PASSWORD );
-        
-        
+
+
         String newPassword = "123password";
         Status status = ChangePasswordUtils.changePassword( TEST_USER_NAME, TEST_USER_PASSWORD, newPassword );
         Assert.assertTrue( "Status: ", status.isSuccess() );
-         
+
         // now change the password
         context.setPassword( newPassword );
-        
+
         // reboot
         NexusStateUtil.doSoftRestart();
 
         // now we can verify everything worked out
         Assert.assertTrue( "Nexus is not running", NexusStateUtil.isNexusRunning() );
-        
+
     }
-    
+
 }
