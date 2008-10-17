@@ -27,7 +27,7 @@ public class RoutesMessageUtil
     private XStream xstream;
 
     private MediaType mediaType;
-    
+
     private static final Logger LOG = Logger.getLogger( RoutesMessageUtil.class );
 
     public RoutesMessageUtil( XStream xstream, MediaType mediaType )
@@ -60,7 +60,7 @@ public class RoutesMessageUtil
     {
         String responseString = response.getEntity().getText();
         LOG.debug( "responseText: "+ responseString );
-        
+
         Assert.assertFalse( "Response text was empty.", StringUtils.isEmpty( responseString ) );
 
         XStreamRepresentation representation = new XStreamRepresentation( xstream, responseString, mediaType );
@@ -70,11 +70,11 @@ public class RoutesMessageUtil
 
         return resourceResponse.getData();
     }
-    
+
     public void validateSame( List<RepositoryRouteMemberRepository> repos1, List<RepositoryRouteMemberRepository> repos2 )
     {
         Assert.assertEquals( repos1.size(), repos2.size() );
-        
+
         for ( int ii = 0; ii < repos1.size(); ii++ )
         {
             RepositoryRouteMemberRepository repo1 = repos1.get( ii );
@@ -82,11 +82,11 @@ public class RoutesMessageUtil
             this.validateSame( repo1, repo2 );
         }
     }
-    
+
     public void validateSameRepoIds( List<RepositoryRouteMemberRepository> repos1, List<String> repos2 )
     {
         Assert.assertEquals( repos1.size(), repos2.size() );
-        
+
         // this is ordered
         for ( int ii = 0; ii < repos1.size(); ii++ )
         {
@@ -95,26 +95,27 @@ public class RoutesMessageUtil
             Assert.assertEquals( repo1.getId(), repo2 );
         }
     }
-    
+
     public void validateSame( RepositoryRouteMemberRepository repo1, RepositoryRouteMemberRepository repo2 )
     {
         // we only care about the Id field
         Assert.assertEquals( repo1.getId(), repo2.getId() );
     }
-    
-    
+
+
     public void validateRoutesConfig( RepositoryRouteResource resource ) throws IOException
     {
-        
+
         CGroupsSettingPathMappingItem cRoute = NexusConfigUtil.getRoute( resource.getId() );
-        
+
+        Assert.assertEquals("Should be the same route", resource.getId(), cRoute.getId() );
         Assert.assertEquals( resource.getGroupId(), cRoute.getGroupId() );
         Assert.assertEquals( resource.getPattern(), cRoute.getRoutePattern() );
         Assert.assertEquals( resource.getRuleType(), cRoute.getRouteType() );
-        
+
         this.validateSameRepoIds( resource.getRepositories(), cRoute.getRepositories() );
 
-        
+
     }
 
     public void validateResponseErrorXml( String xml )
@@ -126,7 +127,7 @@ public class RoutesMessageUtil
 
         for ( Iterator<NexusError> iter = errorResponse.getErrors().iterator(); iter.hasNext(); )
         {
-            NexusError error = (NexusError) iter.next();
+            NexusError error = iter.next();
             Assert.assertFalse( "Response Error message is empty.", StringUtils.isEmpty( error.getMsg() ) );
 
         }
