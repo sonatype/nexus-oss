@@ -70,6 +70,16 @@
 			</roles>
 			<timezone>-9</timezone>
 		</developer>
+		<developer>
+			<id>juven</id>
+			<name>Juven Xu</name>
+			<email>juven@sonatype.com</email>
+			<organization>Sonatype</organization>
+			<roles>
+				<role>Developer</role>
+			</roles>
+			<timezone>8</timezone>
+		</developer>		
 	</developers>
 	<contributors>
 		<contributor>
@@ -113,6 +123,7 @@
 		<module>nexus-migration-tool</module>
 		<module>nexus-webapp</module>
 		<module>nexus-clients</module>
+		<module>nexus-repository-convertion-tool</module>
 	</modules>
 	<profiles>
 		<profile>
