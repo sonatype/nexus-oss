@@ -79,7 +79,45 @@ Sonatype.utils.Observable = function(){
      * 
      * See Sonatype.repoServer.RepoServer.addNexusNavigationItems() for more examples.
      */
-    'nexusNavigationInit': true
+    'nexusNavigationInit': true,
+    
+    /*
+     * Fired when a repository context action menu is initialized.
+     * Subscribers can add action items to the menu.
+     * 
+     * A menu object and repository record are passed as parameters.
+     * If clicked, the action handler receives a repository record as parameter.
+     * 
+     * init: function() {
+     *   Sonatype.Events.addListener( 'repositoryMenuInit', this.onRepoMenu, this );
+     * },
+     * 
+     * onRepoMenu: function( menu, repoRecord ) {
+     *   if ( repoRecord.get( 'repoType' ) == 'proxy' ) {
+     *     menu.add( this.actions.myProxyAction );
+     *   }
+     * },
+     */
+    'repositoryMenuInit': true,
+    
+    /*
+     * Fired when an repository item (e.g. artifact or folder) context action menu
+     * is initialized. Subscribers can add action items to the menu.
+     * 
+     * A menu object, a repository and item records are passed as parameters.
+     * If clicked, the action handler receives an item record as parameter.
+     * 
+     * init: function() {
+     *   Sonatype.Events.addListener( 'repositoryContentMenuInit', this.onArtifactMenu, this );
+     * },
+     * 
+     * onRepoMenu: function( menu, repoRecord, contentRecord ) {
+     *   if ( repoRecord.get( 'repoType' ) == 'proxy' ) {
+     *     menu.add( this.actions.myProxyContentAction );
+     *   }
+     * },
+     */
+    'repositoryContentMenuInit': true
   });
 };
 Ext.extend( Sonatype.utils.Observable, Ext.util.Observable );

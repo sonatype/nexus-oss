@@ -85,30 +85,6 @@ Sonatype.repoServer.RepoEditPanel = function(config){
     autoLoad: true
   });
   
-  
-  this.actions = {
-    clearCache : new Ext.Action({
-      text: 'Clear Cache',
-      scope:this,
-      handler: this.clearCacheHandler
-    }),
-    reIndex : new Ext.Action({
-      text: 'Re-Index',
-      scope:this,
-      handler: this.reIndexHandler
-    }),
-    rebuildAttributes : new Ext.Action({
-      text: 'Rebuild Attributes',
-      scope:this,
-      handler: this.rebuildAttributesHandler
-    }),
-    uploadArtifact: new Ext.Action({
-      text: 'Upload Artifact...',
-      scope: this,
-      handler: this.uploadArtifactHandler
-    })
-  };
-  
   this.defaultTimeoutVals = {
     proxy_release : null,
     proxy_snapshot : null,
@@ -1157,46 +1133,28 @@ Ext.extend(Sonatype.repoServer.RepoEditPanel, Sonatype.repoServer.AbstractRepoPa
   onContextClickHandler : function(grid, index, e){
     this.onContextHideHandler();
     
-    var clearcachPriv = this.sp.checkPermission(Sonatype.user.curr.repoServer.actionDeleteCache, this.sp.DELETE);
     var reindexPriv = this.sp.checkPermission(Sonatype.user.curr.repoServer.actionReindex, this.sp.DELETE);
     var attributesPriv = this.sp.checkPermission(Sonatype.user.curr.repoServer.actionRebuildAttribs, this.sp.DELETE);
     var uploadPriv = this.sp.checkPermission(Sonatype.user.curr.repoServer.actionUploadArtifact, this.sp.CREATE);
     
-    if ( e.target.nodeName == 'A' ||
-            ( !clearcachPriv &&
-              !reindexPriv &&
-              !attributesPriv &&
-              !uploadPriv ) ) return; // no menu on links or no privs
+    if ( e.target.nodeName == 'A' ) return; // no menu on links
     
     this.ctxRow = this.reposGridPanel.view.getRow(index);
     this.ctxRecord = this.reposGridPanel.store.getAt(index);
     Ext.fly(this.ctxRow).addClass('x-node-ctx');
 
     //@todo: would be faster to pre-render the six variations of the menu for whole instance
-    var menu = new Ext.menu.Menu({
+    var menu = new Sonatype.menu.Menu({
       id:'repo-maint-grid-ctx',
+      payload: this.ctxRecord,
+      scope: this,
       items: []
     });
     
-    if( clearcachPriv
-        && this.ctxRecord.get('repoType') != 'virtual'){
-      menu.add(this.actions.clearCache);
-    }
-    
-    if (reindexPriv){
-        menu.add(this.actions.reIndex);
-    }
-    
-    if (attributesPriv){
-        menu.add(this.actions.rebuildAttributes);
-    }
-    
-    if (uploadPriv
-        && this.ctxRecord.get('repoType') == 'hosted'
-        && this.ctxRecord.get('repoPolicy') == 'release'){
-      menu.add(this.actions.uploadArtifact);
-    }
-    
+    Sonatype.Events.fireEvent( 'repositoryMenuInit', menu, this.ctxRecord );
+
+    if ( ! menu.items.first() ) return;
+
     menu.on('hide', this.onContextHideHandler, this);
     e.stopEvent();
     menu.showAt(e.getXY());

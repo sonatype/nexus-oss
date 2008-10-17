@@ -28,14 +28,34 @@
     title: title of this panel (shows in tab)
   }
 */
-
 Sonatype.repoServer.AbstractRepoPanel = function(config){
   var config = config || {};
   var defaultConfig = {};
   Ext.apply(this, config, defaultConfig);
+  
+  this.sp = Sonatype.lib.Permissions;
 
   this.ctxRecord = null;
   this.reposGridPanel == null;
+  
+  this.repoActions = {
+    clearCache: {
+      text: 'Clear Cache',
+      handler: this.clearCacheHandler
+    },
+    reIndex: {
+      text: 'Re-Index',
+      handler: this.reIndexHandler
+    },
+    rebuildAttributes: {
+      text: 'Rebuild Attributes',
+      handler: this.rebuildAttributesHandler
+    },
+    uploadArtifact: {
+      text: 'Upload Artifact...',
+      handler: this.uploadArtifactHandler
+    }
+  };
 
   Sonatype.repoServer.AbstractRepoPanel.superclass.constructor.call(this, {
   });
@@ -53,31 +73,21 @@ Ext.extend(Sonatype.repoServer.AbstractRepoPanel, Ext.Panel, {
     }
   },
   
-  clearCacheHandler : function(){
-    if (this.ctxBrowseNode || this.hasSelection()){
-      var url;
-      
-      if (this.ctxBrowseNode){
-        url = Sonatype.config.repos.urls.cache + this.ctxBrowseNode.id.slice(Sonatype.config.host.length + Sonatype.config.servicePath.length);
-      }
-      else if (this.hasSelection()){
-        //@todo: start updating messaging here
-        var rec = (this.ctxRecord) ? this.ctxRecord : this.reposGridPanel.getSelectionModel().getSelected();
-        url = Sonatype.config.repos.urls.cache + rec.id.slice(Sonatype.config.host.length + Sonatype.config.servicePath.length);
-      }
-      
-      //make sure to provide /content path for repository root requests like ../repositories/central
-      if (/.*\/repositories\/[^\/]*$/i.test(url) || /.*\/repo_groups\/[^\/]*$/i.test(url)){
-        url += '/content';
-      }
-      
-      Ext.Ajax.request({
-        url: url,
-        callback: this.clearCacheCallback,
-        scope: this,
-        method: 'DELETE'
-      });
+  clearCacheHandler: function( rec ) {
+    var url = Sonatype.config.repos.urls.cache + rec.id.slice(
+      Sonatype.config.host.length + Sonatype.config.servicePath.length );
+    
+    //make sure to provide /content path for repository root requests like ../repositories/central
+    if (/.*\/repositories\/[^\/]*$/i.test(url) || /.*\/repo_groups\/[^\/]*$/i.test(url)){
+      url += '/content';
     }
+    
+    Ext.Ajax.request({
+      url: url,
+      callback: this.clearCacheCallback,
+      scope: this,
+      method: 'DELETE'
+    });
   },
   
   clearCacheCallback : function(options, isSuccess, response){
@@ -91,31 +101,21 @@ Ext.extend(Sonatype.repoServer.AbstractRepoPanel, Ext.Panel, {
   },
 
   
-  reIndexHandler : function(){
-    if (this.ctxBrowseNode || this.hasSelection()){
-      var url;
-      
-      if (this.ctxBrowseNode){
-        url = Sonatype.config.repos.urls.index + this.ctxBrowseNode.id.slice(Sonatype.config.host.length + Sonatype.config.servicePath.length);
-      }
-      else if (this.hasSelection()){
-        //@todo: start updating messaging here
-        var rec = (this.ctxRecord) ? this.ctxRecord : this.reposGridPanel.getSelectionModel().getSelected();
-        url = Sonatype.config.repos.urls.index + rec.id.slice(Sonatype.config.host.length + Sonatype.config.servicePath.length);
-      }
-      
-      //make sure to provide /content path for repository root requests like ../repositories/central
-      if (/.*\/repositories\/[^\/]*$/i.test(url) || /.*\/repo_groups\/[^\/]*$/i.test(url)){
-        url += '/content';
-      }
-      
-      Ext.Ajax.request({
-        url: url,
-        callback: this.reIndexCallback,
-        scope: this,
-        method: 'DELETE'
-      });
+  reIndexHandler: function( rec ){
+    var url = Sonatype.config.repos.urls.index +
+      rec.id.slice(Sonatype.config.host.length + Sonatype.config.servicePath.length);
+    
+    //make sure to provide /content path for repository root requests like ../repositories/central
+    if (/.*\/repositories\/[^\/]*$/i.test(url) || /.*\/repo_groups\/[^\/]*$/i.test(url)){
+      url += '/content';
     }
+    
+    Ext.Ajax.request({
+      url: url,
+      callback: this.reIndexCallback,
+      scope: this,
+      method: 'DELETE'
+    });
   },
   
   reIndexCallback : function(options, isSuccess, response){
@@ -128,31 +128,21 @@ Ext.extend(Sonatype.repoServer.AbstractRepoPanel, Ext.Panel, {
     }
   },
   
-  rebuildAttributesHandler : function(){
-    if (this.ctxBrowseNode || this.hasSelection()){
-      var url;
-      
-      if (this.ctxBrowseNode){
-        url = Sonatype.config.repos.urls.attributes + this.ctxBrowseNode.id.slice(Sonatype.config.host.length + Sonatype.config.servicePath.length);
-      }
-      else if (this.hasSelection()){
-        //@todo: start updating messaging here
-        var rec = (this.ctxRecord) ? this.ctxRecord : this.reposGridPanel.getSelectionModel().getSelected();
-        url = Sonatype.config.repos.urls.attributes + rec.id.slice(Sonatype.config.host.length + Sonatype.config.servicePath.length);
-      }
-      
-      //make sure to provide /content path for repository root requests like ../repositories/central
-      if (/.*\/repositories\/[^\/]*$/i.test(url) || /.*\/repo_groups\/[^\/]*$/i.test(url)){
-        url += '/content';
-      }
-      
-      Ext.Ajax.request({
-        url: url,
-        callback: this.rebuildAttributesCallback,
-        scope: this,
-        method: 'DELETE'
-      });
+  rebuildAttributesHandler: function( rec ){
+    var url = Sonatype.config.repos.urls.attributes +
+      rec.id.slice(Sonatype.config.host.length + Sonatype.config.servicePath.length);
+    
+    //make sure to provide /content path for repository root requests like ../repositories/central
+    if (/.*\/repositories\/[^\/]*$/i.test(url) || /.*\/repo_groups\/[^\/]*$/i.test(url)){
+      url += '/content';
     }
+    
+    Ext.Ajax.request({
+      url: url,
+      callback: this.rebuildAttributesCallback,
+      scope: this,
+      method: 'DELETE'
+    });
   },
   
   rebuildAttributesCallback : function(options, isSuccess, response){
@@ -308,58 +298,81 @@ Ext.extend(Sonatype.repoServer.AbstractRepoPanel, Ext.Panel, {
   updateRepoStatuses: function(data) {
   },
   
-  uploadArtifactHandler : function(){
-    if (this.hasSelection()){
-      //@todo: start updating messaging here
-      var rec = (this.ctxRecord) ? this.ctxRecord : this.reposGridPanel.getSelectionModel().getSelected();
+  uploadArtifactHandler : function( rec ){
       
-      Ext.Ajax.request({
-        url: rec.id,
-        scope: this,
-        callback: function(options, success, response) {
-          if ( success ) {
-            var statusResp = Ext.decode(response.responseText);
-            if (statusResp.data) {
-              if ( statusResp.data.allowWrite ) {
-                var oldItem = this.formCards.getLayout().activeItem;
-                this.formCards.remove(oldItem, true);
-                
-                if ( this.formCards.tbar ) {
-                  this.formCards.tbar.oldSize = this.formCards.tbar.getSize(); 
-                  this.formCards.tbar.hide();
-                  this.formCards.tbar.setHeight(0);
-                }
-
-                var rec = (this.ctxRecord) ? this.ctxRecord : this.reposGridPanel.getSelectionModel().getSelected();
-
-                var panel = new Ext.Panel({
-                  layout: 'fit',
-                  frame: true,
-                  items: [ new Sonatype.repoServer.FileUploadPanel({
-                    title: 'Artifact Upload to ' + rec.get('name'),
-                    repoPanel: this,
-                    repoRecord: rec
-                  }) ]
-                });
-                this.formCards.insert(1, panel);
-                this.formCards.getLayout().setActiveItem(panel);
-                panel.doLayout();
+    Ext.Ajax.request({
+      url: rec.id,
+      scope: this,
+      callback: function(options, success, response) {
+        if ( success ) {
+          var statusResp = Ext.decode(response.responseText);
+          if (statusResp.data) {
+            if ( statusResp.data.allowWrite ) {
+              var oldItem = this.formCards.getLayout().activeItem;
+              this.formCards.remove(oldItem, true);
+              
+              if ( this.formCards.tbar ) {
+                this.formCards.tbar.oldSize = this.formCards.tbar.getSize(); 
+                this.formCards.tbar.hide();
+                this.formCards.tbar.setHeight(0);
               }
-              else {
-                Sonatype.MessageBox.show({
-                  title: 'Deployment Disabled',
-                  icon: Sonatype.MessageBox.ERROR,
-                  buttons: Sonatype.MessageBox.OK,
-                  msg: 'Deployment is disabled for the selected repository.<br /><br />' +
-                    'You can enable it in the "Access Settings" section of the repository configuration'
-                });
-              }
-              return;
+
+//              var rec = (this.ctxRecord) ? this.ctxRecord : this.reposGridPanel.getSelectionModel().getSelected();
+
+              var panel = new Ext.Panel({
+                layout: 'fit',
+                frame: true,
+                items: [ new Sonatype.repoServer.FileUploadPanel({
+                  title: 'Artifact Upload to ' + rec.get('name'),
+                  repoPanel: this,
+                  repoRecord: rec
+                }) ]
+              });
+              this.formCards.insert(1, panel);
+              this.formCards.getLayout().setActiveItem(panel);
+              panel.doLayout();
             }
+            else {
+              Sonatype.MessageBox.show({
+                title: 'Deployment Disabled',
+                icon: Sonatype.MessageBox.ERROR,
+                buttons: Sonatype.MessageBox.OK,
+                msg: 'Deployment is disabled for the selected repository.<br /><br />' +
+                  'You can enable it in the "Access Settings" section of the repository configuration'
+              });
+            }
+            return;
           }
-          Sonatype.utils.connectionError( response, 'There was a problem obtaining repository status.' );
         }
-      });
+        Sonatype.utils.connectionError( response, 'There was a problem obtaining repository status.' );
+      }
+    });
+  },
+  
+  onRepositoryMenuInit: function( menu, repoRecord ) {
+    if ( this.sp.checkPermission(
+          Sonatype.user.curr.repoServer.actionDeleteCache, this.sp.DELETE ) &&
+        repoRecord.get( 'repoType' ) != 'virtual' ) {
+      menu.add( this.repoActions.clearCache );
+    }
+
+    if ( this.sp.checkPermission(
+          Sonatype.user.curr.repoServer.actionReindex, this.sp.DELETE ) ) {
+      menu.add( this.repoActions.reIndex );
+    }
+
+    if ( this.sp.checkPermission(
+          Sonatype.user.curr.repoServer.actionRebuildAttribs, this.sp.DELETE ) ){
+      menu.add( this.repoActions.rebuildAttributes );
+    }
+
+    if ( this.sp.checkPermission(
+          Sonatype.user.curr.repoServer.actionUploadArtifact, this.sp.CREATE ) &&
+        repoRecord.get('repoType') == 'hosted' &&
+        repoRecord.get('repoPolicy') == 'release' ){
+      menu.add( this.repoActions.uploadArtifact );
     }
   }
 });
+
+Sonatype.repoServer.DefaultRepoHandler = new Sonatype.repoServer.AbstractRepoPanel();

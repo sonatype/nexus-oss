@@ -105,7 +105,11 @@ Sonatype.repoServer.RepoServer = function(){
     // Each Sonatype server will need one of these 
     initServerTab : function() {
 
-      Sonatype.Events.addListener( 'nexusNavigationInit', this.addNexusNavigationItems, this );
+      Sonatype.Events.addListener( 'nexusNavigationInit',
+        this.addNexusNavigationItems, this );
+      Sonatype.Events.addListener( 'repositoryMenuInit',
+        Sonatype.repoServer.DefaultRepoHandler.onRepositoryMenuInit,
+        Sonatype.repoServer.DefaultRepoHandler );
       
       // Left Panel
       this.nexusPanel = new Sonatype.navigation.NavigationPanel({

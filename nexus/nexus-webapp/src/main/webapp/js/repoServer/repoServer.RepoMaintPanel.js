@@ -43,6 +43,7 @@ Sonatype.repoServer.RepoMaintPanel = function(config){
 
   Sonatype.Events.addListener( 'repositoryChanged', this.onRepoChange, this );
   Sonatype.Events.addListener( 'groupChanged', this.onRepoChange, this );
+  Sonatype.Events.addListener( 'repositoryContentMenuInit', this.onRepositoryContentMenuInit, this );
 
   this.actions = {
     view : {
@@ -71,25 +72,10 @@ Sonatype.repoServer.RepoMaintPanel = function(config){
       scope:this,
       handler: this.downloadFromRemoteHandler
     },
-        clearCache : {
-          text: 'Clear Cache',
-          scope:this,
-          handler: this.clearCacheHandler
-        },
         deleteRepoItem : {
           text: 'Delete',
           scope:this,
           handler: this.deleteRepoItemHandler
-        },
-        reIndex : {
-          text: 'Re-Index',
-          scope:this,
-          handler: this.reIndexHandler
-        },
-        rebuildAttributes : {
-          text: 'Rebuild Attributes',
-          scope:this,
-          handler: this.rebuildAttributesHandler
         },
         putInService : {
           text: 'Put in Service',
@@ -110,11 +96,6 @@ Sonatype.repoServer.RepoMaintPanel = function(config){
           text: 'Block Proxy',
           scope:this,
           handler: this.blockProxyHandler
-        },
-        uploadArtifact: {
-          text: 'Upload Artifact...',
-          scope: this,
-          handler: this.uploadArtifactHandler
         }
   };
   
@@ -288,8 +269,6 @@ Sonatype.repoServer.RepoMaintPanel = function(config){
       }
     }
   });
-  
-  this.sp = Sonatype.lib.Permissions;
 
   this.reposGridPanel = new Ext.grid.GridPanel({
     //title: 'Repositories',
@@ -384,6 +363,7 @@ Sonatype.repoServer.RepoMaintPanel = function(config){
           Ext.TaskMgr.stop( this.repoStatusTask );
           Sonatype.Events.removeListener( 'repositoryChanged', this.onRepoChange, this );
           Sonatype.Events.removeListener( 'groupChanged', this.onRepoChange, this );
+          Sonatype.Events.removeListener( 'repositoryContentMenuInit', this.onRepositoryContentMenuInit, this );
         },
         scope: this
       }
@@ -497,11 +477,7 @@ Ext.extend(Sonatype.repoServer.RepoMaintPanel, Sonatype.repoServer.AbstractRepoP
   onContextClickHandler : function(grid, index, e){
     this.onContextHideHandler();
     
-    var clearcachPriv = this.sp.checkPermission(Sonatype.user.curr.repoServer.actionDeleteCache, this.sp.DELETE);
-    var reindexPriv = this.sp.checkPermission(Sonatype.user.curr.repoServer.actionReindex, this.sp.DELETE);
-    var attributesPriv = this.sp.checkPermission(Sonatype.user.curr.repoServer.actionRebuildAttribs, this.sp.DELETE);
     var repoStatusPriv = this.sp.checkPermission(Sonatype.user.curr.repoServer.maintRepos, this.sp.EDIT);
-    var uploadPriv = this.sp.checkPermission(Sonatype.user.curr.repoServer.actionUploadArtifact, this.sp.CREATE);
     
     if ( e.target.nodeName == 'A' ) return; // no menu on links
     
@@ -512,43 +488,31 @@ Ext.extend(Sonatype.repoServer.RepoMaintPanel, Sonatype.repoServer.AbstractRepoP
     var isGroup = this.ctxRecord.get('repoType') == 'group';
 
     //@todo: would be faster to pre-render the six variations of the menu for whole instance
-    var menu = new Ext.menu.Menu({
+    var menu = new Sonatype.menu.Menu({
       id:'repo-maint-grid-ctx',
+      payload: this.ctxRecord,
+      scope: this,
       items: [
         this.actions.view
       ]
     });
-    
-      if(clearcachPriv && this.ctxRecord.get('repoType') != 'virtual'){
-        menu.add(this.actions.clearCache);
-      }
-      
-      if (reindexPriv){
-        menu.add(this.actions.reIndex);
-      }
-      if (attributesPriv){
-        menu.add(this.actions.rebuildAttributes);
-      }
 
-      if(repoStatusPriv && this.ctxRecord.get('repoType') == 'proxy'){
-        menu.add((this.ctxRecord.get('proxyMode') == 'allow')
-                   ? this.actions.blockProxy
-                   : this.actions.allowProxy
-                );
-      }
-      
-      if (repoStatusPriv && !isGroup ) {
-        menu.add((this.ctxRecord.get('localStatus') == 'inService') 
-                 ? this.actions.putOutOfService
-                 : this.actions.putInService
+    if(repoStatusPriv && this.ctxRecord.get('repoType') == 'proxy'){
+      menu.add((this.ctxRecord.get('proxyMode') == 'allow')
+                 ? this.actions.blockProxy
+                 : this.actions.allowProxy
               );
-      }
+    }
+    
+    if (repoStatusPriv && !isGroup ) {
+      menu.add((this.ctxRecord.get('localStatus') == 'inService') 
+               ? this.actions.putOutOfService
+               : this.actions.putInService
+            );
+    }
 
-      if (uploadPriv
-      && this.ctxRecord.get('repoType') == 'hosted'
-      && this.ctxRecord.get('repoPolicy') == 'release'){
-        menu.add(this.actions.uploadArtifact);
-      }
+      
+    Sonatype.Events.fireEvent( 'repositoryMenuInit', menu, this.ctxRecord );
     
     menu.on('hide', this.onContextHideHandler, this);
     e.stopEvent();
@@ -559,63 +523,49 @@ Ext.extend(Sonatype.repoServer.RepoMaintPanel, Sonatype.repoServer.AbstractRepoP
     if(this.ctxRow){
       Ext.fly(this.ctxRow).removeClass('x-node-ctx');
       this.ctxRow = null;
-      this.ctxRecord = null;
+      this.ctxRecord = null
     }
   },
   
   onBrowseContextClickHandler : function(node, e){
     this.onBrowseContextHideHandler();
     
-    var clearcachPriv = this.sp.checkPermission(Sonatype.user.curr.repoServer.actionDeleteCache, this.sp.DELETE);
-    var reindexPriv = this.sp.checkPermission(Sonatype.user.curr.repoServer.actionReindex, this.sp.DELETE);
-    var attributesPriv = this.sp.checkPermission(Sonatype.user.curr.repoServer.actionRebuildAttribs, this.sp.DELETE);
-    var uploadPriv = this.sp.checkPermission(Sonatype.user.curr.repoServer.actionUploadArtifact, this.sp.CREATE);
-    var repoStatusPriv = this.sp.checkPermission(Sonatype.user.curr.repoServer.setMaintRepos, this.sp.EDIT);
-    
-    var isVirtualRepo = (node.getOwnerTree().root.attributes.repoType == 'virtual');
     var isProxyRepo = (node.getOwnerTree().root.attributes.repoType == 'proxy');
     var isGroup = (node.getOwnerTree().root.attributes.repoType == 'group');
     
-      this.ctxBrowseNode = node;
-      
-      var menu = new Ext.menu.Menu({
-        id:'repo-maint-browse-ctx'
-      });
+    this.ctxBrowseNode = node;
+    
+    var menu = new Sonatype.menu.Menu({
+      id: 'repo-maint-browse-ctx',
+      payload: node
+    });
 
+    Sonatype.Events.fireEvent( 'repositoryContentMenuInit', menu,
+      this.reposGridPanel.store.getById(node.getOwnerTree().root.contentUrl),
+      this.ctxBrowseNode );
+    
+    if (node.isLeaf()){
+      if (isProxyRepo){
+        var rec = (this.ctxRecord) ? this.ctxRecord : this.reposGridPanel.getSelectionModel().getSelected();      
+        this.actions.downloadFromRemote.href = this.restToRemoteUrl(node,rec);
+        menu.add(this.actions.downloadFromRemote);
+      }
+      this.actions.download.href = this.restToContentUrl(node.id);
+      menu.add(this.actions.download);
+    }
+    
+    if (!node.isRoot && !isGroup){
       if ( ! this.browseIndex ) {
-        if (clearcachPriv && !isVirtualRepo){
-          menu.add(this.actions.clearCache);
-        }
-        if (reindexPriv){
-          menu.add(this.actions.reIndex);
-        }
-        if (attributesPriv){
-          menu.add(this.actions.rebuildAttributes);
-        }
+        menu.add(this.actions.deleteRepoItem);
       }
-      
-      if (node.isLeaf()){
-        if (isProxyRepo){
-          var rec = (this.ctxRecord) ? this.ctxRecord : this.reposGridPanel.getSelectionModel().getSelected();      
-          this.actions.downloadFromRemote.href = this.restToRemoteUrl(node,rec);
-          menu.add(this.actions.downloadFromRemote);
-        }
-        this.actions.download.href = this.restToContentUrl(node.id);
-        menu.add(this.actions.download);
+      if (isProxyRepo && !node.isLeaf()){
+        menu.add(this.actions.viewRemote);
       }
-      
-      if (!node.isRoot && !isGroup){
-        if ( ! this.browseIndex ) {
-          menu.add(this.actions.deleteRepoItem);
-        }
-        if (isProxyRepo && !node.isLeaf()){
-          menu.add(this.actions.viewRemote);
-        }
-      }
+    }
 
-      menu.on('hide', this.onBrowseContextHideHandler, this);
-      e.stopEvent();
-      menu.showAt(e.getXY());
+    menu.on('hide', this.onBrowseContextHideHandler, this);
+    e.stopEvent();
+    menu.showAt(e.getXY());
   },
 
   onBrowseContextHideHandler : function(){
@@ -712,7 +662,6 @@ Ext.extend(Sonatype.repoServer.RepoMaintPanel, Sonatype.repoServer.AbstractRepoP
   
   //rec is grid store record
   viewRepo : function(rec){
-
     if ( rec.get('repoType') == 'proxy' ) {
       this.browseSelector.enable();
     }
@@ -1085,6 +1034,23 @@ Ext.extend(Sonatype.repoServer.RepoMaintPanel, Sonatype.repoServer.AbstractRepoP
         root.reload();
       }
     }
-  }
+  },
 
+  onRepositoryContentMenuInit: function( menu, repoRecord, contentRecord ) {
+    if ( ! this.browseIndex ) {
+      if ( this.sp.checkPermission(
+            Sonatype.user.curr.repoServer.actionDeleteCache, this.sp.DELETE ) &&
+          repoRecord.get( 'repoType' ) != 'virtual'){
+        menu.add( this.repoActions.clearCache );
+      }
+      if ( this.sp.checkPermission(
+          Sonatype.user.curr.repoServer.actionReindex, this.sp.DELETE ) ) {
+        menu.add( this.repoActions.reIndex );
+      }
+      if ( this.sp.checkPermission(
+            Sonatype.user.curr.repoServer.actionRebuildAttribs, this.sp.DELETE ) ){
+        menu.add( this.repoActions.rebuildAttributes );
+      }
+    }
+  }
 });

@@ -157,3 +157,36 @@ Ext.extend( Sonatype.navigation.Section, Ext.Panel, {
     return Sonatype.navigation.Section.superclass.add.call( this, c );
   }
 });
+
+
+Ext.namespace( 'Sonatype.menu' );
+
+Sonatype.menu.Menu = function( config ) {
+  var config = config || {};
+  var defaultConfig = {};
+  Ext.apply( this, config, defaultConfig );
+
+  Sonatype.menu.Menu.superclass.constructor.call( this );
+};
+
+Ext.extend( Sonatype.menu.Menu, Ext.menu.Menu, {
+  add: function( c ) {
+    if ( c == null ) return null;
+
+    var a = arguments;
+    if ( a.length > 1 ) {
+      for( var i = 0; i < a.length; i++ ) {
+        this.add( a[i] );
+      }
+      return;
+    }
+
+    var item = Sonatype.menu.Menu.superclass.add.call( this, c );
+    var param = c.payload ? c.payload : this.payload;
+    if ( c.handler && param ) {
+      // create a delegate to pass the payload object to the handler
+      item.setHandler( c.handler.createDelegate( c.scope ? c.scope : this.scope, [param] ) );
+    }
+    return item;
+  }
+});
