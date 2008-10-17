@@ -164,6 +164,10 @@ public abstract class AbstractSystemFeedSource
             {
                 entry.setTitle( "Emptying Trash" );
             }
+            else if ( FeedRecorder.SYSTEM_SYNC_SHADOW_ACTION.equals( item.getAction() ) )
+            {
+                entry.setTitle( "Synchronizing Shadow Repository" );
+            }
             else
             {
                 entry.setTitle( item.getAction() );
