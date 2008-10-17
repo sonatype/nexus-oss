@@ -123,7 +123,7 @@
 		<module>nexus-migration-tool</module>
 		<module>nexus-webapp</module>
 		<module>nexus-clients</module>
-		<module>nexus-repository-convertion-tool</module>
+		<module>nexus-repository-conversion-tool</module>
 	</modules>
 	<profiles>
 		<profile>
