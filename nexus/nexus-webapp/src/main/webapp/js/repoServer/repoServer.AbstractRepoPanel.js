@@ -350,14 +350,17 @@ Ext.extend(Sonatype.repoServer.AbstractRepoPanel, Ext.Panel, {
   },
   
   onRepositoryMenuInit: function( menu, repoRecord ) {
+    var isVirtual = repoRecord.get( 'repoType' ) == 'virtual';
+
     if ( this.sp.checkPermission(
           Sonatype.user.curr.repoServer.actionDeleteCache, this.sp.DELETE ) &&
-        repoRecord.get( 'repoType' ) != 'virtual' ) {
+        ! isVirtual ) {
       menu.add( this.repoActions.clearCache );
     }
 
     if ( this.sp.checkPermission(
-          Sonatype.user.curr.repoServer.actionReindex, this.sp.DELETE ) ) {
+          Sonatype.user.curr.repoServer.actionReindex, this.sp.DELETE ) &&
+        ! isVirtual ) {
       menu.add( this.repoActions.reIndex );
     }
 
