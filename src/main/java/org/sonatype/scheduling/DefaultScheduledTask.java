@@ -106,7 +106,7 @@ public class DefaultScheduledTask<T>
     public boolean isExposed()
     {
         if ( callable != null 
-            && callable.getClass().isAssignableFrom( SchedulerTask.class ) )
+            && SchedulerTask.class.isAssignableFrom( callable.getClass() ) )
         {
             return ( ( SchedulerTask<T> ) callable ).isExposed();
         }
@@ -320,7 +320,7 @@ public class DefaultScheduledTask<T>
         {
             setTaskState( TaskState.RUNNING );
 
-            setLastRun( new Date() );
+            Date startDate = new Date();
 
             try
             {
@@ -365,6 +365,10 @@ public class DefaultScheduledTask<T>
                     // this is a Throwable or Error instance, pack it into an exception and rethrow
                     throw new TaskExecutionException( e );
                 }
+            }
+            finally
+            {
+                setLastRun( startDate );
             }
         }
 
