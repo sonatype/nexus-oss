@@ -31,6 +31,12 @@ import org.sonatype.scheduling.schedules.Schedule;
 public interface ScheduledTask<T>
 {
     /**
+     * If the task is exposed for user control/view
+     * @return
+     */
+    boolean isExposed();
+    
+    /**
      * Returns a unique ID of the task.
      * 
      * @return

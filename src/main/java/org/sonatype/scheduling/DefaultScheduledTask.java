@@ -102,6 +102,17 @@ public class DefaultScheduledTask<T>
 
         this.manualRun = false;
     }
+    
+    public boolean isExposed()
+    {
+        if ( callable != null 
+            && callable.getClass().isAssignableFrom( SchedulerTask.class ) )
+        {
+            return ( ( SchedulerTask<T> ) callable ).isExposed();
+        }
+        
+        return false;
+    }
 
     protected void start()
     {
