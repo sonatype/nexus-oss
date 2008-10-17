@@ -209,12 +209,13 @@ public class DefaultScheduler
                 }
 
                 Collections.sort( list );
-
-                while ( list.contains( idGen.incrementAndGet() ) )
+                
+                if ( list.size() > 0 )
                 {
+                    idGen.set( list.get( list.size() - 1 ) );
                 }
-
-                id = String.valueOf( idGen.get() );
+                
+                id = String.valueOf( idGen.incrementAndGet() );                    
             }
             else
             {
