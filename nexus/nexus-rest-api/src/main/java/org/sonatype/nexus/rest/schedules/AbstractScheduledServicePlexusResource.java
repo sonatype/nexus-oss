@@ -429,7 +429,8 @@ public abstract class AbstractScheduledServicePlexusResource
     {
         ScheduledServiceBaseResource resource = null;
 
-        if ( task.getSchedule() == null || ManualRunSchedule.class.isAssignableFrom( task.getSchedule().getClass() ) )
+        if ( RunNowSchedule.class.isAssignableFrom( task.getSchedule().getClass() ) 
+            || ManualRunSchedule.class.isAssignableFrom( task.getSchedule().getClass() ) )
         {
             resource = new ScheduledServiceBaseResource();
         }

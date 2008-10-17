@@ -1313,7 +1313,6 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
     
     formPanel.form.on('actioncomplete', this.actionCompleteHandler, this);
     formPanel.form.on('actionfailed', this.actionFailedHandler, this);
-    formPanel.on('beforerender', this.beforeFormRenderHandler, this);
     formPanel.on('afterlayout', this.afterLayoutFormHandler, this, {single:true});
     
     var serviceTypeField = formPanel.find('name', 'typeId')[0];
@@ -1331,6 +1330,11 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
     formPanel.buttons[0].on('click', this.saveHandler.createDelegate(this, [buttonInfoObj]));
     //cancel button event handler
     formPanel.buttons[1].on('click', this.cancelHandler.createDelegate(this, [buttonInfoObj]));
+    
+    var sp = Sonatype.lib.Permissions;
+    if(sp.checkPermission(Sonatype.user.curr.repoServer.configSchedules, sp.EDIT)){
+        formPanel.buttons[0].disabled = false;
+    }
     
     this.loadWeekdayListHelper([], {}, formPanel);
     
@@ -1624,13 +1628,6 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
 
     //@todo: need global alert mechanism for fatal errors.
   },
-  
-  beforeFormRenderHandler : function(component){
-    var sp = Sonatype.lib.Permissions;
-    if(sp.checkPermission(Sonatype.user.curr.repoServer.configSchedules, sp.EDIT)){
-      component.buttons[0].disabled = false;
-    }
-  },
 
   formDataLoader : function(formPanel, resourceURI, modFuncs){
     formPanel.getForm().doAction('sonatypeLoad', {url:resourceURI, method:'GET', fpanel:formPanel, dataModifiers: modFuncs, scope: this});
@@ -1651,7 +1648,6 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
       
       formPanel.form.on('actioncomplete', this.actionCompleteHandler, this);
       formPanel.form.on('actionfailed', this.actionFailedHandler, this);
-      formPanel.on('beforerender', this.beforeFormRenderHandler, this);
       formPanel.on('afterlayout', this.afterLayoutFormHandler, this, {single:true});
   
       //On load need to make sure and set the proper schedule type card as active    
@@ -1706,6 +1702,12 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
       
       formPanel.buttons[0].on('click', this.saveHandler.createDelegate(this, [buttonInfoObj]));
       formPanel.buttons[1].on('click', this.cancelHandler.createDelegate(this, [buttonInfoObj]));
+      
+      var sp = Sonatype.lib.Permissions;
+      if(sp.checkPermission(Sonatype.user.curr.repoServer.configSchedules, sp.EDIT)
+              && rec.data.schedule != 'internal'){
+          formPanel.buttons[0].disabled = false;
+      }
       
       this.loadWeekdayListHelper([], {}, formPanel);
 
