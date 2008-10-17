@@ -409,8 +409,7 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
                 width: 75,                
                 disabled:true,
                 allowBlank:false,
-                format:'H:i',
-                value: new Date().format('H:i')
+                format:'H:i'
               }
             ]
           },
@@ -445,8 +444,7 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
                 width: 75,                
                 disabled:true,
                 allowBlank:false,
-                format:'H:i',
-                value: new Date().format('H:i')
+                format:'H:i'
               }
             ]
           },
@@ -481,8 +479,7 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
                 width: 75,
                 disabled:true,
                 allowBlank:false,
-                format:'H:i',
-                value: new Date().format('H:i')
+                format:'H:i'
               }
             ]
           },
@@ -517,8 +514,7 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
                 width: 75,
                 disabled:true,
                 allowBlank:false,
-                format:'H:i',
-                value: new Date().format('H:i')
+                format:'H:i'
               },
               {
                 xtype: 'panel',
@@ -662,8 +658,7 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
                 width: 75,
                 disabled:true,
                 allowBlank:false,
-                format:'H:i',
-                value: new Date().format('H:i')
+                format:'H:i'
               },
               {
                 xtype: 'panel',
@@ -1812,8 +1807,16 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
     //Then enable the fields in that card
     schedulePanel.getLayout().activeItem.items.each(function(item){
       item.enable();
-      if ( item.xtype == 'datefield' || item.xtype == 'timefield' ) {
+      if ( item.xtype == 'datefield' ) {
         item.setValue(item.value);
+      }
+      else if ( item.xtype == 'timefield' ){
+          if ( item.value == null ){
+              item.setValue( new Date().format('H:i') );
+          }
+          else {
+              item.setValue( item.value );
+          }
       }
     });
     schedulePanel.doLayout();
