@@ -28,6 +28,8 @@ Sonatype.repoServer.UserEditPanel = function(config){
   Ext.apply(this, config, defaultConfig);
   
   var ht = Sonatype.repoServer.resources.help.users;
+
+  Sonatype.Events.addListener( 'userMenuInit', this.onUserMenuInit, this );
   
   //List of user statuses
   this.statusStore = new Ext.data.SimpleStore({fields:['value','display'], data:[['active','Active'],['disabled','Disabled']]});
@@ -50,22 +52,27 @@ Sonatype.repoServer.UserEditPanel = function(config){
   };
   
   this.actions = {
-    refresh : new Ext.Action({
+    refresh: {
       text: 'Refresh',
       iconCls: 'st-icon-refresh',
       scope:this,
       handler: this.reloadAll
-    }),
-    deleteAction : new Ext.Action({
+    },
+    deleteAction: {
       text: 'Delete',
       scope:this,
       handler: this.deleteHandler
-    }),
-    resetPasswordAction: new Ext.Action({
+    },
+    resetPasswordAction: {
       text: 'Reset Password',
       scope: this,
       handler: this.resetPasswordHandler
-    })
+    },
+    changePasswordAction: {
+      text: 'Set Password',
+      scope: this,
+      handler: this.changePasswordHandler
+    }
   };
   
   //Methods that will take the incoming json data and map over to the ui controls
@@ -385,6 +392,14 @@ Sonatype.repoServer.UserEditPanel = function(config){
     autoScroll: false,
     width: '100%',
     height: '100%',
+    listeners: {
+      'beforedestroy': {
+        fn: function(){
+          Sonatype.Events.removeListener( 'userMenuInit', this.onUserMenuInit, this );
+        },
+        scope: this
+      }
+    },
     items: [
       this.usersGridPanel,
       {
@@ -554,9 +569,107 @@ Ext.extend(Sonatype.repoServer.UserEditPanel, Ext.Panel, {
     }.defer(300, formPanel);
   },
   
-  resetPasswordHandler : function(){
-    if (this.ctxRecord && this.ctxRecord.data.resourceURI != 'new'){
-      var rec = this.ctxRecord;
+  changePasswordHandler : function( rec ) {
+    var userId = rec.get( 'userId' );
+
+    var w = new Ext.Window({
+      title: 'Set Password',
+      closable: true,
+      autoWidth: false,
+      width: 350,
+      autoHeight: true,
+      modal:true,
+      constrain: true,
+      resizable: false,
+      draggable: false,
+      items: [
+        {
+          xtype: 'form',
+          labelAlign: 'right',
+          labelWidth:110,
+          frame:true,  
+          defaultType:'textfield',
+          monitorValid:true,
+          items:[
+            {
+              xtype: 'panel',
+              style: 'padding-left: 70px; padding-bottom: 10px',
+              html: 'Enter a new password for user ' + userId
+            },
+            { 
+              fieldLabel: 'New Password', 
+              inputType: 'password',
+              name: 'newPassword',
+              width: 200,
+              allowBlank: false 
+            },
+            { 
+              fieldLabel: 'Confirm Password', 
+              inputType: 'password',
+              name: 'confirmPassword',
+              width: 200,
+              allowBlank: false,
+              validator: function( s ) {
+                var firstField = this.ownerCt.find( 'name', 'newPassword' )[0];
+                if ( firstField && firstField.getRawValue() != s ) {
+                  return "Passwords don't match";
+                }
+                return true;
+              }
+            }
+          ],
+          buttons: [
+            {
+              text: 'Set Password',
+              formBind: true,
+              scope: this,
+              handler: function(){
+                var newPassword = w.find('name', 'newPassword')[0].getValue();
+
+                Ext.Ajax.request({
+                  scope: this,
+                  method: 'POST',
+                  jsonData: {
+                    data: {
+                      userId: userId,
+                      newPassword: newPassword
+                    }
+                  },
+                  url: Sonatype.config.repos.urls.usersSetPassword,
+                  success: function(response, options){
+                    w.close();
+                    Sonatype.MessageBox.show( {
+                      title: 'Password Changed',
+                      msg: 'Password change request completed successfully.',
+                      buttons: Sonatype.MessageBox.OK,
+                      icon: Sonatype.MessageBox.INFO,
+                      animEl: 'mb3'
+                    } );
+                  },
+                  failure: function(response, options){
+                    Sonatype.utils.connectionError( response, 'There is a problem changing the password.' )
+                  }
+                });
+              }
+            },
+            {
+              text: 'Cancel',
+              formBind: false,
+              scope: this,
+              handler: function(){
+                w.close();
+              }
+            }
+          ]
+        }
+      ]
+    });
+
+    w.show();
+  },
+  
+  resetPasswordHandler : function( rec ) {
+    if ( rec.data.resourceURI != 'new' ) {
       Sonatype.MessageBox.getDialog().on('show', function(){
         this.focusEl = this.buttons[2]; //ack! we're offset dependent here
         this.focus();
@@ -597,48 +710,44 @@ Ext.extend(Sonatype.repoServer.UserEditPanel, Ext.Panel, {
     }
   },
   
-  deleteHandler : function(){
-    if (this.ctxRecord || this.usersGridPanel.getSelectionModel().hasSelection()){
-      var rec = this.ctxRecord ? this.ctxRecord : this.usersGridPanel.getSelectionModel().getSelected();
-
-      if(rec.data.resourceURI == 'new'){
-        this.cancelHandler({
-          formPanel : Ext.getCmp(rec.id),
-          isNew : true
-        });
-      }
-      else {
-        //@note: this handler selects the "No" button as the default
-        //@todo: could extend Sonatype.MessageBox to take the button to select as a param
-        Sonatype.MessageBox.getDialog().on('show', function(){
-          this.focusEl = this.buttons[2]; //ack! we're offset dependent here
-          this.focus();
-        },
-        Sonatype.MessageBox.getDialog(),
-        {single:true});
-        
-        Sonatype.MessageBox.show({
-          animEl: this.usersGridPanel.getEl(),
-          title : 'Delete User?',
-          msg : 'Delete the ' + rec.get('userId') + ' User?',
-          buttons: Sonatype.MessageBox.YESNO,
-          scope: this,
-          icon: Sonatype.MessageBox.QUESTION,
-          fn: function(btnName){
-            if (btnName == 'yes' || btnName == 'ok') {
-              Ext.Ajax.request({
-                callback: this.deleteCallback,
-                cbPassThru: {
-                  resourceId: rec.id
-                },
-                scope: this,
-                method: 'DELETE',
-                url:rec.data.resourceURI
-              });
-            }
+  deleteHandler : function( rec ){
+    if(rec.data.resourceURI == 'new'){
+      this.cancelHandler({
+        formPanel : Ext.getCmp(rec.id),
+        isNew : true
+      });
+    }
+    else {
+      //@note: this handler selects the "No" button as the default
+      //@todo: could extend Sonatype.MessageBox to take the button to select as a param
+      Sonatype.MessageBox.getDialog().on('show', function(){
+        this.focusEl = this.buttons[2]; //ack! we're offset dependent here
+        this.focus();
+      },
+      Sonatype.MessageBox.getDialog(),
+      {single:true});
+      
+      Sonatype.MessageBox.show({
+        animEl: this.usersGridPanel.getEl(),
+        title : 'Delete User?',
+        msg : 'Delete the ' + rec.get('userId') + ' user?',
+        buttons: Sonatype.MessageBox.YESNO,
+        scope: this,
+        icon: Sonatype.MessageBox.QUESTION,
+        fn: function(btnName){
+          if (btnName == 'yes' || btnName == 'ok') {
+            Ext.Ajax.request({
+              callback: this.deleteCallback,
+              cbPassThru: {
+                resourceId: rec.id
+              },
+              scope: this,
+              method: 'DELETE',
+              url:rec.data.resourceURI
+            });
           }
-        });
-      }
+        }
+      });
     }
   },
   
@@ -847,24 +956,15 @@ Ext.extend(Sonatype.repoServer.UserEditPanel, Ext.Panel, {
     Ext.fly(this.ctxRow).addClass('x-node-ctx');
 
     //@todo: would be faster to pre-render the six variations of the menu for whole instance
-    var menu = new Ext.menu.Menu({
+    var menu = new Sonatype.menu.Menu({
       id:'users-grid-ctx',
+      payload: this.ctxRecord,
       items: [
         this.actions.refresh
       ]
     });
-    
-    if (this.ctxRecord.data.readOnly == false
-      && this.sp.checkPermission(Sonatype.user.curr.repoServer.configUsers, this.sp.DELETE)){
-        menu.add(this.actions.deleteAction);
-    }
-    
-    if (this.ctxRecord.data.readOnly == false
-      && this.sp.checkPermission(Sonatype.user.curr.repoServer.actionResetPassword, this.sp.DELETE)){
-        menu.add(this.actions.resetPasswordAction);
-    }
-    
-    //TODO: Add additional menu items
+
+    Sonatype.Events.fireEvent( 'userMenuInit', menu, this.ctxRecord );
     
     menu.on('hide', this.contextHide, this);
     e.stopEvent();
@@ -963,5 +1063,24 @@ Ext.extend(Sonatype.repoServer.UserEditPanel, Ext.Panel, {
     }
 
     return outputArr;
+  },
+  
+  onUserMenuInit: function( menu, userRecord ) {
+    if ( userRecord.data.readOnly == false ) {
+
+      if ( this.sp.checkPermission( Sonatype.user.curr.repoServer.configUsers, this.sp.DELETE ) ) {
+        menu.add( this.actions.deleteAction );
+      }
+
+      if ( userRecord.data.resourceURI != 'new' ) {
+        if ( this.sp.checkPermission( Sonatype.user.curr.repoServer.actionResetPassword, this.sp.DELETE ) ) {
+          menu.add(this.actions.resetPasswordAction);
+        }
+
+        if ( this.sp.checkPermission( Sonatype.user.curr.repoServer.configUsers, this.sp.EDIT ) ) {
+          menu.add( this.actions.changePasswordAction );
+        }
+      }
+    }
   }
 });

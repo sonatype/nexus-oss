@@ -99,7 +99,7 @@ Sonatype.utils.Observable = function(){
      * },
      */
     'repositoryMenuInit': true,
-    
+
     /*
      * Fired when an repository item (e.g. artifact or folder) context action menu
      * is initialized. Subscribers can add action items to the menu.
@@ -117,7 +117,26 @@ Sonatype.utils.Observable = function(){
      *   }
      * },
      */
-    'repositoryContentMenuInit': true
+    'repositoryContentMenuInit': true,
+
+    /*
+     * Fired when a user action menu is initialized (most likely an admin function).
+     * Subscribers can add action items to the menu.
+     * 
+     * A menu object and a user record are passed as parameters.
+     * If clicked, the action handler receives an user record as parameter.
+     * 
+     * init: function() {
+     *   Sonatype.Events.addListener( 'userMenuInit', this.onUserMenu, this );
+     * },
+     * 
+     * onUserMenu: function( menu, userRecord ) {
+     *   if ( userRecord.get( 'userId' ) != 'anonymous' ) {
+     *     menu.add( this.actions.myUserAction );
+     *   }
+     * },
+     */
+    'userMenuInit': true
   });
 };
 Ext.extend( Sonatype.utils.Observable, Ext.util.Observable );
