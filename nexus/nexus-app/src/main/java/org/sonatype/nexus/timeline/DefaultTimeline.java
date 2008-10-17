@@ -343,7 +343,7 @@ public class DefaultTimeline
                     {
                         result.add( map );
                     }
-                    else
+                    else if ( filter == null )
                     {
                         result.add( map );
                     }
