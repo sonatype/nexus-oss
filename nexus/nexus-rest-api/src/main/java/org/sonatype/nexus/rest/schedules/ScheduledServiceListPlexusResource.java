@@ -73,9 +73,15 @@ public class ScheduledServiceListPlexusResource
             {
                 if ( task.isExposed() )
                 {
+                    String lastRunResult = "n/a";
+                    
+                    if ( task.getLastRun() != null )
+                    {
+                        lastRunResult = TaskState.BROKEN.equals( task.getTaskState() ) ? "Error" : "Ok";
+                    }
                     ScheduledServiceListResource item = new ScheduledServiceListResource();
                     item.setResourceURI( createChildReference( request, task.getId() ).toString() );
-                    item.setLastRunResult( TaskState.BROKEN.equals( task.getTaskState() ) ? "Error" : "Ok" );
+                    item.setLastRunResult( lastRunResult );
                     item.setId( task.getId() );
                     item.setName( task.getName() );
                     item.setStatus( StringUtils.capitalise( task.getTaskState().toString() ) );

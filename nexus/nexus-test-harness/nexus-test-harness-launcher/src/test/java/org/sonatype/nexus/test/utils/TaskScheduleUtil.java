@@ -5,7 +5,6 @@ import java.util.List;
 
 import junit.framework.Assert;
 
-import org.jmock.core.stub.ThrowStub;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
@@ -16,7 +15,6 @@ import org.sonatype.nexus.rest.model.ScheduledServiceListResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceListResourceResponse;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceResourceResponse;
-import org.sonatype.nexus.rest.xstream.XStreamInitializer;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
 
 import com.thoughtworks.xstream.XStream;
@@ -100,16 +98,17 @@ public class TaskScheduleUtil
         for ( int attempt = 0; attempt < maxAttempts; attempt++ )
         {
             ScheduledServiceListResource task = getTask( name );
-            String status = task.getStatus();
             
-            if ( !status.equals( "RUNNING" ) )
+            if ( task.getLastRunResult() != "n/a"
+                && ( task.getStatus().equals( "SUBMITTED" ) 
+                    || task.getStatus().equals( "WAITING" ) ) )
             {
                 return task;
             }
             else
             {
                 Thread.sleep( sleep );
-            }
+            }            
         }
         return null;
     }
