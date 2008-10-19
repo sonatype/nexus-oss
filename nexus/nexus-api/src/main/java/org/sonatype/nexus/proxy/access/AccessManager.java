@@ -47,6 +47,11 @@ public interface AccessManager
     String REQUEST_CONFIDENTIAL = "request.isConfidential";
 
     /**
+     * Key used to mark the request certificates of confidential channel (https).
+     */
+    String REQUEST_CERTIFICATES = "request.certificates";
+
+    /**
      * The implementation of this method should throw AccessDeniedException or any subclass if it denies access.
      * 
      * @param request the request

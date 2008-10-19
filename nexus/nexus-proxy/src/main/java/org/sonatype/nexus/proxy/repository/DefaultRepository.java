@@ -23,6 +23,7 @@ package org.sonatype.nexus.proxy.repository;
 import java.util.Collection;
 import java.util.Map;
 
+import org.sonatype.nexus.proxy.ItemContextUtils;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.RepositoryNotAvailableException;
 import org.sonatype.nexus.proxy.StorageException;
@@ -120,6 +121,7 @@ public abstract class DefaultRepository
                 try
                 {
                     boolean shouldGetRemote = false;
+
                     if ( localItem != null )
                     {
                         if ( getLogger().isDebugEnabled() )
@@ -129,13 +131,25 @@ public abstract class DefaultRepository
                         }
 
                         // check do we have newer remotely
-                        shouldGetRemote = getRemoteStorage().containsItem( uid, localItem.getModified() );
-
-                        if ( !shouldGetRemote )
+                        if ( ItemContextUtils.isConditional( context ) )
                         {
-                            // remote file unchanged, touch the local one to renew it's Age
-                            markItemRemotelyChecked( localItem.getRepositoryItemUid() );
+                            // check is the remote newer then the one requested
+                            shouldGetRemote = getRemoteStorage().containsItem(
+                                uid,
+                                ItemContextUtils.getIfModifiedSince( context ) );
                         }
+                        else
+                        {
+                            // check is the remote newer than the local one
+                            shouldGetRemote = getRemoteStorage().containsItem( uid, localItem.getModified() );
+
+                            if ( !shouldGetRemote )
+                            {
+                                // remote file unchanged, touch the local one to renew it's Age
+                                markItemRemotelyChecked( localItem.getRepositoryItemUid() );
+                            }
+                        }
+
                     }
                     else
                     {
@@ -185,6 +199,7 @@ public abstract class DefaultRepository
                     {
                         getLogger().debug( "Item " + uid.toString() + " not found in remote storage." );
                     }
+
                     remoteItem = null;
                 }
             }
@@ -200,6 +215,7 @@ public abstract class DefaultRepository
                                 + uid.toString()
                                 + " does not exist in local storage neither in remote storage, throwing ItemNotFoundException." );
                 }
+
                 throw new ItemNotFoundException( uid );
             }
             else if ( localItem != null && remoteItem == null )
@@ -210,13 +226,14 @@ public abstract class DefaultRepository
                     getLogger().debug(
                         "Item " + uid.toString() + " does exist in local storage and is fresh, returning local one." );
                 }
+
                 item = localItem;
             }
             else
             {
-                // the fact that remoteItem != null means we _have_ to cache it
-                // OR: we have to cache it if can, since we had no local copy
-                // OR: we have to cache it if can, since remoteItem is fur sure newer (look above)
+                // the fact that remoteItem != null means we _have_ to return that one
+                // OR: we had no local copy
+                // OR: remoteItem is for sure newer (look above)
                 item = remoteItem;
             }
 
@@ -231,6 +248,7 @@ public abstract class DefaultRepository
                     getLogger().debug(
                         "Item " + uid.toString() + " does exist locally and cannot go remote, returning local one." );
                 }
+
                 item = localItem;
             }
             else
@@ -241,9 +259,11 @@ public abstract class DefaultRepository
                         "Item " + uid.toString()
                             + " does not exist locally and cannot go remote, throwing ItemNotFoundException." );
                 }
+
                 throw new ItemNotFoundException( uid );
             }
         }
+
         return item;
     }
 

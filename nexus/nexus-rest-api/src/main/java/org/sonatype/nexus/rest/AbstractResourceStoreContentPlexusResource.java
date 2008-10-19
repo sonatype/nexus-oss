@@ -70,13 +70,13 @@ public abstract class AbstractResourceStoreContentPlexusResource
     extends AbstractNexusPlexusResource
 {
     public static final String IS_LOCAL_PARAMETER = "isLocal";
-    
+
     public AbstractResourceStoreContentPlexusResource()
     {
         super();
-        
+
         setReadable( true );
-        
+
         setModifiable( true );
     }
 
@@ -229,26 +229,32 @@ public abstract class AbstractResourceStoreContentPlexusResource
             getLogger().info( "Created ResourceStore request for " + result.getRequestPath() );
         }
 
+        // honor if-modified-since
+        if ( request.getConditions().getModifiedSince() != null )
+        {
+            result.setIfModifiedSince( request.getConditions().getModifiedSince().getTime() );
+        }
+
+        // stuff in the originating remote address
         result.getRequestContext().put( AccessManager.REQUEST_REMOTE_ADDRESS, request.getClientInfo().getAddress() );
 
+        // stuff in the user id if we have it in request
         if ( request.getChallengeResponse() != null && request.getChallengeResponse().getIdentifier() != null )
         {
             result.getRequestContext().put( AccessManager.REQUEST_USER, request.getChallengeResponse().getIdentifier() );
         }
 
+        // this is HTTPS, get the cert and stuff it too for later
         if ( request.isConfidential() )
         {
             result.getRequestContext().put( AccessManager.REQUEST_CONFIDENTIAL, Boolean.TRUE );
 
-            // X509Certificate[] certs = (X509Certificate[]) context.getHttpServletRequest().getAttribute(
-            // "javax.servlet.request.X509Certificate" );
-            // if ( false ) // certs != null )
-            // {
-            // result.getRequestContext().put( CertificateBasedAccessDecisionVoter.REQUEST_CERTIFICATES, certs );
-            // }
-        }
-        return result;
+            List<?> certs = (List<?>) request.getAttributes().get( "org.restlet.https.clientCertificates" );
 
+            result.getRequestContext().put( AccessManager.REQUEST_CERTIFICATES, certs );
+        }
+
+        return result;
     }
 
     protected Object renderItem( Context context, Request req, Response res, Variant variant, StorageItem item )

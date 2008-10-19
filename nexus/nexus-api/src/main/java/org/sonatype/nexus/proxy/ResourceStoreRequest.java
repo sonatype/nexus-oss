@@ -39,16 +39,13 @@ public class ResourceStoreRequest
     /** If true, there will not happen remote access to get this item. Only local storage will be involved. */
     private boolean requestLocalOnly;
 
-    /** IfModifiedSince. */
-    private Long ifModifiedSince;
-
     /** Extra data associated with this request. */
     private Map<String, Object> requestContext;
 
-    /** Explicitly targets a repository. */
+    /** Explicitly targets a repository (only if accessed over Routers!). */
     private String requestRepositoryId;
 
-    /** Explicitly targets a repository group. */
+    /** Explicitly targets a repository group (only if accessed over Routers!). */
     private String requestRepositoryGroupId;
 
     /** Used internally by Routers. */
@@ -63,7 +60,6 @@ public class ResourceStoreRequest
         this.requestRepositoryGroupId = repositoryGroupId;
         this.requestContext = new HashMap<String, Object>();
         this.pathStack = new Stack<String>();
-        this.ifModifiedSince = null;
     }
 
     /**
@@ -215,7 +211,7 @@ public class ResourceStoreRequest
      */
     public boolean isConditional()
     {
-        return this.ifModifiedSince != null;
+        return ItemContextUtils.isConditional( getRequestContext() );
     }
 
     /**
@@ -225,18 +221,11 @@ public class ResourceStoreRequest
      */
     public long getIfModifiedSince()
     {
-        return ifModifiedSince.longValue();
+        return ItemContextUtils.getIfModifiedSince( getRequestContext() );
     }
 
     public void setIfModifiedSince( long ifModifiedSince )
     {
-        if ( ifModifiedSince != 0 )
-        {
-            this.ifModifiedSince = Long.valueOf( ifModifiedSince );
-        }
-        else
-        {
-            this.ifModifiedSince = null;
-        }
+        ItemContextUtils.setIfModifiedSince( getRequestContext(), ifModifiedSince );
     }
 }
