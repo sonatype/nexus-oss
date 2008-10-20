@@ -23,7 +23,6 @@ package org.sonatype.nexus.proxy.repository;
 import java.util.Collection;
 import java.util.Map;
 
-import org.sonatype.nexus.proxy.ItemContextUtils;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.RepositoryNotAvailableException;
 import org.sonatype.nexus.proxy.StorageException;
@@ -85,9 +84,9 @@ public abstract class DefaultRepository
             try
             {
                 localItem = getLocalStorage().retrieveItem( uid );
-                
+
                 localItem.getItemContext().putAll( context );
-                
+
                 if ( getLogger().isDebugEnabled() )
                 {
                     getLogger().debug( "Item " + uid.toString() + " found in local storage." );
@@ -132,24 +131,13 @@ public abstract class DefaultRepository
                                 .debug( "Item " + uid.toString() + " is old, checking for newer file on remote." );
                         }
 
-                        // check do we have newer remotely
-                        if ( ItemContextUtils.isConditional( context ) )
-                        {
-                            // check is the remote newer then the one requested
-                            shouldGetRemote = getRemoteStorage().containsItem(
-                                uid,
-                                ItemContextUtils.getIfModifiedSince( context ) );
-                        }
-                        else
-                        {
-                            // check is the remote newer than the local one
-                            shouldGetRemote = getRemoteStorage().containsItem( uid, localItem.getModified() );
+                        // check is the remote newer than the local one
+                        shouldGetRemote = getRemoteStorage().containsItem( uid, localItem.getModified() );
 
-                            if ( !shouldGetRemote )
-                            {
-                                // remote file unchanged, touch the local one to renew it's Age
-                                markItemRemotelyChecked( localItem.getRepositoryItemUid() );
-                            }
+                        if ( !shouldGetRemote )
+                        {
+                            // remote file unchanged, touch the local one to renew it's Age
+                            markItemRemotelyChecked( localItem.getRepositoryItemUid() );
                         }
 
                     }

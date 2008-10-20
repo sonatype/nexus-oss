@@ -215,7 +215,7 @@ public class ResourceStoreRequest
     }
 
     /**
-     * Returns the timestamp to checg against if
+     * Returns the timestamp to check against.
      * 
      * @return
      */
@@ -224,8 +224,33 @@ public class ResourceStoreRequest
         return ItemContextUtils.getIfModifiedSince( getRequestContext() );
     }
 
+    /**
+     * Sets the timestamp to check against.
+     * 
+     * @param ifModifiedSince
+     */
     public void setIfModifiedSince( long ifModifiedSince )
     {
         ItemContextUtils.setIfModifiedSince( getRequestContext(), ifModifiedSince );
+    }
+
+    /**
+     * Gets the ETag (SHA1 in Nexus) to check item against.
+     * 
+     * @return
+     */
+    public String getIfNoneMatch()
+    {
+        return ItemContextUtils.getIfNoneMatch( getRequestContext() );
+    }
+
+    /**
+     * Sets the ETag (SHA1 in Nexus) to check item against.
+     * 
+     * @param tag
+     */
+    public void setIfNoneMatch( String tag )
+    {
+        ItemContextUtils.setIfNoneMatch( getRequestContext(), tag );
     }
 }

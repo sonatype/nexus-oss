@@ -31,7 +31,7 @@ public class StorageFileItemRepresentation
         
         if ( file.getAttributes().containsKey( DigestCalculatingInspector.DIGEST_SHA1_KEY ) )
         {
-            setTag( new Tag( file.getAttributes().get( DigestCalculatingInspector.DIGEST_SHA1_KEY ) ) );
+            setTag( new Tag( file.getAttributes().get( DigestCalculatingInspector.DIGEST_SHA1_KEY ), false ) );
         }
 
     }

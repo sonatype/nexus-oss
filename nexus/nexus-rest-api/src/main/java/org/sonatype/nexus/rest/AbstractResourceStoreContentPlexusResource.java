@@ -36,6 +36,7 @@ import org.restlet.data.MediaType;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.data.Status;
+import org.restlet.data.Tag;
 import org.restlet.resource.Representation;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
@@ -51,6 +52,7 @@ import org.sonatype.nexus.proxy.ResourceStore;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.access.AccessManager;
+import org.sonatype.nexus.proxy.attributes.inspectors.DigestCalculatingInspector;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
@@ -235,6 +237,14 @@ public abstract class AbstractResourceStoreContentPlexusResource
             result.setIfModifiedSince( request.getConditions().getModifiedSince().getTime() );
         }
 
+        // honor if-none-match
+        if ( request.getConditions().getNoneMatch() != null && request.getConditions().getNoneMatch().size() > 0 )
+        {
+            Tag tag = request.getConditions().getNoneMatch().get( 0 );
+
+            result.setIfNoneMatch( tag.getName() );
+        }
+
         // stuff in the originating remote address
         result.getRequestContext().put( AccessManager.REQUEST_REMOTE_ADDRESS, request.getClientInfo().getAddress() );
 
@@ -283,9 +293,22 @@ public abstract class AbstractResourceStoreContentPlexusResource
                 }
                 else
                 {
-                    res.setStatus( Status.REDIRECTION_NOT_MODIFIED );
+                    throw new ResourceException( Status.REDIRECTION_NOT_MODIFIED, "Resource is not modified." );
+                }
+            }
+            else if ( req.getConditions().getNoneMatch() != null && req.getConditions().getNoneMatch().size() > 0
+                && file.getAttributes().containsKey( DigestCalculatingInspector.DIGEST_SHA1_KEY ) )
+            {
+                Tag tag = req.getConditions().getNoneMatch().get( 0 );
 
-                    return null;
+                // this is a conditional get using ETag
+                if ( !file.getAttributes().get( DigestCalculatingInspector.DIGEST_SHA1_KEY ).equals( tag.getName() ) )
+                {
+                    result = new StorageFileItemRepresentation( file );
+                }
+                else
+                {
+                    throw new ResourceException( Status.REDIRECTION_NOT_MODIFIED, "Resource is not modified." );
                 }
             }
             else
