@@ -228,6 +228,7 @@ Sonatype.repoServer.PrivilegeEditPanel = function(config){
           width: this.COMBO_WIDTH
         },
       {
+        id: 'privTypeId',
         xtype: 'combo',
         fieldLabel: 'Type',
         labelStyle: 'margin-left: 15px; width: 185px;',
@@ -636,6 +637,8 @@ Ext.extend(Sonatype.repoServer.PrivilegeEditPanel, Ext.Panel, {
     var repoCombo = formPanel.find('name', 'repositoryOrGroup')[0];
     repoCombo.on('select', this.repositorySelectHandler, formPanel);
     
+    repoCombo.setValue( repoCombo.getValue() );
+    
     //add place holder to grid
     var newRec = new this.privilegeRecordConstructor({
         id : 'new_item',
@@ -668,6 +671,10 @@ Ext.extend(Sonatype.repoServer.PrivilegeEditPanel, Ext.Panel, {
         });
       });
     }.defer(300, formPanel);
+    
+    var privTypeComp = formPanel.findById( 'privTypeId' ); 
+    
+    privTypeComp.setValue( privTypeComp.value );
   },
     
   deleteHandler : function(){
