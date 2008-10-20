@@ -906,6 +906,35 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
                 {
                   xtype: 'panel',
                   layout: 'fit',
+                  html: Sonatype.repoServer.resources.help.cronBriefHelp.text
+                },
+                {
+                  xtype: 'button',
+                  text: 'Show More Help >>',
+                  hideLabel: true,
+                  listeners: {
+                    click: {
+                      fn: function( target, event ) {
+                        var helpIndex = target.ownerCt.items.indexOf( target );
+                        var helpPanel = target.ownerCt.items.itemAt( helpIndex + 1 );
+                        if ( helpPanel.collapsed ) {
+                          helpPanel.expand( false );
+                          target.setText( "Hide Extra Help <<" );
+                        }
+                        else {
+                          helpPanel.collapse( false );
+                          target.setText( "Show More Help >>" );
+                        }
+                      },
+                      scope: this
+                    }
+                  }
+                },
+                {
+                  xtype: 'panel',
+                  collapsible: true,
+                  collapsed: true,
+                  layout: 'fit',
                   html: Sonatype.repoServer.resources.help.cronBigHelp.text
                 }                
               ]
