@@ -1,16 +1,12 @@
 package org.sonatype.nexus.integrationtests.nexus969;
 
-import java.io.IOException;
-
 import junit.framework.Assert;
 
 import org.junit.Test;
-import org.restlet.data.Method;
 import org.restlet.data.Status;
 import org.sonatype.appbooter.ForkedAppBooter;
 import org.sonatype.appbooter.ctl.AppBooterServiceException;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
-import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.rest.model.ScheduledServiceBaseResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceListResource;
@@ -57,15 +53,6 @@ public class Nexus969CacheEvictInteractionTest
 
     }
 
-    private void runClearCache()
-        throws IOException, InterruptedException
-    {
-        String uri = "service/local/data_cache/repositories/nexus-test-harness-repo/content";
-        Status status = RequestFacade.sendMessage( uri, Method.DELETE ).getStatus();
-        Assert.assertTrue( "Unable to run clear cache " + status.getDescription(), status.isSuccess() );
-        Thread.sleep( 1000 );
-    }
-
     private ScheduledServiceListResource createEvictTask( String taskName )
         throws Exception
     {
@@ -85,7 +72,7 @@ public class Nexus969CacheEvictInteractionTest
         scheduledTask.addProperty( repo );
 
         Status status = TaskScheduleUtil.create( scheduledTask );
-        Assert.assertTrue( "Unable to create task:" + scheduledTask.getTypeId(), status.isSuccess() );
+        Assert.assertTrue( "Unable to create task: " + status.getDescription(), status.isSuccess() );
 
         return TaskScheduleUtil.getTask( taskName );
     }
