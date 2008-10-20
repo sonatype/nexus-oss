@@ -78,7 +78,8 @@ public class UserListPlexusResource
 
             try
             {
-                getNexusSecurity( request ).createUser( user );
+                String password = resource.getPassword();
+                getNexusSecurity( request ).createUser( user, password );
 
                 result = new UserResourceResponse();
 

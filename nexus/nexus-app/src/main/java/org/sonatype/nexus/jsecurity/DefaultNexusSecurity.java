@@ -13,6 +13,7 @@ import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.StartingException;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.StoppingException;
+import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.jsecurity.model.CProperty;
 import org.sonatype.jsecurity.realms.tools.ConfigurationManager;
 import org.sonatype.jsecurity.realms.tools.InvalidConfigurationException;
@@ -122,17 +123,41 @@ public class DefaultNexusSecurity
     public void createUser( SecurityUser user )
         throws InvalidConfigurationException
     {
-        createUser( user, null );
+        createUser( user, null, null );
+    }
+    
+    public void createUser( SecurityUser user, String password )
+    throws InvalidConfigurationException
+    {
+        createUser( user, password, null );
     }
     
     public void createUser( SecurityUser user, ValidationContext context )
         throws InvalidConfigurationException
     {
-        String password = generatePassword( user );
+        createUser( user, null, context );
+    }
+    
+    public void createUser( SecurityUser user, String password, ValidationContext context )
+        throws InvalidConfigurationException
+    {
+        // if the password passed in is not null, hash it and use it, else, just generate one.
+        if( StringUtils.isEmpty( password ))
+        {
+            password = generatePassword( user );
+        }
+        else
+        {
+            user.setPassword( pwGenerator.hashPassword( password ) );
+        }
+        
         manager.createUser( user, context );
         emailer.sendNewUserCreated( user.getEmail(), user.getId(), password );
         save();
+        
     }
+
+
 
     public void deletePrivilege( String id )
         throws NoSuchPrivilegeException

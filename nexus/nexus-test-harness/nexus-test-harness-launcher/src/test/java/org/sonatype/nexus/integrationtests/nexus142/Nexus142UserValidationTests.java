@@ -56,6 +56,30 @@ public class Nexus142UserValidationTests
         
     }
     
+
+    @Test
+    public void updateUsersPasswordTest() throws IOException
+    {
+        
+        UserResource resource = new UserResource();
+
+        resource.setName( "updateUsersPasswordTest" );
+        resource.setUserId( "updateUsersPasswordTest" );
+        resource.setStatus( "active" );
+        resource.setEmail( "nexus@user.com" );
+        resource.addRole( "role1" );
+
+        resource = this.messageUtil.createUser( resource );
+
+        resource.setPassword( "SHOULD-FAIL" );
+        Response response = this.messageUtil.sendMessage( Method.PUT, resource );
+        
+        String responseText = response.getEntity().getText();
+        Assert.assertFalse( "Expected failure: Satus: "+ response.getStatus()+"\n Response Text:" + responseText, response.getStatus().isSuccess() );
+        Assert.assertTrue( "Error message: "+ responseText, responseText.startsWith( "{\"errors\":" ) );
+        
+    }
+    
     @Test
     public void createUserWithNoUserId() throws IOException
     {

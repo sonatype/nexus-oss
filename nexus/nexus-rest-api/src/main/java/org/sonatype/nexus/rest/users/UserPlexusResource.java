@@ -1,5 +1,6 @@
 package org.sonatype.nexus.rest.users;
 
+import org.codehaus.plexus.util.StringUtils;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
@@ -80,6 +81,12 @@ public class UserPlexusResource
         if ( resourceRequest != null )
         {
             UserResource resource = resourceRequest.getData();
+            
+            // the password can not be set on update, The only way to set a password is using the users_setpw resource
+            if( StringUtils.isNotEmpty( resource.getPassword() ) )
+            {
+                throw new PlexusResourceException(Status.CLIENT_ERROR_BAD_REQUEST, this.getNexusErrorResponse( "*", "Updating a users password using this URI is not allowed." ));
+            }
 
             try
             {

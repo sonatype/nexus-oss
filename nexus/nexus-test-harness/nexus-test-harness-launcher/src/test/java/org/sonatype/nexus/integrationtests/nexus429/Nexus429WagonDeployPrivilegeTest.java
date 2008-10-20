@@ -45,9 +45,7 @@ public class Nexus429WagonDeployPrivilegeTest
 
 //    @Test
     public void doReleaseArtifactTest()
-        throws IOException, ConnectionException, AuthenticationException, ResourceDoesNotExistException,
-        AuthorizationException, ComponentLookupException, TransferFailedException, InterruptedException,
-        CommandLineException, VerificationException
+        throws Exception
     {
         Gav gav =
             new Gav( this.getTestId(), "artifact", "1.0.0", null, "xml", 0, new Date().getTime(), "", false, false,
@@ -58,9 +56,7 @@ public class Nexus429WagonDeployPrivilegeTest
 
     @Test
     public void doSnapshotArtifactTest()
-        throws IOException, ConnectionException, AuthenticationException, ResourceDoesNotExistException,
-        AuthorizationException, ComponentLookupException, TransferFailedException, InterruptedException,
-        CommandLineException, VerificationException
+        throws Exception
     {
         Gav gav =
             new Gav( this.getTestId(), "artifact", "1.0.0-SNAPSHOT", null, "xml", 0, new Date().getTime(), "", false,
@@ -71,9 +67,7 @@ public class Nexus429WagonDeployPrivilegeTest
 
     @Test
     public void doServicesReleaseArtifactTest()
-        throws IOException, ConnectionException, AuthenticationException, ResourceDoesNotExistException,
-        AuthorizationException, ComponentLookupException, TransferFailedException, InterruptedException,
-        CommandLineException, VerificationException
+        throws Exception
     {
         if ( !this.printKnownErrorButDoNotFail( this.getClass(), "doServicesReleaseArtifactTest" ) )
         {
@@ -87,9 +81,7 @@ public class Nexus429WagonDeployPrivilegeTest
 
     @Test
     public void doServicesSnapshotArtifactTest()
-        throws IOException, ConnectionException, AuthenticationException, ResourceDoesNotExistException,
-        AuthorizationException, ComponentLookupException, TransferFailedException, InterruptedException,
-        CommandLineException, VerificationException
+        throws Exception
     {
         if ( !this.printKnownErrorButDoNotFail( this.getClass(), "doServicesReleaseArtifactTest" ) )
         {
@@ -102,9 +94,7 @@ public class Nexus429WagonDeployPrivilegeTest
     }
 
     private void deployPrivWithWagon( Gav gav, String repoUrl )
-        throws IOException, ConnectionException, AuthenticationException, ResourceDoesNotExistException,
-        AuthorizationException, ComponentLookupException, TransferFailedException, InterruptedException,
-        CommandLineException, VerificationException
+        throws Exception
     {
         this.resetTestUserPrivs();
 
