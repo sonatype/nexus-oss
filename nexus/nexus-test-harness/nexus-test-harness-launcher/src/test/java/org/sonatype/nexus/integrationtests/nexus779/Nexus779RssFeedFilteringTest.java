@@ -59,6 +59,7 @@ public class Nexus779RssFeedFilteringTest
         TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
         TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
 
+        Thread.sleep( 200 );
         // Should be able to see both test1 & test2 artifacts
         SyndFeed feed = FeedUtil.getFeed( "recentlyDeployed" );
         List<SyndEntry> entries = feed.getEntries();
