@@ -271,6 +271,15 @@ Sonatype.repoServer.referenceData = {
     status : "",
     roles : []
   },
+
+  userNew : {
+    userId : "",
+    name : "",
+    email : "",
+    status : "",
+    password : "",
+    roles : []
+  },
   
   roles : {
     id : "",

@@ -197,6 +197,33 @@ Sonatype.repoServer.UserEditPanel = function(config){
         width: this.COMBO_WIDTH
       },
       {
+        xtype: 'textfield',
+        fieldLabel: 'New Password (optional)',
+        inputType: 'password',
+        labelStyle: 'margin-left: 15px; width: 185px;',
+        helpText: ht.password,
+        name: 'password',
+        allowBlank: true,
+        width: this.COMBO_WIDTH
+      },
+      {
+        xtype: 'textfield',
+        fieldLabel: 'Confirm Password',
+        inputType: 'password',
+        labelStyle: 'margin-left: 15px; width: 185px;',
+        helpText: ht.reenterPassword,
+        name: 'confirmPassword',
+        allowBlank: true,
+        width: this.COMBO_WIDTH,
+        validator: function( s ) {
+          var firstField = this.ownerCt.find( 'name', 'password' )[0];
+          if ( firstField && firstField.getRawValue() != s ) {
+            return "Passwords don't match";
+          }
+          return true;
+        }
+      },
+      {
         xtype: 'panel',
         id: '_roles_tree_panel',
         layout: 'column',
@@ -360,7 +387,7 @@ Sonatype.repoServer.UserEditPanel = function(config){
         icon: Sonatype.config.resourcePath + '/images/icons/delete.png',
         cls: 'x-btn-text-icon',
         scope:this,
-        handler: this.deleteHandler,
+        handler: this.deleteToolbarHandler,
         disabled: !this.sp.checkPermission(Sonatype.user.curr.repoServer.configUsers, this.sp.DELETE)
       }
     ],
@@ -456,6 +483,7 @@ Ext.extend(Sonatype.repoServer.UserEditPanel, Ext.Panel, {
     
     if (allValid) {
       var isNew = formInfoObj.isNew;
+      var password = formInfoObj.formPanel.form.getValues().password;
     
       formInfoObj.formPanel.form.doAction('sonatypeSubmit', {
         method: (isNew) ? 'POST' : 'PUT',
@@ -463,7 +491,7 @@ Ext.extend(Sonatype.repoServer.UserEditPanel, Ext.Panel, {
         waitMsg: isNew ? 'Creating User...' : 'Updating User...',
         fpanel: formInfoObj.formPanel,
         dataModifiers: this.submitDataModFunc,
-        serviceDataObj : Sonatype.repoServer.referenceData.users,
+        serviceDataObj : (isNew && password) ? Sonatype.repoServer.referenceData.userNew : Sonatype.repoServer.referenceData.users,
         isNew : isNew //extra option to send to callback, instead of conditioning on method
       });
     }
@@ -710,6 +738,12 @@ Ext.extend(Sonatype.repoServer.UserEditPanel, Ext.Panel, {
     }
   },
   
+  deleteToolbarHandler : function(){
+    if (this.ctxRecord || this.usersGridPanel.getSelectionModel().hasSelection()){
+      this.deleteHandler( this.ctxRecord ? this.ctxRecord : this.usersGridPanel.getSelectionModel().getSelected() );
+    }
+  },
+  
   deleteHandler : function( rec ){
     if(rec.data.resourceURI == 'new'){
       this.cancelHandler({
@@ -840,6 +874,15 @@ Ext.extend(Sonatype.repoServer.UserEditPanel, Ext.Panel, {
         
         //cancel button event handler
         action.options.fpanel.buttons[1].on('click', this.cancelHandler.createDelegate(this, [buttonInfoObj]));
+        
+        var passwordField = action.options.fpanel.find( 'name', 'password' )[0];
+        if ( passwordField ) {
+          action.options.fpanel.remove( passwordField );
+        }
+        var passwordField2 = action.options.fpanel.find( 'name', 'confirmPassword' )[0];
+        if ( passwordField2 ) {
+          action.options.fpanel.remove( passwordField2 );
+        }
       }
       else {
         var i = this.usersDataStore.indexOfId(action.options.fpanel.id);
@@ -908,8 +951,10 @@ Ext.extend(Sonatype.repoServer.UserEditPanel, Ext.Panel, {
 	    //assumption: new route forms already exist in formCards, so they won't get into this case
 	    if(!formPanel){ //create form and populate current data
 	      var config = Ext.apply({}, this.formConfig, {id:id});
+	      config.items = config.items.slice( 0 ); // copy the array
 	      
 	      config = this.initializeTreeRoots(id, config);
+	      config.items.splice( 4, 2 ); // remove the confirm password fields
 	      
 	      formPanel = new Ext.FormPanel(config);
 	      formPanel.form.on('actioncomplete', this.actionCompleteHandler, this);
@@ -999,11 +1044,11 @@ Ext.extend(Sonatype.repoServer.UserEditPanel, Ext.Panel, {
     //@note: there has to be a better way to do this.  Depending on offsets is very error prone
     var newConfig = config;
 
-    newConfig.items[4].id = id + '_roles_tree_panel';
-    newConfig.items[4].items[0].root = new Ext.tree.TreeNode({text: 'root'});
-    newConfig.items[4].items[0].id = id + '_roles_tree';
-    newConfig.items[4].items[2].root = new Ext.tree.TreeNode({text: 'root'});
-    newConfig.items[4].items[2].id = id + '_all_roles_tree';
+    newConfig.items[6].id = id + '_roles_tree_panel';
+    newConfig.items[6].items[0].root = new Ext.tree.TreeNode({text: 'root'});
+    newConfig.items[6].items[0].id = id + '_roles_tree';
+    newConfig.items[6].items[2].root = new Ext.tree.TreeNode({text: 'root'});
+    newConfig.items[6].items[2].id = id + '_all_roles_tree';
 
     return newConfig;
   },
