@@ -26,11 +26,13 @@ import edu.emory.mathcs.backport.java.util.Collections;
 public class Nexus779RssFeedFilteringTest
     extends AbstractPrivilegeTest
 {
+    private static final String RECENTLY_DEPLOYED = "recentlyDeployed";
+
     public Nexus779RssFeedFilteringTest()
     {
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings( "unchecked" )
     @Test
     public void filteredFeeds()
         throws Exception
@@ -38,8 +40,10 @@ public class Nexus779RssFeedFilteringTest
         TestContainer.getInstance().getTestContext().useAdminForRequests();
 
         // First create the targets
-        RepositoryTargetResource test1Target = createTarget( "filterTarget1", Collections.singletonList( ".*/test1/.*" ) );
-        RepositoryTargetResource test2Target = createTarget( "filterTarget2", Collections.singletonList( ".*/test2/.*" ) );
+        RepositoryTargetResource test1Target =
+            createTarget( "filterTarget1", Collections.singletonList( ".*/test1/.*" ) );
+        RepositoryTargetResource test2Target =
+            createTarget( "filterTarget2", Collections.singletonList( ".*/test2/.*" ) );
 
         // Then create the privileges
         PrivilegeTargetStatusResource priv1 = createPrivilege( "filterPriv1", test1Target.getId() );
@@ -59,15 +63,12 @@ public class Nexus779RssFeedFilteringTest
         TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
         TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
 
-        Thread.sleep( 200 );
         // Should be able to see both test1 & test2 artifacts
-        SyndFeed feed = FeedUtil.getFeed( "recentlyDeployed" );
-        List<SyndEntry> entries = feed.getEntries();
+        Assert.assertTrue( "Feed should contain entry for nexus779:test1:1.0.0.\nEntries: "
+        /* + this.entriesToString( entries ) */, feedListContainsArtifact( "nexus779", "test1", "1.0.0" ) );
 
-        Assert.assertTrue("Feed should contain entry for nexus779:test1:1.0.0.\nEntries: "+ this.entriesToString(entries), feedListContainsArtifact( entries, "nexus779", "test1", "1.0.0" ) );
-
-        Assert.assertTrue("Feed should contain entry for nexus779:test2:1.0.0\nEntries: "+ this.entriesToString(entries), feedListContainsArtifact( entries, "nexus779", "test2", "1.0.0" ) );
-
+        Assert.assertTrue( "Feed should contain entry for nexus779:test2:1.0.0\nEntries: "
+        /* + this.entriesToString( entries ) */, feedListContainsArtifact( "nexus779", "test2", "1.0.0" ) );
 
         // Now update the test user so that the user can only access test1
         updateUserRole( TEST_USER_NAME, Collections.singletonList( role1.getId() ) );
@@ -76,32 +77,28 @@ public class Nexus779RssFeedFilteringTest
         TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
 
         // Should be able to see only test1 artifacts
-        feed = FeedUtil.getFeed( "recentlyDeployed" );
-        entries = feed.getEntries();
+        Assert.assertTrue( "Feed should contain entry for nexus779:test1:1.0.0.\nEntries: "
+        /* + this.entriesToString( entries ) */, feedListContainsArtifact( "nexus779", "test1", "1.0.0" ) );
 
-        Assert.assertTrue("Feed should contain entry for nexus779:test1:1.0.0.\nEntries: "+ this.entriesToString(entries), feedListContainsArtifact( entries, "nexus779", "test1", "1.0.0" ) );
-
-        Assert.assertFalse( "Feed should not contain entry for nexus779:test2:1.0.0\nEntries: "+ this.entriesToString(entries), feedListContainsArtifact( entries, "nexus779", "test2", "1.0.0" ) );
-
+        Assert.assertFalse( "Feed should not contain entry for nexus779:test2:1.0.0\nEntries: "
+        /* + this.entriesToString( entries ) */, feedListContainsArtifact( "nexus779", "test2", "1.0.0" ) );
 
         // Now update the test user so that the user can only access test2
         updateUserRole( TEST_USER_NAME, Collections.singletonList( role2.getId() ) );
-
 
         TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
         TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
 
         // Should be able to see only test2 artifacts
-        feed = FeedUtil.getFeed( "recentlyDeployed" );
-        entries = feed.getEntries();
+        Assert.assertFalse( "Feed should not contain entry for nexus779:test1:1.0.0.\nEntries: "
+        /* + this.entriesToString( entries ) */, feedListContainsArtifact( "nexus779", "test1", "1.0.0" ) );
 
-        Assert.assertFalse("Feed should not contain entry for nexus779:test1:1.0.0.\nEntries: "+ this.entriesToString(entries), feedListContainsArtifact( entries, "nexus779", "test1", "1.0.0" ) );
-
-        Assert.assertTrue( "Feed should contain entry for nexus779:test2:1.0.0\nEntries: "+ this.entriesToString(entries), feedListContainsArtifact( entries, "nexus779", "test2", "1.0.0" ) );
+        Assert.assertTrue( "Feed should contain entry for nexus779:test2:1.0.0\nEntries: "
+        /* + this.entriesToString( entries ) */, feedListContainsArtifact( "nexus779", "test2", "1.0.0" ) );
 
     }
 
-    private String entriesToString(List<SyndEntry> entries)
+    private String entriesToString( List<SyndEntry> entries )
     {
         StringBuffer buffer = new StringBuffer();
 
@@ -113,16 +110,23 @@ public class Nexus779RssFeedFilteringTest
         return buffer.toString();
     }
 
-    private boolean feedListContainsArtifact( List<SyndEntry> entries, String groupId, String artifactId, String version )
+    private boolean feedListContainsArtifact( String groupId, String artifactId, String version )
+        throws Exception
     {
-        for ( SyndEntry entry : entries )
+        for ( int i = 0; i < 10; i++ )
         {
-            if ( entry.getTitle().contains( groupId )
-                && entry.getTitle().contains( artifactId )
-                && entry.getTitle().contains( version ) )
+            SyndFeed feed = FeedUtil.getFeed( RECENTLY_DEPLOYED );
+            List<SyndEntry> entries = feed.getEntries();
+
+            for ( SyndEntry entry : entries )
             {
-                return true;
+                if ( entry.getTitle().contains( groupId ) && entry.getTitle().contains( artifactId )
+                    && entry.getTitle().contains( version ) )
+                {
+                    return true;
+                }
             }
+            Thread.sleep( 200 );
         }
         return false;
     }
@@ -151,7 +155,7 @@ public class Nexus779RssFeedFilteringTest
         resource.setRepositoryTargetId( targetId );
         resource.addMethod( "read" );
 
-        return ( PrivilegeTargetStatusResource ) privUtil.createPrivileges( resource ).iterator().next();
+        return (PrivilegeTargetStatusResource) privUtil.createPrivileges( resource ).iterator().next();
     }
 
     private RoleResource createRole( String name, List<String> privilegeIds )
