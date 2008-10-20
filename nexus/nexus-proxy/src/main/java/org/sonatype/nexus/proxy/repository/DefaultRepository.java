@@ -85,7 +85,9 @@ public abstract class DefaultRepository
             try
             {
                 localItem = getLocalStorage().retrieveItem( uid );
+                
                 localItem.getItemContext().putAll( context );
+                
                 if ( getLogger().isDebugEnabled() )
                 {
                     getLogger().debug( "Item " + uid.toString() + " found in local storage." );
