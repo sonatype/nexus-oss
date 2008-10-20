@@ -31,6 +31,7 @@ import org.apache.lucene.index.Term;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.StringUtils;
 import org.restlet.Context;
 import org.restlet.data.Request;
@@ -64,9 +65,7 @@ public class RepositoryIndexContentPlexusResource
 {
     public static final String REPOSITORY_ID_KEY = "repositoryId";
 
-    /**
-     * @plexus.requirement
-     */
+    @Requirement
     private IndexerManager indexerManager;
 
     @Override
