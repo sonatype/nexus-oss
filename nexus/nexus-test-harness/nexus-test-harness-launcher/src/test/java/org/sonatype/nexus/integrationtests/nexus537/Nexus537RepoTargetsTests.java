@@ -12,6 +12,8 @@ import java.util.List;
 import junit.framework.Assert;
 
 import org.apache.commons.httpclient.HttpException;
+import org.apache.maven.it.VerificationException;
+import org.apache.maven.it.Verifier;
 import org.apache.maven.wagon.ConnectionException;
 import org.apache.maven.wagon.ResourceDoesNotExistException;
 import org.apache.maven.wagon.TransferFailedException;
@@ -168,16 +170,17 @@ public class Nexus537RepoTargetsTests
         TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
         TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
 
-        // we should not be able to hit any of the repos directly
+        // try the groups
         this.groupDownload( repo1BarArtifact, false );
         this.groupDownload( repo2BarArtifact, false );
         this.groupDownload( repo2FooArtifact, true );
         this.groupDownload( repo1FooArtifact, true );
         
+        
         this.download( REPO1_ID, repo1BarArtifact, false );
         this.download( REPO2_ID, repo2BarArtifact, false );
-//        this.download( REPO2_ID, repo2FooArtifact, false );// FIXME: fix
-//        this.download( REPO1_ID, repo1FooArtifact, false );// FIXME: fix
+        this.download( REPO2_ID, repo2FooArtifact, true ); // this repo is included in a group we have access to
+        this.download( REPO1_ID, repo1FooArtifact, true );
         
     }
 
@@ -196,7 +199,7 @@ public class Nexus537RepoTargetsTests
         this.deploy( repo1FooArtifact, REPO2_ID, this.getTestFile( "repo2-foo-artifact.jar" ), false );
 
         // now give
-        this.overwriteUserRole( TEST_USER_NAME, "fooPrivUpdateId", this.fooPrivUpdateId );
+        this.overwriteUserRole( TEST_USER_NAME, "fooPrivUpdateId", this.fooPrivUpdateId, this.fooPrivCreateId );
 
         TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
         TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
@@ -207,7 +210,7 @@ public class Nexus537RepoTargetsTests
         this.deploy( repo1FooArtifact, REPO2_ID, this.getTestFile( "repo2-foo-artifact.jar" ), false );
 
         // now give
-        this.overwriteUserRole( TEST_USER_NAME, "barPrivUpdateId", this.barPrivUpdateId );
+        this.overwriteUserRole( TEST_USER_NAME, "barPrivUpdateId", this.barPrivUpdateId, this.barPrivCreateId );
 
         TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
         TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
@@ -224,9 +227,9 @@ public class Nexus537RepoTargetsTests
         TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
 
         this.deploy( repo1BarArtifact, REPO1_ID, this.getTestFile( "repo1-bar-artifact.jar" ), false );
-        this.deploy( repo1FooArtifact, REPO1_ID, this.getTestFile( "repo1-foo-artifact.jar" ), false );
+        this.deploy( repo1FooArtifact, REPO1_ID, this.getTestFile( "repo1-foo-artifact.jar" ), true ); // group contains this repo
         this.deploy( repo2BarArtifact, REPO2_ID, this.getTestFile( "repo2-bar-artifact.jar" ), false );
-        this.deploy( repo1FooArtifact, REPO2_ID, this.getTestFile( "repo2-foo-artifact.jar" ), false );
+        this.deploy( repo1FooArtifact, REPO1_ID, this.getTestFile( "repo2-foo-artifact.jar" ), true ); // group contains this repo
 
     }
      
@@ -243,7 +246,7 @@ public class Nexus537RepoTargetsTests
          this.upload( repo1FooArtifact, REPO2_ID, this.getTestFile( "repo2-foo-artifact.jar" ), false );
 
          // now give
-         this.overwriteUserRole( TEST_USER_NAME, "fooPrivUpdateId", this.fooPrivUpdateId );
+         this.overwriteUserRole( TEST_USER_NAME, "fooPrivUpdateId", this.fooPrivUpdateId, this.fooPrivCreateId, "65" ); // 65 is upload priv
 
          TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
          TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
@@ -254,7 +257,7 @@ public class Nexus537RepoTargetsTests
          this.upload( repo1FooArtifact, REPO2_ID, this.getTestFile( "repo2-foo-artifact.jar" ), false );
 
          // now give
-         this.overwriteUserRole( TEST_USER_NAME, "barPrivUpdateId", this.barPrivUpdateId );
+         this.overwriteUserRole( TEST_USER_NAME, "barPrivUpdateId", this.barPrivUpdateId, this.barPrivCreateId, "65" );
 
          TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
          TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
@@ -265,15 +268,15 @@ public class Nexus537RepoTargetsTests
          this.upload( repo1FooArtifact, REPO2_ID, this.getTestFile( "repo2-foo-artifact.jar" ), false );
 
          // now give
-         this.overwriteUserRole( TEST_USER_NAME, "groupFooPrivUpdateId", this.groupFooPrivUpdateId );
+         this.overwriteUserRole( TEST_USER_NAME, "groupFooPrivUpdateId", this.groupFooPrivUpdateId, "65" );
 
          TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
          TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
 
          this.upload( repo1BarArtifact, REPO1_ID, this.getTestFile( "repo1-bar-artifact.jar" ), false );
-         this.upload( repo1FooArtifact, REPO1_ID, this.getTestFile( "repo1-foo-artifact.jar" ), false );
+         this.upload( repo1FooArtifact, REPO1_ID, this.getTestFile( "repo1-foo-artifact.jar" ), true );
          this.upload( repo2BarArtifact, REPO2_ID, this.getTestFile( "repo2-bar-artifact.jar" ), false );
-         this.upload( repo1FooArtifact, REPO2_ID, this.getTestFile( "repo2-foo-artifact.jar" ), false );
+         this.upload( repo1FooArtifact, REPO2_ID, this.getTestFile( "repo2-foo-artifact.jar" ), true );
      }
 
     @Test
@@ -347,17 +350,20 @@ public class Nexus537RepoTargetsTests
         try
         {
             
-            DeployUtils.deployWithWagon( this.getContainer(), "http",  this.getRepositoryUrl( repoId ), fileToDeploy, this.getRelitiveArtifactPath( gav ) );
-//            MavenDeployer.deploy( gav, this.getRepositoryUrl( repoId ), fileToDeploy,
-//                                  this.getOverridableFile( "settings.xml" ) );
+//            DeployUtils.forkDeployWithWagon( this.getContainer(), "http",  this.getRepositoryUrl( repoId ), fileToDeploy, this.getRelitiveArtifactPath( gav ) );
+            Verifier verifier = MavenDeployer.deployAndGetVerifier( gav, this.getRepositoryUrl( repoId ), fileToDeploy,
+                                  this.getOverridableFile( "settings.xml" ) );
+            
             Assert.assertTrue( "Artifact upload should have thrown exception", shouldUpload );
-            // if we made it this far we should also test download, because upload implies download
-            this.download( repoId, gav, shouldUpload );
         }
-        catch ( CommandLineException e )
+        catch ( VerificationException e )
         {
             Assert.assertFalse( "Artifact should have uploaded: \n" + e.getMessage(), shouldUpload );
         }
+            
+            // if we made it this far we should also test download, because upload implies download
+            this.download( repoId, gav, shouldUpload );
+
     }
     
     private void upload( Gav gav, String repoId, File fileToDeploy, boolean shouldUpload )

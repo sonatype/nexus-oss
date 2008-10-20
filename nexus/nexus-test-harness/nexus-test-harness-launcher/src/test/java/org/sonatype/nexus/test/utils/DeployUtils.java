@@ -40,24 +40,23 @@ public class DeployUtils
         throws ComponentLookupException, ConnectionException, AuthenticationException, TransferFailedException,
         ResourceDoesNotExistException, AuthorizationException, InterruptedException, CommandLineException
     {
-        // must fork due to bug: http://forums.sun.com/thread.jspa?threadID=567697&messageID=2805259
         new WagonDeployer( wagonHint, TestContainer.getInstance().getTestContext().getUsername(),
                            TestContainer.getInstance().getTestContext().getPassword(), repositoryUrl, fileToDeploy,
                            artifactPath ).deploy();
 
     }
     
-//    public static void forkDeployWithWagon( PlexusContainer container, String wagonHint, String repositoryUrl,
-//                                        File fileToDeploy, String artifactPath )
-//        throws ComponentLookupException, ConnectionException, AuthenticationException, TransferFailedException,
-//        ResourceDoesNotExistException, AuthorizationException, InterruptedException, CommandLineException
-//    {
-//        // must fork due to bug: http://forums.sun.com/thread.jspa?threadID=567697&messageID=2805259
-//        new WagonDeployer( wagonHint, TestContainer.getInstance().getTestContext().getUsername(),
-//                           TestContainer.getInstance().getTestContext().getPassword(), repositoryUrl, fileToDeploy,
-//                           artifactPath ).forkDeploy(container);
-//
-//    }
+    public static void forkDeployWithWagon( PlexusContainer container, String wagonHint, String repositoryUrl,
+                                        File fileToDeploy, String artifactPath )
+        throws ComponentLookupException, ConnectionException, AuthenticationException, TransferFailedException,
+        ResourceDoesNotExistException, AuthorizationException, InterruptedException, CommandLineException
+    {
+        // must fork due to bug: http://forums.sun.com/thread.jspa?threadID=567697&messageID=2805259
+        new WagonDeployer( wagonHint, TestContainer.getInstance().getTestContext().getUsername(),
+                           TestContainer.getInstance().getTestContext().getPassword(), repositoryUrl, fileToDeploy,
+                           artifactPath ).forkDeploy(container);
+
+    }
 
     public static int deployUsingGavWithRest( String repositoryId, Gav gav, File fileToDeploy )
         throws HttpException, IOException
