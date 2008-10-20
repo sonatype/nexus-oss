@@ -326,7 +326,7 @@ Sonatype.repoServer.RepoMaintPanel = function(config){
   );
   this.browseIndexMenuItem = new Ext.menu.CheckItem(
     {
-      text: 'Browse remote index',
+      text: 'Browse index',
       value: 1,
       checked: false,
       group:'browse-group',
@@ -563,6 +563,8 @@ Ext.extend(Sonatype.repoServer.RepoMaintPanel, Sonatype.repoServer.AbstractRepoP
       }
     }
 
+    if ( ! menu.items.first() ) return;
+
     menu.on('hide', this.onBrowseContextHideHandler, this);
     e.stopEvent();
     menu.showAt(e.getXY());
@@ -575,7 +577,7 @@ Ext.extend(Sonatype.repoServer.RepoMaintPanel, Sonatype.repoServer.AbstractRepoP
   },
   
   //for downloading artifacts from the browse view
-  downloadHandler : function( button, event ){
+  downloadHandler : function( item, button, event ){
     event.stopEvent();
     if(this.ctxBrowseNode){
       window.open(this.restToContentUrl(this.ctxBrowseNode.id));
@@ -583,7 +585,7 @@ Ext.extend(Sonatype.repoServer.RepoMaintPanel, Sonatype.repoServer.AbstractRepoP
   },
   
   //for downloading artifacts from the browse view of the remote repository
-  downloadFromRemoteHandler : function( button, event ){
+  downloadFromRemoteHandler : function( item, button, event ){
     event.stopEvent();
     if(this.ctxBrowseNode){
       var rec = (this.ctxRecord) ? this.ctxRecord : this.reposGridPanel.getSelectionModel().getSelected();      
@@ -662,7 +664,8 @@ Ext.extend(Sonatype.repoServer.RepoMaintPanel, Sonatype.repoServer.AbstractRepoP
   
   //rec is grid store record
   viewRepo : function(rec){
-    if ( rec.get('repoType') == 'proxy' ) {
+    var repoType = rec.get('repoType'); 
+    if ( repoType == 'proxy' || repoType == 'hosted' ) {
       this.browseSelector.enable();
     }
     else {

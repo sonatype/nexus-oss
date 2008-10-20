@@ -185,7 +185,7 @@ Ext.extend( Sonatype.menu.Menu, Ext.menu.Menu, {
     var param = c.payload ? c.payload : this.payload;
     if ( c.handler && param ) {
       // create a delegate to pass the payload object to the handler
-      item.setHandler( c.handler.createDelegate( c.scope ? c.scope : this.scope, [param] ) );
+      item.setHandler( c.handler.createDelegate( c.scope ? c.scope : this.scope, [param], 0 ) );
     }
     return item;
   }

@@ -47,6 +47,8 @@ import org.sonatype.nexus.index.NexusIndexer;
 import org.sonatype.nexus.index.context.IndexContextInInconsistentStateException;
 import org.sonatype.nexus.index.context.IndexingContext;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
+import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.proxy.repository.RepositoryType;
 import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
 import org.sonatype.nexus.rest.model.ContentListResource;
 import org.sonatype.nexus.rest.model.ContentListResourceResponse;
@@ -100,9 +102,29 @@ public class RepositoryIndexContentPlexusResource
         String repositoryId = String.valueOf( request.getAttributes().get( REPOSITORY_ID_KEY ) );
         try
         {
-            IndexingContext indexingContext = indexerManager.getRepositoryRemoteIndexContext( repositoryId );
+            IndexingContext indexingContext = null; 
 
-            return createResponse( request, indexingContext );
+            Repository repository = getNexusInstance( request ).getRepository( repositoryId );
+            RepositoryType repositoryType = repository.getRepositoryType();
+
+            if ( RepositoryType.HOSTED.equals( repositoryType ) ) {
+                indexingContext = indexerManager.getRepositoryLocalIndexContext( repositoryId );
+            }
+            else if ( RepositoryType.PROXY.equals( repositoryType ) ) {
+                indexingContext = indexerManager.getRepositoryRemoteIndexContext( repositoryId );
+            }
+            else {
+                throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND );
+            }
+
+            ContentListResourceResponse resourceResponse =
+                createResponse( request, indexingContext );
+            
+            if ( resourceResponse.getData().size() == 0 ) {
+                response.setStatus( Status.CLIENT_ERROR_NOT_FOUND );
+            }
+
+            return resourceResponse;
         }
         catch ( NoSuchRepositoryException e )
         {
@@ -110,7 +132,7 @@ public class RepositoryIndexContentPlexusResource
         }
     }
 
-    protected Object createResponse( Request request, IndexingContext indexingContext )
+    protected ContentListResourceResponse createResponse( Request request, IndexingContext indexingContext )
         throws ResourceException
     {
         NexusIndexer indexer = indexerManager.getNexusIndexer();
@@ -126,7 +148,9 @@ public class RepositoryIndexContentPlexusResource
                 Set<String> rootGroups = indexer.getRootGroups( indexingContext );
                 for ( String group : rootGroups )
                 {
-                    response.addData( createGroupResource( request, path, group ) );
+                    if ( group.length() > 0 ) {
+                        response.addData( createGroupResource( request, path, group ) );
+                    }
                 }
             }
             else
@@ -272,7 +296,7 @@ public class RepositoryIndexContentPlexusResource
                 {
                     group = group.substring( 0, nextDot );
                 }
-                if ( !result.contains( group ) )
+                if ( group.length() > 0 && ! result.contains( group ) )
                 {
                     result.add( group );
                 }
