@@ -7,10 +7,7 @@ import java.util.Set;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.context.Context;
-import org.codehaus.plexus.context.ContextException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.StartingException;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.StoppingException;
 import org.codehaus.plexus.util.StringUtils;
@@ -34,8 +31,7 @@ import org.sonatype.nexus.proxy.events.EventListener;
 @Component( role = NexusSecurity.class )
 public class DefaultNexusSecurity
     extends AbstractLogEnabled
-    implements NexusSecurity,
-        Contextualizable
+    implements NexusSecurity
 {
     @Requirement( role = ConfigurationManager.class, hint = "resourceMerging" )
     private ConfigurationManager manager;
@@ -54,12 +50,6 @@ public class DefaultNexusSecurity
 
     private List<EventListener> listeners = new ArrayList<EventListener>();
     
-    public void contextualize( Context context )
-        throws ContextException
-    {
-        context.put( "static-security-resource", "META-INF/nexus/static-security.xml" );
-    }
-
     public void startService()
         throws StartingException
     {
