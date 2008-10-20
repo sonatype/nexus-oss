@@ -30,8 +30,10 @@ public class Nexus779RssFeedFilteringTest
 
     private List<SyndEntry> entries;
 
-    public Nexus779RssFeedFilteringTest()
+    public Nexus779RssFeedFilteringTest() throws Exception
     {
+        //Must be sure to run this tests after deploy
+        Thread.sleep( 2000 );
     }
 
     @SuppressWarnings( "unchecked" )
