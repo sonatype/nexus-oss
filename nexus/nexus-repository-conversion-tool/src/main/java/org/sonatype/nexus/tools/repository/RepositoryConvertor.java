@@ -22,6 +22,7 @@
 package org.sonatype.nexus.tools.repository;
 
 import java.io.File;
+import java.io.IOException;
 
 /**
  * Convert a repository mixed with release and snapshot versions to two, one with release versions and the other with
@@ -36,7 +37,9 @@ public interface RepositoryConvertor
 
     String SUFFIX_SNAPSHOTS = "-snapshots";
 
-    void convertRepositoryWithCopy( File repository, File targetPath );
+    void convertRepositoryWithCopy( File repository, File targetPath )
+        throws IOException;
 
-    void convertRepositoryWithMove( File repository, File targetPath );
+    void convertRepositoryWithMove( File repository, File targetPath )
+        throws IOException;
 }

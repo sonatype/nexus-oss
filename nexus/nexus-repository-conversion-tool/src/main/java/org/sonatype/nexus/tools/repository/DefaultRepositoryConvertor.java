@@ -24,14 +24,19 @@ package org.sonatype.nexus.tools.repository;
 import java.io.File;
 import java.io.IOException;
 
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
+
 /**
  * @author Juven Xu
  */
+@Component( role = RepositoryConvertor.class )
 public class DefaultRepositoryConvertor
     implements RepositoryConvertor
 {
 
-    private DefaultRepositoryConvertorFileHelper fileHelper = new DefaultRepositoryConvertorFileHelper();
+    @Requirement
+    private RepositoryConvertorFileHelper repositoryConvertorFileHelper;
 
     /**
      * when traverse a folder, if this mark is true, then go back to the parent folder
@@ -45,6 +50,7 @@ public class DefaultRepositoryConvertor
     private File snapshotRepository;
 
     public void convertRepositoryWithCopy( File repository, File targetPath )
+        throws IOException
     {
         setUp( repository, targetPath );
 
@@ -52,6 +58,7 @@ public class DefaultRepositoryConvertor
     }
 
     public void convertRepositoryWithMove( File repository, File targetPath )
+        throws IOException
     {
         setUp( repository, targetPath );
 
@@ -72,24 +79,19 @@ public class DefaultRepositoryConvertor
     }
 
     private void convert( File file, boolean isMove )
+        throws IOException
     {
         if ( isRepositoryLeaf( file ) )
         {
-            try
+            if ( isMove )
             {
-                if ( isMove )
-                {
-                    moveToTargetRepository( file.getParentFile() );
-                }
-                else
-                {
-                    copyToTargetRepository( file.getParentFile() );
-                }
+                moveToTargetRepository( file.getParentFile() );
             }
-            catch ( IOException e )
+            else
             {
-                e.printStackTrace();
+                copyToTargetRepository( file.getParentFile() );
             }
+
             // since the whole folder containing this file is already moved
             // don't need to look the other files in this folder
             breakToParent = true;
@@ -109,8 +111,8 @@ public class DefaultRepositoryConvertor
             breakToParent = false;
 
         }
-        
-        if (isMove)
+
+        if ( isMove )
         {
             file.delete();
         }
@@ -126,7 +128,7 @@ public class DefaultRepositoryConvertor
         throws IOException
     {
 
-        fileHelper.copy( versionFolder, getTargetRepository( versionFolder ), getCoordinatePath( versionFolder ) );
+        repositoryConvertorFileHelper.copy( versionFolder, getTargetRepository( versionFolder ), getCoordinatePath( versionFolder ) );
     }
 
     /**
@@ -138,7 +140,7 @@ public class DefaultRepositoryConvertor
     private void moveToTargetRepository( File versionFolder )
         throws IOException
     {
-        fileHelper.move( versionFolder, getTargetRepository( versionFolder ), getCoordinatePath( versionFolder ) );
+        repositoryConvertorFileHelper.move( versionFolder, getTargetRepository( versionFolder ), getCoordinatePath( versionFolder ) );
     }
 
     private boolean isSnapshot( String version )

@@ -26,11 +26,13 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
+import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.util.IOUtil;
 
 /**
  * @author Juven Xu
  */
+@Component( role = RepositoryConvertorFileHelper.class )
 public class DefaultRepositoryConvertorFileHelper
     implements RepositoryConvertorFileHelper
 {

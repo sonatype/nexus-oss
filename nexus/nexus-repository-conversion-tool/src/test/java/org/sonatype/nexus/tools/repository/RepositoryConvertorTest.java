@@ -23,13 +23,13 @@ package org.sonatype.nexus.tools.repository;
 
 import java.io.File;
 
-import junit.framework.TestCase;
+import org.codehaus.plexus.PlexusTestCase;
 
 /**
  * @author Juven Xu
  */
 public class RepositoryConvertorTest
-    extends TestCase
+    extends PlexusTestCase
 {
     private RepositoryConvertor convertor;
 
@@ -39,9 +39,9 @@ public class RepositoryConvertorTest
 
     private File copyTargetPath = new File( "target/convert-output-copy" );
 
-    public void setUp()
+    public void setUp() throws Exception
     {
-        convertor = new DefaultRepositoryConvertor();
+        convertor = (RepositoryConvertor) this.lookup( RepositoryConvertor.class );
 
         if ( copyTargetPath.exists() )
         {
