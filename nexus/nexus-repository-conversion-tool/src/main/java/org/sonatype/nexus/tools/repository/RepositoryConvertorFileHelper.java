@@ -22,21 +22,34 @@
 package org.sonatype.nexus.tools.repository;
 
 import java.io.File;
+import java.io.IOException;
 
 /**
- * Convert a repository mixed with release and snapshot versions to two, one with release versions and the other with
- * snapshot version.</br> For example, a repository named 'third-party' will be converted to 'third-party-releases' and
- * 'third-party-snapshots'.
  * 
  * @author Juven Xu
+ *
  */
-public interface RepositoryConvertor
+public interface RepositoryConvertorFileHelper
 {
-    String SUFFIX_RELEASES = "-releases";
+    /**
+     * move a file or folder to the target location, based on the basePath
+     * 
+     * @param file The file or folder to be moved
+     * @param target The target repository
+     * @param basePath The path based on which to run the moving.
+     * @throws IOException
+     */
+    void move( File file, File target, String basePath )
+        throws IOException;
 
-    String SUFFIX_SNAPSHOTS = "-snapshots";
-
-    void convertRepositoryWithCopy( File repository, File targetPath );
-
-    void convertRepositoryWithMove( File repository, File targetPath );
+    /**
+     * copy a file or folder to the target location, based on the basePath
+     * 
+     * @param file The file or folder to be moved
+     * @param target The target repository
+     * @param basePath The path based on which to run the moving.
+     * @throws IOException
+     */
+    void copy( File file, File target, String basePath )
+        throws IOException;
 }

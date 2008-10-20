@@ -33,52 +33,101 @@ public class RepositoryConvertorTest
 {
     private RepositoryConvertor convertor;
 
+    private File repository = new File( "src/test/resources/local-test-repo" );
+
+    private File moveTargetPath = new File( "target/convert-output-move" );
+
+    private File copyTargetPath = new File( "target/convert-output-copy" );
+
     public void setUp()
     {
         convertor = new DefaultRepositoryConvertor();
+
+        if ( copyTargetPath.exists() )
+        {
+            deleteFile( copyTargetPath );
+        }
+
+        copyTargetPath.mkdir();
+
+        if ( moveTargetPath.exists() )
+        {
+            deleteFile( moveTargetPath );
+        }
+
+        moveTargetPath.mkdir();
     }
 
     public void testConvert()
         throws Exception
     {
-        File repository = new File( "src/test/resources/local-test-repo" );
 
-        File targetPath = new File( "target/convert-output" );
+        convertor.convertRepositoryWithCopy( repository, copyTargetPath );
 
-        if (targetPath.exists())
+        assertTargetRepositoryContent( copyTargetPath );
+
+    }
+
+    private void deleteFile( File file )
+    {
+        if ( file.isDirectory() )
         {
-            targetPath.delete();
+            for ( File subFile : file.listFiles() )
+            {
+                deleteFile( subFile );
+            }
         }
-        
-        targetPath.mkdir();
+        file.delete();
+    }
 
-        convertor.convertRepository( repository, targetPath );
-
+    private void assertTargetRepositoryContent( File targetPath )
+    {
         assertTrue( new File( targetPath, "local-test-repo-releases/org/apache/maven/plugins/maven-javadoc-plugin/2.5/" )
             .isDirectory() );
-        
+        assertTrue( new File( targetPath, "local-test-repo-releases/org/apache/maven/plugins/maven-javadoc-plugin/2.5/" )
+            .exists() );
+
         assertTrue( new File(
             targetPath,
             "local-test-repo-releases/org/apache/maven/plugins/maven-javadoc-plugin/2.5/maven-javadoc-plugin-2.5.jar" )
             .isFile() );
-        
+        assertTrue( new File(
+            targetPath,
+            "local-test-repo-releases/org/apache/maven/plugins/maven-javadoc-plugin/2.5/maven-javadoc-plugin-2.5.jar" )
+            .exists() );
+
         assertTrue( new File(
             targetPath,
             "local-test-repo-releases/org/apache/maven/plugins/maven-javadoc-plugin/2.5/maven-javadoc-plugin-2.5.pom" )
             .isFile() );
-        
+        assertTrue( new File(
+            targetPath,
+            "local-test-repo-releases/org/apache/maven/plugins/maven-javadoc-plugin/2.5/maven-javadoc-plugin-2.5.pom" )
+            .exists() );
+
         assertTrue( new File(
             targetPath,
             "local-test-repo-snapshots/org/apache/maven/plugins/maven-javadoc-plugin/2.5.1-SNAPSHOT/" ).isDirectory() );
+        assertTrue( new File(
+            targetPath,
+            "local-test-repo-snapshots/org/apache/maven/plugins/maven-javadoc-plugin/2.5.1-SNAPSHOT/" ).exists() );
 
         assertTrue( new File(
             targetPath,
             "local-test-repo-snapshots/org/apache/maven/plugins/maven-javadoc-plugin/2.5.1-SNAPSHOT/maven-javadoc-plugin-2.5.1-20081013.050423-737.jar" )
             .isFile() );
+        assertTrue( new File(
+            targetPath,
+            "local-test-repo-snapshots/org/apache/maven/plugins/maven-javadoc-plugin/2.5.1-SNAPSHOT/maven-javadoc-plugin-2.5.1-20081013.050423-737.jar" )
+            .exists() );
 
         assertTrue( new File(
             targetPath,
             "local-test-repo-snapshots/org/apache/maven/plugins/maven-javadoc-plugin/2.5.1-SNAPSHOT/maven-javadoc-plugin-2.5.1-20081013.050423-737.pom" )
             .isFile() );
+        assertTrue( new File(
+            targetPath,
+            "local-test-repo-snapshots/org/apache/maven/plugins/maven-javadoc-plugin/2.5.1-SNAPSHOT/maven-javadoc-plugin-2.5.1-20081013.050423-737.pom" )
+            .exists() );
     }
 }

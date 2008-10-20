@@ -22,12 +22,7 @@
 package org.sonatype.nexus.tools.repository;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-
-import org.codehaus.plexus.util.IOUtil;
-
 
 /**
  * @author Juven Xu
@@ -36,21 +31,37 @@ public class DefaultRepositoryConvertor
     implements RepositoryConvertor
 {
 
+    private DefaultRepositoryConvertorFileHelper fileHelper = new DefaultRepositoryConvertorFileHelper();
+
     /**
-     * when traverse a folder, if this make is true, then go back to the parent folder
+     * when traverse a folder, if this mark is true, then go back to the parent folder
      */
     private boolean breakToParent = false;
-    
+
     private File currentRepository;
-    
+
     private File releaseRepository;
-    
+
     private File snapshotRepository;
-    
-    public void convertRepository( File repository, File targetPath )
+
+    public void convertRepositoryWithCopy( File repository, File targetPath )
+    {
+        setUp( repository, targetPath );
+
+        convert( currentRepository, false );
+    }
+
+    public void convertRepositoryWithMove( File repository, File targetPath )
+    {
+        setUp( repository, targetPath );
+
+        convert( currentRepository, true );
+    }
+
+    private void setUp( File repository, File targetPath )
     {
         currentRepository = repository;
-        
+
         releaseRepository = new File( targetPath, currentRepository.getName() + SUFFIX_RELEASES );
 
         snapshotRepository = new File( targetPath, currentRepository.getName() + SUFFIX_SNAPSHOTS );
@@ -58,18 +69,24 @@ public class DefaultRepositoryConvertor
         releaseRepository.mkdir();
 
         snapshotRepository.mkdir();
-
-        convert( currentRepository );
     }
-    
-    private void convert( File file )
+
+    private void convert( File file, boolean isMove )
     {
         if ( isRepositoryLeaf( file ) )
         {
-            try{
-            move( file.getParentFile() );
+            try
+            {
+                if ( isMove )
+                {
+                    moveToTargetRepository( file.getParentFile() );
+                }
+                else
+                {
+                    copyToTargetRepository( file.getParentFile() );
+                }
             }
-            catch(IOException e)
+            catch ( IOException e )
             {
                 e.printStackTrace();
             }
@@ -87,36 +104,52 @@ public class DefaultRepositoryConvertor
                 {
                     break;
                 }
-                convert( subFile );
+                convert( subFile, isMove );
             }
             breakToParent = false;
+
         }
-    }
-
-    private void move( File versionFolder ) throws IOException
-    {
-
-
-        if ( isSnapshot( versionFolder.getName() ) )
+        
+        if (isMove)
         {
-            // move to snapshot repository
-            move( versionFolder, snapshotRepository, getCoordinatePath (versionFolder) );
-        }
-        else{
-            // move to release repository
-            move( versionFolder, releaseRepository, getCoordinatePath (versionFolder) );
+            file.delete();
         }
     }
-    
-    private boolean isSnapshot(String version)
+
+    /**
+     * copy the version folder to its target repository according to it's version type
+     * 
+     * @param versionFolder A folder in repository, normally its name is a version of an artifact
+     * @throws IOException
+     */
+    private void copyToTargetRepository( File versionFolder )
+        throws IOException
     {
-        if (version.endsWith( "SNAPSHOT" ))
+
+        fileHelper.copy( versionFolder, getTargetRepository( versionFolder ), getCoordinatePath( versionFolder ) );
+    }
+
+    /**
+     * move the version folder to its target repository according to it's version type
+     * 
+     * @param versionFolder A folder in repository, normally its name is a version of an artifact
+     * @throws IOException
+     */
+    private void moveToTargetRepository( File versionFolder )
+        throws IOException
+    {
+        fileHelper.move( versionFolder, getTargetRepository( versionFolder ), getCoordinatePath( versionFolder ) );
+    }
+
+    private boolean isSnapshot( String version )
+    {
+        if ( version.endsWith( "SNAPSHOT" ) )
         {
             return true;
         }
         return false;
     }
-    
+
     private boolean isRepositoryLeaf( File file )
     {
         if ( !file.isFile() )
@@ -133,79 +166,28 @@ public class DefaultRepositoryConvertor
         }
         return false;
     }
-    
-    
-    protected void move( File file, File targetRepository,  String base )
-        throws IOException
-    {
-        File targetFile = new File( targetRepository, base + file.getName() );
 
-        buildDirectoryPath (targetFile.getParentFile());
-        
-        
-        if ( file.isDirectory() )
-        {
-            targetFile.mkdir();
-
-            for ( File child : file.listFiles() )
-            {
-                move( child, targetRepository,  base + file.getName() + File.separatorChar );
-            }
-        }
-        else if ( file.isFile() )
-        {
-            moveFileContent( file, targetFile );
-        }
-     //   file.delete();
-    }
-
-    private void moveFileContent( File from, File to )
-        throws IOException
-    {
-        FileInputStream fis = null;
-
-        FileOutputStream fos = null;
-
-        try
-        {
-            fis = new FileInputStream( from );
-
-            fos = new FileOutputStream( to );
-
-            IOUtil.copy( fis, fos );
-       
-            fos.flush();
-        }
-        catch ( IOException ioe )
-        {
-            throw ioe;
-        }
-        finally
-        {
-            if ( fis != null )
-            {
-                IOUtil.close( fis );
-            }
-            if ( fos != null )
-            {
-                IOUtil.close( fos );
-            }
-        }
-
-    }
-    
-    private void buildDirectoryPath( File directory)
-    {
-        if (!directory.getParentFile().exists())
-        {
-            buildDirectoryPath(directory.getParentFile());
-        }
-        directory.mkdir();
-    }
-    
+    /**
+     * @param versionFolder
+     * @return The path from repository root to the parent of our version folder
+     */
     private String getCoordinatePath( File versionFolder )
     {
         String temp = versionFolder.getAbsolutePath().substring( currentRepository.getAbsolutePath().length() );
+
         return temp.substring( 0, temp.length() - versionFolder.getName().length() );
     }
+
+    private File getTargetRepository( File versionFolder )
+    {
+        if ( isSnapshot( versionFolder.getName() ) )
+        {
+            return snapshotRepository;
+        }
+        else
+        {
+            return releaseRepository;
+        }
+    }
+
 }
