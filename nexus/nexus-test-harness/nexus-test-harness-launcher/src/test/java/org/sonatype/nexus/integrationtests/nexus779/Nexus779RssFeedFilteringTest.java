@@ -28,6 +28,8 @@ public class Nexus779RssFeedFilteringTest
 {
     private static final String RECENTLY_DEPLOYED = "recentlyDeployed";
 
+    private List<SyndEntry> entries;
+
     public Nexus779RssFeedFilteringTest()
     {
     }
@@ -64,11 +66,11 @@ public class Nexus779RssFeedFilteringTest
         TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
 
         // Should be able to see both test1 & test2 artifacts
-        Assert.assertTrue( "Feed should contain entry for nexus779:test1:1.0.0.\nEntries: "
-        /* + this.entriesToString( entries ) */, feedListContainsArtifact( "nexus779", "test1", "1.0.0" ) );
+        Assert.assertTrue( "Feed should contain entry for nexus779:test1:1.0.0.\nEntries: " + this.entriesToString(),
+                           feedListContainsArtifact( "nexus779", "test1", "1.0.0" ) );
 
-        Assert.assertTrue( "Feed should contain entry for nexus779:test2:1.0.0\nEntries: "
-        /* + this.entriesToString( entries ) */, feedListContainsArtifact( "nexus779", "test2", "1.0.0" ) );
+        Assert.assertTrue( "Feed should contain entry for nexus779:test2:1.0.0\nEntries: " + this.entriesToString(),
+                           feedListContainsArtifact( "nexus779", "test2", "1.0.0" ) );
 
         // Now update the test user so that the user can only access test1
         updateUserRole( TEST_USER_NAME, Collections.singletonList( role1.getId() ) );
@@ -77,11 +79,11 @@ public class Nexus779RssFeedFilteringTest
         TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
 
         // Should be able to see only test1 artifacts
-        Assert.assertTrue( "Feed should contain entry for nexus779:test1:1.0.0.\nEntries: "
-        /* + this.entriesToString( entries ) */, feedListContainsArtifact( "nexus779", "test1", "1.0.0" ) );
+        Assert.assertTrue( "Feed should contain entry for nexus779:test1:1.0.0.\nEntries: " + this.entriesToString(),
+                           feedListContainsArtifact( "nexus779", "test1", "1.0.0" ) );
 
         Assert.assertFalse( "Feed should not contain entry for nexus779:test2:1.0.0\nEntries: "
-        /* + this.entriesToString( entries ) */, feedListContainsArtifact( "nexus779", "test2", "1.0.0" ) );
+            + this.entriesToString(), feedListContainsArtifact( "nexus779", "test2", "1.0.0" ) );
 
         // Now update the test user so that the user can only access test2
         updateUserRole( TEST_USER_NAME, Collections.singletonList( role2.getId() ) );
@@ -91,15 +93,21 @@ public class Nexus779RssFeedFilteringTest
 
         // Should be able to see only test2 artifacts
         Assert.assertFalse( "Feed should not contain entry for nexus779:test1:1.0.0.\nEntries: "
-        /* + this.entriesToString( entries ) */, feedListContainsArtifact( "nexus779", "test1", "1.0.0" ) );
+            + this.entriesToString(), feedListContainsArtifact( "nexus779", "test1", "1.0.0" ) );
 
-        Assert.assertTrue( "Feed should contain entry for nexus779:test2:1.0.0\nEntries: "
-        /* + this.entriesToString( entries ) */, feedListContainsArtifact( "nexus779", "test2", "1.0.0" ) );
+        Assert.assertTrue( "Feed should contain entry for nexus779:test2:1.0.0\nEntries: " + this.entriesToString(),
+                           feedListContainsArtifact( "nexus779", "test2", "1.0.0" ) );
 
     }
 
-    private String entriesToString( List<SyndEntry> entries )
+    private String entriesToString()
+        throws Exception
     {
+        if ( entries == null )
+        {
+            return "No entries";
+        }
+
         StringBuffer buffer = new StringBuffer();
 
         for ( SyndEntry syndEntry : entries )
@@ -110,13 +118,14 @@ public class Nexus779RssFeedFilteringTest
         return buffer.toString();
     }
 
+    @SuppressWarnings("unchecked")
     private boolean feedListContainsArtifact( String groupId, String artifactId, String version )
         throws Exception
     {
         for ( int i = 0; i < 10; i++ )
         {
             SyndFeed feed = FeedUtil.getFeed( RECENTLY_DEPLOYED );
-            List<SyndEntry> entries = feed.getEntries();
+            entries = feed.getEntries();
 
             for ( SyndEntry entry : entries )
             {
