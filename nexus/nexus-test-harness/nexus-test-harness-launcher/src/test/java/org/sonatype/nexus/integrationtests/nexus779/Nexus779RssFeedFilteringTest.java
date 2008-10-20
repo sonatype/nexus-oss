@@ -122,7 +122,7 @@ public class Nexus779RssFeedFilteringTest
     private boolean feedListContainsArtifact( String groupId, String artifactId, String version )
         throws Exception
     {
-        for ( int i = 0; i < 10; i++ )
+        for ( int i = 0; i < 40; i++ )
         {
             SyndFeed feed = FeedUtil.getFeed( RECENTLY_DEPLOYED );
             entries = feed.getEntries();
