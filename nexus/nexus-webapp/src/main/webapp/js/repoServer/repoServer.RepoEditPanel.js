@@ -730,7 +730,7 @@ Sonatype.repoServer.RepoEditPanel = function(config){
       {
         xtype: 'fieldset',
         checkboxToggle:true,
-        title: 'HTTP Proxy Settings (optional)',
+        title: 'Override HTTP Proxy Settings (optional)',
         anchor: Sonatype.view.FIELDSET_OFFSET,
         id: '_remoteStorage.httpProxySettings', //needs late prepend of specific form id
         collapsed: true,

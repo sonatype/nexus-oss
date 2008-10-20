@@ -314,7 +314,7 @@ Sonatype.repoServer.ServerEditPanel = function(config){
         checkboxToggle:true,
         collapsed: true,
         id: formId + '_' + 'globalHttpProxySettings',
-        title: 'HTTP Proxy Settings (optional)',
+        title: 'Default HTTP Proxy Settings (optional)',
         anchor: Sonatype.view.FIELDSET_OFFSET,
         autoHeight:true,
         layoutConfig: {
