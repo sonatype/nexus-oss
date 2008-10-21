@@ -20,36 +20,14 @@
  */
 package org.sonatype.nexus.rest.repositories;
 
-import junit.framework.TestCase;
-
 import org.restlet.data.MediaType;
+import org.sonatype.nexus.rest.AbstractRestTestCase;
 import org.sonatype.nexus.rest.model.RepositoryResourceResponse;
-import org.sonatype.nexus.rest.xstream.XStreamInitializer;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
-import org.sonatype.plexus.rest.xstream.json.JsonOrgHierarchicalStreamDriver;
-
-import com.thoughtworks.xstream.XStream;
 
 public class RepositoryResponseTest
-    extends TestCase
+    extends AbstractRestTestCase
 {
-
-    protected XStream xstream;
-
-    protected void setUp()
-        throws Exception
-    {
-        super.setUp();
-
-        // create and configure XStream for JSON
-        xstream = XStreamInitializer.initialize( new XStream( new JsonOrgHierarchicalStreamDriver() ) );
-    }
-
-    protected void tearDown()
-        throws Exception
-    {
-        super.tearDown();
-    }
 
     public void testRepo()
         throws Exception
@@ -65,20 +43,20 @@ public class RepositoryResponseTest
             .getPayload( new RepositoryResourceResponse() );
 
     }
-    
+
     public void testProxyRepo()
         throws Exception
     {
         String jsonString = "{ \"repository\" : {\"data\" : {\"allowWrite\":true, \"artifactMaxAge\":1440,\"browseable\":true,\"defaultLocalStorageUrl\":null,\"id\":\"test1\", \"indexable\":true,\"metadataMaxAge\":1440,\"name\":\"test1\",\"notFoundCacheTTL\":1440,\"overrideLocalStorageUrl\":null,\"repoPolicy\":\"release\", \"repoType\":\"proxy\"}}}";
-    
+
         XStreamRepresentation representation = new XStreamRepresentation(
             xstream,
             jsonString,
             MediaType.APPLICATION_JSON );
-    
+
         RepositoryResourceResponse response = (RepositoryResourceResponse) representation
             .getPayload( new RepositoryResourceResponse() );
-    
+
     }
 
 }

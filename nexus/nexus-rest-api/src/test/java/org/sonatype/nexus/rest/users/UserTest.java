@@ -20,47 +20,26 @@
  */
 package org.sonatype.nexus.rest.users;
 
-import junit.framework.TestCase;
-
 import org.restlet.data.MediaType;
+import org.sonatype.nexus.rest.AbstractRestTestCase;
 import org.sonatype.nexus.rest.model.UserResourceRequest;
-import org.sonatype.nexus.rest.xstream.XStreamInitializer;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
-import org.sonatype.plexus.rest.xstream.json.JsonOrgHierarchicalStreamDriver;
-
-import com.thoughtworks.xstream.XStream;
 
 public class UserTest
-    extends TestCase
+    extends AbstractRestTestCase
 {
 
-    protected XStream xstream;
-
-    protected void setUp()
-        throws Exception
-    {
-        super.setUp();
-
-        // create and configure XStream for JSON
-        xstream = XStreamInitializer.initialize( new XStream( new JsonOrgHierarchicalStreamDriver() ) );
-    }
-
-    protected void tearDown()
-        throws Exception
-    {
-        super.tearDown();
-    }
-    
     public void testRequest()
         throws Exception
     {
-        String jsonString =
-            "{\"data\":{\"userId\":\"myuser\",\"name\":\"johnny test\",\"email\":\"test@email.com\",\"status\":\"active\"," +
-            "\"roles\":[\"roleId\"]}}}";
-        XStreamRepresentation representation =
-            new XStreamRepresentation( xstream, jsonString, MediaType.APPLICATION_JSON );
-        
-        UserResourceRequest request = ( UserResourceRequest ) representation.getPayload( new UserResourceRequest() );
+        String jsonString = "{\"data\":{\"userId\":\"myuser\",\"name\":\"johnny test\",\"email\":\"test@email.com\",\"status\":\"active\","
+            + "\"roles\":[\"roleId\"]}}}";
+        XStreamRepresentation representation = new XStreamRepresentation(
+            xstream,
+            jsonString,
+            MediaType.APPLICATION_JSON );
+
+        UserResourceRequest request = (UserResourceRequest) representation.getPayload( new UserResourceRequest() );
 
         assert request.getData().getUserId().equals( "myuser" );
         assert request.getData().getName().equals( "johnny test" );

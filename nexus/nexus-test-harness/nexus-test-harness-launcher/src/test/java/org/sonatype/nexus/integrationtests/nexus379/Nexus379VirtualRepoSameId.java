@@ -10,11 +10,7 @@ import org.restlet.data.Response;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.rest.model.RepositoryResource;
 import org.sonatype.nexus.rest.model.RepositoryShadowResource;
-import org.sonatype.nexus.rest.xstream.XStreamInitializer;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
-
-import com.thoughtworks.xstream.XStream;
-
 
 /**
  * Test to make sure a Virtual repo cannot have the same Id as an real repository.
@@ -27,16 +23,14 @@ public class Nexus379VirtualRepoSameId
 
     public Nexus379VirtualRepoSameId()
     {
-        this.messageUtil =
-            new RepositoryMessageUtil(
-                                       this.getXMLXStream(),
-                                       MediaType.APPLICATION_XML );
+        this.messageUtil = new RepositoryMessageUtil( this.getXMLXStream(), MediaType.APPLICATION_XML );
     }
-    
+
     @Test
-    public void testVirtualRepoWithSameId() throws IOException
+    public void testVirtualRepoWithSameId()
+        throws IOException
     {
-        
+
         // create a repository
         RepositoryResource repo = new RepositoryResource();
 
@@ -47,10 +41,9 @@ public class Nexus379VirtualRepoSameId
         repo.setRepoPolicy( "release" );
         repo.setChecksumPolicy( "ignore" ); // [ignore, warn, strictIfExists, strict]
         repo = (RepositoryResource) this.messageUtil.createRepository( repo );
-        
+
         // now create a virtual one, this should fail
-        
-        
+
         // create a repository
         RepositoryShadowResource virtualRepo = new RepositoryShadowResource();
 
@@ -60,10 +53,9 @@ public class Nexus379VirtualRepoSameId
         virtualRepo.setFormat( "maven1" );
         virtualRepo.setShadowOf( "testVirtualRepoWithSameId" );
         Response response = this.messageUtil.sendMessage( Method.POST, virtualRepo );
-        
-        Assert.assertEquals( "Status:" + "\n"+ response.getEntity().getText(), 400, response.getStatus().getCode() );
-        
+
+        Assert.assertEquals( "Status:" + "\n" + response.getEntity().getText(), 400, response.getStatus().getCode() );
+
     }
-    
 
 }

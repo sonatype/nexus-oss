@@ -6,7 +6,6 @@ import org.restlet.data.Response;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.rest.model.UserForgotPasswordRequest;
 import org.sonatype.nexus.rest.model.UserForgotPasswordResource;
-import org.sonatype.nexus.rest.xstream.XStreamInitializer;
 import org.sonatype.nexus.test.utils.XStreamFactory;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
 
@@ -19,7 +18,6 @@ public class ForgotPasswordUtils
     static
     {
         xstream = XStreamFactory.getXmlXStream();
-        XStreamInitializer.initialize( xstream );
     }
 
     public static Response recoverUserPassword( String username, String email )

@@ -8,10 +8,7 @@ import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.rest.model.PrivilegeBaseStatusResource;
-import org.sonatype.nexus.rest.xstream.XStreamInitializer;
 import org.sonatype.nexus.test.utils.PrivilegesMessageUtil;
-
-import com.thoughtworks.xstream.XStream;
 
 /**
  * GETS for application privileges where returning an error, so this is a really simple test to make sure the GET will work.

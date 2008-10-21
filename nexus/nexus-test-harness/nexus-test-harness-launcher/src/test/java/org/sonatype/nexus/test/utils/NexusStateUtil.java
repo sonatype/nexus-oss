@@ -11,7 +11,6 @@ import org.restlet.data.Response;
 import org.restlet.resource.StringRepresentation;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.rest.model.StatusResourceResponse;
-import org.sonatype.nexus.rest.xstream.XStreamInitializer;
 
 import com.thoughtworks.xstream.XStream;
 

@@ -20,9 +20,8 @@
  */
 package org.sonatype.nexus.rest.schedules;
 
-import junit.framework.TestCase;
-
 import org.restlet.data.MediaType;
+import org.sonatype.nexus.rest.AbstractRestTestCase;
 import org.sonatype.nexus.rest.model.ScheduledServiceAdvancedResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceDailyResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceMonthlyResource;
@@ -30,43 +29,23 @@ import org.sonatype.nexus.rest.model.ScheduledServiceOnceResource;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceResourceResponse;
 import org.sonatype.nexus.rest.model.ScheduledServiceWeeklyResource;
-import org.sonatype.nexus.rest.xstream.XStreamInitializer;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
-import org.sonatype.plexus.rest.xstream.json.JsonOrgHierarchicalStreamDriver;
-
-import com.thoughtworks.xstream.XStream;
 
 public class ScheduledServiceResponseTest
-    extends TestCase
+    extends AbstractRestTestCase
 {
-
-    protected XStream xstream;
-
-    protected void setUp()
-        throws Exception
-    {
-        super.setUp();
-
-        // create and configure XStream for JSON
-        xstream = XStreamInitializer.initialize( new XStream( new JsonOrgHierarchicalStreamDriver() ) );
-    }
-
-    protected void tearDown()
-        throws Exception
-    {
-        super.tearDown();
-    }
 
     public void testNoScheduledService()
         throws Exception
     {
-        String jsonString =
-            "{\"data\":{\"id\":null,\"name\":\"test\",\"typeId\":\"Synchronize Repositories\",\"schedule\":\"none\"}}}";
-        XStreamRepresentation representation =
-            new XStreamRepresentation( xstream, jsonString, MediaType.APPLICATION_JSON );
+        String jsonString = "{\"data\":{\"id\":null,\"name\":\"test\",\"typeId\":\"Synchronize Repositories\",\"schedule\":\"none\"}}}";
+        XStreamRepresentation representation = new XStreamRepresentation(
+            xstream,
+            jsonString,
+            MediaType.APPLICATION_JSON );
 
-        ScheduledServiceResourceResponse response =
-            (ScheduledServiceResourceResponse) representation.getPayload( new ScheduledServiceResourceResponse() );
+        ScheduledServiceResourceResponse response = (ScheduledServiceResourceResponse) representation
+            .getPayload( new ScheduledServiceResourceResponse() );
 
         assert response.getData().getId() == null;
         assert response.getData().getName().equals( "test" );
@@ -77,13 +56,14 @@ public class ScheduledServiceResponseTest
     public void testOnceScheduledService()
         throws Exception
     {
-        String jsonString =
-            "{\"data\":{\"id\":null,\"name\":\"test\",\"typeId\":\"Synchronize Repositories\",\"schedule\":\"once\",\"startDate\":\"1210651200000\",\"startTime\":\"12:30\"}}}";
-        XStreamRepresentation representation =
-            new XStreamRepresentation( xstream, jsonString, MediaType.APPLICATION_JSON );
+        String jsonString = "{\"data\":{\"id\":null,\"name\":\"test\",\"typeId\":\"Synchronize Repositories\",\"schedule\":\"once\",\"startDate\":\"1210651200000\",\"startTime\":\"12:30\"}}}";
+        XStreamRepresentation representation = new XStreamRepresentation(
+            xstream,
+            jsonString,
+            MediaType.APPLICATION_JSON );
 
-        ScheduledServiceResourceResponse response =
-            (ScheduledServiceResourceResponse) representation.getPayload( new ScheduledServiceResourceResponse() );
+        ScheduledServiceResourceResponse response = (ScheduledServiceResourceResponse) representation
+            .getPayload( new ScheduledServiceResourceResponse() );
 
         assert response.getData().getId() == null;
         assert response.getData().getName().equals( "test" );
@@ -96,13 +76,14 @@ public class ScheduledServiceResponseTest
     public void testDailyScheduledService()
         throws Exception
     {
-        String jsonString =
-            "{\"data\":{\"id\":null,\"name\":\"test\",\"typeId\":\"Synchronize Repositories\",\"schedule\":\"daily\",\"startDate\":\"1210651200000\",\"recurringTime\":\"12:30\"}}}";
-        XStreamRepresentation representation =
-            new XStreamRepresentation( xstream, jsonString, MediaType.APPLICATION_JSON );
+        String jsonString = "{\"data\":{\"id\":null,\"name\":\"test\",\"typeId\":\"Synchronize Repositories\",\"schedule\":\"daily\",\"startDate\":\"1210651200000\",\"recurringTime\":\"12:30\"}}}";
+        XStreamRepresentation representation = new XStreamRepresentation(
+            xstream,
+            jsonString,
+            MediaType.APPLICATION_JSON );
 
-        ScheduledServiceResourceResponse response =
-            (ScheduledServiceResourceResponse) representation.getPayload( new ScheduledServiceResourceResponse() );
+        ScheduledServiceResourceResponse response = (ScheduledServiceResourceResponse) representation
+            .getPayload( new ScheduledServiceResourceResponse() );
 
         assert response.getData().getId() == null;
         assert response.getData().getName().equals( "test" );
@@ -115,13 +96,14 @@ public class ScheduledServiceResponseTest
     public void testWeeklyScheduledService()
         throws Exception
     {
-        String jsonString =
-            "{\"data\":{\"id\":null,\"name\":\"test\",\"typeId\":\"Synchronize Repositories\",\"schedule\":\"weekly\",\"startDate\":\"1210651200000\",\"recurringTime\":\"12:30\",\"recurringDay\":[\"Monday\",\"Wednesday\"]}}}";
-        XStreamRepresentation representation =
-            new XStreamRepresentation( xstream, jsonString, MediaType.APPLICATION_JSON );
+        String jsonString = "{\"data\":{\"id\":null,\"name\":\"test\",\"typeId\":\"Synchronize Repositories\",\"schedule\":\"weekly\",\"startDate\":\"1210651200000\",\"recurringTime\":\"12:30\",\"recurringDay\":[\"Monday\",\"Wednesday\"]}}}";
+        XStreamRepresentation representation = new XStreamRepresentation(
+            xstream,
+            jsonString,
+            MediaType.APPLICATION_JSON );
 
-        ScheduledServiceResourceResponse response =
-            (ScheduledServiceResourceResponse) representation.getPayload( new ScheduledServiceResourceResponse() );
+        ScheduledServiceResourceResponse response = (ScheduledServiceResourceResponse) representation
+            .getPayload( new ScheduledServiceResourceResponse() );
 
         assert response.getData().getId() == null;
         assert response.getData().getName().equals( "test" );
@@ -134,13 +116,14 @@ public class ScheduledServiceResponseTest
     public void testMonthlyScheduledService()
         throws Exception
     {
-        String jsonString =
-            "{\"data\":{\"id\":null,\"name\":\"test\",\"typeId\":\"Synchronize Repositories\",\"schedule\":\"monthly\",\"startDate\":\"1210651200000\",\"recurringTime\":\"12:30\",\"recurringDay\":[\"1\",\"2\"]}}}";
-        XStreamRepresentation representation =
-            new XStreamRepresentation( xstream, jsonString, MediaType.APPLICATION_JSON );
+        String jsonString = "{\"data\":{\"id\":null,\"name\":\"test\",\"typeId\":\"Synchronize Repositories\",\"schedule\":\"monthly\",\"startDate\":\"1210651200000\",\"recurringTime\":\"12:30\",\"recurringDay\":[\"1\",\"2\"]}}}";
+        XStreamRepresentation representation = new XStreamRepresentation(
+            xstream,
+            jsonString,
+            MediaType.APPLICATION_JSON );
 
-        ScheduledServiceResourceResponse response =
-            (ScheduledServiceResourceResponse) representation.getPayload( new ScheduledServiceResourceResponse() );
+        ScheduledServiceResourceResponse response = (ScheduledServiceResourceResponse) representation
+            .getPayload( new ScheduledServiceResourceResponse() );
 
         assert response.getData().getId() == null;
         assert response.getData().getName().equals( "test" );
@@ -153,13 +136,14 @@ public class ScheduledServiceResponseTest
     public void testAdvancedScheduledService()
         throws Exception
     {
-        String jsonString =
-            "{\"data\":{\"id\":null,\"name\":\"test\",\"typeId\":\"Synchronize Repositories\",\"schedule\":\"advanced\",\"cronCommand\":\"somecroncommand\"}}}";
-        XStreamRepresentation representation =
-            new XStreamRepresentation( xstream, jsonString, MediaType.APPLICATION_JSON );
+        String jsonString = "{\"data\":{\"id\":null,\"name\":\"test\",\"typeId\":\"Synchronize Repositories\",\"schedule\":\"advanced\",\"cronCommand\":\"somecroncommand\"}}}";
+        XStreamRepresentation representation = new XStreamRepresentation(
+            xstream,
+            jsonString,
+            MediaType.APPLICATION_JSON );
 
-        ScheduledServiceResourceResponse response =
-            (ScheduledServiceResourceResponse) representation.getPayload( new ScheduledServiceResourceResponse() );
+        ScheduledServiceResourceResponse response = (ScheduledServiceResourceResponse) representation
+            .getPayload( new ScheduledServiceResourceResponse() );
 
         assert response.getData().getId() == null;
         assert response.getData().getName().equals( "test" );
@@ -167,25 +151,27 @@ public class ScheduledServiceResponseTest
         assert response.getData().getSchedule().equals( "advanced" );
         assert ( (ScheduledServiceAdvancedResource) response.getData() ).getCronCommand().equals( "somecroncommand" );
     }
-    
+
     public void testAdvancedScheduledServiceWithProperties()
         throws Exception
     {
-        String jsonString =
-            "{\"data\":{\"id\":null,\"name\":\"test\",\"typeId\":\"Synchronize Repositories\",\"schedule\":\"advanced\",\"cronCommand\":\"somecroncommand\",\"properties\":[{\"id\":\"1\",\"value\":\"true\",\"@class\":\"org.sonatype.nexus.rest.model.ScheduledServicePropertyResource\"}]}}}";
-        XStreamRepresentation representation =
-            new XStreamRepresentation( xstream, jsonString, MediaType.APPLICATION_JSON );
-    
-        ScheduledServiceResourceResponse response =
-            (ScheduledServiceResourceResponse) representation.getPayload( new ScheduledServiceResourceResponse() );
-    
+        String jsonString = "{\"data\":{\"id\":null,\"name\":\"test\",\"typeId\":\"Synchronize Repositories\",\"schedule\":\"advanced\",\"cronCommand\":\"somecroncommand\",\"properties\":[{\"id\":\"1\",\"value\":\"true\",\"@class\":\"org.sonatype.nexus.rest.model.ScheduledServicePropertyResource\"}]}}}";
+        XStreamRepresentation representation = new XStreamRepresentation(
+            xstream,
+            jsonString,
+            MediaType.APPLICATION_JSON );
+
+        ScheduledServiceResourceResponse response = (ScheduledServiceResourceResponse) representation
+            .getPayload( new ScheduledServiceResourceResponse() );
+
         assert response.getData().getId() == null;
         assert response.getData().getName().equals( "test" );
         assert response.getData().getTypeId().equals( "Synchronize Repositories" );
         assert response.getData().getSchedule().equals( "advanced" );
         assert response.getData().getProperties().size() == 1;
         assert ( (ScheduledServicePropertyResource) response.getData().getProperties().get( 0 ) ).getId().equals( "1" );
-        assert ( (ScheduledServicePropertyResource) response.getData().getProperties().get( 0 ) ).getValue().equals( "true" );
+        assert ( (ScheduledServicePropertyResource) response.getData().getProperties().get( 0 ) ).getValue().equals(
+            "true" );
         assert ( (ScheduledServiceAdvancedResource) response.getData() ).getCronCommand().equals( "somecroncommand" );
     }
 }

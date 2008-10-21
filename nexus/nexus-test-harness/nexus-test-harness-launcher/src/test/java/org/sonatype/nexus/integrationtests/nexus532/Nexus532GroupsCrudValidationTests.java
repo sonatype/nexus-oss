@@ -11,10 +11,7 @@ import org.restlet.data.Response;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.rest.model.RepositoryGroupMemberRepository;
 import org.sonatype.nexus.rest.model.RepositoryGroupResource;
-import org.sonatype.nexus.rest.xstream.XStreamInitializer;
 import org.sonatype.nexus.test.utils.GroupMessageUtil;
-
-import com.thoughtworks.xstream.XStream;
 
 public class Nexus532GroupsCrudValidationTests
     extends AbstractNexusIntegrationTest

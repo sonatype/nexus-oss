@@ -11,10 +11,7 @@ import org.restlet.data.MediaType;
 import org.sonatype.nexus.integrationtests.AbstractMavenNexusIT;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.rest.model.UserResource;
-import org.sonatype.nexus.rest.xstream.XStreamInitializer;
 import org.sonatype.nexus.test.utils.UserMessageUtil;
-
-import com.thoughtworks.xstream.XStream;
 
 /**
  * Put a bunch of artifacts in a repo, and then run a maven project to download them 

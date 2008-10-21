@@ -20,57 +20,34 @@
  */
 package org.sonatype.nexus.rest.roles;
 
-import junit.framework.TestCase;
-
 import org.restlet.data.MediaType;
-import org.sonatype.nexus.rest.model.RoleResource;
+import org.sonatype.nexus.rest.AbstractRestTestCase;
 import org.sonatype.nexus.rest.model.RoleResourceRequest;
-import org.sonatype.nexus.rest.model.RoleResourceResponse;
-import org.sonatype.nexus.rest.xstream.XStreamInitializer;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
-import org.sonatype.plexus.rest.xstream.json.JsonOrgHierarchicalStreamDriver;
-
-import com.thoughtworks.xstream.XStream;
 
 public class RoleTest
-    extends TestCase
+    extends AbstractRestTestCase
 {
-
-    protected XStream xstream;
-
-    protected void setUp()
-        throws Exception
-    {
-        super.setUp();
-
-        // create and configure XStream for JSON
-        xstream = XStreamInitializer.initialize( new XStream( new JsonOrgHierarchicalStreamDriver() ) );
-    }
-
-    protected void tearDown()
-        throws Exception
-    {
-        super.tearDown();
-    }
 
     public void testRequest()
         throws Exception
     {
-        String jsonString =
-            "{\"data\":{\"id\":null,\"name\":\"Test Role\",\"description\":\"This is a test role\",\"sessionTimeout\":50," +
-            "\"roles\":[\"roleid\"],\"privileges\":[\"privid\"]}}}";
-        XStreamRepresentation representation =
-            new XStreamRepresentation( xstream, jsonString, MediaType.APPLICATION_JSON );
-        
-        RoleResourceRequest request = ( RoleResourceRequest ) representation.getPayload( new RoleResourceRequest() );
+        String jsonString = "{\"data\":{\"id\":null,\"name\":\"Test Role\",\"description\":\"This is a test role\",\"sessionTimeout\":50,"
+            + "\"roles\":[\"roleid\"],\"privileges\":[\"privid\"]}}}";
+        XStreamRepresentation representation = new XStreamRepresentation(
+            xstream,
+            jsonString,
+            MediaType.APPLICATION_JSON );
+
+        RoleResourceRequest request = (RoleResourceRequest) representation.getPayload( new RoleResourceRequest() );
 
         assert request.getData().getId() == null;
         assert request.getData().getName().equals( "Test Role" );
         assert request.getData().getDescription().equals( "This is a test role" );
         assert request.getData().getSessionTimeout() == 50;
         assert request.getData().getRoles().size() == 1;
-        assert ( ( String ) request.getData().getRoles().get( 0 ) ).equals( "roleid" );        
+        assert ( (String) request.getData().getRoles().get( 0 ) ).equals( "roleid" );
         assert request.getData().getPrivileges().size() == 1;
-        assert ( ( String ) request.getData().getPrivileges().get( 0 ) ).equals( "privid" );
+        assert ( (String) request.getData().getPrivileges().get( 0 ) ).equals( "privid" );
     }
 }

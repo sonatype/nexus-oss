@@ -13,6 +13,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
 import org.apache.commons.lang.time.DateUtils;
 import org.codehaus.plexus.util.StringUtils;
+import org.sonatype.nexus.rest.NexusApplication;
 import org.sonatype.nexus.rest.model.AuthenticationClientPermissions;
 import org.sonatype.nexus.rest.model.AuthenticationLoginResource;
 import org.sonatype.nexus.rest.model.AuthenticationLoginResourceResponse;
@@ -105,23 +106,31 @@ import org.sonatype.nexus.rest.model.UserResourceRequest;
 import org.sonatype.nexus.rest.model.UserResourceResponse;
 import org.sonatype.nexus.rest.model.WastebasketResource;
 import org.sonatype.nexus.rest.model.WastebasketResourceResponse;
-import org.sonatype.nexus.rest.xstream.XStreamInitializer;
 import org.sonatype.plexus.rest.xstream.json.JsonOrgHierarchicalStreamDriver;
 import org.sonatype.plexus.rest.xstream.xml.LookAheadXppDriver;
 
 import com.thoughtworks.xstream.XStream;
 
-import edu.emory.mathcs.backport.java.util.Arrays;
-
 public class TestMarshalUnmarchal
     extends TestCase
 {
-
     private SimpleDateFormat dateFormat = new SimpleDateFormat( "MM/dd/yyyy" );
 
-    private XStream xstreamXML = XStreamInitializer.initialize( new XStream( new LookAheadXppDriver() ) );
+    private XStream xstreamXML;
 
-    private XStream xstreamJSON = XStreamInitializer.initialize( new XStream( new JsonOrgHierarchicalStreamDriver() ) );
+    private XStream xstreamJSON;
+
+    protected void setUp()
+        throws Exception
+    {
+        super.setUp();
+
+        NexusApplication napp = new NexusApplication();
+
+        xstreamXML = napp.doConfigureXstream( new XStream( new LookAheadXppDriver() ) );
+
+        xstreamJSON = napp.doConfigureXstream( new XStream( new JsonOrgHierarchicalStreamDriver() ) );
+    }
 
     public void testNexusErrorResponse()
     {
@@ -132,10 +141,10 @@ public class TestMarshalUnmarchal
         errorResponse.addError( error );
 
         this.marshalUnmarchalThenCompare( errorResponse );
-        
-//        System.out.println( "JSON:\n" + this.xstreamJSON.toXML( errorResponse ));
-//        System.out.println( "XML:\n" + this.xstreamXML.toXML( errorResponse ));
-        
+
+        // System.out.println( "JSON:\n" + this.xstreamJSON.toXML( errorResponse ));
+        // System.out.println( "XML:\n" + this.xstreamXML.toXML( errorResponse ));
+
         this.validateXmlHasNoPackageNames( errorResponse );
 
     }
@@ -173,7 +182,8 @@ public class TestMarshalUnmarchal
         responseResponse.addData( resource1 );
         responseResponse.addData( resource2 );
 
-        this.marshalUnmarchalThenCompare( responseResponse, this.xstreamXML ); //FIXME: JSON READER CANNOT PARSE DATES CORRECTLY.
+        this.marshalUnmarchalThenCompare( responseResponse, this.xstreamXML ); // FIXME: JSON READER CANNOT PARSE DATES
+        // CORRECTLY.
         this.validateXmlHasNoPackageNames( responseResponse );
 
     }
@@ -290,7 +300,7 @@ public class TestMarshalUnmarchal
         resourceResponse.setData( resource );
 
         this.marshalUnmarchalThenCompare( resourceResponse );
-        this.validateXmlHasNoPackageNames( resourceResponse );      
+        this.validateXmlHasNoPackageNames( resourceResponse );
     }
 
     public void testRepositoryStatusListResourceResponse()
@@ -356,7 +366,9 @@ public class TestMarshalUnmarchal
 
         resourceResponse.setData( metaResource );
 
-        this.marshalUnmarchalThenCompare( resourceResponse, this.xstreamXML ); //FIXME: Need some sort of type map, for the json reader to figure out if some fields are longs not ints.
+        this.marshalUnmarchalThenCompare( resourceResponse, this.xstreamXML ); // FIXME: Need some sort of type map, for
+        // the json reader to figure out if some
+        // fields are longs not ints.
         this.validateXmlHasNoPackageNames( resourceResponse );
     }
 
@@ -573,7 +585,9 @@ public class TestMarshalUnmarchal
 
         resourceResponse.setData( resource );
 
-        this.marshalUnmarchalThenCompare( resourceResponse, this.xstreamXML ); //FIXME: Need some sort of type map, for the json reader to figure out if some fields are longs not ints.
+        this.marshalUnmarchalThenCompare( resourceResponse, this.xstreamXML ); // FIXME: Need some sort of type map, for
+        // the json reader to figure out if some
+        // fields are longs not ints.
         this.validateXmlHasNoPackageNames( resourceResponse );
     }
 
@@ -596,7 +610,9 @@ public class TestMarshalUnmarchal
         resourceResponse.addData( item1 );
         resourceResponse.addData( item2 );
 
-        this.marshalUnmarchalThenCompare( resourceResponse, this.xstreamXML ); //FIXME: Need some sort of type map, for the json reader to figure out if some fields are longs not ints.
+        this.marshalUnmarchalThenCompare( resourceResponse, this.xstreamXML ); // FIXME: Need some sort of type map, for
+        // the json reader to figure out if some
+        // fields are longs not ints.
         this.validateXmlHasNoPackageNames( resourceResponse );
     }
 
@@ -793,7 +809,8 @@ public class TestMarshalUnmarchal
 
         resourceResponse.setData( status );
 
-        this.marshalUnmarchalThenCompare( resourceResponse, this.xstreamXML ); //FIXME: JSON READER CANNOT PARSE DATES CORRECTLY.
+        this.marshalUnmarchalThenCompare( resourceResponse, this.xstreamXML ); // FIXME: JSON READER CANNOT PARSE DATES
+        // CORRECTLY.
         this.validateXmlHasNoPackageNames( resourceResponse );
     }
 
@@ -835,7 +852,6 @@ public class TestMarshalUnmarchal
         this.validateXmlHasNoPackageNames( resourceResponse );
     }
 
-    
     public void testScheduledServiceBaseResource()
     {
         ScheduledServiceBaseResource resource = new ScheduledServiceBaseResource();
@@ -860,9 +876,9 @@ public class TestMarshalUnmarchal
 
         this.marshalUnmarchalThenCompare( resourceResponse );
         this.validateXmlHasNoPackageNames( resourceResponse );
-       
+
     }
-    
+
     public void testScheduledServiceOnceResource()
     {
         ScheduledServiceOnceResource resource = new ScheduledServiceOnceResource();
@@ -1290,7 +1306,8 @@ public class TestMarshalUnmarchal
         resourceResponse.addData( appResource2 );
         resourceResponse.addData( targetResource2 );
 
-        this.marshalUnmarchalThenCompare( resourceResponse, this.xstreamXML ); //FIXME: list of multiple objects would need a converter
+        this.marshalUnmarchalThenCompare( resourceResponse, this.xstreamXML ); // FIXME: list of multiple objects would
+        // need a converter
         this.validateXmlHasNoPackageNames( resourceResponse );
     }
 
@@ -1396,7 +1413,7 @@ public class TestMarshalUnmarchal
 
         this.marshalUnmarchalThenCompare( resourceResponse );
         this.validateXmlHasNoPackageNames( resourceResponse );
-        
+
     }
 
     public void testRepositoryContentClassListResourceResponse()
@@ -1417,10 +1434,7 @@ public class TestMarshalUnmarchal
         this.marshalUnmarchalThenCompare( resourceResponse );
         this.validateXmlHasNoPackageNames( resourceResponse );
     }
-    
-    
-    
-    
+
     public void onHold()
     {
         ScheduledServiceWeeklyResource scheduledTask = new ScheduledServiceWeeklyResource();
@@ -1433,12 +1447,11 @@ public class TestMarshalUnmarchal
         startDate = DateUtils.round( startDate, Calendar.DAY_OF_MONTH );
         scheduledTask.setStartDate( String.valueOf( startDate.getTime() ) );
         scheduledTask.setRecurringTime( "03:30" );
-        
-//        scheduledTask.setRecurringDay( Arrays.asList( new String[] { "monday", "wednesday", "friday" } ) );
+
+        // scheduledTask.setRecurringDay( Arrays.asList( new String[] { "monday", "wednesday", "friday" } ) );
         scheduledTask.addRecurringDay( "monday" );
         scheduledTask.addRecurringDay( "wednesday" );
         scheduledTask.addRecurringDay( "friday" );
-        
 
         scheduledTask.setTypeId( "org.sonatype.nexus.tasks.ReindexTask" );
 
@@ -1446,45 +1459,45 @@ public class TestMarshalUnmarchal
         prop.setId( "repositoryOrGroupId" );
         prop.setValue( "all_repo" );
         scheduledTask.addProperty( prop );
-        
-        
+
         ScheduledServiceResourceResponse resourceResponse = new ScheduledServiceResourceResponse();
         resourceResponse.setData( scheduledTask );
-        
-//        System.out.println( "xml:\n"+ this.xstreamXML.toXML( resourceResponse ) );
+
+        // System.out.println( "xml:\n"+ this.xstreamXML.toXML( resourceResponse ) );
 
         this.marshalUnmarchalThenCompare( resourceResponse );
         this.validateXmlHasNoPackageNames( resourceResponse );
-        
+
     }
-    
+
     public void testPlexusComponentListResourceResponse()
     {
         PlexusComponentListResourceResponse resourceResponse = new PlexusComponentListResourceResponse();
-        
+
         PlexusComponentListResource resource1 = new PlexusComponentListResource();
         resource1.setDescription( "description1" );
         resource1.setRoleHint( "role-hint1" );
         resourceResponse.addData( resource1 );
-        
+
         PlexusComponentListResource resource2 = new PlexusComponentListResource();
         resource2.setDescription( "description2" );
         resource2.setRoleHint( "role-hint2" );
         resourceResponse.addData( resource2 );
-        
+
         this.marshalUnmarchalThenCompare( resourceResponse );
         this.validateXmlHasNoPackageNames( resourceResponse );
-        
+
     }
-    
+
     protected void marshalUnmarchalThenCompare( Object obj )
     {
         // do xml
         String xml = this.xstreamXML.toXML( obj );
         this.compareObjects( obj, xstreamXML.fromXML( xml ) );
-        
+
         // do json
-        String json = new StringBuffer( "{ \"" ).append( obj.getClass().getName() ).append( "\" : " ).append( this.xstreamJSON.toXML( obj ) ).append( " }" ).toString();
+        String json = new StringBuffer( "{ \"" ).append( obj.getClass().getName() ).append( "\" : " ).append(
+            this.xstreamJSON.toXML( obj ) ).append( " }" ).toString();
         try
         {
             this.compareObjects( obj, xstreamJSON.fromXML( json, obj.getClass().newInstance() ) );
@@ -1492,10 +1505,9 @@ public class TestMarshalUnmarchal
         catch ( Exception e )
         {
             e.printStackTrace();
-           Assert.fail( e.getMessage() +"\nJSON:\n"+ json );
+            Assert.fail( e.getMessage() + "\nJSON:\n" + json );
         }
     }
-    
 
     protected void marshalUnmarchalThenCompare( Object obj, XStream xstream )
     {
@@ -1515,12 +1527,12 @@ public class TestMarshalUnmarchal
 
         // check the counts
         Assert.assertFalse( "Found package name in XML:\n" + xml, totalCount > 0 );
-        
-//        // print out each type of method, so i can rafb it
-//        System.out.println( "\n\nClass: "+ obj.getClass() +"\n" );
-//        System.out.println( xml+"\n" );
-//        
-//        Assert.assertFalse( "Found <string> XML: " + obj.getClass() + "\n" + xml, xml.contains( "<string>" ) );
+
+        // // print out each type of method, so i can rafb it
+        // System.out.println( "\n\nClass: "+ obj.getClass() +"\n" );
+        // System.out.println( xml+"\n" );
+        //        
+        // Assert.assertFalse( "Found <string> XML: " + obj.getClass() + "\n" + xml, xml.contains( "<string>" ) );
 
     }
 
@@ -1567,9 +1579,7 @@ public class TestMarshalUnmarchal
             }
 
         }
-                
+
     }
-    
-    
 
 }

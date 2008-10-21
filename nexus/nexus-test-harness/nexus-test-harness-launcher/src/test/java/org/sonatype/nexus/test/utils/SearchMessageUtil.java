@@ -10,7 +10,6 @@ import org.apache.log4j.Logger;
 import org.codehaus.plexus.util.StringUtils;
 import org.junit.Assert;
 import org.restlet.data.MediaType;
-import org.restlet.data.Message;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
 import org.restlet.data.Status;
@@ -19,7 +18,6 @@ import org.sonatype.nexus.rest.model.NexusArtifact;
 import org.sonatype.nexus.rest.model.RepositoryResource;
 import org.sonatype.nexus.rest.model.RepositoryResourceResponse;
 import org.sonatype.nexus.rest.model.SearchResponse;
-import org.sonatype.nexus.rest.xstream.XStreamInitializer;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
 
 import com.thoughtworks.xstream.XStream;
@@ -34,7 +32,6 @@ public class SearchMessageUtil
     static
     {
         xstream = XStreamFactory.getXmlXStream();
-        XStreamInitializer.initialize( xstream );
     }
 
     public Response doSearchFor( String query )

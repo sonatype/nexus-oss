@@ -20,59 +20,36 @@
  */
 package org.sonatype.nexus.rest.privileges;
 
-import junit.framework.TestCase;
-
 import org.restlet.data.MediaType;
-import org.sonatype.nexus.rest.model.PrivilegeApplicationStatusResource;
+import org.sonatype.nexus.rest.AbstractRestTestCase;
 import org.sonatype.nexus.rest.model.PrivilegeResourceRequest;
-import org.sonatype.nexus.rest.model.PrivilegeStatusResourceResponse;
 import org.sonatype.nexus.rest.model.PrivilegeTargetResource;
-import org.sonatype.nexus.rest.model.PrivilegeTargetStatusResource;
-import org.sonatype.nexus.rest.xstream.XStreamInitializer;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
-import org.sonatype.plexus.rest.xstream.json.JsonOrgHierarchicalStreamDriver;
-
-import com.thoughtworks.xstream.XStream;
 
 public class PrivilegeTest
-    extends TestCase
+    extends AbstractRestTestCase
 {
-
-    protected XStream xstream;
-
-    protected void setUp()
-        throws Exception
-    {
-        super.setUp();
-
-        // create and configure XStream for JSON
-        xstream = XStreamInitializer.initialize( new XStream( new JsonOrgHierarchicalStreamDriver() ) );
-    }
-
-    protected void tearDown()
-        throws Exception
-    {
-        super.tearDown();
-    }
 
     public void testTargetRequest()
         throws Exception
     {
-        String jsonString =
-            "{\"data\":{\"name\":\"Test Priv\",\"type\":\"repositoryTarget\",\"method\":[\"read\",\"create\"]," +
-            "\"repositoryTargetId\":\"targetId\",\"repositoryId\":\"repoId\",\"repositoryGroupId\":\"groupId\"}}";
-        XStreamRepresentation representation =
-            new XStreamRepresentation( xstream, jsonString, MediaType.APPLICATION_JSON );
-        
-        PrivilegeResourceRequest request = ( PrivilegeResourceRequest ) representation.getPayload( new PrivilegeResourceRequest() );
+        String jsonString = "{\"data\":{\"name\":\"Test Priv\",\"type\":\"repositoryTarget\",\"method\":[\"read\",\"create\"],"
+            + "\"repositoryTargetId\":\"targetId\",\"repositoryId\":\"repoId\",\"repositoryGroupId\":\"groupId\"}}";
+        XStreamRepresentation representation = new XStreamRepresentation(
+            xstream,
+            jsonString,
+            MediaType.APPLICATION_JSON );
+
+        PrivilegeResourceRequest request = (PrivilegeResourceRequest) representation
+            .getPayload( new PrivilegeResourceRequest() );
 
         assert request.getData().getName().equals( "Test Priv" );
         assert request.getData().getType().equals( AbstractPrivilegePlexusResource.TYPE_REPO_TARGET );
         assert request.getData().getMethod().size() == 2;
         assert request.getData().getMethod().contains( "read" );
         assert request.getData().getMethod().contains( "create" );
-        assert ( ( PrivilegeTargetResource ) request.getData() ).getRepositoryTargetId().equals( "targetId" );
-        assert ( ( PrivilegeTargetResource ) request.getData() ).getRepositoryId().equals( "repoId" );
-        assert ( ( PrivilegeTargetResource ) request.getData() ).getRepositoryGroupId().equals( "groupId" );
+        assert ( (PrivilegeTargetResource) request.getData() ).getRepositoryTargetId().equals( "targetId" );
+        assert ( (PrivilegeTargetResource) request.getData() ).getRepositoryId().equals( "repoId" );
+        assert ( (PrivilegeTargetResource) request.getData() ).getRepositoryGroupId().equals( "groupId" );
     }
 }

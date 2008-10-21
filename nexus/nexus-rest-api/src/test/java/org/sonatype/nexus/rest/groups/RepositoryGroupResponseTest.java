@@ -20,42 +20,20 @@
  */
 package org.sonatype.nexus.rest.groups;
 
-import junit.framework.TestCase;
-
 import org.restlet.data.MediaType;
+import org.sonatype.nexus.rest.AbstractRestTestCase;
 import org.sonatype.nexus.rest.model.RepositoryGroupListResourceResponse;
-import org.sonatype.nexus.rest.xstream.XStreamInitializer;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
-import org.sonatype.plexus.rest.xstream.json.JsonOrgHierarchicalStreamDriver;
-
-import com.thoughtworks.xstream.XStream;
 
 public class RepositoryGroupResponseTest
-    extends TestCase
+    extends AbstractRestTestCase
 {
-
-    protected XStream xstream;
-
-    protected void setUp()
-        throws Exception
-    {
-        super.setUp();
-
-        // create and configure XStream for JSON
-        xstream = XStreamInitializer.initialize( new XStream( new JsonOrgHierarchicalStreamDriver() ) );
-    }
-
-    protected void tearDown()
-        throws Exception
-    {
-        super.tearDown();
-    }
 
     public void testRepoGroup()
         throws Exception
     {
         String jsonString = "{ \"org.sonatype.nexus.rest.model.RepositoryGroupResourceResponse\" : {\"data\":{\"id\":\"public-releases\",\"name\":\"public-releases11\",\"repositories\":[{\"@class\":\"org.sonatype.nexus.rest.model.RepositoryGroupResource\",\"id\":\"extFree\",\"name\":\"Modified OSS\",\"resourceURI\":\"/nexus/service/local/repo_groups//repositories/extFree\"},{\"@class\":\"org.sonatype.nexus.rest.model.RepositoryGroupResource\",\"id\":\"extNonFree\",\"name\":\"Commerical\",\"resourceURI\":\"/nexus/service/local/repo_groups//repositories/extNonFree\"},{\"@class\":\"org.sonatype.nexus.rest.model.RepositoryGroupResource\",\"id\":\"central\",\"name\":\"Maven Central\",\"resourceURI\":\"/nexus/service/local/repo_groups//repositories/central\"},{\"@class\":\"org.sonatype.nexus.rest.model.RepositoryGroupResource\",\"id\":\"codehaus\",\"name\":\"Codehaus\",\"resourceURI\":\"/nexus/service/local/repo_groups//repositories/codehaus\"},{\"@class\":\"org.sonatype.nexus.rest.model.RepositoryGroupResource\",\"id\":\"maven2-repository.dev.java.net\",\"name\":\"Java dot NET\",\"resourceURI\":\"/nexus/service/local/repo_groups//repositories/maven2-repository.dev.java.net\"}]}}}";
-        
+
         XStreamRepresentation representation = new XStreamRepresentation(
             xstream,
             jsonString,
@@ -63,7 +41,6 @@ public class RepositoryGroupResponseTest
 
         RepositoryGroupListResourceResponse response = (RepositoryGroupListResourceResponse) representation
             .getPayload( new RepositoryGroupListResourceResponse() );
-
     }
 
 }

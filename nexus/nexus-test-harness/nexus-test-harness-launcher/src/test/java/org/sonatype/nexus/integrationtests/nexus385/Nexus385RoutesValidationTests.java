@@ -11,10 +11,7 @@ import org.restlet.data.Response;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.rest.model.RepositoryRouteMemberRepository;
 import org.sonatype.nexus.rest.model.RepositoryRouteResource;
-import org.sonatype.nexus.rest.xstream.XStreamInitializer;
 import org.sonatype.nexus.test.utils.RoutesMessageUtil;
-
-import com.thoughtworks.xstream.XStream;
 
 /**
  * Extra CRUD validation tests.
@@ -27,9 +24,7 @@ public class Nexus385RoutesValidationTests
 
     public Nexus385RoutesValidationTests()
     {
-        this.messageUtil = new RoutesMessageUtil(
-            XStreamInitializer.initialize( this.getXMLXStream() ),
-            MediaType.APPLICATION_XML );
+        this.messageUtil = new RoutesMessageUtil( this.getXMLXStream(), MediaType.APPLICATION_XML );
     }
 
     @SuppressWarnings( "unchecked" )
@@ -40,7 +35,7 @@ public class Nexus385RoutesValidationTests
         // EXPLANATION
         // When no groupId sent with route, Nexus _defaults_ it to '*', meaning
         // all repositories to "mimic" the pre-this-change behaviour
-        
+
         RepositoryRouteResource resource = new RepositoryRouteResource();
         // resource.setGroupId( "nexus-test" );
         resource.setPattern( ".*createNoGroupIdTest.*" );
@@ -54,7 +49,7 @@ public class Nexus385RoutesValidationTests
 
         String responseText = response.getEntity().getText();
         if ( response.getStatus().getCode() != 201 || !responseText.contains( "<groupId>*</groupId>" ) )
-        {   
+        {
             Assert.fail( "Should have returned a 201, but returned: " + response.getStatus() + "\nresponse:\n"
                 + responseText + ", and the omitted groupId should be defaulted with '*'" );
         }

@@ -24,10 +24,10 @@ import org.restlet.resource.Representation;
 import org.restlet.resource.StringRepresentation;
 import org.sonatype.nexus.client.NexusClientException;
 import org.sonatype.nexus.client.NexusConnectionException;
+import org.sonatype.nexus.rest.NexusApplication;
 import org.sonatype.nexus.rest.model.NexusError;
 import org.sonatype.nexus.rest.model.NexusErrorResponse;
 import org.sonatype.nexus.rest.model.NexusResponse;
-import org.sonatype.nexus.rest.xstream.XStreamInitializer;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
 import org.sonatype.plexus.rest.xstream.xml.LookAheadXppDriver;
 
@@ -47,7 +47,7 @@ public class RestClientHelper
 
     private Logger logger = Logger.getLogger( getClass() );
 
-    private XStream xstream = XStreamInitializer.initialize( new XStream( new LookAheadXppDriver() ) );
+    private XStream xstream;
 
     public RestClientHelper( String baseUrl, String username, String password )
     {
@@ -57,6 +57,9 @@ public class RestClientHelper
         this.baseUrl = baseUrl;
         this.restContext = new Context();
         this.restClient = new Client( restContext, Protocol.HTTP );
+
+        NexusApplication napp = new NexusApplication();
+        xstream = napp.doConfigureXstream( new XStream( new LookAheadXppDriver() ) );
     }
 
     private String buildUrl( String service, String id )
