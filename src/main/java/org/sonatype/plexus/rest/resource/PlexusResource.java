@@ -9,6 +9,8 @@ import org.restlet.data.Response;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
 
+import com.thoughtworks.xstream.XStream;
+
 /**
  * An automatically managed Rest Resource.
  * 
@@ -29,6 +31,14 @@ public interface PlexusResource
      * @return
      */
     Object getPayloadInstance();
+
+    /**
+     * A Resource may add some configuration stuff to the XStream, and control the serialization of the payloads it
+     * uses.
+     * 
+     * @param xstream
+     */
+    void configureXStream( XStream xstream );
 
     /**
      * A permission prefix to be applied when securing the resource.

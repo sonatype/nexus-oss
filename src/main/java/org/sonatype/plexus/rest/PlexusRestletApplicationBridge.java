@@ -122,6 +122,24 @@ public class PlexusRestletApplicationBridge
      */
     protected final void configure()
     {
+        // sorting out the resources, collecting them
+        boolean shouldCollectPlexusResources = getContext().getParameters().getFirstValue( PLEXUS_DISCOVER_RESOURCES ) != null
+            ? Boolean.parseBoolean( (String) getContext().getParameters().getFirstValue( PLEXUS_DISCOVER_RESOURCES ) )
+            : true; // the default if not set
+
+        if ( shouldCollectPlexusResources )
+        {
+            // discover the plexusResources
+            getLogger().info( "Discovered " + plexusResources.size() + " PlexusResource components." );
+        }
+        else
+        {
+            // create an empty map
+            plexusResources = new HashMap<String, PlexusResource>();
+
+            getLogger().info( "PlexusResource discovery disabled." );
+        }
+
         // we are putting XStream into this Application's Context, since XStream is threadsafe
         // and it is safe to share it across multiple threads. XStream is heavily used by our
         // custom Representation implementation to support XML and JSON.
@@ -143,24 +161,6 @@ public class PlexusRestletApplicationBridge
 
         // put fileItemFactory into context
         getContext().getAttributes().put( FILEITEM_FACTORY, new DiskFileItemFactory() );
-
-        boolean shouldCollectPlexusResources = getContext().getParameters().getFirstValue( PLEXUS_DISCOVER_RESOURCES ) != null
-            ? Boolean.parseBoolean( (String) getContext().getParameters().getFirstValue( PLEXUS_DISCOVER_RESOURCES ) )
-            : true; // the default if not set
-
-        if ( shouldCollectPlexusResources )
-        {
-            // discover the plexusResources
-            // TODO: plexus will inject the resources anyway
-            getLogger().info( "Discovered " + plexusResources.size() + " PlexusResource components." );
-        }
-        else
-        {
-            // create an empty map
-            plexusResources = new HashMap<String, PlexusResource>();
-
-            getLogger().info( "PlexusResource discovery disabled." );
-        }
 
         doConfigure();
     }
@@ -195,7 +195,17 @@ public class PlexusRestletApplicationBridge
     {
         XStream xstream = new XStream( driver );
 
-        return doConfigureXstream( xstream );
+        // let the application configure the XStream
+        xstream = doConfigureXstream( xstream );
+
+        // then apply all the needed stuff from Resources
+        for ( PlexusResource resource : plexusResources.values() )
+        {
+            resource.configureXStream( xstream );
+        }
+
+        // and return it
+        return xstream;
     }
 
     protected void attach( Router router, boolean strict, String uriPattern, Restlet target )
@@ -246,7 +256,7 @@ public class PlexusRestletApplicationBridge
      * @param xstream
      * @return
      */
-    protected XStream doConfigureXstream( XStream xstream )
+    public XStream doConfigureXstream( XStream xstream )
     {
         // default implementation does nothing, override if needed
         return xstream;

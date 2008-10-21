@@ -13,6 +13,8 @@ import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
 
+import com.thoughtworks.xstream.XStream;
+
 public abstract class AbstractPlexusResource
     extends AbstractLogEnabled
     implements PlexusResource
@@ -74,7 +76,7 @@ public abstract class AbstractPlexusResource
     public abstract PathProtectionDescriptor getResourceProtection();
 
     public abstract Object getPayloadInstance();
-    
+
     // to be overridden by subclasses if needed
 
     public List<Variant> getVariants()
@@ -92,6 +94,11 @@ public abstract class AbstractPlexusResource
     {
         // since this property will not change during the lifetime of a resource, it is needed to be overrided
         return false;
+    }
+
+    public void configureXStream( XStream xstream )
+    {
+        // a dummy implementation to be overridden if needed
     }
 
     public Object get( Context context, Request request, Response response, Variant variant )
