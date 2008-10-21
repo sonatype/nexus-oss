@@ -35,7 +35,14 @@
 		<dependency>
 			<groupId>org.codehaus.plexus</groupId>
 			<artifactId>plexus-container-default</artifactId>
+			<scope>compile</scope>
 		</dependency>
+		<dependency>
+			<groupId>org.codehaus.plexus</groupId>
+			<artifactId>plexus-classworlds</artifactId>
+			
+			<scope>compile</scope>
+		</dependency>		
 	</dependencies>
 	<build>
 		<plugins>
