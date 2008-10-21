@@ -23,6 +23,8 @@ package org.sonatype.nexus.tools.repository;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
@@ -35,34 +37,61 @@ public class DefaultRepositoryConvertor
     implements RepositoryConvertor
 {
 
-    @Requirement
-    private RepositoryConvertorFileHelper repositoryConvertorFileHelper;
+    public static final String VERSION_REGEX = "^[0-9].*$";
+    
 
-    /**
-     * when traverse a folder, if this mark is true, then go back to the parent folder
-     */
-    private boolean breakToParent = false;
-
+    @Requirement( role = ConvertorCommand.class , hint = RepositorySeperationConvertorCommand.ID )
+    private RepositorySeperationConvertorCommand repositorySeperationConvertorCommand; 
+    
     private File currentRepository;
 
     private File releaseRepository;
 
     private File snapshotRepository;
+    
+    private List<ConvertorCommand> convertorCommands = new ArrayList<ConvertorCommand>();
 
+    
     public void convertRepositoryWithCopy( File repository, File targetPath )
         throws IOException
     {
         setUp( repository, targetPath );
+        
+        convertorCommands.clear();
+        
+        repositorySeperationConvertorCommand.setRepository( currentRepository );
+        
+        repositorySeperationConvertorCommand.setReleaseRepository( releaseRepository );
+        
+        repositorySeperationConvertorCommand.setSnapshotRepository( snapshotRepository );
+        
+        repositorySeperationConvertorCommand.setMove( false );
 
-        convert( currentRepository, false );
+        convertorCommands.add( repositorySeperationConvertorCommand );
+        
+        iterate( currentRepository, false );
     }
 
     public void convertRepositoryWithMove( File repository, File targetPath )
         throws IOException
     {
         setUp( repository, targetPath );
+        
+        convertorCommands.clear();
+        
+        repositorySeperationConvertorCommand.setRepository( currentRepository );
+        
+        repositorySeperationConvertorCommand.setReleaseRepository( releaseRepository );
+        
+        repositorySeperationConvertorCommand.setSnapshotRepository( snapshotRepository );
+        
+        repositorySeperationConvertorCommand.setMove( true );
 
-        convert( currentRepository, true );
+        convertorCommands.add( repositorySeperationConvertorCommand );
+        
+        iterate( currentRepository, true );
+        
+        deleteCurrentRepository();
     }
 
     private void setUp( File repository, File targetPath )
@@ -78,118 +107,70 @@ public class DefaultRepositoryConvertor
         snapshotRepository.mkdir();
     }
 
-    private void convert( File file, boolean isMove )
+    
+    private void iterate( File file , boolean isMove)
         throws IOException
     {
-        if ( isRepositoryLeaf( file ) )
+        List<File> artifactVersions = getArtifactVersions( file );
+
+        if ( !artifactVersions.isEmpty() )
         {
-            if ( isMove )
+            for (ConvertorCommand convertorCommand : convertorCommands )
             {
-                moveToTargetRepository( file.getParentFile() );
+                convertorCommand.execute( artifactVersions );
             }
-            else
-            {
-                copyToTargetRepository( file.getParentFile() );
-            }
-
-            // since the whole folder containing this file is already moved
-            // don't need to look the other files in this folder
-            breakToParent = true;
-
-            return;
         }
+        else if ( file.isDirectory() )
+        {
+            for ( File subFile : file.listFiles() )
+            {
+                iterate( subFile , isMove);
+            }
+        }
+    }
+    
+    /**
+     * Check if the file is the artifact directory, which contains sub-directory named by version
+     * 
+     * @param file
+     * @return
+     */
+    private List<File> getArtifactVersions( File file )
+    {
+        List<File> artifactVersions = new ArrayList<File>();
+        
+        if ( !file.exists() || !file.isDirectory() )
+        {
+            return artifactVersions;
+        }
+        else
+        {
+            for ( File subFile : file.listFiles() )
+            {
+                if ( subFile.getName().matches( VERSION_REGEX ))
+                {
+                    artifactVersions.add( subFile );
+                }
+            }
+            return artifactVersions;
+        }
+    }
+    
+    private void deleteCurrentRepository()
+    {
+        deleteFile (currentRepository);
+    }
+    
+    private void deleteFile( File file )
+    {
         if ( file.isDirectory() )
         {
             for ( File subFile : file.listFiles() )
             {
-                if ( breakToParent )
-                {
-                    break;
-                }
-                convert( subFile, isMove );
+                deleteFile( subFile );
             }
-            breakToParent = false;
-
         }
-
-        if ( isMove )
-        {
-            file.delete();
-        }
-    }
-
-    /**
-     * copy the version folder to its target repository according to it's version type
-     * 
-     * @param versionFolder A folder in repository, normally its name is a version of an artifact
-     * @throws IOException
-     */
-    private void copyToTargetRepository( File versionFolder )
-        throws IOException
-    {
-
-        repositoryConvertorFileHelper.copy( versionFolder, getTargetRepository( versionFolder ), getCoordinatePath( versionFolder ) );
-    }
-
-    /**
-     * move the version folder to its target repository according to it's version type
-     * 
-     * @param versionFolder A folder in repository, normally its name is a version of an artifact
-     * @throws IOException
-     */
-    private void moveToTargetRepository( File versionFolder )
-        throws IOException
-    {
-        repositoryConvertorFileHelper.move( versionFolder, getTargetRepository( versionFolder ), getCoordinatePath( versionFolder ) );
-    }
-
-    private boolean isSnapshot( String version )
-    {
-        if ( version.endsWith( "SNAPSHOT" ) )
-        {
-            return true;
-        }
-        return false;
-    }
-
-    private boolean isRepositoryLeaf( File file )
-    {
-        if ( !file.isFile() )
-        {
-            return false;
-        }
-        if ( file.getName().endsWith( ".pom" ) )
-        {
-            return true;
-        }
-        if ( file.getName().endsWith( ".jar" ) )
-        {
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * @param versionFolder
-     * @return The path from repository root to the parent of our version folder
-     */
-    private String getCoordinatePath( File versionFolder )
-    {
-        String temp = versionFolder.getAbsolutePath().substring( currentRepository.getAbsolutePath().length() );
-
-        return temp.substring( 0, temp.length() - versionFolder.getName().length() );
-    }
-
-    private File getTargetRepository( File versionFolder )
-    {
-        if ( isSnapshot( versionFolder.getName() ) )
-        {
-            return snapshotRepository;
-        }
-        else
-        {
-            return releaseRepository;
-        }
+        file.delete();
     }
 
 }
