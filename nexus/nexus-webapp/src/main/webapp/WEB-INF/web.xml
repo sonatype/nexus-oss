@@ -45,6 +45,10 @@
 			tgperms.pathPrefix = /service/local/repo_groups/(.*)/content(.*)
 			tgperms.pathReplacement = /groups/@1@2
 
+            tgiperms = org.sonatype.nexus.security.filter.authz.NexusTargetMappingAuthorizationFilter
+            tgiperms.pathPrefix = /service/local/repo_groups/(.*)/index_content(.*)
+            tgiperms.pathReplacement = /repo_groups/@1@2
+
 			contentAuthcBasic = org.sonatype.nexus.security.filter.authc.NexusHttpAuthenticationFilter
 			contentAuthcBasic.applicationName = Sonatype Nexus Repository Manager
 			contentAuthcBasic.fakeAuthScheme = false
@@ -104,6 +108,7 @@
     <!--
         Uncomment this if you need to edit JavaScript files and other resources while Jetty is running (to prevent it from locking
         everything).
+    -->
     <servlet>
         <servlet-name>default</servlet-name>
         <servlet-class>org.mortbay.jetty.servlet.DefaultServlet</servlet-class>
@@ -112,5 +117,4 @@
             <param-value>false</param-value>
         </init-param>
     </servlet>
-    -->
 </web-app>
