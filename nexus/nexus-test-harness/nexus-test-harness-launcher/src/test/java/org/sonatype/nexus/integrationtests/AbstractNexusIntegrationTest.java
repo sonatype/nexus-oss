@@ -33,7 +33,6 @@ import org.junit.BeforeClass;
 import org.restlet.data.Method;
 import org.restlet.data.Reference;
 import org.restlet.data.Response;
-import org.restlet.data.Status;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 import org.sonatype.appbooter.ForkedAppBooter;
 import org.sonatype.appbooter.ctl.AppBooterServiceException;
@@ -146,8 +145,6 @@ public class AbstractNexusIntegrationTest
         {
             if ( NEEDS_INIT )
             {
-                checkPreviousInstance();
-
                 // tell the console what we are doing, now that there is no output its
                 System.out.println( "Running Test: " + this.getClass().getSimpleName() );
 
@@ -185,23 +182,6 @@ public class AbstractNexusIntegrationTest
                 // TODO: we can remove this now that we have the soft restart
                 NEEDS_INIT = false;
             }
-        }
-    }
-
-    private void checkPreviousInstance()
-        throws Exception
-    {
-        try
-        {
-            Status status = RequestFacade.doGetRequest( "service/local/status " ).getStatus();
-            if ( status.isSuccess() )
-            {
-                Assert.fail( "Nexus already started.  Stop it first!" );
-            }
-        }
-        catch ( Exception e )
-        {
-            e.printStackTrace();
         }
     }
 
