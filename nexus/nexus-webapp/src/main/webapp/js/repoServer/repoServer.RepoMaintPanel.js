@@ -665,7 +665,7 @@ Ext.extend(Sonatype.repoServer.RepoMaintPanel, Sonatype.repoServer.AbstractRepoP
   //rec is grid store record
   viewRepo : function(rec){
     var repoType = rec.get('repoType'); 
-    if ( repoType == 'proxy' || repoType == 'hosted' ) {
+    if ( repoType != 'virtual' ) {
       this.browseSelector.enable();
     }
     else {
