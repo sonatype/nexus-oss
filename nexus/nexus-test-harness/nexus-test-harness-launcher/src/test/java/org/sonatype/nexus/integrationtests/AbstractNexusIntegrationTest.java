@@ -33,6 +33,7 @@ import org.junit.BeforeClass;
 import org.restlet.data.Method;
 import org.restlet.data.Reference;
 import org.restlet.data.Response;
+import org.restlet.data.Status;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 import org.sonatype.appbooter.ForkedAppBooter;
 import org.sonatype.appbooter.ctl.AppBooterServiceException;
@@ -56,11 +57,16 @@ public class AbstractNexusIntegrationTest
 {
 
     public static final String REPO_TEST_HARNESS_REPO = "nexus-test-harness-repo";
+
     public static final String REPO_TEST_HARNESS_REPO2 = "nexus-test-harness-repo2";
+
     public static final String REPO_TEST_HARNESS_RELEASE_REPO = "nexus-test-harness-release-repo";
+
     public static final String REPO_TEST_HARNESS_SNAPSHOT_REPO = "nexus-test-harness-snapshot-repo";
-    public static final String REPO_RELEASE_PROXY_REPO1= "release-proxy-repo-1";
-    public static final String REPO_TEST_HARNESS_SHADOW= "nexus-test-harness-shadow";
+
+    public static final String REPO_RELEASE_PROXY_REPO1 = "release-proxy-repo-1";
+
+    public static final String REPO_TEST_HARNESS_SHADOW = "nexus-test-harness-shadow";
 
     protected PlexusContainer container;
 
@@ -87,7 +93,6 @@ public class AbstractNexusIntegrationTest
     protected static String nexusLogDir;
 
     protected Logger log = Logger.getLogger( getClass() );
-
 
     /**
      * Flag that says if we should verify the config before startup, we do not want to do this for upgrade tests.
@@ -141,8 +146,10 @@ public class AbstractNexusIntegrationTest
         {
             if ( NEEDS_INIT )
             {
+                checkPreviousInstance();
+
                 // tell the console what we are doing, now that there is no output its
-                System.out.println( "Running Test: "+ this.getClass().getSimpleName() );
+                System.out.println( "Running Test: " + this.getClass().getSimpleName() );
 
                 HashMap<String, String> variables = new HashMap<String, String>();
                 variables.put( "test-harness-id", this.getTestId() );
@@ -164,7 +171,7 @@ public class AbstractNexusIntegrationTest
                 }
 
                 // we need to make sure the config is valid, so we don't need to hunt through log files
-                if( this.verifyNexusConfigBeforeStart )
+                if ( this.verifyNexusConfigBeforeStart )
                 {
                     NexusConfigUtil.validateConfig();
                 }
@@ -178,6 +185,23 @@ public class AbstractNexusIntegrationTest
                 // TODO: we can remove this now that we have the soft restart
                 NEEDS_INIT = false;
             }
+        }
+    }
+
+    private void checkPreviousInstance()
+        throws Exception
+    {
+        try
+        {
+            Status status = RequestFacade.doGetRequest( "service/local/status " ).getStatus();
+            if ( status.isSuccess() )
+            {
+                Assert.fail( "Nexus already started.  Stop it first!" );
+            }
+        }
+        catch ( Exception e )
+        {
+            e.printStackTrace();
         }
     }
 
@@ -258,9 +282,10 @@ public class AbstractNexusIntegrationTest
                 // the Restlet Client does not support multipart forms:
                 // http://restlet.tigris.org/issues/show_bug.cgi?id=71
 
-//                int status = DeployUtils.deployUsingPomWithRest( deployUrl, repositoryId, gav, artifactFile, pom );
+                // int status = DeployUtils.deployUsingPomWithRest( deployUrl, repositoryId, gav, artifactFile, pom );
 
-                DeployUtils.deployWithWagon( this.container, "http", deployUrl, artifactFile, this.getRelitiveArtifactPath( gav ) );
+                DeployUtils.deployWithWagon( this.container, "http", deployUrl, artifactFile,
+                                             this.getRelitiveArtifactPath( gav ) );
                 DeployUtils.deployWithWagon( this.container, "http", deployUrl, pom, this.getRelitivePomPath( gav ) );
 
             }
@@ -370,8 +395,11 @@ public class AbstractNexusIntegrationTest
         // the test can override the test config.
         File testConfigFile = this.getOverridableFile( configFile );
 
-        log.debug( "copying " + configFile + " to:  "
-            + new File( AbstractNexusIntegrationTest.nexusBaseDir + "/" + ( path == null ? RELATIVE_CONF_DIR : path ), configFile ) );
+        log.debug( "copying "
+            + configFile
+            + " to:  "
+            + new File( AbstractNexusIntegrationTest.nexusBaseDir + "/" + ( path == null ? RELATIVE_CONF_DIR : path ),
+                        configFile ) );
 
         FileTestingUtils.interpolationFileCopy( testConfigFile, new File( AbstractNexusIntegrationTest.nexusBaseDir
             + "/" + ( path == null ? RELATIVE_CONF_DIR : path ), destShortName ), variables );
@@ -529,11 +557,10 @@ public class AbstractNexusIntegrationTest
     }
 
     protected String getRelitivePomPath( Gav gav )
-    throws FileNotFoundException
-{
-    return this.getRelitiveArtifactPath( gav.getGroupId(), gav.getArtifactId(), gav.getVersion(),
-                                         "pom", null );
-}
+        throws FileNotFoundException
+    {
+        return this.getRelitiveArtifactPath( gav.getGroupId(), gav.getArtifactId(), gav.getVersion(), "pom", null );
+    }
 
     protected String getRelitiveArtifactPath( Gav gav )
         throws FileNotFoundException
@@ -542,12 +569,13 @@ public class AbstractNexusIntegrationTest
                                              gav.getExtension(), gav.getClassifier() );
     }
 
-    protected String getRelitiveArtifactPath( String groupId, String artifactId, String version, String extension, String classifier )
+    protected String getRelitiveArtifactPath( String groupId, String artifactId, String version, String extension,
+                                              String classifier )
         throws FileNotFoundException
     {
-        String classifierPart = StringUtils.isEmpty( classifier ) ? "" : "-"+classifier;
-        return groupId.replace( '.', '/' ) + "/" + artifactId + "/" + version + "/" + artifactId + "-" + version + classifierPart + "."
-            + extension;
+        String classifierPart = StringUtils.isEmpty( classifier ) ? "" : "-" + classifier;
+        return groupId.replace( '.', '/' ) + "/" + artifactId + "/" + version + "/" + artifactId + "-" + version
+            + classifierPart + "." + extension;
     }
 
     protected File downloadSnapshotArtifact( String repository, Gav gav, File parentDir )
@@ -560,16 +588,18 @@ public class AbstractNexusIntegrationTest
         // v=<version> -- mandatory
         // c=<classifier> -- optional
         // p=<packaging> -- optional, jar is taken as default
-        //http://localhost:8087/nexus/service/local/artifact/maven/redirect?r=tasks-snapshot-repo&g=nexus&a=artifact&
+        // http://localhost:8087/nexus/service/local/artifact/maven/redirect?r=tasks-snapshot-repo&g=nexus&a=artifact&
         // v=1.0-SNAPSHOT
         String serviceURI =
             "service/local/artifact/maven/redirect?r=" + repository + "&g=" + gav.getGroupId() + "&a="
                 + gav.getArtifactId() + "&v=" + gav.getVersion();
         Response response = RequestFacade.doGetRequest( serviceURI );
-        Assert.assertEquals( "Snapshot download should redirect to a new file " + response.getRequest().getResourceRef().toString(), 301, response.getStatus().getCode());
+        Assert.assertEquals( "Snapshot download should redirect to a new file "
+            + response.getRequest().getResourceRef().toString(), 301, response.getStatus().getCode() );
 
         Reference redirectRef = response.getRedirectRef();
-        Assert.assertNotNull( "Snapshot download should redirect to a new file " + response.getRequest().getResourceRef().toString(), redirectRef );
+        Assert.assertNotNull( "Snapshot download should redirect to a new file "
+            + response.getRequest().getResourceRef().toString(), redirectRef );
 
         serviceURI = redirectRef.toString();
 
@@ -582,40 +612,41 @@ public class AbstractNexusIntegrationTest
     protected File downloadArtifact( Gav gav, String targetDirectory )
         throws IOException
     {
-        return this.downloadArtifact( gav.getGroupId(), gav.getArtifactId(), gav.getVersion(), gav.getExtension(), gav.getClassifier(),
-                                      targetDirectory );
+        return this.downloadArtifact( gav.getGroupId(), gav.getArtifactId(), gav.getVersion(), gav.getExtension(),
+                                      gav.getClassifier(), targetDirectory );
     }
 
     protected File downloadArtifact( String groupId, String artifact, String version, String type, String classifier,
                                      String targetDirectory )
         throws IOException
     {
-        return this.downloadArtifact( this.getNexusTestRepoUrl(), groupId, artifact, version, type, classifier, targetDirectory );
+        return this.downloadArtifact( this.getNexusTestRepoUrl(), groupId, artifact, version, type, classifier,
+                                      targetDirectory );
     }
 
     protected File downloadArtifactFromRepository( String repoId, Gav gav, String targetDirectory )
         throws IOException
     {
         return this.downloadArtifact( AbstractNexusIntegrationTest.baseNexusUrl + REPOSITORY_RELATIVE_URL + repoId
-            + "/", gav.getGroupId(), gav.getArtifactId(), gav.getVersion(), gav.getExtension(), gav.getClassifier(), targetDirectory );
+            + "/", gav.getGroupId(), gav.getArtifactId(), gav.getVersion(), gav.getExtension(), gav.getClassifier(),
+                                      targetDirectory );
     }
 
     protected File downloadArtifactFromGroup( String groupId, Gav gav, String targetDirectory )
         throws IOException
     {
         return this.downloadArtifact( AbstractNexusIntegrationTest.baseNexusUrl + GROUP_REPOSITORY_RELATIVE_URL
-            + groupId + "/", gav.getGroupId(), gav.getArtifactId(), gav.getVersion(), gav.getExtension(), gav.getClassifier(),
-                                      targetDirectory );
+            + groupId + "/", gav.getGroupId(), gav.getArtifactId(), gav.getVersion(), gav.getExtension(),
+                                      gav.getClassifier(), targetDirectory );
     }
 
-    protected File downloadArtifact( String baseUrl, String groupId, String artifact, String version, String type, String classifier,
-                                     String targetDirectory )
+    protected File downloadArtifact( String baseUrl, String groupId, String artifact, String version, String type,
+                                     String classifier, String targetDirectory )
         throws IOException
     {
-        URL url =
-            new URL( baseUrl + this.getRelitiveArtifactPath( groupId, artifact, version, type, classifier ) );
+        URL url = new URL( baseUrl + this.getRelitiveArtifactPath( groupId, artifact, version, type, classifier ) );
 
-        String classifierPart = ( classifier != null ) ? "-"+classifier : "";
+        String classifierPart = ( classifier != null ) ? "-" + classifier : "";
         return this.downloadFile( url, targetDirectory + "/" + artifact + "-" + version + classifierPart + "." + type );
     }
 
@@ -650,7 +681,7 @@ public class AbstractNexusIntegrationTest
 
         // fake it because the artifact doesn't exist
         // TODO: clean this up.
-        if( response.getStatus().getCode() == 404 )
+        if ( response.getStatus().getCode() == 404 )
         {
             deleted = true;
         }
@@ -675,7 +706,7 @@ public class AbstractNexusIntegrationTest
 
     public String getNexusTestRepoServiceUrl()
     {
-        return baseNexusUrl + "service/local/repositories/"+ testRepositoryId +"/content/";
+        return baseNexusUrl + "service/local/repositories/" + testRepositoryId + "/content/";
     }
 
     public PlexusContainer getContainer()
@@ -707,8 +738,6 @@ public class AbstractNexusIntegrationTest
     {
         return baseNexusUrl + GROUP_REPOSITORY_RELATIVE_URL + groupId + "/";
     }
-
-
 
     protected boolean isVerifyNexusConfigBeforeStart()
     {
