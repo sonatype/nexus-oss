@@ -1,15 +1,19 @@
 <assembly>
-  <id>cli</id>
-  <includeBaseDirectory>false</includeBaseDirectory>
-  <formats>
-    <format>jar</format>
-  </formats>
-
-  <dependencySets>
-    <dependencySet>
-      <scope>runtime</scope>
-      <outputDirectory>/</outputDirectory>
-      <unpack>true</unpack>	    
-    </dependencySet>
-  </dependencySets>
+	<id>cli</id>
+	<includeBaseDirectory>false</includeBaseDirectory>
+	<formats>
+		<format>jar</format>
+	</formats>
+	<fileSets>
+		<fileSet>
+			<directory>target/classes</directory>
+		</fileSet>
+	</fileSets>
+	<dependencySets>
+		<dependencySet>
+			<scope>runtime</scope>
+			<outputDirectory>/</outputDirectory>
+			<unpack>true</unpack>
+		</dependencySet>
+	</dependencySets>
 </assembly>
