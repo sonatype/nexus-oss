@@ -6,17 +6,13 @@ import java.util.List;
 import junit.framework.Assert;
 
 import org.junit.Test;
-import org.sonatype.nexus.integrationtests.AbstractPrivilegeTest;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.rest.model.PrivilegeTargetResource;
 import org.sonatype.nexus.rest.model.PrivilegeTargetStatusResource;
 import org.sonatype.nexus.rest.model.RepositoryTargetResource;
 import org.sonatype.nexus.rest.model.RoleResource;
 import org.sonatype.nexus.rest.model.UserResource;
-import org.sonatype.nexus.test.utils.FeedUtil;
 
-import com.sun.syndication.feed.synd.SyndEntry;
-import com.sun.syndication.feed.synd.SyndFeed;
 
 import edu.emory.mathcs.backport.java.util.Collections;
 
@@ -24,12 +20,8 @@ import edu.emory.mathcs.backport.java.util.Collections;
  * Test filtering search results based upon security
  */
 public class Nexus779RssFeedFilteringTest
-    extends AbstractPrivilegeTest
+    extends AbstractRssTest
 {
-    private static final String RECENTLY_DEPLOYED = "recentlyDeployed";
-
-    private List<SyndEntry> entries;
-
     public Nexus779RssFeedFilteringTest() throws Exception
     {
         //Must be sure to run this tests after deploy
@@ -100,46 +92,6 @@ public class Nexus779RssFeedFilteringTest
         Assert.assertTrue( "Feed should contain entry for nexus779:test2:1.0.0\nEntries: " + this.entriesToString(),
                            feedListContainsArtifact( "nexus779", "test2", "1.0.0" ) );
 
-    }
-
-    private String entriesToString()
-        throws Exception
-    {
-        if ( entries == null )
-        {
-            return "No entries";
-        }
-
-        StringBuffer buffer = new StringBuffer();
-
-        for ( SyndEntry syndEntry : entries )
-        {
-            buffer.append( "\n" ).append( syndEntry.getTitle() );
-        }
-
-        return buffer.toString();
-    }
-
-    @SuppressWarnings("unchecked")
-    private boolean feedListContainsArtifact( String groupId, String artifactId, String version )
-        throws Exception
-    {
-        for ( int i = 0; i < 40; i++ )
-        {
-            SyndFeed feed = FeedUtil.getFeed( RECENTLY_DEPLOYED );
-            entries = feed.getEntries();
-
-            for ( SyndEntry entry : entries )
-            {
-                if ( entry.getTitle().contains( groupId ) && entry.getTitle().contains( artifactId )
-                    && entry.getTitle().contains( version ) )
-                {
-                    return true;
-                }
-            }
-            Thread.sleep( 200 );
-        }
-        return false;
     }
 
     private RepositoryTargetResource createTarget( String name, List<String> patterns )
