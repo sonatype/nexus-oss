@@ -13,20 +13,38 @@ public class Nexus779DeployRssTest
     public void restDeployRssCheck()
         throws Exception
     {
-        deploy( "artifact1" );
-        deploy( "artifact2" );
+        deployRest( "artifact1" );
         feedListContainsArtifact( "nexus779", "artifact1", "1.0" );
-
-        deploy( "artifact3" );
-        feedListContainsArtifact( "nexus779", "artifact3", "1.0" );
-
-        deploy( "artifact4" );
-        feedListContainsArtifact( "nexus779", "artifact4", "1.0" );
-        // I wanna to delay this check
+        deployRest( "artifact2" );
         feedListContainsArtifact( "nexus779", "artifact2", "1.0" );
     }
 
-    private int deploy( String artifactName )
+    @Test
+    public void wagonDeployRSSCheck()
+        throws Exception
+    {
+        deployWagon( "artifact3" );
+        feedListContainsArtifact( "nexus779", "artifact3", "1.0" );
+
+        deployWagon( "artifact4" );
+        feedListContainsArtifact( "nexus779", "artifact4", "1.0" );
+    }
+
+    private void deployWagon( String artifactName )
+        throws Exception
+    {
+        File jarFile = getTestFile( artifactName + ".jar" );
+        File pomFile = getTestFile( artifactName + ".pom" );
+
+        String deployUrl = baseNexusUrl + "content/repositories/" + REPO_TEST_HARNESS_REPO;
+        DeployUtils.deployWithWagon( this.container, "http", deployUrl, jarFile, "nexus779/" + artifactName + "/1.0/"
+            + artifactName + "-1.0.jar" );
+        DeployUtils.deployWithWagon( this.container, "http", deployUrl, pomFile, "nexus779/" + artifactName + "/1.0/"
+            + artifactName + "-1.0.pom" );
+
+    }
+
+    private int deployRest( String artifactName )
         throws Exception
     {
         File jarFile = getTestFile( artifactName + ".jar" );

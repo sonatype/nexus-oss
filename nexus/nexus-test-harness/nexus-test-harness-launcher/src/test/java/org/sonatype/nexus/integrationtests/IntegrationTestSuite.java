@@ -59,9 +59,9 @@ public class IntegrationTestSuite
                 Assert.fail( "Nexus already started.  Stop it first!" );
             }
         }
-        catch ( Exception e )
+        catch ( Throwable t )
         {
-            e.printStackTrace();
+            //I'm fine with that
         }
     }
 
