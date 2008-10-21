@@ -536,6 +536,7 @@ public class Nexus537RepoTargetsTests
 
     }
 
+    //TODO This will be no longer required when NEXUS-1018 is fixed
     private boolean contains( String foundMethod, String... expectedMethods )
     {
         List<String> foundMethods = new ArrayList<String>( Arrays.asList( foundMethod.split( "," ) ) );
