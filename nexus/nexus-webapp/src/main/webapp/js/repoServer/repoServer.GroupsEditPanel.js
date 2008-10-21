@@ -133,10 +133,24 @@ Sonatype.repoServer.GroupsEditPanel = function(config){
             dropConfig: {
               allowContainerDrop: true,
               onContainerDrop: function(source, e, data){
-                this.tree.root.appendChild(data.node);
-                return true;
+                if ( this.onContainerOver( source, e, data ) == this.dropAllowed ) {
+                  this.tree.root.appendChild(data.node);
+                  return true;
+                }
+                else {
+                  return false;
+                }
               },
-              onContainerOver:function(source, e, data){return this.dropAllowed;},
+              onContainerOver:function(source, e, data){
+                var repos = this.tree.root.childNodes;
+                var draggedRepo = data.node.attributes.payload;
+                for ( var i = 0; i < repos.length; i++ ) {
+                  if ( repos[i].attributes.payload.format != draggedRepo.format ) {
+                    return this.dropNotAllowed;
+                  }
+                }
+                return this.dropAllowed;
+              },
               // passign padding to make whole treePanel the drop zone.  This is dependent
               // on a sonatype fix in the Ext.dd.DropTarget class.  This is necessary
               // because treepanel.dropZone.setPadding is never available in time to be useful.
@@ -607,7 +621,8 @@ Ext.extend(Sonatype.repoServer.GroupsEditPanel, Ext.Panel, {
           rList[i] = {
             id : item.resourceURI.slice(item.resourceURI.lastIndexOf('/')+1),
             name : item.name,
-            resourceURI : item.resourceURI
+            resourceURI : item.resourceURI,
+            format : item.format
           };
         },
         this);
@@ -876,8 +891,9 @@ Ext.extend(Sonatype.repoServer.GroupsEditPanel, Ext.Panel, {
     if(rList){
       for(var i=0; i<rList.length; i++){
         repo = rList[i];
-        
-        if(typeof(grpTree.getNodeById(repo.id)) == 'undefined'){
+
+        var assignedNode = grpTree.getNodeById(repo.id);
+        if(typeof(assignedNode) == 'undefined'){
           
           allTree.root.appendChild(
             new Ext.tree.TreeNode({
@@ -890,6 +906,9 @@ Ext.extend(Sonatype.repoServer.GroupsEditPanel, Ext.Panel, {
               leaf: true
             })
           );
+        }
+        else {
+          assignedNode.attributes.payload.format = repo.format;
         }
       }
     }

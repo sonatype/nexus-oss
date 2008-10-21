@@ -78,7 +78,7 @@ Sonatype.ext.TwinPanelController = function(config){
 
 Ext.extend(Sonatype.ext.TwinPanelController, Ext.Panel, {
   addOne : function() {
-	this.moveItems( 2, 0, false );
+    this.moveItems( 2, 0, false );
   },
 
   addAll : function() {
@@ -86,7 +86,7 @@ Ext.extend(Sonatype.ext.TwinPanelController, Ext.Panel, {
   },
 
   removeOne : function() {
-	this.moveItems( 0, 2, false );
+    this.moveItems( 0, 2, false );
   },
 
   removeAll : function() {
@@ -94,24 +94,36 @@ Ext.extend(Sonatype.ext.TwinPanelController, Ext.Panel, {
   },
   
   moveItems : function( fromIndex, toIndex, moveAll ) {
-	var fromPanel = this.ownerCt.getComponent( fromIndex );
-	var toPanel = this.ownerCt.getComponent( toIndex );
-	if ( fromPanel && toPanel ) {
+    var fromPanel = this.ownerCt.getComponent( fromIndex );
+    var toPanel = this.ownerCt.getComponent( toIndex );
+
+    var dragZone = fromPanel.dragZone;
+    var dropZone = toPanel.dropZone;
+    var fn = toPanel.dropConfig.onContainerOver.createDelegate( dropZone, [ dragZone, null ], 0 );
+    var checkIfDragAllowed = function( node ) {
+      return fn( { node: node } ) == dropZone.dropAllowed;
+    }
+    
+    if ( fromPanel && toPanel ) {
       var fromRoot = fromPanel.root;
       var toRoot = toPanel.root;
       if ( moveAll ) {
-    	while ( fromRoot.hasChildNodes() ) {
-          toRoot.appendChild( fromRoot.firstChild );
-    	}
+        for ( var i = 0; i < fromRoot.childNodes.length; i++ ) {
+          var node = fromRoot.childNodes[i];
+          if ( checkIfDragAllowed( node ) ) {
+            toRoot.appendChild( node );
+            i--;
+          }
+        }
       }
       else {
-   	    var selectedNode = fromPanel.getSelectionModel().getSelectedNode();
-   	    if ( selectedNode ) {
-     	  toRoot.appendChild( selectedNode );
-   	    }
+        var selectedNode = fromPanel.getSelectionModel().getSelectedNode();
+        if ( selectedNode && checkIfDragAllowed( selectedNode ) ) {
+          toRoot.appendChild( selectedNode );
+        }
       }
-	}
-  }
+    }
+  },
 });
 
 Ext.reg('twinpanelcontroller', Sonatype.ext.TwinPanelController);
