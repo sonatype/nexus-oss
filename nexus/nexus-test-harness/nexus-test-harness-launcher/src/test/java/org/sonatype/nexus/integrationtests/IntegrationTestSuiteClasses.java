@@ -61,6 +61,7 @@ import org.sonatype.nexus.integrationtests.nexus640.Nexus640RebuildRepositoryAtt
 import org.sonatype.nexus.integrationtests.nexus642.Nexus642SynchShadowTaskTest;
 import org.sonatype.nexus.integrationtests.nexus643.Nexus643EmptyTrashTaskTest;
 import org.sonatype.nexus.integrationtests.nexus688.Nexus688ReindexOnRepoAdd;
+import org.sonatype.nexus.integrationtests.nexus779.Nexus779DeployRssTest;
 import org.sonatype.nexus.integrationtests.nexus782.Nexus782UploadWithClassifier;
 import org.sonatype.nexus.integrationtests.nexus810.Nexus810PackageNamesInNexusConf;
 import org.sonatype.nexus.integrationtests.nexus810.Nexus810PackageNamesInRestMessages;
@@ -154,7 +155,8 @@ import org.sonatype.nexus.integrationtests.upgrades.nexus652.Nexus652Beta5To10Up
     Nexus970DeleteRepositoryTest.class,
     Nexus969CacheEvictInteractionTest.class,
     Nexus980ReindexVirtualReposTest.class,
-    Nexus950CorruptPomTest.class } )
+    Nexus950CorruptPomTest.class,
+    Nexus779DeployRssTest.class } )
 public class IntegrationTestSuiteClasses
 {
 
