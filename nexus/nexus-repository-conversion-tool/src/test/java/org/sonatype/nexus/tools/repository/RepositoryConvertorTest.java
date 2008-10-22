@@ -129,5 +129,15 @@ public class RepositoryConvertorTest
             targetPath,
             "local-test-repo-snapshots/org/apache/maven/plugins/maven-javadoc-plugin/2.5.1-SNAPSHOT/maven-javadoc-plugin-2.5.1-20081013.050423-737.pom" )
             .exists() );
+        
+        // maven-metadata files should be filtered
+        assertFalse( new File(
+            targetPath,
+            "local-test-repo-snapshots/org/apache/maven/plugins/maven-javadoc-plugin/2.5.1-SNAPSHOT/maven-metadata-central.xml" )
+            .exists() );
+        assertFalse( new File(
+            targetPath,
+            "local-test-repo-snapshots/org/apache/maven/plugins/maven-javadoc-plugin/2.5.1-SNAPSHOT/maven-metadata-central.xml.sha1" )
+            .exists() );
     }
 }

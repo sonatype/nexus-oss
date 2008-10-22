@@ -132,7 +132,7 @@ public class RepositoryConvertorCli
 
             ioe.printStackTrace();
         }
-        System.out.println( "Repository convertion is succefull!" );
+        System.out.println( "Repository convertion is succeful!" );
     }
 
 }

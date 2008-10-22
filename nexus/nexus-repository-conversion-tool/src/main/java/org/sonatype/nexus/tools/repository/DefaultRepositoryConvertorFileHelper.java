@@ -65,7 +65,7 @@ public class DefaultRepositoryConvertorFileHelper
                 copyOrMove( child, target, basePath + file.getName() + File.separatorChar, isMove );
             }
         }
-        else if ( file.isFile() )
+        else if ( file.isFile() && !isMetadataFile (file) )
         {
             moveFileContent( file, targetFile );
         }
@@ -118,6 +118,26 @@ public class DefaultRepositoryConvertorFileHelper
             buildDirectoryPath( directory.getParentFile() );
         }
         directory.mkdir();
+    }
+    
+    
+    /**
+     * maven-metadata-<repoId>.xml, maven-matedata.xml, and their checksums md5/sha1
+     * 
+     * @param file
+     * @return
+     */
+    private boolean isMetadataFile( File file )
+    {
+        if ( !file.exists() || !file.isFile() )
+        {
+            return false;
+        }
+        if ( file.getName().startsWith( "maven-metadata" ) )
+        {
+            return true;
+        }
+        return false;
     }
 
 }
