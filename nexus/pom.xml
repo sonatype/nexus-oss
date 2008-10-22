@@ -140,7 +140,7 @@
 	</profiles>
 	<!-- Shortcuts for outnumbered deps :) -->
 	<properties>
-		<plexus.appbooter.version>1.6.0</plexus.appbooter.version>
+		<plexus.appbooter.version>1.6.1-SNAPSHOT</plexus.appbooter.version>
 		<jsw.binaries.version>3.2.3.2</jsw.binaries.version>
 		<plexus-jsecurity-realms.version>1.0.1</plexus-jsecurity-realms.version>
 		<slf4j.version>1.5.3</slf4j.version>
