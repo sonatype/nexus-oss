@@ -56,6 +56,7 @@
             <description>Deployment role for Nexus</description>
             <sessionTimeout>60</sessionTimeout>
             <privileges>
+                <privilege>64</privilege>
                 <privilege>T1</privilege>
                 <privilege>T2</privilege>
                 <privilege>T3</privilege>
@@ -64,8 +65,6 @@
                 <privilege>T6</privilege>
                 <privilege>T7</privilege>
                 <privilege>T8</privilege>
-                <privilege>64</privilege>
-                <privilege>2</privilege>
             </privileges>
             <roles>
                 <role>anonymous</role>
@@ -88,12 +87,10 @@
                 <privilege>56</privilege>
                 <privilege>57</privilege>
                 <privilege>58</privilege>
-                <privilege>64</privilege>
+                <privilege>70</privilege>
                 <privilege>T1</privilege>
                 <privilege>T2</privilege>
-                <privilege>T3</privilege>
             </privileges>
-            <roles />
         </role>
         <role>
             <id>developer</id>
@@ -102,182 +99,11 @@
             <sessionTimeout>30</sessionTimeout>
             <privileges>
                 <privilege>2</privilege>
-                <privilege>64</privilege>
             </privileges>
             <roles>
                 <role>anonymous</role>
                 <role>deployment</role>
             </roles>
-        </role>
-        <role>
-            <id>ui-search</id>
-            <name>UI: Search</name>
-            <description>Gives access to the Search screen in Nexus UI</description>
-            <sessionTimeout>60</sessionTimeout>
-            <privileges>
-                <privilege>17</privilege>
-                <privilege>19</privilege>
-            </privileges>
-        </role>
-        <role>
-            <id>ui-repo-browser</id>
-            <name>UI: Repository Browser</name>
-            <description>Gives access to the Repository Browser screen in Nexus UI</description>
-            <sessionTimeout>60</sessionTimeout>
-            <privileges>
-                <privilege>6</privilege>
-                <privilege>14</privilege>
-                <privilege>55</privilege>
-            </privileges>
-        </role>
-        <role>
-            <id>ui-system-feeds</id>
-            <name>UI: System Feeds</name>
-            <description>Gives access to the System Feeds screen in Nexus UI</description>
-            <sessionTimeout>60</sessionTimeout>
-            <privileges>
-                <privilege>44</privilege>
-            </privileges>
-        </role>
-        <role>
-            <id>ui-logs-config-files</id>
-            <name>UI: Logs and Config Files</name>
-            <description>Gives access to the Logs and Config Files screen in Nexus UI</description>
-            <sessionTimeout>60</sessionTimeout>
-            <privileges>
-                <privilege>42</privilege>
-                <privilege>43</privilege>
-            </privileges>
-        </role>
-        <role>
-            <id>ui-server-admin</id>
-            <name>UI: Server Administration</name>
-            <description>Gives access to the Server Administration screen in Nexus UI</description>
-            <sessionTimeout>60</sessionTimeout>
-            <privileges>
-                <privilege>3</privilege>
-                <privilege>4</privilege>
-            </privileges>
-        </role>
-        <role>
-            <id>ui-repository-admin</id>
-            <name>UI: Repository Administration</name>
-            <description>Gives access to the Repository Administration screen in Nexus UI</description>
-            <sessionTimeout>60</sessionTimeout>
-            <privileges>
-                <privilege>5</privilege>
-                <privilege>6</privilege>
-                <privilege>7</privilege>
-                <privilege>8</privilege>
-                <privilege>10</privilege>
-            </privileges>
-        </role>
-        <role>
-            <id>ui-group-admin</id>
-            <name>UI: Group Administration</name>
-            <description>Gives access to the Group Administration screen in Nexus UI</description>
-            <sessionTimeout>60</sessionTimeout>
-            <privileges>
-                <privilege>6</privilege>
-                <privilege>13</privilege>
-                <privilege>14</privilege>
-                <privilege>15</privilege>
-                <privilege>16</privilege>
-            </privileges>
-        </role>
-        <role>
-            <id>ui-routing-admin</id>
-            <name>UI: Routing Administration</name>
-            <description>Gives access to the Routing Administration screen in Nexus UI</description>
-            <sessionTimeout>60</sessionTimeout>
-            <privileges>
-                <privilege>6</privilege>
-                <privilege>14</privilege>
-                <privilege>22</privilege>
-                <privilege>23</privilege>
-                <privilege>24</privilege>
-                <privilege>25</privilege>
-            </privileges>
-        </role>
-        <role>
-            <id>ui-scheduled-tasks-admin</id>
-            <name>UI: Scheduled Task Administration</name>
-            <description>Gives access to the Scheduled Task Administration screen in Nexus UI</description>
-            <sessionTimeout>60</sessionTimeout>
-            <privileges>
-                <privilege>6</privilege>
-                <privilege>14</privilege>
-                <privilege>26</privilege>
-                <privilege>27</privilege>
-                <privilege>28</privilege>
-                <privilege>29</privilege>
-                <privilege>69</privilege>
-            </privileges>
-        </role>
-        <role>
-            <id>ui-repository-targets-admin</id>
-            <name>UI: Repository Target Administration</name>
-            <description>Gives access to the Repository Target Administration screen in Nexus UI</description>
-            <sessionTimeout>60</sessionTimeout>
-            <privileges>
-                <privilege>45</privilege>
-                <privilege>46</privilege>
-                <privilege>47</privilege>
-                <privilege>48</privilege>
-                <privilege>56</privilege>
-            </privileges>
-        </role>
-        <role>
-            <id>ui-users-admin</id>
-            <name>UI: User Administration</name>
-            <description>Gives access to the User Administration screen in Nexus UI</description>
-            <sessionTimeout>60</sessionTimeout>
-            <privileges>
-                <privilege>35</privilege>
-                <privilege>38</privilege>
-                <privilege>39</privilege>
-                <privilege>40</privilege>
-                <privilege>41</privilege>
-            </privileges>
-        </role>
-        <role>
-            <id>ui-roles-admin</id>
-            <name>UI: Role Administration</name>
-            <description>Gives access to the Role Administration screen in Nexus UI</description>
-            <sessionTimeout>60</sessionTimeout>
-            <privileges>
-                <privilege>31</privilege>
-                <privilege>34</privilege>
-                <privilege>35</privilege>
-                <privilege>36</privilege>
-                <privilege>37</privilege>
-            </privileges>
-        </role>
-        <role>
-            <id>ui-privileges-admin</id>
-            <name>UI: Privilege Administration</name>
-            <description>Gives access to the Privilege Administration screen in Nexus UI</description>
-            <sessionTimeout>60</sessionTimeout>
-            <privileges>
-                <privilege>6</privilege>
-                <privilege>14</privilege>
-                <privilege>30</privilege>
-                <privilege>31</privilege>
-                <privilege>32</privilege>
-                <privilege>33</privilege>
-                <privilege>46</privilege>
-            </privileges>
-        </role>
-        <role>
-            <id>ui-basic</id>
-            <name>UI: Base UI Privileges</name>
-            <description>Generic privileges for users in the Nexus UI</description>
-            <sessionTimeout>60</sessionTimeout>
-            <privileges>
-                <privilege>1</privilege>
-                <privilege>2</privilege>
-                <privilege>64</privilege>
-            </privileges>
         </role>
     </roles>
     

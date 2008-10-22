@@ -75,7 +75,7 @@ public class Nexus652Beta5To10UpgradeTest
         org.sonatype.jsecurity.model.Configuration secConfig = SecurityConfigUtil.getSecurityConfig();
         
         Assert.assertEquals( "User Count:", 7, secConfig.getUsers().size());
-        Assert.assertEquals( "Roles Count:", 19, secConfig.getRoles().size());
+        Assert.assertEquals( "Roles Count:", 23, secConfig.getRoles().size());
         
         // again, everything should have been upgraded.
     }

@@ -25,6 +25,7 @@
 			<email>changeme1@yourcompany.com</email>
 			<roles>
 				<role>deployment</role>
+                <role>repo-all-full</role>
 			</roles>
 		</user>
 		<user>
@@ -36,6 +37,7 @@
 			<email>changeme2@yourcompany.com</email>
 			<roles>
 				<role>anonymous</role>
+                <role>repo-all-read</role>
 			</roles>
 		</user>
 	</users>

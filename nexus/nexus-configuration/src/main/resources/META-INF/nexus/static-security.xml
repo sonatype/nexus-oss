@@ -20,6 +20,55 @@
             <name>Nexus Deployment Role</name>
             <description>Deployment role for Nexus</description>
             <sessionTimeout>60</sessionTimeout>
+            <roles>
+                <role>anonymous</role>
+            </roles>
+        </role>
+        <role>
+            <id>anonymous</id>
+            <name>Nexus Anonymous Role</name>
+            <description>Anonymous role for Nexus</description>
+            <sessionTimeout>60</sessionTimeout>
+            <privileges>
+                <privilege>1</privilege>
+                <privilege>54</privilege>
+                <privilege>56</privilege>
+                <privilege>57</privilege>
+                <privilege>58</privilege>
+                <privilege>70</privilege>
+            </privileges>
+            <roles>
+                <role>ui-repo-browser</role>
+                <role>ui-search</role>
+                <role>ui-system-feeds</role>
+            </roles>
+        </role>
+        <role>
+            <id>developer</id>
+            <name>Nexus Developer Role</name>
+            <description>Developer role for Nexus</description>
+            <sessionTimeout>30</sessionTimeout>
+            <privileges />
+            <roles>
+                <role>ui-basic</role>
+                <role>deployment</role>
+            </roles>
+        </role>
+        <role>
+            <id>repo-all-read</id>
+            <name>Repo: All Repositories (Read)</name>
+            <description>Gives access to read ALL content of ALL repositories in Nexus.</description>
+            <sessionTimeout>60</sessionTimeout>
+            <privileges>
+                <privilege>T1</privilege>
+                <privilege>T2</privilege>
+            </privileges>
+        </role>
+        <role>
+            <id>repo-all-full</id>
+            <name>Repo: All Repositories (Full Control)</name>
+            <description>Gives access to create/read/update/delete ALL content of ALL repositories in Nexus.</description>
+            <sessionTimeout>60</sessionTimeout>
             <privileges>
                 <privilege>T1</privilege>
                 <privilege>T2</privilege>
@@ -30,47 +79,6 @@
                 <privilege>T7</privilege>
                 <privilege>T8</privilege>
             </privileges>
-            <roles>
-                <role>anonymous</role>
-                <role>ui-basic</role>
-            </roles>
-        </role>
-        <role>
-            <id>anonymous</id>
-            <name>Nexus Anonymous Role</name>
-            <description>Anonymous role for Nexus</description>
-            <sessionTimeout>60</sessionTimeout>
-            <privileges>
-                <privilege>1</privilege>
-                <privilege>6</privilege>
-                <privilege>14</privilege>
-                <privilege>17</privilege>
-                <privilege>19</privilege>
-                <privilege>44</privilege>
-                <privilege>54</privilege>
-                <privilege>55</privilege>
-                <privilege>56</privilege>
-                <privilege>57</privilege>
-                <privilege>58</privilege>
-                <privilege>64</privilege>
-                <privilege>70</privilege>
-                <privilege>T1</privilege>
-                <privilege>T2</privilege>
-            </privileges>
-            <roles />
-        </role>
-        <role>
-            <id>developer</id>
-            <name>Nexus Developer Role</name>
-            <description>Developer role for Nexus</description>
-            <sessionTimeout>30</sessionTimeout>
-            <privileges>
-                <privilege>2</privilege>
-            </privileges>
-            <roles>
-                <role>anonymous</role>
-                <role>deployment</role>
-            </roles>
         </role>
         <role>
             <id>ui-search</id>

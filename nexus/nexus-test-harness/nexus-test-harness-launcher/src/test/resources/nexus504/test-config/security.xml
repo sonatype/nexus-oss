@@ -19,6 +19,7 @@
       <email>changeme1@yourcompany.com</email>
       <roles>
         <role>deployment</role>
+        <role>repo-all-full</role>
         <!-- FIXME role note found <role>11b99a138b6</role> -->
       </roles>
     </user>
@@ -30,6 +31,7 @@
       <email>changeme2@yourcompany.com</email>
       <roles>
         <role>anonymous</role>
+        <role>repo-all-read</role>
       </roles>
     </user>
 
@@ -41,6 +43,7 @@
       <email>nexus-dev2@sonatype.org</email>
       <roles>
         <role>anonymous</role>
+        <role>repo-all-read</role>
       </roles>
     </user>
     
