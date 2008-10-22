@@ -1,6 +1,7 @@
 package org.sonatype.nexus.integrationtests.nexus779;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import junit.framework.Assert;
@@ -14,7 +15,6 @@ import org.sonatype.nexus.rest.model.RoleResource;
 import org.sonatype.nexus.rest.model.UserResource;
 
 
-import edu.emory.mathcs.backport.java.util.Collections;
 
 /**
  * Test filtering search results based upon security
@@ -22,13 +22,7 @@ import edu.emory.mathcs.backport.java.util.Collections;
 public class Nexus779RssFeedFilteringTest
     extends AbstractRssTest
 {
-    public Nexus779RssFeedFilteringTest() throws Exception
-    {
-        //Must be sure to run this tests after deploy
-        Thread.sleep( 2000 );
-    }
 
-    @SuppressWarnings( "unchecked" )
     @Test
     public void filteredFeeds()
         throws Exception
@@ -52,19 +46,6 @@ public class Nexus779RssFeedFilteringTest
         RoleResource role1 = createRole( "filterRole1", Collections.singletonList( priv1.getId() ) );
         RoleResource role2 = createRole( "filterRole2", Collections.singletonList( priv2.getId() ) );
         RoleResource role3 = createRole( "filterRole3", combined );
-
-        // Now update the test user
-        updateUserRole( TEST_USER_NAME, Collections.singletonList( role3.getId() ) );
-
-        TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
-        TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
-
-        // Should be able to see both test1 & test2 artifacts
-        Assert.assertTrue( "Feed should contain entry for nexus779:test1:1.0.0.\nEntries: " + this.entriesToString(),
-                           feedListContainsArtifact( "nexus779", "test1", "1.0.0" ) );
-
-        Assert.assertTrue( "Feed should contain entry for nexus779:test2:1.0.0\nEntries: " + this.entriesToString(),
-                           feedListContainsArtifact( "nexus779", "test2", "1.0.0" ) );
 
         // Now update the test user so that the user can only access test1
         updateUserRole( TEST_USER_NAME, Collections.singletonList( role1.getId() ) );
@@ -92,7 +73,20 @@ public class Nexus779RssFeedFilteringTest
         Assert.assertTrue( "Feed should contain entry for nexus779:test2:1.0.0\nEntries: " + this.entriesToString(),
                            feedListContainsArtifact( "nexus779", "test2", "1.0.0" ) );
 
-    }
+
+        // Now update the test user to find both
+        updateUserRole( TEST_USER_NAME, Collections.singletonList( role3.getId() ) );
+
+        TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
+        TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
+
+        // Should be able to see both test1 & test2 artifacts
+        Assert.assertTrue( "Feed should contain entry for nexus779:test1:1.0.0.\nEntries: " + this.entriesToString(),
+                           feedListContainsArtifact( "nexus779", "test1", "1.0.0" ) );
+
+        Assert.assertTrue( "Feed should contain entry for nexus779:test2:1.0.0\nEntries: " + this.entriesToString(),
+                           feedListContainsArtifact( "nexus779", "test2", "1.0.0" ) );
+}
 
     private RepositoryTargetResource createTarget( String name, List<String> patterns )
         throws Exception

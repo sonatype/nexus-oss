@@ -13,6 +13,7 @@ public abstract class AbstractRssTest
 {
 
     private static final String RECENTLY_DEPLOYED = "recentlyDeployed";
+
     private List<SyndEntry> entries;
 
     public AbstractRssTest( String testRepositoryId )
@@ -32,14 +33,14 @@ public abstract class AbstractRssTest
         {
             return "No entries";
         }
-    
+
         StringBuffer buffer = new StringBuffer();
-    
+
         for ( SyndEntry syndEntry : entries )
         {
             buffer.append( "\n" ).append( syndEntry.getTitle() );
         }
-    
+
         return buffer.toString();
     }
 
@@ -47,20 +48,16 @@ public abstract class AbstractRssTest
     protected boolean feedListContainsArtifact( String groupId, String artifactId, String version )
         throws Exception
     {
-        for ( int i = 0; i < 40; i++ )
+        SyndFeed feed = FeedUtil.getFeed( RECENTLY_DEPLOYED );
+        entries = feed.getEntries();
+
+        for ( SyndEntry entry : entries )
         {
-            SyndFeed feed = FeedUtil.getFeed( RECENTLY_DEPLOYED );
-            entries = feed.getEntries();
-    
-            for ( SyndEntry entry : entries )
+            if ( entry.getTitle().contains( groupId ) && entry.getTitle().contains( artifactId )
+                && entry.getTitle().contains( version ) )
             {
-                if ( entry.getTitle().contains( groupId ) && entry.getTitle().contains( artifactId )
-                    && entry.getTitle().contains( version ) )
-                {
-                    return true;
-                }
+                return true;
             }
-            Thread.sleep( 200 );
         }
         return false;
     }
