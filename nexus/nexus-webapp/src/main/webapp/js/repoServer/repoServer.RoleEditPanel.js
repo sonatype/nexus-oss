@@ -855,6 +855,7 @@ Ext.extend(Sonatype.repoServer.RoleEditPanel, Ext.Panel, {
         })
       );
     }, this);
+    
   },
     
   loadRolesTreeHelper : function(arr, srcObj, fpanel){
@@ -951,6 +952,12 @@ Ext.extend(Sonatype.repoServer.RoleEditPanel, Ext.Panel, {
         allTree.root.removeChild(allTree.getNodeById(item.data.id));
       }
     }, this);
+
+    var sortTypeFunc = function( node ) {
+      return ( node.attributes.nodeType == 'role' ? '0' : '1' ) + node.text;
+    }
+    new Ext.tree.TreeSorter( selectedTree, { sortType: sortTypeFunc } );
+    new Ext.tree.TreeSorter( allTree, { sortType: sortTypeFunc } );
     
     return arr; //return arr, even if empty to comply with sonatypeLoad data modifier requirement
   },
