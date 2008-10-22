@@ -9,7 +9,7 @@
 	<artifactId>nexus</artifactId>
 	<packaging>pom</packaging>
 	<name>Nexus Repository Manager</name>
-	<version>1.1.0-SNAPSHOT</version>
+	<version>1.2.0-SNAPSHOT</version>
 	<description>Sonatype Nexus Repository Manager</description>
 	<inceptionYear>2007</inceptionYear>
 	<mailingLists />

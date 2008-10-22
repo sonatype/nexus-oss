@@ -4,13 +4,12 @@
 	<parent>
 		<artifactId>nexus-clients</artifactId>
 		<groupId>org.sonatype.nexus</groupId>
-		<version>1.1.0-SNAPSHOT</version>
+		<version>1.2.0-SNAPSHOT</version>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.sonatype.nexus</groupId>
 	<artifactId>nexus-rest-client-java</artifactId>
 	<name>Nexus Client: Java/REST</name>
-	<version>1.1.0-SNAPSHOT</version>
 	<description />
 	<dependencies>
 		<dependency>
