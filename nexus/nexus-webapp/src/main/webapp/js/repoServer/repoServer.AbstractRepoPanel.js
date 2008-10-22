@@ -77,6 +77,10 @@ Ext.extend(Sonatype.repoServer.AbstractRepoPanel, Ext.Panel, {
     var url = Sonatype.config.repos.urls.cache + rec.id.slice(
       Sonatype.config.host.length + Sonatype.config.servicePath.length );
     
+    if ( url.indexOf( Sonatype.config.browseIndexPathSnippet ) > -1 ) {
+      url = url.replace( Sonatype.config.browseIndexPathSnippet, Sonatype.config.browsePathSnippet );
+    }
+    
     //make sure to provide /content path for repository root requests like ../repositories/central
     if (/.*\/repositories\/[^\/]*$/i.test(url) || /.*\/repo_groups\/[^\/]*$/i.test(url)){
       url += '/content';
@@ -105,6 +109,10 @@ Ext.extend(Sonatype.repoServer.AbstractRepoPanel, Ext.Panel, {
     var url = Sonatype.config.repos.urls.index +
       rec.id.slice(Sonatype.config.host.length + Sonatype.config.servicePath.length);
     
+    if ( url.indexOf( Sonatype.config.browseIndexPathSnippet ) > -1 ) {
+      url = url.replace( Sonatype.config.browseIndexPathSnippet, Sonatype.config.browsePathSnippet );
+    }
+    
     //make sure to provide /content path for repository root requests like ../repositories/central
     if (/.*\/repositories\/[^\/]*$/i.test(url) || /.*\/repo_groups\/[^\/]*$/i.test(url)){
       url += '/content';
@@ -131,6 +139,10 @@ Ext.extend(Sonatype.repoServer.AbstractRepoPanel, Ext.Panel, {
   rebuildAttributesHandler: function( rec ){
     var url = Sonatype.config.repos.urls.attributes +
       rec.id.slice(Sonatype.config.host.length + Sonatype.config.servicePath.length);
+    
+    if ( url.indexOf( Sonatype.config.browseIndexPathSnippet ) > -1 ) {
+      url = url.replace( Sonatype.config.browseIndexPathSnippet, Sonatype.config.browsePathSnippet );
+    }
     
     //make sure to provide /content path for repository root requests like ../repositories/central
     if (/.*\/repositories\/[^\/]*$/i.test(url) || /.*\/repo_groups\/[^\/]*$/i.test(url)){
@@ -316,8 +328,6 @@ Ext.extend(Sonatype.repoServer.AbstractRepoPanel, Ext.Panel, {
                 this.formCards.tbar.hide();
                 this.formCards.tbar.setHeight(0);
               }
-
-//              var rec = (this.ctxRecord) ? this.ctxRecord : this.reposGridPanel.getSelectionModel().getSelected();
 
               var panel = new Ext.Panel({
                 layout: 'fit',
