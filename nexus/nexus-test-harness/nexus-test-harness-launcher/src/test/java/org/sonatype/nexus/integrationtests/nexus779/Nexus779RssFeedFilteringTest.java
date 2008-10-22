@@ -14,14 +14,22 @@ import org.sonatype.nexus.rest.model.RepositoryTargetResource;
 import org.sonatype.nexus.rest.model.RoleResource;
 import org.sonatype.nexus.rest.model.UserResource;
 
-
-
 /**
  * Test filtering search results based upon security
  */
 public class Nexus779RssFeedFilteringTest
     extends AbstractRssTest
 {
+
+    @Test
+    public void stressTest()
+        throws Exception
+    {
+        for ( int i = 0; i < 20; i++ )
+        {
+            filteredFeeds();
+        }
+    }
 
     @Test
     public void filteredFeeds()
@@ -73,7 +81,6 @@ public class Nexus779RssFeedFilteringTest
         Assert.assertTrue( "Feed should contain entry for nexus779:test2:1.0.0\nEntries: " + this.entriesToString(),
                            feedListContainsArtifact( "nexus779", "test2", "1.0.0" ) );
 
-
         // Now update the test user to find both
         updateUserRole( TEST_USER_NAME, Collections.singletonList( role3.getId() ) );
 
@@ -86,7 +93,7 @@ public class Nexus779RssFeedFilteringTest
 
         Assert.assertTrue( "Feed should contain entry for nexus779:test2:1.0.0\nEntries: " + this.entriesToString(),
                            feedListContainsArtifact( "nexus779", "test2", "1.0.0" ) );
-}
+    }
 
     private RepositoryTargetResource createTarget( String name, List<String> patterns )
         throws Exception

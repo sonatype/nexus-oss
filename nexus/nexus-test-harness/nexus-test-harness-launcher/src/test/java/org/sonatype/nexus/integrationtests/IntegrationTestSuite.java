@@ -53,7 +53,7 @@ public class IntegrationTestSuite
     {
         try
         {
-            Status status = RequestFacade.doGetRequest( "service/local/status " ).getStatus();
+            Status status = RequestFacade.doGetRequest( "service/local/status" ).getStatus();
             if ( status.isSuccess() )
             {
                 Assert.fail( "Nexus already started.  Stop it first!" );

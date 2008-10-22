@@ -2,6 +2,7 @@ package org.sonatype.nexus.integrationtests.nexus778;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import junit.framework.Assert;
@@ -22,7 +23,6 @@ import org.sonatype.nexus.rest.model.UserResource;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
 import org.sonatype.nexus.test.utils.SearchMessageUtil;
 
-import edu.emory.mathcs.backport.java.util.Collections;
 
 /**
  * Test filtering search results based upon security
