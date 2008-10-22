@@ -112,6 +112,11 @@
 			<artifactId>maven-verifier</artifactId>
 			<version>1.2-SNAPSHOT</version>
 		</dependency>
+		<dependency>
+			<groupId>httpunit</groupId>
+			<artifactId>httpunit</artifactId>
+			<version>1.6.2</version>
+		</dependency>
 
 	</dependencies>
 	<build>

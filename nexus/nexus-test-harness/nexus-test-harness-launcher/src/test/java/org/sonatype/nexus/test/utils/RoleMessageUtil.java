@@ -67,7 +67,7 @@ public class RoleMessageUtil
 
         if ( !response.getStatus().isSuccess() )
         {
-            Assert.fail( "Could not create role: " + response.getStatus() );
+            Assert.fail( "Could not find role: " + roleId + " got: " + response.getStatus() );
         }
 
         // get the Resource object
@@ -104,7 +104,7 @@ public class RoleMessageUtil
 
     /**
      * This should be replaced with a REST Call, but the REST client does not set the Accept correctly on GET's/
-     * 
+     *
      * @return
      * @throws IOException
      */
