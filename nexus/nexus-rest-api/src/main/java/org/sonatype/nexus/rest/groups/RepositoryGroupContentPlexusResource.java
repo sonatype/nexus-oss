@@ -45,7 +45,7 @@ public class RepositoryGroupContentPlexusResource
     @Override
     public PathProtectionDescriptor getResourceProtection()
     {
-        return new PathProtectionDescriptor( "/repo_groups/*/content/**", "contentAuthcBasic,tgperms" );
+        return new PathProtectionDescriptor( "/repo_groups/*/content/**", "authcBasic,tgperms" );
     }
 
     @Override
