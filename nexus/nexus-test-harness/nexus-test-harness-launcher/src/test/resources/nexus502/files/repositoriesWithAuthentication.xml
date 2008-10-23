@@ -4,6 +4,14 @@
           xsi:schemaLocation="http://maven.apache.org/setrings/1.0.0
           http://maven.apache.org/xsd/settings-1.0.0.xsd">
 
+  <mirrors>
+    <mirror>
+      <id>fake-central</id>
+      <mirrorOf>central</mirrorOf>
+      <url>${nexus-base-url}content/repositories/fake-central</url>
+    </mirror>
+  </mirrors>
+
   <servers>
     <server>
       <id>nexus-test-harness-repo</id>
