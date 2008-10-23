@@ -12,6 +12,7 @@ import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.jsecurity.web.WebUtils;
+import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.access.Action;
@@ -114,11 +115,17 @@ public class NexusTargetMappingAuthorizationFilter
                 // the path does not exists, it is a CREATE
                 action = "post";
             }
+            catch ( AccessDeniedException e )
+            {
+                // no access for read, so chances are post or put doesnt matter
+                action = "post";
+            }
             catch ( Exception e )
             {
                 // huh?
                 throw new IllegalStateException( "Got exception during target mapping!", e );
             }
+            
 
             // the path exists, this is UPDATE
             return super.getActionFromHttpVerb( action );

@@ -100,11 +100,9 @@ public class HttpVerbMappingAuthorizationFilter
     public boolean isAccessAllowed( ServletRequest request, ServletResponse response, Object mappedValue )
         throws IOException
     {
-        Action action = getActionFromHttpVerb( request );
-
         String[] perms = (String[]) mappedValue;
 
-        return super.isAccessAllowed( request, response, mapPerms( perms, action ) );
+        return super.isAccessAllowed( request, response, mapPerms( perms, getActionFromHttpVerb( request ) ) );
     }
 
     protected boolean onAccessDenied( ServletRequest request, ServletResponse response )
