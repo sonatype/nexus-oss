@@ -52,7 +52,7 @@ public class RepositoryIndexContentPlexusResource
     @Override
     public PathProtectionDescriptor getResourceProtection()
     {
-        return new PathProtectionDescriptor( "/repositories/*/index_content**", "authcBasic,tiperms" );
+        return new PathProtectionDescriptor( "/repositories/*/index_content/**", "contentAuthcBasic,tiperms" );
     }
     
     protected IndexingContext getIndexingContext( Request request )

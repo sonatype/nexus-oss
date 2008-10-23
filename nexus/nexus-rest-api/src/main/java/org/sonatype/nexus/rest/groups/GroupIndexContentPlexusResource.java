@@ -58,8 +58,8 @@ public class GroupIndexContentPlexusResource extends
 
     @Override
     public PathProtectionDescriptor getResourceProtection() {
-        return new PathProtectionDescriptor("/repo_groups/*/index_content**",
-                "authcBasic,tgiperms");
+        return new PathProtectionDescriptor("/repo_groups/*/index_content/**",
+                "contentAuthcBasic,tgiperms");
     }
 
     protected IndexingContext getIndexingContext( Request request )
