@@ -31,7 +31,7 @@ public class TargetMessageUtil
     private MediaType mediaType;
 
     private static final Logger LOG = Logger.getLogger( TargetMessageUtil.class );
-    
+
     public TargetMessageUtil( XStream xstream, MediaType mediaType )
     {
         super();
@@ -45,10 +45,8 @@ public class TargetMessageUtil
         Response response = this.sendMessage( Method.POST, target );
         String responseText = response.getEntity().getText();
 
-        if ( !response.getStatus().isSuccess() )
-        {
-            Assert.fail( "Could not create Repository Target: " + response.getStatus() +"\nResponse Text:\n"+responseText );
-        }
+        Assert.assertTrue( "Could not create Repository Target: " + response.getStatus() + "\nResponse Text:\n"
+            + responseText + "\n" + xstream.toXML( target ), response.getStatus().isSuccess() );
 
         // get the Resource object
         RepositoryTargetResource responseResource = this.getResourceFromResponse( responseText );
@@ -108,20 +106,20 @@ public class TargetMessageUtil
         String responseString = response.getEntity().getText();
         return this.getResourceFromResponse( responseString );
     }
-    
+
     public RepositoryTargetResource getResourceFromResponse( String responseText )
-    throws IOException
-{
-    LOG.debug( " getResourceFromResponse: " + responseText );
+        throws IOException
+    {
+        LOG.debug( " getResourceFromResponse: " + responseText );
 
-    XStreamRepresentation representation = new XStreamRepresentation( xstream, responseText, mediaType );
+        XStreamRepresentation representation = new XStreamRepresentation( xstream, responseText, mediaType );
 
-    RepositoryTargetResourceResponse resourceResponse =
-        (RepositoryTargetResourceResponse) representation.getPayload( new RepositoryTargetResourceResponse() );
+        RepositoryTargetResourceResponse resourceResponse =
+            (RepositoryTargetResourceResponse) representation.getPayload( new RepositoryTargetResourceResponse() );
 
-    return resourceResponse.getData();
+        return resourceResponse.getData();
 
-}
+    }
 
     public void verifyTargetsConfig( RepositoryTargetResource targetResource )
         throws IOException
