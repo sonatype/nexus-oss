@@ -99,8 +99,8 @@ public class Upgrade200to201
                 org.sonatype.jsecurity.model.CRole newr = new org.sonatype.jsecurity.model.CRole();
                 
                 newr.setDescription( oldr.getDescription() );
-                newr.setId( oldr.getId() + "-archive" );
-                newr.setName( oldr.getName() + " (Archive)" );
+                newr.setId( oldr.getId() + "-customized" );
+                newr.setName( oldr.getName() + " (Customized)" );
                 newr.setPrivileges( oldr.getPrivileges() );
                 newr.setRoles( oldr.getRoles() );
                 newr.setSessionTimeout( oldr.getSessionTimeout() );
@@ -221,7 +221,7 @@ public class Upgrade200to201
             && oldRole.getPrivileges().contains( "56" )
             && oldRole.getPrivileges().contains( "57" )
             && oldRole.getPrivileges().contains( "58" )
-            && oldRole.getPrivileges().contains( "70" )
+            && oldRole.getPrivileges().contains( "64" )
             && oldRole.getPrivileges().contains( "T1" )
             && oldRole.getPrivileges().contains( "T2" )
             && oldRole.getRoles().size() == 0 )
@@ -350,7 +350,7 @@ public class Upgrade200to201
             result = false;
         }
         else if ( "ui-scheduled-tasks-admin".equals( oldRole.getId() )
-            && oldRole.getPrivileges().size() == 8
+            && oldRole.getPrivileges().size() == 7
             && oldRole.getPrivileges().contains( "6" )
             && oldRole.getPrivileges().contains( "14" )
             && oldRole.getPrivileges().contains( "26" )
@@ -358,19 +358,17 @@ public class Upgrade200to201
             && oldRole.getPrivileges().contains( "28" )
             && oldRole.getPrivileges().contains( "29" )
             && oldRole.getPrivileges().contains( "69" )
-            && oldRole.getPrivileges().contains( "71" )
             && oldRole.getRoles().size() == 0 )
         {
             result = false;
         }
         else if ( "ui-repository-targets-admin".equals( oldRole.getId() )
-            && oldRole.getPrivileges().size() == 6
+            && oldRole.getPrivileges().size() == 5
             && oldRole.getPrivileges().contains( "45" )
             && oldRole.getPrivileges().contains( "46" )
             && oldRole.getPrivileges().contains( "47" )
             && oldRole.getPrivileges().contains( "48" )
             && oldRole.getPrivileges().contains( "56" )
-            && oldRole.getPrivileges().contains( "70" )
             && oldRole.getRoles().size() == 0 )
         {
             result = false;

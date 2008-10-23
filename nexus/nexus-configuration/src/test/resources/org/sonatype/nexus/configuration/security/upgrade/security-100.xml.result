@@ -19,7 +19,7 @@
       <status>active</status>
       <email>changeme1@yourcompany.com</email>
       <roles>
-        <role>deployment-archive</role>
+        <role>deployment-customized</role>
       </roles>
     </user>
     <user>
@@ -29,14 +29,14 @@
       <status>active</status>
       <email>changeme2@yourcompany.com</email>
       <roles>
-        <role>anonymous-archive</role>
+        <role>anonymous-customized</role>
       </roles>
     </user>
   </users>
   <roles>
     <role>
-      <id>deployment-archive</id>
-      <name>Nexus Deployment Role (Archive)</name>
+      <id>deployment-customized</id>
+      <name>Nexus Deployment Role (Customized)</name>
       <description>Deployment role for Nexus</description>
       <sessionTimeout>60</sessionTimeout>
       <privileges>
@@ -52,12 +52,12 @@
         <privilege>2</privilege>
       </privileges>
       <roles>
-        <role>anonymous-archive</role>
+        <role>anonymous-customized</role>
       </roles>
     </role>
     <role>
-      <id>anonymous-archive</id>
-      <name>Nexus Anonymous Role (Archive)</name>
+      <id>anonymous-customized</id>
+      <name>Nexus Anonymous Role (Customized)</name>
       <description>Anonymous role for Nexus</description>
       <sessionTimeout>60</sessionTimeout>
       <privileges>
@@ -79,8 +79,8 @@
       </privileges>
     </role>
     <role>
-      <id>developer-archive</id>
-      <name>Nexus Developer Role (Archive)</name>
+      <id>developer-customized</id>
+      <name>Nexus Developer Role (Customized)</name>
       <description>Developer role for Nexus</description>
       <sessionTimeout>30</sessionTimeout>
       <privileges>
@@ -88,37 +88,9 @@
         <privilege>64</privilege>
       </privileges>
       <roles>
-        <role>anonymous-archive</role>
-        <role>deployment-archive</role>
+        <role>anonymous-customized</role>
+        <role>deployment-customized</role>
       </roles>
-    </role>
-    <role>
-      <id>ui-scheduled-tasks-admin-archive</id>
-      <name>UI: Scheduled Task Administration (Archive)</name>
-      <description>Gives access to the Scheduled Task Administration screen in Nexus UI</description>
-      <sessionTimeout>60</sessionTimeout>
-      <privileges>
-        <privilege>6</privilege>
-        <privilege>14</privilege>
-        <privilege>26</privilege>
-        <privilege>27</privilege>
-        <privilege>28</privilege>
-        <privilege>29</privilege>
-        <privilege>69</privilege>
-      </privileges>
-    </role>
-    <role>
-      <id>ui-repository-targets-admin-archive</id>
-      <name>UI: Repository Target Administration (Archive)</name>
-      <description>Gives access to the Repository Target Administration screen in Nexus UI</description>
-      <sessionTimeout>60</sessionTimeout>
-      <privileges>
-        <privilege>45</privilege>
-        <privilege>46</privilege>
-        <privilege>47</privilege>
-        <privilege>48</privilege>
-        <privilege>56</privilege>
-      </privileges>
     </role>
   </roles>
 </security>
