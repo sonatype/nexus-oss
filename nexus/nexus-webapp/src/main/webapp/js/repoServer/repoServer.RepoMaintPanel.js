@@ -1071,6 +1071,7 @@ Ext.extend(Sonatype.repoServer.RepoMaintPanel, Sonatype.repoServer.AbstractRepoP
       node.attributes.localStorageUpdated = true;
       Ext.Ajax.request({
         url: node.id.replace( Sonatype.config.browseIndexPathSnippet, Sonatype.config.browsePathSnippet ) + '?isLocal',
+        suppressStatus: 404,
         success: function( response, options ) {
           var decodedResponse = Ext.decode( response.responseText );
           if ( decodedResponse.data && decodedResponse.data.length > 0 ) {
@@ -1086,6 +1087,7 @@ Ext.extend(Sonatype.repoServer.RepoMaintPanel, Sonatype.repoServer.AbstractRepoP
             }
           }
         },
+        failure: function() {},
         scope: this
       });
     }
