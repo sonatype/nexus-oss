@@ -159,12 +159,7 @@ public class DefaultTimeline
                     indexWriter = new NexusIndexWriter( indexDirectory, new KeywordAnalyzer(), true );
                 }
 
-                // TODO: decide should optimize happen here?
-                // indexWriter.optimize();
-
-                indexWriter.close();
-
-                indexWriter = null;
+                closeWriter();
 
                 running = true;
             }
@@ -188,6 +183,7 @@ public class DefaultTimeline
         try
         {
             boolean shouldStop = false;
+
             synchronized ( this )
             {
                 shouldStop = running;
@@ -197,15 +193,7 @@ public class DefaultTimeline
 
             if ( shouldStop )
             {
-                if ( indexWriter != null )
-                {
-                    // TODO: decide should this happen here?
-                    indexWriter.optimize();
-
-                    indexWriter.close();
-
-                    indexWriter = null;
-                }
+                closeWriter();
 
                 if ( indexSearcher != null )
                 {
@@ -278,12 +266,47 @@ public class DefaultTimeline
         return indexSearcher;
     }
 
+    protected void closeReaders()
+        throws IOException
+    {
+        if ( indexSearcher != null )
+        {
+            indexSearcher.getIndexReader().close();
+
+            indexSearcher.close();
+
+            indexSearcher = null;
+        }
+
+        if ( indexReader != null )
+        {
+            indexReader.close();
+
+            indexReader = null;
+        }
+    }
+
+    protected void closeWriter()
+        throws IOException
+    {
+        if ( indexWriter != null )
+        {
+            indexWriter.flush();
+
+            indexWriter.close();
+
+            indexWriter = null;
+        }
+    }
+
     protected void purge( Query query )
     {
         try
         {
             synchronized ( this )
             {
+                closeWriter();
+
                 Hits hits = getIndexSearcher().search( query );
 
                 int docId;
@@ -292,9 +315,16 @@ public class DefaultTimeline
                 {
                     docId = hits.id( i );
 
-                    // TODO: this will break if concurrent Writer is open!
                     getIndexSearcher().getIndexReader().deleteDocument( docId );
                 }
+
+                closeReaders();
+
+                IndexWriter iw = getIndexWriter();
+
+                iw.optimize();
+
+                closeWriter();
             }
         }
         catch ( IOException e )
@@ -413,84 +443,26 @@ public class DefaultTimeline
         }
     }
 
-    protected void addDocument( IndexWriter iw, long timestamp, String type, String subType, Map<String, String> data )
+    protected Document createDocument( long timestamp, String type, String subType, Map<String, String> data )
     {
-        try
+        Document doc = new Document();
+
+        doc.add( new Field(
+            TIMESTAMP,
+            DateTools.timeToString( timestamp, DateTools.Resolution.MINUTE ),
+            Field.Store.NO,
+            Field.Index.UN_TOKENIZED ) );
+
+        doc.add( new Field( TYPE, type, Field.Store.NO, Field.Index.UN_TOKENIZED ) );
+
+        doc.add( new Field( SUBTYPE, subType, Field.Store.NO, Field.Index.UN_TOKENIZED ) );
+
+        for ( String key : data.keySet() )
         {
-            Document doc = new Document();
-
-            doc.add( new Field(
-                TIMESTAMP,
-                DateTools.timeToString( timestamp, DateTools.Resolution.MINUTE ),
-                Field.Store.NO,
-                Field.Index.UN_TOKENIZED ) );
-
-            doc.add( new Field( TYPE, type, Field.Store.NO, Field.Index.UN_TOKENIZED ) );
-
-            doc.add( new Field( SUBTYPE, subType, Field.Store.NO, Field.Index.UN_TOKENIZED ) );
-
-            for ( String key : data.keySet() )
-            {
-                doc.add( new Field( key, data.get( key ), Field.Store.YES, Field.Index.UN_TOKENIZED ) );
-            }
-
-            iw.addDocument( doc );
-        }
-        catch ( IOException e )
-        {
-            getLogger().warn( "Cannot maintain timeline!", e );
-        }
-    }
-
-    public void add( String type, String subType, Map<String, String> data )
-    {
-        if ( !running )
-        {
-            return;
+            doc.add( new Field( key, data.get( key ), Field.Store.YES, Field.Index.UN_TOKENIZED ) );
         }
 
-        IndexWriter iw = null;
-
-        try
-        {
-            iw = getIndexWriter();
-
-            addDocument( iw, System.currentTimeMillis(), type, subType, data );
-
-            iw.flush();
-        }
-        catch ( IOException e )
-        {
-            getLogger().error( "Cannot add to timeline!", e );
-        }
-    }
-
-    public void addAll( String type, String subType, Collection<Map<String, String>> datas )
-    {
-        if ( !running )
-        {
-            return;
-        }
-
-        IndexWriter iw = null;
-
-        try
-        {
-            iw = getIndexWriter();
-
-            long ts = System.currentTimeMillis();
-
-            for ( Map<String, String> data : datas )
-            {
-                addDocument( iw, ts, type, subType, data );
-            }
-
-            iw.flush();
-        }
-        catch ( IOException e )
-        {
-            getLogger().error( "Cannot add to timeline!", e );
-        }
+        return doc;
     }
 
     public void add( long timestamp, String type, String subType, Map<String, String> data )
@@ -506,14 +478,19 @@ public class DefaultTimeline
         {
             iw = getIndexWriter();
 
-            addDocument( iw, timestamp, type, subType, data );
+            iw.addDocument( createDocument( timestamp, type, subType, data ) );
 
-            iw.flush();
+            closeWriter();
         }
         catch ( IOException e )
         {
             getLogger().error( "Cannot add to timeline!", e );
         }
+    }
+
+    public void add( String type, String subType, Map<String, String> data )
+    {
+        add( System.currentTimeMillis(), type, subType, data );
     }
 
     public void addAll( long timestamp, String type, String subType, Collection<Map<String, String>> datas )
@@ -531,15 +508,20 @@ public class DefaultTimeline
 
             for ( Map<String, String> data : datas )
             {
-                addDocument( iw, timestamp, type, subType, data );
+                iw.addDocument( createDocument( timestamp, type, subType, data ) );
             }
 
-            iw.flush();
+            closeWriter();
         }
         catch ( IOException e )
         {
             getLogger().error( "Cannot add to timeline!", e );
         }
+    }
+
+    public void addAll( String type, String subType, Collection<Map<String, String>> datas )
+    {
+        addAll( System.currentTimeMillis(), type, subType, datas );
     }
 
     public void purgeAll()
