@@ -5,9 +5,6 @@ import java.util.Collection;
 import java.util.List;
 
 import org.apache.commons.fileupload.FileItemFactory;
-import org.apache.maven.model.Model;
-import org.apache.maven.model.ModelBase;
-import org.apache.maven.model.Scm;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.annotations.Requirement;
@@ -32,22 +29,12 @@ import org.sonatype.nexus.proxy.access.NexusItemAuthorizer;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.rest.model.*;
-import org.sonatype.nexus.rest.privileges.PrivilegeBaseResourceConverter;
-import org.sonatype.nexus.rest.privileges.PrivilegeBaseStatusResourceConverter;
-import org.sonatype.nexus.rest.privileges.PrivilegeResourceRequestConverter;
-import org.sonatype.nexus.rest.privileges.PrivilegeStatusResourceResponseConverter;
-import org.sonatype.nexus.rest.repositories.RepositoryBaseResourceConverter;
-import org.sonatype.nexus.rest.repositories.RepositoryResourceResponseConverter;
-import org.sonatype.nexus.rest.schedules.ScheduledServiceBaseResourceConverter;
-import org.sonatype.nexus.rest.schedules.ScheduledServicePropertyResourceConverter;
-import org.sonatype.nexus.rest.schedules.ScheduledServiceResourceResponseConverter;
+import org.sonatype.nexus.rest.model.NexusArtifact;
+import org.sonatype.nexus.rest.model.NexusError;
+import org.sonatype.nexus.rest.model.NexusErrorResponse;
 import org.sonatype.plexus.rest.resource.AbstractPlexusResource;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 import org.sonatype.plexus.rest.resource.PlexusResourceException;
-import org.sonatype.plexus.rest.xstream.AliasingListConverter;
-
-import com.thoughtworks.xstream.XStream;
 
 public abstract class AbstractNexusPlexusResource
     extends AbstractPlexusResource
