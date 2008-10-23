@@ -1074,20 +1074,27 @@ Ext.extend(Sonatype.repoServer.RepoMaintPanel, Sonatype.repoServer.AbstractRepoP
         suppressStatus: 404,
         success: function( response, options ) {
           var decodedResponse = Ext.decode( response.responseText );
-          if ( decodedResponse.data && decodedResponse.data.length > 0 ) {
+          if ( decodedResponse.data ) {
             var data = decodedResponse.data;
-            for ( var i = 0; i < data.length; i++ ) {
-              var contentNode = data[i];
-              for ( var j = 0; j < node.childNodes.length; j++ ) {
-                if ( contentNode.text == node.childNodes[j].text ) {
-                  node.childNodes[j].ui.iconNode.className = 'x-tree-node-nexus-icon';
+            for ( var j = 0; j < node.childNodes.length; j++ ) {
+              var indexNode = node.childNodes[j];
+              indexNode.attributes.localStorageUpdated = true;
+              for ( var i = 0; i < data.length; i++ ) {
+                var contentNode = data[i];
+                if ( contentNode.text == indexNode.text ) {
+                  indexNode.ui.iconNode.className = 'x-tree-node-nexus-icon';
+                  indexNode.attributes.localStorageUpdated = false;
                   break;
                 }
               }
             }
           }
         },
-        failure: function() {},
+        failure: function( response, options ) {
+          for ( var j = 0; j < node.childNodes.length; j++ ) {
+            node.childNodes[j].attributes.localStorageUpdated = true;
+          }
+        },
         scope: this
       });
     }
