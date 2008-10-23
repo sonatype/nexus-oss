@@ -239,3 +239,9 @@ button.st-icon-refresh {
     padding-top:2px;padding-bottom:2px;
     width:130px; /* FF3 */
 }
+
+.x-tree-node-expanded .x-tree-node-nexus-icon{background-image:url(../images/icons/folder-open-nexus.png);}
+.x-tree-node-leaf .x-tree-node-nexus-icon{background-image:url(../images/icons/leaf-nexus.png);}
+.x-tree-node-collapsed .x-tree-node-nexus-icon{background-image:url(../images/icons/folder-nexus.png);}
+.x-tree-node-collapsed .x-tree-node-nexus-icon,.x-tree-node-expanded .x-tree-node-nexus-icon,.x-tree-node-leaf .x-tree-node-nexus-icon{border:0 none;height:18px;margin:0;padding:0;vertical-align:top;width:16px;background-position:center;background-repeat:no-repeat;}
+.ext-ie .x-tree-node-indent img,.ext-ie .x-tree-node-nexus-icon,.ext-ie .x-tree-ec-icon{vertical-align:middle!important;}

@@ -123,7 +123,7 @@ Ext.extend(Sonatype.ext.TwinPanelController, Ext.Panel, {
         }
       }
     }
-  },
+  }
 });
 
 Ext.reg('twinpanelcontroller', Sonatype.ext.TwinPanelController);
