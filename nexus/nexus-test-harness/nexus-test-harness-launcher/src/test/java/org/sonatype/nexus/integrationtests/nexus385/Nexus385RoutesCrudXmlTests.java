@@ -30,7 +30,7 @@ public class Nexus385RoutesCrudXmlTests
     }
 
     @Test
-    public void createTest()
+    public void createRouteTest()
         throws IOException
     {
         this.runCreateTest( "exclusive" );

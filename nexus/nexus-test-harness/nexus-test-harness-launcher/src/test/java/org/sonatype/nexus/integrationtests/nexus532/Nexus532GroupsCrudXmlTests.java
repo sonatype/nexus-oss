@@ -33,7 +33,7 @@ public class Nexus532GroupsCrudXmlTests extends AbstractNexusIntegrationTest
     }
 
     @Test
-    public void createTest()
+    public void createGroupTest()
         throws IOException
     {
 
@@ -42,11 +42,11 @@ public class Nexus532GroupsCrudXmlTests extends AbstractNexusIntegrationTest
         resource.setId( "createTestGroup" );
         resource.setName( "createTestGroup" );
         resource.setFormat( "maven2" );
-        
+
         RepositoryGroupMemberRepository member = new RepositoryGroupMemberRepository();
         member.setId( "nexus-test-harness-repo" );
         resource.addRepository( member );
-        
+
 
         // this also validates
         this.messageUtil.createGroup( resource );
@@ -62,11 +62,11 @@ public class Nexus532GroupsCrudXmlTests extends AbstractNexusIntegrationTest
         resource.setId( "readTestGroup" );
         resource.setName( "readTestGroup" );
         resource.setFormat( "maven2" );
-        
+
         RepositoryGroupMemberRepository member = new RepositoryGroupMemberRepository();
         member.setId( "nexus-test-harness-repo" );
         resource.addRepository( member );
-        
+
 
         // this also validates
         this.messageUtil.createGroup( resource );
@@ -77,7 +77,7 @@ public class Nexus532GroupsCrudXmlTests extends AbstractNexusIntegrationTest
         this.messageUtil.validateResourceResponse( resource, responseRepo );
 
     }
-    
+
     @Test
     public void updateTest()
         throws IOException
@@ -88,11 +88,11 @@ public class Nexus532GroupsCrudXmlTests extends AbstractNexusIntegrationTest
         resource.setId( "updateTestGroup" );
         resource.setName( "updateTestGroup" );
         resource.setFormat( "maven2" );
-        
+
         RepositoryGroupMemberRepository member = new RepositoryGroupMemberRepository();
         member.setId( "nexus-test-harness-repo" );
         resource.addRepository( member );
-        
+
 
         // this also validates
         resource = this.messageUtil.createGroup( resource );
@@ -115,11 +115,11 @@ public class Nexus532GroupsCrudXmlTests extends AbstractNexusIntegrationTest
         resource.setId( "deleteTestGroup" );
         resource.setName( "deleteTestGroup" );
         resource.setFormat( "maven2" );
-        
+
         RepositoryGroupMemberRepository member = new RepositoryGroupMemberRepository();
         member.setId( "nexus-test-harness-repo" );
         resource.addRepository( member );
-        
+
 
         // this also validates
         resource = this.messageUtil.createGroup( resource );
@@ -146,11 +146,11 @@ public class Nexus532GroupsCrudXmlTests extends AbstractNexusIntegrationTest
         resource.setId( "listTestGroup" );
         resource.setName( "listTestGroup" );
         resource.setFormat( "maven2" );
-        
+
         RepositoryGroupMemberRepository member = new RepositoryGroupMemberRepository();
         member.setId( "nexus-test-harness-repo" );
         resource.addRepository( member );
-        
+
 
         // this also validates
         resource = this.messageUtil.createGroup( resource );
@@ -162,9 +162,9 @@ public class Nexus532GroupsCrudXmlTests extends AbstractNexusIntegrationTest
         {
             RepositoryGroupListResource group = iter.next();
             CRepositoryGroup cGroup = NexusConfigUtil.getGroup( group.getId() );
-            
+
             Assert.assertNotNull( "CRepositoryGroup", cGroup );
-            
+
             this.messageUtil.validateRepoLists( group.getRepositories(), cGroup.getRepositories() );
         }
     }

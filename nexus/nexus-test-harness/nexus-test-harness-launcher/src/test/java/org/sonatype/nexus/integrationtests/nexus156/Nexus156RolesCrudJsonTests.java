@@ -30,7 +30,7 @@ public class Nexus156RolesCrudJsonTests
     }
 
     @Test
-    public void createTest()
+    public void createRoleTest()
         throws IOException
     {
 
@@ -106,7 +106,7 @@ public class Nexus156RolesCrudJsonTests
         resource.addPrivilege( "4" );
 
         RoleResource responseResource = this.messageUtil.createRole( resource );
-        
+
         // update the Role
         // TODO: add tests that changes the Id
         resource.setId( responseResource.getId() );

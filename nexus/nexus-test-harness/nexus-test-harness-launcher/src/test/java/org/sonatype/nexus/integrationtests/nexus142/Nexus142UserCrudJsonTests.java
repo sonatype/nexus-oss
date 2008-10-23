@@ -26,14 +26,14 @@ public class Nexus142UserCrudJsonTests
 {
 
     protected UserMessageUtil messageUtil;
-    
+
     public Nexus142UserCrudJsonTests()
     {
         this.messageUtil = new UserMessageUtil( this.getJsonXStream(), MediaType.APPLICATION_JSON );
     }
 
     @Test
-    public void createTest()
+    public void createUserTest()
         throws IOException
     {
 
@@ -48,7 +48,7 @@ public class Nexus142UserCrudJsonTests
         // this also validates
         this.messageUtil.createUser( resource );
     }
-    
+
     @Test
     public void createTestWithPassword()
         throws IOException, ComponentLookupException
@@ -65,15 +65,15 @@ public class Nexus142UserCrudJsonTests
 
         // this also validates
         this.messageUtil.createUser( resource );
-        
+
         // validate password is correct
         PasswordGenerator pwGenerator = (PasswordGenerator) this.getContainer().lookup( PasswordGenerator.class );
         String hashedPassword = pwGenerator.hashPassword( password );
         CUser cUser = SecurityConfigUtil.getCUser( "createTestWithPassword" );
         Assert.assertEquals( "Expected hashed passwords to be the same.", hashedPassword, cUser.getPassword() );
-        
+
     }
-    
+
     @Test
     public void listTest() throws IOException
     {
@@ -84,20 +84,20 @@ public class Nexus142UserCrudJsonTests
         resource.setStatus( "active" );
         resource.setEmail( "listTest@user.com" );
         resource.addRole( "role1" );
-        
+
      // this also validates
         this.messageUtil.createUser( resource );
-        
+
         // now that we have at least one element stored (more from other tests, most likely)
-        
-        
+
+
         // NEED to work around a GET problem with the REST client
         List<UserResource> users = this.messageUtil.getList();
         SecurityConfigUtil.verifyUsers( users );
-        
-        
+
+
     }
-    
+
     public void readTest()
         throws IOException
     {
@@ -112,15 +112,15 @@ public class Nexus142UserCrudJsonTests
 
      // this also validates
         this.messageUtil.createUser( resource );
-        
-        
+
+
         Response response = this.messageUtil.sendMessage( Method.GET, resource );
 
         if ( !response.getStatus().isSuccess() )
         {
             Assert.fail( "Could not GET Repository Target: " + response.getStatus() );
         }
-        
+
         // get the Resource object
         UserResource responseResource = this.messageUtil.getResourceFromResponse( response );
 
@@ -130,7 +130,7 @@ public class Nexus142UserCrudJsonTests
         Assert.assertEquals( resource.getEmail(), responseResource.getEmail() );
         Assert.assertEquals( resource.getRoles(), responseResource.getRoles() );
     }
-    
+
 
     @Test
     public void updateTest()

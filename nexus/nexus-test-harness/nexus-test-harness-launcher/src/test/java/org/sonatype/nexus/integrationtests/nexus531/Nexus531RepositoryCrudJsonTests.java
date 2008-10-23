@@ -35,7 +35,7 @@ public class Nexus531RepositoryCrudJsonTests
     }
 
     @Test
-    public void createTest()
+    public void createRepositoryTest()
         throws IOException
     {
 
@@ -204,7 +204,7 @@ public class Nexus531RepositoryCrudJsonTests
 
             // now check all agaist the the cRepo
             CRepository cRepo = NexusConfigUtil.getRepo( listRepo.getId() );
-            
+
             if ( cRepo != null )
             {
                 Assert.assertEquals( cRepo.getId(), listRepo.getId() );
@@ -216,12 +216,12 @@ public class Nexus531RepositoryCrudJsonTests
                 log.debug( "listRepo.getRemoteUri(): " + listRepo.getRemoteUri() );
 
                 Assert.assertTrue( ( cRepo.getRemoteStorage() == null && listRepo.getRemoteUri() == null )
-                    || ( cRepo.getRemoteStorage().getUrl().equals( listRepo.getRemoteUri() ) ) );   
+                    || ( cRepo.getRemoteStorage().getUrl().equals( listRepo.getRemoteUri() ) ) );
             }
             else
             {
                 CRepositoryShadow cShadow = NexusConfigUtil.getRepoShadow( listRepo.getId() );
-                
+
                 Assert.assertEquals( cShadow.getId(), listRepo.getId() );
                 Assert.assertEquals( cShadow.getName(), listRepo.getName() );
                 Assert.assertEquals( cShadow.getType(), listRepo.getFormat() );

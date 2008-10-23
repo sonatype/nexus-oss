@@ -33,7 +33,7 @@ public class Nexus133TargetCrudJsonTests
 
     @SuppressWarnings( "unchecked" )
     @Test
-    public void createTest()
+    public void createTargetTest()
         throws IOException
     {
 
@@ -100,7 +100,7 @@ public class Nexus133TargetCrudJsonTests
         Assert.assertEquals( resource.getPatterns(), responseResource.getPatterns() );
 
     }
-    
+
     @Test
     public void listTest() throws IOException
     {
@@ -129,16 +129,16 @@ public class Nexus133TargetCrudJsonTests
 
         // make sure it was added
         this.messageUtil.verifyTargetsConfig( responseResource );
-        
+
         // now that we have at least one element stored (more from other tests, most likely)
-        
-        
+
+
         // NEED to work around a GET problem with the REST client
         List<RepositoryTargetListResource> targets = this.messageUtil.getList();
         // the response is a list of RepositoryTargetListResource, so we need a different compare method.
         this.messageUtil.verifyCompleteTargetsConfig( targets );
-        
-        
+
+
     }
 
     @Test
@@ -224,7 +224,7 @@ public class Nexus133TargetCrudJsonTests
 
         this.messageUtil.verifyTargetsConfig( new ArrayList<RepositoryTargetResource>() );
     }
-    
+
 
 
 }

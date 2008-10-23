@@ -172,7 +172,7 @@ public class Nexus537RepoTargetsTests
     }
 
     @Test
-    public void doCreateTest()
+    public void doCreateRepoTargetTest()
         throws Exception
     {
 
