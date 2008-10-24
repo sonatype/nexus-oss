@@ -1,17 +1,14 @@
 package org.sonatype.nexus.integrationtests.nexus778;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import junit.framework.Assert;
 
-import org.apache.commons.io.FileUtils;
-import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
-import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.AbstractPrivilegeTest;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.rest.model.NexusArtifact;
@@ -20,7 +17,6 @@ import org.sonatype.nexus.rest.model.PrivilegeTargetStatusResource;
 import org.sonatype.nexus.rest.model.RepositoryTargetResource;
 import org.sonatype.nexus.rest.model.RoleResource;
 import org.sonatype.nexus.rest.model.UserResource;
-import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
 import org.sonatype.nexus.test.utils.SearchMessageUtil;
 
 
@@ -30,22 +26,6 @@ import org.sonatype.nexus.test.utils.SearchMessageUtil;
 public class Nexus778SearchResultsFilteringTest
     extends AbstractPrivilegeTest
 {
-
-    @BeforeClass
-    public static void cleanWorkFolder()
-        throws Exception
-    {
-        File repo =
-            new File( AbstractNexusIntegrationTest.nexusBaseDir, "runtime/work/storage/" + REPO_TEST_HARNESS_REPO );
-        FileUtils.forceDelete( repo );
-    }
-
-    @Before
-    public void reindex()
-        throws Exception
-    {
-        RepositoryMessageUtil.updateIndexes( REPO_TEST_HARNESS_REPO );
-    }
 
     protected SearchMessageUtil searchUtil;
 
@@ -58,10 +38,10 @@ public class Nexus778SearchResultsFilteringTest
     public void simpleSearch()
         throws Exception
     {
-        List<NexusArtifact> results = this.searchUtil.searchFor( "test1" );
+        List<NexusArtifact> results = searchFor( "test1" );
         Assert.assertEquals( "Results found " + printResults( results ), 1, results.size() );
 
-        results = this.searchUtil.searchFor( "test2" );
+        results = searchFor( "test2" );
         Assert.assertEquals( "Results found " + printResults( results ), 1, results.size() );
     }
 
@@ -97,10 +77,10 @@ public class Nexus778SearchResultsFilteringTest
         TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
 
         // Should be able to retrieve both test1 & test2 artifacts
-        List<NexusArtifact> results = this.searchUtil.searchFor( "test1" );
+        List<NexusArtifact> results = searchFor( "test1" );
         Assert.assertEquals( "Results found " + printResults( results ), 1, results.size() );
 
-        results = this.searchUtil.searchFor( "test2" );
+        results = searchFor( "test2" );
         Assert.assertEquals( "Results found " + printResults( results ), 1, results.size() );
 
         // Now update the test user so that the user can only access test1
@@ -112,10 +92,10 @@ public class Nexus778SearchResultsFilteringTest
         TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
 
         // Should be able to retrieve only test1 artifacts
-        results = this.searchUtil.searchFor( "test1" );
+        results = searchFor( "test1" );
         Assert.assertEquals( "Results found " + printResults( results ), 1, results.size() );
 
-        results = this.searchUtil.searchFor( "test2" );
+        results = searchFor( "test2" );
         Assert.assertEquals( "Results found " + printResults( results ), 0, results.size() );
 
         // Now update the test user so that the user can only access test2
@@ -127,11 +107,22 @@ public class Nexus778SearchResultsFilteringTest
         TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
 
         // Should be able to retrieve only test2 artifacts
-        results = this.searchUtil.searchFor( "test1" );
+        results = searchFor( "test1" );
         Assert.assertEquals( "Results found " + printResults( results ), 0, results.size() );
 
-        results = this.searchUtil.searchFor( "test2" );
+        results = searchFor( "test2" );
         Assert.assertEquals( "Results found " + printResults( results ), 1, results.size() );
+    }
+
+    private List<NexusArtifact> searchFor( String artifactId )
+        throws Exception
+    {
+        Map<String, String> args = new HashMap<String, String>();
+        args.put( "a", artifactId );
+        args.put( "g", "nexus778" );
+
+        List<NexusArtifact> results = searchUtil.searchFor( args );
+        return results;
     }
 
     private CharSequence printResults( List<NexusArtifact> results )
