@@ -30,6 +30,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.apache.commons.fileupload.FileItem;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.StringUtils;
 import org.restlet.Context;
 import org.restlet.data.MediaType;
@@ -40,6 +41,7 @@ import org.restlet.data.Tag;
 import org.restlet.resource.Representation;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
+import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
@@ -73,6 +75,9 @@ public abstract class AbstractResourceStoreContentPlexusResource
 {
     public static final String IS_LOCAL_PARAMETER = "isLocal";
 
+    @Requirement
+    private Nexus nexus;
+
     public AbstractResourceStoreContentPlexusResource()
     {
         super();
@@ -85,6 +90,11 @@ public abstract class AbstractResourceStoreContentPlexusResource
     public boolean acceptsUpload()
     {
         return true;
+    }
+
+    protected Nexus getNexus()
+    {
+        return nexus;
     }
 
     protected String getResourceStorePath( Request request )
@@ -293,7 +303,9 @@ public abstract class AbstractResourceStoreContentPlexusResource
                 }
                 else
                 {
-                    throw new ResourceException( Status.REDIRECTION_NOT_MODIFIED, "Resource is not modified." );
+                    res.setStatus( Status.REDIRECTION_NOT_MODIFIED, "The resource is not modified!" );
+
+                    return null;
                 }
             }
             else if ( req.getConditions().getNoneMatch() != null && req.getConditions().getNoneMatch().size() > 0
@@ -384,6 +396,7 @@ public abstract class AbstractResourceStoreContentPlexusResource
             if ( MediaType.TEXT_HTML.equals( variant.getMediaType() ) )
             {
                 result = serialize( context, req, variant, response );
+
                 result.setModificationDate( new Date( coll.getModified() ) );
             }
             else
@@ -407,6 +420,10 @@ public abstract class AbstractResourceStoreContentPlexusResource
             dataModel.put( "listItems", sortContentListResource( ( (ContentListResourceResponse) payload ).getData() ) );
 
             dataModel.put( "request", req );
+
+            dataModel.put( "nexusVersion", getNexus().getSystemStatus().getVersion() );
+
+            dataModel.put( "nexusRoot", req.getRootRef().getPath() );
 
             // Load up the template, and pass in the data
             VelocityRepresentation representation = new VelocityRepresentation(

@@ -28,51 +28,51 @@
   <link rel="shortcut icon" href="favicon.ico" type="image/gif" />
   <link rel="stylesheet" href="ext-2.2/resources/css/ext-all.css" type="text/css" media="screen" charset="utf-8">
   <link rel="stylesheet" href="ext-2.2/resources/css/xtheme-gray.css" type="text/css" media="screen" charset="utf-8">
-  <link rel="stylesheet" href="style/Sonatype.css" type="text/css" media="screen" title="no title" charset="utf-8">
+  <link rel="stylesheet" href="style/Sonatype.css?$nexusVersion" type="text/css" media="screen" title="no title" charset="utf-8">
 
   <script src="ext-2.2/adapter/ext/ext-base.js" type="text/javascript" charset="utf-8"></script>
   <script src="ext-2.2/ext-all.js" type="text/javascript" charset="utf-8"></script>
-  <script src="js/extensions/ext-override.js" type="text/javascript" charset="utf-8"></script>
+  <script src="js/extensions/ext-override.js?$nexusVersion" type="text/javascript" charset="utf-8"></script>
 
-  <script src="js/filetree/js/Ext.ux.form.BrowseButton.js" type="text/javascript" charset="utf-8"></script>
+  <script src="js/filetree/js/Ext.ux.form.BrowseButton.js?$nexusVersion" type="text/javascript" charset="utf-8"></script>
   
-  <script src="js/Sonatype.js" type="text/javascript" charset="utf-8"></script>
+  <script src="js/Sonatype.js?$nexusVersion" type="text/javascript" charset="utf-8"></script>
   
-  <script src="js/extensions/Ext.messagebox.js" type="text/javascript" charset="utf-8"></script>  
-  <script src="js/extensions/Ext.form.js" type="text/javascript" charset="utf-8"></script>
-  <script src="js/extensions/SearchField.js" type="text/javascript" charset="utf-8"></script>
-  <script src="js/extensions/Sonatype.ext.FeedGrid.js" type="text/javascript" charset="utf-8"></script>
-  <script src="js/extensions/Ext.tree.js" type="text/javascript" charset="utf-8"></script>
-  <script src="js/extensions/TwinPanelController.js" type="text/javascript" charset="utf-8"></script>
-  <script src="js/extensions/Sonatype.events.js" type="text/javascript" charset="utf-8"></script>
-  <script src="js/extensions/Sonatype.navigation.js" type="text/javascript" charset="utf-8"></script>
+  <script src="js/extensions/Ext.messagebox.js?$nexusVersion" type="text/javascript" charset="utf-8"></script>  
+  <script src="js/extensions/Ext.form.js?$nexusVersion" type="text/javascript" charset="utf-8"></script>
+  <script src="js/extensions/SearchField.js?$nexusVersion" type="text/javascript" charset="utf-8"></script>
+  <script src="js/extensions/Sonatype.ext.FeedGrid.js?$nexusVersion" type="text/javascript" charset="utf-8"></script>
+  <script src="js/extensions/Ext.tree.js?$nexusVersion" type="text/javascript" charset="utf-8"></script>
+  <script src="js/extensions/TwinPanelController.js?$nexusVersion" type="text/javascript" charset="utf-8"></script>
+  <script src="js/extensions/Sonatype.events.js?$nexusVersion" type="text/javascript" charset="utf-8"></script>
+  <script src="js/extensions/Sonatype.navigation.js?$nexusVersion" type="text/javascript" charset="utf-8"></script>
   
-  <script src="js/Sonatype.utils.js" type="text/javascript" charset="utf-8"></script>
-  <script src="js/Sonatype.config.js" type="text/javascript" charset="utf-8"></script>
-  <script src="js/Sonatype.lib.js" type="text/javascript" charset="utf-8"></script>
-  <script src="js/Sonatype.resources.js" type="text/javascript" charset="utf-8"></script>
-  <script src="js/Sonatype.view.js" type="text/javascript" charset="utf-8"></script>
+  <script src="js/Sonatype.utils.js?$nexusVersion" type="text/javascript" charset="utf-8"></script>
+  <script src="js/Sonatype.config.js?$nexusVersion" type="text/javascript" charset="utf-8"></script>
+  <script src="js/Sonatype.lib.js?$nexusVersion" type="text/javascript" charset="utf-8"></script>
+  <script src="js/Sonatype.resources.js?$nexusVersion" type="text/javascript" charset="utf-8"></script>
+  <script src="js/Sonatype.view.js?$nexusVersion" type="text/javascript" charset="utf-8"></script>
   
-  <script src="js/repoServer/repoServer.referenceData.js" type="text/javascript" charset="utf-8"></script>
-  <script src="js/repoServer/repoServer.resources.js" type="text/javascript" charset="utf-8"></script>
-  <script src="js/repoServer/repoServer.FeedViewPanel.js" type="text/javascript" charset="utf-8"></script>
-  <script src="js/repoServer/repoServer.SearchResultGrid.js" type="text/javascript" charset="utf-8"></script>
-  <script src="js/repoServer/repoServer.SearchPanel.js" type="text/javascript" charset="utf-8"></script>
+  <script src="js/repoServer/repoServer.referenceData.js?$nexusVersion" type="text/javascript" charset="utf-8"></script>
+  <script src="js/repoServer/repoServer.resources.js?$nexusVersion" type="text/javascript" charset="utf-8"></script>
+  <script src="js/repoServer/repoServer.FeedViewPanel.js?$nexusVersion" type="text/javascript" charset="utf-8"></script>
+  <script src="js/repoServer/repoServer.SearchResultGrid.js?$nexusVersion" type="text/javascript" charset="utf-8"></script>
+  <script src="js/repoServer/repoServer.SearchPanel.js?$nexusVersion" type="text/javascript" charset="utf-8"></script>
   
-  <script src="js/repoServer/repoServer.LogsViewPanel.js" type="text/javascript" charset="utf-8"></script>
-  <script src="js/repoServer/repoServer.ServerEditPanel.js" type="text/javascript" charset="utf-8"></script>
-  <script src="js/repoServer/repoServer.GroupsEditPanel.js" type="text/javascript" charset="utf-8"></script>
-  <script src="js/repoServer/repoServer.RoutesEditPanel.js" type="text/javascript" charset="utf-8"></script>
-  <script src="js/repoServer/repoServer.SchedulesEditPanel.js" type="text/javascript" charset="utf-8"></script>
-  <script src="js/repoServer/repoServer.UserEditPanel.js" type="text/javascript" charset="utf-8"></script>
-  <script src="js/repoServer/repoServer.RoleEditPanel.js" type="text/javascript" charset="utf-8"></script>
-  <script src="js/repoServer/repoServer.PrivilegeEditPanel.js" type="text/javascript" charset="utf-8"></script>
-  <script src="js/repoServer/repoServer.AbstractRepoPanel.js" type="text/javascript" charset="utf-8"></script>
-  <script src="js/repoServer/repoServer.RepoEditPanel.js" type="text/javascript" charset="utf-8"></script>
-  <script src="js/repoServer/repoServer.FileUploadPanel.js" type="text/javascript" charset="utf-8"></script>  
-  <script src="js/repoServer/repoServer.RepoMaintPanel.js" type="text/javascript" charset="utf-8"></script>
-  <script src="js/repoServer/repoServer.RepoServer.js" type="text/javascript" charset="utf-8"></script>  
-  <script src="js/repoServer/repoServer.RepoTargetEditPanel.js" type="text/javascript" charset="utf-8"></script>
+  <script src="js/repoServer/repoServer.LogsViewPanel.js?$nexusVersion" type="text/javascript" charset="utf-8"></script>
+  <script src="js/repoServer/repoServer.ServerEditPanel.js?$nexusVersion" type="text/javascript" charset="utf-8"></script>
+  <script src="js/repoServer/repoServer.GroupsEditPanel.js?$nexusVersion" type="text/javascript" charset="utf-8"></script>
+  <script src="js/repoServer/repoServer.RoutesEditPanel.js?$nexusVersion" type="text/javascript" charset="utf-8"></script>
+  <script src="js/repoServer/repoServer.SchedulesEditPanel.js?$nexusVersion" type="text/javascript" charset="utf-8"></script>
+  <script src="js/repoServer/repoServer.UserEditPanel.js?$nexusVersion" type="text/javascript" charset="utf-8"></script>
+  <script src="js/repoServer/repoServer.RoleEditPanel.js?$nexusVersion" type="text/javascript" charset="utf-8"></script>
+  <script src="js/repoServer/repoServer.PrivilegeEditPanel.js?$nexusVersion" type="text/javascript" charset="utf-8"></script>
+  <script src="js/repoServer/repoServer.AbstractRepoPanel.js?$nexusVersion" type="text/javascript" charset="utf-8"></script>
+  <script src="js/repoServer/repoServer.RepoEditPanel.js?$nexusVersion" type="text/javascript" charset="utf-8"></script>
+  <script src="js/repoServer/repoServer.FileUploadPanel.js?$nexusVersion" type="text/javascript" charset="utf-8"></script>  
+  <script src="js/repoServer/repoServer.RepoMaintPanel.js?$nexusVersion" type="text/javascript" charset="utf-8"></script>
+  <script src="js/repoServer/repoServer.RepoServer.js?$nexusVersion" type="text/javascript" charset="utf-8"></script>  
+  <script src="js/repoServer/repoServer.RepoTargetEditPanel.js?$nexusVersion" type="text/javascript" charset="utf-8"></script>
 
     <!-- Plugin HEAD contributions start here -->
 	#foreach( $pluginHeadContribution in $pluginHeadContributions )

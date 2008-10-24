@@ -56,7 +56,7 @@ public class RepositoryContentPlexusResource
             NoSuchRepositoryRouterException,
             ResourceException
     {
-        return getNexusInstance( request ).getRepository(
+        return getNexus().getRepository(
             request.getAttributes().get( AbstractRepositoryPlexusResource.REPOSITORY_ID_KEY ).toString() );
     }
 

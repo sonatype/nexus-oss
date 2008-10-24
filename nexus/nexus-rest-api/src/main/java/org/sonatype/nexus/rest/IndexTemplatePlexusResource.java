@@ -23,6 +23,7 @@ import org.restlet.data.Status;
 import org.restlet.resource.Representation;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
+import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.plugins.rest.NexusResourceBundle;
 import org.sonatype.plexus.rest.representation.VelocityRepresentation;
 import org.sonatype.plexus.rest.resource.AbstractPlexusResource;
@@ -34,6 +35,9 @@ public class IndexTemplatePlexusResource
     extends AbstractPlexusResource
     implements ManagedPlexusResource
 {
+    @Requirement
+    private Nexus nexus;
+
     @Requirement( role = NexusResourceBundle.class )
     private Map<String, NexusResourceBundle> bundles;
 
@@ -91,6 +95,10 @@ public class IndexTemplatePlexusResource
         templatingContext.put( "serviceBase", "service/local" );
 
         templatingContext.put( "contentBase", "content" );
+
+        templatingContext.put( "nexusVersion", nexus.getSystemStatus().getVersion() );
+
+        templatingContext.put( "nexusRoot", request.getRootRef().getPath() );
 
         VelocityRepresentation templateRepresentation = new VelocityRepresentation(
             context,

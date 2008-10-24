@@ -41,9 +41,6 @@ public class ContentPlexusResource
     extends AbstractResourceStoreContentPlexusResource
     implements ManagedPlexusResource
 {
-    @Requirement
-    private Nexus nexus;
-
     @Override
     public Object getPayloadInstance()
     {
@@ -79,6 +76,6 @@ public class ContentPlexusResource
             NoSuchRepositoryRouterException,
             ResourceException
     {
-        return nexus.getRootRouter();
+        return getNexus().getRootRouter();
     }
 }
