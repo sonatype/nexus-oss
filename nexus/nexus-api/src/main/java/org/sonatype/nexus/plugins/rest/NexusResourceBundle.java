@@ -16,7 +16,8 @@ import java.util.List;
  * <ul>
  * <li>${serviceBase} - the path to local services base ("service/local" by default)</li>
  * <li>${contentBase} - the path to content base ("content" by default)</li>
- * <li>${bundle} - the instance of this ResourceBundle (the contributor)</li>
+ * <li>${nexusRoot} - the root path of Nexus Web Application</li>
+ * <li>${bundle} - the instance of this ResourceBundle (the contributor, this instance)</li>
  * <li>${nexusVersion} - the version of Nexus that currently runs, see NEXUS-932</li>
  * </ul>
  * 

@@ -431,7 +431,7 @@ public abstract class AbstractResourceStoreContentPlexusResource
                 "/templates/repositoryContentHtml.vm",
                 dataModel,
                 variant.getMediaType() );
-
+            
             return representation;
         }
         return null;

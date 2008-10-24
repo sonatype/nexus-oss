@@ -23,12 +23,10 @@ package org.sonatype.nexus.rest;
 import java.util.List;
 
 import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.restlet.data.MediaType;
 import org.restlet.data.Request;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
-import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryGroupException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryRouterException;
@@ -50,6 +48,7 @@ public class ContentPlexusResource
     @Override
     public String getResourceUri()
     {
+        // this is managed plexus resource, so path is not important
         return "";
     }
 

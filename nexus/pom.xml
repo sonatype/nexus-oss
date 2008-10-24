@@ -1,5 +1,4 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>org.sonatype.nexus</groupId>
@@ -79,7 +78,7 @@
 				<role>Developer</role>
 			</roles>
 			<timezone>8</timezone>
-		</developer>		
+		</developer>
 	</developers>
 	<contributors>
 		<contributor>
@@ -149,7 +148,7 @@
 		<nexus.indexer.version>1.0.3</nexus.indexer.version>
 		<!-- Shared with nexus-client, hence it is properties'ed -->
 		<plexus.restlet.bridge.version>1.4</plexus.restlet.bridge.version>
-        <micromailer.version>1.0.1</micromailer.version>
+		<micromailer.version>1.0.1</micromailer.version>
 	</properties>
 	<dependencyManagement>
 		<dependencies>
@@ -276,6 +275,35 @@
 				<groupId>org.sonatype.micromailer</groupId>
 				<artifactId>micromailer</artifactId>
 				<version>${micromailer.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.codehaus.plexus</groupId>
+				<artifactId>plexus-velocity</artifactId>
+				<version>1.1.7</version>
+				<type>jar</type>
+				<scope>compile</scope>
+				<exclusions>
+					<exclusion>
+						<groupId>org.codehaus.plexus</groupId>
+						<artifactId>plexus-component-api</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>velocity</groupId>
+						<artifactId>velocity</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>commons-collections</groupId>
+						<artifactId>commons-collections</artifactId>
+					</exclusion>
+				</exclusions>
+			</dependency>
+
+			<dependency>
+				<groupId>org.apache.velocity</groupId>
+				<artifactId>velocity</artifactId>
+				<version>1.5</version>
+				<type>jar</type>
+				<scope>compile</scope>
 			</dependency>
 
 			<!-- JSecurity -->
@@ -432,11 +460,6 @@
 				<version>1.2.1</version>
 				<type>jar</type>
 				<scope>compile</scope>
-			</dependency>
-			<dependency>
-				<groupId>org.apache.velocity</groupId>
-				<artifactId>velocity</artifactId>
-				<version>1.5</version>
 			</dependency>
 
 			<!-- Storage impls -->
@@ -626,7 +649,8 @@
 									<excludes>
 										<exclude>*:plexus-component-api</exclude>
 									</excludes>
-									<message> plexus-component-api conflicts with newer plexus-container-default. You probably added a dependency that is plexus component made with older plexus container. </message>
+									<message> plexus-component-api conflicts with newer plexus-container-default. You probably added a dependency that is plexus component made
+										with older plexus container. </message>
 								</bannedDependencies>
 								<!--  <requirePluginVersions>
 									<banSnapshots>false</banSnapshots>
