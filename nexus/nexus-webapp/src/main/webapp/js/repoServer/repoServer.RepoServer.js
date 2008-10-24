@@ -294,6 +294,12 @@ Sonatype.repoServer.RepoServer = function(){
 
       //Config Group **************************************************
       nexusPanel.add( {
+        title: 'Enterprise',
+        id: 'st-nexus-enterprise'
+      } );
+
+      //Config Group **************************************************
+      nexusPanel.add( {
         title: 'Administration',
         id: 'st-nexus-config',
         items: [

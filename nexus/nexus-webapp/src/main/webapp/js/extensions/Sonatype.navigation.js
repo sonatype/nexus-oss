@@ -26,6 +26,8 @@ Sonatype.navigation.NavigationPanel = function( config ) {
   var defaultConfig = {};
   Ext.apply( this, config, defaultConfig );
 
+  this.delayedItems = {};
+
   Sonatype.navigation.NavigationPanel.superclass.constructor.call( this, {
     cls: 'st-server-panel',
     layout:'fit',
@@ -35,10 +37,17 @@ Sonatype.navigation.NavigationPanel = function( config ) {
 
 Ext.extend( Sonatype.navigation.NavigationPanel, Ext.Panel, {
   add: function( c ) {
+    var arr = null;
     var a = arguments;
     if ( a.length > 1 ) {
-      for( var i = 0; i < a.length; i++ ) {
-        this.add( a[i] );
+      arr = a;
+    }
+    else if ( Ext.isArray( c ) ) {
+      arr = c;
+    }
+    if ( arr != null ) {
+      for( var i = 0; i < arr.length; i++ ) {
+        this.add( arr[i] );
       }
       return;
     }
@@ -46,11 +55,25 @@ Ext.extend( Sonatype.navigation.NavigationPanel, Ext.Panel, {
     // check if this is an attempt to add a navigation item to an existing section
     if ( c.sectionId ) {
       var panel = this.findById( c.sectionId );
-      return panel ? panel.add( c ) : null;
+      if ( panel ) {
+        return panel.add( c );
+      }
+      else {
+        if ( this.delayedItems[c.sectionId] == null ) {
+          this.delayedItems[c.sectionId] = [];
+        }
+        this.delayedItems[c.sectionId].push( c );
+        return null;
+      }
     }
     
     var panel = new Sonatype.navigation.Section( c );
-    return Sonatype.navigation.NavigationPanel.superclass.add.call( this, panel );
+    panel = Sonatype.navigation.NavigationPanel.superclass.add.call( this, panel );
+    if ( panel.id && this.delayedItems[panel.id] ) {
+      panel.add( this.delayedItems[panel.id] );
+      this.delayedItems[panel.id] = null;
+    }
+    return panel;
   }
 });
 
@@ -140,10 +163,17 @@ Ext.extend( Sonatype.navigation.Section, Ext.Panel, {
   },
 
   add: function( c ) {
+    var arr = null;
     var a = arguments;
     if ( a.length > 1 ) {
-      for( var i = 0; i < a.length; i++ ) {
-        this.add( a[i] );
+      arr = a;
+    }
+    else if ( Ext.isArray( c ) ) {
+      arr = c;
+    }
+    if ( arr != null ) {
+      for( var i = 0; i < arr.length; i++ ) {
+        this.add( arr[i] );
       }
       return;
     }
