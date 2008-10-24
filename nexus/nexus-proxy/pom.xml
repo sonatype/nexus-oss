@@ -137,8 +137,28 @@
             <artifactId>slf4j-log4j12</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+        	<groupId>org.apache.maven.mercury</groupId>
+        	<artifactId>mercury-md-shared</artifactId>
+        </dependency>
 
     </dependencies>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.apache.maven.mercury</groupId>
+        		<artifactId>mercury-md-shared</artifactId>
+        		<version>1.0.0-alpha-2-SNAPSHOT</version>
+        		<exclusions>
+        			<exclusion>
+        				<groupId>org.codehaus.plexus</groupId>
+        				<artifactId>plexus-component-api</artifactId>
+        			</exclusion>
+        		</exclusions>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
 
     <build>
         <plugins>
