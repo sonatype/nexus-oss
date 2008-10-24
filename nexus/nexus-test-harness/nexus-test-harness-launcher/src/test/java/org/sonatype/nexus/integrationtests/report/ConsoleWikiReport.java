@@ -27,8 +27,13 @@ public class ConsoleWikiReport
                     + ".java]";
 
             String jiraUrl = "[" + bean.getTestId() + "|" + NEXUS_BUG_URL_BASE + bean.getTestId() + "]";
+            
+            // get the description
+            String comment = bean.getJavaClass().getComment();
+            comment = (comment == null) ? "MISSING DESCRIPTION" : convertAnchor( comment );
+            
             String row =
-                " | " + scmUrl + " | " + convertAnchor( bean.getJavaClass().getComment() ) + " | " + jiraUrl
+                " | " + scmUrl + " | " + comment + " | " + jiraUrl
                     + " | (/) |";
 
             System.out.println( row );

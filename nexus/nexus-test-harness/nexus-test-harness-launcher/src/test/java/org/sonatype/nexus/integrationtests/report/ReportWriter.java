@@ -78,6 +78,7 @@ public class ReportWriter
         // print errors here.. this should be handled better, but there are no plans for this 'report' anyway.
         if ( !classesWithoutDescriptions.isEmpty() )
         {
+
             System.err.println( "\n\n\n\nErrors:\n" );
 
             for ( Iterator<JavaClass> iter = classesWithoutDescriptions.iterator(); iter.hasNext(); )
