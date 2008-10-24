@@ -22,12 +22,12 @@
     <proxy-repo-target-dir>${project.build.directory}/test-classes/${proxy-repo-target-dir-name}</proxy-repo-target-dir>
 
     <jetty-application-host>0.0.0.0</jetty-application-host>
-    
+
     <proxy-repo-plexus-config-file>${project.build.directory}/test-classes/proxyRepo/conf/ProxyRepoPlexus.xml</proxy-repo-plexus-config-file>
     <proxy-repo-port>8090</proxy-repo-port>
     <proxy-repo-control-port>33002</proxy-repo-control-port>
     <proxy-repo-base-url>http://localhost:${proxy-repo-port}/remote/</proxy-repo-base-url>
-    
+
     <nexus-abs-basedir>${project.build.directory}/bundle/nexus-webapp-${project.version}</nexus-abs-basedir>
     <nexus-application-protocol>http</nexus-application-protocol>
     <nexus-application-host>localhost</nexus-application-host>
@@ -41,7 +41,7 @@
     <lib-target-dir>${nexus-abs-basedir}/runtime/apps/nexus/lib</lib-target-dir>
     <config-target-dir>${nexus-abs-basedir}/runtime/apps/nexus/conf</config-target-dir>
     <work-target-dir>${nexus-abs-basedir}/runtime/work</work-target-dir>
-    
+
     <fake-central-repo>${project.build.testOutputDirectory}/fake-central</fake-central-repo>
   </properties>
 
@@ -244,15 +244,15 @@
                   <classifier>sources</classifier>
                   <outputDirectory>${emma-sources-base}/nexus-indexer</outputDirectory>
                 </artifactItem>
+                <!-- 
                 <artifactItem>
                   <groupId>org.sonatype.nexus</groupId>
                   <artifactId>nexus-rest-model</artifactId>
                   <version>${project.version}</version>
                   <classifier>sources</classifier>
-                  <outputDirectory>
-                    ${emma-sources-base}/nexus-rest-model
-                  </outputDirectory>
+                  <outputDirectory>${emma-sources-base}/nexus-rest-model</outputDirectory>
                 </artifactItem>
+                  -->
                 <artifactItem>
                   <groupId>org.sonatype.nexus</groupId>
                   <artifactId>nexus-rest-api</artifactId>
