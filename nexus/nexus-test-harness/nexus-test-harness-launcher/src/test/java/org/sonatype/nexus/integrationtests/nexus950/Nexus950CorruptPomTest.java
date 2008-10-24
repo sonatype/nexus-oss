@@ -24,7 +24,7 @@ public class Nexus950CorruptPomTest
         
         HttpMethod resultMethod = DeployUtils.deployUsingPomWithRestReturnResult( this.getTestRepositoryId(), jarFile, badPomFile, "", "jar" );
         
-        Assert.assertEquals( "", resultMethod.getStatusCode(), 500 );        
+        Assert.assertEquals( "Expected a 400 error returned.", resultMethod.getStatusCode(), 400 );        
     }
     
 }

@@ -188,13 +188,13 @@ public abstract class AbstractArtifactPlexusResource
         {
             getLogger().warn( "XmlPullParserException during retrieve of POM:", e );
 
-            throw new ResourceException( Status.SERVER_ERROR_INTERNAL );
+            throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Error occurred while reading the POM file." );
         }
         catch ( IOException e )
         {
             getLogger().warn( "IOException during retrieve of POM:", e );
 
-            throw new ResourceException( Status.SERVER_ERROR_INTERNAL );
+            throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Error occurred while reading the POM file." );
         }
     }
 
@@ -561,13 +561,13 @@ public abstract class AbstractArtifactPlexusResource
         {
             getLogger().warn( "XmlPullParserException during retrieve of POM:", e );
 
-            throw new ResourceException( Status.SERVER_ERROR_INTERNAL );
+            throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Error occurred while reading the POM file." );
         }
         catch ( IOException e )
         {
             getLogger().warn( "IOException during retrieve of POM:", e );
 
-            throw new ResourceException( Status.SERVER_ERROR_INTERNAL );
+            throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Error occurred while reading the POM file." );
         }
         catch ( Exception e )
         {
