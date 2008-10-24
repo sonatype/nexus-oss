@@ -426,6 +426,19 @@
 					</exclusion>
 				</exclusions>
 			</dependency>
+			
+			<!-- maven mercury -->
+			<dependency>
+				<groupId>org.apache.maven.mercury</groupId>
+        		<artifactId>mercury-md-shared</artifactId>
+        		<version>1.0.0-alpha-2-SNAPSHOT</version>
+        		<exclusions>
+        			<exclusion>
+        				<groupId>org.codehaus.plexus</groupId>
+        				<artifactId>plexus-component-api</artifactId>
+        			</exclusion>
+        		</exclusions>
+			</dependency>
 
 			<!-- Wagon -->
 			<dependency>
