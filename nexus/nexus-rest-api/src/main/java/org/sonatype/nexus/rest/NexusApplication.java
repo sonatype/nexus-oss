@@ -540,9 +540,12 @@ public class NexusApplication
             {
                 List<StaticResource> resources = bundle.getContributedResouces();
 
-                for ( StaticResource resource : resources )
+                if ( resources != null )
                 {
-                    attach( root, true, resource.getPath(), new StaticResourceFinder( getContext(), resource ) );
+                    for ( StaticResource resource : resources )
+                    {
+                        attach( root, true, resource.getPath(), new StaticResourceFinder( getContext(), resource ) );
+                    }
                 }
             }
         }
