@@ -50,9 +50,7 @@ import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.proxy.utils.StoreWalker;
 
 /**
- * 
  * @author Juven Xu
- *
  */
 public class RecreateMavenMetadataWalker
     extends StoreWalker
@@ -136,7 +134,8 @@ public class RecreateMavenMetadataWalker
     {
         getLogger().debug( "Creating maven-metadata.xml at: " + coll.getPath() );
 
-        RepositoryItemUid mdUid = repository.createUid( coll.getPath() + File.separator + "maven-metadata.xml" );
+        // UIDs are like URIs! The separator is _always_ "/"!!!
+        RepositoryItemUid mdUid = repository.createUid( coll.getPath() + "/maven-metadata.xml" );
 
         Metadata md = new Metadata();
 
@@ -162,7 +161,7 @@ public class RecreateMavenMetadataWalker
         repository.storeItem( mdFile );
 
         repository.removeFromNotFoundCache( mdUid.getPath() );
-        
+
         outputStream.close();
     }
 
