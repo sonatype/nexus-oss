@@ -221,9 +221,7 @@ public abstract class AbstractResourceStoreContentPlexusResource
      * @throws NoSuchRepositoryRouterException
      */
     protected abstract ResourceStore getResourceStore( Request request )
-        throws NoSuchRepositoryException,
-            NoSuchRepositoryGroupException,
-            NoSuchRepositoryRouterException,
+        throws NoSuchResourceStoreException,
             ResourceException;
 
     /**
@@ -431,7 +429,7 @@ public abstract class AbstractResourceStoreContentPlexusResource
                 "/templates/repositoryContentHtml.vm",
                 dataModel,
                 variant.getMediaType() );
-            
+
             return representation;
         }
         return null;
