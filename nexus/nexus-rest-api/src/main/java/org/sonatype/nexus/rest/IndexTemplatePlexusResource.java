@@ -123,17 +123,17 @@ public class IndexTemplatePlexusResource
 
             pluginContext.put( "bundle", bundle );
 
-            evaluateIfNeeded(
-                templateRepresentation.getEngine(),
-                pluginContext,
-                bundle.getHeadContribution(),
-                pluginHeadContributions );
+            // HEAD
 
-            evaluateIfNeeded(
-                templateRepresentation.getEngine(),
-                pluginContext,
-                bundle.getBodyContribution(),
-                pluginBodyContributions );
+            String headTemplate = bundle.getHeadContribution( pluginContext );
+
+            evaluateIfNeeded( templateRepresentation.getEngine(), pluginContext, headTemplate, pluginHeadContributions );
+
+            // BODY
+
+            String bodyTemplate = bundle.getBodyContribution( pluginContext );
+
+            evaluateIfNeeded( templateRepresentation.getEngine(), pluginContext, bodyTemplate, pluginBodyContributions );
         }
 
         templatingContext.put( "pluginHeadContributions", pluginHeadContributions );
