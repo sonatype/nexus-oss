@@ -5,6 +5,9 @@
       <outputDirectory>/${pom.build.finalName}/runtime/apps/nexus/lib</outputDirectory>
       <fileMode>0644</fileMode>
       <scope>runtime</scope>
+      <excludes>
+        <exclude>org.sonatype.appbooter.plexus-platforms:plexus-platform-*</exclude>
+      </excludes>
     </dependencySet>
   </dependencySets>
   <fileSets>
@@ -32,6 +35,15 @@
         <include>style/Sonatype.css</include>
         <include>WEB-INF/*</include>
       </includes>
+      <excludes>
+        <!-- The plexus.xml and plexus.properties files used in the bundle come from src/main/assembly/base-bundle/conf, 
+             where these are used in the WAR archive. We don't want to confuse things by leaving these in... -->
+        <exclude>WEB-INF/plexus*</exclude>
+        
+        <!-- The web.xml for the bundle comes from the src/main/assembly/bundle/webapp/WEB-INF directory. 
+             This one is for the WAR archive. -->
+        <exclude>WEB-INF/web.xml</exclude>
+      </excludes>
     </fileSet>
     <fileSet>
       <directory>target/nexus-tools</directory>

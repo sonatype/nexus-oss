@@ -3,7 +3,6 @@
     <dependencySet>
       <outputDirectory>/${pom.build.finalName}/lib</outputDirectory>
       <fileMode>0644</fileMode>
-      <scope>provided</scope>
       <includes>
         <include>org.sonatype.appbooter.plexus-platforms:plexus-platform-jsw</include>
       </includes>
