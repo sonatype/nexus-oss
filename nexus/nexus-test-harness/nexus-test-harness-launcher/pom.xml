@@ -345,7 +345,6 @@
         <version>1.0-SNAPSHOT</version>
         <executions>
           <execution>
-            <id>first-run</id>
             <phase>validate</phase>
             <goals>
               <goal>allocate-ports</goal>
@@ -363,20 +362,6 @@
                 </port>
                 <port>
                   <name>nexus-control-port</name>
-                </port>
-              </ports>
-            </configuration>
-          </execution>
-          <execution>
-            <id>second-run</id>
-            <phase>generate-resources</phase>
-            <goals>
-              <goal>allocate-ports</goal>
-            </goals>
-            <configuration>
-              <ports>
-                <port>
-                  <name>nexus-something</name>
                 </port>
               </ports>
             </configuration>
