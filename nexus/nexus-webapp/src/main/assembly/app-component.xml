@@ -9,6 +9,15 @@
         <exclude>org.sonatype.appbooter.plexus-platforms:plexus-platform-*</exclude>
       </excludes>
     </dependencySet>
+    <dependencySet>
+      <useProjectArtifact>false</useProjectArtifact>
+      <outputDirectory>/${pom.build.finalName}/runtime/apps/nexus/lib</outputDirectory>
+      <fileMode>0644</fileMode>
+      <scope>provided</scope>
+      <includes>
+        <include>javax.servlet:servlet-api</include>
+      </includes>
+    </dependencySet>
   </dependencySets>
   <fileSets>
     <fileSet>
