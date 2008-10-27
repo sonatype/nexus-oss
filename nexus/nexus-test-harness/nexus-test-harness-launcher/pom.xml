@@ -24,8 +24,6 @@
     <jetty-application-host>0.0.0.0</jetty-application-host>
 
     <proxy-repo-plexus-config-file>${project.build.directory}/test-classes/proxyRepo/conf/ProxyRepoPlexus.xml</proxy-repo-plexus-config-file>
-    <proxy-repo-port>8090</proxy-repo-port>
-    <proxy-repo-control-port>33002</proxy-repo-control-port>
     <proxy-repo-base-url>http://localhost:${proxy-repo-port}/remote/</proxy-repo-base-url>
 
     <nexus-abs-basedir>${project.build.directory}/bundle/nexus-webapp-${project.version}</nexus-abs-basedir>
@@ -33,8 +31,6 @@
     <nexus-application-host>localhost</nexus-application-host>
     <nexus-application-name>nexus</nexus-application-name>
     <nexus-base-url>${nexus-application-protocol}://${nexus-application-host}:${nexus-application-port}/${nexus-application-name}/</nexus-base-url>
-    <nexus-application-port>8087</nexus-application-port>
-    <nexus-control-port>33001</nexus-control-port>
     <nexus-plexus-config-file>${nexus-abs-basedir}/conf/plexus.xml</nexus-plexus-config-file>
     <nexus-relative-basedir>${bundle-expanded-dir}/nexus-webapp-${project.version}</nexus-relative-basedir>
 
@@ -43,6 +39,14 @@
     <work-target-dir>${nexus-abs-basedir}/runtime/work</work-target-dir>
 
     <fake-central-repo>${project.build.testOutputDirectory}/fake-central</fake-central-repo>
+
+    <!--  Testing port allocator
+    <proxy-repo-port>8090</proxy-repo-port>
+    <proxy-repo-control-port>33002</proxy-repo-control-port>
+
+    <nexus-application-port>8087</nexus-application-port>
+    <nexus-control-port>33001</nexus-control-port>
+ -->
   </properties>
 
   <dependencies>
@@ -244,15 +248,10 @@
                   <classifier>sources</classifier>
                   <outputDirectory>${emma-sources-base}/nexus-indexer</outputDirectory>
                 </artifactItem>
-                <!-- 
-                <artifactItem>
-                  <groupId>org.sonatype.nexus</groupId>
-                  <artifactId>nexus-rest-model</artifactId>
-                  <version>${project.version}</version>
-                  <classifier>sources</classifier>
-                  <outputDirectory>${emma-sources-base}/nexus-rest-model</outputDirectory>
-                </artifactItem>
-                  -->
+                <!--
+                  <artifactItem> <groupId>org.sonatype.nexus</groupId> <artifactId>nexus-rest-model</artifactId> <version>${project.version}</version> <classifier>sources</classifier>
+                  <outputDirectory>${emma-sources-base}/nexus-rest-model</outputDirectory> </artifactItem>
+                -->
                 <artifactItem>
                   <groupId>org.sonatype.nexus</groupId>
                   <artifactId>nexus-rest-api</artifactId>
@@ -340,6 +339,50 @@
         </configuration>
       </plugin>
 
+      <plugin>
+        <groupId>org.sonatype.plugins</groupId>
+        <artifactId>port-allocator-maven-plugin</artifactId>
+        <version>1.0-SNAPSHOT</version>
+        <executions>
+          <execution>
+            <id>first-run</id>
+            <phase>validate</phase>
+            <goals>
+              <goal>allocate-ports</goal>
+            </goals>
+            <configuration>
+              <ports>
+                <port>
+                  <name>proxy-repo-port</name>
+                </port>
+                <port>
+                  <name>proxy-repo-control-port</name>
+                </port>
+                <port>
+                  <name>nexus-application-port</name>
+                </port>
+                <port>
+                  <name>nexus-control-port</name>
+                </port>
+              </ports>
+            </configuration>
+          </execution>
+          <execution>
+            <id>second-run</id>
+            <phase>generate-resources</phase>
+            <goals>
+              <goal>allocate-ports</goal>
+            </goals>
+            <configuration>
+              <ports>
+                <port>
+                  <name>nexus-something</name>
+                </port>
+              </ports>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
   </build>
 
