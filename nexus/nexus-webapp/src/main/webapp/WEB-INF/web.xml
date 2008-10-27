@@ -13,6 +13,10 @@
     <display-name>Nexus Application</display-name>
 
     <!-- Booter -->
+	<listener>
+		<listener-class>org.sonatype.nexus.web.PlexusContainerContextListener</listener-class>
+	</listener>    
+    
     <listener>
         <listener-class>org.sonatype.nexus.web.NexusBooterListener</listener-class>
     </listener>
