@@ -60,9 +60,9 @@ public class StoreWalkerTest
 
         w = new TestWalker( getRouter( "repositories" ), null );
         w.walk();
-        assertEquals( 14, w.collEnters );
-        assertEquals( 14, w.collExits );
-        assertEquals( 14, w.colls );
+        assertEquals( 15, w.collEnters );
+        assertEquals( 15, w.collExits );
+        assertEquals( 15, w.colls );
         assertEquals( 4, w.files );
         assertEquals( 0, w.links );
 

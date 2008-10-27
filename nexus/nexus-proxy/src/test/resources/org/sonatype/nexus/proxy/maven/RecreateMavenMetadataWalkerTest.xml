@@ -1,27 +1,24 @@
 <plexus>
 	<components>
 		<component>
-			<role>org.sonatype.jettytestsuite.ServletServer</role>
-			<implementation>
-				org.sonatype.jettytestsuite.ServletServer
+			<role>org.sonatype.jettytestsuite.ServletServer
+			</role>
+			<implementation> org.sonatype.jettytestsuite.ServletServer
 			</implementation>
 			<configuration>
 				<port>12345</port>
 				<webappContexts>
 					<webappContext>
-						<name>repo4</name>
+						<name>repo1</name>
 						<servletInfos>
 							<servletInfo>
 								<mapping>/*</mapping>
-								<servletClass>
-									org.mortbay.jetty.servlet.DefaultServlet
+								<servletClass> org.mortbay.jetty.servlet.DefaultServlet
 								</servletClass>
 								<parameters>
 									<property>
 										<name>resourceBase</name>
-										<value>
-											${basedir}/target/test-classes/repo4
-										</value>
+										<value> ${basedir}/target/test-classes/repo1</value>
 									</property>
 									<property>
 										<name>dirAllowed</name>

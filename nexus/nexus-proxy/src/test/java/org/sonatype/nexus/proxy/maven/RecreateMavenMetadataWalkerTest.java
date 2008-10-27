@@ -21,6 +21,9 @@
 
 package org.sonatype.nexus.proxy.maven;
 
+import java.io.File;
+import java.io.FileInputStream;
+
 import org.sonatype.jettytestsuite.ServletServer;
 import org.sonatype.nexus.proxy.AbstractProxyTestEnvironment;
 import org.sonatype.nexus.proxy.EnvironmentBuilder;
@@ -41,6 +44,10 @@ public class RecreateMavenMetadataWalkerTest
 
     private Repository inhouse;
 
+    private Repository inhouseSnapshot;
+
+    private File repoBase = new File( "./target/test-classes/controlledRepo" );
+
     private String[] releaseArtifactFiles = {
         "/junit/junit/3.8.1/junit-3.8.1.jar",
         "/junit/junit/3.8.1/junit-3.8.1.pom",
@@ -49,16 +56,24 @@ public class RecreateMavenMetadataWalkerTest
         "/junit/junit/4.0/junit-4.0.jar",
         "/junit/junit/4.0/junit-4.0.pom",
         "/junit/junit/4.4/junit-4.4.jar",
-        "/junit/junit/4.4/junit-4.4.pom"};
+        "/junit/junit/4.4/junit-4.4.pom" };
+
+    private String[] snapshotArtifactFiles = {
+        "/org/sonatype/nexus/nexus-api/1.2.0-SNAPSHOT/nexus-api-1.2.0-20081022.180215-1.jar",
+        "/org/sonatype/nexus/nexus-api/1.2.0-SNAPSHOT/nexus-api-1.2.0-20081022.180215-1.pom",
+        "/org/sonatype/nexus/nexus-api/1.2.0-SNAPSHOT/nexus-api-1.2.0-20081022.182430-2.jar",
+        "/org/sonatype/nexus/nexus-api/1.2.0-SNAPSHOT/nexus-api-1.2.0-20081022.182430-2.pom",
+        "/org/sonatype/nexus/nexus-api/1.2.0-SNAPSHOT/nexus-api-1.2.0-20081022.184527-3.jar",
+        "/org/sonatype/nexus/nexus-api/1.2.0-SNAPSHOT/nexus-api-1.2.0-20081022.184527-3.pom", };
 
     @Override
     protected EnvironmentBuilder getEnvironmentBuilder()
         throws Exception
     {
         ServletServer ss = (ServletServer) lookup( ServletServer.ROLE );
-       
+
         this.jettyTestsuiteEnvironmentBuilder = new M2TestsuiteEnvironmentBuilder( ss );
-       
+
         return jettyTestsuiteEnvironmentBuilder;
     }
 
@@ -69,34 +84,56 @@ public class RecreateMavenMetadataWalkerTest
 
         super.setUp();
 
-        // copy all release artifact fils from proxy repo4 to hosted inhouse repo
+        inhouse = getRepositoryRegistry().getRepository( "inhouse" );
+
+        // copy all release artifact fils hosted inhouse repo
         for ( String releaseArtifactFile : releaseArtifactFiles )
         {
-            Repository repo4 = getRepositoryRegistry().getRepository( "repo4" );
-
-            inhouse = getRepositoryRegistry().getRepository( "inhouse" );
-
-            StorageFileItem item = (StorageFileItem) repo4.retrieveItem( new ResourceStoreRequest(
-                releaseArtifactFile,
-                false ) );
-
             ResourceStoreRequest request = new ResourceStoreRequest( releaseArtifactFile, true );
 
-            inhouse.storeItem( request, item.getInputStream(), null );
+            FileInputStream fis = new FileInputStream( new File( repoBase, releaseArtifactFile ) );
+
+            inhouse.storeItem( request, fis, null );
+
+            fis.close();
         }
 
+        inhouseSnapshot = getRepositoryRegistry().getRepository( "inhouse-snapshot" );
+
+        // copy all snapshot artifact fils hosted snapshot inhouse repo
+        for ( String snapshotArtifactFile : snapshotArtifactFiles )
+        {
+            ResourceStoreRequest request = new ResourceStoreRequest( snapshotArtifactFile, true );
+
+            FileInputStream fis = new FileInputStream( new File( repoBase, snapshotArtifactFile ) );
+
+            inhouseSnapshot.storeItem( request, fis, null );
+
+            fis.close();
+        }
     }
 
-    public void testStoreWalker()
+    public void testRecreateMavenMetadataWalkerWalkerRelease()
         throws Exception
     {
         StoreWalker storeWalker = new RecreateMavenMetadataWalker( inhouse, getLogger() );
 
         storeWalker.walk();
 
-        assertNotNull( inhouse
-            .retrieveItem( new ResourceStoreRequest( "/junit/junit/maven-metadata.xml", false ) ) );
+        assertNotNull( inhouse.retrieveItem( new ResourceStoreRequest( "/junit/junit/maven-metadata.xml", false ) ) );
 
+    }
+
+    public void testRecreateMavenMetadataWalkerWalkerSnapshot()
+        throws Exception
+    {
+        StoreWalker storeWalker = new RecreateMavenMetadataWalker( inhouseSnapshot, getLogger() );
+
+        storeWalker.walk();
+
+        assertNotNull( inhouseSnapshot.retrieveItem( new ResourceStoreRequest( "/org/sonatype/nexus/nexus-api/maven-metadata.xml", false ) ) );
+
+        assertNotNull( inhouseSnapshot.retrieveItem( new ResourceStoreRequest( "/org/sonatype/nexus/nexus-api/1.2.0-SNAPSHOT/maven-metadata.xml", false ) ) );
     }
 
 }
