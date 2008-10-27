@@ -276,4 +276,32 @@
       </patterns>
     </repositoryTarget>
   </repositoryTargets>
+  <tasks>
+    <task>
+      <id>2</id>
+      <name>weekly</name>
+      <enabled>true</enabled>
+      <type>org.sonatype.nexus.tasks.ClearCacheTask</type>
+      <status>SUBMITTED</status>
+      <nextRun>1225168020000</nextRun>
+      <schedule>
+        <type>weekly</type>
+        <startDate>1225081620000</startDate>
+        <daysOfWeek>
+          <daysOfWeek>1</daysOfWeek>
+          <daysOfWeek>3</daysOfWeek>
+        </daysOfWeek>
+      </schedule>
+      <properties>
+        <property>
+          <key>resourceStorePath</key>
+          <value></value>
+        </property>
+        <property>
+          <key>repositoryOrGroupId</key>
+          <value>all_repo</value>
+        </property>
+      </properties>
+    </task>
+  </tasks>
 </nexusConfiguration>
