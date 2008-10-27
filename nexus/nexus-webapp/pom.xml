@@ -19,7 +19,7 @@
     <jsw-output>jsw-filtered</jsw-output>
     <nexus-tools-input>target/nexus-tools</nexus-tools-input>
   </properties>
-	<dependencies>
+  <dependencies>
 		<dependency>
 			<groupId>httpunit</groupId>
 			<artifactId>httpunit</artifactId>
@@ -32,70 +32,29 @@
 			<version>2.5</version>
 			<scope>provided</scope>
 		</dependency>
-		<dependency>
-			<groupId>org.sonatype.appbooter.plexus-platforms</groupId>
-			<artifactId>plexus-platform-jsw</artifactId>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.sonatype.nexus</groupId>
-			<artifactId>nexus-rest-api</artifactId>
-			<exclusions>
-				<exclusion>
-					<groupId>org.mortbay.jetty</groupId>
-					<artifactId>servlet-api-2.5</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-		<dependency>
-			<groupId>org.sonatype.nexus.tools</groupId>
-			<artifactId>nexus-migration-app</artifactId>
-			<version>${project.version}</version>
-			<classifier>cli</classifier>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.sonatype.jsw-binaries</groupId>
-			<artifactId>jsw-binaries</artifactId>
-			<type>zip</type>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.codehaus.plexus</groupId>
-			<artifactId>plexus-container-default</artifactId>
-			<scope>compile</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.codehaus.plexus</groupId>
-			<artifactId>plexus-classworlds</artifactId>
-			<scope>compile</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.codehaus.plexus</groupId>
-			<artifactId>plexus-utils</artifactId>
-			<scope>compile</scope>
-		</dependency>
-	</dependencies>
-	<dependencyManagement>
-		<dependencies>
-			<dependency>
-				<groupId>org.codehaus.plexus</groupId>
-				<artifactId>plexus-container-default</artifactId>
-				<version>1.0-beta-1</version>
-				<exclusions>
-					<exclusion>
-						<groupId>log4j</groupId>
-						<artifactId>log4j</artifactId>
-					</exclusion>
-					<exclusion>
-						<groupId>commons-logging</groupId>
-						<artifactId>commons-logging-api</artifactId>
-					</exclusion>
-				</exclusions>
-			</dependency>
-		</dependencies>
-	</dependencyManagement>
-  
+    <dependency>
+      <groupId>org.sonatype.appbooter.plexus-platforms</groupId>
+      <artifactId>plexus-platform-jsw</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-rest-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.nexus.tools</groupId>
+      <artifactId>nexus-migration-app</artifactId>
+      <version>${project.version}</version>
+      <classifier>cli</classifier>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.jsw-binaries</groupId>
+      <artifactId>jsw-binaries</artifactId>
+      <type>zip</type>
+      <scope>provided</scope>
+    </dependency>
+  </dependencies>
   <build>
     <filters>
       <filter>src/main/filters/assemble.properties</filter>
