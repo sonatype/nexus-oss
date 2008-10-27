@@ -32,6 +32,17 @@ under the License.
       <module>nexus</module>
     </modules>
     
+    <build>
+      <pluginManagement>
+        <plugins>
+          <plugin>
+            <artifactId>maven-resources-plugin</artifactId>
+            <version>2.4-SONATYPE-704694</version>
+          </plugin>
+        </plugins>
+      </pluginManagement>
+    </build>
+    
     <distributionManagement>
       <repository>
         <id>localhost</id>
