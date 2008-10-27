@@ -29,7 +29,6 @@ import org.sonatype.nexus.proxy.AbstractProxyTestEnvironment;
 import org.sonatype.nexus.proxy.EnvironmentBuilder;
 import org.sonatype.nexus.proxy.M2TestsuiteEnvironmentBuilder;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
-import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.utils.StoreWalker;
 
@@ -46,7 +45,7 @@ public class RecreateMavenMetadataWalkerTest
 
     private Repository inhouseSnapshot;
 
-    private File repoBase = new File( "./target/test-classes/controlledRepo" );
+    private File repoBase = new File( "./target/test-classes/mavenMetadataTestRepo" );
 
     private String[] releaseArtifactFiles = {
         "/junit/junit/3.8.1/junit-3.8.1.jar",
@@ -64,8 +63,12 @@ public class RecreateMavenMetadataWalkerTest
         "/org/sonatype/nexus/nexus-api/1.2.0-SNAPSHOT/nexus-api-1.2.0-20081022.182430-2.jar",
         "/org/sonatype/nexus/nexus-api/1.2.0-SNAPSHOT/nexus-api-1.2.0-20081022.182430-2.pom",
         "/org/sonatype/nexus/nexus-api/1.2.0-SNAPSHOT/nexus-api-1.2.0-20081022.184527-3.jar",
-        "/org/sonatype/nexus/nexus-api/1.2.0-SNAPSHOT/nexus-api-1.2.0-20081022.184527-3.pom", };
+        "/org/sonatype/nexus/nexus-api/1.2.0-SNAPSHOT/nexus-api-1.2.0-20081022.184527-3.pom",
+        "/org/sonatype/nexus/nexus-api/1.2.0-SNAPSHOT/nexus-api-1.2.0-20081025.143218-32.jar",
+        "/org/sonatype/nexus/nexus-api/1.2.0-SNAPSHOT/nexus-api-1.2.0-20081025.143218-32.pom"};
 
+    
+    
     @Override
     protected EnvironmentBuilder getEnvironmentBuilder()
         throws Exception

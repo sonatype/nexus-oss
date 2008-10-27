@@ -22,7 +22,6 @@
 package org.sonatype.nexus.proxy.maven;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
 
 import org.apache.maven.mercury.artifact.version.VersionComparator;
@@ -155,24 +154,6 @@ public class RecreateMavenMetadataWalker
 
         createVersioningForRelease( md, coll );
 
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-
-        MetadataBuilder.write( md, outputStream );
-
-        ContentLocator contentLocator = new StringContentLocator( outputStream.toString() );
-
-        DefaultStorageFileItem mdFile = new DefaultStorageFileItem(
-            repository,
-            mdUid.getPath(),
-            true,
-            true,
-            contentLocator );
-
-        repository.storeItem( mdFile );
-
-        repository.removeFromNotFoundCache( mdUid.getPath() );
-        
-        outputStream.close();
         storeMetadata( md, mdUid );
     }
 
@@ -286,7 +267,7 @@ public class RecreateMavenMetadataWalker
     {
         getLogger().debug( "Creating maven-metadata.xml at: " + coll.getPath() );
 
-        RepositoryItemUid mdUid = repository.createUid( coll.getPath() + File.separator + "maven-metadata.xml" );
+        RepositoryItemUid mdUid = repository.createUid( coll.getPath() +  "/maven-metadata.xml" );
 
         Metadata md = new Metadata();
 
@@ -331,7 +312,7 @@ public class RecreateMavenMetadataWalker
             {
                 int lastHyphenPos = item.getName().lastIndexOf( '-' );
 
-                int buildNumber = Integer.parseInt( item.getName().substring( lastHyphenPos + 1, lastHyphenPos + 2 ) );
+                int buildNumber = Integer.parseInt( item.getName().substring( lastHyphenPos + 1, item.getName().length() - 4 ) );
 
                 if ( buildNumber > snapshot.getBuildNumber() )
                 {
