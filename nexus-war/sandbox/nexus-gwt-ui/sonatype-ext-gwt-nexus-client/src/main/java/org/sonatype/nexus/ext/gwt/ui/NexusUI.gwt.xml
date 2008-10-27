@@ -1,9 +1,0 @@
-<module>
-    <inherits name="com.extjs.gxt.ui.GXT" />
-    <inherits name="org.sonatype.gwt.REST" />
-
-    <entry-point class="org.sonatype.nexus.ext.gwt.ui.client.NexusUI" />
-
-    <stylesheet src="css/xtheme-gray.css" />
-    <stylesheet src="css/Sonatype.css" />
-</module>

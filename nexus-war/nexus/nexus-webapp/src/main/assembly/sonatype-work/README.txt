@@ -1,1 +1,0 @@
-This is the default work folder used for Sonatype Applications. The location of the individual work folders may be overridden using environment variables. For example, the Nexus work location can be defined with PLEXUS_NEXUS_WORK. If it is not defined, then this default is used. Make sure the applications have read+write permissions to this folder.
