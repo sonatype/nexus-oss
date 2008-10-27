@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+
+<beans>
+
+	<!--
+		=================================================================================
+	-->
+
+	<!--
+		Her Majesty: the Quartz scheduler :)
+	-->
+
+	<bean id="scheduler"
+		class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+		<property name="triggers">
+			<list>
+				<ref bean="reindexerTrigger" />
+				<!--
+				<ref bean="inhouseReindexerTrigger" />
+				-->
+				<ref bean="snapshotRemoverTrigger" />
+			</list>
+		</property>
+	</bean>
+
+	<!--
+		=================================================================================
+	-->
+
+	<!--
+		And the pawns: trigger + job pairs
+	-->
+
+	<!--
+		Reindexer job
+	-->
+	<bean id="reindexerTrigger"
+		class="org.springframework.scheduling.quartz.CronTriggerBean">
+		<property name="jobDetail" ref="reindexerJob" />
+		<!-- run every morning at 6 AM -->
+		<property name="cronExpression" value="0 0 6 * * ?" />
+	</bean>
+	<bean name="reindexerJob"
+		class="org.springframework.scheduling.quartz.JobDetailBean">
+		<property name="jobClass"
+			value="org.abstracthorizon.proximity.scheduler.jobs.RepositoryReindexerJob" />
+		<property name="description"
+			value="Job for reindexing all registered repositories on regular basis." />
+		<property name="jobDataAsMap">
+			<map>
+				<entry key="indexer">
+					<ref bean="proximity.indexer" />
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<!--
+		Inhouse reindexer job
+	<bean id="inhouseReindexerTrigger"
+		class="org.springframework.scheduling.quartz.CronTriggerBean">
+		<property name="jobDetail" ref="inhouseReindexerJob" />
+		<property name="cronExpression" value="0 0 3 * * ?" />
+	</bean>
+	<bean name="inhouseReindexerJob"
+		class="org.springframework.scheduling.quartz.JobDetailBean">
+		<property name="jobClass"
+			value="org.abstracthorizon.proximity.scheduler.jobs.RepositoryReindexerJob" />
+		<property name="description"
+			value="Job for reindexing inhouse repository on regular basis." />
+		<property name="jobDataAsMap">
+			<map>
+				<entry key="indexer">
+					<ref bean="proximity.indexer" />
+				</entry>
+				<entry key="repositoryId">
+					<value>inhouse</value>
+				</entry>
+			</map>
+		</property>
+	</bean>
+	-->
+
+	<!--
+		Maven old snapshot remover job
+	-->
+	<bean id="snapshotRemoverTrigger"
+		class="org.springframework.scheduling.quartz.CronTriggerBean">
+		<property name="jobDetail" ref="snapshotRemoverJob" />
+		<!-- run every morning at 12 AM -->
+		<property name="cronExpression" value="0 0 0 * * ?" />
+	</bean>
+	<bean name="snapshotRemoverJob"
+		class="org.springframework.scheduling.quartz.JobDetailBean">
+		<property name="jobClass"
+			value="org.abstracthorizon.proximity.maven.jobs.SnapshotRemoverJob" />
+		<property name="description"
+			value="Job for removing stale and old snapshots from repository on regular basis." />
+		<property name="jobDataAsMap">
+			<map>
+				<entry key="proximity">
+					<ref bean="proximity" />
+				</entry>
+				<entry key="indexer">
+					<ref bean="proximity.indexer" />
+				</entry>
+				<entry key="minCountOfSnapshotsToKeep">
+					<value>5</value>
+				</entry>
+				<entry key="removeSnapshotsOlderThanDays">
+					<value>7</value>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+</beans>

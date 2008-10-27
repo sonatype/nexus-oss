@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- This configuration will cause 3 validation warnings -->
+<!-- This configuration will cause 11 validation error -->
+<nexusSecurity>
+    <version>1.0.0</version>    
+    <applicationPrivileges>      
+      <applicationPrivilege>
+        <id>1</id>
+        <name>priv</name>
+        <method>read</method>
+        <permission>/some/path/</permission>
+      </applicationPrivilege>      
+    </applicationPrivileges>    
+    <roles>      
+        <!-- invalid id of 0 -->   
+        <!-- no privs/roles -->
+        <!-- no session timeout -->
+        <role>      
+            <id>0</id>
+            <name>name</name>
+        </role>
+        
+        <!-- no id -->
+        <!-- no name -->
+        <!-- invalid session timeout -->
+        <role>
+          <sessionTimeout>0</sessionTimeout>
+          <privileges>
+            <privilege>1</privilege>
+          </privileges>
+        </role>
+        
+        <role>
+            <id>arole</id>
+            <name>name</name>
+            <sessionTimeout>25</sessionTimeout>
+            <privileges>
+              <privilege>1</privilege>
+            </privileges>
+        </role>
+        
+        <!-- Duplicate role id -->      
+        <role>
+            <id>arole</id>
+            <name>name</name>
+            <sessionTimeout>25</sessionTimeout>
+            <privileges>
+              <privilege>1</privilege>
+            </privileges>
+        </role>   
+        
+        <!-- including itself -->
+        <role>
+          <id>recursive</id>
+          <name>recursive</name>
+          <sessionTimeout>25</sessionTimeout>
+          <roles>
+            <role>recursive</role>
+          </roles>
+        </role>
+        
+        <!-- including itself via another role -->
+        <role>
+          <id>recursive2</id>
+          <name>recursive2</name>
+          <sessionTimeout>25</sessionTimeout>
+          <roles>
+            <role>recursive3</role>
+          </roles>
+        </role>     
+        
+        <!-- including itself via another role -->
+        <role>
+          <id>recursive3</id>
+          <name>recursive3</name>
+          <sessionTimeout>25</sessionTimeout>
+          <roles>
+            <role>recursive2</role>
+          </roles>
+        </role>          
+        
+        <!-- including itself via another role -->
+        <role>
+          <id>recursive4</id>
+          <name>recursive4</name>
+          <sessionTimeout>25</sessionTimeout>
+          <roles>
+            <role>recursive5</role>
+          </roles>
+        </role>
+        
+        <!-- including itself via another role -->
+        <role>
+          <id>recursive5</id>
+          <name>recursive5</name>
+          <sessionTimeout>25</sessionTimeout>
+          <roles>
+            <role>recursive6</role>
+          </roles>
+        </role>
+        
+        <!-- including itself via another role -->
+        <role>
+          <id>recursive6</id>
+          <name>recursive6</name>
+          <sessionTimeout>25</sessionTimeout>
+          <roles>
+            <role>recursive4</role>
+          </roles>
+        </role>
+        
+        <role>
+          <id>errantRole1</id>
+          <name>role</name>
+          <sessionTimeout>25</sessionTimeout>
+          <roles>
+            <role>errantRole2</role>
+          </roles>
+        </role>
+        <role>
+          <id>errantRole2</id>
+          <name>role</name>
+          <sessionTimeout>25</sessionTimeout>
+          <roles>
+            <role>errantRole3</role>
+          </roles>
+        </role>
+        <!-- Invalid roel -->
+        <role>
+          <id>errantRole3</id>
+          <name>role</name>
+          <sessionTimeout>25</sessionTimeout>
+          <roles>
+            <role>errantRoleNotValid</role>
+          </roles>
+        </role>
+    </roles>
+</nexusSecurity>

@@ -1,0 +1,9 @@
+<metadata>
+	<plugins>
+		<plugin>
+			<name>Plugin B</name>
+			<prefix>pluginb</prefix>
+			<artifactId>maven-pluginb-plugin</artifactId>
+		</plugin>
+	</plugins>
+</metadata>

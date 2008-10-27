@@ -1,0 +1,93 @@
+<html>
+  <head>
+    <title>Change History</title>
+  </head>
+  <body>
+    <p>Changes are split into three categories:</p>
+    <ul>
+      <li><b>Major changes</b>: The major new features that all users should know about.</li>
+      <li><b>Minor changes</b>: Any smaller changes, including bugfixes.</li>
+      <li><b>API changes</b>: Any changes to the API that could impact existing users.</li>
+    </ul>
+
+	Full details can be found in our issue trackers
+	<a href="http://issues.sonatype.org/browse/NX?report=com.atlassian.jira.plugin.system.project:roadmap-panel">Roadmap</a>  and
+	<a href="http://issues.sonatype.org/browse/XSITE?report=com.atlassian.jira.plugin.system.project:changelog-panel">Change Log</a>.
+     <br>Releases are available on the <a href="http://nexus.sonatype.org/downloads">Download Site</a></p> 
+	    <h2>Release 1.0.0-beta-3</h2>
+    <p>13 May 2008<p>
+    <p><b>Key Bugs Fixed:</b>
+    
+    <ul>
+      <li> NX-87 / NX-136 / NX-137 -    Connection Error Handling</li>
+      <li> NX-321 - Remove Allow Deploy from Proxy Repos</li>
+      <li> NX-466 - Timeouts in the reachability check of proxy repos blocks the repo list response (empty repository list in UI)</li>
+      <li> NX-491 - Store the checksum files in the repository folder</li>
+      <li> NX-537 - set '-Djava.io.tmpdir=../../../runtime/work/tmp' at launch time</li>
+<li>[<a href='http://issues.sonatype.org/browse/NEXUS-3'>NEXUS-3</a>] -         Password for HTTP proxy is not being masked with &quot;stars&quot; but displayed instead.
+</li>
+<li>[<a href='http://issues.sonatype.org/browse/NEXUS-13'>NEXUS-13</a>] -         Indexer Fails to Index all Artifacts
+</li>
+<li>[<a href='http://issues.sonatype.org/browse/NEXUS-17'>NEXUS-17</a>] -         Empty repository list
+</li>
+<li>[<a href='http://issues.sonatype.org/browse/NEXUS-24'>NEXUS-24</a>] -         Changing Context root log in stops working
+</li>
+<li>[<a href='http://issues.sonatype.org/browse/NEXUS-26'>NEXUS-26</a>] -         Feeds subscription don't work when context is changed.
+</li>
+<li>[<a href='http://issues.sonatype.org/browse/NEXUS-31'>NEXUS-31</a>] -         When a repository (hosted) is added to the repositories it cannot be grouped until the Nexus server is restarted
+</li>
+<li>[<a href='http://issues.sonatype.org/browse/NEXUS-36'>NEXUS-36</a>] -         Proximity Migration App Fails with NPE
+</li>
+</ul>
+
+    
+    <p><b>Enhancements / New Features:</b>
+    <ul>
+    <li>Maven 1 repository proxy support and addition of M2 Virtual repo to allow M1 data to be grouped with other M2 repositories</li>
+    <li>Generate HTML listing of repositories when browsed from a web browser or Maven Wagon</li>
+    <li>Separated the Rebuild Attributes from Reindex - rebuild attributes takes longer and reconstructs corrupted Nexus metadata.</li>
+    <li>Deployment Password - A new hardcoded user "deployment" can have a password set to restrict write access to all repositories. Full RBAC is coming in beta-4/5</li>
+    <li>New Admin functions in the repo maintenance: View on Remote, Delete</li>
+    <li>Checksum search capability to identify unknown jars</li>
+    <li>[<a href='http://issues.sonatype.org/browse/NEXUS-16'>NEXUS-16</a>] -         Additional URL parameters should not be mandatory
+</li>
+
+<li>[<a href='http://issues.sonatype.org/browse/NEXUS-11'>NEXUS-11</a>] -         User management
+</li>
+<li>[<a href='http://issues.sonatype.org/browse/NEXUS-29'>NEXUS-29</a>] -         Proxying Maven 1 legacy Repositories as a Maven 2 Repo
+</li>
+
+    </ul>
+    
+    <p><b>Upgrade Notes:</b> This release requires an update to the base platform, therefore an upgrade bundle has not been provided. After installing the new bundle, copy the work folder located at /runtime/work and the files located at /runtime/apps/nexus/conf to the new location. After starting the system, run "rebuild attributes" on all hosted repositories. This is done to migrate the checksums to the proper location in the repository data (NX-491 above).
+    
+      <h2>Release 1.0.0-beta-2</h2>
+    <p>7 April 2008<p>
+    <p>Bugs Fixed:
+<ul>
+<li>NX-434 -         system config feed doesn't work from FF
+</li>
+<li>NX-464 -         Sometimes metadata is not merged properly in group routers.
+</li>
+<li>NX-465 -         Mapping changes repo ordering in a group
+</li>
+<li>NX-467 -         Nexus is not merging metadata at all on when started up the bundled app.
+</li>
+<li>NX-470 -         Global proxy settings nor Global Connection Settings (if set) is not applied on Nexus boot.
+</li>
+<li>NX-474 -         timeouts are not handled properly
+</li>
+<li>NX-475 -         M1GavCalculator worngly calculates GAV for artifacts with name like &quot;dom4j-1.7-20060614.jar&quot;
+</li>
+<li>[<a href='http://issues.sonatype.org/browse/NEXUS-1'>NEXUS-1</a>] -         HTTP Proxy not working
+</li>
+<li>[<a href='http://issues.sonatype.org/browse/NEXUS-10'>NEXUS-10</a>] -         Proxy config does not work
+</li>
+</ul>
+    
+    </p>
+
+    <p>Note: If you are upgrading from beta-1, see the new upgrade instructions <a href="http://www.sonatype.com/book/reference/repository-manager.html#d0e10357">here</a></p>
+    
+  </body>
+</html>

@@ -1,0 +1,6 @@
+<module>
+	<inherits name="org.sonatype.nexus.gwt.NexusClient" />
+    <inherits name="com.google.gwt.i18n.I18N"/> 
+	
+	<entry-point class="org.sonatype.nexus.gwt.ui.client.NexusUI" />
+</module>

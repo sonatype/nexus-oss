@@ -1,0 +1,48 @@
+<plexus>
+
+	<load-on-start>
+		<component>
+			<role>org.sonatype.plexus.jetty.ServletContainer</role>
+		</component>
+	</load-on-start>
+
+	<components>
+
+		<component>
+			<role>org.codehaus.plexus.logging.LoggerManager</role>
+			<implementation>
+				org.codehaus.plexus.logging.slf4j.Slf4jLoggerManager
+			</implementation>
+			<configuration>
+				<threshold>DEBUG</threshold>
+			</configuration>
+		</component>
+
+		<component>
+			<role>org.sonatype.plexus.jetty.ServletContainer</role>
+			<implementation>
+				org.sonatype.plexus.jetty.DefaultServletContainer
+			</implementation>
+			<configuration>
+				<!-- To host multiple webapps, add root -->
+				<!-- webapps>${webapp}</webapps -->
+				<connectorInfos>
+					<connectorInfo>
+						<clazz>
+							org.mortbay.jetty.nio.SelectChannelConnector
+						</clazz>
+						<host>${application-host}</host>
+						<port>${application-port}</port>
+					</connectorInfo>
+				</connectorInfos>
+				<webappInfos>
+					<webappInfo>
+						<warPath>${webapp}</warPath>
+						<contextPath>${webapp-context-path}</contextPath>
+					</webappInfo>
+				</webappInfos>
+			</configuration>
+		</component>
+
+	</components>
+</plexus>

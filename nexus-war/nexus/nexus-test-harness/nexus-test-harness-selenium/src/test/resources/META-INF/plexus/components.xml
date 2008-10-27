@@ -1,0 +1,75 @@
+<component-set>
+  <components>
+    <component>
+      <role>org.sonatype.appbooter.ForkedAppBooter</role>
+      <role-hint>TestForkedAppBooter</role-hint>
+      <implementation>org.sonatype.appbooter.DefaultForkedAppBooter</implementation>
+      <instantiation-strategy>per-lookup</instantiation-strategy>
+      <description></description>
+      <isolated-realm>false</isolated-realm>
+      <configuration>
+        <disable-blocking>true</disable-blocking>
+        <debug>false</debug>
+        <java-cmd>java</java-cmd>
+        <debug-port>5005</debug-port>
+        <debug-suspend>true</debug-suspend>
+        <debug-java-cmd>java -Xdebug -Xnoagent -Xrunjdwp:transport=dt_socket,server=y,suspend=@DEBUG_SUSPEND@,address=@DEBUG_PORT@ -Djava.compiler=NONE</debug-java-cmd>
+        <launcher-class>org.sonatype.appbooter.PlexusContainerHost</launcher-class>
+        <configuration>${nexus-plexus-config-file}</configuration>
+        <basedir>${nexus-abs-basedir}</basedir>
+        <temp-dir>${project.build.directory}/appbooter.tmp/</temp-dir>
+        <control-port>${nexus-control-port}</control-port>
+        <platform-file>${nexus-abs-basedir}/lib/plexus-platform-jsw-*.jar</platform-file>
+        <class-path-elements>${nexus-abs-basedir}/runtime/apps/nexus/conf, ${nexus-abs-basedir}/runtime/apps/nexus/lib/*.jar</class-path-elements>
+        <sleep-after-start>6000</sleep-after-start>
+        <systemProperties>
+        		<plexus.application-port>${nexus-application-port}</plexus.application-port>
+        		<plexus.application-host>${jetty-application-host}</plexus.application-host>
+        		<plexus.runtime>${nexus-abs-basedir}/runtime</plexus.runtime>
+        		<plexus.apps>${nexus-abs-basedir}/runtime/apps</plexus.apps>
+        		<plexus.nexus-work>${nexus-abs-basedir}/runtime/work</plexus.nexus-work>
+        		<plexus.webapp>${nexus-abs-basedir}/runtime/apps/nexus/webapp</plexus.webapp>
+        		<plexus.webapp-context-path>/nexus</plexus.webapp-context-path>
+        </systemProperties>
+      </configuration>
+    </component>
+    
+    
+    <component>
+			<role>org.sonatype.jettytestsuite.ServletServer</role>
+			<implementation>
+				org.sonatype.jettytestsuite.ServletServer
+			</implementation>
+			<instantiation-strategy>singleton</instantiation-strategy>
+			<configuration>
+				<port>${proxy-repo-port}</port>
+				<webappContexts>
+					<webappContext>
+						<name>remote</name>
+						<servletInfos>
+							<servletInfo>
+								<mapping>/*</mapping>
+								<servletClass>
+									org.mortbay.jetty.servlet.DefaultServlet
+								</servletClass>
+								<parameters>
+									<property>
+										<name>resourceBase</name>
+										<value>
+											${proxy-repo-target-dir}
+										</value>
+									</property>
+									<property>
+										<name>dirAllowed</name>
+										<value>true</value>
+									</property>
+								</parameters>
+							</servletInfo>
+						</servletInfos>
+					</webappContext>
+				</webappContexts>
+			</configuration>
+		</component>
+    
+  </components>
+</component-set>

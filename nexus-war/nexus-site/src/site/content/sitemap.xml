@@ -1,0 +1,31 @@
+<sitemap>
+  <section>
+    <name>About Nexus</name>
+    <page>index.html</page>
+    <page>license.html</page>
+    <page>download.html</page>
+    <page>faq.html</page>
+    <page>news.html</page>
+    <page>changes.html</page>
+    <page>history.html</page>
+    <link title="Product Roadmap">https://docs.sonatype.com/display/Nexus/Nexus+RoadMap</link>
+   <!-- <page>versioning.html</page>    -->
+    <!--
+    <page>used-by.html</page>   
+    -->
+  </section>
+  <section>
+    <name>Using Nexus</name>
+    <page>why.html</page>
+    <page>getting-started.html</page>
+    <link title="Reporting Issues">http://issues.sonatype.org/browse/NEXUS</link>
+  </section>
+  <section>
+    <name>Nexus Community</name>
+    <page>irc.html</page>
+    <page>mailing-lists.html</page>
+    <page>team.html</page>
+    <page>repository.html</page>
+    <link title="Product Wiki">https://docs.sonatype.com/display/Nexus/Home</link>
+  </section>
+</sitemap>

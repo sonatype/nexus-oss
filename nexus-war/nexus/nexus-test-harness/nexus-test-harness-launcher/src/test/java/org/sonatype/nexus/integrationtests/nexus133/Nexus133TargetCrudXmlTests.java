@@ -1,0 +1,32 @@
+package org.sonatype.nexus.integrationtests.nexus133;
+
+import java.io.IOException;
+
+import org.junit.Test;
+import org.restlet.data.MediaType;
+import org.sonatype.nexus.test.utils.TargetMessageUtil;
+
+/**
+ * CRUD tests for XML request/response.
+ */
+public class Nexus133TargetCrudXmlTests
+    extends Nexus133TargetCrudJsonTests
+{
+
+    public Nexus133TargetCrudXmlTests()
+    {
+        this.messageUtil =
+            new TargetMessageUtil( this.getXMLXStream(),
+                                 MediaType.APPLICATION_XML );
+    }
+    
+    
+    
+    @Test
+    public void readTest()
+        throws IOException
+    {
+        super.readTest();
+    }
+    
+}

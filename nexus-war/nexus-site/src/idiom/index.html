@@ -1,0 +1,62 @@
+<html>
+  <head>
+    <title>Nexus: Maven Repository Manager</title>
+  </head>
+
+  <body>
+    <p>
+      Nexus is a powerful and robust Maven repository manager, created to provide reliable access to artifacts
+      required for development and provisioning. Maven's central repository has always served as a great convenience for
+      users of Maven, but it has always been recommended to maintain your own repositories to ensure stability within 
+      your organization. Nexus greatly simplifies the maintenance of your own internal repositories and access 
+      to external repositories. With Nexus you can completely control access to, and deployment of, every artifact
+      in your organization from a single location.
+    </p>
+
+    <h1>Getting Started</h1>
+    <p>
+      The best way to get started with Nexus is to read the chapter about Nexus in 
+      <a href="http://www.sonatype.com/book/reference/repository-manager.html">Maven: The Definitive Guide</a>. It will
+      give you a brief introduction to Maven repository managers, why Nexus kicks ass, and how to install it for your
+      own software develop needs.
+    </p>
+
+    <h1>Features</h1>
+    <ul>
+      <li>Runs out-of-the-box. Unpack it and go!</li>      
+      <li>Rich UI using the amazing <a href="http://extjs.com">ExtJS</a> library. Take a look at our <a href="http://repository.sonatype.org:8081/nexus">public instance</a>.</li>
+      <li>Full <a href="https://docs.sonatype.com/display/Nexus/Nexus+Rest+API">REST APIs</a> made possible using <a href="http://restlet.org">Restlet.</a></li>      
+      <li>Full integration with Eclipse using <a href="http://m2eclipse.sonatype.org">m2eclipse</a>.</li>
+      <li>Repository RSS feeds for recently deployed and cached artifacts.</li>
+      <li>Full indexing and searching. This also includes searching proxied repositories by integrating 
+        Nexus indices hosted by the remotely proxied repositories.</li>      
+      <li>Tool to convert Proximity configurations to Nexus configurations.</li>
+      <li>No database required. Nexus uses the filesystem with Lucene and that's it. Amazing things are still possible.</li>
+      <li>Snapshot cleanup</li>
+      <li>Advanced Repository Proxying and Hosting</li>
+      <ul>      
+        <li>On-the-fly repository metadata correction: if a proxied repository contains snapshots and releases Nexus 
+          removes removes the versions from the metadata that don't match the type or repository you
+          have configured.</li>
+        <li>Logical groups: Nexus allows you to logically represent any number of proxied, or hosted 
+          repositories as a single group which accessible via a unified URL.</li>
+        <li>Artifact request optimization based on groupId or artifactId: You can configure Nexus to not
+          look in certain places for certain artifacts. For example you wouldn't need to search Maven's 
+          central repository for your own organization's artifacts.</li>
+        <li>Ability to present and proxy Maven 2.x repositories to Maven 1.x clients: this means that you can service
+          all users of Maven 1.x and Maven 2.x in your organization using Nexus.</li>
+          <li>Ability to present Maven 1.x repositories to Maven 2.x clients</li>
+        <li>Intelligent NFC (not found cache), with the ability to persist NFC cache to disk.</li>
+        <li>Ability to check remote peer availability and make a Nexus proxy "offline" automatically 
+        (prevent any reach attempt toward unreachable remote repo) HTTP proxy and connection settings may be set 
+        globally or per repository. This means Nexus is able to use more than one HTTP proxy simultaneously.</li>
+        <li>Flexible Repository aggregation into multiple logical views without duplicating storage on disk.</li>
+       </ul>
+    </ul>
+      <!-->
+      <li>Stand-alone security model with LDAP support</li>
+      <li>Fully compliant WebDAV support</li>
+      -->
+    
+  </body>
+</html>
