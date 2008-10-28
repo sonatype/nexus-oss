@@ -1,13 +1,10 @@
 package org.sonatype.nexus.integrationtests;
 
-import junit.framework.Assert;
-
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
-import org.restlet.data.Status;
 import org.sonatype.appbooter.ForkedAppBooter;
 import org.sonatype.nexus.client.NexusClient;
 import org.sonatype.nexus.client.rest.NexusRestClient;
@@ -24,7 +21,7 @@ public class IntegrationTestSuite
     public static void beforeSuite()
         throws Exception
     {
-        checkPreviousInstance();
+        // checkPreviousInstance(); r1931 no longer required, port allocator put each new instance in a new port
 
         TestContainer testContainer = TestContainer.getInstance();
 
@@ -46,23 +43,6 @@ public class IntegrationTestSuite
         // now to make everything work correctly we actually have to "soft-stop" nexus
         NexusStateUtil.doSoftStop();
 
-    }
-
-    private static void checkPreviousInstance()
-        throws Exception
-    {
-        try
-        {
-            Status status = RequestFacade.doGetRequest( "service/local/status" ).getStatus();
-            if ( status.isSuccess() )
-            {
-                Assert.fail( "Nexus already started.  Stop it first!" );
-            }
-        }
-        catch ( Throwable t )
-        {
-            //I'm fine with that
-        }
     }
 
     @AfterClass
