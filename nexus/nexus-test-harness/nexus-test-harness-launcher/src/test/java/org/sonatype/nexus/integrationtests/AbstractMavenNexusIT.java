@@ -12,8 +12,6 @@ import org.apache.maven.it.VerificationException;
 import org.apache.maven.it.Verifier;
 import org.sonatype.nexus.test.utils.TestProperties;
 
-import com.thoughtworks.xstream.XStream;
-
 public class AbstractMavenNexusIT
     extends AbstractNexusIntegrationTest
 {
@@ -48,13 +46,14 @@ public class AbstractMavenNexusIT
     {
         Verifier verifier = new Verifier( mavenProject.getAbsolutePath(), false );
 
-        File mavenRepository = new File(TestProperties.getString( "maven.local.repo" ));
+        File mavenRepository = new File( TestProperties.getString( "maven.local.repo" ) );
         verifier.setLocalRepo( mavenRepository.getAbsolutePath() );
         cleanRepository( mavenRepository );
 
         verifier.resetStreams();
 
         List<String> options = new ArrayList<String>();
+        options.add( "-X" );
         options.add( "-Dmaven.repo.local=" + mavenRepository.getAbsolutePath() );
         if ( settings != null )
         {
