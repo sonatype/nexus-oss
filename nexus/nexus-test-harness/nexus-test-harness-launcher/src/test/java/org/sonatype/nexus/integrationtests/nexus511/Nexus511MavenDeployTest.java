@@ -47,14 +47,19 @@ public class Nexus511MavenDeployTest
         }
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings( "unchecked" )
     @Test
     public void privateDeploy()
         throws Exception
     {
         // try to deploy without servers authentication tokens
         verifier.getCliOptions().clear();
-        verifier.getCliOptions().add("-X");
+        verifier.getCliOptions().add( "-X" );
+
+        //need to force it to compile at grid
+        verifier.getCliOptions().add(
+                                      "-DaltDeploymentRepository=nexus-test-harness-repo::default::"
+                                          + getBaseNexusUrl() + "content/repositories/nexus-test-harness-repo" );
 
         try
         {
