@@ -376,6 +376,7 @@ public class ApacheHttpClientRemoteStorage
      * @return the http response
      */
     protected HttpResponse executeMethod( Repository repository, HttpHost target, HttpUriRequest request )
+        throws StorageException
     {
         getLogger().debug( "HTTPClient :: executeMethod() ENTER" );
 

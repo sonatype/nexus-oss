@@ -83,9 +83,11 @@ public abstract class AbstractRemoteRepositoryStorage
      * 
      * @param context
      */
-    protected abstract void updateContext( Repository repository, RemoteStorageContext context );
+    protected abstract void updateContext( Repository repository, RemoteStorageContext context )
+        throws StorageException;
 
     protected synchronized RemoteStorageContext getRemoteStorageContext( Repository repository )
+        throws StorageException
     {
         if ( repository.getRemoteStorageContext() != null )
         {
