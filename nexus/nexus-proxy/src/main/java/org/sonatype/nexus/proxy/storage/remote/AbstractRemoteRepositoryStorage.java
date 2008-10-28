@@ -83,7 +83,7 @@ public abstract class AbstractRemoteRepositoryStorage
      * 
      * @param context
      */
-    protected abstract void updateContext( RemoteStorageContext context );
+    protected abstract void updateContext( Repository repository, RemoteStorageContext context );
 
     protected synchronized RemoteStorageContext getRemoteStorageContext( Repository repository )
     {
@@ -100,7 +100,7 @@ public abstract class AbstractRemoteRepositoryStorage
                         getLogger().debug( "Remote storage settings change detected, updating..." );
                     }
 
-                    updateContext( repository.getRemoteStorageContext() );
+                    updateContext( repository, repository.getRemoteStorageContext() );
 
                     repositoryContexts.put( repository.getId(), Long.valueOf( repository
                         .getRemoteStorageContext().getLastChanged() ) );
@@ -113,7 +113,7 @@ public abstract class AbstractRemoteRepositoryStorage
                     getLogger().debug( "Remote storage settings change detected, updating..." );
                 }
 
-                updateContext( repository.getRemoteStorageContext() );
+                updateContext( repository, repository.getRemoteStorageContext() );
 
                 repositoryContexts.put( repository.getId(), Long.valueOf( repository
                     .getRemoteStorageContext().getLastChanged() ) );

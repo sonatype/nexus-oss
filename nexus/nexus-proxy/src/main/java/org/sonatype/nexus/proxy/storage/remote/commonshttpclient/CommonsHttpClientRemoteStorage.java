@@ -52,6 +52,7 @@ import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.PreparedContentLocator;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
+import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.proxy.storage.remote.AbstractRemoteRepositoryStorage;
 import org.sonatype.nexus.proxy.storage.remote.RemoteRepositoryStorage;
@@ -250,7 +251,7 @@ public class CommonsHttpClientRemoteStorage
      * 
      * @return the http client
      */
-    protected void updateContext( RemoteStorageContext ctx )
+    protected void updateContext( Repository repository, RemoteStorageContext ctx )
     {
         HttpClient httpClient = null;
 

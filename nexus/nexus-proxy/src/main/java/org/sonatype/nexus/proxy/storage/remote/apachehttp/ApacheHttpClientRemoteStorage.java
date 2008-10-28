@@ -247,7 +247,7 @@ public class ApacheHttpClientRemoteStorage
             + getAbsoluteUrlFromBase( item.getRepositoryItemUid() ) );
     }
 
-    protected void updateContext( RemoteStorageContext ctx )
+    protected void updateContext( Repository repository, RemoteStorageContext ctx )
     {
         DefaultHttpClient httpClient = null;
 

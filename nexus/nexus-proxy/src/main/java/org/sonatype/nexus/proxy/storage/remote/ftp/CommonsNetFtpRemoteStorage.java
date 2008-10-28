@@ -207,7 +207,7 @@ public class CommonsNetFtpRemoteStorage
     // =============================================================
     // inner stuff
 
-    protected void updateContext( RemoteStorageContext ctx )
+    protected void updateContext( Repository repository, RemoteStorageContext ctx )
     {
         FTPClientConfig ftpClientConfig = (FTPClientConfig) ctx.getRemoteConnectionContext().get( CTX_KEY_CONFIG );
 
