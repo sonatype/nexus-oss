@@ -47,14 +47,14 @@ public class Nexus511MavenDeployTest
         }
     }
 
-    @SuppressWarnings( "unchecked" )
     @Test
     public void privateDeploy()
         throws Exception
     {
         // try to deploy without servers authentication tokens
-        verifier.getCliOptions().clear();
-        verifier.getCliOptions().add( "-X" );
+        File mavenProject = getTestFile( "maven-project" );
+        File settings = getTestFile( "serverWithoutAuthentication.xml" );
+        verifier = createVerifier( mavenProject, settings );
 
         try
         {
