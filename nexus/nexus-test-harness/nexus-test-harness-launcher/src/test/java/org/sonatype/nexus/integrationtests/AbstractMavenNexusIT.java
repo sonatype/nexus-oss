@@ -46,6 +46,8 @@ public class AbstractMavenNexusIT
     {
         Verifier verifier = new Verifier( mavenProject.getAbsolutePath(), false );
 
+        System.setProperty( "maven.home", TestProperties.getString( "maven.instance" ) );
+
         File mavenRepository = new File( TestProperties.getString( "maven.local.repo" ) );
         verifier.setLocalRepo( mavenRepository.getAbsolutePath() );
         cleanRepository( mavenRepository );

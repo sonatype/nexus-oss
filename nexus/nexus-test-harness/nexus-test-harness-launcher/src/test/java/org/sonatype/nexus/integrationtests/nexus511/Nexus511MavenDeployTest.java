@@ -23,7 +23,6 @@ public class Nexus511MavenDeployTest
 
     private Verifier verifier;
 
-    @SuppressWarnings( "unchecked" )
     @Before
     public void createVerifier()
         throws Exception
@@ -31,11 +30,6 @@ public class Nexus511MavenDeployTest
         File mavenProject = getTestFile( "maven-project" );
         File settings = getTestFile( "server.xml" );
         verifier = createVerifier( mavenProject, settings );
-
-        // need to force it to run test at grid
-        verifier.getCliOptions().add(
-                                      "-DaltDeploymentRepository=nexus-test-harness-repo::default::"
-                                          + getBaseNexusUrl() + "content/repositories/nexus-test-harness-repo" );
     }
 
     @Test
@@ -61,11 +55,6 @@ public class Nexus511MavenDeployTest
         // try to deploy without servers authentication tokens
         verifier.getCliOptions().clear();
         verifier.getCliOptions().add( "-X" );
-
-        // need to force it to run test at grid
-        verifier.getCliOptions().add(
-                                      "-DaltDeploymentRepository=nexus-test-harness-repo::default::"
-                                          + getBaseNexusUrl() + "content/repositories/nexus-test-harness-repo" );
 
         try
         {

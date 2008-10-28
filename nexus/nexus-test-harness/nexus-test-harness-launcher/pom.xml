@@ -38,7 +38,9 @@
     <config-target-dir>${nexus-abs-basedir}/runtime/apps/nexus/conf</config-target-dir>
     <work-target-dir>${nexus-abs-basedir}/runtime/work</work-target-dir>
 
+    <maven-version>2.0.9</maven-version>
     <fake-central-repo>${project.build.testOutputDirectory}/fake-central</fake-central-repo>
+    <fake-maven>${project.build.directory}/apache-maven-${maven-version}</fake-maven>
 
     <!--  Testing port allocator
     <proxy-repo-port>8090</proxy-repo-port>
@@ -209,6 +211,25 @@
             </configuration>
           </execution>
           <execution>
+            <id>unpack-maven</id>
+            <phase>generate-resources</phase>
+            <goals>
+              <goal>unpack</goal>
+            </goals>
+            <configuration>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>org.apache.maven</groupId>
+                  <artifactId>apache-maven</artifactId>
+                  <version>${maven-version}</version>
+                  <type>tar.gz</type>
+                  <classifier>bin</classifier>
+                </artifactItem>
+              </artifactItems>
+              <outputDirectory>${project.build.directory}</outputDirectory>
+            </configuration>
+          </execution>
+          <execution>
             <id>get-emma</id>
             <phase>generate-resources</phase>
             <goals>
@@ -369,6 +390,14 @@
         </executions>
       </plugin>
     </plugins>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <artifactId>maven-resources-plugin</artifactId>
+          <version>2.4-SONATYPE-704694</version>
+        </plugin>
+      </plugins>
+    </pluginManagement>
   </build>
 
   <reporting>
