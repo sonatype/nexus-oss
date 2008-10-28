@@ -715,6 +715,13 @@ public class DefaultApplicationConfigurationValidator
             response.setContext( ctx );
         }
 
+        if ( settings.getProxyPort() < 1 || settings.getProxyPort() > 65535 )
+        {
+            response.addValidationError( "The proxy port must be an integer between 1 and 65535!" );
+        }
+
+        response.append( validateRemoteAuthentication( ctx, settings.getAuthentication() ) );
+
         return response;
     }
 
