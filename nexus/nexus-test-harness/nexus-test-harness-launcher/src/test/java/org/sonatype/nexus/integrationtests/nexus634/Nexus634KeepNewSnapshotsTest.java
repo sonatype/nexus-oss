@@ -24,7 +24,7 @@ public class Nexus634KeepNewSnapshotsTest
         runSnapshotRemover( "nexus-test-harness-snapshot-repo", 0, 10, true );
 
         Collection<File> jars = listFiles( artifactFolder, new String[] { "jar" }, false );
-        Assert.assertEquals( "SnapshotRemoverTask should remove only old artifacts", 1, jars.size() );
+        Assert.assertEquals( "SnapshotRemoverTask should remove only old artifacts.  Artifacts found: " + jars, 1, jars.size() );
     }
 
 }
