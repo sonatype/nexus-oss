@@ -55,6 +55,7 @@ public class Nexus511MavenDeployTest
         // try to deploy without servers authentication tokens
         verifier.getCliOptions().clear();
         verifier.getCliOptions().add("-X");
+        verifier.getCliOptions().add("-DaltDeploymentRepository=\"\""); //
 
         try
         {
