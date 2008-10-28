@@ -44,4 +44,11 @@ public class StorageException
 
         initCause( cause );
     }
+
+    public StorageException( Throwable cause )
+    {
+        super( "A storage exception occured!" );
+
+        initCause( cause );
+    }
 }
