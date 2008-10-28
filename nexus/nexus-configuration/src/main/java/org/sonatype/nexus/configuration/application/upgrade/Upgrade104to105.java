@@ -502,12 +502,7 @@ public class Upgrade104to105
         {
             schedule.setCronCommand( oldschedule.getCronCommand() );
             schedule.setDaysOfMonth( oldschedule.getDaysOfMonth() );
-            
-            for ( String dayOfWeek : ( List<String> )oldschedule.getDaysOfWeek() )
-            {
-                schedule.addDaysOfWeek( Integer.toString( Integer.parseInt( dayOfWeek ) + 1 ) );
-            }
-            
+            schedule.setDaysOfWeek( oldschedule.getDaysOfWeek() );            
             schedule.setEndDate( oldschedule.getEndDate() );
             schedule.setStartDate( oldschedule.getStartDate() );
             schedule.setType( oldschedule.getType() );
