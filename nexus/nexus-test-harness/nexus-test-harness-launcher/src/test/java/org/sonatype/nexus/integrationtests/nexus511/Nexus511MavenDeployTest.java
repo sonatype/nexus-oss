@@ -10,7 +10,7 @@ import org.sonatype.nexus.integrationtests.AbstractMavenNexusIT;
 import org.sonatype.nexus.integrationtests.TestContainer;
 
 /**
- * Tests deploy to nexus using mvn deploy 
+ * Tests deploy to nexus using mvn deploy
  */
 public class Nexus511MavenDeployTest
     extends AbstractMavenNexusIT
@@ -47,12 +47,14 @@ public class Nexus511MavenDeployTest
         }
     }
 
+    @SuppressWarnings("unchecked")
     @Test
     public void privateDeploy()
         throws Exception
     {
         // try to deploy without servers authentication tokens
         verifier.getCliOptions().clear();
+        verifier.getCliOptions().add("-X");
 
         try
         {
