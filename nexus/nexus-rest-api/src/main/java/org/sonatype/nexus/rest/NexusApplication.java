@@ -600,7 +600,7 @@ public class NexusApplication
                     ( (PlexusMutableWebConfiguration) plexusWebConfiguration )
                         .addProtectedResource(
                             "/service/**",
-                            "authcBasic,perms[nexus:someFreakinStupidPermToCatchAllUnprotectedsAndOnlyAdminWillHaveItSinceItHaveAStar]" );
+                            "authcBasic,perms[nexus:permToCatchAllUnprotecteds]" );
                 }
                 catch ( SecurityConfigurationException e )
                 {
