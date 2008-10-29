@@ -471,11 +471,12 @@ public class NexusApplication
         xstream.registerLocalConverter( PlexusComponentListResourceResponse.class, "data", new AliasingListConverter(
             PlexusComponentListResource.class,
             "component" ) );
-        
-        xstream.registerLocalConverter( AuthenticationClientPermissions.class, "permissions", new AliasingListConverter(
-            ClientPermission.class,
-            "permission" ) );
-        
+
+        xstream.registerLocalConverter(
+            AuthenticationClientPermissions.class,
+            "permissions",
+            new AliasingListConverter( ClientPermission.class, "permission" ) );
+
         xstream.omitField( ClientPermission.class, "modelEncoding" );
 
         // Maven model
@@ -492,7 +493,8 @@ public class NexusApplication
         // ==========
         // INDEX.HTML and WAR contents
         // TODO: would be nice to get the resourceUri from indexTemplateResource! (and discover the root of the app!)
-        Redirector redirector = new Redirector( getContext(), "index.html", Redirector.MODE_CLIENT_PERMANENT );
+        Redirector redirector = new Redirector( getContext(), "{op}/index.html", Redirector.MODE_CLIENT_PERMANENT );
+        attach( root, true, "", redirector );
         attach( root, true, "/", redirector );
 
         attach( root, true, indexTemplateResource );
@@ -603,10 +605,9 @@ public class NexusApplication
                 try
                 {
                     // TODO: recheck this? We are adding a flat wall to be hit if a mapping is missed
-                    ( (PlexusMutableWebConfiguration) plexusWebConfiguration )
-                        .addProtectedResource(
-                            "/service/**",
-                            "authcBasic,perms[nexus:permToCatchAllUnprotecteds]" );
+                    ( (PlexusMutableWebConfiguration) plexusWebConfiguration ).addProtectedResource(
+                        "/service/**",
+                        "authcBasic,perms[nexus:permToCatchAllUnprotecteds]" );
                 }
                 catch ( SecurityConfigurationException e )
                 {
