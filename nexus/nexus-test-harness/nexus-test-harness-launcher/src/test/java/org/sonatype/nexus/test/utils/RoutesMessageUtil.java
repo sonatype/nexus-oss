@@ -37,7 +37,8 @@ public class RoutesMessageUtil
         this.mediaType = mediaType;
     }
 
-    public Response sendMessage( Method method, RepositoryRouteResource resource ) throws IOException
+    public Response sendMessage( Method method, RepositoryRouteResource resource )
+        throws IOException
     {
         XStreamRepresentation representation = new XStreamRepresentation( xstream, "", mediaType );
 
@@ -56,10 +57,11 @@ public class RoutesMessageUtil
         return RequestFacade.sendMessage( serviceURI, method, representation );
     }
 
-    public RepositoryRouteResource getResourceFromResponse( Response response ) throws IOException
+    public RepositoryRouteResource getResourceFromResponse( Response response )
+        throws IOException
     {
         String responseString = response.getEntity().getText();
-        LOG.debug( "responseText: "+ responseString );
+        LOG.debug( "responseText: " + responseString );
 
         Assert.assertFalse( "Response text was empty.", StringUtils.isEmpty( responseString ) );
 
@@ -102,19 +104,22 @@ public class RoutesMessageUtil
         Assert.assertEquals( repo1.getId(), repo2.getId() );
     }
 
-
-    public void validateRoutesConfig( RepositoryRouteResource resource ) throws IOException
+    public void validateRoutesConfig( RepositoryRouteResource resource )
+        throws IOException
     {
 
         CGroupsSettingPathMappingItem cRoute = NexusConfigUtil.getRoute( resource.getId() );
 
-        Assert.assertEquals("Should be the same route", resource.getId(), cRoute.getId() );
-        Assert.assertEquals( resource.getGroupId(), cRoute.getGroupId() );
-        Assert.assertEquals( resource.getPattern(), cRoute.getRoutePattern() );
-        Assert.assertEquals( resource.getRuleType(), cRoute.getRouteType() );
+        String msg =
+            "Should be the same route. \n Expected:\n" + new XStream().toXML( resource ) + " \n \n Got: \n"
+                + new XStream().toXML( cRoute );
+
+        Assert.assertEquals( msg, resource.getId(), cRoute.getId() );
+        Assert.assertEquals( msg, resource.getGroupId(), cRoute.getGroupId() );
+        Assert.assertEquals( msg, resource.getPattern(), cRoute.getRoutePattern() );
+        Assert.assertEquals( msg, resource.getRuleType(), cRoute.getRouteType() );
 
         this.validateSameRepoIds( resource.getRepositories(), cRoute.getRepositories() );
-
 
     }
 

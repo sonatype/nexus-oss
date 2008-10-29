@@ -14,32 +14,32 @@ import org.sonatype.nexus.rest.model.StatusResourceResponse;
 
 import com.thoughtworks.xstream.XStream;
 
-
 /**
  * Simple util class
- *
  */
 public class NexusStateUtil
 {
-    
+
     private static final String STATUS_STOPPED = "STOPPED";
 
     private static final String STATUS_STARTED = "STARTED";
-    
-    
 
-    public static void sendNexusStatusCommand( String command ) throws IOException
+    public static void sendNexusStatusCommand( String command )
+        throws IOException
     {
-        
-        Response response = RequestFacade.sendMessage( "service/local/status/command", Method.PUT, new StringRepresentation(command, MediaType.TEXT_ALL) );
+
+        Response response =
+            RequestFacade.sendMessage( "service/local/status/command", Method.PUT,
+                                       new StringRepresentation( command, MediaType.TEXT_ALL ) );
 
         if ( !response.getStatus().isSuccess() )
         {
             Assert.fail( "Could not " + command + " Nexus: (" + response.getStatus() + ")" );
         }
     }
-    
-    public static StatusResourceResponse getNexusStatus() throws IOException
+
+    public static StatusResourceResponse getNexusStatus()
+        throws IOException
     {
         Response response = RequestFacade.doGetRequest( "service/local/status" );
 
@@ -47,26 +47,30 @@ public class NexusStateUtil
         {
             throw new ConnectException( response.getStatus().toString() );
         }
-        
-        XStream xstream = XStreamFactory.getXmlXStream();
-        StatusResourceResponse status = null;
 
-        status =
-            (StatusResourceResponse) xstream.fromXML( response.getEntity().getText() );
+        XStream xstream = XStreamFactory.getXmlXStream();
+
+        String entityText = response.getEntity().getText();
+        Assert.assertNotNull( "Invalid server response: " + new XStream().toXML( response ), entityText );
+
+        StatusResourceResponse status = (StatusResourceResponse) xstream.fromXML( entityText );
         return status;
     }
 
-    public static void doSoftStop() throws IOException
+    public static void doSoftStop()
+        throws IOException
     {
         sendNexusStatusCommand( "STOP" );
     }
 
-    public static void doSoftStart() throws IOException
+    public static void doSoftStart()
+        throws IOException
     {
         sendNexusStatusCommand( "START" );
     }
 
-    public static void doSoftRestart() throws IOException
+    public static void doSoftRestart()
+        throws IOException
     {
         sendNexusStatusCommand( "RESTART" );
     }
@@ -77,5 +81,4 @@ public class NexusStateUtil
         return ( STATUS_STARTED.equals( getNexusStatus().getData().getState() ) );
     }
 
-    
 }

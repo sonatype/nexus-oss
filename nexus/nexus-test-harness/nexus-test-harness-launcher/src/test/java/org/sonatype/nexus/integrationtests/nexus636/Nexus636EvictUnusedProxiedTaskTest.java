@@ -33,12 +33,12 @@ public class Nexus636EvictUnusedProxiedTaskTest
 {
 
     private File repositoryPath;
-    
+
     private File attributesPath;
-        
+
     public Nexus636EvictUnusedProxiedTaskTest()
     {
-        super(REPO_RELEASE_PROXY_REPO1);
+        super( REPO_RELEASE_PROXY_REPO1 );
     }
 
     @Before
@@ -52,10 +52,10 @@ public class Nexus636EvictUnusedProxiedTaskTest
         File repo = getTestFile( "repo" );
 
         FileUtils.copyDirectory( repo, repositoryPath );
-        
+
         // overwrite attributes
-//        FileUtils.copyDirectory( getTestFile( "attributes" ), attributesPath );
-        
+        // FileUtils.copyDirectory( getTestFile( "attributes" ), attributesPath );
+
         // rebuild attributes
         ScheduledServicePropertyResource prop = new ScheduledServicePropertyResource();
         prop.setId( "repositoryOrGroupId" );
@@ -63,7 +63,7 @@ public class Nexus636EvictUnusedProxiedTaskTest
         ScheduledServiceListResource task = TaskScheduleUtil.runTask( RebuildAttributesTaskDescriptor.ID, prop );
         Assert.assertNotNull( task );
         Assert.assertEquals( "SUBMITTED", task.getStatus() );
-        
+
     }
 
     @Test
@@ -73,11 +73,13 @@ public class Nexus636EvictUnusedProxiedTaskTest
         executeTask( "clearProxy", "repo_release-proxy-repo-1", 0 );
 
         File[] files = repositoryPath.listFiles();
-        
-        if( files.length != 0)
+
+        if ( files.length != 0 )
         {
-            Assert.assertEquals( "All files should be delete from repository except the index:\n"+ Arrays.asList( files ), 1, files.length );
-            Assert.assertTrue( "The only file left should be the index.\n"+Arrays.asList( files ), files[0].getAbsolutePath().endsWith( ".index" ) );
+            Assert.assertEquals( "All files should be delete from repository except the index:\n"
+                + Arrays.asList( files ), 1, files.length );
+            Assert.assertTrue( "The only file left should be the index.\n" + Arrays.asList( files ),
+                               files[0].getAbsolutePath().endsWith( ".index" ) );
         }
     }
 
@@ -89,33 +91,34 @@ public class Nexus636EvictUnusedProxiedTaskTest
 
         File artifact = new File( repositoryPath, "nexus636/artifact-new/1.0/artifact-new-1.0.jar" );
         Assert.assertTrue( "The files deployed by this test should be young enought to be kept", artifact.exists() );
-        
+
     }
-    
+
     @Test
-    public void doNotDeleteEverythingTest() throws Exception
+    public void doNotDeleteEverythingTest()
+        throws Exception
     {
-        
+
         executeTask( "doNotDeleteEverythingTest-1", this.getTestRepositoryId(), 2 );
         // expect 3 files in repo
-        File groupDirectory = new File(repositoryPath, this.getTestId());
+        File groupDirectory = new File( repositoryPath, this.getTestId() );
         File[] files = groupDirectory.listFiles();
-        Assert.assertEquals( "Expected 3 artifacts in repo:\n"+ Arrays.asList( files ), 3, files.length );
-        
+        Assert.assertEquals( "Expected 3 artifacts in repo:\n" + Arrays.asList( files ), 3, files.length );
+
         // edit dates on files
-        File oldJar = new File(this.attributesPath, "nexus636/artifact-old/2.1/artifact-old-2.1.jar");
-        File oldPom = new File(this.attributesPath, "nexus636/artifact-old/2.1/artifact-old-2.1.pom");
-        
-        // set date to 3 days ago       
+        File oldJar = new File( this.attributesPath, "nexus636/artifact-old/2.1/artifact-old-2.1.jar" );
+        File oldPom = new File( this.attributesPath, "nexus636/artifact-old/2.1/artifact-old-2.1.pom" );
+
+        // set date to 3 days ago
         this.changeProxyAttributeDate( oldJar, -3 );
         this.changeProxyAttributeDate( oldPom, -3 );
-        
+
         // run task
         executeTask( "doNotDeleteEverythingTest-2", this.getTestRepositoryId(), 2 );
-        
+
         // check file list
         files = groupDirectory.listFiles();
-        Assert.assertEquals( "Expected 2 artifacts in repo:\n"+ Arrays.asList( files ), 2, files.length );
+        Assert.assertEquals( "Expected 2 artifacts in repo:\n" + Arrays.asList( files ), 2, files.length );
     }
 
     private void executeTask( String taskName, String repository, int cacheAge )
@@ -129,43 +132,44 @@ public class Nexus636EvictUnusedProxiedTaskTest
         age.setValue( String.valueOf( cacheAge ) );
 
         // clean unused
-        ScheduledServiceListResource task = TaskScheduleUtil.runTask( taskName, EvictUnusedItemsTaskDescriptor.ID, 40, repo, age );
-        Assert.assertNotNull( task );
+        ScheduledServiceListResource task =
+            TaskScheduleUtil.runTask( taskName, EvictUnusedItemsTaskDescriptor.ID, 40, repo, age );
+        Assert.assertNotNull( "Task '" + taskName + "' didn't execute!", task );
         Assert.assertEquals( "SUBMITTED", task.getStatus() );
     }
-    
-    
+
     private XStream getXStream()
     {
         XStream xstream = new XStream();
         xstream.alias( "file", DefaultStorageFileItem.class );
         xstream.alias( "collection", DefaultStorageCollectionItem.class );
         xstream.alias( "link", DefaultStorageLinkItem.class );
-        
+
         return xstream;
     }
-    
-    private void changeProxyAttributeDate( File attributeFile, int daysFromToday ) throws IOException
-    {   
+
+    private void changeProxyAttributeDate( File attributeFile, int daysFromToday )
+        throws IOException
+    {
         // load file
-        FileInputStream fis = new FileInputStream(attributeFile);
-//        Object obj = this.getXStream().fromXML( fis );
+        FileInputStream fis = new FileInputStream( attributeFile );
+        // Object obj = this.getXStream().fromXML( fis );
         DefaultStorageFileItem fileItem = (DefaultStorageFileItem) this.getXStream().fromXML( fis );
         fis.close();
-        
+
         Calendar cal = Calendar.getInstance();
         cal.setTime( new Date() );
         cal.add( Calendar.DATE, daysFromToday );
-        
+
         // edit object
         fileItem.incrementGeneration();
         fileItem.setLastRequested( cal.getTime().getTime() );
         fileItem.setRemoteChecked( cal.getTime().getTime() );
-        
+
         // save file
-        FileOutputStream fos = new FileOutputStream(attributeFile);
+        FileOutputStream fos = new FileOutputStream( attributeFile );
         this.getXStream().toXML( fileItem, fos );
         fos.close();
     }
-    
+
 }
