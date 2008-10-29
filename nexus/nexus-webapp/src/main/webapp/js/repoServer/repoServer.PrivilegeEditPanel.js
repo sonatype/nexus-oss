@@ -31,8 +31,6 @@ Sonatype.repoServer.PrivilegeEditPanel = function(config){
   
   this.typeStore = new Ext.data.SimpleStore({fields:['value','display'], data:[['repositoryTarget','Repository Target'],['application','Application']]});
   
-  this.methodStore = new Ext.data.SimpleStore({fields:['value','display'], data:[['create','Create'],['read','Read'],['update','Update'],['delete','Delete']]});
-  
   this.actions = {
     refresh : new Ext.Action({
       text: 'Refresh',
@@ -53,7 +51,7 @@ Sonatype.repoServer.PrivilegeEditPanel = function(config){
   
   //Methods that will take the data from the ui controls and map over to json
   this.submitDataModFunc = {
-    "method" : this.saveTreeHelper.createDelegate(this),
+    "method" : this.buildMethods.createDelegate(this),
     "repositoryId" : this.saveRepositoryHelper.createDelegate(this),
     "repositoryGroupId" : this.saveGroupHelper.createDelegate(this)
   };
@@ -228,7 +226,6 @@ Sonatype.repoServer.PrivilegeEditPanel = function(config){
           width: this.COMBO_WIDTH
         },
       {
-        id: 'privTypeId',
         xtype: 'combo',
         fieldLabel: 'Type',
         labelStyle: 'margin-left: 15px; width: 185px;',
@@ -288,130 +285,6 @@ Sonatype.repoServer.PrivilegeEditPanel = function(config){
         selectOnFocus:true,
         allowBlank: false,
         width: this.COMBO_WIDTH
-      },
-      {
-        xtype: 'panel',
-        layout: 'column',
-        items: [
-          {
-            xtype: 'label',
-            cls: 'x-form-item-label',
-            ctCls: 'x-form-item',
-            style: 'margin-left: 15px;',
-            width: 190,
-            text: 'Method(s)'
-          },
-          {
-            xtype: 'panel',
-            id: '_methods_tree_panel',
-            layout: 'column',
-            items: [
-              {
-                xtype: 'treepanel',
-                id: '_methods_tree',
-                title: 'Selected Methods',
-                cls: 'required-field',
-                border: true, //note: this seem to have no effect w/in form panel
-                bodyBorder: true, //note: this seem to have no effect w/in form panel
-                //note: this style matches the expected behavior
-                bodyStyle: 'background-color:#FFFFFF; border: 1px solid #B5B8C8',
-                width: 225,
-                height: 200,
-                animate:true,
-                lines: false,
-                autoScroll:true,
-                containerScroll: true,
-                //@note: root node must be instantiated uniquely for each instance of treepanel
-                //@ext: can TreeNode be registerd as a component with an xtype so this new root node
-                //      may be instantiated uniquely for each form panel that uses this config?
-                rootVisible: false,
-
-                enableDD: true,
-                ddScroll: true,
-                dropConfig: {
-                  allowContainerDrop: true,
-                  onContainerDrop: function(source, e, data){
-                    this.tree.root.appendChild(data.node);
-                    return true;
-                  },
-                  onContainerOver:function(source, e, data){return this.dropAllowed;},
-                  // passign padding to make whole treePanel the drop zone.  This is dependent
-                  // on a sonatype fix in the Ext.dd.DropTarget class.  This is necessary
-                  // because treepanel.dropZone.setPadding is never available in time to be useful.
-                  padding: [0,0,274,0]
-                },
-                // added Field values to simulate form field validation
-                invalidText: 'One or more method(s) are required',
-                validate: function(){
-                  return (this.root.childNodes.length > 0);
-                },
-                invalid: false,
-                listeners: {
-                  'append' : {
-                    fn: function(tree, parentNode, insertedNode, i) {
-                      if (tree.invalid) {
-                        //remove error messaging
-                        tree.getEl().child('.x-panel-body').setStyle({
-                          'background-color' : '#FFFFFF',
-                          border : '1px solid #B5B8C8'
-                        });
-                        Ext.form.Field.msgFx['normal'].hide(tree.errorEl, tree);
-                      }
-                    },
-                    scope: this
-                  },
-                  'remove' : {
-                    fn: function(tree, parentNode, removedNode) {
-                      if(tree.root.childNodes.length < 1) {
-                        this.markTreeInvalid(tree);
-                      }
-                    },
-                    scope: this
-                  }
-                }
-              },
-              {
-              	xtype: 'twinpanelcontroller'
-              },
-              {
-                xtype: 'treepanel',
-                id: '_all_methods_tree', 
-                title: 'Available Methods',
-                border: true, //note: this seem to have no effect w/in form panel
-                bodyBorder: true, //note: this seem to have no effect w/in form panel
-                //note: this style matches the expected behavior
-                bodyStyle: 'background-color:#FFFFFF; border: 1px solid #B5B8C8',
-                width: 225,
-                height: Ext.isGecko ? 215 : 200,
-                animate:true,
-                lines: false,
-                autoScroll:true,
-                containerScroll: true,
-                //@note: root node must be instantiated uniquely for each instance of treepanel
-                //@ext: can TreeNode be registerd as a component with an xtype so this new root node
-                //      may be instantiated uniquely for each form panel that uses this config?
-                rootVisible: false,
-
-                enableDD: true,
-                ddScroll: true,
-                dropConfig: {
-                  allowContainerDrop: true,
-                  onContainerDrop: function(source, e, data){
-                    this.tree.root.appendChild(data.node);
-                    return true;
-                  },
-                  onContainerOver:function(source, e, data){return this.dropAllowed;},
-                  // passign padding to make whole treePanel the drop zone.  This is dependent
-                  // on a sonatype fix in the Ext.dd.DropTarget class.  This is necessary
-                  // because treepanel.dropZone.setPadding is never available in time to be useful.
-                  padding: [0,0,274,0]
-                }
-              }
-            ]
-          }
-        ]
-      },
-      {
       }
       ],
     buttons: [
@@ -540,18 +413,7 @@ Ext.extend(Sonatype.repoServer.PrivilegeEditPanel, Ext.Panel, {
   },
   
   saveHandler : function(formInfoObj){
-    var allValid = false;
-    allValid = formInfoObj.formPanel.form.isValid()
-    
-    //form validation of repository treepanel
-    var selectedTree = Ext.getCmp(formInfoObj.formPanel.id + '_methods_tree');
-    var treeValid = selectedTree.validate.call(selectedTree);
-    
-    if (!treeValid) {
-      this.markTreeInvalid(selectedTree);
-    }
-    
-    allValid = (allValid && treeValid);
+    var allValid = formInfoObj.formPanel.form.isValid()
     
     if (allValid) {
       var isNew = formInfoObj.isNew;
@@ -613,11 +475,7 @@ Ext.extend(Sonatype.repoServer.PrivilegeEditPanel, Ext.Panel, {
     }
     config.items[5].store = new Ext.data.SimpleStore({fields:['id','name','contentClass'], data:targets});
     
-    config = this.initializeTreeRoots(id, config);
-    
     var formPanel = new Ext.FormPanel(config);
-    
-    this.populateTree(formPanel);
     
     formPanel.form.on('actioncomplete', this.actionCompleteHandler, this);
     formPanel.form.on('actionfailed', this.actionFailedHandler, this);
@@ -672,7 +530,7 @@ Ext.extend(Sonatype.repoServer.PrivilegeEditPanel, Ext.Panel, {
       });
     }.defer(300, formPanel);
     
-    var privTypeComp = formPanel.findById( 'privTypeId' ); 
+    var privTypeComp = formPanel.find( 'name', 'type' )[0]; 
     
     privTypeComp.setValue( privTypeComp.value );
   },
@@ -862,8 +720,8 @@ Ext.extend(Sonatype.repoServer.PrivilegeEditPanel, Ext.Panel, {
     });
     
     if (this.ctxRecord.data.type != 'application'
-    	&& this.ctxRecord.data.readOnly == false
-    	&& this.sp.checkPermission('nexus:privileges', this.sp.DELETE)){
+        && this.ctxRecord.data.readOnly == false
+        && this.sp.checkPermission('nexus:privileges', this.sp.DELETE)){
       menu.add(this.actions.deleteAction);
     }
     
@@ -882,68 +740,8 @@ Ext.extend(Sonatype.repoServer.PrivilegeEditPanel, Ext.Panel, {
     }
   },
   
-  populateTree : function(fpanel) {
-    var allTree = Ext.getCmp(fpanel.id + '_all_methods_tree');
-    
-    this.methodStore.each(function(item, i, len){
-      allTree.root.appendChild(
-        new Ext.tree.TreeNode({
-          id: item.data.value,
-          text: item.data.display,
-          payload: item.data.value, //sonatype added attribute
-          allowChildren: false,
-          draggable: true,
-          leaf: true
-        })
-      );
-    }, this);
-  },
-  
-  saveTreeHelper : function(val, fpanel){
-    var selectedTree = Ext.getCmp(fpanel.id + '_methods_tree');
-
-    var outputArr = [];
-    var nodes = selectedTree.root.childNodes;
-
-    //Pretty simple here, just go through the weekdays selected and output the payload
-    //which is just the name of the weekday (monday, tuesday, etc.)
-    for(var i = 0; i < nodes.length; i++){
-      outputArr[i] = nodes[i].attributes.payload;
-    }
-
-    return outputArr;
-  },
-  
-  initializeTreeRoots : function(id, config){
-    //@note: there has to be a better way to do this.  Depending on offsets is very error prone
-    var newConfig = config;
-
-    newConfig.items[6].items[1].items[0].root = new Ext.tree.TreeNode({text: 'root'});
-    newConfig.items[6].items[1].items[2].root = new Ext.tree.TreeNode({text: 'root'});
-    
-    newConfig.items[6].items[1].id = id + '_methods_tree_panel';
-    newConfig.items[6].items[1].items[0].root = new Ext.tree.TreeNode({text: 'root'});
-    newConfig.items[6].items[1].items[0].id = id + '_methods_tree';
-    newConfig.items[6].items[1].items[2].root = new Ext.tree.TreeNode({text: 'root'});
-    newConfig.items[6].items[1].items[2].id = id + '_all_methods_tree';
-
-    return newConfig;
-  },
-  
-  markTreeInvalid : function(tree) {
-    var elp = tree.getEl();
-    
-    if(!tree.errorEl){
-        tree.errorEl = elp.createChild({cls:'x-form-invalid-msg'});
-        tree.errorEl.setWidth(elp.getWidth(true)); //note removed -20 like on form fields
-    }
-    tree.invalid = true;
-    tree.errorEl.update(tree.invalidText);
-    elp.child('.x-panel-body').setStyle({
-      'background-color' : '#fee',
-      border : '1px solid #dd7870'
-    });
-    Ext.form.Field.msgFx['normal'].show(tree.errorEl, tree);  
+  buildMethods : function(val, fpanel){
+    return ['create','read','update','delete'];
   },
   
   saveRepositoryHelper : function(val, fpanel){
