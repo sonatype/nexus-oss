@@ -669,7 +669,7 @@ Sonatype.utils = {
   
           Sonatype.utils.version = respObj.data.version;
           
-          Sonatype.user.curr.repoServer = respObj.data.clientPermissions;
+          Sonatype.user.curr.repoServer = respObj.data.clientPermissions.permissions;
           Sonatype.user.curr.isLoggedIn = respObj.data.clientPermissions.loggedIn;
           Sonatype.user.curr.username = respObj.data.clientPermissions.loggedInUsername;
           

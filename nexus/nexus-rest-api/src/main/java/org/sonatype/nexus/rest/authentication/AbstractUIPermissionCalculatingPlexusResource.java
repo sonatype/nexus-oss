@@ -6,8 +6,11 @@ import org.jsecurity.authz.permission.WildcardPermission;
 import org.jsecurity.subject.Subject;
 import org.restlet.data.Request;
 import org.restlet.resource.ResourceException;
+import org.sonatype.jsecurity.realms.tools.dao.SecurityPrivilege;
+import org.sonatype.nexus.jsecurity.NexusSecurity;
 import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
 import org.sonatype.nexus.rest.model.AuthenticationClientPermissions;
+import org.sonatype.nexus.rest.model.ClientPermission;
 
 public abstract class AbstractUIPermissionCalculatingPlexusResource
     extends AbstractNexusPlexusResource
@@ -67,62 +70,22 @@ public abstract class AbstractUIPermissionCalculatingPlexusResource
 
             perms.setLoggedInUsername( "anonymous" );
         }
-
-        perms.setViewSearch( getFlagsForPermission( subject, "nexus:index", request ) );
-
-        perms.setViewUpdatedArtifacts( getFlagsForPermission( subject, "nexus:feeds", request ) );
-
-        perms.setViewCachedArtifacts( getFlagsForPermission( subject, "nexus:feeds", request ) );
-
-        perms.setViewDeployedArtifacts( getFlagsForPermission( subject, "nexus:feeds", request ) );
-
-        perms.setViewSystemChanges( getFlagsForPermission( subject, "nexus:feeds", request ) );
-
-        perms.setMaintLogs( getFlagsForPermission( subject, "nexus:logs", request ) );
-
-        perms.setMaintConfig( getFlagsForPermission( subject, "nexus:configuration", request ) );
-
-        perms.setMaintRepos( getFlagsForPermission( subject, "nexus:repostatus", request ) );
-
-        perms.setConfigServer( getFlagsForPermission( subject, "nexus:settings", request ) );
-
-        perms.setConfigGroups( getFlagsForPermission( subject, "nexus:repogroups", request ) );
-
-        perms.setConfigRules( getFlagsForPermission( subject, "nexus:routes", request ) );
-
-        perms.setConfigRepos( getFlagsForPermission( subject, "nexus:repositories", request ) );
-
-        perms.setConfigSchedules( getFlagsForPermission( subject, "nexus:tasks", request ) );
-
-        perms.setConfigUsers( getFlagsForPermission( subject, "nexus:users", request ) );
-
-        perms.setConfigRoles( getFlagsForPermission( subject, "nexus:roles", request ) );
-
-        perms.setConfigPrivileges( getFlagsForPermission( subject, "nexus:privileges", request ) );
-
-        perms.setConfigRepoTargets( getFlagsForPermission( subject, "nexus:targets" , request ) );
-
-        perms.setActionChangePassword( getFlagsForPermission( subject, "nexus:userschangepw", request ) );
-
-        perms.setActionForgotPassword( getFlagsForPermission( subject, "nexus:usersforgotpw", request ) );
-
-        perms.setActionForgotUserid( getFlagsForPermission( subject, "nexus:usersforgotid", request ) );
-
-        perms.setActionResetPassword( getFlagsForPermission( subject, "nexus:usersreset", request ) );
-
-        perms.setActionEmptyTrash( getFlagsForPermission( subject, "nexus:wastebasket", request ) );
-
-        perms.setActionDeleteCache( getFlagsForPermission( subject, "nexus:cache", request ) );
-
-        perms.setActionRebuildAttribs( getFlagsForPermission( subject, "nexus:attributes", request ) );
-
-        perms.setActionRunTask( getFlagsForPermission( subject, "nexus:tasksrun", request ) );
-
-        perms.setActionUploadArtifact( getFlagsForPermission( subject, "nexus:artifact", request ) );
-
-        perms.setActionReindex( getFlagsForPermission( subject, "nexus:index", request ) );
-
-        perms.setActionChecksumSearch( getFlagsForPermission( subject, "nexus:identify", request ) );
+        
+        NexusSecurity security = getNexusSecurity( request );
+        
+        for ( SecurityPrivilege priv : security.listPrivileges() )
+        {
+            if ( priv.getType().equals( "method" ) )
+            {
+                String permission = security.getPrivilegeProperty( priv, "permission" );
+                
+                ClientPermission cPermission = new ClientPermission();
+                cPermission.setId( permission );
+                cPermission.setValue( getFlagsForPermission( subject, permission, request ) );
+                
+                perms.addPermission( cPermission );
+            }
+        }        
 
         return perms;
     }

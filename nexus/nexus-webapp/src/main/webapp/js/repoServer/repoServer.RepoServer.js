@@ -63,10 +63,10 @@ Sonatype.repoServer.RepoServer = function(){
     buildRecoveryText : function(){
         var htmlString = null;
         
-        if(sp.checkPermission(Sonatype.user.curr.repoServer.actionForgotUserid, sp.CREATE)){
+        if(sp.checkPermission('nexus:usersforgotid', sp.CREATE)){
           htmlString = 'Forgot your <a id="recover-username" href="#">username</a>'
         }
-        if(sp.checkPermission(Sonatype.user.curr.repoServer.actionForgotPassword, sp.CREATE)){
+        if(sp.checkPermission('nexus:usersforgotpw', sp.CREATE)){
           if (htmlString != null){
             htmlString += ' or ';
           }
@@ -210,10 +210,8 @@ Sonatype.repoServer.RepoServer = function(){
       
     },
     
-    addNexusNavigationItems: function( nexusPanel ) {
-      var userPerms = Sonatype.user.curr.repoServer;
-      
-      if(sp.checkPermission(userPerms.viewSearch, sp.READ)){
+    addNexusNavigationItems: function( nexusPanel ) {      
+      if(sp.checkPermission('nexus:index', sp.READ)){
         nexusPanel.add(
           {
             title: 'Artifact Search',
@@ -269,21 +267,21 @@ Sonatype.repoServer.RepoServer = function(){
         id: 'st-nexus-views',
         items: [
           {
-            enabled: sp.checkPermission( userPerms.maintRepos, sp.READ ),
+            enabled: sp.checkPermission( 'nexus:repostatus', sp.READ ),
             title: 'Browse Repositories',
             tabId: 'repos-maint',
             tabCode: Sonatype.repoServer.RepoMaintPanel,
             tabTitle: 'Repositories'
           },
           {
-            enabled: sp.checkPermission( userPerms.viewSystemChanges, sp.READ ),
+            enabled: sp.checkPermission( 'nexus:feeds', sp.READ ),
             title: 'System Feeds',
             tabId: 'feed-view-system_changes',
             tabCode: Sonatype.repoServer.FeedViewPanel
           },
           {
-            enabled: sp.checkPermission( userPerms.maintLogs, sp.READ ) ||
-              sp.checkPermission( userPerms.maintConfig, sp.READ ),
+            enabled: sp.checkPermission( 'nexus:logs', sp.READ ) ||
+              sp.checkPermission( 'nexus:configuration', sp.READ ),
             title: 'Logs and Config Files',
             tabId: 'view-logs',
             tabCode: Sonatype.repoServer.LogsViewPanel,
@@ -304,57 +302,57 @@ Sonatype.repoServer.RepoServer = function(){
         id: 'st-nexus-config',
         items: [
           {
-            enabled: sp.checkPermission(userPerms.configServer, sp.READ) &&
-              ( sp.checkPermission(userPerms.configServer, sp.CREATE) ||
-                sp.checkPermission(userPerms.configServer, sp.DELETE)
-              |  sp.checkPermission(userPerms.configServer, sp.EDIT)),
+            enabled: sp.checkPermission('nexus:settings', sp.READ) &&
+              ( sp.checkPermission('nexus:settings', sp.CREATE) ||
+                sp.checkPermission('nexus:settings', sp.DELETE) ||
+                sp.checkPermission('nexus:settings', sp.EDIT)),
             title: 'Server',
             tabId: 'nexus-config',
             tabCode: Sonatype.repoServer.ServerEditPanel,
             tabTitle: 'Nexus'
           },
           {
-            enabled: sp.checkPermission(userPerms.configRepos, sp.READ) &&
-              ( sp.checkPermission(userPerms.configRepos, sp.CREATE) ||
-                sp.checkPermission(userPerms.configRepos, sp.DELETE) ||
-                sp.checkPermission(userPerms.configRepos, sp.EDIT)),
+            enabled: sp.checkPermission('nexus:repositories', sp.READ) &&
+              ( sp.checkPermission('nexus:repositories', sp.CREATE) ||
+                sp.checkPermission('nexus:repositories', sp.DELETE) ||
+                sp.checkPermission('nexus:repositories', sp.EDIT)),
             title: 'Repositories',
             tabId: 'repos-config',
             tabCode: Sonatype.repoServer.RepoEditPanel,
             tabTitle: 'Repository Config'
           },
           {
-            enabled: sp.checkPermission(userPerms.configGroups, sp.READ) &&
-              ( sp.checkPermission(userPerms.configGroups, sp.CREATE) ||
-                sp.checkPermission(userPerms.configGroups, sp.DELETE) ||
-                sp.checkPermission(userPerms.configGroups, sp.EDIT)),
+            enabled: sp.checkPermission('nexus:repogroups', sp.READ) &&
+              ( sp.checkPermission('nexus:repogroups', sp.CREATE) ||
+                sp.checkPermission('nexus:repogroups', sp.DELETE) ||
+                sp.checkPermission('nexus:repogroups', sp.EDIT)),
             title: 'Groups',
             tabId: 'groups-config',
             tabCode: Sonatype.repoServer.GroupsEditPanel
           },
           {
-            enabled: sp.checkPermission(userPerms.configRules, sp.READ) &&
-              ( sp.checkPermission(userPerms.configRules, sp.CREATE) ||
-                sp.checkPermission(userPerms.configRules, sp.DELETE) ||
-                sp.checkPermission(userPerms.configRules, sp.EDIT)),
+            enabled: sp.checkPermission('nexus:routes', sp.READ) &&
+              ( sp.checkPermission('nexus:routes', sp.CREATE) ||
+                sp.checkPermission('nexus:routes', sp.DELETE) ||
+                sp.checkPermission('nexus:routes', sp.EDIT)),
             title: 'Routing',
             tabId: 'routes-config',
             tabCode: Sonatype.repoServer.RoutesEditPanel
           },
           {
-            enabled: sp.checkPermission(userPerms.configSchedules, sp.READ) &&
-              ( sp.checkPermission(userPerms.configSchedules, sp.CREATE) ||
-                sp.checkPermission(userPerms.configSchedules, sp.DELETE) ||
-                sp.checkPermission(userPerms.configSchedules, sp.EDIT)),
+            enabled: sp.checkPermission('nexus:tasks', sp.READ) &&
+              ( sp.checkPermission('nexus:tasks', sp.CREATE) ||
+                sp.checkPermission('nexus:tasks', sp.DELETE) ||
+                sp.checkPermission('nexus:tasks', sp.EDIT)),
             title: 'Scheduled Tasks',
             tabId: 'schedules-config',
             tabCode: Sonatype.repoServer.SchedulesEditPanel
           },
           {
-            enabled: sp.checkPermission(userPerms.configRepoTargets, sp.READ) &&
-              ( sp.checkPermission(userPerms.configRepoTargets, sp.CREATE) ||
-                sp.checkPermission(userPerms.configRepoTargets, sp.DELETE) ||
-                sp.checkPermission(userPerms.configRepoTargets, sp.EDIT)),
+            enabled: sp.checkPermission('nexus:targets', sp.READ) &&
+              ( sp.checkPermission('nexus:targets', sp.CREATE) ||
+                sp.checkPermission('nexus:targets', sp.DELETE) ||
+                sp.checkPermission('nexus:targets', sp.EDIT)),
             title: 'Repository Targets',
             tabId: 'config-repoTargets',
             tabCode: Sonatype.repoServer.RepoTargetEditPanel
@@ -369,33 +367,33 @@ Sonatype.repoServer.RepoServer = function(){
         items: [
           {
             enabled: Sonatype.user.curr.isLoggedIn && 
-              sp.checkPermission( userPerms.actionChangePassword, sp.CREATE ),
+              sp.checkPermission( 'nexus:userschangepw', sp.CREATE ),
             title: 'Change Password',
             handler: Sonatype.utils.changePassword
           },
           {
-            enabled: sp.checkPermission( userPerms.configUsers, sp.READ ) && 
-              ( sp.checkPermission(userPerms.configUsers, sp.CREATE) &&
-                sp.checkPermission(userPerms.configUsers, sp.DELETE) &&
-                sp.checkPermission(userPerms.configUsers, sp.EDIT)),
+            enabled: sp.checkPermission( 'nexus:users', sp.READ ) && 
+              ( sp.checkPermission('nexus:users', sp.CREATE) &&
+                sp.checkPermission('nexus:users', sp.DELETE) &&
+                sp.checkPermission('nexus:users', sp.EDIT)),
             title: 'Users',
             tabId: 'security-users',
             tabCode: Sonatype.repoServer.UserEditPanel
           },
           {
-            enabled: sp.checkPermission( userPerms.configRoles, sp.READ ) && 
-              ( sp.checkPermission(userPerms.configRoles, sp.CREATE) ||
-                sp.checkPermission(userPerms.configRoles, sp.DELETE) ||
-                sp.checkPermission(userPerms.configRoles, sp.EDIT)),
+            enabled: sp.checkPermission('nexus:roles', sp.READ ) && 
+              ( sp.checkPermission('nexus:roles', sp.CREATE) ||
+                sp.checkPermission('nexus:roles', sp.DELETE) ||
+                sp.checkPermission('nexus:roles', sp.EDIT)),
             title: 'Roles',
             tabId: 'security-roles',
             tabCode: Sonatype.repoServer.RoleEditPanel
           },
           {
-            enabled: sp.checkPermission( userPerms.configPrivileges, sp.READ ) && 
-              ( sp.checkPermission(userPerms.configPrivileges, sp.CREATE) ||
-                sp.checkPermission(userPerms.configPrivileges, sp.DELETE) ||
-                sp.checkPermission(userPerms.configPrivileges, sp.EDIT)),
+            enabled: sp.checkPermission('nexus:privileges', sp.READ ) && 
+              ( sp.checkPermission('nexus:privileges', sp.CREATE) ||
+                sp.checkPermission('nexus:privileges', sp.DELETE) ||
+                sp.checkPermission('nexus:privileges', sp.EDIT)),
             title: 'Privileges',
             tabId: 'security-privileges',
             tabCode: Sonatype.repoServer.PrivilegeEditPanel

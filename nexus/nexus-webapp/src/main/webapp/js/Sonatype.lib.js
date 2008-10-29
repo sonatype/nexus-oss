@@ -34,6 +34,22 @@ Sonatype.lib.Permissions = {
     checkPermission : function(value, perm /*, perm...*/) {
       var p = perm;
       
+      if (Sonatype.user.curr.repoServer){      
+        Ext.each(Sonatype.user.curr.repoServer, function(item, i, arr){
+          if ( item.id == value ){
+            value = item.value;
+            return false;
+          }
+        });
+      }
+      
+      Ext.each(Sonatype.user.curr.repoServer.permissions, function(item, i, arr){
+        if ( item.id == value ){
+          value = item.value;
+          return false;
+        }
+      });
+      
       if(arguments.length > 2){
         var perms = Array.slice(arguments, 2);
         Ext.each(perms, function(item, i, arr){

@@ -547,7 +547,7 @@ Ext.extend(Sonatype.repoServer.ServerEditPanel, Ext.Panel, {
   
   beforeRenderHandler : function(){
     var sp = Sonatype.lib.Permissions;
-    if(sp.checkPermission(Sonatype.user.curr.repoServer.configServer, sp.EDIT)){
+    if(sp.checkPermission('nexus:settings', sp.EDIT)){
       this.buttons[0].disabled = false;
     }
   },

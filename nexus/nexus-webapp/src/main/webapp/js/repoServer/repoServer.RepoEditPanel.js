@@ -1009,7 +1009,7 @@ Sonatype.repoServer.RepoEditPanel = function(config){
             }
           ]
         },
-        disabled: !this.sp.checkPermission(Sonatype.user.curr.repoServer.configRepos, this.sp.CREATE)
+        disabled: !this.sp.checkPermission('nexus:repositories', this.sp.CREATE)
       },
       {
         id: 'repo-delete-btn',
@@ -1018,7 +1018,7 @@ Sonatype.repoServer.RepoEditPanel = function(config){
         cls: 'x-btn-text-icon',
         scope:this,
         handler: this.deleteRepoHandler,
-        disabled: !this.sp.checkPermission(Sonatype.user.curr.repoServer.configRepos, this.sp.DELETE)
+        disabled: !this.sp.checkPermission('nexus:repositories', this.sp.DELETE)
       },
       {
         id: 'repo-trash-btn',
@@ -1035,7 +1035,7 @@ Sonatype.repoServer.RepoEditPanel = function(config){
             }
           ]
         },
-        disabled: !this.sp.checkPermission(Sonatype.user.curr.repoServer.actionEmptyTrash, this.sp.DELETE)
+        disabled: !this.sp.checkPermission('nexus:wastebasket', this.sp.DELETE)
       }
     ],
 
@@ -1133,9 +1133,9 @@ Ext.extend(Sonatype.repoServer.RepoEditPanel, Sonatype.repoServer.AbstractRepoPa
   onContextClickHandler : function(grid, index, e){
     this.onContextHideHandler();
     
-    var reindexPriv = this.sp.checkPermission(Sonatype.user.curr.repoServer.actionReindex, this.sp.DELETE);
-    var attributesPriv = this.sp.checkPermission(Sonatype.user.curr.repoServer.actionRebuildAttribs, this.sp.DELETE);
-    var uploadPriv = this.sp.checkPermission(Sonatype.user.curr.repoServer.actionUploadArtifact, this.sp.CREATE);
+    var reindexPriv = this.sp.checkPermission('nexus:index', this.sp.DELETE);
+    var attributesPriv = this.sp.checkPermission('nexus:attributes', this.sp.DELETE);
+    var uploadPriv = this.sp.checkPermission('nexus:artifact', this.sp.CREATE);
     
     if ( e.target.nodeName == 'A' ) return; // no menu on links
     
@@ -1606,7 +1606,7 @@ Ext.extend(Sonatype.repoServer.RepoEditPanel, Sonatype.repoServer.AbstractRepoPa
     }
     
     var sp = Sonatype.lib.Permissions;
-    if(sp.checkPermission(Sonatype.user.curr.repoServer.configRepos, sp.EDIT)){
+    if(sp.checkPermission('nexus:repositories', sp.EDIT)){
       component.buttons[0].disabled = false;
     }
   },

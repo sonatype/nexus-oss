@@ -350,7 +350,7 @@ Sonatype.repoServer.RoutesEditPanel = function(config){
         cls: 'x-btn-text-icon',
         scope: this,
         handler: this.addResourceHandler,
-        disabled: !this.sp.checkPermission(Sonatype.user.curr.repoServer.configRules, this.sp.CREATE)
+        disabled: !this.sp.checkPermission('nexus:routes', this.sp.CREATE)
       },
       {
         id: 'route-delete-btn',
@@ -359,7 +359,7 @@ Sonatype.repoServer.RoutesEditPanel = function(config){
         cls: 'x-btn-text-icon',
         scope:this,
         handler: this.deleteResourceHandler,
-        disabled: !this.sp.checkPermission(Sonatype.user.curr.repoServer.configRules, this.sp.DELETE)
+        disabled: !this.sp.checkPermission('nexus:routes', this.sp.DELETE)
       }
     ],
 
@@ -785,7 +785,7 @@ Ext.extend(Sonatype.repoServer.RoutesEditPanel, Ext.Panel, {
 
   beforeFormRenderHandler : function(component){
     var sp = Sonatype.lib.Permissions;
-    if(sp.checkPermission(Sonatype.user.curr.repoServer.configRules, sp.EDIT)){
+    if(sp.checkPermission('nexus:routes', sp.EDIT)){
       component.buttons[0].disabled = false;
     }
   },

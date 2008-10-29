@@ -199,7 +199,7 @@ Sonatype.repoServer.SearchPanel = function(config){
     }
   };
 
-  if (this.sp.checkPermission(Sonatype.user.curr.repoServer.actionChecksumSearch, this.sp.READ)){
+  if (this.sp.checkPermission('nexus:identify', this.sp.READ)){
     this.searchComponents['checksum'] = [
       {
         xtype: 'nexussearchfield',

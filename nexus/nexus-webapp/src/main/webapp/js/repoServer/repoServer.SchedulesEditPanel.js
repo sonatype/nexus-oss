@@ -986,7 +986,7 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
         cls: 'x-btn-text-icon',
         scope: this,
         handler: this.addResourceHandler,
-        disabled: !this.sp.checkPermission(Sonatype.user.curr.repoServer.configSchedules, this.sp.CREATE)
+        disabled: !this.sp.checkPermission('nexus:tasks', this.sp.CREATE)
       },
       {
         id: 'schedule-delete-btn',
@@ -995,7 +995,7 @@ Sonatype.repoServer.SchedulesEditPanel = function(config){
         cls: 'x-btn-text-icon',
         scope:this,
         handler: this.deleteHandler,
-        disabled: !this.sp.checkPermission(Sonatype.user.curr.repoServer.configSchedules, this.sp.DELETE)
+        disabled: !this.sp.checkPermission('nexus:tasks', this.sp.DELETE)
       }
     ],
 
@@ -1356,7 +1356,7 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
     formPanel.buttons[1].on('click', this.cancelHandler.createDelegate(this, [buttonInfoObj]));
     
     var sp = Sonatype.lib.Permissions;
-    if(sp.checkPermission(Sonatype.user.curr.repoServer.configSchedules, sp.EDIT)){
+    if(sp.checkPermission('nexus:tasks', sp.EDIT)){
         formPanel.buttons[0].disabled = false;
     }
     
@@ -1728,7 +1728,7 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
       formPanel.buttons[1].on('click', this.cancelHandler.createDelegate(this, [buttonInfoObj]));
       
       var sp = Sonatype.lib.Permissions;
-      if(sp.checkPermission(Sonatype.user.curr.repoServer.configSchedules, sp.EDIT)
+      if(sp.checkPermission('nexus:tasks', sp.EDIT)
               && rec.data.schedule != 'internal'){
           formPanel.buttons[0].disabled = false;
       }
@@ -1762,11 +1762,11 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
       ]
     });
     
-    if (this.sp.checkPermission(Sonatype.user.curr.repoServer.configSchedules, this.sp.DELETE)){
+    if (this.sp.checkPermission('nexus:tasks', this.sp.DELETE)){
         menu.add(this.actions.deleteAction);
     }
     
-    if (this.sp.checkPermission(Sonatype.user.curr.repoServer.actionRunTask, this.sp.READ)
+    if (this.sp.checkPermission('nexus:tasksrun', this.sp.READ)
       && (this.ctxRecord.data.status == 'SUBMITTED'
       || this.ctxRecord.data.status == 'WAITING')) {
       menu.add(this.actions.run);

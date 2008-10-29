@@ -311,7 +311,7 @@ Sonatype.repoServer.RoleEditPanel = function(config){
         cls: 'x-btn-text-icon',
         scope: this,
         handler: this.addResourceHandler,
-        disabled: !this.sp.checkPermission(Sonatype.user.curr.repoServer.configRoles, this.sp.CREATE)
+        disabled: !this.sp.checkPermission('nexus:roles', this.sp.CREATE)
       },
       {
         id: 'role-delete-btn',
@@ -320,7 +320,7 @@ Sonatype.repoServer.RoleEditPanel = function(config){
         cls: 'x-btn-text-icon',
         scope:this,
         handler: this.deleteHandler,
-        disabled: !this.sp.checkPermission(Sonatype.user.curr.repoServer.configRoles, this.sp.DELETE)
+        disabled: !this.sp.checkPermission('nexus:roles', this.sp.DELETE)
       }
     ],
 
@@ -588,7 +588,7 @@ Ext.extend(Sonatype.repoServer.RoleEditPanel, Ext.Panel, {
             gridSelectModel.selectRow(i);
             var rec = store.getById(formLayout.activeItem.id);
             if (rec.data.readOnly == false
-            		&& this.sp.checkPermission(Sonatype.user.curr.repoServer.configRoles, this.sp.DELETE)){
+            		&& this.sp.checkPermission('nexus:roles', this.sp.DELETE)){
             	this.rolesGridPanel.getTopToolbar().items.get('role-delete-btn').enable();
             }
             else{
@@ -714,7 +714,7 @@ Ext.extend(Sonatype.repoServer.RoleEditPanel, Ext.Panel, {
     var rec = grid.store.getAt(rowIndex);
     if (rec) {
 	    if (rec.data.readOnly == false
-	    		&& this.sp.checkPermission(Sonatype.user.curr.repoServer.configRoles, this.sp.DELETE)) {
+	    		&& this.sp.checkPermission('nexus:roles', this.sp.DELETE)) {
 	      grid.getTopToolbar().items.get('role-delete-btn').enable();
 	    } else {
 	      grid.getTopToolbar().items.get('role-delete-btn')
@@ -735,7 +735,7 @@ Ext.extend(Sonatype.repoServer.RoleEditPanel, Ext.Panel, {
 	      formPanel.on('afterlayout', this.afterLayoutFormHandler, this, {single:true});
 	      
 	      if (rec.data.readOnly == false
-            && this.sp.checkPermission(Sonatype.user.curr.repoServer.configRoles, this.sp.EDIT)){
+            && this.sp.checkPermission('nexus:roles', this.sp.EDIT)){
 	          formPanel.buttons[0].disabled = false;
 	      }
 	      
@@ -789,7 +789,7 @@ Ext.extend(Sonatype.repoServer.RoleEditPanel, Ext.Panel, {
     });
     
     if (this.ctxRecord.data.readOnly == false
-    		&& this.sp.checkPermission(Sonatype.user.curr.repoServer.configRoles, this.sp.DELETE)){
+    		&& this.sp.checkPermission('nexus:roles', this.sp.DELETE)){
         menu.add(this.actions.deleteAction);
     }
     

@@ -379,7 +379,7 @@ Sonatype.repoServer.UserEditPanel = function(config){
         cls: 'x-btn-text-icon',
         scope: this,
         handler: this.addResourceHandler,
-        disabled: !this.sp.checkPermission(Sonatype.user.curr.repoServer.configUsers, this.sp.CREATE)
+        disabled: !this.sp.checkPermission('nexus:users', this.sp.CREATE)
       },
       {
         id: 'user-delete-btn',
@@ -388,7 +388,7 @@ Sonatype.repoServer.UserEditPanel = function(config){
         cls: 'x-btn-text-icon',
         scope:this,
         handler: this.deleteToolbarHandler,
-        disabled: !this.sp.checkPermission(Sonatype.user.curr.repoServer.configUsers, this.sp.DELETE)
+        disabled: !this.sp.checkPermission('nexus:users', this.sp.DELETE)
       }
     ],
 
@@ -512,7 +512,7 @@ Ext.extend(Sonatype.repoServer.UserEditPanel, Ext.Panel, {
         gridSelectModel.selectRow(i);
         var rec = store.getById(formLayout.activeItem.id);
         if (rec.data.readOnly == false
-        		&& this.sp.checkPermission(Sonatype.user.curr.repoServer.configUsers, this.sp.DELETE)){
+        		&& this.sp.checkPermission('nexus:users', this.sp.DELETE)){
         	this.usersGridPanel.getTopToolbar().items.get('user-delete-btn').enable();
         }
         else{
@@ -802,7 +802,7 @@ Ext.extend(Sonatype.repoServer.UserEditPanel, Ext.Panel, {
             gridSelectModel.selectRow(i);
             var rec = store.getById(formLayout.activeItem.id);
             if (rec.data.readOnly == false
-            		&& this.sp.checkPermission(Sonatype.user.curr.repoServer.configUsers, this.sp.DELETE)){
+            		&& this.sp.checkPermission('nexus:users', this.sp.DELETE)){
             	this.usersGridPanel.getTopToolbar().items.get('user-delete-btn').enable();
             }
             else{
@@ -939,7 +939,7 @@ Ext.extend(Sonatype.repoServer.UserEditPanel, Ext.Panel, {
     var rec = grid.store.getAt(rowIndex);
     if (rec) {
 	    if (rec.data.readOnly == false
-	            && this.sp.checkPermission(Sonatype.user.curr.repoServer.configUsers, this.sp.DELETE)) {
+	            && this.sp.checkPermission('nexus:users', this.sp.DELETE)) {
 	      grid.getTopToolbar().items.get('user-delete-btn').enable();
 	    } else {
 	      grid.getTopToolbar().items.get('user-delete-btn')
@@ -962,7 +962,7 @@ Ext.extend(Sonatype.repoServer.UserEditPanel, Ext.Panel, {
 	      formPanel.on('afterlayout', this.afterLayoutFormHandler, this, {single:true});
 	      
 	      if (rec.data.readOnly == false
-	              && this.sp.checkPermission(Sonatype.user.curr.repoServer.configUsers, this.sp.EDIT)){
+	              && this.sp.checkPermission('nexus:users', this.sp.EDIT)){
 	                formPanel.buttons[0].disabled = false;
 	            }
 	      
@@ -1113,16 +1113,16 @@ Ext.extend(Sonatype.repoServer.UserEditPanel, Ext.Panel, {
   onUserMenuInit: function( menu, userRecord ) {
     if ( userRecord.data.readOnly == false ) {
 
-      if ( this.sp.checkPermission( Sonatype.user.curr.repoServer.configUsers, this.sp.DELETE ) ) {
+      if ( this.sp.checkPermission( 'nexus:users', this.sp.DELETE ) ) {
         menu.add( this.actions.deleteAction );
       }
 
       if ( userRecord.data.resourceURI != 'new' ) {
-        if ( this.sp.checkPermission( Sonatype.user.curr.repoServer.actionResetPassword, this.sp.DELETE ) ) {
+        if ( this.sp.checkPermission( 'nexus:usersreset', this.sp.DELETE ) ) {
           menu.add(this.actions.resetPasswordAction);
         }
 
-        if ( this.sp.checkPermission( Sonatype.user.curr.repoServer.configUsers, this.sp.EDIT ) ) {
+        if ( this.sp.checkPermission( 'nexus:users', this.sp.EDIT ) ) {
           menu.add( this.actions.changePasswordAction );
         }
       }

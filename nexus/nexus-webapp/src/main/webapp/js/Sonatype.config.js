@@ -129,36 +129,7 @@ Sonatype.user.anon = {
   username : '',
   isLoggedIn : false,
   authToken : null,
-  repoServer : {
-    viewSearch : 0,
-    viewUpdatedArtifacts : 0,
-    viewCachedArtifacts : 0,
-    viewDeployedArtifacts : 0,
-    viewSystemChanges : 0,
-    maintRepos : 0,
-    maintLogs : 0,
-    maintConfig : 0,
-    configServer : 0,
-    configGroups : 0,
-    configRules : 0,
-    configRepos : 0,
-    configSchedules : 0,
-    configUsers : 0,
-    configRoles : 0,
-    configPrivileges : 0,
-    configRepoTargets : 0,
-    actionForgotPassword: 0,
-    actionForgotUserid: 0,
-    actionChangePassword: 0,
-    actionResetPassword: 0,
-    actionEmptyTrash: 0,
-    actionRunTask: 0,
-    actionDeleteCache: 0,
-    actionRebuildAttribs: 0,
-    actionUploadArtifact: 0,
-    actionReindex: 0,
-    actionChecksumSearch: 0
-  }
+  repoServer : {}
 };
 
 Sonatype.user.curr = Sonatype.utils.cloneObj(Sonatype.user.anon);

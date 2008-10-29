@@ -477,7 +477,7 @@ Ext.extend(Sonatype.repoServer.RepoMaintPanel, Sonatype.repoServer.AbstractRepoP
   onContextClickHandler : function(grid, index, e){
     this.onContextHideHandler();
     
-    var repoStatusPriv = this.sp.checkPermission(Sonatype.user.curr.repoServer.maintRepos, this.sp.EDIT);
+    var repoStatusPriv = this.sp.checkPermission('nexus:repostatus', this.sp.EDIT);
     
     if ( e.target.nodeName == 'A' ) return; // no menu on links
     
@@ -651,10 +651,6 @@ Ext.extend(Sonatype.repoServer.RepoMaintPanel, Sonatype.repoServer.AbstractRepoP
   },
   
   beforeRenderHandler : function(component){
-//  var sp = Sonatype.lib.Permissions;
-//  if(sp.checkPermission(Sonatype.user.curr.repoServer.configRepos, sp.EDIT)){
-//    component.buttons[0].disabled = false;
-//  }
   },
   
   repoRowClickHandler : function(grid, rowIndex, e){
@@ -1051,17 +1047,17 @@ Ext.extend(Sonatype.repoServer.RepoMaintPanel, Sonatype.repoServer.AbstractRepoP
     var isVirtual = repoRecord.get( 'repoType' ) == 'virtual';
 
     if ( this.sp.checkPermission(
-          Sonatype.user.curr.repoServer.actionDeleteCache, this.sp.DELETE ) &&
+          'nexus:cache', this.sp.DELETE ) &&
         ! isVirtual ){
       menu.add( this.repoActions.clearCache );
     }
     if ( this.sp.checkPermission(
-          Sonatype.user.curr.repoServer.actionReindex, this.sp.DELETE ) &&
+          'nexus:index', this.sp.DELETE ) &&
         ! isVirtual ) {
       menu.add( this.repoActions.reIndex );
     }
     if ( this.sp.checkPermission(
-          Sonatype.user.curr.repoServer.actionRebuildAttribs, this.sp.DELETE ) ){
+          'nexus:attributes', this.sp.DELETE ) ){
       menu.add( this.repoActions.rebuildAttributes );
     }
   },

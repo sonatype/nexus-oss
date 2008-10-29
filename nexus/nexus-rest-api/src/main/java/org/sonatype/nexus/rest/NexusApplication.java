@@ -471,6 +471,12 @@ public class NexusApplication
         xstream.registerLocalConverter( PlexusComponentListResourceResponse.class, "data", new AliasingListConverter(
             PlexusComponentListResource.class,
             "component" ) );
+        
+        xstream.registerLocalConverter( AuthenticationClientPermissions.class, "permissions", new AliasingListConverter(
+            ClientPermission.class,
+            "permission" ) );
+        
+        xstream.omitField( ClientPermission.class, "modelEncoding" );
 
         // Maven model
         xstream.omitField( Model.class, "modelEncoding" );

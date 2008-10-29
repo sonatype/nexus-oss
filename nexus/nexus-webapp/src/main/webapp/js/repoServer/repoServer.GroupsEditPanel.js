@@ -312,7 +312,7 @@ Sonatype.repoServer.GroupsEditPanel = function(config){
         cls: 'x-btn-text-icon',
         scope: this,
         handler: this.addResourceHandler,
-        disabled: !this.sp.checkPermission(Sonatype.user.curr.repoServer.configGroups, this.sp.CREATE)
+        disabled: !this.sp.checkPermission('nexus:repogroups', this.sp.CREATE)
       },
       {
         id: 'group-delete-btn',
@@ -321,7 +321,7 @@ Sonatype.repoServer.GroupsEditPanel = function(config){
         cls: 'x-btn-text-icon',
         scope:this,
         handler: this.deleteResourceHandler,
-        disabled: !this.sp.checkPermission(Sonatype.user.curr.repoServer.configGroups, this.sp.DELETE)
+        disabled: !this.sp.checkPermission('nexus:repogroups', this.sp.DELETE)
       }
     ],
 
@@ -777,7 +777,7 @@ Ext.extend(Sonatype.repoServer.GroupsEditPanel, Ext.Panel, {
     }
     
     var sp = Sonatype.lib.Permissions;
-    if(sp.checkPermission(Sonatype.user.curr.repoServer.configGroups, sp.EDIT)){
+    if(sp.checkPermission('nexus:repogroups', sp.EDIT)){
       component.buttons[0].disabled = false;
     }
   },

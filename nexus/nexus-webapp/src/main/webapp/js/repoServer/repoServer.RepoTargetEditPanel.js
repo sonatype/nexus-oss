@@ -277,7 +277,7 @@ Sonatype.repoServer.RepoTargetEditPanel = function(config){
         cls: 'x-btn-text-icon',
         scope: this,
         handler: this.addResourceHandler,
-        disabled: !this.sp.checkPermission(Sonatype.user.curr.repoServer.configRepoTargets, this.sp.CREATE)
+        disabled: !this.sp.checkPermission('nexus:targets', this.sp.CREATE)
       },
       {
         id: 'repoTarget-delete-btn',
@@ -286,7 +286,7 @@ Sonatype.repoServer.RepoTargetEditPanel = function(config){
         cls: 'x-btn-text-icon',
         scope:this,
         handler: this.deleteHandler,
-        disabled: !this.sp.checkPermission(Sonatype.user.curr.repoServer.configRepoTargets, this.sp.DELETE)
+        disabled: !this.sp.checkPermission('nexus:targets', this.sp.DELETE)
       }
     ],
 
@@ -631,7 +631,7 @@ Ext.extend(Sonatype.repoServer.RepoTargetEditPanel, Ext.Panel, {
   beforeFormRenderHandler : function(component){
     var sp = Sonatype.lib.Permissions;
     // TODO
-    if(sp.checkPermission(Sonatype.user.curr.repoServer.configRepoTargets, sp.EDIT)){
+    if(sp.checkPermission('nexus:targets', sp.EDIT)){
       component.buttons[0].disabled = false;
     }
   },
@@ -695,7 +695,7 @@ Ext.extend(Sonatype.repoServer.RepoTargetEditPanel, Ext.Panel, {
       ]
     });
     
-    if (this.sp.checkPermission(Sonatype.user.curr.repoServer.configRepoTargets, this.sp.DELETE)){
+    if (this.sp.checkPermission('nexus:targets', this.sp.DELETE)){
         menu.add(this.actions.deleteAction);
     }
     

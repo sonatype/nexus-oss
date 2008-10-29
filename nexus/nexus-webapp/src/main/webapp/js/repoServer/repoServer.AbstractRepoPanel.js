@@ -363,24 +363,24 @@ Ext.extend(Sonatype.repoServer.AbstractRepoPanel, Ext.Panel, {
     var isVirtual = repoRecord.get( 'repoType' ) == 'virtual';
 
     if ( this.sp.checkPermission(
-          Sonatype.user.curr.repoServer.actionDeleteCache, this.sp.DELETE ) &&
+          'nexus:cache', this.sp.DELETE ) &&
         ! isVirtual ) {
       menu.add( this.repoActions.clearCache );
     }
 
     if ( this.sp.checkPermission(
-          Sonatype.user.curr.repoServer.actionReindex, this.sp.DELETE ) &&
+          'nexus:index', this.sp.DELETE ) &&
         ! isVirtual ) {
       menu.add( this.repoActions.reIndex );
     }
 
     if ( this.sp.checkPermission(
-          Sonatype.user.curr.repoServer.actionRebuildAttribs, this.sp.DELETE ) ){
+          'nexus:attributes', this.sp.DELETE ) ){
       menu.add( this.repoActions.rebuildAttributes );
     }
 
     if ( this.sp.checkPermission(
-          Sonatype.user.curr.repoServer.actionUploadArtifact, this.sp.CREATE ) &&
+          'nexus:artifact', this.sp.CREATE ) &&
         repoRecord.get('repoType') == 'hosted' &&
         repoRecord.get('repoPolicy') == 'release' ){
       menu.add( this.repoActions.uploadArtifact );

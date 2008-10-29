@@ -458,7 +458,7 @@ Sonatype.repoServer.PrivilegeEditPanel = function(config){
         cls: 'x-btn-text-icon',
         scope: this,
         handler: this.addResourceHandler,
-        disabled: !this.sp.checkPermission(Sonatype.user.curr.repoServer.configPrivileges, this.sp.CREATE)
+        disabled: !this.sp.checkPermission('nexus:privileges', this.sp.CREATE)
       },
       {
         id: 'privilege-delete-btn',
@@ -467,7 +467,7 @@ Sonatype.repoServer.PrivilegeEditPanel = function(config){
         cls: 'x-btn-text-icon',
         scope:this,
         handler: this.deleteHandler,
-        disabled: !this.sp.checkPermission(Sonatype.user.curr.repoServer.configPrivileges, this.sp.DELETE)
+        disabled: !this.sp.checkPermission('nexus:privileges', this.sp.DELETE)
       }
     ],
 
@@ -799,7 +799,7 @@ Ext.extend(Sonatype.repoServer.PrivilegeEditPanel, Ext.Panel, {
   
   beforeFormRenderHandler : function(component){
     var sp = Sonatype.lib.Permissions;
-    if(sp.checkPermission(Sonatype.user.curr.repoServer.configPrivileges, sp.EDIT)){
+    if(sp.checkPermission('nexus:privileges', sp.EDIT)){
       component.buttons[0].disabled = false;
     }
   },
@@ -809,7 +809,7 @@ Ext.extend(Sonatype.repoServer.PrivilegeEditPanel, Ext.Panel, {
 
     if (rec) {
       if (rec.data.type != "application" && rec.data.readOnly == false
-              && this.sp.checkPermission(Sonatype.user.curr.repoServer.configPrivileges, this.sp.DELETE)) {
+              && this.sp.checkPermission('nexus:privileges', this.sp.DELETE)) {
         grid.getTopToolbar().items.get('privilege-delete-btn').enable();
       } else {
         grid.getTopToolbar().items.get('privilege-delete-btn')
@@ -863,7 +863,7 @@ Ext.extend(Sonatype.repoServer.PrivilegeEditPanel, Ext.Panel, {
     
     if (this.ctxRecord.data.type != 'application'
     	&& this.ctxRecord.data.readOnly == false
-    	&& this.sp.checkPermission(Sonatype.user.curr.repoServer.configPrivileges, this.sp.DELETE)){
+    	&& this.sp.checkPermission('nexus:privileges', this.sp.DELETE)){
       menu.add(this.actions.deleteAction);
     }
     
