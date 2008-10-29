@@ -237,6 +237,7 @@
       <plugin>
         <groupId>org.sonatype.plugins</groupId>
         <artifactId>plx-maven-plugin</artifactId>
+        <version>1.5-SNAPSHOT</version>
         <configuration>
           <includeTestClasspath>true</includeTestClasspath>
           <!-- prependClasspaths>
