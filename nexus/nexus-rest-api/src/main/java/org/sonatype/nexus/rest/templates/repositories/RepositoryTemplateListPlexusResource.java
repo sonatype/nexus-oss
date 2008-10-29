@@ -60,6 +60,8 @@ public class RepositoryTemplateListPlexusResource
             for ( CRepository repository : repositories )
             {
                 repoRes = new RepositoryListResource();
+                
+                repoRes.setId( repository.getId() );
 
                 repoRes.setResourceURI( createChildReference( request, repository.getId() ).toString() );
 
