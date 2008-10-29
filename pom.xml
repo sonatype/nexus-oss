@@ -32,17 +32,6 @@ under the License.
       <module>nexus</module>
     </modules>
     
-    <build>
-      <pluginManagement>
-        <plugins>
-          <plugin>
-            <artifactId>maven-resources-plugin</artifactId>
-            <version>2.3</version>
-          </plugin>
-        </plugins>
-      </pluginManagement>
-    </build>
-    
     <distributionManagement>
       <repository>
         <id>localhost</id>
