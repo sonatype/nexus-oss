@@ -73,7 +73,7 @@ public class RepositoryTemplateListPlexusResource
                 {
                     repoRes.setRepoType( "hosted" );
                 }
-
+                
                 repoRes.setName( repository.getName() );
 
                 repoRes.setEffectiveLocalStorageUrl( repository.getLocalStorage() != null
