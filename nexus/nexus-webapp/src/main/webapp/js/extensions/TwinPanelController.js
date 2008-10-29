@@ -317,6 +317,32 @@ Ext.extend( Sonatype.ext.TwinPanelChooser, Ext.Panel, {
     }
     
     return output;
+  },
+
+  setValue: function( arr ) {
+    if ( ! Ext.isArray( arr ) ) {
+      arr = [arr];
+    }
+    var leftRoot = this.getComponent( 0 ).root;
+    var rightRoot = this.getComponent( 2 ).root;
+    var nodes = rightRoot.childNodes;
+    
+    for ( var i = 0; i < arr.length; i++ ) {
+      var valueId = arr[i];
+      if ( ! typeof( valueId ) == 'String' ) {
+        valueId = valueId[this.valueField];
+      }
+      for ( var j = 0; j < nodes.length; j++ ) {
+        var node = nodes[j];
+        var nodeValue = this.valueField ?
+          node.attributes.payload.get( this.valueField ) :
+          node.attributes.payload.id;
+        if ( nodeValue == valueId ) {
+          leftRoot.appendChild( node );
+          j--;
+        }
+      }
+    }
   }
 });
 
