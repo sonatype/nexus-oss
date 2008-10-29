@@ -41,7 +41,7 @@ public class RepositoryContentPlexusResource
     @Override
     public PathProtectionDescriptor getResourceProtection()
     {
-        return new PathProtectionDescriptor( "/repositories/*/content/**", "authcBasic,trperms" );
+        return new PathProtectionDescriptor( "/repositories/*/content/**", "contentAuthcBasic,trperms" );
     }
 
     public boolean acceptsUpload()
