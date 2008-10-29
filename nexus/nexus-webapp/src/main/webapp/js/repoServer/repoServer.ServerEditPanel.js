@@ -39,7 +39,6 @@ Sonatype.repoServer.ServerEditPanel = function(config){
   this.realmTypeDataStore = new Ext.data.Store({
     url: Sonatype.config.repos.urls.realmComponents,
     reader: this.realmTypeReader,
-    sortInfo: {field: 'roleHint', direction: 'ASC'},
     autoLoad: true,
     listeners: {
       'load' : {
@@ -788,12 +787,6 @@ Ext.extend(Sonatype.repoServer.ServerEditPanel, Ext.Panel, {
                 allTree.root.removeChild(allTree.getNodeById(item.data.roleHint));
               }
             });
-            
-            var sortTypeFunc = function( node ) {
-              return node.text;
-            }
-            new Ext.tree.TreeSorter( selectedTree, { sortType: sortTypeFunc } );
-            new Ext.tree.TreeSorter( allTree, { sortType: sortTypeFunc } );
             
             return arr; //return arr, even if empty to comply with sonatypeLoad data modifier requirement
           },
