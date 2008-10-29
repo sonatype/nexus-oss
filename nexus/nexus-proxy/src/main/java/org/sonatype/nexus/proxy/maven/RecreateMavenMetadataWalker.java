@@ -366,7 +366,7 @@ public class RecreateMavenMetadataWalker
                 xml.append( "      <name>" + getName() + "</name>" + "\n" );
             }
 
-            xml.append( "      <artifactid>" + getArtifactId() + "</artifactid>" + "\n" );
+            xml.append( "      <artifactId>" + getArtifactId() + "</artifactId>" + "\n" );
 
             xml.append( "    </plugin>\n" );
 
