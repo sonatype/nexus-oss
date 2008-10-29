@@ -3,11 +3,13 @@ package org.sonatype.nexus.integrationtests.nexus688;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 
 import junit.framework.Assert;
 
+import org.apache.commons.io.IOUtils;
 import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
@@ -20,10 +22,11 @@ public class Nexus688ReindexOnRepoAdd
     extends AbstractNexusIntegrationTest
 {
 
-    private RepositoryMessageUtil messageUtil = new RepositoryMessageUtil(this.getXMLXStream(), MediaType.APPLICATION_XML);
+    private RepositoryMessageUtil messageUtil =
+        new RepositoryMessageUtil( this.getXMLXStream(), MediaType.APPLICATION_XML );
 
     private static final String INDEX_FILE = ".index/nexus-maven-repository-index.zip";
-    
+
     private static final int SLEEP_TIME = 1000;
 
     @Test
@@ -46,17 +49,17 @@ public class Nexus688ReindexOnRepoAdd
 
         // this also validates
         this.messageUtil.createRepository( resource );
-        
+
         Thread.sleep( SLEEP_TIME );
-        
+
         // check to see if it has an index to download
         File indexFile = this.downloadIndexFromRepository( resource.getId() );
-        
+
         // if the above line didn't throw a FileNotFound, we are good to go, but check anyway.
         Assert.assertNotNull( "Downloaded index file was null.", indexFile );
         Assert.assertTrue( "Downloaded index does not exists", indexFile.exists() );
     }
-    
+
     @Test
     public void repoTestNotIndexable()
         throws IOException, InterruptedException
@@ -77,22 +80,21 @@ public class Nexus688ReindexOnRepoAdd
 
         // this also validates
         this.messageUtil.createRepository( resource );
-        
+
         Thread.sleep( SLEEP_TIME );
-        
-        
-        // check to see if it has an index to download        
+
+        // check to see if it has an index to download
         try
         {
             this.downloadIndexFromRepository( resource.getId() );
             Assert.fail( "Expected a 404, FileNotFoundException." );
         }
-        catch(FileNotFoundException e)
+        catch ( FileNotFoundException e )
         {
-          // expected 404
+            // expected 404
         }
     }
-    
+
     @Test
     public void proxyRepoTestIndexableWithInvalidURL()
         throws IOException, InterruptedException
@@ -110,25 +112,24 @@ public class Nexus688ReindexOnRepoAdd
         resource.setBrowseable( true );
         resource.setIndexable( true );
         resource.setAllowWrite( true );
-        
+
         RepositoryResourceRemoteStorage remoteStorage = new RepositoryResourceRemoteStorage();
         remoteStorage.setRemoteStorageUrl( "http://INVALID-URL" );
         resource.setRemoteStorage( remoteStorage );
 
         // this also validates
         this.messageUtil.createRepository( resource );
-        
+
         Thread.sleep( SLEEP_TIME );
-        
 
         // check to see if it has an index to download
         File indexFile = this.downloadIndexFromRepository( resource.getId() );
-        
+
         // if the above line didn't throw a FileNotFound, we are good to go, but check anyway.
         Assert.assertNotNull( "Downloaded index file was null.", indexFile );
         Assert.assertTrue( "Downloaded index does not exists", indexFile.exists() );
     }
-    
+
     @Test
     public void proxyRepoTestIndexable()
         throws IOException, InterruptedException
@@ -146,25 +147,24 @@ public class Nexus688ReindexOnRepoAdd
         resource.setBrowseable( true );
         resource.setIndexable( true );
         resource.setAllowWrite( true );
-        
+
         RepositoryResourceRemoteStorage remoteStorage = new RepositoryResourceRemoteStorage();
         remoteStorage.setRemoteStorageUrl( "http://INVALID-URL" );
         resource.setRemoteStorage( remoteStorage );
-        
+
         // this also validates
         this.messageUtil.createRepository( resource );
-        
+
         Thread.sleep( SLEEP_TIME );
-        
 
         // check to see if it has an index to download
         File indexFile = this.downloadIndexFromRepository( resource.getId() );
-        
+
         // if the above line didn't throw a FileNotFound, we are good to go, but check anyway.
         Assert.assertNotNull( "Downloaded index file was null.", indexFile );
         Assert.assertTrue( "Downloaded index does not exists", indexFile.exists() );
     }
-    
+
     @Test
     public void proxyRepoTestNotIndexable()
         throws IOException, InterruptedException
@@ -182,14 +182,14 @@ public class Nexus688ReindexOnRepoAdd
         resource.setBrowseable( true );
         resource.setIndexable( false );
         resource.setAllowWrite( true );
-        
+
         RepositoryResourceRemoteStorage remoteStorage = new RepositoryResourceRemoteStorage();
         remoteStorage.setRemoteStorageUrl( "http://INVALID-URL" );
         resource.setRemoteStorage( remoteStorage );
 
         // this also validates
         this.messageUtil.createRepository( resource );
-        
+
         Thread.sleep( SLEEP_TIME );
 
         // check to see if it has an index to download
@@ -198,15 +198,27 @@ public class Nexus688ReindexOnRepoAdd
             this.downloadIndexFromRepository( resource.getId() );
             Assert.fail( "Expected a 404, FileNotFoundException." );
         }
-        catch(FileNotFoundException e)
+        catch ( FileNotFoundException e )
         {
-          // expected 404
+            e.printStackTrace();
+            // expected 404
         }
     }
-    
-    private File downloadIndexFromRepository( String repoId ) throws MalformedURLException, IOException
+
+    private File downloadIndexFromRepository( String repoId )
+        throws MalformedURLException, IOException
     {
-        return this.downloadFile( new URL( this.getRepositoryUrl( repoId ) + INDEX_FILE ), "target/downloads/index.zip" );
+        String repositoryUrl = this.getRepositoryUrl( repoId );
+        try
+        {
+            URL url = new URL( repositoryUrl + INDEX_FILE );
+            return this.downloadFile( url, "target/downloads/index.zip" );
+        }
+        catch ( FileNotFoundException e )
+        {
+            String files = IOUtils.toString( (InputStream) new URL( repositoryUrl + ".index" ).getContent() );
+            throw new FileNotFoundException( repositoryUrl + " Available files: " + files );
+        }
     }
 
 }
