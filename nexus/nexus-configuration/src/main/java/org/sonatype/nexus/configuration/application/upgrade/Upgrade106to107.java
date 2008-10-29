@@ -323,11 +323,14 @@ public class Upgrade106to107
             security.setAnonymousPassword( oldsecurity.getAnonymousPassword() );
             security.setAnonymousUsername( oldsecurity.getAnonymousUsername() );
             security.setEnabled( oldsecurity.isEnabled() );
+            security.getRealms().addAll( oldsecurity.getRealms() );
         }
-
-        security.addRealm( "XmlAuthenticatingRealm" );
-        security.addRealm( "NexusMethodAuthorizingRealm" );
-        security.addRealm( "NexusTargetAuthorizingRealm" );
+        else
+        {
+            security.addRealm( "XmlAuthenticatingRealm" );
+            security.addRealm( "NexusMethodAuthorizingRealm" );
+            security.addRealm( "NexusTargetAuthorizingRealm" );
+        }
 
         return security;
     }
@@ -521,12 +524,12 @@ public class Upgrade106to107
         {
             schedule.setCronCommand( oldschedule.getCronCommand() );
             schedule.setDaysOfMonth( oldschedule.getDaysOfMonth() );
-            
-            for ( String dayOfWeek : ( List<String> )oldschedule.getDaysOfWeek() )
+
+            for ( String dayOfWeek : (List<String>) oldschedule.getDaysOfWeek() )
             {
                 schedule.addDaysOfWeek( Integer.toString( Integer.parseInt( dayOfWeek ) + 1 ) );
             }
-            
+
             schedule.setEndDate( oldschedule.getEndDate() );
             schedule.setStartDate( oldschedule.getStartDate() );
             schedule.setType( oldschedule.getType() );
