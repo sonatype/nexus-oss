@@ -65,10 +65,20 @@ public class RecreateMavenMetadataWalkerTest
         "/org/sonatype/nexus/nexus-api/1.2.0-SNAPSHOT/nexus-api-1.2.0-20081022.184527-3.jar",
         "/org/sonatype/nexus/nexus-api/1.2.0-SNAPSHOT/nexus-api-1.2.0-20081022.184527-3.pom",
         "/org/sonatype/nexus/nexus-api/1.2.0-SNAPSHOT/nexus-api-1.2.0-20081025.143218-32.jar",
-        "/org/sonatype/nexus/nexus-api/1.2.0-SNAPSHOT/nexus-api-1.2.0-20081025.143218-32.pom"};
+        "/org/sonatype/nexus/nexus-api/1.2.0-SNAPSHOT/nexus-api-1.2.0-20081025.143218-32.pom" };
 
-    
-    
+    private String[] pluginArtifactFiles = {
+        "/org/apache/maven/plugins/maven-antrun-plugin/1.1/maven-antrun-plugin-1.1.jar",
+        "/org/apache/maven/plugins/maven-antrun-plugin/1.1/maven-antrun-plugin-1.1.pom",
+        "/org/apache/maven/plugins/maven-clean-plugin/2.2/maven-clean-plugin-2.2.jar",
+        "/org/apache/maven/plugins/maven-clean-plugin/2.2/maven-clean-plugin-2.2.pom",
+        "/org/apache/maven/plugins/maven-plugin-plugin/2.4.1/maven-plugin-plugin-2.4.1.jar",
+        "/org/apache/maven/plugins/maven-plugin-plugin/2.4.1/maven-plugin-plugin-2.4.1.pom",
+        "/org/apache/maven/plugins/maven-plugin-plugin/2.4.3/maven-plugin-plugin-2.4.3.jar",
+        "/org/apache/maven/plugins/maven-plugin-plugin/2.4.3/maven-plugin-plugin-2.4.3.pom",
+        "/org/apache/maven/plugins/maven-source-plugin/2.0.4/maven-source-plugin-2.0.4.jar",
+        "/org/apache/maven/plugins/maven-source-plugin/2.0.4/maven-source-plugin-2.0.4.pom" };
+
     @Override
     protected EnvironmentBuilder getEnvironmentBuilder()
         throws Exception
@@ -95,6 +105,17 @@ public class RecreateMavenMetadataWalkerTest
             ResourceStoreRequest request = new ResourceStoreRequest( releaseArtifactFile, true );
 
             FileInputStream fis = new FileInputStream( new File( repoBase, releaseArtifactFile ) );
+
+            inhouse.storeItem( request, fis, null );
+
+            fis.close();
+        }
+
+        for ( String pluginArtifactFile : pluginArtifactFiles )
+        {
+            ResourceStoreRequest request = new ResourceStoreRequest( pluginArtifactFile, true );
+
+            FileInputStream fis = new FileInputStream( new File( repoBase, pluginArtifactFile ) );
 
             inhouse.storeItem( request, fis, null );
 
@@ -134,9 +155,25 @@ public class RecreateMavenMetadataWalkerTest
 
         storeWalker.walk();
 
-        assertNotNull( inhouseSnapshot.retrieveItem( new ResourceStoreRequest( "/org/sonatype/nexus/nexus-api/maven-metadata.xml", false ) ) );
+        assertNotNull( inhouseSnapshot.retrieveItem( new ResourceStoreRequest(
+            "/org/sonatype/nexus/nexus-api/maven-metadata.xml",
+            false ) ) );
 
-        assertNotNull( inhouseSnapshot.retrieveItem( new ResourceStoreRequest( "/org/sonatype/nexus/nexus-api/1.2.0-SNAPSHOT/maven-metadata.xml", false ) ) );
+        assertNotNull( inhouseSnapshot.retrieveItem( new ResourceStoreRequest(
+            "/org/sonatype/nexus/nexus-api/1.2.0-SNAPSHOT/maven-metadata.xml",
+            false ) ) );
+    }
+
+    public void testRecreateMavenMetadataWalkerWalkerPlugin()
+        throws Exception
+    {
+        StoreWalker storeWalker = new RecreateMavenMetadataWalker( inhouse, getLogger() );
+
+        storeWalker.walk();
+
+        assertNotNull( inhouse.retrieveItem( new ResourceStoreRequest(
+            "/org/apache/maven/plugins/maven-metadata.xml",
+            false ) ) );
     }
 
 }

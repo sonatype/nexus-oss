@@ -21,41 +21,30 @@
 
 package org.sonatype.nexus.proxy.maven;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
+import java.io.Reader;
+import java.util.HashMap;
+import java.util.Map;
 
-import org.apache.maven.mercury.artifact.version.VersionComparator;
-import org.apache.maven.mercury.repository.metadata.Metadata;
-import org.apache.maven.mercury.repository.metadata.MetadataBuilder;
-import org.apache.maven.mercury.repository.metadata.MetadataException;
-import org.apache.maven.mercury.repository.metadata.SetSnapshotOperation;
-import org.apache.maven.mercury.repository.metadata.Snapshot;
-import org.apache.maven.mercury.repository.metadata.SnapshotOperand;
-import org.apache.maven.mercury.repository.metadata.Versioning;
-import org.apache.maven.mercury.util.TimeUtil;
+import org.apache.maven.model.Model;
+import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.codehaus.plexus.logging.Logger;
+import org.codehaus.plexus.util.ReaderFactory;
+import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.NoSuchResourceStoreException;
 import org.sonatype.nexus.proxy.RepositoryNotAvailableException;
 import org.sonatype.nexus.proxy.RepositoryNotListableException;
 import org.sonatype.nexus.proxy.StorageException;
-import org.sonatype.nexus.proxy.item.ContentLocator;
-import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
-import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
-import org.sonatype.nexus.proxy.item.StringContentLocator;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RepositoryType;
-import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.proxy.utils.StoreWalker;
 
 /**
- * 
  * @author Juven Xu
- *
  */
 public class RecreateMavenMetadataWalker
     extends StoreWalker
@@ -65,7 +54,20 @@ public class RecreateMavenMetadataWalker
 
     private boolean isHostedRepo;
 
-    private static final String VERSION_REGEX = "^[0-9].*$";
+    public static final String VERSION_REGEX = "^[0-9].*$";
+
+    /**
+     * current groupId based on the current collection, if no groupId, it's null
+     */
+    private String currentGroupId;
+
+    private String currentArtifactId;
+
+    private String currentVersion;
+
+    private Map<String, PluginInfoForMetadata> currentPlugins = new HashMap<String, PluginInfoForMetadata>();
+
+    private MavenMetadataHelper mdHelper = new MavenMetadataHelper( this );
 
     public RecreateMavenMetadataWalker( Repository repository, Logger logger )
     {
@@ -78,28 +80,141 @@ public class RecreateMavenMetadataWalker
 
     protected void processItem( StorageItem item )
     {
-        // nothing here
+        
+        // we only handle pom file
+        if ( !item.getName().endsWith( "pom" ) )
+        {
+            return;
+        }
+
+        if ( !StorageFileItem.class.isAssignableFrom( item.getClass() ) )
+        {
+            return;
+        }
+
+        handleMavenPlugin( (StorageFileItem) item );
+
     }
 
-    protected void onCollectionEnter( StorageCollectionItem coll )
+    protected void beforeWalk()
     {
+        if ( !isHostedRepo )
+        {
+            stop( new Exception( "Not allowed to create metadata files for non-hosted repositoty" ) );
+        }
+
+    }
+
+    private void handleMavenPlugin( StorageFileItem pomFile )
+    {
+        Model model = null;
         try
         {
-            if ( shouldCreateMavenMetadata( coll ) )
+            Reader reader = ReaderFactory.newXmlReader( pomFile.getInputStream() );
+            MavenXpp3Reader xpp3 = new MavenXpp3Reader();
+
+            try
             {
-                createMavenMetadata( coll );
+                model = xpp3.read( reader );
             }
-            else if ( shouldCreateSnapshotMavenMetadata( coll ) )
+            finally
             {
-                createSnapshotMavenMetadata( coll );
+                reader.close();
+                reader = null;
             }
         }
         catch ( Exception e )
         {
-
-            getLogger().info( "Can't recreate maven metadata. ", e );
+            getLogger().info( "Can't build POM model from " + pomFile.getPath(), e );
         }
 
+        if ( model != null && model.getPackaging().equals( "maven-plugin" ) )
+        {
+
+            if ( !StringUtils.isEmpty( model.getName() ) )
+            {
+                currentPlugins.put( model.getArtifactId(), new PluginInfoForMetadata( model.getArtifactId(), model
+                    .getName() ) );
+            }
+            else
+            {
+                currentPlugins.put( model.getArtifactId(), new PluginInfoForMetadata( model.getArtifactId() ) );
+            }
+
+        }
+    }
+
+    private void buildGAV( StorageCollectionItem coll )
+    {
+        if ( coll.getName().matches( VERSION_REGEX ) )
+        {
+            currentVersion = coll.getName();
+
+            int spaceOfGAPos = coll.getParentPath().lastIndexOf( '/' );
+
+            if ( currentArtifactId == null )
+            {
+                currentArtifactId = coll.getParentPath().substring( spaceOfGAPos + 1 );
+            }
+
+            if ( currentGroupId == null )
+            {
+                currentGroupId = coll.getParentPath().substring( 1, spaceOfGAPos ).replace( '/', '.' );
+            }
+        }
+
+    }
+
+    private void cleanGAV( StorageCollectionItem coll )
+    {
+        if ( currentVersion != null && coll.getName().equals( currentVersion ) )
+        {
+            currentVersion = null;
+        }
+        else if ( currentVersion == null && currentArtifactId != null && coll.getName().equals( currentArtifactId ) )
+        {
+            currentArtifactId = null;
+        }
+        else if ( currentArtifactId == null && currentGroupId != null && isGroupPath( coll.getPath() ) )
+        {
+            currentGroupId = null;
+        }
+
+    }
+
+    protected void onCollectionEnter( StorageCollectionItem coll )
+    {
+
+        buildGAV( coll );
+
+    }
+
+    protected void onCollectionExit( StorageCollectionItem coll )
+    {
+        try
+        {
+            if ( shouldCreateMetadataForSnapshotVersionDir( coll ) )
+            {
+                mdHelper.createMetadataForSnapshotVersionDir( coll );
+            }
+            else if ( shouldCreateMetadataForArtifactDir( coll ) )
+            {
+                mdHelper.createMetadataForArtifactDir( coll );
+            }
+            else if ( shouldCreateMetadataForPluginGroupDir( coll ) )
+            {
+                mdHelper.createMetadataForPluginGroupDir( coll );
+                
+                currentPlugins.clear();
+            }
+
+        }
+        catch ( Exception e )
+        {
+            getLogger().info( "Can't build maven metadata in " + coll.getPath(), e );
+        }
+
+        cleanGAV( coll );
     }
 
     public Repository getRepository()
@@ -107,7 +222,7 @@ public class RecreateMavenMetadataWalker
         return repository;
     }
 
-    private boolean shouldCreateMavenMetadata( StorageCollectionItem coll )
+    private boolean shouldCreateMetadataForArtifactDir( StorageCollectionItem coll )
         throws StorageException,
             AccessDeniedException,
             NoSuchResourceStoreException,
@@ -115,10 +230,6 @@ public class RecreateMavenMetadataWalker
             RepositoryNotListableException,
             ItemNotFoundException
     {
-        if ( !isHostedRepo )
-        {
-            return false;
-        }
         for ( StorageItem item : coll.list() )
         {
             if ( StorageCollectionItem.class.isAssignableFrom( item.getClass() )
@@ -131,33 +242,7 @@ public class RecreateMavenMetadataWalker
         return false;
     }
 
-    private void createMavenMetadata( StorageCollectionItem coll )
-        throws AccessDeniedException,
-            NoSuchResourceStoreException,
-            RepositoryNotAvailableException,
-            RepositoryNotListableException,
-            ItemNotFoundException,
-            IOException,
-            MetadataException,
-            UnsupportedStorageOperationException
-    {
-        getLogger().debug( "Creating maven-metadata.xml at: " + coll.getPath() );
-
-        // UIDs are like URIs! The separator is _always_ "/"!!!
-        RepositoryItemUid mdUid = repository.createUid( coll.getPath() + "/maven-metadata.xml" );
-
-        Metadata md = new Metadata();
-
-        md.setGroupId( coll.getParentPath().substring( 1 ).replace( '/', '.' ) );
-
-        md.setArtifactId( coll.getName() );
-
-        createVersioningForRelease( md, coll );
-
-        storeMetadata( md, mdUid );
-    }
-
-    private void createVersioningForRelease( Metadata md, StorageCollectionItem coll )
+    private boolean shouldCreateMetadataForSnapshotVersionDir( StorageCollectionItem coll )
         throws StorageException,
             AccessDeniedException,
             NoSuchResourceStoreException,
@@ -165,76 +250,6 @@ public class RecreateMavenMetadataWalker
             RepositoryNotListableException,
             ItemNotFoundException
     {
-        Versioning versioning = new Versioning();
-
-        String release = null;
-
-        String latest = null;
-
-        VersionComparator versionComparator = new VersionComparator();
-
-        for ( StorageItem item : coll.list() )
-        {
-            if ( StorageCollectionItem.class.isAssignableFrom( item.getClass() )
-                && item.getName().matches( VERSION_REGEX ) )
-            {
-                versioning.addVersion( item.getName() );
-
-                if ( latest == null )
-                {
-                    latest = item.getName();
-
-                    continue;
-                }
-
-                if ( release == null && !item.getName().endsWith( "SNAPSHOT" ) )
-                {
-                    release = item.getName();
-
-                    continue;
-                }
-
-                if ( latest != null && versionComparator.compare( latest, item.getName() ) < 0 )
-                {
-                    latest = item.getName();
-                }
-
-                if ( release != null && !item.getName().endsWith( "SNAPSHOT" )
-                    && versionComparator.compare( release, item.getName() ) < 0 )
-                {
-                    release = item.getName();
-                }
-            }
-        }
-
-        if ( release != null )
-        {
-            versioning.setRelease( release );
-        }
-
-        if ( latest != null )
-        {
-            versioning.setLatest( latest );
-        }
-
-        versioning.setLastUpdated( TimeUtil.getUTCTimestamp() );
-
-        md.setVersioning( versioning );
-    }
-
-    private boolean shouldCreateSnapshotMavenMetadata( StorageCollectionItem coll )
-        throws StorageException,
-            AccessDeniedException,
-            NoSuchResourceStoreException,
-            RepositoryNotAvailableException,
-            RepositoryNotListableException,
-            ItemNotFoundException
-    {
-        if ( !isHostedRepo )
-        {
-            return false;
-        }
-
         if ( !coll.getName().matches( VERSION_REGEX ) )
         {
             return false;
@@ -255,106 +270,108 @@ public class RecreateMavenMetadataWalker
         return false;
     }
 
-    private void createSnapshotMavenMetadata( StorageCollectionItem coll )
-        throws AccessDeniedException,
-            NoSuchResourceStoreException,
-            RepositoryNotAvailableException,
-            RepositoryNotListableException,
-            ItemNotFoundException,
-            IOException,
-            MetadataException,
-            UnsupportedStorageOperationException
+    private boolean shouldCreateMetadataForPluginGroupDir( StorageCollectionItem coll )
     {
-        getLogger().debug( "Creating maven-metadata.xml at: " + coll.getPath() );
+        if ( isGroupPath( coll.getPath() ) && !currentPlugins.isEmpty() )
+        {
+            return true;
+        }
 
-        RepositoryItemUid mdUid = repository.createUid( coll.getPath() +  "/maven-metadata.xml" );
-
-        Metadata md = new Metadata();
-
-        int spaceOfGAPos = coll.getParentPath().lastIndexOf( '/' );
-
-        md.setGroupId( coll.getParentPath().substring( 1, spaceOfGAPos ).replace( '/', '.' ) );
-
-        md.setArtifactId( coll.getParentPath().substring( spaceOfGAPos + 1 ) );
-
-        md.setVersion( coll.getName() );
-
-        createVersioningForSnapshot( md, coll );
-
-        storeMetadata( md, mdUid );
+        return false;
     }
 
-    private void createVersioningForSnapshot( Metadata md, StorageCollectionItem coll )
-        throws MetadataException,
-            NumberFormatException,
-            StorageException,
-            AccessDeniedException,
-            NoSuchResourceStoreException,
-            RepositoryNotAvailableException,
-            RepositoryNotListableException,
-            ItemNotFoundException
+    public String getCurrentGroupId()
     {
-        Versioning versioning = new Versioning();
+        return currentGroupId;
+    }
 
-        versioning.setLastUpdated( TimeUtil.getUTCTimestamp() );
+    public String getCurrentArtifactId()
+    {
+        return currentArtifactId;
+    }
 
-        md.setVersioning( versioning );
+    public String getCurrentVersion()
+    {
+        return currentVersion;
+    }
 
-        Snapshot snapshot = new Snapshot();
+    public Map<String, PluginInfoForMetadata> getCurrentPlugins()
+    {
+        return currentPlugins;
+    }
 
-        snapshot.setLocalCopy( false );
-
-        snapshot.setBuildNumber( 1 );
-
-        for ( StorageItem item : coll.list() )
+    private boolean isGroupPath( String path )
+    {
+        if ( StringUtils.isEmpty( currentGroupId ) )
         {
-            if ( StorageFileItem.class.isAssignableFrom( item.getClass() ) && item.getName().endsWith( "pom" ) )
+            return false;
+        }
+        if ( path.substring( 1 ).replace( '/', '.' ).equals( currentGroupId ) )
+        {
+            return true;
+        }
+        return false;
+    }
+    
+    class PluginInfoForMetadata
+    {
+        private String name;
+
+        private String artifactId;
+
+        public PluginInfoForMetadata( String artifactId )
+        {
+            this.artifactId = artifactId;
+        }
+
+        public PluginInfoForMetadata( String artifactId, String name )
+        {
+            this.artifactId = artifactId;
+
+            this.name = name;
+        }
+
+        public String getName()
+        {
+            return name;
+        }
+
+        public String getArtifactId()
+        {
+            return artifactId;
+        }
+
+        public String getPrefix()
+        {
+            if ( "maven-plugin-plugin".equals( artifactId ) )
             {
-                int lastHyphenPos = item.getName().lastIndexOf( '-' );
-
-                int buildNumber = Integer.parseInt( item.getName().substring( lastHyphenPos + 1, item.getName().length() - 4 ) );
-
-                if ( buildNumber > snapshot.getBuildNumber() )
-                {
-                    snapshot.setBuildNumber( buildNumber );
-
-                    String timeStamp = item.getName().substring(
-                        ( md.getArtifactId() + '-' + md.getVersion() + '-' ).length() - "-SNAPSHOT".length(),
-                        lastHyphenPos );
-
-                    snapshot.setTimestamp( timeStamp );
-
-                }
+                return "plugin";
+            }
+            else
+            {
+                return artifactId.replaceAll( "-?maven-?", "" ).replaceAll( "-?plugin-?", "" );
             }
         }
 
-        MetadataBuilder.changeMetadata( md, new SetSnapshotOperation( new SnapshotOperand( snapshot ) ) );
+        public String toXml()
+        {
+            StringBuffer xml = new StringBuffer();
 
-    }
+            xml.append( "    <plugin>" + "\n" );
 
-    private void storeMetadata( Metadata md, RepositoryItemUid mdUid )
-        throws MetadataException,
-            UnsupportedStorageOperationException,
-            RepositoryNotAvailableException,
-            IOException
-    {
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            xml.append( "      <prefix>" + getPrefix() + "</prefix>" + "\n" );
 
-        MetadataBuilder.write( md, outputStream );
+            if ( !StringUtils.isEmpty( getName() ) )
+            {
+                xml.append( "      <name>" + getName() + "</name>" + "\n" );
+            }
 
-        ContentLocator contentLocator = new StringContentLocator( outputStream.toString() );
+            xml.append( "      <artifactid>" + getArtifactId() + "</artifactid>" + "\n" );
 
-        DefaultStorageFileItem mdFile = new DefaultStorageFileItem(
-            repository,
-            mdUid.getPath(),
-            true,
-            true,
-            contentLocator );
+            xml.append( "    </plugin>\n" );
 
-        repository.storeItem( mdFile );
+            return xml.toString();
+        }
 
-        repository.removeFromNotFoundCache( mdUid.getPath() );
-
-        outputStream.close();
     }
 }
