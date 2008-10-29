@@ -43,13 +43,6 @@ Sonatype.lib.Permissions = {
         });
       }
       
-      Ext.each(Sonatype.user.curr.repoServer.permissions, function(item, i, arr){
-        if ( item.id == value ){
-          value = item.value;
-          return false;
-        }
-      });
-      
       if(arguments.length > 2){
         var perms = Array.slice(arguments, 2);
         Ext.each(perms, function(item, i, arr){
