@@ -142,6 +142,7 @@ public class DefaultApplicationRuntimeConfigurationBuilder
                 m2repository.setProxyMode( repositoryStatusConverter.proxyModeFromModel( repo.getProxyMode() ) );
                 m2repository.setIndexable( repo.isIndexable() );
                 m2repository.setNotFoundCacheTimeToLive( repo.getNotFoundCacheTTL() );
+                m2repository.setUserManaged( repo.isUserManaged() );
 
                 m2repository.setItemMaxAge( repo.getArtifactMaxAge() );
                 m2repository.setReleaseMaxAge( repo.getArtifactMaxAge() );
@@ -173,6 +174,7 @@ public class DefaultApplicationRuntimeConfigurationBuilder
                 m1repository.setProxyMode( repositoryStatusConverter.proxyModeFromModel( repo.getProxyMode() ) );
                 m1repository.setIndexable( repo.isIndexable() );
                 m1repository.setNotFoundCacheTimeToLive( repo.getNotFoundCacheTTL() );
+                m1repository.setUserManaged( repo.isUserManaged() );
 
                 m1repository.setItemMaxAge( repo.getArtifactMaxAge() );
                 m1repository.setReleaseMaxAge( repo.getArtifactMaxAge() );
@@ -362,6 +364,7 @@ public class DefaultApplicationRuntimeConfigurationBuilder
                 shadowRepository.setProxyMode( null );
                 shadowRepository.setIndexable( false );
                 shadowRepository.setNotFoundCacheTimeToLive( master.getNotFoundCacheTimeToLive() );
+                shadowRepository.setUserManaged( shadow.isUserManaged() );
 
                 shadowRepository.setItemMaxAge( ( (MavenRepository) master ).getItemMaxAge() );
             }
@@ -380,6 +383,7 @@ public class DefaultApplicationRuntimeConfigurationBuilder
                 shadowRepository.setProxyMode( null );
                 shadowRepository.setIndexable( false );
                 shadowRepository.setNotFoundCacheTimeToLive( master.getNotFoundCacheTimeToLive() );
+                shadowRepository.setUserManaged( shadow.isUserManaged() );
 
                 shadowRepository.setItemMaxAge( ( (MavenRepository) master ).getItemMaxAge() );
             }
@@ -398,6 +402,7 @@ public class DefaultApplicationRuntimeConfigurationBuilder
                 shadowRepository.setProxyMode( null );
                 shadowRepository.setIndexable( false );
                 shadowRepository.setNotFoundCacheTimeToLive( master.getNotFoundCacheTimeToLive() );
+                shadowRepository.setUserManaged( shadow.isUserManaged() );
 
                 shadowRepository.setItemMaxAge( ( (MavenRepository) master ).getItemMaxAge() );
 

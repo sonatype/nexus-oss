@@ -237,6 +237,21 @@ public interface Repository
     void setIndexable( boolean val );
 
     /**
+     * If is user managed, the nexus core and nexus core UI handles the repository. Thus, users are allowed to edit/drop
+     * the repository.
+     * 
+     * @return
+     */
+    boolean isUserManaged();
+
+    /**
+     * Sets is the repository user managed.
+     * 
+     * @param val
+     */
+    void setUserManaged( boolean val );
+
+    /**
      * Returns the local URL of this repository, if any.
      * 
      * @return local url of this repository, null otherwise.

@@ -293,6 +293,12 @@
     public static final String MODEL_VERSION = "1.0.6";
 ]]></code>
                 </codeSegment>
+                <codeSegment>
+                    <version>1.0.7</version>
+                    <code><![CDATA[
+    public static final String MODEL_VERSION = "1.0.7";
+]]></code>
+                </codeSegment>
 			</codeSegments>
 		</class>
 
@@ -733,6 +739,16 @@
 					<defaultValue>false</defaultValue>
 				</field>
 				<field>
+					<name>userManaged</name>
+					<version>1.0.7+</version>
+					<type>boolean</type>
+					<required>true</required>
+					<description>
+						If true, repository is user managed, and it is allowed to be edited/dropped by users.
+					</description>
+					<defaultValue>true</defaultValue>
+				</field>
+				<field>
 					<name>browseable</name>
 					<version>1.0.0+</version>
 					<type>boolean</type>
@@ -1106,6 +1122,16 @@
 						If true, the shadow will sync with master at startup. It may cause longer startup time of Nexus.
 					</description>
 					<defaultValue>false</defaultValue>
+				</field>
+				<field>
+					<name>userManaged</name>
+					<version>1.0.7+</version>
+					<type>boolean</type>
+					<required>true</required>
+					<description>
+						If true, repository is user managed, and it is allowed to be edited/dropped by users.
+					</description>
+					<defaultValue>true</defaultValue>
 				</field>
 				<field>
 					<name>realmId</name>

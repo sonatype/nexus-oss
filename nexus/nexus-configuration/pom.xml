@@ -91,7 +91,7 @@
 							<goal>xpp3-writer</goal>
 						</goals>
 						<configuration>
-							<version>1.0.6</version>
+							<version>1.0.7</version>
 							<packagedVersions>
 								<packagedVersion>1.0.0</packagedVersion>
 								<packagedVersion>1.0.1</packagedVersion>
@@ -99,6 +99,7 @@
 								<packagedVersion>1.0.3</packagedVersion>
 								<packagedVersion>1.0.4</packagedVersion>
 								<packagedVersion>1.0.5</packagedVersion>
+								<packagedVersion>1.0.6</packagedVersion>
 							</packagedVersions>
 							<model>src/main/mdo/nexus.xml</model>
 						</configuration>

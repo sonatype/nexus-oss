@@ -157,6 +157,9 @@ public abstract class AbstractRepository
 
     /** The indexable. */
     private boolean indexable = true;
+    
+    /** User managed */
+    private boolean userManaged = true;
 
     /** The local storage. */
     private LocalRepositoryStorage localStorage;
@@ -415,6 +418,16 @@ public abstract class AbstractRepository
     public void setBrowseable( boolean browseable )
     {
         this.browseable = browseable;
+    }
+
+    public boolean isUserManaged()
+    {
+        return userManaged;
+    }
+
+    public void setUserManaged( boolean userManaged )
+    {
+        this.userManaged = userManaged;
     }
 
     public int getNotFoundCacheTimeToLive()
