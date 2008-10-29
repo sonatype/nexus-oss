@@ -392,6 +392,13 @@ public class DefaultNexus
     {
         nexusConfiguration.setSecurityEnabled( enabled );
     }
+    
+    public void setRealms( List<String> realms )
+        throws IOException
+    {
+        nexusConfiguration.getRealms().clear();
+        nexusConfiguration.setRealms( realms );
+    }
 
     public boolean isAnonymousAccessEnabled()
     {

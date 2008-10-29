@@ -128,6 +128,7 @@
             <privileges>
                 <privilege>3</privilege>
                 <privilege>4</privilege>
+                <privilege>73</privilege>
             </privileges>
         </role>
         <role>
@@ -211,6 +212,7 @@
                 <privilege>39</privilege>
                 <privilege>40</privilege>
                 <privilege>41</privilege>
+                <privilege>72</privilege>
             </privileges>
         </role>
         <role>
@@ -1452,6 +1454,22 @@
                 <property>
                     <key>permission</key>
                     <value>nexus:userssetpw</value>
+                </property>
+            </properties>
+        </privilege>
+        <privilege>
+            <id>73</id>
+            <type>method</type>
+            <name>Realm Types Component - (read)</name>
+            <description>Give permission to retrieve list of support realms available in nexus.</description>
+            <properties>
+                <property>
+                    <key>method</key>
+                    <value>read</value>
+                </property>
+                <property>
+                    <key>permission</key>
+                    <value>nexus:componentrealmtypes</value>
                 </property>
             </properties>
         </privilege>

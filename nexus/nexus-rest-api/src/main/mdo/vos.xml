@@ -328,6 +328,15 @@
 					<type>String</type>
 					<required>true</required>
 				</field>
+                <field>
+                    <name>securityRealms</name>
+                    <version>1.0.0+</version>
+                    <association>
+                        <type>String</type>
+                        <multiplicity>*</multiplicity>
+                    </association>
+                    <required>true</required>
+                </field>
 				<field>
 					<name>baseUrl</name>
 					<version>1.0.0+</version>

@@ -1,6 +1,7 @@
 package org.sonatype.nexus.rest.global;
 
 import java.io.IOException;
+import java.util.List;
 
 import org.codehaus.plexus.util.StringUtils;
 import org.jsecurity.authc.AuthenticationException;
@@ -200,6 +201,8 @@ public class GlobalConfigurationPlexusResource
                     {
                         getNexusInstance( request ).updateGlobalRemoteHttpProxySettings( null );
                     }
+                    
+                    getNexusInstance( request ).setRealms( ( List<String> ) resource.getSecurityRealms() );
 
                     getNexusInstance( request ).setSecurityEnabled( resource.isSecurityEnabled() );
 
@@ -311,6 +314,8 @@ public class GlobalConfigurationPlexusResource
         resource.setSecurityEnabled( nexus.isDefaultSecurityEnabled() );
 
         resource.setSecurityAnonymousAccessEnabled( nexus.isDefaultAnonymousAccessEnabled() );
+        
+        resource.setSecurityRealms( nexus.getDefaultRealms() );
 
         resource.setSecurityAnonymousUsername( nexus.getDefaultAnonymousUsername() );
 
@@ -333,6 +338,8 @@ public class GlobalConfigurationPlexusResource
         resource.setSecurityEnabled( nexus.isSecurityEnabled() );
 
         resource.setSecurityAnonymousAccessEnabled( nexus.isAnonymousAccessEnabled() );
+        
+        resource.setSecurityRealms( nexus.getRealms() );
 
         resource.setSecurityAnonymousUsername( nexus.getAnonymousUsername() );
 

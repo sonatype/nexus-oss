@@ -277,7 +277,9 @@ public class DefaultApplicationConfigurationValidator
         {
             if ( settings.getRealms().size() == 0 )
             {
-                settings.addRealm( PlexusConstants.PLEXUS_DEFAULT_HINT );
+                settings.addRealm( "XmlAuthenticatingRealm" );
+                settings.addRealm( "NexusMethodAuthorizingRealm" );
+                settings.addRealm( "NexusTargetAuthorizingRealm" );
 
                 response.addValidationWarning( "Security is enabled, but no realm is set, setting 'default' realm." );
 

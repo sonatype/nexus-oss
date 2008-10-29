@@ -68,6 +68,9 @@ public interface MutableConfiguration
         throws IOException;
 
     List<String> getRealms();
+    
+    void setRealms( List<String> realms )
+        throws IOException;
 
     // ----------------------------------------------------------------------------
     // ContentClasses
