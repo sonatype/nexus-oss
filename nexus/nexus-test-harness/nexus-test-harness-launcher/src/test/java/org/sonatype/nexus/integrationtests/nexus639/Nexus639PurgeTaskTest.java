@@ -12,7 +12,6 @@ import org.sonatype.nexus.tasks.descriptors.PurgeTimelineTaskDescriptor;
 import org.sonatype.nexus.test.utils.FeedUtil;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 
-import com.sun.syndication.feed.atom.Entry;
 import com.sun.syndication.feed.synd.SyndEntry;
 import com.sun.syndication.feed.synd.SyndFeed;
 

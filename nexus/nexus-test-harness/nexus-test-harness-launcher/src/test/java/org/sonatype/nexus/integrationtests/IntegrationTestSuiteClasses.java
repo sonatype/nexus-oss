@@ -142,6 +142,7 @@ import org.sonatype.nexus.integrationtests.upgrades.nexus652.Nexus652Beta5To10Up
     Nexus634KeepNewSnapshotsTest.class,
     Nexus634KeepTwoSnapshotsTest.class,
     Nexus636EvictUnusedProxiedTaskTest.class,
+    Nexus639PurgeTaskTest.class,
     Nexus598ClassnameSearchTest.class,
     Nexus640RebuildRepositoryAttributesTaskTest.class,
     Nexus531RepositoryCrudValidationTests.class,
