@@ -14,6 +14,8 @@ import org.sonatype.nexus.rest.model.RepositoryRouteResource;
 import org.sonatype.nexus.test.utils.NexusConfigUtil;
 import org.sonatype.nexus.test.utils.RoutesMessageUtil;
 
+import com.thoughtworks.xstream.XStream;
+
 /**
  * CRUD tests for XML request/response.
  */
@@ -25,8 +27,7 @@ public class Nexus385RoutesCrudXmlTests
 
     public Nexus385RoutesCrudXmlTests()
     {
-        this.messageUtil =
-            new RoutesMessageUtil( this.getXMLXStream(), MediaType.APPLICATION_XML );
+        this.messageUtil = new RoutesMessageUtil( this.getXMLXStream(), MediaType.APPLICATION_XML );
     }
 
     @Test
@@ -59,7 +60,14 @@ public class Nexus385RoutesCrudXmlTests
         if ( !response.getStatus().isSuccess() )
         {
             String responseText = response.getEntity().getText();
-            Assert.fail( "Could not create privilege: " + response.getStatus() + "\nresponse:\n" + responseText );
+            try
+            {
+                Assert.fail( "Could not create privilege: " + response.getStatus() + "\nresponse:\n" + responseText );
+            }
+            catch ( NullPointerException e )
+            {
+                Assert.fail( new XStream().toXML( response ) );
+            }
         }
 
         // get the Resource object
@@ -147,7 +155,6 @@ public class Nexus385RoutesCrudXmlTests
 
     }
 
-    @SuppressWarnings( "unchecked" )
     @Test
     public void deleteTest()
         throws IOException
