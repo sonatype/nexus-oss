@@ -26,6 +26,7 @@ import org.sonatype.nexus.rest.model.PrivilegeTargetResource;
 import org.sonatype.nexus.rest.model.RepositoryTargetResource;
 import org.sonatype.nexus.test.utils.DeployUtils;
 import org.sonatype.nexus.test.utils.MavenDeployer;
+import org.sonatype.nexus.test.utils.TargetMessageUtil;
 
 /**
  * Creates a few repo targets and make sure the privileges work correctly.
@@ -426,6 +427,9 @@ public class Nexus537RepoTargetsTests
     {
         super.oncePerClassSetUp();
 
+        // clean up before start
+        TargetMessageUtil.removeAllTarget();
+
         // create my repo targets
         RepositoryTargetResource fooTarget = new RepositoryTargetResource();
         fooTarget.setContentClass( "maven2" );
@@ -536,7 +540,7 @@ public class Nexus537RepoTargetsTests
 
     }
 
-    //TODO This will be no longer required when NEXUS-1018 is fixed
+    // TODO This will be no longer required when NEXUS-1018 is fixed
     private boolean contains( String foundMethod, String... expectedMethods )
     {
         List<String> foundMethods = new ArrayList<String>( Arrays.asList( foundMethod.split( "," ) ) );

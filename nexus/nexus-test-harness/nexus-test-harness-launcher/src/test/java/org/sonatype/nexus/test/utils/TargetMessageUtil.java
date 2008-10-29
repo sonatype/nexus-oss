@@ -12,6 +12,7 @@ import org.codehaus.plexus.util.StringUtils;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
+import org.restlet.data.Status;
 import org.sonatype.nexus.configuration.model.CRepositoryTarget;
 import org.sonatype.nexus.configuration.model.Configuration;
 import org.sonatype.nexus.integrationtests.RequestFacade;
@@ -83,7 +84,7 @@ public class TargetMessageUtil
     }
 
     @SuppressWarnings( "unchecked" )
-    public List<RepositoryTargetListResource> getList()
+    public static List<RepositoryTargetListResource> getList()
         throws IOException
     {
 
@@ -217,6 +218,18 @@ public class TargetMessageUtil
             }
         }
 
+    }
+
+    public static void removeAllTarget()
+        throws IOException
+    {
+        List<RepositoryTargetListResource> targets = getList();
+        for ( RepositoryTargetListResource target : targets )
+        {
+            Status status =
+                RequestFacade.sendMessage( "service/local/repo_targets/" + target.getId(), Method.DELETE ).getStatus();
+            Assert.assertTrue( "", status.isSuccess() );
+        }
     }
 
 }
