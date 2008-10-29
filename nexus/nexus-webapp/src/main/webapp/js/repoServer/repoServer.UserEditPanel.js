@@ -399,7 +399,7 @@ Sonatype.repoServer.UserEditPanel = function(config){
     deferredRender: false,
     columns: [
       {header: 'User ID', dataIndex: 'userId', width:120, id: 'user-config-userid-col'},
-      {header: 'Read Only', dataIndex: 'readOnly', width:80, id: 'user-config-readonly-col'},
+      {header: 'Internal', dataIndex: 'readOnly', width:80, id: 'user-config-readonly-col'},
       {header: 'Name', dataIndex: 'name', width:175, id: 'user-config-name-col'},
       {header: 'Email', dataIndex: 'email', width:175, id: 'user-config-email-col'},
       {header: 'Status', dataIndex: 'status', width:75, id: 'user-config-status-col'},

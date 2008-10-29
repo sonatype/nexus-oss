@@ -351,7 +351,7 @@ Sonatype.repoServer.PrivilegeEditPanel = function(config){
     deferredRender: false,
     columns: [
       {header: 'Name', dataIndex: 'name', width:175, id: 'privilege-config-name-col'},
-      {header: 'Read Only', dataIndex: 'readOnly', width:80 ,id: 'privilege-config-readonly-col'},
+      {header: 'Internal', dataIndex: 'readOnly', width:80 ,id: 'privilege-config-readonly-col'},
       {header: 'Type', dataIndex: 'type', width:175, id: 'privilege-config-type-col'},
       {header: 'Target', dataIndex: 'sTarget', width:175, id: 'privilege-config-target-col'},
       {header: 'Method', dataIndex: 'method', width:175, id: 'privilege-config-method-col'}
