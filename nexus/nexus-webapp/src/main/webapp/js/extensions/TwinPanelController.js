@@ -256,23 +256,30 @@ Sonatype.ext.TwinPanelChooser = function( config ){
       }
     ]
   });
-  
+
   if ( this.store ) {
-    var root = this.getComponent( 2 ).root;
-    this.store.each( function( rec ) {
-      root.appendChild( new Ext.tree.TreeNode( {
-        id: rec.id,
-        text: rec.get( this.displayField ),
-        payload: rec,
-        allowChildren: false,
-        draggable: true,
-        leaf: true
-      }));
-    }, this );
+    this.loadStore();
+    this.store.on( 'load', this.loadStore, this );
   }
 };
 
 Ext.extend( Sonatype.ext.TwinPanelChooser, Ext.Panel, {
+
+  loadStore: function() {
+    if ( this.store ) {
+      var root = this.getComponent( 2 ).root;
+      this.store.each( function( rec ) {
+        root.appendChild( new Ext.tree.TreeNode( {
+          id: rec.id,
+          text: rec.get( this.displayField ),
+          payload: rec,
+          allowChildren: false,
+          draggable: true,
+          leaf: true
+        }));
+      }, this );
+    }
+  },
   
   markTreeInvalid : function( tree, errortext ) {
     if ( tree == null ) {

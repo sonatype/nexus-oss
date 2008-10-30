@@ -39,28 +39,7 @@ Sonatype.repoServer.ServerEditPanel = function(config){
   this.realmTypeDataStore = new Ext.data.Store({
     url: Sonatype.config.repos.urls.realmComponents,
     reader: this.realmTypeReader,
-    autoLoad: true,
-    listeners: {
-      'load' : {
-        fn: function() {
-        var allTree = Ext.getCmp('all_realms_tree');
-  
-    this.realmTypeDataStore.each(function(item, i, len){
-      allTree.root.appendChild(
-        new Ext.tree.TreeNode({
-          id: item.data.roleHint,
-          text: item.data.roleHint,
-          payload: item.data.roleHint, //sonatype added attribute
-          allowChildren: false,
-          draggable: true,
-          leaf: true
-        })
-      );
-    }, this);
-        },
-        scope: this
-      }
-    }
+    autoLoad: true
   });
   
   // help text alias
@@ -241,126 +220,16 @@ Sonatype.repoServer.ServerEditPanel = function(config){
             allowBlank: false
           },
           {
-              xtype: 'panel',
-              id: 'realms_tree_panel',
-              layout: 'column',
-              autoHeight: true,
-              style: 'padding: 10px 0 10px 0',
-              
-              items: [
-                {
-                  xtype: 'treepanel',
-                  id: 'realms_tree', //note: unique ID is assinged before instantiation
-                  title: 'Selected Realms',
-                  cls: 'required-field',
-                  root: new Ext.tree.TreeNode({text: 'root'}),
-                  border: true, //note: this seem to have no effect w/in form panel
-                  bodyBorder: true, //note: this seem to have no effect w/in form panel
-                  //note: this style matches the expected behavior
-                  bodyStyle: 'background-color:#FFFFFF; border: 1px solid #B5B8C8',
-                  width: 225,
-                  height: Ext.isGecko ? 240 : 200,
-                  animate:true,
-                  lines: false,
-                  autoScroll:true,
-                  containerScroll: true,
-                  //@note: root node must be instantiated uniquely for each instance of treepanel
-                  //@ext: can TreeNode be registerd as a component with an xtype so this new root node
-                  //      may be instantiated uniquely for each form panel that uses this config?
-                  rootVisible: false,
-
-                  enableDD: true,
-                  ddScroll: true,
-                  dropConfig: {
-                    allowContainerDrop: true,
-                    onContainerDrop: function(source, e, data){
-                      this.tree.root.appendChild(data.node);
-                      return true;
-                    },
-                    onContainerOver:function(source, e, data){return this.dropAllowed;},
-                    // passign padding to make whole treePanel the drop zone.  This is dependent
-                    // on a sonatype fix in the Ext.dd.DropTarget class.  This is necessary
-                    // because treepanel.dropZone.setPadding is never available in time to be useful.
-                    padding: [0,0,274,0]
-                  },
-                  // added Field values to simulate form field validation
-                  invalidText: 'One or more realms are required',
-                  validate: function(){
-                    return (this.root.childNodes.length > 0);
-                  },
-                  invalid: false,
-                  listeners: {
-                    'append' : {
-                      fn: function(tree, parentNode, insertedNode, i) {
-                        if (tree.invalid) {
-                          //remove error messaging
-                          tree.getEl().child('.x-panel-body').setStyle({
-                            'background-color' : '#FFFFFF',
-                            border : '1px solid #B5B8C8'
-                          });
-                          Ext.form.Field.msgFx['normal'].hide(tree.errorEl, tree);
-                        }
-                      },
-                      scope: this
-                    },
-                    'remove' : {
-                      fn: function(tree, parentNode, removedNode) {
-                        if(tree.root.childNodes.length < 1) {
-                          this.ownerCt.markTreeInvalid(tree);
-                        }
-                        else if (tree.invalid) {
-                          //remove error messaging
-                          tree.getEl().child('.x-panel-body').setStyle({
-                            'background-color' : '#FFFFFF',
-                            border : '1px solid #B5B8C8'
-                          });
-                          Ext.form.Field.msgFx['normal'].hide(tree.errorEl, tree);
-                        }
-                      },
-                      scope: this
-                    }
-                  }
-                },
-                {
-                  xtype: 'twinpanelcontroller'
-                },
-                {
-                  xtype: 'treepanel',
-                  id: 'all_realms_tree', //note: unique ID is assinged before instantiation
-                  title: 'Available Realms',
-                  root: new Ext.tree.TreeNode({text: 'root'}),
-                  border: true, //note: this seem to have no effect w/in form panel
-                  bodyBorder: true, //note: this seem to have no effect w/in form panel
-                  //note: this style matches the expected behavior
-                  bodyStyle: 'background-color:#FFFFFF; border: 1px solid #B5B8C8',
-                  width: 225,
-                  height: Ext.isGecko ? 240 : 200,
-                  animate:true,
-                  lines: false,
-                  autoScroll:true,
-                  containerScroll: true,
-                  //@note: root node must be instantiated uniquely for each instance of treepanel
-                  //@ext: can TreeNode be registerd as a component with an xtype so this new root node
-                  //      may be instantiated uniquely for each form panel that uses this config?
-                  rootVisible: false,
-
-                  enableDD: true,
-                  ddScroll: true,
-                  dropConfig: {
-                    allowContainerDrop: true,
-                    onContainerDrop: function(source, e, data){
-                      this.tree.root.appendChild(data.node);
-                      return true;
-                    },
-                    onContainerOver:function(source, e, data){return this.dropAllowed;},
-                    // passign padding to make whole treePanel the drop zone.  This is dependent
-                    // on a sonatype fix in the Ext.dd.DropTarget class.  This is necessary
-                    // because treepanel.dropZone.setPadding is never available in time to be useful.
-                    padding: [0,0,274,0]
-                  }
-                }
-                ]
-              },
+            xtype: 'twinpanelchooser',
+            titleLeft: 'Selected Realms',
+            titleRight: 'Available Realms',
+            name: 'securityRealms',
+            valueField: 'roleHint',
+            displayField: 'roleHint',
+            store: this.realmTypeDataStore,
+            required: true,
+            halfSize: true
+          },
           {
             xtype: 'fieldset',
             checkboxToggle:true,
@@ -663,38 +532,12 @@ Ext.extend(Sonatype.repoServer.ServerEditPanel, Ext.Panel, {
       }
     }, this); // "this" is RepoEditPanel
   },
-  markTreeInvalid : function(tree) {
-      var elp = tree.getEl();
-      
-      if(!tree.errorEl){
-          tree.errorEl = elp.createChild({cls:'x-form-invalid-msg'});
-          tree.errorEl.setWidth(elp.getWidth(true)); //note removed -20 like on form fields
-      }
-      tree.invalid = true;
-      tree.errorEl.update(tree.invalidText);
-      elp.child('.x-panel-body').setStyle({
-        'background-color' : '#fee',
-        border : '1px solid #dd7870'
-      });
-      Ext.form.Field.msgFx['normal'].show(tree.errorEl, tree);  
-    },
-  
-  
   
   saveBtnHandler : function() {
-      var allValid = this.form.isValid();
-      
-      //form validation of repository treepanel
-      var selectedTree = Ext.getCmp('realms_tree');
-      var treeValid = selectedTree.validate.call(selectedTree);
-      
-      if (!treeValid) {
-        this.ownerCt.markTreeInvalid(selectedTree);
-      }
-      
-      allValid = (allValid && treeValid);
-      
-      if (allValid) {
+    var allValid = this.form.isValid() &&
+      this.find( 'name', 'securityRealms' )[0].validate();
+    
+    if (allValid) {
       this.save();
     }
   },
@@ -721,17 +564,8 @@ Ext.extend(Sonatype.repoServer.ServerEditPanel, Ext.Panel, {
         "routing.groups.stopItemSearchOnFirstFoundFile" : Sonatype.utils.convert.stringContextToBool,
         "routing.groups.mergeMetadata" : Sonatype.utils.convert.stringContextToBool,
         "securityRealms" : function(val, fpanel){
-            var tree = Ext.getCmp('realms_tree');
-    
-            var outputArr = [];
-            var nodes = tree.root.childNodes;
-    
-            for(var i = 0; i < nodes.length; i++){
-              outputArr[i] = nodes[i].attributes.payload;
-            }
-    
-            return outputArr;
-          },
+          return fpanel.find( 'name', 'securityRealms' )[0].getValue();
+        },
         "baseUrl" : Sonatype.utils.returnValidStr
       },
       serviceDataObj : Sonatype.repoServer.referenceData.globalSettingsState
@@ -763,33 +597,9 @@ Ext.extend(Sonatype.repoServer.ServerEditPanel, Ext.Panel, {
         "routing.groups.stopItemSearchOnFirstFoundFile" : Sonatype.utils.capitalize,
         "routing.groups.mergeMetadata" : Sonatype.utils.capitalize,
         "securityRealms" : function(arr, srcObj, fpanel){
-            var selectedTree = Ext.getCmp('realms_tree');
-            var allTree = Ext.getCmp('all_realms_tree');
-    
-            var priv;
-    
-            for(var i=0; i<arr.length; i++){
-                selectedTree.root.appendChild(
-                  new Ext.tree.TreeNode({
-                    id: arr[i],
-                    text: arr[i],
-                    payload: arr[i], //sonatype added attribute
-                    allowChildren: false,
-                    draggable: true,
-                    leaf: true
-                  })
-                );
-            }
-            
-            fpanel.ownerCt.realmTypeDataStore.each(function(item, i, len){
-              var nodeSelected = selectedTree.getNodeById(item.data.roleHint);
-              if(nodeSelected){
-                allTree.root.removeChild(allTree.getNodeById(item.data.roleHint));
-              }
-            });
-            
-            return arr; //return arr, even if empty to comply with sonatypeLoad data modifier requirement
-          },
+          fpanel.find( 'name', 'securityRealms' )[0].setValue( arr );
+          return arr; //return arr, even if empty to comply with sonatypeLoad data modifier requirement
+        },
         "baseUrl" : function(str) {
             if (!Ext.isEmpty(str)){
               appSettingsPanel.expand();
