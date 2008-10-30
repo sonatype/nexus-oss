@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>org.sonatype.nexus</groupId>
 		<artifactId>nexus-parent</artifactId>
-		<version>5-SNAPSHOT</version>
+		<version>5</version>
 	</parent>
 	<artifactId>nexus</artifactId>
 	<packaging>pom</packaging>
@@ -188,7 +188,7 @@
 			<dependency>
 				<groupId>org.sonatype.plexus</groupId>
 				<artifactId>plexus-task-scheduler</artifactId>
-				<version>1.0-SNAPSHOT</version>
+				<version>1.0</version>
 			</dependency>
 			<dependency>
 				<groupId>org.sonatype.plexus</groupId>
