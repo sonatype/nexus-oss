@@ -114,7 +114,7 @@ public class Nexus450UserCreationTest
         throws Exception
     {
         TestContainer.getInstance().getTestContext().useAdminForRequests();
-        userUtil.removeUser( USER_ID );
+        UserMessageUtil.removeUser( USER_ID );
     }
 
 }
