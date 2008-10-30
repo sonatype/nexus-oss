@@ -223,7 +223,7 @@ public class Nexus688ReindexOnRepoAdd
 
             try
             {
-                IOUtils.toString( (InputStream) new URL( repositoryUrl + ".index" ).getContent() );
+                IOUtils.toString( (InputStream) new URL( repositoryUrl + ".index/" ).getContent() );
                 return true;
             }
             catch ( FileNotFoundException e )
