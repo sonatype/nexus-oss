@@ -1,6 +1,7 @@
 package org.sonatype.nexus.test.utils;
 
 import java.io.IOException;
+import java.net.URL;
 import java.util.Iterator;
 import java.util.List;
 
@@ -11,10 +12,13 @@ import org.codehaus.plexus.util.StringUtils;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
+import org.restlet.data.Status;
 import org.sonatype.nexus.configuration.model.CGroupsSettingPathMappingItem;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.rest.model.NexusError;
 import org.sonatype.nexus.rest.model.NexusErrorResponse;
+import org.sonatype.nexus.rest.model.RepositoryRouteListResource;
+import org.sonatype.nexus.rest.model.RepositoryRouteListResourceResponse;
 import org.sonatype.nexus.rest.model.RepositoryRouteMemberRepository;
 import org.sonatype.nexus.rest.model.RepositoryRouteResource;
 import org.sonatype.nexus.rest.model.RepositoryRouteResourceResponse;
@@ -137,6 +141,44 @@ public class RoutesMessageUtil
 
         }
 
+    }
+
+    @SuppressWarnings( "unchecked" )
+    public static List<RepositoryRouteListResource> getList()
+        throws IOException
+    {
+        String serviceURI = "service/local/repo_routes";
+
+        Response response = RequestFacade.doGetRequest( serviceURI );
+        Status status = response.getStatus();
+        Assert.assertTrue( "Unable to get routes: " + status.getDescription(), status.isSuccess() );
+
+        XStreamRepresentation representation =
+            new XStreamRepresentation( XStreamFactory.getXmlXStream(), response.getEntity().getText(),
+                                       MediaType.APPLICATION_XML );
+
+        RepositoryRouteListResourceResponse resourceResponse =
+            (RepositoryRouteListResourceResponse) representation.getPayload( new RepositoryRouteListResourceResponse() );
+
+        return resourceResponse.getData();
+    }
+
+    public static void removeAllRoutes()
+        throws IOException
+    {
+        List<RepositoryRouteListResource> routes = getList();
+        for ( RepositoryRouteListResource route : routes )
+        {
+            Status status = delete( route.getResourceURI() ).getStatus();
+            Assert.assertTrue( "Unable to delete route: '" + route.getResourceURI() + "', due to: "
+                + status.getDescription(), status.isSuccess() );
+        }
+    }
+
+    public static Response delete( String resourceUri )
+        throws IOException
+    {
+        return RequestFacade.sendMessage( new URL( resourceUri ), Method.DELETE, null );
     }
 
 }

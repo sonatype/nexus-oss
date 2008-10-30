@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import junit.framework.Assert;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
@@ -28,6 +29,13 @@ public class Nexus385RoutesCrudXmlTests
     public Nexus385RoutesCrudXmlTests()
     {
         this.messageUtil = new RoutesMessageUtil( this.getXMLXStream(), MediaType.APPLICATION_XML );
+    }
+
+    @Before
+    public void cleanRoutes()
+        throws IOException
+    {
+        RoutesMessageUtil.removeAllRoutes();
     }
 
     @Test
