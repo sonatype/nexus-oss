@@ -384,6 +384,9 @@
                 <port>
                   <name>nexus-control-port</name>
                 </port>
+                <port>
+                  <name>email-server-port</name>
+                </port>
               </ports>
             </configuration>
           </execution>

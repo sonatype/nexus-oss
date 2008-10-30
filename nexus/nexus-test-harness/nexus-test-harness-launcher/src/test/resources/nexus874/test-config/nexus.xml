@@ -4,7 +4,7 @@
   
     <smtpConfiguration>
     <host>localhost</host>
-    <port>3025</port>
+    <port>${email-server-port}</port>
     <sslEnabled>false</sslEnabled>
     <tlsEnabled>false</tlsEnabled>
     <username>smtp-username</username>
