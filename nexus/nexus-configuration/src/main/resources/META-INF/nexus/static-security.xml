@@ -36,6 +36,7 @@
                 <privilege>57</privilege>
                 <privilege>58</privilege>
                 <privilege>70</privilege>
+                <privilege>74</privilege>
             </privileges>
             <roles>
                 <role>ui-repo-browser</role>
@@ -199,6 +200,7 @@
                 <privilege>48</privilege>
                 <privilege>56</privilege>
                 <privilege>70</privilege>
+                <privilege>74</privilege>
             </privileges>
         </role>
         <role>
@@ -1470,6 +1472,22 @@
                 <property>
                     <key>permission</key>
                     <value>nexus:componentrealmtypes</value>
+                </property>
+            </properties>
+        </privilege>
+        <privilege>
+            <id>74</id>
+            <type>method</type>
+            <name>Repository Types - (read)</name>
+            <description>Give permission to retrieve the list of repository types supported by nexus.</description>
+            <properties>
+                <property>
+                    <key>method</key>
+                    <value>read</value>
+                </property>
+                <property>
+                    <key>permission</key>
+                    <value>nexus:componentsrepotypes</value>
                 </property>
             </properties>
         </privilege>
