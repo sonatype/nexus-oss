@@ -60,7 +60,7 @@ public abstract class AbstractRepositoryTargetPlexusResource extends AbstractNex
         {
             if ( resource.getId() == null )
             {
-                resource.setId( Long.toHexString( System.currentTimeMillis() ) );
+                resource.setId( Long.toHexString( System.nanoTime() ) );
             }
         }
 
