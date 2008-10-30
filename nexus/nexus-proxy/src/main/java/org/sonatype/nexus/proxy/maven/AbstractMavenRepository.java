@@ -40,6 +40,7 @@ import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.attributes.inspectors.DigestCalculatingInspector;
 import org.sonatype.nexus.proxy.events.RepositoryEventEvictUnusedItems;
 import org.sonatype.nexus.proxy.events.RepositoryEventRecreateAttributes;
+import org.sonatype.nexus.proxy.events.RepositoryEventRecreateMavenMetadata;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
@@ -128,6 +129,19 @@ public abstract class AbstractMavenRepository
 
         notifyProximityEventListeners( new RepositoryEventRecreateAttributes( this ) );
 
+        return true;
+    }
+    
+    public boolean recreateMavenMetadata (String path )
+    {
+        getLogger().info( "Recreating Maven medadata on repository " + getId() );
+        
+        RecreateMavenMetadataWalker walker = new RecreateMavenMetadataWalker ( this, getLogger() );
+        
+        walker.walk( path, true, false );
+        
+        notifyProximityEventListeners( new RepositoryEventRecreateMavenMetadata( this ) );
+        
         return true;
     }
 

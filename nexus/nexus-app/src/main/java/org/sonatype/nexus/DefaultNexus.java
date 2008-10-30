@@ -1411,6 +1411,9 @@ public class DefaultNexus
 
         for ( Repository repo : reposes )
         {
+            //create maven metadata first, checksum files should be created based on this
+            repo.recreateMavenMetadata( path );
+            
             repo.recreateAttributes( path, null );
         }
     }
@@ -1419,6 +1422,8 @@ public class DefaultNexus
         throws NoSuchRepositoryException,
             IOException
     {
+        repositoryRegistry.getRepository( repositoryId ).recreateMavenMetadata( path );
+        
         repositoryRegistry.getRepository( repositoryId ).recreateAttributes( path, null );
     }
 
@@ -1430,6 +1435,8 @@ public class DefaultNexus
 
         for ( Repository repo : reposes )
         {
+            repo.recreateMavenMetadata( path );
+            
             repo.recreateAttributes( path, null );
         }
     }

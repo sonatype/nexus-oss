@@ -49,6 +49,7 @@ import org.sonatype.nexus.proxy.events.RepositoryEventEvictUnusedItems;
 import org.sonatype.nexus.proxy.events.RepositoryEventLocalStatusChanged;
 import org.sonatype.nexus.proxy.events.RepositoryEventProxyModeChanged;
 import org.sonatype.nexus.proxy.events.RepositoryEventRecreateAttributes;
+import org.sonatype.nexus.proxy.events.RepositoryEventRecreateMavenMetadata;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventDelete;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventRetrieve;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventStore;
@@ -61,6 +62,7 @@ import org.sonatype.nexus.proxy.item.RepositoryItemUidFactory;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
+import org.sonatype.nexus.proxy.maven.RecreateMavenMetadataWalker;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.proxy.storage.local.LocalRepositoryStorage;
 import org.sonatype.nexus.proxy.storage.remote.RemoteRepositoryStorage;
@@ -657,6 +659,19 @@ public abstract class AbstractRepository
 
         notifyProximityEventListeners( new RepositoryEventRecreateAttributes( this ) );
 
+        return true;
+    }
+    
+    public boolean recreateMavenMetadata (String path )
+    {
+        getLogger().info( "Recreating Maven medadata on repository " + getId() );
+        
+        RecreateMavenMetadataWalker walker = new RecreateMavenMetadataWalker ( this, getLogger() );
+        
+        walker.walk( path, true, false );
+        
+        notifyProximityEventListeners( new RepositoryEventRecreateMavenMetadata( this ) );
+        
         return true;
     }
 
