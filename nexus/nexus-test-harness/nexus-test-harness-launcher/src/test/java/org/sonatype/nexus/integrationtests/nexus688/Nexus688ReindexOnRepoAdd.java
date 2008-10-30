@@ -27,11 +27,11 @@ public class Nexus688ReindexOnRepoAdd
 
     private static final String INDEX_FILE = ".index/nexus-maven-repository-index.zip";
 
-    private static final int SLEEP_TIME = 2000;
+    private static final int SLEEP_TIME = 200;
 
     @Test
     public void repoTestIndexable()
-        throws IOException, InterruptedException
+        throws Exception
     {
 
         // create a repo
@@ -50,7 +50,7 @@ public class Nexus688ReindexOnRepoAdd
         // this also validates
         this.messageUtil.createRepository( resource );
 
-        Thread.sleep( SLEEP_TIME );
+        waitForIndexCreation( 40, resource.getId() );
 
         // check to see if it has an index to download
         File indexFile = this.downloadIndexFromRepository( resource.getId() );
@@ -62,7 +62,7 @@ public class Nexus688ReindexOnRepoAdd
 
     @Test
     public void repoTestNotIndexable()
-        throws IOException, InterruptedException
+        throws Exception
     {
 
         // create a repo
@@ -81,7 +81,7 @@ public class Nexus688ReindexOnRepoAdd
         // this also validates
         this.messageUtil.createRepository( resource );
 
-        Thread.sleep( SLEEP_TIME );
+        waitForIndexCreation( 40, resource.getId() );
 
         // check to see if it has an index to download
         try
@@ -97,7 +97,7 @@ public class Nexus688ReindexOnRepoAdd
 
     @Test
     public void proxyRepoTestIndexableWithInvalidURL()
-        throws IOException, InterruptedException
+        throws Exception
     {
 
         // create a repo
@@ -120,7 +120,7 @@ public class Nexus688ReindexOnRepoAdd
         // this also validates
         this.messageUtil.createRepository( resource );
 
-        Thread.sleep( SLEEP_TIME );
+        waitForIndexCreation( 40, resource.getId() );
 
         // check to see if it has an index to download
         File indexFile = this.downloadIndexFromRepository( resource.getId() );
@@ -132,7 +132,7 @@ public class Nexus688ReindexOnRepoAdd
 
     @Test
     public void proxyRepoTestIndexable()
-        throws IOException, InterruptedException
+        throws Exception
     {
 
         // create a repo
@@ -155,7 +155,7 @@ public class Nexus688ReindexOnRepoAdd
         // this also validates
         this.messageUtil.createRepository( resource );
 
-        Thread.sleep( SLEEP_TIME );
+        waitForIndexCreation( 40, resource.getId() );
 
         // check to see if it has an index to download
         File indexFile = this.downloadIndexFromRepository( resource.getId() );
@@ -167,7 +167,7 @@ public class Nexus688ReindexOnRepoAdd
 
     @Test
     public void proxyRepoTestNotIndexable()
-        throws IOException, InterruptedException
+        throws Exception
     {
 
         // create a repo
@@ -190,7 +190,7 @@ public class Nexus688ReindexOnRepoAdd
         // this also validates
         this.messageUtil.createRepository( resource );
 
-        Thread.sleep( SLEEP_TIME );
+        waitForIndexCreation( 40, resource.getId() );
 
         // check to see if it has an index to download
         try
@@ -209,25 +209,30 @@ public class Nexus688ReindexOnRepoAdd
         throws MalformedURLException, IOException
     {
         String repositoryUrl = this.getRepositoryUrl( repoId );
-        try
+        URL url = new URL( repositoryUrl + INDEX_FILE );
+        return this.downloadFile( url, "target/downloads/index.zip" );
+    }
+
+    private boolean waitForIndexCreation( int maxTimesTowait, String repoId )
+        throws Exception
+    {
+        String repositoryUrl = this.getRepositoryUrl( repoId );
+        for ( int i = 0; i < maxTimesTowait; i++ )
         {
-            URL url = new URL( repositoryUrl + INDEX_FILE );
-            return this.downloadFile( url, "target/downloads/index.zip" );
-        }
-        catch ( FileNotFoundException e )
-        {
-            String files;
+            Thread.sleep( SLEEP_TIME );
+
             try
             {
-                files = IOUtils.toString( (InputStream) new URL( repositoryUrl + ".index" ).getContent() );
+                IOUtils.toString( (InputStream) new URL( repositoryUrl + ".index" ).getContent() );
+                return true;
             }
-            catch ( FileNotFoundException e1 )
+            catch ( FileNotFoundException e )
             {
-                Assert.fail( ".index folder folt found at " + repositoryUrl );
-                throw e1;
+                //means index was not created yet
             }
-            throw new FileNotFoundException( repositoryUrl + "\n Available files: \n" + files );
         }
+
+        return false;
     }
 
 }
