@@ -65,10 +65,15 @@ public class Nexus450UserCreationTest
 
         MimeMessage[] msgs = server.getReceivedMessages();
         String password = null;
+        StringBuilder emailsContent = new StringBuilder();
         for ( MimeMessage mimeMessage : msgs )
         {
+            emailsContent.append( GreenMailUtil.getHeaders( mimeMessage ) ).append( '\n' );
+
             // Sample body: Your new password is ********
             String body = GreenMailUtil.getBody( mimeMessage );
+            emailsContent.append( body ).append( '\n' ).append( '\n' );
+
             int index = body.indexOf( "Your new password is " );
             int passwordStartIndex = index + "Your new password is ".length();
             if ( index != -1 )
@@ -79,7 +84,7 @@ public class Nexus450UserCreationTest
             }
         }
 
-        Assert.assertNotNull( password );
+        Assert.assertNotNull("Didn't recieve a password.  Got the following messages:\n" + emailsContent, password );
 
         // login with generated password
         testContext.setUsername( USER_ID );
