@@ -62,6 +62,7 @@ public class Nexus450UserCreationTest
         // get email
         // two e-mails (first confirming user creating and second with users pw)
         server.waitForIncomingEmail( 1000, 2 );
+        Thread.sleep( 1000 ); //w8 a few more
 
         MimeMessage[] msgs = server.getReceivedMessages();
         String password = null;

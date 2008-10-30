@@ -14,6 +14,7 @@ import junit.framework.Assert;
 import org.apache.commons.httpclient.HttpException;
 import org.apache.maven.it.VerificationException;
 import org.apache.maven.it.Verifier;
+import org.junit.Before;
 import org.junit.Test;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
@@ -105,6 +106,12 @@ public class Nexus537RepoTargetsTests
         repo2FooArtifactDelete =
             new Gav( this.getTestId(), "repo2-foo-artifact-delete", "1.0.0", null, "jar", 0, new Date().getTime(),
                      "repo1-bar-artifact-delete", false, false, null, false, null );
+    }
+
+    @Before
+    public void cleanPrevious() throws IOException {
+        // clean up before start
+        TargetMessageUtil.removeAllTarget();
     }
 
     @Override
@@ -426,9 +433,6 @@ public class Nexus537RepoTargetsTests
         throws Exception
     {
         super.oncePerClassSetUp();
-
-        // clean up before start
-        TargetMessageUtil.removeAllTarget();
 
         // create my repo targets
         RepositoryTargetResource fooTarget = new RepositoryTargetResource();

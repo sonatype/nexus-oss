@@ -228,7 +228,7 @@ public class TargetMessageUtil
         {
             Status status =
                 RequestFacade.sendMessage( "service/local/repo_targets/" + target.getId(), Method.DELETE ).getStatus();
-            Assert.assertTrue( "", status.isSuccess() );
+            Assert.assertTrue( "Failt to delete: " + status.getDescription(), status.isSuccess() );
         }
     }
 
