@@ -1731,7 +1731,7 @@ public class DefaultNexus
 
             hostedTemplate.setId( TEMPLATE_DEFAULT_HOSTED_RELEASE );
 
-            hostedTemplate.setName( "" );
+            hostedTemplate.setName( "Default Release Hosted Repository Template" );
 
             hostedTemplate.setRepositoryPolicy( CRepository.REPOSITORY_POLICY_RELEASE );
 
@@ -1753,7 +1753,7 @@ public class DefaultNexus
 
             hostedTemplate.setId( TEMPLATE_DEFAULT_HOSTED_SNAPSHOT );
 
-            hostedTemplate.setName( "" );
+            hostedTemplate.setName( "Default Snapshot Hosted Repository Template" );
 
             hostedTemplate.setRepositoryPolicy( CRepository.REPOSITORY_POLICY_SNAPSHOT );
 
@@ -1775,7 +1775,7 @@ public class DefaultNexus
 
             proxiedTemplate.setId( TEMPLATE_DEFAULT_PROXY_RELEASE );
 
-            proxiedTemplate.setName( "" );
+            proxiedTemplate.setName( "Default Release Proxy Repository Template" );
 
             proxiedTemplate.setRepositoryPolicy( CRepository.REPOSITORY_POLICY_RELEASE );
 
@@ -1801,7 +1801,7 @@ public class DefaultNexus
 
             proxiedTemplate.setId( TEMPLATE_DEFAULT_PROXY_SNAPSHOT );
 
-            proxiedTemplate.setName( "" );
+            proxiedTemplate.setName( "Default Snapshot Proxy Repository Template" );
 
             proxiedTemplate.setRepositoryPolicy( CRepository.REPOSITORY_POLICY_SNAPSHOT );
 
@@ -1823,7 +1823,7 @@ public class DefaultNexus
 
             shadowTemplate.setId( TEMPLATE_DEFAULT_VIRTUAL );
 
-            shadowTemplate.setName( "" );
+            shadowTemplate.setName( "Default Virtual Repository Template" );
 
             createRepositoryShadowTemplate( shadowTemplate, shouldRecreate );
         }
