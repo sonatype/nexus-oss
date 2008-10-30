@@ -241,38 +241,34 @@
           <tarLongFileMode>gnu</tarLongFileMode>
         </configuration>
       </plugin>
+      <plugin>
+        <groupId>org.mortbay.jetty</groupId>
+        <artifactId>maven-jetty-plugin</artifactId>
+        <version>6.1.9</version>
+        <configuration>
+          <webXml>${basedir}/src/main/webapp-war-extras/WEB-INF/web.xml</webXml>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.sonatype.plugins</groupId>
+        <artifactId>plx-maven-plugin</artifactId>
+        <version>1.4</version>
+        <configuration>
+          <includeTestClasspath>true</includeTestClasspath>
+          <!-- prependClasspaths>
+            <prependClasspath>${project.build.directory}/plexus-home/conf</prependClasspath>
+          </prependClasspaths-->
+          <systemProperties>
+            <plexus.host.control.socket.enabled>true</plexus.host.control.socket.enabled>
+          </systemProperties>
+          <platformArtifact>
+            <groupId>org.sonatype.appbooter.plexus-platforms</groupId>
+            <artifactId>plexus-platform-base</artifactId>
+            <version>${plexus.appbooter.version}</version>
+          </platformArtifact>
+          <debugOutput>true</debugOutput>
+        </configuration>
+      </plugin>
     </plugins>
-    <pluginManagement>
-      <plugins>
-        <plugin>
-          <groupId>org.mortbay.jetty</groupId>
-          <artifactId>maven-jetty-plugin</artifactId>
-          <version>6.1.9</version>
-          <configuration>
-            <webXml>${basedir}/src/main/webapp-war-extras/WEB-INF/web.xml</webXml>
-          </configuration>
-        </plugin>
-        <plugin>
-          <groupId>org.sonatype.plugins</groupId>
-          <artifactId>plx-maven-plugin</artifactId>
-          <version>1.5-SNAPSHOT</version>
-          <configuration>
-            <includeTestClasspath>true</includeTestClasspath>
-            <!-- prependClasspaths>
-              <prependClasspath>${project.build.directory}/plexus-home/conf</prependClasspath>
-            </prependClasspaths-->
-            <systemProperties>
-              <plexus.host.control.socket.enabled>true</plexus.host.control.socket.enabled>
-            </systemProperties>
-            <platformArtifact>
-              <groupId>org.sonatype.appbooter.plexus-platforms</groupId>
-              <artifactId>plexus-platform-base</artifactId>
-              <version>${plexus.appbooter.version}</version>
-            </platformArtifact>
-            <debugOutput>true</debugOutput>
-          </configuration>
-        </plugin>
-      </plugins>
-    </pluginManagement>
   </build>
 </project>
