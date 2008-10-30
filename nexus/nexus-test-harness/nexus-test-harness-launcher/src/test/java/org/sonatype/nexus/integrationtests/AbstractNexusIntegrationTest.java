@@ -129,11 +129,12 @@ public class AbstractNexusIntegrationTest
     }
 
     /**
-     * To me this seems like a bad hack around this problem. I don't have any other thoughts though. <BR/>If you see
-     * this and think: "Wow, why did he to that instead of XYZ, please let me know." <BR/> The issue is that we want to
-     * init the tests once (to start/stop the app) and the <code>@BeforeClass</code> is static, so we don't have access
-     * to the package name of the running tests. We are going to use the package name to find resources for additional
-     * setup. NOTE: With this setup running multiple Test at the same time is not possible.
+     * To me this seems like a bad hack around this problem. I don't have any other thoughts though. <BR/>
+     * If you see this and think: "Wow, why did he to that instead of XYZ, please let me know." <BR/>
+     * The issue is that we want to init the tests once (to start/stop the app) and the <code>@BeforeClass</code> is
+     * static, so we don't have access to the package name of the running tests. We are going to use the package name to
+     * find resources for additional setup. NOTE: With this setup running multiple Test at the same time is not
+     * possible.
      *
      * @throws Exception
      */
@@ -179,10 +180,18 @@ public class AbstractNexusIntegrationTest
                 // deploy artifacts
                 this.deployArtifacts();
 
+                runOnce();
+
                 // TODO: we can remove this now that we have the soft restart
                 NEEDS_INIT = false;
             }
         }
+    }
+
+    protected void runOnce()
+        throws Exception
+    {
+        // must override
     }
 
     private boolean isSecurityTest()

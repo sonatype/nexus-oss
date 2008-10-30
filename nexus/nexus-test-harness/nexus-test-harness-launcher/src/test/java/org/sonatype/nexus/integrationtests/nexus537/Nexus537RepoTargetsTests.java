@@ -14,7 +14,6 @@ import junit.framework.Assert;
 import org.apache.commons.httpclient.HttpException;
 import org.apache.maven.it.VerificationException;
 import org.apache.maven.it.Verifier;
-import org.junit.Before;
 import org.junit.Test;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
@@ -35,6 +34,7 @@ import org.sonatype.nexus.test.utils.TargetMessageUtil;
 public class Nexus537RepoTargetsTests
     extends AbstractPrivilegeTest
 {
+
     private String fooPrivCreateId;
 
     private String fooPrivReadId;
@@ -108,9 +108,11 @@ public class Nexus537RepoTargetsTests
                      "repo1-bar-artifact-delete", false, false, null, false, null );
     }
 
-    @Before
-    public void cleanPrevious() throws IOException {
-        // clean up before start
+    @Override
+    public void runOnce()
+        throws Exception
+    {
+        super.runOnce();
         TargetMessageUtil.removeAllTarget();
     }
 
