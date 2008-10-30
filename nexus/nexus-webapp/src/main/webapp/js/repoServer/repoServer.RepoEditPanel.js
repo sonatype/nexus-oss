@@ -114,15 +114,18 @@ Sonatype.repoServer.RepoEditPanel = function(config){
   
   this.templateLoadDataModFuncs = {
     virtual : Ext.apply({}, {
-        id : Sonatype.utils.returnEmptyStr
+        id : Sonatype.utils.returnEmptyStr,
+      name : Sonatype.utils.returnEmptyStr
       },
       this.loadDataModFuncs.virtual),
     hosted : Ext.apply({}, {
-        id : Sonatype.utils.returnEmptyStr
+        id : Sonatype.utils.returnEmptyStr,
+      name : Sonatype.utils.returnEmptyStr
       },
       this.loadDataModFuncs.hosted),
     proxy : Ext.apply({}, {
-        id : Sonatype.utils.returnEmptyStr
+        id : Sonatype.utils.returnEmptyStr,
+      name : Sonatype.utils.returnEmptyStr
       },
       this.loadDataModFuncs.proxy)
   };
