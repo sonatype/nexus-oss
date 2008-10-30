@@ -27,7 +27,7 @@ public class Nexus688ReindexOnRepoAdd
 
     private static final String INDEX_FILE = ".index/nexus-maven-repository-index.zip";
 
-    private static final int SLEEP_TIME = 1000;
+    private static final int SLEEP_TIME = 2000;
 
     @Test
     public void repoTestIndexable()
@@ -216,8 +216,17 @@ public class Nexus688ReindexOnRepoAdd
         }
         catch ( FileNotFoundException e )
         {
-            String files = IOUtils.toString( (InputStream) new URL( repositoryUrl + ".index" ).getContent() );
-            throw new FileNotFoundException( repositoryUrl + " Available files: " + files );
+            String files;
+            try
+            {
+                files = IOUtils.toString( (InputStream) new URL( repositoryUrl + ".index" ).getContent() );
+            }
+            catch ( FileNotFoundException e1 )
+            {
+                Assert.fail( ".index folder folt found at " + repositoryUrl );
+                throw e1;
+            }
+            throw new FileNotFoundException( repositoryUrl + "\n Available files: \n" + files );
         }
     }
 
