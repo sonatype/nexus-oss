@@ -1,4 +1,4 @@
-<project>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<parent>
 		<groupId>org.sonatype.spice</groupId>
 		<artifactId>spice-parent</artifactId>
@@ -6,17 +6,14 @@
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.sonatype.plexus</groupId>
-	<version>1.0-SNAPSHOT</version>
+	<version>1.0</version>
 	<name>Plexus Task Scheduler</name>
 	<artifactId>plexus-task-scheduler</artifactId>
 	<packaging>jar</packaging>
 	<scm>
-		<connection>scm:svn:http://svn.sonatype.org/spice/trunk/plexus-task-scheduler
-		</connection>
-		<url>http://svn.sonatype.org/spice/trunk/plexus-task-scheduler
-		</url>
-		<developerConnection>scm:svn:https://svn.sonatype.org/spice/trunk/plexus-task-scheduler
-		</developerConnection>
+		<connection>scm:svn:http://svn.sonatype.org/spice/tags/plexus-task-scheduler-1.0</connection>
+		<url>http://svn.sonatype.org/spice/tags/plexus-task-scheduler-1.0</url>
+		<developerConnection>scm:svn:https://svn.sonatype.org/spice/tags/plexus-task-scheduler-1.0</developerConnection>
 	</scm>
 
 	<dependencies>
