@@ -113,7 +113,7 @@ Sonatype.config = function() {
         roles: servicePath + '/roles',
         privileges: servicePath + '/privileges',
         repoTargets: servicePath + '/repo_targets',
-        repoContentClasses: servicePath + '/repo_content_classes',
+        repoContentClasses: servicePath + '/components/repo_content_classes',
         realmComponents: servicePath + '/components/realm_types',
         repoTypes: servicePath + '/components/repo_types',
         shadowRepoTypes: servicePath + '/components/shadow_repo_types'

@@ -63,8 +63,8 @@ Sonatype.repoServer.RepoTargetEditPanel = function(config){
 
   //A record to hold the contentClasses
   this.contentClassRecordConstructor = Ext.data.Record.create([
-    {name:'contentClass'},
-    {name:'name', sortType:Ext.data.SortTypes.asUCString}
+    {name:'roleHint'},
+    {name:'description', sortType:Ext.data.SortTypes.asUCString}
   ]);
   
   //Reader and datastore that queries the server for the list of repo targets
@@ -77,11 +77,11 @@ Sonatype.repoServer.RepoTargetEditPanel = function(config){
   });
 
   //Reader and datastore that queries the server for the list of content classes
-  this.contentClassesReader = new Ext.data.JsonReader({root: 'data', id: 'contentClass'}, this.contentClassRecordConstructor );
+  this.contentClassesReader = new Ext.data.JsonReader({root: 'data', id: 'roleHint'}, this.contentClassRecordConstructor );
   this.contentClassesDataStore = new Ext.data.Store({
     url: Sonatype.config.repos.urls.repoContentClasses,
     reader: this.contentClassesReader,
-    sortInfo: {field: 'name', direction: 'ASC'},
+    sortInfo: {field: 'description', direction: 'ASC'},
     autoLoad: true
   });
   
@@ -121,8 +121,8 @@ Sonatype.repoServer.RepoTargetEditPanel = function(config){
         name: 'contentClass',
         width: this.COMBO_WIDTH,
         store: this.contentClassesDataStore,
-        displayField:'contentClass',
-        valueField:'contentClass',
+        displayField:'description',
+        valueField:'roleHint',
         editable: false,
         forceSelection: true,
         mode: 'local',
