@@ -181,7 +181,7 @@ Sonatype.ext.TwinPanelChooser = function( config ){
         // added Field values to simulate form field validation
         invalidText: 'Select one or more items',
         validate: function(){
-          return (this.root.childNodes.length > 0);
+          return (this.root.childNodes.length > 0) || ! this.required;
         },
         invalid: false,
         listeners: {
