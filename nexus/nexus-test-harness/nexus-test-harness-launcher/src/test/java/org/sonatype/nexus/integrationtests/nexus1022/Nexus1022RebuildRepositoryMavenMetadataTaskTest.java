@@ -28,7 +28,7 @@ import junit.framework.Assert;
 import org.junit.Test;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
-import org.sonatype.nexus.tasks.descriptors.RebuildAttributesTaskDescriptor;
+import org.sonatype.nexus.tasks.descriptors.RebuildMavenMetadataTaskDescriptor;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 
 public class Nexus1022RebuildRepositoryMavenMetadataTaskTest
@@ -46,7 +46,7 @@ public class Nexus1022RebuildRepositoryMavenMetadataTaskTest
         
         repo.setValue( "repo_" + REPO_TEST_HARNESS_REPO );
         
-        TaskScheduleUtil.runTask( RebuildAttributesTaskDescriptor.ID, repo );
+        TaskScheduleUtil.runTask( RebuildMavenMetadataTaskDescriptor.ID, repo );
 
         File artifactDirMd = new File( nexusBaseDir, releaseRepoPath + "nexus1022/foo/bar/artifact/maven-metadata.xml" );
         Assert.assertTrue( "Maven metadata file should be generated after rebuild", artifactDirMd.exists() );
