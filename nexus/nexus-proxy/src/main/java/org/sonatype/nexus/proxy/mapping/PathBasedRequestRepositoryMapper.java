@@ -120,6 +120,7 @@ public class PathBasedRequestRepositoryMapper
             }
         }
 
+        // include, if found a match
         for ( RepositoryPathMapping mapping : inclusions )
         {
             if ( mapping.matches( request ) )
@@ -133,11 +134,11 @@ public class PathBasedRequestRepositoryMapper
 
                 mapped = true;
 
-                // add only those that are in initial resolvedRepositories list
-                // (preserve groups)
+                // add only those that are in initial resolvedRepositories list and that are non-user managed
+                // (preserve ordering)
                 for ( ResourceStore repo : resolvedRepositories )
                 {
-                    if ( mapping.getResourceStores().contains( repo ) )
+                    if ( mapping.getResourceStores().contains( repo ) || !repo.isUserManaged() )
                     {
                         reposList.add( repo );
                     }
@@ -145,14 +146,21 @@ public class PathBasedRequestRepositoryMapper
             }
         }
 
-        // then, if exlude found, remove it.
+        // then, if exlude found, remove those
         for ( RepositoryPathMapping mapping : exclusions )
         {
             if ( mapping.matches( request ) )
             {
                 mapped = true;
 
-                reposList.removeAll( mapping.getResourceStores() );
+                for ( ResourceStore store : mapping.getResourceStores() )
+                {
+                    // but only if is user managed
+                    if ( store.isUserManaged() )
+                    {
+                        reposList.remove( store );
+                    }
+                }
             }
         }
         // at the end, if the list is empty, add all repos
