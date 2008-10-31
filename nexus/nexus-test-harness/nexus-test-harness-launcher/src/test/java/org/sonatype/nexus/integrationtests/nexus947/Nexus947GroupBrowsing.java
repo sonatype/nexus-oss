@@ -6,6 +6,7 @@ import java.util.List;
 
 import junit.framework.Assert;
 
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
@@ -54,4 +55,11 @@ public class Nexus947GroupBrowsing
         Assert.assertTrue(response.getLocationRef().toString().endsWith( uriPart + "/" ));
 
     }
+    
+    @BeforeClass
+    public static void cleanWorkFolder() throws Exception {
+        cleanWorkDir();
+    }
+    
+    
 }
