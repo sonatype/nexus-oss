@@ -155,10 +155,7 @@ public class RecreateMavenMetadataWalker
             if ( currentArtifactId == null )
             {
                 currentArtifactId = coll.getParentPath().substring( spaceOfGAPos + 1 );
-            }
-
-            if ( currentGroupId == null )
-            {
+                
                 currentGroupId = coll.getParentPath().substring( 1, spaceOfGAPos ).replace( '/', '.' );
             }
         }

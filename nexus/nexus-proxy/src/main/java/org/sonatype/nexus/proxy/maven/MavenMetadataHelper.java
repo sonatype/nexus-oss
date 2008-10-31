@@ -128,6 +128,8 @@ public class MavenMetadataHelper
 
         md.append( "<metadata>\n" );
 
+        md.append( "  <groupId>" + walker.getCurrentGroupId() + "</groupId>\n");
+        
         md.append( "  <plugins>\n" );
 
         for ( PluginInfoForMetadata plugin : walker.getCurrentPlugins().values() )
