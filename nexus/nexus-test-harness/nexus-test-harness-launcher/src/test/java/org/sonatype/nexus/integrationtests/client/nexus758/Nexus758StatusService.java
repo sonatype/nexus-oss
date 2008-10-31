@@ -6,6 +6,8 @@ import org.junit.Test;
 import org.sonatype.appbooter.AbstractForkedAppBooter;
 import org.sonatype.appbooter.ForkedAppBooter;
 import org.sonatype.nexus.client.NexusClient;
+import org.sonatype.nexus.client.NexusClientException;
+import org.sonatype.nexus.client.NexusConnectionException;
 import org.sonatype.nexus.client.rest.NexusRestClient;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.TestContainer;
@@ -39,11 +41,11 @@ public class Nexus758StatusService
 
         // stop Nexus
         client.stopNexus(); // blocking
-        Assert.assertFalse( "Expected Nexus to be Stopped", client.isNexusStarted( false ) );
+        Assert.assertTrue( "Expected Nexus to be Stopped", waitForStop( client ) );
 
         // start Nexus
         client.startNexus(); // blocking
-        Assert.assertTrue( "Expected Nexus to be Started", client.isNexusStarted( false ) );
+        Assert.assertTrue( "Expected Nexus to be Started", waitForStart( client ) );
 
         client.disconnect();
     }
@@ -66,24 +68,23 @@ public class Nexus758StatusService
         throws Exception
     {
         NexusClient client = null;
-        
+
         AbstractForkedAppBooter appBooter =
             (AbstractForkedAppBooter) TestContainer.getInstance().lookup( ForkedAppBooter.ROLE, "TestForkedAppBooter" );
-        
+
         try
         {
             appBooter.stop();
-            
+
             client = this.getConnectedNexusClient();
             // turn down the timeout to speed up the tests
-            System.setProperty( NexusRestClient.WAIT_FOR_START_TIMEOUT_KEY, "2100" );
-            Assert.assertFalse("Wait for start, timed out.", client.isNexusStarted( true ));
-            
+
+            Assert.assertTrue( "Wait for start, timed out.", waitForStop( client ) );
+
             appBooter.setSleepAfterStart( 0 );
             appBooter.start();
             // set the timeout back to 16 sec
-            System.setProperty( NexusRestClient.WAIT_FOR_START_TIMEOUT_KEY, "16000" );
-            Assert.assertTrue("Wait for start, timed out.", client.isNexusStarted( true ));
+            Assert.assertTrue( "Wait for start, timed out.", waitForStart( client ) );
 
         }
         finally
@@ -93,6 +94,34 @@ public class Nexus758StatusService
         }
 
         client.disconnect();
+    }
+
+    private boolean waitForStart( NexusClient client )
+        throws NexusClientException, NexusConnectionException
+    {
+        System.setProperty( NexusRestClient.WAIT_FOR_START_TIMEOUT_KEY, "1000" );
+        for ( int i = 0; i < 20; i++ )
+        {
+            if ( client.isNexusStarted( true ) )
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean waitForStop( NexusClient client )
+        throws NexusClientException, NexusConnectionException
+    {
+        System.setProperty( NexusRestClient.WAIT_FOR_START_TIMEOUT_KEY, "500" );
+        for ( int i = 0; i < 20; i++ )
+        {
+            if ( !client.isNexusStarted( true ) )
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
 }

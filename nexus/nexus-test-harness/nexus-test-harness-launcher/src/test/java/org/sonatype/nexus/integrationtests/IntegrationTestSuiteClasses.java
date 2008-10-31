@@ -3,6 +3,7 @@ package org.sonatype.nexus.integrationtests;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
+import org.sonatype.nexus.integrationtests.client.nexus758.Nexus758StatusService;
 import org.sonatype.nexus.integrationtests.nexus1022.Nexus1022RebuildRepositoryMavenMetadataTaskTest;
 import org.sonatype.nexus.integrationtests.nexus133.Nexus133TargetCrudJsonTests;
 import org.sonatype.nexus.integrationtests.nexus133.Nexus133TargetCrudXmlTests;
@@ -161,7 +162,9 @@ import org.sonatype.nexus.integrationtests.upgrades.nexus652.Nexus652Beta5To10Up
     Nexus950CorruptPomTest.class,
     Nexus779DeployRssTest.class,
     Nexus639PurgeTaskTest.class,
-    Nexus1022RebuildRepositoryMavenMetadataTaskTest.class } )
+    Nexus1022RebuildRepositoryMavenMetadataTaskTest.class,
+    Nexus758StatusService.class
+} )
 public class IntegrationTestSuiteClasses
 {
 

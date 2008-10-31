@@ -137,7 +137,6 @@ import org.sonatype.nexus.integrationtests.upgrades.nexus652.Nexus652Beta5To10Up
     Nexus531RepositoryCrudValidationTests.class,
     Nexus531RepositoryCrudPermissionTests.class,
     Nexus532GroupCrudPermissionTests.class,
-//    Nexus758StatusService.class,
     Nexus810PackageNamesInRestMessages.class,
     Nexus810PackageNamesInNexusConf.class,
     Nexus782UploadWithClassifier.class,
