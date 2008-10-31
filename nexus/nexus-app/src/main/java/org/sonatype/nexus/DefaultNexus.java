@@ -1403,7 +1403,38 @@ public class DefaultNexus
     {
         indexerManager.publishRepositoryGroupIndex( repositoryGroupId );
     }
+    
+    
+    public void rebuildMavenMetadataAllRepositories( String path )
+        throws IOException
+    {
+        List<Repository> reposes = repositoryRegistry.getRepositories();
 
+        for ( Repository repo : reposes )
+        {
+            repo.recreateMavenMetadata( path );
+        }
+    }
+
+    public void rebuildMavenMetadataRepository( String path, String repositoryId )
+        throws NoSuchRepositoryException,
+            IOException
+    {
+        repositoryRegistry.getRepository( repositoryId ).recreateMavenMetadata( path );
+    }
+
+    public void rebuildMavenMetadataRepositoryGroup( String path, String repositoryGroupId )
+        throws NoSuchRepositoryGroupException,
+            IOException
+    {
+        List<Repository> reposes = repositoryRegistry.getRepositoryGroup( repositoryGroupId );
+
+        for ( Repository repo : reposes )
+        {
+            repo.recreateMavenMetadata( path );
+        }
+    }
+    
     public void rebuildAttributesAllRepositories( String path )
         throws IOException
     {
@@ -1411,9 +1442,6 @@ public class DefaultNexus
 
         for ( Repository repo : reposes )
         {
-            //create maven metadata first, checksum files should be created based on this
-            repo.recreateMavenMetadata( path );
-            
             repo.recreateAttributes( path, null );
         }
     }
@@ -1422,8 +1450,6 @@ public class DefaultNexus
         throws NoSuchRepositoryException,
             IOException
     {
-        repositoryRegistry.getRepository( repositoryId ).recreateMavenMetadata( path );
-        
         repositoryRegistry.getRepository( repositoryId ).recreateAttributes( path, null );
     }
 
@@ -1435,8 +1461,6 @@ public class DefaultNexus
 
         for ( Repository repo : reposes )
         {
-            repo.recreateMavenMetadata( path );
-            
             repo.recreateAttributes( path, null );
         }
     }

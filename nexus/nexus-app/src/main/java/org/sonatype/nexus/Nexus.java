@@ -169,6 +169,17 @@ public interface Nexus
     void rebuildAttributesRepositoryGroup( String path, String repositoryGroupId )
         throws NoSuchRepositoryGroupException,
             IOException;
+    
+    void rebuildMavenMetadataAllRepositories( String path )
+        throws IOException;
+
+    void rebuildMavenMetadataRepository( String path, String repositoryId )
+        throws NoSuchRepositoryException,
+            IOException;
+
+    void rebuildMavenMetadataRepositoryGroup( String path, String repositoryGroupId )
+        throws NoSuchRepositoryGroupException,
+            IOException;
 
     Collection<String> evictAllUnusedProxiedItems( long timestamp )
         throws IOException;
