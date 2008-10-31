@@ -81,7 +81,17 @@ public class NexusHttpAuthenticationFilter
 
         if ( isLoginAttempt( request, response ) )
         {
-            loggedIn = executeLogin( request, response );
+            try
+            {
+                loggedIn = executeLogin( request, response );
+            }
+            // if no username or password is supplied, an IllegalStateException (runtime)
+            // is thrown, so if anything fails in executeLogin just assume failed login
+            catch ( Exception e )
+            {
+                getLogger().error( "Unable to login", e );
+                loggedIn = false;
+            }
         }
         else
         {
