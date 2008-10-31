@@ -68,7 +68,7 @@ public interface MutableConfiguration
         throws IOException;
 
     List<String> getRealms();
-    
+
     void setRealms( List<String> realms )
         throws IOException;
 
@@ -77,13 +77,13 @@ public interface MutableConfiguration
     // ----------------------------------------------------------------------------
 
     Collection<ContentClass> listRepositoryContentClasses();
-    
+
     // ----------------------------------------------------------------------------
     // Scheduled Tasks
     // ----------------------------------------------------------------------------
-    
+
     List<ScheduledTaskDescriptor> listScheduledTaskDescriptors();
-    
+
     ScheduledTaskDescriptor getScheduledTaskDescriptor( String id );
 
     // ----------------------------------------------------------------------------------------------------------
