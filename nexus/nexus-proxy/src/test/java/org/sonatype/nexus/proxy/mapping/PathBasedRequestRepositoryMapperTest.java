@@ -73,21 +73,27 @@ public class PathBasedRequestRepositoryMapperTest
         repoA = createMock( Repository.class );
         makeThreadSafe( repoA, true );
         expect( repoA.getId() ).andReturn( "repoA" ).anyTimes();
+        expect( repoA.isUserManaged() ).andReturn( true ).anyTimes();
         repoB = createMock( Repository.class );
         makeThreadSafe( repoB, true );
         expect( repoB.getId() ).andReturn( "repoB" ).anyTimes();
+        expect( repoB.isUserManaged() ).andReturn( true ).anyTimes();
         repoC = createMock( Repository.class );
         makeThreadSafe( repoC, true );
         expect( repoC.getId() ).andReturn( "repoC" ).anyTimes();
+        expect( repoC.isUserManaged() ).andReturn( true ).anyTimes();
         repoD = createMock( Repository.class );
         makeThreadSafe( repoD, true );
         expect( repoD.getId() ).andReturn( "repoD" ).anyTimes();
+        expect( repoD.isUserManaged() ).andReturn( true ).anyTimes();
         repoE = createMock( Repository.class );
         makeThreadSafe( repoE, true );
         expect( repoE.getId() ).andReturn( "repoE" ).anyTimes();
+        expect( repoE.isUserManaged() ).andReturn( true ).anyTimes();
         repoF = createMock( Repository.class );
         makeThreadSafe( repoF, true );
         expect( repoF.getId() ).andReturn( "repoF" ).anyTimes();
+        expect( repoF.isUserManaged() ).andReturn( true ).anyTimes();
         
         expect(repoA.getProxyMode()).andReturn( null ).anyTimes();
         expect(repoB.getProxyMode()).andReturn( null ).anyTimes();
