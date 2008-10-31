@@ -70,18 +70,27 @@ Sonatype.repoServer.RepoEditPanel = function(config){
     autoLoad: true
   });
 
-  //A record to hold the contentClasses
-  this.contentClassRecordConstructor = Ext.data.Record.create([
-    {name:'contentClass'},
-    {name:'name', sortType:Ext.data.SortTypes.asUCString}
+  this.repoTypeRecordConstructor = Ext.data.Record.create([
+    {name:'description'},
+    {name:'roleHint', sortType:Ext.data.SortTypes.asUCString}
   ]);
+  this.repoTypeReader = new Ext.data.JsonReader({root: 'data', id: 'roleHint'}, this.repoTypeRecordConstructor );  
+  this.repoTypeDataStore = new Ext.data.Store({
+    url: Sonatype.config.repos.urls.repoTypes,
+    reader: this.repoTypeReader,
+    sortInfo: { field: 'roleHint', direction: 'ASC' },
+    autoLoad: true
+  });
 
-  //Reader and datastore that queries the server for the list of content classes
-  this.contentClassesReader = new Ext.data.JsonReader({root: 'data', id: 'contentClass'}, this.contentClassRecordConstructor );
-  this.contentClassesDataStore = new Ext.data.Store({
-    url: Sonatype.config.repos.urls.repoContentClasses,
-    reader: this.contentClassesReader,
-    sortInfo: {field: 'name', direction: 'ASC'},
+  this.shadowRepoTypeRecordConstructor = Ext.data.Record.create([
+    {name:'description'},
+    {name:'roleHint', sortType:Ext.data.SortTypes.asUCString}
+  ]);
+  this.shadowRepoTypeReader = new Ext.data.JsonReader({root: 'data', id: 'roleHint'}, this.shadowRepoTypeRecordConstructor );  
+  this.shadowRepoTypeDataStore = new Ext.data.Store({
+    url: Sonatype.config.repos.urls.shadowRepoTypes,
+    reader: this.shadowRepoTypeReader,
+    sortInfo: { field: 'roleHint', direction: 'ASC' },
     autoLoad: true
   });
   
@@ -215,9 +224,9 @@ Sonatype.repoServer.RepoEditPanel = function(config){
         name: 'format',
         //hiddenName: 'connectionTimeout',
         width: 150,
-        store: this.contentClassesDataStore,
-        displayField:'contentClass',
-        valueField:'contentClass',
+        store: this.repoTypeDataStore,
+        displayField:'roleHint',
+        valueField:'roleHint',
         editable: false,
         forceSelection: true,
         mode: 'local',
@@ -408,9 +417,9 @@ Sonatype.repoServer.RepoEditPanel = function(config){
         name: 'format',
         //hiddenName: 'connectionTimeout',
         width: 150,
-        store: this.contentClassesDataStore,
-        displayField:'contentClass',
-        valueField:'contentClass',
+        store: this.repoTypeDataStore,
+        displayField:'roleHint',
+        valueField:'roleHint',
         editable: false,
         forceSelection: true,
         mode: 'local',
@@ -905,9 +914,9 @@ Sonatype.repoServer.RepoEditPanel = function(config){
       //hiddenName: 'connectionTimeout',
       width: 200,
       midWidth: 200,
-      store: this.contentClassesDataStore,
-      displayField:'contentClass',
-      valueField:'contentClass',
+      store: this.shadowRepoTypeDataStore,
+      displayField:'roleHint',
+      valueField:'roleHint',
       editable: false,
       forceSelection: true,
       mode: 'local',
