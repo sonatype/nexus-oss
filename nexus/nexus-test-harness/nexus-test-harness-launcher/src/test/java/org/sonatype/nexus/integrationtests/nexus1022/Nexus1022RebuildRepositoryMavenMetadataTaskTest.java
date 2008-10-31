@@ -57,9 +57,5 @@ public class Nexus1022RebuildRepositoryMavenMetadataTaskTest
 
     }
     
-    @BeforeClass
-    public static void cleanWorkFolder() throws Exception {
-        cleanWorkDir();
-    }
     
 }
