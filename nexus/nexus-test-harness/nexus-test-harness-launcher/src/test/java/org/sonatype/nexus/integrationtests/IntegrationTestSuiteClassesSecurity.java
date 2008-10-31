@@ -5,7 +5,6 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 import org.sonatype.nexus.integrationtests.client.nexus725.Nexus725InitialRestClient;
-import org.sonatype.nexus.integrationtests.client.nexus758.Nexus758StatusService;
 import org.sonatype.nexus.integrationtests.nexus133.Nexus133TargetCrudJsonTests;
 import org.sonatype.nexus.integrationtests.nexus133.Nexus133TargetCrudXmlTests;
 import org.sonatype.nexus.integrationtests.nexus133.Nexus133TargetPermissionTests;
@@ -138,7 +137,7 @@ import org.sonatype.nexus.integrationtests.upgrades.nexus652.Nexus652Beta5To10Up
     Nexus531RepositoryCrudValidationTests.class,
     Nexus531RepositoryCrudPermissionTests.class,
     Nexus532GroupCrudPermissionTests.class,
-    Nexus758StatusService.class,
+//    Nexus758StatusService.class,
     Nexus810PackageNamesInRestMessages.class,
     Nexus810PackageNamesInNexusConf.class,
     Nexus782UploadWithClassifier.class,
@@ -150,7 +149,7 @@ import org.sonatype.nexus.integrationtests.upgrades.nexus652.Nexus652Beta5To10Up
     Nexus930AutoDiscoverComponent.class,
     Nexus947GroupBrowsing.class,
     Nexus570IndexArchetypeTest.class,
-    Nexus504ChangeRoleTest.class, 
+    Nexus504ChangeRoleTest.class,
     Nexus999SetUsersPassword.class,
     Nexus537RepoTargetsTests.class } )
 public class IntegrationTestSuiteClassesSecurity
