@@ -464,43 +464,7 @@ public class Upgrade106to107
 
         if ( oldtask != null )
         {
-            if ( "org.sonatype.nexus.tasks.PublishIndexesTask".equals( oldtask.getType() ) )
-            {
-                task.setType( "PublishIndexesTask" );
-            }
-            else if ( "org.sonatype.nexus.tasks.ReindexTask".equals( oldtask.getType() ) )
-            {
-                task.setType( "ReindexTask" );
-            }
-            else if ( "org.sonatype.nexus.tasks.RebuildAttributesTask".equals( oldtask.getType() ) )
-            {
-                task.setType( "RebuildAttributesTask" );
-            }
-            else if ( "org.sonatype.nexus.tasks.ClearCacheTask".equals( oldtask.getType() ) )
-            {
-                task.setType( "ClearCacheTask" );
-            }
-            else if ( "org.sonatype.nexus.maven.tasks.SnapshotRemoverTask".equals( oldtask.getType() ) )
-            {
-                task.setType( "SnapshotRemoverTask" );
-            }
-            else if ( "org.sonatype.nexus.tasks.EvictUnusedProxiedItemsTask".equals( oldtask.getType() ) )
-            {
-                task.setType( "EvictUnusedProxiedItemsTask" );
-            }
-            else if ( "org.sonatype.nexus.tasks.PurgeTimeline".equals( oldtask.getType() ) )
-            {
-                task.setType( "PurgeTimeline" );
-            }
-            else if ( "org.sonatype.nexus.tasks.SynchronizeShadowsTask".equals( oldtask.getType() ) )
-            {
-                task.setType( "SynchronizeShadowsTask" );
-            }
-            else if ( "org.sonatype.nexus.tasks.EmptyTrashTask".equals( oldtask.getType() ) )
-            {
-                task.setType( "EmptyTrashTask" );
-            }
-
+            task.setType( oldtask.getType() );
             task.setEnabled( oldtask.isEnabled() );
             task.setId( oldtask.getId() );
             task.setLastRun( oldtask.getLastRun() );
@@ -524,12 +488,7 @@ public class Upgrade106to107
         {
             schedule.setCronCommand( oldschedule.getCronCommand() );
             schedule.setDaysOfMonth( oldschedule.getDaysOfMonth() );
-
-            for ( String dayOfWeek : (List<String>) oldschedule.getDaysOfWeek() )
-            {
-                schedule.addDaysOfWeek( Integer.toString( Integer.parseInt( dayOfWeek ) + 1 ) );
-            }
-
+            schedule.setDaysOfWeek( oldschedule.getDaysOfWeek() );
             schedule.setEndDate( oldschedule.getEndDate() );
             schedule.setStartDate( oldschedule.getStartDate() );
             schedule.setType( oldschedule.getType() );
@@ -540,6 +499,7 @@ public class Upgrade106to107
 
     protected CRepositoryShadow copyCRepositoryShadow1_0_6(
         org.sonatype.nexus.configuration.model.v1_0_6.CRepositoryShadow oldshadow )
+        throws ConfigurationIsCorruptedException
     {
         CRepositoryShadow shadow = new CRepositoryShadow();
 
@@ -549,7 +509,32 @@ public class Upgrade106to107
             shadow.setName( oldshadow.getName() );
             shadow.setLocalStatus( oldshadow.getLocalStatus() );
             shadow.setShadowOf( oldshadow.getShadowOf() );
-            shadow.setType( oldshadow.getType() );
+
+            // TYPE: we had a discrepancy between role hints and type, fixing it in 1.0.7 version
+            String type = null;
+
+            if ( org.sonatype.nexus.configuration.model.v1_0_6.CRepositoryShadow.TYPE_MAVEN1.equals( oldshadow
+                .getType() ) )
+            {
+                type = "m2-m1-shadow";
+            }
+            else if ( org.sonatype.nexus.configuration.model.v1_0_6.CRepositoryShadow.TYPE_MAVEN2.equals( oldshadow
+                .getType() ) )
+            {
+                type = "m1-m2-shadow";
+            }
+            else if ( org.sonatype.nexus.configuration.model.v1_0_6.CRepositoryShadow.TYPE_MAVEN2_CONSTRAINED
+                .equals( oldshadow.getType() ) )
+            {
+                type = "m2-constrained";
+            }
+            else
+            {
+                throw new ConfigurationIsCorruptedException( "Repository shadow type '" + oldshadow.getType()
+                    + "' creation is not supported!" );
+            }
+            shadow.setType( type );
+
             shadow.setSyncAtStartup( oldshadow.isSyncAtStartup() );
         }
 

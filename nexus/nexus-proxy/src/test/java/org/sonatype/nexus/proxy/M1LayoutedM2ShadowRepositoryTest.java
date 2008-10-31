@@ -28,7 +28,9 @@ import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.item.StorageLinkItem;
 import org.sonatype.nexus.proxy.maven.maven1.M1LayoutedM2ShadowRepository;
+import org.sonatype.nexus.proxy.repository.IncompatibleMasterRepositoryException;
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.proxy.repository.ShadowRepository;
 
 public class M1LayoutedM2ShadowRepositoryTest
     extends AbstractProxyTestEnvironment
@@ -47,12 +49,13 @@ public class M1LayoutedM2ShadowRepositoryTest
 
     protected void addShadowReposes()
         throws IOException,
-            ComponentLookupException
+            ComponentLookupException,
+            IncompatibleMasterRepositoryException
     {
         for ( Repository master : getRepositoryRegistry().getRepositories() )
         {
             M1LayoutedM2ShadowRepository shadow = (M1LayoutedM2ShadowRepository) getContainer().lookup(
-                Repository.class,
+                ShadowRepository.class,
                 "m2-m1-shadow" );
             // shadow.enableLogging( getLogger().getChildLogger( "SHADOW " + master.getId() ) );
             shadow.setMasterRepository( master );

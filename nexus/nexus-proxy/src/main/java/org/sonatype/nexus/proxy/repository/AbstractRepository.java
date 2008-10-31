@@ -29,6 +29,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.proxy.AccessDeniedException;
@@ -97,37 +98,31 @@ public abstract class AbstractRepository
 
     private static final ExecutorService exec = Executors.newCachedThreadPool();
 
-    /**
-     * @plexus.requirement
-     */
+    @Requirement
     private ApplicationConfiguration applicationConfiguration;
 
     /**
      * The cache manager.
-     * 
-     * @plexus.requirement
      */
+    @Requirement
     private CacheManager cacheManager;
 
     /**
      * The target registry.
-     * 
-     * @plexus.requirement
      */
+    @Requirement
     private TargetRegistry targetRegistry;
 
     /**
      * Factory for UIDs.
-     * 
-     * @plexus.requirement
      */
+    @Requirement
     private RepositoryItemUidFactory repositoryItemUidFactory;
 
     /**
      * The access manager.
-     * 
-     * @plexus.requirement
      */
+    @Requirement
     private AccessManager accessManager;
 
     /** The id. */

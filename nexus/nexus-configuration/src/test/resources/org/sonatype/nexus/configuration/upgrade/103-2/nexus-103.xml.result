@@ -65,6 +65,7 @@
       <id>central-m1</id>
       <name>Central M1 shadow</name>
       <shadowOf>central</shadowOf>
+      <type>m2-m1-shadow</type>
     </repositoryShadow>
   </repositoryShadows>
   <repositoryGrouping>

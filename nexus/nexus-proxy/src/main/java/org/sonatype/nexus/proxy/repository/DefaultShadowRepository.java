@@ -48,9 +48,9 @@ import org.sonatype.nexus.proxy.utils.StoreFileWalker;
  * 
  * @author cstamas
  */
-public abstract class ShadowRepository
+public abstract class DefaultShadowRepository
     extends DefaultRepository
-    implements EventListener
+    implements ShadowRepository, EventListener
 {
 
     /** The master repository. */
@@ -79,6 +79,7 @@ public abstract class ShadowRepository
      * @param masterRepository the new master repository
      */
     public void setMasterRepository( Repository masterRepository )
+        throws IncompatibleMasterRepositoryException
     {
         if ( getMasterRepositoryContentClass().getId().equals( masterRepository.getRepositoryContentClass().getId() ) )
         {
@@ -88,9 +89,7 @@ public abstract class ShadowRepository
         }
         else
         {
-            throw new IllegalArgumentException( "This shadow repository needs master repository with content class "
-                + getMasterRepositoryContentClass() + ", but the passed master repository is contentClass "
-                + masterRepository.getRepositoryContentClass() );
+            throw new IncompatibleMasterRepositoryException( this, masterRepository );
         }
     }
 

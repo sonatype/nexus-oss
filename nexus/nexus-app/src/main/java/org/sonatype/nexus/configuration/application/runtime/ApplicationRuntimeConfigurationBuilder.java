@@ -44,10 +44,10 @@ public interface ApplicationRuntimeConfigurationBuilder
     Repository updateRepositoryFromModel( Repository old, Configuration configuration, CRepository repository )
         throws InvalidConfigurationException;
 
-    Repository createRepositoryFromModel( Configuration configuration, CRepositoryShadow repositoryShadow )
+    ShadowRepository createRepositoryFromModel( Configuration configuration, CRepositoryShadow repositoryShadow )
         throws InvalidConfigurationException;
 
-    Repository updateRepositoryFromModel( ShadowRepository old, Configuration configuration,
+    ShadowRepository updateRepositoryFromModel( ShadowRepository old, Configuration configuration,
         CRepositoryShadow repositoryShadow )
         throws InvalidConfigurationException;
 }

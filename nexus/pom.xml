@@ -706,14 +706,6 @@
 					</dependencies>
 				</plugin>
 				<plugin>
-					<artifactId>maven-eclipse-plugin</artifactId>
-					<configuration>
-						<downloadSources>true</downloadSources>
-						<downloadJavadocs>true</downloadJavadocs>
-						<wtpversion>1.5</wtpversion>
-					</configuration>
-				</plugin>
-				<plugin>
 					<groupId>org.codehaus.mojo</groupId>
 					<artifactId>retrotranslator-maven-plugin</artifactId>
 					<version>1.0-alpha-2</version>
@@ -721,7 +713,7 @@
 				<plugin>
 					<groupId>org.codehaus.modello</groupId>
 					<artifactId>modello-maven-plugin</artifactId>
-					<version>1.0-alpha-17</version>
+					<version>1.0-alpha-21</version>
 				</plugin>
 				<plugin>
 					<artifactId>plx-maven-plugin</artifactId>

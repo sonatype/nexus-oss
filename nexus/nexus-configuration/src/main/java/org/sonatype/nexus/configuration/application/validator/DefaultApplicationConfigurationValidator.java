@@ -27,9 +27,13 @@ import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 import org.codehaus.plexus.PlexusConstants;
+import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
+import org.codehaus.plexus.context.Context;
+import org.codehaus.plexus.context.ContextException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.configuration.ConfigurationIdGenerator;
 import org.sonatype.nexus.configuration.model.CGroupsSetting;
@@ -54,6 +58,8 @@ import org.sonatype.nexus.configuration.model.Configuration;
 import org.sonatype.nexus.configuration.validator.ValidationMessage;
 import org.sonatype.nexus.configuration.validator.ValidationRequest;
 import org.sonatype.nexus.configuration.validator.ValidationResponse;
+import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.proxy.repository.ShadowRepository;
 
 /**
  * The default configuration validator provider. It checks the model for semantical validity.
@@ -63,10 +69,12 @@ import org.sonatype.nexus.configuration.validator.ValidationResponse;
 @Component( role = ApplicationConfigurationValidator.class )
 public class DefaultApplicationConfigurationValidator
     extends AbstractLogEnabled
-    implements ApplicationConfigurationValidator
+    implements ApplicationConfigurationValidator, Contextualizable
 {
     @Requirement
     private ConfigurationIdGenerator idGenerator;
+
+    private PlexusContainer plexusContainer;
 
     @SuppressWarnings( "unchecked" )
     public ValidationResponse validateModel( ValidationRequest request )
@@ -325,9 +333,8 @@ public class DefaultApplicationConfigurationValidator
 
         if ( !validateRepositoryType( repo.getType() ) )
         {
-            response.addValidationError( "Type of repository with ID='" + repo.getId()
-                + "' is wrong! (Allowed values are: '" + CRepository.TYPE_MAVEN2 + "', '" + CRepository.TYPE_MAVEN1
-                + "', '" + CRepository.TYPE_MAVEN_SITE + "', '" + CRepository.TYPE_ECLIPSE_UPDATE_SITE + "')" );
+            response.addValidationError( "TYPE='" + repo.getType() + "' of repository with ID='" + repo.getId()
+                + "' is wrong!" );
         }
 
         if ( !CRepository.PROXY_MODE_ALLOW.equals( repo.getProxyMode() )
@@ -440,9 +447,8 @@ public class DefaultApplicationConfigurationValidator
 
         if ( !validateShadowRepositoryType( shadow.getType() ) )
         {
-            response.addValidationError( "Type of repository shadow with ID='" + shadow.getId() + "' is wrong: '"
-                + shadow.getType() + "'! (Allowed values are: '" + CRepositoryShadow.TYPE_MAVEN2 + "', '"
-                + CRepositoryShadow.TYPE_MAVEN1 + "', '" + CRepositoryShadow.TYPE_MAVEN2_CONSTRAINED + "')" );
+            response.addValidationError( "TYPE='" + shadow.getType() + "' of shadow repository with ID='" + shadow.getId()
+                + "' is wrong!" );
         }
 
         if ( context.getExistingRepositoryShadowIds() != null )
@@ -896,14 +902,14 @@ public class DefaultApplicationConfigurationValidator
 
     protected boolean validateRepositoryType( String type )
     {
-        return CRepository.TYPE_MAVEN2.equals( type ) || CRepository.TYPE_MAVEN1.equals( type )
-            || CRepository.TYPE_MAVEN_SITE.equals( type ) || CRepository.TYPE_ECLIPSE_UPDATE_SITE.equals( type );
+        // TODO introduce getComponentDescriptor(Class, String)
+        return plexusContainer.getComponentDescriptor( Repository.class.getName(), type ) != null;
     }
 
     protected boolean validateShadowRepositoryType( String type )
     {
-        return CRepositoryShadow.TYPE_MAVEN1.equals( type ) || CRepositoryShadow.TYPE_MAVEN2.equals( type )
-            || CRepositoryShadow.TYPE_MAVEN2_CONSTRAINED.equals( type );
+        // TODO introduce getComponentDescriptor(Class, String)
+        return plexusContainer.getComponentDescriptor( ShadowRepository.class.getName(), type ) != null;
     }
 
     protected boolean isValidRegexp( String regexp )
@@ -923,5 +929,11 @@ public class DefaultApplicationConfigurationValidator
         {
             return false;
         }
+    }
+
+    public void contextualize( Context ctx )
+        throws ContextException
+    {
+        this.plexusContainer = (PlexusContainer) ctx.get( PlexusConstants.PLEXUS_KEY );
     }
 }

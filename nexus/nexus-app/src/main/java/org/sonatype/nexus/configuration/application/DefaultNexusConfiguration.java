@@ -61,7 +61,7 @@ import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.LocalStatus;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RepositoryType;
-import org.sonatype.nexus.proxy.repository.ShadowRepository;
+import org.sonatype.nexus.proxy.repository.DefaultShadowRepository;
 import org.sonatype.nexus.proxy.storage.remote.DefaultRemoteStorageContext;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 import org.sonatype.nexus.proxy.target.Target;
@@ -798,7 +798,7 @@ public class DefaultNexusConfiguration
     {
         Repository repository = repositoryRegistry.getRepository( id );
 
-        if ( ShadowRepository.class.isAssignableFrom( repository.getClass() ) )
+        if ( DefaultShadowRepository.class.isAssignableFrom( repository.getClass() ) )
         {
             // this is shadow
             throw new NoSuchRepositoryException( id );
@@ -955,10 +955,10 @@ public class DefaultNexusConfiguration
 
         Repository repository = repositoryRegistry.getRepository( settings.getId() );
 
-        if ( ShadowRepository.class.isAssignableFrom( repository.getClass() ) )
+        if ( DefaultShadowRepository.class.isAssignableFrom( repository.getClass() ) )
         {
             Repository newRepository = runtimeConfigurationBuilder.updateRepositoryFromModel(
-                (ShadowRepository) repository,
+                (DefaultShadowRepository) repository,
                 getConfiguration(),
                 settings );
 
@@ -996,7 +996,7 @@ public class DefaultNexusConfiguration
     {
         Repository repository = repositoryRegistry.getRepository( id );
 
-        if ( !ShadowRepository.class.isAssignableFrom( repository.getClass() ) )
+        if ( !DefaultShadowRepository.class.isAssignableFrom( repository.getClass() ) )
         {
             // this is shadow
             throw new NoSuchRepositoryException( id );

@@ -20,6 +20,8 @@
  */
 package org.sonatype.nexus.proxy.maven.maven1;
 
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.artifact.GavCalculator;
 import org.sonatype.nexus.artifact.M1ArtifactRecognizer;
@@ -29,37 +31,34 @@ import org.sonatype.nexus.proxy.maven.AbstractMavenRepository;
 import org.sonatype.nexus.proxy.maven.ArtifactPackagingMapper;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.proxy.registry.ContentClass;
+import org.sonatype.nexus.proxy.repository.Repository;
 
 /**
  * The default M1Repository. This class adds snapshot/release sensing and differentiated expiration handling and repo
  * policies for them.
  * 
  * @author cstamas
- * @plexus.component instantiation-strategy="per-lookup" role="org.sonatype.nexus.proxy.repository.Repository"
- *                   role-hint="maven1"
  */
+@Component( role = Repository.class, hint = "maven1", instantiationStrategy = "per-lookup" )
 public class M1Repository
     extends AbstractMavenRepository
 {
     /**
      * The ContentClass.
-     * 
-     * @plexus.requirement role-hint="maven1"
      */
+	@Requirement( hint="maven1" )
     private ContentClass contentClass;
 
     /**
      * The GAV Calculator.
-     * 
-     * @plexus.requirement role-hint="maven1"
      */
+	@Requirement( hint="maven1" )
     private GavCalculator gavCalculator;
 
     /**
      * The artifact packaging mapper.
-     * 
-     * @plexus.requirement
      */
+	@Requirement
     private ArtifactPackagingMapper artifactPackagingMapper;
 
     public ContentClass getRepositoryContentClass()

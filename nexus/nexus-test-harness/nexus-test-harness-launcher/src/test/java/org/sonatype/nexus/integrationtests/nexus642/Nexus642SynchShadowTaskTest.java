@@ -31,7 +31,7 @@ public class Nexus642SynchShadowTaskTest
 
         RepositoryShadowResource repo = new RepositoryShadowResource();
         repo.setId( shadowRepoId );
-        repo.setFormat( "maven1" );
+        repo.setFormat( "m2-m1-shadow" );
         repo.setName( shadowRepoId );
         repo.setRepoType( "virtual" );
         repo.setShadowOf( this.getTestRepositoryId() );

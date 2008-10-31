@@ -105,7 +105,7 @@ import org.sonatype.nexus.proxy.repository.LocalStatus;
 import org.sonatype.nexus.proxy.repository.ProxyMode;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RepositoryType;
-import org.sonatype.nexus.proxy.repository.ShadowRepository;
+import org.sonatype.nexus.proxy.repository.DefaultShadowRepository;
 import org.sonatype.nexus.proxy.router.RepositoryRouter;
 import org.sonatype.nexus.proxy.router.RootRepositoryRouter;
 import org.sonatype.nexus.proxy.wastebasket.Wastebasket;
@@ -943,7 +943,7 @@ public class DefaultNexus
     {
         try
         {
-            ShadowRepository shadowRepo = (ShadowRepository) getRepository( shadowRepositoryId );
+            DefaultShadowRepository shadowRepo = (DefaultShadowRepository) getRepository( shadowRepositoryId );
 
             shadowRepo.synchronizeWithMaster();
         }
@@ -1947,11 +1947,11 @@ public class DefaultNexus
 
                     sb.append( " virtual repository for " );
 
-                    sb.append( ( (ShadowRepository) revt.getRepository() ).getMasterRepository().getName() );
+                    sb.append( ( (DefaultShadowRepository) revt.getRepository() ).getMasterRepository().getName() );
 
                     sb.append( " (ID=" );
 
-                    sb.append( ( (ShadowRepository) revt.getRepository() ).getMasterRepository().getId() );
+                    sb.append( ( (DefaultShadowRepository) revt.getRepository() ).getMasterRepository().getId() );
 
                     sb.append( ") " );
                 }

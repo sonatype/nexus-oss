@@ -26,6 +26,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.Map;
 
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.artifact.Gav;
@@ -61,16 +62,14 @@ public abstract class AbstractMavenRepository
 {
     /**
      * Feed recorder.
-     * 
-     * @plexus.requirement
      */
+    @Requirement
     private FeedRecorder feedRecorder;
 
     /**
      * Metadata manager.
-     * 
-     * @plexus.requirement
      */
+    @Requirement
     private MetadataManager metadataManager;
 
     /** Maven repository policy */

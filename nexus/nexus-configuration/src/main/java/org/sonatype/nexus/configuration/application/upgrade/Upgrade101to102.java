@@ -305,7 +305,7 @@ public class Upgrade101to102
         CRepository newrepos = new CRepository();
         newrepos.setId( oldrepos.getId() );
         newrepos.setName( oldrepos.getName() );
-        newrepos.setType( CRepository.TYPE_MAVEN2 );
+        newrepos.setType( "maven2" );
         newrepos.setLocalStatus( oldrepos.isAvailable()
             ? org.sonatype.nexus.configuration.model.v1_0_2.Configuration.LOCAL_STATUS_IN_SERVICE
             : org.sonatype.nexus.configuration.model.v1_0_2.Configuration.LOCAL_STATUS_OUT_OF_SERVICE );

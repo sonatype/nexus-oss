@@ -25,6 +25,7 @@ import java.io.InputStream;
 import java.util.Collection;
 import java.util.Map;
 
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.artifact.GavCalculator;
@@ -39,8 +40,9 @@ import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StringContentLocator;
+import org.sonatype.nexus.proxy.repository.IncompatibleMasterRepositoryException;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.proxy.repository.ShadowRepository;
+import org.sonatype.nexus.proxy.repository.DefaultShadowRepository;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 
 /**
@@ -49,28 +51,25 @@ import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
  * @author cstamas
  */
 public abstract class LayoutConverterShadowRepository
-    extends ShadowRepository
+    extends DefaultShadowRepository
     implements MavenRepository
 {
     /**
      * The GAV Calculator.
-     * 
-     * @plexus.requirement role-hint="maven1"
      */
+    @Requirement( hint = "maven1" )
     private GavCalculator m1GavCalculator;
 
     /**
      * The GAV Calculator.
-     * 
-     * @plexus.requirement role-hint="maven2"
      */
+    @Requirement( hint = "maven2" )
     private GavCalculator m2GavCalculator;
 
     /**
      * Metadata manager.
-     * 
-     * @plexus.requirement
      */
+    @Requirement
     private MetadataManager metadataManager;
 
     /**
@@ -84,12 +83,15 @@ public abstract class LayoutConverterShadowRepository
     }
 
     public void setMasterRepository( Repository masterRepository )
+        throws IncompatibleMasterRepositoryException
     {
         // we allow only MavenRepository instances as masters
         if ( !MavenRepository.class.isAssignableFrom( masterRepository.getClass() ) )
         {
-            throw new IllegalArgumentException(
-                "This shadow repository needs master repository which implements MavenRepository interface!" );
+            throw new IncompatibleMasterRepositoryException(
+                "This shadow repository needs master repository which implements MavenRepository interface!",
+                this,
+                masterRepository );
         }
 
         super.setMasterRepository( masterRepository );

@@ -163,7 +163,7 @@
 			<name>Central M1 shadow</name>
 			<localStatus>inService</localStatus>
 			<shadowOf>central</shadowOf>
-			<type>maven1</type>
+			<type>m2-m1-shadow</type>
 			<syncAtStartup>false</syncAtStartup>
 		</repositoryShadow>
 
@@ -172,7 +172,7 @@
 			<name>Central M1 shadow</name>
 			<localStatus>inService</localStatus>
 			<shadowOf>nonexistent</shadowOf>
-			<type>maven1</type>
+			<type>m2-m1-shadow</type>
 			<syncAtStartup>false</syncAtStartup>
 		</repositoryShadow>
 

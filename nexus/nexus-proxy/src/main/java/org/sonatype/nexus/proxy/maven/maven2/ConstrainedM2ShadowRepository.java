@@ -37,6 +37,8 @@ import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Reader;
 import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Writer;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.artifact.versioning.VersionRange;
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.artifact.Gav;
@@ -63,6 +65,8 @@ import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.maven.MetadataManager;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.proxy.registry.ContentClass;
+import org.sonatype.nexus.proxy.repository.DefaultShadowRepository;
+import org.sonatype.nexus.proxy.repository.IncompatibleMasterRepositoryException;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.ShadowRepository;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
@@ -73,39 +77,34 @@ import org.sonatype.nexus.util.AlphanumComparator;
  * metadata. This shadow will (if set) report specific plugin versions only.
  * 
  * @author cstamas
- * @plexus.component instantiation-strategy="per-lookup" role="org.sonatype.nexus.proxy.repository.Repository"
- *                   role-hint="m2-constrained"
  */
+@Component( role = ShadowRepository.class, hint = "m2-constrained", instantiationStrategy = "per-lookup" )
 public class ConstrainedM2ShadowRepository
-    extends ShadowRepository
+    extends DefaultShadowRepository
     implements MavenRepository
 {
     /**
      * The GAV Calculator.
-     * 
-     * @plexus.requirement role-hint="maven2"
      */
+    @Requirement( hint = "maven2" )
     private GavCalculator gavCalculator;
 
     /**
      * The ContentClass.
-     * 
-     * @plexus.requirement role-hint="maven2"
      */
+    @Requirement( hint = "maven2" )
     private ContentClass contentClass;
 
     /**
      * The artifact packaging mapper.
-     * 
-     * @plexus.requirement
      */
+    @Requirement
     private ArtifactPackagingMapper artifactPackagingMapper;
 
     /**
      * Metadata manager.
-     * 
-     * @plexus.requirement
      */
+    @Requirement
     private MetadataManager metadataManager;
 
     /**
@@ -131,12 +130,15 @@ public class ConstrainedM2ShadowRepository
     }
 
     public void setMasterRepository( Repository masterRepository )
+        throws IncompatibleMasterRepositoryException
     {
         // we allow only MavenRepository instances as masters
         if ( !MavenRepository.class.isAssignableFrom( masterRepository.getClass() ) )
         {
-            throw new IllegalArgumentException(
-                "This shadow repository needs master repository which implements MavenRepository interface!" );
+            throw new IncompatibleMasterRepositoryException(
+                "This shadow repository needs master repository which implements MavenRepository interface!",
+                this,
+                masterRepository );
         }
 
         super.setMasterRepository( masterRepository );

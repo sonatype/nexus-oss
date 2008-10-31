@@ -32,6 +32,8 @@ import java.util.List;
 import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Reader;
 import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Writer;
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.IOUtil;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.artifact.GavCalculator;
@@ -47,37 +49,34 @@ import org.sonatype.nexus.proxy.maven.AbstractMavenRepository;
 import org.sonatype.nexus.proxy.maven.ArtifactPackagingMapper;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.proxy.registry.ContentClass;
+import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.util.AlphanumComparator;
 
 /**
  * The default M2Repository.
  * 
  * @author cstamas
- * @plexus.component instantiation-strategy="per-lookup" role="org.sonatype.nexus.proxy.repository.Repository"
- *                   role-hint="maven2"
  */
+@Component( role = Repository.class, hint = "maven2", instantiationStrategy = "per-lookup" )
 public class M2Repository
     extends AbstractMavenRepository
 {
     /**
      * The ContentClass.
-     * 
-     * @plexus.requirement role-hint="maven2"
      */
+	@Requirement( hint = "maven2" )
     private ContentClass contentClass;
 
     /**
      * The GAV Calculator.
-     * 
-     * @plexus.requirement role-hint="maven2"
      */
+	@Requirement( hint = "maven2" )
     private GavCalculator gavCalculator;
 
     /**
      * The artifact packaging mapper.
-     * 
-     * @plexus.requirement
      */
+	@Requirement
     private ArtifactPackagingMapper artifactPackagingMapper;
 
     public ContentClass getRepositoryContentClass()

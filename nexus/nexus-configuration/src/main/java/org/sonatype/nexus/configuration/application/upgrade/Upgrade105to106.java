@@ -11,26 +11,26 @@ import java.util.Set;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
-import org.sonatype.nexus.configuration.model.CGroupsSetting;
-import org.sonatype.nexus.configuration.model.CGroupsSettingPathMappingItem;
-import org.sonatype.nexus.configuration.model.CHttpProxySettings;
-import org.sonatype.nexus.configuration.model.CLocalStorage;
-import org.sonatype.nexus.configuration.model.CProps;
-import org.sonatype.nexus.configuration.model.CRemoteAuthentication;
-import org.sonatype.nexus.configuration.model.CRemoteConnectionSettings;
-import org.sonatype.nexus.configuration.model.CRemoteHttpProxySettings;
-import org.sonatype.nexus.configuration.model.CRemoteStorage;
-import org.sonatype.nexus.configuration.model.CRepository;
-import org.sonatype.nexus.configuration.model.CRepositoryGroup;
-import org.sonatype.nexus.configuration.model.CRepositoryGrouping;
-import org.sonatype.nexus.configuration.model.CRepositoryShadow;
-import org.sonatype.nexus.configuration.model.CRepositoryTarget;
-import org.sonatype.nexus.configuration.model.CRestApiSettings;
-import org.sonatype.nexus.configuration.model.CRouting;
-import org.sonatype.nexus.configuration.model.CScheduleConfig;
-import org.sonatype.nexus.configuration.model.CScheduledTask;
-import org.sonatype.nexus.configuration.model.CSecurity;
-import org.sonatype.nexus.configuration.model.CSmtpConfiguration;
+import org.sonatype.nexus.configuration.model.v1_0_6.CGroupsSetting;
+import org.sonatype.nexus.configuration.model.v1_0_6.CGroupsSettingPathMappingItem;
+import org.sonatype.nexus.configuration.model.v1_0_6.CHttpProxySettings;
+import org.sonatype.nexus.configuration.model.v1_0_6.CLocalStorage;
+import org.sonatype.nexus.configuration.model.v1_0_6.CProps;
+import org.sonatype.nexus.configuration.model.v1_0_6.CRemoteAuthentication;
+import org.sonatype.nexus.configuration.model.v1_0_6.CRemoteConnectionSettings;
+import org.sonatype.nexus.configuration.model.v1_0_6.CRemoteHttpProxySettings;
+import org.sonatype.nexus.configuration.model.v1_0_6.CRemoteStorage;
+import org.sonatype.nexus.configuration.model.v1_0_6.CRepository;
+import org.sonatype.nexus.configuration.model.v1_0_6.CRepositoryGroup;
+import org.sonatype.nexus.configuration.model.v1_0_6.CRepositoryGrouping;
+import org.sonatype.nexus.configuration.model.v1_0_6.CRepositoryShadow;
+import org.sonatype.nexus.configuration.model.v1_0_6.CRepositoryTarget;
+import org.sonatype.nexus.configuration.model.v1_0_6.CRestApiSettings;
+import org.sonatype.nexus.configuration.model.v1_0_6.CRouting;
+import org.sonatype.nexus.configuration.model.v1_0_6.CScheduleConfig;
+import org.sonatype.nexus.configuration.model.v1_0_6.CScheduledTask;
+import org.sonatype.nexus.configuration.model.v1_0_6.CSecurity;
+import org.sonatype.nexus.configuration.model.v1_0_6.CSmtpConfiguration;
 import org.sonatype.nexus.configuration.model.v1_0_5.Configuration;
 import org.sonatype.nexus.configuration.model.v1_0_5.io.xpp3.NexusConfigurationXpp3Reader;
 import org.sonatype.nexus.configuration.upgrade.ConfigurationIsCorruptedException;
@@ -83,7 +83,7 @@ public class Upgrade105to106
         throws ConfigurationIsCorruptedException
     {
         Configuration oldc = (Configuration) message.getConfiguration();
-        org.sonatype.nexus.configuration.model.Configuration newc = new org.sonatype.nexus.configuration.model.Configuration();
+        org.sonatype.nexus.configuration.model.v1_0_6.Configuration newc = new org.sonatype.nexus.configuration.model.v1_0_6.Configuration();
 
         newc.setVersion( org.sonatype.nexus.configuration.model.Configuration.MODEL_VERSION );
         // Working & log directories removed in this revision
@@ -171,7 +171,7 @@ public class Upgrade105to106
             newc.setRepositoryGrouping( repositoryGrouping );
         }
 
-        message.setModelVersion( org.sonatype.nexus.configuration.model.Configuration.MODEL_VERSION );
+        message.setModelVersion( org.sonatype.nexus.configuration.model.v1_0_6.Configuration.MODEL_VERSION );
         message.setConfiguration( newc );
     }
 
@@ -521,12 +521,12 @@ public class Upgrade105to106
         {
             schedule.setCronCommand( oldschedule.getCronCommand() );
             schedule.setDaysOfMonth( oldschedule.getDaysOfMonth() );
-            
-            for ( String dayOfWeek : ( List<String> )oldschedule.getDaysOfWeek() )
+
+            for ( String dayOfWeek : (List<String>) oldschedule.getDaysOfWeek() )
             {
                 schedule.addDaysOfWeek( Integer.toString( Integer.parseInt( dayOfWeek ) + 1 ) );
             }
-            
+
             schedule.setEndDate( oldschedule.getEndDate() );
             schedule.setStartDate( oldschedule.getStartDate() );
             schedule.setType( oldschedule.getType() );

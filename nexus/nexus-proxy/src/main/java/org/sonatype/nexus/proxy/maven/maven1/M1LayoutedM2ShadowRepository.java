@@ -20,41 +20,40 @@
  */
 package org.sonatype.nexus.proxy.maven.maven1;
 
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.nexus.artifact.GavCalculator;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.maven.ArtifactPackagingMapper;
 import org.sonatype.nexus.proxy.maven.LayoutConverterShadowRepository;
 import org.sonatype.nexus.proxy.registry.ContentClass;
+import org.sonatype.nexus.proxy.repository.ShadowRepository;
 
 /**
  * A shadow repository that transforms M2 layout of master to M1 layouted shadow.
  * 
  * @author cstamas
- * @plexus.component instantiation-strategy="per-lookup" role="org.sonatype.nexus.proxy.repository.Repository"
- *                   role-hint="m2-m1-shadow"
  */
+@Component( role = ShadowRepository.class, hint = "m2-m1-shadow", instantiationStrategy = "per-lookup" )
 public class M1LayoutedM2ShadowRepository
     extends LayoutConverterShadowRepository
 {
     /**
      * The ContentClass.
-     * 
-     * @plexus.requirement role-hint="maven1"
      */
+    @Requirement( hint = "maven1" )
     private ContentClass contentClass;
 
     /**
      * The ContentClass.
-     * 
-     * @plexus.requirement role-hint="maven2"
      */
+    @Requirement( hint = "maven2" )
     private ContentClass masterContentClass;
 
     /**
      * The artifact packaging mapper.
-     * 
-     * @plexus.requirement
      */
+    @Requirement
     private ArtifactPackagingMapper artifactPackagingMapper;
 
     /**
@@ -94,6 +93,5 @@ public class M1LayoutedM2ShadowRepository
     {
         return transformM1toM2( path );
     }
-
 
 }

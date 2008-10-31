@@ -934,7 +934,7 @@
 ]]></code>
 				</codeSegment>
 				<codeSegment>
-					<version>1.0.2+</version>
+					<version>1.0.2/1.0.6</version>
 					<code><![CDATA[
     public static final String REPOSITORY_POLICY_RELEASE = "release";
     public static final String REPOSITORY_POLICY_SNAPSHOT = "snapshot";
@@ -952,6 +952,28 @@
     public static final String TYPE_MAVEN1 = "maven1";
     public static final String TYPE_MAVEN_SITE = "maven-site";
     public static final String TYPE_ECLIPSE_UPDATE_SITE = "eclipse-update-site";
+
+	/* A field that "carries" the Configuration modelVersion with object */
+    public final String modelVersion = Configuration.MODEL_VERSION;
+    
+    /* A field to store the default local storage URL */
+    public transient String defaultLocalStorageUrl;
+]]></code>
+				</codeSegment>
+				<codeSegment>
+					<version>1.0.7+</version>
+					<code><![CDATA[
+    public static final String REPOSITORY_POLICY_RELEASE = "release";
+    public static final String REPOSITORY_POLICY_SNAPSHOT = "snapshot";
+
+    public static final String CHECKSUM_POLICY_IGNORE = "ignore";
+    public static final String CHECKSUM_POLICY_WARN = "warn";
+    public static final String CHECKSUM_POLICY_STRICT_IF_EXISTS = "strictIfExists";
+    public static final String CHECKSUM_POLICY_STRICT = "strict";
+
+    public static final String PROXY_MODE_ALLOW = "allow";
+    public static final String PROXY_MODE_BLOCKED_AUTO = "blockedAuto";
+    public static final String PROXY_MODE_BLOCKED_MANUAL = "blockedManual";
 
 	/* A field that "carries" the Configuration modelVersion with object */
     public final String modelVersion = Configuration.MODEL_VERSION;
@@ -1107,11 +1129,18 @@
 				</field>
 				<field>
 					<name>type</name>
-					<version>1.0.0+</version>
+					<version>1.0.0/1.0.6</version>
 					<type>String</type>
 					<required>true</required>
 					<description>Shadow type.</description>
 					<defaultValue>maven1</defaultValue>
+				</field>
+				<field>
+					<name>type</name>
+					<version>1.0.7+</version>
+					<type>String</type>
+					<required>true</required>
+					<description>Shadow type.</description>
 				</field>
 				<field>
 					<name>syncAtStartup</name>
@@ -1153,12 +1182,22 @@
 			</fields>
 			<codeSegments>
 				<codeSegment>
-					<version>1.0.1+</version>
+					<version>1.0.1/1.0.6</version>
 					<code><![CDATA[
     public static final String TYPE_MAVEN1 = "maven1"; /* maven1 layout of maven2 repo */
     public static final String TYPE_MAVEN2 = "maven2"; /* maven2 layout of maven1 repo */
     public static final String TYPE_MAVEN2_CONSTRAINED = "maven2-constrained"; /* maven2 with version constraints */
 
+	/* A field that "carries" the Configuration modelVersion with object */
+    public final String modelVersion = Configuration.MODEL_VERSION;
+    
+    /* A field to store the default local storage URL */
+    public transient String defaultLocalStorageUrl;
+]]></code>
+				</codeSegment>
+				<codeSegment>
+					<version>1.0.7+</version>
+					<code><![CDATA[
 	/* A field that "carries" the Configuration modelVersion with object */
     public final String modelVersion = Configuration.MODEL_VERSION;
     
