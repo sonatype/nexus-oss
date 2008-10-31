@@ -1,5 +1,7 @@
 package org.sonatype.nexus.rest.repositories;
 
+import java.util.Collection;
+
 import org.restlet.data.Form;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
@@ -19,6 +21,8 @@ import org.sonatype.nexus.proxy.repository.RemoteStatus;
 import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
 import org.sonatype.nexus.rest.global.AbstractGlobalConfigurationPlexusResource;
 import org.sonatype.nexus.rest.model.RepositoryBaseResource;
+import org.sonatype.nexus.rest.model.RepositoryListResource;
+import org.sonatype.nexus.rest.model.RepositoryListResourceResponse;
 import org.sonatype.nexus.rest.model.RepositoryProxyResource;
 import org.sonatype.nexus.rest.model.RepositoryResource;
 import org.sonatype.nexus.rest.model.RepositoryResourceRemoteStorage;
@@ -43,6 +47,7 @@ public abstract class AbstractRepositoryPlexusResource
 
     /**
      * Pull the repository Id out of the Request.
+     * 
      * @param request
      * @return
      */
@@ -50,7 +55,7 @@ public abstract class AbstractRepositoryPlexusResource
     {
         return request.getAttributes().get( REPOSITORY_ID_KEY ).toString();
     }
-    
+
     /**
      * Converting App model to REST DTO.
      */
@@ -84,7 +89,7 @@ public abstract class AbstractRepositoryPlexusResource
     public CRepositoryShadow getRepositoryShadowAppModel( RepositoryShadowResource model, CRepositoryShadow target )
     {
         CRepositoryShadow appModel = new CRepositoryShadow();
-        
+
         if ( target == null )
         {
             appModel.setLocalStatus( Configuration.LOCAL_STATUS_IN_SERVICE );
@@ -93,7 +98,7 @@ public abstract class AbstractRepositoryPlexusResource
         {
             appModel.setLocalStatus( target.getLocalStatus() );
         }
-        
+
         appModel.setId( model.getId() );
 
         appModel.setName( model.getName() );
@@ -191,12 +196,12 @@ public abstract class AbstractRepositoryPlexusResource
     public CRepository getRepositoryAppModel( RepositoryResource model, CRepository target )
     {
         CRepository appModel = new CRepository();
-        
+
         if ( target != null )
-        {            
+        {
             appModel.setLocalStatus( target.getLocalStatus() );
         }
-        
+
         appModel.setId( model.getId() );
 
         appModel.setName( model.getName() );
@@ -436,7 +441,8 @@ public abstract class AbstractRepositoryPlexusResource
         }
     }
 
-    public String getRestRepoRemoteStatus( Object model, Request request, Response response ) throws ResourceException
+    public String getRestRepoRemoteStatus( Object model, Request request, Response response )
+        throws ResourceException
     {
         try
         {
@@ -482,12 +488,12 @@ public abstract class AbstractRepositoryPlexusResource
             return null;
         }
     }
-    
-    
-    protected RepositoryResourceResponse getRepositoryResourceResponse( String repoId, Nexus nexus ) throws ResourceException
+
+    protected RepositoryResourceResponse getRepositoryResourceResponse( String repoId, Nexus nexus )
+        throws ResourceException
     {
         RepositoryResourceResponse result = new RepositoryResourceResponse();
-        
+
         try
         {
             RepositoryBaseResource resource = null;
@@ -505,7 +511,7 @@ public abstract class AbstractRepositoryPlexusResource
             }
 
             result.setData( resource );
-            }
+        }
         catch ( NoSuchRepositoryException e )
         {
             getLogger().warn( "Repository not found, id=" + repoId );
@@ -514,5 +520,80 @@ public abstract class AbstractRepositoryPlexusResource
         }
         return result;
     }
-    
+
+    protected RepositoryListResourceResponse listRepositories( Request request, boolean allReposes )
+        throws ResourceException
+    {
+        RepositoryListResourceResponse result = new RepositoryListResourceResponse();
+
+        RepositoryListResource repoRes;
+
+        Collection<CRepository> repositories = getNexusInstance( request ).listRepositories();
+
+        for ( CRepository repository : repositories )
+        {
+            if ( allReposes || repository.isUserManaged() )
+            {
+                repoRes = new RepositoryListResource();
+
+                repoRes.setResourceURI( createChildReference( request, repository.getId() ).toString() );
+
+                repoRes.setRepoType( getRestRepoType( repository ) );
+
+                repoRes.setFormat( repository.getType() );
+
+                repoRes.setId( repository.getId() );
+
+                repoRes.setName( repository.getName() );
+
+                repoRes.setUserManaged( repository.isUserManaged() );
+
+                repoRes.setEffectiveLocalStorageUrl( repository.getLocalStorage() != null
+                    && repository.getLocalStorage().getUrl() != null
+                    ? repository.getLocalStorage().getUrl()
+                    : repository.defaultLocalStorageUrl );
+
+                repoRes.setRepoPolicy( getRestRepoPolicy( repository ) );
+
+                if ( REPO_TYPE_PROXIED.equals( repoRes.getRepoType() ) )
+                {
+                    if ( repository.getRemoteStorage() != null )
+                    {
+                        repoRes.setRemoteUri( repository.getRemoteStorage().getUrl() );
+                    }
+                }
+
+                result.addData( repoRes );
+            }
+        }
+
+        Collection<CRepositoryShadow> shadows = getNexusInstance( request ).listRepositoryShadows();
+
+        for ( CRepositoryShadow shadow : shadows )
+        {
+            if ( allReposes || shadow.isUserManaged() )
+            {
+                repoRes = new RepositoryListResource();
+
+                repoRes.setId( shadow.getId() );
+
+                repoRes.setFormat( shadow.getType() );
+
+                repoRes.setResourceURI( createChildReference( request, shadow.getId() ).toString() );
+
+                repoRes.setRepoType( getRestRepoType( shadow ) );
+
+                repoRes.setName( shadow.getName() );
+
+                repoRes.setUserManaged( shadow.isUserManaged() );
+
+                repoRes.setEffectiveLocalStorageUrl( shadow.defaultLocalStorageUrl );
+
+                result.addData( repoRes );
+            }
+        }
+
+        return result;
+    }
+
 }

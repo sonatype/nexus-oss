@@ -7,7 +7,7 @@ import org.sonatype.nexus.rest.component.AbstractComponentListPlexusResource;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 
-@Component( role = PlexusResource.class, hint = "RepositoryTypesComponentListPlexusResource" )
+@Component( role = PlexusResource.class, hint = "ShadowRepositoryTypesComponentListPlexusResource" )
 public class ShadowRepositoryTypesComponentListPlexusResource
     extends AbstractComponentListPlexusResource
 {

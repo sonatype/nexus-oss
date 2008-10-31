@@ -498,6 +498,12 @@
 					<required>true</required>
 				</field>
 				<field>
+					<name>userManaged</name>
+					<version>1.0.0+</version>
+					<type>boolean</type>
+					<required>true</required>
+				</field>
+				<field>
 					<name>effectiveLocalStorageUrl</name>
 					<version>1.0.0+</version>
 					<type>String</type>

@@ -1,7 +1,6 @@
 package org.sonatype.nexus.rest.repositories;
 
 import java.io.IOException;
-import java.util.Collection;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.restlet.Context;
@@ -15,8 +14,6 @@ import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.CRepositoryShadow;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.rest.model.RepositoryBaseResource;
-import org.sonatype.nexus.rest.model.RepositoryListResource;
-import org.sonatype.nexus.rest.model.RepositoryListResourceResponse;
 import org.sonatype.nexus.rest.model.RepositoryResource;
 import org.sonatype.nexus.rest.model.RepositoryResourceResponse;
 import org.sonatype.nexus.rest.model.RepositoryShadowResource;
@@ -61,66 +58,7 @@ public class RepositoryListPlexusResource
     public Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
     {
-        RepositoryListResourceResponse result = new RepositoryListResourceResponse();
-
-        RepositoryListResource repoRes;
-
-        Collection<CRepository> repositories = getNexusInstance( request ).listRepositories();
-
-        for ( CRepository repository : repositories )
-        {
-            repoRes = new RepositoryListResource();
-
-            repoRes.setResourceURI( createChildReference( request, repository.getId() ).toString() );
-
-            repoRes.setRepoType( getRestRepoType( repository ) );
-
-            repoRes.setFormat( repository.getType() );
-
-            repoRes.setId( repository.getId() );
-
-            repoRes.setName( repository.getName() );
-
-            repoRes.setEffectiveLocalStorageUrl( repository.getLocalStorage() != null
-                && repository.getLocalStorage().getUrl() != null
-                ? repository.getLocalStorage().getUrl()
-                : repository.defaultLocalStorageUrl );
-
-            repoRes.setRepoPolicy( getRestRepoPolicy( repository ) );
-
-            if ( REPO_TYPE_PROXIED.equals( repoRes.getRepoType() ) )
-            {
-                if ( repository.getRemoteStorage() != null )
-                {
-                    repoRes.setRemoteUri( repository.getRemoteStorage().getUrl() );
-                }
-            }
-
-            result.addData( repoRes );
-        }
-
-        Collection<CRepositoryShadow> shadows = getNexusInstance( request ).listRepositoryShadows();
-
-        for ( CRepositoryShadow shadow : shadows )
-        {
-            repoRes = new RepositoryListResource();
-
-            repoRes.setId( shadow.getId() );
-
-            repoRes.setFormat( shadow.getType() );
-
-            repoRes.setResourceURI( createChildReference( request, shadow.getId() ).toString() );
-
-            repoRes.setRepoType( getRestRepoType( shadow ) );
-
-            repoRes.setName( shadow.getName() );
-
-            repoRes.setEffectiveLocalStorageUrl( shadow.defaultLocalStorageUrl );
-
-            result.addData( repoRes );
-        }
-
-        return result;
+        return listRepositories( request, false );
     }
 
     @Override
