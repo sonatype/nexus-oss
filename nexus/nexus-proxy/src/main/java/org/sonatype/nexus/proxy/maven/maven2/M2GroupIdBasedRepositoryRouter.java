@@ -54,7 +54,6 @@ import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.router.DefaultGroupIdBasedRepositoryRouter;
-import org.sonatype.nexus.proxy.router.GroupIdBasedRepositoryRouter;
 import org.sonatype.nexus.proxy.router.RepositoryRouter;
 
 /**
@@ -66,7 +65,7 @@ import org.sonatype.nexus.proxy.router.RepositoryRouter;
  */
 @Component( role = RepositoryRouter.class, hint = "groups-m2" )
 public class M2GroupIdBasedRepositoryRouter
-    extends GroupIdBasedRepositoryRouter
+    extends DefaultGroupIdBasedRepositoryRouter
 {
     /**
      * The ContentClass.

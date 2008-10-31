@@ -44,6 +44,21 @@ public interface ResourceStore
     String getId();
 
     /**
+     * If is user managed, the nexus core and nexus core UI handles the store. Thus, for reposes, users are allowed to
+     * edit/drop the repository.
+     * 
+     * @return
+     */
+    boolean isUserManaged();
+
+    /**
+     * Sets is the store user managed.
+     * 
+     * @param val
+     */
+    void setUserManaged( boolean val );
+
+    /**
      * Retrieves item from the path of the request.
      * 
      * @param request the request

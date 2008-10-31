@@ -110,6 +110,16 @@ public abstract class AbstractRepositoryRouter
     // =====================================================================
     // RepositoryRouter iface
 
+    public final boolean isUserManaged()
+    {
+        return false;
+    }
+
+    public final void setUserManaged( boolean val )
+    {
+        throw new UnsupportedOperationException( "Setting UserManaged flag on Routers is not supported!" );
+    }
+
     public boolean isFollowLinks()
     {
         return followLinks;
