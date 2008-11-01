@@ -31,6 +31,7 @@ import org.sonatype.plexus.rest.xstream.json.JsonOrgHierarchicalStreamDriver;
 import org.sonatype.plexus.rest.xstream.json.PrimitiveKeyedMapConverter;
 import org.sonatype.plexus.rest.xstream.xml.LookAheadXppDriver;
 
+import com.noelios.restlet.application.Encoder;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.HierarchicalStreamDriver;
 
@@ -186,8 +187,13 @@ public class PlexusRestletApplicationBridge
 
             doCreateRoot( applicationRouter, isStarted );
 
+            // encoding support
+            Encoder encoder = new Encoder( getContext() );
+
+            encoder.setNext( rootRouter );
+
             // set it
-            root.setRoot( rootRouter );
+            root.setRoot( encoder );
         }
     }
 

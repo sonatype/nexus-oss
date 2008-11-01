@@ -17,6 +17,7 @@
 	</scm>
 
 	<properties>
+		<!-- restlet.version>1.1.1</restlet.version-->
 		<restlet.version>1.1-RC2</restlet.version>
 	</properties>
 

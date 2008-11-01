@@ -23,6 +23,8 @@ public class PlexusServerServlet
         return (PlexusContainer) getServletContext().getAttribute( PlexusConstants.PLEXUS_KEY );
     }
 
+    // TODO: -- TO BE REMOVED WHEN MOVING OFF 1.1-RC2
+    // In 1.1.1 this client is added already
     protected Component createComponent()
     {
         Component result = super.createComponent();
@@ -31,6 +33,7 @@ public class PlexusServerServlet
 
         return result;
     }
+    // TODO: -- TO BE REMOVED WHEN MOVING OFF 1.1-RC2
 
     public Application createApplication( Context context )
     {
@@ -62,6 +65,9 @@ public class PlexusServerServlet
         application.setName( getServletConfig().getServletName() );
 
         application.setContext( new ServletContextAdapter( this, context ) );
+
+        // setting logger explicitly, to override the stupid logger put there by ServletContextAdapter
+        application.getContext().setLogger( application.getClass().getName() );
 
         // --- FROM SUPERCLASS (as is) -- BEGIN
         // Copy all the servlet parameters into the context
