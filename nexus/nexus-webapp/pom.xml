@@ -137,7 +137,7 @@
           </execution>
         </executions>
       </plugin>
-      
+      <!-- 
       <plugin>
         <artifactId>maven-antrun-plugin</artifactId>
         <executions>
@@ -201,15 +201,17 @@
           </execution>
         </executions>
       </plugin>
-      
+      -->
       <plugin>
         <artifactId>maven-war-plugin</artifactId>
         <version>2.1-alpha-2</version>
         <configuration>
           <webResources>
+            <!-- 
             <webResource>
               <directory>${basedir}/target/gzip-web-content</directory>
             </webResource>
+            -->
             <webResource>
               <directory>${basedir}/src/main/webapp-war-extras</directory>
               <excludes>
