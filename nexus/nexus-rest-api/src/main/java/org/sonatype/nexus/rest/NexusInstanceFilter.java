@@ -40,6 +40,7 @@ import org.sonatype.nexus.proxy.access.NexusItemAuthorizer;
  * instance into request attributes, hance making local and remote call transparent in underlying restlets.
  * 
  * @author cstamas
+ * @deprecated
  */
 @Component( role = Filter.class, hint = "nexusInstance" )
 public class NexusInstanceFilter

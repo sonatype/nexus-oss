@@ -33,6 +33,7 @@ import org.sonatype.nexus.Nexus;
  * instance into request attributes, hance making local and remote call transparent in underlying restlets.
  * 
  * @author cstamas
+ * @deprecated
  */
 @Component( role = Filter.class, hint = "localNexusInstance" )
 public class LocalNexusInstanceFilter

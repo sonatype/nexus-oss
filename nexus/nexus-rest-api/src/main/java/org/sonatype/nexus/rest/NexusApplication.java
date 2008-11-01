@@ -492,13 +492,18 @@ public class NexusApplication
     {
         // ==========
         // INDEX.HTML and WAR contents
-        // TODO: would be nice to get the resourceUri from indexTemplateResource! (and discover the root of the app!)
-        Redirector redirector = new Redirector( getContext(), "{op}/index.html", Redirector.MODE_CLIENT_PERMANENT );
+        // redirector, to redirect "uncaught" requests to indexTemplateResource
+        Redirector redirector = new Redirector(
+            getContext(),
+            "{op}" + indexTemplateResource.getResourceUri(),
+            Redirector.MODE_CLIENT_PERMANENT );
         attach( root, true, "", redirector );
         attach( root, true, "/", redirector );
 
+        // the indexTemplateResource
         attach( root, true, indexTemplateResource );
 
+        // publish the WAR contents
         Directory rootDir = new Directory( getContext(), "war:///" );
         rootDir.setListingAllowed( false );
         rootDir.setNegotiateContent( false );

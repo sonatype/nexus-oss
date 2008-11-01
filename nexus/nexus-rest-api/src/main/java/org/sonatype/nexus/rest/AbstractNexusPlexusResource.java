@@ -56,6 +56,11 @@ public abstract class AbstractNexusPlexusResource
     @Requirement
     private NexusItemAuthorizer nexusItemAuthorizer;
 
+    /**
+     * Deprecated. Resources are Plexus components, use Requirement from now on.
+     * 
+     * @deprecated Use Plexus DI from now on.
+     */
     protected Nexus getNexusInstance( Request request )
         throws ResourceException
     {
@@ -70,11 +75,21 @@ public abstract class AbstractNexusPlexusResource
         }
     }
 
+    /**
+     * Deprecated. Resources are Plexus components, use Requirement from now on.
+     * 
+     * @deprecated Use Plexus DI from now on.
+     */
     protected NexusSecurity getNexusSecurity( Request request )
     {
         return (NexusSecurity) request.getAttributes().get( NexusSecurity.class.getName() );
     }
 
+    /**
+     * Deprecated. Resources are Plexus components, use Requirement from now on.
+     * 
+     * @deprecated Use Plexus DI from now on.
+     */
     protected SecurityManager getSecurityManager( Request request )
     {
         return (SecurityManager) request.getAttributes().get( SecurityManager.class.getName() );
