@@ -114,6 +114,16 @@ Sonatype.repoServer.RoleEditPanel = function(config){
         
     items: [
       {
+        name: 'internalResourceHeader',
+        xtype: 'panel',
+        layout: 'table',
+        hidden: true,
+        style: 'font-size: 18px; padding: 5px 0px 5px 15px',
+        items: [{
+            html: '<b>This is an internal Nexus resource which cannot be edited or deleted.</b><br><hr/>'
+        }]
+      },
+      {
         xtype: 'hidden',
         name: 'id'
       },
@@ -671,6 +681,14 @@ Ext.extend(Sonatype.repoServer.RoleEditPanel, Ext.Panel, {
         this.rolesDataStore.sort(sortState.field, sortState.direction);
       }
     }
+    else {
+        var i = this.rolesDataStore.indexOfId(action.options.fpanel.id);
+        var rec = this.rolesDataStore.getAt(i);
+
+        if ( rec.data.readOnly) {
+          action.options.fpanel.find('name', 'internalResourceHeader')[0].setVisible( true );
+        }
+      }
   },
   
   updateRoleRecord : function(rec, receivedData){
@@ -828,11 +846,11 @@ Ext.extend(Sonatype.repoServer.RoleEditPanel, Ext.Panel, {
     //@note: there has to be a better way to do this.  Depending on offsets is very error prone
     var newConfig = config;
 
-    newConfig.items[4].id = id + '_roles_privs_tree_panel';
-    newConfig.items[4].items[0].root = new Ext.tree.TreeNode({text: 'root'});
-    newConfig.items[4].items[0].id = id + '_roles_privs_tree';
-    newConfig.items[4].items[2].root = new Ext.tree.TreeNode({text: 'root'});
-    newConfig.items[4].items[2].id = id + '_all_roles_privs_tree';
+    newConfig.items[5].id = id + '_roles_privs_tree_panel';
+    newConfig.items[5].items[0].root = new Ext.tree.TreeNode({text: 'root'});
+    newConfig.items[5].items[0].id = id + '_roles_privs_tree';
+    newConfig.items[5].items[2].root = new Ext.tree.TreeNode({text: 'root'});
+    newConfig.items[5].items[2].id = id + '_all_roles_privs_tree';
 
     return newConfig;
   },
