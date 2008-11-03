@@ -192,7 +192,7 @@ public class Nexus758ServiceStabilityTest
 
         client.startNexus();
 
-        Assert.assertTrue( "Unable to start Nexus after 40 seconds", ServiceStatusUtil.waitForStart( client ) );
+        Assert.assertTrue( "Unable to start Nexus after 4 minutes", ServiceStatusUtil.waitForStart( client ) );
     }
 
     private void doClientStop()
@@ -202,7 +202,7 @@ public class Nexus758ServiceStabilityTest
 
         client.stopNexus();
 
-        Assert.assertTrue( "Unable to stop Nexus after 10 seconds", ServiceStatusUtil.waitForStop( client ) );
+        Assert.assertTrue( "Unable to stop Nexus after 4 minutes", ServiceStatusUtil.waitForStop( client ) );
     }
 
     private void doSoftStart()
@@ -212,7 +212,7 @@ public class Nexus758ServiceStabilityTest
 
         NexusStateUtil.doSoftStart();
 
-        Assert.assertTrue( "Unable to start Nexus after 40 seconds", ServiceStatusUtil.waitForStart( client ) );
+        Assert.assertTrue( "Unable to start Nexus after 4 minutes", ServiceStatusUtil.waitForStart( client ) );
     }
 
     private void doSoftStop()
@@ -222,7 +222,7 @@ public class Nexus758ServiceStabilityTest
 
         NexusStateUtil.doSoftStop();
 
-        Assert.assertTrue( "Unable to stop Nexus after 10 seconds", ServiceStatusUtil.waitForStop( client ) );
+        Assert.assertTrue( "Unable to stop Nexus after 4 minutes", ServiceStatusUtil.waitForStop( client ) );
     }
 
     public void startAndStopTest()
@@ -260,7 +260,7 @@ public class Nexus758ServiceStabilityTest
         appBooter.setSleepAfterStart( 0 );
         appBooter.start();
 
-        Assert.assertTrue( "Unable to start Nexus after 40 seconds", ServiceStatusUtil.waitForStart( client ) );
+        Assert.assertTrue( "Unable to start Nexus after 4 minutes", ServiceStatusUtil.waitForStart( client ) );
 
         return appBooter;
     }
@@ -272,7 +272,7 @@ public class Nexus758ServiceStabilityTest
 
         app.stop();
 
-        Assert.assertTrue( "Unable to stop Nexus after 10 seconds", ServiceStatusUtil.waitForStop( client ) );
+        Assert.assertTrue( "Unable to stop Nexus after 4 minutes", ServiceStatusUtil.waitForStop( client ) );
     }
 
 }
