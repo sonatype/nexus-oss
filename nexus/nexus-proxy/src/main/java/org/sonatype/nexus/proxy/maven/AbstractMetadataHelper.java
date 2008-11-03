@@ -23,6 +23,7 @@ package org.sonatype.nexus.proxy.maven;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -40,11 +41,16 @@ import org.apache.maven.mercury.repository.metadata.Versioning;
 import org.apache.maven.mercury.util.TimeUtil;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
-import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.StringUtils;
 
-public class AbstractMetadataHelper
+/**
+ * a maven metadata helper containing all the logic for creating maven-metadata.xml
+ * 
+ * @author Juven Xu
+ *
+ */
+abstract public class AbstractMetadataHelper
 {
 
     private static final String VERSION_REGEX = "^[0-9].*$";
@@ -63,12 +69,6 @@ public class AbstractMetadataHelper
     private List<String> currentVersions = new ArrayList<String>();
 
     private List<String> currentArtifacts = new ArrayList<String>();
-
-    private boolean hasVersion;
-
-    private boolean hasArtifact;
-
-    private boolean hasPlugin;
 
     public void onDirEnter( String path )
     {
@@ -108,13 +108,7 @@ public class AbstractMetadataHelper
         {
             currentArtifacts.add( path );
 
-            hasArtifact = true;
             handleMavenPlugin( path );
-
-            if ( !currentPlugins.isEmpty() )
-            {
-                hasPlugin = true;
-            }
         }
 
     }
@@ -198,8 +192,6 @@ public class AbstractMetadataHelper
 
                 currentGroupId = getParentPath( path ).substring( 1, spaceOfGAPos ).replace( '/', '.' );
             }
-
-            hasVersion = true;
         }
     }
 
@@ -224,7 +216,7 @@ public class AbstractMetadataHelper
         Model model = null;
         try
         {
-            Reader reader = ReaderFactory.newXmlReader( FileUtils.getFile( path ) );
+            Reader reader = ReaderFactory.newXmlReader( retrieveContent( path ) );
             MavenXpp3Reader xpp3 = new MavenXpp3Reader();
 
             try
@@ -239,7 +231,7 @@ public class AbstractMetadataHelper
         }
         catch ( Exception e )
         {
-            // getLogger().info( "Can't build POM model from " + pomFile.getPath(), e );
+            e.printStackTrace();
         }
 
         if ( model != null && model.getPackaging().equals( "maven-plugin" ) )
@@ -254,13 +246,12 @@ public class AbstractMetadataHelper
             {
                 currentPlugins.put( model.getArtifactId(), new PluginInfoForMetadata( model.getArtifactId() ) );
             }
-
         }
     }
 
     private boolean shouldCreateMetadataForArtifactDir( String path )
     {
-        if ( hasVersion && inArtifactIdPath( path ) )
+        if ( !currentVersions.isEmpty() && inArtifactIdPath( path ) )
         {
             return true;
         }
@@ -269,7 +260,7 @@ public class AbstractMetadataHelper
 
     private boolean shouldCreateMetadataForSnapshotVersionDir( String path )
     {
-        if ( hasArtifact && inVersionPath( path ) && currentVersion.endsWith( "SNAPSHOT" ) )
+        if ( !currentArtifacts.isEmpty() && inVersionPath( path ) && currentVersion.endsWith( "SNAPSHOT" ) )
         {
             return true;
         }
@@ -278,7 +269,7 @@ public class AbstractMetadataHelper
 
     private boolean shouldCreateMetadataForPluginGroupDir( String path )
     {
-        if ( hasPlugin && inGroupIdPath( path ) )
+        if ( !currentPlugins.isEmpty() && inGroupIdPath( path ) )
         {
             return true;
         }
@@ -350,8 +341,6 @@ public class AbstractMetadataHelper
 
     public void createMetadataForPluginGroupDir( String path )
     {
-        // RepositoryItemUid mdUid = walker.getRepository().createUid( coll.getPath() + "/maven-metadata.xml" );
-
         StringBuffer md = new StringBuffer();
 
         md.append( "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" );
@@ -372,17 +361,12 @@ public class AbstractMetadataHelper
         md.append( "</metadata>\n" );
 
         store( md.toString(), path );
-
     }
 
     public void createMetadataForArtifactDir( String path )
         throws MetadataException,
             IOException
     {
-
-        // UIDs are like URIs! The separator is _always_ "/"!!!
-        // RepositoryItemUid mdUid = walker.getRepository().createUid( coll.getPath() + "/maven-metadata.xml" );
-
         Metadata md = new Metadata();
 
         md.setGroupId( currentGroupId );
@@ -459,8 +443,6 @@ public class AbstractMetadataHelper
         throws MetadataException,
             IOException
     {
-        // RepositoryItemUid mdUid = walker.getRepository().createUid( coll.getPath() + "/maven-metadata.xml" );
-
         Metadata md = new Metadata();
 
         md.setGroupId( currentGroupId );
@@ -499,15 +481,18 @@ public class AbstractMetadataHelper
 
         for ( String artifact : currentArtifacts )
         {
-            int lastHyphenPos = artifact.lastIndexOf( '-' );
+            String artifactName = getName( artifact );
 
-            int buildNumber = Integer.parseInt( artifact.substring( lastHyphenPos + 1, artifact.length() - 4 ) );
+            int lastHyphenPos = artifactName.lastIndexOf( '-' );
+
+            int buildNumber = Integer.parseInt( artifactName.substring( lastHyphenPos + 1, artifactName.length() - 4 ) );
 
             if ( buildNumber > snapshot.getBuildNumber() )
             {
                 snapshot.setBuildNumber( buildNumber );
 
-                String timeStamp = artifact.substring( ( md.getArtifactId() + '-' + md.getVersion() + '-' ).length()
+                String timeStamp = artifactName.substring( ( md.getArtifactId() + '-' + md.getVersion() + '-' )
+                    .length()
                     - "-SNAPSHOT".length(), lastHyphenPos );
 
                 snapshot.setTimestamp( timeStamp );
@@ -519,8 +504,18 @@ public class AbstractMetadataHelper
 
     }
 
-    public void store( String metadata, String path )
-    {
+    /**
+     * Store the metadata, according to the path
+     * 
+     * @param metadata
+     * @param path
+     */
+    abstract public void store( String metadata, String path );
 
-    }
+    /**
+     * Retrieve the content according to the path
+     * @param path
+     * @return
+     */
+    abstract public InputStream retrieveContent( String path );
 }
