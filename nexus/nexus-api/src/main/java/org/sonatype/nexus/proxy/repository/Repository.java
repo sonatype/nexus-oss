@@ -301,13 +301,13 @@ public interface Repository
     boolean recreateAttributes( String fromPath, Map<String, String> initialData );
 
     /**
-     * Forces the recreation of Maven metadata on this repository. 
+     * Forces the recreation of Maven metadata on this repository.
      * 
      * @param path
      * @return true, if recreate metadata.
      */
-    boolean recreateMavenMetadata (String fromPath );
-    
+    boolean recreateMavenMetadata( String fromPath );
+
     /**
      * Returns the repository level AccessManager. Per repository instance may exists.
      * 

@@ -11,12 +11,31 @@ import org.sonatype.nexus.proxy.registry.ContentClass;
 public interface ShadowRepository
     extends Repository
 {
+    /**
+     * The content class that is expected to have the repository set as master for this ShadowRepository.
+     * 
+     * @return
+     */
     ContentClass getMasterRepositoryContentClass();
 
+    /**
+     * Returns the master repository of this ShadowRepository.
+     * 
+     * @return
+     */
     Repository getMasterRepository();
 
+    /**
+     * Sets the master repository of this ShadowRepository.
+     * 
+     * @param masterRepository
+     * @throws IncompatibleMasterRepositoryException
+     */
     public void setMasterRepository( Repository masterRepository )
         throws IncompatibleMasterRepositoryException;
 
+    /**
+     * Triggers syncing with master repository.
+     */
     public void synchronizeWithMaster();
 }
