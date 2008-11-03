@@ -165,7 +165,11 @@ public abstract class AbstractNexusPlexusResource
     {
         Reference ref = new Reference( base, relPart );
 
-        if ( !ref.getBaseRef().getPath().endsWith( "/" ) )
+        if ( ref.getBaseRef().getPath() == null )
+        {
+            ref.getBaseRef().setPath( "/" );
+        }
+        else if ( !ref.getBaseRef().getPath().endsWith( "/" ) )
         {
             ref.getBaseRef().setPath( ref.getBaseRef().getPath() + "/" );
         }

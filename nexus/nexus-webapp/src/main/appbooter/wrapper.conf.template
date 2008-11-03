@@ -4,6 +4,9 @@
 # Java Application
 wrapper.java.command=java
 
+# Wait a bit longer than default before assuming jvm hasn't started properly
+wrapper.startup.timeout=60
+
 # Java Main class.  This class must implement the WrapperListener interface
 #  or guarantee that the WrapperManager class is initialized.  Helper
 #  classes are provided to do this for you.  See the Integration section

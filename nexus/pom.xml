@@ -148,7 +148,7 @@
 		<maven.artifact.version>3.0-SONATYPE-653272</maven.artifact.version>
 		<nexus.indexer.version>1.0.3</nexus.indexer.version>
 		<!-- Shared with nexus-client, hence it is properties'ed -->
-		<plexus.restlet.bridge.version>1.5-SNAPSHOT</plexus.restlet.bridge.version>
+		<plexus.restlet.bridge.version>1.6-SNAPSHOT</plexus.restlet.bridge.version>
 		<micromailer.version>1.0.1</micromailer.version>
 	</properties>
 	<dependencyManagement>

@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 
+import org.codehaus.plexus.component.annotations.Component;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
@@ -20,6 +21,7 @@ import org.sonatype.nexus.rest.model.RepositoryGroupMemberRepository;
 import org.sonatype.nexus.rest.model.RepositoryGroupResource;
 import org.sonatype.nexus.rest.model.RepositoryGroupResourceResponse;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
+import org.sonatype.plexus.rest.resource.PlexusResource;
 import org.sonatype.plexus.rest.resource.PlexusResourceException;
 
 /**
@@ -27,8 +29,8 @@ import org.sonatype.plexus.rest.resource.PlexusResourceException;
  * 
  * @author cstamas
  * @author tstevens
- * @plexus.component role-hint="RepositoryGroupListPlexusResource"
  */
+@Component( role = PlexusResource.class, hint = "RepositoryGroupListPlexusResource" )
 public class RepositoryGroupListPlexusResource
     extends AbstractRepositoryGroupPlexusResource
 {
