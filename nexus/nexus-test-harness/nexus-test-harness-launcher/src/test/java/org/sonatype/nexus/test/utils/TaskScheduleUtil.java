@@ -65,13 +65,11 @@ public class TaskScheduleUtil
     {
         String serviceURI = "service/local/schedules";
         Response response = RequestFacade.doGetRequest( serviceURI );
-        XStreamRepresentation representation = new XStreamRepresentation(
-            xstream,
-            response.getEntity().getText(),
-            MediaType.APPLICATION_XML );
+        XStreamRepresentation representation =
+            new XStreamRepresentation( xstream, response.getEntity().getText(), MediaType.APPLICATION_XML );
 
-        ScheduledServiceListResourceResponse scheduleResponse = (ScheduledServiceListResourceResponse) representation
-            .getPayload( new ScheduledServiceListResourceResponse() );
+        ScheduledServiceListResourceResponse scheduleResponse =
+            (ScheduledServiceListResourceResponse) representation.getPayload( new ScheduledServiceListResourceResponse() );
 
         return scheduleResponse.getData();
     }
@@ -95,6 +93,8 @@ public class TaskScheduleUtil
     {
         long sleep = 200;
 
+        Thread.sleep( 500 ); // give an time to task start
+
         for ( int attempt = 0; attempt < maxAttempts; attempt++ )
         {
             Thread.sleep( sleep );
@@ -102,8 +102,7 @@ public class TaskScheduleUtil
             ScheduledServiceListResource task = getTask( name );
 
             if ( task.getLastRunResult() != "n/a"
-                && ( task.getStatus().equals( "SUBMITTED" )
-                    || task.getStatus().equals( "WAITING" ) ) )
+                && ( task.getStatus().equals( "SUBMITTED" ) || task.getStatus().equals( "WAITING" ) ) )
             {
                 return task;
             }
@@ -151,7 +150,7 @@ public class TaskScheduleUtil
     }
 
     public static ScheduledServiceListResource runTask( String taskName, String typeId, int maxAttempts,
-        ScheduledServicePropertyResource... properties )
+                                                        ScheduledServicePropertyResource... properties )
         throws Exception
     {
         ScheduledServiceBaseResource scheduledTask = new ScheduledServiceBaseResource();
@@ -177,7 +176,7 @@ public class TaskScheduleUtil
     }
 
     public static ScheduledServiceListResource runTask( String taskName, String typeId,
-        ScheduledServicePropertyResource... properties )
+                                                        ScheduledServicePropertyResource... properties )
         throws Exception
     {
         return runTask( typeId, typeId, 40, properties );
