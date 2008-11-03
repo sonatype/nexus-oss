@@ -154,7 +154,7 @@ public abstract class AbstractRepository
 
     /** The indexable. */
     private boolean indexable = true;
-    
+
     /** User managed */
     private boolean userManaged = true;
 
@@ -656,17 +656,17 @@ public abstract class AbstractRepository
 
         return true;
     }
-    
-    public boolean recreateMavenMetadata (String path )
+
+    public boolean recreateMavenMetadata( String path )
     {
         getLogger().info( "Recreating Maven medadata on repository " + getId() );
-        
-        RecreateMavenMetadataWalker walker = new RecreateMavenMetadataWalker ( this, getLogger() );
-        
+
+        RecreateMavenMetadataWalker walker = new RecreateMavenMetadataWalker( this, getLogger() );
+
         walker.walk( path, true, false );
-        
+
         notifyProximityEventListeners( new RepositoryEventRecreateMavenMetadata( this ) );
-        
+
         return true;
     }
 

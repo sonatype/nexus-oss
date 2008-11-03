@@ -39,6 +39,11 @@ public abstract class StoreFileWalker
         super( store, logger );
     }
 
+    public StoreFileWalker( ResourceStore store, Logger logger, StoreWalkerFilter filter )
+    {
+        super( store, logger, filter );
+    }
+
     protected final void processItem( StorageItem item )
     {
         if ( StorageFileItem.class.isAssignableFrom( item.getClass() ) )
