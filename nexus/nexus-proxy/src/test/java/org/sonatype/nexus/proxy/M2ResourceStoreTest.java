@@ -119,7 +119,7 @@ public abstract class M2ResourceStoreTest
 
         try
         {
-            StorageItem item = getResourceStore().retrieveItem( new ResourceStoreRequest( getItemPath(), true ) );
+            getResourceStore().retrieveItem( new ResourceStoreRequest( getItemPath(), true ) );
 
             fail();
         }

@@ -665,7 +665,7 @@ public class DefaultApplicationConfigurationValidator
             response.setContext( ctx );
         }
 
-        ApplicationValidationContext context = (ApplicationValidationContext) response.getContext();
+        // ApplicationValidationContext context = (ApplicationValidationContext) response.getContext();
 
         if ( settings.getPort() < 80 )
         {

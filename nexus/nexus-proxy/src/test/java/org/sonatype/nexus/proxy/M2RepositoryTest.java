@@ -245,7 +245,7 @@ public class M2RepositoryTest
     public void testIsSnapshot()
         throws Exception
     {
-        M2Repository repository = (M2Repository) getResourceStore();
+        // M2Repository repository = (M2Repository) getResourceStore();
 
         assertEquals( false, VersionUtils.isSnapshot( "1.0.0" ) );
         assertEquals( true, VersionUtils.isSnapshot( "1.0.0-SNAPSHOT" ) );

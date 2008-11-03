@@ -180,7 +180,6 @@ public class FileConfigurationSource
      * @return the configuration
      * @throws IOException Signals that an I/O exception has occurred.
      */
-    @SuppressWarnings( "unchecked" )
     private void loadConfiguration( File file )
         throws IOException
     {

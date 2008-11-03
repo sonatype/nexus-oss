@@ -85,7 +85,6 @@ public abstract class AbstractSecurityConfigurationSource
      * @return the configuration
      * @throws IOException Signals that an I/O exception has occurred.
      */
-    @SuppressWarnings( "unchecked" )
     protected void loadConfiguration( InputStream is )
         throws IOException
     {

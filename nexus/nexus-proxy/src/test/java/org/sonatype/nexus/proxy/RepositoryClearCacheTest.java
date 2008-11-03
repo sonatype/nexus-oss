@@ -69,7 +69,7 @@ public class RepositoryClearCacheTest
 
         try
         {
-            StorageItem item = getRepository().retrieveItem( req );
+            getRepository().retrieveItem( req );
         }
         catch ( ItemNotFoundException e )
         {
@@ -81,7 +81,7 @@ public class RepositoryClearCacheTest
 
         try
         {
-            StorageItem item = getRepository().retrieveItem( req );
+            getRepository().retrieveItem( req );
         }
         catch ( ItemNotFoundException e )
         {
