@@ -9,6 +9,7 @@ import org.sonatype.appbooter.ForkedAppBooter;
 import org.sonatype.nexus.client.NexusClient;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.integrationtests.TestContext;
+import org.sonatype.nexus.test.utils.NexusStateUtil;
 import org.sonatype.nexus.test.utils.ServiceStatusUtil;
 import org.sonatype.nexus.test.utils.TestProperties;
 
@@ -39,45 +40,189 @@ public class Nexus758ServiceStabilityTest
 
         // this could be done using a for, but I wanna to know how may times it run just looking to stack trace
         // 1
-        app = hardStartTest();
-        hardStopTest( app );
+        app = doHardStart();
+        doHardStop( app );
 
         // 2
-        app = hardStartTest();
-        hardStopTest( app );
+        app = doHardStart();
+        doHardStop( app );
 
         // 3
-        app = hardStartTest();
-        hardStopTest( app );
+        app = doHardStart();
+        doHardStop( app );
 
         // 4
-        app = hardStartTest();
-        hardStopTest( app );
+        app = doHardStart();
+        doHardStop( app );
 
         // 5
-        app = hardStartTest();
-        hardStopTest( app );
+        app = doHardStart();
+        doHardStop( app );
 
         // 6
-        app = hardStartTest();
-        hardStopTest( app );
+        app = doHardStart();
+        doHardStop( app );
 
         // 7
-        app = hardStartTest();
-        hardStopTest( app );
+        app = doHardStart();
+        doHardStop( app );
 
         // 8
-        app = hardStartTest();
-        hardStopTest( app );
+        app = doHardStart();
+        doHardStop( app );
 
         // 9
-        app = hardStartTest();
-        hardStopTest( app );
+        app = doHardStart();
+        doHardStop( app );
 
         // 10
-        app = hardStartTest();
-        hardStopTest( app );
+        app = doHardStart();
+        doHardStop( app );
 
+    }
+
+    @Test
+    public void softRestarts()
+        throws Exception
+    {
+        ForkedAppBooter app = doHardStart();
+
+        doSoftStop();
+
+        // 1
+        doSoftStart();
+        doSoftStop();
+
+        // 2
+        doSoftStart();
+        doSoftStop();
+
+        // 3
+        doSoftStart();
+        doSoftStop();
+
+        // 4
+        doSoftStart();
+        doSoftStop();
+
+        // 5
+        doSoftStart();
+        doSoftStop();
+
+        // 6
+        doSoftStart();
+        doSoftStop();
+
+        // 7
+        doSoftStart();
+        doSoftStop();
+
+        // 8
+        doSoftStart();
+        doSoftStop();
+
+        // 9
+        doSoftStart();
+        doSoftStop();
+
+        // 10
+        doSoftStart();
+        doSoftStop();
+
+        doSoftStart();
+        doHardStop( app );
+    }
+
+    @Test
+    public void clientRestarts()
+        throws Exception
+    {
+        ForkedAppBooter app = doHardStart();
+
+        doClientStop();
+
+        // 1
+        doClientStart();
+        doClientStop();
+
+        // 2
+        doClientStart();
+        doClientStop();
+
+        // 3
+        doClientStart();
+        doClientStop();
+
+        // 4
+        doClientStart();
+        doClientStop();
+
+        // 5
+        doClientStart();
+        doClientStop();
+
+        // 6
+        doClientStart();
+        doClientStop();
+
+        // 7
+        doClientStart();
+        doClientStop();
+
+        // 8
+        doClientStart();
+        doClientStop();
+
+        // 9
+        doClientStart();
+        doClientStop();
+
+        // 10
+        doClientStart();
+        doClientStop();
+
+        doClientStart();
+        doHardStop( app );
+    }
+
+    private void doClientStart()
+        throws Exception
+    {
+        Assert.assertFalse( "Nexus should not be started.", client.isNexusStarted( true ) );
+
+        client.startNexus();
+
+        Assert.assertTrue( "Unable to start Nexus after 40 seconds", ServiceStatusUtil.waitForStart( client ) );
+    }
+
+    private void doClientStop()
+        throws Exception
+    {
+        Assert.assertTrue( "Nexus is not started.", client.isNexusStarted( true ) );
+
+        client.stopNexus();
+
+        Assert.assertTrue( "Unable to stop Nexus after 10 seconds", ServiceStatusUtil.waitForStop( client ) );
+    }
+
+    private void doSoftStart()
+        throws Exception
+    {
+        Assert.assertFalse( "Nexus should not be started.", client.isNexusStarted( true ) );
+
+        NexusStateUtil.doSoftStart();
+
+        Assert.assertTrue( "Unable to start Nexus after 40 seconds", ServiceStatusUtil.waitForStart( client ) );
+    }
+
+    private void doSoftStop()
+        throws Exception
+    {
+        Assert.assertTrue( "Nexus is not started.", client.isNexusStarted( true ) );
+
+        NexusStateUtil.doSoftStop();
+
+        Assert.assertTrue( "Unable to stop Nexus after 10 seconds", ServiceStatusUtil.waitForStop( client ) );
     }
 
     public void startAndStopTest()
@@ -104,7 +249,7 @@ public class Nexus758ServiceStabilityTest
         client.disconnect();
     }
 
-    public ForkedAppBooter hardStartTest()
+    public ForkedAppBooter doHardStart()
         throws Exception
     {
         AbstractForkedAppBooter appBooter =
@@ -115,12 +260,12 @@ public class Nexus758ServiceStabilityTest
         appBooter.setSleepAfterStart( 0 );
         appBooter.start();
 
-        Assert.assertTrue( "Unable to start Nexus after 20 seconds", ServiceStatusUtil.waitForStart( client ) );
+        Assert.assertTrue( "Unable to start Nexus after 40 seconds", ServiceStatusUtil.waitForStart( client ) );
 
         return appBooter;
     }
 
-    public void hardStopTest( ForkedAppBooter app )
+    public void doHardStop( ForkedAppBooter app )
         throws Exception
     {
         Assert.assertTrue( "Nexus is not started.", client.isNexusStarted( true ) );
