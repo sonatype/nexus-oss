@@ -12,9 +12,6 @@ import org.sonatype.nexus.configuration.validator.InvalidConfigurationException;
 import org.sonatype.nexus.configuration.validator.ValidationMessage;
 import org.sonatype.nexus.configuration.validator.ValidationResponse;
 import org.sonatype.nexus.proxy.StorageException;
-import org.sonatype.nexus.proxy.maven.ChecksumPolicy;
-import org.sonatype.nexus.proxy.maven.MavenRepository;
-import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.proxy.storage.local.LocalRepositoryStorage;
 import org.sonatype.nexus.proxy.storage.remote.DefaultRemoteStorageContext;
 import org.sonatype.nexus.proxy.storage.remote.RemoteRepositoryStorage;
@@ -30,7 +27,7 @@ public abstract class AbstractRepositoryConfigurator
         CRepository repo, RemoteStorageContext rsc, LocalRepositoryStorage ls, RemoteRepositoryStorage rs )
         throws InvalidConfigurationException
     {
-        MavenRepository repository = (MavenRepository) old;
+        AbstractRepository repository = (AbstractRepository) old;
 
         repository.setId( repo.getId() );
         repository.setName( repo.getName() );
@@ -43,20 +40,6 @@ public abstract class AbstractRepositoryConfigurator
         repository.setUserManaged( repo.isUserManaged() );
 
         repository.setItemMaxAge( repo.getArtifactMaxAge() );
-        repository.setReleaseMaxAge( repo.getArtifactMaxAge() );
-        repository.setSnapshotMaxAge( repo.getArtifactMaxAge() );
-        repository.setMetadataMaxAge( repo.getMetadataMaxAge() );
-        repository.setCleanseRepositoryMetadata( repo.isMaintainProxiedRepositoryMetadata() );
-        repository.setChecksumPolicy( ChecksumPolicy.fromModel( repo.getChecksumPolicy() ) );
-
-        if ( CRepository.REPOSITORY_POLICY_RELEASE.equals( repo.getRepositoryPolicy() ) )
-        {
-            repository.setRepositoryPolicy( RepositoryPolicy.RELEASE );
-        }
-        else
-        {
-            repository.setRepositoryPolicy( RepositoryPolicy.SNAPSHOT );
-        }
 
         // Setting common things on a repository
 
