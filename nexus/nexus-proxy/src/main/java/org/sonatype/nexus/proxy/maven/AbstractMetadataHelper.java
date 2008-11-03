@@ -197,6 +197,11 @@ abstract public class AbstractMetadataHelper
 
     private void cleanGAV( String path )
     {
+        if ( currentVersion != null )
+        {
+            currentArtifacts.clear();
+        }
+
         if ( currentVersion != null && getName( path ).equals( currentVersion ) )
         {
             currentVersion = null;
@@ -482,22 +487,39 @@ abstract public class AbstractMetadataHelper
         for ( String artifact : currentArtifacts )
         {
             String artifactName = getName( artifact );
+            
+            //skip files like groupId-artifactId-versionSNAPSHOT.pom
+            if (artifactName.endsWith( "SNAPSHOT.pom" ))
+            {
+                continue;
+            }
 
             int lastHyphenPos = artifactName.lastIndexOf( '-' );
 
-            int buildNumber = Integer.parseInt( artifactName.substring( lastHyphenPos + 1, artifactName.length() - 4 ) );
-
-            if ( buildNumber > snapshot.getBuildNumber() )
+            try
             {
-                snapshot.setBuildNumber( buildNumber );
+                int buildNumber = Integer.parseInt( artifactName.substring(
+                    lastHyphenPos + 1,
+                    artifactName.length() - 4 ) );
 
-                String timeStamp = artifactName.substring( ( md.getArtifactId() + '-' + md.getVersion() + '-' )
-                    .length()
-                    - "-SNAPSHOT".length(), lastHyphenPos );
+                if ( buildNumber > snapshot.getBuildNumber() )
+                {
+                    snapshot.setBuildNumber( buildNumber );
 
-                snapshot.setTimestamp( timeStamp );
+                    String timeStamp = artifactName.substring( ( md.getArtifactId() + '-' + md.getVersion() + '-' )
+                        .length()
+                        - "-SNAPSHOT".length(), lastHyphenPos );
 
+                    snapshot.setTimestamp( timeStamp );
+
+                }
             }
+
+            catch ( Exception  e )
+            {
+                //skip any exception because of illegal version numbers
+            }
+
         }
 
         MetadataBuilder.changeMetadata( md, new SetSnapshotOperation( new SnapshotOperand( snapshot ) ) );

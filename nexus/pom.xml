@@ -122,6 +122,7 @@
 		<module>nexus-webapp</module>
 		<module>nexus-clients</module>
 		<module>nexus-repository-conversion-tool</module>
+		<module>nexus-metadata-rebuild-tool</module>
 	</modules>
 	<profiles>
 		<profile>
