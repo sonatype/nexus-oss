@@ -687,6 +687,9 @@ Ext.extend(Sonatype.repoServer.RoleEditPanel, Ext.Panel, {
 
         if ( rec.data.readOnly) {
           action.options.fpanel.find('name', 'internalResourceHeader')[0].setVisible( true );
+          action.options.fpanel.find('name', 'name')[0].setDisabled( true );
+          action.options.fpanel.find('name', 'description')[0].setDisabled( true );
+          action.options.fpanel.find('name', 'sessionTimeout')[0].setDisabled( true );
         }
       }
   },
