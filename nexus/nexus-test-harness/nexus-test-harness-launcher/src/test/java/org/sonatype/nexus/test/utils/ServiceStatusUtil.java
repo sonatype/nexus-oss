@@ -12,7 +12,7 @@ public class ServiceStatusUtil
         throws NexusClientException, NexusConnectionException
     {
         System.setProperty( NexusRestClient.WAIT_FOR_START_TIMEOUT_KEY, "1000" );
-        for ( int i = 0; i < 20; i++ )
+        for ( int i = 0; i < 40; i++ )
         {
             if ( client.isNexusStarted( true ) )
             {
