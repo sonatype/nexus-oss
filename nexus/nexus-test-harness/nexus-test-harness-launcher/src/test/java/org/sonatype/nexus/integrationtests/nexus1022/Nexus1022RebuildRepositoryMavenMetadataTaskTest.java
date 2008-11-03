@@ -40,10 +40,10 @@ public class Nexus1022RebuildRepositoryMavenMetadataTaskTest
     public void rebuildMavenMetadata()
         throws Exception
     {
-        if(true) {
+/*        if(true) {
             printKnownErrorButDoNotFail( getClass(), "rebuildMavenMetadata" );
             return;
-        }
+        }*/
         String releaseRepoPath = "runtime/work/storage/nexus-test-harness-repo/";
 
         ScheduledServicePropertyResource repo = new ScheduledServicePropertyResource();
