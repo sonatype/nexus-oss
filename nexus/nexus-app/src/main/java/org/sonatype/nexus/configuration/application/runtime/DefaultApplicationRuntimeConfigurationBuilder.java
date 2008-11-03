@@ -36,7 +36,6 @@ import org.sonatype.nexus.configuration.model.Configuration;
 import org.sonatype.nexus.configuration.validator.InvalidConfigurationException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
-import org.sonatype.nexus.proxy.repository.DefaultShadowRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RepositoryConfigurator;
 import org.sonatype.nexus.proxy.repository.ShadowRepository;
@@ -146,7 +145,7 @@ public class DefaultApplicationRuntimeConfigurationBuilder
     {
         try
         {
-            ShadowRepository shadowRepository = (DefaultShadowRepository) plexusContainer.lookup(
+            ShadowRepository shadowRepository = (ShadowRepository) plexusContainer.lookup(
                 ShadowRepository.class,
                 shadow.getType() );
 

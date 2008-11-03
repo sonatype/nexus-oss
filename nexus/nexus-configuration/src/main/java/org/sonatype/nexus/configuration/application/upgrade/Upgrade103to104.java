@@ -368,8 +368,6 @@ public class Upgrade103to104
                 else if ( org.sonatype.nexus.configuration.model.v1_0_3.CRunNowSchedule.class.isAssignableFrom( oldTask
                     .getSchedule().getClass() ) )
                 {
-                    CRunNowSchedule s = new CRunNowSchedule();
-
                     scheduleConfig.setType( CScheduleConfig.TYPE_RUN_NOW );
                 }
                 else if ( org.sonatype.nexus.configuration.model.v1_0_3.CMonthlySchedule.class

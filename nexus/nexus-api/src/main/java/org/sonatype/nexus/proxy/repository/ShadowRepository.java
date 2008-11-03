@@ -4,7 +4,7 @@ import org.sonatype.nexus.proxy.registry.ContentClass;
 
 /**
  * A Shadow Repository is a special repository type that usually points to a master repository and transforms it in some
- * way (look at Maven1 to Maven2 layout chnging repo).
+ * way (look at Maven1 to Maven2 layout changing repo).
  * 
  * @author cstamas
  */
