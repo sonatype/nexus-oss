@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
+import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.util.StringUtils;
 import org.restlet.Context;
 import org.restlet.data.Form;
@@ -37,13 +38,14 @@ import org.sonatype.nexus.NexusStreamResponse;
 import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
 import org.sonatype.plexus.rest.representation.InputStreamRepresentation;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
+import org.sonatype.plexus.rest.resource.PlexusResource;
 
 /**
  * The log file resource handler. It returns the content of the requested log file on incoming GET methods.
  * 
  * @author cstamas
- * @plexus.component role-hint="logs"
  */
+@Component( role = PlexusResource.class, hint = "logs" )
 public class LogsPlexusResource
     extends AbstractNexusPlexusResource
 {
@@ -109,7 +111,7 @@ public class LogsPlexusResource
         NexusStreamResponse result;
         try
         {
-            result = getNexusInstance( request ).getApplicationLogAsStream( logFile, from, count );
+            result = getNexus().getApplicationLogAsStream( logFile, from, count );
         }
         catch ( IOException e )
         {

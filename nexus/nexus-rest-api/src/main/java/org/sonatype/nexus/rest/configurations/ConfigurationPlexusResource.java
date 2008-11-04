@@ -3,6 +3,7 @@ package org.sonatype.nexus.rest.configurations;
 import java.io.IOException;
 import java.util.List;
 
+import org.codehaus.plexus.component.annotations.Component;
 import org.restlet.Context;
 import org.restlet.data.MediaType;
 import org.restlet.data.Request;
@@ -15,13 +16,14 @@ import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
 import org.sonatype.nexus.rest.global.GlobalConfigurationPlexusResource;
 import org.sonatype.plexus.rest.representation.InputStreamRepresentation;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
+import org.sonatype.plexus.rest.resource.PlexusResource;
 
 /**
  * A resource that is able to retrieve configurations as stream.
  * 
  * @author cstamas
- * @plexus.component role-hint="configuration"
  */
+@Component( role = PlexusResource.class, hint = "configuration" )
 public class ConfigurationPlexusResource
     extends AbstractNexusPlexusResource
 {
@@ -78,11 +80,11 @@ public class ConfigurationPlexusResource
 
             if ( DEFAULT_CONFIG_NAME.equals( configurationName ) )
             {
-                result = getNexusInstance( request ).getDefaultConfigurationAsStream();
+                result = getNexus().getDefaultConfigurationAsStream();
             }
             else if ( CURRENT_CONFIG_NAME.equals( configurationName ) )
             {
-                result = getNexusInstance( request ).getConfigurationAsStream();
+                result = getNexus().getConfigurationAsStream();
             }
             else
             {

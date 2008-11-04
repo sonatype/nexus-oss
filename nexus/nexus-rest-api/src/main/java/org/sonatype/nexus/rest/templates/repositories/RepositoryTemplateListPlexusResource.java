@@ -3,6 +3,7 @@ package org.sonatype.nexus.rest.templates.repositories;
 import java.io.IOException;
 import java.util.Collection;
 
+import org.codehaus.plexus.component.annotations.Component;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
@@ -19,12 +20,13 @@ import org.sonatype.nexus.rest.model.RepositoryResourceResponse;
 import org.sonatype.nexus.rest.model.RepositoryShadowResource;
 import org.sonatype.nexus.rest.repositories.AbstractRepositoryPlexusResource;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
+import org.sonatype.plexus.rest.resource.PlexusResource;
 import org.sonatype.plexus.rest.resource.PlexusResourceException;
 
 /**
  * @author tstevens
- * @plexus.component role-hint="RepositoryTemplateListPlexusResource"
  */
+@Component( role = PlexusResource.class, hint = "RepositoryTemplateListPlexusResource" )
 public class RepositoryTemplateListPlexusResource
     extends AbstractRepositoryPlexusResource
 {
@@ -55,12 +57,12 @@ public class RepositoryTemplateListPlexusResource
         {
             RepositoryListResource repoRes;
 
-            Collection<CRepository> repositories = getNexusInstance( request ).listRepositoryTemplates();
+            Collection<CRepository> repositories = getNexus().listRepositoryTemplates();
 
             for ( CRepository repository : repositories )
             {
                 repoRes = new RepositoryListResource();
-                
+
                 repoRes.setId( repository.getId() );
 
                 repoRes.setResourceURI( createChildReference( request, repository.getId() ).toString() );
@@ -73,7 +75,7 @@ public class RepositoryTemplateListPlexusResource
                 {
                     repoRes.setRepoType( "hosted" );
                 }
-                
+
                 repoRes.setName( repository.getName() );
 
                 repoRes.setEffectiveLocalStorageUrl( repository.getLocalStorage() != null
@@ -86,7 +88,7 @@ public class RepositoryTemplateListPlexusResource
                 result.addData( repoRes );
             }
 
-            Collection<CRepositoryShadow> shadows = getNexusInstance( request ).listRepositoryShadowTemplates();
+            Collection<CRepositoryShadow> shadows = getNexus().listRepositoryShadowTemplates();
 
             for ( CRepositoryShadow shadow : shadows )
             {
@@ -129,17 +131,15 @@ public class RepositoryTemplateListPlexusResource
 
                 if ( REPO_TYPE_VIRTUAL.equals( resource.getRepoType() ) )
                 {
-                    CRepositoryShadow shadow = getNexusInstance( request ).readRepositoryShadowTemplate(
-                        resource.getId() );
+                    CRepositoryShadow shadow = getNexus().readRepositoryShadowTemplate( resource.getId() );
 
                     if ( shadow == null )
                     {
                         shadow = getRepositoryShadowAppModel( (RepositoryShadowResource) resource, null );
 
-                        getNexusInstance( request ).createRepositoryShadowTemplate( shadow );
+                        getNexus().createRepositoryShadowTemplate( shadow );
 
-                        CRepositoryShadow resultRepoShadow = getNexusInstance( request ).readRepositoryShadowTemplate(
-                            resource.getId() );
+                        CRepositoryShadow resultRepoShadow = getNexus().readRepositoryShadowTemplate( resource.getId() );
 
                         result.setData( getRepositoryShadowRestModel( resultRepoShadow ) );
                     }
@@ -157,15 +157,15 @@ public class RepositoryTemplateListPlexusResource
                 }
                 else
                 {
-                    CRepository normal = getNexusInstance( request ).readRepositoryTemplate( resource.getId() );
+                    CRepository normal = getNexus().readRepositoryTemplate( resource.getId() );
 
                     if ( normal == null )
                     {
                         normal = getRepositoryAppModel( (RepositoryResource) resource, null );
 
-                        getNexusInstance( request ).createRepositoryTemplate( normal );
+                        getNexus().createRepositoryTemplate( normal );
 
-                        CRepository resultRepo = getNexusInstance( request ).readRepositoryTemplate( resource.getId() );
+                        CRepository resultRepo = getNexus().readRepositoryTemplate( resource.getId() );
 
                         result.setData( getRepositoryRestModel( resultRepo ) );
                     }

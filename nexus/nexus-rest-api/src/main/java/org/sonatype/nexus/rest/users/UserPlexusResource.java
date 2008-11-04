@@ -1,5 +1,6 @@
 package org.sonatype.nexus.rest.users;
 
+import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.util.StringUtils;
 import org.restlet.Context;
 import org.restlet.data.Request;
@@ -14,12 +15,13 @@ import org.sonatype.nexus.rest.model.UserResource;
 import org.sonatype.nexus.rest.model.UserResourceRequest;
 import org.sonatype.nexus.rest.model.UserResourceResponse;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
+import org.sonatype.plexus.rest.resource.PlexusResource;
 import org.sonatype.plexus.rest.resource.PlexusResourceException;
 
 /**
  * @author tstevens
- * @plexus.component role-hint="UserPlexusResource"
  */
+@Component( role = PlexusResource.class, hint = "UserPlexusResource" )
 public class UserPlexusResource
     extends AbstractUserPlexusResource
 {
@@ -61,7 +63,7 @@ public class UserPlexusResource
 
         try
         {
-            result.setData( nexusToRestModel( getNexusSecurity( request ).readUser( getUserId( request ) ), request ) );
+            result.setData( nexusToRestModel( getNexusSecurity().readUser( getUserId( request ) ), request ) );
 
         }
         catch ( NoSuchUserException e )
@@ -81,18 +83,20 @@ public class UserPlexusResource
         if ( resourceRequest != null )
         {
             UserResource resource = resourceRequest.getData();
-            
+
             // the password can not be set on update, The only way to set a password is using the users_setpw resource
-            if( StringUtils.isNotEmpty( resource.getPassword() ) )
+            if ( StringUtils.isNotEmpty( resource.getPassword() ) )
             {
-                throw new PlexusResourceException(Status.CLIENT_ERROR_BAD_REQUEST, this.getNexusErrorResponse( "*", "Updating a users password using this URI is not allowed." ));
+                throw new PlexusResourceException( Status.CLIENT_ERROR_BAD_REQUEST, this.getNexusErrorResponse(
+                    "*",
+                    "Updating a users password using this URI is not allowed." ) );
             }
 
             try
             {
-                SecurityUser user = restToNexusModel( getNexusSecurity( request ).readUser( resource.getUserId() ), resource );
+                SecurityUser user = restToNexusModel( getNexusSecurity().readUser( resource.getUserId() ), resource );
 
-                getNexusSecurity( request ).updateUser( user );
+                getNexusSecurity().updateUser( user );
 
                 result = new UserResourceResponse();
 
@@ -122,7 +126,7 @@ public class UserPlexusResource
         {
             if ( !isAnonymousUser( getUserId( request ), request ) )
             {
-                getNexusSecurity( request ).deleteUser( getUserId( request ) );
+                getNexusSecurity().deleteUser( getUserId( request ) );
 
                 response.setStatus( Status.SUCCESS_NO_CONTENT );
             }

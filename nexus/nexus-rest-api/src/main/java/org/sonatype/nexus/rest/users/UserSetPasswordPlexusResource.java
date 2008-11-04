@@ -21,7 +21,7 @@ public class UserSetPasswordPlexusResource
     {
         this.setModifiable( true );
     }
-    
+
     @Override
     public Object getPayloadInstance()
     {
@@ -54,7 +54,7 @@ public class UserSetPasswordPlexusResource
             {
                 if ( !isAnonymousUser( resource.getUserId(), request ) )
                 {
-                    getNexusSecurity( request ).changePassword( resource.getUserId(), resource.getNewPassword() );
+                    getNexusSecurity().changePassword( resource.getUserId(), resource.getNewPassword() );
 
                     response.setStatus( Status.SUCCESS_NO_CONTENT );
                 }

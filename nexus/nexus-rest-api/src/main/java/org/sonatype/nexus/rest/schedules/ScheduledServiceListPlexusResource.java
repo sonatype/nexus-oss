@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.RejectedExecutionException;
 
+import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.util.StringUtils;
 import org.restlet.Context;
 import org.restlet.data.Request;
@@ -20,6 +21,7 @@ import org.sonatype.nexus.rest.model.ScheduledServiceResourceResponse;
 import org.sonatype.nexus.rest.model.ScheduledServiceResourceStatus;
 import org.sonatype.nexus.rest.model.ScheduledServiceResourceStatusResponse;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
+import org.sonatype.plexus.rest.resource.PlexusResource;
 import org.sonatype.plexus.rest.resource.PlexusResourceException;
 import org.sonatype.scheduling.ScheduledTask;
 import org.sonatype.scheduling.TaskState;
@@ -28,8 +30,8 @@ import org.sonatype.scheduling.schedules.Schedule;
 
 /**
  * @author tstevens
- * @plexus.component role-hint="ScheduledServiceListPlexusResource"
  */
+@Component( role = PlexusResource.class, hint = "ScheduledServiceListPlexusResource" )
 public class ScheduledServiceListPlexusResource
     extends AbstractScheduledServicePlexusResource
 {
@@ -61,7 +63,7 @@ public class ScheduledServiceListPlexusResource
     public Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
     {
-        Map<String, List<ScheduledTask<?>>> tasksMap = getNexusInstance( request ).getAllTasks();
+        Map<String, List<ScheduledTask<?>>> tasksMap = getNexus().getAllTasks();
 
         ScheduledServiceListResourceResponse result = new ScheduledServiceListResourceResponse();
 
@@ -74,7 +76,7 @@ public class ScheduledServiceListPlexusResource
                 if ( task.isExposed() )
                 {
                     String lastRunResult = "n/a";
-                    
+
                     if ( task.getLastRun() != null )
                     {
                         lastRunResult = TaskState.BROKEN.equals( task.getTaskState() ) ? "Error" : "Ok";
@@ -86,13 +88,13 @@ public class ScheduledServiceListPlexusResource
                     item.setName( task.getName() );
                     item.setStatus( StringUtils.capitalise( task.getTaskState().toString() ) );
                     item.setTypeId( task.getType() );
-                    item.setTypeName( getNexusInstance( request ).getScheduledTaskDescriptor( task.getType() ).getName() );
+                    item.setTypeName( getNexus().getScheduledTaskDescriptor( task.getType() ).getName() );
                     item.setCreated( task.getScheduledAt() == null ? "n/a" : task.getScheduledAt().toString() );
                     item.setLastRunTime( task.getLastRun() == null ? "n/a" : task.getLastRun().toString() );
                     item.setNextRunTime( getNextRunTime( task ) );
                     item.setSchedule( getScheduleShortName( task.getSchedule() ) );
                     item.setEnabled( task.isEnabled() );
-    
+
                     result.addData( item );
                 }
             }
@@ -119,14 +121,14 @@ public class ScheduledServiceListPlexusResource
 
                 if ( schedule != null )
                 {
-                    task = getNexusInstance( request ).schedule(
+                    task = getNexus().schedule(
                         getModelName( serviceResource ),
                         getModelNexusTask( serviceResource, request ),
                         schedule );
                 }
                 else
                 {
-                    task = getNexusInstance( request ).schedule(
+                    task = getNexus().schedule(
                         getModelName( serviceResource ),
                         getModelNexusTask( serviceResource, request ),
                         new ManualRunSchedule() );
@@ -135,7 +137,7 @@ public class ScheduledServiceListPlexusResource
                 task.setEnabled( serviceResource.isEnabled() );
 
                 // Need to store the enabled flag update
-                getNexusInstance( request ).updateSchedule( task );
+                getNexus().updateSchedule( task );
 
                 ScheduledServiceResourceStatus resourceStatus = new ScheduledServiceResourceStatus();
                 resourceStatus.setResource( serviceResource );

@@ -11,7 +11,6 @@ import org.sonatype.plexus.rest.resource.PlexusResource;
 public class RealmComponentListPlexusResource
     extends AbstractComponentListPlexusResource
 {
-
     @Override
     public String getResourceUri()
     {

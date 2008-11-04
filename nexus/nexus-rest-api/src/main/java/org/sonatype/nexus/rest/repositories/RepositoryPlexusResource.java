@@ -57,7 +57,7 @@ public class RepositoryPlexusResource
     public Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
     {
-        return this.getRepositoryResourceResponse( this.getRepositoryId( request ), this.getNexusInstance( request ) );
+        return this.getRepositoryResourceResponse( this.getRepositoryId( request ), getNexus() );
     }
 
     @Override
@@ -78,11 +78,11 @@ public class RepositoryPlexusResource
                 {
                     try
                     {
-                        CRepositoryShadow shadow = getNexusInstance( request ).readRepositoryShadow( repoId );
+                        CRepositoryShadow shadow = getNexus().readRepositoryShadow( repoId );
 
                         shadow = getRepositoryShadowAppModel( (RepositoryShadowResource) resource, shadow );
 
-                        getNexusInstance( request ).updateRepositoryShadow( shadow );
+                        getNexus().updateRepositoryShadow( shadow );
                     }
                     catch ( NoSuchRepositoryException e )
                     {
@@ -95,11 +95,11 @@ public class RepositoryPlexusResource
                 {
                     try
                     {
-                        CRepository normal = getNexusInstance( request ).readRepository( repoId );
+                        CRepository normal = getNexus().readRepository( repoId );
 
                         normal = getRepositoryAppModel( (RepositoryResource) resource, normal );
 
-                        getNexusInstance( request ).updateRepository( normal );
+                        getNexus().updateRepository( normal );
                     }
                     catch ( NoSuchRepositoryException e )
                     {
@@ -122,7 +122,7 @@ public class RepositoryPlexusResource
         }
 
         // return current repo
-        return this.getRepositoryResourceResponse( this.getRepositoryId( request ), this.getNexusInstance( request ) );
+        return this.getRepositoryResourceResponse( this.getRepositoryId( request ), this.getNexus() );
     }
 
     @Override
@@ -134,11 +134,11 @@ public class RepositoryPlexusResource
         {
             try
             {
-                getNexusInstance( request ).deleteRepository( repoId );
+                getNexus().deleteRepository( repoId );
             }
             catch ( NoSuchRepositoryException e )
             {
-                getNexusInstance( request ).deleteRepositoryShadow( repoId );
+                getNexus().deleteRepositoryShadow( repoId );
             }
 
             response.setStatus( Status.SUCCESS_NO_CONTENT );

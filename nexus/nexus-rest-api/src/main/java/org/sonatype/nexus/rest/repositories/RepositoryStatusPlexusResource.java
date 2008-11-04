@@ -62,7 +62,7 @@ public class RepositoryStatusPlexusResource
 
             try
             {
-                CRepository model = getNexusInstance( request ).readRepository( repoId );
+                CRepository model = getNexus().readRepository( repoId );
 
                 resource.setId( model.getId() );
 
@@ -82,7 +82,7 @@ public class RepositoryStatusPlexusResource
             }
             catch ( NoSuchRepositoryException e )
             {
-                CRepositoryShadow model = getNexusInstance( request ).readRepositoryShadow( repoId );
+                CRepositoryShadow model = getNexus().readRepositoryShadow( repoId );
 
                 resource.setId( model.getId() );
 
@@ -124,17 +124,17 @@ public class RepositoryStatusPlexusResource
 
                 if ( REPO_TYPE_VIRTUAL.equals( resource.getRepoType() ) )
                 {
-                    CRepositoryShadow shadow = getNexusInstance( request ).readRepositoryShadow( repoId );
+                    CRepositoryShadow shadow = getNexus().readRepositoryShadow( repoId );
 
                     shadow.setLocalStatus( resource.getLocalStatus() );
 
-                    getNexusInstance( request ).updateRepositoryShadow( shadow );
+                    getNexus().updateRepositoryShadow( shadow );
 
                     result = (RepositoryStatusResourceResponse) this.get( context, request, response, null );
                 }
                 else
                 {
-                    CRepository normal = getNexusInstance( request ).readRepository( repoId );
+                    CRepository normal = getNexus().readRepository( repoId );
 
                     normal.setLocalStatus( resource.getLocalStatus() );
 
@@ -144,21 +144,21 @@ public class RepositoryStatusPlexusResource
                     }
 
                     // update dependant shadows too
-                    for ( CRepositoryShadow shadow : getNexusInstance( request ).listRepositoryShadows() )
+                    for ( CRepositoryShadow shadow : getNexus().listRepositoryShadows() )
                     {
                         if ( normal.getId().equals( shadow.getShadowOf() ) )
                         {
                             shadow.setLocalStatus( resource.getLocalStatus() );
 
-                            getNexusInstance( request ).updateRepositoryShadow( shadow );
+                            getNexus().updateRepositoryShadow( shadow );
                         }
                     }
 
-                    getNexusInstance( request ).updateRepository( normal );
+                    getNexus().updateRepository( normal );
 
                     result = (RepositoryStatusResourceResponse) this.get( context, request, response, null );
 
-                    for ( CRepositoryShadow shadow : getNexusInstance( request ).listRepositoryShadows() )
+                    for ( CRepositoryShadow shadow : getNexus().listRepositoryShadows() )
                     {
                         if ( normal.getId().equals( shadow.getShadowOf() ) )
                         {

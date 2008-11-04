@@ -23,6 +23,7 @@ package org.sonatype.nexus.rest.logs;
 import java.io.IOException;
 import java.util.Collection;
 
+import org.codehaus.plexus.component.annotations.Component;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
@@ -33,14 +34,15 @@ import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
 import org.sonatype.nexus.rest.model.LogsListResource;
 import org.sonatype.nexus.rest.model.LogsListResourceResponse;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
+import org.sonatype.plexus.rest.resource.PlexusResource;
 
 /**
  * The log file list resource handler. This handles the GET method only and simply returns the list of existing nexus
  * application log files.
  * 
  * @author cstamas
- * @plexus.component role-hint="logsList"
  */
+@Component( role = PlexusResource.class, hint = "logsList" )
 public class LogsListPlexusResource
     extends AbstractNexusPlexusResource
 {
@@ -71,7 +73,7 @@ public class LogsListPlexusResource
 
         try
         {
-            Collection<NexusStreamResponse> logFiles = getNexusInstance( request ).getApplicationLogFiles();
+            Collection<NexusStreamResponse> logFiles = getNexus().getApplicationLogFiles();
 
             for ( NexusStreamResponse logFile : logFiles )
             {

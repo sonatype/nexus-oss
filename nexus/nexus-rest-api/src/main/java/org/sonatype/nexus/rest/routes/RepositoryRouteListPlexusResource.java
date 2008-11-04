@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.regex.PatternSyntaxException;
 
+import org.codehaus.plexus.component.annotations.Component;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
@@ -21,6 +22,7 @@ import org.sonatype.nexus.rest.model.RepositoryRouteMemberRepository;
 import org.sonatype.nexus.rest.model.RepositoryRouteResource;
 import org.sonatype.nexus.rest.model.RepositoryRouteResourceResponse;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
+import org.sonatype.plexus.rest.resource.PlexusResource;
 import org.sonatype.plexus.rest.resource.PlexusResourceException;
 
 /**
@@ -28,8 +30,8 @@ import org.sonatype.plexus.rest.resource.PlexusResourceException;
  * 
  * @author cstamas
  * @author tstevens
- * @plexus.component role-hint="RepositoryRouteListPlexusResource"
  */
+@Component( role = PlexusResource.class, hint = "RepositoryRouteListPlexusResource" )
 public class RepositoryRouteListPlexusResource
     extends AbstractRepositoryRoutePlexusResource
 {
@@ -63,7 +65,7 @@ public class RepositoryRouteListPlexusResource
     {
         RepositoryRouteListResourceResponse result = new RepositoryRouteListResourceResponse();
 
-        Collection<CGroupsSettingPathMappingItem> mappings = getNexusInstance( request ).listGroupsSettingPathMapping();
+        Collection<CGroupsSettingPathMappingItem> mappings = getNexus().listGroupsSettingPathMapping();
 
         RepositoryRouteListResource resource = null;
 
@@ -146,7 +148,7 @@ public class RepositoryRouteListPlexusResource
 
                 route.setRepositories( repositories );
 
-                getNexusInstance( request ).createGroupsSettingPathMapping( route );
+                getNexus().createGroupsSettingPathMapping( route );
 
                 resource.setGroupId( route.getGroupId() );
 

@@ -30,7 +30,6 @@ public abstract class AbstractIndexPlexusResource
         return null;
     }
 
-
     @Override
     public Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
@@ -89,7 +88,7 @@ public abstract class AbstractIndexPlexusResource
         {
             try
             {
-                na = ai2Na( request, getNexusInstance( request ).identifyArtifact( ArtifactInfo.SHA1, sha1 ) );
+                na = ai2Na( request, getNexus().identifyArtifact( ArtifactInfo.SHA1, sha1 ) );
             }
             catch ( IOException e )
             {
@@ -101,7 +100,7 @@ public abstract class AbstractIndexPlexusResource
         }
         else if ( !StringUtils.isEmpty( query ) )
         {
-            searchResult = getNexusInstance( request ).searchArtifactFlat(
+            searchResult = getNexus().searchArtifactFlat(
                 query,
                 getRepositoryId( request ),
                 getRepositoryGroupId( request ),
@@ -110,7 +109,7 @@ public abstract class AbstractIndexPlexusResource
         }
         else if ( !StringUtils.isEmpty( className ) )
         {
-            searchResult = getNexusInstance( request ).searchArtifactClassFlat(
+            searchResult = getNexus().searchArtifactClassFlat(
                 className,
                 getRepositoryId( request ),
                 getRepositoryGroupId( request ),
@@ -120,7 +119,7 @@ public abstract class AbstractIndexPlexusResource
         else if ( !StringUtils.isEmpty( g ) || !StringUtils.isEmpty( a ) || !StringUtils.isEmpty( v )
             || !StringUtils.isEmpty( p ) || !StringUtils.isEmpty( c ) )
         {
-            searchResult = getNexusInstance( request ).searchArtifactFlat(
+            searchResult = getNexus().searchArtifactFlat(
                 g,
                 a,
                 v,
@@ -182,7 +181,7 @@ public abstract class AbstractIndexPlexusResource
     public void delete( Context context, Request request, Response response )
         throws ResourceException
     {
-        ReindexTask task = (ReindexTask) getNexusInstance( request ).createTaskInstance( ReindexTaskDescriptor.ID );
+        ReindexTask task = (ReindexTask) getNexus().createTaskInstance( ReindexTaskDescriptor.ID );
 
         task.setRepositoryId( getRepositoryId( request ) );
 

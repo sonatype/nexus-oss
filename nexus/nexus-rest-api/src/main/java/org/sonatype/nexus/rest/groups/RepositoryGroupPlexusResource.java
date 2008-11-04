@@ -3,6 +3,7 @@ package org.sonatype.nexus.rest.groups;
 import java.io.IOException;
 import java.util.List;
 
+import org.codehaus.plexus.component.annotations.Component;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
@@ -17,14 +18,15 @@ import org.sonatype.nexus.rest.model.RepositoryGroupMemberRepository;
 import org.sonatype.nexus.rest.model.RepositoryGroupResource;
 import org.sonatype.nexus.rest.model.RepositoryGroupResourceResponse;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
+import org.sonatype.plexus.rest.resource.PlexusResource;
 import org.sonatype.plexus.rest.resource.PlexusResourceException;
 
 /**
  * Resource handler for Repository resource.
  * 
  * @author tstevens
- * @plexus.component role-hint="RepositoryGroupPlexusResource"
  */
+@Component( role = PlexusResource.class, hint = "RepositoryGroupPlexusResource" )
 public class RepositoryGroupPlexusResource
     extends AbstractRepositoryGroupPlexusResource
 {
@@ -64,7 +66,7 @@ public class RepositoryGroupPlexusResource
         RepositoryGroupResourceResponse result = new RepositoryGroupResourceResponse();
         try
         {
-            CRepositoryGroup group = getNexusInstance( request ).readRepositoryGroup( getGroupId( request ) );
+            CRepositoryGroup group = getNexus().readRepositoryGroup( getGroupId( request ) );
 
             RepositoryGroupResource resource = new RepositoryGroupResource();
 
@@ -72,7 +74,7 @@ public class RepositoryGroupPlexusResource
 
             resource.setName( group.getName() );
 
-            resource.setFormat( getNexusInstance( request ).getRepositoryGroupType( group.getGroupId() ) );
+            resource.setFormat( getNexus().getRepositoryGroupType( group.getGroupId() ) );
 
             // just to trigger list creation, and not stay null coz of XStream serialization
             resource.getRepositories();
@@ -83,7 +85,7 @@ public class RepositoryGroupPlexusResource
 
                 member.setId( repoId );
 
-                member.setName( getNexusInstance( request ).getRepository( repoId ).getName() );
+                member.setName( getNexus().getRepository( repoId ).getName() );
 
                 member.setResourceURI( createChildReference( request, repoId ).toString() );
 
@@ -134,7 +136,7 @@ public class RepositoryGroupPlexusResource
             {
                 validateGroup( resource, request );
 
-                CRepositoryGroup group = getNexusInstance( request ).readRepositoryGroup( getGroupId( request ) );
+                CRepositoryGroup group = getNexus().readRepositoryGroup( getGroupId( request ) );
 
                 group.setName( resource.getName() );
 
@@ -146,7 +148,7 @@ public class RepositoryGroupPlexusResource
                     group.addRepository( member.getId() );
                 }
 
-                getNexusInstance( request ).updateRepositoryGroup( group );
+                getNexus().updateRepositoryGroup( group );
             }
             catch ( NoSuchRepositoryGroupException e )
             {
@@ -191,7 +193,7 @@ public class RepositoryGroupPlexusResource
     {
         try
         {
-            getNexusInstance( request ).deleteRepositoryGroup( getGroupId( request ) );
+            getNexus().deleteRepositoryGroup( getGroupId( request ) );
         }
         catch ( NoSuchRepositoryGroupException e )
         {

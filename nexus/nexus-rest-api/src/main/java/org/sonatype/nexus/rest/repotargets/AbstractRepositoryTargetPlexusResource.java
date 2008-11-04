@@ -7,10 +7,11 @@ import org.sonatype.nexus.configuration.model.CRepositoryTarget;
 import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
 import org.sonatype.nexus.rest.model.RepositoryTargetResource;
 
-public abstract class AbstractRepositoryTargetPlexusResource extends AbstractNexusPlexusResource
+public abstract class AbstractRepositoryTargetPlexusResource
+    extends AbstractNexusPlexusResource
 {
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings( "unchecked" )
     protected RepositoryTargetResource getNexusToRestResource( CRepositoryTarget target, Request request )
     {
         RepositoryTargetResource resource = new RepositoryTargetResource();
@@ -33,7 +34,7 @@ public abstract class AbstractRepositoryTargetPlexusResource extends AbstractNex
         return resource;
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings( "unchecked" )
     protected CRepositoryTarget getRestToNexusResource( RepositoryTargetResource resource )
     {
         CRepositoryTarget target = new CRepositoryTarget();
@@ -41,7 +42,7 @@ public abstract class AbstractRepositoryTargetPlexusResource extends AbstractNex
         target.setId( resource.getId() );
 
         target.setName( resource.getName() );
-        
+
         target.setContentClass( resource.getContentClass() );
 
         List<String> patterns = resource.getPatterns();
@@ -71,5 +72,5 @@ public abstract class AbstractRepositoryTargetPlexusResource extends AbstractNex
 
         return true;
     }
-    
+
 }

@@ -1,5 +1,6 @@
 package org.sonatype.nexus.rest.configurations;
 
+import org.codehaus.plexus.component.annotations.Component;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
@@ -9,13 +10,14 @@ import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
 import org.sonatype.nexus.rest.model.ConfigurationsListResource;
 import org.sonatype.nexus.rest.model.ConfigurationsListResourceResponse;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
+import org.sonatype.plexus.rest.resource.PlexusResource;
 
 /**
  * A resource that is able to retrieve list of configurations.
  * 
  * @author cstamas
- * @plexus.component role-hint="configurationList"
  */
+@Component( role = PlexusResource.class, hint = "configurationList" )
 public class ConfigurationListPlexusResource
     extends AbstractNexusPlexusResource
 {

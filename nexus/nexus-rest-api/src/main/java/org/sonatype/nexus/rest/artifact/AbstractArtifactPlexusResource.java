@@ -122,7 +122,7 @@ public abstract class AbstractArtifactPlexusResource
 
         try
         {
-            Repository repository = getNexusInstance( request ).getRepository( repositoryId );
+            Repository repository = getNexus().getRepository( repositoryId );
 
             if ( !MavenRepository.class.isAssignableFrom( repository.getClass() ) )
             {
@@ -236,7 +236,7 @@ public abstract class AbstractArtifactPlexusResource
 
         try
         {
-            Repository repository = getNexusInstance( request ).getRepository( repositoryId );
+            Repository repository = getNexus().getRepository( repositoryId );
 
             if ( !MavenRepository.class.isAssignableFrom( repository.getClass() ) )
             {
@@ -274,7 +274,7 @@ public abstract class AbstractArtifactPlexusResource
                 Representation result = new StorageFileItemRepresentation( file );
 
                 result.setDownloadable( true );
-                
+
                 result.setDownloadName( file.getName() );
 
                 return result;
@@ -358,7 +358,7 @@ public abstract class AbstractArtifactPlexusResource
 
             String extension = null;
 
-            PomArtifactManager pomManager = new PomArtifactManager( getNexusInstance( request )
+            PomArtifactManager pomManager = new PomArtifactManager( getNexus()
                 .getNexusConfiguration().getTemporaryDirectory() );
 
             for ( FileItem fi : files )
@@ -471,7 +471,7 @@ public abstract class AbstractArtifactPlexusResource
 
                     try
                     {
-                        Repository repository = getNexusInstance( request ).getRepository( repositoryId );
+                        Repository repository = getNexus().getRepository( repositoryId );
 
                         if ( !MavenRepository.class.isAssignableFrom( repository.getClass() ) )
                         {
@@ -595,7 +595,7 @@ public abstract class AbstractArtifactPlexusResource
                 // Just forcing creation of the temporary directory if it doesn't exist.
                 // Because the upload is using the tmp directory outside of our code
                 // Our method wont be called, which will create the directory on request
-                getNexusInstance( request ).getNexusConfiguration().getTemporaryDirectory();
+                getNexus().getNexusConfiguration().getTemporaryDirectory();
 
                 FileItemFactory factory = this.getFileItemFactory( context );
 
@@ -630,7 +630,7 @@ public abstract class AbstractArtifactPlexusResource
 
                     String extension = null;
 
-                    PomArtifactManager pomManager = new PomArtifactManager( getNexusInstance( request )
+                    PomArtifactManager pomManager = new PomArtifactManager( getNexus()
                         .getNexusConfiguration().getTemporaryDirectory() );
 
                     for ( FileItem fi : items )
@@ -745,7 +745,7 @@ public abstract class AbstractArtifactPlexusResource
 
                             try
                             {
-                                Repository repository = getNexusInstance( request ).getRepository( repositoryId );
+                                Repository repository = getNexus().getRepository( repositoryId );
 
                                 if ( !MavenRepository.class.isAssignableFrom( repository.getClass() ) )
                                 {

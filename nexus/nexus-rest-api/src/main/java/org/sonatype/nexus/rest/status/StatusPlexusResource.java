@@ -47,7 +47,7 @@ public class StatusPlexusResource
         throws ResourceException
     {
 
-        SystemStatus status = getNexusInstance( request ).getSystemStatus();
+        SystemStatus status = getNexus().getSystemStatus();
 
         StatusResource resource = new StatusResource();
 

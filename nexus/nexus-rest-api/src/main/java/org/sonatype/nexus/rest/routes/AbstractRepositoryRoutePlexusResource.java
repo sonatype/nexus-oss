@@ -42,7 +42,7 @@ public abstract class AbstractRepositoryRoutePlexusResource
 {
 
     public static final String ROUTE_ID_KEY = "routeId";
-    
+
     /**
      * Creating a list of member reposes. Since this method is used in two Resource subclasses too, and those are
      * probably mapped to different bases, a listBase param is needed to generate a correct URI, from the actual
@@ -53,11 +53,12 @@ public abstract class AbstractRepositoryRoutePlexusResource
      * @param request
      * @return
      * @throws NoSuchRepositoryException
-     * @throws ResourceException 
+     * @throws ResourceException
      */
     protected List<RepositoryRouteMemberRepository> getRepositoryRouteMemberRepositoryList( Reference listBase,
         List<String> reposList, Request request )
-        throws NoSuchRepositoryException, ResourceException
+        throws NoSuchRepositoryException,
+            ResourceException
     {
         List<RepositoryRouteMemberRepository> members = new ArrayList<RepositoryRouteMemberRepository>( reposList
             .size() );
@@ -78,7 +79,7 @@ public abstract class AbstractRepositoryRoutePlexusResource
             {
                 member.setId( repoId );
 
-                member.setName( getNexusInstance( request ).getRepository( repoId ).getName() );
+                member.setName( getNexus().getRepository( repoId ).getName() );
 
                 member.setResourceURI( createChildReference( request, repoId ).toString() );
             }

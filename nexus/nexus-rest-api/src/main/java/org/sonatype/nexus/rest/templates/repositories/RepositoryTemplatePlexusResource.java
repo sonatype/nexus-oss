@@ -2,6 +2,7 @@ package org.sonatype.nexus.rest.templates.repositories;
 
 import java.io.IOException;
 
+import org.codehaus.plexus.component.annotations.Component;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
@@ -16,11 +17,12 @@ import org.sonatype.nexus.rest.model.RepositoryResourceResponse;
 import org.sonatype.nexus.rest.model.RepositoryShadowResource;
 import org.sonatype.nexus.rest.repositories.AbstractRepositoryPlexusResource;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
+import org.sonatype.plexus.rest.resource.PlexusResource;
 
 /**
  * @author tstevens
- * @plexus.component role-hint="RepositoryTemplatePlexusResource"
  */
+@Component( role = PlexusResource.class, hint = "RepositoryTemplatePlexusResource" )
 public class RepositoryTemplatePlexusResource
     extends AbstractRepositoryPlexusResource
 {
@@ -54,12 +56,11 @@ public class RepositoryTemplatePlexusResource
         RepositoryResourceResponse result = new RepositoryResourceResponse();;
         try
         {
-            CRepository model = getNexusInstance( request ).readRepositoryTemplate( getRepositoryId( request ) );
+            CRepository model = getNexus().readRepositoryTemplate( getRepositoryId( request ) );
 
             if ( model == null )
             {
-                CRepositoryShadow shadowModel = getNexusInstance( request ).readRepositoryShadowTemplate(
-                    getRepositoryId( request ) );
+                CRepositoryShadow shadowModel = getNexus().readRepositoryShadowTemplate( getRepositoryId( request ) );
 
                 if ( shadowModel == null )
                 {
@@ -97,8 +98,7 @@ public class RepositoryTemplatePlexusResource
 
                 if ( REPO_TYPE_VIRTUAL.equals( resource.getRepoType() ) )
                 {
-                    CRepositoryShadow shadow = getNexusInstance( request ).readRepositoryShadowTemplate(
-                        getRepositoryId( request ) );
+                    CRepositoryShadow shadow = getNexus().readRepositoryShadowTemplate( getRepositoryId( request ) );
 
                     if ( shadow == null )
                     {
@@ -110,7 +110,7 @@ public class RepositoryTemplatePlexusResource
                     {
                         shadow = getRepositoryShadowAppModel( (RepositoryShadowResource) resource, shadow );
 
-                        getNexusInstance( request ).updateRepositoryShadowTemplate( shadow );
+                        getNexus().updateRepositoryShadowTemplate( shadow );
 
                         result = new RepositoryResourceResponse();
                         result.setData( getRepositoryShadowRestModel( shadow ) );
@@ -118,8 +118,7 @@ public class RepositoryTemplatePlexusResource
                 }
                 else
                 {
-                    CRepository normal = getNexusInstance( request )
-                        .readRepositoryTemplate( getRepositoryId( request ) );
+                    CRepository normal = getNexus().readRepositoryTemplate( getRepositoryId( request ) );
 
                     if ( normal == null )
                     {
@@ -130,7 +129,7 @@ public class RepositoryTemplatePlexusResource
                     {
                         normal = getRepositoryAppModel( (RepositoryResource) resource, normal );
 
-                        getNexusInstance( request ).updateRepositoryTemplate( normal );
+                        getNexus().updateRepositoryTemplate( normal );
 
                         result = new RepositoryResourceResponse();
                         result.setData( getRepositoryRestModel( normal ) );
@@ -154,22 +153,21 @@ public class RepositoryTemplatePlexusResource
     {
         try
         {
-            CRepository model = getNexusInstance( request ).readRepositoryTemplate( getRepositoryId( request ) );
+            CRepository model = getNexus().readRepositoryTemplate( getRepositoryId( request ) );
 
             if ( model == null )
             {
-                CRepositoryShadow shadowModel = getNexusInstance( request ).readRepositoryShadowTemplate(
-                    getRepositoryId( request ) );
+                CRepositoryShadow shadowModel = getNexus().readRepositoryShadowTemplate( getRepositoryId( request ) );
 
                 if ( shadowModel == null )
                 {
                     throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, "Repository template not found" );
                 }
 
-                getNexusInstance( request ).deleteRepositoryShadowTemplate( getRepositoryId( request ) );
+                getNexus().deleteRepositoryShadowTemplate( getRepositoryId( request ) );
             }
 
-            getNexusInstance( request ).deleteRepositoryTemplate( getRepositoryId( request ) );
+            getNexus().deleteRepositoryTemplate( getRepositoryId( request ) );
         }
         catch ( IOException e )
         {

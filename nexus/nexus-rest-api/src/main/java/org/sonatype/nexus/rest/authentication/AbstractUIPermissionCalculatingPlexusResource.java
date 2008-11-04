@@ -1,5 +1,6 @@
 package org.sonatype.nexus.rest.authentication;
 
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.jsecurity.SecurityUtils;
 import org.jsecurity.authz.Permission;
 import org.jsecurity.authz.permission.WildcardPermission;
@@ -27,18 +28,22 @@ public abstract class AbstractUIPermissionCalculatingPlexusResource
 
     private static final int ALL = READ | UPDATE | DELETE | CREATE;
 
-    protected AuthenticationClientPermissions getClientPermissionsForCurrentUser( Request request ) throws ResourceException
+    @Requirement
+    private NexusSecurity nexusSecurity;
+
+    protected AuthenticationClientPermissions getClientPermissionsForCurrentUser( Request request )
+        throws ResourceException
     {
         AuthenticationClientPermissions perms = new AuthenticationClientPermissions();
 
         Subject subject = SecurityUtils.getSubject();
 
-        if ( getNexusInstance( request ).isSecurityEnabled() )
+        if ( getNexus().isSecurityEnabled() )
         {
-            if ( getNexusInstance( request ).isAnonymousAccessEnabled() )
+            if ( getNexus().isAnonymousAccessEnabled() )
             {
                 // we must decide is the user logged in the anon user and we must tell "false" if it is
-                if ( getNexusInstance( request ).getAnonymousUsername().equals( subject.getPrincipal() ) )
+                if ( getNexus().getAnonymousUsername().equals( subject.getPrincipal() ) )
                 {
                     perms.setLoggedIn( false );
                 }
@@ -70,31 +75,30 @@ public abstract class AbstractUIPermissionCalculatingPlexusResource
 
             perms.setLoggedInUsername( "anonymous" );
         }
-        
-        NexusSecurity security = getNexusSecurity( request );
-        
-        for ( SecurityPrivilege priv : security.listPrivileges() )
+
+        for ( SecurityPrivilege priv : nexusSecurity.listPrivileges() )
         {
             if ( priv.getType().equals( "method" ) )
             {
-                String permission = security.getPrivilegeProperty( priv, "permission" );
-                
+                String permission = nexusSecurity.getPrivilegeProperty( priv, "permission" );
+
                 ClientPermission cPermission = new ClientPermission();
                 cPermission.setId( permission );
                 cPermission.setValue( getFlagsForPermission( subject, permission, request ) );
-                
+
                 perms.addPermission( cPermission );
             }
-        }        
+        }
 
         return perms;
     }
 
-    protected int getFlagsForPermission( Subject subject, String domain, Request request ) throws ResourceException
+    protected int getFlagsForPermission( Subject subject, String domain, Request request )
+        throws ResourceException
     {
         if ( subject == null )
         {
-            if ( getNexusInstance( request ).isSecurityEnabled() )
+            if ( getNexus().isSecurityEnabled() )
             {
                 // WTF? How is it here then?
                 return NONE;

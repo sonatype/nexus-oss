@@ -22,7 +22,7 @@ public abstract class AbstractAttributesPlexusResource
     public void delete( Context context, Request request, Response response )
         throws ResourceException
     {
-        RebuildAttributesTask task = (RebuildAttributesTask) getNexusInstance( request ).createTaskInstance(
+        RebuildAttributesTask task = (RebuildAttributesTask) getNexus().createTaskInstance(
             RebuildAttributesTaskDescriptor.ID );
 
         task.setRepositoryId( getRepositoryId( request ) );

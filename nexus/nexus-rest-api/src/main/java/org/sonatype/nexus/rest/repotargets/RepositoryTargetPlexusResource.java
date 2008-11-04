@@ -2,6 +2,7 @@ package org.sonatype.nexus.rest.repotargets;
 
 import java.io.IOException;
 
+import org.codehaus.plexus.component.annotations.Component;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
@@ -13,11 +14,12 @@ import org.sonatype.nexus.configuration.model.CRepositoryTarget;
 import org.sonatype.nexus.rest.model.RepositoryTargetResource;
 import org.sonatype.nexus.rest.model.RepositoryTargetResourceResponse;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
+import org.sonatype.plexus.rest.resource.PlexusResource;
 
 /**
  * @author tstevens
- * @plexus.component role-hint="RepositoryTargetPlexusResource"
  */
+@Component( role = PlexusResource.class, hint = "RepositoryTargetPlexusResource" )
 public class RepositoryTargetPlexusResource
     extends AbstractRepositoryTargetPlexusResource
 {
@@ -59,7 +61,7 @@ public class RepositoryTargetPlexusResource
     {
         RepositoryTargetResourceResponse result = new RepositoryTargetResourceResponse();
 
-        CRepositoryTarget target = getNexusInstance( request ).readRepositoryTarget( this.getRepoTargetId( request ) );
+        CRepositoryTarget target = getNexus().readRepositoryTarget( this.getRepoTargetId( request ) );
 
         if ( target != null )
         {
@@ -84,8 +86,7 @@ public class RepositoryTargetPlexusResource
         {
             RepositoryTargetResource resource = requestResource.getData();
 
-            CRepositoryTarget target = getNexusInstance( request )
-                .readRepositoryTarget( this.getRepoTargetId( request ) );
+            CRepositoryTarget target = getNexus().readRepositoryTarget( this.getRepoTargetId( request ) );
 
             if ( target != null )
             {
@@ -96,7 +97,7 @@ public class RepositoryTargetPlexusResource
                         target = getRestToNexusResource( resource );
 
                         // update
-                        getNexusInstance( request ).updateRepositoryTarget( target );
+                        getNexus().updateRepositoryTarget( target );
 
                         // response
                         resultResource = new RepositoryTargetResourceResponse();
@@ -132,13 +133,13 @@ public class RepositoryTargetPlexusResource
     public void delete( Context context, Request request, Response response )
         throws ResourceException
     {
-        CRepositoryTarget target = getNexusInstance( request ).readRepositoryTarget( getRepoTargetId( request ) );
+        CRepositoryTarget target = getNexus().readRepositoryTarget( getRepoTargetId( request ) );
 
         if ( target != null )
         {
             try
             {
-                getNexusInstance( request ).deleteRepositoryTarget( getRepoTargetId( request ) );
+                getNexus().deleteRepositoryTarget( getRepoTargetId( request ) );
             }
             catch ( IOException e )
             {

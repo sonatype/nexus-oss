@@ -4,6 +4,7 @@ import java.text.ParseException;
 import java.util.Iterator;
 import java.util.concurrent.RejectedExecutionException;
 
+import org.codehaus.plexus.component.annotations.Component;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
@@ -17,14 +18,15 @@ import org.sonatype.nexus.rest.model.ScheduledServiceResourceResponse;
 import org.sonatype.nexus.rest.model.ScheduledServiceResourceStatus;
 import org.sonatype.nexus.rest.model.ScheduledServiceResourceStatusResponse;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
+import org.sonatype.plexus.rest.resource.PlexusResource;
 import org.sonatype.scheduling.NoSuchTaskException;
 import org.sonatype.scheduling.ScheduledTask;
 import org.sonatype.scheduling.TaskState;
 
 /**
  * @author tstevens
- * @plexus.component role-hint="ScheduledServicePlexusResource"
  */
+@Component( role = PlexusResource.class, hint = "ScheduledServicePlexusResource" )
 public class ScheduledServicePlexusResource
     extends AbstractScheduledServicePlexusResource
 {
@@ -66,7 +68,7 @@ public class ScheduledServicePlexusResource
         ScheduledServiceResourceResponse result = new ScheduledServiceResourceResponse();
         try
         {
-            ScheduledTask<?> task = getNexusInstance( request ).getTaskById( getScheduledServiceId( request ) );
+            ScheduledTask<?> task = getNexus().getTaskById( getScheduledServiceId( request ) );
 
             ScheduledServiceBaseResource resource = getServiceRestModel( task );
 
@@ -106,7 +108,7 @@ public class ScheduledServicePlexusResource
                 // task name
                 // task schedule (even to another type)
                 // task params
-                ScheduledTask<?> task = getNexusInstance( request ).getTaskById( getScheduledServiceId( request ) );
+                ScheduledTask<?> task = getNexus().getTaskById( getScheduledServiceId( request ) );
 
                 task.setEnabled( resource.isEnabled() );
 
@@ -124,7 +126,7 @@ public class ScheduledServicePlexusResource
                 task.reset();
 
                 // Store the changes
-                getNexusInstance( request ).updateSchedule( task );
+                getNexus().updateSchedule( task );
 
                 ScheduledServiceResourceStatus resourceStatus = new ScheduledServiceResourceStatus();
                 resourceStatus.setResource( resource );
@@ -169,7 +171,7 @@ public class ScheduledServicePlexusResource
     {
         try
         {
-            getNexusInstance( request ).getTaskById( getScheduledServiceId( request ) ).cancel();
+            getNexus().getTaskById( getScheduledServiceId( request ) ).cancel();
 
             response.setStatus( Status.SUCCESS_NO_CONTENT );
         }

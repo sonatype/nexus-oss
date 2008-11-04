@@ -1,5 +1,6 @@
 package org.sonatype.nexus.rest.roles;
 
+import org.codehaus.plexus.component.annotations.Component;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
@@ -13,11 +14,12 @@ import org.sonatype.nexus.rest.model.RoleResource;
 import org.sonatype.nexus.rest.model.RoleResourceRequest;
 import org.sonatype.nexus.rest.model.RoleResourceResponse;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
+import org.sonatype.plexus.rest.resource.PlexusResource;
 
 /**
  * @author tstevens
- * @plexus.component role-hint="RolePlexusResource"
  */
+@Component( role = PlexusResource.class, hint = "RolePlexusResource" )
 public class RolePlexusResource
     extends AbstractRolePlexusResource
 {
@@ -60,7 +62,7 @@ public class RolePlexusResource
 
         try
         {
-            result.setData( nexusToRestModel( getNexusSecurity( request ).readRole( getRoleId( request ) ), request ) );
+            result.setData( nexusToRestModel( getNexusSecurity().readRole( getRoleId( request ) ), request ) );
 
         }
         catch ( NoSuchRoleException e )
@@ -81,19 +83,20 @@ public class RolePlexusResource
         if ( resourceRequest != null )
         {
             RoleResource resource = resourceRequest.getData();
-            
+
             try
             {
-                SecurityRole role = restToNexusModel( getNexusSecurity( request ).readRole( resource.getId() ), resource );
-                
-                getNexusSecurity( request ).updateRole( role );
-                
+                SecurityRole role = restToNexusModel( getNexusSecurity().readRole( resource.getId() ), resource );
+
+                getNexusSecurity().updateRole( role );
+
                 resourceResponse = new RoleResourceResponse();
-                
+
                 resourceResponse.setData( resourceRequest.getData() );
-                
-                resourceResponse.getData().setResourceURI( createChildReference( request, resource.getId() ).toString() );
-                
+
+                resourceResponse
+                    .getData().setResourceURI( createChildReference( request, resource.getId() ).toString() );
+
             }
             catch ( NoSuchRoleException e )
             {
@@ -113,8 +116,8 @@ public class RolePlexusResource
         throws ResourceException
     {
         try
-        {            
-            getNexusSecurity( request ).deleteRole( getRoleId( request ) );
+        {
+            getNexusSecurity().deleteRole( getRoleId( request ) );
         }
         catch ( NoSuchRoleException e )
         {

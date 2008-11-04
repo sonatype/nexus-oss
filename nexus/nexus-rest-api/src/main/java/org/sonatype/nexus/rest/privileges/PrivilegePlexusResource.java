@@ -1,5 +1,6 @@
 package org.sonatype.nexus.rest.privileges;
 
+import org.codehaus.plexus.component.annotations.Component;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
@@ -11,11 +12,12 @@ import org.sonatype.jsecurity.realms.tools.dao.SecurityPrivilege;
 import org.sonatype.nexus.jsecurity.realms.NexusMethodAuthorizingRealm;
 import org.sonatype.nexus.rest.model.PrivilegeStatusResourceResponse;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
+import org.sonatype.plexus.rest.resource.PlexusResource;
 
 /**
  * @author tstevens
- * @plexus.component role-hint="PrivilegePlexusResource"
  */
+@Component( role = PlexusResource.class, hint = "PrivilegePlexusResource" )
 public class PrivilegePlexusResource
     extends AbstractPrivilegePlexusResource
 {
@@ -58,7 +60,7 @@ public class PrivilegePlexusResource
 
         try
         {
-            priv = getNexusSecurity( request ).readPrivilege( getPrivilegeId( request ) );
+            priv = getNexusSecurity().readPrivilege( getPrivilegeId( request ) );
         }
         catch ( NoSuchPrivilegeException e )
         {
@@ -78,7 +80,7 @@ public class PrivilegePlexusResource
 
         try
         {
-            priv = getNexusSecurity( request ).readPrivilege( getPrivilegeId( request ) );
+            priv = getNexusSecurity().readPrivilege( getPrivilegeId( request ) );
 
             if ( priv.getType().equals( NexusMethodAuthorizingRealm.PRIVILEGE_TYPE_METHOD ) )
             {
@@ -88,7 +90,7 @@ public class PrivilegePlexusResource
             }
             else
             {
-                getNexusSecurity( request ).deletePrivilege( getPrivilegeId( request ) );
+                getNexusSecurity().deletePrivilege( getPrivilegeId( request ) );
             }
         }
         catch ( NoSuchPrivilegeException e )

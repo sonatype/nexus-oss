@@ -1,5 +1,6 @@
 package org.sonatype.nexus.rest.users;
 
+import org.codehaus.plexus.component.annotations.Component;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
@@ -10,11 +11,12 @@ import org.sonatype.nexus.jsecurity.InvalidCredentialsException;
 import org.sonatype.nexus.rest.model.UserChangePasswordRequest;
 import org.sonatype.nexus.rest.model.UserChangePasswordResource;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
+import org.sonatype.plexus.rest.resource.PlexusResource;
 
 /**
  * @author tstevens
- * @plexus.component role-hint="UserChangePasswordPlexusResource"
  */
+@Component( role = PlexusResource.class, hint = "UserChangePasswordPlexusResource" )
 public class UserChangePasswordPlexusResource
     extends AbstractUserPlexusResource
 {
@@ -56,7 +58,7 @@ public class UserChangePasswordPlexusResource
             {
                 if ( !isAnonymousUser( resource.getUserId(), request ) )
                 {
-                    getNexusSecurity( request ).changePassword(
+                    getNexusSecurity().changePassword(
                         resource.getUserId(),
                         resource.getOldPassword(),
                         resource.getNewPassword() );

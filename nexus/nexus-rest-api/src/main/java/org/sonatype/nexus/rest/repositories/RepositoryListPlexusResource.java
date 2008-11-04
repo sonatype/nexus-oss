@@ -79,7 +79,7 @@ public class RepositoryListPlexusResource
                 {
                     try
                     {
-                        CRepositoryShadow shadow = getNexusInstance( request ).readRepositoryShadow( resource.getId() );
+                        CRepositoryShadow shadow = getNexus().readRepositoryShadow( resource.getId() );
 
                         if ( shadow != null )
                         {
@@ -98,14 +98,14 @@ public class RepositoryListPlexusResource
                             (RepositoryShadowResource) resource,
                             null );
 
-                        getNexusInstance( request ).createRepositoryShadow( shadow );
+                        getNexus().createRepositoryShadow( shadow );
                     }
                 }
                 else
                 {
                     try
                     {
-                        CRepository normal = getNexusInstance( request ).readRepository( resource.getId() );
+                        CRepository normal = getNexus().readRepository( resource.getId() );
 
                         if ( normal != null )
                         {
@@ -121,7 +121,7 @@ public class RepositoryListPlexusResource
                     {
                         CRepository normal = getRepositoryAppModel( (RepositoryResource) resource, null );
 
-                        getNexusInstance( request ).createRepository( normal );
+                        getNexus().createRepository( normal );
                     }
                 }
             }
@@ -137,6 +137,6 @@ public class RepositoryListPlexusResource
             }
         }
 
-        return this.getRepositoryResourceResponse( repoId, this.getNexusInstance( request ) );
+        return this.getRepositoryResourceResponse( repoId, this.getNexus() );
     }
 }

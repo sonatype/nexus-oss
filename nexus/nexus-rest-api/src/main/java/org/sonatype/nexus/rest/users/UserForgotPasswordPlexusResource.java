@@ -1,5 +1,6 @@
 package org.sonatype.nexus.rest.users;
 
+import org.codehaus.plexus.component.annotations.Component;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
@@ -10,11 +11,12 @@ import org.sonatype.nexus.jsecurity.NoSuchEmailException;
 import org.sonatype.nexus.rest.model.UserForgotPasswordRequest;
 import org.sonatype.nexus.rest.model.UserForgotPasswordResource;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
+import org.sonatype.plexus.rest.resource.PlexusResource;
 
 /**
  * @author tstevens
- * @plexus.component role-hint="UserForgotPasswordPlexusResource"
  */
+@Component( role = PlexusResource.class, hint = "UserForgotPasswordPlexusResource" )
 public class UserForgotPasswordPlexusResource
     extends AbstractUserPlexusResource
 {
@@ -23,7 +25,7 @@ public class UserForgotPasswordPlexusResource
     {
         this.setModifiable( true );
     }
-    
+
     @Override
     public Object getPayloadInstance()
     {
@@ -56,7 +58,7 @@ public class UserForgotPasswordPlexusResource
             {
                 if ( !isAnonymousUser( resource.getUserId(), request ) )
                 {
-                    getNexusSecurity( request ).forgotPassword( resource.getUserId(), resource.getEmail() );
+                    getNexusSecurity().forgotPassword( resource.getUserId(), resource.getEmail() );
 
                     response.setStatus( Status.SUCCESS_ACCEPTED );
                 }

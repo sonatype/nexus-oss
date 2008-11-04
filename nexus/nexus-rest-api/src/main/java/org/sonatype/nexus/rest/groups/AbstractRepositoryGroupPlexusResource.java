@@ -47,7 +47,7 @@ public abstract class AbstractRepositoryGroupPlexusResource
         for ( RepositoryGroupMemberRepository member : (Collection<RepositoryGroupMemberRepository>) resource
             .getRepositories() )
         {
-            Repository repo = getNexusInstance( request ).getRepository( member.getId() );
+            Repository repo = getNexus().getRepository( member.getId() );
 
             if ( cc == null )
             {

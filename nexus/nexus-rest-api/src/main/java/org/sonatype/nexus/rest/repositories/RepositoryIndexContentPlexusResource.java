@@ -54,20 +54,22 @@ public class RepositoryIndexContentPlexusResource
     {
         return new PathProtectionDescriptor( "/repositories/*/index_content/**", "authcBasic,tiperms" );
     }
-    
+
     protected IndexingContext getIndexingContext( Request request )
         throws ResourceException
     {
         try
         {
             String repositoryId = String.valueOf( request.getAttributes().get( REPOSITORY_ID_KEY ) );
-            Repository repository = getNexusInstance( request ).getRepository( repositoryId );
+            Repository repository = getNexus().getRepository( repositoryId );
             RepositoryType repositoryType = repository.getRepositoryType();
 
-            if ( RepositoryType.HOSTED.equals( repositoryType ) ) {
+            if ( RepositoryType.HOSTED.equals( repositoryType ) )
+            {
                 return indexerManager.getRepositoryLocalIndexContext( repositoryId );
             }
-            else if ( RepositoryType.PROXY.equals( repositoryType ) ) {
+            else if ( RepositoryType.PROXY.equals( repositoryType ) )
+            {
                 return indexerManager.getRepositoryRemoteIndexContext( repositoryId );
             }
         }

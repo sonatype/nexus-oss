@@ -32,7 +32,6 @@ import org.sonatype.nexus.rest.model.RepositoryShadowResource;
 public abstract class AbstractRepositoryPlexusResource
     extends AbstractNexusPlexusResource
 {
-
     /** Key to store Repo with which we work against. */
     public static final String REPOSITORY_ID_KEY = "repositoryId";
 
@@ -454,7 +453,7 @@ public abstract class AbstractRepositoryPlexusResource
 
                 CRepository m = (CRepository) model;
 
-                RemoteStatus rs = getNexusInstance( request ).getRepository( m.getId() ).getRemoteStatus( forceCheck );
+                RemoteStatus rs = getNexus().getRepository( m.getId() ).getRemoteStatus( forceCheck );
 
                 if ( RemoteStatus.UNKNOWN.equals( rs ) )
                 {
@@ -528,7 +527,7 @@ public abstract class AbstractRepositoryPlexusResource
 
         RepositoryListResource repoRes;
 
-        Collection<CRepository> repositories = getNexusInstance( request ).listRepositories();
+        Collection<CRepository> repositories = getNexus().listRepositories();
 
         for ( CRepository repository : repositories )
         {
@@ -567,7 +566,7 @@ public abstract class AbstractRepositoryPlexusResource
             }
         }
 
-        Collection<CRepositoryShadow> shadows = getNexusInstance( request ).listRepositoryShadows();
+        Collection<CRepositoryShadow> shadows = getNexus().listRepositoryShadows();
 
         for ( CRepositoryShadow shadow : shadows )
         {

@@ -2,11 +2,13 @@ package org.sonatype.nexus.rest.users;
 
 import java.util.List;
 
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.restlet.data.Request;
 import org.restlet.data.Status;
 import org.restlet.resource.Representation;
 import org.restlet.resource.ResourceException;
 import org.sonatype.jsecurity.realms.tools.dao.SecurityUser;
+import org.sonatype.nexus.jsecurity.NexusSecurity;
 import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
 import org.sonatype.nexus.rest.model.UserResource;
 import org.sonatype.plexus.rest.resource.PlexusResourceException;
@@ -14,21 +16,31 @@ import org.sonatype.plexus.rest.resource.PlexusResourceException;
 public abstract class AbstractUserPlexusResource
     extends AbstractNexusPlexusResource
 {
-    
     public static final String USER_ID_KEY = "userId";
 
     public static final String USER_EMAIL_KEY = "email";
 
     private static final String ROLE_VALIDATION_ERROR = "The user cannot have zero roles!";
-    
-    
-    protected boolean validateFields( UserResource resource, Representation representation ) throws PlexusResourceException
+
+    @Requirement
+    private NexusSecurity nexusSecurity;
+
+    protected NexusSecurity getNexusSecurity()
+    {
+        return nexusSecurity;
+    }
+
+    protected boolean validateFields( UserResource resource, Representation representation )
+        throws PlexusResourceException
     {
         if ( resource.getRoles() == null || resource.getRoles().size() == 0 )
         {
             getLogger().info( "The userId (" + resource.getUserId() + ") cannot have 0 roles!" );
 
-            throw new PlexusResourceException( Status.CLIENT_ERROR_BAD_REQUEST, ROLE_VALIDATION_ERROR, getNexusErrorResponse( "users", ROLE_VALIDATION_ERROR ) );
+            throw new PlexusResourceException(
+                Status.CLIENT_ERROR_BAD_REQUEST,
+                ROLE_VALIDATION_ERROR,
+                getNexusErrorResponse( "users", ROLE_VALIDATION_ERROR ) );
         }
 
         return true;
@@ -73,9 +85,10 @@ public abstract class AbstractUserPlexusResource
         return user;
     }
 
-    protected boolean isAnonymousUser( String username, Request request ) throws ResourceException
+    protected boolean isAnonymousUser( String username, Request request )
+        throws ResourceException
     {
-        return getNexusInstance( request ).isAnonymousAccessEnabled() && getNexusInstance( request).getAnonymousUsername().equals( username );
+        return getNexus().isAnonymousAccessEnabled() && getNexus().getAnonymousUsername().equals( username );
     }
 
 }

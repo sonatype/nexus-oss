@@ -1,5 +1,6 @@
 package org.sonatype.nexus.rest.users;
 
+import org.codehaus.plexus.component.annotations.Component;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
@@ -7,11 +8,12 @@ import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 import org.sonatype.jsecurity.realms.tools.NoSuchUserException;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
+import org.sonatype.plexus.rest.resource.PlexusResource;
 
 /**
  * @author tstevens
- * @plexus.component role-hint="UserResetPlexusResource"
  */
+@Component( role = PlexusResource.class, hint = "UserResetPlexusResource" )
 public class UserResetPlexusResource
     extends AbstractUserPlexusResource
 {
@@ -50,7 +52,7 @@ public class UserResetPlexusResource
         {
             if ( !isAnonymousUser( userId, request ) )
             {
-                getNexusSecurity( request ).resetPassword( userId );
+                getNexusSecurity().resetPassword( userId );
 
                 response.setStatus( Status.SUCCESS_NO_CONTENT );
             }

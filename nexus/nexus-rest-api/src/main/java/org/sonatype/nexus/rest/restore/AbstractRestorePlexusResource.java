@@ -86,21 +86,21 @@ public abstract class AbstractRestorePlexusResource
             // check reposes
             if ( getRepositoryGroupId( request ) != null )
             {
-                getNexusInstance( request ).readRepositoryGroup( getRepositoryGroupId( request ) );
+                getNexus().readRepositoryGroup( getRepositoryGroupId( request ) );
             }
             else if ( getRepositoryId( request ) != null )
             {
                 try
                 {
-                    getNexusInstance( request ).readRepository( getRepositoryId( request ) );
+                    getNexus().readRepository( getRepositoryId( request ) );
                 }
                 catch ( NoSuchRepositoryException e )
                 {
-                    getNexusInstance( request ).readRepositoryShadow( getRepositoryId( request ) );
+                    getNexus().readRepositoryShadow( getRepositoryId( request ) );
                 }
             }
 
-            getNexusInstance( request ).submit( "Internal", task );
+            getNexus().submit( "Internal", task );
 
             throw new ResourceException( Status.SUCCESS_NO_CONTENT );
         }

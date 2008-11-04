@@ -3,6 +3,7 @@ package org.sonatype.nexus.rest.repotargets;
 import java.io.IOException;
 import java.util.Collection;
 
+import org.codehaus.plexus.component.annotations.Component;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
@@ -16,11 +17,12 @@ import org.sonatype.nexus.rest.model.RepositoryTargetListResourceResponse;
 import org.sonatype.nexus.rest.model.RepositoryTargetResource;
 import org.sonatype.nexus.rest.model.RepositoryTargetResourceResponse;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
+import org.sonatype.plexus.rest.resource.PlexusResource;
 
 /**
  * @author tstevens
- * @plexus.component role-hint="RepositoryTargetListPlexusResource"
  */
+@Component( role = PlexusResource.class, hint = "RepositoryTargetListPlexusResource" )
 public class RepositoryTargetListPlexusResource
     extends AbstractRepositoryTargetPlexusResource
 {
@@ -54,7 +56,7 @@ public class RepositoryTargetListPlexusResource
     {
         RepositoryTargetListResourceResponse result = new RepositoryTargetListResourceResponse();
 
-        Collection<CRepositoryTarget> targets = getNexusInstance( request ).listRepositoryTargets();
+        Collection<CRepositoryTarget> targets = getNexus().listRepositoryTargets();
 
         RepositoryTargetListResource res = null;
 
@@ -94,7 +96,7 @@ public class RepositoryTargetListPlexusResource
                     CRepositoryTarget target = getRestToNexusResource( resource );
 
                     // create
-                    getNexusInstance( request ).createRepositoryTarget( target );
+                    getNexus().createRepositoryTarget( target );
 
                     // response
                     resourceResponse = new RepositoryTargetResourceResponse();

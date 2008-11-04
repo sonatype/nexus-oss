@@ -1,5 +1,6 @@
 package org.sonatype.nexus.rest.users;
 
+import org.codehaus.plexus.component.annotations.Component;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
@@ -12,11 +13,12 @@ import org.sonatype.nexus.rest.model.UserResource;
 import org.sonatype.nexus.rest.model.UserResourceRequest;
 import org.sonatype.nexus.rest.model.UserResourceResponse;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
+import org.sonatype.plexus.rest.resource.PlexusResource;
 
 /**
  * @author tstevens
- * @plexus.component role-hint="UserListPlexusResource"
  */
+@Component( role = PlexusResource.class, hint = "UserListPlexusResource" )
 public class UserListPlexusResource
     extends AbstractUserPlexusResource
 {
@@ -50,7 +52,7 @@ public class UserListPlexusResource
     {
         UserListResourceResponse result = new UserListResourceResponse();
 
-        for ( SecurityUser user : getNexusSecurity(request).listUsers() )
+        for ( SecurityUser user : getNexusSecurity().listUsers() )
         {
             UserResource res = nexusToRestModel( user, request );
 
@@ -79,7 +81,7 @@ public class UserListPlexusResource
             try
             {
                 String password = resource.getPassword();
-                getNexusSecurity( request ).createUser( user, password );
+                getNexusSecurity().createUser( user, password );
 
                 result = new UserResourceResponse();
 

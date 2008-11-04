@@ -1,5 +1,6 @@
 package org.sonatype.nexus.rest.roles;
 
+import org.codehaus.plexus.component.annotations.Component;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
@@ -12,11 +13,12 @@ import org.sonatype.nexus.rest.model.RoleResource;
 import org.sonatype.nexus.rest.model.RoleResourceRequest;
 import org.sonatype.nexus.rest.model.RoleResourceResponse;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
+import org.sonatype.plexus.rest.resource.PlexusResource;
 
 /**
  * @author tstevens
- * @plexus.component role-hint="RoleListPlexusResource"
  */
+@Component( role = PlexusResource.class, hint = "RoleListPlexusResource" )
 public class RoleListPlexusResource
     extends AbstractRolePlexusResource
 {
@@ -50,7 +52,7 @@ public class RoleListPlexusResource
     {
         RoleListResourceResponse result = new RoleListResourceResponse();
 
-        for ( SecurityRole role : getNexusSecurity( request ).listRoles() )
+        for ( SecurityRole role : getNexusSecurity().listRoles() )
         {
             RoleResource res = nexusToRestModel( role, request );
 
@@ -78,7 +80,7 @@ public class RoleListPlexusResource
 
             try
             {
-                getNexusSecurity( request ).createRole( role );
+                getNexusSecurity().createRole( role );
 
                 result = new RoleResourceResponse();
 

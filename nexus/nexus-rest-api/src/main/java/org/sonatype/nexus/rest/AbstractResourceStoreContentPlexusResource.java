@@ -30,7 +30,6 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.apache.commons.fileupload.FileItem;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.StringUtils;
 import org.restlet.Context;
 import org.restlet.data.MediaType;
@@ -41,7 +40,6 @@ import org.restlet.data.Tag;
 import org.restlet.resource.Representation;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
-import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
@@ -75,9 +73,6 @@ public abstract class AbstractResourceStoreContentPlexusResource
 {
     public static final String IS_LOCAL_PARAMETER = "isLocal";
 
-    @Requirement
-    private Nexus nexus;
-
     public AbstractResourceStoreContentPlexusResource()
     {
         super();
@@ -90,11 +85,6 @@ public abstract class AbstractResourceStoreContentPlexusResource
     public boolean acceptsUpload()
     {
         return true;
-    }
-
-    protected Nexus getNexus()
-    {
-        return nexus;
     }
 
     protected String getResourceStorePath( Request request )
@@ -332,8 +322,7 @@ public abstract class AbstractResourceStoreContentPlexusResource
             // TODO: we should be able to do HTTP redirects too! (parametrize the dereferencing?)
             try
             {
-                return renderItem( context, req, res, variant, getNexusInstance( req ).dereferenceLinkItem(
-                    (StorageLinkItem) item ) );
+                return renderItem( context, req, res, variant, getNexus().dereferenceLinkItem( (StorageLinkItem) item ) );
             }
             catch ( Exception e )
             {

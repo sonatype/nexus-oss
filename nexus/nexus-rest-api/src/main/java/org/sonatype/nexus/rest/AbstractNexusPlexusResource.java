@@ -8,12 +8,10 @@ import org.apache.commons.fileupload.FileItemFactory;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.jsecurity.mgt.SecurityManager;
 import org.restlet.Context;
 import org.restlet.data.Reference;
 import org.restlet.data.Request;
 import org.restlet.data.Status;
-import org.restlet.resource.ResourceException;
 import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.artifact.VersionUtils;
@@ -22,7 +20,6 @@ import org.sonatype.nexus.configuration.validator.InvalidConfigurationException;
 import org.sonatype.nexus.configuration.validator.ValidationMessage;
 import org.sonatype.nexus.configuration.validator.ValidationResponse;
 import org.sonatype.nexus.index.ArtifactInfo;
-import org.sonatype.nexus.jsecurity.NexusSecurity;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.access.Action;
 import org.sonatype.nexus.proxy.access.NexusItemAuthorizer;
@@ -40,59 +37,17 @@ public abstract class AbstractNexusPlexusResource
     extends AbstractPlexusResource
     implements PlexusResource
 {
-    public static final String NEXUS_INSTANCE_KEY = "instanceName";
-
     public static final String NEXUS_INSTANCE_LOCAL = "local";
 
-    /**
-     * @plexus.requirement
-     */
     @Requirement
     private Nexus nexus;
 
-    /**
-     * @plexus.requirement
-     */
     @Requirement
     private NexusItemAuthorizer nexusItemAuthorizer;
 
-    /**
-     * Deprecated. Resources are Plexus components, use Requirement from now on.
-     * 
-     * @deprecated Use Plexus DI from now on.
-     */
-    protected Nexus getNexusInstance( Request request )
-        throws ResourceException
+    protected Nexus getNexus()
     {
-        if ( NEXUS_INSTANCE_LOCAL.equals( request.getAttributes().get( NEXUS_INSTANCE_KEY ) ) )
-        {
-            return nexus;
-        }
-        else
-        {
-            throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, "Nexus instance named '"
-                + request.getAttributes().get( NEXUS_INSTANCE_KEY ) + "' not found!" );
-        }
-    }
-
-    /**
-     * Deprecated. Resources are Plexus components, use Requirement from now on.
-     * 
-     * @deprecated Use Plexus DI from now on.
-     */
-    protected NexusSecurity getNexusSecurity( Request request )
-    {
-        return (NexusSecurity) request.getAttributes().get( NexusSecurity.class.getName() );
-    }
-
-    /**
-     * Deprecated. Resources are Plexus components, use Requirement from now on.
-     * 
-     * @deprecated Use Plexus DI from now on.
-     */
-    protected SecurityManager getSecurityManager( Request request )
-    {
-        return (SecurityManager) request.getAttributes().get( SecurityManager.class.getName() );
+        return nexus;
     }
 
     /**

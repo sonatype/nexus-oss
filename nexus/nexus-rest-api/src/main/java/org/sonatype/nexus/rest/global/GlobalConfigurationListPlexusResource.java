@@ -1,5 +1,6 @@
 package org.sonatype.nexus.rest.global;
 
+import org.codehaus.plexus.component.annotations.Component;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
@@ -8,6 +9,7 @@ import org.restlet.resource.Variant;
 import org.sonatype.nexus.rest.model.GlobalConfigurationListResource;
 import org.sonatype.nexus.rest.model.GlobalConfigurationListResourceResponse;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
+import org.sonatype.plexus.rest.resource.PlexusResource;
 
 /**
  * The GlobalConfigurationList resource. This is a read only resource that simply returns a list of known configuration
@@ -15,12 +17,11 @@ import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
  * 
  * @author cstamas
  * @author tstevens
- * @plexus.component role-hint="GlobalConfigurationListPlexusResource"
  */
+@Component( role = PlexusResource.class, hint = "GlobalConfigurationListPlexusResource" )
 public class GlobalConfigurationListPlexusResource
     extends AbstractGlobalConfigurationPlexusResource
 {
-
     @Override
     public Object getPayloadInstance()
     {

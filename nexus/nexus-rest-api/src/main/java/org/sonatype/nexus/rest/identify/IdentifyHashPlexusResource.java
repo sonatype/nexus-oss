@@ -21,7 +21,7 @@ import org.sonatype.plexus.rest.resource.PlexusResource;
  * 
  * @author cstamas
  */
-@Component(role=PlexusResource.class, hint="IdentifyHashPlexusResource")
+@Component( role = PlexusResource.class, hint = "IdentifyHashPlexusResource" )
 public class IdentifyHashPlexusResource
     extends AbstractNexusPlexusResource
 {
@@ -62,11 +62,11 @@ public class IdentifyHashPlexusResource
         {
             if ( "md5".equalsIgnoreCase( alg ) )
             {
-                na = ai2Na( request, getNexusInstance( request ).identifyArtifact( ArtifactInfo.MD5, checksum ) );
+                na = ai2Na( request, getNexus().identifyArtifact( ArtifactInfo.MD5, checksum ) );
             }
             else if ( "sha1".equalsIgnoreCase( alg ) )
             {
-                na = ai2Na( request, getNexusInstance( request ).identifyArtifact( ArtifactInfo.SHA1, checksum ) );
+                na = ai2Na( request, getNexus().identifyArtifact( ArtifactInfo.SHA1, checksum ) );
             }
         }
         catch ( IOException e )

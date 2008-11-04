@@ -50,7 +50,7 @@ public class RepositoryMetaPlexusResource
         {
             RepositoryMetaResource resource = new RepositoryMetaResource();
 
-            Repository repository = getNexusInstance( request ).getRepository( repoId );
+            Repository repository = getNexus().getRepository( repoId );
 
             String localPath = repository.getLocalUrl().substring( repository.getLocalUrl().indexOf( "file:" ) + 1 );
 
@@ -58,7 +58,7 @@ public class RepositoryMetaPlexusResource
             // a stupid trick here
             try
             {
-                CRepository model = getNexusInstance( request ).readRepository( repoId );
+                CRepository model = getNexus().readRepository( repoId );
 
                 resource.setRepoType( getRestRepoType( model ) );
 
@@ -66,7 +66,7 @@ public class RepositoryMetaPlexusResource
             }
             catch ( NoSuchRepositoryException e )
             {
-                CRepositoryShadow model = getNexusInstance( request ).readRepositoryShadow( repoId );
+                CRepositoryShadow model = getNexus().readRepositoryShadow( repoId );
 
                 resource.setRepoType( getRestRepoType( model ) );
 

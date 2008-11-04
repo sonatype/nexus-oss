@@ -3,6 +3,7 @@ package org.sonatype.nexus.rest.privileges;
 import java.util.Collection;
 import java.util.List;
 
+import org.codehaus.plexus.component.annotations.Component;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
@@ -18,18 +19,18 @@ import org.sonatype.nexus.rest.model.PrivilegeListResourceResponse;
 import org.sonatype.nexus.rest.model.PrivilegeResourceRequest;
 import org.sonatype.nexus.rest.model.PrivilegeTargetResource;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
+import org.sonatype.plexus.rest.resource.PlexusResource;
 import org.sonatype.plexus.rest.resource.PlexusResourceException;
 
 /**
  * Handles the GET and POST request for the Nexus privileges.
  * 
  * @author tstevens
- * @plexus.component role-hint="PrivilegeListPlexusResource"
  */
+@Component( role = PlexusResource.class, hint = "PrivilegeListPlexusResource" )
 public class PrivilegeListPlexusResource
     extends AbstractPrivilegePlexusResource
 {
-
     public PrivilegeListPlexusResource()
     {
         this.setModifiable( true );
@@ -59,7 +60,7 @@ public class PrivilegeListPlexusResource
     {
         PrivilegeListResourceResponse result = new PrivilegeListResourceResponse();
 
-        Collection<SecurityPrivilege> privs = getNexusSecurity( request ).listPrivileges();
+        Collection<SecurityPrivilege> privs = getNexusSecurity().listPrivileges();
 
         for ( SecurityPrivilege priv : privs )
         {
@@ -147,7 +148,7 @@ public class PrivilegeListPlexusResource
 
                             priv.addProperty( prop );
 
-                            getNexusSecurity( request ).createPrivilege( priv );
+                            getNexusSecurity().createPrivilege( priv );
 
                             result.addData( nexusToRestModel( priv, request ) );
                         }

@@ -1,5 +1,6 @@
 package org.sonatype.nexus.rest.schedules;
 
+import org.codehaus.plexus.component.annotations.Component;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
@@ -10,14 +11,15 @@ import org.sonatype.nexus.rest.model.ScheduledServiceBaseResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceResourceStatus;
 import org.sonatype.nexus.rest.model.ScheduledServiceResourceStatusResponse;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
+import org.sonatype.plexus.rest.resource.PlexusResource;
 import org.sonatype.scheduling.NoSuchTaskException;
 import org.sonatype.scheduling.ScheduledTask;
 import org.sonatype.scheduling.TaskState;
 
 /**
  * @author tstevens
- * @plexus.component role-hint="ScheduledServiceRunPlexusResource"
  */
+@Component( role = PlexusResource.class, hint = "ScheduledServiceRunPlexusResource" )
 public class ScheduledServiceRunPlexusResource
     extends AbstractScheduledServicePlexusResource
 {
@@ -50,7 +52,7 @@ public class ScheduledServiceRunPlexusResource
 
         try
         {
-            ScheduledTask<?> task = getNexusInstance( request ).getTaskById( scheduledServiceId );
+            ScheduledTask<?> task = getNexus().getTaskById( scheduledServiceId );
 
             task.runNow();
 

@@ -53,22 +53,22 @@ public class CommandPlexusResource
 
             if ( "START".equalsIgnoreCase( cmd ) )
             {
-                result = getNexusInstance( request ).setState( SystemState.STARTED );
+                result = getNexus().setState( SystemState.STARTED );
             }
             else if ( "STOP".equalsIgnoreCase( cmd ) )
             {
-                result = getNexusInstance( request ).setState( SystemState.STOPPED );
+                result = getNexus().setState( SystemState.STOPPED );
             }
             else if ( "RESTART".equalsIgnoreCase( cmd ) )
             {
                 // if running stop it
-                if ( SystemState.STARTED.equals( getNexusInstance( request ).getSystemStatus().getState() ) )
+                if ( SystemState.STARTED.equals( getNexus().getSystemStatus().getState() ) )
                 {
-                    getNexusInstance( request ).setState( SystemState.STOPPED );
+                    getNexus().setState( SystemState.STOPPED );
                 }
 
                 // and start it
-                result = getNexusInstance( request ).setState( SystemState.STARTED );
+                result = getNexus().setState( SystemState.STARTED );
             }
             else
             {

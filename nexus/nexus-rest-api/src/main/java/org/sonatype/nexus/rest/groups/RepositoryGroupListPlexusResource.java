@@ -64,7 +64,7 @@ public class RepositoryGroupListPlexusResource
     {
         RepositoryGroupListResourceResponse result = new RepositoryGroupListResourceResponse();
 
-        Collection<CRepositoryGroup> groups = getNexusInstance( request ).listRepositoryGroups();
+        Collection<CRepositoryGroup> groups = getNexus().listRepositoryGroups();
 
         try
         {
@@ -76,7 +76,7 @@ public class RepositoryGroupListPlexusResource
 
                 resource.setId( group.getGroupId() );
 
-                resource.setFormat( getNexusInstance( request ).getRepositoryGroupType( group.getGroupId() ) );
+                resource.setFormat( getNexus().getRepositoryGroupType( group.getGroupId() ) );
 
                 resource.setName( group.getName() );
 
@@ -89,7 +89,7 @@ public class RepositoryGroupListPlexusResource
 
                     member.setId( repoId );
 
-                    member.setName( getNexusInstance( request ).getRepository( repoId ).getName() );
+                    member.setName( getNexus().getRepository( repoId ).getName() );
 
                     member.setResourceURI( createRepositoryReference( request, repoId ).toString() );
 
@@ -140,7 +140,7 @@ public class RepositoryGroupListPlexusResource
 
             try
             {
-                CRepositoryGroup group = getNexusInstance( request ).readRepositoryGroup( resource.getId() );
+                CRepositoryGroup group = getNexus().readRepositoryGroup( resource.getId() );
 
                 if ( group != null )
                 {
@@ -170,7 +170,7 @@ public class RepositoryGroupListPlexusResource
                         group.addRepository( member.getId() );
                     }
 
-                    getNexusInstance( request ).createRepositoryGroup( group );
+                    getNexus().createRepositoryGroup( group );
                     //
                     // response.setStatus( Status.SUCCESS_NO_CONTENT );
                 }

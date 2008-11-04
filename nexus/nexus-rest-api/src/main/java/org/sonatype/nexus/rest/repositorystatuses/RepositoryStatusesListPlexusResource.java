@@ -48,7 +48,7 @@ public class RepositoryStatusesListPlexusResource
 
         RepositoryStatusListResource repoRes;
 
-        Collection<CRepository> repositories = getNexusInstance( request ).listRepositories();
+        Collection<CRepository> repositories = getNexus().listRepositories();
 
         for ( CRepository repository : repositories )
         {
@@ -80,7 +80,7 @@ public class RepositoryStatusesListPlexusResource
             result.addData( repoRes );
         }
 
-        Collection<CRepositoryShadow> shadows = getNexusInstance( request ).listRepositoryShadows();
+        Collection<CRepositoryShadow> shadows = getNexus().listRepositoryShadows();
 
         for ( CRepositoryShadow shadow : shadows )
         {

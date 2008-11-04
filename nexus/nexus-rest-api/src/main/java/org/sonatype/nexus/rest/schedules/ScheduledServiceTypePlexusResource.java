@@ -2,6 +2,7 @@ package org.sonatype.nexus.rest.schedules;
 
 import java.util.List;
 
+import org.codehaus.plexus.component.annotations.Component;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
@@ -13,11 +14,12 @@ import org.sonatype.nexus.rest.model.ScheduledServiceTypeResourceResponse;
 import org.sonatype.nexus.tasks.descriptors.ScheduledTaskDescriptor;
 import org.sonatype.nexus.tasks.descriptors.properties.ScheduledTaskPropertyDescriptor;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
+import org.sonatype.plexus.rest.resource.PlexusResource;
 
 /**
  * @author tstevens
- * @plexus.component role-hint="ScheduledServiceTypePlexusResource"
  */
+@Component( role = PlexusResource.class, hint = "ScheduledServiceTypePlexusResource" )
 public class ScheduledServiceTypePlexusResource
     extends AbstractScheduledServicePlexusResource
 {
@@ -46,7 +48,7 @@ public class ScheduledServiceTypePlexusResource
     {
         ScheduledServiceTypeResourceResponse result = new ScheduledServiceTypeResourceResponse();
 
-        List<ScheduledTaskDescriptor> taskDescriptors = getNexusInstance( request ).listScheduledTaskDescriptors();
+        List<ScheduledTaskDescriptor> taskDescriptors = getNexus().listScheduledTaskDescriptors();
 
         for ( ScheduledTaskDescriptor taskDescriptor : taskDescriptors )
         {
@@ -55,7 +57,7 @@ public class ScheduledServiceTypePlexusResource
                 ScheduledServiceTypeResource type = new ScheduledServiceTypeResource();
                 type.setId( taskDescriptor.getId() );
                 type.setName( taskDescriptor.getName() );
-    
+
                 for ( ScheduledTaskPropertyDescriptor propertyDescriptor : taskDescriptor.getPropertyDescriptors() )
                 {
                     ScheduledServiceTypePropertyResource property = new ScheduledServiceTypePropertyResource();
@@ -64,10 +66,10 @@ public class ScheduledServiceTypePlexusResource
                     property.setName( propertyDescriptor.getName() );
                     property.setRequired( propertyDescriptor.isRequired() );
                     property.setType( propertyDescriptor.getType() );
-    
+
                     type.addProperty( property );
                 }
-    
+
                 result.addData( type );
             }
         }
