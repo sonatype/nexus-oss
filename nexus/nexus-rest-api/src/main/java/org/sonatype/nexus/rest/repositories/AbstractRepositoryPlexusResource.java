@@ -536,7 +536,7 @@ public abstract class AbstractRepositoryPlexusResource
             {
                 repoRes = new RepositoryListResource();
 
-                repoRes.setResourceURI( createChildReference( request, repository.getId() ).toString() );
+                repoRes.setResourceURI( createRepositoryReference( request, repository.getId() ).toString() );
 
                 repoRes.setRepoType( getRestRepoType( repository ) );
 
@@ -579,7 +579,7 @@ public abstract class AbstractRepositoryPlexusResource
 
                 repoRes.setFormat( shadow.getType() );
 
-                repoRes.setResourceURI( createChildReference( request, shadow.getId() ).toString() );
+                repoRes.setResourceURI( createRepositoryReference( request, shadow.getId() ).toString() );
 
                 repoRes.setRepoType( getRestRepoType( shadow ) );
 

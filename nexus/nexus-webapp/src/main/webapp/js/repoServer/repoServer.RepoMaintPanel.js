@@ -99,6 +99,32 @@ Sonatype.repoServer.RepoMaintPanel = function(config){
         }
   };
   
+  this.browseTypeButtonConfig = {
+          text: 'User Managed Repositories',
+          value: 'user',
+          tooltip: 'Click to browse other types of repositories.',
+          handler: this.switchBrowseType,
+          scope: this,
+          menu: {
+            items: [
+              {
+                text: 'User Managed Repositories',
+                value: 'user',
+                scope: this,
+                handler: this.switchBrowseType
+              },
+              {
+                text: 'Nexus Managed Repositories',
+                value: 'nexus',
+                scope: this,
+                handler: this.switchBrowseType
+              }
+            ]
+          }
+        };
+  
+  this.browseTypeButton = new Ext.Button( this.browseTypeButtonConfig );
+  
   this.detailPanelConfig = {
     //region: 'center',
     autoScroll: false,
@@ -111,64 +137,8 @@ Sonatype.repoServer.RepoMaintPanel = function(config){
     layoutConfig: {
       labelSeparator: ''
     },
-    //  items: [
-    //    {
-    //      xtype: 'panel',
-    //      layout: 'column',
-    //      autoWidth: true,
-    //      //height: 400,
-    //      autoHeight: true,
-    //      //style: 'padding: 10px 0 0 0',
 
     items: [
-//    {
-//      //columnWidth: .5,
-//      xtype: 'panel',
-//      layout: 'fit',
-//      //title: 'Additional Repository Info',
-//      //autoHeight: true,
-//      autoScroll: false,
-//      border: false,
-//      frame: true,
-//      collapsible: false,
-//      collapsed: false
-//      //,
-//      //contentEl: '<p>Additional Repository Info Here</p>'
-//    },
-
-//    {
-//      xtype: 'treepanel',
-//      anchor: '0 -2',
-//      id: '_repo-browse', //note: unique ID is assinged before instantiation
-//      title: 'Repository Content',
-//      border: true,
-//      bodyBorder: true,
-//      loader: null, //note: created uniquely per repo
-//      //note: this style matches the expected behavior
-//      bodyStyle: 'background-color:#FFFFFF; border: 1px solid #99BBE8',
-//      animate:true,
-//      lines: false,
-//      autoScroll:true,
-//      containerScroll: true,
-//      rootVisible: true,
-//      enableDD: false,
-//      tools: [
-//        {
-//          id: 'refresh',
-//          handler: function(e, toolEl, panel){
-//            var i = panel.root.text.search(/\(Out of Service\)/);
-//            if(i > -1){
-//              panel.root.setText(panel.root.text.slice(0, i-1));
-//            }
-//            panel.root.reload();
-//          }
-//        }
-//      ],
-//      listeners: {
-//        contextmenu: this.onBrowseContextClickHandler,
-//        scope: this
-//      }
-//    }
     ]
 };
       
@@ -234,7 +204,8 @@ Sonatype.repoServer.RepoMaintPanel = function(config){
 //  {name:'effectiveLocalStorageUrl'},
     {name:'repoPolicy'},
     {name:'contentUri', mapping:'resourceURI', convert: this.restToContentUrl },
-    {name:'remoteUri'}
+    {name:'remoteUri'},
+    {name:'userManaged'}
   ]);
 
   this.reposReader = new Ext.data.JsonReader({root: 'data', id: 'resourceURI'}, this.repoRecordConstructor );
@@ -269,6 +240,31 @@ Sonatype.repoServer.RepoMaintPanel = function(config){
       }
     }
   });
+  
+  this.allReposDataStore = new Ext.data.Store({
+    url: Sonatype.config.repos.urls.allRepositories,
+    reader: this.reposReader,
+    sortInfo: {field: 'name', direction: 'ASC'},
+    autoLoad: true,
+    listeners: {
+      'load' : {
+        fn: function() {
+          this.searchField.triggers[1].hide();
+          this.allReposDataStore.each(function(item,i,len){
+              if ( item.data.userManaged == true )
+              {
+                  this.allReposDataStore.remove( item );
+              }
+              else
+              {
+                  item.data.sStatus = 'In Service';
+              }
+            },this);
+        },
+        scope: this
+      }
+    }
+  });
 
   this.reposGridPanel = new Ext.grid.GridPanel({
     //title: 'Repositories',
@@ -287,7 +283,8 @@ Sonatype.repoServer.RepoMaintPanel = function(config){
       singleSelect: true
     }),
     tbar: [
-      this.actions.refreshList
+      this.actions.refreshList,
+      this.browseTypeButton
     ],
 
     //grid view options
@@ -476,7 +473,10 @@ Ext.extend(Sonatype.repoServer.RepoMaintPanel, Sonatype.repoServer.AbstractRepoP
 
   onContextClickHandler : function(grid, index, e){
     this.onContextHideHandler();
-    
+    if ( this.browseTypeButton.value == 'nexus' )
+    {
+        return;
+    }
     var repoStatusPriv = this.sp.checkPermission('nexus:repostatus', this.sp.EDIT);
     
     if ( e.target.nodeName == 'A' ) return; // no menu on links
@@ -530,6 +530,11 @@ Ext.extend(Sonatype.repoServer.RepoMaintPanel, Sonatype.repoServer.AbstractRepoP
   onBrowseContextClickHandler : function(node, e){
     this.onBrowseContextHideHandler();
     
+    if ( this.browseTypeButton.value == 'nexus' )
+    {
+        return;
+    }
+    
     var isProxyRepo = (node.getOwnerTree().root.attributes.repoType == 'proxy');
     var isGroup = (node.getOwnerTree().root.attributes.repoType == 'group');
     
@@ -554,7 +559,7 @@ Ext.extend(Sonatype.repoServer.RepoMaintPanel, Sonatype.repoServer.AbstractRepoP
       menu.add(this.actions.download);
     }
     
-    if (!node.isRoot && !isGroup){
+    if (this.browseTypeButton.value == 'user' && !node.isRoot && !isGroup){
       if ( ! this.browseIndex ) {
         menu.add(this.actions.deleteRepoItem);
       }
@@ -894,6 +899,7 @@ Ext.extend(Sonatype.repoServer.RepoMaintPanel, Sonatype.repoServer.AbstractRepoP
       this.forceStatuses = true;
     }
 
+    this.allReposDataStore.reload();
     this.reposDataStore.reload();
     this.formCards.items.each(function(item, i, len){
       this.remove(item, true);
@@ -1094,5 +1100,31 @@ Ext.extend(Sonatype.repoServer.RepoMaintPanel, Sonatype.repoServer.AbstractRepoP
         scope: this
       });
     }
-  }
+  },
+  switchBrowseType: function( button, event ) {
+      this.setBrowseType( this, button.value );
+      
+      if ( button.value == 'nexus' )
+      {
+          this.reposGridPanel.store = this.allReposDataStore;
+          this.reposGridPanel.getView().refresh();
+      }
+      else if ( button.value == 'user' )
+      {
+          this.reposGridPanel.store = this.reposDataStore;
+          this.reposGridPanel.getView().refresh();
+      }
+    },
+
+    setBrowseType: function( panel, t ) {
+      if ( t != panel.browseTypeButton.value ) {
+        var items = panel.browseTypeButtonConfig.menu.items;
+        panel.browseTypeButton.value = t;
+        for ( var i = 0; i < items.length; i++ ) {
+          if ( items[i].value == t ) {
+            panel.browseTypeButton.setText( items[i].text );
+          }
+        }
+      }
+    },
 });

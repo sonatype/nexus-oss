@@ -72,6 +72,7 @@ Sonatype.config = function() {
         globalSettings : servicePath + '/global_settings',
         globalSettingsState : servicePath + '/global_settings/current',
         repositories : servicePath + '/repositories',
+        allRepositories : servicePath + '/all_repositories',
         repositoryStatuses : servicePath + '/repository_statuses',
         repoTemplates : servicePath + '/templates/repositories',
         repoTemplate : {
