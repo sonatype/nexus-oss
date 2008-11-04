@@ -1,11 +1,9 @@
 package org.sonatype.nexus.proxy.wastebasket;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
 
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
@@ -22,7 +20,6 @@ import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.proxy.repository.RepositoryType;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.proxy.storage.local.LocalRepositoryStorage;
 import org.sonatype.nexus.proxy.storage.local.fs.DefaultFSLocalRepositoryStorage;
@@ -205,101 +202,37 @@ public class DefaultFSWastebasket
     public void deleteRepositoryFolders( Repository repository )
         throws IOException
     {
-        File localStorageFile = new File( new URL( repository.getLocalUrl() ).getFile() );
-
         File defaultStorageFile = new File(
             new File( applicationConfiguration.getWorkingDirectory(), "storage" ),
             repository.getId() );
 
-        // only remove the storage folder when in default storage case
-        if ( defaultStorageFile.getAbsolutePath().equals( localStorageFile.getAbsolutePath() ) )
-        {
-            delete( defaultStorageFile );
-        }
-
-        File indexerFile = null;
-
-        if ( repository.getRepositoryType() == RepositoryType.HOSTED )
-        {
-            indexerFile = new File( new File( applicationConfiguration.getWorkingDirectory(), "indexer" ), repository
-                .getId()
-                + "-local" );
-        }
-        else if ( repository.getRepositoryType() == RepositoryType.PROXY )
-        {
-            indexerFile = new File( new File( applicationConfiguration.getWorkingDirectory(), "indexer" ), repository
-                .getId()
-                + "-remote" );
-        }
-
-        if ( indexerFile != null )
-        {
-            delete( indexerFile );
-        }
-
+        delete( defaultStorageFile );
     }
-    
+
+    /**
+     * Move file or directory to the trash
+     * 
+     * @param file
+     * @throws IOException
+     */
     protected void delete( File file )
         throws IOException
     {
-        delete( file, "" );
-    }
-
-    protected void delete( File file, String base )
-        throws IOException
-    {
-        File basketFile = new File( getWastebasketDirectory(), base + file.getName() );
+        File basketFile = new File( getWastebasketDirectory(), file.getName() );
 
         if ( file.isDirectory() )
         {
-            basketFile.mkdir();
+            FileUtils.mkdir( basketFile.getAbsolutePath() );
 
-            for ( File child : file.listFiles() )
-            {
-                delete( child, base + file.getName() + File.separatorChar );
-            }
+            FileUtils.copyDirectoryStructure( file, basketFile );
         }
-        else if ( file.isFile() )
+        else
         {
-            moveFileContent( file, basketFile );
+            FileUtils.copyFile( file, basketFile );
         }
-        file.delete();
+
+        FileUtils.forceDelete( file );
     }
 
-    private void moveFileContent( File from, File to )
-        throws IOException
-    {
 
-        FileInputStream fis = null;
-
-        FileOutputStream fos = null;
-
-        try
-        {
-
-            fis = new FileInputStream( from );
-
-            fos = new FileOutputStream( to );
-
-            IOUtil.copy( fis, fos );
-
-            fos.flush();
-        }
-        catch ( IOException ioe )
-        {
-            throw ioe;
-        }
-        finally
-        {
-            if ( fis != null )
-            {
-                IOUtil.close( fis );
-            }
-            if ( fos != null )
-            {
-                IOUtil.close( fos );
-            }
-        }
-
-    }
 }

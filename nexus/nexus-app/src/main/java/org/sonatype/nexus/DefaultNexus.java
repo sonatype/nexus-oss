@@ -24,6 +24,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -574,13 +575,22 @@ public class DefaultNexus
             IOException,
             ConfigurationException
     {
-        // remove the folders for the repository
-        RemoveRepoFolderTask task = (RemoveRepoFolderTask) nexusScheduler
-            .createTaskInstance( RemoveRepoFolderTaskDescriptor.ID );
+        Repository repository = repositoryRegistry.getRepository( id );
 
-        task.setRepository( repositoryRegistry.getRepository( id ) );
+        File defaultStorageFile = new File( new File( nexusConfiguration.getWorkingDirectory(), "storage" ), repository
+            .getId() );
 
-        nexusScheduler.submit( "Remove repository folder", task );
+        // only remove the storage folder when in default storage case
+        if ( defaultStorageFile.toURL().toString().equals( repository.getLocalUrl() + "/" ) )
+        {
+            // remove the storage folders for the repository
+            RemoveRepoFolderTask task = (RemoveRepoFolderTask) nexusScheduler
+                .createTaskInstance( RemoveRepoFolderTaskDescriptor.ID );
+
+            task.setRepository( repository );
+
+            nexusScheduler.submit( "Remove repository folder", task );
+        }
 
         // delete the configuration
         nexusConfiguration.deleteRepository( id );
