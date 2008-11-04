@@ -86,7 +86,7 @@ public abstract class StoreWalker
         return logger;
     }
 
-    protected ResourceStore getResourceStore()
+    public ResourceStore getResourceStore()
     {
         return store;
     }
@@ -94,6 +94,11 @@ public abstract class StoreWalker
     public Throwable getStopCause()
     {
         return stopCause;
+    }
+
+    public void stop()
+    {
+        stop( null );
     }
 
     public void stop( Throwable cause )
@@ -117,6 +122,11 @@ public abstract class StoreWalker
                     + " because stop() was called without submitted cause." );
             }
         }
+    }
+
+    public boolean isStopped()
+    {
+        return !running;
     }
 
     public void walk()
