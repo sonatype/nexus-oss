@@ -45,6 +45,7 @@ public class Nexus642SynchShadowTaskTest
         ScheduledServiceListResource task = this.executeTask( taskName, repo.getId() );
 
         // check the status:
+        Assert.assertNotNull( task );
         Assert.assertEquals( "SUBMITTED", task.getStatus() );
 
         // download the file using the shadow repo
@@ -67,7 +68,7 @@ public class Nexus642SynchShadowTaskTest
         age.setValue( shadowRepo );
 
         // clean unused
-        return TaskScheduleUtil.runTask( taskName, SynchronizeShadowTaskDescriptor.ID, repo, age );
+        return TaskScheduleUtil.runTask( taskName, SynchronizeShadowTaskDescriptor.ID, 100, repo, age );
     }
 
 }

@@ -1,0 +1,15 @@
+<assembly>
+  <id>configs</id>
+  <formats>
+    <format>zip</format>
+  </formats>
+  
+  <baseDirectory>/</baseDirectory>
+
+  <fileSets>
+    <fileSet>
+      <outputDirectory>/</outputDirectory>
+      <directory>src/assemble/resources</directory>
+    </fileSet>
+  </fileSets>
+</assembly>

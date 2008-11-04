@@ -8,8 +8,8 @@
   <description></description>
   <distributionManagement>
     <repository>
-      <id>sample-test-case-repo</id>
-      <url>${nexus-base-url}content/repositories/sample-test-case-repo</url>
+      <id>nexus-test-harness-repo</id>
+      <url>${nexus-base-url}content/repositories/nexus-test-harness-repo</url>
     </repository>
   </distributionManagement>
 </project>

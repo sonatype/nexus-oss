@@ -7,9 +7,7 @@ import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.net.URL;
-import java.net.URLDecoder;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -273,6 +271,11 @@ public class AbstractNexusIntegrationTest
 
                 // int status = DeployUtils.deployUsingPomWithRest( deployUrl, repositoryId, gav, artifactFile, pom );
 
+                if ( !artifactFile.isFile() )
+                {
+                    throw new FileNotFoundException( "File " + artifactFile.getAbsolutePath() + " doesn't exists!" );
+                }
+
                 DeployUtils.deployWithWagon( this.container, "http", deployUrl, artifactFile,
                                              this.getRelitiveArtifactPath( gav ) );
                 DeployUtils.deployWithWagon( this.container, "http", deployUrl, pom, this.getRelitivePomPath( gav ) );
@@ -456,17 +459,19 @@ public class AbstractNexusIntegrationTest
     protected File getResource( String resource )
     {
         log.debug( "Looking for resource: " + resource );
-        URL classURL = Thread.currentThread().getContextClassLoader().getResource( resource );
-        log.debug( "found: " + classURL );
+        // URL classURL = Thread.currentThread().getContextClassLoader().getResource( resource );
 
-        try
+        File rootDir = new File( TestProperties.getString( "test.root.dir" ) );
+        File file = new File( rootDir, resource );
+
+        if ( !file.exists() )
         {
-            return classURL == null ? null : new File( URLDecoder.decode( classURL.getFile(), "UTF-8" ) );
+            return null;
         }
-        catch ( UnsupportedEncodingException e )
-        {
-            throw new RuntimeException( "This test assumes the use of UTF-8 encoding: " + e.getMessage(), e );
-        }
+
+        log.debug( "found: " + file );
+
+        return file;
     }
 
     /**

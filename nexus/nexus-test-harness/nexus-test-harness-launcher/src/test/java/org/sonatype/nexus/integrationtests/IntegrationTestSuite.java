@@ -41,7 +41,7 @@ public class IntegrationTestSuite
         client.disconnect();
 
         // now to make everything work correctly we actually have to "soft-stop" nexus
-        NexusStateUtil.doSoftStop();
+//        NexusStateUtil.doSoftStop();
 
     }
 
