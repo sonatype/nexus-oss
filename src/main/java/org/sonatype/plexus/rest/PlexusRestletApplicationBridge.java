@@ -67,6 +67,12 @@ public class PlexusRestletApplicationBridge
     /** The root that is changeable as-needed basis */
     private RetargetableRestlet root;
 
+    /** The root */
+    private Router rootRouter;
+
+    /** The applicationRouter */
+    private Router applicationRouter;
+
     /**
      * Constructor.
      */
@@ -115,6 +121,16 @@ public class PlexusRestletApplicationBridge
         recreateRoot( true );
 
         return root;
+    }
+
+    protected Router getRootRouter()
+    {
+        return rootRouter;
+    }
+
+    protected Router getApplicationRouter()
+    {
+        return applicationRouter;
     }
 
     /**
@@ -172,9 +188,9 @@ public class PlexusRestletApplicationBridge
         if ( root != null )
         {
             // create a new root router
-            Router rootRouter = new Router( getContext() );
+            rootRouter = new Router( getContext() );
 
-            Router applicationRouter = initializeRouter( rootRouter, isStarted );
+            applicationRouter = initializeRouter( rootRouter, isStarted );
 
             // attach all PlexusResources
             if ( isStarted )
@@ -185,7 +201,7 @@ public class PlexusRestletApplicationBridge
                 }
             }
 
-            doCreateRoot( applicationRouter, isStarted );
+            doCreateRoot( rootRouter, isStarted );
 
             // encoding support
             Encoder encoder = new Encoder( getContext() );
@@ -269,7 +285,8 @@ public class PlexusRestletApplicationBridge
     }
 
     /**
-     * Left for subclass to inject a "prefix" path.
+     * Left for subclass to inject a "prefix" path. The automatically managed PlexusResources will be attached under the
+     * router returned by this method.
      * 
      * @param root
      * @return
