@@ -1,6 +1,8 @@
 package org.sonatype.nexus.proxy.walker;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.sonatype.nexus.proxy.ResourceStore;
@@ -13,6 +15,8 @@ public class DefaultWalkerContext
     private final WalkerFilter walkerFilter;
 
     private Map<String, Object> context;
+
+    private List<WalkerProcessor> processors;
 
     private Throwable stopCause;
 
@@ -41,6 +45,21 @@ public class DefaultWalkerContext
             context = new HashMap<String, Object>();
         }
         return context;
+    }
+
+    public List<WalkerProcessor> getProcessors()
+    {
+        if ( processors == null )
+        {
+            processors = new ArrayList<WalkerProcessor>();
+        }
+
+        return processors;
+    }
+
+    public void setProcessors( List<WalkerProcessor> processors )
+    {
+        this.processors = processors;
     }
 
     public WalkerFilter getFilter()

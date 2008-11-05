@@ -1,6 +1,5 @@
 package org.sonatype.nexus.proxy.walker;
 
-import java.util.List;
 
 /**
  * This is the actual Walker that walks the ResourceStorage.
@@ -14,7 +13,7 @@ public interface Walker
      * 
      * @throws WalkerException
      */
-    void walk( WalkerContext context, List<WalkerProcessor> processors )
+    void walk( WalkerContext context )
         throws WalkerException;
 
     /**
@@ -23,7 +22,7 @@ public interface Walker
      * @param fromPath
      * @throws WalkerException
      */
-    void walk( WalkerContext context, String fromPath, List<WalkerProcessor> processors )
+    void walk( WalkerContext context, String fromPath )
         throws WalkerException;
 
     /**
@@ -33,7 +32,7 @@ public interface Walker
      * @param collectionsOnly
      * @throws WalkerException
      */
-    void walk( WalkerContext context, boolean localOnly, boolean collectionsOnly, List<WalkerProcessor> processors )
+    void walk( WalkerContext context, boolean localOnly, boolean collectionsOnly )
         throws WalkerException;
 
     /**
@@ -44,7 +43,6 @@ public interface Walker
      * @param collectionsOnly
      * @throws WalkerException
      */
-    void walk( WalkerContext context, String fromPath, boolean localOnly, boolean collectionsOnly,
-        List<WalkerProcessor> processors )
+    void walk( WalkerContext context, String fromPath, boolean localOnly, boolean collectionsOnly )
         throws WalkerException;
 }

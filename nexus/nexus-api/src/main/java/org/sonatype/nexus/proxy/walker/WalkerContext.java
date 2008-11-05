@@ -1,5 +1,6 @@
 package org.sonatype.nexus.proxy.walker;
 
+import java.util.List;
 import java.util.Map;
 
 import org.sonatype.nexus.proxy.ResourceStore;
@@ -17,6 +18,20 @@ public interface WalkerContext
      * @return
      */
     Map<String, Object> getContext();
+
+    /**
+     * Gets (and creates in null and empty list) the list of processors.
+     * 
+     * @return
+     */
+    List<WalkerProcessor> getProcessors();
+
+    /**
+     * Sets the list of processors to use.
+     * 
+     * @param processors
+     */
+    void setProcessors( List<WalkerProcessor> processors );
 
     /**
      * Stops the walker.

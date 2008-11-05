@@ -30,8 +30,6 @@ import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.item.StorageLinkItem;
 
-import edu.emory.mathcs.backport.java.util.Collections;
-
 public class WalkerTest
     extends AbstractProxyTestEnvironment
 {
@@ -69,9 +67,13 @@ public class WalkerTest
         getRouter( "groups-m2" ).retrieveItem( new ResourceStoreRequest( "/test/repo3.txt", false ) );
 
         TestWalkerProcessor wp = null;
+        WalkerContext wc = null;
 
         wp = new TestWalkerProcessor();
-        walker.walk( new DefaultWalkerContext( getRouter( "repositories" ) ), Collections.singletonList( wp ) );
+        wc = new DefaultWalkerContext( getRouter( "repositories" ) );
+        wc.getProcessors().add( wp );
+
+        walker.walk( wc );
         assertEquals( 15, wp.collEnters );
         assertEquals( 15, wp.collExits );
         assertEquals( 15, wp.colls );
@@ -79,7 +81,10 @@ public class WalkerTest
         assertEquals( 0, wp.links );
 
         wp = new TestWalkerProcessor();
-        walker.walk( new DefaultWalkerContext( getRouter( "groups-m2" ) ), Collections.singletonList( wp ) );
+        wc = new DefaultWalkerContext( getRouter( "groups-m2" ) );
+        wc.getProcessors().add( wp );
+
+        walker.walk( wc );
         assertEquals( 11, wp.collEnters );
         assertEquals( 11, wp.collExits );
         assertEquals( 11, wp.colls );

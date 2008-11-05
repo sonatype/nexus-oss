@@ -21,7 +21,6 @@
 package org.sonatype.nexus.proxy.walker;
 
 import java.util.Collection;
-import java.util.List;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
@@ -47,27 +46,25 @@ public class DefaultWalker
     extends AbstractLogEnabled
     implements Walker
 {
-    public void walk( WalkerContext context, List<WalkerProcessor> processors )
+    public void walk( WalkerContext context )
         throws WalkerException
     {
-        walk( context, null, processors );
+        walk( context, null );
     }
 
-    public void walk( WalkerContext context, String fromPath, List<WalkerProcessor> processors )
+    public void walk( WalkerContext context, String fromPath )
         throws WalkerException
     {
-        walk( context, fromPath, true, false, processors );
+        walk( context, fromPath, true, false );
     }
 
-    public final void walk( WalkerContext context, boolean localOnly, boolean collectionsOnly,
-        List<WalkerProcessor> processors )
+    public final void walk( WalkerContext context, boolean localOnly, boolean collectionsOnly )
         throws WalkerException
     {
-        walk( context, null, localOnly, collectionsOnly, processors );
+        walk( context, null, localOnly, collectionsOnly );
     }
 
-    public final void walk( WalkerContext context, String fromPath, boolean localOnly, boolean collectionsOnly,
-        List<WalkerProcessor> processors )
+    public final void walk( WalkerContext context, String fromPath, boolean localOnly, boolean collectionsOnly )
         throws WalkerException
     {
         if ( fromPath == null )
@@ -83,7 +80,7 @@ public class DefaultWalker
         }
 
         // user may call stop()
-        beforeWalk( context, processors );
+        beforeWalk( context );
 
         if ( context.isStopped() )
         {
@@ -143,14 +140,7 @@ public class DefaultWalker
                     ? context.getFilter()
                     : new AffirmativeStoreWalkerFilter();
 
-                collCount = walkRecursive(
-                    0,
-                    context,
-                    filter,
-                    (StorageCollectionItem) item,
-                    localOnly,
-                    collectionsOnly,
-                    processors );
+                collCount = walkRecursive( 0, context, filter, (StorageCollectionItem) item, localOnly, collectionsOnly );
             }
             catch ( Throwable e )
             {
@@ -162,7 +152,7 @@ public class DefaultWalker
 
         if ( !context.isStopped() )
         {
-            afterWalk( context, processors );
+            afterWalk( context );
 
             if ( getLogger().isDebugEnabled() )
             {
@@ -175,7 +165,7 @@ public class DefaultWalker
     }
 
     protected final int walkRecursive( int collCount, WalkerContext context, WalkerFilter filter,
-        StorageCollectionItem coll, boolean localOnly, boolean collectionsOnly, List<WalkerProcessor> processors )
+        StorageCollectionItem coll, boolean localOnly, boolean collectionsOnly )
         throws AccessDeniedException,
             RepositoryNotAvailableException,
             RepositoryNotListableException,
@@ -200,7 +190,7 @@ public class DefaultWalker
         // user may call stop()
         if ( shouldProcess )
         {
-            onCollectionEnter( context, processors, coll );
+            onCollectionEnter( context, coll );
 
             collCount++;
         }
@@ -213,7 +203,7 @@ public class DefaultWalker
         // user may call stop()
         if ( shouldProcess )
         {
-            processItem( context, processors, coll );
+            processItem( context, coll );
         }
 
         if ( context.isStopped() )
@@ -244,7 +234,7 @@ public class DefaultWalker
                     if ( filter.shouldProcess( context, i ) )
                     {
                         // user may call stop()
-                        processItem( context, processors, i );
+                        processItem( context, i );
                     }
 
                     if ( context.isStopped() )
@@ -262,8 +252,7 @@ public class DefaultWalker
                         filter,
                         (StorageCollectionItem) i,
                         localOnly,
-                        collectionsOnly,
-                        processors );
+                        collectionsOnly );
 
                     if ( context.isStopped() )
                     {
@@ -276,17 +265,17 @@ public class DefaultWalker
         // user may call stop()
         if ( shouldProcess )
         {
-            onCollectionExit( context, processors, coll );
+            onCollectionExit( context, coll );
         }
 
         return collCount;
     }
 
-    protected void beforeWalk( WalkerContext context, List<WalkerProcessor> processors )
+    protected void beforeWalk( WalkerContext context )
     {
         try
         {
-            for ( WalkerProcessor processor : processors )
+            for ( WalkerProcessor processor : context.getProcessors() )
             {
                 processor.beforeWalk( context );
 
@@ -302,12 +291,11 @@ public class DefaultWalker
         }
     }
 
-    protected void onCollectionEnter( WalkerContext context, List<WalkerProcessor> processors,
-        StorageCollectionItem coll )
+    protected void onCollectionEnter( WalkerContext context, StorageCollectionItem coll )
     {
         try
         {
-            for ( WalkerProcessor processor : processors )
+            for ( WalkerProcessor processor : context.getProcessors() )
             {
                 processor.onCollectionEnter( context, coll );
 
@@ -323,11 +311,11 @@ public class DefaultWalker
         }
     }
 
-    protected void processItem( WalkerContext context, List<WalkerProcessor> processors, StorageItem item )
+    protected void processItem( WalkerContext context, StorageItem item )
     {
         try
         {
-            for ( WalkerProcessor processor : processors )
+            for ( WalkerProcessor processor : context.getProcessors() )
             {
                 processor.processItem( context, item );
 
@@ -343,11 +331,11 @@ public class DefaultWalker
         }
     }
 
-    protected void onCollectionExit( WalkerContext context, List<WalkerProcessor> processors, StorageCollectionItem coll )
+    protected void onCollectionExit( WalkerContext context, StorageCollectionItem coll )
     {
         try
         {
-            for ( WalkerProcessor processor : processors )
+            for ( WalkerProcessor processor : context.getProcessors() )
             {
                 processor.onCollectionExit( context, coll );
 
@@ -363,11 +351,11 @@ public class DefaultWalker
         }
     }
 
-    protected void afterWalk( WalkerContext context, List<WalkerProcessor> processors )
+    protected void afterWalk( WalkerContext context )
     {
         try
         {
-            for ( WalkerProcessor processor : processors )
+            for ( WalkerProcessor processor : context.getProcessors() )
             {
                 processor.afterWalk( context );
 
