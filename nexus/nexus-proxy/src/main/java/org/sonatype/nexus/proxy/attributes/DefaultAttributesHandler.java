@@ -33,7 +33,6 @@ import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.IOUtil;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.proxy.LoggingComponent;
-import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
@@ -141,7 +140,7 @@ public class DefaultAttributesHandler
         return getAttributeStorage().deleteAttributes( uid );
     }
 
-    public void fetchAttributes( AbstractStorageItem item )
+    public void fetchAttributes( StorageItem item )
     {
         StorageItem mdItem = getAttributeStorage().getAttributes( item.getRepositoryItemUid() );
 
@@ -174,7 +173,7 @@ public class DefaultAttributesHandler
         }
     }
 
-    public void storeAttributes( AbstractStorageItem item, InputStream inputStream )
+    public void storeAttributes( StorageItem item, InputStream inputStream )
     {
         if ( inputStream != null )
         {

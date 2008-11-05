@@ -87,7 +87,7 @@ public class DummyLocalRepositoryStorage
         return new ByteArrayInputStream( uid.getPath().getBytes() );
     }
 
-    public void storeItem( AbstractStorageItem item )
+    public void storeItem( StorageItem item )
         throws UnsupportedStorageOperationException,
             StorageException
     {
@@ -113,15 +113,15 @@ public class DummyLocalRepositoryStorage
             StorageException
     {
         // TODO Auto-generated method stub
-        
+
     }
 
-    public void updateItemAttributes( AbstractStorageItem item )
+    public void updateItemAttributes( StorageItem item )
         throws ItemNotFoundException,
             StorageException
     {
         // TODO Auto-generated method stub
-        
+
     }
 
     public void touchItemRemoteChecked( RepositoryItemUid uid )
@@ -129,7 +129,7 @@ public class DummyLocalRepositoryStorage
             StorageException
     {
         // TODO Auto-generated method stub
-        
+
     }
 
     public void touchItemRemoteChecked( RepositoryItemUid uid, long timestamp )
@@ -137,7 +137,7 @@ public class DummyLocalRepositoryStorage
             StorageException
     {
         // TODO Auto-generated method stub
-        
+
     }
 
     public void touchItemLastRequested( RepositoryItemUid uid )
@@ -145,7 +145,7 @@ public class DummyLocalRepositoryStorage
             StorageException
     {
         // TODO Auto-generated method stub
-        
+
     }
 
     public void touchItemLastRequested( RepositoryItemUid uid, long timestamp )
@@ -153,14 +153,14 @@ public class DummyLocalRepositoryStorage
             StorageException
     {
         // TODO Auto-generated method stub
-        
+
     }
-    
+
     public void validateStorageUrl( String url )
         throws StorageException
     {
         // TODO Auto-generated method stub
-        
+
     }
 
 }

@@ -63,6 +63,13 @@ public interface StorageItem
     long getStoredLocally();
 
     /**
+     * Sets the stored locally time.
+     * 
+     * @return the stored locally
+     */
+    void setStoredLocally( long ts );
+
+    /**
      * Gets the remote checked.
      * 
      * @return the remote checked
@@ -70,11 +77,25 @@ public interface StorageItem
     long getRemoteChecked();
 
     /**
+     * Sets the remote checked.
+     * 
+     * @return the remote checked
+     */
+    void setRemoteChecked( long ts );
+
+    /**
      * Gets the last requested.
      * 
      * @return time when it was last served
      */
     long getLastRequested();
+
+    /**
+     * Sets the last requested.
+     * 
+     * @return time when it was last served
+     */
+    void setLastRequested( long ts );
 
     /**
      * Checks if is virtual.
@@ -101,6 +122,11 @@ public interface StorageItem
      * Returns true if the item is expired.
      */
     boolean isExpired();
+
+    /**
+     * Sets if the item is expired.
+     */
+    void setExpired( boolean expired );
 
     /**
      * Gets the path.
@@ -157,4 +183,11 @@ public interface StorageItem
      * @return
      */
     int getGeneration();
+
+    /**
+     * Increments the generation of the attributes. For Nexus internal use only!
+     * 
+     * @return
+     */
+    void incrementGeneration();
 }

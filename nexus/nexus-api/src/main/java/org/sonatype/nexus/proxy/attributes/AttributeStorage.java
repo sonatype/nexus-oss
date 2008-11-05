@@ -23,6 +23,7 @@ package org.sonatype.nexus.proxy.attributes;
 import org.sonatype.nexus.proxy.events.EventListener;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
+import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.storage.local.LocalRepositoryStorage;
 
 /**
@@ -47,7 +48,7 @@ public interface AttributeStorage
      * 
      * @param item the item
      */
-    void putAttribute( AbstractStorageItem item );
+    void putAttribute( StorageItem item );
 
     /**
      * Delete attributes.

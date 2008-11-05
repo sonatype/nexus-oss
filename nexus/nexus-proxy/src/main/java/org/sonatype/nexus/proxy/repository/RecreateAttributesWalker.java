@@ -55,7 +55,7 @@ public class RecreateAttributesWalker
             }
 
             getRepository().getLocalStorage().getAttributesHandler().storeAttributes(
-                (AbstractStorageItem) item,
+                item,
                 item.getInputStream() );
         }
         catch ( IOException e )

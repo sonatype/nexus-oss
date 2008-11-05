@@ -30,6 +30,7 @@ import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.attributes.AttributesHandler;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
+import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.proxy.wastebasket.Wastebasket;
 
@@ -151,7 +152,7 @@ public abstract class AbstractLocalRepositoryStorage
         }
     }
 
-    public void updateItemAttributes( AbstractStorageItem item )
+    public void updateItemAttributes( StorageItem item )
         throws ItemNotFoundException,
             StorageException
     {

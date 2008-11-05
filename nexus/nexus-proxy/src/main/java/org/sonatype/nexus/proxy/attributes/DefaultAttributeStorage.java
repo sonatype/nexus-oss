@@ -41,6 +41,7 @@ import org.sonatype.nexus.proxy.item.DefaultStorageLinkItem;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.RepositoryItemUidFactory;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
+import org.sonatype.nexus.proxy.item.StorageItem;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.XStreamException;
@@ -197,7 +198,7 @@ public class DefaultAttributeStorage
         }
     }
 
-    public void putAttribute( AbstractStorageItem item )
+    public void putAttribute( StorageItem item )
     {
         RepositoryItemUid origUid = item.getRepositoryItemUid();
 

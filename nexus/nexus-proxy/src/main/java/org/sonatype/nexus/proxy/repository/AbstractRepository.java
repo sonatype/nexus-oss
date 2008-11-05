@@ -609,9 +609,9 @@ public abstract class AbstractRepository
                 try
                 {
                     // expire it
-                    ( (AbstractStorageItem) item ).setExpired( true );
+                    item.setExpired( true );
 
-                    getLocalStorage().updateItemAttributes( (AbstractStorageItem) item );
+                    getLocalStorage().updateItemAttributes( item );
                 }
                 catch ( ItemNotFoundException e )
                 {
@@ -1076,7 +1076,7 @@ public abstract class AbstractRepository
         doDeleteItem( uid );
     }
 
-    public void storeItem( AbstractStorageItem item )
+    public void storeItem( StorageItem item )
         throws UnsupportedStorageOperationException,
             RepositoryNotAvailableException,
             StorageException

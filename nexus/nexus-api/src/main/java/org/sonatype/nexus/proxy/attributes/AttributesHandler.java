@@ -22,8 +22,8 @@ package org.sonatype.nexus.proxy.attributes;
 
 import java.io.InputStream;
 
-import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
+import org.sonatype.nexus.proxy.item.StorageItem;
 
 /**
  * The Interface AttributesHandler. Used by LocalStorage to decorate the items.
@@ -40,7 +40,7 @@ public interface AttributesHandler
      * @param item the item
      * @return Map of attributes or empty map if none found.
      */
-    void fetchAttributes( AbstractStorageItem item );
+    void fetchAttributes( StorageItem item );
 
     /**
      * Creates the item attributes and stores them.
@@ -48,7 +48,7 @@ public interface AttributesHandler
      * @param item the item
      * @param inputStream the input stream
      */
-    void storeAttributes( AbstractStorageItem item, InputStream inputStream );
+    void storeAttributes( StorageItem item, InputStream inputStream );
 
     /**
      * Removes the item attributes.

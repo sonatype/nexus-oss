@@ -293,7 +293,7 @@ public class DefaultFSLocalRepositoryStorage
         }
     }
 
-    public void storeItem( AbstractStorageItem item )
+    public void storeItem( StorageItem item )
         throws UnsupportedStorageOperationException,
             StorageException
     {
@@ -558,12 +558,12 @@ public class DefaultFSLocalRepositoryStorage
             return null;
         }
     }
-    
+
     public void validateStorageUrl( String url )
         throws StorageException
     {
         boolean result = org.sonatype.nexus.util.FileUtils.validFileUrl( url );
-        
+
         if ( !result )
         {
             throw new StorageException( "Invalid storage url: " + url );

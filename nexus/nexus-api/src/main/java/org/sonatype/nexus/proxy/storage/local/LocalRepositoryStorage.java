@@ -155,7 +155,7 @@ public interface LocalRepositoryStorage
      * @throws UnsupportedStorageOperationException the unsupported storage operation exception
      * @throws StorageException the storage exception
      */
-    void storeItem( AbstractStorageItem item )
+    void storeItem( StorageItem item )
         throws UnsupportedStorageOperationException,
             StorageException;
 
@@ -165,7 +165,7 @@ public interface LocalRepositoryStorage
      * @param item the item
      * @throws StorageException the storage exception
      */
-    void updateItemAttributes( AbstractStorageItem item )
+    void updateItemAttributes( StorageItem item )
         throws ItemNotFoundException,
             StorageException;
 
