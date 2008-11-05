@@ -89,7 +89,7 @@
         </property>
         <property>
           <key>repositoryGroupId</key>
-          <value>public</value>
+          <value>nexus-public</value>
         </property>
       </properties>
     </privilege>
@@ -113,7 +113,7 @@
         </property>
         <property>
           <key>repositoryGroupId</key>
-          <value>public-snapshots</value>
+          <value>nexus-test-harness-snapshot-group</value>
         </property>
       </properties>
     </privilege>

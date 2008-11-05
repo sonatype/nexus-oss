@@ -25,7 +25,6 @@ import java.io.File;
 
 import org.apache.maven.it.VerificationException;
 import org.apache.maven.it.Verifier;
-import org.junit.Before;
 import org.junit.Test;
 import org.sonatype.nexus.integrationtests.AbstractMavenNexusIT;
 import org.sonatype.nexus.integrationtests.TestContainer;
@@ -38,29 +37,71 @@ public class Nexus1071DeployToRepoAnonCannotAccess
         TestContainer.getInstance().getTestContext().setSecureTest( true );
     }
 
-    private Verifier verifier;
-
-    @Before
-    public void createVerifier()
+    @Test
+    public void deploySnapshot()
         throws Exception
     {
-        File mavenProject = getTestFile( "maven-project" );
-        File settings = getTestFile( "server.xml" );
-        verifier = createVerifier( mavenProject, settings );
+        File mavenProject = getTestFile("maven-project-snapshot");
+        
+        File settings = getTestFile("settings-snapshot.xml");
+        
+        Verifier verifier = null;
+        
+        try{
+            verifier = createVerifier(mavenProject, settings);
+            
+            verifier.executeGoal( "deploy" );
+            
+            verifier.verifyErrorFreeLog();
+        }
+        
+        catch ( VerificationException e )
+        {
+            failTest( verifier );
+        }
     }
-
+    
     @Test
     public void deploy()
         throws Exception
     {
+        
+        File mavenProject1 = getTestFile( "maven-project-1" );
+        
+        File mavenProject2 = getTestFile( "maven-project-2" );
+        
+        File settings1 = getTestFile( "settings1.xml" );
+        
+        File settings2 = getTestFile( "settings2.xml");
+        
+        Verifier verifier1 = null;
+        
+        Verifier verifier2 = null;
+        
         try
         {
-            verifier.executeGoal( "deploy" );
-            verifier.verifyErrorFreeLog();
+            verifier1 = createVerifier( mavenProject1, settings1 );
+            
+            verifier1.executeGoal( "deploy" );
+         
+            verifier1.verifyErrorFreeLog();
         }
         catch ( VerificationException e )
         {
-            failTest( verifier );
+            failTest( verifier1 );
+        }
+        
+        try
+        {
+            verifier2 = createVerifier( mavenProject2, settings2 );
+            
+            verifier2.executeGoal( "deploy" );
+         
+            verifier2.verifyErrorFreeLog();
+        }
+        catch ( VerificationException e )
+        {
+            failTest( verifier2 );
         }
     }
 }

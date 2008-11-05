@@ -19,47 +19,24 @@
     <groups />
   </routing>
   <repositories>
-    <repository>
-      <id>central</id>
-      <name>Maven Central</name>
-      <artifactMaxAge>-1</artifactMaxAge>
-      <remoteStorage>
-        <url>http://repo1.maven.org/maven2/</url>
-      </remoteStorage>
+  	<repository>
+      <id>fake-central</id>
+      <name>fake-central</name>
+      <allowWrite>false</allowWrite>
+      <localStorage>
+      	<url>${project.build.directory}/test-classes/fake-central</url>
+      </localStorage>
     </repository>
     <repository>
-      <id>apache-snapshots</id>
-      <name>Apache Snapshots</name>
-      <repositoryPolicy>snapshot</repositoryPolicy>
-      <remoteStorage>
-        <url>http://people.apache.org/repo/m2-snapshot-repository</url>
-      </remoteStorage>
-    </repository>
-    <repository>
-      <id>codehaus-snapshots</id>
-      <name>Codehaus Snapshots</name>
-      <repositoryPolicy>snapshot</repositoryPolicy>
-      <remoteStorage>
-        <url>http://snapshots.repository.codehaus.org/</url>
-      </remoteStorage>
-    </repository>
-    <repository>
-      <id>releases</id>
-      <name>Releases</name>
+      <id>nexus-test-harness-repo</id>
+      <name>nexus-test-harness-repo</name>
       <allowWrite>true</allowWrite>
-      <artifactMaxAge>-1</artifactMaxAge>
-    </repository>
+    </repository>    
     <repository>
-      <id>snapshots</id>
-      <name>Snapshots</name>
+      <id>nexus-test-harness-snapshot-repo</id>
+      <name>nexus-test-harness-snapshot-repo</name>
       <allowWrite>true</allowWrite>
       <repositoryPolicy>snapshot</repositoryPolicy>
-    </repository>
-    <repository>
-      <id>thirdparty</id>
-      <name>3rd party</name>
-      <allowWrite>true</allowWrite>
-      <artifactMaxAge>-1</artifactMaxAge>
     </repository>
     <repository>
       <id>Internal</id>
@@ -78,8 +55,8 @@
         <routePattern>.*/(com|org)/somecompany/.*</routePattern>
         <routeType>inclusive</routeType>
         <repositories>
-          <repository>snapshots</repository>
-          <repository>releases</repository>
+          <repository>nexus-test-harness-repo</repository>
+          <repository>nexus-test-harness-snapshot-repo</repository>
         </repositories>
       </pathMapping>
       <pathMapping>
@@ -88,30 +65,28 @@
         <routePattern>.*/org/some-oss/.*</routePattern>
         <routeType>exclusive</routeType>
         <repositories>
-          <repository>releases</repository>
-          <repository>snapshots</repository>
+          <repository>nexus-test-harness-repo</repository>
+          <repository>nexus-test-harness-snapshot-repo</repository>
         </repositories>
       </pathMapping>
     </pathMappings>
     <repositoryGroups>
       <repositoryGroup>
-        <groupId>public</groupId>
-        <name>Public Repositories</name>
+        <groupId>nexus-public</groupId>
+        <name>nexus-public</name>
         <repositories>
-          <repository>releases</repository>
-          <repository>snapshots</repository>
-          <repository>thirdparty</repository>
-          <repository>central</repository>
+          <repository>fake-central</repository>
+          <repository>nexus-test-harness-repo</repository>
+          <repository>Internal</repository>
         </repositories>
       </repositoryGroup>
       <repositoryGroup>
-        <groupId>public-snapshots</groupId>
-        <name>Public Snapshot Repositories</name>
+        <groupId>nexus-test-harness-snapshot-group</groupId>
+        <name>nexus-test-harness-snapshot-group</name>
         <repositories>
-          <repository>apache-snapshots</repository>
-          <repository>codehaus-snapshots</repository>
+          <repository>nexus-test-harness-snapshot-repo</repository>
         </repositories>
-      </repositoryGroup>
+      </repositoryGroup>      
     </repositoryGroups>
   </repositoryGrouping>
   <repositoryTargets>
