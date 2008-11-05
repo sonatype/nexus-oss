@@ -140,6 +140,17 @@ Sonatype.ext.TwinPanelChooser = function( config ){
     layout: 'column',
     autoHeight: true,
     style: 'padding: 10px 0 10px 0',
+    listeners: {
+      beforedestroy: {
+        fn: function(){
+          if ( this.store ) {
+            this.loadStore();
+            this.store.un( 'load', this.loadStore, this );
+          }
+        },
+        scope: this
+      }
+    },
     
     items: [
       {
@@ -181,7 +192,7 @@ Sonatype.ext.TwinPanelChooser = function( config ){
         // added Field values to simulate form field validation
         invalidText: 'Select one or more items',
         validate: function(){
-          return (this.root.childNodes.length > 0) || ! this.required;
+          return (this.root.childNodes.length > 0);
         },
         invalid: false,
         listeners: {
@@ -306,6 +317,8 @@ Ext.extend( Sonatype.ext.TwinPanelChooser, Ext.Panel, {
   },
 
   validate: function() {
+    if ( ! this.required ) return true;
+
     var leftTree = this.getComponent( 0 );
     var valid = leftTree.validate.call( leftTree );
     if ( ! valid ) {

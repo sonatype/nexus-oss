@@ -224,116 +224,14 @@ Sonatype.repoServer.UserEditPanel = function(config){
         }
       },
       {
-        xtype: 'panel',
-        id: '_roles_tree_panel',
-        layout: 'column',
-        autoHeight: true,
-        style: 'padding: 10px 0 0 0',
-        
-        items: [
-          {
-            xtype: 'treepanel',
-            id: '_roles_tree', //note: unique ID is assinged before instantiation
-            title: 'Selected Roles',
-            cls: 'required-field',
-            border: true, //note: this seem to have no effect w/in form panel
-            bodyBorder: true, //note: this seem to have no effect w/in form panel
-            //note: this style matches the expected behavior
-            bodyStyle: 'background-color:#FFFFFF; border: 1px solid #B5B8C8',
-            width: 225,
-            height: 300,
-            animate:true,
-            lines: false,
-            autoScroll:true,
-            containerScroll: true,
-            //@note: root node must be instantiated uniquely for each instance of treepanel
-            //@ext: can TreeNode be registerd as a component with an xtype so this new root node
-            //      may be instantiated uniquely for each form panel that uses this config?
-            rootVisible: false,
-
-            enableDD: true,
-            ddScroll: true,
-            dropConfig: {
-              allowContainerDrop: true,
-              onContainerDrop: function(source, e, data){
-                this.tree.root.appendChild(data.node);
-                return true;
-              },
-              onContainerOver:function(source, e, data){return this.dropAllowed;},
-              // passign padding to make whole treePanel the drop zone.  This is dependent
-              // on a sonatype fix in the Ext.dd.DropTarget class.  This is necessary
-              // because treepanel.dropZone.setPadding is never available in time to be useful.
-              padding: [0,0,274,0]
-            },
-            // added Field values to simulate form field validation
-            invalidText: 'One or more roles are required',
-            validate: function(){
-              return (this.root.childNodes.length > 0);
-            },
-            invalid: false,
-            listeners: {
-              'append' : {
-                fn: function(tree, parentNode, insertedNode, i) {
-                  if (tree.invalid) {
-                    //remove error messaging
-                    tree.getEl().child('.x-panel-body').setStyle({
-                      'background-color' : '#FFFFFF',
-                      border : '1px solid #B5B8C8'
-                    });
-                    Ext.form.Field.msgFx['normal'].hide(tree.errorEl, tree);
-                  }
-                },
-                scope: this
-              },
-              'remove' : {
-                fn: function(tree, parentNode, removedNode) {
-                  if(tree.root.childNodes.length < 1) {
-                    this.markTreeInvalid(tree);
-                  }
-                },
-                scope: this
-              }
-            }
-          },
-          {
-          	xtype: 'twinpanelcontroller'
-          },
-          {
-            xtype: 'treepanel',
-            id: '_all_roles_tree', //note: unique ID is assinged before instantiation
-            title: 'Available Roles',
-            border: true, //note: this seem to have no effect w/in form panel
-            bodyBorder: true, //note: this seem to have no effect w/in form panel
-            //note: this style matches the expected behavior
-            bodyStyle: 'background-color:#FFFFFF; border: 1px solid #B5B8C8',
-            width: 225,
-            height: Ext.isGecko ? 315 : 300,
-            animate:true,
-            lines: false,
-            autoScroll:true,
-            containerScroll: true,
-            //@note: root node must be instantiated uniquely for each instance of treepanel
-            //@ext: can TreeNode be registerd as a component with an xtype so this new root node
-            //      may be instantiated uniquely for each form panel that uses this config?
-            rootVisible: false,
-
-            enableDD: true,
-            ddScroll: true,
-            dropConfig: {
-              allowContainerDrop: true,
-              onContainerDrop: function(source, e, data){
-                this.tree.root.appendChild(data.node);
-                return true;
-              },
-              onContainerOver:function(source, e, data){return this.dropAllowed;},
-              // passign padding to make whole treePanel the drop zone.  This is dependent
-              // on a sonatype fix in the Ext.dd.DropTarget class.  This is necessary
-              // because treepanel.dropZone.setPadding is never available in time to be useful.
-              padding: [0,0,274,0]
-            }
-          }
-          ]
-        }
+        xtype: 'twinpanelchooser',
+        titleLeft: 'Selected Roles',
+        titleRight: 'Available Roles',
+        name: 'roles',
+        valueField: 'id',
+        store: this.roleDataStore,
+        required: true
+      }
       ],
     buttons: [
       {
@@ -457,29 +355,21 @@ Sonatype.repoServer.UserEditPanel = function(config){
 Ext.extend(Sonatype.repoServer.UserEditPanel, Ext.Panel, {
   //Dump the currently stored data and requery for everything
   reloadAll : function(){
-    this.roleDataStore.removeAll();
-    this.usersDataStore.removeAll();
-    this.roleDataStore.reload();
     this.formCards.items.each(function(item, i, len){
       if(i>0){this.remove(item, true);}
     }, this.formCards);
+
+    this.roleDataStore.removeAll();
+    this.usersDataStore.removeAll();
+    this.roleDataStore.reload();
     
     this.formCards.getLayout().setActiveItem(0);
   },
   
   saveHandler : function(formInfoObj){
     var allValid = false;
-    allValid = formInfoObj.formPanel.form.isValid()
-    
-    //form validation of repository treepanel
-    var selectedTree = Ext.getCmp(formInfoObj.formPanel.id + '_roles_tree');
-    var treeValid = selectedTree.validate.call(selectedTree);
-    
-    if (!treeValid) {
-      this.markTreeInvalid(selectedTree);
-    }
-    
-    allValid = (allValid && treeValid);
+    allValid = formInfoObj.formPanel.form.isValid() &&
+      formInfoObj.formPanel.find( 'name', 'roles' )[0].validate();
     
     if (allValid) {
       var isNew = formInfoObj.isNew;
@@ -538,8 +428,6 @@ Ext.extend(Sonatype.repoServer.UserEditPanel, Ext.Panel, {
     var id = 'new_user_' + new Date().getTime();
 
     var config = Ext.apply({}, this.formConfig, {id:id});
-    
-    config = this.initializeTreeRoots(id, config);
     
     var formPanel = new Ext.FormPanel(config);
     
@@ -953,7 +841,6 @@ Ext.extend(Sonatype.repoServer.UserEditPanel, Ext.Panel, {
 	      var config = Ext.apply({}, this.formConfig, {id:id});
 	      config.items = config.items.slice( 0 ); // copy the array
 	      
-	      config = this.initializeTreeRoots(id, config);
 	      config.items.splice( 4, 2 ); // remove the confirm password fields
 	      
 	      formPanel = new Ext.FormPanel(config);
@@ -1023,91 +910,14 @@ Ext.extend(Sonatype.repoServer.UserEditPanel, Ext.Panel, {
       this.ctxRecord = null;
     }
   },
-  
-  markTreeInvalid : function(tree) {
-    var elp = tree.getEl();
-    
-    if(!tree.errorEl){
-        tree.errorEl = elp.createChild({cls:'x-form-invalid-msg'});
-        tree.errorEl.setWidth(elp.getWidth(true)); //note removed -20 like on form fields
-    }
-    tree.invalid = true;
-    tree.errorEl.update(tree.invalidText);
-    elp.child('.x-panel-body').setStyle({
-      'background-color' : '#fee',
-      border : '1px solid #dd7870'
-    });
-    Ext.form.Field.msgFx['normal'].show(tree.errorEl, tree);  
-  },
-  
-  initializeTreeRoots : function(id, config){
-    //@note: there has to be a better way to do this.  Depending on offsets is very error prone
-    var newConfig = config;
-
-    newConfig.items[6].id = id + '_roles_tree_panel';
-    newConfig.items[6].items[0].root = new Ext.tree.TreeNode({text: 'root'});
-    newConfig.items[6].items[0].id = id + '_roles_tree';
-    newConfig.items[6].items[2].root = new Ext.tree.TreeNode({text: 'root'});
-    newConfig.items[6].items[2].id = id + '_all_roles_tree';
-
-    return newConfig;
-  },
     
   loadTreeHelper : function(arr, srcObj, fpanel){
-    var selectedTree = Ext.getCmp(fpanel.id + '_roles_tree');
-    var allTree = Ext.getCmp(fpanel.id + '_all_roles_tree');
-
-    var role;
-
-    for(var i=0; i<arr.length; i++){
-	role = this.roleDataStore.getAt(this.roleDataStore.findBy(function(record, id){
-        if (record.data.id == arr[i]){
-          return true;
-        }
-        return false;
-      }));
-      selectedTree.root.appendChild(
-        new Ext.tree.TreeNode({
-          id: role.data.id,
-          text: role.data.name,
-          payload: role.data.id, //sonatype added attribute
-          allowChildren: false,
-          draggable: true,
-          leaf: true
-        })
-      );
-    }
-    
-    
-    this.roleDataStore.each(function(item, i, len){
-      if(typeof(selectedTree.getNodeById(item.data.id)) == 'undefined'){
-        allTree.root.appendChild(
-          new Ext.tree.TreeNode({
-            id: item.data.id,
-            text: item.data.name,
-            payload: item.data.id, //sonatype added attribute
-            allowChildren: false,
-            draggable: true,
-            leaf: true
-          })
-        );
-      }
-    }, this);
-    
+    fpanel.find( 'name', 'roles' )[0].setValue( arr );
     return arr; //return arr, even if empty to comply with sonatypeLoad data modifier requirement
   },
   
   saveTreeHelper : function(val, fpanel){
-    var tree = Ext.getCmp(fpanel.id + '_roles_tree');
-
-    var outputArr = [];
-    var nodes = tree.root.childNodes;
-
-    for(var i = 0; i < nodes.length; i++){
-      outputArr[i] = nodes[i].attributes.payload;
-    }
-
-    return outputArr;
+    return fpanel.find( 'name', 'roles' )[0].getValue();
   },
   
   onUserMenuInit: function( menu, userRecord ) {
