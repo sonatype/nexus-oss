@@ -150,7 +150,8 @@ import org.sonatype.nexus.integrationtests.upgrades.nexus652.Nexus652Beta5To10Up
     Nexus570IndexArchetypeTest.class,
     Nexus504ChangeRoleTest.class,
     Nexus999SetUsersPassword.class,
-    Nexus537RepoTargetsTests.class } )
+    Nexus537RepoTargetsTests.class
+} )
 public class IntegrationTestSuiteClassesSecurity
 {
     @BeforeClass

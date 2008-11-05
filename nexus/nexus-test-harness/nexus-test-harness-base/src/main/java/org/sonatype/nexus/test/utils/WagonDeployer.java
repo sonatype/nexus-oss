@@ -31,13 +31,10 @@ import org.sonatype.plexus.classworlds.validator.ClassworldsValidationResult;
 /**
  * Due to a <a href='http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4941958'>bug</a> ( i wouldn't call this a
  * feature request ) You cannot change change/clear the cache of the default Authenticator, and that is what the Wagon
- * uses. So to work around this very stupid problem I am forking the VM to do a deploy.
- * </p>
- * I wanted to be able to catch each exception, yes, there are better ways to do this, i know.... but this was really
- * easy... and its only for testing...
- * </p>
- * We can look into using the forked app-booter, but that might be a little over kill, and we still couldn't trap the
- * individual exceptions.
+ * uses. So to work around this very stupid problem I am forking the VM to do a deploy. </p> I wanted to be able to
+ * catch each exception, yes, there are better ways to do this, i know.... but this was really easy... and its only for
+ * testing... </p> We can look into using the forked app-booter, but that might be a little over kill, and we still
+ * couldn't trap the individual exceptions.
  */
 public class WagonDeployer
 {
@@ -53,7 +50,7 @@ public class WagonDeployer
     private File fileToDeploy;
 
     private String artifactPath;
-    
+
     private static final Logger LOG = Logger.getLogger( WagonDeployer.class );
 
     public WagonDeployer( String protocol, String username, String password, String repositoryUrl, File fileToDeploy,
@@ -70,7 +67,6 @@ public class WagonDeployer
         // so the RequestFacade will still work
         if ( StringUtils.isNotBlank( username ) )
         {
-            TestContainer.getInstance().getTestContext().setSecureTest( true );
             TestContainer.getInstance().getTestContext().setUsername( this.username );
             TestContainer.getInstance().getTestContext().setPassword( this.password );
         }
@@ -137,7 +133,8 @@ public class WagonDeployer
 
         if ( true )
         {
-            // warn people that this does not work.  I would like to make something like this work later... but for now. I need to move on...
+            // warn people that this does not work. I would like to make something like this work later... but for now.
+            // I need to move on...
             throw new NotImplementedException(
                                                "This method does not work due to some classworlds problem, most likely its my fault." );
         }

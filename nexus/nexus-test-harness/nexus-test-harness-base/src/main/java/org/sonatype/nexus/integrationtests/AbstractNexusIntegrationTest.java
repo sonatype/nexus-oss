@@ -89,7 +89,7 @@ public class AbstractNexusIntegrationTest
 
     protected static String nexusLogDir;
 
-    protected Logger log = Logger.getLogger( getClass() );
+    protected static Logger log = Logger.getLogger( AbstractNexusIntegrationTest.class );
 
     /**
      * Flag that says if we should verify the config before startup, we do not want to do this for upgrade tests.
@@ -142,10 +142,11 @@ public class AbstractNexusIntegrationTest
     {
         synchronized ( AbstractNexusIntegrationTest.class )
         {
+            log.debug( "oncePerClassSetUp is init: " + NEEDS_INIT );
             if ( NEEDS_INIT )
             {
                 // tell the console what we are doing, now that there is no output its
-                System.out.println( "Running Test: " + this.getClass().getSimpleName() );
+                log.info( "Running Test: " + this.getClass().getSimpleName() );
 
                 HashMap<String, String> variables = new HashMap<String, String>();
                 variables.put( "test-harness-id", this.getTestId() );
@@ -298,6 +299,8 @@ public class AbstractNexusIntegrationTest
         throws Exception
     {
 
+        log.info( "starting nexus" );
+
         // if nexus is running but stopped we only want to do a softstart
         // and we don't want to start if it is already running.
 
@@ -321,12 +324,12 @@ public class AbstractNexusIntegrationTest
             // we need a hard start
             NEEDS_HARD_STOP = true;
 
-            System.out.println( "***************************" );
-            System.out.println( "*\n*" );
-            System.out.println( "*  DOING A HARD START OF NEXUS." );
-            System.out.println( "*  If your not running a single test manually, then something bad happened" );
-            System.out.println( "*\n*" );
-            System.out.println( "***************************" );
+            log.info( "***************************" );
+            log.info( "*\n*" );
+            log.info( "*  DOING A HARD START OF NEXUS." );
+            log.info( "*  If your not running a single test manually, then something bad happened" );
+            log.info( "*\n*" );
+            log.info( "***************************" );
 
             ForkedAppBooter appBooter =
                 (ForkedAppBooter) TestContainer.getInstance().lookup( ForkedAppBooter.ROLE, "TestForkedAppBooter" );
@@ -456,7 +459,7 @@ public class AbstractNexusIntegrationTest
         return this.getTestResourceAsFile( "files/" + relativePath );
     }
 
-    protected File getResource( String resource )
+    public static File getResource( String resource )
     {
         log.debug( "Looking for resource: " + resource );
         // URL classURL = Thread.currentThread().getContextClassLoader().getResource( resource );
@@ -480,6 +483,7 @@ public class AbstractNexusIntegrationTest
     @BeforeClass
     public static void staticOncePerClassSetUp()
     {
+        log.debug( "staticOncePerClassSetUp" );
         // hacky state machine
         NEEDS_INIT = true;
     }
