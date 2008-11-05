@@ -8,6 +8,7 @@ import org.sonatype.nexus.proxy.item.StorageItem;
  * items and will dive into all collections.
  * 
  * @author cstamas
+ * @deprecated use Walker service in org.sonatype.nexus.proxy.walker package
  */
 public class AffirmativeStoreWalkerFilter
     implements StoreWalkerFilter

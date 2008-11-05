@@ -9,6 +9,7 @@ import org.sonatype.nexus.proxy.item.StorageItem;
  * dive in deeper.
  * 
  * @author cstamas
+ * @deprecated use Walker service in org.sonatype.nexus.proxy.walker package
  */
 public interface StoreWalkerFilter
 {

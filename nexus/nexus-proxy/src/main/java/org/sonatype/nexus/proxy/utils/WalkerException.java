@@ -4,6 +4,7 @@ package org.sonatype.nexus.proxy.utils;
  * Thrown by walker if something terrible happened.
  * 
  * @author cstamas
+ * @deprecated use Walker service in org.sonatype.nexus.proxy.walker package
  */
 public class WalkerException
     extends RuntimeException

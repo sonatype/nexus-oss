@@ -40,6 +40,7 @@ import org.sonatype.nexus.proxy.repository.Repository;
  * The Class StoreWalker.
  * 
  * @author cstamas
+ * @deprecated use Walker service in org.sonatype.nexus.proxy.walker package
  */
 public abstract class StoreWalker
 {

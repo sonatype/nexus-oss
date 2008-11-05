@@ -29,6 +29,7 @@ import org.sonatype.nexus.proxy.item.StorageItem;
  * The Class StoreFileWalker.
  * 
  * @author cstamas
+ * @deprecated use Walker service in org.sonatype.nexus.proxy.walker package
  */
 public abstract class StoreFileWalker
     extends StoreWalker
