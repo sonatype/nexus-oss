@@ -8,6 +8,7 @@ public abstract class AbstractFileWalkerProcessor
 {
     @Override
     public final void processItem( WalkerContext context, StorageItem item )
+        throws Exception
     {
         if ( StorageFileItem.class.isAssignableFrom( item.getClass() ) )
         {
@@ -22,5 +23,6 @@ public abstract class AbstractFileWalkerProcessor
      * @param fItem the f item
      * @param logger the logger
      */
-    protected abstract void processFileItem( WalkerContext context, StorageFileItem fItem );
+    protected abstract void processFileItem( WalkerContext context, StorageFileItem fItem )
+        throws Exception;
 }

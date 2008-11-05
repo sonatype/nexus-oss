@@ -7,20 +7,25 @@ public abstract class AbstractWalkerProcessor
     implements WalkerProcessor
 {
     public void beforeWalk( WalkerContext context )
+        throws Exception
     {
     }
 
     public void onCollectionEnter( WalkerContext context, StorageCollectionItem coll )
+        throws Exception
     {
     }
 
-    public abstract void processItem( WalkerContext context, StorageItem item );
+    public abstract void processItem( WalkerContext context, StorageItem item )
+        throws Exception;
 
     public void onCollectionExit( WalkerContext context, StorageCollectionItem coll )
+        throws Exception
     {
     }
 
     public void afterWalk( WalkerContext context )
+        throws Exception
     {
     }
 }

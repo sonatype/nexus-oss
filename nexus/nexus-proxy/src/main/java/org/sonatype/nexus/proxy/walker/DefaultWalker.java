@@ -284,67 +284,102 @@ public class DefaultWalker
 
     protected void beforeWalk( WalkerContext context, List<WalkerProcessor> processors )
     {
-        for ( WalkerProcessor processor : processors )
+        try
         {
-            processor.beforeWalk( context );
-
-            if ( context.isStopped() )
+            for ( WalkerProcessor processor : processors )
             {
-                break;
+                processor.beforeWalk( context );
+
+                if ( context.isStopped() )
+                {
+                    break;
+                }
             }
+        }
+        catch ( Exception e )
+        {
+            context.stop( e );
         }
     }
 
     protected void onCollectionEnter( WalkerContext context, List<WalkerProcessor> processors,
         StorageCollectionItem coll )
     {
-        for ( WalkerProcessor processor : processors )
+        try
         {
-            processor.onCollectionEnter( context, coll );
-
-            if ( context.isStopped() )
+            for ( WalkerProcessor processor : processors )
             {
-                break;
+                processor.onCollectionEnter( context, coll );
+
+                if ( context.isStopped() )
+                {
+                    break;
+                }
             }
+        }
+        catch ( Exception e )
+        {
+            context.stop( e );
         }
     }
 
     protected void processItem( WalkerContext context, List<WalkerProcessor> processors, StorageItem item )
     {
-        for ( WalkerProcessor processor : processors )
+        try
         {
-            processor.processItem( context, item );
-
-            if ( context.isStopped() )
+            for ( WalkerProcessor processor : processors )
             {
-                break;
+                processor.processItem( context, item );
+
+                if ( context.isStopped() )
+                {
+                    break;
+                }
             }
+        }
+        catch ( Exception e )
+        {
+            context.stop( e );
         }
     }
 
     protected void onCollectionExit( WalkerContext context, List<WalkerProcessor> processors, StorageCollectionItem coll )
     {
-        for ( WalkerProcessor processor : processors )
+        try
         {
-            processor.onCollectionExit( context, coll );
-
-            if ( context.isStopped() )
+            for ( WalkerProcessor processor : processors )
             {
-                break;
+                processor.onCollectionExit( context, coll );
+
+                if ( context.isStopped() )
+                {
+                    break;
+                }
             }
+        }
+        catch ( Exception e )
+        {
+            context.stop( e );
         }
     }
 
     protected void afterWalk( WalkerContext context, List<WalkerProcessor> processors )
     {
-        for ( WalkerProcessor processor : processors )
+        try
         {
-            processor.afterWalk( context );
-
-            if ( context.isStopped() )
+            for ( WalkerProcessor processor : processors )
             {
-                break;
+                processor.afterWalk( context );
+
+                if ( context.isStopped() )
+                {
+                    break;
+                }
             }
+        }
+        catch ( Exception e )
+        {
+            context.stop( e );
         }
     }
 
