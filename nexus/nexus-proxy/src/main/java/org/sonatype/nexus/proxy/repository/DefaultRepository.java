@@ -23,6 +23,9 @@ package org.sonatype.nexus.proxy.repository;
 import java.util.Collection;
 import java.util.Map;
 
+import org.codehaus.plexus.component.annotations.Requirement;
+import org.sonatype.nexus.feeds.FeedRecorder;
+import org.sonatype.nexus.feeds.NexusArtifactEvent;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.RepositoryNotAvailableException;
 import org.sonatype.nexus.proxy.StorageException;
@@ -42,6 +45,14 @@ import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 public abstract class DefaultRepository
     extends AbstractRepository
 {
+
+    private static final int DOWNLOAD_RETRY_COUNT = 2;
+
+    /**
+     * Feed recorder.
+     */
+    @Requirement
+    private FeedRecorder feedRecorder;
 
     /**
      * The item max age.
@@ -150,7 +161,42 @@ public abstract class DefaultRepository
                         // this will GET it unconditionally
                         try
                         {
-                            remoteItem = doRetrieveRemoteItem( uid, context );
+                            ContentValidationResult result = null;
+
+                            for ( int retry = 0; retry < DOWNLOAD_RETRY_COUNT; retry++ )
+                            {
+                                remoteItem = doRetrieveRemoteItem( uid, context );
+
+                                remoteItem = doCacheItem( remoteItem );
+
+                                result = doValidateRemoteItemContent( remoteItem, context );
+
+                                if ( result == null )
+                                {
+                                    break;
+                                }
+                            }
+
+                            if ( result != null )
+                            {
+                                // send validation error/warning events
+                                for ( NexusArtifactEvent event : result.getEvents() )
+                                {
+                                    feedRecorder.addNexusArtifactEvent( event );
+                                }
+
+                                if ( ! result.isContentValid() )
+                                {
+                                    if ( getLogger().isDebugEnabled() )
+                                    {
+                                        getLogger().debug( "Item " + uid.toString() + " failed content integrity validation." );
+                                    }
+
+                                    getLocalStorage().retrieveItem( uid );
+
+                                    throw new ItemNotFoundException( uid );
+                                }
+                            }
 
                             if ( getLogger().isDebugEnabled() )
                             {
@@ -255,6 +301,16 @@ public abstract class DefaultRepository
         return item;
     }
 
+    /**
+     * Validates integrity of content of <code>item</code>. Not-null return value 
+     * indicates there were content validation errors or warnings.
+     */
+    protected ContentValidationResult doValidateRemoteItemContent( AbstractStorageItem item, Map<String, Object> context ) 
+        throws StorageException
+    {
+        return null;
+    }
+
     protected void markItemRemotelyChecked( RepositoryItemUid uid )
         throws StorageException,
             ItemNotFoundException
@@ -288,7 +344,7 @@ public abstract class DefaultRepository
             throw ex;
         }
 
-        return doCacheItem( result );
+        return result;
     }
 
     protected AbstractStorageItem doCacheItem( AbstractStorageItem item )

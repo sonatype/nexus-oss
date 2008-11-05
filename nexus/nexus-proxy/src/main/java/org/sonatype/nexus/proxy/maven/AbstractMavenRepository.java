@@ -31,7 +31,6 @@ import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.artifact.NexusItemInfo;
-import org.sonatype.nexus.feeds.FeedRecorder;
 import org.sonatype.nexus.feeds.NexusArtifactEvent;
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
@@ -48,6 +47,7 @@ import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.item.StringContentLocator;
+import org.sonatype.nexus.proxy.repository.ContentValidationResult;
 import org.sonatype.nexus.proxy.repository.DefaultRepository;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 
@@ -60,11 +60,6 @@ public abstract class AbstractMavenRepository
     extends DefaultRepository
     implements MavenRepository
 {
-    /**
-     * Feed recorder.
-     */
-    @Requirement
-    private FeedRecorder feedRecorder;
 
     /**
      * Metadata manager.
@@ -214,11 +209,6 @@ public abstract class AbstractMavenRepository
         this.fixRepositoryChecksums = fixRepositoryChecksums;
     }
 
-    public FeedRecorder getFeedRecorder()
-    {
-        return feedRecorder;
-    }
-
     public void storeItemWithChecksums( AbstractStorageItem item )
         throws UnsupportedStorageOperationException,
             RepositoryNotAvailableException,
@@ -330,11 +320,6 @@ public abstract class AbstractMavenRepository
         }
     }
 
-    public void setFeedRecorder( FeedRecorder feedRecorder )
-    {
-        this.feedRecorder = feedRecorder;
-    }
-
     public MetadataManager getMetadataManager()
     {
         return metadataManager;
@@ -442,76 +427,7 @@ public abstract class AbstractMavenRepository
             ItemNotFoundException,
             StorageException
     {
-        if ( shouldServeByPolicies( uid ) )
-        {
-            boolean isChecksum = uid.getPath().endsWith( ".sha1" ) || uid.getPath().endsWith( ".md5" );
-
-            if ( !isFixRepositoryChecksums() || !isChecksum )
-            {
-                // the "normal" way, serving the file from repo (cache or remote, whatever)
-                return super.doRetrieveItem( localOnly, uid, context );
-            }
-            else
-            {
-                // otherwise we get the "owner" (who's checksum is this) and simply
-                // create a File item with prepared content: the hash
-                String ownerPath = null;
-
-                if ( uid.getPath().endsWith( ".sha1" ) )
-                {
-                    ownerPath = uid.getPath().substring( 0, uid.getPath().length() - 5 );
-                }
-                else
-                {
-                    ownerPath = uid.getPath().substring( 0, uid.getPath().length() - 4 );
-                }
-
-                RepositoryItemUid ownerUid = createUid( ownerPath );
-
-                StorageItem ownerItem = super.doRetrieveItem( localOnly, ownerUid, context );
-
-                if ( StorageFileItem.class.isAssignableFrom( ownerItem.getClass() ) )
-                {
-                    StorageFileItem owner = (StorageFileItem) ownerItem;
-
-                    String hash = null;
-
-                    if ( uid.getPath().endsWith( ".sha1" ) )
-                    {
-                        hash = owner.getAttributes().get( DigestCalculatingInspector.DIGEST_SHA1_KEY );
-                    }
-                    else
-                    {
-                        hash = owner.getAttributes().get( DigestCalculatingInspector.DIGEST_MD5_KEY );
-                    }
-
-                    StringContentLocator content = new StringContentLocator( hash );
-
-                    DefaultStorageFileItem result = new DefaultStorageFileItem(
-                        this,
-                        uid.getPath(),
-                        owner.isReadable(),
-                        owner.isWritable(),
-                        content );
-
-                    result.overlay( owner );
-
-                    result.getItemContext().putAll( owner.getItemContext() );
-
-                    result.setMimeType( "text/plain" );
-
-                    result.setLength( hash.length() );
-
-                    return result;
-                }
-                else
-                {
-                    // this is not a file?
-                    return super.doRetrieveItem( localOnly, uid, context );
-                }
-            }
-        }
-        else
+        if ( !shouldServeByPolicies( uid ) )
         {
             if ( getLogger().isDebugEnabled() )
             {
@@ -521,271 +437,220 @@ public abstract class AbstractMavenRepository
             throw new ItemNotFoundException( uid );
         }
 
+        return super.doRetrieveItem( localOnly, uid, context );
     }
 
+    @Override
     protected AbstractStorageItem doRetrieveRemoteItem( RepositoryItemUid uid, Map<String, Object> context )
         throws ItemNotFoundException,
             StorageException
     {
-        if ( uid.getPath().endsWith( ".sha1" ) || uid.getPath().endsWith( ".md5" ) )
+        if ( ! isChecksum( uid ) )
         {
-            // checksums go the simple way
-            return super.doRetrieveRemoteItem( uid, context );
+            // we are about to download an artifact from remote repository
+            // lets clean any existing (stale) checksum files
+            removeLocalChecksum( uid );
         }
-        else
-        {
-            // artifacts and poms have "special treat", they should come with checksums
-            return doRetrieveRemoteMavenItem( 0, uid, context, super.doRetrieveRemoteItem( uid, context ) );
-        }
+
+        return super.doRetrieveRemoteItem( uid, context );
     }
 
-    protected AbstractStorageItem doRetrieveRemoteMavenItem( int tried, RepositoryItemUid uid,
-        Map<String, Object> context, AbstractStorageItem result )
-        throws ItemNotFoundException,
-            StorageException
+    @Override
+    protected ContentValidationResult doValidateRemoteItemContent( AbstractStorageItem item, Map<String, Object> context ) 
+        throws StorageException
     {
-        if ( tried == 1 )
+        if ( isChecksum( item.getRepositoryItemUid() ) )
         {
-            if ( ChecksumPolicy.STRICT.equals( getChecksumPolicy() )
-                || ChecksumPolicy.STRICT_IF_EXISTS.equals( getChecksumPolicy() ) )
+            // do not validate checksum files
+            return null;
+        }
+
+        if ( getChecksumPolicy() == null || ! getChecksumPolicy().shouldCheckChecksum() || ! (item instanceof DefaultStorageFileItem) )
+        {
+            // there is either no need to validate or we can't validate the item content
+            return null;
+        }
+
+        RepositoryItemUid uid = item.getRepositoryItemUid();
+
+        DefaultStorageFileItem hashItem = null;
+
+        // we prefer SHA1 ...
+        try
+        {
+            hashItem = (DefaultStorageFileItem) super.doRetrieveRemoteItem( uid.getRepository().createUid( uid.getPath() + ".sha1" ), context );
+        }
+        catch ( ItemNotFoundException sha1e )
+        {
+            // ... but MD5 will do too
+            try
             {
-                try
-                {
-                    try
-                    {
-                        getLocalStorage().deleteItem( uid );
-                    }
-                    catch ( ItemNotFoundException e )
-                    {
-                        // neglect
-                    }
-                    try
-                    {
-                        getLocalStorage().deleteItem( uid.getRepository().createUid( uid.getPath() + ".sha1" ) );
-                    }
-                    catch ( ItemNotFoundException e )
-                    {
-                        // neglect
-                    }
-                    try
-                    {
-                        getLocalStorage().deleteItem( uid.getRepository().createUid( uid.getPath() + ".md5" ) );
-                    }
-                    catch ( ItemNotFoundException e )
-                    {
-                        // neglect
-                    }
-
-                }
-                catch ( UnsupportedStorageOperationException e )
-                {
-                    // huh?
-                }
-
-                NexusArtifactEvent nae = new NexusArtifactEvent();
-
-                nae.setAction( NexusArtifactEvent.ACTION_BROKEN_WRONG_REMOTE_CHECKSUM );
-
-                nae.setEventDate( new Date() );
-
-                nae.setMessage( "The artifact " + result.getPath()
-                    + " and it's remote checksums does not match in repository " + result.getRepositoryId()
-                    + "! The checksumPolicy of repository forbids downloading of it." );
-
-                nae.setEventContext( result.getItemContext() );
-
-                NexusItemInfo ai = new NexusItemInfo();
-
-                ai.setPath( result.getPath() );
-
-                ai.setRepositoryId( result.getRepositoryId() );
-
-                ai.setRemoteUrl( result.getRemoteUrl() );
-
-                nae.setNexusItemInfo( ai );
-
-                feedRecorder.addNexusArtifactEvent( nae );
-
-                throw new ItemNotFoundException( uid );
+                hashItem = (DefaultStorageFileItem) super.doRetrieveRemoteItem( uid.getRepository().createUid( uid.getPath() + ".md5" ), context );
             }
-            else if ( ChecksumPolicy.WARN.equals( getChecksumPolicy() ) )
+            catch ( ItemNotFoundException md5e )
             {
-                getLogger().warn(
-                    "The artifact " + uid.toString() + " and it's remote checksums does not match in repository "
-                        + result.getRepositoryId() + "!" );
-
-                NexusArtifactEvent nae = new NexusArtifactEvent();
-
-                nae.setAction( NexusArtifactEvent.ACTION_BROKEN_WRONG_REMOTE_CHECKSUM );
-
-                nae.setEventDate( new Date() );
-
-                nae.setMessage( "Warning, the artifact " + result.getPath()
-                    + " and it's remote checksums does not match in repository " + result.getRepositoryId() + "!" );
-
-                nae.setEventContext( result.getItemContext() );
-
-                NexusItemInfo ai = new NexusItemInfo();
-
-                ai.setPath( result.getPath() );
-
-                ai.setRepositoryId( result.getRepositoryId() );
-
-                ai.setRemoteUrl( result.getRemoteUrl() );
-
-                nae.setNexusItemInfo( ai );
-
-                feedRecorder.addNexusArtifactEvent( nae );
-
-                return result;
-            }
-            else
-            {
-                return result;
+                getLogger().debug( "Item checksums (SHA1, MD5) remotely unavailable " + uid.toString() );
             }
         }
 
-        // this is not a checksum for sure (see doRetrieveItem in this class), hence go remote as should
-        // but use remote maven repo checksum to verify transport success
+        String remoteHash = null;
 
-        if ( getChecksumPolicy().shouldCheckChecksum() && StorageFileItem.class.isAssignableFrom( result.getClass() ) )
+        if ( hashItem != null )
         {
-            String hashKey = null;
+            // store checksum file locally
+            hashItem = (DefaultStorageFileItem) doCacheItem( hashItem );
 
-            RepositoryItemUid hashUid = null;
-
-            DefaultStorageFileItem hashItem = null;
-
-            // we prefer sha1
+            // read checksum
             try
             {
-                hashKey = DigestCalculatingInspector.DIGEST_SHA1_KEY;
+                InputStream hashItemContent = hashItem.getInputStream();
 
-                hashUid = uid.getRepository().createUid( uid.getPath() + ".sha1" );
-
-                hashItem = (DefaultStorageFileItem) doRetrieveRemoteItem( hashUid, context );
-
-                getLocalStorage().touchItemRemoteChecked( hashUid );
-            }
-            catch ( ItemNotFoundException esha1 )
-            {
                 try
                 {
-                    hashKey = DigestCalculatingInspector.DIGEST_MD5_KEY;
-
-                    hashUid = uid.getRepository().createUid( uid.getPath() + ".md5" );
-
-                    hashItem = (DefaultStorageFileItem) doRetrieveRemoteItem( hashUid, context );
-
-                    getLocalStorage().touchItemRemoteChecked( hashUid );
+                    remoteHash = StringUtils.chomp( IOUtil.toString( hashItemContent ) ).trim().split( " " )[0];
                 }
-                catch ( ItemNotFoundException emd5 )
+                finally
                 {
-                    // it seems we don't have any remotely available checksum
-                    getLogger().debug( "Item checksums (SHA1, MD5) remotely unavailable " + uid.toString() );
-
-                    if ( ChecksumPolicy.STRICT.equals( getChecksumPolicy() ) )
-                    {
-                        NexusArtifactEvent nae = new NexusArtifactEvent();
-
-                        nae.setAction( NexusArtifactEvent.ACTION_BROKEN_WRONG_REMOTE_CHECKSUM );
-
-                        nae.setEventDate( new Date() );
-
-                        nae.setEventContext( result.getItemContext() );
-
-                        nae.setMessage( "The artifact " + result.getPath() + " has no remote checksum in repository "
-                            + result.getRepositoryId()
-                            + "! The checksumPolicy of repository forbids downloading of it." );
-
-                        NexusItemInfo ai = new NexusItemInfo();
-
-                        ai.setPath( result.getPath() );
-
-                        ai.setRepositoryId( result.getRepositoryId() );
-
-                        ai.setRemoteUrl( result.getRemoteUrl() );
-
-                        nae.setNexusItemInfo( ai );
-
-                        feedRecorder.addNexusArtifactEvent( nae );
-
-                        throw new ItemNotFoundException( uid );
-                    }
-                    else
-                    {
-                        NexusArtifactEvent nae = new NexusArtifactEvent();
-
-                        nae.setAction( NexusArtifactEvent.ACTION_BROKEN_WRONG_REMOTE_CHECKSUM );
-
-                        nae.setEventDate( new Date() );
-
-                        nae.setEventContext( result.getItemContext() );
-
-                        nae.setMessage( "Warning, the artifact " + result.getPath()
-                            + " has no remote checksum in repository " + result.getRepositoryId() + "!" );
-
-                        NexusItemInfo ai = new NexusItemInfo();
-
-                        ai.setPath( result.getPath() );
-
-                        ai.setRepositoryId( result.getRepositoryId() );
-
-                        ai.setRemoteUrl( result.getRemoteUrl() );
-
-                        nae.setNexusItemInfo( ai );
-
-                        feedRecorder.addNexusArtifactEvent( nae );
-
-                        return result;
-                    }
+                    IOUtil.close( hashItemContent );
                 }
-            }
-
-            String remoteHash = null;
-
-            InputStream hashItemContent = null;
-
-            try
-            {
-                hashItemContent = hashItem.getInputStream();
-
-                remoteHash = StringUtils.chomp( IOUtil.toString( hashItemContent ) ).trim().split( " " )[0];
             }
             catch ( IOException e )
             {
-                // it seems we don't have any remotely available checksum
                 getLogger().warn( "Cannot read hash string for remotely fetched StorageFileItem: " + uid.toString(), e );
+            }
+        }
 
-                if ( ChecksumPolicy.STRICT.equals( getChecksumPolicy() ) )
-                {
-                    throw new ItemNotFoundException( uid );
-                }
-                else
-                {
-                    return result;
-                }
-            }
-            finally
-            {
-                IOUtil.close( hashItemContent );
-            }
+        // let compiler make sure I did not forget to populate validation results 
+        String msg;
+        boolean contentValid;
 
-            if ( remoteHash != null && remoteHash.equals( result.getAttributes().get( hashKey ) ) )
-            {
-                // the transfer succeeded and we have it ok already stored
-                return result;
-            }
-            else
-            {
-                // the hashes differ, lets redownload it and try it again
-                return doRetrieveRemoteMavenItem( ++tried, uid, context, super.doRetrieveRemoteItem( uid, context ) );
-            }
+        ContentValidationResult result = new ContentValidationResult();
+
+        if ( remoteHash == null && ChecksumPolicy.STRICT.equals( getChecksumPolicy() ) )
+        {
+            msg = "The artifact " + item.getPath() + " has no remote checksum in repository "
+                + item.getRepositoryId()
+                + "! The checksumPolicy of repository forbids downloading of it.";
+
+            contentValid = false;
+        }
+        else if ( hashItem == null )
+        {
+            msg = "Warning, the artifact " + item.getPath()
+                + " has no remote checksum in repository " + item.getRepositoryId() + "!";
+
+            contentValid = true; // policy is STRICT_IF_EXIST or WARN
         }
         else
         {
-            return result;
+            String hashKey = hashItem.getPath().endsWith( ".sha1" )
+                ? DigestCalculatingInspector.DIGEST_SHA1_KEY
+                : DigestCalculatingInspector.DIGEST_MD5_KEY;
+
+            if ( remoteHash != null && remoteHash.equals( item.getAttributes().get( hashKey ) ) )
+            {
+                // remote hash exists and matches item content
+                return null;
+            }
+
+            if ( ChecksumPolicy.WARN.equals( getChecksumPolicy() ) )
+            {
+                msg = "Warning, the artifact " + item.getPath()
+                    + " and it's remote checksums does not match in repository " + item.getRepositoryId() + "!";
+
+                contentValid = true;
+            }
+            else // STRICT or STRICT_IF_EXISTS
+            {
+                msg = "The artifact " + item.getPath()
+                    + " and it's remote checksums does not match in repository " + item.getRepositoryId()
+                    + "! The checksumPolicy of repository forbids downloading of it.";
+
+                contentValid = false;
+            }
         }
+
+        result.addEvent( newChechsumFailureEvent( item, msg ) );
+        result.setContentValid( contentValid );
+
+        if ( ! contentValid && hashItem != null )
+        {
+            // TODO should we remove bad checksum if policy==WARN?
+            try
+            {
+                getLocalStorage().deleteItem( hashItem.getRepositoryItemUid() );
+            }
+            catch ( ItemNotFoundException e )
+            {
+                // ignore
+            }
+            catch ( UnsupportedStorageOperationException e )
+            {
+                // huh?
+            }
+        }
+
+        return result;
+    }
+
+    private NexusArtifactEvent newChechsumFailureEvent( AbstractStorageItem item, String msg )
+    {
+        NexusArtifactEvent nae = new NexusArtifactEvent();
+
+        nae.setAction( NexusArtifactEvent.ACTION_BROKEN_WRONG_REMOTE_CHECKSUM );
+
+        nae.setEventDate( new Date() );
+
+        nae.setEventContext( item.getItemContext() );
+
+        nae.setMessage( msg );
+
+        NexusItemInfo ai = new NexusItemInfo();
+
+        ai.setPath( item.getPath() );
+
+        ai.setRepositoryId( item.getRepositoryId() );
+
+        ai.setRemoteUrl( item.getRemoteUrl() );
+
+        nae.setNexusItemInfo( ai );
+
+        return nae;
+    }
+
+    private boolean isChecksum( RepositoryItemUid uid )
+    {
+        return uid.getPath().endsWith( ".sha1" ) || uid.getPath().endsWith( ".md5" );
+    }
+
+    private void removeLocalChecksum( RepositoryItemUid uid )
+        throws StorageException
+    {
+        try
+        {
+            try
+            {
+                getLocalStorage().deleteItem( uid.getRepository().createUid( uid.getPath() + ".sha1" ) );
+            }
+            catch ( ItemNotFoundException e )
+            {
+                // this is exactly what we're trying to achieve
+            }
+
+            try
+            {
+                getLocalStorage().deleteItem( uid.getRepository().createUid( uid.getPath() + ".md5" ) );
+            }
+            catch ( ItemNotFoundException e )
+            {
+                // this is exactly what we're trying to achieve
+            }
+        }
+        catch ( UnsupportedStorageOperationException e )
+        {
+            // huh?
+        }
+
     }
 
     protected void markItemRemotelyChecked( RepositoryItemUid uid )
