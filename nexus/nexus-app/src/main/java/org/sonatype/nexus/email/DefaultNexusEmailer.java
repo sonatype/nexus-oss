@@ -145,13 +145,20 @@ public class DefaultNexusEmailer
         emailer.configure( config );
     }
 
-    private boolean configChanged( CSmtpConfiguration newSmtp )
+    protected boolean configChanged( CSmtpConfiguration newSmtp )
     {
-        if ( smtp == null || !smtp.getHost().equals( newSmtp.getHost() )
-            || !smtp.getUsername().equals( newSmtp.getUsername() )
-            || !smtp.getPassword().equals( newSmtp.getPassword() ) || !( smtp.getPort() == newSmtp.getPort() )
-            || !smtp.getSystemEmailAddress().equals( newSmtp.getSystemEmailAddress() )
-            || !( smtp.isSslEnabled() == newSmtp.isSslEnabled() ) || !( smtp.isTlsEnabled() == newSmtp.isTlsEnabled() )
+        if ( smtp == null 
+            || ( smtp.getHost() == null && newSmtp.getHost() != null )
+            || ( smtp.getHost() != null && !smtp.getHost().equals( newSmtp.getHost() ) )
+            || ( smtp.getUsername() == null && newSmtp.getUsername() != null )
+            || ( smtp.getUsername() != null && !smtp.getUsername().equals( newSmtp.getUsername() ) )
+            || ( smtp.getPassword() == null && newSmtp.getPassword() != null )
+            || ( smtp.getPassword() != null && !smtp.getPassword().equals( newSmtp.getPassword() ) ) 
+            || !( smtp.getPort() == newSmtp.getPort() )
+            || ( smtp.getSystemEmailAddress() == null && newSmtp.getSystemEmailAddress() != null )
+            || ( smtp.getSystemEmailAddress() != null && !smtp.getSystemEmailAddress().equals( newSmtp.getSystemEmailAddress() ) )
+            || !( smtp.isSslEnabled() == newSmtp.isSslEnabled() ) 
+            || !( smtp.isTlsEnabled() == newSmtp.isTlsEnabled() )
             || !( smtp.isDebugMode() == newSmtp.isDebugMode() ) )
         {
             smtp = newSmtp;
