@@ -1,18 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<settings xmlns="http://maven.apache.org/settings/1.0.0"
-          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-          xsi:schemaLocation="http://maven.apache.org/setrings/1.0.0
+<settings xmlns="http://maven.apache.org/settings/1.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/setrings/1.0.0
           http://maven.apache.org/xsd/settings-1.0.0.xsd">
 
-<localRepository>${project.build.directory}/maven_repo</localRepository>
+  <localRepository>${project.build.directory}/maven_repo</localRepository>
 
-<servers>
-   <server>
-    <id>remote-repository</id>
-    <username>test-user</username>
-     <password>admin123</password>
-   </server>
-</servers>
+  <servers>
+    <server>
+      <id>remote-repository</id>
+      <username>test-user</username>
+      <password>admin123</password>
+    </server>
+  </servers>
 
   <mirrors>
     <mirror>
@@ -37,16 +35,24 @@
         <repository>
           <id>central</id>
           <url>http://central</url>
-          <releases><enabled>true</enabled></releases>
-          <snapshots><enabled>true</enabled></snapshots>
+          <releases>
+            <enabled>true</enabled>
+          </releases>
+          <snapshots>
+            <enabled>true</enabled>
+          </snapshots>
         </repository>
       </repositories>
-     <pluginRepositories>
+      <pluginRepositories>
         <pluginRepository>
           <id>central</id>
           <url>http://central</url>
-          <releases><enabled>true</enabled></releases>
-          <snapshots><enabled>true</enabled></snapshots>
+          <releases>
+            <enabled>true</enabled>
+          </releases>
+          <snapshots>
+            <enabled>true</enabled>
+          </snapshots>
         </pluginRepository>
       </pluginRepositories>
     </profile>
@@ -57,16 +63,24 @@
         <repository>
           <id>public-snapshots</id>
           <url>http://public-snapshots</url>
-          <releases><enabled>false</enabled></releases>
-          <snapshots><enabled>true</enabled></snapshots>
+          <releases>
+            <enabled>false</enabled>
+          </releases>
+          <snapshots>
+            <enabled>true</enabled>
+          </snapshots>
         </repository>
       </repositories>
-     <pluginRepositories>
+      <pluginRepositories>
         <pluginRepository>
           <id>public-snapshots</id>
           <url>http://public-snapshots</url>
-          <releases><enabled>false</enabled></releases>
-          <snapshots><enabled>true</enabled></snapshots>
+          <releases>
+            <enabled>false</enabled>
+          </releases>
+          <snapshots>
+            <enabled>true</enabled>
+          </snapshots>
         </pluginRepository>
       </pluginRepositories>
     </profile>

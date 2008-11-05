@@ -1,8 +1,9 @@
-<?xml version="1.0" encoding="UTF-8"?><nexusConfiguration>
+<?xml version="1.0" encoding="UTF-8"?>
+<nexusConfiguration>
   <version>1.0.7</version>
   <applicationLogDirectory>${project.build.directory}/logs/</applicationLogDirectory>
-  
-    <smtpConfiguration>
+
+  <smtpConfiguration>
     <host>localhost</host>
     <port>${email-server-port}</port>
     <sslEnabled>false</sslEnabled>
@@ -12,12 +13,12 @@
     <debugMode>false</debugMode>
     <systemEmailAddress>system@nexus.org</systemEmailAddress>
   </smtpConfiguration>
-  
+
   <security>
     <enabled>false</enabled>
     <anonymousAccessEnabled>true</anonymousAccessEnabled>
     <anonymousUsername>anonymous</anonymousUsername>
-	<anonymousPassword>anonymous</anonymousPassword> 
+    <anonymousPassword>anonymous</anonymousPassword>
     <realms>
       <realm>XmlAuthenticatingRealm</realm>
       <realm>NexusMethodAuthorizingRealm</realm>
@@ -31,32 +32,19 @@
     <groups />
   </routing>
   <repositories>
- <!-- <repository>
-            <id>central</id>
-            <name>Maven Central</name>
-            <localStatus>inService</localStatus>
-            <proxyMode>allow</proxyMode>
-            <allowWrite>false</allowWrite>
-            <browseable>true</browseable>
-            <indexable>true</indexable>
-            <notFoundCacheTTL>1440</notFoundCacheTTL>
-            <artifactMaxAge>-1</artifactMaxAge>
-            <metadataMaxAge>1440</metadataMaxAge>
-            <maintainProxiedRepositoryMetadata>false</maintainProxiedRepositoryMetadata>
-            <repositoryPolicy>release</repositoryPolicy>
-            <remoteStorage>
-                <provider>apacheHttpClient3x</provider>
-                <url>http://repo1.maven.org/maven2/</url>
-            </remoteStorage>
-        </repository> -->
+    <!--
+      <repository> <id>central</id> <name>Maven Central</name> <localStatus>inService</localStatus> <proxyMode>allow</proxyMode> <allowWrite>false</allowWrite> <browseable>true</browseable> <indexable>true</indexable>
+      <notFoundCacheTTL>1440</notFoundCacheTTL> <artifactMaxAge>-1</artifactMaxAge> <metadataMaxAge>1440</metadataMaxAge> <maintainProxiedRepositoryMetadata>false</maintainProxiedRepositoryMetadata> <repositoryPolicy>release</repositoryPolicy>
+      <remoteStorage> <provider>apacheHttpClient3x</provider> <url>http://repo1.maven.org/maven2/</url> </remoteStorage> </repository>
+    -->
 
 
-	<repository>
+    <repository>
       <id>fake-central</id>
       <name>fake-central</name>
       <allowWrite>false</allowWrite>
       <localStorage>
-      	<url>${project.build.directory}/test-classes/fake-central</url>
+        <url>${project.build.directory}/test-classes/fake-central</url>
       </localStorage>
     </repository>
 
@@ -100,19 +88,19 @@
   </repositoryShadows>
   <repositoryGrouping>
     <repositoryGroups>
-            <repositoryGroup>
-                <groupId>public</groupId>
-                <name>Public Repositories</name>
-                <repositories>
-                    <repository>fake-central</repository>
-                    <repository>nexus-test-harness-repo</repository>
-                    <repository>nexus-test-harness-repo2</repository>
-                    <repository>release-proxy-repo-1</repository>
-                    <repository>nexus-test-harness-release-repo</repository>
-                    <!-- <repository>central</repository> -->
-                </repositories>
-            </repositoryGroup>
-            
+      <repositoryGroup>
+        <groupId>public</groupId>
+        <name>Public Repositories</name>
+        <repositories>
+          <repository>fake-central</repository>
+          <repository>nexus-test-harness-repo</repository>
+          <repository>nexus-test-harness-repo2</repository>
+          <repository>release-proxy-repo-1</repository>
+          <repository>nexus-test-harness-release-repo</repository>
+          <!-- <repository>central</repository> -->
+        </repositories>
+      </repositoryGroup>
+
       <repositoryGroup>
         <groupId>nexus-test</groupId>
         <name>nexus-test</name>
@@ -138,7 +126,7 @@
       </repositoryGroup>
     </repositoryGroups>
   </repositoryGrouping>
-  
+
   <repositoryTargets>
     <repositoryTarget>
       <id>testTarget</id>
@@ -148,7 +136,7 @@
         <pattern>.*test.*</pattern>
       </patterns>
     </repositoryTarget>
-    
+
     <repositoryTarget>
       <id>allRepos</id>
       <name>All M2 Repositories</name>
@@ -157,7 +145,7 @@
         <pattern>.*</pattern>
       </patterns>
     </repositoryTarget>
-    
+
     <repositoryTarget>
       <id>1</id>
       <name>All (Maven2)</name>
@@ -174,8 +162,8 @@
         <pattern>.*</pattern>
       </patterns>
     </repositoryTarget>
-    
-    
+
+
   </repositoryTargets>
-  
+
 </nexusConfiguration>

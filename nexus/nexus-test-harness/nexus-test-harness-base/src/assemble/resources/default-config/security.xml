@@ -1,4 +1,5 @@
-<?xml version="1.0" encoding="UTF-8"?><security>
+<?xml version="1.0" encoding="UTF-8"?>
+<security>
   <version>2.0.1</version>
   <users>
     <user>
@@ -48,25 +49,25 @@
 
   </users>
   <roles>
-  	<role>
-			<id>role1</id>
-			<name>RoleOne</name>
-			<description>Role One</description>
-			<sessionTimeout>60</sessionTimeout>
-			<privileges>
-				<privilege>1</privilege>
-				<privilege>2</privilege>
-			</privileges>
-		</role>
-		<role>
-			<id>role2</id>
-			<name>RoleTwo</name>
-			<description>Role Two</description>
-			<sessionTimeout>60</sessionTimeout>
-			<privileges>
-				<privilege>3</privilege>
-				<privilege>4</privilege>
-			</privileges>
-		</role>
-	</roles>
+    <role>
+      <id>role1</id>
+      <name>RoleOne</name>
+      <description>Role One</description>
+      <sessionTimeout>60</sessionTimeout>
+      <privileges>
+        <privilege>1</privilege>
+        <privilege>2</privilege>
+      </privileges>
+    </role>
+    <role>
+      <id>role2</id>
+      <name>RoleTwo</name>
+      <description>Role Two</description>
+      <sessionTimeout>60</sessionTimeout>
+      <privileges>
+        <privilege>3</privilege>
+        <privilege>4</privilege>
+      </privileges>
+    </role>
+  </roles>
 </security>
