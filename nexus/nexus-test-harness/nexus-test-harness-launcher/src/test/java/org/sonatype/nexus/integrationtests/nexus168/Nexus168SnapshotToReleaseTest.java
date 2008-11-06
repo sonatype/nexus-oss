@@ -44,21 +44,19 @@ public class Nexus168SnapshotToReleaseTest
         File fileToDeploy =
             this.getTestFile( gav.getArtifactId() + "." + gav.getExtension() );
 
-        boolean testPassed = false;
         try
         {
             // deploy it
             // this should fail
             DeployUtils.deployWithWagon( this.getContainer(), "http", this.getNexusTestRepoUrl(), fileToDeploy,
                                          this.getRelitiveArtifactPath( gav ) );
+            Assert.fail( "Should not be able to deploy a SNAPSHOT artifact into a RELEASE repo" );
         }
         catch ( AuthorizationException e )
         {
             // this is expected
-            testPassed = true;
         }
 
-        Assert.assertTrue( testPassed );
     }
 
     @Test
