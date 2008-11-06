@@ -87,7 +87,7 @@ import org.sonatype.nexus.integrationtests.upgrades.nexus652.Nexus652Beta5To10Up
 @RunWith( Suite.class )
 @SuiteClasses( {
     Nexus166SampleTest.class,
-    Nexus758StatusService.class,
+//    Nexus758StatusService.class,
     Nexus169ReleaseMetaDataInSnapshotRepoTest.class,
     Nexus258ReleaseDeployTest.class,
     Nexus167ReleaseToSnapshotTest.class,
