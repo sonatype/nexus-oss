@@ -35,6 +35,13 @@ public interface StorageItem
     RepositoryItemUid getRepositoryItemUid();
 
     /**
+     * Set the repository item uid.
+     * 
+     * @param repositoryItemUid
+     */
+    void setRepositoryItemUid( RepositoryItemUid repositoryItemUid );
+
+    /**
      * Gets the repository id from where originates item.
      * 
      * @return the repository id

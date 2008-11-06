@@ -161,7 +161,7 @@ public abstract class AbstractRepository
 
     /** User managed */
     private boolean userManaged = true;
-    
+
     /** Exposed */
     private boolean exposed = true;
 
@@ -1100,6 +1100,10 @@ public abstract class AbstractRepository
             throw new RepositoryNotAvailableException( this.getId() );
         }
 
+        // replace UID to own one
+        item.setRepositoryItemUid( createUid( item.getPath() ) );
+
+        // store it
         getLocalStorage().storeItem( item );
 
         // remove the "request" item from n-cache if there

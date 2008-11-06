@@ -157,7 +157,7 @@ public class DefaultWalker
             if ( getLogger().isDebugEnabled() )
             {
                 getLogger().debug(
-                    "Start walking on ResourceStore " + context.getResourceStore().getId() + " from path '" + fromPath
+                    "Finished walking on ResourceStore " + context.getResourceStore().getId() + " from path '" + fromPath
                         + "'. Walked over " + Integer.toString( collCount ) + " collections." );
 
             }
