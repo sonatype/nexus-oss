@@ -21,77 +21,60 @@
 
 package org.sonatype.nexus.proxy.maven;
 
-import org.codehaus.plexus.logging.Logger;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RepositoryType;
-import org.sonatype.nexus.proxy.utils.StoreWalker;
+import org.sonatype.nexus.proxy.walker.AbstractWalkerProcessor;
+import org.sonatype.nexus.proxy.walker.WalkerContext;
 
 /**
  * @author Juven Xu
  */
-public class RecreateMavenMetadataWalker
-    extends StoreWalker
+public class RecreateMavenMetadataWalkerProcessor
+    extends AbstractWalkerProcessor
 {
-
-    private Repository repository;
-
     private boolean isHostedRepo;
 
     private AbstractMetadataHelper mdHelper;
 
-    public RecreateMavenMetadataWalker( Repository repository, Logger logger )
+    @Override
+    public void beforeWalk( WalkerContext context )
+        throws Exception
     {
-        super( repository, logger );
+        isHostedRepo = false;
 
-        this.repository = repository;
+        Repository repository = context.getResourceStore() instanceof Repository ? (Repository) context
+            .getResourceStore() : null;
 
-        isHostedRepo = RepositoryType.HOSTED.equals( repository.getRepositoryType() );
-
-        mdHelper = new DefaultMetadataHelper( repository, logger );
-
-    }
-
-    protected void beforeWalk()
-    {
-        if ( !isHostedRepo )
+        if ( repository != null )
         {
-            stop( new Exception( "Not allowed to create metadata files for non-hosted repositoty" ) );
+            mdHelper = new DefaultMetadataHelper( repository );
+
+            isHostedRepo = RepositoryType.HOSTED.equals( repository.getRepositoryType() );
         }
 
+        setActive( isHostedRepo );
     }
 
     @Override
-    protected void onCollectionEnter( StorageCollectionItem coll )
+    public void onCollectionEnter( WalkerContext context, StorageCollectionItem coll )
+        throws Exception
     {
-
         mdHelper.onDirEnter( coll.getPath() );
-
     }
 
     @Override
-    protected void onCollectionExit( StorageCollectionItem coll )
-    {
-        try
-        {
-            mdHelper.onDirExit( coll.getPath() );
-        }
-        catch ( Exception e )
-        {
-            getLogger().info( "Can't create Metadata on exit: " + coll.getPath(), e );
-        }
-    }
-
-    @Override
-    protected void processItem( StorageItem item )
+    public void processItem( WalkerContext context, StorageItem item )
+        throws Exception
     {
         mdHelper.processFile( item.getPath() );
     }
 
-    public Repository getRepository()
+    @Override
+    public void onCollectionExit( WalkerContext context, StorageCollectionItem coll )
+        throws Exception
     {
-        return repository;
+        mdHelper.onDirExit( coll.getPath() );
     }
-
 }

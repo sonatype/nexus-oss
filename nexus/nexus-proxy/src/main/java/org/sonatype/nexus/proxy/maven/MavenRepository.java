@@ -68,6 +68,8 @@ public interface MavenRepository
 
     MetadataManager getMetadataManager();
 
+    boolean recreateMavenMetadata( String path );
+
     void storeItemWithChecksums( AbstractStorageItem item )
         throws UnsupportedStorageOperationException,
             RepositoryNotAvailableException,

@@ -50,6 +50,8 @@ import org.sonatype.nexus.proxy.item.StringContentLocator;
 import org.sonatype.nexus.proxy.repository.ContentValidationResult;
 import org.sonatype.nexus.proxy.repository.DefaultRepository;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
+import org.sonatype.nexus.proxy.walker.DefaultWalkerContext;
+import org.sonatype.nexus.proxy.walker.WalkerException;
 
 /**
  * The abstract (layout unaware) Maven Repository.
@@ -125,18 +127,31 @@ public abstract class AbstractMavenRepository
 
         return true;
     }
-    
-    public boolean recreateMavenMetadata (String path )
+
+    public boolean recreateMavenMetadata( String path )
     {
         getLogger().info( "Recreating Maven medadata on repository " + getId() );
-        
-        RecreateMavenMetadataWalker walker = new RecreateMavenMetadataWalker ( this, getLogger() );
-        
-        walker.walk( path, true, false );
-        
-        notifyProximityEventListeners( new RepositoryEventRecreateMavenMetadata( this ) );
-        
-        return true;
+
+        try
+        {
+            RecreateMavenMetadataWalkerProcessor wp = new RecreateMavenMetadataWalkerProcessor();
+
+            DefaultWalkerContext ctx = new DefaultWalkerContext( this );
+
+            ctx.getProcessors().add( wp );
+
+            getWalker().walk( ctx, path );
+
+            notifyProximityEventListeners( new RepositoryEventRecreateMavenMetadata( this ) );
+
+            return true;
+        }
+        catch ( WalkerException e )
+        {
+            getLogger().warn( "Recreating Maven metadata failed!", e );
+        }
+
+        return false;
     }
 
     public ChecksumPolicy getChecksumPolicy()
@@ -445,7 +460,7 @@ public abstract class AbstractMavenRepository
         throws ItemNotFoundException,
             StorageException
     {
-        if ( ! isChecksum( uid ) )
+        if ( !isChecksum( uid ) )
         {
             // we are about to download an artifact from remote repository
             // lets clean any existing (stale) checksum files
@@ -456,7 +471,7 @@ public abstract class AbstractMavenRepository
     }
 
     @Override
-    protected ContentValidationResult doValidateRemoteItemContent( AbstractStorageItem item, Map<String, Object> context ) 
+    protected ContentValidationResult doValidateRemoteItemContent( AbstractStorageItem item, Map<String, Object> context )
         throws StorageException
     {
         if ( isChecksum( item.getRepositoryItemUid() ) )
@@ -465,7 +480,8 @@ public abstract class AbstractMavenRepository
             return null;
         }
 
-        if ( getChecksumPolicy() == null || ! getChecksumPolicy().shouldCheckChecksum() || ! (item instanceof DefaultStorageFileItem) )
+        if ( getChecksumPolicy() == null || !getChecksumPolicy().shouldCheckChecksum()
+            || !( item instanceof DefaultStorageFileItem ) )
         {
             // there is either no need to validate or we can't validate the item content
             return null;
@@ -478,14 +494,16 @@ public abstract class AbstractMavenRepository
         // we prefer SHA1 ...
         try
         {
-            hashItem = (DefaultStorageFileItem) super.doRetrieveRemoteItem( uid.getRepository().createUid( uid.getPath() + ".sha1" ), context );
+            hashItem = (DefaultStorageFileItem) super.doRetrieveRemoteItem( uid.getRepository().createUid(
+                uid.getPath() + ".sha1" ), context );
         }
         catch ( ItemNotFoundException sha1e )
         {
             // ... but MD5 will do too
             try
             {
-                hashItem = (DefaultStorageFileItem) super.doRetrieveRemoteItem( uid.getRepository().createUid( uid.getPath() + ".md5" ), context );
+                hashItem = (DefaultStorageFileItem) super.doRetrieveRemoteItem( uid.getRepository().createUid(
+                    uid.getPath() + ".md5" ), context );
             }
             catch ( ItemNotFoundException md5e )
             {
@@ -520,7 +538,7 @@ public abstract class AbstractMavenRepository
             }
         }
 
-        // let compiler make sure I did not forget to populate validation results 
+        // let compiler make sure I did not forget to populate validation results
         String msg;
         boolean contentValid;
 
@@ -528,16 +546,15 @@ public abstract class AbstractMavenRepository
 
         if ( remoteHash == null && ChecksumPolicy.STRICT.equals( getChecksumPolicy() ) )
         {
-            msg = "The artifact " + item.getPath() + " has no remote checksum in repository "
-                + item.getRepositoryId()
+            msg = "The artifact " + item.getPath() + " has no remote checksum in repository " + item.getRepositoryId()
                 + "! The checksumPolicy of repository forbids downloading of it.";
 
             contentValid = false;
         }
         else if ( hashItem == null )
         {
-            msg = "Warning, the artifact " + item.getPath()
-                + " has no remote checksum in repository " + item.getRepositoryId() + "!";
+            msg = "Warning, the artifact " + item.getPath() + " has no remote checksum in repository "
+                + item.getRepositoryId() + "!";
 
             contentValid = true; // policy is STRICT_IF_EXIST or WARN
         }
@@ -560,11 +577,11 @@ public abstract class AbstractMavenRepository
 
                 contentValid = true;
             }
-            else // STRICT or STRICT_IF_EXISTS
+            else
+            // STRICT or STRICT_IF_EXISTS
             {
-                msg = "The artifact " + item.getPath()
-                    + " and it's remote checksums does not match in repository " + item.getRepositoryId()
-                    + "! The checksumPolicy of repository forbids downloading of it.";
+                msg = "The artifact " + item.getPath() + " and it's remote checksums does not match in repository "
+                    + item.getRepositoryId() + "! The checksumPolicy of repository forbids downloading of it.";
 
                 contentValid = false;
             }
@@ -573,7 +590,7 @@ public abstract class AbstractMavenRepository
         result.addEvent( newChechsumFailureEvent( item, msg ) );
         result.setContentValid( contentValid );
 
-        if ( ! contentValid && hashItem != null )
+        if ( !contentValid && hashItem != null )
         {
             // TODO should we remove bad checksum if policy==WARN?
             try

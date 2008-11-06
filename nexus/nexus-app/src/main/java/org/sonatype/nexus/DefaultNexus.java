@@ -24,7 +24,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -99,14 +98,15 @@ import org.sonatype.nexus.proxy.http.HttpProxyService;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.item.StorageLinkItem;
+import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.registry.InvalidGroupingException;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
+import org.sonatype.nexus.proxy.repository.DefaultShadowRepository;
 import org.sonatype.nexus.proxy.repository.LocalStatus;
 import org.sonatype.nexus.proxy.repository.ProxyMode;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RepositoryType;
-import org.sonatype.nexus.proxy.repository.DefaultShadowRepository;
 import org.sonatype.nexus.proxy.router.RepositoryRouter;
 import org.sonatype.nexus.proxy.router.RootRepositoryRouter;
 import org.sonatype.nexus.proxy.wastebasket.Wastebasket;
@@ -393,7 +393,7 @@ public class DefaultNexus
     {
         nexusConfiguration.setSecurityEnabled( enabled );
     }
-    
+
     public void setRealms( List<String> realms )
         throws IOException
     {
@@ -1413,8 +1413,7 @@ public class DefaultNexus
     {
         indexerManager.publishRepositoryGroupIndex( repositoryGroupId );
     }
-    
-    
+
     public void rebuildMavenMetadataAllRepositories( String path )
         throws IOException
     {
@@ -1422,7 +1421,10 @@ public class DefaultNexus
 
         for ( Repository repo : reposes )
         {
-            repo.recreateMavenMetadata( path );
+            if ( repo instanceof MavenRepository )
+            {
+                ( (MavenRepository) repo ).recreateMavenMetadata( path );
+            }
         }
     }
 
@@ -1430,7 +1432,12 @@ public class DefaultNexus
         throws NoSuchRepositoryException,
             IOException
     {
-        repositoryRegistry.getRepository( repositoryId ).recreateMavenMetadata( path );
+        Repository repo = repositoryRegistry.getRepository( repositoryId );
+
+        if ( repo instanceof MavenRepository )
+        {
+            ( (MavenRepository) repo ).recreateMavenMetadata( path );
+        }
     }
 
     public void rebuildMavenMetadataRepositoryGroup( String path, String repositoryGroupId )
@@ -1441,10 +1448,13 @@ public class DefaultNexus
 
         for ( Repository repo : reposes )
         {
-            repo.recreateMavenMetadata( path );
+            if ( repo instanceof MavenRepository )
+            {
+                ( (MavenRepository) repo ).recreateMavenMetadata( path );
+            }
         }
     }
-    
+
     public void rebuildAttributesAllRepositories( String path )
         throws IOException
     {

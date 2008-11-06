@@ -117,6 +117,11 @@ public abstract class LayoutConverterShadowRepository
         return metadataManager;
     }
 
+    public boolean recreateMavenMetadata( String path )
+    {
+        return false;
+    }
+
     public void storeItemWithChecksums( AbstractStorageItem item )
         throws UnsupportedStorageOperationException,
             RepositoryNotAvailableException,

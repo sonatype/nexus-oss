@@ -6,6 +6,18 @@ import org.sonatype.nexus.proxy.item.StorageItem;
 public abstract class AbstractWalkerProcessor
     implements WalkerProcessor
 {
+    private boolean active = true;
+
+    public boolean isActive()
+    {
+        return active;
+    }
+
+    public void setActive( boolean active )
+    {
+        this.active = active;
+    }
+
     public void beforeWalk( WalkerContext context )
         throws Exception
     {

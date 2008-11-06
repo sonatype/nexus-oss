@@ -22,10 +22,8 @@
 package org.sonatype.nexus.tools.metadata;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.URI;
 
-import org.apache.maven.mercury.repository.metadata.MetadataException;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.FileUtils;
@@ -63,8 +61,7 @@ public class DefaultMetadataRebuilder
     }
 
     private void walk( File file )
-        throws MetadataException,
-            IOException
+        throws Exception
     {
         if ( file.isFile() )
         {

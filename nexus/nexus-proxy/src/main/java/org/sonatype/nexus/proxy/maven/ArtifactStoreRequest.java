@@ -26,6 +26,8 @@ import org.sonatype.nexus.proxy.ResourceStoreRequest;
 public class ArtifactStoreRequest
     extends ResourceStoreRequest
 {
+    public static final String DUMMY_PATH = "GAV";
+
     private String groupId;
 
     private String artifactId;
@@ -35,13 +37,13 @@ public class ArtifactStoreRequest
     private String packaging;
 
     private String classifier;
-    
+
     private String extension;
 
     public ArtifactStoreRequest( boolean localOnly, String repositoryId, String repositoryGroupId, String g, String a,
         String v, String p, String c, String e )
     {
-        super( "GAV", localOnly, repositoryId, repositoryGroupId );
+        super( DUMMY_PATH, localOnly, repositoryId, repositoryGroupId );
 
         if ( StringUtils.isEmpty( g ) || StringUtils.isEmpty( a ) || StringUtils.isEmpty( v ) )
         {
@@ -71,7 +73,7 @@ public class ArtifactStoreRequest
         {
             setClassifier( null );
         }
-        
+
         if ( !StringUtils.isEmpty( e ) )
         {
             setExtension( e );
@@ -141,12 +143,12 @@ public class ArtifactStoreRequest
     {
         this.classifier = classifier;
     }
-    
+
     public String getExtension()
     {
         return extension;
     }
-    
+
     public void setExtension( String extension )
     {
         this.extension = extension;

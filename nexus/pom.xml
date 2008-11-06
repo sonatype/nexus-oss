@@ -145,8 +145,7 @@
 		<plexus-jsecurity-realms.version>1.0.2-SNAPSHOT</plexus-jsecurity-realms.version>
 		<slf4j.version>1.5.5</slf4j.version>
 		<maven.version>2.1-SONATYPE-653485</maven.version>
-		<maven.artifact.version>3.0-SONATYPE-653272</maven.artifact.version>
-		<nexus.indexer.version>1.0.3</nexus.indexer.version>
+		<nexus.indexer.version>1.0.3-SNAPSHOT</nexus.indexer.version>
 		<!-- Shared with nexus-client, hence it is properties'ed -->
 		<plexus.restlet.bridge.version>1.6-SNAPSHOT</plexus.restlet.bridge.version>
 		<micromailer.version>1.0.1</micromailer.version>
@@ -184,7 +183,7 @@
 			<dependency>
 				<groupId>org.sonatype.plexus</groupId>
 				<artifactId>plexus-jetty6</artifactId>
-				<version>1.1</version>
+				<version>1.2-SNAPSHOT</version>
 			</dependency>
 			<dependency>
 				<groupId>org.sonatype.plexus</groupId>
@@ -398,11 +397,6 @@
 				<groupId>org.apache.maven</groupId>
 				<artifactId>maven-core</artifactId>
 				<version>${maven.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.apache.maven.artifact</groupId>
-				<artifactId>maven-artifact</artifactId>
-				<version>${maven.artifact.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.maven.archetype</groupId>

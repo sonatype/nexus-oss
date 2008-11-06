@@ -22,7 +22,6 @@
 package org.sonatype.nexus.proxy.maven;
 
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
 import java.util.ArrayList;
@@ -34,6 +33,7 @@ import org.apache.maven.mercury.artifact.version.VersionComparator;
 import org.apache.maven.mercury.repository.metadata.Metadata;
 import org.apache.maven.mercury.repository.metadata.MetadataBuilder;
 import org.apache.maven.mercury.repository.metadata.MetadataException;
+import org.apache.maven.mercury.repository.metadata.Plugin;
 import org.apache.maven.mercury.repository.metadata.SetSnapshotOperation;
 import org.apache.maven.mercury.repository.metadata.Snapshot;
 import org.apache.maven.mercury.repository.metadata.SnapshotOperand;
@@ -48,7 +48,6 @@ import org.codehaus.plexus.util.StringUtils;
  * a maven metadata helper containing all the logic for creating maven-metadata.xml
  * 
  * @author Juven Xu
- *
  */
 abstract public class AbstractMetadataHelper
 {
@@ -64,7 +63,7 @@ abstract public class AbstractMetadataHelper
 
     private String currentVersion;
 
-    private Map<String, PluginInfoForMetadata> currentPlugins = new HashMap<String, PluginInfoForMetadata>();
+    private Map<String, Plugin> currentPlugins = new HashMap<String, Plugin>();
 
     private List<String> currentVersions = new ArrayList<String>();
 
@@ -76,8 +75,7 @@ abstract public class AbstractMetadataHelper
     }
 
     public void onDirExit( String path )
-        throws MetadataException,
-            IOException
+        throws Exception
     {
 
         if ( shouldCreateMetadataForSnapshotVersionDir( path ) )
@@ -241,16 +239,16 @@ abstract public class AbstractMetadataHelper
 
         if ( model != null && model.getPackaging().equals( "maven-plugin" ) )
         {
+            Plugin plugin = new Plugin();
+            plugin.setArtifactId( model.getArtifactId() );
+            plugin.setPrefix( getPlginPrefix( model.getArtifactId() ) );
 
             if ( !StringUtils.isEmpty( model.getName() ) )
             {
-                currentPlugins.put( model.getArtifactId(), new PluginInfoForMetadata( model.getArtifactId(), model
-                    .getName() ) );
+                plugin.setName( model.getName() );
             }
-            else
-            {
-                currentPlugins.put( model.getArtifactId(), new PluginInfoForMetadata( model.getArtifactId() ) );
-            }
+
+            currentPlugins.put( model.getArtifactId(), plugin );
         }
     }
 
@@ -282,95 +280,41 @@ abstract public class AbstractMetadataHelper
         return false;
     }
 
-    private class PluginInfoForMetadata
+    private String getPlginPrefix( String artifactId )
     {
-        private String name;
-
-        private String artifactId;
-
-        public PluginInfoForMetadata( String artifactId )
+        if ( "maven-plugin-plugin".equals( artifactId ) )
         {
-            this.artifactId = artifactId;
+            return "plugin";
         }
-
-        public PluginInfoForMetadata( String artifactId, String name )
+        else
         {
-            this.artifactId = artifactId;
-
-            this.name = name;
+            return artifactId.replaceAll( "-?maven-?", "" ).replaceAll( "-?plugin-?", "" );
         }
-
-        public String getName()
-        {
-            return name;
-        }
-
-        public String getArtifactId()
-        {
-            return artifactId;
-        }
-
-        public String getPrefix()
-        {
-            if ( "maven-plugin-plugin".equals( artifactId ) )
-            {
-                return "plugin";
-            }
-            else
-            {
-                return artifactId.replaceAll( "-?maven-?", "" ).replaceAll( "-?plugin-?", "" );
-            }
-        }
-
-        public String toXml()
-        {
-            StringBuffer xml = new StringBuffer();
-
-            xml.append( "    <plugin>" + "\n" );
-
-            xml.append( "      <prefix>" + getPrefix() + "</prefix>" + "\n" );
-
-            if ( !StringUtils.isEmpty( getName() ) )
-            {
-                xml.append( "      <name>" + getName() + "</name>" + "\n" );
-            }
-
-            xml.append( "      <artifactId>" + getArtifactId() + "</artifactId>" + "\n" );
-
-            xml.append( "    </plugin>\n" );
-
-            return xml.toString();
-        }
-
     }
 
     public void createMetadataForPluginGroupDir( String path )
+        throws Exception
     {
-        StringBuffer md = new StringBuffer();
+        Metadata md = new Metadata();
 
-        md.append( "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" );
-
-        md.append( "<metadata>\n" );
-
-        md.append( "  <groupId>" + currentGroupId + "</groupId>\n" );
-
-        md.append( "  <plugins>\n" );
-
-        for ( PluginInfoForMetadata plugin : currentPlugins.values() )
+        for ( Plugin plugin : currentPlugins.values() )
         {
-            md.append( plugin.toXml() );
+            md.addPlugin( plugin );
         }
 
-        md.append( "  </plugins>\n" );
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
-        md.append( "</metadata>\n" );
+        MetadataBuilder.write( md, outputStream );
 
-        store( md.toString(), path );
+        String mdString = outputStream.toString();
+
+        outputStream.close();
+
+        store( mdString, path );
     }
 
     public void createMetadataForArtifactDir( String path )
-        throws MetadataException,
-            IOException
+        throws Exception
     {
         Metadata md = new Metadata();
 
@@ -445,8 +389,7 @@ abstract public class AbstractMetadataHelper
     }
 
     public void createMetadataForSnapshotVersionDir( String path )
-        throws MetadataException,
-            IOException
+        throws Exception
     {
         Metadata md = new Metadata();
 
@@ -487,9 +430,9 @@ abstract public class AbstractMetadataHelper
         for ( String artifact : currentArtifacts )
         {
             String artifactName = getName( artifact );
-            
-            //skip files like groupId-artifactId-versionSNAPSHOT.pom
-            if (artifactName.endsWith( "SNAPSHOT.pom" ))
+
+            // skip files like groupId-artifactId-versionSNAPSHOT.pom
+            if ( artifactName.endsWith( "SNAPSHOT.pom" ) )
             {
                 continue;
             }
@@ -515,9 +458,9 @@ abstract public class AbstractMetadataHelper
                 }
             }
 
-            catch ( Exception  e )
+            catch ( Exception e )
             {
-                //skip any exception because of illegal version numbers
+                // skip any exception because of illegal version numbers
             }
 
         }
@@ -532,12 +475,15 @@ abstract public class AbstractMetadataHelper
      * @param metadata
      * @param path
      */
-    abstract public void store( String metadata, String path );
+    abstract public void store( String metadata, String path )
+        throws Exception;
 
     /**
      * Retrieve the content according to the path
+     * 
      * @param path
      * @return
      */
-    abstract public InputStream retrieveContent( String path );
+    abstract public InputStream retrieveContent( String path )
+        throws Exception;
 }

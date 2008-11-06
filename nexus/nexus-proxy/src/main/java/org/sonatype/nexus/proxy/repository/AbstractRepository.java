@@ -50,11 +50,9 @@ import org.sonatype.nexus.proxy.events.RepositoryEventEvictUnusedItems;
 import org.sonatype.nexus.proxy.events.RepositoryEventLocalStatusChanged;
 import org.sonatype.nexus.proxy.events.RepositoryEventProxyModeChanged;
 import org.sonatype.nexus.proxy.events.RepositoryEventRecreateAttributes;
-import org.sonatype.nexus.proxy.events.RepositoryEventRecreateMavenMetadata;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventDelete;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventRetrieve;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventStore;
-import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.DefaultStorageCollectionItem;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.PreparedContentLocator;
@@ -63,7 +61,6 @@ import org.sonatype.nexus.proxy.item.RepositoryItemUidFactory;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
-import org.sonatype.nexus.proxy.maven.RecreateMavenMetadataWalker;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.proxy.storage.local.LocalRepositoryStorage;
 import org.sonatype.nexus.proxy.storage.remote.RemoteRepositoryStorage;
@@ -71,6 +68,7 @@ import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 import org.sonatype.nexus.proxy.target.TargetRegistry;
 import org.sonatype.nexus.proxy.target.TargetSet;
 import org.sonatype.nexus.proxy.utils.StoreFileWalker;
+import org.sonatype.nexus.proxy.walker.Walker;
 
 /**
  * <p>
@@ -124,6 +122,12 @@ public abstract class AbstractRepository
      */
     @Requirement
     private AccessManager accessManager;
+
+    /**
+     * The Walker service.
+     */
+    @Requirement
+    private Walker walker;
 
     /** The id. */
     private String id;
@@ -564,6 +568,11 @@ public abstract class AbstractRepository
         }
     }
 
+    protected Walker getWalker()
+    {
+        return walker;
+    }
+
     // ===================================================================================
     // Repository iface
 
@@ -653,19 +662,6 @@ public abstract class AbstractRepository
         walker.walk( path, true, false );
 
         notifyProximityEventListeners( new RepositoryEventRecreateAttributes( this ) );
-
-        return true;
-    }
-
-    public boolean recreateMavenMetadata( String path )
-    {
-        getLogger().info( "Recreating Maven medadata on repository " + getId() );
-
-        RecreateMavenMetadataWalker walker = new RecreateMavenMetadataWalker( this, getLogger() );
-
-        walker.walk( path, true, false );
-
-        notifyProximityEventListeners( new RepositoryEventRecreateMavenMetadata( this ) );
 
         return true;
     }

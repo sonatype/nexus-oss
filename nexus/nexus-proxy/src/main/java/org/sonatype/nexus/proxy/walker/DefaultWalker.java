@@ -277,11 +277,14 @@ public class DefaultWalker
         {
             for ( WalkerProcessor processor : context.getProcessors() )
             {
-                processor.beforeWalk( context );
-
-                if ( context.isStopped() )
+                if ( processor.isActive() )
                 {
-                    break;
+                    processor.beforeWalk( context );
+
+                    if ( context.isStopped() )
+                    {
+                        break;
+                    }
                 }
             }
         }
@@ -297,11 +300,14 @@ public class DefaultWalker
         {
             for ( WalkerProcessor processor : context.getProcessors() )
             {
-                processor.onCollectionEnter( context, coll );
-
-                if ( context.isStopped() )
+                if ( processor.isActive() )
                 {
-                    break;
+                    processor.onCollectionEnter( context, coll );
+
+                    if ( context.isStopped() )
+                    {
+                        break;
+                    }
                 }
             }
         }
@@ -317,11 +323,14 @@ public class DefaultWalker
         {
             for ( WalkerProcessor processor : context.getProcessors() )
             {
-                processor.processItem( context, item );
-
-                if ( context.isStopped() )
+                if ( processor.isActive() )
                 {
-                    break;
+                    processor.processItem( context, item );
+
+                    if ( context.isStopped() )
+                    {
+                        break;
+                    }
                 }
             }
         }
@@ -337,11 +346,14 @@ public class DefaultWalker
         {
             for ( WalkerProcessor processor : context.getProcessors() )
             {
-                processor.onCollectionExit( context, coll );
-
-                if ( context.isStopped() )
+                if ( processor.isActive() )
                 {
-                    break;
+                    processor.onCollectionExit( context, coll );
+
+                    if ( context.isStopped() )
+                    {
+                        break;
+                    }
                 }
             }
         }
@@ -357,11 +369,14 @@ public class DefaultWalker
         {
             for ( WalkerProcessor processor : context.getProcessors() )
             {
-                processor.afterWalk( context );
-
-                if ( context.isStopped() )
+                if ( processor.isActive() )
                 {
-                    break;
+                    processor.afterWalk( context );
+
+                    if ( context.isStopped() )
+                    {
+                        break;
+                    }
                 }
             }
         }

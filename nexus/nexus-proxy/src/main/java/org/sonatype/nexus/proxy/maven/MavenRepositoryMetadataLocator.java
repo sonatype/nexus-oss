@@ -58,6 +58,37 @@ public class MavenRepositoryMetadataLocator
         return getMavenRepository().getArtifactPackagingMapper();
     }
 
+    public Gav getGavForRequest( ArtifactStoreRequest request )
+    {
+        Gav gav = null;
+
+        if ( ArtifactStoreRequest.DUMMY_PATH.equals( request.getRequestPath() ) )
+        {
+            // we have no path info
+            gav = new Gav(
+                request.getGroupId(),
+                request.getArtifactId(),
+                request.getVersion(),
+                request.getClassifier(),
+                getArtifactPackagingMapper().getExtensionForPackaging( request.getPackaging() ),
+                null,
+                null,
+                null,
+                VersionUtils.isSnapshot( request.getVersion() ),
+                false,
+                null,
+                false,
+                null );
+        }
+        else
+        {
+            // we have path info, the best way is to calc GAV
+            gav = getGavCalculator().pathToGav( request.getRequestPath() );
+        }
+
+        return gav;
+    }
+
     public Plugin extractPluginElementFromPom( ArtifactStoreRequest request )
         throws IOException
     {
@@ -118,7 +149,7 @@ public class MavenRepositoryMetadataLocator
     {
         try
         {
-            Gav gav = getGavFromArtifactStoreRequest( request );
+            Gav gav = getGavForRequest( request );
 
             return readOrCreateGAVMetadata( getMavenRepository(), gav, request.getRequestContext() );
         }
@@ -133,7 +164,7 @@ public class MavenRepositoryMetadataLocator
     {
         try
         {
-            Gav gav = getGavFromArtifactStoreRequest( request );
+            Gav gav = getGavForRequest( request );
 
             return readOrCreateGAMetadata( getMavenRepository(), gav, request.getRequestContext() );
         }
@@ -148,7 +179,7 @@ public class MavenRepositoryMetadataLocator
     {
         try
         {
-            Gav gav = getGavFromArtifactStoreRequest( request );
+            Gav gav = getGavForRequest( request );
 
             return readOrCreateGMetadata( getMavenRepository(), gav, request.getRequestContext() );
         }
@@ -163,7 +194,7 @@ public class MavenRepositoryMetadataLocator
     {
         try
         {
-            Gav gav = getGavFromArtifactStoreRequest( request );
+            Gav gav = getGavForRequest( request );
 
             writeGAVMetadata( getMavenRepository(), gav, metadata, request.getRequestContext() );
         }
@@ -178,7 +209,7 @@ public class MavenRepositoryMetadataLocator
     {
         try
         {
-            Gav gav = getGavFromArtifactStoreRequest( request );
+            Gav gav = getGavForRequest( request );
 
             writeGAMetadata( getMavenRepository(), gav, metadata, request.getRequestContext() );
         }
@@ -193,7 +224,7 @@ public class MavenRepositoryMetadataLocator
     {
         try
         {
-            Gav gav = getGavFromArtifactStoreRequest( request );
+            Gav gav = getGavForRequest( request );
 
             writeGMetadata( getMavenRepository(), gav, metadata, request.getRequestContext() );
         }
@@ -414,26 +445,6 @@ public class MavenRepositoryMetadataLocator
         RepositoryItemUid uid = repository.createUid( mdPath );
 
         writeMetadata( uid, ctx, md );
-    }
-
-    private Gav getGavFromArtifactStoreRequest( ArtifactStoreRequest request )
-    {
-        Gav gav = new Gav(
-            request.getGroupId(),
-            request.getArtifactId(),
-            request.getVersion(),
-            request.getClassifier(),
-            getArtifactPackagingMapper().getExtensionForPackaging( request.getPackaging() ),
-            null,
-            null,
-            null,
-            VersionUtils.isSnapshot( request.getVersion() ),
-            false,
-            null,
-            false,
-            null );
-
-        return gav;
     }
 
 }

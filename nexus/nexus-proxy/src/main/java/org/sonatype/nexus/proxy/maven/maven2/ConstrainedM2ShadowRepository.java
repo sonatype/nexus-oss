@@ -173,6 +173,11 @@ public class ConstrainedM2ShadowRepository
         return artifactStoreHelper;
     }
 
+    public boolean recreateMavenMetadata( String path )
+    {
+        return false;
+    }
+
     @Override
     protected String transformMaster2Shadow( String path )
     {

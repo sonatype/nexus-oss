@@ -23,7 +23,6 @@ package org.sonatype.nexus.proxy.maven;
 
 import java.io.InputStream;
 
-import org.codehaus.plexus.logging.Logger;
 import org.sonatype.nexus.proxy.item.ContentLocator;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
@@ -38,63 +37,41 @@ import org.sonatype.nexus.proxy.repository.Repository;
 public class DefaultMetadataHelper
     extends AbstractMetadataHelper
 {
-
     private Repository repository;
 
-    private Logger logger;
-
-    public DefaultMetadataHelper( Repository repository, Logger logger )
+    public DefaultMetadataHelper( Repository repository )
     {
         this.repository = repository;
-
-        this.logger = logger;
     }
 
     @Override
     public void store( String metadata, String path )
+        throws Exception
     {
-        try
-        {
-            // UIDs are like URIs! The separator is _always_ "/"!!!
-            RepositoryItemUid mdUid = repository.createUid( path + "/maven-metadata.xml" );
+        // UIDs are like URIs! The separator is _always_ "/"!!!
+        RepositoryItemUid mdUid = repository.createUid( path + "/maven-metadata.xml" );
 
-            ContentLocator contentLocator = new StringContentLocator( metadata );
-            
-            DefaultStorageFileItem mdFile = new DefaultStorageFileItem(
-                repository,
-                mdUid.getPath(),
-                true,
-                true,
-                contentLocator );
+        ContentLocator contentLocator = new StringContentLocator( metadata );
 
-            repository.storeItem( mdFile );
+        DefaultStorageFileItem mdFile = new DefaultStorageFileItem(
+            repository,
+            mdUid.getPath(),
+            true,
+            true,
+            contentLocator );
 
-            repository.removeFromNotFoundCache( mdUid.getPath() );
-        }
+        repository.storeItem( mdFile );
 
-        catch ( Exception e )
-        {
-            logger.info( "Can't store metadata into Repository: " + repository.getId(), e );
-        }
-
+        repository.removeFromNotFoundCache( mdUid.getPath() );
     }
 
     @Override
     public InputStream retrieveContent( String path )
+        throws Exception
     {
-        try
-        {
-            RepositoryItemUid uid = repository.createUid( path );
+        RepositoryItemUid uid = repository.createUid( path );
 
-            return repository.retrieveItemContent( uid );
-        }
-        catch ( Exception e )
-        {
-            logger.info( "Can't retrive content of: " + path, e );
-        }
-
-        return null;
-
+        return repository.retrieveItemContent( uid );
     }
 
 }

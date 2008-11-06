@@ -5,6 +5,7 @@ import java.io.IOException;
 import org.apache.maven.mercury.repository.metadata.Metadata;
 import org.apache.maven.mercury.repository.metadata.Plugin;
 import org.apache.maven.model.Model;
+import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.artifact.GavCalculator;
 
 /**
@@ -29,7 +30,16 @@ public interface MetadataLocator
     ArtifactPackagingMapper getArtifactPackagingMapper();
 
     /**
-     * Constructs a Plugin elem for given request.
+     * Calculates the GAV for the request.
+     * 
+     * @param request
+     * @return
+     */
+    Gav getGavForRequest( ArtifactStoreRequest request );
+
+    /**
+     * Constructs a Plugin elem for given request. It returns null if the artifacts's POM pointed out by request is not
+     * "maven-plugin".
      * 
      * @param request
      * @return

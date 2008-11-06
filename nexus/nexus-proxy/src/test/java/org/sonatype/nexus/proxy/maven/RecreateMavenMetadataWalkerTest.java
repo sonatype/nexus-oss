@@ -31,6 +31,8 @@ import org.sonatype.nexus.proxy.M2TestsuiteEnvironmentBuilder;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.utils.StoreWalker;
+import org.sonatype.nexus.proxy.walker.DefaultWalkerContext;
+import org.sonatype.nexus.proxy.walker.Walker;
 
 /**
  * @author Juven Xu
@@ -46,6 +48,8 @@ public class RecreateMavenMetadataWalkerTest
     private Repository inhouseSnapshot;
 
     private File repoBase = new File( "./target/test-classes/mavenMetadataTestRepo" );
+
+    private Walker walker;
 
     private String[] releaseArtifactFiles = {
         "/junit/junit/3.8.1/junit-3.8.1.jar",
@@ -135,14 +139,20 @@ public class RecreateMavenMetadataWalkerTest
 
             fis.close();
         }
+
+        walker = (Walker) lookup( Walker.class );
     }
 
     public void testRecreateMavenMetadataWalkerWalkerRelease()
         throws Exception
     {
-        StoreWalker storeWalker = new RecreateMavenMetadataWalker( inhouse, getLogger() );
+        RecreateMavenMetadataWalkerProcessor wp = new RecreateMavenMetadataWalkerProcessor();
 
-        storeWalker.walk();
+        DefaultWalkerContext ctx = new DefaultWalkerContext( inhouse );
+
+        ctx.getProcessors().add( wp );
+
+        walker.walk( ctx );
 
         assertNotNull( inhouse.retrieveItem( new ResourceStoreRequest( "/junit/junit/maven-metadata.xml", false ) ) );
 
@@ -151,9 +161,13 @@ public class RecreateMavenMetadataWalkerTest
     public void testRecreateMavenMetadataWalkerWalkerSnapshot()
         throws Exception
     {
-        StoreWalker storeWalker = new RecreateMavenMetadataWalker( inhouseSnapshot, getLogger() );
+        RecreateMavenMetadataWalkerProcessor wp = new RecreateMavenMetadataWalkerProcessor();
 
-        storeWalker.walk();
+        DefaultWalkerContext ctx = new DefaultWalkerContext( inhouseSnapshot );
+
+        ctx.getProcessors().add( wp );
+
+        walker.walk( ctx );
 
         assertNotNull( inhouseSnapshot.retrieveItem( new ResourceStoreRequest(
             "/org/sonatype/nexus/nexus-api/maven-metadata.xml",
@@ -167,9 +181,13 @@ public class RecreateMavenMetadataWalkerTest
     public void testRecreateMavenMetadataWalkerWalkerPlugin()
         throws Exception
     {
-        StoreWalker storeWalker = new RecreateMavenMetadataWalker( inhouse, getLogger() );
+        RecreateMavenMetadataWalkerProcessor wp = new RecreateMavenMetadataWalkerProcessor();
 
-        storeWalker.walk();
+        DefaultWalkerContext ctx = new DefaultWalkerContext( inhouse );
+
+        ctx.getProcessors().add( wp );
+
+        walker.walk( ctx );
 
         assertNotNull( inhouse.retrieveItem( new ResourceStoreRequest(
             "/org/apache/maven/plugins/maven-metadata.xml",
