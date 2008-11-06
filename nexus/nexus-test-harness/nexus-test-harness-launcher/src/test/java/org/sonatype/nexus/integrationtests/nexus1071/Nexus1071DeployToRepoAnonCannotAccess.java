@@ -23,6 +23,8 @@ package org.sonatype.nexus.integrationtests.nexus1071;
 
 import java.io.File;
 
+import junit.framework.Assert;
+
 import org.apache.maven.it.VerificationException;
 import org.apache.maven.it.Verifier;
 import org.junit.Test;
@@ -38,65 +40,85 @@ public class Nexus1071DeployToRepoAnonCannotAccess
     }
 
     @Test
+    public void deployRepeatly()
+        throws Exception
+    {
+        File mavenProject1 = getTestFile( "maven-project-1" );
+
+        File settings1 = getTestFile( "settings1.xml" );
+
+        Verifier verifier1 = null;
+
+        try
+        {
+            verifier1 = createVerifier( mavenProject1, settings1 );
+
+            verifier1.executeGoal( "deploy" );
+
+            verifier1.verifyErrorFreeLog();
+        }
+
+        catch ( VerificationException e )
+        {
+            failTest( verifier1 );
+        }
+
+        try
+        {
+            verifier1.executeGoal( "deploy" );
+
+            verifier1.verifyErrorFreeLog();
+
+            Assert.fail( "Should return 401 error" );
+        }
+        catch ( VerificationException e )
+        {
+            // 401 error
+        }
+    }
+
+    @Test
     public void deploySnapshot()
         throws Exception
     {
-        File mavenProject = getTestFile("maven-project-snapshot");
-        
-        File settings = getTestFile("settings-snapshot.xml");
-        
+        File mavenProject = getTestFile( "maven-project-snapshot" );
+
+        File settings = getTestFile( "settings-snapshot.xml" );
+
         Verifier verifier = null;
-        
-        try{
-            verifier = createVerifier(mavenProject, settings);
-            
+
+        try
+        {
+            verifier = createVerifier( mavenProject, settings );
+
             verifier.executeGoal( "deploy" );
-            
+
             verifier.verifyErrorFreeLog();
         }
-        
+
         catch ( VerificationException e )
         {
             failTest( verifier );
         }
     }
-    
+
     @Test
-    public void deploy()
+    public void deployToAnotherRepo()
         throws Exception
     {
-        
-        File mavenProject1 = getTestFile( "maven-project-1" );
-        
+
         File mavenProject2 = getTestFile( "maven-project-2" );
-        
-        File settings1 = getTestFile( "settings1.xml" );
-        
-        File settings2 = getTestFile( "settings2.xml");
-        
-        Verifier verifier1 = null;
-        
+
+        File settings2 = getTestFile( "settings2.xml" );
+
         Verifier verifier2 = null;
-        
-        try
-        {
-            verifier1 = createVerifier( mavenProject1, settings1 );
-            
-            verifier1.executeGoal( "deploy" );
-         
-            verifier1.verifyErrorFreeLog();
-        }
-        catch ( VerificationException e )
-        {
-            failTest( verifier1 );
-        }
-        
+
         try
         {
             verifier2 = createVerifier( mavenProject2, settings2 );
-            
+
             verifier2.executeGoal( "deploy" );
-         
+
             verifier2.verifyErrorFreeLog();
         }
         catch ( VerificationException e )
@@ -104,4 +126,5 @@ public class Nexus1071DeployToRepoAnonCannotAccess
             failTest( verifier2 );
         }
     }
+
 }

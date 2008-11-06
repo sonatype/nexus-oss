@@ -13,20 +13,20 @@
   </servers>
 
 
-<localRepository>${project.build.directory}/maven_repo</localRepository>
+  <localRepository>${project.build.directory}/maven_repo</localRepository>
 
-<mirrors>
+  <mirrors>
     <mirror>
       <!--This is used to direct the public snapshots repo in the profile below over to a different nexus group -->
       <id>nexus-public-snapshots</id>
       <mirrorOf>public-snapshots</mirrorOf>
-      <url>${nexus-base-url}content/groups/nexus-test-harness-snapshot-group</url>
+      <url>${nexus-base-url}content/groups/public-snapshots</url>
     </mirror>
     <mirror>
       <!--This sends everything else to /public -->
       <id>nexus</id>
       <mirrorOf>*</mirrorOf>
-      <url>${nexus-base-url}content/groups/nexus-public</url>
+      <url>${nexus-base-url}content/groups/public</url>
     </mirror>
   </mirrors>
   <profiles>
@@ -38,16 +38,24 @@
         <repository>
           <id>central</id>
           <url>http://central</url>
-          <releases><enabled>true</enabled></releases>
-          <snapshots><enabled>true</enabled></snapshots>
+          <releases>
+            <enabled>true</enabled>
+          </releases>
+          <snapshots>
+            <enabled>true</enabled>
+          </snapshots>
         </repository>
       </repositories>
-     <pluginRepositories>
+      <pluginRepositories>
         <pluginRepository>
           <id>central</id>
           <url>http://central</url>
-          <releases><enabled>true</enabled></releases>
-          <snapshots><enabled>true</enabled></snapshots>
+          <releases>
+            <enabled>true</enabled>
+          </releases>
+          <snapshots>
+            <enabled>true</enabled>
+          </snapshots>
         </pluginRepository>
       </pluginRepositories>
     </profile>
@@ -58,16 +66,24 @@
         <repository>
           <id>public-snapshots</id>
           <url>http://public-snapshots</url>
-          <releases><enabled>false</enabled></releases>
-          <snapshots><enabled>true</enabled></snapshots>
+          <releases>
+            <enabled>false</enabled>
+          </releases>
+          <snapshots>
+            <enabled>true</enabled>
+          </snapshots>
         </repository>
       </repositories>
-     <pluginRepositories>
+      <pluginRepositories>
         <pluginRepository>
           <id>public-snapshots</id>
           <url>http://public-snapshots</url>
-          <releases><enabled>false</enabled></releases>
-          <snapshots><enabled>true</enabled></snapshots>
+          <releases>
+            <enabled>false</enabled>
+          </releases>
+          <snapshots>
+            <enabled>true</enabled>
+          </snapshots>
         </pluginRepository>
       </pluginRepositories>
     </profile>

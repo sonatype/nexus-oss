@@ -72,8 +72,8 @@
     </pathMappings>
     <repositoryGroups>
       <repositoryGroup>
-        <groupId>nexus-public</groupId>
-        <name>nexus-public</name>
+        <groupId>public</groupId>
+        <name>public</name>
         <repositories>
           <repository>fake-central</repository>
           <repository>nexus-test-harness-repo</repository>
@@ -81,8 +81,8 @@
         </repositories>
       </repositoryGroup>
       <repositoryGroup>
-        <groupId>nexus-test-harness-snapshot-group</groupId>
-        <name>nexus-test-harness-snapshot-group</name>
+        <groupId>public-snapshots</groupId>
+        <name>public-snapshots</name>
         <repositories>
           <repository>nexus-test-harness-snapshot-repo</repository>
         </repositories>
