@@ -31,6 +31,7 @@ import org.junit.BeforeClass;
 import org.restlet.data.Method;
 import org.restlet.data.Reference;
 import org.restlet.data.Response;
+import org.restlet.data.Status;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 import org.sonatype.appbooter.ForkedAppBooter;
 import org.sonatype.appbooter.ctl.AppBooterServiceException;
@@ -592,8 +593,9 @@ public class AbstractNexusIntegrationTest
             "service/local/artifact/maven/redirect?r=" + repository + "&g=" + gav.getGroupId() + "&a="
                 + gav.getArtifactId() + "&v=" + gav.getVersion();
         Response response = RequestFacade.doGetRequest( serviceURI );
-        Assert.assertEquals( "Snapshot download should redirect to a new file "
-            + response.getRequest().getResourceRef().toString(), 301, response.getStatus().getCode() );
+        Status status = response.getStatus();
+		Assert.assertEquals( "Snapshot download should redirect to a new file\n "
+            + response.getRequest().getResourceRef().toString() + " \n Error: " +status.getDescription(), 301, status.getCode() );
 
         Reference redirectRef = response.getRedirectRef();
         Assert.assertNotNull( "Snapshot download should redirect to a new file "
