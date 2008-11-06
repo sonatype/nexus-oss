@@ -511,4 +511,16 @@ public class DummyRepository implements Repository
         
     }
 
+    public boolean isExposed()
+    {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    public void setExposed( boolean val )
+    {
+        // TODO Auto-generated method stub
+        
+    }
+
 }

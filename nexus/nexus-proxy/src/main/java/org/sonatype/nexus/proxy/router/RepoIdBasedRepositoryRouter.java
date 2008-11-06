@@ -60,23 +60,27 @@ public abstract class RepoIdBasedRepositoryRouter
                 // we have a targeted request at repos
                 Repository repository = getRepositoryRegistry().getRepository( request.getRequestRepositoryId() );
 
-                if ( repository.getLocalStatus().shouldServiceRequest() )
+                if ( repository.isExposed() )
                 {
-                    if ( getLogger().isDebugEnabled() )
+                    if ( repository.getLocalStatus().shouldServiceRequest() )
                     {
-                        getLogger().debug(
-                            "Adding repository " + repository.getId() + " to virtual path " + request.getRequestPath() );
+                        if ( getLogger().isDebugEnabled() )
+                        {
+                            getLogger().debug(
+                                "Adding repository " + repository.getId() + " to virtual path "
+                                    + request.getRequestPath() );
+                        }
+
+                        DefaultStorageCollectionItem coll = new DefaultStorageCollectionItem(
+                            this,
+                            RepositoryItemUid.PATH_ROOT + repository.getId(),
+                            true,
+                            false );
+
+                        coll.setRepositoryId( repository.getId() );
+
+                        result.add( coll );
                     }
-
-                    DefaultStorageCollectionItem coll = new DefaultStorageCollectionItem(
-                        this,
-                        RepositoryItemUid.PATH_ROOT + repository.getId(),
-                        true,
-                        false );
-
-                    coll.setRepositoryId( repository.getId() );
-
-                    result.add( coll );
                 }
             }
             else if ( request.getRequestRepositoryGroupId() != null )
@@ -86,23 +90,26 @@ public abstract class RepoIdBasedRepositoryRouter
                 for ( Repository repository : getRepositoryRegistry().getRepositoryGroup(
                     request.getRequestRepositoryGroupId() ) )
                 {
-                    if ( repository.getLocalStatus().shouldServiceRequest() )
+                    if ( repository.isExposed() )
                     {
-                        if ( getLogger().isDebugEnabled() )
+                        if ( repository.getLocalStatus().shouldServiceRequest() )
                         {
-                            getLogger().debug(
-                                "Adding repository " + repository.getId() + " to virtual path "
-                                    + request.getRequestPath() );
+                            if ( getLogger().isDebugEnabled() )
+                            {
+                                getLogger().debug(
+                                    "Adding repository " + repository.getId() + " to virtual path "
+                                        + request.getRequestPath() );
+                            }
+                            DefaultStorageCollectionItem coll = new DefaultStorageCollectionItem(
+                                this,
+                                RepositoryItemUid.PATH_ROOT + repository.getId(),
+                                true,
+                                false );
+
+                            coll.setRepositoryId( repository.getId() );
+
+                            result.add( coll );
                         }
-                        DefaultStorageCollectionItem coll = new DefaultStorageCollectionItem(
-                            this,
-                            RepositoryItemUid.PATH_ROOT + repository.getId(),
-                            true,
-                            false );
-
-                        coll.setRepositoryId( repository.getId() );
-
-                        result.add( coll );
                     }
                 }
             }
@@ -111,23 +118,26 @@ public abstract class RepoIdBasedRepositoryRouter
                 // list all reposes as "root"
                 for ( Repository repository : getRepositoryRegistry().getRepositories() )
                 {
-                    if ( repository.getLocalStatus().shouldServiceRequest() )
+                    if ( repository.isExposed() )
                     {
-                        if ( getLogger().isDebugEnabled() )
+                        if ( repository.getLocalStatus().shouldServiceRequest() )
                         {
-                            getLogger().debug(
-                                "Adding repository " + repository.getId() + " to virtual path "
-                                    + request.getRequestPath() );
+                            if ( getLogger().isDebugEnabled() )
+                            {
+                                getLogger().debug(
+                                    "Adding repository " + repository.getId() + " to virtual path "
+                                        + request.getRequestPath() );
+                            }
+                            DefaultStorageCollectionItem coll = new DefaultStorageCollectionItem(
+                                this,
+                                RepositoryItemUid.PATH_ROOT + repository.getId(),
+                                true,
+                                false );
+
+                            coll.setRepositoryId( repository.getId() );
+
+                            result.add( coll );
                         }
-                        DefaultStorageCollectionItem coll = new DefaultStorageCollectionItem(
-                            this,
-                            RepositoryItemUid.PATH_ROOT + repository.getId(),
-                            true,
-                            false );
-
-                        coll.setRepositoryId( repository.getId() );
-
-                        result.add( coll );
                     }
                 }
             }

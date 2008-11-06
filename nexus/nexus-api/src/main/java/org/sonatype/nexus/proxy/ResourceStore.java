@@ -59,6 +59,20 @@ public interface ResourceStore
     void setUserManaged( boolean val );
 
     /**
+     * Tells whether the resource store is exposed as Nexus content or not.
+     * 
+     * @return
+     */
+    boolean isExposed();
+
+    /**
+     * Sets the exposed flag.
+     * 
+     * @param val
+     */
+    void setExposed( boolean val );
+
+    /**
      * Retrieves item from the path of the request.
      * 
      * @param request the request

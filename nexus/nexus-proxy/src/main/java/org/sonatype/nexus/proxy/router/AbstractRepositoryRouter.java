@@ -120,6 +120,16 @@ public abstract class AbstractRepositoryRouter
         throw new UnsupportedOperationException( "Setting UserManaged flag on Routers is not supported!" );
     }
 
+    public final boolean isExposed()
+    {
+        return true;
+    }
+
+    public final void setExposed( boolean val )
+    {
+        throw new UnsupportedOperationException( "Setting Exposed flag on Routers is not supported!" );
+    }
+
     public boolean isFollowLinks()
     {
         return followLinks;

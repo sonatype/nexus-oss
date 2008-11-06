@@ -161,6 +161,9 @@ public abstract class AbstractRepository
 
     /** User managed */
     private boolean userManaged = true;
+    
+    /** Exposed */
+    private boolean exposed = true;
 
     /** The local storage. */
     private LocalRepositoryStorage localStorage;
@@ -429,6 +432,16 @@ public abstract class AbstractRepository
     public void setUserManaged( boolean userManaged )
     {
         this.userManaged = userManaged;
+    }
+
+    public boolean isExposed()
+    {
+        return exposed;
+    }
+
+    public void setExposed( boolean exposed )
+    {
+        this.exposed = exposed;
     }
 
     public int getNotFoundCacheTimeToLive()
