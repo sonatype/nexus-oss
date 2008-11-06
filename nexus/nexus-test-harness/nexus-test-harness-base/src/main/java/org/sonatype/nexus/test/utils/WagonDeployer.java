@@ -67,6 +67,7 @@ public class WagonDeployer
         // so the RequestFacade will still work
         if ( StringUtils.isNotBlank( username ) )
         {
+        	//FIXME
             TestContainer.getInstance().getTestContext().setSecureTest( true );
             TestContainer.getInstance().getTestContext().setUsername( this.username );
             TestContainer.getInstance().getTestContext().setPassword( this.password );
