@@ -437,6 +437,7 @@ public abstract class AbstractMavenRepository
     // =================================================================================
     // DefaultRepository customizations
 
+    @Override
     protected StorageItem doRetrieveItem( boolean localOnly, RepositoryItemUid uid, Map<String, Object> context )
         throws RepositoryNotAvailableException,
             ItemNotFoundException,
@@ -670,6 +671,7 @@ public abstract class AbstractMavenRepository
 
     }
 
+    @Override
     protected void markItemRemotelyChecked( RepositoryItemUid uid )
         throws StorageException,
             ItemNotFoundException
@@ -691,6 +693,7 @@ public abstract class AbstractMavenRepository
         }
     }
 
+    @Override
     public InputStream retrieveItemContent( RepositoryItemUid uid )
         throws IllegalArgumentException,
             RepositoryNotAvailableException,
@@ -712,7 +715,8 @@ public abstract class AbstractMavenRepository
         }
     }
 
-    public void storeItem( AbstractStorageItem item )
+    @Override
+    public void storeItem( StorageItem item )
         throws UnsupportedStorageOperationException,
             RepositoryNotAvailableException,
             StorageException
