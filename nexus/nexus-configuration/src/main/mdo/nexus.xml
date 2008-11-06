@@ -749,6 +749,16 @@
 					<defaultValue>true</defaultValue>
 				</field>
 				<field>
+					<name>exposed</name>
+					<version>1.0.7+</version>
+					<type>boolean</type>
+					<required>true</required>
+					<description>
+						If true, repository is exposed at content.
+					</description>
+					<defaultValue>true</defaultValue>
+				</field>
+				<field>
 					<name>browseable</name>
 					<version>1.0.0+</version>
 					<type>boolean</type>
@@ -1159,6 +1169,16 @@
 					<required>true</required>
 					<description>
 						If true, repository is user managed, and it is allowed to be edited/dropped by users.
+					</description>
+					<defaultValue>true</defaultValue>
+				</field>
+				<field>
+					<name>exposed</name>
+					<version>1.0.7+</version>
+					<type>boolean</type>
+					<required>true</required>
+					<description>
+						If true, repository is exposed at content.
 					</description>
 					<defaultValue>true</defaultValue>
 				</field>
