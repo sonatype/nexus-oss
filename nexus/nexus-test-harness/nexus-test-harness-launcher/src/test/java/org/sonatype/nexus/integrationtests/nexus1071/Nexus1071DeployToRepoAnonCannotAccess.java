@@ -126,5 +126,31 @@ public class Nexus1071DeployToRepoAnonCannotAccess
             failTest( verifier2 );
         }
     }
+    
+    @Test
+    public void anonDeploy()
+        throws Exception
+    {
+        File mavenProjectAnon = getTestFile( "maven-project-anon" );
+
+        File settingsAnon = getTestFile( "settings-anon.xml" );
+
+        Verifier verifierAnon = null;
+
+        try
+        {
+            verifierAnon = createVerifier( mavenProjectAnon, settingsAnon );
+
+            verifierAnon.executeGoal( "deploy" );
+
+            verifierAnon.verifyErrorFreeLog();
+
+            Assert.fail( "Should return 401 error" );
+        }
+        catch ( VerificationException e )
+        {
+            // test pass
+        }
+    }
 
 }
