@@ -26,14 +26,11 @@ Sonatype.repoServer.UserEditPanel = function(config){
   var config = config || {};
   var defaultConfig = {};
   Ext.apply(this, config, defaultConfig);
-  
-  var ht = Sonatype.repoServer.resources.help.users;
 
   Sonatype.Events.addListener( 'userMenuInit', this.onUserMenuInit, this );
-  
-  //List of user statuses
-  this.statusStore = new Ext.data.SimpleStore({fields:['value','display'], data:[['active','Active'],['disabled','Disabled']]});
-    
+
+  this.editorMap = {};
+
   this.roleCombiner = function(val, parent) {
     var s = '';
     if ( val ) {
@@ -75,16 +72,6 @@ Sonatype.repoServer.UserEditPanel = function(config){
     }
   };
   
-  //Methods that will take the incoming json data and map over to the ui controls
-  this.loadDataModFunc = {
-    "roles" : this.loadTreeHelper.createDelegate(this)
-  };
-  
-  //Methods that will take the data from the ui controls and map over to json
-  this.submitDataModFunc = {
-    "roles" : this.saveTreeHelper.createDelegate(this)
-  };
-  
   //A record to hold the name and id of a repository
   this.userRecordConstructor = Ext.data.Record.create([
     {name:'resourceURI'},
@@ -94,15 +81,9 @@ Sonatype.repoServer.UserEditPanel = function(config){
     {name:'status'},
     {name:'roles'},
     {name:'readOnly'},
-    {name:'displayRoles', mapping:'roles', convert: this.roleCombiner.createDelegate(this)}
+    {name:'displayRoles', mapping:'roles', convert: this.roleCombiner.createDelegate(this)},
+    {name:'stRealm'}
   ]);
-  
-  //A record to hold the name and id of a role
-  this.roleRecordConstructor = Ext.data.Record.create([
-    {name:'id'},
-    {name:'name', sortType:Ext.data.SortTypes.asUCString}
-  ]);
-  
   
   //Reader and datastore that queries the server for the list of currently defined users
   this.usersReader = new Ext.data.JsonReader({root: 'data', id: 'resourceURI'}, this.userRecordConstructor );
@@ -113,6 +94,12 @@ Sonatype.repoServer.UserEditPanel = function(config){
     autoLoad: false
   });
   
+  //A record to hold the name and id of a role
+  this.roleRecordConstructor = Ext.data.Record.create([
+    {name:'id'},
+    {name:'name', sortType:Ext.data.SortTypes.asUCString}
+  ]);
+  
   this.roleReader = new Ext.data.JsonReader({root: 'data', id: 'id'}, this.roleRecordConstructor );  
   this.roleDataStore = new Ext.data.Store({
     url: Sonatype.config.repos.urls.roles,
@@ -122,129 +109,12 @@ Sonatype.repoServer.UserEditPanel = function(config){
     listeners: {
       'load': {
         fn: function() {
-          this.usersDataStore.reload(); 
+          Sonatype.Events.fireEvent( 'userListInit', this, this );
         },
         scope: this
       }
     }
   });
-  
-  this.COMBO_WIDTH = 300;
-  
-  //Build the form
-  this.formConfig = {
-    region: 'center',
-    width: '100%',
-    height: '100%',
-    autoScroll: true,
-    border: false,
-    frame: true,
-    collapsible: false,
-    collapsed: false,
-    labelWidth: 200,
-    layoutConfig: {
-      labelSeparator: ''
-    },
-        
-    items: [
-      {
-        xtype: 'textfield',
-        fieldLabel: 'User ID',
-        itemCls: 'required-field',
-        labelStyle: 'margin-left: 15px; width: 185px;',
-        helpText: ht.userId,
-        name: 'userId',
-        allowBlank: false,
-        width: this.COMBO_WIDTH
-      },
-      {
-        xtype: 'textfield',
-        fieldLabel: 'Name',
-        itemCls: 'required-field',
-        labelStyle: 'margin-left: 15px; width: 185px;',
-        helpText: ht.name,
-        name: 'name',
-        allowBlank: false,
-        width: this.COMBO_WIDTH
-      },
-      {
-        xtype: 'textfield',
-        fieldLabel: 'Email',
-        itemCls: 'required-field',
-        labelStyle: 'margin-left: 15px; width: 185px;',
-        helpText: ht.email,
-        name: 'email',
-        allowBlank: false,
-        width: this.COMBO_WIDTH
-      },
-      {
-        xtype: 'combo',
-        fieldLabel: 'Status',
-        labelStyle: 'margin-left: 15px; width: 185px;',
-        itemCls: 'required-field',
-        helpText: ht.status,
-        name: 'status',
-        store: this.statusStore,
-        displayField:'display',
-        valueField:'value',
-        editable: false,
-        forceSelection: true,
-        mode: 'local',
-        triggerAction: 'all',
-        emptyText:'Select...',
-        selectOnFocus:true,
-        allowBlank: false,
-        width: this.COMBO_WIDTH
-      },
-      {
-        xtype: 'textfield',
-        fieldLabel: 'New Password (optional)',
-        inputType: 'password',
-        labelStyle: 'margin-left: 15px; width: 185px;',
-        helpText: ht.password,
-        name: 'password',
-        allowBlank: true,
-        width: this.COMBO_WIDTH
-      },
-      {
-        xtype: 'textfield',
-        fieldLabel: 'Confirm Password',
-        inputType: 'password',
-        labelStyle: 'margin-left: 15px; width: 185px;',
-        helpText: ht.reenterPassword,
-        name: 'confirmPassword',
-        allowBlank: true,
-        width: this.COMBO_WIDTH,
-        validator: function( s ) {
-          var firstField = this.ownerCt.find( 'name', 'password' )[0];
-          if ( firstField && firstField.getRawValue() != s ) {
-            return "Passwords don't match";
-          }
-          return true;
-        }
-      },
-      {
-        xtype: 'twinpanelchooser',
-        titleLeft: 'Selected Roles',
-        titleRight: 'Available Roles',
-        name: 'roles',
-        valueField: 'id',
-        store: this.roleDataStore,
-        required: true
-      }
-      ],
-    buttons: [
-      {
-        id: 'savebutton',
-        text: 'Save',
-        disabled: true
-      },
-      {
-        id: 'cancelbutton',
-        text: 'Cancel'
-      }
-    ]
-  };
   
   this.sp = Sonatype.lib.Permissions;
 
@@ -296,8 +166,9 @@ Sonatype.repoServer.UserEditPanel = function(config){
     loadMask: true,
     deferredRender: false,
     columns: [
-      {header: 'User ID', dataIndex: 'userId', width:120, id: 'user-config-userid-col'},
-      {header: 'Internal', dataIndex: 'readOnly', width:80, id: 'user-config-readonly-col'},
+      {header: 'User ID', dataIndex: 'userId', width:100, id: 'user-config-userid-col'},
+      {header: 'Realm', dataIndex: 'stRealm', width:50, id: 'user-config-realm-col'},
+      {header: 'Internal', dataIndex: 'readOnly', width:50, id: 'user-config-readonly-col'},
       {header: 'Name', dataIndex: 'name', width:175, id: 'user-config-name-col'},
       {header: 'Email', dataIndex: 'email', width:175, id: 'user-config-email-col'},
       {header: 'Status', dataIndex: 'status', width:75, id: 'user-config-status-col'},
@@ -359,6 +230,7 @@ Ext.extend(Sonatype.repoServer.UserEditPanel, Ext.Panel, {
       if(i>0){this.remove(item, true);}
     }, this.formCards);
 
+    this.editorMap = {};
     this.roleDataStore.removeAll();
     this.usersDataStore.removeAll();
     this.roleDataStore.reload();
@@ -366,33 +238,12 @@ Ext.extend(Sonatype.repoServer.UserEditPanel, Ext.Panel, {
     this.formCards.getLayout().setActiveItem(0);
   },
   
-  saveHandler : function(formInfoObj){
-    var allValid = false;
-    allValid = formInfoObj.formPanel.form.isValid() &&
-      formInfoObj.formPanel.find( 'name', 'roles' )[0].validate();
-    
-    if (allValid) {
-      var isNew = formInfoObj.isNew;
-      var password = formInfoObj.formPanel.form.getValues().password;
-    
-      formInfoObj.formPanel.form.doAction('sonatypeSubmit', {
-        method: (isNew) ? 'POST' : 'PUT',
-        url: isNew ? Sonatype.config.repos.urls.users : formInfoObj.resourceURI,
-        waitMsg: isNew ? 'Creating User...' : 'Updating User...',
-        fpanel: formInfoObj.formPanel,
-        dataModifiers: this.submitDataModFunc,
-        serviceDataObj : (isNew && password) ? Sonatype.repoServer.referenceData.userNew : Sonatype.repoServer.referenceData.users,
-        isNew : isNew //extra option to send to callback, instead of conditioning on method
-      });
-    }
-  },
-  
-  cancelHandler : function(formInfoObj) {
+  cancelHandler : function(formObj) {
     var formLayout = this.formCards.getLayout();
     var gridSelectModel = this.usersGridPanel.getSelectionModel();
     var store = this.usersGridPanel.getStore();
   
-    this.formCards.remove(formInfoObj.formPanel.id, true);
+    this.formCards.remove(formObj.id, true);
   
     if (this.formCards.items.length > 1){
       formLayout.setActiveItem(this.formCards.items.length - 1);
@@ -419,43 +270,37 @@ Ext.extend(Sonatype.repoServer.UserEditPanel, Ext.Panel, {
     }
     
     //delete row from grid if canceling a new repo form
-    if(formInfoObj.isNew){
-      store.remove( store.getById(formInfoObj.formPanel.id) );
+    if(formObj.isNew){
+      store.remove( store.getById(formObj.id) );
     }
   },
   
   addResourceHandler : function() {
     var id = 'new_user_' + new Date().getTime();
 
-    var config = Ext.apply({}, this.formConfig, {id:id});
-    
-    var formPanel = new Ext.FormPanel(config);
-    
-    formPanel.form.on('actioncomplete', this.actionCompleteHandler, this);
-    formPanel.form.on('actionfailed', this.actionFailedHandler, this);
-    formPanel.on('afterlayout', this.afterLayoutFormHandler, this, {single:true});
-        
-    var buttonInfoObj = {
-        formPanel : formPanel,
-        isNew : true
-      };
-    
-    formPanel.buttons[0].disabled = false;
-    
-    //save button event handler
-    formPanel.buttons[0].on('click', this.saveHandler.createDelegate(this, [buttonInfoObj]));
-    //cancel button event handler
-    formPanel.buttons[1].on('click', this.cancelHandler.createDelegate(this, [buttonInfoObj]));
-    
-    this.loadTreeHelper([], {}, formPanel);
-    
-    //add place holder to grid
     var newRec = new this.userRecordConstructor({
         userId : 'New User',
         resourceURI : 'new',
         readOnly : false
       },
-      id); //use "new_user_" id instead of resourceURI like the reader does
+      id
+    ); //use "new_user_" id instead of resourceURI like the reader does
+    
+    var formPanel = new Sonatype.repoServer.DefaultUserEditor( {
+      payload: newRec,
+      listeners: {
+        cancel: {
+          fn: this.cancelHandler,
+          scope: this
+        },
+        submit: {
+          fn: this.actionCompleteHandler,
+          scope: this
+        }
+      }
+    } );
+    
+    //add place holder to grid
     this.usersDataStore.insert(0, [newRec]);
     this.usersGridPanel.getSelectionModel().selectRow(0);
     
@@ -467,22 +312,6 @@ Ext.extend(Sonatype.repoServer.UserEditPanel, Ext.Panel, {
     //always set active and re-layout
     this.formCards.getLayout().setActiveItem(formPanel);
     formPanel.doLayout();
-  },
-  
-  afterLayoutFormHandler : function(formPanel, fLayout){
-    // register required field quicktip, but have to wait for elements to show up in DOM
-    var temp = function(){
-      var els = Ext.select('.required-field .x-form-item-label, .required-field .x-panel-header-text', this.getEl());
-      els.each(function(el, els, i){
-        Ext.QuickTips.register({
-          target: el,
-          cls: 'required-field',
-          title: '',
-          text: 'Required Field',
-          enabled: true
-        });
-      });
-    }.defer(300, formPanel);
   },
   
   changePasswordHandler : function( rec ) {
@@ -634,10 +463,7 @@ Ext.extend(Sonatype.repoServer.UserEditPanel, Ext.Panel, {
   
   deleteHandler : function( rec ){
     if(rec.data.resourceURI == 'new'){
-      this.cancelHandler({
-        formPanel : Ext.getCmp(rec.id),
-        isNew : true
-      });
+      this.cancelHandler(Ext.getCmp(rec.id));
     }
     else {
       //@note: this handler selects the "No" button as the default
@@ -718,72 +544,39 @@ Ext.extend(Sonatype.repoServer.UserEditPanel, Ext.Panel, {
   },
       
   //(Ext.form.BasicForm, Ext.form.Action)
-  actionCompleteHandler : function(form, action) {
-    //@todo: handle server error response here!!
-
-    if (action.type == 'sonatypeSubmit'){
-      var isNew = action.options.isNew;
-      var receivedData = action.handleResponse(action.response).data;
-      if (isNew) {
-        //successful create        
-        var dataObj = {
-          userId : receivedData.userId,
-          name : receivedData.name,
-          resourceURI : receivedData.resourceURI,
-          email : receivedData.email,
-          status : receivedData.status,
-          roles : receivedData.roles,
-          readOnly : receivedData.readOnly,
-          displayRoles : this.roleCombiner(receivedData.roles)
-        };
-        
-        var newRec = new this.userRecordConstructor(
-          dataObj,
-          action.options.fpanel.id);
-        
-        this.usersDataStore.remove(this.usersDataStore.getById(action.options.fpanel.id)); //remove old one
-        this.usersDataStore.addSorted(newRec);
-        this.usersGridPanel.getSelectionModel().selectRecords([newRec], false);
-
-        //remove button click listeners
-        action.options.fpanel.buttons[0].purgeListeners();
-        action.options.fpanel.buttons[1].purgeListeners();
-        
-        action.options.fpanel.find('name', 'status')[0].setValue(receivedData.status);
-
-        var buttonInfoObj = {
-            formPanel : action.options.fpanel,
-            isNew : false,
-            resourceURI : dataObj.resourceURI
-          };
-
-        //save button event handler
-        action.options.fpanel.buttons[0].on('click', this.saveHandler.createDelegate(this, [buttonInfoObj]));
-        
-        //cancel button event handler
-        action.options.fpanel.buttons[1].on('click', this.cancelHandler.createDelegate(this, [buttonInfoObj]));
-        
-        var passwordField = action.options.fpanel.find( 'name', 'password' )[0];
-        if ( passwordField ) {
-          action.options.fpanel.remove( passwordField );
-        }
-        var passwordField2 = action.options.fpanel.find( 'name', 'confirmPassword' )[0];
-        if ( passwordField2 ) {
-          action.options.fpanel.remove( passwordField2 );
-        }
-      }
-      else {
-        var i = this.usersDataStore.indexOfId(action.options.fpanel.id);
-        var rec = this.usersDataStore.getAt(i);
-
-        this.updateUserRecord(rec, receivedData);
-        
-        var sortState = this.usersDataStore.getSortState();
-        this.usersDataStore.sort(sortState.field, sortState.direction);
-      }
+  actionCompleteHandler : function(form, action, receivedData) {
+    var isNew = action.options.isNew;
+    if (isNew) {
+      //successful create        
+      var dataObj = {
+        userId : receivedData.userId,
+        name : receivedData.name,
+        resourceURI : receivedData.resourceURI,
+        email : receivedData.email,
+        status : receivedData.status,
+        roles : receivedData.roles,
+        readOnly : receivedData.readOnly,
+        displayRoles : this.roleCombiner(receivedData.roles),
+        stRealm: 'Nexus'
+      };
+      
+      var newRec = new this.userRecordConstructor(
+        dataObj,
+        action.options.fpanel.id);
+      
+      this.usersDataStore.remove(this.usersDataStore.getById(action.options.fpanel.id)); //remove old one
+      this.usersDataStore.addSorted(newRec);
+      this.usersGridPanel.getSelectionModel().selectRecords([newRec], false);
+      action.options.fpanel.payload = newRec;
     }
-    //Load
-    else{
+    else {
+      var i = this.usersDataStore.indexOfId(action.options.fpanel.id);
+      var rec = this.usersDataStore.getAt(i);
+
+      this.updateUserRecord(rec, receivedData);
+      
+      var sortState = this.usersDataStore.getSortState();
+      this.usersDataStore.sort(sortState.field, sortState.direction);
     }
   },
   
@@ -798,29 +591,6 @@ Ext.extend(Sonatype.repoServer.UserEditPanel, Ext.Panel, {
         rec.set('displayRoles', this.roleCombiner(receivedData.roles));
         rec.commit();
         rec.endEdit();
-  },
-
-  //(Ext.form.BasicForm, Ext.form.Action)
-  actionFailedHandler : function(form, action){
-    if(action.failureType == Ext.form.Action.CLIENT_INVALID){
-      Sonatype.MessageBox.alert('Missing or Invalid Fields', 'Please change the missing or invalid fields.').setIcon(Sonatype.MessageBox.WARNING);
-    }
-//@note: server validation error are now handled just like client validation errors by marking the field invalid
-//  else if(action.failureType == Ext.form.Action.SERVER_INVALID){
-//    Sonatype.MessageBox.alert('Invalid Fields', 'The server identified invalid fields.').setIcon(Sonatype.MessageBox.ERROR);
-//  }
-    else if(action.failureType == Ext.form.Action.CONNECT_FAILURE){
-      Sonatype.utils.connectionError( action.response, 'There is an error communicating with the server.' )
-    }
-    else if(action.failureType == Ext.form.Action.LOAD_FAILURE){
-      Sonatype.MessageBox.alert('Load Failure', 'The data failed to load from the server.').setIcon(Sonatype.MessageBox.ERROR);
-    }
-
-    //@todo: need global alert mechanism for fatal errors.
-  },
-
-  formDataLoader : function(formPanel, resourceURI, modFuncs){
-    formPanel.getForm().doAction('sonatypeLoad', {url:resourceURI, method:'GET', fpanel:formPanel, dataModifiers: modFuncs, scope: this});
   },
 
   rowClick : function(grid, rowIndex, e){
@@ -838,35 +608,28 @@ Ext.extend(Sonatype.repoServer.UserEditPanel, Ext.Panel, {
 	    
 	    //assumption: new route forms already exist in formCards, so they won't get into this case
 	    if(!formPanel){ //create form and populate current data
-	      var config = Ext.apply({}, this.formConfig, {id:id});
-	      config.items = config.items.slice( 0 ); // copy the array
-	      
-	      config.items.splice( 4, 2 ); // remove the confirm password fields
-	      
-	      formPanel = new Ext.FormPanel(config);
-	      formPanel.form.on('actioncomplete', this.actionCompleteHandler, this);
-	      formPanel.form.on('actionfailed', this.actionFailedHandler, this);
-	      formPanel.on('afterlayout', this.afterLayoutFormHandler, this, {single:true});
-	      
-	      if (rec.data.readOnly == false
-	              && this.sp.checkPermission('nexus:users', this.sp.EDIT)){
-	                formPanel.buttons[0].disabled = false;
-	            }
-	      
-	      var buttonInfoObj = {
-	        formPanel : formPanel,
-	        isNew : false, //not a new route form, see assumption
-	        resourceURI : rec.data.resourceURI
-	      };
-	      
-	      formPanel.buttons[0].on('click', this.saveHandler.createDelegate(this, [buttonInfoObj]));
-	      formPanel.buttons[1].on('click', this.cancelHandler.createDelegate(this, [buttonInfoObj]));
-	  
-	      this.formDataLoader(formPanel, rec.data.resourceURI, this.loadDataModFunc);
-	      
-	      this.formCards.add(formPanel);
-	      this.formCards.getLayout().setActiveItem(formPanel);    
-	      formPanel.doLayout();
+	      var editor = this.editorMap[rec.data.stRealm];
+	      if ( editor ) {
+  	      formPanel = new editor( {
+            payload: rec,
+            readOnly: rec.data.readOnly ||
+              ! this.sp.checkPermission( 'nexus:users', this.sp.EDIT ),
+            listeners: {
+              cancel: {
+                fn: this.cancelHandler,
+                scope: this
+              },
+              submit: {
+                fn: this.actionCompleteHandler,
+                scope: this
+              }
+            }
+          } );
+  	  
+  	      this.formCards.add(formPanel);
+  	      this.formCards.getLayout().setActiveItem(formPanel);    
+  	      formPanel.doLayout();
+	      }
 	    }
 	    else{
 	      //always set active
@@ -910,17 +673,8 @@ Ext.extend(Sonatype.repoServer.UserEditPanel, Ext.Panel, {
       this.ctxRecord = null;
     }
   },
-    
-  loadTreeHelper : function(arr, srcObj, fpanel){
-    fpanel.find( 'name', 'roles' )[0].setValue( arr );
-    return arr; //return arr, even if empty to comply with sonatypeLoad data modifier requirement
-  },
-  
-  saveTreeHelper : function(val, fpanel){
-    return fpanel.find( 'name', 'roles' )[0].getValue();
-  },
-  
-  onUserMenuInit: function( menu, userRecord ) {
+
+  onUserMenuInit: function( menu, userRecord, a, b, c ) {
     if ( userRecord.data.readOnly == false ) {
 
       if ( this.sp.checkPermission( 'nexus:users', this.sp.DELETE ) ) {
@@ -937,5 +691,207 @@ Ext.extend(Sonatype.repoServer.UserEditPanel, Ext.Panel, {
         }
       }
     }
+  },
+  
+  addRecords: function( users, realm, form ) {
+    if ( form ) {
+      this.editorMap[realm] = form;
+    }
+
+    for ( var i = 0; i < users.length; i++ ) {
+      users[i].stRealm = realm;
+    }
+
+    this.usersDataStore.loadData( { data: users }, true );
+    this.usersDataStore.sort( 'userId' );
   }
 });
+
+Sonatype.repoServer.DefaultUserEditor = function( config ) {
+  var config = config || {};
+  var defaultConfig = {
+    uri: Sonatype.config.repos.urls.users,
+    dataModifiers: {
+      load: {
+        roles: function( arr, srcObj, fpanel ) {
+          fpanel.find( 'name', 'roles' )[0].setValue( arr );
+          return arr;
+        }
+      },
+      submit: { 
+        roles: function( value, fpanel ) {
+          return fpanel.find( 'name', 'roles' )[0].getValue();
+        }
+      }
+    }
+  };
+  Ext.apply( this, config, defaultConfig );
+  
+  //List of user statuses
+  this.statusStore = new Ext.data.SimpleStore( { fields: ['value', 'display'],
+    data: [['active', 'Active'], ['disabled', 'Disabled']] } );
+  
+  //A record to hold the name and id of a role
+  this.roleRecordConstructor = Ext.data.Record.create( [
+    { name: 'id' },
+    { name: 'name', sortType: Ext.data.SortTypes.asUCString }
+  ] );
+  this.roleReader = new Ext.data.JsonReader(
+    { root: 'data', id: 'id' }, this.roleRecordConstructor );  
+  this.roleDataStore = new Ext.data.Store( {
+    url: Sonatype.config.repos.urls.roles,
+    reader: this.roleReader,
+    sortInfo: { field: 'name', direction: 'ASC' },
+    autoLoad: true
+  } );
+
+  var ht = Sonatype.repoServer.resources.help.users;
+  
+  this.COMBO_WIDTH = 300;
+
+  this.checkPayload();
+  var items = [
+    {
+      xtype: 'textfield',
+      fieldLabel: 'User ID',
+      itemCls: 'required-field',
+      labelStyle: 'margin-left: 15px; width: 185px;',
+      helpText: ht.userId,
+      name: 'userId',
+      disabled: ! this.isNew,
+      allowBlank: false,
+      width: this.COMBO_WIDTH
+    },
+    {
+      xtype: 'textfield',
+      fieldLabel: 'Name',
+      itemCls: 'required-field',
+      labelStyle: 'margin-left: 15px; width: 185px;',
+      helpText: ht.name,
+      name: 'name',
+      allowBlank: false,
+      width: this.COMBO_WIDTH
+    },
+    {
+      xtype: 'textfield',
+      fieldLabel: 'Email',
+      itemCls: 'required-field',
+      labelStyle: 'margin-left: 15px; width: 185px;',
+      helpText: ht.email,
+      name: 'email',
+      allowBlank: false,
+      width: this.COMBO_WIDTH
+    },
+    {
+      xtype: 'combo',
+      fieldLabel: 'Status',
+      labelStyle: 'margin-left: 15px; width: 185px;',
+      itemCls: 'required-field',
+      helpText: ht.status,
+      name: 'status',
+      store: this.statusStore,
+      displayField:'display',
+      valueField:'value',
+      editable: false,
+      forceSelection: true,
+      mode: 'local',
+      triggerAction: 'all',
+      emptyText:'Select...',
+      selectOnFocus:true,
+      allowBlank: false,
+      width: this.COMBO_WIDTH
+    }
+  ];
+  
+  if ( this.isNew ) {
+    items.push( {
+      xtype: 'textfield',
+      fieldLabel: 'New Password (optional)',
+      inputType: 'password',
+      labelStyle: 'margin-left: 15px; width: 185px;',
+      helpText: ht.password,
+      name: 'password',
+      allowBlank: true,
+      width: this.COMBO_WIDTH
+    } );
+    items.push( {
+      xtype: 'textfield',
+      fieldLabel: 'Confirm Password',
+      inputType: 'password',
+      labelStyle: 'margin-left: 15px; width: 185px;',
+      helpText: ht.reenterPassword,
+      name: 'confirmPassword',
+      allowBlank: true,
+      width: this.COMBO_WIDTH,
+      validator: function( s ) {
+        var firstField = this.ownerCt.find( 'name', 'password' )[0];
+        if ( firstField && firstField.getRawValue() != s ) {
+          return "Passwords don't match";
+        }
+        return true;
+      }
+    } );
+  }
+
+  items.push( {
+    xtype: 'twinpanelchooser',
+    titleLeft: 'Selected Roles',
+    titleRight: 'Available Roles',
+    name: 'roles',
+    valueField: 'id',
+    store: this.roleDataStore,
+    required: true
+  } );
+
+  Sonatype.repoServer.DefaultUserEditor.superclass.constructor.call( this, {
+    items: items
+  } );
+
+  this.on( 'submit', this.submitCleanup, this );
+};
+
+Ext.extend( Sonatype.repoServer.DefaultUserEditor, Sonatype.ext.FormPanel, {
+  isValid: function() {
+    return this.form.isValid() && this.find( 'name', 'roles' )[0].validate();
+  },
+  
+  saveHandler: function( button, event ) {
+    var password = this.form.getValues().password;
+    this.referenceData = ( this.isNew && password ) ?
+      Sonatype.repoServer.referenceData.userNew : Sonatype.repoServer.referenceData.users;
+    
+    return Sonatype.repoServer.DefaultUserEditor.superclass.saveHandler.call( this, button, event );
+  },
+  
+  submitCleanup: function( form, action, receivedData ) {
+    this.find( 'name', 'status' )[0].setValue( receivedData.status );
+    
+    if ( this.isNew ) {
+      var useridField = this.find( 'name', 'userId' )[0];
+      if ( useridField ) {
+        useridField.disable();
+      }
+      var passwordField = this.find( 'name', 'password' )[0];
+      if ( passwordField ) {
+        this.remove( passwordField );
+      }
+      var passwordField2 = this.find( 'name', 'confirmPassword' )[0];
+      if ( passwordField2 ) {
+        this.remove( passwordField2 );
+      }
+    }
+  }
+} );
+
+Sonatype.Events.addListener( 'userListInit', function( userContainer ) {
+  Ext.Ajax.request( {
+    url: Sonatype.config.repos.urls.users,
+    success: function( response, options ) {
+      var resp = Ext.decode( response.responseText );
+      if ( resp.data ) {
+        userContainer.addRecords( resp.data, 'Nexus', Sonatype.repoServer.DefaultUserEditor );
+      }
+    },
+    scope: userContainer
+  } );
+} );

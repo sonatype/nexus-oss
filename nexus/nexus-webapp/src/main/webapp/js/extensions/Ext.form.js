@@ -427,3 +427,175 @@ Ext.extend(Ext.form.Action.sonatypeLoad, Ext.form.Action, {
 
 Ext.form.Action.ACTION_TYPES.sonatypeLoad = Ext.form.Action.sonatypeLoad;
 Ext.form.Action.ACTION_TYPES.sonatypeSubmit = Ext.form.Action.sonatypeSubmit;
+
+
+/*
+  Generic object editor (intended to be subclassed).
+  
+  var formPanel = new Sonatype.ext.FormPanelSubclass( {
+    payload: newRec,
+    uri: '/my/rest/path',
+    dataModifiers: {
+      load: this.loadDataModFunc,
+      submit: this.submitDataModFunc
+    },
+    listeners: {
+      cancel: {
+        fn: function( panel ) {
+          // remove the form from the container,
+          // delete the temporary grid record, etc.
+        },
+        scope: this
+      },
+      load: {
+        fn: function( form, action, receivedData ) {
+          // handle data update
+        },
+        scope: this
+      },
+      submit: {
+        fn: function( form, action, receivedData ) {
+          // handle grid data update
+        },
+        scope: this
+      }
+    }
+  } );
+
+*/
+Sonatype.ext.FormPanel = function( config ) {
+  var config = config || {};
+  var defaultConfig = {
+    region: 'center',
+    width: '100%',
+    height: '100%',
+    autoScroll: true,
+    border: false,
+    frame: true,
+    collapsible: false,
+    collapsed: false,
+    labelWidth: 200,
+    layoutConfig: {
+      labelSeparator: ''
+    },
+    buttons: [
+      {
+        text: 'Save',
+        handler: this.saveHandler,
+        scope: this,
+        disabled: config.readOnly
+      },
+      {
+        handler: this.cancelHandler,
+        scope: this,
+        text: 'Cancel'
+      }
+    ]
+  };
+  Ext.apply( this, config, defaultConfig );
+
+  this.checkPayload();
+
+  Sonatype.ext.FormPanel.superclass.constructor.call( this, {} );
+
+  this.on( 'afterlayout', this.registerRequiredQuicktips, this, { single:true } );
+  this.form.on( 'actioncomplete', this.actionCompleteHandler, this );
+  this.form.on( 'actionfailed', this.actionFailedHandler, this );
+  this.addEvents( { cancel: true, load: true, submit: true } );
+
+  if ( ! this.isNew ) {
+    this.form.doAction( 'sonatypeLoad', {
+      url: this.getActionURL(),
+      method: 'GET',
+      fpanel: this,
+      dataModifiers: this.dataModifiers.load,
+      scope: this
+    } );
+  }
+};
+
+Ext.extend( Sonatype.ext.FormPanel, Ext.FormPanel, {
+  checkPayload: function() {
+    this.isNew = false;
+    if ( this.payload ) {
+      this.id = this.payload.id;
+      if ( this.id.substring( 0, 4 ) == 'new_' ) {
+        this.isNew = true;
+      }
+    }
+  },
+  
+  registerRequiredQuicktips: function( formPanel, fLayout ) {
+    // register required field quicktip, but have to wait for elements to show up in DOM
+    var temp = function(){
+      var els = Ext.select('.required-field .x-form-item-label, .required-field .x-panel-header-text', this.getEl());
+      els.each(function(el, els, i){
+        Ext.QuickTips.register({
+          target: el,
+          cls: 'required-field',
+          title: '',
+          text: 'Required Field',
+          enabled: true
+        });
+      });
+    }.defer(300, formPanel);
+  },
+  
+  cancelHandler: function( button, event ) {
+    this.fireEvent( 'cancel', this );
+  },
+  
+  isValid: function() {
+    return this.form.isValid();
+  },
+  
+  saveHandler : function( button, event ){
+    if ( this.isValid() ) {
+      this.form.doAction( 'sonatypeSubmit', {
+        method: this.isNew ? 'POST' : 'PUT',
+        url: this.getActionURL(),
+        waitMsg: this.isNew ? 'Creating a new record...' : 'Updating records...',
+        fpanel: this,
+        dataModifiers: this.dataModifiers.submit,
+        serviceDataObj: this.referenceData,
+        isNew: this.isNew //extra option to send to callback, instead of conditioning on method
+      } );
+    }
+  },
+
+  actionFailedHandler: function(form, action){
+    if ( action.failureType == Ext.form.Action.CLIENT_INVALID ) {
+      Sonatype.MessageBox.alert( 'Missing or Invalid Fields',
+          'Please change the missing or invalid fields.')
+        .setIcon( Sonatype.MessageBox.WARNING );
+    }
+    else if ( action.failureType == Ext.form.Action.CONNECT_FAILURE ) {
+      Sonatype.utils.connectionError( action.response,
+        'There is an error communicating with the server.' );
+    }
+    else if ( action.failureType == Ext.form.Action.LOAD_FAILURE ) {
+      Sonatype.MessageBox.alert( 'Load Failure',
+          'The data failed to load from the server.')
+        .setIcon( Sonatype.MessageBox.ERROR );
+    }
+  },
+  
+  //(Ext.form.BasicForm, Ext.form.Action)
+  actionCompleteHandler : function( form, action ) {
+    var receivedData = action.handleResponse(action.response).data;
+    if ( action.type == 'sonatypeSubmit' ) {
+      this.fireEvent( 'submit', form, action, receivedData );
+      this.isNew = false;
+    }
+    else if ( action.type == 'sonatypeLoad' ) {
+      this.fireEvent( 'load', form, action, receivedData );
+    }
+  },
+  
+  getActionURL: function() {
+    return this.isNew ? this.uri :       // if new, return the uri
+      ( this.payload.data.resourceURI ?  // if resouceURI is supplied, return it
+          this.payload.data.resourceURI :
+          this.uri + '/' + payload.id ); // otherwise construct a uri
+  }
+});

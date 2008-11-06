@@ -136,7 +136,25 @@ Sonatype.utils.Observable = function(){
      *   }
      * },
      */
-    'userMenuInit': true
+    'userMenuInit': true,
+
+    /*
+     * Fired when a user list is loaded (e.g. on the user editor panel).
+     * Subscribers can add more users to the list and assign editors.
+     * 
+     * A container object is passed as parameter. Some container implementations
+     * may be read only, so they will ignore the editor supplied.
+     * 
+     * init: function() {
+     *   Sonatype.Events.addListener( 'userListInit', this.populateUsers, this );
+     * },
+     * 
+     * populateUsers: function( userPanel ) {
+     *   userPanel.addRecords( myReadOnlyUsers, 'System Users' );
+     *   userPanel.addRecords( myEditableUsers, 'Other Users', My.ext.UserFormPanel );
+     * },
+     */
+    'userListInit': true
   });
 };
 Ext.extend( Sonatype.utils.Observable, Ext.util.Observable );

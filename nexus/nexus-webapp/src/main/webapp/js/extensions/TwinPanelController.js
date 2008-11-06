@@ -211,7 +211,7 @@ Sonatype.ext.TwinPanelChooser = function( config ){
           },
           'remove' : {
             fn: function(tree, parentNode, removedNode) {
-              if(tree.root.childNodes.length < 1) {
+              if(tree.root.childNodes.length < 1 && this.required) {
                 this.markTreeInvalid(tree,null);
               }
               else if (tree.invalid) {
