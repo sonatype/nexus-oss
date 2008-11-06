@@ -102,13 +102,17 @@ Sonatype.utils = {
       var n1 = r.toLowerCase().indexOf( '<h3>' ) + 4;
       var n2 = r.toLowerCase().indexOf( '</h3>' );
       if ( n2 > n1 ) {
-        serverMessage = '<br /><br />' + r.substring( n1, n2 );
+        serverMessage = r.substring( n1, n2 );
       }
     }
 
     if ( response.status == 403 || response.status == 401 ) {
       if ( options && options.options && options.options.ignore401 ) {
         return;
+      }
+
+      if ( serverMessage ) {
+        serverMessage = '<br /><br />' + serverMessage;
       }
       
       if ( Sonatype.repoServer.RepoServer.loginWindow.isVisible() ) {
@@ -145,10 +149,19 @@ Sonatype.utils = {
       }
     }
     else {
+      if ( message == null ) {
+        message = '';
+      }
+      if ( serverMessage ) {
+        if ( message ) {
+          message += '<br /><br />';
+        }
+        message += serverMessage;
+      }
       Sonatype.MessageBox.show( {
         title: "Error",
         msg: (
-          ( message ? message + serverMessage + '<br /><br />' : '' ) +
+          ( message ? message + '<br /><br />' : '' ) +
           ( response.status == '400' && responseText ? 
               response.responseText
               :
