@@ -224,9 +224,9 @@ public abstract class AbstractResourceStoreContentPlexusResource
     {
         ResourceStoreRequest result = new ResourceStoreRequest( resourceStorePath, isLocal );
 
-        if ( getLogger().isInfoEnabled() )
+        if ( getLogger().isDebugEnabled() )
         {
-            getLogger().info( "Created ResourceStore request for " + result.getRequestPath() );
+            getLogger().debug( "Created ResourceStore request for " + result.getRequestPath() );
         }
 
         // honor if-modified-since
