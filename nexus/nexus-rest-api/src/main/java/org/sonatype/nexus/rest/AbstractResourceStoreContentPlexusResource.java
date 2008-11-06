@@ -470,7 +470,11 @@ public abstract class AbstractResourceStoreContentPlexusResource
     protected void handleException( Exception t )
         throws ResourceException
     {
-        if ( t instanceof IllegalArgumentException )
+        if ( t instanceof ResourceException )
+        {
+            throw (ResourceException) t;
+        }
+        else if ( t instanceof IllegalArgumentException )
         {
             getLogger().info( "ResourceStoreContentResource, illegal argument:" + t.getMessage() );
             throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, t.getMessage() );
