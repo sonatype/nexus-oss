@@ -22,8 +22,11 @@ package org.sonatype.nexus.proxy.storage.remote.commonshttpclient;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.zip.GZIPInputStream;
 
 import org.apache.commons.httpclient.DefaultHttpMethodRetryHandler;
@@ -52,6 +55,7 @@ import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.PreparedContentLocator;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
+import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.proxy.storage.remote.AbstractRemoteRepositoryStorage;
@@ -68,7 +72,6 @@ public class CommonsHttpClientRemoteStorage
     extends AbstractRemoteRepositoryStorage
     implements RemoteRepositoryStorage
 {
-
     public static final String CTX_KEY = "apacheHttpClient3x";
 
     public static final String CTX_KEY_CLIENT = CTX_KEY + ".client";
@@ -80,7 +83,25 @@ public class CommonsHttpClientRemoteStorage
     // ===============================================================================
     // RemoteStorage iface
 
-    public boolean containsItem( RepositoryItemUid uid, long newerThen )
+    public void validateStorageUrl( String url )
+        throws StorageException
+    {
+        try
+        {
+            URL u = new URL( url );
+
+            if ( !"http".equals( u.getProtocol().toLowerCase() ) && !"https".equals( u.getProtocol().toLowerCase() ) )
+            {
+                throw new StorageException( "Unsupported protocol: " + u.getProtocol().toLowerCase() );
+            }
+        }
+        catch ( MalformedURLException e )
+        {
+            throw new StorageException( "Malformed URL", e );
+        }
+    }
+
+    public boolean containsItem( RepositoryItemUid uid, long newerThen, Map<String, Object> context )
         throws StorageException
     {
         HttpMethodBase method = new HeadMethod( getAbsoluteUrlFromBase( uid ).toString() );
@@ -146,7 +167,7 @@ public class CommonsHttpClientRemoteStorage
         }
     }
 
-    public void deleteItem( RepositoryItemUid uid )
+    public void deleteItem( RepositoryItemUid uid, Map<String, Object> context )
         throws ItemNotFoundException,
             UnsupportedStorageOperationException,
             StorageException
@@ -156,7 +177,7 @@ public class CommonsHttpClientRemoteStorage
             + getAbsoluteUrlFromBase( uid ).toString() );
     }
 
-    public AbstractStorageItem retrieveItem( RepositoryItemUid uid )
+    public AbstractStorageItem retrieveItem( RepositoryItemUid uid, Map<String, Object> context )
         throws ItemNotFoundException,
             StorageException
     {
@@ -237,7 +258,7 @@ public class CommonsHttpClientRemoteStorage
         }
     }
 
-    public void storeItem( AbstractStorageItem item )
+    public void storeItem( StorageItem item )
         throws UnsupportedStorageOperationException,
             StorageException
     {
@@ -486,5 +507,4 @@ public class CommonsHttpClientRemoteStorage
         }
         return result;
     }
-
 }

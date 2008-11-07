@@ -141,7 +141,7 @@ public abstract class DefaultRepository
                         }
 
                         // check is the remote newer than the local one
-                        shouldGetRemote = getRemoteStorage().containsItem( uid, localItem.getModified() );
+                        shouldGetRemote = getRemoteStorage().containsItem( uid, localItem.getModified(), context );
 
                         if ( !shouldGetRemote )
                         {
@@ -326,7 +326,7 @@ public abstract class DefaultRepository
 
         try
         {
-            result = getRemoteStorage().retrieveItem( uid );
+            result = getRemoteStorage().retrieveItem( uid, context );
 
             result.getItemContext().putAll( context );
         }

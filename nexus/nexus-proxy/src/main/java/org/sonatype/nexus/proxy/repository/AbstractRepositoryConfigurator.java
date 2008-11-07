@@ -82,41 +82,58 @@ public abstract class AbstractRepositoryConfigurator
         catch ( StorageException e )
         {
             ValidationResponse response = new ApplicationValidationResponse();
+
             ValidationMessage error = new ValidationMessage(
                 "overrideLocalStorageUrl",
                 "Repository has an invalid local storage URL '" + localUrl,
                 "Invalid file location" );
+
             response.addValidationError( error );
+
             throw new InvalidConfigurationException( response );
         }
 
-        if ( repo.getRemoteStorage() != null )
+        try
         {
-            repository.setRemoteUrl( repo.getRemoteStorage().getUrl() );
-
-            repository.setRemoteStorage( rs );
-
-            if ( repo.getRemoteStorage().getAuthentication() != null
-                || repo.getRemoteStorage().getConnectionSettings() != null
-                || repo.getRemoteStorage().getHttpProxySettings() != null )
+            if ( repo.getRemoteStorage() != null )
             {
-                DefaultRemoteStorageContext ctx = new DefaultRemoteStorageContext( rsc );
+                rs.validateStorageUrl( repo.getRemoteStorage().getUrl() );
 
-                ctx.putRemoteConnectionContextObject( RemoteStorageContext.REMOTE_CONNECTIONS_SETTINGS, repo
-                    .getRemoteStorage().getConnectionSettings() );
+                repository.setRemoteUrl( repo.getRemoteStorage().getUrl() );
+                repository.setRemoteStorage( rs );
 
-                ctx.putRemoteConnectionContextObject( RemoteStorageContext.REMOTE_HTTP_PROXY_SETTINGS, repo
-                    .getRemoteStorage().getHttpProxySettings() );
+                if ( repo.getRemoteStorage().getAuthentication() != null
+                    || repo.getRemoteStorage().getConnectionSettings() != null
+                    || repo.getRemoteStorage().getHttpProxySettings() != null )
+                {
+                    DefaultRemoteStorageContext ctx = new DefaultRemoteStorageContext( rsc );
 
-                ctx.putRemoteConnectionContextObject( RemoteStorageContext.REMOTE_AUTHENTICATION_SETTINGS, repo
-                    .getRemoteStorage().getAuthentication() );
+                    ctx.putRemoteConnectionContextObject( RemoteStorageContext.REMOTE_CONNECTIONS_SETTINGS, repo
+                        .getRemoteStorage().getConnectionSettings() );
 
-                repository.setRemoteStorageContext( ctx );
+                    ctx.putRemoteConnectionContextObject( RemoteStorageContext.REMOTE_HTTP_PROXY_SETTINGS, repo
+                        .getRemoteStorage().getHttpProxySettings() );
+
+                    ctx.putRemoteConnectionContextObject( RemoteStorageContext.REMOTE_AUTHENTICATION_SETTINGS, repo
+                        .getRemoteStorage().getAuthentication() );
+
+                    repository.setRemoteStorageContext( ctx );
+                }
+                else
+                {
+                    repository.setRemoteStorageContext( rsc );
+                }
             }
-            else
-            {
-                repository.setRemoteStorageContext( rsc );
-            }
+        }
+        catch ( StorageException e )
+        {
+            ValidationResponse response = new ApplicationValidationResponse();
+
+            ValidationMessage error = new ValidationMessage( "remoteStorageUrl", e.getMessage(), e.getMessage() );
+
+            response.addValidationError( error );
+
+            throw new InvalidConfigurationException( response );
         }
 
         return repository;

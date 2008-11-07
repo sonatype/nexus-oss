@@ -126,16 +126,16 @@ public abstract class AbstractRemoteRepositoryStorage
         return repository.getRemoteStorageContext();
     }
 
-    public boolean isReachable( Repository repository )
+    public boolean isReachable( Repository repository, Map<String, Object> context )
         throws StorageException
     {
-        return containsItem( repository.createUid( RepositoryItemUid.PATH_ROOT ) );
+        return containsItem( repository.createUid( RepositoryItemUid.PATH_ROOT ), context );
     }
 
-    public boolean containsItem( RepositoryItemUid uid )
+    public boolean containsItem( RepositoryItemUid uid, Map<String, Object> context )
         throws StorageException
     {
-        return containsItem( uid, 0 );
+        return containsItem( uid, 0, context );
     }
 
     // helper methods

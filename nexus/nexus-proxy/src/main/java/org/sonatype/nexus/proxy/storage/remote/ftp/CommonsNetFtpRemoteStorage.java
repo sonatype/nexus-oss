@@ -22,9 +22,11 @@ package org.sonatype.nexus.proxy.storage.remote.ftp;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
 import java.net.SocketException;
 import java.net.URL;
 
+import java.util.Map;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPClientConfig;
 import org.apache.commons.net.ftp.FTPFile;
@@ -34,6 +36,7 @@ import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
+import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.proxy.storage.remote.AbstractRemoteRepositoryStorage;
@@ -50,12 +53,29 @@ public class CommonsNetFtpRemoteStorage
     extends AbstractRemoteRepositoryStorage
     implements RemoteRepositoryStorage
 {
-
     public static final String CTX_KEY = "commonsNetFtp";
 
     public static final String CTX_KEY_CONFIG = CTX_KEY + ".config";
 
-    public boolean isReachable( Repository repository )
+    public void validateStorageUrl( String url )
+        throws StorageException
+    {
+        try
+        {
+            URL u = new URL( url );
+
+            if ( !"ftp".equals( u.getProtocol().toLowerCase() ) && !"ftps".equals( u.getProtocol().toLowerCase() ) )
+            {
+                throw new StorageException( "Unsupported protocol: " + u.getProtocol().toLowerCase() );
+            }
+        }
+        catch ( MalformedURLException e )
+        {
+            throw new StorageException( "Malformed URL", e );
+        }
+    }
+
+    public boolean isReachable( Repository repository, Map<String, Object> context )
     {
         FTPClient client = null;
         try
@@ -103,7 +123,7 @@ public class CommonsNetFtpRemoteStorage
         }
     }
 
-    public boolean containsItem( RepositoryItemUid uid, long newerThan )
+    public boolean containsItem( RepositoryItemUid uid, long newerThan, Map<String, Object> context )
         throws StorageException
     {
         FTPClient client = null;
@@ -136,14 +156,14 @@ public class CommonsNetFtpRemoteStorage
         }
     }
 
-    public AbstractStorageItem retrieveItem( RepositoryItemUid uid )
+    public AbstractStorageItem retrieveItem( RepositoryItemUid uid, Map<String, Object> context )
         throws ItemNotFoundException,
             StorageException
     {
-        return retrieveItem( uid, 0 );
+        return retrieveItem( uid, 0, context );
     }
 
-    public AbstractStorageItem retrieveItem( RepositoryItemUid uid, long newerThan )
+    public AbstractStorageItem retrieveItem( RepositoryItemUid uid, long newerThan, Map<String, Object> context )
         throws ItemNotFoundException,
             StorageException
     {
@@ -187,7 +207,7 @@ public class CommonsNetFtpRemoteStorage
         }
     }
 
-    public void storeItem( AbstractStorageItem item )
+    public void storeItem( StorageItem item )
         throws UnsupportedStorageOperationException,
             StorageException
     {
@@ -195,7 +215,7 @@ public class CommonsNetFtpRemoteStorage
         throw new UnsupportedStorageOperationException( "This operation is not supported on " + this.getClass() );
     }
 
-    public void deleteItem( RepositoryItemUid uid )
+    public void deleteItem( RepositoryItemUid uid, Map<String, Object> context )
         throws ItemNotFoundException,
             UnsupportedStorageOperationException,
             StorageException
@@ -206,7 +226,6 @@ public class CommonsNetFtpRemoteStorage
 
     // =============================================================
     // inner stuff
-
     protected void updateContext( Repository repository, RemoteStorageContext ctx )
     {
         FTPClientConfig ftpClientConfig = (FTPClientConfig) ctx.getRemoteConnectionContext().get( CTX_KEY_CONFIG );
@@ -276,5 +295,4 @@ public class CommonsNetFtpRemoteStorage
         fItem.setCreated( fItem.getModified() );
         return fItem;
     }
-
 }

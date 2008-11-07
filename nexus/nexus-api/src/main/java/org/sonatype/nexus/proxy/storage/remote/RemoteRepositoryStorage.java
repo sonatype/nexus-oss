@@ -22,10 +22,12 @@ package org.sonatype.nexus.proxy.storage.remote;
 
 import java.net.URL;
 
+import java.util.Map;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
+import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 
@@ -43,7 +45,7 @@ public interface RemoteRepositoryStorage
      * @return true, if available (reachable)
      * @throws StorageException the storage exception
      */
-    boolean isReachable( Repository repository )
+    boolean isReachable( Repository repository, Map<String, Object> context )
         throws StorageException;
 
     /**
@@ -63,7 +65,7 @@ public interface RemoteRepositoryStorage
      * @return true, if successful
      * @throws StorageException the storage exception
      */
-    boolean containsItem( RepositoryItemUid uid )
+    boolean containsItem( RepositoryItemUid uid, Map<String, Object> context )
         throws StorageException;
 
     /**
@@ -73,7 +75,7 @@ public interface RemoteRepositoryStorage
      * @return true, if successful
      * @throws StorageException the storage exception
      */
-    boolean containsItem( RepositoryItemUid uid, long newerThen )
+    boolean containsItem( RepositoryItemUid uid, long newerThen, Map<String, Object> context )
         throws StorageException;
 
     /**
@@ -84,7 +86,7 @@ public interface RemoteRepositoryStorage
      * @throws ItemNotFoundException the item not found exception
      * @throws StorageException the storage exception
      */
-    AbstractStorageItem retrieveItem( RepositoryItemUid uid )
+    AbstractStorageItem retrieveItem( RepositoryItemUid uid, Map<String, Object> context )
         throws ItemNotFoundException,
             StorageException;
 
@@ -95,7 +97,7 @@ public interface RemoteRepositoryStorage
      * @throws UnsupportedStorageOperationException the unsupported storage operation exception
      * @throws StorageException the storage exception
      */
-    void storeItem( AbstractStorageItem item )
+    void storeItem( StorageItem item )
         throws UnsupportedStorageOperationException,
             StorageException;
 
@@ -107,9 +109,17 @@ public interface RemoteRepositoryStorage
      * @throws UnsupportedStorageOperationException the unsupported storage operation exception
      * @throws StorageException the storage exception
      */
-    void deleteItem( RepositoryItemUid uid )
+    void deleteItem( RepositoryItemUid uid, Map<String, Object> context )
         throws ItemNotFoundException,
             UnsupportedStorageOperationException,
             StorageException;
 
+    /**
+     * Validate that the URL that defines storage location is valid.
+     * 
+     * @param url
+     * @throws StorageException
+     */
+    void validateStorageUrl( String url )
+        throws StorageException;
 }
