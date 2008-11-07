@@ -48,6 +48,11 @@ public class RoleMessageUtil
 
         // make sure the id != null
         Assert.assertNotNull( responseResource.getId() );
+        
+        if( role.getId() != null)
+        {
+            Assert.assertEquals( role.getId(), responseResource.getId() );
+        }
 
         Assert.assertEquals( role.getDescription(), responseResource.getDescription() );
         Assert.assertEquals( role.getName(), responseResource.getName() );

@@ -44,6 +44,23 @@ public class Nexus156RolesCrudJsonTests
 
         this.messageUtil.createRole( resource );
     }
+    
+    @Test
+    public void createRoleWithIdTest()
+        throws IOException
+    {
+
+        RoleResource resource = new RoleResource();
+
+        resource.setDescription( "Create Test Role With ID" );
+        resource.setName( "CreateRoleWithID" );
+        resource.setId( "CreateRoleWithID" );
+        resource.setSessionTimeout( 30 );
+        resource.addPrivilege( "1" );
+        resource.addPrivilege( "2" );
+
+        this.messageUtil.createRole( resource );
+    }
 
     @Test
     public void listTest()

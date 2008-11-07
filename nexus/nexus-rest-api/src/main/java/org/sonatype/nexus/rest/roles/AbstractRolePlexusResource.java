@@ -53,6 +53,8 @@ public abstract class AbstractRolePlexusResource
             role = new SecurityRole();
         }
 
+        role.setId( resource.getId() );
+        
         role.setDescription( resource.getDescription() );
         role.setName( resource.getName() );
         role.setSessionTimeout( resource.getSessionTimeout() );
