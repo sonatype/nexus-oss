@@ -2,29 +2,26 @@ package org.sonatype.nexus.integrationtests.proxy;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ResourceBundle;
 
 import junit.framework.Assert;
 
 import org.junit.After;
 import org.junit.Before;
-import org.restlet.Client;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
-import org.restlet.data.Protocol;
-import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.resource.StringRepresentation;
 import org.sonatype.jettytestsuite.ServletServer;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
+import org.sonatype.nexus.test.utils.TestProperties;
 
 public abstract class AbstractNexusProxyIntegrationTest
     extends AbstractNexusIntegrationTest
 {
 
-    private String baseURL = null;
+    protected String baseProxyURL = null;
 
     protected String localStorageDir = null;
 
@@ -37,11 +34,8 @@ public abstract class AbstractNexusProxyIntegrationTest
     {
         super( testRepositoryId );
 
-        ResourceBundle rb = ResourceBundle.getBundle( "baseTest" );
-
-        this.baseURL = rb.getString( "proxy.repo.base.url" );
-        this.localStorageDir = rb.getString( "proxy.repo.base.dir" );
-
+        this.baseProxyURL = TestProperties.getString( "proxy.repo.base.url" );
+        this.localStorageDir = TestProperties.getString( "proxy.repo.base.dir" );
     }
 
     @Before
@@ -95,7 +89,7 @@ public abstract class AbstractNexusProxyIntegrationTest
                                  MediaType.APPLICATION_JSON);
 
 
-        
+
         Response response = RequestFacade.sendMessage( serviceURI, Method.PUT, representation );
 
         if ( !response.getStatus().isSuccess() )
@@ -109,13 +103,13 @@ public abstract class AbstractNexusProxyIntegrationTest
     {
 
         String serviceURI = "service/local/repositories/" + repoId + "/status?undefined";
-        
+
         // unblock string
         String servicePart = outOfService ? "outOfService" : "inService";
 
         StringRepresentation representation = new StringRepresentation("{\"data\":{\"id\":\"" + repoId + "\",\"repoType\":\"proxy\",\"localStatus\":\""
             + servicePart + "\"}}", MediaType.APPLICATION_JSON );
-        
+
         Response response = RequestFacade.sendMessage( serviceURI, Method.PUT, representation );
 
         if ( !response.getStatus().isSuccess() )
