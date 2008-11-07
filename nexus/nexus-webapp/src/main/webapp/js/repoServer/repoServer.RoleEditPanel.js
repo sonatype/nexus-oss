@@ -124,8 +124,14 @@ Sonatype.repoServer.RoleEditPanel = function(config){
         }]
       },
       {
-        xtype: 'hidden',
-        name: 'id'
+        xtype: 'textfield',
+        fieldLabel: 'Role Id',
+        itemCls: 'required-field',
+        labelStyle: 'margin-left: 15px; width: 185px;',
+        helpText: ht.id,
+        name: 'id',
+        allowBlank: false,
+        width: this.COMBO_WIDTH
       },
       {
         xtype: 'textfield',
@@ -340,9 +346,10 @@ Sonatype.repoServer.RoleEditPanel = function(config){
     loadMask: true,
     deferredRender: false,
     columns: [
-      {header: 'Name', dataIndex: 'name', width:175, id: 'role-config-name-col'},
+      {header: 'Role Id', dataIndex: 'id', width:120, id: 'role-config-id-col'},
+      {header: 'Name', dataIndex: 'name', width:200, id: 'role-config-name-col'},
       {header: 'Internal', dataIndex: 'readOnly', width:80, id: 'role-config-readonly-col'},
-      {header: 'Session Timeout', dataIndex: 'sessionTimeout', width:175, id: 'role-config-session-timeout-col'},
+      {header: 'Session Timeout', dataIndex: 'sessionTimeout', width:100, id: 'role-config-session-timeout-col'},
       {header: 'Description', dataIndex: 'description', width:175, id: 'role-config-description-col'}      
     ],
     autoExpandColumn: 'role-config-description-col',
@@ -665,6 +672,8 @@ Ext.extend(Sonatype.repoServer.RoleEditPanel, Ext.Panel, {
             resourceURI : dataObj.resourceURI
           };
 
+        action.options.fpanel.find('name', 'id')[0].setDisabled( true );
+
         //save button event handler
         action.options.fpanel.buttons[0].on('click', this.saveHandler.createDelegate(this, [buttonInfoObj]));
         
@@ -685,6 +694,7 @@ Ext.extend(Sonatype.repoServer.RoleEditPanel, Ext.Panel, {
         var i = this.rolesDataStore.indexOfId(action.options.fpanel.id);
         var rec = this.rolesDataStore.getAt(i);
 
+        action.options.fpanel.find('name', 'id')[0].setDisabled( true );
         if ( rec.data.readOnly) {
           action.options.fpanel.find('name', 'internalResourceHeader')[0].setVisible( true );
           action.options.fpanel.find('name', 'name')[0].setDisabled( true );

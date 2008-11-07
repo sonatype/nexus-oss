@@ -118,6 +118,7 @@ Sonatype.repoServer.resources.help = {
   
   // Roles help
   roles: {
+    id : 'The id of this role.',
     name : 'The name of this role.',
     description : 'The description of this role.',
     sessionTimeout : 'The number of minutes to wait before timing out an idle user session.',
