@@ -83,7 +83,7 @@ public class RolePlexusResource
         if ( resourceRequest != null )
         {
             RoleResource resource = resourceRequest.getData();
-
+            
             try
             {
                 SecurityRole role = restToNexusModel( getNexusSecurity().readRole( resource.getId() ), resource );
@@ -100,7 +100,7 @@ public class RolePlexusResource
             }
             catch ( NoSuchRoleException e )
             {
-                response.setStatus( Status.CLIENT_ERROR_NOT_FOUND, e.getMessage() );
+                throw new ResourceException(Status.CLIENT_ERROR_NOT_FOUND, e.getMessage() );
             }
             catch ( InvalidConfigurationException e )
             {

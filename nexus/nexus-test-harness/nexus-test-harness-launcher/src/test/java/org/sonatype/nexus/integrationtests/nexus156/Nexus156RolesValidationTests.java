@@ -70,6 +70,33 @@ public class Nexus156RolesValidationTests extends AbstractNexusIntegrationTest
     }
     
     @Test
+    public void duplicateIdTest()
+        throws IOException
+    {
+
+        RoleResource resource = new RoleResource();
+
+        resource.setDescription( "duplicateIdTest" );
+        resource.setName( "duplicateIdTest" );
+        resource.setId( "duplicateIdTest" );
+        resource.setSessionTimeout( 30 );
+        resource.addPrivilege( "1" );
+
+        // create
+        resource = this.messageUtil.createRole( resource );
+        Assert.assertEquals( "duplicateIdTest", resource.getId() );
+
+        // update
+        Response response = this.messageUtil.sendMessage( Method.POST, resource );
+
+        if ( response.getStatus().isSuccess() )
+        {
+            Assert.fail( "Role should not have been updated: " + response.getStatus() +"New Id: "+ this.messageUtil.getResourceFromResponse( response ).getId() );
+        }
+        Assert.assertTrue( response.getEntity().getText().startsWith( "{\"errors\":" ) );
+    }
+    
+    @Test
     public void createWithNoTimeout()
         throws IOException
     {
@@ -243,6 +270,27 @@ public class Nexus156RolesValidationTests extends AbstractNexusIntegrationTest
             Assert.fail( "Role should not have been updated: " + response.getStatus() );
         }
         Assert.assertTrue( response.getEntity().getText().startsWith( "{\"errors\":" ) );
+     
+        /*
+         * Update Id
+         */
+        resource.setDescription( "updateValidationTests" );
+        resource.setName( "updateValidationTests" );
+        resource.setId( "NEW-ID-WILL-FAIL" );
+        resource.setSessionTimeout( 99999 );
+        resource.addPrivilege( "5" );
+        resource.addPrivilege( "4" );
+
+        response = this.messageUtil.sendMessage( Method.PUT, resource );
+        String responseText = response.getEntity().getText();
+
+        if ( response.getStatus().isSuccess() )
+        {
+            Assert.fail( "Role should not have been updated: " + response.getStatus() );
+        }
+        // expect a 404
+        Assert.assertEquals( 404, response.getStatus().getCode() );
+        
         
     }
     
