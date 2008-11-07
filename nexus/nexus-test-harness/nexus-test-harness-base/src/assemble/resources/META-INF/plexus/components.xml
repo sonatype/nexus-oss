@@ -37,9 +37,7 @@
 
     <component>
       <role>org.sonatype.jettytestsuite.ServletServer</role>
-      <implementation>
-        org.sonatype.jettytestsuite.ServletServer
-			</implementation>
+      <implementation>org.sonatype.jettytestsuite.ServletServer</implementation>
       <instantiation-strategy>singleton</instantiation-strategy>
       <configuration>
         <port>${proxy-repo-port}</port>
@@ -49,15 +47,11 @@
             <servletInfos>
               <servletInfo>
                 <mapping>/*</mapping>
-                <servletClass>
-                  org.mortbay.jetty.servlet.DefaultServlet
-								</servletClass>
+                <servletClass>org.mortbay.jetty.servlet.DefaultServlet</servletClass>
                 <parameters>
                   <property>
                     <name>resourceBase</name>
-                    <value>
-                      ${proxy-repo-target-dir}
-										</value>
+                    <value>${proxy-repo-target-dir}</value>
                   </property>
                   <property>
                     <name>dirAllowed</name>
@@ -68,6 +62,15 @@
             </servletInfos>
           </webappContext>
         </webappContexts>
+      </configuration>
+    </component>
+
+    <component>
+      <role>org.sonatype.jettytestsuite.ProxyServer</role>
+      <implementation>org.sonatype.jettytestsuite.ProxyServer</implementation>
+      <instantiation-strategy>singleton</instantiation-strategy>
+      <configuration>
+        <port>${webproxy-server-port}</port>
       </configuration>
     </component>
 
