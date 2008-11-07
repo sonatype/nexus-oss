@@ -13,6 +13,16 @@
   <packaging>pom</packaging>
   <name>Nexus Test Harness Parent</name>
 
+  <dependencyManagement>
+  	<dependencies>
+  		<dependency>
+  			<groupId>junit</groupId>
+  			<artifactId>junit</artifactId>
+  			<version>4.4</version>
+  		</dependency>
+  	</dependencies>
+  </dependencyManagement>
+
   <properties>
     <bundle-expanded-dir>target/bundle</bundle-expanded-dir>
     <config-expanded-dir>target/test-nexus-config</config-expanded-dir>
@@ -44,6 +54,7 @@
     <fake-maven>${project.build.directory}/apache-maven-${maven-version}</fake-maven>
 
     <config-resource>${project.build.directory}/config-resources</config-resource>
+    <bundle-conf-resource>${project.build.directory}/bundle-conf-resource</bundle-conf-resource>
   </properties>
 
   <dependencies>
@@ -56,6 +67,12 @@
       <scope>provided</scope>
     </dependency>
 
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-test-harness-base</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
   </dependencies>
 
   <build>
@@ -64,6 +81,12 @@
       <testResource>
         <directory>${config-resource}</directory>
         <filtering>true</filtering>
+      </testResource>
+
+      <testResource>
+        <directory>${bundle-conf-resource}</directory>
+        <filtering>true</filtering>
+        <targetPath>${nexus-abs-basedir}</targetPath>
       </testResource>
 
       <testResource>
@@ -82,22 +105,6 @@
           <include>**/*.jar</include>
           <include>**/fake-central/**</include>
         </includes>
-      </testResource>
-
-      <testResource>
-        <directory>src/test/bundle-conf</directory>
-        <filtering>true</filtering>
-        <targetPath>../../${nexus-relative-basedir}</targetPath>
-      </testResource>
-
-      <testResource>
-        <directory>src/test/resources/default-config</directory>
-        <filtering>true</filtering>
-        <targetPath>../../${nexus-relative-basedir}/runtime/work/conf</targetPath>
-        <excludes>
-          <exclude>**/settings.xml</exclude>
-          <exclude>**/log4j.properties</exclude>
-        </excludes>
       </testResource>
 
     </testResources>
@@ -216,9 +223,17 @@
                   <groupId>org.sonatype.nexus</groupId>
                   <artifactId>nexus-test-harness-base</artifactId>
                   <version>${project.version}</version>
-                  <classifier>configs</classifier>
+                  <classifier>resources</classifier>
                   <type>zip</type>
                   <outputDirectory>${config-resource}</outputDirectory>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.sonatype.nexus</groupId>
+                  <artifactId>nexus-test-harness-base</artifactId>
+                  <version>${project.version}</version>
+                  <classifier>bundle-conf</classifier>
+                  <type>zip</type>
+                  <outputDirectory>${bundle-conf-resource}</outputDirectory>
                 </artifactItem>
               </artifactItems>
 

@@ -1,5 +1,6 @@
 <assembly>
-  <id>configs</id>
+  <id>resources</id>
+
   <formats>
     <format>zip</format>
   </formats>
@@ -9,7 +10,7 @@
   <fileSets>
     <fileSet>
       <outputDirectory>/</outputDirectory>
-      <directory>src/assemble/resources</directory>
+      <directory>src/test/resources</directory>
     </fileSet>
   </fileSets>
 </assembly>

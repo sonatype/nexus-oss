@@ -25,7 +25,8 @@
             </goals>
             <configuration>
               <descriptors>
-                <descriptor>src/assemble/distribution.xml</descriptor>
+                <descriptor>src/assemble/resources.xml</descriptor>
+                <descriptor>src/assemble/bundle-conf.xml</descriptor>
               </descriptors>
             </configuration>
           </execution>
