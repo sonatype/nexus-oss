@@ -31,6 +31,11 @@ import org.junit.Test;
 import org.sonatype.nexus.integrationtests.AbstractMavenNexusIT;
 import org.sonatype.nexus.integrationtests.TestContainer;
 
+/**
+ * 
+ * @author Juven Xu
+ *
+ */
 public class Nexus1071DeployToRepoAnonCannotAccess
     extends AbstractMavenNexusIT
 {

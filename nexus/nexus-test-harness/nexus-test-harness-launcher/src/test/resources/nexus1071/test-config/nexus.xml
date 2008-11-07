@@ -77,7 +77,6 @@
         <repositories>
           <repository>fake-central</repository>
           <repository>nexus-test-harness-repo</repository>
-          <repository>Internal</repository>
         </repositories>
       </repositoryGroup>
       <repositoryGroup>
