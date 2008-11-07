@@ -82,7 +82,7 @@ public class AbstractNexusIntegrationTest
 
     public String testRepositoryId;
 
-    protected static String nexusBaseDir;
+    public static String nexusBaseDir;
 
     protected static String baseNexusUrl;
 
@@ -341,6 +341,7 @@ public class AbstractNexusIntegrationTest
     private void stopNexus()
         throws Exception
     {
+        log.info( "stopping Nexus" );
 
         // craptastic state machine
         if ( !NEEDS_HARD_STOP )
@@ -594,8 +595,9 @@ public class AbstractNexusIntegrationTest
                 + gav.getArtifactId() + "&v=" + gav.getVersion();
         Response response = RequestFacade.doGetRequest( serviceURI );
         Status status = response.getStatus();
-		Assert.assertEquals( "Snapshot download should redirect to a new file\n "
-            + response.getRequest().getResourceRef().toString() + " \n Error: " +status.getDescription(), 301, status.getCode() );
+        Assert.assertEquals( "Snapshot download should redirect to a new file\n "
+            + response.getRequest().getResourceRef().toString() + " \n Error: " + status.getDescription(), 301,
+                             status.getCode() );
 
         Reference redirectRef = response.getRedirectRef();
         Assert.assertNotNull( "Snapshot download should redirect to a new file "
