@@ -292,6 +292,9 @@
                 <port>
                   <name>email-server-port</name>
                 </port>
+                <port>
+                  <name>webproxy-server-port</name>
+                </port>
               </ports>
             </configuration>
           </execution>
