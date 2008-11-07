@@ -38,6 +38,7 @@ public abstract class AbstractRepositoryConfigurator
         repository.setIndexable( repo.isIndexable() );
         repository.setNotFoundCacheTimeToLive( repo.getNotFoundCacheTTL() );
         repository.setUserManaged( repo.isUserManaged() );
+        repository.setExposed( repo.isExposed() );
 
         repository.setItemMaxAge( repo.getArtifactMaxAge() );
 
