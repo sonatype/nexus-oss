@@ -152,7 +152,7 @@ public abstract class AbstractSystemFeedSource
             {
                 entry.setTitle( "Clearing caches" );
             }
-            else if ( FeedRecorder.SYSTEM_EVICT_UNUSED_PROXIED_ITEMS.equals( item.getAction() ) )
+            else if ( FeedRecorder.SYSTEM_EVICT_UNUSED_PROXIED_ITEMS_ACTION.equals( item.getAction() ) )
             {
                 entry.setTitle( "Evicting unused proxied items" );
             }

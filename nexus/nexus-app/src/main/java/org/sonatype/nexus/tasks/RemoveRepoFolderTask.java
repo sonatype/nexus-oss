@@ -48,7 +48,7 @@ public class RemoveRepoFolderTask
     @Override
     protected String getAction()
     {
-        return FeedRecorder.SYSTEM_REMOVE_REPO_FOLDER;
+        return FeedRecorder.SYSTEM_REMOVE_REPO_FOLDER_ACTION;
     }
 
     @Override

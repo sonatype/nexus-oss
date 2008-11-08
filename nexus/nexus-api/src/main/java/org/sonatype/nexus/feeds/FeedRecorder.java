@@ -28,7 +28,8 @@ import org.sonatype.nexus.NexusService;
 import org.sonatype.nexus.timeline.TimelineFilter;
 
 /**
- * A recorder for events for later retrieval. This is actually event recorder, not feed recorder.
+ * A recorder for events for later retrieval. The Actions are "generic" Nexus event related. For specific (Maven, P2)
+ * actions, look into specific sources. Note: This is actually event recorder, not feed recorder.
  * 
  * @author cstamas
  */
@@ -64,8 +65,6 @@ public interface FeedRecorder
      * System event action: rebuildAttributes
      */
     public static final String SYSTEM_REBUILDATTRIBUTES_ACTION = "REBUILDATTRIBUTES";
-    
-    public static final String SYSTEM_REBUILD_MAVEN_METADATA_ACTION = "REBUILD_MAVEN_METADATA";
 
     /**
      * System event action: repository local status changes
@@ -95,7 +94,7 @@ public interface FeedRecorder
     /**
      * System event action: evict unused proxied items
      */
-    public static final String SYSTEM_EVICT_UNUSED_PROXIED_ITEMS = "EVICT_UNUSED_PROXIED_ITEMS";
+    public static final String SYSTEM_EVICT_UNUSED_PROXIED_ITEMS_ACTION = "EVICT_UNUSED_PROXIED_ITEMS";
 
     /**
      * System event action: empty trash
@@ -105,7 +104,7 @@ public interface FeedRecorder
     /**
      * System event action: remove repository folder
      */
-    public static final String SYSTEM_REMOVE_REPO_FOLDER = "REMOVE_REPO_FOLDER";
+    public static final String SYSTEM_REMOVE_REPO_FOLDER_ACTION = "REMOVE_REPO_FOLDER";
 
     // creating
 

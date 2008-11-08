@@ -18,25 +18,34 @@
  * along with this program.  If not, see http://www.gnu.org/licenses/.
  *
  */
-
-package org.sonatype.nexus.tasks.descriptors;
+package org.sonatype.nexus.maven.tasks.descriptors;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
+import org.sonatype.nexus.tasks.descriptors.AbstractScheduledTaskDescriptor;
+import org.sonatype.nexus.tasks.descriptors.ScheduledTaskDescriptor;
 import org.sonatype.nexus.tasks.descriptors.properties.ScheduledTaskPropertyDescriptor;
 
-@Component( role = ScheduledTaskDescriptor.class, hint = "RebuildMavenMetadata", description = "Rebuild Maven Medata Files" )
-public class RebuildMavenMetadataTaskDescriptor
+@Component( role = ScheduledTaskDescriptor.class, hint = "SnapshotRemoval", description = "Remove Snapshots From Repository" )
+public class SnapshotRemovalTaskDescriptor
     extends AbstractScheduledTaskDescriptor
 {
-    
-    public static final String ID = "RebuildMavenMetadataTask";
+    public static final String ID = "SnapshotRemoverTask";
 
     @Requirement( role = ScheduledTaskPropertyDescriptor.class, hint = "RepositoryOrGroup" )
     private ScheduledTaskPropertyDescriptor repositoryOrGroupId;
+
+    @Requirement( role = ScheduledTaskPropertyDescriptor.class, hint = "MinimumSnapshotCount" )
+    private ScheduledTaskPropertyDescriptor minSnapshots;
+
+    @Requirement( role = ScheduledTaskPropertyDescriptor.class, hint = "SnapshotRetentionDays" )
+    private ScheduledTaskPropertyDescriptor retentionDays;
+
+    @Requirement( role = ScheduledTaskPropertyDescriptor.class, hint = "RemoveIfReleased" )
+    private ScheduledTaskPropertyDescriptor removeWhenReleased;
 
     public String getId()
     {
@@ -45,7 +54,7 @@ public class RebuildMavenMetadataTaskDescriptor
 
     public String getName()
     {
-        return "Rebuild Maven Medata Files";
+        return "Remove Snapshots From Repository";
     }
 
     public List<ScheduledTaskPropertyDescriptor> getPropertyDescriptors()
@@ -53,8 +62,10 @@ public class RebuildMavenMetadataTaskDescriptor
         List<ScheduledTaskPropertyDescriptor> properties = new ArrayList<ScheduledTaskPropertyDescriptor>();
 
         properties.add( repositoryOrGroupId );
+        properties.add( minSnapshots );
+        properties.add( retentionDays );
+        properties.add( removeWhenReleased );
 
         return properties;
     }
-
 }

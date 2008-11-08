@@ -22,11 +22,11 @@ package org.sonatype.nexus.maven.tasks;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.util.StringUtils;
+import org.sonatype.nexus.maven.tasks.descriptors.SnapshotRemovalTaskDescriptor;
+import org.sonatype.nexus.maven.tasks.descriptors.properties.MinimumSnapshotCountPropertyDescriptor;
+import org.sonatype.nexus.maven.tasks.descriptors.properties.RemoveIfReleasedPropertyDescriptor;
+import org.sonatype.nexus.maven.tasks.descriptors.properties.SnapshotRetentionDaysPropertyDescriptor;
 import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesTask;
-import org.sonatype.nexus.tasks.descriptors.SnapshotRemovalTaskDescriptor;
-import org.sonatype.nexus.tasks.descriptors.properties.MinimumSnapshotCountPropertyDescriptor;
-import org.sonatype.nexus.tasks.descriptors.properties.RemoveIfReleasedPropertyDescriptor;
-import org.sonatype.nexus.tasks.descriptors.properties.SnapshotRetentionDaysPropertyDescriptor;
 import org.sonatype.scheduling.SchedulerTask;
 
 /**

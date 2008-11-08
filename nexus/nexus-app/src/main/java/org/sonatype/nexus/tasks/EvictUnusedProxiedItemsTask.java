@@ -74,7 +74,7 @@ public class EvictUnusedProxiedItemsTask
     @Override
     protected String getAction()
     {
-        return FeedRecorder.SYSTEM_EVICT_UNUSED_PROXIED_ITEMS;
+        return FeedRecorder.SYSTEM_EVICT_UNUSED_PROXIED_ITEMS_ACTION;
     }
 
     @Override

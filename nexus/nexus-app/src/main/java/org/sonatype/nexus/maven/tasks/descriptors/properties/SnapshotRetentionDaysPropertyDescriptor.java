@@ -18,19 +18,21 @@
  * along with this program.  If not, see http://www.gnu.org/licenses/.
  *
  */
-package org.sonatype.nexus.tasks.descriptors.properties;
+package org.sonatype.nexus.maven.tasks.descriptors.properties;
 
 import org.codehaus.plexus.component.annotations.Component;
+import org.sonatype.nexus.tasks.descriptors.properties.AbstractNumberPropertyDescriptor;
+import org.sonatype.nexus.tasks.descriptors.properties.ScheduledTaskPropertyDescriptor;
 
-@Component( role = ScheduledTaskPropertyDescriptor.class, hint = "MinimumSnapshotCount", instantiationStrategy = "per-lookup" )
-public class MinimumSnapshotCountPropertyDescriptor
+@Component( role = ScheduledTaskPropertyDescriptor.class, hint = "SnapshotRetentionDays", instantiationStrategy = "per-lookup" )
+public class SnapshotRetentionDaysPropertyDescriptor
     extends AbstractNumberPropertyDescriptor
 {
-    public static final String ID = "minSnapshotsToKeep";
+    public static final String ID = "removeOlderThanDays";
     
-    public MinimumSnapshotCountPropertyDescriptor()
+    public SnapshotRetentionDaysPropertyDescriptor()
     {
-        setHelpText( "Minimum number of snapshots to keep for one GAV." );
+        setHelpText( "The job will purge all snapshots older than the entered number of days, but will obey to Min. count of snapshots to keep." );
         setRequired( false );
     }
  
@@ -41,6 +43,6 @@ public class MinimumSnapshotCountPropertyDescriptor
 
     public String getName()
     {
-        return "Minimum snapshot count";
+        return "Snapshot retention (days)";
     }
 }

@@ -28,9 +28,9 @@ import junit.framework.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
+import org.sonatype.nexus.maven.tasks.descriptors.RebuildMavenMetadataTaskDescriptor;
 import org.sonatype.nexus.rest.model.ScheduledServiceListResource;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
-import org.sonatype.nexus.tasks.descriptors.RebuildMavenMetadataTaskDescriptor;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 
 public class Nexus1022RebuildRepositoryMavenMetadataTaskTest
