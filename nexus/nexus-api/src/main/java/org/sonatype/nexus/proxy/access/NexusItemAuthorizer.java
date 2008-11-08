@@ -4,6 +4,7 @@ import java.util.Map;
 
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
+import org.sonatype.nexus.proxy.repository.Repository;
 
 /**
  * Authorizes the Repository requests against permissions.
@@ -30,4 +31,14 @@ public interface NexusItemAuthorizer
      * @return
      */
     boolean authorizePath( ResourceStoreRequest rsr, Action action );
+
+    /**
+     * Authorizes an Event.
+     * 
+     * @param request
+     * @param repository
+     * @param action
+     * @return
+     */
+    boolean authorizeInternalAction( ResourceStoreRequest request, Repository repository, InternalAction action );
 }

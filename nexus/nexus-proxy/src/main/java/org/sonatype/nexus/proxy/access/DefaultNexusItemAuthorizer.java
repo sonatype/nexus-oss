@@ -11,6 +11,7 @@ import org.jsecurity.subject.Subject;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
+import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.router.RepositoryRouter;
 import org.sonatype.nexus.proxy.router.RootRepositoryRouter;
 import org.sonatype.nexus.proxy.target.TargetMatch;
@@ -44,6 +45,15 @@ public class DefaultNexusItemAuthorizer
         return authorizePath( matched, action );
     }
 
+    public boolean authorizeInternalAction( ResourceStoreRequest request, Repository repository, InternalAction action )
+    {
+        ArrayList<String> perms = new ArrayList<String>( 1 );
+
+        perms.add( action.getPermissionString() );
+
+        return isPermitted( perms );
+    }
+
     protected boolean authorizePath( TargetSet matched, Action action )
     {
         // did we hit repositories at all?
@@ -60,7 +70,21 @@ public class DefaultNexusItemAuthorizer
         }
     }
 
-    protected boolean isPermitted( String[] perms )
+    protected List<String> getTargetPerms( TargetSet matched, Action action )
+    {
+        List<String> perms = new ArrayList<String>( matched.getMatches().size() );
+
+        // nexus : 'target' + targetId : repoId : read
+        for ( TargetMatch match : matched.getMatches() )
+        {
+            perms
+                .add( "nexus:target:" + match.getTarget().getId() + ":" + match.getRepository().getId() + ":" + action );
+        }
+
+        return perms;
+    }
+
+    protected boolean isPermitted( List<String> perms )
     {
         // Get the current user
         Subject subject = SecurityUtils.getSubject();
@@ -85,23 +109,4 @@ public class DefaultNexusItemAuthorizer
 
         return false;
     }
-
-    protected String[] getTargetPerms( TargetSet matched, Action action )
-    {
-        String[] result = null;
-
-        List<String> perms = new ArrayList<String>( matched.getMatches().size() );
-
-        // nexus : 'target' + targetId : repoId : read
-        for ( TargetMatch match : matched.getMatches() )
-        {
-            perms
-                .add( "nexus:target:" + match.getTarget().getId() + ":" + match.getRepository().getId() + ":" + action );
-        }
-
-        result = perms.toArray( new String[perms.size()] );
-
-        return result;
-    }
-
 }

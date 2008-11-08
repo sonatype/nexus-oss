@@ -40,4 +40,9 @@ public class OpenAccessManager
         // this access manager is open, everybody has access to everything since
         // it never throws AccessDeniedEx
     }
+
+    public boolean isAuthorizedFor( ResourceStoreRequest request, Repository repository, InternalAction action )
+    {
+        return true;
+    }
 }

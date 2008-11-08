@@ -31,4 +31,9 @@ public class DefaultAccessManager
                 + "', path='" + request.getRequestPath() + "', action='" + action + "'!" );
         }
     }
+
+    public boolean isAuthorizedFor( ResourceStoreRequest request, Repository repository, InternalAction action )
+    {
+        return nexusItemAuthorizer.authorizeInternalAction( request, repository, action );
+    }
 }
