@@ -20,9 +20,59 @@
  */
 package org.sonatype.nexus.proxy.maven;
 
+import org.apache.lucene.document.Document;
+import org.sonatype.nexus.artifact.VersionUtils;
+import org.sonatype.nexus.index.ArtifactInfo;
+import org.sonatype.nexus.index.DocumentFilter;
+import org.sonatype.nexus.index.creator.AbstractIndexCreator;
+
 public enum RepositoryPolicy
 {
-    RELEASE,
+    RELEASE 
+    {
+        public DocumentFilter getFilter() 
+        {
+            return new DocumentFilter()
+            {
+                public boolean accept( Document doc )
+                {
+                    String uinfo = doc.get( ArtifactInfo.UINFO );
+    
+                    if ( uinfo == null ) 
+                    {
+                        return true;
+                    } 
+    
+                    String[] r = AbstractIndexCreator.FS_PATTERN.split( uinfo );
+    
+                    return !VersionUtils.isSnapshot( r[2] );
+                }
+            };         
+        }
+    },
 
-    SNAPSHOT;
+    SNAPSHOT 
+    {
+        public DocumentFilter getFilter() 
+        {
+            return new DocumentFilter()
+            {
+                public boolean accept( Document doc )
+                {
+                    String uinfo = doc.get( ArtifactInfo.UINFO );
+    
+                    if ( uinfo == null ) 
+                    {
+                        return true;
+                    } 
+    
+                    String[] r = AbstractIndexCreator.FS_PATTERN.split( uinfo );
+    
+                    return VersionUtils.isSnapshot( r[2] );
+                }
+            };         
+        }
+    };
+
+    public abstract DocumentFilter getFilter();
 }
