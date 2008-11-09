@@ -29,7 +29,7 @@ import org.sonatype.nexus.index.context.IndexingContext;
 /**
  * Default Indexer implementation.
  * 
- * @author cstamas
+ * @author Tamas Cservenak
  * @plexus.component
  */
 public class DefaultIndexerEngine
@@ -40,14 +40,12 @@ public class DefaultIndexerEngine
     public void beginIndexing( IndexingContext context )
         throws IOException
     {
-
     }
 
     public void index( IndexingContext context, ArtifactContext ac )
         throws IOException
     {
-        // the GAV null means the file to scan is not obeying to repo layout (whether m1 or m2)
-        // skip it
+        // skip artifacts not obeying repo layout (whether m1 or m2) 
         if ( ac.getGav() != null )
         {
             Document d = createDocument( context, ac );
@@ -76,8 +74,18 @@ public class DefaultIndexerEngine
     {
         IndexWriter w = context.getIndexWriter();
 
-        w.deleteDocuments( getKeyTerm( ac ) );
+        String uinfo = getUinfo( ac );
 
+        // add artifact deletion marker
+        Document doc = new Document();
+        doc.add( new Field( ArtifactInfo.DELETED, uinfo, Field.Store.YES, Field.Index.NO ) );
+        doc.add( new Field( ArtifactInfo.LAST_MODIFIED, //
+            Long.toString( System.currentTimeMillis() ), Field.Store.YES, Field.Index.NO ) );
+        
+        w.addDocument( doc );
+        
+        w.deleteDocuments( new Term( ArtifactInfo.UINFO, uinfo ) );
+        
         w.flush();
 
         context.updateTimestamp();
@@ -88,7 +96,7 @@ public class DefaultIndexerEngine
     {
         IndexWriter w = context.getIndexWriter();
 
-        w.updateDocument( getKeyTerm( ac ), createDocument( context, ac ) );
+        w.updateDocument( new Term( ArtifactInfo.UINFO, getUinfo( ac ) ), createDocument( context, ac ) );
 
         w.flush();
 
@@ -97,12 +105,11 @@ public class DefaultIndexerEngine
 
     //
 
-    private Term getKeyTerm( ArtifactContext ac )
+    private String getUinfo( ArtifactContext ac )
     {
         ArtifactInfo ai = ac.getArtifactInfo();
 
-        return new Term( ArtifactInfo.UINFO, //
-            AbstractIndexCreator.getGAV( ai.groupId, ai.artifactId, ai.version, ai.classifier, ai.packaging ) );
+        return AbstractIndexCreator.getGAV( ai.groupId, ai.artifactId, ai.version, ai.classifier, ai.packaging );
     }
 
     private Document createDocument( IndexingContext context, ArtifactContext ac )
@@ -112,7 +119,7 @@ public class DefaultIndexerEngine
 
         Document doc = new Document();
 
-        // primary key
+        // unique key
         doc.add( new Field( ArtifactInfo.UINFO, AbstractIndexCreator.getGAV(
             ai.groupId,
             ai.artifactId,
@@ -120,6 +127,9 @@ public class DefaultIndexerEngine
             ai.classifier,
             ai.packaging ), Field.Store.YES, Field.Index.UN_TOKENIZED ) );
 
+        doc.add( new Field( ArtifactInfo.LAST_MODIFIED, //
+            Long.toString( System.currentTimeMillis() ), Field.Store.YES, Field.Index.NO ) );
+        
         ArtifactIndexingContext indexingContext = new DefaultArtifactIndexingContext( ac );
 
         for ( IndexCreator indexCreator : context.getIndexCreators() )

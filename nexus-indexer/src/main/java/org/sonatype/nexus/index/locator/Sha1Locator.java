@@ -21,6 +21,7 @@ public class Sha1Locator
 {
     public File locate( File source )
     {
-        return new File( source.getParentFile(), source.getName() + ".sha1" );
+        // return new File( source.getParentFile(), source.getName() + ".sha1" );
+        return new File( source.getAbsolutePath() + ".sha1" );
     }
 }

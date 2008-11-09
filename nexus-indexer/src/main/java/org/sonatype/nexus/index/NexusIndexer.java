@@ -53,18 +53,16 @@ public interface NexusIndexer
         // Collections.singletonList(new MinimalArtifactInfoIndexCreator());
 
     /**
-     * The "default" set of index creators. It adds Jar contents (classes) to minimal index.
-     */
-    public static final List<? extends IndexCreator> DEFAULT_INDEX = Arrays.asList(
-        new MinimalArtifactInfoIndexCreator(),
-        new JarFileContentsIndexCreator() );
-
-    /**
      * The full set of index creators.
      */
     public static final List<? extends IndexCreator> FULL_INDEX = Arrays.asList(
         new MinimalArtifactInfoIndexCreator(),
         new JarFileContentsIndexCreator() );
+    /**
+     * The "default" set of index creators. It adds Jar contents (classes) to minimal index.
+     */
+    public static final List<? extends IndexCreator> DEFAULT_INDEX = FULL_INDEX;
+    
 
     /**
      * Adds an indexing context to Nexus indexer.
@@ -106,7 +104,9 @@ public interface NexusIndexer
         String repositoryUrl, String indexUpdateUrl, List<? extends IndexCreator> indexers )
         throws IOException;
 
-    @Deprecated
+    /**
+     * @deprecated use {@link #addIndexingContext(String, String, File, Directory, String, String, List)} 
+     */
     IndexingContext addIndexingContext( String id, String repositoryId, File repository, File indexDirectory,
         String repositoryUrl, String indexUpdateUrl, List<? extends IndexCreator> indexers,
         boolean reclaimIndexOwnership )
@@ -153,7 +153,9 @@ public interface NexusIndexer
         String repositoryUrl, String indexUpdateUrl, List<? extends IndexCreator> indexers )
         throws IOException;
 
-    @Deprecated
+    /**
+     * @deprecated use {@link #addIndexingContext(String, String, File, Directory, String, String, List)} instead
+     */
     IndexingContext addIndexingContext( String id, String repositoryId, File repository, Directory directory,
         String repositoryUrl, String indexUpdateUrl, List<? extends IndexCreator> indexers,
         boolean reclaimIndexOwnership )
@@ -172,8 +174,6 @@ public interface NexusIndexer
 
     /**
      * Returns the map of indexing contexts keyed by their ID.
-     * 
-     * @return
      */
     Map<String, IndexingContext> getIndexingContexts();
 
@@ -210,16 +210,18 @@ public interface NexusIndexer
     /**
      * Will search all searchable contexts know to Nexus indexer and merge the results. The default comparator will be
      * used (VersionComparator) to sort the results.
+     * 
+     * @deprecated use {@link #searchFlat(FlatSearchRequest)} instead 
      */
-    @Deprecated
     Collection<ArtifactInfo> searchFlat( Query query )
         throws IOException,
             IndexContextInInconsistentStateException;
 
     /**
      * Will search the given context. The default comparator will be used (VersionComparator) to sort the results.
-     */
-    @Deprecated
+     * 
+     * @deprecated use {@link #searchFlat(FlatSearchRequest)} instead
+     */ 
     Collection<ArtifactInfo> searchFlat( Query query, IndexingContext context )
         throws IOException,
             IndexContextInInconsistentStateException;
@@ -227,16 +229,18 @@ public interface NexusIndexer
     /**
      * Will search all searchable contexts know to Nexus indexer and merge the results. The given comparator will be
      * used to sort the results.
-     */
-    @Deprecated
+     * 
+     * @deprecated use {@link #searchFlat(FlatSearchRequest)} instead
+     */ 
     Collection<ArtifactInfo> searchFlat( Comparator<ArtifactInfo> artifactInfoComparator, Query query )
         throws IOException,
             IndexContextInInconsistentStateException;
 
     /**
      * Will search the given context. The given comparator will be used to sort the results.
-     */
-    @Deprecated
+     * 
+     * @deprecated use {@link #searchFlat(FlatSearchRequest)} instead
+     */ 
     Collection<ArtifactInfo> searchFlat( Comparator<ArtifactInfo> artifactInfoComparator, Query query,
         IndexingContext context )
         throws IOException,
@@ -262,8 +266,9 @@ public interface NexusIndexer
      * @return
      * @throws IOException
      * @throws IndexContextInInconsistentStateException
+     * 
+     * @deprecated use {@link #searchGrouped(GroupedSearchRequest)
      */
-    @Deprecated
     Map<String, ArtifactInfoGroup> searchGrouped( Grouping grouping, Query query )
         throws IOException,
             IndexContextInInconsistentStateException;
@@ -277,8 +282,9 @@ public interface NexusIndexer
      * @return
      * @throws IOException
      * @throws IndexContextInInconsistentStateException
+     * 
+     * @deprecated use {@link #searchGrouped(GroupedSearchRequest)
      */
-    @Deprecated
     Map<String, ArtifactInfoGroup> searchGrouped( Grouping grouping, Query query, IndexingContext context )
         throws IOException,
             IndexContextInInconsistentStateException;
@@ -292,8 +298,9 @@ public interface NexusIndexer
      * @return
      * @throws IOException
      * @throws IndexContextInInconsistentStateException
+     * 
+     * @deprecated use {@link #searchGrouped(GroupedSearchRequest)
      */
-    @Deprecated
     Map<String, ArtifactInfoGroup> searchGrouped( Grouping grouping, Comparator<String> groupKeyComparator, Query query )
         throws IOException,
             IndexContextInInconsistentStateException;
@@ -308,8 +315,9 @@ public interface NexusIndexer
      * @return
      * @throws IOException
      * @throws IndexContextInInconsistentStateException
+     * 
+     * @deprecated use {@link #searchGrouped(GroupedSearchRequest)
      */
-    @Deprecated
     Map<String, ArtifactInfoGroup> searchGrouped( Grouping grouping, Comparator<String> groupKeyComparator,
         Query query, IndexingContext context )
         throws IOException,

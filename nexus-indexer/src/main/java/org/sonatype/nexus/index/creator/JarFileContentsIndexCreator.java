@@ -27,7 +27,7 @@ import org.sonatype.nexus.index.context.ArtifactIndexingContext;
 import org.sonatype.nexus.index.context.IndexingContext;
 
 /**
- * @plexus.component role-hint="jarContents-uniqueArtifactInfo"
+ * @plexus.component role-hint="jarContent"
  */
 public class JarFileContentsIndexCreator
     extends AbstractIndexCreator
@@ -132,4 +132,9 @@ public class JarFileContentsIndexCreator
         }
     }
 
+    public String toString() 
+    {
+        return "jarContent";
+    }
+    
 }

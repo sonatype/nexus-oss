@@ -15,6 +15,7 @@ package org.sonatype.nexus.index.cli;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.cli.CommandLine;
@@ -37,9 +38,7 @@ import org.sonatype.nexus.index.scan.ScanningResult;
 public class NexusIndexerCli
     extends AbstractCli
 {
-    // ----------------------------------------------------------------------------
-    // Options
-    // ----------------------------------------------------------------------------
+    // Command line options
 
     public static final char REPO = 'r';
 
@@ -49,15 +48,15 @@ public class NexusIndexerCli
 
     public static final char TYPE = 't';
 
-    public static final char ZIP = 'z';
+    // public static final char ZIP = 'z';
 
     public static final char UPDATE = 'u';
 
     public static final char OVERWRITE = 'o';
 
-    // ----------------------------------------------------------------------------
-    // Properties controlling Repository conversion
-    // ----------------------------------------------------------------------------
+    public static final char TARGET_DIR = 'd';
+    
+    private static final long MB = 1024 * 1024;
 
     public static void main( String[] args )
         throws Exception
@@ -75,24 +74,28 @@ public class NexusIndexerCli
     @SuppressWarnings( "static-access" )
     public Options buildCliOptions( Options options )
     {
-        options.addOption( OptionBuilder
-            .withLongOpt( "index" ).hasArg().withDescription( "Path to the index folder." ).create( INDEX ) );
+        options.addOption( OptionBuilder.withLongOpt( "index" ).hasArg() //
+            .withDescription( "Path to the index folder." ).create( INDEX ) );
 
-        options.addOption( OptionBuilder.withLongOpt( "repository" ).hasArg().withDescription(
-            "Path to the Maven repository." ).create( REPO ) );
+        options.addOption( OptionBuilder.withLongOpt( "target" )  //
+            .withDescription( "Target folder." ).create( TARGET_DIR ) );
+        
+        options.addOption( OptionBuilder.withLongOpt( "repository" ).hasArg() //
+            .withDescription( "Path to the Maven repository." ).create( REPO ) );
 
-        options.addOption( OptionBuilder.withLongOpt( "name" ).hasArg().withDescription( "Repository name." ).create(
-            NAME ) );
+        options.addOption( OptionBuilder.withLongOpt( "name" ).hasArg() //
+            .withDescription( "Repository name." ).create( NAME ) );
 
-        options.addOption( OptionBuilder.withLongOpt( "type" ).hasArg().withDescription(
-            "Index type (default, min or full)." ).create( TYPE ) );
+        options.addOption( OptionBuilder.withLongOpt( "type" ).hasArg() //
+            .withDescription( "Indexer type (default, min, full or coma separated list of custom types)." ).create( TYPE ) );
 
-        options.addOption( OptionBuilder.withLongOpt( "zip" ).withDescription( "Create index archive." ).create( ZIP ) );
+        // options.addOption( OptionBuilder.withLongOpt( "zip" ).withDescription( "Create index archive." ).create( ZIP ) );
 
-        options.addOption( OptionBuilder
-            .withLongOpt( "overwrite" ).withDescription( "Overwrite existing index." ).create( OVERWRITE ) );
+        options.addOption( OptionBuilder.withLongOpt( "overwrite" ) //
+            .withDescription( "Overwrite existing index." ).create( OVERWRITE ) );
 
-        options.addOption( OptionBuilder.withLongOpt( "update" ).withDescription( "Create update." ).create( UPDATE ) );
+        options.addOption( OptionBuilder.withLongOpt( "update" ) //
+            .withDescription( "Create update." ).create( UPDATE ) );
 
         return options;
     }
@@ -125,13 +128,13 @@ public class NexusIndexerCli
 
         String indexDirectoryName = cli.getOptionValue( INDEX );
 
-        File indexDirectory = new File( indexDirectoryName );
+        File indexFolder = new File( indexDirectoryName );
 
-        if ( indexDirectory.exists() )
+        if ( indexFolder.exists() )
         {
             if ( cli.hasOption( OVERWRITE ) )
             {
-                FileUtils.deleteDirectory( indexDirectory );
+                FileUtils.deleteDirectory( indexFolder );
             }
             else if ( !cli.hasOption( UPDATE ) )
             {
@@ -143,87 +146,141 @@ public class NexusIndexerCli
             }
         }
 
-        List<? extends IndexCreator> indexers = NexusIndexer.DEFAULT_INDEX;
+        File outputFolder = new File( cli.hasOption( TARGET_DIR ) ? cli.getOptionValue( TARGET_DIR ) : "." );
+        
+        File repositoryFolder = new File( cli.getOptionValue( REPO ) );
+        
+        String repositoryName = cli.hasOption( NAME ) ? cli.getOptionValue( NAME ) : indexFolder.getName();
 
-        if ( cli.hasOption( TYPE ) )
-        {
-            String type = cli.getOptionValue( TYPE );
-
-            if ( "min".equals( type ) )
-            {
-                indexers = NexusIndexer.MINIMAL_INDEX;
-            }
-            else if ( "full".equals( type ) )
-            {
-                indexers = NexusIndexer.FULL_INDEX;
-            }
-        }
-
-        String repositoryName = cli.hasOption( NAME ) ? cli.getOptionValue( NAME ) : indexDirectory.getName();
-
-        File repository = new File( cli.getOptionValue( REPO ) );
-
+        List<IndexCreator> indexers = getIndexers( cli, plexus );
+        
+        System.err.printf( "Repository Folder: %s\n", repositoryFolder.getAbsolutePath() );
+        System.err.printf( "Index Folder:      %s\n", indexFolder.getAbsolutePath() );
+        System.err.printf( "Output Folder:     %s\n", outputFolder.getAbsolutePath() );
+        System.err.printf( "Repository name:   %s\n", repositoryName );
+        System.err.printf( "Indexers: %s\n", indexers.toString() );
+        
         NexusIndexer indexer = (NexusIndexer) plexus.lookup( NexusIndexer.class );
 
-        IndexPacker packer = (IndexPacker) plexus.lookup( IndexPacker.class );
-
-        IndexingContext indexingContext = indexer.addIndexingContext( //
+        long tstart = System.currentTimeMillis();
+        
+        IndexingContext context = indexer.addIndexingContext( //
             repositoryName, // context id
             repositoryName, // repository id
-            repository, // repository folder
-            indexDirectory, // index folder
+            repositoryFolder, // repository folder
+            indexFolder, // index folder
             null, // repositoryUrl
             null, // index update url
-            indexers,
-            false);
+            indexers);
 
-        boolean createZip = cli.hasOption( ZIP );
-
+        IndexPacker packer = (IndexPacker) plexus.lookup( IndexPacker.class );
+        
         boolean debug = cli.hasOption( DEBUG );
 
         boolean update = cli.hasOption( UPDATE );
 
-        ArtifactScanningListener listener = new IndexerListener( indexingContext, packer, createZip, debug, update );
+        ArtifactScanningListener listener = new IndexerListener( context, debug );
 
-        indexer.scan( indexingContext, listener, update );
+        indexer.scan( context, listener, update );
+        
+        packIndex( context, packer, outputFolder, debug );
+        
+        // print stats
+        
+        long t = System.currentTimeMillis() - tstart;
+
+        long s = t / 1000L;
+
+        if ( t > 60 * 1000 )
+        {
+            long m = t / 1000L / 60L;
+
+            System.err.printf( "Total time: %d min %d sec\n", m, s - ( m * 60 ) );
+        }
+        else
+        {
+            System.err.printf( "Total time: %d sec\n", s );
+        }
+
+        Runtime r = Runtime.getRuntime();
+
+        System.err.printf( "Final memory: %dM/%dM\n", //
+            ( r.totalMemory() - r.freeMemory() ) / MB, r.totalMemory() / MB );
     }
 
-    // Listener
+    private List<IndexCreator> getIndexers(final CommandLine cli,
+        PlexusContainer plexus) throws ComponentLookupException {
+      String type = "default";
+      
+      if ( cli.hasOption( TYPE ) )
+      {
+          type = cli.getOptionValue( TYPE );
+      }
 
+      List<IndexCreator> indexers = new ArrayList<IndexCreator>();  // NexusIndexer.DEFAULT_INDEX;
+      
+      if( "default".equals( type ) )
+      {
+          indexers.add( (IndexCreator) plexus.lookup( IndexCreator.class, "min" ) );
+          indexers.add( (IndexCreator) plexus.lookup( IndexCreator.class, "jarContent" ) );
+      }
+      else if ( "full".equals( type ) )
+      {
+          for ( Object component : plexus.lookupList( IndexCreator.class ) )
+          {
+              indexers.add( (IndexCreator) component );
+          }
+      }
+      else
+      {
+          for ( String hint : type.split(",") )
+          {
+              indexers.add( (IndexCreator) plexus.lookup( IndexCreator.class, hint ) );
+          }
+      }
+      return indexers;
+    }
+
+    private void packIndex(IndexingContext context, IndexPacker packer, File outputDir, boolean debug) 
+    {
+        try
+        {
+            packer.packIndex( context, outputDir );
+        }
+        catch ( IOException e )
+        {
+            System.err.printf( "Cannot zip index; \n", e.getMessage() );
+  
+            if ( debug )
+            {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    /**
+     * Scanner listener
+     */
     private static final class IndexerListener
         implements ArtifactScanningListener
     {
-        private static final long MB = 1024 * 1024;
-
         private final IndexingContext context;
 
-        private final IndexPacker packer;
-
-        private final boolean createZip;
-
         private final boolean debug;
-
-        private final boolean update;
-
-        private long tstart;
 
         private long ts = System.currentTimeMillis();
 
         private int count;
 
-        IndexerListener( IndexingContext context, IndexPacker packer, boolean createZip, boolean debug, boolean update )
+        IndexerListener( IndexingContext context, boolean debug )
         {
             this.context = context;
-            this.packer = packer;
-            this.createZip = createZip;
             this.debug = debug;
-            this.update = update;
         }
 
         public void scanningStarted( IndexingContext context )
         {
             System.err.println( "Scanning started" );
-            tstart = System.currentTimeMillis();
         }
 
         public void artifactDiscovered( ArtifactContext ac )
@@ -244,11 +301,7 @@ public class NexusIndexerCli
                     "" + ai.goals );
             }
 
-            if ( update )
-            {
-                System.err.printf( "  %6d %s\n", count, formatFile( ac.getPom() ) );
-            }
-            else if ( ( t - ts ) > 2000L )
+            if ( ( t - ts ) > 2000L )
             {
                 System.err.printf( "  %6d %s\n", count, formatFile( ac.getPom() ) );
                 ts = t;
@@ -282,43 +335,8 @@ public class NexusIndexerCli
             }
 
             System.err.printf( "Total files scanned: %s\n", result.getTotalFiles() );
-
-            long t = System.currentTimeMillis() - tstart;
-
-            long s = t / 1000L;
-
-            if ( t > 60 * 1000 )
-            {
-                long m = t / 1000L / 60L;
-
-                System.err.printf( "Total time: %d min %d sec\n", m, s - ( m * 60 ) );
-            }
-            else
-            {
-                System.err.printf( "Total time: %d sec\n", s );
-            }
-
-            Runtime r = Runtime.getRuntime();
-
-            System.err.printf( "Final memory: %dM/%dM\n", ( r.totalMemory() - r.freeMemory() ) / MB, r.totalMemory()
-                / MB );
-
-            if ( createZip )
-            {
-                try
-                {
-                    packer.packIndex( context, new File( "." ) );
-                }
-                catch ( IOException e )
-                {
-                    System.err.printf( "Cannot zip index; \n", e.getMessage() );
-
-                    if ( debug )
-                    {
-                        e.printStackTrace();
-                    }
-                }
-            }
         }
     }
+    
 }
+

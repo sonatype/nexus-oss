@@ -13,7 +13,6 @@
  *******************************************************************************/
 package org.sonatype.nexus.index.archetype;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -26,6 +25,8 @@ import org.apache.maven.archetype.source.ArchetypeDataSource;
 import org.apache.maven.archetype.source.ArchetypeDataSourceException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.sonatype.nexus.index.ArtifactInfo;
+import org.sonatype.nexus.index.FlatSearchRequest;
+import org.sonatype.nexus.index.FlatSearchResponse;
 import org.sonatype.nexus.index.NexusIndexer;
 import org.sonatype.nexus.index.context.IndexingContext;
 
@@ -49,11 +50,12 @@ public class NexusArchetypeDataSource
         {
             Map<String, String> repositories = getRepositoryMap();
 
-            Collection<ArtifactInfo> artifacts = indexer.searchFlat( //
-                ArtifactInfo.VERSION_COMPARATOR, //
+            FlatSearchRequest searchRequest = new FlatSearchRequest( //
                 new TermQuery( new Term( ArtifactInfo.PACKAGING, "maven-archetype" ) ) );
-
-            for ( ArtifactInfo info : artifacts )
+            
+            FlatSearchResponse searchResponse = indexer.searchFlat( searchRequest );
+            
+            for ( ArtifactInfo info : searchResponse.getResults() )
             {
                 Archetype archetype = new Archetype();
                 archetype.setGroupId( info.groupId );

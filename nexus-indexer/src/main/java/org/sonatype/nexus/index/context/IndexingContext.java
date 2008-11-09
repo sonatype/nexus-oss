@@ -15,8 +15,10 @@ package org.sonatype.nexus.index.context;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.Document;
@@ -25,6 +27,7 @@ import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.store.Directory;
 import org.sonatype.nexus.artifact.GavCalculator;
+import org.sonatype.nexus.index.ArtifactContext;
 import org.sonatype.nexus.index.ArtifactInfo;
 import org.sonatype.nexus.index.ArtifactInfoFilter;
 import org.sonatype.nexus.index.DocumentFilter;
@@ -34,7 +37,7 @@ import org.sonatype.nexus.index.creator.IndexCreator;
  * This is the indexing context.
  * 
  * @author Jason van Zyl
- * @author cstamas
+ * @author Tamas Cservenak
  * @author Eugene Kuleshov
  */
 public interface IndexingContext
@@ -45,11 +48,17 @@ public interface IndexingContext
      */
     public static final String INDEX_FILE = "nexus-maven-repository-index";
 
-    public static final String INDEX_ID = "nexus.index.id";
+    public static final String INDEX_PROPERTY_PREFIX = "nexus.index.";
 
-    public static final String INDEX_TIMESTAMP = "nexus.index.time";
+    public static final String INDEX_DAY_PREFIX = INDEX_PROPERTY_PREFIX + "day-";
+    
+    public static final String INDEX_ID = INDEX_PROPERTY_PREFIX + "id";
+
+    public static final String INDEX_TIMESTAMP = INDEX_PROPERTY_PREFIX + "time";
 
     public static final String INDEX_TIME_FORMAT = "yyyyMMddHHmmss.SSS Z";
+
+    public static final String INDEX_TIME_DAY_FORMAT = "yyyyMMdd";
 
     /**
      * Returns this indexing context id.
@@ -223,4 +232,26 @@ public interface IndexingContext
      * @return
      */
     GavCalculator getGavCalculator();
+
+    /**
+     * Sets all groups stored in the current indexing context
+     */
+    void setAllGroups( Collection<String> groups ) 
+        throws IOException;
+
+    Set<String> getAllGroups()
+        throws IOException;
+
+    Set<String> getRootGroups()
+        throws IOException;
+
+    void setRootGroups(Collection<String> groups)
+        throws IOException;
+
+    void rebuildGroups() 
+        throws IOException;
+
+    void updateGroups( ArtifactContext ac )
+        throws IOException;
+    
 }

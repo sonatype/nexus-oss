@@ -86,10 +86,24 @@ public abstract class AbstractIndexCreator
 
     public static String getGAV( String groupId, String artifactId, String version, String classifier, String packaging )
     {
-        return new StringBuilder()
-            .append( groupId ).append( FS ).append( artifactId ).append( FS ).append( version ).append( FS ).append(
-                nvl( classifier ) ).append( 
-                  ( ( StringUtils.isEmpty( classifier ) || StringUtils.isEmpty( packaging ) ) ? "" : ( FS + packaging ) ) ).toString();
+        return new StringBuilder() //
+            .append( groupId ).append( FS ) //
+            .append( artifactId ).append( FS ) //
+            .append( version ).append( FS ) //
+            .append( nvl( classifier ) ) //
+            .append( StringUtils.isEmpty( classifier ) || StringUtils.isEmpty( packaging ) ? "" : FS + packaging ) //
+            .toString();
+    }
+    
+    public static String getRootGroup( String groupId )
+    {
+        String group = groupId;
+        int n = group.indexOf( '.' );
+        if ( n > -1 )
+        {
+            group = group.substring( 0, n );
+        }
+        return group;
     }
 
     public static boolean isIndexable( File file )

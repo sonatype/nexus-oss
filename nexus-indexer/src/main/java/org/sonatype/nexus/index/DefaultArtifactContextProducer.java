@@ -27,8 +27,9 @@ import org.sonatype.nexus.index.locator.PomLocator;
 /**
  * The default implementation of the ArtifactContextProducer.
  * 
- * @author cstamas
+ * @author Tamas Cservenak
  * @author Eugene Kuleshov
+ * 
  * @plexus.component
  */
 public class DefaultArtifactContextProducer
@@ -44,19 +45,14 @@ public class DefaultArtifactContextProducer
     public ArtifactContext getArtifactContext( IndexingContext context, File file )
     {
         // TODO shouldn't this use repository layout instead?
-        String path = null;
 
+        String repositoryPath = context.getRepository().getAbsolutePath();
+        String artifactPath = file.getAbsolutePath();
+        
         // protection from IndexOutOfBounds
-        if ( file.getAbsolutePath().length() > context.getRepository().getAbsolutePath().length() )
+        if ( artifactPath.length() <= repositoryPath.length() ) 
         {
-            path = file.getAbsolutePath().substring( context.getRepository().getAbsolutePath().length() + 1 ).replace(
-                '\\',
-                '/' );
-        }
-        else
-        {
-            // this is junk path?
-            return null;
+            return null;  // this is junk path?
         }
         
         if ( !AbstractIndexCreator.isIndexable( file ) )
@@ -64,6 +60,8 @@ public class DefaultArtifactContextProducer
             return null;
         }
 
+        String path = artifactPath.substring( repositoryPath.length() + 1 ).replace( '\\', '/' );
+        
         Gav gav = context.getGavCalculator().pathToGav( path );
 
         if ( gav == null )

@@ -27,15 +27,25 @@ import org.sonatype.nexus.index.context.UnsupportedExistingLuceneIndexException;
  */
 public interface IndexUpdater
 {
+    /**
+     * @return timestamp for updated index
+     */
     Date fetchAndUpdateIndex( IndexingContext context, TransferListener listener )
         throws IOException,
             UnsupportedExistingLuceneIndexException;
 
+    /**
+     * @return timestamp for updated index
+     */
     Date fetchAndUpdateIndex( IndexingContext context, TransferListener listener, ProxyInfo proxyInfo )
         throws IOException,
             UnsupportedExistingLuceneIndexException;
 
-    public Properties fetchIndexProperties( IndexingContext context, TransferListener listener, ProxyInfo proxyInfo )
-        throws IOException;    
+    Properties fetchIndexProperties( IndexingContext context, TransferListener listener, ProxyInfo proxyInfo )
+        throws IOException;
+
+    Date getTimestamp( Properties properties, String key ); 
+
+    String getUpdateChunkName( Date contextTimestamp, Properties properties ); 
 
 }

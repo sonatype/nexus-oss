@@ -24,6 +24,7 @@ import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
  * ArtifactInfo holds the values known about an repository artifact. This is a simple Value Object kind of stuff.
  * 
  * @author Jason van Zyl
+ * @author Eugene Kuleshov
  */
 public class ArtifactInfo
     implements Serializable
@@ -45,7 +46,7 @@ public class ArtifactInfo
     public static final String ALL_GROUPS_LIST = "allGroupsList";
 
     /**
-     * packaging lastModified size sourcesExists javadocExists signatureExists
+     * packaging, lastModified, size, sourcesExists, javadocExists, signatureExists
      */
     public static final String INFO = "i";
 
@@ -64,7 +65,7 @@ public class ArtifactInfo
     // These are attributes that are unique across the versions of a particular artifact.
 
     /**
-     * groupId artifactId version classifier
+     * Unique groupId, artifactId, version, classifier, packaging
      */
     public static final String UINFO = "u";
 
@@ -94,6 +95,11 @@ public class ArtifactInfo
 
     public static final String PLUGIN_GOALS = "gx";
 
+    /**
+     * Field that contains {@link #UINFO} value for deleted artifact
+     */
+    public static final String DELETED = "del";
+    
     public static final VersionComparator VERSION_COMPARATOR = new VersionComparator();
 
     public static final VersionComparator REPOSITORY_VERSION_COMPARATOR = new RepositoryVersionComparator();
@@ -212,6 +218,7 @@ public class ArtifactInfo
     public static class VersionComparator
         implements Comparator<ArtifactInfo>
     {
+        @SuppressWarnings("unchecked")
         public int compare( ArtifactInfo f1, ArtifactInfo f2 )
         {
             int n = f1.groupId.compareTo( f2.groupId );

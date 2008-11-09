@@ -21,7 +21,7 @@ import org.sonatype.nexus.artifact.Gav;
  * The context of an artifact.
  * 
  * @author Jason van Zyl
- * @author cstamas
+ * @author Tamas Cservenak
  */
 public class ArtifactContext
 {

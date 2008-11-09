@@ -34,7 +34,6 @@ import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.sonatype.nexus.index.context.IndexingContext;
-import org.sonatype.nexus.index.creator.AbstractIndexCreator;
 
 /** @author Jason van Zyl */
 public class DefaultIndexNexusIndexerTest
@@ -52,8 +51,7 @@ public class DefaultIndexNexusIndexerTest
             indexDir,
             null,
             null,
-            NexusIndexer.DEFAULT_INDEX,
-            false );
+            NexusIndexer.DEFAULT_INDEX );
 
         assertNull( context.getTimestamp() ); // unknown upon creation
 
@@ -220,8 +218,7 @@ public class DefaultIndexNexusIndexerTest
             newIndexDir,
             null,
             null,
-            NexusIndexer.DEFAULT_INDEX,
-            false );
+            NexusIndexer.DEFAULT_INDEX );
 
         assertEquals( context.getTimestamp().getTime(), newContext.getTimestamp().getTime() );
 
@@ -260,8 +257,7 @@ public class DefaultIndexNexusIndexerTest
             newIndexDir,
             null,
             null,
-            NexusIndexer.DEFAULT_INDEX,
-            false );
+            NexusIndexer.DEFAULT_INDEX );
 
         assertEquals( timestamp, newContext.getTimestamp() );
 

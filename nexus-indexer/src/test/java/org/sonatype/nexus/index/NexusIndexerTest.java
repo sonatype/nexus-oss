@@ -35,7 +35,6 @@ import org.codehaus.plexus.util.FileUtils;
 import org.sonatype.nexus.index.context.IndexingContext;
 import org.sonatype.nexus.index.context.UnsupportedExistingLuceneIndexException;
 import org.sonatype.nexus.index.creator.IndexCreator;
-import org.sonatype.nexus.index.creator.MinimalArtifactInfoIndexCreator;
 
 /** @author Jason van Zyl */
 public class NexusIndexerTest

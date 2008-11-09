@@ -27,4 +27,5 @@ public interface ScanningResult
     public boolean hasExceptions();
 
     public List<Exception> getExceptions();
+    
 }

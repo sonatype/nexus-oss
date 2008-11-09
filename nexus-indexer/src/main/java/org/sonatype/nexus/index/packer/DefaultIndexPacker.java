@@ -18,70 +18,211 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 import java.util.Properties;
+import java.util.TreeMap;
+import java.util.Map.Entry;
 
+import org.apache.lucene.document.Document;
+import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.index.IndexWriter;
+import org.apache.lucene.store.RAMDirectory;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.IOUtil;
+import org.sonatype.nexus.index.ArtifactInfo;
 import org.sonatype.nexus.index.IndexUtils;
+import org.sonatype.nexus.index.context.DefaultIndexingContext;
 import org.sonatype.nexus.index.context.IndexingContext;
+import org.sonatype.nexus.index.context.UnsupportedExistingLuceneIndexException;
 
 /**
- * Default provider for IndexPacker. Creates the Peoperties and ZIP files.
+ * Default provider for IndexPacker. Creates the properties and zip files.
  * 
- * @author cstamas
+ * @author Tamas Cservenak
+ * @author Eugene Kuleshov
+ * 
  * @plexus.component
  */
 public class DefaultIndexPacker
     extends AbstractLogEnabled
     implements IndexPacker
 {
-
-    private SimpleDateFormat df = new SimpleDateFormat( IndexingContext.INDEX_TIME_FORMAT );
+    private static final int MAX_CHUNKS = 30;
 
     public void packIndex( IndexingContext context, File targetDir )
-        throws IOException,
-            IllegalArgumentException
+        throws IOException, IllegalArgumentException
     {
         if ( targetDir == null )
         {
-            throw new IllegalArgumentException( "The supplied targetDir is null!" );
+            throw new IllegalArgumentException( "The target dir is null" );
         }
 
-        if ( !targetDir.exists() )
+        if ( targetDir.exists() )
         {
-            targetDir.mkdirs();
-        }
-        else
-        {
-            if ( !targetDir.isDirectory() || !targetDir.canWrite() )
+            if ( !targetDir.isDirectory() )
             {
-                throw new IllegalArgumentException( "The supplied targetDir (" + targetDir.getAbsolutePath()
-                    + ") is not directory or is not writable!" );
+                throw new IllegalArgumentException( //
+                    String.format( "Specified target path %s is not a directory", targetDir.getAbsolutePath() ) );
+            } 
+            if ( !targetDir.canWrite() ) 
+            {
+                throw new IllegalArgumentException( 
+                    String.format( "Specified target path %s is not writtable", targetDir.getAbsolutePath() ) );
+            }
+        }
+        else 
+        {
+            if( !targetDir.mkdirs() ) 
+            {
+                throw new IllegalArgumentException( "Can't create " + targetDir.getAbsolutePath() );
             }
         }
 
-        writeIndexProperties( context, targetDir );
+        Properties info = new Properties();
+        
+        DateFormat df = new SimpleDateFormat( IndexingContext.INDEX_TIME_DAY_FORMAT );
+        
+        Map<String, List<Integer>> chunks = getIndexChunks( context, df );
 
-        writeIndexArchive( context, targetDir );
+        writeIndexChunks( context, info, MAX_CHUNKS, chunks, df, targetDir );
+        
+        writeIndexArchive( context, new File( targetDir, IndexingContext.INDEX_FILE + ".zip" ) );
+
+        writeIndexProperties( context, info, new File( targetDir, IndexingContext.INDEX_FILE + ".properties" ) );
     }
 
-    private void writeIndexProperties( IndexingContext context, File targetDir )
+    Map<String, List<Integer>> getIndexChunks( IndexingContext context, DateFormat df ) 
         throws IOException
     {
-        Properties info = new Properties();
+        Map<String, List<Integer>> chunks = new TreeMap<String, List<Integer>>( Collections.<String>reverseOrder() );
+        
+        IndexReader r = context.getIndexReader();
+        
+        for ( int i = 0; i < r.numDocs(); i++ )
+        {
+            if ( !r.isDeleted( i ) )
+            {
+                Document d = r.document( i );
+    
+                String lastModified = d.get( ArtifactInfo.LAST_MODIFIED );
+                
+                if( lastModified != null )
+                {
+                    Date t = new Date( Long.parseLong( lastModified ) );
+                    getChunk( chunks, df.format( t ) ).add( i );
+                }
+            }
+        }
+        
+        return chunks;
+    }
 
+    void writeIndexChunks( IndexingContext context, Properties info, 
+        int max, Map<String, List<Integer>> chunks, DateFormat df, File targetDir ) 
+        throws IOException
+    {
+        RAMDirectory ctxDir = new RAMDirectory();
+
+        IndexingContext ctx;
+        try 
+        {
+            ctx = new DefaultIndexingContext(
+                context.getId(),
+                context.getRepositoryId(),
+                null,
+                ctxDir,
+                null,
+                null,
+                context.getIndexCreators(), 
+                false );
+        } 
+        catch ( UnsupportedExistingLuceneIndexException ex ) 
+        {
+            throw new IOException( "Can't create temporary indexing context" );
+        }
+
+        IndexReader r = context.getIndexReader();
+        
+        IndexWriter w = ctx.getIndexWriter();
+        
+        int n = 0;
+        for ( Entry<String, List<Integer>> e : chunks.entrySet() ) 
+        {
+            String key = e.getKey();
+          
+            for ( int i : e.getValue() ) 
+            {
+                w.addDocument( r.document( i ) );
+            }
+            
+            w.flush();
+            w.optimize();
+            
+            try 
+            {
+                info.put( IndexingContext.INDEX_DAY_PREFIX + n, format( df.parse( key ) ) );
+            } catch ( ParseException ex ) 
+            {
+            }
+            
+            writeIndexArchive( ctx, new File( targetDir, IndexingContext.INDEX_FILE + "." + key + ".zip" ));
+            
+            if ( max <= n++ ) 
+            {
+                break;
+            }
+        }
+        
+        w.close();
+        
+        ctx.close( /* delete files */ false );
+
+        // ctxDir.delete();
+
+        ctxDir.close();
+    }
+  
+    void writeIndexArchive( IndexingContext context, File targetArchive )
+        throws IOException
+    {
+        if ( targetArchive.exists() ) 
+        {
+            targetArchive.delete();
+        }
+    
+        OutputStream os = null;
+    
+        try
+        {
+            os = new BufferedOutputStream( new FileOutputStream( targetArchive ), 4096 );
+    
+            IndexUtils.packIndexArchive( context, os );
+        }
+        finally
+        {
+            IOUtil.close( os );
+        }
+    }
+
+    void writeIndexProperties( IndexingContext context, Properties info, File propertiesFile )
+        throws IOException
+    {
         info.setProperty( IndexingContext.INDEX_ID, context.getId() );
 
-        info.setProperty( IndexingContext.INDEX_TIMESTAMP, df.format( context.getTimestamp() ) );
-
-        File indexInfo = new File( targetDir, IndexingContext.INDEX_FILE + ".properties" );
+        info.setProperty( IndexingContext.INDEX_TIMESTAMP, format( context.getTimestamp() ) );
 
         OutputStream os = null;
 
         try
         {
-            os = new FileOutputStream( indexInfo );
+            os = new FileOutputStream( propertiesFile );
 
             info.store( os, null );
         }
@@ -91,22 +232,21 @@ public class DefaultIndexPacker
         }
     }
 
-    private void writeIndexArchive( IndexingContext context, File targetDir )
-        throws IOException
+    private String format( Date d ) 
     {
-        File indexArchive = new File( targetDir, IndexingContext.INDEX_FILE + ".zip" );
-
-        OutputStream os = null;
-
-        try
-        {
-            os = new BufferedOutputStream( new FileOutputStream( indexArchive ), 4096 );
-
-            IndexUtils.packIndexArchive( context, os );
-        }
-        finally
-        {
-            IOUtil.close( os );
-        }
+        return new SimpleDateFormat( IndexingContext.INDEX_TIME_FORMAT ).format( d );
     }
+
+    private List<Integer> getChunk( Map<String, List<Integer>> chunks, String key ) 
+    {
+        List<Integer> chunk = chunks.get( key );
+        if( chunk == null) 
+        {
+            chunk = new ArrayList<Integer>();
+            chunks.put( key, chunk );
+        }
+        return chunk;
+    }
+    
 }
+

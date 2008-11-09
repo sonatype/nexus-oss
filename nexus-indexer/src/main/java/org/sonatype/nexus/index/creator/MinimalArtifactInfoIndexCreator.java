@@ -13,6 +13,7 @@
  *******************************************************************************/
 package org.sonatype.nexus.index.creator;
 
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
@@ -50,7 +51,7 @@ import org.sonatype.nexus.index.locator.SourcesLocator;
 /**
  * Minimal index creator to create repository index for using in the repository search (e.g. from IDE plugins).
  * 
- * @plexus.component role-hint="artifactId-minimal"
+ * @plexus.component role-hint="min"
  */
 public class MinimalArtifactInfoIndexCreator
     extends AbstractIndexCreator
@@ -93,6 +94,8 @@ public class MinimalArtifactInfoIndexCreator
                     ai.packaging = model.getPackaging();
                 }
             }
+
+            ai.lastModified = pom.lastModified();
         }
 
         if ( pom != null && ai.classifier == null )
@@ -167,44 +170,46 @@ public class MinimalArtifactInfoIndexCreator
 
     private void checkMavenPlugin( ArtifactInfo ai, File artifact )
     {
-        if ( "maven-plugin".equals( ai.packaging ) && artifact != null )
+        if ( !"maven-plugin".equals( ai.packaging ) || artifact == null )
         {
-            ZipFile jf = null;
+            return;
+        }
+        
+        ZipFile jf = null;
 
-            InputStream is = null;
+        InputStream is = null;
 
-            try
+        try
+        {
+            jf = new ZipFile( artifact );
+
+            ZipEntry entry = jf.getEntry( "META-INF/maven/plugin.xml" );
+
+            if ( entry != null )
             {
-                jf = new ZipFile( artifact );
+                is = new BufferedInputStream( jf.getInputStream( entry ) );
 
-                ZipEntry entry = jf.getEntry( "META-INF/maven/plugin.xml" );
+                PluginDescriptorBuilder builder = new PluginDescriptorBuilder();
 
-                if ( entry != null )
+                PluginDescriptor descriptor = builder.build( new InputStreamReader( is ) );
+
+                ai.prefix = descriptor.getGoalPrefix();
+
+                ai.goals = new ArrayList<String>();
+
+                for ( Object o : descriptor.getMojos() )
                 {
-                    is = jf.getInputStream( entry );
-
-                    PluginDescriptorBuilder builder = new PluginDescriptorBuilder();
-
-                    PluginDescriptor descriptor = builder.build( new InputStreamReader( is ) );
-
-                    ai.prefix = descriptor.getGoalPrefix();
-
-                    ai.goals = new ArrayList<String>();
-
-                    for ( Object o : descriptor.getMojos() )
-                    {
-                        ai.goals.add( ( (MojoDescriptor) o ).getGoal() );
-                    }
+                    ai.goals.add( ( (MojoDescriptor) o ).getGoal() );
                 }
             }
-            catch ( Exception e )
-            {
-            }
-            finally
-            {
-                close( jf );
-                IOUtil.close( is );
-            }
+        }
+        catch ( Exception e )
+        {
+        }
+        finally
+        {
+            close( jf );
+            IOUtil.close( is );
         }
     }
 
@@ -500,4 +505,9 @@ public class MinimalArtifactInfoIndexCreator
 
     }
 
+    public String toString() 
+    {
+        return "min";
+    }
+    
 }

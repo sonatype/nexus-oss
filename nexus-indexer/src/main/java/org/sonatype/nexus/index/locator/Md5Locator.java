@@ -21,6 +21,7 @@ public class Md5Locator
 {
     public File locate( File source )
     {
-        return new File( source.getParentFile(), source.getName() + ".md5" );
+        // return new File( source.getParentFile(), source.getName() + ".md5" );
+        return new File( source.getAbsolutePath() + ".md5" );
     }
 }

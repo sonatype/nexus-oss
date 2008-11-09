@@ -28,6 +28,9 @@ public interface IndexCreator
   
     void updateDocument( ArtifactIndexingContext context, Document doc );
     
+    /**
+     * @return true is artifact info has been updated
+     */
     boolean updateArtifactInfo( IndexingContext ctx, Document d, ArtifactInfo artifactInfo );
 
 }

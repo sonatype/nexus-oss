@@ -24,6 +24,7 @@ public class SourcesLocator
      */
     public File locate( File source )
     {
-        return new File( source.getAbsolutePath().replaceAll( ".pom", "-sources.jar" ) );
+        String path = source.getAbsolutePath();
+        return new File( path.substring( 0, path.length()-4 ).concat( "-sources.jar" ) );
     }
 }

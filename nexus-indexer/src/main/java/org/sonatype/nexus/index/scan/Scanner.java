@@ -16,6 +16,5 @@ package org.sonatype.nexus.index.scan;
 /** @author Jason van Zyl */
 public interface Scanner
 {
-    ScanningResult scan( ScanningRequest request )
-        throws ScanningException;
+    ScanningResult scan( ScanningRequest request );
 }

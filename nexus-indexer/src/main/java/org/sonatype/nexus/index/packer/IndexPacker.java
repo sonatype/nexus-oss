@@ -21,7 +21,7 @@ import org.sonatype.nexus.index.context.IndexingContext;
 /**
  * A component that creates defined ZIP and Properties file where the index will get packed.
  * 
- * @author cstamas
+ * @author Tamas Cservenak
  */
 public interface IndexPacker
 {

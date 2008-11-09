@@ -21,6 +21,7 @@ public class SignatureLocator
 {
     public File locate( File source )
     {
-        return new File( source.getParentFile(), source.getName() + ".asc" );
+        // return new File( source.getParentFile(), source.getName() + ".asc" );
+        return new File( source.getAbsolutePath() + ".asc" );
     }
 }

@@ -13,25 +13,25 @@
  *******************************************************************************/
 package org.sonatype.nexus.index.scan;
 
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
 /** @author Jason van Zyl */
 public class DefaultScanningResult
     implements ScanningResult
 {
-    private int totalFiles;
+    private int totalFiles = 0;
 
-    private List<Exception> exceptions;
-
-    public DefaultScanningResult()
-    {
-        exceptions = new ArrayList<Exception>();
-    }
+    private List<Exception> exceptions = new ArrayList<Exception>();
 
     public void setTotalFiles( int totalFiles )
     {
         this.totalFiles = totalFiles;
+    }
+
+    public void incrementCount()
+    {
+        totalFiles++;
     }
 
     public int getTotalFiles()
@@ -54,8 +54,4 @@ public class DefaultScanningResult
         return exceptions;
     }
 
-    public void incrementCount()
-    {
-        totalFiles++;
-    }
 }

@@ -23,6 +23,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Properties;
 
+import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.RAMDirectory;
 import org.apache.maven.artifact.manager.WagonManager;
 import org.apache.maven.wagon.ConnectionException;
@@ -35,19 +36,20 @@ import org.apache.maven.wagon.events.TransferListener;
 import org.apache.maven.wagon.proxy.ProxyInfo;
 import org.apache.maven.wagon.repository.Repository;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
+import org.codehaus.plexus.util.IOUtil;
 import org.sonatype.nexus.index.IndexUtils;
 import org.sonatype.nexus.index.context.IndexingContext;
 
 /**
  * @author Jason van Zyl
  * @author Eugene Kuleshov
+ * 
  * @plexus.component
  */
 public class DefaultIndexUpdater
     extends AbstractLogEnabled
     implements IndexUpdater
 {
-
     /** @plexus.requirement */
     private WagonManager wagonManager;
 
@@ -60,66 +62,36 @@ public class DefaultIndexUpdater
     public Date fetchAndUpdateIndex( final IndexingContext context, TransferListener listener, ProxyInfo proxyInfo )
         throws IOException
     {
-        return (Date) run( context, listener, proxyInfo, new WagonTask()
+        return run( context, listener, proxyInfo, new WagonTask<Date>()
         {
-            public Object invoke( Wagon wagon )
-                throws FileNotFoundException,
-                    IOException
+            public Date invoke( Wagon wagon )
+                throws IOException
             {
                 Date contextTimestamp = context.getTimestamp();
 
                 if ( contextTimestamp != null )
                 {
-                    Date updateTimestamp = getIndexTimestamp( context, wagon );
-
-                    if ( updateTimestamp.before( contextTimestamp ) || updateTimestamp.equals( contextTimestamp ) )
-                    {
-                        return null;
-                    }
-                }
-
-                File indexArchive = File.createTempFile( "nexus", "index.zip" );
-
-                try
-                {
-                    String remoteIndexFile = IndexingContext.INDEX_FILE + ".zip";
-
-                    downloadResource( wagon, remoteIndexFile, indexArchive );
-
-                    RAMDirectory directory = new RAMDirectory();
-
-                    BufferedInputStream is = new BufferedInputStream( new FileInputStream( indexArchive ), 4096 );
-
-                    Date updateTimestamp = IndexUtils.unpackIndexArchive( is, directory );
-
-                    context.replace( directory );
-
-                    return updateTimestamp;
-                }
-                finally
-                {
-                    indexArchive.delete();
-                }
-            }
-
-            private Date getIndexTimestamp( IndexingContext context, Wagon wagon )
-                throws IOException
-            {
-                try
-                {
                     Properties properties = downloadIndexProperties( wagon );
+                    
+                    Date updateTimestamp = getTimestamp( properties, IndexingContext.INDEX_TIMESTAMP );
 
-                    String indexFileTimestamp = properties.getProperty( IndexingContext.INDEX_TIMESTAMP );
-
-                    if ( indexFileTimestamp != null )
+                    if ( updateTimestamp != null && 
+                        ( updateTimestamp.before( contextTimestamp ) || updateTimestamp.equals( contextTimestamp ) ) )
                     {
-                        return new SimpleDateFormat( IndexingContext.INDEX_TIME_FORMAT ).parse( indexFileTimestamp );
+                        return null;  // index is up to date
                     }
+                    
+                    String chunkName = getUpdateChunkName( contextTimestamp, properties );
+                    
+                    if( chunkName != null )
+                    {
+                        downloadIndexChunk( context, wagon, chunkName );
+                        return updateTimestamp;
+                    }
+                    
                 }
-                catch ( ParseException ex )
-                {
-                }
-                return null;
+
+                return downloadFullIndex( context, wagon );
             }
         } );
     }
@@ -127,18 +99,17 @@ public class DefaultIndexUpdater
     public Properties fetchIndexProperties( IndexingContext context, TransferListener listener, ProxyInfo proxyInfo )
         throws IOException
     {
-        return (Properties) run( context, listener, proxyInfo, new WagonTask()
+        return run( context, listener, proxyInfo, new WagonTask<Properties>()
         {
-            public Object invoke( Wagon wagon )
-                throws FileNotFoundException,
-                    IOException
+            public Properties invoke( Wagon wagon )
+                throws IOException
             {
                 return downloadIndexProperties( wagon );
             }
         } );
     }
 
-    private Object run( IndexingContext context, TransferListener listener, ProxyInfo proxyInfo, WagonTask task )
+    private <T> T run( IndexingContext context, TransferListener listener, ProxyInfo proxyInfo, WagonTask<T> task )
         throws IOException
     {
         Repository repository = new Repository( context.getRepositoryId(), context.getIndexUpdateUrl() );
@@ -148,7 +119,7 @@ public class DefaultIndexUpdater
         try
         {
             wagon = wagonManager.getWagon( repository );
-
+            
             if ( listener != null )
             {
                 wagon.addTransferListener( listener );
@@ -192,6 +163,40 @@ public class DefaultIndexUpdater
                     }
                 }
             }
+        }
+    }
+
+    Date downloadFullIndex( IndexingContext context, Wagon wagon ) 
+        throws IOException 
+    {
+        RAMDirectory directory = new RAMDirectory();
+        
+        Date updateTimestamp = loadIndexDirectory( IndexingContext.INDEX_FILE + ".zip", wagon, directory);
+
+        context.replace( directory );
+        
+        return updateTimestamp;
+    }
+    
+    Date loadIndexDirectory(String remoteIndexFile, Wagon wagon, 
+        Directory directory) throws IOException 
+    {
+        File indexArchive = File.createTempFile( "nexus", "index.zip" );
+        
+        BufferedInputStream is = null;
+
+        try
+        {
+            downloadResource( wagon, remoteIndexFile, indexArchive );
+            
+            is = new BufferedInputStream( new FileInputStream( indexArchive ) );
+      
+            return IndexUtils.unpackIndexArchive( is, directory );
+        }
+        finally
+        {
+            IOUtil.close( is );
+            indexArchive.delete();
         }
     }
 
@@ -249,13 +254,67 @@ public class DefaultIndexUpdater
     }
 
     /**
+     * Returns chunk name for downloading or null
+     */
+    public String getUpdateChunkName( Date contextTimestamp, Properties properties )
+    {
+        int n = 0;
+        
+        while ( true ) 
+        {
+            Date chunkTimestamp = getTimestamp( properties, IndexingContext.INDEX_DAY_PREFIX + n );
+
+            if( chunkTimestamp == null )
+            {
+                break;  // no update chunk available
+            }
+            
+            if ( contextTimestamp.after( chunkTimestamp ) )
+            {
+                SimpleDateFormat df = new SimpleDateFormat( IndexingContext.INDEX_TIME_DAY_FORMAT );
+                return IndexingContext.INDEX_FILE + "." + df.format( chunkTimestamp ) + ".zip";                
+            }
+
+            n++;
+        }
+        
+        return null;  // no update chunk available
+    }
+
+    void downloadIndexChunk( IndexingContext context, Wagon wagon, String name ) 
+        throws IOException 
+    {
+        RAMDirectory directory = new RAMDirectory();
+        
+        loadIndexDirectory( name, wagon, directory );
+
+        context.merge( directory );
+    }
+
+    public Date getTimestamp( Properties properties, String key )
+    {
+        String indexTimestamp = properties.getProperty( key );
+        
+        if ( indexTimestamp != null )
+        {
+            try
+            {
+                return new SimpleDateFormat( IndexingContext.INDEX_TIME_FORMAT ).parse( indexTimestamp );
+            }
+            catch ( ParseException ex )
+            {
+            }
+        }
+        return null;
+    }
+
+    /**
      * A task that requires a Wagon instance
      */
-    public interface WagonTask
+    interface WagonTask<T>
     {
-        Object invoke( Wagon wagon )
-            throws FileNotFoundException,
-                IOException;
+        T invoke( Wagon wagon )
+            throws IOException;
     }
 
 }

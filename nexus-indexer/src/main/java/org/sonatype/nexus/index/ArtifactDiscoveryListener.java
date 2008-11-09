@@ -16,7 +16,7 @@ package org.sonatype.nexus.index;
 /**
  * Listener triggered on artifact discovery.
  * 
- * @author cstamas
+ * @author Tamas Cservenak
  */
 public interface ArtifactDiscoveryListener
 {

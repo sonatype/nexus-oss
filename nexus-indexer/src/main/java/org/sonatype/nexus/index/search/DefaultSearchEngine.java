@@ -39,7 +39,8 @@ import org.sonatype.nexus.index.context.IndexingContext;
 
 /**
  * @author Eugene Kuleshov
- * @author cstamas
+ * @author Tamas Cservenak
+ * 
  * @plexus.component
  */
 public class DefaultSearchEngine

@@ -14,8 +14,9 @@
 package org.sonatype.nexus.index.scan;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.TreeSet;
 
 import org.codehaus.plexus.logging.AbstractLogEnabled;
@@ -28,26 +29,26 @@ import org.sonatype.nexus.index.creator.AbstractIndexCreator;
 
 /**
  * @author Jason Van Zyl
- * @author cstamas
+ * @author Tamas Cservenak
  * @plexus.component
  */
 public class DefaultScanner
     extends AbstractLogEnabled
     implements Scanner
 {
-
     /** @plexus.requirement */
     private ArtifactContextProducer artifactContextProducer;
 
-    /** @plexus.requirement role-hint="maven2" */
-    private GavCalculator gavCalculator;
-
     public ScanningResult scan( ScanningRequest request )
     {
+        request.getArtifactScanningListener().scanningStarted( request.getIndexingContext() );
+      
         ScanningResult result = new DefaultScanningResult();
 
         scanDirectory( request.getIndexingContext().getRepository(), request, result );
 
+        request.getArtifactScanningListener().scanningFinished( request.getIndexingContext(), result );
+        
         return result;
     }
 
@@ -62,64 +63,60 @@ public class DefaultScanner
 
         if ( fileArray != null )
         {
+            Set<File> files = new TreeSet<File>( Arrays.asList( fileArray ) );
 
-            TreeSet<File> files = new TreeSet<File>( Arrays.asList( fileArray ) );
-
+            Set<String> uinfos = new HashSet<String>();
+            
             for ( File f : files )
             {
                 if ( f.getName().startsWith( "." ) )
                 {
-                    continue; // skip all hidden files and directories
+                    continue;  // skip all hidden files and directories
                 }
 
                 if ( f.isDirectory() )
                 {
                     scanDirectory( f, request, result );
                 }
-                // Skip non-indexable files
                 else if ( !AbstractIndexCreator.isIndexable( f ) )
                 {
-                    continue;
+                    continue;  // skip non-indexable files
                 }
                 else
                 {
-                    try
-                    {
-                        if ( request.getInfos() != null )
-                        {
-                            String repoFile = f.getAbsolutePath().substring(
-                                request.getIndexingContext().getRepository().getAbsolutePath().length() + 1 );
-
-                            Gav gav = gavCalculator.pathToGav( repoFile.replace( '\\', '/' ) );
-
-                            if ( gav != null )
-                            {
-                                String uinfo = AbstractIndexCreator.getGAV( gav.getGroupId(), //
-                                    gav.getArtifactId(),
-                                    gav.getBaseVersion(),
-                                    gav.getClassifier(),
-                                    gav.getExtension() );
-
-                                if ( request.getInfos().contains( uinfo ) )
-                                {
-                                    continue; // skip already indexed file
-                                }
-                            }
-                        }
-
-                        processFile( f, request, result );
-                    }
-                    catch ( IOException e )
-                    {
-                        result.addException( e );
-                    }
+                    scanFile( f, request, result, uinfos );
                 }
             }
         }
     }
 
+    private void scanFile( File file, ScanningRequest request, ScanningResult result, Set<String> uinfos ) 
+    {
+        String repoFile = file.getAbsolutePath().substring(
+            request.getIndexingContext().getRepository().getAbsolutePath().length() + 1 );
+        
+        GavCalculator gavCalculator = request.getIndexingContext().getGavCalculator();
+        
+        Gav gav = gavCalculator.pathToGav( repoFile.replace( '\\', '/' ) );
+        
+        if ( gav != null )
+        {
+            String uinfo = AbstractIndexCreator.getGAV( gav.getGroupId(), //
+                gav.getArtifactId(),
+                gav.getBaseVersion(),
+                gav.getClassifier(),
+                gav.getExtension() );
+            
+            if( !uinfos.contains( uinfo ) )
+            {
+                uinfos.add( uinfo );  // skip multiple snapshots
+          
+                processFile( file, request, result );
+            }
+        }
+    }
+
     private void processFile( File file, ScanningRequest request, ScanningResult result )
-        throws IOException
     {
         result.incrementCount();
 
@@ -129,23 +126,7 @@ public class DefaultScanner
 
         if ( ac != null )
         {
-            try
-            {
-                request.getNexusIndexer().artifactDiscovered( ac, context );
-
-                if ( request.getArtifactScanningListener() != null )
-                {
-                    request.getArtifactScanningListener().artifactDiscovered( ac );
-                }
-            }
-            catch ( IOException e )
-            {
-                if ( request.getArtifactScanningListener() != null )
-                {
-                    request.getArtifactScanningListener().artifactError( ac, e );
-                }
-                throw e;
-            }
+            request.getArtifactScanningListener().artifactDiscovered( ac );
         }
     }
 }
