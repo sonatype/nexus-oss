@@ -82,6 +82,7 @@ import org.sonatype.nexus.integrationtests.proxy.nexus262.Nexus262SimpleProxyTes
 import org.sonatype.nexus.integrationtests.proxy.nexus635.Nexus635ClearCacheTaskTest;
 import org.sonatype.nexus.integrationtests.upgrades.nexus652.Nexus652Beta5To10UpgradeTest;
 import org.sonatype.nexus.integrationtests.webproxy.nexus1101.Nexus1101NexusOverWebproxyTest;
+import org.sonatype.nexus.integrationtests.webproxy.nexus1113.Nexus1113WebProxyWithAuthenticationTest;
 
 /**
  *
@@ -169,7 +170,8 @@ import org.sonatype.nexus.integrationtests.webproxy.nexus1101.Nexus1101NexusOver
     Nexus1022RebuildRepositoryMavenMetadataTaskTest.class,
     Nexus1071DeployToRepoAnonCannotAccess.class,
     Nexus1071AnonAccessTest.class,
-    Nexus1101NexusOverWebproxyTest.class
+    Nexus1101NexusOverWebproxyTest.class,
+    Nexus1113WebProxyWithAuthenticationTest.class
 } )
 public class IntegrationTestSuiteClasses
 {

@@ -20,7 +20,7 @@ public abstract class AbstractNexusWebProxyIntegrationTest
     }
 
     @Before
-    public void runServer()
+    public void startWebProxy()
         throws Exception
     {
         server = (ProxyServer) lookup( ProxyServer.ROLE );
