@@ -24,7 +24,6 @@ import org.apache.commons.cli.Options;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.tools.cli.AbstractCli;
-import org.codehaus.plexus.util.FileUtils;
 import org.sonatype.nexus.index.ArtifactContext;
 import org.sonatype.nexus.index.ArtifactInfo;
 import org.sonatype.nexus.index.ArtifactScanningListener;
@@ -50,9 +49,7 @@ public class NexusIndexerCli
 
     // public static final char ZIP = 'z';
 
-    public static final char UPDATE = 'u';
-
-    public static final char OVERWRITE = 'o';
+    // public static final char OVERWRITE = 'o';
 
     public static final char TARGET_DIR = 'd';
     
@@ -91,12 +88,6 @@ public class NexusIndexerCli
 
         // options.addOption( OptionBuilder.withLongOpt( "zip" ).withDescription( "Create index archive." ).create( ZIP ) );
 
-        options.addOption( OptionBuilder.withLongOpt( "overwrite" ) //
-            .withDescription( "Overwrite existing index." ).create( OVERWRITE ) );
-
-        options.addOption( OptionBuilder.withLongOpt( "update" ) //
-            .withDescription( "Create update." ).create( UPDATE ) );
-
         return options;
     }
 
@@ -119,32 +110,9 @@ public class NexusIndexerCli
             IOException,
             UnsupportedExistingLuceneIndexException
     {
-        if ( cli.hasOption( OVERWRITE ) && cli.hasOption( UPDATE ) )
-        {
-            System.err.printf( "Invalid options. Should use either 'overwrite' or 'update' but not both" );
-
-            return;
-        }
-
         String indexDirectoryName = cli.getOptionValue( INDEX );
 
         File indexFolder = new File( indexDirectoryName );
-
-        if ( indexFolder.exists() )
-        {
-            if ( cli.hasOption( OVERWRITE ) )
-            {
-                FileUtils.deleteDirectory( indexFolder );
-            }
-            else if ( !cli.hasOption( UPDATE ) )
-            {
-                System.err.printf(
-                    "Index folder '%s' already exists. Use 'overwrite' or 'update' option\n",
-                    indexDirectoryName );
-
-                return;
-            }
-        }
 
         File outputFolder = new File( cli.hasOption( TARGET_DIR ) ? cli.getOptionValue( TARGET_DIR ) : "." );
         
@@ -177,11 +145,9 @@ public class NexusIndexerCli
         
         boolean debug = cli.hasOption( DEBUG );
 
-        boolean update = cli.hasOption( UPDATE );
-
         ArtifactScanningListener listener = new IndexerListener( context, debug );
 
-        indexer.scan( context, listener, update );
+        indexer.scan( context, listener, true );
         
         packIndex( context, packer, outputFolder, debug );
         
