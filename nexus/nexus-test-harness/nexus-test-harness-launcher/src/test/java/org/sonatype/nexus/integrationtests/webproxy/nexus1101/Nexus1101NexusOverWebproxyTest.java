@@ -16,12 +16,6 @@ public class Nexus1101NexusOverWebproxyTest
     public void downloadArtifactOverWebProxy()
         throws Exception
     {
-        if ( true )
-        {
-            printKnownErrorButDoNotFail( getClass(), "downloadArtifactOverWebProxy" );
-            return;
-        }
-
         File pomFile = this.getLocalFile( "release-proxy-repo-1", "nexus1101", "artifact", "1.0", "pom" );
         File pomArtifact = this.downloadArtifact( "nexus1101", "artifact", "1.0", "pom", null, "target/downloads" );
         Assert.assertTrue( FileTestingUtils.compareFileSHA1s( pomArtifact, pomFile ) );
@@ -29,6 +23,9 @@ public class Nexus1101NexusOverWebproxyTest
         File jarFile = this.getLocalFile( "release-proxy-repo-1", "nexus1101", "artifact", "1.0", "jar" );
         File jarArtifact = this.downloadArtifact( "nexus1101", "artifact", "1.0", "jar", null, "target/downloads" );
         Assert.assertTrue( FileTestingUtils.compareFileSHA1s( jarArtifact, jarFile ) );
+
+        String artifactUrl = baseProxyURL + "release-proxy-repo-1/nexus1101/artifact/1.0/artifact-1.0.jar";
+        Assert.assertTrue( "Proxy was not accessed", server.getAccessedUris().contains( artifactUrl ) );
     }
 
 }
