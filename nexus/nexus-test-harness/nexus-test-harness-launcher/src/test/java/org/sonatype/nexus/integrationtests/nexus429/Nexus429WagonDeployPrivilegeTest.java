@@ -65,28 +65,6 @@ public class Nexus429WagonDeployPrivilegeTest
         this.deployPrivWithWagon( gav, this.getNexusTestRepoUrl() );
     }
 
-    @Test
-    public void doServicesReleaseArtifactTest()
-        throws Exception
-    {
-        Gav gav =
-            new Gav( this.getTestId(), "artifact", "1.0.0", null, "xml", 0, new Date().getTime(), "", false, false,
-                     null, false, null );
-        this.setTestRepositoryId( TEST_RELEASE_REPO );
-        this.deployPrivWithWagon( gav, this.getNexusTestRepoServiceUrl() );
-    }
-
-    @Test
-    public void doServicesSnapshotArtifactTest()
-        throws Exception
-    {
-        Gav gav =
-            new Gav( this.getTestId(), "artifact", "1.0.0-SNAPSHOT", null, "xml", 0, new Date().getTime(), "",
-                     false, false, null, false, null );
-        this.setTestRepositoryId( TEST_SNAPSHOT_REPO );
-        this.deployPrivWithWagon( gav, this.getNexusTestRepoServiceUrl() );
-    }
-
     private void deployPrivWithWagon( Gav gav, String repoUrl )
         throws Exception
     {
