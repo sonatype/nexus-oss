@@ -46,17 +46,6 @@ public class NexusHttpAuthenticationFilter
     public void setFakeAuthScheme( String fakeAuthSchemeStr )
     {
         this.fakeAuthScheme = Boolean.parseBoolean( fakeAuthSchemeStr );
-
-        if ( fakeAuthScheme )
-        {
-            setAuthcScheme( FAKE_AUTH_SCHEME );
-            setAuthzScheme( FAKE_AUTH_SCHEME );
-        }
-        else
-        {
-            setAuthcScheme( HttpServletRequest.BASIC_AUTH );
-            setAuthzScheme( HttpServletRequest.BASIC_AUTH );
-        }
     }
 
     protected Nexus getNexus( ServletRequest request )
@@ -113,15 +102,23 @@ public class NexusHttpAuthenticationFilter
     protected boolean isLoginAttempt( String authzHeader )
     {
         // handle BASIC in the same way as our faked one
-        String authzHeaderScheme = getAuthzScheme().toLowerCase();
-
         if ( authzHeader.toLowerCase().startsWith( HttpServletRequest.BASIC_AUTH.toLowerCase() ) )
         {
+            setAuthcScheme( HttpServletRequest.BASIC_AUTH );
+            setAuthzScheme( HttpServletRequest.BASIC_AUTH );
             return true;
         }
+        // switch back to fake when necessary
+        else if ( Boolean.parseBoolean( isFakeAuthScheme() ) )
+        {
+            setAuthcScheme( FAKE_AUTH_SCHEME );
+            setAuthzScheme( FAKE_AUTH_SCHEME );
+            return super.isLoginAttempt( getAuthzScheme().toLowerCase() );
+        }
+        // default
         else
         {
-            return super.isLoginAttempt( authzHeaderScheme );
+            return super.isLoginAttempt( getAuthzScheme().toLowerCase() );
         }
     }
 
