@@ -12,16 +12,18 @@ public abstract class AbstractNexusWebProxyIntegrationTest
 
     protected static final int webProxyPort;
 
+    protected ProxyServer server;
+
     static
     {
         webProxyPort = TestProperties.getInteger( "webproxy.server.port" );
     }
 
     @Before
-    public void startWebProxy()
+    public void runServer()
         throws Exception
     {
-        ProxyServer server = (ProxyServer) this.lookup( ProxyServer.ROLE );
+        server = (ProxyServer) lookup( ProxyServer.ROLE );
         server.start();
     }
 
@@ -29,7 +31,6 @@ public abstract class AbstractNexusWebProxyIntegrationTest
     public void stopWebProxy()
         throws Exception
     {
-        ProxyServer server = (ProxyServer) this.lookup( ProxyServer.ROLE );
         server.stop();
     }
 
