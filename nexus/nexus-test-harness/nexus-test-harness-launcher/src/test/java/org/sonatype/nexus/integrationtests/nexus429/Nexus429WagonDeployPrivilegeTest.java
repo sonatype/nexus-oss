@@ -69,28 +69,22 @@ public class Nexus429WagonDeployPrivilegeTest
     public void doServicesReleaseArtifactTest()
         throws Exception
     {
-        if ( !this.printKnownErrorButDoNotFail( this.getClass(), "doServicesReleaseArtifactTest" ) )
-        {
-            Gav gav =
-                new Gav( this.getTestId(), "artifact", "1.0.0", null, "xml", 0, new Date().getTime(), "", false, false,
-                         null, false, null );
-            this.setTestRepositoryId( TEST_RELEASE_REPO );
-            this.deployPrivWithWagon( gav, this.getNexusTestRepoServiceUrl() );
-        }
+        Gav gav =
+            new Gav( this.getTestId(), "artifact", "1.0.0", null, "xml", 0, new Date().getTime(), "", false, false,
+                     null, false, null );
+        this.setTestRepositoryId( TEST_RELEASE_REPO );
+        this.deployPrivWithWagon( gav, this.getNexusTestRepoServiceUrl() );
     }
 
     @Test
     public void doServicesSnapshotArtifactTest()
         throws Exception
     {
-        if ( !this.printKnownErrorButDoNotFail( this.getClass(), "doServicesReleaseArtifactTest" ) )
-        {
-            Gav gav =
-                new Gav( this.getTestId(), "artifact", "1.0.0-SNAPSHOT", null, "xml", 0, new Date().getTime(), "",
-                         false, false, null, false, null );
-            this.setTestRepositoryId( TEST_SNAPSHOT_REPO );
-            this.deployPrivWithWagon( gav, this.getNexusTestRepoServiceUrl() );
-        }
+        Gav gav =
+            new Gav( this.getTestId(), "artifact", "1.0.0-SNAPSHOT", null, "xml", 0, new Date().getTime(), "",
+                     false, false, null, false, null );
+        this.setTestRepositoryId( TEST_SNAPSHOT_REPO );
+        this.deployPrivWithWagon( gav, this.getNexusTestRepoServiceUrl() );
     }
 
     private void deployPrivWithWagon( Gav gav, String repoUrl )
