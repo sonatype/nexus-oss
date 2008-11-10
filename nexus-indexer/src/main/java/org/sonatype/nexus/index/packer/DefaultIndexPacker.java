@@ -128,6 +128,11 @@ public class DefaultIndexPacker
         int max, Map<String, List<Integer>> chunks, DateFormat df, File targetDir ) 
         throws IOException
     {
+        if ( chunks.size() < 2 )
+        {
+           return;  // no updates available
+        }
+        
         RAMDirectory ctxDir = new RAMDirectory();
 
         IndexingContext ctx;
@@ -153,6 +158,7 @@ public class DefaultIndexPacker
         IndexWriter w = ctx.getIndexWriter();
         
         int n = 0;
+        
         for ( Entry<String, List<Integer>> e : chunks.entrySet() ) 
         {
             String key = e.getKey();
@@ -168,13 +174,16 @@ public class DefaultIndexPacker
             try 
             {
                 info.put( IndexingContext.INDEX_DAY_PREFIX + n, format( df.parse( key ) ) );
-            } catch ( ParseException ex ) 
+            } 
+            catch ( ParseException ex ) 
             {
             }
             
             writeIndexArchive( ctx, new File( targetDir, IndexingContext.INDEX_FILE + "." + key + ".zip" ));
+        
+            n++;
             
-            if ( max <= n++ ) 
+            if ( max <= n || n == chunks.size() - 1 ) 
             {
                 break;
             }
