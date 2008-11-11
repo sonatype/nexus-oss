@@ -19,6 +19,6 @@ public interface RequestProcessor
      * @param action
      * @throws AccessDeniedException
      */
-    void process( ResourceStoreRequest request, Action action )
+    boolean process( Repository repository, ResourceStoreRequest request, Action action )
         throws AccessDeniedException;
 }

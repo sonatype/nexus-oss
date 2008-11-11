@@ -724,7 +724,10 @@ public abstract class AbstractRepository
             StorageException,
             AccessDeniedException
     {
-        checkConditions( request, Action.read );
+        if ( !checkConditions( request, Action.read ) )
+        {
+            throw new ItemNotFoundException( request.getRequestPath(), this.getId() );
+        }
 
         RepositoryItemUid uid = createUid( request.getRequestPath() );
 
@@ -750,9 +753,14 @@ public abstract class AbstractRepository
             StorageException,
             AccessDeniedException
     {
-        checkConditions( from, Action.read );
-
-        checkConditions( to, getResultingActionOnWrite( to ) );
+        if ( !checkConditions( from, Action.read ) )
+        {
+            throw new AccessDeniedException( from, "Operation does not fills needed requirements!" );
+        }
+        if ( !checkConditions( to, getResultingActionOnWrite( to ) ) )
+        {
+            throw new AccessDeniedException( to, "Operation does not fills needed requirements!" );
+        }
 
         RepositoryItemUid fromUid = createUid( from.getRequestPath() );
 
@@ -769,11 +777,18 @@ public abstract class AbstractRepository
             StorageException,
             AccessDeniedException
     {
-        checkConditions( from, Action.read );
-
-        checkConditions( from, Action.delete );
-
-        checkConditions( to, getResultingActionOnWrite( to ) );
+        if ( !checkConditions( from, Action.read ) )
+        {
+            throw new AccessDeniedException( from, "Operation does not fills needed requirements!" );
+        }
+        if ( !checkConditions( from, Action.delete ) )
+        {
+            throw new AccessDeniedException( from, "Operation does not fills needed requirements!" );
+        }
+        if ( !checkConditions( to, getResultingActionOnWrite( to ) ) )
+        {
+            throw new AccessDeniedException( to, "Operation does not fills needed requirements!" );
+        }
 
         RepositoryItemUid fromUid = createUid( from.getRequestPath() );
 
@@ -791,7 +806,10 @@ public abstract class AbstractRepository
             StorageException,
             AccessDeniedException
     {
-        checkConditions( request, Action.delete );
+        if ( !checkConditions( request, Action.delete ) )
+        {
+            throw new AccessDeniedException( request, "Operation does not fills needed requirements!" );
+        }
 
         RepositoryItemUid uid = createUid( request.getRequestPath() );
 
@@ -805,7 +823,10 @@ public abstract class AbstractRepository
             StorageException,
             AccessDeniedException
     {
-        checkConditions( request, getResultingActionOnWrite( request ) );
+        if ( !checkConditions( request, getResultingActionOnWrite( request ) ) )
+        {
+            throw new AccessDeniedException( request, "Operation does not fills needed requirements!" );
+        }
 
         DefaultStorageFileItem fItem = new DefaultStorageFileItem( this, request.getRequestPath(), true, true, is );
 
@@ -826,7 +847,10 @@ public abstract class AbstractRepository
             StorageException,
             AccessDeniedException
     {
-        checkConditions( request, getResultingActionOnWrite( request ) );
+        if ( !checkConditions( request, getResultingActionOnWrite( request ) ) )
+        {
+            throw new AccessDeniedException( request, "Operation does not fills needed requirements!" );
+        }
 
         DefaultStorageCollectionItem coll = new DefaultStorageCollectionItem(
             this,
@@ -852,7 +876,10 @@ public abstract class AbstractRepository
             StorageException,
             AccessDeniedException
     {
-        checkConditions( request, Action.read );
+        if ( !checkConditions( request, Action.read ) )
+        {
+            throw new ItemNotFoundException( request.getRequestPath(), this.getId() );
+        }
 
         RepositoryItemUid uid = createUid( request.getRequestPath() );
 
@@ -1253,7 +1280,7 @@ public abstract class AbstractRepository
      * @throws RepositoryNotAvailableException the repository not available exception
      * @throws AccessDeniedException the access denied exception
      */
-    protected void checkConditions( ResourceStoreRequest request, Action action )
+    protected boolean checkConditions( ResourceStoreRequest request, Action action )
         throws RepositoryNotAvailableException,
             AccessDeniedException
     {
@@ -1269,13 +1296,17 @@ public abstract class AbstractRepository
 
         getAccessManager().decide( request, this, action );
 
+        boolean result = true;
+
         if ( getRequestProcessors().size() > 0 )
         {
             for ( RequestProcessor processor : getRequestProcessors() )
             {
-                processor.process( request, action );
+                result = result && processor.process( this, request, action );
             }
         }
+
+        return result;
     }
 
     /**
