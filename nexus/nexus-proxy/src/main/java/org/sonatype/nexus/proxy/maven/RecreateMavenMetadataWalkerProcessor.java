@@ -22,6 +22,7 @@
 package org.sonatype.nexus.proxy.maven;
 
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
+import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RepositoryType;
@@ -68,7 +69,10 @@ public class RecreateMavenMetadataWalkerProcessor
     public void processItem( WalkerContext context, StorageItem item )
         throws Exception
     {
-        mdHelper.processFile( item.getPath() );
+        if ( item instanceof StorageFileItem )
+        {
+            mdHelper.processFile( item.getPath() );
+        }
     }
 
     @Override

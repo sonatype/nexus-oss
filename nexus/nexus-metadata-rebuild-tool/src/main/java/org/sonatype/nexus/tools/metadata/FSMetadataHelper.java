@@ -21,10 +21,13 @@
 
 package org.sonatype.nexus.tools.metadata;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.security.MessageDigest;
 
+import org.apache.commons.codec.binary.Hex;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.util.FileUtils;
 import org.sonatype.nexus.proxy.maven.AbstractMetadataHelper;
@@ -49,17 +52,17 @@ public class FSMetadataHelper
     }
 
     @Override
-    public void store( String metadata, String path )
+    public void store( String content, String path )
     {
-        String file = repo + path + "/maven-metadata.xml";
+        String file = repo + path;
 
         try
         {
-            FileUtils.fileWrite( file, metadata );
+            FileUtils.fileWrite( file, content );
         }
         catch ( Exception e )
         {
-            throw new RuntimeException( "Can't write metadata to: " + file, e );
+            throw new RuntimeException( "Can't write content to: " + file, e );
         }
 
     }
@@ -72,6 +75,76 @@ public class FSMetadataHelper
     public void setRepo( String repo )
     {
         this.repo = repo;
+    }
+
+    //copy from org.sonatype.nexus.proxy.attributes.inspectors.DigestCalculatingInspector
+    @Override
+    public String buildMd5( String path )
+        throws Exception
+    {
+        InputStream fis = retrieveContent( path );
+        
+        try
+        {
+            byte[] buffer = new byte[1024];
+
+            MessageDigest md5 = MessageDigest.getInstance( "MD5" );
+
+            int numRead;
+
+            do
+            {
+                numRead = fis.read( buffer );
+                
+                if ( numRead > 0 )
+                {
+                    md5.update( buffer, 0, numRead );
+                }
+            }
+            while ( numRead != -1 );
+
+            return new String( Hex.encodeHex( md5.digest() ) );
+
+        }
+        finally
+        {
+            fis.close();
+        }
+    }
+
+    @Override
+    public String buildSh1( String path )
+        throws Exception
+    {
+        InputStream fis = retrieveContent( path );
+        
+        try
+        {
+            byte[] buffer = new byte[1024];
+
+            MessageDigest sha1 = MessageDigest.getInstance( "SHA1" );
+
+            int numRead;
+
+            do
+            {
+                numRead = fis.read( buffer );
+                
+                if ( numRead > 0 )
+                {
+                    sha1.update( buffer, 0, numRead );
+
+                }
+            }
+            while ( numRead != -1 );
+
+            return new String( Hex.encodeHex( sha1.digest() ) );
+
+        }
+        finally
+        {
+            fis.close();
+        }
     }
     
 }

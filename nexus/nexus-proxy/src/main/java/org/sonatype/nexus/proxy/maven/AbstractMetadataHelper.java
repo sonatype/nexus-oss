@@ -45,7 +45,8 @@ import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.StringUtils;
 
 /**
- * a maven metadata helper containing all the logic for creating maven-metadata.xml
+ * a maven metadata helper containing all the logic for creating maven-metadata.xml <br/>
+ * and logic for creating md5 and sh1 checksum files
  * 
  * @author Juven Xu
  */
@@ -53,6 +54,12 @@ abstract public class AbstractMetadataHelper
 {
 
     private static final String VERSION_REGEX = "^[0-9].*$";
+    
+    private static final String MD5_SUFFIX = ".md5";
+    
+    private static final String SHA1_SUFFIX = ".sha1";
+    
+    private static final String METADATA_SUFFIX = "/maven-metadata.xml";
 
     /**
      * current groupId based on the current collection, if no groupId, it's null
@@ -82,25 +89,31 @@ abstract public class AbstractMetadataHelper
         {
             createMetadataForSnapshotVersionDir( path );
 
+            rebuildChecksum( path + METADATA_SUFFIX);
+            
             currentArtifacts.clear();
         }
         else if ( shouldCreateMetadataForArtifactDir( path ) )
         {
             createMetadataForArtifactDir( path );
 
+            rebuildChecksum( path + METADATA_SUFFIX );
+            
             currentVersions.clear();
         }
         else if ( shouldCreateMetadataForPluginGroupDir( path ) )
         {
             createMetadataForPluginGroupDir( path );
 
+            rebuildChecksum( path + METADATA_SUFFIX );
+            
             currentPlugins.clear();
         }
 
         cleanGAV( path );
     }
 
-    public void processFile( String path )
+    public void processFile( String path ) throws Exception
     {
         if ( currentVersion != null && path.endsWith( "pom" ) )
         {
@@ -108,6 +121,8 @@ abstract public class AbstractMetadataHelper
 
             handleMavenPlugin( path );
         }
+        
+        rebuildChecksum( path );
 
     }
 
@@ -310,7 +325,7 @@ abstract public class AbstractMetadataHelper
 
         outputStream.close();
 
-        store( mdString, path );
+        store( mdString, path + METADATA_SUFFIX );
     }
 
     public void createMetadataForArtifactDir( String path )
@@ -332,7 +347,7 @@ abstract public class AbstractMetadataHelper
 
         outputStream.close();
 
-        store( mdString, path );
+        store( mdString, path + METADATA_SUFFIX );
     }
 
     private void versioningForArtifactDir( Metadata md )
@@ -409,7 +424,7 @@ abstract public class AbstractMetadataHelper
 
         outputStream.close();
 
-        store( mdString, path );
+        store( mdString, path + METADATA_SUFFIX );
     }
 
     private void versioningForSnapshotVersionDir( Metadata md )
@@ -468,14 +483,43 @@ abstract public class AbstractMetadataHelper
         MetadataBuilder.changeMetadata( md, new SetSnapshotOperation( new SnapshotOperand( snapshot ) ) );
 
     }
+    
+    private void rebuildChecksum( String path )
+        throws Exception
+    {
+        if ( !shouldBuildChecksum( path ) )
+        {
+            return;
+        }
+
+        store( buildMd5( path ), path + MD5_SUFFIX );
+
+        store( buildSh1( path ), path + SHA1_SUFFIX );
+    }
+    
+    protected boolean shouldBuildChecksum( String path )
+    {
+        if ( getName( path ).endsWith( MD5_SUFFIX ) || getName( path ).endsWith( SHA1_SUFFIX ) )
+        {
+            return false;
+        }
+
+        return true;
+    }
+    
+    abstract public String buildMd5(String path)
+        throws Exception;
+    
+    abstract public String buildSh1(String path)
+        throws Exception;
 
     /**
-     * Store the metadata, according to the path
+     * Store the content to the file of the path
      * 
      * @param metadata
      * @param path
      */
-    abstract public void store( String metadata, String path )
+    abstract public void store( String content, String path )
         throws Exception;
 
     /**

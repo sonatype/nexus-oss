@@ -23,11 +23,17 @@ package org.sonatype.nexus.proxy.maven;
 
 import java.io.InputStream;
 
+import org.sonatype.nexus.proxy.ItemNotFoundException;
+import org.sonatype.nexus.proxy.RepositoryNotAvailableException;
+import org.sonatype.nexus.proxy.StorageException;
+import org.sonatype.nexus.proxy.attributes.inspectors.DigestCalculatingInspector;
+import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.ContentLocator;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StringContentLocator;
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 
 /**
  * Default MetadataHelper in Nexus, works based on a Repository.
@@ -45,24 +51,15 @@ public class DefaultMetadataHelper
     }
 
     @Override
-    public void store( String metadata, String path )
+    public void store( String content, String path )
         throws Exception
     {
         // UIDs are like URIs! The separator is _always_ "/"!!!
-        RepositoryItemUid mdUid = repository.createUid( path + "/maven-metadata.xml" );
+        RepositoryItemUid mdUid = repository.createUid( path );
 
-        ContentLocator contentLocator = new StringContentLocator( metadata );
+        ContentLocator contentLocator = new StringContentLocator( content );
 
-        DefaultStorageFileItem mdFile = new DefaultStorageFileItem(
-            repository,
-            mdUid.getPath(),
-            true,
-            true,
-            contentLocator );
-
-        repository.storeItem( mdFile );
-
-        repository.removeFromNotFoundCache( mdUid.getPath() );
+        storeItem( mdUid, contentLocator );
     }
 
     @Override
@@ -72,6 +69,69 @@ public class DefaultMetadataHelper
         RepositoryItemUid uid = repository.createUid( path );
 
         return repository.retrieveItemContent( uid );
+    }
+
+    @Override
+    protected boolean shouldBuildChecksum( String path )
+    {
+        if ( !super.shouldBuildChecksum( path ) )
+        {
+            return false;
+        }
+
+        try
+        {
+            if ( getStorageItem( path ).isVirtual() )
+            {
+                return false;
+            }
+        }
+        catch ( Exception e )
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    public String buildMd5( String path )
+        throws StorageException,
+            ItemNotFoundException
+    {
+        return getStorageItem( path ).getAttributes().get( DigestCalculatingInspector.DIGEST_MD5_KEY );
+    }
+
+    @Override
+    public String buildSh1( String path )
+        throws StorageException,
+            ItemNotFoundException
+    {
+        return getStorageItem( path ).getAttributes().get( DigestCalculatingInspector.DIGEST_SHA1_KEY );
+    }
+
+    private AbstractStorageItem getStorageItem( String path )
+        throws StorageException,
+            ItemNotFoundException
+    {
+        return repository.getLocalStorage().retrieveItem( repository.createUid( path ) );
+    }
+
+    private void storeItem( RepositoryItemUid uid, ContentLocator contentLocator )
+        throws StorageException,
+            UnsupportedStorageOperationException,
+            RepositoryNotAvailableException
+    {
+        DefaultStorageFileItem mdFile = new DefaultStorageFileItem(
+            repository,
+            uid.getPath(),
+            true,
+            true,
+            contentLocator );
+
+        repository.storeItem( mdFile );
+
+        repository.removeFromNotFoundCache( uid.getPath() );
     }
 
 }

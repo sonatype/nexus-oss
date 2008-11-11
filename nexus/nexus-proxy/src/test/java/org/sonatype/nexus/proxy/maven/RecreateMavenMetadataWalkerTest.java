@@ -193,5 +193,31 @@ public class RecreateMavenMetadataWalkerTest
             "/org/apache/maven/plugins/maven-metadata.xml",
             false ) ) );
     }
+    
+    public void testRebuildChecksumFiles()
+        throws Exception
+    {
+        RecreateMavenMetadataWalkerProcessor wp = new RecreateMavenMetadataWalkerProcessor();
+
+        DefaultWalkerContext ctx = new DefaultWalkerContext( inhouse );
+
+        ctx.getProcessors().add( wp );
+
+        walker.walk( ctx );
+
+        assertNotNull( inhouse
+            .retrieveItem( new ResourceStoreRequest( "/junit/junit/3.8.1/junit-3.8.1.jar.md5", false ) ) );
+
+        assertNotNull( inhouse
+            .retrieveItem( new ResourceStoreRequest( "/junit/junit/3.8.1/junit-3.8.1.jar.sha1", false ) ) );
+
+        assertNotNull( inhouse.retrieveItem( new ResourceStoreRequest( "/junit/junit/4.0/junit-4.0.pom.md5", false ) ) );
+
+        assertNotNull( inhouse.retrieveItem( new ResourceStoreRequest( "/junit/junit/maven-metadata.xml.md5", false ) ) );
+
+        assertNotNull( inhouse.retrieveItem( new ResourceStoreRequest(
+            "/org/apache/maven/plugins/maven-metadata.xml.sha1",
+            false ) ) );
+    }
 
 }
