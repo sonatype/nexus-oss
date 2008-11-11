@@ -33,12 +33,12 @@ public class Nexus947GroupBrowsing
         // now for a bit more control
         items = contentUtil.getContentListResource( "public", "/nexus947/nexus947/3.2.1/", true );
 
-        // exactly 2 items
-        Assert.assertEquals( 2, items.size() );
-
-        ArrayList<String> itemsText = new ArrayList<String>();
-        itemsText.add( items.get( 0 ).getText() );
-        itemsText.add( items.get( 1 ).getText() );
+        ArrayList<String> itemsText = new ArrayList<String>();        
+      
+        for(ContentListResource resource: items)
+        {
+            itemsText.add( resource.getText() );
+        }
 
         // they are sorted in alpha order, so expect the jar, then the pom
         Assert.assertTrue( itemsText.contains("nexus947-3.2.1.jar") );
