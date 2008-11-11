@@ -16,8 +16,9 @@ public class Nexus1116InvalidProxyTest
     extends AbstractNexusWebProxyIntegrationTest
     implements Runnable
 {
+
     @Test
-    public void downloadArtifactOverWebProxy()
+    public void checkInvalidProxy()
         throws Exception
     {
         if ( true )
@@ -92,4 +93,5 @@ public class Nexus1116InvalidProxyTest
             status = "failExecute" + e.getMessage();
         }
     }
+
 }
