@@ -23,7 +23,7 @@ public class Nexus634RemoveAllTest
         runSnapshotRemover( "nexus-test-harness-snapshot-repo", 0, 0, true );
 
         Collection<File> jars = listFiles( artifactFolder, new String[] { "jar" }, false );
-        Assert.assertTrue( "All artifacts should be deleted by SnapshotRemoverTask", jars.isEmpty() );
+        Assert.assertTrue( "All artifacts should be deleted by SnapshotRemoverTask. Found: " + jars, jars.isEmpty() );
     }
 
 }
