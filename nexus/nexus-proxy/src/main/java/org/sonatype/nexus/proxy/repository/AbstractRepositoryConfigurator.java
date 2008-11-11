@@ -2,6 +2,7 @@ package org.sonatype.nexus.proxy.repository;
 
 import java.io.File;
 import java.net.MalformedURLException;
+import java.util.Map;
 
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.nexus.configuration.RepositoryStatusConverter;
@@ -11,6 +12,7 @@ import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.validator.InvalidConfigurationException;
 import org.sonatype.nexus.configuration.validator.ValidationMessage;
 import org.sonatype.nexus.configuration.validator.ValidationResponse;
+import org.sonatype.nexus.plugins.PluginRepositoryConfigurator;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.storage.local.LocalRepositoryStorage;
 import org.sonatype.nexus.proxy.storage.remote.DefaultRemoteStorageContext;
@@ -22,6 +24,9 @@ public abstract class AbstractRepositoryConfigurator
 {
     @Requirement
     private RepositoryStatusConverter repositoryStatusConverter;
+
+    @Requirement( role = PluginRepositoryConfigurator.class )
+    private Map<String, PluginRepositoryConfigurator> pluginRepositoryConfigurators;
 
     public Repository updateRepositoryFromModel( Repository old, ApplicationConfiguration configuration,
         CRepository repo, RemoteStorageContext rsc, LocalRepositoryStorage ls, RemoteRepositoryStorage rs )
@@ -134,6 +139,14 @@ public abstract class AbstractRepositoryConfigurator
             response.addValidationError( error );
 
             throw new InvalidConfigurationException( response );
+        }
+
+        for ( PluginRepositoryConfigurator configurator : pluginRepositoryConfigurators.values() )
+        {
+            if ( configurator.isHandledRepository( repository ) )
+            {
+                configurator.configureRepository( repository );
+            }
         }
 
         return repository;
