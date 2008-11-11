@@ -22,6 +22,7 @@ package org.sonatype.nexus.proxy.repository;
 
 import java.io.InputStream;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 import org.sonatype.nexus.proxy.AccessDeniedException;
@@ -189,6 +190,13 @@ public interface Repository
      * @param mode
      */
     void setRepositoryStatusCheckMode( RepositoryStatusCheckMode mode );
+
+    /**
+     * Returns the list of defined request processors.
+     * 
+     * @return
+     */
+    List<RequestProcessor> getRequestProcessors();
 
     /**
      * Is Repository listable?.

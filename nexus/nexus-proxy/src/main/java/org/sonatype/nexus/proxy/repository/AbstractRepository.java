@@ -22,8 +22,10 @@ package org.sonatype.nexus.proxy.repository;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
@@ -88,8 +90,8 @@ import org.sonatype.nexus.proxy.walker.Walker;
  * @author cstamas
  */
 public abstract class AbstractRepository
-        extends EventMulticasterComponent
-        implements Repository, Initializable
+    extends EventMulticasterComponent
+    implements Repository, Initializable
 {
     /** The time while we do NOT check an already known remote status: 5 mins */
     protected static final long REMOTE_STATUS_RETAIN_TIME = 5L * 60L * 1000L;
@@ -183,15 +185,18 @@ public abstract class AbstractRepository
     /** The remote url. */
     private String remoteUrl;
 
+    /** Request processors list */
+    private List<RequestProcessor> requestProcessors;
+
     /** Remote storage context to store connection configs. */
     private RemoteStorageContext remoteStorageContext;
 
     public void initialize()
     {
-        applicationConfiguration.addProximityEventListener(this);
+        applicationConfiguration.addProximityEventListener( this );
     }
 
-    public void onProximityEvent(AbstractEvent evt)
+    public void onProximityEvent( AbstractEvent evt )
     {
         // TODO
     }
@@ -203,7 +208,7 @@ public abstract class AbstractRepository
 
     public RepositoryType getRepositoryType()
     {
-        if (getRemoteUrl() != null)
+        if ( getRemoteUrl() != null )
         {
             return RepositoryType.PROXY;
         }
@@ -218,15 +223,15 @@ public abstract class AbstractRepository
         return localStatus;
     }
 
-    public void setLocalStatus(LocalStatus localStatus)
+    public void setLocalStatus( LocalStatus localStatus )
     {
         LocalStatus oldStatus = this.localStatus;
 
         this.localStatus = localStatus;
 
-        if (!oldStatus.equals(localStatus))
+        if ( !oldStatus.equals( localStatus ) )
         {
-            notifyProximityEventListeners(new RepositoryEventLocalStatusChanged(this, oldStatus, localStatus));
+            notifyProximityEventListeners( new RepositoryEventLocalStatusChanged( this, oldStatus, localStatus ) );
         }
     }
 
@@ -236,16 +241,16 @@ public abstract class AbstractRepository
     }
 
     protected boolean isRemoteStorageReachable()
-            throws StorageException
+        throws StorageException
     {
-        if (!RepositoryType.PROXY.equals(getRepositoryType()))
+        if ( !RepositoryType.PROXY.equals( getRepositoryType() ) )
         {
             return false;
         }
         else
         {
             // TODO: include context? from where?
-            return getRemoteStorage().isReachable(this, null);
+            return getRemoteStorage().isReachable( this, null );
         }
 
     }
@@ -253,42 +258,43 @@ public abstract class AbstractRepository
     /** Is checking in progress? */
     private volatile boolean _remoteStatusChecking = false;
 
-    public RemoteStatus getRemoteStatus(boolean forceCheck)
+    public RemoteStatus getRemoteStatus( boolean forceCheck )
     {
-        if (RepositoryType.PROXY.equals(getRepositoryType()))
+        if ( RepositoryType.PROXY.equals( getRepositoryType() ) )
         {
             // if the last known status is old, simply reset it
-            if (forceCheck || System.currentTimeMillis() - remoteStatusUpdated > REMOTE_STATUS_RETAIN_TIME)
+            if ( forceCheck || System.currentTimeMillis() - remoteStatusUpdated > REMOTE_STATUS_RETAIN_TIME )
             {
                 remoteStatus = RemoteStatus.UNKNOWN;
             }
 
-            if (getProxyMode() != null && getProxyMode().shouldCheckRemoteStatus() && RemoteStatus.UNKNOWN.equals(remoteStatus) && !_remoteStatusChecking)
+            if ( getProxyMode() != null && getProxyMode().shouldCheckRemoteStatus()
+                && RemoteStatus.UNKNOWN.equals( remoteStatus ) && !_remoteStatusChecking )
             {
                 // check for thread and go check it
                 _remoteStatusChecking = true;
 
-                exec.submit(new Callable<Object>()
+                exec.submit( new Callable<Object>()
                 {
                     public Object call()
-                            throws Exception
+                        throws Exception
                     {
                         try
                         {
                             try
                             {
-                                if (isRemoteStorageReachable())
+                                if ( isRemoteStorageReachable() )
                                 {
-                                    setRemoteStatus(RemoteStatus.AVAILABLE, null);
+                                    setRemoteStatus( RemoteStatus.AVAILABLE, null );
                                 }
                                 else
                                 {
-                                    setRemoteStatus(RemoteStatus.UNAVAILABLE, new ItemNotFoundException("/"));
+                                    setRemoteStatus( RemoteStatus.UNAVAILABLE, new ItemNotFoundException( "/" ) );
                                 }
                             }
-                            catch (StorageException e)
+                            catch ( StorageException e )
                             {
-                                setRemoteStatus(RemoteStatus.UNAVAILABLE, e);
+                                setRemoteStatus( RemoteStatus.UNAVAILABLE, e );
                             }
                         }
                         finally
@@ -298,11 +304,12 @@ public abstract class AbstractRepository
 
                         return null;
                     }
-                });
+                } );
             }
-            else if (getProxyMode() != null && !getProxyMode().shouldCheckRemoteStatus() && RemoteStatus.UNKNOWN.equals(remoteStatus) && !_remoteStatusChecking)
+            else if ( getProxyMode() != null && !getProxyMode().shouldCheckRemoteStatus()
+                && RemoteStatus.UNKNOWN.equals( remoteStatus ) && !_remoteStatusChecking )
             {
-                setRemoteStatus(RemoteStatus.UNAVAILABLE, null);
+                setRemoteStatus( RemoteStatus.UNAVAILABLE, null );
 
                 _remoteStatusChecking = false;
             }
@@ -315,29 +322,29 @@ public abstract class AbstractRepository
         }
     }
 
-    private void setRemoteStatus(RemoteStatus remoteStatus, Throwable cause)
+    private void setRemoteStatus( RemoteStatus remoteStatus, Throwable cause )
     {
         this.remoteStatus = remoteStatus;
 
-        if (RemoteStatus.AVAILABLE.equals(remoteStatus))
+        if ( RemoteStatus.AVAILABLE.equals( remoteStatus ) )
         {
             this.remoteStatusUpdated = System.currentTimeMillis();
 
-            if (getProxyMode() != null && getProxyMode().shouldAutoUnblock())
+            if ( getProxyMode() != null && getProxyMode().shouldAutoUnblock() )
             {
-                setProxyMode(ProxyMode.ALLOW, true, cause);
+                setProxyMode( ProxyMode.ALLOW, true, cause );
             }
         }
-    /*
-     * AUTO_BLOCK temporarily disabled else if ( RemoteStatus.UNAVAILABLE.equals( remoteStatus ) ) {
-     * this.remoteStatusUpdated = System.currentTimeMillis(); if ( getProxyMode() != null &&
-     * getProxyMode().shouldProxy() ) { setProxyMode( ProxyMode.BLOCKED_AUTO, true, cause ); } }
-     */
+        /*
+         * AUTO_BLOCK temporarily disabled else if ( RemoteStatus.UNAVAILABLE.equals( remoteStatus ) ) {
+         * this.remoteStatusUpdated = System.currentTimeMillis(); if ( getProxyMode() != null &&
+         * getProxyMode().shouldProxy() ) { setProxyMode( ProxyMode.BLOCKED_AUTO, true, cause ); } }
+         */
     }
 
     public ProxyMode getProxyMode()
     {
-        if (RepositoryType.PROXY.equals(getRepositoryType()))
+        if ( RepositoryType.PROXY.equals( getRepositoryType() ) )
         {
             return proxyMode;
         }
@@ -347,9 +354,9 @@ public abstract class AbstractRepository
         }
     }
 
-    protected void setProxyMode(ProxyMode proxyMode, boolean sendNotification, Throwable cause)
+    protected void setProxyMode( ProxyMode proxyMode, boolean sendNotification, Throwable cause )
     {
-        if (RepositoryType.PROXY.equals(getRepositoryType()))
+        if ( RepositoryType.PROXY.equals( getRepositoryType() ) )
         {
             ProxyMode oldProxyMode = this.proxyMode;
 
@@ -357,11 +364,11 @@ public abstract class AbstractRepository
 
             // if this is proxy
             // and was !shouldProxy() and the new is shouldProxy()
-            if (this.proxyMode != null && this.proxyMode.shouldProxy() && !oldProxyMode.shouldProxy())
+            if ( this.proxyMode != null && this.proxyMode.shouldProxy() && !oldProxyMode.shouldProxy() )
             {
-                if (getLogger().isDebugEnabled())
+                if ( getLogger().isDebugEnabled() )
                 {
-                    getLogger().debug("We have a !shouldProxy() -> shouldProxy() transition, purging NFC");
+                    getLogger().debug( "We have a !shouldProxy() -> shouldProxy() transition, purging NFC" );
                 }
 
                 getNotFoundCache().purge();
@@ -369,27 +376,27 @@ public abstract class AbstractRepository
                 resetRemoteStatus();
             }
 
-            if (sendNotification && !proxyMode.equals(oldProxyMode))
+            if ( sendNotification && !proxyMode.equals( oldProxyMode ) )
             {
-                notifyProximityEventListeners(new RepositoryEventProxyModeChanged(
-                        this,
-                        oldProxyMode,
-                        proxyMode,
-                        cause));
+                notifyProximityEventListeners( new RepositoryEventProxyModeChanged(
+                    this,
+                    oldProxyMode,
+                    proxyMode,
+                    cause ) );
             }
         }
     }
 
-    public void setProxyMode(ProxyMode proxyMode)
+    public void setProxyMode( ProxyMode proxyMode )
     {
-        setProxyMode(proxyMode, true, null);
+        setProxyMode( proxyMode, true, null );
     }
 
-    protected void autoBlockProxying(Throwable cause)
+    protected void autoBlockProxying( Throwable cause )
     {
-        if (RepositoryType.PROXY.equals(getRepositoryType()))
+        if ( RepositoryType.PROXY.equals( getRepositoryType() ) )
         {
-            setRemoteStatus(RemoteStatus.UNAVAILABLE, cause);
+            setRemoteStatus( RemoteStatus.UNAVAILABLE, cause );
         }
     }
 
@@ -398,7 +405,7 @@ public abstract class AbstractRepository
         return repositoryStatusCheckMode;
     }
 
-    public void setRepositoryStatusCheckMode(RepositoryStatusCheckMode mode)
+    public void setRepositoryStatusCheckMode( RepositoryStatusCheckMode mode )
     {
         this.repositoryStatusCheckMode = mode;
     }
@@ -408,7 +415,7 @@ public abstract class AbstractRepository
         return allowWrite;
     }
 
-    public void setAllowWrite(boolean allowWrite)
+    public void setAllowWrite( boolean allowWrite )
     {
         this.allowWrite = allowWrite;
     }
@@ -418,7 +425,7 @@ public abstract class AbstractRepository
         return browseable;
     }
 
-    public void setBrowseable(boolean browseable)
+    public void setBrowseable( boolean browseable )
     {
         this.browseable = browseable;
     }
@@ -428,7 +435,7 @@ public abstract class AbstractRepository
         return userManaged;
     }
 
-    public void setUserManaged(boolean userManaged)
+    public void setUserManaged( boolean userManaged )
     {
         this.userManaged = userManaged;
     }
@@ -438,9 +445,19 @@ public abstract class AbstractRepository
         return exposed;
     }
 
-    public void setExposed(boolean exposed)
+    public void setExposed( boolean exposed )
     {
         this.exposed = exposed;
+    }
+
+    public List<RequestProcessor> getRequestProcessors()
+    {
+        if ( requestProcessors == null )
+        {
+            requestProcessors = new ArrayList<RequestProcessor>();
+        }
+
+        return requestProcessors;
     }
 
     public int getNotFoundCacheTimeToLive()
@@ -448,7 +465,7 @@ public abstract class AbstractRepository
         return notFoundCacheTimeToLive;
     }
 
-    public void setNotFoundCacheTimeToLive(int notFoundCacheTimeToLive)
+    public void setNotFoundCacheTimeToLive( int notFoundCacheTimeToLive )
     {
         this.notFoundCacheTimeToLive = notFoundCacheTimeToLive;
     }
@@ -468,7 +485,7 @@ public abstract class AbstractRepository
      * 
      * @param cacheManager the new cache manager
      */
-    public void setCacheManager(CacheManager cacheManager)
+    public void setCacheManager( CacheManager cacheManager )
     {
         this.cacheManager = cacheManager;
     }
@@ -480,9 +497,9 @@ public abstract class AbstractRepository
      */
     public PathCache getNotFoundCache()
     {
-        if (notFoundCache == null)
+        if ( notFoundCache == null )
         {
-            notFoundCache = getCacheManager().getPathCache(getId());
+            notFoundCache = getCacheManager().getPathCache( getId() );
         }
         return notFoundCache;
     }
@@ -492,7 +509,7 @@ public abstract class AbstractRepository
      * 
      * @param notFoundcache the new not found cache
      */
-    public void setNotFoundCache(PathCache notFoundcache)
+    public void setNotFoundCache( PathCache notFoundcache )
     {
         this.notFoundCache = notFoundcache;
     }
@@ -502,7 +519,7 @@ public abstract class AbstractRepository
         return id;
     }
 
-    public void setId(String id)
+    public void setId( String id )
     {
         this.id = id;
     }
@@ -512,7 +529,7 @@ public abstract class AbstractRepository
         return name;
     }
 
-    public void setName(String name)
+    public void setName( String name )
     {
         this.name = name;
     }
@@ -522,7 +539,7 @@ public abstract class AbstractRepository
         return indexable;
     }
 
-    public void setIndexable(boolean indexable)
+    public void setIndexable( boolean indexable )
     {
         this.indexable = indexable;
     }
@@ -532,16 +549,16 @@ public abstract class AbstractRepository
         return localUrl;
     }
 
-    public void setLocalUrl(String localUrl)
+    public void setLocalUrl( String localUrl )
     {
         String trstr = localUrl.trim();
-        if (!trstr.endsWith(RepositoryItemUid.PATH_SEPARATOR))
+        if ( !trstr.endsWith( RepositoryItemUid.PATH_SEPARATOR ) )
         {
             this.localUrl = trstr;
         }
         else
         {
-            this.localUrl = trstr.substring(0, trstr.length() - 1);
+            this.localUrl = trstr.substring( 0, trstr.length() - 1 );
         }
     }
 
@@ -550,17 +567,17 @@ public abstract class AbstractRepository
         return remoteUrl;
     }
 
-    public void setRemoteUrl(String remoteUrl)
+    public void setRemoteUrl( String remoteUrl )
     {
         String trstr = remoteUrl.trim();
 
-        if (!trstr.endsWith(RepositoryItemUid.PATH_SEPARATOR))
+        if ( !trstr.endsWith( RepositoryItemUid.PATH_SEPARATOR ) )
         {
             this.remoteUrl = trstr;
         }
         else
         {
-            this.remoteUrl = trstr.substring(0, trstr.length() - 1);
+            this.remoteUrl = trstr.substring( 0, trstr.length() - 1 );
         }
     }
 
@@ -569,14 +586,14 @@ public abstract class AbstractRepository
         return remoteStorageContext;
     }
 
-    public void setRemoteStorageContext(RemoteStorageContext remoteStorageContext)
+    public void setRemoteStorageContext( RemoteStorageContext remoteStorageContext )
     {
         this.remoteStorageContext = remoteStorageContext;
 
-        if (getProxyMode() != null && getProxyMode().shouldAutoUnblock())
+        if ( getProxyMode() != null && getProxyMode().shouldAutoUnblock() )
         {
             // perm changes? retry if autoBlocked
-            setProxyMode(ProxyMode.ALLOW);
+            setProxyMode( ProxyMode.ALLOW );
         }
     }
 
@@ -592,87 +609,87 @@ public abstract class AbstractRepository
         return accessManager;
     }
 
-    public void setAccessManager(AccessManager accessManager)
+    public void setAccessManager( AccessManager accessManager )
     {
         this.accessManager = accessManager;
     }
 
-    public void clearCaches(String path)
+    public void clearCaches( String path )
     {
         // no path given, purge the whole NFC
-        if (path == null || RepositoryItemUid.PATH_ROOT.equals(path))
+        if ( path == null || RepositoryItemUid.PATH_ROOT.equals( path ) )
         {
             path = RepositoryItemUid.PATH_ROOT;
 
-            if (getNotFoundCache() != null)
+            if ( getNotFoundCache() != null )
             {
                 getNotFoundCache().purge();
             }
         }
         else
         {
-            if (getNotFoundCache() != null)
+            if ( getNotFoundCache() != null )
             {
-                getNotFoundCache().removeWithParents(path);
+                getNotFoundCache().removeWithParents( path );
 
-                getNotFoundCache().removeWithChildren(path);
+                getNotFoundCache().removeWithChildren( path );
             }
         }
 
         // construct an imperial walker to do the job
-        StoreFileWalker walker = new StoreFileWalker(this, getLogger())
+        StoreFileWalker walker = new StoreFileWalker( this, getLogger() )
         {
             @Override
-            protected void processFileItem(StorageFileItem item)
+            protected void processFileItem( StorageFileItem item )
             {
                 // expiring found files
                 try
                 {
                     // expire it
-                    item.setExpired(true);
+                    item.setExpired( true );
 
-                    getLocalStorage().updateItemAttributes(item);
+                    getLocalStorage().updateItemAttributes( item );
                 }
-                catch (ItemNotFoundException e)
+                catch ( ItemNotFoundException e )
                 {
                     // will not happen
                 }
-                catch (StorageException e)
+                catch ( StorageException e )
                 {
                     getLogger().warn(
-                            "Got storage exception while touching " + item.getRepositoryItemUid().toString(),
-                            e);
+                        "Got storage exception while touching " + item.getRepositoryItemUid().toString(),
+                        e );
                 }
             }
         };
 
         // and let it loose
-        walker.walk(path, true, false);
+        walker.walk( path, true, false );
 
-        notifyProximityEventListeners(new RepositoryEventClearCaches(this, path));
+        notifyProximityEventListeners( new RepositoryEventClearCaches( this, path ) );
     }
 
-    public Collection<String> evictUnusedItems(final long timestamp)
+    public Collection<String> evictUnusedItems( final long timestamp )
     {
-        EvictUnusedItemsWalker walker = new EvictUnusedItemsWalker(this, getLogger(), timestamp);
+        EvictUnusedItemsWalker walker = new EvictUnusedItemsWalker( this, getLogger(), timestamp );
 
         // and let it loose
-        walker.walk(RepositoryItemUid.PATH_ROOT, true, false);
+        walker.walk( RepositoryItemUid.PATH_ROOT, true, false );
 
-        notifyProximityEventListeners(new RepositoryEventEvictUnusedItems(this));
+        notifyProximityEventListeners( new RepositoryEventEvictUnusedItems( this ) );
 
         return walker.getFiles();
     }
 
-    public boolean recreateAttributes(String path, final Map<String, String> initialData)
+    public boolean recreateAttributes( String path, final Map<String, String> initialData )
     {
-        getLogger().info("Rebuilding attributes on repository " + getId());
+        getLogger().info( "Rebuilding attributes on repository " + getId() );
 
-        RecreateAttributesWalker walker = new RecreateAttributesWalker(this, getLogger(), initialData);
+        RecreateAttributesWalker walker = new RecreateAttributesWalker( this, getLogger(), initialData );
 
-        walker.walk(path, true, false);
+        walker.walk( path, true, false );
 
-        notifyProximityEventListeners(new RepositoryEventRecreateAttributes(this));
+        notifyProximityEventListeners( new RepositoryEventRecreateAttributes( this ) );
 
         return true;
     }
@@ -682,7 +699,7 @@ public abstract class AbstractRepository
         return localStorage;
     }
 
-    public void setLocalStorage(LocalRepositoryStorage localStorage)
+    public void setLocalStorage( LocalRepositoryStorage localStorage )
     {
         this.localStorage = localStorage;
     }
@@ -692,80 +709,81 @@ public abstract class AbstractRepository
         return remoteStorage;
     }
 
-    public void setRemoteStorage(RemoteRepositoryStorage remoteStorage)
+    public void setRemoteStorage( RemoteRepositoryStorage remoteStorage )
     {
         this.remoteStorage = remoteStorage;
 
-        setAllowWrite(false);
+        setAllowWrite( false );
     }
 
     // ===================================================================================
     // Store iface
-    public StorageItem retrieveItem(ResourceStoreRequest request)
-            throws RepositoryNotAvailableException,
+    public StorageItem retrieveItem( ResourceStoreRequest request )
+        throws RepositoryNotAvailableException,
             ItemNotFoundException,
             StorageException,
             AccessDeniedException
     {
-        checkConditions(request, Action.read);
+        checkConditions( request, Action.read );
 
-        RepositoryItemUid uid = createUid(request.getRequestPath());
+        RepositoryItemUid uid = createUid( request.getRequestPath() );
 
-        StorageItem item = retrieveItem(request.isRequestLocalOnly(), uid, request.getRequestContext());
+        StorageItem item = retrieveItem( request.isRequestLocalOnly(), uid, request.getRequestContext() );
 
-        if (StorageCollectionItem.class.isAssignableFrom(item.getClass()) && !isBrowseable())
+        if ( StorageCollectionItem.class.isAssignableFrom( item.getClass() ) && !isBrowseable() )
         {
             getLogger().debug(
-                    getId() + " retrieveItem() :: FOUND a collection on " + uid.toString() + " but repository is not Browseable.");
+                getId() + " retrieveItem() :: FOUND a collection on " + uid.toString()
+                    + " but repository is not Browseable." );
 
-            throw new ItemNotFoundException(uid);
+            throw new ItemNotFoundException( uid );
         }
 
         return item;
     }
 
-    public void copyItem(ResourceStoreRequest from, ResourceStoreRequest to)
-            throws UnsupportedStorageOperationException,
+    public void copyItem( ResourceStoreRequest from, ResourceStoreRequest to )
+        throws UnsupportedStorageOperationException,
             NoSuchResourceStoreException,
             RepositoryNotAvailableException,
             ItemNotFoundException,
             StorageException,
             AccessDeniedException
     {
-        checkConditions(from, Action.read);
+        checkConditions( from, Action.read );
 
-        checkConditions(to, getResultingActionOnWrite(to));
+        checkConditions( to, getResultingActionOnWrite( to ) );
 
-        RepositoryItemUid fromUid = createUid(from.getRequestPath());
+        RepositoryItemUid fromUid = createUid( from.getRequestPath() );
 
-        RepositoryItemUid toUid = createUid(to.getRequestPath());
+        RepositoryItemUid toUid = createUid( to.getRequestPath() );
 
-        copyItem(fromUid, toUid, to.getRequestContext());
+        copyItem( fromUid, toUid, to.getRequestContext() );
     }
 
-    public void moveItem(ResourceStoreRequest from, ResourceStoreRequest to)
-            throws UnsupportedStorageOperationException,
+    public void moveItem( ResourceStoreRequest from, ResourceStoreRequest to )
+        throws UnsupportedStorageOperationException,
             NoSuchResourceStoreException,
             RepositoryNotAvailableException,
             ItemNotFoundException,
             StorageException,
             AccessDeniedException
     {
-        checkConditions(from, Action.read);
+        checkConditions( from, Action.read );
 
-        checkConditions(from, Action.delete);
+        checkConditions( from, Action.delete );
 
-        checkConditions(to, getResultingActionOnWrite(to));
+        checkConditions( to, getResultingActionOnWrite( to ) );
 
-        RepositoryItemUid fromUid = createUid(from.getRequestPath());
+        RepositoryItemUid fromUid = createUid( from.getRequestPath() );
 
-        RepositoryItemUid toUid = createUid(to.getRequestPath());
+        RepositoryItemUid toUid = createUid( to.getRequestPath() );
 
-        moveItem(fromUid, toUid, to.getRequestContext());
+        moveItem( fromUid, toUid, to.getRequestContext() );
     }
 
-    public void deleteItem(ResourceStoreRequest request)
-            throws IllegalArgumentException,
+    public void deleteItem( ResourceStoreRequest request )
+        throws IllegalArgumentException,
             UnsupportedStorageOperationException,
             NoSuchResourceStoreException,
             RepositoryNotAvailableException,
@@ -773,115 +791,115 @@ public abstract class AbstractRepository
             StorageException,
             AccessDeniedException
     {
-        checkConditions(request, Action.delete);
+        checkConditions( request, Action.delete );
 
-        RepositoryItemUid uid = createUid(request.getRequestPath());
+        RepositoryItemUid uid = createUid( request.getRequestPath() );
 
-        deleteItem(uid, request.getRequestContext());
+        deleteItem( uid, request.getRequestContext() );
     }
 
-    public void storeItem(ResourceStoreRequest request, InputStream is, Map<String, String> userAttributes)
-            throws UnsupportedStorageOperationException,
+    public void storeItem( ResourceStoreRequest request, InputStream is, Map<String, String> userAttributes )
+        throws UnsupportedStorageOperationException,
             NoSuchResourceStoreException,
             RepositoryNotAvailableException,
             StorageException,
             AccessDeniedException
     {
-        checkConditions(request, getResultingActionOnWrite(request));
+        checkConditions( request, getResultingActionOnWrite( request ) );
 
-        DefaultStorageFileItem fItem = new DefaultStorageFileItem(this, request.getRequestPath(), true, true, is);
+        DefaultStorageFileItem fItem = new DefaultStorageFileItem( this, request.getRequestPath(), true, true, is );
 
-        fItem.getItemContext().putAll(request.getRequestContext());
+        fItem.getItemContext().putAll( request.getRequestContext() );
 
-        if (userAttributes != null)
+        if ( userAttributes != null )
         {
-            fItem.getAttributes().putAll(userAttributes);
+            fItem.getAttributes().putAll( userAttributes );
         }
 
-        storeItem(fItem);
+        storeItem( fItem );
     }
 
-    public void createCollection(ResourceStoreRequest request, Map<String, String> userAttributes)
-            throws UnsupportedStorageOperationException,
+    public void createCollection( ResourceStoreRequest request, Map<String, String> userAttributes )
+        throws UnsupportedStorageOperationException,
             NoSuchResourceStoreException,
             RepositoryNotAvailableException,
             StorageException,
             AccessDeniedException
     {
-        checkConditions(request, getResultingActionOnWrite(request));
+        checkConditions( request, getResultingActionOnWrite( request ) );
 
         DefaultStorageCollectionItem coll = new DefaultStorageCollectionItem(
-                this,
-                request.getRequestPath(),
-                true,
-                true);
+            this,
+            request.getRequestPath(),
+            true,
+            true );
 
-        coll.getItemContext().putAll(request.getRequestContext());
+        coll.getItemContext().putAll( request.getRequestContext() );
 
-        if (userAttributes != null)
+        if ( userAttributes != null )
         {
-            coll.getAttributes().putAll(userAttributes);
+            coll.getAttributes().putAll( userAttributes );
         }
 
-        storeItem(coll);
+        storeItem( coll );
     }
 
-    public Collection<StorageItem> list(ResourceStoreRequest request)
-            throws NoSuchResourceStoreException,
+    public Collection<StorageItem> list( ResourceStoreRequest request )
+        throws NoSuchResourceStoreException,
             RepositoryNotAvailableException,
             RepositoryNotListableException,
             ItemNotFoundException,
             StorageException,
             AccessDeniedException
     {
-        checkConditions(request, Action.read);
+        checkConditions( request, Action.read );
 
-        RepositoryItemUid uid = createUid(request.getRequestPath());
+        RepositoryItemUid uid = createUid( request.getRequestPath() );
 
         Collection<StorageItem> items = null;
 
-        if (isBrowseable())
+        if ( isBrowseable() )
         {
-            items = list(uid, request.getRequestContext());
+            items = list( uid, request.getRequestContext() );
         }
         else
         {
-            throw new RepositoryNotListableException(this.getId());
+            throw new RepositoryNotListableException( this.getId() );
         }
 
         return items;
     }
 
-    public TargetSet getTargetsForRequest(ResourceStoreRequest request)
+    public TargetSet getTargetsForRequest( ResourceStoreRequest request )
     {
-        RepositoryItemUid uid = createUid(request.getRequestPath());
+        RepositoryItemUid uid = createUid( request.getRequestPath() );
 
-        return getTargetsForRequest(uid, request.getRequestContext());
+        return getTargetsForRequest( uid, request.getRequestContext() );
     }
 
-    public Action getResultingActionOnWrite(ResourceStoreRequest rsr)
+    public Action getResultingActionOnWrite( ResourceStoreRequest rsr )
     {
         try
         {
-            RepositoryItemUid uid = createUid(rsr.getRequestPath());
+            RepositoryItemUid uid = createUid( rsr.getRequestPath() );
 
-            retrieveItem(true, uid, rsr.getRequestContext());
+            retrieveItem( true, uid, rsr.getRequestContext() );
 
             return Action.update;
         }
-        catch (ItemNotFoundException e)
+        catch ( ItemNotFoundException e )
         {
             return Action.create;
         }
-        catch (StorageException e)
+        catch ( StorageException e )
         {
-            getLogger().warn("Got exception while checking for resulting actionOnWrite", e);
+            getLogger().warn( "Got exception while checking for resulting actionOnWrite", e );
 
             return null;
         }
-        catch (RepositoryNotAvailableException e)
+        catch ( RepositoryNotAvailableException e )
         {
-            getLogger().warn("Got exception while checking for resulting actionOnWrite", e);
+            getLogger().warn( "Got exception while checking for resulting actionOnWrite", e );
 
             return null;
         }
@@ -889,272 +907,272 @@ public abstract class AbstractRepository
 
     // ===================================================================================
     // Repositry store-like
-    public InputStream retrieveItemContent(RepositoryItemUid uid)
-            throws RepositoryNotAvailableException,
+    public InputStream retrieveItemContent( RepositoryItemUid uid )
+        throws RepositoryNotAvailableException,
             ItemNotFoundException,
             StorageException
     {
-        if (getLogger().isDebugEnabled())
+        if ( getLogger().isDebugEnabled() )
         {
-            getLogger().debug("retrieveItemContent() :: " + uid.toString());
+            getLogger().debug( "retrieveItemContent() :: " + uid.toString() );
         }
 
-        if (!getLocalStatus().shouldServiceRequest())
+        if ( !getLocalStatus().shouldServiceRequest() )
         {
-            throw new RepositoryNotAvailableException(this.getId());
+            throw new RepositoryNotAvailableException( this.getId() );
         }
 
-        getLocalStorage().touchItemLastRequested(uid);
+        getLocalStorage().touchItemLastRequested( uid );
 
-        return getLocalStorage().retrieveItemContent(uid);
+        return getLocalStorage().retrieveItemContent( uid );
     }
 
-    public StorageItem retrieveItem(boolean localOnly, RepositoryItemUid uid, Map<String, Object> context)
-            throws RepositoryNotAvailableException,
+    public StorageItem retrieveItem( boolean localOnly, RepositoryItemUid uid, Map<String, Object> context )
+        throws RepositoryNotAvailableException,
             ItemNotFoundException,
             StorageException
     {
-        if (getLogger().isDebugEnabled())
+        if ( getLogger().isDebugEnabled() )
         {
-            getLogger().debug("retrieveItem() :: " + uid.toString());
+            getLogger().debug( "retrieveItem() :: " + uid.toString() );
         }
 
-        if (!getLocalStatus().shouldServiceRequest())
+        if ( !getLocalStatus().shouldServiceRequest() )
         {
-            throw new RepositoryNotAvailableException(this.getId());
+            throw new RepositoryNotAvailableException( this.getId() );
         }
 
-        maintainNotFoundCache(uid.getPath());
+        maintainNotFoundCache( uid.getPath() );
 
-        boolean isLocalOnlyRequest = (localOnly) || (getProxyMode() != null && !getProxyMode().shouldProxy());
+        boolean isLocalOnlyRequest = ( localOnly ) || ( getProxyMode() != null && !getProxyMode().shouldProxy() );
 
         try
         {
             StorageItem item = null;
 
-            repositoryItemUidFactory.lock(uid);
+            repositoryItemUidFactory.lock( uid );
 
             try
             {
-                item = doRetrieveItem(localOnly, uid, new HashMap<String, Object>());
+                item = doRetrieveItem( localOnly, uid, new HashMap<String, Object>() );
             }
             finally
             {
-                repositoryItemUidFactory.unlock(uid);
+                repositoryItemUidFactory.unlock( uid );
             }
 
-            if (context != null)
+            if ( context != null )
             {
-                item.getItemContext().putAll(context);
+                item.getItemContext().putAll( context );
             }
 
-            if (getLogger().isDebugEnabled())
+            if ( getLogger().isDebugEnabled() )
             {
-                getLogger().debug(getId() + " retrieveItem() :: FOUND " + uid.toString());
+                getLogger().debug( getId() + " retrieveItem() :: FOUND " + uid.toString() );
             }
 
-            notifyProximityEventListeners(new RepositoryItemEventRetrieve(item));
+            notifyProximityEventListeners( new RepositoryItemEventRetrieve( item ) );
 
             return item;
         }
-        catch (ItemNotFoundException ex)
+        catch ( ItemNotFoundException ex )
         {
-            if (getLogger().isDebugEnabled())
+            if ( getLogger().isDebugEnabled() )
             {
-                getLogger().debug(getId() + " retrieveItem() :: NOT FOUND " + uid.toString());
+                getLogger().debug( getId() + " retrieveItem() :: NOT FOUND " + uid.toString() );
             }
 
-            if (!isLocalOnlyRequest)
+            if ( !isLocalOnlyRequest )
             {
-                addToNotFoundCache(uid.getPath());
+                addToNotFoundCache( uid.getPath() );
             }
 
             throw ex;
         }
     }
 
-    public void copyItem(RepositoryItemUid from, RepositoryItemUid to, Map<String, Object> context)
-            throws UnsupportedStorageOperationException,
+    public void copyItem( RepositoryItemUid from, RepositoryItemUid to, Map<String, Object> context )
+        throws UnsupportedStorageOperationException,
             RepositoryNotAvailableException,
             ItemNotFoundException,
             StorageException
     {
-        if (getLogger().isDebugEnabled())
+        if ( getLogger().isDebugEnabled() )
         {
-            getLogger().debug("copyItem() :: " + from.toString() + " --> " + to.toString());
+            getLogger().debug( "copyItem() :: " + from.toString() + " --> " + to.toString() );
         }
 
-        if (!getLocalStatus().shouldServiceRequest())
+        if ( !getLocalStatus().shouldServiceRequest() )
         {
-            throw new RepositoryNotAvailableException(this.getId());
+            throw new RepositoryNotAvailableException( this.getId() );
         }
 
-        maintainNotFoundCache(from.getPath());
+        maintainNotFoundCache( from.getPath() );
 
-        StorageItem item = retrieveItem(true, from, context);
+        StorageItem item = retrieveItem( true, from, context );
 
-        if (StorageFileItem.class.isAssignableFrom(item.getClass()))
+        if ( StorageFileItem.class.isAssignableFrom( item.getClass() ) )
         {
             try
             {
                 DefaultStorageFileItem target = new DefaultStorageFileItem(
-                        this,
-                        to.getPath(),
-                        true,
-                        true,
-                        new PreparedContentLocator(((StorageFileItem) item).getInputStream()));
+                    this,
+                    to.getPath(),
+                    true,
+                    true,
+                    new PreparedContentLocator( ( (StorageFileItem) item ).getInputStream() ) );
 
-                target.getItemContext().putAll(item.getItemContext());
+                target.getItemContext().putAll( item.getItemContext() );
 
-                storeItem(target);
+                storeItem( target );
             }
-            catch (IOException e)
+            catch ( IOException e )
             {
-                throw new StorageException("Could not get the content of source file (is it file?)!", e);
+                throw new StorageException( "Could not get the content of source file (is it file?)!", e );
             }
         }
 
         // remove the "to" item from n-cache if there
-        removeFromNotFoundCache(to.getPath());
+        removeFromNotFoundCache( to.getPath() );
     }
 
-    public void moveItem(RepositoryItemUid from, RepositoryItemUid to, Map<String, Object> context)
-            throws UnsupportedStorageOperationException,
+    public void moveItem( RepositoryItemUid from, RepositoryItemUid to, Map<String, Object> context )
+        throws UnsupportedStorageOperationException,
             RepositoryNotAvailableException,
             ItemNotFoundException,
             StorageException
     {
-        if (getLogger().isDebugEnabled())
+        if ( getLogger().isDebugEnabled() )
         {
-            getLogger().debug("moveItem() :: " + from.toString() + " --> " + to.toString());
+            getLogger().debug( "moveItem() :: " + from.toString() + " --> " + to.toString() );
         }
 
-        if (!getLocalStatus().shouldServiceRequest())
+        if ( !getLocalStatus().shouldServiceRequest() )
         {
-            throw new RepositoryNotAvailableException(this.getId());
+            throw new RepositoryNotAvailableException( this.getId() );
         }
 
-        copyItem(from, to, context);
+        copyItem( from, to, context );
 
-        deleteItem(from, context);
+        deleteItem( from, context );
     }
 
-    public void deleteItem(RepositoryItemUid uid, Map<String, Object> context)
-            throws UnsupportedStorageOperationException,
+    public void deleteItem( RepositoryItemUid uid, Map<String, Object> context )
+        throws UnsupportedStorageOperationException,
             RepositoryNotAvailableException,
             ItemNotFoundException,
             StorageException
     {
-        if (getLogger().isDebugEnabled())
+        if ( getLogger().isDebugEnabled() )
         {
-            getLogger().debug("deleteItem() :: " + uid.toString());
+            getLogger().debug( "deleteItem() :: " + uid.toString() );
         }
 
-        if (!getLocalStatus().shouldServiceRequest())
+        if ( !getLocalStatus().shouldServiceRequest() )
         {
-            throw new RepositoryNotAvailableException(this.getId());
+            throw new RepositoryNotAvailableException( this.getId() );
         }
 
-        maintainNotFoundCache(uid.getPath());
+        maintainNotFoundCache( uid.getPath() );
 
         // determine is the thing to be deleted a collection or not
-        StorageItem item = retrieveItem(true, uid, context);
+        StorageItem item = retrieveItem( true, uid, context );
 
         // fire the event for file being deleted
-        notifyProximityEventListeners(new RepositoryItemEventDelete(item));
+        notifyProximityEventListeners( new RepositoryItemEventDelete( item ) );
 
-        if (StorageCollectionItem.class.isAssignableFrom(item.getClass()))
+        if ( StorageCollectionItem.class.isAssignableFrom( item.getClass() ) )
         {
-            if (getLogger().isDebugEnabled())
+            if ( getLogger().isDebugEnabled() )
             {
                 getLogger().debug(
-                        "We are deleting a collection, starting a walker to send delete notifications per-file.");
+                    "We are deleting a collection, starting a walker to send delete notifications per-file." );
             }
 
             // it is collection, walk it and below and fire events for all files
-            DeletionNotifierWalker dnw = new DeletionNotifierWalker(this, getLogger(), context);
+            DeletionNotifierWalker dnw = new DeletionNotifierWalker( this, getLogger(), context );
 
-            dnw.walk(uid.getPath());
+            dnw.walk( uid.getPath() );
         }
 
-        doDeleteItem(uid);
+        doDeleteItem( uid );
     }
 
-    public void storeItem(StorageItem item)
-            throws UnsupportedStorageOperationException,
+    public void storeItem( StorageItem item )
+        throws UnsupportedStorageOperationException,
             RepositoryNotAvailableException,
             StorageException
     {
-        if (getLogger().isDebugEnabled())
+        if ( getLogger().isDebugEnabled() )
         {
-            getLogger().debug("storeItem() :: " + item.getRepositoryItemUid().toString());
+            getLogger().debug( "storeItem() :: " + item.getRepositoryItemUid().toString() );
         }
 
-        if (!getLocalStatus().shouldServiceRequest())
+        if ( !getLocalStatus().shouldServiceRequest() )
         {
-            throw new RepositoryNotAvailableException(this.getId());
+            throw new RepositoryNotAvailableException( this.getId() );
         }
 
         // replace UID to own one
-        item.setRepositoryItemUid(createUid(item.getPath()));
+        item.setRepositoryItemUid( createUid( item.getPath() ) );
 
         // store it
-        getLocalStorage().storeItem(item);
+        getLocalStorage().storeItem( item );
 
         // remove the "request" item from n-cache if there
-        removeFromNotFoundCache(item.getRepositoryItemUid().getPath());
+        removeFromNotFoundCache( item.getRepositoryItemUid().getPath() );
 
-        notifyProximityEventListeners(new RepositoryItemEventStore(item));
+        notifyProximityEventListeners( new RepositoryItemEventStore( item ) );
     }
 
-    public Collection<StorageItem> list(RepositoryItemUid uid, Map<String, Object> context)
-            throws RepositoryNotAvailableException,
+    public Collection<StorageItem> list( RepositoryItemUid uid, Map<String, Object> context )
+        throws RepositoryNotAvailableException,
             ItemNotFoundException,
             StorageException
     {
-        if (getLogger().isDebugEnabled())
+        if ( getLogger().isDebugEnabled() )
         {
-            getLogger().debug("list() :: " + uid.toString());
+            getLogger().debug( "list() :: " + uid.toString() );
         }
 
-        if (!getLocalStatus().shouldServiceRequest())
+        if ( !getLocalStatus().shouldServiceRequest() )
         {
-            throw new RepositoryNotAvailableException(this.getId());
+            throw new RepositoryNotAvailableException( this.getId() );
         }
 
-        maintainNotFoundCache(uid.getPath());
+        maintainNotFoundCache( uid.getPath() );
 
-        Collection<StorageItem> items = doListItems(uid);
+        Collection<StorageItem> items = doListItems( uid );
 
-        for (StorageItem item : items)
+        for ( StorageItem item : items )
         {
-            item.getItemContext().putAll(context);
+            item.getItemContext().putAll( context );
         }
 
         return items;
     }
 
-    public Collection<StorageItem> list(StorageCollectionItem item)
-            throws RepositoryNotAvailableException,
+    public Collection<StorageItem> list( StorageCollectionItem item )
+        throws RepositoryNotAvailableException,
             ItemNotFoundException,
             StorageException
     {
-        return list(item.getRepositoryItemUid(), item.getItemContext());
+        return list( item.getRepositoryItemUid(), item.getItemContext() );
     }
 
-    public TargetSet getTargetsForRequest(RepositoryItemUid uid, Map<String, Object> context)
+    public TargetSet getTargetsForRequest( RepositoryItemUid uid, Map<String, Object> context )
     {
-        if (getLogger().isDebugEnabled())
+        if ( getLogger().isDebugEnabled() )
         {
-            getLogger().debug("getTargetsForRequest() :: " + uid.toString());
+            getLogger().debug( "getTargetsForRequest() :: " + uid.toString() );
         }
 
-        return targetRegistry.getTargetsForRepositoryPath(uid.getRepository(), uid.getPath());
+        return targetRegistry.getTargetsForRepositoryPath( uid.getRepository(), uid.getPath() );
     }
 
-    public RepositoryItemUid createUid(String path)
+    public RepositoryItemUid createUid( String path )
     {
-        return repositoryItemUidFactory.createUid(this, path);
+        return repositoryItemUidFactory.createUid( this, path );
     }
 
     // ===================================================================================
@@ -1165,29 +1183,29 @@ public abstract class AbstractRepository
      * @param path the path
      * @throws ItemNotFoundException the item not found exception
      */
-    protected void maintainNotFoundCache(String path)
-            throws ItemNotFoundException
+    protected void maintainNotFoundCache( String path )
+        throws ItemNotFoundException
     {
-        if (getNotFoundCache() != null)
+        if ( getNotFoundCache() != null )
         {
-            if (getNotFoundCache().contains(path))
+            if ( getNotFoundCache().contains( path ) )
             {
-                if (getNotFoundCache().isExpired(path))
+                if ( getNotFoundCache().isExpired( path ) )
                 {
-                    if (getLogger().isDebugEnabled())
+                    if ( getLogger().isDebugEnabled() )
                     {
-                        getLogger().debug("The path " + path + " is in NFC but expired.");
+                        getLogger().debug( "The path " + path + " is in NFC but expired." );
                     }
-                    removeFromNotFoundCache(path);
+                    removeFromNotFoundCache( path );
                 }
                 else
                 {
-                    if (getLogger().isDebugEnabled())
+                    if ( getLogger().isDebugEnabled() )
                     {
                         getLogger().debug(
-                                "The path " + path + " is in NFC and still active, throwing ItemNotFoundException.");
+                            "The path " + path + " is in NFC and still active, throwing ItemNotFoundException." );
                     }
-                    throw new ItemNotFoundException(path);
+                    throw new ItemNotFoundException( path );
                 }
             }
         }
@@ -1198,15 +1216,15 @@ public abstract class AbstractRepository
      * 
      * @param path the path
      */
-    public void addToNotFoundCache(String path)
+    public void addToNotFoundCache( String path )
     {
-        if (getNotFoundCache() != null)
+        if ( getNotFoundCache() != null )
         {
-            if (getLogger().isDebugEnabled())
+            if ( getLogger().isDebugEnabled() )
             {
-                getLogger().debug("Adding path " + path + " to NFC.");
+                getLogger().debug( "Adding path " + path + " to NFC." );
             }
-            getNotFoundCache().put(path, Boolean.TRUE, getNotFoundCacheTimeToLive() * 60);
+            getNotFoundCache().put( path, Boolean.TRUE, getNotFoundCacheTimeToLive() * 60 );
         }
     }
 
@@ -1215,15 +1233,15 @@ public abstract class AbstractRepository
      * 
      * @param path the path
      */
-    public void removeFromNotFoundCache(String path)
+    public void removeFromNotFoundCache( String path )
     {
-        if (getNotFoundCache() != null)
+        if ( getNotFoundCache() != null )
         {
-            if (getLogger().isDebugEnabled())
+            if ( getLogger().isDebugEnabled() )
             {
-                getLogger().debug("Removing path " + path + " from NFC.");
+                getLogger().debug( "Removing path " + path + " from NFC." );
             }
-            getNotFoundCache().removeWithParents(path);
+            getNotFoundCache().removeWithParents( path );
         }
     }
 
@@ -1235,21 +1253,29 @@ public abstract class AbstractRepository
      * @throws RepositoryNotAvailableException the repository not available exception
      * @throws AccessDeniedException the access denied exception
      */
-    protected void checkConditions(ResourceStoreRequest request, Action action)
-            throws RepositoryNotAvailableException,
+    protected void checkConditions( ResourceStoreRequest request, Action action )
+        throws RepositoryNotAvailableException,
             AccessDeniedException
     {
-        if (!getLocalStatus().shouldServiceRequest())
+        if ( !getLocalStatus().shouldServiceRequest() )
         {
-            throw new RepositoryNotAvailableException(this.getId());
+            throw new RepositoryNotAvailableException( this.getId() );
         }
 
-        if (!isAllowWrite() && (action.isWritingAction()))
+        if ( !isAllowWrite() && ( action.isWritingAction() ) )
         {
-            throw new AccessDeniedException(request, "Repository is READ ONLY!!");
+            throw new AccessDeniedException( request, "Repository is READ ONLY!!" );
         }
 
-        getAccessManager().decide(request, this, action);
+        getAccessManager().decide( request, this, action );
+
+        if ( getRequestProcessors().size() > 0 )
+        {
+            for ( RequestProcessor processor : getRequestProcessors() )
+            {
+                processor.process( request, action );
+            }
+        }
     }
 
     /**
@@ -1263,8 +1289,8 @@ public abstract class AbstractRepository
      * @throws StorageException the storage exception
      * @throws AccessDeniedException the access denied exception
      */
-    protected abstract StorageItem doRetrieveItem(boolean localOnly, RepositoryItemUid uid, Map<String, Object> context)
-            throws RepositoryNotAvailableException,
+    protected abstract StorageItem doRetrieveItem( boolean localOnly, RepositoryItemUid uid, Map<String, Object> context )
+        throws RepositoryNotAvailableException,
             ItemNotFoundException,
             StorageException;
 
@@ -1278,8 +1304,8 @@ public abstract class AbstractRepository
      * @throws StorageException the storage exception
      * @throws UnsupportedStorageOperationException
      */
-    protected abstract void doDeleteItem(RepositoryItemUid uid)
-            throws UnsupportedStorageOperationException,
+    protected abstract void doDeleteItem( RepositoryItemUid uid )
+        throws UnsupportedStorageOperationException,
             RepositoryNotAvailableException,
             ItemNotFoundException,
             StorageException;
@@ -1294,8 +1320,8 @@ public abstract class AbstractRepository
      * @throws StorageException the storage exception
      * @throws AccessDeniedException the access denied exception
      */
-    protected abstract Collection<StorageItem> doListItems(RepositoryItemUid uid)
-            throws RepositoryNotAvailableException,
+    protected abstract Collection<StorageItem> doListItems( RepositoryItemUid uid )
+        throws RepositoryNotAvailableException,
             ItemNotFoundException,
             StorageException;
 }

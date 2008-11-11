@@ -2,6 +2,7 @@ package org.sonatype.nexus.proxy.dummy;
 
 import java.io.InputStream;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 import org.sonatype.nexus.proxy.AccessDeniedException;
@@ -26,6 +27,7 @@ import org.sonatype.nexus.proxy.repository.RemoteStatus;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RepositoryStatusCheckMode;
 import org.sonatype.nexus.proxy.repository.RepositoryType;
+import org.sonatype.nexus.proxy.repository.RequestProcessor;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.proxy.storage.local.LocalRepositoryStorage;
 import org.sonatype.nexus.proxy.storage.remote.RemoteRepositoryStorage;
@@ -521,6 +523,12 @@ public class DummyRepository implements Repository
     {
         // TODO Auto-generated method stub
         
+    }
+
+    public List<RequestProcessor> getRequestProcessors()
+    {
+        // TODO Auto-generated method stub
+        return null;
     }
 
 }
