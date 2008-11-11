@@ -115,18 +115,6 @@ public abstract class AbstractMavenRepository
         return walker.getFiles();
     }
 
-    public boolean recreateAttributes( String path, final Map<String, String> initialData )
-    {
-        getLogger().info( "Recreating Maven attributes on repository " + getId() );
-
-        RecreateMavenAttributesWalker walker = new RecreateMavenAttributesWalker( this, getLogger(), initialData );
-
-        walker.walk( path, true, false );
-
-        notifyProximityEventListeners( new RepositoryEventRecreateAttributes( this ) );
-
-        return true;
-    }
 
     public boolean recreateMavenMetadata( String path )
     {
