@@ -25,10 +25,16 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
+import org.apache.log4j.PropertyConfigurator;
 import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.PlexusContainerException;
 
+/**
+ * 
+ * @author Juven Xu
+ *
+ */
 public class PlexusContainerContextListener
     implements ServletContextListener
 {
@@ -49,6 +55,12 @@ public class PlexusContainerContextListener
 
             NexusWorkDirUtils.setUpNexusWorkDir( plexusContainerConfiguration.getContext() );
 
+            //initialize log4j
+            String log4jFile = servletContext.getRealPath( "/" ) + "/WEB-INF/log4j.properties";
+
+            PropertyConfigurator.configure( log4jFile );
+
+            //initialize plexus container
             PlexusContainer plexusContainer = plexusContainerUtils.startContainer( plexusContainerConfiguration );
 
             servletContext.setAttribute( KEY_PLEXUS, plexusContainer );
