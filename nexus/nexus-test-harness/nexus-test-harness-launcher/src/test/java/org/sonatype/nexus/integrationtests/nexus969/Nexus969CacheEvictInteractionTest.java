@@ -4,14 +4,12 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 import org.restlet.data.Status;
-import org.sonatype.appbooter.ForkedAppBooter;
-import org.sonatype.appbooter.ctl.AppBooterServiceException;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
-import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.rest.model.ScheduledServiceBaseResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceListResource;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.tasks.descriptors.EvictUnusedItemsTaskDescriptor;
+import org.sonatype.nexus.test.utils.NexusStateUtil;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 
 public class Nexus969CacheEvictInteractionTest
@@ -43,18 +41,9 @@ public class Nexus969CacheEvictInteractionTest
     {
         // soft restart isn't enought to catch the bug
         // NexusStateUtil.doSoftRestart();
-        ForkedAppBooter appBooter =
-            (ForkedAppBooter) TestContainer.getInstance().lookup( ForkedAppBooter.ROLE, "TestForkedAppBooter" );
 
-        try
-        {
-            appBooter.stop();
-            appBooter.start();
-        }
-        catch ( AppBooterServiceException e )
-        {
-            Assert.fail( "The Test failed to stop a forked JVM, so, it was either (most likely) not running or an orphaned process that you will need to kill." );
-        }
+        NexusStateUtil.doHardStop(appBooter);
+        NexusStateUtil.doHardStart();
 
     }
 

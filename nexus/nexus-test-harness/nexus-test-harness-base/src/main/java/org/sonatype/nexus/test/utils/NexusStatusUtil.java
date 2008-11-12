@@ -6,10 +6,10 @@ import org.sonatype.nexus.client.NexusClientException;
 import org.sonatype.nexus.client.NexusConnectionException;
 import org.sonatype.nexus.client.rest.NexusRestClient;
 
-public class ServiceStatusUtil
+public class NexusStatusUtil
 {
 
-    protected static Logger log = Logger.getLogger( ServiceStatusUtil.class );
+    protected static Logger log = Logger.getLogger( NexusStatusUtil.class );
 
     public static boolean waitForStart( NexusClient client )
         throws NexusClientException, NexusConnectionException

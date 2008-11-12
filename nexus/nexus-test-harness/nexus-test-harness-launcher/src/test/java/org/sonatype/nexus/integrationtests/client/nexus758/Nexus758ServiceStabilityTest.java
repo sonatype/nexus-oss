@@ -1,16 +1,18 @@
 package org.sonatype.nexus.integrationtests.client.nexus758;
 
-import junit.framework.Assert;
+import static org.sonatype.nexus.test.utils.NexusStateUtil.doClientStart;
+import static org.sonatype.nexus.test.utils.NexusStateUtil.doClientStop;
+import static org.sonatype.nexus.test.utils.NexusStateUtil.doHardStart;
+import static org.sonatype.nexus.test.utils.NexusStateUtil.doHardStop;
+import static org.sonatype.nexus.test.utils.NexusStateUtil.doSoftStart;
+import static org.sonatype.nexus.test.utils.NexusStateUtil.doSoftStop;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.sonatype.appbooter.AbstractForkedAppBooter;
 import org.sonatype.appbooter.ForkedAppBooter;
 import org.sonatype.nexus.client.NexusClient;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.integrationtests.TestContext;
-import org.sonatype.nexus.test.utils.NexusStateUtil;
-import org.sonatype.nexus.test.utils.ServiceStatusUtil;
 import org.sonatype.nexus.test.utils.TestProperties;
 
 /**
@@ -18,7 +20,6 @@ import org.sonatype.nexus.test.utils.TestProperties;
  */
 public class Nexus758ServiceStabilityTest
 {
-
     private static NexusClient client;
 
     @BeforeClass
@@ -183,96 +184,6 @@ public class Nexus758ServiceStabilityTest
 
         doClientStart();
         doHardStop( app );
-    }
-
-    private void doClientStart()
-        throws Exception
-    {
-        Assert.assertFalse( "Nexus should not be started.", client.isNexusStarted( true ) );
-
-        client.startNexus();
-
-        Assert.assertTrue( "Unable to start Nexus after 4 minutes", ServiceStatusUtil.waitForStart( client ) );
-    }
-
-    private void doClientStop()
-        throws Exception
-    {
-        Assert.assertTrue( "Nexus is not started.", client.isNexusStarted( true ) );
-
-        client.stopNexus();
-
-        Assert.assertTrue( "Unable to stop Nexus after 4 minutes", ServiceStatusUtil.waitForStop( client ) );
-    }
-
-    private void doSoftStart()
-        throws Exception
-    {
-        Assert.assertFalse( "Nexus should not be started.", client.isNexusStarted( true ) );
-
-        NexusStateUtil.doSoftStart();
-
-        Assert.assertTrue( "Unable to start Nexus after 4 minutes", ServiceStatusUtil.waitForStart( client ) );
-    }
-
-    private void doSoftStop()
-        throws Exception
-    {
-        Assert.assertTrue( "Nexus is not started.", client.isNexusStarted( true ) );
-
-        NexusStateUtil.doSoftStop();
-
-        Assert.assertTrue( "Unable to stop Nexus after 4 minutes", ServiceStatusUtil.waitForStop( client ) );
-    }
-
-    public void startAndStopTest()
-        throws Exception
-    {
-        // stop Nexus
-        client.stopNexus(); // blocking
-        Assert.assertTrue( "Expected Nexus to be Stopped", ServiceStatusUtil.waitForStop( client ) );
-
-        // start Nexus
-        client.startNexus(); // blocking
-        Assert.assertTrue( "Expected Nexus to be Started", ServiceStatusUtil.waitForStart( client ) );
-
-        client.disconnect();
-    }
-
-    public void restartTest()
-        throws Exception
-    {
-        // restart Nexus
-        client.restartNexus(); // this is blocking
-        Assert.assertTrue( "Expected Nexus to be Started", client.isNexusStarted( false ) );
-
-        client.disconnect();
-    }
-
-    public ForkedAppBooter doHardStart()
-        throws Exception
-    {
-        AbstractForkedAppBooter appBooter =
-            (AbstractForkedAppBooter) TestContainer.getInstance().lookup( ForkedAppBooter.ROLE, "TestForkedAppBooter" );
-
-        Assert.assertFalse( "Nexus should not be started.", client.isNexusStarted( true ) );
-
-        appBooter.setSleepAfterStart( 0 );
-        appBooter.start();
-
-        Assert.assertTrue( "Unable to start Nexus after 4 minutes", ServiceStatusUtil.waitForStart( client ) );
-
-        return appBooter;
-    }
-
-    public void doHardStop( ForkedAppBooter app )
-        throws Exception
-    {
-        Assert.assertTrue( "Nexus is not started.", client.isNexusStarted( true ) );
-
-        app.stop();
-
-        Assert.assertTrue( "Unable to stop Nexus after 4 minutes", ServiceStatusUtil.waitForStop( client ) );
     }
 
 }

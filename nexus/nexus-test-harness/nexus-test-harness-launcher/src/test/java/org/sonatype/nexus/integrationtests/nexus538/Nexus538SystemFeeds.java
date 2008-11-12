@@ -8,9 +8,7 @@ import junit.framework.Assert;
 import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
-import org.sonatype.nexus.proxy.repository.ProxyMode;
 import org.sonatype.nexus.rest.model.RepositoryBaseResource;
-import org.sonatype.nexus.rest.model.RepositoryProxyResource;
 import org.sonatype.nexus.rest.model.RepositoryStatusResource;
 import org.sonatype.nexus.test.utils.FeedUtil;
 import org.sonatype.nexus.test.utils.NexusStateUtil;
@@ -27,7 +25,7 @@ public class Nexus538SystemFeeds
     @SuppressWarnings( "unchecked" )
     @Test
     public void bootEventTest()
-        throws IOException,
+        throws Exception,
             IllegalArgumentException,
             FeedException
     {
@@ -75,8 +73,8 @@ public class Nexus538SystemFeeds
         Assert.assertTrue( "Could not find new repo id in feed entry, Entry body:\n"+ entry.getDescription().getValue(), entry.getDescription().getValue().contains( newName ) );
         Assert.assertTrue( "Could not find old repo id in feed entry, Entry body:\n"+ entry.getDescription().getValue(), entry.getDescription().getValue().contains( oldName ) );
     }
-    
-    
+
+
     @SuppressWarnings( "unchecked" )
     @Test
     public void changeProxyStatusTest()
@@ -104,7 +102,7 @@ public class Nexus538SystemFeeds
         SyndEntry entry = entries.get( 0 );
         Assert.assertEquals( "Feed entry: " + entry.getPublishedDate(), "Repository proxy mode change", entry.getTitle() );
         Assert.assertTrue( "Could not find repo id in feed entry, Entry body:\n"+ entry.getDescription().getValue(), entry.getDescription().getValue().contains( "release-proxy-repo-1" ) );
-        
+
         feed = FeedUtil.getFeed( "systemRepositoryStatusChanges" );
         entries = feed.getEntries();
 

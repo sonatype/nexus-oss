@@ -19,7 +19,7 @@ public class Nexus292SoftRestartTest
 
     @Test
     public void softRebootTest()
-        throws IOException
+        throws Exception
     {
 
         // make sure Nexus is running
@@ -45,7 +45,7 @@ public class Nexus292SoftRestartTest
 
     @Test
     public void softStopTest()
-        throws IOException
+        throws Exception
     {
 
         // make sure Nexus is running
