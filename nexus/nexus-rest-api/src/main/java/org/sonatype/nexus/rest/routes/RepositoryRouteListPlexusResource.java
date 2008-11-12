@@ -124,7 +124,7 @@ public class RepositoryRouteListPlexusResource
                 resource.setRepositories( null );
             }
 
-            resource.setId( Long.toHexString( System.currentTimeMillis() ) );
+            resource.setId( Long.toHexString( System.nanoTime() ) );
 
             try
             {
