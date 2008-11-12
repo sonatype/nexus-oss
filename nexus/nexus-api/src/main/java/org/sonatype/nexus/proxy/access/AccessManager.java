@@ -61,14 +61,4 @@ public interface AccessManager
      */
     void decide( ResourceStoreRequest request, Repository repository, Action action )
         throws AccessDeniedException;
-
-    /**
-     * Authorizes an InternalAction.
-     * 
-     * @param request
-     * @param repository
-     * @param action
-     * @return
-     */
-    boolean isAuthorizedFor( ResourceStoreRequest request, Repository repository, InternalAction action );
 }

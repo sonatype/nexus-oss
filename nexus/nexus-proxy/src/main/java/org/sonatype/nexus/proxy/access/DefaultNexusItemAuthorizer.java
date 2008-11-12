@@ -11,7 +11,6 @@ import org.jsecurity.subject.Subject;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
-import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.router.RepositoryRouter;
 import org.sonatype.nexus.proxy.router.RootRepositoryRouter;
 import org.sonatype.nexus.proxy.target.TargetMatch;
@@ -43,15 +42,6 @@ public class DefaultNexusItemAuthorizer
         TargetSet matched = root.getTargetsForRequest( rsr );
 
         return authorizePath( matched, action );
-    }
-
-    public boolean authorizeInternalAction( ResourceStoreRequest request, Repository repository, InternalAction action )
-    {
-        ArrayList<String> perms = new ArrayList<String>( 1 );
-
-        perms.add( action.getPermissionString() );
-
-        return isPermitted( perms );
     }
 
     protected boolean authorizePath( TargetSet matched, Action action )

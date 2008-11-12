@@ -13,12 +13,12 @@ public interface RequestProcessor
 {
     /**
      * A method that is able to modify the request _after_ it is authorized, but before it is executed. If the method
-     * wants to completely reject this request, AccessDeniedException should be thrown.
+     * wants to completely stop the execution of this request, it should return false. Otherwise, true should be
+     * returned.
      * 
      * @param request
      * @param action
      * @throws AccessDeniedException
      */
-    boolean process( Repository repository, ResourceStoreRequest request, Action action )
-        throws AccessDeniedException;
+    boolean process( Repository repository, ResourceStoreRequest request, Action action );
 }

@@ -1277,6 +1277,8 @@ public abstract class AbstractRepository
      * 
      * @param request the request
      * @param permission the permission
+     * @return false, if the request should not be processed with response appropriate for current method, or true is
+     *         execution should continue as usual.
      * @throws RepositoryNotAvailableException the repository not available exception
      * @throws AccessDeniedException the access denied exception
      */
