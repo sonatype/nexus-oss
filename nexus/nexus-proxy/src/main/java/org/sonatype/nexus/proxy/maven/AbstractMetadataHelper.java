@@ -113,19 +113,52 @@ abstract public class AbstractMetadataHelper
         cleanGAV( path );
     }
 
-    public void processFile( String path ) throws Exception
+    public void processFile( String path )
+        throws Exception
     {
+        // remove old metadata files
+        if ( isMavenMetadataFile( path ) )
+        {
+            remove( path );
+
+            return;
+        }
+        // remove rotten checksum
+        if ( isRottenChecksum( path ) )
+        {
+            remove( path );
+
+            return;
+        }
+
         if ( currentVersion != null && path.endsWith( "pom" ) )
         {
             currentArtifacts.add( path );
 
             handleMavenPlugin( path );
         }
-        
         rebuildChecksum( path );
 
     }
+    
+    private boolean isRottenChecksum( String path )
+        throws Exception
+    {
+        if ( !isChecksumFile( path ) )
+        {
+            return false;
+        }
 
+        String originalPath = path.substring( 0, path.lastIndexOf( '.' ) );
+
+        if ( exists( originalPath ) )
+        {
+            return false;
+        }
+
+        return true;
+    }
+    
     private String getParentPath( String path )
     {
         int pos = path.lastIndexOf( '/' );
@@ -499,12 +532,30 @@ abstract public class AbstractMetadataHelper
     
     protected boolean shouldBuildChecksum( String path )
     {
-        if ( getName( path ).endsWith( MD5_SUFFIX ) || getName( path ).endsWith( SHA1_SUFFIX ) )
+        if ( isChecksumFile( path ) )
         {
             return false;
         }
 
         return true;
+    }
+    
+    protected boolean isChecksumFile( String path )
+    {
+        if ( getName( path ).endsWith( MD5_SUFFIX ) || getName( path ).endsWith( SHA1_SUFFIX ) )
+        {
+            return true;
+        }
+        return false;
+    }
+
+    protected boolean isMavenMetadataFile( String path )
+    {
+        if ( getName( path ).endsWith( METADATA_SUFFIX.substring( 1 ) ) )
+        {
+            return true;
+        }
+        return false;
     }
     
     abstract public String buildMd5(String path)
@@ -523,6 +574,15 @@ abstract public class AbstractMetadataHelper
         throws Exception;
 
     /**
+     * Remove the file of the path
+     * 
+     * @param path
+     * @throws Exception
+     */
+    abstract public void remove( String path )
+        throws Exception;
+
+    /**
      * Retrieve the content according to the path
      * 
      * @param path
@@ -530,4 +590,15 @@ abstract public class AbstractMetadataHelper
      */
     abstract public InputStream retrieveContent( String path )
         throws Exception;
+    
+    /**
+     * Check if the file or item of this path exists
+     * @param path
+     * @return
+     * @throws Exception
+     */
+    abstract public boolean exists(String path)
+        throws Exception;
+    
+
 }

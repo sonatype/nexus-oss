@@ -61,6 +61,19 @@ public class DefaultMetadataHelper
 
         storeItem( mdUid, contentLocator );
     }
+    
+    @Override
+    public void remove( String path ) throws StorageException, UnsupportedStorageOperationException, RepositoryNotAvailableException, ItemNotFoundException
+    {
+        repository.deleteItem( repository.createUid( path ), null );
+    }
+    
+    @Override
+    public boolean exists( String path )
+        throws StorageException
+    {
+        return repository.getLocalStorage().containsItem( repository.createUid( path ) );
+    }
 
     @Override
     public InputStream retrieveContent( String path )

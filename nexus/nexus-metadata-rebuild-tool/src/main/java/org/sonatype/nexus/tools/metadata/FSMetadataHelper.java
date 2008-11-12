@@ -21,7 +21,6 @@
 
 package org.sonatype.nexus.tools.metadata;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
@@ -65,6 +64,12 @@ public class FSMetadataHelper
             throw new RuntimeException( "Can't write content to: " + file, e );
         }
 
+    }
+    
+    @Override
+    public boolean exists( String path )
+    {
+        return FileUtils.fileExists( repo + path );
     }
 
     public String getRepo()
@@ -145,6 +150,13 @@ public class FSMetadataHelper
         {
             fis.close();
         }
+    }
+
+    @Override
+    public void remove( String path )
+        throws Exception
+    {
+        FileUtils.forceDelete( repo + path );
     }
     
 }

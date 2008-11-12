@@ -30,7 +30,6 @@ import org.sonatype.nexus.proxy.EnvironmentBuilder;
 import org.sonatype.nexus.proxy.M2TestsuiteEnvironmentBuilder;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.proxy.utils.StoreWalker;
 import org.sonatype.nexus.proxy.walker.DefaultWalkerContext;
 import org.sonatype.nexus.proxy.walker.Walker;
 
@@ -59,7 +58,9 @@ public class RecreateMavenMetadataWalkerTest
         "/junit/junit/4.0/junit-4.0.jar",
         "/junit/junit/4.0/junit-4.0.pom",
         "/junit/junit/4.4/junit-4.4.jar",
-        "/junit/junit/4.4/junit-4.4.pom" };
+        "/junit/junit/4.4/junit-4.4.pom",
+        "/junit/junit/4.4/junit-4.4.sources.jar.md5",
+        "/junit/junit-mock/maven-metadata.xml"};
 
     private String[] snapshotArtifactFiles = {
         "/org/sonatype/nexus/nexus-api/1.2.0-SNAPSHOT/nexus-api-1.2.0-20081022.180215-1.jar",
@@ -218,6 +219,38 @@ public class RecreateMavenMetadataWalkerTest
         assertNotNull( inhouse.retrieveItem( new ResourceStoreRequest(
             "/org/apache/maven/plugins/maven-metadata.xml.sha1",
             false ) ) );
+    }
+    
+    public void testRemoveRottenFiles()
+        throws Exception
+    {
+        RecreateMavenMetadataWalkerProcessor wp = new RecreateMavenMetadataWalkerProcessor();
+
+        DefaultWalkerContext ctx = new DefaultWalkerContext( inhouse );
+
+        ctx.getProcessors().add( wp );
+
+        walker.walk( ctx );
+        
+        try
+        {
+            inhouse.retrieveItem( new ResourceStoreRequest( "/junit/junit/4.4/junit-4.4.sources.jar.md5", false ) );
+            
+            fail("Should throw exception telling that can't find this item");
+        }
+        catch ( Exception e )
+        {
+        }
+        
+        try
+        {
+            inhouse.retrieveItem( new ResourceStoreRequest( "/junit/junit-mock/maven-metadata.xml", false ) );
+            
+            fail("Should throw exception telling that can't find this item");
+        }
+        catch ( Exception e )
+        {
+        }
     }
 
 }
