@@ -21,50 +21,10 @@
 	<name>Nexus Tools :: Migration tool</name>
 
 	<modules>
-	  <module>nexus-migration-core</module>
-	  <module>nexus-migration-plugin-archiva</module>
-	  <module>nexus-migration-plugin-artifactory</module>
-	  <module>nexus-migration-plugin-proximity</module>
-	  <module>nexus-migration-app</module>
-	  <module>nexus-migration-app-swing</module>
+	  <module>nexus-repository-conversion-tool</module>
+	  <module>nexus-metadata-rebuild-tool</module>
 	</modules>
-
-
-	<dependencyManagement>
-		<dependencies>
-			<!-- The modules -->
-			<dependency>
-				<groupId>org.sonatype.nexus.tools</groupId>
-				<artifactId>nexus-migration-core</artifactId>
-				<version>${project.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.sonatype.nexus.tools</groupId>
-				<artifactId>nexus-migration-app</artifactId>
-				<version>${project.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.sonatype.nexus.tools</groupId>
-				<artifactId>nexus-migration-app-swing</artifactId>
-				<version>${project.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.sonatype.nexus.tools</groupId>
-				<artifactId>nexus-migration-plugin-archiva</artifactId>
-				<version>${project.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.sonatype.nexus.tools</groupId>
-				<artifactId>nexus-migration-plugin-artifactory</artifactId>
-				<version>${project.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.sonatype.nexus.tools</groupId>
-				<artifactId>nexus-migration-plugin-proximity</artifactId>
-				<version>${project.version}</version>
-			</dependency>
-		</dependencies>
-	</dependencyManagement>
+			
 
 	<!-- build information for the project -->
 	<build>
