@@ -36,10 +36,13 @@ import org.slf4j.bridge.SLF4JBridgeHandler;
 import org.sonatype.appbooter.ForkedAppBooter;
 import org.sonatype.appbooter.ctl.AppBooterServiceException;
 import org.sonatype.nexus.artifact.Gav;
+import org.sonatype.nexus.client.NexusClient;
+import org.sonatype.nexus.client.rest.NexusRestClient;
 import org.sonatype.nexus.test.utils.DeployUtils;
 import org.sonatype.nexus.test.utils.FileTestingUtils;
 import org.sonatype.nexus.test.utils.NexusConfigUtil;
 import org.sonatype.nexus.test.utils.NexusStateUtil;
+import org.sonatype.nexus.test.utils.ServiceStatusUtil;
 import org.sonatype.nexus.test.utils.TestProperties;
 import org.sonatype.nexus.test.utils.XStreamFactory;
 
@@ -366,6 +369,15 @@ public class AbstractNexusIntegrationTest
             }
         }
 
+        NexusClient client = new NexusRestClient();
+        // at this point security should not be turned on, but you never know...
+        client.connect( baseNexusUrl,
+                        TestContainer.getInstance().getTestContext().getAdminUsername(),
+                        TestContainer.getInstance().getTestContext().getAdminPassword() );
+
+        ServiceStatusUtil.waitForStop( client );
+
+        client.disconnect();
     }
 
     protected File getOverridableFile( String file )
