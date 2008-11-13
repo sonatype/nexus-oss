@@ -19,7 +19,7 @@
  *
  */
 Sonatype.view = {
-  FIELD_OFFSET_WITH_SCROLL : (3 + 16 + 3 + 18)*(-1) + '', //  (help icon margin) + (help icon) + margin + (scrollbar)
+  FIELD_OFFSET_WITH_SCROLL : (3 + 16 + 3 + 30)*(-1) + '', //  (help icon margin) + (help icon) + margin + (scrollbar)
   FIELD_OFFSET : (3 + 16)*(-1) + '', //extra padding on right of icon not needed
   FIELDSET_OFFSET : (3 + 18)*(-1) + '', // (extra room between border and scrollbar) + (scrollbar)
   
