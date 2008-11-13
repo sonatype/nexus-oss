@@ -13,7 +13,7 @@ public class RepositoryOrGroupAttributesPlexusResource
     public String getResourceUri()
     {
         return "/attributes/{" + AbstractAttributesPlexusResource.DOMAIN + "}/{"
-            + AbstractAttributesPlexusResource.TARGET_ID + "}";
+            + AbstractAttributesPlexusResource.TARGET_ID + "}/content";
     }
 
     @Override
