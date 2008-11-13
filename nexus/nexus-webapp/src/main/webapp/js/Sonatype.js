@@ -23,6 +23,13 @@
 window.Sonatype = function(){
   return {    
     init : function() {
+      Ext.QuickTips.init();
+      Ext.apply(Ext.QuickTips.getQuickTip(), {
+        showDelay: 250,
+        hideDelay: 300,
+        dismissDelay: 0 //don't automatically hide quicktip
+      });
+
       Ext.get('header').hide();
       Ext.get('welcome-tab').hide();
       

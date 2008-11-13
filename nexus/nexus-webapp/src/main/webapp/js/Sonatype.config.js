@@ -33,13 +33,6 @@ Ext.form.Field.prototype.msgTarget = 'under';
 Sonatype.MessageBox.minWidth = 200;
 
 Ext.state.Manager.setProvider(new Ext.state.CookieProvider());
-Ext.QuickTips.init();
-Ext.apply(Ext.QuickTips.getQuickTip(), {
-  showDelay: 250,
-  hideDelay: 300,
-  dismissDelay: 0 //don't automatically hide quicktip
-});
-  
 
 Sonatype.config = function() {
   var host = window.location.protocol + '//' + window.location.host;
