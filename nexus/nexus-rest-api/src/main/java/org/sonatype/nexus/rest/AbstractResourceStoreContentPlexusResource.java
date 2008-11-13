@@ -410,7 +410,7 @@ public abstract class AbstractResourceStoreContentPlexusResource
 
             dataModel.put( "nexusVersion", getNexus().getSystemStatus().getVersion() );
 
-            dataModel.put( "nexusRoot", req.getRootRef().getPath() );
+            dataModel.put( "nexusRoot", req.getRootRef().toString() );
 
             // Load up the template, and pass in the data
             VelocityRepresentation representation = new VelocityRepresentation(

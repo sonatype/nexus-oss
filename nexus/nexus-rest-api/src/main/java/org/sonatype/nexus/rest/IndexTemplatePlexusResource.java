@@ -98,7 +98,7 @@ public class IndexTemplatePlexusResource
 
         templatingContext.put( "nexusVersion", nexus.getSystemStatus().getVersion() );
 
-        templatingContext.put( "nexusRoot", request.getRootRef().getPath() );
+        templatingContext.put( "nexusRoot", request.getRootRef().toString() );
 
         VelocityRepresentation templateRepresentation = new VelocityRepresentation(
             context,
