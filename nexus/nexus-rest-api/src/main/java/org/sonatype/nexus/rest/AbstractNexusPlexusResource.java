@@ -8,6 +8,7 @@ import org.apache.commons.fileupload.FileItemFactory;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.annotations.Requirement;
+import org.codehaus.plexus.util.StringUtils;
 import org.restlet.Context;
 import org.restlet.data.Reference;
 import org.restlet.data.Request;
@@ -70,7 +71,14 @@ public abstract class AbstractNexusPlexusResource
      */
     protected Reference getContextRoot( Request request )
     {
-        return request.getRootRef();
+        Reference result = request.getRootRef();
+
+        if ( StringUtils.isEmpty( result.getPath() ) )
+        {
+            result.setPath( "/" );
+        }
+
+        return result;
     }
 
     protected Reference createChildReference( Request request, String childPath )
