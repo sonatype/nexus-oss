@@ -42,6 +42,7 @@
         <include>js/filetree/js/Ext.ux.form.BrowseButton.js</include>
         <include>js/repoServer/*</include>
         <include>style/Sonatype.css</include>
+        <include>style/Sonatype-content.css</include>
         <include>WEB-INF/*</include>
       </includes>
     </fileSet>
