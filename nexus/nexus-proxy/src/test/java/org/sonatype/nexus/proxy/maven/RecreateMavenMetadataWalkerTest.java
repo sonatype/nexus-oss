@@ -60,7 +60,8 @@ public class RecreateMavenMetadataWalkerTest
         "/junit/junit/4.4/junit-4.4.jar",
         "/junit/junit/4.4/junit-4.4.pom",
         "/junit/junit/4.4/junit-4.4.sources.jar.md5",
-        "/junit/junit-mock/maven-metadata.xml"};
+        "/junit/junit-mock/maven-metadata.xml",
+        "/junit/junit-mock/1.1/readme.txt" };
 
     private String[] snapshotArtifactFiles = {
         "/org/sonatype/nexus/nexus-api/1.2.0-SNAPSHOT/nexus-api-1.2.0-20081022.180215-1.jar",

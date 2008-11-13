@@ -78,7 +78,7 @@ abstract public class AbstractMetadataHelper
 
     public void onDirEnter( String path )
     {
-        updateGAV( path );
+        //do nothing
     }
 
     public void onDirExit( String path )
@@ -131,12 +131,11 @@ abstract public class AbstractMetadataHelper
             return;
         }
 
-        if ( currentVersion != null && path.endsWith( "pom" ) )
+        if ( path.endsWith( "pom" ) )
         {
-            currentArtifacts.add( path );
-
-            handleMavenPlugin( path );
+            updateMavenInfo( path );
         }
+
         rebuildChecksum( path );
 
     }
@@ -159,17 +158,6 @@ abstract public class AbstractMetadataHelper
         return true;
     }
     
-    private String getParentPath( String path )
-    {
-        int pos = path.lastIndexOf( '/' );
-
-        if ( pos == -1 )
-        {
-            return null;
-        }
-
-        return path.substring( 0, pos );
-    }
 
     private String getName( String path )
     {
@@ -222,25 +210,6 @@ abstract public class AbstractMetadataHelper
         return false;
     }
 
-    private void updateGAV( String path )
-    {
-        if ( getName( path ).matches( VERSION_REGEX ) )
-        {
-            currentVersions.add( getName( path ) );
-
-            currentVersion = getName( path );
-
-            int spaceOfGAPos = getParentPath( path ).lastIndexOf( '/' );
-
-            if ( currentArtifactId == null )
-            {
-                currentArtifactId = getParentPath( path ).substring( spaceOfGAPos + 1 );
-
-                currentGroupId = getParentPath( path ).substring( 1, spaceOfGAPos ).replace( '/', '.' );
-            }
-        }
-    }
-
     private void cleanGAV( String path )
     {
         if ( currentVersion != null )
@@ -261,13 +230,14 @@ abstract public class AbstractMetadataHelper
             currentGroupId = null;
         }
     }
-
-    private void handleMavenPlugin( String path )
+    
+    private void updateMavenInfo( String path )
     {
         Model model = null;
         try
         {
             Reader reader = ReaderFactory.newXmlReader( retrieveContent( path ) );
+            
             MavenXpp3Reader xpp3 = new MavenXpp3Reader();
 
             try
@@ -282,14 +252,50 @@ abstract public class AbstractMetadataHelper
         }
         catch ( Exception e )
         {
-            e.printStackTrace();
+            //skip
+            return;
         }
 
-        if ( model != null && model.getPackaging().equals( "maven-plugin" ) )
+        if ( model == null )
+        {
+            return;
+        }
+
+        currentArtifactId = model.getArtifactId();
+        
+        if ( !StringUtils.isEmpty( model.getGroupId() ) )
+        {
+            currentGroupId = model.getGroupId();
+        }
+        else
+        {
+            currentGroupId = model.getParent().getGroupId();
+        }
+
+        if ( !StringUtils.isEmpty( model.getVersion() ) )
+        {
+            currentVersion = model.getVersion();
+
+            currentVersions.add( model.getVersion() );
+        }
+        else
+        {
+            currentVersion = model.getParent().getVersion();
+
+            currentVersions.add( model.getParent().getVersion() );
+        }
+        
+        
+        currentArtifacts.add( path );
+        
+
+        if ( model.getPackaging().equals( "maven-plugin" ) )
         {
             Plugin plugin = new Plugin();
+            
             plugin.setArtifactId( model.getArtifactId() );
-            plugin.setPrefix( getPlginPrefix( model.getArtifactId() ) );
+            
+            plugin.setPrefix( getPluginPrefix( model.getArtifactId() ) );
 
             if ( !StringUtils.isEmpty( model.getName() ) )
             {
@@ -328,7 +334,7 @@ abstract public class AbstractMetadataHelper
         return false;
     }
 
-    private String getPlginPrefix( String artifactId )
+    private String getPluginPrefix( String artifactId )
     {
         if ( "maven-plugin-plugin".equals( artifactId ) )
         {
