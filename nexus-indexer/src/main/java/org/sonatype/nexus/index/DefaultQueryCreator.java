@@ -52,7 +52,7 @@ public class DefaultQueryCreator
         {
             String[] terms = null;
 
-            if ( ArtifactInfo.GROUP_ID.equals( field ) )
+            if ( ArtifactInfo.GROUP_ID.equals( field ) || ArtifactInfo.VERSION.equals( field ) )
             {
                 terms = phrase.split( "[ _\\-/\\\\&&[^\\.]]" );
             }

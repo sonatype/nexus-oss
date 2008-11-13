@@ -52,7 +52,6 @@ public class QueryCreatorTest
 
         assertEquals( "a:\"something is dotted\"", q.toString() );
 
-        
         // GROUP_ID : dots are left in place
 
         q = queryCreator.constructQuery( ArtifactInfo.GROUP_ID, "something is dotted" );
@@ -66,9 +65,9 @@ public class QueryCreatorTest
         q = queryCreator.constructQuery( ArtifactInfo.GROUP_ID, "\"something.is.dotted\"" );
 
         assertEquals( "g:\"something.is.dotted\"*", q.toString() );
-        
+
         // some special chars
-        
+
         q = queryCreator.constructQuery( ArtifactInfo.ARTIFACT_ID, "_" );
 
         assertEquals( "a:_*", q.toString() );
@@ -100,6 +99,24 @@ public class QueryCreatorTest
         q = queryCreator.constructQuery( ArtifactInfo.GROUP_ID, "\"commons-col\"" );
 
         assertEquals( "g:\"commons col\"", q.toString() );
-}
+        
+        // VERSION : should not be splitted
+
+        q = queryCreator.constructQuery( ArtifactInfo.VERSION, "1.2" );
+
+        assertEquals( "v:1.2*", q.toString() );
+
+        q = queryCreator.constructQuery( ArtifactInfo.VERSION, "\"1.2\"" );
+
+        assertEquals( "v:\"1.2\"*", q.toString() );
+
+        q = queryCreator.constructQuery( ArtifactInfo.VERSION, "1.2-SNAP" );
+
+        assertEquals( "+v:1.2 +v:snap*", q.toString() );
+
+        q = queryCreator.constructQuery( ArtifactInfo.VERSION, "\"1.2-SNAPSHOT\"" );
+
+        assertEquals( "v:\"1.2 snapshot\"", q.toString() );
+    }
 
 }
