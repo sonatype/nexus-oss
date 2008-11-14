@@ -9,6 +9,8 @@ import org.sonatype.nexus.index.context.IndexContextInInconsistentStateException
 public abstract class AbstractTreeNode
     implements TreeNode
 {
+    private Type type;
+
     private boolean leaf;
 
     private String nodeName;
@@ -34,6 +36,16 @@ public abstract class AbstractTreeNode
         this.treeView = tview;
 
         this.factory = factory;
+    }
+
+    public Type getType()
+    {
+        return type;
+    }
+
+    public void setType( Type type )
+    {
+        this.type = type;
     }
 
     public boolean isLeaf()

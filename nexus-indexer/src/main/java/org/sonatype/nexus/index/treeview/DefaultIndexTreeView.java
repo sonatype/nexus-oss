@@ -21,6 +21,7 @@ import org.sonatype.nexus.index.FlatSearchResponse;
 import org.sonatype.nexus.index.NexusIndexer;
 import org.sonatype.nexus.index.context.IndexContextInInconsistentStateException;
 import org.sonatype.nexus.index.context.IndexingContext;
+import org.sonatype.nexus.index.treeview.TreeNode.Type;
 
 @Component( role = IndexTreeView.class )
 public class DefaultIndexTreeView
@@ -83,13 +84,15 @@ public class DefaultIndexTreeView
 
         for ( ArtifactInfo ai : artifacts )
         {
-            String versionKey = ai.artifactId + ":" + ai.version;
+            String versionKey = Type.V + ":" + ai.artifactId + ":" + ai.version;
 
             TreeNode versionResource = folders.get( versionKey );
 
             if ( versionResource == null )
             {
-                TreeNode artifactResource = folders.get( ai.artifactId );
+                String artifactKey = Type.A + ":" + ai.artifactId;
+
+                TreeNode artifactResource = folders.get( artifactKey );
 
                 if ( artifactResource == null )
                 {
@@ -97,7 +100,7 @@ public class DefaultIndexTreeView
 
                     root.getChildren().add( artifactResource );
 
-                    folders.put( ai.artifactId, artifactResource );
+                    folders.put( artifactKey, artifactResource );
                 }
 
                 versionResource = factory.createVNode( this, ai, path + ai.artifactId + "/" + ai.version + "/" );
@@ -135,7 +138,7 @@ public class DefaultIndexTreeView
 
         for ( String group : groups )
         {
-            TreeNode groupResource = findChildByPath( root, path + group + "/" );
+            TreeNode groupResource = findChildByPath( root, path + group + "/", Type.G );
 
             if ( groupResource == null )
             {
@@ -334,13 +337,13 @@ public class DefaultIndexTreeView
         return searchResponse.getResults();
     }
 
-    protected TreeNode findChildByPath( TreeNode parent, String path )
+    protected TreeNode findChildByPath( TreeNode parent, String path, Type type )
         throws IndexContextInInconsistentStateException,
             IOException
     {
         for ( TreeNode child : parent.getChildren() )
         {
-            if ( path.equals( child.getPath() ) )
+            if ( path.equals( child.getPath() ) && type.equals( child.getType() ) )
             {
                 return child;
             }

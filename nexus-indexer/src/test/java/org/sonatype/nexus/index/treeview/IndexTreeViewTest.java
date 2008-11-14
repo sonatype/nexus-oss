@@ -12,7 +12,7 @@ public class IndexTreeViewTest
 
     protected IndexTreeView indexTreeView;
 
-    protected boolean debug = false;
+    protected boolean debug = true;
 
     @Override
     protected void setUp()
@@ -43,7 +43,7 @@ public class IndexTreeViewTest
     {
         if ( debug )
         {
-            System.out.print( node.getPath() + " - " + node.getNodeName() );
+            System.out.print( node.getPath() + " := " + node.getNodeName() + ", type=" + node.getType() );
             System.out.println();
         }
 

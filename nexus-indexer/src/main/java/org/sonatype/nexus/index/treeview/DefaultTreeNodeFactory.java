@@ -2,6 +2,7 @@ package org.sonatype.nexus.index.treeview;
 
 import org.sonatype.nexus.index.ArtifactInfo;
 import org.sonatype.nexus.index.context.IndexingContext;
+import org.sonatype.nexus.index.treeview.TreeNode.Type;
 
 /**
  * A default implementation of TreeNodeFactory, that is failry simple to extend.
@@ -25,7 +26,7 @@ public class DefaultTreeNodeFactory
 
     public TreeNode createGNode( IndexTreeView tview, String path, String groupName )
     {
-        TreeNode result = createNode( tview, path, false, groupName );
+        TreeNode result = createNode( tview, path, false, groupName, Type.G );
 
         return decorateGNode( tview, path, groupName, result );
     }
@@ -37,7 +38,7 @@ public class DefaultTreeNodeFactory
 
     public TreeNode createANode( IndexTreeView tview, ArtifactInfo ai, String path )
     {
-        TreeNode result = createNode( tview, path, false, ai.artifactId );
+        TreeNode result = createNode( tview, path, false, ai.artifactId, Type.A );
 
         result.setGroupId( ai.groupId );
 
@@ -53,7 +54,7 @@ public class DefaultTreeNodeFactory
 
     public TreeNode createVNode( IndexTreeView tview, ArtifactInfo ai, String path )
     {
-        TreeNode result = createNode( tview, path, false, ai.version );
+        TreeNode result = createNode( tview, path, false, ai.version, Type.V );
 
         result.setGroupId( ai.groupId );
 
@@ -80,7 +81,7 @@ public class DefaultTreeNodeFactory
 
         sb.append( "." ).append( ai.fextension == null ? "jar" : ai.fextension );
 
-        TreeNode result = createNode( tview, path, true, sb.toString() );
+        TreeNode result = createNode( tview, path, true, sb.toString(), Type.artifact );
 
         result.setGroupId( ai.groupId );
 
@@ -96,11 +97,13 @@ public class DefaultTreeNodeFactory
         return node;
     }
 
-    protected TreeNode createNode( IndexTreeView tview, String path, boolean leaf, String nodeName )
+    protected TreeNode createNode( IndexTreeView tview, String path, boolean leaf, String nodeName, Type type )
     {
         TreeNode result = instantiateNode( tview, path, leaf, nodeName );
 
         result.setPath( path );
+
+        result.setType( type );
 
         result.setLeaf( leaf );
 

@@ -3,6 +3,7 @@ package org.sonatype.nexus.index.treeview;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.index.ArtifactInfo;
 import org.sonatype.nexus.index.context.IndexingContext;
+import org.sonatype.nexus.index.treeview.TreeNode.Type;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.ResourceStore;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
@@ -84,9 +85,9 @@ public class DefaultMergedTreeNodeFactory
         return node;
     }
 
-    protected TreeNode createNode( IndexTreeView tview, String path, boolean leaf, String nodeName )
+    protected TreeNode createNode( IndexTreeView tview, String path, boolean leaf, String nodeName, Type type )
     {
-        TreeNode result = super.createNode( tview, path, leaf, nodeName );
+        TreeNode result = super.createNode( tview, path, leaf, nodeName, type );
 
         result.setRepositoryId( getResourceStore().getId() );
 

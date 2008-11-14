@@ -7,6 +7,15 @@ import org.sonatype.nexus.index.context.IndexContextInInconsistentStateException
 
 public interface TreeNode
 {
+    public enum Type
+    {
+        G, A, V, artifact
+    };
+
+    Type getType();
+
+    void setType( Type t );
+
     boolean isLeaf();
 
     void setLeaf( boolean leaf );
