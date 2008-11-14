@@ -23,6 +23,8 @@ public abstract class AbstractTreeNode
 
     private String version;
 
+    private String repositoryId;
+
     private transient final IndexTreeView treeView;
 
     private transient final TreeNodeFactory factory;
@@ -92,6 +94,16 @@ public abstract class AbstractTreeNode
     public void setVersion( String version )
     {
         this.version = version;
+    }
+
+    public String getRepositoryId()
+    {
+        return repositoryId;
+    }
+
+    public void setRepositoryId( String repositoryId )
+    {
+        this.repositoryId = repositoryId;
     }
 
     public List<TreeNode> getChildren()

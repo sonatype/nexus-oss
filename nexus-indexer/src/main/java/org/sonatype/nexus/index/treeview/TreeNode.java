@@ -31,6 +31,10 @@ public interface TreeNode
 
     void setVersion( String version );
 
+    String getRepositoryId();
+
+    void setRepositoryId( String repositoryId );
+
     List<TreeNode> getChildren();
 
     List<TreeNode> listChildren()

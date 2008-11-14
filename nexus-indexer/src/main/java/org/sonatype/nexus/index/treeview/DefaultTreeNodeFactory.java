@@ -106,6 +106,8 @@ public class DefaultTreeNodeFactory
 
         result.setNodeName( nodeName );
 
+        result.setRepositoryId( getIndexingContext().getRepositoryId() );
+
         return result;
     }
 

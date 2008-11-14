@@ -12,7 +12,7 @@ public class IndexTreeViewTest
 
     protected IndexTreeView indexTreeView;
 
-    protected boolean debug = true;
+    protected boolean debug = false;
 
     @Override
     protected void setUp()
