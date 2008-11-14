@@ -64,7 +64,7 @@ public class QueryCreatorTest
 
         q = queryCreator.constructQuery( ArtifactInfo.GROUP_ID, "\"something.is.dotted\"" );
 
-        assertEquals( "g:\"something.is.dotted\"*", q.toString() );
+        assertEquals( "g:\"something.is.dotted\"", q.toString() );
 
         // some special chars
 
@@ -104,19 +104,19 @@ public class QueryCreatorTest
 
         q = queryCreator.constructQuery( ArtifactInfo.VERSION, "1.2" );
 
-        assertEquals( "v:1.2*", q.toString() );
+        assertEquals( "v:\"1 2\"", q.toString() );
 
         q = queryCreator.constructQuery( ArtifactInfo.VERSION, "\"1.2\"" );
 
-        assertEquals( "v:\"1.2\"*", q.toString() );
+        assertEquals( "v:\"1 2\"", q.toString() );
 
         q = queryCreator.constructQuery( ArtifactInfo.VERSION, "1.2-SNAP" );
 
-        assertEquals( "+v:1.2 +v:snap*", q.toString() );
+        assertEquals( "v:\"1 2 snap\"", q.toString() );
 
         q = queryCreator.constructQuery( ArtifactInfo.VERSION, "\"1.2-SNAPSHOT\"" );
 
-        assertEquals( "v:\"1.2 snapshot\"", q.toString() );
+        assertEquals( "v:\"1 2 snapshot\"", q.toString() );
     }
 
 }

@@ -52,7 +52,7 @@ public class DefaultQueryCreator
         {
             String[] terms = null;
 
-            if ( ArtifactInfo.GROUP_ID.equals( field ) || ArtifactInfo.VERSION.equals( field ) )
+            if ( ArtifactInfo.GROUP_ID.equals( field ) )
             {
                 terms = phrase.split( "[ _\\-/\\\\&&[^\\.]]" );
             }
@@ -101,27 +101,32 @@ public class DefaultQueryCreator
 
                     queries.add( bq );
                 }
-                else if ( phrase.startsWith( "\"" ) && phrase.endsWith( "\"" ) )
+                else if ( ( phrase.startsWith( "\"" ) && phrase.endsWith( "\"" ) )
+                    || ArtifactInfo.VERSION.equals( field ) )
                 {
                     // we have quotes around, make it a phrase query
 
                     PhraseQuery pq = new PhraseQuery();
 
-                    if ( len == 1 )
+                    if ( len == 1 && terms[0].startsWith( "\"" ) && terms[0].endsWith( "\"" ) )
                     {
-                        // "shave" those quotes
+                        // shave
                         pq.add( new Term( field, terms[0].substring( 1, terms.length - 1 ) ) );
+                    }
+                    else if ( len == 1 )
+                    {
+                        pq.add( new Term( field, terms[0] ) );
                     }
                     else
                     {
                         for ( int i = 0; i < len; i++ )
                         {
-                            if ( i == 0 )
+                            if ( i == 0 && terms[i].startsWith( "\"" ) )
                             {
                                 // first: "shave" those quotes
                                 pq.add( new Term( field, terms[i].substring( 1 ) ) );
                             }
-                            else if ( i == len - 1 )
+                            else if ( i == len - 1 && terms[i].endsWith( "\"" ) )
                             {
                                 // last: "shave" those quotes
                                 pq.add( new Term( field, terms[i].substring( 0, terms[i].length() - 1 ) ) );
@@ -168,6 +173,14 @@ public class DefaultQueryCreator
                 if ( phrase.indexOf( 'X' ) > -1 )
                 {
                     queries.add( new WildcardQuery( new Term( field, phrase.replaceAll( "X", "*" ) ) ) );
+                }
+                else if ( phrase.startsWith( "\"" ) && phrase.endsWith( "\"" ) )
+                {
+                    PhraseQuery pq = new PhraseQuery();
+
+                    pq.add( new Term( field, phrase.substring( 1, phrase.length() - 1 ) ) );
+
+                    queries.add( pq );
                 }
                 else
                 {

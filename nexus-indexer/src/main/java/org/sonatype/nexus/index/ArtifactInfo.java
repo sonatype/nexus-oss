@@ -58,6 +58,8 @@ public class ArtifactInfo
 
     public static final String NAME = "n";
 
+    public static final String EXTENSION = "e";
+
     public static final String DESCRIPTION = "d";
 
     public static final String REPOSITORY = "r";
@@ -99,12 +101,14 @@ public class ArtifactInfo
      * Field that contains {@link #UINFO} value for deleted artifact
      */
     public static final String DELETED = "del";
-    
+
     public static final VersionComparator VERSION_COMPARATOR = new VersionComparator();
 
     public static final VersionComparator REPOSITORY_VERSION_COMPARATOR = new RepositoryVersionComparator();
 
     public String fname;
+
+    public String fextension;
 
     public String groupId;
 
@@ -160,13 +164,14 @@ public class ArtifactInfo
     {
     }
 
-    public ArtifactInfo( String fname, String groupId, String artifactId, String version, String classifier,
-        String packaging, String name, String description, long lastModified, long size, String md5, String sha1,
-        ArtifactAvailablility sourcesExists, ArtifactAvailablility javadocExists,
+    public ArtifactInfo( String fname, String fextension, String groupId, String artifactId, String version,
+        String classifier, String packaging, String name, String description, long lastModified, long size, String md5,
+        String sha1, ArtifactAvailablility sourcesExists, ArtifactAvailablility javadocExists,
         ArtifactAvailablility signatureExists, String repository )
     {
         // artifact unique
         this.fname = fname;
+        this.fextension = fextension;
         this.version = version;
         this.classifier = classifier;
         this.lastModified = lastModified;
@@ -218,7 +223,7 @@ public class ArtifactInfo
     public static class VersionComparator
         implements Comparator<ArtifactInfo>
     {
-        @SuppressWarnings("unchecked")
+        @SuppressWarnings( "unchecked" )
         public int compare( ArtifactInfo f1, ArtifactInfo f2 )
         {
             int n = f1.groupId.compareTo( f2.groupId );
@@ -244,17 +249,18 @@ public class ArtifactInfo
                 String c2 = f2.classifier;
                 if ( c1 == null )
                 {
-                    if (c2 != null)
+                    if ( c2 != null )
                     {
                         return -1;
                     }
                 }
                 else
                 {
-                    if (c2 == null) {
-                      return 1;
+                    if ( c2 == null )
+                    {
+                        return 1;
                     }
-                    
+
                     n = c1.compareTo( c2 );
                     if ( n != 0 )
                     {
@@ -262,7 +268,7 @@ public class ArtifactInfo
                     }
                 }
             }
-            
+
             {
                 String p1 = f1.packaging;
                 String p2 = f2.packaging;
