@@ -1,7 +1,6 @@
 package org.sonatype.nexus.jsecurity.locators;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.codehaus.plexus.component.annotations.Component;
@@ -26,11 +25,6 @@ public class NexusRealmLocator
     NexusConfiguration configuration;
 
     private ServiceLocator container;
-    
-    /**
-     * We are always going to return the same list so if we pass this list off to an API, they will pickup the changes.
-     */
-    private List<Realm> realms = new ArrayList<Realm>();
 
     public void service( ServiceLocator locator )
     {
@@ -41,8 +35,7 @@ public class NexusRealmLocator
     {
         // Until nexus.xml code is done, simply returning hardcoded realms
 
-        // reset the list
-        realms.clear();
+        List<Realm> realms = new ArrayList<Realm>();
 
         List<String> realmIds = configuration.getRealms();
 
@@ -75,7 +68,7 @@ public class NexusRealmLocator
             }
         }
 
-        return Collections.unmodifiableList( realms );
+        return realms;
     }
 
 }
