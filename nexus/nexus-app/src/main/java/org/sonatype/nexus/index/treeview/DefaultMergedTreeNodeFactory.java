@@ -33,21 +33,6 @@ public class DefaultMergedTreeNodeFactory
         return store;
     }
 
-    protected TreeNode decorateGNode( IndexTreeView tview, String path, String groupName, TreeNode node )
-    {
-        return node;
-    }
-
-    protected TreeNode decorateANode( IndexTreeView tview, ArtifactInfo ai, String path, TreeNode node )
-    {
-        return node;
-    }
-
-    protected TreeNode decorateVNode( IndexTreeView tview, ArtifactInfo ai, String path, TreeNode node )
-    {
-        return node;
-    }
-
     protected TreeNode decorateArtifactNode( IndexTreeView tview, ArtifactInfo ai, String path, TreeNode node )
     {
         ResourceStoreRequest request = new ResourceStoreRequest( path, true );
