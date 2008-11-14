@@ -117,7 +117,15 @@ public abstract class DefaultRepository
                 localItem = null;
             }
         }
-        if ( getProxyMode() != null && getProxyMode().shouldProxy() && !localOnly )
+
+        boolean shouldProxy = true;
+
+        for ( RequestProcessor processor : getRequestProcessors() )
+        {
+            shouldProxy = shouldProxy && processor.shouldProxy( this, uid, context );
+        }
+
+        if ( getProxyMode() != null && getProxyMode().shouldProxy() && !localOnly && shouldProxy )
         {
             if ( getLogger().isDebugEnabled() )
             {
@@ -185,11 +193,12 @@ public abstract class DefaultRepository
                                     feedRecorder.addNexusArtifactEvent( event );
                                 }
 
-                                if ( ! result.isContentValid() )
+                                if ( !result.isContentValid() )
                                 {
                                     if ( getLogger().isDebugEnabled() )
                                     {
-                                        getLogger().debug( "Item " + uid.toString() + " failed content integrity validation." );
+                                        getLogger().debug(
+                                            "Item " + uid.toString() + " failed content integrity validation." );
                                     }
 
                                     getLocalStorage().retrieveItem( uid );
@@ -302,10 +311,10 @@ public abstract class DefaultRepository
     }
 
     /**
-     * Validates integrity of content of <code>item</code>. Not-null return value 
-     * indicates there were content validation errors or warnings.
+     * Validates integrity of content of <code>item</code>. Not-null return value indicates there were content
+     * validation errors or warnings.
      */
-    protected ContentValidationResult doValidateRemoteItemContent( AbstractStorageItem item, Map<String, Object> context ) 
+    protected ContentValidationResult doValidateRemoteItemContent( AbstractStorageItem item, Map<String, Object> context )
         throws StorageException
     {
         return null;
