@@ -7,7 +7,7 @@ public interface TreeNodeFactory
 {
     IndexingContext getIndexingContext();
 
-    TreeNode createNode( IndexTreeView tview, String path, String name );
+    TreeNode createGNode( IndexTreeView tview, String path, String name );
 
     TreeNode createANode( IndexTreeView tview, ArtifactInfo ai, String path );
 

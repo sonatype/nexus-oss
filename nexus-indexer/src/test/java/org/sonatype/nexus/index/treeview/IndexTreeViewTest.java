@@ -12,7 +12,7 @@ public class IndexTreeViewTest
 
     protected IndexTreeView indexTreeView;
 
-    protected boolean debug = false;
+    protected boolean debug = true;
 
     @Override
     protected void setUp()
@@ -69,7 +69,7 @@ public class IndexTreeViewTest
     public void testRoot()
         throws Exception
     {
-        TreeNode root = indexTreeView.listNodes( new SimpleTreeNodeFactory( context ), "/" );
+        TreeNode root = indexTreeView.listNodes( new DefaultTreeNodeFactory( context ), "/" );
 
         int leafsFound = prettyPrint( debug, root, 0 );
 
@@ -80,7 +80,7 @@ public class IndexTreeViewTest
     public void testPathIsAboveRealGroup()
         throws Exception
     {
-        TreeNode root = indexTreeView.listNodes( new SimpleTreeNodeFactory( context ), "/org/" );
+        TreeNode root = indexTreeView.listNodes( new DefaultTreeNodeFactory( context ), "/org/" );
 
         int leafsFound = prettyPrint( debug, root, 0 );
 
@@ -91,7 +91,7 @@ public class IndexTreeViewTest
     public void testPathIsRealGroup()
         throws Exception
     {
-        TreeNode root = indexTreeView.listNodes( new SimpleTreeNodeFactory( context ), "/org/slf4j/" );
+        TreeNode root = indexTreeView.listNodes( new DefaultTreeNodeFactory( context ), "/org/slf4j/" );
 
         int leafsFound = prettyPrint( debug, root, 0 );
 
@@ -102,7 +102,7 @@ public class IndexTreeViewTest
     public void testPathIsRealGroupArtifact()
         throws Exception
     {
-        TreeNode root = indexTreeView.listNodes( new SimpleTreeNodeFactory( context ), "/org/slf4j/slf4j-log4j12/" );
+        TreeNode root = indexTreeView.listNodes( new DefaultTreeNodeFactory( context ), "/org/slf4j/slf4j-log4j12/" );
 
         int leafsFound = prettyPrint( debug, root, 0 );
 
@@ -114,7 +114,7 @@ public class IndexTreeViewTest
         throws Exception
     {
         TreeNode root = indexTreeView.listNodes(
-            new SimpleTreeNodeFactory( context ),
+            new DefaultTreeNodeFactory( context ),
             "/org/slf4j/slf4j-log4j12/1.4.1/" );
 
         int leafsFound = prettyPrint( debug, root, 0 );

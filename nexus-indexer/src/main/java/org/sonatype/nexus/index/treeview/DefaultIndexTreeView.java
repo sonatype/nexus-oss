@@ -39,7 +39,7 @@ public class DefaultIndexTreeView
         throws IndexContextInInconsistentStateException,
             IOException
     {
-        TreeNode result = factory.createNode( this, path, path );
+        TreeNode result = factory.createGNode( this, path, path );
 
         if ( "/".equals( path ) )
         {
@@ -50,7 +50,7 @@ public class DefaultIndexTreeView
             {
                 if ( group.length() > 0 )
                 {
-                    result.getChildren().add( factory.createNode( this, path + group + "/", group ) );
+                    result.getChildren().add( factory.createGNode( this, path + group + "/", group ) );
                 }
             }
         }
@@ -64,6 +64,13 @@ public class DefaultIndexTreeView
         return result;
     }
 
+    /**
+     * @param root
+     * @param factory
+     * @param allGroups
+     * @throws IndexContextInInconsistentStateException
+     * @throws IOException
+     */
     protected void listChildren( TreeNode root, TreeNodeFactory factory, Set<String> allGroups )
         throws IndexContextInInconsistentStateException,
             IOException
@@ -100,19 +107,28 @@ public class DefaultIndexTreeView
                 folders.put( versionKey, versionResource );
             }
 
-            StringBuffer sb = new StringBuffer( path )
-                .append( ai.artifactId ).append( "/" ).append( ai.version ).append( "/" ).append( ai.artifactId )
-                .append( "-" ).append( ai.version );
+            String nodePath = getPathForAi( path, ai );
 
-            if ( ai.classifier != null )
-            {
-                sb.append( "-" ).append( ai.classifier );
-            }
+            versionResource.getChildren().add( factory.createArtifactNode( this, ai, nodePath ) );
 
-            sb.append( "." ).append( ai.fextension == null ? "jar" : ai.fextension );
-
-            // TODO: create nodes for javadoc, sources, et al found in ai
-            versionResource.getChildren().add( factory.createArtifactNode( this, ai, sb.toString() ) );
+            // TODO: do we need to represent these are another artifacts?
+            // The correct answer is YES, but...
+            // if ( ArtifactAvailablility.PRESENT.equals( ai.javadocExists ) )
+            // {
+            // ai.classifier = "javadoc";
+            //
+            // nodePath = getPathForAi( path, ai );
+            //
+            // versionResource.getChildren().add( factory.createArtifactNode( this, ai, nodePath ) );
+            // }
+            // if ( ArtifactAvailablility.PRESENT.equals( ai.sourcesExists ) )
+            // {
+            // ai.classifier = "sources";
+            //
+            // nodePath = getPathForAi( path, ai );
+            //
+            // versionResource.getChildren().add( factory.createArtifactNode( this, ai, nodePath ) );
+            // }
         }
 
         Set<String> groups = getGroups( path, allGroups );
@@ -123,7 +139,7 @@ public class DefaultIndexTreeView
 
             if ( groupResource == null )
             {
-                groupResource = factory.createNode( this, path + group + "/", group );
+                groupResource = factory.createGNode( this, path + group + "/", group );
 
                 root.getChildren().add( groupResource );
             }
@@ -134,6 +150,21 @@ public class DefaultIndexTreeView
                 listChildren( groupResource, factory, allGroups );
             }
         }
+    }
+
+    protected String getPathForAi( String path, ArtifactInfo ai )
+    {
+        StringBuffer sb = new StringBuffer( path ).append( ai.artifactId ).append( "/" ).append( ai.version ).append(
+            "/" ).append( ai.artifactId ).append( "-" ).append( ai.version );
+
+        if ( ai.classifier != null )
+        {
+            sb.append( "-" ).append( ai.classifier );
+        }
+
+        sb.append( "." ).append( ai.fextension == null ? "jar" : ai.fextension );
+
+        return sb.toString();
     }
 
     protected Set<String> getGroups( String path, Set<String> allGroups )
