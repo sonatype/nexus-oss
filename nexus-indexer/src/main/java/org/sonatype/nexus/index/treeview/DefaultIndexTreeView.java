@@ -138,7 +138,7 @@ public class DefaultIndexTreeView
 
         for ( String group : groups )
         {
-            TreeNode groupResource = findChildByPath( root, path + group + "/", Type.G );
+            TreeNode groupResource = root.findChildByPath( path + group + "/", Type.G );
 
             if ( groupResource == null )
             {
@@ -335,20 +335,5 @@ public class DefaultIndexTreeView
         FlatSearchResponse searchResponse = getNexusIndexer().searchFlat( searchRequest );
 
         return searchResponse.getResults();
-    }
-
-    protected TreeNode findChildByPath( TreeNode parent, String path, Type type )
-        throws IndexContextInInconsistentStateException,
-            IOException
-    {
-        for ( TreeNode child : parent.getChildren() )
-        {
-            if ( path.equals( child.getPath() ) && type.equals( child.getType() ) )
-            {
-                return child;
-            }
-        }
-
-        return null;
     }
 }

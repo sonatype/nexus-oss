@@ -139,4 +139,19 @@ public abstract class AbstractTreeNode
 
         return children;
     }
+
+    public TreeNode findChildByPath( String path, Type type )
+        throws IndexContextInInconsistentStateException,
+            IOException
+    {
+        for ( TreeNode child : getChildren() )
+        {
+            if ( path.equals( child.getPath() ) && type.equals( child.getType() ) )
+            {
+                return child;
+            }
+        }
+
+        return null;
+    }
 }

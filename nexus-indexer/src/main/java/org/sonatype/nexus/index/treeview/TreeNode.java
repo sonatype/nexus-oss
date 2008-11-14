@@ -49,4 +49,8 @@ public interface TreeNode
     List<TreeNode> listChildren()
         throws IndexContextInInconsistentStateException,
             IOException;
+
+    TreeNode findChildByPath( String path, Type type )
+        throws IndexContextInInconsistentStateException,
+            IOException;
 }
