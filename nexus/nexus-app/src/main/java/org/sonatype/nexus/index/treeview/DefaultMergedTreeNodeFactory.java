@@ -13,7 +13,9 @@ import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 
 /**
- * A default implementation of TreeNodeFactory, that is failry simple to extend.
+ * A default implementation of merged TreeNodeFactory, that is failry simple to extend. Note: this implementation
+ * assumes that index is <b>superset</b> of the local storage content, which is true for both proxied (if remote idx
+ * exists and is downloaded) and hosted reposes (where actually the sets are equal)!
  * 
  * @author cstamas
  */
@@ -36,7 +38,7 @@ public class DefaultMergedTreeNodeFactory
 
     protected TreeNode decorateArtifactNode( IndexTreeView tview, ArtifactInfo ai, String path, TreeNode node )
     {
-        ResourceStoreRequest request = new ResourceStoreRequest( path, true );
+        ResourceStoreRequest request = getResourceStoreRequest( path );
 
         DefaultMergedTreeNode mnode = (DefaultMergedTreeNode) node;
 
@@ -97,6 +99,11 @@ public class DefaultMergedTreeNodeFactory
     protected TreeNode instantiateNode( IndexTreeView tview, String path, boolean leaf, String nodeName )
     {
         return new DefaultMergedTreeNode( tview, this );
+    }
+
+    protected ResourceStoreRequest getResourceStoreRequest( String path )
+    {
+        return new ResourceStoreRequest( path, true );
     }
 
 }
