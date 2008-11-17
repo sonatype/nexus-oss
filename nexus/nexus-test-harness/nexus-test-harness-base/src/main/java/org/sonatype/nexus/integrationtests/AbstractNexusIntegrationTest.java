@@ -335,6 +335,7 @@ public class AbstractNexusIntegrationTest
             log.info( "*\n*" );
             log.info( "***************************" );
 
+			NexusStateUtil.doHardStart();
         }
     }
 
