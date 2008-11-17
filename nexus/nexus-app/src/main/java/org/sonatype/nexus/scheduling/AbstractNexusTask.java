@@ -34,13 +34,12 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.feeds.SystemProcess;
 import org.sonatype.scheduling.ScheduledTask;
-import org.sonatype.scheduling.SchedulerTask;
 import org.sonatype.scheduling.TaskExecutionException;
 import org.sonatype.scheduling.TaskState;
 
 public abstract class AbstractNexusTask<T>
     extends AbstractLogEnabled
-    implements SchedulerTask<T>, Contextualizable
+    implements NexusTask<T>, Contextualizable
 {
     public static final long A_DAY = 24L * 60L * 60L * 1000L;
 
@@ -51,11 +50,17 @@ public abstract class AbstractNexusTask<T>
     private SystemProcess prc;
 
     private Nexus nexus = null;
-    
+
     // override if you have a task that needs to hide itself
     public boolean isExposed()
     {
         return true;
+    }
+
+    // TODO: finish this thread!
+    public RepositoryTaskActivityDescriptor getTaskActivityDescriptor()
+    {
+        return null;
     }
 
     public void contextualize( Context ctx )

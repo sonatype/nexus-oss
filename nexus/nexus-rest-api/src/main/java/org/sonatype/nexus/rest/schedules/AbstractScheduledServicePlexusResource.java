@@ -27,8 +27,8 @@ import org.sonatype.nexus.rest.model.ScheduledServiceMonthlyResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceOnceResource;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceWeeklyResource;
+import org.sonatype.nexus.scheduling.NexusTask;
 import org.sonatype.scheduling.ScheduledTask;
-import org.sonatype.scheduling.SchedulerTask;
 import org.sonatype.scheduling.iterators.MonthlySchedulerIterator;
 import org.sonatype.scheduling.schedules.CronSchedule;
 import org.sonatype.scheduling.schedules.DailySchedule;
@@ -288,13 +288,13 @@ public abstract class AbstractScheduledServicePlexusResource
         return model.getName();
     }
 
-    public SchedulerTask<?> getModelNexusTask( ScheduledServiceBaseResource model, Request request )
+    public NexusTask<?> getModelNexusTask( ScheduledServiceBaseResource model, Request request )
         throws IllegalArgumentException,
             ResourceException
     {
         String serviceType = model.getTypeId();
 
-        SchedulerTask<?> task = getNexus().createTaskInstance( serviceType );
+        NexusTask<?> task = getNexus().createTaskInstance( serviceType );
 
         for ( Iterator iter = model.getProperties().iterator(); iter.hasNext(); )
         {

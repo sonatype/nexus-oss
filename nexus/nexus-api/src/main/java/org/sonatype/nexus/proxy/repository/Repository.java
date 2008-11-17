@@ -45,6 +45,7 @@ import org.sonatype.nexus.proxy.storage.local.LocalRepositoryStorage;
 import org.sonatype.nexus.proxy.storage.remote.RemoteRepositoryStorage;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 import org.sonatype.nexus.proxy.target.TargetSet;
+import org.sonatype.nexus.scheduling.RepositoryTaskFilter;
 
 /**
  * Repository interface used by Proximity. It is an extension of ResourceStore iface, allowing to make direct
@@ -68,6 +69,13 @@ public interface Repository
      * @return
      */
     RepositoryType getRepositoryType();
+
+    /**
+     * Returns the task filter for this repository.
+     * 
+     * @return
+     */
+    RepositoryTaskFilter getRepositoryTaskFilter();
 
     /**
      * Sets the ID of the resourceStore. It must be unique type-wide (Router vs Repository).

@@ -35,7 +35,6 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 import org.sonatype.scheduling.NoSuchTaskException;
 import org.sonatype.scheduling.ScheduledTask;
 import org.sonatype.scheduling.Scheduler;
-import org.sonatype.scheduling.SchedulerTask;
 import org.sonatype.scheduling.schedules.Schedule;
 
 /**
@@ -68,7 +67,7 @@ public class DefaultNexusScheduler
         return plexusContainer;
     }
 
-    public <T> ScheduledTask<T> submit( String name, SchedulerTask<T> nexusTask )
+    public <T> ScheduledTask<T> submit( String name, NexusTask<T> nexusTask )
         throws RejectedExecutionException,
             NullPointerException
     {
@@ -82,7 +81,7 @@ public class DefaultNexusScheduler
         }
     }
 
-    public <T> ScheduledTask<T> schedule( String name, SchedulerTask<T> nexusTask, Schedule schedule )
+    public <T> ScheduledTask<T> schedule( String name, NexusTask<T> nexusTask, Schedule schedule )
         throws RejectedExecutionException,
             NullPointerException
     {
@@ -140,16 +139,16 @@ public class DefaultNexusScheduler
         scheduler.stopService();
     }
 
-    public SchedulerTask<?> createTaskInstance( String taskType )
+    public NexusTask<?> createTaskInstance( String taskType )
         throws IllegalArgumentException
     {
-        return scheduler.createTaskInstance( taskType );
+        return (NexusTask<?>) scheduler.createTaskInstance( taskType );
     }
 
-    public SchedulerTask<?> createTaskInstance( Class<?> taskType )
+    public NexusTask<?> createTaskInstance( Class<?> taskType )
         throws IllegalArgumentException
     {
-        return scheduler.createTaskInstance( taskType );
+        return (NexusTask<?>) scheduler.createTaskInstance( taskType );
     }
 
 }

@@ -71,6 +71,9 @@ import org.sonatype.nexus.proxy.target.TargetRegistry;
 import org.sonatype.nexus.proxy.target.TargetSet;
 import org.sonatype.nexus.proxy.utils.StoreFileWalker;
 import org.sonatype.nexus.proxy.walker.Walker;
+import org.sonatype.nexus.scheduling.DefaultRepositoryTaskActivityDescriptor;
+import org.sonatype.nexus.scheduling.DefaultRepositoryTaskFilter;
+import org.sonatype.nexus.scheduling.RepositoryTaskFilter;
 
 /**
  * <p>
@@ -216,6 +219,15 @@ public abstract class AbstractRepository
         {
             return RepositoryType.HOSTED;
         }
+    }
+
+    public RepositoryTaskFilter getRepositoryTaskFilter()
+    {
+        // TODO: now we are allowing everything. But this is not a finished implementation!
+        return new DefaultRepositoryTaskFilter()
+            .setAllowsRepositoryScanning( true ).setAllowsScheduledTasks( true ).setAllowsUserInitiatedTasks( true )
+            .setContentOperators( DefaultRepositoryTaskActivityDescriptor.ALL_CONTENT_OPERATIONS )
+            .setAttributeOperators( DefaultRepositoryTaskActivityDescriptor.ALL_ATTRIBUTES_OPERATIONS );
     }
 
     public LocalStatus getLocalStatus()

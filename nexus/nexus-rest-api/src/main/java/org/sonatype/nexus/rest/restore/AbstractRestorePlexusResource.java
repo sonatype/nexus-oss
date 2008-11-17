@@ -9,7 +9,7 @@ import org.restlet.resource.ResourceException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryGroupException;
 import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
-import org.sonatype.scheduling.SchedulerTask;
+import org.sonatype.nexus.scheduling.NexusTask;
 
 public abstract class AbstractRestorePlexusResource
     extends AbstractNexusPlexusResource
@@ -78,7 +78,7 @@ public abstract class AbstractRestorePlexusResource
         return path;
     }
 
-    public void handleDelete( SchedulerTask<?> task, Request request )
+    public void handleDelete( NexusTask<?> task, Request request )
         throws ResourceException
     {
         try

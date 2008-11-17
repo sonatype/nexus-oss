@@ -53,9 +53,9 @@ import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.item.StorageLinkItem;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.router.RepositoryRouter;
+import org.sonatype.nexus.scheduling.NexusTask;
 import org.sonatype.scheduling.NoSuchTaskException;
 import org.sonatype.scheduling.ScheduledTask;
-import org.sonatype.scheduling.SchedulerTask;
 import org.sonatype.scheduling.schedules.Schedule;
 
 /**
@@ -236,11 +236,11 @@ public interface Nexus
     // Scheduler
     // ----------------------------------------------------------------------------
 
-    <T> void submit( String name, SchedulerTask<T> task )
+    <T> void submit( String name, NexusTask<T> task )
         throws RejectedExecutionException,
             NullPointerException;
 
-    <T> ScheduledTask<T> schedule( String name, SchedulerTask<T> nexusTask, Schedule schedule )
+    <T> ScheduledTask<T> schedule( String name, NexusTask<T> nexusTask, Schedule schedule )
         throws RejectedExecutionException,
             NullPointerException;
 
@@ -255,7 +255,7 @@ public interface Nexus
     ScheduledTask<?> getTaskById( String id )
         throws NoSuchTaskException;
 
-    SchedulerTask<?> createTaskInstance( String taskType )
+    NexusTask<?> createTaskInstance( String taskType )
         throws IllegalArgumentException;
 
     // SchedulerTask<?> createTaskInstance( Class<?> taskType )

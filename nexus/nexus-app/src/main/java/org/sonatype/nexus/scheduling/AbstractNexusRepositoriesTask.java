@@ -39,7 +39,7 @@ public abstract class AbstractNexusRepositoriesTask<T>
     private static final String REPO_PREFIX = "repo_";
 
     private static final String GROUP_PREFIX = "group_";
-    
+
     public static String getIdFromPrefixedString( String prefix, String prefixedString )
     {
         if ( prefixedString != null && prefixedString.startsWith( prefix ) )
@@ -81,14 +81,14 @@ public abstract class AbstractNexusRepositoriesTask<T>
         return !hasIntersectingTasksThatRuns( activeTasks );
     }
 
-    protected boolean hasIntersectingTasksThatRuns(
-        Map<String, List<ScheduledTask<?>>> activeTasks )
-    {        
+    protected boolean hasIntersectingTasksThatRuns( Map<String, List<ScheduledTask<?>>> activeTasks )
+    {
         // get all activeTasks that runs and are descendants of AbstractNexusRepositoriesTask
         for ( String taskCls : activeTasks.keySet() )
         {
-            if ( AbstractNexusRepositoriesTask.class.isAssignableFrom( this.getNexus().createTaskInstance( taskCls ).getClass() ) )
-            {                
+            if ( AbstractNexusRepositoriesTask.class.isAssignableFrom( this
+                .getNexus().createTaskInstance( taskCls ).getClass() ) )
+            {
                 List<ScheduledTask<?>> tasks = activeTasks.get( taskCls );
 
                 for ( ScheduledTask<?> task : tasks )
@@ -96,9 +96,14 @@ public abstract class AbstractNexusRepositoriesTask<T>
                     // check against RUNNING intersection
                     if ( TaskState.RUNNING.equals( task.getTaskState() )
                         && DefaultScheduledTask.class.isAssignableFrom( task.getClass() )
-                        && repositorySetIntersectionIsNotEmpty( task.getTaskParams().get( RepositoryOrGroupPropertyDescriptor.ID ) ) )
+                        && repositorySetIntersectionIsNotEmpty( task.getTaskParams().get(
+                            RepositoryOrGroupPropertyDescriptor.ID ) ) )
                     {
-                        getLogger().debug( "Task " + task.getName() + " is running and shares same repo or group, so this task will be rescheduled for a later time." );
+                        getLogger()
+                            .debug(
+                                "Task "
+                                    + task.getName()
+                                    + " is running and shares same repo or group, so this task will be rescheduled for a later time." );
                         return true;
                     }
                 }
@@ -112,7 +117,7 @@ public abstract class AbstractNexusRepositoriesTask<T>
     {
         String otherRepositoryId = getIdFromPrefixedString( REPO_PREFIX, repoOrGroupId );
         String otherRepositoryGroupId = getIdFromPrefixedString( GROUP_PREFIX, repoOrGroupId );
-        
+
         // simplest cases, checking for repoId and groupId equality
         if ( getRepositoryId() != null && otherRepositoryId != null
             && StringUtils.equals( getRepositoryId(), otherRepositoryId ) )
@@ -125,7 +130,7 @@ public abstract class AbstractNexusRepositoriesTask<T>
         {
             return true;
         }
-        
+
         // All repo check
         if ( ( getRepositoryId() == null && getRepositoryGroupId() == null )
             || ( otherRepositoryId == null && otherRepositoryGroupId == null ) )

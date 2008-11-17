@@ -111,6 +111,7 @@ import org.sonatype.nexus.proxy.router.RepositoryRouter;
 import org.sonatype.nexus.proxy.router.RootRepositoryRouter;
 import org.sonatype.nexus.proxy.wastebasket.Wastebasket;
 import org.sonatype.nexus.scheduling.NexusScheduler;
+import org.sonatype.nexus.scheduling.NexusTask;
 import org.sonatype.nexus.store.DefaultEntry;
 import org.sonatype.nexus.store.Entry;
 import org.sonatype.nexus.store.Store;
@@ -1322,14 +1323,14 @@ public class DefaultNexus
     // =============
     // Schedules
 
-    public <T> void submit( String name, SchedulerTask<T> task )
+    public <T> void submit( String name, NexusTask<T> task )
         throws RejectedExecutionException,
             NullPointerException
     {
         nexusScheduler.submit( name, task );
     }
 
-    public <T> ScheduledTask<T> schedule( String name, SchedulerTask<T> nexusTask, Schedule schedule )
+    public <T> ScheduledTask<T> schedule( String name, NexusTask<T> nexusTask, Schedule schedule )
         throws RejectedExecutionException,
             NullPointerException
     {
@@ -1359,7 +1360,7 @@ public class DefaultNexus
         return nexusScheduler.getTaskById( id );
     }
 
-    public SchedulerTask<?> createTaskInstance( String taskType )
+    public NexusTask<?> createTaskInstance( String taskType )
         throws IllegalArgumentException
     {
         return nexusScheduler.createTaskInstance( taskType );

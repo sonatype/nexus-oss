@@ -33,6 +33,7 @@ import org.sonatype.nexus.proxy.storage.local.LocalRepositoryStorage;
 import org.sonatype.nexus.proxy.storage.remote.RemoteRepositoryStorage;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 import org.sonatype.nexus.proxy.target.TargetSet;
+import org.sonatype.nexus.scheduling.RepositoryTaskFilter;
 
 public class DummyRepository implements Repository
 {
@@ -526,6 +527,12 @@ public class DummyRepository implements Repository
     }
 
     public List<RequestProcessor> getRequestProcessors()
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public RepositoryTaskFilter getRepositoryTaskFilter()
     {
         // TODO Auto-generated method stub
         return null;

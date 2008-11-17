@@ -27,7 +27,6 @@ import java.util.concurrent.RejectedExecutionException;
 import org.sonatype.nexus.NexusService;
 import org.sonatype.scheduling.NoSuchTaskException;
 import org.sonatype.scheduling.ScheduledTask;
-import org.sonatype.scheduling.SchedulerTask;
 import org.sonatype.scheduling.schedules.Schedule;
 
 public interface NexusScheduler
@@ -40,7 +39,7 @@ public interface NexusScheduler
      * @param runnable
      * @return
      */
-    <T> ScheduledTask<T> submit( String name, SchedulerTask<T> nexusTask )
+    <T> ScheduledTask<T> submit( String name, NexusTask<T> nexusTask )
         throws RejectedExecutionException,
             NullPointerException;
 
@@ -52,7 +51,7 @@ public interface NexusScheduler
      * @param iterator
      * @return
      */
-    <T> ScheduledTask<T> schedule( String name, SchedulerTask<T> nexusTask, Schedule schedule )
+    <T> ScheduledTask<T> schedule( String name, NexusTask<T> nexusTask, Schedule schedule )
         throws RejectedExecutionException,
             NullPointerException;
 
@@ -98,7 +97,7 @@ public interface NexusScheduler
      * @return
      * @throws IllegalArgumentException
      */
-    SchedulerTask<?> createTaskInstance( String taskType )
+    NexusTask<?> createTaskInstance( String taskType )
         throws IllegalArgumentException;
 
     /**
@@ -108,6 +107,6 @@ public interface NexusScheduler
      * @return
      * @throws IllegalArgumentException
      */
-    SchedulerTask<?> createTaskInstance( Class<?> taskType )
+    NexusTask<?> createTaskInstance( Class<?> taskType )
         throws IllegalArgumentException;
 }

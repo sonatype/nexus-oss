@@ -5,10 +5,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.sonatype.scheduling.ScheduledTask;
-import org.sonatype.scheduling.SchedulerTask;
 
 public class DummyWaitingNexusTask
-    implements SchedulerTask<Object>
+    implements NexusTask<Object>
 {
     private boolean allowConcurrentSubmission = false;
 
@@ -91,6 +90,11 @@ public class DummyWaitingNexusTask
     protected String getMessage()
     {
         return "A Dummy task, waits for some time";
+    }
+
+    public TaskActivityDescriptor getTaskActivityDescriptor()
+    {
+        return null;
     }
 
 }
