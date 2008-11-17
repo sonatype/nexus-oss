@@ -45,8 +45,15 @@ public class DefaultRemoteStorageContext
 
         this.defaults = defaults;
 
-        // TODO: why is this needed?
-        this.putRemoteConnectionContextObject( REMOTE_CONNECTIONS_SETTINGS, new CRemoteConnectionSettings() );
+        if ( defaults == null )
+        {
+            // Note: this is needed since RemoteConnectionsSettings, in contrary to the other two (HttpProxy and Auth)
+            // is _mandatory_ and is always used, while the other two is used if present, otherwise not (like
+            // HttpProxy).
+            // Also, when we have no "parent" (defaults, to delegate lookup to), that means that we have to create a
+            // default one.
+            this.putRemoteConnectionContextObject( REMOTE_CONNECTIONS_SETTINGS, new CRemoteConnectionSettings() );
+        }
     }
 
     public long getLastChanged()

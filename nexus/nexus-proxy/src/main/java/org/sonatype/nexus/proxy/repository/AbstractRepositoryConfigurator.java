@@ -107,27 +107,27 @@ public abstract class AbstractRepositoryConfigurator
                 repository.setRemoteUrl( repo.getRemoteStorage().getUrl() );
                 repository.setRemoteStorage( rs );
 
-                if ( repo.getRemoteStorage().getAuthentication() != null
-                    || repo.getRemoteStorage().getConnectionSettings() != null
-                    || repo.getRemoteStorage().getHttpProxySettings() != null )
-                {
-                    DefaultRemoteStorageContext ctx = new DefaultRemoteStorageContext( rsc );
+                DefaultRemoteStorageContext ctx = new DefaultRemoteStorageContext( rsc );
 
+                if ( repo.getRemoteStorage().getConnectionSettings() != null )
+                {
                     ctx.putRemoteConnectionContextObject( RemoteStorageContext.REMOTE_CONNECTIONS_SETTINGS, repo
                         .getRemoteStorage().getConnectionSettings() );
+                }
 
+                if ( repo.getRemoteStorage().getHttpProxySettings() != null )
+                {
                     ctx.putRemoteConnectionContextObject( RemoteStorageContext.REMOTE_HTTP_PROXY_SETTINGS, repo
                         .getRemoteStorage().getHttpProxySettings() );
+                }
 
+                if ( repo.getRemoteStorage().getAuthentication() != null )
+                {
                     ctx.putRemoteConnectionContextObject( RemoteStorageContext.REMOTE_AUTHENTICATION_SETTINGS, repo
                         .getRemoteStorage().getAuthentication() );
+                }
 
-                    repository.setRemoteStorageContext( ctx );
-                }
-                else
-                {
-                    repository.setRemoteStorageContext( rsc );
-                }
+                repository.setRemoteStorageContext( ctx );
             }
         }
         catch ( StorageException e )
@@ -151,5 +151,4 @@ public abstract class AbstractRepositoryConfigurator
 
         return repository;
     }
-
 }
