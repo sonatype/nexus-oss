@@ -33,7 +33,6 @@ import org.restlet.data.Reference;
 import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.slf4j.bridge.SLF4JBridgeHandler;
-import org.sonatype.appbooter.ForkedAppBooter;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.test.utils.DeployUtils;
 import org.sonatype.nexus.test.utils.FileTestingUtils;
@@ -96,8 +95,6 @@ public class AbstractNexusIntegrationTest
      */
     private boolean verifyNexusConfigBeforeStart = true;
 
-    protected ForkedAppBooter appBooter;
-
     static
     {
         nexusBaseDir = TestProperties.getString( "nexus.base.dir" );
@@ -156,12 +153,7 @@ public class AbstractNexusIntegrationTest
                 // clean common work dir
                 // this.cleanWorkDir();
 
-                this.copyConfigFile( "nexus.xml", RELATIVE_WORK_CONF_DIR );
-
-                // copy security config
-                this.copyConfigFile( "security.xml", RELATIVE_WORK_CONF_DIR );
-
-                // this.copyConfigFile( "log4j.properties", variables );
+                this.copyConfigFiles();
 
                 if ( TestContainer.getInstance().getTestContext().isSecureTest()
                     || Boolean.valueOf( System.getProperty( "secure.test" ) ) )
@@ -187,6 +179,16 @@ public class AbstractNexusIntegrationTest
                 NEEDS_INIT = false;
             }
         }
+    }
+    
+    protected void copyConfigFiles() throws IOException
+    {
+        this.copyConfigFile( "nexus.xml", RELATIVE_WORK_CONF_DIR );
+
+        // copy security config
+        this.copyConfigFile( "security.xml", RELATIVE_WORK_CONF_DIR );
+
+        // this.copyConfigFile( "log4j.properties", variables );
     }
 
     protected void runOnce()
@@ -333,7 +335,6 @@ public class AbstractNexusIntegrationTest
             log.info( "*\n*" );
             log.info( "***************************" );
 
-            appBooter = NexusStateUtil.doHardStart();
         }
     }
 
@@ -353,7 +354,7 @@ public class AbstractNexusIntegrationTest
             // must reset
             NEEDS_HARD_STOP = false;
 
-            NexusStateUtil.doHardStop( appBooter );
+            NexusStateUtil.doHardStop();
         }
 
     }
@@ -376,7 +377,7 @@ public class AbstractNexusIntegrationTest
         return testConfigFile;
     }
 
-    private void copyConfigFile( String configFile, String destShortName, Map<String, String> variables, String path )
+    protected void copyConfigFile( String configFile, String destShortName, Map<String, String> variables, String path )
         throws IOException
     {
         // the test can override the test config.
@@ -394,26 +395,14 @@ public class AbstractNexusIntegrationTest
     }
 
     // Overloaded helpers
-    private void copyConfigFile( String configFile )
-        throws IOException
-    {
-        this.copyConfigFile( configFile, (String) null );
-    }
 
-    private void copyConfigFile( String configFile, String path )
+    protected void copyConfigFile( String configFile, String path )
         throws IOException
     {
         this.copyConfigFile( configFile, new HashMap<String, String>(), path );
     }
 
-    private void copyConfigFile( String configFile, Map<String, String> variables )
-        throws IOException
-    {
-        this.copyConfigFile( configFile, configFile, variables, null );
-
-    }
-
-    private void copyConfigFile( String configFile, Map<String, String> variables, String path )
+    protected void copyConfigFile( String configFile, Map<String, String> variables, String path )
         throws IOException
     {
         this.copyConfigFile( configFile, configFile, variables, path );

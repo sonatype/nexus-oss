@@ -46,6 +46,11 @@ public class NexusStateUtil
             Assert.fail( "Could not " + command + " Nexus: (" + response.getStatus() + ")" );
         }
     }
+    
+    private static AbstractForkedAppBooter getAppBooter() throws Exception
+    {
+        return (AbstractForkedAppBooter) TestContainer.getInstance().lookup( ForkedAppBooter.ROLE, "TestForkedAppBooter" );
+    }
 
     public static StatusResourceResponse getNexusStatus()
         throws IOException
@@ -125,8 +130,7 @@ public class NexusStateUtil
     public static ForkedAppBooter doHardStart()
         throws Exception
     {
-        AbstractForkedAppBooter appBooter =
-            (AbstractForkedAppBooter) TestContainer.getInstance().lookup( ForkedAppBooter.ROLE, "TestForkedAppBooter" );
+        AbstractForkedAppBooter appBooter = getAppBooter();
 
         Assert.assertFalse( "Nexus is already started.", getClient().isNexusStarted( true ) );
 
@@ -138,13 +142,14 @@ public class NexusStateUtil
         return appBooter;
     }
 
-    public static void doHardStop( ForkedAppBooter app )
+    public static void doHardStop()
         throws Exception
     {
-        doHardStop( app, true );
+        AbstractForkedAppBooter appBooter = getAppBooter();
+        doHardStop( true );
     }
 
-    public static void doHardStop( ForkedAppBooter app, boolean checkStarted )
+    public static void doHardStop( boolean checkStarted )
         throws Exception
     {
         if ( checkStarted )
@@ -152,7 +157,7 @@ public class NexusStateUtil
             Assert.assertTrue( "Nexus is not started.", getClient().isNexusStarted( true ) );
         }
 
-        app.stop();
+        getAppBooter().stop();
 
         Assert.assertTrue( "Unable to stop Nexus after 4 minutes", NexusStatusUtil.waitForStop( getClient() ) );
 

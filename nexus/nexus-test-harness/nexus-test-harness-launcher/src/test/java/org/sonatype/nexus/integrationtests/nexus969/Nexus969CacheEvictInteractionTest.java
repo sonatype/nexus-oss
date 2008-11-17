@@ -42,7 +42,7 @@ public class Nexus969CacheEvictInteractionTest
         // soft restart isn't enought to catch the bug
         // NexusStateUtil.doSoftRestart();
 
-        NexusStateUtil.doHardStop(appBooter);
+        NexusStateUtil.doHardStop();
         NexusStateUtil.doHardStart();
 
     }

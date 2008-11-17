@@ -37,7 +37,7 @@ public class IntegrationTestSuite
     public static void afterSuite()
         throws Exception
     {
-        NexusStateUtil.doHardStop( app, false );
+        NexusStateUtil.doHardStop( false );
     }
 
 }

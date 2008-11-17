@@ -42,43 +42,43 @@ public class Nexus758ServiceStabilityTest
         // this could be done using a for, but I wanna to know how may times it run just looking to stack trace
         // 1
         app = doHardStart();
-        doHardStop( app );
+        doHardStop();
 
         // 2
         app = doHardStart();
-        doHardStop( app );
+        doHardStop();
 
         // 3
         app = doHardStart();
-        doHardStop( app );
+        doHardStop();
 
         // 4
         app = doHardStart();
-        doHardStop( app );
+        doHardStop();
 
         // 5
         app = doHardStart();
-        doHardStop( app );
+        doHardStop();
 
         // 6
         app = doHardStart();
-        doHardStop( app );
+        doHardStop();
 
         // 7
         app = doHardStart();
-        doHardStop( app );
+        doHardStop();
 
         // 8
         app = doHardStart();
-        doHardStop( app );
+        doHardStop();
 
         // 9
         app = doHardStart();
-        doHardStop( app );
+        doHardStop();
 
         // 10
         app = doHardStart();
-        doHardStop( app );
+        doHardStop();
 
     }
 
@@ -131,7 +131,7 @@ public class Nexus758ServiceStabilityTest
         doSoftStop();
 
         doSoftStart();
-        doHardStop( app );
+        doHardStop();
     }
 
     @Test
@@ -183,7 +183,7 @@ public class Nexus758ServiceStabilityTest
         doClientStop();
 
         doClientStart();
-        doHardStop( app );
+        doHardStop();
     }
 
 }

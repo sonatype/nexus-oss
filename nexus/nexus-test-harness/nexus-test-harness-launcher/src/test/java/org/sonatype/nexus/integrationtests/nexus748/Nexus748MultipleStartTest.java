@@ -50,7 +50,7 @@ public class Nexus748MultipleStartTest
             stopWatch.stop();
 
             // stop
-            NexusStateUtil.doHardStop( appBooter );
+            NexusStateUtil.doHardStop();
 
             startTimes.add( stopWatch.getTime() );
         }
