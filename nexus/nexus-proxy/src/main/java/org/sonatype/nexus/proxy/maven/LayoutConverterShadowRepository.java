@@ -33,6 +33,7 @@ import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.NoSuchResourceStoreException;
 import org.sonatype.nexus.proxy.RepositoryNotAvailableException;
+import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.attributes.inspectors.DigestCalculatingInspector;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
@@ -120,6 +121,126 @@ public abstract class LayoutConverterShadowRepository
     public boolean recreateMavenMetadata( String path )
     {
         return false;
+    }
+
+    public void storeItemWithChecksums( ResourceStoreRequest request, InputStream is, Map<String, String> userAttributes )
+        throws UnsupportedStorageOperationException,
+            NoSuchResourceStoreException,
+            RepositoryNotAvailableException,
+            StorageException,
+            AccessDeniedException
+    {
+        if ( getLogger().isDebugEnabled() )
+        {
+            getLogger().debug( "storeItemWithChecksums() :: " + request.getRequestPath() );
+        }
+
+        try
+        {
+            try
+            {
+                storeItem( request, is, userAttributes );
+            }
+            catch ( IOException e )
+            {
+                throw new StorageException( "Could not get the content from the ContentLocator!", e );
+            }
+
+            RepositoryItemUid itemUid = createUid( request.getRequestPath() );
+
+            StorageFileItem storedFile = (StorageFileItem) retrieveItem( true, itemUid, null );
+
+            String sha1Hash = storedFile.getAttributes().get( DigestCalculatingInspector.DIGEST_SHA1_KEY );
+
+            String md5Hash = storedFile.getAttributes().get( DigestCalculatingInspector.DIGEST_MD5_KEY );
+
+            if ( !StringUtils.isEmpty( sha1Hash ) )
+            {
+                storeItem( new DefaultStorageFileItem(
+                    this,
+                    storedFile.getPath() + ".sha1",
+                    true,
+                    true,
+                    new StringContentLocator( sha1Hash ) ) );
+            }
+
+            if ( !StringUtils.isEmpty( md5Hash ) )
+            {
+                storeItem( new DefaultStorageFileItem(
+                    this,
+                    storedFile.getPath() + ".md5",
+                    true,
+                    true,
+                    new StringContentLocator( md5Hash ) ) );
+            }
+        }
+        catch ( ItemNotFoundException e )
+        {
+            throw new StorageException( "Storage inconsistency!", e );
+        }
+    }
+
+    public void deleteItemWithChecksums( ResourceStoreRequest request )
+        throws UnsupportedStorageOperationException,
+            NoSuchResourceStoreException,
+            RepositoryNotAvailableException,
+            ItemNotFoundException,
+            StorageException,
+            AccessDeniedException
+    {
+        if ( getLogger().isDebugEnabled() )
+        {
+            getLogger().debug( "deleteItemWithChecksums() :: " + request.getRequestPath() );
+        }
+
+        try
+        {
+            deleteItem( request );
+        }
+        catch ( ItemNotFoundException e )
+        {
+            if ( request.getRequestPath().endsWith( ".asc" ) )
+            {
+                // Do nothing no guarantee that the .asc files will exist
+            }
+            else
+            {
+                throw e;
+            }
+        }
+
+        String originalPath = request.getRequestPath();
+
+        request.setRequestPath( originalPath + ".sha1" );
+
+        try
+        {
+            deleteItem( request );
+        }
+        catch ( ItemNotFoundException e )
+        {
+            // ignore not found
+        }
+
+        request.setRequestPath( originalPath + ".md5" );
+
+        try
+        {
+            deleteItem( request );
+        }
+        catch ( ItemNotFoundException e )
+        {
+            // ignore not found
+        }
+
+        // Now remove the .asc files, and the checksums stored with them as well
+        // Note this is a recursive call, hence the check for .asc
+        if ( !originalPath.endsWith( ".asc" ) )
+        {
+            request.setRequestPath( originalPath + ".asc" );
+
+            deleteItemWithChecksums( request );
+        }
     }
 
     public void storeItemWithChecksums( AbstractStorageItem item )

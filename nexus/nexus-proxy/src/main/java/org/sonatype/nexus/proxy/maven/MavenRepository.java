@@ -20,11 +20,15 @@
  */
 package org.sonatype.nexus.proxy.maven;
 
+import java.io.InputStream;
 import java.util.Map;
 
 import org.sonatype.nexus.artifact.GavCalculator;
+import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
+import org.sonatype.nexus.proxy.NoSuchResourceStoreException;
 import org.sonatype.nexus.proxy.RepositoryNotAvailableException;
+import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
@@ -69,6 +73,25 @@ public interface MavenRepository
     MetadataManager getMetadataManager();
 
     boolean recreateMavenMetadata( String path );
+
+    // == "Public API" (JSec protected)
+
+    void storeItemWithChecksums( ResourceStoreRequest request, InputStream is, Map<String, String> userAttributes )
+        throws UnsupportedStorageOperationException,
+            NoSuchResourceStoreException,
+            RepositoryNotAvailableException,
+            StorageException,
+            AccessDeniedException;
+
+    void deleteItemWithChecksums( ResourceStoreRequest request )
+        throws UnsupportedStorageOperationException,
+            NoSuchResourceStoreException,
+            RepositoryNotAvailableException,
+            ItemNotFoundException,
+            StorageException,
+            AccessDeniedException;
+
+    // == "Insider API" (unprotected)
 
     void storeItemWithChecksums( AbstractStorageItem item )
         throws UnsupportedStorageOperationException,

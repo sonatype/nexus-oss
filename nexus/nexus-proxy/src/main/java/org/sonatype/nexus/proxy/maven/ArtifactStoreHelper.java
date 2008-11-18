@@ -20,6 +20,7 @@
  */
 package org.sonatype.nexus.proxy.maven;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
@@ -41,16 +42,11 @@ import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.NoSuchResourceStoreException;
 import org.sonatype.nexus.proxy.RepositoryNotAvailableException;
-import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
-import org.sonatype.nexus.proxy.item.ContentLocator;
-import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
-import org.sonatype.nexus.proxy.item.PreparedContentLocator;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
-import org.sonatype.nexus.proxy.item.StringContentLocator;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 
 /**
@@ -69,48 +65,6 @@ public class ArtifactStoreHelper
         super();
 
         this.repository = repo;
-    }
-
-    protected void storeItemWithChecksums( ResourceStoreRequest request, ContentLocator locator,
-        Map<String, String> attributes )
-        throws UnsupportedStorageOperationException,
-            NoSuchResourceStoreException,
-            RepositoryNotAvailableException,
-            StorageException,
-            AccessDeniedException
-    {
-        repository.storeItemWithChecksums( new DefaultStorageFileItem(
-            repository,
-            request.getRequestPath(),
-            true,
-            true,
-            locator ) );
-    }
-
-    protected RepositoryItemUid deleteWithChecksums( ArtifactStoreRequest request )
-        throws UnsupportedStorageOperationException,
-            RepositoryNotAvailableException,
-            ItemNotFoundException,
-            StorageException
-    {
-        RepositoryItemUid uid = repository.createUid( request.getRequestPath() );
-
-        repository.deleteItemWithChecksums( uid, request.getRequestContext() );
-
-        return uid;
-    }
-
-    protected RepositoryItemUid deleteWithoutChecksums( ArtifactStoreRequest request )
-        throws UnsupportedStorageOperationException,
-            RepositoryNotAvailableException,
-            ItemNotFoundException,
-            StorageException
-    {
-        RepositoryItemUid uid = repository.createUid( request.getRequestPath() );
-
-        repository.deleteItem( uid, request.getRequestContext() );
-
-        return uid;
     }
 
     public StorageFileItem retrieveArtifactPom( ArtifactStoreRequest gavRequest )
@@ -180,7 +134,7 @@ public class ArtifactStoreHelper
 
         gavRequest.setRequestPath( repository.getGavCalculator().gavToPath( gav ) );
 
-        storeItemWithChecksums( gavRequest, new PreparedContentLocator( is ), attributes );
+        repository.storeItemWithChecksums( gavRequest, is, attributes );
 
         try
         {
@@ -206,14 +160,25 @@ public class ArtifactStoreHelper
             throw new IllegalArgumentException( "Cannot generate POM without valid 'packaging'!" );
         }
 
-        Gav gav = new Gav( gavRequest.getGroupId(), gavRequest.getArtifactId(), gavRequest.getVersion(), gavRequest
-            .getClassifier(), gavRequest.getExtension() != null ? gavRequest.getExtension() : repository.getArtifactPackagingMapper().getExtensionForPackaging(
-            gavRequest.getPackaging() ), null, null, null, RepositoryPolicy.SNAPSHOT.equals( repository
-            .getRepositoryPolicy() ), false, null, false, null );
+        Gav gav = new Gav(
+            gavRequest.getGroupId(),
+            gavRequest.getArtifactId(),
+            gavRequest.getVersion(),
+            gavRequest.getClassifier(),
+            gavRequest.getExtension() != null ? gavRequest.getExtension() : repository
+                .getArtifactPackagingMapper().getExtensionForPackaging( gavRequest.getPackaging() ),
+            null,
+            null,
+            null,
+            RepositoryPolicy.SNAPSHOT.equals( repository.getRepositoryPolicy() ),
+            false,
+            null,
+            false,
+            null );
 
         gavRequest.setRequestPath( repository.getGavCalculator().gavToPath( gav ) );
 
-        storeItemWithChecksums( gavRequest, new PreparedContentLocator( is ), attributes );
+        repository.storeItemWithChecksums( gavRequest, is, attributes );
     }
 
     public void storeArtifactWithGeneratedPom( ArtifactStoreRequest gavRequest, InputStream is,
@@ -227,9 +192,20 @@ public class ArtifactStoreHelper
         checkRequest( gavRequest );
 
         // Force classifier to null, as the pom shouldn't have a classifier
-        Gav pomGav = new Gav( gavRequest.getGroupId(), gavRequest.getArtifactId(), gavRequest.getVersion(), null, 
-            "pom", null, null, null, RepositoryPolicy.SNAPSHOT.equals( repository
-            .getRepositoryPolicy() ), false, null, false, null );
+        Gav pomGav = new Gav(
+            gavRequest.getGroupId(),
+            gavRequest.getArtifactId(),
+            gavRequest.getVersion(),
+            null,
+            "pom",
+            null,
+            null,
+            null,
+            RepositoryPolicy.SNAPSHOT.equals( repository.getRepositoryPolicy() ),
+            false,
+            null,
+            false,
+            null );
 
         try
         {
@@ -272,7 +248,10 @@ public class ArtifactStoreHelper
 
             gavRequest.setRequestPath( repository.getGavCalculator().gavToPath( pomGav ) );
 
-            storeItemWithChecksums( gavRequest, new StringContentLocator( sw.toString() ), attributes );
+            repository.storeItemWithChecksums(
+                gavRequest,
+                new ByteArrayInputStream( sw.toString().getBytes() ),
+                attributes );
 
             try
             {
@@ -290,9 +269,8 @@ public class ArtifactStoreHelper
             gavRequest.getArtifactId(),
             gavRequest.getVersion(),
             gavRequest.getClassifier(),
-            gavRequest.getExtension() != null ?
-                gavRequest.getExtension() :
-                repository.getArtifactPackagingMapper().getExtensionForPackaging( gavRequest.getPackaging() ),
+            gavRequest.getExtension() != null ? gavRequest.getExtension() : repository
+                .getArtifactPackagingMapper().getExtensionForPackaging( gavRequest.getPackaging() ),
             null,
             null,
             null,
@@ -304,7 +282,7 @@ public class ArtifactStoreHelper
 
         gavRequest.setRequestPath( repository.getGavCalculator().gavToPath( artifactGav ) );
 
-        storeItemWithChecksums( gavRequest, new PreparedContentLocator( is ), attributes );
+        repository.storeItemWithChecksums( gavRequest, is, attributes );
     }
 
     public void deleteArtifactPom( ArtifactStoreRequest gavRequest, boolean withChecksums, boolean withAllSubordinates,
@@ -385,11 +363,11 @@ public class ArtifactStoreHelper
         {
             if ( withChecksums )
             {
-                deleteWithChecksums( gavRequest );
+                repository.deleteItemWithChecksums( gavRequest );
             }
             else
             {
-                deleteWithoutChecksums( gavRequest );
+                repository.deleteItem( gavRequest );
             }
 
             if ( withAllSubordinates )
