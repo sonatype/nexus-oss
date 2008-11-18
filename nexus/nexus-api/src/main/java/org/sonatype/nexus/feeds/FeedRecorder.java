@@ -67,6 +67,11 @@ public interface FeedRecorder
     public static final String SYSTEM_REBUILDATTRIBUTES_ACTION = "REBUILDATTRIBUTES";
 
     /**
+     * System event action: rebuild maven metadata files
+     */
+    public static final String SYSTEM_REBUILD_MAVEN_METADATA_ACTION = "REBUILD_MAVEN_METADATA";
+    
+    /**
      * System event action: repository local status changes
      */
     public static final String SYSTEM_REPO_LSTATUS_CHANGES_ACTION = "REPO_LSTATUS_CHANGES";

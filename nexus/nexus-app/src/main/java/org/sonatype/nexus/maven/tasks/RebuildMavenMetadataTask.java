@@ -22,6 +22,7 @@
 package org.sonatype.nexus.maven.tasks;
 
 import org.codehaus.plexus.component.annotations.Component;
+import org.sonatype.nexus.feeds.FeedRecorder;
 import org.sonatype.nexus.maven.tasks.descriptors.RebuildMavenMetadataTaskDescriptor;
 import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesPathAwareTask;
 import org.sonatype.scheduling.SchedulerTask;
@@ -33,7 +34,6 @@ import org.sonatype.scheduling.SchedulerTask;
 public class RebuildMavenMetadataTask
     extends AbstractNexusRepositoriesPathAwareTask<Object>
 {
-    public static final String SYSTEM_REBUILD_MAVEN_METADATA_ACTION = "REBUILDMAVENMETADATA";
 
     public Object doRun()
         throws Exception
@@ -56,7 +56,7 @@ public class RebuildMavenMetadataTask
 
     protected String getAction()
     {
-        return SYSTEM_REBUILD_MAVEN_METADATA_ACTION;
+        return FeedRecorder.SYSTEM_REBUILD_MAVEN_METADATA_ACTION;
     }
 
     protected String getMessage()

@@ -136,6 +136,10 @@ public abstract class AbstractSystemFeedSource
             {
                 entry.setTitle( "Rebuilding attributes" );
             }
+            else if ( FeedRecorder.SYSTEM_REBUILD_MAVEN_METADATA_ACTION.equals( item.getAction() ) )
+            {
+            	entry.setTitle( "Rebuilding maven metadata files" );
+            }
             else if ( FeedRecorder.SYSTEM_REPO_LSTATUS_CHANGES_ACTION.equals( item.getAction() ) )
             {
                 entry.setTitle( "Repository local status change" );
