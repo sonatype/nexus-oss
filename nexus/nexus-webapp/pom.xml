@@ -206,12 +206,24 @@
         <artifactId>maven-war-plugin</artifactId>
         <version>2.1-alpha-2</version>
         <configuration>
+          <warSourceIncludes>
+          	*, 
+          	docs/*, 
+          	ext-2.2/ext-all.js,
+          	ext-2.2/adapter/ext/ext-base.js,
+          	ext-2.2/resources/css/ext-all.css,
+          	ext-2.2/resources/css/xtheme-gray.css,
+          	ext-2.2/resources/images/**,
+          	images/**,
+          	js/*,
+          	js/extensions/*,
+          	js/filetree/js/Ext.ux.form.BrowseButton.js,
+          	js/repoServer/*,
+          	style/Sonatype.css,
+          	style/Sonatype-content.css,
+          	WEB-INF/*
+          </warSourceIncludes>
           <webResources>
-            <!-- 
-            <webResource>
-              <directory>${basedir}/target/gzip-web-content</directory>
-            </webResource>
-            -->
             <webResource>
               <directory>${basedir}/src/main/webapp-war-extras</directory>
               <excludes>
