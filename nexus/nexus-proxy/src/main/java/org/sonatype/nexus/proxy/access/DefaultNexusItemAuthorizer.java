@@ -81,14 +81,25 @@ public class DefaultNexusItemAuthorizer
 
         if ( applicationConfiguration.isSecurityEnabled() )
         {
-            // And finally check each of the target permissions and see if the user
-            // has access, all it takes is one
-            for ( String perm : perms )
+            if ( subject != null )
             {
-                if ( subject.isPermitted( perm ) )
+
+                // And finally check each of the target permissions and see if the user
+                // has access, all it takes is one
+                for ( String perm : perms )
                 {
-                    return true;
+                    if ( subject.isPermitted( perm ) )
+                    {
+                        return true;
+                    }
                 }
+
+                return false;
+            }
+            else
+            {
+                // security is enabled, but we have nobody authenticated? Fail!
+                return false;
             }
         }
         else
@@ -96,7 +107,5 @@ public class DefaultNexusItemAuthorizer
             // sec is disabled, simply say YES
             return true;
         }
-
-        return false;
     }
 }
