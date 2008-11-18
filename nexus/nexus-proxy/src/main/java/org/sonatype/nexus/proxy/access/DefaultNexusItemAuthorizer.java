@@ -6,6 +6,7 @@ import java.util.Map;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
+import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.jsecurity.SecurityUtils;
 import org.jsecurity.subject.Subject;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
@@ -21,6 +22,7 @@ import org.sonatype.nexus.proxy.target.TargetSet;
  */
 @Component( role = NexusItemAuthorizer.class )
 public class DefaultNexusItemAuthorizer
+    extends AbstractLogEnabled
     implements NexusItemAuthorizer
 {
     @Requirement
@@ -83,7 +85,6 @@ public class DefaultNexusItemAuthorizer
         {
             if ( subject != null )
             {
-
                 // And finally check each of the target permissions and see if the user
                 // has access, all it takes is one
                 for ( String perm : perms )
@@ -94,10 +95,20 @@ public class DefaultNexusItemAuthorizer
                     }
                 }
 
+                if ( getLogger().isDebugEnabled() )
+                {
+                    getLogger().debug( "Subject is authenticated, but has none of the needed permissions, rejecting." );
+                }
+
                 return false;
             }
             else
             {
+                if ( getLogger().isDebugEnabled() )
+                {
+                    getLogger().debug( "Subject is not authenticated, rejecting." );
+                }
+
                 // security is enabled, but we have nobody authenticated? Fail!
                 return false;
             }
