@@ -279,7 +279,7 @@ public class Nexus537RepoTargetsTests
         this.upload( repo1BarArtifact, REPO1_ID, this.getTestFile( "repo1-bar-artifact.jar" ), false );
         this.upload( repo1FooArtifact, REPO1_ID, this.getTestFile( "repo1-foo-artifact.jar" ), true );
         this.upload( repo2BarArtifact, REPO2_ID, this.getTestFile( "repo2-bar-artifact.jar" ), false );
-        this.upload( repo1FooArtifact, REPO2_ID, this.getTestFile( "repo2-foo-artifact.jar" ), true );
+        this.upload( repo2FooArtifact, REPO2_ID, this.getTestFile( "repo2-foo-artifact.jar" ), true );
     }
 
     @Test

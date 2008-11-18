@@ -6,19 +6,16 @@ import java.io.InputStreamReader;
 import java.util.List;
 
 import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.fileupload.FileItemFactory;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.restlet.Context;
 import org.restlet.data.Form;
-import org.restlet.data.MediaType;
 import org.restlet.data.Reference;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.data.Status;
-import org.restlet.ext.fileupload.RestletFileUpload;
 import org.restlet.resource.Representation;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
@@ -315,26 +312,8 @@ public abstract class AbstractArtifactPlexusResource
     public Object upload( Context context, Request request, Response response, List<FileItem> files )
         throws ResourceException
     {
-
-        // if ( representation != null )
-        // {
-        // if ( MediaType.MULTIPART_FORM_DATA.equals( representation.getMediaType(), true ) )
-        // {
-        // // Just forcing creation of the temporary directory if it doesn't exist.
-        // // Because the upload is using the tmp directory outside of our code
-        // // Our method wont be called, which will create the directory on request
-        // getNexusInstance( request ).getNexusConfiguration().getTemporaryDirectory();
-        //                
-        // FileItemFactory factory = this.getFileItemFactory( context );
-        //
-        // RestletFileUpload upload = new RestletFileUpload( factory );
-        //
-        // List<FileItem> items;
-
         try
         {
-            // items = upload.parseRequest( request );
-
             // we have "nibbles": (params,fileA,[fileB])+
             // the second file is optional
             // if two files are present, one of them should be POM
@@ -536,8 +515,6 @@ public abstract class AbstractArtifactPlexusResource
             {
                 pomManager.removeTempPomFile();
             }
-
-            // response.setStatus( Status.SUCCESS_CREATED );
         }
         catch ( StorageException e )
         {
@@ -575,291 +552,8 @@ public abstract class AbstractArtifactPlexusResource
 
             throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST );
         }
-        // }
-        // }
-        // else
-        // {
-        // // POST request with no entity.
-        // throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST );
-        // }
+        
         return null;
-    }
-
-    protected void uploadArtifact( Representation representation, Context context, Request request )
-        throws ResourceException
-    {
-        if ( representation != null )
-        {
-            if ( MediaType.MULTIPART_FORM_DATA.equals( representation.getMediaType(), true ) )
-            {
-                // Just forcing creation of the temporary directory if it doesn't exist.
-                // Because the upload is using the tmp directory outside of our code
-                // Our method wont be called, which will create the directory on request
-                getNexus().getNexusConfiguration().getTemporaryDirectory();
-
-                FileItemFactory factory = this.getFileItemFactory( context );
-
-                RestletFileUpload upload = new RestletFileUpload( factory );
-
-                List<FileItem> items;
-
-                try
-                {
-                    items = upload.parseRequest( request );
-
-                    // we have "nibbles": (params,fileA,[fileB])+
-                    // the second file is optional
-                    // if two files are present, one of them should be POM
-                    String repositoryId = null;
-
-                    boolean hasPom = false;
-
-                    boolean isPom = false;
-
-                    InputStream is = null;
-
-                    String groupId = null;
-
-                    String artifactId = null;
-
-                    String version = null;
-
-                    String classifier = null;
-
-                    String packaging = null;
-
-                    String extension = null;
-
-                    PomArtifactManager pomManager = new PomArtifactManager( getNexus()
-                        .getNexusConfiguration().getTemporaryDirectory() );
-
-                    for ( FileItem fi : items )
-                    {
-                        if ( fi.isFormField() )
-                        {
-                            // a parameter
-                            if ( "r".equals( fi.getFieldName() ) )
-                            {
-                                repositoryId = fi.getString();
-                            }
-                            else if ( "g".equals( fi.getFieldName() ) )
-                            {
-                                groupId = fi.getString();
-                            }
-                            else if ( "a".equals( fi.getFieldName() ) )
-                            {
-                                artifactId = fi.getString();
-                            }
-                            else if ( "v".equals( fi.getFieldName() ) )
-                            {
-                                version = fi.getString();
-                            }
-                            else if ( "p".equals( fi.getFieldName() ) )
-                            {
-                                packaging = fi.getString();
-                            }
-                            else if ( "c".equals( fi.getFieldName() ) )
-                            {
-                                classifier = fi.getString();
-                            }
-                            else if ( "e".equals( fi.getFieldName() ) )
-                            {
-                                extension = fi.getString();
-                            }
-                            else if ( "hasPom".equals( fi.getFieldName() ) )
-                            {
-                                hasPom = Boolean.parseBoolean( fi.getString() );
-                            }
-                        }
-                        else
-                        {
-                            // a file
-                            isPom = fi.getName().endsWith( ".pom" ) || fi.getName().endsWith( "pom.xml" );
-
-                            ArtifactStoreRequest gavRequest;
-
-                            if ( hasPom )
-                            {
-                                if ( isPom )
-                                {
-                                    pomManager.storeTempPomFile( fi.getInputStream() );
-
-                                    is = pomManager.getTempPomFileInputStream();
-
-                                }
-                                else
-                                {
-                                    is = fi.getInputStream();
-                                }
-
-                                // this is ugly: since GAVRequest does not allow contructing
-                                // without GAV, i am filling it with dummy values, and pomManager
-                                // will set those to proper values
-                                gavRequest = pomManager.getGAVRequestFromTempPomFile( getResourceStoreRequest(
-                                    request,
-                                    true,
-                                    repositoryId,
-                                    null,
-                                    "G",
-                                    "A",
-                                    "V",
-                                    "P",
-                                    null,
-                                    null ) );
-
-                                if ( !isPom )
-                                {
-
-                                    // Can't retrieve these details from the pom, so we must expect the user to provide
-                                    // them
-                                    // If now, the classifier will not be appended, and we will use the extension mapped
-                                    // from
-                                    // the packaging type in the pom (or the packaging type provided
-                                    if ( !StringUtils.isEmpty( extension ) )
-                                    {
-                                        gavRequest.setExtension( extension );
-                                    }
-
-                                    if ( !StringUtils.isEmpty( classifier ) )
-                                    {
-                                        gavRequest.setClassifier( classifier );
-                                    }
-                                }
-                            }
-                            else
-                            {
-                                is = fi.getInputStream();
-
-                                gavRequest = getResourceStoreRequest(
-                                    request,
-                                    true,
-                                    repositoryId,
-                                    null,
-                                    groupId,
-                                    artifactId,
-                                    version,
-                                    packaging,
-                                    classifier,
-                                    extension );
-                            }
-
-                            try
-                            {
-                                Repository repository = getNexus().getRepository( repositoryId );
-
-                                if ( !MavenRepository.class.isAssignableFrom( repository.getClass() ) )
-                                {
-                                    getLogger().warn( "Upload to non maven repository attempted" );
-                                    throw new ResourceException(
-                                        Status.CLIENT_ERROR_BAD_REQUEST,
-                                        "This is not a Maven repository!" );
-                                }
-                                else
-                                {
-                                    // temporarily we disable SNAPSHOT upload
-                                    // check is it a Snapshot repo
-                                    MavenRepository mr = (MavenRepository) repository;
-
-                                    if ( RepositoryPolicy.SNAPSHOT.equals( mr.getRepositoryPolicy() ) )
-                                    {
-                                        getLogger().info( "Upload to SNAPSHOT maven repository attempted" );
-
-                                        throw new ResourceException(
-                                            Status.CLIENT_ERROR_BAD_REQUEST,
-                                            "This is a Maven SNAPSHOT repository, and manual upload against it is forbidden!" );
-                                    }
-                                }
-
-                                if ( !versionMatchesPolicy( gavRequest.getVersion(), ( (MavenRepository) repository )
-                                    .getRepositoryPolicy() ) )
-                                {
-                                    getLogger().warn(
-                                        "Version (" + gavRequest.getVersion() + ") and Repository Policy mismatch" );
-                                    throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "The version "
-                                        + gavRequest.getVersion() + " does not match the repository policy!" );
-                                }
-
-                                if ( isPom )
-                                {
-                                    ( (MavenRepository) repository ).storeArtifactPom( gavRequest, is, null );
-
-                                    isPom = false;
-                                }
-                                else
-                                {
-                                    if ( hasPom )
-                                    {
-                                        ( (MavenRepository) repository ).storeArtifact( gavRequest, is, null );
-                                    }
-                                    else
-                                    {
-                                        ( (MavenRepository) repository ).storeArtifactWithGeneratedPom(
-                                            gavRequest,
-                                            is,
-                                            null );
-                                    }
-                                }
-                            }
-                            catch ( IllegalArgumentException e )
-                            {
-                                getLogger().info( "Cannot upload!", e );
-
-                                throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, e.getMessage() );
-                            }
-                        }
-                    }
-
-                    if ( hasPom )
-                    {
-                        pomManager.removeTempPomFile();
-                    }
-
-                    // response.setStatus( Status.SUCCESS_CREATED );
-                }
-                catch ( StorageException e )
-                {
-                    getLogger().warn( "StorageException during retrieve:", e );
-
-                    throw new ResourceException( Status.SERVER_ERROR_INTERNAL );
-                }
-                catch ( NoSuchResourceStoreException e )
-                {
-                    throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, "No repository with id=" + "" );
-                }
-                catch ( RepositoryNotAvailableException e )
-                {
-                    throw new ResourceException( Status.SERVER_ERROR_SERVICE_UNAVAILABLE );
-                }
-                catch ( AccessDeniedException e )
-                {
-                    throw new ResourceException( Status.CLIENT_ERROR_FORBIDDEN );
-                }
-                catch ( XmlPullParserException e )
-                {
-                    getLogger().warn( "XmlPullParserException during retrieve of POM:", e );
-
-                    throw new ResourceException( Status.SERVER_ERROR_INTERNAL );
-                }
-                catch ( IOException e )
-                {
-                    getLogger().warn( "IOException during retrieve of POM:", e );
-
-                    throw new ResourceException( Status.SERVER_ERROR_INTERNAL );
-                }
-                catch ( Exception e )
-                {
-                    getLogger().warn( "Exception during upload:", e );
-
-                    throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST );
-                }
-            }
-        }
-        else
-        {
-            // POST request with no entity.
-            throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST );
-        }
-
     }
 
     private boolean versionMatchesPolicy( String version, RepositoryPolicy policy )
