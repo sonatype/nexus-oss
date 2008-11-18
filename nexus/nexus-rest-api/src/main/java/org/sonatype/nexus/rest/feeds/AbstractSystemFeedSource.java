@@ -164,6 +164,10 @@ public abstract class AbstractSystemFeedSource
             {
                 entry.setTitle( "Removing snapshots" );
             }
+            else if ( FeedRecorder.SYSTEM_REMOVE_REPO_FOLDER_ACTION.equals( item.getAction() ) )
+            {
+            	entry.setTitle( "Removing repository folder" );
+            }
             else if ( FeedRecorder.SYSTEM_EMPTY_TRASH_ACTION.equals( item.getAction() ) )
             {
                 entry.setTitle( "Emptying Trash" );
