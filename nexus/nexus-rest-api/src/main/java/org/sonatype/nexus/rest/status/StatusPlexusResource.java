@@ -70,6 +70,8 @@ public class StatusPlexusResource
         resource.setOperationMode( status.getOperationMode().toString() );
 
         resource.setErrorCause( spit( status.getErrorCause() ) );
+        
+        resource.setBaseUrl( getContextRoot( request ).toString() );
 
         if ( status.getConfigurationValidationResponse() != null )
         {
