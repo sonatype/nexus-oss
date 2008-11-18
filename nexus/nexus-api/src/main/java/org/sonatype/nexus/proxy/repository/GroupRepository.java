@@ -2,8 +2,8 @@ package org.sonatype.nexus.proxy.repository;
 
 import java.util.List;
 
-import org.sonatype.nexus.proxy.NoSuchRepositoryGroupException;
-import org.sonatype.nexus.proxy.registry.ContentClass;
+import org.sonatype.nexus.proxy.NoSuchRepositoryException;
+import org.sonatype.nexus.proxy.registry.InvalidGroupingException;
 
 /**
  * A group repository is simply as it's name says, a repository that is backed by a group of other repositories. There
@@ -17,18 +17,41 @@ public interface GroupRepository
     extends Repository
 {
     /**
-     * Returns the content class of this repository group.
-     * 
-     * @return
-     * @throws NoSuchRepositoryGroupException
-     */
-    ContentClass getRepositoryGroupContentClass();
-
-    /**
-     * Returns the list of Repositories that are group members in this GroupRepository. The repo order within list is
-     * repo rank, so processing is possible by simply iterating over resulting list.
+     * Returns the unmodifiable list of Repositories that are group members in this GroupRepository. The repo order
+     * within list is repo rank (the order how they will be processed), so processing is possible by simply iterating
+     * over resulting list.
      * 
      * @return a List<Repository>
      */
     List<Repository> getMemberRepositories();
+
+    /**
+     * Adds a new Repository as member to this group.
+     * 
+     * @param repository
+     * @throws InvalidGroupingException
+     */
+    void addMemberRepository( Repository repository )
+        throws InvalidGroupingException;
+
+    /**
+     * Adds several Repositories as members to this group. All reposes in the list have to have compatible ContentClass
+     * within each other.
+     * 
+     * @param repositories
+     * @throws InvalidGroupingException
+     */
+    void addMemberRepositories( List<Repository> repositories )
+        throws InvalidGroupingException;
+
+    /**
+     * Removed the repository from this group.
+     * 
+     * @param repository
+     * @throws NoSuchRepositoryException
+     * @throws InvalidGroupingException
+     */
+    void removeMemberRepository( Repository repository )
+        throws NoSuchRepositoryException,
+            InvalidGroupingException;
 }
