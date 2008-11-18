@@ -68,9 +68,9 @@ public class Target
         return Collections.unmodifiableSet( patternTexts );
     }
 
-    public boolean isPathContained( Repository repository, String path )
+    public boolean isPathContained( ContentClass contentClass, String path )
     {
-        if ( getContentClass().isCompatible( repository.getRepositoryContentClass() ) )
+        if ( getContentClass().isCompatible( contentClass ) )
         {
             // look for pattern matching
             for ( Pattern pattern : patterns )

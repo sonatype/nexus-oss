@@ -58,7 +58,7 @@ public class TargetSet
         for ( TargetMatch targetMatch : matches )
         {
             if ( targetMatch.getRepository().getId().equals( repository.getId() )
-                && targetMatch.getTarget().isPathContained( repository, path ) )
+                && targetMatch.getTarget().isPathContained( repository.getRepositoryContentClass(), path ) )
             {
                 return true;
             }
