@@ -149,7 +149,7 @@ public class GlobalConfigurationPlexusResource
 
                         config.setUsername( settings.getUsername() );
 
-                        config.setSystemEmailAddress( settings.getSystemEmailAddress() );
+                        config.setSystemEmailAddress( settings.getSystemEmailAddress().trim() );
 
                         getNexus().updateSmtpConfiguration( config );
                     }
