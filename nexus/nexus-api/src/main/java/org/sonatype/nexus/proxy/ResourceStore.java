@@ -164,8 +164,7 @@ public interface ResourceStore
      * @throws AccessDeniedException the access denied exception
      */
     void storeItem( ResourceStoreRequest request, InputStream is, Map<String, String> userAttributes )
-        throws ItemNotFoundException,
-            UnsupportedStorageOperationException,
+        throws UnsupportedStorageOperationException,
             NoSuchResourceStoreException,
             RepositoryNotAvailableException,
             StorageException,
@@ -183,8 +182,7 @@ public interface ResourceStore
      * @throws AccessDeniedException the access denied exception
      */
     void createCollection( ResourceStoreRequest request, Map<String, String> userAttributes )
-        throws ItemNotFoundException,
-            UnsupportedStorageOperationException,
+        throws UnsupportedStorageOperationException,
             NoSuchResourceStoreException,
             RepositoryNotAvailableException,
             StorageException,

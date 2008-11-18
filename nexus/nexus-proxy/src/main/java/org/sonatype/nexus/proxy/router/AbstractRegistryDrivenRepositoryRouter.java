@@ -31,6 +31,7 @@ import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
+import org.sonatype.nexus.proxy.NoAvailableResourceStoreFoundException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryGroupException;
 import org.sonatype.nexus.proxy.NoSuchResourceStoreException;
@@ -146,6 +147,10 @@ public abstract class AbstractRegistryDrivenRepositoryRouter
                 getLogger().debug( "Rendering virtual path for " + req.getRequestPath() );
             }
             result = renderVirtualPath( req, false );
+        }
+        else if ( stores.size() == 0 )
+        {
+            throw new ItemNotFoundException( req.getRequestPath() );
         }
         else
         {
@@ -288,6 +293,10 @@ public abstract class AbstractRegistryDrivenRepositoryRouter
             {
                 item.getItemContext().putAll( req.getRequestContext() );
             }
+        }
+        else if ( stores.size() == 0 )
+        {
+            throw new ItemNotFoundException( req.getRequestPath() );
         }
         else
         {
@@ -448,8 +457,7 @@ public abstract class AbstractRegistryDrivenRepositoryRouter
      * Storing an item. Getting the list of affected reposes and ensuring we have only one.
      */
     protected void doStoreItem( ResourceStoreRequest req, InputStream is, Map<String, String> userAttributes )
-        throws ItemNotFoundException,
-            UnsupportedStorageOperationException,
+        throws UnsupportedStorageOperationException,
             NoSuchResourceStoreException,
             RepositoryNotAvailableException,
             StorageException,
@@ -459,7 +467,7 @@ public abstract class AbstractRegistryDrivenRepositoryRouter
 
         if ( stores == null )
         {
-            throw new ItemNotFoundException( req.getRequestPath() );
+            throw new NoAvailableResourceStoreFoundException( "Could not find any available ResourceStores!" );
         }
         else if ( stores.size() != 1 )
         {
@@ -479,8 +487,7 @@ public abstract class AbstractRegistryDrivenRepositoryRouter
      * Creating a collection. Getting the list of affected reposes and ensuring we have only one.
      */
     protected void doCreateCollection( ResourceStoreRequest req, Map<String, String> userAttributes )
-        throws ItemNotFoundException,
-            UnsupportedStorageOperationException,
+        throws UnsupportedStorageOperationException,
             NoSuchResourceStoreException,
             RepositoryNotAvailableException,
             StorageException,
@@ -490,7 +497,7 @@ public abstract class AbstractRegistryDrivenRepositoryRouter
 
         if ( stores == null )
         {
-            throw new ItemNotFoundException( req.getRequestPath() );
+            throw new NoAvailableResourceStoreFoundException( "Could not find any available ResourceStores!" );
         }
         else if ( stores.size() != 1 )
         {
@@ -547,13 +554,6 @@ public abstract class AbstractRegistryDrivenRepositoryRouter
         {
             stores = resolveResourceStoreByRequest( request );
         }
-        catch ( ItemNotFoundException e )
-        {
-            // thrown when route mapping simply excludes all processable Stores
-            // will handle below
-
-            stores = null;
-        }
         catch ( NoSuchResourceStoreException e )
         {
             // nothing here
@@ -565,7 +565,18 @@ public abstract class AbstractRegistryDrivenRepositoryRouter
             // we handle "virtual" paths, not backed by real Reposes since no repos found to serve this request
             if ( getLogger().isDebugEnabled() )
             {
-                getLogger().debug( "Request path is not backed by Stores, no targets for: " + request.getRequestPath() );
+                getLogger().debug(
+                    "Request path is not backed by Stores (is Virtual), no targets for: " + request.getRequestPath() );
+            }
+        }
+        else if ( stores.size() == 0 )
+        {
+            // we found no ResourceStore to handle request
+            if ( getLogger().isDebugEnabled() )
+            {
+                getLogger().debug(
+                    "Request path is not backed by Stores (path mapping filtered those out?), no targets for: "
+                        + request.getRequestPath() );
             }
         }
         else
@@ -616,8 +627,7 @@ public abstract class AbstractRegistryDrivenRepositoryRouter
      * @throws NoSuchRepositoryGroupException the no such repository group exception
      */
     protected List<ResourceStore> resolveResourceStoreByRequest( ResourceStoreRequest request )
-        throws NoSuchResourceStoreException,
-            ItemNotFoundException
+        throws NoSuchResourceStoreException
     {
         List<ResourceStore> result = null;
 

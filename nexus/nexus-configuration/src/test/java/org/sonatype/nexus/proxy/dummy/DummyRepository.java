@@ -35,19 +35,20 @@ import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 import org.sonatype.nexus.proxy.target.TargetSet;
 import org.sonatype.nexus.scheduling.RepositoryTaskFilter;
 
-public class DummyRepository implements Repository
+public class DummyRepository
+    implements Repository
 {
 
     public void addToNotFoundCache( String path )
     {
         // TODO Auto-generated method stub
-        
+
     }
 
     public void clearCaches( String path )
     {
         // TODO Auto-generated method stub
-        
+
     }
 
     public void copyItem( RepositoryItemUid from, RepositoryItemUid to, Map<String, Object> context )
@@ -57,7 +58,7 @@ public class DummyRepository implements Repository
             StorageException
     {
         // TODO Auto-generated method stub
-        
+
     }
 
     public RepositoryItemUid createUid( String path )
@@ -73,7 +74,7 @@ public class DummyRepository implements Repository
             StorageException
     {
         // TODO Auto-generated method stub
-        
+
     }
 
     public Collection<String> evictUnusedItems( long timestamp )
@@ -239,7 +240,7 @@ public class DummyRepository implements Repository
             StorageException
     {
         // TODO Auto-generated method stub
-        
+
     }
 
     public boolean recreateAttributes( String fromPath, Map<String, String> initialData )
@@ -257,7 +258,7 @@ public class DummyRepository implements Repository
     public void removeFromNotFoundCache( String path )
     {
         // TODO Auto-generated method stub
-        
+
     }
 
     public StorageItem retrieveItem( boolean localOnly, RepositoryItemUid uid, Map<String, Object> context )
@@ -281,109 +282,109 @@ public class DummyRepository implements Repository
     public void setAccessManager( AccessManager accessManager )
     {
         // TODO Auto-generated method stub
-        
+
     }
 
     public void setAllowWrite( boolean val )
     {
         // TODO Auto-generated method stub
-        
+
     }
 
     public void setBrowseable( boolean val )
     {
         // TODO Auto-generated method stub
-        
+
     }
 
     public void setId( String id )
     {
         // TODO Auto-generated method stub
-        
+
     }
 
     public void setIndexable( boolean val )
     {
         // TODO Auto-generated method stub
-        
+
     }
 
     public void setItemMaxAge( int itemMaxAge )
     {
         // TODO Auto-generated method stub
-        
+
     }
 
     public void setLocalStatus( LocalStatus val )
     {
         // TODO Auto-generated method stub
-        
+
     }
 
     public void setLocalStorage( LocalRepositoryStorage storage )
     {
         // TODO Auto-generated method stub
-        
+
     }
 
     public void setLocalUrl( String url )
     {
         // TODO Auto-generated method stub
-        
+
     }
 
     public void setName( String name )
     {
         // TODO Auto-generated method stub
-        
+
     }
 
     public void setNotFoundCache( PathCache notFoundcache )
     {
         // TODO Auto-generated method stub
-        
+
     }
 
     public void setNotFoundCacheTimeToLive( int notFoundCacheTimeToLive )
     {
         // TODO Auto-generated method stub
-        
+
     }
 
     public void setProxyMode( ProxyMode val )
     {
         // TODO Auto-generated method stub
-        
+
     }
 
     public void setRemoteStorage( RemoteRepositoryStorage storage )
     {
         // TODO Auto-generated method stub
-        
+
     }
 
     public void setRemoteStorageContext( RemoteStorageContext ctx )
     {
         // TODO Auto-generated method stub
-        
+
     }
 
     public void setRemoteUrl( String url )
     {
         // TODO Auto-generated method stub
-        
+
     }
 
     public void setRepositoryStatusCheckMode( RepositoryStatusCheckMode mode )
     {
         // TODO Auto-generated method stub
-        
+
     }
 
     public void setUserManaged( boolean val )
     {
         // TODO Auto-generated method stub
-        
+
     }
 
     public void storeItem( StorageItem item )
@@ -392,25 +393,25 @@ public class DummyRepository implements Repository
             StorageException
     {
         // TODO Auto-generated method stub
-        
+
     }
 
     public void addProximityEventListener( EventListener listener )
     {
         // TODO Auto-generated method stub
-        
+
     }
 
     public void notifyProximityEventListeners( AbstractEvent evt )
     {
         // TODO Auto-generated method stub
-        
+
     }
 
     public void removeProximityEventListener( EventListener listener )
     {
         // TODO Auto-generated method stub
-        
+
     }
 
     public void copyItem( ResourceStoreRequest from, ResourceStoreRequest to )
@@ -422,19 +423,18 @@ public class DummyRepository implements Repository
             AccessDeniedException
     {
         // TODO Auto-generated method stub
-        
+
     }
 
     public void createCollection( ResourceStoreRequest request, Map<String, String> userAttributes )
-        throws ItemNotFoundException,
-            UnsupportedStorageOperationException,
+        throws UnsupportedStorageOperationException,
             NoSuchResourceStoreException,
             RepositoryNotAvailableException,
             StorageException,
             AccessDeniedException
     {
         // TODO Auto-generated method stub
-        
+
     }
 
     public void deleteItem( ResourceStoreRequest request )
@@ -446,7 +446,7 @@ public class DummyRepository implements Repository
             AccessDeniedException
     {
         // TODO Auto-generated method stub
-        
+
     }
 
     public String getId()
@@ -482,7 +482,7 @@ public class DummyRepository implements Repository
             AccessDeniedException
     {
         // TODO Auto-generated method stub
-        
+
     }
 
     public StorageItem retrieveItem( ResourceStoreRequest request )
@@ -497,21 +497,20 @@ public class DummyRepository implements Repository
     }
 
     public void storeItem( ResourceStoreRequest request, InputStream is, Map<String, String> userAttributes )
-        throws ItemNotFoundException,
-            UnsupportedStorageOperationException,
+        throws UnsupportedStorageOperationException,
             NoSuchResourceStoreException,
             RepositoryNotAvailableException,
             StorageException,
             AccessDeniedException
     {
         // TODO Auto-generated method stub
-        
+
     }
 
     public void onProximityEvent( AbstractEvent evt )
     {
         // TODO Auto-generated method stub
-        
+
     }
 
     public boolean isExposed()
@@ -523,7 +522,7 @@ public class DummyRepository implements Repository
     public void setExposed( boolean val )
     {
         // TODO Auto-generated method stub
-        
+
     }
 
     public List<RequestProcessor> getRequestProcessors()

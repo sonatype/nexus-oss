@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryGroupException;
 import org.sonatype.nexus.proxy.NoSuchResourceStoreException;
@@ -124,8 +123,7 @@ public abstract class GroupIdBasedRepositoryRouter
      * We are filtering the response from superclass by PathMapper.
      */
     protected List<ResourceStore> resolveResourceStoreByRequest( ResourceStoreRequest request )
-        throws NoSuchResourceStoreException,
-            ItemNotFoundException
+        throws NoSuchResourceStoreException
     {
         List<ResourceStore> result = super.resolveResourceStoreByRequest( request );
 
@@ -139,7 +137,9 @@ public abstract class GroupIdBasedRepositoryRouter
 
                 if ( resultWasNonempty && result.size() == 0 )
                 {
-                    throw new ItemNotFoundException( "The repository mapping excluded any processible repository." );
+                    getLogger().debug(
+                        "The repository mapping hit by request path='" + request.getRequestPath()
+                            + "' excluded any processible repository." );
                 }
             }
             catch ( NoSuchResourceStoreException e )
@@ -149,6 +149,7 @@ public abstract class GroupIdBasedRepositoryRouter
                         "Repository mapping of request " + request.getRequestPath()
                             + " contains a nonexistent repository!",
                         e );
+
                 throw e;
             }
 

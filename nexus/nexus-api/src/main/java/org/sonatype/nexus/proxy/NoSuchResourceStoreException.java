@@ -30,9 +30,18 @@ public abstract class NoSuchResourceStoreException
 {
     private static final long serialVersionUID = 299346983704055394L;
 
+    public NoSuchResourceStoreException( String msg )
+    {
+        super( msg );
+    }
+
+    public NoSuchResourceStoreException( String msg, Throwable t )
+    {
+        super( msg, t );
+    }
+
     public NoSuchResourceStoreException( String type, String id )
     {
         super( "ResourceStore of type " + type + " with id='" + id + "' not found!" );
     }
-
 }

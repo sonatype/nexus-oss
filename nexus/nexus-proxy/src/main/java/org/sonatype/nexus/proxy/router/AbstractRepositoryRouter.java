@@ -310,8 +310,7 @@ public abstract class AbstractRepositoryRouter
     }
 
     public void storeItem( ResourceStoreRequest request, InputStream is, Map<String, String> userAttributes )
-        throws ItemNotFoundException,
-            UnsupportedStorageOperationException,
+        throws UnsupportedStorageOperationException,
             NoSuchResourceStoreException,
             RepositoryNotAvailableException,
             StorageException,
@@ -327,8 +326,7 @@ public abstract class AbstractRepositoryRouter
     }
 
     public void createCollection( ResourceStoreRequest request, Map<String, String> userAttributes )
-        throws ItemNotFoundException,
-            UnsupportedStorageOperationException,
+        throws UnsupportedStorageOperationException,
             NoSuchResourceStoreException,
             RepositoryNotAvailableException,
             StorageException,
@@ -666,8 +664,7 @@ public abstract class AbstractRepositoryRouter
      */
     protected abstract void doStoreItem( ResourceStoreRequest request, InputStream is,
         Map<String, String> userAttributes )
-        throws ItemNotFoundException,
-            UnsupportedStorageOperationException,
+        throws UnsupportedStorageOperationException,
             NoSuchResourceStoreException,
             RepositoryNotAvailableException,
             StorageException,
@@ -686,8 +683,7 @@ public abstract class AbstractRepositoryRouter
      * @throws AccessDeniedException the access denied exception
      */
     protected void doCreateCollection( ResourceStoreRequest request, Map<String, String> userAttributes )
-        throws ItemNotFoundException,
-            UnsupportedStorageOperationException,
+        throws UnsupportedStorageOperationException,
             NoSuchResourceStoreException,
             RepositoryNotAvailableException,
             StorageException,
