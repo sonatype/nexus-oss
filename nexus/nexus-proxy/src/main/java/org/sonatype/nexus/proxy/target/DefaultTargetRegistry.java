@@ -1,8 +1,11 @@
 package org.sonatype.nexus.proxy.target;
 
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.codehaus.plexus.logging.AbstractLogEnabled;
+import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.repository.Repository;
 
 /**
@@ -49,6 +52,27 @@ public class DefaultTargetRegistry
         return false;
     }
 
+    public Set<Target> getTargetsForContentClassPath( ContentClass contentClass, String path )
+    {
+        Set<Target> result = new HashSet<Target>();
+
+        if ( getLogger().isDebugEnabled() )
+        {
+            getLogger().debug(
+                "Resolving targets for contentClass='" + contentClass.getId() + "' for path='" + path + "'" );
+        }
+
+        for ( Target t : targets.values() )
+        {
+            if ( t.isPathContained( contentClass, path ) )
+            {
+                result.add( t );
+            }
+        }
+
+        return result;
+    }
+
     public TargetSet getTargetsForRepositoryPath( Repository repository, String path )
     {
         TargetSet result = new TargetSet();
@@ -60,7 +84,7 @@ public class DefaultTargetRegistry
 
         for ( Target t : targets.values() )
         {
-            if ( t.isPathContained( repository, path ) )
+            if ( t.isPathContained( repository.getRepositoryContentClass(), path ) )
             {
                 result.addTargetMatch( new TargetMatch( t, repository ) );
             }

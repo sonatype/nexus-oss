@@ -29,7 +29,8 @@ public class TargetStoreWalkerFilter
 
     public boolean shouldProcess( StorageItem item )
     {
-        return target.isPathContained( item.getRepositoryItemUid().getRepository(), item.getPath() );
+        return target.isPathContained( item.getRepositoryItemUid().getRepository().getRepositoryContentClass(), item
+            .getPath() );
     }
 
     public boolean shouldProcessRecursively( StorageCollectionItem coll )
