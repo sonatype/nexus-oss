@@ -1298,17 +1298,24 @@ public abstract class AbstractRepository
         throws RepositoryNotAvailableException,
             AccessDeniedException
     {
-        if ( !getLocalStatus().shouldServiceRequest() )
+        return checkConditions( this, request, action );
+    }
+
+    protected boolean checkConditions( Repository repository, ResourceStoreRequest request, Action action )
+        throws RepositoryNotAvailableException,
+            AccessDeniedException
+    {
+        if ( !repository.getLocalStatus().shouldServiceRequest() )
         {
-            throw new RepositoryNotAvailableException( this.getId() );
+            throw new RepositoryNotAvailableException( repository.getId() );
         }
 
-        if ( !isAllowWrite() && ( action.isWritingAction() ) )
+        if ( !repository.isAllowWrite() && ( action.isWritingAction() ) )
         {
-            throw new AccessDeniedException( request, "Repository is READ ONLY!!" );
+            throw new AccessDeniedException( request, "Repository with ID='" + repository.getId() + "' is Read Only!!" );
         }
 
-        getAccessManager().decide( request, this, action );
+        getAccessManager().decide( request, repository, action );
 
         boolean result = true;
 
@@ -1316,7 +1323,7 @@ public abstract class AbstractRepository
         {
             for ( RequestProcessor processor : getRequestProcessors() )
             {
-                result = result && processor.process( this, request, action );
+                result = result && processor.process( repository, request, action );
             }
         }
 
