@@ -136,6 +136,8 @@ public class MinimalArtifactInfoIndexCreator
 
             ai.size = artifact.length();
 
+            ai.fextension = FileUtils.getExtension( artifact.getName() );
+
             if ( ai.packaging == null )
             {
                 if ( gav != null )
@@ -174,7 +176,7 @@ public class MinimalArtifactInfoIndexCreator
         {
             return;
         }
-        
+
         ZipFile jf = null;
 
         InputStream is = null;
@@ -217,13 +219,12 @@ public class MinimalArtifactInfoIndexCreator
     {
         ArtifactInfo ai = context.getArtifactContext().getArtifactInfo();
 
-        String info = new StringBuilder() //
-            .append( ai.packaging ).append( AbstractIndexCreator.FS ) //
-            .append( Long.toString( ai.lastModified ) ).append( AbstractIndexCreator.FS ) //
-            .append( Long.toString( ai.size ) ).append( AbstractIndexCreator.FS ) //
-            .append( ai.sourcesExists.toString() ).append( AbstractIndexCreator.FS ) //
-            .append( ai.javadocExists.toString() ).append( AbstractIndexCreator.FS ) //
-            .append( ai.signatureExists.toString() ).toString();
+        String info = new StringBuilder()
+            .append( ai.packaging ).append( AbstractIndexCreator.FS ).append( Long.toString( ai.lastModified ) )
+            .append( AbstractIndexCreator.FS ).append( Long.toString( ai.size ) ).append( AbstractIndexCreator.FS )
+            .append( ai.sourcesExists.toString() ).append( AbstractIndexCreator.FS ).append(
+                ai.javadocExists.toString() ).append( AbstractIndexCreator.FS ).append( ai.signatureExists.toString() )
+            .append( AbstractIndexCreator.FS ).append( ai.fextension ).toString();
 
         doc.add( new Field( ArtifactInfo.INFO, info, Field.Store.YES, Field.Index.NO ) );
 
@@ -309,6 +310,8 @@ public class MinimalArtifactInfoIndexCreator
             ai.javadocExists = ArtifactAvailablility.fromString( r[4] );
 
             ai.signatureExists = ArtifactAvailablility.fromString( r[5] );
+
+            ai.fextension = r[6];
 
             if ( "maven-plugin".equals( ai.packaging ) )
             {
@@ -505,9 +508,9 @@ public class MinimalArtifactInfoIndexCreator
 
     }
 
-    public String toString() 
+    public String toString()
     {
         return "min";
     }
-    
+
 }
