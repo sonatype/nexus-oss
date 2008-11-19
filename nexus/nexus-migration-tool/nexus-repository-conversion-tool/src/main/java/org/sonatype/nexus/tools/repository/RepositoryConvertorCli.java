@@ -38,11 +38,11 @@ import org.codehaus.plexus.tools.cli.AbstractCli;
 public class RepositoryConvertorCli
     extends AbstractCli
 {
-    
+
     public static final String GROUP_ID = "org.sonatype.nexus.tools";
-    
+
     public static final String ARTIFACT_ID = "nexus-repository-convertion-tool";
-    
+
     // ----------------------------------------------------------------------------
     // Options
     // ----------------------------------------------------------------------------
@@ -50,8 +50,8 @@ public class RepositoryConvertorCli
 
     public static final char OUTPUT = 'o';
 
-    public static final char TYPE = 't';
-    
+    public static final char MOVE = 'm';
+
     public static void main( String[] args )
         throws Exception
     {
@@ -66,10 +66,10 @@ public class RepositoryConvertorCli
             "The repository to be converted." ).create( REPO ) );
 
         options.addOption( OptionBuilder.withLongOpt( "output" ).hasArg().withDescription(
-            "where the converted repositoris locate." ).create( OUTPUT ) );
+            "Where the converted repositoris locate." ).create( OUTPUT ) );
 
-        options.addOption( OptionBuilder.withLongOpt( "type" ).hasArg().withDescription(
-            "Type of the convertion, copy or move." ).create( TYPE ) );
+        options.addOption( OptionBuilder.withLongOpt( "move" ).withDescription(
+            "Move the repository (old repository will be deleted )." ).create( MOVE ) );
 
         return options;
     }
@@ -78,13 +78,13 @@ public class RepositoryConvertorCli
     public void invokePlexusComponent( CommandLine cli, PlexusContainer container )
         throws Exception
     {
-        if ( cli.hasOption( HELP ))
+        if ( cli.hasOption( HELP ) )
         {
             displayHelp();
-            
+
             return;
         }
-        
+
         if ( cli.hasOption( REPO ) && cli.hasOption( OUTPUT ) )
         {
             convert( cli, container );
@@ -92,7 +92,7 @@ public class RepositoryConvertorCli
         else
         {
             showError( "Missing options -r or -o", null, false );
-            
+
             displayHelp();
         }
 
@@ -131,7 +131,7 @@ public class RepositoryConvertorCli
 
         try
         {
-            if ( cli.hasOption( TYPE ) && cli.getOptionValue( TYPE ).toLowerCase().equals( "move" ) )
+            if ( cli.hasOption( MOVE ) )
             {
                 repositoryConvertor.convertRepositoryWithMove( repository, output );
             }
@@ -144,10 +144,10 @@ public class RepositoryConvertorCli
         {
             showError( "Repository conversion failed!", ioe, true );
         }
-        
+
         System.out.println( "Repository conversion is successful!" );
     }
-    
+
     @Override
     public String getPomPropertiesPath()
     {
