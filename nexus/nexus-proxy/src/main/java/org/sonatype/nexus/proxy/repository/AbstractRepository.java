@@ -1315,7 +1315,10 @@ public abstract class AbstractRepository
             throw new AccessDeniedException( request, "Repository with ID='" + repository.getId() + "' is Read Only!!" );
         }
 
-        getAccessManager().decide( request, repository, action );
+        if ( isExposed() )
+        {
+            getAccessManager().decide( request, repository, action );
+        }
 
         boolean result = true;
 
