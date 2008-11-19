@@ -3,6 +3,7 @@ package org.sonatype.nexus.proxy.repository;
 import java.util.List;
 
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
+import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.registry.InvalidGroupingException;
 
 /**
@@ -16,6 +17,15 @@ import org.sonatype.nexus.proxy.registry.InvalidGroupingException;
 public interface GroupRepository
     extends Repository
 {
+    /**
+     * This is the "class" of the repository content. It is used in grouping, only same content reposes may be grouped.
+     * The group may have set contentClass before adding reposes, then it will only those reposes to be members that
+     * have the set contentClass. Otherwise, it will pick the contentClass of 1st repository added as member.
+     * 
+     * @return
+     */
+    void setRepositoryContentClass( ContentClass contentClass );
+
     /**
      * Returns the unmodifiable list of Repositories that are group members in this GroupRepository. The repo order
      * within list is repo rank (the order how they will be processed), so processing is possible by simply iterating

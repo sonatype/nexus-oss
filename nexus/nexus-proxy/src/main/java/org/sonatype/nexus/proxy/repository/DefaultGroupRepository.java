@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
@@ -23,100 +24,96 @@ import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.registry.InvalidGroupingException;
-import org.sonatype.nexus.proxy.registry.UnknownContentClass;
 
 public class DefaultGroupRepository
     extends DefaultRepository
     implements GroupRepository, EventListener
 {
-    private static final UnknownContentClass UNKNOWN_CONTENT_CLASS = new UnknownContentClass();
+    private final List<Repository> memberRepositories = new CopyOnWriteArrayList<Repository>();
 
-    private final List<Repository> memberRepositories = new ArrayList<Repository>();
-
-    private ContentClass contentClass = UNKNOWN_CONTENT_CLASS;
+    private ContentClass contentClass = null;
 
     public ContentClass getRepositoryContentClass()
     {
         return contentClass;
     }
 
+    public void setRepositoryContentClass( ContentClass contentClass )
+    {
+        this.contentClass = contentClass;
+    }
+
     public List<Repository> getMemberRepositories()
     {
-        return Collections.unmodifiableList( memberRepositories );
+        // RO + a copy is returned
+        return Collections.unmodifiableList( new ArrayList<Repository>( memberRepositories ) );
     }
 
     public void addMemberRepositories( List<Repository> repositories )
         throws InvalidGroupingException
     {
-        if ( contentClass != UNKNOWN_CONTENT_CLASS )
+        if ( repositories == null || repositories.size() == 0 )
         {
-            // test for compatibility of all of them at once if we already have members and thus, contentClass
+            // return silently, do not modify members
+            return;
+        }
+
+        if ( getMemberRepositories().size() != 0 )
+        {
+            // we are not empty
+            // test for compatibility of all of them at once if we already have members
             for ( Repository repository : repositories )
             {
-                if ( !contentClass.isCompatible( repository.getRepositoryContentClass() ) )
+                if ( !getRepositoryContentClass().isCompatible( repository.getRepositoryContentClass() ) )
                 {
-                    throw new InvalidGroupingException( contentClass, repository.getRepositoryContentClass() );
+                    throw new InvalidGroupingException( getRepositoryContentClass(), repository
+                        .getRepositoryContentClass() );
                 }
             }
         }
         else
         {
             // we are empty
-            // test that they all have compatible content classes
-            // note: the isCompatible() is commutative but not associative, so one way is enough to be checked
-            for ( int i = 0; i < repositories.size() - 1; i++ )
-            {
-                Repository r1 = repositories.get( i );
+            // simply get the contentClass of the 1st repository, and check for compatibility
+            ContentClass toBeClass = repositories.get( 0 ).getRepositoryContentClass();
 
-                for ( Repository r2 : repositories.subList( i, repositories.size() - 1 ) )
-                {
-                    if ( !r1.getRepositoryContentClass().isCompatible( r2.getRepositoryContentClass() ) )
-                    {
-                        throw new InvalidGroupingException( r1.getRepositoryContentClass(), r2
-                            .getRepositoryContentClass() );
-                    }
-                }
-            }
-        }
-
-        // add it as batch
-        if ( memberRepositories.size() == 0 )
-        {
-            // group was empty
-            // TODO: and how does this fit with the fact the ContentClass is not associative?
-            this.contentClass = repositories.get( 0 ).getRepositoryContentClass();
-
-            memberRepositories.addAll( repositories );
-        }
-        else
-        {
             for ( Repository repository : repositories )
             {
-                // add it to list only if not already added
-                if ( !memberRepositories.contains( repository ) )
+                if ( !toBeClass.isCompatible( repository.getRepositoryContentClass() ) )
                 {
-                    memberRepositories.add( repository );
+                    throw new InvalidGroupingException( contentClass, repository.getRepositoryContentClass() );
                 }
             }
 
-            // TODO: should we consider as error repeated addition to group?
+            setRepositoryContentClass( toBeClass );
         }
+
+        for ( Repository repository : repositories )
+        {
+            // add it to list only if not already added
+            if ( !memberRepositories.contains( repository ) )
+            {
+                memberRepositories.add( repository );
+            }
+        }
+
+        // TODO: should we consider as error repeated addition to group?
     }
 
     public void addMemberRepository( Repository repository )
         throws InvalidGroupingException
     {
-        if ( memberRepositories.size() == 0 )
+        if ( getRepositoryContentClass() == null )
         {
-            // group was empty
+            // group was empty, no contentClass is set
             this.contentClass = repository.getRepositoryContentClass();
 
             memberRepositories.add( repository );
         }
-        else if ( !contentClass.isCompatible( repository.getRepositoryContentClass() ) )
+        else if ( !getRepositoryContentClass().isCompatible( repository.getRepositoryContentClass() ) )
         {
             // invalid grouping, not compatible
-            throw new InvalidGroupingException( contentClass, repository.getRepositoryContentClass() );
+            throw new InvalidGroupingException( getRepositoryContentClass(), repository.getRepositoryContentClass() );
         }
         else
         {
@@ -141,7 +138,7 @@ public class DefaultGroupRepository
 
         if ( memberRepositories.size() == 0 )
         {
-            contentClass = UNKNOWN_CONTENT_CLASS;
+            contentClass = null;
         }
     }
 
