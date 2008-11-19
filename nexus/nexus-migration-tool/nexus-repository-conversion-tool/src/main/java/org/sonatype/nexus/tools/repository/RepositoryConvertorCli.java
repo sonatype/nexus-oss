@@ -128,11 +128,11 @@ public class RepositoryConvertorCli
         }
         catch ( IOException ioe )
         {
-            System.err.println( "Repository convertion failed!" );
+            System.err.println( "Repository conversion failed!" );
 
             ioe.printStackTrace();
         }
-        System.out.println( "Repository convertion is succeful!" );
+        System.out.println( "Repository conversion is successful!" );
     }
 
 }
