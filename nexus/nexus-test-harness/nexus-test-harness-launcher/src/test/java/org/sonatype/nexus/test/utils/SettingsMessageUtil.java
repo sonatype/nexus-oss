@@ -1,4 +1,4 @@
-package org.sonatype.nexus.integrationtests.nexus586;
+package org.sonatype.nexus.test.utils;
 
 import java.io.IOException;
 

@@ -478,7 +478,7 @@ public class AbstractNexusIntegrationTest
         new AbstractNexusIntegrationTest().stopNexus();
     }
 
-    private void setupContainer()
+    protected void setupContainer()
     {
         // ----------------------------------------------------------------------------
         // Context Setup

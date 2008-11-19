@@ -7,6 +7,7 @@ import org.restlet.data.Status;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.rest.model.GlobalConfigurationResource;
+import org.sonatype.nexus.test.utils.SettingsMessageUtil;
 
 
 /**
