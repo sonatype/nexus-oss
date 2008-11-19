@@ -28,6 +28,7 @@ import java.util.Map;
 import org.restlet.data.MediaType;
 import org.sonatype.nexus.feeds.FeedRecorder;
 import org.sonatype.nexus.feeds.SystemEvent;
+import org.sonatype.nexus.maven.tasks.RebuildMavenMetadataTask;
 import org.sonatype.nexus.maven.tasks.SnapshotRemoverTask;
 import org.sonatype.nexus.proxy.access.AccessManager;
 
@@ -136,10 +137,6 @@ public abstract class AbstractSystemFeedSource
             {
                 entry.setTitle( "Rebuilding attributes" );
             }
-            else if ( FeedRecorder.SYSTEM_REBUILD_MAVEN_METADATA_ACTION.equals( item.getAction() ) )
-            {
-            	entry.setTitle( "Rebuilding maven metadata files" );
-            }
             else if ( FeedRecorder.SYSTEM_REPO_LSTATUS_CHANGES_ACTION.equals( item.getAction() ) )
             {
                 entry.setTitle( "Repository local status change" );
@@ -175,6 +172,10 @@ public abstract class AbstractSystemFeedSource
             else if ( FeedRecorder.SYSTEM_SYNC_SHADOW_ACTION.equals( item.getAction() ) )
             {
                 entry.setTitle( "Synchronizing Shadow Repository" );
+            }
+            else if ( RebuildMavenMetadataTask.REBUILD_MAVEN_METADATA_ACTION.equals( item.getAction() ) )
+            {
+                entry.setTitle( "Rebuilding maven metadata files" );
             }
             else
             {
