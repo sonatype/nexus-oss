@@ -38,6 +38,11 @@ import org.codehaus.plexus.tools.cli.AbstractCli;
 public class RepositoryConvertorCli
     extends AbstractCli
 {
+    
+    public static final String GROUP_ID = "org.sonatype.nexus.tools";
+    
+    public static final String ARTIFACT_ID = "nexus-repository-convertion-tool";
+    
     // ----------------------------------------------------------------------------
     // Options
     // ----------------------------------------------------------------------------
@@ -141,6 +146,12 @@ public class RepositoryConvertorCli
         }
         
         System.out.println( "Repository conversion is successful!" );
+    }
+    
+    @Override
+    public String getPomPropertiesPath()
+    {
+        return "META-INF/maven/" + GROUP_ID + "/" + ARTIFACT_ID + "/pom.properties";
     }
 
 }
