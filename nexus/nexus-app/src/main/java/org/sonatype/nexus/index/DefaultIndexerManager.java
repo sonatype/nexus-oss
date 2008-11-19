@@ -124,20 +124,20 @@ public class DefaultIndexerManager
 
     @Requirement
     private IndexUpdater indexUpdater;
-    
+
     @Requirement
     private IndexPacker indexPacker;
 
-     @Requirement
+    @Requirement
     private NexusConfiguration nexusConfiguration;
 
-     @Requirement
+    @Requirement
     private RepositoryRegistry repositoryRegistry;
 
-     @Requirement
+    @Requirement
     private NexusScheduler nexusScheduler;
 
-     @Requirement( role = RootRepositoryRouter.class )
+    @Requirement( role = RootRepositoryRouter.class )
     private ResourceStoreIdBasedRepositoryRouter rootRouter;
 
     private File workingDirectory;
@@ -300,6 +300,32 @@ public class DefaultIndexerManager
         IndexingContext ctx = nexusIndexer.getIndexingContexts().get( getRemoteContextId( repository.getId() ) );
 
         return ctx;
+    }
+
+    public IndexingContext getRepositoryBestIndexContext( String repositoryId )
+        throws NoSuchRepositoryException
+    {
+        IndexingContext bestContext = getRepositoryLocalIndexContext( repositoryId );
+
+        IndexingContext remoteContext = getRepositoryRemoteIndexContext( repositoryId );
+
+        if ( remoteContext != null )
+        {
+            try
+            {
+                // if remote is here and is downloaded, it is the best (it is always the superset of local cache)
+                if ( bestContext.getIndexReader().numDocs() < remoteContext.getIndexReader().numDocs() )
+                {
+                    bestContext = remoteContext;
+                }
+            }
+            catch ( IOException e )
+            {
+                // silent
+            }
+        }
+
+        return bestContext;
     }
 
     public void addRepositoryGroupIndexContext( String repositoryGroupId )
@@ -501,9 +527,9 @@ public class DefaultIndexerManager
 
             // publish index update
             IndexingContext context = nexusIndexer.getIndexingContexts().get( getLocalContextId( repository.getId() ) );
-            
+
             File targetDir = null;
-            
+
             try
             {
                 targetDir = new File( getTempDirectory(), "nx-index" + System.currentTimeMillis() );
@@ -511,8 +537,8 @@ public class DefaultIndexerManager
                 if ( !targetDir.mkdirs() )
                 {
                     getLogger().error( "Could not create temp dir for packing indexes: " + targetDir );
-                } 
-                else 
+                }
+                else
                 {
                     indexPacker.packIndex( context, targetDir );
 
@@ -523,9 +549,9 @@ public class DefaultIndexerManager
                         for ( File file : files )
                         {
                             String path = "/.index/" + file.getName();
-                            
+
                             FileInputStream fis = null;
-                          
+
                             try
                             {
                                 fis = new FileInputStream( file );
@@ -574,35 +600,34 @@ public class DefaultIndexerManager
         }
     }
 
-    private boolean updateIndexForRemoteRepository( Repository repository ) 
-        throws IOException 
+    private boolean updateIndexForRemoteRepository( Repository repository )
+        throws IOException
     {
         boolean shouldDownloadRemoteIndex = false;
-        
+
         try
         {
             CRepository repoModel = nexusConfiguration.readRepository( repository.getId() );
-  
+
             shouldDownloadRemoteIndex = repoModel.isDownloadRemoteIndexes();
         }
         catch ( NoSuchRepositoryException e )
         {
             // TODO: heee?
         }
-  
+
         boolean hasRemoteIndex = false;
-        
+
         if ( shouldDownloadRemoteIndex )
         {
             try
             {
                 getLogger().info( "Trying to get remote index for repository " + repository.getId() );
-  
+
                 updateRemoteIndex( repository );
 
-                getLogger().info(
-                    "Remote indexes updated successfully for repository " + repository.getId() );
-  
+                getLogger().info( "Remote indexes updated successfully for repository " + repository.getId() );
+
                 hasRemoteIndex = true;
             }
             catch ( Exception e )
@@ -613,104 +638,105 @@ public class DefaultIndexerManager
         else
         {
             // make empty the remote context
-            IndexingContext context = nexusIndexer.getIndexingContexts().get(
-                getRemoteContextId( repository.getId() ) );
-  
+            IndexingContext context = nexusIndexer.getIndexingContexts().get( getRemoteContextId( repository.getId() ) );
+
             context.purge();
-            
+
             // XXX remove obsolete files, should remove all index fragments
             // deleteItem( repository, ctx, zipUid );
             // deleteItem( repository, ctx, chunkUid ) ;
         }
-        
+
         return hasRemoteIndex;
     }
 
-    private boolean updateRemoteIndex( Repository repository ) 
-        throws IOException, RepositoryNotAvailableException, ItemNotFoundException 
+    private boolean updateRemoteIndex( Repository repository )
+        throws IOException,
+            RepositoryNotAvailableException,
+            ItemNotFoundException
     {
         // this will force redownload
         // XXX should only force downloading of the .properties file
         repository.clearCaches( "/.index" );
-      
+
         Map<String, IndexingContext> indexingContexts = nexusIndexer.getIndexingContexts();
-        
+
         IndexingContext context = indexingContexts.get( getRemoteContextId( repository.getId() ) );
-  
+
         Date contextTimestamp = context.getTimestamp();
-  
+
         RepositoryItemUid propsUid = repository.createUid( //
             "/.index/" + IndexingContext.INDEX_FILE + ".properties" );
 
         Map<String, Object> ctx = new HashMap<String, Object>();
-        
-        StorageFileItem propItem = retrieveItem(repository, ctx, propsUid);
-        
+
+        StorageFileItem propItem = retrieveItem( repository, ctx, propsUid );
+
         File tmpdir = null;
-        
+
         FSDirectory directory = null;
-        
-        try 
+
+        try
         {
             if ( contextTimestamp != null )
             {
-                Properties properties = loadProperties(propItem);
-              
+                Properties properties = loadProperties( propItem );
+
                 Date updateTimestamp = indexUpdater.getTimestamp( properties, IndexingContext.INDEX_TIMESTAMP );
-   
-                if ( updateTimestamp != null && 
-                    ( updateTimestamp.before( contextTimestamp ) || updateTimestamp.equals( contextTimestamp ) ) )
+
+                if ( updateTimestamp != null
+                    && ( updateTimestamp.before( contextTimestamp ) || updateTimestamp.equals( contextTimestamp ) ) )
                 {
-                    return true;  // index is up to date
+                    return true; // index is up to date
                 }
-                
+
                 String chunkName = indexUpdater.getUpdateChunkName( contextTimestamp, properties );
-                
-                if( chunkName != null )
+
+                if ( chunkName != null )
                 {
                     // download update index chunk
                     RepositoryItemUid zipUid = repository.createUid( "/.index/" + chunkName );
 
                     StorageFileItem chunkItem = retrieveItem( repository, ctx, zipUid );
-                    
+
                     tmpdir = createTmpDir();
-                    
+
                     directory = unpackIndex( chunkItem, repository, tmpdir );
-  
+
                     context.merge( directory );
-                    
+
                     return true;
                 }
             }
-   
+
             // download full index
             RepositoryItemUid zipUid = //
-                repository.createUid( "/.index/" + IndexingContext.INDEX_FILE + ".zip" );
-            
+            repository.createUid( "/.index/" + IndexingContext.INDEX_FILE + ".zip" );
+
             StorageFileItem zipItem = retrieveItem( repository, ctx, zipUid );
-            
+
             tmpdir = createTmpDir();
-            
+
             directory = unpackIndex( zipItem, repository, tmpdir );
-            
+
             context.replace( directory );
-            
+
             return true;
-        } 
+        }
         finally
         {
             if ( directory != null )
             {
                 directory.close();
             }
-            
+
             if ( tmpdir != null )
             {
-                try 
+                try
                 {
                     FileUtils.deleteDirectory( tmpdir );
                 }
-                catch ( IOException ex ) 
+                catch ( IOException ex )
                 {
                     // ignore
                 }
@@ -719,17 +745,17 @@ public class DefaultIndexerManager
     }
 
     private Properties loadProperties( StorageFileItem item )
-        throws IOException 
+        throws IOException
     {
         InputStream is = null;
         try
         {
             is = item.getInputStream();
-          
+
             Properties properties = new Properties();
-            
+
             properties.load( is );
-            
+
             return properties;
         }
         finally
@@ -738,66 +764,66 @@ public class DefaultIndexerManager
         }
     }
 
-    private StorageFileItem retrieveItem( Repository repository,
-        Map<String, Object> ctx, RepositoryItemUid uid ) 
-        throws StorageException, RepositoryNotAvailableException, ItemNotFoundException 
+    private StorageFileItem retrieveItem( Repository repository, Map<String, Object> ctx, RepositoryItemUid uid )
+        throws StorageException,
+            RepositoryNotAvailableException,
+            ItemNotFoundException
     {
-        try 
+        try
         {
             return (StorageFileItem) repository.retrieveItem( false, uid, ctx );
-        } 
+        }
         catch ( StorageException ex )
         {
             deleteItem( repository, ctx, uid );
-            
+
             throw ex;
         }
         catch ( ItemNotFoundException ex )
         {
             deleteItem( repository, ctx, uid );
-            
+
             throw ex;
         }
         catch ( RepositoryNotAvailableException ex )
         {
             deleteItem( repository, ctx, uid );
-            
+
             throw ex;
         }
     }
 
-    private File createTmpDir() 
+    private File createTmpDir()
     {
         File tmpdir = new File( getTempDirectory(), "nx-remote-index" + System.currentTimeMillis() );
-        
+
         tmpdir.mkdirs();
-        
+
         return tmpdir;
     }
 
-    private FSDirectory unpackIndex( StorageFileItem item, Repository repository, File tmpdir ) 
-        throws IOException 
+    private FSDirectory unpackIndex( StorageFileItem item, Repository repository, File tmpdir )
+        throws IOException
     {
         FSDirectory directory = FSDirectory.getDirectory( tmpdir );
-  
+
         BufferedInputStream is = new BufferedInputStream( item.getInputStream(), 4096 );
-  
+
         IndexUtils.unpackIndexArchive( is, directory );
-  
+
         if ( repository instanceof MavenRepository )
         {
             getLogger().info( "Filtering downloaded index..." );
-  
+
             MavenRepository mrepository = (MavenRepository) repository;
-  
+
             IndexUtils.filterDirectory( directory, mrepository.getRepositoryPolicy().getFilter() );
         }
-        
+
         return directory;
     }
 
-    private void deleteItem( Repository repository, Map<String, Object> ctx,
-        RepositoryItemUid uid) 
+    private void deleteItem( Repository repository, Map<String, Object> ctx, RepositoryItemUid uid )
     {
         if ( uid != null )
         {
@@ -834,28 +860,23 @@ public class DefaultIndexerManager
             if ( !RepositoryType.SHADOW.equals( repo.getRepositoryType() ) && repo.isIndexable() )
             {
                 // local idx has every repo
-                bestContext = nexusIndexer.getIndexingContexts().get( getLocalContextId( repo.getId() ) );
-
-                if ( nexusIndexer.getIndexingContexts().containsKey( getRemoteContextId( repo.getId() ) ) )
+                try
                 {
-                    // if remote is here and is downloaded, it is the best
-                    if ( bestContext.getIndexReader().numDocs() < nexusIndexer.getIndexingContexts().get(
-                        getRemoteContextId( repo.getId() ) ).getIndexReader().numDocs() )
-                    {
-                        bestContext = nexusIndexer.getIndexingContexts().get( getRemoteContextId( repo.getId() ) );
-                    }
+                    bestContext = getRepositoryBestIndexContext( repo.getId() );
+                }
+                catch ( NoSuchRepositoryException e )
+                {
+                    // not to happen, we are iterating over them
                 }
 
-                if ( bestContext != null )
+                if ( getLogger().isDebugEnabled() )
                 {
-                    if ( getLogger().isDebugEnabled() )
-                    {
-                        getLogger().debug(
-                            " ...found best context " + bestContext.getId() + " for repository "
-                                + bestContext.getRepositoryId() + ", merging it..." );
-                    }
-                    context.merge( bestContext.getIndexDirectory() );
+                    getLogger().debug(
+                        " ...found best context " + bestContext.getId() + " for repository "
+                            + bestContext.getRepositoryId() + ", merging it..." );
                 }
+
+                context.merge( bestContext.getIndexDirectory() );
             }
         }
 
@@ -864,7 +885,7 @@ public class DefaultIndexerManager
             getLogger().debug( "Rebuilding groups in merged index for repository group " + repositoryGroupId );
         }
 
-        // rebuild group info 
+        // rebuild group info
         nexusIndexer.rebuildGroups( context );
 
         // committing changes
