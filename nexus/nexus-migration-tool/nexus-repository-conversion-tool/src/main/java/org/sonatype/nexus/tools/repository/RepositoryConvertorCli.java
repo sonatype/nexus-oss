@@ -46,7 +46,7 @@ public class RepositoryConvertorCli
     public static final char OUTPUT = 'o';
 
     public static final char TYPE = 't';
-
+    
     public static void main( String[] args )
         throws Exception
     {
@@ -58,10 +58,10 @@ public class RepositoryConvertorCli
     public Options buildCliOptions( Options options )
     {
         options.addOption( OptionBuilder.withLongOpt( "repository" ).hasArg().withDescription(
-            "The repository to be converted." ).isRequired().create( REPO ) );
+            "The repository to be converted." ).create( REPO ) );
 
         options.addOption( OptionBuilder.withLongOpt( "output" ).hasArg().withDescription(
-            "where the converted repositoris locate." ).isRequired().create( OUTPUT ) );
+            "where the converted repositoris locate." ).create( OUTPUT ) );
 
         options.addOption( OptionBuilder.withLongOpt( "type" ).hasArg().withDescription(
             "Type of the convertion, copy or move." ).create( TYPE ) );
@@ -73,12 +73,21 @@ public class RepositoryConvertorCli
     public void invokePlexusComponent( CommandLine cli, PlexusContainer container )
         throws Exception
     {
+        if ( cli.hasOption( HELP ))
+        {
+            displayHelp();
+            
+            return;
+        }
+        
         if ( cli.hasOption( REPO ) && cli.hasOption( OUTPUT ) )
         {
             convert( cli, container );
         }
         else
         {
+            showError( "Missing options -r or -o", null, false );
+            
             displayHelp();
         }
 
@@ -128,10 +137,9 @@ public class RepositoryConvertorCli
         }
         catch ( IOException ioe )
         {
-            System.err.println( "Repository conversion failed!" );
-
-            ioe.printStackTrace();
+            showError( "Repository conversion failed!", ioe, true );
         }
+        
         System.out.println( "Repository conversion is successful!" );
     }
 
