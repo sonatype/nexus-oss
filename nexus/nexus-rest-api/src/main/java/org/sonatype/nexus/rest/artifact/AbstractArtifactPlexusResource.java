@@ -171,7 +171,7 @@ public abstract class AbstractArtifactPlexusResource
         {
             handleException( request, e );
         }
-        
+
         return null;
     }
 
@@ -360,17 +360,28 @@ public abstract class AbstractArtifactPlexusResource
                         // this is ugly: since GAVRequest does not allow contructing
                         // without GAV, i am filling it with dummy values, and pomManager
                         // will set those to proper values
-                        gavRequest = pomManager.getGAVRequestFromTempPomFile( getResourceStoreRequest(
-                            request,
-                            true,
-                            repositoryId,
-                            null,
-                            "G",
-                            "A",
-                            "V",
-                            "P",
-                            null,
-                            null ) );
+                        try
+                        {
+                            gavRequest = pomManager.getGAVRequestFromTempPomFile( getResourceStoreRequest(
+                                request,
+                                true,
+                                repositoryId,
+                                null,
+                                "G",
+                                "A",
+                                "V",
+                                "P",
+                                null,
+                                null ) );
+                        }
+                        catch ( IOException e )
+                        {
+                            getLogger().info( e.getMessage() );
+
+                            throw new ResourceException(
+                                Status.CLIENT_ERROR_BAD_REQUEST,
+                                "Error occurred while reading the POM file. Malformed POM?" );
+                        }
 
                         if ( !isPom )
                         {
