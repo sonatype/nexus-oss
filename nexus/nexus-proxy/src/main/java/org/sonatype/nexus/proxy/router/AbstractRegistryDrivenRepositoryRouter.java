@@ -190,7 +190,10 @@ public abstract class AbstractRegistryDrivenRepositoryRouter
                 }
                 catch ( RepositoryNotAvailableException ex )
                 {
-                    getLogger().info( ex.getMessage() );
+                    if ( getLogger().isDebugEnabled() )
+                    {
+                        getLogger().debug( ex.getMessage() );
+                    }
                 }
                 catch ( ItemNotFoundException ex )
                 {
