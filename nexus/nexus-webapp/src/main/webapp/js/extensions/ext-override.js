@@ -472,6 +472,17 @@ Ext.override( Ext.form.Field, {
   }
 });
 
+Ext.override( Ext.form.TextField, {
+  onEnable : function(){
+    this.getActionEl().removeClass(this.disabledClass);
+    this.el.dom.readOnly = false;
+  },
+  onDisable : function(){
+    this.getActionEl().addClass(this.disabledClass);
+    this.el.dom.readOnly = true;
+  }
+});
+
 Ext.override( Ext.grid.GridView, {
   initTemplates : function() {
     var ts = this.templates || {};
