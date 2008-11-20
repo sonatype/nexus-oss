@@ -75,6 +75,7 @@ import org.sonatype.nexus.integrationtests.nexus950.Nexus950CorruptPomTest;
 import org.sonatype.nexus.integrationtests.nexus969.Nexus969CacheEvictInteractionTest;
 import org.sonatype.nexus.integrationtests.nexus970.Nexus970DeleteRepositoryTest;
 import org.sonatype.nexus.integrationtests.nexus980.Nexus980ReindexVirtualReposTest;
+import org.sonatype.nexus.integrationtests.proxy.nexus1111.Nexus1111ProxyRemote500ErrorTest;
 import org.sonatype.nexus.integrationtests.proxy.nexus177.Nexus177OutOfServiceTest;
 import org.sonatype.nexus.integrationtests.proxy.nexus178.Nexus178BlockProxyDownloadTest;
 import org.sonatype.nexus.integrationtests.proxy.nexus179.Nexus179RemoteRepoDownTest;
@@ -173,7 +174,8 @@ import org.sonatype.nexus.integrationtests.webproxy.nexus1116.Nexus1116InvalidPr
     Nexus1071AnonAccessTest.class,
     Nexus1101NexusOverWebproxyTest.class,
     Nexus1113WebProxyWithAuthenticationTest.class,
-    Nexus1116InvalidProxyTest.class
+    Nexus1116InvalidProxyTest.class,
+    Nexus1111ProxyRemote500ErrorTest.class
 } )
 public class IntegrationTestSuiteClasses
 {
