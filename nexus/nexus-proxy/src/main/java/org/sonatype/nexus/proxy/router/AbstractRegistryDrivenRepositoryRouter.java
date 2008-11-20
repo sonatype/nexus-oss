@@ -240,11 +240,15 @@ public abstract class AbstractRegistryDrivenRepositoryRouter
         }
         else
         {
-            if ( stores != null && stores.size() > 0 && stores.size() == accessDeniedCount )
+            if ( accessDeniedCount > 1 )
             {
-                getLogger().debug( "Banned from all searched repositories, throwing AccessDeniedException." );
+                if ( getLogger().isDebugEnabled() )
+                {
+                    getLogger()
+                        .debug( "Banned from some/all of searched repositories, throwing AccessDeniedException." );
+                }
 
-                throw new AccessDeniedException( req, "Access denied from all member repositories!" );
+                throw new AccessDeniedException( req, "Access denied from all/some of the member repositories!" );
             }
             else
             {
