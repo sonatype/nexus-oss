@@ -818,6 +818,7 @@ public abstract class AbstractMavenRepository
                 getLogger().debug(
                     "The serving of item " + uid.toString() + " is forbidden by Maven repository policy." );
             }
+            
             throw new ItemNotFoundException( uid );
         }
     }
@@ -834,8 +835,12 @@ public abstract class AbstractMavenRepository
         }
         else
         {
-            throw new UnsupportedStorageOperationException( "Storing of item " + item.getRepositoryItemUid().toString()
-                + " is forbidden by Repository policy." );
+            String msg = "Storing of item " + item.getRepositoryItemUid().toString()
+                + " is forbidden by Maven Repository policy.";
+
+            getLogger().info( msg );
+
+            throw new UnsupportedStorageOperationException( msg );
         }
     }
 
