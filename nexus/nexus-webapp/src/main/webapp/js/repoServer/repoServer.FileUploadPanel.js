@@ -188,7 +188,7 @@ Sonatype.repoServer.FileUploadPanel = function(config){
               store: packagingStore,
               displayField: 'value',
               editable: true,
-              forceSelection: true,
+              forceSelection: false,
               mode: 'local',
               triggerAction: 'all',
               emptyText: 'Select...',
