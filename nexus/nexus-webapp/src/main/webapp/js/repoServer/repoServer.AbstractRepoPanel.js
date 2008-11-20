@@ -40,7 +40,7 @@ Sonatype.repoServer.AbstractRepoPanel = function(config){
   
   this.repoActions = {
     clearCache: {
-      text: 'Clear Cache',
+      text: 'Expire Cache',
       handler: this.clearCacheHandler
     },
     reIndex: {
