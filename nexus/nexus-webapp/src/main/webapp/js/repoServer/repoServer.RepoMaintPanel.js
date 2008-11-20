@@ -530,11 +530,6 @@ Ext.extend(Sonatype.repoServer.RepoMaintPanel, Sonatype.repoServer.AbstractRepoP
   onBrowseContextClickHandler : function(node, e){
     this.onBrowseContextHideHandler();
     
-    if ( this.browseTypeButton.value == 'nexus' )
-    {
-        return;
-    }
-    
     var isProxyRepo = (node.getOwnerTree().root.attributes.repoType == 'proxy');
     var isGroup = (node.getOwnerTree().root.attributes.repoType == 'group');
     
@@ -559,7 +554,7 @@ Ext.extend(Sonatype.repoServer.RepoMaintPanel, Sonatype.repoServer.AbstractRepoP
       menu.add(this.actions.download);
     }
     
-    if (this.browseTypeButton.value == 'user' && !node.isRoot && !isGroup){
+    if (!node.isRoot && !isGroup){
       if ( ! this.browseIndex ) {
         menu.add(this.actions.deleteRepoItem);
       }
@@ -1052,19 +1047,21 @@ Ext.extend(Sonatype.repoServer.RepoMaintPanel, Sonatype.repoServer.AbstractRepoP
   onRepositoryContentMenuInit: function( menu, repoRecord, contentRecord ) {
     var isVirtual = repoRecord.get( 'repoType' ) == 'virtual';
 
-    if ( this.sp.checkPermission(
-          'nexus:cache', this.sp.DELETE ) &&
-        ! isVirtual ){
-      menu.add( this.repoActions.clearCache );
-    }
-    if ( this.sp.checkPermission(
-          'nexus:index', this.sp.DELETE ) &&
-        ! isVirtual ) {
-      menu.add( this.repoActions.reIndex );
-    }
-    if ( this.sp.checkPermission(
-          'nexus:attributes', this.sp.DELETE ) ){
-      menu.add( this.repoActions.rebuildAttributes );
+    if ( this.browseTypeButton.value != 'nexus' ){
+      if ( this.sp.checkPermission(
+            'nexus:cache', this.sp.DELETE ) &&
+          ! isVirtual ){
+        menu.add( this.repoActions.clearCache );
+      }
+      if ( this.sp.checkPermission(
+            'nexus:index', this.sp.DELETE ) &&
+          ! isVirtual ) {
+        menu.add( this.repoActions.reIndex );
+      }
+      if ( this.sp.checkPermission(
+            'nexus:attributes', this.sp.DELETE ) ){
+        menu.add( this.repoActions.rebuildAttributes );
+      }
     }
   },
   
