@@ -35,13 +35,15 @@ Sonatype.repoServer.UserEditPanel = function(config){
     var s = '';
     if ( val ) {
       for ( var i = 0; i < val.length; i++ ) {
-        var rec = this.roleDataStore.getAt( this.roleDataStore.find( 'id', val[i] ) );
+        var roleName = val[i];
+        var rec = this.roleDataStore.getAt( this.roleDataStore.find( 'id', roleName ) );
         if ( rec ) {
-          if ( s ) {
-            s += ', ';
-          }
-          s += rec.get( 'name' );
+          roleName = rec.get( 'name' );
         }
+        if ( s ) {
+          s += ', ';
+        }
+        s += roleName;
       }
     }
 
