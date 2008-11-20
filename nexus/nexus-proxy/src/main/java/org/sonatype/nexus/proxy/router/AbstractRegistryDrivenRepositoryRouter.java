@@ -130,7 +130,7 @@ public abstract class AbstractRegistryDrivenRepositoryRouter
 
         List<ResourceStore> stores = resolveResourceStoreByRequest( req );
 
-        AccessDeniedException lastAccessDenial = null;
+        int accessDeniedCount = 0;
 
         if ( stores == null )
         {
@@ -206,7 +206,7 @@ public abstract class AbstractRegistryDrivenRepositoryRouter
                 catch ( AccessDeniedException ex )
                 {
                     // silent, we are searching but remember it for later
-                    lastAccessDenial = ex;
+                    accessDeniedCount++;
 
                     if ( getLogger().isDebugEnabled() )
                     {
@@ -240,22 +240,15 @@ public abstract class AbstractRegistryDrivenRepositoryRouter
         }
         else
         {
-            if ( lastAccessDenial != null )
+            if ( stores != null && stores.size() > 0 && stores.size() == accessDeniedCount )
             {
                 getLogger().debug( "Banned from all searched repositories, throwing AccessDeniedException." );
 
-                throw lastAccessDenial;
+                throw new AccessDeniedException( req, "Access denied from all member repositories!" );
             }
             else
             {
-                // if ( stores != null && stores.size() == 0 )
-                // {
-                // return new DefaultStorageCollectionItem( this, req.getRequestPath(), true, true );
-                // }
-                // else
-                // {
                 throw new ItemNotFoundException( req.getRequestPath() );
-                // }
             }
         }
     }

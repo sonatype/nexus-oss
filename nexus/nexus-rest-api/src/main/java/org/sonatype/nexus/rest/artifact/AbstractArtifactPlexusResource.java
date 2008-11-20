@@ -5,6 +5,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.commons.fileupload.FileItem;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
@@ -22,8 +24,10 @@ import org.restlet.resource.Variant;
 import org.sonatype.nexus.artifact.VersionUtils;
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
+import org.sonatype.nexus.proxy.NoSuchRepositoryRouterException;
 import org.sonatype.nexus.proxy.NoSuchResourceStoreException;
 import org.sonatype.nexus.proxy.RepositoryNotAvailableException;
+import org.sonatype.nexus.proxy.RepositoryNotListableException;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.access.AccessManager;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
@@ -32,8 +36,12 @@ import org.sonatype.nexus.proxy.maven.ArtifactStoreRequest;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
 import org.sonatype.nexus.rest.StorageFileItemRepresentation;
+import org.sonatype.nexus.security.filter.NexusJSecurityFilter;
+
+import com.noelios.restlet.ext.servlet.ServletCall;
 
 public abstract class AbstractArtifactPlexusResource
     extends AbstractNexusPlexusResource
@@ -159,40 +167,12 @@ public abstract class AbstractArtifactPlexusResource
             return pom;
 
         }
-        catch ( StorageException e )
+        catch ( Exception e )
         {
-            getLogger().warn( "StorageException during retrieve:", e );
-
-            throw new ResourceException( Status.SERVER_ERROR_INTERNAL );
+            handleException( request, e );
         }
-        catch ( NoSuchResourceStoreException e )
-        {
-            throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, "No repository with id=" + repositoryId );
-        }
-        catch ( RepositoryNotAvailableException e )
-        {
-            throw new ResourceException( Status.SERVER_ERROR_SERVICE_UNAVAILABLE );
-        }
-        catch ( ItemNotFoundException e )
-        {
-            throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, "Artifact not found." );
-        }
-        catch ( AccessDeniedException e )
-        {
-            throw new ResourceException( Status.CLIENT_ERROR_FORBIDDEN );
-        }
-        catch ( XmlPullParserException e )
-        {
-            getLogger().warn( "XmlPullParserException during retrieve of POM:", e );
-
-            throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Error occurred while reading the POM file." );
-        }
-        catch ( IOException e )
-        {
-            getLogger().warn( "IOException during retrieve of POM:", e );
-
-            throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Error occurred while reading the POM file." );
-        }
+        
+        return null;
     }
 
     protected Object getContent( Variant variant, boolean redirectTo, Request request, Response response )
@@ -278,34 +258,12 @@ public abstract class AbstractArtifactPlexusResource
             }
 
         }
-        catch ( StorageException e )
+        catch ( Exception e )
         {
-            getLogger().warn( "StorageException during retrieve:", e );
+            handleException( request, e );
+        }
 
-            throw new ResourceException( Status.SERVER_ERROR_INTERNAL );
-        }
-        catch ( NoSuchResourceStoreException e )
-        {
-            throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, "No repository with id=" + repositoryId );
-        }
-        catch ( RepositoryNotAvailableException e )
-        {
-            throw new ResourceException( Status.SERVER_ERROR_SERVICE_UNAVAILABLE );
-        }
-        catch ( ItemNotFoundException e )
-        {
-            throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, "Artifact not found." );
-        }
-        catch ( AccessDeniedException e )
-        {
-            throw new ResourceException( Status.CLIENT_ERROR_FORBIDDEN );
-        }
-        catch ( IOException e )
-        {
-            getLogger().warn( "IOException during retrieve of POM:", e );
-
-            throw new ResourceException( Status.SERVER_ERROR_INTERNAL );
-        }
+        return null;
     }
 
     @Override
@@ -516,44 +474,83 @@ public abstract class AbstractArtifactPlexusResource
                 pomManager.removeTempPomFile();
             }
         }
-        catch ( StorageException e )
-        {
-            getLogger().warn( "StorageException during retrieve:", e );
-
-            throw new ResourceException( Status.SERVER_ERROR_INTERNAL );
-        }
-        catch ( NoSuchResourceStoreException e )
-        {
-            throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, "No repository with id=" + "" );
-        }
-        catch ( RepositoryNotAvailableException e )
-        {
-            throw new ResourceException( Status.SERVER_ERROR_SERVICE_UNAVAILABLE );
-        }
-        catch ( AccessDeniedException e )
-        {
-            throw new ResourceException( Status.CLIENT_ERROR_FORBIDDEN );
-        }
-        catch ( XmlPullParserException e )
-        {
-            getLogger().warn( "XmlPullParserException during retrieve of POM:", e );
-
-            throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Error occurred while reading the POM file." );
-        }
-        catch ( IOException e )
-        {
-            getLogger().warn( "IOException during retrieve of POM:", e );
-
-            throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Error occurred while reading the POM file." );
-        }
         catch ( Exception e )
         {
-            getLogger().warn( "Exception during upload:", e );
-
-            throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST );
+            handleException( request, e );
         }
-        
+
         return null;
+    }
+
+    protected int handleException( Request request, Exception t )
+        throws ResourceException
+    {
+        if ( t instanceof ResourceException )
+        {
+            throw (ResourceException) t;
+        }
+        else if ( t instanceof IllegalArgumentException )
+        {
+            getLogger().info( "ResourceStoreContentResource, illegal argument:" + t.getMessage() );
+
+            throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, t.getMessage() );
+        }
+        else if ( t instanceof StorageException )
+        {
+            getLogger().warn( "IO problem!", t );
+
+            throw new ResourceException( Status.SERVER_ERROR_INTERNAL, t.getMessage() );
+        }
+        else if ( t instanceof UnsupportedStorageOperationException )
+        {
+            throw new ResourceException( Status.CLIENT_ERROR_FORBIDDEN, t.getMessage() );
+        }
+        else if ( t instanceof NoSuchResourceStoreException )
+        {
+            throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, t.getMessage() );
+        }
+        else if ( t instanceof NoSuchRepositoryRouterException )
+        {
+            throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, t.getMessage() );
+        }
+        else if ( t instanceof RepositoryNotAvailableException )
+        {
+            throw new ResourceException( Status.SERVER_ERROR_SERVICE_UNAVAILABLE, t.getMessage() );
+        }
+        else if ( t instanceof RepositoryNotListableException )
+        {
+            throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, t.getMessage() );
+        }
+        else if ( t instanceof ItemNotFoundException )
+        {
+            throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, t.getMessage() );
+        }
+        else if ( t instanceof AccessDeniedException )
+        {
+            // WARN1: WE ARE TYING RESTLET CODE TO BE RUN WITHIN SERLVET CONTAINER!
+            // WARN2: THIS IS SOMETHING NASTY!
+            HttpServletRequest httpRequest = ServletCall.getRequest( request );
+
+            httpRequest.setAttribute( NexusJSecurityFilter.REQUEST_IS_AUTHZ_REJECTED, Boolean.TRUE );
+
+            throw new ResourceException( Status.CLIENT_ERROR_UNAUTHORIZED, "Authenticate to access this resource!" );
+        }
+        else if ( t instanceof XmlPullParserException )
+        {
+            throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, t.getMessage() );
+        }
+        else if ( t instanceof IOException )
+        {
+            getLogger().warn( "IO error!", t );
+
+            throw new ResourceException( Status.SERVER_ERROR_INTERNAL, t.getMessage() );
+        }
+        else
+        {
+            getLogger().warn( t.getMessage(), t );
+
+            throw new ResourceException( Status.SERVER_ERROR_INTERNAL, t.getMessage() );
+        }
     }
 
     private boolean versionMatchesPolicy( String version, RepositoryPolicy policy )
