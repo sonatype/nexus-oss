@@ -238,7 +238,7 @@ public class Nexus725InitialRestClient
         }
         catch ( NexusConnectionException e )
         {
-            e.printStackTrace();
+            // expected
         }
 
     }

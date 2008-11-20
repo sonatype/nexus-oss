@@ -736,7 +736,6 @@ public class AbstractNexusIntegrationTest
         StringBuffer error =
             new StringBuffer(
                               "\n\n\n\n\n\n*********************************************************************************" );
-        error.append( "*\n*\n*\n*\n*\n*" );
         error.append( "\n* This test is being skipped because its known to fail," );
         error.append( "\n* It is a very minor error, and is only a problem if you start sending in " );
         error.append( "\n* raw REST request to Nexus. (it is not a security problem)" );
@@ -746,7 +745,7 @@ public class AbstractNexusIntegrationTest
         {
             error.append( "*\n* Test: " + test );
         }
-        error.append( "*\n*\n*\n*\n*\n**********************************************************************************" );
+        error.append( "\n**********************************************************************************" );
 
         System.out.println( error.toString() );
 
