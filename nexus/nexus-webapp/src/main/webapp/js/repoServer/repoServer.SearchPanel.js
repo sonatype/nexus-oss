@@ -170,7 +170,7 @@ Sonatype.repoServer.SearchPanel = function(config){
   this.sp = Sonatype.lib.Permissions;
 
   this.searchTypeButtonConfig = {
-    text: 'Quick Search',
+    text: 'Keyword Search',
     value: 'quick',
     tooltip: 'Click for more search options',
     handler: this.switchSearchType,
@@ -178,7 +178,7 @@ Sonatype.repoServer.SearchPanel = function(config){
     menu: {
       items: [
         {
-          text: 'Quick Search',
+          text: 'Keyword Search',
           value: 'quick',
           scope: this,
           handler: this.switchSearchType
@@ -282,6 +282,8 @@ Sonatype.repoServer.SearchPanel = function(config){
       items: toolbaritems
    });
   
+  this.artifactInformationPanel = new Sonatype.repoServer.ArtifactInformationPanel({});
+  
   Sonatype.repoServer.SearchPanel.superclass.constructor.call(this, {
 //  id: 'st-nexus-search-panel',
 //  title: 'Nexus Search',
@@ -289,7 +291,8 @@ Sonatype.repoServer.SearchPanel = function(config){
     hideMode: 'offsets',
     tbar: this.searchToolbar,
     items: [
-      this.grid
+      this.grid,
+      this.artifactInformationPanel
 //    this.detailView
     ]
   });
@@ -300,11 +303,18 @@ Sonatype.repoServer.SearchPanel = function(config){
     },
     scope: this
   });
+  
+  this.grid.on( 'rowclick', this.displayArtifactInformation, this );
 };
 
 //@todo: generalize this search panel for other ST servers to use by providing their own store & reader
 Ext.extend(Sonatype.repoServer.SearchPanel, Ext.Panel, {
 
+  displayArtifactInformation: function( grid, index, e ) {
+    var rec = grid.store.getAt( index );
+    this.artifactInformationPanel.showArtifact( rec.data );
+  },
+  
   startSearch: function( p ) {
     p.searchField.triggers[0].show();
 
@@ -409,3 +419,74 @@ Ext.extend(Sonatype.repoServer.SearchPanel, Ext.Panel, {
   }
 
 });
+
+Sonatype.repoServer.ArtifactInformationPanel = function( config ) {
+  var config = config || {};
+  var defaultConfig = {};
+  Ext.apply( this, config, defaultConfig );
+  
+  this.formPanel = new Ext.form.FormPanel( {
+    autoScroll: true,
+    border: false,
+    frame: true,
+    collapsible: false,
+    collapsed: false,
+    labelWidth: 70,
+    layoutConfig: {
+      labelSeparator: ''
+    },
+        
+    items: [
+      {
+        xtype: 'textfield',
+        fieldLabel: 'Group',
+        name: 'groupId',
+        width: 300,
+        allowBlank: true,
+        disabled: true
+      },
+      {
+        xtype: 'textfield',
+        fieldLabel: 'Artifact',
+        name: 'artifactId',
+        width: 300,
+        allowBlank: true,
+        disabled: true
+      },
+      {
+        xtype: 'textfield',
+        fieldLabel: 'Version',
+        name: 'version',
+        width: 300,
+        allowBlank: true,
+        disabled: true
+      }
+    ]
+  } );
+
+  Sonatype.repoServer.ArtifactInformationPanel.superclass.constructor.call( this, {
+    title: 'Artifact Information',
+    layout: 'fit',
+    region: 'south',
+    collapsible: true,
+    collapsed: true,
+    split: true,
+    height: 150,
+    minHeight: 100,
+    maxHeight: 400,
+    frame: false,
+    autoScroll: true,
+
+    items: [
+      this.formPanel
+    ]
+  } );
+};
+
+Ext.extend( Sonatype.repoServer.ArtifactInformationPanel, Ext.Panel, {
+  showArtifact: function( data ) {
+    this.formPanel.form.setValues( data );
+    this.expand();
+  }
+} );
+
