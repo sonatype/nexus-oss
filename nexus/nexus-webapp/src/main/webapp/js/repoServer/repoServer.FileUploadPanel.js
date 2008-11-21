@@ -194,7 +194,9 @@ Sonatype.repoServer.FileUploadPanel = function(config){
               emptyText: 'Select...',
               selectOnFocus: true,
               allowBlank: false,
-              name: 'p'
+              name: 'p',
+              width: 150,
+              listWidth: 150
             },
             {
               xtype: 'textfield',
@@ -307,6 +309,7 @@ Sonatype.repoServer.FileUploadPanel = function(config){
                     fn: function( checkbox, checked ) {
                       if ( checked ) {
                         this.cardPanel.layout.setActiveItem( this.attributeCard );
+//                        this.cardPanel.findById( this.attributeCard ).find( 'name', 'p' )[0].setWidth( 150 );
                         this.pomMode = false;
                       }
                       this.updateUploadButton( this );
