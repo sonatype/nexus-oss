@@ -1099,29 +1099,29 @@ Ext.extend(Sonatype.repoServer.RepoMaintPanel, Sonatype.repoServer.AbstractRepoP
     }
   },
   switchBrowseType: function( button, event ) {
-      this.setBrowseType( this, button.value );
-      
-      if ( button.value == 'nexus' )
-      {
-          this.reposGridPanel.store = this.allReposDataStore;
-          this.reposGridPanel.getView().refresh();
-      }
-      else if ( button.value == 'user' )
-      {
-          this.reposGridPanel.store = this.reposDataStore;
-          this.reposGridPanel.getView().refresh();
-      }
-    },
+    this.setBrowseType( this, button.value );
+    
+    if ( button.value == 'nexus' )
+    {
+        this.reposGridPanel.store = this.allReposDataStore;
+        this.reposGridPanel.getView().refresh();
+    }
+    else if ( button.value == 'user' )
+    {
+        this.reposGridPanel.store = this.reposDataStore;
+        this.reposGridPanel.getView().refresh();
+    }
+  },
 
-    setBrowseType: function( panel, t ) {
-      if ( t != panel.browseTypeButton.value ) {
-        var items = panel.browseTypeButtonConfig.menu.items;
-        panel.browseTypeButton.value = t;
-        for ( var i = 0; i < items.length; i++ ) {
-          if ( items[i].value == t ) {
-            panel.browseTypeButton.setText( items[i].text );
-          }
+  setBrowseType: function( panel, t ) {
+    if ( t != panel.browseTypeButton.value ) {
+      var items = panel.browseTypeButtonConfig.menu.items;
+      panel.browseTypeButton.value = t;
+      for ( var i = 0; i < items.length; i++ ) {
+        if ( items[i].value == t ) {
+          panel.browseTypeButton.setText( items[i].text );
         }
       }
-    },
+    }
+  }
 });
