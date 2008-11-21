@@ -180,7 +180,12 @@ public abstract class RepoIdBasedRepositoryRouter
             {
                 result = new ArrayList<ResourceStore>( 1 );
 
-                result.add( getRepositoryRegistry().getRepository( explodedPath[0] ) );
+                Repository repository = getRepositoryRegistry().getRepository( explodedPath[0] );
+
+                if ( repository.isExposed() )
+                {
+                    result.add( repository );
+                }
             }
         }
         return result;
