@@ -95,7 +95,7 @@ Sonatype.utils = {
     return sOut.substring(0, sOut.length - sep.length);
   },
 
-  connectionError: function( response, message, offerRestart, options, responseText ) {
+  connectionError: function( response, message, offerRestart, options, showResponseText ) {
     var serverMessage = ''; 
     var r = response.responseText;
     if ( r ) {
@@ -162,14 +162,14 @@ Sonatype.utils = {
         title: "Error",
         msg: (
           ( message ? message + '<br /><br />' : '' ) +
-          ( response.status == '400' && responseText ? 
+          ( response.status == 400 && showResponseText ? 
               response.responseText
-              :
-          ( response.status ?
-              'Nexus returned an error: ERROR ' + response.status + ': ' + response.statusText
-              :
-              'There was an error communicating with the Nexus server: ' + response.statusText + '<br />' +
-              'Check the status of the server, and log in to the application again.' ) ) +
+              : ( options && options.hideErrorStatus ? '' :
+                ( response.status ?
+                  'Nexus returned an error: ERROR ' + response.status + ': ' + response.statusText
+                  :
+                  'There was an error communicating with the Nexus server: ' + response.statusText + '<br />' +
+                  'Check the status of the server, and log in to the application again.' ) ) ) +
           ( offerRestart ?
               '<br /><br />Click OK to reload the console or ' +
               'CANCEL if you wish to retry the same action in a little while.'
