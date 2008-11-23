@@ -6,7 +6,6 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
-import org.sonatype.jsecurity.locators.users.PlexusUserManager;
 import org.sonatype.micromailer.Address;
 import org.sonatype.micromailer.EMailer;
 import org.sonatype.micromailer.EmailerConfiguration;
@@ -33,9 +32,6 @@ public class DefaultNexusEmailer
 
     @Requirement
     private NexusConfiguration configuration;
-    
-    @Requirement
-    private PlexusUserManager userManager;
 
     private CSmtpConfiguration smtp;
 
@@ -170,20 +166,5 @@ public class DefaultNexusEmailer
         }
 
         return false;
-    }
-    
-    protected CSmtpConfiguration getSmtp()
-    {
-        return smtp;
-    }
-    
-    protected EMailer getEmailer()
-    {
-        return emailer;
-    }
-    
-    protected PlexusUserManager getPlexusUserManager()
-    {
-        return userManager;
     }
 }
