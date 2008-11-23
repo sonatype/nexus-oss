@@ -111,9 +111,11 @@ public class IndexTemplatePlexusResource
 
         Map<String, Object> pluginContext = null;
 
-        List<String> pluginHeadContributions = new ArrayList<String>();
+        List<String> pluginPreHeadContributions = new ArrayList<String>();
+        List<String> pluginPostHeadContributions = new ArrayList<String>();
 
-        List<String> pluginBodyContributions = new ArrayList<String>();
+        List<String> pluginPreBodyContributions = new ArrayList<String>();
+        List<String> pluginPostBodyContributions = new ArrayList<String>();
 
         for ( String key : bundles.keySet() )
         {
@@ -123,22 +125,52 @@ public class IndexTemplatePlexusResource
 
             pluginContext.put( "bundle", bundle );
 
-            // HEAD
+            // pre HEAD
 
-            String headTemplate = bundle.getHeadContribution( pluginContext );
+            String preHeadTemplate = bundle.getPreHeadContribution( pluginContext );
 
-            evaluateIfNeeded( templateRepresentation.getEngine(), pluginContext, headTemplate, pluginHeadContributions );
+            evaluateIfNeeded(
+                templateRepresentation.getEngine(),
+                pluginContext,
+                preHeadTemplate,
+                pluginPreHeadContributions );
 
-            // BODY
+            // post HEAD
 
-            String bodyTemplate = bundle.getBodyContribution( pluginContext );
+            String postHeadTemplate = bundle.getPostHeadContribution( pluginContext );
 
-            evaluateIfNeeded( templateRepresentation.getEngine(), pluginContext, bodyTemplate, pluginBodyContributions );
+            evaluateIfNeeded(
+                templateRepresentation.getEngine(),
+                pluginContext,
+                postHeadTemplate,
+                pluginPostHeadContributions );
+
+            // pre BODY
+
+            String preBodyTemplate = bundle.getPreBodyContribution( pluginContext );
+
+            evaluateIfNeeded(
+                templateRepresentation.getEngine(),
+                pluginContext,
+                preBodyTemplate,
+                pluginPreBodyContributions );
+
+            // post BODY
+
+            String postBodyTemplate = bundle.getPreBodyContribution( pluginContext );
+
+            evaluateIfNeeded(
+                templateRepresentation.getEngine(),
+                pluginContext,
+                postBodyTemplate,
+                pluginPostBodyContributions );
         }
 
-        templatingContext.put( "pluginHeadContributions", pluginHeadContributions );
+        templatingContext.put( "pluginPreHeadContributions", pluginPreHeadContributions );
+        templatingContext.put( "pluginPostHeadContributions", pluginPostHeadContributions );
 
-        templatingContext.put( "pluginBodyContributions", pluginBodyContributions );
+        templatingContext.put( "pluginPreBodyContributions", pluginPreBodyContributions );
+        templatingContext.put( "pluginPostBodyContributions", pluginPostBodyContributions );
 
         templateRepresentation.setDataModel( templatingContext );
 

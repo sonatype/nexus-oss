@@ -37,20 +37,38 @@ public interface NexusResourceBundle
     List<StaticResource> getContributedResouces();
 
     /**
-     * A header contribution is a HTML snippet, that will be injected into the HEAD section of the index.html. The
-     * snippet will be processed by Velocity, so it can be a Velocity template too. The context passed in may be
+     * A header contribution is a HTML snippet, that will be injected into the beginning of HEAD section of the
+     * index.html. The snippet will be processed by Velocity, so it can be a Velocity template too. The context passed
+     * in may be modified by this bundle, and it will be finally used to evaluate the template returned by this call.
+     * 
+     * @return
+     */
+    String getPreHeadContribution( Map<String, Object> context );
+
+    /**
+     * A header contribution is a HTML snippet, that will be injected into the end of HEAD section of the index.html.
+     * The snippet will be processed by Velocity, so it can be a Velocity template too. The context passed in may be
      * modified by this bundle, and it will be finally used to evaluate the template returned by this call.
      * 
      * @return
      */
-    String getHeadContribution( Map<String, Object> context );
+    String getPostHeadContribution( Map<String, Object> context );
 
     /**
-     * A header contribution is a HTML snippet, that will be injected into the HEAD section of the index.html. The
-     * snippet will be processed by Velocity, so it can be a Velocity template too.The context passed in may be modified
-     * by this bundle, and it will be finally used to evaluate the template returned by this call.
+     * A header contribution is a HTML snippet, that will be injected into the beginning of BODY section of the
+     * index.html. The snippet will be processed by Velocity, so it can be a Velocity template too.The context passed in
+     * may be modified by this bundle, and it will be finally used to evaluate the template returned by this call.
      * 
      * @return
      */
-    String getBodyContribution( Map<String, Object> context );
+    String getPreBodyContribution( Map<String, Object> context );
+
+    /**
+     * A header contribution is a HTML snippet, that will be injected into the end of BODY section of the index.html.
+     * The snippet will be processed by Velocity, so it can be a Velocity template too. The context passed in may be
+     * modified by this bundle, and it will be finally used to evaluate the template returned by this call.
+     * 
+     * @return
+     */
+    String getPostBodyContribution( Map<String, Object> context );
 }

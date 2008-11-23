@@ -26,6 +26,13 @@
   
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
   <link rel="shortcut icon" href="favicon.ico" type="image/gif" />
+
+  <!-- Plugin pre HEAD contributions start here -->
+  #foreach( $pluginPreHeadContribution in $pluginPreHeadContributions )
+    $pluginPreHeadContribution
+  #end
+  <!-- Plugin pre HEAD contributions ends here -->
+
   <link rel="stylesheet" href="ext-2.2/resources/css/ext-all.css" type="text/css" media="screen" charset="utf-8">
   <link rel="stylesheet" href="ext-2.2/resources/css/xtheme-gray.css" type="text/css" media="screen" charset="utf-8">
   <link rel="stylesheet" href="style/Sonatype.css?$nexusVersion" type="text/css" media="screen" title="no title" charset="utf-8">
@@ -74,11 +81,11 @@
   <script src="js/repoServer/repoServer.RepoServer.js?$nexusVersion" type="text/javascript" charset="utf-8"></script>  
   <script src="js/repoServer/repoServer.RepoTargetEditPanel.js?$nexusVersion" type="text/javascript" charset="utf-8"></script>
 
-    <!-- Plugin HEAD contributions start here -->
-	#foreach( $pluginHeadContribution in $pluginHeadContributions )
-	    $pluginHeadContribution
-	#end
-    <!-- Plugin HEAD contributions ends here -->
+  <!-- Plugin post HEAD contributions start here -->
+  #foreach( $pluginPostHeadContribution in $pluginPostHeadContributions )
+    $pluginPostHeadContribution
+  #end
+  <!-- Plugin post HEAD contributions ends here -->
 
   <script type="text/javascript" charset="utf-8">
     Ext.onReady(Sonatype.init);
@@ -87,11 +94,11 @@
 
 <body>
 
-<!-- Plugin BODY contributions start here -->
-#foreach( $pluginBodyContribution in $pluginBodyContributions )
-    $pluginBodyContribution
+<!-- Plugin pre BODY contributions start here -->
+#foreach( $pluginPreBodyContribution in $pluginPreBodyContributions )
+    $pluginPreBodyContribution
 #end
-<!-- Plugin BODY contributions ends here -->
+<!-- Plugin pre BODY contributions ends here -->
 
 <div id="header">
   <div id="logo">
@@ -103,12 +110,17 @@
   </div>
 </div>
 
-
 <div id="welcome-tab" class="little-padding">
   <p>Welcome to the Sonatype Nexus Repository Manager.</p>
   <br/>
   <p>You may browse and search the repositories using the options on the left. Administrators may login via the link on the top right.<p>
 </div>
+
+<!-- Plugin post BODY contributions start here -->
+#foreach( $pluginPostBodyContribution in $pluginPostBodyContributions )
+    $pluginPostBodyContribution
+#end
+<!-- Plugin post BODY contributions ends here -->
 
 </body>
 </html>
