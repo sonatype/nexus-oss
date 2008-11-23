@@ -29,7 +29,6 @@ import org.sonatype.nexus.feeds.NexusArtifactEvent;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.RepositoryNotAvailableException;
 import org.sonatype.nexus.proxy.StorageException;
-import org.sonatype.nexus.proxy.events.RepositoryItemEventCache;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
@@ -45,7 +44,6 @@ import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 public abstract class DefaultRepository
     extends AbstractRepository
 {
-
     private static final int DOWNLOAD_RETRY_COUNT = 2;
 
     /**
@@ -53,31 +51,6 @@ public abstract class DefaultRepository
      */
     @Requirement
     private FeedRecorder feedRecorder;
-
-    /**
-     * The item max age.
-     */
-    private int itemMaxAge = 24 * 60;
-
-    /**
-     * Gets the item max age in (in minutes).
-     * 
-     * @return the item max age in (in minutes)
-     */
-    public int getItemMaxAge()
-    {
-        return itemMaxAge;
-    }
-
-    /**
-     * Sets the item max age in (in minutes).
-     * 
-     * @param itemMaxAgeInSeconds the new item max age in (in minutes).
-     */
-    public void setItemMaxAge( int itemMaxAge )
-    {
-        this.itemMaxAge = itemMaxAge;
-    }
 
     protected StorageItem doRetrieveItem( boolean localOnly, RepositoryItemUid uid, Map<String, Object> context )
         throws RepositoryNotAvailableException,
@@ -356,43 +329,6 @@ public abstract class DefaultRepository
         return result;
     }
 
-    protected AbstractStorageItem doCacheItem( AbstractStorageItem item )
-        throws StorageException
-    {
-        AbstractStorageItem result = null;
-
-        try
-        {
-            if ( getLogger().isDebugEnabled() )
-            {
-                getLogger().debug(
-                    "Caching item " + item.getRepositoryItemUid().toString() + " in local storage of repository." );
-            }
-
-            getLocalStorage().storeItem( item );
-
-            removeFromNotFoundCache( item.getRepositoryItemUid().getPath() );
-
-            result = getLocalStorage().retrieveItem( item.getRepositoryItemUid() );
-
-            notifyProximityEventListeners( new RepositoryItemEventCache( result ) );
-
-            result.getItemContext().putAll( item.getItemContext() );
-        }
-        catch ( ItemNotFoundException ex )
-        {
-            // this is a nonsense, we just stored it!
-            result = item;
-        }
-        catch ( UnsupportedStorageOperationException ex )
-        {
-            getLogger().warn( "LocalStorage does not handle STORE operation, not caching remote fetched item.", ex );
-            result = item;
-        }
-
-        return result;
-    }
-
     protected void doDeleteItem( RepositoryItemUid uid )
         throws UnsupportedStorageOperationException,
             RepositoryNotAvailableException,
@@ -402,7 +338,7 @@ public abstract class DefaultRepository
         getLocalStorage().deleteItem( uid );
     }
 
-    protected Collection<StorageItem> doListItems( RepositoryItemUid uid )
+    protected Collection<StorageItem> doListItems( boolean localOnly, RepositoryItemUid uid, Map<String, Object> context )
         throws RepositoryNotAvailableException,
             ItemNotFoundException,
             StorageException

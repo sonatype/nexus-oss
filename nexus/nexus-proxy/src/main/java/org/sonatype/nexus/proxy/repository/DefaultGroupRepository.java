@@ -277,6 +277,7 @@ public class DefaultGroupRepository
         return resultItems;
     }
 
+    @Override
     protected AbstractStorageItem doRetrieveRemoteItem( RepositoryItemUid uid, Map<String, Object> context )
         throws ItemNotFoundException,
             StorageException
@@ -284,7 +285,8 @@ public class DefaultGroupRepository
         throw new StorageException( "Functionality not implemented!" );
     }
 
-    protected Collection<StorageItem> doListItems( RepositoryItemUid uid )
+    @Override
+    protected Collection<StorageItem> doListItems( boolean localOnly, RepositoryItemUid uid, Map<String, Object> context )
         throws RepositoryNotAvailableException,
             ItemNotFoundException,
             StorageException
@@ -292,6 +294,7 @@ public class DefaultGroupRepository
         return getLocalStorage().listItems( uid );
     }
 
+    @Override
     public void onProximityEvent( AbstractEvent evt )
     {
         super.onProximityEvent( evt );

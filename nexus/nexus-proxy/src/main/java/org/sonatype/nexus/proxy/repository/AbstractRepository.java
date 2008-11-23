@@ -52,9 +52,11 @@ import org.sonatype.nexus.proxy.events.RepositoryEventEvictUnusedItems;
 import org.sonatype.nexus.proxy.events.RepositoryEventLocalStatusChanged;
 import org.sonatype.nexus.proxy.events.RepositoryEventProxyModeChanged;
 import org.sonatype.nexus.proxy.events.RepositoryEventRecreateAttributes;
+import org.sonatype.nexus.proxy.events.RepositoryItemEventCache;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventDelete;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventRetrieve;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventStore;
+import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.DefaultStorageCollectionItem;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.PreparedContentLocator;
@@ -193,6 +195,11 @@ public abstract class AbstractRepository
 
     /** Remote storage context to store connection configs. */
     private RemoteStorageContext remoteStorageContext;
+
+    /**
+     * The item max age.
+     */
+    private int itemMaxAge = 24 * 60;
 
     public void initialize()
     {
@@ -607,6 +614,26 @@ public abstract class AbstractRepository
             // perm changes? retry if autoBlocked
             setProxyMode( ProxyMode.ALLOW );
         }
+    }
+
+    /**
+     * Gets the item max age in (in minutes).
+     * 
+     * @return the item max age in (in minutes)
+     */
+    public int getItemMaxAge()
+    {
+        return itemMaxAge;
+    }
+
+    /**
+     * Sets the item max age in (in minutes).
+     * 
+     * @param itemMaxAgeInSeconds the new item max age in (in minutes).
+     */
+    public void setItemMaxAge( int itemMaxAge )
+    {
+        this.itemMaxAge = itemMaxAge;
     }
 
     protected Walker getWalker()
@@ -1181,7 +1208,7 @@ public abstract class AbstractRepository
 
         maintainNotFoundCache( uid.getPath() );
 
-        Collection<StorageItem> items = doListItems( uid );
+        Collection<StorageItem> items = doListItems( false, uid, context );
 
         for ( StorageItem item : items )
         {
@@ -1333,6 +1360,43 @@ public abstract class AbstractRepository
         return result;
     }
 
+    protected AbstractStorageItem doCacheItem( AbstractStorageItem item )
+        throws StorageException
+    {
+        AbstractStorageItem result = null;
+
+        try
+        {
+            if ( getLogger().isDebugEnabled() )
+            {
+                getLogger().debug(
+                    "Caching item " + item.getRepositoryItemUid().toString() + " in local storage of repository." );
+            }
+
+            getLocalStorage().storeItem( item );
+
+            removeFromNotFoundCache( item.getRepositoryItemUid().getPath() );
+
+            result = getLocalStorage().retrieveItem( item.getRepositoryItemUid() );
+
+            notifyProximityEventListeners( new RepositoryItemEventCache( result ) );
+
+            result.getItemContext().putAll( item.getItemContext() );
+        }
+        catch ( ItemNotFoundException ex )
+        {
+            // this is a nonsense, we just stored it!
+            result = item;
+        }
+        catch ( UnsupportedStorageOperationException ex )
+        {
+            getLogger().warn( "LocalStorage does not handle STORE operation, not caching remote fetched item.", ex );
+            result = item;
+        }
+
+        return result;
+    }
+
     /**
      * Do retrieve item.
      * 
@@ -1375,7 +1439,8 @@ public abstract class AbstractRepository
      * @throws StorageException the storage exception
      * @throws AccessDeniedException the access denied exception
      */
-    protected abstract Collection<StorageItem> doListItems( RepositoryItemUid uid )
+    protected abstract Collection<StorageItem> doListItems( boolean localOnly, RepositoryItemUid uid,
+        Map<String, Object> context )
         throws RepositoryNotAvailableException,
             ItemNotFoundException,
             StorageException;
