@@ -19,6 +19,7 @@ import org.apache.maven.mercury.repository.metadata.StringOperand;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.artifact.Gav;
+import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 
 public class DefaultMetadataUpdater
     extends AbstractLogEnabled
@@ -183,6 +184,13 @@ public class DefaultMetadataUpdater
     {
         // TODO Auto-generated method stub
 
+    }
+
+    public void recreateMetadata( StorageCollectionItem coll, MetadataLocator locator )
+        throws IOException
+    {
+        // TODO Auto-generated method stub
+        
     }
 
 }

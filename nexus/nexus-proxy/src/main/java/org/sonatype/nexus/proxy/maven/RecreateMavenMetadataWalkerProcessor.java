@@ -21,10 +21,11 @@
 
 package org.sonatype.nexus.proxy.maven;
 
+import java.util.Collection;
+
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
-import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RepositoryType;
 import org.sonatype.nexus.proxy.walker.AbstractWalkerProcessor;
 import org.sonatype.nexus.proxy.walker.WalkerContext;
@@ -37,6 +38,8 @@ public class RecreateMavenMetadataWalkerProcessor
 {
     private boolean isHostedRepo;
 
+    private MavenRepository repository;
+
     private AbstractMetadataHelper mdHelper;
 
     @Override
@@ -45,7 +48,7 @@ public class RecreateMavenMetadataWalkerProcessor
     {
         isHostedRepo = false;
 
-        Repository repository = context.getResourceStore() instanceof Repository ? (Repository) context
+        repository = context.getResourceStore() instanceof MavenRepository ? (MavenRepository) context
             .getResourceStore() : null;
 
         if ( repository != null )
@@ -59,26 +62,28 @@ public class RecreateMavenMetadataWalkerProcessor
     }
 
     @Override
-    public void onCollectionEnter( WalkerContext context, StorageCollectionItem coll )
-        throws Exception
-    {
-        mdHelper.onDirEnter( coll.getPath() );
-    }
-
-    @Override
     public void processItem( WalkerContext context, StorageItem item )
         throws Exception
     {
-        if ( item instanceof StorageFileItem )
-        {
-            mdHelper.processFile( item.getPath() );
-        }
+        // nothing
     }
 
     @Override
     public void onCollectionExit( WalkerContext context, StorageCollectionItem coll )
         throws Exception
     {
+        mdHelper.onDirEnter( coll.getPath() );
+
+        Collection<StorageItem> items = repository.list( coll );
+
+        for ( StorageItem item : items )
+        {
+            if ( item instanceof StorageFileItem )
+            {
+                mdHelper.processFile( item.getPath() );
+            }
+        }
+
         mdHelper.onDirExit( coll.getPath() );
     }
 }

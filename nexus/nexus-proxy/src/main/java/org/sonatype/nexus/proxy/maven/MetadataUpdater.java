@@ -3,6 +3,8 @@ package org.sonatype.nexus.proxy.maven;
 import java.io.IOException;
 import java.util.Collection;
 
+import org.sonatype.nexus.proxy.item.StorageCollectionItem;
+
 /**
  * A metadata updater that offers simple metadata management services.
  * 
@@ -40,5 +42,15 @@ public interface MetadataUpdater
      * @param req
      */
     void deployArtifacts( Collection<ArtifactStoreRequest> requests, MetadataLocator locator )
+        throws IOException;
+
+    /**
+     * Give me a coll, and i will createate the metadata.
+     * 
+     * @param coll
+     * @param locator
+     * @throws IOException
+     */
+    void recreateMetadata( StorageCollectionItem coll, MetadataLocator locator )
         throws IOException;
 }
