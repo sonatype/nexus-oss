@@ -677,6 +677,8 @@ Sonatype.utils = {
       options: { ignore401: true },
       url: Sonatype.config.repos.urls.status,
       callback: function(options, success, response){
+        var baseUrlMismatch = false;
+
         if ( success ) {
           var respObj = Ext.decode(response.responseText);
   
@@ -692,6 +694,9 @@ Sonatype.utils = {
               Sonatype[srv][Sonatype.utils.capitalize(srv)].statusComplete(respObj);
             }
           }
+
+          var baseUrl = respObj.data.baseUrl;
+          baseUrlMismatch = ( baseUrl != window.location.href.substring( 0, baseUrl.length ) );
         }
         else {
           Sonatype.utils.version = 'Version unavailable';
@@ -701,6 +706,17 @@ Sonatype.utils = {
         Sonatype.view.updateLoginLinkText();
         Sonatype.repoServer.RepoServer.resetMainTabPanel();
         Sonatype.repoServer.RepoServer.createSubComponents();
+
+        if ( baseUrlMismatch ) {
+          Sonatype.view.welcomeTab.add( {
+            xtype: 'panel',
+            html: '<div class="x-toolbar"><div class="x-form-invalid-msg">' +
+              '<b>WARNING:</b> ' +
+              'Base URL setting of <a href="' + baseUrl + '">' + baseUrl + '</a> ' +
+              'does not match your actual URL. Check your Nexus configuration!</div></div>'
+          } );
+          Sonatype.view.welcomeTab.doLayout();
+        }
       }
     });
   }
