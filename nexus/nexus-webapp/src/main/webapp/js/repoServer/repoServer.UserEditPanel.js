@@ -170,7 +170,7 @@ Sonatype.repoServer.UserEditPanel = function(config){
     columns: [
       {header: 'User ID', dataIndex: 'userId', width:100, id: 'user-config-userid-col'},
       {header: 'Realm', dataIndex: 'stRealm', width:50, id: 'user-config-realm-col'},
-      {header: 'Internal', dataIndex: 'readOnly', width:50, id: 'user-config-readonly-col'},
+      {header: 'User Managed', dataIndex: 'readOnly', width:100, id: 'user-config-readonly-col'},
       {header: 'Name', dataIndex: 'name', width:175, id: 'user-config-name-col'},
       {header: 'Email', dataIndex: 'email', width:175, id: 'user-config-email-col'},
       {header: 'Status', dataIndex: 'status', width:75, id: 'user-config-status-col'},
