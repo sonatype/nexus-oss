@@ -23,6 +23,8 @@
 			<role>org.sonatype.plexus.jetty.ServletContainer</role>
 			<implementation>org.sonatype.plexus.jetty.DefaultServletContainer</implementation>
 			<configuration>
+			  <jettyXml>${jetty.xml}</jettyXml>
+			  
 				<!-- To host multiple webapps, add root -->
 				<!-- webapps>${webapp}</webapps -->
 				<connectorInfos>
