@@ -1,12 +1,17 @@
 package org.sonatype.nexus.maven.tasks;
 
-import org.sonatype.jettytestsuite.ServletServer;
+import java.io.File;
+import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.codehaus.plexus.util.FileUtils;
 import org.sonatype.nexus.AbstractNexusTestCase;
 import org.sonatype.nexus.DefaultNexus;
 import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
-import org.sonatype.nexus.proxy.maven.ArtifactStoreRequest;
+import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 
 public class DefaultSnapshotRemoverTest
@@ -14,357 +19,266 @@ public class DefaultSnapshotRemoverTest
 {
     private DefaultNexus defaultNexus;
 
-    private MavenRepository apacheSnapshots;
+    private MavenRepository snapshots;
 
-    private MavenRepository central;
-
-    private ServletServer servetServer;
+    private MavenRepository releases;
 
     protected void setUp()
         throws Exception
     {
         super.setUp();
 
-        // jetty as "remote repo"
-        servetServer = (ServletServer) lookup( ServletServer.ROLE );
-
-        servetServer.start();
-
         defaultNexus = (DefaultNexus) lookup( Nexus.class );
 
-        apacheSnapshots = (MavenRepository) defaultNexus.getRepository( "apache-snapshots" );
+        // get a snapshots hosted repo
+        snapshots = (MavenRepository) defaultNexus.getRepository( "snapshots" );
 
-        apacheSnapshots.setRemoteUrl( servetServer.getUrl( apacheSnapshots.getId() ) );
-
-        central = (MavenRepository) defaultNexus.getRepository( "central" );
-
-        central.setRemoteUrl( servetServer.getUrl( central.getId() ) );
+        // get a releases hosted repo
+        releases = (MavenRepository) defaultNexus.getRepository( "releases" );
     }
 
     protected void tearDown()
         throws Exception
     {
-        servetServer.stop();
-
         super.tearDown();
     }
 
     public void fillInRepo()
         throws Exception
     {
-        // Case1: different builds of same snap artifact. Should be kept the newest (with regard to params)
-        // get 4 pieces of beta-5-snap
-        ArtifactStoreRequest gavRequest = new ArtifactStoreRequest(
-            "org.sonatype.nexus",
-            "nexus-indexer",
-            "1.0-beta-5-20080711.162119-2" );
+        URL snapshotsRootUrl = new URL( snapshots.getLocalUrl() );
 
-        apacheSnapshots.retrieveArtifactPom( gavRequest );
+        File snapshotsRoot = new File( snapshotsRootUrl.toURI() );
 
-        apacheSnapshots.retrieveArtifact( gavRequest );
+        // copy the files to their place
+        FileUtils.copyDirectoryStructure(
+            new File( getBasedir(), "src/test/resources/reposes/snapshots" ),
+            snapshotsRoot );
 
-        gavRequest = new ArtifactStoreRequest( "org.sonatype.nexus", "nexus-indexer", "1.0-beta-5-20080718.231118-50" );
+        URL releaseRootUrl = new URL( releases.getLocalUrl() );
 
-        apacheSnapshots.retrieveArtifactPom( gavRequest );
+        File releasesRoot = new File( releaseRootUrl.toURI() );
 
-        apacheSnapshots.retrieveArtifact( gavRequest );
+        // copy the files to their place
+        FileUtils
+            .copyDirectoryStructure( new File( getBasedir(), "src/test/resources/reposes/releases" ), releasesRoot );
 
-        gavRequest = new ArtifactStoreRequest( "org.sonatype.nexus", "nexus-indexer", "1.0-beta-5-20080730.002543-149" );
+        // This above is possible, since SnapshotRemover is not using index, hence we can manipulate the content
+        // "from behind"
 
-        apacheSnapshots.retrieveArtifactPom( gavRequest );
-
-        apacheSnapshots.retrieveArtifact( gavRequest );
-
-        gavRequest = new ArtifactStoreRequest( "org.sonatype.nexus", "nexus-indexer", "1.0-beta-5-20080731.150252-163" );
-
-        apacheSnapshots.retrieveArtifactPom( gavRequest );
-
-        apacheSnapshots.retrieveArtifact( gavRequest );
-
-        // Case2: a snap is here that has release also in other repo
-        // get 1 piece of nexus-indexer b4
-        apacheSnapshots.retrieveItem( new ResourceStoreRequest(
-            "/org/sonatype/nexus/nexus-indexer/1.0-beta-4-SNAPSHOT/nexus-indexer-1.0-beta-4-SNAPSHOT.pom",
-            false ) );
-
-        apacheSnapshots.retrieveItem( new ResourceStoreRequest(
-            "/org/sonatype/nexus/nexus-indexer/1.0-beta-4-SNAPSHOT/nexus-indexer-1.0-beta-4-SNAPSHOT.jar",
-            false ) );
-
-        // and get it's release counterpart
-        central.retrieveItem( new ResourceStoreRequest(
-            "/org/sonatype/nexus/nexus-indexer/1.0-beta-4/nexus-indexer-1.0-beta-4.pom",
-            false ) );
-
-        central.retrieveItem( new ResourceStoreRequest(
-            "/org/sonatype/nexus/nexus-indexer/1.0-beta-4/nexus-indexer-1.0-beta-4.jar",
-            false ) );
+        // but clear caches
+        snapshots.clearCaches( RepositoryItemUid.PATH_ROOT );
+        releases.clearCaches( RepositoryItemUid.PATH_ROOT );
     }
 
-    public void testSnapshotRemover()
+    protected void validateResults( Map<String, Boolean> results )
+        throws Exception
+    {
+        for ( Map.Entry<String, Boolean> entry : results.entrySet() )
+        {
+            try
+            {
+                snapshots.retrieveItem( new ResourceStoreRequest( entry.getKey(), false ) );
+
+                // we succeaeded, the value must be true
+                assertTrue( "The entry '" + entry.getKey() + "' was found in repository.", entry.getValue() );
+            }
+            catch ( ItemNotFoundException e )
+            {
+                // we succeeded, the value must be true
+                assertFalse( "The entry '" + entry.getKey() + "' was not found in repository.", entry.getValue() );
+            }
+        }
+    }
+
+    public void testSnapshotRemoverRemoveReleased()
         throws Exception
     {
         fillInRepo();
 
         // and now setup the request
         // process the apacheSnapshots, leave min 1 snap, remove older than 0 day and delete them if release exists
-        SnapshotRemovalRequest request = new SnapshotRemovalRequest( apacheSnapshots.getId(), null, 1, 0, true );
+        SnapshotRemovalRequest snapshotRemovalRequest = new SnapshotRemovalRequest( snapshots.getId(), null, 1, 0, true );
 
-        SnapshotRemovalResult result = defaultNexus.removeSnapshots( request );
+        SnapshotRemovalResult result = defaultNexus.removeSnapshots( snapshotRemovalRequest );
 
         assertEquals( 1, result.getProcessedRepositories().size() );
 
-        ArtifactStoreRequest gavRequest = null;
+        HashMap<String, Boolean> expecting = new HashMap<String, Boolean>();
 
-        // test the results by their local availability
+        // 1.0-beta-4-SNAPSHOT should be nuked completely
+        expecting.put(
+            "/org/sonatype/nexus/nexus-indexer/1.0-beta-4-SNAPSHOT/nexus-indexer-1.0-beta-4-SNAPSHOT-cli.jar",
+            Boolean.FALSE );
+        expecting.put(
+            "/org/sonatype/nexus/nexus-indexer/1.0-beta-4-SNAPSHOT/nexus-indexer-1.0-beta-4-SNAPSHOT-jdk14.jar",
+            Boolean.FALSE );
+        expecting.put(
+            "/org/sonatype/nexus/nexus-indexer/1.0-beta-4-SNAPSHOT/nexus-indexer-1.0-beta-4-SNAPSHOT-sources.jar",
+            Boolean.FALSE );
+        expecting.put(
+            "/org/sonatype/nexus/nexus-indexer/1.0-beta-4-SNAPSHOT/nexus-indexer-1.0-beta-4-SNAPSHOT.pom",
+            Boolean.FALSE );
+        expecting.put(
+            "/org/sonatype/nexus/nexus-indexer/1.0-beta-4-SNAPSHOT/nexus-indexer-1.0-beta-4-SNAPSHOT.jar",
+            Boolean.FALSE );
 
-        gavRequest = new ArtifactStoreRequest( "org.sonatype.nexus", "nexus-indexer", "1.0-beta-5-20080731.150252-163" );
+        // 1.0-beta-5-SNAPSHOT should have only one snapshot remaining, the newest
+        expecting.put(
+            "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/nexus-indexer-1.0-beta-5-20080711.162119-2.jar",
+            Boolean.FALSE );
+        expecting
+            .put(
+                "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/nexus-indexer-1.0-beta-5-20080711.162119-2.jar.sha1",
+                Boolean.FALSE );
+        expecting.put(
+            "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/nexus-indexer-1.0-beta-5-20080711.162119-2.pom",
+            Boolean.FALSE );
+        expecting
+            .put(
+                "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/nexus-indexer-1.0-beta-5-20080711.162119-2.pom.sha1",
+                Boolean.FALSE );
+        expecting.put(
+            "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/nexus-indexer-1.0-beta-5-20080718.231118-50.jar",
+            Boolean.FALSE );
+        expecting
+            .put(
+                "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/nexus-indexer-1.0-beta-5-20080718.231118-50.jar.sha1",
+                Boolean.FALSE );
+        expecting.put(
+            "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/nexus-indexer-1.0-beta-5-20080718.231118-50.pom",
+            Boolean.FALSE );
+        expecting
+            .put(
+                "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/nexus-indexer-1.0-beta-5-20080718.231118-50.pom.sha1",
+                Boolean.FALSE );
+        expecting.put(
+            "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/nexus-indexer-1.0-beta-5-20080730.002543-149.jar",
+            Boolean.FALSE );
+        expecting
+            .put(
+                "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/nexus-indexer-1.0-beta-5-20080730.002543-149.jar.sha1",
+                Boolean.FALSE );
+        expecting.put(
+            "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/nexus-indexer-1.0-beta-5-20080730.002543-149.pom",
+            Boolean.FALSE );
+        expecting
+            .put(
+                "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/nexus-indexer-1.0-beta-5-20080730.002543-149.pom.sha1",
+                Boolean.FALSE );
+        expecting.put(
+            "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/nexus-indexer-1.0-beta-5-20080731.150252-163.jar",
+            Boolean.TRUE );
+        expecting
+            .put(
+                "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/nexus-indexer-1.0-beta-5-20080731.150252-163.jar.sha1",
+                Boolean.TRUE );
+        expecting.put(
+            "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/nexus-indexer-1.0-beta-5-20080731.150252-163.pom",
+            Boolean.TRUE );
+        expecting
+            .put(
+                "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/nexus-indexer-1.0-beta-5-20080731.150252-163.pom.sha1",
+                Boolean.TRUE );
 
-        gavRequest.setRequestLocalOnly( true );
+        validateResults( expecting );
+    }
 
-        try
-        {
-            apacheSnapshots.retrieveArtifactPom( gavRequest );
-        }
-        catch ( ItemNotFoundException e )
-        {
-            fail( "This is the newest, it should be left!" );
-        }
-
-        try
-        {
-            apacheSnapshots.retrieveArtifact( gavRequest );
-        }
-        catch ( ItemNotFoundException e )
-        {
-            fail( "This is the newest, it should be left!" );
-        }
-
-        gavRequest = new ArtifactStoreRequest( "org.sonatype.nexus", "nexus-indexer", "1.0-beta-5-20080730.002543-149" );
-
-        gavRequest.setRequestLocalOnly( true );
-
-        try
-        {
-            apacheSnapshots.retrieveArtifactPom( gavRequest );
-
-            fail( "This is not the newest, it should be deleted!" );
-        }
-        catch ( ItemNotFoundException e )
-        {
-            // good
-        }
-
-        gavRequest = new ArtifactStoreRequest( "org.sonatype.nexus", "nexus-indexer", "1.0-beta-5-20080718.231118-50" );
-
-        gavRequest.setRequestLocalOnly( true );
-
-        try
-        {
-            apacheSnapshots.retrieveArtifactPom( gavRequest );
-
-            fail( "This is not the newest, it should be deleted!" );
-        }
-        catch ( ItemNotFoundException e )
-        {
-            // good
-        }
-
-        try
-        {
-            apacheSnapshots.retrieveArtifact( gavRequest );
-
-            fail( "This is not the newest, it should be deleted!" );
-        }
-        catch ( ItemNotFoundException e )
-        {
-            // good
-        }
-
-        // get 1 piece of maven-artifact
-        try
-        {
-            apacheSnapshots.retrieveItem( new ResourceStoreRequest(
-                "/org/sonatype/nexus/nexus-indexer/1.0-beta-4-SNAPSHOT/nexus-indexer-1.0-beta-4-SNAPSHOT.pom",
-                true ) );
-
-            fail( "Release exists, it should be deleted!" );
-        }
-        catch ( ItemNotFoundException e )
-        {
-            // good
-        }
-
-        try
-        {
-            apacheSnapshots.retrieveItem( new ResourceStoreRequest(
-                "/org/sonatype/nexus/nexus-indexer/1.0-beta-4-SNAPSHOT/nexus-indexer-1.0-beta-4-SNAPSHOT.jar",
-                true ) );
-
-            fail( "Release exists, it should be deleted!" );
-        }
-        catch ( ItemNotFoundException e )
-        {
-            // good
-        }
-
-        // and get it's release counterpart
-        try
-        {
-            central.retrieveItem( new ResourceStoreRequest(
-                "/org/sonatype/nexus/nexus-indexer/1.0-beta-4/nexus-indexer-1.0-beta-4.pom",
-                true ) );
-        }
-        catch ( ItemNotFoundException e )
-        {
-            fail( "This is the release, it should be left!" );
-        }
-
-        try
-        {
-            central.retrieveItem( new ResourceStoreRequest(
-                "/org/sonatype/nexus/nexus-indexer/1.0-beta-4/nexus-indexer-1.0-beta-4.jar",
-                true ) );
-        }
-        catch ( ItemNotFoundException e )
-        {
-            fail( "This is the release, it should be left!" );
-        }
-
-        /*******************************************
-         * Start round 2
-         ******************************************/
-
+    public void testSnapshotRemoverDoNotRemoveReleased()
+        throws Exception
+    {
         fillInRepo();
 
         // and now setup the request
-        // process the apacheSnapshots, leave min 2 snap
-        request = new SnapshotRemovalRequest( apacheSnapshots.getId(), null, 2, -1, false );
+        // process the apacheSnapshots, leave min 2 snap, do not remove released ones
+        SnapshotRemovalRequest snapshotRemovalRequest = new SnapshotRemovalRequest(
+            snapshots.getId(),
+            null,
+            2,
+            -1,
+            false );
 
-        result = defaultNexus.removeSnapshots( request );
+        SnapshotRemovalResult result = defaultNexus.removeSnapshots( snapshotRemovalRequest );
 
         assertEquals( 1, result.getProcessedRepositories().size() );
 
-        gavRequest = null;
+        HashMap<String, Boolean> expecting = new HashMap<String, Boolean>();
 
-        // test the results by their local availability
+        // 1.0-beta-4-SNAPSHOT should be untouched completely
+        expecting.put(
+            "/org/sonatype/nexus/nexus-indexer/1.0-beta-4-SNAPSHOT/nexus-indexer-1.0-beta-4-SNAPSHOT-cli.jar",
+            Boolean.TRUE );
+        expecting.put(
+            "/org/sonatype/nexus/nexus-indexer/1.0-beta-4-SNAPSHOT/nexus-indexer-1.0-beta-4-SNAPSHOT-jdk14.jar",
+            Boolean.TRUE );
+        expecting.put(
+            "/org/sonatype/nexus/nexus-indexer/1.0-beta-4-SNAPSHOT/nexus-indexer-1.0-beta-4-SNAPSHOT-sources.jar",
+            Boolean.TRUE );
+        expecting.put(
+            "/org/sonatype/nexus/nexus-indexer/1.0-beta-4-SNAPSHOT/nexus-indexer-1.0-beta-4-SNAPSHOT.pom",
+            Boolean.TRUE );
+        expecting.put(
+            "/org/sonatype/nexus/nexus-indexer/1.0-beta-4-SNAPSHOT/nexus-indexer-1.0-beta-4-SNAPSHOT.jar",
+            Boolean.TRUE );
 
-        gavRequest = new ArtifactStoreRequest( "org.sonatype.nexus", "nexus-indexer", "1.0-beta-5-20080731.150252-163" );
+        // 1.0-beta-5-SNAPSHOT should have only twp snapshot remaining, the two newest
+        expecting.put(
+            "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/nexus-indexer-1.0-beta-5-20080711.162119-2.jar",
+            Boolean.FALSE );
+        expecting
+            .put(
+                "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/nexus-indexer-1.0-beta-5-20080711.162119-2.jar.sha1",
+                Boolean.FALSE );
+        expecting.put(
+            "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/nexus-indexer-1.0-beta-5-20080711.162119-2.pom",
+            Boolean.FALSE );
+        expecting
+            .put(
+                "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/nexus-indexer-1.0-beta-5-20080711.162119-2.pom.sha1",
+                Boolean.FALSE );
+        expecting.put(
+            "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/nexus-indexer-1.0-beta-5-20080718.231118-50.jar",
+            Boolean.FALSE );
+        expecting
+            .put(
+                "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/nexus-indexer-1.0-beta-5-20080718.231118-50.jar.sha1",
+                Boolean.FALSE );
+        expecting.put(
+            "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/nexus-indexer-1.0-beta-5-20080718.231118-50.pom",
+            Boolean.FALSE );
+        expecting
+            .put(
+                "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/nexus-indexer-1.0-beta-5-20080718.231118-50.pom.sha1",
+                Boolean.FALSE );
+        expecting.put(
+            "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/nexus-indexer-1.0-beta-5-20080730.002543-149.jar",
+            Boolean.TRUE );
+        expecting
+            .put(
+                "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/nexus-indexer-1.0-beta-5-20080730.002543-149.jar.sha1",
+                Boolean.TRUE );
+        expecting.put(
+            "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/nexus-indexer-1.0-beta-5-20080730.002543-149.pom",
+            Boolean.TRUE );
+        expecting
+            .put(
+                "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/nexus-indexer-1.0-beta-5-20080730.002543-149.pom.sha1",
+                Boolean.TRUE );
+        expecting.put(
+            "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/nexus-indexer-1.0-beta-5-20080731.150252-163.jar",
+            Boolean.TRUE );
+        expecting
+            .put(
+                "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/nexus-indexer-1.0-beta-5-20080731.150252-163.jar.sha1",
+                Boolean.TRUE );
+        expecting.put(
+            "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/nexus-indexer-1.0-beta-5-20080731.150252-163.pom",
+            Boolean.TRUE );
+        expecting
+            .put(
+                "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/nexus-indexer-1.0-beta-5-20080731.150252-163.pom.sha1",
+                Boolean.TRUE );
 
-        gavRequest.setRequestLocalOnly( true );
-
-        try
-        {
-            apacheSnapshots.retrieveArtifactPom( gavRequest );
-        }
-        catch ( ItemNotFoundException e )
-        {
-            fail( "Should not be deleted!" );
-        }
-
-        try
-        {
-            apacheSnapshots.retrieveArtifact( gavRequest );
-        }
-        catch ( ItemNotFoundException e )
-        {
-            fail( "Should not be deleted!" );
-        }
-
-        gavRequest = new ArtifactStoreRequest( "org.sonatype.nexus", "nexus-indexer", "1.0-beta-5-20080730.002543-149" );
-
-        gavRequest.setRequestLocalOnly( true );
-
-        try
-        {
-            apacheSnapshots.retrieveArtifactPom( gavRequest );
-        }
-        catch ( ItemNotFoundException e )
-        {
-            fail( "Should not be deleted!" );
-        }
-
-        try
-        {
-            apacheSnapshots.retrieveArtifact( gavRequest );
-        }
-        catch ( ItemNotFoundException e )
-        {
-            fail( "Should not be deleted!" );
-        }
-
-        gavRequest = new ArtifactStoreRequest( "org.sonatype.nexus", "nexus-indexer", "1.0-beta-5-20080718.231118-50" );
-
-        gavRequest.setRequestLocalOnly( true );
-
-        try
-        {
-            apacheSnapshots.retrieveArtifactPom( gavRequest );
-
-            fail( "Should be deleted!" );
-        }
-        catch ( ItemNotFoundException e )
-        {
-            // good
-        }
-
-        try
-        {
-            apacheSnapshots.retrieveArtifact( gavRequest );
-
-            fail( "Should be deleted!" );
-        }
-        catch ( ItemNotFoundException e )
-        {
-            // good
-        }
-
-        // get 1 piece of maven-artifact
-        try
-        {
-            apacheSnapshots.retrieveItem( new ResourceStoreRequest(
-                "/org/sonatype/nexus/nexus-indexer/1.0-beta-4-SNAPSHOT/nexus-indexer-1.0-beta-4-SNAPSHOT.pom",
-                true ) );
-        }
-        catch ( ItemNotFoundException e )
-        {
-            fail( "Should not be deleted!" );
-        }
-
-        try
-        {
-            apacheSnapshots.retrieveItem( new ResourceStoreRequest(
-                "/org/sonatype/nexus/nexus-indexer/1.0-beta-4-SNAPSHOT/nexus-indexer-1.0-beta-4-SNAPSHOT.jar",
-                true ) );
-        }
-        catch ( ItemNotFoundException e )
-        {
-            fail( "Should not be deleted!" );
-        }
-
-        // and get it's release counterpart
-        try
-        {
-            central.retrieveItem( new ResourceStoreRequest(
-                "/org/sonatype/nexus/nexus-indexer/1.0-beta-4/nexus-indexer-1.0-beta-4.pom",
-                true ) );
-        }
-        catch ( ItemNotFoundException e )
-        {
-            fail( "Should not be deleted!" );
-        }
-
-        try
-        {
-            central.retrieveItem( new ResourceStoreRequest(
-                "/org/sonatype/nexus/nexus-indexer/1.0-beta-4/nexus-indexer-1.0-beta-4.jar",
-                true ) );
-        }
-        catch ( ItemNotFoundException e )
-        {
-            fail( "Should not be deleted!" );
-        }
-
+        validateResults( expecting );
     }
-
 }
