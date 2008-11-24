@@ -72,7 +72,7 @@ public class RebuildMavenMetadataTask
         }
         else
         {
-            return "Rebuilding attributes of all registered repositories";
+            return "Rebuilding maven metadata of all registered repositories";
         }
     }
 }
