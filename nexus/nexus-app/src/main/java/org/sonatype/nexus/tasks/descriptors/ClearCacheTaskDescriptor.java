@@ -55,7 +55,7 @@ public class ClearCacheTaskDescriptor
     
     public String getName()
     {
-        return "Clear Repository Caches";
+        return "Expire Repository Caches";
     }
 
     public List<ScheduledTaskPropertyDescriptor> getPropertyDescriptors()
