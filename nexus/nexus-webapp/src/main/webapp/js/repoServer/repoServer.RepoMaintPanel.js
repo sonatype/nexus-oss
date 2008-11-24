@@ -205,7 +205,8 @@ Sonatype.repoServer.RepoMaintPanel = function(config){
     {name:'repoPolicy'},
     {name:'contentUri', mapping:'resourceURI', convert: this.restToContentUrl },
     {name:'remoteUri'},
-    {name:'userManaged'}
+    {name:'userManaged'},
+    {name:'exposed'}
   ]);
 
   this.reposReader = new Ext.data.JsonReader({root: 'data', id: 'resourceURI'}, this.repoRecordConstructor );
@@ -530,6 +531,12 @@ Ext.extend(Sonatype.repoServer.RepoMaintPanel, Sonatype.repoServer.AbstractRepoP
   onBrowseContextClickHandler : function(node, e){
     this.onBrowseContextHideHandler();
     
+    var rec = (this.ctxRecord) ? this.ctxRecord : this.reposGridPanel.getSelectionModel().getSelected();
+    
+    if ( rec.get( 'exposed' ) == false )
+      return;
+        
+    
     var isProxyRepo = (node.getOwnerTree().root.attributes.repoType == 'proxy');
     var isGroup = (node.getOwnerTree().root.attributes.repoType == 'group');
     
@@ -545,8 +552,7 @@ Ext.extend(Sonatype.repoServer.RepoMaintPanel, Sonatype.repoServer.AbstractRepoP
       this.ctxBrowseNode );
     
     if (node.isLeaf()){
-      if (isProxyRepo){
-        var rec = (this.ctxRecord) ? this.ctxRecord : this.reposGridPanel.getSelectionModel().getSelected();      
+      if (isProxyRepo){      
         this.actions.downloadFromRemote.href = this.restToRemoteUrl(node,rec);
         menu.add(this.actions.downloadFromRemote);
       }

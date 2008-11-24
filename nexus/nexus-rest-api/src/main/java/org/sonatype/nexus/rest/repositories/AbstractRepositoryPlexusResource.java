@@ -546,6 +546,8 @@ public abstract class AbstractRepositoryPlexusResource
                 repoRes.setName( repository.getName() );
 
                 repoRes.setUserManaged( repository.isUserManaged() );
+                
+                repoRes.setExposed( repository.isExposed() );
 
                 repoRes.setEffectiveLocalStorageUrl( repository.getLocalStorage() != null
                     && repository.getLocalStorage().getUrl() != null
