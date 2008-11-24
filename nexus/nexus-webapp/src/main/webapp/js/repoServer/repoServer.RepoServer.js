@@ -187,6 +187,10 @@ Sonatype.repoServer.RepoServer = function(){
       this.loginWindow.on('close', function(){
         this.loginForm.getForm().reset();
       }, this);
+      
+      this.loginWindow.on('hide', function(){
+        this.loginForm.getForm().reset();
+      }, this);
     },
     
     //Add/Replace Nexus left hand components
