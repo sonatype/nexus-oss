@@ -5,7 +5,6 @@
 <!--                                                                 -->
 <!--  NOTE: Copy this file to ../jetty.xml to use it.                -->
 <!--                                                                 -->
-<!-- --------------------------------------------------------------- -->
 <!-- Configure the Jetty Server                                      -->
 <!--                                                                 -->
 <!-- Documentation of this file format can be found at:              -->
