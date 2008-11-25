@@ -36,7 +36,7 @@ import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 
 public interface MavenRepository
-    extends ArtifactStore, Repository
+    extends Repository
 {
     GavCalculator getGavCalculator();
 

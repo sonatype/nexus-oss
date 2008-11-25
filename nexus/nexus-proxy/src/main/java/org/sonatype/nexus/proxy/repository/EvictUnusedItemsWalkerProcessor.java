@@ -3,38 +3,32 @@ package org.sonatype.nexus.proxy.repository;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.codehaus.plexus.logging.Logger;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.RepositoryNotAvailableException;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
-import org.sonatype.nexus.proxy.utils.StoreFileWalker;
+import org.sonatype.nexus.proxy.walker.AbstractFileWalkerProcessor;
+import org.sonatype.nexus.proxy.walker.WalkerContext;
 
-public class EvictUnusedItemsWalker
-    extends StoreFileWalker
+public class EvictUnusedItemsWalkerProcessor
+    extends AbstractFileWalkerProcessor
 {
-    private final Repository repository;
-
     private final long timestamp;
 
     private final ArrayList<String> files;
 
-    public EvictUnusedItemsWalker( Repository repository, Logger logger, long timestamp )
+    public EvictUnusedItemsWalkerProcessor( long timestamp )
     {
-        super( repository, logger );
-
-        this.repository = repository;
-
         this.timestamp = timestamp;
 
         this.files = new ArrayList<String>();
     }
 
-    protected Repository getRepository()
+    protected Repository getRepository( WalkerContext ctx )
     {
-        return repository;
+        return (Repository) ctx.getResourceStore();
     }
 
     public long getTimestamp()
@@ -48,67 +42,65 @@ public class EvictUnusedItemsWalker
     }
 
     @Override
-    protected void processFileItem( StorageFileItem item )
+    public void processFileItem( WalkerContext ctx, StorageFileItem item )
+        throws StorageException
     {
         // expiring found files
         try
         {
             if ( item.getLastRequested() < getTimestamp() )
             {
-                doDelete( item );
-                
+                doDelete( ctx, item );
+
                 getFiles().add( item.getPath() );
             }
         }
         catch ( RepositoryNotAvailableException e )
         {
             // simply stop if set during processing
-            stop( e );
+            ctx.stop( e );
         }
         catch ( UnsupportedStorageOperationException e )
         {
             // if op not supported (R/O repo?)
-            stop( e );
+            ctx.stop( e );
         }
         catch ( ItemNotFoundException e )
         {
             // will not happen
         }
-        catch ( StorageException e )
-        {
-            getLogger().warn( "Got storage exception while evicting " + item.getRepositoryItemUid().toString(), e );
-        }
     }
-    
-    protected void doDelete( StorageFileItem item ) 
-        throws StorageException, 
-            UnsupportedStorageOperationException, 
-            RepositoryNotAvailableException, 
+
+    protected void doDelete( WalkerContext ctx, StorageFileItem item )
+        throws StorageException,
+            UnsupportedStorageOperationException,
+            RepositoryNotAvailableException,
             ItemNotFoundException
     {
-        getRepository().deleteItem( item.getRepositoryItemUid(), item.getItemContext() );
+        getRepository( ctx ).deleteItem( item.getRepositoryItemUid(), item.getItemContext() );
     }
 
     @Override
-    protected void onCollectionExit( StorageCollectionItem coll )
+    public void onCollectionExit( WalkerContext ctx, StorageCollectionItem coll )
+        throws Exception
     {
         // expiring now empty directories
         try
         {
-            if ( ( (Repository) getResourceStore() ).list( coll ).size() == 0 )
+            if ( getRepository( ctx ).list( coll ).size() == 0 )
             {
-                getRepository().deleteItem( coll.getRepositoryItemUid(), coll.getItemContext() );
+                getRepository( ctx ).deleteItem( coll.getRepositoryItemUid(), coll.getItemContext() );
             }
         }
         catch ( RepositoryNotAvailableException e )
         {
             // simply stop if set during processing
-            stop( e );
+            ctx.stop( e );
         }
         catch ( UnsupportedStorageOperationException e )
         {
             // if op not supported (R/O repo?)
-            stop( e );
+            ctx.stop( e );
         }
         catch ( ItemNotFoundException e )
         {
@@ -116,7 +108,7 @@ public class EvictUnusedItemsWalker
         }
         catch ( StorageException e )
         {
-            stop( e );
+            ctx.stop( e );
         }
     }
 }

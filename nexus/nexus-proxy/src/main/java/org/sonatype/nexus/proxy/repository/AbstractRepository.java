@@ -72,7 +72,9 @@ import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 import org.sonatype.nexus.proxy.target.TargetRegistry;
 import org.sonatype.nexus.proxy.target.TargetSet;
 import org.sonatype.nexus.proxy.utils.StoreFileWalker;
+import org.sonatype.nexus.proxy.walker.DefaultWalkerContext;
 import org.sonatype.nexus.proxy.walker.Walker;
+import org.sonatype.nexus.proxy.walker.WalkerException;
 import org.sonatype.nexus.scheduling.DefaultRepositoryTaskActivityDescriptor;
 import org.sonatype.nexus.scheduling.DefaultRepositoryTaskFilter;
 import org.sonatype.nexus.scheduling.RepositoryTaskFilter;
@@ -710,14 +712,25 @@ public abstract class AbstractRepository
 
     public Collection<String> evictUnusedItems( final long timestamp )
     {
-        EvictUnusedItemsWalker walker = new EvictUnusedItemsWalker( this, getLogger(), timestamp );
+        EvictUnusedItemsWalkerProcessor walkerProcessor = new EvictUnusedItemsWalkerProcessor( timestamp );
+
+        DefaultWalkerContext ctx = new DefaultWalkerContext( this );
+
+        ctx.getProcessors().add( walkerProcessor );
 
         // and let it loose
-        walker.walk( RepositoryItemUid.PATH_ROOT, true, false );
+        try
+        {
+            walker.walk( ctx, true, false );
+        }
+        catch ( WalkerException e )
+        {
+            getLogger().warn( "Walker throw an exception:", e );
+        }
 
         notifyProximityEventListeners( new RepositoryEventEvictUnusedItems( this ) );
 
-        return walker.getFiles();
+        return walkerProcessor.getFiles();
     }
 
     public boolean recreateAttributes( String path, final Map<String, String> initialData )

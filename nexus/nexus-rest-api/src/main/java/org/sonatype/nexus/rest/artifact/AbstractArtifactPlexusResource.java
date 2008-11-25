@@ -32,6 +32,7 @@ import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.access.AccessManager;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
+import org.sonatype.nexus.proxy.maven.ArtifactStoreHelper;
 import org.sonatype.nexus.proxy.maven.ArtifactStoreRequest;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
@@ -142,7 +143,9 @@ public abstract class AbstractArtifactPlexusResource
 
             try
             {
-                StorageFileItem file = ( (MavenRepository) repository ).retrieveArtifactPom( gavRequest );
+                ArtifactStoreHelper helper = new ArtifactStoreHelper( (MavenRepository) repository );
+
+                StorageFileItem file = helper.retrieveArtifactPom( gavRequest );
 
                 pomContent = file.getInputStream();
 
@@ -220,7 +223,9 @@ public abstract class AbstractArtifactPlexusResource
                 throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "This is not a Maven repository!" );
             }
 
-            StorageFileItem file = ( (MavenRepository) repository ).retrieveArtifact( gavRequest );
+            ArtifactStoreHelper helper = new ArtifactStoreHelper( (MavenRepository) repository );
+
+            StorageFileItem file = helper.retrieveArtifact( gavRequest );
 
             if ( redirectTo )
             {
@@ -421,6 +426,8 @@ public abstract class AbstractArtifactPlexusResource
                     {
                         Repository repository = getNexus().getRepository( repositoryId );
 
+                        ArtifactStoreHelper helper = new ArtifactStoreHelper( (MavenRepository) repository );
+
                         if ( !MavenRepository.class.isAssignableFrom( repository.getClass() ) )
                         {
                             getLogger().warn( "Upload to non maven repository attempted" );
@@ -455,7 +462,7 @@ public abstract class AbstractArtifactPlexusResource
 
                         if ( isPom )
                         {
-                            ( (MavenRepository) repository ).storeArtifactPom( gavRequest, is, null );
+                            helper.storeArtifactPom( gavRequest, is, null );
 
                             isPom = false;
                         }
@@ -463,11 +470,11 @@ public abstract class AbstractArtifactPlexusResource
                         {
                             if ( hasPom )
                             {
-                                ( (MavenRepository) repository ).storeArtifact( gavRequest, is, null );
+                                helper.storeArtifact( gavRequest, is, null );
                             }
                             else
                             {
-                                ( (MavenRepository) repository ).storeArtifactWithGeneratedPom( gavRequest, is, null );
+                                helper.storeArtifactWithGeneratedPom( gavRequest, is, null );
                             }
                         }
                     }

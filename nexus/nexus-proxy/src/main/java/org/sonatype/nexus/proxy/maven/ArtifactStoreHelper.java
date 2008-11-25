@@ -54,9 +54,10 @@ import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
  * Repository interface of it's "owner" repository for storing/retrieval.
  * 
  * @author cstamas
+ * @deprecated Please try to avoid using this class until we decide how should we properly add
+ *             "high level maven awareness" to reposes.
  */
 public class ArtifactStoreHelper
-    implements ArtifactStore
 {
     private final MavenRepository repository;
 

@@ -26,7 +26,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -41,7 +40,6 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
-import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.artifact.GavCalculator;
 import org.sonatype.nexus.artifact.M2ArtifactRecognizer;
 import org.sonatype.nexus.proxy.AccessDeniedException;
@@ -60,7 +58,6 @@ import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.item.StringContentLocator;
 import org.sonatype.nexus.proxy.maven.ArtifactPackagingMapper;
 import org.sonatype.nexus.proxy.maven.ArtifactStoreHelper;
-import org.sonatype.nexus.proxy.maven.ArtifactStoreRequest;
 import org.sonatype.nexus.proxy.maven.ChecksumPolicy;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.maven.MetadataManager;
@@ -409,89 +406,6 @@ public class ConstrainedM2ShadowRepository
         {
             // ignore not found
         }
-    }
-
-    // =================================================================================
-    // ArtifactStore iface
-
-    public StorageFileItem retrieveArtifactPom( ArtifactStoreRequest gavRequest )
-        throws NoSuchResourceStoreException,
-            RepositoryNotAvailableException,
-            ItemNotFoundException,
-            StorageException,
-            AccessDeniedException
-    {
-        return getArtifactStoreHelper().retrieveArtifactPom( gavRequest );
-    }
-
-    public StorageFileItem retrieveArtifact( ArtifactStoreRequest gavRequest )
-        throws NoSuchResourceStoreException,
-            RepositoryNotAvailableException,
-            ItemNotFoundException,
-            StorageException,
-            AccessDeniedException
-    {
-        return getArtifactStoreHelper().retrieveArtifact( gavRequest );
-    }
-
-    public void storeArtifact( ArtifactStoreRequest gavRequest, InputStream is, Map<String, String> attributes )
-        throws UnsupportedStorageOperationException,
-            NoSuchResourceStoreException,
-            RepositoryNotAvailableException,
-            StorageException,
-            AccessDeniedException
-    {
-        getArtifactStoreHelper().storeArtifact( gavRequest, is, attributes );
-    }
-
-    public void storeArtifactPom( ArtifactStoreRequest gavRequest, InputStream is, Map<String, String> attributes )
-        throws UnsupportedStorageOperationException,
-            NoSuchResourceStoreException,
-            RepositoryNotAvailableException,
-            StorageException,
-            AccessDeniedException
-    {
-        getArtifactStoreHelper().storeArtifactPom( gavRequest, is, attributes );
-    }
-
-    public void storeArtifactWithGeneratedPom( ArtifactStoreRequest gavRequest, InputStream is,
-        Map<String, String> attributes )
-        throws UnsupportedStorageOperationException,
-            NoSuchResourceStoreException,
-            RepositoryNotAvailableException,
-            StorageException,
-            AccessDeniedException
-    {
-        getArtifactStoreHelper().storeArtifactWithGeneratedPom( gavRequest, is, attributes );
-    }
-
-    public void deleteArtifactPom( ArtifactStoreRequest gavRequest, boolean withChecksums, boolean withAllSubordinates,
-        boolean deleteWholeGav )
-        throws UnsupportedStorageOperationException,
-            NoSuchResourceStoreException,
-            RepositoryNotAvailableException,
-            ItemNotFoundException,
-            StorageException,
-            AccessDeniedException
-    {
-        getArtifactStoreHelper().deleteArtifactPom( gavRequest, withChecksums, withAllSubordinates, deleteWholeGav );
-    }
-
-    public void deleteArtifact( ArtifactStoreRequest gavRequest, boolean withChecksums, boolean withAllSubordinates,
-        boolean deleteWholeGav )
-        throws UnsupportedStorageOperationException,
-            NoSuchResourceStoreException,
-            RepositoryNotAvailableException,
-            ItemNotFoundException,
-            StorageException,
-            AccessDeniedException
-    {
-        getArtifactStoreHelper().deleteArtifact( gavRequest, withChecksums, withAllSubordinates, deleteWholeGav );
-    }
-
-    public Collection<Gav> listArtifacts( ArtifactStoreRequest gavRequest )
-    {
-        return getArtifactStoreHelper().listArtifacts( gavRequest );
     }
 
     // =================================================================================

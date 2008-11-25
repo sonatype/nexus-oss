@@ -28,9 +28,7 @@ import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.artifact.VersionUtils;
-import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
-import org.sonatype.nexus.proxy.NoSuchResourceStoreException;
 import org.sonatype.nexus.proxy.RepositoryNotAvailableException;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
@@ -569,19 +567,12 @@ public class DefaultMetadataManager
 
         try
         {
-            pomFile = repository.retrieveArtifactPom( req );
-        }
-        catch ( AccessDeniedException e )
-        {
-            getLogger().warn( "Could not maintain maven-plugin metadata!", e );
+            Gav pomGav = repository.getMetadataManager().resolveArtifact( repository, req );
 
-            return;
-        }
-        catch ( NoSuchResourceStoreException e )
-        {
-            getLogger().warn( "Could not maintain maven-plugin metadata!", e );
+            String pomPath = repository.getGavCalculator().gavToPath( pomGav );
 
-            return;
+            pomFile = (StorageFileItem) repository.retrieveItem( true, repository.createUid( pomPath ), req
+                .getRequestContext() );
         }
         catch ( ItemNotFoundException e )
         {
@@ -670,19 +661,12 @@ public class DefaultMetadataManager
 
         try
         {
-            pomFile = repository.retrieveArtifactPom( req );
-        }
-        catch ( AccessDeniedException e )
-        {
-            getLogger().warn( "Could not maintain maven-plugin metadata!", e );
+            Gav pomGav = repository.getMetadataManager().resolveArtifact( repository, req );
 
-            return;
-        }
-        catch ( NoSuchResourceStoreException e )
-        {
-            getLogger().warn( "Could not maintain maven-plugin metadata!", e );
+            String pomPath = repository.getGavCalculator().gavToPath( pomGav );
 
-            return;
+            pomFile = (StorageFileItem) repository.retrieveItem( true, repository.createUid( pomPath ), req
+                .getRequestContext() );
         }
         catch ( ItemNotFoundException e )
         {
@@ -773,8 +757,7 @@ public class DefaultMetadataManager
             version = resolveRelease( repository, gavRequest, gav );
         }
 
-        if ( Artifact.LATEST_VERSION.equals( version )
-            || Artifact.RELEASE_VERSION.equals( version ) )
+        if ( Artifact.LATEST_VERSION.equals( version ) || Artifact.RELEASE_VERSION.equals( version ) )
         {
             // Nexus was not able to resolve those
             return null;

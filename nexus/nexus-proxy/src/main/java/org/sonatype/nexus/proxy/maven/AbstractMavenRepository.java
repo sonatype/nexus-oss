@@ -29,7 +29,6 @@ import java.util.Map;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
-import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.artifact.NexusItemInfo;
 import org.sonatype.nexus.feeds.NexusArtifactEvent;
 import org.sonatype.nexus.proxy.AccessDeniedException;
@@ -47,6 +46,7 @@ import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.item.StringContentLocator;
+import org.sonatype.nexus.proxy.maven.EvictUnusedMavenItemsWalkerProcessor.EvictUnusedMavenItemsWalkerFilter;
 import org.sonatype.nexus.proxy.repository.ContentValidationResult;
 import org.sonatype.nexus.proxy.repository.DefaultRepository;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
@@ -98,21 +98,28 @@ public abstract class AbstractMavenRepository
      */
     private ChecksumPolicy checksumPolicy;
 
-    /**
-     * ArtifactStoreHelper.
-     */
-    private ArtifactStoreHelper artifactStoreHelper;
-
     public Collection<String> evictUnusedItems( final long timestamp )
     {
-        EvictUnusedMavenItemsWalker walker = new EvictUnusedMavenItemsWalker( this, getLogger(), timestamp );
+        EvictUnusedMavenItemsWalkerProcessor walkerProcessor = new EvictUnusedMavenItemsWalkerProcessor( timestamp );
 
-        // and let it loose
-        walker.walk( RepositoryItemUid.PATH_ROOT, true, false );
+        DefaultWalkerContext ctx = new DefaultWalkerContext(
+            this,
+            new EvictUnusedMavenItemsWalkerFilter() );
+
+        ctx.getProcessors().add( walkerProcessor );
+
+        try
+        {
+            getWalker().walk( ctx, true, false );
+        }
+        catch ( WalkerException e )
+        {
+
+        }
 
         notifyProximityEventListeners( new RepositoryEventEvictUnusedItems( this ) );
 
-        return walker.getFiles();
+        return walkerProcessor.getFiles();
     }
 
     public boolean recreateMavenMetadata( String path )
@@ -447,99 +454,7 @@ public abstract class AbstractMavenRepository
         return metadataManager;
     }
 
-    protected ArtifactStoreHelper getArtifactStoreHelper()
-    {
-        if ( artifactStoreHelper == null )
-        {
-            artifactStoreHelper = new ArtifactStoreHelper( this );
-        }
-        return artifactStoreHelper;
-    }
-
     public abstract boolean shouldServeByPolicies( RepositoryItemUid uid );
-
-    // =================================================================================
-    // ArtifactStore iface
-
-    public StorageFileItem retrieveArtifactPom( ArtifactStoreRequest gavRequest )
-        throws NoSuchResourceStoreException,
-            RepositoryNotAvailableException,
-            ItemNotFoundException,
-            StorageException,
-            AccessDeniedException
-    {
-        return getArtifactStoreHelper().retrieveArtifactPom( gavRequest );
-    }
-
-    public StorageFileItem retrieveArtifact( ArtifactStoreRequest gavRequest )
-        throws NoSuchResourceStoreException,
-            RepositoryNotAvailableException,
-            ItemNotFoundException,
-            StorageException,
-            AccessDeniedException
-    {
-        return getArtifactStoreHelper().retrieveArtifact( gavRequest );
-    }
-
-    public void storeArtifact( ArtifactStoreRequest gavRequest, InputStream is, Map<String, String> attributes )
-        throws UnsupportedStorageOperationException,
-            NoSuchResourceStoreException,
-            RepositoryNotAvailableException,
-            StorageException,
-            AccessDeniedException
-    {
-        getArtifactStoreHelper().storeArtifact( gavRequest, is, attributes );
-    }
-
-    public void storeArtifactPom( ArtifactStoreRequest gavRequest, InputStream is, Map<String, String> attributes )
-        throws UnsupportedStorageOperationException,
-            NoSuchResourceStoreException,
-            RepositoryNotAvailableException,
-            StorageException,
-            AccessDeniedException
-    {
-        getArtifactStoreHelper().storeArtifactPom( gavRequest, is, attributes );
-    }
-
-    public void storeArtifactWithGeneratedPom( ArtifactStoreRequest gavRequest, InputStream is,
-        Map<String, String> attributes )
-        throws UnsupportedStorageOperationException,
-            NoSuchResourceStoreException,
-            RepositoryNotAvailableException,
-            StorageException,
-            AccessDeniedException
-    {
-        getArtifactStoreHelper().storeArtifactWithGeneratedPom( gavRequest, is, attributes );
-    }
-
-    public void deleteArtifactPom( ArtifactStoreRequest gavRequest, boolean withChecksums, boolean withAllSubordinates,
-        boolean deleteWholeGav )
-        throws UnsupportedStorageOperationException,
-            NoSuchResourceStoreException,
-            RepositoryNotAvailableException,
-            ItemNotFoundException,
-            StorageException,
-            AccessDeniedException
-    {
-        getArtifactStoreHelper().deleteArtifactPom( gavRequest, withChecksums, withAllSubordinates, deleteWholeGav );
-    }
-
-    public void deleteArtifact( ArtifactStoreRequest gavRequest, boolean withChecksums, boolean withAllSubordinates,
-        boolean deleteWholeGav )
-        throws UnsupportedStorageOperationException,
-            NoSuchResourceStoreException,
-            RepositoryNotAvailableException,
-            ItemNotFoundException,
-            StorageException,
-            AccessDeniedException
-    {
-        getArtifactStoreHelper().deleteArtifact( gavRequest, withChecksums, withAllSubordinates, deleteWholeGav );
-    }
-
-    public Collection<Gav> listArtifacts( ArtifactStoreRequest gavRequest )
-    {
-        return getArtifactStoreHelper().listArtifacts( gavRequest );
-    }
 
     // =================================================================================
     // DefaultRepository customizations
@@ -818,7 +733,7 @@ public abstract class AbstractMavenRepository
                 getLogger().debug(
                     "The serving of item " + uid.toString() + " is forbidden by Maven repository policy." );
             }
-            
+
             throw new ItemNotFoundException( uid );
         }
     }

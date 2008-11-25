@@ -115,7 +115,14 @@ public class MavenRepositoryMetadataLocator
     {
         try
         {
-            StorageFileItem pomFile = getMavenRepository().retrieveArtifactPom( request );
+            Gav gav = getMavenRepository().getMetadataManager().resolveArtifact( getMavenRepository(), request );
+
+            String pomPath = getMavenRepository().getGavCalculator().gavToPath( gav );
+
+            StorageFileItem pomFile = (StorageFileItem) getMavenRepository().retrieveItem(
+                true,
+                getMavenRepository().createUid( pomPath ),
+                request.getRequestContext() );
 
             Model model = null;
 
