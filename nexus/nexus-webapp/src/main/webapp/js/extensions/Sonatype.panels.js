@@ -209,7 +209,7 @@ Ext.extend( Sonatype.panels.GridViewer, Ext.Panel, {
           title: rec.get( this.titleColumn )
         } );
 
-        Sonatype.Events.fireEvent( this.rowClickEvent, panel, rec.data );
+        Sonatype.Events.fireEvent( this.rowClickEvent, panel, rec );
 
         if ( panel.items ) {
           this.cardPanel.add( panel );
