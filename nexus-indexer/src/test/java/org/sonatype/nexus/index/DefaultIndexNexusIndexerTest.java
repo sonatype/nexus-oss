@@ -23,8 +23,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.lucene.document.Document;
-import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.FilteredQuery;
 import org.apache.lucene.search.PrefixQuery;
@@ -283,38 +281,12 @@ public class DefaultIndexNexusIndexerTest
         assertEquals(r.toString(), 1, r.size());
     }
 
-    public void testPackaging() throws Exception 
+    public void testArchetypePackaging() throws Exception 
     {
-        IndexReader reader = context.getIndexReader();
-        
-        for (int i = 0; i < reader.numDocs(); i++) 
-        {
-            Document document = reader.document( i );
-            
-            String uinfo = document.get( ArtifactInfo.UINFO );
-            
-            if( uinfo!=null ) 
-            {
-                String info = document.get( ArtifactInfo.INFO );
-                assertFalse(info.startsWith("null"));
-            }
-        }
-        
-        {
-            Query query = new TermQuery( new Term( ArtifactInfo.PACKAGING, "jar" ) );
-            FlatSearchResponse response = nexusIndexer.searchFlat(new FlatSearchRequest(query));
-            assertEquals(response.getResults().toString(), 19, response.getTotalHits());
-        }
-        {
-            Query query = new TermQuery( new Term( ArtifactInfo.PACKAGING, "tar.gz" ) );
-            FlatSearchResponse response = nexusIndexer.searchFlat(new FlatSearchRequest(query));
-            assertEquals(response.getResults().toString(), 1, response.getTotalHits());
-        }
-        {
-            Query query = new TermQuery( new Term( ArtifactInfo.PACKAGING, "zip" ) );
-            FlatSearchResponse response = nexusIndexer.searchFlat(new FlatSearchRequest(query));
-            assertEquals(response.getResults().toString(), 1, response.getTotalHits());
-        }
+        Query query = new TermQuery( new Term( ArtifactInfo.PACKAGING, "maven-archetype" ) );
+        FlatSearchResponse response = nexusIndexer.searchFlat(new FlatSearchRequest(query));
+        assertEquals(response.getResults().toString(), 4, response.getTotalHits());
     }
     
+
 }

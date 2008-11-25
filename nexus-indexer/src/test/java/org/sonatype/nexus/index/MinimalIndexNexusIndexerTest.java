@@ -90,4 +90,11 @@ public class MinimalIndexNexusIndexerTest
         assertEquals( "tricky-params", goals.get( 13 ) );
     }
 
+    public void testPluginPackaging() throws Exception 
+    {
+        Query query = new TermQuery( new Term( ArtifactInfo.PACKAGING, "maven-plugin" ) );
+        FlatSearchResponse response = nexusIndexer.searchFlat(new FlatSearchRequest(query));
+        assertEquals(response.getResults().toString(), 2, response.getTotalHits());
+    }
+    
 }

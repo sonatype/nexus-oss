@@ -58,8 +58,6 @@ public class ArtifactInfo
 
     public static final String NAME = "n";
 
-    public static final String EXTENSION = "e";
-
     public static final String DESCRIPTION = "d";
 
     public static final String REPOSITORY = "r";
@@ -211,9 +209,11 @@ public class ArtifactInfo
     @Override
     public String toString()
     {
-        return new StringBuilder()
-            .append( groupId ).append( ":" ).append( artifactId ).append( ":" ).append( version ).append( ":" ).append(
-                classifier ).toString();
+        return new StringBuilder( groupId )
+            .append( ':' ).append( artifactId )  //
+            .append( ':' ).append( version )  //
+            .append( ':' ).append( classifier ) //
+            .append( ':' ).append( packaging ).toString();
     }
 
     // ----------------------------------------------------------------------------

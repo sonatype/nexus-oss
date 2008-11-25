@@ -74,8 +74,6 @@ public class MinimalArtifactInfoIndexCreator
 
         File pom = artifactContext.getPom();
 
-        Gav gav = artifactContext.getGav();
-
         ArtifactInfo ai = artifactContext.getArtifactInfo();
 
         if ( pom != null )
@@ -96,6 +94,8 @@ public class MinimalArtifactInfoIndexCreator
             }
 
             ai.lastModified = pom.lastModified();
+            
+            ai.fextension = "pom";
         }
 
         if ( pom != null && ai.classifier == null )
@@ -136,38 +136,43 @@ public class MinimalArtifactInfoIndexCreator
 
             ai.size = artifact.length();
 
-            ai.fextension = FileUtils.getExtension( artifact.getName() );
+            ai.fextension = getExtension( artifact, artifactContext.getGav() );
 
             if ( ai.packaging == null )
             {
-                if ( gav != null )
-                {
-                    ai.packaging = gav.getExtension();
-                }
-                else
-                {
-                    // last resort, the extension of the file
-                    String artifactFileName = artifact.getName().toLowerCase();
-
-                    // tar.gz? and other "special" combinations?
-                    if ( artifactFileName.endsWith( "tar.gz" ) )
-                    {
-                        ai.packaging = "tar.gz";
-                    }
-                    else if ( artifactFileName.equals( "tar.bz2" ) )
-                    {
-                        ai.packaging = "tar.bz2";
-                    }
-                    else
-                    {
-                        // javadoc: gets the part _AFTER_ last dot!
-                        ai.packaging = FileUtils.getExtension( artifactFileName );
-                    }
-                }
+                ai.packaging = ai.fextension;
             }
         }
 
         checkMavenPlugin( ai, artifact );
+    }
+
+    private String getExtension( File artifact, Gav gav ) 
+    {
+        if ( gav != null )
+        {
+            return gav.getExtension();
+        }
+        else
+        {
+            // last resort, the extension of the file
+            String artifactFileName = artifact.getName().toLowerCase();
+  
+            // tar.gz? and other "special" combinations?
+            if ( artifactFileName.endsWith( "tar.gz" ) )
+            {
+                return "tar.gz";
+            }
+            else if ( artifactFileName.equals( "tar.bz2" ) )
+            {
+                return "tar.bz2";
+            }
+            else
+            {
+                // javadoc: gets the part _AFTER_ last dot!
+                return FileUtils.getExtension( artifactFileName );
+            }
+        }
     }
 
     private void checkMavenPlugin( ArtifactInfo ai, File artifact )
@@ -311,7 +316,24 @@ public class MinimalArtifactInfoIndexCreator
 
             ai.signatureExists = ArtifactAvailablility.fromString( r[5] );
 
-            ai.fextension = r[6];
+            if ( r.length > 6 )
+            {
+                ai.fextension = r[6];
+            }
+            else
+            {
+                if ( ai.classifier != null 
+                    || "pom".equals( ai.packaging ) 
+                    || "war".equals( ai.packaging ) 
+                    || "ear".equals( ai.packaging ) )
+                {
+                    ai.fextension = ai.packaging;
+                }
+                else
+                {
+                    ai.fextension = "jar";  // best guess
+                }
+            }
 
             if ( "maven-plugin".equals( ai.packaging ) )
             {

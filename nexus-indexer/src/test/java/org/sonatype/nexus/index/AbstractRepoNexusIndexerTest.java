@@ -20,7 +20,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.lucene.document.Document;
+import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.index.Term;
 import org.apache.lucene.search.Query;
+import org.apache.lucene.search.TermQuery;
 
 public abstract class AbstractRepoNexusIndexerTest
     extends AbstractNexusIndexerTest
@@ -89,16 +93,15 @@ public abstract class AbstractRepoNexusIndexerTest
 
         assertEquals( 2, list.size() );
 
-        ArtifactInfo ai = list.get( 0 );
-
-        assertEquals( "1.6.1", ai.version );
-
-        ai = list.get( 1 );
-
-        assertEquals( "1.5", ai.version );
-
-        assertEquals( "test", ai.repository );
-
+        {
+            ArtifactInfo ai = list.get( 0 );
+            assertEquals( "1.6.1", ai.version );
+        }
+        {
+            ArtifactInfo ai = list.get( 1 );
+            assertEquals( "1.5", ai.version );
+            assertEquals( "test", ai.repository );
+        }
     }
 
     public void testSearchGrouped()
@@ -290,4 +293,49 @@ public abstract class AbstractRepoNexusIndexerTest
         return true;
     }
 
+    public void testPackaging() throws Exception 
+    {
+        IndexReader reader = context.getIndexReader();
+        
+        for ( int i = 0; i < reader.numDocs(); i++ )
+        {
+            if ( !reader.isDeleted( i ) )
+            {
+                Document document = reader.document( i );
+                
+                String uinfo = document.get( ArtifactInfo.UINFO );
+                
+                if( uinfo != null ) 
+                {
+                    String info = document.get( ArtifactInfo.INFO );
+                    assertFalse(info.startsWith("null"));
+                }
+            }
+        }
+        
+//        {
+//            Query query = new TermQuery( new Term( ArtifactInfo.PACKAGING, "jar" ) );
+//            FlatSearchResponse response = nexusIndexer.searchFlat(new FlatSearchRequest(query));
+//            assertEquals(response.getResults().toString(), 22, response.getTotalHits());
+//        }
+        {
+            Query query = new TermQuery( new Term( ArtifactInfo.PACKAGING, "tar.gz" ) );
+            FlatSearchResponse response = nexusIndexer.searchFlat( new FlatSearchRequest( query ) );
+            assertEquals( response.getResults().toString(), 1, response.getTotalHits() );
+            
+            ArtifactInfo ai = response.getResults().iterator().next();
+            assertEquals( "tar.gz", ai.packaging );
+            assertEquals( "tar.gz", ai.fextension );
+        }
+        {
+            Query query = new TermQuery( new Term( ArtifactInfo.PACKAGING, "zip" ) );
+            FlatSearchResponse response = nexusIndexer.searchFlat( new FlatSearchRequest( query ) );
+            assertEquals( response.getResults().toString(), 1, response.getTotalHits() );
+            
+            ArtifactInfo ai = response.getResults().iterator().next();
+            assertEquals( "zip", ai.packaging );
+            assertEquals( "zip", ai.fextension );
+        }
+    }
+    
 }

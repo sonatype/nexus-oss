@@ -63,6 +63,7 @@ public class Nexus645NexusIndexerTest
         assertEquals( "pom", ai.packaging );
         assertEquals( null, ai.classifier );
         assertEquals( "nexus-645", ai.repository );
+        assertEquals( "pom", ai.fextension );
 
         // g a v p c #2
         ai = list.get( 1 );
@@ -73,6 +74,7 @@ public class Nexus645NexusIndexerTest
         assertEquals( "tar.gz", ai.packaging );
         assertEquals( "bin", ai.classifier );
         assertEquals( "nexus-645", ai.repository );
+        assertEquals( "tar.gz", ai.fextension );
 
         // g a v p c #3
         ai = list.get( 2 );
@@ -83,6 +85,7 @@ public class Nexus645NexusIndexerTest
         assertEquals( "zip", ai.packaging );
         assertEquals( "bin", ai.classifier );
         assertEquals( "nexus-645", ai.repository );
+        assertEquals( "zip", ai.fextension );
     }
 
 }
