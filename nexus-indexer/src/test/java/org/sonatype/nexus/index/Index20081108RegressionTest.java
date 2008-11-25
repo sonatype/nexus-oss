@@ -44,7 +44,10 @@ public class Index20081108RegressionTest
             null,
             NexusIndexer.DEFAULT_INDEX );
         
-        InputStream is = new FileInputStream("src" + File.separator + "test" + File.separator  + "nexus-maven-repository-index.20081108.zip" );
+        InputStream is = new FileInputStream( getBasedir() +  //
+            File.separator + "src" +  // 
+            File.separator + "test" + //
+            File.separator  + "nexus-maven-repository-index.20081108.zip" );
         Directory archiveDir = new RAMDirectory();
         
         IndexUtils.unpackIndexArchive( is, archiveDir );
