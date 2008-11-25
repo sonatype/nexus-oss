@@ -208,7 +208,6 @@
         <configuration>
           <warSourceIncludes>
           	*, 
-          	docs/*, 
           	ext-2.2/ext-all.js,
           	ext-2.2/adapter/ext/ext-base.js,
           	ext-2.2/resources/css/ext-all.css,
