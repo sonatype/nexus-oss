@@ -69,7 +69,7 @@ Sonatype.repoServer.RoutesEditPanel = function(config){
         fn: function() {
           var allRec = new this.repositoryGroupRecordConstructor({
               id : '*',
-              name : 'All Repositories'
+              name : 'All Repository Groups'
             },
             '*');
           this.repositoryGroupDataStore.insert(0, allRec);
