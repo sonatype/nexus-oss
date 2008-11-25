@@ -80,6 +80,26 @@ public class TaskScheduleUtil
         ScheduledServiceListResource task = getTask( name );
         return task.getLastRunResult();
     }
+    
+    public static void waitForTasks( int maxAttempts )
+        throws Exception
+    {
+        long sleep = 200;
+
+        Thread.sleep( 500 ); // give an time to task start
+
+        for ( int attempt = 0; attempt < maxAttempts; attempt++ )
+        {
+            Thread.sleep( sleep );
+
+            List<ScheduledServiceListResource> tasks = getTasks();
+
+            if ( tasks.size() == 0 )
+            {
+                return;
+            }
+        }
+    }
 
     /**
      * Blocks while waiting for a task to finish.
