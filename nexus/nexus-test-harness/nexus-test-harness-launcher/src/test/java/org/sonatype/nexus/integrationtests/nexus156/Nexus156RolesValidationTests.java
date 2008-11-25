@@ -154,7 +154,7 @@ public class Nexus156RolesValidationTests extends AbstractNexusIntegrationTest
         
         RoleResource resourceC = new RoleResource();
         resourceC = new RoleResource();
-        resourceC.setName( "recursive2" );
+        resourceC.setName( "recursive3" );
         resourceC.setSessionTimeout( 60 );
         resourceC.addRole( responseResourceB.getId() );
         

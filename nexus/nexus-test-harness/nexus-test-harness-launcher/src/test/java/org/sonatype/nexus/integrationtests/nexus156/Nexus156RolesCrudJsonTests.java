@@ -70,7 +70,7 @@ public class Nexus156RolesCrudJsonTests
         RoleResource resource = new RoleResource();
 
         resource.setDescription( "Create Test Role" );
-        resource.setName( "CreateRole" );
+        resource.setName( "ListTestRole" );
         resource.setSessionTimeout( 30 );
         resource.addPrivilege( "1" );
 
