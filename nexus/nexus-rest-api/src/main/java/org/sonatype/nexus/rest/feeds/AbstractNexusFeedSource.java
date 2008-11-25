@@ -223,7 +223,7 @@ public abstract class AbstractNexusFeedSource
                     }
                     else if ( NexusArtifactEvent.ACTION_DEPLOYED.equals( item.getAction() ) )
                     {
-                        msg.append( "deployed onto Nexus." );
+                        msg.append( "deployed into Nexus." );
 
                         if ( username != null )
                         {
