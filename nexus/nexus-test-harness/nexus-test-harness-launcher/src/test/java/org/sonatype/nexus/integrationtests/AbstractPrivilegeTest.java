@@ -134,14 +134,36 @@ public abstract class AbstractPrivilegeTest
         // use admin
         TestContainer.getInstance().getTestContext().useAdminForRequests();
 
-        // now give create
-        RoleResource role = new RoleResource();
-        role.setDescription( priv + " Role" );
-        role.setName( priv + "Role" );
-        role.setSessionTimeout( 60 );
-        role.addPrivilege( priv );
-        // save it
-        role = this.roleUtil.createRole( role );
+        RoleResource role = null;
+
+        // first try to retrieve
+        for ( RoleResource roleResource : roleUtil.getList() )
+        {
+            if ( roleResource.getName().equals( priv + "Role" ) )
+            {
+                role = roleResource;
+
+                if ( !role.getPrivileges().contains( priv ) )
+                {
+                    role.addPrivilege( priv );
+                    // update the permissions
+                    RoleMessageUtil.update( role );
+                }
+                break;
+            }
+        }
+
+        if ( role == null )
+        {
+            // now give create
+            role = new RoleResource();
+            role.setDescription( priv + " Role" );
+            role.setName( priv + "Role" );
+            role.setSessionTimeout( 60 );
+            role.addPrivilege( priv );
+            // save it
+            role = this.roleUtil.createRole( role );
+        }
 
         // add it
         this.giveUserRole( userId, role.getId() );
@@ -164,19 +186,42 @@ public abstract class AbstractPrivilegeTest
     {
         // use admin
         TestContainer.getInstance().getTestContext().useAdminForRequests();
-        
-        // now give create
-        RoleResource role = new RoleResource();
-        role.setDescription( newRoleName );
-        role.setName( newRoleName );
-        role.setSessionTimeout( 60 );
-        for ( String priv : permissions )
-        {
-            role.addPrivilege( priv );
-        }
-        // save it
-        role = this.roleUtil.createRole( role );
 
+        // now give create
+        RoleResource role = null;
+
+        // first try to retrieve
+        for ( RoleResource roleResource : roleUtil.getList() )
+        {
+            if ( roleResource.getName().equals( newRoleName ) )
+            {
+                role = roleResource;
+                role.getPrivileges().clear();
+                for ( String priv : permissions )
+                {
+                    role.addPrivilege( priv );
+                }
+                // update the permissions
+                RoleMessageUtil.update( role );
+                break;
+            }
+        }
+        // if doesn't exist, create it 
+        if ( role == null )
+        {
+            role = new RoleResource();
+            role.setDescription( newRoleName );
+            role.setName( newRoleName );
+            role.setSessionTimeout( 60 );
+            
+            for ( String priv : permissions )
+            {
+                role.addPrivilege( priv );
+            }
+            // save it
+            role = this.roleUtil.createRole( role );
+        }
+        
         // add it
         UserResource testUser = this.userUtil.getUser( userId );
         testUser.getRoles().clear();
