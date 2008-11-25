@@ -1,9 +1,17 @@
 package org.sonatype.nexus.rest.authentication;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.jsecurity.SecurityUtils;
 import org.jsecurity.authz.Permission;
 import org.jsecurity.authz.permission.WildcardPermission;
+import org.jsecurity.crypto.hash.Hash;
 import org.jsecurity.subject.Subject;
 import org.restlet.data.Request;
 import org.restlet.resource.ResourceException;
@@ -76,67 +84,109 @@ public abstract class AbstractUIPermissionCalculatingPlexusResource
             perms.setLoggedInUsername( "anonymous" );
         }
 
+        Map<String, Integer> privilegeMap = new HashMap<String, Integer>();
+
         for ( SecurityPrivilege priv : nexusSecurity.listPrivileges() )
         {
             if ( priv.getType().equals( "method" ) )
             {
                 String permission = nexusSecurity.getPrivilegeProperty( priv, "permission" );
 
-                ClientPermission cPermission = new ClientPermission();
-                cPermission.setId( permission );
-                cPermission.setValue( getFlagsForPermission( subject, permission, request ) );
+                // check this shit her
+                // FAIL COMPILE
+                // subject.checkPermissions( permissions )
+                privilegeMap.put( permission, NONE );
 
-                perms.addPermission( cPermission );
             }
+        }
+
+        // this will update the privilegeMap
+        this.checkSubjectsPermissions( subject, privilegeMap );
+
+        for ( Entry<String, Integer> privEntry : privilegeMap.entrySet() )
+        {
+            ClientPermission cPermission = new ClientPermission();
+            cPermission.setId( privEntry.getKey() );
+            cPermission.setValue( privEntry.getValue() );
+
+            perms.addPermission( cPermission );
         }
 
         return perms;
     }
 
-    protected int getFlagsForPermission( Subject subject, String domain, Request request )
-        throws ResourceException
+    private void checkSubjectsPermissions( Subject subject, Map<String, Integer> privilegeMap )
     {
-        if ( subject == null )
+        List<Permission> permissionList = new ArrayList<Permission>();
+        List<String> permissionNameList = new ArrayList<String>();
+
+        for ( Entry<String, Integer> priv : privilegeMap.entrySet() )
         {
-            if ( getNexus().isSecurityEnabled() )
+            permissionList.add( new WildcardPermission( priv.getKey() + ":read" ) );
+            permissionList.add( new WildcardPermission( priv.getKey() + ":create" ) );
+            permissionList.add( new WildcardPermission( priv.getKey() + ":update" ) );
+            permissionList.add( new WildcardPermission( priv.getKey() + ":delete" ) );
+            permissionNameList.add( priv.getKey() + ":read" );
+            permissionNameList.add( priv.getKey() + ":create" );
+            permissionNameList.add( priv.getKey() + ":update" );
+            permissionNameList.add( priv.getKey() + ":delete" );
+        }
+
+        if ( subject != null )
+        {
+
+            // get the privileges for this subject
+            boolean[] boolResults = subject.isPermitted( permissionList );
+
+            // put then in a map so we can access them easily
+            Map<String, Boolean> resultMap = new HashMap<String, Boolean>();
+            for ( int ii = 0; ii < permissionList.size(); ii++ )
             {
-                // WTF? How is it here then?
-                return NONE;
+                String permissionName = permissionNameList.get( ii );
+                boolean b = boolResults[ii];
+                resultMap.put( permissionName, b );
             }
-            else
+
+            // now loop through the original set and figure out the correct value
+            for ( Entry<String, Integer> priv : privilegeMap.entrySet() )
             {
-                // Security is OFF
-                return ALL;
+
+                boolean readPriv = resultMap.get( priv.getKey() + ":read" );
+                boolean createPriv = resultMap.get( priv.getKey() + ":create" );
+                boolean updaetPriv = resultMap.get( priv.getKey() + ":update" );
+                boolean deletePriv = resultMap.get( priv.getKey() + ":delete" );
+
+                int perm = NONE;
+
+                if ( readPriv )
+                {
+                    perm |= READ;
+                }
+                if ( createPriv )
+                {
+                    perm |= CREATE;
+                }
+                if ( updaetPriv )
+                {
+                    perm |= UPDATE;
+                }
+                if ( deletePriv )
+                {
+                    perm |= DELETE;
+                }
+                // now set the value
+                priv.setValue( perm );
+            }
+        }
+        else
+        {// subject is null
+            // we should not have got here if security is not enabled.
+            int value = getNexus().isSecurityEnabled() ? NONE : ALL;
+            for ( Entry<String, Integer> priv : privilegeMap.entrySet() )
+            {
+                priv.setValue( value );
             }
         }
 
-        Permission readPerm = new WildcardPermission( domain + ":read" );
-
-        Permission createPerm = new WildcardPermission( domain + ":create" );
-
-        Permission updatePerm = new WildcardPermission( domain + ":update" );
-
-        Permission deletePerm = new WildcardPermission( domain + ":delete" );
-
-        int perm = NONE;
-
-        if ( subject.isPermitted( readPerm ) )
-        {
-            perm |= READ;
-        }
-        if ( subject.isPermitted( createPerm ) )
-        {
-            perm |= CREATE;
-        }
-        if ( subject.isPermitted( updatePerm ) )
-        {
-            perm |= UPDATE;
-        }
-        if ( subject.isPermitted( deletePerm ) )
-        {
-            perm |= DELETE;
-        }
-
-        return perm;
     }
 }
