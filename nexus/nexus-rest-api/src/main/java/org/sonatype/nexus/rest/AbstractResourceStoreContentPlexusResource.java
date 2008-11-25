@@ -34,6 +34,8 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.fileupload.FileItem;
 import org.codehaus.plexus.util.StringUtils;
 import org.restlet.Context;
+import org.restlet.data.ChallengeRequest;
+import org.restlet.data.ChallengeScheme;
 import org.restlet.data.MediaType;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
@@ -63,10 +65,11 @@ import org.sonatype.nexus.proxy.item.StorageLinkItem;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.rest.model.ContentListResource;
 import org.sonatype.nexus.rest.model.ContentListResourceResponse;
-import org.sonatype.nexus.security.filter.NexusJSecurityFilter;
+import org.sonatype.nexus.security.filter.authc.NexusHttpAuthenticationFilter;
 import org.sonatype.plexus.rest.representation.VelocityRepresentation;
 
 import com.noelios.restlet.ext.servlet.ServletCall;
+import com.noelios.restlet.http.HttpRequest;
 
 /**
  * This is an abstract resource handler that uses ResourceStore implementor and publishes those over REST.
@@ -130,7 +133,7 @@ public abstract class AbstractResourceStoreContentPlexusResource
         }
         catch ( Exception e )
         {
-            handleException( request, e );
+            handleException( request, response, e );
 
             return null;
         }
@@ -154,7 +157,7 @@ public abstract class AbstractResourceStoreContentPlexusResource
         }
         catch ( Exception t )
         {
-            handleException( request, t );
+            handleException( request, response, t );
         }
         return null;
     }
@@ -180,7 +183,7 @@ public abstract class AbstractResourceStoreContentPlexusResource
         }
         catch ( Exception e )
         {
-            handleException( request, e );
+            handleException( request, response, e );
         }
     }
 
@@ -331,7 +334,7 @@ public abstract class AbstractResourceStoreContentPlexusResource
             }
             catch ( Exception e )
             {
-                handleException( req, e );
+                handleException( req, res, e );
 
                 return null;
             }
@@ -472,7 +475,7 @@ public abstract class AbstractResourceStoreContentPlexusResource
      * 
      * @param t
      */
-    protected void handleException( Request req, Exception t )
+    protected void handleException( Request req, Response res, Exception t )
         throws ResourceException
     {
         if ( t instanceof ResourceException )
@@ -523,13 +526,30 @@ public abstract class AbstractResourceStoreContentPlexusResource
         }
         else if ( t instanceof AccessDeniedException )
         {
-            // WARN1: WE ARE TYING RESTLET CODE TO BE RUN WITHIN SERLVET CONTAINER!
-            // WARN2: THIS IS SOMETHING NASTY!
-            HttpServletRequest request = ServletCall.getRequest( req );
+            // TODO: a big fat problem here!
+            // this makes restlet code tied to Servlet code, and we what is happening here is VERY dirty!
+            HttpServletRequest servletRequest = ( (ServletCall) ( (HttpRequest) req ).getHttpCall() ).getRequest();
 
-            request.setAttribute( NexusJSecurityFilter.REQUEST_IS_AUTHZ_REJECTED, Boolean.TRUE );
+            String scheme = (String) servletRequest.getAttribute( NexusHttpAuthenticationFilter.AUTH_SCHEME_KEY );
 
-            throw new ResourceException( Status.CLIENT_ERROR_UNAUTHORIZED, "Authenticate to access this resource!" );
+            ChallengeScheme challengeScheme = null;
+
+            if ( NexusHttpAuthenticationFilter.FAKE_AUTH_SCHEME.equals( scheme ) )
+            {
+                challengeScheme = new ChallengeScheme( "HTTP_NXBASIC", "NxBasic", "Fake basic HTTP authentication" );
+            }
+            else
+            {
+                challengeScheme = ChallengeScheme.HTTP_BASIC;
+            }
+
+            String realm = (String) servletRequest.getAttribute( NexusHttpAuthenticationFilter.AUTH_REALM_KEY );
+
+            res.setStatus( Status.CLIENT_ERROR_UNAUTHORIZED );
+
+            res.getChallengeRequests().add( new ChallengeRequest( challengeScheme, realm ) );
+
+            // throw new ResourceException( Status.CLIENT_ERROR_UNAUTHORIZED, "Authenticate to access this resource!" );
         }
         else
         {

@@ -240,7 +240,7 @@ public abstract class AbstractRegistryDrivenRepositoryRouter
         }
         else
         {
-            if ( accessDeniedCount > 1 )
+            if ( accessDeniedCount > 0 )
             {
                 if ( getLogger().isDebugEnabled() )
                 {

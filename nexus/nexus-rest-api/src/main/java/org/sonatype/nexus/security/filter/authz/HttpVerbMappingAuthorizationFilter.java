@@ -97,6 +97,7 @@ public class HttpVerbMappingAuthorizationFilter
         }
     }
 
+    @Override
     public boolean isAccessAllowed( ServletRequest request, ServletResponse response, Object mappedValue )
         throws IOException
     {
@@ -105,6 +106,7 @@ public class HttpVerbMappingAuthorizationFilter
         return super.isAccessAllowed( request, response, mapPerms( perms, getActionFromHttpVerb( request ) ) );
     }
 
+    @Override
     protected boolean onAccessDenied( ServletRequest request, ServletResponse response )
         throws IOException
     {

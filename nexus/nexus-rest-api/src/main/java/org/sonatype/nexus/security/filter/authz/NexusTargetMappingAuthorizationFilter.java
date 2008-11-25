@@ -98,6 +98,12 @@ public class NexusTargetMappingAuthorizationFilter
         return path;
     }
 
+    protected ResourceStoreRequest getResourceStoreRequest( ServletRequest request, boolean localOnly )
+    {
+        return new ResourceStoreRequest( getResourceStorePath( request ), localOnly );
+    }
+
+    @Override
     protected Action getActionFromHttpVerb( ServletRequest request )
     {
         String action = ( (HttpServletRequest) request ).getMethod().toLowerCase();
@@ -125,7 +131,6 @@ public class NexusTargetMappingAuthorizationFilter
                 // huh?
                 throw new IllegalStateException( "Got exception during target mapping!", e );
             }
-            
 
             // the path exists, this is UPDATE
             return super.getActionFromHttpVerb( action );
@@ -136,11 +141,7 @@ public class NexusTargetMappingAuthorizationFilter
         }
     }
 
-    protected ResourceStoreRequest getResourceStoreRequest( ServletRequest request, boolean localOnly )
-    {
-        return new ResourceStoreRequest( getResourceStorePath( request ), localOnly );
-    }
-
+    @Override
     public boolean isAccessAllowed( ServletRequest request, ServletResponse response, Object mappedValue )
         throws IOException
     {

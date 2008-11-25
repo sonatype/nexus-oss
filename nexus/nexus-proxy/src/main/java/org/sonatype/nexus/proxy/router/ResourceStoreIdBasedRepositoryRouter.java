@@ -46,7 +46,7 @@ import org.sonatype.nexus.proxy.registry.ContentClass;
 @Component( role = RootRepositoryRouter.class )
 public class ResourceStoreIdBasedRepositoryRouter
     extends AbstractRegistryDrivenRepositoryRouter
-    implements RepositoryRouter, Initializable
+    implements RootRepositoryRouter, Initializable
 {
     public static final String ROLE = "org.sonatype.nexus.proxy.router.RootRepositoryRouter";
 

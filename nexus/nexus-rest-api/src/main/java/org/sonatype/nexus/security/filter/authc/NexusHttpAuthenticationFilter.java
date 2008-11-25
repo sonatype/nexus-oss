@@ -21,7 +21,11 @@ import org.sonatype.nexus.security.filter.NexusJSecurityFilter;
 public class NexusHttpAuthenticationFilter
     extends BasicHttpAuthenticationFilter
 {
-    private static final String FAKE_AUTH_SCHEME = "NxBASIC";
+    public static final String AUTH_SCHEME_KEY = "auth.scheme";
+
+    public static final String AUTH_REALM_KEY = "auth.realm";
+
+    public static final String FAKE_AUTH_SCHEME = "NxBASIC";
 
     private static final String ANONYMOUS_LOGIN = "nexus.anonynmous";
 
@@ -64,6 +68,7 @@ public class NexusHttpAuthenticationFilter
         return (Nexus) request.getAttribute( Nexus.class.getName() );
     }
 
+    @Override
     protected boolean onAccessDenied( ServletRequest request, ServletResponse response )
         throws Exception
     {
@@ -106,10 +111,17 @@ public class NexusHttpAuthenticationFilter
         {
             sendChallenge( request, response );
         }
+        else
+        {
+            request.setAttribute( AUTH_SCHEME_KEY, getAuthcScheme() );
+
+            request.setAttribute( AUTH_REALM_KEY, getApplicationName() );
+        }
 
         return loggedIn;
     }
 
+    @Override
     protected boolean isLoginAttempt( String authzHeader )
     {
         // handle BASIC in the same way as our faked one
@@ -125,7 +137,8 @@ public class NexusHttpAuthenticationFilter
         }
     }
 
-    protected boolean isRememberMeEnabled( ServletRequest request )
+    @Override
+    protected boolean isRememberMe( ServletRequest request )
     {
         if ( request.getAttribute( ANONYMOUS_LOGIN ) == null )
         {
@@ -139,53 +152,6 @@ public class NexusHttpAuthenticationFilter
         {
             // it is anon login. no rembemberMe
             return false;
-        }
-    }
-
-    protected boolean executeLogin( AuthenticationToken token, ServletRequest request, ServletResponse response )
-    {
-        Subject subject = getSubject( request, response );
-
-        if ( token != null && subject != null )
-        {
-            try
-            {
-                subject.login( token );
-
-                if ( getLogger().isDebugEnabled() )
-                {
-                    getLogger().debug( "Successfully logged in user [" + token.getPrincipal() + "]" );
-                }
-
-                return true;
-            }
-            catch ( AuthenticationException ae )
-            {
-                getLogger().info(
-                    "Unable to authenticate user [" + token.getPrincipal() + "] from address/host ["
-                        + request.getRemoteAddr() + "/" + request.getRemoteHost() + "]" );
-
-                if ( getLogger().isDebugEnabled() )
-                {
-                    getLogger().debug( "Unable to log in user [" + token.getPrincipal() + "]", ae );
-                }
-
-                onAuthenticationException( token, ae, request, response );
-            }
-        }
-
-        // always default to false - authentication attempt never occurred or wasn't successful:
-        return false;
-    }
-
-    protected void onAuthenticationException( AuthenticationToken token, AuthenticationException ae,
-        ServletRequest request, ServletResponse response )
-    {
-        HttpServletResponse httpResponse = WebUtils.toHttp( response );
-
-        if ( ExpiredCredentialsException.class.isAssignableFrom( ae.getClass() ) )
-        {
-            httpResponse.addHeader( "X-Nexus-Reason", "expired" );
         }
     }
 
@@ -233,6 +199,21 @@ public class NexusHttpAuthenticationFilter
         return false;
     }
 
+    @Override
+    protected boolean onLoginFailure( AuthenticationToken token, AuthenticationException ae, ServletRequest request,
+        ServletResponse response )
+    {
+        HttpServletResponse httpResponse = WebUtils.toHttp( response );
+
+        if ( ExpiredCredentialsException.class.isAssignableFrom( ae.getClass() ) )
+        {
+            httpResponse.addHeader( "X-Nexus-Reason", "expired" );
+        }
+
+        return false;
+    }
+
+    @Override
     public void postHandle( ServletRequest request, ServletResponse response )
         throws Exception
     {

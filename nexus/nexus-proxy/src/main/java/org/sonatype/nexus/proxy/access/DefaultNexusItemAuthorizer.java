@@ -85,6 +85,11 @@ public class DefaultNexusItemAuthorizer
         {
             if ( subject != null )
             {
+                if ( getLogger().isDebugEnabled() )
+                {
+                    getLogger().debug( "Checking isPermitted() with perms: " + perms.toString() );
+                }
+
                 // And finally check each of the target permissions and see if the user
                 // has access, all it takes is one
                 for ( String perm : perms )
