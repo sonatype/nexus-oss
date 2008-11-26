@@ -1409,6 +1409,11 @@ public abstract class AbstractRepository
 
         return result;
     }
+    
+    public boolean isCompatible( Repository repository )
+    {
+        return getRepositoryContentClass().isCompatible( repository.getRepositoryContentClass() );
+    }
 
     /**
      * Do retrieve item.

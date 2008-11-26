@@ -482,4 +482,12 @@ public interface Repository
      * @return
      */
     Action getResultingActionOnWrite( ResourceStoreRequest rsr );
+    
+    /**
+     * Is the target repository compatible to this one
+     * 
+     * @param repository
+     * @return
+     */
+    boolean isCompatible( Repository repository );
 }

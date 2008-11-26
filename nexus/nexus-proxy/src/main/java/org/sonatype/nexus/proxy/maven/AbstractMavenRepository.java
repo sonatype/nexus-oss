@@ -49,6 +49,7 @@ import org.sonatype.nexus.proxy.item.StringContentLocator;
 import org.sonatype.nexus.proxy.maven.EvictUnusedMavenItemsWalkerProcessor.EvictUnusedMavenItemsWalkerFilter;
 import org.sonatype.nexus.proxy.repository.ContentValidationResult;
 import org.sonatype.nexus.proxy.repository.DefaultRepository;
+import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.proxy.walker.DefaultWalkerContext;
 import org.sonatype.nexus.proxy.walker.WalkerException;
@@ -757,6 +758,19 @@ public abstract class AbstractMavenRepository
 
             throw new UnsupportedStorageOperationException( msg );
         }
+    }
+    
+    @Override
+    public boolean isCompatible( Repository repository )
+    {
+        if ( super.isCompatible( repository )
+            && MavenRepository.class.isAssignableFrom( repository.getClass() ) 
+            && getRepositoryPolicy().equals( ( ( MavenRepository ) repository ).getRepositoryPolicy() ) )
+        {
+            return true;
+        }
+        
+        return false;
     }
 
 }

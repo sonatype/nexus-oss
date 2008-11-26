@@ -536,5 +536,11 @@ public class DummyRepository
         // TODO Auto-generated method stub
         return null;
     }
+    
+    public boolean isCompatible( Repository repository )
+    {
+        // TODO Auto-generated method stub
+        return false;
+    }
 
 }
