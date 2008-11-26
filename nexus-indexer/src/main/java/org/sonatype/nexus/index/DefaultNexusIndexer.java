@@ -250,14 +250,16 @@ public class DefaultNexusIndexer
         throws IOException
     {
         File repositoryDirectory = context.getRepository();
-
+  
         if ( !repositoryDirectory.exists() )
         {
             throw new IOException( "Repository directory " + repositoryDirectory + " does not exist" );
         }
-
+  
         scanner.scan( new DefaultScanningRequest( context, //
             new DefaultNexusIndexerListener( context, this, indexerEngine, update, listener ) ) );
+        
+        IndexUtils.updateTimestamp( context.getIndexDirectory(), context.getTimestamp() );
     }
 
     public void artifactDiscovered( ArtifactContext ac, IndexingContext context )
@@ -266,6 +268,8 @@ public class DefaultNexusIndexer
         if ( ac != null )
         {
             indexerEngine.index( context, ac );
+
+            context.updateTimestamp();
         }
     }
 
@@ -281,7 +285,7 @@ public class DefaultNexusIndexer
             indexerEngine.update( context, ac );
 
             context.updateGroups( ac );
-
+            
             context.updateTimestamp();
         }
     }
@@ -336,7 +340,7 @@ public class DefaultNexusIndexer
     public void rebuildGroups( IndexingContext context )
         throws IOException
     {
-        context.rebuildGroups();
+        context.rebuildGroups();  
     }
 
     // ----------------------------------------------------------------------------
@@ -400,7 +404,6 @@ public class DefaultNexusIndexer
 
     /**
      * @deprecated use {@link #searchGrouped(GroupedSearchRequest)
-
      */
     public Map<String, ArtifactInfoGroup> searchGrouped( Grouping grouping, Query query )
         throws IOException,
@@ -411,7 +414,6 @@ public class DefaultNexusIndexer
 
     /**
      * @deprecated use {@link #searchGrouped(GroupedSearchRequest)
-
      */
     public Map<String, ArtifactInfoGroup> searchGrouped( Grouping grouping, Query query, IndexingContext context )
         throws IOException,
@@ -422,7 +424,6 @@ public class DefaultNexusIndexer
 
     /**
      * @deprecated use {@link #searchGrouped(GroupedSearchRequest)
-
      */
     public Map<String, ArtifactInfoGroup> searchGrouped( Grouping grouping, Comparator<String> groupKeyComparator,
         Query query )
@@ -436,7 +437,6 @@ public class DefaultNexusIndexer
 
     /**
      * @deprecated use {@link #searchGrouped(GroupedSearchRequest)
-
      */
     public Map<String, ArtifactInfoGroup> searchGrouped( Grouping grouping, Comparator<String> groupKeyComparator,
         Query query, IndexingContext context )
@@ -479,29 +479,29 @@ public class DefaultNexusIndexer
             IndexContextInInconsistentStateException
     {
         FileInputStream is = null;
-
+        
         try
         {
-            MessageDigest sha1 = MessageDigest.getInstance( "SHA-1" );
+            MessageDigest sha1 = MessageDigest.getInstance("SHA-1");
 
-            is = new FileInputStream( artifact );
-
-            byte[] buff = new byte[4096];
-
+            is = new FileInputStream(artifact);
+            
+            byte[] buff = new byte[ 4096 ];
+            
             int n;
-
-            while ( ( n = is.read( buff ) ) > -1 )
+            
+            while ( ( n = is.read( buff ) ) > -1 ) 
             {
                 sha1.update( buff, 0, n );
             }
-
+            
             byte[] digest = sha1.digest();
-
+            
             // String sha1 = new Sha1Digester().calc( artifact );
 
             return identify( ArtifactInfo.SHA1, encode( digest ) );
         }
-        catch ( NoSuchAlgorithmException ex )
+        catch (NoSuchAlgorithmException ex) 
         {
             throw new IOException( "Unable to calculate digest" );
         }
@@ -512,18 +512,18 @@ public class DefaultNexusIndexer
 
     }
 
-    private static String encode( byte[] digest )
+    private static String encode( byte[] digest ) 
     {
-        char[] buff = new char[digest.length * 2];
-
+        char[] buff = new char[ digest.length * 2 ];
+        
         int n = 0;
-
-        for ( byte b : digest )
+        
+        for (byte b : digest) 
         {
-            buff[n++] = DIGITS[( 0xF0 & b ) >> 4];
-            buff[n++] = DIGITS[0x0F & b];
+            buff[ n++ ] = DIGITS[ ( 0xF0 & b ) >> 4 ];  
+            buff[ n++ ] = DIGITS[ 0x0F & b ];  
         }
-
+        
         return new String( buff );
     }
 
@@ -555,5 +555,5 @@ public class DefaultNexusIndexer
         }
         return null;
     }
-
+    
 }
