@@ -20,8 +20,6 @@
  */
 package org.sonatype.nexus.configuration.application.validator;
 
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.List;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
@@ -385,18 +383,6 @@ public class DefaultApplicationConfigurationValidator
             {
                 response.addValidationError( "Repository " + repo.getId()
                     + " conflicts woth existing Shadow with same ID='" + repo.getId() + "'!" );
-            }
-        }
-
-        if ( repo.getRemoteStorage() != null && repo.getRemoteStorage().getUrl() != null )
-        {
-            try
-            {
-                new URL( repo.getRemoteStorage().getUrl() );
-            }
-            catch ( MalformedURLException e )
-            {
-                response.addValidationError( "Repository " + repo.getId() + " has malformed remote storage URL!", e );
             }
         }
 
