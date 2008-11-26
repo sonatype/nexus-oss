@@ -216,11 +216,11 @@ public class DefaultIndexerManager
 
         ctxLocal.setSearchable( repository.isIndexable() );
 
-        if ( ctxLocal.getTimestamp() == null )
-        {
-            // it is probably new or first start
-            ctxLocal.updateTimestamp();
-        }
+//        if ( ctxLocal.getTimestamp() == null )
+//        {
+//            // it is probably new or first start
+//            ctxLocal.updateTimestamp();
+//        }
 
         if ( RepositoryType.PROXY.equals( repository.getRepositoryType() ) )
         {
@@ -235,11 +235,11 @@ public class DefaultIndexerManager
 
             ctxRemote.setSearchable( repository.isIndexable() );
 
-            if ( ctxRemote.getTimestamp() == null )
-            {
-                // it is probably new or first start
-                ctxRemote.updateTimestamp();
-            }
+//            if ( ctxRemote.getTimestamp() == null )
+//            {
+//                // it is probably new or first start
+//                ctxRemote.updateTimestamp();
+//            }
         }
     }
 
@@ -349,11 +349,11 @@ public class DefaultIndexerManager
 
         ctxMerged.setSearchable( false );
 
-        if ( ctxMerged.getTimestamp() == null )
-        {
-            // it is probably new or first start
-            ctxMerged.updateTimestamp();
-        }
+//        if ( ctxMerged.getTimestamp() == null )
+//        {
+//            // it is probably new or first start
+//            ctxMerged.updateTimestamp();
+//        }
     }
 
     public void removeRepositoryGroupIndexContext( String repositoryGroupId, boolean deleteFiles )
@@ -659,9 +659,16 @@ public class DefaultIndexerManager
         // XXX should only force downloading of the .properties file
         repository.clearCaches( "/.index" );
 
-        Map<String, IndexingContext> indexingContexts = nexusIndexer.getIndexingContexts();
+        IndexingContext context = null;
 
-        IndexingContext context = indexingContexts.get( getRemoteContextId( repository.getId() ) );
+        try
+        {
+            context = getRepositoryRemoteIndexContext( repository.getId() );
+        }
+        catch ( NoSuchRepositoryException e )
+        {
+            // will not happen
+        }
 
         Date contextTimestamp = context.getTimestamp();
 
@@ -1057,7 +1064,7 @@ public class DefaultIndexerManager
                 context.getIndexCreators() );
 
             nexusIndexer.scan( tmpContext );
-            
+
             tmpContext.updateTimestamp( true );
 
             context.replace( tmpContext.getIndexDirectory() );
