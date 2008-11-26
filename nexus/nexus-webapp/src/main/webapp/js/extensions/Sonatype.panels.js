@@ -54,7 +54,8 @@ Sonatype.panels.GridViewer = function( config ) {
     dataId: 'resourceURI',
     dataRoot: 'data',
     titleColumn: 'name',
-    singleSelect: true
+    singleSelect: true,
+    id: Ext.id()
   };
   Ext.apply( this, config, defaultConfig );
 
@@ -179,7 +180,7 @@ Ext.extend( Sonatype.panels.GridViewer, Ext.Panel, {
   clearCards: function() {
     this.cardPanel.items.each( function( item, i, len ) {
       if ( i > 0 ) { this.remove( item, true ); }
-    }, this.formCards );
+    }, this.cardPanel );
     
     this.cardPanel.getLayout().setActiveItem( 0 );
   },
