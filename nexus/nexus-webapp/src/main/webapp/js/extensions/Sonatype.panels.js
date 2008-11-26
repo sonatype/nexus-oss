@@ -54,8 +54,7 @@ Sonatype.panels.GridViewer = function( config ) {
     dataId: 'resourceURI',
     dataRoot: 'data',
     titleColumn: 'name',
-    singleSelect: true,
-    id: Ext.id()
+    singleSelect: true
   };
   Ext.apply( this, config, defaultConfig );
 
@@ -271,5 +270,159 @@ Ext.extend( Sonatype.panels.GridViewer, Ext.Panel, {
       e.stopEvent();
       menu.showAt(e.getXY());
     }
+  }
+} );
+
+Sonatype.panels.TreePanel = function( config ) {
+  var config = config || {};
+  var defaultConfig = { 
+    titleColumn: 'name',
+  };
+  Ext.apply( this, config, defaultConfig );
+
+  Sonatype.panels.TreePanel.superclass.constructor.call( this, {
+    anchor: '0 -2',
+    bodyStyle: 'background-color:#FFFFFF',
+    animate: true,
+    lines: false,
+    autoScroll: true,
+    containerScroll: true,
+    rootVisible: true,
+    enableDD: false,
+    tbar: [
+      {
+        text: 'Refresh',
+        icon: Sonatype.config.resourcePath + '/images/icons/arrow_refresh.png',
+        cls: 'x-btn-text-icon',
+        scope: this,
+        handler: this.refreshHandler
+      }
+    ],
+    loader : new Ext.tree.TreeLoader( {
+      requestMethod: 'GET',
+      url: this.url,
+      listeners: {
+        loadexception: this.treeLoadExceptionHandler,
+        scope: this
+      },
+      requestData: function( node, callback ) {
+        if ( this.fireEvent( "beforeload", this, node, callback ) !== false ) {
+          this.transId = Ext.Ajax.request({
+            method: this.requestMethod,
+            // Sonatype: nodes contain a relative request path
+            url: this.url + node.attributes.path,
+            success: this.handleResponse,
+            failure: this.handleFailure,
+            scope: this,
+            argument: { callback: callback, node: node }
+          });
+        }
+        else {
+          if ( typeof callback == "function" ) {
+            callback();
+          }
+        }
+      },
+      createNode : function( attr ) {
+        if ( this.baseAttrs ) {
+          Ext.applyIf( attr, this.baseAttrs );
+        }
+        if ( this.applyLoader !== false ) {
+          attr.loader = this;
+        }
+        if ( typeof attr.uiProvider == 'string' ) {
+          attr.uiProvider = this.uiProviders[attr.uiProvider] || eval( attr.uiProvider );
+        }
+
+        // Sonatype: node name is supplied as 'nodeName' instead of 'text'
+        if ( ! attr.text && attr.nodeName ) {
+          attr.text = attr.nodeName;
+        }
+
+        if ( attr.nodeType ) {
+          return new Ext.tree.TreePanel.nodeTypes[attr.nodeType](attr);
+        }
+        else {
+          return attr.leaf ?
+            new Ext.tree.TreeNode( attr ) :
+            new Ext.tree.AsyncTreeNode( attr );
+        }
+      },
+      processResponse : function( response, node, callback ) {
+        var json = response.responseText;
+        try {
+          var o = eval( "(" + json + ")" );
+          if ( o.data ) {
+            o = o.data;
+            node.beginUpdate();
+  
+            // Sonatype: 
+            // - tree response contains the current node, not just an array of children
+            // - node name is supplied as 'nodeName' instead of 'text'
+            if ( ! node.isRoot ) {
+              node.setText( o.nodeName );
+              Ext.apply( node.attributes, o, { } );
+            }
+            for ( var i = 0, len = o.children.length; i < len; i++ ){
+              var n = this.createNode( o.children[i] );
+              if ( n ) {
+                node.appendChild( n );
+              }
+            }
+  
+            node.endUpdate();
+          }
+
+          if ( typeof callback == "function" ) {
+            callback( this, node );
+          }
+        }
+        catch ( e ) {
+          this.handleFailure( response );
+        }
+      }
+    } )
+  } );
+
+  new Ext.tree.TreeSorter( this, { folderSort:true } );
+
+  var root = new Ext.tree.AsyncTreeNode( {
+    text: this.payload ? this.payload.get( this.titleColumn ) : '/',
+    path: '/',
+//    id: Sonatype.config.servicePath + this.servicePath.treeView +
+//      this.payload.data.id + Sonatype.config.browsePathSnippet + '/',
+    singleClickExpand: true,
+    expanded: true
+  } );
+  
+  this.setRootNode( root );
+};
+
+Ext.extend( Sonatype.panels.TreePanel, Ext.tree.TreePanel, {
+  treeLoadExceptionHandler : function( treeLoader, node, response ) {
+    if ( response.status == 503 ) {
+      if ( Sonatype.MessageBox.isVisible() ) {
+        Sonatype.MessageBox.hide();
+      }
+      node.setText( node.text + ' (Out of Service)' );
+    }
+    else if ( response.status == 404 ) {
+      if ( Sonatype.MessageBox.isVisible() ) {
+        Sonatype.MessageBox.hide();
+      }
+      node.setText( node.text + ( node.isRoot ? ' (Not Available)' : ' (Not Found)' ) );
+    }
+    else if ( response.status == 401 ) {
+      if ( Sonatype.MessageBox.isVisible() ) {
+        Sonatype.MessageBox.hide();   
+      }
+      node.setText( node.text + ' (Access Denied)' );
+    }
+  },
+  
+  refreshHandler: function( button, e ) {
+    this.root.setText( this.payload ? this.payload.get( this.titleColumn ) : '/' );
+    this.root.attributes.localStorageUpdated = false;
+    this.root.reload();
   }
 } );
