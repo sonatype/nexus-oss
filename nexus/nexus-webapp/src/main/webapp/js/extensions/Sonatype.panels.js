@@ -268,7 +268,7 @@ Ext.extend( Sonatype.panels.GridViewer, Ext.Panel, {
       if ( ! menu.items.first() ) return;
 
       e.stopEvent();
-      menu.showAt(e.getXY());
+      menu.showAt( e.getXY() );
     }
   }
 } );
@@ -381,7 +381,17 @@ Sonatype.panels.TreePanel = function( config ) {
           this.handleFailure( response );
         }
       }
-    } )
+    } ),
+    listeners: {
+      click: {
+        fn: this.nodeClickHandler,
+        scope: this
+      },
+      contextMenu: {
+        fn: this.nodeContextMenuHandler,
+        scope: this
+      } 
+    } 
   } );
 
   new Ext.tree.TreeSorter( this, { folderSort:true } );
@@ -389,8 +399,6 @@ Sonatype.panels.TreePanel = function( config ) {
   var root = new Ext.tree.AsyncTreeNode( {
     text: this.payload ? this.payload.get( this.titleColumn ) : '/',
     path: '/',
-//    id: Sonatype.config.servicePath + this.servicePath.treeView +
-//      this.payload.data.id + Sonatype.config.browsePathSnippet + '/',
     singleClickExpand: true,
     expanded: true
   } );
@@ -399,6 +407,39 @@ Sonatype.panels.TreePanel = function( config ) {
 };
 
 Ext.extend( Sonatype.panels.TreePanel, Ext.tree.TreePanel, {
+  nodeClickHandler: function( node, e ) {
+    if ( e.target.nodeName == 'A' ) return; // no menu on links
+
+    if ( this.nodeClickEvent ) {
+      Sonatype.Events.fireEvent( this.nodeClickEvent, node );
+    }
+  },
+  
+  nodeContextMenuHandler: function( node, e ) {
+    if ( e.target.nodeName == 'A' ) return; // no menu on links
+
+    if ( this.nodeContextMenuEvent ) { 
+  
+      var menu = new Sonatype.menu.Menu({
+        payload: node,
+        scope: this,
+        items: []
+      });
+  
+      Sonatype.Events.fireEvent( this.nodeContextMenuEvent, menu, node );
+      if ( ! menu.items.first() ) return;
+
+      e.stopEvent();
+      menu.showAt( e.getXY() );
+    }
+  },
+
+  refreshHandler: function( button, e ) {
+    this.root.setText( this.payload ? this.payload.get( this.titleColumn ) : '/' );
+    this.root.attributes.localStorageUpdated = false;
+    this.root.reload();
+  },
+
   treeLoadExceptionHandler : function( treeLoader, node, response ) {
     if ( response.status == 503 ) {
       if ( Sonatype.MessageBox.isVisible() ) {
@@ -418,11 +459,5 @@ Ext.extend( Sonatype.panels.TreePanel, Ext.tree.TreePanel, {
       }
       node.setText( node.text + ' (Access Denied)' );
     }
-  },
-  
-  refreshHandler: function( button, e ) {
-    this.root.setText( this.payload ? this.payload.get( this.titleColumn ) : '/' );
-    this.root.attributes.localStorageUpdated = false;
-    this.root.reload();
   }
 } );
