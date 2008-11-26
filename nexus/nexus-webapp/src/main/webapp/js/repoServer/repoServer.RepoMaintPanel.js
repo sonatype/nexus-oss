@@ -166,6 +166,7 @@ Sonatype.repoServer.RepoMaintPanel = function(config){
   };
 
   this.groupRecordConstructor = Ext.data.Record.create([
+    {name:'id'},
     {name:'repoType', convert: function(s, parent){return 'group';}},
     {name:'resourceURI'},
     {name:'name', sortType:Ext.data.SortTypes.asUCString},
@@ -193,6 +194,7 @@ Sonatype.repoServer.RepoMaintPanel = function(config){
   
   // START: Repo list ******************************************************
   this.repoRecordConstructor = Ext.data.Record.create([
+    {name:'id'},
     {name:'repoType'},
     {name:'resourceURI'},
     {name:'status'},

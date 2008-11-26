@@ -100,6 +100,10 @@ Sonatype.panels.GridViewer = function( config ) {
     url: this.url,
     autoLoad: this.dataAutoLoad,
     listeners: {
+      remove: {
+        fn: this.recordRemoveHandler,
+        scope: this
+      }, 
       update: {
         fn: this.recordUpdateHandler,
         scope: this
@@ -229,6 +233,21 @@ Ext.extend( Sonatype.panels.GridViewer, Ext.Panel, {
 
     this.cardPanel.getLayout().setActiveItem( panel );
     panel.doLayout();
+  },
+  
+  recordRemoveHandler: function( store, rec, index ) {
+    var id = this.id + rec.id;
+
+    var panel = this.cardPanel.findById( id );
+
+    if ( panel ) {
+      var resetActiveItem = this.cardPanel.getLayout().activeItem == panel; 
+      this.cardPanel.remove( panel, true );
+      
+      if ( resetActiveItem ) {
+        this.cardPanel.getLayout().setActiveItem( 0 );
+      }
+    }
   },
   
   recordUpdateHandler: function( store, rec, op ) {

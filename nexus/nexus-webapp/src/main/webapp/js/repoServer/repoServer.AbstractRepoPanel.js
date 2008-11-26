@@ -74,7 +74,7 @@ Ext.extend(Sonatype.repoServer.AbstractRepoPanel, Ext.Panel, {
   },
   
   clearCacheHandler: function( rec ) {
-    var url = Sonatype.config.repos.urls.cache + rec.id.slice(
+    var url = Sonatype.config.repos.urls.cache + rec.data.resourceURI.slice(
       Sonatype.config.host.length + Sonatype.config.servicePath.length );
     
     if ( url.indexOf( Sonatype.config.browseIndexPathSnippet ) > -1 ) {
@@ -107,7 +107,7 @@ Ext.extend(Sonatype.repoServer.AbstractRepoPanel, Ext.Panel, {
   
   reIndexHandler: function( rec ){
     var url = Sonatype.config.repos.urls.index +
-      rec.id.slice(Sonatype.config.host.length + Sonatype.config.servicePath.length);
+      rec.data.resourceURI.slice(Sonatype.config.host.length + Sonatype.config.servicePath.length);
     
     if ( url.indexOf( Sonatype.config.browseIndexPathSnippet ) > -1 ) {
       url = url.replace( Sonatype.config.browseIndexPathSnippet, Sonatype.config.browsePathSnippet );
@@ -138,7 +138,7 @@ Ext.extend(Sonatype.repoServer.AbstractRepoPanel, Ext.Panel, {
   
   rebuildAttributesHandler: function( rec ){
     var url = Sonatype.config.repos.urls.attributes +
-      rec.id.slice(Sonatype.config.host.length + Sonatype.config.servicePath.length);
+      rec.data.resourceURI.slice(Sonatype.config.host.length + Sonatype.config.servicePath.length);
     
     if ( url.indexOf( Sonatype.config.browseIndexPathSnippet ) > -1 ) {
       url = url.replace( Sonatype.config.browseIndexPathSnippet, Sonatype.config.browsePathSnippet );
@@ -174,14 +174,14 @@ Ext.extend(Sonatype.repoServer.AbstractRepoPanel, Ext.Panel, {
       
       var out = {
         data : {
-          id : rec.id.slice(rec.id.lastIndexOf('/') + 1),
+          id : rec.data.id,
           repoType : rec.get('repoType'),
           localStatus : 'inService'
         }
       };
       
       Ext.Ajax.request({
-        url: rec.id + '/status',
+        url: rec.data.resourceURI + '/status',
         jsonData: out,
         callback: this.putInServiceCallback,
         scope: this,
@@ -208,14 +208,14 @@ Ext.extend(Sonatype.repoServer.AbstractRepoPanel, Ext.Panel, {
       
       var out = {
         data : {
-          id : rec.id.slice(rec.id.lastIndexOf('/') + 1),
+          id : rec.data.id,
           repoType : rec.get('repoType'),
           localStatus : 'outOfService'
         }
       };
       
       Ext.Ajax.request({
-        url: rec.id + '/status',
+        url: rec.data.resourceURI + '/status',
         jsonData: out,
         callback: this.putOutOfServiceCallback,
         scope: this,
@@ -231,7 +231,7 @@ Ext.extend(Sonatype.repoServer.AbstractRepoPanel, Ext.Panel, {
       
       var out = {
         data : {
-          id : rec.id.slice(rec.id.lastIndexOf('/') + 1),
+          id : rec.data.id,
           repoType : rec.get('repoType'),
           localStatus : rec.get('localStatus'),
           remoteStatus : rec.get('remoteStatus'),
@@ -240,7 +240,7 @@ Ext.extend(Sonatype.repoServer.AbstractRepoPanel, Ext.Panel, {
       };
       
       Ext.Ajax.request({
-        url: rec.id + '/status',
+        url: rec.data.resourceURI + '/status',
         jsonData: out,
         callback: this.allowProxyCallback,
         scope: this,
@@ -267,7 +267,7 @@ Ext.extend(Sonatype.repoServer.AbstractRepoPanel, Ext.Panel, {
       
       var out = {
         data : {
-          id : rec.id.slice(rec.id.lastIndexOf('/') + 1),
+          id : rec.data.id,
           repoType : rec.get('repoType'),
           localStatus : rec.get('localStatus'),
           remoteStatus : rec.get('remoteStatus'),
@@ -276,7 +276,7 @@ Ext.extend(Sonatype.repoServer.AbstractRepoPanel, Ext.Panel, {
       };
       
       Ext.Ajax.request({
-        url: rec.id + '/status',
+        url: rec.data.resourceURI + '/status',
         jsonData: out,
         callback: this.blockProxyCallback,
         scope: this,
@@ -313,7 +313,7 @@ Ext.extend(Sonatype.repoServer.AbstractRepoPanel, Ext.Panel, {
   uploadArtifactHandler : function( rec ){
       
     Ext.Ajax.request({
-      url: rec.id,
+      url: rec.data.resourceURI,
       scope: this,
       callback: function(options, success, response) {
         if ( success ) {
