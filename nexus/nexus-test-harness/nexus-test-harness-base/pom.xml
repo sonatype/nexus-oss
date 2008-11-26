@@ -74,6 +74,18 @@
     </dependency>
 
     <dependency>
+      <groupId>org.apache.maven.wagon</groupId>
+      <artifactId>wagon-http-lightweight</artifactId>
+      <version>1.0-beta-4</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.codehaus.plexus</groupId>
+          <artifactId>plexus-component-api</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+
+    <dependency>
       <groupId>org.sonatype.appbooter</groupId>
       <artifactId>plexus-forked-app-booter</artifactId>
       <version>${plexus.appbooter.version}</version>
