@@ -51,7 +51,7 @@ public interface IndexingContext
     public static final String INDEX_PROPERTY_PREFIX = "nexus.index.";
 
     public static final String INDEX_DAY_PREFIX = INDEX_PROPERTY_PREFIX + "day-";
-    
+
     public static final String INDEX_ID = INDEX_PROPERTY_PREFIX + "id";
 
     public static final String INDEX_TIMESTAMP = INDEX_PROPERTY_PREFIX + "time";
@@ -113,6 +113,9 @@ public interface IndexingContext
     Date getTimestamp();
 
     void updateTimestamp()
+        throws IOException;
+
+    void updateTimestamp( boolean save )
         throws IOException;
 
     /**
@@ -236,7 +239,7 @@ public interface IndexingContext
     /**
      * Sets all groups stored in the current indexing context
      */
-    void setAllGroups( Collection<String> groups ) 
+    void setAllGroups( Collection<String> groups )
         throws IOException;
 
     Set<String> getAllGroups()
@@ -245,13 +248,13 @@ public interface IndexingContext
     Set<String> getRootGroups()
         throws IOException;
 
-    void setRootGroups(Collection<String> groups)
+    void setRootGroups( Collection<String> groups )
         throws IOException;
 
-    void rebuildGroups() 
+    void rebuildGroups()
         throws IOException;
 
     void updateGroups( ArtifactContext ac )
         throws IOException;
-    
+
 }

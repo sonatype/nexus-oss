@@ -305,7 +305,18 @@ public class DefaultIndexingContext
     public void updateTimestamp()
         throws IOException
     {
+        updateTimestamp( false );
+    }
+
+    public void updateTimestamp( boolean save )
+        throws IOException
+    {
         timestamp = new Date();
+
+        if ( save )
+        {
+            IndexUtils.updateTimestamp( indexDirectory, getTimestamp() );
+        }
     }
 
     public Date getTimestamp()
@@ -476,7 +487,7 @@ public class DefaultIndexingContext
         storeDescriptor();
 
         timestamp = IndexUtils.getTimestamp( directory );
-        
+
         IndexUtils.updateTimestamp( indexDirectory, getTimestamp() );
     }
 
@@ -524,8 +535,8 @@ public class DefaultIndexingContext
                 else
                 {
                     String deleted = d.get( ArtifactInfo.DELETED );
-                    
-                    if( deleted != null )
+
+                    if ( deleted != null )
                     {
                         w.deleteDocuments( new Term( ArtifactInfo.UINFO, deleted ) );
                     }
@@ -537,43 +548,42 @@ public class DefaultIndexingContext
         {
             closeReaders();
         }
-        
+
         rebuildGroups();
 
         updateTimestamp();
-        
+
         IndexUtils.updateTimestamp( indexDirectory, getTimestamp() );
     }
 
-    private void addDocument( String uinfo, Document d, Searcher s, IndexWriter w ) 
-        throws IOException 
+    private void addDocument( String uinfo, Document d, Searcher s, IndexWriter w )
+        throws IOException
     {
         Term term = new Term( ArtifactInfo.UINFO, uinfo );
-  
+
         Hits hits = s.search( new TermQuery( term ) );
-        
+
         if ( hits.length() == 0 )
         {
             ArtifactInfo info = constructArtifactInfo( d );
             ArtifactContext artifactContext = new ArtifactContext( null, null, null, info, null );
-            ArtifactIndexingContext indexingContext = new DefaultArtifactIndexingContext(
-                artifactContext );
-      
+            ArtifactIndexingContext indexingContext = new DefaultArtifactIndexingContext( artifactContext );
+
             Document doc = new Document();
-      
+
             doc.add( new Field( ArtifactInfo.UINFO, AbstractIndexCreator.getGAV(
                 info.groupId,
                 info.artifactId,
                 info.version,
                 info.classifier,
                 info.packaging ), Field.Store.YES, Field.Index.UN_TOKENIZED ) );
-      
+
             // recreate document to index not stored fields
             for ( IndexCreator ic : getIndexCreators() )
             {
                 ic.updateDocument( indexingContext, doc );
             }
-            
+
             w.addDocument( doc );
         }
     }
@@ -653,30 +663,30 @@ public class DefaultIndexingContext
         return res ? artifactInfo : null;
     }
 
-
     /**
      * Rebuild groups
      */
-    public void rebuildGroups() throws IOException 
+    public void rebuildGroups()
+        throws IOException
     {
         IndexReader r = getIndexReader();
-        
+
         Set<String> rootGroups = new LinkedHashSet<String>();
         Set<String> allGroups = new LinkedHashSet<String>();
 
         int numDocs = r.maxDoc();
-  
+
         for ( int i = 0; i < numDocs; i++ )
         {
             if ( r.isDeleted( i ) )
             {
                 continue;
             }
-  
+
             Document d = r.document( i );
-  
+
             String uinfo = d.get( ArtifactInfo.UINFO );
-  
+
             if ( uinfo != null )
             {
                 ArtifactInfo info = constructArtifactInfo( d );
@@ -684,12 +694,12 @@ public class DefaultIndexingContext
                 allGroups.add( info.groupId );
             }
         }
-  
+
         setRootGroups( rootGroups );
         setAllGroups( allGroups );
-        
+
         getIndexWriter().optimize();
-  
+
         getIndexWriter().flush();
     }
 
@@ -703,7 +713,7 @@ public class DefaultIndexingContext
             rootGroups.add( rootGroup );
             setRootGroups( rootGroups );
         }
-        
+
         Set<String> allGroups = getAllGroups();
         if ( !allGroups.contains( ac.getArtifactInfo().groupId ) )
         {
@@ -711,86 +721,88 @@ public class DefaultIndexingContext
             setAllGroups( allGroups );
         }
     }
-    
+
     // All groups
-    
-    public void setAllGroups( Collection<String> groups ) 
-        throws IOException 
+
+    public void setAllGroups( Collection<String> groups )
+        throws IOException
     {
         setGroups( groups, ArtifactInfo.ALL_GROUPS, ArtifactInfo.ALL_GROUPS_VALUE, ArtifactInfo.ALL_GROUPS_LIST );
     }
 
-    public Set<String> getAllGroups() 
-        throws IOException 
+    public Set<String> getAllGroups()
+        throws IOException
     {
         return getGroups( ArtifactInfo.ALL_GROUPS, ArtifactInfo.ALL_GROUPS_VALUE, ArtifactInfo.ALL_GROUPS_LIST );
     }
 
     // Root groups
-    
-    public Set<String> getRootGroups() 
-        throws IOException 
+
+    public Set<String> getRootGroups()
+        throws IOException
     {
         return getGroups( ArtifactInfo.ROOT_GROUPS, ArtifactInfo.ROOT_GROUPS_VALUE, ArtifactInfo.ROOT_GROUPS_LIST );
     }
 
-    public void setRootGroups( Collection<String> groups ) 
-        throws IOException 
+    public void setRootGroups( Collection<String> groups )
+        throws IOException
     {
         setGroups( groups, ArtifactInfo.ROOT_GROUPS, ArtifactInfo.ROOT_GROUPS_VALUE, ArtifactInfo.ROOT_GROUPS_LIST );
     }
 
     //
 
-    void setGroups( Collection<String> groups, String groupField, 
-        String groupFieldValue, String groupListField ) 
-        throws IOException, CorruptIndexException 
+    void setGroups( Collection<String> groups, String groupField, String groupFieldValue, String groupListField )
+        throws IOException,
+            CorruptIndexException
     {
         IndexWriter w = getIndexWriter();
-    
-        w.updateDocument( new Term( groupField, groupFieldValue ),
-            createGroupsDocument( groups, groupField, groupFieldValue, groupListField ) );
-    
+
+        w.updateDocument( new Term( groupField, groupFieldValue ), createGroupsDocument(
+            groups,
+            groupField,
+            groupFieldValue,
+            groupListField ) );
+
         w.flush();
     }
-    
-    private Set<String> getGroups( String field, String filedValue, String listField ) 
-        throws IOException, CorruptIndexException 
+
+    private Set<String> getGroups( String field, String filedValue, String listField )
+        throws IOException,
+            CorruptIndexException
     {
-        Hits hits = getIndexSearcher().search(
-            new TermQuery( new Term( field, filedValue ) ) );
+        Hits hits = getIndexSearcher().search( new TermQuery( new Term( field, filedValue ) ) );
         Set<String> groups = new LinkedHashSet<String>( Math.max( 10, hits.length() ) );
         if ( hits.length() > 0 )
         {
             Document doc = hits.doc( 0 );
-    
+
             String groupList = doc.get( listField );
-    
+
             if ( groupList != null )
             {
                 groups.addAll( Arrays.asList( groupList.split( "\\|" ) ) );
             }
         }
-    
+
         return groups;
     }
-    
-    static Document createGroupsDocument( Collection<String> groups, 
-        String field, String fieldValue, String listField )
+
+    static Document createGroupsDocument( Collection<String> groups, String field, String fieldValue, String listField )
     {
         Document groupDoc = new Document();
-    
+
         groupDoc.add( new Field( field, //
             fieldValue,
             Field.Store.YES,
             Field.Index.UN_TOKENIZED ) );
-    
+
         groupDoc.add( new Field( listField, //
             AbstractIndexCreator.lst2str( groups ),
             Field.Store.YES,
             Field.Index.NO ) );
-    
+
         return groupDoc;
     }
-    
+
 }
