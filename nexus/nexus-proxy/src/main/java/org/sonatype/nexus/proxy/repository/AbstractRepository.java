@@ -261,7 +261,7 @@ public abstract class AbstractRepository
         remoteStatusUpdated = 0;
     }
 
-    protected boolean isRemoteStorageReachable()
+    protected boolean isRemoteStorageReachable( Map<String, Object> context )
         throws StorageException
     {
         if ( !RepositoryType.PROXY.equals( getRepositoryType() ) )
@@ -271,7 +271,7 @@ public abstract class AbstractRepository
         else
         {
             // TODO: include context? from where?
-            return getRemoteStorage().isReachable( this, null );
+            return getRemoteStorage().isReachable( this, context );
         }
 
     }
@@ -304,7 +304,7 @@ public abstract class AbstractRepository
                         {
                             try
                             {
-                                if ( isRemoteStorageReachable() )
+                                if ( isRemoteStorageReachable( null ) )
                                 {
                                     setRemoteStatus( RemoteStatus.AVAILABLE, null );
                                 }
@@ -315,6 +315,8 @@ public abstract class AbstractRepository
                             }
                             catch ( StorageException e )
                             {
+                                getLogger().info( "Storage exception: ", e );
+
                                 setRemoteStatus( RemoteStatus.UNAVAILABLE, e );
                             }
                         }
