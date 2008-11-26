@@ -377,6 +377,12 @@ public class MinimalArtifactInfoIndexCreator
             res = true;
         }
 
+        // sometimes there's a pom without packaging, then the value will be "null" String
+        if ( ai.packaging.equals( "null" ) )
+        {
+            ai.packaging = null;
+        }
+        
         return res;
 
         // artifactInfo.fname = ???
