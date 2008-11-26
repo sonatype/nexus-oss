@@ -57,7 +57,7 @@ Sonatype.panels.GridViewer = function( config ) {
     singleSelect: true
   };
   Ext.apply( this, config, defaultConfig );
-
+  
   var fields = [];
   var columns = [];
   if ( config.columns ) {
@@ -177,7 +177,7 @@ Sonatype.panels.GridViewer = function( config ) {
         scope: this,
         handler: this.refreshHandler
       }
-    ],
+    ].concat( this.tbar ? this.tbar : [] ),
     items: [
       this.gridPanel,
       this.cardPanel
