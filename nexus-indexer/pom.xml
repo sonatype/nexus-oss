@@ -1,187 +1,154 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-    <modelVersion>4.0.0</modelVersion>
-    <parent>
-        <groupId>org.sonatype.nexus</groupId>
-        <artifactId>nexus-parent</artifactId>
-        <version>5-SNAPSHOT</version>
-    </parent>
+<project xmlns="http://maven.apache.org/POM/4.0.0" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
 
+  <parent>
     <groupId>org.sonatype.nexus</groupId>
-    <artifactId>nexus-indexer</artifactId>
-    <version>1.1.0-SNAPSHOT</version>
-    <name>Sonatype Nexus: Indexer</name>
+    <artifactId>nexus-parent</artifactId>
+    <version>5-SNAPSHOT</version>
+  </parent>
 
-    <licenses>
-		<license>
-			<name>Eclipse Public License</name>
-			<url>http://www.eclipse.org/org/documents/epl-v10.html</url>
-		</license>
-	</licenses>
-    <developers>
-		<developer>
-			<id>cstamas</id>
-			<name>Tamas Cservenak</name>
-			<email>cstamas@sonatype.com</email>
-			<organization>Sonatype</organization>
-			<roles>
-				<role>Developer</role>
-			</roles>
-			<timezone>2</timezone>
-		</developer>
-		<developer>
-			<id>brianf</id>
-			<name>Brian Fox</name>
-			<email>brian@sonatype.com</email>
-			<organization>Sonatype</organization>
-			<roles>
-				<role>Developer</role>
-			</roles>
-			<timezone>-6</timezone>
-		</developer>
-		<developer>
-			<id>eu</id>
-			<name>Eugene Kuleshov</name>
-			<email>eugene@sonatype.com</email>
-			<organization>Sonatype</organization>
-			<roles>
-				<role>Developer</role>
-			</roles>
-			<timezone>-6</timezone>
-		</developer>
-     </developers>
-     
-    <properties>
-		<maven.version>2.1-SONATYPE-653485</maven.version>
-        <maven.artifact.version>3.0-SONATYPE-653272</maven.artifact.version>
-	</properties>
-     
-     <!--override the snapshot included in maven-->
-     <dependencyManagement>
-       <dependencies>
-         <dependency>
-           <groupId>org.apache.xbean</groupId>
-           <artifactId>xbean-reflect</artifactId>
-           <version>3.4</version>
-         </dependency>
-       </dependencies>
-     </dependencyManagement>
-     
+  <groupId>org.sonatype.nexus</groupId>
+  <artifactId>nexus-indexer</artifactId>
+  <version>1.1.0-SNAPSHOT</version>
+
+  <name>Sonatype Nexus: Indexer</name>
+
+  <licenses>
+    <license>
+      <name>Eclipse Public License</name>
+      <url>http://www.eclipse.org/org/documents/epl-v10.html</url>
+    </license>
+  </licenses>
+
+  <properties>
+    <maven.version>2.1-SONATYPE-653485</maven.version>
+    <maven.artifact.version>3.0-SONATYPE-653272</maven.artifact.version>
+  </properties>
+
+  <!-- override the snapshot included in Maven -->
+  <dependencyManagement>
     <dependencies>
-
-        <!-- Plexus -->
-        <dependency>
-            <groupId>org.codehaus.plexus</groupId>
-            <artifactId>plexus-container-default</artifactId>
-            <scope>compile</scope>
-        </dependency>
-		<dependency>
-			<groupId>org.codehaus.plexus</groupId>
-			<artifactId>plexus-component-annotations</artifactId>
-		</dependency>
-        <dependency>
-            <groupId>org.codehaus.plexus</groupId>
-            <artifactId>plexus-utils</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.codehaus.plexus</groupId>
-            <artifactId>plexus-cli</artifactId>
-            <version>1.2</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.lucene</groupId>
-            <artifactId>lucene-core</artifactId>
-            <version>2.3.2</version>
-        </dependency>
-        <dependency>
-            <groupId>commons-cli</groupId>
-            <artifactId>commons-cli</artifactId>
-            <version>1.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.maven</groupId>
-            <artifactId>maven-model</artifactId>
-            <version>${maven.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.maven</groupId>
-            <artifactId>maven-plugin-api</artifactId>
-            <version>${maven.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.maven.artifact</groupId>
-            <artifactId>maven-artifact</artifactId>
-            <version>${maven.artifact.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.maven.archetype</groupId>
-            <artifactId>archetype-common</artifactId>
-            <version>2.0-alpha-1</version>
-        </dependency>
-
-        <!-- Wagon -->
-        <dependency>
-            <groupId>org.apache.maven.wagon</groupId>
-            <artifactId>wagon-provider-api</artifactId>
-            <version>1.0-beta-2</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.maven.wagon</groupId>
-            <artifactId>wagon-http-lightweight</artifactId>
-            <version>1.0-beta-2</version>
-        </dependency>
-
-        <!-- Test -->
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <scope>test</scope>
-            <version>3.8.2</version>
-        </dependency>
+      <dependency>
+        <groupId>org.apache.xbean</groupId>
+        <artifactId>xbean-reflect</artifactId>
+        <version>3.4</version>
+      </dependency>
     </dependencies>
+  </dependencyManagement>
 
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.codehaus.plexus</groupId>
-                <artifactId>plexus-component-metadata</artifactId>
-            </plugin>
-            <!-- 1.4 jar -->
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>retrotranslator-maven-plugin</artifactId>
-                <version>1.0-alpha-3</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>translate-project</goal>
-                        </goals>
-                        <configuration>
-                            <classifier>jdk14</classifier>
-                            <attach>true</attach>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
+  <dependencies>
+    <!-- Plexus -->
+    <dependency>
+        <groupId>org.codehaus.plexus</groupId>
+        <artifactId>plexus-container-default</artifactId>
+        <scope>compile</scope>
+    </dependency>
+    <dependency>
+        <groupId>org.codehaus.plexus</groupId>
+        <artifactId>plexus-component-annotations</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>org.codehaus.plexus</groupId>
+        <artifactId>plexus-utils</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>org.codehaus.plexus</groupId>
+        <artifactId>plexus-cli</artifactId>
+        <version>1.2</version>
+    </dependency>
+    <dependency>
+        <groupId>org.apache.lucene</groupId>
+        <artifactId>lucene-core</artifactId>
+        <version>2.3.2</version>
+    </dependency>
+    <dependency>
+        <groupId>commons-cli</groupId>
+        <artifactId>commons-cli</artifactId>
+        <version>1.0</version>
+    </dependency>
+    <dependency>
+        <groupId>org.apache.maven</groupId>
+        <artifactId>maven-model</artifactId>
+        <version>${maven.version}</version>
+    </dependency>
+    <dependency>
+        <groupId>org.apache.maven</groupId>
+        <artifactId>maven-plugin-api</artifactId>
+        <version>${maven.version}</version>
+    </dependency>
+    <dependency>
+        <groupId>org.apache.maven.artifact</groupId>
+        <artifactId>maven-artifact</artifactId>
+        <version>${maven.artifact.version}</version>
+    </dependency>
+    <dependency>
+        <groupId>org.apache.maven.archetype</groupId>
+        <artifactId>archetype-common</artifactId>
+        <version>2.0-alpha-1</version>
+    </dependency>
 
-            <plugin>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <configuration>
-                    <forkMode>never</forkMode>
-                </configuration>
-            </plugin>
+    <!-- Wagon -->
+    <dependency>
+        <groupId>org.apache.maven.wagon</groupId>
+        <artifactId>wagon-provider-api</artifactId>
+        <version>1.0-beta-2</version>
+    </dependency>
+    
+    <!-- Test -->
+    <dependency>
+        <groupId>junit</groupId>
+        <artifactId>junit</artifactId>
+        <scope>test</scope>
+        <version>3.8.2</version>
+    </dependency>
+  </dependencies>
 
-            <plugin>
-                <artifactId>maven-source-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                        <phase>package</phase>          
-                    </execution>
-                </executions>
-            </plugin>
-            
+  <build>
+    <plugins>
+      <plugin>
+          <groupId>org.codehaus.plexus</groupId>
+          <artifactId>plexus-component-metadata</artifactId>
+      </plugin>
+
+      <!-- 1.4 jar -->
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>retrotranslator-maven-plugin</artifactId>
+        <version>1.0-alpha-3</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>translate-project</goal>
+            </goals>
+            <configuration>
+              <classifier>jdk14</classifier>
+              <attach>true</attach>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <configuration>
+              <forkMode>never</forkMode>
+          </configuration>
+      </plugin>
+
+      <plugin>
+          <artifactId>maven-source-plugin</artifactId>
+          <executions>
+              <execution>
+                  <goals>
+                      <goal>jar</goal>
+                  </goals>
+                  <phase>package</phase>
+              </execution>
+          </executions>
+      </plugin>
+
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-shade-plugin</artifactId>
@@ -206,7 +173,7 @@
               <artifactSet>
                 <includes>
                   <include>aspectj:aspectjrt</include>
-                  <include>net.sf.retrotranslator:retrotranslator-runtime</include>                  
+                  <include>net.sf.retrotranslator:retrotranslator-runtime</include>
                   <include>backport-util-concurrent:backport-util-concurrent</include>
                   <include>commons-cli:commons-cli</include>
                   <include>net.sf.retrotranslator:retrotranslator-runtime</include>
@@ -219,7 +186,7 @@
                   <include>org.codehaus.plexus:plexus-classworlds</include>
                   <include>org.codehaus.plexus:plexus-cli</include>
                   <include>org.codehaus.plexus:plexus-container-default</include>
-                  <include>org.codehaus.plexus:plexus-utils</include>                
+                  <include>org.codehaus.plexus:plexus-utils</include>
                 </includes>
               </artifactSet>
             </configuration>
@@ -243,7 +210,7 @@
               <artifactSet>
                 <includes>
                   <include>aspectj:aspectjrt</include>
-                  <include>commons-cli:commons-cli</include>                  
+                  <include>commons-cli:commons-cli</include>
                   <include>org.apache.lucene:lucene-core</include>
                   <include>org.apache.maven.artifact:maven-artifact</include>
                   <include>org.apache.maven:maven-model</include>
@@ -253,13 +220,350 @@
                   <include>org.codehaus.plexus:plexus-classworlds</include>
                   <include>org.codehaus.plexus:plexus-cli</include>
                   <include>org.codehaus.plexus:plexus-container-default</include>
-                  <include>org.codehaus.plexus:plexus-utils</include>                
+                  <include>org.codehaus.plexus:plexus-utils</include>
                 </includes>
               </artifactSet>
             </configuration>
-          </execution>          
+          </execution>
         </executions>
-      </plugin>            
-      </plugins>
-    </build>
+      </plugin>
+
+      <!--
+      <plugin>
+        <groupId>org.codehaus.tycho</groupId>
+        <artifactId>maven-osgi-packaging-plugin</artifactId>
+        <version>0.3.0-DEV-1819</version>
+        <configuration>
+          <packageSources>false</packageSources>
+          <exportPackages>
+            org.sonatype.nexus.*
+          </exportPackages>
+          <manifestAttributes>
+            <Bundle-RequiredExecutionEnvironment>J2SE-1.5, JavaSE-1.6</Bundle-RequiredExecutionEnvironment>
+          </manifestAttributes>
+          <exclusions>
+              <exclusion>
+                  <groupId>org.codehaus.plexus</groupId>
+                  <artifactId>plexus-container-default</artifactId>
+              </exclusion>
+              <exclusion>
+                  <groupId>org.codehaus.plexus</groupId>
+                  <artifactId>plexus-component-annotations</artifactId>
+              </exclusion>
+              <exclusion>
+                  <groupId>org.codehaus.plexus</groupId>
+                  <artifactId>plexus-utils</artifactId>
+              </exclusion>
+              <exclusion>
+                  <groupId>org.codehaus.plexus</groupId>
+                  <artifactId>plexus-cli</artifactId>
+                  <version>1.2</version>
+              </exclusion>
+              
+              <exclusion>
+                  <groupId>commons-cli</groupId>
+                  <artifactId>commons-cli</artifactId>
+                  <version>1.0</version>
+              </exclusion>
+              
+              <exclusion>
+                  <groupId>org.apache.maven</groupId>
+                  <artifactId>maven-model</artifactId>
+                  <version>${maven.version}</version>
+              </exclusion>
+              <exclusion>
+                  <groupId>org.apache.maven</groupId>
+                  <artifactId>maven-plugin-api</artifactId>
+                  <version>${maven.version}</version>
+              </exclusion>
+              <exclusion>
+                  <groupId>org.apache.maven.artifact</groupId>
+                  <artifactId>maven-artifact</artifactId>
+                  <version>${maven.artifact.version}</version>
+              </exclusion>
+              <exclusion>
+                  <groupId>org.apache.maven</groupId>
+                  <artifactId>maven-core</artifactId>
+                  <version>2.0.8</version>
+              </exclusion>    
+              <exclusion>
+                  <groupId>org.apache.maven</groupId>
+                  <artifactId>maven-settings</artifactId>
+                  <version>2.0.8</version>
+              </exclusion>    
+              <exclusion>
+                  <groupId>org.apache.maven</groupId>
+                  <artifactId>maven-plugin-parameter-documenter</artifactId>
+                  <version>2.0.8</version>
+              </exclusion>    
+              <exclusion>
+                  <groupId>org.apache.maven</groupId>
+                  <artifactId>maven-profile</artifactId>
+                  <version>2.0.8</version>
+              </exclusion>    
+              <exclusion>
+                <groupId>org.apache.maven</groupId>
+                <artifactId>maven-artifact</artifactId>
+                <version>2.0.8</version>
+              </exclusion>    
+              <exclusion>
+                  <groupId>org.apache.maven</groupId>
+                  <artifactId>maven-repository-metadata</artifactId>
+                  <version>2.0.8</version>
+              </exclusion>
+              <exclusion>
+                  <groupId>org.apache.maven</groupId>
+                  <artifactId>maven-error-diagnostics</artifactId>
+                  <version>2.0.8</version>
+              </exclusion>    
+              <exclusion>
+                  <groupId>org.apache.maven</groupId>
+                  <artifactId>maven-project</artifactId>
+                  <version>2.0.8</version>
+              </exclusion>    
+              <exclusion>
+                  <groupId>org.apache.maven</groupId>
+                  <artifactId>maven-artifact-manager</artifactId>
+                  <version>2.0.8</version>
+              </exclusion>    
+              <exclusion>
+                  <groupId>org.apache.maven</groupId>
+                  <artifactId>maven-plugin-registry</artifactId>
+                  <version>2.0.8</version>
+              </exclusion>    
+              <exclusion>
+                  <groupId>org.apache.maven</groupId>
+                  <artifactId>maven-plugin-descriptor</artifactId>
+                  <version>2.0.8</version>
+              </exclusion>    
+              <exclusion>
+                  <groupId>org.apache.maven</groupId>
+                  <artifactId>maven-monitor</artifactId>
+                  <version>2.0.8</version>
+              </exclusion>    
+
+              <exclusion>
+                  <groupId>org.apache.maven.reporting</groupId>
+                  <artifactId>maven-reporting-api</artifactId>
+                  <version>2.0.8</version>
+              </exclusion>
+                  
+              <exclusion>
+                  <groupId>org.apache.maven.archetype</groupId>
+                  <artifactId>archetype-common</artifactId>
+                  <version>2.0-alpha-1</version>
+              </exclusion>
+
+              <exclusion>
+                  <groupId>org.apache.maven.wagon</groupId>
+                  <artifactId>wagon-provider-api</artifactId>
+                  <version>1.0-beta-2</version>
+              </exclusion>
+              <exclusion>
+                  <groupId>org.apache.maven.wagon</groupId>
+                  <artifactId>wagon-ssh</artifactId>
+                  <version>1.0-beta-2</version>
+              </exclusion>    
+              <exclusion>
+                  <groupId>org.apache.maven.wagon</groupId>
+                  <artifactId>wagon-ssh-external</artifactId>
+                  <version>1.0-beta-2</version>
+              </exclusion>    
+              <exclusion>
+                  <groupId>org.apache.maven.wagon</groupId>
+                  <artifactId>wagon-ssh-common</artifactId>
+                  <version>1.0-beta-2</version>
+              </exclusion>    
+              <exclusion>
+                  <groupId>org.apache.maven.wagon</groupId>
+                  <artifactId>wagon-http-lightweight</artifactId>
+                  <version>1.0-beta-2</version>
+              </exclusion>    
+              <exclusion>
+                  <groupId>org.apache.maven.wagon</groupId>
+                  <artifactId>wagon-http-shared</artifactId>
+                  <version>1.0-beta-2</version>
+              </exclusion>    
+              <exclusion>
+                  <groupId>org.apache.maven.wagon</groupId>
+                  <artifactId>wagon-file</artifactId>
+                  <version>1.0-beta-2</version>
+              </exclusion>    
+
+              <exclusion>
+                  <groupId>aspectj</groupId>
+                  <artifactId>aspectjrt</artifactId>
+                  <version>1.5.3</version>
+              </exclusion>    
+                  
+              <exclusion>
+                  <groupId>org.codehaus.plexus</groupId>
+                  <artifactId>plexus-classworlds</artifactId>
+                  <version>1.2-alpha-13</version>
+              </exclusion>    
+              <exclusion>
+                  <groupId>org.codehaus.plexus</groupId>
+                  <artifactId>plexus-interactivity-api</artifactId>
+                  <version>1.0-alpha-4</version>
+              </exclusion>    
+              <exclusion>
+                  <groupId>org.codehaus.plexus</groupId>
+                  <artifactId>plexus-velocity</artifactId>
+                  <version>1.1.3</version>
+              </exclusion>    
+                  
+              <exclusion>
+                  <groupId>commons-logging</groupId>
+                  <artifactId>commons-logging</artifactId>
+                  <version>1.0</version>
+              </exclusion>    
+              <exclusion>
+                  <groupId>commons-lang</groupId>
+                  <artifactId>commons-lang</artifactId>
+                  <version>1.0</version>
+              </exclusion>    
+              <exclusion>
+                  <groupId>commons-io</groupId>
+                  <artifactId>commons-io</artifactId>
+                  <version>1.3.1</version>
+              </exclusion>    
+              <exclusion>
+                  <groupId>commons-collections</groupId>
+                  <artifactId>commons-collections</artifactId>
+                  <version>3.2</version>
+              </exclusion>    
+                  
+              <exclusion>
+                  <groupId>net.sf.retrotranslator</groupId>    
+                  <artifactId>retrotranslator-runtime</artifactId>
+                  <version>1.2.1</version>
+              </exclusion>
+              <exclusion>
+                  <groupId>backport-util-concurrent</groupId>    
+                  <artifactId>backport-util-concurrent</artifactId>
+                  <version>3.0</version>
+              </exclusion>
+              <exclusion>
+                  <groupId>jtidy</groupId>    
+                  <artifactId>jtidy</artifactId>
+                  <version>4aug2000r7-dev</version>
+              </exclusion>
+              <exclusion>
+                  <groupId>xml-apis</groupId>    
+                  <artifactId>xml-apis</artifactId>
+                  <version>1.0.b2</version>
+              </exclusion>
+              <exclusion>
+                  <groupId>org.apache.maven.doxia</groupId>    
+                  <artifactId>doxia-sink-api</artifactId>
+                  <version>1.0-alpha-9</version>
+              </exclusion>
+              <exclusion>
+                  <groupId>org.apache.xbean</groupId>    
+                  <artifactId>xbean-reflect</artifactId>
+                  <version>3.4</version>
+              </exclusion>
+              <exclusion>
+                  <groupId>classworlds</groupId>    
+                  <artifactId>classworlds</artifactId>
+                  <version>1.1</version>
+              </exclusion>
+              <exclusion>
+                  <groupId>com.jcraft</groupId>    
+                  <artifactId>jsch</artifactId>
+                  <version>0.1.27</version>
+              </exclusion>
+              <exclusion>
+                  <groupId>net.sourceforge.jchardet</groupId>    
+                  <artifactId>jchardet</artifactId>
+                  <version>1.0</version>
+              </exclusion>
+              <exclusion>
+                  <groupId>dom4j</groupId>    
+                  <artifactId>dom4j</artifactId>
+                  <version>1.6.1</version>
+              </exclusion>
+              <exclusion>
+                  <groupId>jdom</groupId>    
+                  <artifactId>jdom</artifactId>
+                  <version>1.0</version>
+              </exclusion>
+              <exclusion>
+                  <groupId>velocity</groupId>    
+                  <artifactId>velocity</artifactId>
+                  <version>1.4</version>
+              </exclusion>
+              <exclusion>
+                  <groupId>velocity</groupId>    
+                  <artifactId>velocity-dep</artifactId>
+                  <version>1.4</version>
+              </exclusion>
+               
+          </exclusions>
+        </configuration>
+      </plugin>
+      -->
+
+    </plugins>
+  </build>
+  
+  <pluginRepositories>
+    <pluginRepository>
+      <id>tycho</id>
+      <url>http://repository.sonatype.org/content/repositories/tycho-pseudo-releases/</url>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </pluginRepository>
+  </pluginRepositories>
+
+  <repositories>
+    <repository>
+      <id>tycho</id>
+      <url>http://repository.sonatype.org/content/repositories/tycho-pseudo-releases/</url>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </repository>
+  </repositories>
+
+  <developers>
+    <developer>
+      <id>cstamas</id>
+      <name>Tamas Cservenak</name>
+      <email>cstamas@sonatype.com</email>
+      <organization>Sonatype</organization>
+      <roles>
+        <role>Developer</role>
+      </roles>
+      <timezone>2</timezone>
+    </developer>
+    <developer>
+      <id>brianf</id>
+      <name>Brian Fox</name>
+      <email>brian@sonatype.com</email>
+      <organization>Sonatype</organization>
+      <roles>
+        <role>Developer</role>
+      </roles>
+      <timezone>-6</timezone>
+    </developer>
+    <developer>
+      <id>eu</id>
+      <name>Eugene Kuleshov</name>
+      <email>eugene@sonatype.com</email>
+      <organization>Sonatype</organization>
+      <roles>
+        <role>Developer</role>
+      </roles>
+      <timezone>-5</timezone>
+    </developer>
+  </developers>
+
 </project>
