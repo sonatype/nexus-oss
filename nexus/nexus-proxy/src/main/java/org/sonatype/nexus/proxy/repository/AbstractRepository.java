@@ -592,15 +592,22 @@ public abstract class AbstractRepository
 
     public void setRemoteUrl( String remoteUrl )
     {
-        String trstr = remoteUrl.trim();
-
-        if ( !trstr.endsWith( RepositoryItemUid.PATH_SEPARATOR ) )
+        if ( remoteUrl == null )
         {
-            this.remoteUrl = trstr;
+            this.remoteUrl = null;
         }
         else
         {
-            this.remoteUrl = trstr.substring( 0, trstr.length() - 1 );
+            String trstr = remoteUrl.trim();
+
+            if ( !trstr.endsWith( RepositoryItemUid.PATH_SEPARATOR ) )
+            {
+                this.remoteUrl = trstr;
+            }
+            else
+            {
+                this.remoteUrl = trstr.substring( 0, trstr.length() - 1 );
+            }
         }
     }
 
@@ -1411,7 +1418,7 @@ public abstract class AbstractRepository
 
         return result;
     }
-    
+
     public boolean isCompatible( Repository repository )
     {
         return getRepositoryContentClass().isCompatible( repository.getRepositoryContentClass() );
