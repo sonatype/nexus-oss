@@ -40,7 +40,35 @@ public class DefaultIndexTreeView
         throws IndexContextInInconsistentStateException,
             IOException
     {
-        TreeNode result = factory.createGNode( this, path, path );
+        // get the last path elem
+        String name = null;
+        if ( !"/".equals( path ) )
+        {
+
+            if ( path.endsWith( "/" ) )
+            {
+                name = path.substring( 0, path.length() - 1 );
+            }
+            else
+            {
+                name = path;
+            }
+
+            name = name.substring( name.lastIndexOf( '/' ) + 1, name.length() );
+
+            // root is "/"
+            if ( !name.equals( "/" ) && name.endsWith( "/" ) )
+            {
+                name = name.substring( 0, name.length() - 1 );
+            }
+
+        }
+        else
+        {
+            name = "/";
+        }
+
+        TreeNode result = factory.createGNode( this, path, name );
 
         if ( "/".equals( path ) )
         {

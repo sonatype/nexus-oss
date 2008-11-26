@@ -73,6 +73,7 @@ public class IndexTreeViewTest
 
         int leafsFound = prettyPrint( debug, root, 0 );
 
+        assertEquals( "The group name should be here", "/", root.getNodeName() );
         assertEquals( 8, root.getChildren().size() );
         assertEquals( 28, leafsFound );
     }
@@ -84,6 +85,7 @@ public class IndexTreeViewTest
 
         int leafsFound = prettyPrint( debug, root, 0 );
 
+        assertEquals( "The group name should be here", "org", root.getNodeName() );
         assertEquals( 4, root.getChildren().size() );
         assertEquals( 15, leafsFound );
     }
@@ -95,6 +97,7 @@ public class IndexTreeViewTest
 
         int leafsFound = prettyPrint( debug, root, 0 );
 
+        assertEquals( "The group name should be here", "slf4j", root.getNodeName() );
         assertEquals( 3, root.getChildren().size() );
         assertEquals( 6, leafsFound );
     }
@@ -106,6 +109,7 @@ public class IndexTreeViewTest
 
         int leafsFound = prettyPrint( debug, root, 0 );
 
+        assertEquals( "The group name should be here", "slf4j-log4j12", root.getNodeName() );
         assertEquals( 1, root.getChildren().size() );
         assertEquals( 3, leafsFound );
     }
@@ -119,6 +123,7 @@ public class IndexTreeViewTest
 
         int leafsFound = prettyPrint( debug, root, 0 );
 
+        assertEquals( "The group name should be here", "1.4.1", root.getNodeName() );
         assertEquals( 1, root.getChildren().size() );
         assertEquals( 3, leafsFound );
     }
