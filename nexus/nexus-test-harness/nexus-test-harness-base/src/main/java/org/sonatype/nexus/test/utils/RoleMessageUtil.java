@@ -48,8 +48,8 @@ public class RoleMessageUtil
 
         // make sure the id != null
         Assert.assertNotNull( responseResource.getId() );
-        
-        if( role.getId() != null)
+
+        if ( role.getId() != null )
         {
             Assert.assertEquals( role.getId(), responseResource.getId() );
         }
@@ -164,5 +164,19 @@ public class RoleMessageUtil
         Response response = RequestFacade.sendMessage( serviceURI, Method.PUT, representation );
 
         return response.getStatus();
+    }
+
+    public RoleResource findRole( String roleId )
+        throws IOException
+    {
+        Response response = this.sendMessage( Method.GET, null, roleId );
+
+        if ( !response.getStatus().isSuccess() )
+        {
+            return null;
+        }
+
+        // get the Resource object
+        return this.getResourceFromResponse( response );
     }
 }
