@@ -1057,6 +1057,8 @@ public class DefaultIndexerManager
                 context.getIndexCreators() );
 
             nexusIndexer.scan( tmpContext );
+            
+            tmpContext.updateTimestamp( true );
 
             context.replace( tmpContext.getIndexDirectory() );
         }
