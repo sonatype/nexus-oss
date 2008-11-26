@@ -15,6 +15,7 @@ package org.sonatype.nexus.index.updater;
 
 import java.io.File;
 import java.util.Collection;
+import java.util.Date;
 import java.util.Set;
 
 import org.apache.lucene.search.Query;
@@ -24,6 +25,7 @@ import org.codehaus.plexus.PlexusTestCase;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.index.ArtifactContext;
 import org.sonatype.nexus.index.ArtifactInfo;
+import org.sonatype.nexus.index.IndexUtils;
 import org.sonatype.nexus.index.NexusIndexer;
 import org.sonatype.nexus.index.context.IndexingContext;
 
@@ -100,11 +102,18 @@ public class DefaultIndexUpdaterTest
 
         assertEquals( tempContent.toString(), 2, tempContent.size() );
 
+        // RAMDirectory is closed with context, forcing timestamp update
+        IndexUtils.updateTimestamp( tempContext.getIndexDirectory(), tempContext.getTimestamp() );
+        
         RAMDirectory tempDir2 = new RAMDirectory( tempContext.getIndexDirectory() );
 
+        Date newIndexTimestamp = tempContext.getTimestamp();
+        
         indexer.removeIndexingContext( tempContext, false );
 
         context.replace( tempDir2 );
+        
+        assertEquals( newIndexTimestamp, context.getTimestamp() );
 
         q = indexer.constructQuery( ArtifactInfo.ARTIFACT_ID, "commons-lang" );
 

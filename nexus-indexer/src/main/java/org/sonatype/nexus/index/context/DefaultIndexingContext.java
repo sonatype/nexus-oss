@@ -475,7 +475,9 @@ public class DefaultIndexingContext
         // reclaim the index as mine
         storeDescriptor();
 
-        updateTimestamp();
+        timestamp = IndexUtils.getTimestamp( directory );
+        
+        IndexUtils.updateTimestamp( indexDirectory, getTimestamp() );
     }
 
     public void merge( Directory directory )
@@ -539,6 +541,8 @@ public class DefaultIndexingContext
         rebuildGroups();
 
         updateTimestamp();
+        
+        IndexUtils.updateTimestamp( indexDirectory, getTimestamp() );
     }
 
     private void addDocument( String uinfo, Document d, Searcher s, IndexWriter w ) 
