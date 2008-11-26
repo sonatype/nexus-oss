@@ -245,3 +245,10 @@ button.st-icon-refresh {
 .x-tree-node-collapsed .x-tree-node-nexus-icon{background-image:url(../images/icons/folder-nexus.png);}
 .x-tree-node-collapsed .x-tree-node-nexus-icon,.x-tree-node-expanded .x-tree-node-nexus-icon,.x-tree-node-leaf .x-tree-node-nexus-icon{border:0 none;height:18px;margin:0;padding:0;vertical-align:top;width:16px;background-position:center;background-repeat:no-repeat;}
 .ext-ie .x-tree-node-indent img,.ext-ie .x-tree-node-nexus-icon,.ext-ie .x-tree-ec-icon{vertical-align:middle!important;}
+
+.ext-mb-input{padding:1px 3px;background:#fff url(../ext-2.2/resources/images/default/form/text-bg.gif) repeat-x 0 0;border:1px solid #B5B8C8;}
+.ext-mb-input{height:22px;line-height:18px;vertical-align:middle;}
+.ext-ie .ext-mb-input{margin:-1px 0;height:22px;line-height:18px;}
+.ext-strict .ext-mb-input{height:18px;}
+.ext-safari .ext-mb-input{height:20px;padding:0 3px;}
+.ext-gecko .ext-mb-input{padding-top:2px;padding-bottom:0;}
