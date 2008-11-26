@@ -278,7 +278,11 @@ Ext.extend(Sonatype.repoServer.SearchResultGrid, Ext.grid.GridPanel, {
     if ( c ) {
       return this.makeArtifactLink( r, g, a, v, c, p, 'artifact' );
     }
-    else if ( p == 'pom' ) {
+    // no packaging, only shows a pom link
+    else if ( !p ){
+      return this.makeArtifactLink( r, g, a, v, null, 'pom', 'pom')
+    }
+    else if ( p == 'pom') {
       return this.makeArtifactLink( r, g, a, v, c, p, 'pom' );
     }
     else {
