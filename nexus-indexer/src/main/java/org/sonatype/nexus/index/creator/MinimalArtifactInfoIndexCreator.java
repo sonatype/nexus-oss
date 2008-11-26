@@ -377,12 +377,13 @@ public class MinimalArtifactInfoIndexCreator
             res = true;
         }
 
-        // sometimes there's a pom without packaging, then the value will be "null" String
-        if ( ai.packaging.equals( "null" ) )
+        // sometimes there's a pom without packaging(default to jar), but no artifact, then the value will be a "null"
+        // String
+        if ( "null".equals( ai.packaging ) )
         {
             ai.packaging = null;
         }
-        
+
         return res;
 
         // artifactInfo.fname = ???
