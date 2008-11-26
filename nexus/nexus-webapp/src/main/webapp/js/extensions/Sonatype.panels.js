@@ -99,7 +99,13 @@ Sonatype.panels.GridViewer = function( config ) {
     id: this.dataId,
     fields: fields,
     url: this.url,
-    autoLoad: this.dataAutoLoad
+    autoLoad: this.dataAutoLoad,
+    listeners: {
+      update: {
+        fn: this.recordUpdateHandler,
+        scope: this
+      }
+    }
   } );
 
   this.gridPanel = new Ext.grid.GridPanel( {
@@ -184,6 +190,53 @@ Ext.extend( Sonatype.panels.GridViewer, Ext.Panel, {
     
     this.cardPanel.getLayout().setActiveItem( 0 );
   },
+  
+  createChildPanel: function( rec, recreateIfExists ) {
+    var id = this.id + rec.id;
+
+    var panel = this.cardPanel.findById( id );
+
+    if ( recreateIfExists ) {
+      if ( panel ) {
+        this.cardPanel.remove( panel, true );
+        panel = null;
+      }
+      else {
+        return;
+      }
+    }
+
+    if ( ! panel ) {
+      panel = new Ext.Panel( { 
+        id: id,
+        layout: 'card',
+        activeItem: 0,
+        deferredRender: false,
+        autoScroll: false,
+        frame: false,
+        border: false,
+        title: rec.get( this.titleColumn )
+      } );
+
+      Sonatype.Events.fireEvent( this.rowClickEvent, panel, rec );
+
+      if ( panel.items ) {
+        this.cardPanel.add( panel );
+      }
+      else {
+        return;
+      }
+    }
+
+    this.cardPanel.getLayout().setActiveItem( panel );
+    panel.doLayout();
+  },
+  
+  recordUpdateHandler: function( store, rec, op ) {
+    if ( op == Ext.data.Record.COMMIT ) {
+      this.createChildPanel( rec, true );
+    }
+  },
 
   refreshHandler: function( button, e ) {
     this.clearCards();
@@ -193,35 +246,10 @@ Ext.extend( Sonatype.panels.GridViewer, Ext.Panel, {
   rowClickHandler: function( grid, index, e ) {
     if ( e.target.nodeName == 'A' ) return; // no menu on links
 
-    if ( this.rowClickEvent ) { 
+    if ( this.rowClickEvent ) {
       var rec = grid.store.getAt( index );
-      var id = this.id + rec.id;
-
-      var panel = this.cardPanel.findById( id );
-      if ( ! panel ) {
-        panel = new Ext.Panel( { 
-          id: id,
-          layout: 'card',
-          activeItem: 0,
-          deferredRender: false,
-          autoScroll: false,
-          frame: false,
-          border: false,
-          title: rec.get( this.titleColumn )
-        } );
-
-        Sonatype.Events.fireEvent( this.rowClickEvent, panel, rec );
-
-        if ( panel.items ) {
-          this.cardPanel.add( panel );
-        }
-        else {
-          return;
-        }
-      }
-
-      this.cardPanel.getLayout().setActiveItem( panel );
-      panel.doLayout();
+      
+      this.createChildPanel( rec );
     }
   },
   
