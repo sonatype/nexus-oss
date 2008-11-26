@@ -22,6 +22,8 @@
  * User Edit/Create panel layout and controller
  */
   
+var NEXUS_USER_REALM = 'Nexus';
+
 Sonatype.repoServer.UserEditPanel = function(config){
   var config = config || {};
   var defaultConfig = {};
@@ -559,7 +561,7 @@ Ext.extend(Sonatype.repoServer.UserEditPanel, Ext.Panel, {
         roles : receivedData.roles,
         readOnly : receivedData.readOnly,
         displayRoles : this.roleCombiner(receivedData.roles),
-        stRealm: 'Nexus'
+        stRealm: NEXUS_USER_REALM
       };
       
       var newRec = new this.userRecordConstructor(
@@ -677,7 +679,7 @@ Ext.extend(Sonatype.repoServer.UserEditPanel, Ext.Panel, {
   },
 
   onUserMenuInit: function( menu, userRecord, a, b, c ) {
-    if ( userRecord.data.readOnly == false ) {
+    if ( userRecord.data.readOnly == false && userRecord.data.stRealm == NEXUS_USER_REALM ) {
 
       if ( this.sp.checkPermission( 'nexus:users', this.sp.DELETE ) ) {
         menu.add( this.actions.deleteAction );
@@ -891,7 +893,7 @@ Sonatype.Events.addListener( 'userListInit', function( userContainer ) {
     success: function( response, options ) {
       var resp = Ext.decode( response.responseText );
       if ( resp.data ) {
-        userContainer.addRecords( resp.data, 'Nexus', Sonatype.repoServer.DefaultUserEditor );
+        userContainer.addRecords( resp.data, NEXUS_USER_REALM, Sonatype.repoServer.DefaultUserEditor );
       }
     },
     scope: userContainer
