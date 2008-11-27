@@ -295,7 +295,7 @@ Ext.extend( Sonatype.panels.GridViewer, Ext.Panel, {
 Sonatype.panels.TreePanel = function( config ) {
   var config = config || {};
   var defaultConfig = { 
-    titleColumn: 'name',
+    titleColumn: 'name'
   };
   Ext.apply( this, config, defaultConfig );
 
