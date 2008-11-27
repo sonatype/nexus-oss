@@ -357,6 +357,9 @@ Sonatype.panels.TreePanel = function( config ) {
         if ( ! attr.text && attr.nodeName ) {
           attr.text = attr.nodeName;
         }
+        if ( ! attr.id ) {
+          attr.id = ( this.url + attr.path ).replace( /\//g, '_' );
+        }
 
         if ( attr.nodeType ) {
           return new Ext.tree.TreePanel.nodeTypes[attr.nodeType](attr);
