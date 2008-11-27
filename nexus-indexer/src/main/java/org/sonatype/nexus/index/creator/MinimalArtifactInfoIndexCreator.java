@@ -350,15 +350,6 @@ public class MinimalArtifactInfoIndexCreator
             res = true;
         }
 
-        String md5 = doc.get( ArtifactInfo.MD5 );
-
-        if ( md5 != null )
-        {
-            ai.md5 = md5;
-
-            res = true;
-        }
-
         String name = doc.get( ArtifactInfo.NAME );
 
         if ( name != null )
