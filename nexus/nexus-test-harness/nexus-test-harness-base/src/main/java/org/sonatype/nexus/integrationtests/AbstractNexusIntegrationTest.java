@@ -180,8 +180,9 @@ public class AbstractNexusIntegrationTest
             }
         }
     }
-    
-    protected void copyConfigFiles() throws IOException
+
+    protected void copyConfigFiles()
+        throws IOException
     {
         this.copyConfigFile( "nexus.xml", RELATIVE_WORK_CONF_DIR );
 
@@ -281,9 +282,17 @@ public class AbstractNexusIntegrationTest
                     throw new FileNotFoundException( "File " + artifactFile.getAbsolutePath() + " doesn't exists!" );
                 }
 
-                DeployUtils.deployWithWagon( this.container, "http", deployUrl, artifactFile,
-                                             this.getRelitiveArtifactPath( gav ) );
-                DeployUtils.deployWithWagon( this.container, "http", deployUrl, pom, this.getRelitivePomPath( gav ) );
+                try
+                {
+                    DeployUtils.deployWithWagon( this.container, "http", deployUrl, artifactFile,
+                                                 this.getRelitiveArtifactPath( gav ) );
+                    DeployUtils.deployWithWagon( this.container, "http", deployUrl, pom, this.getRelitivePomPath( gav ) );
+                }
+                catch ( Exception e )
+                {
+                    log.error( getTestId() + " Unable to deploy " + artifactFileName, e );
+                    throw e;
+                }
 
             }
 
@@ -335,7 +344,7 @@ public class AbstractNexusIntegrationTest
             log.info( "*\n*" );
             log.info( "***************************" );
 
-			NexusStateUtil.doHardStart();
+            NexusStateUtil.doHardStart();
         }
     }
 
@@ -734,8 +743,7 @@ public class AbstractNexusIntegrationTest
     protected boolean printKnownErrorButDoNotFail( Class<? extends AbstractNexusIntegrationTest> clazz, String... tests )
     {
         StringBuffer error =
-            new StringBuffer(
-                              "*********************************************************************************" );
+            new StringBuffer( "*********************************************************************************" );
         error.append( "\n* This test is being skipped because its known to fail," );
         error.append( "\n* It is a very minor error, and is only a problem if you start sending in " );
         error.append( "\n* raw REST request to Nexus. (it is not a security problem)" );
