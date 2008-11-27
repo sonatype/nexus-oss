@@ -60,11 +60,7 @@ public class IdentifyHashPlexusResource
 
         try
         {
-            if ( "md5".equalsIgnoreCase( alg ) )
-            {
-                na = ai2Na( request, getNexus().identifyArtifact( ArtifactInfo.MD5, checksum ) );
-            }
-            else if ( "sha1".equalsIgnoreCase( alg ) )
+            if ( "sha1".equalsIgnoreCase( alg ) )
             {
                 na = ai2Na( request, getNexus().identifyArtifact( ArtifactInfo.SHA1, checksum ) );
             }

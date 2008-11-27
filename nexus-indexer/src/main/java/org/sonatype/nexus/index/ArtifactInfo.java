@@ -31,8 +31,6 @@ public class ArtifactInfo
 {
     private static final long serialVersionUID = 6028843453477511104L;
 
-    // These are attributes that are constant across the versions of a particular artifact.
-
     public static final String ROOT_GROUPS = "rootGroups";
 
     public static final String ROOT_GROUPS_VALUE = "rootGroups";
@@ -46,53 +44,81 @@ public class ArtifactInfo
     public static final String ALL_GROUPS_LIST = "allGroupsList";
 
     /**
-     * packaging, lastModified, size, sourcesExists, javadocExists, signatureExists
+     * Info: packaging, lastModified, size, sourcesExists, javadocExists, signatureExists. 
+     * Stored, not indexed.
      */
     public static final String INFO = "i";
 
+    /**
+     * GroupId.
+     * Not stored, indexed untokenized
+     */
     public static final String GROUP_ID = "g";
 
+    /**
+     * ArtifactId.
+     * Not stored, indexed tokenized
+     */
     public static final String ARTIFACT_ID = "a";
 
-    public static final String PACKAGING = "p";
-
-    public static final String NAME = "n";
-
-    public static final String DESCRIPTION = "d";
-
-    public static final String REPOSITORY = "r";
-
-    // These are attributes that are unique across the versions of a particular artifact.
+    /**
+     * Version.
+     * Not stored, indexed tokenized
+     */
+    public static final String VERSION = "v";
 
     /**
-     * Unique groupId, artifactId, version, classifier, packaging
+     * Packaging.
+     * Not stored, indexed untokenized
+     */
+    public static final String PACKAGING = "p";
+
+    /**
+     * Name.
+     * Stored, not indexed
+     */
+    public static final String NAME = "n";
+
+    /**
+     * Description.
+     * Stored, not indexed
+     */
+    public static final String DESCRIPTION = "d";
+
+    /**
+     * Unique groupId, artifactId, version, classifier, packaging. 
+     * Stored, indexed untokenized
      */
     public static final String UINFO = "u";
 
-    public static final String ID = "id"; // groupId + artifactId
-
-    public static final String FNAME = "f"; // the artifact filename
-
-    public static final String VERSION = "v";
-
+    /**
+     * Last modified.
+     * Stored, not indexed
+     */
     public static final String LAST_MODIFIED = "m";
 
-    public static final String SIZE = "s";
-
-    public static final String MD5 = "5";
-
+    /**
+     * SHA1. 
+     * Not stored, indexed untokenized
+     */
     public static final String SHA1 = "1";
 
-    public static final String SOURCES_EXISTS = "se";
-
-    public static final String JAVADOC_EXISTS = "je";
-
-    public static final String SIGNATURE_EXISTS = "ae";
-
+    /**
+     * Class names
+     * Stored compressed, indexed tokeninzed
+     */
     public static final String NAMES = "c";
 
+    /**
+     * Plugin prefix.
+     * Stored, not indexed
+     */
     public static final String PLUGIN_PREFIX = "px";
 
+    /**
+     * Plugin goals.
+     * Stored, not indexed
+     */
     public static final String PLUGIN_GOALS = "gx";
 
     /**
