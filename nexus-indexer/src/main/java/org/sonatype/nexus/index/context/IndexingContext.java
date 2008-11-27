@@ -22,6 +22,7 @@ import java.util.Set;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.Document;
+import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.search.IndexSearcher;
@@ -178,6 +179,12 @@ public interface IndexingContext
     ArtifactInfo constructArtifactInfo( Document doc )
         throws IndexContextInInconsistentStateException;
 
+    /**
+     * Optimizes index
+     */
+    void optimize() 
+        throws CorruptIndexException, IOException;
+    
     /**
      * Shuts down this context.
      */

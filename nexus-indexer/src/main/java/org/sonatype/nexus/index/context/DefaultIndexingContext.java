@@ -404,6 +404,12 @@ public class DefaultIndexingContext
         return indexSearcher;
     }
 
+    public void optimize() 
+        throws CorruptIndexException, IOException 
+    {
+        getIndexWriter().optimize();
+    }
+    
     public void close( boolean deleteFiles )
         throws IOException
     {
@@ -411,11 +417,6 @@ public class DefaultIndexingContext
 
         if ( indexDirectory != null )
         {
-            if ( !deleteFiles )
-            {
-                getIndexWriter().optimize();
-            }
-
             closeReaders();
 
             if ( deleteFiles )
@@ -489,6 +490,8 @@ public class DefaultIndexingContext
         timestamp = IndexUtils.getTimestamp( directory );
 
         IndexUtils.updateTimestamp( indexDirectory, getTimestamp() );
+        
+        optimize();
     }
 
     public void merge( Directory directory )
@@ -551,9 +554,9 @@ public class DefaultIndexingContext
 
         rebuildGroups();
 
-        updateTimestamp();
+        updateTimestamp( true );
 
-        IndexUtils.updateTimestamp( indexDirectory, getTimestamp() );
+        optimize();
     }
 
     private void addDocument( String uinfo, Document d, Searcher s, IndexWriter w )
