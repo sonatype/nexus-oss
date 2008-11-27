@@ -28,11 +28,6 @@ public class Nexus637PublishIndexTest
     public void publishIndex()
         throws Exception
     {
-        if ( true )
-        {
-            printKnownErrorButDoNotFail( getClass(), "publishIndex" );
-            return;
-        }
         File repositoryPath = new File( nexusBaseDir, "runtime/work/storage/nexus-test-harness-repo" );
         File index = new File( repositoryPath, ".index" );
 
