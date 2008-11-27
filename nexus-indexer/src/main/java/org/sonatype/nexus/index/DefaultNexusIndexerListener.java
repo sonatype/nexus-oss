@@ -134,7 +134,7 @@ class DefaultNexusIndexerListener implements
             
             if ( update )
             {
-                removeDeletedArtifacts( context );
+                removeDeletedArtifacts( context, result );
             }
         } 
         catch ( IOException ex ) 
@@ -185,9 +185,11 @@ class DefaultNexusIndexerListener implements
         }
     }
     
-    private void removeDeletedArtifacts( IndexingContext context ) 
+    private void removeDeletedArtifacts( IndexingContext context, ScanningResult result ) 
         throws IOException 
     {
+        int deleted = 0;
+      
         for ( String uinfo : uinfos ) 
         {
             Term term = new Term( ArtifactInfo.UINFO, uinfo );
@@ -223,8 +225,12 @@ class DefaultNexusIndexerListener implements
                 ArtifactContext ac = new ArtifactContext( null, null, null, ai, null );
                 
                 indexer.deleteArtifactFromIndex( ac, context );
+                
+                deleted++;
             }
         }
+        
+        result.setDeletedFiles( deleted );
     }
     
 }

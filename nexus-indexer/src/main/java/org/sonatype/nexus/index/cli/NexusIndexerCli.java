@@ -161,11 +161,11 @@ public class NexusIndexerCli
         {
             long m = t / 1000L / 60L;
 
-            System.err.printf( "Total time: %d min %d sec\n", m, s - ( m * 60 ) );
+            System.err.printf( "Total time:   %d min %d sec\n", m, s - ( m * 60 ) );
         }
         else
         {
-            System.err.printf( "Total time: %d sec\n", s );
+            System.err.printf( "Total time:   %d sec\n", s );
         }
 
         Runtime r = Runtime.getRuntime();
@@ -295,12 +295,15 @@ public class NexusIndexerCli
 
         public void scanningFinished( IndexingContext context, ScanningResult result )
         {
+            result.setTotalFiles( count - result.getExceptions().size() );
+            
             if ( result.hasExceptions() )
             {
-                System.err.printf( "Total scanning errors: %s\n", result.getExceptions().size() );
+                System.err.printf( "Scanning errors:   %s\n", result.getExceptions().size() );
             }
-
-            System.err.printf( "Total files scanned: %s\n", result.getTotalFiles() );
+            
+            System.err.printf( "Artifacts added:   %s\n", result.getTotalFiles() );
+            System.err.printf( "Artifacts deleted: %s\n", result.getDeletedFiles() );
         }
     }
     

@@ -45,14 +45,14 @@ public class DefaultScanner
       
         ScanningResult result = new DefaultScanningResult();
 
-        scanDirectory( request.getIndexingContext().getRepository(), request, result );
+        scanDirectory( request.getIndexingContext().getRepository(), request );
 
         request.getArtifactScanningListener().scanningFinished( request.getIndexingContext(), result );
         
         return result;
     }
 
-    private void scanDirectory( File dir, ScanningRequest request, ScanningResult result )
+    private void scanDirectory( File dir, ScanningRequest request )
     {
         if ( dir == null )
         {
@@ -76,7 +76,7 @@ public class DefaultScanner
 
                 if ( f.isDirectory() )
                 {
-                    scanDirectory( f, request, result );
+                    scanDirectory( f, request );
                 }
                 else if ( !AbstractIndexCreator.isIndexable( f ) )
                 {
@@ -84,13 +84,13 @@ public class DefaultScanner
                 }
                 else
                 {
-                    scanFile( f, request, result, uinfos );
+                    scanFile( f, request, uinfos );
                 }
             }
         }
     }
 
-    private void scanFile( File file, ScanningRequest request, ScanningResult result, Set<String> uinfos ) 
+    private void scanFile( File file, ScanningRequest request, Set<String> uinfos ) 
     {
         String repoFile = file.getAbsolutePath().substring(
             request.getIndexingContext().getRepository().getAbsolutePath().length() + 1 );
@@ -111,15 +111,13 @@ public class DefaultScanner
             {
                 uinfos.add( uinfo );  // skip multiple snapshots
           
-                processFile( file, request, result );
+                processFile( file, request );
             }
         }
     }
 
-    private void processFile( File file, ScanningRequest request, ScanningResult result )
+    private void processFile( File file, ScanningRequest request )
     {
-        result.incrementCount();
-
         IndexingContext context = request.getIndexingContext();
 
         ArtifactContext ac = artifactContextProducer.getArtifactContext( context, file );

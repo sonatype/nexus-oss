@@ -21,6 +21,8 @@ public class DefaultScanningResult
     implements ScanningResult
 {
     private int totalFiles = 0;
+    
+    private int deletedFiles = 0;
 
     private List<Exception> exceptions = new ArrayList<Exception>();
 
@@ -28,15 +30,20 @@ public class DefaultScanningResult
     {
         this.totalFiles = totalFiles;
     }
-
-    public void incrementCount()
+    
+    public void setDeletedFiles(int deletedFiles) 
     {
-        totalFiles++;
+        this.deletedFiles = deletedFiles;
     }
-
+    
     public int getTotalFiles()
     {
         return totalFiles;
+    }
+    
+    public int getDeletedFiles() 
+    {
+        return deletedFiles;
     }
 
     public void addException( Exception e )

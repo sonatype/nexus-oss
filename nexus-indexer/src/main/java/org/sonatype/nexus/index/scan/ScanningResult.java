@@ -20,12 +20,16 @@ public interface ScanningResult
 {
     int getTotalFiles();
 
+    int getDeletedFiles();
+
+    void setTotalFiles(int count);
+
+    void setDeletedFiles(int count);
+    
     void addException( Exception e );
-
-    void incrementCount();
-
+    
     public boolean hasExceptions();
 
     public List<Exception> getExceptions();
-    
+
 }
