@@ -32,7 +32,6 @@ import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.Hits;
 import org.apache.lucene.search.IndexSearcher;
-import org.apache.lucene.search.Searcher;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
@@ -533,7 +532,12 @@ public class DefaultIndexingContext
 
                 if ( uinfo != null )
                 {
-                    addDocument( uinfo, d, s, w );
+                    Hits hits = s.search( new TermQuery( new Term( ArtifactInfo.UINFO, uinfo ) ) );
+                    
+                    if ( hits.length() == 0 )
+                    {
+                        copyDocument( d, w );
+                    }
                 }
                 else
                 {
@@ -559,36 +563,29 @@ public class DefaultIndexingContext
         optimize();
     }
 
-    private void addDocument( String uinfo, Document d, Searcher s, IndexWriter w )
-        throws IOException
+    public void copyDocument( Document d, IndexWriter w )
+        throws CorruptIndexException, IOException 
     {
-        Term term = new Term( ArtifactInfo.UINFO, uinfo );
-
-        Hits hits = s.search( new TermQuery( term ) );
-
-        if ( hits.length() == 0 )
+        ArtifactInfo info = constructArtifactInfo( d );
+        ArtifactContext artifactContext = new ArtifactContext( null, null, null, info, null );
+        ArtifactIndexingContext indexingContext = new DefaultArtifactIndexingContext( artifactContext );
+  
+        Document doc = new Document();
+  
+        doc.add( new Field( ArtifactInfo.UINFO, AbstractIndexCreator.getGAV(
+            info.groupId,
+            info.artifactId,
+            info.version,
+            info.classifier,
+            info.packaging ), Field.Store.YES, Field.Index.UN_TOKENIZED ) );
+  
+        // recreate document to index not stored fields
+        for ( IndexCreator ic : getIndexCreators() )
         {
-            ArtifactInfo info = constructArtifactInfo( d );
-            ArtifactContext artifactContext = new ArtifactContext( null, null, null, info, null );
-            ArtifactIndexingContext indexingContext = new DefaultArtifactIndexingContext( artifactContext );
-
-            Document doc = new Document();
-
-            doc.add( new Field( ArtifactInfo.UINFO, AbstractIndexCreator.getGAV(
-                info.groupId,
-                info.artifactId,
-                info.version,
-                info.classifier,
-                info.packaging ), Field.Store.YES, Field.Index.UN_TOKENIZED ) );
-
-            // recreate document to index not stored fields
-            for ( IndexCreator ic : getIndexCreators() )
-            {
-                ic.updateDocument( indexingContext, doc );
-            }
-
-            w.addDocument( doc );
+            ic.updateDocument( indexingContext, doc );
         }
+  
+        w.addDocument( doc );
     }
 
     public void filter( ArtifactInfoFilter filter )

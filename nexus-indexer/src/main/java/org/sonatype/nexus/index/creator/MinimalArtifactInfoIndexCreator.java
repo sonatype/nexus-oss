@@ -266,7 +266,7 @@ public class MinimalArtifactInfoIndexCreator
 
         if ( ai.sha1 != null )
         {
-            doc.add( new Field( ArtifactInfo.SHA1, ai.sha1, Field.Store.NO, Field.Index.UN_TOKENIZED ) );
+            doc.add( new Field( ArtifactInfo.SHA1, ai.sha1, Field.Store.YES, Field.Index.UN_TOKENIZED ) );
         }
     }
 
@@ -375,11 +375,17 @@ public class MinimalArtifactInfoIndexCreator
             ai.packaging = null;
         }
 
+        String sha1 = doc.get( ArtifactInfo.SHA1 );
+        
+        if( sha1 != null )
+        {
+            ai.sha1 = sha1;
+        }
+        
         return res;
 
         // artifactInfo.fname = ???
 
-        // artifactInfo.sha1 = ???
     }
 
     private void close( ZipFile zf )

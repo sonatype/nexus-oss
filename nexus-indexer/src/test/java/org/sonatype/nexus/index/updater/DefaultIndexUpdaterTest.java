@@ -18,13 +18,17 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.Set;
 
+import org.apache.lucene.index.Term;
 import org.apache.lucene.search.Query;
+import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.RAMDirectory;
 import org.codehaus.plexus.PlexusTestCase;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.index.ArtifactContext;
 import org.sonatype.nexus.index.ArtifactInfo;
+import org.sonatype.nexus.index.FlatSearchRequest;
+import org.sonatype.nexus.index.FlatSearchResponse;
 import org.sonatype.nexus.index.IndexUtils;
 import org.sonatype.nexus.index.NexusIndexer;
 import org.sonatype.nexus.index.context.IndexingContext;
@@ -240,6 +244,45 @@ public class DefaultIndexUpdaterTest
         assertEquals( content2.toString(), 1, content2.size() );
     }
     
+    public void testMergeSearch() throws Exception 
+    {
+        File repo1 = new File( getBasedir(), "src/test/nexus-658" );
+        Directory indexDir1 = new RAMDirectory();
+        
+        IndexingContext context1 = indexer.addIndexingContext(
+            "nexus-658",
+            "nexus-658",
+            repo1,
+            indexDir1,
+            null,
+            null,
+            NexusIndexer.DEFAULT_INDEX );
+        indexer.scan( context1 );
+        
+        File repo2 = new File( getBasedir(), "src/test/nexus-13" );
+        Directory indexDir2 = new RAMDirectory();
+        
+        IndexingContext context2 = indexer.addIndexingContext(
+            "nexus-13",
+            "nexus-13",
+            repo2,
+            indexDir2,
+            null,
+            null,
+            NexusIndexer.DEFAULT_INDEX );
+        indexer.scan( context2 );
+        
+        context1.merge( indexDir2 );
+        
+        Query q = new TermQuery( new Term( ArtifactInfo.SHA1, "b5e9d009320d11b9859c15d3ad3603b455fa1c85" ) );
+        FlatSearchRequest request = new FlatSearchRequest( q, context1 );
+        FlatSearchResponse response = indexer.searchFlat( request );
+        
+        Set<ArtifactInfo> results = response.getResults();
+        ArtifactInfo artifactInfo = results.iterator().next();
+        assertEquals( artifactInfo.artifactId, "dma.integration.tests" );
+    }
+    
     public void testMergeGroups() throws Exception 
     {
         indexer.addArtifactToIndex(
@@ -312,7 +355,7 @@ public class DefaultIndexUpdaterTest
             artifactId,
             version,
             classifier,
-            "jat",
+            "jar",
             null,
             null,
             artifact.getName(),

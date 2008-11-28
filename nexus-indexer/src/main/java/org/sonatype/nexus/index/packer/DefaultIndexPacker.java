@@ -133,16 +133,16 @@ public class DefaultIndexPacker
            return;  // no updates available
         }
         
-        RAMDirectory ctxDir = new RAMDirectory();
+        RAMDirectory chunkDir = new RAMDirectory();
 
-        IndexingContext ctx;
+        IndexingContext chunkContext;
         try 
         {
-            ctx = new DefaultIndexingContext(
+            chunkContext = new DefaultIndexingContext(
                 context.getId(),
                 context.getRepositoryId(),
                 null,
-                ctxDir,
+                chunkDir,
                 null,
                 null,
                 context.getIndexCreators(), 
@@ -155,7 +155,7 @@ public class DefaultIndexPacker
 
         IndexReader r = context.getIndexReader();
         
-        IndexWriter w = ctx.getIndexWriter();
+        IndexWriter w = chunkContext.getIndexWriter();
         
         int n = 0;
         
@@ -163,23 +163,23 @@ public class DefaultIndexPacker
         {
             String key = e.getKey();
           
-            for ( int i : e.getValue() ) 
+            for ( int i : e.getValue() )
             {
-                w.addDocument( r.document( i ) );
+                context.copyDocument( r.document( i ), w );
             }
             
             w.flush();
             w.optimize();
             
-            try 
+            try
             {
                 info.put( IndexingContext.INDEX_DAY_PREFIX + n, format( df.parse( key ) ) );
-            } 
+            }
             catch ( ParseException ex ) 
             {
             }
             
-            writeIndexArchive( ctx, new File( targetDir, IndexingContext.INDEX_FILE + "." + key + ".zip" ));
+            writeIndexArchive( chunkContext, new File( targetDir, IndexingContext.INDEX_FILE + "." + key + ".zip" ));
         
             n++;
             
@@ -191,11 +191,11 @@ public class DefaultIndexPacker
         
         w.close();
         
-        ctx.close( /* delete files */ false );
+        chunkContext.close( /* delete files */ false );
 
         // ctxDir.delete();
 
-        ctxDir.close();
+        chunkDir.close();
     }
   
     void writeIndexArchive( IndexingContext context, File targetArchive )

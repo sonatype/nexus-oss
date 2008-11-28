@@ -232,6 +232,12 @@ public interface IndexingContext
     void filter( ArtifactInfoFilter filter )
         throws IOException;
 
+    /**
+     * Copy document to the target writer
+     */
+    void copyDocument( Document document, IndexWriter w ) 
+        throws CorruptIndexException, IOException;
+    
     Directory getIndexDirectory();
 
     File getIndexDirectoryFile();

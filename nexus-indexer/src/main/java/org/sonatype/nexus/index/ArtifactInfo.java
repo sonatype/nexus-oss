@@ -44,10 +44,10 @@ public class ArtifactInfo
     public static final String ALL_GROUPS_LIST = "allGroupsList";
 
     /**
-     * Info: packaging, lastModified, size, sourcesExists, javadocExists, signatureExists. 
-     * Stored, not indexed.
+     * Unique groupId, artifactId, version, classifier, packaging. 
+     * Stored, indexed untokenized
      */
-    public static final String INFO = "i";
+    public static final String UINFO = "u";
 
     /**
      * GroupId.
@@ -74,6 +74,12 @@ public class ArtifactInfo
     public static final String PACKAGING = "p";
 
     /**
+     * Info: packaging, lastModified, size, sourcesExists, javadocExists, signatureExists. 
+     * Stored, not indexed.
+     */
+    public static final String INFO = "i";
+
+    /**
      * Name.
      * Stored, not indexed
      */
@@ -86,12 +92,6 @@ public class ArtifactInfo
     public static final String DESCRIPTION = "d";
 
     /**
-     * Unique groupId, artifactId, version, classifier, packaging. 
-     * Stored, indexed untokenized
-     */
-    public static final String UINFO = "u";
-
-    /**
      * Last modified.
      * Stored, not indexed
      */
@@ -99,7 +99,7 @@ public class ArtifactInfo
 
     /**
      * SHA1. 
-     * Not stored, indexed untokenized
+     * Stored, indexed untokenized
      */
     public static final String SHA1 = "1";
 
