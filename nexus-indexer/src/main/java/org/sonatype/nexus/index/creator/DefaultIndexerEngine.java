@@ -65,8 +65,6 @@ public class DefaultIndexerEngine
         w.optimize();
 
         w.flush();
-
-        context.updateTimestamp();
     }
 
     public void remove( IndexingContext context, ArtifactContext ac )

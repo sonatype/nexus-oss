@@ -446,6 +446,10 @@ public class DefaultIndexingContext
             {
                 // just deleted it
             }
+
+            rebuildGroups();
+            
+            updateTimestamp( true );
         }
     }
 
@@ -805,4 +809,9 @@ public class DefaultIndexingContext
         return groupDoc;
     }
 
+    public String toString() 
+    {
+        return id + " : " + timestamp;
+    }
+    
 }

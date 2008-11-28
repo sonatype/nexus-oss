@@ -225,7 +225,14 @@ public class DefaultIndexPacker
     {
         info.setProperty( IndexingContext.INDEX_ID, context.getId() );
 
-        info.setProperty( IndexingContext.INDEX_TIMESTAMP, format( context.getTimestamp() ) );
+        Date timestamp = context.getTimestamp();
+        
+        if( timestamp == null )
+        {
+            timestamp = new Date( 0 );  // never updated
+        }
+        
+        info.setProperty( IndexingContext.INDEX_TIMESTAMP, format( timestamp ) );
 
         OutputStream os = null;
 
