@@ -258,10 +258,6 @@ public class DefaultNexusIndexer
   
         scanner.scan( new DefaultScanningRequest( context, //
             new DefaultNexusIndexerListener( context, this, indexerEngine, update, listener ) ) );
-        
-        context.updateTimestamp( true );
-
-        context.optimize();
     }
 
     public void artifactDiscovered( ArtifactContext ac, IndexingContext context )

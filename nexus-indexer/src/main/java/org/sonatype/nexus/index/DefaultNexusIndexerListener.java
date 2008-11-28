@@ -47,6 +47,8 @@ class DefaultNexusIndexerListener implements
     
     private final List<IOException> exceptions = new ArrayList<IOException>();
     
+    private int count = 0;
+    
     DefaultNexusIndexerListener( IndexingContext context, //
         NexusIndexer indexer, IndexerEngine indexerEngine, boolean update, // 
         ArtifactScanningListener listener ) 
@@ -97,6 +99,16 @@ class DefaultNexusIndexerListener implements
         try
         {
             indexer.artifactDiscovered( ac, context );
+            
+            groups.add( AbstractIndexCreator.getRootGroup( ac.getArtifactInfo().groupId ) );
+            allGroups.add( ac.getArtifactInfo().groupId );
+            
+            count++;
+            
+            if ( listener != null )
+            {
+              listener.artifactDiscovered( ac );
+            }
         }
         catch ( IOException ex )
         {
@@ -107,18 +119,12 @@ class DefaultNexusIndexerListener implements
                 listener.artifactError( ac, ex );
             }
         }
-      
-        groups.add( AbstractIndexCreator.getRootGroup( ac.getArtifactInfo().groupId ) );
-        allGroups.add( ac.getArtifactInfo().groupId );
-  
-        if ( listener != null )
-        {
-            listener.artifactDiscovered( ac );
-        }
     }
     
     public void scanningFinished( IndexingContext ctx, ScanningResult result )
     {
+        result.setTotalFiles( count );
+        
         for ( IOException ex : exceptions ) 
         {
             result.addException( ex );
@@ -142,10 +148,23 @@ class DefaultNexusIndexerListener implements
             result.addException( ex );
         }
         
-        
         if ( listener != null )
         {
             listener.scanningFinished( ctx, result );
+        }
+        
+        if ( result.getDeletedFiles() >0 || result.getTotalFiles() > 0 ) 
+        {
+            try 
+            {
+                context.updateTimestamp( true );
+ 
+                context.optimize();
+            } 
+            catch (Exception ex) 
+            {
+                result.addException(ex);
+            }
         }
     }
   

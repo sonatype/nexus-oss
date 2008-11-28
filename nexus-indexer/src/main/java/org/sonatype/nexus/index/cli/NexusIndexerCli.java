@@ -295,8 +295,6 @@ public class NexusIndexerCli
 
         public void scanningFinished( IndexingContext context, ScanningResult result )
         {
-            result.setTotalFiles( count - result.getExceptions().size() );
-            
             if ( result.hasExceptions() )
             {
                 System.err.printf( "Scanning errors:   %s\n", result.getExceptions().size() );
