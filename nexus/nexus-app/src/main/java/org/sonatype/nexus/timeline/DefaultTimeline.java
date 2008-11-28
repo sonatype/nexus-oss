@@ -476,11 +476,14 @@ public class DefaultTimeline
 
         try
         {
-            iw = getIndexWriter();
+            synchronized ( this )
+            {
+                iw = getIndexWriter();
 
-            iw.addDocument( createDocument( timestamp, type, subType, data ) );
+                iw.addDocument( createDocument( timestamp, type, subType, data ) );
 
-            closeWriter();
+                closeWriter();
+            }
         }
         catch ( IOException e )
         {
@@ -504,14 +507,17 @@ public class DefaultTimeline
 
         try
         {
-            iw = getIndexWriter();
-
-            for ( Map<String, String> data : datas )
+            synchronized ( this )
             {
-                iw.addDocument( createDocument( timestamp, type, subType, data ) );
-            }
+                iw = getIndexWriter();
 
-            closeWriter();
+                for ( Map<String, String> data : datas )
+                {
+                    iw.addDocument( createDocument( timestamp, type, subType, data ) );
+                }
+
+                closeWriter();
+            }
         }
         catch ( IOException e )
         {

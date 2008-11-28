@@ -272,7 +272,7 @@ public class DefaultNexus
             }
             catch ( StartingException e )
             {
-                getLogger().error( "Could not start Nexus!", e );
+                getLogger().error( "Could not start Nexus! (currentState=" + currentState.toString() + ")", e );
             }
 
             return false;
@@ -288,7 +288,7 @@ public class DefaultNexus
             }
             catch ( StoppingException e )
             {
-                getLogger().error( "Could not stop Nexus!", e );
+                getLogger().error( "Could not stop STARTED Nexus! (currentState=" + currentState.toString() + ")", e );
             }
 
             return false;
