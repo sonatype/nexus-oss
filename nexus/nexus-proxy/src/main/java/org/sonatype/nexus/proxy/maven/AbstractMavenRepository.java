@@ -752,7 +752,8 @@ public abstract class AbstractMavenRepository
         else
         {
             String msg = "Storing of item " + item.getRepositoryItemUid().toString()
-                + " is forbidden by Maven Repository policy.";
+                + " is forbidden by Maven Repository policy. Because " + getId() + " is a "
+                + getRepositoryPolicy().name() + " repository";
 
             getLogger().info( msg );
 
