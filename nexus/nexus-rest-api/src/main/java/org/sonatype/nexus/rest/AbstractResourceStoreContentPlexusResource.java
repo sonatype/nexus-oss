@@ -478,6 +478,13 @@ public abstract class AbstractResourceStoreContentPlexusResource
     protected void handleException( Request req, Response res, Exception t )
         throws ResourceException
     {
+        if ( getLogger().isDebugEnabled() )
+        {
+            getLogger().debug(
+                "Got exception during processing " + req.getMethod() + " " + req.getResourceRef().toString(),
+                t );
+        }
+
         if ( t instanceof ResourceException )
         {
             throw (ResourceException) t;

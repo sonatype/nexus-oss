@@ -129,6 +129,14 @@ public abstract class AbstractRepositoryConfigurator
 
                 repository.setRemoteStorageContext( ctx );
             }
+            else
+            {
+                repository.setRemoteUrl( null );
+                
+                repository.setRemoteStorage( null );
+                
+                repository.setRemoteStorageContext( null );
+            }
         }
         catch ( StorageException e )
         {
