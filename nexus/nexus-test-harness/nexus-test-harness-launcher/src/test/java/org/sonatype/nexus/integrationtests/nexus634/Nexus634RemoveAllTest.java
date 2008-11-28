@@ -4,8 +4,6 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 
-import edu.emory.mathcs.backport.java.util.Arrays;
-
 /**
  * Test SnapshotRemoverTask to remove all artifacts
  * 
@@ -29,8 +27,7 @@ public class Nexus634RemoveAllTest
 
         // looking at the IT resources, there is only one artifact in there, hence, the dir should be removed
         Assert.assertFalse(
-            "The folder should be removed since all artifacts should be gone, instead there is file left: "
-                + Arrays.asList( artifactFolder.list() ),
+            "The folder should be removed since all artifacts should be gone, instead there are files left!",
             artifactFolder.exists() );
     }
 
