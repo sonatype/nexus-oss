@@ -52,7 +52,6 @@ import org.sonatype.nexus.proxy.repository.DefaultRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.proxy.walker.DefaultWalkerContext;
-import org.sonatype.nexus.proxy.walker.WalkerException;
 
 /**
  * The abstract (layout unaware) Maven Repository.
@@ -103,20 +102,11 @@ public abstract class AbstractMavenRepository
     {
         EvictUnusedMavenItemsWalkerProcessor walkerProcessor = new EvictUnusedMavenItemsWalkerProcessor( timestamp );
 
-        DefaultWalkerContext ctx = new DefaultWalkerContext(
-            this,
-            new EvictUnusedMavenItemsWalkerFilter() );
+        DefaultWalkerContext ctx = new DefaultWalkerContext( this, new EvictUnusedMavenItemsWalkerFilter() );
 
         ctx.getProcessors().add( walkerProcessor );
 
-        try
-        {
-            getWalker().walk( ctx, true, false );
-        }
-        catch ( WalkerException e )
-        {
-
-        }
+        getWalker().walk( ctx );
 
         notifyProximityEventListeners( new RepositoryEventEvictUnusedItems( this ) );
 
@@ -127,26 +117,17 @@ public abstract class AbstractMavenRepository
     {
         getLogger().info( "Recreating Maven medadata on repository " + getId() );
 
-        try
-        {
-            RecreateMavenMetadataWalkerProcessor wp = new RecreateMavenMetadataWalkerProcessor();
+        RecreateMavenMetadataWalkerProcessor wp = new RecreateMavenMetadataWalkerProcessor();
 
-            DefaultWalkerContext ctx = new DefaultWalkerContext( this );
+        DefaultWalkerContext ctx = new DefaultWalkerContext( this );
 
-            ctx.getProcessors().add( wp );
+        ctx.getProcessors().add( wp );
 
-            getWalker().walk( ctx, path );
+        getWalker().walk( ctx, path );
 
-            notifyProximityEventListeners( new RepositoryEventRecreateMavenMetadata( this ) );
+        notifyProximityEventListeners( new RepositoryEventRecreateMavenMetadata( this ) );
 
-            return true;
-        }
-        catch ( WalkerException e )
-        {
-            getLogger().warn( "Recreating Maven metadata failed!", e );
-        }
-
-        return false;
+        return !ctx.isStopped();
     }
 
     public ChecksumPolicy getChecksumPolicy()
@@ -760,17 +741,16 @@ public abstract class AbstractMavenRepository
             throw new UnsupportedStorageOperationException( msg );
         }
     }
-    
+
     @Override
     public boolean isCompatible( Repository repository )
     {
-        if ( super.isCompatible( repository )
-            && MavenRepository.class.isAssignableFrom( repository.getClass() ) 
-            && getRepositoryPolicy().equals( ( ( MavenRepository ) repository ).getRepositoryPolicy() ) )
+        if ( super.isCompatible( repository ) && MavenRepository.class.isAssignableFrom( repository.getClass() )
+            && getRepositoryPolicy().equals( ( (MavenRepository) repository ).getRepositoryPolicy() ) )
         {
             return true;
         }
-        
+
         return false;
     }
 

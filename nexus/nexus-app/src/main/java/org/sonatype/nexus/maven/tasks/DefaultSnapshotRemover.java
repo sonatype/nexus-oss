@@ -50,7 +50,6 @@ import org.sonatype.nexus.proxy.walker.AbstractWalkerProcessor;
 import org.sonatype.nexus.proxy.walker.DefaultWalkerContext;
 import org.sonatype.nexus.proxy.walker.Walker;
 import org.sonatype.nexus.proxy.walker.WalkerContext;
-import org.sonatype.nexus.proxy.walker.WalkerException;
 
 /**
  * The Class SnapshotRemoverJob. After a succesful run, the job guarantees that there will remain at least
@@ -165,44 +164,40 @@ public class DefaultSnapshotRemover
                     + repository.getLocalUrl() );
         }
 
-        // create a walker to collect deletables and let it loose on collections only
-        SnapshotRemoverWalker snapshotRemoverWalker = new SnapshotRemoverWalker( repository, request );
-
         // and "sandwich" it with RecreateMavenMetadataWalkerProcessor at once
         RecreateMavenMetadataWalkerProcessor recreateMavenMetadataWalker = new RecreateMavenMetadataWalkerProcessor();
+
+        // create a walker to collect deletables and let it loose on collections only
+        SnapshotRemoverWalkerProcessor snapshotRemoverWalker = new SnapshotRemoverWalkerProcessor(
+            repository,
+            request,
+            recreateMavenMetadataWalker );
 
         DefaultWalkerContext ctx = new DefaultWalkerContext( repository );
 
         ctx.getProcessors().add( snapshotRemoverWalker );
-        ctx.getProcessors().add( recreateMavenMetadataWalker );
 
-        try
+        walker.walk( ctx );
+
+        // and collect results
+        result.setDeletedSnapshots( snapshotRemoverWalker.getDeletedSnapshots() );
+        result.setDeletedFiles( snapshotRemoverWalker.getDeletedFiles() );
+
+        if ( getLogger().isDebugEnabled() )
         {
-            walker.walk( ctx );
-
-            // and collect results
-            result.setDeletedSnapshots( snapshotRemoverWalker.getDeletedSnapshots() );
-            result.setDeletedFiles( snapshotRemoverWalker.getDeletedFiles() );
-
-            if ( getLogger().isDebugEnabled() )
-            {
-                getLogger().debug(
-                    "Collected and deleted " + snapshotRemoverWalker.getDeletedSnapshots()
-                        + " snapshots with alltogether " + snapshotRemoverWalker.getDeletedFiles()
-                        + " files on repository " + repository.getId() );
-            }
-        }
-        catch ( WalkerException e )
-        {
-            getLogger().warn( "Snapshot removal failed:", e );
+            getLogger().debug(
+                "Collected and deleted " + snapshotRemoverWalker.getDeletedSnapshots() + " snapshots with alltogether "
+                    + snapshotRemoverWalker.getDeletedFiles() + " files on repository " + repository.getId() );
         }
 
         return result;
     }
 
-    private class SnapshotRemoverWalker
+    private class SnapshotRemoverWalkerProcessor
         extends AbstractWalkerProcessor
     {
+        private final RecreateMavenMetadataWalkerProcessor recreateMavenMetadataWalker;
+
         private final MavenRepository repository;
 
         private final SnapshotRemovalRequest request;
@@ -221,11 +216,14 @@ public class DefaultSnapshotRemover
 
         private int deletedFiles = 0;
 
-        public SnapshotRemoverWalker( MavenRepository repository, SnapshotRemovalRequest request )
+        public SnapshotRemoverWalkerProcessor( MavenRepository repository, SnapshotRemovalRequest request,
+            RecreateMavenMetadataWalkerProcessor recreateMavenMetadataWalker )
         {
             this.repository = repository;
 
             this.request = request;
+
+            this.recreateMavenMetadataWalker = recreateMavenMetadataWalker;
 
             int days = request.getRemoveSnapshotsOlderThanDays();
 
@@ -252,6 +250,12 @@ public class DefaultSnapshotRemover
             map.get( key ).add( item );
         }
 
+        public void beforeWalk( WalkerContext context )
+            throws Exception
+        {
+            recreateMavenMetadataWalker.beforeWalk( context );
+        }
+
         @Override
         public void processItem( WalkerContext context, StorageItem item )
         {
@@ -261,6 +265,11 @@ public class DefaultSnapshotRemover
         @Override
         public void onCollectionExit( WalkerContext context, StorageCollectionItem coll )
         {
+            if ( getLogger().isDebugEnabled() )
+            {
+                getLogger().debug( "onCollectionExit() :: " + coll.getRepositoryItemUid().toString() );
+            }
+
             shouldProcessCollection = coll.getPath().endsWith( "-SNAPSHOT" );
 
             if ( shouldProcessCollection )
@@ -389,7 +398,7 @@ public class DefaultSnapshotRemover
                             .getMinCountOfSnapshotsToKeep() )
                         {
                             // delete nothing, since there is less snapshots in total as allowed
-                            return;
+                            deletableSnapshotsAndFiles.clear();
                         }
                         else
                         {
@@ -456,6 +465,11 @@ public class DefaultSnapshotRemover
                     }
 
                     repository.deleteItem( coll.getRepositoryItemUid(), coll.getItemContext() );
+                }
+                else
+                {
+                    // activate next processor
+                    recreateMavenMetadataWalker.onCollectionExit( context, coll );
                 }
             }
             catch ( ItemNotFoundException e )

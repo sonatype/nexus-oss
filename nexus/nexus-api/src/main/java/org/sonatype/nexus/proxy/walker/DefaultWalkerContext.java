@@ -14,6 +14,10 @@ public class DefaultWalkerContext
 
     private final WalkerFilter walkerFilter;
 
+    private final boolean localOnly;
+
+    private final boolean collectionsOnly;
+
     private Map<String, Object> context;
 
     private List<WalkerProcessor> processors;
@@ -29,13 +33,32 @@ public class DefaultWalkerContext
 
     public DefaultWalkerContext( ResourceStore store, WalkerFilter filter )
     {
+        this( store, filter, true, false );
+    }
+
+    public DefaultWalkerContext( ResourceStore store, WalkerFilter filter, boolean localOnly, boolean collectionsOnly )
+    {
         super();
 
         this.resourceStore = store;
 
         this.walkerFilter = filter;
 
+        this.localOnly = localOnly;
+
+        this.collectionsOnly = collectionsOnly;
+
         this.running = true;
+    }
+
+    public boolean isLocalOnly()
+    {
+        return localOnly;
+    }
+
+    public boolean isCollectionsOnly()
+    {
+        return collectionsOnly;
     }
 
     public Map<String, Object> getContext()

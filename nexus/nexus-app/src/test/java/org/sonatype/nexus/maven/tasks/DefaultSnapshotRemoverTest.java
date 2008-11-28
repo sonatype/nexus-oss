@@ -1,16 +1,19 @@
 package org.sonatype.nexus.maven.tasks;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.codehaus.plexus.logging.Logger;
+import org.codehaus.plexus.util.DirectoryWalkListener;
+import org.codehaus.plexus.util.DirectoryWalker;
 import org.codehaus.plexus.util.FileUtils;
 import org.sonatype.nexus.AbstractNexusTestCase;
 import org.sonatype.nexus.DefaultNexus;
 import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
-import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 
@@ -27,6 +30,8 @@ public class DefaultSnapshotRemoverTest
         throws Exception
     {
         super.setUp();
+
+        getContainer().getLoggerManager().setThresholds( Logger.LEVEL_DEBUG );
 
         defaultNexus = (DefaultNexus) lookup( Nexus.class );
 
@@ -46,22 +51,22 @@ public class DefaultSnapshotRemoverTest
     public void fillInRepo()
         throws Exception
     {
-        URL snapshotsRootUrl = new URL( snapshots.getLocalUrl() );
+        final File sourceSnapshotsRoot = new File( getBasedir(), "src/test/resources/reposes/snapshots" )
+            .getAbsoluteFile();
 
-        File snapshotsRoot = new File( snapshotsRootUrl.toURI() );
+        final URL snapshotsRootUrl = new URL( snapshots.getLocalUrl() );
 
-        // copy the files to their place
-        FileUtils.copyDirectoryStructure(
-            new File( getBasedir(), "src/test/resources/reposes/snapshots" ),
-            snapshotsRoot );
+        final File snapshotsRoot = new File( snapshotsRootUrl.toURI() ).getAbsoluteFile();
 
-        URL releaseRootUrl = new URL( releases.getLocalUrl() );
+        copyDirectory( sourceSnapshotsRoot, snapshotsRoot );
 
-        File releasesRoot = new File( releaseRootUrl.toURI() );
+        final File sourceReleasesRoot = new File( getBasedir(), "src/test/resources/reposes/releases" );
 
-        // copy the files to their place
-        FileUtils
-            .copyDirectoryStructure( new File( getBasedir(), "src/test/resources/reposes/releases" ), releasesRoot );
+        final URL releaseRootUrl = new URL( releases.getLocalUrl() );
+
+        final File releasesRoot = new File( releaseRootUrl.toURI() );
+
+        copyDirectory( sourceReleasesRoot, releasesRoot );
 
         // This above is possible, since SnapshotRemover is not using index, hence we can manipulate the content
         // "from behind"
@@ -71,6 +76,52 @@ public class DefaultSnapshotRemoverTest
         releases.clearCaches( RepositoryItemUid.PATH_ROOT );
     }
 
+    protected void copyDirectory( final File from, final File to )
+        throws IOException
+    {
+        DirectoryWalker w = new DirectoryWalker();
+
+        w.setBaseDir( from );
+
+        w.addSCMExcludes();
+
+        w.addDirectoryWalkListener( new DirectoryWalkListener()
+        {
+            public void debug( String message )
+            {
+            }
+
+            public void directoryWalkStarting( File basedir )
+            {
+            }
+
+            public void directoryWalkStep( int percentage, File file )
+            {
+                if ( !file.isFile() )
+                {
+                    return;
+                }
+
+                try
+                {
+                    String path = file.getAbsolutePath().substring( from.getAbsolutePath().length() );
+
+                    FileUtils.copyFile( file, new File( to, path ) );
+                }
+                catch ( IOException e )
+                {
+                    throw new IllegalStateException( "Cannot copy dirtree.", e );
+                }
+            }
+
+            public void directoryWalkFinished()
+            {
+            }
+        } );
+
+        w.scan();
+    }
+
     protected void validateResults( Map<String, Boolean> results )
         throws Exception
     {
@@ -78,7 +129,7 @@ public class DefaultSnapshotRemoverTest
         {
             try
             {
-                snapshots.retrieveItem( new ResourceStoreRequest( entry.getKey(), false ) );
+                snapshots.retrieveItem( true, snapshots.createUid( entry.getKey() ), null );
 
                 // we succeaeded, the value must be true
                 assertTrue( "The entry '" + entry.getKey() + "' was found in repository.", entry.getValue() );
@@ -180,6 +231,8 @@ public class DefaultSnapshotRemoverTest
             .put(
                 "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/nexus-indexer-1.0-beta-5-20080731.150252-163.pom.sha1",
                 Boolean.TRUE );
+        expecting.put( "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/maven-metadata.xml", Boolean.TRUE );
+        expecting.put( "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/maven-metadata.xml.sha1", Boolean.TRUE );
 
         validateResults( expecting );
     }
@@ -220,6 +273,8 @@ public class DefaultSnapshotRemoverTest
         expecting.put(
             "/org/sonatype/nexus/nexus-indexer/1.0-beta-4-SNAPSHOT/nexus-indexer-1.0-beta-4-SNAPSHOT.jar",
             Boolean.TRUE );
+        expecting.put( "/org/sonatype/nexus/nexus-indexer/1.0-beta-4-SNAPSHOT/maven-metadata.xml", Boolean.TRUE );
+        expecting.put( "/org/sonatype/nexus/nexus-indexer/1.0-beta-4-SNAPSHOT/maven-metadata.xml.sha1", Boolean.TRUE );
 
         // 1.0-beta-5-SNAPSHOT should have only twp snapshot remaining, the two newest
         expecting.put(
@@ -278,6 +333,8 @@ public class DefaultSnapshotRemoverTest
             .put(
                 "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/nexus-indexer-1.0-beta-5-20080731.150252-163.pom.sha1",
                 Boolean.TRUE );
+        expecting.put( "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/maven-metadata.xml", Boolean.TRUE );
+        expecting.put( "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/maven-metadata.xml.sha1", Boolean.TRUE );
 
         validateResults( expecting );
     }

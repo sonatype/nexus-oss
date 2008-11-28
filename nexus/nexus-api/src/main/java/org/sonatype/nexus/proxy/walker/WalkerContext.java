@@ -13,6 +13,20 @@ import org.sonatype.nexus.proxy.ResourceStore;
 public interface WalkerContext
 {
     /**
+     * Will not try to reach remote storage.
+     * 
+     * @return
+     */
+    boolean isLocalOnly();
+
+    /**
+     * The WalkerProcessors will get notified only on collections.
+     * 
+     * @return
+     */
+    boolean isCollectionsOnly();
+
+    /**
      * Returns the context.
      * 
      * @return

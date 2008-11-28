@@ -19,11 +19,6 @@ public class Nexus634KeepNewSnapshotsTest
     public void keepNewSnapshots()
         throws Exception
     {
-        if(true) {
-            printKnownErrorButDoNotFail( getClass(), "keepNewSnapshot" );
-            return;
-        }
-
         // This is THE important part
         runSnapshotRemover( "nexus-test-harness-snapshot-repo", 0, 10, true );
 

@@ -54,11 +54,11 @@ abstract public class AbstractMetadataHelper
 {
 
     private static final String VERSION_REGEX = "^[0-9].*$";
-    
+
     private static final String MD5_SUFFIX = ".md5";
-    
+
     private static final String SHA1_SUFFIX = ".sha1";
-    
+
     private static final String METADATA_SUFFIX = "/maven-metadata.xml";
 
     /**
@@ -78,7 +78,7 @@ abstract public class AbstractMetadataHelper
 
     public void onDirEnter( String path )
     {
-        //do nothing
+        // do nothing
     }
 
     public void onDirExit( String path )
@@ -89,8 +89,8 @@ abstract public class AbstractMetadataHelper
         {
             createMetadataForSnapshotVersionDir( path );
 
-            rebuildChecksum( path + METADATA_SUFFIX);
-            
+            rebuildChecksum( path + METADATA_SUFFIX );
+
             currentArtifacts.clear();
         }
         else if ( shouldCreateMetadataForArtifactDir( path ) )
@@ -98,7 +98,7 @@ abstract public class AbstractMetadataHelper
             createMetadataForArtifactDir( path );
 
             rebuildChecksum( path + METADATA_SUFFIX );
-            
+
             currentVersions.clear();
         }
         else if ( shouldCreateMetadataForPluginGroupDir( path ) )
@@ -106,7 +106,7 @@ abstract public class AbstractMetadataHelper
             createMetadataForPluginGroupDir( path );
 
             rebuildChecksum( path + METADATA_SUFFIX );
-            
+
             currentPlugins.clear();
         }
 
@@ -139,7 +139,7 @@ abstract public class AbstractMetadataHelper
         rebuildChecksum( path );
 
     }
-    
+
     private boolean isRottenChecksum( String path )
         throws Exception
     {
@@ -157,7 +157,6 @@ abstract public class AbstractMetadataHelper
 
         return true;
     }
-    
 
     private String getName( String path )
     {
@@ -230,14 +229,14 @@ abstract public class AbstractMetadataHelper
             currentGroupId = null;
         }
     }
-    
+
     private void updateMavenInfo( String path )
     {
         Model model = null;
         try
         {
             Reader reader = ReaderFactory.newXmlReader( retrieveContent( path ) );
-            
+
             MavenXpp3Reader xpp3 = new MavenXpp3Reader();
 
             try
@@ -252,7 +251,7 @@ abstract public class AbstractMetadataHelper
         }
         catch ( Exception e )
         {
-            //skip
+            // skip
             return;
         }
 
@@ -262,7 +261,7 @@ abstract public class AbstractMetadataHelper
         }
 
         currentArtifactId = model.getArtifactId();
-        
+
         if ( !StringUtils.isEmpty( model.getGroupId() ) )
         {
             currentGroupId = model.getGroupId();
@@ -284,17 +283,15 @@ abstract public class AbstractMetadataHelper
 
             currentVersions.add( model.getParent().getVersion() );
         }
-        
-        
+
         currentArtifacts.add( path );
-        
 
         if ( model.getPackaging().equals( "maven-plugin" ) )
         {
             Plugin plugin = new Plugin();
-            
+
             plugin.setArtifactId( model.getArtifactId() );
-            
+
             plugin.setPrefix( getPluginPrefix( model.getArtifactId() ) );
 
             if ( !StringUtils.isEmpty( model.getName() ) )
@@ -401,7 +398,10 @@ abstract public class AbstractMetadataHelper
 
         for ( String version : currentVersions )
         {
-            versioning.addVersion( version );
+            if ( !versioning.getVersions().contains( version ) )
+            {
+                versioning.addVersion( version );
+            }
 
             if ( latest != null && versionComparator.compare( latest, version ) < 0 )
             {
@@ -522,7 +522,7 @@ abstract public class AbstractMetadataHelper
         MetadataBuilder.changeMetadata( md, new SetSnapshotOperation( new SnapshotOperand( snapshot ) ) );
 
     }
-    
+
     private void rebuildChecksum( String path )
         throws Exception
     {
@@ -535,7 +535,7 @@ abstract public class AbstractMetadataHelper
 
         store( buildSh1( path ), path + SHA1_SUFFIX );
     }
-    
+
     protected boolean shouldBuildChecksum( String path )
     {
         if ( isChecksumFile( path ) )
@@ -545,7 +545,7 @@ abstract public class AbstractMetadataHelper
 
         return true;
     }
-    
+
     protected boolean isChecksumFile( String path )
     {
         if ( getName( path ).endsWith( MD5_SUFFIX ) || getName( path ).endsWith( SHA1_SUFFIX ) )
@@ -563,11 +563,11 @@ abstract public class AbstractMetadataHelper
         }
         return false;
     }
-    
-    abstract public String buildMd5(String path)
+
+    abstract public String buildMd5( String path )
         throws Exception;
-    
-    abstract public String buildSh1(String path)
+
+    abstract public String buildSh1( String path )
         throws Exception;
 
     /**
@@ -596,15 +596,15 @@ abstract public class AbstractMetadataHelper
      */
     abstract public InputStream retrieveContent( String path )
         throws Exception;
-    
+
     /**
      * Check if the file or item of this path exists
+     * 
      * @param path
      * @return
      * @throws Exception
      */
-    abstract public boolean exists(String path)
+    abstract public boolean exists( String path )
         throws Exception;
-    
 
 }

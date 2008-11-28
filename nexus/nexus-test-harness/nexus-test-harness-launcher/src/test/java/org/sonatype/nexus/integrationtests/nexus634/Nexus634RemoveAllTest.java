@@ -1,15 +1,14 @@
 package org.sonatype.nexus.integrationtests.nexus634;
 
-import java.io.File;
-import java.util.Collection;
-
 import junit.framework.Assert;
 
 import org.junit.Test;
 
+import edu.emory.mathcs.backport.java.util.Arrays;
+
 /**
  * Test SnapshotRemoverTask to remove all artifacts
- *
+ * 
  * @author marvin
  */
 public class Nexus634RemoveAllTest
@@ -20,17 +19,19 @@ public class Nexus634RemoveAllTest
     public void removeAllSnapshots()
         throws Exception
     {
-        if ( true )
-        {
-            printKnownErrorButDoNotFail( getClass(), "keepNewSnapshot" );
-            return;
-        }
-
         // This is THE important part
         runSnapshotRemover( "nexus-test-harness-snapshot-repo", 0, 0, true );
 
-        Collection<File> jars = listFiles( artifactFolder, new String[] { "jar" }, false );
-        Assert.assertTrue( "All artifacts should be deleted by SnapshotRemoverTask. Found: " + jars, jars.isEmpty() );
+        // this IT is wrong: nexus will remove the parent folder too, if the GAV folder is emptied completely
+        // Collection<File> jars = listFiles( artifactFolder, new String[] { "jar" }, false );
+        // Assert.assertTrue( "All artifacts should be deleted by SnapshotRemoverTask. Found: " + jars, jars.isEmpty()
+        // );
+
+        // looking at the IT resources, there is only one artifact in there, hence, the dir should be removed
+        Assert.assertFalse(
+            "The folder should be removed since all artifacts should be gone, instead there is file left: "
+                + Arrays.asList( artifactFolder.list() ),
+            artifactFolder.exists() );
     }
 
 }

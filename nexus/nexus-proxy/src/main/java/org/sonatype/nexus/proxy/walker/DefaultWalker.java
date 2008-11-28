@@ -46,31 +46,23 @@ public class DefaultWalker
     extends AbstractLogEnabled
     implements Walker
 {
+    public static final String WALKER_WALKED_COLLECTION_COUNT = Walker.class.getSimpleName() + ".collCount";
+
+    public static final String WALKER_WALKED_FROM_PATH = Walker.class.getSimpleName() + ".fromPath";
+
     public void walk( WalkerContext context )
-        throws WalkerException
     {
         walk( context, null );
     }
 
     public void walk( WalkerContext context, String fromPath )
-        throws WalkerException
-    {
-        walk( context, fromPath, true, false );
-    }
-
-    public final void walk( WalkerContext context, boolean localOnly, boolean collectionsOnly )
-        throws WalkerException
-    {
-        walk( context, null, localOnly, collectionsOnly );
-    }
-
-    public final void walk( WalkerContext context, String fromPath, boolean localOnly, boolean collectionsOnly )
-        throws WalkerException
     {
         if ( fromPath == null )
         {
             fromPath = RepositoryItemUid.PATH_ROOT;
         }
+
+        context.getContext().put( WALKER_WALKED_FROM_PATH, fromPath );
 
         if ( getLogger().isDebugEnabled() )
         {
@@ -84,6 +76,8 @@ public class DefaultWalker
 
         if ( context.isStopped() )
         {
+            reportWalkEnd( context );
+
             return;
         }
 
@@ -98,12 +92,12 @@ public class DefaultWalker
                 // TODO: enable somehow ability to pass-over the req context!
                 RepositoryItemUid uid = ( (Repository) context.getResourceStore() ).createUid( fromPath );
 
-                item = ( (Repository) context.getResourceStore() ).retrieveItem( localOnly, uid, null );
+                item = ( (Repository) context.getResourceStore() ).retrieveItem( context.isLocalOnly(), uid, null );
             }
             else
             {
                 // we are dealing with router
-                ResourceStoreRequest request = new ResourceStoreRequest( fromPath, localOnly );
+                ResourceStoreRequest request = new ResourceStoreRequest( fromPath, context.isLocalOnly() );
 
                 item = context.getResourceStore().retrieveItem( request );
             }
@@ -111,6 +105,10 @@ public class DefaultWalker
         catch ( AccessDeniedException ex )
         {
             getLogger().warn( "Security is enabled. Walking on routers without context is not possible.", ex );
+
+            context.stop( ex );
+
+            reportWalkEnd( context );
 
             return;
         }
@@ -121,11 +119,19 @@ public class DefaultWalker
                 getLogger().debug( "ItemNotFound where walking should start, bailing out.", ex );
             }
 
+            context.stop( ex );
+
+            reportWalkEnd( context );
+
             return;
         }
         catch ( Exception ex )
         {
             getLogger().warn( "Got exception while doing retrieve, bailing out.", ex );
+
+            context.stop( ex );
+
+            reportWalkEnd( context );
 
             return;
         }
@@ -140,32 +146,54 @@ public class DefaultWalker
                     ? context.getFilter()
                     : new AffirmativeStoreWalkerFilter();
 
-                collCount = walkRecursive( 0, context, filter, (StorageCollectionItem) item, localOnly, collectionsOnly );
+                collCount = walkRecursive( 0, context, filter, (StorageCollectionItem) item );
+
+                context.getContext().put( WALKER_WALKED_COLLECTION_COUNT, collCount );
             }
             catch ( Throwable e )
             {
                 context.stop( e );
 
-                throw new WalkerException( context, e );
+                reportWalkEnd( context );
+
+                return;
             }
         }
 
         if ( !context.isStopped() )
         {
             afterWalk( context );
+        }
 
+        reportWalkEnd( context );
+    }
+
+    protected void reportWalkEnd( WalkerContext context )
+    {
+        if ( context.isStopped() )
+        {
+            if ( context.getStopCause() != null )
+            {
+                getLogger().warn( "Walking aborted, cause:", context.getStopCause() );
+            }
+            else
+            {
+                getLogger().warn( "Walking aborted." );
+            }
+        }
+        else
+        {
             if ( getLogger().isDebugEnabled() )
             {
                 getLogger().debug(
-                    "Finished walking on ResourceStore " + context.getResourceStore().getId() + " from path '" + fromPath
-                        + "'. Walked over " + Integer.toString( collCount ) + " collections." );
-
+                    "Finished walking on ResourceStore '" + context.getResourceStore().getId() + "' from path '"
+                        + context.getContext().get( WALKER_WALKED_FROM_PATH ) + "'." );
             }
         }
     }
 
     protected final int walkRecursive( int collCount, WalkerContext context, WalkerFilter filter,
-        StorageCollectionItem coll, boolean localOnly, boolean collectionsOnly )
+        StorageCollectionItem coll )
         throws AccessDeniedException,
             RepositoryNotAvailableException,
             RepositoryNotListableException,
@@ -222,14 +250,14 @@ public class DefaultWalker
             else
             {
                 // we are dealing with router
-                ResourceStoreRequest request = new ResourceStoreRequest( coll.getPath(), localOnly );
+                ResourceStoreRequest request = new ResourceStoreRequest( coll.getPath(), context.isLocalOnly() );
 
                 ls = context.getResourceStore().list( request );
             }
 
             for ( StorageItem i : ls )
             {
-                if ( !collectionsOnly && !StorageCollectionItem.class.isAssignableFrom( i.getClass() ) )
+                if ( !context.isCollectionsOnly() && !StorageCollectionItem.class.isAssignableFrom( i.getClass() ) )
                 {
                     if ( filter.shouldProcess( context, i ) )
                     {
@@ -246,13 +274,7 @@ public class DefaultWalker
                 if ( StorageCollectionItem.class.isAssignableFrom( i.getClass() ) )
                 {
                     // user may call stop()
-                    collCount = walkRecursive(
-                        collCount,
-                        context,
-                        filter,
-                        (StorageCollectionItem) i,
-                        localOnly,
-                        collectionsOnly );
+                    collCount = walkRecursive( collCount, context, filter, (StorageCollectionItem) i );
 
                     if ( context.isStopped() )
                     {

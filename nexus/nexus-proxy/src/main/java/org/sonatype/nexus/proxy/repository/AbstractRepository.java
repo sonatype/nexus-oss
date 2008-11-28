@@ -74,7 +74,6 @@ import org.sonatype.nexus.proxy.target.TargetSet;
 import org.sonatype.nexus.proxy.utils.StoreFileWalker;
 import org.sonatype.nexus.proxy.walker.DefaultWalkerContext;
 import org.sonatype.nexus.proxy.walker.Walker;
-import org.sonatype.nexus.proxy.walker.WalkerException;
 import org.sonatype.nexus.scheduling.DefaultRepositoryTaskActivityDescriptor;
 import org.sonatype.nexus.scheduling.DefaultRepositoryTaskFilter;
 import org.sonatype.nexus.scheduling.RepositoryTaskFilter;
@@ -726,14 +725,7 @@ public abstract class AbstractRepository
         ctx.getProcessors().add( walkerProcessor );
 
         // and let it loose
-        try
-        {
-            walker.walk( ctx, true, false );
-        }
-        catch ( WalkerException e )
-        {
-            getLogger().warn( "Walker throw an exception:", e );
-        }
+        walker.walk( ctx );
 
         notifyProximityEventListeners( new RepositoryEventEvictUnusedItems( this ) );
 
