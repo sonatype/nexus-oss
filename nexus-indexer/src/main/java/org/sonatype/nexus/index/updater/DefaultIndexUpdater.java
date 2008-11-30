@@ -75,8 +75,7 @@ public class DefaultIndexUpdater
                     
                     Date updateTimestamp = getTimestamp( properties, IndexingContext.INDEX_TIMESTAMP );
 
-                    if ( updateTimestamp != null && 
-                        ( updateTimestamp.before( contextTimestamp ) || updateTimestamp.equals( contextTimestamp ) ) )
+                    if ( updateTimestamp != null && contextTimestamp.after( updateTimestamp ) )
                     {
                         return null;  // index is up to date
                     }
@@ -258,6 +257,13 @@ public class DefaultIndexUpdater
      */
     public String getUpdateChunkName( Date contextTimestamp, Properties properties )
     {
+        Date updateTimestamp = getTimestamp( properties, IndexingContext.INDEX_TIMESTAMP );
+        
+        if ( updateTimestamp == null || updateTimestamp.before( contextTimestamp ) )
+        {
+            return null;  // no updates
+        }
+        
         int n = 0;
         
         while ( true ) 
@@ -266,15 +272,15 @@ public class DefaultIndexUpdater
 
             if( chunkTimestamp == null )
             {
-                break;  // no update chunk available
+                break;
             }
             
-            if ( contextTimestamp.after( chunkTimestamp ) )
+            if( contextTimestamp.after( chunkTimestamp ) )
             {
                 SimpleDateFormat df = new SimpleDateFormat( IndexingContext.INDEX_TIME_DAY_FORMAT );
-                return IndexingContext.INDEX_FILE + "." + df.format( chunkTimestamp ) + ".zip";                
+                return IndexingContext.INDEX_FILE + "." + df.format( contextTimestamp ) + ".zip";                
             }
-
+        
             n++;
         }
         

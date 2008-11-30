@@ -691,8 +691,7 @@ public class DefaultIndexerManager
 
                 Date updateTimestamp = indexUpdater.getTimestamp( properties, IndexingContext.INDEX_TIMESTAMP );
 
-                if ( updateTimestamp != null
-                    && ( updateTimestamp.before( contextTimestamp ) || updateTimestamp.equals( contextTimestamp ) ) )
+                if ( updateTimestamp != null && contextTimestamp.after( updateTimestamp ) )
                 {
                     return true; // index is up to date
                 }

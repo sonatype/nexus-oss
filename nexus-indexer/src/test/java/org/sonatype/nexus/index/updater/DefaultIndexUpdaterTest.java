@@ -14,8 +14,10 @@
 package org.sonatype.nexus.index.updater;
 
 import java.io.File;
+import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Date;
+import java.util.Properties;
 import java.util.Set;
 
 import org.apache.lucene.index.Term;
@@ -339,6 +341,46 @@ public class DefaultIndexUpdaterTest
         Set<String> allGroups = context.getAllGroups();
         
         assertEquals( allGroups.toString(), 5, allGroups.size());
+    }
+    
+    public void testGetUpdateChunkName() throws Exception 
+    {
+        IndexUpdater updater = (IndexUpdater) lookup( IndexUpdater.class );
+        
+        Properties properties = new Properties();
+        properties.setProperty("nexus.index.id", "central");
+        properties.setProperty("nexus.index.time",  "20081129174241.859 -0600");
+        properties.setProperty("nexus.index.day-0", "20081129000000.000 -0600");
+        properties.setProperty("nexus.index.day-1", "20081128000000.000 -0600");
+        properties.setProperty("nexus.index.day-2", "20081127000000.000 -0600");
+        properties.setProperty("nexus.index.day-3", "20081126000000.000 -0600");
+
+        SimpleDateFormat df = new SimpleDateFormat("yyyyMMddHHmmss.SSS Z");
+        
+        {
+            String updateChunkName = updater.getUpdateChunkName(df.parse("20081125010000.000 -0600"), properties);
+            assertEquals(null, updateChunkName);
+        }
+        {
+            String updateChunkName = updater.getUpdateChunkName(df.parse("20081126010000.000 -0600"), properties);
+            assertEquals("nexus-maven-repository-index.20081126.zip", updateChunkName);
+        }
+        {
+            String updateChunkName = updater.getUpdateChunkName(df.parse("20081127010000.000 -0600"), properties);
+            assertEquals("nexus-maven-repository-index.20081127.zip", updateChunkName);
+        }
+        {
+            String updateChunkName = updater.getUpdateChunkName(df.parse("20081128010000.000 -0600"), properties);
+            assertEquals("nexus-maven-repository-index.20081128.zip", updateChunkName);
+        }
+        {
+            String updateChunkName = updater.getUpdateChunkName(df.parse("20081129010000.000 -0600"), properties);
+            assertEquals("nexus-maven-repository-index.20081129.zip", updateChunkName);
+        }
+        {
+            String updateChunkName = updater.getUpdateChunkName(df.parse("20081130010000.000 -0600"), properties);
+            assertEquals(null, updateChunkName);
+        }
     }
     
     
