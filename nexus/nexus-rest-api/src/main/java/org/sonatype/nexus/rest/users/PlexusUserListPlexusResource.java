@@ -23,6 +23,8 @@ import com.thoughtworks.xstream.XStream;
 public class PlexusUserListPlexusResource
     extends AbstractNexusPlexusResource
 {
+    public static final String USER_SOURCE_KEY = "userSource";
+    
     @Requirement( role = PlexusUserManager.class )
     private PlexusUserManager userManager;
     
@@ -48,13 +50,13 @@ public class PlexusUserListPlexusResource
     @Override
     public PathProtectionDescriptor getResourceProtection()
     {
-        return new PathProtectionDescriptor( getResourceUri(), "authcBasic,perms[nexus:users]" );
+        return new PathProtectionDescriptor( "/plexus_users/*", "authcBasic,perms[nexus:users]" );
     }
 
     @Override
     public String getResourceUri()
     {
-        return "/plexus_users";
+        return "/plexus_users/{" + USER_SOURCE_KEY + "}";
     }
     
     @Override
@@ -63,7 +65,7 @@ public class PlexusUserListPlexusResource
     {
         PlexusUserListResourceResponse result = new PlexusUserListResourceResponse();
         
-        for ( PlexusUser user : userManager.listUsers() )
+        for ( PlexusUser user : userManager.listUsers( getUserSource( request ) ) )
         {
             PlexusUserResource res = nexusToRestModel( user, request );
 
@@ -95,5 +97,10 @@ public class PlexusUserListPlexusResource
         }
         
         return resource;
+    }
+    
+    protected String getUserSource( Request request )
+    {
+        return request.getAttributes().get( USER_SOURCE_KEY ).toString();
     }
 }
