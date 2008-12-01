@@ -208,8 +208,6 @@ public abstract class AbstractRepository
     public void initialize()
     {
         applicationConfiguration.addProximityEventListener( this );
-
-        notFoundCache = getCacheManager().getPathCache( getId() );
     }
 
     public void onProximityEvent( AbstractEvent evt )
@@ -522,6 +520,12 @@ public abstract class AbstractRepository
      */
     public PathCache getNotFoundCache()
     {
+        if ( notFoundCache == null )
+        {
+            // getting it lazily
+            notFoundCache = getCacheManager().getPathCache( getId() );
+        }
+        
         return notFoundCache;
     }
 
