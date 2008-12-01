@@ -44,6 +44,7 @@ public abstract class AbstractRepositoryConfigurator
         repository.setNotFoundCacheTimeToLive( repo.getNotFoundCacheTTL() );
         repository.setUserManaged( repo.isUserManaged() );
         repository.setExposed( repo.isExposed() );
+        repository.setNotFoundCacheActive( repo.isNotFoundCacheActive() );
 
         repository.setItemMaxAge( repo.getArtifactMaxAge() );
 

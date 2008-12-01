@@ -1,28 +1,17 @@
-<!-- 
-	
-	Nexus: Maven Repository Manager
-	Copyright (C) 2008 Sonatype, Inc.                                                                                                                          
-	
-	This file is part of Nexus.                                                                                                                                  
-	
-	This program is free software; you can redistribute it and/or                                                                                                 
-	modify it under the terms of the GNU Lesser General Public License                                                                                            
-	as published by the Free Software Foundation; either version 3                                                                                                
-	of the License, or (at your option) any later version.                                                                                                        
-	
-	This program is distributed in the hope that it will be useful,                                                                                               
-	but WITHOUT ANY WARRANTY; without even the implied warranty of                                                                                                
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                                                                                                 
-	GNU Lesser General Public License for more details.                                                                                                           
-	
-	You should have received a copy of the GNU Lesser General Public License                                                                                      
-	along with this program; if not, write to the Free Software                                                                                                   
-	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-	
--->
 
-<model xsd.namespace="http://www.sonatype.com/xsd/nexus-configuration-1.0.1"
-	xsd.target-namespace="http://www.sonatype.com/xsd/nexus-configuration-1.0.1">
+	<!--
+
+		Nexus: Maven Repository Manager Copyright (C) 2008 Sonatype, Inc. This file is part of Nexus. This program is free
+		software; you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as
+		published by the Free Software Foundation; either version 3 of the License, or (at your option) any later version.
+
+		This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+		warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
+		details. You should have received a copy of the GNU Lesser General Public License along with this program; if not,
+		write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+	-->
+
+<model xsd.namespace="http://www.sonatype.com/xsd/nexus-configuration-1.0.1" xsd.target-namespace="http://www.sonatype.com/xsd/nexus-configuration-1.0.1">
 
 	<id>nexus</id>
 
@@ -64,7 +53,8 @@
 					<version>1.0.0/1.0.4</version>
 					<description>
 						The Nexus workingDirectory contains files needed for Nexus to function properly. Data like
-						Lucene index, file attributes, shared local storage, etc. are here.
+						Lucene
+						index, file attributes, shared local storage, etc. are here.
 					</description>
 					<type>String</type>
 					<required>true</required>
@@ -232,14 +222,14 @@
 					</association>
 				</field>
 				<field>
-                    <name>smtpConfiguration</name>
-                    <version>1.0.4+</version>
-                    <description>SMTP Parameters</description>
-                    <required>true</required>
-                    <association>
-                        <type>CSmtpConfiguration</type>
-                    </association>
-                </field>
+					<name>smtpConfiguration</name>
+					<version>1.0.4+</version>
+					<description>SMTP Parameters</description>
+					<required>true</required>
+					<association>
+						<type>CSmtpConfiguration</type>
+					</association>
+				</field>
 			</fields>
 			<codeSegments>
 				<codeSegment>
@@ -280,25 +270,25 @@
 					<code><![CDATA[
     public static final String MODEL_VERSION = "1.0.4";
 ]]></code>
-                </codeSegment>
-                <codeSegment>
-                    <version>1.0.5</version>
-                    <code><![CDATA[
+				</codeSegment>
+				<codeSegment>
+					<version>1.0.5</version>
+					<code><![CDATA[
     public static final String MODEL_VERSION = "1.0.5";
 ]]></code>
 				</codeSegment>
-                <codeSegment>
-                    <version>1.0.6</version>
-                    <code><![CDATA[
+				<codeSegment>
+					<version>1.0.6</version>
+					<code><![CDATA[
     public static final String MODEL_VERSION = "1.0.6";
 ]]></code>
-                </codeSegment>
-                <codeSegment>
-                    <version>1.0.7</version>
-                    <code><![CDATA[
+				</codeSegment>
+				<codeSegment>
+					<version>1.0.7</version>
+					<code><![CDATA[
     public static final String MODEL_VERSION = "1.0.7";
 ]]></code>
-                </codeSegment>
+				</codeSegment>
 			</codeSegments>
 		</class>
 
@@ -608,8 +598,10 @@
 					<required>false</required>
 					<description>
 						Path mapping, that directs routers where to search and/or avoid full-group search. You can also
-						use path mappings to create ranking exceptions, since if mapping is found for path, the request
-						will be executed by ordering supplied in mapping.
+						use
+						path mappings to create ranking exceptions, since if mapping is found for path, the request
+						will be executed by
+						ordering supplied in mapping.
 					</description>
 				</field>
 			</fields>
@@ -629,7 +621,8 @@
 					<required>true</required>
 					<description>
 						The map of inclusions. Keys are regexps for paths (like /some/path/.*) and values are comma
-						separated list of repository ID's.
+						separated
+						list of repository ID's.
 					</description>
 				</field>
 				<field>
@@ -642,7 +635,8 @@
 					<required>true</required>
 					<description>
 						The map of exclusions. Keys are regexps for paths (like /some/path/.*) and values are comma
-						separated list of repository ID's.
+						separated
+						list of repository ID's.
 					</description>
 				</field>
 			</fields>
@@ -759,13 +753,24 @@
 					<defaultValue>true</defaultValue>
 				</field>
 				<field>
+					<name>notFoundCacheActive</name>
+					<version>1.0.7+</version>
+					<type>boolean</type>
+					<required>true</required>
+					<description>
+						If true, NFC will be used. If false, no miss caching will happen.
+					</description>
+					<defaultValue>true</defaultValue>
+				</field>
+				<field>
 					<name>browseable</name>
 					<version>1.0.0+</version>
 					<type>boolean</type>
 					<required>true</required>
 					<description>
 						If true, repository is browseable on UI/DAV. With any value repository will still properly serve
-						Maven clients.
+						Maven
+						clients.
 					</description>
 					<defaultValue>true</defaultValue>
 				</field>
@@ -788,7 +793,8 @@
 					<description>
 						If true, repository will get indexed. If false, the files and artifacts from repository will NOT
 						appear on Nexus index, thus will be not searcheable (and browseable on views that relies on
-						index), altough it will serve Maven clients properly.
+						index), altough it will
+						serve Maven clients properly.
 					</description>
 					<defaultValue>true</defaultValue>
 				</field>
@@ -858,8 +864,10 @@
 					<required>true</required>
 					<description>
 						If true, repository will fix/maintain repository metadata (according to it's repositoryType)
-						that is coming from it's remote store (this setting does not affect hosted reposes). Beware,
-						this setting is modifying the repo metadata!
+						that is
+						coming from it's remote store (this setting does not affect hosted reposes). Beware,
+						this setting is modifying the
+						repo metadata!
 					</description>
 					<defaultValue>false</defaultValue>
 				</field>
@@ -870,7 +878,8 @@
 					<required>true</required>
 					<description>
 						The type of repository, it may have "release" or "snapshot" values allowing it to
-						host/proxy/server release or snapshot artifacts only.
+						host/proxy/server
+						release or snapshot artifacts only.
 					</description>
 					<defaultValue>release</defaultValue>
 				</field>
@@ -881,9 +890,12 @@
 					<required>true</required>
 					<description>
 						The checksum policy of this repository (used on proxies only). Valid values are: 'ignore'
-						(simply ignore checksums), 'warn' (warn in logs on wrong checksums but serve it), 'strict'
-						(strict checksumming, on bad or missing remote checksum the artifact is not served) and
-						'strictIfExists' (like 'strict' if hash exists remotely or warn if not exists).
+						(simply
+						ignore checksums), 'warn' (warn in logs on wrong checksums but serve it), 'strict'
+						(strict checksumming, on bad or
+						missing remote checksum the artifact is not served) and
+						'strictIfExists' (like 'strict' if hash exists remotely or
+						warn if not exists).
 					</description>
 					<defaultValue>warn</defaultValue>
 				</field>
@@ -908,7 +920,8 @@
 					<version>1.0.0+</version>
 					<description>
 						The local storage definition of repository. It is optional element. If not defined, the
-						repository will use the shared local storage.
+						repository will
+						use the shared local storage.
 					</description>
 					<association>
 						<type>CLocalStorage</type>
@@ -920,7 +933,8 @@
 					<version>1.0.0+</version>
 					<description>
 						The remote storage definition of repository. It not defined, the repository will be
-						Nexus-hosted. If defined at least the remote URL, the repository will be proxy-repository.
+						Nexus-hosted. If
+						defined at least the remote URL, the repository will be proxy-repository.
 					</description>
 					<association>
 						<type>CRemoteStorage</type>
@@ -1025,7 +1039,8 @@
 					<required>true</required>
 					<description>
 						If true, the base of URL will be repoIds. Set to false if this local storage points to an
-						existing repo contens on FS not in default location.
+						existing repo
+						contens on FS not in default location.
 					</description>
 					<defaultValue>false</defaultValue>
 				</field>
@@ -1134,7 +1149,8 @@
 					<required>true</required>
 					<description>
 						Repository ID of existing Nexus repository to be master of this shadow. It should point to an
-						existing Nexus Repository.
+						existing
+						Nexus Repository.
 					</description>
 				</field>
 				<field>
@@ -1269,8 +1285,10 @@
 					<required>false</required>
 					<description>
 						Path mapping, that directs grouping router where to search and/or avoid full-group search. You
-						can also use path mappings to create ranking exceptions, since if mapping is found for path, the
-						request will be executed by ordering supplied in mapping.
+						can also
+						use path mappings to create ranking exceptions, since if mapping is found for path, the
+						request will be executed by
+						ordering supplied in mapping.
 					</description>
 				</field>
 				<field>
@@ -1406,7 +1424,8 @@
 					<required>true</required>
 					<description>
 						If enabled, the users will be able to access DAV resources unauthenticated, if Realm allows. To
-						set rights for unauthenticated users, use "anonymous" username.
+						set
+						rights for unauthenticated users, use "anonymous" username.
 					</description>
 					<defaultValue>false</defaultValue>
 				</field>
@@ -1416,7 +1435,8 @@
 					<type>String</type>
 					<required>true</required>
 					<description>
-						The username used to log in as anonymous user. The account should be enabled and existing according to the
+						The username used to log in as anonymous user. The account should be enabled and existing according to
+						the
 						used JSecurity realm!
 					</description>
 					<defaultValue>anonymous</defaultValue>
@@ -1427,7 +1447,8 @@
 					<type>String</type>
 					<required>true</required>
 					<description>
-						The username used to log in as anonymous user. The account should be enabled and existing according to the
+						The username used to log in as anonymous user. The account should be enabled and existing according to
+						the
 						used JSecurity realm!
 					</description>
 					<defaultValue>anonymous</defaultValue>
@@ -1919,92 +1940,92 @@
 				</field>
 			</fields>
 		</class>
-		
+
 		<!-- SMTP Settings -->
-        <class>
-            <name>CSmtpConfiguration</name>
-            <version>1.0.4+</version>
-            <description>The SMTP Settings.</description>
-            <fields>
-                <field>
-                    <name>host</name>
-                    <version>1.0.4+</version>
-                    <type>String</type>
-                    <required>true</required>
-                    <description>
-                        The host of the smtp server.
+		<class>
+			<name>CSmtpConfiguration</name>
+			<version>1.0.4+</version>
+			<description>The SMTP Settings.</description>
+			<fields>
+				<field>
+					<name>host</name>
+					<version>1.0.4+</version>
+					<type>String</type>
+					<required>true</required>
+					<description>
+						The host of the smtp server.
                     </description>
-                </field>
-                <field>
-                    <name>port</name>
-                    <version>1.0.4+</version>
-                    <type>int</type>
-                    <required>true</required>
-                    <description>
-                        The port of the smtp server.
+				</field>
+				<field>
+					<name>port</name>
+					<version>1.0.4+</version>
+					<type>int</type>
+					<required>true</required>
+					<description>
+						The port of the smtp server.
                     </description>
-                    <defaultValue>-1</defaultValue>
-                </field>
-                <field>
-                    <name>sslEnabled</name>
-                    <version>1.0.4+</version>
-                    <type>boolean</type>
-                    <required>false</required>
-                    <description>
-                        Enable ssl.
+					<defaultValue>-1</defaultValue>
+				</field>
+				<field>
+					<name>sslEnabled</name>
+					<version>1.0.4+</version>
+					<type>boolean</type>
+					<required>false</required>
+					<description>
+						Enable ssl.
                     </description>
-                    <defaultValue>false</defaultValue>
-                </field>
-                <field>
-                    <name>tlsEnabled</name>
-                    <version>1.0.4+</version>
-                    <type>boolean</type>
-                    <required>false</required>
-                    <description>
-                        Enable tls.
+					<defaultValue>false</defaultValue>
+				</field>
+				<field>
+					<name>tlsEnabled</name>
+					<version>1.0.4+</version>
+					<type>boolean</type>
+					<required>false</required>
+					<description>
+						Enable tls.
                     </description>
-                    <defaultValue>false</defaultValue>
-                </field>
-                <field>
-                    <name>username</name>
-                    <version>1.0.4+</version>
-                    <type>String</type>
-                    <required>false</required>
-                    <description>
-                        Username to access smtp server.
+					<defaultValue>false</defaultValue>
+				</field>
+				<field>
+					<name>username</name>
+					<version>1.0.4+</version>
+					<type>String</type>
+					<required>false</required>
+					<description>
+						Username to access smtp server.
                     </description>
-                </field>
-                <field>
-                    <name>password</name>
-                    <version>1.0.4+</version>
-                    <type>String</type>
-                    <required>false</required>
-                    <description>
-                        Password to access smtp server.
+				</field>
+				<field>
+					<name>password</name>
+					<version>1.0.4+</version>
+					<type>String</type>
+					<required>false</required>
+					<description>
+						Password to access smtp server.
                     </description>
-                </field>
-                <field>
-                    <name>debugMode</name>
-                    <version>1.0.4+</version>
-                    <type>boolean</type>
-                    <required>false</required>
-                    <description>
-                        Enable debug mode.
+				</field>
+				<field>
+					<name>debugMode</name>
+					<version>1.0.4+</version>
+					<type>boolean</type>
+					<required>false</required>
+					<description>
+						Enable debug mode.
                     </description>
-                    <defaultValue>false</defaultValue>
-                </field>
-                <field>
-                    <name>systemEmailAddress</name>
-                    <version>1.0.4+</version>
-                    <type>String</type>
-                    <required>true</required>
-                    <description>
-                        Email addresses that Nexus will use to send emails from.
+					<defaultValue>false</defaultValue>
+				</field>
+				<field>
+					<name>systemEmailAddress</name>
+					<version>1.0.4+</version>
+					<type>String</type>
+					<required>true</required>
+					<description>
+						Email addresses that Nexus will use to send emails from.
                     </description>
-                    <defaultValue>nexus-system@sonatype.org</defaultValue>
-                </field>
-            </fields>
-        </class>
+					<defaultValue>nexus-system@sonatype.org</defaultValue>
+				</field>
+			</fields>
+		</class>
 
 		<!-- UTIL -->
 		<class>

@@ -543,4 +543,16 @@ public class DummyRepository
         return false;
     }
 
+    public boolean isNotFoundCacheActive()
+    {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    public void setNotFoundCacheActive( boolean notFoundCacheActive )
+    {
+        // TODO Auto-generated method stub
+        
+    }
+
 }

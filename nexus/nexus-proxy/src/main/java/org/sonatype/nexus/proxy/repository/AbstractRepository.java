@@ -182,6 +182,9 @@ public abstract class AbstractRepository
     /** The not found cache. */
     private PathCache notFoundCache;
 
+    /** Flag: is NFC active */
+    private boolean notFoundCacheActive = true;
+
     /** The not found cache time to live (in minutes). */
     private int notFoundCacheTimeToLive = 24 * 60;
 
@@ -205,6 +208,8 @@ public abstract class AbstractRepository
     public void initialize()
     {
         applicationConfiguration.addProximityEventListener( this );
+
+        notFoundCache = getCacheManager().getPathCache( getId() );
     }
 
     public void onProximityEvent( AbstractEvent evt )
@@ -517,10 +522,6 @@ public abstract class AbstractRepository
      */
     public PathCache getNotFoundCache()
     {
-        if ( notFoundCache == null )
-        {
-            notFoundCache = getCacheManager().getPathCache( getId() );
-        }
         return notFoundCache;
     }
 
@@ -532,6 +533,16 @@ public abstract class AbstractRepository
     public void setNotFoundCache( PathCache notFoundcache )
     {
         this.notFoundCache = notFoundcache;
+    }
+
+    public boolean isNotFoundCacheActive()
+    {
+        return notFoundCacheActive;
+    }
+
+    public void setNotFoundCacheActive( boolean notFoundCacheActive )
+    {
+        this.notFoundCacheActive = notFoundCacheActive;
     }
 
     public String getId()
@@ -1264,7 +1275,7 @@ public abstract class AbstractRepository
     protected void maintainNotFoundCache( String path )
         throws ItemNotFoundException
     {
-        if ( getNotFoundCache() != null )
+        if ( isNotFoundCacheActive() )
         {
             if ( getNotFoundCache().contains( path ) )
             {
@@ -1296,12 +1307,13 @@ public abstract class AbstractRepository
      */
     public void addToNotFoundCache( String path )
     {
-        if ( getNotFoundCache() != null )
+        if ( isNotFoundCacheActive() )
         {
             if ( getLogger().isDebugEnabled() )
             {
                 getLogger().debug( "Adding path " + path + " to NFC." );
             }
+
             getNotFoundCache().put( path, Boolean.TRUE, getNotFoundCacheTimeToLive() * 60 );
         }
     }
@@ -1313,12 +1325,13 @@ public abstract class AbstractRepository
      */
     public void removeFromNotFoundCache( String path )
     {
-        if ( getNotFoundCache() != null )
+        if ( isNotFoundCacheActive() )
         {
             if ( getLogger().isDebugEnabled() )
             {
                 getLogger().debug( "Removing path " + path + " from NFC." );
             }
+
             getNotFoundCache().removeWithParents( path );
         }
     }

@@ -141,6 +141,20 @@ public interface Repository
     void removeFromNotFoundCache( String path );
 
     /**
+     * Is NFC active? (true by default)
+     * 
+     * @return
+     */
+    boolean isNotFoundCacheActive();
+
+    /**
+     * Sets is NFC active.
+     * 
+     * @param notFoundCacheActive
+     */
+    void setNotFoundCacheActive( boolean notFoundCacheActive );
+
+    /**
      * Gets the item max age in (in minutes).
      * 
      * @return the item max age in (in minutes)
@@ -482,7 +496,7 @@ public interface Repository
      * @return
      */
     Action getResultingActionOnWrite( ResourceStoreRequest rsr );
-    
+
     /**
      * Is the target repository compatible to this one
      * 
