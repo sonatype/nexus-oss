@@ -101,7 +101,7 @@ Ext.extend(Sonatype.ext.TwinPanelController, Ext.Panel, {
     var dropZone = toPanel.dropZone;
     var fn = toPanel.dropConfig.onContainerOver.createDelegate( dropZone, [ dragZone, null ], 0 );
     var checkIfDragAllowed = function( node ) {
-      return fn( { node: node } ) == dropZone.dropAllowed;
+      return ( ! node.disabled ) && fn( { node: node } ) == dropZone.dropAllowed;
     }
     
     if ( fromPanel && toPanel ) {
@@ -275,19 +275,23 @@ Sonatype.ext.TwinPanelChooser = function( config ){
 };
 
 Ext.extend( Sonatype.ext.TwinPanelChooser, Ext.Panel, {
-
+  createNode: function( root, rec ) {
+    root.appendChild( new Ext.tree.TreeNode( {
+      id: rec.id,
+      text: rec.data[this.displayField],
+      payload: rec,
+      allowChildren: false,
+      draggable: true,
+      leaf: true,
+      disabled: rec.data.readOnly
+    }));
+  },
+  
   loadStore: function() {
     if ( this.store ) {
       var root = this.getComponent( 2 ).root;
       this.store.each( function( rec ) {
-        root.appendChild( new Ext.tree.TreeNode( {
-          id: rec.id,
-          text: rec.get( this.displayField ),
-          payload: rec,
-          allowChildren: false,
-          draggable: true,
-          leaf: true
-        }));
+        this.createNode( root, rec );
       }, this );
     }
   },
@@ -332,8 +336,10 @@ Ext.extend( Sonatype.ext.TwinPanelChooser, Ext.Panel, {
     var nodes = this.getComponent( 0 ).root.childNodes;
     
     for( var i = 0; i < nodes.length; i++) {
-      output.push( this.valueField ? nodes[i].attributes.payload.get( this.valueField ) :
-        nodes[i].attributes.payload.data );
+      if ( ! nodes[i].disabled ) {
+        output.push( this.valueField ? nodes[i].attributes.payload.data[this.valueField] :
+          nodes[i].attributes.payload.data );
+      }
     }
     
     return output;
@@ -349,18 +355,38 @@ Ext.extend( Sonatype.ext.TwinPanelChooser, Ext.Panel, {
     
     for ( var i = 0; i < arr.length; i++ ) {
       var valueId = arr[i];
-      if ( ! typeof( valueId ) == 'String' ) {
+      var name = valueId;
+      var readOnly = false;
+      if ( typeof( valueId ) != 'string' ) {
+        name = valueId[this.displayField];
+        readOnly = valueId.readOnly;
         valueId = valueId[this.valueField];
       }
+      var found = false;
       for ( var j = 0; j < nodes.length; j++ ) {
         var node = nodes[j];
         var nodeValue = this.valueField ?
-          node.attributes.payload.get( this.valueField ) :
+          node.attributes.payload.data[this.valueField] :
           node.attributes.payload.id;
         if ( nodeValue == valueId ) {
           leftRoot.appendChild( node );
-          j--;
+          if ( readOnly ) {
+            node.disable();
+          }
+          found = true;
+          break;
         }
+      }
+      if ( ! found ) {
+        var rec = {
+          id: valueId,
+          data: {
+            readOnly: readOnly,
+          }
+        };
+        rec.data[this.valueField] = valueId;
+        rec.data[this.displayField] = name;
+        this.createNode( leftRoot, rec );
       }
     }
   }
