@@ -585,16 +585,18 @@ Ext.extend(Sonatype.repoServer.UserEditPanel, Ext.Panel, {
   },
   
   updateUserRecord : function(rec, receivedData){
-        rec.beginEdit();
-        rec.set('name', receivedData.name);
-        rec.set('userId', receivedData.userId);
-        rec.set('email', receivedData.email);
-        rec.set('status', receivedData.status);
-        rec.set('roles', receivedData.roles);
-        rec.set('readOnly', receivedData.readOnly);
-        rec.set('displayRoles', this.roleCombiner(receivedData.roles));
-        rec.commit();
-        rec.endEdit();
+    if ( receivedData ) {
+      rec.beginEdit();
+      rec.set('name', receivedData.name);
+      rec.set('userId', receivedData.userId);
+      rec.set('email', receivedData.email);
+      rec.set('status', receivedData.status);
+      rec.set('roles', receivedData.roles);
+      rec.set('readOnly', receivedData.readOnly);
+      rec.set('displayRoles', this.roleCombiner(receivedData.roles));
+      rec.commit();
+      rec.endEdit();
+    }
   },
 
   rowClick : function(grid, rowIndex, e){
