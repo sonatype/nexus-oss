@@ -17,6 +17,8 @@ import org.sonatype.nexus.rest.model.PlexusUserResource;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 
+import com.thoughtworks.xstream.XStream;
+
 @Component( role = PlexusResource.class, hint = "PlexusUserListPlexusResource" )
 public class PlexusUserListPlexusResource
     extends AbstractNexusPlexusResource
@@ -27,6 +29,14 @@ public class PlexusUserListPlexusResource
     public PlexusUserListPlexusResource()
     {
         setModifiable( false );
+    }
+    
+    @Override
+    public void configureXStream( XStream xstream )
+    {
+        xstream.omitField( PlexusUserListResourceResponse.class, "modelEncoding" );
+        xstream.omitField( PlexusUserResource.class, "modelEncoding" );
+        xstream.omitField( PlexusRoleResource.class, "modelEncoding" );
     }
     
     @Override
