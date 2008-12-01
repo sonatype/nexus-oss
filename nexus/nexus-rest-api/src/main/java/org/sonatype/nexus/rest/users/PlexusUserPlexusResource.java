@@ -54,7 +54,7 @@ public class PlexusUserPlexusResource
     @Override
     public String getResourceUri()
     {
-        return "/plexus_users/{" + USER_ID_KEY + "}";
+        return "/plexus_user/{" + USER_ID_KEY + "}";
     }
     
     @Override
