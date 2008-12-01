@@ -130,9 +130,9 @@ public class DefaultRepositoryRegistry
     {
         Repository repository = getRepository( repoId );
 
-        removeRepositorySilently( repoId );
-
         notifyProximityEventListeners( new RepositoryRegistryEventRemove( this, repository ) );
+        
+        removeRepositorySilently( repoId );
     }
 
     public void removeRepositorySilently( String repoId )
@@ -227,6 +227,8 @@ public class DefaultRepositoryRegistry
     {
         if ( repositoryGroups.containsKey( groupId ) )
         {
+            notifyProximityEventListeners( new RepositoryRegistryGroupEventRemove( this, groupId ) );
+            
             if ( withRepositories )
             {
                 List<Repository> groupOrder = getRepositoryGroup( groupId );
@@ -248,8 +250,6 @@ public class DefaultRepositoryRegistry
             }
 
             repositoryGroups.remove( groupId );
-
-            notifyProximityEventListeners( new RepositoryRegistryGroupEventRemove( this, groupId ) );
         }
         else
         {
