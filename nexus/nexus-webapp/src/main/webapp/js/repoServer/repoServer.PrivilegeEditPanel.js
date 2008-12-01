@@ -404,6 +404,13 @@ Ext.extend(Sonatype.repoServer.PrivilegeEditPanel, Ext.Panel, {
     this.repoTargetDataStore.reload();
     this.privilegesDataStore.removeAll();
     this.privilegesDataStore.reload();
+    
+    this.repoOrGroupDataStore.removeAll();
+    this.repositoryDataStore.removeAll();
+    this.repositoryDataStore.reload();
+    this.repositoryGroupDataStore.removeAll();
+    this.repositoryGroupDataStore.reload();
+    
     this.formCards.items.each(function(item, i, len){
       if(i>0){this.remove(item, true);}
     }, this.formCards);
