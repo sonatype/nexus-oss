@@ -1490,6 +1490,10 @@ Ext.extend(Sonatype.repoServer.RepoEditPanel, Sonatype.repoServer.AbstractRepoPa
         var rsUrl = form.findField( 'remoteStorage.remoteStorageUrl' );
         rsUrl.disable();
         rsUrl.clearInvalid();
+        
+        // Disable the editor - this is a temporary measure,
+        // until we find a better solution for procurement repos
+        action.options.fpanel.buttons[0].disable();
       }
       
       if (repoType == 'hosted' || repoType == 'proxy') {
