@@ -2913,6 +2913,22 @@
     </class>
     
     <class>
+      <name>PlexusUserResourceResponse</name>
+      <version>1.0.0+</version>
+      <superClass>NexusResponse</superClass>
+      <fields>
+        <field>
+          <name>data</name>
+          <version>1.0.0+</version>
+          <association>
+            <type>PlexusUserResource</type>
+          </association>
+          <required>true</required>
+        </field>
+      </fields>
+    </class>
+    
+    <class>
       <name>PlexusUserResource</name>
       <version>1.0.0+</version>
       <fields>
