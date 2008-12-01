@@ -319,7 +319,7 @@ public abstract class AbstractNexusFeedSource
             catch ( NoSuchRepositoryException e )
             {
                 // Can't get repository for artifact, therefore we can't authorize access, therefore you dont see it
-                getLogger().error(
+                getLogger().debug(
                     "Feed entry contained invalid repository id " + item.getNexusItemInfo().getRepositoryId(),
                     e );
             }
