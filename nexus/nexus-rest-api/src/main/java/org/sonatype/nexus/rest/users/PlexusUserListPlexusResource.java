@@ -7,9 +7,11 @@ import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
+import org.sonatype.jsecurity.locators.users.PlexusRole;
 import org.sonatype.jsecurity.locators.users.PlexusUser;
 import org.sonatype.jsecurity.locators.users.PlexusUserManager;
 import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
+import org.sonatype.nexus.rest.model.PlexusRoleResource;
 import org.sonatype.nexus.rest.model.PlexusUserListResourceResponse;
 import org.sonatype.nexus.rest.model.PlexusUserResource;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
@@ -71,6 +73,16 @@ public class PlexusUserListPlexusResource
         resource.setUserId( user.getUserId() );
         resource.setName( user.getName() );
         resource.setEmail( user.getEmailAddress() );
+        
+        for ( PlexusRole role : user.getRoles() )
+        {
+            PlexusRoleResource roleResource = new PlexusRoleResource();
+            roleResource.setRoleId( role.getRoleId() );
+            roleResource.setName( role.getName() );
+            roleResource.setSource( role.getSource() );
+            
+            resource.addRole( roleResource );
+        }
         
         return resource;
     }
