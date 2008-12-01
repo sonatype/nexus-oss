@@ -22,6 +22,8 @@
  * Repository Edit/Create panel layout and controller
  */
 
+var REPO_REMOTE_STORAGE_REGEXP = /^(?:http|https|ftp):\/\//i;
+
 Sonatype.repoServer.RepoEditPanel = function(config){
   var config = config || {};
   var defaultConfig = {};
@@ -485,7 +487,7 @@ Sonatype.repoServer.RepoEditPanel = function(config){
             anchor: Sonatype.view.FIELD_OFFSET,
             allowBlank:false,
             validator: function(v){
-              if(v.match(/^(?:http|https|ftp):\/\//i)){ return true; }
+              if(v.match(REPO_REMOTE_STORAGE_REGEXP)){ return true; }
               else{ return 'Protocol must be http://, https:// or ftp://'; }
             }
           },
@@ -1482,6 +1484,13 @@ Ext.extend(Sonatype.repoServer.RepoEditPanel, Sonatype.repoServer.AbstractRepoPa
     if (action.type == 'sonatypeLoad'){
       var repoType = action.result.data.repoType;
       var repoPolicy = action.result.data.repoPolicy;
+      
+      if ( repoType == 'proxy' &&! action.result.data.remoteStorage.remoteStorageUrl
+          .match( REPO_REMOTE_STORAGE_REGEXP ) ) {
+        var rsUrl = form.findField( 'remoteStorage.remoteStorageUrl' );
+        rsUrl.disable();
+        rsUrl.clearInvalid();
+      }
       
       if (repoType == 'hosted' || repoType == 'proxy') {
         
