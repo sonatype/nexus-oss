@@ -21,15 +21,15 @@ public class Nexus1146RepositoryOverProxyTest
     public void downloadArtifactOverWebProxy()
         throws Exception
     {
-        File pomFile = this.getLocalFile( "release-proxy-repo-1", "nexus1146", "artifact", "1.0", "pom" );
-        File pomArtifact = this.downloadArtifact( "nexus1146", "artifact", "1.0", "pom", null, "target/downloads" );
+        File pomFile = this.getLocalFile( "release-proxy-repo-1", getTestId(), "artifact", "1.0", "pom" );
+        File pomArtifact = this.downloadArtifact( getTestId(), "artifact", "1.0", "pom", null, "target/downloads" );
         Assert.assertTrue( FileTestingUtils.compareFileSHA1s( pomArtifact, pomFile ) );
 
-        File jarFile = this.getLocalFile( "release-proxy-repo-1", "nexus1146", "artifact", "1.0", "jar" );
-        File jarArtifact = this.downloadArtifact( "nexus1146", "artifact", "1.0", "jar", null, "target/downloads" );
+        File jarFile = this.getLocalFile( "release-proxy-repo-1", getTestId(), "artifact", "1.0", "jar" );
+        File jarArtifact = this.downloadArtifact( getTestId(), "artifact", "1.0", "jar", null, "target/downloads" );
         Assert.assertTrue( FileTestingUtils.compareFileSHA1s( jarArtifact, jarFile ) );
 
-        String artifactUrl = baseProxyURL + "release-proxy-repo-1/nexus1146/artifact/1.0/artifact-1.0.jar";
+        String artifactUrl = baseProxyURL + "release-proxy-repo-1/"+getTestId()+"/artifact/1.0/artifact-1.0.jar";
         Assert.assertTrue( "Proxy was not accessed", server.getAccessedUris().contains( artifactUrl ) );
     }
 
@@ -39,14 +39,14 @@ public class Nexus1146RepositoryOverProxyTest
     {
         try
         {
-            this.downloadArtifact( "nexus1146", "some-artifact-that-dont-exists", "4.8.15.16.23.42", "jar", null,
+            this.downloadArtifact( getTestId(), "some-artifact-that-dont-exists", "4.8.15.16.23.42", "jar", null,
                                    "target/downloads" );
         }
         finally
         {
             String artifactUrl =
                 baseProxyURL
-                    + "release-proxy-repo-1/nexus1146/some-artifact-that-dont-exists/4.8.15.16.23.42/some-artifact-that-dont-exists-4.8.15.16.23.42.jar";
+                    + "release-proxy-repo-1/"+getTestId()+"/some-artifact-that-dont-exists/4.8.15.16.23.42/some-artifact-that-dont-exists-4.8.15.16.23.42.jar";
             Assert.assertTrue( "Proxy was not accessed", server.getAccessedUris().contains( artifactUrl ) );
         }
     }
@@ -74,7 +74,7 @@ public class Nexus1146RepositoryOverProxyTest
         verifier.executeGoal( "dependency:resolve" );
         verifier.verifyErrorFreeLog();
 
-        String artifactUrl = baseProxyURL + "release-proxy-repo-1/nexus1146/maven-artifact/1.0/maven-artifact-1.0.jar";
+        String artifactUrl = baseProxyURL + "release-proxy-repo-1/"+getTestId()+"/maven-artifact/1.0/maven-artifact-1.0.jar";
         Assert.assertTrue( "Proxy was not accessed", server.getAccessedUris().contains( artifactUrl ) );
     }
 

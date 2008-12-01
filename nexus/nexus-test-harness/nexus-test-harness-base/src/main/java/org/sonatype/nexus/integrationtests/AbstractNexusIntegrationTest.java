@@ -218,7 +218,7 @@ public class AbstractNexusIntegrationTest
         }
     }
 
-    private void deployArtifacts()
+    protected void deployArtifacts()
         throws Exception
     {
         // test the test directory
