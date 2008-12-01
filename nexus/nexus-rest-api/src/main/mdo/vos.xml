@@ -2895,6 +2895,47 @@
 			</fields>
 		</class>
 
+    <class>
+      <name>PlexusUserListResourceResponse</name>
+      <version>1.0.0+</version>
+      <superClass>NexusResponse</superClass>
+      <fields>
+        <field>
+          <name>data</name>
+          <version>1.0.0+</version>
+          <association>
+            <type>PlexusUserResource</type>
+            <multiplicity>*</multiplicity>
+          </association>
+          <required>true</required>
+        </field>
+      </fields>
+    </class>
+    
+    <class>
+      <name>PlexusUserResource</name>
+      <version>1.0.0+</version>
+      <fields>
+        <field>
+          <name>userId</name>
+          <version>1.0.0+</version>
+          <type>String</type>
+          <required>true</required>
+        </field>
+        <field>
+          <name>name</name>
+          <version>1.0.0+</version>
+          <type>String</type>
+          <required>true</required>
+        </field>
+        <field>
+          <name>email</name>
+          <version>1.0.0+</version>
+          <type>String</type>
+          <required>true</required>
+        </field>
+      </fields>
+    </class>
 
 	</classes>
 </model>
