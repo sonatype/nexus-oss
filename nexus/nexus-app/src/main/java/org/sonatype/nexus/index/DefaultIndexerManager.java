@@ -48,39 +48,21 @@ import org.apache.lucene.store.FSDirectory;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
-import org.sonatype.nexus.artifact.Gav;
-import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.index.context.IndexContextInInconsistentStateException;
 import org.sonatype.nexus.index.context.IndexingContext;
 import org.sonatype.nexus.index.packer.IndexPacker;
 import org.sonatype.nexus.index.updater.IndexUpdater;
-import org.sonatype.nexus.maven.tasks.SnapshotRemover;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryGroupException;
 import org.sonatype.nexus.proxy.RepositoryNotAvailableException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
-import org.sonatype.nexus.proxy.events.AbstractEvent;
-import org.sonatype.nexus.proxy.events.EventListener;
-import org.sonatype.nexus.proxy.events.RepositoryItemEvent;
-import org.sonatype.nexus.proxy.events.RepositoryItemEventCache;
-import org.sonatype.nexus.proxy.events.RepositoryItemEventDelete;
-import org.sonatype.nexus.proxy.events.RepositoryItemEventStore;
-import org.sonatype.nexus.proxy.events.RepositoryRegistryEventAdd;
-import org.sonatype.nexus.proxy.events.RepositoryRegistryEventRemove;
-import org.sonatype.nexus.proxy.events.RepositoryRegistryEventUpdate;
-import org.sonatype.nexus.proxy.events.RepositoryRegistryGroupEvent;
-import org.sonatype.nexus.proxy.events.RepositoryRegistryGroupEventAdd;
-import org.sonatype.nexus.proxy.events.RepositoryRegistryGroupEventRemove;
-import org.sonatype.nexus.proxy.events.RepositoryRegistryRepositoryEvent;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
@@ -104,7 +86,7 @@ import org.sonatype.nexus.tasks.ReindexTask;
 @Component( role = IndexerManager.class )
 public class DefaultIndexerManager
     extends AbstractLogEnabled
-    implements IndexerManager, Initializable, EventListener
+    implements IndexerManager
 
 {
     /** Context id local suffix */
@@ -115,9 +97,6 @@ public class DefaultIndexerManager
 
     /** Context id merged suffix */
     public static final String CTX_MERGED_SUFIX = "-merged";
-
-    @Requirement
-    private ArtifactContextProducer artifactContextProducer;
 
     @Requirement
     private NexusIndexer nexusIndexer;
@@ -143,14 +122,6 @@ public class DefaultIndexerManager
     private File workingDirectory;
 
     private File tempDirectory;
-
-    public void initialize()
-        throws InitializationException
-    {
-        nexusConfiguration.addProximityEventListener( this );
-
-        repositoryRegistry.addProximityEventListener( this );
-    }
 
     protected File getWorkingDirectory()
     {
@@ -185,6 +156,13 @@ public class DefaultIndexerManager
         }
     }
 
+    public void resetConfiguration()
+    {
+        workingDirectory = null;
+
+        tempDirectory = null;
+    }
+
     // ----------------------------------------------------------------------------
     // Context management et al
     // ----------------------------------------------------------------------------
@@ -216,11 +194,11 @@ public class DefaultIndexerManager
 
         ctxLocal.setSearchable( repository.isIndexable() );
 
-//        if ( ctxLocal.getTimestamp() == null )
-//        {
-//            // it is probably new or first start
-//            ctxLocal.updateTimestamp();
-//        }
+        // if ( ctxLocal.getTimestamp() == null )
+        // {
+        // // it is probably new or first start
+        // ctxLocal.updateTimestamp();
+        // }
 
         if ( RepositoryType.PROXY.equals( repository.getRepositoryType() ) )
         {
@@ -235,11 +213,11 @@ public class DefaultIndexerManager
 
             ctxRemote.setSearchable( repository.isIndexable() );
 
-//            if ( ctxRemote.getTimestamp() == null )
-//            {
-//                // it is probably new or first start
-//                ctxRemote.updateTimestamp();
-//            }
+            // if ( ctxRemote.getTimestamp() == null )
+            // {
+            // // it is probably new or first start
+            // ctxRemote.updateTimestamp();
+            // }
         }
     }
 
@@ -349,11 +327,11 @@ public class DefaultIndexerManager
 
         ctxMerged.setSearchable( false );
 
-//        if ( ctxMerged.getTimestamp() == null )
-//        {
-//            // it is probably new or first start
-//            ctxMerged.updateTimestamp();
-//        }
+        // if ( ctxMerged.getTimestamp() == null )
+        // {
+        // // it is probably new or first start
+        // ctxMerged.updateTimestamp();
+        // }
     }
 
     public void removeRepositoryGroupIndexContext( String repositoryGroupId, boolean deleteFiles )
@@ -1379,243 +1357,7 @@ public class DefaultIndexerManager
         return nexusIndexer.constructQuery( field, query );
     }
 
-    // ----------------------------------------------------------------------------
-    // Event handling
-    // ----------------------------------------------------------------------------
-
-    public void onProximityEvent( AbstractEvent evt )
-    {
-        if ( getLogger().isDebugEnabled() )
-        {
-            getLogger().debug( "Processing event (" + evt.toString() + ")" );
-        }
-
-        if ( ConfigurationChangeEvent.class.isAssignableFrom( evt.getClass() ) )
-        {
-            workingDirectory = null;
-
-            tempDirectory = null;
-        }
-        else if ( RepositoryRegistryRepositoryEvent.class.isAssignableFrom( evt.getClass() ) )
-        {
-            try
-            {
-                Repository repository = ( (RepositoryRegistryRepositoryEvent) evt ).getRepository();
-
-                // we are handling repo events, like addition and removal
-                if ( RepositoryRegistryEventAdd.class.isAssignableFrom( evt.getClass() ) )
-                {
-                    addRepositoryIndexContext( repository.getId() );
-                }
-                else if ( RepositoryRegistryEventRemove.class.isAssignableFrom( evt.getClass() ) )
-                {
-                    removeRepositoryIndexContext( repository.getId(), false );
-                }
-                else if ( RepositoryRegistryEventUpdate.class.isAssignableFrom( evt.getClass() ) )
-                {
-                    updateRepositoryIndexContext( repository.getId() );
-                }
-            }
-            catch ( Exception e )
-            {
-                getLogger().error( "Could not maintain indexing contexts!", e );
-            }
-        }
-        else if ( RepositoryRegistryGroupEvent.class.isAssignableFrom( evt.getClass() ) )
-        {
-            try
-            {
-                RepositoryRegistryGroupEvent gevt = (RepositoryRegistryGroupEvent) evt;
-
-                // we are handling repo events, like addition and removal
-                if ( RepositoryRegistryGroupEventAdd.class.isAssignableFrom( evt.getClass() ) )
-                {
-                    addRepositoryGroupIndexContext( gevt.getGroupId() );
-                }
-                else if ( RepositoryRegistryGroupEventRemove.class.isAssignableFrom( evt.getClass() ) )
-                {
-                    removeRepositoryGroupIndexContext( gevt.getGroupId(), false );
-                }
-            }
-            catch ( Exception e )
-            {
-                getLogger().error( "Could not maintain group (merged) indexing contexts!", e );
-            }
-        }
-        else if ( RepositoryItemEvent.class.isAssignableFrom( evt.getClass() ) )
-        {
-            try
-            {
-                RepositoryItemEvent ievt = (RepositoryItemEvent) evt;
-
-                // sadly, the nexus-indexer is maven2 only, hence we check is the repo
-                // from where we get the event is a maven2 repo
-                if ( !MavenRepository.class.isAssignableFrom( ievt.getRepository().getClass() ) )
-                {
-                    if ( getLogger().isDebugEnabled() )
-                    {
-                        getLogger().debug( "This is not a MavenRepository instance, will not process it." );
-                    }
-
-                    return;
-                }
-
-                // should we sync at all
-                if ( ievt.getRepository().isIndexable()
-                    && ( RepositoryItemEventStore.class.isAssignableFrom( ievt.getClass() )
-                        || RepositoryItemEventCache.class.isAssignableFrom( ievt.getClass() ) || RepositoryItemEventDelete.class
-                        .isAssignableFrom( ievt.getClass() ) ) )
-                {
-                    IndexingContext context = nexusIndexer.getIndexingContexts().get(
-                        getLocalContextId( ievt.getRepository().getId() ) );
-
-                    // by calculating GAV we check wether the request is against a repo artifact at all
-                    Gav gav = ( (MavenRepository) ievt.getRepository() ).getGavCalculator().pathToGav(
-                        ievt.getItemUid().getPath() );
-
-                    // signatures and hashes are not considered for processing
-                    // reason (NEXUS-814 related): the actual artifact and it's POM will (or already did)
-                    // emitted events about modifying them
-                    if ( context != null && gav != null && !gav.isSignature() && !gav.isHash() )
-                    {
-                        // if we have a valid indexing context and have access to a File
-                        if ( DefaultFSLocalRepositoryStorage.class.isAssignableFrom( ievt
-                            .getItemUid().getRepository().getLocalStorage().getClass() ) )
-                        {
-                            File file = ( (DefaultFSLocalRepositoryStorage) ievt.getRepository().getLocalStorage() )
-                                .getFileFromBase( ievt.getItemUid() );
-
-                            if ( file.exists() )
-                            {
-                                ArtifactContext ac = artifactContextProducer.getArtifactContext( context, file );
-
-                                if ( ac != null )
-                                {
-                                    if ( getLogger().isDebugEnabled() )
-                                    {
-                                        getLogger()
-                                            .debug( "The ArtifactContext created from file is fine, continuing." );
-                                    }
-
-                                    ArtifactInfo ai = ac.getArtifactInfo();
-
-                                    if ( ievt instanceof RepositoryItemEventCache )
-                                    {
-                                        // add file to index
-                                        if ( getLogger().isDebugEnabled() )
-                                        {
-                                            getLogger().debug(
-                                                "Adding artifact " + ai.groupId + ":" + ai.artifactId + ":"
-                                                    + ai.version + " to index (CACHE)." );
-                                        }
-
-                                        nexusIndexer.addArtifactToIndex( ac, context );
-                                    }
-                                    else if ( ievt instanceof RepositoryItemEventStore )
-                                    {
-                                        // add file to index
-                                        if ( getLogger().isDebugEnabled() )
-                                        {
-                                            getLogger().debug(
-                                                "Adding artifact " + ai.groupId + ":" + ai.artifactId + ":"
-                                                    + ai.version + " to index (STORE)." );
-                                        }
-
-                                        nexusIndexer.addArtifactToIndex( ac, context );
-                                    }
-                                    else if ( ievt instanceof RepositoryItemEventDelete )
-                                    {
-                                        // NEXUS-814: we should not delete always
-                                        if ( !ievt.getItem().getItemContext().containsKey(
-                                            SnapshotRemover.MORE_TS_SNAPSHOTS_EXISTS_FOR_GAV ) )
-                                        {
-                                            // remove file from index
-                                            if ( getLogger().isDebugEnabled() )
-                                            {
-                                                getLogger().debug(
-                                                    "Deleting artifact " + ai.groupId + ":" + ai.artifactId + ":"
-                                                        + ai.version + " from index (DELETE)." );
-                                            }
-
-                                            nexusIndexer.deleteArtifactFromIndex( ac, context );
-                                        }
-                                        else
-                                        {
-                                            // do NOT remove file from index
-                                            if ( getLogger().isDebugEnabled() )
-                                            {
-                                                getLogger()
-                                                    .debug(
-                                                        "NOT deleting artifact "
-                                                            + ai.groupId
-                                                            + ":"
-                                                            + ai.artifactId
-                                                            + ":"
-                                                            + ai.version
-                                                            + " from index (DELETE), since it is a timestamped snapshot and more builds exists." );
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        else
-                        {
-                            if ( ievt instanceof RepositoryItemEventDelete )
-                            {
-                                // NEXUS-814: we should not delete always
-                                if ( !ievt.getItem().getItemContext().containsKey(
-                                    SnapshotRemover.MORE_TS_SNAPSHOTS_EXISTS_FOR_GAV ) )
-                                {
-                                    ArtifactInfo ai = new ArtifactInfo();
-
-                                    ai.groupId = gav.getGroupId();
-
-                                    ai.artifactId = gav.getArtifactId();
-
-                                    ai.version = gav.getVersion();
-
-                                    ai.classifier = gav.getClassifier();
-
-                                    ArtifactContext ac = new ArtifactContext( null, null, null, ai, null );
-
-                                    // remove file from index
-                                    if ( getLogger().isDebugEnabled() )
-                                    {
-                                        getLogger().debug(
-                                            "Deleting artifact " + ai.groupId + ":" + ai.artifactId + ":" + ai.version
-                                                + " from index (DELETE)." );
-                                    }
-
-                                    nexusIndexer.deleteArtifactFromIndex( ac, context );
-                                }
-                                else
-                                {
-                                    // do NOT remove file from index
-                                    if ( getLogger().isDebugEnabled() )
-                                    {
-                                        getLogger()
-                                            .debug(
-                                                "NOT deleting artifact "
-                                                    + gav.getGroupId()
-                                                    + ":"
-                                                    + gav.getArtifactId()
-                                                    + ":"
-                                                    + gav.getVersion()
-                                                    + " from index (DELETE), since it is a timestamped snapshot and more builds exists." );
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            catch ( Exception e ) // TODO be more specific
-            {
-                getLogger().error( "Could not maintain index!", e );
-            }
-        }
-    }
+    // == En Privee
 
     protected String getLocalContextId( String repositoryId )
     {

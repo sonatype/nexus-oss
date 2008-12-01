@@ -49,6 +49,8 @@ public interface IndexerManager
         throws IOException,
             NoSuchRepositoryException;
 
+    void resetConfiguration();
+
     /**
      * Returns the local index (the true index for hosted ones, and the true cacheds index for proxy reposes). Every
      * repo has local index.

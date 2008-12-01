@@ -43,7 +43,6 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationExce
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Startable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.StartingException;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.StoppingException;
-import org.sonatype.nexus.artifact.NexusItemInfo;
 import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
 import org.sonatype.nexus.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
@@ -79,23 +78,9 @@ import org.sonatype.nexus.proxy.NoSuchResourceStoreException;
 import org.sonatype.nexus.proxy.RepositoryNotAvailableException;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.cache.CacheManager;
-import org.sonatype.nexus.proxy.events.AbstractEvent;
-import org.sonatype.nexus.proxy.events.EventListener;
 import org.sonatype.nexus.proxy.events.NexusStartedEvent;
 import org.sonatype.nexus.proxy.events.NexusStoppedEvent;
-import org.sonatype.nexus.proxy.events.RepositoryEventLocalStatusChanged;
-import org.sonatype.nexus.proxy.events.RepositoryEventProxyModeChanged;
-import org.sonatype.nexus.proxy.events.RepositoryItemEvent;
-import org.sonatype.nexus.proxy.events.RepositoryItemEventCache;
-import org.sonatype.nexus.proxy.events.RepositoryItemEventDelete;
-import org.sonatype.nexus.proxy.events.RepositoryItemEventRetrieve;
-import org.sonatype.nexus.proxy.events.RepositoryItemEventStore;
-import org.sonatype.nexus.proxy.events.RepositoryRegistryEventAdd;
-import org.sonatype.nexus.proxy.events.RepositoryRegistryEventRemove;
-import org.sonatype.nexus.proxy.events.RepositoryRegistryEventUpdate;
-import org.sonatype.nexus.proxy.events.RepositoryRegistryRepositoryEvent;
 import org.sonatype.nexus.proxy.http.HttpProxyService;
-import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.item.StorageLinkItem;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
@@ -103,8 +88,6 @@ import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.registry.InvalidGroupingException;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.DefaultShadowRepository;
-import org.sonatype.nexus.proxy.repository.LocalStatus;
-import org.sonatype.nexus.proxy.repository.ProxyMode;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RepositoryType;
 import org.sonatype.nexus.proxy.router.RepositoryRouter;
@@ -138,7 +121,7 @@ import org.sonatype.scheduling.schedules.Schedule;
 @Component( role = Nexus.class )
 public class DefaultNexus
     extends AbstractLogEnabled
-    implements Nexus, Initializable, Startable, EventListener
+    implements Nexus, Initializable, Startable
 {
     /**
      * The nexus configuration.
@@ -1527,8 +1510,6 @@ public class DefaultNexus
     {
         systemStatus = new SystemStatus();
 
-        repositoryRegistry.addProximityEventListener( this );
-
         // EventInspectorHost -- BEGIN
         // tying in eventInspectorHost to all event producers
         repositoryRegistry.addProximityEventListener( eventInspectorHost );
@@ -1871,226 +1852,6 @@ public class DefaultNexus
             shadowTemplate.setName( "Default Virtual Repository Template" );
 
             createRepositoryShadowTemplate( shadowTemplate, shouldRecreate );
-        }
-    }
-
-    // ===========================
-    // Event handling
-
-    public void onProximityEvent( AbstractEvent evt )
-    {
-        try
-        {
-            if ( ConfigurationChangeEvent.class.isAssignableFrom( evt.getClass() ) )
-            {
-                systemStatus.setLastConfigChange( new Date() );
-
-                addSystemEvent( FeedRecorder.SYSTEM_CONFIG_ACTION, "Nexus configuration changed/updated." );
-            }
-            else if ( evt instanceof RepositoryItemEvent )
-            {
-                RepositoryItemEvent ievt = (RepositoryItemEvent) evt;
-
-                if ( ievt instanceof RepositoryItemEventRetrieve )
-                {
-                    // RETRIEVE event creates a lot of noise in events,
-                    // so we are not processing those
-                    return;
-                }
-
-                if ( ievt.getItemUid().getPath().endsWith( ".pom" ) || ievt.getItemUid().getPath().endsWith( ".jar" ) )
-                {
-                    // filter out links and dirs/collections
-                    if ( StorageFileItem.class.isAssignableFrom( ievt.getItem().getClass() ) )
-                    {
-                        StorageFileItem pomItem = (StorageFileItem) ievt.getItem();
-
-                        NexusArtifactEvent nae = new NexusArtifactEvent();
-                        NexusItemInfo ai = new NexusItemInfo();
-                        ai.setRepositoryId( pomItem.getRepositoryId() );
-                        ai.setPath( pomItem.getPath() );
-                        ai.setRemoteUrl( pomItem.getRemoteUrl() );
-                        nae.setNexusItemInfo( ai );
-                        nae.setEventDate( ievt.getEventDate() );
-                        nae.setEventContext( ievt.getContext() );
-
-                        if ( ievt instanceof RepositoryItemEventCache )
-                        {
-                            nae.setAction( NexusArtifactEvent.ACTION_CACHED );
-                        }
-                        else if ( ievt instanceof RepositoryItemEventStore )
-                        {
-                            nae.setAction( NexusArtifactEvent.ACTION_DEPLOYED );
-                        }
-                        else if ( ievt instanceof RepositoryItemEventDelete )
-                        {
-                            nae.setAction( NexusArtifactEvent.ACTION_DELETED );
-                        }
-                        else
-                        {
-                            return;
-                        }
-
-                        addNexusArtifactEvent( nae );
-                    }
-
-                }
-            }
-            else if ( evt instanceof RepositoryRegistryRepositoryEvent )
-            {
-                RepositoryRegistryRepositoryEvent revt = (RepositoryRegistryRepositoryEvent) evt;
-
-                StringBuffer sb = new StringBuffer( " repository " );
-
-                sb.append( revt.getRepository().getName() );
-
-                sb.append( " (ID=" );
-
-                sb.append( revt.getRepository().getId() );
-
-                sb.append( ") " );
-
-                if ( RepositoryType.PROXY.equals( revt.getRepository().getRepositoryType() ) )
-                {
-                    sb.append( " as proxy repository for URL " );
-
-                    sb.append( revt.getRepository().getRemoteUrl() );
-                }
-                else if ( RepositoryType.HOSTED.equals( revt.getRepository().getRepositoryType() ) )
-                {
-                    sb.append( " as hosted repository" );
-                }
-                else if ( RepositoryType.SHADOW.equals( revt.getRepository().getRepositoryType() ) )
-                {
-                    sb.append( " as " );
-
-                    sb.append( revt.getRepository().getClass().getName() );
-
-                    sb.append( " virtual repository for " );
-
-                    sb.append( ( (DefaultShadowRepository) revt.getRepository() ).getMasterRepository().getName() );
-
-                    sb.append( " (ID=" );
-
-                    sb.append( ( (DefaultShadowRepository) revt.getRepository() ).getMasterRepository().getId() );
-
-                    sb.append( ") " );
-                }
-
-                sb.append( "." );
-
-                if ( revt instanceof RepositoryRegistryEventAdd )
-                {
-                    sb.insert( 0, "Registered" );
-                }
-                else if ( revt instanceof RepositoryRegistryEventRemove )
-                {
-                    sb.insert( 0, "Unregistered" );
-                }
-                else if ( revt instanceof RepositoryRegistryEventUpdate )
-                {
-                    sb.insert( 0, "Updated" );
-                }
-
-                addSystemEvent( FeedRecorder.SYSTEM_CONFIG_ACTION, sb.toString() );
-            }
-            else if ( evt instanceof RepositoryEventLocalStatusChanged )
-            {
-                RepositoryEventLocalStatusChanged revt = (RepositoryEventLocalStatusChanged) evt;
-
-                StringBuffer sb = new StringBuffer( "The repository '" );
-
-                sb.append( revt.getRepository().getName() );
-
-                sb.append( "' (ID='" ).append( revt.getRepository().getId() ).append( "') was put " );
-
-                if ( LocalStatus.IN_SERVICE.equals( revt.getRepository().getLocalStatus() ) )
-                {
-                    sb.append( "IN SERVICE." );
-                }
-                else if ( LocalStatus.OUT_OF_SERVICE.equals( revt.getRepository().getLocalStatus() ) )
-                {
-                    sb.append( "OUT OF SERVICE." );
-                }
-                else
-                {
-                    sb.append( revt.getRepository().getLocalStatus().toString() ).append( "." );
-                }
-
-                sb.append( " The previous state was " );
-
-                if ( LocalStatus.IN_SERVICE.equals( revt.getOldLocalStatus() ) )
-                {
-                    sb.append( "IN SERVICE." );
-                }
-                else if ( LocalStatus.OUT_OF_SERVICE.equals( revt.getOldLocalStatus() ) )
-                {
-                    sb.append( "OUT OF SERVICE." );
-                }
-                else
-                {
-                    sb.append( revt.getOldLocalStatus().toString() ).append( "." );
-                }
-
-                addSystemEvent( FeedRecorder.SYSTEM_REPO_LSTATUS_CHANGES_ACTION, sb.toString() );
-            }
-            else if ( evt instanceof RepositoryEventProxyModeChanged )
-            {
-                RepositoryEventProxyModeChanged revt = (RepositoryEventProxyModeChanged) evt;
-
-                StringBuffer sb = new StringBuffer( "The proxy mode of repository '" );
-
-                sb.append( revt.getRepository().getName() );
-
-                sb.append( "' (ID='" ).append( revt.getRepository().getId() ).append( "') was set to " );
-
-                if ( ProxyMode.ALLOW.equals( revt.getRepository().getProxyMode() ) )
-                {
-                    sb.append( "Allow." );
-                }
-                else if ( ProxyMode.BLOCKED_AUTO.equals( revt.getRepository().getProxyMode() ) )
-                {
-                    sb.append( "Blocked (auto)." );
-                }
-                else if ( ProxyMode.BLOKED_MANUAL.equals( revt.getRepository().getProxyMode() ) )
-                {
-                    sb.append( "Blocked (by user)." );
-                }
-                else
-                {
-                    sb.append( revt.getRepository().getProxyMode().toString() ).append( "." );
-                }
-
-                sb.append( " The previous state was " );
-
-                if ( ProxyMode.ALLOW.equals( revt.getOldProxyMode() ) )
-                {
-                    sb.append( "Allow." );
-                }
-                else if ( ProxyMode.BLOCKED_AUTO.equals( revt.getOldProxyMode() ) )
-                {
-                    sb.append( "Blocked (auto)." );
-                }
-                else if ( ProxyMode.BLOKED_MANUAL.equals( revt.getOldProxyMode() ) )
-                {
-                    sb.append( "Blocked (by user)." );
-                }
-                else
-                {
-                    sb.append( revt.getOldProxyMode().toString() ).append( "." );
-                }
-
-                if ( revt.getCause() != null )
-                {
-                    sb.append( " Last detected transport error: " ).append( revt.getCause().getMessage() );
-                }
-
-                addSystemEvent( FeedRecorder.SYSTEM_REPO_PSTATUS_CHANGES_ACTION, sb.toString() );
-            }
-        }
-        catch ( Exception e )
-        {
-            getLogger().warn( "Error during Nexus event handling:", e );
         }
     }
 
