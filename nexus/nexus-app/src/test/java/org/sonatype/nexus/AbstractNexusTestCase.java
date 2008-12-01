@@ -91,10 +91,10 @@ public abstract class AbstractNexusTestCase
     protected void setUp()
         throws Exception
     {
-        FileUtils.deleteDirectory( PLEXUS_HOME );
-        
         super.setUp();
 
+        FileUtils.deleteDirectory( PLEXUS_HOME );
+        
         PLEXUS_HOME.mkdirs();
         WORK_HOME.mkdirs();
         CONF_HOME.mkdirs();
