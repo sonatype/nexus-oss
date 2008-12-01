@@ -468,6 +468,10 @@ public class DefaultIndexingContext
         if ( indexSearcher != null )
         {
             indexSearcher.close();
+
+            // the reader was supplied explicitly
+            indexSearcher.getIndexReader().close();
+
             indexSearcher = null;
         }
         if ( indexReader != null )
