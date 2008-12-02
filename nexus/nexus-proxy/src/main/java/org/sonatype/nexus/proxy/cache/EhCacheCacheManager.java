@@ -85,6 +85,8 @@ public class EhCacheCacheManager
         ehCacheManager.removalAll();
 
         ehCacheManager.shutdown();
+        
+        ehCacheManager  = null;
     }
 
     private void constructEhCacheManager()
