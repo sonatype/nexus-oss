@@ -173,13 +173,6 @@ public class DefaultIndexerManager
     {
         Repository repository = repositoryRegistry.getRepository( repositoryId );
 
-        String remoteRoot = null;
-
-        if ( repository.getRemoteUrl() != null )
-        {
-            remoteRoot = repository.getRemoteUrl();
-        }
-
         File repoRoot = getRepositoryLocalStorageAsFile( repository );
 
         // add context for repository
@@ -188,17 +181,11 @@ public class DefaultIndexerManager
             repository.getId(),
             repoRoot,
             new File( getWorkingDirectory(), getLocalContextId( repository.getId() ) ),
-            remoteRoot,
+            repository.getRemoteUrl(),
             null,
             NexusIndexer.FULL_INDEX );
 
         ctxLocal.setSearchable( repository.isIndexable() );
-
-        // if ( ctxLocal.getTimestamp() == null )
-        // {
-        // // it is probably new or first start
-        // ctxLocal.updateTimestamp();
-        // }
 
         if ( RepositoryType.PROXY.equals( repository.getRepositoryType() ) )
         {
@@ -207,17 +194,11 @@ public class DefaultIndexerManager
                 repository.getId(),
                 repoRoot,
                 new File( getWorkingDirectory(), getRemoteContextId( repository.getId() ) ),
-                remoteRoot,
-                remoteRoot,
+                repository.getRemoteUrl(),
+                repository.getRemoteUrl(),
                 NexusIndexer.FULL_INDEX );
 
             ctxRemote.setSearchable( repository.isIndexable() );
-
-            // if ( ctxRemote.getTimestamp() == null )
-            // {
-            // // it is probably new or first start
-            // ctxRemote.updateTimestamp();
-            // }
         }
     }
 
@@ -250,11 +231,45 @@ public class DefaultIndexerManager
 
         ctx.setRepository( repoRoot );
 
-        if ( nexusIndexer.getIndexingContexts().containsKey( getRemoteContextId( repository.getId() ) ) )
-        {
-            ctx = nexusIndexer.getIndexingContexts().get( getRemoteContextId( repository.getId() ) );
+        ctx.setRepositoryUrl( repository.getRemoteUrl() );
 
-            ctx.setRepository( repoRoot );
+        // watch for HOSTED -> PROXY and PROXY -> HOSTED transitions (existence of the remote idx context)
+        if ( RepositoryType.PROXY.equals( repository.getRepositoryType() ) )
+        {
+            if ( nexusIndexer.getIndexingContexts().containsKey( getRemoteContextId( repository.getId() ) ) )
+            {
+                // good, it should have remote context and there is already one
+                ctx = nexusIndexer.getIndexingContexts().get( getRemoteContextId( repository.getId() ) );
+
+                ctx.setRepository( repoRoot );
+
+                ctx.setRepositoryUrl( repository.getRemoteUrl() );
+
+                ctx.setIndexUpdateUrl( repository.getRemoteUrl() );
+            }
+            else
+            {
+                // it should have remote context, but there is none. Create one on the fly.
+                IndexingContext ctxRemote = nexusIndexer.addIndexingContextForced(
+                    getRemoteContextId( repository.getId() ),
+                    repository.getId(),
+                    repoRoot,
+                    new File( getWorkingDirectory(), getRemoteContextId( repository.getId() ) ),
+                    repository.getRemoteUrl(),
+                    repository.getRemoteUrl(),
+                    NexusIndexer.FULL_INDEX );
+
+                ctxRemote.setSearchable( repository.isIndexable() );
+            }
+        }
+        else
+        {
+            if ( nexusIndexer.getIndexingContexts().containsKey( getRemoteContextId( repository.getId() ) ) )
+            {
+                // bad, it should have no remote context and there is already one
+                nexusIndexer.removeIndexingContext( nexusIndexer.getIndexingContexts().get(
+                    getRemoteContextId( repositoryId ) ), true );
+            }
         }
     }
 
