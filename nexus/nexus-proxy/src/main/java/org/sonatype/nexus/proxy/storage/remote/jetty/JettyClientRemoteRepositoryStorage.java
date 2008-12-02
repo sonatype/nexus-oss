@@ -29,7 +29,7 @@ import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 public class JettyClientRemoteRepositoryStorage
     extends AbstractRemoteRepositoryStorage
 {
-    public static final String JETTY_CLIENT_KEY = "jettyClient";
+    public static final String CTX_KEY = "jettyClient";
 
     @Override
     protected void updateContext( Repository repository, RemoteStorageContext context )
@@ -111,7 +111,7 @@ public class JettyClientRemoteRepositoryStorage
 
             jettyClient.start();
 
-            context.putRemoteConnectionContextObject( JETTY_CLIENT_KEY, jettyClient );
+            context.putRemoteConnectionContextObject( CTX_KEY, jettyClient );
         }
         catch ( Exception e )
         {
@@ -126,7 +126,7 @@ public class JettyClientRemoteRepositoryStorage
 
         ContainsHttpExchange contains = new ContainsHttpExchange( uid, newerThen );
 
-        setUpExchange( contains, rsc );
+        setUpExchange( contains, rsc, uid );
 
         executeRequest( rsc, contains );
 
@@ -148,7 +148,7 @@ public class JettyClientRemoteRepositoryStorage
 
         RetrieveHttpExchange retrieve = new RetrieveHttpExchange( uid );
 
-        setUpExchange( retrieve, rsc );
+        setUpExchange( retrieve, rsc, uid );
 
         executeRequest( rsc, retrieve );
 
@@ -163,7 +163,7 @@ public class JettyClientRemoteRepositoryStorage
 
         StoreHttpExchange store = new StoreHttpExchange( item );
 
-        setUpExchange( store, rsc );
+        setUpExchange( store, rsc, item.getRepositoryItemUid() );
 
         executeRequest( rsc, store );
 
@@ -186,7 +186,7 @@ public class JettyClientRemoteRepositoryStorage
 
         DeleteHttpExchange delete = new DeleteHttpExchange( uid );
 
-        setUpExchange( delete, rsc );
+        setUpExchange( delete, rsc, uid );
 
         executeRequest( rsc, delete );
 
@@ -213,7 +213,7 @@ public class JettyClientRemoteRepositoryStorage
 
     // ----
 
-    protected void setUpExchange( AbstractNexusExchange exchange, RemoteStorageContext context )
+    protected void setUpExchange( AbstractNexusExchange exchange, RemoteStorageContext context, RepositoryItemUid uid )
         throws StorageException
     {
         URL requestURL = getAbsoluteUrlFromBase( exchange.getRepositoryItemUid() );
@@ -226,8 +226,8 @@ public class JettyClientRemoteRepositoryStorage
         {
             if ( !StringUtils.isEmpty( rcs.getUserAgentString() ) )
             {
-                exchange.setRequestHeader( HttpHeaders.USER_AGENT, getRemoteConnectionSettings( context )
-                    .getUserAgentString() );
+                exchange
+                    .setRequestHeader( HttpHeaders.USER_AGENT, formatUserAgentString( context, uid.getRepository() ) );
             }
 
             if ( !StringUtils.isEmpty( rcs.getQueryString() ) )
@@ -251,7 +251,7 @@ public class JettyClientRemoteRepositoryStorage
     protected void executeRequest( RemoteStorageContext context, AbstractNexusExchange exchange )
         throws StorageException
     {
-        HttpClient jettyClient = (HttpClient) context.getRemoteConnectionContextObject( JETTY_CLIENT_KEY );
+        HttpClient jettyClient = (HttpClient) context.getRemoteConnectionContextObject( CTX_KEY );
 
         try
         {
@@ -263,5 +263,10 @@ public class JettyClientRemoteRepositoryStorage
         {
             throw new StorageException( "Could not send HttpExchange!", e );
         }
+    }
+
+    public String getName()
+    {
+        return CTX_KEY;
     }
 }

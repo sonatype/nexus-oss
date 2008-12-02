@@ -34,6 +34,7 @@ import org.sonatype.nexus.proxy.maven.maven2.M2Repository;
 import org.sonatype.nexus.proxy.registry.InvalidGroupingException;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.storage.remote.DefaultRemoteStorageContext;
+import org.sonatype.nexus.proxy.storage.remote.RemoteRepositoryStorage;
 import org.sonatype.nexus.proxy.storage.remote.commonshttpclient.CommonsHttpClientRemoteStorage;
 
 /**
@@ -75,8 +76,9 @@ public class M2TestsuiteEnvironmentBuilder
             {
                 // we have a protected repo, cannot share remote peer
                 // auth should be set somewhere else
-                CommonsHttpClientRemoteStorage rs = new CommonsHttpClientRemoteStorage();
-                rs.enableLogging( env.getLogger().getChildLogger( "RS" + repo.getId() ) );
+                CommonsHttpClientRemoteStorage rs = (CommonsHttpClientRemoteStorage) env.getPlexusContainer().lookup(
+                    RemoteRepositoryStorage.class,
+                    "apacheHttpClient3x" );
                 repo.setRemoteStorage( rs );
                 repo.setRemoteStorageContext( new DefaultRemoteStorageContext( env.getRemoteStorageContext() ) );
             }
@@ -93,7 +95,7 @@ public class M2TestsuiteEnvironmentBuilder
         }
 
         // ading one hosted only
-        M2Repository repo = (M2Repository) container.lookup( Repository.class, "maven2" ); 
+        M2Repository repo = (M2Repository) container.lookup( Repository.class, "maven2" );
         // repo.enableLogging( env.getLogger().getChildLogger( "REPO" + repo.getId() ) );
         repo.setId( "inhouse" );
         repo.setLocalUrl( env
@@ -104,17 +106,16 @@ public class M2TestsuiteEnvironmentBuilder
         reposes.add( repo.getId() );
         env.getRepositoryRegistry().addRepository( repo );
 
-        //add a hosted snapshot repo
-        M2Repository repoSnapshot = (M2Repository) container.lookup( Repository.class, "maven2" ); 
+        // add a hosted snapshot repo
+        M2Repository repoSnapshot = (M2Repository) container.lookup( Repository.class, "maven2" );
         repoSnapshot.setId( "inhouse-snapshot" );
         repoSnapshot.setRepositoryPolicy( RepositoryPolicy.SNAPSHOT );
-        repoSnapshot.setLocalUrl( env
-            .getApplicationConfiguration().getWorkingDirectory( "proxy/store/" + repoSnapshot.getId() ).toURI().toURL()
-            .toString() );
+        repoSnapshot.setLocalUrl( env.getApplicationConfiguration().getWorkingDirectory(
+            "proxy/store/" + repoSnapshot.getId() ).toURI().toURL().toString() );
         repoSnapshot.setLocalStorage( env.getLocalRepositoryStorage() );
         reposes.add( repoSnapshot.getId() );
         env.getRepositoryRegistry().addRepository( repoSnapshot );
-        
+
         try
         {
             env.getRepositoryRegistry().addRepositoryGroup( "test", reposes );

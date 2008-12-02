@@ -402,8 +402,7 @@ public class ApacheHttpClientRemoteStorage
 
         if ( getRemoteConnectionSettings( ctx ).getUserAgentString() != null )
         {
-            request
-                .setHeader( new BasicHeader( "user-agent", getRemoteConnectionSettings( ctx ).getUserAgentString() ) );
+            request.setHeader( new BasicHeader( "user-agent", formatUserAgentString( ctx, repository ) ) );
         }
         // request.setHeader( new BasicHeader( "accept", "*/*" ) );
         // request.setHeader( new BasicHeader( "accept-language", "en-us" ) );
@@ -504,5 +503,10 @@ public class ApacheHttpClientRemoteStorage
             // length of ungzipped content is not known
             return -1;
         }
+    }
+
+    public String getName()
+    {
+        return CTX_KEY;
     }
 }

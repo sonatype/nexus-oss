@@ -33,7 +33,7 @@
 		<connectionTimeout>10000</connectionTimeout>
 		<retrievalRetryCount>3</retrievalRetryCount>
 		<queryString></queryString>
-		<userAgentString>Nexus/1.0</userAgentString>
+		<userAgentString></userAgentString>
 	</globalConnectionSettings>
 
 	<routing>

@@ -432,11 +432,7 @@ public class CommonsHttpClientRemoteStorage
         HostConfiguration httpConfiguration = (HostConfiguration) ctx.getRemoteConnectionContext().get(
             CTX_KEY_HTTP_CONFIGURATION );
 
-        if ( getRemoteConnectionSettings( ctx ).getUserAgentString() != null )
-        {
-            method
-                .setRequestHeader( new Header( "user-agent", getRemoteConnectionSettings( ctx ).getUserAgentString() ) );
-        }
+        method.setRequestHeader( new Header( "user-agent", formatUserAgentString( ctx, uid.getRepository() ) ) );
         method.setRequestHeader( new Header( "accept", "*/*" ) );
         method.setRequestHeader( new Header( "accept-language", "en-us" ) );
         method.setRequestHeader( new Header( "accept-encoding", "gzip, identity" ) );
@@ -507,4 +503,10 @@ public class CommonsHttpClientRemoteStorage
         }
         return result;
     }
+
+    public String getName()
+    {
+        return CTX_KEY;
+    }
+
 }

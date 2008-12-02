@@ -221,10 +221,12 @@ public class Upgrade106to107
             {
                 cs.setQueryString( old.getQueryString() );
             }
-            if ( old.getUserAgentString() != null )
-            {
-                cs.setUserAgentString( old.getUserAgentString() );
-            }
+            // nullify userAgentString!
+            // if ( old.getUserAgentString() != null )
+            // {
+            // cs.setUserAgentString( old.getUserAgentString() );
+            // }
+            cs.setUserAgentString( null );
         }
         return cs;
     }

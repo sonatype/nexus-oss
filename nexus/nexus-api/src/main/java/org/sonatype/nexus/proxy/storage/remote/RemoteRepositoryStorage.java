@@ -122,4 +122,11 @@ public interface RemoteRepositoryStorage
      */
     void validateStorageUrl( String url )
         throws StorageException;
+
+    /**
+     * Returns a designator to identify the remote storage implementation (hint: for example the Plexus role hint).
+     * 
+     * @return
+     */
+    String getName();
 }

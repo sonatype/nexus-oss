@@ -208,9 +208,10 @@ public class DefaultNexus
     private EventInspectorHost eventInspectorHost;
 
     /**
-     * System status.
+     * The status holding component.
      */
-    private SystemStatus systemStatus;
+    @Requirement
+    private ApplicationStatusSource applicationStatusSource;
 
     // ----------------------------------------------------------------------------------------------------------
     // Template names and prefixes, not allowed to go out of this class
@@ -236,7 +237,7 @@ public class DefaultNexus
 
     public SystemStatus getSystemStatus()
     {
-        return systemStatus;
+        return applicationStatusSource.getSystemStatus();
     }
 
     public boolean setState( SystemState state )
@@ -1508,8 +1509,6 @@ public class DefaultNexus
     public void initialize()
         throws InitializationException
     {
-        systemStatus = new SystemStatus();
-
         // EventInspectorHost -- BEGIN
         // tying in eventInspectorHost to all event producers
         repositoryRegistry.addProximityEventListener( eventInspectorHost );
@@ -1519,11 +1518,11 @@ public class DefaultNexus
         security.addProximityEventListener( eventInspectorHost );
         // EventInspectorHost -- END
 
-        systemStatus.setState( SystemState.STOPPED );
+        applicationStatusSource.setState( SystemState.STOPPED );
 
-        systemStatus.setOperationMode( OperationMode.STANDALONE );
+        applicationStatusSource.getSystemStatus().setOperationMode( OperationMode.STANDALONE );
 
-        systemStatus.setInitializedAt( new Date() );
+        applicationStatusSource.getSystemStatus().setInitializedAt( new Date() );
 
         try
         {
@@ -1537,7 +1536,7 @@ public class DefaultNexus
                 props.load( is );
             }
 
-            systemStatus.setVersion( props.getProperty( "version" ) );
+            applicationStatusSource.getSystemStatus().setVersion( props.getProperty( "version" ) );
         }
         catch ( IOException e )
         {
@@ -1545,10 +1544,10 @@ public class DefaultNexus
                 "Could not load/read Nexus version from /META-INF/maven/org.sonatype.nexus/nexus-app/pom.properties",
                 e );
 
-            systemStatus.setVersion( "unknown" );
+            applicationStatusSource.getSystemStatus().setVersion( "unknown" );
         }
 
-        getLogger().info( "Initialized Nexus (version " + systemStatus.getVersion() + ")" );
+        getLogger().info( "Initialized Nexus (version " + applicationStatusSource.getSystemStatus().getVersion() + ")" );
     }
 
     public void start()
@@ -1580,7 +1579,7 @@ public class DefaultNexus
     public void startService()
         throws Exception
     {
-        systemStatus.setState( SystemState.STARTING );
+        applicationStatusSource.getSystemStatus().setState( SystemState.STARTING );
 
         try
         {
@@ -1600,39 +1599,39 @@ public class DefaultNexus
 
             nexusScheduler.startService();
 
-            addSystemEvent( FeedRecorder.SYSTEM_BOOT_ACTION, "Starting Nexus (version " + systemStatus.getVersion()
+            addSystemEvent( FeedRecorder.SYSTEM_BOOT_ACTION, "Starting Nexus (version " + applicationStatusSource.getSystemStatus().getVersion()
                 + ")" );
 
-            systemStatus.setLastConfigChange( new Date() );
+            applicationStatusSource.getSystemStatus().setLastConfigChange( new Date() );
 
-            systemStatus.setConfigurationValidationResponse( nexusConfiguration
+            applicationStatusSource.getSystemStatus().setConfigurationValidationResponse( nexusConfiguration
                 .getConfigurationSource().getValidationResponse() );
 
-            systemStatus.setFirstStart( nexusConfiguration.isConfigurationDefaulted() );
+            applicationStatusSource.getSystemStatus().setFirstStart( nexusConfiguration.isConfigurationDefaulted() );
 
-            systemStatus.setInstanceUpgraded( nexusConfiguration.isInstanceUpgraded() );
+            applicationStatusSource.getSystemStatus().setInstanceUpgraded( nexusConfiguration.isInstanceUpgraded() );
 
-            systemStatus.setConfigurationUpgraded( nexusConfiguration.isConfigurationUpgraded() );
+            applicationStatusSource.getSystemStatus().setConfigurationUpgraded( nexusConfiguration.isConfigurationUpgraded() );
 
             // creating default templates if needed
-            createDefaultTemplate( TEMPLATE_DEFAULT_HOSTED_RELEASE, systemStatus.isInstanceUpgraded() );
+            createDefaultTemplate( TEMPLATE_DEFAULT_HOSTED_RELEASE, applicationStatusSource.getSystemStatus().isInstanceUpgraded() );
 
-            createDefaultTemplate( TEMPLATE_DEFAULT_HOSTED_SNAPSHOT, systemStatus.isInstanceUpgraded() );
+            createDefaultTemplate( TEMPLATE_DEFAULT_HOSTED_SNAPSHOT, applicationStatusSource.getSystemStatus().isInstanceUpgraded() );
 
-            createDefaultTemplate( TEMPLATE_DEFAULT_PROXY_RELEASE, systemStatus.isInstanceUpgraded() );
+            createDefaultTemplate( TEMPLATE_DEFAULT_PROXY_RELEASE, applicationStatusSource.getSystemStatus().isInstanceUpgraded() );
 
-            createDefaultTemplate( TEMPLATE_DEFAULT_PROXY_SNAPSHOT, systemStatus.isInstanceUpgraded() );
+            createDefaultTemplate( TEMPLATE_DEFAULT_PROXY_SNAPSHOT, applicationStatusSource.getSystemStatus().isInstanceUpgraded() );
 
-            createDefaultTemplate( TEMPLATE_DEFAULT_VIRTUAL, systemStatus.isInstanceUpgraded() );
+            createDefaultTemplate( TEMPLATE_DEFAULT_VIRTUAL, applicationStatusSource.getSystemStatus().isInstanceUpgraded() );
 
-            if ( systemStatus.isFirstStart() )
+            if ( applicationStatusSource.getSystemStatus().isFirstStart() )
             {
                 getLogger().info( "This is 1st start of new Nexus instance." );
 
                 // TODO: a virgin instance, inital config created
             }
 
-            if ( systemStatus.isInstanceUpgraded() )
+            if ( applicationStatusSource.getSystemStatus().isInstanceUpgraded() )
             {
                 getLogger().info( "This is an upgraded instance of Nexus." );
 
@@ -1642,24 +1641,24 @@ public class DefaultNexus
             // sync shadows now, those needed
             synchronizeShadowsAtStartup();
 
-            systemStatus.setState( SystemState.STARTED );
+            applicationStatusSource.getSystemStatus().setState( SystemState.STARTED );
 
-            systemStatus.setStartedAt( new Date() );
+            applicationStatusSource.getSystemStatus().setStartedAt( new Date() );
 
             getLogger().info( "Nexus Work Directory : " + nexusConfiguration.getWorkingDirectory().toString() );
 
-            getLogger().info( "Started Nexus (version " + systemStatus.getVersion() + ")" );
+            getLogger().info( "Started Nexus (version " + applicationStatusSource.getSystemStatus().getVersion() + ")" );
 
             nexusConfiguration.notifyProximityEventListeners( new NexusStartedEvent() );
         }
         catch ( IOException e )
         {
-            systemStatus.setState( SystemState.BROKEN_IO );
+            applicationStatusSource.getSystemStatus().setState( SystemState.BROKEN_IO );
 
-            systemStatus.setConfigurationValidationResponse( nexusConfiguration
+            applicationStatusSource.getSystemStatus().setConfigurationValidationResponse( nexusConfiguration
                 .getConfigurationSource().getValidationResponse() );
 
-            systemStatus.setErrorCause( e );
+            applicationStatusSource.getSystemStatus().setErrorCause( e );
 
             getLogger().error( "Could not start Nexus, bad IO exception!", e );
 
@@ -1667,12 +1666,12 @@ public class DefaultNexus
         }
         catch ( ConfigurationException e )
         {
-            systemStatus.setState( SystemState.BROKEN_CONFIGURATION );
+            applicationStatusSource.getSystemStatus().setState( SystemState.BROKEN_CONFIGURATION );
 
-            systemStatus.setConfigurationValidationResponse( nexusConfiguration
+            applicationStatusSource.getSystemStatus().setConfigurationValidationResponse( nexusConfiguration
                 .getConfigurationSource().getValidationResponse() );
 
-            systemStatus.setErrorCause( e );
+            applicationStatusSource.getSystemStatus().setErrorCause( e );
 
             getLogger().error( "Could not start Nexus, user configuration exception!", e );
 
@@ -1683,9 +1682,9 @@ public class DefaultNexus
     public void stopService()
         throws Exception
     {
-        systemStatus.setState( SystemState.STOPPING );
+        applicationStatusSource.getSystemStatus().setState( SystemState.STOPPING );
 
-        addSystemEvent( FeedRecorder.SYSTEM_BOOT_ACTION, "Stopping Nexus (version " + systemStatus.getVersion() + ")" );
+        addSystemEvent( FeedRecorder.SYSTEM_BOOT_ACTION, "Stopping Nexus (version " + applicationStatusSource.getSystemStatus().getVersion() + ")" );
 
         nexusConfiguration.notifyProximityEventListeners( new NexusStoppedEvent() );
 
@@ -1717,9 +1716,9 @@ public class DefaultNexus
 
         nexusConfiguration.dropInternals();
 
-        systemStatus.setState( SystemState.STOPPED );
+        applicationStatusSource.getSystemStatus().setState( SystemState.STOPPED );
 
-        getLogger().info( "Stopped Nexus (version " + systemStatus.getVersion() + ")" );
+        getLogger().info( "Stopped Nexus (version " + applicationStatusSource.getSystemStatus().getVersion() + ")" );
     }
 
     private void synchronizeShadowsAtStartup()

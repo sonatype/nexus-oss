@@ -34,7 +34,12 @@ public class SystemStatus
     /**
      * The Nexus Application version.
      */
-    private String version;
+    private String version = "unknown";
+
+    /**
+     * The Nexus Application edition.
+     */
+    private String edition = "OSS";
 
     /**
      * The Nexus Application state.
@@ -94,6 +99,16 @@ public class SystemStatus
     public void setVersion( String version )
     {
         this.version = version;
+    }
+
+    public String getEdition()
+    {
+        return edition;
+    }
+
+    public void setEdition( String edition )
+    {
+        this.edition = edition;
     }
 
     public SystemState getState()

@@ -25,6 +25,8 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.sonatype.nexus.ApplicationStatusSource;
+import org.sonatype.nexus.SystemStatus;
 import org.sonatype.nexus.configuration.model.CRemoteAuthentication;
 import org.sonatype.nexus.configuration.model.CRemoteConnectionSettings;
 import org.sonatype.nexus.configuration.model.CRemoteHttpProxySettings;
@@ -42,6 +44,15 @@ public abstract class AbstractRemoteRepositoryStorage
     extends LoggingComponent
     implements RemoteRepositoryStorage
 {
+    /**
+     * @plexus.requirement
+     */
+    private ApplicationStatusSource applicationStatusSource;
+
+    /**
+     * The lazily calculated invariant part of the UserAgentString.
+     */
+    private String userAgentPlatformInfo;
 
     /**
      * Since storages are shared, we are tracking the last changes from each of them.
@@ -139,6 +150,41 @@ public abstract class AbstractRemoteRepositoryStorage
     }
 
     // helper methods
+
+    private String getUserAgentPlatformInfo()
+    {
+        if ( userAgentPlatformInfo == null )
+        {
+            SystemStatus status = applicationStatusSource.getSystemStatus();
+
+            userAgentPlatformInfo = new StringBuffer( "Nexus/" ).append( status.getVersion() ).append( " (" ).append(
+                status.getEdition() ).append( "; " ).append( System.getProperty( "os.name" ) ).append( "; " ).append(
+                System.getProperty( "os.version" ) ).append( "; " ).append( System.getProperty( "os.arch" ) ).append(
+                "; " ).append( System.getProperty( "java.version" ) ).append( ") " ).toString();
+        }
+
+        return userAgentPlatformInfo;
+    }
+
+    protected String formatUserAgentString( RemoteStorageContext ctx, Repository repository )
+        throws StorageException
+    {
+        StringBuffer buf = new StringBuffer( getUserAgentPlatformInfo() );
+
+        SystemStatus status = applicationStatusSource.getSystemStatus();
+
+        buf.append( getName() ).append( "/" ).append( status.getVersion() );
+
+        // user customization
+        CRemoteConnectionSettings remoteConnectionSettings = getRemoteConnectionSettings( ctx );
+
+        if ( remoteConnectionSettings.getUserAgentString() != null )
+        {
+            buf.append( " " ).append( remoteConnectionSettings.getUserAgentString() );
+        }
+
+        return buf.toString();
+    }
 
     protected CRemoteConnectionSettings getRemoteConnectionSettings( RemoteStorageContext ctx )
     {

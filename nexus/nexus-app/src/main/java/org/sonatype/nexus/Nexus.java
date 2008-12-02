@@ -65,15 +65,8 @@ import org.sonatype.scheduling.schedules.Schedule;
  * @author cstamas
  */
 public interface Nexus
-    extends MutableConfiguration, NexusService
+    extends ApplicationStatusSource, MutableConfiguration, NexusService
 {
-    // ------------------------------------------------------------------
-    // Status
-
-    SystemStatus getSystemStatus();
-
-    boolean setState( SystemState state );
-
     // ------------------------------------------------------------------
     // Configuration
 
@@ -169,7 +162,7 @@ public interface Nexus
     void rebuildAttributesRepositoryGroup( String path, String repositoryGroupId )
         throws NoSuchRepositoryGroupException,
             IOException;
-    
+
     void rebuildMavenMetadataAllRepositories( String path )
         throws IOException;
 
@@ -220,7 +213,8 @@ public interface Nexus
 
     List<NexusArtifactEvent> getRecentlyStorageChanges( Integer from, Integer count, Set<String> repositoryIds );
 
-    List<NexusArtifactEvent> getRecentlyDeployedOrCachedArtifacts( Integer from, Integer count, Set<String> repositoryIds );
+    List<NexusArtifactEvent> getRecentlyDeployedOrCachedArtifacts( Integer from, Integer count,
+        Set<String> repositoryIds );
 
     List<NexusArtifactEvent> getRecentlyCachedArtifacts( Integer from, Integer count, Set<String> repositoryIds );
 

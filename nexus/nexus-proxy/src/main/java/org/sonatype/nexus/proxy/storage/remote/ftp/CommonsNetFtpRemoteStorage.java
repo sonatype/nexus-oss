@@ -295,4 +295,9 @@ public class CommonsNetFtpRemoteStorage
         fItem.setCreated( fItem.getModified() );
         return fItem;
     }
+
+    public String getName()
+    {
+        return CTX_KEY;
+    }
 }
