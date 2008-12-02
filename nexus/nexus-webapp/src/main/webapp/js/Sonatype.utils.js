@@ -682,7 +682,7 @@ Sonatype.utils = {
         if ( success ) {
           var respObj = Ext.decode(response.responseText);
   
-          Sonatype.utils.version = respObj.data.version;
+          Sonatype.utils.version = "Version " + respObj.data.version;
           
           Sonatype.user.curr.repoServer = respObj.data.clientPermissions.permissions;
           Sonatype.user.curr.isLoggedIn = respObj.data.clientPermissions.loggedIn;
