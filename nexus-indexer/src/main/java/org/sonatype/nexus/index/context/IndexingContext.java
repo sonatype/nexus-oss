@@ -89,9 +89,19 @@ public interface IndexingContext
     String getRepositoryUrl();
 
     /**
+     * Returns public repository url.
+     */
+    void setRepositoryUrl( String remoteUrl );
+
+    /**
      * Returns url for the index update
      */
     String getIndexUpdateUrl();
+
+    /**
+     * Returns url for the index update
+     */
+    void setIndexUpdateUrl( String indexUpdateUrl );
 
     /**
      * Is the context searchable when doing "non-targeted" searches? Ie. Should it take a part when searching without
@@ -182,9 +192,10 @@ public interface IndexingContext
     /**
      * Optimizes index
      */
-    void optimize() 
-        throws CorruptIndexException, IOException;
-    
+    void optimize()
+        throws CorruptIndexException,
+            IOException;
+
     /**
      * Shuts down this context.
      */
@@ -235,9 +246,10 @@ public interface IndexingContext
     /**
      * Copy document to the target writer
      */
-    void copyDocument( Document document, IndexWriter w ) 
-        throws CorruptIndexException, IOException;
-    
+    void copyDocument( Document document, IndexWriter w )
+        throws CorruptIndexException,
+            IOException;
+
     Directory getIndexDirectory();
 
     File getIndexDirectoryFile();

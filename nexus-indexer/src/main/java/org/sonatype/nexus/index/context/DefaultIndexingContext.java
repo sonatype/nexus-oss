@@ -343,6 +343,11 @@ public class DefaultIndexingContext
         return repositoryUrl;
     }
 
+    public void setRepositoryUrl( String remoteUrl )
+    {
+        this.repositoryUrl = remoteUrl;
+    }
+
     public String getIndexUpdateUrl()
     {
         if ( repositoryUrl != null )
@@ -353,6 +358,11 @@ public class DefaultIndexingContext
             }
         }
         return indexUpdateUrl;
+    }
+
+    public void setIndexUpdateUrl( String indexUpdateUrl )
+    {
+        this.indexUpdateUrl = indexUpdateUrl;
     }
 
     public Analyzer getAnalyzer()
@@ -403,12 +413,13 @@ public class DefaultIndexingContext
         return indexSearcher;
     }
 
-    public void optimize() 
-        throws CorruptIndexException, IOException 
+    public void optimize()
+        throws CorruptIndexException,
+            IOException
     {
         getIndexWriter().optimize();
     }
-    
+
     public void close( boolean deleteFiles )
         throws IOException
     {
@@ -448,7 +459,7 @@ public class DefaultIndexingContext
             }
 
             rebuildGroups();
-            
+
             updateTimestamp( true );
         }
     }
@@ -497,7 +508,7 @@ public class DefaultIndexingContext
         timestamp = IndexUtils.getTimestamp( directory );
 
         IndexUtils.updateTimestamp( indexDirectory, getTimestamp() );
-        
+
         optimize();
     }
 
@@ -541,7 +552,7 @@ public class DefaultIndexingContext
                 if ( uinfo != null )
                 {
                     Hits hits = s.search( new TermQuery( new Term( ArtifactInfo.UINFO, uinfo ) ) );
-                    
+
                     if ( hits.length() == 0 )
                     {
                         copyDocument( d, w );
@@ -572,27 +583,28 @@ public class DefaultIndexingContext
     }
 
     public void copyDocument( Document d, IndexWriter w )
-        throws CorruptIndexException, IOException 
+        throws CorruptIndexException,
+            IOException
     {
         ArtifactInfo info = constructArtifactInfo( d );
         ArtifactContext artifactContext = new ArtifactContext( null, null, null, info, null );
         ArtifactIndexingContext indexingContext = new DefaultArtifactIndexingContext( artifactContext );
-  
+
         Document doc = new Document();
-  
+
         doc.add( new Field( ArtifactInfo.UINFO, AbstractIndexCreator.getGAV(
             info.groupId,
             info.artifactId,
             info.version,
             info.classifier,
             info.packaging ), Field.Store.YES, Field.Index.UN_TOKENIZED ) );
-  
+
         // recreate document to index not stored fields
         for ( IndexCreator ic : getIndexCreators() )
         {
             ic.updateDocument( indexingContext, doc );
         }
-  
+
         w.addDocument( doc );
     }
 
@@ -813,9 +825,9 @@ public class DefaultIndexingContext
         return groupDoc;
     }
 
-    public String toString() 
+    public String toString()
     {
         return id + " : " + timestamp;
     }
-    
+
 }
