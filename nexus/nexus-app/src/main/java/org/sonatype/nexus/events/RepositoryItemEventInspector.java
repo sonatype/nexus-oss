@@ -30,6 +30,7 @@ import org.sonatype.nexus.feeds.NexusArtifactEvent;
 import org.sonatype.nexus.index.ArtifactContext;
 import org.sonatype.nexus.index.ArtifactContextProducer;
 import org.sonatype.nexus.index.ArtifactInfo;
+import org.sonatype.nexus.index.IndexerManager;
 import org.sonatype.nexus.index.context.IndexingContext;
 import org.sonatype.nexus.maven.tasks.SnapshotRemover;
 import org.sonatype.nexus.proxy.events.AbstractEvent;
@@ -48,11 +49,18 @@ import org.sonatype.nexus.proxy.storage.local.fs.DefaultFSLocalRepositoryStorage
  */
 @Component( role = EventInspector.class, hint = "RepositoryItemEvent" )
 public class RepositoryItemEventInspector
-    extends AbstractEventInspector
+    extends AbstractFeedRecorderEventInspector
 {
+    @Requirement
+    private IndexerManager indexerManager;
 
     @Requirement
     private ArtifactContextProducer artifactContextProducer;
+
+    protected IndexerManager getIndexerManager()
+    {
+        return indexerManager;
+    }
 
     public boolean accepts( AbstractEvent evt )
     {
@@ -114,7 +122,7 @@ public class RepositoryItemEventInspector
                     return;
                 }
 
-                getNexus().addNexusArtifactEvent( nae );
+                getFeedRecorder().addNexusArtifactEvent( nae );
             }
 
         }
@@ -144,7 +152,8 @@ public class RepositoryItemEventInspector
                     || RepositoryItemEventCache.class.isAssignableFrom( ievt.getClass() ) || RepositoryItemEventDelete.class
                     .isAssignableFrom( ievt.getClass() ) ) )
             {
-                IndexingContext context = getIndexerManager().getRepositoryLocalIndexContext( ievt.getRepository().getId() );
+                IndexingContext context = getIndexerManager().getRepositoryLocalIndexContext(
+                    ievt.getRepository().getId() );
 
                 // by calculating GAV we check wether the request is against a repo artifact at all
                 Gav gav = ( (MavenRepository) ievt.getRepository() ).getGavCalculator().pathToGav(

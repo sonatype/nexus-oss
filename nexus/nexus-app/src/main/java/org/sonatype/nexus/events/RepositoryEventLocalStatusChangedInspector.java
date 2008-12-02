@@ -32,7 +32,7 @@ import org.sonatype.nexus.proxy.repository.LocalStatus;
  */
 @Component( role = EventInspector.class, hint = "RepositoryEventLocalStatusChanged" )
 public class RepositoryEventLocalStatusChangedInspector
-    extends AbstractEventInspector
+    extends AbstractFeedRecorderEventInspector
 {
 
     public boolean accepts( AbstractEvent evt )
@@ -82,7 +82,7 @@ public class RepositoryEventLocalStatusChangedInspector
             sb.append( revt.getOldLocalStatus().toString() ).append( "." );
         }
 
-        getNexus().addSystemEvent( FeedRecorder.SYSTEM_REPO_LSTATUS_CHANGES_ACTION, sb.toString() );
+        getFeedRecorder().addSystemEvent( FeedRecorder.SYSTEM_REPO_LSTATUS_CHANGES_ACTION, sb.toString() );
     }
 
 }

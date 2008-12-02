@@ -21,6 +21,8 @@
 package org.sonatype.nexus.events;
 
 import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
+import org.sonatype.nexus.index.IndexerManager;
 import org.sonatype.nexus.proxy.events.AbstractEvent;
 import org.sonatype.nexus.proxy.events.EventInspector;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryGroupEvent;
@@ -28,18 +30,23 @@ import org.sonatype.nexus.proxy.events.RepositoryRegistryGroupEventAdd;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryGroupEventRemove;
 
 /**
- * 
  * @author Juven Xu
- *
  */
 @Component( role = EventInspector.class, hint = "RepositoryRegistryGroupEvent" )
 public class RepositoryRegistryGroupEventInspector
     extends AbstractEventInspector
 {
+    @Requirement
+    private IndexerManager indexerManager;
+
+    protected IndexerManager getIndexerManager()
+    {
+        return indexerManager;
+    }
 
     public boolean accepts( AbstractEvent evt )
     {
-        if ( evt instanceof RepositoryRegistryGroupEvent)
+        if ( evt instanceof RepositoryRegistryGroupEvent )
         {
             return true;
         }

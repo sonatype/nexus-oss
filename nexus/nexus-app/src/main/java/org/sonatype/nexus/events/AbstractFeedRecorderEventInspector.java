@@ -20,15 +20,20 @@
  */
 package org.sonatype.nexus.events;
 
-import org.codehaus.plexus.logging.AbstractLogEnabled;
-import org.sonatype.nexus.proxy.events.EventInspector;
+import org.codehaus.plexus.component.annotations.Requirement;
+import org.sonatype.nexus.feeds.FeedRecorder;
 
 /**
- * @author Juven Xu
+ * @author cstamas
  */
-public abstract class AbstractEventInspector
-    extends AbstractLogEnabled
-    implements EventInspector
+public abstract class AbstractFeedRecorderEventInspector
+    extends AbstractEventInspector
 {
+    @Requirement
+    private FeedRecorder feedRecorder;
 
+    protected FeedRecorder getFeedRecorder()
+    {
+        return feedRecorder;
+    }
 }

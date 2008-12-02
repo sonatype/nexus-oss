@@ -31,36 +31,24 @@ import org.sonatype.nexus.proxy.registry.ContentClass;
 public class DefaultNexusTest
     extends AbstractNexusTestCase
 {
+    private Nexus defaultNexus;
 
-    private DefaultNexus defaultNexus;
+    public Nexus getDefaultNexus()
+    {
+        return defaultNexus;
+    }
 
     protected void setUp()
         throws Exception
     {
         super.setUp();
 
-        defaultNexus = (DefaultNexus) lookup( Nexus.class );
-    }
-
-    protected void tearDown()
-        throws Exception
-    {
-        super.tearDown();
+        defaultNexus = (Nexus) lookup( Nexus.class );
     }
 
     protected boolean loadConfigurationAtSetUp()
     {
         return false;
-    }
-
-    public DefaultNexus getDefaultNexus()
-    {
-        return defaultNexus;
-    }
-
-    public void setDefaultNexus( DefaultNexus defaultNexus )
-    {
-        this.defaultNexus = defaultNexus;
     }
 
     public void testRepositoryTemplates()
@@ -168,8 +156,8 @@ public class DefaultNexusTest
     public void testBounceNexus()
         throws Exception
     {
-        getDefaultNexus().stop();
-        
-        getDefaultNexus().start();
+        getDefaultNexus().stopService();
+
+        getDefaultNexus().startService();
     }
 }

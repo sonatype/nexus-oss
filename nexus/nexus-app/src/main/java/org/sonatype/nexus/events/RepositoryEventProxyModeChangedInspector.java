@@ -32,7 +32,7 @@ import org.sonatype.nexus.proxy.repository.ProxyMode;
  */
 @Component( role = EventInspector.class, hint = "RepositoryEventProxyModeChanged" )
 public class RepositoryEventProxyModeChangedInspector
-    extends AbstractEventInspector
+    extends AbstractFeedRecorderEventInspector
 {
 
     public boolean accepts( AbstractEvent evt )
@@ -95,7 +95,7 @@ public class RepositoryEventProxyModeChangedInspector
             sb.append( " Last detected transport error: " ).append( revt.getCause().getMessage() );
         }
 
-        getNexus().addSystemEvent( FeedRecorder.SYSTEM_REPO_PSTATUS_CHANGES_ACTION, sb.toString() );
+        getFeedRecorder().addSystemEvent( FeedRecorder.SYSTEM_REPO_PSTATUS_CHANGES_ACTION, sb.toString() );
     }
 
 }

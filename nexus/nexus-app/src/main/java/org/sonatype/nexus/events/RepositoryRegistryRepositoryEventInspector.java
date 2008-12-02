@@ -21,7 +21,9 @@
 package org.sonatype.nexus.events;
 
 import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.nexus.feeds.FeedRecorder;
+import org.sonatype.nexus.index.IndexerManager;
 import org.sonatype.nexus.proxy.events.AbstractEvent;
 import org.sonatype.nexus.proxy.events.EventInspector;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventAdd;
@@ -37,8 +39,15 @@ import org.sonatype.nexus.proxy.repository.RepositoryType;
  */
 @Component( role = EventInspector.class, hint = "RepositoryRegistryRepositoryEvent" )
 public class RepositoryRegistryRepositoryEventInspector
-    extends AbstractEventInspector
+    extends AbstractFeedRecorderEventInspector
 {
+    @Requirement
+    private IndexerManager indexerManager;
+
+    protected IndexerManager getIndexerManager()
+    {
+        return indexerManager;
+    }
 
     public boolean accepts( AbstractEvent evt )
     {
@@ -112,7 +121,7 @@ public class RepositoryRegistryRepositoryEventInspector
             sb.insert( 0, "Updated" );
         }
 
-        getNexus().addSystemEvent( FeedRecorder.SYSTEM_CONFIG_ACTION, sb.toString() );
+        getFeedRecorder().addSystemEvent( FeedRecorder.SYSTEM_CONFIG_ACTION, sb.toString() );
 
     }
 
