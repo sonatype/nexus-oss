@@ -93,7 +93,9 @@ public abstract class AbstractNexusFeedSource
                         {
                             result.append( " : " ).append( gav.getClassifier() );
                         }
-
+                        
+                        result.append( " : " ).append( gav.getExtension() );
+                        
                         return result.toString();
                     }
                     else
