@@ -38,6 +38,7 @@ import java.util.concurrent.RejectedExecutionException;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.Disposable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Startable;
@@ -121,7 +122,7 @@ import org.sonatype.scheduling.schedules.Schedule;
 @Component( role = Nexus.class )
 public class DefaultNexus
     extends AbstractLogEnabled
-    implements Nexus, Initializable, Startable
+    implements Nexus, Initializable, Startable, Disposable
 {
     /**
      * The nexus configuration.
@@ -230,6 +231,30 @@ public class DefaultNexus
     private static final String TEMPLATE_DEFAULT_HOSTED_SNAPSHOT = "default_hosted_snapshot";
 
     private static final String TEMPLATE_DEFAULT_VIRTUAL = "default_virtual";
+
+    // PLX-399 hack -- START
+
+    private static int instanceCount = 0;
+
+    public DefaultNexus()
+    {
+        instanceCount++;
+
+        if ( instanceCount > 1 )
+        {
+            dispose();
+
+            throw new IllegalStateException( "Nexus is a singleton, but there is " + instanceCount
+                + " instances of it!" );
+        }
+    }
+
+    public void dispose()
+    {
+        instanceCount--;
+    }
+
+    // PLX-399 hack -- END
 
     // ----------------------------------------------------------------------------------------------------------
     // SystemStatus
@@ -1599,30 +1624,36 @@ public class DefaultNexus
 
             nexusScheduler.startService();
 
-            addSystemEvent( FeedRecorder.SYSTEM_BOOT_ACTION, "Starting Nexus (version " + applicationStatusSource.getSystemStatus().getVersion()
-                + ")" );
+            addSystemEvent( FeedRecorder.SYSTEM_BOOT_ACTION, "Starting Nexus (version "
+                + applicationStatusSource.getSystemStatus().getVersion() + ")" );
 
             applicationStatusSource.getSystemStatus().setLastConfigChange( new Date() );
 
-            applicationStatusSource.getSystemStatus().setConfigurationValidationResponse( nexusConfiguration
-                .getConfigurationSource().getValidationResponse() );
+            applicationStatusSource.getSystemStatus().setConfigurationValidationResponse(
+                nexusConfiguration.getConfigurationSource().getValidationResponse() );
 
             applicationStatusSource.getSystemStatus().setFirstStart( nexusConfiguration.isConfigurationDefaulted() );
 
             applicationStatusSource.getSystemStatus().setInstanceUpgraded( nexusConfiguration.isInstanceUpgraded() );
 
-            applicationStatusSource.getSystemStatus().setConfigurationUpgraded( nexusConfiguration.isConfigurationUpgraded() );
+            applicationStatusSource.getSystemStatus().setConfigurationUpgraded(
+                nexusConfiguration.isConfigurationUpgraded() );
 
             // creating default templates if needed
-            createDefaultTemplate( TEMPLATE_DEFAULT_HOSTED_RELEASE, applicationStatusSource.getSystemStatus().isInstanceUpgraded() );
+            createDefaultTemplate( TEMPLATE_DEFAULT_HOSTED_RELEASE, applicationStatusSource
+                .getSystemStatus().isInstanceUpgraded() );
 
-            createDefaultTemplate( TEMPLATE_DEFAULT_HOSTED_SNAPSHOT, applicationStatusSource.getSystemStatus().isInstanceUpgraded() );
+            createDefaultTemplate( TEMPLATE_DEFAULT_HOSTED_SNAPSHOT, applicationStatusSource
+                .getSystemStatus().isInstanceUpgraded() );
 
-            createDefaultTemplate( TEMPLATE_DEFAULT_PROXY_RELEASE, applicationStatusSource.getSystemStatus().isInstanceUpgraded() );
+            createDefaultTemplate( TEMPLATE_DEFAULT_PROXY_RELEASE, applicationStatusSource
+                .getSystemStatus().isInstanceUpgraded() );
 
-            createDefaultTemplate( TEMPLATE_DEFAULT_PROXY_SNAPSHOT, applicationStatusSource.getSystemStatus().isInstanceUpgraded() );
+            createDefaultTemplate( TEMPLATE_DEFAULT_PROXY_SNAPSHOT, applicationStatusSource
+                .getSystemStatus().isInstanceUpgraded() );
 
-            createDefaultTemplate( TEMPLATE_DEFAULT_VIRTUAL, applicationStatusSource.getSystemStatus().isInstanceUpgraded() );
+            createDefaultTemplate( TEMPLATE_DEFAULT_VIRTUAL, applicationStatusSource
+                .getSystemStatus().isInstanceUpgraded() );
 
             if ( applicationStatusSource.getSystemStatus().isFirstStart() )
             {
@@ -1655,8 +1686,8 @@ public class DefaultNexus
         {
             applicationStatusSource.getSystemStatus().setState( SystemState.BROKEN_IO );
 
-            applicationStatusSource.getSystemStatus().setConfigurationValidationResponse( nexusConfiguration
-                .getConfigurationSource().getValidationResponse() );
+            applicationStatusSource.getSystemStatus().setConfigurationValidationResponse(
+                nexusConfiguration.getConfigurationSource().getValidationResponse() );
 
             applicationStatusSource.getSystemStatus().setErrorCause( e );
 
@@ -1668,8 +1699,8 @@ public class DefaultNexus
         {
             applicationStatusSource.getSystemStatus().setState( SystemState.BROKEN_CONFIGURATION );
 
-            applicationStatusSource.getSystemStatus().setConfigurationValidationResponse( nexusConfiguration
-                .getConfigurationSource().getValidationResponse() );
+            applicationStatusSource.getSystemStatus().setConfigurationValidationResponse(
+                nexusConfiguration.getConfigurationSource().getValidationResponse() );
 
             applicationStatusSource.getSystemStatus().setErrorCause( e );
 
@@ -1684,7 +1715,8 @@ public class DefaultNexus
     {
         applicationStatusSource.getSystemStatus().setState( SystemState.STOPPING );
 
-        addSystemEvent( FeedRecorder.SYSTEM_BOOT_ACTION, "Stopping Nexus (version " + applicationStatusSource.getSystemStatus().getVersion() + ")" );
+        addSystemEvent( FeedRecorder.SYSTEM_BOOT_ACTION, "Stopping Nexus (version "
+            + applicationStatusSource.getSystemStatus().getVersion() + ")" );
 
         nexusConfiguration.notifyProximityEventListeners( new NexusStoppedEvent() );
 
