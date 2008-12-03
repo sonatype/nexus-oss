@@ -23,6 +23,7 @@
   </dependencyManagement>
 
   <properties>
+    <nexus-bundle-name>nexus-webapp</nexus-bundle-name>
     <bundle-expanded-dir>target/bundle</bundle-expanded-dir>
     <config-expanded-dir>target/test-nexus-config</config-expanded-dir>
 
@@ -36,7 +37,7 @@
     <proxy-repo-plexus-config-file>${project.build.directory}/test-classes/proxyRepo/conf/ProxyRepoPlexus.xml</proxy-repo-plexus-config-file>
     <proxy-repo-base-url>http://localhost:${proxy-repo-port}/remote/</proxy-repo-base-url>
 
-    <nexus-abs-basedir>${project.build.directory}/bundle/nexus-webapp-${project.version}</nexus-abs-basedir>
+    <nexus-abs-basedir>${project.build.directory}/bundle/${nexus-bundle-name}-${project.version}</nexus-abs-basedir>
     <nexus-application-protocol>http</nexus-application-protocol>
     <nexus-application-host>localhost</nexus-application-host>
     <nexus-application-name>nexus</nexus-application-name>
