@@ -40,6 +40,11 @@
 						<contextPath>${webapp-context-path}</contextPath>
 					</webappInfo>
 				</webappInfos>
+        <lifecycleListenerInfos>
+            <lifecycleListenerInfo>
+                <clazz>org.sonatype.plexus.jetty.custom.DisableTagLibsListener</clazz>
+            </lifecycleListenerInfo>
+        </lifecycleListenerInfos>
 			</configuration>
 		</component>
 
