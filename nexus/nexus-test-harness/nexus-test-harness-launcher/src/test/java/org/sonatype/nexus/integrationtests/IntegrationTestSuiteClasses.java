@@ -42,6 +42,7 @@ import org.sonatype.nexus.integrationtests.nexus526.Nexus526FeedsTests;
 import org.sonatype.nexus.integrationtests.nexus531.Nexus531RepositoryCrudJsonTests;
 import org.sonatype.nexus.integrationtests.nexus531.Nexus531RepositoryCrudValidationTests;
 import org.sonatype.nexus.integrationtests.nexus531.Nexus531RepositoryCrudXMLTests;
+import org.sonatype.nexus.integrationtests.nexus532.Nexus532GroupsCrudValidationTests;
 import org.sonatype.nexus.integrationtests.nexus532.Nexus532GroupsCrudXmlTests;
 import org.sonatype.nexus.integrationtests.nexus533.Nexus533TaskCronTest;
 import org.sonatype.nexus.integrationtests.nexus533.Nexus533TaskManualTest;
@@ -141,6 +142,7 @@ import org.sonatype.nexus.integrationtests.webproxy.nexus1116.Nexus1116InvalidPr
     Nexus586AnonymousForgotUserIdTest.class,
     Nexus586AnonymousResetPasswordTest.class,
     Nexus532GroupsCrudXmlTests.class,
+    Nexus532GroupsCrudValidationTests.class,
     Nexus606DownloadLogsAndConfigFilesTest.class,
     Nexus643EmptyTrashTaskTest.class,
     Nexus637PublishIndexTest.class,
