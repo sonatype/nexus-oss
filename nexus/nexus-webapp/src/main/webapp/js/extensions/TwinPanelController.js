@@ -381,7 +381,7 @@ Ext.extend( Sonatype.ext.TwinPanelChooser, Ext.Panel, {
         var rec = {
           id: valueId,
           data: {
-            readOnly: readOnly,
+            readOnly: readOnly
           }
         };
         rec.data[this.valueField] = valueId;
