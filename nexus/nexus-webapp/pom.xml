@@ -48,13 +48,6 @@
       </exclusions>
     </dependency>
     <dependency>
-      <groupId>org.sonatype.nexus.tools</groupId>
-      <artifactId>nexus-migration-app</artifactId>
-      <version>${project.version}</version>
-      <classifier>cli</classifier>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
       <groupId>org.sonatype.jsw-binaries</groupId>
       <artifactId>jsw-binaries</artifactId>
       <type>zip</type>
@@ -122,17 +115,6 @@
             <configuration>
               <includeArtifactIds>jsw-binaries</includeArtifactIds>
               <outputDirectory>${jsw-input}</outputDirectory>
-            </configuration>
-          </execution>
-          <execution>
-            <id>unpack-nexus-tools</id>
-            <phase>generate-resources</phase>
-            <goals>
-              <goal>copy-dependencies</goal>
-            </goals>
-            <configuration>
-              <includeArtifactIds>nexus-migration-app</includeArtifactIds>
-              <outputDirectory>${nexus-tools-input}</outputDirectory>
             </configuration>
           </execution>
         </executions>
