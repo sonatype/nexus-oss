@@ -199,7 +199,8 @@ public interface MutableConfiguration
     void createRepositoryGroup( CRepositoryGroup settings )
         throws NoSuchRepositoryException,
             InvalidGroupingException,
-            IOException;
+            IOException,
+            ConfigurationException;
 
     CRepositoryGroup readRepositoryGroup( String id )
         throws NoSuchRepositoryGroupException;
@@ -208,7 +209,8 @@ public interface MutableConfiguration
         throws NoSuchRepositoryException,
             NoSuchRepositoryGroupException,
             InvalidGroupingException,
-            IOException;
+            IOException,
+            ConfigurationException;
 
     void deleteRepositoryGroup( String id )
         throws NoSuchRepositoryGroupException,

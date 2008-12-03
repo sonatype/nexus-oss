@@ -659,7 +659,29 @@ public class DefaultNexusConfiguration
     {
         ApplicationValidationContext result = new ApplicationValidationContext();
 
-        result.addExistingRepositoryIds();
+        fillValidationContextRepositoryIds( result );
+
+        fillValidationContextRepositoryShadowIds( result );
+
+        return result;
+    }
+
+    protected ApplicationValidationContext getRepositoryGroupValidationContext()
+    {
+        ApplicationValidationContext result = new ApplicationValidationContext();
+
+        fillValidationContextRepositoryIds( result );
+
+        fillValidationContextRepositoryShadowIds( result );
+
+        fillValidationContextRepositoryGroupIds( result );
+
+        return result;
+    }
+    
+    private void fillValidationContextRepositoryIds( ApplicationValidationContext context )
+    {
+        context.addExistingRepositoryIds();
 
         List<CRepository> repositories = getConfiguration().getRepositories();
 
@@ -667,11 +689,14 @@ public class DefaultNexusConfiguration
         {
             for ( CRepository repo : repositories )
             {
-                result.getExistingRepositoryIds().add( repo.getId() );
+                context.getExistingRepositoryIds().add( repo.getId() );
             }
         }
+    }
 
-        result.addExistingRepositoryShadowIds();
+    private void fillValidationContextRepositoryShadowIds( ApplicationValidationContext context )
+    {
+        context.addExistingRepositoryShadowIds();
 
         List<CRepositoryShadow> repositoryShadows = getConfiguration().getRepositoryShadows();
 
@@ -679,11 +704,24 @@ public class DefaultNexusConfiguration
         {
             for ( CRepositoryShadow repo : repositoryShadows )
             {
-                result.getExistingRepositoryShadowIds().add( repo.getId() );
+                context.getExistingRepositoryShadowIds().add( repo.getId() );
             }
         }
+    }
 
-        return result;
+    private void fillValidationContextRepositoryGroupIds( ApplicationValidationContext context )
+    {
+        context.addExistingRepositoryGroupIds();
+
+        List<CRepositoryGroup> repositoryGroups = getConfiguration().getRepositoryGrouping().getRepositoryGroups();
+
+        if ( repositoryGroups != null )
+        {
+            for ( CRepositoryGroup repoGroup : repositoryGroups )
+            {
+                context.getExistingRepositoryGroupIds().add( repoGroup.getGroupId() );
+            }
+        }
     }
 
     // CRepository: CRUD
@@ -705,6 +743,25 @@ public class DefaultNexusConfiguration
         {
             throw new InvalidConfigurationException( vr );
         }
+    }
+    
+    protected void validateRepositoryGroup( CRepositoryGroup settings, boolean create )
+        throws ConfigurationException
+    {
+        ApplicationValidationContext ctx = getRepositoryGroupValidationContext();
+
+        if ( !create && !StringUtils.isEmpty( settings.getGroupId() ) )
+        {
+            ctx.getExistingRepositoryGroupIds().remove( settings.getGroupId() );
+        }
+
+        ValidationResponse vr = configurationValidator.validateRepositoryGroup( ctx, settings );
+
+        if ( !vr.isValid() )
+        {
+            throw new InvalidConfigurationException( vr );
+        }
+
     }
 
     public Collection<CRepository> listRepositories()
@@ -1145,6 +1202,17 @@ public class DefaultNexusConfiguration
     public void createRepositoryGroup( CRepositoryGroup settings )
         throws NoSuchRepositoryException,
             InvalidGroupingException,
+            IOException,
+            ConfigurationException
+    {
+        validateRepositoryGroup( settings, true );
+
+        createRepositoryGroupAfterValidation( settings );
+    }
+
+    protected void createRepositoryGroupAfterValidation( CRepositoryGroup settings )
+        throws NoSuchRepositoryException,
+            InvalidGroupingException,
             IOException
     {
         repositoryRegistry.addRepositoryGroup( settings.getGroupId(), settings.getRepositories() );
@@ -1178,11 +1246,14 @@ public class DefaultNexusConfiguration
         throws NoSuchRepositoryException,
             NoSuchRepositoryGroupException,
             InvalidGroupingException,
-            IOException
+            IOException,
+            ConfigurationException
     {
+        validateRepositoryGroup( settings, false );
+
         deleteRepositoryGroup( settings.getGroupId() );
 
-        createRepositoryGroup( settings );
+        createRepositoryGroupAfterValidation( settings );
     }
 
     public void deleteRepositoryGroup( String id )

@@ -11,6 +11,7 @@ import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
+import org.sonatype.nexus.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.model.CRepositoryGroup;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryGroupException;
@@ -173,6 +174,10 @@ public class RepositoryGroupListPlexusResource
                     getNexus().createRepositoryGroup( group );
                     //
                     // response.setStatus( Status.SUCCESS_NO_CONTENT );
+                }
+                catch ( ConfigurationException e )
+                {
+                    handleConfigurationException( e );
                 }
                 catch ( NoSuchRepositoryException e )
                 {

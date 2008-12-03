@@ -687,7 +687,8 @@ public class DefaultNexus
     public void createRepositoryGroup( CRepositoryGroup settings )
         throws NoSuchRepositoryException,
             InvalidGroupingException,
-            IOException
+            IOException,
+            ConfigurationException
     {
         nexusConfiguration.createRepositoryGroup( settings );
     }
@@ -702,7 +703,8 @@ public class DefaultNexus
         throws NoSuchRepositoryException,
             NoSuchRepositoryGroupException,
             InvalidGroupingException,
-            IOException
+            IOException,
+            ConfigurationException
     {
         nexusConfiguration.updateRepositoryGroup( settings );
     }

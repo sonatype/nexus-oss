@@ -4,12 +4,14 @@ import java.io.IOException;
 import java.util.List;
 
 import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.util.StringUtils;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
+import org.sonatype.nexus.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.model.CRepositoryGroup;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryGroupException;
@@ -132,11 +134,21 @@ public class RepositoryGroupPlexusResource
                     getNexusErrorResponse( "repositories", "The group cannot have zero repository members!" ) );
             }
 
+            if ( StringUtils.isEmpty( resource.getId() ) )
+            {
+                getLogger().warn( "Repository group id is empty! " );
+
+                throw new PlexusResourceException(
+                    Status.CLIENT_ERROR_NOT_FOUND,
+                    "Repository group id is empty! ",
+                    getNexusErrorResponse( "repositories", "Repository group id can't be empty! " ) );
+            }
+            
             try
             {
                 validateGroup( resource, request );
 
-                CRepositoryGroup group = getNexus().readRepositoryGroup( getGroupId( request ) );
+                CRepositoryGroup group = getNexus().readRepositoryGroup( resource.getId() );
 
                 group.setName( resource.getName() );
 
@@ -149,6 +161,10 @@ public class RepositoryGroupPlexusResource
                 }
 
                 getNexus().updateRepositoryGroup( group );
+            }
+            catch ( ConfigurationException e )
+            {
+                handleConfigurationException( e );
             }
             catch ( NoSuchRepositoryGroupException e )
             {
