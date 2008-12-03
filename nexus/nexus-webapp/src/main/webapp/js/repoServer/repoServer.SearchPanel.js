@@ -54,18 +54,6 @@ Sonatype.repoServer.SearchPanel = function(config){
         });
     }
   };
-
-//this.detailView = new Ext.Panel({
-//    id: 'st-artifact-detail-view',
-//    region: 'south',
-//    layout: 'fit',
-//    cls:'preview',
-//    autoScroll: true,
-//    height: 300,
-//    split: true,
-//    border:false,
-//    listeners: linkInterceptor
-//});
     
   this.grid = new Sonatype.repoServer.SearchResultGrid({
     
@@ -285,15 +273,12 @@ Sonatype.repoServer.SearchPanel = function(config){
   this.artifactInformationPanel = new Sonatype.repoServer.ArtifactInformationPanel({});
   
   Sonatype.repoServer.SearchPanel.superclass.constructor.call(this, {
-//  id: 'st-nexus-search-panel',
-//  title: 'Nexus Search',
     layout: 'border',
     hideMode: 'offsets',
     tbar: this.searchToolbar,
     items: [
       this.grid,
       this.artifactInformationPanel
-//    this.detailView
     ]
   });
 
@@ -419,74 +404,3 @@ Ext.extend(Sonatype.repoServer.SearchPanel, Ext.Panel, {
   }
 
 });
-
-Sonatype.repoServer.ArtifactInformationPanel = function( config ) {
-  var config = config || {};
-  var defaultConfig = {};
-  Ext.apply( this, config, defaultConfig );
-  
-  this.formPanel = new Ext.form.FormPanel( {
-    autoScroll: true,
-    border: false,
-    frame: true,
-    collapsible: false,
-    collapsed: false,
-    labelWidth: 70,
-    layoutConfig: {
-      labelSeparator: ''
-    },
-        
-    items: [
-      {
-        xtype: 'textfield',
-        fieldLabel: 'Group',
-        name: 'groupId',
-        width: 300,
-        allowBlank: true,
-        disabled: true
-      },
-      {
-        xtype: 'textfield',
-        fieldLabel: 'Artifact',
-        name: 'artifactId',
-        width: 300,
-        allowBlank: true,
-        disabled: true
-      },
-      {
-        xtype: 'textfield',
-        fieldLabel: 'Version',
-        name: 'version',
-        width: 300,
-        allowBlank: true,
-        disabled: true
-      }
-    ]
-  } );
-
-  Sonatype.repoServer.ArtifactInformationPanel.superclass.constructor.call( this, {
-    title: 'Artifact Information',
-    layout: 'fit',
-    region: 'south',
-    collapsible: true,
-    collapsed: true,
-    split: true,
-    height: 150,
-    minHeight: 100,
-    maxHeight: 400,
-    frame: false,
-    autoScroll: true,
-
-    items: [
-      this.formPanel
-    ]
-  } );
-};
-
-Ext.extend( Sonatype.repoServer.ArtifactInformationPanel, Ext.Panel, {
-  showArtifact: function( data ) {
-    this.formPanel.form.setValues( data );
-    this.expand();
-  }
-} );
-

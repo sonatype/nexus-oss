@@ -64,6 +64,7 @@
   <script src="js/repoServer/repoServer.referenceData.js?$nexusVersion" type="text/javascript" charset="utf-8"></script>
   <script src="js/repoServer/repoServer.resources.js?$nexusVersion" type="text/javascript" charset="utf-8"></script>
   <script src="js/repoServer/repoServer.FeedViewPanel.js?$nexusVersion" type="text/javascript" charset="utf-8"></script>
+  <script src="js/repoServer/repoServer.ArtifactInformationPanel.js?$nexusVersion" type="text/javascript" charset="utf-8"></script>
   <script src="js/repoServer/repoServer.SearchResultGrid.js?$nexusVersion" type="text/javascript" charset="utf-8"></script>
   <script src="js/repoServer/repoServer.SearchPanel.js?$nexusVersion" type="text/javascript" charset="utf-8"></script>
   

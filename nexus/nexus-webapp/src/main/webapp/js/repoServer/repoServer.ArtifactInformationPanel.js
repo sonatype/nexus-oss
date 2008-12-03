@@ -1,0 +1,171 @@
+/*
+ * Nexus: Maven Repository Manager
+ * Copyright (C) 2008 Sonatype Inc.                                                                                                                          
+ * 
+ * This file is part of Nexus.                                                                                                                                  
+ * 
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+Sonatype.repoServer.ArtifactInformationPanel = function( config ) {
+  var config = config || {};
+  var defaultConfig = {};
+  Ext.apply( this, config, defaultConfig );
+  
+  this.linkDivId = Ext.id();
+  
+  this.formPanel = new Ext.form.FormPanel( {
+    autoScroll: true,
+    border: false,
+    frame: true,
+    collapsible: false,
+    collapsed: false,
+        
+    items: [
+      { 
+        xtype: 'panel',
+        layout: 'column',
+        items: [
+          {
+            xtype: 'panel',
+            layout: 'form',
+            labelWidth: 70,
+            items: [
+              {
+                xtype: 'textfield',
+                fieldLabel: 'Group',
+                name: 'groupId',
+                width: 300,
+                allowBlank: true,
+                readOnly: true
+              },
+              {
+                xtype: 'textfield',
+                fieldLabel: 'Artifact',
+                name: 'artifactId',
+                width: 300,
+                allowBlank: true,
+                readOnly: true
+              },
+              {
+                xtype: 'textfield',
+                fieldLabel: 'Version',
+                name: 'version',
+                width: 300,
+                allowBlank: true,
+                readOnly: true
+              },
+              {
+                xtype: 'panel',
+                html: '<div class="x-form-item" tabindex="-1">' + 
+                  '<label class="x-form-item-label" style="width: 70px;">Download</label>' +
+                  '<div id="' + this.linkDivId + '" class="x-form-element" style="padding-left: 75px; padding-top: 3px">' +
+                  '</div><div class="x-form-clear-left"/></div>'
+              }
+            ]
+          },
+          {
+            xtype: 'panel',
+            layout: 'form',
+            style: 'padding-left: 20px;',
+            labelWidth: 30,
+            items: [
+              {
+                xtype: 'textarea',
+                fieldLabel: 'XML',
+                name: 'xml',
+                width: 300,
+                height: 100,
+                allowBlank: true,
+                readOnly: true
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  } );
+
+  Sonatype.repoServer.ArtifactInformationPanel.superclass.constructor.call( this, {
+    title: 'Artifact Information',
+    layout: 'fit',
+    region: 'south',
+    collapsible: true,
+    collapsed: true,
+    split: true,
+    height: 150,
+    minHeight: 100,
+    maxHeight: 400,
+    frame: false,
+    autoScroll: true,
+
+    items: [
+      this.formPanel
+    ]
+  } );
+};
+
+Ext.extend( Sonatype.repoServer.ArtifactInformationPanel, Ext.Panel, {
+  formatJarLink: function( data ) {
+    var r = data.repoId;
+    var g = data.groupId;
+    var a = data.artifactId;
+    var v = data.version;
+    var c = data.classifier;
+    var p = data.packaging;
+  
+    if ( c ) {
+      return this.makeArtifactLink( r, g, a, v, c, p, 'artifact' );
+    }
+    // no packaging, only shows a pom link
+    else if ( ! p ) {
+      return this.makeArtifactLink( r, g, a, v, null, 'pom', 'pom' )
+    }
+    else if ( p == 'pom') {
+      return this.makeArtifactLink( r, g, a, v, c, p, 'pom' );
+    }
+    else {
+      return this.makeArtifactLink( r, g, a, v, c, p, 'artifact' ) + ', ' +
+      this.makeArtifactLink( r, g, a, v, null, 'pom', 'pom' );
+    }
+  },
+  
+  makeArtifactLink: function( r, g, a, v, c, p, title ) {
+    var url = Sonatype.config.repos.urls.redirect +
+      '?r=' + r + '&g=' + g + '&a=' + a + '&v=' + v;
+    if ( c ) {
+      url += '&c=' + c;
+    }
+    if ( p ) {
+      url += '&p=' + p;
+    }
+    return String.format( '<a target="_blank" href="{0}">{1}</a>', url, title );
+  },
+
+  showArtifact: function( data ) {
+    data.xml = '<dependency>\n' +
+      '  <groupId>' + data.groupId + '</groupId>\n' +
+      '  <artifactId>' + data.artifactId + '</artifactId>\n' +
+      '  <version>' + data.version + '</version>\n' +
+      ( data.classifier ? 
+        ( '  <classifier>' + data.classifier + '</classifier>\n' ) : '' ) +
+      '</dependency>\n';
+    this.formPanel.form.setValues( data );
+    var linkDiv = document.getElementById( this.linkDivId );
+    linkDiv.innerHTML = this.formatJarLink( data );
+    this.expand();
+  }
+} );
+
