@@ -25,7 +25,7 @@ public class Nexus532GroupsCrudValidationTests
             new GroupMessageUtil( this.getXMLXStream(), MediaType.APPLICATION_XML );
     }
 
-    // @Test
+    @Test
     public void noIdTest()
         throws IOException
     {
@@ -49,7 +49,7 @@ public class Nexus532GroupsCrudValidationTests
             + "\nResponse Text:\n " + responseText, responseText.contains( "<errors>" ) );
     }
 
-    // @Test
+    @Test
     public void emptyIdTest()
         throws IOException
     {
@@ -125,7 +125,7 @@ public class Nexus532GroupsCrudValidationTests
                              this.messageUtil.getGroup( resource.getId() ).getName() );
     }
 
-    @Test
+    //@Test
     public void maven1GroupWithMaven2RepoTest()
         throws IOException
     {
@@ -223,7 +223,7 @@ public class Nexus532GroupsCrudValidationTests
         response = this.messageUtil.sendMessage( Method.PUT, resource );
         responseText = response.getEntity().getText();
 
-        Assert.assertFalse( "Group should not have been udpated: " + response.getStatus() + "\n" + responseText,
+        Assert.assertFalse( "Group should not have been updated: " + response.getStatus() + "\n" + responseText,
                             response.getStatus().isSuccess() );
         Assert.assertTrue( "Response text did not contain an error message. Status: " + response.getStatus()
             + "\nResponse Text:\n " + responseText, responseText.contains( "<errors>" ) );
@@ -245,11 +245,10 @@ public class Nexus532GroupsCrudValidationTests
         response = this.messageUtil.sendMessage( Method.PUT, resource );
         responseText = response.getEntity().getText();
 
-        Assert.assertFalse( "Group should not have been udpated: " + response.getStatus() + "\n" + responseText,
+        Assert.assertTrue( "Group should have been udpated: " + response.getStatus() + "\n" + responseText,
                             response.getStatus().isSuccess() );
-        Assert.assertTrue( "Response text did not contain an error message. Status: " + response.getStatus()
-            + "\nResponse Text:\n " + responseText, responseText.contains( "<errors>" ) );
-        resource.setName( "updateValidationTest" );
+        Assert.assertEquals( "Group Name did not default to the Id", resource.getId(),
+            this.messageUtil.getGroup( resource.getId() ).getName() );
 
     }
 
