@@ -478,7 +478,7 @@ abstract public class AbstractMetadataHelper
         Snapshot snapshot = new Snapshot();
 
         snapshot.setLocalCopy( false );
-
+        
         snapshot.setBuildNumber( 1 );
 
         for ( String artifact : currentArtifacts )
@@ -499,7 +499,7 @@ abstract public class AbstractMetadataHelper
                     lastHyphenPos + 1,
                     artifactName.length() - 4 ) );
 
-                if ( buildNumber > snapshot.getBuildNumber() )
+                if ( buildNumber >= snapshot.getBuildNumber() )
                 {
                     snapshot.setBuildNumber( buildNumber );
 
