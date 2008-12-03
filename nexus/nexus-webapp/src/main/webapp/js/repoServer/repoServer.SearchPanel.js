@@ -290,10 +290,19 @@ Sonatype.repoServer.SearchPanel = function(config){
   });
   
   this.grid.on( 'rowclick', this.displayArtifactInformation, this );
+  this.grid.clearButton.on( 'click', this.clearArtifactInformation, this );
 };
 
 //@todo: generalize this search panel for other ST servers to use by providing their own store & reader
 Ext.extend(Sonatype.repoServer.SearchPanel, Ext.Panel, {
+
+  clearArtifactInformation: function( button, e ) {
+    this.artifactInformationPanel.showArtifact( {
+      groupId: '',
+      artifactId: '',
+      version: ''
+    }, true );
+  },
 
   displayArtifactInformation: function( grid, index, e ) {
     var rec = grid.store.getAt( index );

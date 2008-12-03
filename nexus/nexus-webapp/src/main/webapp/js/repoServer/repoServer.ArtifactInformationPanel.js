@@ -41,13 +41,14 @@ Sonatype.repoServer.ArtifactInformationPanel = function( config ) {
           {
             xtype: 'panel',
             layout: 'form',
+            columnWidth: .4,
             labelWidth: 70,
             items: [
               {
                 xtype: 'textfield',
                 fieldLabel: 'Group',
                 name: 'groupId',
-                width: 300,
+                anchor: Sonatype.view.FIELD_OFFSET_WITH_SCROLL,
                 allowBlank: true,
                 readOnly: true
               },
@@ -55,7 +56,7 @@ Sonatype.repoServer.ArtifactInformationPanel = function( config ) {
                 xtype: 'textfield',
                 fieldLabel: 'Artifact',
                 name: 'artifactId',
-                width: 300,
+                anchor: Sonatype.view.FIELD_OFFSET_WITH_SCROLL,
                 allowBlank: true,
                 readOnly: true
               },
@@ -63,14 +64,14 @@ Sonatype.repoServer.ArtifactInformationPanel = function( config ) {
                 xtype: 'textfield',
                 fieldLabel: 'Version',
                 name: 'version',
-                width: 300,
+                anchor: Sonatype.view.FIELD_OFFSET_WITH_SCROLL,
                 allowBlank: true,
                 readOnly: true
               },
               {
                 xtype: 'panel',
                 html: '<div class="x-form-item" tabindex="-1">' + 
-                  '<label class="x-form-item-label" style="width: 70px;">Download</label>' +
+                  '<label class="x-form-item-label" style="width: 70px;">Download:</label>' +
                   '<div id="' + this.linkDivId + '" class="x-form-element" style="padding-left: 75px; padding-top: 3px">' +
                   '</div><div class="x-form-clear-left"/></div>'
               }
@@ -79,14 +80,14 @@ Sonatype.repoServer.ArtifactInformationPanel = function( config ) {
           {
             xtype: 'panel',
             layout: 'form',
-            style: 'padding-left: 20px;',
+            columnWidth: .6,
             labelWidth: 30,
             items: [
               {
                 xtype: 'textarea',
                 fieldLabel: 'XML',
                 name: 'xml',
-                width: 300,
+                anchor: Sonatype.view.FIELD_OFFSET_WITH_SCROLL,
                 height: 100,
                 allowBlank: true,
                 readOnly: true
@@ -113,7 +114,16 @@ Sonatype.repoServer.ArtifactInformationPanel = function( config ) {
 
     items: [
       this.formPanel
-    ]
+    ],
+    
+    listeners: {
+      expand: {
+        fn: function( p ) {
+          this.formPanel.doLayout();
+        },
+        scope: this
+      }
+    }
   } );
 };
 
@@ -154,18 +164,27 @@ Ext.extend( Sonatype.repoServer.ArtifactInformationPanel, Ext.Panel, {
     return String.format( '<a target="_blank" href="{0}">{1}</a>', url, title );
   },
 
-  showArtifact: function( data ) {
-    data.xml = '<dependency>\n' +
-      '  <groupId>' + data.groupId + '</groupId>\n' +
-      '  <artifactId>' + data.artifactId + '</artifactId>\n' +
-      '  <version>' + data.version + '</version>\n' +
-      ( data.classifier ? 
-        ( '  <classifier>' + data.classifier + '</classifier>\n' ) : '' ) +
-      '</dependency>\n';
+  showArtifact: function( data, collapse ) {
+    data.xml = '';
+    var empty = data.groupId == null || data.groupId == ''; 
+    if ( ! empty ) {
+      data.xml = '<dependency>\n' +
+        '  <groupId>' + data.groupId + '</groupId>\n' +
+        '  <artifactId>' + data.artifactId + '</artifactId>\n' +
+        '  <version>' + data.version + '</version>\n' +
+        ( data.classifier ? 
+          ( '  <classifier>' + data.classifier + '</classifier>\n' ) : '' ) +
+        '</dependency>\n';
+    }
     this.formPanel.form.setValues( data );
     var linkDiv = document.getElementById( this.linkDivId );
-    linkDiv.innerHTML = this.formatJarLink( data );
-    this.expand();
+    linkDiv.innerHTML = empty ? '' : this.formatJarLink( data );
+    if ( collapse ) {
+      this.collapse();
+    }
+    else {
+      this.expand();
+    }
   }
 } );
 
