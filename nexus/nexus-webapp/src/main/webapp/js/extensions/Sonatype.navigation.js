@@ -81,7 +81,7 @@ Ext.extend( Sonatype.navigation.NavigationPanel, Ext.Panel, {
 Sonatype.navigation.Section = function( config ) {
   var config = config || {};
   var defaultConfig = {
-    collapsible: false,
+    collapsible: true,
     collapsed: false
   };
   
