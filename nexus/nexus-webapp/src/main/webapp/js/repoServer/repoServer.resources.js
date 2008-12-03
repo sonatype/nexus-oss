@@ -30,7 +30,7 @@
 (function(){
 
 //Nexus default help text values for re-use in child forms
-var userAgentString = 'This the HTTP \'user-agent\' used in HTTP requests.';
+var userAgentString = 'A custom fragment to add to the "user-agent" string used in HTTP requests.';
 var queryString = 'These are additional parameters sent along with the HTTP request. They are appended to the url along with a \'?\'. So \'foo=bar&foo2=bar2\' becomes \'HTTP://myurl?foo=bar&foo2=bar2\'';
 var connectionTimeout = 'Time Nexus will wait for a successful connection before retrying. (seconds)';
 var retrievalRetryCount = 'Nexus will make this many connection attempts before giving up.';

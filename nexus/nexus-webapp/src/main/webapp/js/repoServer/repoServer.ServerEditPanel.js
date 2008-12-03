@@ -147,12 +147,11 @@ Sonatype.repoServer.ServerEditPanel = function(config){
         items: [
           {
             xtype: 'textfield',
-            fieldLabel: 'User Agent',
+            fieldLabel: 'User Agent Customization',
             helpText: ht.userAgentString,
             name: 'globalConnectionSettings.userAgentString',
             anchor: Sonatype.view.FIELD_OFFSET,
-            allowBlank:false,
-            itemCls: 'required-field'
+            allowBlank: true
           },
           {
             xtype: 'textfield',
