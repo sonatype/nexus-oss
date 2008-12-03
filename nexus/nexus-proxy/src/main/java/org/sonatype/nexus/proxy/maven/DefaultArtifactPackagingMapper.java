@@ -28,8 +28,6 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.codehaus.plexus.logging.AbstractLogEnabled;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
 import org.codehaus.plexus.util.IOUtil;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 
@@ -43,7 +41,7 @@ import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
  */
 public class DefaultArtifactPackagingMapper
     extends AbstractLogEnabled
-    implements ArtifactPackagingMapper, Initializable
+    implements ArtifactPackagingMapper
 {
     public static final String MAPPING_PROPERTIES_FILE = "packaging2extension-mapping.properties";
 
@@ -52,7 +50,7 @@ public class DefaultArtifactPackagingMapper
      */
     private ApplicationConfiguration applicationConfiguration;
 
-    private Map<String, String> packaging2extensionMapping = new HashMap<String, String>();
+    private Map<String, String> packaging2extensionMapping;
 
     private final static Map<String, String> defaults;
 
@@ -70,6 +68,60 @@ public class DefaultArtifactPackagingMapper
 
     public Map<String, String> getPackaging2extensionMapping()
     {
+        if ( packaging2extensionMapping == null )
+        {
+            packaging2extensionMapping = new HashMap<String, String>();
+
+            // merge defaults
+            packaging2extensionMapping.putAll( defaults );
+
+            // if user file exists, add it too
+            File propertiesFile = new File(
+                applicationConfiguration.getConfigurationDirectory(),
+                MAPPING_PROPERTIES_FILE );
+
+            if ( propertiesFile.exists() )
+            {
+                getLogger().info( "Found user mappings file, applying it..." );
+
+                Properties userMappings = new Properties();
+
+                FileInputStream fis = null;
+
+                try
+                {
+                    fis = new FileInputStream( propertiesFile );
+
+                    userMappings.load( fis );
+
+                    if ( userMappings.keySet().size() > 0 )
+                    {
+                        for ( Object key : userMappings.keySet() )
+                        {
+                            packaging2extensionMapping.put( key.toString(), userMappings.getProperty( key.toString() ) );
+                        }
+
+                        getLogger().info(
+                            propertiesFile.getAbsolutePath() + " user mapping file contained "
+                                + userMappings.keySet().size() + " mappings, applied them all succesfully." );
+                    }
+                }
+                catch ( IOException e )
+                {
+                    getLogger().warn( "Got IO exception during read of file: " + propertiesFile.getAbsolutePath() );
+                }
+                finally
+                {
+                    IOUtil.close( fis );
+                }
+
+            }
+            else
+            {
+                getLogger().info( "User mappings file not found, will work with defaults..." );
+            }
+        }
+
         return packaging2extensionMapping;
     }
 
@@ -81,58 +133,6 @@ public class DefaultArtifactPackagingMapper
     public Map<String, String> getDefaults()
     {
         return defaults;
-    }
-
-    public void initialize()
-        throws InitializationException
-    {
-        // merge defaults
-        getPackaging2extensionMapping().putAll( defaults );
-
-        // if user file exists, add it too
-        File propertiesFile = new File( applicationConfiguration.getConfigurationDirectory(), MAPPING_PROPERTIES_FILE );
-
-        if ( propertiesFile.exists() )
-        {
-            getLogger().info( "Found user mappings file, applying it..." );
-
-            Properties userMappings = new Properties();
-
-            FileInputStream fis = null;
-
-            try
-            {
-                fis = new FileInputStream( propertiesFile );
-
-                userMappings.load( fis );
-
-                if ( userMappings.keySet().size() > 0 )
-                {
-                    for ( Object key : userMappings.keySet() )
-                    {
-                        getPackaging2extensionMapping()
-                            .put( key.toString(), userMappings.getProperty( key.toString() ) );
-                    }
-
-                    getLogger().info(
-                        propertiesFile.getAbsolutePath() + " user mapping file contained "
-                            + userMappings.keySet().size() + " mappings, applied them all succesfully." );
-                }
-            }
-            catch ( IOException e )
-            {
-                throw new InitializationException( "Cannot initialize, got IOException", e );
-            }
-            finally
-            {
-                IOUtil.close( fis );
-            }
-
-        }
-        else
-        {
-            getLogger().info( "User mappings file not found, will work with defaults..." );
-        }
     }
 
     public String getExtensionForPackaging( String packaging )

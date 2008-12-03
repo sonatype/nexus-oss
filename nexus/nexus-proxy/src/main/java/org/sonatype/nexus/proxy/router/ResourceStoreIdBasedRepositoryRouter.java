@@ -65,28 +65,31 @@ public class ResourceStoreIdBasedRepositoryRouter
      */
     private Map<String, List<RepositoryRouter>> contentClassHandlers;
 
-    public void initialize()
+    protected Map<String, List<RepositoryRouter>> getContentClassHandlers()
     {
-        super.initialize();
-
-        contentClassHandlers = new HashMap<String, List<RepositoryRouter>>();
-
-        for ( RepositoryRouter router : routers )
+        if ( contentClassHandlers == null )
         {
-            if ( !contentClassHandlers.containsKey( router.getId() ) )
-            {
-                contentClassHandlers.put( router.getId(), new ArrayList<RepositoryRouter>() );
-            }
+            contentClassHandlers = new HashMap<String, List<RepositoryRouter>>();
 
-            if ( DefaultContentClass.ID.equals( router.getHandledContentClass().getId() ) )
+            for ( RepositoryRouter router : routers )
             {
-                contentClassHandlers.get( router.getId() ).add( 0, router );
-            }
-            else
-            {
-                contentClassHandlers.get( router.getId() ).add( router );
+                if ( !contentClassHandlers.containsKey( router.getId() ) )
+                {
+                    contentClassHandlers.put( router.getId(), new ArrayList<RepositoryRouter>() );
+                }
+
+                if ( DefaultContentClass.ID.equals( router.getHandledContentClass().getId() ) )
+                {
+                    contentClassHandlers.get( router.getId() ).add( 0, router );
+                }
+                else
+                {
+                    contentClassHandlers.get( router.getId() ).add( router );
+                }
             }
         }
+
+        return contentClassHandlers;
     }
 
     public String getId()
@@ -109,7 +112,7 @@ public class ResourceStoreIdBasedRepositoryRouter
         if ( list )
         {
             // creating a list of collections. Each collection is actually the "root" of an available Router
-            for ( String id : contentClassHandlers.keySet() )
+            for ( String id : getContentClassHandlers().keySet() )
             {
                 if ( getLogger().isDebugEnabled() )
                 {
@@ -163,10 +166,10 @@ public class ResourceStoreIdBasedRepositoryRouter
 
                 ResourceStore defaultHandler = null;
 
-                if ( contentClassHandlers.containsKey( explodedPath[0] ) )
+                if ( getContentClassHandlers().containsKey( explodedPath[0] ) )
                 {
                     // it is a known id, like: repositories, groups, etc.
-                    List<RepositoryRouter> handlers = contentClassHandlers.get( explodedPath[0] );
+                    List<RepositoryRouter> handlers = getContentClassHandlers().get( explodedPath[0] );
 
                     if ( handlers.size() == 1 )
                     {
