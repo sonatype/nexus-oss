@@ -318,6 +318,7 @@ Ext.extend(Sonatype.repoServer.SearchPanel, Ext.Panel, {
   },
   
   fetchFirst50: function( p ) {
+    p.artifactInformationPanel.collapse();
     p.grid.totalRecords = 0;
     p.grid.store.load({
       params: {
