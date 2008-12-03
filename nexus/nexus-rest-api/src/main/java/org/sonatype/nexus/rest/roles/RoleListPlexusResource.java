@@ -85,6 +85,8 @@ public class RoleListPlexusResource
                 result = new RoleResourceResponse();
 
                 resource.setId( role.getId() );
+                
+                resource.setUserManaged( true );
 
                 resource.setResourceURI( createChildReference( request, resource.getId() ).toString() );
 

@@ -93,6 +93,8 @@ public class RolePlexusResource
                 resourceResponse = new RoleResourceResponse();
 
                 resourceResponse.setData( resourceRequest.getData() );
+                
+                resourceResponse.getData().setUserManaged( !role.isReadOnly() );
 
                 resourceResponse
                     .getData().setResourceURI( createChildReference( request, resource.getId() ).toString() );

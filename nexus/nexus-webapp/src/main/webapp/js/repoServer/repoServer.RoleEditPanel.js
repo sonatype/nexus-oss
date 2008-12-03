@@ -68,7 +68,7 @@ Sonatype.repoServer.RoleEditPanel = function(config){
     {name:'sessionTimeout'},
     {name:'privileges'},
     {name:'roles'},
-    {name:'readOnly'}
+    {name:'userManaged'}
   ]);
   
   this.privRecordConstructor = Ext.data.Record.create([
@@ -348,7 +348,7 @@ Sonatype.repoServer.RoleEditPanel = function(config){
     columns: [
       {header: 'Role Id', dataIndex: 'id', width:120, id: 'role-config-id-col'},
       {header: 'Name', dataIndex: 'name', width:200, id: 'role-config-name-col'},
-      {header: 'User Managed', dataIndex: 'readOnly', width:100, id: 'role-config-readonly-col'},
+      {header: 'User Managed', dataIndex: 'userManaged', width:100, id: 'role-config-readonly-col'},
       {header: 'Session Timeout', dataIndex: 'sessionTimeout', width:100, id: 'role-config-session-timeout-col'},
       {header: 'Description', dataIndex: 'description', width:175, id: 'role-config-description-col'}      
     ],
@@ -454,7 +454,7 @@ Ext.extend(Sonatype.repoServer.RoleEditPanel, Ext.Panel, {
       if (i >= 0){
         gridSelectModel.selectRow(i);
         var rec = store.getById(formLayout.activeItem.id);
-        if (rec.data.readOnly == false){
+        if (rec.data.userManaged == true){
         	this.rolesGridPanel.getTopToolbar().items.get('role-delete-btn').enable();
         }
         else{
@@ -511,7 +511,7 @@ Ext.extend(Sonatype.repoServer.RoleEditPanel, Ext.Panel, {
         id : 'new_role_',
         name : 'New Role',
         resourceURI : 'new',
-        readOnly : false
+        userManaged : true
       },
       id); //use "new_role_" id instead of resourceURI like the reader does
     this.rolesDataStore.insert(0, [newRec]);
@@ -604,7 +604,7 @@ Ext.extend(Sonatype.repoServer.RoleEditPanel, Ext.Panel, {
           if (i >= 0){
             gridSelectModel.selectRow(i);
             var rec = store.getById(formLayout.activeItem.id);
-            if (rec.data.readOnly == false
+            if (rec.data.userManaged == true
             		&& this.sp.checkPermission('nexus:roles', this.sp.DELETE)){
             	this.rolesGridPanel.getTopToolbar().items.get('role-delete-btn').enable();
             }
@@ -649,7 +649,7 @@ Ext.extend(Sonatype.repoServer.RoleEditPanel, Ext.Panel, {
           privileges : receivedData.privileges,
           roles : receivedData.roles,
           sessionTimeout : receivedData.sessionTimeout,
-          readOnly : receivedData.readOnly
+          userManaged : receivedData.userManaged
         };
         
         var newRec = new this.roleRecordConstructor(
@@ -695,7 +695,7 @@ Ext.extend(Sonatype.repoServer.RoleEditPanel, Ext.Panel, {
         var rec = this.rolesDataStore.getAt(i);
 
         action.options.fpanel.find('name', 'id')[0].setDisabled( true );
-        if ( rec.data.readOnly) {
+        if ( !rec.data.userManaged) {
           action.options.fpanel.find('name', 'internalResourceHeader')[0].setVisible( true );
           action.options.fpanel.find('name', 'name')[0].setDisabled( true );
           action.options.fpanel.find('name', 'description')[0].setDisabled( true );
@@ -713,7 +713,7 @@ Ext.extend(Sonatype.repoServer.RoleEditPanel, Ext.Panel, {
         rec.set('privileges', receivedData.privileges);
         rec.set('sessionTimeout', receivedData.sessionTimeout);
         rec.set('roles', receivedData.roles);
-        rec.set('readOnly', receivedData.readOnly);
+        rec.set('userManaged', receivedData.userManaged);
         rec.commit();
         rec.endEdit();
   },
@@ -744,7 +744,7 @@ Ext.extend(Sonatype.repoServer.RoleEditPanel, Ext.Panel, {
   rowClick : function(grid, rowIndex, e){
     var rec = grid.store.getAt(rowIndex);
     if (rec) {
-	    if (rec.data.readOnly == false
+	    if (rec.data.userManaged == true
 	    		&& this.sp.checkPermission('nexus:roles', this.sp.DELETE)) {
 	      grid.getTopToolbar().items.get('role-delete-btn').enable();
 	    } else {
@@ -765,7 +765,7 @@ Ext.extend(Sonatype.repoServer.RoleEditPanel, Ext.Panel, {
 	      formPanel.form.on('actionfailed', this.actionFailedHandler, this);
 	      formPanel.on('afterlayout', this.afterLayoutFormHandler, this, {single:true});
 	      
-	      if (rec.data.readOnly == false
+	      if (rec.data.userManaged == true
             && this.sp.checkPermission('nexus:roles', this.sp.EDIT)){
 	          formPanel.buttons[0].disabled = false;
 	      }
@@ -819,7 +819,7 @@ Ext.extend(Sonatype.repoServer.RoleEditPanel, Ext.Panel, {
       ]
     });
     
-    if (this.ctxRecord.data.readOnly == false
+    if (this.ctxRecord.data.userManaged == true
     		&& this.sp.checkPermission('nexus:roles', this.sp.DELETE)){
         menu.add(this.actions.deleteAction);
     }

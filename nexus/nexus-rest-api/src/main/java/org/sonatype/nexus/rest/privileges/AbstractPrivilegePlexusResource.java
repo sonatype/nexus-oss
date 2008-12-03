@@ -82,7 +82,7 @@ public abstract class AbstractPrivilegePlexusResource
             resource.setName( privilege.getName() );
             resource.setDescription( privilege.getDescription() );
             resource.setResourceURI( this.createChildReference( request, resource.getId() ).toString() );
-            resource.setReadOnly( privilege.isReadOnly() );
+            resource.setUserManaged( !privilege.isReadOnly() );
 
             for ( CProperty prop : (List<CProperty>) privilege.getProperties() )
             {

@@ -79,7 +79,7 @@ Sonatype.repoServer.PrivilegeEditPanel = function(config){
     {name:'method'},
     {name:'repositoryTargetId'},
     {name:'description'},
-    {name:'readOnly'},
+    {name:'userManaged'},
     {name:'sTarget', mapping:'repositoryTargetId', convert: this.getRepositoryTarget.createDelegate(this)}
   ]);
   
@@ -351,7 +351,7 @@ Sonatype.repoServer.PrivilegeEditPanel = function(config){
     deferredRender: false,
     columns: [
       {header: 'Name', dataIndex: 'name', width:175, id: 'privilege-config-name-col'},
-      {header: 'User Managed', dataIndex: 'readOnly', width:100 ,id: 'privilege-config-readonly-col'},
+      {header: 'User Managed', dataIndex: 'userManaged', width:100 ,id: 'privilege-config-readonly-col'},
       {header: 'Type', dataIndex: 'type', width:175, id: 'privilege-config-type-col'},
       {header: 'Target', dataIndex: 'sTarget', width:175, id: 'privilege-config-target-col'},
       {header: 'Method', dataIndex: 'method', width:175, id: 'privilege-config-method-col'}
@@ -638,7 +638,7 @@ Ext.extend(Sonatype.repoServer.PrivilegeEditPanel, Ext.Panel, {
         rec.set('name', receivedData.name);
         rec.set('resourceURI', receivedData.resourceURI);
         rec.set('description', receivedData.description);
-        rec.set('readOnly', receivedData.readOnly);
+        rec.set('userManaged', receivedData.userManaged);
         rec.commit();
         rec.endEdit();
   },
@@ -673,7 +673,7 @@ Ext.extend(Sonatype.repoServer.PrivilegeEditPanel, Ext.Panel, {
     var rec = grid.store.getAt(rowIndex);
 
     if (rec) {
-      if (rec.data.type != "application" && rec.data.readOnly == false
+      if (rec.data.type != "application" && rec.data.userManaged == true
               && this.sp.checkPermission('nexus:privileges', this.sp.DELETE)) {
         grid.getTopToolbar().items.get('privilege-delete-btn').enable();
       } else {
@@ -727,7 +727,7 @@ Ext.extend(Sonatype.repoServer.PrivilegeEditPanel, Ext.Panel, {
     });
     
     if (this.ctxRecord.data.type != 'application'
-        && this.ctxRecord.data.readOnly == false
+        && this.ctxRecord.data.userManaged == true
         && this.sp.checkPermission('nexus:privileges', this.sp.DELETE)){
       menu.add(this.actions.deleteAction);
     }

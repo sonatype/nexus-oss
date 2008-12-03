@@ -89,6 +89,8 @@ public class UserListPlexusResource
                 resource.setStatus( user.getStatus() );
 
                 resource.setResourceURI( createChildReference( request, resource.getUserId() ).toString() );
+                
+                resource.setUserManaged( true );
 
                 result.setData( resource );
 

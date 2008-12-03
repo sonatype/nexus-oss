@@ -84,7 +84,7 @@ Sonatype.repoServer.UserEditPanel = function(config){
     {name:'email'},
     {name:'status'},
     {name:'roles'},
-    {name:'readOnly'},
+    {name:'userManaged'},
     {name:'displayRoles', mapping:'roles', convert: this.roleCombiner.createDelegate(this)},
     {name:'stRealm'}
   ]);
@@ -172,7 +172,7 @@ Sonatype.repoServer.UserEditPanel = function(config){
     columns: [
       {header: 'User ID', dataIndex: 'userId', width:100, id: 'user-config-userid-col'},
       {header: 'Realm', dataIndex: 'stRealm', width:50, id: 'user-config-realm-col'},
-      {header: 'User Managed', dataIndex: 'readOnly', width:100, id: 'user-config-readonly-col'},
+      {header: 'User Managed', dataIndex: 'userManaged', width:100, id: 'user-config-readonly-col'},
       {header: 'Name', dataIndex: 'name', width:175, id: 'user-config-name-col'},
       {header: 'Email', dataIndex: 'email', width:175, id: 'user-config-email-col'},
       {header: 'Status', dataIndex: 'status', width:75, id: 'user-config-status-col'},
@@ -256,7 +256,7 @@ Ext.extend(Sonatype.repoServer.UserEditPanel, Ext.Panel, {
       if (i >= 0){
         gridSelectModel.selectRow(i);
         var rec = store.getById(formLayout.activeItem.id);
-        if (rec.data.readOnly == false
+        if (rec.data.userManaged == true
         		&& this.sp.checkPermission('nexus:users', this.sp.DELETE)){
         	this.usersGridPanel.getTopToolbar().items.get('user-delete-btn').enable();
         }
@@ -285,7 +285,7 @@ Ext.extend(Sonatype.repoServer.UserEditPanel, Ext.Panel, {
     var newRec = new this.userRecordConstructor({
         userId : 'New User',
         resourceURI : 'new',
-        readOnly : false
+        userManaged : true
       },
       id
     ); //use "new_user_" id instead of resourceURI like the reader does
@@ -519,7 +519,7 @@ Ext.extend(Sonatype.repoServer.UserEditPanel, Ext.Panel, {
           if (i >= 0){
             gridSelectModel.selectRow(i);
             var rec = store.getById(formLayout.activeItem.id);
-            if (rec.data.readOnly == false
+            if (rec.data.userManaged == true
             		&& this.sp.checkPermission('nexus:users', this.sp.DELETE)){
             	this.usersGridPanel.getTopToolbar().items.get('user-delete-btn').enable();
             }
@@ -559,7 +559,7 @@ Ext.extend(Sonatype.repoServer.UserEditPanel, Ext.Panel, {
         email : receivedData.email,
         status : receivedData.status,
         roles : receivedData.roles,
-        readOnly : receivedData.readOnly,
+        userManaged : receivedData.userManaged,
         displayRoles : this.roleCombiner(receivedData.roles),
         stRealm: NEXUS_USER_REALM
       };
@@ -592,7 +592,7 @@ Ext.extend(Sonatype.repoServer.UserEditPanel, Ext.Panel, {
       rec.set('email', receivedData.email);
       rec.set('status', receivedData.status);
       rec.set('roles', receivedData.roles);
-      rec.set('readOnly', receivedData.readOnly);
+      rec.set('userManaged', receivedData.userManaged);
       rec.set('displayRoles', this.roleCombiner(receivedData.roles));
       rec.commit();
       rec.endEdit();
@@ -602,7 +602,7 @@ Ext.extend(Sonatype.repoServer.UserEditPanel, Ext.Panel, {
   rowClick : function(grid, rowIndex, e){
     var rec = grid.store.getAt(rowIndex);
     if (rec) {
-	    if (rec.data.readOnly == false
+	    if (rec.data.userManaged == true
 	            && this.sp.checkPermission('nexus:users', this.sp.DELETE)) {
 	      grid.getTopToolbar().items.get('user-delete-btn').enable();
 	    } else {
@@ -618,7 +618,7 @@ Ext.extend(Sonatype.repoServer.UserEditPanel, Ext.Panel, {
 	      if ( editor ) {
   	      formPanel = new editor( {
             payload: rec,
-            readOnly: rec.data.readOnly ||
+            readOnly: rec.data.userManaged == false ||
               ! this.sp.checkPermission( 'nexus:users', this.sp.EDIT ),
             listeners: {
               cancel: {
@@ -681,7 +681,7 @@ Ext.extend(Sonatype.repoServer.UserEditPanel, Ext.Panel, {
   },
 
   onUserMenuInit: function( menu, userRecord, a, b, c ) {
-    if ( userRecord.data.readOnly == false && userRecord.data.stRealm == NEXUS_USER_REALM ) {
+    if ( userRecord.data.userManaged == true && userRecord.data.stRealm == NEXUS_USER_REALM ) {
 
       if ( this.sp.checkPermission( 'nexus:users', this.sp.DELETE ) ) {
         menu.add( this.actions.deleteAction );

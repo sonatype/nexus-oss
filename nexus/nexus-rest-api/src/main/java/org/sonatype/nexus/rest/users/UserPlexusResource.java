@@ -101,6 +101,8 @@ public class UserPlexusResource
                 result = new UserResourceResponse();
 
                 result.setData( resourceRequest.getData() );
+                
+                result.getData().setUserManaged( !user.isReadOnly() );
 
                 result.getData().setResourceURI( createChildReference( request, resource.getUserId() ).toString() );
 

@@ -31,7 +31,7 @@ public abstract class AbstractRolePlexusResource
         resource.setName( role.getName() );
         resource.setResourceURI( this.createChildReference( request, resource.getId() ).toString() );
         resource.setSessionTimeout( role.getSessionTimeout() );
-        resource.setReadOnly( role.isReadOnly() );
+        resource.setUserManaged( !role.isReadOnly() );
 
         for ( String roleId : (List<String>) role.getRoles() )
         {
