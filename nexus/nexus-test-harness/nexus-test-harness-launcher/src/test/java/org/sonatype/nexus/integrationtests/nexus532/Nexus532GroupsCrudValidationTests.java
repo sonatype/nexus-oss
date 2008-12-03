@@ -125,20 +125,24 @@ public class Nexus532GroupsCrudValidationTests
                              this.messageUtil.getGroup( resource.getId() ).getName() );
     }
 
-    //@Test
-    public void maven1GroupWithMaven2RepoTest()
+    @Test
+    public void maven2Maven2GroupTest()
         throws IOException
     {
 
         RepositoryGroupResource resource = new RepositoryGroupResource();
 
-        resource.setId( "maven1GroupWithMaven2RepoTest" );
-        resource.setName( "maven1GroupWithMaven2RepoTest" );
-        resource.setFormat( "maven1" );
+        resource.setId( "maven2Maven2GroupTest" );
+        resource.setName( "maven2Maven2GroupTest" );
 
-        RepositoryGroupMemberRepository member = new RepositoryGroupMemberRepository();
-        member.setId( "nexus-test-harness-repo" );
-        resource.addRepository( member );
+        RepositoryGroupMemberRepository m2Repo = new RepositoryGroupMemberRepository();
+        m2Repo.setId( "nexus-test-harness-repo" );
+        resource.addRepository( m2Repo );
+        
+        RepositoryGroupMemberRepository m1Repo = new RepositoryGroupMemberRepository();
+        m1Repo.setId( "nexus-test-harness-shadow" );
+        resource.addRepository( m1Repo );
+        
 
         Response response = this.messageUtil.sendMessage( Method.POST, resource );
         String responseText = response.getEntity().getText();
