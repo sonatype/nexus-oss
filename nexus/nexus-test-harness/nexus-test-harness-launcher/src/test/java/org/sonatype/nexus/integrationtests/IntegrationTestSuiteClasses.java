@@ -7,6 +7,7 @@ import org.sonatype.nexus.integrationtests.client.nexus758.Nexus758StatusService
 import org.sonatype.nexus.integrationtests.nexus1022.Nexus1022RebuildRepositoryMavenMetadataTaskTest;
 import org.sonatype.nexus.integrationtests.nexus1071.Nexus1071AnonAccessTest;
 import org.sonatype.nexus.integrationtests.nexus1071.Nexus1071DeployToRepoAnonCannotAccess;
+import org.sonatype.nexus.integrationtests.nexus1197.Nexus1197CheckUserAgentTest;
 import org.sonatype.nexus.integrationtests.nexus133.Nexus133TargetCrudJsonTests;
 import org.sonatype.nexus.integrationtests.nexus133.Nexus133TargetCrudXmlTests;
 import org.sonatype.nexus.integrationtests.nexus133.Nexus133TargetValidationTests;
@@ -177,7 +178,8 @@ import org.sonatype.nexus.integrationtests.webproxy.nexus1116.Nexus1116InvalidPr
     Nexus1101NexusOverWebproxyTest.class,
     Nexus1113WebProxyWithAuthenticationTest.class,
     Nexus1116InvalidProxyTest.class,
-    Nexus1111ProxyRemote500ErrorTest.class
+    Nexus1111ProxyRemote500ErrorTest.class,
+    Nexus1197CheckUserAgentTest.class
 } )
 public class IntegrationTestSuiteClasses
 {
