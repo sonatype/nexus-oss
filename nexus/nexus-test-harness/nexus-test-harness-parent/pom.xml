@@ -72,6 +72,12 @@
       <artifactId>nexus-test-harness-base</artifactId>
       <version>${project.version}</version>
     </dependency>
+    
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-simple-memory-realm</artifactId>
+      <version>${project.version}</version>
+    </dependency>
 
   </dependencies>
 
