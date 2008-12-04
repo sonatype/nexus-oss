@@ -47,11 +47,8 @@
                                  specified, then the presence of the header with any value will trigger
                                  the scheme modification.
                             -->
-                            <Set name="header">User-Agent</Set>
-                            <!--
                             <Set name="header">X-Forwarded-Scheme</Set>
                             <Set name="headerValue">https</Set>
-                            -->
                             <Set name="scheme">https</Set>
                         </New>
                     </Item>
