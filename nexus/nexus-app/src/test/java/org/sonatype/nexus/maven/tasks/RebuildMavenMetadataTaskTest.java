@@ -1,10 +1,11 @@
 package org.sonatype.nexus.maven.tasks;
 
+import org.sonatype.nexus.AbstractMavenRepoContentTests;
 import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.scheduling.ScheduledTask;
 
 public class RebuildMavenMetadataTaskTest
-    extends AbstractMavenTaskTests
+    extends AbstractMavenRepoContentTests
 {
     protected NexusScheduler nexusScheduler;
 

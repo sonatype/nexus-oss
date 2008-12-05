@@ -1,4 +1,4 @@
-package org.sonatype.nexus.maven.tasks;
+package org.sonatype.nexus;
 
 import java.io.File;
 import java.io.IOException;
@@ -14,7 +14,12 @@ import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 
-public class AbstractMavenTaskTests
+/**
+ * Tests that needs some repo content and are Maven related.
+ * 
+ * @author cstamas
+ */
+public class AbstractMavenRepoContentTests
     extends AbstractNexusTestCase
 {
     protected DefaultNexus defaultNexus;

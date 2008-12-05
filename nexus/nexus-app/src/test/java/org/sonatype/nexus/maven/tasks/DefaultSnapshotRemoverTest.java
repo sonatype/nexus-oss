@@ -3,10 +3,11 @@ package org.sonatype.nexus.maven.tasks;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.sonatype.nexus.AbstractMavenRepoContentTests;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 
 public class DefaultSnapshotRemoverTest
-    extends AbstractMavenTaskTests
+    extends AbstractMavenRepoContentTests
 {
     protected void validateResults( Map<String, Boolean> results )
         throws Exception

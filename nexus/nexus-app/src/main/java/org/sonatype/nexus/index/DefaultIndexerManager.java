@@ -763,35 +763,6 @@ public class DefaultIndexerManager
         }
     }
 
-    private StorageFileItem retrieveItem( Repository repository, Map<String, Object> ctx, RepositoryItemUid uid )
-        throws StorageException,
-            RepositoryNotAvailableException,
-            ItemNotFoundException
-    {
-        try
-        {
-            return (StorageFileItem) repository.retrieveItem( false, uid, ctx );
-        }
-        catch ( StorageException ex )
-        {
-            deleteItem( repository, ctx, uid );
-
-            throw ex;
-        }
-        catch ( ItemNotFoundException ex )
-        {
-            deleteItem( repository, ctx, uid );
-
-            throw ex;
-        }
-        catch ( RepositoryNotAvailableException ex )
-        {
-            deleteItem( repository, ctx, uid );
-
-            throw ex;
-        }
-    }
-
     private File createTmpDir()
     {
         File tmpdir = new File( getTempDirectory(), "nx-remote-index" + System.currentTimeMillis() );
@@ -822,80 +793,16 @@ public class DefaultIndexerManager
         return directory;
     }
 
-    private void deleteItem( Repository repository, Map<String, Object> ctx, RepositoryItemUid uid )
-    {
-        if ( uid != null )
-        {
-            try
-            {
-                repository.deleteItem( uid, ctx );
-            }
-            catch ( ItemNotFoundException ex )
-            {
-                // silent
-            }
-            catch ( Exception ex )
-            {
-                getLogger().warn( "Cannot delete index part:", ex );
-            }
-        }
-    }
-
     protected void publishRepositoryGroupIndex( String repositoryGroupId, List<Repository> repositories )
         throws IOException,
             NoSuchRepositoryGroupException
     {
-        getLogger().info( "Merging and publishing index for repository group " + repositoryGroupId );
-
-        IndexingContext context = nexusIndexer.getIndexingContexts().get( getMergedContextId( repositoryGroupId ) );
-
-        context.purge();
-
-        IndexingContext bestContext = null;
-
-        for ( Repository repo : repositories )
-        {
-            // only merge non-shadows and indexable reposes
-            if ( !RepositoryType.SHADOW.equals( repo.getRepositoryType() ) && repo.isIndexable() )
-            {
-                // local idx has every repo
-                try
-                {
-                    bestContext = getRepositoryBestIndexContext( repo.getId() );
-                }
-                catch ( NoSuchRepositoryException e )
-                {
-                    // not to happen, we are iterating over them
-                }
-
-                if ( getLogger().isDebugEnabled() )
-                {
-                    getLogger().debug(
-                        " ...found best context " + bestContext.getId() + " for repository "
-                            + bestContext.getRepositoryId() + ", merging it..." );
-                }
-
-                context.merge( bestContext.getIndexDirectory() );
-            }
-        }
-
-        if ( getLogger().isDebugEnabled() )
-        {
-            getLogger().debug( "Rebuilding groups in merged index for repository group " + repositoryGroupId );
-        }
-
-        // rebuild group info
-        nexusIndexer.rebuildGroups( context );
-
-        // committing changes
-        context.getIndexWriter().flush();
-
-        context.updateTimestamp();
-
         if ( getLogger().isDebugEnabled() )
         {
             getLogger().debug( "Publishing merged index for repository group " + repositoryGroupId );
         }
+
+        IndexingContext context = nexusIndexer.getIndexingContexts().get( getMergedContextId( repositoryGroupId ) );
 
         File targetDir = null;
 
@@ -992,6 +899,12 @@ public class DefaultIndexerManager
     {
         List<Repository> reposes = repositoryRegistry.getRepositories();
 
+        // purge all group idxes, below will get all repopulated
+        for ( String groupId : repositoryRegistry.getRepositoryGroupIds() )
+        {
+            purgeRepositoryGroupIndex( groupId );
+        }
+
         for ( Repository repository : reposes )
         {
             reindexRepository( repository );
@@ -1016,6 +929,9 @@ public class DefaultIndexerManager
             IOException
     {
         List<Repository> group = repositoryRegistry.getRepositoryGroup( repositoryGroupId );
+
+        // purge it, and below will be repopulated
+        purgeRepositoryGroupIndex( repositoryGroupId );
 
         for ( Repository repository : group )
         {
@@ -1060,6 +976,8 @@ public class DefaultIndexerManager
             tmpContext.updateTimestamp( true );
 
             context.replace( tmpContext.getIndexDirectory() );
+
+            mergeRepositoryGroupIndexWithMember( repository );
         }
         finally
         {
@@ -1074,6 +992,70 @@ public class DefaultIndexerManager
             {
                 FileUtils.deleteDirectory( tmpdir );
             }
+        }
+    }
+
+    protected void mergeRepositoryGroupIndexWithMember( Repository repository )
+        throws IOException
+    {
+        if ( !RepositoryType.SHADOW.equals( repository.getRepositoryType() ) )
+        {
+            List<String> groupsOfRepository = repositoryRegistry.getGroupsOfRepository( repository.getId() );
+
+            for ( String repositoryGroupId : groupsOfRepository )
+            {
+                getLogger().info(
+                    "Cascading merge of group indexes for group '" + repositoryGroupId + "', where repository '"
+                        + repository.getId() + "' is member." );
+
+                IndexingContext context = nexusIndexer.getIndexingContexts().get(
+                    getMergedContextId( repositoryGroupId ) );
+
+                IndexingContext bestContext = null;
+
+                // local idx has every repo
+                try
+                {
+                    bestContext = getRepositoryBestIndexContext( repository.getId() );
+                }
+                catch ( NoSuchRepositoryException e )
+                {
+                    // not to happen, we are iterating over them
+                }
+
+                if ( getLogger().isDebugEnabled() )
+                {
+                    getLogger().debug(
+                        " ...found best context " + bestContext.getId() + " for repository "
+                            + bestContext.getRepositoryId() + ", merging it..." );
+                }
+
+                context.merge( bestContext.getIndexDirectory() );
+
+                if ( getLogger().isDebugEnabled() )
+                {
+                    getLogger().debug( "Rebuilding groups in merged index for repository group " + repositoryGroupId );
+                }
+
+                // rebuild group info
+                nexusIndexer.rebuildGroups( context );
+
+                // committing changes
+                context.getIndexWriter().flush();
+
+                context.updateTimestamp();
+            }
+        }
+    }
+
+    protected void purgeRepositoryGroupIndex( String repositoryGroupId )
+        throws IOException
+    {
+        IndexingContext context = nexusIndexer.getIndexingContexts().get( getMergedContextId( repositoryGroupId ) );
+
+        if ( context != null )
+        {
+            context.purge();
         }
     }
 
@@ -1372,7 +1354,9 @@ public class DefaultIndexerManager
         return nexusIndexer.constructQuery( field, query );
     }
 
-    // == En Privee
+    // ----------------------------------------------------------------------------
+    // PRIVATE
+    // ----------------------------------------------------------------------------
 
     protected String getLocalContextId( String repositoryId )
     {
@@ -1387,6 +1371,14 @@ public class DefaultIndexerManager
     protected String getMergedContextId( String groupId )
     {
         return groupId + CTX_MERGED_SUFIX;
+    }
+
+    private StorageFileItem retrieveItem( Repository repository, Map<String, Object> ctx, RepositoryItemUid uid )
+        throws StorageException,
+            RepositoryNotAvailableException,
+            ItemNotFoundException
+    {
+        return (StorageFileItem) repository.retrieveItem( false, uid, ctx );
     }
 
 }
