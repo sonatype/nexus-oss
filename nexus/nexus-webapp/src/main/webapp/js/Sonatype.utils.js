@@ -505,7 +505,10 @@ Sonatype.utils = {
                     } );
                   },
                   failure: function(response, options){
-                    Sonatype.utils.connectionError( response, 'There is a problem resetting your password.' )
+                    var errorOptions = {
+                        hideErrorStatus : true
+                    };
+                    Sonatype.utils.connectionError( response, 'There is a problem resetting your password.', false, errorOptions )
                   }
                 });
               }
