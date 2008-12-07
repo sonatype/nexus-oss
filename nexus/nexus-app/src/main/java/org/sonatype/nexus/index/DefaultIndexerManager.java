@@ -510,16 +510,19 @@ public class DefaultIndexerManager
         {
             repository.setIndexable( false );
 
-            // only proxies have remote indexes
-            if ( RepositoryType.PROXY.equals( repository.getRepositoryType() ) )
+            getLogger().info( "Publishing best index for repository " + repository.getId() );
+
+            // publish index update, publish the best context we have downstream
+            IndexingContext context = null;
+
+            try
             {
-                updateIndexForRemoteRepository( repository );
+                context = getRepositoryBestIndexContext( repository.getId() );
             }
-
-            getLogger().info( "Publishing local index for repository " + repository.getId() );
-
-            // publish index update
-            IndexingContext context = nexusIndexer.getIndexingContexts().get( getLocalContextId( repository.getId() ) );
+            catch ( NoSuchRepositoryException e )
+            {
+                // will not happen, but...
+            }
 
             File targetDir = null;
 
@@ -530,6 +533,8 @@ public class DefaultIndexerManager
                 if ( !targetDir.mkdirs() )
                 {
                     getLogger().error( "Could not create temp dir for packing indexes: " + targetDir );
+
+                    throw new IOException( "Could not create temp dir for packing indexes: " + targetDir );
                 }
                 else
                 {
@@ -590,6 +595,278 @@ public class DefaultIndexerManager
         finally
         {
             repository.setIndexable( repositoryIndexable );
+        }
+    }
+
+    protected void publishRepositoryGroupIndex( String repositoryGroupId, List<Repository> repositories )
+        throws IOException,
+            NoSuchRepositoryGroupException
+    {
+        if ( getLogger().isDebugEnabled() )
+        {
+            getLogger().debug( "Publishing merged index for repository group " + repositoryGroupId );
+        }
+
+        IndexingContext context = nexusIndexer.getIndexingContexts().get( getMergedContextId( repositoryGroupId ) );
+
+        File targetDir = null;
+
+        try
+        {
+            targetDir = new File( getTempDirectory(), "nx-index" + System.currentTimeMillis() );
+
+            if ( targetDir.mkdirs() )
+            {
+                if ( getLogger().isDebugEnabled() )
+                {
+                    getLogger().debug( "Packing the merged index context." );
+                }
+
+                indexPacker.packIndex( context, targetDir );
+
+                FileInputStream fi = null;
+
+                DigestInputStream sha1Is = null;
+
+                DigestInputStream md5Is = null;
+
+                File[] files = targetDir.listFiles();
+
+                if ( files != null )
+                {
+                    try
+                    {
+                        for ( File file : files )
+                        {
+                            fi = new FileInputStream( file );
+
+                            sha1Is = new DigestInputStream( fi, MessageDigest.getInstance( "SHA1" ) );
+
+                            md5Is = new DigestInputStream( sha1Is, MessageDigest.getInstance( "MD5" ) );
+
+                            String filePath = DefaultGroupIdBasedRepositoryRouter.ID + "/" + repositoryGroupId
+                                + "/.index/" + file.getName();
+
+                            RepositoryRouter router = (RepositoryRouter) rootRouter.resolveResourceStore(
+                                new ResourceStoreRequest( filePath, true ) ).get( 0 );
+
+                            if ( getLogger().isDebugEnabled() )
+                            {
+                                getLogger().debug(
+                                    "Storing the " + file.getName() + " file in the " + router.getId() + " router." );
+                            }
+
+                            router.storeItem( repositoryGroupId + "/.index/" + file.getName(), md5Is );
+
+                            String sha1Sum = new String( Hex.encodeHex( sha1Is.getMessageDigest().digest() ) );
+
+                            String md5Sum = new String( Hex.encodeHex( md5Is.getMessageDigest().digest() ) );
+
+                            router.storeItem(
+                                repositoryGroupId + "/.index/" + file.getName() + ".sha1",
+                                new ByteArrayInputStream( sha1Sum.getBytes() ) );
+
+                            router.storeItem(
+                                repositoryGroupId + "/.index/" + file.getName() + ".md5",
+                                new ByteArrayInputStream( md5Sum.getBytes() ) );
+                        }
+                    }
+                    catch ( NoSuchAlgorithmException e )
+                    {
+                        // will not happen
+                    }
+                }
+            }
+            else
+            {
+                getLogger().warn( "Could not create temp dir for packing indexes: " + targetDir );
+            }
+        }
+        finally
+        {
+            if ( targetDir != null )
+            {
+                if ( getLogger().isDebugEnabled() )
+                {
+                    getLogger().debug( "Cleanup of temp files..." );
+                }
+                FileUtils.deleteDirectory( targetDir );
+            }
+        }
+    }
+
+    // ----------------------------------------------------------------------------
+    // Reindexing related
+    // ----------------------------------------------------------------------------
+
+    public void reindexAllRepositories( String path )
+        throws IOException
+    {
+        List<Repository> reposes = repositoryRegistry.getRepositories();
+
+        // purge all group idxes, below will get all repopulated
+        for ( String groupId : repositoryRegistry.getRepositoryGroupIds() )
+        {
+            purgeRepositoryGroupIndex( groupId );
+        }
+
+        for ( Repository repository : reposes )
+        {
+            reindexRepository( repository );
+        }
+
+        publishAllIndex();
+    }
+
+    public void reindexRepository( String path, String repositoryId )
+        throws NoSuchRepositoryException,
+            IOException
+    {
+        Repository repository = repositoryRegistry.getRepository( repositoryId );
+
+        reindexRepository( repository );
+
+        publishRepositoryIndex( repositoryId );
+    }
+
+    public void reindexRepositoryGroup( String path, String repositoryGroupId )
+        throws NoSuchRepositoryGroupException,
+            IOException
+    {
+        List<Repository> group = repositoryRegistry.getRepositoryGroup( repositoryGroupId );
+
+        // purge it, and below will be repopulated
+        purgeRepositoryGroupIndex( repositoryGroupId );
+
+        for ( Repository repository : group )
+        {
+            reindexRepository( repository );
+        }
+
+        publishRepositoryGroupIndex( repositoryGroupId );
+    }
+
+    protected void reindexRepository( Repository repository )
+        throws IOException
+    {
+        boolean repositoryIndexable = repository.isIndexable();
+
+        IndexingContext tmpContext = null;
+
+        File tmpdir = null;
+
+        try
+        {
+            repository.setIndexable( false );
+
+            tmpdir = new File( getTempDirectory(), "nx-remote-index" + System.currentTimeMillis() );
+
+            tmpdir.mkdirs();
+
+            FSDirectory directory = FSDirectory.getDirectory( tmpdir );
+
+            IndexingContext context = nexusIndexer.getIndexingContexts().get( getLocalContextId( repository.getId() ) );
+
+            tmpContext = nexusIndexer.addIndexingContextForced(
+                context.getId() + "-tmp",
+                context.getRepositoryId(),
+                context.getRepository(),
+                directory,
+                context.getRepositoryUrl(),
+                context.getIndexUpdateUrl(),
+                context.getIndexCreators() );
+
+            nexusIndexer.scan( tmpContext );
+
+            tmpContext.updateTimestamp( true );
+
+            context.replace( tmpContext.getIndexDirectory() );
+
+            // only proxies have remote indexes
+            if ( RepositoryType.PROXY.equals( repository.getRepositoryType() ) )
+            {
+                updateIndexForRemoteRepository( repository );
+            }
+
+            mergeRepositoryGroupIndexWithMember( repository );
+        }
+        finally
+        {
+            repository.setIndexable( repositoryIndexable );
+
+            if ( tmpContext != null )
+            {
+                nexusIndexer.removeIndexingContext( tmpContext, true );
+            }
+
+            if ( tmpdir != null )
+            {
+                FileUtils.deleteDirectory( tmpdir );
+            }
+        }
+    }
+
+    protected void mergeRepositoryGroupIndexWithMember( Repository repository )
+        throws IOException
+    {
+        if ( !RepositoryType.SHADOW.equals( repository.getRepositoryType() ) )
+        {
+            List<String> groupsOfRepository = repositoryRegistry.getGroupsOfRepository( repository.getId() );
+
+            for ( String repositoryGroupId : groupsOfRepository )
+            {
+                getLogger().info(
+                    "Cascading merge of group indexes for group '" + repositoryGroupId + "', where repository '"
+                        + repository.getId() + "' is member." );
+
+                IndexingContext context = nexusIndexer.getIndexingContexts().get(
+                    getMergedContextId( repositoryGroupId ) );
+
+                IndexingContext bestContext = null;
+
+                // local idx has every repo
+                try
+                {
+                    bestContext = getRepositoryBestIndexContext( repository.getId() );
+                }
+                catch ( NoSuchRepositoryException e )
+                {
+                    // not to happen, we are iterating over them
+                }
+
+                if ( getLogger().isDebugEnabled() )
+                {
+                    getLogger().debug(
+                        " ...found best context " + bestContext.getId() + " for repository "
+                            + bestContext.getRepositoryId() + ", merging it..." );
+                }
+
+                context.merge( bestContext.getIndexDirectory() );
+
+                if ( getLogger().isDebugEnabled() )
+                {
+                    getLogger().debug( "Rebuilding groups in merged index for repository group " + repositoryGroupId );
+                }
+
+                // rebuild group info
+                nexusIndexer.rebuildGroups( context );
+
+                // committing changes
+                context.getIndexWriter().flush();
+
+                context.updateTimestamp();
+            }
+        }
+    }
+
+    protected void purgeRepositoryGroupIndex( String repositoryGroupId )
+        throws IOException
+    {
+        IndexingContext context = nexusIndexer.getIndexingContexts().get( getMergedContextId( repositoryGroupId ) );
+
+        if ( context != null )
+        {
+            context.purge();
         }
     }
 
@@ -791,272 +1068,6 @@ public class DefaultIndexerManager
         }
 
         return directory;
-    }
-
-    protected void publishRepositoryGroupIndex( String repositoryGroupId, List<Repository> repositories )
-        throws IOException,
-            NoSuchRepositoryGroupException
-    {
-        if ( getLogger().isDebugEnabled() )
-        {
-            getLogger().debug( "Publishing merged index for repository group " + repositoryGroupId );
-        }
-
-        IndexingContext context = nexusIndexer.getIndexingContexts().get( getMergedContextId( repositoryGroupId ) );
-
-        File targetDir = null;
-
-        try
-        {
-            targetDir = new File( getTempDirectory(), "nx-index" + System.currentTimeMillis() );
-
-            if ( targetDir.mkdirs() )
-            {
-                if ( getLogger().isDebugEnabled() )
-                {
-                    getLogger().debug( "Packing the merged index context." );
-                }
-
-                indexPacker.packIndex( context, targetDir );
-
-                FileInputStream fi = null;
-
-                DigestInputStream sha1Is = null;
-
-                DigestInputStream md5Is = null;
-
-                File[] files = targetDir.listFiles();
-
-                if ( files != null )
-                {
-                    try
-                    {
-                        for ( File file : files )
-                        {
-                            fi = new FileInputStream( file );
-
-                            sha1Is = new DigestInputStream( fi, MessageDigest.getInstance( "SHA1" ) );
-
-                            md5Is = new DigestInputStream( sha1Is, MessageDigest.getInstance( "MD5" ) );
-
-                            String filePath = DefaultGroupIdBasedRepositoryRouter.ID + "/" + repositoryGroupId
-                                + "/.index/" + file.getName();
-
-                            RepositoryRouter router = (RepositoryRouter) rootRouter.resolveResourceStore(
-                                new ResourceStoreRequest( filePath, true ) ).get( 0 );
-
-                            if ( getLogger().isDebugEnabled() )
-                            {
-                                getLogger().debug(
-                                    "Storing the " + file.getName() + " file in the " + router.getId() + " router." );
-                            }
-
-                            router.storeItem( repositoryGroupId + "/.index/" + file.getName(), md5Is );
-
-                            String sha1Sum = new String( Hex.encodeHex( sha1Is.getMessageDigest().digest() ) );
-
-                            String md5Sum = new String( Hex.encodeHex( md5Is.getMessageDigest().digest() ) );
-
-                            router.storeItem(
-                                repositoryGroupId + "/.index/" + file.getName() + ".sha1",
-                                new ByteArrayInputStream( sha1Sum.getBytes() ) );
-
-                            router.storeItem(
-                                repositoryGroupId + "/.index/" + file.getName() + ".md5",
-                                new ByteArrayInputStream( md5Sum.getBytes() ) );
-                        }
-                    }
-                    catch ( NoSuchAlgorithmException e )
-                    {
-                        // will not happen
-                    }
-                }
-            }
-            else
-            {
-                getLogger().warn( "Could not create temp dir for packing indexes: " + targetDir );
-            }
-        }
-        finally
-        {
-            if ( targetDir != null )
-            {
-                if ( getLogger().isDebugEnabled() )
-                {
-                    getLogger().debug( "Cleanup of temp files..." );
-                }
-                FileUtils.deleteDirectory( targetDir );
-            }
-        }
-    }
-
-    // ----------------------------------------------------------------------------
-    // Reindexing related
-    // ----------------------------------------------------------------------------
-
-    public void reindexAllRepositories( String path )
-        throws IOException
-    {
-        List<Repository> reposes = repositoryRegistry.getRepositories();
-
-        // purge all group idxes, below will get all repopulated
-        for ( String groupId : repositoryRegistry.getRepositoryGroupIds() )
-        {
-            purgeRepositoryGroupIndex( groupId );
-        }
-
-        for ( Repository repository : reposes )
-        {
-            reindexRepository( repository );
-        }
-
-        publishAllIndex();
-    }
-
-    public void reindexRepository( String path, String repositoryId )
-        throws NoSuchRepositoryException,
-            IOException
-    {
-        Repository repository = repositoryRegistry.getRepository( repositoryId );
-
-        reindexRepository( repository );
-
-        publishRepositoryIndex( repositoryId );
-    }
-
-    public void reindexRepositoryGroup( String path, String repositoryGroupId )
-        throws NoSuchRepositoryGroupException,
-            IOException
-    {
-        List<Repository> group = repositoryRegistry.getRepositoryGroup( repositoryGroupId );
-
-        // purge it, and below will be repopulated
-        purgeRepositoryGroupIndex( repositoryGroupId );
-
-        for ( Repository repository : group )
-        {
-            reindexRepository( repository );
-        }
-
-        publishRepositoryGroupIndex( repositoryGroupId );
-    }
-
-    protected void reindexRepository( Repository repository )
-        throws IOException
-    {
-        boolean repositoryIndexable = repository.isIndexable();
-
-        IndexingContext tmpContext = null;
-
-        File tmpdir = null;
-
-        try
-        {
-            repository.setIndexable( false );
-
-            tmpdir = new File( getTempDirectory(), "nx-remote-index" + System.currentTimeMillis() );
-
-            tmpdir.mkdirs();
-
-            FSDirectory directory = FSDirectory.getDirectory( tmpdir );
-
-            IndexingContext context = nexusIndexer.getIndexingContexts().get( getLocalContextId( repository.getId() ) );
-
-            tmpContext = nexusIndexer.addIndexingContextForced(
-                context.getId() + "-tmp",
-                context.getRepositoryId(),
-                context.getRepository(),
-                directory,
-                context.getRepositoryUrl(),
-                context.getIndexUpdateUrl(),
-                context.getIndexCreators() );
-
-            nexusIndexer.scan( tmpContext );
-
-            tmpContext.updateTimestamp( true );
-
-            context.replace( tmpContext.getIndexDirectory() );
-
-            mergeRepositoryGroupIndexWithMember( repository );
-        }
-        finally
-        {
-            repository.setIndexable( repositoryIndexable );
-
-            if ( tmpContext != null )
-            {
-                nexusIndexer.removeIndexingContext( tmpContext, true );
-            }
-
-            if ( tmpdir != null )
-            {
-                FileUtils.deleteDirectory( tmpdir );
-            }
-        }
-    }
-
-    protected void mergeRepositoryGroupIndexWithMember( Repository repository )
-        throws IOException
-    {
-        if ( !RepositoryType.SHADOW.equals( repository.getRepositoryType() ) )
-        {
-            List<String> groupsOfRepository = repositoryRegistry.getGroupsOfRepository( repository.getId() );
-
-            for ( String repositoryGroupId : groupsOfRepository )
-            {
-                getLogger().info(
-                    "Cascading merge of group indexes for group '" + repositoryGroupId + "', where repository '"
-                        + repository.getId() + "' is member." );
-
-                IndexingContext context = nexusIndexer.getIndexingContexts().get(
-                    getMergedContextId( repositoryGroupId ) );
-
-                IndexingContext bestContext = null;
-
-                // local idx has every repo
-                try
-                {
-                    bestContext = getRepositoryBestIndexContext( repository.getId() );
-                }
-                catch ( NoSuchRepositoryException e )
-                {
-                    // not to happen, we are iterating over them
-                }
-
-                if ( getLogger().isDebugEnabled() )
-                {
-                    getLogger().debug(
-                        " ...found best context " + bestContext.getId() + " for repository "
-                            + bestContext.getRepositoryId() + ", merging it..." );
-                }
-
-                context.merge( bestContext.getIndexDirectory() );
-
-                if ( getLogger().isDebugEnabled() )
-                {
-                    getLogger().debug( "Rebuilding groups in merged index for repository group " + repositoryGroupId );
-                }
-
-                // rebuild group info
-                nexusIndexer.rebuildGroups( context );
-
-                // committing changes
-                context.getIndexWriter().flush();
-
-                context.updateTimestamp();
-            }
-        }
-    }
-
-    protected void purgeRepositoryGroupIndex( String repositoryGroupId )
-        throws IOException
-    {
-        IndexingContext context = nexusIndexer.getIndexingContexts().get( getMergedContextId( repositoryGroupId ) );
-
-        if ( context != null )
-        {
-            context.purge();
-        }
     }
 
     // ----------------------------------------------------------------------------
