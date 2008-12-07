@@ -20,61 +20,31 @@
  */
 package org.sonatype.nexus;
 
-import java.io.IOException;
-
-import org.sonatype.nexus.configuration.ConfigurationException;
-import org.sonatype.nexus.configuration.model.CRepository;
+import org.sonatype.nexus.index.ArtifactInfo;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 
 public class ReindexTest
-    extends AbstractNexusTestCase
+    extends AbstractMavenRepoContentTests
 {
-    private DefaultNexus defaultNexus;
-
-    protected void setUp()
-        throws Exception
-    {
-        super.setUp();
-
-        defaultNexus = (DefaultNexus) lookup( Nexus.class );
-    }
-
-    protected void tearDown()
-        throws Exception
-    {
-        super.tearDown();
-    }
-
-    protected boolean loadConfigurationAtSetUp()
-    {
-        return false;
-    }
-
-    public DefaultNexus getDefaultNexus()
-    {
-        return defaultNexus;
-    }
-
-    public void setDefaultNexus( DefaultNexus defaultNexus )
-    {
-        this.defaultNexus = defaultNexus;
-    }
-
     public void testRepositoryReindex()
-        throws IOException
+        throws Exception
     {
+        fillInRepo();
+
         try
         {
-            CRepository newRepo = new CRepository();
-            newRepo.setId( "test" );
-            newRepo.setName( "Test" );
-            getDefaultNexus().createRepository( newRepo );
+            defaultNexus.reindexRepository( null, "releases" );
 
-            getDefaultNexus().reindexRepository( null, "test" );
-        }
-        catch ( ConfigurationException e )
-        {
-            fail( "ConfigurationException creating repository" );
+            // nexus-indexer-1.0-beta-4.jar :: sha1 = 86e12071021fa0be4ec809d4d2e08f07b80d4877
+            ArtifactInfo ai = defaultNexus.identifyArtifact(
+                ArtifactInfo.SHA1,
+                "86e12071021fa0be4ec809d4d2e08f07b80d4877" );
+
+            assertNotNull( "Should find it!", ai );
+
+            assertEquals( "org.sonatype.nexus", ai.groupId );
+            assertEquals( "nexus-indexer", ai.artifactId );
+            assertEquals( "1.0-beta-4", ai.version );
         }
         catch ( NoSuchRepositoryException e )
         {
