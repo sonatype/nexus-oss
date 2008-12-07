@@ -32,7 +32,7 @@ public class RepositoryResponseTest
     public void testRepo()
         throws Exception
     {
-        String jsonString = "{ \"repository\" : {\"data\" : {\"allowWrite\":true, \"browseable\":true,\"defaultLocalStorageUrl\":null,\"id\":\"test1\", \"indexable\":true,\"name\":\"test1\",\"notFoundCacheTTL\":1440,\"overrideLocalStorageUrl\":null,\"repoPolicy\":\"release\", \"repoType\":\"hosted\"}}}";
+        String jsonString = "{\"data\" : {\"allowWrite\":true, \"browseable\":true,\"defaultLocalStorageUrl\":null,\"id\":\"test1\", \"indexable\":true,\"name\":\"test1\",\"notFoundCacheTTL\":1440,\"overrideLocalStorageUrl\":null,\"repoPolicy\":\"release\", \"repoType\":\"hosted\"}}";
 
         XStreamRepresentation representation = new XStreamRepresentation(
             xstream,
@@ -47,7 +47,7 @@ public class RepositoryResponseTest
     public void testProxyRepo()
         throws Exception
     {
-        String jsonString = "{ \"repository\" : {\"data\" : {\"allowWrite\":true, \"artifactMaxAge\":1440,\"browseable\":true,\"defaultLocalStorageUrl\":null,\"id\":\"test1\", \"indexable\":true,\"metadataMaxAge\":1440,\"name\":\"test1\",\"notFoundCacheTTL\":1440,\"overrideLocalStorageUrl\":null,\"repoPolicy\":\"release\", \"repoType\":\"proxy\"}}}";
+        String jsonString = "{\"data\" : {\"allowWrite\":true, \"artifactMaxAge\":1440,\"browseable\":true,\"defaultLocalStorageUrl\":null,\"id\":\"test1\", \"indexable\":true,\"metadataMaxAge\":1440,\"name\":\"test1\",\"notFoundCacheTTL\":1440,\"overrideLocalStorageUrl\":null,\"repoPolicy\":\"release\", \"repoType\":\"proxy\"}}";
 
         XStreamRepresentation representation = new XStreamRepresentation(
             xstream,
