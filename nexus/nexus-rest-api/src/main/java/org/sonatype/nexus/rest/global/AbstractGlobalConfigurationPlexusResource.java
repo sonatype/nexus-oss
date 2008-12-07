@@ -90,7 +90,7 @@ public abstract class AbstractGlobalConfigurationPlexusResource
 
         result.setQueryString( settings.getQueryString() );
 
-        result.setUserAgentString( settings.getUserAgentString() );
+        result.setUserAgentString( settings.getUserAgentCustomizationString() );
 
         return result;
     }

@@ -221,12 +221,12 @@ public class Upgrade106to107
             {
                 cs.setQueryString( old.getQueryString() );
             }
-            // nullify userAgentString!
-            // if ( old.getUserAgentString() != null )
-            // {
-            // cs.setUserAgentString( old.getUserAgentString() );
-            // }
-            cs.setUserAgentString( null );
+
+            if ( !"Nexus/1.0".equals( old.getUserAgentString() ) )
+            {
+                // the use has customized user agent string
+                cs.setUserAgentCustomizationString( old.getUserAgentString() );
+            }
         }
         return cs;
     }

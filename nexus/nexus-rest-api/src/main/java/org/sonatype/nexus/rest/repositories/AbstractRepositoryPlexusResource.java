@@ -303,7 +303,7 @@ public abstract class AbstractRepositoryPlexusResource
             target.getRemoteStorage().getConnectionSettings().setRetrievalRetryCount(
                 model.getRemoteStorage().getConnectionSettings().getRetrievalRetryCount() );
 
-            target.getRemoteStorage().getConnectionSettings().setUserAgentString(
+            target.getRemoteStorage().getConnectionSettings().setUserAgentCustomizationString(
                 model.getRemoteStorage().getConnectionSettings().getUserAgentString() );
 
             target.getRemoteStorage().getConnectionSettings().setQueryString(
@@ -546,7 +546,7 @@ public abstract class AbstractRepositoryPlexusResource
                 repoRes.setName( repository.getName() );
 
                 repoRes.setUserManaged( repository.isUserManaged() );
-                
+
                 repoRes.setExposed( repository.isExposed() );
 
                 repoRes.setEffectiveLocalStorageUrl( repository.getLocalStorage() != null

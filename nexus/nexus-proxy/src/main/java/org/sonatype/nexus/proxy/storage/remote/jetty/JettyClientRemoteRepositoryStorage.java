@@ -224,11 +224,7 @@ public class JettyClientRemoteRepositoryStorage
 
         if ( rcs != null )
         {
-            if ( !StringUtils.isEmpty( rcs.getUserAgentString() ) )
-            {
-                exchange
-                    .setRequestHeader( HttpHeaders.USER_AGENT, formatUserAgentString( context, uid.getRepository() ) );
-            }
+            exchange.setRequestHeader( HttpHeaders.USER_AGENT, formatUserAgentString( context, uid.getRepository() ) );
 
             if ( !StringUtils.isEmpty( rcs.getQueryString() ) )
             {

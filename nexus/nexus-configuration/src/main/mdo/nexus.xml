@@ -362,11 +362,18 @@
 				</field>
 				<field>
 					<name>userAgentString</name>
-					<version>1.0.1+</version>
+					<version>1.0.1/1.0.6</version>
 					<type>String</type>
 					<required>true</required>
 					<description>A user-agent identification to send in HTTP requests, if needed.</description>
 					<defaultValue>Nexus/1.0</defaultValue>
+				</field>
+				<field>
+					<name>userAgentCustomizationString</name>
+					<version>1.0.7+</version>
+					<type>String</type>
+					<required>false</required>
+					<description>A user-agent customization to send in HTTP requests, if needed.</description>
 				</field>
 			</fields>
 		</class>

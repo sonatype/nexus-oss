@@ -400,10 +400,8 @@ public class ApacheHttpClientRemoteStorage
 
         HttpClient httpClient = (HttpClient) ctx.getRemoteConnectionContext().get( CTX_KEY_CLIENT );
 
-        if ( getRemoteConnectionSettings( ctx ).getUserAgentString() != null )
-        {
-            request.setHeader( new BasicHeader( "user-agent", formatUserAgentString( ctx, repository ) ) );
-        }
+        request.setHeader( new BasicHeader( "user-agent", formatUserAgentString( ctx, repository ) ) );
+
         // request.setHeader( new BasicHeader( "accept", "*/*" ) );
         // request.setHeader( new BasicHeader( "accept-language", "en-us" ) );
         // request.setHeader( new BasicHeader( "connection", "Keep-Alive" ) );

@@ -166,7 +166,7 @@ public class GlobalConfigurationPlexusResource
 
                         connection.setQueryString( s.getQueryString() );
 
-                        connection.setUserAgentString( s.getUserAgentString() );
+                        connection.setUserAgentCustomizationString( s.getUserAgentString() );
 
                         getNexus().updateGlobalRemoteConnectionSettings( connection );
                     }

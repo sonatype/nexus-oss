@@ -25,6 +25,7 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.ApplicationStatusSource;
 import org.sonatype.nexus.SystemStatus;
 import org.sonatype.nexus.configuration.model.CRemoteAuthentication;
@@ -178,9 +179,9 @@ public abstract class AbstractRemoteRepositoryStorage
         // user customization
         CRemoteConnectionSettings remoteConnectionSettings = getRemoteConnectionSettings( ctx );
 
-        if ( remoteConnectionSettings.getUserAgentString() != null )
+        if ( !StringUtils.isEmpty( remoteConnectionSettings.getUserAgentCustomizationString() ) )
         {
-            buf.append( " " ).append( remoteConnectionSettings.getUserAgentString() );
+            buf.append( " " ).append( remoteConnectionSettings.getUserAgentCustomizationString() );
         }
 
         return buf.toString();
