@@ -1015,7 +1015,7 @@ public class TestMarshalUnmarchal
         prop4.setName( "name4" );
         prop4.setRequired( true );
         prop4.setType( "type4" );
-        item2.addProperty( prop2 );
+        item2.addProperty( prop4 );
 
         resourceResponse.addData( item1 );
         resourceResponse.addData( item2 );
