@@ -72,10 +72,10 @@ public abstract class AbstractRegistryDrivenRepositoryRouter
 
     public void onProximityEvent( AbstractEvent evt )
     {
+        super.onProximityEvent( evt );
+
         if ( ConfigurationChangeEvent.class.isAssignableFrom( evt.getClass() ) )
         {
-            super.onProximityEvent( evt );
-
             stopItemSearchOnFirstFoundFile = getApplicationConfiguration()
                 .getConfiguration().getRouting().getGroups().isStopItemSearchOnFirstFoundFile();
         }
