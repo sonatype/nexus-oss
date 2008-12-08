@@ -454,21 +454,40 @@ Sonatype.repoServer.RepoServer = function(){
     },
     
     resetMainTabPanel: function() {
-      Sonatype.view.mainTabPanel.items.each(function(item, i, len){
-        this.remove( item, true );
-      }, Sonatype.view.mainTabPanel);
-      Sonatype.view.mainTabPanel.activeTab = null;
-      
-      Sonatype.view.welcomeTab = new Ext.Panel({
-        title: 'Welcome',
-        html: '<div class="little-padding">' +
-          '<p>Welcome to the <a href="http://nexus.sonatype.org" target="new">Sonatype Nexus Maven Repository Manager</a>.</p>' +
-          '<br/>' +
-          '<p>You may browse and search the repositories using the options on the left. Administrators may login via the link on the top right.<p>' +
-          '</div>'
-      });
-      Sonatype.view.mainTabPanel.add(Sonatype.view.welcomeTab);
-      Sonatype.view.mainTabPanel.setActiveTab(Sonatype.view.welcomeTab);
+        Sonatype.view.mainTabPanel.items.each(function(item, i, len){
+          this.remove( item, true );
+        }, Sonatype.view.mainTabPanel);
+        Sonatype.view.mainTabPanel.activeTab = null;
+        
+        Sonatype.view.welcomeTab = new Ext.Panel({
+          title: 'Welcome'
+        });
+        
+        var welcomeMsg = '<p>Welcome to the <a href="http://nexus.sonatype.org" target="new">Sonatype Nexus Maven Repository Manager</a>.</p>' ;
+        
+        if( !Sonatype.user.curr.isLoggedIn ){
+        	welcomeMsg += '</br>';
+        	welcomeMsg += '<p>Administrators may login via the link on the top right.<p>';
+        }
+        
+        var searchEnabled = sp.checkPermission('nexus:index', sp.READ);
+        var browseEnabled = sp.checkPermission('nexus:repostatus', sp.READ );
+        if (searchEnabled || browseEnabled){
+        	welcomeMsg += '</br>';
+        	if (searchEnabled && browseEnabled){
+        		welcomeMsg += '<p>You may browse and search the repositories using the options on the left.</p>'
+        	}
+        	else if (searchEnabled && !browseEnabled){
+        		welcomeMsg += '<p>You may search the repositories using the options on the left.</p>'
+        	}
+        	else if (!searchEnabled && browseEnabled){
+        		welcomeMsg += '<p>You may browse the repositories using the options on the left.</p>'
+        	}
+        }
+        
+        Sonatype.view.welcomeTab.html = '<div class="little-padding">' + welcomeMsg + '</div>';
+        Sonatype.view.mainTabPanel.add(Sonatype.view.welcomeTab);
+        Sonatype.view.mainTabPanel.setActiveTab(Sonatype.view.welcomeTab);
     },
 
     recoverLogin : function(e, target){
