@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>org.sonatype.nexus</groupId>
 		<artifactId>nexus-parent</artifactId>
-		<version>6</version>
+		<version>7-SNAPSHOT</version>
 		<relativePath>../nexus-parent/pom.xml</relativePath>
 	</parent>
 	<artifactId>nexus</artifactId>
@@ -144,7 +144,7 @@
 		<plexus-jsecurity-realms.version>1.0.2</plexus-jsecurity-realms.version>
 		<slf4j.version>1.5.5</slf4j.version>
 		<maven.version>2.1-SONATYPE-653485</maven.version>
-		<nexus.indexer.version>1.1.0</nexus.indexer.version>
+		<nexus.indexer.version>1.1.1-SNAPSHOT</nexus.indexer.version>
 		<!-- Shared with nexus-client, hence it is properties'ed -->
 		<plexus.restlet.bridge.version>1.6</plexus.restlet.bridge.version>
 		<micromailer.version>1.0.2</micromailer.version>
