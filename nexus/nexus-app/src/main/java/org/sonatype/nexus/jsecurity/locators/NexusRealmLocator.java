@@ -3,12 +3,11 @@ package org.sonatype.nexus.jsecurity.locators;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.ServiceLocator;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.Serviceable;
 import org.jsecurity.realm.Realm;
 import org.sonatype.jsecurity.locators.RealmLocator;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
@@ -19,22 +18,16 @@ import org.sonatype.nexus.configuration.application.NexusConfiguration;
 @Component( role = RealmLocator.class )
 public class NexusRealmLocator
     extends AbstractLogEnabled
-    implements RealmLocator, Serviceable
+    implements RealmLocator
 {
     @Requirement
     NexusConfiguration configuration;
 
-    private ServiceLocator container;
-
-    public void service( ServiceLocator locator )
-    {
-        this.container = locator;
-    }
+    @Requirement
+    private PlexusContainer container;
 
     public List<Realm> getRealms()
     {
-        // Until nexus.xml code is done, simply returning hardcoded realms
-
         List<Realm> realms = new ArrayList<Realm>();
 
         List<String> realmIds = configuration.getRealms();
