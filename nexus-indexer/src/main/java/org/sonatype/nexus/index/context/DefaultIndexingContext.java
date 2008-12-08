@@ -333,19 +333,9 @@ public class DefaultIndexingContext
         return repository;
     }
 
-    public void setRepository( File repository )
-    {
-        this.repository = repository;
-    }
-
     public String getRepositoryUrl()
     {
         return repositoryUrl;
-    }
-
-    public void setRepositoryUrl( String remoteUrl )
-    {
-        this.repositoryUrl = remoteUrl;
     }
 
     public String getIndexUpdateUrl()
@@ -358,11 +348,6 @@ public class DefaultIndexingContext
             }
         }
         return indexUpdateUrl;
-    }
-
-    public void setIndexUpdateUrl( String indexUpdateUrl )
-    {
-        this.indexUpdateUrl = indexUpdateUrl;
     }
 
     public Analyzer getAnalyzer()
@@ -423,10 +408,10 @@ public class DefaultIndexingContext
     public void close( boolean deleteFiles )
         throws IOException
     {
-        IndexUtils.updateTimestamp( indexDirectory, getTimestamp() );
-
         if ( indexDirectory != null )
         {
+            IndexUtils.updateTimestamp( indexDirectory, getTimestamp() );
+
             closeReaders();
 
             if ( deleteFiles )
