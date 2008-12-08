@@ -39,9 +39,9 @@ public abstract class AbstractPrivilegeTest
     protected TargetMessageUtil targetUtil;
 
     protected RoutesMessageUtil routeUtil;
-    
+
     protected RepositoryMessageUtil repoUtil;
-    
+
     protected GroupMessageUtil groupUtil;
 
     public AbstractPrivilegeTest( String testRepositoryId)
@@ -59,7 +59,7 @@ public abstract class AbstractPrivilegeTest
     {
         // turn on security for the test
         TestContainer.getInstance().getTestContext().setSecureTest( true );
-        
+
         XStream xstream = this.getXMLXStream();
 
         this.userUtil = new UserMessageUtil( xstream, MediaType.APPLICATION_XML );
@@ -206,14 +206,14 @@ public abstract class AbstractPrivilegeTest
                 break;
             }
         }
-        // if doesn't exist, create it 
+        // if doesn't exist, create it
         if ( role == null )
         {
             role = new RoleResource();
             role.setDescription( newRoleName );
             role.setName( newRoleName );
             role.setSessionTimeout( 60 );
-            
+
             for ( String priv : permissions )
             {
                 role.addPrivilege( priv );
@@ -221,7 +221,7 @@ public abstract class AbstractPrivilegeTest
             // save it
             role = this.roleUtil.createRole( role );
         }
-        
+
         // add it
         UserResource testUser = this.userUtil.getUser( userId );
         testUser.getRoles().clear();
@@ -229,6 +229,7 @@ public abstract class AbstractPrivilegeTest
         this.userUtil.updateUser( testUser );
     }
 
+    @Override
     @After
     public void afterTest()
         throws Exception
@@ -236,4 +237,51 @@ public abstract class AbstractPrivilegeTest
         // reset any password
         TestContainer.getInstance().getTestContext().useAdminForRequests();
     }
+
+
+    protected void addPrivilege( String userId, String privilege, String... privs )
+        throws IOException
+    {
+        TestContainer.getInstance().getTestContext().useAdminForRequests();
+
+        RoleResource role = roleUtil.findRole( privilege + "-role" );
+        boolean create = false;
+        if ( role == null )
+        {
+            role = new RoleResource();
+            create = true;
+        }
+        role.setId( privilege + "-role" );
+        role.setName( privilege + "-name" );
+        role.addPrivilege( privilege );
+        for ( String priv : privs )
+        {
+            role.addPrivilege( priv );
+        }
+        role.setDescription( privilege );
+        role.setSessionTimeout( 100 );
+        if ( create )
+        {
+            this.roleUtil.createRole( role );
+        }
+        else
+        {
+            RoleMessageUtil.update( role );
+        }
+
+        UserResource testUser = this.userUtil.getUser( userId );
+        testUser.addRole( role.getId() );
+        this.userUtil.updateUser( testUser );
+    }
+
+    protected void removePrivilege( String userId, String privilege )
+        throws IOException
+    {
+        TestContainer.getInstance().getTestContext().useAdminForRequests();
+
+        UserResource testUser = this.userUtil.getUser( userId );
+        testUser.removeRole( privilege + "-role" );
+        this.userUtil.updateUser( testUser );
+    }
+
 }
