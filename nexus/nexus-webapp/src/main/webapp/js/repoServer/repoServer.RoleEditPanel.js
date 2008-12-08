@@ -161,7 +161,8 @@ Sonatype.repoServer.RoleEditPanel = function(config){
         name: 'sessionTimeout',
         allowBlank: false,
         width: this.COMBO_WIDTH,
-        value: 60
+        value: 60,
+        allowDecimals: false
       },
       {
         xtype: 'panel',
