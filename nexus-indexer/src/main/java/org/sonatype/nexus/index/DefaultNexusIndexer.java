@@ -545,7 +545,7 @@ public class DefaultNexusIndexer
     {
         Set<ArtifactInfo> result = searcher.searchFlatPaged(
             new FlatSearchRequest( query, ArtifactInfo.VERSION_COMPARATOR ),
-            indexingContexts.values() ).getResults();
+            contexts ).getResults();
 
         if ( result.size() == 1 )
         {
