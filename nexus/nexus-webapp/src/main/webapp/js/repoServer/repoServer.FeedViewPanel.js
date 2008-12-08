@@ -75,6 +75,7 @@ Sonatype.repoServer.FeedViewPanel = function(config){
         scope: this,
         handler: function() {
           this.feedsDataStore.reload();
+          this.grid.reloadFeed();
         }
       },
       {
