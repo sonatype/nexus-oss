@@ -27,7 +27,15 @@
     </Call>
     
     <Set name="handler">
-      <New id="Contexts" class="org.mortbay.jetty.handler.ContextHandlerCollection" />
+      <New id="Contexts" class="org.mortbay.jetty.handler.ContextHandlerCollection">
+          <!-- The following configuration disables JSP taglib support, the validation of which
+               slows down Jetty's startup significantly. -->
+          <Call name="addLifeCycleListener">
+              <Arg>
+                <New class="org.sonatype.plexus.jetty.custom.DisableTagLibsListener" />
+              </Arg>
+          </Call>
+      </New>
     </Set>
     
     <New id="NexusWebAppContext" class="org.mortbay.jetty.webapp.WebAppContext">
