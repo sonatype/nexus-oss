@@ -21,6 +21,57 @@
 
 Ext.namespace( 'Sonatype.panels' );
 
+
+/*
+ * A helper panel creating a tabbed container inside itself if more than 
+ * one component is added.
+ */
+Sonatype.panels.AutoTabPanel = function( config ) {
+  var config = config || { };
+  var defaultConfig = {
+    layout: 'card',
+    activeItem: 0,
+    deferredRender: false,
+    autoScroll: false,
+    frame: false,
+    border: false
+  };
+  Ext.apply( this, config, defaultConfig );
+  Sonatype.panels.AutoTabPanel.superclass.constructor.call( this, {} );
+};
+
+Ext.extend( Sonatype.panels.AutoTabPanel, Ext.Panel, {
+  add: function( c ) {
+    if ( this.items && this.items.length > 0 ) {
+      if ( ! this.tabPanel ) {
+        var first = this.getComponent( 0 );
+        this.remove( first, false );
+        first.setTitle( first.tabTitle );
+  
+        this.tabPanel = new Ext.TabPanel( { 
+          activeItem: 0,
+          deferredRender: false,
+          autoScroll: false,
+          frame: false,
+          border: false,
+          items: [ first ]
+        } );
+  
+        Sonatype.panels.AutoTabPanel.superclass.add.call( this, this.tabPanel );
+      }
+
+      if ( ! c.title && c.tabTitle ) {
+        c.title = c.tabTitle;
+      }
+      return this.tabPanel.add( c );
+    }
+    else {
+      return Sonatype.panels.AutoTabPanel.superclass.add.call( this, c );
+    }
+  }
+} );
+
+
 /*
  * A viewer panel offering a grid on top and a details pane at the bottom.
  * 
@@ -210,14 +261,8 @@ Ext.extend( Sonatype.panels.GridViewer, Ext.Panel, {
     }
 
     if ( ! panel ) {
-      panel = new Ext.Panel( { 
+      panel = new Sonatype.panels.AutoTabPanel( { 
         id: id,
-        layout: 'card',
-        activeItem: 0,
-        deferredRender: false,
-        autoScroll: false,
-        frame: false,
-        border: false,
         title: rec.get( this.titleColumn )
       } );
 
