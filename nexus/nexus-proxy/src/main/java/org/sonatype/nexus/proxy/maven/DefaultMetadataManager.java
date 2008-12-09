@@ -28,8 +28,8 @@ import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.artifact.VersionUtils;
+import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
-import org.sonatype.nexus.proxy.RepositoryNotAvailableException;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
@@ -54,7 +54,7 @@ public class DefaultMetadataManager
     }
 
     protected Metadata readOrCreateMetadata( RepositoryItemUid uid, Map<String, Object> ctx )
-        throws RepositoryNotAvailableException,
+        throws IllegalOperationException,
             IOException,
             XmlPullParserException
     {
@@ -107,7 +107,7 @@ public class DefaultMetadataManager
     }
 
     protected Metadata readOrCreateGAVMetadata( MavenRepository repository, Gav gav, Map<String, Object> ctx )
-        throws RepositoryNotAvailableException,
+        throws IllegalOperationException,
             IOException,
             XmlPullParserException
     {
@@ -130,7 +130,7 @@ public class DefaultMetadataManager
     }
 
     protected Metadata readOrCreateGAMetadata( MavenRepository repository, Gav gav, Map<String, Object> ctx )
-        throws RepositoryNotAvailableException,
+        throws IllegalOperationException,
             IOException,
             XmlPullParserException
     {
@@ -156,7 +156,7 @@ public class DefaultMetadataManager
     }
 
     protected Metadata readOrCreatePluginMetadata( MavenRepository repository, Gav gav, Map<String, Object> ctx )
-        throws RepositoryNotAvailableException,
+        throws IllegalOperationException,
             IOException,
             XmlPullParserException
     {
@@ -186,7 +186,7 @@ public class DefaultMetadataManager
 
     protected void saveGAVMetadata( MavenRepository repository, Gav gav, Metadata md, Map<String, Object> ctx )
         throws UnsupportedStorageOperationException,
-            RepositoryNotAvailableException,
+            IllegalOperationException,
             IOException
     {
         String mdPath = repository.getGavCalculator().gavToPath( gav );
@@ -214,7 +214,7 @@ public class DefaultMetadataManager
 
     protected void saveGAMetadata( MavenRepository repository, Gav gav, Metadata md, Map<String, Object> ctx )
         throws UnsupportedStorageOperationException,
-            RepositoryNotAvailableException,
+            IllegalOperationException,
             IOException
     {
         String mdPath = repository.getGavCalculator().gavToPath( gav );
@@ -245,7 +245,7 @@ public class DefaultMetadataManager
 
     protected void savePluginMetadata( MavenRepository repository, Gav gav, Metadata md, Map<String, Object> ctx )
         throws UnsupportedStorageOperationException,
-            RepositoryNotAvailableException,
+            IllegalOperationException,
             IOException
     {
         String mdPath = repository.getGavCalculator().gavToPath( gav );
@@ -278,7 +278,7 @@ public class DefaultMetadataManager
     }
 
     public void deployArtifact( ArtifactStoreRequest req, MavenRepository repository )
-        throws RepositoryNotAvailableException,
+        throws IllegalOperationException,
             IOException,
             UnsupportedStorageOperationException
     {
@@ -438,7 +438,7 @@ public class DefaultMetadataManager
     }
 
     public void undeployArtifact( ArtifactStoreRequest req, MavenRepository repository )
-        throws RepositoryNotAvailableException,
+        throws IllegalOperationException,
             IOException,
             UnsupportedStorageOperationException
     {
@@ -530,7 +530,7 @@ public class DefaultMetadataManager
 
     public void deployPlugin( ArtifactStoreRequest req, MavenRepository repository )
         throws IOException,
-            RepositoryNotAvailableException,
+        IllegalOperationException,
             UnsupportedStorageOperationException
     {
         if ( req.getClassifier() != null )
@@ -624,7 +624,7 @@ public class DefaultMetadataManager
 
     public void undeployPlugin( ArtifactStoreRequest req, MavenRepository repository )
         throws IOException,
-            RepositoryNotAvailableException,
+        IllegalOperationException,
             UnsupportedStorageOperationException
     {
         if ( req.getClassifier() != null )
@@ -709,7 +709,7 @@ public class DefaultMetadataManager
     }
 
     public Gav resolveArtifact( MavenRepository repository, ArtifactStoreRequest gavRequest )
-        throws RepositoryNotAvailableException,
+        throws IllegalOperationException,
             IOException
     {
         String version = gavRequest.getVersion();
@@ -790,7 +790,7 @@ public class DefaultMetadataManager
     }
 
     protected String resolveLatest( MavenRepository repository, ArtifactStoreRequest gavRequest, Gav gav )
-        throws RepositoryNotAvailableException,
+        throws IllegalOperationException,
             IOException
     {
         if ( RepositoryPolicy.SNAPSHOT.equals( repository.getRepositoryPolicy() ) )
@@ -845,7 +845,7 @@ public class DefaultMetadataManager
     }
 
     protected String resolveRelease( MavenRepository repository, ArtifactStoreRequest gavRequest, Gav gav )
-        throws RepositoryNotAvailableException,
+        throws IllegalOperationException,
             IOException
     {
         if ( RepositoryPolicy.SNAPSHOT.equals( repository.getRepositoryPolicy() ) )
@@ -917,7 +917,7 @@ public class DefaultMetadataManager
     }
 
     public Gav resolveSnapshot( MavenRepository repository, ArtifactStoreRequest gavRequest, Gav gav )
-        throws RepositoryNotAvailableException,
+        throws IllegalOperationException,
             IOException
     {
         if ( !RepositoryPolicy.SNAPSHOT.equals( repository.getRepositoryPolicy() ) )

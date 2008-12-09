@@ -45,10 +45,11 @@ import org.restlet.resource.Representation;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
 import org.sonatype.nexus.proxy.AccessDeniedException;
+import org.sonatype.nexus.proxy.IllegalOperationException;
+import org.sonatype.nexus.proxy.IllegalRequestException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryGroupException;
-import org.sonatype.nexus.proxy.NoSuchRepositoryRouterException;
 import org.sonatype.nexus.proxy.NoSuchResourceStoreException;
 import org.sonatype.nexus.proxy.RepositoryNotAvailableException;
 import org.sonatype.nexus.proxy.RepositoryNotListableException;
@@ -277,8 +278,7 @@ public abstract class AbstractResourceStoreContentPlexusResource
         throws IOException,
             AccessDeniedException,
             NoSuchResourceStoreException,
-            RepositoryNotAvailableException,
-            RepositoryNotListableException,
+            IllegalOperationException,
             ItemNotFoundException,
             StorageException,
             ResourceException
@@ -499,9 +499,29 @@ public abstract class AbstractResourceStoreContentPlexusResource
             getLogger().error( "IO error!", t );
             throw new ResourceException( Status.SERVER_ERROR_INTERNAL, t.getMessage() );
         }
+        else if ( t instanceof RepositoryNotAvailableException )
+        {
+            throw new ResourceException( Status.SERVER_ERROR_SERVICE_UNAVAILABLE, t.getMessage() );
+        }
+        else if ( t instanceof RepositoryNotListableException )
+        {
+            throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, t.getMessage() );
+        }
+        else if ( t instanceof IllegalRequestException )
+        {
+            getLogger().info( "ResourceStoreContentResource, illegal request:" + t.getMessage() );
+
+            throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, t.getMessage() );
+        }
+        else if ( t instanceof IllegalOperationException )
+        {
+            getLogger().info( "ResourceStoreContentResource, illegal operation:" + t.getMessage() );
+
+            throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, t.getMessage() );
+        }
         else if ( t instanceof UnsupportedStorageOperationException )
         {
-            throw new ResourceException( Status.CLIENT_ERROR_FORBIDDEN, t.getMessage() );
+            throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, t.getMessage() );
         }
         else if ( t instanceof NoSuchRepositoryException )
         {
@@ -512,18 +532,6 @@ public abstract class AbstractResourceStoreContentPlexusResource
             throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, t.getMessage() );
         }
         else if ( t instanceof NoSuchRepositoryGroupException )
-        {
-            throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, t.getMessage() );
-        }
-        else if ( t instanceof NoSuchRepositoryRouterException )
-        {
-            throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, t.getMessage() );
-        }
-        else if ( t instanceof RepositoryNotAvailableException )
-        {
-            throw new ResourceException( Status.SERVER_ERROR_SERVICE_UNAVAILABLE, t.getMessage() );
-        }
-        else if ( t instanceof RepositoryNotListableException )
         {
             throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, t.getMessage() );
         }

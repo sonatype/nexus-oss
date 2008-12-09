@@ -39,9 +39,8 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParser;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.proxy.AccessDeniedException;
+import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
-import org.sonatype.nexus.proxy.NoSuchResourceStoreException;
-import org.sonatype.nexus.proxy.RepositoryNotAvailableException;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
@@ -69,8 +68,7 @@ public class ArtifactStoreHelper
     }
 
     public StorageFileItem retrieveArtifactPom( ArtifactStoreRequest gavRequest )
-        throws NoSuchResourceStoreException,
-            RepositoryNotAvailableException,
+        throws IllegalOperationException,
             ItemNotFoundException,
             StorageException,
             AccessDeniedException
@@ -83,8 +81,7 @@ public class ArtifactStoreHelper
     }
 
     public StorageFileItem retrieveArtifact( ArtifactStoreRequest gavRequest )
-        throws NoSuchResourceStoreException,
-            RepositoryNotAvailableException,
+        throws IllegalOperationException,
             ItemNotFoundException,
             StorageException,
             AccessDeniedException
@@ -122,8 +119,8 @@ public class ArtifactStoreHelper
 
     public void storeArtifactPom( ArtifactStoreRequest gavRequest, InputStream is, Map<String, String> attributes )
         throws UnsupportedStorageOperationException,
-            NoSuchResourceStoreException,
-            RepositoryNotAvailableException,
+            IllegalOperationException,
+            ItemNotFoundException,
             StorageException,
             AccessDeniedException
     {
@@ -149,8 +146,8 @@ public class ArtifactStoreHelper
 
     public void storeArtifact( ArtifactStoreRequest gavRequest, InputStream is, Map<String, String> attributes )
         throws UnsupportedStorageOperationException,
-            NoSuchResourceStoreException,
-            RepositoryNotAvailableException,
+            IllegalOperationException,
+            ItemNotFoundException,
             StorageException,
             AccessDeniedException
     {
@@ -185,8 +182,8 @@ public class ArtifactStoreHelper
     public void storeArtifactWithGeneratedPom( ArtifactStoreRequest gavRequest, InputStream is,
         Map<String, String> attributes )
         throws UnsupportedStorageOperationException,
-            NoSuchResourceStoreException,
-            RepositoryNotAvailableException,
+            IllegalOperationException,
+            ItemNotFoundException,
             StorageException,
             AccessDeniedException
     {
@@ -289,8 +286,7 @@ public class ArtifactStoreHelper
     public void deleteArtifactPom( ArtifactStoreRequest gavRequest, boolean withChecksums, boolean withAllSubordinates,
         boolean deleteWholeGav )
         throws UnsupportedStorageOperationException,
-            NoSuchResourceStoreException,
-            RepositoryNotAvailableException,
+            IllegalOperationException,
             ItemNotFoundException,
             StorageException,
             AccessDeniedException
@@ -321,8 +317,7 @@ public class ArtifactStoreHelper
     public void deleteArtifact( ArtifactStoreRequest gavRequest, boolean withChecksums, boolean withAllSubordinates,
         boolean deleteWholeGav )
         throws UnsupportedStorageOperationException,
-            NoSuchResourceStoreException,
-            RepositoryNotAvailableException,
+            IllegalOperationException,
             ItemNotFoundException,
             StorageException,
             AccessDeniedException
@@ -342,8 +337,7 @@ public class ArtifactStoreHelper
         boolean withAllSubordinates )
         throws StorageException,
             UnsupportedStorageOperationException,
-            NoSuchResourceStoreException,
-            RepositoryNotAvailableException,
+            IllegalOperationException,
             AccessDeniedException,
             ItemNotFoundException
     {
@@ -388,8 +382,7 @@ public class ArtifactStoreHelper
 
     protected void deleteAllSubordinates( ArtifactStoreRequest gavRequest )
         throws UnsupportedStorageOperationException,
-            NoSuchResourceStoreException,
-            RepositoryNotAvailableException,
+            IllegalOperationException,
             StorageException,
             AccessDeniedException
     {
@@ -450,8 +443,7 @@ public class ArtifactStoreHelper
 
     protected void deleteWholeGav( ArtifactStoreRequest gavRequest )
         throws UnsupportedStorageOperationException,
-            NoSuchResourceStoreException,
-            RepositoryNotAvailableException,
+            IllegalOperationException,
             StorageException,
             AccessDeniedException
     {
@@ -512,7 +504,7 @@ public class ArtifactStoreHelper
     protected String getPackagingFromPom( String requestPath )
         throws IOException,
             XmlPullParserException,
-            RepositoryNotAvailableException,
+            IllegalOperationException,
             ItemNotFoundException
     {
         String packaging = "jar";

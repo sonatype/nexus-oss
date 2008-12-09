@@ -23,8 +23,8 @@ package org.sonatype.nexus.proxy.repository;
 import java.util.Map;
 
 import org.codehaus.plexus.logging.Logger;
+import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
-import org.sonatype.nexus.proxy.RepositoryNotAvailableException;
 import org.sonatype.nexus.proxy.ResourceStore;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.events.AbstractEvent;
@@ -142,7 +142,7 @@ public abstract class DefaultShadowRepository
     }
 
     protected StorageItem doRetrieveItem( boolean localOnly, RepositoryItemUid uid, Map<String, Object> context )
-        throws RepositoryNotAvailableException,
+        throws IllegalOperationException,
             ItemNotFoundException,
             StorageException
     {
@@ -173,7 +173,7 @@ public abstract class DefaultShadowRepository
 
     public void storeItem( AbstractStorageItem item )
         throws UnsupportedStorageOperationException,
-            RepositoryNotAvailableException,
+            IllegalOperationException,
             StorageException
     {
         if ( StorageLinkItem.class.isAssignableFrom( item.getClass() ) )

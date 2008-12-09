@@ -20,19 +20,30 @@
  */
 package org.sonatype.nexus.proxy;
 
+import org.sonatype.nexus.proxy.repository.Repository;
+
 /**
  * Thrown if the repository involved in processing is not listable.
  * 
  * @author cstamas
  */
 public class RepositoryNotListableException
-    extends Exception
+    extends IllegalOperationException
 {
     private static final long serialVersionUID = 6414483658234772613L;
 
-    public RepositoryNotListableException( String repoId )
+    private final Repository repository;
+
+    public RepositoryNotListableException( Repository repository )
     {
-        super( "Repository with repoId=[" + repoId + "] is not listable!" );
+        super( "Repository with ID='" + repository.getId() + "' is not listable!" );
+
+        this.repository = repository;
+    }
+
+    public Repository getRepository()
+    {
+        return repository;
     }
 
 }

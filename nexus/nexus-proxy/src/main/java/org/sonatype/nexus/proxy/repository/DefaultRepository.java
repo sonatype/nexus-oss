@@ -26,8 +26,8 @@ import java.util.Map;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.nexus.feeds.FeedRecorder;
 import org.sonatype.nexus.feeds.NexusArtifactEvent;
+import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
-import org.sonatype.nexus.proxy.RepositoryNotAvailableException;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
@@ -53,7 +53,7 @@ public abstract class DefaultRepository
     private FeedRecorder feedRecorder;
 
     protected StorageItem doRetrieveItem( boolean localOnly, RepositoryItemUid uid, Map<String, Object> context )
-        throws RepositoryNotAvailableException,
+        throws IllegalOperationException,
             ItemNotFoundException,
             StorageException
     {
@@ -331,7 +331,6 @@ public abstract class DefaultRepository
 
     protected void doDeleteItem( RepositoryItemUid uid )
         throws UnsupportedStorageOperationException,
-            RepositoryNotAvailableException,
             ItemNotFoundException,
             StorageException
     {
@@ -339,8 +338,7 @@ public abstract class DefaultRepository
     }
 
     protected Collection<StorageItem> doListItems( boolean localOnly, RepositoryItemUid uid, Map<String, Object> context )
-        throws RepositoryNotAvailableException,
-            ItemNotFoundException,
+        throws ItemNotFoundException,
             StorageException
     {
         return getLocalStorage().listItems( uid );

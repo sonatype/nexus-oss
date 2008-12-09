@@ -20,19 +20,30 @@
  */
 package org.sonatype.nexus.proxy;
 
+import org.sonatype.nexus.proxy.repository.Repository;
+
 /**
  * Thrown if the repository involved in processing is not available.
  * 
  * @author cstamas
  */
 public class RepositoryNotAvailableException
-    extends Exception
+    extends IllegalOperationException
 {
     private static final long serialVersionUID = 6414483658234772613L;
 
-    public RepositoryNotAvailableException( String repoId )
+    private final Repository repository;
+
+    public RepositoryNotAvailableException( Repository repository )
     {
-        super( "Repository with repoId='" + repoId + "' is not available!" );
+        super( "Repository with ID='" + repository.getId() + "' is not available!" );
+
+        this.repository = repository;
+    }
+
+    public Repository getRepository()
+    {
+        return repository;
     }
 
 }

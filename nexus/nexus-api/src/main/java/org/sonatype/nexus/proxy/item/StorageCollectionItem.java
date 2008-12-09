@@ -23,10 +23,9 @@ package org.sonatype.nexus.proxy.item;
 import java.util.Collection;
 
 import org.sonatype.nexus.proxy.AccessDeniedException;
+import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.NoSuchResourceStoreException;
-import org.sonatype.nexus.proxy.RepositoryNotAvailableException;
-import org.sonatype.nexus.proxy.RepositoryNotListableException;
 import org.sonatype.nexus.proxy.StorageException;
 
 /**
@@ -44,8 +43,7 @@ public interface StorageCollectionItem
     Collection<StorageItem> list()
         throws AccessDeniedException,
             NoSuchResourceStoreException,
-            RepositoryNotAvailableException,
-            RepositoryNotListableException,
+            IllegalOperationException,
             ItemNotFoundException,
             StorageException;;
 

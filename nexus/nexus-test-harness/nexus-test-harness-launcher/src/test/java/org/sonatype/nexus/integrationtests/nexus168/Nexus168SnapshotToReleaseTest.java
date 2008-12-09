@@ -11,7 +11,7 @@ import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.params.HttpMethodParams;
-import org.apache.maven.wagon.authorization.AuthorizationException;
+import org.apache.maven.wagon.TransferFailedException;
 import org.junit.Test;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
@@ -52,8 +52,9 @@ public class Nexus168SnapshotToReleaseTest
                                          this.getRelitiveArtifactPath( gav ) );
             Assert.fail( "Should not be able to deploy a SNAPSHOT artifact into a RELEASE repo" );
         }
-        catch ( AuthorizationException e )
+        catch ( TransferFailedException e )
         {
+            // cstamas: HTTP 400 is returned from now on
             // this is expected
         }
 

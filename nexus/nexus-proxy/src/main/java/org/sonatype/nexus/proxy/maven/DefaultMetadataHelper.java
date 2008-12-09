@@ -23,6 +23,7 @@ package org.sonatype.nexus.proxy.maven;
 
 import java.io.InputStream;
 
+import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.RepositoryNotAvailableException;
 import org.sonatype.nexus.proxy.StorageException;
@@ -61,13 +62,17 @@ public class DefaultMetadataHelper
 
         storeItem( mdUid, contentLocator );
     }
-    
+
     @Override
-    public void remove( String path ) throws StorageException, UnsupportedStorageOperationException, RepositoryNotAvailableException, ItemNotFoundException
+    public void remove( String path )
+        throws StorageException,
+            UnsupportedStorageOperationException,
+            IllegalOperationException,
+            ItemNotFoundException
     {
         repository.deleteItem( repository.createUid( path ), null );
     }
-    
+
     @Override
     public boolean exists( String path )
         throws StorageException
@@ -133,7 +138,7 @@ public class DefaultMetadataHelper
     private void storeItem( RepositoryItemUid uid, ContentLocator contentLocator )
         throws StorageException,
             UnsupportedStorageOperationException,
-            RepositoryNotAvailableException
+            IllegalOperationException
     {
         DefaultStorageFileItem mdFile = new DefaultStorageFileItem(
             repository,

@@ -78,15 +78,14 @@ public interface ResourceStore
      * @param request the request
      * @return the storage item
      * @throws NoSuchResourceStoreException the no such store exception
-     * @throws RepositoryNotAvailableException the repository not available exception
+     * @throws IllegalOperationException the repository not available exception
      * @throws ItemNotFoundException the item not found exception
      * @throws StorageException the storage exception
      * @throws AccessDeniedException the access denied exception
      */
     StorageItem retrieveItem( ResourceStoreRequest request )
-        throws NoSuchResourceStoreException,
-            RepositoryNotAvailableException,
-            ItemNotFoundException,
+        throws ItemNotFoundException,
+            IllegalOperationException,
             StorageException,
             AccessDeniedException;
 
@@ -98,16 +97,15 @@ public interface ResourceStore
      * @param to the to
      * @throws UnsupportedStorageOperationException
      * @throws NoSuchResourceStoreException the no such repository exception
-     * @throws RepositoryNotAvailableException the repository not available exception
+     * @throws IllegalOperationException the repository not available exception
      * @throws ItemNotFoundException the item not found exception
      * @throws StorageException the storage exception
      * @throws AccessDeniedException the access denied exception
      */
     void copyItem( ResourceStoreRequest from, ResourceStoreRequest to )
         throws UnsupportedStorageOperationException,
-            NoSuchResourceStoreException,
-            RepositoryNotAvailableException,
             ItemNotFoundException,
+            IllegalOperationException,
             StorageException,
             AccessDeniedException;
 
@@ -119,16 +117,15 @@ public interface ResourceStore
      * @param to the to
      * @throws UnsupportedStorageOperationException
      * @throws NoSuchResourceStoreException the no such repository exception
-     * @throws RepositoryNotAvailableException the repository not available exception
+     * @throws IllegalOperationException the repository not available exception
      * @throws ItemNotFoundException the item not found exception
      * @throws StorageException the storage exception
      * @throws AccessDeniedException the access denied exception
      */
     void moveItem( ResourceStoreRequest from, ResourceStoreRequest to )
         throws UnsupportedStorageOperationException,
-            NoSuchResourceStoreException,
-            RepositoryNotAvailableException,
             ItemNotFoundException,
+            IllegalOperationException,
             StorageException,
             AccessDeniedException;
 
@@ -139,15 +136,14 @@ public interface ResourceStore
      * @throws UnsupportedStorageOperationException
      * @throws StorageException the storage exception
      * @throws NoSuchResourceStoreException the no such repository exception
-     * @throws RepositoryNotAvailableException the repository not available exception
+     * @throws IllegalOperationException the repository not available exception
      * @throws ItemNotFoundException the item not found exception
      * @throws AccessDeniedException the access denied exception
      */
     void deleteItem( ResourceStoreRequest request )
         throws UnsupportedStorageOperationException,
-            NoSuchResourceStoreException,
-            RepositoryNotAvailableException,
             ItemNotFoundException,
+            IllegalOperationException,
             StorageException,
             AccessDeniedException;
 
@@ -165,8 +161,8 @@ public interface ResourceStore
      */
     void storeItem( ResourceStoreRequest request, InputStream is, Map<String, String> userAttributes )
         throws UnsupportedStorageOperationException,
-            NoSuchResourceStoreException,
-            RepositoryNotAvailableException,
+            ItemNotFoundException,
+            IllegalOperationException,
             StorageException,
             AccessDeniedException;
 
@@ -178,13 +174,13 @@ public interface ResourceStore
      * @throws UnsupportedStorageOperationException
      * @throws StorageException the storage exception
      * @throws NoSuchResourceStoreException the no such repository exception
-     * @throws RepositoryNotAvailableException the repository not available exception
+     * @throws IllegalOperationException the repository not available exception
      * @throws AccessDeniedException the access denied exception
      */
     void createCollection( ResourceStoreRequest request, Map<String, String> userAttributes )
         throws UnsupportedStorageOperationException,
-            NoSuchResourceStoreException,
-            RepositoryNotAvailableException,
+            ItemNotFoundException,
+            IllegalOperationException,
             StorageException,
             AccessDeniedException;
 
@@ -194,16 +190,14 @@ public interface ResourceStore
      * @param request the request
      * @return the collection< storage item>
      * @throws NoSuchResourceStoreException the no such repository exception
-     * @throws RepositoryNotAvailableException the repository not available exception
+     * @throws IllegalOperationException the repository not available exception
      * @throws ItemNotFoundException the item not found exception
      * @throws StorageException the storage exception
      * @throws AccessDeniedException the access denied exception
      */
     Collection<StorageItem> list( ResourceStoreRequest request )
-        throws NoSuchResourceStoreException,
-            RepositoryNotAvailableException,
-            RepositoryNotListableException,
-            ItemNotFoundException,
+        throws ItemNotFoundException,
+            IllegalOperationException,
             StorageException,
             AccessDeniedException;
 

@@ -6,7 +6,6 @@ import org.restlet.data.Request;
 import org.restlet.resource.ResourceException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryGroupException;
-import org.sonatype.nexus.proxy.NoSuchRepositoryRouterException;
 import org.sonatype.nexus.proxy.ResourceStore;
 import org.sonatype.nexus.proxy.router.RepositoryRouter;
 import org.sonatype.nexus.rest.AbstractResourceStoreContentPlexusResource;
@@ -59,10 +58,8 @@ public class RepositoryGroupContentPlexusResource
     protected ResourceStore getResourceStore( Request request )
         throws NoSuchRepositoryException,
             NoSuchRepositoryGroupException,
-            NoSuchRepositoryRouterException,
             ResourceException
     {
-
         return resourceStore;
     }
 

@@ -25,9 +25,8 @@ import java.util.Map;
 
 import org.sonatype.nexus.artifact.GavCalculator;
 import org.sonatype.nexus.proxy.AccessDeniedException;
+import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
-import org.sonatype.nexus.proxy.NoSuchResourceStoreException;
-import org.sonatype.nexus.proxy.RepositoryNotAvailableException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
@@ -78,16 +77,15 @@ public interface MavenRepository
 
     void storeItemWithChecksums( ResourceStoreRequest request, InputStream is, Map<String, String> userAttributes )
         throws UnsupportedStorageOperationException,
-            NoSuchResourceStoreException,
-            RepositoryNotAvailableException,
+            ItemNotFoundException,
+            IllegalOperationException,
             StorageException,
             AccessDeniedException;
 
     void deleteItemWithChecksums( ResourceStoreRequest request )
         throws UnsupportedStorageOperationException,
-            NoSuchResourceStoreException,
-            RepositoryNotAvailableException,
             ItemNotFoundException,
+            IllegalOperationException,
             StorageException,
             AccessDeniedException;
 
@@ -95,12 +93,12 @@ public interface MavenRepository
 
     void storeItemWithChecksums( AbstractStorageItem item )
         throws UnsupportedStorageOperationException,
-            RepositoryNotAvailableException,
+            IllegalOperationException,
             StorageException;
 
     void deleteItemWithChecksums( RepositoryItemUid uid, Map<String, Object> context )
         throws UnsupportedStorageOperationException,
-            RepositoryNotAvailableException,
+            IllegalOperationException,
             ItemNotFoundException,
             StorageException;
 }

@@ -41,7 +41,7 @@ public class ArtifactPlexusResource
     public Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
     {
-        return getPom( variant, request );
+        return getPom( variant, request, response );
     }
 
 }

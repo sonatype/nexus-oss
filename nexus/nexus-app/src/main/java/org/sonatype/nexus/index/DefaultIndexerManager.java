@@ -57,10 +57,10 @@ import org.sonatype.nexus.index.context.IndexContextInInconsistentStateException
 import org.sonatype.nexus.index.context.IndexingContext;
 import org.sonatype.nexus.index.packer.IndexPacker;
 import org.sonatype.nexus.index.updater.IndexUpdater;
+import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryGroupException;
-import org.sonatype.nexus.proxy.RepositoryNotAvailableException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
@@ -884,7 +884,7 @@ public class DefaultIndexerManager
 
     private boolean updateRemoteIndex( Repository repository )
         throws IOException,
-            RepositoryNotAvailableException,
+            IllegalOperationException,
             ItemNotFoundException
     {
         if ( RepositoryType.PROXY.equals( repository.getRepositoryType() ) )
@@ -1354,7 +1354,7 @@ public class DefaultIndexerManager
 
     private StorageFileItem retrieveItem( Repository repository, Map<String, Object> ctx, RepositoryItemUid uid )
         throws StorageException,
-            RepositoryNotAvailableException,
+            IllegalOperationException,
             ItemNotFoundException
     {
         return (StorageFileItem) repository.retrieveItem( false, uid, ctx );

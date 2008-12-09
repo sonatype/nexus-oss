@@ -13,6 +13,8 @@ import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.restlet.Context;
+import org.restlet.data.ChallengeRequest;
+import org.restlet.data.ChallengeScheme;
 import org.restlet.data.Form;
 import org.restlet.data.Reference;
 import org.restlet.data.Request;
@@ -23,8 +25,9 @@ import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
 import org.sonatype.nexus.artifact.VersionUtils;
 import org.sonatype.nexus.proxy.AccessDeniedException;
+import org.sonatype.nexus.proxy.IllegalOperationException;
+import org.sonatype.nexus.proxy.IllegalRequestException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
-import org.sonatype.nexus.proxy.NoSuchRepositoryRouterException;
 import org.sonatype.nexus.proxy.NoSuchResourceStoreException;
 import org.sonatype.nexus.proxy.RepositoryNotAvailableException;
 import org.sonatype.nexus.proxy.RepositoryNotListableException;
@@ -40,9 +43,10 @@ import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
 import org.sonatype.nexus.rest.StorageFileItemRepresentation;
-import org.sonatype.nexus.security.filter.NexusJSecurityFilter;
+import org.sonatype.nexus.security.filter.authc.NexusHttpAuthenticationFilter;
 
 import com.noelios.restlet.ext.servlet.ServletCall;
+import com.noelios.restlet.http.HttpRequest;
 
 public abstract class AbstractArtifactPlexusResource
     extends AbstractNexusPlexusResource
@@ -94,7 +98,7 @@ public abstract class AbstractArtifactPlexusResource
         return result;
     }
 
-    protected Model getPom( Variant variant, Request request )
+    protected Model getPom( Variant variant, Request request, Response response )
         throws ResourceException
     {
         Form form = request.getResourceRef().getQueryAsForm();
@@ -172,7 +176,7 @@ public abstract class AbstractArtifactPlexusResource
         }
         catch ( Exception e )
         {
-            handleException( request, e );
+            handleException( request, response, e );
         }
 
         return null;
@@ -265,7 +269,7 @@ public abstract class AbstractArtifactPlexusResource
         }
         catch ( Exception e )
         {
-            handleException( request, e );
+            handleException( request, response, e );
         }
 
         return null;
@@ -494,13 +498,13 @@ public abstract class AbstractArtifactPlexusResource
         }
         catch ( Exception e )
         {
-            handleException( request, e );
+            handleException( request, response, e );
         }
 
         return null;
     }
 
-    protected int handleException( Request request, Exception t )
+    protected void handleException( Request request, Response res, Exception t )
         throws ResourceException
     {
         if ( t instanceof ResourceException )
@@ -510,6 +514,26 @@ public abstract class AbstractArtifactPlexusResource
         else if ( t instanceof IllegalArgumentException )
         {
             getLogger().info( "ResourceStoreContentResource, illegal argument:" + t.getMessage() );
+
+            throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, t.getMessage() );
+        }
+        else if ( t instanceof RepositoryNotAvailableException )
+        {
+            throw new ResourceException( Status.SERVER_ERROR_SERVICE_UNAVAILABLE, t.getMessage() );
+        }
+        else if ( t instanceof RepositoryNotListableException )
+        {
+            throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, t.getMessage() );
+        }
+        else if ( t instanceof IllegalRequestException )
+        {
+            getLogger().info( "ResourceStoreContentResource, illegal request:" + t.getMessage() );
+
+            throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, t.getMessage() );
+        }
+        else if ( t instanceof IllegalOperationException )
+        {
+            getLogger().info( "ResourceStoreContentResource, illegal operation:" + t.getMessage() );
 
             throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, t.getMessage() );
         }
@@ -527,31 +551,36 @@ public abstract class AbstractArtifactPlexusResource
         {
             throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, t.getMessage() );
         }
-        else if ( t instanceof NoSuchRepositoryRouterException )
-        {
-            throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, t.getMessage() );
-        }
-        else if ( t instanceof RepositoryNotAvailableException )
-        {
-            throw new ResourceException( Status.SERVER_ERROR_SERVICE_UNAVAILABLE, t.getMessage() );
-        }
-        else if ( t instanceof RepositoryNotListableException )
-        {
-            throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, t.getMessage() );
-        }
         else if ( t instanceof ItemNotFoundException )
         {
             throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, t.getMessage() );
         }
         else if ( t instanceof AccessDeniedException )
         {
-            // WARN1: WE ARE TYING RESTLET CODE TO BE RUN WITHIN SERLVET CONTAINER!
-            // WARN2: THIS IS SOMETHING NASTY!
-            HttpServletRequest httpRequest = ServletCall.getRequest( request );
+            // TODO: a big fat problem here!
+            // this makes restlet code tied to Servlet code, and we what is happening here is VERY dirty!
+            HttpServletRequest servletRequest = ( (ServletCall) ( (HttpRequest) request ).getHttpCall() ).getRequest();
 
-            httpRequest.setAttribute( NexusJSecurityFilter.REQUEST_IS_AUTHZ_REJECTED, Boolean.TRUE );
+            String scheme = (String) servletRequest.getAttribute( NexusHttpAuthenticationFilter.AUTH_SCHEME_KEY );
 
-            throw new ResourceException( Status.CLIENT_ERROR_UNAUTHORIZED, "Authenticate to access this resource!" );
+            ChallengeScheme challengeScheme = null;
+
+            if ( NexusHttpAuthenticationFilter.FAKE_AUTH_SCHEME.equals( scheme ) )
+            {
+                challengeScheme = new ChallengeScheme( "HTTP_NXBASIC", "NxBasic", "Fake basic HTTP authentication" );
+            }
+            else
+            {
+                challengeScheme = ChallengeScheme.HTTP_BASIC;
+            }
+
+            String realm = (String) servletRequest.getAttribute( NexusHttpAuthenticationFilter.AUTH_REALM_KEY );
+
+            res.setStatus( Status.CLIENT_ERROR_UNAUTHORIZED );
+
+            res.getChallengeRequests().add( new ChallengeRequest( challengeScheme, realm ) );
+
+            // throw new ResourceException( Status.CLIENT_ERROR_UNAUTHORIZED, "Authenticate to access this resource!" );
         }
         else if ( t instanceof XmlPullParserException )
         {

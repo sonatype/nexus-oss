@@ -32,8 +32,7 @@ import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.PrefixQuery;
 import org.apache.lucene.search.TermQuery;
 import org.sonatype.nexus.index.ArtifactInfo;
-import org.sonatype.nexus.proxy.NoSuchRepositoryException;
-import org.sonatype.nexus.proxy.NoSuchRepositoryGroupException;
+import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
@@ -103,8 +102,7 @@ public class M2NamespaceBasedRepositoryRouter
     }
 
     protected List<StorageItem> renderVirtualPath( ResourceStoreRequest request, boolean list )
-        throws NoSuchRepositoryException,
-            NoSuchRepositoryGroupException,
+        throws ItemNotFoundException,
             StorageException
     {
         // prefix

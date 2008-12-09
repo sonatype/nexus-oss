@@ -24,10 +24,8 @@ import java.util.Collection;
 
 import org.codehaus.plexus.logging.Logger;
 import org.sonatype.nexus.proxy.AccessDeniedException;
+import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
-import org.sonatype.nexus.proxy.NoSuchResourceStoreException;
-import org.sonatype.nexus.proxy.RepositoryNotAvailableException;
-import org.sonatype.nexus.proxy.RepositoryNotListableException;
 import org.sonatype.nexus.proxy.ResourceStore;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
@@ -257,10 +255,8 @@ public abstract class StoreWalker
     protected final int walkRecursive( int collCount, StorageCollectionItem coll, boolean localOnly,
         boolean collectionsOnly )
         throws AccessDeniedException,
-            RepositoryNotAvailableException,
-            RepositoryNotListableException,
+            IllegalOperationException,
             ItemNotFoundException,
-            NoSuchResourceStoreException,
             StorageException
     {
         if ( !running )

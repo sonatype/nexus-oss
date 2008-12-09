@@ -32,12 +32,12 @@ public class AccessDeniedException
 {
     private static final long serialVersionUID = 8341250956517740603L;
 
-    private ResourceStoreRequest request;
+    private final ResourceStoreRequest request;
 
     public AccessDeniedException( ResourceStoreRequest request, String msg )
     {
         super( msg );
-
+        
         this.request = request;
     }
 

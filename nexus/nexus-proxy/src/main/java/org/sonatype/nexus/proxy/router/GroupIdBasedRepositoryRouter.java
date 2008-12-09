@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.codehaus.plexus.component.annotations.Requirement;
+import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryGroupException;
 import org.sonatype.nexus.proxy.NoSuchResourceStoreException;
@@ -73,50 +74,61 @@ public abstract class GroupIdBasedRepositoryRouter
     }
 
     protected List<StorageItem> renderVirtualPath( ResourceStoreRequest request, boolean list )
-        throws NoSuchResourceStoreException
+        throws ItemNotFoundException
     {
         List<StorageItem> result = new ArrayList<StorageItem>();
 
-        if ( list )
+        try
         {
-            if ( request.getRequestRepositoryGroupId() != null )
+            if ( list )
             {
-                // we have a targeted request at repos
-                Repository repository = getRepositoryRegistry().getRepository( request.getRequestRepositoryGroupId() );
-
-                DefaultStorageCollectionItem coll = new DefaultStorageCollectionItem( this, RepositoryItemUid.PATH_ROOT
-                    + repository.getId(), true, false );
-
-                coll.setRepositoryId( repository.getId() );
-
-                result.add( coll );
-            }
-            else
-            {
-                // list all reposes as "root"
-                for ( String groupId : getRepositoryRegistry().getRepositoryGroupIds() )
+                if ( request.getRequestRepositoryGroupId() != null )
                 {
+                    // we have a targeted request at repos
+                    Repository repository = getRepositoryRegistry().getRepository(
+                        request.getRequestRepositoryGroupId() );
+
                     DefaultStorageCollectionItem coll = new DefaultStorageCollectionItem(
                         this,
-                        RepositoryItemUid.PATH_ROOT + groupId,
+                        RepositoryItemUid.PATH_ROOT + repository.getId(),
                         true,
                         false );
 
+                    coll.setRepositoryId( repository.getId() );
+
                     result.add( coll );
                 }
-            }
-        }
-        else if ( !list )
-        {
-            DefaultStorageCollectionItem coll = new DefaultStorageCollectionItem(
-                this,
-                RepositoryItemUid.PATH_ROOT,
-                true,
-                false );
-            result.add( coll );
-        }
+                else
+                {
+                    // list all reposes as "root"
+                    for ( String groupId : getRepositoryRegistry().getRepositoryGroupIds() )
+                    {
+                        DefaultStorageCollectionItem coll = new DefaultStorageCollectionItem(
+                            this,
+                            RepositoryItemUid.PATH_ROOT + groupId,
+                            true,
+                            false );
 
-        return result;
+                        result.add( coll );
+                    }
+                }
+            }
+            else if ( !list )
+            {
+                DefaultStorageCollectionItem coll = new DefaultStorageCollectionItem(
+                    this,
+                    RepositoryItemUid.PATH_ROOT,
+                    true,
+                    false );
+                result.add( coll );
+            }
+
+            return result;
+        }
+        catch ( NoSuchResourceStoreException e )
+        {
+            throw new ItemNotFoundException( request.getRequestPath() );
+        }
     }
 
     /**

@@ -26,8 +26,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.sonatype.nexus.proxy.AccessDeniedException;
+import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
-import org.sonatype.nexus.proxy.RepositoryNotAvailableException;
 import org.sonatype.nexus.proxy.ResourceStore;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
@@ -385,7 +385,7 @@ public interface Repository
      * @throws AccessDeniedException the access denied exception
      */
     InputStream retrieveItemContent( RepositoryItemUid uid )
-        throws RepositoryNotAvailableException,
+        throws IllegalOperationException,
             ItemNotFoundException,
             StorageException;
 
@@ -401,19 +401,19 @@ public interface Repository
      * @throws AccessDeniedException the access denied exception
      */
     StorageItem retrieveItem( boolean localOnly, RepositoryItemUid uid, Map<String, Object> context )
-        throws RepositoryNotAvailableException,
+        throws IllegalOperationException,
             ItemNotFoundException,
             StorageException;
 
     void copyItem( RepositoryItemUid from, RepositoryItemUid to, Map<String, Object> context )
         throws UnsupportedStorageOperationException,
-            RepositoryNotAvailableException,
+            IllegalOperationException,
             ItemNotFoundException,
             StorageException;
 
     void moveItem( RepositoryItemUid from, RepositoryItemUid to, Map<String, Object> context )
         throws UnsupportedStorageOperationException,
-            RepositoryNotAvailableException,
+            IllegalOperationException,
             ItemNotFoundException,
             StorageException;
 
@@ -429,7 +429,7 @@ public interface Repository
      */
     void deleteItem( RepositoryItemUid uid, Map<String, Object> context )
         throws UnsupportedStorageOperationException,
-            RepositoryNotAvailableException,
+            IllegalOperationException,
             ItemNotFoundException,
             StorageException;
 
@@ -444,7 +444,7 @@ public interface Repository
      */
     void storeItem( StorageItem item )
         throws UnsupportedStorageOperationException,
-            RepositoryNotAvailableException,
+            IllegalOperationException,
             StorageException;
 
     /**
@@ -457,7 +457,7 @@ public interface Repository
      * @throws StorageException the storage exception
      */
     Collection<StorageItem> list( RepositoryItemUid uid, Map<String, Object> context )
-        throws RepositoryNotAvailableException,
+        throws IllegalOperationException,
             ItemNotFoundException,
             StorageException;
 
@@ -471,7 +471,7 @@ public interface Repository
      * @throws StorageException the storage exception
      */
     Collection<StorageItem> list( StorageCollectionItem item )
-        throws RepositoryNotAvailableException,
+        throws IllegalOperationException,
             ItemNotFoundException,
             StorageException;
 

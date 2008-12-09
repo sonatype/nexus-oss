@@ -6,10 +6,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.sonatype.nexus.proxy.AccessDeniedException;
+import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
-import org.sonatype.nexus.proxy.NoSuchResourceStoreException;
-import org.sonatype.nexus.proxy.RepositoryNotAvailableException;
-import org.sonatype.nexus.proxy.RepositoryNotListableException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.access.AccessManager;
@@ -53,7 +51,7 @@ public class DummyRepository
 
     public void copyItem( RepositoryItemUid from, RepositoryItemUid to, Map<String, Object> context )
         throws UnsupportedStorageOperationException,
-            RepositoryNotAvailableException,
+            IllegalOperationException,
             ItemNotFoundException,
             StorageException
     {
@@ -69,7 +67,7 @@ public class DummyRepository
 
     public void deleteItem( RepositoryItemUid uid, Map<String, Object> context )
         throws UnsupportedStorageOperationException,
-            RepositoryNotAvailableException,
+            IllegalOperationException,
             ItemNotFoundException,
             StorageException
     {
@@ -173,7 +171,19 @@ public class DummyRepository
         return null;
     }
 
+    public RepositoryTaskFilter getRepositoryTaskFilter()
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
     public RepositoryType getRepositoryType()
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public List<RequestProcessor> getRequestProcessors()
     {
         // TODO Auto-generated method stub
         return null;
@@ -203,20 +213,26 @@ public class DummyRepository
         return false;
     }
 
+    public boolean isCompatible( Repository repository )
+    {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
     public boolean isIndexable()
     {
         // TODO Auto-generated method stub
         return false;
     }
 
-    public boolean isUserManaged()
+    public boolean isNotFoundCacheActive()
     {
         // TODO Auto-generated method stub
         return false;
     }
 
     public Collection<StorageItem> list( RepositoryItemUid uid, Map<String, Object> context )
-        throws RepositoryNotAvailableException,
+        throws IllegalOperationException,
             ItemNotFoundException,
             StorageException
     {
@@ -225,7 +241,7 @@ public class DummyRepository
     }
 
     public Collection<StorageItem> list( StorageCollectionItem item )
-        throws RepositoryNotAvailableException,
+        throws IllegalOperationException,
             ItemNotFoundException,
             StorageException
     {
@@ -235,7 +251,7 @@ public class DummyRepository
 
     public void moveItem( RepositoryItemUid from, RepositoryItemUid to, Map<String, Object> context )
         throws UnsupportedStorageOperationException,
-            RepositoryNotAvailableException,
+            IllegalOperationException,
             ItemNotFoundException,
             StorageException
     {
@@ -249,12 +265,6 @@ public class DummyRepository
         return false;
     }
 
-    public boolean recreateMavenMetadata( String fromPath )
-    {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
     public void removeFromNotFoundCache( String path )
     {
         // TODO Auto-generated method stub
@@ -262,7 +272,7 @@ public class DummyRepository
     }
 
     public StorageItem retrieveItem( boolean localOnly, RepositoryItemUid uid, Map<String, Object> context )
-        throws RepositoryNotAvailableException,
+        throws IllegalOperationException,
             ItemNotFoundException,
             StorageException
     {
@@ -271,7 +281,7 @@ public class DummyRepository
     }
 
     public InputStream retrieveItemContent( RepositoryItemUid uid )
-        throws RepositoryNotAvailableException,
+        throws IllegalOperationException,
             ItemNotFoundException,
             StorageException
     {
@@ -345,6 +355,12 @@ public class DummyRepository
 
     }
 
+    public void setNotFoundCacheActive( boolean notFoundCacheActive )
+    {
+        // TODO Auto-generated method stub
+
+    }
+
     public void setNotFoundCacheTimeToLive( int notFoundCacheTimeToLive )
     {
         // TODO Auto-generated method stub
@@ -381,15 +397,9 @@ public class DummyRepository
 
     }
 
-    public void setUserManaged( boolean val )
-    {
-        // TODO Auto-generated method stub
-
-    }
-
     public void storeItem( StorageItem item )
         throws UnsupportedStorageOperationException,
-            RepositoryNotAvailableException,
+            IllegalOperationException,
             StorageException
     {
         // TODO Auto-generated method stub
@@ -416,9 +426,8 @@ public class DummyRepository
 
     public void copyItem( ResourceStoreRequest from, ResourceStoreRequest to )
         throws UnsupportedStorageOperationException,
-            NoSuchResourceStoreException,
-            RepositoryNotAvailableException,
             ItemNotFoundException,
+            IllegalOperationException,
             StorageException,
             AccessDeniedException
     {
@@ -428,8 +437,7 @@ public class DummyRepository
 
     public void createCollection( ResourceStoreRequest request, Map<String, String> userAttributes )
         throws UnsupportedStorageOperationException,
-            NoSuchResourceStoreException,
-            RepositoryNotAvailableException,
+            IllegalOperationException,
             StorageException,
             AccessDeniedException
     {
@@ -439,9 +447,8 @@ public class DummyRepository
 
     public void deleteItem( ResourceStoreRequest request )
         throws UnsupportedStorageOperationException,
-            NoSuchResourceStoreException,
-            RepositoryNotAvailableException,
             ItemNotFoundException,
+            IllegalOperationException,
             StorageException,
             AccessDeniedException
     {
@@ -461,11 +468,21 @@ public class DummyRepository
         return null;
     }
 
+    public boolean isExposed()
+    {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    public boolean isUserManaged()
+    {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
     public Collection<StorageItem> list( ResourceStoreRequest request )
-        throws NoSuchResourceStoreException,
-            RepositoryNotAvailableException,
-            RepositoryNotListableException,
-            ItemNotFoundException,
+        throws ItemNotFoundException,
+            IllegalOperationException,
             StorageException,
             AccessDeniedException
     {
@@ -475,9 +492,8 @@ public class DummyRepository
 
     public void moveItem( ResourceStoreRequest from, ResourceStoreRequest to )
         throws UnsupportedStorageOperationException,
-            NoSuchResourceStoreException,
-            RepositoryNotAvailableException,
             ItemNotFoundException,
+            IllegalOperationException,
             StorageException,
             AccessDeniedException
     {
@@ -486,9 +502,8 @@ public class DummyRepository
     }
 
     public StorageItem retrieveItem( ResourceStoreRequest request )
-        throws NoSuchResourceStoreException,
-            RepositoryNotAvailableException,
-            ItemNotFoundException,
+        throws ItemNotFoundException,
+            IllegalOperationException,
             StorageException,
             AccessDeniedException
     {
@@ -496,10 +511,21 @@ public class DummyRepository
         return null;
     }
 
+    public void setExposed( boolean val )
+    {
+        // TODO Auto-generated method stub
+
+    }
+
+    public void setUserManaged( boolean val )
+    {
+        // TODO Auto-generated method stub
+
+    }
+
     public void storeItem( ResourceStoreRequest request, InputStream is, Map<String, String> userAttributes )
         throws UnsupportedStorageOperationException,
-            NoSuchResourceStoreException,
-            RepositoryNotAvailableException,
+            IllegalOperationException,
             StorageException,
             AccessDeniedException
     {
@@ -511,48 +537,6 @@ public class DummyRepository
     {
         // TODO Auto-generated method stub
 
-    }
-
-    public boolean isExposed()
-    {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    public void setExposed( boolean val )
-    {
-        // TODO Auto-generated method stub
-
-    }
-
-    public List<RequestProcessor> getRequestProcessors()
-    {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    public RepositoryTaskFilter getRepositoryTaskFilter()
-    {
-        // TODO Auto-generated method stub
-        return null;
-    }
-    
-    public boolean isCompatible( Repository repository )
-    {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    public boolean isNotFoundCacheActive()
-    {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    public void setNotFoundCacheActive( boolean notFoundCacheActive )
-    {
-        // TODO Auto-generated method stub
-        
     }
 
 }

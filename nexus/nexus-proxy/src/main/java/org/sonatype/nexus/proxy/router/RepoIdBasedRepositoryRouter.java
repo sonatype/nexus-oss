@@ -23,6 +23,7 @@ package org.sonatype.nexus.proxy.router;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryGroupException;
 import org.sonatype.nexus.proxy.NoSuchResourceStoreException;
@@ -48,48 +49,20 @@ public abstract class RepoIdBasedRepositoryRouter
      * We are rendering registered reposes.
      */
     protected List<StorageItem> renderVirtualPath( ResourceStoreRequest request, boolean list )
-        throws NoSuchResourceStoreException
+        throws ItemNotFoundException
     {
         List<StorageItem> result = new ArrayList<StorageItem>();
 
-        if ( list )
+        try
         {
-            // we are doing "dir"
-            if ( request.getRequestRepositoryId() != null )
+            if ( list )
             {
-                // we have a targeted request at repos
-                Repository repository = getRepositoryRegistry().getRepository( request.getRequestRepositoryId() );
-
-                if ( repository.isExposed() )
+                // we are doing "dir"
+                if ( request.getRequestRepositoryId() != null )
                 {
-                    if ( repository.getLocalStatus().shouldServiceRequest() )
-                    {
-                        if ( getLogger().isDebugEnabled() )
-                        {
-                            getLogger().debug(
-                                "Adding repository " + repository.getId() + " to virtual path "
-                                    + request.getRequestPath() );
-                        }
+                    // we have a targeted request at repos
+                    Repository repository = getRepositoryRegistry().getRepository( request.getRequestRepositoryId() );
 
-                        DefaultStorageCollectionItem coll = new DefaultStorageCollectionItem(
-                            this,
-                            RepositoryItemUid.PATH_ROOT + repository.getId(),
-                            true,
-                            false );
-
-                        coll.setRepositoryId( repository.getId() );
-
-                        result.add( coll );
-                    }
-                }
-            }
-            else if ( request.getRequestRepositoryGroupId() != null )
-            {
-                // we have a targeted request at group
-                // list all group member reposes as "root"
-                for ( Repository repository : getRepositoryRegistry().getRepositoryGroup(
-                    request.getRequestRepositoryGroupId() ) )
-                {
                     if ( repository.isExposed() )
                     {
                         if ( repository.getLocalStatus().shouldServiceRequest() )
@@ -100,6 +73,7 @@ public abstract class RepoIdBasedRepositoryRouter
                                     "Adding repository " + repository.getId() + " to virtual path "
                                         + request.getRequestPath() );
                             }
+
                             DefaultStorageCollectionItem coll = new DefaultStorageCollectionItem(
                                 this,
                                 RepositoryItemUid.PATH_ROOT + repository.getId(),
@@ -112,52 +86,86 @@ public abstract class RepoIdBasedRepositoryRouter
                         }
                     }
                 }
-            }
-            else
-            {
-                // list all reposes as "root"
-                for ( Repository repository : getRepositoryRegistry().getRepositories() )
+                else if ( request.getRequestRepositoryGroupId() != null )
                 {
-                    if ( repository.isExposed() )
+                    // we have a targeted request at group
+                    // list all group member reposes as "root"
+                    for ( Repository repository : getRepositoryRegistry().getRepositoryGroup(
+                        request.getRequestRepositoryGroupId() ) )
                     {
-                        if ( repository.getLocalStatus().shouldServiceRequest() )
+                        if ( repository.isExposed() )
                         {
-                            if ( getLogger().isDebugEnabled() )
+                            if ( repository.getLocalStatus().shouldServiceRequest() )
                             {
-                                getLogger().debug(
-                                    "Adding repository " + repository.getId() + " to virtual path "
-                                        + request.getRequestPath() );
+                                if ( getLogger().isDebugEnabled() )
+                                {
+                                    getLogger().debug(
+                                        "Adding repository " + repository.getId() + " to virtual path "
+                                            + request.getRequestPath() );
+                                }
+                                DefaultStorageCollectionItem coll = new DefaultStorageCollectionItem(
+                                    this,
+                                    RepositoryItemUid.PATH_ROOT + repository.getId(),
+                                    true,
+                                    false );
+
+                                coll.setRepositoryId( repository.getId() );
+
+                                result.add( coll );
                             }
-                            DefaultStorageCollectionItem coll = new DefaultStorageCollectionItem(
-                                this,
-                                RepositoryItemUid.PATH_ROOT + repository.getId(),
-                                true,
-                                false );
+                        }
+                    }
+                }
+                else
+                {
+                    // list all reposes as "root"
+                    for ( Repository repository : getRepositoryRegistry().getRepositories() )
+                    {
+                        if ( repository.isExposed() )
+                        {
+                            if ( repository.getLocalStatus().shouldServiceRequest() )
+                            {
+                                if ( getLogger().isDebugEnabled() )
+                                {
+                                    getLogger().debug(
+                                        "Adding repository " + repository.getId() + " to virtual path "
+                                            + request.getRequestPath() );
+                                }
+                                DefaultStorageCollectionItem coll = new DefaultStorageCollectionItem(
+                                    this,
+                                    RepositoryItemUid.PATH_ROOT + repository.getId(),
+                                    true,
+                                    false );
 
-                            coll.setRepositoryId( repository.getId() );
+                                coll.setRepositoryId( repository.getId() );
 
-                            result.add( coll );
+                                result.add( coll );
+                            }
                         }
                     }
                 }
             }
-        }
-        else if ( !list )
-        {
-            if ( getLogger().isDebugEnabled() )
+            else if ( !list )
             {
-                getLogger().debug( "Adding ROOT to virtual path " + request.getRequestPath() );
+                if ( getLogger().isDebugEnabled() )
+                {
+                    getLogger().debug( "Adding ROOT to virtual path " + request.getRequestPath() );
+                }
+                DefaultStorageCollectionItem coll = new DefaultStorageCollectionItem(
+                    this,
+                    RepositoryItemUid.PATH_ROOT,
+                    true,
+                    false );
+
+                result.add( coll );
             }
-            DefaultStorageCollectionItem coll = new DefaultStorageCollectionItem(
-                this,
-                RepositoryItemUid.PATH_ROOT,
-                true,
-                false );
 
-            result.add( coll );
+            return result;
         }
-
-        return result;
+        catch ( NoSuchResourceStoreException e )
+        {
+            throw new ItemNotFoundException( request.getRequestPath() );
+        }
     }
 
     /**

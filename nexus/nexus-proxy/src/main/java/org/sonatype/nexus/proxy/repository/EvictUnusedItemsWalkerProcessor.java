@@ -3,6 +3,7 @@ package org.sonatype.nexus.proxy.repository;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.RepositoryNotAvailableException;
 import org.sonatype.nexus.proxy.StorageException;
@@ -55,7 +56,7 @@ public class EvictUnusedItemsWalkerProcessor
                 getFiles().add( item.getPath() );
             }
         }
-        catch ( RepositoryNotAvailableException e )
+        catch ( IllegalOperationException e )
         {
             // simply stop if set during processing
             ctx.stop( e );
@@ -74,7 +75,7 @@ public class EvictUnusedItemsWalkerProcessor
     protected void doDelete( WalkerContext ctx, StorageFileItem item )
         throws StorageException,
             UnsupportedStorageOperationException,
-            RepositoryNotAvailableException,
+            IllegalOperationException,
             ItemNotFoundException
     {
         getRepository( ctx ).deleteItem( item.getRepositoryItemUid(), item.getItemContext() );

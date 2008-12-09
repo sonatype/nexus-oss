@@ -24,9 +24,9 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.sonatype.nexus.proxy.AccessDeniedException;
+import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.NoSuchResourceStoreException;
-import org.sonatype.nexus.proxy.RepositoryNotAvailableException;
 import org.sonatype.nexus.proxy.ResourceStore;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.events.EventListener;
@@ -68,7 +68,7 @@ public interface RepositoryRouter
         throws NoSuchResourceStoreException,
             AccessDeniedException,
             ItemNotFoundException,
-            RepositoryNotAvailableException,
+            IllegalOperationException,
             StorageException;
 
     /**

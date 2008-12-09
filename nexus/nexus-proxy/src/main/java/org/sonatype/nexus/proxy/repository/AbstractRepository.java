@@ -36,8 +36,9 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.EventMulticasterComponent;
+import org.sonatype.nexus.proxy.IllegalOperationException;
+import org.sonatype.nexus.proxy.IllegalRequestException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
-import org.sonatype.nexus.proxy.NoSuchResourceStoreException;
 import org.sonatype.nexus.proxy.RepositoryNotAvailableException;
 import org.sonatype.nexus.proxy.RepositoryNotListableException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
@@ -525,7 +526,7 @@ public abstract class AbstractRepository
             // getting it lazily
             notFoundCache = getCacheManager().getPathCache( getId() );
         }
-        
+
         return notFoundCache;
     }
 
@@ -785,7 +786,7 @@ public abstract class AbstractRepository
     // ===================================================================================
     // Store iface
     public StorageItem retrieveItem( ResourceStoreRequest request )
-        throws RepositoryNotAvailableException,
+        throws IllegalOperationException,
             ItemNotFoundException,
             StorageException,
             AccessDeniedException
@@ -813,19 +814,18 @@ public abstract class AbstractRepository
 
     public void copyItem( ResourceStoreRequest from, ResourceStoreRequest to )
         throws UnsupportedStorageOperationException,
-            NoSuchResourceStoreException,
-            RepositoryNotAvailableException,
+            IllegalOperationException,
             ItemNotFoundException,
             StorageException,
             AccessDeniedException
     {
         if ( !checkConditions( from, Action.read ) )
         {
-            throw new AccessDeniedException( from, "Operation does not fills needed requirements!" );
+            throw new IllegalRequestException( from, "copyItem: Operation does not fills needed requirements!" );
         }
         if ( !checkConditions( to, getResultingActionOnWrite( to ) ) )
         {
-            throw new AccessDeniedException( to, "Operation does not fills needed requirements!" );
+            throw new IllegalRequestException( to, "copyItem: Operation does not fills needed requirements!" );
         }
 
         RepositoryItemUid fromUid = createUid( from.getRequestPath() );
@@ -837,8 +837,7 @@ public abstract class AbstractRepository
 
     public void moveItem( ResourceStoreRequest from, ResourceStoreRequest to )
         throws UnsupportedStorageOperationException,
-            NoSuchResourceStoreException,
-            RepositoryNotAvailableException,
+            IllegalOperationException,
             ItemNotFoundException,
             StorageException,
             AccessDeniedException
@@ -864,10 +863,8 @@ public abstract class AbstractRepository
     }
 
     public void deleteItem( ResourceStoreRequest request )
-        throws IllegalArgumentException,
-            UnsupportedStorageOperationException,
-            NoSuchResourceStoreException,
-            RepositoryNotAvailableException,
+        throws UnsupportedStorageOperationException,
+            IllegalOperationException,
             ItemNotFoundException,
             StorageException,
             AccessDeniedException
@@ -884,8 +881,7 @@ public abstract class AbstractRepository
 
     public void storeItem( ResourceStoreRequest request, InputStream is, Map<String, String> userAttributes )
         throws UnsupportedStorageOperationException,
-            NoSuchResourceStoreException,
-            RepositoryNotAvailableException,
+            IllegalOperationException,
             StorageException,
             AccessDeniedException
     {
@@ -908,8 +904,7 @@ public abstract class AbstractRepository
 
     public void createCollection( ResourceStoreRequest request, Map<String, String> userAttributes )
         throws UnsupportedStorageOperationException,
-            NoSuchResourceStoreException,
-            RepositoryNotAvailableException,
+            IllegalOperationException,
             StorageException,
             AccessDeniedException
     {
@@ -935,9 +930,7 @@ public abstract class AbstractRepository
     }
 
     public Collection<StorageItem> list( ResourceStoreRequest request )
-        throws NoSuchResourceStoreException,
-            RepositoryNotAvailableException,
-            RepositoryNotListableException,
+        throws IllegalOperationException,
             ItemNotFoundException,
             StorageException,
             AccessDeniedException
@@ -957,7 +950,7 @@ public abstract class AbstractRepository
         }
         else
         {
-            throw new RepositoryNotListableException( this.getId() );
+            throw new RepositoryNotListableException( this );
         }
 
         return items;
@@ -990,7 +983,7 @@ public abstract class AbstractRepository
 
             return null;
         }
-        catch ( RepositoryNotAvailableException e )
+        catch ( IllegalOperationException e )
         {
             getLogger().warn( "Got exception while checking for resulting actionOnWrite", e );
 
@@ -1001,7 +994,7 @@ public abstract class AbstractRepository
     // ===================================================================================
     // Repositry store-like
     public InputStream retrieveItemContent( RepositoryItemUid uid )
-        throws RepositoryNotAvailableException,
+        throws IllegalOperationException,
             ItemNotFoundException,
             StorageException
     {
@@ -1012,7 +1005,7 @@ public abstract class AbstractRepository
 
         if ( !getLocalStatus().shouldServiceRequest() )
         {
-            throw new RepositoryNotAvailableException( this.getId() );
+            throw new RepositoryNotAvailableException( this );
         }
 
         getLocalStorage().touchItemLastRequested( uid );
@@ -1021,7 +1014,7 @@ public abstract class AbstractRepository
     }
 
     public StorageItem retrieveItem( boolean localOnly, RepositoryItemUid uid, Map<String, Object> context )
-        throws RepositoryNotAvailableException,
+        throws IllegalOperationException,
             ItemNotFoundException,
             StorageException
     {
@@ -1032,7 +1025,7 @@ public abstract class AbstractRepository
 
         if ( !getLocalStatus().shouldServiceRequest() )
         {
-            throw new RepositoryNotAvailableException( this.getId() );
+            throw new RepositoryNotAvailableException( this );
         }
 
         maintainNotFoundCache( uid.getPath() );
@@ -1086,7 +1079,7 @@ public abstract class AbstractRepository
 
     public void copyItem( RepositoryItemUid from, RepositoryItemUid to, Map<String, Object> context )
         throws UnsupportedStorageOperationException,
-            RepositoryNotAvailableException,
+            IllegalOperationException,
             ItemNotFoundException,
             StorageException
     {
@@ -1097,7 +1090,7 @@ public abstract class AbstractRepository
 
         if ( !getLocalStatus().shouldServiceRequest() )
         {
-            throw new RepositoryNotAvailableException( this.getId() );
+            throw new RepositoryNotAvailableException( this );
         }
 
         maintainNotFoundCache( from.getPath() );
@@ -1131,7 +1124,7 @@ public abstract class AbstractRepository
 
     public void moveItem( RepositoryItemUid from, RepositoryItemUid to, Map<String, Object> context )
         throws UnsupportedStorageOperationException,
-            RepositoryNotAvailableException,
+            IllegalOperationException,
             ItemNotFoundException,
             StorageException
     {
@@ -1142,7 +1135,7 @@ public abstract class AbstractRepository
 
         if ( !getLocalStatus().shouldServiceRequest() )
         {
-            throw new RepositoryNotAvailableException( this.getId() );
+            throw new RepositoryNotAvailableException( this );
         }
 
         copyItem( from, to, context );
@@ -1152,7 +1145,7 @@ public abstract class AbstractRepository
 
     public void deleteItem( RepositoryItemUid uid, Map<String, Object> context )
         throws UnsupportedStorageOperationException,
-            RepositoryNotAvailableException,
+            IllegalOperationException,
             ItemNotFoundException,
             StorageException
     {
@@ -1163,7 +1156,7 @@ public abstract class AbstractRepository
 
         if ( !getLocalStatus().shouldServiceRequest() )
         {
-            throw new RepositoryNotAvailableException( this.getId() );
+            throw new RepositoryNotAvailableException( this );
         }
 
         maintainNotFoundCache( uid.getPath() );
@@ -1193,7 +1186,7 @@ public abstract class AbstractRepository
 
     public void storeItem( StorageItem item )
         throws UnsupportedStorageOperationException,
-            RepositoryNotAvailableException,
+            IllegalOperationException,
             StorageException
     {
         if ( getLogger().isDebugEnabled() )
@@ -1203,7 +1196,7 @@ public abstract class AbstractRepository
 
         if ( !getLocalStatus().shouldServiceRequest() )
         {
-            throw new RepositoryNotAvailableException( this.getId() );
+            throw new RepositoryNotAvailableException( this );
         }
 
         // replace UID to own one
@@ -1219,7 +1212,7 @@ public abstract class AbstractRepository
     }
 
     public Collection<StorageItem> list( RepositoryItemUid uid, Map<String, Object> context )
-        throws RepositoryNotAvailableException,
+        throws IllegalOperationException,
             ItemNotFoundException,
             StorageException
     {
@@ -1230,7 +1223,7 @@ public abstract class AbstractRepository
 
         if ( !getLocalStatus().shouldServiceRequest() )
         {
-            throw new RepositoryNotAvailableException( this.getId() );
+            throw new RepositoryNotAvailableException( this );
         }
 
         maintainNotFoundCache( uid.getPath() );
@@ -1246,7 +1239,7 @@ public abstract class AbstractRepository
     }
 
     public Collection<StorageItem> list( StorageCollectionItem item )
-        throws RepositoryNotAvailableException,
+        throws IllegalOperationException,
             ItemNotFoundException,
             StorageException
     {
@@ -1351,24 +1344,26 @@ public abstract class AbstractRepository
      * @throws AccessDeniedException the access denied exception
      */
     protected boolean checkConditions( ResourceStoreRequest request, Action action )
-        throws RepositoryNotAvailableException,
+        throws IllegalOperationException,
             AccessDeniedException
     {
         return checkConditions( this, request, action );
     }
 
     protected boolean checkConditions( Repository repository, ResourceStoreRequest request, Action action )
-        throws RepositoryNotAvailableException,
+        throws IllegalOperationException,
             AccessDeniedException
     {
         if ( !repository.getLocalStatus().shouldServiceRequest() )
         {
-            throw new RepositoryNotAvailableException( repository.getId() );
+            throw new IllegalRequestException( request, "Repository with ID='" + repository.getId()
+                + "' is not available (localStatus=" + repository.getLocalStatus().toString() + ")!" );
         }
 
         if ( !repository.isAllowWrite() && ( action.isWritingAction() ) )
         {
-            throw new AccessDeniedException( request, "Repository with ID='" + repository.getId() + "' is Read Only!!" );
+            throw new IllegalRequestException( request, "Repository with ID='" + repository.getId()
+                + "' is Read Only, but action was '" + action.toString() + "'!" );
         }
 
         if ( isExposed() )
@@ -1443,7 +1438,7 @@ public abstract class AbstractRepository
      * @throws AccessDeniedException the access denied exception
      */
     protected abstract StorageItem doRetrieveItem( boolean localOnly, RepositoryItemUid uid, Map<String, Object> context )
-        throws RepositoryNotAvailableException,
+        throws IllegalOperationException,
             ItemNotFoundException,
             StorageException;
 
@@ -1459,7 +1454,7 @@ public abstract class AbstractRepository
      */
     protected abstract void doDeleteItem( RepositoryItemUid uid )
         throws UnsupportedStorageOperationException,
-            RepositoryNotAvailableException,
+            IllegalOperationException,
             ItemNotFoundException,
             StorageException;
 
@@ -1475,7 +1470,7 @@ public abstract class AbstractRepository
      */
     protected abstract Collection<StorageItem> doListItems( boolean localOnly, RepositoryItemUid uid,
         Map<String, Object> context )
-        throws RepositoryNotAvailableException,
+        throws IllegalOperationException,
             ItemNotFoundException,
             StorageException;
 }

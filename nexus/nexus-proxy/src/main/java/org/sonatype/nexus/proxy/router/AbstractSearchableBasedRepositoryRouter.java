@@ -27,10 +27,10 @@ import java.util.Map;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.nexus.index.NexusIndexer;
 import org.sonatype.nexus.proxy.AccessDeniedException;
+import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryGroupException;
-import org.sonatype.nexus.proxy.NoSuchResourceStoreException;
 import org.sonatype.nexus.proxy.RepositoryNotAvailableException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
@@ -104,8 +104,7 @@ public abstract class AbstractSearchableBasedRepositoryRouter
     // AbstractPathBasedRepositoryRouter
 
     protected StorageItem doRetrieveItem( ResourceStoreRequest req )
-        throws NoSuchResourceStoreException,
-            RepositoryNotAvailableException,
+        throws RepositoryNotAvailableException,
             ItemNotFoundException,
             StorageException,
             AccessDeniedException
@@ -114,8 +113,7 @@ public abstract class AbstractSearchableBasedRepositoryRouter
     }
 
     protected List<StorageItem> doListItems( ResourceStoreRequest req )
-        throws NoSuchResourceStoreException,
-            RepositoryNotAvailableException,
+        throws IllegalOperationException,
             ItemNotFoundException,
             StorageException,
             AccessDeniedException
@@ -127,8 +125,7 @@ public abstract class AbstractSearchableBasedRepositoryRouter
     // Unsupported ops
 
     protected void doCopyItem( ResourceStoreRequest f, ResourceStoreRequest t )
-        throws NoSuchResourceStoreException,
-            RepositoryNotAvailableException,
+        throws IllegalOperationException,
             ItemNotFoundException,
             StorageException,
             AccessDeniedException
@@ -137,8 +134,7 @@ public abstract class AbstractSearchableBasedRepositoryRouter
     }
 
     protected void doMoveItem( ResourceStoreRequest f, ResourceStoreRequest t )
-        throws NoSuchResourceStoreException,
-            RepositoryNotAvailableException,
+        throws IllegalOperationException,
             ItemNotFoundException,
             StorageException,
             AccessDeniedException
@@ -147,8 +143,7 @@ public abstract class AbstractSearchableBasedRepositoryRouter
     }
 
     protected void doStoreItem( ResourceStoreRequest req, InputStream is, Map<String, String> userAttributes )
-        throws NoSuchResourceStoreException,
-            RepositoryNotAvailableException,
+        throws IllegalOperationException,
             StorageException,
             AccessDeniedException
     {
@@ -156,8 +151,7 @@ public abstract class AbstractSearchableBasedRepositoryRouter
     }
 
     protected void doDeleteItem( ResourceStoreRequest request )
-        throws NoSuchResourceStoreException,
-            RepositoryNotAvailableException,
+        throws IllegalOperationException,
             ItemNotFoundException,
             StorageException,
             AccessDeniedException
@@ -184,8 +178,7 @@ public abstract class AbstractSearchableBasedRepositoryRouter
      * @throws NoSuchRepositoryGroupException the no such repository group exception
      */
     protected abstract List<StorageItem> renderVirtualPath( ResourceStoreRequest request, boolean list )
-        throws NoSuchRepositoryException,
-            NoSuchRepositoryGroupException,
+        throws ItemNotFoundException,
             StorageException;
 
 }

@@ -43,11 +43,11 @@ import org.sonatype.nexus.index.FlatSearchResponse;
 import org.sonatype.nexus.maven.tasks.SnapshotRemovalRequest;
 import org.sonatype.nexus.maven.tasks.SnapshotRemovalResult;
 import org.sonatype.nexus.proxy.AccessDeniedException;
+import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryGroupException;
 import org.sonatype.nexus.proxy.NoSuchResourceStoreException;
-import org.sonatype.nexus.proxy.RepositoryNotAvailableException;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.item.StorageLinkItem;
@@ -91,7 +91,7 @@ public interface Nexus
         throws NoSuchResourceStoreException,
             ItemNotFoundException,
             AccessDeniedException,
-            RepositoryNotAvailableException,
+            IllegalOperationException,
             StorageException;
 
     RepositoryRouter getRootRouter();

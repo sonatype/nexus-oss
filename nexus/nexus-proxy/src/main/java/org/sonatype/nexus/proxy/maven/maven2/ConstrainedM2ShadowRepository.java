@@ -43,9 +43,8 @@ import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.artifact.GavCalculator;
 import org.sonatype.nexus.artifact.M2ArtifactRecognizer;
 import org.sonatype.nexus.proxy.AccessDeniedException;
+import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
-import org.sonatype.nexus.proxy.NoSuchResourceStoreException;
-import org.sonatype.nexus.proxy.RepositoryNotAvailableException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.attributes.inspectors.DigestCalculatingInspector;
@@ -200,8 +199,7 @@ public class ConstrainedM2ShadowRepository
 
     public void storeItemWithChecksums( ResourceStoreRequest request, InputStream is, Map<String, String> userAttributes )
         throws UnsupportedStorageOperationException,
-            NoSuchResourceStoreException,
-            RepositoryNotAvailableException,
+            IllegalOperationException,
             StorageException,
             AccessDeniedException
     {
@@ -257,8 +255,7 @@ public class ConstrainedM2ShadowRepository
 
     public void deleteItemWithChecksums( ResourceStoreRequest request )
         throws UnsupportedStorageOperationException,
-            NoSuchResourceStoreException,
-            RepositoryNotAvailableException,
+            IllegalOperationException,
             ItemNotFoundException,
             StorageException,
             AccessDeniedException
@@ -320,7 +317,7 @@ public class ConstrainedM2ShadowRepository
 
     public void storeItemWithChecksums( AbstractStorageItem item )
         throws UnsupportedStorageOperationException,
-            RepositoryNotAvailableException,
+            IllegalOperationException,
             StorageException
     {
         if ( getLogger().isDebugEnabled() )
@@ -374,7 +371,7 @@ public class ConstrainedM2ShadowRepository
 
     public void deleteItemWithChecksums( RepositoryItemUid uid, Map<String, Object> context )
         throws UnsupportedStorageOperationException,
-            RepositoryNotAvailableException,
+            IllegalOperationException,
             ItemNotFoundException,
             StorageException
     {
@@ -412,7 +409,7 @@ public class ConstrainedM2ShadowRepository
     // ShadowRepository customizations
 
     protected StorageItem doRetrieveItem( boolean localOnly, RepositoryItemUid uid, Map<String, Object> context )
-        throws RepositoryNotAvailableException,
+        throws IllegalOperationException,
             ItemNotFoundException,
             StorageException
     {

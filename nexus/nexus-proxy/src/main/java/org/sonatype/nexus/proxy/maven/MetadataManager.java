@@ -3,6 +3,7 @@ package org.sonatype.nexus.proxy.maven;
 import java.io.IOException;
 
 import org.sonatype.nexus.artifact.Gav;
+import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.RepositoryNotAvailableException;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 
@@ -16,7 +17,7 @@ public interface MetadataManager
      * @param req
      */
     void deployArtifact( ArtifactStoreRequest req, MavenRepository repository )
-        throws RepositoryNotAvailableException,
+        throws IllegalOperationException,
             IOException,
             UnsupportedStorageOperationException;
 
@@ -26,7 +27,7 @@ public interface MetadataManager
      * @param req
      */
     void undeployArtifact( ArtifactStoreRequest req, MavenRepository repository )
-        throws RepositoryNotAvailableException,
+        throws IllegalOperationException,
             IOException,
             UnsupportedStorageOperationException;
 
@@ -36,7 +37,7 @@ public interface MetadataManager
      * @param req
      */
     void deployPlugin( ArtifactStoreRequest req, MavenRepository repository )
-        throws RepositoryNotAvailableException,
+        throws IllegalOperationException,
             IOException,
             UnsupportedStorageOperationException;
 
@@ -46,7 +47,7 @@ public interface MetadataManager
      * @param req
      */
     void undeployPlugin( ArtifactStoreRequest req, MavenRepository repository )
-        throws RepositoryNotAvailableException,
+        throws IllegalOperationException,
             IOException,
             UnsupportedStorageOperationException;
 
@@ -59,7 +60,7 @@ public interface MetadataManager
      * @throws IOException
      */
     Gav resolveArtifact( MavenRepository repository, ArtifactStoreRequest gavRequest )
-        throws RepositoryNotAvailableException,
+        throws IllegalOperationException,
             IOException;
 
     /**
@@ -71,6 +72,6 @@ public interface MetadataManager
      * @throws IOException
      */
     Gav resolveSnapshot( MavenRepository repository, ArtifactStoreRequest gavRequest, Gav gav )
-        throws RepositoryNotAvailableException,
+        throws IllegalOperationException,
             IOException;
 }

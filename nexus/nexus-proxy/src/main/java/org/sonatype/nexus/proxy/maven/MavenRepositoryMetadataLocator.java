@@ -17,8 +17,8 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.artifact.GavCalculator;
 import org.sonatype.nexus.artifact.VersionUtils;
+import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
-import org.sonatype.nexus.proxy.RepositoryNotAvailableException;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
@@ -255,7 +255,7 @@ public class MavenRepositoryMetadataLocator
     }
 
     protected Metadata readOrCreateMetadata( RepositoryItemUid uid, Map<String, Object> ctx )
-        throws RepositoryNotAvailableException,
+        throws IllegalOperationException,
             IOException,
             MetadataException
     {
@@ -296,7 +296,7 @@ public class MavenRepositoryMetadataLocator
     }
 
     protected void writeMetadata( RepositoryItemUid uid, Map<String, Object> ctx, Metadata md )
-        throws RepositoryNotAvailableException,
+        throws IllegalOperationException,
             UnsupportedStorageOperationException,
             MetadataException,
             IOException
@@ -320,7 +320,7 @@ public class MavenRepositoryMetadataLocator
     }
 
     protected Metadata readOrCreateGAVMetadata( MavenRepository repository, Gav gav, Map<String, Object> ctx )
-        throws RepositoryNotAvailableException,
+        throws IllegalOperationException,
             IOException,
             MetadataException
     {
@@ -343,7 +343,7 @@ public class MavenRepositoryMetadataLocator
     }
 
     protected Metadata readOrCreateGAMetadata( MavenRepository repository, Gav gav, Map<String, Object> ctx )
-        throws RepositoryNotAvailableException,
+        throws IllegalOperationException,
             IOException,
             MetadataException
     {
@@ -369,7 +369,7 @@ public class MavenRepositoryMetadataLocator
     }
 
     protected Metadata readOrCreateGMetadata( MavenRepository repository, Gav gav, Map<String, Object> ctx )
-        throws RepositoryNotAvailableException,
+        throws IllegalOperationException,
             IOException,
             MetadataException
     {
@@ -399,7 +399,7 @@ public class MavenRepositoryMetadataLocator
 
     protected void writeGAVMetadata( MavenRepository repository, Gav gav, Metadata md, Map<String, Object> ctx )
         throws UnsupportedStorageOperationException,
-            RepositoryNotAvailableException,
+            IllegalOperationException,
             MetadataException,
             IOException
     {
@@ -415,7 +415,7 @@ public class MavenRepositoryMetadataLocator
 
     protected void writeGAMetadata( MavenRepository repository, Gav gav, Metadata md, Map<String, Object> ctx )
         throws UnsupportedStorageOperationException,
-            RepositoryNotAvailableException,
+            IllegalOperationException,
             MetadataException,
             IOException
     {
@@ -434,7 +434,7 @@ public class MavenRepositoryMetadataLocator
 
     protected void writeGMetadata( MavenRepository repository, Gav gav, Metadata md, Map<String, Object> ctx )
         throws UnsupportedStorageOperationException,
-            RepositoryNotAvailableException,
+            IllegalOperationException,
             MetadataException,
             IOException
     {

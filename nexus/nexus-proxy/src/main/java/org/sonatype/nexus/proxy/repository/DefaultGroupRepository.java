@@ -8,9 +8,9 @@ import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.sonatype.nexus.proxy.AccessDeniedException;
+import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
-import org.sonatype.nexus.proxy.NoSuchResourceStoreException;
 import org.sonatype.nexus.proxy.RepositoryNotAvailableException;
 import org.sonatype.nexus.proxy.RepositoryNotListableException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
@@ -143,7 +143,7 @@ public class DefaultGroupRepository
     }
 
     public StorageItem retrieveItem( ResourceStoreRequest request )
-        throws RepositoryNotAvailableException,
+        throws IllegalOperationException,
             ItemNotFoundException,
             StorageException,
             AccessDeniedException
@@ -160,10 +160,6 @@ public class DefaultGroupRepository
                 {
                     resultItems.add( repository.retrieveItem( request ) );
                 }
-            }
-            catch ( NoSuchResourceStoreException e )
-            {
-                // nothing, keep moving
             }
             catch ( RepositoryNotAvailableException e )
             {
@@ -224,16 +220,14 @@ public class DefaultGroupRepository
     }
 
     public Collection<StorageItem> list( ResourceStoreRequest request )
-        throws NoSuchResourceStoreException,
-            RepositoryNotAvailableException,
-            RepositoryNotListableException,
+        throws IllegalOperationException,
             ItemNotFoundException,
             StorageException,
             AccessDeniedException
     {
         if ( !isBrowseable() )
         {
-            throw new RepositoryNotListableException( getId() );
+            throw new RepositoryNotListableException( this );
         }
 
         List<StorageItem> resultItems = new ArrayList<StorageItem>();
@@ -247,15 +241,7 @@ public class DefaultGroupRepository
                     resultItems.addAll( repository.list( request ) );
                 }
             }
-            catch ( NoSuchResourceStoreException e )
-            {
-                // nothing, keep moving
-            }
-            catch ( RepositoryNotListableException e )
-            {
-                // nothing, keep moving
-            }
-            catch ( RepositoryNotAvailableException e )
+            catch ( IllegalOperationException e )
             {
                 // nothing, keep moving
             }
@@ -287,8 +273,7 @@ public class DefaultGroupRepository
 
     @Override
     protected Collection<StorageItem> doListItems( boolean localOnly, RepositoryItemUid uid, Map<String, Object> context )
-        throws RepositoryNotAvailableException,
-            ItemNotFoundException,
+        throws ItemNotFoundException,
             StorageException
     {
         return getLocalStorage().listItems( uid );

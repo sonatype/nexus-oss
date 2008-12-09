@@ -29,7 +29,6 @@ import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryGroupException;
-import org.sonatype.nexus.proxy.NoSuchRepositoryRouterException;
 import org.sonatype.nexus.proxy.ResourceStore;
 import org.sonatype.plexus.rest.resource.ManagedPlexusResource;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
@@ -72,7 +71,6 @@ public class ContentPlexusResource
     protected ResourceStore getResourceStore( Request request )
         throws NoSuchRepositoryException,
             NoSuchRepositoryGroupException,
-            NoSuchRepositoryRouterException,
             ResourceException
     {
         return getNexus().getRootRouter();

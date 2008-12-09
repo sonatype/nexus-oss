@@ -1,7 +1,7 @@
 package org.sonatype.nexus.proxy.maven;
 
+import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
-import org.sonatype.nexus.proxy.RepositoryNotAvailableException;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
@@ -42,7 +42,7 @@ public class EvictUnusedMavenItemsWalkerProcessor
     public void doDelete( WalkerContext ctx, StorageFileItem item )
         throws StorageException,
             UnsupportedStorageOperationException,
-            RepositoryNotAvailableException,
+            IllegalOperationException,
             ItemNotFoundException
     {
         MavenRepository repository = (MavenRepository) getRepository( ctx );
@@ -63,11 +63,6 @@ public class EvictUnusedMavenItemsWalkerProcessor
                     .getItemContext() );
             }
         }
-        catch ( RepositoryNotAvailableException e )
-        {
-            // simply stop if set during processing
-            ctx.stop( e );
-        }
         catch ( UnsupportedStorageOperationException e )
         {
             // if op not supported (R/O repo?)
@@ -76,6 +71,11 @@ public class EvictUnusedMavenItemsWalkerProcessor
         catch ( ItemNotFoundException e )
         {
             // will not happen
+        }
+        catch ( IllegalOperationException e )
+        {
+            // simply stop if set during processing
+            ctx.stop( e );
         }
         catch ( StorageException e )
         {
