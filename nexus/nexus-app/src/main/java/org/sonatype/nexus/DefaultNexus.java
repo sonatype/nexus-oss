@@ -38,7 +38,6 @@ import java.util.concurrent.RejectedExecutionException;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.Disposable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Startable;
@@ -122,7 +121,7 @@ import org.sonatype.scheduling.schedules.Schedule;
 @Component( role = Nexus.class )
 public class DefaultNexus
     extends AbstractLogEnabled
-    implements Nexus, Initializable, Startable, Disposable
+    implements Nexus, Initializable, Startable
 {
     /**
      * The nexus configuration.
@@ -231,30 +230,6 @@ public class DefaultNexus
     private static final String TEMPLATE_DEFAULT_HOSTED_SNAPSHOT = "default_hosted_snapshot";
 
     private static final String TEMPLATE_DEFAULT_VIRTUAL = "default_virtual";
-
-    // PLX-399 hack -- START
-
-    private static int instanceCount = 0;
-
-    public DefaultNexus()
-    {
-        instanceCount++;
-
-        if ( instanceCount > 1 )
-        {
-            dispose();
-
-            throw new IllegalStateException( "Nexus is a singleton, but there is " + instanceCount
-                + " instances of it!" );
-        }
-    }
-
-    public void dispose()
-    {
-        instanceCount--;
-    }
-
-    // PLX-399 hack -- END
 
     // ----------------------------------------------------------------------------------------------------------
     // SystemStatus
@@ -1678,7 +1653,8 @@ public class DefaultNexus
 
             applicationStatusSource.getSystemStatus().setStartedAt( new Date() );
 
-            getLogger().info( "Nexus Work Directory : " + nexusConfiguration.getWorkingDirectory().toString() );
+            getLogger().info(
+                "Nexus Work Directory : " + nexusConfiguration.getWorkingDirectory().getAbsolutePath().toString() );
 
             getLogger().info( "Started Nexus (version " + applicationStatusSource.getSystemStatus().getVersion() + ")" );
 
