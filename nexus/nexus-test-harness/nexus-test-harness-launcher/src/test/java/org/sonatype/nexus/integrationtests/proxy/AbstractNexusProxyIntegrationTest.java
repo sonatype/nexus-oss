@@ -25,6 +25,8 @@ public abstract class AbstractNexusProxyIntegrationTest
 
     protected String localStorageDir = null;
 
+    protected Integer proxyPort;
+
     protected AbstractNexusProxyIntegrationTest()
     {
         this( "release-proxy-repo-1" );
@@ -36,6 +38,7 @@ public abstract class AbstractNexusProxyIntegrationTest
 
         this.baseProxyURL = TestProperties.getString( "proxy.repo.base.url" );
         this.localStorageDir = TestProperties.getString( "proxy.repo.base.dir" );
+        this.proxyPort = TestProperties.getInteger( "proxy.server.port" );
     }
 
     @Before
