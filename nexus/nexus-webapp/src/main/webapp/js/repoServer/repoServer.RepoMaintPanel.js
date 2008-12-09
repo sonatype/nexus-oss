@@ -1400,26 +1400,8 @@ Ext.extend( Sonatype.repoServer.RepositoryBrowsePanel, Ext.tree.TreePanel, {
 } );
 
 Sonatype.Events.addListener( 'repositoryViewInit', function( cardPanel, rec ) {
-  var sp = Sonatype.lib.Permissions;
-
   cardPanel.add( new Sonatype.repoServer.RepositoryBrowsePanel( { 
     payload: rec,
     tabTitle: 'Browse'
   } ) );
-
-  if ( sp.checkPermission( 'nexus:repositories', sp.READ ) &&
-      ( sp.checkPermission( 'nexus:repositories', sp.CREATE ) ||
-        sp.checkPermission( 'nexus:repositories', sp.DELETE ) ||
-        sp.checkPermission( 'nexus:repositories', sp.EDIT ) ) ) {
-    cardPanel.add( {
-      xtype: 'panel',
-      tabTitle: 'Configuration',
-      items: [
-        {
-          border: false,
-          html: '<div class="little-padding">config form goes here</div>'
-        }
-      ]
-    } );
-  }
 } );

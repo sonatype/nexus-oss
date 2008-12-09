@@ -88,6 +88,8 @@ Ext.extend( Sonatype.panels.AutoTabPanel, Ext.Panel, {
  * 
  * dataRoot: the root property of the response (defaults to 'data').
  * 
+ * dataSortInfo: the 'sortInfo' property for the data store.
+ * 
  * rowClickEvent: event name to fire when a row is clicked.
  * 
  * rowContextClickEvent: event name to fire when a row is right-clicked.
@@ -104,6 +106,7 @@ Sonatype.panels.GridViewer = function( config ) {
     dataAutoLoad: true,
     dataId: 'resourceURI',
     dataRoot: 'data',
+    dataSortInfo: { field: 'name', direction: 'asc' },
     titleColumn: 'name',
     singleSelect: true
   };
@@ -150,6 +153,7 @@ Sonatype.panels.GridViewer = function( config ) {
     fields: fields,
     url: this.url,
     autoLoad: this.dataAutoLoad,
+    sortInfo: this.dataSortInfo,
     listeners: {
       remove: {
         fn: this.recordRemoveHandler,
