@@ -557,6 +557,8 @@ public class DefaultIndexingContext
         }
         finally
         {
+            r.close();
+            
             closeReaders();
         }
 
